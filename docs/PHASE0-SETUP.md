@@ -78,7 +78,14 @@ Poring ×100, Lunatic ×40, Pupa ×20, Drops ×10, Mastering (boss) ×1
 
 ### A. ฝั่ง Server (Windows)
 
-1. เปิด `RoRebuildServer/RoRebuildServer.sln` ด้วย VS 2022 → Build Solution ให้ผ่านก่อน
+**ไม่ต้องมี Visual Studio 2022** — csproj เป็น SDK-style ธรรมดา (`Microsoft.NET.Sdk.Web` / `Microsoft.NET.Sdk`)
+ไม่มี WPF/WinForms → `dotnet` CLI + VS Code build และรันได้ครบ
+
+1. build ให้ผ่านก่อน:
+   ```bat
+   cd RoRebuildServer
+   dotnet build RoRebuildServer.sln
+   ```
 2. รัน `updateclient.bat` ที่ root ของ repo
 
 `updateclient.bat` ทำ 3 อย่าง:
@@ -117,8 +124,28 @@ Water Textures · ~~Missing Maps~~ · **Skill and Item Icons**
 
 ### C. รัน
 
-7. VS → dropdown ข้างปุ่ม Run สีเขียว → เลือก **`RoRebuildServer`** (ห้าม IIS / IIS Express)
+7. รัน server:
+   ```bat
+   dotnet dev-certs https --trust      :: ครั้งเดียวพอ
+   cd RoRebuildServer\RoRebuildServer
+   dotnet run --launch-profile RoRebuildServer
+   ```
    server ขึ้นที่ `http://localhost:5000`, SQLite `RoCharacterDatabase.db` สร้างเอง
+   client ต่อที่ `ws://127.0.0.1:5000/ws` (`NetworkManager.cs:191`)
+
+   **⛔ ห้ามใช้ `--no-launch-profile`** — `ASPNETCORE_ENVIRONMENT` จะกลายเป็น Production
+   แล้วโหลด `appsettings.Production.json` ทับ ซึ่งตั้ง `DataPath: "./ServerData/"` และ
+   `WalkPathData: "./walkdata/"` (path สำหรับเครื่อง deploy ไม่ใช่ local) + bind https ที่ port 443
+
+   **ทำไมถึงไม่ติดกับดัก IIS:** `launchSettings.json` มี 2 profile — `IIS Express`
+   (`commandName: "IISExpress"`) กับ `RoRebuildServer` (`commandName: "Project"`)
+   `dotnet run` ใช้ได้เฉพาะแบบ `Project` เท่านั้น → รันผ่าน CLI ยังไงก็ไม่โดน IIS
+   ข้อห้าม 1.3 ใน CLAUDE.md จะมีผลก็ต่อเมื่อกดปุ่ม Run ใน Visual Studio
+
+   **ทำไมต้อง `dev-certs`:** profile `RoRebuildServer` ตั้ง
+   `applicationUrl: "https://localhost:5001;http://localhost:5000"` → Kestrel ต้อง bind
+   https ได้ด้วยถึงจะ start ถ้าไม่มี dev cert จะขึ้น `Unable to configure HTTPS endpoint`
+   (ตัวเกมใช้แค่ port 5000)
 8. Unity → `Ragnarok → Open Main Scene` → กด Play → สร้างตัวละคร → เกิดที่ prt_fild08 (166, 360)
 
 ---
@@ -159,13 +186,13 @@ Water Textures · ~~Missing Maps~~ · **Skill and Item Icons**
 - [ ] Unity 6000.3.19f1 (+ WebGL module) — เวอร์ชั่นตรงกับ `ProjectSettings/ProjectVersion.txt`
 - [ ] system locale = Korean (ไม่ติ๊ก "Beta: UTF-8")
 - [ ] extract data.grf แล้วเห็น `data\sprite\인간족\몸통\남\*.spr` อ่านออก
-- [ ] Build Solution ผ่าน
+- [ ] `dotnet build RoRebuildServer.sln` ผ่าน
 - [ ] `updateclient.bat` สำเร็จ → มี `Assets/StreamingAssets/ClientConfigGenerated/maps.json`
 - [ ] Set Ragnarok Data Directory = โฟลเดอร์ที่มี `prontera.gat` อยู่ตรง ๆ
 - [ ] Select maps to import → Unselect All → 4 แมพ → Import
 - [ ] Health Check → Select Missing → **ติ๊กออก Missing Maps** → Import
 - [ ] Update Addressables (Full)
-- [ ] Server รันผ่าน profile `RoRebuildServer` ที่ localhost:5000
+- [ ] `dotnet run --launch-profile RoRebuildServer` ขึ้นที่ localhost:5000
 - [ ] Play → เดินได้ + ตี TARGET_DUMMY ที่ (179,353) ได้ + ตีปอริงแล้วดรอปของ ✅
 
 ---
