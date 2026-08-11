@@ -5,6 +5,31 @@
 
 ---
 
+## data.grf ต้องเอามาจากไหน
+
+repo นี้ไม่มี asset ของ RO เลย (README ต้นทางระบุไว้) ต้องหา `data.grf` จาก client RO ตัวจริงเอง
+**ต้องการแค่ไฟล์ `data.grf` ไฟล์เดียว** — ไม่ต้องสมัคร ไม่ต้องเล่น ไม่ต้อง login
+
+### ต้องใช้ client ยุคไหน
+
+ดูจากข้อมูลใน repo:
+
+| ตรวจจาก | ผลลัพธ์ |
+|---|---|
+| `Db/Jobs.csv` | สูงสุดคือ Ninja / Gunslinger / Taekwon / Soul Linker / Star Gladiator (id 21-25) — **ไม่มีอาชีพ 3 ไม่มี Doram ไม่มี Rebellion** |
+| `Db/Maps.csv` | 275 แมพ **ไม่มีแมพยุค renewal สักแมพ** (ra_, ve_, dic_, mora, malaya, eclage = 0) |
+
+→ ต้องการ sprite แค่ยุค **Episode 12 ลงมา** client ตัวไหนก็ได้ที่ใหม่กว่าปี 2007
+client ยุคใหม่มีของเก่าครบอยู่แล้ว (GRF เพิ่มของ ไม่ได้ลบของเก่าทิ้ง) → ใช้ตัวที่หาง่ายที่สุดได้เลย
+
+### ⛔ ตัวที่ใช้ไม่ได้
+
+- **Ragnarok V: Returns** — เกม 3D คนละเกม ไม่มีโครงสร้าง GRF แบบนี้
+- **Ragnarok M / Ragnarok Origin / RO Landverse** — เกมมือถือ คนละ engine
+- ต้องเป็น **Ragnarok Online ตัว client PC คลาสสิก 2D** เท่านั้น
+
+---
+
 ## ⚠️ 4 จุดที่ไกด์ทั่วไปเขียนผิด — อ่านก่อน
 
 ### 1. Data Directory ต้องชี้ที่โฟลเดอร์ `data` ไม่ใช่โฟลเดอร์แม่
