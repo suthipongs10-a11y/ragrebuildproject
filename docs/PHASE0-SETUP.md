@@ -19,8 +19,8 @@ if (!TestPath("prontera.gat") || !TestPath("texture/워터/water000.jpg"))
 คือหาไฟล์ `<dataDir>/prontera.gat` และ `<dataDir>/texture/워터/water000.jpg` **ตรง ๆ**
 `RagnarokMapImporterWindow.cs:46` ก็หา `.gnd` แบบเดียวกัน: `Path.Combine(dataDir, map.Code + ".gnd")`
 
-data.grf แตกออกมาจะได้โครง `D:\ROData\data\prontera.gat` → **ต้องเลือก `D:\ROData\data`**
-ถ้าเลือก `D:\ROData` หน้าต่างจะเด้งปิดเงียบ ๆ พร้อม error `Invalid client data directory: missing prontera.gat`
+data.grf แตกออกมาจะได้โครง `C:\ROData\data\prontera.gat` → **ต้องเลือก `C:\ROData\data`**
+ถ้าเลือก `C:\ROData` หน้าต่างจะเด้งปิดเงียบ ๆ พร้อม error `Invalid client data directory: missing prontera.gat`
 
 **กฎที่จำง่ายที่สุด:** โฟลเดอร์ที่เลือก ต้องมี `prontera.gat` วางอยู่ในนั้นตรง ๆ และมีโฟลเดอร์ `texture`, `sprite` อยู่ข้าง ๆ
 
@@ -90,7 +90,7 @@ Poring ×100, Lunatic ×40, Pupa ×20, Drops ×10, Mastering (boss) ×1
 
 ### B. ฝั่ง Unity
 
-3. `Ragnarok → Set Ragnarok Data Directory` → เลือก **`D:\ROData\data`** (ดูข้อ 1 ด้านบน)
+3. `Ragnarok → Set Ragnarok Data Directory` → เลือก **`C:\ROData\data`** (ดูข้อ 1 ด้านบน)
 4. `Ragnarok → Select maps to import`
    → กด **Unselect All** ก่อน (หน้าต่างเปิดมาติ๊กทุกแมพที่ยังไม่ import ให้อัตโนมัติ = 275 แมพ)
    → ติ๊กเฉพาะ 4 แมพข้างบน → **Import Selected Maps**
