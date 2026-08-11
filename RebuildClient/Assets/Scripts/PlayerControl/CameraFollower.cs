@@ -6,6 +6,7 @@ using System.Text;
 using Assets.Scripts.Effects;
 using Assets.Scripts.Effects.EffectHandlers;
 using Assets.Scripts.Effects.EffectHandlers.General;
+using Assets.Scripts.Effects.EffectHandlers.Skills.Crusader;
 using Assets.Scripts.Effects.EffectHandlers.StatusEffects;
 using Assets.Scripts.MapEditor;
 using Assets.Scripts.Network;
