@@ -122,6 +122,25 @@ Poring ×100, Lunatic ×40, Pupa ×20, Drops ×10, Mastering (boss) ×1
 
 ### B. ฝั่ง Unity
 
+**⛔ ต้องเป็น 6000.3.19f1 เป๊ะ — ห้ามกดตัวที่ Hub เชียร์ในหน้าแรก**
+
+`Packages/manifest.json` pin ไว้ว่า:
+
+```json
+"com.unity.render-pipelines.universal": "17.3.0",
+"com.unity.shadergraph": "17.3.0",
+```
+
+URP 17.3 ผูกกับ editor สาย 6000.3 ถ้าเปิดด้วย 6.5 (6000.5.x) Unity จะบังคับอัป URP
+เป็นเวอร์ชั่นของตัวเอง → shader ทั้งโปรเจกต์โดน migrate (โปรเจกต์นี้มี custom shader เยอะ)
+README เขียน "6000.3.19f1 or higher" ก็จริง แต่เฟส 0 เอา "รันได้" ไว้ก่อน
+
+**วิธีลง:** Unity Hub → Installs → Install Editor → แท็บ **Archive** → เปิด download archive
+→ หา `6000.3.19f1` → Install with Unity Hub
+
+**ติ๊กออกให้หมดเพื่อประหยัดที่:** Visual Studio (ใช้ VS Code แทน), WebGL (เฟส 2 ค่อยเพิ่ม),
+Documentation, Language packs, Android / iOS / Mac / Linux Build Support
+
 3. `Ragnarok → Set Ragnarok Data Directory` → เลือก **`C:\ROData\data`** (ดูข้อ 1 ด้านบน)
 4. `Ragnarok → Select maps to import`
    → กด **Unselect All** ก่อน (หน้าต่างเปิดมาติ๊กทุกแมพที่ยังไม่ import ให้อัตโนมัติ = 275 แมพ)
@@ -208,7 +227,7 @@ Water Textures · ~~Missing Maps~~ · **Skill and Item Icons**
 ## เช็คลิสต์
 
 - [ ] `dotnet --version` ขึ้น 9.x
-- [ ] Unity 6000.3.19f1 (+ WebGL module) — เวอร์ชั่นตรงกับ `ProjectSettings/ProjectVersion.txt`
+- [ ] Unity **6000.3.19f1 เป๊ะ** (ลงผ่าน Archive) — ไม่ต้องเอา WebGL module ในเฟส 0
 - [ ] system locale = Korean (ไม่ติ๊ก "Beta: UTF-8")
 - [ ] extract data.grf แล้วเห็น `data\sprite\인간족\몸통\남\*.spr` อ่านออก
 - [ ] `dotnet build RoRebuildServer.sln` ผ่าน
