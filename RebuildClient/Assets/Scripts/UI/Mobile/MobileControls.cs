@@ -21,9 +21,11 @@ namespace Assets.Scripts.UI.Mobile
         private const int MaxEnemyBlips = 40;
         private const float BlipRefreshInterval = 0.2f;
 
-        //the game's own windows are laid out for a desktop screen. The bottom row holds
-        //nine buttons, which needs roughly this much shrinking to fit across a phone.
-        private const float GameUiScale = 0.45f;
+        //the bottom menu wraps to this many buttons per row so it fits a phone screen
+        private const int MenuColumns = 5;
+        private const float MenuCellWidth = 100f;
+        private const float MenuCellHeight = 30f;
+        private const float MenuSpacing = 4f;
 
         private static readonly Color AttackColor = new Color(0.78f, 0.20f, 0.20f, 0.45f);
         private static readonly Color PickUpColor = new Color(0.18f, 0.60f, 0.30f, 0.45f);
@@ -41,7 +43,9 @@ namespace Assets.Scripts.UI.Mobile
         private Sprite circleSprite;
         private string builtMapName = "";
         private float blipTimer;
-        private bool scaledGameUi;
+        private GridLayoutGroup menuGrid;
+        private RectTransform menuRect;
+        private float menuFitWidth = -1f;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -97,7 +101,7 @@ namespace Assets.Scripts.UI.Mobile
 
         private void Update()
         {
-            ApplyGameUiScale();
+            RestructureBottomMenu();
             RefreshMinimapForCurrentMap();
 
             blipTimer -= Time.deltaTime;
@@ -109,30 +113,64 @@ namespace Assets.Scripts.UI.Mobile
         }
 
         /// <summary>
-        /// Shrinks the game's own interface once it exists. Its windows are sized for a
-        /// desktop screen, which on a phone leaves the bottom button row running off the
-        /// edge and the status panel covering a quarter of the view.
+        /// The bottom menu is one long row anchored to the bottom right corner, so on a
+        /// phone the leftmost buttons (Stats, Skills, Inventory) hang off the screen.
+        /// Scaling can't fix it because CameraFollower.UpdateCameraSize reapplies the
+        /// configured MasterUIScale, so instead the row is rebuilt as a grid that wraps
+        /// into two rows sized to the actual screen.
         /// </summary>
-        private void ApplyGameUiScale()
+        private void RestructureBottomMenu()
         {
-            if (scaledGameUi)
+            if (menuGrid == null)
+            {
+                foreach (var layout in FindObjectsByType<HorizontalLayoutGroup>(FindObjectsSortMode.None))
+                {
+                    var bar = layout.transform;
+                    if (bar.Find("Database") == null || bar.Find("Hotbar") == null || bar.Find("Stats") == null)
+                        continue;
+
+                    Destroy(layout);
+                    menuRect = (RectTransform)bar;
+                    menuGrid = bar.gameObject.AddComponent<GridLayoutGroup>();
+                    menuGrid.spacing = new Vector2(MenuSpacing, MenuSpacing);
+                    menuGrid.startCorner = GridLayoutGroup.Corner.UpperLeft;
+                    menuGrid.startAxis = GridLayoutGroup.Axis.Horizontal;
+                    menuGrid.childAlignment = TextAnchor.UpperCenter;
+                    menuGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+                    menuGrid.constraintCount = MenuColumns;
+
+                    //long labels like Equipment must shrink to fit a narrow cell, not clip
+                    foreach (var label in bar.GetComponentsInChildren<TMP_Text>(true))
+                    {
+                        label.fontSizeMax = label.fontSize;
+                        label.fontSizeMin = 8;
+                        label.enableAutoSizing = true;
+                    }
+
+                    Debug.Log("[MobileControls] Wrapped the bottom menu into two rows.");
+                    break;
+                }
+
+                if (menuGrid == null)
+                    return;
+            }
+
+            //cells are sized off the real screen, so redo them when it rotates or rescales
+            var canvas = menuRect.GetComponentInParent<Canvas>();
+            var scale = canvas != null && canvas.scaleFactor > 0 ? canvas.scaleFactor : 1f;
+            var available = Screen.width / scale - 20f;
+            if (Mathf.Approximately(available, menuFitWidth))
                 return;
+            menuFitWidth = available;
 
-            var ui = UiManager.Instance;
-            if (ui == null || ui.PrimaryUserUIContainer == null)
-                return;
+            var cell = Mathf.Min(MenuCellWidth, (available - (MenuColumns - 1) * MenuSpacing) / MenuColumns);
+            menuGrid.cellSize = new Vector2(cell, MenuCellHeight);
 
-            //the container carries the canvas itself, and it may have no scaler at all,
-            //so add one rather than hoping to find one
-            var scaler = ui.PrimaryUserUIContainer.GetComponent<CanvasScaler>();
-            if (scaler == null)
-                scaler = ui.PrimaryUserUIContainer.AddComponent<CanvasScaler>();
-
-            scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-            scaler.scaleFactor = GameUiScale;
-
-            scaledGameUi = true;
-            Debug.Log($"[MobileControls] Scaled the game interface to {GameUiScale:P0}.");
+            menuRect.anchorMin = new Vector2(1f, 0f);
+            menuRect.anchorMax = new Vector2(1f, 0f);
+            menuRect.pivot = new Vector2(1f, 0f);
+            menuRect.sizeDelta = new Vector2(cell * MenuColumns + (MenuColumns - 1) * MenuSpacing, MenuCellHeight * 2 + MenuSpacing);
+            menuRect.anchoredPosition = new Vector2(-10f, 8f);
         }
 
         //---------------------------------------------------------------- actions

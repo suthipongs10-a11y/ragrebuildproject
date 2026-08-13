@@ -168,8 +168,10 @@ namespace Assets.Scripts.UI.Inventory
                 if (activeItemSection == 1 && (!item.ItemData.IsUnique || item.ItemData.Id < 0)) continue;
                 if (activeItemSection == 2 && (item.ItemData.IsUnique || item.ItemData.UseType != ItemUseType.NotUsable) && item.ItemData.Id > 0) continue;
 
-                // if (state.EquippedItems.Contains(item.BagSlotId))
-                //     continue;
+                //worn gear belongs to the equipment window, not the bag. Ammo is the
+                //exception, its stack stays visible here so you can watch it deplete.
+                if (state.EquippedItems.Contains(item.BagSlotId) && item.ItemData.ItemClass != ItemClass.Ammo)
+                    continue;
 
                 if (entryList.Count <= activeEntryCount)
                 {
@@ -193,7 +195,7 @@ namespace Assets.Scripts.UI.Inventory
                 itemEntry.DragItem.OnRightClick = () => OnRightClick(item);
                 if (state.EquippedItems.Contains(item.BagSlotId))
                 {
-                    //keep showing the stack count, tint it to mark the item as worn
+                    //only equipped ammo reaches here, tint its count to mark it as worn
                     itemEntry.DragItem.BlueCount();
                     itemEntry.DragItem.OnDoubleClick = null;
                 }
