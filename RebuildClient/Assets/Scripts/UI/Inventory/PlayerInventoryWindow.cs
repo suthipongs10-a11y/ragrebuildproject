@@ -193,7 +193,8 @@ namespace Assets.Scripts.UI.Inventory
                 itemEntry.DragItem.OnRightClick = () => OnRightClick(item);
                 if (state.EquippedItems.Contains(item.BagSlotId))
                 {
-                    itemEntry.DragItem.SetEquipped();
+                    //keep showing the stack count, tint it to mark the item as worn
+                    itemEntry.DragItem.BlueCount();
                     itemEntry.DragItem.OnDoubleClick = null;
                 }
                 else

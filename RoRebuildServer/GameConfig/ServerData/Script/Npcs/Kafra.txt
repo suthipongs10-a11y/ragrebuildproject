@@ -19,9 +19,9 @@ macro Kafra(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %saveLo
 			Dialog(name, "Your Respawn Point has been saved " + %saveDesc + ". Thank you for using the Kafra Service.");
 			return;
 		case 1:
-			if(GetLearnedLevelOfSkill("BasicMastery") < 5)
+			if(JobId == 0 && JobLevel < 5)
 			{
-				Dialog(name, "Sorry, only adventurers with level 5 or higher in Basic Mastery are allowed to access Kafra storage. Please come back when you have a few more levels.");
+				Dialog(name, "Sorry, only adventurers who have reached job level 5 are allowed to access Kafra storage. Please come back when you have a few more levels.");
 				return;
 			}
 			ReleaseFocus();
@@ -63,9 +63,9 @@ macro KafraNoSave(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %
 		switch(Result) 	
 		{
 		case 0:
-			if(GetLearnedLevelOfSkill("BasicMastery") < 5)
+			if(JobId == 0 && JobLevel < 5)
 			{
-				Dialog(name, "Sorry, only adventurers with level 5 or higher in Basic Mastery are allowed to access Kafra storage. Please come back when you have a few more levels.");
+				Dialog(name, "Sorry, only adventurers who have reached job level 5 are allowed to access Kafra storage. Please come back when you have a few more levels.");
 				return;
 			}
 			ReleaseFocus();
