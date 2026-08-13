@@ -336,7 +336,8 @@ namespace Assets.Scripts.UI.Hud
                 else
                 {
                     MapImage.material = OverworldMaterial;
-                    OverworldMaterial.SetTexture("_SecondaryTex", walkSprite.texture);
+                    if (walkSprite != null)
+                        OverworldMaterial.SetTexture("_SecondaryTex", walkSprite.texture);
                 }
 
             }
