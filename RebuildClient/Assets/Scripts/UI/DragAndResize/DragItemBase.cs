@@ -27,7 +27,8 @@ namespace Assets.Scripts.UI
             {
                 Image.gameObject.SetActive(true);
                 Image.sprite = sprite;
-                Image.rectTransform.sizeDelta = Sprite.rect.size * 2;
+                if (Sprite != null)
+                    Image.rectTransform.sizeDelta = Sprite.rect.size * 2;
             }
         }
 
