@@ -27,8 +27,15 @@ namespace Assets.Scripts.UI.Inventory
             InventoryItem = item;
             ItemId = item.ItemData.Id;
             Sprite = ClientDataLoader.Instance.GetIconAtlasSprite(item.ItemData.Sprite);
+            if (Sprite == null)
+            {
+                Debug.LogWarning($"Failed to load sprite {item.ItemData.Sprite} for item {item.ItemData.Name}");
+                Sprite = ClientDataLoader.Instance.GetIconAtlasSprite("Apple");
+            }
+
             Image.sprite = Sprite;
-            Image.rectTransform.sizeDelta = Sprite.rect.size * 2;
+            if (Sprite != null)
+                Image.rectTransform.sizeDelta = Sprite.rect.size * 2;
             ItemName.text = item.ProperName();
             
             Background.gameObject.SetActive(false);
