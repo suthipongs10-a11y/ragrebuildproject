@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Assets.Scripts.MapEditor;
 using Assets.Scripts.Network;
+using RebuildSharedData.Enum;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -99,7 +100,7 @@ namespace Assets.Scripts.UI.Mobile
 
             foreach (var entity in NetworkManager.Instance.EntityList.Values)
             {
-                if (entity == null || entity.IsMainCharacter || !entity.IsAttackable || !entity.IsCharacterAlive || entity.IsHidden)
+                if (!IsValidTarget(entity))
                     continue;
 
                 var distance = Vector3.Distance(player.transform.position, entity.transform.position);
@@ -112,6 +113,19 @@ namespace Assets.Scripts.UI.Mobile
 
             if (best != null)
                 NetworkManager.Instance.SendAttack(best.Id);
+        }
+
+        /// <summary>
+        /// Mirrors the canClickEnemy test in CameraFollower. A monster is not flagged
+        /// IsAttackable, that flag is only set on traps, so what actually marks a valid
+        /// target is being a non-NPC the server told us we may interact with.
+        /// </summary>
+        private static bool IsValidTarget(ServerControllable entity)
+        {
+            if (entity == null || entity.IsMainCharacter || !entity.IsCharacterAlive || entity.IsHidden || entity.IsAlly)
+                return false;
+
+            return (entity.CharacterType != CharacterType.NPC && entity.IsInteractable) || entity.IsAttackable;
         }
 
         private void OnPickUp()
@@ -225,7 +239,7 @@ namespace Assets.Scripts.UI.Mobile
                 if (used >= MaxEnemyBlips)
                     break;
 
-                if (entity == null || entity.IsMainCharacter || !entity.IsAttackable || !entity.IsCharacterAlive || entity.IsHidden)
+                if (!IsValidTarget(entity))
                     continue;
 
                 while (enemyBlips.Count <= used)
