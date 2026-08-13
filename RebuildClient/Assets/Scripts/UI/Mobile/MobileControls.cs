@@ -21,6 +21,13 @@ namespace Assets.Scripts.UI.Mobile
         private const int MaxEnemyBlips = 40;
         private const float BlipRefreshInterval = 0.2f;
 
+        //the game's own windows are laid out for a desktop screen, so shrink them
+        //enough that the whole button row fits across a phone
+        private const float GameUiScale = 0.62f;
+
+        private static readonly Color AttackColor = new Color(0.78f, 0.20f, 0.20f, 0.45f);
+        private static readonly Color PickUpColor = new Color(0.18f, 0.60f, 0.30f, 0.45f);
+        private static readonly Color ZoomColor = new Color(0.25f, 0.28f, 0.35f, 0.35f);
         private static readonly Color WalkableColor = new Color(0.55f, 0.62f, 0.45f, 0.85f);
         private static readonly Color BlockedColor = new Color(0.12f, 0.13f, 0.15f, 0.85f);
 
@@ -33,6 +40,7 @@ namespace Assets.Scripts.UI.Mobile
         private Sprite circleSprite;
         private string builtMapName = "";
         private float blipTimer;
+        private bool scaledGameUi;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -67,16 +75,17 @@ namespace Assets.Scripts.UI.Mobile
 
             var root = canvasObject.GetComponent<RectTransform>();
 
-            CreateButton(root, "Attack", new Vector2(-110, 250), 170, new Color(0.72f, 0.18f, 0.18f, 0.8f), OnAttack);
-            CreateButton(root, "Pick Up", new Vector2(-110, 440), 140, new Color(0.18f, 0.55f, 0.28f, 0.8f), OnPickUp);
-            CreateButton(root, "+", new Vector2(-110, 610), 100, new Color(0.25f, 0.28f, 0.35f, 0.7f), () => Zoom(-6f));
-            CreateButton(root, "-", new Vector2(-110, 720), 100, new Color(0.25f, 0.28f, 0.35f, 0.7f), () => Zoom(6f));
+            CreateButton(root, new Vector2(-110, 250), 170, AttackColor, CreateSwordSprite(), OnAttack);
+            CreateButton(root, new Vector2(-110, 440), 140, PickUpColor, CreateHandSprite(), OnPickUp);
+            CreateButton(root, new Vector2(-110, 610), 100, ZoomColor, null, () => Zoom(-6f), "+");
+            CreateButton(root, new Vector2(-110, 720), 100, ZoomColor, null, () => Zoom(6f), "-");
 
             CreateMinimap(root);
         }
 
         private void Update()
         {
+            ApplyGameUiScale();
             RefreshMinimapForCurrentMap();
 
             blipTimer -= Time.deltaTime;
@@ -85,6 +94,32 @@ namespace Assets.Scripts.UI.Mobile
 
             blipTimer = BlipRefreshInterval;
             RefreshBlips();
+        }
+
+        /// <summary>
+        /// Shrinks the game's own interface once it exists. Its windows are sized for a
+        /// desktop screen, which on a phone leaves the bottom button row running off the
+        /// edge and the status panel covering a quarter of the view.
+        /// </summary>
+        private void ApplyGameUiScale()
+        {
+            if (scaledGameUi)
+                return;
+
+            var ui = UiManager.Instance;
+            if (ui == null || ui.PrimaryUserUIContainer == null)
+                return;
+
+            var scaler = ui.PrimaryUserUIContainer.GetComponentInParent<CanvasScaler>();
+            if (scaler == null)
+                return;
+
+            if (scaler.uiScaleMode == CanvasScaler.ScaleMode.ScaleWithScreenSize)
+                scaler.referenceResolution = scaler.referenceResolution / GameUiScale;
+            else
+                scaler.scaleFactor *= GameUiScale;
+
+            scaledGameUi = true;
         }
 
         //---------------------------------------------------------------- actions
@@ -163,7 +198,7 @@ namespace Assets.Scripts.UI.Mobile
         private void CreateMinimap(RectTransform root)
         {
             minimapArea = CreatePanel(root, "Minimap", new Vector2(1, 1), new Vector2(-20, -20),
-                new Vector2(MinimapPixels, MinimapPixels), new Color(0, 0, 0, 0.35f));
+                new Vector2(MinimapPixels, MinimapPixels), new Color(0, 0, 0, 0.3f));
 
             var imageObject = new GameObject("MinimapImage", typeof(RawImage));
             imageObject.transform.SetParent(minimapArea, false);
@@ -277,9 +312,10 @@ namespace Assets.Scripts.UI.Mobile
             return camera == null ? null : camera.Target;
         }
 
-        private void CreateButton(RectTransform root, string label, Vector2 offset, float size, Color color, UnityEngine.Events.UnityAction action)
+        private void CreateButton(RectTransform root, Vector2 offset, float size, Color color, Sprite icon,
+            UnityEngine.Events.UnityAction action, string label = null)
         {
-            var buttonObject = new GameObject("Button" + label, typeof(Image), typeof(Button));
+            var buttonObject = new GameObject("MobileButton", typeof(Image), typeof(Button));
             buttonObject.transform.SetParent(root, false);
 
             var image = buttonObject.GetComponent<Image>();
@@ -295,8 +331,25 @@ namespace Assets.Scripts.UI.Mobile
 
             buttonObject.GetComponent<Button>().onClick.AddListener(action);
 
+            if (icon != null)
+            {
+                var iconObject = new GameObject("Icon", typeof(Image));
+                iconObject.transform.SetParent(rect, false);
+
+                var iconImage = iconObject.GetComponent<Image>();
+                iconImage.sprite = icon;
+                iconImage.color = new Color(1, 1, 1, 0.9f);
+                iconImage.raycastTarget = false;
+
+                var iconRect = iconObject.GetComponent<RectTransform>();
+                iconRect.anchorMin = new Vector2(0.5f, 0.5f);
+                iconRect.anchorMax = new Vector2(0.5f, 0.5f);
+                iconRect.sizeDelta = new Vector2(size * 0.55f, size * 0.55f);
+                return;
+            }
+
             var font = TMP_Settings.defaultFontAsset;
-            if (font == null)
+            if (font == null || string.IsNullOrEmpty(label))
                 return;
 
             var textObject = new GameObject("Label", typeof(TextMeshProUGUI));
@@ -306,8 +359,8 @@ namespace Assets.Scripts.UI.Mobile
             text.font = font;
             text.text = label;
             text.alignment = TextAlignmentOptions.Center;
-            text.fontSize = size * 0.24f;
-            text.color = Color.white;
+            text.fontSize = size * 0.4f;
+            text.color = new Color(1, 1, 1, 0.9f);
             text.raycastTarget = false;
 
             var textRect = textObject.GetComponent<RectTransform>();
@@ -355,28 +408,80 @@ namespace Assets.Scripts.UI.Mobile
             return rect;
         }
 
+        //---------------------------------------------------------------- generated art
+
+        private const int IconResolution = 64;
+
         private static Sprite CreateCircleSprite()
         {
-            const int resolution = 64;
-            var texture = new Texture2D(resolution, resolution, TextureFormat.RGBA32, false);
-            var center = (resolution - 1) * 0.5f;
+            var pixels = NewTransparentBuffer();
+            var center = (IconResolution - 1) * 0.5f;
             var radius = center - 0.5f;
-            var pixels = new Color32[resolution * resolution];
 
-            for (var y = 0; y < resolution; y++)
+            for (var y = 0; y < IconResolution; y++)
             {
-                for (var x = 0; x < resolution; x++)
+                for (var x = 0; x < IconResolution; x++)
                 {
                     var distance = Vector2.Distance(new Vector2(x, y), new Vector2(center, center));
-                    var alpha = Mathf.Clamp01(radius - distance);
-                    pixels[y * resolution + x] = new Color(1, 1, 1, alpha);
+                    pixels[y * IconResolution + x] = new Color(1, 1, 1, Mathf.Clamp01(radius - distance));
                 }
             }
 
-            texture.SetPixels32(pixels);
+            return BuildSprite(pixels);
+        }
+
+        private static Sprite CreateSwordSprite()
+        {
+            var pixels = NewTransparentBuffer();
+
+            FillRect(pixels, 28, 30, 36, 54, Color.white); //blade
+            FillRect(pixels, 30, 54, 34, 59, Color.white); //point
+            FillRect(pixels, 18, 25, 46, 30, Color.white); //crossguard
+            FillRect(pixels, 30, 11, 34, 25, Color.white); //grip
+            FillRect(pixels, 27, 6, 37, 11, Color.white);  //pommel
+
+            return BuildSprite(pixels);
+        }
+
+        private static Sprite CreateHandSprite()
+        {
+            var pixels = NewTransparentBuffer();
+
+            FillRect(pixels, 20, 8, 44, 34, Color.white);  //palm
+            FillRect(pixels, 21, 34, 26, 48, Color.white); //fingers
+            FillRect(pixels, 27, 34, 32, 52, Color.white);
+            FillRect(pixels, 33, 34, 38, 50, Color.white);
+            FillRect(pixels, 39, 34, 44, 45, Color.white);
+            FillRect(pixels, 13, 20, 20, 31, Color.white); //thumb
+
+            return BuildSprite(pixels);
+        }
+
+        private static Color[] NewTransparentBuffer()
+        {
+            var pixels = new Color[IconResolution * IconResolution];
+            for (var i = 0; i < pixels.Length; i++)
+                pixels[i] = new Color(1, 1, 1, 0);
+
+            return pixels;
+        }
+
+        private static void FillRect(Color[] pixels, int left, int bottom, int right, int top, Color color)
+        {
+            for (var y = Mathf.Max(0, bottom); y < Mathf.Min(IconResolution, top); y++)
+            {
+                for (var x = Mathf.Max(0, left); x < Mathf.Min(IconResolution, right); x++)
+                    pixels[y * IconResolution + x] = color;
+            }
+        }
+
+        private static Sprite BuildSprite(Color[] pixels)
+        {
+            var texture = new Texture2D(IconResolution, IconResolution, TextureFormat.RGBA32, false);
+            texture.SetPixels(pixels);
             texture.Apply();
 
-            return Sprite.Create(texture, new Rect(0, 0, resolution, resolution), new Vector2(0.5f, 0.5f));
+            return Sprite.Create(texture, new Rect(0, 0, IconResolution, IconResolution), new Vector2(0.5f, 0.5f));
         }
     }
 }
