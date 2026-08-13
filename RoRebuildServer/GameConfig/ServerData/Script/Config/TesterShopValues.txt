@@ -1,0 +1,36 @@
+
+//The Equipment Tester in Prontera sells one of every job's starting kit for a single
+//zeny. The server refuses to let an npc sell anything below what it can be sold back
+//for, so the gear it stocks is made worthless to npc shopkeepers instead. That closes
+//the buy-at-1z-sell-at-full-price loop without having to weaken the check itself.
+ServerConfig("TesterShopValues") {
+OnSetItemSaleValue:
+
+	//every job
+	if(code == "Novice_Main_Gauche" || code == "Adventurer's_Suit_" || code == "Guard_" || code == "Undershirt_") return 0;
+	if(code == "Shackles" || code == "Bongun_Hat_" || code == "Clip") return 0;
+
+	//swordsman, knight, crusader
+	if(code == "Orcish_Sword" || code == "Windhawk" || code == "Partizan_") return 0;
+
+	//merchant, blacksmith, alchemist
+	if(code == "Orcish_Axe_" || code == "Hammer_") return 0;
+
+	//thief, assassin, rogue
+	if(code == "Stiletto_" || code == "Damascus_" || code == "Jur_") return 0;
+
+	//archer and hunter
+	if(code == "Cross_Bow_") return 0;
+
+	//mage, wizard, sage
+	if(code == "Wand_" || code == "Mighty_Staff" || code == "Book") return 0;
+
+	//acolyte, priest, monk
+	if(code == "Chain_" || code == "Smasher_" || code == "Fist_") return 0;
+
+	//bard and dancer
+	if(code == "Lute_" || code == "Wire_Whip_") return 0;
+
+	//ninja and gunslinger
+	if(code == "Murasame_" || code == "Gate_Keeper") return 0;
+}
