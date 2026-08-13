@@ -1,0 +1,49 @@
+
+//A test shop next to the Prontera Kafra. Everything costs a single zeny so any
+//job can try out its own gear without grinding for it first.
+Trader("prontera", "Equipment Tester", "1_M_03", 149, 89, S) {
+
+	//--- every job -------------------------------------------------------
+	SellItem("Novice_Main_Gauche", 1);
+	SellItem("Adventurer's_Suit_", 1);
+	SellItem("Guard_", 1);
+	SellItem("Undershirt_", 1);
+	SellItem("Shackles", 1);
+	SellItem("Bongun_Hat_", 1);
+	SellItem("Clip", 1);
+
+	//--- swordsman, knight, crusader -------------------------------------
+	SellItem("Orcish_Sword", 1);
+	SellItem("Windhawk", 1);
+	SellItem("Partizan_", 1);
+
+	//--- merchant, blacksmith, alchemist ---------------------------------
+	SellItem("Orcish_Axe_", 1);
+	SellItem("Hammer_", 1);
+
+	//--- thief, assassin, rogue ------------------------------------------
+	SellItem("Stiletto_", 1);
+	SellItem("Damascus_", 1);
+	SellItem("Jur_", 1);
+
+	//--- archer, hunter --------------------------------------------------
+	SellItem("Cross_Bow_", 1);
+
+	//--- mage, wizard, sage, soul linker ---------------------------------
+	SellItem("Wand_", 1);
+	SellItem("Mighty_Staff", 1);
+	SellItem("Book", 1);
+
+	//--- acolyte, priest, monk -------------------------------------------
+	SellItem("Chain_", 1);
+	SellItem("Smasher_", 1);
+	SellItem("Fist_", 1);
+
+	//--- bard and dancer -------------------------------------------------
+	SellItem("Lute_", 1);
+	SellItem("Wire_Whip_", 1);
+
+	//--- ninja and gunslinger --------------------------------------------
+	SellItem("Murasame_", 1);
+	SellItem("Gate_Keeper", 1);
+}
