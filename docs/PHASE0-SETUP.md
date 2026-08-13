@@ -252,6 +252,80 @@ Water Textures · ~~Missing Maps~~ · **Skill and Item Icons**
 
 ---
 
+## บันทึกจากการทำจริง — กับดักที่เจอ
+
+### 1. ⭐ Health Check ขึ้นเขียวไม่ได้แปลว่าครบ
+
+เงื่อนไขเช็คของหลาย category หลวมมาก เช่น `RagnarokCopyFromRealClient.cs:709`:
+
+```csharp
+HasAnyFile("Assets/Sprites/Imported/Icons/Sprites", "*.png") &&
+HasAnyFile("Assets/Sprites/Imported/Collections", "*.png");
+```
+
+แค่มีไฟล์ **สักไฟล์** ก็ขึ้น OK — จริง ๆ import ไปแค่ 38% ก็ยังเขียว
+
+**วิธีเช็คของจริง:** นับไฟล์ `.act` ต้นทางเทียบกับ `.asset` ที่ถูกสร้าง
+
+```powershell
+$b='C:\ragrebuildproject\RebuildClient\Assets\Sprites'
+Get-ChildItem $b -Directory -Exclude Imported | ForEach-Object {
+  [PSCustomObject]@{
+    Folder = $_.Name
+    Act    = (Get-ChildItem $_.FullName -Recurse -Filter *.act -EA SilentlyContinue).Count
+    Asset  = (Get-ChildItem (Join-Path "$b\Imported" $_.Name) -Recurse -Filter *.asset -EA SilentlyContinue).Count
+  }
+} | Format-Table -AutoSize
+```
+
+`Asset` ควร **≥** `Act` (โฟลเดอร์ที่มี palette จะเกิน เพราะสร้าง `_0`..`_9` เพิ่ม)
+
+**ถ้าไม่ครบ:** Project → คลิกขวาที่โฟลเดอร์นั้น → **Reimport** → `ActPostProcessor` จะยิงใหม่ทุกไฟล์ `.act` แล้วสร้าง `RoSpriteData` ให้ → จบแล้ว `Update Addressables (Fast)`
+
+**สาเหตุที่ import ไม่ครบ:** ดิสก์เต็มระหว่างทาง หรือปิด Unity กลางคัน
+
+### 2. ⭐ อย่าลบ `C:\ROData` จนกว่าจะกด Play ผ่าน
+
+Health Check ขึ้น 100% ไม่ได้แปลว่าเลิกใช้ data directory ได้ — importer พวกนี้**อ่านจาก data directory ตอนรัน** ไม่ได้ใช้ไฟล์ที่ copy เข้า `Assets/` ไปแล้ว:
+
+| เมนู | อ่านจาก |
+|---|---|
+| Import Skill and Item Icons | `texture/유저인터페이스/{item,collection,cardbmp}` + `sprite/아이템` |
+| Import and Update Skill Effect Atlas | `texture/effect/*.tga` |
+
+ลบเร็วไป = ไอคอนไอเทม/การ์ดไม่ครบ และเอฟเฟกต์สกิลเป็นสี่เหลี่ยม ต้อง extract GRF ใหม่
+
+### 3. `Post-process: Missing Maps` — ถ้าเผลอกดไปแล้ว ไม่ต้องลบทิ้ง
+
+maps.json ที่ client ใช้มี **234 แมพ** (ไม่ใช่ 275 ตาม `Maps.csv`) ถ้าปล่อยให้มัน import จนจบก็ได้แมพครบ ~7.7 GB
+ข้อดีที่ตามมา: เดินทะลุประตูไหนก็ได้ไม่ต้องระวัง และ server ไม่ขึ้น error walk data
+
+3 แมพที่ import ไม่ได้เพราะ client ทั่วไปไม่มีไฟล์: `payon_p`, `2009rwc_03`, `pvp_n_1-5` — ไม่กระทบอะไร
+
+### 4. บั๊ก upstream ที่แก้ไปแล้วใน branch นี้
+
+| ไฟล์ | อาการ |
+|---|---|
+| `PlayerControl/CameraFollower.cs` | ขาด `using ...Skills.Crusader` → compile ไม่ผ่านตั้งแต่ clone (CS0103) |
+| `UI/Inventory/EquipWindowEntry.cs` | ไอคอนไอเทมหาย → NRE ใน `PacketCreateEntity` → ตัวละครไม่มี `FloatingDisplay` → **ค้างที่ Loading 99% ตลอดกาล** |
+| `UI/Hud/MinimapController.cs` | ไม่มี minimap → NRE ใน coroutine |
+| `UI/Hud/ItemObtainedToast.cs` | เก็บของที่ไอคอนหาย → NRE |
+| `Network/GroundItem.cs` | ของที่ไอคอนหายมองไม่เห็นบนพื้น |
+
+ทั้งหมดใช้ pattern เดียวกับที่ `PlayerInventoryWindow.cs:182` ทำอยู่แล้ว (fallback เป็นไอคอน Apple)
+
+### 5. `EffectSharedMaterialManager` cache ค่า null
+
+```csharp
+sprite = atlas.GetSprite(name);
+cachedSprites.Add(name, sprite);   // เก็บ null ด้วย
+```
+
+เป็น static → อยู่ข้าม Play session ถ้าปิด domain reload
+**หลัง import asset ใหม่ทุกครั้ง ให้ปิด-เปิด Unity ก่อนเทส** ไม่งั้นอาจได้ผลลัพธ์เก่า
+
+---
+
 ## เรื่องที่ปกติ ไม่ต้องแก้
 
 - warning มอนสเตอร์ ID 6000+ ไม่มี sprite — custom monster ของ Doddler ปิดอยู่ด้วย `"FeatureFlags": []` ตามเดิม
