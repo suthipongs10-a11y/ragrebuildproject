@@ -53,6 +53,12 @@ namespace Assets.Scripts.Network
             item.Count = count;
             item.ItemType = ItemType.RegularItem;
             item.Sprite = ClientDataLoader.Instance.GetIconAtlasSprite(data.Sprite);
+            if (item.Sprite == null)
+            {
+                Debug.LogWarning($"Failed to load sprite {data.Sprite} for item {data.Name}");
+                item.Sprite = ClientDataLoader.Instance.GetIconAtlasSprite("Apple");
+            }
+
             item.ItemName = data.Slots == 0 ? data.Name : $"{data.Name} [{data.Slots}]";
             item.EntityId = entityId;
 

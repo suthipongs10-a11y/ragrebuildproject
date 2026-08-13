@@ -34,7 +34,10 @@ namespace Assets.Scripts.UI.Hud
                 return;
             
             Icon.sprite = ClientDataLoader.Instance.GetIconAtlasSprite(inventoryItem.ItemData.Sprite);
-            Icon.rectTransform.sizeDelta = Icon.sprite.rect.size * 2;
+            if (Icon.sprite == null)
+                Icon.sprite = ClientDataLoader.Instance.GetIconAtlasSprite("Apple");
+            if (Icon.sprite != null)
+                Icon.rectTransform.sizeDelta = Icon.sprite.rect.size * 2;
             Text.text = obtainedText;
             
             Container.SetActive(true);
