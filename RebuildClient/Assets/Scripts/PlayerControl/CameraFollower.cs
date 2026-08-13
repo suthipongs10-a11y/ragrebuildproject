@@ -284,6 +284,7 @@ namespace Assets.Scripts
         private Vector2 rotationRange;
         private Vector2 heightRange;
         private Vector2 zoomRange = new Vector2(30, 70);
+        private const float PinchZoomSpeed = 0.1f; //camera units per pixel the fingers travel
         public bool InTextBox;
         public bool InItemInputBox;
         public bool InTextInputBox;
@@ -2168,6 +2169,18 @@ namespace Assets.Scripts
                     skillScroll = Mathf.Clamp(skillScroll, 1, cursorMaxSkillLvl);
                     cursorSkillLvl = Mathf.RoundToInt(skillScroll);
                 }
+            }
+
+            //pinch to zoom, the touch equivalent of the scroll wheel above
+            if (Input.touchCount == 2 && !blockScrollZoom)
+            {
+                var touch0 = Input.GetTouch(0);
+                var touch1 = Input.GetTouch(1);
+                var previousSpread = ((touch0.position - touch0.deltaPosition) - (touch1.position - touch1.deltaPosition)).magnitude;
+                var currentSpread = (touch0.position - touch1.position).magnitude;
+
+                //spreading the fingers apart pulls the camera in, the same way it does on a map
+                Distance -= (currentSpread - previousSpread) * PinchZoomSpeed;
             }
 
             Distance = Mathf.Clamp(Distance, zoomRange.x, zoomRange.y);
