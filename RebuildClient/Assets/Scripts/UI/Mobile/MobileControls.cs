@@ -21,9 +21,9 @@ namespace Assets.Scripts.UI.Mobile
         private const int MaxEnemyBlips = 40;
         private const float BlipRefreshInterval = 0.2f;
 
-        //the game's own windows are laid out for a desktop screen, so shrink them
-        //enough that the whole button row fits across a phone
-        private const float GameUiScale = 0.62f;
+        //the game's own windows are laid out for a desktop screen. The bottom row holds
+        //nine buttons, which needs roughly this much shrinking to fit across a phone.
+        private const float GameUiScale = 0.45f;
 
         private static readonly Color AttackColor = new Color(0.78f, 0.20f, 0.20f, 0.45f);
         private static readonly Color PickUpColor = new Color(0.18f, 0.60f, 0.30f, 0.45f);
@@ -31,6 +31,7 @@ namespace Assets.Scripts.UI.Mobile
         private static readonly Color WalkableColor = new Color(0.55f, 0.62f, 0.45f, 0.85f);
         private static readonly Color BlockedColor = new Color(0.12f, 0.13f, 0.15f, 0.85f);
 
+        private RectTransform controlGroup;
         private RectTransform minimapArea;
         private RawImage minimapImage;
         private Texture2D minimapTexture;
@@ -75,12 +76,23 @@ namespace Assets.Scripts.UI.Mobile
 
             var root = canvasObject.GetComponent<RectTransform>();
 
-            CreateButton(root, new Vector2(-110, 250), 170, AttackColor, CreateSwordSprite(), OnAttack);
-            CreateButton(root, new Vector2(-110, 440), 140, PickUpColor, CreateHandSprite(), OnPickUp);
-            CreateButton(root, new Vector2(-110, 610), 100, ZoomColor, null, () => Zoom(-6f), "+");
-            CreateButton(root, new Vector2(-110, 720), 100, ZoomColor, null, () => Zoom(6f), "-");
+            //everything except the toggle lives in here so one call can hide the lot
+            var groupObject = new GameObject("Controls", typeof(RectTransform));
+            groupObject.transform.SetParent(root, false);
+            controlGroup = groupObject.GetComponent<RectTransform>();
+            controlGroup.anchorMin = Vector2.zero;
+            controlGroup.anchorMax = Vector2.one;
+            controlGroup.offsetMin = Vector2.zero;
+            controlGroup.offsetMax = Vector2.zero;
 
-            CreateMinimap(root);
+            CreateButton(controlGroup, new Vector2(-110, 250), 170, AttackColor, CreateSwordSprite(), OnAttack);
+            CreateButton(controlGroup, new Vector2(-110, 440), 140, PickUpColor, CreateHandSprite(), OnPickUp);
+            CreateButton(controlGroup, new Vector2(-110, 610), 100, ZoomColor, null, () => Zoom(-6f), "+");
+            CreateButton(controlGroup, new Vector2(-110, 720), 100, ZoomColor, null, () => Zoom(6f), "-");
+
+            CreateMinimap(controlGroup);
+
+            CreateButton(root, new Vector2(-20, 130), 70, ZoomColor, CreateMenuSprite(), ToggleControls);
         }
 
         private void Update()
@@ -110,16 +122,17 @@ namespace Assets.Scripts.UI.Mobile
             if (ui == null || ui.PrimaryUserUIContainer == null)
                 return;
 
-            var scaler = ui.PrimaryUserUIContainer.GetComponentInParent<CanvasScaler>();
+            //the container carries the canvas itself, and it may have no scaler at all,
+            //so add one rather than hoping to find one
+            var scaler = ui.PrimaryUserUIContainer.GetComponent<CanvasScaler>();
             if (scaler == null)
-                return;
+                scaler = ui.PrimaryUserUIContainer.AddComponent<CanvasScaler>();
 
-            if (scaler.uiScaleMode == CanvasScaler.ScaleMode.ScaleWithScreenSize)
-                scaler.referenceResolution = scaler.referenceResolution / GameUiScale;
-            else
-                scaler.scaleFactor *= GameUiScale;
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+            scaler.scaleFactor = GameUiScale;
 
             scaledGameUi = true;
+            Debug.Log($"[MobileControls] Scaled the game interface to {GameUiScale:P0}.");
         }
 
         //---------------------------------------------------------------- actions
@@ -184,6 +197,11 @@ namespace Assets.Scripts.UI.Mobile
 
             if (best != null)
                 NetworkManager.Instance.SendPickUpItem(best.EntityId);
+        }
+
+        private void ToggleControls()
+        {
+            controlGroup.gameObject.SetActive(!controlGroup.gameObject.activeSelf);
         }
 
         private void Zoom(float amount)
@@ -453,6 +471,17 @@ namespace Assets.Scripts.UI.Mobile
             FillRect(pixels, 33, 34, 38, 50, Color.white);
             FillRect(pixels, 39, 34, 44, 45, Color.white);
             FillRect(pixels, 13, 20, 20, 31, Color.white); //thumb
+
+            return BuildSprite(pixels);
+        }
+
+        private static Sprite CreateMenuSprite()
+        {
+            var pixels = NewTransparentBuffer();
+
+            FillRect(pixels, 14, 42, 50, 49, Color.white);
+            FillRect(pixels, 14, 29, 50, 36, Color.white);
+            FillRect(pixels, 14, 16, 50, 23, Color.white);
 
             return BuildSprite(pixels);
         }
