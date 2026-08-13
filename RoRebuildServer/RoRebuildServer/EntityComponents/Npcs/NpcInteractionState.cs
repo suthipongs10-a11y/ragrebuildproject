@@ -159,6 +159,14 @@ public class NpcInteractionState
     public void ChangePlayerJob(int jobId) => Player?.ChangeJob(jobId);
     public void SkillReset() => Player?.SkillReset();
     public void StatPointReset() => Player?.StatPointReset();
+
+    public void HealPlayerFull()
+    {
+        if (Player == null)
+            return;
+        Player.CombatEntity.HealHpPercent(100);
+        Player.CombatEntity.HealSpPercent(100);
+    }
     public bool HasLearnedSkill(CharacterSkill skill, int level = 1) => Player?.DoesCharacterKnowSkill(skill, level) ?? false;
     public bool HasCart => ((Player?.GetData(PlayerStat.FollowerType) ?? 0) & (int)CharacterFollowerState.AnyCart) > 0;
     public bool HasBird => ((Player?.GetData(PlayerStat.FollowerType) ?? 0) & (int)CharacterFollowerState.Falcon) > 0;

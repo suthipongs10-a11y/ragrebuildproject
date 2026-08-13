@@ -1,0 +1,18 @@
+
+//A free healer beside the Prontera Kafra so trips back from the field stay short.
+Npc("prontera", "Nurse", "4_F_SISTER", 152, 89, S)
+{
+	localstr name = "Nurse";
+OnClick:
+	FocusNpc();
+	Dialog(name, "Welcome! You look a little worn out from your adventures. Would you like me to patch you up? It's free!");
+	Option("Heal me please", "No thanks");
+	if(Result == 0)
+	{
+		HealPlayerFull();
+		Dialog(name, "All done! Your HP and SP are fully restored. Do be careful out there~");
+		return;
+	}
+	Dialog(name, "Alright then, come see me any time you're hurt!");
+	return;
+}

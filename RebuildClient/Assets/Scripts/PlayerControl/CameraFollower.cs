@@ -283,7 +283,7 @@ namespace Assets.Scripts
         public bool lockCamera;
         private Vector2 rotationRange;
         private Vector2 heightRange;
-        private Vector2 zoomRange = new Vector2(30, 70);
+        private Vector2 zoomRange = new Vector2(30, 90);
         private const float PinchZoomSpeed = 0.1f; //camera units per pixel the fingers travel
         public bool InTextBox;
         public bool InItemInputBox;

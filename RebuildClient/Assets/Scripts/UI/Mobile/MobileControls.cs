@@ -17,6 +17,7 @@ namespace Assets.Scripts.UI.Mobile
     {
         private const float TargetSearchRange = 40f;
         private const float PickUpSearchRange = 20f;
+        private const float TalkSearchRange = 15f;
         private const int MinimapPixels = 240;
         private const int MaxEnemyBlips = 40;
         private const float BlipRefreshInterval = 0.2f;
@@ -30,6 +31,7 @@ namespace Assets.Scripts.UI.Mobile
         private static readonly Color AttackColor = new Color(0.78f, 0.20f, 0.20f, 0.45f);
         private static readonly Color PickUpColor = new Color(0.18f, 0.60f, 0.30f, 0.45f);
         private static readonly Color ZoomColor = new Color(0.25f, 0.28f, 0.35f, 0.35f);
+        private static readonly Color TalkColor = new Color(0.85f, 0.60f, 0.20f, 0.45f);
         private static readonly Color WalkableColor = new Color(0.55f, 0.62f, 0.45f, 0.85f);
         private static readonly Color BlockedColor = new Color(0.12f, 0.13f, 0.15f, 0.85f);
 
@@ -93,6 +95,8 @@ namespace Assets.Scripts.UI.Mobile
             CreateButton(controlGroup, new Vector2(-110, 440), 140, PickUpColor, CreateHandSprite(), OnPickUp);
             CreateButton(controlGroup, new Vector2(-110, 610), 100, ZoomColor, null, () => Zoom(-6f), "+");
             CreateButton(controlGroup, new Vector2(-110, 720), 100, ZoomColor, null, () => Zoom(6f), "-");
+            CreateButton(controlGroup, new Vector2(-300, 250), 120, TalkColor, null, OnTalk, "...");
+            CreateButton(controlGroup, new Vector2(-300, 400), 120, ZoomColor, null, OnSit, "Zz");
 
             CreateMinimap(controlGroup);
 
@@ -235,6 +239,50 @@ namespace Assets.Scripts.UI.Mobile
 
             if (best != null)
                 NetworkManager.Instance.SendPickUpItem(best.EntityId);
+        }
+
+        /// <summary>
+        /// Talks to the closest NPC. Portals count as npcs but have no click handler,
+        /// so the server simply ignores the click if one happens to be nearest.
+        /// </summary>
+        private void OnTalk()
+        {
+            var player = PlayerObject();
+            if (player == null)
+                return;
+
+            ServerControllable best = null;
+            var bestDistance = TalkSearchRange;
+
+            foreach (var entity in NetworkManager.Instance.EntityList.Values)
+            {
+                if (entity == null || entity.CharacterType != CharacterType.NPC || !entity.IsInteractable || entity.IsHidden)
+                    continue;
+
+                var distance = Vector3.Distance(player.transform.position, entity.transform.position);
+                if (distance >= bestDistance)
+                    continue;
+
+                best = entity;
+                bestDistance = distance;
+            }
+
+            if (best != null)
+                NetworkManager.Instance.SendNpcClick(best.Id);
+        }
+
+        private void OnSit()
+        {
+            var camera = CameraFollower.Instance;
+            var controllable = camera == null ? null : camera.TargetControllable;
+            if (controllable == null || controllable.SpriteAnimator == null)
+                return;
+
+            var state = controllable.SpriteAnimator.State;
+            if (state == SpriteState.Idle || state == SpriteState.Standby)
+                NetworkManager.Instance.ChangePlayerSitStand(true);
+            else if (state == SpriteState.Sit)
+                NetworkManager.Instance.ChangePlayerSitStand(false);
         }
 
         private void ToggleControls()
