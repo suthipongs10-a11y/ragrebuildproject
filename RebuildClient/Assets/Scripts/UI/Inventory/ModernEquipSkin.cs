@@ -128,10 +128,10 @@ namespace Assets.Scripts.UI.Inventory
                 child.gameObject.SetActive(false);
             }
 
-            ModernUiTheme.CreateTitleBar(win, "Equipment", "Worn gear", ModernUiIcons.Armor);
+            ModernUiTheme.CreateTitleBar(win, ThaiUiText.Get("Equipment"), ThaiUiText.Get("Worn gear"), ModernUiIcons.Armor);
             ModernUiTheme.AttachShadow(root);
 
-            CreateText(panel, "Hint", "Double-click a slot to unequip  ·  Right-click an item for details",
+            CreateText(panel, "Hint", ThaiUiText.Get("Double-click a slot to unequip  ·  Right-click an item for details"),
                 ModernUiTheme.SizeLabel, HintColor, TextAlignmentOptions.Left, FontStyles.Normal,
                 new Vector2(Margin, -92), new Vector2(WindowWidth - Margin * 2, 22), new Vector2(0, 1));
 
@@ -196,7 +196,7 @@ namespace Assets.Scripts.UI.Inventory
         private EquipWindowEntry BuildSlotContents(RectTransform card, int slotIndex)
         {
             //the small always-visible label naming the slot
-            CreateText(card, "SlotLabel", SlotLabels[slotIndex], ModernUiTheme.SizeSmall, LabelColor,
+            CreateText(card, "SlotLabel", ThaiUiText.Get(SlotLabels[slotIndex]), ModernUiTheme.SizeSmall, LabelColor,
                 TextAlignmentOptions.TopLeft, FontStyles.Bold,
                 new Vector2(64, -6), new Vector2(CardWidth - 74, 18), new Vector2(0, 1));
 
@@ -209,7 +209,7 @@ namespace Assets.Scripts.UI.Inventory
             var slotIcon = ModernUiTheme.CreateIcon(background, SlotIcons[slotIndex], EmptyColor, 26);
             ModernUiTheme.Place(slotIcon.rectTransform, new Vector2(0, 0.5f), new Vector2(19, 0), new Vector2(26, 26));
 
-            var emptyText = CreateText(background, "EmptyText", "Empty", ModernUiTheme.SizeLabel, EmptyColor,
+            var emptyText = CreateText(background, "EmptyText", ThaiUiText.Get("Empty"), ModernUiTheme.SizeLabel, EmptyColor,
                 TextAlignmentOptions.Right, FontStyles.Normal, Vector2.zero, Vector2.zero, null);
             Stretch((RectTransform)emptyText.transform, 12, 4, -16, -4);
 
@@ -266,9 +266,9 @@ namespace Assets.Scripts.UI.Inventory
             go.transform.SetParent(parent, false);
 
             var text = go.GetComponent<TextMeshProUGUI>();
-            if (TMP_Settings.defaultFontAsset != null)
+            if (ModernUiTheme.ThemeFont != null)
             {
-                text.font = TMP_Settings.defaultFontAsset;
+                text.font = ModernUiTheme.ThemeFont;
                 var material = ModernUiTheme.CrispMaterial;
                 if (material != null)
                     text.fontSharedMaterial = material;

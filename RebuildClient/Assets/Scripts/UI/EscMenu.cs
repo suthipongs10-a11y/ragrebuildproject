@@ -76,7 +76,7 @@ namespace Assets.Scripts.UI
                          + (entries - 1) * ButtonGap + Padding;
             rect.sizeDelta = new Vector2(MenuWidth, height);
 
-            ModernUiTheme.CreateTitleBar(menu, "Menu", "System", ModernUiIcons.Gear);
+            ModernUiTheme.CreateTitleBar(menu, ThaiUiText.Get("Menu"), ThaiUiText.Get("System"), ModernUiIcons.Gear);
             ModernUiTheme.AttachShadow(rect);
 
             var y = -(ModernUiTheme.TitleBarHeight + Padding);
@@ -94,7 +94,7 @@ namespace Assets.Scripts.UI
             UnityEngine.Events.UnityAction action, bool isCancel)
         {
             var background = isCancel ? ModernUiTheme.CardDeepColor : ModernUiTheme.CardColor;
-            var button = ModernUiTheme.CreateIconButton(parent, label, label, icon, background,
+            var button = ModernUiTheme.CreateIconButton(parent, label, ThaiUiText.Get(label), icon, background,
                 ModernUiTheme.NameColor);
             ModernUiTheme.Place((RectTransform)button.transform, new Vector2(0, 1),
                 new Vector2(Padding, y), new Vector2(MenuWidth - Padding * 2, ButtonHeight));

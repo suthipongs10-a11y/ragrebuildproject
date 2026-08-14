@@ -95,10 +95,10 @@ namespace Assets.Scripts.UI.Stats
                 child.gameObject.SetActive(false);
             }
 
-            ModernUiTheme.CreateTitleBar(win, "Stats", "Character sheet", ModernUiIcons.Person);
+            ModernUiTheme.CreateTitleBar(win, ThaiUiText.Get("Stats"), ThaiUiText.Get("Character sheet"), ModernUiIcons.Person);
             ModernUiTheme.AttachShadow(root);
 
-            var hint = ModernUiTheme.CreateText(panel, "Hint", "Hold shift to add ten points at a time",
+            var hint = ModernUiTheme.CreateText(panel, "Hint", ThaiUiText.Get("Hold shift to add ten points at a time"),
                 ModernUiTheme.SizeLabel, ModernUiTheme.HintColor, TextAlignmentOptions.Left);
             ModernUiTheme.Place((RectTransform)hint.transform, new Vector2(0, 1), new Vector2(Margin, -86), new Vector2(WindowWidth - Margin * 2, 22));
 
@@ -109,7 +109,7 @@ namespace Assets.Scripts.UI.Stats
             var pointsIcon = ModernUiTheme.CreateIcon(pointsCard, ModernUiIcons.Spark, ModernUiTheme.AccentColor, 20);
             ModernUiTheme.Place(pointsIcon.rectTransform, new Vector2(0, 0.5f), new Vector2(14, 0), new Vector2(20, 20));
 
-            var pointsLabel = ModernUiTheme.CreateText(pointsCard, "Label", "Points Available", ModernUiTheme.SizeBody,
+            var pointsLabel = ModernUiTheme.CreateText(pointsCard, "Label", ThaiUiText.Get("Points Available"), ModernUiTheme.SizeBody,
                 ModernUiTheme.LabelColor, TextAlignmentOptions.Left, FontStyles.Bold);
             ModernUiTheme.Stretch((RectTransform)pointsLabel.transform, 44, 2, -120, -2);
 
@@ -190,7 +190,7 @@ namespace Assets.Scripts.UI.Stats
                 var icon = ModernUiTheme.CreateIcon(attrCard, attrIcons[i], ModernUiTheme.IconMutedColor, 15);
                 ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 1), new Vector2(x, y - 4), new Vector2(15, 15));
 
-                var label = ModernUiTheme.CreateText(attrCard, $"AttrLabel{i}", AttributeNames[i],
+                var label = ModernUiTheme.CreateText(attrCard, $"AttrLabel{i}", ThaiUiText.Get(AttributeNames[i]),
                     ModernUiTheme.SizeLabel, ModernUiTheme.LabelColor, TextAlignmentOptions.Left);
                 ModernUiTheme.Place((RectTransform)label.transform, new Vector2(0, 1), new Vector2(x + 21, y), new Vector2(70, 24));
 
@@ -206,12 +206,12 @@ namespace Assets.Scripts.UI.Stats
 
             var buttonWidth = (WindowWidth - Margin * 2 - 10) / 2f;
 
-            var reset = ModernUiTheme.CreateIconButton(panel, "Reset", "Reset", ModernUiIcons.Refresh,
+            var reset = ModernUiTheme.CreateIconButton(panel, "Reset", ThaiUiText.Get("Reset"), ModernUiIcons.Refresh,
                 ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor);
             ModernUiTheme.Place((RectTransform)reset.transform, new Vector2(0, 0), new Vector2(Margin, 18),
                 new Vector2(buttonWidth, 44));
 
-            var apply = ModernUiTheme.CreateIconButton(panel, "Apply", "Apply", ModernUiIcons.Check,
+            var apply = ModernUiTheme.CreateIconButton(panel, "Apply", ThaiUiText.Get("Apply"), ModernUiIcons.Check,
                 ModernUiTheme.AccentColor, ModernUiTheme.AccentTextColor);
             ModernUiTheme.Place((RectTransform)apply.transform, new Vector2(1, 0), new Vector2(-Margin, 18),
                 new Vector2(buttonWidth, 44));

@@ -18,8 +18,10 @@ namespace Assets.Scripts.UI
     public class ModernPanelSkins : MonoBehaviour
     {
         private const float SweepInterval = 0.5f;
+        private const float TranslateInterval = 3f;
 
         private EmoteWindow emoteWindow;
+        private float translateTimer;
 
         //the general pass holds off at first so the windows with a skin of their own get
         //to claim themselves before anything else touches them
@@ -58,6 +60,17 @@ namespace Assets.Scripts.UI
                 emoteWindow = FindFirstObjectByType<EmoteWindow>(FindObjectsInactive.Include);
             if (emoteWindow != null && !ModernUiTheme.IsSkinned(emoteWindow.gameObject))
                 SkinEmotes(emoteWindow);
+
+            //the bar along the bottom and the rest of the heads up display are built by
+            //the scene rather than by a window, so the wording is swapped on its own
+            //slower beat: buttons can appear at any point during a session
+            translateTimer -= Time.deltaTime;
+            if (translateTimer <= 0)
+            {
+                translateTimer = TranslateInterval;
+                if (ui.PrimaryUserUIContainer != null)
+                    ThaiUiText.ApplyToControls(ui.PrimaryUserUIContainer.transform);
+            }
 
             //windows built from prefabs appear long after the scene loads, so the general
             //pass runs on a timer rather than only once
@@ -102,6 +115,7 @@ namespace Assets.Scripts.UI
 
             ModernUiTheme.RecolorLightTexts(win.transform);
             ModernUiTheme.RecolorAccents(win.transform);
+            ThaiUiText.Apply(win.transform);
 
             Debug.Log("[ModernPanelSkins] Retinted the inventory window.");
         }
@@ -156,6 +170,8 @@ namespace Assets.Scripts.UI
 
             ModernUiTheme.RecolorLightTexts(win.transform);
             ModernUiTheme.RecolorAccents(win.transform);
+
+            ThaiUiText.Apply(win.transform);
 
             //after the sweeps, so nothing repaints the number the window is here for
             StylePointsReadout(win);
@@ -307,6 +323,7 @@ namespace Assets.Scripts.UI
 
             ModernUiTheme.RecolorLightTexts(win.transform);
             ModernUiTheme.RecolorAccents(win.transform);
+            ThaiUiText.Apply(win.transform);
 
             Debug.Log("[ModernPanelSkins] Retinted the emote window.");
         }
@@ -349,6 +366,7 @@ namespace Assets.Scripts.UI
 
                 ModernUiTheme.RecolorLightTexts(child);
                 ModernUiTheme.RecolorAccents(child);
+                ThaiUiText.Apply(child);
 
                 Debug.Log($"[ModernPanelSkins] Retinted {child.name}.");
             }

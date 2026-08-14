@@ -121,8 +121,8 @@ namespace Assets.Scripts.UI.Mobile
             //left thumb: the stick, with every other control stacked above it
             CreateJoystick(controlGroup);
 
-            CreateButton(controlGroup, UtilSlot(0, 0), UtilSize, TalkColor, null, OpenChat, "Chat", true);
-            CreateButton(controlGroup, UtilSlot(1, 0), UtilSize, TalkColor, null, OpenChatRoomCommand, "Room", true);
+            CreateButton(controlGroup, UtilSlot(0, 0), UtilSize, TalkColor, null, OpenChat, ThaiUiText.Get("Chat"), true);
+            CreateButton(controlGroup, UtilSlot(1, 0), UtilSize, TalkColor, null, OpenChatRoomCommand, ThaiUiText.Get("Room"), true);
             CreateButton(controlGroup, UtilSlot(2, 0), UtilSize, ZoomColor, null, PressEscape, "ESC", true);
 
             CreateButton(controlGroup, UtilSlot(0, 1), UtilSize, ZoomColor, null, ToggleFullscreen, "[ ]", true);

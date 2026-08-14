@@ -1,0 +1,180 @@
+using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Assets.Scripts.UI
+{
+    /// <summary>
+    /// Thai wording for the interface. Two ways in: Get, which the rebuilt windows use
+    /// when they generate a label, and Apply, which walks a window the game built itself
+    /// and swaps the wording it finds. Only whole strings are matched, so a label the
+    /// table has never heard of is left exactly as it was.
+    ///
+    /// This covers the chrome: window names, buttons, slot names, tabs. Item, skill and
+    /// monster names come from the server data files and stay as they are there.
+    /// </summary>
+    public static class ThaiUiText
+    {
+        private static readonly Dictionary<string, string> Words = new Dictionary<string, string>
+        {
+            //--- windows and the bar along the bottom
+            { "Stats", "สเตตัส" },
+            { "Skills", "สกิล" },
+            { "Skill", "สกิล" },
+            { "Inventory", "กระเป๋า" },
+            { "Equipment", "อุปกรณ์" },
+            { "Hotbar", "แถบลัด" },
+            { "Emotes", "อีโมชั่น" },
+            { "Emote", "อีโมชั่น" },
+            { "Config", "ตั้งค่า" },
+            { "Options", "ตั้งค่า" },
+            { "Help", "ช่วยเหลือ" },
+            { "Database", "ฐานข้อมูล" },
+            { "Menu", "เมนู" },
+            { "Cart", "รถเข็น" },
+            { "Storage", "คลังเก็บของ" },
+            { "Party", "ปาร์ตี้" },
+            { "Chat", "แชท" },
+            { "Room", "ห้อง" },
+
+            //--- headers the rebuilt windows put under their titles
+            { "Character sheet", "ค่าสถานะตัวละคร" },
+            { "Worn gear", "ของที่สวมใส่" },
+            { "System", "ระบบ" },
+            { "New adventurer", "นักผจญภัยคนใหม่" },
+            { "Skill tree", "สายสกิล" },
+
+            //--- stats
+            { "Points Available", "แต้มที่เหลือ" },
+            { "Points remaining", "แต้มที่เหลือ" },
+            { "Hold shift to add ten points at a time", "กด Shift ค้างไว้เพื่อเพิ่มทีละ 10 แต้ม" },
+            { "Reset", "รีเซ็ต" },
+            { "Apply", "ยืนยัน" },
+            { "Atk", "พลังโจมตี" },
+            { "Matk", "พลังเวท" },
+            { "Hit", "ความแม่นยำ" },
+            { "Critical", "คริติคอล" },
+            { "Def", "ป้องกัน" },
+            { "Mdef", "ป้องกันเวท" },
+            { "Flee", "หลบหลีก" },
+            { "Aspd", "ความเร็วโจมตี" },
+
+            //--- equipment slots
+            { "Upper Head", "ศีรษะบน" },
+            { "Mid Head", "ศีรษะกลาง" },
+            { "Lower Head", "ศีรษะล่าง" },
+            { "Armor", "เสื้อเกราะ" },
+            { "Right Hand", "มือขวา" },
+            { "Left Hand", "มือซ้าย" },
+            { "Garment", "ผ้าคลุม" },
+            { "Footgear", "รองเท้า" },
+            { "Accessory", "เครื่องประดับ" },
+            { "Empty", "ว่าง" },
+            {
+                "Double-click a slot to unequip  ·  Right-click an item for details",
+                "ดับเบิลคลิกเพื่อถอด  ·  คลิกขวาเพื่อดูรายละเอียด"
+            },
+
+            //--- the escape menu
+            { "Respawn", "เกิดใหม่" },
+            { "Unstuck", "กลับจุดเซฟ" },
+            { "Shortcut", "แถบลัด" },
+            { "Logout", "ออกจากเกม" },
+            { "Cancel", "ยกเลิก" },
+
+            //--- character creation
+            { "Create Character", "สร้างตัวละคร" },
+            { "Create", "สร้าง" },
+            { "Name", "ชื่อ" },
+            { "Character name", "ชื่อตัวละคร" },
+            { "Gender", "เพศ" },
+            { "Male", "ชาย" },
+            { "Female", "หญิง" },
+            { "Hair style", "ทรงผม" },
+            { "Hair color", "สีผม" },
+
+            //--- inventory and skills
+            { "Items", "ไอเทม" },
+            { "Equip", "สวมใส่" },
+            { "Etc", "อื่น ๆ" },
+            { "Drop", "ทิ้ง" },
+            { "Weight", "น้ำหนัก" },
+            { "Zeny", "เซนี่" },
+            { "Lock Points", "ล็อกแต้ม" },
+            { "Novice", "มือใหม่" },
+            { "1st Job", "อาชีพ 1" },
+            { "2nd Job", "อาชีพ 2" },
+            { "Other", "อื่น ๆ" },
+
+            //--- options
+            { "Game", "เกม" },
+            { "UI", "หน้าจอ" },
+            { "Experimental", "ทดลอง" },
+            { "Audio Volume", "ระดับเสียง" },
+            { "Master", "เสียงรวม" },
+            { "BGM", "เพลงประกอบ" },
+            { "Environment", "เสียงสภาพแวดล้อม" },
+            { "Effects", "เสียงเอฟเฟกต์" },
+            { "Mute", "ปิดเสียง" },
+            { "Display", "การแสดงผล" },
+            { "Text", "ข้อความ" },
+            { "Close", "ปิด" },
+            { "OK", "ตกลง" },
+            { "Yes", "ใช่" },
+            { "No", "ไม่" },
+        };
+
+        /// <summary>
+        /// The Thai for a label the code is about to create, or the label itself when
+        /// the table has nothing for it.
+        /// </summary>
+        public static string Get(string english)
+        {
+            if (string.IsNullOrEmpty(english))
+                return english;
+
+            return Words.TryGetValue(english, out var thai) ? thai : english;
+        }
+
+        /// <summary>
+        /// Swaps the wording on every label under the root that the table recognises.
+        /// Safe to call more than once: Thai is never a key, so a translated label is
+        /// simply not matched a second time.
+        /// </summary>
+        public static void Apply(Transform root)
+        {
+            Apply(root, false);
+        }
+
+        /// <summary>
+        /// The same, restricted to labels that sit inside a button or a toggle. The bar
+        /// along the bottom of the screen is swept on a timer, and that sweep also
+        /// passes over the chat log: a player typing the word Skills into chat should
+        /// not have it rewritten underneath them.
+        /// </summary>
+        public static void ApplyToControls(Transform root)
+        {
+            Apply(root, true);
+        }
+
+        private static void Apply(Transform root, bool controlsOnly)
+        {
+            if (root == null)
+                return;
+
+            foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
+            {
+                var current = text.text;
+                if (string.IsNullOrEmpty(current))
+                    continue;
+
+                if (controlsOnly && text.GetComponentInParent<Selectable>(true) == null)
+                    continue;
+
+                if (Words.TryGetValue(current.Trim(), out var thai))
+                    text.text = thai;
+            }
+        }
+    }
+}

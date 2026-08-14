@@ -62,7 +62,7 @@ namespace Assets.Scripts.UI.TitleScreen
             if (creator != null && hairStyleLabel != null && creator.hairStyle != shownHairStyle)
             {
                 shownHairStyle = creator.hairStyle;
-                hairStyleLabel.text = $"Style {shownHairStyle + 1:00}";
+                hairStyleLabel.text = $"แบบ {shownHairStyle + 1:00}";
             }
 
             searchTimer -= Time.deltaTime;
@@ -145,12 +145,12 @@ namespace Assets.Scripts.UI.TitleScreen
             ModernUiTheme.Place(badge, new Vector2(0, 1), new Vector2(Margin, -16), new Vector2(38, 38));
             ModernUiTheme.CreateIcon(badge, ModernUiIcons.Person, ModernUiTheme.AccentTextColor, 22);
 
-            var title = ModernUiTheme.CreateText(panel, "Title", "Create Character", 26,
+            var title = ModernUiTheme.CreateText(panel, "Title", ThaiUiText.Get("Create Character"), 26,
                 ModernUiTheme.TitleColor, TextAlignmentOptions.BottomLeft, FontStyles.Bold);
             ModernUiTheme.Place((RectTransform)title.transform, new Vector2(0, 1),
                 new Vector2(Margin + 50, -12), new Vector2(400, 30));
 
-            var subtitle = ModernUiTheme.CreateText(panel, "Subtitle", "New adventurer",
+            var subtitle = ModernUiTheme.CreateText(panel, "Subtitle", ThaiUiText.Get("New adventurer"),
                 ModernUiTheme.SizeSubtitle, ModernUiTheme.AccentColor, TextAlignmentOptions.TopLeft);
             ModernUiTheme.Place((RectTransform)subtitle.transform, new Vector2(0, 1),
                 new Vector2(Margin + 50, -44), new Vector2(400, 22));
@@ -192,18 +192,18 @@ namespace Assets.Scripts.UI.TitleScreen
                 if (win.PlayerNameText.placeholder is TextMeshProUGUI placeholder)
                 {
                     placeholder.color = ModernUiTheme.MutedColor;
-                    placeholder.text = "Character name";
+                    placeholder.text = ThaiUiText.Get("Character name");
                 }
             }
             y -= 48f;
 
             Label(card, "Gender", ref y);
-            var maleButton = ModernUiTheme.CreateButton(card, "Male", "Male", ModernUiTheme.AccentColor,
+            var maleButton = ModernUiTheme.CreateButton(card, "Male", ThaiUiText.Get("Male"), ModernUiTheme.AccentColor,
                 ModernUiTheme.AccentTextColor, ModernUiTheme.SizeBody);
             ModernUiTheme.Place((RectTransform)maleButton.transform, new Vector2(0, 1),
                 new Vector2(14, y), new Vector2((LeftWidth - 34) / 2f, 34));
 
-            var femaleButton = ModernUiTheme.CreateButton(card, "Female", "Female", ModernUiTheme.CardDeepColor,
+            var femaleButton = ModernUiTheme.CreateButton(card, "Female", ThaiUiText.Get("Female"), ModernUiTheme.CardDeepColor,
                 ModernUiTheme.NameColor, ModernUiTheme.SizeBody);
             ModernUiTheme.Place((RectTransform)femaleButton.transform, new Vector2(0, 1),
                 new Vector2(20 + (LeftWidth - 34) / 2f, y), new Vector2((LeftWidth - 34) / 2f, 34));
@@ -222,7 +222,7 @@ namespace Assets.Scripts.UI.TitleScreen
             ModernUiTheme.CreateIcon((RectTransform)prev.transform, ModernUiIcons.ChevronLeft, ModernUiTheme.NameColor, 15);
             prev.onClick.AddListener(() => win.ChangeHair(false));
 
-            hairStyleLabel = ModernUiTheme.CreateText(card, "HairStyle", "Style 01", 17,
+            hairStyleLabel = ModernUiTheme.CreateText(card, "HairStyle", "แบบ 01", 17,
                 ModernUiTheme.NameColor, TextAlignmentOptions.Center, FontStyles.Bold);
             ModernUiTheme.Place((RectTransform)hairStyleLabel.transform, new Vector2(0, 1),
                 new Vector2(58, y), new Vector2(LeftWidth - 116, 34));
@@ -306,7 +306,7 @@ namespace Assets.Scripts.UI.TitleScreen
             var card = ModernUiTheme.CreateCard(panel, "StatsCard", ModernUiTheme.CardColor);
             ModernUiTheme.Place(card, new Vector2(0, 1), new Vector2(x, -TopOffset), new Vector2(RightWidth, 404));
 
-            var pointsLabel = ModernUiTheme.CreateText(card, "PointsLabel", "Points remaining",
+            var pointsLabel = ModernUiTheme.CreateText(card, "PointsLabel", ThaiUiText.Get("Points remaining"),
                 ModernUiTheme.SizeLabel, ModernUiTheme.LabelColor, TextAlignmentOptions.Left, FontStyles.Bold);
             ModernUiTheme.Place((RectTransform)pointsLabel.transform, new Vector2(0, 1),
                 new Vector2(14, -12), new Vector2(180, 24));
@@ -370,13 +370,13 @@ namespace Assets.Scripts.UI.TitleScreen
 
         private void BuildFooter(CharacterCreatorWindow win, RectTransform panel)
         {
-            var cancel = ModernUiTheme.CreateIconButton(panel, "Cancel", "Cancel", ModernUiIcons.Close,
+            var cancel = ModernUiTheme.CreateIconButton(panel, "Cancel", ThaiUiText.Get("Cancel"), ModernUiIcons.Close,
                 ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor);
             ModernUiTheme.Place((RectTransform)cancel.transform, new Vector2(1, 0),
                 new Vector2(-Margin - 180, 22), new Vector2(168, 46));
             cancel.onClick.AddListener(win.CancelCreate);
 
-            var create = ModernUiTheme.CreateIconButton(panel, "Create", "Create", ModernUiIcons.Check,
+            var create = ModernUiTheme.CreateIconButton(panel, "Create", ThaiUiText.Get("Create"), ModernUiIcons.Check,
                 ModernUiTheme.AccentColor, ModernUiTheme.AccentTextColor);
             ModernUiTheme.Place((RectTransform)create.transform, new Vector2(1, 0),
                 new Vector2(-Margin, 22), new Vector2(168, 46));
@@ -386,7 +386,7 @@ namespace Assets.Scripts.UI.TitleScreen
 
         private static void Label(RectTransform card, string text, ref float y)
         {
-            var label = ModernUiTheme.CreateText(card, $"{text}Label", text, ModernUiTheme.SizeLabel,
+            var label = ModernUiTheme.CreateText(card, $"{text}Label", ThaiUiText.Get(text), ModernUiTheme.SizeLabel,
                 ModernUiTheme.LabelColor, TextAlignmentOptions.Left, FontStyles.Bold);
             ModernUiTheme.Place((RectTransform)label.transform, new Vector2(0, 1),
                 new Vector2(14, y), new Vector2(200, 20));

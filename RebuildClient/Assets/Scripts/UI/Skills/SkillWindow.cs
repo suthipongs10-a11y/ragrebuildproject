@@ -361,7 +361,7 @@ namespace Assets.Scripts.UI
         {
             var points = PlayerState.Instance.SkillPoints; 
             
-            PointsText.text = $"Skill Points {points}";
+            PointsText.text = $"แต้มสกิล {points}";
             for (var i = 0; i < Entries.Count; i++)
             {
                 Entries[i].UpdateLevelUpButton(points > 0, !lockSkillLevelUp);

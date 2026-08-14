@@ -100,6 +100,39 @@ namespace Assets.Scripts.UI
             }
         }
 
+        private static TMP_FontAsset themeFont;
+
+        /// <summary>
+        /// The font the rebuilt windows draw with. The client's default is Liberation
+        /// Sans, which carries no Thai at all, so the Thai capable fallback registered
+        /// in the TextMeshPro settings is preferred when there is one. Drawing straight
+        /// from it rather than leaning on the fallback chain keeps a Thai label in the
+        /// same material as the English beside it, and so in the same draw call.
+        /// </summary>
+        public static TMP_FontAsset ThemeFont
+        {
+            get
+            {
+                if (themeFont != null)
+                    return themeFont;
+
+                var fallbacks = TMP_Settings.fallbackFontAssets;
+                if (fallbacks != null)
+                {
+                    for (var i = 0; i < fallbacks.Count; i++)
+                    {
+                        if (fallbacks[i] == null)
+                            continue;
+                        themeFont = fallbacks[i];
+                        return themeFont;
+                    }
+                }
+
+                themeFont = TMP_Settings.defaultFontAsset;
+                return themeFont;
+            }
+        }
+
         private static Material crispMaterial;
         private static bool crispMaterialBuilt;
 
@@ -119,7 +152,7 @@ namespace Assets.Scripts.UI
 
                 crispMaterialBuilt = true;
 
-                var font = TMP_Settings.defaultFontAsset;
+                var font = ThemeFont;
                 if (font == null || font.material == null)
                     return null;
 
@@ -574,9 +607,9 @@ namespace Assets.Scripts.UI
             go.transform.SetParent(parent, false);
 
             var text = go.GetComponent<TextMeshProUGUI>();
-            if (TMP_Settings.defaultFontAsset != null)
+            if (ThemeFont != null)
             {
-                text.font = TMP_Settings.defaultFontAsset;
+                text.font = ThemeFont;
                 var material = CrispMaterial;
                 if (material != null)
                     text.fontSharedMaterial = material;
