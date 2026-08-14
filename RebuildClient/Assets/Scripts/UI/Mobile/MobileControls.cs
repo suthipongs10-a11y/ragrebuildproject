@@ -24,6 +24,16 @@ namespace Assets.Scripts.UI.Mobile
         private const int MaxEnemyBlips = 40;
         private const float BlipRefreshInterval = 0.2f;
 
+        //action buttons sit under the right thumb, everything else is grouped bottom left
+        private const float AttackSize = 110f;
+        private const float PickUpSize = 90f;
+        private const float ToggleSize = 52f;
+        private const float UtilSize = 62f;
+        private const float UtilGap = 8f;
+        private const float UtilOriginX = 24f;
+        private const float UtilOriginY = 410f;
+        private const int UtilRows = 4;
+
         //the bottom menu wraps to this many buttons per row so it fits a phone screen
         private const int MenuColumns = 5;
         private const float MenuCellWidth = 100f;
@@ -101,26 +111,37 @@ namespace Assets.Scripts.UI.Mobile
             controlGroup.offsetMin = Vector2.zero;
             controlGroup.offsetMax = Vector2.zero;
 
-            CreateButton(controlGroup, new Vector2(-110, 250), 170, AttackColor, CreateSwordSprite(), OnAttack);
-            CreateButton(controlGroup, new Vector2(-110, 440), 140, PickUpColor, CreateHandSprite(), OnPickUp);
-            CreateButton(controlGroup, new Vector2(-110, 610), 100, ZoomColor, null, () => Zoom(-6f), "+");
-            CreateButton(controlGroup, new Vector2(-110, 720), 100, ZoomColor, null, () => Zoom(6f), "-");
-            CreateButton(controlGroup, new Vector2(-300, 250), 120, TalkColor, null, OnTalk, "...");
-            CreateButton(controlGroup, new Vector2(-300, 400), 120, ZoomColor, null, OnSit, "Zz");
-            CreateButton(controlGroup, new Vector2(-300, 550), 100, ZoomColor, null, PressEscape, "ESC");
-            CreateButton(controlGroup, new Vector2(-300, 680), 100, ZoomColor, null, ToggleFullscreen, "[  ]");
+            //right thumb: the two buttons used constantly while fighting
+            CreateButton(controlGroup, new Vector2(-24, 170), AttackSize, AttackColor, CreateSwordSprite(), OnAttack);
+            CreateButton(controlGroup, new Vector2(-34, 300), PickUpSize, PickUpColor, CreateHandSprite(), OnPickUp);
 
+            //left thumb: the stick, with every other control stacked above it
             CreateJoystick(controlGroup);
-            CreateButton(controlGroup, new Vector2(45, 560), 90, ZoomColor, null, () => RotateCamera(-45f), "<", true);
-            CreateButton(controlGroup, new Vector2(145, 560), 90, ZoomColor, null, ResetCamera, "o", true);
-            CreateButton(controlGroup, new Vector2(245, 560), 90, ZoomColor, null, () => RotateCamera(45f), ">", true);
-            CreateButton(controlGroup, new Vector2(45, 670), 90, TalkColor, null, OpenChat, "Chat", true);
-            CreateButton(controlGroup, new Vector2(145, 670), 90, TalkColor, null, OpenChatRoomCommand, "Room", true);
+
+            CreateButton(controlGroup, UtilSlot(0, 0), UtilSize, TalkColor, null, OpenChat, "Chat", true);
+            CreateButton(controlGroup, UtilSlot(1, 0), UtilSize, TalkColor, null, OpenChatRoomCommand, "Room", true);
+            CreateButton(controlGroup, UtilSlot(2, 0), UtilSize, ZoomColor, null, PressEscape, "ESC", true);
+
+            CreateButton(controlGroup, UtilSlot(0, 1), UtilSize, ZoomColor, null, ToggleFullscreen, "[ ]", true);
+            CreateButton(controlGroup, UtilSlot(1, 1), UtilSize, ZoomColor, null, OnSit, "Zz", true);
+            CreateButton(controlGroup, UtilSlot(2, 1), UtilSize, TalkColor, null, OnTalk, "...", true);
+
+            CreateButton(controlGroup, UtilSlot(0, 2), UtilSize, ZoomColor, null, () => RotateCamera(-45f), "<", true);
+            CreateButton(controlGroup, UtilSlot(1, 2), UtilSize, ZoomColor, null, ResetCamera, "o", true);
+            CreateButton(controlGroup, UtilSlot(2, 2), UtilSize, ZoomColor, null, () => RotateCamera(45f), ">", true);
+
+            CreateButton(controlGroup, UtilSlot(0, 3), UtilSize, ZoomColor, null, () => Zoom(-6f), "+", true);
+            CreateButton(controlGroup, UtilSlot(1, 3), UtilSize, ZoomColor, null, () => Zoom(6f), "-", true);
 
             CreateMinimap(controlGroup);
 
-            CreateButton(root, new Vector2(-20, 130), 70, ZoomColor, CreateMenuSprite(), ToggleControls);
+            CreateButton(root, new Vector2(-24, 96), ToggleSize, ZoomColor, CreateMenuSprite(), ToggleControls);
         }
+
+        //row 0 is the top row of the block, so it fills upward from the joystick
+        private static Vector2 UtilSlot(int column, int row) => new Vector2(
+            UtilOriginX + column * (UtilSize + UtilGap),
+            UtilOriginY + (UtilRows - 1 - row) * (UtilSize + UtilGap));
 
         private void Update()
         {
@@ -147,15 +168,31 @@ namespace Assets.Scripts.UI.Mobile
         {
             if (menuGrid == null)
             {
-                foreach (var layout in FindObjectsByType<HorizontalLayoutGroup>(FindObjectsSortMode.None))
+                //The bar is found through its Stats button rather than its layout
+                //component, since a button name is stable while the layout type is not.
+                foreach (var button in FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 {
-                    var bar = layout.transform;
-                    if (bar.Find("Database") == null || bar.Find("Hotbar") == null || bar.Find("Stats") == null)
+                    if (button.name != "Stats")
                         continue;
 
-                    Destroy(layout);
+                    var bar = button.transform.parent;
+                    if (bar == null || bar.Find("Database") == null || bar.Find("Inventory") == null)
+                        continue;
+
+                    //LayoutGroup forbids two of its kind on one object and Destroy only
+                    //takes effect at the end of the frame, so the old group has to go
+                    //immediately or AddComponent below quietly hands back null.
+                    foreach (var old in bar.GetComponents<LayoutGroup>())
+                        DestroyImmediate(old);
+
                     menuRect = (RectTransform)bar;
                     menuGrid = bar.gameObject.AddComponent<GridLayoutGroup>();
+                    if (menuGrid == null)
+                    {
+                        Debug.LogWarning("[MobileControls] Could not replace the bottom menu layout.");
+                        return;
+                    }
+
                     menuGrid.spacing = new Vector2(MenuSpacing, MenuSpacing);
                     menuGrid.startCorner = GridLayoutGroup.Corner.UpperLeft;
                     menuGrid.startAxis = GridLayoutGroup.Axis.Horizontal;
@@ -612,8 +649,8 @@ namespace Assets.Scripts.UI.Mobile
             padRect.anchorMin = Vector2.zero;
             padRect.anchorMax = Vector2.zero;
             padRect.pivot = new Vector2(0.5f, 0.5f);
-            padRect.sizeDelta = new Vector2(270, 270);
-            padRect.anchoredPosition = new Vector2(180, 340);
+            padRect.sizeDelta = new Vector2(180, 180);
+            padRect.anchoredPosition = new Vector2(130, 230);
 
             var knobObject = new GameObject("Knob", typeof(Image));
             knobObject.transform.SetParent(padRect, false);
@@ -626,11 +663,11 @@ namespace Assets.Scripts.UI.Mobile
             var knobRect = knobObject.GetComponent<RectTransform>();
             knobRect.anchorMin = new Vector2(0.5f, 0.5f);
             knobRect.anchorMax = new Vector2(0.5f, 0.5f);
-            knobRect.sizeDelta = new Vector2(115, 115);
+            knobRect.sizeDelta = new Vector2(76, 76);
 
             joystick = padObject.GetComponent<JoystickPad>();
             joystick.Knob = knobRect;
-            joystick.Radius = 85f;
+            joystick.Radius = 58f;
         }
 
         private class JoystickPad : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
