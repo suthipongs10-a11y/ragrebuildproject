@@ -213,6 +213,26 @@ namespace Assets.Scripts.UI.ClientDatabase
             if (mapsTabImage != null) mapsTabImage.color = idx == 2 ? s_activeTabColor : s_inactiveTabColor;
             if (helpTabImage != null) helpTabImage.color = idx == 3 ? s_activeTabColor : s_inactiveTabColor;
             if (npcsTabImage != null) npcsTabImage.color = idx == 4 ? s_activeTabColor : s_inactiveTabColor;
+
+            //the active tab is now a filled blue chip rather than a white one, so its
+            //label has to turn over with it or it goes dark on dark
+            PaintTabLabel(monstersTabImage, idx == 0);
+            PaintTabLabel(itemsTabImage, idx == 1);
+            PaintTabLabel(mapsTabImage, idx == 2);
+            PaintTabLabel(helpTabImage, idx == 3);
+            PaintTabLabel(npcsTabImage, idx == 4);
+        }
+
+        private static void PaintTabLabel(Image tab, bool active)
+        {
+            if (tab == null)
+                return;
+
+            foreach (var label in tab.GetComponentsInChildren<TextMeshProUGUI>(true))
+            {
+                label.color = active ? ModernUiTheme.AccentTextColor : ModernUiTheme.NameColor;
+                label.fontStyle = FontStyles.Bold;
+            }
         }
 
         private void JumpToItem(ItemData item)

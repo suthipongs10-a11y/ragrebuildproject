@@ -95,9 +95,28 @@ namespace Assets.Scripts.UI
             get
             {
                 if (roundedSprite == null)
-                    roundedSprite = CreateRoundedSprite();
+                    roundedSprite = CreateRoundedSprite(Color.white);
                 return roundedSprite;
             }
+        }
+
+        private static readonly System.Collections.Generic.Dictionary<Color, Sprite> tintedRounded =
+            new System.Collections.Generic.Dictionary<Color, Sprite>();
+
+        /// <summary>
+        /// A rounded panel with the colour baked into the pixels rather than applied as
+        /// a tint. Windows that swap a sprite to show a state, the character slots being
+        /// the one that matters, never touch the image's colour, so the only way to give
+        /// those two states different colours is to hand them two different sprites.
+        /// </summary>
+        public static Sprite TintedRounded(Color color)
+        {
+            if (tintedRounded.TryGetValue(color, out var existing) && existing != null)
+                return existing;
+
+            var sprite = CreateRoundedSprite(color);
+            tintedRounded[color] = sprite;
+            return sprite;
         }
 
         private static TMP_FontAsset themeFont;
@@ -582,6 +601,163 @@ namespace Assets.Scripts.UI
                 0, SpriteMeshType.FullRect, new Vector4(30, 30, 30, 30));
         }
 
+        /// <summary>
+        /// A thin blue handle running on a soft track, in place of the boxy default.
+        /// </summary>
+        public static void StyleScrollbar(Scrollbar bar)
+        {
+            if (bar == null)
+                return;
+
+            var track = bar.GetComponent<Image>();
+            if (track != null)
+            {
+                track.sprite = RoundedSprite;
+                track.type = Image.Type.Sliced;
+                track.color = CardDeepColor;
+            }
+
+            if (bar.handleRect == null)
+                return;
+
+            var handle = bar.handleRect.GetComponent<Image>();
+            if (handle != null)
+            {
+                handle.sprite = RoundedSprite;
+                handle.type = Image.Type.Sliced;
+                handle.color = AccentColor;
+            }
+        }
+
+        /// <summary>
+        /// Styles every scroll view under the root and drops the sideways bar. Nothing in
+        /// this interface is wider than its window, so a horizontal bar only ever eats a
+        /// strip along the bottom of a list, which is what hid the skill point count.
+        /// </summary>
+        public static void StyleScrollViews(Transform root)
+        {
+            foreach (var scroll in root.GetComponentsInChildren<ScrollRect>(true))
+            {
+                StyleScrollbar(scroll.verticalScrollbar);
+
+                if (scroll.horizontalScrollbar != null)
+                    scroll.horizontalScrollbar.gameObject.SetActive(false);
+                scroll.horizontal = false;
+                scroll.horizontalScrollbar = null;
+            }
+        }
+
+        /// <summary>
+        /// Gives a text box the card look, a blue caret and a readable placeholder.
+        /// </summary>
+        public static void StyleInputField(TMP_InputField field)
+        {
+            if (field == null)
+                return;
+
+            var image = field.GetComponent<Image>();
+            if (image != null)
+            {
+                image.sprite = RoundedSprite;
+                image.type = Image.Type.Sliced;
+                image.color = CardColor;
+            }
+
+            if (field.textComponent != null)
+            {
+                field.textComponent.color = NameColor;
+                field.textComponent.fontSize = SizeBody;
+                field.textComponent.extraPadding = true;
+            }
+
+            if (field.placeholder is TextMeshProUGUI placeholder)
+            {
+                placeholder.color = MutedColor;
+                placeholder.fontSize = SizeBody;
+                placeholder.extraPadding = true;
+            }
+
+            field.customCaretColor = true;
+            field.caretColor = AccentColor;
+            field.selectionColor = new Color(AccentColor.r, AccentColor.g, AccentColor.b, 0.28f);
+        }
+
+        /// <summary>
+        /// Draws sliders as a thin track with a blue fill and a round handle.
+        /// Only the ones the player can actually drag are touched: a health or cast bar
+        /// is built from the same component, and its colour is carrying a meaning that
+        /// painting it blue would throw away.
+        /// </summary>
+        public static void StyleSliders(Transform root)
+        {
+            foreach (var slider in root.GetComponentsInChildren<Slider>(true))
+            {
+                if (!slider.interactable)
+                    continue;
+
+                if (slider.fillRect != null)
+                {
+                    var fill = slider.fillRect.GetComponent<Image>();
+                    if (fill != null)
+                    {
+                        fill.sprite = RoundedSprite;
+                        fill.type = Image.Type.Sliced;
+                        fill.color = AccentColor;
+                    }
+                }
+
+                if (slider.handleRect != null)
+                {
+                    var handle = slider.handleRect.GetComponent<Image>();
+                    if (handle != null)
+                    {
+                        handle.sprite = RoundedSprite;
+                        handle.type = Image.Type.Sliced;
+                        handle.color = AccentColor;
+                    }
+                }
+
+                //the track sits behind both of those, on the slider itself
+                var track = slider.GetComponent<Image>();
+                if (track != null)
+                {
+                    track.sprite = RoundedSprite;
+                    track.type = Image.Type.Sliced;
+                    track.color = CardDeepColor;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Lays a card behind an element the window keeps writing into, matched to that
+        /// element's own rect and padded out a little. Building it from the rect rather
+        /// than from guessed coordinates means it lands correctly in a layout this code
+        /// has never seen. Returns null when there is already one there.
+        /// </summary>
+        public static RectTransform CardBehind(RectTransform target, string name, Color color, float padX = 16,
+            float padY = 8)
+        {
+            if (target == null)
+                return null;
+
+            var parent = target.parent;
+            if (parent == null || parent.Find(name) != null)
+                return null;
+
+            var card = CreateCard(parent, name, color);
+            card.anchorMin = target.anchorMin;
+            card.anchorMax = target.anchorMax;
+            card.pivot = target.pivot;
+            //the offsets place and size the card in one go, whether the element they were
+            //read from is stretched or pinned to a corner
+            card.offsetMin = target.offsetMin - new Vector2(padX, padY);
+            card.offsetMax = target.offsetMax + new Vector2(padX, padY);
+            card.GetComponent<Image>().raycastTarget = false;
+            //behind the thing it is backing, never over it
+            card.SetSiblingIndex(target.GetSiblingIndex());
+            return card;
+        }
+
         public static RectTransform CreateRect(string name, Transform parent)
         {
             var go = new GameObject(name, typeof(RectTransform));
@@ -658,7 +834,7 @@ namespace Assets.Scripts.UI
             return button;
         }
 
-        private static Sprite CreateRoundedSprite()
+        private static Sprite CreateRoundedSprite(Color fill)
         {
             const int size = 32;
             const int radius = 10;
@@ -678,7 +854,7 @@ namespace Assets.Scripts.UI
                     else if (x >= size - radius && y >= size - radius)
                         inside = InCorner(x, y, size - radius - 1, size - radius - 1, radius);
 
-                    texture.SetPixel(x, y, inside ? Color.white : Color.clear);
+                    texture.SetPixel(x, y, inside ? fill : Color.clear);
                 }
             }
 

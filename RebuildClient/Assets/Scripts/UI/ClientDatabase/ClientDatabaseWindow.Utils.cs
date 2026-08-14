@@ -18,9 +18,12 @@ namespace Assets.Scripts.UI.ClientDatabase
 {
     public partial class ClientDatabaseWindow
     {
-        private static readonly Color s_activeTabColor = Color.white;
-        private static readonly Color s_inactiveTabColor = new(0.78f, 0.78f, 0.80f, 1f);
-        private static readonly Color s_defaultTextColor = new(0.08f, 0.08f, 0.10f, 1f);
+        //taken from the shared theme rather than written out again here: ShowTab reapplies
+        //these on every click, so a colour set from outside would be undone the moment the
+        //player changed tab
+        private static readonly Color s_activeTabColor = ModernUiTheme.AccentColor;
+        private static readonly Color s_inactiveTabColor = ModernUiTheme.TabIdleColor;
+        private static readonly Color s_defaultTextColor = ModernUiTheme.NameColor;
 
         private static string FormatItemName(ItemData item) => item.Slots > 0 ? $"{item.Name}[{item.Slots}]" : item.Name;
         private static string FormatNameWithBracket(string name, string bracket) => $"{name}  <size=80%><color=#888888>[{bracket}]</color></size>";

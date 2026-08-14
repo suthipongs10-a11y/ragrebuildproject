@@ -1,3 +1,4 @@
+using Assets.Scripts.UI.ClientDatabase;
 using Assets.Scripts.UI.ConfigWindow;
 using Assets.Scripts.UI.Inventory;
 using TMPro;
@@ -113,6 +114,7 @@ namespace Assets.Scripts.UI
             if (win.ItemBoxRoot != null)
                 ModernUiTheme.RecolorLightTexts(win.ItemBoxRoot);
 
+            ModernUiTheme.StyleScrollViews(win.transform);
             ModernUiTheme.RecolorLightTexts(win.transform);
             ModernUiTheme.RecolorAccents(win.transform);
             ThaiUiText.Apply(win.transform);
@@ -136,13 +138,7 @@ namespace Assets.Scripts.UI
             if (horizontal != null)
                 horizontal.gameObject.SetActive(false);
 
-            var scroll = win.GetComponentInChildren<ScrollRect>(true);
-            if (scroll != null)
-            {
-                scroll.horizontal = false;
-                scroll.horizontalScrollbar = null;
-                StyleScrollbar(scroll.verticalScrollbar);
-            }
+            ModernUiTheme.StyleScrollViews(win.transform);
 
             ModernUiTheme.AttachShadow(root);
             ModernUiTheme.StyleTabBar(win.Tabs);
@@ -254,31 +250,6 @@ namespace Assets.Scripts.UI
             text.extraPadding = true;
         }
 
-        private static void StyleScrollbar(Scrollbar bar)
-        {
-            if (bar == null)
-                return;
-
-            var track = bar.GetComponent<Image>();
-            if (track != null)
-            {
-                track.sprite = ModernUiTheme.RoundedSprite;
-                track.type = Image.Type.Sliced;
-                track.color = ModernUiTheme.CardDeepColor;
-            }
-
-            if (bar.handleRect == null)
-                return;
-
-            var handle = bar.handleRect.GetComponent<Image>();
-            if (handle != null)
-            {
-                handle.sprite = ModernUiTheme.RoundedSprite;
-                handle.type = Image.Type.Sliced;
-                handle.color = ModernUiTheme.AccentColor;
-            }
-        }
-
         private static Transform FindDeep(Transform root, string name)
         {
             if (root.name == name)
@@ -303,7 +274,9 @@ namespace Assets.Scripts.UI
             ModernUiTheme.StyleTabBar(win.TabButtons);
             ModernUiTheme.RecolorLightTexts(win.transform);
             ModernUiTheme.RecolorAccents(win.transform);
-            StyleSliders(win.transform);
+            ModernUiTheme.StyleSliders(win.transform);
+            ModernUiTheme.StyleScrollViews(win.transform);
+            ThaiUiText.Apply(win.transform);
 
             Debug.Log("[ModernPanelSkins] Retinted the options window.");
         }
@@ -364,6 +337,8 @@ namespace Assets.Scripts.UI
                 if (background != null && background.color.a > 0.5f)
                     ModernUiTheme.AttachShadow(child);
 
+                ModernUiTheme.StyleScrollViews(child);
+                ModernUiTheme.StyleSliders(child);
                 ModernUiTheme.RecolorLightTexts(child);
                 ModernUiTheme.RecolorAccents(child);
                 ThaiUiText.Apply(child);
@@ -379,6 +354,13 @@ namespace Assets.Scripts.UI
         /// </summary>
         private bool HasOwnSkin(UiManager ui, WindowBase window)
         {
+            //matched by type where there is more than one of a window alive at once: the
+            //item description card exists twice over, one for the item under the cursor
+            //and one for whatever it is being compared against
+            if (window is ItemDescriptionWindow || window is CardIllustrationWindow
+                                                || window is ClientDatabaseWindow || window is DialogWindow)
+                return true;
+
             return window == ui.StatusWindow
                    || window == ui.EquipmentWindow
                    || window == ui.InventoryWindow
@@ -387,45 +369,5 @@ namespace Assets.Scripts.UI
                    || (emoteWindow != null && window == emoteWindow);
         }
 
-        /// <summary>
-        /// Options is mostly sliders, and the reference draws them as a thin blue track
-        /// with a round handle rather than the boxy default.
-        /// </summary>
-        private static void StyleSliders(Transform root)
-        {
-            foreach (var slider in root.GetComponentsInChildren<Slider>(true))
-            {
-                if (slider.fillRect != null)
-                {
-                    var fill = slider.fillRect.GetComponent<Image>();
-                    if (fill != null)
-                    {
-                        fill.sprite = ModernUiTheme.RoundedSprite;
-                        fill.type = Image.Type.Sliced;
-                        fill.color = ModernUiTheme.AccentColor;
-                    }
-                }
-
-                if (slider.handleRect != null)
-                {
-                    var handle = slider.handleRect.GetComponent<Image>();
-                    if (handle != null)
-                    {
-                        handle.sprite = ModernUiTheme.RoundedSprite;
-                        handle.type = Image.Type.Sliced;
-                        handle.color = ModernUiTheme.AccentColor;
-                    }
-                }
-
-                //the track sits behind both of those, on the slider itself
-                var track = slider.GetComponent<Image>();
-                if (track != null)
-                {
-                    track.sprite = ModernUiTheme.RoundedSprite;
-                    track.type = Image.Type.Sliced;
-                    track.color = ModernUiTheme.CardDeepColor;
-                }
-            }
-        }
     }
 }
