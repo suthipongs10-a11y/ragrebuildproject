@@ -1,9 +1,11 @@
 using System.Collections.Generic;
 using Assets.Scripts.MapEditor;
 using Assets.Scripts.Network;
+using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace Assets.Scripts.UI.Mobile
@@ -48,6 +50,11 @@ namespace Assets.Scripts.UI.Mobile
         private GridLayoutGroup menuGrid;
         private RectTransform menuRect;
         private float menuFitWidth = -1f;
+
+        private JoystickPad joystick;
+        private Vector2Int lastWalkDirection;
+        private float walkResendTimer;
+        private bool joystickWalking;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -97,6 +104,14 @@ namespace Assets.Scripts.UI.Mobile
             CreateButton(controlGroup, new Vector2(-110, 720), 100, ZoomColor, null, () => Zoom(6f), "-");
             CreateButton(controlGroup, new Vector2(-300, 250), 120, TalkColor, null, OnTalk, "...");
             CreateButton(controlGroup, new Vector2(-300, 400), 120, ZoomColor, null, OnSit, "Zz");
+            CreateButton(controlGroup, new Vector2(-300, 550), 100, ZoomColor, null, PressEscape, "ESC");
+            CreateButton(controlGroup, new Vector2(-300, 680), 100, ZoomColor, null, ToggleFullscreen, "[  ]");
+
+            CreateJoystick(controlGroup);
+            CreateButton(controlGroup, new Vector2(45, 560), 90, ZoomColor, null, () => RotateCamera(-45f), "<", true);
+            CreateButton(controlGroup, new Vector2(145, 560), 90, ZoomColor, null, ResetCamera, "o", true);
+            CreateButton(controlGroup, new Vector2(245, 560), 90, ZoomColor, null, () => RotateCamera(45f), ">", true);
+            CreateButton(controlGroup, new Vector2(45, 670), 90, TalkColor, null, OpenChat, "Chat", true);
 
             CreateMinimap(controlGroup);
 
@@ -106,6 +121,7 @@ namespace Assets.Scripts.UI.Mobile
         private void Update()
         {
             RestructureBottomMenu();
+            UpdateJoystickWalk();
             RefreshMinimapForCurrentMap();
 
             blipTimer -= Time.deltaTime;
@@ -271,6 +287,91 @@ namespace Assets.Scripts.UI.Mobile
                 NetworkManager.Instance.SendNpcClick(best.Id);
         }
 
+        /// <summary>
+        /// Walks the player in the direction the joystick is held, reusing the same
+        /// direction packets and resend cadence as desktop WASD movement. The angle is
+        /// offset by the camera rotation so pushing up always walks away from the camera.
+        /// </summary>
+        private void UpdateJoystickWalk()
+        {
+            if (joystick == null)
+                return;
+
+            var held = joystick.Active && joystick.Value.sqrMagnitude > 0.05f;
+            if (!held)
+            {
+                if (joystickWalking)
+                {
+                    NetworkManager.Instance.StopPlayer();
+                    joystickWalking = false;
+                    lastWalkDirection = Vector2Int.zero;
+                }
+                return;
+            }
+
+            var camera = CameraFollower.Instance;
+            if (camera == null || camera.TargetControllable == null)
+                return;
+
+            //the x axis is mirrored on purpose, the wasd path feeds mirrored east/west
+            //into this same math (see GetWASDKeyPress) and GetFacingForAngle undoes it
+            var push = joystick.Value;
+            var angle = Mathf.Atan2(-push.x, push.y) * Mathf.Rad2Deg - camera.Rotation;
+            angle = Mathf.Repeat(angle + 180f, 360f) - 180f;
+            var facing = Directions.GetFacingForAngle(angle);
+            var step = Directions.GetXYForDirection(facing);
+            var direction = new Vector2Int(step.x, step.y);
+
+            walkResendTimer -= Time.deltaTime;
+            if (direction != lastWalkDirection)
+                walkResendTimer = -1f;
+            if (walkResendTimer > 0)
+                return;
+
+            NetworkManager.Instance.MovePlayerInDirection(direction);
+            lastWalkDirection = direction;
+            walkResendTimer = 0.30f;
+            joystickWalking = true;
+        }
+
+        private void RotateCamera(float amount)
+        {
+            var camera = CameraFollower.Instance;
+            if (camera != null)
+                camera.TargetRotation += amount;
+        }
+
+        private void ResetCamera()
+        {
+            var camera = CameraFollower.Instance;
+            if (camera == null)
+                return;
+
+            camera.TargetRotation = 0;
+            camera.Height = 50;
+            camera.Distance = 60;
+        }
+
+        private void OpenChat()
+        {
+            var camera = CameraFollower.Instance;
+            if (camera == null || camera.TextBoxInputField == null)
+                return;
+
+            camera.TextBoxInputField.ActivateInputField();
+        }
+
+        private void PressEscape()
+        {
+            if (UiManager.Instance != null)
+                UiManager.Instance.CloseLastWindow();
+        }
+
+        private void ToggleFullscreen()
+        {
+            Screen.fullScreen = !Screen.fullScreen;
+        }
+
         private void OnSit()
         {
             var camera = CameraFollower.Instance;
@@ -417,7 +518,7 @@ namespace Assets.Scripts.UI.Mobile
         }
 
         private void CreateButton(RectTransform root, Vector2 offset, float size, Color color, Sprite icon,
-            UnityEngine.Events.UnityAction action, string label = null)
+            UnityEngine.Events.UnityAction action, string label = null, bool leftSide = false)
         {
             var buttonObject = new GameObject("MobileButton", typeof(Image), typeof(Button));
             buttonObject.transform.SetParent(root, false);
@@ -426,10 +527,11 @@ namespace Assets.Scripts.UI.Mobile
             image.sprite = circleSprite;
             image.color = color;
 
+            var corner = leftSide ? new Vector2(0, 0) : new Vector2(1, 0);
             var rect = buttonObject.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(1, 0);
-            rect.anchorMax = new Vector2(1, 0);
-            rect.pivot = new Vector2(1, 0);
+            rect.anchorMin = corner;
+            rect.anchorMax = corner;
+            rect.pivot = corner;
             rect.sizeDelta = new Vector2(size, size);
             rect.anchoredPosition = offset;
 
@@ -463,7 +565,7 @@ namespace Assets.Scripts.UI.Mobile
             text.font = font;
             text.text = label;
             text.alignment = TextAlignmentOptions.Center;
-            text.fontSize = size * 0.4f;
+            text.fontSize = size * (label.Length > 2 ? 0.28f : 0.4f);
             text.color = new Color(1, 1, 1, 0.9f);
             text.raycastTarget = false;
 
@@ -472,6 +574,79 @@ namespace Assets.Scripts.UI.Mobile
             textRect.anchorMax = Vector2.one;
             textRect.offsetMin = Vector2.zero;
             textRect.offsetMax = Vector2.zero;
+        }
+
+        /// <summary>
+        /// A drag pad in the bottom left corner that walks the player like WASD does.
+        /// The pad tracks the finger, UpdateJoystickWalk turns it into move packets.
+        /// </summary>
+        private void CreateJoystick(RectTransform root)
+        {
+            var padObject = new GameObject("Joystick", typeof(Image), typeof(JoystickPad));
+            padObject.transform.SetParent(root, false);
+
+            var padImage = padObject.GetComponent<Image>();
+            padImage.sprite = circleSprite;
+            padImage.color = new Color(0.25f, 0.28f, 0.35f, 0.25f);
+
+            var padRect = padObject.GetComponent<RectTransform>();
+            padRect.anchorMin = Vector2.zero;
+            padRect.anchorMax = Vector2.zero;
+            padRect.pivot = new Vector2(0.5f, 0.5f);
+            padRect.sizeDelta = new Vector2(270, 270);
+            padRect.anchoredPosition = new Vector2(180, 340);
+
+            var knobObject = new GameObject("Knob", typeof(Image));
+            knobObject.transform.SetParent(padRect, false);
+
+            var knobImage = knobObject.GetComponent<Image>();
+            knobImage.sprite = circleSprite;
+            knobImage.color = new Color(1f, 1f, 1f, 0.35f);
+            knobImage.raycastTarget = false;
+
+            var knobRect = knobObject.GetComponent<RectTransform>();
+            knobRect.anchorMin = new Vector2(0.5f, 0.5f);
+            knobRect.anchorMax = new Vector2(0.5f, 0.5f);
+            knobRect.sizeDelta = new Vector2(115, 115);
+
+            joystick = padObject.GetComponent<JoystickPad>();
+            joystick.Knob = knobRect;
+            joystick.Radius = 85f;
+        }
+
+        private class JoystickPad : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
+        {
+            public RectTransform Knob;
+            public float Radius = 85f;
+            public Vector2 Value;
+            public bool Active;
+
+            public void OnPointerDown(PointerEventData eventData)
+            {
+                Active = true;
+                MoveKnob(eventData);
+            }
+
+            public void OnDrag(PointerEventData eventData) => MoveKnob(eventData);
+
+            public void OnPointerUp(PointerEventData eventData)
+            {
+                Active = false;
+                Value = Vector2.zero;
+                if (Knob != null)
+                    Knob.anchoredPosition = Vector2.zero;
+            }
+
+            private void MoveKnob(PointerEventData eventData)
+            {
+                RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)transform,
+                    eventData.position, eventData.pressEventCamera, out var local);
+
+                var clamped = Vector2.ClampMagnitude(local, Radius);
+                Value = clamped / Radius;
+                if (Knob != null)
+                    Knob.anchoredPosition = clamped;
+            }
         }
 
         private RectTransform CreatePanel(RectTransform root, string name, Vector2 anchor, Vector2 offset, Vector2 size, Color color)
