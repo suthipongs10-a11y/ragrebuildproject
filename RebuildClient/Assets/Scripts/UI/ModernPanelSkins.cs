@@ -1,5 +1,4 @@
 using Assets.Scripts.UI.Inventory;
-using Assets.Scripts.UI.Skills;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
