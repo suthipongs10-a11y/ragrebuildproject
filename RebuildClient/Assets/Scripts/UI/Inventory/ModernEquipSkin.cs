@@ -41,9 +41,15 @@ namespace Assets.Scripts.UI.Inventory
         private static readonly int[] LeftSlots = { 0, 2, 4, 6, 8 };
         private static readonly int[] RightSlots = { 1, 3, 5, 7, 9 };
 
-        private Sprite roundedSprite;
+        //shown in an empty slot so the window still reads at a glance with nothing worn
+        private static Sprite[] SlotIcons => new[]
+        {
+            ModernUiIcons.Helmet, ModernUiIcons.Glasses, ModernUiIcons.Mask, ModernUiIcons.Armor,
+            ModernUiIcons.Sword, ModernUiIcons.Shield, ModernUiIcons.Cape, ModernUiIcons.Boot,
+            ModernUiIcons.Ring, ModernUiIcons.Ring
+        };
 
-        private class SkinMarker : MonoBehaviour { }
+        private Sprite roundedSprite;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -65,7 +71,7 @@ namespace Assets.Scripts.UI.Inventory
             if (ui == null || ui.EquipmentWindow == null)
                 return;
 
-            if (ui.EquipmentWindow.GetComponent<SkinMarker>() != null)
+            if (ModernUiTheme.IsSkinned(ui.EquipmentWindow.gameObject))
                 return;
 
             ApplySkin(ui.EquipmentWindow);
@@ -73,7 +79,7 @@ namespace Assets.Scripts.UI.Inventory
 
         private void ApplySkin(EquipmentWindow win)
         {
-            win.gameObject.AddComponent<SkinMarker>();
+            ModernUiTheme.MarkSkinned(win.gameObject);
 
             if (roundedSprite == null)
                 roundedSprite = ModernUiTheme.RoundedSprite;
@@ -120,11 +126,11 @@ namespace Assets.Scripts.UI.Inventory
                 child.gameObject.SetActive(false);
             }
 
-            ModernUiTheme.CreateTitleBar(win, "Equipment", "อุปกรณ์");
+            ModernUiTheme.CreateTitleBar(win, "Equipment", "อุปกรณ์", ModernUiIcons.Armor);
             ModernUiTheme.AttachShadow(root);
 
             CreateText(panel, "Hint", "Double-click a slot to unequip  ·  Right-click an item for details",
-                13, HintColor, TextAlignmentOptions.Left, FontStyles.Normal,
+                ModernUiTheme.SizeLabel, HintColor, TextAlignmentOptions.Left, FontStyles.Normal,
                 new Vector2(Margin, -92), new Vector2(WindowWidth - Margin * 2, 22), new Vector2(0, 1));
 
             //center card sits between the two slot columns
@@ -146,12 +152,12 @@ namespace Assets.Scripts.UI.Inventory
             ammoCard.sizeDelta = new Vector2(centerCard.sizeDelta.x, 46);
             ammoCard.anchoredPosition = new Vector2(0, -TopOffset - centerCard.sizeDelta.y - CardSpacing);
 
-            var ammoText = CreateText(ammoCard, "AmmoText", "", 13, NameColor, TextAlignmentOptions.Center,
-                FontStyles.Normal, Vector2.zero, Vector2.zero, null);
+            var ammoText = CreateText(ammoCard, "AmmoText", "", ModernUiTheme.SizeLabel, NameColor,
+                TextAlignmentOptions.Center, FontStyles.Normal, Vector2.zero, Vector2.zero, null);
             Stretch((RectTransform)ammoText.transform, 8, 4, -8, -4);
 
-            var cartText = CreateText(panel, "CartText", "", 14, NameColor, TextAlignmentOptions.Left,
-                FontStyles.Normal, new Vector2(Margin, 18), new Vector2(400, 24), new Vector2(0, 0));
+            var cartText = CreateText(panel, "CartText", "", ModernUiTheme.SizeBody, NameColor,
+                TextAlignmentOptions.Left, FontStyles.Normal, new Vector2(Margin, 18), new Vector2(400, 26), new Vector2(0, 0));
 
             win.EquipEntries = entries;
             win.AmmoType = ammoText;
@@ -188,13 +194,20 @@ namespace Assets.Scripts.UI.Inventory
         private EquipWindowEntry BuildSlotContents(RectTransform card, int slotIndex)
         {
             //the small always-visible label naming the slot
-            CreateText(card, "SlotLabel", SlotLabels[slotIndex], 11, LabelColor, TextAlignmentOptions.TopLeft,
-                FontStyles.Normal, new Vector2(64, -7), new Vector2(CardWidth - 74, 16), new Vector2(0, 1));
+            CreateText(card, "SlotLabel", SlotLabels[slotIndex], ModernUiTheme.SizeSmall, LabelColor,
+                TextAlignmentOptions.TopLeft, FontStyles.Bold,
+                new Vector2(64, -6), new Vector2(CardWidth - 74, 18), new Vector2(0, 1));
 
             //shown while the slot is empty
             var background = CreateRect("Background", card);
             Stretch(background, 0, 0, 0, 0);
-            var emptyText = CreateText(background, "EmptyText", SlotLabels[slotIndex], 14, EmptyColor,
+
+            //the slot's own icon stands in for the missing item, which is what makes an
+            //empty column still read as a set of equipment slots rather than blank rows
+            var slotIcon = ModernUiTheme.CreateIcon(background, SlotIcons[slotIndex], EmptyColor, 26);
+            ModernUiTheme.Place(slotIcon.rectTransform, new Vector2(0, 0.5f), new Vector2(19, 0), new Vector2(26, 26));
+
+            var emptyText = CreateText(background, "EmptyText", "Empty", ModernUiTheme.SizeLabel, EmptyColor,
                 TextAlignmentOptions.Right, FontStyles.Normal, Vector2.zero, Vector2.zero, null);
             Stretch((RectTransform)emptyText.transform, 12, 4, -16, -4);
 
@@ -209,10 +222,10 @@ namespace Assets.Scripts.UI.Inventory
             iconRect.anchorMax = new Vector2(0, 0.5f);
             iconRect.anchoredPosition = new Vector2(32, 0);
 
-            var itemName = CreateText(card, "ItemName", "", 14, NameColor, TextAlignmentOptions.Left,
-                FontStyles.Bold, Vector2.zero, Vector2.zero, null);
+            var itemName = CreateText(card, "ItemName", "", ModernUiTheme.SizeBody, NameColor,
+                TextAlignmentOptions.Left, FontStyles.Bold, Vector2.zero, Vector2.zero, null);
             var nameRect = (RectTransform)itemName.transform;
-            Stretch(nameRect, 64, 4, -10, -20);
+            Stretch(nameRect, 64, 4, -10, -22);
             itemName.overflowMode = TextOverflowModes.Ellipsis;
 
             var entry = card.gameObject.AddComponent<EquipWindowEntry>();
@@ -252,13 +265,20 @@ namespace Assets.Scripts.UI.Inventory
 
             var text = go.GetComponent<TextMeshProUGUI>();
             if (TMP_Settings.defaultFontAsset != null)
+            {
                 text.font = TMP_Settings.defaultFontAsset;
+                var material = ModernUiTheme.CrispMaterial;
+                if (material != null)
+                    text.fontSharedMaterial = material;
+            }
+
             text.text = content;
             text.fontSize = size;
             text.color = color;
             text.alignment = alignment;
             text.fontStyle = style;
             text.raycastTarget = false;
+            text.extraPadding = true;
 
             if (corner.HasValue)
             {
@@ -281,41 +301,5 @@ namespace Assets.Scripts.UI.Inventory
             rect.offsetMax = new Vector2(right, top);
         }
 
-        private static Sprite CreateRoundedSprite()
-        {
-            const int size = 32;
-            const int radius = 10;
-            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
-
-            for (var y = 0; y < size; y++)
-            {
-                for (var x = 0; x < size; x++)
-                {
-                    var inside = true;
-                    //check each corner circle, pixels beyond the arc turn transparent
-                    if (x < radius && y < radius)
-                        inside = InCorner(x, y, radius, radius);
-                    else if (x >= size - radius && y < radius)
-                        inside = InCorner(x, y, size - radius - 1, radius);
-                    else if (x < radius && y >= size - radius)
-                        inside = InCorner(x, y, radius, size - radius - 1);
-                    else if (x >= size - radius && y >= size - radius)
-                        inside = InCorner(x, y, size - radius - 1, size - radius - 1);
-
-                    texture.SetPixel(x, y, inside ? Color.white : Color.clear);
-                }
-            }
-
-            texture.Apply();
-            return Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100,
-                0, SpriteMeshType.FullRect, new Vector4(12, 12, 12, 12));
-        }
-
-        private static bool InCorner(int x, int y, int cx, int cy)
-        {
-            var dx = x - cx;
-            var dy = y - cy;
-            return dx * dx + dy * dy <= 10 * 10;
-        }
     }
 }

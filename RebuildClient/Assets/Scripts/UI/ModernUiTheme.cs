@@ -15,24 +15,54 @@ namespace Assets.Scripts.UI
     public static class ModernUiTheme
     {
         //a soft blue set: the window is a tinted off white, cards step down in two
-        //stages and the header is the most saturated tone so it reads as a header
-        public static readonly Color WindowColor = new Color(0.960f, 0.975f, 0.992f, 0.98f);
-        public static readonly Color CardColor = new Color(0.898f, 0.933f, 0.976f);
-        public static readonly Color CardDeepColor = new Color(0.843f, 0.894f, 0.957f);
-        public static readonly Color TitleBarColor = new Color(0.741f, 0.843f, 0.941f);
-        public static readonly Color TabIdleColor = new Color(0.949f, 0.965f, 0.984f);
-        public static readonly Color CardBorderColor = new Color(0.804f, 0.855f, 0.918f);
-        public static readonly Color TitleColor = new Color(0.098f, 0.192f, 0.310f);
-        public static readonly Color LabelColor = new Color(0.416f, 0.510f, 0.616f);
-        public static readonly Color NameColor = new Color(0.129f, 0.204f, 0.302f);
-        public static readonly Color MutedColor = new Color(0.639f, 0.714f, 0.796f);
-        public static readonly Color HintColor = new Color(0.427f, 0.522f, 0.620f);
-        public static readonly Color AccentColor = new Color(0.263f, 0.545f, 0.878f);
+        //stages and the header is the most saturated tone so it reads as a header.
+        //The inks are deliberately dark: the canvas draws the whole interface at three
+        //quarter scale, so anything less than strong contrast turns to mush on a phone.
+        public static readonly Color WindowColor = new Color(0.965f, 0.978f, 0.992f, 0.99f);
+        public static readonly Color CardColor = new Color(0.894f, 0.929f, 0.973f);
+        public static readonly Color CardDeepColor = new Color(0.831f, 0.886f, 0.953f);
+        public static readonly Color TitleBarColor = new Color(0.729f, 0.835f, 0.937f);
+        public static readonly Color TabIdleColor = new Color(0.933f, 0.953f, 0.980f);
+        public static readonly Color CardBorderColor = new Color(0.784f, 0.843f, 0.914f);
+        public static readonly Color TitleColor = new Color(0.055f, 0.129f, 0.235f);
+        public static readonly Color LabelColor = new Color(0.302f, 0.400f, 0.514f);
+        public static readonly Color NameColor = new Color(0.075f, 0.145f, 0.239f);
+        public static readonly Color MutedColor = new Color(0.514f, 0.596f, 0.686f);
+        public static readonly Color HintColor = new Color(0.333f, 0.427f, 0.529f);
+        public static readonly Color AccentColor = new Color(0.180f, 0.478f, 0.855f);
         public static readonly Color AccentTextColor = Color.white;
-        public static readonly Color PositiveColor = new Color(0.145f, 0.573f, 0.392f);
+        //a gain on a stat used to be drawn green; the interface is blue throughout now
+        public static readonly Color PositiveColor = new Color(0.106f, 0.482f, 0.827f);
+        public static readonly Color IconColor = new Color(0.180f, 0.478f, 0.855f);
+        public static readonly Color IconMutedColor = new Color(0.478f, 0.573f, 0.678f);
+
+        //one place to change how big text is, so a legibility pass is a single edit
+        public const float SizeTitle = 30f;
+        public const float SizeSubtitle = 15f;
+        public const float SizeValue = 19f;
+        public const float SizeBody = 16f;
+        public const float SizeLabel = 14f;
+        public const float SizeSmall = 13f;
 
         public const float TitleBarHeight = 76f; //title plus the small subtitle under it
         public const float ShadowSpread = 14f;
+
+        /// <summary>
+        /// Left on a window once a skin has claimed it, so the general pass that tidies
+        /// up every other window knows to leave the rebuilt ones alone.
+        /// </summary>
+        public class SkinMarker : MonoBehaviour { }
+
+        public static bool IsSkinned(GameObject target)
+        {
+            return target != null && target.GetComponent<SkinMarker>() != null;
+        }
+
+        public static void MarkSkinned(GameObject target)
+        {
+            if (target != null && target.GetComponent<SkinMarker>() == null)
+                target.AddComponent<SkinMarker>();
+        }
 
         private static bool? runtimeUiEnabled;
 
@@ -70,17 +100,61 @@ namespace Assets.Scripts.UI
             }
         }
 
+        private static Material crispMaterial;
+        private static bool crispMaterialBuilt;
+
+        /// <summary>
+        /// One shared copy of the default font's material with the glyph edges pushed
+        /// out a little. The interface is drawn at three quarter scale, which leaves a
+        /// thirteen point label about ten pixels tall, and at that size the untouched
+        /// signed distance field goes thin and grey. Sharing a single material keeps
+        /// every label in one draw call, so this costs nothing to batching.
+        /// </summary>
+        public static Material CrispMaterial
+        {
+            get
+            {
+                if (crispMaterialBuilt)
+                    return crispMaterial;
+
+                crispMaterialBuilt = true;
+
+                var font = TMP_Settings.defaultFontAsset;
+                if (font == null || font.material == null)
+                    return null;
+
+                try
+                {
+                    var material = new Material(font.material) { name = font.material.name + " Crisp" };
+                    //named rather than looked up through TMP's id table, which is only
+                    //filled in once the package has initialised itself
+                    if (material.HasProperty("_FaceDilate"))
+                        material.SetFloat("_FaceDilate", 0.12f);
+                    crispMaterial = material;
+                }
+                catch (Exception e)
+                {
+                    //not worth failing the whole skin over, the text simply stays as it was
+                    Debug.LogWarning($"[ModernUi] Could not build the text material: {e.Message}");
+                }
+
+                return crispMaterial;
+            }
+        }
+
         /// <summary>
         /// Turns an existing window's own backdrop white and restyles its drag bar
         /// while keeping the bar (and so moving and closing) fully functional.
         /// Returns the drag bar so callers can skip it when hiding old content.
         /// </summary>
-        public static Transform ApplyWindowChrome(Component window)
+        public static Transform ApplyWindowChrome(Component window, Sprite icon = null)
         {
             var root = (RectTransform)window.transform;
 
             var rootImage = window.GetComponent<Image>();
-            if (rootImage != null)
+            //an image the window left clear is there to catch clicks, not to be seen, so
+            //painting it would put a panel on screen that was never meant to be there
+            if (rootImage != null && rootImage.color.a > 0.1f)
             {
                 rootImage.sprite = RoundedSprite;
                 rootImage.type = Image.Type.Sliced;
@@ -107,6 +181,7 @@ namespace Assets.Scripts.UI
                 {
                     barText.color = TitleColor;
                     barText.fontStyle = FontStyles.Bold;
+                    barText.extraPadding = true;
                 }
 
                 foreach (var barButton in child.GetComponentsInChildren<Button>(true))
@@ -115,9 +190,41 @@ namespace Assets.Scripts.UI
                     if (buttonImage != null)
                         buttonImage.color = HintColor;
                 }
+
+                if (icon != null)
+                    AddBarIcon(child, icon);
             }
 
             return dragBar;
+        }
+
+        /// <summary>
+        /// Puts an icon at the left end of a window's existing drag bar and moves the
+        /// title out of its way. Only text that actually starts at the left is shifted,
+        /// so a centred title stays where the window's own layout put it.
+        /// </summary>
+        private static void AddBarIcon(Transform bar, Sprite icon)
+        {
+            if (bar.Find("ModernBarIcon") != null)
+                return;
+
+            const float shift = 26f;
+
+            foreach (var text in bar.GetComponentsInChildren<TextMeshProUGUI>(true))
+            {
+                var rect = text.rectTransform;
+                if (rect.anchorMin.x > 0.4f)
+                    continue;
+
+                if (rect.anchorMax.x > rect.anchorMin.x)
+                    rect.offsetMin = new Vector2(rect.offsetMin.x + shift, rect.offsetMin.y);
+                else
+                    rect.anchoredPosition = new Vector2(rect.anchoredPosition.x + shift, rect.anchoredPosition.y);
+            }
+
+            var image = CreateIcon(bar, icon, TitleColor, 19);
+            image.gameObject.name = "ModernBarIcon";
+            Place(image.rectTransform, new Vector2(0, 0.5f), new Vector2(9, 0), new Vector2(19, 19));
         }
 
         /// <summary>
@@ -144,7 +251,8 @@ namespace Assets.Scripts.UI
         /// windows hide their original chrome, so without this they have no way to be
         /// moved or closed at all.
         /// </summary>
-        public static RectTransform CreateTitleBar(WindowBase window, string title, string subtitle = null)
+        public static RectTransform CreateTitleBar(WindowBase window, string title, string subtitle = null,
+            Sprite icon = null)
         {
             var root = (RectTransform)window.transform;
 
@@ -172,18 +280,28 @@ namespace Assets.Scripts.UI
             handle.Target = root;
             handle.Window = window;
 
-            var label = CreateText(bar, "Title", title, 26, TitleColor, TextAlignmentOptions.BottomLeft, FontStyles.Bold);
-            Place((RectTransform)label.transform, new Vector2(0, 1), new Vector2(24, -14), new Vector2(420, 32));
+            var textLeft = 24f;
+            if (icon != null)
+            {
+                var badge = CreateCard(bar, "Icon", AccentColor);
+                Place(badge, new Vector2(0, 1), new Vector2(22, -18), new Vector2(38, 38));
+                CreateIcon(badge, icon, AccentTextColor, 22);
+                textLeft = 72f;
+            }
+
+            var label = CreateText(bar, "Title", title, SizeTitle - 2, TitleColor, TextAlignmentOptions.BottomLeft,
+                FontStyles.Bold);
+            Place((RectTransform)label.transform, new Vector2(0, 1), new Vector2(textLeft, -12), new Vector2(420, 34));
 
             if (!string.IsNullOrEmpty(subtitle))
             {
-                var sub = CreateText(bar, "Subtitle", subtitle, 14, AccentColor, TextAlignmentOptions.TopLeft);
-                Place((RectTransform)sub.transform, new Vector2(0, 1), new Vector2(24, -48), new Vector2(420, 20));
+                var sub = CreateText(bar, "Subtitle", subtitle, SizeSubtitle, AccentColor, TextAlignmentOptions.TopLeft);
+                Place((RectTransform)sub.transform, new Vector2(0, 1), new Vector2(textLeft, -48), new Vector2(420, 22));
             }
 
-            var close = CreateButton(bar, "Close", "X", new Color(0, 0, 0, 0), TitleColor, 20);
-            Place((RectTransform)close.transform, new Vector2(1, 1), new Vector2(-14, -12), new Vector2(36, 36));
-            ((RectTransform)close.transform).pivot = new Vector2(1, 1);
+            var close = CreateButton(bar, "Close", "", CardColor, TitleColor, SizeBody);
+            Place((RectTransform)close.transform, new Vector2(1, 1), new Vector2(-14, -14), new Vector2(36, 36));
+            CreateIcon((RectTransform)close.transform, ModernUiIcons.Close, HintColor, 15);
             close.onClick.AddListener(window.CloseWindow);
 
             barObject.SetActive(true);
@@ -325,30 +443,77 @@ namespace Assets.Scripts.UI
         }
 
         /// <summary>
-        /// The wide accent button the reference layouts put along the bottom of a window.
+        /// Drops one of the drawn icons in, centred on its parent by default. The sprite
+        /// is white, so the color given here is what the icon ends up being.
         /// </summary>
-        public static Button CreateFooterButton(RectTransform parent, string label, string subLabel,
-            UnityEngine.Events.UnityAction action)
+        public static Image CreateIcon(Transform parent, Sprite icon, Color color, float size)
         {
-            var button = CreateButton(parent, "FooterButton", "", AccentColor, AccentTextColor);
+            var go = new GameObject("Icon", typeof(Image));
+            go.transform.SetParent(parent, false);
+
+            var image = go.GetComponent<Image>();
+            image.sprite = icon;
+            image.color = color;
+            image.raycastTarget = false;
+            image.preserveAspect = true;
+
+            var rect = (RectTransform)go.transform;
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.anchoredPosition = Vector2.zero;
+            rect.sizeDelta = new Vector2(size, size);
+            return image;
+        }
+
+        /// <summary>
+        /// A button with its icon on the left and the label reading from just after it,
+        /// which is how the reference menus are laid out.
+        /// </summary>
+        public static Button CreateIconButton(Transform parent, string name, string label, Sprite icon,
+            Color background, Color textColor, float fontSize = SizeBody)
+        {
+            var button = CreateButton(parent, name, label, background, textColor, fontSize);
             var rect = (RectTransform)button.transform;
-            rect.anchorMin = new Vector2(0, 0);
-            rect.anchorMax = new Vector2(1, 0);
-            rect.pivot = new Vector2(0.5f, 0);
-            rect.offsetMin = new Vector2(18, 16);
-            rect.offsetMax = new Vector2(-18, 16 + 56);
 
-            var main = CreateText(rect, "Main", label, 18, AccentTextColor, TextAlignmentOptions.Bottom, FontStyles.Bold);
-            Stretch((RectTransform)main.transform, 0, 26, 0, -6);
+            var glyph = CreateIcon(rect, icon, textColor, 20);
+            Place((RectTransform)glyph.transform, new Vector2(0, 0.5f), new Vector2(16, 0), new Vector2(20, 20));
 
-            if (!string.IsNullOrEmpty(subLabel))
+            var text = button.GetComponentInChildren<TextMeshProUGUI>(true);
+            if (text != null)
             {
-                var sub = CreateText(rect, "Sub", subLabel, 13, new Color(1, 1, 1, 0.85f), TextAlignmentOptions.Top);
-                Stretch((RectTransform)sub.transform, 0, 6, 0, -30);
+                text.alignment = TextAlignmentOptions.Left;
+                Stretch(text.rectTransform, 48, 2, -14, -2);
             }
 
-            button.onClick.AddListener(action);
             return button;
+        }
+
+        /// <summary>
+        /// Turns any strongly green element under the root blue. The game's own windows
+        /// use green for confirm buttons, highlighted tabs and gains, which fought with
+        /// the blue everything else has moved to.
+        /// </summary>
+        public static void RecolorAccents(Transform root)
+        {
+            foreach (var image in root.GetComponentsInChildren<Image>(true))
+            {
+                if (IsGreen(image.color))
+                    image.color = AccentColor;
+            }
+
+            foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
+            {
+                if (IsGreen(text.color))
+                    text.color = AccentColor;
+            }
+        }
+
+        private static bool IsGreen(Color c)
+        {
+            //green only counts when that channel clearly leads the other two, which
+            //leaves item sprites, white icons and grey chrome untouched
+            return c.a > 0.2f && c.g > 0.35f && c.g - c.r > 0.12f && c.g - c.b > 0.12f;
         }
 
         private static Sprite CreateShadowSprite()
@@ -410,13 +575,22 @@ namespace Assets.Scripts.UI
 
             var text = go.GetComponent<TextMeshProUGUI>();
             if (TMP_Settings.defaultFontAsset != null)
+            {
                 text.font = TMP_Settings.defaultFontAsset;
+                var material = CrispMaterial;
+                if (material != null)
+                    text.fontSharedMaterial = material;
+            }
+
             text.text = content;
             text.fontSize = size;
             text.color = color;
             text.alignment = alignment;
             text.fontStyle = style;
             text.raycastTarget = false;
+            //the thickened glyphs need a little more room in the atlas sampling window,
+            //without this the outermost edge of a letter can be clipped away
+            text.extraPadding = true;
             return text;
         }
 
@@ -438,7 +612,7 @@ namespace Assets.Scripts.UI
         }
 
         public static Button CreateButton(Transform parent, string name, string label, Color background,
-            Color textColor, float fontSize = 14, FontStyles style = FontStyles.Bold)
+            Color textColor, float fontSize = SizeBody, FontStyles style = FontStyles.Bold)
         {
             var card = CreateCard(parent, name, background);
             var go = card.gameObject;

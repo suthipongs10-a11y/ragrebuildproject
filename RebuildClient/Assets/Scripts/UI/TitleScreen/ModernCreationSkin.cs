@@ -30,12 +30,16 @@ namespace Assets.Scripts.UI.TitleScreen
 
         private static readonly string[] StatNames = { "STR", "AGI", "VIT", "INT", "DEX", "LUK" };
 
+        private static Sprite[] StatIcons => new[]
+        {
+            ModernUiIcons.Sword, ModernUiIcons.Bolt, ModernUiIcons.Heart,
+            ModernUiIcons.Spark, ModernUiIcons.Target, ModernUiIcons.Star
+        };
+
         private float searchTimer;
         private CharacterCreatorWindow creator;
         private TextMeshProUGUI hairStyleLabel;
         private int shownHairStyle = -1;
-
-        private class SkinMarker : MonoBehaviour { }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -70,7 +74,7 @@ namespace Assets.Scripts.UI.TitleScreen
                 return;
 
             var found = FindFirstObjectByType<CharacterCreatorWindow>(FindObjectsInactive.Include);
-            if (found == null || found.GetComponent<SkinMarker>() != null)
+            if (found == null || ModernUiTheme.IsSkinned(found.gameObject))
                 return;
 
             ApplySkin(found);
@@ -78,7 +82,7 @@ namespace Assets.Scripts.UI.TitleScreen
 
         private void ApplySkin(CharacterCreatorWindow win)
         {
-            win.gameObject.AddComponent<SkinMarker>();
+            ModernUiTheme.MarkSkinned(win.gameObject);
             creator = win;
 
             if (win.Pane == null)
@@ -137,10 +141,19 @@ namespace Assets.Scripts.UI.TitleScreen
                 child.gameObject.SetActive(false);
             }
 
-            var title = ModernUiTheme.CreateText(panel, "Title", "Create Character", 22,
-                ModernUiTheme.TitleColor, TextAlignmentOptions.Left, FontStyles.Bold);
+            var badge = ModernUiTheme.CreateCard(panel, "TitleIcon", ModernUiTheme.AccentColor);
+            ModernUiTheme.Place(badge, new Vector2(0, 1), new Vector2(Margin, -16), new Vector2(38, 38));
+            ModernUiTheme.CreateIcon(badge, ModernUiIcons.Person, ModernUiTheme.AccentTextColor, 22);
+
+            var title = ModernUiTheme.CreateText(panel, "Title", "Create Character", 26,
+                ModernUiTheme.TitleColor, TextAlignmentOptions.BottomLeft, FontStyles.Bold);
             ModernUiTheme.Place((RectTransform)title.transform, new Vector2(0, 1),
-                new Vector2(Margin, -22), new Vector2(400, 30));
+                new Vector2(Margin + 50, -12), new Vector2(400, 30));
+
+            var subtitle = ModernUiTheme.CreateText(panel, "Subtitle", "สร้างตัวละคร",
+                ModernUiTheme.SizeSubtitle, ModernUiTheme.AccentColor, TextAlignmentOptions.TopLeft);
+            ModernUiTheme.Place((RectTransform)subtitle.transform, new Vector2(0, 1),
+                new Vector2(Margin + 50, -44), new Vector2(400, 22));
 
             BuildLeftColumn(win, panel, nameField, swatchColors);
             BuildCenterColumn(win, panel, preview);
@@ -186,12 +199,12 @@ namespace Assets.Scripts.UI.TitleScreen
 
             Label(card, "Gender", ref y);
             var maleButton = ModernUiTheme.CreateButton(card, "Male", "Male", ModernUiTheme.AccentColor,
-                ModernUiTheme.AccentTextColor, 14);
+                ModernUiTheme.AccentTextColor, ModernUiTheme.SizeBody);
             ModernUiTheme.Place((RectTransform)maleButton.transform, new Vector2(0, 1),
                 new Vector2(14, y), new Vector2((LeftWidth - 34) / 2f, 34));
 
             var femaleButton = ModernUiTheme.CreateButton(card, "Female", "Female", ModernUiTheme.CardDeepColor,
-                ModernUiTheme.NameColor, 14);
+                ModernUiTheme.NameColor, ModernUiTheme.SizeBody);
             ModernUiTheme.Place((RectTransform)femaleButton.transform, new Vector2(0, 1),
                 new Vector2(20 + (LeftWidth - 34) / 2f, y), new Vector2((LeftWidth - 34) / 2f, 34));
 
@@ -203,20 +216,22 @@ namespace Assets.Scripts.UI.TitleScreen
             y -= 44f;
 
             Label(card, "Hair style", ref y);
-            var prev = ModernUiTheme.CreateButton(card, "HairPrev", "<", ModernUiTheme.CardDeepColor,
-                ModernUiTheme.NameColor, 16);
+            var prev = ModernUiTheme.CreateButton(card, "HairPrev", "", ModernUiTheme.CardDeepColor,
+                ModernUiTheme.NameColor);
             ModernUiTheme.Place((RectTransform)prev.transform, new Vector2(0, 1), new Vector2(14, y), new Vector2(40, 34));
+            ModernUiTheme.CreateIcon((RectTransform)prev.transform, ModernUiIcons.ChevronLeft, ModernUiTheme.NameColor, 15);
             prev.onClick.AddListener(() => win.ChangeHair(false));
 
-            hairStyleLabel = ModernUiTheme.CreateText(card, "HairStyle", "Style 01", 15,
+            hairStyleLabel = ModernUiTheme.CreateText(card, "HairStyle", "Style 01", 17,
                 ModernUiTheme.NameColor, TextAlignmentOptions.Center, FontStyles.Bold);
             ModernUiTheme.Place((RectTransform)hairStyleLabel.transform, new Vector2(0, 1),
                 new Vector2(58, y), new Vector2(LeftWidth - 116, 34));
 
-            var next = ModernUiTheme.CreateButton(card, "HairNext", ">", ModernUiTheme.CardDeepColor,
-                ModernUiTheme.NameColor, 16);
+            var next = ModernUiTheme.CreateButton(card, "HairNext", "", ModernUiTheme.CardDeepColor,
+                ModernUiTheme.NameColor);
             ModernUiTheme.Place((RectTransform)next.transform, new Vector2(0, 1),
                 new Vector2(LeftWidth - 54, y), new Vector2(40, 34));
+            ModernUiTheme.CreateIcon((RectTransform)next.transform, ModernUiIcons.ChevronRight, ModernUiTheme.NameColor, 15);
             next.onClick.AddListener(() => win.ChangeHair(true));
             y -= 44f;
 
@@ -268,16 +283,18 @@ namespace Assets.Scripts.UI.TitleScreen
             if (win.StatGimbal != null)
                 win.StatGimbal.gameObject.SetActive(false);
 
-            var left = ModernUiTheme.CreateButton(card, "TurnLeft", "<", ModernUiTheme.CardColor,
-                ModernUiTheme.NameColor, 16);
+            var left = ModernUiTheme.CreateButton(card, "TurnLeft", "", ModernUiTheme.CardColor,
+                ModernUiTheme.NameColor);
             ModernUiTheme.Place((RectTransform)left.transform, new Vector2(0, 0),
-                new Vector2(28, 16), new Vector2(90, 34));
+                new Vector2(28, 16), new Vector2(90, 36));
+            ModernUiTheme.CreateIcon((RectTransform)left.transform, ModernUiIcons.ChevronLeft, ModernUiTheme.NameColor, 16);
             left.onClick.AddListener(() => win.TurnCharacter(true));
 
-            var right = ModernUiTheme.CreateButton(card, "TurnRight", ">", ModernUiTheme.CardColor,
-                ModernUiTheme.NameColor, 16);
+            var right = ModernUiTheme.CreateButton(card, "TurnRight", "", ModernUiTheme.CardColor,
+                ModernUiTheme.NameColor);
             ModernUiTheme.Place((RectTransform)right.transform, new Vector2(1, 0),
-                new Vector2(-28, 16), new Vector2(90, 34));
+                new Vector2(-28, 16), new Vector2(90, 36));
+            ModernUiTheme.CreateIcon((RectTransform)right.transform, ModernUiIcons.ChevronRight, ModernUiTheme.NameColor, 16);
             right.onClick.AddListener(() => win.TurnCharacter(false));
         }
 
@@ -289,20 +306,21 @@ namespace Assets.Scripts.UI.TitleScreen
             var card = ModernUiTheme.CreateCard(panel, "StatsCard", ModernUiTheme.CardColor);
             ModernUiTheme.Place(card, new Vector2(0, 1), new Vector2(x, -TopOffset), new Vector2(RightWidth, 404));
 
-            var pointsLabel = ModernUiTheme.CreateText(card, "PointsLabel", "Points remaining", 13,
-                ModernUiTheme.LabelColor, TextAlignmentOptions.Left);
+            var pointsLabel = ModernUiTheme.CreateText(card, "PointsLabel", "Points remaining",
+                ModernUiTheme.SizeLabel, ModernUiTheme.LabelColor, TextAlignmentOptions.Left, FontStyles.Bold);
             ModernUiTheme.Place((RectTransform)pointsLabel.transform, new Vector2(0, 1),
-                new Vector2(14, -12), new Vector2(180, 22));
+                new Vector2(14, -12), new Vector2(180, 24));
 
-            var points = ModernUiTheme.CreateText(card, "Points", startingPoints, 20,
+            var points = ModernUiTheme.CreateText(card, "Points", startingPoints, 22,
                 ModernUiTheme.AccentColor, TextAlignmentOptions.Right, FontStyles.Bold);
             ModernUiTheme.Place((RectTransform)points.transform, new Vector2(1, 1),
-                new Vector2(-14, -8), new Vector2(70, 28));
+                new Vector2(-14, -8), new Vector2(70, 30));
             win.StatsRemainingText = points;
 
             var texts = new TextMeshProUGUI[6];
             var ups = new Button[6];
             var downs = new Button[6];
+            var statIcons = StatIcons;
 
             for (var i = 0; i < 6; i++)
             {
@@ -311,29 +329,30 @@ namespace Assets.Scripts.UI.TitleScreen
                     new Vector2(14, -46 - i * (StatRowHeight + StatRowGap)),
                     new Vector2(RightWidth - 28, StatRowHeight));
 
-                var name = ModernUiTheme.CreateText(row, "Name", StatNames[i], 14,
+                var icon = ModernUiTheme.CreateIcon(row, statIcons[i], ModernUiTheme.AccentColor, 18);
+                ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f), new Vector2(11, 0), new Vector2(18, 18));
+
+                var name = ModernUiTheme.CreateText(row, "Name", StatNames[i], ModernUiTheme.SizeLabel,
                     ModernUiTheme.LabelColor, TextAlignmentOptions.Left, FontStyles.Bold);
                 ModernUiTheme.Place((RectTransform)name.transform, new Vector2(0, 0.5f),
-                    new Vector2(12, 0), new Vector2(56, 22));
-                name.rectTransform.pivot = new Vector2(0, 0.5f);
+                    new Vector2(37, 0), new Vector2(56, 24));
 
-                var down = ModernUiTheme.CreateButton(row, "Minus", "-", ModernUiTheme.CardColor,
-                    ModernUiTheme.NameColor, 16);
+                var down = ModernUiTheme.CreateButton(row, "Minus", "", ModernUiTheme.CardColor,
+                    ModernUiTheme.NameColor);
                 ModernUiTheme.Place((RectTransform)down.transform, new Vector2(1, 0.5f),
                     new Vector2(-98, 0), new Vector2(30, 30));
-                ((RectTransform)down.transform).pivot = new Vector2(1, 0.5f);
+                ModernUiTheme.CreateIcon((RectTransform)down.transform, ModernUiIcons.Minus, ModernUiTheme.NameColor, 13);
 
-                var value = ModernUiTheme.CreateText(row, "Value", startingStats[i] ?? "5", 17,
+                var value = ModernUiTheme.CreateText(row, "Value", startingStats[i] ?? "5", ModernUiTheme.SizeValue,
                     ModernUiTheme.NameColor, TextAlignmentOptions.Center, FontStyles.Bold);
                 ModernUiTheme.Place((RectTransform)value.transform, new Vector2(1, 0.5f),
-                    new Vector2(-52, 0), new Vector2(46, 26));
-                value.rectTransform.pivot = new Vector2(1, 0.5f);
+                    new Vector2(-52, 0), new Vector2(46, 28));
 
-                var up = ModernUiTheme.CreateButton(row, "Plus", "+", ModernUiTheme.AccentColor,
-                    ModernUiTheme.AccentTextColor, 16);
+                var up = ModernUiTheme.CreateButton(row, "Plus", "", ModernUiTheme.AccentColor,
+                    ModernUiTheme.AccentTextColor);
                 ModernUiTheme.Place((RectTransform)up.transform, new Vector2(1, 0.5f),
                     new Vector2(-12, 0), new Vector2(30, 30));
-                ((RectTransform)up.transform).pivot = new Vector2(1, 0.5f);
+                ModernUiTheme.CreateIcon((RectTransform)up.transform, ModernUiIcons.Plus, ModernUiTheme.AccentTextColor, 13);
 
                 var captured = i;
                 up.onClick.AddListener(() => win.AddStat(captured));
@@ -351,27 +370,27 @@ namespace Assets.Scripts.UI.TitleScreen
 
         private void BuildFooter(CharacterCreatorWindow win, RectTransform panel)
         {
-            var cancel = ModernUiTheme.CreateButton(panel, "Cancel", "Cancel", ModernUiTheme.CardDeepColor,
-                ModernUiTheme.NameColor, 15);
+            var cancel = ModernUiTheme.CreateIconButton(panel, "Cancel", "Cancel", ModernUiIcons.Close,
+                ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor);
             ModernUiTheme.Place((RectTransform)cancel.transform, new Vector2(1, 0),
-                new Vector2(-Margin - 180, 22), new Vector2(160, 44));
+                new Vector2(-Margin - 180, 22), new Vector2(168, 46));
             cancel.onClick.AddListener(win.CancelCreate);
 
-            var create = ModernUiTheme.CreateButton(panel, "Create", "Create", ModernUiTheme.AccentColor,
-                ModernUiTheme.AccentTextColor, 15);
+            var create = ModernUiTheme.CreateIconButton(panel, "Create", "Create", ModernUiIcons.Check,
+                ModernUiTheme.AccentColor, ModernUiTheme.AccentTextColor);
             ModernUiTheme.Place((RectTransform)create.transform, new Vector2(1, 0),
-                new Vector2(-Margin, 22), new Vector2(160, 44));
+                new Vector2(-Margin, 22), new Vector2(168, 46));
             create.onClick.AddListener(win.SubmitCreate);
             win.SaveButton = create;
         }
 
         private static void Label(RectTransform card, string text, ref float y)
         {
-            var label = ModernUiTheme.CreateText(card, $"{text}Label", text, 12,
-                ModernUiTheme.LabelColor, TextAlignmentOptions.Left);
+            var label = ModernUiTheme.CreateText(card, $"{text}Label", text, ModernUiTheme.SizeLabel,
+                ModernUiTheme.LabelColor, TextAlignmentOptions.Left, FontStyles.Bold);
             ModernUiTheme.Place((RectTransform)label.transform, new Vector2(0, 1),
-                new Vector2(14, y), new Vector2(200, 18));
-            y -= 20f;
+                new Vector2(14, y), new Vector2(200, 20));
+            y -= 22f;
         }
     }
 }

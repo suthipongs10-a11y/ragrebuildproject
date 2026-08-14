@@ -17,8 +17,8 @@ namespace Assets.Scripts.UI
     /// </summary>
     public class EscMenu : WindowBase
     {
-        private const float MenuWidth = 300f;
-        private const float ButtonHeight = 44f;
+        private const float MenuWidth = 320f;
+        private const float ButtonHeight = 48f;
         private const float ButtonGap = 8f;
         private const float Padding = 16f;
 
@@ -62,6 +62,8 @@ namespace Assets.Scripts.UI
 
             var menu = host.AddComponent<EscMenu>();
             menu.CanCloseWithEscape = true;
+            //already built in the theme, so the general retint pass leaves it be
+            ModernUiTheme.MarkSkinned(host);
 
             var rect = (RectTransform)host.transform;
             rect.anchorMin = new Vector2(0.5f, 0.5f);
@@ -74,26 +76,26 @@ namespace Assets.Scripts.UI
                          + (entries - 1) * ButtonGap + Padding;
             rect.sizeDelta = new Vector2(MenuWidth, height);
 
-            ModernUiTheme.CreateTitleBar(menu, "Menu", "เมนู");
+            ModernUiTheme.CreateTitleBar(menu, "Menu", "เมนู", ModernUiIcons.Gear);
             ModernUiTheme.AttachShadow(rect);
 
             var y = -(ModernUiTheme.TitleBarHeight + Padding);
-            menu.respawnButton = menu.AddEntry(rect, "Respawn", ref y, menu.OnRespawn, false);
-            menu.AddEntry(rect, "Unstuck", ref y, menu.OnUnstuck, false);
-            menu.AddEntry(rect, "Shortcut", ref y, menu.OnShortcut, false);
-            menu.AddEntry(rect, "Logout", ref y, menu.OnLogout, false);
-            menu.AddEntry(rect, "Cancel", ref y, menu.CloseWindow, true);
+            menu.respawnButton = menu.AddEntry(rect, "Respawn", ModernUiIcons.Home, ref y, menu.OnRespawn, false);
+            menu.AddEntry(rect, "Unstuck", ModernUiIcons.Refresh, ref y, menu.OnUnstuck, false);
+            menu.AddEntry(rect, "Shortcut", ModernUiIcons.Grid, ref y, menu.OnShortcut, false);
+            menu.AddEntry(rect, "Logout", ModernUiIcons.Exit, ref y, menu.OnLogout, false);
+            menu.AddEntry(rect, "Cancel", ModernUiIcons.Close, ref y, menu.CloseWindow, true);
 
             host.SetActive(true);
             return menu;
         }
 
-        private Button AddEntry(RectTransform parent, string label, ref float y,
+        private Button AddEntry(RectTransform parent, string label, Sprite icon, ref float y,
             UnityEngine.Events.UnityAction action, bool isCancel)
         {
             var background = isCancel ? ModernUiTheme.CardDeepColor : ModernUiTheme.CardColor;
-            var button = ModernUiTheme.CreateButton(parent, label, label, background,
-                ModernUiTheme.NameColor, 15);
+            var button = ModernUiTheme.CreateIconButton(parent, label, label, icon, background,
+                ModernUiTheme.NameColor);
             ModernUiTheme.Place((RectTransform)button.transform, new Vector2(0, 1),
                 new Vector2(Padding, y), new Vector2(MenuWidth - Padding * 2, ButtonHeight));
             button.onClick.AddListener(action);

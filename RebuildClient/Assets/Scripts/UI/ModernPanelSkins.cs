@@ -7,17 +7,23 @@ using UnityEngine.UI;
 namespace Assets.Scripts.UI
 {
     /// <summary>
-    /// Applies the shared white card theme to the inventory and skill windows.
-    /// These two windows keep their original layout and logic, the skin only
-    /// retints their chrome, tabs and text so they match the rebuilt equipment
-    /// and stats windows. Item and skill entries spawn from template objects,
-    /// so restyling the template once is enough to cover every future entry.
+    /// Applies the shared card theme to the windows that keep their own layout. The
+    /// inventory, skill, options and emote windows are named here because each has
+    /// pieces worth treating individually; everything else the game opens is picked up
+    /// by a slower sweep that gives it the same panel, ink and accent colours, so a
+    /// shop or an item description no longer looks like it came from another game.
+    /// Item and skill entries spawn from template objects, so restyling the template
+    /// once is enough to cover every future entry.
     /// </summary>
     public class ModernPanelSkins : MonoBehaviour
     {
-        private class SkinMarker : MonoBehaviour { }
+        private const float SweepInterval = 0.5f;
 
         private EmoteWindow emoteWindow;
+
+        //the general pass holds off at first so the windows with a skin of their own get
+        //to claim themselves before anything else touches them
+        private float sweepTimer = 2f;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -39,26 +45,35 @@ namespace Assets.Scripts.UI
             if (ui == null)
                 return;
 
-            if (ui.InventoryWindow != null && ui.InventoryWindow.GetComponent<SkinMarker>() == null)
+            if (ui.InventoryWindow != null && !ModernUiTheme.IsSkinned(ui.InventoryWindow.gameObject))
                 SkinInventory(ui.InventoryWindow);
 
-            if (ui.SkillManager != null && ui.SkillManager.GetComponent<SkinMarker>() == null)
+            if (ui.SkillManager != null && !ModernUiTheme.IsSkinned(ui.SkillManager.gameObject))
                 SkinSkills(ui.SkillManager);
 
-            if (ui.ConfigManager != null && ui.ConfigManager.GetComponent<SkinMarker>() == null)
+            if (ui.ConfigManager != null && !ModernUiTheme.IsSkinned(ui.ConfigManager.gameObject))
                 SkinOptions(ui.ConfigManager);
 
             if (emoteWindow == null)
                 emoteWindow = FindFirstObjectByType<EmoteWindow>(FindObjectsInactive.Include);
-            if (emoteWindow != null && emoteWindow.GetComponent<SkinMarker>() == null)
+            if (emoteWindow != null && !ModernUiTheme.IsSkinned(emoteWindow.gameObject))
                 SkinEmotes(emoteWindow);
+
+            //windows built from prefabs appear long after the scene loads, so the general
+            //pass runs on a timer rather than only once
+            sweepTimer -= Time.deltaTime;
+            if (sweepTimer > 0)
+                return;
+            sweepTimer = SweepInterval;
+
+            SweepRemainingWindows(ui);
         }
 
         private static void SkinInventory(PlayerInventoryWindow win)
         {
-            win.gameObject.AddComponent<SkinMarker>();
+            ModernUiTheme.MarkSkinned(win.gameObject);
 
-            ModernUiTheme.ApplyWindowChrome(win);
+            ModernUiTheme.ApplyWindowChrome(win, ModernUiIcons.Bag);
             ModernUiTheme.AttachShadow((RectTransform)win.transform);
 
             if (win.WeightText != null)
@@ -86,19 +101,20 @@ namespace Assets.Scripts.UI
                 ModernUiTheme.RecolorLightTexts(win.ItemBoxRoot);
 
             ModernUiTheme.RecolorLightTexts(win.transform);
+            ModernUiTheme.RecolorAccents(win.transform);
 
             Debug.Log("[ModernPanelSkins] Retinted the inventory window.");
         }
 
         private static void SkinSkills(SkillWindow win)
         {
-            win.gameObject.AddComponent<SkinMarker>();
+            ModernUiTheme.MarkSkinned(win.gameObject);
 
-            ModernUiTheme.ApplyWindowChrome(win);
+            ModernUiTheme.ApplyWindowChrome(win, ModernUiIcons.Book);
 
             if (win.PointsText != null)
             {
-                win.PointsText.color = ModernUiTheme.NameColor;
+                win.PointsText.color = ModernUiTheme.AccentColor;
                 win.PointsText.fontStyle = FontStyles.Bold;
             }
 
@@ -125,27 +141,30 @@ namespace Assets.Scripts.UI
                 ModernUiTheme.RecolorLightTexts(win.TemplateObject.transform);
 
             ModernUiTheme.RecolorLightTexts(win.transform);
+            ModernUiTheme.RecolorAccents(win.transform);
 
             Debug.Log("[ModernPanelSkins] Retinted the skill window.");
         }
 
         private static void SkinOptions(OptionsWindow win)
         {
-            win.gameObject.AddComponent<SkinMarker>();
+            ModernUiTheme.MarkSkinned(win.gameObject);
 
-            ModernUiTheme.ApplyWindowChrome(win);
+            ModernUiTheme.ApplyWindowChrome(win, ModernUiIcons.Gear);
             ModernUiTheme.AttachShadow((RectTransform)win.transform);
             ModernUiTheme.StyleTabBar(win.TabButtons);
             ModernUiTheme.RecolorLightTexts(win.transform);
+            ModernUiTheme.RecolorAccents(win.transform);
+            StyleSliders(win.transform);
 
             Debug.Log("[ModernPanelSkins] Retinted the options window.");
         }
 
         private static void SkinEmotes(EmoteWindow win)
         {
-            win.gameObject.AddComponent<SkinMarker>();
+            ModernUiTheme.MarkSkinned(win.gameObject);
 
-            ModernUiTheme.ApplyWindowChrome(win);
+            ModernUiTheme.ApplyWindowChrome(win, ModernUiIcons.Smile);
             ModernUiTheme.AttachShadow((RectTransform)win.transform);
 
             //emote entries are cloned from this one, so tinting it covers them all
@@ -155,30 +174,107 @@ namespace Assets.Scripts.UI
                 ModernUiTheme.RecolorLightTexts(win.ContentArea.transform);
 
             ModernUiTheme.RecolorLightTexts(win.transform);
+            ModernUiTheme.RecolorAccents(win.transform);
 
             Debug.Log("[ModernPanelSkins] Retinted the emote window.");
         }
 
-        private static void StyleTabButtons(Button[] tabs)
+        /// <summary>
+        /// Gives every other window the same panel colour, dark ink and blue accents.
+        /// Nothing here moves a single element, it only recolours, so a window this pass
+        /// has never been tried against still lays out exactly as it always did.
+        /// </summary>
+        private void SweepRemainingWindows(UiManager ui)
         {
-            if (tabs == null)
+            var container = ui.PrimaryUserWindowContainer;
+            if (container == null)
                 return;
 
-            foreach (var tab in tabs)
+            var containerRect = container.rect;
+
+            for (var i = 0; i < container.childCount; i++)
             {
-                if (tab == null)
+                var child = container.GetChild(i) as RectTransform;
+                if (child == null || ModernUiTheme.IsSkinned(child.gameObject))
                     continue;
 
-                var image = tab.GetComponent<Image>();
-                if (image != null)
+                var window = child.GetComponent<WindowBase>();
+                if (window == null || HasOwnSkin(ui, window))
+                    continue;
+
+                //a panel that fills the container is a backdrop rather than a window,
+                //and painting it would wash out whatever it is standing behind
+                if (child.rect.width >= containerRect.width * 0.95f &&
+                    child.rect.height >= containerRect.height * 0.95f)
+                    continue;
+
+                ModernUiTheme.MarkSkinned(child.gameObject);
+                ModernUiTheme.ApplyWindowChrome(window);
+
+                var background = child.GetComponent<Image>();
+                if (background != null && background.color.a > 0.5f)
+                    ModernUiTheme.AttachShadow(child);
+
+                ModernUiTheme.RecolorLightTexts(child);
+                ModernUiTheme.RecolorAccents(child);
+
+                Debug.Log($"[ModernPanelSkins] Retinted {child.name}.");
+            }
+        }
+
+        /// <summary>
+        /// The windows rebuilt or retinted by name elsewhere. Which component runs first
+        /// is not something Unity promises, so the general pass checks rather than
+        /// relying on having been beaten to them.
+        /// </summary>
+        private bool HasOwnSkin(UiManager ui, WindowBase window)
+        {
+            return window == ui.StatusWindow
+                   || window == ui.EquipmentWindow
+                   || window == ui.InventoryWindow
+                   || window == ui.SkillManager
+                   || window == ui.ConfigManager
+                   || (emoteWindow != null && window == emoteWindow);
+        }
+
+        /// <summary>
+        /// Options is mostly sliders, and the reference draws them as a thin blue track
+        /// with a round handle rather than the boxy default.
+        /// </summary>
+        private static void StyleSliders(Transform root)
+        {
+            foreach (var slider in root.GetComponentsInChildren<Slider>(true))
+            {
+                if (slider.fillRect != null)
                 {
-                    image.sprite = ModernUiTheme.RoundedSprite;
-                    image.type = Image.Type.Sliced;
-                    image.color = ModernUiTheme.CardColor;
+                    var fill = slider.fillRect.GetComponent<Image>();
+                    if (fill != null)
+                    {
+                        fill.sprite = ModernUiTheme.RoundedSprite;
+                        fill.type = Image.Type.Sliced;
+                        fill.color = ModernUiTheme.AccentColor;
+                    }
                 }
 
-                foreach (var label in tab.GetComponentsInChildren<TextMeshProUGUI>(true))
-                    label.color = ModernUiTheme.NameColor;
+                if (slider.handleRect != null)
+                {
+                    var handle = slider.handleRect.GetComponent<Image>();
+                    if (handle != null)
+                    {
+                        handle.sprite = ModernUiTheme.RoundedSprite;
+                        handle.type = Image.Type.Sliced;
+                        handle.color = ModernUiTheme.AccentColor;
+                    }
+                }
+
+                //the track sits behind both of those, on the slider itself
+                var track = slider.GetComponent<Image>();
+                if (track != null)
+                {
+                    track.sprite = ModernUiTheme.RoundedSprite;
+                    track.type = Image.Type.Sliced;
+                    track.color = ModernUiTheme.CardDeepColor;
+                }
             }
         }
     }
