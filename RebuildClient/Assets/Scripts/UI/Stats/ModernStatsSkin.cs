@@ -29,6 +29,9 @@ namespace Assets.Scripts.UI.Stats
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
+            if (!ModernUiTheme.RuntimeUiEnabled)
+                return;
+
             if (FindFirstObjectByType<ModernStatsSkin>() != null)
                 return;
 

@@ -19,6 +19,9 @@ namespace Assets.Scripts.UI
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
+            if (!ModernUiTheme.RuntimeUiEnabled)
+                return;
+
             if (FindFirstObjectByType<ModernPanelSkins>() != null)
                 return;
 

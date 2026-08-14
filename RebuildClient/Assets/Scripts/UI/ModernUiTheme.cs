@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -23,6 +24,30 @@ namespace Assets.Scripts.UI
         public static readonly Color AccentColor = new Color(0.231f, 0.510f, 0.965f);
         public static readonly Color AccentTextColor = Color.white;
         public static readonly Color PositiveColor = new Color(0.16f, 0.65f, 0.37f);
+
+        private static bool? runtimeUiEnabled;
+
+        /// <summary>
+        /// Everything this project adds at runtime, the window skins and the touch
+        /// controls, can be switched off by putting ?vanillaui=1 in the page address.
+        /// A WebGL build takes long enough that being able to tell a fault in this code
+        /// apart from one in the game itself without rebuilding is worth the flag.
+        /// </summary>
+        public static bool RuntimeUiEnabled
+        {
+            get
+            {
+                if (runtimeUiEnabled == null)
+                {
+                    var url = Application.absoluteURL ?? "";
+                    runtimeUiEnabled = url.IndexOf("vanillaui=1", StringComparison.OrdinalIgnoreCase) < 0;
+                    if (!runtimeUiEnabled.Value)
+                        Debug.Log("[ModernUi] Runtime interface disabled by the vanillaui flag.");
+                }
+
+                return runtimeUiEnabled.Value;
+            }
+        }
 
         private static Sprite roundedSprite;
 

@@ -59,6 +59,9 @@ namespace Assets.Scripts.UI.Mobile
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
+            if (!ModernUiTheme.RuntimeUiEnabled)
+                return;
+
             if (!Input.touchSupported && !Application.isMobilePlatform)
                 return;
 
