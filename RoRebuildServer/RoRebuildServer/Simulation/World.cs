@@ -505,6 +505,7 @@ public class World
             player.Equipment = new ItemEquipState();
         player.CharacterSlot = req.CharacterSlot;
         player.Party = req.Party;
+        player.Guild = req.Guild;
 
         if (req.SaveVersion < 3)
         {

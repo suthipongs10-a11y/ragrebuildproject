@@ -162,7 +162,8 @@ public enum ClientTextCommand : byte
     Where,
     Info,
     Adminify,
-    ChatRoom
+    ChatRoom,
+    Guild
 }
 
 public enum NpcInteractionType

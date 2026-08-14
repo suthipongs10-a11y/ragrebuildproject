@@ -40,5 +40,6 @@ public class RoContext : IdentityDbContext<RoUserAccount, UserRole, int>
     public DbSet<DbCharacter> Character { get; set; }
     public DbSet<StorageInventory> StorageInventory { get; set; }
     public DbSet<DbParty> Parties { get; set; }
+    public DbSet<DbGuild> Guilds { get; set; }
     public DbSet<ScriptGlobalVar> ScriptGlobalVars { get; set; }
 }

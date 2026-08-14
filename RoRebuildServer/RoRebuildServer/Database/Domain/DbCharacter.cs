@@ -27,6 +27,7 @@ public class DbCharacter
     public byte[]? ItemData { get; set; }
     public int ItemDataLength { get; set; }
     public int? PartyId { get; set; }
+    public int? GuildId { get; set; } //plain column, guilds are resolved in code rather than by a navigation property
     public int AccountId { get; set; }
     public int VersionFormat { get; set; }
     public DbParty? Party { get; set; }

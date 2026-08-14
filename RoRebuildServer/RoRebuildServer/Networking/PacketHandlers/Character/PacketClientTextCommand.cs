@@ -37,6 +37,16 @@ public class PacketClientTextCommand : IClientPacketHandler
             CommandBuilder.ClearRecipients();
         }
 
+        if (type == ClientTextCommand.Guild)
+        {
+            var arguments = msg.ReadString();
+            if (connection.Character == null || connection.Player == null)
+                return;
+
+            Simulation.Guilds.GuildCommands.Handle(connection, arguments);
+            return;
+        }
+
         if (type == ClientTextCommand.ChatRoom)
         {
             var title = msg.ReadString();

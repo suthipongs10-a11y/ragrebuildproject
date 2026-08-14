@@ -41,6 +41,7 @@ public class LoadCharacterRequest : IDbRequest
     public CharacterBag? Cart;
     public ItemEquipState? EquipState;
     public Party? Party;
+    public Simulation.Guilds.Guild? Guild;
 
     public byte[]? Data;
     public bool HasCharacter;
@@ -102,6 +103,33 @@ public class LoadCharacterRequest : IDbRequest
                         if (!World.Instance.TryAddParty(Party)) //if another query somehow beat us to the punch
                             if (World.Instance.TryFindPartyById(ch.PartyId.Value, out party))
                                 Party = party;
+                    }
+                }
+            }
+
+            //guild stuff. Unlike a party a guild outlives every session, so if it isn't
+            //cached yet the row and its member list are pulled in here.
+            if (ch.GuildId != null)
+            {
+                if (Simulation.Guilds.GuildManager.TryGetGuild(ch.GuildId.Value, out var cachedGuild))
+                    Guild = cachedGuild;
+                else
+                {
+                    var dbGuild = await dbContext.Guilds.AsNoTracking()
+                        .FirstOrDefaultAsync(g => g.Id == ch.GuildId.Value);
+
+                    if (dbGuild != null)
+                    {
+                        var loaded = new Simulation.Guilds.Guild(dbGuild);
+                        var members = await dbContext.Character.AsNoTracking()
+                            .Where(c => c.GuildId == dbGuild.Id)
+                            .Select(c => new { c.Id, c.Name })
+                            .ToListAsync();
+
+                        foreach (var member in members)
+                            loaded.AddMember(member.Id, member.Name);
+
+                        Guild = Simulation.Guilds.GuildManager.Register(loaded);
                     }
                 }
             }

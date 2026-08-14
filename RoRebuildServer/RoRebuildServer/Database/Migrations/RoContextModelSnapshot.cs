@@ -137,6 +137,9 @@ namespace RoRebuildServer.Migrations
                     b.Property<int>("DataLength")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("GuildId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<byte[]>("ItemData")
                         .HasColumnType("BLOB");
 
@@ -191,6 +194,25 @@ namespace RoRebuildServer.Migrations
                     b.HasIndex("PartyId");
 
                     b.ToTable("Character");
+                });
+
+            modelBuilder.Entity("RoRebuildServer.Database.Domain.DbGuild", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("GuildName")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("LeaderId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Guild");
                 });
 
             modelBuilder.Entity("RoRebuildServer.Database.Domain.DbParty", b =>
