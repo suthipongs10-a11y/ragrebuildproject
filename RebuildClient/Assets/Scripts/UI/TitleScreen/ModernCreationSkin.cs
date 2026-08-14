@@ -85,7 +85,15 @@ namespace Assets.Scripts.UI.TitleScreen
                 return;
 
             var pane = (RectTransform)win.Pane.transform;
+
+            //resizing alone left the pane hanging off the top left, because it kept
+            //whatever corner the original layout was pinned to. Centre it explicitly.
+            pane.anchorMin = new Vector2(0.5f, 0.5f);
+            pane.anchorMax = new Vector2(0.5f, 0.5f);
+            pane.pivot = new Vector2(0.5f, 0.5f);
             pane.sizeDelta = new Vector2(PaneWidth, PaneHeight);
+            pane.anchoredPosition = Vector2.zero;
+            pane.localScale = Vector3.one;
 
             //the starting values were written into the old texts by the window's Awake,
             //so they are read back here rather than assumed

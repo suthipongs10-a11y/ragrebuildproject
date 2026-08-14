@@ -37,6 +37,19 @@ public class PacketClientTextCommand : IClientPacketHandler
             CommandBuilder.ClearRecipients();
         }
 
+        if (type == ClientTextCommand.ReturnToSave)
+        {
+            //the unstuck option in the escape menu, this is the same trip a butterfly
+            //wing makes and unlike respawning it works while the character is alive
+            if (connection.Character == null || connection.Player == null)
+                return;
+            if (connection.Character.State == RebuildSharedData.Enum.CharacterState.Dead)
+                return;
+
+            connection.Player.ReturnToSavePoint();
+            return;
+        }
+
         if (type == ClientTextCommand.Guild)
         {
             var arguments = msg.ReadString();

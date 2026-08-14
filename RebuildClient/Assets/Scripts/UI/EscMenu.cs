@@ -1,6 +1,7 @@
 using Assets.Scripts.Network;
 using Assets.Scripts.PlayerControl;
 using Assets.Scripts.UI.ConfigWindow;
+using RebuildSharedData.Networking;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -118,7 +119,9 @@ namespace Assets.Scripts.UI
 
         private void OnUnstuck()
         {
-            NetworkManager.Instance.RandomTeleport();
+            //returns to the save point rather than teleporting somewhere random on the
+            //same map, which is what actually gets a stuck character out of trouble
+            NetworkManager.Instance.SendClientTextCommand(ClientTextCommand.ReturnToSave);
             CloseWindow();
         }
 
