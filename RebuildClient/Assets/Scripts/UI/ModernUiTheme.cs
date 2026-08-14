@@ -1,5 +1,6 @@
 using System;
 using TMPro;
+using UnityEngine.EventSystems;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,17 +14,22 @@ namespace Assets.Scripts.UI
     /// </summary>
     public static class ModernUiTheme
     {
-        public static readonly Color WindowColor = new Color(1f, 1f, 1f, 0.97f);
-        public static readonly Color CardColor = new Color(0.949f, 0.957f, 0.973f);
-        public static readonly Color CardDeepColor = new Color(0.933f, 0.942f, 0.960f);
-        public static readonly Color TitleColor = new Color(0.078f, 0.094f, 0.125f);
-        public static readonly Color LabelColor = new Color(0.541f, 0.573f, 0.639f);
-        public static readonly Color NameColor = new Color(0.122f, 0.141f, 0.188f);
-        public static readonly Color MutedColor = new Color(0.765f, 0.788f, 0.831f);
-        public static readonly Color HintColor = new Color(0.42f, 0.455f, 0.52f);
-        public static readonly Color AccentColor = new Color(0.231f, 0.510f, 0.965f);
+        //a soft blue set: the window is a tinted off white, cards step down in two
+        //stages and the header is the most saturated tone so it reads as a header
+        public static readonly Color WindowColor = new Color(0.960f, 0.975f, 0.992f, 0.98f);
+        public static readonly Color CardColor = new Color(0.898f, 0.933f, 0.976f);
+        public static readonly Color CardDeepColor = new Color(0.843f, 0.894f, 0.957f);
+        public static readonly Color TitleBarColor = new Color(0.741f, 0.843f, 0.941f);
+        public static readonly Color TitleColor = new Color(0.098f, 0.192f, 0.310f);
+        public static readonly Color LabelColor = new Color(0.416f, 0.510f, 0.616f);
+        public static readonly Color NameColor = new Color(0.129f, 0.204f, 0.302f);
+        public static readonly Color MutedColor = new Color(0.639f, 0.714f, 0.796f);
+        public static readonly Color HintColor = new Color(0.427f, 0.522f, 0.620f);
+        public static readonly Color AccentColor = new Color(0.263f, 0.545f, 0.878f);
         public static readonly Color AccentTextColor = Color.white;
-        public static readonly Color PositiveColor = new Color(0.16f, 0.65f, 0.37f);
+        public static readonly Color PositiveColor = new Color(0.145f, 0.573f, 0.392f);
+
+        public const float TitleBarHeight = 52f;
 
         private static bool? runtimeUiEnabled;
 
@@ -91,7 +97,7 @@ namespace Assets.Scripts.UI
                 {
                     barImage.sprite = RoundedSprite;
                     barImage.type = Image.Type.Sliced;
-                    barImage.color = WindowColor;
+                    barImage.color = TitleBarColor;
                 }
 
                 foreach (var barText in child.GetComponentsInChildren<TextMeshProUGUI>(true))
@@ -126,6 +132,90 @@ namespace Assets.Scripts.UI
                 var isGray = max - min < 0.15f;
                 if (isGray && max > 0.7f)
                     text.color = NameColor;
+            }
+        }
+
+        /// <summary>
+        /// Builds a header across the top of a rebuilt window: a tinted bar carrying the
+        /// window name and a close button, and doubling as the drag handle. Rebuilt
+        /// windows hide their original chrome, so without this they have no way to be
+        /// moved or closed at all.
+        /// </summary>
+        public static RectTransform CreateTitleBar(WindowBase window, string title)
+        {
+            var root = (RectTransform)window.transform;
+
+            //assembled while inactive so the drag handle can be pointed at its window
+            //before anything starts listening for pointers on it
+            var barObject = new GameObject("ModernTitleBar", typeof(Image));
+            barObject.SetActive(false);
+            barObject.transform.SetParent(root, false);
+
+            var image = barObject.GetComponent<Image>();
+            image.sprite = RoundedSprite;
+            image.type = Image.Type.Sliced;
+            image.color = TitleBarColor;
+            image.raycastTarget = true;
+
+            var bar = (RectTransform)barObject.transform;
+            bar.anchorMin = new Vector2(0, 1);
+            bar.anchorMax = new Vector2(1, 1);
+            bar.pivot = new Vector2(0.5f, 1);
+            bar.offsetMin = new Vector2(0, -TitleBarHeight);
+            bar.offsetMax = Vector2.zero;
+
+            var handle = barObject.AddComponent<WindowDragHandle>();
+            handle.Target = root;
+            handle.Window = window;
+
+            var label = CreateText(bar, "Title", title, 18, TitleColor, TextAlignmentOptions.Left, FontStyles.Bold);
+            Stretch((RectTransform)label.transform, 18, 0, -60, 0);
+
+            var close = CreateButton(bar, "Close", "X", CardColor, TitleColor, 16);
+            Place((RectTransform)close.transform, new Vector2(1, 0.5f), new Vector2(-10, 0), new Vector2(34, 34));
+            ((RectTransform)close.transform).pivot = new Vector2(1, 0.5f);
+            close.onClick.AddListener(window.CloseWindow);
+
+            barObject.SetActive(true);
+            return bar;
+        }
+
+        /// <summary>
+        /// Drags a window by its header. Written here rather than reusing the project's
+        /// Draggable because that one reads its target during Awake, which a component
+        /// added from code cannot satisfy in time.
+        /// </summary>
+        private class WindowDragHandle : MonoBehaviour, IPointerDownHandler, IDragHandler
+        {
+            public RectTransform Target;
+            public WindowBase Window;
+
+            private Vector2 grabOffset;
+
+            public void OnPointerDown(PointerEventData eventData)
+            {
+                if (Window != null)
+                    Window.MoveToTop();
+
+                if (TryGetLocalPoint(eventData, out var local))
+                    grabOffset = Target.anchoredPosition - local;
+            }
+
+            public void OnDrag(PointerEventData eventData)
+            {
+                if (Target != null && TryGetLocalPoint(eventData, out var local))
+                    Target.anchoredPosition = local + grabOffset;
+            }
+
+            private bool TryGetLocalPoint(PointerEventData eventData, out Vector2 local)
+            {
+                local = Vector2.zero;
+                var parent = Target != null ? Target.parent as RectTransform : null;
+                if (parent == null)
+                    return false;
+
+                return RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                    parent, eventData.position, eventData.pressEventCamera, out local);
             }
         }
 

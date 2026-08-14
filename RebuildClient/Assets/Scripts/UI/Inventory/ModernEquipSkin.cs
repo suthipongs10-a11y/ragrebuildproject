@@ -22,14 +22,14 @@ namespace Assets.Scripts.UI.Inventory
         private const float Margin = 24f;
         private const float TopOffset = 96f; //below the drag bar and the hint line
 
-        private static readonly Color WindowColor = new Color(1f, 1f, 1f, 0.97f);
-        private static readonly Color CardColor = new Color(0.949f, 0.957f, 0.973f);
-        private static readonly Color CenterColor = new Color(0.933f, 0.942f, 0.960f);
-        private static readonly Color TitleColor = new Color(0.078f, 0.094f, 0.125f);
-        private static readonly Color LabelColor = new Color(0.541f, 0.573f, 0.639f);
-        private static readonly Color NameColor = new Color(0.122f, 0.141f, 0.188f);
-        private static readonly Color EmptyColor = new Color(0.765f, 0.788f, 0.831f);
-        private static readonly Color HintColor = new Color(0.42f, 0.455f, 0.52f);
+        //this skin predates the shared theme, its colours now come from there
+        private static Color WindowColor => ModernUiTheme.WindowColor;
+        private static Color CardColor => ModernUiTheme.CardColor;
+        private static Color CenterColor => ModernUiTheme.CardDeepColor;
+        private static Color LabelColor => ModernUiTheme.LabelColor;
+        private static Color NameColor => ModernUiTheme.NameColor;
+        private static Color EmptyColor => ModernUiTheme.MutedColor;
+        private static Color HintColor => ModernUiTheme.HintColor;
 
         private static readonly string[] SlotLabels =
         {
@@ -76,7 +76,7 @@ namespace Assets.Scripts.UI.Inventory
             win.gameObject.AddComponent<SkinMarker>();
 
             if (roundedSprite == null)
-                roundedSprite = CreateRoundedSprite();
+                roundedSprite = ModernUiTheme.RoundedSprite;
 
             var root = (RectTransform)win.transform;
             root.sizeDelta = new Vector2(WindowWidth, WindowHeight);
@@ -88,36 +88,6 @@ namespace Assets.Scripts.UI.Inventory
                 rootImage.sprite = roundedSprite;
                 rootImage.type = Image.Type.Sliced;
                 rootImage.color = WindowColor;
-            }
-
-            //keep the drag bar alive so moving and closing still work, just recolor it
-            Transform dragBar = null;
-            for (var i = 0; i < root.childCount; i++)
-            {
-                var child = root.GetChild(i);
-                var lower = child.name.ToLowerInvariant();
-                if (lower.Contains("drag"))
-                {
-                    dragBar = child;
-                    var barImage = child.GetComponent<Image>();
-                    if (barImage != null)
-                    {
-                        barImage.sprite = roundedSprite;
-                        barImage.type = Image.Type.Sliced;
-                        barImage.color = WindowColor;
-                    }
-                    foreach (var barText in child.GetComponentsInChildren<TextMeshProUGUI>(true))
-                    {
-                        barText.color = TitleColor;
-                        barText.fontStyle = FontStyles.Bold;
-                    }
-                    foreach (var barButton in child.GetComponentsInChildren<Button>(true))
-                    {
-                        var buttonImage = barButton.GetComponent<Image>();
-                        if (buttonImage != null)
-                            buttonImage.color = HintColor;
-                    }
-                }
             }
 
             //the character preview moves into the new center card before the old content goes away
@@ -140,14 +110,17 @@ namespace Assets.Scripts.UI.Inventory
                 preview.gameObject.SetActive(true);
             }
 
-            //everything from the old layout that isn't the drag bar or our panel gets hidden
+            //the whole original layout goes, including its chrome, and the themed header
+            //below takes over moving and closing the window
             for (var i = 0; i < root.childCount; i++)
             {
                 var child = root.GetChild(i);
-                if (child == dragBar || child == panel)
+                if (child == panel)
                     continue;
                 child.gameObject.SetActive(false);
             }
+
+            ModernUiTheme.CreateTitleBar(win, "Equipment");
 
             CreateText(panel, "Hint", "Double-click a slot to unequip  ·  Right-click an item for details",
                 13, HintColor, TextAlignmentOptions.Left, FontStyles.Normal,

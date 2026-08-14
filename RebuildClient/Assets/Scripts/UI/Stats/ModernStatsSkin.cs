@@ -59,11 +59,10 @@ namespace Assets.Scripts.UI.Stats
             var root = (RectTransform)win.transform;
             root.sizeDelta = new Vector2(WindowWidth, WindowHeight);
 
-            var dragBar = ModernUiTheme.ApplyWindowChrome(win);
+            ModernUiTheme.ApplyWindowChrome(win);
 
-            //this window lives in the scene rather than a prefab, so play it safe:
-            //give it a backdrop if the root carries no image of its own, and never
-            //hide whatever holds the title bar or close button
+            //this window lives in the scene rather than a prefab and may carry no image
+            //of its own, so the backdrop is added when it is missing
             if (win.GetComponent<Image>() == null)
             {
                 var backdrop = ModernUiTheme.CreateCard(root, "ModernSkinBackdrop", ModernUiTheme.WindowColor);
@@ -75,16 +74,16 @@ namespace Assets.Scripts.UI.Stats
             var panel = ModernUiTheme.CreateRect("ModernSkinPanel", root);
             ModernUiTheme.Stretch(panel, 0, 0, 0, 0);
 
+            //the original chrome goes entirely, the header built below replaces it
             for (var i = 0; i < root.childCount; i++)
             {
                 var child = root.GetChild(i);
-                if (child == dragBar || child == panel)
-                    continue;
-                var lower = child.name.ToLowerInvariant();
-                if (lower.Contains("drag") || lower.Contains("close") || lower.Contains("title") || lower.Contains("backdrop"))
+                if (child == panel || child.name == "ModernSkinBackdrop")
                     continue;
                 child.gameObject.SetActive(false);
             }
+
+            ModernUiTheme.CreateTitleBar(win, "Stats");
 
             var hint = ModernUiTheme.CreateText(panel, "Hint", "Hold shift to add ten points at a time",
                 13, ModernUiTheme.HintColor, TextAlignmentOptions.Left);
