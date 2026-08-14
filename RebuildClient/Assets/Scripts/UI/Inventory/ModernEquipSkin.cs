@@ -109,9 +109,11 @@ namespace Assets.Scripts.UI.Inventory
                 var previewRect = preview as RectTransform;
                 if (previewRect != null)
                 {
+                    //the sprite's pivot sits well above its feet, so anchoring it to the
+                    //middle of the card left the character floating with a gap underneath
                     previewRect.anchorMin = new Vector2(0.5f, 0.5f);
                     previewRect.anchorMax = new Vector2(0.5f, 0.5f);
-                    previewRect.anchoredPosition = new Vector2(0, -20);
+                    previewRect.anchoredPosition = new Vector2(0, -78);
                 }
                 preview.gameObject.SetActive(true);
             }
@@ -126,7 +128,7 @@ namespace Assets.Scripts.UI.Inventory
                 child.gameObject.SetActive(false);
             }
 
-            ModernUiTheme.CreateTitleBar(win, "Equipment", "อุปกรณ์", ModernUiIcons.Armor);
+            ModernUiTheme.CreateTitleBar(win, "Equipment", "Worn gear", ModernUiIcons.Armor);
             ModernUiTheme.AttachShadow(root);
 
             CreateText(panel, "Hint", "Double-click a slot to unequip  ·  Right-click an item for details",

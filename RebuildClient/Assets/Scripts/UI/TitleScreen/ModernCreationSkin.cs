@@ -150,7 +150,7 @@ namespace Assets.Scripts.UI.TitleScreen
             ModernUiTheme.Place((RectTransform)title.transform, new Vector2(0, 1),
                 new Vector2(Margin + 50, -12), new Vector2(400, 30));
 
-            var subtitle = ModernUiTheme.CreateText(panel, "Subtitle", "สร้างตัวละคร",
+            var subtitle = ModernUiTheme.CreateText(panel, "Subtitle", "New adventurer",
                 ModernUiTheme.SizeSubtitle, ModernUiTheme.AccentColor, TextAlignmentOptions.TopLeft);
             ModernUiTheme.Place((RectTransform)subtitle.transform, new Vector2(0, 1),
                 new Vector2(Margin + 50, -44), new Vector2(400, 22));

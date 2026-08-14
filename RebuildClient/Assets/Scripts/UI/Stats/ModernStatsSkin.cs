@@ -95,7 +95,7 @@ namespace Assets.Scripts.UI.Stats
                 child.gameObject.SetActive(false);
             }
 
-            ModernUiTheme.CreateTitleBar(win, "Stats", "สเตตัส", ModernUiIcons.Person);
+            ModernUiTheme.CreateTitleBar(win, "Stats", "Character sheet", ModernUiIcons.Person);
             ModernUiTheme.AttachShadow(root);
 
             var hint = ModernUiTheme.CreateText(panel, "Hint", "Hold shift to add ten points at a time",

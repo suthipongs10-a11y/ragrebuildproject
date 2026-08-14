@@ -76,7 +76,7 @@ namespace Assets.Scripts.UI
                          + (entries - 1) * ButtonGap + Padding;
             rect.sizeDelta = new Vector2(MenuWidth, height);
 
-            ModernUiTheme.CreateTitleBar(menu, "Menu", "เมนู", ModernUiIcons.Gear);
+            ModernUiTheme.CreateTitleBar(menu, "Menu", "System", ModernUiIcons.Gear);
             ModernUiTheme.AttachShadow(rect);
 
             var y = -(ModernUiTheme.TitleBarHeight + Padding);

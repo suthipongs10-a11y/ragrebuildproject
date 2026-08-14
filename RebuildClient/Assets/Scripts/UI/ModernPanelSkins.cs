@@ -112,13 +112,25 @@ namespace Assets.Scripts.UI
 
             ModernUiTheme.ApplyWindowChrome(win, ModernUiIcons.Book);
 
-            if (win.PointsText != null)
+            var root = (RectTransform)win.transform;
+            if (root.sizeDelta.x < 460f)
+                root.sizeDelta = new Vector2(460f, Mathf.Max(root.sizeDelta.y, 560f));
+
+            //the horizontal scrollbar runs along the bottom of the window straight over
+            //the points readout, and a list of skills has nothing to scroll sideways to
+            var horizontal = FindDeep(win.transform, "Scrollbar Horizontal");
+            if (horizontal != null)
+                horizontal.gameObject.SetActive(false);
+
+            var scroll = win.GetComponentInChildren<ScrollRect>(true);
+            if (scroll != null)
             {
-                win.PointsText.color = ModernUiTheme.AccentColor;
-                win.PointsText.fontStyle = FontStyles.Bold;
+                scroll.horizontal = false;
+                scroll.horizontalScrollbar = null;
+                StyleScrollbar(scroll.verticalScrollbar);
             }
 
-            ModernUiTheme.AttachShadow((RectTransform)win.transform);
+            ModernUiTheme.AttachShadow(root);
             ModernUiTheme.StyleTabBar(win.Tabs);
 
             //the hover tooltip becomes a white card with dark text
@@ -136,14 +148,134 @@ namespace Assets.Scripts.UI
             if (win.TooltipText != null)
                 win.TooltipText.color = ModernUiTheme.NameColor;
 
-            //skill rows are cloned from this template
-            if (win.TemplateObject != null)
-                ModernUiTheme.RecolorLightTexts(win.TemplateObject.transform);
+            //skill rows are cloned from this template, so styling it covers everything
+            //the window builds from here on, and the rows already made are done directly
+            StyleSkillEntry(win.TemplateObject);
+            foreach (var entry in win.GetComponentsInChildren<SkillWindowEntry>(true))
+                StyleSkillEntry(entry);
 
             ModernUiTheme.RecolorLightTexts(win.transform);
             ModernUiTheme.RecolorAccents(win.transform);
 
+            //after the sweeps, so nothing repaints the number the window is here for
+            StylePointsReadout(win);
+
             Debug.Log("[ModernPanelSkins] Retinted the skill window.");
+        }
+
+        /// <summary>
+        /// Gives the skill point count a card of its own. It shares a parent with
+        /// whatever the original layout put around it, so the card is built from that
+        /// rect rather than from coordinates guessed at from the outside.
+        /// </summary>
+        private static void StylePointsReadout(SkillWindow win)
+        {
+            var points = win.PointsText;
+            if (points == null)
+                return;
+
+            var rect = points.rectTransform;
+            var parent = rect.parent;
+            if (parent != null && parent.Find("ModernPointsCard") == null)
+            {
+                var card = ModernUiTheme.CreateCard(parent, "ModernPointsCard", ModernUiTheme.CardDeepColor);
+                card.anchorMin = rect.anchorMin;
+                card.anchorMax = rect.anchorMax;
+                card.pivot = rect.pivot;
+                card.anchoredPosition = rect.anchoredPosition;
+                card.sizeDelta = rect.sizeDelta + new Vector2(16, 8);
+                card.GetComponent<Image>().raycastTarget = false;
+                //behind the text, which the window keeps writing into
+                card.SetSiblingIndex(rect.GetSiblingIndex());
+            }
+
+            points.color = ModernUiTheme.NameColor;
+            points.fontStyle = FontStyles.Bold;
+            points.fontSize = ModernUiTheme.SizeBody;
+            points.extraPadding = true;
+        }
+
+        /// <summary>
+        /// Makes a skill row read like the rest of the theme: a strong name, quiet
+        /// numbers and a hairline separating it from the row below.
+        /// </summary>
+        private static void StyleSkillEntry(SkillWindowEntry entry)
+        {
+            if (entry == null)
+                return;
+
+            if (entry.SkillName != null)
+            {
+                entry.SkillName.color = ModernUiTheme.NameColor;
+                entry.SkillName.fontSize = ModernUiTheme.SizeBody;
+                entry.SkillName.fontStyle = FontStyles.Bold;
+                entry.SkillName.extraPadding = true;
+            }
+
+            StyleEntryDetail(entry.TextCurLevel);
+            StyleEntryDetail(entry.TextMaxLevel);
+            StyleEntryDetail(entry.SPCost);
+
+            if (entry.transform.Find("ModernDivider") != null)
+                return;
+
+            var divider = ModernUiTheme.CreateCard(entry.transform, "ModernDivider", ModernUiTheme.CardBorderColor);
+            divider.anchorMin = new Vector2(0, 0);
+            divider.anchorMax = new Vector2(1, 0);
+            divider.pivot = new Vector2(0.5f, 0);
+            divider.offsetMin = new Vector2(10, 0);
+            divider.offsetMax = new Vector2(-10, 1);
+            divider.GetComponent<Image>().raycastTarget = false;
+        }
+
+        private static void StyleEntryDetail(TextMeshProUGUI text)
+        {
+            if (text == null)
+                return;
+
+            text.color = ModernUiTheme.LabelColor;
+            text.fontSize = ModernUiTheme.SizeSmall;
+            text.extraPadding = true;
+        }
+
+        private static void StyleScrollbar(Scrollbar bar)
+        {
+            if (bar == null)
+                return;
+
+            var track = bar.GetComponent<Image>();
+            if (track != null)
+            {
+                track.sprite = ModernUiTheme.RoundedSprite;
+                track.type = Image.Type.Sliced;
+                track.color = ModernUiTheme.CardDeepColor;
+            }
+
+            if (bar.handleRect == null)
+                return;
+
+            var handle = bar.handleRect.GetComponent<Image>();
+            if (handle != null)
+            {
+                handle.sprite = ModernUiTheme.RoundedSprite;
+                handle.type = Image.Type.Sliced;
+                handle.color = ModernUiTheme.AccentColor;
+            }
+        }
+
+        private static Transform FindDeep(Transform root, string name)
+        {
+            if (root.name == name)
+                return root;
+
+            for (var i = 0; i < root.childCount; i++)
+            {
+                var found = FindDeep(root.GetChild(i), name);
+                if (found != null)
+                    return found;
+            }
+
+            return null;
         }
 
         private static void SkinOptions(OptionsWindow win)
