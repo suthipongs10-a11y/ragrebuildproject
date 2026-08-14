@@ -1874,7 +1874,9 @@ namespace Assets.Scripts
                 }
                 else
                 {
-                    UiManager.Instance.CloseLastWindow();
+                    //nothing was open to close, so escape brings up the system menu
+                    if (!UiManager.Instance.CloseLastWindow())
+                        UI.EscMenu.Open();
                 }
 
                 EventSystem.current.SetSelectedGameObject(null);

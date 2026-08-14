@@ -28,6 +28,7 @@ public class SaveCharacterRequest : IDbRequest
     private int itemDataSize;
     private int dataLength;
     private int? partyId;
+    private int? guildId;
 
     public SaveCharacterRequest(string newCharacterName, int accountId)
     {
@@ -59,6 +60,8 @@ public class SaveCharacterRequest : IDbRequest
         slot = player.CharacterSlot;
 
         partyId = player.Party?.PartyId;
+        //the save rewrites the whole row, so anything left out here is written as null
+        guildId = player.Guild?.GuildId;
 
         //store player data (data, npc flags, learned skills, status effects)
         data = PlayerDataDbHelper.StorePlayerDataForDatabaseUse(player, out dataLength);
@@ -104,6 +107,7 @@ public class SaveCharacterRequest : IDbRequest
             SkillDataLength = 0,
             NpcFlagsLength = 0,
             PartyId = partyId,
+            GuildId = guildId,
             VersionFormat = PlayerDataDbHelper.CurrentPlayerSaveVersion
         };
 

@@ -454,8 +454,13 @@ namespace Assets.Scripts.UI.Mobile
 
         private void PressEscape()
         {
-            if (UiManager.Instance != null)
-                UiManager.Instance.CloseLastWindow();
+            if (UiManager.Instance == null)
+                return;
+
+            //matches the escape key: close the top window, or open the system menu
+            //when there was nothing left to close
+            if (!UiManager.Instance.CloseLastWindow())
+                EscMenu.Open();
         }
 
         private void ToggleFullscreen()
