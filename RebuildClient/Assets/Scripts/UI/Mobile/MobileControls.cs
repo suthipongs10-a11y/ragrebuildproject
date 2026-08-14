@@ -66,6 +66,9 @@ namespace Assets.Scripts.UI.Mobile
         private float walkResendTimer;
         private bool joystickWalking;
 
+        private RectTransform toggleButton;
+        private bool wasInGame;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
@@ -135,7 +138,35 @@ namespace Assets.Scripts.UI.Mobile
 
             CreateMinimap(controlGroup);
 
-            CreateButton(root, new Vector2(-24, 96), ToggleSize, ZoomColor, CreateMenuSprite(), ToggleControls);
+            toggleButton = CreateButton(root, new Vector2(-24, 96), ToggleSize, ZoomColor, CreateMenuSprite(), ToggleControls);
+
+            //nothing is shown until a character is actually in the world, and even then
+            //the pad stays folded away behind the toggle until it is asked for
+            controlGroup.gameObject.SetActive(false);
+            toggleButton.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// The title screen, the login box and character creation all live in the same
+        /// scene as the game, so the controls key off the camera having a character to
+        /// follow rather than off the scene being loaded.
+        /// </summary>
+        private static bool IsInGame()
+        {
+            var camera = CameraFollower.Instance;
+            return camera != null && camera.Target != null;
+        }
+
+        private void RefreshVisibility()
+        {
+            var inGame = IsInGame();
+            if (inGame == wasInGame)
+                return;
+            wasInGame = inGame;
+
+            toggleButton.gameObject.SetActive(inGame);
+            if (!inGame)
+                controlGroup.gameObject.SetActive(false);
         }
 
         //row 0 is the top row of the block, so it fills upward from the joystick
@@ -145,6 +176,10 @@ namespace Assets.Scripts.UI.Mobile
 
         private void Update()
         {
+            RefreshVisibility();
+            if (!wasInGame)
+                return;
+
             RestructureBottomMenu();
             UpdateJoystickWalk();
             RefreshMinimapForCurrentMap();
@@ -573,7 +608,7 @@ namespace Assets.Scripts.UI.Mobile
             return camera == null ? null : camera.Target;
         }
 
-        private void CreateButton(RectTransform root, Vector2 offset, float size, Color color, Sprite icon,
+        private RectTransform CreateButton(RectTransform root, Vector2 offset, float size, Color color, Sprite icon,
             UnityEngine.Events.UnityAction action, string label = null, bool leftSide = false)
         {
             var buttonObject = new GameObject("MobileButton", typeof(Image), typeof(Button));
@@ -607,12 +642,12 @@ namespace Assets.Scripts.UI.Mobile
                 iconRect.anchorMin = new Vector2(0.5f, 0.5f);
                 iconRect.anchorMax = new Vector2(0.5f, 0.5f);
                 iconRect.sizeDelta = new Vector2(size * 0.55f, size * 0.55f);
-                return;
+                return rect;
             }
 
             var font = TMP_Settings.defaultFontAsset;
             if (font == null || string.IsNullOrEmpty(label))
-                return;
+                return rect;
 
             var textObject = new GameObject("Label", typeof(TextMeshProUGUI));
             textObject.transform.SetParent(rect, false);
@@ -630,6 +665,8 @@ namespace Assets.Scripts.UI.Mobile
             textRect.anchorMax = Vector2.one;
             textRect.offsetMin = Vector2.zero;
             textRect.offsetMax = Vector2.zero;
+
+            return rect;
         }
 
         /// <summary>
