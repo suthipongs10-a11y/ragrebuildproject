@@ -15,12 +15,12 @@ namespace Assets.Scripts.UI.Inventory
     public class ModernEquipSkin : MonoBehaviour
     {
         private const float WindowWidth = 880f;
-        private const float WindowHeight = 620f;
+        private const float WindowHeight = 648f;
         private const float CardWidth = 254f;
         private const float CardHeight = 58f;
         private const float CardSpacing = 12f;
         private const float Margin = 24f;
-        private const float TopOffset = 96f; //below the drag bar and the hint line
+        private const float TopOffset = 124f; //below the header and the hint line
 
         //this skin predates the shared theme, its colours now come from there
         private static Color WindowColor => ModernUiTheme.WindowColor;
@@ -120,11 +120,12 @@ namespace Assets.Scripts.UI.Inventory
                 child.gameObject.SetActive(false);
             }
 
-            ModernUiTheme.CreateTitleBar(win, "Equipment");
+            ModernUiTheme.CreateTitleBar(win, "Equipment", "อุปกรณ์");
+            ModernUiTheme.AttachShadow(root);
 
             CreateText(panel, "Hint", "Double-click a slot to unequip  ·  Right-click an item for details",
                 13, HintColor, TextAlignmentOptions.Left, FontStyles.Normal,
-                new Vector2(Margin, -64), new Vector2(WindowWidth - Margin * 2, 22), new Vector2(0, 1));
+                new Vector2(Margin, -92), new Vector2(WindowWidth - Margin * 2, 22), new Vector2(0, 1));
 
             //center card sits between the two slot columns
             centerCard.anchorMin = new Vector2(0.5f, 1);

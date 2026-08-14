@@ -15,9 +15,9 @@ namespace Assets.Scripts.UI.Stats
     public class ModernStatsSkin : MonoBehaviour
     {
         private const float WindowWidth = 460f;
-        private const float WindowHeight = 668f;
+        private const float WindowHeight = 692f;
         private const float Margin = 20f;
-        private const float TopOffset = 92f;
+        private const float TopOffset = 116f;
         private const float RowHeight = 46f;
         private const float RowSpacing = 8f;
 
@@ -83,11 +83,12 @@ namespace Assets.Scripts.UI.Stats
                 child.gameObject.SetActive(false);
             }
 
-            ModernUiTheme.CreateTitleBar(win, "Stats");
+            ModernUiTheme.CreateTitleBar(win, "Stats", "สเตตัส");
+            ModernUiTheme.AttachShadow(root);
 
             var hint = ModernUiTheme.CreateText(panel, "Hint", "Hold shift to add ten points at a time",
                 13, ModernUiTheme.HintColor, TextAlignmentOptions.Left);
-            ModernUiTheme.Place((RectTransform)hint.transform, new Vector2(0, 1), new Vector2(Margin, -60), new Vector2(WindowWidth - Margin * 2, 20));
+            ModernUiTheme.Place((RectTransform)hint.transform, new Vector2(0, 1), new Vector2(Margin, -86), new Vector2(WindowWidth - Margin * 2, 20));
 
             //points remaining, the number the whole window revolves around
             var pointsCard = ModernUiTheme.CreateCard(panel, "PointsCard", ModernUiTheme.CardDeepColor);

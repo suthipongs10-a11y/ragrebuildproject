@@ -74,7 +74,8 @@ namespace Assets.Scripts.UI
                          + (entries - 1) * ButtonGap + Padding;
             rect.sizeDelta = new Vector2(MenuWidth, height);
 
-            ModernUiTheme.CreateTitleBar(menu, "Menu");
+            ModernUiTheme.CreateTitleBar(menu, "Menu", "เมนู");
+            ModernUiTheme.AttachShadow(rect);
 
             var y = -(ModernUiTheme.TitleBarHeight + Padding);
             menu.respawnButton = menu.AddEntry(rect, "Respawn", ref y, menu.OnRespawn, false);

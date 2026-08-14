@@ -1,3 +1,4 @@
+using Assets.Scripts.UI.ConfigWindow;
 using Assets.Scripts.UI.Inventory;
 using TMPro;
 using UnityEngine;
@@ -15,6 +16,8 @@ namespace Assets.Scripts.UI
     public class ModernPanelSkins : MonoBehaviour
     {
         private class SkinMarker : MonoBehaviour { }
+
+        private EmoteWindow emoteWindow;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -41,6 +44,14 @@ namespace Assets.Scripts.UI
 
             if (ui.SkillManager != null && ui.SkillManager.GetComponent<SkinMarker>() == null)
                 SkinSkills(ui.SkillManager);
+
+            if (ui.ConfigManager != null && ui.ConfigManager.GetComponent<SkinMarker>() == null)
+                SkinOptions(ui.ConfigManager);
+
+            if (emoteWindow == null)
+                emoteWindow = FindFirstObjectByType<EmoteWindow>(FindObjectsInactive.Include);
+            if (emoteWindow != null && emoteWindow.GetComponent<SkinMarker>() == null)
+                SkinEmotes(emoteWindow);
         }
 
         private static void SkinInventory(PlayerInventoryWindow win)
@@ -48,11 +59,12 @@ namespace Assets.Scripts.UI
             win.gameObject.AddComponent<SkinMarker>();
 
             ModernUiTheme.ApplyWindowChrome(win);
+            ModernUiTheme.AttachShadow((RectTransform)win.transform);
 
             if (win.WeightText != null)
                 win.WeightText.color = ModernUiTheme.NameColor;
 
-            StyleTabButtons(win.UiTabButtons);
+            ModernUiTheme.StyleTabBar(win.UiTabButtons);
 
             //the scroll area behind the item grid becomes a soft gray card
             if (win.ViewBoxTransform != null)
@@ -90,8 +102,8 @@ namespace Assets.Scripts.UI
                 win.PointsText.fontStyle = FontStyles.Bold;
             }
 
-            if (win.Tabs != null)
-                StyleTabButtons(win.Tabs.ToArray());
+            ModernUiTheme.AttachShadow((RectTransform)win.transform);
+            ModernUiTheme.StyleTabBar(win.Tabs);
 
             //the hover tooltip becomes a white card with dark text
             if (win.TooltipBox != null)
@@ -115,6 +127,36 @@ namespace Assets.Scripts.UI
             ModernUiTheme.RecolorLightTexts(win.transform);
 
             Debug.Log("[ModernPanelSkins] Retinted the skill window.");
+        }
+
+        private static void SkinOptions(OptionsWindow win)
+        {
+            win.gameObject.AddComponent<SkinMarker>();
+
+            ModernUiTheme.ApplyWindowChrome(win);
+            ModernUiTheme.AttachShadow((RectTransform)win.transform);
+            ModernUiTheme.StyleTabBar(win.TabButtons);
+            ModernUiTheme.RecolorLightTexts(win.transform);
+
+            Debug.Log("[ModernPanelSkins] Retinted the options window.");
+        }
+
+        private static void SkinEmotes(EmoteWindow win)
+        {
+            win.gameObject.AddComponent<SkinMarker>();
+
+            ModernUiTheme.ApplyWindowChrome(win);
+            ModernUiTheme.AttachShadow((RectTransform)win.transform);
+
+            //emote entries are cloned from this one, so tinting it covers them all
+            if (win.EntryTemplate != null)
+                ModernUiTheme.RecolorLightTexts(win.EntryTemplate.transform);
+            if (win.ContentArea != null)
+                ModernUiTheme.RecolorLightTexts(win.ContentArea.transform);
+
+            ModernUiTheme.RecolorLightTexts(win.transform);
+
+            Debug.Log("[ModernPanelSkins] Retinted the emote window.");
         }
 
         private static void StyleTabButtons(Button[] tabs)

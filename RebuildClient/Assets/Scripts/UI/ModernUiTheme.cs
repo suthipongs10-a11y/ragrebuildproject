@@ -20,6 +20,8 @@ namespace Assets.Scripts.UI
         public static readonly Color CardColor = new Color(0.898f, 0.933f, 0.976f);
         public static readonly Color CardDeepColor = new Color(0.843f, 0.894f, 0.957f);
         public static readonly Color TitleBarColor = new Color(0.741f, 0.843f, 0.941f);
+        public static readonly Color TabIdleColor = new Color(0.949f, 0.965f, 0.984f);
+        public static readonly Color CardBorderColor = new Color(0.804f, 0.855f, 0.918f);
         public static readonly Color TitleColor = new Color(0.098f, 0.192f, 0.310f);
         public static readonly Color LabelColor = new Color(0.416f, 0.510f, 0.616f);
         public static readonly Color NameColor = new Color(0.129f, 0.204f, 0.302f);
@@ -29,7 +31,8 @@ namespace Assets.Scripts.UI
         public static readonly Color AccentTextColor = Color.white;
         public static readonly Color PositiveColor = new Color(0.145f, 0.573f, 0.392f);
 
-        public const float TitleBarHeight = 52f;
+        public const float TitleBarHeight = 76f; //title plus the small subtitle under it
+        public const float ShadowSpread = 14f;
 
         private static bool? runtimeUiEnabled;
 
@@ -141,7 +144,7 @@ namespace Assets.Scripts.UI
         /// windows hide their original chrome, so without this they have no way to be
         /// moved or closed at all.
         /// </summary>
-        public static RectTransform CreateTitleBar(WindowBase window, string title)
+        public static RectTransform CreateTitleBar(WindowBase window, string title, string subtitle = null)
         {
             var root = (RectTransform)window.transform;
 
@@ -151,10 +154,11 @@ namespace Assets.Scripts.UI
             barObject.SetActive(false);
             barObject.transform.SetParent(root, false);
 
+            //the header is not a coloured strip, it is a clear band over the window with
+            //the name set large and a quiet subtitle beneath it. The image stays so the
+            //whole band still catches drags, it is simply invisible.
             var image = barObject.GetComponent<Image>();
-            image.sprite = RoundedSprite;
-            image.type = Image.Type.Sliced;
-            image.color = TitleBarColor;
+            image.color = new Color(0, 0, 0, 0);
             image.raycastTarget = true;
 
             var bar = (RectTransform)barObject.transform;
@@ -168,12 +172,18 @@ namespace Assets.Scripts.UI
             handle.Target = root;
             handle.Window = window;
 
-            var label = CreateText(bar, "Title", title, 18, TitleColor, TextAlignmentOptions.Left, FontStyles.Bold);
-            Stretch((RectTransform)label.transform, 18, 0, -60, 0);
+            var label = CreateText(bar, "Title", title, 26, TitleColor, TextAlignmentOptions.BottomLeft, FontStyles.Bold);
+            Place((RectTransform)label.transform, new Vector2(0, 1), new Vector2(24, -14), new Vector2(420, 32));
 
-            var close = CreateButton(bar, "Close", "X", CardColor, TitleColor, 16);
-            Place((RectTransform)close.transform, new Vector2(1, 0.5f), new Vector2(-10, 0), new Vector2(34, 34));
-            ((RectTransform)close.transform).pivot = new Vector2(1, 0.5f);
+            if (!string.IsNullOrEmpty(subtitle))
+            {
+                var sub = CreateText(bar, "Subtitle", subtitle, 14, AccentColor, TextAlignmentOptions.TopLeft);
+                Place((RectTransform)sub.transform, new Vector2(0, 1), new Vector2(24, -48), new Vector2(420, 20));
+            }
+
+            var close = CreateButton(bar, "Close", "X", new Color(0, 0, 0, 0), TitleColor, 20);
+            Place((RectTransform)close.transform, new Vector2(1, 1), new Vector2(-14, -12), new Vector2(36, 36));
+            ((RectTransform)close.transform).pivot = new Vector2(1, 1);
             close.onClick.AddListener(window.CloseWindow);
 
             barObject.SetActive(true);
@@ -217,6 +227,161 @@ namespace Assets.Scripts.UI
                 return RectTransformUtility.ScreenPointToLocalPointInRectangle(
                     parent, eventData.position, eventData.pressEventCamera, out local);
             }
+        }
+
+        private static Sprite shadowSprite;
+
+        public static Sprite ShadowSprite
+        {
+            get
+            {
+                if (shadowSprite == null)
+                    shadowSprite = CreateShadowSprite();
+                return shadowSprite;
+            }
+        }
+
+        /// <summary>
+        /// Lays a soft shadow around a window. It goes in as the first child rather than
+        /// a sibling so it follows the window when dragged: the sprite is clear through
+        /// the middle, so the part covering the window shows nothing and only the falloff
+        /// past the edges is visible.
+        /// </summary>
+        public static void AttachShadow(RectTransform window, float spread = ShadowSpread)
+        {
+            if (window == null || window.Find("ModernShadow") != null)
+                return;
+
+            var go = new GameObject("ModernShadow", typeof(Image));
+            go.transform.SetParent(window, false);
+            go.transform.SetAsFirstSibling();
+
+            var image = go.GetComponent<Image>();
+            image.sprite = ShadowSprite;
+            image.type = Image.Type.Sliced;
+            image.raycastTarget = false;
+
+            var rect = (RectTransform)go.transform;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = new Vector2(-spread, -spread);
+            rect.offsetMax = new Vector2(spread, spread);
+        }
+
+        /// <summary>
+        /// Gives a row of tab buttons the filled active look. Which tab is active is
+        /// tracked here purely for appearance, the window keeps its own tab logic.
+        /// </summary>
+        public static void StyleTabBar(System.Collections.Generic.IList<Button> tabs, int activeIndex = 0)
+        {
+            if (tabs == null || tabs.Count == 0)
+                return;
+
+            var group = new TabGroup { Tabs = tabs };
+            for (var i = 0; i < tabs.Count; i++)
+            {
+                var tab = tabs[i];
+                if (tab == null)
+                    continue;
+
+                var image = tab.GetComponent<Image>();
+                if (image != null)
+                {
+                    image.sprite = RoundedSprite;
+                    image.type = Image.Type.Sliced;
+                }
+
+                var index = i;
+                tab.onClick.AddListener(() => group.SetActive(index));
+            }
+
+            group.SetActive(activeIndex);
+        }
+
+        private class TabGroup
+        {
+            public System.Collections.Generic.IList<Button> Tabs;
+
+            public void SetActive(int active)
+            {
+                for (var i = 0; i < Tabs.Count; i++)
+                {
+                    var tab = Tabs[i];
+                    if (tab == null)
+                        continue;
+
+                    var isActive = i == active;
+                    var image = tab.GetComponent<Image>();
+                    if (image != null)
+                        image.color = isActive ? AccentColor : TabIdleColor;
+
+                    foreach (var label in tab.GetComponentsInChildren<TextMeshProUGUI>(true))
+                    {
+                        label.color = isActive ? AccentTextColor : NameColor;
+                        label.fontStyle = FontStyles.Bold;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// The wide accent button the reference layouts put along the bottom of a window.
+        /// </summary>
+        public static Button CreateFooterButton(RectTransform parent, string label, string subLabel,
+            UnityEngine.Events.UnityAction action)
+        {
+            var button = CreateButton(parent, "FooterButton", "", AccentColor, AccentTextColor);
+            var rect = (RectTransform)button.transform;
+            rect.anchorMin = new Vector2(0, 0);
+            rect.anchorMax = new Vector2(1, 0);
+            rect.pivot = new Vector2(0.5f, 0);
+            rect.offsetMin = new Vector2(18, 16);
+            rect.offsetMax = new Vector2(-18, 16 + 56);
+
+            var main = CreateText(rect, "Main", label, 18, AccentTextColor, TextAlignmentOptions.Bottom, FontStyles.Bold);
+            Stretch((RectTransform)main.transform, 0, 26, 0, -6);
+
+            if (!string.IsNullOrEmpty(subLabel))
+            {
+                var sub = CreateText(rect, "Sub", subLabel, 13, new Color(1, 1, 1, 0.85f), TextAlignmentOptions.Top);
+                Stretch((RectTransform)sub.transform, 0, 6, 0, -30);
+            }
+
+            button.onClick.AddListener(action);
+            return button;
+        }
+
+        private static Sprite CreateShadowSprite()
+        {
+            const int size = 64;
+            const int inset = 20;
+            const int radius = 12;
+            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+
+            for (var y = 0; y < size; y++)
+            {
+                for (var x = 0; x < size; x++)
+                {
+                    //distance outside the inner rounded rect, clear within it so the
+                    //window underneath is never darkened
+                    var dx = Mathf.Max(inset + radius - x, x - (size - 1 - inset - radius), 0);
+                    var dy = Mathf.Max(inset + radius - y, y - (size - 1 - inset - radius), 0);
+                    var distance = Mathf.Sqrt(dx * dx + dy * dy) - radius;
+
+                    var alpha = 0f;
+                    if (distance > 0)
+                    {
+                        var t = Mathf.Clamp01(distance / inset);
+                        alpha = 0.20f * (1f - t) * (1f - t);
+                    }
+
+                    texture.SetPixel(x, y, new Color(0.05f, 0.11f, 0.20f, alpha));
+                }
+            }
+
+            texture.Apply();
+            return Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100,
+                0, SpriteMeshType.FullRect, new Vector4(30, 30, 30, 30));
         }
 
         public static RectTransform CreateRect(string name, Transform parent)
