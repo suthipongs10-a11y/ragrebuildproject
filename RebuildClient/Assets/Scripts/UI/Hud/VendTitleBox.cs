@@ -10,6 +10,7 @@ namespace Assets.Scripts.UI.Hud
     public class VendTitleBox : MonoBehaviour, IPointerClickHandler
     {
         public int VendOwnerId;
+        [NonSerialized] public bool IsChatRoom;
         [NonSerialized] public GameObject FollowObject;
         
         public RectTransform Parent;
@@ -44,10 +45,18 @@ namespace Assets.Scripts.UI.Hud
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (eventData.button == PointerEventData.InputButton.Left && eventData.clickCount >= 2)
+            if (eventData.button != PointerEventData.InputButton.Left)
+                return;
+
+            //a single tap joins a chat room so it works on touch screens too
+            if (IsChatRoom)
             {
-                NetworkManager.Instance.VendingOpenStore(VendOwnerId);
+                NetworkManager.Instance.SendNpcClick(VendOwnerId);
+                return;
             }
+
+            if (eventData.clickCount >= 2)
+                NetworkManager.Instance.VendingOpenStore(VendOwnerId);
         }
     }
 }

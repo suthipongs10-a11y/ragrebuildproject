@@ -115,6 +115,13 @@ namespace PlayerControl
 
                 Debug.Log($"string command: " + string.Join('|', s));
 
+                if (s[0] == "/chat" || s[0] == "/chatroom")
+                {
+                    var title = s.Length > 1 ? text.Substring(s[0].Length + 1) : "";
+                    NetworkManager.Instance.SendClientTextCommand(ClientTextCommand.ChatRoom, title);
+                    return;
+                }
+
                 if (s[0] == "/memo")
                 {
                     WarpPortalWindow.RunMemoCommand();

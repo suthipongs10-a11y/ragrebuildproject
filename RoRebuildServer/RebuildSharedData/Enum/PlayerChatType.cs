@@ -5,5 +5,6 @@ public enum PlayerChatType
     Say,
     Shout,
     Party,
-    Notice
+    Notice,
+    ChatRoom //server side only, clients ask for rooms via ClientTextCommand and Say
 }

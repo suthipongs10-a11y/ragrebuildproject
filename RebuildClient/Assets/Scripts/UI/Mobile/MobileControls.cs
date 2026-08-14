@@ -112,6 +112,7 @@ namespace Assets.Scripts.UI.Mobile
             CreateButton(controlGroup, new Vector2(145, 560), 90, ZoomColor, null, ResetCamera, "o", true);
             CreateButton(controlGroup, new Vector2(245, 560), 90, ZoomColor, null, () => RotateCamera(45f), ">", true);
             CreateButton(controlGroup, new Vector2(45, 670), 90, TalkColor, null, OpenChat, "Chat", true);
+            CreateButton(controlGroup, new Vector2(145, 670), 90, TalkColor, null, OpenChatRoomCommand, "Room", true);
 
             CreateMinimap(controlGroup);
 
@@ -359,6 +360,21 @@ namespace Assets.Scripts.UI.Mobile
                 return;
 
             camera.TextBoxInputField.ActivateInputField();
+        }
+
+        /// <summary>
+        /// Prefills the chat room command. Typing a title after it opens a room,
+        /// sending it bare leaves or closes the one you're in.
+        /// </summary>
+        private void OpenChatRoomCommand()
+        {
+            var camera = CameraFollower.Instance;
+            if (camera == null || camera.TextBoxInputField == null)
+                return;
+
+            camera.TextBoxInputField.text = "/chat ";
+            camera.TextBoxInputField.ActivateInputField();
+            camera.TextBoxInputField.caretPosition = camera.TextBoxInputField.text.Length;
         }
 
         private void PressEscape()

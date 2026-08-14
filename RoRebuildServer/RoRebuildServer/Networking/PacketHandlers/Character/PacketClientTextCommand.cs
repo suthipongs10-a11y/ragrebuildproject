@@ -37,6 +37,19 @@ public class PacketClientTextCommand : IClientPacketHandler
             CommandBuilder.ClearRecipients();
         }
 
+        if (type == ClientTextCommand.ChatRoom)
+        {
+            var title = msg.ReadString();
+            if (connection.Character == null || connection.Player == null)
+                return;
+
+            if (string.IsNullOrWhiteSpace(title))
+                EntityComponents.Npcs.ChatRoomNpcProxy.LeaveRoom(connection.Player);
+            else
+                EntityComponents.Npcs.ChatRoomNpcProxy.CreateRoom(connection.Player, title.Trim());
+            return;
+        }
+
         if (type == ClientTextCommand.Where)
         {
             CommandBuilder.AddRecipient(connection.Entity);

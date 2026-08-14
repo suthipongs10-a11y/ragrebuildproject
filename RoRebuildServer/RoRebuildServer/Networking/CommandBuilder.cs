@@ -272,7 +272,7 @@ public static class CommandBuilder
                 EffectType = npc.EffectType,
             };
 
-            if (display == NpcDisplayType.VendingProxy)
+            if (display == NpcDisplayType.VendingProxy || display == NpcDisplayType.ChatRoomProxy)
             {
                 if (!npc.Owner.TryGet<WorldObject>(out var ownerCh))
                 {
@@ -436,7 +436,7 @@ public static class CommandBuilder
                     packet.Write(mask[i]);
             }
 
-            if (display == NpcDisplayType.VendingProxy)
+            if (display == NpcDisplayType.VendingProxy || display == NpcDisplayType.ChatRoomProxy)
             {
                 if (!npc.Owner.TryGet<WorldObject>(out var ownerCh))
                 {

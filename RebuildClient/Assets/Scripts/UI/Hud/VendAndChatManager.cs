@@ -27,7 +27,7 @@ namespace Assets.Scripts.UI.Hud
             return true;
         }
 
-        public void CreateVendDialog(int npcId, int characterId, GameObject followObject, string title)
+        public void CreateVendDialog(int npcId, int characterId, GameObject followObject, string title, bool isChatRoom = false)
         {
             // if (characterId == PlayerState.Instance.EntityId)
             // {
@@ -43,6 +43,9 @@ namespace Assets.Scripts.UI.Hud
             box.Text.text = title;
             box.FollowObject = followObject;
             box.VendOwnerId = npcId;
+            box.IsChatRoom = isChatRoom;
+            if (isChatRoom)
+                box.Text.color = new Color(0.55f, 0.85f, 1f); //tint chat rooms so they don't read as shops
             box.SnapDialog();
             
             vendingBoxes.Add(npcId, box);

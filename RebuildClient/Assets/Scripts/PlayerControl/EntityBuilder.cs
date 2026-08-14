@@ -115,10 +115,11 @@ namespace Assets.Scripts.PlayerControl
             go.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
             var control = go.AddComponent<ServerControllable>();
 
-            if (npc.DisplayType == NpcDisplayType.VendingProxy)
+            if (npc.DisplayType == NpcDisplayType.VendingProxy || npc.DisplayType == NpcDisplayType.ChatRoomProxy)
             {
                 InstantiateEffect(control, ref spawn, ref npc, NpcEffectType.None);
-                UiManager.Instance.VendAndChatManager.CreateVendDialog(spawn.ServerId, npc.OwnerId, go, name);
+                UiManager.Instance.VendAndChatManager.CreateVendDialog(spawn.ServerId, npc.OwnerId, go, name,
+                    npc.DisplayType == NpcDisplayType.ChatRoomProxy);
                 return control;
             }
 

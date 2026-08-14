@@ -45,6 +45,14 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
                 return;
             }
 
+            if (type == PlayerChatType.ChatRoom)
+            {
+                if (Network.EntityList.TryGetValue(id, out var roomMember))
+                    roomMember.DialogBox($"{name}: <i><color=#8CD9FF>{text}</color></i>");
+                Camera.AppendChatText($"{name} in chat: <i><color=#8CD9FF>{text}</color></i>");
+                return;
+            }
+
             if (Network.EntityList.TryGetValue(id, out var controllable))
             {
                 if (type == PlayerChatType.Shout)

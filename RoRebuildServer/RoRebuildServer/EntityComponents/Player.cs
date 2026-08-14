@@ -74,6 +74,7 @@ public class Player : IEntityAutoReset
     public CharacterBag? CartInventory;
     public CharacterBag? StorageInventory;
     public VendingState? VendingState;
+    public Npcs.ChatRoom? ChatRoom; //not persisted, the room dies with the session
     public EntityValueList<float> RecentAttackersList = null!;
     private float lastAttackerListCheckUpdate;
     public float ShoutCooldown;
@@ -293,6 +294,7 @@ public class Player : IEntityAutoReset
         EntityValueListPool<float>.Return(RecentAttackersList);
         RecentAttackersList = null!;
         VendingState = null;
+        ChatRoom = null;
 
         isSittingHpTick = false;
         isSittingSpTick = false;

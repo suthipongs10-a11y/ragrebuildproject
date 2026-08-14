@@ -211,7 +211,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Network
                     effectType = (NpcEffectType)msg.ReadByte();
                     //Debug.Log(name);
 
-                    if (displayType == NpcDisplayType.VendingProxy)
+                    if (displayType == NpcDisplayType.VendingProxy || displayType == NpcDisplayType.ChatRoomProxy)
                         owner = msg.ReadInt32();
                 }
 
@@ -230,12 +230,13 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Network
                     CharacterStatusEffects = statuses,
                 };
 
-                if (displayType == NpcDisplayType.VendingProxy)
+                if (displayType == NpcDisplayType.VendingProxy || displayType == NpcDisplayType.ChatRoomProxy)
                 {
-                    monData.Name = "Vend Shop";
+                    var isChatRoom = displayType == NpcDisplayType.ChatRoomProxy;
+                    monData.Name = isChatRoom ? "Chat Room" : "Vend Shop";
                     controllable = ClientDataLoader.Instance.InstantiateEffect(ref monData, NpcEffectType.None, true);
                     Network.EntityList.Add(id, controllable);
-                    UiManager.VendAndChatManager.CreateVendDialog(id, owner, controllable.gameObject, name);
+                    UiManager.VendAndChatManager.CreateVendDialog(id, owner, controllable.gameObject, name, isChatRoom);
                     return controllable;
                 }
                 
