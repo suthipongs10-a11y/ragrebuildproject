@@ -201,6 +201,13 @@ namespace PlayerControl
                         NetworkManager.Instance.SendAdminLevelUpRequest(level, true);
                 }
 
+                if (s[0] == "/zeny" || s[0] == "/money")
+                {
+                    var amount = s.Length > 1 ? s[1] : "";
+                    NetworkManager.Instance.SendClientTextCommand(ClientTextCommand.Zeny, amount);
+                    return;
+                }
+
                 if (s[0] == "/skillreset")
                 {
                     NetworkManager.Instance.SendAdminResetSkillPoints();

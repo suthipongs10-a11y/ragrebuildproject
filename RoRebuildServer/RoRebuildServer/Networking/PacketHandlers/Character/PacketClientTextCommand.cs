@@ -73,6 +73,39 @@ public class PacketClientTextCommand : IClientPacketHandler
             return;
         }
 
+        if (type == ClientTextCommand.Zeny)
+        {
+            //the string is read before anything else so the message is always consumed
+            //the same way no matter which branch below takes over
+            var amountText = msg.ReadString();
+            var player = connection.Player;
+
+            if (!player.IsAdmin)
+            {
+                CommandBuilder.ErrorMessage(player, "You do not have permission to use that command.");
+                return;
+            }
+
+            if (!int.TryParse(amountText, out var amount) || amount == 0)
+            {
+                CommandBuilder.ErrorMessage(player, "Usage: /zeny <amount>. A negative amount takes it away.");
+                return;
+            }
+
+            if (amount > 0)
+                player.AddZeny(amount);
+            else
+                player.DropZeny(-amount);
+
+            //AddZeny only changes the stored value, the client is told separately
+            CommandBuilder.SendUpdateZeny(player);
+
+            CommandBuilder.AddRecipient(connection.Entity);
+            CommandBuilder.SendServerMessage($"You now have {player.GetZeny():N0} zeny.");
+            CommandBuilder.ClearRecipients();
+            return;
+        }
+
         if (type == ClientTextCommand.Where)
         {
             CommandBuilder.AddRecipient(connection.Entity);
