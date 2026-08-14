@@ -364,6 +364,17 @@ namespace Assets.Scripts.UI.Hud
             mapSprite = loadMap.Result;
             walkSprite = loadWalk.Result;
 
+            //An addressable key that isn't in the catalog still reports done and valid,
+            //it simply hands back nothing. Every other use of mapSprite already checks
+            //for that, this one didn't. It matters more than a blank minimap: WebGL is
+            //built with exceptions limited to explicitly thrown ones, so dereferencing
+            //the null here isn't a catchable error there, it takes the client down.
+            if (mapSprite == null || mapSprite.texture == null)
+            {
+                Debug.LogWarning($"No minimap image is available for {mapName}, leaving the minimap blank.");
+                yield break;
+            }
+
             UpdateMapMaterial();
 
             minScale = 250f / mapSprite.texture.width;
