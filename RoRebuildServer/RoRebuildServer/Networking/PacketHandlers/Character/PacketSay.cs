@@ -51,7 +51,7 @@ public class PacketSay : IClientPacketHandler
         //regular talk while inside a chat room only reaches the other members
         if (type == PlayerChatType.Say && p!.ChatRoom != null)
         {
-            EntityComponents.Npcs.ChatRoomNpcProxy.SayToRoom(p.ChatRoom, connection.Character, p.Character.Name, text);
+            EntityComponents.Npcs.ChatRoomNpcProxy.SayToRoom(p.ChatRoom, connection.Character!, p.Character.Name, text);
             return;
         }
 

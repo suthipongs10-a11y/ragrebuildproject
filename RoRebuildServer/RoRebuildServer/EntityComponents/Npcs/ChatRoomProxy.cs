@@ -5,6 +5,7 @@ using RoRebuildServer.EntitySystem;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Networking;
 using RoRebuildServer.Simulation;
+using RoRebuildServer.Simulation.Pathfinding;
 
 namespace RoRebuildServer.EntityComponents.Npcs;
 
