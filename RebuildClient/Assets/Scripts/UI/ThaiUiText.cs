@@ -132,8 +132,8 @@ namespace Assets.Scripts.UI
             { "Monster", "มอนสเตอร์" },
             { "Maps", "แผนที่" },
             { "Map", "แผนที่" },
-            { "NPCs", "เอ็นพีซี" },
-            { "NPC", "เอ็นพีซี" },
+            //NPC is left in English: it is a term the game itself uses everywhere, and
+            //spelling it out phonetically in Thai reads worse than the abbreviation
             { "Back", "ย้อนกลับ" },
             { "Search", "ค้นหา" },
             { "Drops", "ของที่ดรอป" },

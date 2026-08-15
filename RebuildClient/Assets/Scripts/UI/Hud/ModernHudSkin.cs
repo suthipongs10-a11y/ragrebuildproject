@@ -22,6 +22,7 @@ namespace Assets.Scripts.UI.Hud
         private Image minimapFrame;
         private GameObject minimapContent;
         private Slider minimapZoom;
+        private GameObject minimapEmpty;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -292,6 +293,29 @@ namespace Assets.Scripts.UI.Hud
                 ModernUiTheme.Stretch((RectTransform)go.transform, -3, -3, 3, 3);
             }
 
+            //A map with no minimap rendered for it yet leaves this corner of the screen
+            //completely blank, which reads as the widget being broken rather than as the
+            //picture being absent. Saying so is the difference between a bug and a step
+            //that has not been run.
+            var existingEmpty = root.Find("ModernMinimapEmpty");
+            if (existingEmpty != null)
+            {
+                minimapEmpty = existingEmpty.gameObject;
+            }
+            else
+            {
+                var card = ModernUiTheme.CreateCard(root, "ModernMinimapEmpty",
+                    ModernUiTheme.PanelOverlayColor, true);
+                ModernUiTheme.Stretch(card, 0, 0, 0, 0);
+                card.GetComponent<Image>().raycastTarget = false;
+
+                var hint = ModernUiTheme.CreateText(card, "Hint", "ยังไม่มีแผนที่ย่อ",
+                    ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor, TextAlignmentOptions.Center);
+                ModernUiTheme.Stretch(hint.rectTransform, 8, 8, -8, -8);
+
+                minimapEmpty = card.gameObject;
+            }
+
             minimapContent = map.ContentContainer;
             minimapZoom = map.ZoomSlider;
             ModernUiTheme.StyleSliders(root);
@@ -322,6 +346,9 @@ namespace Assets.Scripts.UI.Hud
             //on a rule down the edge of the screen, with nothing to say what it zoomed.
             if (minimapZoom != null && minimapZoom.gameObject.activeSelf != hasMap)
                 minimapZoom.gameObject.SetActive(hasMap);
+
+            if (minimapEmpty != null && minimapEmpty.activeSelf == hasMap)
+                minimapEmpty.SetActive(!hasMap);
         }
     }
 }

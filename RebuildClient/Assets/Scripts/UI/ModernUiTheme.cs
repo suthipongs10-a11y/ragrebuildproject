@@ -938,9 +938,21 @@ namespace Assets.Scripts.UI
                 if (child.Find("ModernGrip") != null)
                     continue;
 
-                var grip = CreateCard(child, "ModernGrip", IconMutedColor);
-                Place(grip, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(44, 4));
-                grip.GetComponent<Image>().raycastTarget = false;
+                //A bar across the foot of a window and a tab in its corner are the same
+                //control wearing two shapes, so the mark follows the shape it is drawn on:
+                //a short rule along a wide one, the corner diagonals on a square one.
+                var rect = child as RectTransform;
+                if (rect != null && rect.rect.width > rect.rect.height * 2f)
+                {
+                    var pill = CreateCard(child, "ModernGrip", IconMutedColor);
+                    Place(pill, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(44, 4));
+                    pill.GetComponent<Image>().raycastTarget = false;
+                }
+                else
+                {
+                    var diagonals = CreateIcon(child, ModernUiIcons.Grip, IconMutedColor, 15);
+                    diagonals.gameObject.name = "ModernGrip";
+                }
             }
         }
 

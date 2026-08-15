@@ -147,6 +147,7 @@ namespace Assets.Scripts.UI.Inventory
                     label.gameObject.SetActive(false);
             }
 
+            ModernUiTheme.StyleResizeGrip(root);
             ModernUiTheme.StyleScrollViews(root);
             ModernUiTheme.RepaintInk(root);
             ModernUiTheme.RecolorAccents(root);

@@ -60,6 +60,7 @@ namespace Assets.Scripts.UI
         public static Sprite Grid => Get("Grid", GridShape);
         public static Sprite Exit => Get("Exit", ExitShape);
         public static Sprite Magnifier => Get("Magnifier", MagnifierShape);
+        public static Sprite Grip => Get("Grip", GripShape);
 
         private static Sprite Get(string name, Func<Vector2, float> shape)
         {
@@ -272,6 +273,16 @@ namespace Assets.Scripts.UI
             var shaft = Box(p, new Vector2(0.37f, 0.58f), new Vector2(0.15f, 0.30f), 0.05f);
             var foot = Box(p, new Vector2(0.53f, 0.26f), new Vector2(0.31f, 0.14f), 0.06f);
             return Mathf.Min(shaft, foot);
+        }
+
+        private static float GripShape(Vector2 p)
+        {
+            //three diagonals stepping out of the corner, which is what a window corner
+            //you can pull on has looked like since windows had corners
+            var a = Segment(p, new Vector2(0.28f, 0.14f), new Vector2(0.86f, 0.72f), 0.045f);
+            var b = Segment(p, new Vector2(0.51f, 0.14f), new Vector2(0.86f, 0.49f), 0.045f);
+            var c = Segment(p, new Vector2(0.74f, 0.14f), new Vector2(0.86f, 0.26f), 0.045f);
+            return Mathf.Min(a, Mathf.Min(b, c));
         }
 
         private static float MagnifierShape(Vector2 p)
