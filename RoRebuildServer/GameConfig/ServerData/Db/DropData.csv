@@ -12,6 +12,7 @@ ANGELING,Angel_Wing,1000,Scapulare_,600,Yggdrasil_Leaf,5000,Halo,10,White_Herb,1
 ANOLIAN,Anolian_Skin,10000,Crystal_Arrow#5-50,10000,Royal_Jelly,50,,0,Solid_Shell,10000,Brooch_,10,Oridecon,1340,Anolian_Card,10
 ANT_EGG,Phracon,3200,Shell,10000,Jellopy,10000,Sticky_Mucus,6500,Empty_Bottle,10000,Iron_Ore,2000,,0,Ant_Egg_Card,10
 ANTIQUE_FIRELOCK,Iron,10000,Apple_of_Archer,10,Large_Jellopy,10000,Yellow_Herb,400,Yam,3500,Panacea,2500,Cyclone_,50,Firelock_Soldier_Card,10
+ANTONIO,Gift_Box,10000,Red_Stocking,3000,Snake_Head,50
 ANUBIS,Rotten_Bandage,10000,Healing_Staff,100,Memento,5500,Oridecon,1050,Cultish_Masque,10000,Celebrant's_Mitten,10,Wand_of_Occult,30,Anubis_Card,10
 ARCHANGELING,Evil_Wing,1000,Yggdrasil_Leaf,10000,Yggdrasil_Seed,1500,Agate,10000,Angel_Wing,1000,Full_Plate_,30,Turquoise,10000,Archangeling_Card,10
 ARCHER_SKELETON,Skel-Bone,10000,Rough_Oridecon,700,Apple_of_Archer,30,Great_Bow_,350,Fire_Arrow,10000,Red_Herb,10000,Bow,1500,Archer_Skeleton_Card,10
@@ -90,7 +91,6 @@ GHOSTRING,Fabric,10000,Ghost_Bandana,1000,Thief_Clothes_,500,Dead_Branch,5000,Ol
 GHOUL,Horrendous_Mouth,10000,Rough_Oridecon,1100,White_Herb,7000,Green_Herb,8000,Skull_Ring,600,Memento,1500,Sharpened_Legbone_of_Ghoul,10,Ghoul_Card,10
 GIANT_HONET,Royal_Jelly,5500,Honey,10000,Mastela_Fruit,120,Yggdrasil_Leaf,150,Staff_,30,Pearl,200,Belt,10,Giant_Hornet_Card,10
 GIEARTH,Great_Nature,300,Coal,1500,Elder_Pixie's_Moustache,10000,Elven_Ears,10,Cap_,100,Star_Dust,1000,,0,Giearth_Card,10
-GIFT_PORING,Gift_Box,10000,Snake_Head,50
 GOAT,Antelope_Horn,10000,Antelope_Skin,10000,Empty_Bottle,10000,Red_Herb,5000,Blue_Herb,10000,Yellow_Herb,10000,Green_Herb,10000,Goat_Card,10
 GOBLIN_1,Iron,2700,Scell,10000,Rough_Oridecon,430,Goblin_Mask,30,Dirk_,100,Buckler_,50,Red_Herb,10000,Goblin_Card,10
 GOBLIN_2,Iron,2500,Scell,10000,Indian_Fillet,30,Flail_,100,Buckler_,10,Red_Herb,10000,Goblin_Mask,30,Goblin_Card,10

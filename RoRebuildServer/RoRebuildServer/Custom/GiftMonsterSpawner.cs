@@ -5,24 +5,25 @@ using RoRebuildServer.Logging;
 namespace RoRebuildServer.Custom;
 
 /// <summary>
-/// Puts one harmless gift monster on every map that has monsters of its own.
+/// Puts Antonio, the Christmas santa, on every map that has monsters of its own.
 ///
-/// The point is to give somebody grinding Porings a reason to look around the map, and a
-/// small chance at something they could not otherwise reach. It never attacks and never
-/// fights back, it has very little health, and when it dies it comes back somewhere else
-/// on the same map a few minutes later.
+/// He is the one who used to turn up at Christmas handing out gift boxes and stockings,
+/// and here he does it all year. The point is to give somebody grinding Porings a reason
+/// to look around the map, and a small chance at something they could not otherwise
+/// reach. He never attacks and never fights back, he has very little health, and when he
+/// dies he comes back somewhere else on the same map a few minutes later.
 ///
-/// Spawning it from here instead of writing it into all of the spawn scripts means the
-/// list of maps it appears on is always the list of maps that actually have monsters, and
+/// Spawning him from here instead of writing him into all of the spawn scripts means the
+/// list of maps he appears on is always the list of maps that actually have monsters, and
 /// stays right when maps are added or removed.
 /// </summary>
 public static class GiftMonsterSpawner
 {
-    /// <summary>The row added to Monsters.csv. AiPacifist is what makes it harmless.</summary>
-    private const string MonsterCode = "GIFT_PORING";
+    /// <summary>The row added to Monsters.csv. AiPacifist is what makes him harmless.</summary>
+    private const string MonsterCode = "ANTONIO";
 
     /// <summary>
-    /// Three to six minutes after it dies. Long enough that finding one feels like luck,
+    /// Three to six minutes after he dies. Long enough that finding him feels like luck,
     /// short enough that a map is rarely without one. Note the server clamps this against
     /// MinSpawnTime/MaxSpawnTime in ServerDebugConfig.
     /// </summary>
@@ -51,13 +52,13 @@ public static class GiftMonsterSpawner
             if (!warnedMissing)
             {
                 warnedMissing = true;
-                ServerLogger.LogWarning($"Gift monsters are enabled but '{MonsterCode}' is not in the monster database. No gift monsters will spawn.");
+                ServerLogger.LogWarning($"Gift monsters are enabled but '{MonsterCode}' is not in the monster database. Antonio will not spawn anywhere.");
             }
 
             return;
         }
 
-        //no spawn area, so it can turn up anywhere the map is walkable
+        //no spawn area, so he can turn up anywhere the map is walkable
         config.CreateSpawn(MonsterCode, 1, RespawnTime, RespawnVariance);
     }
 }
