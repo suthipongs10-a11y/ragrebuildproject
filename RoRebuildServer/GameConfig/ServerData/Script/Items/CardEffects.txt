@@ -174,10 +174,10 @@ Item("Beelzebub_Card") { OnEquip: AddStat(AddCastTime, -30); }
 Item("Maya_Card") { OnEquip: } //should add 50% magic reflect
 Item("Baphomet_Card") { OnEquip: AddStat(AddHit, -10); AutoSpellOnAttack(SplashAttack, 1, 1000); }
 Item("Pharaoh_Card") { OnEquip: AddStat(SpConsumption, -30); }
-Item("Gargoyle_Card") { OnEquip: } //add item drop box of thunder 1% when killing insect monsters
+Item("Gargoyle_Card") { OnEquip: AddBonusDropOnKillRace(RaceInsect, 10, "Box_of_Thunder"); }
 Item("Goat_Card") { OnEquip: if(Refine < 6) {AddStat(AddDef, 2); AddStat(AddMDef, 5);} }
 Item("Gajomart_Card") { OnEquip: AddStat(AddExpRacePlant, 10); AddStat(AddResistRacePlant, -20); }
-Item("Galapago_Card") { OnEquip: } //add 3% chance to get apple, banana, or carrot juice when killing insects, and boosts healing fo those items by 50%
+Item("Galapago_Card") { OnEquip: AddBonusDropOnKillRace(RaceInsect, 30, "Apple_Juice,Banana_Juice,Carrot_Juice"); }
 Item("Crab_Card") { OnEquip: AddStat(AddAttackPower, 5); } //should add 30% bonus damage against aster, adn 30% chance to get sashimi when killing fish
 Item("Dumpling_Kid_Card") { OnValidate: return false; OnEquip: }
 Item("Goblin_Leader_Card") { OnEquip: AddDamageVsTag("Goblin", 30); } //should add 30% damage to all goblins
@@ -222,16 +222,16 @@ Item("Vagabond_Wolf_Card") { OnEquip: AddStat(AddStr, 1); } //should combo with 
 Item("Lava_Golem_Card") { OnEquip: AddDamageVsTag("Golem", 30); } //should add 30% damage vs golem
 Item("Rideword_Card") { OnEquip: AddStat(AddInt, 1); if(IsBaseJob(JobAcolyte)) { AddStat(AddInt, 1); AddStat(AddMDef, 1); } }
 Item("Raggler_Card") { OnEquip: AddStat(AddStr, 1); AddStat(AddVit, 1); }
-Item("Raydric_Archer_Card") { OnEquip: } //should add chance to get box of grudge when killin demon
+Item("Raydric_Archer_Card") { OnEquip: AddBonusDropOnKillRace(RaceDemon, 10, "Box_of_Resentment"); }
 Item("Leib_Olmai_Card") { OnEquip: AddStat(AddResistElementFire, 10); } //should add a chance to get red blood when killing animals
 Item("Wraith_Dead_Card") { OnEquip: AddStat(WhenAttackedCurse, 60); }
-Item("Wraith_Card") { OnEquip: } //chance to drop giggling box when killing undead
+Item("Wraith_Card") { OnEquip: AddBonusDropOnKillRace(RaceUndead, 10, "Box_of_Laughter"); }
 Item("Loli_Ruri_Card") { OnEquip: AutoSpellWhenAttacked(Heal, 3, 50, TargetSelf); } //autospell heal when attacked
 Item("Rotar_Zairo_Card") { OnEquip: AddStat(AddCritDamage, 10); AddStat(AddCritChanceRaceAquatic, 7); }
 Item("Lude_Card") { OnValidate: return false; OnEquip: } //endure for novices
 Item("Rybio_Card") { OnEquip: AddStat(WhenAttackedStun, 30); } //stun resist
 Item("Leaf_Cat_Card") { OnEquip: AddStat(AddResistElementWater, 10); } //crystal blue from fish
-Item("Marin_Card") { OnEquip: } //add chance to get jellopy and giant jellopy on kill
+Item("Marin_Card") { OnEquip: AddBonusDropOnKill(200, "Jellopy"); AddBonusDropOnKill(10, "Large_Jellopy"); }
 Item("Mastering_Card") { OnEquip: AddStat(AddLuk, 1); }
 Item("Maya_Purple_Card") { OnEquip: } //should allwo you to see hidden
 Item("Merman_Card") { OnEquip: AddStat(AddHpRecoveryPercent, 10); AddStat(AddSpRecoveryPercent, 10); }
@@ -240,8 +240,8 @@ Item("Majorous_Card") { OnEquip: AddStat(WhenAttackedStun, 60); }
 Item("Mao_Guai_Card") { OnEquip: AddStat(AddAttackElementGhost, 20); }
 Item("Mutant_Dragonoid_Card") { OnEquip: AddStat(AddAttackPower, 15); var lvl = 3; if(HasLearnedSkill(FireBall, 10)) lvl = 10; AutoSpellWhenAttacked(FireBall, lvl, 50, TargetEnemy); }
 Item("Mini_Demon_Card") { OnEquip: AddStat(AddExpRaceBeast, 10); AddStat(AddResistRaceBeast, -20); }
-Item("Mimic_Card") { OnEquip: } //chance to obtain old blue box
-Item("Myst_Case_Card") { OnEquip: } //chance to obtain gift box
+Item("Mimic_Card") { OnEquip: AddBonusDropOnKill(1, "Old_Blue_Box"); }
+Item("Myst_Case_Card") { OnEquip: AddBonusDropOnKill(3, "Gift_Box"); }
 Item("Mistilteinn_Card") { OnEquip: AddStat(AddResistSmallSize, 25); AddStat(AddDef, 1); }
 Item("Miyabi_Doll_Card") { OnEquip: AddStat(AddMaxSpPercent, 10); } //+5% damage with frostdiver
 Item("Violy_Card") { OnValidate: return false; OnEquip: } //autospell frost joke
@@ -254,16 +254,16 @@ Item("Blazer_Card") { OnValidate: return false; OnEquip: } //chance to get food 
 Item("Sasquatch_Card") { OnEquip: AddStat(WhenAttackedFreeze, 60); }
 Item("Enchanted_Peach_Tree_Card") { OnEquip: AutoSpellOnAttack(Heal, 1, 20, TargetSelf); } //autospell heal
 Item("Succubus_Card") { OnEquip: AddStat(AddVit, -3); AddStat(AddHpRecoveryPercent, -20); AddStat(AddMaxHp, 1000); }
-Item("Sage_Worm_Card") { OnEquip: } //chance to get gemstone
+Item("Sage_Worm_Card") { OnEquip: AddBonusDropOnKill(3, "Blue_Gemstone,Red_Gemstone,Yellow_Gemstone"); }
 Item("Solider_Card") { OnEquip: AddStat(AddDef, 2); AddStat(AddMDef, 2); }
 Item("Skeleton_General_Card") { OnEquip: AddStat(AddExpRaceInsect, 10); AddStat(AddResistRaceInsect, -20); }
 Item("Skel_Prisoner_Card") { OnEquip: AddStat(WhenAttackedSleep, 30); }
 Item("Stalactic_Golem_Card") { OnEquip: AddStat(AddDef, 1); AddStat(ResistStunStatus, 30); AddStat(DecreaseStunDuration, 30); }
-Item("Stem_Worm_Card") { OnEquip: } //change to get box of storms
+Item("Stem_Worm_Card") { OnEquip: AddBonusDropOnKillRace(RaceBeast, 10, "Box_of_Storms"); }
 Item("Stone_Shooter_Card") { OnEquip: AddStat(AddHit, 10); AddStat(AddAttackPower, 10); }
 Item("Sting_Card") { OnEquip: AddStat(AddDef, 2); if(Refine > 8) {AddStat(AddMDef, 5);} }
-Item("Spring_Rabbit_Card") { OnEquip: } //meat drop and bonus meat healing
-Item("Sleeper_Card") { OnEquip: } //sleepy box on fish kill
+Item("Spring_Rabbit_Card") { OnEquip: AddBonusDropOnKillRace(RaceBeast, 20, "Meat,Monster's_Feed"); }
+Item("Sleeper_Card") { OnEquip: AddBonusDropOnKillRace(RaceAquatic, 10, "Box_of_Drowsiness"); }
 Item("Cloud_Tower_Manager_Card") { OnEquip: AddStat(AddInt, 1); AddStat(AddMagicAttackPower, 10); AddStat(AddCastTime, -5); }
 Item("Shinobi_Card") { OnEquip: AddStat(AddAgi, 1); AutoSpellWhenAttacked(Cloaking, 5, 100); } //autospell cloaking when attacked
 Item("Mi_Gao_Card") { OnEquip: AddDamageVsTag("Flying", 20); }
@@ -291,7 +291,7 @@ Item("Alligator_Card") { OnEquip: AddStat(AddResistRangedAttack, 5); }
 Item("Alice_Card") { OnEquip: AddStat(AddResistSpecialNormal, -40); AddStat(AddResistSpecialBoss, 40); }
 Item("Tyrfing_Card") { OnEquip: AddStat(AddResistMidSize, 25); AddStat(AddDef, 1); }
 Item("Orc_Lady_Card") { OnEquip: AddDamageVsTag("Orc", 30); } //+30% damage against orcs
-Item("Orc_Archer_Card") { OnEquip: } //add panting box when killing human mobs
+Item("Orc_Archer_Card") { OnEquip: AddBonusDropOnKillRace(RaceDemihuman, 10, "Box_of_Panting"); }
 Item("Wild_Rose_Card") { OnEquip: AddStat(AddAgi, 1); if(IsBaseJob(JobThief)) { AddStat(PerfectDodge, 5); } }
 Item("Evil_Nymph_Card") { OnEquip: AddStat(AddInt, 1); AddStat(AddMaxSp, 50); }
 Item("Wooden_Golem_Card") { OnEquip: AddStat(AddHpRecoveryPercent, 30); AddStat(AddDef, 1); }
@@ -317,7 +317,7 @@ Item("Gibbet_Card") { OnEquip: if(Refine < 6) {AddStat(AddMDef, 5);} }
 Item("Earth_Deleter_Card") { OnEquip: AddStat(SpGainOnKill, 10); AddStat(AddSpRecoveryPercent, -100); }
 Item("Geographer_Card") { OnEquip: var lvl = 3; if(HasLearnedSkill(Blessing, 10)) lvl = 10; AutoSpellWhenAttacked(Blessing, lvl, 30); } //autospell blessing
 Item("Zipper_Bear_Card") { OnEquip: AddStat(AddAttackPower, 30); } //Should drain SP
-Item("Tengu_Card") { OnEquip: } //get healing items
+Item("Tengu_Card") { OnEquip: AddBonusDropOnKill(60, "Rice_Cake"); AddBonusDropOnKill(20, "Monster's_Feed"); AddBonusDropOnKill(10, "Candy"); AddBonusDropOnKill(5, "Yam,Novice_Potion"); AddBonusDropOnKill(3, "Red_Herb,Green_Herb"); AddBonusDropOnKill(2, "Red_Potion,Yellow_Herb"); AddBonusDropOnKill(1, "Condensed_Red_Potion,Hinalle_Leaflet"); AddBonusDropOnKill(1, "Aloe_Leaflet,Mastela_Fruit"); }
 Item("Greatest_General_Card") { OnEquip: } //autospell summon spirit sphere
 Item("Chepet_Card") { OnEquip: AutoSpellWhenAttacked(Heal, 5, 50, TargetEnemy); }
 Item("Choco_Card") { OnEquip: AddStat(PerfectDodge, 5); AddStat(AddFlee, 10); }
@@ -331,7 +331,7 @@ Item("Kobold_Archer_Card") { OnEquip: AddStat(AddCritDamage, 10); AddStat(AddCri
 Item("Cookie_Card") { OnEquip: AddStat(AddLuk, 2); } //+10% damage with holy light
 Item("Quve_Card") { OnValidate: return false; OnEquip: } //autospell inc agi for novices
 Item("Kraben_Card") { OnEquip: AddStat(WhenAttackedBlind, 60); }
-Item("Cramp_Card") { OnEquip: } //get zeny on kikll
+Item("Cramp_Card") { OnEquip: AddBonusZenyOnKill(10, 1, 500); }
 Item("Cruiser_Card") { OnEquip: AddStat(AddCritDamage, 10); AddStat(AddCritChanceRaceBeast, 7); }
 Item("Creamy_Fear_Card") { OnEquip: AddStat(WhenAttackedConfusion, 60); }
 Item("Clock_Card") { OnEquip: } //autospell autoguard
@@ -361,7 +361,7 @@ Item("High_Orc_Card") { OnEquip: AddStat(AddDef, 1); } //melee reflect
 Item("Hati_Baby_Card") { OnEquip: AutoSpellOnAttack(FrostDiver, 3, 50, TargetEnemy); }
 Item("Hati_Card") { OnEquip: AddStat(WhenAttackedFreeze, 500); }
 Item("Harpy_Card") { OnEquip: AddStat(AddResistElementNeutral, 15); } //bonus napalm beat damage
-Item("Sea_Otter_Card") { OnEquip: } //sushi/sashimi
+Item("Sea_Otter_Card") { OnEquip: AddBonusDropOnKillRace(RaceAquatic, 30, "Sushi,Raw_Fish"); }
 Item("Bloody_Butterfly_Card") { OnValidate: return false; OnEquip: } //discount phen
 Item("Yao_Jun_Card") { OnEquip: AddStat(AddFlee, 15); AddStat(AddCrit, 1); }
 Item("Phendark_Card") { OnEquip: AddStat(SpGainOnKillRaceDemihuman, 5); }

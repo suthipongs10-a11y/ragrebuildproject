@@ -395,6 +395,11 @@ public enum CharacterStat
     DamageVsTag,
     ResistVsTag,
     NoEffect,
+
+    //appended rather than slotted in: these values travel as numbers, so anything
+    //inserted above here would renumber every stat after it
+    BonusDropOnKill,
+    BonusZenyOnKill,
     CharacterStatsMax,
 }
 

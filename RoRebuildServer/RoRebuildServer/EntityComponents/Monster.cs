@@ -620,6 +620,8 @@ public partial class Monster : IEntityAutoReset
             }
         }
 
+        DoKillBonusDrops(topContributor, ref dropId);
+
         dropId = 3; //bonus drops start north
         if (inventoryCount > 0 && monsterInventory != null)
         {
@@ -633,6 +635,58 @@ public partial class Monster : IEntityAutoReset
 
             inventoryIndex = 0;
             inventoryCount = 0;
+        }
+    }
+
+    /// <summary>
+    /// The "chance to find something on a kill" carried by a card the killer is wearing.
+    ///
+    /// Thirteen cards ship with an empty effect block and a comment describing one of
+    /// these, which is why it is worth being a feature rather than thirteen special cases.
+    /// What is found lands on the ground beside the corpse and is held for the person who
+    /// earned it, exactly like the monster's own drops: putting it straight in the bag
+    /// would mean deciding what happens when the bag is full, and a bonus that silently
+    /// vanishes is worse than one you have to bend down for.
+    ///
+    /// The killer here is the top damage contributor, which is the same person the drops
+    /// above are reserved for. Nobody else's cards are consulted.
+    /// </summary>
+    private void DoKillBonusDrops(WorldObject? topContributor, ref int dropId)
+    {
+        if (topContributor == null || topContributor.Type != CharacterType.Player || Character.Map == null)
+            return;
+
+        var player = topContributor.Player;
+        if (player?.Equipment == null)
+            return;
+
+        foreach (var (_, effect) in player.Equipment.BonusDropsOnKill)
+        {
+            if (effect.Race.HasValue && effect.Race.Value != MonsterBase.Race)
+                continue;
+
+            if (GameRandom.Next(0, 1000) >= effect.Chance)
+                continue;
+
+            //one roll, one item: the cards that name several are offering a choice rather
+            //than several chances, which is what their own descriptions say
+            var itemId = effect.ItemIds[GameRandom.Next(0, effect.ItemIds.Length)];
+
+            var dropPos = GetNextTileForDrop(dropId);
+            var item = new GroundItem(dropPos, itemId, 1);
+            item.SetExclusivePickupTime(topContributor, 8f);
+            Character.Map.DropGroundItem(ref item);
+            dropId++;
+        }
+
+        foreach (var (_, effect) in player.Equipment.BonusZenyOnKill)
+        {
+            if (GameRandom.Next(0, 1000) >= effect.Chance)
+                continue;
+
+            //no item to drop, so this one does go straight to the player: zeny has no
+            //bag to be full and nowhere on the ground to put it
+            player.AddZeny(GameRandom.NextInclusive(effect.ItemIds[0], effect.ItemIds[1]));
         }
     }
 

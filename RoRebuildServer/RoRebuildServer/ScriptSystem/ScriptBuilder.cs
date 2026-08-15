@@ -609,6 +609,12 @@ public class ScriptBuilder
             foreach (var i in Enum.GetValues<SkillPreferredTarget>())
                 additionalVariables.TryAdd($"Target{i}", $"SkillPreferredTarget.{i}");
 
+            //prefixed the same way the targets are, and for the same reason: a bare Insect
+            //or Demon would sit in the same namespace as every skill and stat name, and the
+            //first card to want a skill called after a creature would collide with it
+            foreach (var i in Enum.GetValues<CharacterRace>())
+                additionalVariables.TryAdd($"Race{i}", $"CharacterRace.{i}");
+
             foreach (var i in Enum.GetValues<JobType>())
                 additionalVariables.TryAdd(i.ToString(), $"JobType.{i}");
         }

@@ -540,7 +540,6 @@ SP Consumption -30%
 
 ::Gargoyle_Card //id 4149 - slotted on Accessory
 +1% chance to find <color=#008080>Box of Thunder</color> on Insect kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Goat_Card //id 4150 - slotted on Armor
 if Refine < 6: DEF +2, MDEF +5
@@ -709,7 +708,6 @@ STR +1, VIT +1
 
 ::Raydric_Archer_Card //id 4187 - slotted on Accessory
 +1% chance to find <color=#008080>Box of Resentment</color> on Demon kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Leib_Olmai_Card //id 4188 - slotted on Headgear
 -10% damage from Fire attacks
@@ -720,8 +718,7 @@ STR +1, VIT +1
 +6% chance of <color=#800000>Curse</color> on receive physical damage
 
 ::Wraith_Card //id 4190 - slotted on Accessory
-+1% chance to find <color=#008080>Giggling Box</color> on Undead kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
++1% chance to find <color=#008080>Box of Laughter</color> on Undead kill
 
 ::Loli_Ruri_Card //id 4191 - slotted on Armor
 +5% autocast <skill>Heal 3</skill> when taking physical damage.
@@ -749,7 +746,6 @@ if bDEX > 76:
 ::Marin_Card //id 4196 - slotted on Accessory
 +20% chance to find <color=#008080>Jellopy</color>,
 +1% <color=#008080>Large Jellopy</color> on monster kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Mastering_Card //id 4197 - slotted on Garment
 LUK +1
@@ -787,11 +783,9 @@ if <color=#0000FF>Fireball 10</color>:
 
 ::Mimic_Card //id 4205 - slotted on Accessory
 +0.1% chance to find <color=#008080>Old Blue Box</color> on monster kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Myst_Case_Card //id 4206 - slotted on Headgear
 +0.3% chance to find <color=#008080>Gift Box</color> on monster kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Mistilteinn_Card //id 4207 - slotted on Shield
 DEF +1
@@ -857,7 +851,6 @@ HP Regeneration -20%
 
 ::Sage_Worm_Card //id 4219 - slotted on Accessory
 +0.3% chance to find <color=#008080>Blue Gemstone</color>, <color=#008080>Red Gemstone</color>, <color=#008080>Yellow Gemstone</color> on monster kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Solider_Card //id 4220 - slotted on Armor
 DEF +2, MDEF +2
@@ -875,7 +868,6 @@ DEF +1
 
 ::Stem_Worm_Card //id 4224 - slotted on Accessory
 +1% chance to find <color=#008080>Box of Storms</color> on Brute kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Stone_Shooter_Card //id 4225 - slotted on Weapon
 ATK +10, HIT +10
@@ -891,7 +883,6 @@ if Refine > 8: MDEF +5
 
 ::Sleeper_Card //id 4228 - slotted on Accessory
 +1% chance to find <color=#008080>Box of Drowsiness</color> on Fish kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Cloud_Tower_Manager_Card //id 4229 - slotted on Headgear
 INT +1, MATK +10
@@ -1009,7 +1000,6 @@ DEF +1
 
 ::Orc_Archer_Card //id 4256 - slotted on Accessory
 +1% chance to find <color=#008080>Box of Panting</color> on Demi-Human kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Wild_Rose_Card //id 4257 - slotted on Boots
 AGI +1
@@ -1131,9 +1121,8 @@ if Merchant:
 +0.5% chance to find <color=#008080>Yam</color>, <color=#008080>Novice Potion</color>,
 +0.3% chance to find <color=#008080>Red Herb</color>, <color=#008080>Green Herb</color>,
 +0.2% chance to find <color=#008080>Red Potion</color>, <color=#008080>Yellow Herb</color>,
-+0.1% chance to find <color=#008080>Earthproof Potion</color>, <color=#008080>Condensed Red Potion</color>, <color=#008080>Hinalle Leaflet</color>,
-+0.05% chance to find <color=#008080>Aloe Leaflet</color>, <color=#008080>Mastela Fruit</color> on monster kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
++0.1% chance to find <color=#008080>Condensed Red Potion</color>, <color=#008080>Hinalle Leaflet</color>,
++0.1% chance to find <color=#008080>Aloe Leaflet</color>, <color=#008080>Mastela Fruit</color> on monster kill
 
 ::Greatest_General_Card //id 4283 - slotted on Accessory
 +0.2% Autospell <color=#0000FF>Summon Spirit Sphere 5</color> on non-skill attack

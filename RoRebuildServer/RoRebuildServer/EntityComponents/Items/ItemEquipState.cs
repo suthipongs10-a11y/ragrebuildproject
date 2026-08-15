@@ -44,6 +44,23 @@ public struct AutoSpellEffect
     public int Chance;
 }
 
+/// <summary>
+/// A card's "chance to find something when you kill something". Thirteen cards were
+/// shipped with an empty effect block and a comment describing one of these, so it is
+/// one feature rather than thirteen.
+///
+/// Race is nullable because most of them apply to anything; the ones that do not name a
+/// single race. ItemIds is a list because several cards offer a choice — a gemstone of
+/// any colour, one of three juices — and the roll picks one of them, which is what the
+/// printed description of those cards says happens.
+/// </summary>
+public struct BonusDropEffect
+{
+    public int[] ItemIds;
+    public CharacterRace? Race;
+    public int Chance; //per mille, matching the autospells
+}
+
 public struct WeaponAttackInfo
 {
     public WeaponInfo? WeaponInfo;
@@ -103,6 +120,8 @@ public class ItemEquipState
     public Dictionary<int, int> EquippedItems = new();
     public Dictionary<int, AutoSpellEffect> AutoSpellSkillsOnAttack = new();
     public Dictionary<int, AutoSpellEffect> AutoSpellSkillsWhenAttacked = new();
+    public Dictionary<int, BonusDropEffect> BonusDropsOnKill = new();
+    public Dictionary<int, BonusDropEffect> BonusZenyOnKill = new();
     private readonly SwapList<EquipStatChange> equipmentEffects = new();
     private int activeSlotId;
     private bool isOffHand;
@@ -128,6 +147,8 @@ public class ItemEquipState
         AmmoElement = AttackElement.None;
         AutoSpellSkillsOnAttack.Clear();
         AutoSpellSkillsWhenAttacked.Clear();
+        BonusDropsOnKill.Clear();
+        BonusZenyOnKill.Clear();
         equipmentEffects.Clear();
         EquippedItems.Clear();
         ActiveItemCombos.Clear();
@@ -736,6 +757,12 @@ public class ItemEquipState
             case CharacterStat.AutoSpellWhenAttacked:
                 AutoSpellSkillsWhenAttacked.Remove(effect.Change);
                 return false;
+            case CharacterStat.BonusDropOnKill:
+                BonusDropsOnKill.Remove(effect.Change);
+                return false;
+            case CharacterStat.BonusZenyOnKill:
+                BonusZenyOnKill.Remove(effect.Change);
+                return false;
             case CharacterStat.DamageVsTag:
                 if (Player.AttackVersusTag != null &&
                     Player.AttackVersusTag.TryGetValue(effect.Value, out var existingAttack))
@@ -944,6 +971,83 @@ public class ItemEquipState
         };
 
         equipmentEffects.Add(ref equipState);
+    }
+
+    /// <summary>
+    /// A chance to find an item when the wearer kills anything.
+    ///
+    /// Item codes are given as one comma separated string rather than as a parameter list,
+    /// because that is a plain literal and needs nothing of the script language. When more
+    /// than one is named the roll picks one of them, which is how the cards that offer a
+    /// choice are written: "3% chance to find Apple Juice, Banana Juice, Carrot Juice" is
+    /// one roll and one juice, not three rolls.
+    /// </summary>
+    public void AddBonusDropOnKill(int chance, string itemCodes) =>
+        RegisterBonusDrop(chance, null, itemCodes);
+
+    /// <summary>The same, but only when what died was of the named race.</summary>
+    public void AddBonusDropOnKillRace(CharacterRace race, int chance, string itemCodes) =>
+        RegisterBonusDrop(chance, race, itemCodes);
+
+    private void RegisterBonusDrop(int chance, CharacterRace? race, string itemCodes)
+    {
+        if (chance <= 0 || string.IsNullOrWhiteSpace(itemCodes))
+            return;
+
+        var codes = itemCodes.Split(',');
+        var ids = new List<int>(codes.Length);
+        foreach (var code in codes)
+        {
+            var trimmed = code.Trim();
+            if (trimmed.Length == 0)
+                continue;
+
+            //a card naming an item that is not in the tables is a mistake in the card, and
+            //saying so once at equip time beats a bonus that silently never happens
+            if (DataManager.ItemIdByName.TryGetValue(trimmed, out var id))
+                ids.Add(id);
+            else
+                ServerLogger.LogWarning($"Bonus drop effect refers to unknown item '{trimmed}'.");
+        }
+
+        if (ids.Count == 0)
+            return;
+
+        var effect = new BonusDropEffect() { ItemIds = ids.ToArray(), Race = race, Chance = chance };
+
+        var id2 = nextId++;
+        BonusDropsOnKill.Add(id2, effect);
+
+        equipmentEffects.Add(new EquipStatChange()
+        {
+            Slot = (int)activeSlotId,
+            Stat = CharacterStat.BonusDropOnKill,
+            Value = ids[0],
+            Change = id2,
+        });
+    }
+
+    /// <summary>
+    /// A chance to find zeny on a kill. Modelled as a drop with no items so it travels the
+    /// same path and is removed the same way; the amount is carried in the two ids.
+    /// </summary>
+    public void AddBonusZenyOnKill(int chance, int min, int max)
+    {
+        if (chance <= 0 || max < min)
+            return;
+
+        var effect = new BonusDropEffect() { ItemIds = new[] { min, max }, Race = null, Chance = chance };
+
+        var id = nextId++;
+        BonusZenyOnKill.Add(id, effect);
+
+        equipmentEffects.Add(new EquipStatChange()
+        {
+            Slot = (int)activeSlotId,
+            Stat = CharacterStat.BonusZenyOnKill,
+            Value = max,
+            Change = id,
+        });
     }
 
     public void GrantSkill(CharacterSkill skill, int level)
