@@ -34,6 +34,14 @@ namespace Assets.Scripts.UI
 
         public void HideCount()
         {
+            //Guarded like every other method that touches this label. It was the only one
+            //that was not, and that mattered: equipping a piece of gear hides its stack
+            //count first and sends the equip second, so an entry that had lost its label
+            //threw here and the equip was never sent. Ammunition took the other branch and
+            //still worked, which is what made it look like a problem with gear.
+            if (CountText == null)
+                return;
+
             CountText.gameObject.SetActive(false);
         }
 

@@ -100,6 +100,33 @@ namespace Assets.Scripts.UI.Inventory
         }
 
         /// <summary>
+        /// Points an entry back at its stack count when the reference has gone.
+        ///
+        /// An earlier version of this pass reached into the prefab asset entries are cloned
+        /// from, which the engine will not let a scene object be parented into: the original
+        /// label ended up switched off and the reference to it lost, and every entry cloned
+        /// afterwards came out of the template that way. That pass is gone, but a project
+        /// whose template was damaged while it was still there would otherwise stay broken
+        /// until someone noticed the file was modified, so the label is found again here.
+        ///
+        /// There is exactly one label on an entry, so the first one found is it.
+        /// </summary>
+        private static bool RecoverCountLabel(DragItemBase item)
+        {
+            var labels = item.GetComponentsInChildren<TextMeshProUGUI>(true);
+            if (labels.Length == 0)
+                return false;
+
+            var label = labels[0];
+
+            //switched on because the damage switched it off; what it should actually say and
+            //whether it should show at all is written by the window on its next refresh
+            label.gameObject.SetActive(true);
+            item.CountText = label;
+            return true;
+        }
+
+        /// <summary>
         /// Draws the number in the corner of each item icon again, in the theme's own
         /// material.
         ///
@@ -124,7 +151,10 @@ namespace Assets.Scripts.UI.Inventory
 
             foreach (var item in root.GetComponentsInChildren<DragItemBase>(true))
             {
-                if (item.CountText == null || !item.gameObject.scene.IsValid())
+                if (!item.gameObject.scene.IsValid())
+                    continue;
+
+                if (item.CountText == null && !RecoverCountLabel(item))
                     continue;
 
                 //already ours: the theme font is the mark, since nothing the client builds
