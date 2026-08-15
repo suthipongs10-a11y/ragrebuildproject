@@ -203,6 +203,21 @@ namespace Assets.Scripts.UI
                     //turned headings into blocks.
                     if (material.HasProperty("_FaceDilate"))
                         material.SetFloat("_FaceDilate", 0.03f);
+
+                    //No drop shadow on the glyphs. A shadow under a letter is a second,
+                    //blurred copy of it a pixel away, and at the size this interface draws
+                    //that reads as a smeared edge rather than as depth. Depth belongs to
+                    //the panels; the text on them wants to be flat and sharp.
+                    if (material.HasProperty("_UnderlayColor"))
+                        material.SetColor("_UnderlayColor", new Color(0f, 0f, 0f, 0f));
+                    if (material.HasProperty("_UnderlayOffsetX"))
+                        material.SetFloat("_UnderlayOffsetX", 0f);
+                    if (material.HasProperty("_UnderlayOffsetY"))
+                        material.SetFloat("_UnderlayOffsetY", 0f);
+                    if (material.HasProperty("_UnderlaySoftness"))
+                        material.SetFloat("_UnderlaySoftness", 0f);
+                    material.DisableKeyword("UNDERLAY_ON");
+
                     crispMaterial = material;
                 }
                 catch (Exception e)
@@ -395,6 +410,13 @@ namespace Assets.Scripts.UI
         {
             foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
             {
+                //A shadow or an outline behind a letter is a second copy of it a pixel
+                //away, and at the size this interface draws it reads as a smeared edge
+                //rather than as depth. Depth is the panels' job. Outline derives from
+                //Shadow, so asking for one finds both.
+                foreach (var shadow in text.GetComponents<Shadow>())
+                    shadow.enabled = false;
+
                 var c = text.color;
                 var max = Mathf.Max(c.r, Mathf.Max(c.g, c.b));
                 var min = Mathf.Min(c.r, Mathf.Min(c.g, c.b));

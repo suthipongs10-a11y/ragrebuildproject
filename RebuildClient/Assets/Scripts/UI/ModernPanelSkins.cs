@@ -447,7 +447,8 @@ namespace Assets.Scripts.UI
             //item description card exists twice over, one for the item under the cursor
             //and one for whatever it is being compared against
             if (window is ItemDescriptionWindow || window is CardIllustrationWindow
-                                                || window is ClientDatabaseWindow || window is DialogWindow)
+                                                || window is ClientDatabaseWindow || window is DialogWindow
+                                                || window is CharacterHubWindow)
                 return true;
 
             return window == ui.StatusWindow

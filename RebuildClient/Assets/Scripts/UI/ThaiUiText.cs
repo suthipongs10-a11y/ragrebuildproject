@@ -19,6 +19,7 @@ namespace Assets.Scripts.UI
         private static readonly Dictionary<string, string> Words = new Dictionary<string, string>
         {
             //--- windows and the bar along the bottom
+            { "Character", "ตัวละคร" },
             { "Stats", "สเตตัส" },
             { "Skills", "สกิล" },
             { "Skill", "สกิล" },
