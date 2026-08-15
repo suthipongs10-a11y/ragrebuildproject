@@ -655,22 +655,24 @@ public class World
         {
             map.AddEntity(ref e);
 
+            //The MVP list used to be consulted only when there was no spawn rule, which
+            //is the one case that almost never happens: MVPs are placed by the spawn
+            //scripts like everything else, so unless a rule named the display type by
+            //hand they were never registered and never appeared on anyone's minimap.
+            var display = CharacterDisplayType.None;
+
             if (spawnRule != null && (spawnRule.DisplayType == CharacterDisplayType.Boss ||
                                       spawnRule.DisplayType == CharacterDisplayType.Mvp))
+                display = spawnRule.DisplayType;
+            else if (DataManager.MvpMonsterCodes != null &&
+                     DataManager.MvpMonsterCodes.Contains(monsterDef.Code))
+                display = CharacterDisplayType.Mvp;
+
+            if (display != CharacterDisplayType.None)
             {
                 ch.IsImportant = true;
-                ch.DisplayType = spawnRule.DisplayType;
+                ch.DisplayType = display;
                 map.RegisterImportantEntity(ch);
-            }
-
-            if (spawnRule == null)
-            {
-                if (DataManager.MvpMonsterCodes.Contains(monsterDef.Code))
-                {
-                    ch.IsImportant = true;
-                    ch.DisplayType = CharacterDisplayType.Mvp;
-                    map.RegisterImportantEntity(ch);
-                }
             }
         }
 

@@ -23,6 +23,8 @@ namespace Assets.Scripts.UI.Hud
         private GameObject minimapContent;
         private Slider minimapZoom;
         private GameObject minimapEmpty;
+        private MinimapController minimapController;
+        private TextMeshProUGUI minimapPopulation;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -316,6 +318,30 @@ namespace Assets.Scripts.UI.Hud
                 minimapEmpty = card.gameObject;
             }
 
+            //How busy the map is, which the client already knows: every player on it is
+            //registered as an important entity so their marker can be drawn, and counting
+            //those markers is the same number without asking the server for anything.
+            if (root.Find("ModernMinimapCount") == null)
+            {
+                var chip = ModernUiTheme.CreateCard(root, "ModernMinimapCount",
+                    ModernUiTheme.PanelOverlayColor, true);
+                ModernUiTheme.Place(chip, new Vector2(0, 0), new Vector2(6f, 6f), new Vector2(74f, 22f));
+                chip.GetComponent<Image>().raycastTarget = false;
+
+                var icon = ModernUiTheme.CreateIcon(chip, ModernUiIcons.Person, ModernUiTheme.AccentInkColor, 13);
+                ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f), new Vector2(8f, 0f),
+                    new Vector2(13f, 13f));
+
+                minimapPopulation = ModernUiTheme.CreateText(chip, "Count", "1", ModernUiTheme.SizeSmall,
+                    ModernUiTheme.NameColor, TextAlignmentOptions.Left, FontStyles.Bold);
+                ModernUiTheme.Stretch(minimapPopulation.rectTransform, 26f, 0f, -6f, 0f);
+            }
+            else
+            {
+                minimapPopulation = root.Find("ModernMinimapCount/Count")?.GetComponent<TextMeshProUGUI>();
+            }
+
+            minimapController = map;
             minimapContent = map.ContentContainer;
             minimapZoom = map.ZoomSlider;
             ModernUiTheme.StyleSliders(root);
@@ -349,6 +375,17 @@ namespace Assets.Scripts.UI.Hud
 
             if (minimapEmpty != null && minimapEmpty.activeSelf == hasMap)
                 minimapEmpty.SetActive(!hasMap);
+
+            if (minimapPopulation == null)
+                return;
+
+            if (minimapPopulation.transform.parent.gameObject.activeSelf != hasMap)
+                minimapPopulation.transform.parent.gameObject.SetActive(hasMap);
+
+            //plus one for the player reading it, who is on the map but is not one of the
+            //markers drawn on it
+            if (hasMap && minimapController != null)
+                minimapPopulation.text = (minimapController.CountTrackedPlayers() + 1).ToString();
         }
     }
 }

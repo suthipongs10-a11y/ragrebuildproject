@@ -466,9 +466,44 @@ public class MonsterSkillAiState(Monster monsterIn)
         monster.Character.ChangeLookDirection(p);
     }
 
+    /// <summary>
+    /// Whether this monster is allowed to cast at all.
+    ///
+    /// Episode 4 has ordinary monsters swinging rather than casting, and the skill
+    /// scripts this project inherited hand a lot of them spells they have no business
+    /// with; a Marionette throwing Fire Wall is what started this. With the switch on,
+    /// only the monsters meant to be a fight keep their skills: anything on the MVP
+    /// list, and anything a spawn flagged as a boss, which is the same flag that puts a
+    /// monster on the minimap, so a mini boss with skills and a mini boss with a marker
+    /// are the same monster by construction.
+    ///
+    /// The scripts also run their idle behaviour through here, casting None or NoCast to
+    /// pull an emote or a state change, and those are not skills and are left alone.
+    /// </summary>
+    private bool IsAllowedToUseSkills(CharacterSkill skill)
+    {
+        if (!ServerConfig.OperationConfig.RestrictMonsterSkillsToBosses)
+            return true;
+
+        if (skill == CharacterSkill.None || skill == CharacterSkill.NoCast)
+            return true;
+
+        var display = monster.Character.DisplayType;
+        if (display == CharacterDisplayType.Mvp || display == CharacterDisplayType.Boss)
+            return true;
+
+        var mvps = DataManager.MvpMonsterCodes;
+        return mvps != null && mvps.Contains(monster.MonsterBase.Code);
+    }
+
     public bool Cast(CharacterSkill skill, int level, int castTime, int delay = 0, MonsterSkillAiFlags flags = MonsterSkillAiFlags.None)
     {
         Debug.Assert(monster.Character.Map != null);
+
+        //every path a script can reach a cast by comes through here, so this is the one
+        //place the restriction has to be applied
+        if (!IsAllowedToUseSkills(skill))
+            return false;
 
         var ce = monster.CombatEntity;
         var attr = SkillHandler.GetMonsterSkillAttributes(skill);

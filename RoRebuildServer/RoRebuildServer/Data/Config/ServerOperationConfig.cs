@@ -13,6 +13,9 @@ public class ServerOperationConfig
     public string? AdminifyPasscode { get; set; }
     public bool RemapDropRates { get; set; }
     public bool GuaranteeMvpDrops { get; set; } = true;
+    //ordinary monsters swing, they do not cast. See MonsterSkillAiState for what this
+    //counts as a boss and why the two are tied to the same flag.
+    public bool RestrictMonsterSkillsToBosses { get; set; } = true;
     public bool FliersIgnoreTraps { get; set; } = true;
     public bool SleepMonsterOnEmptyMap { get; set; } = true;
     public int MapMonsterSleepTimer { get; set; } = 600;

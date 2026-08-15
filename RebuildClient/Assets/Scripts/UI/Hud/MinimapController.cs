@@ -70,6 +70,26 @@ namespace Assets.Scripts.UI.Hud
             }
         }
 
+        /// <summary>
+        /// How many other players the map is currently tracking. Every player on the map
+        /// is registered as an important entity by the server, so this is the map's
+        /// population less yourself.
+        /// </summary>
+        public int CountTrackedPlayers()
+        {
+            if (mapIcons == null)
+                return 0;
+
+            var count = 0;
+            foreach (var entry in mapIcons)
+            {
+                if (entry.Value != null && entry.Value.Type == CharacterDisplayType.Player)
+                    count++;
+            }
+
+            return count;
+        }
+
         public void RemoveAllEntities()
         {
             if (mapIcons == null) return;
