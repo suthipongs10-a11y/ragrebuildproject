@@ -433,6 +433,74 @@ namespace Assets.Scripts.MapEditor.Editor
             Lightmapping.BakeAsync();
         }
         
+        /// <summary>
+        /// Replaces any folder dropped into the scene list with the scenes inside it.
+        ///
+        /// Dragging the Maps folder in is the obvious thing to do, and every button here
+        /// then failed with "Scene file not found", because a folder's asset path is not
+        /// a scene path. Expanding it here rather than inside each button means the list
+        /// on screen shows exactly what is about to be worked through, and every button
+        /// keeps reading a plain array of scenes.
+        /// </summary>
+        private void ExpandDroppedFolders()
+        {
+            if (Scenes == null || Scenes.Length == 0)
+                return;
+
+            var hasFolder = false;
+            foreach (var entry in Scenes)
+            {
+                if (entry == null)
+                    continue;
+
+                if (AssetDatabase.IsValidFolder(AssetDatabase.GetAssetPath(entry)))
+                {
+                    hasFolder = true;
+                    break;
+                }
+            }
+
+            if (!hasFolder)
+                return;
+
+            var expanded = new List<Object>();
+            var seen = new HashSet<string>();
+
+            foreach (var entry in Scenes)
+            {
+                if (entry == null)
+                    continue;
+
+                var path = AssetDatabase.GetAssetPath(entry);
+                if (string.IsNullOrEmpty(path))
+                    continue;
+
+                if (!AssetDatabase.IsValidFolder(path))
+                {
+                    if (seen.Add(path))
+                        expanded.Add(entry);
+                    continue;
+                }
+
+                foreach (var guid in AssetDatabase.FindAssets("t:Scene", new[] { path }))
+                {
+                    var scenePath = AssetDatabase.GUIDToAssetPath(guid);
+                    if (string.IsNullOrEmpty(scenePath) || !seen.Add(scenePath))
+                        continue;
+
+                    var scene = AssetDatabase.LoadAssetAtPath<Object>(scenePath);
+                    if (scene != null)
+                        expanded.Add(scene);
+                }
+            }
+
+            expanded.Sort((a, b) => string.Compare(AssetDatabase.GetAssetPath(a),
+                AssetDatabase.GetAssetPath(b), System.StringComparison.OrdinalIgnoreCase));
+
+            Scenes = expanded.ToArray();
+            Debug.Log($"[Lighting] Expanded the folder into {Scenes.Length} scene(s).");
+        }
+
         private IEnumerator MakeMinimaps()
         {
             //yield return new EditorWaitForSeconds(1f);
@@ -883,6 +951,8 @@ namespace Assets.Scripts.MapEditor.Editor
 
             EditorGUILayout.PropertyField(scenesProperty, true); // True shows children
             so.ApplyModifiedProperties(); // Apply modified properties
+
+            ExpandDroppedFolders();
 
             GUILayout.EndScrollView();
         }
