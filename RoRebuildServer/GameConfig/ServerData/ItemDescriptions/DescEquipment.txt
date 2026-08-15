@@ -1994,7 +1994,8 @@ INT +2, SP +150
 +10% <color=#800000>Freeze</color> resist
 
 ::Water_Lily_Hat //id 5302 - Headgear Top
-<desc>A hat resembling a blooming water lily.</desc>
+<desc>A hat resembling a blooming water lily.
+Adds a 15% chance to strike twice with any weapon.</desc>
 
 ::Pirate_Dagger //id 5305 - Headgear Bottom
 <desc>A small silver knife that is held between your teeth.</desc>

@@ -58,7 +58,10 @@ public static class GiftMonsterSpawner
             return;
         }
 
-        //no spawn area, so he can turn up anywhere the map is walkable
-        config.CreateSpawn(MonsterCode, 1, RespawnTime, RespawnVariance);
+        //No spawn area, so he can turn up anywhere the map is walkable. The boss flag is
+        //not about how hard he is, it is what puts a marker on the minimap: a map is 250
+        //tiles across and one wandering monster on it is not something anybody is going
+        //to stumble into. He has no skills, and the flag reaches nothing else.
+        config.CreateSpawn(MonsterCode, 1, RespawnTime, RespawnVariance, SpawnCreateFlags.Boss);
     }
 }

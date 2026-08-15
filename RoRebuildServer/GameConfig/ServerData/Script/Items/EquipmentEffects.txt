@@ -255,6 +255,9 @@ Item("Coif_") { OnEquip: AddStat(AddMaxSp, 100); }
 Item("Orc_Hero_Helm") { OnEquip: AddStat(AddStr, 2); AddStat(AddVit, 1); }
 Item("Zealotus_Mask") { OnEquip: AddStat(AddResistRaceDemihuman, 5); AddStat(AddAttackRaceDemihuman, 5); }
 Item("Shafka") { OnEquip: AddStat(ResistFreezeStatus, 10); }
+//Antonio's rare drop. The chance stat also lifts the dagger-only restriction on double
+//attack, so the hat is worth wearing whatever the job swings.
+Item("Water_Lily_Hat") { OnEquip: AddStat(DoubleAttackChance, 15); }
 Item("Hat_of_the_Sun_God_") { OnEquip: AddStat(AddStr, 3); AddStat(AddInt, 2); }
 Item("Haedonggum") { OnEquip: AddStat(AddInt, 3); }
 Item("Haedonggum_") { OnEquip: AddStat(AddInt, 3); }

@@ -1,4 +1,4 @@
-
+﻿
 ServerConfig("ItemAdjustments") {
 OnLoadDropData:
 	//if you want to use drop rates as provided in the db, remove this block or replace with return rate;
@@ -8,7 +8,7 @@ OnLoadDropData:
 
 	//Antonio's drops are authored at the rates we actually want to see in game, so they
 	//skip the remap below. In DropData.csv 50 means 0.5% and stays 0.5%.
-	if(code == "Snake_Head" || code == "Red_Stocking")
+	if(code == "Water_Lily_Hat" || code == "Red_Stocking")
 		return rate;
 
 	if(type == Etc && subType == "Refine")

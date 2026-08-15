@@ -93,6 +93,19 @@ namespace Assets.Scripts.UI.ClientDatabase
             AttachRightClick(mapDetailMinimap.gameObject, OnMinimapRightClick);
         }
 
+        /// <summary>
+        /// Warps to the map being shown, letting the server pick the arrival spot. Right
+        /// clicking the picture already went to a chosen tile, but only somebody who knew
+        /// that was there would ever find it, and often the point is just to get there.
+        /// </summary>
+        internal void TeleportToShownMap()
+        {
+            if (string.IsNullOrEmpty(currentMapDetailCode))
+                return;
+
+            NetworkManager.Instance.SendMoveRequest(currentMapDetailCode);
+        }
+
         private void OnMinimapRightClick()
         {
             if (string.IsNullOrEmpty(currentMapDetailCode)) return;

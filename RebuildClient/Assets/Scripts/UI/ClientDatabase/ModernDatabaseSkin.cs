@@ -116,6 +116,8 @@ namespace Assets.Scripts.UI.ClientDatabase
             if (win.iconRowTemplate != null)
                 ModernUiTheme.RepaintInk(win.iconRowTemplate.transform);
 
+            AddMapTeleportButton(win);
+
             //this window builds its own close button rather than inheriting a drag bar,
             //so it needs the x drawn on it the same way every other window gets one
             ModernUiTheme.StyleCloseButton(win.closeButton);
@@ -264,6 +266,48 @@ namespace Assets.Scripts.UI.ClientDatabase
             text.fontSize = ModernUiTheme.SizeBody;
             text.extraPadding = true;
         }
+
+        /// <summary>
+        /// Puts a warp button under the list of connected maps.
+        ///
+        /// Getting to a map from here was already possible by right clicking its picture,
+        /// but nothing on screen said so, so in practice it did not exist. The list of
+        /// exits above it ended well short of the bottom of its own box, which is exactly
+        /// the room a button needs; the list gives up that much height and the button
+        /// takes it, so the pane still finishes level with the map picture beside it.
+        /// </summary>
+        private static void AddMapTeleportButton(ClientDatabaseWindow win)
+        {
+            const float ButtonHeight = 28f;
+            const float Gap = 6f;
+
+            //Content -> Viewport -> the scroll rect that owns them, whose sibling we want
+            //to become. Walking up from the content is what keeps this working if the
+            //window's own layout is ever rearranged.
+            var scroll = win.mapConnectionsContent?.transform.parent?.parent as RectTransform;
+            var pane = scroll?.parent as RectTransform;
+            if (pane == null || pane.Find(TeleportButtonName) != null)
+                return;
+
+            scroll.sizeDelta = new Vector2(scroll.sizeDelta.x, scroll.sizeDelta.y - ButtonHeight - Gap);
+
+            var button = ModernUiTheme.CreateIconButton(pane, TeleportButtonName, "Teleport To Map",
+                ModernUiIcons.Target, ModernUiTheme.AccentColor, ModernUiTheme.AccentTextColor);
+
+            //copied off the list above rather than written out, so the two line up down
+            //both edges whatever the pane is doing
+            var rect = (RectTransform)button.transform;
+            rect.anchorMin = scroll.anchorMin;
+            rect.anchorMax = scroll.anchorMax;
+            rect.pivot = scroll.pivot;
+            rect.sizeDelta = new Vector2(scroll.sizeDelta.x, ButtonHeight);
+            rect.anchoredPosition = new Vector2(scroll.anchoredPosition.x,
+                scroll.anchoredPosition.y - scroll.sizeDelta.y - Gap);
+
+            button.onClick.AddListener(win.TeleportToShownMap);
+        }
+
+        private const string TeleportButtonName = "ModernMapTeleport";
 
         private static void StyleBackButton(Button button)
         {

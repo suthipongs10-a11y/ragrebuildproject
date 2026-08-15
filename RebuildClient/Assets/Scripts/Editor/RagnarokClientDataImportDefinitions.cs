@@ -98,11 +98,7 @@ namespace Assets.Editor
             new TemporaryMonsterAlias("piere", "soldier_piere"),
             new TemporaryMonsterAlias("vagabond_wolf", "were_wolf"),
             new TemporaryMonsterAlias("frilldora", "raptice"),
-            new TemporaryMonsterAlias("poison_spore", "deathspore"),
-            //Antonio only exists in clients new enough to have had the christmas event.
-            //If the real sprite came across with the rest of the monsters this does
-            //nothing, otherwise he borrows the santa poring so he is at least visible.
-            new TemporaryMonsterAlias("poring_", "antonio")
+            new TemporaryMonsterAlias("poison_spore", "deathspore")
         };
     }
 }
