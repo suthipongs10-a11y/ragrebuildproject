@@ -1,0 +1,6 @@
+# Batch files are handed to cmd.exe, which is only dependably correct with
+# carriage return line endings once a script uses labels, goto or multi line
+# blocks. Checking them out with Windows endings on every machine keeps that
+# from depending on how each person happens to have git configured.
+*.bat text eol=crlf
+*.cmd text eol=crlf
