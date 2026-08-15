@@ -544,6 +544,21 @@ public partial class Monster : IEntityAutoReset
         }
     }
 
+    /// <summary>
+    /// A drop chance, out of ten thousand, as one of four bands.
+    ///
+    /// The bands are what the glow on the ground is pitched at, so they are cut where a
+    /// player's sense of luck is rather than evenly: anything you see most sessions is not
+    /// worth a light, one in a hundred is, and one in five hundred should stop you walking.
+    /// </summary>
+    private static byte RarityOfChance(int chance)
+    {
+        if (chance > 500) return 0;  //better than 5%, an ordinary drop
+        if (chance > 100) return 1;  //5% down to 1%
+        if (chance > 20) return 2;   //1% down to 0.2%
+        return 3;                    //rarer than one in five hundred
+    }
+
     private Position GetNextTileForDrop(int dropId)
     {
         if (dropId == 0)
@@ -591,7 +606,7 @@ public partial class Monster : IEntityAutoReset
                     if (d.CountMax > 1)
                         count = GameRandom.NextInclusive(d.CountMin, d.CountMax);
                     var dropPos = GetNextTileForDrop(dropId);
-                    var item = new GroundItem(dropPos, d.Id, count);
+                    var item = new GroundItem(dropPos, d.Id, count) { Rarity = RarityOfChance(chance) };
                     if (topContributor != null)
                         item.SetExclusivePickupTime(topContributor, isMvp ? 8f : 4f);
                     Character.Map.DropGroundItem(ref item);
@@ -611,7 +626,8 @@ public partial class Monster : IEntityAutoReset
                         continue;
 
                     var dropPos = GetNextTileForDrop(dropId);
-                    var item = new GroundItem(dropPos, drops.DropChances[i].Id, 1);
+                    var item = new GroundItem(dropPos, drops.DropChances[i].Id, 1)
+                        { Rarity = RarityOfChance(drops.DropChances[i].Chance) };
                     if (topContributor != null)
                         item.SetExclusivePickupTime(topContributor, isMvp ? 8f : 4f);
                     Character.Map.DropGroundItem(ref item);

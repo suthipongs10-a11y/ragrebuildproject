@@ -1,4 +1,4 @@
-using RebuildSharedData.Enum;
+﻿using RebuildSharedData.Enum;
 using RoRebuildServer.Data;
 using RoRebuildServer.Data.Monster;
 using RoRebuildServer.Data.ServerConfigScript;
@@ -61,6 +61,22 @@ public class ServerAnnouncements : ServerConfigScriptHandlerBase
 
         var map = character.Map?.Name ?? "somewhere";
         Announce($"★ {character.Name} has been defeated on {map}!");
+    }
+
+    /// <summary>
+    /// Called as a card is picked up off the ground.
+    ///
+    /// Cards are the one drop in the game everybody wants and almost nobody sees, so who
+    /// got which one is the news of the evening on a server this size. Said at the pickup
+    /// rather than at the drop, because the drop is not yet anybody's.
+    /// </summary>
+    public static void AnnounceCardFound(Player player, int itemId)
+    {
+        var info = DataManager.GetItemInfoById(itemId);
+        if (info == null || info.ItemClass != ItemClass.Card)
+            return;
+
+        Announce($"★ {player.Name} found {info.Name}!");
     }
 
     /// <summary>

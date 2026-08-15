@@ -16,6 +16,17 @@ public struct GroundItem : IEquatable<GroundItem>
     public float ExclusiveTime;
     public float Expiration;
     public ItemType Type;
+
+    /// <summary>
+    /// How unlikely this drop was, on a scale of nothing special to almost never: 0, 1, 2, 3.
+    ///
+    /// Only the server knows it — the client has the item but not the odds of the monster
+    /// parting with it — and it is the whole of what the client needs to decide whether the
+    /// thing on the ground deserves to glow. What colour it glows is decided over there,
+    /// where the item's own class already is.
+    /// </summary>
+    public byte Rarity;
+
     public FloatPosition Position;
     public RegularItem Item;
     public UniqueItem UniqueItem;
@@ -94,6 +105,8 @@ public struct GroundItem : IEquatable<GroundItem>
         }
         else
             UniqueItem.SerializeAsRegularItem(msg);
+
+        msg.Write(Rarity);
     }
 
     public bool Equals(GroundItem other)

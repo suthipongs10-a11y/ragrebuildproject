@@ -36,7 +36,8 @@ namespace Assets.Scripts.Network
         private static readonly Vector2[] BatchUvs = new Vector2[4];
         private static readonly Color[] BatchColors = { Color.white, Color.white, Color.white, Color.white };
 
-        public static GroundItem Create(int entityId, int id, int count, Vector2 position, bool showAnimation)
+        public static GroundItem Create(int entityId, int id, int count, Vector2 position, bool showAnimation,
+            int rarity = 0)
         {
             if (spriteMaterial == null)
             {
@@ -102,6 +103,10 @@ namespace Assets.Scripts.Network
             //     go.transform.localScale = Vector3.one;
 
             SpriteUtil.AttachShadowToGameObject(go, 0.3f, true);
+
+            //after the shadow, because that is what adds the billboard to this object, and
+            //the light wants to face the camera along with everything else on it
+            GroundItemAura.TryAttach(go, data, rarity);
 
             if (showAnimation)
             {

@@ -1618,6 +1618,10 @@ public class Map
         CommandBuilder.PickUpOrRemoveItemMulti(pickerUpper, item);
         CommandBuilder.ClearRecipients();
 
+        //this method also runs when a drop simply expires, which is nobody picking it up
+        if (pickerUpper is { Type: CharacterType.Player } && pickerUpper.Player != null)
+            ServerAnnouncements.AnnounceCardFound(pickerUpper.Player, item.Item.Id);
+
         Chunks[chunkId].RemoveGroundItem(groundId);
         ItemChunkLookup.Remove(groundId);
 
