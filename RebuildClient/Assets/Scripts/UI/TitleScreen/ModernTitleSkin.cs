@@ -132,6 +132,7 @@ namespace Assets.Scripts.UI.TitleScreen
                     panel.sprite = ModernUiTheme.RoundedSprite;
                     panel.type = Image.Type.Sliced;
                     panel.color = ModernUiTheme.WindowColor;
+                    ModernUiTheme.AddBorder(win.WindowRect, ModernUiTheme.CardBorderColor);
                 }
 
                 ModernUiTheme.AttachShadow(win.WindowRect);

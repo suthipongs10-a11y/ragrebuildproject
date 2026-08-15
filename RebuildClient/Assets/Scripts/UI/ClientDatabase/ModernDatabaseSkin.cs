@@ -67,6 +67,7 @@ namespace Assets.Scripts.UI.ClientDatabase
                     panel.sprite = ModernUiTheme.RoundedSprite;
                     panel.type = Image.Type.Sliced;
                     panel.color = ModernUiTheme.WindowColor;
+                    ModernUiTheme.AddBorder(win.panelRT, ModernUiTheme.CardBorderColor);
                 }
 
                 ModernUiTheme.AttachShadow(win.panelRT);

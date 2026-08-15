@@ -71,6 +71,7 @@ namespace Assets.Scripts.UI.Inventory
                     panel.sprite = ModernUiTheme.RoundedSprite;
                     panel.type = Image.Type.Sliced;
                     panel.color = ModernUiTheme.WindowColor;
+                    ModernUiTheme.AddBorder(win.WindowRect, ModernUiTheme.CardBorderColor);
                 }
 
                 ModernUiTheme.AttachShadow(win.WindowRect);

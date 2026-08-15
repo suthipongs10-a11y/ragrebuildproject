@@ -128,12 +128,14 @@ namespace Assets.Scripts.UI
 
             ModernUiTheme.ApplyWindowChrome(win, ModernUiIcons.Book);
 
+            //a skill row lays its name, its level and its cost out across 500 points of
+            //width, so at the original 430 the last two columns fell off the right and the
+            //window grew a sideways scrollbar to reach them
             var root = (RectTransform)win.transform;
-            if (root.sizeDelta.x < 460f)
-                root.sizeDelta = new Vector2(460f, Mathf.Max(root.sizeDelta.y, 560f));
+            root.sizeDelta = new Vector2(Mathf.Max(root.sizeDelta.x, 580f), Mathf.Max(root.sizeDelta.y, 600f));
 
-            //the horizontal scrollbar runs along the bottom of the window straight over
-            //the points readout, and a list of skills has nothing to scroll sideways to
+            //with the row fitting, there is nothing left to scroll sideways to, and the
+            //bar was only ever taking a strip out of the bottom of the window
             var horizontal = FindDeep(win.transform, "Scrollbar Horizontal");
             if (horizontal != null)
                 horizontal.gameObject.SetActive(false);
@@ -176,9 +178,14 @@ namespace Assets.Scripts.UI
         }
 
         /// <summary>
-        /// Gives the skill point count a card of its own. It shares a parent with
-        /// whatever the original layout put around it, so the card is built from that
-        /// rect rather than from coordinates guessed at from the outside.
+        /// Moves the skill point count out of the strip along the bottom of the window and
+        /// into a band of its own under the tabs, the way the stats window reads.
+        ///
+        /// In the original layout it is a 145 point box pinned to the bottom right corner,
+        /// sharing that strip with the lock toggle and sitting directly under the sideways
+        /// scrollbar. It is the one number the window exists to tell you, and down there it
+        /// was never once seen. The window keeps writing into the same component, so
+        /// nothing about how the count is produced changes.
         /// </summary>
         private static void StylePointsReadout(SkillWindow win)
         {
@@ -186,24 +193,41 @@ namespace Assets.Scripts.UI
             if (points == null)
                 return;
 
-            var rect = points.rectTransform;
-            var parent = rect.parent;
-            if (parent != null && parent.Find("ModernPointsCard") == null)
+            var root = (RectTransform)win.transform;
+            if (root.Find("ModernPointsCard") != null)
+                return;
+
+            //the tabs run from 35 to 61 below the top of the window, so the band goes in
+            //just under them and the list is pushed down far enough to clear it
+            const float bandTop = -68f;
+            const float bandBottom = -104f;
+
+            var scroll = win.GetComponentInChildren<ScrollRect>(true);
+            if (scroll != null)
             {
-                var card = ModernUiTheme.CreateCard(parent, "ModernPointsCard", ModernUiTheme.CardDeepColor);
-                card.anchorMin = rect.anchorMin;
-                card.anchorMax = rect.anchorMax;
-                card.pivot = rect.pivot;
-                card.anchoredPosition = rect.anchoredPosition;
-                card.sizeDelta = rect.sizeDelta + new Vector2(16, 8);
-                card.GetComponent<Image>().raycastTarget = false;
-                //behind the text, which the window keeps writing into
-                card.SetSiblingIndex(rect.GetSiblingIndex());
+                var view = (RectTransform)scroll.transform;
+                view.offsetMax = new Vector2(view.offsetMax.x, bandBottom - 6f);
             }
 
-            points.color = ModernUiTheme.NameColor;
+            var card = ModernUiTheme.CreateCard(root, "ModernPointsCard", ModernUiTheme.CardDeepColor, true);
+            card.anchorMin = new Vector2(0, 1);
+            card.anchorMax = new Vector2(1, 1);
+            card.pivot = new Vector2(0.5f, 1);
+            card.offsetMin = new Vector2(14, bandBottom);
+            card.offsetMax = new Vector2(-14, bandTop);
+            card.GetComponent<Image>().raycastTarget = false;
+
+            var icon = ModernUiTheme.CreateIcon(card, ModernUiIcons.Spark, ModernUiTheme.AccentColor, 18);
+            ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f), new Vector2(12, 0), new Vector2(18, 18));
+
+            var rect = points.rectTransform;
+            rect.SetParent(card, false);
+            ModernUiTheme.Stretch(rect, 38, 0, -14, 0);
+
+            points.color = ModernUiTheme.TitleColor;
             points.fontStyle = FontStyles.Bold;
-            points.fontSize = ModernUiTheme.SizeBody;
+            points.fontSize = ModernUiTheme.SizeValue;
+            points.alignment = TextAlignmentOptions.Left;
             points.extraPadding = true;
         }
 

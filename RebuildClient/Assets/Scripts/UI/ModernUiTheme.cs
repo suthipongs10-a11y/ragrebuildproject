@@ -23,6 +23,10 @@ namespace Assets.Scripts.UI
         public static readonly Color CardDeepColor = new Color(0.831f, 0.886f, 0.953f);
         public static readonly Color TitleBarColor = new Color(0.729f, 0.835f, 0.937f);
         public static readonly Color TabIdleColor = new Color(0.933f, 0.953f, 0.980f);
+        //for a panel laid over the game world rather than inside a window: solid enough to
+        //read against whatever the player is standing in front of, clear enough that it
+        //does not wall off the view
+        public static readonly Color PanelOverlayColor = new Color(0.965f, 0.978f, 0.992f, 0.86f);
         public static readonly Color CardBorderColor = new Color(0.784f, 0.843f, 0.914f);
         public static readonly Color TitleColor = new Color(0.055f, 0.129f, 0.235f);
         public static readonly Color LabelColor = new Color(0.302f, 0.400f, 0.514f);
@@ -179,9 +183,12 @@ namespace Assets.Scripts.UI
                 {
                     var material = new Material(font.material) { name = font.material.name + " Crisp" };
                     //named rather than looked up through TMP's id table, which is only
-                    //filled in once the package has initialised itself
+                    //filled in once the package has initialised itself.
+                    //Kept small: bold text is already thickened by the font style, and
+                    //stacking a heavy dilate on top of that filled the counters in and
+                    //turned headings into blocks.
                     if (material.HasProperty("_FaceDilate"))
-                        material.SetFloat("_FaceDilate", 0.12f);
+                        material.SetFloat("_FaceDilate", 0.03f);
                     crispMaterial = material;
                 }
                 catch (Exception e)
@@ -211,6 +218,7 @@ namespace Assets.Scripts.UI
                 rootImage.sprite = RoundedSprite;
                 rootImage.type = Image.Type.Sliced;
                 rootImage.color = WindowColor;
+                AddBorder(root, CardBorderColor);
             }
 
             Transform dragBar = null;
@@ -434,8 +442,10 @@ namespace Assets.Scripts.UI
             var rect = (RectTransform)go.transform;
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
-            rect.offsetMin = new Vector2(-spread, -spread);
-            rect.offsetMax = new Vector2(spread, spread);
+            //biased downward, the way a shadow from a light overhead actually falls: an
+            //evenly spread halo reads as a glow rather than as height off the page
+            rect.offsetMin = new Vector2(-spread, -spread - 5f);
+            rect.offsetMax = new Vector2(spread, spread - 5f);
         }
 
         /// <summary>
@@ -589,7 +599,7 @@ namespace Assets.Scripts.UI
                     if (distance > 0)
                     {
                         var t = Mathf.Clamp01(distance / inset);
-                        alpha = 0.20f * (1f - t) * (1f - t);
+                        alpha = 0.34f * (1f - t) * (1f - t);
                     }
 
                     texture.SetPixel(x, y, new Color(0.05f, 0.11f, 0.20f, alpha));
@@ -744,7 +754,7 @@ namespace Assets.Scripts.UI
             if (parent == null || parent.Find(name) != null)
                 return null;
 
-            var card = CreateCard(parent, name, color);
+            var card = CreateCard(parent, name, color, true);
             card.anchorMin = target.anchorMin;
             card.anchorMax = target.anchorMax;
             card.pivot = target.pivot;
@@ -765,7 +775,7 @@ namespace Assets.Scripts.UI
             return (RectTransform)go.transform;
         }
 
-        public static RectTransform CreateCard(Transform parent, string name, Color color)
+        public static RectTransform CreateCard(Transform parent, string name, Color color, bool bordered = false)
         {
             var go = new GameObject(name, typeof(Image));
             go.transform.SetParent(parent, false);
@@ -773,7 +783,11 @@ namespace Assets.Scripts.UI
             image.sprite = RoundedSprite;
             image.type = Image.Type.Sliced;
             image.color = color;
-            return (RectTransform)go.transform;
+
+            var rect = (RectTransform)go.transform;
+            if (bordered)
+                AddBorder(rect, CardBorderColor);
+            return rect;
         }
 
         public static TextMeshProUGUI CreateText(Transform parent, string name, string content, float size,
@@ -834,40 +848,109 @@ namespace Assets.Scripts.UI
             return button;
         }
 
+        private const int PanelSize = 32;
+        private const int PanelRadius = 10;
+
+        /// <summary>
+        /// How far a point lies outside a rounded rectangle filling the texture: negative
+        /// inside, zero on the outline, positive outside. Working from a distance rather
+        /// than an inside or outside test is what lets both the panel and its border come
+        /// out with smooth corners instead of a staircase.
+        /// </summary>
+        private static float RoundedDistance(int x, int y, int size, int radius)
+        {
+            var half = size * 0.5f;
+            var dx = Mathf.Abs(x + 0.5f - half) - (half - radius);
+            var dy = Mathf.Abs(y + 0.5f - half) - (half - radius);
+            var outside = new Vector2(Mathf.Max(dx, 0f), Mathf.Max(dy, 0f)).magnitude;
+            var inside = Mathf.Min(Mathf.Max(dx, dy), 0f);
+            return outside + inside - radius;
+        }
+
         private static Sprite CreateRoundedSprite(Color fill)
         {
-            const int size = 32;
-            const int radius = 10;
-            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            var texture = new Texture2D(PanelSize, PanelSize, TextureFormat.RGBA32, false);
 
-            for (var y = 0; y < size; y++)
+            for (var y = 0; y < PanelSize; y++)
             {
-                for (var x = 0; x < size; x++)
+                for (var x = 0; x < PanelSize; x++)
                 {
-                    var inside = true;
-                    if (x < radius && y < radius)
-                        inside = InCorner(x, y, radius, radius, radius);
-                    else if (x >= size - radius && y < radius)
-                        inside = InCorner(x, y, size - radius - 1, radius, radius);
-                    else if (x < radius && y >= size - radius)
-                        inside = InCorner(x, y, radius, size - radius - 1, radius);
-                    else if (x >= size - radius && y >= size - radius)
-                        inside = InCorner(x, y, size - radius - 1, size - radius - 1, radius);
-
-                    texture.SetPixel(x, y, inside ? fill : Color.clear);
+                    var distance = RoundedDistance(x, y, PanelSize, PanelRadius);
+                    //one pixel of falloff across the edge, which is what takes the jaggies
+                    //off the corners at the size these panels are actually drawn
+                    var alpha = Mathf.Clamp01(0.5f - distance);
+                    texture.SetPixel(x, y, new Color(fill.r, fill.g, fill.b, fill.a * alpha));
                 }
             }
 
             texture.Apply();
-            return Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100,
+            return Sprite.Create(texture, new Rect(0, 0, PanelSize, PanelSize), new Vector2(0.5f, 0.5f), 100,
                 0, SpriteMeshType.FullRect, new Vector4(12, 12, 12, 12));
         }
 
-        private static bool InCorner(int x, int y, int cx, int cy, int radius)
+        private static Sprite outlineSprite;
+
+        /// <summary>
+        /// The same rounded rectangle drawn as an outline with nothing in the middle, so
+        /// it can be laid over a panel to give it an edge without a second panel behind.
+        /// </summary>
+        public static Sprite OutlineSprite
         {
-            var dx = x - cx;
-            var dy = y - cy;
-            return dx * dx + dy * dy <= radius * radius;
+            get
+            {
+                if (outlineSprite == null)
+                    outlineSprite = CreateOutlineSprite();
+                return outlineSprite;
+            }
+        }
+
+        private static Sprite CreateOutlineSprite()
+        {
+            const float thickness = 2f;
+            var texture = new Texture2D(PanelSize, PanelSize, TextureFormat.RGBA32, false);
+
+            for (var y = 0; y < PanelSize; y++)
+            {
+                for (var x = 0; x < PanelSize; x++)
+                {
+                    var distance = RoundedDistance(x, y, PanelSize, PanelRadius);
+                    //the stroke runs just inside the outline rather than centred on it, so
+                    //it never creeps past the edge of the panel it is edging. Distance is
+                    //measured from the middle of that band and faded over half a pixel
+                    //either side, which is what keeps the corners smooth.
+                    var fromBand = Mathf.Abs(distance + thickness * 0.5f);
+                    var alpha = Mathf.Clamp01(thickness * 0.5f - fromBand + 0.5f);
+                    texture.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
+                }
+            }
+
+            texture.Apply();
+            return Sprite.Create(texture, new Rect(0, 0, PanelSize, PanelSize), new Vector2(0.5f, 0.5f), 100,
+                0, SpriteMeshType.FullRect, new Vector4(12, 12, 12, 12));
+        }
+
+        /// <summary>
+        /// Lays a hairline edge over a panel. It goes in last so window content cannot
+        /// paint over the stroke, and it never takes pointer input, so a border across a
+        /// button does not stop the button being pressed.
+        /// </summary>
+        public static Image AddBorder(RectTransform target, Color color)
+        {
+            if (target == null || target.Find("ModernBorder") != null)
+                return null;
+
+            var go = new GameObject("ModernBorder", typeof(Image));
+            go.transform.SetParent(target, false);
+            go.transform.SetAsLastSibling();
+
+            var image = go.GetComponent<Image>();
+            image.sprite = OutlineSprite;
+            image.type = Image.Type.Sliced;
+            image.color = color;
+            image.raycastTarget = false;
+
+            Stretch((RectTransform)go.transform, 0, 0, 0, 0);
+            return image;
         }
     }
 }

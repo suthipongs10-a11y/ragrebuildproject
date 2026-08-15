@@ -19,6 +19,8 @@ namespace Assets.Scripts.UI.Hud
         private const float SearchInterval = 0.5f;
 
         private float searchTimer;
+        private Image minimapFrame;
+        private Image minimapImage;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -52,6 +54,59 @@ namespace Assets.Scripts.UI.Hud
             var minimap = MinimapController.Instance;
             if (minimap != null && !ModernUiTheme.IsSkinned(minimap.gameObject))
                 SkinMinimap(minimap);
+            SyncMinimapFrame();
+
+            var details = FindFirstObjectByType<CharacterDetailBox>(FindObjectsInactive.Include);
+            if (details != null && !ModernUiTheme.IsSkinned(details.gameObject))
+                SkinCharacterDetails(details);
+        }
+
+        /// <summary>
+        /// The name, level, health and weight readout in the top corner is drawn straight
+        /// onto the world, so how legible it is depends entirely on what the player happens
+        /// to be standing in front of. A panel of its own behind it fixes that, and is what
+        /// the rest of the interface already does.
+        /// </summary>
+        private static void SkinCharacterDetails(CharacterDetailBox box)
+        {
+            var root = box.transform as RectTransform;
+            if (root == null)
+            {
+                ModernUiTheme.MarkSkinned(box.gameObject);
+                return;
+            }
+
+            //A rect reporting almost nothing has not been through a layout pass yet, so
+            //this leaves it unclaimed and comes back to it. Marking first and measuring
+            //second would have written the readout off for the rest of the session.
+            var size = root.rect.size;
+            if (size.x < 40f || size.y < 40f)
+                return;
+
+            ModernUiTheme.MarkSkinned(box.gameObject);
+
+            //a readout is a few hundred points across; anything much larger is not the
+            //readout but something stretched over the whole screen, and a panel behind
+            //that would black the game out
+            if (size.x > 720f || size.y > 480f)
+                return;
+
+            if (root.Find("ModernDetailsCard") == null)
+            {
+                var card = ModernUiTheme.CreateCard(root, "ModernDetailsCard", ModernUiTheme.PanelOverlayColor, true);
+                ModernUiTheme.Stretch(card, -12, -10, 12, 10);
+                card.GetComponent<Image>().raycastTarget = false;
+                card.SetAsFirstSibling();
+            }
+
+            //the bars keep their own colours, they are saying how much health is left
+            foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
+            {
+                text.color = ModernUiTheme.NameColor;
+                text.extraPadding = true;
+            }
+
+            Debug.Log("[ModernHudSkin] Backed the character readout with a panel.");
         }
 
         private static void SkinDialog(DialogWindow win)
@@ -134,7 +189,7 @@ namespace Assets.Scripts.UI.Hud
             }
         }
 
-        private static void SkinMinimap(MinimapController map)
+        private void SkinMinimap(MinimapController map)
         {
             ModernUiTheme.MarkSkinned(map.gameObject);
 
@@ -144,19 +199,48 @@ namespace Assets.Scripts.UI.Hud
             if (root == null)
                 return;
 
-            //a soft plate a few pixels proud of the map on every side, which reads as a
-            //frame without anything having to be measured or moved
-            if (root.Find("ModernMinimapFrame") == null)
+            //An outline rather than a filled plate. A filled one was a mistake: on a map
+            //with no minimap image rendered for it yet the picture is simply absent, and
+            //the plate meant for the back of it became a large blue rectangle sitting over
+            //the corner of the screen with nothing in it.
+            var existing = root.Find("ModernMinimapFrame");
+            if (existing != null)
             {
-                var frame = ModernUiTheme.CreateCard(root, "ModernMinimapFrame", ModernUiTheme.CardDeepColor);
-                ModernUiTheme.Stretch(frame, -6, -6, 6, 6);
-                frame.GetComponent<Image>().raycastTarget = false;
-                frame.SetAsFirstSibling();
+                minimapFrame = existing.GetComponent<Image>();
+            }
+            else
+            {
+                var go = new GameObject("ModernMinimapFrame", typeof(Image));
+                go.transform.SetParent(root, false);
+
+                minimapFrame = go.GetComponent<Image>();
+                minimapFrame.sprite = ModernUiTheme.OutlineSprite;
+                minimapFrame.type = Image.Type.Sliced;
+                minimapFrame.color = ModernUiTheme.AccentColor;
+                minimapFrame.raycastTarget = false;
+
+                ModernUiTheme.Stretch((RectTransform)go.transform, -3, -3, 3, 3);
             }
 
+            minimapImage = map.MapImage;
             ModernUiTheme.StyleSliders(root);
 
             Debug.Log("[ModernHudSkin] Framed the minimap.");
+        }
+
+        /// <summary>
+        /// Hides the frame whenever there is no map behind it. Which map has a picture
+        /// depends on what has been rendered by the lighting tool, and it changes on every
+        /// warp, so this is checked on the same beat as everything else rather than once.
+        /// </summary>
+        private void SyncMinimapFrame()
+        {
+            if (minimapFrame == null)
+                return;
+
+            var hasMap = minimapImage != null && minimapImage.sprite != null && minimapImage.enabled;
+            if (minimapFrame.enabled != hasMap)
+                minimapFrame.enabled = hasMap;
         }
     }
 }

@@ -29,7 +29,9 @@ namespace Assets.Scripts.UI
             { "Emote", "อีโมชั่น" },
             { "Config", "ตั้งค่า" },
             { "Options", "ตั้งค่า" },
-            { "Help", "ช่วยเหลือ" },
+            //the buttons along the bottom of the screen are a fixed width sized for the
+            //English, and the longer Thai for help was being clipped mid word
+            { "Help", "คู่มือ" },
             { "Database", "ฐานข้อมูล" },
             { "Menu", "เมนู" },
             { "Cart", "รถเข็น" },
@@ -154,6 +156,10 @@ namespace Assets.Scripts.UI
             { "Login", "เข้าสู่ระบบ" },
             { "Log In", "เข้าสู่ระบบ" },
             { "Register", "สมัครสมาชิก" },
+            { "Create New", "สมัครใหม่" },
+            { "Server Settings", "ตั้งค่าเซิร์ฟเวอร์" },
+            { "Remember password", "จำรหัสผ่าน" },
+            { "Remember Password", "จำรหัสผ่าน" },
             { "Server", "เซิร์ฟเวอร์" },
             { "Username", "ชื่อผู้ใช้" },
             { "Password", "รหัสผ่าน" },
