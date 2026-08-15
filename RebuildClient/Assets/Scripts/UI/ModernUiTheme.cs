@@ -515,9 +515,12 @@ namespace Assets.Scripts.UI
             var textLeft = 24f;
             if (icon != null)
             {
+                //Lined up with the title rather than centred in the band. The band is not
+                //always the same height, and at 38 tall from 18 down the badge ran past
+                //the foot of a short one and sat on the rule.
                 var badge = CreateCard(bar, "Icon", AccentColor);
-                Place(badge, new Vector2(0, 1), new Vector2(22, -18), new Vector2(38, 38));
-                CreateIcon(badge, icon, AccentTextColor, 22);
+                Place(badge, new Vector2(0, 1), new Vector2(22, -12), new Vector2(34, 34));
+                CreateIcon(badge, icon, AccentTextColor, 20);
                 textLeft = 72f;
             }
 
@@ -651,7 +654,7 @@ namespace Assets.Scripts.UI
             if (tabs == null || tabs.Count == 0)
                 return;
 
-            var group = new TabGroup { Tabs = tabs };
+            var group = new TabGroup { Tabs = tabs, Borders = new Image[tabs.Count] };
             for (var i = 0; i < tabs.Count; i++)
             {
                 var tab = tabs[i];
@@ -665,6 +668,12 @@ namespace Assets.Scripts.UI
                     image.type = Image.Type.Sliced;
                 }
 
+                //an idle tab in the tab tone is barely a step from the panel behind it, so
+                //it carries an edge as well; without one a tab waiting to be pressed is
+                //not visibly a thing that can be pressed
+                group.Borders[i] = AddBorder((RectTransform)tab.transform, CardBorderColor)
+                                   ?? tab.transform.Find("ModernBorder")?.GetComponent<Image>();
+
                 var index = i;
                 tab.onClick.AddListener(() => group.SetActive(index));
             }
@@ -675,6 +684,7 @@ namespace Assets.Scripts.UI
         private class TabGroup
         {
             public System.Collections.Generic.IList<Button> Tabs;
+            public Image[] Borders;
 
             public void SetActive(int active)
             {
@@ -687,7 +697,10 @@ namespace Assets.Scripts.UI
                     var isActive = i == active;
                     var image = tab.GetComponent<Image>();
                     if (image != null)
-                        image.color = isActive ? AccentColor : TabIdleColor;
+                        image.color = isActive ? AccentColor : CardColor;
+
+                    if (Borders != null && i < Borders.Length && Borders[i] != null)
+                        Borders[i].color = isActive ? AccentColor : CardBorderColor;
 
                     foreach (var label in tab.GetComponentsInChildren<TextMeshProUGUI>(true))
                     {

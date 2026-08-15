@@ -100,10 +100,14 @@ namespace Assets.Scripts.UI
             //                                       .Replace("{Description}","A skill.");
 
             var rect = (RectTransform)transform;
-            
-            var x = rect.sizeDelta.x;
-            if (rect.position.x + (rect.sizeDelta.x + tooltipWidth) * rect.lossyScale.x > Screen.width)
-                x = -TooltipBox.sizeDelta.x;
+
+            //Measured from the window's actual edges rather than from its size alone. The
+            //two only agree while the pivot is the left edge, and this window is centred
+            //while it is a tab of the character hub, which put the tooltip a half width
+            //out from where it belonged and, on the flipped side, straight over the list.
+            var x = rect.rect.xMax + 8f;
+            if (rect.position.x + (x + tooltipWidth) * rect.lossyScale.x > Screen.width)
+                x = rect.rect.xMin - tooltipWidth - 8f;
             // Debug.Log($"{entry.transform.localPosition.y} - 60 + {SkillContainer.localPosition.y}");
             var y = entry.transform.localPosition.y - 60 + SkillContainer.localPosition.y;
 

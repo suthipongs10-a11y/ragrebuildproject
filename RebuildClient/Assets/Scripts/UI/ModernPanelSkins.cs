@@ -48,9 +48,6 @@ namespace Assets.Scripts.UI
             if (ui == null)
                 return;
 
-            if (ui.InventoryWindow != null && !ModernUiTheme.IsSkinned(ui.InventoryWindow.gameObject))
-                SkinInventory(ui.InventoryWindow);
-
             if (ui.SkillManager != null && !ModernUiTheme.IsSkinned(ui.SkillManager.gameObject))
                 SkinSkills(ui.SkillManager);
 
@@ -81,45 +78,6 @@ namespace Assets.Scripts.UI
             sweepTimer = SweepInterval;
 
             SweepRemainingWindows(ui);
-        }
-
-        private static void SkinInventory(PlayerInventoryWindow win)
-        {
-            ModernUiTheme.MarkSkinned(win.gameObject);
-
-            ModernUiTheme.ApplyWindowChrome(win, ModernUiIcons.Bag);
-            ModernUiTheme.AttachShadow((RectTransform)win.transform);
-
-            if (win.WeightText != null)
-                win.WeightText.color = ModernUiTheme.NameColor;
-
-            ModernUiTheme.StyleTabBar(win.UiTabButtons);
-
-            //the scroll area behind the item grid becomes a soft gray card
-            if (win.ViewBoxTransform != null)
-            {
-                var viewImage = win.ViewBoxTransform.GetComponent<Image>();
-                if (viewImage != null)
-                {
-                    viewImage.sprite = ModernUiTheme.RoundedSprite;
-                    viewImage.type = Image.Type.Sliced;
-                    viewImage.color = ModernUiTheme.CardDeepColor;
-                }
-            }
-
-            //item counts spawn from this template, darken them once and every
-            //future entry inherits it. Existing entries get the same treatment.
-            if (win.ItemEntryPrefab != null)
-                ModernUiTheme.RepaintInk(win.ItemEntryPrefab.transform);
-            if (win.ItemBoxRoot != null)
-                ModernUiTheme.RepaintInk(win.ItemBoxRoot);
-
-            ModernUiTheme.StyleScrollViews(win.transform);
-            ModernUiTheme.RepaintInk(win.transform);
-            ModernUiTheme.RecolorAccents(win.transform);
-            ThaiUiText.Apply(win.transform);
-
-            Debug.Log("[ModernPanelSkins] Retinted the inventory window.");
         }
 
         private static void SkinSkills(SkillWindow win)
@@ -155,6 +113,18 @@ namespace Assets.Scripts.UI
                     tipImage.type = Image.Type.Sliced;
                     tipImage.color = ModernUiTheme.WindowColor;
                 }
+
+                ModernUiTheme.AddBorder(win.TooltipBox, ModernUiTheme.CardBorderColor);
+                ModernUiTheme.AttachShadow(win.TooltipBox, 10f);
+
+                //The tooltip must never take the pointer. It grows to fit the description,
+                //and a long one grew far enough to cover the row being hovered: the row
+                //lost the pointer, hid the tooltip, got the pointer back, showed it again,
+                //once per frame. That loop is what read as flickering, and it only ever
+                //happened on the long descriptions because the short ones stayed clear of
+                //the cursor.
+                foreach (var graphic in win.TooltipBox.GetComponentsInChildren<Graphic>(true))
+                    graphic.raycastTarget = false;
             }
 
             if (win.TooltipText != null)

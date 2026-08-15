@@ -159,7 +159,7 @@ namespace Assets.Scripts.UI.Inventory
             var countText = bagItems.Count < 190 ? $"{bagItems.Count}/200" : $"<color=red>{bagItems.Count}</color>/200";
             var percentText = weightPercent < 90 ? $"{weightPercent}%" : $"<color=red>{weightPercent}%</color>";
             
-            WeightText.text = $"Items: {countText}  Weight: {curWeight}/{totalWeight} ({percentText})";
+            WeightText.text = $"ไอเทม {countText}     น้ำหนัก {curWeight}/{totalWeight} ({percentText})";
             
             foreach (var bagEntry in bagItems)
             {
