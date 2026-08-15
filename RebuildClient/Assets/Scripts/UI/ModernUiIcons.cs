@@ -59,6 +59,7 @@ namespace Assets.Scripts.UI
         public static Sprite Refresh => Get("Refresh", RefreshShape);
         public static Sprite Grid => Get("Grid", GridShape);
         public static Sprite Exit => Get("Exit", ExitShape);
+        public static Sprite Magnifier => Get("Magnifier", MagnifierShape);
 
         private static Sprite Get(string name, Func<Vector2, float> shape)
         {
@@ -271,6 +272,13 @@ namespace Assets.Scripts.UI
             var shaft = Box(p, new Vector2(0.37f, 0.58f), new Vector2(0.15f, 0.30f), 0.05f);
             var foot = Box(p, new Vector2(0.53f, 0.26f), new Vector2(0.31f, 0.14f), 0.06f);
             return Mathf.Min(shaft, foot);
+        }
+
+        private static float MagnifierShape(Vector2 p)
+        {
+            var lens = RingBand(p, new Vector2(0.43f, 0.57f), 0.235f, 0.055f);
+            var handle = Segment(p, new Vector2(0.60f, 0.40f), new Vector2(0.80f, 0.20f), 0.055f);
+            return Mathf.Min(lens, handle);
         }
 
         private static float RingShape(Vector2 p)

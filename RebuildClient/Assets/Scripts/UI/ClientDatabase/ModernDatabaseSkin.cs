@@ -77,11 +77,7 @@ namespace Assets.Scripts.UI.ClientDatabase
                 ModernUiTheme.AttachShadow(root);
             }
 
-            StyleTab(win.monstersTabImage);
-            StyleTab(win.itemsTabImage);
-            StyleTab(win.mapsTabImage);
-            StyleTab(win.helpTabImage);
-            StyleTab(win.npcsTabImage);
+            BuildRail(win);
 
             StyleSearch(win.monsterSearchField, win.monsterSearchGhost);
             StyleSearch(win.itemSearchField, win.itemSearchGhost);
@@ -139,20 +135,92 @@ namespace Assets.Scripts.UI.ClientDatabase
             Debug.Log("[ModernDatabaseSkin] Retinted the database window.");
         }
 
-        private static void StyleTab(Image tab)
+        private const float RailWidth = 152f;
+        private const float RailRow = 44f;
+        private const float RailGap = 8f;
+        private const float RailTop = 66f;
+        private const float RailInset = 12f;
+
+        /// <summary>
+        /// Moves the five tabs from a row along the top into a rail down the left side.
+        ///
+        /// Five tabs in a row is what pushed this window's header into a strip of tiny
+        /// evenly-squeezed buttons; down the side each gets its full name and an icon, and
+        /// the reading pane gets the whole width back. Each tab keeps its own image and
+        /// button, so ShowTab still colours them and still switches the panes; they are
+        /// only reparented onto the panel so their positions can be set from one place.
+        /// </summary>
+        private static void BuildRail(ClientDatabaseWindow win)
         {
-            if (tab == null)
+            var panel = win.panelRT;
+            if (panel == null)
                 return;
 
-            //the colour is driven by ShowTab, this only replaces the shape underneath it
-            tab.sprite = ModernUiTheme.RoundedSprite;
-            tab.type = Image.Type.Sliced;
-
-            foreach (var label in tab.GetComponentsInChildren<TextMeshProUGUI>(true))
+            var tabs = new[]
             {
-                label.fontSize = ModernUiTheme.SizeLabel;
-                label.fontStyle = FontStyles.Bold;
-                label.extraPadding = true;
+                win.monstersTabImage, win.itemsTabImage, win.mapsTabImage,
+                win.npcsTabImage, win.helpTabImage
+            };
+            var icons = new[]
+            {
+                ModernUiIcons.Smile, ModernUiIcons.Bag, ModernUiIcons.Grid,
+                ModernUiIcons.Person, ModernUiIcons.Book
+            };
+            var panes = new[]
+            {
+                win.monstersContainer, win.itemsContainer, win.mapsContainer,
+                win.npcsContainer, win.helpContainer
+            };
+
+            var row = 0;
+            for (var i = 0; i < tabs.Length; i++)
+            {
+                var tab = tabs[i];
+                if (tab == null)
+                    continue;
+
+                tab.sprite = ModernUiTheme.RoundedSprite;
+                tab.type = Image.Type.Sliced;
+
+                var rect = (RectTransform)tab.transform;
+                rect.SetParent(panel, false);
+                rect.localScale = Vector3.one;
+                ModernUiTheme.Place(rect, new Vector2(0, 1),
+                    new Vector2(RailInset, -(RailTop + row * (RailRow + RailGap))),
+                    new Vector2(RailWidth, RailRow));
+
+                if (rect.Find("ModernRailIcon") == null)
+                {
+                    var glyph = ModernUiTheme.CreateIcon(rect, icons[i], ModernUiTheme.AccentInkColor, 18);
+                    glyph.gameObject.name = "ModernRailIcon";
+                    ModernUiTheme.Place(glyph.rectTransform, new Vector2(0, 0.5f), new Vector2(13f, 0f),
+                        new Vector2(18f, 18f));
+                }
+
+                foreach (var label in tab.GetComponentsInChildren<TextMeshProUGUI>(true))
+                {
+                    label.fontSize = ModernUiTheme.SizeLabel;
+                    label.fontStyle = FontStyles.Bold;
+                    label.alignment = TextAlignmentOptions.Left;
+                    label.extraPadding = true;
+                    ModernUiTheme.Stretch(label.rectTransform, 40f, 0f, -8f, 0f);
+                }
+
+                row++;
+            }
+
+            //the panes give up the strip the rail now occupies. Only a pane that spans its
+            //parent is touched: on one pinned to a corner an inset would be meaningless.
+            foreach (var pane in panes)
+            {
+                if (pane == null)
+                    continue;
+
+                var rect = pane.transform as RectTransform;
+                if (rect == null || rect.anchorMin.x > 0.1f || rect.anchorMax.x < 0.9f)
+                    continue;
+
+                rect.offsetMin = new Vector2(RailWidth + RailInset * 2f, rect.offsetMin.y);
             }
         }
 

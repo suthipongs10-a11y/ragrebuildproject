@@ -329,9 +329,11 @@ namespace Assets.Scripts.UI.Inventory
                 win.WeightFill = fill;
             }
 
-            //an empty container left behind once the readout moved out of it
+            //ItemCounts is not a container around the readout, it is the readout: the
+            //text component sits on that very object. Switching it off after moving it
+            //is what made the weight line disappear from the footer entirely.
             var counts = root.Find("ItemCounts");
-            if (counts != null)
+            if (counts != null && (win.WeightText == null || counts != win.WeightText.transform))
                 counts.gameObject.SetActive(false);
 
             if (win.CartButton != null)

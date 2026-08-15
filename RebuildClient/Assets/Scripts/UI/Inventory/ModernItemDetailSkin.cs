@@ -120,20 +120,31 @@ namespace Assets.Scripts.UI.Inventory
 
             if (win.ShowIllustrationButton != null)
             {
+                //This opens the card's full illustration, so it wants to read as a
+                //magnifier. Painted as a plain accent square it was a blue tile in the
+                //corner of the card with nothing to say what it did.
                 var image = win.ShowIllustrationButton.GetComponent<Image>();
                 if (image != null)
                 {
                     image.sprite = ModernUiTheme.RoundedSprite;
                     image.type = Image.Type.Sliced;
-                    image.color = ModernUiTheme.AccentColor;
+                    image.color = ModernUiTheme.CardColor;
                 }
 
-                foreach (var label in win.ShowIllustrationButton.GetComponentsInChildren<TextMeshProUGUI>(true))
+                var button = (RectTransform)win.ShowIllustrationButton.transform;
+                ModernUiTheme.AddBorder(button, ModernUiTheme.CardBorderColor);
+
+                if (button.Find("ModernGlass") == null)
                 {
-                    label.color = ModernUiTheme.AccentTextColor;
-                    label.fontStyle = FontStyles.Bold;
-                    label.extraPadding = true;
+                    var glass = ModernUiTheme.CreateIcon(button, ModernUiIcons.Magnifier,
+                        ModernUiTheme.AccentInkColor, 17);
+                    glass.gameObject.name = "ModernGlass";
                 }
+
+                //the button carries no wording of its own, and any it had would sit under
+                //the glass
+                foreach (var label in win.ShowIllustrationButton.GetComponentsInChildren<TextMeshProUGUI>(true))
+                    label.gameObject.SetActive(false);
             }
 
             ModernUiTheme.StyleScrollViews(root);

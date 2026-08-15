@@ -295,6 +295,7 @@ namespace Assets.Scripts.UI
 
             ModernUiTheme.ApplyWindowChrome(win, ModernUiIcons.Gear);
             ModernUiTheme.AttachShadow((RectTransform)win.transform);
+            SpreadTabs((RectTransform)win.transform, win.TabButtons);
             ModernUiTheme.StyleTabBar(win.TabButtons);
             ModernUiTheme.RepaintInk(win.transform);
             ModernUiTheme.RecolorAccents(win.transform);
@@ -338,6 +339,65 @@ namespace Assets.Scripts.UI
                 //and below the line without the text touching the row on either side
                 text.fontSize = Mathf.Clamp(height * 0.62f, 10f, ModernUiTheme.SizeBody);
             }
+        }
+
+        /// <summary>
+        /// Divides the tab strip evenly between the tabs that are actually showing.
+        ///
+        /// The strip is laid out by a group with a cell size written for the wording it
+        /// originally had, so the filled tab was wider than the tab it was filling and the
+        /// row packed to the left with a gap along the right. Sizing the cell from the
+        /// window and from how many tabs are switched on gets both right at once, and
+        /// keeps working when a tab is hidden.
+        /// </summary>
+        private static void SpreadTabs(RectTransform window, System.Collections.Generic.IList<Button> tabs)
+        {
+            if (tabs == null || tabs.Count == 0 || tabs[0] == null)
+                return;
+
+            var strip = tabs[0].transform.parent as RectTransform;
+            if (strip == null)
+                return;
+
+            var visible = 0;
+            foreach (var tab in tabs)
+            {
+                if (tab != null && tab.gameObject.activeSelf)
+                    visible++;
+            }
+
+            if (visible == 0)
+                return;
+
+            const float gap = 6f;
+            const float inset = 10f;
+            var width = window.rect.width - inset * 2f;
+
+            //only the horizontal offsets are touched; the strip's own height and where it
+            //sits under the header are the window's business
+            strip.offsetMin = new Vector2(inset, strip.offsetMin.y);
+            strip.offsetMax = new Vector2(-inset, strip.offsetMax.y);
+
+            var grid = strip.GetComponent<GridLayoutGroup>();
+            if (grid != null)
+            {
+                grid.startAxis = GridLayoutGroup.Axis.Horizontal;
+                grid.constraint = GridLayoutGroup.Constraint.FixedRowCount;
+                grid.constraintCount = 1;
+                grid.padding = new RectOffset(0, 0, 0, 0);
+                grid.spacing = new Vector2(gap, 0);
+                grid.cellSize = new Vector2((width - gap * (visible - 1)) / visible, grid.cellSize.y);
+                return;
+            }
+
+            var row = strip.GetComponent<HorizontalLayoutGroup>();
+            if (row == null)
+                return;
+
+            row.padding = new RectOffset(0, 0, 0, 0);
+            row.spacing = gap;
+            row.childForceExpandWidth = true;
+            row.childControlWidth = true;
         }
 
         private static void SkinEmotes(EmoteWindow win)
