@@ -122,7 +122,7 @@ namespace Assets.Scripts.UI
         private static float BagShape(Vector2 p)
         {
             var body = Box(p, new Vector2(0.5f, 0.38f), new Vector2(0.32f, 0.26f), 0.09f);
-            var handle = Mathf.Max(Ring(p, new Vector2(0.5f, 0.64f), 0.17f, 0.05f), 0.64f - p.y);
+            var handle = Mathf.Max(RingBand(p, new Vector2(0.5f, 0.64f), 0.17f, 0.05f), 0.64f - p.y);
             return Mathf.Min(body, handle);
         }
 
@@ -149,10 +149,10 @@ namespace Assets.Scripts.UI
 
         private static float SmileShape(Vector2 p)
         {
-            var face = Ring(p, new Vector2(0.5f, 0.5f), 0.36f, 0.055f);
+            var face = RingBand(p, new Vector2(0.5f, 0.5f), 0.36f, 0.055f);
             var eyes = Mathf.Min(Circle(p, new Vector2(0.38f, 0.60f), 0.048f),
                 Circle(p, new Vector2(0.62f, 0.60f), 0.048f));
-            var mouth = Mathf.Max(Ring(p, new Vector2(0.5f, 0.52f), 0.17f, 0.045f), p.y - 0.50f);
+            var mouth = Mathf.Max(RingBand(p, new Vector2(0.5f, 0.52f), 0.17f, 0.045f), p.y - 0.50f);
             return Mathf.Min(Mathf.Min(face, mouth), eyes);
         }
 
@@ -199,7 +199,7 @@ namespace Assets.Scripts.UI
         private static float TargetShape(Vector2 p)
         {
             var center = new Vector2(0.5f, 0.5f);
-            var outer = Ring(p, center, 0.28f, 0.055f);
+            var outer = RingBand(p, center, 0.28f, 0.055f);
             var dot = Circle(p, center, 0.075f);
             var vertical = Mathf.Min(Segment(p, new Vector2(0.5f, 0.72f), new Vector2(0.5f, 0.95f), 0.035f),
                 Segment(p, new Vector2(0.5f, 0.05f), new Vector2(0.5f, 0.28f), 0.035f));
@@ -234,7 +234,7 @@ namespace Assets.Scripts.UI
         private static float CoinShape(Vector2 p)
         {
             var center = new Vector2(0.5f, 0.5f);
-            return Mathf.Min(Ring(p, center, 0.30f, 0.055f), Ring(p, center, 0.155f, 0.045f));
+            return Mathf.Min(RingBand(p, center, 0.30f, 0.055f), RingBand(p, center, 0.155f, 0.045f));
         }
 
         private static float HelmetShape(Vector2 p)
@@ -246,8 +246,8 @@ namespace Assets.Scripts.UI
 
         private static float GlassesShape(Vector2 p)
         {
-            var lenses = Mathf.Min(Ring(p, new Vector2(0.28f, 0.5f), 0.17f, 0.05f),
-                Ring(p, new Vector2(0.72f, 0.5f), 0.17f, 0.05f));
+            var lenses = Mathf.Min(RingBand(p, new Vector2(0.28f, 0.5f), 0.17f, 0.05f),
+                RingBand(p, new Vector2(0.72f, 0.5f), 0.17f, 0.05f));
             var bridge = Segment(p, new Vector2(0.44f, 0.53f), new Vector2(0.56f, 0.53f), 0.032f);
             return Mathf.Min(lenses, bridge);
         }
@@ -275,7 +275,7 @@ namespace Assets.Scripts.UI
 
         private static float RingShape(Vector2 p)
         {
-            var band = Ring(p, new Vector2(0.5f, 0.40f), 0.24f, 0.06f);
+            var band = RingBand(p, new Vector2(0.5f, 0.40f), 0.24f, 0.06f);
             var gem = Convex4(p, new Vector2(0.5f, 0.62f), new Vector2(0.64f, 0.78f), new Vector2(0.5f, 0.94f),
                 new Vector2(0.36f, 0.78f));
             return Mathf.Min(band, gem);
@@ -326,7 +326,7 @@ namespace Assets.Scripts.UI
         {
             var center = new Vector2(0.5f, 0.5f);
             //an open circle: the arc is cut away where the arrow head takes over
-            var arc = Mathf.Max(Ring(p, center, 0.28f, 0.065f),
+            var arc = Mathf.Max(RingBand(p, center, 0.28f, 0.065f),
                 -Box(p, new Vector2(0.80f, 0.74f), new Vector2(0.28f, 0.24f), 0f));
             var head = Convex3(p, new Vector2(0.74f, 0.56f), new Vector2(0.94f, 0.78f), new Vector2(0.62f, 0.88f));
             return Mathf.Min(arc, head);
@@ -365,7 +365,7 @@ namespace Assets.Scripts.UI
             return (p - center).magnitude - radius;
         }
 
-        private static float Ring(Vector2 p, Vector2 center, float radius, float thickness)
+        private static float RingBand(Vector2 p, Vector2 center, float radius, float thickness)
         {
             return Mathf.Abs(Circle(p, center, radius)) - thickness;
         }
