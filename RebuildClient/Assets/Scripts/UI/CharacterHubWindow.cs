@@ -33,6 +33,7 @@ namespace Assets.Scripts.UI
 
         private readonly List<WindowBase> pages = new List<WindowBase>();
         private readonly List<Button> tabs = new List<Button>();
+        private readonly List<Image> tabBorders = new List<Image>();
         private readonly List<Vector2> pageSizes = new List<Vector2>();
 
         private RectTransform content;
@@ -112,9 +113,13 @@ namespace Assets.Scripts.UI
             pages.Add(window);
             pageSizes.Add(new Vector2(size.x, Mathf.Max(size.y - trim, 120f)));
 
+            //Not TabIdleColor: against this window's panel that sits at 1.06 to 1, which
+            //is to say invisible. A tab waiting to be pressed has to look like something
+            //that can be pressed, so it takes the card tone and an edge of its own.
             var tab = ModernUiTheme.CreateButton(transform, "Tab" + index, label,
-                ModernUiTheme.TabIdleColor, ModernUiTheme.NameColor, ModernUiTheme.SizeLabel);
+                ModernUiTheme.CardColor, ModernUiTheme.NameColor, ModernUiTheme.SizeLabel);
             tabs.Add(tab);
+            tabBorders.Add(ModernUiTheme.AddBorder((RectTransform)tab.transform, ModernUiTheme.CardBorderColor));
             tab.onClick.AddListener(() => Show(index));
 
             if (icon != null)
@@ -131,7 +136,7 @@ namespace Assets.Scripts.UI
             }
 
             window.gameObject.SetActive(false);
-            ResizeTo(0);
+            ResizeToLargest();
         }
 
         /// <summary>
@@ -196,20 +201,26 @@ namespace Assets.Scripts.UI
         }
 
         /// <summary>
-        /// Sizes the window to the page being shown. Sizing it to the largest page instead
-        /// kept every tab as tall as the tallest, which put a band of empty panel under the
-        /// short ones and pushed the window off the bottom of the screen. The window is
-        /// pinned by its top left corner, so growing and shrinking moves only its lower
-        /// edge and the tabs stay under the pointer.
+        /// Sizes the window once, to the largest page it holds, and leaves it there.
+        ///
+        /// Sizing it to whichever tab was open made the frame resize on every click, and a
+        /// frame that changes shape underneath you reads as three windows taking turns
+        /// rather than as one window with three tabs, which is the whole point of it. A
+        /// fixed frame with the contents changing inside is what makes it one thing.
         /// </summary>
-        private void ResizeTo(int index)
+        private void ResizeToLargest()
         {
-            if (index < 0 || index >= pageSizes.Count)
-                return;
+            var widest = 360f;
+            var tallest = 320f;
 
-            var page = pageSizes[index];
-            var width = page.x + Padding * 2f;
-            var height = page.y + HeaderHeight + TabHeight + TabGap + Padding;
+            foreach (var page in pageSizes)
+            {
+                widest = Mathf.Max(widest, page.x);
+                tallest = Mathf.Max(tallest, page.y);
+            }
+
+            var width = widest + Padding * 2f;
+            var height = tallest + HeaderHeight + TabHeight + TabGap + Padding;
 
             //never taller than what it is being drawn into, whatever a page asks for
             var container = transform.parent as RectTransform;
@@ -232,7 +243,6 @@ namespace Assets.Scripts.UI
                 return;
 
             current = index;
-            ResizeTo(index);
 
             //Shown and hidden through the window's own methods rather than by switching
             //the object, so that the escape stack stays true. Escape closes whatever is
@@ -269,7 +279,12 @@ namespace Assets.Scripts.UI
                 var active = i == current;
                 var image = tabs[i].GetComponent<Image>();
                 if (image != null)
-                    image.color = active ? ModernUiTheme.AccentColor : ModernUiTheme.TabIdleColor;
+                    image.color = active ? ModernUiTheme.AccentColor : ModernUiTheme.CardColor;
+
+                //the edge is there to define an idle tab; on the filled one it would only
+                //draw a line around a colour that already stands out
+                if (i < tabBorders.Count && tabBorders[i] != null)
+                    tabBorders[i].color = active ? ModernUiTheme.AccentColor : ModernUiTheme.CardBorderColor;
 
                 var ink = active ? ModernUiTheme.AccentTextColor : ModernUiTheme.NameColor;
                 foreach (var label in tabs[i].GetComponentsInChildren<TextMeshProUGUI>(true))

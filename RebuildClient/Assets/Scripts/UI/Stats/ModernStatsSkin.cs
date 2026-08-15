@@ -14,7 +14,9 @@ namespace Assets.Scripts.UI.Stats
     /// </summary>
     public class ModernStatsSkin : MonoBehaviour
     {
-        private const float WindowWidth = 460f;
+        //wide enough for the Thai attribute names to sit on one line beside their
+        //numbers; at 460 the longest of them wrapped and pushed its row out of the card
+        private const float WindowWidth = 600f;
         private const float WindowHeight = 704f;
         private const float Margin = 20f;
         private const float TopOffset = 116f;
@@ -192,11 +194,13 @@ namespace Assets.Scripts.UI.Stats
 
                 var label = ModernUiTheme.CreateText(attrCard, $"AttrLabel{i}", ThaiUiText.Get(AttributeNames[i]),
                     ModernUiTheme.SizeLabel, ModernUiTheme.LabelColor, TextAlignmentOptions.Left);
-                ModernUiTheme.Place((RectTransform)label.transform, new Vector2(0, 1), new Vector2(x + 21, y), new Vector2(70, 24));
+                //110 rather than 70: the widest of these reads accuracy in Thai, which is
+                //ten letters where the English was three
+                ModernUiTheme.Place((RectTransform)label.transform, new Vector2(0, 1), new Vector2(x + 21, y), new Vector2(110, 24));
 
                 var value = ModernUiTheme.CreateText(attrCard, $"AttrValue{i}", "", ModernUiTheme.SizeBody,
                     ModernUiTheme.NameColor, TextAlignmentOptions.Right, FontStyles.Bold);
-                ModernUiTheme.Place((RectTransform)value.transform, new Vector2(0, 1), new Vector2(x + 87, y), new Vector2(halfWidth - 117, 24));
+                ModernUiTheme.Place((RectTransform)value.transform, new Vector2(0, 1), new Vector2(x + 131, y), new Vector2(halfWidth - 161, 24));
 
                 attrTexts.Add(value);
             }
