@@ -5,32 +5,46 @@ using UnityEngine.UI;
 namespace Assets.Scripts.UI.Inventory
 {
     /// <summary>
-    /// Rebuilds the bag around the window's own machinery rather than replacing it.
+    /// Rebuilds the bag: the grid on the left, a rail of tabs down the right, and a
+    /// footer carrying the weight as a bar rather than as a number in brackets.
     ///
-    /// The item grid is laid out by a flexible GridLayoutGroup, so the columns follow
-    /// whatever width the view is given and the window's code, which only ever hands
-    /// entries to that group, does not need to know the window changed shape. The tab
-    /// strip is laid out by a second one, which is what lets the tabs move from a column
-    /// down the left side to a row across the top by resizing a rect.
+    /// The tabs are new buttons calling the window's own ClickTabButton, and the strip
+    /// the prefab came with is switched off. That is not for looks: ClickTabButton sets
+    /// the position of each of the original buttons itself, sliding the selected one out
+    /// by six points, so any layout given to them is overwritten on the next click. The
+    /// window's own buttons stay alive and hidden, so everything that method touches is
+    /// still there to touch.
     ///
     /// Nothing that carries or receives a drag is moved: the drop zone, the entry
-    /// template and the entries themselves are left exactly where the window puts them.
+    /// template and the entries themselves stay exactly where the window puts them, and
+    /// the grid is laid out by a flexible GridLayoutGroup, so its columns follow whatever
+    /// width the view is given without the window needing to know.
     /// </summary>
     public class ModernInventorySkin : MonoBehaviour
     {
-        private const float WindowWidth = 520f;
-        private const float WindowHeight = 560f;
+        private const float WindowWidth = 640f;
+        private const float WindowHeight = 470f;
         private const float Margin = 14f;
 
-        private const float TabTop = 58f;   //below the header band
-        private const float TabHeight = 34f;
-        private const float TabGap = 6f;
+        private const float BarHeight = 52f;
+        private const float BodyTop = 88f;    //below the header and the count line
 
-        private const float GridTop = 100f;
-        private const float FooterBottom = 14f;
-        private const float FooterHeight = 44f;
+        private const float RailWidth = 150f;
+        private const float RailGap = 10f;
+        private const float TabHeight = 52f;
+        private const float TabGap = 8f;
+
+        private const float FooterHeight = 56f;
+        private const float CartWidth = 130f;
 
         private const float SearchInterval = 0.5f;
+
+        private static readonly string[] TabLabels = { "Items", "Equip", "Etc" };
+
+        private static Sprite[] TabIcons => new[]
+        {
+            ModernUiIcons.Heart, ModernUiIcons.Sword, ModernUiIcons.Star
+        };
 
         private float searchTimer;
 
@@ -80,22 +94,22 @@ namespace Assets.Scripts.UI.Inventory
                 panel.color = ModernUiTheme.WindowColor;
             }
 
-            //the original bar carries the title and the close button; the header built
-            //below replaces both, and takes over dragging with them
             HideOriginalChrome(root);
+            HideOriginalTabs(win);
 
             ModernUiTheme.AddBorder(root, ModernUiTheme.CardBorderColor);
             ModernUiTheme.AttachShadow(root);
 
             var bar = ModernUiTheme.CreateTitleBar(win, ThaiUiText.Get("Inventory"), null, ModernUiIcons.Bag);
-            bar.offsetMin = new Vector2(0, -(TabTop - 6f));
+            bar.offsetMin = new Vector2(0, -BarHeight);
 
-            LayOutTabs(win);
+            BuildCountLine(win, root);
             LayOutGrid(win);
+            BuildTabRail(win, root);
             BuildFooter(win, root);
 
-            //entries are cloned from this one, so the template is styled as well as the
-            //entries the window has already built
+            //entries are cloned from the template, so it is styled alongside the ones the
+            //window has already built
             if (win.ItemEntryPrefab != null)
                 ModernUiTheme.RepaintInk(win.ItemEntryPrefab.transform);
             if (win.ItemBoxRoot != null)
@@ -116,9 +130,8 @@ namespace Assets.Scripts.UI.Inventory
                 var child = root.GetChild(i);
                 var name = child.name.ToLowerInvariant();
 
-                //the drop zone is what makes this window a place items can be dragged to,
-                //and the entry root is where they live; neither is chrome
-                if (name.Contains("dropzone") || name.Contains("content"))
+                //the drop zone is what makes this a window items can be dragged into
+                if (name.Contains("dropzone"))
                     continue;
 
                 if (name.Contains("dragobject") || name.Contains("closebutton"))
@@ -127,53 +140,37 @@ namespace Assets.Scripts.UI.Inventory
         }
 
         /// <summary>
-        /// Moves the tabs from a column down the left side to a row across the top. They
-        /// are positioned by a GridLayoutGroup, so the row is a matter of giving that
-        /// group one row to work with and a cell wide enough to divide the window between
-        /// however many tabs there turn out to be.
+        /// Switches off the strip the prefab came with. The search walks up from a tab
+        /// button by name and only a few levels, because the button sits two deep inside
+        /// it and walking blindly to the top would switch off the window itself.
         /// </summary>
-        private static void LayOutTabs(PlayerInventoryWindow win)
+        private static void HideOriginalTabs(PlayerInventoryWindow win)
         {
             if (win.UiTabButtons == null || win.UiTabButtons.Length == 0 || win.UiTabButtons[0] == null)
                 return;
 
-            var strip = win.UiTabButtons[0].transform.parent as RectTransform;
-            if (strip == null)
-                return;
-
-            strip.anchorMin = new Vector2(0, 1);
-            strip.anchorMax = new Vector2(1, 1);
-            strip.pivot = new Vector2(0.5f, 1);
-            strip.offsetMin = new Vector2(Margin, -(TabTop + TabHeight));
-            strip.offsetMax = new Vector2(-Margin, -TabTop);
-
-            var count = win.UiTabButtons.Length;
-            var grid = strip.GetComponent<GridLayoutGroup>();
-            if (grid != null)
+            var t = win.UiTabButtons[0].transform;
+            for (var i = 0; i < 4 && t != null; i++, t = t.parent)
             {
-                grid.startAxis = GridLayoutGroup.Axis.Horizontal;
-                grid.constraint = GridLayoutGroup.Constraint.FixedRowCount;
-                grid.constraintCount = 1;
-                grid.padding = new RectOffset(0, 0, 0, 0);
-                grid.spacing = new Vector2(TabGap, 0);
-                grid.cellSize = new Vector2(
-                    (WindowWidth - Margin * 2f - TabGap * (count - 1)) / count, TabHeight);
-            }
-
-            foreach (var tab in win.UiTabButtons)
-            {
-                if (tab == null)
+                if (!t.name.ToLowerInvariant().Contains("tabbar"))
                     continue;
 
-                foreach (var label in tab.GetComponentsInChildren<TextMeshProUGUI>(true))
-                {
-                    label.fontSize = ModernUiTheme.SizeLabel;
-                    label.alignment = TextAlignmentOptions.Center;
-                    label.extraPadding = true;
-                }
+                t.gameObject.SetActive(false);
+                return;
             }
+        }
 
-            ModernUiTheme.StyleTabBar(win.UiTabButtons);
+        private static void BuildCountLine(PlayerInventoryWindow win, RectTransform root)
+        {
+            if (root.Find("ModernBagCount") != null)
+                return;
+
+            var count = ModernUiTheme.CreateText(root, "ModernBagCount", "", ModernUiTheme.SizeBody,
+                ModernUiTheme.LabelColor, TextAlignmentOptions.Left, FontStyles.Bold);
+            ModernUiTheme.Place(count.rectTransform, new Vector2(0, 1),
+                new Vector2(Margin + 4f, -(BarHeight + 4f)), new Vector2(300f, 24f));
+
+            win.CountText = count;
         }
 
         private static void LayOutGrid(PlayerInventoryWindow win)
@@ -184,12 +181,12 @@ namespace Assets.Scripts.UI.Inventory
                 view.anchorMin = new Vector2(0, 0);
                 view.anchorMax = new Vector2(1, 1);
                 view.pivot = new Vector2(0.5f, 0.5f);
-                view.offsetMin = new Vector2(Margin, FooterBottom + FooterHeight + 8f);
-                view.offsetMax = new Vector2(-Margin, -GridTop);
+                view.offsetMin = new Vector2(Margin, Margin + FooterHeight + 8f);
+                view.offsetMax = new Vector2(-(Margin + RailWidth + RailGap), -BodyTop);
             }
 
             //a sunken tray behind the items, so the grid reads as a container rather than
-            //as icons scattered on the panel
+            //as icons scattered across the panel
             if (win.ViewBoxTransform != null)
             {
                 var tray = win.ViewBoxTransform.GetComponent<Image>();
@@ -202,37 +199,145 @@ namespace Assets.Scripts.UI.Inventory
             }
         }
 
-        private static void BuildFooter(PlayerInventoryWindow win, RectTransform root)
+        private static void BuildTabRail(PlayerInventoryWindow win, RectTransform root)
         {
-            if (root.Find("ModernBagFooter") == null)
+            if (root.Find("ModernBagRail") != null)
+                return;
+
+            var rail = ModernUiTheme.CreateCard(root, "ModernBagRail", ModernUiTheme.WindowColor, true);
+            rail.anchorMin = new Vector2(1, 0);
+            rail.anchorMax = new Vector2(1, 1);
+            rail.pivot = new Vector2(1, 0.5f);
+            rail.offsetMin = new Vector2(-(Margin + RailWidth), Margin + FooterHeight + 8f);
+            rail.offsetMax = new Vector2(-Margin, -BodyTop);
+
+            var buttons = new Button[TabLabels.Length];
+            var borders = new Image[TabLabels.Length];
+            var icons = new Image[TabLabels.Length];
+            var glyphs = TabIcons;
+            var state = new RailState { Buttons = buttons, Borders = borders, Icons = icons };
+
+            for (var i = 0; i < TabLabels.Length; i++)
             {
-                var footer = ModernUiTheme.CreateCard(root, "ModernBagFooter", ModernUiTheme.CardColor, true);
-                footer.anchorMin = new Vector2(0, 0);
-                footer.anchorMax = new Vector2(1, 0);
-                footer.pivot = new Vector2(0.5f, 0);
-                footer.offsetMin = new Vector2(Margin, FooterBottom);
-                footer.offsetMax = new Vector2(-Margin, FooterBottom + FooterHeight);
-                footer.GetComponent<Image>().raycastTarget = false;
-                footer.SetAsFirstSibling();
+                var button = ModernUiTheme.CreateButton(rail, "Tab" + i, ThaiUiText.Get(TabLabels[i]),
+                    ModernUiTheme.CardColor, ModernUiTheme.NameColor, ModernUiTheme.SizeBody);
+                ModernUiTheme.Place((RectTransform)button.transform, new Vector2(0, 1),
+                    new Vector2(10f, -(10f + i * (TabHeight + TabGap))),
+                    new Vector2(RailWidth - 20f, TabHeight));
 
-                if (win.WeightText != null)
+                borders[i] = ModernUiTheme.AddBorder((RectTransform)button.transform,
+                    ModernUiTheme.CardBorderColor);
+
+                var icon = ModernUiTheme.CreateIcon(button.transform, glyphs[i], ModernUiTheme.AccentInkColor, 20);
+                ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f), new Vector2(14f, 0f),
+                    new Vector2(20f, 20f));
+                icons[i] = icon;
+
+                var label = button.GetComponentInChildren<TextMeshProUGUI>(true);
+                if (label != null)
                 {
-                    var text = win.WeightText.rectTransform;
-                    text.SetParent(footer, false);
-                    ModernUiTheme.Stretch(text, 14, 0, -14, 0);
+                    label.alignment = TextAlignmentOptions.Left;
+                    ModernUiTheme.Stretch(label.rectTransform, 44f, 0f, -10f, 0f);
+                }
 
-                    win.WeightText.color = ModernUiTheme.NameColor;
-                    win.WeightText.fontSize = ModernUiTheme.SizeLabel;
-                    win.WeightText.alignment = TextAlignmentOptions.Left;
-                    win.WeightText.extraPadding = true;
+                var index = i;
+                //the window's own method, so the filtering and the refresh are untouched
+                button.onClick.AddListener(() =>
+                {
+                    win.ClickTabButton(index);
+                    state.Paint(index);
+                });
+            }
+
+            //the click handlers close over the state, which is all that has to keep it
+            //alive: it goes when the buttons do
+            state.Paint(0);
+        }
+
+        /// <summary>
+        /// Which of the three is filled in. Kept beside the buttons rather than in the
+        /// window, which tracks the same thing privately for its own filtering.
+        /// </summary>
+        private class RailState
+        {
+            public Button[] Buttons;
+            public Image[] Borders;
+            public Image[] Icons;
+
+            public void Paint(int active)
+            {
+                for (var i = 0; i < Buttons.Length; i++)
+                {
+                    if (Buttons[i] == null)
+                        continue;
+
+                    var isActive = i == active;
+
+                    var fill = Buttons[i].GetComponent<Image>();
+                    if (fill != null)
+                        fill.color = isActive ? ModernUiTheme.AccentColor : ModernUiTheme.CardColor;
+
+                    if (Borders[i] != null)
+                        Borders[i].color = isActive ? ModernUiTheme.AccentColor : ModernUiTheme.CardBorderColor;
+
+                    if (Icons[i] != null)
+                        Icons[i].color = isActive ? ModernUiTheme.AccentTextColor : ModernUiTheme.AccentInkColor;
+
+                    foreach (var label in Buttons[i].GetComponentsInChildren<TextMeshProUGUI>(true))
+                    {
+                        label.color = isActive ? ModernUiTheme.AccentTextColor : ModernUiTheme.NameColor;
+                        label.fontStyle = FontStyles.Bold;
+                    }
                 }
             }
+        }
+
+        private static void BuildFooter(PlayerInventoryWindow win, RectTransform root)
+        {
+            var textWidth = WindowWidth - Margin * 2f - CartWidth - 16f;
+
+            if (win.WeightText != null && root.Find("ModernBagWeightTrack") == null)
+            {
+                var text = win.WeightText.rectTransform;
+                text.SetParent(root, false);
+                ModernUiTheme.Place(text, new Vector2(0, 0), new Vector2(Margin + 4f, Margin + 26f),
+                    new Vector2(textWidth, 24f));
+
+                win.WeightText.color = ModernUiTheme.NameColor;
+                win.WeightText.fontSize = ModernUiTheme.SizeBody;
+                win.WeightText.alignment = TextAlignmentOptions.Left;
+                win.WeightText.fontStyle = FontStyles.Bold;
+                win.WeightText.extraPadding = true;
+
+                //A bar says how full the bag is at a glance, which a percentage in
+                //brackets does not. The window drives the fill; it writes nothing when the
+                //skin has not given it one, so the plain readout still works on its own.
+                var track = ModernUiTheme.CreateCard(root, "ModernBagWeightTrack", ModernUiTheme.CardDeepColor);
+                ModernUiTheme.Place(track, new Vector2(0, 0), new Vector2(Margin + 4f, Margin + 12f),
+                    new Vector2(textWidth, 10f));
+                track.GetComponent<Image>().raycastTarget = false;
+
+                var fillRect = ModernUiTheme.CreateCard(track, "Fill", ModernUiTheme.AccentColor);
+                ModernUiTheme.Stretch(fillRect, 0, 0, 0, 0);
+
+                var fill = fillRect.GetComponent<Image>();
+                fill.type = Image.Type.Filled;
+                fill.fillMethod = Image.FillMethod.Horizontal;
+                fill.fillOrigin = 0;
+                fill.fillAmount = 0f;
+                fill.raycastTarget = false;
+                win.WeightFill = fill;
+            }
+
+            //an empty container left behind once the readout moved out of it
+            var counts = root.Find("ItemCounts");
+            if (counts != null)
+                counts.gameObject.SetActive(false);
 
             if (win.CartButton != null)
             {
-                var cart = (RectTransform)win.CartButton.transform;
-                ModernUiTheme.Place(cart, new Vector2(1, 0), new Vector2(-Margin - 4f, FooterBottom + 6f),
-                    new Vector2(96f, FooterHeight - 12f));
+                ModernUiTheme.Place((RectTransform)win.CartButton.transform, new Vector2(1, 0),
+                    new Vector2(-Margin, Margin + 6f), new Vector2(CartWidth, 44f));
 
                 var image = win.CartButton.GetComponent<Image>();
                 if (image != null)
@@ -245,8 +350,9 @@ namespace Assets.Scripts.UI.Inventory
                 foreach (var label in win.CartButton.GetComponentsInChildren<TextMeshProUGUI>(true))
                 {
                     label.color = ModernUiTheme.AccentTextColor;
-                    label.fontSize = ModernUiTheme.SizeSmall;
+                    label.fontSize = ModernUiTheme.SizeBody;
                     label.fontStyle = FontStyles.Bold;
+                    label.alignment = TextAlignmentOptions.Center;
                     label.extraPadding = true;
                 }
             }

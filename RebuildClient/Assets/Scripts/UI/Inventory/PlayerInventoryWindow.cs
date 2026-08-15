@@ -21,6 +21,10 @@ namespace Assets.Scripts.UI.Inventory
         public ScrollRect ScrollArea;
         private List<InventoryEntry> entryList = new();
         public TextMeshProUGUI WeightText;
+        //filled in by the skin when it splits the one readout into a count line and a
+        //weight line with a bar; left null the window writes the single line it always did
+        public TextMeshProUGUI CountText;
+        public Image WeightFill;
         public Button CartButton;
         private int activeEntryCount;
         private int activeItemSection;
@@ -159,7 +163,16 @@ namespace Assets.Scripts.UI.Inventory
             var countText = bagItems.Count < 190 ? $"{bagItems.Count}/200" : $"<color=red>{bagItems.Count}</color>/200";
             var percentText = weightPercent < 90 ? $"{weightPercent}%" : $"<color=red>{weightPercent}%</color>";
             
-            WeightText.text = $"ไอเทม {countText}     น้ำหนัก {curWeight}/{totalWeight} ({percentText})";
+            if (CountText != null)
+            {
+                CountText.text = $"{countText} ไอเทม";
+                WeightText.text = $"น้ำหนัก {curWeight} / {totalWeight} ({percentText})";
+            }
+            else
+                WeightText.text = $"ไอเทม {countText}     น้ำหนัก {curWeight}/{totalWeight} ({percentText})";
+
+            if (WeightFill != null)
+                WeightFill.fillAmount = Mathf.Clamp01(weightPercent / 100f);
             
             foreach (var bagEntry in bagItems)
             {
