@@ -72,7 +72,7 @@ Item("Drainliar_Card") { OnEquip: AddStat(AddAttackElementWater, 20); }
 Item("Eggyra_Card") { OnEquip: AddStat(AddSpRecoveryPercent, 15); }
 Item("Orc_Zombie_Card") { OnEquip: AddStat(AddResistElementUndead, 30); AddStat(AddFlee, 5); }
 Item("Golem_Card") { OnEquip: AddStat(AddAttackPower, 5); } //make weapon unbreakable
-Item("Pirate_Skel_Card") { OnEquip: } //enable skill discount 5
+Item("Pirate_Skel_Card") { OnEquip: GrantSkill(Discount, 5); }
 Item("Bigfoot_Card") { OnEquip: AddStat(AddResistRaceInsect, 30); }
 Item("Argos_Card") { OnEquip: AddStat(ResistStoneStatus, 30); AddStat(AddDef, 1); AddStat(AddResistElementPoison, 30); }
 Item("Magnolia_Card") { OnEquip: AddStat(OnMeleeAttackCurse, 50); AddStat(OnRangedAttackCurse, 50); AddStat(AddAttackPower, 5); }
@@ -186,14 +186,14 @@ Item("Goblin_Archer_Card") { OnEquip: AddStat(AddCritDamage, 10); AddStat(AddCri
 Item("Sky_Deleter_Card") { OnEquip: AddStat(HpGainOnKill, 100); AddStat(AddHpRecoveryPercent, -100); }
 Item("Nine_Tail_Card") { OnEquip: AddStat(AddAgi, 2); if(Refine > 8) {AddStat(AddFlee, 20);} } //should add 20 flee if upgraded to +9
 Item("Firelock_Soldier_Card") { OnEquip: AddStat(AddStr, 2); if(Refine > 8) {AddStat(AddMaxHpPercent, 10); AddStat(AddMaxSpPercent, 10);} }
-Item("Grand_Peco_Card") { OnEquip: } //should auto-cast gloria when attacked
+Item("Grand_Peco_Card") { OnEquip: AutoSpellWhenAttacked(Gloria, 1, 30); } //3% gloria on self
 Item("Grizzly_Card") { OnEquip: AddStat(WhenAttackedBlind, 30); }
 Item("Gryphon_Card") { OnEquip: AddStat(AddFlee, 2); AddStat(AddCrit, 7); } //should add a 1% chance for swordsman to proc bowling bash 5
 Item("Gullinbursti_Card") { OnEquip: AddStat(AddExpRaceAquatic, 10); AddStat(AddResistRaceAquatic, -20); }
 Item("Gig_Card") { OnEquip: AddStat(SpGainOnKillRaceInsect, 5); }
 Item("Nightmare_Terror_Card") { OnEquip: AddStat(WhenAttackedCurse, 30); }
 Item("Nereid_Card") { OnEquip: AddStat(SpGainOnKillRaceBeast, 5); }
-Item("Dark_Lord_Card") { OnEquip: } //should add 10% chance to autospell meteor storm 5 when taking damage
+Item("Dark_Lord_Card") { OnEquip: AutoSpellWhenAttacked(MeteorStorm, 5, 100, TargetEnemy); } //10% meteor storm 5
 Item("Dark_Illusion_Card") { OnEquip: AddStat(AddMaxHpPercent, -8); AddStat(AddMaxSpPercent, -8); AddStat(AddCastTime, -12); }
 Item("Dark_Frame_Card") { OnEquip: AddStat(WhenAttackedStone, 60); }
 Item("The_Paper_Card") { OnEquip: AddStat(AddCritDamage, 20); } //should cost the user 1 sp per attack
@@ -272,8 +272,8 @@ Item("Baby_Leopard_Card") { OnEquip: AddStat(AddLuk, 3); } //should make armor i
 Item("Anolian_Card") { OnEquip: var lvl = 2; if(HasLearnedSkill(ImproveConcentration, 10)) lvl = 10; AutoSpellWhenAttacked(ImproveConcentration, lvl, 30); } //should autospell improved concentration
 Item("Christmas_Cookie_Card") { OnEquip: AddStat(AddExpRaceAngel, 10); AddStat(AddResistRaceAngel, -20); }
 Item("Amon_Ra_Card") { OnEquip: AddStat(AddStr, 1); AddStat(AddInt, 1); AddStat(AddDex, 1); AddStat(AddAgi, 1); AddStat(AddLuk, 1); AddStat(AddVit, 1); } //should autospell kyrie
-Item("Owl_Duke_Card") { OnEquip: } //should autospell impositio
-Item("Owl_Baron_Card") { OnEquip: } //should autospell lex aeterna
+Item("Owl_Duke_Card") { OnEquip: AutoSpellWhenAttacked(ImpositioManus, 2, 50, TargetSelf); } //5% impositio on self
+Item("Owl_Baron_Card") { OnEquip: AutoSpellWhenAttacked(LexAeterna, 1, 50, TargetEnemy); } //5% lex aeterna
 Item("Iron_Fist_Card") { OnEquip: AddStat(AddExpRaceFormless, 10); AddStat(AddResistRaceFormless, -20); }
 Item("Arclouse_Card") { OnEquip: if(Refine < 6) {AddStat(AddDef, 2); AddStat(AddMDef, 3);} }
 Item("Archangeling_Card") { OnEquip: AddStat(AddMaxHp, 300); if(GetStat(Luk) >= 77) { AddStat(AddHpRecoveryPercent, 100); AddStat(AddSpRecoveryPercent, 100); } } //should boost hp/sp recovery if your luk is 77 or higher
@@ -348,14 +348,14 @@ Item("Parasite_Card") { OnEquip: AddStat(AddDef, 1); AddStat(AddResistRaceFormle
 Item("Panzer_Goblin_Card") { OnEquip: AddStat(AddCritDamage, 10); AddStat(AddCritChanceRaceDemon, 7); }
 Item("Permeter_Card") { OnEquip: AddStat(AddResistElementUndead, 15); AddStat(AddResistElementDark, 15); }
 Item("Fur_Seal_Card") { OnEquip: AddStat(AddHit, 10); AddStat(AddFlee, 3); if(IsBaseJob(JobAcolyte)) { AddStat(AddCritChanceRaceDemon, 9); AddStat(AddCritChanceRaceUndead, 9); } } //should add bonus crit vs undead/demon fro acolyte
-Item("Punk_Card") { OnEquip: } //autospell quagmire
+Item("Punk_Card") { OnEquip: AutoSpellWhenAttacked(Quagmire, 1, 30, TargetEnemy); } //3% quagmire
 Item("Penomena_Card") { OnEquip: AddStat(AddResistRaceFormless, 30); }
 Item("Pest_Card") { OnEquip: AddStat(WhenAttackedStone, 30); } //petrify when attacked
 Item("False_Angel_Card") { OnEquip: AddStat(SpGainOnKillRaceAngel, 5); }
 Item("Mobster_Card") { OnEquip: AddStat(AddCritDamage, 15); if(IsBaseJob(JobThief)) AddStat(AddCrit, 4); } //should add 4 crit to thief
 Item("Stormy_Knight_Card") { OnEquip: AddStat(OnMeleeAttackFreeze, 200); AddStat(OnRangedAttackFreeze, 200);  } //autospell SG
 Item("Freezer_Card") { OnEquip: AddStat(AddMaxHp, 300); } //bonus bash damage
-Item("Bloody_Knight_Card") { OnEquip: } //autospell meteor storm
+Item("Bloody_Knight_Card") { OnEquip: AutoSpellOnAttack(MeteorStorm, 1, 50, TargetEnemy); } //5% meteor storm 1 on attack
 Item("Hylozoist_Card") { OnValidate: return false; OnEquip: } //monster class change
 Item("High_Orc_Card") { OnEquip: AddStat(AddDef, 1); } //melee reflect
 Item("Hati_Baby_Card") { OnEquip: AutoSpellOnAttack(FrostDiver, 3, 50, TargetEnemy); }
