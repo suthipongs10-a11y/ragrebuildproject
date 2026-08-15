@@ -13,9 +13,14 @@ namespace RoRebuildServer.Custom;
 /// The things worth the whole server hearing about, said in gold across everyone's
 /// chat with the notice sound behind it.
 ///
-/// A private server lives on the moments the rest of the players see. Two of them are
-/// worth interrupting people for: somebody taking a piece of gear to the refine level
-/// where it could just as easily have shattered, and an MVP going down.
+/// A private server lives on the moments the rest of the players see, and there are
+/// exactly three: a card found, a piece of gear taken to the refine level where it could
+/// as easily have shattered, and an MVP going down. Three is the point — a fourth would
+/// start the slide to nobody reading any of them.
+///
+/// Written in Thai, like the rest of the interface. These are read at a glance in the
+/// middle of a fight, which is the one place a language you have to translate in your head
+/// costs you something.
 /// </summary>
 public class ServerAnnouncements : ServerConfigScriptHandlerBase
 {
@@ -59,8 +64,13 @@ public class ServerAnnouncements : ServerConfigScriptHandlerBase
         if (character.DisplayType != CharacterDisplayType.Mvp)
             return;
 
-        var map = character.Map?.Name ?? "somewhere";
-        Announce($"★ {character.Name} has been defeated on {map}!");
+        //Who did it, not just what died. The top damage contributor is the same person the
+        //drops are reserved for, so it is the same answer the rest of the kill already uses.
+        var killer = monster.GetTopContributor();
+        if (killer != null && killer.Type == CharacterType.Player)
+            Announce($"เทพมาแล้ว {killer.Name} กำจัด {character.Name} ได้รับ MVP !");
+        else
+            Announce($"{character.Name} ถูกกำจัดแล้ว !");
     }
 
     /// <summary>
@@ -76,7 +86,7 @@ public class ServerAnnouncements : ServerConfigScriptHandlerBase
         if (info == null || info.ItemClass != ItemClass.Card)
             return;
 
-        Announce($"★ {player.Name} found {info.Name}!");
+        Announce($"{player.Name} ได้รับ {info.Name} !");
     }
 
     /// <summary>
@@ -88,7 +98,7 @@ public class ServerAnnouncements : ServerConfigScriptHandlerBase
         if (refineLevel < RefineAnnounceLevel)
             return;
 
-        var name = DataManager.GetItemInfoById(itemId)?.Name ?? "a piece of equipment";
-        Announce($"★ {player.Name} has refined {name} to +{refineLevel}!");
+        var name = DataManager.GetItemInfoById(itemId)?.Name ?? "อุปกรณ์";
+        Announce($"สุดยอด {player.Name} ตีบวก +{refineLevel} {name} ได้สำเร็จ !");
     }
 }

@@ -54,54 +54,39 @@ Dialog(name, "It's a bit rough out there, harder than the last test, but you sho
 			*/
 }
 
-macro BardChangeJob()
+//Novice to first job, and first job to second. Second job needs job level 50 on the
+//first, which is the whole of the first job, and it puts the job level back to 10 so
+//the new tree is learned rather than arriving already finished.
+//
+//The six second jobs offered here are the six the server has a skill tree for. Crusader,
+//Monk, Sage, Rogue, Bard, Dancer and Alchemist have no entry in Skills/SkillTree.toml,
+//so changing into one would leave the player with nothing to spend points on at all.
+macro JobMasterFirstJob()
 {
-	ShowSprite("bard_eland01", right);
-	if(JobId == 0 && JobLevel < 10)
-	{
-		Dialog(name, "Looking to change jobs are you? I can help you out with that, but first you'll need to get to job level 10.");
-		return;
-	}
-
-	if(JobId == 0 && UnusedSkillPoints > 0)
-	{
-		Dialog(name, "Looking to change jobs are you? You're job level 10 alright, but you'll need to spend your unused skill points before I can help.");
-		Dialog(name, "I'm not actually sure what that basic mastery skill does but you still need to spend the points first.");
-		return;
-	} else {
-		
-	}
 	if(GetNpcFlag(bardFlag) > 1)
-		Dialog(name, "Want to change your job again? I'll have to reset your skills and stat points to do it, but i can do it. What are you looking for?");
+		Dialog(name, "อยากเปลี่ยนอาชีพอีกครั้งใช่ไหม? ได้เลย แต่ต้องรีเซ็ตสกิลกับสเตตัสด้วยนะ จะเอาอาชีพอะไรดี?");
 	else
-		Dialog(name, "Looking to change jobs are you? Well then! What were you thinking of becoming?");
+		Dialog(name, "มาเปลี่ยนอาชีพใช่ไหม? ดีเลย! คิดจะเป็นอะไรดีล่ะ?");
 
-	Option("Swordsman", "Archer", "Mage", "Acolyte", "Thief", "Merchant", "Cancel");
+	Option("Swordsman", "Archer", "Mage", "Acolyte", "Thief", "Merchant", "ยกเลิก");
 	if(result == 6)
 	{
-		Dialog(name, "I'll be here to help you out if you change your mind!");
+		Dialog(name, "เปลี่ยนใจเมื่อไหร่ก็มาหาได้นะ");
 		return;
 	}
 
 	var jobChoice = result + 1;
 	if(jobChoice == JobId)
 	{
-		Dialog(name, "What a good choice! I'm disapointed to have to tell you though that that's already your job.");
+		Dialog(name, "เลือกได้ดีมาก! แต่เสียใจด้วย นั่นคืออาชีพที่เธอเป็นอยู่แล้ว");
 		return;
 	}
 
-	//if(jobChoice == 0) Dialog(name, "A novice! What a weird thing to want to become. But if that's your choice I can still do it. What do you say?");
-	if(jobChoice == 1) Dialog(name, "A swordsman? Very good! Are you sure you want to become a swordsman?");
-	if(jobChoice == 2) Dialog(name, "An archer? Very good! Are you sure you want to become an archer?");
-	if(jobChoice == 3) Dialog(name, "A mage? Very good! Are you sure you want to become a mage?");
-	if(jobChoice == 4) Dialog(name, "A acolyte? Very good! Are you sure you want to become a acolyte?");
-	if(jobChoice == 5) Dialog(name, "A thief? Very good! Are you sure you want to become a thief?");
-	if(jobChoice == 6) Dialog(name, "A merchant? Very good! Are you sure you want to become a merchant?");
-
-	Option("I'm sure", "I changed my mind");
+	Dialog(name, "แน่ใจนะว่าจะเป็นอาชีพนี้?");
+	Option("แน่ใจ", "ขอคิดดูก่อน");
 	if(result == 1)
 	{
-		Dialog(name, "I'll be here to help you out when you make up your mind.");
+		Dialog(name, "ตัดสินใจได้เมื่อไหร่ก็มาบอกได้เลย");
 		return;
 	}
 
@@ -115,7 +100,7 @@ macro BardChangeJob()
 	ShowEffectOnPlayer("JobUp");
 
 	ShowSprite("bard_eland02", right);
-	if(GetNpcFlag(bardFlag) == 1) 
+	if(GetNpcFlag(bardFlag) == 1)
 	{
 		GiveZeny(2000);
 		GiveItem("Novice_Potion", 60);
@@ -131,13 +116,101 @@ macro BardChangeJob()
 		if(jobChoice == 6) GiveItem("Axe");
 
 		SetNpcFlag(bardFlag, 2);
-		Dialog(name, "It's done! I tossed in a little extra for you to get started. If you regret your choice and want to change jobs, just let me know.");
-	} 
-	else 
+		Dialog(name, "เรียบร้อย! แถมของให้เล็กน้อยไว้ใช้ตอนเริ่มต้น ถ้าเปลี่ยนใจอยากย้ายอาชีพอีกก็มาบอกได้");
+	}
+	else
 	{
-		Dialog(name, "It's done! Let me know again if you ever need another to change.");
+		Dialog(name, "เรียบร้อย! ต้องการเปลี่ยนอีกเมื่อไหร่ก็มาหาได้เลย");
 	}
 
+	return;
+}
+
+macro JobMasterSecondJob()
+{
+	if(JobLevel < 50)
+	{
+		Dialog(name, "อยากไปอาชีพ 2 ใช่ไหม? ต้องทำ Job Level ให้ครบ 50 ก่อนนะ ตอนนี้เธออยู่ที่ " + JobLevel + " เท่านั้น");
+		return;
+	}
+
+	//the second job that follows from what they are now. Anything else has no skill tree
+	//on this server, so it is not offered at all rather than offered and empty.
+	var target = 0;
+	var targetName = "";
+	if(JobId == 1) { target = 7;  targetName = "Knight"; }
+	if(JobId == 2) { target = 10; targetName = "Hunter"; }
+	if(JobId == 3) { target = 8;  targetName = "Wizard"; }
+	if(JobId == 4) { target = 9;  targetName = "Priest"; }
+	if(JobId == 5) { target = 11; targetName = "Assassin"; }
+	if(JobId == 6) { target = 12; targetName = "Blacksmith"; }
+
+	if(target == 0)
+	{
+		Dialog(name, "อาชีพของเธอยังไม่มีสายอาชีพ 2 ให้ไปต่อในตอนนี้");
+		return;
+	}
+
+	Dialog(name, "Job Level 50 แล้ว! เธอพร้อมเป็น " + targetName + " ได้เลย");
+	Dialog(name, "<color=#CC5500>บอกไว้ก่อนนะ พอเปลี่ยนแล้ว Job Level จะกลับไปเริ่มที่ 10 และสกิลเดิมจะถูกรีเซ็ตทั้งหมด " +
+				 "เพื่อให้เธอไปเก็บสกิลสายใหม่ ส่วน Base Level กับไอเทมไม่หายไปไหน</color>");
+	Dialog(name, "จะเป็น " + targetName + " เลยไหม?");
+
+	Option("เอาเลย", "ขอคิดดูก่อน");
+	if(result == 1)
+	{
+		Dialog(name, "ไม่ต้องรีบ ตัดสินใจได้แล้วค่อยมา");
+		return;
+	}
+
+	ReleaseFocus();
+	SkillReset();
+	ChangePlayerJob(target);
+	//ChangeJob only puts the job level back when leaving novice, so this step says it
+	SetJobLevel(10);
+	ShowEffectOnPlayer("JobUp");
+
+	ShowSprite("bard_eland02", right);
+	Dialog(name, "เรียบร้อย! ยินดีด้วยนะ " + targetName + " ไปลุยได้เลย");
+	return;
+}
+
+macro BardChangeJob()
+{
+	ShowSprite("bard_eland01", right);
+
+	if(JobId == 0 && JobLevel < 10)
+	{
+		Dialog(name, "มาเปลี่ยนอาชีพใช่ไหม? ช่วยได้แน่นอน แต่ต้องทำ Job Level ให้ถึง 10 ก่อนนะ");
+		return;
+	}
+
+	if(JobId == 0 && UnusedSkillPoints > 0)
+	{
+		Dialog(name, "Job Level 10 แล้วก็จริง แต่ต้องใช้แต้มสกิลที่เหลือให้หมดก่อน ถึงจะเปลี่ยนอาชีพให้ได้");
+		return;
+	}
+
+	//a novice has only one road out, so it is not worth asking which
+	if(JobId == 0)
+	{
+		@JobMasterFirstJob();
+		return;
+	}
+
+	Option("เปลี่ยนเป็นอาชีพ 2", "เปลี่ยนอาชีพ 1 ใหม่", "ยกเลิก");
+	if(result == 0)
+	{
+		@JobMasterSecondJob();
+		return;
+	}
+	if(result == 1)
+	{
+		@JobMasterFirstJob();
+		return;
+	}
+
+	Dialog(name, "ได้เลย ต้องการอะไรก็บอกได้");
 	return;
 }
 
@@ -327,33 +400,33 @@ macro BardWarps()
 	return;
 }
 
-Npc("prt_fild08", "Adventuring Bard", "1_M_BARD", 153, 357, SE, 1, 1)  //175, 374, SW
+Npc("prt_fild08", "Job Master", "1_M_BARD", 153, 357, SE, 1, 1)  //175, 374, SW
 {
 	localstr bardFlag = "PrtBardStatus";
-	localstr name = "Adventuring Bard"
+	localstr name = "Job Master"
 	OnClick:
 		FocusNpc();
 		ShowSprite("bard_eland01", right);
 
 		if(GetNpcFlag(bardFlag) == 0)
 		{
-			Dialog(name, "Hey there, welcome to Ragnarok Rebuild! Nice to see a new face around here. " + 
-						 "The job trainers are all on vacation so it's up to me to help adventurers like yourself.");
-			Dialog(name, "Since it's your first time here, let me give you a little something to help you out.");
+			Dialog(name, "สวัสดี ยินดีต้อนรับ! ข้าคือ <color=#0066CC>Job Master</color> มีหน้าที่เปลี่ยนอาชีพให้นักผจญภัยอย่างเธอ " +
+						 "ทั้งอาชีพ 1 และอาชีพ 2 รวมถึงรีเซ็ตสกิลกับสเตตัสให้ด้วย");
+			Dialog(name, "มาครั้งแรกสินะ เดี๋ยวข้าให้ของติดตัวไปหน่อย");
 			SetNpcFlag(bardFlag, 1);
 			GiveZeny(1000);
 			GiveItem("Novice_Potion", 30);
-			Dialog(name, "So, is there anything I can help you with?");
+			Dialog(name, "เอาล่ะ ให้ข้าช่วยอะไรดี?");
 		}
 		else
 		{
-			Dialog(name, "Welcome back! Anything I can help you with?");
+			Dialog(name, "กลับมาแล้วหรือ! ให้ข้าช่วยอะไรดี?");
 		}
 
 		result = 0;
 		while(result < 3)
 		{
-			Option("About Rebuild", "Job change", "Skill reset", "Stat reset", "Change appearance", "Cancel");
+			Option("เกี่ยวกับเซิร์ฟเวอร์", "เปลี่ยนอาชีพ", "รีเซ็ตสกิล", "รีเซ็ตสเตตัส", "เปลี่ยนรูปลักษณ์", "ยกเลิก");
 			switch(result) 
 			{
 				case 0: @BardAboutRebuild();

@@ -160,6 +160,25 @@ public class NpcInteractionState
     public void SkillReset() => Player?.SkillReset();
     public void StatPointReset() => Player?.StatPointReset();
 
+    /// <summary>
+    /// Sets the player's job level, for a job change that is supposed to start you over.
+    ///
+    /// ChangeJob only resets the job level when the character is leaving novice, which is
+    /// right for that step and wrong for the one after it, so the second job change has to
+    /// say so itself. Nothing has to be tidied up afterwards: how many skill points a
+    /// character has is worked out from their job level less what they have spent, so it
+    /// comes out correct on its own once the stats are refreshed.
+    /// </summary>
+    public void SetJobLevel(int level)
+    {
+        if (Player == null || level < 1)
+            return;
+
+        Player.SetData(PlayerStat.JobLevel, level);
+        Player.SetData(PlayerStat.JobExp, 0);
+        Player.UpdateStats();
+    }
+
     public void HealPlayerFull()
     {
         if (Player == null)
