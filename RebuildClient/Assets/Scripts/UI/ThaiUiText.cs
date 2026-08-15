@@ -42,6 +42,7 @@ namespace Assets.Scripts.UI
             { "Room", "ห้อง" },
 
             //--- headers the rebuilt windows put under their titles
+            { "Guide", "คำแนะนำ" },
             { "Character sheet", "ค่าสถานะตัวละคร" },
             { "Worn gear", "ของที่สวมใส่" },
             { "Drag to turn", "ลากเพื่อหมุนตัว" },

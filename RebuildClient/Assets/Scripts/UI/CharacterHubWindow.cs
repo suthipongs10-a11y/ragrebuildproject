@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.PlayerControl;
+using Assets.Scripts.UI.Guide;
 using Assets.Scripts.UI.Inventory;
 using TMPro;
 using UnityEngine;
@@ -553,6 +554,13 @@ namespace Assets.Scripts.UI
             hub.AddPage(equipment, ThaiUiText.Get("Equipment"), ModernUiIcons.Armor);
             hub.AddPage(stats, ThaiUiText.Get("Stats"), ModernUiIcons.Person);
             hub.AddPage(skills, ThaiUiText.Get("Skills"), ModernUiIcons.Book);
+
+            //Built here rather than by a skin of its own, because it is the only page that
+            //has no window of the game's behind it. It reads the job off the player and
+            //says how that job is played, which is the one thing the other three tabs
+            //cannot tell you: they show what you have, not what to do with it.
+            var guide = CharacterGuideWindow.Create(ui.PrimaryUserWindowContainer);
+            hub.AddPage(guide, ThaiUiText.Get("Guide"), ModernUiIcons.Star);
 
             //taken off the equipment page and stood in the window's own column, so it is
             //still there when the stats or skills tab is the one on screen
