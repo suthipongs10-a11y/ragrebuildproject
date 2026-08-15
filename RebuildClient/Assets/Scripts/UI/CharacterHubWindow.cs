@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Assets.Scripts.PlayerControl;
 using Assets.Scripts.UI.Inventory;
 using TMPro;
 using UnityEngine;
@@ -31,6 +32,14 @@ namespace Assets.Scripts.UI
         private const float TabHeight = 34f;
         private const float TabGap = 6f;
 
+        //The character stands in a column of his own down the right hand side, the same
+        //width the equipment page used to give him in its middle, so the window is no
+        //wider for it. He belongs to this window rather than to any tab, which is the
+        //point: you can read your stats or your skills and still see who you are reading
+        //them for.
+        private const float StageWidth = 292f;
+        private const float StageGap = 16f;
+
         private readonly List<WindowBase> pages = new List<WindowBase>();
         private readonly List<Button> tabs = new List<Button>();
         private readonly List<Image> tabBorders = new List<Image>();
@@ -38,6 +47,8 @@ namespace Assets.Scripts.UI
         private readonly List<float> pageOffsets = new List<float>();
 
         private RectTransform content;
+        private RectTransform stage;
+        private TextMeshProUGUI identity;
         private int current;
 
         public int PageCount => pages.Count;
@@ -72,11 +83,69 @@ namespace Assets.Scripts.UI
             var bar = ModernUiTheme.CreateTitleBar(this, ThaiUiText.Get("Character"), null, ModernUiIcons.Person);
             bar.offsetMin = new Vector2(0, -BarHeight);
 
+            //who you are looking at, in the corner of the bar. The tabs below change what
+            //is being said about the character; this says which character.
+            identity = ModernUiTheme.CreateText(bar, "Identity", "", ModernUiTheme.SizeLabel,
+                ModernUiTheme.TitleColor, TextAlignmentOptions.Right, FontStyles.Bold);
+            ModernUiTheme.Place(identity.rectTransform, new Vector2(1, 1), new Vector2(-58, -16),
+                new Vector2(260, 22));
+
             content = ModernUiTheme.CreateRect("Pages", root);
             content.anchorMin = new Vector2(0, 0);
             content.anchorMax = new Vector2(1, 1);
             content.offsetMin = new Vector2(Padding, Padding);
-            content.offsetMax = new Vector2(-Padding, -(HeaderHeight + TabHeight + TabGap));
+            content.offsetMax = new Vector2(-(Padding + StageWidth + StageGap),
+                -(HeaderHeight + TabHeight + TabGap));
+
+            stage = ModernUiTheme.CreateCard(root, "CharacterStage", ModernUiTheme.CardDeepColor, true);
+            stage.anchorMin = new Vector2(1, 0);
+            stage.anchorMax = new Vector2(1, 1);
+            stage.pivot = new Vector2(1, 1);
+            stage.offsetMin = new Vector2(-(Padding + StageWidth), Padding);
+            stage.offsetMax = new Vector2(-Padding, -(HeaderHeight + TabHeight + TabGap));
+            stage.GetComponent<Image>().raycastTarget = false;
+        }
+
+        /// <summary>
+        /// Moves the character preview out of whichever page owned it and into this
+        /// window, where it stays put while the tabs change underneath it.
+        ///
+        /// The preview is a live object the equipment window keeps a reference to and
+        /// refreshes on every gear change, so it is moved rather than rebuilt: the
+        /// reference still points at it and every one of those refreshes still lands.
+        /// </summary>
+        public void AttachCharacterStage(Component preview)
+        {
+            if (preview == null || stage == null)
+                return;
+
+            var rect = preview.transform as RectTransform;
+            if (rect == null)
+                return;
+
+            rect.SetParent(stage, false);
+            rect.localScale = Vector3.one;
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            //the sprite's pivot sits well above its feet, so centring it in the card
+            //leaves the character floating with a gap underneath
+            rect.anchoredPosition = new Vector2(0, -78);
+            preview.gameObject.SetActive(true);
+        }
+
+        private void RefreshIdentity()
+        {
+            if (identity == null)
+                return;
+
+            var state = PlayerState.Instance;
+            if (state == null)
+                return;
+
+            var text = $"{state.PlayerName}  ·  Lv.{state.Level}";
+            if (identity.text != text)
+                identity.text = text;
         }
 
         /// <summary>
@@ -221,7 +290,7 @@ namespace Assets.Scripts.UI
                 tallest = Mathf.Max(tallest, page.y);
             }
 
-            var width = widest + Padding * 2f;
+            var width = widest + Padding * 2f + StageWidth + StageGap;
             var height = tallest + HeaderHeight + TabHeight + TabGap + Padding;
 
             //never taller than what it is being drawn into, whatever a page asks for
@@ -312,6 +381,8 @@ namespace Assets.Scripts.UI
         /// </summary>
         public void SyncToPages()
         {
+            RefreshIdentity();
+
             //A page other than the one showing having been switched on is the player
             //asking for that page: pressing the skills key while equipment is up leaves
             //two of them on, and the one that was not already there is the one wanted.
@@ -469,6 +540,10 @@ namespace Assets.Scripts.UI
             hub.AddPage(equipment, ThaiUiText.Get("Equipment"), ModernUiIcons.Armor);
             hub.AddPage(stats, ThaiUiText.Get("Stats"), ModernUiIcons.Person);
             hub.AddPage(skills, ThaiUiText.Get("Skills"), ModernUiIcons.Book);
+
+            //taken off the equipment page and stood in the window's own column, so it is
+            //still there when the stats or skills tab is the one on screen
+            hub.AttachCharacterStage(equipment.PlayerSprite);
 
             hub.CenterWindow();
             hub.CloseWindow();

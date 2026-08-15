@@ -1,4 +1,4 @@
-using Assets.Scripts.PlayerControl;
+﻿using Assets.Scripts.PlayerControl;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -14,7 +14,10 @@ namespace Assets.Scripts.UI.Inventory
     /// </summary>
     public class ModernEquipSkin : MonoBehaviour
     {
-        private const float WindowWidth = 880f;
+        //two columns of slots and nothing between them. The character used to stand in
+        //the middle here; he belongs to the hub window now, where he stays visible while
+        //the other tabs are open, so this page is exactly the two columns wide.
+        private const float WindowWidth = 572f;
         private const float WindowHeight = 648f;
         private const float CardWidth = 254f;
         private const float CardHeight = 58f;
@@ -25,7 +28,6 @@ namespace Assets.Scripts.UI.Inventory
         //this skin predates the shared theme, its colours now come from there
         private static Color WindowColor => ModernUiTheme.WindowColor;
         private static Color CardColor => ModernUiTheme.CardColor;
-        private static Color CenterColor => ModernUiTheme.CardDeepColor;
         private static Color LabelColor => ModernUiTheme.LabelColor;
         private static Color NameColor => ModernUiTheme.NameColor;
         private static Color EmptyColor => ModernUiTheme.MutedColor;
@@ -96,27 +98,11 @@ namespace Assets.Scripts.UI.Inventory
                 rootImage.color = WindowColor;
             }
 
-            //the character preview moves into the new center card before the old content goes away
-            var preview = win.PlayerSprite != null ? win.PlayerSprite.transform : null;
-
+            //The character preview is deliberately left where it is. CharacterHubWindow
+            //takes it when it builds and stands it in a column of its own, so that it is
+            //there on the stats and skills tabs too rather than only on this one.
             var panel = CreateRect("ModernSkinPanel", root);
             Stretch(panel, 0, 0, 0, 0);
-
-            var centerCard = CreateCard(panel, "CenterCard");
-            if (preview != null)
-            {
-                preview.SetParent(centerCard, false);
-                var previewRect = preview as RectTransform;
-                if (previewRect != null)
-                {
-                    //the sprite's pivot sits well above its feet, so anchoring it to the
-                    //middle of the card left the character floating with a gap underneath
-                    previewRect.anchorMin = new Vector2(0.5f, 0.5f);
-                    previewRect.anchorMax = new Vector2(0.5f, 0.5f);
-                    previewRect.anchoredPosition = new Vector2(0, -78);
-                }
-                preview.gameObject.SetActive(true);
-            }
 
             //the whole original layout goes, including its chrome, and the themed header
             //below takes over moving and closing the window
@@ -135,24 +121,18 @@ namespace Assets.Scripts.UI.Inventory
                 ModernUiTheme.SizeLabel, HintColor, TextAlignmentOptions.Left, FontStyles.Normal,
                 new Vector2(Margin, -92), new Vector2(WindowWidth - Margin * 2, 22), new Vector2(0, 1));
 
-            //center card sits between the two slot columns
-            centerCard.anchorMin = new Vector2(0.5f, 1);
-            centerCard.anchorMax = new Vector2(0.5f, 1);
-            centerCard.pivot = new Vector2(0.5f, 1);
-            centerCard.sizeDelta = new Vector2(WindowWidth - (CardWidth + Margin + 16) * 2, CardHeight * 5 + CardSpacing * 4 - 60);
-            centerCard.anchoredPosition = new Vector2(0, -TopOffset);
-
             var entries = new EquipWindowEntry[10];
             BuildColumn(panel, LeftSlots, entries, leftSide: true);
             BuildColumn(panel, RightSlots, entries, leftSide: false);
 
-            //ammo card under the character preview
+            //ammo card across the foot of both columns, where the middle used to be
             var ammoCard = CreateCard(panel, "AmmoCard");
             ammoCard.anchorMin = new Vector2(0.5f, 1);
             ammoCard.anchorMax = new Vector2(0.5f, 1);
             ammoCard.pivot = new Vector2(0.5f, 1);
-            ammoCard.sizeDelta = new Vector2(centerCard.sizeDelta.x, 46);
-            ammoCard.anchoredPosition = new Vector2(0, -TopOffset - centerCard.sizeDelta.y - CardSpacing);
+            ammoCard.sizeDelta = new Vector2(WindowWidth - Margin * 2, 46);
+            ammoCard.anchoredPosition = new Vector2(0,
+                -TopOffset - (CardHeight * 5 + CardSpacing * 4) - CardSpacing);
 
             var ammoText = CreateText(ammoCard, "AmmoText", "", ModernUiTheme.SizeLabel, NameColor,
                 TextAlignmentOptions.Center, FontStyles.Normal, Vector2.zero, Vector2.zero, null);
@@ -257,7 +237,7 @@ namespace Assets.Scripts.UI.Inventory
             var image = go.GetComponent<Image>();
             image.sprite = roundedSprite;
             image.type = Image.Type.Sliced;
-            image.color = name == "CenterCard" ? CenterColor : CardColor;
+            image.color = CardColor;
             return (RectTransform)go.transform;
         }
 
