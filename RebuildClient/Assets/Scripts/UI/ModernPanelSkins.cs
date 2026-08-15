@@ -173,8 +173,38 @@ namespace Assets.Scripts.UI
 
             //after the sweeps, so nothing repaints the number the window is here for
             StylePointsReadout(win);
+            StyleSkillFooter(win);
 
             Debug.Log("[ModernPanelSkins] Retinted the skill window.");
+        }
+
+        /// <summary>
+        /// Finishes the strip along the bottom of the skill window. With the point count
+        /// moved up under the tabs, what was left down here was the lock toggle off to one
+        /// side and the resize target, a 120 by 30 image that read as a stray bar lying
+        /// across the middle. The strip becomes a proper footer and the resize target
+        /// becomes a small grip, without its rect changing, so the drag still works.
+        /// </summary>
+        private static void StyleSkillFooter(SkillWindow win)
+        {
+            var root = (RectTransform)win.transform;
+
+            if (root.Find("ModernFooter") == null)
+            {
+                //measured off the prefab: the lock toggle runs from 2.8 to 28.8 above the
+                //bottom edge and the resize target from 4 to 34, so a band from 2 to 38
+                //holds both with a little room
+                var footer = ModernUiTheme.CreateCard(root, "ModernFooter", ModernUiTheme.CardColor, true);
+                footer.anchorMin = new Vector2(0, 0);
+                footer.anchorMax = new Vector2(1, 0);
+                footer.pivot = new Vector2(0.5f, 0);
+                footer.offsetMin = new Vector2(14, 2);
+                footer.offsetMax = new Vector2(-14, 38);
+                footer.GetComponent<Image>().raycastTarget = false;
+                footer.SetAsFirstSibling();
+            }
+
+            ModernUiTheme.StyleResizeGrip(root);
         }
 
         /// <summary>
@@ -300,9 +330,44 @@ namespace Assets.Scripts.UI
             ModernUiTheme.RecolorAccents(win.transform);
             ModernUiTheme.StyleSliders(win.transform);
             ModernUiTheme.StyleScrollViews(win.transform);
+            ModernUiTheme.StyleResizeGrip(win.transform);
             ThaiUiText.Apply(win.transform);
 
+            //after the wording is swapped, since it is the Thai that has to fit
+            if (win.TabContents != null)
+            {
+                foreach (var page in win.TabContents)
+                {
+                    if (page != null)
+                        FitLabelsToRows(page.transform);
+                }
+            }
+
             Debug.Log("[ModernPanelSkins] Retinted the options window.");
+        }
+
+        /// <summary>
+        /// Brings each label down to what its own row can hold.
+        ///
+        /// Thai sets taller than Latin at the same point size: the vowels sit above the
+        /// letters and the tone marks above those again. The options rows are twenty
+        /// points high and were laid out for English, so the wording that replaced it
+        /// grew up into the row above and the two ran together. Sizing from the row rather
+        /// than picking one number covers the headings, which have more room, at the same
+        /// time.
+        /// </summary>
+        private static void FitLabelsToRows(Transform root)
+        {
+            foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
+            {
+                var height = text.rectTransform.rect.height;
+                if (height <= 1f)
+                    continue;
+
+                //a shade under two thirds of the row leaves room for what Thai puts above
+                //and below the line without the text touching the row on either side
+                text.fontSize = Mathf.Clamp(height * 0.62f, 10f, ModernUiTheme.SizeBody);
+            }
         }
 
         private static void SkinEmotes(EmoteWindow win)

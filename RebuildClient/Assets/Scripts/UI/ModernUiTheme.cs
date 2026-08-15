@@ -713,6 +713,131 @@ namespace Assets.Scripts.UI
                 0, SpriteMeshType.FullRect, new Vector4(30, 30, 30, 30));
         }
 
+        //The gauges along the top of the screen. Each hue is darkened to the point where
+        //white bold text on it clears 4.5 to 1, since the reading is printed across the
+        //bar itself, and they are told apart by hue rather than by brightness so that all
+        //four sit at the same weight beside each other.
+        public static readonly Color GaugeTrackColor = new Color(0.106f, 0.145f, 0.196f);
+        public static readonly Color GaugeHealthColor = new Color(0.184f, 0.523f, 0.215f);
+        public static readonly Color GaugeManaColor = new Color(0.205f, 0.451f, 0.820f);
+        public static readonly Color GaugeExpColor = new Color(0.595f, 0.428f, 0.119f);
+        public static readonly Color GaugeJobExpColor = new Color(0.547f, 0.362f, 0.805f);
+
+        private static Sprite gaugeSprite;
+
+        /// <summary>
+        /// A rounded bar carrying a top lit gradient in its pixels. Multiplying that
+        /// against whatever colour a gauge is tinted is what gives a flat rectangle its
+        /// roundness; the alternative, a second image laid over every bar, doubles the
+        /// draw calls for the part of the screen that redraws most often.
+        /// </summary>
+        public static Sprite GaugeSprite
+        {
+            get
+            {
+                if (gaugeSprite == null)
+                    gaugeSprite = CreateGaugeSprite();
+                return gaugeSprite;
+            }
+        }
+
+        private static Sprite CreateGaugeSprite()
+        {
+            const int size = 32;
+            const int radius = 12;
+            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+
+            for (var y = 0; y < size; y++)
+            {
+                var height = (y + 0.5f) / size;
+                var shade = Mathf.Lerp(0.56f, 1f, Mathf.Pow(height, 0.7f));
+                //a narrow band of extra light below the top edge, which is the highlight
+                //the eye reads as a curved surface rather than a painted rectangle
+                var highlight = Mathf.Exp(-Mathf.Pow((height - 0.76f) / 0.11f, 2f)) * 0.16f;
+                var value = Mathf.Clamp01(shade + highlight);
+
+                for (var x = 0; x < size; x++)
+                {
+                    var distance = RoundedDistance(x, y, size, radius);
+                    var alpha = Mathf.Clamp01(0.5f - distance);
+                    texture.SetPixel(x, y, new Color(value, value, value, alpha));
+                }
+            }
+
+            texture.Apply();
+            //sliced left and right only. With no border top or bottom the whole height is
+            //stretched to the bar, so the gradient scales with it instead of a middle band
+            //being smeared out between two fixed caps.
+            return Sprite.Create(texture, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f), 100,
+                0, SpriteMeshType.FullRect, new Vector4(12, 0, 12, 0));
+        }
+
+        /// <summary>
+        /// Draws a slider as a read-only gauge: a sunken dark channel with a lit bar in
+        /// it. The handle is taken off, because a health bar is not something to drag.
+        /// </summary>
+        public static void StyleGauge(Slider slider, Color fill)
+        {
+            if (slider == null)
+                return;
+
+            var track = slider.GetComponent<Image>();
+            if (track == null)
+            {
+                var background = slider.transform.Find("Background");
+                if (background != null)
+                    track = background.GetComponent<Image>();
+            }
+
+            if (track != null)
+            {
+                track.sprite = GaugeSprite;
+                track.type = Image.Type.Sliced;
+                track.color = GaugeTrackColor;
+            }
+
+            if (slider.fillRect != null)
+            {
+                var bar = slider.fillRect.GetComponent<Image>();
+                if (bar != null)
+                {
+                    bar.sprite = GaugeSprite;
+                    bar.type = Image.Type.Sliced;
+                    bar.color = fill;
+                }
+            }
+
+            if (slider.handleRect != null)
+                slider.handleRect.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// Turns the resize target in the corner of a window into a small grip. The
+        /// original is a 120 by 30 image, which under the new panel colours read as a
+        /// stray bar lying across the bottom of the window. The rect is left exactly as
+        /// it was so that whatever listens for the drag still has the same area to
+        /// listen over, and only what is drawn inside it changes.
+        /// </summary>
+        public static void StyleResizeGrip(Transform root)
+        {
+            foreach (var child in root.GetComponentsInChildren<Transform>(true))
+            {
+                if (child.name.IndexOf("ResizeHandle", StringComparison.OrdinalIgnoreCase) < 0)
+                    continue;
+
+                var image = child.GetComponent<Image>();
+                if (image != null)
+                    image.color = new Color(1f, 1f, 1f, 0f);
+
+                if (child.Find("ModernGrip") != null)
+                    continue;
+
+                var grip = CreateCard(child, "ModernGrip", IconMutedColor);
+                Place(grip, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(44, 4));
+                grip.GetComponent<Image>().raycastTarget = false;
+            }
+        }
+
         /// <summary>
         /// A thin blue handle running on a soft track, in place of the boxy default.
         /// </summary>

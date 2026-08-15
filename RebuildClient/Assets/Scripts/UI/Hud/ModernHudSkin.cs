@@ -21,6 +21,7 @@ namespace Assets.Scripts.UI.Hud
         private float searchTimer;
         private Image minimapFrame;
         private GameObject minimapContent;
+        private Slider minimapZoom;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -111,12 +112,39 @@ namespace Assets.Scripts.UI.Hud
                 card.SetAsFirstSibling();
             }
 
-            //the bars keep their own colours, they are saying how much health is left
             ModernUiTheme.RepaintInk(root);
+
+            //Four flat rectangles in four bright colours, with the reading printed across
+            //them in white that did not contrast with any of them. They become sunken
+            //channels with a lit bar inside, and each hue is darkened to the point where
+            //the reading on top of it is actually readable.
+            ModernUiTheme.StyleGauge(box.HpSlider, ModernUiTheme.GaugeHealthColor);
+            ModernUiTheme.StyleGauge(box.SpSlider, ModernUiTheme.GaugeManaColor);
+            ModernUiTheme.StyleGauge(box.ExpSlider, ModernUiTheme.GaugeExpColor);
+            ModernUiTheme.StyleGauge(box.JobExpSlider, ModernUiTheme.GaugeJobExpColor);
+
+            //set after the ink pass, which cannot see that these sit on a dark channel:
+            //the reading spans the filled part and the empty part both, so it takes the
+            //ink for the darker of the two
+            StyleGaugeLabel(box.HpDisplay);
+            StyleGaugeLabel(box.SpDisplay);
+            StyleGaugeLabel(box.ExpDisplay);
+            StyleGaugeLabel(box.JobExpDisplay);
+
             foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
                 text.extraPadding = true;
 
             Debug.Log("[ModernHudSkin] Repainted the character readout.");
+        }
+
+        private static void StyleGaugeLabel(TextMeshProUGUI text)
+        {
+            if (text == null)
+                return;
+
+            text.color = ModernUiTheme.LightInkColor;
+            text.fontStyle = FontStyles.Bold;
+            text.extraPadding = true;
         }
 
         /// <summary>
@@ -265,6 +293,7 @@ namespace Assets.Scripts.UI.Hud
             }
 
             minimapContent = map.ContentContainer;
+            minimapZoom = map.ZoomSlider;
             ModernUiTheme.StyleSliders(root);
 
             Debug.Log("[ModernHudSkin] Framed the minimap.");
@@ -288,6 +317,11 @@ namespace Assets.Scripts.UI.Hud
             var hasMap = minimapContent != null && minimapContent.activeInHierarchy;
             if (minimapFrame.enabled != hasMap)
                 minimapFrame.enabled = hasMap;
+
+            //the zoom slider goes with it. Left behind on its own it was a lone blue dot
+            //on a rule down the edge of the screen, with nothing to say what it zoomed.
+            if (minimapZoom != null && minimapZoom.gameObject.activeSelf != hasMap)
+                minimapZoom.gameObject.SetActive(hasMap);
         }
     }
 }
