@@ -207,6 +207,11 @@ public class Player : IEntityAutoReset
             CharData[(int)PlayerStat.Zeny] = int.MaxValue;
         else
             CharData[(int)PlayerStat.Zeny] += val;
+
+        //DropZeny right below has always told the client; this did not, so zeny gained
+        //anywhere other than a shop counter sat on the server until the next login and
+        //read to the player as the thing that gave it being broken
+        CommandBuilder.SendUpdateZeny(this);
     }
 
     [ScriptUseable]

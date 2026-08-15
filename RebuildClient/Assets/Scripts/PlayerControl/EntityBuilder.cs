@@ -95,7 +95,12 @@ namespace Assets.Scripts.PlayerControl
             if (dataLoader.MonsterClassLookup.TryGetValue(spawn.ClassId, out var lookupData))
                 mData = lookupData;
             else
-                Debug.LogWarning("Failed to find monster with id of " + spawn.ClassId);
+                //Named, because the id on its own tells you nothing and the fallback is a
+                //Poring, so the symptom is a monster wearing the wrong body rather than an
+                //error. The client's copy of the monster table is written by updateclient.bat.
+                Debug.LogWarning($"Failed to find monster '{spawn.Name}' with id of {spawn.ClassId} "
+                                 + "in the client's monster table, so it is being drawn as a Poring. "
+                                 + "The table is out of date: run updateclient.bat.");
 
             if (mData.SpriteName.Contains(".prefab"))
             {
@@ -133,7 +138,12 @@ namespace Assets.Scripts.PlayerControl
             if (dataLoader.MonsterClassLookup.TryGetValue(spawn.ClassId, out var lookupData))
                 mData = lookupData;
             else
-                Debug.LogWarning("Failed to find monster with id of " + spawn.ClassId);
+                //Named, because the id on its own tells you nothing and the fallback is a
+                //Poring, so the symptom is a monster wearing the wrong body rather than an
+                //error. The client's copy of the monster table is written by updateclient.bat.
+                Debug.LogWarning($"Failed to find monster '{spawn.Name}' with id of {spawn.ClassId} "
+                                 + "in the client's monster table, so it is being drawn as a Poring. "
+                                 + "The table is out of date: run updateclient.bat.");
 
             if (mData.SpriteName.Contains(".prefab"))
             {
