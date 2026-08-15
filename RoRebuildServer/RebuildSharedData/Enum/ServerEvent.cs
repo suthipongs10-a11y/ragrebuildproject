@@ -14,6 +14,9 @@ public enum ServerEvent
     //a line worth the whole server stopping to read, shown across the top of the screen
     //rather than only in the chat log. Carries its text in the packet's string field.
     Announcement,
+    //something a card gave the wearer. Carries the item's name in the string field, or
+    //nothing at all when what was found was zeny, in which case the amount is in the value.
+    CardBonus,
 }
 
 public enum ServerResult

@@ -46,6 +46,20 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
                     //once the banner has gone, all this has to do is put it on screen
                     AnnouncementBanner.Show(msg.ReadString());
                     break;
+                case ServerEvent.CardBonus:
+                {
+                    //A card's find lands on the ground and picking it up says so, but the
+                    //pickup line looks exactly like every other pickup, so there was nothing
+                    //to tell the player their card had done anything at all.
+                    var found = msg.ReadString();
+                    if (string.IsNullOrEmpty(found))
+                        Camera.AppendChatText($"<color=#e0a020>[การ์ด] ได้รับ {val} เซนี่</color>");
+                    else if (val > 1)
+                        Camera.AppendChatText($"<color=#e0a020>[การ์ด] พบ {val}x {found}</color>");
+                    else
+                        Camera.AppendChatText($"<color=#e0a020>[การ์ด] พบ {found}</color>");
+                    break;
+                }
                 case ServerEvent.MemoLocationSaved:
                     if(State.KnownSkills.TryGetValue(CharacterSkill.WarpPortal, out var level) && level > 1)
                         Camera.AppendChatText($"<color=#00fbfb>Current location has been recorded in slot {val + 1} as a warp portal destination.</color>");

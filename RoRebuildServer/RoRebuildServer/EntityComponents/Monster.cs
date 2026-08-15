@@ -677,6 +677,12 @@ public partial class Monster : IEntityAutoReset
             item.SetExclusivePickupTime(topContributor, 8f);
             Character.Map.DropGroundItem(ref item);
             dropId++;
+
+            //Said out loud, because it lands on the ground looking exactly like the
+            //monster's own drops and the pickup line reads the same as any other. Without
+            //this there is nothing to tell the player their card did anything.
+            CommandBuilder.SendServerEvent(player, ServerEvent.CardBonus, 1,
+                DataManager.GetItemInfoById(itemId)?.Name ?? "?");
         }
 
         foreach (var (_, effect) in player.Equipment.BonusZenyOnKill)
@@ -686,7 +692,9 @@ public partial class Monster : IEntityAutoReset
 
             //no item to drop, so this one does go straight to the player: zeny has no
             //bag to be full and nowhere on the ground to put it
-            player.AddZeny(GameRandom.NextInclusive(effect.ItemIds[0], effect.ItemIds[1]));
+            var amount = GameRandom.NextInclusive(effect.ItemIds[0], effect.ItemIds[1]);
+            player.AddZeny(amount);
+            CommandBuilder.SendServerEvent(player, ServerEvent.CardBonus, amount);
         }
     }
 
