@@ -118,6 +118,7 @@ namespace Assets.Scripts.UI.Inventory
             ModernUiTheme.StyleScrollViews(root);
             ModernUiTheme.RepaintInk(root);
             ModernUiTheme.RecolorAccents(root);
+            ModernUiTheme.StyleCloseButtons(root);
             ThaiUiText.Apply(root);
 
             Debug.Log("[ModernInventorySkin] Rebuilt the bag window.");

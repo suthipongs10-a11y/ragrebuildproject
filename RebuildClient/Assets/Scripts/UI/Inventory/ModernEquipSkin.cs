@@ -171,6 +171,8 @@ namespace Assets.Scripts.UI.Inventory
                 catch (System.Exception e) { Debug.LogWarning($"[ModernEquipSkin] Initial refresh skipped: {e.Message}"); }
             }
 
+            ModernUiTheme.StyleCloseButtons(win.transform);
+
             Debug.Log("[ModernEquipSkin] Rebuilt the equipment window.");
         }
 

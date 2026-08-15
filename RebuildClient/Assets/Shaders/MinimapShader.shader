@@ -5,6 +5,11 @@ Shader "Ragnarok/MinimapShader"
 		[PerRendererData] _MainTex("Sprite Texture", 2D) = "white" {}
 		_SecondaryTex("Sprite Texture", 2D) = "white" {}
 		_Color("Tint", Color) = (1,1,1,1)
+		// Lifts the whole image after the walkable areas have been shaded. 1 leaves the
+		// map exactly as it was rendered, which is what the minimap on the hud wants; the
+		// small preview in the database asks for more than that, because it is read on a
+		// pale panel rather than against the world.
+		_Brightness("Brightness", Float) = 1
 
 		_StencilComp("Stencil Comparison", Float) = 8
 		_Stencil("Stencil ID", Float) = 0
@@ -80,6 +85,7 @@ Shader "Ragnarok/MinimapShader"
 			TEXTURE2D(_SecondaryTex);
 			SAMPLER(sampler_SecondaryTex);
 			half4 _Color;
+			half _Brightness;
 			half4 _TextureSampleAdd;
 			float4 _ClipRect;
 			float4 _MainTex_ST;
@@ -105,6 +111,8 @@ Shader "Ragnarok/MinimapShader"
 
 				if (color2.r > 0.5)
 					color.rgb *= 0.6;
+
+				color.rgb = saturate(color.rgb * _Brightness);
 
 				return color;
 			}

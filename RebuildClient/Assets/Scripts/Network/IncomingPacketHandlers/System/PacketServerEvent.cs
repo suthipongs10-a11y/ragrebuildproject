@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Network.HandlerBase;
+using Assets.Scripts.UI.Hud;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
 
@@ -39,6 +40,11 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
                 case ServerEvent.EligibleForJobChange:
                     Camera.AppendChatText($"<color=#99CCFF><i>Congratulations, you've reached job 10! You are now eligible to change jobs. "
                                           + "Speak to the bard south of Prontera to get started.</i></color>");
+                    break;
+                case ServerEvent.Announcement:
+                    //the chat copy is sent separately so the line is still there to read
+                    //once the banner has gone, all this has to do is put it on screen
+                    AnnouncementBanner.Show(msg.ReadString());
                     break;
                 case ServerEvent.MemoLocationSaved:
                     if(State.KnownSkills.TryGetValue(CharacterSkill.WarpPortal, out var level) && level > 1)

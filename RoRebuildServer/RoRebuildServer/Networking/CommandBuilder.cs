@@ -1062,6 +1062,22 @@ public static class CommandBuilder
         NetworkManager.SendMessage(packet, p.Connection);
     }
 
+    /// <summary>
+    /// The same packet as SendServerEvent, sent to everyone currently in the recipient
+    /// list rather than to one player. Used for announcements, which are the only server
+    /// event that is about somebody other than the person reading it.
+    /// </summary>
+    public static void SendServerEventMulti(ServerEvent eventType, int id = 0, string text = "")
+    {
+        var packet = NetworkManager.StartPacket(PacketType.ServerEvent, 128);
+
+        packet.Write((byte)eventType);
+        packet.Write(id);
+        packet.Write(text);
+
+        NetworkManager.SendMessageMulti(packet, recipients);
+    }
+
     public static void SendActionResult(Player p, ServerResult eventType, int id = 0, string text = "")
     {
         var packet = NetworkManager.StartPacket(PacketType.ServerResult, 128);

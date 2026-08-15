@@ -19,7 +19,6 @@ namespace Assets.Scripts.UI.Hud
         private const float SearchInterval = 0.5f;
 
         private float searchTimer;
-        private Image minimapFrame;
         private GameObject minimapContent;
         private Slider minimapZoom;
         private GameObject minimapEmpty;
@@ -272,28 +271,13 @@ namespace Assets.Scripts.UI.Hud
             if (root == null)
                 return;
 
-            //An outline rather than a filled plate. A filled one was a mistake: on a map
-            //with no minimap image rendered for it yet the picture is simply absent, and
-            //the plate meant for the back of it became a large blue rectangle sitting over
-            //the corner of the screen with nothing in it.
-            var existing = root.Find("ModernMinimapFrame");
-            if (existing != null)
-            {
-                minimapFrame = existing.GetComponent<Image>();
-            }
-            else
-            {
-                var go = new GameObject("ModernMinimapFrame", typeof(Image));
-                go.transform.SetParent(root, false);
-
-                minimapFrame = go.GetComponent<Image>();
-                minimapFrame.sprite = ModernUiTheme.OutlineSprite;
-                minimapFrame.type = Image.Type.Sliced;
-                minimapFrame.color = ModernUiTheme.AccentColor;
-                minimapFrame.raycastTarget = false;
-
-                ModernUiTheme.Stretch((RectTransform)go.transform, -3, -3, 3, 3);
-            }
+            //No frame around it. One was tried and it was wrong: the minimap is a window
+            //onto the world rather than a panel of the interface, and a blue rule around
+            //the edge made it look like a dialog that had failed to close. What the corner
+            //of the screen wants there is the map and nothing else.
+            var staleFrame = root.Find("ModernMinimapFrame");
+            if (staleFrame != null)
+                Destroy(staleFrame.gameObject);
 
             //A map with no minimap rendered for it yet leaves this corner of the screen
             //completely blank, which reads as the widget being broken rather than as the
@@ -350,13 +334,14 @@ namespace Assets.Scripts.UI.Hud
         }
 
         /// <summary>
-        /// Hides the frame whenever there is no map behind it. Which map has a picture
-        /// depends on what has been rendered by the lighting tool, and it changes on every
-        /// warp, so this is checked on the same beat as everything else rather than once.
+        /// Hides everything that only makes sense with a map behind it. Which map has a
+        /// picture depends on what has been rendered by the lighting tool, and it changes
+        /// on every warp, so this is checked on the same beat as everything else rather
+        /// than once.
         /// </summary>
         private void SyncMinimapFrame()
         {
-            if (minimapFrame == null)
+            if (minimapEmpty == null && minimapPopulation == null)
                 return;
 
             //Read off the content container, not off MapImage. The map is drawn through a
@@ -365,8 +350,6 @@ namespace Assets.Scripts.UI.Hud
             //LoadMinimapCoroutine switches the container on as its very last step and
             //gives up before reaching it whenever a map has no minimap rendered yet.
             var hasMap = minimapContent != null && minimapContent.activeInHierarchy;
-            if (minimapFrame.enabled != hasMap)
-                minimapFrame.enabled = hasMap;
 
             //the zoom slider goes with it. Left behind on its own it was a lone blue dot
             //on a rule down the edge of the screen, with nothing to say what it zoomed.

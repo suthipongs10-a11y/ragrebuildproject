@@ -134,12 +134,22 @@ namespace Assets.Scripts.UI.Hud
                 mapIcons.Add(entityId, iconData);
             }
 
+            //Kept up to date even when there is nowhere to draw it yet. The minimap image
+            //loads a moment after a warp does, and what it replays once it arrives is this
+            //stored position, so a stale one would put everybody where they used to be.
+            iconData.Position = pos;
+            iconData.Type = type;
+
             if (!gameObject.activeInHierarchy || MapImage == null || mapSprite == null)
                 return;
 
             var scale = 0.3f;
             if (type == CharacterDisplayType.Boss || type == CharacterDisplayType.Mvp)
                 scale = 0.4f;
+            //Another player is the one marker you are actually looking for on a crowded
+            //map, and at the size the rest of the furniture uses it was a speck.
+            if (type == CharacterDisplayType.Player)
+                scale = 0.42f;
             if (type == CharacterDisplayType.Portal)
                 scale = 0.08f;
 
@@ -179,24 +189,14 @@ namespace Assets.Scripts.UI.Hud
             r.anchorMin = Vector2.zero;
             r.anchorMax = Vector2.zero;
 
-            var w = mapSprite.texture.width;
             var h = mapSprite.texture.height;
             var offset = new Vector3(0.5f, 0.5f, 0);
 
             r.localPosition = new Vector3(pos.x * MinimapPixelsPerTile / 2f, pos.y * MinimapPixelsPerTile / 2f - h, 0f) + offset;
 
-            var px = (pos.x * MinimapPixelsPerTile / 2f + offsetX) * curSize;
-            var py = ((h - pos.y * MinimapPixelsPerTile / 2f) + offsetY) * curSize;
-
-            var scrollx = px - 125f;
-            var scrolly = py - 125f;
-
-            var maxScroll = ((Mathf.Max(w, h) * curSize - 250f));
-
-            scrollx = Mathf.Clamp(-scrollx, -maxScroll, 0);
-            scrolly = Mathf.Clamp(scrolly, 0, maxScroll);
-
-            ContentContainer.GetComponent<RectTransform>().anchoredPosition = new Vector3(scrollx, scrolly, 0f);
+            //Only the marker moves. Scrolling the map to whatever entity was last reported
+            //belongs to SetPlayerPosition and was copied in here by mistake: it meant that
+            //every time somebody else took a step, the view slid off you and onto them.
 
             var s = scale * ObjectScaleFactor * (1 / curSize);
         

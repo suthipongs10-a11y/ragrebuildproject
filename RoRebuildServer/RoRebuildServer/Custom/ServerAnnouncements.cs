@@ -35,14 +35,21 @@ public class ServerAnnouncements : ServerConfigScriptHandlerBase
     }
 
     /// <summary>
-    /// Sends one line to every player on the server. The empty name is what tells the
-    /// client to print the text on its own rather than prefixing it with a speaker, and
-    /// the flag at the end is what plays the notice sound.
+    /// Sends one line to every player on the server, twice over: once as an announcement
+    /// event, which the client puts across the top of the screen for a few seconds, and
+    /// once into the chat log so it is still there to read afterwards.
+    ///
+    /// The empty name on the chat copy is what tells the client to print the text on its
+    /// own rather than prefixing it with a speaker, and the flag at the end is what plays
+    /// the notice sound.
     /// </summary>
     public static void Announce(string text)
     {
+        var line = $"<color={GoldColor}>{text}</color>";
+
         CommandBuilder.AddAllPlayersAsRecipients();
-        CommandBuilder.SendServerMessage($"<color={GoldColor}>{text}</color>", "", true);
+        CommandBuilder.SendServerEventMulti(ServerEvent.Announcement, 0, line);
+        CommandBuilder.SendServerMessage(line, "", true);
         CommandBuilder.ClearRecipients();
     }
 

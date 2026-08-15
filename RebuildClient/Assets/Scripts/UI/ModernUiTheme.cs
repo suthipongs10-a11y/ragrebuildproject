@@ -275,6 +275,9 @@ namespace Assets.Scripts.UI
 
                 foreach (var barButton in child.GetComponentsInChildren<Button>(true))
                 {
+                    if (IsCloseButton(barButton))
+                        continue;
+
                     var buttonImage = barButton.GetComponent<Image>();
                     if (buttonImage != null)
                         buttonImage.color = HintColor;
@@ -284,7 +287,78 @@ namespace Assets.Scripts.UI
                     AddBarIcon(child, icon);
             }
 
+            StyleCloseButtons(root);
+
             return dragBar;
+        }
+
+        private const string CloseGlyphName = "ModernCloseGlyph";
+
+        /// <summary>
+        /// Every window's close button is named CloseButton and wears the same one piece
+        /// of art. The name on its own is not enough: the skill bar's minimise button is
+        /// called CloseButton too and would end up wearing an x that means the wrong
+        /// thing, so the picture has to agree as well.
+        /// </summary>
+        private static bool IsCloseButton(Component button)
+        {
+            if (button == null || !button.name.ToLowerInvariant().StartsWith("closebutton"))
+                return false;
+
+            if (button.transform.Find(CloseGlyphName) != null)
+                return true;
+
+            var image = button.GetComponent<Image>();
+            return image == null || image.sprite == null ||
+                   image.sprite.name.ToLowerInvariant().Contains("close_off");
+        }
+
+        /// <summary>
+        /// Draws the little x in the corner of a window as a shape of our own.
+        ///
+        /// The client's own close sprite is an x and a filled disc baked into one image.
+        /// Tinting that image tints both at once, so whatever colour was chosen, the x
+        /// ended up the same shade as the disc it was sitting on and the button read as a
+        /// blank circle. The fix is to stop tinting a picture that has two things in it:
+        /// the button becomes a plain pale chip, and the x goes on top as its own graphic
+        /// in an ink dark enough to read against it.
+        /// </summary>
+        public static void StyleCloseButtons(Transform root)
+        {
+            foreach (var button in root.GetComponentsInChildren<Button>(true))
+            {
+                if (!IsCloseButton(button))
+                    continue;
+
+                StyleCloseButton(button);
+            }
+        }
+
+        public static void StyleCloseButton(Button button)
+        {
+            if (!IsCloseButton(button))
+                return;
+
+            var rect = (RectTransform)button.transform;
+
+            var image = button.GetComponent<Image>();
+            if (image != null)
+            {
+                image.sprite = RoundedSprite;
+                image.type = Image.Type.Sliced;
+                image.color = CardColor;
+                //the button's own hover tint runs on this graphic, so it has to stay the
+                //target rather than being handed over to the glyph
+                button.targetGraphic = image;
+            }
+
+            if (rect.Find(CloseGlyphName) != null)
+                return;
+
+            //CreateIcon leaves the graphic out of the raycast, which is what keeps the
+            //click on the button underneath it
+            var glyph = CreateIcon(rect, ModernUiIcons.Close, NameColor, 11f);
+            glyph.gameObject.name = CloseGlyphName;
         }
 
         /// <summary>

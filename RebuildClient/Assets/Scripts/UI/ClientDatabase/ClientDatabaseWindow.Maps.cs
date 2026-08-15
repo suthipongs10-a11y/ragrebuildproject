@@ -15,6 +15,7 @@ namespace Assets.Scripts.UI.ClientDatabase
     public partial class ClientDatabaseWindow
     {
         private static readonly int s_secondaryTex = Shader.PropertyToID("_SecondaryTex");
+        private static readonly int s_brightness = Shader.PropertyToID("_Brightness");
         private const float MinimapPxPerTile = 1f;
 
         private readonly List<(GameObject go, ClientMapEntry entry, string searchText)> mapRowEntries = new();
@@ -82,6 +83,10 @@ namespace Assets.Scripts.UI.ClientDatabase
             if (source == null) return;
 
             minimapMaterialInstance = new Material(source) { name = "MonsterDb_Minimap" };
+            //The picture here is a few hundred pixels of a map that was rendered to be
+            //read against the game world, shown instead on a pale card at thumbnail size.
+            //At its own brightness the walls and the floor were the same near black.
+            minimapMaterialInstance.SetFloat(s_brightness, 1.5f);
             mapDetailMinimap.material = minimapMaterialInstance;
 
             mapDetailMinimap.raycastTarget = true;
@@ -173,8 +178,12 @@ namespace Assets.Scripts.UI.ClientDatabase
             mapDetailMinimap.sprite = null;
             mapDetailMinimap.color = new Color(1, 1, 1, 0.08f);
 
+            //Black, not null. Clearing a texture falls back to the shader's declared
+            //default, which for this one is white, and white in the walk mask means the
+            //shader shades the pixel down. So a map with no mask rendered for it had its
+            //whole picture darkened, which is most of why these previews were unreadable.
             if (minimapMaterialInstance != null)
-                minimapMaterialInstance.SetTexture(s_secondaryTex, null);
+                minimapMaterialInstance.SetTexture(s_secondaryTex, Texture2D.blackTexture);
             ClearPortalMarkers();
             ClearNpcMarkers();
 

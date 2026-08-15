@@ -116,16 +116,10 @@ namespace Assets.Scripts.UI.ClientDatabase
             if (win.iconRowTemplate != null)
                 ModernUiTheme.RepaintInk(win.iconRowTemplate.transform);
 
-            if (win.closeButton != null)
-            {
-                var closeImage = win.closeButton.GetComponent<Image>();
-                if (closeImage != null)
-                {
-                    closeImage.sprite = ModernUiTheme.RoundedSprite;
-                    closeImage.type = Image.Type.Sliced;
-                    closeImage.color = ModernUiTheme.CardColor;
-                }
-            }
+            //this window builds its own close button rather than inheriting a drag bar,
+            //so it needs the x drawn on it the same way every other window gets one
+            ModernUiTheme.StyleCloseButton(win.closeButton);
+            ModernUiTheme.StyleCloseButtons(root);
 
             ModernUiTheme.StyleScrollViews(root);
             ModernUiTheme.RepaintInk(root);
