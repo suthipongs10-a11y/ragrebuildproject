@@ -1,5 +1,6 @@
 ﻿using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
+using RoRebuildServer.Custom;
 using RoRebuildServer.Data;
 using RoRebuildServer.EntityComponents.Character;
 
@@ -62,6 +63,12 @@ public class PacketNpcRefineSubmit : IClientPacketHandler
                 player.Equipment.EquipItem(bagId);
                 player.UpdateStats(false);
             }
+
+            //only a real success is worth telling the server about; a level down landed
+            //here too and announcing that would be announcing a loss
+            if (result == RefineSuccessResult.Success)
+                ServerAnnouncements.AnnounceRefine(player, targetItem.UniqueItem.Id,
+                    targetItem.UniqueItem.Refine);
         }
 
         return;
