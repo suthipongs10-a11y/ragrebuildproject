@@ -363,12 +363,31 @@ namespace Assets.Scripts.Sprites
             return (time * frames) / 1000f;
         }
 
+        /// <summary>
+        /// How long this sprite takes to fall over, or zero if it cannot.
+        ///
+        /// Npc sprites have no death animation and GetMotionIdForSprite hands back -1 for
+        /// them, which this used to index the action list with. That throws, and it threw
+        /// inside the coroutine that removes a dead body, so anything wearing an npc
+        /// costume stayed on the ground forever: still there to hover, no longer there to
+        /// hit. Nothing has to fall over for the body to be taken away.
+        /// </summary>
         public float GetDeathTiming()
         {
             var motionId = RoAnimationHelper.GetMotionIdForSprite(Type, SpriteMotion.Dead);
+            if (SpriteData?.Actions == null || motionId < 0 || motionId >= SpriteData.Actions.Length)
+                return 0f;
+
             var time = SpriteData.Actions[motionId].Delay;
             var frames = SpriteData.Actions[motionId].Frames.Length;
             return (time * frames) / 1000f;
+        }
+
+        /// <summary>Whether the sprite actually has art for a motion.</summary>
+        public bool HasMotion(SpriteMotion motion)
+        {
+            var motionId = RoAnimationHelper.GetMotionIdForSprite(Type, motion);
+            return SpriteData?.Actions != null && motionId >= 0 && motionId < SpriteData.Actions.Length;
         }
 
         public void UpdateSpriteFrame()
@@ -512,7 +531,9 @@ namespace Assets.Scripts.Sprites
                 return;
 
             var action = RoAnimationHelper.GetMotionIdForSprite(Type, nextMotion);
-            if (action < 0 || action > SpriteData.Actions.Length)
+            //the last valid action index is Length - 1, and ChangeAction reads past it by
+            //the facing offset, so an action equal to the length was never usable either
+            if (action < 0 || action >= SpriteData.Actions.Length)
                 action = 0;
             ChangeAction(action);
             isPaused = false;

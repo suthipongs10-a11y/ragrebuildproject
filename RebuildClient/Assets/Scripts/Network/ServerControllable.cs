@@ -1211,12 +1211,18 @@ namespace Assets.Scripts.Network
                 yield break;
             }
 
-            var deathTiming = SpriteAnimator.GetDeathTiming();
-            SpriteAnimator.State = SpriteState.Dead;
-            SpriteAnimator.ChangeMotion(SpriteMotion.Dead, true);
-            SpriteAnimator.AnimSpeed = 1f;
+            //not everything can fall over. Npc sprites have no death animation, and a
+            //monster is allowed to wear one, in which case it simply fades out from
+            //wherever it was standing.
+            if (SpriteAnimator.HasMotion(SpriteMotion.Dead))
+            {
+                var deathTiming = SpriteAnimator.GetDeathTiming();
+                SpriteAnimator.State = SpriteState.Dead;
+                SpriteAnimator.ChangeMotion(SpriteMotion.Dead, true);
+                SpriteAnimator.AnimSpeed = 1f;
 
-            yield return new WaitForSeconds(deathTiming);
+                yield return new WaitForSeconds(deathTiming);
+            }
 
             if (CameraFollower.Instance.SelectedTarget == gameObject)
                 CameraFollower.Instance.ClearSelected();
@@ -1229,7 +1235,11 @@ namespace Assets.Scripts.Network
             isMoving = false;
             movePath = null;
 
-            FloatingDisplay.Close();
+            //Everything above the coroutine has to be safe to run, because anything that
+            //throws here means the coroutine never starts and the body is never taken
+            //away: still there to hover over, no longer there to hit.
+            if (FloatingDisplay != null)
+                FloatingDisplay.Close();
             FloatingDisplay = null;
 
             StopCasting();
