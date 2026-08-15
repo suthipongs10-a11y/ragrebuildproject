@@ -20,8 +20,6 @@ namespace Assets.Scripts.UI.ClientDatabase
 
         private readonly List<(GameObject go, MonsterEntry entry, string searchText)> monsterRowEntries = new();
 
-        private const string MonsterSpriteBasePath = "Assets/Sprites/Monsters/";
-
         private const float MonsterSpriteFitSize = 160f;
         private const float MonsterSpriteNaturalScale = 100f;
 
@@ -228,7 +226,9 @@ namespace Assets.Scripts.UI.ClientDatabase
                 return;
             }
 
-            var path = MonsterSpriteBasePath + cls.SpriteName;
+            //a monster wearing an npc's sprite is looked up in the npc folder instead, the
+            //same way the world does it, so the database shows what the player will meet
+            var path = ClientDataLoader.ResolveEntitySpritePath(monsterId, cls.SpriteName);
             AddressableUtility.LoadRoSpriteData(monsterSpriteHost, path, OnMonsterSpriteLoaded);
         }
 

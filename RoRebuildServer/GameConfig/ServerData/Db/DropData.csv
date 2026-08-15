@@ -12,7 +12,7 @@ ANGELING,Angel_Wing,1000,Scapulare_,600,Yggdrasil_Leaf,5000,Halo,10,White_Herb,1
 ANOLIAN,Anolian_Skin,10000,Crystal_Arrow#5-50,10000,Royal_Jelly,50,,0,Solid_Shell,10000,Brooch_,10,Oridecon,1340,Anolian_Card,10
 ANT_EGG,Phracon,3200,Shell,10000,Jellopy,10000,Sticky_Mucus,6500,Empty_Bottle,10000,Iron_Ore,2000,,0,Ant_Egg_Card,10
 ANTIQUE_FIRELOCK,Iron,10000,Apple_of_Archer,10,Large_Jellopy,10000,Yellow_Herb,400,Yam,3500,Panacea,2500,Cyclone_,50,Firelock_Soldier_Card,10
-ANTONIO,Gift_Box,10000,Red_Stocking,3000,Water_Lily_Hat,50
+ANTONIO,Gift_Box,5000,Red_Stocking,5000,Candy,10000,Water_Lily_Hat,50
 ANUBIS,Rotten_Bandage,10000,Healing_Staff,100,Memento,5500,Oridecon,1050,Cultish_Masque,10000,Celebrant's_Mitten,10,Wand_of_Occult,30,Anubis_Card,10
 ARCHANGELING,Evil_Wing,1000,Yggdrasil_Leaf,10000,Yggdrasil_Seed,1500,Agate,10000,Angel_Wing,1000,Full_Plate_,30,Turquoise,10000,Archangeling_Card,10
 ARCHER_SKELETON,Skel-Bone,10000,Rough_Oridecon,700,Apple_of_Archer,30,Great_Bow_,350,Fire_Arrow,10000,Red_Herb,10000,Bow,1500,Archer_Skeleton_Card,10
@@ -42,7 +42,7 @@ CLOCK,Needle_of_Alarm,10000,Trunk,8000,White_Herb,10000,Lemon,3200,Key_of_Clock_
 COCO,Acorn,10000,Hood_,200,Fluff,10000,Animal_Skin,10000,Potato,5000,Sandals_,250,Strawberry,6000,Coco_Card,10
 CONDOR,Talon,10000,Bow_,1500,Yellow_Gemstone,800,Arrow,10000,Meat,4000,Bird_Feather,10000,Orange,6000,Condor_Card,10
 COOKIE,Well-Baked_Cookie,10000,Candy_Cane,1500,Darkgreen_Dyestuffs,10,Chef_King_Orleans_Vol.1,500,Sandals_,300,,0,Candy,3200,Cookie_Card,10
-COOKIE_XMAS,Well-Baked_Cookie,10000,Pearl,450,Zargon,2000,Hood_,250,Gift_Box,50,,0,Red_Herb,10000,Christmas_Cookie_Card,10
+COOKIE_XMAS,Well-Baked_Cookie,10000,Pearl,450,Zargon,2000,Hood_,250,Gift_Box,300,,0,Red_Herb,10000,Christmas_Cookie_Card,10
 CORNUTUS,Crystal_Blue,450,Conch,10000,Scell,8000,Rough_Elunium,530,Shield_,50,Solid_Shell,10000,Blue_Gemstone,1000,Cornutus_Card,10
 CRAB,Crab_Shell,10000,Nipper,10000,Stone,7000,Star_Dust,130,,0,,0,Rough_Elunium,370,Crab_Card,10
 CRAMP,Claw_of_Rat,10000,Monster's_Feed,10000,Sapphire,800,Glass_Bead,1100,,0,Blue_Herb,700,Oridecon,950,Cramp_Card,10
@@ -99,7 +99,7 @@ GOBLIN_4,Green_Live,1000,Iron,1700,Poker_Face,150,Zorro_Masque,30,Smasher_,100,B
 GOBLIN_5,Iron,1500,Scell,10000,Wand_,150,Buckler_,10,Annoyed_Mask,150,Red_Herb,10000,Yellow_Herb,2200,Goblin_Card,10
 GOBLIN_ARCHER,Goblin_Mask,30,Iron,2500,Scell,10000,Oridecon_Arrow#2-10,10000,Red_Herb,6000,Composite_Bow_,250,Grape,3000,Goblin_Archer_Card,10
 GOBLIN_LEADER,Brigan,10000,Steel,8000,Rough_Oridecon,1200,Goblin_Leader_Mask,1500,Buckler_,400,Shield_,2000,Yellow_Herb,6500,Angry_Snarl,1500,Goblin_Leader_Card,10
-GOBLINE_XMAS,Wrapping_Lace,5500,Wrapping_Paper,5500,Rough_Oridecon,430,Gift_Box,100,Dirk_,100,Buckler_,50,Santa_Hat,100,Goblin_Card,10
+GOBLINE_XMAS,Wrapping_Lace,5500,Wrapping_Paper,5500,Rough_Oridecon,430,Gift_Box,445,Dirk_,100,Buckler_,50,Santa_Hat,100,Goblin_Card,10
 GOLDEN_BUG,Gold,10000,Golden_Mace,1500,Golden_Gear,2500,,0,Emperium,3000,Elunium,10000,Oridecon,10000,Golden_Thief_Bug_Card,10
 GOLEM,Steel,1500,Stone_Heart,10000,Zargon,2200,Rough_Elunium,700,Coal,2100,Yellow_Gemstone,2000,Iron,3500,Golem_Card,10
 GRAND_PECO,Peco_Peco_Feather,10000,Mastela_Fruit,3000,Wind_of_Verdure,10000,Gold,10,,0,,0,Orange,5000,Grand_Peco_Card,10

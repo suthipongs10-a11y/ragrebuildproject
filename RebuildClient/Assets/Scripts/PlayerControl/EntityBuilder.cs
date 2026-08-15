@@ -304,12 +304,9 @@ namespace Assets.Scripts.PlayerControl
             control.ConfigureEntity(spawn.ServerId, spawn.Position.ToVector2Int(), spawn.Facing);
             // control.EnsureFloatingDisplayCreated().SetUp(param.Name, param.MaxHp, 0);
 
-            var basePath = "Assets/Sprites/Monsters/";
-            if (control.ClassId < 4000)
-                basePath = "Assets/Sprites/Npcs/";
-
-
-            AddressableUtility.LoadRoSpriteData(go, basePath + data.SpriteName, control.SpriteAnimator.OnSpriteDataLoad);
+            AddressableUtility.LoadRoSpriteData(go,
+                ClientDataLoader.ResolveEntitySpritePath(control.ClassId, data.SpriteName),
+                control.SpriteAnimator.OnSpriteDataLoad);
             if (data.ShadowSize > 0)
                 control.AttachShadow(dataLoader.ShadowSprite);
             //AddressableUtility.LoadSprite(go, "shadow", control.AttachShadow);

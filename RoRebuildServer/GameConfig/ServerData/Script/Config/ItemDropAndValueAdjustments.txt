@@ -7,8 +7,10 @@ OnLoadDropData:
 		return rate;
 
 	//Antonio's drops are authored at the rates we actually want to see in game, so they
-	//skip the remap below. In DropData.csv 50 means 0.5% and stays 0.5%.
-	if(code == "Water_Lily_Hat" || code == "Red_Stocking")
+	//skip the remap below. In DropData.csv 50 means 0.5% and stays 0.5%. Gift Box is in
+	//here too, so the two christmas monsters that drop it carry the rate they were
+	//already getting after the remap, written out in full instead.
+	if(code == "Water_Lily_Hat" || code == "Red_Stocking" || code == "Gift_Box")
 		return rate;
 
 	if(type == Etc && subType == "Refine")

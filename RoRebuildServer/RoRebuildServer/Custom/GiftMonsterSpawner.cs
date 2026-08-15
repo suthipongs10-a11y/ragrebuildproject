@@ -23,13 +23,13 @@ public static class GiftMonsterSpawner
     private const string MonsterCode = "ANTONIO";
 
     /// <summary>
-    /// Three to six minutes after he dies. Long enough that finding him feels like luck,
-    /// short enough that a map is rarely without one. Note the server clamps this against
+    /// A minute after he dies. He is a giveaway rather than a prize, so the map is meant
+    /// to have one nearly all of the time. Note the server clamps this against
     /// MinSpawnTime/MaxSpawnTime in ServerDebugConfig.
     /// </summary>
-    private const int RespawnTime = 180000;
+    private const int RespawnTime = 60000;
 
-    private const int RespawnVariance = 180000;
+    private const int RespawnVariance = 0;
 
     private static bool warnedMissing;
 

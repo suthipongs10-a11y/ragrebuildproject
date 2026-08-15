@@ -593,6 +593,37 @@ namespace Assets.Scripts.Sprites
             return $"Assets/Sprites/Headgear/{(isMale ? "Male/남_" : "Female/여_")}{hatSprite}.spr";
         }
 
+        public const string MonsterSpritePath = "Assets/Sprites/Monsters/";
+        public const string NpcSpritePath = "Assets/Sprites/Npcs/";
+
+        /// <summary>
+        /// Where to find the sprite for a monster or npc.
+        ///
+        /// Which folder it lives in follows from the class id, npcs below 4000 and
+        /// monsters above it, and that holds for everything the game shipped with. But a
+        /// monster is free to wear an npc's costume, and sometimes has to: there is a
+        /// santa among the npc sprites and no santa at all among the monster ones. So when
+        /// the file is not where the id says it should be, the other folder is tried
+        /// before giving up on it.
+        /// </summary>
+        public static string ResolveEntitySpritePath(int classId, string spriteName)
+        {
+            if (string.IsNullOrWhiteSpace(spriteName))
+                return null;
+
+            var basePath = classId < 4000 ? NpcSpritePath : MonsterSpritePath;
+            if (AssetExists(basePath + spriteName))
+                return basePath + spriteName;
+
+            var otherPath = basePath == NpcSpritePath ? MonsterSpritePath : NpcSpritePath;
+            if (AssetExists(otherPath + spriteName))
+                return otherPath + spriteName;
+
+            //nothing found either way, so hand back the one the id asked for and let the
+            //loader report the miss with the name it expected
+            return basePath + spriteName;
+        }
+
         public static bool AssetExists(object key)
         {
             if (Application.isPlaying)
@@ -1241,12 +1272,8 @@ namespace Assets.Scripts.Sprites
             control.ConfigureEntity(param.ServerId, param.Position, param.Facing);
             // control.EnsureFloatingDisplayCreated().SetUp(param.Name, param.MaxHp, 0);
 
-            var basePath = "Assets/Sprites/Monsters/";
-            if (param.ClassId < 4000)
-                basePath = "Assets/Sprites/Npcs/";
-
-
-            AddressableUtility.LoadRoSpriteData(go, basePath + mData.SpriteName, control.SpriteAnimator.OnSpriteDataLoad);
+            AddressableUtility.LoadRoSpriteData(go, ResolveEntitySpritePath(param.ClassId, mData.SpriteName),
+                control.SpriteAnimator.OnSpriteDataLoad);
             if (mData.ShadowSize > 0)
                 control.AttachShadow(ShadowSprite);
             //AddressableUtility.LoadSprite(go, "shadow", control.AttachShadow);

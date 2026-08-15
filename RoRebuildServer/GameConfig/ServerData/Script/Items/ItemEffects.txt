@@ -1,4 +1,4 @@
-RecoveryItem("Red_Potion", 45, 65, 0, 0);
+﻿RecoveryItem("Red_Potion", 45, 65, 0, 0);
 RecoveryItem("Orange_Potion", 105, 145, 0, 0);
 RecoveryItem("Yellow_Potion", 175, 235, 0, 0);
 RecoveryItem("White_Potion", 325, 405, 0, 0);
@@ -120,7 +120,7 @@ Item("Shining_Stone") { OnValidate: return false; OnUse: }
 Item("Contract_in_Shadow") { OnValidate: return false; OnUse: }
 Item("Book_of_the_Devil") { OnValidate: return false; OnUse: }
 Item("Pet_Incubator") { OnValidate: return false; OnUse: }
-Item("Gift_Box") { OnValidate: return false; OnUse: }
+Item("Gift_Box") { OnUse: UseItemCreationItem("Gift_Box"); }
 Item("Concentration_Potion") { OnUse: AddStatusEffect(StatusIncreasedAttackSpeed, 30m, 10); }
 Item("Awakening_Potion") { OnValidate: return CharacterLevel >= 40 && JobId != 4 && JobId != 9; OnUse: AddStatusEffect(StatusIncreasedAttackSpeed, 30m, 15); }
 Item("Berserk_Potion") { OnValidate: return CharacterLevel >= 85 && (JobId == 1 || JobId == 3 || JobId == 6 || JobId == 7 || JobId == 8 || JobId == 11 || JobId == 12); OnUse: AddStatusEffect(StatusIncreasedAttackSpeed, 30m, 20); }
@@ -134,10 +134,10 @@ Item("Forbidden_Red_Candle") { OnValidate: return false; OnUse: }
 Item("Soft_Apron") { OnValidate: return false; OnUse: }
 Item("Authoritative_Badge") { OnUse: AddStatusEffect(StatusIncreasedMoveSpeed, 3m, 25); }
 Item("Korean_Rice_Cake") { OnValidate: return false; OnUse: }
-Item("Gift_Box_") { OnValidate: return false; OnUse: }
-Item("Gift_Box__") { OnValidate: return false; OnUse: }
-Item("Gift_Box___") { OnValidate: return false; OnUse: }
-Item("Gift_Box____") { OnValidate: return false; OnUse: }
+Item("Gift_Box_") { OnUse: UseItemCreationItem("Gift_Box_1"); }
+Item("Gift_Box__") { OnUse: UseItemCreationItem("Gift_Box_2"); }
+Item("Gift_Box___") { OnUse: UseItemCreationItem("Gift_Box_3"); }
+Item("Gift_Box____") { OnUse: UseItemCreationItem("Gift_Box_4"); }
 Item("Red_Envelope") { OnValidate: return false; OnUse: }
 Item("Poison_Bottle") { OnValidate: return false; OnUse: }
 Item("Pilule") { OnValidate: return false; OnUse: }
