@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using TMPro;
 using UnityEngine.EventSystems;
 using UnityEngine;
@@ -217,6 +217,15 @@ namespace Assets.Scripts.UI
                     if (material.HasProperty("_UnderlaySoftness"))
                         material.SetFloat("_UnderlaySoftness", 0f);
                     material.DisableKeyword("UNDERLAY_ON");
+
+                    //and no outline either, for the same reason: a dark band drawn around
+                    //a glyph is most of the stroke at interface sizes, so the letter comes
+                    //out looking smudged rather than defined
+                    if (material.HasProperty("_OutlineWidth"))
+                        material.SetFloat("_OutlineWidth", 0f);
+                    if (material.HasProperty("_OutlineColor"))
+                        material.SetColor("_OutlineColor", new Color(0f, 0f, 0f, 0f));
+                    material.DisableKeyword("OUTLINE_ON");
 
                     crispMaterial = material;
                 }
@@ -451,26 +460,47 @@ namespace Assets.Scripts.UI
         /// </summary>
         public static Material WithoutShadow(Material source)
         {
-            if (source == null || !source.HasProperty("_UnderlayColor"))
+            if (source == null)
                 return source;
 
-            var hasShadow = source.GetColor("_UnderlayColor").a > 0.01f
-                            || source.IsKeywordEnabled("UNDERLAY_ON");
-            if (!hasShadow)
+            var hasShadow = source.HasProperty("_UnderlayColor")
+                            && (source.GetColor("_UnderlayColor").a > 0.01f
+                                || source.IsKeywordEnabled("UNDERLAY_ON"));
+
+            //An outline is the same problem wearing a different name. It is a dark band
+            //laid around every glyph, and at interface sizes the band is most of the
+            //stroke, so the letter reads as smudged rather than as outlined.
+            var hasOutline = source.HasProperty("_OutlineWidth")
+                             && (source.GetFloat("_OutlineWidth") > 0.001f
+                                 || source.IsKeywordEnabled("OUTLINE_ON"));
+
+            if (!hasShadow && !hasOutline)
                 return source;
 
             if (unshadowed.TryGetValue(source, out var cached) && cached != null)
                 return cached;
 
             var copy = new Material(source) { name = source.name + " Flat" };
-            copy.SetColor("_UnderlayColor", new Color(0f, 0f, 0f, 0f));
-            if (copy.HasProperty("_UnderlayOffsetX"))
-                copy.SetFloat("_UnderlayOffsetX", 0f);
-            if (copy.HasProperty("_UnderlayOffsetY"))
-                copy.SetFloat("_UnderlayOffsetY", 0f);
-            if (copy.HasProperty("_UnderlaySoftness"))
-                copy.SetFloat("_UnderlaySoftness", 0f);
-            copy.DisableKeyword("UNDERLAY_ON");
+
+            if (hasShadow)
+            {
+                copy.SetColor("_UnderlayColor", new Color(0f, 0f, 0f, 0f));
+                if (copy.HasProperty("_UnderlayOffsetX"))
+                    copy.SetFloat("_UnderlayOffsetX", 0f);
+                if (copy.HasProperty("_UnderlayOffsetY"))
+                    copy.SetFloat("_UnderlayOffsetY", 0f);
+                if (copy.HasProperty("_UnderlaySoftness"))
+                    copy.SetFloat("_UnderlaySoftness", 0f);
+                copy.DisableKeyword("UNDERLAY_ON");
+            }
+
+            if (hasOutline)
+            {
+                copy.SetFloat("_OutlineWidth", 0f);
+                if (copy.HasProperty("_OutlineColor"))
+                    copy.SetColor("_OutlineColor", new Color(0f, 0f, 0f, 0f));
+                copy.DisableKeyword("OUTLINE_ON");
+            }
 
             unshadowed[source] = copy;
             return copy;

@@ -114,6 +114,25 @@ namespace Assets.Scripts.UI.Hud
                 card.SetAsFirstSibling();
             }
 
+            //Every label in here is drawn again from nothing. The ones the prefab shipped
+            //carry a dark outline and a drop shadow baked into their own material, and at
+            //this size the outline is most of the stroke, so the reading came out smeared
+            //rather than sharp. Stripping those off the material fixes some of them and
+            //not others, because several share a material with text elsewhere. Building
+            //the labels fresh in the theme's own crisp material settles it for all of them
+            //at once, and the box's references are moved onto the new ones so every write
+            //the client makes still lands.
+            box.CharacterName = RebuildLabel(box.CharacterName);
+            box.CharacterJob = RebuildLabel(box.CharacterJob);
+            box.CharacterZeny = RebuildLabel(box.CharacterZeny);
+            box.CharacterWeight = RebuildLabel(box.CharacterWeight);
+            box.HpDisplay = RebuildLabel(box.HpDisplay);
+            box.SpDisplay = RebuildLabel(box.SpDisplay);
+            box.ExpDisplay = RebuildLabel(box.ExpDisplay);
+            box.JobExpDisplay = RebuildLabel(box.JobExpDisplay);
+            box.BaseLvlDisplay = RebuildLabel(box.BaseLvlDisplay);
+            box.JobLvlDisplay = RebuildLabel(box.JobLvlDisplay);
+
             ModernUiTheme.RepaintInk(root);
 
             //Four flat rectangles in four bright colours, with the reading printed across
@@ -137,6 +156,60 @@ namespace Assets.Scripts.UI.Hud
                 text.extraPadding = true;
 
             Debug.Log("[ModernHudSkin] Repainted the character readout.");
+        }
+
+        /// <summary>
+        /// Replaces one label with an identical one that has no outline and no shadow.
+        ///
+        /// The new object takes the old one's place in the hierarchy and its exact
+        /// rectangle, so nothing moves; only the material it draws with is ours. The old
+        /// label is switched off rather than destroyed, because anything else in the
+        /// client still holding a reference to it would otherwise be holding a null.
+        /// </summary>
+        private static TextMeshProUGUI RebuildLabel(TextMeshProUGUI original)
+        {
+            if (original == null)
+                return null;
+
+            var source = original.rectTransform;
+            var go = new GameObject(original.name + " Crisp", typeof(TextMeshProUGUI));
+            go.transform.SetParent(source.parent, false);
+            go.transform.SetSiblingIndex(source.GetSiblingIndex());
+
+            var rect = (RectTransform)go.transform;
+            rect.anchorMin = source.anchorMin;
+            rect.anchorMax = source.anchorMax;
+            rect.pivot = source.pivot;
+            rect.anchoredPosition = source.anchoredPosition;
+            rect.sizeDelta = source.sizeDelta;
+            rect.localScale = source.localScale;
+
+            var text = go.GetComponent<TextMeshProUGUI>();
+            if (ModernUiTheme.ThemeFont != null)
+                text.font = ModernUiTheme.ThemeFont;
+
+            var material = ModernUiTheme.CrispMaterial;
+            if (material != null)
+                text.fontSharedMaterial = material;
+
+            //everything about how it reads is carried over, so the readout keeps its own
+            //layout and only the smearing goes
+            text.text = original.text;
+            text.fontSize = original.fontSize;
+            text.fontSizeMin = original.fontSizeMin;
+            text.fontSizeMax = original.fontSizeMax;
+            text.enableAutoSizing = original.enableAutoSizing;
+            text.fontStyle = original.fontStyle;
+            text.alignment = original.alignment;
+            text.color = original.color;
+            text.margin = original.margin;
+            text.richText = original.richText;
+            text.overflowMode = original.overflowMode;
+            text.raycastTarget = original.raycastTarget;
+            text.extraPadding = true;
+
+            original.gameObject.SetActive(false);
+            return text;
         }
 
         private static void StyleGaugeLabel(TextMeshProUGUI text)
