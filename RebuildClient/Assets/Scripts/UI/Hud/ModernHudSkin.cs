@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -79,26 +79,19 @@ namespace Assets.Scripts.UI.Hud
                 return;
             }
 
-            //A rect reporting almost nothing has not been through a layout pass yet, so
-            //this leaves it unclaimed and comes back to it. Marking first and measuring
-            //second would have written the readout off for the rest of the session.
-            var size = root.rect.size;
-            if (size.x < 40f || size.y < 40f)
-                return;
-
+            //No size test any more, and that was the whole bug. This readout is laid out
+            //by a vertical group with a content size fitter, so its own rect carries a
+            //height of zero until a layout pass has run on an active object. The guard
+            //that was here waited for a height above forty before doing anything, and
+            //nothing it was guarding against could happen anyway: the component being
+            //a CharacterDetailBox is already proof of what it is.
             ModernUiTheme.MarkSkinned(box.gameObject);
-
-            //a readout is a few hundred points across; anything much larger is not the
-            //readout but something stretched over the whole screen, and a panel behind
-            //that would black the game out
-            if (size.x > 720f || size.y > 480f)
-                return;
 
             //The readout already carries a dark backdrop of its own. Adding a pale panel
             //behind that did nothing except leave the dark one on top, so the near black
             //ink went onto a near black panel. Repaint the backdrop it has rather than
             //stacking a second one behind it, and only build one where there is none.
-            var backdrop = FindBackdrop(root);
+            Image backdrop = FindBackdrop(root);
             if (backdrop != null)
             {
                 backdrop.sprite = ModernUiTheme.RoundedSprite;
@@ -155,7 +148,10 @@ namespace Assets.Scripts.UI.Hud
             foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
                 text.extraPadding = true;
 
-            Debug.Log("[ModernHudSkin] Repainted the character readout.");
+            //the measured size is in here because a size test is what stopped this
+            //running at all, and the log is how that gets caught next time
+            Debug.Log($"[ModernHudSkin] Repainted the character readout ({root.rect.width:0}x{root.rect.height:0}, "
+                      + $"backdrop {(backdrop != null ? backdrop.name : "none")}).");
         }
 
         /// <summary>

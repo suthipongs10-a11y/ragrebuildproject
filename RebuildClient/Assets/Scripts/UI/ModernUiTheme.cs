@@ -740,6 +740,8 @@ namespace Assets.Scripts.UI
             image.type = Image.Type.Sliced;
             image.raycastTarget = false;
 
+            IgnoreLayout(go);
+
             var rect = (RectTransform)go.transform;
             rect.anchorMin = Vector2.zero;
             rect.anchorMax = Vector2.one;
@@ -1451,8 +1453,26 @@ namespace Assets.Scripts.UI
             image.color = color;
             image.raycastTarget = false;
 
+            IgnoreLayout(go);
             Stretch((RectTransform)go.transform, 0, 0, 0, 0);
             return image;
+        }
+
+        /// <summary>
+        /// Keeps a decoration out of its parent's layout.
+        ///
+        /// A border or a shadow is drawn over the whole of the thing it belongs to, not
+        /// beside it. Added as a child of something with a layout group on it, and the
+        /// readout in the corner of the screen is exactly that, it would instead be given
+        /// a row of its own in the stack and push everything else down.
+        /// </summary>
+        private static void IgnoreLayout(GameObject target)
+        {
+            if (target.transform.parent == null
+                || target.transform.parent.GetComponent<LayoutGroup>() == null)
+                return;
+
+            target.AddComponent<LayoutElement>().ignoreLayout = true;
         }
     }
 }
