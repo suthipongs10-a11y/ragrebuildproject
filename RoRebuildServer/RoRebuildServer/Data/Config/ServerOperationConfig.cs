@@ -16,6 +16,8 @@ public class ServerOperationConfig
     //ordinary monsters swing, they do not cast. See MonsterSkillAiState for what this
     //counts as a boss and why the two are tied to the same flag.
     public bool RestrictMonsterSkillsToBosses { get; set; } = true;
+    //one harmless gift monster per map that has monsters. See GiftMonsterSpawner.
+    public bool SpawnGiftMonsters { get; set; } = true;
     public bool FliersIgnoreTraps { get; set; } = true;
     public bool SleepMonsterOnEmptyMap { get; set; } = true;
     public int MapMonsterSleepTimer { get; set; } = 600;

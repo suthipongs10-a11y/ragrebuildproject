@@ -1,6 +1,7 @@
 ﻿using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Enum.EntityStats;
+using RoRebuildServer.Custom;
 using RoRebuildServer.Data;
 using RoRebuildServer.Data.MapData;
 using RoRebuildServer.Data.Monster;
@@ -1712,6 +1713,8 @@ public class Map
         MapConfig = new ServerMapConfig(this);
 
         action(MapConfig);
+
+        GiftMonsterSpawner.AddToMap(MapConfig);
 
         MapConfig.ApplySpawnsToMap();
     }

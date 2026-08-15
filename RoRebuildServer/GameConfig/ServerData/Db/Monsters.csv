@@ -334,3 +334,4 @@
 6019,RETRIBUTION,Baroness of Retribution,79,20434,64,94,79,100,51,55,1067,1304,2,26,34,229090,183970,10,12,Medium,Angel,Dark3,360,360,480,120,Boss,AiStandardBoss,240,retribution.spr,0,0.5,1,#FFFFFFFF,,
 6020,SOLACE,Dame of Sentinel,77,17372,64,80,79,95,48,50,992,1213,2,25,29,176720,133620,10,12,Medium,Angel,Holy3,576,360,420,180,Boss,AiStandardBoss,384,solace.spr,0,0.5,1,#FFFFFFFF,,
 6021,SHELTER,Mistress of Shelter,80,28756,74,107,86,109,53,63,1170,1430,2,28,36,342760,259600,10,12,Medium,Angel,Holy3,432,360,420,160,Boss,AiStandardBoss,240,shelter.spr,0,0.5,1,#FFFFFFFF,,
+6022,GIFT_PORING,Gift Poring,1,200,1,1,1,1,1,1,1,1,1,0,0,30,15,10,12,Medium,Plant,Neutral1,1872,480,672,400,Normal,AiPacifist,288,poring_.spr,0,0.5,1,#FFFFFFFF,,

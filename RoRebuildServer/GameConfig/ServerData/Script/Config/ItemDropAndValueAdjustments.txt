@@ -6,6 +6,11 @@ OnLoadDropData:
 	if(type == Etc && subType == "Quest")
 		return rate;
 
+	//the gift monster's hat is authored at the rate we actually want to see in game,
+	//so it skips the remap below. 50 means 0.5% and stays 0.5%.
+	if(code == "Snake_Head")
+		return rate;
+
 	if(type == Etc && subType == "Refine")
 	 	rate *= 2; //refine item drop chance is doubled flat out
 
