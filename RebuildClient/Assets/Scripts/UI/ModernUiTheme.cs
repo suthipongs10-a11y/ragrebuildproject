@@ -507,6 +507,42 @@ namespace Assets.Scripts.UI
         }
 
         /// <summary>
+        /// Takes the outline and the drop shadow off one label, wherever it came from.
+        ///
+        /// Cheap enough to call on every label of a window every half second: the
+        /// corrected material is cached against the one it was made from, and the
+        /// assignment only happens when it would actually change something. That matters
+        /// because the labels that need it most are the stack counts on item icons, which
+        /// are made and destroyed as the bag is used and so cannot be fixed once.
+        /// </summary>
+        public static void MakeCrisp(TextMeshProUGUI text)
+        {
+            if (text == null)
+                return;
+
+            foreach (var shadow in text.GetComponents<Shadow>())
+                if (shadow.enabled)
+                    shadow.enabled = false;
+
+            var flat = WithoutShadow(text.fontSharedMaterial);
+            if (flat != null && flat != text.fontSharedMaterial)
+                text.fontSharedMaterial = flat;
+
+            if (!text.extraPadding)
+                text.extraPadding = true;
+        }
+
+        /// <summary>Every label under a root, made crisp in one pass.</summary>
+        public static void MakeCrisp(Transform root)
+        {
+            if (root == null)
+                return;
+
+            foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
+                MakeCrisp(text);
+        }
+
+        /// <summary>
         /// The accent blue darkened as far as it has to go to read on a given surface. The
         /// blue that clears the bar on a white card does not clear it on the tinted band
         /// of a header, and settling that per surface is more dependable than picking one

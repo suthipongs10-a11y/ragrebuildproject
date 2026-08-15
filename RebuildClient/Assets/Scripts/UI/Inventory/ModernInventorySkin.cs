@@ -74,7 +74,16 @@ namespace Assets.Scripts.UI.Inventory
                 return;
 
             if (ModernUiTheme.IsSkinned(ui.InventoryWindow.gameObject))
+            {
+                //The stack count on an item icon is made when the item arrives and thrown
+                //away when it leaves, so unlike everything else in this window it cannot
+                //be fixed once at skin time. It is swept instead, and the sweep costs
+                //nothing when there is nothing to do: the corrected material is cached and
+                //only assigned when it would change something.
+                if (ui.InventoryWindow.gameObject.activeInHierarchy)
+                    ModernUiTheme.MakeCrisp(ui.InventoryWindow.transform);
                 return;
+            }
 
             Skin(ui.InventoryWindow);
         }
@@ -308,7 +317,9 @@ namespace Assets.Scripts.UI.Inventory
                 win.WeightText.fontSize = ModernUiTheme.SizeBody;
                 win.WeightText.alignment = TextAlignmentOptions.Left;
                 win.WeightText.fontStyle = FontStyles.Bold;
-                win.WeightText.extraPadding = true;
+                //this one came from the prefab, so it arrives wearing the outlined
+                //material the rest of the game's labels use
+                ModernUiTheme.MakeCrisp(win.WeightText);
 
                 //A bar says how full the bag is at a glance, which a percentage in
                 //brackets does not. The window drives the fill; it writes nothing when the

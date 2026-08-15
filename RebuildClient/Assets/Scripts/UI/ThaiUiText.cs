@@ -44,6 +44,7 @@ namespace Assets.Scripts.UI
             //--- headers the rebuilt windows put under their titles
             { "Character sheet", "ค่าสถานะตัวละคร" },
             { "Worn gear", "ของที่สวมใส่" },
+            { "Drag to turn", "ลากเพื่อหมุนตัว" },
             { "System", "ระบบ" },
             { "New adventurer", "นักผจญภัยคนใหม่" },
             { "Skill tree", "สายสกิล" },

@@ -103,7 +103,20 @@ namespace Assets.Scripts.UI
             stage.pivot = new Vector2(1, 1);
             stage.offsetMin = new Vector2(-(Padding + StageWidth), Padding);
             stage.offsetMax = new Vector2(-Padding, -(HeaderHeight + TabHeight + TabGap));
-            stage.GetComponent<Image>().raycastTarget = false;
+            //it takes the drag that turns the character round, so it has to be hit
+            stage.GetComponent<Image>().raycastTarget = true;
+            stage.gameObject.AddComponent<CharacterStageRotator>();
+
+            var hint = ModernUiTheme.CreateText(stage, "Hint", ThaiUiText.Get("Drag to turn"),
+                ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor, TextAlignmentOptions.Center);
+            ModernUiTheme.Place(hint.rectTransform, new Vector2(0.5f, 0), new Vector2(0, 10f),
+                new Vector2(StageWidth - 16f, 18f));
+
+            //The pages go on top of the stage. A skill's description opens to the right of
+            //the list, which is exactly where the character is standing, and underneath
+            //him it could not be read at all. Over him it can, and it goes away again the
+            //moment the pointer leaves the skill.
+            content.SetAsLastSibling();
         }
 
         /// <summary>

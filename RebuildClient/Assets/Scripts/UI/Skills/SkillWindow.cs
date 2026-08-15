@@ -113,6 +113,9 @@ namespace Assets.Scripts.UI
 
             TooltipBox.localPosition = new Vector3(x, y, TooltipBox.localPosition.z);
             
+            //over the skill list rather than under it, whatever order the prefab left the
+            //children in
+            TooltipBox.SetAsLastSibling();
             TooltipBox.gameObject.SetActive(true);
             TooltipText.ForceMeshUpdate();
             
