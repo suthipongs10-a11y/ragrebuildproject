@@ -137,7 +137,7 @@ namespace Assets.Scripts.UI.Inventory
             }
 
             ModernUiTheme.StyleScrollViews(root);
-            ModernUiTheme.RecolorLightTexts(root);
+            ModernUiTheme.RepaintInk(root);
             ModernUiTheme.RecolorAccents(root);
             ThaiUiText.Apply(root);
 
@@ -151,7 +151,7 @@ namespace Assets.Scripts.UI.Inventory
             var root = (RectTransform)win.transform;
             ModernUiTheme.ApplyWindowChrome(win);
             ModernUiTheme.AttachShadow(root);
-            ModernUiTheme.RecolorLightTexts(root);
+            ModernUiTheme.RepaintInk(root);
             ModernUiTheme.RecolorAccents(root);
             ThaiUiText.Apply(root);
 

@@ -20,7 +20,7 @@ namespace Assets.Scripts.UI.Hud
 
         private float searchTimer;
         private Image minimapFrame;
-        private Image minimapImage;
+        private GameObject minimapContent;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -91,7 +91,19 @@ namespace Assets.Scripts.UI.Hud
             if (size.x > 720f || size.y > 480f)
                 return;
 
-            if (root.Find("ModernDetailsCard") == null)
+            //The readout already carries a dark backdrop of its own. Adding a pale panel
+            //behind that did nothing except leave the dark one on top, so the near black
+            //ink went onto a near black panel. Repaint the backdrop it has rather than
+            //stacking a second one behind it, and only build one where there is none.
+            var backdrop = FindBackdrop(root);
+            if (backdrop != null)
+            {
+                backdrop.sprite = ModernUiTheme.RoundedSprite;
+                backdrop.type = Image.Type.Sliced;
+                backdrop.color = ModernUiTheme.PanelOverlayColor;
+                ModernUiTheme.AddBorder((RectTransform)backdrop.transform, ModernUiTheme.CardBorderColor);
+            }
+            else if (root.Find("ModernDetailsCard") == null)
             {
                 var card = ModernUiTheme.CreateCard(root, "ModernDetailsCard", ModernUiTheme.PanelOverlayColor, true);
                 ModernUiTheme.Stretch(card, -12, -10, 12, 10);
@@ -100,13 +112,43 @@ namespace Assets.Scripts.UI.Hud
             }
 
             //the bars keep their own colours, they are saying how much health is left
+            ModernUiTheme.RepaintInk(root);
             foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
-            {
-                text.color = ModernUiTheme.NameColor;
                 text.extraPadding = true;
+
+            Debug.Log("[ModernHudSkin] Repainted the character readout.");
+        }
+
+        /// <summary>
+        /// The image an element is actually read against: the one on the element itself,
+        /// or failing that the child large enough to be covering it rather than being a
+        /// bar or an icon sitting on it.
+        /// </summary>
+        private static Image FindBackdrop(RectTransform root)
+        {
+            var own = root.GetComponent<Image>();
+            if (own != null && own.color.a > 0.15f)
+                return own;
+
+            var area = root.rect.width * root.rect.height;
+            if (area <= 0f)
+                return null;
+
+            for (var i = 0; i < root.childCount; i++)
+            {
+                var child = root.GetChild(i) as RectTransform;
+                if (child == null)
+                    continue;
+
+                var image = child.GetComponent<Image>();
+                if (image == null || image.color.a <= 0.15f)
+                    continue;
+
+                if (child.rect.width * child.rect.height >= area * 0.7f)
+                    return image;
             }
 
-            Debug.Log("[ModernHudSkin] Backed the character readout with a panel.");
+            return null;
         }
 
         private static void SkinDialog(DialogWindow win)
@@ -119,7 +161,7 @@ namespace Assets.Scripts.UI.Hud
 
             if (win.NameBox != null)
             {
-                win.NameBox.color = ModernUiTheme.AccentColor;
+                win.NameBox.color = ModernUiTheme.AccentInkColor;
                 win.NameBox.fontSize = ModernUiTheme.SizeValue;
                 win.NameBox.fontStyle = FontStyles.Bold;
                 win.NameBox.extraPadding = true;
@@ -134,7 +176,7 @@ namespace Assets.Scripts.UI.Hud
                 win.TextBox.extraPadding = true;
             }
 
-            ModernUiTheme.RecolorLightTexts(root);
+            ModernUiTheme.RepaintInk(root);
             ModernUiTheme.RecolorAccents(root);
             ThaiUiText.ApplyToControls(root);
 
@@ -161,7 +203,7 @@ namespace Assets.Scripts.UI.Hud
                     StyleOptionButton(group.GetChild(i).gameObject);
             }
 
-            ModernUiTheme.RecolorLightTexts(root);
+            ModernUiTheme.RepaintInk(root);
             ModernUiTheme.RecolorAccents(root);
 
             Debug.Log("[ModernHudSkin] Retinted the NPC reply list.");
@@ -182,7 +224,7 @@ namespace Assets.Scripts.UI.Hud
 
             foreach (var label in target.GetComponentsInChildren<TextMeshProUGUI>(true))
             {
-                label.color = ModernUiTheme.AccentColor;
+                label.color = ModernUiTheme.AccentInkColor;
                 label.fontSize = ModernUiTheme.SizeBody;
                 label.fontStyle = FontStyles.Bold;
                 label.extraPadding = true;
@@ -222,7 +264,7 @@ namespace Assets.Scripts.UI.Hud
                 ModernUiTheme.Stretch((RectTransform)go.transform, -3, -3, 3, 3);
             }
 
-            minimapImage = map.MapImage;
+            minimapContent = map.ContentContainer;
             ModernUiTheme.StyleSliders(root);
 
             Debug.Log("[ModernHudSkin] Framed the minimap.");
@@ -238,7 +280,12 @@ namespace Assets.Scripts.UI.Hud
             if (minimapFrame == null)
                 return;
 
-            var hasMap = minimapImage != null && minimapImage.sprite != null && minimapImage.enabled;
+            //Read off the content container, not off MapImage. The map is drawn through a
+            //material with the texture set on it, so MapImage.sprite is null even when a
+            //map is showing, and checking that was why an empty frame stayed on screen.
+            //LoadMinimapCoroutine switches the container on as its very last step and
+            //gives up before reaching it whenever a map has no minimap rendered yet.
+            var hasMap = minimapContent != null && minimapContent.activeInHierarchy;
             if (minimapFrame.enabled != hasMap)
                 minimapFrame.enabled = hasMap;
         }

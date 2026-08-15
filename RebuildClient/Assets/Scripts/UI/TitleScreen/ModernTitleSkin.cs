@@ -78,7 +78,7 @@ namespace Assets.Scripts.UI.TitleScreen
 
             if (win.Job != null)
             {
-                win.Job.color = ModernUiTheme.AccentColor;
+                win.Job.color = ModernUiTheme.AccentInkColor;
                 win.Job.fontSize = ModernUiTheme.SizeSubtitle;
                 win.Job.fontStyle = FontStyles.Bold;
                 win.Job.extraPadding = true;
@@ -113,7 +113,7 @@ namespace Assets.Scripts.UI.TitleScreen
                     PaintButton(confirm, ModernUiTheme.AccentColor, ModernUiTheme.AccentTextColor);
             }
 
-            ModernUiTheme.RecolorLightTexts(root);
+            ModernUiTheme.RepaintInk(root);
             ModernUiTheme.RecolorAccents(root);
             ThaiUiText.Apply(root);
 
@@ -169,7 +169,7 @@ namespace Assets.Scripts.UI.TitleScreen
                 }
             }
 
-            ModernUiTheme.RecolorLightTexts(win.transform);
+            ModernUiTheme.RepaintInk(win.transform);
             ModernUiTheme.RecolorAccents(win.transform);
             ThaiUiText.Apply(win.transform);
 

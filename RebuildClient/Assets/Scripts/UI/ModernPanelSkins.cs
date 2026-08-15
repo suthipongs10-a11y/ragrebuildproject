@@ -110,12 +110,12 @@ namespace Assets.Scripts.UI
             //item counts spawn from this template, darken them once and every
             //future entry inherits it. Existing entries get the same treatment.
             if (win.ItemEntryPrefab != null)
-                ModernUiTheme.RecolorLightTexts(win.ItemEntryPrefab.transform);
+                ModernUiTheme.RepaintInk(win.ItemEntryPrefab.transform);
             if (win.ItemBoxRoot != null)
-                ModernUiTheme.RecolorLightTexts(win.ItemBoxRoot);
+                ModernUiTheme.RepaintInk(win.ItemBoxRoot);
 
             ModernUiTheme.StyleScrollViews(win.transform);
-            ModernUiTheme.RecolorLightTexts(win.transform);
+            ModernUiTheme.RepaintInk(win.transform);
             ModernUiTheme.RecolorAccents(win.transform);
             ThaiUiText.Apply(win.transform);
 
@@ -166,7 +166,7 @@ namespace Assets.Scripts.UI
             foreach (var entry in win.GetComponentsInChildren<SkillWindowEntry>(true))
                 StyleSkillEntry(entry);
 
-            ModernUiTheme.RecolorLightTexts(win.transform);
+            ModernUiTheme.RepaintInk(win.transform);
             ModernUiTheme.RecolorAccents(win.transform);
 
             ThaiUiText.Apply(win.transform);
@@ -296,7 +296,7 @@ namespace Assets.Scripts.UI
             ModernUiTheme.ApplyWindowChrome(win, ModernUiIcons.Gear);
             ModernUiTheme.AttachShadow((RectTransform)win.transform);
             ModernUiTheme.StyleTabBar(win.TabButtons);
-            ModernUiTheme.RecolorLightTexts(win.transform);
+            ModernUiTheme.RepaintInk(win.transform);
             ModernUiTheme.RecolorAccents(win.transform);
             ModernUiTheme.StyleSliders(win.transform);
             ModernUiTheme.StyleScrollViews(win.transform);
@@ -314,11 +314,11 @@ namespace Assets.Scripts.UI
 
             //emote entries are cloned from this one, so tinting it covers them all
             if (win.EntryTemplate != null)
-                ModernUiTheme.RecolorLightTexts(win.EntryTemplate.transform);
+                ModernUiTheme.RepaintInk(win.EntryTemplate.transform);
             if (win.ContentArea != null)
-                ModernUiTheme.RecolorLightTexts(win.ContentArea.transform);
+                ModernUiTheme.RepaintInk(win.ContentArea.transform);
 
-            ModernUiTheme.RecolorLightTexts(win.transform);
+            ModernUiTheme.RepaintInk(win.transform);
             ModernUiTheme.RecolorAccents(win.transform);
             ThaiUiText.Apply(win.transform);
 
@@ -363,7 +363,7 @@ namespace Assets.Scripts.UI
 
                 ModernUiTheme.StyleScrollViews(child);
                 ModernUiTheme.StyleSliders(child);
-                ModernUiTheme.RecolorLightTexts(child);
+                ModernUiTheme.RepaintInk(child);
                 ModernUiTheme.RecolorAccents(child);
                 ThaiUiText.Apply(child);
 

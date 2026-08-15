@@ -116,9 +116,9 @@ namespace Assets.Scripts.UI.ClientDatabase
             //every row in every list is cloned from one of these two, so tinting the
             //templates covers rows the window has not built yet
             if (win.rowTemplate != null)
-                ModernUiTheme.RecolorLightTexts(win.rowTemplate.transform);
+                ModernUiTheme.RepaintInk(win.rowTemplate.transform);
             if (win.iconRowTemplate != null)
-                ModernUiTheme.RecolorLightTexts(win.iconRowTemplate.transform);
+                ModernUiTheme.RepaintInk(win.iconRowTemplate.transform);
 
             if (win.closeButton != null)
             {
@@ -132,7 +132,7 @@ namespace Assets.Scripts.UI.ClientDatabase
             }
 
             ModernUiTheme.StyleScrollViews(root);
-            ModernUiTheme.RecolorLightTexts(root);
+            ModernUiTheme.RepaintInk(root);
             ModernUiTheme.RecolorAccents(root);
             ThaiUiText.Apply(root);
 
@@ -218,7 +218,7 @@ namespace Assets.Scripts.UI.ClientDatabase
 
             foreach (var label in button.GetComponentsInChildren<TextMeshProUGUI>(true))
             {
-                label.color = ModernUiTheme.AccentColor;
+                label.color = ModernUiTheme.AccentInkColor;
                 label.fontStyle = FontStyles.Bold;
                 label.extraPadding = true;
             }

@@ -28,17 +28,31 @@ namespace Assets.Scripts.UI
         //does not wall off the view
         public static readonly Color PanelOverlayColor = new Color(0.965f, 0.978f, 0.992f, 0.86f);
         public static readonly Color CardBorderColor = new Color(0.784f, 0.843f, 0.914f);
+        //Every ink below was measured against every surface above with the contrast
+        //formula from WCAG 2.1 and moved until it cleared 4.5 to 1, the ratio at which
+        //normal sized text stays readable. The quiet greys were the worst offenders: the
+        //muted grey sat at 2.3 to 1 on a card, which is legible on a desk monitor and
+        //gone on a phone in daylight.
         public static readonly Color TitleColor = new Color(0.055f, 0.129f, 0.235f);
-        public static readonly Color LabelColor = new Color(0.302f, 0.400f, 0.514f);
+        public static readonly Color LabelColor = new Color(0.262f, 0.348f, 0.450f);
         public static readonly Color NameColor = new Color(0.075f, 0.145f, 0.239f);
-        public static readonly Color MutedColor = new Color(0.514f, 0.596f, 0.686f);
-        public static readonly Color HintColor = new Color(0.333f, 0.427f, 0.529f);
-        public static readonly Color AccentColor = new Color(0.180f, 0.478f, 0.855f);
+        public static readonly Color MutedColor = new Color(0.304f, 0.355f, 0.414f);
+        public static readonly Color HintColor = new Color(0.270f, 0.350f, 0.435f);
+        //darkened just enough that white on it clears the same bar, since it is the fill
+        //behind every primary button and active tab in the interface
+        public static readonly Color AccentColor = new Color(0.165f, 0.435f, 0.780f);
         public static readonly Color AccentTextColor = Color.white;
+        //A fill and an ink cannot be the same blue. The fill has to stay light enough for
+        //white to read on it and the ink has to go darker to read on a pale card, and one
+        //colour trying to do both lands between the two and fails at each. This is the
+        //ink: the blue for a label, a subtitle or an NPC's name.
+        public static readonly Color AccentInkColor = new Color(0.087f, 0.392f, 0.673f);
+        //the ink for a surface too dark to take the near black one
+        public static readonly Color LightInkColor = new Color(0.957f, 0.973f, 0.996f);
         //a gain on a stat used to be drawn green; the interface is blue throughout now
-        public static readonly Color PositiveColor = new Color(0.106f, 0.482f, 0.827f);
-        public static readonly Color IconColor = new Color(0.180f, 0.478f, 0.855f);
-        public static readonly Color IconMutedColor = new Color(0.478f, 0.573f, 0.678f);
+        public static readonly Color PositiveColor = AccentInkColor;
+        public static readonly Color IconColor = new Color(0.165f, 0.435f, 0.780f);
+        public static readonly Color IconMutedColor = new Color(0.396f, 0.475f, 0.561f);
 
         //one place to change how big text is, so a legibility pass is a single edit
         public const float SizeTitle = 30f;
@@ -288,20 +302,107 @@ namespace Assets.Scripts.UI
         }
 
         /// <summary>
-        /// Recolors every near-white or near-black text under the root to the theme's
-        /// dark ink so light-on-dark leftovers stay readable on the new white panels.
-        /// Colored text (greens, reds, blues) is left alone.
+        /// One channel of a colour converted out of the gamma encoding sRGB stores it in,
+        /// which is the first step of the WCAG contrast formula. Averaging the encoded
+        /// values instead is the usual mistake and reports mid tones as far lighter than
+        /// the eye sees them.
         /// </summary>
-        public static void RecolorLightTexts(Transform root)
+        private static float LinearChannel(float value)
+        {
+            return value <= 0.03928f ? value / 12.92f : Mathf.Pow((value + 0.055f) / 1.055f, 2.4f);
+        }
+
+        /// <summary>How much light a colour puts out, on the WCAG 2.1 definition.</summary>
+        public static float Luminance(Color color)
+        {
+            return 0.2126f * LinearChannel(color.r)
+                   + 0.7152f * LinearChannel(color.g)
+                   + 0.0722f * LinearChannel(color.b);
+        }
+
+        /// <summary>
+        /// How far apart two colours are to read, from 1 (identical) to 21 (black on
+        /// white). Normal sized text wants 4.5 and large text 3.
+        /// </summary>
+        public static float ContrastRatio(Color a, Color b)
+        {
+            var first = Luminance(a);
+            var second = Luminance(b);
+            var lighter = Mathf.Max(first, second);
+            var darker = Mathf.Min(first, second);
+            return (lighter + 0.05f) / (darker + 0.05f);
+        }
+
+        /// <summary>
+        /// The ink to write on a given surface: the near black one on anything pale, the
+        /// near white one on anything dark, whichever of the two actually reads better
+        /// there rather than whichever was guessed at.
+        /// </summary>
+        public static Color InkFor(Color surface)
+        {
+            return ContrastRatio(LightInkColor, surface) > ContrastRatio(NameColor, surface)
+                ? LightInkColor
+                : NameColor;
+        }
+
+        /// <summary>
+        /// The accent blue darkened as far as it has to go to read on a given surface. The
+        /// blue that clears the bar on a white card does not clear it on the tinted band
+        /// of a header, and settling that per surface is more dependable than picking one
+        /// blue and hoping every place it lands is pale enough for it.
+        /// </summary>
+        public static Color AccentInkOn(Color surface)
+        {
+            var ink = AccentInkColor;
+
+            //a bounded walk rather than a solve: twelve steps takes any starting colour
+            //to near black, so it always finishes and always finishes readable
+            for (var i = 0; i < 12 && ContrastRatio(ink, surface) < 4.5f; i++)
+                ink = new Color(ink.r * 0.85f, ink.g * 0.85f, ink.b * 0.85f, ink.a);
+
+            return ink;
+        }
+
+        /// <summary>
+        /// The colour actually behind an element: the first parent painting something
+        /// solid enough to be what the eye sees. Returns false when nothing under it is
+        /// opaque, which means the element is sitting straight on the game world and no
+        /// single ink is right for it, so it is better left as the game drew it.
+        /// </summary>
+        public static bool TryGetSurface(Transform start, out Color surface)
+        {
+            surface = WindowColor;
+
+            for (var t = start; t != null; t = t.parent)
+            {
+                var image = t.GetComponent<Image>();
+                if (image == null || !image.enabled || image.color.a < 0.5f)
+                    continue;
+
+                surface = image.color;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Repaints every neutral label under the root to whichever ink reads on the panel
+        /// it is standing on. Text carrying a colour of its own, a green gain or a red
+        /// warning, is saying something with that colour and is left alone.
+        /// </summary>
+        public static void RepaintInk(Transform root)
         {
             foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
             {
                 var c = text.color;
                 var max = Mathf.Max(c.r, Mathf.Max(c.g, c.b));
                 var min = Mathf.Min(c.r, Mathf.Min(c.g, c.b));
-                var isGray = max - min < 0.15f;
-                if (isGray && max > 0.7f)
-                    text.color = NameColor;
+                if (max - min >= 0.18f)
+                    continue;
+
+                if (TryGetSurface(text.transform, out var surface))
+                    text.color = InkFor(surface);
             }
         }
 
@@ -355,7 +456,7 @@ namespace Assets.Scripts.UI
 
             if (!string.IsNullOrEmpty(subtitle))
             {
-                var sub = CreateText(bar, "Subtitle", subtitle, SizeSubtitle, AccentColor, TextAlignmentOptions.TopLeft);
+                var sub = CreateText(bar, "Subtitle", subtitle, SizeSubtitle, AccentInkColor, TextAlignmentOptions.TopLeft);
                 Place((RectTransform)sub.transform, new Vector2(0, 1), new Vector2(textLeft, -48), new Vector2(420, 22));
             }
 
@@ -566,8 +667,9 @@ namespace Assets.Scripts.UI
 
             foreach (var text in root.GetComponentsInChildren<TextMeshProUGUI>(true))
             {
+                //the ink, not the fill: this is a word on a pale card, not a button face
                 if (IsGreen(text.color))
-                    text.color = AccentColor;
+                    text.color = AccentInkColor;
             }
         }
 
@@ -649,11 +751,21 @@ namespace Assets.Scripts.UI
             foreach (var scroll in root.GetComponentsInChildren<ScrollRect>(true))
             {
                 StyleScrollbar(scroll.verticalScrollbar);
-
-                if (scroll.horizontalScrollbar != null)
-                    scroll.horizontalScrollbar.gameObject.SetActive(false);
                 scroll.horizontal = false;
                 scroll.horizontalScrollbar = null;
+            }
+
+            //Swept by which way the bar runs rather than by the name the prefab gave it or
+            //by the scroll view still holding a reference to it. Clearing the reference
+            //above stops the scroll view putting the bar back, but it also means an object
+            //already left on screen is no longer anyone's to hide.
+            foreach (var bar in root.GetComponentsInChildren<Scrollbar>(true))
+            {
+                if (bar.direction == Scrollbar.Direction.LeftToRight ||
+                    bar.direction == Scrollbar.Direction.RightToLeft)
+                    bar.gameObject.SetActive(false);
+                else
+                    StyleScrollbar(bar);
             }
         }
 
