@@ -360,6 +360,48 @@ namespace Assets.Scripts.UI
                 : NameColor;
         }
 
+        private static readonly System.Collections.Generic.Dictionary<Material, Material> unshadowed =
+            new System.Collections.Generic.Dictionary<Material, Material>();
+
+        /// <summary>
+        /// The same text material with its drop shadow taken off.
+        ///
+        /// A shadow under a letter is a second, blurred copy of it a pixel away, and at
+        /// the size this interface draws that reads as a smeared edge rather than as
+        /// depth. Several of the client's labels are set in a material that has one baked
+        /// in, so turning it off on our own material was never going to reach them.
+        ///
+        /// Results are kept per source material, so every label that shared one before
+        /// shares the corrected one now and the batching is unchanged. Everything else the
+        /// material does, an outline, a glow, a gradient, is copied across untouched.
+        /// </summary>
+        public static Material WithoutShadow(Material source)
+        {
+            if (source == null || !source.HasProperty("_UnderlayColor"))
+                return source;
+
+            var hasShadow = source.GetColor("_UnderlayColor").a > 0.01f
+                            || source.IsKeywordEnabled("UNDERLAY_ON");
+            if (!hasShadow)
+                return source;
+
+            if (unshadowed.TryGetValue(source, out var cached) && cached != null)
+                return cached;
+
+            var copy = new Material(source) { name = source.name + " Flat" };
+            copy.SetColor("_UnderlayColor", new Color(0f, 0f, 0f, 0f));
+            if (copy.HasProperty("_UnderlayOffsetX"))
+                copy.SetFloat("_UnderlayOffsetX", 0f);
+            if (copy.HasProperty("_UnderlayOffsetY"))
+                copy.SetFloat("_UnderlayOffsetY", 0f);
+            if (copy.HasProperty("_UnderlaySoftness"))
+                copy.SetFloat("_UnderlaySoftness", 0f);
+            copy.DisableKeyword("UNDERLAY_ON");
+
+            unshadowed[source] = copy;
+            return copy;
+        }
+
         /// <summary>
         /// The accent blue darkened as far as it has to go to read on a given surface. The
         /// blue that clears the bar on a white card does not clear it on the tinted band
@@ -416,6 +458,10 @@ namespace Assets.Scripts.UI
                 //Shadow, so asking for one finds both.
                 foreach (var shadow in text.GetComponents<Shadow>())
                     shadow.enabled = false;
+
+                //and the same again for a shadow baked into the material, which is where
+                //most of the client's own labels get theirs
+                text.fontSharedMaterial = WithoutShadow(text.fontSharedMaterial);
 
                 var c = text.color;
                 var max = Mathf.Max(c.r, Mathf.Max(c.g, c.b));

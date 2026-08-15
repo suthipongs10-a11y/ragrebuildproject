@@ -24,14 +24,16 @@ namespace Assets.Scripts.UI
     public class CharacterHubWindow : WindowBase
     {
         private const float Padding = 14f;
-        //clears the header the theme builds, which is TitleBarHeight tall and doubles as
-        //the drag area; tabs starting any higher would sit inside it
-        private const float HeaderHeight = ModernUiTheme.TitleBarHeight + 2f;
+        //the theme's header allows for a subtitle under the title; this window has none,
+        //so the bar is cut back to what the title alone needs and the tabs move up
+        private const float BarHeight = 52f;
+        private const float HeaderHeight = BarHeight + 2f;
         private const float TabHeight = 34f;
         private const float TabGap = 6f;
 
         private readonly List<WindowBase> pages = new List<WindowBase>();
         private readonly List<Button> tabs = new List<Button>();
+        private readonly List<Vector2> pageSizes = new List<Vector2>();
 
         private RectTransform content;
         private int current;
@@ -65,7 +67,8 @@ namespace Assets.Scripts.UI
             ModernUiTheme.AttachShadow(root);
             ModernUiTheme.AddBorder(root, ModernUiTheme.CardBorderColor);
 
-            ModernUiTheme.CreateTitleBar(this, ThaiUiText.Get("Character"), null, ModernUiIcons.Person);
+            var bar = ModernUiTheme.CreateTitleBar(this, ThaiUiText.Get("Character"), null, ModernUiIcons.Person);
+            bar.offsetMin = new Vector2(0, -BarHeight);
 
             content = ModernUiTheme.CreateRect("Pages", root);
             content.anchorMin = new Vector2(0, 0);
@@ -97,12 +100,17 @@ namespace Assets.Scripts.UI
             rect.anchorMax = new Vector2(0.5f, 1f);
             rect.pivot = new Vector2(0.5f, 1f);
             rect.sizeDelta = size;
-            rect.anchoredPosition = Vector2.zero;
 
-            StripPageChrome(rect);
+            //The page's own header is switched off, but the space it occupied is still
+            //part of the page. Sliding the page up by exactly that much puts the first
+            //real row of content against the tabs instead of leaving a band of nothing
+            //there, and takes the same amount off the height this window has to be.
+            var trim = StripPageChrome(rect);
+            rect.anchoredPosition = new Vector2(0, trim);
 
             var index = pages.Count;
             pages.Add(window);
+            pageSizes.Add(new Vector2(size.x, Mathf.Max(size.y - trim, 120f)));
 
             var tab = ModernUiTheme.CreateButton(transform, "Tab" + index, label,
                 ModernUiTheme.TabIdleColor, ModernUiTheme.NameColor, ModernUiTheme.SizeLabel);
@@ -123,8 +131,7 @@ namespace Assets.Scripts.UI
             }
 
             window.gameObject.SetActive(false);
-            LayoutTabs();
-            ResizeToPages();
+            ResizeTo(0);
         }
 
         /// <summary>
@@ -133,25 +140,41 @@ namespace Assets.Scripts.UI
         /// so they are switched off rather than removed: a page is still a window and
         /// could be given back its own frame later.
         /// </summary>
-        private static void StripPageChrome(RectTransform page)
+        /// <summary>
+        /// Returns how much dead space the hidden header left at the top of the page.
+        /// </summary>
+        private static float StripPageChrome(RectTransform page)
         {
+            var trim = 0f;
+
             for (var i = 0; i < page.childCount; i++)
             {
                 var child = page.GetChild(i);
                 var name = child.name.ToLowerInvariant();
 
-                if (name.Contains("moderntitlebar") || name.Contains("modernshadow")
-                                                    || name.Contains("modernborder")
-                                                    || name.Contains("drag")
-                                                    || name.Contains("closebutton")
-                                                    || name.Contains("resizehandle"))
-                    child.gameObject.SetActive(false);
+                var isHeader = name.Contains("moderntitlebar") || name.Contains("drag")
+                                                               || name.Contains("closebutton");
+                var isDecoration = name.Contains("modernshadow") || name.Contains("modernborder")
+                                                                 || name.Contains("resizehandle");
+
+                if (!isHeader && !isDecoration)
+                    continue;
+
+                child.gameObject.SetActive(false);
+
+                //only a bar pinned across the top of the page is space that can be
+                //reclaimed; a resize grip at the bottom leaves nothing behind
+                var rect = child as RectTransform;
+                if (isHeader && rect != null && rect.anchorMin.y > 0.9f && rect.anchorMax.y > 0.9f)
+                    trim = Mathf.Max(trim, rect.rect.height);
             }
 
             //the page's own panel would sit as a second card inside this window's card
             var background = page.GetComponent<Image>();
             if (background != null)
                 background.color = new Color(0f, 0f, 0f, 0f);
+
+            return trim;
         }
 
         private void LayoutTabs()
@@ -173,27 +196,32 @@ namespace Assets.Scripts.UI
         }
 
         /// <summary>
-        /// Sizes the window to the largest page rather than to whichever is showing, so
-        /// that changing tab does not make the window jump about under the pointer.
+        /// Sizes the window to the page being shown. Sizing it to the largest page instead
+        /// kept every tab as tall as the tallest, which put a band of empty panel under the
+        /// short ones and pushed the window off the bottom of the screen. The window is
+        /// pinned by its top left corner, so growing and shrinking moves only its lower
+        /// edge and the tabs stay under the pointer.
         /// </summary>
-        private void ResizeToPages()
+        private void ResizeTo(int index)
         {
-            var widest = 360f;
-            var tallest = 320f;
+            if (index < 0 || index >= pageSizes.Count)
+                return;
 
-            foreach (var page in pages)
+            var page = pageSizes[index];
+            var width = page.x + Padding * 2f;
+            var height = page.y + HeaderHeight + TabHeight + TabGap + Padding;
+
+            //never taller than what it is being drawn into, whatever a page asks for
+            var container = transform.parent as RectTransform;
+            if (container != null)
             {
-                if (page == null)
-                    continue;
-
-                var size = ((RectTransform)page.transform).sizeDelta;
-                widest = Mathf.Max(widest, size.x);
-                tallest = Mathf.Max(tallest, size.y);
+                var available = container.rect.height - 24f;
+                if (available > 240f)
+                    height = Mathf.Min(height, available);
             }
 
             var root = (RectTransform)transform;
-            root.sizeDelta = new Vector2(widest + Padding * 2f,
-                tallest + HeaderHeight + TabHeight + TabGap + Padding);
+            root.sizeDelta = new Vector2(width, height);
 
             LayoutTabs();
         }
@@ -204,11 +232,26 @@ namespace Assets.Scripts.UI
                 return;
 
             current = index;
+            ResizeTo(index);
 
+            //Shown and hidden through the window's own methods rather than by switching
+            //the object, so that the escape stack stays true. Escape closes whatever is
+            //last in that stack, and a page put on screen behind its back was never in
+            //it, which is why escape did nothing while this window was open.
             for (var i = 0; i < pages.Count; i++)
             {
-                if (pages[i] != null)
-                    pages[i].gameObject.SetActive(i == index);
+                if (pages[i] == null)
+                    continue;
+
+                if (i == index)
+                {
+                    pages[i].ShowWindow();
+                    pages[i].MoveToTop();
+                }
+                else
+                {
+                    pages[i].HideWindow();
+                }
             }
 
             PaintTabs();
@@ -302,10 +345,11 @@ namespace Assets.Scripts.UI
 
         public override void CloseWindow()
         {
+            //through HideWindow, so the pages come back off the escape stack with them
             foreach (var page in pages)
             {
                 if (page != null)
-                    page.gameObject.SetActive(false);
+                    page.HideWindow();
             }
 
             gameObject.SetActive(false);
