@@ -491,11 +491,14 @@ namespace Assets.Scripts.UI
             barObject.SetActive(false);
             barObject.transform.SetParent(root, false);
 
-            //the header is not a coloured strip, it is a clear band over the window with
-            //the name set large and a quiet subtitle beneath it. The image stays so the
-            //whole band still catches drags, it is simply invisible.
+            //A tinted band rather than the clear one this used to be. Left clear, the top
+            //of a window was the same flat sheet as the rest of it and nothing said where
+            //the chrome ended and the content began; a second tone up there is what gives
+            //a window a top. It still catches drags, being the same image.
             var image = barObject.GetComponent<Image>();
-            image.color = new Color(0, 0, 0, 0);
+            image.sprite = HeaderSprite;
+            image.type = Image.Type.Sliced;
+            image.color = TitleBarColor;
             image.raycastTarget = true;
 
             var bar = (RectTransform)barObject.transform;
@@ -524,12 +527,34 @@ namespace Assets.Scripts.UI
 
             if (!string.IsNullOrEmpty(subtitle))
             {
-                var sub = CreateText(bar, "Subtitle", subtitle, SizeSubtitle, AccentInkColor, TextAlignmentOptions.TopLeft);
+                //measured against the band it lands on, not against the window behind it
+                var sub = CreateText(bar, "Subtitle", subtitle, SizeSubtitle, AccentInkOn(TitleBarColor),
+                    TextAlignmentOptions.TopLeft);
                 Place((RectTransform)sub.transform, new Vector2(0, 1), new Vector2(textLeft, -48), new Vector2(420, 22));
             }
 
-            var close = CreateButton(bar, "Close", "", CardColor, TitleColor, SizeBody);
+            //a hairline of the accent along the foot of the band, which is what stops the
+            //two blues reading as one soft area and gives the header an edge to sit on
+            var rule = new GameObject("Rule", typeof(Image));
+            rule.transform.SetParent(bar, false);
+            var ruleImage = rule.GetComponent<Image>();
+            ruleImage.color = AccentColor;
+            ruleImage.raycastTarget = false;
+
+            var ruleRect = (RectTransform)rule.transform;
+            ruleRect.anchorMin = new Vector2(0, 0);
+            ruleRect.anchorMax = new Vector2(1, 0);
+            ruleRect.pivot = new Vector2(0.5f, 0);
+            ruleRect.offsetMin = Vector2.zero;
+            ruleRect.offsetMax = new Vector2(0, 3);
+
+            //on the band the card tone is barely a step away, so the close button takes
+            //the window tone instead and reads as a control rather than as a smudge
+            var close = CreateButton(bar, "Close", "", WindowColor, TitleColor, SizeBody);
             Place((RectTransform)close.transform, new Vector2(1, 1), new Vector2(-14, -14), new Vector2(36, 36));
+            //the two pale tones are only 1.4 to 1 apart, so the edge is what actually
+            //draws the button rather than the fill
+            AddBorder((RectTransform)close.transform, CardBorderColor);
             CreateIcon((RectTransform)close.transform, ModernUiIcons.Close, HintColor, 15);
             close.onClick.AddListener(window.CloseWindow);
 
@@ -1191,6 +1216,49 @@ namespace Assets.Scripts.UI
             texture.Apply();
             return Sprite.Create(texture, new Rect(0, 0, PanelSize, PanelSize), new Vector2(0.5f, 0.5f), 100,
                 0, SpriteMeshType.FullRect, new Vector4(12, 12, 12, 12));
+        }
+
+        private static Sprite headerSprite;
+
+        /// <summary>
+        /// A panel rounded across the top and square along the bottom, for a header band
+        /// that has to meet the window's own corners up there and run straight into the
+        /// body below. The all-round panel leaves a sliver of window showing under each
+        /// bottom corner of the band, which is exactly the sort of gap that reads as a
+        /// mistake rather than as a shape.
+        /// </summary>
+        public static Sprite HeaderSprite
+        {
+            get
+            {
+                if (headerSprite == null)
+                    headerSprite = CreateHeaderSprite();
+                return headerSprite;
+            }
+        }
+
+        private static Sprite CreateHeaderSprite()
+        {
+            var texture = new Texture2D(PanelSize, PanelSize, TextureFormat.RGBA32, false);
+            var half = PanelSize * 0.5f;
+
+            for (var y = 0; y < PanelSize; y++)
+            {
+                for (var x = 0; x < PanelSize; x++)
+                {
+                    var dx = Mathf.Abs(x + 0.5f - half) - (half - PanelRadius);
+                    var dy = y + 0.5f - (PanelSize - PanelRadius);
+                    var outside = new Vector2(Mathf.Max(dx, 0f), Mathf.Max(dy, 0f)).magnitude;
+                    var inside = Mathf.Min(Mathf.Max(dx, dy), 0f);
+                    //the second term cuts the shape off flat along the bottom edge
+                    var distance = Mathf.Max(outside + inside - PanelRadius, -(y + 0.5f));
+                    texture.SetPixel(x, y, new Color(1f, 1f, 1f, Mathf.Clamp01(0.5f - distance)));
+                }
+            }
+
+            texture.Apply();
+            return Sprite.Create(texture, new Rect(0, 0, PanelSize, PanelSize), new Vector2(0.5f, 0.5f), 100,
+                0, SpriteMeshType.FullRect, new Vector4(12, 2, 12, 12));
         }
 
         private static Sprite outlineSprite;

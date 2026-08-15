@@ -35,6 +35,7 @@ namespace Assets.Scripts.UI
         private readonly List<Button> tabs = new List<Button>();
         private readonly List<Image> tabBorders = new List<Image>();
         private readonly List<Vector2> pageSizes = new List<Vector2>();
+        private readonly List<float> pageOffsets = new List<float>();
 
         private RectTransform content;
         private int current;
@@ -112,6 +113,7 @@ namespace Assets.Scripts.UI
             var index = pages.Count;
             pages.Add(window);
             pageSizes.Add(new Vector2(size.x, Mathf.Max(size.y - trim, 120f)));
+            pageOffsets.Add(trim);
 
             //Not TabIdleColor: against this window's panel that sits at 1.06 to 1, which
             //is to say invisible. A tab waiting to be pressed has to look like something
@@ -343,6 +345,31 @@ namespace Assets.Scripts.UI
 
             if (target != current || !gameObject.activeSelf)
                 Show(target);
+
+            KeepPageInPlace(target);
+        }
+
+        /// <summary>
+        /// Puts the showing page back where this window wants it.
+        ///
+        /// The client remembers where the player last dragged each of its windows and
+        /// writes those positions back over them when a character logs in. A page that
+        /// has been docked in here is still on that list, so it was being moved out from
+        /// under the frame it now lives in, which is what pulled the equipment page off
+        /// to one side. Rather than take the pages off the list, which would leave the
+        /// saved positions matched up against the wrong windows, the position this window
+        /// wants is simply reasserted, which also covers anything else that moves them.
+        /// </summary>
+        private void KeepPageInPlace(int index)
+        {
+            if (index < 0 || index >= pages.Count || pages[index] == null)
+                return;
+
+            var rect = (RectTransform)pages[index].transform;
+            var wanted = new Vector2(0f, pageOffsets[index]);
+
+            if ((rect.anchoredPosition - wanted).sqrMagnitude > 0.01f)
+                rect.anchoredPosition = wanted;
         }
 
         //this window is not in the escape stack: closing it closes its pages, and the
