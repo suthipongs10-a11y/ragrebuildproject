@@ -76,9 +76,10 @@ namespace Assets.Scripts.UI
             { "Footgear", "รองเท้า" },
             { "Accessory", "เครื่องประดับ" },
             { "Empty", "ว่าง" },
+            { "Ammunition", "ลูกธนู / กระสุน" },
             {
                 "Double-click a slot to unequip  ·  Right-click an item for details",
-                "ดับเบิลคลิกเพื่อถอด  ·  คลิกขวาเพื่อดูรายละเอียด"
+                "ดับเบิลคลิกเพื่อถอด  ·  ลากของจากกระเป๋ามาวางเพื่อสวมใส่"
             },
 
             //--- the escape menu

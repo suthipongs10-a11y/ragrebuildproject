@@ -269,7 +269,6 @@ Indestructible Weapon
 
 ::Pirate_Skel_Card //id 4073 - slotted on Accessory
 Enable <color=#0000FF>Discount 5</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Bigfoot_Card //id 4074 - slotted on Shield
 -30% damage from Insect
@@ -933,14 +932,12 @@ if bINT = 99:
 
 ::Owl_Duke_Card //id 4237 - slotted on Accessory
 +0.3% Autospell <color=#0000FF>Impositio Manus 3</color> on non-skill attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 <color=#800080>Set Bonus</color>
  <color=#008080>Owl Baron Card</color>
  +10% Autospell <color=#0000FF>Lightning Bolt 5</color> on non-skill attack
 
 ::Owl_Baron_Card //id 4238 - slotted on Accessory
 +3% Autospell <color=#0000FF>Lex Aeterna</color> on non-skill attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 <color=#800080>Set Bonus</color>
  <color=#008080>Owl Duke Card</color>
  +10% Autospell <color=#0000FF>Lightning Bolt 5</color> on non-skill attack
@@ -1271,7 +1268,6 @@ if Acolyte:
 +5% Autospell <color=#0000FF>Quagmire 1</color> on receive physical damage
 if <color=#0000FF>Quagmire 5</color>:
  Autospell <color=#0000FF>Quagmire 5</color> instead
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Penomena_Card //id 4314 - slotted on Shield
 -30% damage from Formless
@@ -1305,7 +1301,6 @@ if Refine > 8:
 
 ::Bloody_Knight_Card //id 4320 - slotted on Weapon
 +2% Autospell <color=#0000FF>Meteor Storm 1</color> on non-skill attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Hylozoist_Card //id 4321 - slotted on Accessory
 +1% chance of polymorph vs. non-Boss monster on physical attack

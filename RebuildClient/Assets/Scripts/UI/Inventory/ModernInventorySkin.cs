@@ -75,15 +75,28 @@ namespace Assets.Scripts.UI.Inventory
 
             if (ModernUiTheme.IsSkinned(ui.InventoryWindow.gameObject))
             {
-                //The stack count on an item icon is made when the item arrives and thrown
-                //away when the last of it is used, so unlike everything else in this window
-                //it cannot be settled once at skin time.
+                //An entry is made when an item arrives and thrown away when the last of it
+                //is used, so unlike everything else in this window the entries cannot be
+                //settled once at skin time and are swept while the bag is open.
                 if (ui.InventoryWindow.gameObject.activeInHierarchy)
-                    RebuildStackCounts(ui.InventoryWindow.transform);
+                    RefreshEntries(ui.InventoryWindow);
                 return;
             }
 
             Skin(ui.InventoryWindow);
+        }
+
+        /// <summary>
+        /// Brings the entries on screen up to the theme. Runs on a timer because entries
+        /// come and go with the items in them.
+        /// </summary>
+        private static void RefreshEntries(PlayerInventoryWindow win)
+        {
+            if (win.ItemBoxRoot == null)
+                return;
+
+            RebuildStackCounts(win.ItemBoxRoot);
+            ModernUiTheme.RepaintInk(win.ItemBoxRoot);
         }
 
         /// <summary>
@@ -96,8 +109,13 @@ namespace Assets.Scripts.UI.Inventory
         /// to reach these, so the label is built fresh instead, the way the character
         /// readout in the corner of the screen had to be.
         ///
-        /// The template new entries are cloned from is rebuilt as well, so in practice this
-        /// pass finds nothing left to do and costs one walk of the window.
+        /// Live entries only. The template they are cloned from is a prefab asset, not an
+        /// object in the scene, and rebuilding a label inside one of those is not a thing
+        /// that works: the engine refuses to reparent a scene object into an asset, so the
+        /// replacement is left orphaned while the original has already been switched off,
+        /// and every entry cloned afterwards comes out with no number on it at all. That is
+        /// exactly what happened. The scene test below is what makes it impossible rather
+        /// than merely not done.
         /// </summary>
         private static void RebuildStackCounts(Transform root)
         {
@@ -106,9 +124,12 @@ namespace Assets.Scripts.UI.Inventory
 
             foreach (var item in root.GetComponentsInChildren<DragItemBase>(true))
             {
+                if (item.CountText == null || !item.gameObject.scene.IsValid())
+                    continue;
+
                 //already ours: the theme font is the mark, since nothing the client builds
                 //is set in it
-                if (item.CountText == null || item.CountText.font == ModernUiTheme.ThemeFont)
+                if (item.CountText.font == ModernUiTheme.ThemeFont)
                     continue;
 
                 item.CountText = ModernUiTheme.RebuildLabel(item.CountText);
@@ -149,20 +170,9 @@ namespace Assets.Scripts.UI.Inventory
             BuildTabRail(win, root);
             BuildFooter(win, root);
 
-            //entries are cloned from the template, so it is styled alongside the ones the
-            //window has already built. Rebuilding its count label there means every entry
-            //made from here on is born with a clean one.
-            if (win.ItemEntryPrefab != null)
-            {
-                RebuildStackCounts(win.ItemEntryPrefab.transform);
-                ModernUiTheme.RepaintInk(win.ItemEntryPrefab.transform);
-            }
-
-            if (win.ItemBoxRoot != null)
-            {
-                RebuildStackCounts(win.ItemBoxRoot);
-                ModernUiTheme.RepaintInk(win.ItemBoxRoot);
-            }
+            //The template is a prefab asset and is deliberately left alone; entries are
+            //brought up to the theme once they exist, by the sweep above.
+            RefreshEntries(win);
 
             ModernUiTheme.StyleScrollViews(root);
             ModernUiTheme.RepaintInk(root);

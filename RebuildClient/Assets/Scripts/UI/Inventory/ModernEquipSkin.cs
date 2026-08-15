@@ -125,18 +125,10 @@ namespace Assets.Scripts.UI.Inventory
             BuildColumn(panel, LeftSlots, entries, leftSide: true);
             BuildColumn(panel, RightSlots, entries, leftSide: false);
 
-            //ammo card across the foot of both columns, where the middle used to be
-            var ammoCard = CreateCard(panel, "AmmoCard");
-            ammoCard.anchorMin = new Vector2(0.5f, 1);
-            ammoCard.anchorMax = new Vector2(0.5f, 1);
-            ammoCard.pivot = new Vector2(0.5f, 1);
-            ammoCard.sizeDelta = new Vector2(WindowWidth - Margin * 2, 46);
-            ammoCard.anchoredPosition = new Vector2(0,
-                -TopOffset - (CardHeight * 5 + CardSpacing * 4) - CardSpacing);
-
-            var ammoText = CreateText(ammoCard, "AmmoText", "", ModernUiTheme.SizeLabel, NameColor,
-                TextAlignmentOptions.Center, FontStyles.Normal, Vector2.zero, Vector2.zero, null);
-            Stretch((RectTransform)ammoText.transform, 8, 4, -8, -4);
+            //A real slot across the foot of both columns, where the middle used to be.
+            //The window this replaced said which ammunition was loaded and gave no way to
+            //load any, which left an archer with arrows in the bag and nothing to shoot.
+            var ammoText = BuildAmmoSlot(panel);
 
             var cartText = CreateText(panel, "CartText", "", ModernUiTheme.SizeBody, NameColor,
                 TextAlignmentOptions.Left, FontStyles.Normal, new Vector2(Margin, 18), new Vector2(400, 26), new Vector2(0, 0));
@@ -153,7 +145,24 @@ namespace Assets.Scripts.UI.Inventory
 
             ModernUiTheme.StyleCloseButtons(win.transform);
 
-            Debug.Log("[ModernEquipSkin] Rebuilt the equipment window.");
+            //The window's drop zone is one of the children switched off above, and the drag
+            //manager switches it back on for anything equippable. That was not enough on its
+            //own: the rebuilt layout is the last child and so draws over everything, and a
+            //pointer stops at the topmost graphic, so the zone underneath never saw the drag
+            //and nothing could be equipped by dropping it here. An archer felt that first,
+            //because dropping a stack of arrows on this window is how ammunition is loaded.
+            //Lifted back over the layout and resized to the window it now has to cover; it is
+            //only switched on while a drag is in progress, so it is in nobody's way the rest
+            //of the time.
+            var dropZone = root.Find("EquipmentDropZone") as RectTransform;
+            if (dropZone != null)
+            {
+                Stretch(dropZone, 0, 0, 0, 0);
+                dropZone.SetAsLastSibling();
+            }
+
+            Debug.Log($"[ModernEquipSkin] Rebuilt the equipment window "
+                      + $"(drop zone {(dropZone != null ? "restored" : "MISSING")}).");
         }
 
         private void BuildColumn(RectTransform panel, int[] slots, EquipWindowEntry[] entries, bool leftSide)
@@ -173,6 +182,75 @@ namespace Assets.Scripts.UI.Inventory
 
                 entries[slotIndex] = BuildSlotContents(card, slotIndex);
             }
+        }
+
+        /// <summary>
+        /// The ammunition slot: an icon, what is loaded, how much of it is left, and a
+        /// surface that takes a stack dropped from the bag.
+        ///
+        /// Returns a label for the window's own AmmoType reference. That reference is not
+        /// optional — EquipmentWindow writes to it on every refresh and reads it back on
+        /// every click — so it is kept, but it is kept off screen: the line it writes is
+        /// English and carries a link for unequipping, and the slot says the same thing in
+        /// Thai and unequips on a click anywhere in it.
+        /// </summary>
+        private TextMeshProUGUI BuildAmmoSlot(RectTransform panel)
+        {
+            var card = CreateCard(panel, "AmmoCard");
+            card.anchorMin = new Vector2(0.5f, 1);
+            card.anchorMax = new Vector2(0.5f, 1);
+            card.pivot = new Vector2(0.5f, 1);
+            card.sizeDelta = new Vector2(WindowWidth - Margin * 2, 58);
+            card.anchoredPosition = new Vector2(0,
+                -TopOffset - (CardHeight * 5 + CardSpacing * 4) - CardSpacing);
+
+            var image = card.GetComponent<Image>();
+            image.raycastTarget = true;
+
+            //sits over the card and is clear until something is dragged across it, the
+            //same way the window's own drop zone marks itself
+            var highlight = CreateCard(card, "Highlight");
+            Stretch(highlight, 0, 0, 0, 0);
+            var highlightImage = highlight.GetComponent<Image>();
+            highlightImage.color = new Color32(0, 0, 0, 0);
+            highlightImage.raycastTarget = false;
+
+            CreateText(card, "AmmoLabel", ThaiUiText.Get("Ammunition"), ModernUiTheme.SizeSmall,
+                LabelColor, TextAlignmentOptions.Left, FontStyles.Normal,
+                new Vector2(14, -6), new Vector2(200, 16), new Vector2(0, 1));
+
+            var iconRect = CreateRect("AmmoIcon", card);
+            iconRect.anchorMin = new Vector2(0, 0.5f);
+            iconRect.anchorMax = new Vector2(0, 0.5f);
+            iconRect.pivot = new Vector2(0, 0.5f);
+            iconRect.sizeDelta = new Vector2(28, 28);
+            iconRect.anchoredPosition = new Vector2(14, -6);
+            var icon = iconRect.gameObject.AddComponent<Image>();
+            icon.preserveAspect = true;
+            icon.raycastTarget = false;
+            icon.color = new Color32(0, 0, 0, 0);
+
+            var name = CreateText(card, "AmmoName", "", ModernUiTheme.SizeBody, NameColor,
+                TextAlignmentOptions.Left, FontStyles.Bold, new Vector2(50, -20),
+                new Vector2(300, 24), new Vector2(0, 1));
+
+            var count = CreateText(card, "AmmoCount", "", ModernUiTheme.SizeLabel, LabelColor,
+                TextAlignmentOptions.Right, FontStyles.Normal, new Vector2(-14, -20),
+                new Vector2(140, 24), new Vector2(1, 1));
+
+            //kept alive for the window, kept out of the way of the slot
+            var ammoText = CreateText(card, "AmmoType", "", ModernUiTheme.SizeSmall, NameColor,
+                TextAlignmentOptions.Left, FontStyles.Normal, Vector2.zero, new Vector2(1, 1),
+                new Vector2(0, 0));
+            ammoText.color = new Color(0, 0, 0, 0);
+
+            var slot = card.gameObject.AddComponent<ModernAmmoSlot>();
+            slot.Highlight = highlightImage;
+            slot.Icon = icon;
+            slot.Label = name;
+            slot.Count = count;
+
+            return ammoText;
         }
 
         private EquipWindowEntry BuildSlotContents(RectTransform card, int slotIndex)
