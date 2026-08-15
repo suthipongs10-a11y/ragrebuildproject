@@ -543,6 +543,73 @@ namespace Assets.Scripts.UI
         }
 
         /// <summary>
+        /// Replaces one label with an identical one drawn in the theme's own material.
+        ///
+        /// This is the heavy version of MakeCrisp and it exists because the light one does
+        /// not always land. Correcting a label's material means correcting every copy of it
+        /// the text package can end up drawing through: the shared asset, the instance made
+        /// the moment anything writes a material property, the stencil variant made when the
+        /// label is inside a mask, and a submesh per fallback atlas when a glyph is not in
+        /// the font. Handing the label a material we built ourselves skips all of that,
+        /// because there is nothing left to have been derived from the outlined one.
+        ///
+        /// The new object takes the old one's place in the hierarchy and its exact
+        /// rectangle, so nothing moves. The old label is switched off rather than destroyed,
+        /// because anything still holding a reference to it would otherwise hold a null;
+        /// callers are expected to point their own reference at what comes back.
+        /// </summary>
+        public static TextMeshProUGUI RebuildLabel(TextMeshProUGUI original)
+        {
+            if (original == null)
+                return null;
+
+            var source = original.rectTransform;
+            var go = new GameObject(original.name + " Crisp", typeof(TextMeshProUGUI));
+            go.transform.SetParent(source.parent, false);
+            go.transform.SetSiblingIndex(source.GetSiblingIndex());
+
+            var rect = (RectTransform)go.transform;
+            rect.anchorMin = source.anchorMin;
+            rect.anchorMax = source.anchorMax;
+            rect.pivot = source.pivot;
+            rect.anchoredPosition = source.anchoredPosition;
+            rect.sizeDelta = source.sizeDelta;
+            rect.localScale = source.localScale;
+
+            var text = go.GetComponent<TextMeshProUGUI>();
+            if (ThemeFont != null)
+                text.font = ThemeFont;
+
+            var material = CrispMaterial;
+            if (material != null)
+                text.fontSharedMaterial = material;
+
+            //everything about how it reads is carried over, so the label keeps its own
+            //layout and only the smearing goes
+            text.text = original.text;
+            text.fontSize = original.fontSize;
+            text.fontSizeMin = original.fontSizeMin;
+            text.fontSizeMax = original.fontSizeMax;
+            text.enableAutoSizing = original.enableAutoSizing;
+            text.fontStyle = original.fontStyle;
+            text.alignment = original.alignment;
+            text.color = original.color;
+            text.margin = original.margin;
+            text.richText = original.richText;
+            text.overflowMode = original.overflowMode;
+            text.raycastTarget = original.raycastTarget;
+            text.extraPadding = true;
+
+            //A stack count is switched on and off to say whether the item is stacked at
+            //all, so a replacement that came up showing would put a number on every icon
+            //in the bag until the next time the client wrote to it.
+            go.SetActive(original.gameObject.activeSelf);
+
+            original.gameObject.SetActive(false);
+            return text;
+        }
+
+        /// <summary>
         /// The accent blue darkened as far as it has to go to read on a given surface. The
         /// blue that clears the bar on a white card does not clear it on the tinted band
         /// of a header, and settling that per surface is more dependable than picking one

@@ -76,16 +76,48 @@ namespace Assets.Scripts.UI.Inventory
             if (ModernUiTheme.IsSkinned(ui.InventoryWindow.gameObject))
             {
                 //The stack count on an item icon is made when the item arrives and thrown
-                //away when it leaves, so unlike everything else in this window it cannot
-                //be fixed once at skin time. It is swept instead, and the sweep costs
-                //nothing when there is nothing to do: the corrected material is cached and
-                //only assigned when it would change something.
+                //away when the last of it is used, so unlike everything else in this window
+                //it cannot be settled once at skin time.
                 if (ui.InventoryWindow.gameObject.activeInHierarchy)
-                    ModernUiTheme.MakeCrisp(ui.InventoryWindow.transform);
+                    RebuildStackCounts(ui.InventoryWindow.transform);
                 return;
             }
 
             Skin(ui.InventoryWindow);
+        }
+
+        /// <summary>
+        /// Draws the number in the corner of each item icon again, in the theme's own
+        /// material.
+        ///
+        /// It arrives as black type inside a thick white halo, which is how the original
+        /// client made it readable against a dark tray. On a pale one the halo is just a
+        /// smear around every digit. Taking it off the material it came in was not enough
+        /// to reach these, so the label is built fresh instead, the way the character
+        /// readout in the corner of the screen had to be.
+        ///
+        /// The template new entries are cloned from is rebuilt as well, so in practice this
+        /// pass finds nothing left to do and costs one walk of the window.
+        /// </summary>
+        private static void RebuildStackCounts(Transform root)
+        {
+            if (root == null || ModernUiTheme.ThemeFont == null)
+                return;
+
+            foreach (var item in root.GetComponentsInChildren<DragItemBase>(true))
+            {
+                //already ours: the theme font is the mark, since nothing the client builds
+                //is set in it
+                if (item.CountText == null || item.CountText.font == ModernUiTheme.ThemeFont)
+                    continue;
+
+                item.CountText = ModernUiTheme.RebuildLabel(item.CountText);
+
+                //the halo was doing some of the work of making a small number stand out
+                //against whatever sprite it lands on, and weight is what replaces it
+                if (item.CountText != null)
+                    item.CountText.fontStyle = FontStyles.Bold;
+            }
         }
 
         private static void Skin(PlayerInventoryWindow win)
@@ -118,11 +150,19 @@ namespace Assets.Scripts.UI.Inventory
             BuildFooter(win, root);
 
             //entries are cloned from the template, so it is styled alongside the ones the
-            //window has already built
+            //window has already built. Rebuilding its count label there means every entry
+            //made from here on is born with a clean one.
             if (win.ItemEntryPrefab != null)
+            {
+                RebuildStackCounts(win.ItemEntryPrefab.transform);
                 ModernUiTheme.RepaintInk(win.ItemEntryPrefab.transform);
+            }
+
             if (win.ItemBoxRoot != null)
+            {
+                RebuildStackCounts(win.ItemBoxRoot);
                 ModernUiTheme.RepaintInk(win.ItemBoxRoot);
+            }
 
             ModernUiTheme.StyleScrollViews(root);
             ModernUiTheme.RepaintInk(root);
@@ -313,13 +353,16 @@ namespace Assets.Scripts.UI.Inventory
                 ModernUiTheme.Place(text, new Vector2(0, 0), new Vector2(Margin + 4f, Margin + 26f),
                     new Vector2(textWidth, 24f));
 
+                //This one came from the prefab wearing the outlined material the rest of the
+                //game's labels use, and clearing that material was not reaching it. It is
+                //drawn again instead, and the window's own reference is moved onto the new
+                //label so every weight it writes still lands.
+                win.WeightText = ModernUiTheme.RebuildLabel(win.WeightText);
+
                 win.WeightText.color = ModernUiTheme.NameColor;
                 win.WeightText.fontSize = ModernUiTheme.SizeBody;
                 win.WeightText.alignment = TextAlignmentOptions.Left;
                 win.WeightText.fontStyle = FontStyles.Bold;
-                //this one came from the prefab, so it arrives wearing the outlined
-                //material the rest of the game's labels use
-                ModernUiTheme.MakeCrisp(win.WeightText);
 
                 //A bar says how full the bag is at a glance, which a percentage in
                 //brackets does not. The window drives the fill; it writes nothing when the
@@ -341,9 +384,11 @@ namespace Assets.Scripts.UI.Inventory
                 win.WeightFill = fill;
             }
 
-            //ItemCounts is not a container around the readout, it is the readout: the
-            //text component sits on that very object. Switching it off after moving it
-            //is what made the weight line disappear from the footer entirely.
+            //ItemCounts is not a container around the readout, it is the readout: the text
+            //component sits on that very object, and switching it off while it was still
+            //the weight line is what made the footer come up empty. It is safe to hide once
+            //the line has been drawn again, since the reference has moved to the new label,
+            //and the test still stands for the case where there was nothing to redraw.
             var counts = root.Find("ItemCounts");
             if (counts != null && (win.WeightText == null || counts != win.WeightText.transform))
                 counts.gameObject.SetActive(false);

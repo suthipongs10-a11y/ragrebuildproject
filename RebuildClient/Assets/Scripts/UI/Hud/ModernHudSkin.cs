@@ -154,59 +154,10 @@ namespace Assets.Scripts.UI.Hud
                       + $"backdrop {(backdrop != null ? backdrop.name : "none")}).");
         }
 
-        /// <summary>
-        /// Replaces one label with an identical one that has no outline and no shadow.
-        ///
-        /// The new object takes the old one's place in the hierarchy and its exact
-        /// rectangle, so nothing moves; only the material it draws with is ours. The old
-        /// label is switched off rather than destroyed, because anything else in the
-        /// client still holding a reference to it would otherwise be holding a null.
-        /// </summary>
-        private static TextMeshProUGUI RebuildLabel(TextMeshProUGUI original)
-        {
-            if (original == null)
-                return null;
-
-            var source = original.rectTransform;
-            var go = new GameObject(original.name + " Crisp", typeof(TextMeshProUGUI));
-            go.transform.SetParent(source.parent, false);
-            go.transform.SetSiblingIndex(source.GetSiblingIndex());
-
-            var rect = (RectTransform)go.transform;
-            rect.anchorMin = source.anchorMin;
-            rect.anchorMax = source.anchorMax;
-            rect.pivot = source.pivot;
-            rect.anchoredPosition = source.anchoredPosition;
-            rect.sizeDelta = source.sizeDelta;
-            rect.localScale = source.localScale;
-
-            var text = go.GetComponent<TextMeshProUGUI>();
-            if (ModernUiTheme.ThemeFont != null)
-                text.font = ModernUiTheme.ThemeFont;
-
-            var material = ModernUiTheme.CrispMaterial;
-            if (material != null)
-                text.fontSharedMaterial = material;
-
-            //everything about how it reads is carried over, so the readout keeps its own
-            //layout and only the smearing goes
-            text.text = original.text;
-            text.fontSize = original.fontSize;
-            text.fontSizeMin = original.fontSizeMin;
-            text.fontSizeMax = original.fontSizeMax;
-            text.enableAutoSizing = original.enableAutoSizing;
-            text.fontStyle = original.fontStyle;
-            text.alignment = original.alignment;
-            text.color = original.color;
-            text.margin = original.margin;
-            text.richText = original.richText;
-            text.overflowMode = original.overflowMode;
-            text.raycastTarget = original.raycastTarget;
-            text.extraPadding = true;
-
-            original.gameObject.SetActive(false);
-            return text;
-        }
+        //the rebuild that fixed this readout now lives in the theme, because the bag's
+        //stack counts and its weight line needed exactly the same treatment
+        private static TextMeshProUGUI RebuildLabel(TextMeshProUGUI original) =>
+            ModernUiTheme.RebuildLabel(original);
 
         private static void StyleGaugeLabel(TextMeshProUGUI text)
         {
