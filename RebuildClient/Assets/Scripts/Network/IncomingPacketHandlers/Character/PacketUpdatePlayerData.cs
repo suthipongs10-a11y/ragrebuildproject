@@ -87,6 +87,19 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
             CameraFollower.Instance.UpdatePlayerSP(sp, maxSp);
             CameraFollower.Instance.CharacterDetailBox.JobLvlDisplay.text = $"Job Lv. {State.GetData(PlayerStat.JobLevel)}";
             CameraFollower.Instance.UpdatePlayerJobExp(State.GetData(PlayerStat.JobExp), jobMax);
+
+            //The base level and its bar were only ever redrawn by the level up packet, so a
+            //level set any other way left the readout in the corner showing the old number
+            //while every other view of the character had already moved on. The second job
+            //change, which puts the level back to ten, is how that turned up: job level
+            //updated here and base level did not.
+            var baseLevel = State.GetData(PlayerStat.Level);
+            State.Exp = State.GetData(PlayerStat.Experience);
+            CameraFollower.Instance.CharacterDetailBox.BaseLvlDisplay.text = $"Base Lv. {baseLevel}";
+            CameraFollower.Instance.UpdatePlayerExp(State.Exp, CameraFollower.Instance.ExpForLevel(baseLevel));
+
+            if (CameraFollower.Instance.TargetControllable != null)
+                CameraFollower.Instance.TargetControllable.Level = baseLevel;
             CameraFollower.Instance.CharacterDetailBox.UpdateWeightAndZeny();
 
             if (CameraFollower.Instance.TargetControllable != null)
