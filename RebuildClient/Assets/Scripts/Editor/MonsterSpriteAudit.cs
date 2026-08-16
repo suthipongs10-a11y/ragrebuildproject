@@ -27,6 +27,17 @@ namespace Assets.Scripts.Editor
     {
         private const string MonsterClassDataPath = "ClientConfigGenerated/monsterclass.json";
 
+        /// <summary>
+        /// Where the upstream author's own monsters start.
+        ///
+        /// They are behind the DoddlerCustomMonsters flag, which is off here and stays off,
+        /// because most of them have no sprite in the GRF and turning it on makes them all
+        /// Porings. A missing sprite above this id is therefore the arrangement working, not
+        /// a gap to go and fill, and reporting it as one sends you looking through a GRF for
+        /// a file that was never in it.
+        /// </summary>
+        private const int CustomMonsterIdStart = 6000;
+
         [MenuItem("Ragnarok/Check monster sprites", priority = 3)]
         public static void Audit()
         {
@@ -61,6 +72,7 @@ namespace Assets.Scripts.Editor
             var projectRoot = Path.GetFullPath(Path.Combine(Application.dataPath, ".."));
 
             var missing = new List<MonsterClassData>();
+            var switchedOff = new List<MonsterClassData>();
             var wrongFolder = new List<string>();
             var checkedCount = 0;
 
@@ -93,12 +105,16 @@ namespace Assets.Scripts.Editor
                     continue;
                 }
 
-                missing.Add(monster);
+                if (monster.Id >= CustomMonsterIdStart)
+                    switchedOff.Add(monster);
+                else
+                    missing.Add(monster);
             }
 
             if (missing.Count == 0)
             {
-                Debug.Log($"[MonsterSpriteAudit] All {checkedCount} monsters have a sprite. Nothing to do.");
+                Debug.Log($"[MonsterSpriteAudit] All {checkedCount} monsters that can appear have a sprite. "
+                          + "Nothing to do.");
             }
             else
             {
@@ -115,6 +131,22 @@ namespace Assets.Scripts.Editor
                 var outPath = Path.Combine(Application.dataPath, "../MissingMonsterSprites.txt");
                 File.WriteAllText(outPath, report.ToString());
                 Debug.Log($"[MonsterSpriteAudit] Full list written to {Path.GetFullPath(outPath)}");
+            }
+
+            //Said once, quietly, and never as a warning. These cannot appear in the game: the
+            //custom monsters are behind a feature flag that is off, and most of them have no
+            //sprite in the GRF at all, which is exactly why it is off. Reported at all only
+            //so that a future run of this does not look like it missed something.
+            if (switchedOff.Count > 0)
+            {
+                var names = new StringBuilder();
+                foreach (var monster in switchedOff)
+                    names.Append($"{monster.Name} ({monster.Id}), ");
+
+                Debug.Log($"[MonsterSpriteAudit] {switchedOff.Count} custom monster(s) of id "
+                          + $"{CustomMonsterIdStart}+ also have no sprite, which is expected and not a "
+                          + "problem: they are behind the DoddlerCustomMonsters flag and it is off. "
+                          + $"{names.ToString().TrimEnd(' ', ',')}");
             }
 
             //found where the client would not have looked, which is worth knowing separately
