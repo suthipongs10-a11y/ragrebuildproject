@@ -47,8 +47,10 @@ namespace Assets.Scripts.UI
         private readonly List<Image> tabBorders = new List<Image>();
         private readonly List<Vector2> pageSizes = new List<Vector2>();
         private readonly List<float> pageOffsets = new List<float>();
+        private readonly List<RectTransform> pageFrames = new List<RectTransform>();
 
         private RectTransform content;
+        private ScrollRect pageScroll;
         private RectTransform stage;
         private TextMeshProUGUI identity;
         private int current;
@@ -98,6 +100,27 @@ namespace Assets.Scripts.UI
             content.offsetMin = new Vector2(Padding, Padding);
             content.offsetMax = new Vector2(-(Padding + StageWidth + StageGap),
                 -(HeaderHeight + TabHeight + TabGap));
+
+            //The window is capped to the height of what it is drawn into, and the pages were
+            //not, so a page taller than the cap simply hung out of the bottom of the frame -
+            //stats and skills both did, with their last row of buttons floating below the
+            //window. Clipping alone would only hide the problem, so the pages scroll: they
+            //are cut to the frame and what did not fit can still be reached.
+            //
+            //Inert whenever a page does fit, which is the usual case, since a clamped scroll
+            //view with content no taller than its viewport has nowhere to move.
+            content.gameObject.AddComponent<RectMask2D>();
+
+            pageScroll = content.gameObject.AddComponent<ScrollRect>();
+            pageScroll.viewport = content;
+            pageScroll.horizontal = false;
+            pageScroll.vertical = true;
+            pageScroll.movementType = ScrollRect.MovementType.Clamped;
+            pageScroll.scrollSensitivity = 28f;
+            //Dragging an item out of the bag has to keep working. It does, because the item
+            //handles the drag itself and the event never reaches this, but a drag that
+            //starts on nothing would otherwise fling the page about.
+            pageScroll.inertia = false;
 
             stage = ModernUiTheme.CreateCard(root, "CharacterStage", ModernUiTheme.CardDeepColor, true);
             stage.anchorMin = new Vector2(1, 0);
@@ -192,11 +215,34 @@ namespace Assets.Scripts.UI
             //real row of content against the tabs instead of leaving a band of nothing
             //there, and takes the same amount off the height this window has to be.
             var trim = StripPageChrome(rect);
-            rect.anchoredPosition = new Vector2(0, trim);
+            var usable = Mathf.Max(size.y - trim, 120f);
 
             var index = pages.Count;
+
+            //A frame the height of what the page actually shows, with the page inside it
+            //slid up by the band its hidden header left behind.
+            //
+            //The scroll view moves this rather than the page, and it has to: a clamped
+            //scroll view will not let its content start above the top of the view, so given
+            //the page itself it would pull that dead band straight back down into sight.
+            var frame = ModernUiTheme.CreateRect("Page" + index, content);
+            frame.anchorMin = new Vector2(0.5f, 1f);
+            frame.anchorMax = new Vector2(0.5f, 1f);
+            frame.pivot = new Vector2(0.5f, 1f);
+            frame.sizeDelta = new Vector2(size.x, usable);
+            frame.anchoredPosition = Vector2.zero;
+
+            rect.SetParent(frame, false);
+            rect.localScale = Vector3.one;
+            rect.anchorMin = new Vector2(0.5f, 1f);
+            rect.anchorMax = new Vector2(0.5f, 1f);
+            rect.pivot = new Vector2(0.5f, 1f);
+            rect.sizeDelta = size;
+            rect.anchoredPosition = new Vector2(0, trim);
+
             pages.Add(window);
-            pageSizes.Add(new Vector2(size.x, Mathf.Max(size.y - trim, 120f)));
+            pageFrames.Add(frame);
+            pageSizes.Add(new Vector2(size.x, usable));
             pageOffsets.Add(trim);
 
             //Not TabIdleColor: against this window's panel that sits at 1.06 to 1, which
@@ -348,6 +394,14 @@ namespace Assets.Scripts.UI
                 {
                     pages[i].HideWindow();
                 }
+            }
+
+            //The scroll view follows whichever page is up, and each tab opens at its top
+            //rather than wherever the last one had been scrolled to.
+            if (pageScroll != null && index < pageFrames.Count)
+            {
+                pageScroll.content = pageFrames[index];
+                pageFrames[index].anchoredPosition = Vector2.zero;
             }
 
             PaintTabs();
