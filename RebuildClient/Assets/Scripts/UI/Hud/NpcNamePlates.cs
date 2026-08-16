@@ -1,4 +1,4 @@
-using Assets.Scripts.Network;
+﻿using Assets.Scripts.Network;
 using Assets.Scripts.Sprites;
 using RebuildSharedData.Enum;
 using TMPro;
@@ -16,9 +16,10 @@ namespace Assets.Scripts.UI.Hud
     /// town. The Job Master is the one that made the point: renaming him changed nothing
     /// anybody could see, and the hover plate, when it did appear, was small dark text.
     ///
-    /// So this is a sign of its own rather than the hover plate held open: white, bold, and
-    /// large enough to read from where you are standing, which the hover plate is not and
-    /// should not be — it has monsters to label too.
+    /// So this is a sign of its own rather than the hover plate held open: a pale board with
+    /// a dark edge, an icon and the name on it, standing over the head and readable from
+    /// where you are. The hover plate is not that and should not be — it has monsters to
+    /// label too, and forty boards over a field is worse than none.
     /// </summary>
     public class NpcNamePlates : MonoBehaviour
     {
@@ -31,7 +32,12 @@ namespace Assets.Scripts.UI.Hud
         /// <summary>Above the head rather than through it. Sprites here stand 1.5 tall.</summary>
         private const float SignHeight = 2.35f;
 
-        private const float SignFontSize = 3.4f;
+        private const float FontSize = 1.7f;
+        private const float PadX = 0.45f;
+        private const float PadY = 0.28f;
+        private const float IconSize = 1.05f;
+        private const float IconGap = 0.22f;
+        private const float BorderWidth = 0.07f;
         private const string SignName = "NpcSign";
 
         private float timer;
@@ -81,35 +87,98 @@ namespace Assets.Scripts.UI.Hud
             }
         }
 
+        /// <summary>
+        /// A signboard: a pale plaque with a dark edge, an icon, and the name written on it.
+        ///
+        /// Text on its own was the first attempt and it was not a sign, it was writing in
+        /// the air — legible enough, but nothing that reads as "this figure is somebody you
+        /// go and talk to". A panel behind it is what makes it a thing standing in the world
+        /// rather than a label the interface has drawn over it.
+        ///
+        /// Sized to the text rather than to a guess, so a long name is not clipped and a
+        /// short one is not floating in the middle of an oversized board.
+        /// </summary>
         private static void BuildSign(Transform parent, string name)
         {
-            var go = new GameObject(SignName);
-            go.transform.SetParent(parent, false);
-            go.transform.localPosition = new Vector3(0, SignHeight, 0);
+            var root = new GameObject(SignName);
+            root.transform.SetParent(parent, false);
+            root.transform.localPosition = new Vector3(0, SignHeight, 0);
+            //faces the camera, and everything hung on it turns with it
+            root.AddComponent<BillboardObject>();
 
-            var text = go.AddComponent<TextMeshPro>();
+            //Built first and measured, because how wide the board has to be is a question
+            //only the text can answer.
+            var textObject = new GameObject("Name");
+            textObject.transform.SetParent(root.transform, false);
+
+            var text = textObject.AddComponent<TextMeshPro>();
             if (ModernUiTheme.ThemeFont != null)
                 text.font = ModernUiTheme.ThemeFont;
 
             text.text = name;
-            text.fontSize = SignFontSize;
-            text.color = Color.white;
+            text.fontSize = FontSize;
+            text.color = ModernUiTheme.NameColor;
             text.fontStyle = FontStyles.Bold;
-            text.alignment = TextAlignmentOptions.Center;
+            text.alignment = TextAlignmentOptions.Left;
             text.enableWordWrapping = false;
             text.raycastTarget = false;
+            text.ForceMeshUpdate();
 
-            //White alone disappears against a snow map or a pale wall, and RO backgrounds
-            //are every colour there is. A dark edge is what makes one label work everywhere
-            //rather than most places.
-            text.outlineWidth = 0.22f;
-            text.outlineColor = new Color32(0, 0, 0, 255);
+            var textWidth = Mathf.Max(text.preferredWidth, 0.5f);
+            var textHeight = Mathf.Max(text.preferredHeight, FontSize);
 
-            //wide enough that a long name is not folded onto a second line
-            text.rectTransform.sizeDelta = new Vector2(14f, 2f);
+            var boardWidth = PadX * 2f + IconSize + IconGap + textWidth;
+            var boardHeight = Mathf.Max(textHeight, IconSize) + PadY * 2f;
 
-            //faces the camera along with everything else in the world
-            go.AddComponent<BillboardObject>();
+            //the dark edge is a second board very slightly larger behind the first, which is
+            //the same trick the interface uses for its own panels
+            MakePanel(root.transform, "Border", ModernUiTheme.NameColor,
+                boardWidth + BorderWidth * 2f, boardHeight + BorderWidth * 2f, 0);
+            MakePanel(root.transform, "Panel", ModernUiTheme.WindowColor,
+                boardWidth, boardHeight, 1);
+
+            var left = -boardWidth * 0.5f;
+
+            var icon = new GameObject("Icon");
+            icon.transform.SetParent(root.transform, false);
+            icon.transform.localPosition = new Vector3(left + PadX + IconSize * 0.5f, 0f, 0f);
+            var iconRenderer = icon.AddComponent<SpriteRenderer>();
+            iconRenderer.sprite = ModernUiIcons.Person;
+            iconRenderer.color = ModernUiTheme.AccentInkColor;
+            iconRenderer.sortingOrder = 2;
+
+            //scaled rather than sliced: slicing needs a border the icon sprites do not have,
+            //and scaling lands on the right size whatever their own pixels-per-unit is
+            var iconBounds = iconRenderer.sprite != null ? iconRenderer.sprite.bounds.size.x : 0f;
+            if (iconBounds > 0.0001f)
+                icon.transform.localScale = Vector3.one * (IconSize / iconBounds);
+
+            text.rectTransform.sizeDelta = new Vector2(textWidth, textHeight);
+            text.rectTransform.localPosition =
+                new Vector3(left + PadX + IconSize + IconGap + textWidth * 0.5f, 0f, 0f);
+
+            //Sorting order rather than depth, because all of this is coplanar: three quads
+            //at the same distance from the camera would otherwise fight over which is in
+            //front and the answer would change as the camera moved.
+            var textRenderer = textObject.GetComponent<MeshRenderer>();
+            if (textRenderer != null)
+                textRenderer.sortingOrder = 3;
+        }
+
+        private static void MakePanel(Transform parent, string name, Color color,
+            float width, float height, int order)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+
+            var renderer = go.AddComponent<SpriteRenderer>();
+            renderer.sprite = ModernUiTheme.RoundedSprite;
+            //the rounded sprite is built with a border, so it stretches without the corners
+            //smearing
+            renderer.drawMode = SpriteDrawMode.Sliced;
+            renderer.size = new Vector2(width, height);
+            renderer.color = color;
+            renderer.sortingOrder = order;
         }
     }
 }
