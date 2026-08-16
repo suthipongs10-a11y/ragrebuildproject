@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.Network;
+using Assets.Scripts.PlayerControl;
 using Assets.Scripts.Sprites;
 using RebuildSharedData.Enum;
 using TMPro;
@@ -32,16 +33,27 @@ namespace Assets.Scripts.UI.Hud
         /// <summary>Above the head rather than through it. Sprites here stand 1.5 tall.</summary>
         private const float SignHeight = 2.05f;
 
-        //Roughly a third of the height of the figure it belongs to. The first pass was three
-        //times this and the result was a white slab as tall as the NPC — which read as a
-        //chat room sitting in the field rather than as a label on a person, because that is
-        //exactly the size and shape a chat room is.
-        private const float FontSize = 0.6f;
-        private const float PadX = 0.16f;
-        private const float PadY = 0.10f;
-        private const float IconSize = 0.36f;
-        private const float IconGap = 0.09f;
-        private const float BorderWidth = 0.03f;
+        /// <summary>
+        /// Only signs the NPCs you are near enough to walk to.
+        ///
+        /// Every NPC in view carrying one turned a camp into a wall of boards. A sign is for
+        /// finding the person in front of you, so it appears when you are near enough for
+        /// that to be the question.
+        /// </summary>
+        private const float ShowDistance = 11f;
+
+        //Built at a font size TextMeshPro is comfortable with and then shrunk as a whole.
+        //Setting the font size to the final world height instead — 0.6 of a unit — is what
+        //produced boards with an illegible smear in them: at that size the glyphs have
+        //almost no texture left to draw with. Building large and scaling down keeps the text
+        //and the board in proportion whatever either of them turns out to measure.
+        private const float SignScale = 0.13f;
+        private const float FontSize = 4f;
+        private const float PadX = 1.1f;
+        private const float PadY = 0.7f;
+        private const float IconSize = 2.4f;
+        private const float IconGap = 0.6f;
+        private const float BorderWidth = 0.2f;
         private const string SignName = "NpcSign";
 
         private float timer;
@@ -71,6 +83,12 @@ namespace Assets.Scripts.UI.Hud
             if (network == null)
                 return;
 
+            var player = CameraFollower.Instance != null ? CameraFollower.Instance.TargetControllable : null;
+            if (player == null)
+                return;
+
+            var here = player.transform.position;
+
             foreach (var entry in network.EntityList)
             {
                 var entity = entry.Value;
@@ -84,29 +102,29 @@ namespace Assets.Scripts.UI.Hud
                 if (string.IsNullOrWhiteSpace(name) || name.StartsWith("[NPC]"))
                     continue;
 
-                if (entity.transform.Find(SignName) != null)
-                    continue;
+                var sign = entity.transform.Find(SignName);
+                if (sign == null)
+                    sign = BuildSign(entity.transform, name);
 
-                BuildSign(entity.transform, name);
+                var near = Vector3.Distance(here, entity.transform.position) <= ShowDistance;
+                if (sign.gameObject.activeSelf != near)
+                    sign.gameObject.SetActive(near);
             }
         }
 
         /// <summary>
         /// A signboard: a pale plaque with a dark edge, an icon, and the name written on it.
         ///
-        /// Text on its own was the first attempt and it was not a sign, it was writing in
-        /// the air — legible enough, but nothing that reads as "this figure is somebody you
-        /// go and talk to". A panel behind it is what makes it a thing standing in the world
-        /// rather than a label the interface has drawn over it.
-        ///
-        /// Sized to the text rather than to a guess, so a long name is not clipped and a
-        /// short one is not floating in the middle of an oversized board.
+        /// Built in its own units and shrunk at the end, so everything on it stays in
+        /// proportion. Sized to the text rather than to a guess, so a long name is not
+        /// clipped and a short one is not adrift in an oversized plaque.
         /// </summary>
-        private static void BuildSign(Transform parent, string name)
+        private static Transform BuildSign(Transform parent, string name)
         {
             var root = new GameObject(SignName);
             root.transform.SetParent(parent, false);
             root.transform.localPosition = new Vector3(0, SignHeight, 0);
+            root.transform.localScale = Vector3.one * SignScale;
             //faces the camera, and everything hung on it turns with it
             root.AddComponent<BillboardObject>();
 
@@ -128,7 +146,7 @@ namespace Assets.Scripts.UI.Hud
             text.raycastTarget = false;
             text.ForceMeshUpdate();
 
-            var textWidth = Mathf.Max(text.preferredWidth, 0.5f);
+            var textWidth = Mathf.Max(text.preferredWidth, 1f);
             var textHeight = Mathf.Max(text.preferredHeight, FontSize);
 
             var boardWidth = PadX * 2f + IconSize + IconGap + textWidth;
@@ -167,6 +185,8 @@ namespace Assets.Scripts.UI.Hud
             var textRenderer = textObject.GetComponent<MeshRenderer>();
             if (textRenderer != null)
                 textRenderer.sortingOrder = 3;
+
+            return root.transform;
         }
 
         private static void MakePanel(Transform parent, string name, Color color,

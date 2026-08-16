@@ -26,21 +26,24 @@ namespace Assets.Scripts.Network
         //  blue   gear off an ordinary monster
         //  purple gear off a boss
         //  ore    the colour of the ore
-        private static readonly Color CardColor = new Color(1.00f, 0.82f, 0.25f);
-        private static readonly Color BossCardColor = new Color(1.00f, 0.25f, 0.22f);
-        private static readonly Color GearColor = new Color(0.35f, 0.70f, 1.00f);
-        private static readonly Color BossGearColor = new Color(0.72f, 0.40f, 1.00f);
+        //Deliberately saturated — one weak channel each. Additive light adds up, so a tint
+        //with three strong channels reaches white after two passes and the colour is gone.
+        //Leaving one channel near zero is what survives the stacking.
+        private static readonly Color CardColor = new Color(1.00f, 0.66f, 0.04f);
+        private static readonly Color BossCardColor = new Color(1.00f, 0.10f, 0.06f);
+        private static readonly Color GearColor = new Color(0.08f, 0.48f, 1.00f);
+        private static readonly Color BossGearColor = new Color(0.58f, 0.10f, 1.00f);
 
         private static readonly Dictionary<string, Color> OreColors = new Dictionary<string, Color>
         {
-            { "Oridecon", new Color(1.00f, 0.45f, 0.15f) },
-            { "Rough_Oridecon", new Color(0.95f, 0.50f, 0.25f) },
-            { "Elunium", new Color(0.65f, 0.95f, 1.00f) },
-            { "Rough_Elunium", new Color(0.70f, 0.90f, 0.98f) },
-            { "Phracon", new Color(0.85f, 0.55f, 0.30f) },
-            { "Emveretarcon", new Color(0.45f, 0.95f, 0.55f) },
-            { "Gold", new Color(1.00f, 0.90f, 0.30f) },
-            { "Steel", new Color(0.80f, 0.85f, 0.90f) },
+            { "Oridecon", new Color(1.00f, 0.34f, 0.02f) },
+            { "Rough_Oridecon", new Color(0.90f, 0.38f, 0.08f) },
+            { "Elunium", new Color(0.20f, 0.82f, 1.00f) },
+            { "Rough_Elunium", new Color(0.28f, 0.74f, 0.95f) },
+            { "Phracon", new Color(0.80f, 0.38f, 0.10f) },
+            { "Emveretarcon", new Color(0.14f, 0.95f, 0.32f) },
+            { "Gold", new Color(1.00f, 0.78f, 0.05f) },
+            { "Steel", new Color(0.55f, 0.68f, 0.85f) },
         };
 
         //the two worth stopping for whatever the odds were on this particular monster
@@ -56,7 +59,6 @@ namespace Assets.Scripts.Network
 
         private SpriteRenderer beam;
         private SpriteRenderer core;
-        private SpriteRenderer hotCore;
         private SpriteRenderer glow;
         private Color tint;
         private float strength;
@@ -84,29 +86,26 @@ namespace Assets.Scripts.Network
 
             var aura = go.AddComponent<GroundItemAura>();
             aura.tint = color;
-            aura.strength = 0.85f + tier * 0.05f;
+            aura.strength = 0.72f + tier * 0.06f;
             //so a field of drops does not pulse in lockstep
             aura.phase = Random.value * 10f;
 
-            //Four shafts, one inside the next, each narrower and whiter than the last. With
-            //additive blending they sum where they overlap, so the middle of the beam burns
-            //out to white while the outside keeps its colour — which is what a bright light
-            //actually looks like, and is not something one alpha blended quad can do however
-            //opaque it is made.
+            //Two shafts of the same colour, one inside the other, and no white one. A white
+            //shaft fills every channel by itself, and adding it to anything gives white —
+            //which is exactly what four stacked layers produced. Two passes of a saturated
+            //tint fill the strong channels and leave the weak one weak, so the beam is very
+            //bright and still gold, or blue, or purple.
             aura.beamHeight = 2.9f + tier * 0.6f;
             aura.beam = MakeRenderer(go.transform, "Beam", BeamSprite, Vector3.zero);
             aura.beam.transform.localScale = new Vector3(1.7f + tier * 0.3f, aura.beamHeight, 1f);
 
             aura.core = MakeRenderer(go.transform, "Core", BeamSprite, Vector3.zero);
-            aura.core.transform.localScale = new Vector3(0.9f + tier * 0.12f, aura.beamHeight * 0.92f, 1f);
-
-            aura.hotCore = MakeRenderer(go.transform, "HotCore", BeamSprite, Vector3.zero);
-            aura.hotCore.transform.localScale = new Vector3(0.36f + tier * 0.05f, aura.beamHeight * 0.8f, 1f);
+            aura.core.transform.localScale = new Vector3(0.62f + tier * 0.08f, aura.beamHeight * 0.9f, 1f);
 
             //a pool of light where it is actually lying, so the eye is sent to the item and
             //not to the empty air above it
             aura.glow = MakeRenderer(go.transform, "Glow", GlowSprite, new Vector3(0, 0.05f, 0));
-            aura.glow.transform.localScale = Vector3.one * (1.4f + tier * 0.2f);
+            aura.glow.transform.localScale = Vector3.one * (1.25f + tier * 0.18f);
 
             aura.Apply(0f);
         }
@@ -187,14 +186,14 @@ namespace Assets.Scripts.Network
             //SrcAlpha One, so what lands on the screen is colour times alpha, added. Alpha
             //is held near the top and brightness comes from stacking, which is the part that
             //has no ceiling: three shafts at full strength are three times the light.
-            Paint(beam, tint, 0.86f + pulse * 0.14f);
-            Paint(core, Color.Lerp(tint, Color.white, 0.55f), 0.88f + pulse * 0.12f);
-            Paint(hotCore, Color.white, 0.82f + pulse * 0.18f);
-            Paint(glow, Color.Lerp(tint, Color.white, 0.4f), 0.80f + pulse * 0.20f);
+            //A touch toward white on the inner shaft only. Any more and the two passes reach
+            //white together, which is the whole failure this replaced.
+            Paint(beam, tint, 0.88f + pulse * 0.12f);
+            Paint(core, Color.Lerp(tint, Color.white, 0.18f), 0.86f + pulse * 0.14f);
+            Paint(glow, tint, 0.82f + pulse * 0.18f);
 
             Stretch(beam, beamHeight, pulse);
-            Stretch(core, beamHeight * 0.92f, pulse);
-            Stretch(hotCore, beamHeight * 0.8f, pulse);
+            Stretch(core, beamHeight * 0.9f, pulse);
         }
 
         private void Paint(SpriteRenderer renderer, Color color, float amount)
