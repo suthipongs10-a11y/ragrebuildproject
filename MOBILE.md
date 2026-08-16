@@ -3,55 +3,85 @@
 เล่นจากเบราว์เซอร์ในมือถือ โดยที่เครื่องคอมเป็นทั้งเซิร์ฟเวอร์เกมและที่เก็บตัวเกม
 ใช้พอร์ตเดียว ไม่ต้องลงโปรแกรมเสิร์ฟเว็บเพิ่ม
 
-## ทำครั้งเดียว: build เป็น WebGL
+## build เป็น WebGL
 
 Unity build เป็น WebGL ใช้เวลานาน (เป็นสิบนาทีถึงเป็นชั่วโมง) และรันแล้ว
 **ห้ามปิดหรือสลับไปทำอย่างอื่นกับ Unity** ระหว่างนั้น
 
-1. `File → Build Settings`
-2. เลือก **WebGL** แล้วกด `Switch Platform` (ครั้งแรกจะนาน เพราะต้อง import ใหม่หมด)
-3. `Player Settings → Resolution and Presentation → WebGL Template` เลือก **Ragnarok**
-4. `Player Settings → Publishing Settings`
-   - `Compression Format` → **Gzip** (เซิร์ฟเวอร์รองรับทั้ง Gzip, Brotli และไม่บีบอัด
-     แต่ Gzip โหลดเร็วและไม่มีปัญหากับ Safari บน iOS)
-   - `Decompression Fallback` → **ติ๊กถูก**
-5. กด `Build` แล้วเลือกโฟลเดอร์นี้:
+### ขั้นที่ 0 — เตรียม (ก่อนเปิด Unity)
+
+- ถ้าแก้อะไรใน `RoRebuildServer/GameConfig/ServerData/` มาก่อน → รัน `updateclient.bat`
+  แก้แต่ไฟล์ `.cs` ไม่ต้องรัน
+- ลบโฟลเดอร์ `Build_*` เก่าใน `WebClient` ทิ้ง (เหตุผลอยู่ในขั้นที่ 6)
+
+### ขั้นที่ 1 — สลับ platform (ครั้งแรกครั้งเดียว)
+
+`File → Build Settings` → เลือก **WebGL** → `Switch Platform`
+
+ครั้งแรกนานมาก เพราะ Unity ต้อง import ทุกอย่างใหม่สำหรับ platform นี้
+**และจะกินดิสก์เพิ่มอีกชุดเต็ม ๆ** (artifact แยกตาม platform) — สลับกลับไปกลับมาก็ยิ่งกิน
+
+### ขั้นที่ 2 — เช็ค Scenes In Build
+
+ต้องติ๊กแค่ **`Assets/Scenes/MainScene.unity`** อันเดียว
+`Debug` กับ `Cinemachine` ปล่อยไม่ติ๊กไว้ตามเดิม (ค่าปัจจุบันถูกอยู่แล้ว ดูเฉย ๆ)
+
+### ขั้นที่ 3 — Player Settings
+
+- `Resolution and Presentation → WebGL Template` → **Ragnarok**
+- `Publishing Settings → Compression Format` → **Gzip**
+  (เซิร์ฟเวอร์รองรับทั้ง Gzip, Brotli และไม่บีบอัด แต่ Gzip โหลดเร็วและไม่มีปัญหากับ Safari บน iOS)
+- `Publishing Settings → Decompression Fallback` → **ติ๊กถูก**
+
+### ขั้นที่ 4 — กด Build แล้วเลือกโฟลเดอร์นี้
 
 ```
 RoRebuildServer\RoRebuildServer\bin\Debug\net9.0\WebClient
 ```
 
-6. จะมีหน้าต่างเด้งถามว่า **"Do you want to build a clean addressables before export?"**
-   → **ต้องกด `Perform Clean Addressables Build`**
+> โฟลเดอร์ปลายทางสำคัญ — เซิร์ฟเวอร์มองหาโฟลเดอร์ชื่อ `WebClient`
+> ข้าง ๆ ไฟล์เซิร์ฟเวอร์ ถ้าอยากเก็บที่อื่นให้แก้ `WebClientPath` ใน `appsettings.json`
 
-> ⛔ ข้อนี้พลาดบ่อยและอาการหลอก: ถ้ากด `Normal Build` ตัว build จะใช้ addressables
-> ชุดเก่าที่ค้างอยู่ สไปรต์ที่เพิ่งแก้หรือเพิ่งเพิ่มจะไม่ติดไปด้วย เกมรันได้ปกติ
-> แต่มอนบางตัวกลายเป็น Poring — เหมือนตอนแก้ Verit ไม่สำเร็จเป๊ะ ๆ
+### ขั้นที่ 5 — ⛔ หน้าต่างที่เด้งขึ้นมา
 
-## ⚠️ ล้างโฟลเดอร์เก่าทุกครั้งก่อน build ใหม่
+> "Do you want to build a clean addressables before export?"
+> `[ Perform Clean Addressables Build ]` `[ Normal Build ]`
 
-หลัง build เสร็จ `WebGLUnfucker` จะเปลี่ยนชื่อโฟลเดอร์ `Build` เป็น `Build_2026-01-31-08-15`
+**ต้องกดปุ่มซ้าย**
+
+ถ้ากด `Normal Build` ตัว build จะใช้ addressables ชุดเก่าที่ค้างอยู่
+สไปรต์ที่เพิ่งแก้หรือเพิ่งเพิ่มจะไม่ติดไปด้วย — **เกมรันได้ปกติ ไม่ error อะไรเลย**
+แต่มอนที่เพิ่งแก้จะกลับไปเป็น Poring เหมือนตอนแก้ Verit ไม่สำเร็จเป๊ะ ๆ
+อาการหลอกมาก เพราะดูเหมือนโค้ดที่แก้ไม่ได้ผล
+
+### ขั้นที่ 6 — หลัง build เสร็จ
+
+`WebGLUnfucker` จะเปลี่ยนชื่อโฟลเดอร์ `Build` เป็น `Build_2026-01-31-08-15`
 แล้วแก้ `index.html` ให้ชี้ไปที่ชื่อใหม่ (กันเบราว์เซอร์ cache ของเก่า)
 
 **มันไม่ลบของเก่าให้** build 5 ครั้งก็ได้ 5 โฟลเดอร์ โฟลเดอร์ละหลายร้อย MB
-ก่อน build ใหม่ให้ลบ `Build_*` เก่าใน `WebClient` ทิ้งก่อน
+ครั้งหน้าก่อน build ต้องลบเอง (ขั้นที่ 0)
 
-## อย่าใช้เมนู `Build → Build Everything`
+### ขั้นที่ 7 — ยืนยันว่าเซิร์ฟเวอร์เจอ
 
-อันนั้นเป็นสายการ build ของเจ้าของโปรเจกต์ต้นทาง — มันไป `Build/WebGL/ragnarok/`
-ไม่ใช่ `WebClient` แถม build ตัว PC กับ zip ให้อีก ใช้ `File → Build Settings → Build` ตามข้างบน
+รันเซิร์ฟเวอร์ แล้วดู log ตอนเริ่ม ต้องขึ้นบรรทัดนี้:
 
-> โฟลเดอร์ปลายทางสำคัญ — เซิร์ฟเวอร์มองหาโฟลเดอร์ชื่อ `WebClient`
-> ข้าง ๆ ไฟล์เซิร์ฟเวอร์ ถ้าอยากเก็บที่อื่นให้แก้ `WebClientPath` ใน
-> `appsettings.json`
+```
+Serving the browser build from C:\...\WebClient
+```
 
-ถ้า build ด้วย `dotnet run` แล้วหาไม่เจอ ให้ดูบรรทัดนี้ตอนเซิร์ฟเวอร์เริ่ม:
+ถ้าขึ้นแบบนี้แทน แปลว่าวางผิดที่ — บรรทัดนั้นบอก path ที่มันหาอยู่ตรง ๆ:
 
 ```
 No browser build at C:\...\WebClient, so only the socket is being served.
 ```
 
-บรรทัดนั้นบอก path ที่มันหาอยู่ตรง ๆ เอา build ไปวางตรงนั้น
+## อย่าใช้เมนู `Build → Build Everything`
+
+อันนั้นเป็นสายการ build ของเจ้าของโปรเจกต์ต้นทาง — มันไป `Build/WebGL/ragnarok/`
+ไม่ใช่ `WebClient` แถม build ตัว PC กับ zip ให้อีก
+
+(ข้อดีอย่างเดียวที่มันมีคือลบ `Build_*` เก่าให้อัตโนมัติ ซึ่งเราทำเองในขั้นที่ 0 แทน)
 
 ## ทุกครั้งที่จะเล่น
 
