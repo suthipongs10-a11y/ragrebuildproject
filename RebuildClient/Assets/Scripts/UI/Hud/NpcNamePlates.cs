@@ -1,63 +1,85 @@
-﻿using Assets.Scripts.Network;
-using Assets.Scripts.PlayerControl;
-using Assets.Scripts.Sprites;
+using System.Collections.Generic;
+using Assets.Scripts.Network;
+using Assets.Scripts.UI.ConfigWindow;
 using RebuildSharedData.Enum;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Scripts.UI.Hud
 {
     /// <summary>
-    /// Stands a sign over every NPC, permanently.
+    /// A standing sign over the handful of NPCs that are worth walking to.
     ///
-    /// The client only ever puts a name up while the pointer is over something or while it
-    /// is the target, which is right for monsters — a field with forty labels floating over
-    /// it is unreadable — and wrong for NPCs. An NPC is a thing you walk up to on purpose,
-    /// and you cannot do that if finding out what it is means hovering every figure in
-    /// town. The Job Master is the one that made the point: renaming him changed nothing
-    /// anybody could see, and the hover plate, when it did appear, was small dark text.
+    /// Two things were wrong with every earlier attempt and both are fixed here.
     ///
-    /// So this is a sign of its own rather than the hover plate held open: a pale board with
-    /// a dark edge, an icon and the name on it, standing over the head and readable from
-    /// where you are. The hover plate is not that and should not be — it has monsters to
-    /// label too, and forty boards over a field is worse than none.
+    /// The first is what it was made of. The sign used to be world-space geometry — sprite
+    /// quads and a TextMeshPro mesh hung off the NPC — and the board turned up while the
+    /// writing on it never did. Coplanar quads and a text mesh do not agree about who is in
+    /// front; sorting order only settles that between renderers the engine has already
+    /// decided to draw in the same pass, and a text mesh and a sprite are not that. So the
+    /// board painted over its own writing. The client never had this problem with the hover
+    /// plate, the cast bar or the chat bubble because none of them are in the world: they
+    /// are interface elements on the canvas, moved to wherever the character happens to be
+    /// on screen. This is that, the same arithmetic as <see cref="VendTitleBox"/>.
+    ///
+    /// The second is who got one. A sign over every NPC is a wall of boards in a town and
+    /// tells you nothing, which is the opposite of the point. Only the names in
+    /// <see cref="SignedNames"/> are signed.
     /// </summary>
     public class NpcNamePlates : MonoBehaviour
     {
         /// <summary>
-        /// Slow on purpose. It exists to catch NPCs that have just come into view; the sign
-        /// stays up on its own in between.
+        /// The NPCs worth a permanent sign, matched loosely against the name.
+        ///
+        /// Add a line to sign another. Keep it short: the value of a sign is that only a few
+        /// things have one.
         /// </summary>
-        private const float SweepInterval = 0.5f;
-
-        /// <summary>Above the head rather than through it. Sprites here stand 1.5 tall.</summary>
-        private const float SignHeight = 2.05f;
+        private static readonly string[] SignedNames =
+        {
+            "Class Master",
+            "Job Master",
+            "Kafra",
+        };
 
         /// <summary>
-        /// Only signs the NPCs you are near enough to walk to.
-        ///
-        /// Every NPC in view carrying one turned a camp into a wall of boards. A sign is for
-        /// finding the person in front of you, so it appears when you are near enough for
-        /// that to be the question.
+        /// Slow on purpose. It only has to notice NPCs coming into view; the signs move
+        /// themselves every frame in between.
         /// </summary>
-        private const float ShowDistance = 11f;
+        private const float SweepInterval = 0.4f;
 
-        //Built at a font size TextMeshPro is comfortable with and then shrunk as a whole.
-        //Setting the font size to the final world height instead — 0.6 of a unit — is what
-        //produced boards with an illegible smear in them: at that size the glyphs have
-        //almost no texture left to draw with. Building large and scaling down keeps the text
-        //and the board in proportion whatever either of them turns out to measure.
-        private const float SignScale = 0.13f;
-        private const float FontSize = 4f;
-        private const float PadX = 1.1f;
-        private const float PadY = 0.7f;
-        private const float IconSize = 2.4f;
-        private const float IconGap = 0.6f;
-        private const float BorderWidth = 0.2f;
-        private const string SignName = "NpcSign";
+        /// <summary>Far enough to spot from across a field, near enough not to litter a town.</summary>
+        private const float ShowDistance = 26f;
 
+        //Canvas units, before the zoom scaling the whole board gets. The interface is laid
+        //out at this size and then scaled, the same as every other overlay in the client.
+        private const float FontSize = 25f;
+        private const float PadX = 15f;
+        private const float PadY = 9f;
+        private const float IconSize = 26f;
+        private const float IconGap = 9f;
+        private const float TailSize = 17f;
+        private const float BorderWidth = 3f;
+
+        /// <summary>Clear of the head, and clear of the hover plate when both are up.</summary>
+        private const float ExtraHeight = 30f;
+
+        private sealed class Sign
+        {
+            public ServerControllable Target;
+
+            /// <summary>Sits on the NPC's feet; carries the screen position and the zoom scale.</summary>
+            public RectTransform Root;
+
+            /// <summary>The board and its point, lifted clear of the head.</summary>
+            public RectTransform Plate;
+        }
+
+        private readonly Dictionary<int, Sign> signs = new Dictionary<int, Sign>();
+        private readonly List<int> expired = new List<int>();
+
+        private RectTransform container;
         private float timer;
-        private static bool loggedOnce;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -81,14 +103,8 @@ namespace Assets.Scripts.UI.Hud
             timer = SweepInterval;
 
             var network = NetworkManager.Instance;
-            if (network == null)
+            if (network == null || network.OverlayManager == null)
                 return;
-
-            var player = CameraFollower.Instance != null ? CameraFollower.Instance.TargetControllable : null;
-            if (player == null)
-                return;
-
-            var here = player.transform.position;
 
             foreach (var entry in network.EntityList)
             {
@@ -96,125 +112,247 @@ namespace Assets.Scripts.UI.Hud
                 if (entity == null || entity.CharacterType != CharacterType.NPC)
                     continue;
 
-                //Some NPCs are not people: a vending sign, a chat room marker, an effect
-                //standing in for something. Those carry a name the player was never meant
-                //to read, and the client marks them by prefixing it.
-                var name = entity.Name;
-                if (string.IsNullOrWhiteSpace(name) || name.StartsWith("[NPC]"))
+                if (signs.ContainsKey(entry.Key))
                     continue;
 
-                var sign = entity.transform.Find(SignName);
-                if (sign == null)
-                    sign = BuildSign(entity.transform, name);
+                var name = entity.Name;
+                if (!WantsSign(name))
+                    continue;
 
-                var near = Vector3.Distance(here, entity.transform.position) <= ShowDistance;
-                if (sign.gameObject.activeSelf != near)
-                    sign.gameObject.SetActive(near);
+                var sign = BuildSign(name);
+                if (sign == null)
+                    return; //no canvas yet, try again on the next sweep
+
+                sign.Target = entity;
+                signs.Add(entry.Key, sign);
             }
         }
 
         /// <summary>
-        /// A signboard: a pale plaque with a dark edge, an icon, and the name written on it.
+        /// Moves every sign onto its NPC.
         ///
-        /// Built in its own units and shrunk at the end, so everything on it stays in
-        /// proportion. Sized to the text rather than to a guess, so a long name is not
-        /// clipped and a short one is not adrift in an oversized plaque.
+        /// In LateUpdate because the camera has finished moving by then. Doing it in Update
+        /// leaves the boards a frame behind the world, which shows up as the signs sliding
+        /// around whenever the camera turns.
         /// </summary>
-        private static Transform BuildSign(Transform parent, string name)
+        private void LateUpdate()
         {
-            var root = new GameObject(SignName);
-            root.transform.SetParent(parent, false);
-            root.transform.localPosition = new Vector3(0, SignHeight, 0);
-            root.transform.localScale = Vector3.one * SignScale;
-            //faces the camera, and everything hung on it turns with it
-            root.AddComponent<BillboardObject>();
+            if (signs.Count == 0)
+                return;
 
-            //Built first and measured, because how wide the board has to be is a question
-            //only the text can answer.
-            var textObject = new GameObject("Name");
-            textObject.transform.SetParent(root.transform, false);
+            var cf = CameraFollower.Instance;
+            if (cf == null || cf.Camera == null || cf.UiCanvas == null || cf.CanvasScaler == null)
+                return;
 
-            var text = textObject.AddComponent<TextMeshPro>();
-            if (ModernUiTheme.ThemeFont != null)
-                text.font = ModernUiTheme.ThemeFont;
+            var player = cf.TargetControllable;
+            var here = player != null ? player.transform.position : cf.transform.position;
 
-            text.text = name;
-            text.fontSize = FontSize;
-            text.color = ModernUiTheme.NameColor;
-            text.fontStyle = FontStyles.Bold;
-            text.alignment = TextAlignmentOptions.Left;
-            text.enableWordWrapping = false;
-            text.raycastTarget = false;
-            text.ForceMeshUpdate();
-
-            var textWidth = Mathf.Max(text.preferredWidth, 1f);
-            var textHeight = Mathf.Max(text.preferredHeight, FontSize);
-
-            //Reported once, because a board with an unreadable smear on it and a board built
-            //from a bad measurement look identical from outside. If the width here is a
-            //fraction of a unit the text renderer never measured the name at all.
-            if (!loggedOnce)
+            foreach (var entry in signs)
             {
-                loggedOnce = true;
-                Debug.Log($"[NpcNamePlates] '{name}' measured {textWidth:0.00} x {textHeight:0.00} "
-                          + $"at font size {FontSize}, board scaled by {SignScale}. "
-                          + $"Font: {(text.font != null ? text.font.name : "none")}");
+                var sign = entry.Value;
+                if (sign.Target == null || sign.Root == null)
+                {
+                    expired.Add(entry.Key);
+                    continue;
+                }
+
+                var world = sign.Target.transform.position;
+                var near = Vector3.Distance(here, world) <= ShowDistance;
+                if (sign.Root.gameObject.activeSelf != near)
+                    sign.Root.gameObject.SetActive(near);
+                if (!near)
+                    continue;
+
+                Snap(cf, sign, world);
             }
 
-            var boardWidth = PadX * 2f + IconSize + IconGap + textWidth;
-            var boardHeight = Mathf.Max(textHeight, IconSize) + PadY * 2f;
+            if (expired.Count == 0)
+                return;
 
-            //the dark edge is a second board very slightly larger behind the first, which is
-            //the same trick the interface uses for its own panels
-            MakePanel(root.transform, "Border", ModernUiTheme.NameColor,
-                boardWidth + BorderWidth * 2f, boardHeight + BorderWidth * 2f, 0);
-            MakePanel(root.transform, "Panel", ModernUiTheme.WindowColor,
-                boardWidth, boardHeight, 1);
+            foreach (var id in expired)
+            {
+                if (signs.TryGetValue(id, out var sign) && sign.Root != null)
+                    Destroy(sign.Root.gameObject);
+                signs.Remove(id);
+            }
 
-            var left = -boardWidth * 0.5f;
-
-            var icon = new GameObject("Icon");
-            icon.transform.SetParent(root.transform, false);
-            icon.transform.localPosition = new Vector3(left + PadX + IconSize * 0.5f, 0f, 0f);
-            var iconRenderer = icon.AddComponent<SpriteRenderer>();
-            iconRenderer.sprite = ModernUiIcons.Person;
-            iconRenderer.color = ModernUiTheme.AccentInkColor;
-            iconRenderer.sortingOrder = 2;
-
-            //scaled rather than sliced: slicing needs a border the icon sprites do not have,
-            //and scaling lands on the right size whatever their own pixels-per-unit is
-            var iconBounds = iconRenderer.sprite != null ? iconRenderer.sprite.bounds.size.x : 0f;
-            if (iconBounds > 0.0001f)
-                icon.transform.localScale = Vector3.one * (IconSize / iconBounds);
-
-            text.rectTransform.sizeDelta = new Vector2(textWidth, textHeight);
-            text.rectTransform.localPosition =
-                new Vector3(left + PadX + IconSize + IconGap + textWidth * 0.5f, 0f, 0f);
-
-            //Sorting order rather than depth, because all of this is coplanar: three quads
-            //at the same distance from the camera would otherwise fight over which is in
-            //front and the answer would change as the camera moved.
-            var textRenderer = textObject.GetComponent<MeshRenderer>();
-            if (textRenderer != null)
-                textRenderer.sortingOrder = 3;
-
-            return root.transform;
+            expired.Clear();
         }
 
-        private static void MakePanel(Transform parent, string name, Color color,
-            float width, float height, int order)
+        /// <summary>
+        /// Screen position and zoom scale, copied from the vending sign rather than invented.
+        ///
+        /// The canvas puts its origin at the top left, which is why the height of the canvas
+        /// comes off the y — anything else lands the sign mirrored about the middle of the
+        /// screen, which looks like the follow code being broken rather than the sums.
+        /// </summary>
+        private static void Snap(CameraFollower cf, Sign sign, Vector3 world)
         {
-            var go = new GameObject(name);
-            go.transform.SetParent(parent, false);
+            var screenPos = cf.Camera.WorldToScreenPoint(world);
+            var reverseScale = 1f / cf.CanvasScaler.scaleFactor;
 
-            var renderer = go.AddComponent<SpriteRenderer>();
-            renderer.sprite = ModernUiTheme.RoundedSprite;
-            //the rounded sprite is built with a border, so it stretches without the corners
-            //smearing
-            renderer.drawMode = SpriteDrawMode.Sliced;
-            renderer.size = new Vector2(width, height);
-            renderer.color = color;
-            renderer.sortingOrder = order;
+            var d = 70 / cf.Distance;
+            if (!GameConfig.Data.ScalePlayerDisplayWithZoom)
+                d = 1f;
+            d *= Screen.height / 1920f * 2f;
+
+            sign.Root.localScale = new Vector3(d, d, d);
+            sign.Root.anchoredPosition = new Vector2(screenPos.x * reverseScale,
+                (screenPos.y - cf.UiCanvas.pixelRect.height) * reverseScale);
+
+            //Height is read every frame rather than once, because the sprite is often still
+            //loading when the sign is built and its height is zero until it arrives.
+            if (sign.Plate != null)
+                sign.Plate.anchoredPosition = new Vector2(0, StandingHeightOf(sign.Target) + ExtraHeight);
+        }
+
+        private static float StandingHeightOf(ServerControllable target)
+        {
+            //the same measurement the cast bar and the chat bubble use, so a sign sits at the
+            //height everything else over that NPC's head sits at
+            if (target.SpriteAnimator == null || target.SpriteAnimator.SpriteData == null)
+                return 40f;
+
+            var height = target.SpriteAnimator.SpriteData.StandingHeight
+                         * 1.5f * (1 / GameConfig.Data.MasterUIScale) + 15;
+            return height < 40 ? 40 : height;
+        }
+
+        private static bool WantsSign(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
+
+            //the client prefixes the names of NPCs that are not people — a vending marker, an
+            //effect standing in for something — and those were never meant to be read
+            if (name.StartsWith("[NPC]"))
+                return false;
+
+            foreach (var wanted in SignedNames)
+            {
+                if (name.IndexOf(wanted, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// One signboard: a pale plaque with a dark edge, an icon, the name, and a point at
+        /// the bottom aimed at whoever it belongs to.
+        ///
+        /// The point is what stops it reading as a chat room. A chat room in this game is a
+        /// box of text floating over a head and nothing else, so a box of text floating over
+        /// a head is a chat room as far as anyone looking at it is concerned.
+        /// </summary>
+        private Sign BuildSign(string name)
+        {
+            if (container == null && !BuildContainer())
+                return null;
+
+            var root = ModernUiTheme.CreateRect("NpcSign", container);
+            root.anchorMin = new Vector2(0, 1);
+            root.anchorMax = new Vector2(0, 1);
+            root.pivot = new Vector2(0.5f, 0.5f);
+            root.sizeDelta = Vector2.zero;
+
+            //Everything the sign is made of hangs off one rect, so raising it clear of the
+            //head is one number in one place. Lifting the board on its own is how the point
+            //at the bottom ended up left behind on the floor.
+            var plate = ModernUiTheme.CreateRect("Plate", root);
+            plate.anchorMin = new Vector2(0.5f, 0.5f);
+            plate.anchorMax = new Vector2(0.5f, 0.5f);
+            plate.pivot = new Vector2(0.5f, 0.5f);
+            plate.sizeDelta = Vector2.zero;
+
+            //Built first so it can be measured: how wide the board has to be is a question
+            //only the writing on it can answer.
+            var label = ModernUiTheme.CreateText(plate, "Name", name, FontSize,
+                ModernUiTheme.NameColor, TextAlignmentOptions.Left, FontStyles.Bold);
+            label.textWrappingMode = TextWrappingModes.NoWrap;
+            var size = label.GetPreferredValues(name);
+
+            var boardWidth = PadX * 2f + IconSize + IconGap + size.x;
+            var boardHeight = Mathf.Max(size.y, IconSize) + PadY * 2f;
+
+            //Drawn before the board and therefore behind it, so only the half that sticks out
+            //below the bottom edge is seen, which is a point. Two of them, the larger one in
+            //the edge colour, so the point has the same dark edge the board does.
+            MakeTail(plate, "TailEdge", ModernUiTheme.NameColor, TailSize + BorderWidth * 2f, boardHeight);
+            MakeTail(plate, "Tail", ModernUiTheme.WindowColor, TailSize, boardHeight);
+
+            var board = ModernUiTheme.CreateCard(plate, "Board", ModernUiTheme.WindowColor);
+            board.anchorMin = new Vector2(0.5f, 0.5f);
+            board.anchorMax = new Vector2(0.5f, 0.5f);
+            board.pivot = new Vector2(0.5f, 0.5f);
+            board.sizeDelta = new Vector2(boardWidth, boardHeight);
+            board.GetComponent<Image>().raycastTarget = false;
+            ModernUiTheme.AddBorder(board, ModernUiTheme.NameColor);
+
+            var icon = ModernUiTheme.CreateIcon(board, ModernUiIcons.Person,
+                ModernUiTheme.AccentInkColor, IconSize);
+            var iconRect = (RectTransform)icon.transform;
+            iconRect.anchorMin = new Vector2(0, 0.5f);
+            iconRect.anchorMax = new Vector2(0, 0.5f);
+            iconRect.pivot = new Vector2(0, 0.5f);
+            iconRect.anchoredPosition = new Vector2(PadX, 0);
+            icon.raycastTarget = false;
+
+            //moved onto the board now that there is one, and left where it was measured
+            label.transform.SetParent(board, false);
+            var labelRect = label.rectTransform;
+            labelRect.anchorMin = new Vector2(0, 0.5f);
+            labelRect.anchorMax = new Vector2(0, 0.5f);
+            labelRect.pivot = new Vector2(0, 0.5f);
+            labelRect.sizeDelta = size;
+            labelRect.anchoredPosition = new Vector2(PadX + IconSize + IconGap, 0);
+
+            //Nothing on the sign takes a click. It covers the ground the player has to click
+            //on to talk to the NPC underneath it, and a board that eats that click makes the
+            //NPC harder to reach than having no sign at all.
+            return new Sign { Root = root, Plate = plate };
+        }
+
+        private static void MakeTail(Transform parent, string name, Color color, float size, float boardHeight)
+        {
+            var rect = ModernUiTheme.CreateCard(parent, name, color);
+            rect.anchorMin = new Vector2(0.5f, 0.5f);
+            rect.anchorMax = new Vector2(0.5f, 0.5f);
+            rect.pivot = new Vector2(0.5f, 0.5f);
+            rect.sizeDelta = new Vector2(size, size);
+            rect.anchoredPosition = new Vector2(0, -boardHeight * 0.5f);
+            rect.localRotation = Quaternion.Euler(0, 0, 45f);
+            rect.GetComponent<Image>().raycastTarget = false;
+        }
+
+        /// <summary>
+        /// Somewhere on the canvas to keep the signs.
+        ///
+        /// Hung off the overlay manager, which is the object the hover plates and chat
+        /// bubbles already live under. Doing it that way means never having to work out which
+        /// canvas is the right one or how it is anchored — whatever is true for a nameplate
+        /// is true for a sign.
+        /// </summary>
+        private bool BuildContainer()
+        {
+            var overlay = NetworkManager.Instance != null ? NetworkManager.Instance.OverlayManager : null;
+            if (overlay == null)
+                return false;
+
+            //Pinned to the top left corner with no size of its own. The screen arithmetic the
+            //client uses for overlays measures down from the top left, so that corner is the
+            //origin every sign is placed from — and a rect with no size cannot disagree with
+            //its parent about where its own corners are.
+            container = ModernUiTheme.CreateRect("NpcSigns", overlay.transform);
+            container.anchorMin = new Vector2(0, 1);
+            container.anchorMax = new Vector2(0, 1);
+            container.pivot = new Vector2(0, 1);
+            container.sizeDelta = Vector2.zero;
+            container.anchoredPosition = Vector2.zero;
+            container.localScale = Vector3.one;
+            //behind the health bars and hover plates rather than over them
+            container.SetAsFirstSibling();
+            return true;
         }
     }
 }

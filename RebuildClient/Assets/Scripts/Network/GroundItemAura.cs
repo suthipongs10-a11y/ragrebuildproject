@@ -100,17 +100,25 @@ namespace Assets.Scripts.Network
             //which is exactly what four stacked layers produced. Two passes of a saturated
             //tint fill the strong channels and leave the weak one weak, so the beam is very
             //bright and still gold, or blue, or purple.
-            aura.beamHeight = 2.9f + tier * 0.6f;
+            //Width was the whole problem, not brightness.
+            //
+            //The scale numbers are multipliers on the sprite's own size, and the sprite is
+            //32 wide by 256 tall — so the same number means eight times as much height as
+            //width. The old beam came out about half a unit across and seven tall: a needle,
+            //and a needle reads as a faint line however bright it is. A character in this
+            //game stands about a unit and a half. These numbers put the shaft at roughly two
+            //units across and ten tall, which is a pillar you could walk into.
+            aura.beamHeight = 3.6f + tier * 0.6f;
             aura.beam = MakeRenderer(go.transform, "Beam", BeamSprite, Vector3.zero, color);
-            aura.beam.transform.localScale = new Vector3(1.7f + tier * 0.3f, aura.beamHeight, 1f);
+            aura.beam.transform.localScale = new Vector3(6.5f + tier * 1.2f, aura.beamHeight, 1f);
 
             aura.core = MakeRenderer(go.transform, "Core", BeamSprite, Vector3.zero, Color.Lerp(color, Color.white, 0.18f));
-            aura.core.transform.localScale = new Vector3(0.62f + tier * 0.08f, aura.beamHeight * 0.9f, 1f);
+            aura.core.transform.localScale = new Vector3(2.6f + tier * 0.4f, aura.beamHeight * 0.9f, 1f);
 
             //a pool of light where it is actually lying, so the eye is sent to the item and
             //not to the empty air above it
             aura.glow = MakeRenderer(go.transform, "Glow", GlowSprite, new Vector3(0, 0.05f, 0), color);
-            aura.glow.transform.localScale = Vector3.one * (1.25f + tier * 0.18f);
+            aura.glow.transform.localScale = Vector3.one * (4.5f + tier * 0.6f);
 
             aura.Apply(0f);
         }
