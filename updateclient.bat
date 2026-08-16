@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 setlocal
 
 rem One click that takes the project from a fresh pull all the way to a running
@@ -21,7 +21,7 @@ echo ==============================================================
 echo.
 
 rem --------------------------------------------------------------
-echo [1/5] Getting the latest work from GitHub...
+echo [1/6] Getting the latest work from GitHub...
 echo.
 rem The two libraries are kept in the repository but are also rebuilt further
 rem down, so a local build left over from last time is thrown away first. Without
@@ -49,14 +49,14 @@ if errorlevel 1 (
 )
 
 rem --------------------------------------------------------------
-echo [2/5] Building the shared game config...
+echo [2/6] Building the shared game config...
 cd /d "%ROOT%RoRebuildServer\GameConfig"
 dotnet build -c Release --property WarningLevel=0
 if errorlevel 1 goto :build_failed
 echo.
 
 rem --------------------------------------------------------------
-echo [3/5] Building the shared data library and copying it to the client...
+echo [3/6] Building the shared data library and copying it to the client...
 cd /d "%ROOT%RoRebuildServer\RebuildSharedData"
 dotnet build -c Release --property WarningLevel=0
 if errorlevel 1 goto :build_failed
@@ -69,7 +69,7 @@ if errorlevel 1 goto :copy_failed
 echo.
 
 rem --------------------------------------------------------------
-echo [4/5] Exporting the server data to the client...
+echo [4/6] Exporting the server data to the client...
 cd /d "%ROOT%RoRebuildServer\DataToClientUtility"
 dotnet build -c Release --property WarningLevel=0
 if errorlevel 1 goto :build_failed
@@ -79,7 +79,37 @@ if errorlevel 1 goto :export_failed
 echo.
 
 rem --------------------------------------------------------------
-echo [5/5] Starting the server...
+echo [5/6] Opening the network so a phone can reach the server...
+rem The server listens on every network card now, but Windows still drops the
+rem connection at the firewall unless it has been told not to. Adding the rule
+rem needs administrator rights; without them this quietly does nothing and only
+rem this PC can connect, which is exactly how it behaved before.
+netsh advfirewall firewall show rule name="RagnarokRebuild 5000" >nul 2>&1
+if errorlevel 1 (
+    netsh advfirewall firewall add rule name="RagnarokRebuild 5000" dir=in action=allow protocol=TCP localport=5000 >nul 2>&1
+    if errorlevel 1 (
+        echo   Could not add the firewall rule - not running as administrator.
+        echo   Playing on this PC still works. To play from a phone, right click
+        echo   this file and choose "Run as administrator" once.
+    ) else (
+        echo   Port 5000 opened for the local network.
+    )
+) else (
+    echo   Port 5000 is already open.
+)
+
+rem The address the phone has to be given. Read from the machine rather than
+rem written down, because the router hands out a different one often enough
+rem that a number typed in here would be wrong by next week.
+set "LANIP="
+for /f "tokens=2 delims=:" %%A in ('ipconfig ^| findstr /C:"IPv4 Address"') do (
+    if not defined LANIP set "LANIP=%%A"
+)
+set "LANIP=%LANIP: =%"
+echo.
+
+rem --------------------------------------------------------------
+echo [6/6] Starting the server...
 rem netstat is asked for the exact port so that a stray 15000 or 50001 does not
 rem read as a server already being up
 netstat -an | findstr /C:":5000 " | findstr /C:"LISTENING" >nul
@@ -97,9 +127,21 @@ echo.
 echo ==============================================================
 echo   Ready.
 echo.
-echo   1. Switch to Unity and let it finish compiling.
-echo   2. Check the Console has no red errors.
-echo   3. Open Assets/Scenes/MainScene.unity and press Play.
+echo   On this PC:
+echo     1. Switch to Unity and let it finish compiling.
+echo     2. Check the Console has no red errors.
+echo     3. Open Assets/Scenes/MainScene.unity and press Play.
+echo.
+if defined LANIP (
+    echo   On a phone on the same wifi, open this in its browser:
+    echo.
+    echo       http://%LANIP%:5000/
+    echo.
+    echo   That only works once a WebGL build exists. See MOBILE.md.
+) else (
+    echo   Could not work out this PC's network address, so the phone
+    echo   address cannot be shown. Run ipconfig and look for IPv4 Address.
+)
 echo.
 echo   Leave the server window open the whole time you are playing.
 echo ==============================================================

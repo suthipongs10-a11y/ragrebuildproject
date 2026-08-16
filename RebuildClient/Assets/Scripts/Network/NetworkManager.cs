@@ -185,6 +185,36 @@ namespace Assets.Scripts.Network
             AudioManager.Instance.PlayBgm("01.mp3");
         }
 
+        /// <summary>
+        /// Where to connect when nobody has said otherwise.
+        ///
+        /// In a browser the answer is "wherever this page came from". The game server hosts
+        /// the client build itself, so the address the player typed to load the game is by
+        /// definition the address the server is on. That is what lets a phone on the same
+        /// wifi work with nothing configured, and it is why there is no address baked in
+        /// here to go stale the day the router hands out a different one.
+        /// </summary>
+        public static string DefaultServerAddress()
+        {
+            var url = Application.absoluteURL;
+            if (!string.IsNullOrEmpty(url))
+            {
+                try
+                {
+                    var uri = new Uri(url);
+                    var scheme = uri.Scheme == "https" ? "wss" : "ws";
+                    var port = uri.IsDefaultPort ? "" : ":" + uri.Port;
+                    return $"{scheme}://{uri.Host}{port}/ws";
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"Could not read the server address out of '{url}': {e.Message}");
+                }
+            }
+
+            return "ws://127.0.0.1:5000/ws";
+        }
+
         private IEnumerator BeginConnection(string username, string password)
         {
 #if UNITY_EDITOR
@@ -197,6 +227,20 @@ namespace Assets.Scripts.Network
             {
                 var path = File.ReadAllText(Path.Combine(Application.streamingAssetsPath, "serverconfig.txt"));
                 StartConnectServer(path, username, password);
+                yield break;
+            }
+
+            //A browser build is served by the game server itself, so the page's own address
+            //is the one to connect back to. Without this it fell through to fetching a
+            //config file off the upstream project's website, which is not our server.
+            if (Application.platform == RuntimePlatform.WebGLPlayer)
+            {
+                while (!spritePreload.IsDone || !uiPreload.IsDone)
+                    yield return new WaitForSeconds(0.1f);
+
+                var address = DefaultServerAddress();
+                Debug.Log("Connecting to the server this page came from: " + address);
+                StartConnectServer(address, username, password);
                 yield break;
             }
 

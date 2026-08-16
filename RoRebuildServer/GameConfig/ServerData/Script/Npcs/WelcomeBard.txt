@@ -141,16 +141,19 @@ macro JobMasterSecondJob()
 		return;
 	}
 
-	//the second job that follows from what they are now. Anything else has no skill tree
+	//The second job that follows from what they are now. Anything else has no skill tree
 	//on this server, so it is not offered at all rather than offered and empty.
+	//
+	//The name is printed per branch rather than held in a variable, because a variable in
+	//this script language is an int and nothing else — a var holding a string compiles to
+	//"cannot convert string to int", which is exactly what it did.
 	var target = 0;
-	var targetName = "";
-	if(JobId == 1) { target = 7;  targetName = "Knight"; }
-	if(JobId == 2) { target = 10; targetName = "Hunter"; }
-	if(JobId == 3) { target = 8;  targetName = "Wizard"; }
-	if(JobId == 4) { target = 9;  targetName = "Priest"; }
-	if(JobId == 5) { target = 11; targetName = "Assassin"; }
-	if(JobId == 6) { target = 12; targetName = "Blacksmith"; }
+	if(JobId == 1) target = 7;
+	if(JobId == 2) target = 10;
+	if(JobId == 3) target = 8;
+	if(JobId == 4) target = 9;
+	if(JobId == 5) target = 11;
+	if(JobId == 6) target = 12;
 
 	if(target == 0)
 	{
@@ -158,13 +161,18 @@ macro JobMasterSecondJob()
 		return;
 	}
 
-	Dialog(name, "Job Level 50 เต็ม แต้มลงครบแล้ว! เธอพร้อมเป็น " + targetName + " ได้เลย");
+	if(target == 7)  Dialog(name, "Job Level 50 เต็ม แต้มลงครบแล้ว! เธอพร้อมเป็น Knight ได้เลย");
+	if(target == 10) Dialog(name, "Job Level 50 เต็ม แต้มลงครบแล้ว! เธอพร้อมเป็น Hunter ได้เลย");
+	if(target == 8)  Dialog(name, "Job Level 50 เต็ม แต้มลงครบแล้ว! เธอพร้อมเป็น Wizard ได้เลย");
+	if(target == 9)  Dialog(name, "Job Level 50 เต็ม แต้มลงครบแล้ว! เธอพร้อมเป็น Priest ได้เลย");
+	if(target == 11) Dialog(name, "Job Level 50 เต็ม แต้มลงครบแล้ว! เธอพร้อมเป็น Assassin ได้เลย");
+	if(target == 12) Dialog(name, "Job Level 50 เต็ม แต้มลงครบแล้ว! เธอพร้อมเป็น Blacksmith ได้เลย");
 	Dialog(name, "<color=#CC0000>อ่านให้ดีก่อนนะ การเป็นอาชีพ 2 คือการเริ่มใหม่ ไม่ใช่การอัปเกรด</color>");
 	Dialog(name, "<color=#CC5500>• <b>Base Level จะถูกลดเหลือ 10</b> (ตอนนี้เธออยู่เลเวล " + Level + ")\n" +
 				 "• Job Level กลับไปเริ่มที่ 1\n" +
 				 "• สกิลและสเตตัสถูกรีเซ็ตทั้งหมด คืนแต้มให้ตามเลเวลใหม่\n" +
 				 "• ไอเทมกับเงินไม่หายไปไหน</color>");
-	Dialog(name, "<color=#CC0000>ย้อนกลับไม่ได้นะ</color> จะเป็น " + targetName + " เลยไหม?");
+	Dialog(name, "<color=#CC0000>ย้อนกลับไม่ได้นะ</color> จะเปลี่ยนอาชีพเลยไหม?");
 
 	Option("เอาเลย", "ขอคิดดูก่อน");
 	if(result == 1)
@@ -186,7 +194,7 @@ macro JobMasterSecondJob()
 	ShowEffectOnPlayer("JobUp");
 
 	ShowSprite("bard_eland02", right);
-	Dialog(name, "เรียบร้อย! ยินดีด้วยนะ " + targetName + " ไปลุยได้เลย");
+	Dialog(name, "เรียบร้อย! ยินดีด้วยนะ ไปลุยได้เลย");
 	return;
 }
 

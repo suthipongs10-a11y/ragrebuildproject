@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts.Network;
 using Assets.Scripts.Objects;
@@ -51,7 +51,8 @@ namespace Assets.Scripts.UI.TitleScreen
         private IEnumerator StartEvent()
         {
 #if !UNITY_EDITOR
-            ServerInputBox.text = PlayerPrefs.GetString($"ConnectServer", "ws://127.0.0.1:5000/ws");
+            //same default the connection itself uses, so what the box shows is what happens
+            ServerInputBox.text = PlayerPrefs.GetString($"ConnectServer", NetworkManager.DefaultServerAddress());
 #endif
             UsernameBox.text = PlayerPrefs.GetString("LoginUsername", "");
             if (!string.IsNullOrWhiteSpace(GameConfig.Data?.SavedLoginToken) && !string.IsNullOrWhiteSpace(UsernameBox.text) && UsernameBox.text != "ID")
