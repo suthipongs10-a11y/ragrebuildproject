@@ -24,24 +24,57 @@ Unity build เป็น WebGL ใช้เวลานาน (เป็นส�
 
 ### ขั้นที่ 1 — สลับ platform (ครั้งแรกครั้งเดียว)
 
-`File → Build Settings` → เลือก **WebGL** → `Switch Platform`
+**Unity 6 ไม่มี `File → Build Settings` แล้ว** เปลี่ยนเป็น `File → Build Profiles`
+และ platform ที่ชื่อ `WebGL` ก็ถูกเปลี่ยนชื่อเป็น **`Web`**
+
+ในหน้านั้น ช่อง `Platforms` เลือก **Web** แล้วกด `Switch Platform`
+ถ้ามีป้าย **Active** อยู่ข้าง Web แล้ว = สลับไว้แล้ว ข้ามข้อนี้ได้
 
 ครั้งแรกนานมาก เพราะ Unity ต้อง import ทุกอย่างใหม่สำหรับ platform นี้
 **และจะกินดิสก์เพิ่มอีกชุดเต็ม ๆ** (artifact แยกตาม platform) — สลับกลับไปกลับมาก็ยิ่งกิน
 
-### ขั้นที่ 2 — เช็ค Scenes In Build
+### ขั้นที่ 2 — เช็ค Scene List
 
-ต้องติ๊กแค่ **`Assets/Scenes/MainScene.unity`** อันเดียว
-`Debug` กับ `Cinemachine` ปล่อยไม่ติ๊กไว้ตามเดิม (ค่าปัจจุบันถูกอยู่แล้ว ดูเฉย ๆ)
+อยู่ในหน้า `Build Profiles` เหมือนกัน หัวข้อ `Scene List`
 
-### ขั้นที่ 3 — Player Settings
+ต้องติ๊กแค่ **`Scenes/MainScene`** อันเดียว `Debug` กับ `Cinemachine` ปล่อยไม่ติ๊กไว้
+(ค่าปัจจุบันถูกอยู่แล้ว ดูเฉย ๆ)
+
+### ขั้นที่ 3 — build addressables ก่อน (ห้ามข้าม)
+
+ทำ 2 อย่างนี้ก่อนกด Build เสมอ:
+
+1. `Ragnarok → Update Addressables (Fast)` — ลงทะเบียนสไปรต์ที่เพิ่งแก้/เพิ่ม
+2. `Window → Asset Management → Addressables → Groups`
+   → ในหน้าต่างนั้นกด `Build → New Build → Default Build Script`
+
+> ⛔ **ทำมือทั้งสองข้อ อย่าไปหวังหน้าต่างที่เด้งถาม**
+>
+> โปรเจกต์มี hook (`BuildAddressablesProcessor`) ที่เด้งถามว่า
+> "Do you want to build a clean addressables before export?" ตอนกด Build
+> ถ้าเด้งขึ้นมาให้กด `Perform Clean Addressables Build` — แต่ hook ตัวนั้นผูกกับ
+> หน้าต่าง Build Settings แบบเก่า **ไม่รับประกันว่าจะยังทำงานกับ Build Profiles ของ Unity 6**
+>
+> ทำมือแล้วมันจะเด้งหรือไม่เด้งก็ไม่สำคัญ ถ้าเด้งก็กดปุ่มซ้ายไป ทำซ้ำไม่เสียหาย
+>
+> ข้ามข้อนี้แล้วจะได้ build ที่ **รันได้ปกติ ไม่ error อะไรเลย** แต่ใช้ addressables ชุดเก่า
+> สไปรต์ที่เพิ่งแก้จะกลับไปเป็น Poring เหมือนตอนแก้ Verit ไม่สำเร็จเป๊ะ ๆ หลอกมาก
+
+### ขั้นที่ 4 — Player Settings
+
+ปุ่ม `Player Settings` อยู่มุมขวาบนของหน้า `Build Profiles`
 
 - `Resolution and Presentation → WebGL Template` → **Ragnarok**
+  (Unity บาง version เขียนว่า `Web Template` โฟลเดอร์ต้นทางคือ `Assets/WebGLTemplates/Ragnarok`)
 - `Publishing Settings → Compression Format` → **Gzip**
   (เซิร์ฟเวอร์รองรับทั้ง Gzip, Brotli และไม่บีบอัด แต่ Gzip โหลดเร็วและไม่มีปัญหากับ Safari บน iOS)
 - `Publishing Settings → Decompression Fallback` → **ติ๊กถูก**
 
-### ขั้นที่ 4 — กด Build แล้วเลือกโฟลเดอร์นี้
+ส่วน `Platform Settings (Web)` ในหน้า Build Profiles ปล่อยตามเดิมได้:
+`Code Optimization: Shorter Build Time` เหมาะกับตอนเทส (build เร็ว)
+ค่อยเปลี่ยนเป็น `Runtime Speed` ตอนจะเอาไปใช้จริง
+
+### ขั้นที่ 5 — กด Build แล้วเลือกโฟลเดอร์นี้
 
 ```
 RoRebuildServer\RoRebuildServer\bin\Debug\net9.0\WebClient
@@ -50,17 +83,8 @@ RoRebuildServer\RoRebuildServer\bin\Debug\net9.0\WebClient
 > โฟลเดอร์ปลายทางสำคัญ — เซิร์ฟเวอร์มองหาโฟลเดอร์ชื่อ `WebClient`
 > ข้าง ๆ ไฟล์เซิร์ฟเวอร์ ถ้าอยากเก็บที่อื่นให้แก้ `WebClientPath` ใน `appsettings.json`
 
-### ขั้นที่ 5 — ⛔ หน้าต่างที่เด้งขึ้นมา
-
-> "Do you want to build a clean addressables before export?"
-> `[ Perform Clean Addressables Build ]` `[ Normal Build ]`
-
-**ต้องกดปุ่มซ้าย**
-
-ถ้ากด `Normal Build` ตัว build จะใช้ addressables ชุดเก่าที่ค้างอยู่
-สไปรต์ที่เพิ่งแก้หรือเพิ่งเพิ่มจะไม่ติดไปด้วย — **เกมรันได้ปกติ ไม่ error อะไรเลย**
-แต่มอนที่เพิ่งแก้จะกลับไปเป็น Poring เหมือนตอนแก้ Verit ไม่สำเร็จเป๊ะ ๆ
-อาการหลอกมาก เพราะดูเหมือนโค้ดที่แก้ไม่ได้ผล
+ปุ่ม `Build` อยู่มุมขวาล่างของหน้า `Build Profiles`
+(ถ้า build ออกมาแปลก ๆ ลองลูกศรข้าง ๆ ปุ่ม → `Clean Build`)
 
 ### ขั้นที่ 6 — หลัง build เสร็จ
 
