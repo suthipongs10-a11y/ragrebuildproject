@@ -55,7 +55,12 @@ namespace Assets.Scripts.Network
 
         private static Sprite beamSprite;
         private static Sprite glowSprite;
-        private static Material additiveMaterial;
+        //One material per colour rather than one shared by all of them. The colour has to
+        //travel in the material's own Tint property: it is the only one of the shader's two
+        //colour inputs that is certain to arrive, and the beams coming out white is what a
+        //tint that did not arrive looks like.
+        private static readonly Dictionary<Color, Material> additiveMaterials = new Dictionary<Color, Material>();
+        private static bool loggedOnce;
 
         private SpriteRenderer beam;
         private SpriteRenderer core;
@@ -96,21 +101,22 @@ namespace Assets.Scripts.Network
             //tint fill the strong channels and leave the weak one weak, so the beam is very
             //bright and still gold, or blue, or purple.
             aura.beamHeight = 2.9f + tier * 0.6f;
-            aura.beam = MakeRenderer(go.transform, "Beam", BeamSprite, Vector3.zero);
+            aura.beam = MakeRenderer(go.transform, "Beam", BeamSprite, Vector3.zero, color);
             aura.beam.transform.localScale = new Vector3(1.7f + tier * 0.3f, aura.beamHeight, 1f);
 
-            aura.core = MakeRenderer(go.transform, "Core", BeamSprite, Vector3.zero);
+            aura.core = MakeRenderer(go.transform, "Core", BeamSprite, Vector3.zero, Color.Lerp(color, Color.white, 0.18f));
             aura.core.transform.localScale = new Vector3(0.62f + tier * 0.08f, aura.beamHeight * 0.9f, 1f);
 
             //a pool of light where it is actually lying, so the eye is sent to the item and
             //not to the empty air above it
-            aura.glow = MakeRenderer(go.transform, "Glow", GlowSprite, new Vector3(0, 0.05f, 0));
+            aura.glow = MakeRenderer(go.transform, "Glow", GlowSprite, new Vector3(0, 0.05f, 0), color);
             aura.glow.transform.localScale = Vector3.one * (1.25f + tier * 0.18f);
 
             aura.Apply(0f);
         }
 
-        private static SpriteRenderer MakeRenderer(Transform parent, string name, Sprite sprite, Vector3 offset)
+        private static SpriteRenderer MakeRenderer(Transform parent, string name, Sprite sprite, Vector3 offset,
+            Color tint)
         {
             var go = new GameObject(name);
             go.layer = parent.gameObject.layer;
@@ -122,7 +128,7 @@ namespace Assets.Scripts.Network
             //behind the icon, so the item reads on top of its own light
             renderer.sortingOrder = -1;
 
-            var material = AdditiveMaterial;
+            var material = MaterialFor(tint);
             if (material != null)
                 renderer.sharedMaterial = material;
 
@@ -188,21 +194,28 @@ namespace Assets.Scripts.Network
             //has no ceiling: three shafts at full strength are three times the light.
             //A touch toward white on the inner shaft only. Any more and the two passes reach
             //white together, which is the whole failure this replaced.
-            Paint(beam, tint, 0.88f + pulse * 0.12f);
-            Paint(core, Color.Lerp(tint, Color.white, 0.18f), 0.86f + pulse * 0.14f);
-            Paint(glow, tint, 0.82f + pulse * 0.18f);
+            Paint(beam, 0.88f + pulse * 0.12f);
+            Paint(core, 0.86f + pulse * 0.14f);
+            Paint(glow, 0.82f + pulse * 0.18f);
 
             Stretch(beam, beamHeight, pulse);
             Stretch(core, beamHeight * 0.9f, pulse);
         }
 
-        private void Paint(SpriteRenderer renderer, Color color, float amount)
+        /// <summary>
+        /// Sets how bright a shaft is this frame, and only that.
+        ///
+        /// White with a varying alpha, because the hue is in the material now. The shader
+        /// multiplies the two together, so this scales the light without touching its
+        /// colour — and if the vertex colour turns out not to reach the shader at all, the
+        /// beam simply stops breathing instead of going white.
+        /// </summary>
+        private void Paint(SpriteRenderer renderer, float amount)
         {
             if (renderer == null)
                 return;
 
-            color.a = strength * amount;
-            renderer.color = color;
+            renderer.color = new Color(1f, 1f, 1f, strength * amount);
         }
 
         private static void Stretch(SpriteRenderer renderer, float height, float pulse)
@@ -216,30 +229,48 @@ namespace Assets.Scripts.Network
         }
 
         /// <summary>
-        /// The blend that lets light behave like light.
+        /// An additive material carrying one particular colour.
         ///
-        /// Everything before this was alpha blended, which cannot go brighter than the
-        /// colour it is painting with however opaque it is made — the beam was already at
-        /// full opacity and still looked timid, because that is the ceiling. Adding instead
-        /// of covering has no such ceiling, and it is what every other effect in this client
-        /// already uses.
+        /// Additive is the blend that lets light behave like light: alpha blending cannot go
+        /// brighter than the colour it paints with, which is why turning the old beam up
+        /// three times changed nothing. This is the same shader every skill effect in the
+        /// client already uses.
+        ///
+        /// One material per colour, kept for the life of the session. There are about a
+        /// dozen colours in this file and drops are short lived, so the cache never grows.
         /// </summary>
-        private static Material AdditiveMaterial
+        private static Material MaterialFor(Color tint)
         {
-            get
+            if (additiveMaterials.TryGetValue(tint, out var found) && found != null)
+                return found;
+
+            var cache = ShaderCache.Instance;
+            if (cache == null || cache.AdditiveShader == null)
             {
-                if (additiveMaterial != null)
-                    return additiveMaterial;
+                if (!loggedOnce)
+                {
+                    loggedOnce = true;
+                    Debug.LogWarning("[GroundItemAura] No additive shader available, so drop beams "
+                                     + "will be drawn flat and will not glow.");
+                }
 
-                var cache = ShaderCache.Instance;
-                if (cache == null || cache.AdditiveShader == null)
-                    return null;
-
-                additiveMaterial = new Material(cache.AdditiveShader);
-                //after the world is drawn, the way the skill effects do it
-                additiveMaterial.renderQueue = 3001;
-                return additiveMaterial;
+                return null;
             }
+
+            var material = new Material(cache.AdditiveShader);
+            material.SetColor("_Color", new Color(tint.r, tint.g, tint.b, 1f));
+            //after the world is drawn, the way the skill effects do it
+            material.renderQueue = 3001;
+            additiveMaterials[tint] = material;
+
+            if (!loggedOnce)
+            {
+                loggedOnce = true;
+                Debug.Log($"[GroundItemAura] Beams are additive, tint carried in the material. "
+                          + $"First colour {tint}.");
+            }
+
+            return material;
         }
 
         /// <summary>

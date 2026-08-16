@@ -57,6 +57,7 @@ namespace Assets.Scripts.UI.Hud
         private const string SignName = "NpcSign";
 
         private float timer;
+        private static bool loggedOnce;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -148,6 +149,17 @@ namespace Assets.Scripts.UI.Hud
 
             var textWidth = Mathf.Max(text.preferredWidth, 1f);
             var textHeight = Mathf.Max(text.preferredHeight, FontSize);
+
+            //Reported once, because a board with an unreadable smear on it and a board built
+            //from a bad measurement look identical from outside. If the width here is a
+            //fraction of a unit the text renderer never measured the name at all.
+            if (!loggedOnce)
+            {
+                loggedOnce = true;
+                Debug.Log($"[NpcNamePlates] '{name}' measured {textWidth:0.00} x {textHeight:0.00} "
+                          + $"at font size {FontSize}, board scaled by {SignScale}. "
+                          + $"Font: {(text.font != null ? text.font.name : "none")}");
+            }
 
             var boardWidth = PadX * 2f + IconSize + IconGap + textWidth;
             var boardHeight = Mathf.Max(textHeight, IconSize) + PadY * 2f;
