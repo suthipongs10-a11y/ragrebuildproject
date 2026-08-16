@@ -22,28 +22,34 @@ namespace Assets.Scripts.Network
     {
         //Colour says where it came from, at a glance and without reading anything:
         //  gold   a card
-        //  red    a card off a boss
+        //  red    a card off a boss or an MVP
         //  blue   gear off an ordinary monster
         //  purple gear off a boss
         //  ore    the colour of the ore
-        //Deliberately saturated — one weak channel each. Additive light adds up, so a tint
-        //with three strong channels reaches white after two passes and the colour is gone.
-        //Leaving one channel near zero is what survives the stacking.
-        private static readonly Color CardColor = new Color(1.00f, 0.66f, 0.04f);
-        private static readonly Color BossCardColor = new Color(1.00f, 0.10f, 0.06f);
-        private static readonly Color GearColor = new Color(0.08f, 0.48f, 1.00f);
-        private static readonly Color BossGearColor = new Color(0.58f, 0.10f, 1.00f);
+        //
+        //Every one of these is darker than the colour it is meant to look like, and that is
+        //the point. Additive light adds and then clips, so what reaches the screen is the
+        //tint times however many layers cover that pixel — and once the strongest channel
+        //clips at one, only the channels that did not clip still carry any hue. The old blue
+        //had a green of 0.48; three layers took it past one and it landed on exactly cyan.
+        //The old purple landed on exactly magenta the same way. Written at roughly the
+        //brightness the layers will multiply them back up to, they land where they should.
+        private static readonly Color CardColor = new Color(1.00f, 0.52f, 0.02f);
+        private static readonly Color BossCardColor = new Color(1.00f, 0.06f, 0.02f);
+        private static readonly Color GearColor = new Color(0.05f, 0.30f, 1.00f);
+        private static readonly Color BossGearColor = new Color(0.45f, 0.05f, 1.00f);
 
         private static readonly Dictionary<string, Color> OreColors = new Dictionary<string, Color>
         {
-            { "Oridecon", new Color(1.00f, 0.34f, 0.02f) },
-            { "Rough_Oridecon", new Color(0.90f, 0.38f, 0.08f) },
-            { "Elunium", new Color(0.20f, 0.82f, 1.00f) },
-            { "Rough_Elunium", new Color(0.28f, 0.74f, 0.95f) },
-            { "Phracon", new Color(0.80f, 0.38f, 0.10f) },
-            { "Emveretarcon", new Color(0.14f, 0.95f, 0.32f) },
-            { "Gold", new Color(1.00f, 0.78f, 0.05f) },
-            { "Steel", new Color(0.55f, 0.68f, 0.85f) },
+            { "Oridecon", new Color(1.00f, 0.22f, 0.01f) },
+            { "Rough_Oridecon", new Color(0.85f, 0.20f, 0.03f) },
+            //the one colour here that is meant to be cyan, rather than a blue that became one
+            { "Elunium", new Color(0.10f, 0.62f, 1.00f) },
+            { "Rough_Elunium", new Color(0.14f, 0.55f, 0.90f) },
+            { "Phracon", new Color(0.75f, 0.26f, 0.04f) },
+            { "Emveretarcon", new Color(0.06f, 0.85f, 0.16f) },
+            { "Gold", new Color(1.00f, 0.62f, 0.02f) },
+            { "Steel", new Color(0.40f, 0.52f, 0.75f) },
         };
 
         //the two worth stopping for whatever the odds were on this particular monster
@@ -112,7 +118,11 @@ namespace Assets.Scripts.Network
             aura.beam = MakeRenderer(go.transform, "Beam", BeamSprite, Vector3.zero, color);
             aura.beam.transform.localScale = new Vector3(6.5f + tier * 1.2f, aura.beamHeight, 1f);
 
-            aura.core = MakeRenderer(go.transform, "Core", BeamSprite, Vector3.zero, Color.Lerp(color, Color.white, 0.18f));
+            //The same tint as the shaft around it, not a paler one. Mixing white into the
+            //core was a second push toward white on top of the one the stacking already
+            //gives, and it is the middle of the beam — the part you actually read the
+            //colour off — that it bleached.
+            aura.core = MakeRenderer(go.transform, "Core", BeamSprite, Vector3.zero, color);
             aura.core.transform.localScale = new Vector3(2.6f + tier * 0.4f, aura.beamHeight * 0.9f, 1f);
 
             //a pool of light where it is actually lying, so the eye is sent to the item and
@@ -196,15 +206,18 @@ namespace Assets.Scripts.Network
             //and annoyed by something that flashes
             var pulse = 0.5f + 0.5f * Mathf.Sin(t * 2.4f);
 
-            //The additive shader multiplies the texture by the vertex colour and blends with
-            //SrcAlpha One, so what lands on the screen is colour times alpha, added. Alpha
-            //is held near the top and brightness comes from stacking, which is the part that
-            //has no ceiling: three shafts at full strength are three times the light.
-            //A touch toward white on the inner shaft only. Any more and the two passes reach
-            //white together, which is the whole failure this replaced.
-            Paint(beam, 0.88f + pulse * 0.12f);
-            Paint(core, 0.86f + pulse * 0.14f);
-            Paint(glow, 0.82f + pulse * 0.18f);
+            //One layer carries the light and the others only lift it.
+            //
+            //Three layers at nearly full alpha was the mistake: they add to almost three
+            //times the tint, every channel clips, and what is left is white with a hint of
+            //whichever channel started lowest. The wide shaft is the one that has to be
+            //bright, because it is nearly all of what you see; the core adds a hotter line
+            //down the middle and the pool lifts the foot. Together they come to about one
+            //and a quarter, which is enough to clip the strongest channel — a bright beam —
+            //and not enough to clip the second, which is what keeps the colour.
+            Paint(beam, 0.90f + pulse * 0.10f);
+            Paint(core, 0.30f + pulse * 0.12f);
+            Paint(glow, 0.45f + pulse * 0.15f);
 
             Stretch(beam, beamHeight, pulse);
             Stretch(core, beamHeight * 0.9f, pulse);
