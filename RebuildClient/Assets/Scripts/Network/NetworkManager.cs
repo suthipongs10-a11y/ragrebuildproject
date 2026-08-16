@@ -426,6 +426,11 @@ namespace Assets.Scripts.Network
             socket = null;
 
             PlayerState.Instance.PlayerName = null;
+
+            //Guild membership belongs to a character, not to the client. Left standing, the
+            //next character to log in would see the last one's roster until the server got
+            //around to correcting it.
+            GuildState.Clear();
         }
 
         private void StartConnectServer(string serverPath, string username, string password)

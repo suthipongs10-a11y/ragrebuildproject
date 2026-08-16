@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.PlayerControl;
 using Assets.Scripts.UI.Guide;
+using Assets.Scripts.UI.Guild;
 using Assets.Scripts.UI.Inventory;
 using TMPro;
 using UnityEngine;
@@ -561,6 +562,12 @@ namespace Assets.Scripts.UI
             //cannot tell you: they show what you have, not what to do with it.
             var guide = CharacterGuideWindow.Create(ui.PrimaryUserWindowContainer);
             hub.AddPage(guide, ThaiUiText.Get("Guide"), ModernUiIcons.Star);
+
+            //Same reasoning: there is no guild window in the game to take over, because
+            //guilds were only ever reachable by typing /guild. The roster arrives from the
+            //server, so this page is built empty and fills in when the answer comes back.
+            var guild = GuildWindow.Create(ui.PrimaryUserWindowContainer);
+            hub.AddPage(guild, ThaiUiText.Get("Guild"), ModernUiIcons.Person);
 
             //taken off the equipment page and stood in the window's own column, so it is
             //still there when the stats or skills tab is the one on screen

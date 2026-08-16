@@ -38,6 +38,7 @@ namespace Assets.Scripts.UI
             { "Cart", "รถเข็น" },
             { "Storage", "คลังเก็บของ" },
             { "Party", "ปาร์ตี้" },
+            { "Guild", "กิลด์" },
             { "Chat", "แชท" },
             { "Room", "ห้อง" },
 
