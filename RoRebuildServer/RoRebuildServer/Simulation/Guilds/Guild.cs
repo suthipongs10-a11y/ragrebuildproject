@@ -1,10 +1,34 @@
-using RoRebuildServer.Database.Domain;
+﻿using RoRebuildServer.Database.Domain;
 using RoRebuildServer.EntityComponents;
 using RoRebuildServer.Networking;
 
 namespace RoRebuildServer.Simulation.Guilds;
 
 public class GuildMember
+{
+    public Guid CharacterId;
+    public string Name = "";
+
+    /// <summary>
+    /// Last known job and level, which is all that can honestly be offered.
+    ///
+    /// Membership is stored by character id and name because a member can be offline, and
+    /// a character's job and level live inside a serialized blob on their row rather than
+    /// in columns a query can reach. So these are filled in whenever the member is seen
+    /// online and remembered afterwards; a member who has not been on since the server
+    /// started reads as unknown rather than as level zero.
+    /// </summary>
+    public int Job = -1;
+    public int Level = -1;
+    public bool HasDetails => Level >= 0;
+}
+
+/// <summary>
+/// Somebody asking to be let in. Kept in memory only: a request is answered in the same
+/// sitting or it is not worth answering, and persisting it would mean a table and a
+/// migration for something with the lifetime of a conversation.
+/// </summary>
+public class GuildJoinRequest
 {
     public Guid CharacterId;
     public string Name = "";
@@ -18,13 +42,19 @@ public class GuildMember
 /// </summary>
 public class Guild
 {
-    public const int MaxMembers = 32;
+    public const int MaxMembers = 40;
     public const int MaxNameLength = 24;
+
+    /// <summary>How many people may be waiting to be let in at once.</summary>
+    public const int MaxPendingRequests = 20;
 
     public int GuildId;
     public string GuildName;
     public Guid LeaderId;
     public readonly List<GuildMember> Members = new();
+    public readonly List<GuildJoinRequest> JoinRequests = new();
+
+    public bool IsFull => Members.Count >= MaxMembers;
 
     public Guild(int guildId, string guildName, Guid leaderId)
     {
@@ -53,6 +83,77 @@ public class Guild
         if (HasMember(id))
             return;
         Members.Add(new GuildMember { CharacterId = id, Name = name });
+    }
+
+    public GuildMember? FindMember(Guid id)
+    {
+        foreach (var member in Members)
+        {
+            if (member.CharacterId == id)
+                return member;
+        }
+
+        return null;
+    }
+
+    public GuildMember? FindMemberByName(string name)
+    {
+        foreach (var member in Members)
+        {
+            if (string.Equals(member.Name, name, StringComparison.OrdinalIgnoreCase))
+                return member;
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Writes down what a member is, so the roster can say something about them after they
+    /// log out. Called wherever a member is known to be online and current.
+    /// </summary>
+    public void UpdateMemberDetails(Guid id, int job, int level)
+    {
+        var member = FindMember(id);
+        if (member == null)
+            return;
+
+        member.Job = job;
+        member.Level = level;
+    }
+
+    public bool HasJoinRequest(Guid id)
+    {
+        foreach (var request in JoinRequests)
+        {
+            if (request.CharacterId == id)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>Returns false when the queue is full or the request is already in it.</summary>
+    public bool AddJoinRequest(Guid id, string name)
+    {
+        if (HasJoinRequest(id) || HasMember(id) || JoinRequests.Count >= MaxPendingRequests)
+            return false;
+
+        JoinRequests.Add(new GuildJoinRequest { CharacterId = id, Name = name });
+        return true;
+    }
+
+    public bool RemoveJoinRequest(Guid id)
+    {
+        for (var i = JoinRequests.Count - 1; i >= 0; i--)
+        {
+            if (JoinRequests[i].CharacterId != id)
+                continue;
+
+            JoinRequests.RemoveAt(i);
+            return true;
+        }
+
+        return false;
     }
 
     public void RemoveMember(Guid id)
@@ -132,5 +233,18 @@ public static class GuildManager
     {
         lock (SyncRoot)
             LoadedGuilds.Remove(guildId);
+    }
+
+    /// <summary>
+    /// Every guild currently in memory, for the browse list.
+    ///
+    /// Which is not every guild that exists — one whose members are all offline was never
+    /// loaded. That is a real limit of the list and not a bug to be surprised by later: a
+    /// guild you cannot see has nobody online to answer you anyway.
+    /// </summary>
+    public static List<Guild> AllLoadedGuilds()
+    {
+        lock (SyncRoot)
+            return new List<Guild>(LoadedGuilds.Values);
     }
 }

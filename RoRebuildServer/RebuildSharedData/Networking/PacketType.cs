@@ -135,6 +135,12 @@ public enum PacketType : byte
     ResetMotion,
 
     ToggleActivatedState,
+
+    //guild windows: one request in with an action byte, one answer out with whatever
+    //that action needs. One pair rather than a dozen, since they all move the same
+    //shapes and a dozen entries here is a dozen chances for the two sides to disagree.
+    GuildAction,
+    GuildData,
 }
 
 public enum MessageType : byte

@@ -15,6 +15,8 @@ using RoRebuildServer.EntityComponents.Npcs;
 using RoRebuildServer.EntitySystem;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Networking.PacketHandlers.NPCPackets;
+using RoRebuildServer.Simulation;
+using RoRebuildServer.Simulation.Guilds;
 using RoRebuildServer.Simulation.Items;
 using RoRebuildServer.Simulation.Parties;
 using RoRebuildServer.Simulation.Pathfinding;
@@ -1632,6 +1634,83 @@ public static class CommandBuilder
     {
         var packet = NetworkManager.StartPacket(PacketType.AdminHideCharacter, 8);
         packet.Write(isHidden);
+
+        NetworkManager.SendMessage(packet, p.Connection);
+    }
+
+    /// <summary>
+    /// The player's own guild, its roster, and anyone waiting to be let in.
+    ///
+    /// A member's job and level are whatever was last seen of them: membership survives
+    /// logout and a character's job and level live inside a serialized blob rather than in
+    /// columns a query can reach, so an online member is read live and an offline one is
+    /// read from what the guild remembers. A member nobody has seen since the server came
+    /// up is sent as unknown, which the window shows as a dash rather than as level zero.
+    /// </summary>
+    public static void SendGuildData(Player p)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.GuildData, 1024);
+        packet.Write((byte)GuildDataType.MyGuild);
+
+        var guild = p.Guild;
+        if (guild == null)
+        {
+            packet.Write(false);
+            NetworkManager.SendMessage(packet, p.Connection);
+            return;
+        }
+
+        packet.Write(true);
+        packet.Write(guild.GuildId);
+        packet.Write(guild.GuildName);
+        packet.Write(guild.IsLeader(p));
+        packet.Write(Guild.MaxMembers);
+
+        packet.Write((short)guild.Members.Count);
+        foreach (var member in guild.Members)
+        {
+            var online = World.Instance.TryFindPlayerByName(member.Name, out var entity);
+            if (online)
+            {
+                //seen now, so write it down for after they log out
+                var other = entity.Get<Player>();
+                member.Job = other.GetData(PlayerStat.Job);
+                member.Level = other.CharacterLevel;
+            }
+
+            packet.Write(member.Name);
+            packet.Write(online);
+            packet.Write(member.CharacterId == guild.LeaderId);
+            packet.Write((short)member.Job);
+            packet.Write((short)member.Level);
+        }
+
+        //only the leader is shown the queue, since only the leader can answer it
+        var requests = guild.IsLeader(p) ? guild.JoinRequests.Count : 0;
+        packet.Write((short)requests);
+        for (var i = 0; i < requests; i++)
+            packet.Write(guild.JoinRequests[i].Name);
+
+        NetworkManager.SendMessage(packet, p.Connection);
+    }
+
+    /// <summary>
+    /// Every guild that could be asked to join, with how full it is.
+    /// </summary>
+    public static void SendGuildList(Player p, List<Guild> guilds)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.GuildData, 2048);
+        packet.Write((byte)GuildDataType.GuildList);
+        packet.Write(Guild.MaxMembers);
+
+        packet.Write((short)guilds.Count);
+        foreach (var guild in guilds)
+        {
+            packet.Write(guild.GuildId);
+            packet.Write(guild.GuildName);
+            packet.Write((short)guild.Members.Count);
+            packet.Write(guild.HasJoinRequest(p.Id));
+        }
 
         NetworkManager.SendMessage(packet, p.Connection);
     }
