@@ -95,8 +95,25 @@ Unity build เป็น WebGL ใช้เวลานาน (เป็นส�
 RoRebuildServer\RoRebuildServer\bin\Debug\net9.0\WebClient
 ```
 
+**โฟลเดอร์ `WebClient` ยังไม่มี ต้องสร้างเองในหน้าต่างเลือกโฟลเดอร์** — ไม่มีอะไรสร้างให้
+เซิร์ฟเวอร์แค่อ่านจากตรงนั้น ถ้าไม่มีมันก็บอกว่าไม่มีแล้วเสิร์ฟแต่ socket
+
+วิธีทำในหน้าต่างนั้น:
+
+1. กด `Ctrl + L` (หรือคลิกแถบ path ข้างบน) แล้ววางเข้าไป:
+   `C:\ragrebuildproject\RoRebuildServer\RoRebuildServer\bin\Debug\net9.0`
+2. กด `New folder` มุมซ้ายบน ตั้งชื่อ **`WebClient`**
+3. ดับเบิลคลิกเข้าไปข้างใน ให้ช่อง `Folder:` ข้างล่างขึ้นว่า `WebClient`
+4. กด `Select Folder`
+
+> ⚠️ ช่อง `Folder:` มักจำค่าเก่าไว้ (เช่น `WebGL`) — ดูให้แน่ว่าเปลี่ยนเป็น `WebClient` แล้ว
+> ก่อนกด ไม่งั้น build ไปลงที่เดิมอีก
+
 > โฟลเดอร์ปลายทางสำคัญ — เซิร์ฟเวอร์มองหาโฟลเดอร์ชื่อ `WebClient`
 > ข้าง ๆ ไฟล์เซิร์ฟเวอร์ ถ้าอยากเก็บที่อื่นให้แก้ `WebClientPath` ใน `appsettings.json`
+>
+> `dotnet build` ปกติไม่ลบทิ้ง (csproj ลบแค่โฟลเดอร์ `ServerData`)
+> แต่ `dotnet clean` หรือลบ `bin` เองจะพาไปด้วย — เสีย build ไปทั้งรอบ
 
 ปุ่ม `Build` อยู่มุมขวาล่างของหน้า `Build Profiles`
 (ถ้า build ออกมาแปลก ๆ ลองลูกศรข้าง ๆ ปุ่ม → `Clean Build`)
