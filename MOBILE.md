@@ -21,6 +21,26 @@ Unity build เป็น WebGL ใช้เวลานาน (เป็นส�
 RoRebuildServer\RoRebuildServer\bin\Debug\net9.0\WebClient
 ```
 
+6. จะมีหน้าต่างเด้งถามว่า **"Do you want to build a clean addressables before export?"**
+   → **ต้องกด `Perform Clean Addressables Build`**
+
+> ⛔ ข้อนี้พลาดบ่อยและอาการหลอก: ถ้ากด `Normal Build` ตัว build จะใช้ addressables
+> ชุดเก่าที่ค้างอยู่ สไปรต์ที่เพิ่งแก้หรือเพิ่งเพิ่มจะไม่ติดไปด้วย เกมรันได้ปกติ
+> แต่มอนบางตัวกลายเป็น Poring — เหมือนตอนแก้ Verit ไม่สำเร็จเป๊ะ ๆ
+
+## ⚠️ ล้างโฟลเดอร์เก่าทุกครั้งก่อน build ใหม่
+
+หลัง build เสร็จ `WebGLUnfucker` จะเปลี่ยนชื่อโฟลเดอร์ `Build` เป็น `Build_2026-01-31-08-15`
+แล้วแก้ `index.html` ให้ชี้ไปที่ชื่อใหม่ (กันเบราว์เซอร์ cache ของเก่า)
+
+**มันไม่ลบของเก่าให้** build 5 ครั้งก็ได้ 5 โฟลเดอร์ โฟลเดอร์ละหลายร้อย MB
+ก่อน build ใหม่ให้ลบ `Build_*` เก่าใน `WebClient` ทิ้งก่อน
+
+## อย่าใช้เมนู `Build → Build Everything`
+
+อันนั้นเป็นสายการ build ของเจ้าของโปรเจกต์ต้นทาง — มันไป `Build/WebGL/ragnarok/`
+ไม่ใช่ `WebClient` แถม build ตัว PC กับ zip ให้อีก ใช้ `File → Build Settings → Build` ตามข้างบน
+
 > โฟลเดอร์ปลายทางสำคัญ — เซิร์ฟเวอร์มองหาโฟลเดอร์ชื่อ `WebClient`
 > ข้าง ๆ ไฟล์เซิร์ฟเวอร์ ถ้าอยากเก็บที่อื่นให้แก้ `WebClientPath` ใน
 > `appsettings.json`
