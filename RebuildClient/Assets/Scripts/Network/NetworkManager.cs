@@ -1459,6 +1459,48 @@ namespace Assets.Scripts.Network
             SendMessage(msg);
         }
 
+        /// <summary>
+        /// Asks the server for something on the guild's behalf.
+        ///
+        /// Three overloads rather than one with unused arguments, because the server reads
+        /// exactly the payload each action carries and nothing more: sending a name after a
+        /// Refresh would leave a string sitting in the buffer, and the next packet would be
+        /// read starting from the middle of it.
+        /// </summary>
+        public void SendGuildAction(GuildRequestType action)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.GuildAction);
+            msg.Write((byte)action);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>For RequestJoin, which names a guild by id.</summary>
+        public void SendGuildAction(GuildRequestType action, int guildId)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.GuildAction);
+            msg.Write((byte)action);
+            msg.Write(guildId);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>For Kick, ApproveRequest and RejectRequest, which name a character.</summary>
+        public void SendGuildAction(GuildRequestType action, string characterName)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.GuildAction);
+            msg.Write((byte)action);
+            msg.Write(characterName);
+
+            SendMessage(msg);
+        }
+
         public void SendMoveRequest(string map, int x = -999, int y = -999, bool forcePosition = false)
         {
             if (map.ToLower() == "debug" || map.ToLower() == "debugroom")
