@@ -17,13 +17,15 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Environment
             //how unlikely the drop was, which only the server knows; the client turns it
             //into a light around the item
             var rarity = msg.ReadByte();
+            //what died to leave it there, which decides the colour of the light
+            var fromBoss = msg.ReadBoolean();
             var isAnimated = msg.ReadBoolean();
             if (Network.GroundItemList.ContainsKey(groundId))
             {
                 Debug.LogWarning($"Trying to create DropItem of type ${id} at location {pos}, but that drop already exists in the scene!");
                 return;
             }
-            var item = GroundItem.Create(groundId, id, count, pos, isAnimated, rarity);
+            var item = GroundItem.Create(groundId, id, count, pos, isAnimated, rarity, fromBoss);
             Network.GroundItemList.Add(groundId, item);
             
         }

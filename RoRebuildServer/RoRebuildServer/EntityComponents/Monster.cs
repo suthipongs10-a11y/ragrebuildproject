@@ -587,6 +587,10 @@ public partial class Monster : IEntityAutoReset
 
         var isMvp = DataManager.MvpMonsterCodes.Contains(MonsterBase.Code);
 
+        //MVPs and anything flagged boss both count: what the light is answering is "was
+        //this hard to get", and a mini boss is closer to an MVP than to a poring
+        var isBoss = isMvp || CombatEntity.GetSpecialType() == CharacterSpecialType.Boss;
+
         var hasDrop = false;
         var totalChance = 0;
         int dropId = 0;
@@ -606,7 +610,8 @@ public partial class Monster : IEntityAutoReset
                     if (d.CountMax > 1)
                         count = GameRandom.NextInclusive(d.CountMin, d.CountMax);
                     var dropPos = GetNextTileForDrop(dropId);
-                    var item = new GroundItem(dropPos, d.Id, count) { Rarity = RarityOfChance(chance) };
+                    var item = new GroundItem(dropPos, d.Id, count)
+                        { Rarity = RarityOfChance(chance), FromBoss = isBoss };
                     if (topContributor != null)
                         item.SetExclusivePickupTime(topContributor, isMvp ? 8f : 4f);
                     Character.Map.DropGroundItem(ref item);
@@ -627,7 +632,7 @@ public partial class Monster : IEntityAutoReset
 
                     var dropPos = GetNextTileForDrop(dropId);
                     var item = new GroundItem(dropPos, drops.DropChances[i].Id, 1)
-                        { Rarity = RarityOfChance(drops.DropChances[i].Chance) };
+                        { Rarity = RarityOfChance(drops.DropChances[i].Chance), FromBoss = isBoss };
                     if (topContributor != null)
                         item.SetExclusivePickupTime(topContributor, isMvp ? 8f : 4f);
                     Character.Map.DropGroundItem(ref item);

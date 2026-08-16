@@ -27,6 +27,14 @@ public struct GroundItem : IEquatable<GroundItem>
     /// </summary>
     public byte Rarity;
 
+    /// <summary>
+    /// Whether what dropped this was a boss, which the client cannot work out for itself:
+    /// the item on the ground says nothing about what died to leave it there. It is what
+    /// separates a card off an MVP from a card off anything else, and the two are worth
+    /// telling apart at a glance.
+    /// </summary>
+    public bool FromBoss;
+
     public FloatPosition Position;
     public RegularItem Item;
     public UniqueItem UniqueItem;
@@ -107,6 +115,7 @@ public struct GroundItem : IEquatable<GroundItem>
             UniqueItem.SerializeAsRegularItem(msg);
 
         msg.Write(Rarity);
+        msg.Write(FromBoss);
     }
 
     public bool Equals(GroundItem other)

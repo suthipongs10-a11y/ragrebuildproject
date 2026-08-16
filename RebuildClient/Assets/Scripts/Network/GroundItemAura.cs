@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using RebuildSharedData.ClientTypes;
 using RebuildSharedData.Enum;
 using UnityEngine;
@@ -6,25 +6,29 @@ using UnityEngine;
 namespace Assets.Scripts.Network
 {
     /// <summary>
-    /// The light around something worth picking up.
+    /// The pillar of light over something worth picking up.
     ///
-    /// A rare drop and a jellopy land on the floor looking exactly alike, and on a map with
-    /// twenty things on the ground the good one goes unnoticed. This is the halo that makes
-    /// it obvious from across the screen, and the moment it appears is most of the reason
-    /// hunting is fun at all.
+    /// A card and a jellopy land on the floor looking exactly alike, and on a map with
+    /// twenty things on the ground the good one goes unnoticed. A beam is what makes it
+    /// visible from across the screen — the first attempt was a halo behind the icon,
+    /// which was both smaller than the icon and behind it, so it was never seen at all.
     ///
-    /// What glows is decided here rather than on the server because the client already
-    /// holds the item's class and code. The one thing it cannot know is how unlikely the
-    /// drop was, and that is exactly what the server sends: a rarity of nothing special to
-    /// almost never, on a scale of zero to three.
+    /// What glows is decided here rather than on the server, because the client already
+    /// holds the item's class and code. The two things it cannot know — how unlikely the
+    /// drop was, and whether a boss dropped it — are what the server sends.
     /// </summary>
     public class GroundItemAura : MonoBehaviour
     {
-        //Cards are gold, worn gear is blue, and ore takes the colour of the ore. Kept as a
-        //table rather than a chain of ifs because the whole rule is meant to be read at
-        //once and argued with.
+        //Colour says where it came from, at a glance and without reading anything:
+        //  gold   a card
+        //  red    a card off a boss
+        //  blue   gear off an ordinary monster
+        //  purple gear off a boss
+        //  ore    the colour of the ore
         private static readonly Color CardColor = new Color(1.00f, 0.82f, 0.25f);
+        private static readonly Color BossCardColor = new Color(1.00f, 0.25f, 0.22f);
         private static readonly Color GearColor = new Color(0.35f, 0.70f, 1.00f);
+        private static readonly Color BossGearColor = new Color(0.72f, 0.40f, 1.00f);
 
         private static readonly Dictionary<string, Color> OreColors = new Dictionary<string, Color>
         {
@@ -38,94 +42,112 @@ namespace Assets.Scripts.Network
             { "Steel", new Color(0.80f, 0.85f, 0.90f) },
         };
 
-        //the two that are worth stopping for whatever the odds were on this particular
-        //monster, so they are lit even when the server called the drop ordinary
+        //the two worth stopping for whatever the odds were on this particular monster
         private static readonly HashSet<string> AlwaysLitOre = new HashSet<string> { "Oridecon", "Elunium" };
 
-        private const int TextureSize = 64;
+        private const int BeamWidth = 32;
+        private const int BeamHeight = 256;
+        private const int GlowSize = 64;
+
+        private static Sprite beamSprite;
         private static Sprite glowSprite;
 
-        private SpriteRenderer sprite;
+        private SpriteRenderer beam;
+        private SpriteRenderer glow;
         private Color tint;
-        private float baseScale;
-        private float baseAlpha;
+        private float strength;
         private float phase;
 
+        /// <summary>The height the pulse swings around, fixed when the beam is built.</summary>
+        private float beamHeight = 1f;
+
         /// <summary>
-        /// Puts a light on a dropped item, or does not, according to what it is and how
-        /// unlikely it was. Returns quietly for everything ordinary, which is nearly
-        /// everything: a halo on every drop is the same as a halo on none.
+        /// Puts a light on a dropped item, or does not. Returns quietly for everything
+        /// ordinary, which is nearly everything: a beam on every drop is the same as a beam
+        /// on none.
         /// </summary>
-        public static void TryAttach(GameObject parent, ItemData data, int rarity)
+        public static void TryAttach(GameObject parent, ItemData data, int rarity, bool fromBoss)
         {
             if (parent == null || data == null)
                 return;
 
-            if (!Classify(data, rarity, out var color, out var tier))
+            if (!Classify(data, rarity, fromBoss, out var color, out var tier))
                 return;
 
             var go = new GameObject("Aura");
             go.layer = parent.layer;
             go.transform.SetParent(parent.transform, false);
-            //lifted to sit around the icon rather than around its feet
-            go.transform.localPosition = new Vector3(0, 0.16f, 0);
-
-            var renderer = go.AddComponent<SpriteRenderer>();
-            renderer.sprite = GlowSprite;
-            //behind the icon, in front of the shadow the item already carries
-            renderer.sortingOrder = -1;
 
             var aura = go.AddComponent<GroundItemAura>();
-            aura.sprite = renderer;
             aura.tint = color;
-            aura.baseScale = 0.42f + tier * 0.16f;
-            aura.baseAlpha = 0.30f + tier * 0.14f;
+            aura.strength = 0.55f + tier * 0.15f;
             //so a field of drops does not pulse in lockstep
             aura.phase = Random.value * 10f;
+
+            //Standing up out of the ground rather than lying behind the icon. The parent is
+            //billboarded by the shadow it already carries, so this faces the camera with it.
+            aura.beam = MakeRenderer(go.transform, "Beam", BeamSprite, new Vector3(0, 0f, 0));
+            aura.beamHeight = 1.1f + tier * 0.25f;
+            aura.beam.transform.localScale = new Vector3(0.7f + tier * 0.1f, aura.beamHeight, 1f);
+
+            //a pool of light where it is actually lying, so the eye is sent to the item and
+            //not to the empty air above it
+            aura.glow = MakeRenderer(go.transform, "Glow", GlowSprite, new Vector3(0, 0.04f, 0));
+            aura.glow.transform.localScale = Vector3.one * (0.55f + tier * 0.12f);
+
             aura.Apply(0f);
+        }
+
+        private static SpriteRenderer MakeRenderer(Transform parent, string name, Sprite sprite, Vector3 offset)
+        {
+            var go = new GameObject(name);
+            go.layer = parent.gameObject.layer;
+            go.transform.SetParent(parent, false);
+            go.transform.localPosition = offset;
+
+            var renderer = go.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+            //behind the icon, so the item reads on top of its own light
+            renderer.sortingOrder = -1;
+            return renderer;
         }
 
         /// <summary>
         /// The whole rule, in one place.
         /// </summary>
-        private static bool Classify(ItemData data, int rarity, out Color color, out int tier)
+        private static bool Classify(ItemData data, int rarity, bool fromBoss, out Color color, out int tier)
         {
             color = default;
-            tier = rarity;
+            tier = fromBoss ? Mathf.Max(rarity, 3) : rarity;
 
             if (data.ItemClass == ItemClass.Card)
             {
                 //a card is never an ordinary drop, whatever band the roll fell in — some
-                //arrive by other routes entirely, where there was no roll to band
-                color = CardColor;
-                tier = Mathf.Max(rarity, 2);
+                //arrive by routes where there was no roll at all
+                color = fromBoss ? BossCardColor : CardColor;
+                tier = Mathf.Max(tier, 2);
                 return true;
             }
 
             if (!string.IsNullOrEmpty(data.Code) && OreColors.TryGetValue(data.Code, out var oreColor))
             {
-                if (AlwaysLitOre.Contains(data.Code))
-                {
-                    color = oreColor;
-                    tier = Mathf.Max(rarity, 1);
-                    return true;
-                }
-
-                if (rarity < 1)
+                if (!AlwaysLitOre.Contains(data.Code) && rarity < 1 && !fromBoss)
                     return false;
 
                 color = oreColor;
+                tier = Mathf.Max(tier, 1);
                 return true;
             }
 
             if (data.ItemClass == ItemClass.Weapon || data.ItemClass == ItemClass.Equipment)
             {
-                //gear follows the odds, because a monster whose armour drops one time in
-                //three is not handing you a prize
-                if (rarity < 1)
+                //Anything a boss drops is worth a light. Off an ordinary monster it has to
+                //have been unlikely, or every cotton shirt off every poring gets one and the
+                //light stops meaning anything.
+                if (!fromBoss && rarity < 1)
                     return false;
 
-                color = GearColor;
+                color = fromBoss ? BossGearColor : GearColor;
                 return true;
             }
 
@@ -139,26 +161,73 @@ namespace Assets.Scripts.Network
 
         private void Apply(float t)
         {
-            if (sprite == null)
-                return;
-
             //a slow breath rather than a blink: the eye is caught by something that moves
             //and annoyed by something that flashes
-            var pulse = 0.5f + 0.5f * Mathf.Sin(t * 2.2f);
+            var pulse = 0.5f + 0.5f * Mathf.Sin(t * 2.4f);
 
-            var scale = baseScale * (0.92f + pulse * 0.16f);
-            transform.localScale = new Vector3(scale, scale, scale);
+            if (beam != null)
+            {
+                var color = tint;
+                color.a = strength * (0.62f + pulse * 0.38f);
+                beam.color = color;
 
-            var color = tint;
-            color.a = baseAlpha * (0.72f + pulse * 0.28f);
-            sprite.color = color;
+                var scale = beam.transform.localScale;
+                scale.y = beamHeight * (0.94f + pulse * 0.12f);
+                beam.transform.localScale = scale;
+            }
+
+            if (glow != null)
+            {
+                var color = tint;
+                color.a = strength * (0.45f + pulse * 0.30f);
+                glow.color = color;
+            }
         }
 
         /// <summary>
-        /// A soft round glow, drawn rather than imported. One texture serves every colour,
-        /// since the renderer tints it, and drawing it here means there is no art asset to
-        /// go missing from a GRF extract the way a monster sprite can.
+        /// A shaft of light: brightest where it meets the ground, gone by the top, and soft
+        /// along both edges so it reads as light rather than as a coloured rectangle.
+        ///
+        /// Drawn rather than imported, like the rest of this. There is no art asset to go
+        /// missing from a GRF extract the way a monster sprite can, and one white texture
+        /// serves every colour because the renderer tints it.
         /// </summary>
+        private static Sprite BeamSprite
+        {
+            get
+            {
+                if (beamSprite != null)
+                    return beamSprite;
+
+                var texture = new Texture2D(BeamWidth, BeamHeight, TextureFormat.RGBA32, false);
+                texture.wrapMode = TextureWrapMode.Clamp;
+
+                for (var y = 0; y < BeamHeight; y++)
+                {
+                    //full at the foot, nothing at the head, curved so most of the light sits
+                    //in the lower part where the item actually is
+                    var up = y / (float)(BeamHeight - 1);
+                    var vertical = Mathf.Pow(1f - up, 1.7f);
+
+                    for (var x = 0; x < BeamWidth; x++)
+                    {
+                        var across = Mathf.Abs((x + 0.5f) / BeamWidth - 0.5f) * 2f;
+                        var horizontal = Mathf.Pow(Mathf.Clamp01(1f - across), 1.4f);
+
+                        texture.SetPixel(x, y, new Color(1f, 1f, 1f, vertical * horizontal));
+                    }
+                }
+
+                texture.Apply();
+                //pivot at the bottom middle, so it stands up out of the item rather than
+                //being centred on it
+                beamSprite = Sprite.Create(texture, new Rect(0, 0, BeamWidth, BeamHeight),
+                    new Vector2(0.5f, 0f), 100);
+                return beamSprite;
+            }
+        }
+
+        /// <summary>A soft round pool for the foot of the beam.</summary>
         private static Sprite GlowSprite
         {
             get
@@ -166,20 +235,18 @@ namespace Assets.Scripts.Network
                 if (glowSprite != null)
                     return glowSprite;
 
-                var texture = new Texture2D(TextureSize, TextureSize, TextureFormat.RGBA32, false);
+                var texture = new Texture2D(GlowSize, GlowSize, TextureFormat.RGBA32, false);
                 texture.wrapMode = TextureWrapMode.Clamp;
 
-                var half = TextureSize * 0.5f;
-                for (var y = 0; y < TextureSize; y++)
+                var half = GlowSize * 0.5f;
+                for (var y = 0; y < GlowSize; y++)
                 {
-                    for (var x = 0; x < TextureSize; x++)
+                    for (var x = 0; x < GlowSize; x++)
                     {
                         var dx = (x + 0.5f - half) / half;
                         var dy = (y + 0.5f - half) / half;
                         var distance = Mathf.Sqrt(dx * dx + dy * dy);
 
-                        //squared falloff, so the centre reads as a source of light and the
-                        //edge fades out instead of ending on a visible circle
                         var alpha = Mathf.Clamp01(1f - distance);
                         alpha *= alpha;
 
@@ -188,7 +255,7 @@ namespace Assets.Scripts.Network
                 }
 
                 texture.Apply();
-                glowSprite = Sprite.Create(texture, new Rect(0, 0, TextureSize, TextureSize),
+                glowSprite = Sprite.Create(texture, new Rect(0, 0, GlowSize, GlowSize),
                     new Vector2(0.5f, 0.5f), 100);
                 return glowSprite;
             }

@@ -37,7 +37,7 @@ namespace Assets.Scripts.Network
         private static readonly Color[] BatchColors = { Color.white, Color.white, Color.white, Color.white };
 
         public static GroundItem Create(int entityId, int id, int count, Vector2 position, bool showAnimation,
-            int rarity = 0)
+            int rarity = 0, bool fromBoss = false)
         {
             if (spriteMaterial == null)
             {
@@ -106,7 +106,7 @@ namespace Assets.Scripts.Network
 
             //after the shadow, because that is what adds the billboard to this object, and
             //the light wants to face the camera along with everything else on it
-            GroundItemAura.TryAttach(go, data, rarity);
+            GroundItemAura.TryAttach(go, data, rarity, fromBoss);
 
             if (showAnimation)
             {
