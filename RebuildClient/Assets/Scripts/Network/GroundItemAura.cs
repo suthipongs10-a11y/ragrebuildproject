@@ -58,9 +58,24 @@ namespace Assets.Scripts.Network
         private const int BeamWidth = 32;
         private const int BeamHeight = 256;
         private const int GlowSize = 64;
+        private const int RingSize = 128;
+
+        /// <summary>The cast-target decal, which is already a ring drawn to be tinted.</summary>
+        private const string RingTexture = "magic_target_grey";
+
+        /// <summary>Degrees a second. Slow enough to be noticed rather than watched.</summary>
+        private const float RingSpin = 24f;
+
+        /// <summary>
+        /// The item sits a fifth of a unit off the floor, so the ring has to come back down
+        /// by about that much to lie on it rather than through the middle of the icon.
+        /// </summary>
+        private const float RingLift = -0.18f;
 
         private static Sprite beamSprite;
         private static Sprite glowSprite;
+        private static Sprite ringSprite;
+        private static bool ringResourceMissing;
         //One material per colour rather than one shared by all of them. The colour has to
         //travel in the material's own Tint property: it is the only one of the shader's two
         //colour inputs that is certain to arrive, and the beams coming out white is what a
@@ -71,9 +86,11 @@ namespace Assets.Scripts.Network
         private SpriteRenderer beam;
         private SpriteRenderer core;
         private SpriteRenderer glow;
+        private SpriteRenderer ring;
         private Color tint;
         private float strength;
         private float phase;
+        private float ringAngle;
 
         /// <summary>The height the pulse swings around, fixed when the beam is built.</summary>
         private float beamHeight = 1f;
@@ -129,6 +146,13 @@ namespace Assets.Scripts.Network
             //not to the empty air above it
             aura.glow = MakeRenderer(go.transform, "Glow", GlowSprite, new Vector3(0, 0.05f, 0), color);
             aura.glow.transform.localScale = Vector3.one * (4.5f + tier * 0.6f);
+
+            //A ring drawn on the floor around it, turning slowly. Everything else here faces
+            //the camera; this is the one part that lies in the world, and that is what makes
+            //it read as a circle around the item rather than a disc behind it.
+            aura.ring = MakeRenderer(go.transform, "Ring", RingSprite, Vector3.zero, color);
+            if (aura.ring != null)
+                aura.ring.transform.localScale = ScaleFor(aura.ring.sprite, 2.6f + tier * 0.4f);
 
             aura.Apply(0f);
         }
@@ -217,10 +241,50 @@ namespace Assets.Scripts.Network
             //and not enough to clip the second, which is what keeps the colour.
             Paint(beam, 0.90f + pulse * 0.10f);
             Paint(core, 0.30f + pulse * 0.12f);
-            Paint(glow, 0.45f + pulse * 0.15f);
+            Paint(glow, 0.38f + pulse * 0.12f);
+            //brighter than the rest because it is a thin line rather than a filled shape, and
+            //it barely overlaps the shaft, so it has almost nothing stacked underneath it
+            Paint(ring, 0.80f + pulse * 0.20f);
 
             Stretch(beam, beamHeight, pulse);
             Stretch(core, beamHeight * 0.9f, pulse);
+            LayOnGround(ring);
+        }
+
+        /// <summary>
+        /// Keeps the ring flat on the floor and turning, whatever the rest of the object is
+        /// doing.
+        ///
+        /// Position and rotation are both set in world terms on purpose. The item this hangs
+        /// off carries a billboard, and that billboard copies the camera's rotation outright
+        /// — pitch as well as yaw — so under it there is no such thing as "up" or "level".
+        /// A child asked to lie flat in the parent's terms would tilt with the camera and a
+        /// child offset downward would slide sideways as the camera turned.
+        /// </summary>
+        private void LayOnGround(SpriteRenderer renderer)
+        {
+            if (renderer == null)
+                return;
+
+            ringAngle += Time.deltaTime * RingSpin;
+            if (ringAngle > 360f)
+                ringAngle -= 360f;
+
+            renderer.transform.position = transform.position + new Vector3(0, RingLift, 0);
+            renderer.transform.rotation = Quaternion.Euler(90f, ringAngle, 0f);
+        }
+
+        /// <summary>
+        /// The scale that makes a sprite come out a given number of units across, whatever
+        /// the texture's own resolution and pixels-per-unit turn out to be.
+        /// </summary>
+        private static Vector3 ScaleFor(Sprite sprite, float width)
+        {
+            if (sprite == null)
+                return Vector3.one;
+
+            var natural = sprite.bounds.size.x;
+            return natural > 0.0001f ? Vector3.one * (width / natural) : Vector3.one;
         }
 
         /// <summary>
@@ -335,6 +399,75 @@ namespace Assets.Scripts.Network
                     new Vector2(0.5f, 0f), 100);
                 return beamSprite;
             }
+        }
+
+        /// <summary>
+        /// The ring that lies on the floor.
+        ///
+        /// This one is the client's own art rather than something drawn here: it is the
+        /// texture behind the circle that appears under a ground-targeted spell while it is
+        /// being cast, it is greyscale precisely so it can be tinted, and it ships in the
+        /// repository rather than coming out of a GRF extract. Borrowing it means the ring
+        /// looks like it belongs to this game instead of like a circle somebody drew.
+        ///
+        /// If it is ever not there, a plain ring is drawn instead. A missing decoration
+        /// should cost the decoration, not the feature.
+        /// </summary>
+        private static Sprite RingSprite
+        {
+            get
+            {
+                if (ringSprite != null)
+                    return ringSprite;
+
+                if (!ringResourceMissing)
+                {
+                    var texture = Resources.Load<Texture2D>(RingTexture);
+                    if (texture != null)
+                    {
+                        ringSprite = Sprite.Create(texture,
+                            new Rect(0, 0, texture.width, texture.height),
+                            new Vector2(0.5f, 0.5f), 100);
+                        return ringSprite;
+                    }
+
+                    ringResourceMissing = true;
+                    Debug.LogWarning($"[GroundItemAura] No '{RingTexture}' to draw the ring with, "
+                                     + "so a plain one is being used instead.");
+                }
+
+                ringSprite = DrawnRing();
+                return ringSprite;
+            }
+        }
+
+        /// <summary>A band of light at a fixed radius, faded on both sides of the line.</summary>
+        private static Sprite DrawnRing()
+        {
+            var texture = new Texture2D(RingSize, RingSize, TextureFormat.RGBA32, false);
+            texture.wrapMode = TextureWrapMode.Clamp;
+
+            var half = RingSize * 0.5f;
+            for (var y = 0; y < RingSize; y++)
+            {
+                for (var x = 0; x < RingSize; x++)
+                {
+                    var dx = (x + 0.5f - half) / half;
+                    var dy = (y + 0.5f - half) / half;
+                    var distance = Mathf.Sqrt(dx * dx + dy * dy);
+
+                    //the line sits just inside the edge so the sprite is not clipped by its
+                    //own bounds when it turns
+                    var alpha = Mathf.Clamp01(1f - Mathf.Abs(distance - 0.82f) / 0.12f);
+                    alpha *= alpha;
+
+                    texture.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
+                }
+            }
+
+            texture.Apply();
+            return Sprite.Create(texture, new Rect(0, 0, RingSize, RingSize),
+                new Vector2(0.5f, 0.5f), 100);
         }
 
         /// <summary>A soft round pool for the foot of the beam.</summary>
