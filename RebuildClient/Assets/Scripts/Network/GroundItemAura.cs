@@ -53,6 +53,7 @@ namespace Assets.Scripts.Network
         private static Sprite glowSprite;
 
         private SpriteRenderer beam;
+        private SpriteRenderer core;
         private SpriteRenderer glow;
         private Color tint;
         private float strength;
@@ -80,20 +81,27 @@ namespace Assets.Scripts.Network
 
             var aura = go.AddComponent<GroundItemAura>();
             aura.tint = color;
-            aura.strength = 0.55f + tier * 0.15f;
+            aura.strength = 0.80f + tier * 0.07f;
             //so a field of drops does not pulse in lockstep
             aura.phase = Random.value * 10f;
 
             //Standing up out of the ground rather than lying behind the icon. The parent is
             //billboarded by the shadow it already carries, so this faces the camera with it.
-            aura.beam = MakeRenderer(go.transform, "Beam", BeamSprite, new Vector3(0, 0f, 0));
-            aura.beamHeight = 1.1f + tier * 0.25f;
-            aura.beam.transform.localScale = new Vector3(0.7f + tier * 0.1f, aura.beamHeight, 1f);
+            aura.beamHeight = 2.6f + tier * 0.55f;
+            aura.beam = MakeRenderer(go.transform, "Beam", BeamSprite, Vector3.zero);
+            aura.beam.transform.localScale = new Vector3(1.5f + tier * 0.25f, aura.beamHeight, 1f);
+
+            //A second, narrow, near-white shaft inside the coloured one. This is what makes
+            //it read as light rather than as a coloured shape: a real beam is white where it
+            //is brightest and takes its colour at the edges, and stacking the two is how you
+            //get that without an additive shader to reach for.
+            aura.core = MakeRenderer(go.transform, "Core", BeamSprite, Vector3.zero);
+            aura.core.transform.localScale = new Vector3(0.55f + tier * 0.08f, aura.beamHeight * 0.86f, 1f);
 
             //a pool of light where it is actually lying, so the eye is sent to the item and
             //not to the empty air above it
-            aura.glow = MakeRenderer(go.transform, "Glow", GlowSprite, new Vector3(0, 0.04f, 0));
-            aura.glow.transform.localScale = Vector3.one * (0.55f + tier * 0.12f);
+            aura.glow = MakeRenderer(go.transform, "Glow", GlowSprite, new Vector3(0, 0.05f, 0));
+            aura.glow.transform.localScale = Vector3.one * (1.15f + tier * 0.18f);
 
             aura.Apply(0f);
         }
@@ -141,13 +149,13 @@ namespace Assets.Scripts.Network
 
             if (data.ItemClass == ItemClass.Weapon || data.ItemClass == ItemClass.Equipment)
             {
-                //Anything a boss drops is worth a light. Off an ordinary monster it has to
-                //have been unlikely, or every cotton shirt off every poring gets one and the
-                //light stops meaning anything.
-                if (!fromBoss && rarity < 1)
-                    return false;
-
+                //Everything wearable is lit. The rarity gate that used to be here meant a
+                //piece of gear off an ordinary monster usually had no light at all, which
+                //read as the feature being broken rather than as the drop being ordinary.
+                //How unlikely it was still decides how big and bright the beam is, so the
+                //information is kept without anything being left dark.
                 color = fromBoss ? BossGearColor : GearColor;
+                tier = Mathf.Max(tier, 1);
                 return true;
             }
 
@@ -168,7 +176,7 @@ namespace Assets.Scripts.Network
             if (beam != null)
             {
                 var color = tint;
-                color.a = strength * (0.62f + pulse * 0.38f);
+                color.a = strength * (0.78f + pulse * 0.22f);
                 beam.color = color;
 
                 var scale = beam.transform.localScale;
@@ -176,10 +184,23 @@ namespace Assets.Scripts.Network
                 beam.transform.localScale = scale;
             }
 
+            if (core != null)
+            {
+                //most of the way to white, so the middle of the shaft burns out the way a
+                //bright light does rather than just being more of the same colour
+                var color = Color.Lerp(tint, Color.white, 0.72f);
+                color.a = strength * (0.70f + pulse * 0.30f);
+                core.color = color;
+
+                var scale = core.transform.localScale;
+                scale.y = beamHeight * 0.86f * (0.94f + pulse * 0.12f);
+                core.transform.localScale = scale;
+            }
+
             if (glow != null)
             {
-                var color = tint;
-                color.a = strength * (0.45f + pulse * 0.30f);
+                var color = Color.Lerp(tint, Color.white, 0.35f);
+                color.a = strength * (0.62f + pulse * 0.28f);
                 glow.color = color;
             }
         }

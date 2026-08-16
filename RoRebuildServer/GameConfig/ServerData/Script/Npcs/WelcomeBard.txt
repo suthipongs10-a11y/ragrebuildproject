@@ -423,17 +423,17 @@ macro BardWarps()
 	return;
 }
 
-Npc("prt_fild08", "Job Master", "1_M_BARD", 153, 357, SE, 1, 1)  //175, 374, SW
+Npc("prt_fild08", "Class Master", "1_M_BARD", 153, 357, SE, 1, 1)  //175, 374, SW
 {
 	localstr bardFlag = "PrtBardStatus";
-	localstr name = "Job Master"
+	localstr name = "Class Master"
 	OnClick:
 		FocusNpc();
 		ShowSprite("bard_eland01", right);
 
 		if(GetNpcFlag(bardFlag) == 0)
 		{
-			Dialog(name, "สวัสดี ยินดีต้อนรับ! ข้าคือ <color=#0066CC>Job Master</color> มีหน้าที่เปลี่ยนอาชีพให้นักผจญภัยอย่างเธอ " +
+			Dialog(name, "สวัสดี ยินดีต้อนรับ! ข้าคือ <color=#0066CC>Class Master</color> มีหน้าที่เปลี่ยนอาชีพให้นักผจญภัยอย่างเธอ " +
 						 "ทั้งอาชีพ 1 และอาชีพ 2 รวมถึงรีเซ็ตสกิลกับสเตตัสให้ด้วย");
 			Dialog(name, "มาครั้งแรกสินะ เดี๋ยวข้าให้ของติดตัวไปหน่อย");
 			SetNpcFlag(bardFlag, 1);
