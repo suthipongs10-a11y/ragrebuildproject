@@ -30,14 +30,18 @@ namespace Assets.Scripts.UI.Hud
         private const float SweepInterval = 0.5f;
 
         /// <summary>Above the head rather than through it. Sprites here stand 1.5 tall.</summary>
-        private const float SignHeight = 2.35f;
+        private const float SignHeight = 2.05f;
 
-        private const float FontSize = 1.7f;
-        private const float PadX = 0.45f;
-        private const float PadY = 0.28f;
-        private const float IconSize = 1.05f;
-        private const float IconGap = 0.22f;
-        private const float BorderWidth = 0.07f;
+        //Roughly a third of the height of the figure it belongs to. The first pass was three
+        //times this and the result was a white slab as tall as the NPC — which read as a
+        //chat room sitting in the field rather than as a label on a person, because that is
+        //exactly the size and shape a chat room is.
+        private const float FontSize = 0.6f;
+        private const float PadX = 0.16f;
+        private const float PadY = 0.10f;
+        private const float IconSize = 0.36f;
+        private const float IconGap = 0.09f;
+        private const float BorderWidth = 0.03f;
         private const string SignName = "NpcSign";
 
         private float timer;
