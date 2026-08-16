@@ -168,16 +168,34 @@ public class NpcInteractionState
     /// say so itself. Nothing has to be tidied up afterwards: how many skill points a
     /// character has is worked out from their job level less what they have spent, so it
     /// comes out correct on its own once the stats are refreshed.
+    ///
+    /// One is the floor, and not by choice. A job level of zero is not a state this server
+    /// can hold: loading a character repairs a zero to one, so it would not survive a
+    /// logout, and the job stat bonus table is indexed by job level minus one, so a zero
+    /// reads the row belonging to the job before it.
     /// </summary>
     public void SetJobLevel(int level)
     {
-        if (Player == null || level < 1)
+        if (Player == null)
             return;
+
+        if (level < 1)
+            level = 1;
 
         Player.SetData(PlayerStat.JobLevel, level);
         Player.SetData(PlayerStat.JobExp, 0);
         Player.UpdateStats();
     }
+
+    /// <summary>
+    /// Sets the player's base level, wiping the experience toward the next one.
+    ///
+    /// Anything already spent has to be given back before this is called, or the character
+    /// is left owing points: how many stat points a character has is their level's
+    /// allowance less what is spent, and at a level lower than the one they spent at, that
+    /// subtraction goes negative.
+    /// </summary>
+    public void SetBaseLevel(int level) => Player?.JumpToLevel(level);
 
     public void HealPlayerFull()
     {

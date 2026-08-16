@@ -134,6 +134,13 @@ macro JobMasterSecondJob()
 		return;
 	}
 
+	if(UnusedSkillPoints > 0)
+	{
+		Dialog(name, "Job Level 50 แล้วก็จริง แต่ยังเหลือแต้มสกิลอยู่ " + UnusedSkillPoints + " แต้ม " +
+					 "ใช้ให้หมดก่อนนะ แล้วค่อยมาใหม่");
+		return;
+	}
+
 	//the second job that follows from what they are now. Anything else has no skill tree
 	//on this server, so it is not offered at all rather than offered and empty.
 	var target = 0;
@@ -151,10 +158,13 @@ macro JobMasterSecondJob()
 		return;
 	}
 
-	Dialog(name, "Job Level 50 แล้ว! เธอพร้อมเป็น " + targetName + " ได้เลย");
-	Dialog(name, "<color=#CC5500>บอกไว้ก่อนนะ พอเปลี่ยนแล้ว Job Level จะกลับไปเริ่มที่ 10 และสกิลเดิมจะถูกรีเซ็ตทั้งหมด " +
-				 "เพื่อให้เธอไปเก็บสกิลสายใหม่ ส่วน Base Level กับไอเทมไม่หายไปไหน</color>");
-	Dialog(name, "จะเป็น " + targetName + " เลยไหม?");
+	Dialog(name, "Job Level 50 เต็ม แต้มลงครบแล้ว! เธอพร้อมเป็น " + targetName + " ได้เลย");
+	Dialog(name, "<color=#CC0000>อ่านให้ดีก่อนนะ การเป็นอาชีพ 2 คือการเริ่มใหม่ ไม่ใช่การอัปเกรด</color>");
+	Dialog(name, "<color=#CC5500>• <b>Base Level จะถูกลดเหลือ 10</b> (ตอนนี้เธออยู่เลเวล " + Level + ")\n" +
+				 "• Job Level กลับไปเริ่มที่ 1\n" +
+				 "• สกิลและสเตตัสถูกรีเซ็ตทั้งหมด คืนแต้มให้ตามเลเวลใหม่\n" +
+				 "• ไอเทมกับเงินไม่หายไปไหน</color>");
+	Dialog(name, "<color=#CC0000>ย้อนกลับไม่ได้นะ</color> จะเป็น " + targetName + " เลยไหม?");
 
 	Option("เอาเลย", "ขอคิดดูก่อน");
 	if(result == 1)
@@ -164,10 +174,15 @@ macro JobMasterSecondJob()
 	}
 
 	ReleaseFocus();
+	//given back before the level drops, or the character is left owing points: what a
+	//character has spare is their level's allowance less what is spent, and at a lower
+	//level than they spent at, that subtraction goes negative
+	StatPointReset();
 	SkillReset();
 	ChangePlayerJob(target);
 	//ChangeJob only puts the job level back when leaving novice, so this step says it
-	SetJobLevel(10);
+	SetJobLevel(1);
+	SetBaseLevel(10);
 	ShowEffectOnPlayer("JobUp");
 
 	ShowSprite("bard_eland02", right);
