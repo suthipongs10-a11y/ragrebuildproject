@@ -5,6 +5,7 @@ using Assets.Scripts.Network.IncomingPacketHandlers.Character;
 using Assets.Scripts.Network.IncomingPacketHandlers.Party;
 using Assets.Scripts.Network.IncomingPacketHandlers.Combat;
 using Assets.Scripts.Network.IncomingPacketHandlers.Environment;
+using Assets.Scripts.Network.IncomingPacketHandlers.Guilds;
 using Assets.Scripts.Network.IncomingPacketHandlers.Network;
 using Assets.Scripts.Network.IncomingPacketHandlers.System;
 using Assets.Scripts.Network.HandlerBase;
@@ -15,7 +16,7 @@ namespace Assets.Scripts.Network.PacketBase
 	{
 		static ClientPacketHandler()
 		{
-			handlers = new ClientPacketHandlerBase[114];
+			handlers = new ClientPacketHandlerBase[116];
 			handlers[0] = new InvalidPacket(); //PlayerReady
 			handlers[1] = new PacketOnEnterServer(); //EnterServer
 			handlers[2] = new InvalidPacket(); //Ping
@@ -130,6 +131,8 @@ namespace Assets.Scripts.Network.PacketBase
 			handlers[111] = new InvalidPacket(); //StartWalkInDirection
 			handlers[112] = new PacketResetMotion(); //ResetMotion
 			handlers[113] = new PacketToggleActivatedState(); //ToggleActivatedState
+			handlers[114] = new InvalidPacket(); //GuildAction
+			handlers[115] = new PacketGuildData(); //GuildData
 		}
 	}
 }

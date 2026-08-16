@@ -8,6 +8,7 @@ using Assets.Scripts.Network.HandlerBase;
 using RebuildSharedData.Networking;
 using UnityEditor;
 using UnityEditor.Compilation;
+using UnityEngine;
 
 namespace Assets.Scripts.Network
 {
@@ -20,22 +21,21 @@ namespace Assets.Scripts.Network
 
             var code = new StringBuilder();
 
-            code.Append("using Assets.Scripts.Network;\nusing Assets.Scripts.Network.PacketBase;\nusing Assets.Scripts.Network.IncomingPacketHandlers;\n");
-            code.Append("using Assets.Scripts.Network.IncomingPacketHandlers.Character;\n");
-            code.Append("using Assets.Scripts.Network.IncomingPacketHandlers.Party;\n");
-            code.Append("using Assets.Scripts.Network.IncomingPacketHandlers.Combat;\n");
-            code.Append("using Assets.Scripts.Network.IncomingPacketHandlers.Environment;\n");
-            code.Append("using Assets.Scripts.Network.IncomingPacketHandlers.Network;\n");
-            code.Append("using Assets.Scripts.Network.IncomingPacketHandlers.System;\n");
-            code.Append("using Assets.Scripts.Network.HandlerBase;\n\n");
-            code.Append("namespace Assets.Scripts.Network.PacketBase\n{\n\tpublic static partial class ClientPacketHandler\n\t{\n\t\tstatic ClientPacketHandler()\n\t\t{\n");
-            code.Append($"\t\t\thandlers = new ClientPacketHandlerBase[{count}];\n");
-
             var handlers = new List<string>();
             for (var i = 0; i < count; i++)
                 handlers.Add($"\t\t\thandlers[{i}] = new InvalidPacket(); //{(PacketType)i}");
-            
-            //var handlers = new SkillHandlerBase[count];
+
+            //Collected from the handlers that were actually found rather than listed here by
+            //hand. The list used to be written out above, which meant a handler in a folder
+            //nobody had thought of yet generated a file that would not compile - and the
+            //first guild packet did exactly that. Whatever namespace a handler turns up in
+            //is imported because it turned up there.
+            //InvalidPacket fills every slot nothing handles and carries no attribute of its
+            //own, so its namespace is never discovered and has to be named outright.
+            var namespaces = new SortedSet<string>(StringComparer.Ordinal)
+            {
+                "Assets.Scripts.Network.IncomingPacketHandlers"
+            };
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -45,9 +45,31 @@ namespace Assets.Scripts.Network
                     var attr = type.GetCustomAttribute<ClientPacketHandlerAttribute>();
                     var packetType = attr.PacketType;
 
+                    //A handler for a packet the client's copy of the enum does not have yet
+                    //would otherwise be written past the end of the array. That happens when
+                    //the shared library is newer than the one in the client, which is the
+                    //normal state of things between a server build and updateclient.bat.
+                    if ((int)packetType < 0 || (int)packetType >= count)
+                    {
+                        Debug.LogWarning($"[PacketHandlerCodeGen] {type.Name} handles {packetType}, which is "
+                                         + "not in this client's PacketType. Run updateclient.bat and generate "
+                                         + "again.");
+                        continue;
+                    }
+
+                    if (!string.IsNullOrEmpty(type.Namespace))
+                        namespaces.Add(type.Namespace);
+
                     handlers[(int)packetType] = $"\t\t\thandlers[{(int)packetType}] = new {type.Name}(); //{packetType}";
                 }
             }
+
+            code.Append("using Assets.Scripts.Network;\nusing Assets.Scripts.Network.PacketBase;\n");
+            foreach (var space in namespaces)
+                code.Append($"using {space};\n");
+            code.Append("using Assets.Scripts.Network.HandlerBase;\n\n");
+            code.Append("namespace Assets.Scripts.Network.PacketBase\n{\n\tpublic static partial class ClientPacketHandler\n\t{\n\t\tstatic ClientPacketHandler()\n\t\t{\n");
+            code.Append($"\t\t\thandlers = new ClientPacketHandlerBase[{count}];\n");
 
             foreach (var l in handlers)
                 code.Append(l).Append("\n");
