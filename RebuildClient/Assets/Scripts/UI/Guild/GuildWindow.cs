@@ -36,6 +36,9 @@ namespace Assets.Scripts.UI.Guild
         private const float DotSize = 9f;
         private const float NameLeft = 24f;
         private const float KickWidth = 54f;
+        private const float AnswerWidth = 52f;
+        private const float JoinWidth = 82f;
+        private const float HeadingHeight = 22f;
 
         /// <summary>How often the roster is asked for again while the tab is on screen.</summary>
         private const float RefreshInterval = 6f;
@@ -48,6 +51,7 @@ namespace Assets.Scripts.UI.Guild
         private TextMeshProUGUI title;
         private TextMeshProUGUI subtitle;
         private Button leaveButton;
+        private Button browseButton;
 
         private readonly List<GameObject> rows = new List<GameObject>();
 
@@ -89,6 +93,14 @@ namespace Assets.Scripts.UI.Guild
                 new Vector2(-Pad, -Pad), new Vector2(96f, ButtonRowHeight));
             ModernUiTheme.AddBorder((RectTransform)leaveButton.transform, ModernUiTheme.CardBorderColor);
             leaveButton.onClick.AddListener(() => Send(GuildRequestType.Leave));
+
+            //Sits where the leave button sits, since the two are never both wanted: you are
+            //either in a guild and might leave it, or you are not and might look for one.
+            browseButton = ModernUiTheme.CreateButton(root, "Browse", "ค้นหากิลด์",
+                ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeLabel);
+            ModernUiTheme.Place((RectTransform)browseButton.transform, new Vector2(1, 1),
+                new Vector2(-Pad, -Pad), new Vector2(96f, ButtonRowHeight));
+            browseButton.onClick.AddListener(() => Send(GuildRequestType.ListGuilds));
 
             //A sunken tray, which is also what catches the drag that scrolls it: the gaps
             //between the rows would otherwise pass the pointer straight through.
@@ -133,6 +145,12 @@ namespace Assets.Scripts.UI.Guild
             {
                 refreshTimer = RefreshInterval;
                 Send(GuildRequestType.Refresh);
+
+                //Only worth asking while there is no guild to be in. Once there is one the
+                //list is a page you never look at, and asking anyway would have the server
+                //walk every loaded guild every six seconds for nobody.
+                if (!GuildState.InGuild)
+                    Send(GuildRequestType.ListGuilds);
             }
 
             if (drawnRevision == GuildState.Revision)
@@ -156,6 +174,13 @@ namespace Assets.Scripts.UI.Guild
                 network.SendGuildAction(action, name);
         }
 
+        private static void Send(GuildRequestType action, int guildId)
+        {
+            var network = NetworkManager.Instance;
+            if (network != null)
+                network.SendGuildAction(action, guildId);
+        }
+
         private void Redraw()
         {
             ClearRows();
@@ -163,12 +188,14 @@ namespace Assets.Scripts.UI.Guild
             if (!GuildState.InGuild)
             {
                 title.text = "ยังไม่ได้อยู่ในกิลด์";
-                subtitle.text = "สร้างกิลด์ด้วยคำสั่ง  /guild create <ชื่อกิลด์>";
+                subtitle.text = "สร้างกิลด์ด้วย  /guild create <ชื่อกิลด์>  หรือขอเข้ากิลด์ข้างล่าง";
                 leaveButton.gameObject.SetActive(false);
-                body.sizeDelta = new Vector2(0, 0);
+                browseButton.gameObject.SetActive(true);
+                DrawBrowse();
                 return;
             }
 
+            browseButton.gameObject.SetActive(false);
             title.text = GuildState.GuildName;
 
             var online = 0;
@@ -185,6 +212,25 @@ namespace Assets.Scripts.UI.Guild
             leaveButton.gameObject.SetActive(!GuildState.IsLeader);
 
             var y = -RowGap;
+
+            //Above the roster rather than behind a button. Somebody waiting to be let in is
+            //the only thing on this page that is waiting on the person reading it, and a
+            //queue you have to go looking for is a queue nobody answers.
+            if (GuildState.IsLeader && GuildState.JoinRequests.Count > 0)
+            {
+                BuildHeading($"คำขอเข้ากิลด์  ({GuildState.JoinRequests.Count})", y);
+                y -= HeadingHeight;
+
+                foreach (var applicant in GuildState.JoinRequests)
+                {
+                    BuildRequestRow(applicant, y);
+                    y -= RowHeight + RowGap;
+                }
+
+                BuildHeading("สมาชิก", y - RowGap);
+                y -= HeadingHeight + RowGap;
+            }
+
             for (var i = 0; i < GuildState.Members.Count; i++)
             {
                 BuildRow(GuildState.Members[i], y);
@@ -194,18 +240,158 @@ namespace Assets.Scripts.UI.Guild
             body.sizeDelta = new Vector2(0, -y);
         }
 
-        private void BuildRow(GuildMemberInfo member, float y)
+        /// <summary>
+        /// The guilds you could ask to join.
+        ///
+        /// Which is not every guild that exists, and the note says so. The server can only
+        /// list the guilds it has in memory, and one whose members are all offline was never
+        /// loaded — so a guild missing from here is not a guild that is gone, it is one with
+        /// nobody around to answer you anyway.
+        /// </summary>
+        private void DrawBrowse()
         {
-            var row = ModernUiTheme.CreateCard(body, "Member", ModernUiTheme.WindowColor);
-            //Stretched across the tray and positioned by its top edge: sizeDelta.x of minus
-            //twice the gap is an inset on both sides once the anchors span the full width.
+            var y = -RowGap;
+
+            if (!GuildState.BrowseReceived)
+            {
+                BuildNote("กำลังโหลดรายชื่อกิลด์...", y);
+                body.sizeDelta = new Vector2(0, RowHeight * 2f);
+                return;
+            }
+
+            if (GuildState.Browse.Count == 0)
+            {
+                BuildNote("ยังไม่มีกิลด์ที่เข้าได้ตอนนี้", y);
+                BuildNote("กิลด์จะขึ้นเมื่อมีสมาชิกออนไลน์อยู่", y - HeadingHeight);
+                body.sizeDelta = new Vector2(0, RowHeight * 3f);
+                return;
+            }
+
+            BuildHeading($"กิลด์ในเซิร์ฟเวอร์  ({GuildState.Browse.Count})", y);
+            y -= HeadingHeight;
+
+            foreach (var entry in GuildState.Browse)
+            {
+                BuildGuildRow(entry, y);
+                y -= RowHeight + RowGap;
+            }
+
+            body.sizeDelta = new Vector2(0, -y);
+        }
+
+        /// <summary>A row for one guild, with the one thing you can do about it.</summary>
+        private void BuildGuildRow(GuildBrowseEntry entry, float y)
+        {
+            var row = NewRow(y);
+
+            var full = entry.MemberCount >= GuildState.MaxMembers;
+
+            var name = ModernUiTheme.CreateText(row, "Name", entry.Name,
+                ModernUiTheme.SizeLabel, ModernUiTheme.NameColor, TextAlignmentOptions.Left,
+                FontStyles.Bold);
+            ModernUiTheme.Place(name.rectTransform, new Vector2(0, 0.5f),
+                new Vector2(12f, 0f), new Vector2(240f, RowHeight));
+
+            var count = ModernUiTheme.CreateText(row, "Count",
+                $"{entry.MemberCount}/{GuildState.MaxMembers}" + (full ? "  เต็ม" : ""),
+                ModernUiTheme.SizeLabel,
+                full ? ModernUiTheme.MutedColor : ModernUiTheme.LabelColor,
+                TextAlignmentOptions.Left);
+            ModernUiTheme.Place(count.rectTransform, new Vector2(0, 0.5f),
+                new Vector2(258f, 0f), new Vector2(120f, RowHeight));
+
+            //Asked already, or nowhere to put you: either way the button would only produce a
+            //refusal, so it says why instead of offering.
+            if (entry.AlreadyAsked || full)
+            {
+                var said = ModernUiTheme.CreateText(row, "Asked",
+                    entry.AlreadyAsked ? "ส่งคำขอแล้ว" : "-",
+                    ModernUiTheme.SizeLabel, ModernUiTheme.MutedColor, TextAlignmentOptions.Right);
+                ModernUiTheme.Place(said.rectTransform, new Vector2(1, 0.5f),
+                    new Vector2(-10f, 0f), new Vector2(JoinWidth + 10f, RowHeight));
+                return;
+            }
+
+            var join = ModernUiTheme.CreateButton(row, "Join", "ขอเข้าร่วม",
+                ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeLabel);
+            ModernUiTheme.Place((RectTransform)join.transform, new Vector2(1, 0.5f),
+                new Vector2(-6f, 0f), new Vector2(JoinWidth, RowHeight - 6f));
+
+            //captured now, because the row is thrown away and rebuilt on the next refresh
+            var id = entry.GuildId;
+            join.onClick.AddListener(() => Send(GuildRequestType.RequestJoin, id));
+        }
+
+        /// <summary>Somebody asking to be let in, and the two answers.</summary>
+        private void BuildRequestRow(string applicant, float y)
+        {
+            var row = NewRow(y);
+
+            var name = ModernUiTheme.CreateText(row, "Name", applicant,
+                ModernUiTheme.SizeLabel, ModernUiTheme.NameColor, TextAlignmentOptions.Left,
+                FontStyles.Bold);
+            ModernUiTheme.Place(name.rectTransform, new Vector2(0, 0.5f),
+                new Vector2(12f, 0f), new Vector2(240f, RowHeight));
+
+            var target = applicant;
+
+            var reject = ModernUiTheme.CreateButton(row, "Reject", "ปฏิเสธ",
+                ModernUiTheme.CardColor, ModernUiTheme.NameColor, ModernUiTheme.SizeLabel);
+            ModernUiTheme.Place((RectTransform)reject.transform, new Vector2(1, 0.5f),
+                new Vector2(-6f, 0f), new Vector2(AnswerWidth, RowHeight - 6f));
+            reject.onClick.AddListener(() => Send(GuildRequestType.RejectRequest, target));
+
+            var accept = ModernUiTheme.CreateButton(row, "Accept", "รับเข้า",
+                ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeLabel);
+            ModernUiTheme.Place((RectTransform)accept.transform, new Vector2(1, 0.5f),
+                new Vector2(-(AnswerWidth + 12f), 0f), new Vector2(AnswerWidth, RowHeight - 6f));
+            accept.onClick.AddListener(() => Send(GuildRequestType.ApproveRequest, target));
+        }
+
+        private void BuildHeading(string text, float y)
+        {
+            var label = ModernUiTheme.CreateText(body, "Heading", text,
+                ModernUiTheme.SizeLabel, ModernUiTheme.LabelColor, TextAlignmentOptions.Left,
+                FontStyles.Bold);
+            var rect = label.rectTransform;
+            rect.anchorMin = new Vector2(0, 1);
+            rect.anchorMax = new Vector2(1, 1);
+            rect.pivot = new Vector2(0.5f, 1);
+            rect.sizeDelta = new Vector2(-24f, HeadingHeight);
+            rect.anchoredPosition = new Vector2(0, y);
+            rows.Add(label.gameObject);
+        }
+
+        private void BuildNote(string text, float y)
+        {
+            var label = ModernUiTheme.CreateText(body, "Note", text,
+                ModernUiTheme.SizeLabel, ModernUiTheme.MutedColor, TextAlignmentOptions.Left);
+            var rect = label.rectTransform;
+            rect.anchorMin = new Vector2(0, 1);
+            rect.anchorMax = new Vector2(1, 1);
+            rect.pivot = new Vector2(0.5f, 1);
+            rect.sizeDelta = new Vector2(-24f, HeadingHeight);
+            rect.anchoredPosition = new Vector2(0, y);
+            rows.Add(label.gameObject);
+        }
+
+        /// <summary>The card every row of every list is drawn on.</summary>
+        private RectTransform NewRow(float y)
+        {
+            var row = ModernUiTheme.CreateCard(body, "Row", ModernUiTheme.WindowColor);
             row.anchorMin = new Vector2(0, 1);
             row.anchorMax = new Vector2(1, 1);
             row.pivot = new Vector2(0.5f, 1);
             row.sizeDelta = new Vector2(-RowGap * 2f, RowHeight);
             row.anchoredPosition = new Vector2(0, y);
+            row.GetComponent<Image>().raycastTarget = false;
             rows.Add(row.gameObject);
+            return row;
+        }
 
+        private void BuildRow(GuildMemberInfo member, float y)
+        {
+            var row = NewRow(y);
             //Online or not is the one thing worth seeing without reading, because it decides
             //whether there is any point typing to them.
             var dot = ModernUiTheme.CreateCard(row, "Dot",
