@@ -62,13 +62,28 @@ Unity build เป็น WebGL ใช้เวลานาน (เป็นส�
 
 ### ขั้นที่ 4 — Player Settings
 
-ปุ่ม `Player Settings` อยู่มุมขวาบนของหน้า `Build Profiles`
+ปุ่ม `Player Settings` มุมขวาบนของหน้า `Build Profiles`
+(หรือ `Edit → Project Settings → Player` ก็หน้าเดียวกัน)
 
-- `Resolution and Presentation → WebGL Template` → **Ragnarok**
-  (Unity บาง version เขียนว่า `Web Template` โฟลเดอร์ต้นทางคือ `Assets/WebGLTemplates/Ragnarok`)
-- `Publishing Settings → Compression Format` → **Gzip**
-  (เซิร์ฟเวอร์รองรับทั้ง Gzip, Brotli และไม่บีบอัด แต่ Gzip โหลดเร็วและไม่มีปัญหากับ Safari บน iOS)
-- `Publishing Settings → Decompression Fallback` → **ติ๊กถูก**
+หัวเรื่องบนสุดต้องเขียนว่า **"Settings for Web, Facebook Instant Games"** ถึงจะใช่ platform ที่ถูก
+
+ข้างในเป็นหัวข้อพับเก็บไว้ทั้งหมด **ต้องกดสามเหลี่ยม ► เพื่อกาง** ของที่ต้องแก้อยู่คนละหัวข้อกัน:
+
+| หัวข้อ | ตั้งค่า | ค่าเริ่มต้น |
+|---|---|---|
+| `Resolution and Presentation` | `WebGL Template` → **Ragnarok** | Default |
+| `Publishing Settings` | `Compression Format` → **Gzip** | **Disabled** |
+| `Publishing Settings` | `Decompression Fallback` → **ติ๊กถูก** | ไม่ติ๊ก |
+
+- Template: Unity บาง version เขียนว่า `Web Template` โฟลเดอร์ต้นทางคือ `Assets/WebGLTemplates/Ragnarok`
+- Compression: เซิร์ฟเวอร์รองรับทั้ง Gzip, Brotli และไม่บีบอัด แต่ Gzip โหลดเร็วและไม่มีปัญหากับ Safari บน iOS
+- Decompression Fallback ติ๊กไว้ปลอดภัยกว่า ถึงเซิร์ฟเวอร์เราจะส่ง `Content-Encoding` ถูกอยู่แล้ว
+  ก็ไม่ตีกัน (Unity จะใช้ตัวสำรองเฉพาะตอนเบราว์เซอร์ไม่ได้แตกไฟล์ให้)
+
+**อยากให้โหลดรอบสองเร็วขึ้น** (มีประโยชน์มากตอนเทสบนมือถือซ้ำ ๆ):
+`Publishing Settings → Data Caching` → ติ๊กถูก
+เบราว์เซอร์จะเก็บไฟล์เกมไว้ใน IndexedDB ไม่ต้องโหลดใหม่ทุกครั้ง
+และไม่ต้องกลัวได้ของเก่า เพราะ `WebGLUnfucker` เปลี่ยนชื่อโฟลเดอร์ทุก build อยู่แล้ว URL จึงไม่ซ้ำ
 
 ส่วน `Platform Settings (Web)` ในหน้า Build Profiles ปล่อยตามเดิมได้:
 `Code Optimization: Shorter Build Time` เหมาะกับตอนเทส (build เร็ว)
@@ -142,7 +157,19 @@ http://192.168.1.107:5000/
 
 ## ข้อจำกัดที่ต้องรู้ก่อน
 
-**Unity WebGL จองหน่วยความจำเป็นก้อนคงที่ตอน build และคืนให้เบราว์เซอร์ไม่ได้**
+**Unity WebGL จองหน่วยความจำแล้วคืนให้เบราว์เซอร์ไม่ได้**
 ในแมพที่มีผู้เล่นแต่งตัวต่างกันเยอะ ๆ เท็กซ์เจอร์จะกินขึ้นเรื่อย ๆ จนแท็บดับ
 
 เซิร์ฟเวอร์เราคนน้อย ปัญหานี้อาจไม่เกิดเลย — **ต้องวัดจริงก่อน** ถ้าเจอค่อยว่ากัน
+
+ถ้าแท็บบนมือถือดับกลางทาง ปุ่มที่ต้องไปหมุนอยู่ที่
+`Player Settings → Publishing Settings → WebAssembly Language Features`:
+
+| ค่า | ตอนนี้ | หมายเหตุ |
+|---|---|---|
+| `Initial Memory Size` | 32 MB | เริ่มน้อยแล้วค่อยโต |
+| `Memory Growth Mode` | Geometric | โตเป็นเท่าตัว |
+| `Maximum Memory Size` | 2048 MB | **เพดานนี้สูงกว่าที่มือถือหลายรุ่นยอมให้** |
+
+มือถือมักตัดที่ต่ำกว่า 2 GB มาก พอเกมขอเกินที่เครื่องให้ แท็บก็ดับทันทีโดยไม่มี error
+**อย่าเพิ่งไปแก้ตอนนี้** — วัดก่อนว่าดับจริงไหม ที่แมพไหน แล้วค่อยลดเพดานลงมา
