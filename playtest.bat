@@ -21,14 +21,34 @@ echo.
 rem --------------------------------------------------------------
 echo [1/4] Checking the browser build...
 set "WEBCLIENT=%ROOT%RoRebuildServer\RoRebuildServer\bin\Debug\net9.0\WebClient"
+set "BUILDFOLDER="
 if exist "%WEBCLIENT%\index.html" (
     echo   Found one at:
     echo     %WEBCLIENT%
-    rem index.html is rewritten after every build to name the folder the build
-    rem actually went into, so reading it back is proof the build landed rather
-    rem than a guess that it did
-    for /f "tokens=2 delims== " %%A in ('findstr /C:"buildUrl" "%WEBCLIENT%\index.html"') do (
-        echo   Serving build: %%~A
+    rem index.html names the folder the build actually went into - it is rewritten
+    rem after every build - so reading it back and looking for that folder checks
+    rem the two halves still agree. Pulled out with PowerShell because batch has no
+    rem way to take the inside of a quoted string that is not worse than this.
+    for /f "usebackq delims=" %%A in (`powershell -NoProfile -Command "$m=Select-String -Path '%WEBCLIENT%\index.html' -Pattern 'buildUrl\s*=\s*\""([^\"" ]+)\"'; if($m){$m.Matches[0].Groups[1].Value}"`) do set "BUILDFOLDER=%%A"
+)
+
+if exist "%WEBCLIENT%\index.html" (
+    if defined BUILDFOLDER (
+        if exist "%WEBCLIENT%\%BUILDFOLDER%\" (
+            echo   Serving build: %BUILDFOLDER%
+        ) else (
+            echo.
+            echo   **************************************************************
+            echo   index.html asks for a folder called "%BUILDFOLDER%"
+            echo   and there is no such folder next to it. The page will load and
+            echo   then sit on "Loading..." forever, because every file it wants
+            echo   is a 404.
+            echo   Fix: build again, and delete the old Build_* folders first.
+            echo   **************************************************************
+            echo.
+        )
+    ) else (
+        echo   Could not read the build folder out of index.html.
     )
 ) else (
     echo   No browser build yet - only this PC will be able to play,
