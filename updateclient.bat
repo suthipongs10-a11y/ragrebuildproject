@@ -112,11 +112,11 @@ rem --------------------------------------------------------------
 echo [6/6] Starting the server...
 rem netstat is asked for the exact port so that a stray 15000 or 50001 does not
 rem read as a server already being up
+set "STALESERVER="
 netstat -an | findstr /C:":5000 " | findstr /C:"LISTENING" >nul
 if not errorlevel 1 (
+    set "STALESERVER=1"
     echo   Something is already listening on port 5000, so it is left alone.
-    echo   If that is an old server holding stale data, close its window and
-    echo   run this file again.
 ) else (
     start "RoRebuild Server" /d "%ROOT%RoRebuildServer\RoRebuildServer" cmd /k dotnet run
     echo   Opened in a window of its own.
@@ -125,6 +125,23 @@ if not errorlevel 1 (
 
 echo.
 echo ==============================================================
+if defined STALESERVER (
+    echo   **************************************************************
+    echo   THE SERVER WAS NOT RESTARTED.
+    echo.
+    echo   A server was already running on port 5000, so the one you
+    echo   have is still the one that started before this run. It is
+    echo   serving the OLD data and the OLD protocol number, while the
+    echo   client you are about to play has just been given the new
+    echo   ones. Logging in will fail with:
+    echo.
+    echo       your client protocol vNN does not match the server vNN
+    echo.
+    echo   Close the black RoRebuild Server window and run this file
+    echo   again. Nothing else needs doing.
+    echo   **************************************************************
+    echo.
+)
 echo   Ready.
 echo.
 echo   On this PC:
