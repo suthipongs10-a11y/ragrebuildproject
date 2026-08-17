@@ -127,6 +127,13 @@ namespace Assets.Scripts.UI.Mobile
             CreateButton(controlGroup, UtilSlot(0, 3), UtilSize, ZoomColor, null, () => Zoom(-6f), "+", true);
             CreateButton(controlGroup, UtilSlot(1, 3), UtilSize, ZoomColor, null, () => Zoom(6f), "-", true);
 
+            //The last free slot in the block, and the one thing a phone had no way to do at
+            //all: pick out a particular person. Every other button here chooses its own
+            //target and always the nearest one, which is right for swinging a sword and
+            //wrong for anything aimed at somebody in particular.
+            CreateButton(controlGroup, UtilSlot(2, 3), UtilSize, TalkColor, null,
+                NearbyPeopleWindow.Toggle, ThaiUiText.Get("Nearby"), true);
+
             toggleButton = CreateButton(root, new Vector2(-24, 96), ToggleSize, ZoomColor, CreateMenuSprite(), ToggleControls);
 
             //nothing is shown until a character is actually in the world, and even then
