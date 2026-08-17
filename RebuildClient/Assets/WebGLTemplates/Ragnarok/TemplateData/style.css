@@ -15,3 +15,17 @@ html, body { padding: 0; margin: 0; background: #231F20 }
 #unity-build-title { float: right; margin-right: 10px; line-height: 38px; font-family: arial; font-size: 18px }
 #unity-fullscreen-button { float: right; width: 38px; height: 38px; background: url('fullscreen-button.png') no-repeat center }
 #unity-warning { position: absolute; left: 50%; top: 5%; transform: translate(-50%); background: white; padding: 10px; display: none }
+
+/* The desktop canvas is a fixed 960 by 600 - the size in Player Settings - written
+   straight onto the element by the loader, and the container is then centred on the
+   page. In any window narrower than that the canvas hangs off both sides, and since
+   the game keeps its menu in the bottom right corner, the menu is the first thing to
+   go. Marked important because it is an inline style being overridden, which is the
+   one case where a stylesheet needs it.
+
+   Height leaves room for the footer strip and the links under it, so the page itself
+   never has to scroll. The engine matches its render target to the element's size on
+   its own, so resizing the window re-renders at the new size with nothing else to do. */
+.unity-desktop #unity-container { left: 0 !important; top: 0 !important; transform: none !important }
+.unity-desktop #unity-canvas { width: 100vw !important; height: calc(100vh - 90px) !important }
+html, body { overflow-x: hidden }
