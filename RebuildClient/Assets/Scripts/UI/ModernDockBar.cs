@@ -227,7 +227,19 @@ namespace Assets.Scripts.UI
 
             canvasRect = CanvasOf(zone);
 
-            var bar = ModernUiTheme.CreateCard(root, "ModernDock", ModernUiTheme.WindowColor, true);
+            //Hung on the canvas itself, not on the zone it replaces.
+            //
+            //The zone is a scene object laid out for a wide window, and on a phone held
+            //upright its bottom right corner is not the screen's bottom right corner. Three
+            //attempts at measuring the difference and correcting for it all worked on a
+            //desktop and none of them worked on a phone, and with no console on a phone
+            //there was no way to see which of the zone's rect, its layout group, or its
+            //scale was doing it. So the zone stops being involved: anchored to the corner of
+            //the canvas, the bar is where the corner of the screen is, and none of those
+            //three can move it.
+            var host = canvasRect != null ? canvasRect : root;
+
+            var bar = ModernUiTheme.CreateCard(host, "ModernDock", ModernUiTheme.WindowColor, true);
             dockBar = bar;
 
             //The tiles are sized to what there is room for rather than to a number picked on
@@ -260,7 +272,7 @@ namespace Assets.Scripts.UI
             var menuTile = BuildTile(bar, "Menu", ModernUiIcons.Grid, Primary.Length, tileWidth);
             menuTile.onClick.AddListener(ToggleMenu);
 
-            BuildMenu(root, buttons);
+            BuildMenu(host, buttons);
 
             Debug.Log($"[ModernDockBar] Folded {buttons.Count} window buttons into {count} tiles.");
         }
@@ -295,12 +307,12 @@ namespace Assets.Scripts.UI
         /// hidden. It sits above the bar rather than below it because the bar is already
         /// at the bottom of the screen.
         /// </summary>
-        private void BuildMenu(RectTransform root, IReadOnlyDictionary<string, Button> buttons)
+        private void BuildMenu(RectTransform host, IReadOnlyDictionary<string, Button> buttons)
         {
             //a full screen transparent sheet under the drawer, so that clicking anywhere
             //else puts it away. Without one the only way to close it is the tile again.
             clickCatcher = new GameObject("ModernDockCatcher", typeof(Image), typeof(Button));
-            clickCatcher.transform.SetParent(root, false);
+            clickCatcher.transform.SetParent(host, false);
             var catcherImage = clickCatcher.GetComponent<Image>();
             catcherImage.color = new Color(0, 0, 0, 0);
             catcherImage.raycastTarget = true;
@@ -316,7 +328,7 @@ namespace Assets.Scripts.UI
             var rows = Secondary.Length;
             var height = rows * MenuRow + (rows - 1) * 4f + MenuPad * 2f;
 
-            menuPanel = ModernUiTheme.CreateCard(root, "ModernDockMenu", ModernUiTheme.WindowColor, true);
+            menuPanel = ModernUiTheme.CreateCard(host, "ModernDockMenu", ModernUiTheme.WindowColor, true);
             ModernUiTheme.Place(menuPanel, new Vector2(1, 0), new Vector2(-8f, 58f),
                 new Vector2(MenuWidth, height));
             ModernUiTheme.AttachShadow(menuPanel, 12f);
