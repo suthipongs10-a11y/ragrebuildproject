@@ -67,6 +67,16 @@ namespace Assets.Scripts.UI
         private GameObject clickCatcher;
         private RectTransform dockBar;
         private RectTransform canvasRect;
+
+        /// <summary>
+        /// The zone the bar stands in for, kept only to be asked whether it is on screen.
+        ///
+        /// The bar used to live inside it and was hidden along with it, which is how it
+        /// stayed off the title screen without anybody arranging that. Hanging it on the
+        /// canvas fixed where it sits and lost that for free, so the answer is borrowed
+        /// back: whenever the row of buttons this replaces would be shown, so is this.
+        /// </summary>
+        private GameObject zoneObject;
         private float tileWidth = TileWidth;
         private bool loggedOnce;
         private readonly Vector3[] corners = new Vector3[4];
@@ -126,6 +136,19 @@ namespace Assets.Scripts.UI
 
                 return;
             }
+
+            //Follows the zone on and off screen. The title screen switches it off, and a
+            //dock over the login box is both wrong and clickable.
+            var onScreen = zoneObject != null && zoneObject.activeInHierarchy;
+            if (dockBar != null && dockBar.gameObject.activeSelf != onScreen)
+            {
+                dockBar.gameObject.SetActive(onScreen);
+                if (!onScreen)
+                    CloseMenu();
+            }
+
+            if (!onScreen)
+                return;
 
             ReportOnce();
             ClampIntoCanvas(dockBar);
@@ -209,6 +232,7 @@ namespace Assets.Scripts.UI
         private void Build(GameObject zone)
         {
             ModernUiTheme.MarkSkinned(zone);
+            zoneObject = zone;
 
             var buttons = new Dictionary<string, Button>();
             foreach (var button in zone.GetComponentsInChildren<Button>(true))
