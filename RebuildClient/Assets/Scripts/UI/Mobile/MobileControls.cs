@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using Assets.Scripts.MapEditor;
 using Assets.Scripts.Network;
 using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
@@ -11,18 +9,20 @@ using UnityEngine.UI;
 namespace Assets.Scripts.UI.Mobile
 {
     /// <summary>
-    /// Touch buttons and a minimap for phones and tablets. Everything is created from
-    /// code so the shared scene and prefabs stay untouched, and the whole thing only
-    /// spawns on a device that actually reports touch input.
+    /// Touch buttons for phones and tablets. Everything is created from code so the shared
+    /// scene and prefabs stay untouched, and the whole thing only spawns on a device that
+    /// actually reports touch input.
+    ///
+    /// There is no minimap here. There was one, drawn from the walk data as a stand-in back
+    /// when the game's own minimap could not be reached on a phone; the real one works there
+    /// now, so the stand-in was a second map drawn over the first, on the only kind of screen
+    /// with no room for either.
     /// </summary>
     public class MobileControls : MonoBehaviour
     {
         private const float TargetSearchRange = 40f;
         private const float PickUpSearchRange = 20f;
         private const float TalkSearchRange = 15f;
-        private const int MinimapPixels = 240;
-        private const int MaxEnemyBlips = 40;
-        private const float BlipRefreshInterval = 0.2f;
 
         //action buttons sit under the right thumb, everything else is grouped bottom left
         private const float AttackSize = 110f;
@@ -44,19 +44,10 @@ namespace Assets.Scripts.UI.Mobile
         private static readonly Color PickUpColor = new Color(0.18f, 0.60f, 0.30f, 0.45f);
         private static readonly Color ZoomColor = new Color(0.25f, 0.28f, 0.35f, 0.35f);
         private static readonly Color TalkColor = new Color(0.85f, 0.60f, 0.20f, 0.45f);
-        private static readonly Color WalkableColor = new Color(0.55f, 0.62f, 0.45f, 0.85f);
-        private static readonly Color BlockedColor = new Color(0.12f, 0.13f, 0.15f, 0.85f);
 
         private RectTransform controlGroup;
-        private RectTransform minimapArea;
-        private RawImage minimapImage;
-        private Texture2D minimapTexture;
-        private RectTransform playerBlip;
-        private readonly List<RectTransform> enemyBlips = new List<RectTransform>();
 
         private Sprite circleSprite;
-        private string builtMapName = "";
-        private float blipTimer;
         private GridLayoutGroup menuGrid;
         private RectTransform menuRect;
         private float menuFitWidth = -1f;
@@ -136,8 +127,6 @@ namespace Assets.Scripts.UI.Mobile
             CreateButton(controlGroup, UtilSlot(0, 3), UtilSize, ZoomColor, null, () => Zoom(-6f), "+", true);
             CreateButton(controlGroup, UtilSlot(1, 3), UtilSize, ZoomColor, null, () => Zoom(6f), "-", true);
 
-            CreateMinimap(controlGroup);
-
             toggleButton = CreateButton(root, new Vector2(-24, 96), ToggleSize, ZoomColor, CreateMenuSprite(), ToggleControls);
 
             //nothing is shown until a character is actually in the world, and even then
@@ -182,14 +171,6 @@ namespace Assets.Scripts.UI.Mobile
 
             RestructureBottomMenu();
             UpdateJoystickWalk();
-            RefreshMinimapForCurrentMap();
-
-            blipTimer -= Time.deltaTime;
-            if (blipTimer > 0)
-                return;
-
-            blipTimer = BlipRefreshInterval;
-            RefreshBlips();
         }
 
         /// <summary>
@@ -494,117 +475,6 @@ namespace Assets.Scripts.UI.Mobile
                 camera.Distance += amount;
         }
 
-        //---------------------------------------------------------------- minimap
-
-        private void CreateMinimap(RectTransform root)
-        {
-            minimapArea = CreatePanel(root, "Minimap", new Vector2(1, 1), new Vector2(-20, -20),
-                new Vector2(MinimapPixels, MinimapPixels), new Color(0, 0, 0, 0.3f));
-
-            var imageObject = new GameObject("MinimapImage", typeof(RawImage));
-            imageObject.transform.SetParent(minimapArea, false);
-            minimapImage = imageObject.GetComponent<RawImage>();
-            minimapImage.raycastTarget = false;
-
-            var imageRect = imageObject.GetComponent<RectTransform>();
-            imageRect.anchorMin = Vector2.zero;
-            imageRect.anchorMax = Vector2.one;
-            imageRect.offsetMin = new Vector2(4, 4);
-            imageRect.offsetMax = new Vector2(-4, -4);
-
-            playerBlip = CreateBlip(minimapArea, new Color(1f, 1f, 0.3f, 1f), 14);
-        }
-
-        private void RefreshMinimapForCurrentMap()
-        {
-            var map = NetworkManager.Instance == null ? "" : NetworkManager.Instance.CurrentMap;
-            if (string.IsNullOrEmpty(map) || map == builtMapName)
-                return;
-
-            var walkData = RoWalkDataProvider.Instance;
-            if (walkData == null || walkData.WalkData == null)
-                return;
-
-            var width = walkData.WalkData.Width;
-            var height = walkData.WalkData.Height;
-            if (width <= 0 || height <= 0)
-                return;
-
-            if (minimapTexture != null)
-                Destroy(minimapTexture);
-
-            minimapTexture = new Texture2D(width, height, TextureFormat.RGBA32, false)
-            {
-                filterMode = FilterMode.Point,
-                wrapMode = TextureWrapMode.Clamp
-            };
-
-            var pixels = new Color32[width * height];
-            for (var y = 0; y < height; y++)
-            {
-                for (var x = 0; x < width; x++)
-                    pixels[y * width + x] = walkData.IsCellWalkable(new Vector2Int(x, y)) ? WalkableColor : BlockedColor;
-            }
-
-            minimapTexture.SetPixels32(pixels);
-            minimapTexture.Apply();
-
-            minimapImage.texture = minimapTexture;
-            builtMapName = map;
-        }
-
-        private void RefreshBlips()
-        {
-            var player = PlayerObject();
-            var walkData = RoWalkDataProvider.Instance;
-
-            if (player == null || walkData == null || walkData.WalkData == null || minimapTexture == null)
-            {
-                playerBlip.gameObject.SetActive(false);
-                for (var i = 0; i < enemyBlips.Count; i++)
-                    enemyBlips[i].gameObject.SetActive(false);
-                return;
-            }
-
-            playerBlip.gameObject.SetActive(true);
-            playerBlip.anchoredPosition = MinimapPosition(walkData, player.transform.position);
-
-            var used = 0;
-            foreach (var entity in NetworkManager.Instance.EntityList.Values)
-            {
-                if (used >= MaxEnemyBlips)
-                    break;
-
-                if (!IsValidTarget(entity))
-                    continue;
-
-                while (enemyBlips.Count <= used)
-                    enemyBlips.Add(CreateBlip(minimapArea, new Color(1f, 0.35f, 0.35f, 1f), 10));
-
-                var blip = enemyBlips[used];
-                blip.gameObject.SetActive(true);
-                blip.anchoredPosition = MinimapPosition(walkData, entity.transform.position);
-                used++;
-            }
-
-            for (var i = used; i < enemyBlips.Count; i++)
-                enemyBlips[i].gameObject.SetActive(false);
-        }
-
-        private Vector2 MinimapPosition(RoWalkDataProvider walkData, Vector3 worldPosition)
-        {
-            var cell = walkData.GetTilePositionForPoint(worldPosition);
-            var width = Mathf.Max(1, walkData.WalkData.Width);
-            var height = Mathf.Max(1, walkData.WalkData.Height);
-
-            //the image is inset by four units on every side, so match that here
-            var usable = MinimapPixels - 8f;
-            var x = (cell.x / (float)width - 0.5f) * usable;
-            var y = (cell.y / (float)height - 0.5f) * usable;
-
-            return new Vector2(x, y);
-        }
-
         //---------------------------------------------------------------- widgets
 
         private GameObject PlayerObject()
@@ -745,44 +615,6 @@ namespace Assets.Scripts.UI.Mobile
                 if (Knob != null)
                     Knob.anchoredPosition = clamped;
             }
-        }
-
-        private RectTransform CreatePanel(RectTransform root, string name, Vector2 anchor, Vector2 offset, Vector2 size, Color color)
-        {
-            var panelObject = new GameObject(name, typeof(Image));
-            panelObject.transform.SetParent(root, false);
-
-            var image = panelObject.GetComponent<Image>();
-            image.color = color;
-            image.raycastTarget = false;
-
-            var rect = panelObject.GetComponent<RectTransform>();
-            rect.anchorMin = anchor;
-            rect.anchorMax = anchor;
-            rect.pivot = anchor;
-            rect.sizeDelta = size;
-            rect.anchoredPosition = offset;
-
-            return rect;
-        }
-
-        private RectTransform CreateBlip(RectTransform parent, Color color, float size)
-        {
-            var blipObject = new GameObject("Blip", typeof(Image));
-            blipObject.transform.SetParent(parent, false);
-
-            var image = blipObject.GetComponent<Image>();
-            image.sprite = circleSprite;
-            image.color = color;
-            image.raycastTarget = false;
-
-            var rect = blipObject.GetComponent<RectTransform>();
-            rect.anchorMin = new Vector2(0.5f, 0.5f);
-            rect.anchorMax = new Vector2(0.5f, 0.5f);
-            rect.pivot = new Vector2(0.5f, 0.5f);
-            rect.sizeDelta = new Vector2(size, size);
-
-            return rect;
         }
 
         //---------------------------------------------------------------- generated art
