@@ -1652,6 +1652,12 @@ public static class CommandBuilder
         var packet = NetworkManager.StartPacket(PacketType.GuildData, 1024);
         packet.Write((byte)GuildDataType.MyGuild);
 
+        //How long before this character may join a guild again. It belongs to the player
+        //rather than to any guild, so it is written before the guild is even looked at and
+        //arrives whether there is one to describe or not - which is the case that matters,
+        //since the only screen that needs it is the one you see while you have no guild.
+        packet.Write(GuildCooldown.SecondsRemaining(p));
+
         var guild = p.Guild;
         if (guild == null)
         {

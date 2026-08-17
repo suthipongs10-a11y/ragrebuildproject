@@ -47,6 +47,11 @@ namespace Assets.Scripts.UI.Guild
         private static readonly Color OnlineColor = new Color(0.184f, 0.523f, 0.215f);
         private static readonly Color OfflineColor = new Color(0.604f, 0.643f, 0.690f);
         private static readonly Color LeaderColor = new Color(0.478f, 0.341f, 0.086f);
+        private static readonly Color WarnColor = new Color(0.706f, 0.106f, 0.145f);
+        private static readonly Color WarnCardColor = new Color(0.996f, 0.910f, 0.910f);
+
+        /// <summary>The countdown line, kept so it can be retimed without redrawing the list.</summary>
+        private TextMeshProUGUI cooldownNote;
 
         private RectTransform body;
         private TextMeshProUGUI title;
@@ -57,6 +62,7 @@ namespace Assets.Scripts.UI.Guild
         private readonly List<GameObject> rows = new List<GameObject>();
 
         private int drawnRevision = -1;
+        private bool drawnWaiting;
         private float refreshTimer;
 
         public static GuildWindow Create(RectTransform parent)
@@ -152,6 +158,23 @@ namespace Assets.Scripts.UI.Guild
                 //walk every loaded guild every six seconds for nobody.
                 if (!GuildState.InGuild)
                     Send(GuildRequestType.ListGuilds);
+            }
+
+            //Retimed every frame rather than on the six second refresh, so it reads as a
+            //countdown instead of a number that lurches. It is a subtraction against a
+            //deadline the server already gave us, not a question asked again.
+            if (cooldownNote != null)
+                cooldownNote.text = CooldownText();
+
+            //The list has to be redrawn once when the wait ends, or the join buttons stay
+            //greyed out until something else happens to change the roster.
+            var waiting = GuildState.RejoinSecondsLeft > 0;
+            if (drawnWaiting != waiting)
+            {
+                drawnWaiting = waiting;
+                drawnRevision = GuildState.Revision;
+                Redraw();
+                return;
             }
 
             if (drawnRevision == GuildState.Revision)
@@ -286,6 +309,28 @@ namespace Assets.Scripts.UI.Guild
         {
             var y = -RowGap;
 
+            //Above everything, in red, because it is the answer to the question the rest of
+            //the page invites. Being told in chat after tapping is being told too late, and
+            //the chat line scrolls away while the wait does not.
+            if (GuildState.RejoinSecondsLeft > 0)
+            {
+                var banner = ModernUiTheme.CreateCard(body, "Cooldown", WarnCardColor);
+                banner.anchorMin = new Vector2(0, 1);
+                banner.anchorMax = new Vector2(1, 1);
+                banner.pivot = new Vector2(0.5f, 1);
+                banner.sizeDelta = new Vector2(-RowGap * 2f, RowHeight + 12f);
+                banner.anchoredPosition = new Vector2(0, y);
+                banner.GetComponent<Image>().raycastTarget = false;
+                ModernUiTheme.AddBorder(banner, WarnColor);
+                rows.Add(banner.gameObject);
+
+                cooldownNote = ModernUiTheme.CreateText(banner, "Wait", CooldownText(),
+                    ModernUiTheme.SizeLabel, WarnColor, TextAlignmentOptions.Left, FontStyles.Bold);
+                ModernUiTheme.Stretch(cooldownNote.rectTransform, 10f, 2f, -10f, -2f);
+
+                y -= RowHeight + 12f + RowGap;
+            }
+
             if (!GuildState.BrowseReceived)
             {
                 BuildNote("กำลังโหลดรายชื่อกิลด์...", y);
@@ -334,13 +379,15 @@ namespace Assets.Scripts.UI.Guild
             ModernUiTheme.Place(count.rectTransform, new Vector2(0, 0.5f),
                 new Vector2(258f, 0f), new Vector2(120f, RowHeight));
 
-            //Asked already, or nowhere to put you: either way the button would only produce a
-            //refusal, so it says why instead of offering.
-            if (entry.AlreadyAsked || full)
+            //Asked already, still serving out the wait, or nowhere to put you: in every case
+            //the button could only produce a refusal, so it says why instead of offering.
+            var waiting = GuildState.RejoinSecondsLeft > 0;
+            if (entry.AlreadyAsked || full || waiting)
             {
-                var said = ModernUiTheme.CreateText(row, "Asked",
-                    entry.AlreadyAsked ? "ส่งคำขอแล้ว" : "-",
-                    ModernUiTheme.SizeLabel, ModernUiTheme.MutedColor, TextAlignmentOptions.Right);
+                var reason = waiting ? "รออยู่" : entry.AlreadyAsked ? "ส่งคำขอแล้ว" : "-";
+                var said = ModernUiTheme.CreateText(row, "Asked", reason,
+                    ModernUiTheme.SizeLabel, waiting ? WarnColor : ModernUiTheme.MutedColor,
+                    TextAlignmentOptions.Right);
                 ModernUiTheme.Place(said.rectTransform, new Vector2(1, 0.5f),
                     new Vector2(-10f, 0f), new Vector2(JoinWidth + 10f, RowHeight));
                 return;
@@ -474,8 +521,15 @@ namespace Assets.Scripts.UI.Guild
             return data.GetJobNameForId(job);
         }
 
+        private static string CooldownText() =>
+            $"เพิ่งออกจากกิลด์ — เข้ากิลด์ใหม่ได้อีกใน {GuildState.DescribeRejoinWait()}";
+
         private void ClearRows()
         {
+            //it is one of the rows about to be destroyed, and a reference to a destroyed
+            //label is a null check every frame away from an exception
+            cooldownNote = null;
+
             foreach (var row in rows)
             {
                 if (row == null)

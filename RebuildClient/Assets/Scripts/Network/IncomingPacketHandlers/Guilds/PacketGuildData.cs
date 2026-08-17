@@ -38,6 +38,10 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Guilds
             GuildState.Members.Clear();
             GuildState.JoinRequests.Clear();
 
+            //first, and outside the has-a-guild branch, because it is about the character
+            //and not about any guild
+            GuildState.SetRejoinCooldown(msg.ReadInt32());
+
             //Sent even when there is no guild, because "you are not in one" is an answer the
             //window has to be able to receive — it is what arrives after leaving or being
             //thrown out, and without it the roster would stay on screen.

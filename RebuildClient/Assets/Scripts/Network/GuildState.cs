@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Assets.Scripts.Network
 {
@@ -65,6 +66,51 @@ namespace Assets.Scripts.Network
         /// <summary>Bumped whenever anything above changes. The window watches this.</summary>
         public static int Revision;
 
+        private static int rejoinSeconds;
+        private static float rejoinStamp;
+
+        /// <summary>
+        /// Records how long the server says is left, and when it said so.
+        ///
+        /// Kept as a deadline rather than a number to show, so the wait can be counted down
+        /// on screen between packets. Asking the server every second for a figure it works
+        /// out from a clock would be a packet a second for something a subtraction answers.
+        /// </summary>
+        public static void SetRejoinCooldown(int seconds)
+        {
+            rejoinSeconds = seconds > 0 ? seconds : 0;
+            rejoinStamp = Time.realtimeSinceStartup;
+        }
+
+        /// <summary>
+        /// What is left of the wait right now, counted down locally. Zero once it is over,
+        /// which is also what anyone who never left a guild reads.
+        /// </summary>
+        public static int RejoinSecondsLeft
+        {
+            get
+            {
+                if (rejoinSeconds <= 0)
+                    return 0;
+
+                var left = rejoinSeconds - (int)(Time.realtimeSinceStartup - rejoinStamp);
+                return left > 0 ? left : 0;
+            }
+        }
+
+        /// <summary>"23 ชม. 59 นาที 12 วิ", short enough to sit on one line.</summary>
+        public static string DescribeRejoinWait()
+        {
+            var seconds = RejoinSecondsLeft;
+            var hours = seconds / 3600;
+            var minutes = seconds % 3600 / 60;
+            var rest = seconds % 60;
+
+            if (hours > 0)
+                return $"{hours} ชม. {minutes} นาที {rest} วิ";
+            return minutes > 0 ? $"{minutes} นาที {rest} วิ" : $"{rest} วิ";
+        }
+
         public static void Touch() => Revision++;
 
         /// <summary>
@@ -84,6 +130,8 @@ namespace Assets.Scripts.Network
             JoinRequests.Clear();
             Browse.Clear();
             BrowseReceived = false;
+            //the wait belongs to the character that left, not to whoever logs in next
+            rejoinSeconds = 0;
             Touch();
         }
     }
