@@ -171,6 +171,16 @@ public static class GuildCommands
             return;
         }
 
+        //The same wait the window enforces. Checked here as well or an invite would be the
+        //way around it, and a rule with a way around it is not a rule.
+        var wait = GuildCooldown.SecondsRemaining(player);
+        if (wait > 0)
+        {
+            CommandBuilder.ErrorMessage(connection,
+                $"คุณเพิ่งออกจากกิลด์ ต้องรอ {GuildCooldown.Describe(wait)} ถึงจะเข้ากิลด์ใหม่ได้");
+            return;
+        }
+
         if (!PendingInvites.TryGetValue(player.Id, out var invite))
         {
             CommandBuilder.ErrorMessage(connection, "You have no pending guild invitation.");
@@ -235,8 +245,11 @@ public static class GuildCommands
         player.Guild = null;
         RoDatabase.EnqueueDbRequest(new GuildMembershipRequest(GuildMembershipAction.Leave, player.Id, guild.GuildId));
 
+        //typed rather than clicked, but it is the same decision and carries the same wait
+        GuildCooldown.StartFor(player);
+
         guild.Announce($"{player.Name} has left the guild.");
-        Message(connection, $"You have left \"{guild.GuildName}\".");
+        Message(connection, $"You have left \"{guild.GuildName}\". You can join another guild in 24 hours.");
     }
 
     private static void Message(NetworkConnection connection, string text)

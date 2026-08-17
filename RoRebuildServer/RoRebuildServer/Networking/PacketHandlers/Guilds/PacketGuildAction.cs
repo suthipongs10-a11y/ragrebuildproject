@@ -71,6 +71,16 @@ public class PacketGuildAction : IClientPacketHandler
             return;
         }
 
+        //Checked before anything else that could succeed, so the answer is the same whether
+        //the guild is full, gone, or fine: you left one recently and that is that.
+        var wait = GuildCooldown.SecondsRemaining(player);
+        if (wait > 0)
+        {
+            CommandBuilder.ErrorMessage(connection,
+                $"คุณเพิ่งออกจากกิลด์ ต้องรอ {GuildCooldown.Describe(wait)} ถึงจะเข้ากิลด์ใหม่ได้");
+            return;
+        }
+
         if (!GuildManager.TryGetGuild(guildId, out var guild))
         {
             CommandBuilder.ErrorMessage(connection, "ไม่พบกิลด์นี้แล้ว");
@@ -113,6 +123,13 @@ public class PacketGuildAction : IClientPacketHandler
         player.Guild = null;
         RoDatabase.EnqueueDbRequest(new GuildMembershipRequest(GuildMembershipAction.Leave, player.Id, guild.GuildId));
 
+        //Only here, and not where somebody is thrown out: leaving is a choice and waiting a
+        //day is its price. Being kicked is not, and charging for it would hand every leader
+        //a way to bench somebody for a day.
+        GuildCooldown.StartFor(player);
+
+        CommandBuilder.ErrorMessage(connection,
+            $"ออกจากกิลด์แล้ว เข้ากิลด์ใหม่ได้อีกครั้งใน 24 ชั่วโมง");
         guild.Announce($"{player.Name} ออกจากกิลด์แล้ว");
         CommandBuilder.SendGuildData(player);
     }

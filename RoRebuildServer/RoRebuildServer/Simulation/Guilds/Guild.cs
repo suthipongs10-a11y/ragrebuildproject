@@ -189,6 +189,55 @@ public class Guild
 }
 
 /// <summary>
+/// The wait between walking out of a guild and being allowed into another one.
+///
+/// Without it a guild is not a commitment: you can leave the moment a better offer turns
+/// up and be in the other one before anybody notices. A day is long enough that leaving
+/// is a decision and short enough that a mistake is not permanent.
+///
+/// It follows the character rather than the guild, and it is only ever set by leaving of
+/// your own accord. Being thrown out was not your choice, and making the person who was
+/// kicked wait a day would hand every leader a way to bench somebody.
+/// </summary>
+public static class GuildCooldown
+{
+    /// <summary>
+    /// Kept in the same per-character store the NPC scripts use, which already survives
+    /// logout and already goes to the database, rather than in a table of its own for a
+    /// single number.
+    /// </summary>
+    public const string Flag = "GuildLeaveTime";
+
+    public const int Seconds = 24 * 60 * 60;
+
+    private static int Now => (int)DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+    public static void StartFor(Player player) => player.SetNpcFlag(Flag, Now);
+
+    /// <summary>Zero once the wait is over, which is also what it reads for anyone who never left one.</summary>
+    public static int SecondsRemaining(Player player)
+    {
+        var left = player.GetNpcFlag(Flag);
+        if (left <= 0)
+            return 0;
+
+        var remaining = left + Seconds - Now;
+        return remaining > 0 ? remaining : 0;
+    }
+
+    /// <summary>"อีก 5 ชั่วโมง 12 นาที", for saying no with a reason attached.</summary>
+    public static string Describe(int seconds)
+    {
+        var hours = seconds / 3600;
+        var minutes = seconds % 3600 / 60;
+
+        if (hours > 0)
+            return $"อีก {hours} ชั่วโมง {minutes} นาที";
+        return minutes > 0 ? $"อีก {minutes} นาที" : "อีกไม่ถึงหนึ่งนาที";
+    }
+}
+
+/// <summary>
 /// Holds every guild that has been loaded this session. Guilds are added when one is
 /// created and when a member logs in, so a guild whose members are all offline simply
 /// isn't in memory until one of them returns.

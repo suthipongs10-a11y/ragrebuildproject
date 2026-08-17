@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Assets.Scripts.Network;
 using Assets.Scripts.Sprites;
@@ -92,7 +93,7 @@ namespace Assets.Scripts.UI.Guild
             ModernUiTheme.Place((RectTransform)leaveButton.transform, new Vector2(1, 1),
                 new Vector2(-Pad, -Pad), new Vector2(96f, ButtonRowHeight));
             ModernUiTheme.AddBorder((RectTransform)leaveButton.transform, ModernUiTheme.CardBorderColor);
-            leaveButton.onClick.AddListener(() => Send(GuildRequestType.Leave));
+            leaveButton.onClick.AddListener(ConfirmLeave);
 
             //Sits where the leave button sits, since the two are never both wanted: you are
             //either in a guild and might leave it, or you are not and might look for one.
@@ -179,6 +180,39 @@ namespace Assets.Scripts.UI.Guild
             var network = NetworkManager.Instance;
             if (network != null)
                 network.SendGuildAction(action, guildId);
+        }
+
+        /// <summary>
+        /// Asks first, for the two buttons that cannot be undone.
+        ///
+        /// Both sit in a list that is rebuilt every few seconds, on a screen small enough to
+        /// tap by accident, and neither has a way back: the person kicked has to be let in
+        /// again, and leaving costs a day before any guild will take you.
+        ///
+        /// If the prompt window is missing the action does not happen. A destructive thing
+        /// going ahead without the question it was promised is worse than a button that
+        /// appears not to work and leaves a line in the log.
+        /// </summary>
+        private static void Confirm(string question, Action onYes)
+        {
+            var ui = UiManager.Instance;
+            if (ui == null || ui.YesNoOptionsWindow == null)
+            {
+                Debug.LogError("[GuildWindow] No confirmation window, so the action was not carried out.");
+                return;
+            }
+
+            ui.YesNoOptionsWindow.BeginPrompt(question, "ตกลง", "ยกเลิก", onYes, null, false);
+        }
+
+        private void ConfirmLeave()
+        {
+            //The wait is the part worth saying out loud. Leaving is the obvious half; that it
+            //locks you out of every other guild for a day is the half nobody expects, and
+            //finding out afterwards is exactly the wrong time.
+            Confirm($"ออกจากกิลด์ {GuildState.GuildName} ใช่ไหม?\n\n"
+                    + "ออกแล้วจะเข้ากิลด์อื่นไม่ได้จนกว่าจะครบ 24 ชั่วโมง",
+                () => Send(GuildRequestType.Leave));
         }
 
         private void Redraw()
@@ -428,7 +462,8 @@ namespace Assets.Scripts.UI.Guild
 
             //captured now, because the row is thrown away and rebuilt on the next refresh
             var target = member.Name;
-            kick.onClick.AddListener(() => Send(GuildRequestType.Kick, target));
+            kick.onClick.AddListener(() =>
+                Confirm($"ไล่ {target} ออกจากกิลด์ใช่ไหม?", () => Send(GuildRequestType.Kick, target)));
         }
 
         private static string JobName(int job)

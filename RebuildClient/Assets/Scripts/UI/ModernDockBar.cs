@@ -30,6 +30,16 @@ namespace Assets.Scripts.UI
         private const float MenuPad = 8f;
 
         /// <summary>
+        /// Narrow enough that the label under the icon is still readable. Below this the
+        /// tiles stop shrinking and the bar is simply pushed to whatever fits, which on a
+        /// phone held upright is still better than four tiles that run off the edge.
+        /// </summary>
+        private const float MinTileWidth = 58f;
+
+        /// <summary>How far off the edge of the screen anything is allowed to sit.</summary>
+        private const float ScreenMargin = 6f;
+
+        /// <summary>
         /// The three kept out in front, by the name of the button in the scene, and the
         /// icon and label each one takes.
         /// </summary>
@@ -55,6 +65,10 @@ namespace Assets.Scripts.UI
         private float searchTimer;
         private RectTransform menuPanel;
         private GameObject clickCatcher;
+        private RectTransform dockBar;
+        private RectTransform canvasRect;
+        private float tileWidth = TileWidth;
+        private readonly Vector3[] corners = new Vector3[4];
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -87,6 +101,72 @@ namespace Assets.Scripts.UI
             Build(zone);
         }
 
+        /// <summary>
+        /// Pushes the bar and the drawer back inside the screen.
+        ///
+        /// Both are placed against the bottom right corner of a zone the game's own
+        /// interface owns, and that zone's corner is not the screen's corner at every shape
+        /// of screen: on a phone held upright it sits outside, taking the last tile and the
+        /// whole drawer with it. Rather than work out which of the layout, the scale and the
+        /// aspect is responsible, the answer is measured after the fact - where the thing
+        /// actually ended up against where the canvas actually is - which is right whatever
+        /// the cause and stays right when the window is resized.
+        /// </summary>
+        private void LateUpdate()
+        {
+            if (canvasRect == null)
+                return;
+
+            ClampIntoCanvas(dockBar);
+            if (menuPanel != null && menuPanel.gameObject.activeSelf)
+                ClampIntoCanvas(menuPanel);
+        }
+
+        private void ClampIntoCanvas(RectTransform rect)
+        {
+            if (rect == null)
+                return;
+
+            rect.GetWorldCorners(corners);
+            var min = (Vector2)canvasRect.InverseTransformPoint(corners[0]);
+            var max = (Vector2)canvasRect.InverseTransformPoint(corners[2]);
+
+            var bounds = canvasRect.rect;
+            var limitMin = new Vector2(bounds.xMin + ScreenMargin, bounds.yMin + ScreenMargin);
+            var limitMax = new Vector2(bounds.xMax - ScreenMargin, bounds.yMax - ScreenMargin);
+
+            var shift = Vector2.zero;
+            //the far edges first, then the near ones, so something taller or wider than the
+            //screen ends up showing its top left rather than being pinned by its bottom right
+            if (max.x > limitMax.x) shift.x = limitMax.x - max.x;
+            if (min.x + shift.x < limitMin.x) shift.x = limitMin.x - min.x;
+            if (max.y > limitMax.y) shift.y = limitMax.y - max.y;
+            if (min.y + shift.y < limitMin.y) shift.y = limitMin.y - min.y;
+
+            if (shift.sqrMagnitude < 0.01f)
+                return;
+
+            //the shift was worked out in the canvas's space; anchoredPosition is in the
+            //parent's, and the two are only the same number while the scales match
+            var parent = rect.parent as RectTransform;
+            var k = parent != null && Mathf.Abs(parent.lossyScale.x) > 0.0001f
+                ? canvasRect.lossyScale.x / parent.lossyScale.x
+                : 1f;
+
+            rect.anchoredPosition += shift * k;
+        }
+
+        /// <summary>The rect everything has to stay inside, which is the canvas, not the zone.</summary>
+        private static RectTransform CanvasOf(GameObject zone)
+        {
+            var canvas = zone.GetComponentInParent<Canvas>();
+            if (canvas == null)
+                return null;
+
+            var root = canvas.rootCanvas != null ? canvas.rootCanvas : canvas;
+            return root.transform as RectTransform;
+        }
+
         private void Build(GameObject zone)
         {
             ModernUiTheme.MarkSkinned(zone);
@@ -106,9 +186,26 @@ namespace Assets.Scripts.UI
             foreach (var button in buttons.Values)
                 button.gameObject.SetActive(false);
 
+            canvasRect = CanvasOf(zone);
+
             var bar = ModernUiTheme.CreateCard(root, "ModernDock", ModernUiTheme.WindowColor, true);
+            dockBar = bar;
+
+            //The tiles are sized to what there is room for rather than to a number picked on
+            //a desktop. The canvas scaler runs at a constant pixel size, so its width in
+            //layout units is the screen's pixels divided by the interface scale - on a phone
+            //held upright that is around four hundred, and four tiles at the desktop size
+            //come to three hundred and seventy eight before the margins. Which is how the
+            //last tile ended up past the edge of the screen.
             var count = Primary.Length + 1;
-            var width = count * TileWidth + (count - 1) * TileGap + 16f;
+            tileWidth = TileWidth;
+            if (canvasRect != null)
+            {
+                var room = canvasRect.rect.width - ScreenMargin * 2f - 16f - (count - 1) * TileGap;
+                tileWidth = Mathf.Clamp(room / count, MinTileWidth, TileWidth);
+            }
+
+            var width = count * tileWidth + (count - 1) * TileGap + 16f;
             ModernUiTheme.Place(bar, new Vector2(1, 0), new Vector2(-8f, 0f), new Vector2(width, 50f));
             ModernUiTheme.AttachShadow(bar, 10f);
 
@@ -116,12 +213,12 @@ namespace Assets.Scripts.UI
             {
                 var entry = Primary[i];
                 buttons.TryGetValue(entry.Button, out var target);
-                var tile = BuildTile(bar, entry.Label, entry.Icon(), i);
+                var tile = BuildTile(bar, entry.Label, entry.Icon(), i, tileWidth);
                 if (target != null)
                     tile.onClick.AddListener(target.onClick.Invoke);
             }
 
-            var menuTile = BuildTile(bar, "Menu", ModernUiIcons.Grid, Primary.Length);
+            var menuTile = BuildTile(bar, "Menu", ModernUiIcons.Grid, Primary.Length, tileWidth);
             menuTile.onClick.AddListener(ToggleMenu);
 
             BuildMenu(root, buttons);
@@ -130,13 +227,13 @@ namespace Assets.Scripts.UI
         }
 
         /// <summary>One tile: its icon over its name, which is what makes it tappable.</summary>
-        private static Button BuildTile(RectTransform bar, string label, Sprite icon, int index)
+        private static Button BuildTile(RectTransform bar, string label, Sprite icon, int index, float width)
         {
             var button = ModernUiTheme.CreateButton(bar, "Tile" + label, "", ModernUiTheme.CardColor,
                 ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
 
             ModernUiTheme.Place((RectTransform)button.transform, new Vector2(0, 0.5f),
-                new Vector2(8f + index * (TileWidth + TileGap), 0f), new Vector2(TileWidth, 40f));
+                new Vector2(8f + index * (width + TileGap), 0f), new Vector2(width, 40f));
 
             var glyph = ModernUiTheme.CreateIcon(button.transform, icon, ModernUiTheme.AccentInkColor, 16);
             ModernUiTheme.Place(glyph.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -3f),
