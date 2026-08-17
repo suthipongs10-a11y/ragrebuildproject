@@ -39,13 +39,36 @@ namespace Assets.Scripts.UI.Party
         private const float RowGap = 3f;
         private const float HeadingHeight = 22f;
 
+        //One set of columns, used by the rows and by the titles above them. The titles used
+        //to be one string with spaces pushed between the words, which lines up for exactly
+        //one set of names at one font size and for nothing else.
         private const float DotSize = 9f;
         private const float NameLeft = 24f;
-        private const float NameWidth = 186f;
-        private const float DetailLeft = 216f;
-        private const float DetailWidth = 168f;
-        private const float KillsWidth = 96f;
+        private const float NameWidth = 170f;
+        private const float DetailLeft = 200f;
+        private const float DetailWidth = 112f;
+        private const float ShareLeft = 318f;
+        private const float ShareColumnWidth = 84f;
+        private const float KillsRight = 12f;
+        private const float KillsWidth = 84f;
+
+        //The titles are narrower than the columns under them, so that the long one on the
+        //right and the one to its left keep clear of each other on the same strip.
+        private const float ShareTitleWidth = 58f;
+        private const float KillsTitleWidth = 104f;
         private const float ShareWidth = 168f;
+
+        /// <summary>
+        /// The level gaps the server shares experience across, repeated here only to say so
+        /// on screen. The server decides; these two are checked against its own constants by
+        /// the project's packet checker so they cannot quietly drift apart.
+        ///
+        /// Within the first, a pair shares the whole of a kill. Past the second they share
+        /// nothing at all, and between the two it tapers off.
+        /// </summary>
+        private const int FullShareLevelGap = 10;
+
+        private const int NoShareLevelGap = 15;
 
         /// <summary>
         /// How often the roster is asked for again while the tab is on screen.
@@ -60,6 +83,8 @@ namespace Assets.Scripts.UI.Party
         private static readonly Color OfflineColor = new Color(0.604f, 0.643f, 0.690f);
         private static readonly Color LeaderColor = new Color(0.478f, 0.341f, 0.086f);
         private static readonly Color MeCardColor = new Color(0.894f, 0.929f, 0.973f);
+        private static readonly Color WarnColor = new Color(0.706f, 0.106f, 0.145f);
+        private static readonly Color PartialColor = new Color(0.478f, 0.341f, 0.086f);
 
         private RectTransform body;
         private TextMeshProUGUI title;
@@ -100,6 +125,11 @@ namespace Assets.Scripts.UI.Party
                 ModernUiTheme.LabelColor, TextAlignmentOptions.TopLeft);
             ModernUiTheme.Place(subtitle.rectTransform, new Vector2(0, 1), new Vector2(Pad + 2f, -26f),
                 new Vector2(Width - Pad * 2f - 4f - ShareWidth, 20f));
+            //The header band is one line tall. A line too long for it used to fold onto a
+            //second and run down over the list; running on off the end is the lesser of the
+            //two, and the lines put here are written to fit anyway.
+            title.textWrappingMode = TextWrappingModes.NoWrap;
+            subtitle.textWrappingMode = TextWrappingModes.NoWrap;
 
             //The switch and the label for it sit in the same place, because only one of them
             //is ever wanted: the leader decides, everyone else is told.
@@ -223,13 +253,24 @@ namespace Assets.Scripts.UI.Party
             if (!s.IsInParty)
             {
                 title.text = "ยังไม่ได้อยู่ในปาร์ตี้";
-                subtitle.text = "สร้างปาร์ตี้ด้วย  /organize <ชื่อปาร์ตี้>  แล้วชวนด้วย  /invite <ชื่อผู้เล่น>";
+                //Short enough for one line. The long form used to be here and wrapped onto a
+                //second, which the header has no room for - it ran down over the list.
+                subtitle.text = "ยังไม่มีปาร์ตี้";
                 shareButton.gameObject.SetActive(false);
                 shareNote.gameObject.SetActive(false);
 
-                BuildNote("อยู่ปาร์ตี้เดียวกันจะแบ่ง Exp กัน และเห็นกันบนมินิแมพเป็นสีเขียว", -RowGap);
-                BuildNote("ถ้ามีคนชวน พิมพ์  /accept  เพื่อเข้าร่วม", -RowGap - HeadingHeight);
-                body.sizeDelta = new Vector2(0, RowHeight * 3f);
+                var note = -RowGap;
+                BuildNote("สร้างปาร์ตี้:  /organize <ชื่อปาร์ตี้>", note);
+                note -= HeadingHeight;
+                BuildNote("ชวนคนอื่น:  /invite <ชื่อผู้เล่น>  หรือคลิกขวาที่ตัวเขา", note);
+                note -= HeadingHeight;
+                BuildNote("โดนชวน:  /accept  หรือกดปุ่ม Party invite มุมขวา", note);
+                note -= HeadingHeight + RowGap;
+                BuildNote($"ในปาร์ตี้จะแบ่ง Exp กันเมื่อเลเวลห่างกันไม่เกิน {NoShareLevelGap}", note);
+                note -= HeadingHeight;
+                BuildNote("และเห็นกันบนมินิแมพเป็นจุดสีเขียว", note);
+
+                body.sizeDelta = new Vector2(0, -note + HeadingHeight);
                 return;
             }
 
@@ -237,6 +278,7 @@ namespace Assets.Scripts.UI.Party
 
             var online = 0;
             var totalKills = 0;
+
             foreach (var (_, m) in s.PartyMembers)
             {
                 if (m.EntityId > 0)
@@ -244,13 +286,15 @@ namespace Assets.Scripts.UI.Party
                 totalKills += m.Kills;
             }
 
-            subtitle.text = $"สมาชิก {s.PartyMembers.Count} คน  ·  ออนไลน์ {online}  ·  ล้มมอนรวม {totalKills}";
+            //Deliberately three figures and no more. The level spread was a fourth, and the
+            //column on each row says the same thing about the member it actually applies to.
+            subtitle.text = $"สมาชิก {s.PartyMembers.Count} คน  ·  ออนไลน์ {online}  ·  กำจัดรวม {totalKills}";
 
             DrawShareControl();
 
             var y = -RowGap;
 
-            BuildHeading("สมาชิก           อาชีพ / เลเวล                    ล้มมอนสเตอร์", y);
+            BuildHeading(y);
             y -= HeadingHeight;
 
             //Sorted so the list does not shuffle between refreshes: online first, then by
@@ -334,12 +378,55 @@ namespace Assets.Scripts.UI.Party
             ModernUiTheme.Place(info.rectTransform, new Vector2(0, 0.5f),
                 new Vector2(DetailLeft, 0f), new Vector2(DetailWidth, RowHeight));
 
+            DrawShareRange(row, member);
+
             var kills = ModernUiTheme.CreateText(row, "Kills", member.Kills.ToString(),
                 ModernUiTheme.SizeLabel,
                 member.Kills > 0 ? ModernUiTheme.NameColor : ModernUiTheme.MutedColor,
                 TextAlignmentOptions.Right, member.Kills > 0 ? FontStyles.Bold : FontStyles.Normal);
             ModernUiTheme.Place(kills.rectTransform, new Vector2(1, 0.5f),
-                new Vector2(-12f, 0f), new Vector2(KillsWidth, RowHeight));
+                new Vector2(-KillsRight, 0f), new Vector2(KillsWidth, RowHeight));
+        }
+
+        /// <summary>
+        /// Says when somebody is too far from the rest to be paid.
+        ///
+        /// The server splits a kill between the one who made it and each member in turn, and
+        /// drops the pair once they are more than <see cref="NoShareLevelGap"/> levels apart.
+        /// So what decides whether a member is getting anything is not the party's whole
+        /// spread but the nearest other member: a level 11 in a party of 81 and 92 shares with
+        /// neither, while the 81 and the 92 share with each other perfectly well.
+        ///
+        /// Left blank when there is nothing to warn about. A column that says "fine" on every
+        /// row is a column nobody reads, and the one row that does not say it is what matters.
+        /// </summary>
+        private void DrawShareRange(RectTransform row, PartyMemberInfo member)
+        {
+            if (!PlayerState.Instance.PartyShareExp || !member.HasDetails)
+                return;
+
+            var nearest = int.MaxValue;
+            foreach (var (_, other) in PlayerState.Instance.PartyMembers)
+            {
+                if (other.PartyMemberId == member.PartyMemberId || !other.HasDetails)
+                    continue;
+
+                var gap = Mathf.Abs(other.Level - member.Level);
+                if (gap < nearest)
+                    nearest = gap;
+            }
+
+            //nobody else online to compare against, so there is nothing to say
+            if (nearest == int.MaxValue || nearest <= FullShareLevelGap)
+                return;
+
+            var beyond = nearest > NoShareLevelGap;
+            var label = ModernUiTheme.CreateText(row, "Share",
+                beyond ? "ไม่ได้แชร์" : "แบ่งบางส่วน", ModernUiTheme.SizeSmall,
+                beyond ? WarnColor : PartialColor, TextAlignmentOptions.Left,
+                beyond ? FontStyles.Bold : FontStyles.Normal);
+            ModernUiTheme.Place(label.rectTransform, new Vector2(0, 0.5f),
+                new Vector2(ShareLeft, 0f), new Vector2(ShareColumnWidth, RowHeight));
         }
 
         private RectTransform NewRow(float y, Color color)
@@ -355,18 +442,44 @@ namespace Assets.Scripts.UI.Party
             return row;
         }
 
-        private void BuildHeading(string text, float y)
+        /// <summary>
+        /// The column titles, laid on a strip the same shape and inset as a row and placed at
+        /// the same offsets its columns are placed at, so the two cannot drift apart.
+        /// </summary>
+        private void BuildHeading(float y)
         {
-            var label = ModernUiTheme.CreateText(body, "Heading", text,
-                ModernUiTheme.SizeSmall, ModernUiTheme.LabelColor, TextAlignmentOptions.Left,
+            var strip = ModernUiTheme.CreateRect("Heading", body);
+            strip.anchorMin = new Vector2(0, 1);
+            strip.anchorMax = new Vector2(1, 1);
+            strip.pivot = new Vector2(0.5f, 1);
+            strip.sizeDelta = new Vector2(-RowGap * 2f, HeadingHeight);
+            strip.anchoredPosition = new Vector2(0, y);
+            rows.Add(strip.gameObject);
+
+            Title(strip, "สมาชิก", NameLeft, NameWidth);
+            Title(strip, "อาชีพ / เลเวล", DetailLeft, DetailWidth);
+            if (PlayerState.Instance.PartyShareExp)
+                Title(strip, "แชร์ Exp", ShareLeft, ShareTitleWidth);
+
+            //Right aligned to the same edge as the counts under it, so the column reads as one
+            //thing even though the words are longer than any count will be.
+            var kills = ModernUiTheme.CreateText(strip, "KillsTitle", "กำจัดมอนสเตอร์",
+                ModernUiTheme.SizeSmall, ModernUiTheme.LabelColor, TextAlignmentOptions.Right,
                 FontStyles.Bold);
-            var rect = label.rectTransform;
-            rect.anchorMin = new Vector2(0, 1);
-            rect.anchorMax = new Vector2(1, 1);
-            rect.pivot = new Vector2(0.5f, 1);
-            rect.sizeDelta = new Vector2(-30f, HeadingHeight);
-            rect.anchoredPosition = new Vector2(0, y);
-            rows.Add(label.gameObject);
+            kills.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(kills.rectTransform, new Vector2(1, 0.5f),
+                new Vector2(-KillsRight, 0f), new Vector2(KillsTitleWidth, HeadingHeight));
+        }
+
+        private static void Title(RectTransform strip, string text, float x, float width)
+        {
+            var label = ModernUiTheme.CreateText(strip, "Title", text, ModernUiTheme.SizeSmall,
+                ModernUiTheme.LabelColor, TextAlignmentOptions.Left, FontStyles.Bold);
+            //a title that does not fit runs on rather than folding onto a second line the
+            //strip has no room for and would clip in half
+            label.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(label.rectTransform, new Vector2(0, 0.5f),
+                new Vector2(x, 0f), new Vector2(width, HeadingHeight));
         }
 
         private void BuildNote(string text, float y)

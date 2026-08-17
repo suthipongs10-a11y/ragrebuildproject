@@ -68,14 +68,33 @@ public class PartyExpAccumulator
         }
     }
 
+    /// <summary>
+    /// Levels apart at which two party members still share the whole of a kill.
+    ///
+    /// The share is worked out between the pair - whoever hit the monster and whoever is
+    /// being paid - rather than across the party as a whole, so a party can span more than
+    /// this as long as the people actually fighting together are close to each other.
+    /// </summary>
+    public const int FullShareLevelGap = 10;
+
+    /// <summary>
+    /// Levels apart beyond which nothing is shared at all.
+    ///
+    /// Fifteen is the figure the original game uses for even share, and past it a low level
+    /// character in a high level party is not playing, they are being carried. Between the
+    /// two gaps the share tapers off rather than stopping dead, which is this project's own
+    /// doing: 11 levels apart pays half, 12 a third, and so on down to a sixth at 15.
+    /// </summary>
+    public const int NoShareLevelGap = 15;
+
     private (int, int) GetLevelModifiedExp(int srcLevel, int targetLevel, int baseExp, int jobExp)
     {
         var difference = Math.Abs(srcLevel - targetLevel);
-        if (difference > 15)
+        if (difference > NoShareLevelGap)
             return (0, 0);
-        if (difference <= 10)
+        if (difference <= FullShareLevelGap)
             return (baseExp, jobExp);
-        var rate = 100 / (difference - 9);
+        var rate = 100 / (difference - (FullShareLevelGap - 1));
         baseExp = baseExp * rate / 100;
         jobExp = jobExp * rate / 100;
 
