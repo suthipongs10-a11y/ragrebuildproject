@@ -21,39 +21,43 @@ echo.
 rem --------------------------------------------------------------
 echo [1/4] Checking the browser build...
 set "WEBCLIENT=%ROOT%RoRebuildServer\RoRebuildServer\bin\Debug\net9.0\WebClient"
+rem Written with gotos rather than nested if-blocks on purpose. Everything below
+rem reads a line out of index.html, and that line has quotes in it; a bracketed
+rem block that contains a stray bracket - inside a string or not - ends at the
+rem first one cmd meets, and the rest of the file then parses as nonsense and the
+rem window shuts before it can say why. Which is exactly what happened.
 set "BUILDFOLDER="
-if exist "%WEBCLIENT%\index.html" (
-    echo   Found one at:
-    echo     %WEBCLIENT%
-    rem index.html names the folder the build actually went into - it is rewritten
-    rem after every build - so reading it back and looking for that folder checks
-    rem the two halves still agree. Pulled out with PowerShell because batch has no
-    rem way to take the inside of a quoted string that is not worse than this.
-    for /f "usebackq delims=" %%A in (`powershell -NoProfile -Command "$m=Select-String -Path '%WEBCLIENT%\index.html' -Pattern 'buildUrl\s*=\s*\""([^\"" ]+)\"'; if($m){$m.Matches[0].Groups[1].Value}"`) do set "BUILDFOLDER=%%A"
-)
+if not exist "%WEBCLIENT%\index.html" goto :nobuild
 
-if exist "%WEBCLIENT%\index.html" (
-    if defined BUILDFOLDER (
-        if exist "%WEBCLIENT%\%BUILDFOLDER%\" (
-            echo   Serving build: %BUILDFOLDER%
-        ) else (
-            echo.
-            echo   **************************************************************
-            echo   index.html asks for a folder called "%BUILDFOLDER%"
-            echo   and there is no such folder next to it. The page will load and
-            echo   then sit on "Loading..." forever, because every file it wants
-            echo   is a 404.
-            echo   Fix: build again, and delete the old Build_* folders first.
-            echo   **************************************************************
-            echo.
-        )
-    ) else (
-        echo   Could not read the build folder out of index.html.
-    )
-) else (
-    echo   No browser build yet - only this PC will be able to play,
-    echo   through the Unity editor. See MOBILE.md to make one.
-)
+echo   Found one at:
+echo     %WEBCLIENT%
+call :readbuildfolder
+if not defined BUILDFOLDER goto :buildunknown
+if not exist "%WEBCLIENT%\%BUILDFOLDER%\" goto :buildmissing
+echo   Serving build: %BUILDFOLDER%
+goto :buildchecked
+
+:buildmissing
+echo.
+echo   **************************************************************
+echo   index.html asks for a folder named %BUILDFOLDER%
+echo   and there is no such folder next to it. The page will load and
+echo   then sit on "Loading..." forever, because every file it wants
+echo   comes back a 404.
+echo   Fix: build again, deleting the old Build_* folders first.
+echo   **************************************************************
+echo.
+goto :buildchecked
+
+:buildunknown
+echo   Could not read the build folder name out of index.html.
+goto :buildchecked
+
+:nobuild
+echo   No browser build yet - only this PC will be able to play,
+echo   through the Unity editor. See MOBILE.md to make one.
+
+:buildchecked
 echo.
 
 rem --------------------------------------------------------------
@@ -155,3 +159,18 @@ echo ==============================================================
 echo.
 pause
 exit /b 0
+
+rem --------------------------------------------------------------
+rem The line looked for is:      var buildUrl = "Build_2026-01-31-08-15";
+rem
+rem cmd splits arguments on equals and semicolon as well as on spaces, so by the
+rem time it reaches the subroutine the name is argument three, on its own, still
+rem wearing the quotes that %~3 takes off. No string surgery, and nothing here
+rem carries a bracket.
+:readbuildfolder
+for /f "usebackq tokens=*" %%A in (`findstr /C:"var buildUrl" "%WEBCLIENT%\index.html"`) do call :takefolder %%A
+goto :eof
+
+:takefolder
+set "BUILDFOLDER=%~3"
+goto :eof
