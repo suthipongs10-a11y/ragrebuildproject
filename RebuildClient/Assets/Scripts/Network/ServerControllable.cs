@@ -11,6 +11,7 @@ using Assets.Scripts.Objects;
 using Assets.Scripts.PlayerControl;
 using Assets.Scripts.SkillHandlers;
 using Assets.Scripts.Sprites;
+using Assets.Scripts.UI;
 using Assets.Scripts.UI.ConfigWindow;
 using Assets.Scripts.UI.Hud;
 using Assets.Scripts.Utility;
@@ -1264,6 +1265,10 @@ namespace Assets.Scripts.Network
             if (IsMainCharacter)
             {
                 CameraFollower.Instance.AttachEffectToEntity("Death", gameObject, Id);
+
+                //the chat line above names a key, which on a phone is not one; the menu it
+                //stands for is put up instead, with respawn and log out both on it
+                EscMenu.OpenOnDeath();
             }
         }
 

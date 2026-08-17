@@ -74,7 +74,9 @@ public class UiManager : MonoBehaviour
     [NonSerialized] public bool IsDraggingItem;
     private IItemDropTarget hoveredDropTarget;
     private bool canChangeSkillLevel;
-    public bool IsCanvasVisible => canvas.enabled;
+    //null until Initialize runs, and anything asking before then is asking about a
+    //canvas that is not showing anything yet
+    public bool IsCanvasVisible => canvas != null && canvas.enabled;
     private GameObject hoveredObject;
     private CameraFollower cameraFollower;
 

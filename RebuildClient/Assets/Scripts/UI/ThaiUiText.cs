@@ -89,6 +89,8 @@ namespace Assets.Scripts.UI
             { "Shortcut", "แถบลัด" },
             { "Logout", "ออกจากเกม" },
             { "Cancel", "ยกเลิก" },
+            { "You Died", "ตัวละครตายแล้ว" },
+            { "You Died Hint", "เลือก \"เกิดใหม่\" เพื่อกลับไปที่จุดเซฟ หรือ \"ออกจากเกม\"" },
 
             //--- character creation
             { "Create Character", "สร้างตัวละคร" },

@@ -69,12 +69,11 @@ namespace Assets.Scripts.UI
         private RectTransform canvasRect;
 
         /// <summary>
-        /// The zone the bar stands in for, kept only to be asked whether it is on screen.
+        /// The zone the bar stands in for, kept only so the bar goes wherever it goes.
         ///
-        /// The bar used to live inside it and was hidden along with it, which is how it
-        /// stayed off the title screen without anybody arranging that. Hanging it on the
-        /// canvas fixed where it sits and lost that for free, so the answer is borrowed
-        /// back: whenever the row of buttons this replaces would be shown, so is this.
+        /// Whether the interface is on screen at all is not its to answer - see LateUpdate -
+        /// but it is still the row of buttons this replaces, so anything that hides it by
+        /// deactivating it should hide this too.
         /// </summary>
         private GameObject zoneObject;
         private float tileWidth = TileWidth;
@@ -137,9 +136,17 @@ namespace Assets.Scripts.UI
                 return;
             }
 
-            //Follows the zone on and off screen. The title screen switches it off, and a
-            //dock over the login box is both wrong and clickable.
-            var onScreen = zoneObject != null && zoneObject.activeInHierarchy;
+            //Follows the interface it belongs to on and off screen.
+            //
+            //Asking the zone whether it is active was wrong: the title screen does not switch
+            //the in game interface off, it disables the Canvas component above it, which
+            //leaves every object under it active and simply stops drawing them. That used to
+            //take the bar with it, and stopped doing so the moment the bar was hung on the
+            //canvas root instead - a different canvas, and one that is never disabled. So the
+            //question is asked of the thing that actually answers it.
+            var ui = UiManager.Instance;
+            var onScreen = ui != null && ui.IsCanvasVisible
+                           && zoneObject != null && zoneObject.activeInHierarchy;
             if (dockBar != null && dockBar.gameObject.activeSelf != onScreen)
             {
                 dockBar.gameObject.SetActive(onScreen);
