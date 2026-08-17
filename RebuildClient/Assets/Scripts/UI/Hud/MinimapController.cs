@@ -107,22 +107,36 @@ namespace Assets.Scripts.UI.Hud
             Destroy(mapIcon.MapIcon);
         }
 
+        /// <summary>
+        /// Green for the people you are with, grey-blue for everybody else.
+        ///
+        /// There is a separate sprite for a party member and there has been all along, but on
+        /// a phone-sized minimap two shapes of the same colour at five pixels across are the
+        /// same dot. The colour is what carries it at that size, so the sprite is tinted as
+        /// well as swapped - the same green the party window puts beside an online name, so
+        /// the two pages read as being about the same people.
+        /// </summary>
+        private static readonly Color PartyMemberTint = new Color(0.235f, 0.784f, 0.310f);
+
+        private void PaintPlayerIcon(Image image, int entityId)
+        {
+            var state = PlayerState.Instance;
+            var inParty = state.IsInParty && state.PartyMemberIdLookup.ContainsKey(entityId);
+
+            image.sprite = inParty ? PartyMemberIcon : OtherPlayerIcon;
+            image.color = inParty ? PartyMemberTint : Color.white;
+        }
+
         public void RefreshPartyMembers()
         {
             var state = PlayerState.Instance;
-            var isInParty = state.IsInParty;
-            
+
             foreach (var (entityId, mapEntry) in mapIcons)
             {
                 if (mapEntry.MapIcon == null || entityId == state.EntityId || mapEntry.Type != CharacterDisplayType.Player)
                     continue;
 
-                var icon = OtherPlayerIcon;
-                if (isInParty && state.PartyMemberIdLookup.ContainsKey(entityId))
-                    icon = PartyMemberIcon;
-
-                var img = mapEntry.MapIcon.GetComponent<Image>();
-                img.sprite = icon;
+                PaintPlayerIcon(mapEntry.MapIcon.GetComponent<Image>(), entityId);
             }
         }
 
@@ -165,10 +179,7 @@ namespace Assets.Scripts.UI.Hud
                 switch (type)
                 {
                     case CharacterDisplayType.Player:
-                        if (PlayerState.Instance.PartyMemberIdLookup.ContainsKey(entityId))
-                            img.sprite = PartyMemberIcon;
-                        else
-                            img.sprite = OtherPlayerIcon; 
+                        PaintPlayerIcon(img, entityId);
                         break;
                     case CharacterDisplayType.Boss: img.sprite = BossIcon; break;
                     case CharacterDisplayType.Mvp: img.sprite = MvpIcon; break;

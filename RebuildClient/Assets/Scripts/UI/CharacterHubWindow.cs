@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.PlayerControl;
-using Assets.Scripts.UI.Guide;
 using Assets.Scripts.UI.Guild;
 using Assets.Scripts.UI.Inventory;
+using Assets.Scripts.UI.Party;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -610,12 +610,12 @@ namespace Assets.Scripts.UI
             hub.AddPage(stats, ThaiUiText.Get("Stats"), ModernUiIcons.Person);
             hub.AddPage(skills, ThaiUiText.Get("Skills"), ModernUiIcons.Book);
 
-            //Built here rather than by a skin of its own, because it is the only page that
-            //has no window of the game's behind it. It reads the job off the player and
-            //says how that job is played, which is the one thing the other three tabs
-            //cannot tell you: they show what you have, not what to do with it.
-            var guide = CharacterGuideWindow.Create(ui.PrimaryUserWindowContainer);
-            hub.AddPage(guide, ThaiUiText.Get("Guide"), ModernUiIcons.Star);
+            //Where the job guide used to be. The guide said the same thing every time it was
+            //opened and was read once; the party is the thing that changes while you play and
+            //had nowhere at all to be looked at - it was announced in chat and then gone.
+            //CharacterGuideWindow is still in the project if it is ever wanted back.
+            var party = PartyWindow.Create(ui.PrimaryUserWindowContainer);
+            hub.AddPage(party, ThaiUiText.Get("Party"), ModernUiIcons.Heart);
 
             //Same reasoning: there is no guild window in the game to take over, because
             //guilds were only ever reachable by typing /guild. The roster arrives from the

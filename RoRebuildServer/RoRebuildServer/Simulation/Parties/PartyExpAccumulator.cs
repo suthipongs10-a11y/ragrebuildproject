@@ -32,7 +32,9 @@ public class PartyExpAccumulator
         var party = player.Party;
         if (party != null)
             party.OnlineMembers.ClearInactive();
-        if (party == null || party.OnlineMembers.Count == 1)
+        //A party with sharing switched off pays out exactly as though nobody were in one,
+        //which is the whole point of the switch: what you kill is yours.
+        if (party == null || !party.ShareExp || party.OnlineMembers.Count == 1)
         {
             player.GainBaseExpFromMonster(baseExp, src);
             player.GainJobExpFromMonster(jobExp, src);

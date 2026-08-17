@@ -30,6 +30,35 @@ public class Party
     private EntityValueList<float>? InviteRequests;
     private int idCount;
 
+    /// <summary>
+    /// Whether a kill is shared out among the party or kept by whoever made it. The leader's
+    /// to set; on by default, which is how the party behaved before there was a switch.
+    /// </summary>
+    public bool ShareExp = true;
+
+    /// <summary>
+    /// Monsters finished off by each member, by member id.
+    ///
+    /// Held here rather than on the player because it is a party statistic: it starts when
+    /// the party does and it is nobody's business once they have left. That also means it
+    /// does not survive a server restart, since the party is rebuilt from the database
+    /// without it - worth knowing before reading anything into a count of zero.
+    /// </summary>
+    public readonly Dictionary<int, int> KillCounts = new();
+
+    /// <summary>
+    /// Credits one kill to a member. Called on the main thread from the monster's death,
+    /// so it does not take the write lock the roster changes use.
+    /// </summary>
+    public void CreditKill(int memberId)
+    {
+        if (memberId <= 0)
+            return;
+
+        KillCounts.TryGetValue(memberId, out var count);
+        KillCounts[memberId] = count + 1;
+    }
+
     private readonly Lock writeLock = new();
 
     public bool IsPartyLeader(Player p) => p.PartyMemberId == PartyOwnerId;
@@ -154,6 +183,7 @@ public class Party
             //offline player
             PartyMemberInfo.Remove(memberId);
             PlayerIdToMemberId.Remove(member.PlayerId);
+            KillCounts.Remove(memberId);
             CommandBuilder.NotifyPartyOfChange(this, memberId, PartyUpdateType.RemovePlayer);
 
             if (PartyMemberInfo.Count == 0)
@@ -174,6 +204,7 @@ public class Party
             OnlineMembers.Remove(ref player.Entity);
             PartyMemberInfo.Remove(player.PartyMemberId);
             PlayerIdToMemberId.Remove(player.Id);
+            KillCounts.Remove(player.PartyMemberId);
 
             player.Party = null;
             player.PartyMemberId = 0;
@@ -329,8 +360,16 @@ public class Party
         packet.Write((short)info.Level);
         packet.Write(info.Name);
         packet.Write((byte)(info.EntityId > 0 && id == PartyOwnerId ? 1 : 0));
+
+        //Always written, so the reader does not have to know whether they are online to know
+        //how many bytes to take. A member the server has not seen since it started has no job
+        //to report, and -1 says that rather than pretending they are a novice.
+        KillCounts.TryGetValue(id, out var kills);
+        packet.Write(kills);
+
         if (info.EntityId > 0 && info.Entity.TryGet<Player>(out var p))
         {
+            packet.Write((short)p.GetData(PlayerStat.Job));
             packet.Write(p.Character.Map != null ? p.Character.Map.Name : "");
             packet.Write(p.GetStat(CharacterStat.Hp));
             packet.Write(p.GetStat(CharacterStat.MaxHp));
@@ -341,11 +380,31 @@ public class Party
 
     public void SerializePartyInfo(OutboundMessage packet)
     {
+        packet.Write((byte)(ShareExp ? 1 : 0));
         packet.Write(PartyMemberInfo.Count);
         foreach (var (id, info) in PartyMemberInfo)
         {
             SerializePartyMemberInfo(packet, info, id);
         }
+    }
+
+    /// <summary>
+    /// Turns experience sharing on or off and tells everyone. Refuses anyone but the leader,
+    /// because the client hides the switch from the rest but a client is not what decides it.
+    /// </summary>
+    public void SetExpShare(Player requester, bool share)
+    {
+        if (!IsPartyLeader(requester))
+        {
+            CommandBuilder.ErrorMessage(requester, "You must be party leader to change how experience is shared.");
+            return;
+        }
+
+        if (ShareExp == share)
+            return;
+
+        ShareExp = share;
+        CommandBuilder.NotifyPartyOfExpShare(this);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

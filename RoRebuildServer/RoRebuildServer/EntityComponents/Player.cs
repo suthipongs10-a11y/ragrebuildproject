@@ -324,6 +324,8 @@ public class Player : IEntityAutoReset
         foreach (var skill in LearnedSkills)
             SkillHandler.ApplyPassiveEffects(skill.Key, CombatEntity, skill.Value);
 
+        RestoreRentedFollowers();
+
         if (Equipment == null!)
             Equipment = new ItemEquipState();
 
@@ -1068,6 +1070,32 @@ public class Player : IEntityAutoReset
             mastery += appraisal * Equipment.MainHandWeapon.WeaponLevel;
 
         SetStat(CharacterStat.WeaponMastery, mastery);
+    }
+
+    /// <summary>
+    /// Puts back a cart or a mount that was rented rather than earned.
+    ///
+    /// The passive skill handlers restore the follower for anyone holding the skill that
+    /// grants it, which was the only way to get one. The Kafra now rents them to merchants
+    /// and knights whether or not they have taken the skill, and without this the rent buys
+    /// something that lasts until the next log in. The saved follower is trusted only as far
+    /// as the job allows, so a character who changed job does not keep it.
+    /// </summary>
+    private void RestoreRentedFollowers()
+    {
+        var saved = (CharacterFollowerState)GetData(PlayerStat.FollowerType);
+
+        var cart = saved & CharacterFollowerState.AnyCart;
+        if (cart > 0 && DataManager.IsJobInEquipGroup("Merchant", JobId))
+            PlayerFollower |= cart;
+
+        //HasPeco first: the riding skill's handler has already run, and adding the status
+        //effect it also adds would leave the character carrying two of them
+        if ((saved & CharacterFollowerState.Mounted) > 0 && !HasPeco && (JobId == 7 || JobId == 13))
+        {
+            PlayerFollower |= CharacterFollowerState.Mounted;
+            CombatEntity.AddStatusEffect(CharacterStatusEffect.PecoRiding, int.MaxValue);
+        }
     }
 
     public void StartRidingMount()

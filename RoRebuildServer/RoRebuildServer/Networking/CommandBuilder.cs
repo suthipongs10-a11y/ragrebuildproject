@@ -2007,10 +2007,49 @@ public static class CommandBuilder
         ClearRecipients();
     }
 
+    /// <summary>
+    /// Sends one player the whole roster again.
+    ///
+    /// Kill counts change without anything else about a member changing, and pushing a packet
+    /// to the whole party every time a monster falls would be a packet per kill for a number
+    /// nobody is looking at unless their party window is open. So the window asks instead,
+    /// and this is the answer.
+    /// </summary>
+    public static void SendFullPartyRefresh(Player p)
+    {
+        if (p.Party == null)
+            return;
+
+        var packet = NetworkManager.StartPacket(PacketType.UpdateParty, 256);
+        packet.Write((byte)PartyUpdateType.FullRefresh);
+        p.Party.SerializePartyInfo(packet);
+
+        NetworkManager.SendMessage(packet, p.Connection);
+    }
+
+    /// <summary>Tells the whole party that the leader changed how experience is split.</summary>
+    public static void NotifyPartyOfExpShare(Party party)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.UpdateParty, 16);
+        packet.Write((byte)PartyUpdateType.ChangeExpShare);
+        packet.Write((byte)(party.ShareExp ? 1 : 0));
+
+        foreach (var m in party.OnlineMembers)
+        {
+            if (m.TryGet<Player>(out var partyMember))
+                AddRecipient(partyMember.Connection);
+        }
+
+        NetworkManager.SendMessageMulti(packet, recipients);
+        ClearRecipients();
+    }
+
     //notify party members of a party composition change
     public static void NotifyPartyOfChange(Party party, int memberId, PartyUpdateType type)
     {
-        if (type == PartyUpdateType.UpdateHpSp || type == PartyUpdateType.UpdateMap)
+        if (type == PartyUpdateType.UpdateHpSp || type == PartyUpdateType.UpdateMap
+                                               || type == PartyUpdateType.FullRefresh
+                                               || type == PartyUpdateType.ChangeExpShare)
             throw new Exception($"You shouldn't use NotifyPartyOfChange for party updates of type {type}, use specific handlers for them.");
 
         var packet = NetworkManager.StartPacket(PacketType.UpdateParty, 96);

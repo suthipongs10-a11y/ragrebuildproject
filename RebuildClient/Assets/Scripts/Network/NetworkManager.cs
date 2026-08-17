@@ -2077,6 +2077,28 @@ namespace Assets.Scripts.Network
             SendMessage(msg);
         }
         
+        /// <summary>
+        /// Asks for the roster again. Kill counts move with every monster and the server does
+        /// not push them, so the party window asks while it is on screen and not otherwise.
+        /// </summary>
+        public void PartyRequestInfo()
+        {
+            var msg = StartMessage(PacketType.UpdateParty);
+            msg.Write((byte)PartyClientAction.RequestInfo);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>Leader only. The server checks that again rather than taking our word.</summary>
+        public void PartySetExpShare(bool share)
+        {
+            var msg = StartMessage(PacketType.UpdateParty);
+            msg.Write((byte)PartyClientAction.SetExpShare);
+            msg.Write((byte)(share ? 1 : 0));
+
+            SendMessage(msg);
+        }
+
         public void PartyInviteByName(string name)
         {
             var msg = StartMessage(PacketType.InvitePartyMember);

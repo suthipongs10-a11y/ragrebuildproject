@@ -79,6 +79,25 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Party
                         UiManager.Instance.PartyPanel.UpdateHpSpOfPartyMember(hpUpdatePlayer.PartyMemberId);
                     }
                     break;
+                case PartyUpdateType.FullRefresh:
+                    //Answering the party window's own request, so there is nothing to say in
+                    //chat: the player is looking straight at the thing that changed.
+                    //
+                    //Emptied first because this roster is the whole truth, not a change to it.
+                    //Anyone the server left out has left, and keeping them because no removal
+                    //packet happened to arrive is how a window ends up listing a ghost.
+                    State.PartyMembers.Clear();
+                    State.PartyMemberEntityLookup.Clear();
+                    State.PartyMemberIdLookup.Clear();
+                    PacketAcceptPartyInvite.LoadPartyMemberDetails(msg);
+                    UiManager.Instance.PartyPanel.FullRefreshPartyMemberPanel();
+                    break;
+                case PartyUpdateType.ChangeExpShare:
+                    State.PartyShareExp = msg.ReadByte() == 1;
+                    Camera.AppendChatText(State.PartyShareExp
+                        ? "<color=#77FF77>Party experience is now shared between members.</color>"
+                        : "<color=#77FF77>Party experience is no longer shared - everyone keeps their own.</color>");
+                    break;
                 case PartyUpdateType.LeaveParty:
                 case PartyUpdateType.DisbandParty:
                     if(updateType == PartyUpdateType.LeaveParty)
@@ -89,6 +108,9 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Party
                     State.PartyMembers.Clear();
                     State.PartyMemberEntityLookup.Clear();
                     State.PartyMemberIdLookup.Clear();
+                    //back to the default, so the next party is not described by the last one's
+                    //setting before its own first packet arrives
+                    State.PartyShareExp = true;
                     State.UpdatePlayerName();
                     UiManager.Instance.PartyPanel.FullRefreshPartyMemberPanel();
                     MinimapController.Instance.RefreshPartyMembers();

@@ -55,6 +55,12 @@ public class PacketUpdateParty : IClientPacketHandler
 
                 p.Party.Disband();
                 break;
+            case PartyClientAction.RequestInfo:
+                CommandBuilder.SendFullPartyRefresh(p);
+                break;
+            case PartyClientAction.SetExpShare:
+                p.Party.SetExpShare(p, msg.ReadByte() == 1);
+                break;
             default:
                 ServerLogger.LogWarning($"Player {connection.Player} attempted to perform party action {type}, but it is not implemented.");
                 break;

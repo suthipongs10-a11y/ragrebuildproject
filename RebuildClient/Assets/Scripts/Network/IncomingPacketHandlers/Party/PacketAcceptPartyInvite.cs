@@ -43,8 +43,15 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Party
             UiManager.Instance.PartyPanel.FullRefreshPartyMemberPanel();
         }
         
+        /// <summary>
+        /// Reads what the server's SerializePartyInfo writes: the sharing switch, then the
+        /// whole roster. Both the join packet and a refresh come through here, so the two can
+        /// never drift apart into reading the same bytes two different ways.
+        /// </summary>
         public static void LoadPartyMemberDetails(ClientInboundMessage msg, StringBuilder sb = null)
         {
+            PlayerState.Instance.PartyShareExp = msg.ReadByte() == 1;
+
             var partyMemberCount = msg.ReadInt32();
             for (var i = 0; i < partyMemberCount; i++)
             {

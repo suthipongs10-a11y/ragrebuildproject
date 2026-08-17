@@ -54,6 +54,13 @@ namespace Assets.Scripts.PlayerControl
         public int PartyMemberId;
         public int InvitedPartyId = -1;
         public string PartyName;
+
+        /// <summary>
+        /// Whether the leader has experience shared out among the party. Decided by the
+        /// server, so this is only ever what it last said.
+        /// </summary>
+        public bool PartyShareExp = true;
+
         public string MapName;
         public Dictionary<int, PartyMemberInfo> PartyMembers = new();
         public Dictionary<int, int> PartyMemberEntityLookup = new(); //member id to entity id

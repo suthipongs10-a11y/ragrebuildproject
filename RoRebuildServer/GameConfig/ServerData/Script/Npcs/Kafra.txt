@@ -9,10 +9,14 @@ macro Kafra(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %saveLo
 		FocusNpc();
 		ShowSprite(%cutin, right);
 		Dialog(name, "Welcome to the Kafra Corporation~ The Kafra Services are always here to support you. So how can I be of service today?");
+		//An empty option is sent but cannot be picked, so the numbering below stays put
+		//whether or not this character is offered the rentals.
 		string cartOption = "";
-		if(HasLearnedSkill(PushCart, 1) && !HasCart) cartOption = "Rent Push Cart";
-		Option("Save", "Use Storage", "Teleport Service", cartOption, "Cancel");
-		switch(Result) 	
+		string pecoOption = "";
+		if(HasJobType("Merchant") && !HasCart) cartOption = "Rent Push Cart - 200z";
+		if(HasJobType("Knight") && !HasPeco) pecoOption = "Rent Peco Peco - 500z";
+		Option("Save", "Use Storage", "Teleport Service", cartOption, pecoOption, "Cancel");
+		switch(Result)
 		{
 		case 0:
 			SaveSpawnPoint(%saveLocation);
@@ -32,21 +36,53 @@ macro Kafra(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %saveLo
 			Dialog(name, "Please choose your destination.");
 			@%teleportMacro();
 		case 3:
-			Dialog(name, "The fee to rent a push cart is 850 zeny. Is that alright?");
-			Option("Yes", "No");
-			switch(Result)
-			{
-			case 0:
-				if(GetZeny() < 850)
-				{
-					Dialog(name, "Oh dear, you don't have enough money. Please come back when you have at least 850 zeny.");
-					return;
-				}
-				DropZeny(850);
-				EquipPushCart();
-			}
+			@KafraRentCart(name);
+		case 4:
+			@KafraRentPeco(name);
 		}
 	}
+}
+
+//The zeny is taken only once the thing being paid for is about to be handed over, so a
+//character who cannot afford it walks away no poorer.
+macro KafraRentCart(%kafraName)
+{
+	Dialog(%kafraName, "A push cart is 200 zeny to rent, and it is yours to keep. Shall I fetch one?");
+	Option("Yes", "No");
+	switch(Result)
+	{
+	case 0:
+		if(GetZeny() < 200)
+		{
+			Dialog(%kafraName, "Oh dear, you don't have enough money. Please come back when you have at least 200 zeny.");
+			return;
+		}
+		DropZeny(200);
+		EquipPushCart();
+		Dialog(%kafraName, "There you are~ Thank you for using the Kafra Service.");
+		return;
+	}
+	return;
+}
+
+macro KafraRentPeco(%kafraName)
+{
+	Dialog(%kafraName, "A Peco Peco is 500 zeny to rent. Only knights are permitted to ride one. Shall I bring one out?");
+	Option("Yes", "No");
+	switch(Result)
+	{
+	case 0:
+		if(GetZeny() < 500)
+		{
+			Dialog(%kafraName, "Oh dear, you don't have enough money. Please come back when you have at least 500 zeny.");
+			return;
+		}
+		DropZeny(500);
+		GivePeco();
+		Dialog(%kafraName, "Do take care of it~ Thank you for using the Kafra Service.");
+		return;
+	}
+	return;
 }
 
 macro KafraNoSave(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %teleportMacro)
@@ -59,8 +95,12 @@ macro KafraNoSave(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %
 		FocusNpc();
 		ShowSprite(%cutin, right);
 		Dialog(name, "Welcome to the Kafra Corporation~ The Kafra Services are always here to support you. So how can I be of service today?");
-		Option("Use Storage", "Teleport Service", "Cancel");
-		switch(Result) 	
+		string cartOption = "";
+		string pecoOption = "";
+		if(HasJobType("Merchant") && !HasCart) cartOption = "Rent Push Cart - 200z";
+		if(HasJobType("Knight") && !HasPeco) pecoOption = "Rent Peco Peco - 500z";
+		Option("Use Storage", "Teleport Service", cartOption, pecoOption, "Cancel");
+		switch(Result)
 		{
 		case 0:
 			if(JobId == 0 && JobLevel < 5)
@@ -74,6 +114,10 @@ macro KafraNoSave(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %
 		case 1:
 			Dialog(name, "Please choose your destination.");
 			@%teleportMacro();
+		case 2:
+			@KafraRentCart(name);
+		case 3:
+			@KafraRentPeco(name);
 		}
 	}
 }

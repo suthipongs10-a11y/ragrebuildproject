@@ -769,6 +769,34 @@ public partial class Monster : IEntityAutoReset
         CommandBuilder.ClearRecipients();
     }
 
+    /// <summary>
+    /// Gives the kill to whoever hit hardest, for the party window's tally.
+    ///
+    /// One kill goes to one name. Splitting it by damage share the way experience is split
+    /// would make "monsters defeated" a fraction, and what a party wants to know from that
+    /// column is who is doing the killing, not who is doing the chipping.
+    /// </summary>
+    private void CreditKillToParty()
+    {
+        if (TotalDamageReceived == null)
+            return;
+
+        var best = 0;
+        var top = Entity.Null;
+
+        foreach (var (attacker, damage) in TotalDamageReceived)
+        {
+            if (damage <= best)
+                continue;
+
+            best = damage;
+            top = attacker;
+        }
+
+        if (top.TryGet<Player>(out var killer) && killer.Party != null)
+            killer.Party.CreditKill(killer.PartyMemberId);
+    }
+
     public void RewardExperience()
     {
         if (TotalDamageReceived == null || Character.Map == null)
@@ -824,6 +852,7 @@ public partial class Monster : IEntityAutoReset
         {
             DoMonsterDrops();
             //CombatEntity.DistributeExperience();
+            CreditKillToParty();
             RewardExperience();
         }
 
