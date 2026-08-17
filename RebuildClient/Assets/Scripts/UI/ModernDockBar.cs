@@ -68,6 +68,7 @@ namespace Assets.Scripts.UI
         private RectTransform dockBar;
         private RectTransform canvasRect;
         private float tileWidth = TileWidth;
+        private bool loggedOnce;
         private readonly Vector3[] corners = new Vector3[4];
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -115,8 +116,18 @@ namespace Assets.Scripts.UI
         private void LateUpdate()
         {
             if (canvasRect == null)
-                return;
+            {
+                if (!loggedOnce && dockBar != null)
+                {
+                    loggedOnce = true;
+                    Debug.LogWarning("[ModernDockBar] No canvas was found above the zone, so nothing is "
+                                     + "keeping the bar on screen.");
+                }
 
+                return;
+            }
+
+            ReportOnce();
             ClampIntoCanvas(dockBar);
             if (menuPanel != null && menuPanel.gameObject.activeSelf)
                 ClampIntoCanvas(menuPanel);
@@ -154,6 +165,34 @@ namespace Assets.Scripts.UI
                 : 1f;
 
             rect.anchoredPosition += shift * k;
+        }
+
+        /// <summary>
+        /// Says once what the bar is actually being measured against.
+        ///
+        /// The bar fits or it does not, and from a screenshot the two look the same as a
+        /// clamp that never ran, a canvas that is wider than the picture, and a screen
+        /// reported in different units than the one being looked at. This prints all four
+        /// numbers so the next guess is not a guess.
+        /// </summary>
+        private void ReportOnce()
+        {
+            if (loggedOnce || dockBar == null)
+                return;
+            loggedOnce = true;
+
+            dockBar.GetWorldCorners(corners);
+            var min = (Vector2)canvasRect.InverseTransformPoint(corners[0]);
+            var max = (Vector2)canvasRect.InverseTransformPoint(corners[2]);
+            var bounds = canvasRect.rect;
+
+            Debug.Log($"[ModernDockBar] screen {Screen.width}x{Screen.height}, "
+                      + $"canvas {bounds.width:0}x{bounds.height:0} "
+                      + $"(x {bounds.xMin:0} to {bounds.xMax:0}), "
+                      + $"tile {tileWidth:0}, bar x {min.x:0} to {max.x:0}, y {min.y:0} to {max.y:0}. "
+                      + $"Overhang right {max.x - (bounds.xMax - ScreenMargin):0}, "
+                      + $"canvas scale {canvasRect.lossyScale.x:0.000}, "
+                      + $"parent scale {(dockBar.parent as RectTransform)?.lossyScale.x ?? -1f:0.000}");
         }
 
         /// <summary>The rect everything has to stay inside, which is the canvas, not the zone.</summary>
