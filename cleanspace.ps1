@@ -42,7 +42,18 @@ $targets = @(
     @{ Path = 'RebuildClient\Library\PlayerDataCache';   Why = 'cache ของ build player' }
     @{ Path = 'RebuildClient\Library\il2cpp_cache';      Why = 'cache ของ il2cpp' }
     @{ Path = 'RebuildClient\Library\BuildPlayerData';   Why = 'ข้อมูลชั่วคราวตอน build' }
-    @{ Path = 'RebuildClient\Library\com.unity.addressables'; Why = 'cache addressables (จะ build ใหม่อยู่แล้วในขั้นที่ 3)' }
+    # ⛔ Library\com.unity.addressables จงใจไม่อยู่ในรายการนี้
+    #
+    # ชื่อมันหลอกว่าเป็น cache แต่ไม่ใช่ — profile ตั้ง LocalBuildPath ไว้ที่
+    # [Addressables.BuildPath]/[BuildTarget] ซึ่งก็คือโฟลเดอร์นี้ และตอน build player
+    # Unity จะ "ก๊อป" จากตรงนี้ไปใส่ StreamingAssets/aa
+    #
+    # ลบทิ้งแล้วไป build player เลยโดยไม่ได้ build addressables ใหม่ = ไม่มีอะไรให้ก๊อป
+    # เกมจะโหลดขึ้นมาแล้วค้างที่ Loading... ตลอดกาล โดยมีร่องรอยเดียวคือ settings.json
+    # ขึ้น 404 ใน Network tab ซึ่งไม่มีทางเดาถึงเลยว่าเกี่ยวกับการลบโฟลเดอร์นี้
+    #
+    # พื้นที่ที่ได้ไม่คุ้มกับการ build ใหม่อีกรอบ ถ้าจะลบจริง ๆ ต้อง build addressables
+    # ใหม่ก่อน build player เสมอ
     @{ Path = 'RebuildClient\WebGL';                     Why = 'build เก่า 5 อัน ไม่มีอะไรอ้างถึง' }
     @{ Path = 'RebuildClient\StandaloneWindows64';       Why = 'build PC เก่า' }
     @{ Path = 'RebuildClient\Build';                     Why = 'build เก่าจากเมนู Build Everything' }
