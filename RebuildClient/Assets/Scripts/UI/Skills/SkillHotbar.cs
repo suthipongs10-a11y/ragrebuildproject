@@ -77,6 +77,7 @@ namespace Assets.Scripts.UI
 
         private void SetUpEntry(SkillHotbarEntry entry, int id)
         {
+            MakeSlotCatchThePointer(entry);
             entry.Id = id;
             entry.Parent = this;
             entry.enabled = false;
@@ -103,6 +104,35 @@ namespace Assets.Scripts.UI
             entry.DragItem.Origin = ItemDragOrigin.HotBar;
             entry.DragItem.OriginId = id;
             entry.DragItem.OnDoubleClick = entry.OnDoubleClick;
+        }
+
+        /// <summary>
+        /// Makes the whole slot answer the pointer, empty or not.
+        ///
+        /// A slot registers itself as somewhere an item can be dropped from OnPointerEnter,
+        /// and that only arrives if something under the pointer is a raycast target. The only
+        /// one a slot had was the draggable item in it - which is switched off the moment the
+        /// slot is cleared. So a slot with something in it could be dropped on and an empty
+        /// one could not, which is every slot on a new character: dragging a skill onto the
+        /// bar did nothing at all, and there was nothing to see, because the highlight that
+        /// says "here" is drawn by the same event that never arrived.
+        ///
+        /// The background is made to catch it instead. It is behind everything else in the
+        /// slot, so this changes what the slot answers and nothing about how it looks.
+        /// </summary>
+        private static void MakeSlotCatchThePointer(SkillHotbarEntry entry)
+        {
+            var background = entry.GetComponent<Image>();
+            if (background == null)
+            {
+                //no background to make catch it, so one is added behind the rest. Fully
+                //transparent: a raycast target does not have to be visible.
+                background = entry.gameObject.AddComponent<Image>();
+                background.color = new Color(1f, 1f, 1f, 0f);
+                background.transform.SetAsFirstSibling();
+            }
+
+            background.raycastTarget = true;
         }
 
         public void UpdateItemCounts()
