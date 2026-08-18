@@ -207,18 +207,6 @@ namespace Assets.Scripts.Objects
             mf.sharedMesh = mesh;
         }
 
-        /// <summary>
-        /// Multiplied into every layer of the effect, so one animation can be shown in more
-        /// than one colour without a second copy of it.
-        ///
-        /// Multiplied rather than replaced, because the colour of a layer is animated by the
-        /// effect file - it fades in, it pulses, it fades out - and replacing it would throw
-        /// all of that away and leave a flat shape. Multiplying can only take colour away,
-        /// so the base has to be brighter in a channel than the tint wants to keep: a white
-        /// or golden pillar tints to red, and does not tint to blue.
-        /// </summary>
-        public Color Tint = Color.white;
-
         private void UpdateLayerData(GameObject go, Material mat, Vector2 pos, Color color, int layerNum)
         {
             go.transform.localPosition = new Vector3((pos.x - 320f) / 50f, -(pos.y - 320f) / 50f);
@@ -232,7 +220,7 @@ namespace Assets.Scripts.Objects
             var renderer = layerRenderers[layerNum];
 
             renderer.GetPropertyBlock(propBlocks[layerNum]);
-            propBlocks[layerNum].SetColor(ColorProp, color * Tint);
+            propBlocks[layerNum].SetColor(ColorProp, color);
             renderer.SetPropertyBlock(propBlocks[layerNum]);
 
             //mat.SetColor("_Color", color);

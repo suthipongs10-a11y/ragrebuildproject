@@ -1440,8 +1440,7 @@ namespace Assets.Scripts
             lastMessage = text;
         }
 
-        public void AttachEffectToEntity(string effect, GameObject target, int ownerId = -1,
-            System.Action<GameObject> onSpawned = null)
+        public void AttachEffectToEntity(string effect, GameObject target, int ownerId = -1)
         {
             switch (effect.ToLower())
             {
@@ -1462,20 +1461,10 @@ namespace Assets.Scripts
                 return;
             }
 
-            AttachEffectToEntity(id, target, ownerId, onSpawned);
+            AttachEffectToEntity(id, target);
         }
 
-        /// <summary>
-        /// Puts one of the game's effects on an object.
-        ///
-        /// <paramref name="onSpawned"/> is handed whatever was created, which is the only way
-        /// to reach it: the effect may come from the cache on this frame or from an
-        /// addressable several frames later, and there is nothing to return in the second
-        /// case. Callers that only want the effect played leave it null, as they all did
-        /// before there was one.
-        /// </summary>
-        public void AttachEffectToEntity(int effect, GameObject target, int ownerId = -1,
-            System.Action<GameObject> onSpawned = null)
+        public void AttachEffectToEntity(int effect, GameObject target, int ownerId = -1)
         {
             if (!EffectList.TryGetValue(effect, out var asset))
             {
@@ -1512,8 +1501,6 @@ namespace Assets.Scripts
                     var audio = obj2.GetComponent<EffectAudioSource>();
                     if (audio)
                         audio.OwnerId = ownerId;
-
-                    onSpawned?.Invoke(obj2);
                 }
                 else
                 {
@@ -1523,8 +1510,6 @@ namespace Assets.Scripts
                     var audio = obj2.GetComponent<EffectAudioSource>();
                     if (audio)
                         audio.OwnerId = ownerId;
-
-                    onSpawned?.Invoke(obj2);
                 }
 
                 return;
@@ -1543,8 +1528,6 @@ namespace Assets.Scripts
                         var audio = obj2.GetComponent<EffectAudioSource>();
                         if (audio)
                             audio.OwnerId = ownerId;
-
-                        onSpawned?.Invoke(obj2);
                     }
                     else
                     {
@@ -1553,8 +1536,6 @@ namespace Assets.Scripts
                         var audio = obj2.GetComponent<EffectAudioSource>();
                         if (audio)
                             audio.OwnerId = ownerId;
-
-                        onSpawned?.Invoke(obj2);
                     }
 
                     EffectCache[asset.Id] = ah.Result;

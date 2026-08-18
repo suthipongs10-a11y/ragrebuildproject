@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.Effects;
-using Assets.Scripts.Objects;
-using Assets.Scripts.PlayerControl;
 using RebuildSharedData.ClientTypes;
 using RebuildSharedData.Enum;
 using UnityEngine;
@@ -69,6 +67,33 @@ namespace Assets.Scripts.Network
         private const float RingSpin = 24f;
 
         /// <summary>
+        /// How much bigger the grand aura is than the ordinary one.
+        ///
+        /// The game's own effects were tried for this and none of them fit: every one of the
+        /// hundred odd imported effects plays on a character, not on a thing lying on the
+        /// floor. What was wanted was this aura, larger - so it is this aura, larger.
+        ///
+        /// Reserved for cards and for what a boss left behind. A shaft this size over every
+        /// jellopy is a shaft over nothing.
+        /// </summary>
+        /// Height is the cheaper half of this: the ordinary shaft already runs off the top of
+        /// the screen, so more of it is more of something nobody can see. Width is what reads
+        /// from across a map, and the foot of it is what says where the thing actually is.
+        private const float GrandHeight = 1.7f;
+
+        private const float GrandWidth = 1.85f;
+
+        /// <summary>
+        /// Specks of light drifting up the shaft, which is what the ordinary aura has none of
+        /// and what makes the difference between a lit column and something happening.
+        /// </summary>
+        private const int MoteCount = 8;
+
+        private const float MoteRise = 0.55f;
+
+        private const float MoteSpread = 0.42f;
+
+        /// <summary>
         /// The item sits a fifth of a unit off the floor, so the ring has to come back down
         /// by about that much to lie on it rather than through the middle of the icon.
         /// </summary>
@@ -85,43 +110,16 @@ namespace Assets.Scripts.Network
         private static readonly Dictionary<Color, Material> additiveMaterials = new Dictionary<Color, Material>();
         private static bool loggedOnce;
 
-        /// <summary>
-        /// The game's own level-up pillar, borrowed for a drop worth crossing the map for.
-        ///
-        /// It is a far bigger thing than the drawn aura - a shaft of light with a turning
-        /// ring at its foot, the effect the game already plays when somebody levels - and
-        /// that is the point: it is reserved for cards and for what a boss left behind, so
-        /// that seeing one means something. Everything else keeps the quiet aura.
-        ///
-        /// Two different effects rather than one tinted three ways, because a tint can only
-        /// take colour away. The gold pillar has no blue in it to turn purple with, and the
-        /// purple one has no green to turn gold with, so each colour starts from the effect
-        /// that already has the channels it needs.
-        /// </summary>
-        /// <summary>
-        /// Which of the game's effects stands over a card, and over gear off a boss.
-        ///
-        /// Fields rather than constants so /dropfx can point them at a different one while
-        /// the game is running. Which effect is the right one cannot be worked out from the
-        /// files: they are animations built from the player's own copy of the game data, and
-        /// the only way to know what one looks like is to watch it. The first guess here was
-        /// the level up effect, which turned out to be a pair of angel wings.
-        ///
-        /// Set them from chat, watch a card drop, and whatever looks right is the answer.
-        /// </summary>
-        public static string GoldPillar = "Gloria";
+        /// <summary>The second ring, turning the other way, and the rising specks.</summary>
+        private SpriteRenderer halo;
 
-        public static string PurplePillar = "PotionBerserk";
+        private SpriteRenderer[] motes;
 
-        //Multiplied into the effect, so these can only darken a channel the effect already
-        //has. Red comes off the gold pillar, which is strong in red and green: taking the
-        //green away leaves red. White means the effect's own colours, unchanged.
-        public static Color BossCardPillarTint = new Color(1.00f, 0.18f, 0.14f);
-        public static Color CardPillarTint = Color.white;
-        public static Color BossGearPillarTint = new Color(0.86f, 0.55f, 1.00f);
+        /// <summary>Each ring turns on its own angle, so the two do not share a number.</summary>
+        private float haloAngle;
 
-        /// <summary>The pillar effect once it has arrived, or null while it has not.</summary>
-        private GameObject pillar;
+        /// <summary>Whether this drop earned the larger aura.</summary>
+        private bool grand;
 
         private SpriteRenderer beam;
         private SpriteRenderer core;
@@ -156,6 +154,16 @@ namespace Assets.Scripts.Network
             go.transform.SetParent(parent.transform, false);
 
             var aura = go.AddComponent<GroundItemAura>();
+            //A card, and anything wearable a boss or a mini boss left behind. The tier
+            //number already says how unlikely the drop was and drives every size below it;
+            //this is a step above that, and it is a step you either get or you do not.
+            aura.grand = data.ItemClass == ItemClass.Card
+                         || (fromBoss && (data.ItemClass == ItemClass.Weapon
+                                          || data.ItemClass == ItemClass.Equipment));
+
+            var tall = aura.grand ? GrandHeight : 1f;
+            var wide = aura.grand ? GrandWidth : 1f;
+
             aura.tint = color;
             aura.strength = 0.72f + tier * 0.06f;
             //so a field of drops does not pulse in lockstep
@@ -174,96 +182,95 @@ namespace Assets.Scripts.Network
             //and a needle reads as a faint line however bright it is. A character in this
             //game stands about a unit and a half. These numbers put the shaft at roughly two
             //units across and ten tall, which is a pillar you could walk into.
-            aura.beamHeight = 3.6f + tier * 0.6f;
+            aura.beamHeight = (3.6f + tier * 0.6f) * tall;
             aura.beam = MakeRenderer(go.transform, "Beam", BeamSprite, Vector3.zero, color);
-            aura.beam.transform.localScale = new Vector3(6.5f + tier * 1.2f, aura.beamHeight, 1f);
+            aura.beam.transform.localScale = new Vector3((6.5f + tier * 1.2f) * wide, aura.beamHeight, 1f);
 
             //The same tint as the shaft around it, not a paler one. Mixing white into the
             //core was a second push toward white on top of the one the stacking already
             //gives, and it is the middle of the beam — the part you actually read the
             //colour off — that it bleached.
             aura.core = MakeRenderer(go.transform, "Core", BeamSprite, Vector3.zero, color);
-            aura.core.transform.localScale = new Vector3(2.6f + tier * 0.4f, aura.beamHeight * 0.9f, 1f);
+            aura.core.transform.localScale = new Vector3((2.6f + tier * 0.4f) * wide, aura.beamHeight * 0.9f, 1f);
 
             //a pool of light where it is actually lying, so the eye is sent to the item and
             //not to the empty air above it
             aura.glow = MakeRenderer(go.transform, "Glow", GlowSprite, new Vector3(0, 0.05f, 0), color);
-            aura.glow.transform.localScale = Vector3.one * (4.5f + tier * 0.6f);
+            aura.glow.transform.localScale = Vector3.one * ((4.5f + tier * 0.6f) * wide * 1.2f);
 
             //A ring drawn on the floor around it, turning slowly. Everything else here faces
             //the camera; this is the one part that lies in the world, and that is what makes
             //it read as a circle around the item rather than a disc behind it.
             aura.ring = MakeRenderer(go.transform, "Ring", RingSprite, Vector3.zero, color);
             if (aura.ring != null)
-                aura.ring.transform.localScale = ScaleFor(aura.ring.sprite, 2.6f + tier * 0.4f);
+                aura.ring.transform.localScale = ScaleFor(aura.ring.sprite, (2.6f + tier * 0.4f) * wide);
+
+            if (aura.grand)
+                aura.BuildGrandParts(go.transform, color, tier, wide);
 
             aura.Apply(0f);
-
-            //Asked for after the drawn aura is built, not instead of it. The pillar is one of
-            //the game's imported effects, which come out of the player's own copy of the
-            //data file - a client that has not imported them would otherwise leave the best
-            //drop in the game with no light on it at all. So the aura is made either way and
-            //only stood down once the pillar is actually on screen.
-            if (isCard)
-                aura.RequestPillar(GoldPillar, fromBoss ? BossCardPillarTint : CardPillarTint);
-            else if (isGear && fromBoss)
-                aura.RequestPillar(PurplePillar, BossGearPillarTint);
         }
 
         /// <summary>
-        /// Puts the game's own pillar effect on the drop, looping, in the colour this drop
-        /// has earned, and takes the drawn aura down once it is there.
+        /// The two things the ordinary aura does not have: a wider ring turning against the
+        /// first, and specks of light drifting up the shaft.
         ///
-        /// Looping because the effect was written to play once, for somebody levelling up,
-        /// and a drop has to keep shining until it is picked up or it times out. The ring at
-        /// its foot is the part that reads from across a map, and it is the last thing to
-        /// play, so a version that ran once would be dark most of the time.
+        /// Both are what separate a lit column from something happening. A single ring at one
+        /// speed reads as a decal; two at different speeds read as motion, and anything that
+        /// rises is read as rising even when it is eight quads on a sine.
         /// </summary>
-        private void RequestPillar(string effectName, Color tintColor)
+        private void BuildGrandParts(Transform parent, Color color, int tier, float wide)
         {
-            var camera = CameraFollower.Instance;
-            if (camera == null)
+            halo = MakeRenderer(parent, "Halo", RingSprite, Vector3.zero, color);
+            if (halo != null)
+                halo.transform.localScale = ScaleFor(halo.sprite, (4.1f + tier * 0.5f) * wide);
+
+            motes = new SpriteRenderer[MoteCount];
+            for (var i = 0; i < MoteCount; i++)
+            {
+                var mote = MakeRenderer(parent, "Mote" + i, GlowSprite, Vector3.zero, color);
+                //Each one a different size, so the column has some depth to it rather than
+                //looking like one speck copied eight times.
+                mote.transform.localScale = Vector3.one * (0.35f + (i % 3) * 0.16f);
+                motes[i] = mote;
+            }
+        }
+
+        /// <summary>
+        /// Moves the specks up the shaft and fades them out as they go.
+        ///
+        /// Each one is on its own loop rather than on a timer of its own: the fractional part
+        /// of a number that only ever grows is a sawtooth from nought to one, and eight of
+        /// them offset by an eighth is a steady stream with nothing to keep track of.
+        /// </summary>
+        private void DriftMotes(float t)
+        {
+            if (motes == null)
                 return;
 
-            camera.AttachEffectToEntity(effectName, gameObject, -1, spawned =>
+            for (var i = 0; i < motes.Length; i++)
             {
-                //the drop can be picked up while an addressable is still loading, and the
-                //effect would then be parented to something on its way out
-                if (spawned == null || this == null)
-                    return;
+                var mote = motes[i];
+                if (mote == null)
+                    continue;
 
-                var renderers = spawned.GetComponentsInChildren<RoEffectRenderer>(true);
-                if (renderers.Length == 0)
-                {
-                    //nothing to loop and nothing to tint, so the drawn aura stays as it is
-                    Destroy(spawned);
-                    return;
-                }
+                var life = Mathf.Repeat(t * MoteRise + i / (float)motes.Length, 1f);
 
-                foreach (var renderer in renderers)
-                {
-                    renderer.IsLoop = true;
-                    renderer.Tint = tintColor;
-                }
+                //a slow spiral rather than a straight line up, which reads as being drawn
+                //upward rather than as falling upward
+                var angle = (i * 2.4f) + life * 3.1f;
+                var radius = MoteSpread * (1f - life * 0.35f);
 
-                pillar = spawned;
-                HideDrawnAura();
-            });
-        }
+                mote.transform.localPosition = new Vector3(
+                    Mathf.Cos(angle) * radius,
+                    life * beamHeight * 0.82f,
+                    Mathf.Sin(angle) * radius);
 
-        /// <summary>
-        /// Switches off the drawn shafts, leaving the pillar to do the job.
-        ///
-        /// Switched off rather than destroyed, so that if the pillar is ever taken away the
-        /// light can come back without rebuilding it - and so Apply, which runs every frame
-        /// over these four, does not have to learn about any of this.
-        /// </summary>
-        private void HideDrawnAura()
-        {
-            if (beam != null) beam.enabled = false;
-            if (core != null) core.enabled = false;
-            if (glow != null) glow.enabled = false;
-            if (ring != null) ring.enabled = false;
+                //brightest in the middle of the climb: born out of nothing at the foot and
+                //gone before the top, so the shaft has no hard end to it
+                var fade = Mathf.Sin(life * Mathf.PI);
+                mote.color = new Color(1f, 1f, 1f, strength * fade * 0.85f);
+            }
         }
 
         private static SpriteRenderer MakeRenderer(Transform parent, string name, Sprite sprite, Vector3 offset,
@@ -357,7 +364,16 @@ namespace Assets.Scripts.Network
 
             Stretch(beam, beamHeight, pulse);
             Stretch(core, beamHeight * 0.9f, pulse);
-            LayOnGround(ring);
+            LayOnGround(ring, ref ringAngle);
+
+            if (!grand)
+                return;
+
+            //the second ring turns against the first, so the two never line up and the pair
+            //reads as one turning thing rather than as two copies of a decal
+            Paint(halo, 0.55f + pulse * 0.25f);
+            LayOnGround(halo, ref haloAngle, -0.6f);
+            DriftMotes(t);
         }
 
         /// <summary>
@@ -370,17 +386,23 @@ namespace Assets.Scripts.Network
         /// A child asked to lie flat in the parent's terms would tilt with the camera and a
         /// child offset downward would slide sideways as the camera turned.
         /// </summary>
-        private void LayOnGround(SpriteRenderer renderer)
+        /// <summary>
+        /// Lays a ring flat on the floor around the item and turns it.
+        ///
+        /// Each ring keeps its own angle. They used to share one, and with two rings on it
+        /// the shared number was advanced twice a frame and read back between the two writes
+        /// - so instead of turning against each other at different rates they crept round
+        /// together at a rate that was neither.
+        /// </summary>
+        private void LayOnGround(SpriteRenderer renderer, ref float angle, float speed = 1f)
         {
             if (renderer == null)
                 return;
 
-            ringAngle += Time.deltaTime * RingSpin;
-            if (ringAngle > 360f)
-                ringAngle -= 360f;
+            angle = Mathf.Repeat(angle + Time.deltaTime * RingSpin * speed, 360f);
 
             renderer.transform.position = transform.position + new Vector3(0, RingLift, 0);
-            renderer.transform.rotation = Quaternion.Euler(90f, ringAngle, 0f);
+            renderer.transform.rotation = Quaternion.Euler(90f, angle, 0f);
         }
 
         /// <summary>
