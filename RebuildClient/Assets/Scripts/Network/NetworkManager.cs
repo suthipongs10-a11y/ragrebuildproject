@@ -2068,6 +2068,45 @@ namespace Assets.Scripts.Network
             SendMessage(msg);
         }
         
+        /// <summary>
+        /// A trade action that carries nothing after it: accepting, declining, agreeing,
+        /// confirming, calling it off.
+        ///
+        /// Split into three overloads rather than one with unused arguments for the same
+        /// reason the guild actions are: the server reads exactly the payload each action
+        /// carries and stops. An extra int written after a Lock would still be sitting in
+        /// the buffer when the next packet is read, and everything after it would be read
+        /// from the wrong place.
+        /// </summary>
+        public void SendTradeAction(TradeAction action)
+        {
+            var msg = StartMessage(PacketType.TradeAction);
+            msg.Write((byte)action);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>For Request (an entity id), RemoveItem (a bag slot) and SetZeny (an amount).</summary>
+        public void SendTradeAction(TradeAction action, int value)
+        {
+            var msg = StartMessage(PacketType.TradeAction);
+            msg.Write((byte)action);
+            msg.Write(value);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>For AddItem, which names a bag slot and how many out of it.</summary>
+        public void SendTradeAddItem(int bagId, int count)
+        {
+            var msg = StartMessage(PacketType.TradeAction);
+            msg.Write((byte)TradeAction.AddItem);
+            msg.Write(bagId);
+            msg.Write(count);
+
+            SendMessage(msg);
+        }
+
         public void PartyUpdateAction(int id, PartyClientAction action)
         {
             var msg = StartMessage(PacketType.UpdateParty);

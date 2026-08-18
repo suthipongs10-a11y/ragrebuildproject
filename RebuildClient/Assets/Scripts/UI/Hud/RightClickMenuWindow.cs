@@ -105,7 +105,17 @@ namespace Assets.Scripts.UI.Hud
             var state = PlayerState.Instance;
             if (state.EntityId == target.Id || target.CharacterType == CharacterType.PlayerLikeNpc)
                 return;
-            
+
+            //Trading is offered before the party entries because it is the one that does not
+            //depend on who leads what: anybody standing close enough can ask anybody else.
+            //Out of range it is left off rather than greyed, so a menu entry never appears
+            //that could only produce a refusal.
+            if (Distance(target) <= TradeRange)
+            {
+                var tradeButton = AddEntry($"Trade with {target.Name}");
+                tradeButton.onClick.AddListener(TradeWith);
+            }
+
             if (state.IsInParty)
             {
                 if (state.PartyLeader == state.PartyMemberId)
@@ -153,6 +163,22 @@ namespace Assets.Scripts.UI.Hud
                 CameraFollower.Instance.AppendChatText($"<color=yellow>You are not currently in a party.</color>");
             else
                 NetworkManager.Instance.LeaveParty();
+            HideWindow();
+        }
+
+        /// <summary>The server's own trade range, so the menu agrees with what it will allow.</summary>
+        private const int TradeRange = 12;
+
+        private static int Distance(ServerControllable target)
+        {
+            var me = CameraFollower.Instance != null ? CameraFollower.Instance.PlayerPosition : Vector2Int.zero;
+            var d = target.CellPosition - me;
+            return Mathf.RoundToInt(Mathf.Sqrt(d.x * d.x + d.y * d.y));
+        }
+
+        public void TradeWith()
+        {
+            NetworkManager.Instance.SendTradeAction(TradeAction.Request, targetEntityId);
             HideWindow();
         }
 

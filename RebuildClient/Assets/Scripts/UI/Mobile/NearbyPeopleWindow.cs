@@ -36,15 +36,19 @@ namespace Assets.Scripts.UI.Mobile
         private const float RowGap = 3f;
         private const float HeadingHeight = 22f;
 
-        //one set of columns, used by the rows and by the titles above them
-        private const float NameLeft = 12f;
-        private const float NameWidth = 160f;
-        private const float DetailLeft = 178f;
-        private const float DetailWidth = 110f;
-        private const float RangeLeft = 294f;
-        private const float RangeWidth = 40f;
-        private const float ActionLeft = 342f;
-        private const float ActionWidth = 88f;
+        //One set of columns, used by the rows and by the titles above them. A row is 438
+        //wide inside the window's padding, and every column below has to add up to less
+        //than that or the last one is drawn off the edge of a phone screen.
+        private const float NameLeft = 8f;
+        private const float NameWidth = 128f;
+        private const float DetailLeft = 140f;
+        private const float DetailWidth = 96f;
+        private const float RangeLeft = 240f;
+        private const float RangeWidth = 26f;
+        private const float TradeLeft = 272f;
+        private const float TradeWidth = 76f;
+        private const float ActionLeft = 352f;
+        private const float ActionWidth = 80f;
 
         /// <summary>
         /// How far away somebody can be and still be worth listing, in tiles.
@@ -53,6 +57,13 @@ namespace Assets.Scripts.UI.Mobile
         /// standing with, they are somebody the client happens to still be drawing.
         /// </summary>
         private const int Range = 25;
+
+        /// <summary>
+        /// How close you have to be to trade, which is the server's own limit rather than
+        /// this list's. Anyone further off is listed but has no trade button, so a button is
+        /// never offered that could only produce a refusal.
+        /// </summary>
+        private const int TradeRange = 12;
 
         /// <summary>Rebuilt on a timer because people walk; anything faster is wasted work.</summary>
         private const float RefreshInterval = 1f;
@@ -291,7 +302,38 @@ namespace Assets.Scripts.UI.Mobile
             ModernUiTheme.Place(range.rectTransform, new Vector2(0, 0.5f),
                 new Vector2(RangeLeft, 0f), new Vector2(RangeWidth, RowHeight));
 
+            BuildTradeAction(row, person, Distance(me, person));
             BuildPartyAction(row, person, blocked);
+        }
+
+        /// <summary>
+        /// The button that asks somebody to trade, when they are close enough to.
+        ///
+        /// On a desktop this is the right click menu; a phone has neither a second mouse
+        /// button nor a way to point at one character among several standing on the same
+        /// tile, so the row is the target instead.
+        /// </summary>
+        private void BuildTradeAction(RectTransform row, ServerControllable person, int distance)
+        {
+            if (distance > TradeRange)
+            {
+                var far = ModernUiTheme.CreateText(row, "TooFar", "ไกลไป", ModernUiTheme.SizeSmall,
+                    ModernUiTheme.MutedColor, TextAlignmentOptions.Center);
+                far.textWrappingMode = TextWrappingModes.NoWrap;
+                ModernUiTheme.Place(far.rectTransform, new Vector2(0, 0.5f),
+                    new Vector2(TradeLeft, 0f), new Vector2(TradeWidth, RowHeight));
+                return;
+            }
+
+            //captured now, because the row is thrown away and rebuilt on the next refresh
+            var id = person.Id;
+
+            var button = ModernUiTheme.CreateButton(row, "Trade", "ขอเดล",
+                ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place((RectTransform)button.transform, new Vector2(0, 0.5f),
+                new Vector2(TradeLeft, 0f), new Vector2(TradeWidth, RowHeight - 6f));
+            button.onClick.AddListener(() =>
+                NetworkManager.Instance.SendTradeAction(TradeAction.Request, id));
         }
 
         /// <summary>
@@ -380,6 +422,8 @@ namespace Assets.Scripts.UI.Mobile
             Title(strip, "ชื่อ", NameLeft, NameWidth, TextAlignmentOptions.Left);
             Title(strip, "อาชีพ / เลเวล", DetailLeft, DetailWidth, TextAlignmentOptions.Left);
             Title(strip, "ช่อง", RangeLeft, RangeWidth, TextAlignmentOptions.Right);
+            Title(strip, "แลกของ", TradeLeft, TradeWidth, TextAlignmentOptions.Center);
+            Title(strip, "ปาร์ตี้", ActionLeft, ActionWidth, TextAlignmentOptions.Center);
         }
 
         private static void Title(RectTransform strip, string text, float x, float width,

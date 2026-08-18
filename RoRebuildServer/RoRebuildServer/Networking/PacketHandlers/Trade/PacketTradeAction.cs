@@ -54,13 +54,22 @@ public class PacketTradeAction : IClientPacketHandler
             return;
         }
 
+        //Only answering the invitation is possible before it has been answered. Without
+        //this the asker could fill the table, lock it, and have the other side open a window
+        //onto an offer they never agreed to look at.
+        if (!trade.Started && action != TradeAction.Accept && action != TradeAction.Decline
+            && action != TradeAction.Cancel)
+            return;
+
         switch (action)
         {
             case TradeAction.Accept:
-                //accepting is only meaningful for the side that was asked, and the asker's
-                //own accept would otherwise start it twice
-                if (trade.OfferA.Locked || trade.B != player)
+                //accepting is only meaningful for the side that was asked, and only once:
+                //a second accept would re-send the opening packets over a table that already
+                //has things on it
+                if (trade.Started || trade.B != player)
                     return;
+                trade.Started = true;
                 CommandBuilder.SendTradeStarted(trade.A, trade.B);
                 CommandBuilder.SendTradeStarted(trade.B, trade.A);
                 CommandBuilder.SendTradeOffers(trade);

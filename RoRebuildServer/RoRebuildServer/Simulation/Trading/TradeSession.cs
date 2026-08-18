@@ -62,6 +62,17 @@ public class TradeSession
     /// following them around the map.</summary>
     public const int MaxDistance = 12;
 
+    /// <summary>
+    /// Whether the invitation has been accepted.
+    ///
+    /// Both players hold the session from the moment it is asked for - that is what stops a
+    /// third player asking either of them while the question is open - so "there is a
+    /// session" is not the same as "there is a trade". Everything but answering the
+    /// invitation is refused until this is true, otherwise the asker could put items on a
+    /// table the other side has not agreed to sit at.
+    /// </summary>
+    public bool Started;
+
     public TradeSession(Player a, Player b)
     {
         A = a;

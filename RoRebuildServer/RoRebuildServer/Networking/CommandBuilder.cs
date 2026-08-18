@@ -2124,6 +2124,13 @@ public static class CommandBuilder
         SendTradeLockState(trade.B, trade);
     }
 
+    /// <summary>
+    /// Both steps, not just the first.
+    ///
+    /// A window that only knows who has locked cannot tell "press confirm" from "you have
+    /// pressed it, they have not" - the two look identical from the outside and the second
+    /// one is where a player sits waiting, pressing a button that already did its job.
+    /// </summary>
     private static void SendTradeLockState(Player p, TradeSession trade)
     {
         var mine = trade.OfferOf(p);
@@ -2133,6 +2140,8 @@ public static class CommandBuilder
         packet.Write((byte)TradeUpdateType.LockChanged);
         packet.Write((byte)(mine.Locked ? 1 : 0));
         packet.Write((byte)(theirs.Locked ? 1 : 0));
+        packet.Write((byte)(mine.Confirmed ? 1 : 0));
+        packet.Write((byte)(theirs.Confirmed ? 1 : 0));
 
         NetworkManager.SendMessage(packet, p.Connection);
     }
