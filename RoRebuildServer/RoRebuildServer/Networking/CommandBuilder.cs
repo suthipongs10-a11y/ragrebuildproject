@@ -19,6 +19,7 @@ using RoRebuildServer.Simulation;
 using RoRebuildServer.Simulation.Guilds;
 using RoRebuildServer.Simulation.Items;
 using RoRebuildServer.Simulation.Parties;
+using RoRebuildServer.Simulation.Trading;
 using RoRebuildServer.Simulation.Pathfinding;
 using RoRebuildServer.Simulation.StatusEffects.Setup;
 using RoRebuildServer.Simulation.Util;
@@ -2042,6 +2043,116 @@ public static class CommandBuilder
 
         NetworkManager.SendMessageMulti(packet, recipients);
         ClearRecipients();
+    }
+
+    //--- trading between two players ------------------------------------------------
+
+    /// <summary>Tells somebody that a trade has been asked of them, and by whom.</summary>
+    public static void SendTradeRequested(Player p, Player from)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.TradeUpdate, 64);
+        packet.Write((byte)TradeUpdateType.Requested);
+        packet.Write(from.Name);
+        packet.Write(from.Character.Id);
+
+        NetworkManager.SendMessage(packet, p.Connection);
+    }
+
+    /// <summary>Both sides are at the table. Each is told who the other is.</summary>
+    public static void SendTradeStarted(Player p, Player partner)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.TradeUpdate, 64);
+        packet.Write((byte)TradeUpdateType.Started);
+        packet.Write(partner.Name);
+
+        NetworkManager.SendMessage(packet, p.Connection);
+    }
+
+    /// <summary>
+    /// One side's offer, in full, to one player.
+    ///
+    /// Sent whole rather than as a change to what was there, because a trade is the one
+    /// place where showing something that is not what is actually being offered is the
+    /// entire problem. Both sides get both offers, so what each is looking at came from the
+    /// same source rather than from their own copy of what they thought they had put down.
+    /// </summary>
+    public static void SendTradeOffer(Player to, TradeSession trade, Player owner)
+    {
+        var offer = trade.OfferOf(owner);
+        var bag = owner.Inventory;
+
+        var packet = NetworkManager.StartPacket(PacketType.TradeUpdate, 256);
+        packet.Write((byte)TradeUpdateType.Offer);
+        packet.Write((byte)(owner == to ? 1 : 0));
+        packet.Write(offer.Zeny);
+
+        //counted first so the reader knows how many to take, and counted over what is
+        //actually still in the bag rather than over what the offer remembers
+        var sendable = new List<(int BagId, ItemReference Item)>();
+        foreach (var (bagId, count) in offer.Items)
+        {
+            if (bag == null || !bag.GetItem(bagId, out var item))
+                continue;
+
+            item.Count = count;
+            sendable.Add((bagId, item));
+        }
+
+        packet.Write(sendable.Count);
+        foreach (var (bagId, item) in sendable)
+        {
+            packet.Write(bagId);
+            item.SerializeWithType(packet);
+        }
+
+        NetworkManager.SendMessage(packet, to.Connection);
+    }
+
+    /// <summary>Sends both offers to both sides, which is every case that changes one.</summary>
+    public static void SendTradeOffers(TradeSession trade)
+    {
+        SendTradeOffer(trade.A, trade, trade.A);
+        SendTradeOffer(trade.A, trade, trade.B);
+        SendTradeOffer(trade.B, trade, trade.A);
+        SendTradeOffer(trade.B, trade, trade.B);
+    }
+
+    /// <summary>Who has agreed so far, from each side's own point of view.</summary>
+    public static void SendTradeLockState(TradeSession trade)
+    {
+        SendTradeLockState(trade.A, trade);
+        SendTradeLockState(trade.B, trade);
+    }
+
+    private static void SendTradeLockState(Player p, TradeSession trade)
+    {
+        var mine = trade.OfferOf(p);
+        var theirs = trade.OfferOf(trade.Other(p));
+
+        var packet = NetworkManager.StartPacket(PacketType.TradeUpdate, 16);
+        packet.Write((byte)TradeUpdateType.LockChanged);
+        packet.Write((byte)(mine.Locked ? 1 : 0));
+        packet.Write((byte)(theirs.Locked ? 1 : 0));
+
+        NetworkManager.SendMessage(packet, p.Connection);
+    }
+
+    public static void SendTradeCompleted(Player p)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.TradeUpdate, 8);
+        packet.Write((byte)TradeUpdateType.Completed);
+
+        NetworkManager.SendMessage(packet, p.Connection);
+    }
+
+    /// <summary>Says it is off, and why, rather than leaving a window that stopped working.</summary>
+    public static void SendTradeCancelled(Player p, string reason)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.TradeUpdate, 128);
+        packet.Write((byte)TradeUpdateType.Cancelled);
+        packet.Write(reason);
+
+        NetworkManager.SendMessage(packet, p.Connection);
     }
 
     //notify party members of a party composition change

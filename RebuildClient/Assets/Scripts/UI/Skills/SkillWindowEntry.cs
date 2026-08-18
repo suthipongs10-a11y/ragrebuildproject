@@ -180,7 +180,14 @@ namespace Assets.Scripts.UI
 
         public void HoverTooltip()
         {
-            if (!Input.GetMouseButton(0) && !CameraFollower.Instance.HasSkillOnCursor) //if we're not dragging anything basically
+            //The mouse button test is there so a tooltip does not appear while something is
+            //being dragged. On a touch screen it means the tooltip never appears at all: a
+            //finger on the row is a held mouse button, and by the time it lifts the pointer
+            //has left the row. So on a phone the test is only whether a skill is on the
+            //cursor, which is the half of it that still means something.
+            var dragging = !Mobile.MobileMode.IsActive && Input.GetMouseButton(0);
+
+            if (!dragging && !CameraFollower.Instance.HasSkillOnCursor)
                 parent.ShowTooltip(data.SkillId, this);
         }
 
@@ -192,6 +199,13 @@ namespace Assets.Scripts.UI
         public void OnPointerEnter(PointerEventData eventData)
         {
             HighlightSkillBox();
+
+            //The tooltip is normally raised by a small area inside the row, which a mouse
+            //passes over on its way anywhere. A finger does not pass over anything - it
+            //arrives - and it lands on whatever part of the row it lands on, so the whole
+            //row has to raise it.
+            if (Mobile.MobileMode.IsActive)
+                HoverTooltip();
         }
 
         public void OnPointerExit(PointerEventData eventData)

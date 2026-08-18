@@ -22,6 +22,7 @@ using RoRebuildServer.Simulation;
 using RoRebuildServer.Simulation.Items;
 using RoRebuildServer.Simulation.Parties;
 using RoRebuildServer.Simulation.Pathfinding;
+using RoRebuildServer.Simulation.Trading;
 using RoRebuildServer.Simulation.Skills;
 using RoRebuildServer.Simulation.Skills.SkillHandlers;
 using RoRebuildServer.Simulation.Util;
@@ -90,6 +91,9 @@ public class Player : IEntityAutoReset
     public bool HasEnteredServer;
 
     public CharacterFollowerState PlayerFollower;
+
+    /// <summary>The trade this player is at the table for, or null. One at a time.</summary>
+    public TradeSession? Trade;
     public bool HasCart => (PlayerFollower & CharacterFollowerState.AnyCart) > 0;
     public bool HasBird => (PlayerFollower & CharacterFollowerState.Falcon) > 0;
     public bool HasPeco => (PlayerFollower & CharacterFollowerState.Mounted) > 0;
@@ -305,6 +309,11 @@ public class Player : IEntityAutoReset
 
         isSittingHpTick = false;
         isSittingSpTick = false;
+
+        //A trade the other half is still sitting in is a trade that can never finish, so it
+        //is ended rather than dropped: the other player is told and let go.
+        if (Trade != null)
+            Trade.End("The other player has left.");
 
         if (Party != null)
         {

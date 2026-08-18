@@ -141,6 +141,11 @@ public enum PacketType : byte
     //shapes and a dozen entries here is a dozen chances for the two sides to disagree.
     GuildAction,
     GuildData,
+
+    //trading between two players: one request in with an action byte, one answer out with
+    //whatever that action needs, the same shape the guild windows use
+    TradeAction,
+    TradeUpdate,
 }
 
 public enum MessageType : byte
