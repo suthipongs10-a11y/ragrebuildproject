@@ -61,16 +61,6 @@ namespace Assets.Scripts.UI.Mobile
         private float applyTimer;
         private bool reportedOnce;
 
-        /// <summary>
-        /// A screen taller than it is wide, or a device with a finger on it.
-        ///
-        /// Both, rather than touch alone, so the layout can be looked at in the editor by
-        /// setting the game view to a portrait aspect - which is the only way to see it
-        /// without building to a phone and reading a screenshot.
-        /// </summary>
-        private static bool WantsMobileLayout =>
-            Application.isMobilePlatform || Input.touchSupported || Screen.height > Screen.width;
-
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
@@ -101,7 +91,7 @@ namespace Assets.Scripts.UI.Mobile
             //
             //The slots are told either way, not only when it turns out to be a phone, so a
             //window dragged back to landscape gets its double click and its key labels back.
-            var wants = WantsMobileLayout;
+            var wants = MobileMode.IsActive;
             SetSlotsTouchable(ui.SkillHotbar, wants);
 
             if (!wants)
@@ -323,6 +313,18 @@ namespace Assets.Scripts.UI.Mobile
 
                 if (entry.HotkeyText != null && entry.HotkeyText.gameObject.activeSelf == touch)
                     entry.HotkeyText.gameObject.SetActive(!touch);
+
+                //An empty slot has no draggable to click - it is switched off the moment the
+                //slot is cleared - so without this there is nothing on a phone that can put
+                //anything into one.
+                var tap = entry.GetComponent<HotbarSlotTap>();
+                if (touch && tap == null)
+                {
+                    tap = entry.gameObject.AddComponent<HotbarSlotTap>();
+                    tap.Entry = entry;
+                }
+                else if (!touch && tap != null)
+                    Destroy(tap);
             }
         }
 

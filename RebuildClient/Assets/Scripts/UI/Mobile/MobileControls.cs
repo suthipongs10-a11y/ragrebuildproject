@@ -66,7 +66,9 @@ namespace Assets.Scripts.UI.Mobile
             if (!ModernUiTheme.RuntimeUiEnabled)
                 return;
 
-            if (!Input.touchSupported && !Application.isMobilePlatform)
+            //Asked of MobileMode rather than of the hardware: a desktop browser reports
+            //touch support and used to end up with the phone's controls over its own.
+            if (!MobileMode.IsActive)
                 return;
 
             if (FindFirstObjectByType<MobileControls>() != null)

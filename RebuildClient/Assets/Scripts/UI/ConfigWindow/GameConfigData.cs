@@ -32,6 +32,12 @@ namespace Assets.Scripts.UI.ConfigWindow
         public int[] AudioVolumeLevels;
         public bool[] AudioMuteValues;
         //skills
+        /// <summary>
+        /// 0 auto, 1 always the phone layout, 2 never it. See MobileMode, which is the only
+        /// thing that should read this.
+        /// </summary>
+        public int MobileUiMode = 0;
+
         public bool AutoLockSkillWindow = false;
         public bool ShowAllSkillsInSkillWindow = false;
         //character overlay
