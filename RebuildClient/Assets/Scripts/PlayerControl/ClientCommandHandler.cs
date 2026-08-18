@@ -9,6 +9,7 @@ using Assets.Scripts.PlayerControl;
 using Assets.Scripts.Sprites;
 using Assets.Scripts.UI;
 using Assets.Scripts.UI.ConfigWindow;
+using Assets.Scripts.UI.Mobile;
 using Assets.Scripts.UI.Utility;
 using Assets.Scripts.Utility;
 using JetBrains.Annotations;
@@ -155,19 +156,19 @@ namespace PlayerControl
                     //and a screen that is an exception to that should not need a code change.
                     var mode = s.Length > 1 ? s[1].ToLowerInvariant() : "";
                     if (mode == "on")
-                        Mobile.MobileMode.Setting = Mobile.MobileMode.AlwaysOn;
+                        MobileMode.Setting = MobileMode.AlwaysOn;
                     else if (mode == "off")
-                        Mobile.MobileMode.Setting = Mobile.MobileMode.AlwaysOff;
+                        MobileMode.Setting = MobileMode.AlwaysOff;
                     else if (mode == "auto")
-                        Mobile.MobileMode.Setting = Mobile.MobileMode.Auto;
+                        MobileMode.Setting = MobileMode.Auto;
                     else
                     {
-                        cameraFollower.AppendChatText($"<color=yellow>โหมดมือถือ: {Mobile.MobileMode.Describe()}</color>");
+                        cameraFollower.AppendChatText($"<color=yellow>โหมดมือถือ: {MobileMode.Describe()}</color>");
                         cameraFollower.AppendChatText("<color=yellow>ใช้ /mobileui on | off | auto</color>");
                         return;
                     }
 
-                    cameraFollower.AppendChatText($"<color=yellow>โหมดมือถือ: {Mobile.MobileMode.Describe()}  (โหลดหน้าใหม่ถ้าปุ่มยังไม่เปลี่ยน)</color>");
+                    cameraFollower.AppendChatText($"<color=yellow>โหมดมือถือ: {MobileMode.Describe()}  (โหลดหน้าใหม่ถ้าปุ่มยังไม่เปลี่ยน)</color>");
                     return;
                 }
 
