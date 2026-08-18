@@ -131,8 +131,8 @@ namespace Assets.Scripts.UI.Mobile
             //all: pick out a particular person. Every other button here chooses its own
             //target and always the nearest one, which is right for swinging a sword and
             //wrong for anything aimed at somebody in particular.
-            CreateButton(controlGroup, UtilSlot(2, 3), UtilSize, TalkColor, null,
-                NearbyPeopleWindow.Toggle, ThaiUiText.Get("Nearby"), true);
+            CreateButton(controlGroup, UtilSlot(2, 3), UtilSize, TalkColor, CreatePeopleSprite(),
+                NearbyPeopleWindow.Toggle, null, true);
 
             toggleButton = CreateButton(root, new Vector2(-24, 96), ToggleSize, ZoomColor, CreateMenuSprite(), ToggleControls);
 
@@ -669,6 +669,26 @@ namespace Assets.Scripts.UI.Mobile
             FillRect(pixels, 33, 34, 38, 50, Color.white);
             FillRect(pixels, 39, 34, 44, 45, Color.white);
             FillRect(pixels, 13, 20, 20, 31, Color.white); //thumb
+
+            return BuildSprite(pixels);
+        }
+
+        /// <summary>
+        /// Two heads side by side, for the list of people nearby.
+        ///
+        /// A picture rather than the word, which in Thai is nine characters and folded onto
+        /// a second line inside a button 62 across. The other labels here got away with text
+        /// by being two or three characters wide.
+        /// </summary>
+        private static Sprite CreatePeopleSprite()
+        {
+            var pixels = NewTransparentBuffer();
+
+            FillRect(pixels, 12, 36, 26, 50, Color.white); //head, behind and left
+            FillRect(pixels, 8, 12, 30, 33, Color.white);  //shoulders
+
+            FillRect(pixels, 34, 40, 50, 56, Color.white); //head, in front and right
+            FillRect(pixels, 30, 12, 54, 37, Color.white); //shoulders
 
             return BuildSprite(pixels);
         }

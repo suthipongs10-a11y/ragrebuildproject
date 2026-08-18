@@ -47,6 +47,15 @@ namespace Assets.Scripts.UI.Mobile
         private const float SlotGap = 2f;
         private const float ApplyInterval = 1f;
 
+        /// <summary>
+        /// How much bigger a slot is drawn than the desktop prefab makes it.
+        ///
+        /// The prefab is sized for a mouse pointer, which is one pixel wide. A fingertip is
+        /// nearer forty, and a slot you hit four times out of five is worse than no slot.
+        /// Shrunk back below this whenever the column would not otherwise fit.
+        /// </summary>
+        private const float SlotScale = 1.25f;
+
         private readonly Vector3[] corners = new Vector3[4];
 
         private float applyTimer;
@@ -78,11 +87,6 @@ namespace Assets.Scripts.UI.Mobile
 
         private void Update()
         {
-            //Checked every time rather than once at startup: a browser window can be dragged
-            //from wide to tall without the page reloading, and a phone can be turned over.
-            if (!WantsMobileLayout)
-                return;
-
             applyTimer -= Time.deltaTime;
             if (applyTimer > 0f)
                 return;
@@ -90,6 +94,17 @@ namespace Assets.Scripts.UI.Mobile
 
             var ui = UiManager.Instance;
             if (ui == null || !ui.IsCanvasVisible)
+                return;
+
+            //Asked every time rather than once at startup: a browser window can be dragged
+            //from wide to tall without the page reloading, and a phone can be turned over.
+            //
+            //The slots are told either way, not only when it turns out to be a phone, so a
+            //window dragged back to landscape gets its double click and its key labels back.
+            var wants = WantsMobileLayout;
+            SetSlotsTouchable(ui.SkillHotbar, wants);
+
+            if (!wants)
                 return;
 
             var canvas = CanvasRect();
@@ -269,13 +284,46 @@ namespace Assets.Scripts.UI.Mobile
             Place(container, new Vector2(0, 1), Vector2.zero, new Vector2(width, height));
             Place(bar, new Vector2(0, 1), Vector2.zero, new Vector2(width, height));
 
-            //Shrunk only if the column is longer than the band it has. Ten slots at their own
-            //size is the readable answer and the usual one; this is the short screen case.
+            //Drawn a quarter larger than the prefab for a fingertip, then clamped down to
+            //whatever the band between the readout and the thumb controls will hold.
             var band = bounds.height * HotbarHeightShare - readoutHeight - Gap - Margin;
-            var scale = height > band && height > 1f ? Mathf.Clamp(band / height, 0.4f, 1f) : 1f;
+            var wanted = height * SlotScale;
+            var scale = wanted > band && band > 1f
+                ? Mathf.Clamp(band / height, 0.4f, SlotScale)
+                : SlotScale;
             bar.localScale = Vector3.one * scale;
 
             PinToCorner(canvas, bar, new Vector2(0, 1), readoutHeight + Gap);
+        }
+
+        /// <summary>
+        /// Whether a slot answers one tap or two, and whether it wears a keyboard hint.
+        ///
+        /// A slot could only ever be fired by a double click, and its label read "1" or
+        /// "Shift 1" - the name of a key on a machine that has none. Between them that is a
+        /// hotbar which on a phone reads as decoration: nothing says how to use it and
+        /// nothing happens when you try. One tap fires it now, and the label is gone, which
+        /// also gives the icon the whole of a slot that is already small.
+        ///
+        /// Dragging a slot to rearrange it still works: a drag cancels the click before it
+        /// is ever sent, so the two gestures cannot both fire.
+        ///
+        /// Applied every pass rather than once, because the bar rebuilds its rows when the
+        /// player changes character and the new slots would come back untouched.
+        /// </summary>
+        private static void SetSlotsTouchable(SkillHotbar hotbar, bool touch)
+        {
+            if (hotbar == null)
+                return;
+
+            foreach (var entry in hotbar.GetComponentsInChildren<SkillHotbarEntry>(true))
+            {
+                if (entry.DragItem != null)
+                    entry.DragItem.ActivateOnSingleClick = touch;
+
+                if (entry.HotkeyText != null && entry.HotkeyText.gameObject.activeSelf == touch)
+                    entry.HotkeyText.gameObject.SetActive(!touch);
+            }
         }
 
         /// <summary>The size of the first slot found, which every other one shares.</summary>

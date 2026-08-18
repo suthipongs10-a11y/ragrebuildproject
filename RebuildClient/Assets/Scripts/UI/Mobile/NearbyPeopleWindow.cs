@@ -120,7 +120,7 @@ namespace Assets.Scripts.UI.Mobile
             rect.anchoredPosition = Vector2.zero;
             rect.sizeDelta = new Vector2(Width, Height);
 
-            ModernUiTheme.CreateTitleBar(window, "คนรอบตัว", "", ModernUiIcons.Person);
+            ModernUiTheme.CreateTitleBar(window, ThaiUiText.Get("Nearby"), "", ModernUiIcons.Person);
             ModernUiTheme.AttachShadow(rect);
 
             window.subtitle = ModernUiTheme.CreateText(rect, "Count", "", ModernUiTheme.SizeLabel,

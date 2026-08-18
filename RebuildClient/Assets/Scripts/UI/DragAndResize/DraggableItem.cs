@@ -37,6 +37,17 @@ namespace Assets.Scripts.UI
         public Action OnDoubleClick;
         public Action OnRightClick;
 
+        /// <summary>
+        /// Fires <see cref="OnDoubleClick"/> on the first tap rather than the second.
+        ///
+        /// A double click is a mouse idea. On a phone it means two taps inside a third of a
+        /// second on the same few pixels, with nothing on screen saying so, which is a
+        /// hotbar slot that reads as not working at all. Set only where a single press is
+        /// unambiguous - the hotbar, where the other thing a slot does is be dragged, and a
+        /// drag cancels the click before it is ever sent.
+        /// </summary>
+        [NonSerialized] public bool ActivateOnSingleClick;
+
         private UiManager manager;
 
         public void Awake()
@@ -77,7 +88,7 @@ namespace Assets.Scripts.UI
                                      && (Type == DragItemType.Item || Type == DragItemType.Equipment || Type == DragItemType.SocketedItem || Type == DragItemType.CartItem))
                 OnRightClick();
             if (OnDoubleClick != null && Type != DragItemType.None && eventData.button == PointerEventData.InputButton.Left 
-                && eventData.clickCount >= 2 && OnDoubleClick != null)
+                && eventData.clickCount >= (ActivateOnSingleClick ? 1 : 2))
             {
                 OnDoubleClick();
                 UiManager.Instance.HideTooltip(gameObject);
