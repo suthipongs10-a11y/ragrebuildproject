@@ -54,6 +54,9 @@ namespace Assets.Scripts.UI
 
         public SkillHotbarEntry GetEntryById(int id) => HotBarEntries[id];
 
+        /// <summary>How many slots exist, so a caller can walk them without guessing.</summary>
+        public int EntryCount => HotBarEntries.Count;
+
         private KeyCode[] HotKeyCode =
         {
             KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4, KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8, KeyCode.Alpha9, KeyCode.Alpha0,
@@ -127,9 +130,12 @@ namespace Assets.Scripts.UI
             {
                 //no background to make catch it, so one is added behind the rest. Fully
                 //transparent: a raycast target does not have to be visible.
+                //An image added to the slot's own object already draws behind everything in
+                //it, because children draw after their parent. Sending the transform to the
+                //front would move the SLOT to the front of its row instead - this and the
+                //background share one transform - and the row would come out back to front.
                 background = entry.gameObject.AddComponent<Image>();
                 background.color = new Color(1f, 1f, 1f, 0f);
-                background.transform.SetAsFirstSibling();
             }
 
             background.raycastTarget = true;

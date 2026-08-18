@@ -172,6 +172,14 @@ namespace PlayerControl
                     return;
                 }
 
+                if (s[0] == "/hotbar")
+                {
+                    //Reading the code says a skill put into slot 0 should appear and it does
+                    //not, so this asks the running object instead of the source.
+                    HotbarReport.Print();
+                    return;
+                }
+
                 if (s[0] == "/where")
                 {
                     var mapname = NetworkManager.Instance.CurrentMap;
