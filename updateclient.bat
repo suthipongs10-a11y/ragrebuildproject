@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 setlocal
 
 rem One click that takes the project from a fresh pull all the way to a running

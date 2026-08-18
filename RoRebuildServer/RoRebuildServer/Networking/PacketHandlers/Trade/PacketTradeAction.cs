@@ -5,6 +5,7 @@ using RebuildSharedData.Networking;
 using RoRebuildServer.EntityComponents;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Simulation;
+using RoRebuildServer.Simulation.Pathfinding;
 using RoRebuildServer.Simulation.Trading;
 
 namespace RoRebuildServer.Networking.PacketHandlers.Trade;
