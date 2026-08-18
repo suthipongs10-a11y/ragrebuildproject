@@ -1,4 +1,4 @@
-using Assets.Scripts.Network;
+﻿using Assets.Scripts.Network;
 using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
 using TMPro;
@@ -29,6 +29,9 @@ namespace Assets.Scripts.UI.Mobile
         private const float PickUpSize = 90f;
         private const float ToggleSize = 52f;
         private const float UtilSize = 62f;
+
+        /// <summary>Small enough to sit inside the chat bar rather than over it.</summary>
+        private const float SendSize = 40f;
         private const float UtilGap = 8f;
         private const float UtilOriginX = 24f;
         private const float UtilOriginY = 410f;
@@ -58,6 +61,7 @@ namespace Assets.Scripts.UI.Mobile
         private bool joystickWalking;
 
         private RectTransform toggleButton;
+        private RectTransform sendButton;
         private bool wasInGame;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -180,6 +184,48 @@ namespace Assets.Scripts.UI.Mobile
 
             RestructureBottomMenu();
             UpdateJoystickWalk();
+            EnsureSendButton();
+        }
+
+        /// <summary>
+        /// Puts a send button on the end of the chat bar.
+        ///
+        /// A message is sent by the return key and by nothing else. A phone has no return
+        /// key: the one on its soft keyboard closes the keyboard and produces no key event,
+        /// so a message could be typed, and typed correctly, and never go anywhere.
+        ///
+        /// Hung on the input field itself rather than placed by hand, so it sits against the
+        /// right end of the bar wherever the bar is and whatever size the screen made it.
+        /// </summary>
+        private void EnsureSendButton()
+        {
+            if (sendButton != null)
+                return;
+
+            var camera = CameraFollower.Instance;
+            var field = camera != null ? camera.TextBoxInputField : null;
+            if (field == null)
+                return;
+
+            var host = field.transform as RectTransform;
+            if (host == null)
+                return;
+
+            var button = CreateButton(host, Vector2.zero, SendSize, TalkColor, CreateSendSprite(),
+                camera.SubmitActiveTextEntry);
+
+            //against the right end of the bar, vertically centred, rather than in a corner of
+            //the screen: it belongs to the thing it sends
+            button.anchorMin = new Vector2(1, 0.5f);
+            button.anchorMax = new Vector2(1, 0.5f);
+            button.pivot = new Vector2(1, 0.5f);
+            button.anchoredPosition = new Vector2(-4f, 0f);
+
+            //the soft keyboard's own done key does reach this on some browsers, and where it
+            //does the button is only there for the ones where it does not
+            field.onSubmit.AddListener(_ => camera.SubmitActiveTextEntry());
+
+            sendButton = button;
         }
 
         /// <summary>
@@ -691,6 +737,20 @@ namespace Assets.Scripts.UI.Mobile
 
             FillRect(pixels, 34, 40, 50, 56, Color.white); //head, in front and right
             FillRect(pixels, 30, 12, 54, 37, Color.white); //shoulders
+
+            return BuildSprite(pixels);
+        }
+
+        /// <summary>An arrow pointing right, for the button that sends what was typed.</summary>
+        private static Sprite CreateSendSprite()
+        {
+            var pixels = NewTransparentBuffer();
+
+            FillRect(pixels, 12, 29, 44, 35, Color.white); //shaft
+
+            //a head drawn as a stack of shortening bars, which is a triangle at this size
+            for (var i = 0; i < 12; i++)
+                FillRect(pixels, 34 + i, 32 - (12 - i), 36 + i, 32 + (12 - i), Color.white);
 
             return BuildSprite(pixels);
         }

@@ -30,6 +30,16 @@ namespace Assets.Scripts.UI
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            //One tap puts the skill on the bar, on a screen where dragging it there is the
+            //hard way round. The drag still works and is still the only way on a desktop;
+            //this is the way that cannot miss, because the finger never has to travel from
+            //the window it is in to a slot the window is usually covering.
+            if (Mobile.MobileMode.IsActive && eventData.clickCount < 2)
+            {
+                Mobile.HotbarPickerWindow.PutOnBar(ItemId, ItemCount, Entry);
+                return;
+            }
+
             if (eventData.clickCount < 2 && eventData.clickCount % 2 != 0)
                 return;
             if(CameraFollower.Instance.PressSkillButton((CharacterSkill)ItemId, ItemCount))

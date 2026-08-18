@@ -1440,6 +1440,55 @@ namespace Assets.Scripts
             lastMessage = text;
         }
 
+
+        /// <summary>
+        /// Sends whatever text box is open, or opens the chat if none is.
+        ///
+        /// This was the body of the return key's handler and nothing else could reach it. A
+        /// phone has no return key: the one on its soft keyboard closes the keyboard and
+        /// produces no key event at all, so a message could be typed and never sent. The
+        /// button beside the chat bar on a touch screen calls this, which is the same path
+        /// the key takes rather than a second one that would drift away from it.
+        /// </summary>
+        public void SubmitActiveTextEntry()
+        {
+            if (InItemInputBox)
+            {
+                UiManager.Instance.DropCountConfirmationWindow.SubmitDrop();
+                EventSystem.current.SetSelectedGameObject(null);
+            }
+            else if (InTextInputBox)
+            {
+                UiManager.Instance.TextInputWindow.Submit();
+            }
+            else if (!InTextBox)
+            {
+                //EventSystem.current.SetSelectedGameObject(TextBoxInputField.gameObject);
+                TextBoxInputField.ActivateInputField();
+            }
+            else
+            {
+                var text = TextBoxInputField.text;
+                OnSubmitTextBox(text);
+                if (string.IsNullOrWhiteSpace(text) || text.StartsWith("/"))
+                {
+                    TextBoxInputField.text = "";
+                    TextBoxInputField.DeactivateInputField(true);
+                    EventSystem.current.SetSelectedGameObject(null);
+                }
+                else
+                {
+                    InTextBox = false;
+
+                    //Debug.Log(text);
+                    //TextBoxInputField.DeactivateInputField(true);
+                    TextBoxInputField.text = "";
+                    TextBoxInputField.ActivateInputField();
+                    //EventSystem.current.SetSelectedGameObject(null);
+                }
+            }
+        }
+
         public void AttachEffectToEntity(string effect, GameObject target, int ownerId = -1)
         {
             switch (effect.ToLower())
@@ -1903,43 +1952,7 @@ namespace Assets.Scripts
             }
 
             if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-            {
-                if (InItemInputBox)
-                {
-                    UiManager.Instance.DropCountConfirmationWindow.SubmitDrop();
-                    EventSystem.current.SetSelectedGameObject(null);
-                }
-                else if (InTextInputBox)
-                {
-                    UiManager.Instance.TextInputWindow.Submit();
-                }
-                else if (!InTextBox)
-                {
-                    //EventSystem.current.SetSelectedGameObject(TextBoxInputField.gameObject);
-                    TextBoxInputField.ActivateInputField();
-                }
-                else
-                {
-                    var text = TextBoxInputField.text;
-                    OnSubmitTextBox(text);
-                    if (string.IsNullOrWhiteSpace(text) || text.StartsWith("/"))
-                    {
-                        TextBoxInputField.text = "";
-                        TextBoxInputField.DeactivateInputField(true);
-                        EventSystem.current.SetSelectedGameObject(null);
-                    }
-                    else
-                    {
-                        InTextBox = false;
-
-                        //Debug.Log(text);
-                        //TextBoxInputField.DeactivateInputField(true);
-                        TextBoxInputField.text = "";
-                        TextBoxInputField.ActivateInputField();
-                        //EventSystem.current.SetSelectedGameObject(null);
-                    }
-                }
-            }
+                SubmitActiveTextEntry();
 
             if (!inInputUI && Input.GetKeyDown(KeyCode.R))
             {

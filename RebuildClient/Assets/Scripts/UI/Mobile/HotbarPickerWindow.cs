@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Assets.Scripts.PlayerControl;
 using Assets.Scripts.Sprites;
 using Assets.Scripts.UI.ConfigWindow;
@@ -190,6 +190,84 @@ namespace Assets.Scripts.UI.Mobile
 
         private static SkillHotbar Hotbar() =>
             UiManager.Instance != null ? UiManager.Instance.SkillHotbar : null;
+
+        /// <summary>
+        /// Drops a skill into the first free slot, and says which one it went to.
+        ///
+        /// This is the route that cannot miss. Dragging asks the finger to travel from the
+        /// skill window to a slot the skill window is usually sitting on top of, and the
+        /// picker asks the player to know that an empty square is a button. Tapping the skill
+        /// you want asks nothing: it is already the thing under the finger.
+        ///
+        /// Full bar and nothing else to do about it, so it says so rather than quietly
+        /// replacing something that was put there on purpose.
+        /// </summary>
+        public static void PutOnBar(int skillId, int level, SkillWindowEntry source)
+        {
+            var hotbar = Hotbar();
+            var data = ClientDataLoader.Instance;
+            if (hotbar == null || data == null)
+                return;
+
+            var skill = data.GetSkillData((CharacterSkill)skillId);
+            if (skill == null)
+                return;
+
+            if (skill.Target == SkillTarget.Passive)
+            {
+                Say("สกิลนี้เป็นพาสซีฟ ใส่แถบลัดไม่ได้");
+                return;
+            }
+
+            var sprite = data.GetIconAtlasSprite(skill.Icon);
+            if (sprite == null)
+                return;
+
+            for (var i = 0; i < SlotCount; i++)
+            {
+                var entry = hotbar.GetEntryById(i);
+                if (entry == null || entry.DragItem == null)
+                    continue;
+
+                //already on the bar, so putting it on again would only take a second slot
+                if (entry.DragItem.Type == DragItemType.Skill && entry.DragItem.ItemId == skillId)
+                {
+                    Say($"{skill.Name} อยู่ในช่องที่ {i + 1} แล้ว");
+                    return;
+                }
+            }
+
+            for (var i = 0; i < SlotCount; i++)
+            {
+                var entry = hotbar.GetEntryById(i);
+                if (entry == null || entry.DragItem == null || entry.DragItem.Type != DragItemType.None)
+                    continue;
+
+                entry.DragItem.gameObject.SetActive(true);
+                entry.DragItem.Assign(DragItemType.Skill, sprite, skillId,
+                    skill.AdjustableLevel ? level : 0);
+                entry.DragItem.Origin = ItemDragOrigin.HotBar;
+                entry.DragItem.OriginId = i;
+
+                hotbar.UpdateItemCounts();
+                SaveHotbar();
+
+                if (source != null)
+                    source.HighlightSkillBox();
+
+                Say($"ใส่ {skill.Name} ในช่องที่ {i + 1} แล้ว");
+                return;
+            }
+
+            Say("แถบลัดเต็มแล้ว — แตะช่องที่ต้องการเปลี่ยนเพื่อเลือกใหม่");
+        }
+
+        private static void Say(string text)
+        {
+            var camera = CameraFollower.Instance;
+            if (camera != null)
+                camera.AppendChatText($"<color=#77FF77>{text}</color>");
+        }
 
         private void Redraw()
         {
