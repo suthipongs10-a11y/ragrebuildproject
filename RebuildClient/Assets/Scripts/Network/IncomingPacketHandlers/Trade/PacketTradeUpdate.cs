@@ -104,11 +104,14 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Trading
                 }
 
                 case TradeUpdateType.Completed:
-                    TradeWindow.Finish("แลกเปลี่ยนสำเร็จ", true);
+                    //Completed rather than Finish: this is the one ending that has something
+                    //to say beyond that it happened, and the window is the only place the
+                    //two offers exist to say it from.
+                    TradeWindow.Completed();
                     break;
 
                 case TradeUpdateType.Cancelled:
-                    TradeWindow.Finish(msg.ReadString(), false);
+                    TradeWindow.Cancelled(msg.ReadString());
                     break;
             }
         }

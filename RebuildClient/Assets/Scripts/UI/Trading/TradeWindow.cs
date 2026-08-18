@@ -164,13 +164,63 @@ namespace Assets.Scripts.UI.Trading
             instance.Redraw();
         }
 
-        /// <summary>Over, one way or the other. Says which in chat and gets out of the way.</summary>
-        public static void Finish(string message, bool success)
+        /// <summary>
+        /// The trade went through. Says what changed hands, then gets out of the way.
+        ///
+        /// Written out afterwards because the window is about to close: what was on the
+        /// table is the only record of a trade, and once it is gone there is nothing to look
+        /// back at when somebody asks what they actually agreed to.
+        ///
+        /// Read off the last offers the server sent rather than asked for again. They cannot
+        /// be stale: changing either offer clears both agreements, so nothing can have moved
+        /// between the last offer packet and this one.
+        /// </summary>
+        public static void Completed()
         {
-            if (!string.IsNullOrWhiteSpace(message))
-                CameraFollower.Instance.AppendChatText(success
-                    ? $"<color=#77FF77>{message}</color>"
-                    : $"<color=#ed0000>{message}</color>");
+            var camera = CameraFollower.Instance;
+
+            if (instance != null && camera != null)
+            {
+                var who = string.IsNullOrWhiteSpace(instance.partnerName) ? "อีกฝ่าย" : instance.partnerName;
+                camera.AppendChatText($"<color=#77FF77>แลกเปลี่ยนกับ {who} สำเร็จ</color>");
+
+                Report(camera, "ได้รับ", instance.theirOffer, instance.theirZeny, "#77FF77");
+                Report(camera, "ให้ไป", instance.myOffer, instance.myZeny, "#FFC96B");
+            }
+            else if (camera != null)
+                camera.AppendChatText("<color=#77FF77>แลกเปลี่ยนสำเร็จ</color>");
+
+            if (instance != null)
+                instance.HideWindow();
+        }
+
+        /// <summary>One side of what changed hands, or nothing at all if that side was empty.</summary>
+        private static void Report(CameraFollower camera, string label, List<OfferedItem> items,
+            int zeny, string color)
+        {
+            var parts = new List<string>();
+
+            foreach (var entry in items)
+            {
+                var name = entry.Item.ProperName();
+                parts.Add(entry.Item.Count > 1 ? $"{name} x{entry.Item.Count}" : name);
+            }
+
+            if (zeny > 0)
+                parts.Add($"{zeny:N0} z");
+
+            //a side that put nothing down is not worth a line saying so
+            if (parts.Count == 0)
+                return;
+
+            camera.AppendChatText($"<color={color}>  {label}: {string.Join(", ", parts)}</color>");
+        }
+
+        /// <summary>Called off, by either side or by the server. Says why and gets out of the way.</summary>
+        public static void Cancelled(string reason)
+        {
+            if (!string.IsNullOrWhiteSpace(reason) && CameraFollower.Instance != null)
+                CameraFollower.Instance.AppendChatText($"<color=#ed0000>{reason}</color>");
 
             //HideWindow rather than CloseWindow: this is the server telling us the trade is
             //already over, and closing sends a cancel, which would be answering a trade that
