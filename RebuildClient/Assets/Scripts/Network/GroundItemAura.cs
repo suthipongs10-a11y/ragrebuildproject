@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.Effects;
+using Assets.Scripts.Objects;
+using Assets.Scripts.PlayerControl;
 using RebuildSharedData.ClientTypes;
 using RebuildSharedData.Enum;
 using UnityEngine;
@@ -83,6 +85,33 @@ namespace Assets.Scripts.Network
         private static readonly Dictionary<Color, Material> additiveMaterials = new Dictionary<Color, Material>();
         private static bool loggedOnce;
 
+        /// <summary>
+        /// The game's own level-up pillar, borrowed for a drop worth crossing the map for.
+        ///
+        /// It is a far bigger thing than the drawn aura - a shaft of light with a turning
+        /// ring at its foot, the effect the game already plays when somebody levels - and
+        /// that is the point: it is reserved for cards and for what a boss left behind, so
+        /// that seeing one means something. Everything else keeps the quiet aura.
+        ///
+        /// Two different effects rather than one tinted three ways, because a tint can only
+        /// take colour away. The gold pillar has no blue in it to turn purple with, and the
+        /// purple one has no green to turn gold with, so each colour starts from the effect
+        /// that already has the channels it needs.
+        /// </summary>
+        private const string GoldPillar = "LevelUp";
+
+        private const string PurplePillar = "JobUp";
+
+        //Multiplied into the effect, so these can only darken a channel the effect already
+        //has. Red comes off the gold pillar, which is strong in red and green: taking the
+        //green away leaves red. White means the effect's own colours, unchanged.
+        private static readonly Color BossCardPillarTint = new Color(1.00f, 0.18f, 0.14f);
+        private static readonly Color CardPillarTint = Color.white;
+        private static readonly Color BossGearPillarTint = new Color(0.86f, 0.55f, 1.00f);
+
+        /// <summary>The pillar effect once it has arrived, or null while it has not.</summary>
+        private GameObject pillar;
+
         private SpriteRenderer beam;
         private SpriteRenderer core;
         private SpriteRenderer glow;
@@ -107,6 +136,9 @@ namespace Assets.Scripts.Network
 
             if (!Classify(data, rarity, fromBoss, out var color, out var tier))
                 return;
+
+            var isCard = data.ItemClass == ItemClass.Card;
+            var isGear = data.ItemClass == ItemClass.Weapon || data.ItemClass == ItemClass.Equipment;
 
             var go = new GameObject("Aura");
             go.layer = parent.layer;
@@ -155,6 +187,72 @@ namespace Assets.Scripts.Network
                 aura.ring.transform.localScale = ScaleFor(aura.ring.sprite, 2.6f + tier * 0.4f);
 
             aura.Apply(0f);
+
+            //Asked for after the drawn aura is built, not instead of it. The pillar is one of
+            //the game's imported effects, which come out of the player's own copy of the
+            //data file - a client that has not imported them would otherwise leave the best
+            //drop in the game with no light on it at all. So the aura is made either way and
+            //only stood down once the pillar is actually on screen.
+            if (isCard)
+                aura.RequestPillar(GoldPillar, fromBoss ? BossCardPillarTint : CardPillarTint);
+            else if (isGear && fromBoss)
+                aura.RequestPillar(PurplePillar, BossGearPillarTint);
+        }
+
+        /// <summary>
+        /// Puts the game's own pillar effect on the drop, looping, in the colour this drop
+        /// has earned, and takes the drawn aura down once it is there.
+        ///
+        /// Looping because the effect was written to play once, for somebody levelling up,
+        /// and a drop has to keep shining until it is picked up or it times out. The ring at
+        /// its foot is the part that reads from across a map, and it is the last thing to
+        /// play, so a version that ran once would be dark most of the time.
+        /// </summary>
+        private void RequestPillar(string effectName, Color tintColor)
+        {
+            var camera = CameraFollower.Instance;
+            if (camera == null)
+                return;
+
+            camera.AttachEffectToEntity(effectName, gameObject, -1, spawned =>
+            {
+                //the drop can be picked up while an addressable is still loading, and the
+                //effect would then be parented to something on its way out
+                if (spawned == null || this == null)
+                    return;
+
+                var renderers = spawned.GetComponentsInChildren<RoEffectRenderer>(true);
+                if (renderers.Length == 0)
+                {
+                    //nothing to loop and nothing to tint, so the drawn aura stays as it is
+                    Destroy(spawned);
+                    return;
+                }
+
+                foreach (var renderer in renderers)
+                {
+                    renderer.IsLoop = true;
+                    renderer.Tint = tintColor;
+                }
+
+                pillar = spawned;
+                HideDrawnAura();
+            });
+        }
+
+        /// <summary>
+        /// Switches off the drawn shafts, leaving the pillar to do the job.
+        ///
+        /// Switched off rather than destroyed, so that if the pillar is ever taken away the
+        /// light can come back without rebuilding it - and so Apply, which runs every frame
+        /// over these four, does not have to learn about any of this.
+        /// </summary>
+        private void HideDrawnAura()
+        {
+            if (beam != null) beam.enabled = false;
+            if (core != null) core.enabled = false;
+            if (glow != null) glow.enabled = false;
+            if (ring != null) ring.enabled = false;
         }
 
         private static SpriteRenderer MakeRenderer(Transform parent, string name, Sprite sprite, Vector3 offset,
