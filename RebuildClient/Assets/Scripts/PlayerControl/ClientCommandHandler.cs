@@ -473,6 +473,33 @@ namespace PlayerControl
                 if (s[0] == "/randomize" || s[0] == "/random")
                     NetworkManager.Instance.SendChangeAppearance(0);
 
+                if (s[0] == "/dropfx")
+                {
+                    //Which of the hundred odd effects looks like a pillar of light cannot be
+                    //read off the files: they are animations built from the player's own copy
+                    //of the game data, and the only way to know what one is is to watch it.
+                    //So it is set from here, and a card is dropped, rather than guessed at in
+                    //code and found out a build later.
+                    if (s.Length < 2)
+                    {
+                        cameraFollower.AppendChatText($"<color=yellow>เสาแสงการ์ด: {GroundItemAura.GoldPillar}  ·  ของบอส: {GroundItemAura.PurplePillar}</color>");
+                        cameraFollower.AppendChatText("<color=yellow>ใช้ /dropfx <ชื่อเอฟเฟกต์> หรือ /dropfx boss <ชื่อเอฟเฟกต์></color>");
+                        cameraFollower.AppendChatText("<color=yellow>ดูเอฟเฟกต์ก่อนด้วย /effect <ชื่อ></color>");
+                        return;
+                    }
+
+                    if (s[1] == "boss" && s.Length > 2)
+                    {
+                        GroundItemAura.PurplePillar = s[2];
+                        cameraFollower.AppendChatText($"<color=yellow>ของจากบอสใช้ {s[2]} แล้ว — ลองดรอปของดู</color>");
+                        return;
+                    }
+
+                    GroundItemAura.GoldPillar = s[1];
+                    cameraFollower.AppendChatText($"<color=yellow>การ์ดใช้ {s[1]} แล้ว — ลองดรอปการ์ดดู</color>");
+                    return;
+                }
+
                 if (s[0] == "/effect" && s.Length > 1)
                 {
                     if (int.TryParse(s[1], out var id))

@@ -98,16 +98,27 @@ namespace Assets.Scripts.Network
         /// purple one has no green to turn gold with, so each colour starts from the effect
         /// that already has the channels it needs.
         /// </summary>
-        private const string GoldPillar = "LevelUp";
+        /// <summary>
+        /// Which of the game's effects stands over a card, and over gear off a boss.
+        ///
+        /// Fields rather than constants so /dropfx can point them at a different one while
+        /// the game is running. Which effect is the right one cannot be worked out from the
+        /// files: they are animations built from the player's own copy of the game data, and
+        /// the only way to know what one looks like is to watch it. The first guess here was
+        /// the level up effect, which turned out to be a pair of angel wings.
+        ///
+        /// Set them from chat, watch a card drop, and whatever looks right is the answer.
+        /// </summary>
+        public static string GoldPillar = "Gloria";
 
-        private const string PurplePillar = "JobUp";
+        public static string PurplePillar = "PotionBerserk";
 
         //Multiplied into the effect, so these can only darken a channel the effect already
         //has. Red comes off the gold pillar, which is strong in red and green: taking the
         //green away leaves red. White means the effect's own colours, unchanged.
-        private static readonly Color BossCardPillarTint = new Color(1.00f, 0.18f, 0.14f);
-        private static readonly Color CardPillarTint = Color.white;
-        private static readonly Color BossGearPillarTint = new Color(0.86f, 0.55f, 1.00f);
+        public static Color BossCardPillarTint = new Color(1.00f, 0.18f, 0.14f);
+        public static Color CardPillarTint = Color.white;
+        public static Color BossGearPillarTint = new Color(0.86f, 0.55f, 1.00f);
 
         /// <summary>The pillar effect once it has arrived, or null while it has not.</summary>
         private GameObject pillar;
