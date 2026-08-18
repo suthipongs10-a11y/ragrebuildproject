@@ -4,6 +4,7 @@ using RoRebuildServer.EntityComponents;
 using RoRebuildServer.EntityComponents.Items;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Networking;
+using RoRebuildServer.Simulation.Util;
 
 namespace RoRebuildServer.Simulation.Trading;
 
@@ -73,10 +74,22 @@ public class TradeSession
     /// </summary>
     public bool Started;
 
+    /// <summary>
+    /// How long an unanswered invitation stands, in seconds.
+    ///
+    /// Both players hold the session from the moment it is asked for, so one that is never
+    /// answered leaves the asker unable to trade with anybody else and with no window of
+    /// their own to call it off from. It expires instead.
+    /// </summary>
+    private const float RequestTimeout = 30f;
+
+    private readonly float requestedAt;
+
     public TradeSession(Player a, Player b)
     {
         A = a;
         B = b;
+        requestedAt = Time.ElapsedTimeFloat;
     }
 
     public Player Other(Player p) => p == A ? B : A;
@@ -125,6 +138,12 @@ public class TradeSession
             return false;
         }
 
+        if (A.Character.State == CharacterState.Dead || B.Character.State == CharacterState.Dead)
+        {
+            reason = "You cannot trade while dead.";
+            return false;
+        }
+
         if (A.Character.Position.DistanceTo(B.Character.Position) > MaxDistance)
         {
             reason = "You are too far apart to trade.";
@@ -132,6 +151,29 @@ public class TradeSession
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Ends the trade if it has stopped making sense, and says so.
+    ///
+    /// Called from the players' own tick rather than only from their actions, because most
+    /// of the ways a trade dies are things neither of them does to it: one warps out, one
+    /// dies, one wanders off. Left to the actions alone, a trade like that ends when
+    /// somebody next presses a button - and until then it sits on both of them, blocking
+    /// every other trade either might want to start.
+    /// </summary>
+    public void EndIfStale()
+    {
+        if (!Started && Time.ElapsedTimeFloat - requestedAt > RequestTimeout)
+        {
+            End("The trade request went unanswered.");
+            return;
+        }
+
+        if (StillValid(out var reason))
+            return;
+
+        End(reason);
     }
 
     /// <summary>
@@ -161,9 +203,12 @@ public class TradeSession
             return false;
 
         //--- and that the other side can take it ------------------------------------
-        if (!HasRoom(B, fromA, OfferA.Zeny, out reason))
+        //Each side's own offer is passed in as well, because it leaves their bag before the
+        //other side's arrives: refusing a straight swap by a player whose bag is full would
+        //make the last slot untradeable.
+        if (!HasRoom(B, fromA, OfferA.Zeny, fromB, out reason))
             return false;
-        if (!HasRoom(A, fromB, OfferB.Zeny, out reason))
+        if (!HasRoom(A, fromB, OfferB.Zeny, fromA, out reason))
             return false;
 
         //--- nothing below here may fail --------------------------------------------
@@ -194,7 +239,13 @@ public class TradeSession
 
         var bag = from.Inventory;
         if (bag == null)
-            return offer.Items.Count == 0;
+        {
+            if (offer.Items.Count == 0)
+                return true;
+
+            reason = $"{from.Name} no longer has one of the offered items.";
+            return false;
+        }
 
         foreach (var (bagId, count) in offer.Items)
         {
@@ -210,6 +261,25 @@ public class TradeSession
                 return false;
             }
 
+            //Something worn cannot be handed over, the same way it cannot be dropped or put
+            //in storage. Checked here as well as when it was offered, because a player can
+            //equip what is already on the table between the two moments.
+            if (from.Equipment != null && from.Equipment.IsItemEquipped(bagId))
+            {
+                reason = $"{from.Name} is wearing one of the offered items.";
+                return false;
+            }
+
+            //A unique item is one thing in one slot: the bag throws rather than splitting
+            //one, and it would throw from inside the part of this that cannot fail. So a
+            //partial count of one is refused out here, where refusing still means nothing
+            //has moved.
+            if (item.Type == ItemType.UniqueItem && count != item.Count)
+            {
+                reason = $"{from.Name} cannot split one of the offered items.";
+                return false;
+            }
+
             item.Count = count;
             //the slot travels with the item. Removing wants the slot, and looking one back up
             //from the item would pick the wrong one whenever two slots hold the same thing.
@@ -219,7 +289,18 @@ public class TradeSession
         return true;
     }
 
-    private static bool HasRoom(Player to, List<TradedItem> incoming, int zeny, out string reason)
+    /// <summary>
+    /// Whether one side can take what is coming, counting all of it at once.
+    ///
+    /// Asking the bag about each item on its own is not the same question: ten items each
+    /// fitting the one free slot is ten answers of yes and one slot, and the bag's add has
+    /// no refusal of its own - it increments past the limit and the player ends up over
+    /// weight with a bag bigger than the game allows. So the slots and the weight are added
+    /// up here, against the state the bag will actually be in: what this player is giving
+    /// away has left it by the time the other side's items arrive.
+    /// </summary>
+    private static bool HasRoom(Player to, List<TradedItem> incoming, int zeny,
+        List<TradedItem> outgoing, out string reason)
     {
         reason = "";
 
@@ -231,12 +312,80 @@ public class TradeSession
             return false;
         }
 
+        var bag = to.Inventory;
+        var slots = bag?.UsedSlots ?? 0;
+        var weight = bag?.BagWeight ?? 0;
+
+        //how many of each regular item is left once this player's own offer has gone, so a
+        //stack arriving into a slot that is about to empty is not counted as a new slot
+        var remaining = new Dictionary<int, int>();
+        if (bag != null)
+        {
+            foreach (var (id, item) in bag.RegularItems)
+                remaining[id] = item.Count;
+        }
+
+        foreach (var entry in outgoing)
+        {
+            weight -= entry.Item.Weight * entry.Item.Count;
+
+            if (entry.Item.Type != ItemType.RegularItem)
+            {
+                slots--;
+                continue;
+            }
+
+            var id = entry.Item.Id;
+            var left = remaining.TryGetValue(id, out var held) ? held - entry.Item.Count : 0;
+            remaining[id] = left;
+            if (left <= 0)
+            {
+                remaining.Remove(id);
+                slots--;
+            }
+        }
+
         foreach (var entry in incoming)
         {
-            if (to.CanPickUpItem(entry.Item))
-                continue;
+            weight += entry.Item.Weight * entry.Item.Count;
 
-            reason = $"{to.Name} cannot carry any more.";
+            if (entry.Item.Type != ItemType.RegularItem)
+            {
+                //a unique item is always its own slot, no matter how many of its id are held
+                slots++;
+                continue;
+            }
+
+            var id = entry.Item.Id;
+            if (remaining.TryGetValue(id, out var held))
+            {
+                //the same cap the bag's own pick up check uses, so a stack cannot be walked
+                //past its limit by trading into it
+                if (held + entry.Item.Count >= 30000)
+                {
+                    reason = $"{to.Name} already has too many of one of those.";
+                    return false;
+                }
+
+                remaining[id] = held + entry.Item.Count;
+            }
+            else
+            {
+                remaining[id] = entry.Item.Count;
+                slots++;
+            }
+        }
+
+        if (slots > CharacterBag.MaxBagSlots)
+        {
+            reason = $"{to.Name} does not have enough space.";
+            return false;
+        }
+
+        //admins ignore weight everywhere else, so they ignore it here too
+        if (!to.IsAdmin && weight > to.GetStat(CharacterStat.WeightCapacity))
+        {
+            reason = $"{to.Name} cannot carry that much.";
             return false;
         }
 
@@ -270,11 +419,20 @@ public class TradeSession
         to.AddZeny(zeny);
     }
 
-    /// <summary>Ends it for both, tells both, and leaves neither holding a dead session.</summary>
+    /// <summary>
+    /// Ends it for both, tells whoever is still there, and leaves neither holding a dead
+    /// session.
+    ///
+    /// The commonest reason a trade ends is that one of the two left, so being told is
+    /// checked rather than assumed: a message queued against a connection that has gone is
+    /// taken apart on the sending thread, which is a long way from here.
+    /// </summary>
     public void End(string reason)
     {
-        CommandBuilder.SendTradeCancelled(A, reason);
-        CommandBuilder.SendTradeCancelled(B, reason);
+        if (A.Connection != null)
+            CommandBuilder.SendTradeCancelled(A, reason);
+        if (B.Connection != null)
+            CommandBuilder.SendTradeCancelled(B, reason);
 
         A.Trade = null;
         B.Trade = null;

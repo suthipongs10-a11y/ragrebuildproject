@@ -462,7 +462,8 @@ namespace Assets.Scripts.UI.Trading
         ///
         /// Anything already on the table is left out rather than shown greyed: putting the
         /// same slot down twice would replace the count rather than add to it, which reads
-        /// as the second tap having done nothing.
+        /// as the second tap having done nothing. So is anything worn, which the server
+        /// refuses for the same reason it refuses dropping it.
         /// </summary>
         private void DrawBag()
         {
@@ -477,6 +478,12 @@ namespace Assets.Scripts.UI.Trading
                 foreach (var (bagId, item) in bag.GetInventoryData())
                 {
                     if (IsOffered(bagId))
+                        continue;
+
+                    //Something worn cannot be handed over, the same way it cannot be dropped
+                    //or put in storage. Left out rather than shown and refused, so a row is
+                    //never offered that could only produce a message.
+                    if (PlayerState.Instance.EquippedBagIdHashes.Contains(bagId))
                         continue;
 
                     var slot = bagId;

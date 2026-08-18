@@ -248,6 +248,15 @@ public class Player : IEntityAutoReset
 
     public void Reset()
     {
+        //A trade the other half is still sitting in is a trade that can never finish, so it
+        //is ended rather than dropped: the other player is told and let go.
+        //
+        //First, before anything below is cleared. Ending it sends to both connections, and
+        //this one is set to null a few lines down - so from any later point the message
+        //would be queued against nothing and taken apart on the sending thread.
+        if (Trade != null)
+            Trade.End("The other player has left.");
+
         Entity = Entity.Null;
         Target = Entity.Null;
         Character = null!;
@@ -309,11 +318,6 @@ public class Player : IEntityAutoReset
 
         isSittingHpTick = false;
         isSittingSpTick = false;
-
-        //A trade the other half is still sitting in is a trade that can never finish, so it
-        //is ended rather than dropped: the other player is told and let go.
-        if (Trade != null)
-            Trade.End("The other player has left.");
 
         if (Party != null)
         {
@@ -2304,6 +2308,10 @@ public class Player : IEntityAutoReset
 
         Debug.Assert(Character.Map != null);
         Debug.Assert(CombatEntity != null);
+
+        //Above the early return for the dead on purpose: dying is one of the ways a trade
+        //stops making sense, and a check that dying skips would never catch it.
+        Trade?.EndIfStale();
 
         if (!Character.StateCanAttack)
         {

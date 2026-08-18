@@ -169,6 +169,16 @@ public class PacketTradeAction : IClientPacketHandler
             return;
         }
 
+        //Something worn cannot be handed over, the same way it cannot be dropped or put in
+        //storage. Refused here so the answer arrives when the item is put down rather than
+        //when the trade is confirmed - the session checks it again at that point, because a
+        //player can equip what is already on the table in between.
+        if (player.Equipment != null && player.Equipment.IsItemEquipped(bagId))
+        {
+            CommandBuilder.ErrorMessage(player, "You cannot trade something you are wearing.");
+            return;
+        }
+
         //A cap on how many separate things can be on the table, so a full bag cannot be put
         //down at once and leave the other side with a list they cannot read or a packet
         //nobody sized for.
