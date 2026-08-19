@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Assets.Scripts.UI.Hud;
 using UnityEngine;
 using UnityEngine.UI;
@@ -48,18 +49,47 @@ namespace Assets.Scripts.UI.Mobile
         private const float ApplyInterval = 1f;
 
         /// <summary>
-        /// How much bigger a slot is drawn than the desktop prefab makes it.
+        /// The most of the screen's width the hotbar may take, however many columns it needs.
         ///
-        /// The prefab is sized for a mouse pointer, which is one pixel wide. A fingertip is
-        /// nearer forty, and a slot you hit four times out of five is worse than no slot.
-        /// Shrunk back below this whenever the column would not otherwise fit.
+        /// Past this it stops being a bar at the edge of the screen and starts being a wall
+        /// in front of the game, so beyond it the slots are shrunk instead of wrapped again.
         /// </summary>
-        private const float SlotScale = 1.25f;
+        private const float HotbarWidthShare = 0.34f;
+
+        /// <summary>
+        /// The most columns the hotbar wraps into.
+        ///
+        /// Wrapping is what keeps a slot big enough to hit, but only up to a point: past two
+        /// columns it stops being a bar down the edge and becomes a keypad over the game,
+        /// and on a short screen the wrapping runs away - ten columns of slots shrunk to the
+        /// floor to fit the width, which is the same unhittable bar by another route.
+        /// Beyond this the column runs a little below its band instead.
+        /// </summary>
+        private const int HotbarMaxColumns = 2;
+
+        /// <summary>
+        /// The smallest a slot may be drawn, as a fraction of the prefab.
+        ///
+        /// The prefab is already a reasonable target for a fingertip; anything much under
+        /// this is one you hit four times out of five, which is worse than no slot at all.
+        /// It used to be four tenths, and ten slots forced into one column hit that floor
+        /// every time: the skills were on the bar at twenty pixels a side, which reads from
+        /// arm's length as an empty bar.
+        ///
+        /// On a short screen this means the column runs a little past the band it was given
+        /// rather than shrinking to fit it. That is the better of the two: a slot that
+        /// reaches into the thumb controls is occasionally the wrong hit, and a slot too
+        /// small to aim at is always one.
+        /// </summary>
+        private const float MinSlotScale = 0.8f;
 
         private readonly Vector3[] corners = new Vector3[4];
 
         private float applyTimer;
         private bool reportedOnce;
+
+        //reused rather than allocated on every layout pass, which runs on a timer forever
+        private readonly List<RectTransform> slots = new List<RectTransform>();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -229,59 +259,72 @@ namespace Assets.Scripts.UI.Mobile
             if (slot.x <= 1f || slot.y <= 1f)
                 return;
 
-            //Every visible row becomes a column beside the last, so a player who had two rows
-            //open still has all twenty slots - as two columns rather than two rows.
-            var columns = 0;
-            var tallest = 0;
-
+            //Every slot that is actually on screen, in bar order, whichever row it lives in.
+            //Gathered into one list first because the wrapping below runs across rows: which
+            //row a slot was built into says nothing about where it should be drawn once the
+            //bar is a column.
+            slots.Clear();
             foreach (RectTransform row in container)
             {
                 if (!row.gameObject.activeSelf)
                     continue;
 
-                var slots = 0;
                 foreach (RectTransform entry in row)
                 {
-                    if (!entry.gameObject.activeSelf)
-                        continue;
-
-                    Place(entry, new Vector2(0, 1),
-                        new Vector2(columns * (slot.x + SlotGap), -slots * (slot.y + SlotGap)),
-                        slot);
-                    slots++;
+                    if (entry.gameObject.activeSelf)
+                        slots.Add(entry);
                 }
 
-                if (slots == 0)
-                    continue;
-
-                //the row is only a holder now: its slots are placed against its top left
-                //corner, so all it has to do is sit at the container's
-                Place(row, new Vector2(0, 1), Vector2.zero,
-                    new Vector2(slot.x, slots * slot.y + (slots - 1) * SlotGap));
-
-                if (slots > tallest)
-                    tallest = slots;
-                columns++;
+                //the row is only a holder now: every slot is placed against the container's
+                //top left corner, so all the row has to do is sit there itself
+                Place(row, new Vector2(0, 1), Vector2.zero, Vector2.zero);
             }
 
-            if (columns == 0 || tallest == 0)
+            if (slots.Count == 0)
                 return;
 
+            //How many fit above the thumb controls at the size the prefab draws them, with
+            //the rest wrapping into a column beside. The bar used to be squeezed into one
+            //column whatever its length, so ten slots never fit and it was drawn at four
+            //tenths instead - which is the whole reason it looked empty.
+            var band = bounds.height * HotbarHeightShare - readoutHeight - Gap - Margin;
+            var perColumn = Mathf.Clamp(Mathf.FloorToInt((band + SlotGap) / (slot.y + SlotGap)),
+                1, slots.Count);
+            var columns = Mathf.Min(HotbarMaxColumns,
+                Mathf.CeilToInt(slots.Count / (float)perColumn));
+
+            //Balanced, so ten slots over two columns are five and five rather than nine and
+            //one. Also what puts the leftovers back on screen once the column count is
+            //capped: the cap decides how wide, this decides how deep.
+            perColumn = Mathf.CeilToInt(slots.Count / (float)columns);
+
+            for (var i = 0; i < slots.Count; i++)
+            {
+                var column = i / perColumn;
+                var row = i % perColumn;
+
+                Place(slots[i], new Vector2(0, 1),
+                    new Vector2(column * (slot.x + SlotGap), -row * (slot.y + SlotGap)), slot);
+            }
+
             var width = columns * slot.x + (columns - 1) * SlotGap;
-            var height = tallest * slot.y + (tallest - 1) * SlotGap;
+            var height = Mathf.Min(perColumn, slots.Count) * slot.y
+                         + (Mathf.Min(perColumn, slots.Count) - 1) * SlotGap;
 
             var bar = (RectTransform)hotbar.transform;
             Place(container, new Vector2(0, 1), Vector2.zero, new Vector2(width, height));
             Place(bar, new Vector2(0, 1), Vector2.zero, new Vector2(width, height));
 
-            //Drawn a quarter larger than the prefab for a fingertip, then clamped down to
-            //whatever the band between the readout and the thumb controls will hold.
-            var band = bounds.height * HotbarHeightShare - readoutHeight - Gap - Margin;
-            var wanted = height * SlotScale;
-            var scale = wanted > band && band > 1f
-                ? Mathf.Clamp(band / height, 0.4f, SlotScale)
-                : SlotScale;
-            bar.localScale = Vector3.one * scale;
+            //Drawn at the prefab's own size, which is already a fingertip. Shrunk only if
+            //wrapping could not keep it inside the screen - and never past the point where
+            //the slots stop being worth aiming at.
+            var scale = 1f;
+            if (width > bounds.width * HotbarWidthShare)
+                scale = bounds.width * HotbarWidthShare / width;
+            if (band > 1f && height * scale > band)
+                scale = Mathf.Min(scale, band / height);
+
+            bar.localScale = Vector3.one * Mathf.Clamp(scale, MinSlotScale, 1f);
 
             PinToCorner(canvas, bar, new Vector2(0, 1), readoutHeight + Gap);
         }
