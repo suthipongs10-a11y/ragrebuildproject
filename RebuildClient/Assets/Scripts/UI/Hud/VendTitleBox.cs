@@ -48,14 +48,13 @@ namespace Assets.Scripts.UI.Hud
             if (eventData.button != PointerEventData.InputButton.Left)
                 return;
 
-            //a single tap joins a chat room so it works on touch screens too
+            //One click, the same as a chat room, and for the same reason: a phone has no
+            //double click, and the sign is a small label that drifts with the player it
+            //belongs to - asking for two hits on it is asking for none. Opening a shop only
+            //shows what is for sale, so a click landing by accident costs nothing.
             if (IsChatRoom)
-            {
                 NetworkManager.Instance.SendNpcClick(VendOwnerId);
-                return;
-            }
-
-            if (eventData.clickCount >= 2)
+            else
                 NetworkManager.Instance.VendingOpenStore(VendOwnerId);
         }
     }

@@ -123,8 +123,11 @@ namespace Assets.Scripts.PlayerControl
             if (npc.DisplayType == NpcDisplayType.VendingProxy || npc.DisplayType == NpcDisplayType.ChatRoomProxy)
             {
                 InstantiateEffect(control, ref spawn, ref npc, NpcEffectType.None);
-                UiManager.Instance.VendAndChatManager.CreateVendDialog(spawn.ServerId, npc.OwnerId, go, name,
-                    npc.DisplayType == NpcDisplayType.ChatRoomProxy);
+                //spawn.Name, not name: this runs on a MonoBehaviour, so a bare "name" is the
+                //Unity object's own - every shop sign in the game read "GameDataManager",
+                //which is the object this builder happens to live on.
+                UiManager.Instance.VendAndChatManager.CreateVendDialog(spawn.ServerId, npc.OwnerId, go,
+                    spawn.Name, npc.DisplayType == NpcDisplayType.ChatRoomProxy);
                 return control;
             }
 

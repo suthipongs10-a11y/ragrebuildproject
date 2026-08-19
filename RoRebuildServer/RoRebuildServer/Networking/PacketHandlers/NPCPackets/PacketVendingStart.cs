@@ -106,7 +106,13 @@ public class PacketVendingStart : IClientPacketHandler
         }
 
         proxy.ChangeNpcClass("EFFECT");
+        //The name that reaches other clients is the world object's, not the npc's: the
+        //spawn packet is built from the character. Setting only the npc's left every sign
+        //in the world reading the event's own name instead of the shop's, while the store
+        //window - which is sent the npc name - showed the right one.
         proxy.Name = vendName;
+        proxy.FullName = vendName;
+        proxy.Character.Name = vendName;
         proxy.HasInteract = true;
         proxy.ExpireEventWithoutOwner = true;
         proxy.DisplayType = NpcDisplayType.VendingProxy;

@@ -63,7 +63,13 @@ public class ChatRoomNpcProxy : NpcBehaviorBase
         }
 
         proxy.ChangeNpcClass("EFFECT");
+        //The name that reaches other clients is the world object's, not the npc's: the
+        //spawn packet is built from the character. Setting only the npc's left every sign
+        //in the world reading the event's own name instead of the room's, while the store
+        //window - which is sent the npc name - showed the right one.
         proxy.Name = title;
+        proxy.FullName = title;
+        proxy.Character.Name = title;
         proxy.HasInteract = true;
         proxy.ExpireEventWithoutOwner = true;
         proxy.DisplayType = NpcDisplayType.ChatRoomProxy;

@@ -35,10 +35,31 @@ namespace Assets.Scripts.UI.Inventory
             DropZone.gameObject.SetActive(isActive);
         }
 
+        /// <summary>
+        /// Refuses to open without a cart, and shuts if the cart goes away.
+        ///
+        /// The two buttons that open this both check first, and it opened anyway - through
+        /// the saved window state on login, or a follower change that left the flag behind.
+        /// Checking at every door is how one gets left unlocked; the room checks instead.
+        /// </summary>
         public override void ShowWindow()
         {
+            if (!PlayerState.Instance.HasCart)
+            {
+                CameraFollower.Instance.AppendNotice("You need a cart before you can open one.");
+                HideWindow();
+                return;
+            }
+
             base.ShowWindow();
             UpdateActiveVisibleBag();
+        }
+
+        public void Update()
+        {
+            //a cart put away while its contents are on screen leaves a window onto nothing
+            if (gameObject.activeSelf && !PlayerState.Instance.HasCart)
+                HideWindow();
         }
         
         public void OnMoveInventoryItemToCart(int bagSlotId)

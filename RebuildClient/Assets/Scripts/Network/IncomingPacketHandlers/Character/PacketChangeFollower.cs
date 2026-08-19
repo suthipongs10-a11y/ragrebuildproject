@@ -24,10 +24,19 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
                 Object.Destroy(controllable.FollowerObject);
             }
 
+            //Whose follower changed matters. Setting the flags was already guarded by this
+            //and clearing them was not, so anybody nearby putting a cart away cleared it for
+            //you as well - and a change from a cart to a mount left yours set, because only
+            //an empty follower cleared anything.
+            if (controllable.IsMainCharacter)
+            {
+                PlayerState.Instance.HasCart = (follower & CharacterFollowerState.AnyCart) > 0;
+                PlayerState.Instance.HasBird = (follower & CharacterFollowerState.Falcon) > 0;
+            }
+
             if (follower == CharacterFollowerState.None)
             {
                 controllable.FollowerObject = null;
-                PlayerState.Instance.HasCart = false;
                 UiManager.Instance.EquipmentWindow.RefreshEquipmentWindow();
                 return;
             }
@@ -50,9 +59,6 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
                 if(controllable.FollowerObject != null)
                     GameObject.Destroy(controllable.FollowerObject);
                 controllable.FollowerObject = cartObj;
-
-                if (controllable.IsMainCharacter)
-                    PlayerState.Instance.HasCart = true;
             }
 
             if ((follower & CharacterFollowerState.Falcon) > 0)
@@ -64,9 +70,6 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
                 if(controllable.FollowerObject != null)
                     GameObject.Destroy(controllable.FollowerObject);
                 controllable.FollowerObject = birdObj;
-
-                if (controllable.IsMainCharacter)
-                    PlayerState.Instance.HasBird = true;
             }
 
             UiManager.Instance.EquipmentWindow.RefreshEquipmentWindow();
