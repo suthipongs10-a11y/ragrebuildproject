@@ -200,6 +200,7 @@ namespace Assets.Scripts.PlayerControl
             control.PartyName = player.PartyName;
             control.GuildName = player.GuildName;
             control.GuildTitle = player.GuildTitle;
+            control.GuildEmblem = player.GuildEmblem;
             control.IsPartyMember = player.PartyId > 0 && player.PartyId == player.PartyId;
             
             

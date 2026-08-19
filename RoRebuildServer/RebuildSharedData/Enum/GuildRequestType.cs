@@ -30,6 +30,9 @@ public enum GuildRequestType : byte
 
     /// <summary>Leader only: set the guild's title, which every member wears.</summary>
     SetTitle,
+
+    /// <summary>Leader only: choose the guild's emblem, by its number in the list.</summary>
+    SetEmblem,
 }
 
 /// <summary>

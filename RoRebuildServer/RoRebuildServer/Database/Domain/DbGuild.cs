@@ -16,6 +16,10 @@ namespace RoRebuildServer.Database.Domain
         //no title, and a default of "" would mean rewriting all of them on migration.
         [MaxLength(32)] public string? GuildTitle { get; set; }
 
+        //Not nullable: zero already means "no emblem", so a guild from before the column
+        //existed reads as having none without anything having to be written to it.
+        public int Emblem { get; set; }
+
         public Guid LeaderId { get; set; }
     }
 }

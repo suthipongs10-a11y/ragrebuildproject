@@ -207,6 +207,9 @@ namespace RoRebuildServer.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("Emblem")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("GuildTitle")
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");

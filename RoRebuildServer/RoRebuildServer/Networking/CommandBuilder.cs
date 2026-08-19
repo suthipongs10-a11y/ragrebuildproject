@@ -235,6 +235,7 @@ public static class CommandBuilder
                 PartyName = player.Party?.PartyName ?? null,
                 GuildName = player.Guild?.GuildName,
                 GuildTitle = player.Guild?.GuildTitle,
+                GuildEmblem = player.Guild?.EmblemId ?? 0,
                 Follower = player.PlayerFollower
             };
 
@@ -1673,6 +1674,7 @@ public static class CommandBuilder
         packet.Write(guild.GuildId);
         packet.Write(guild.GuildName);
         packet.Write(guild.GuildTitle);
+        packet.Write(guild.EmblemId);
         packet.Write(guild.IsLeader(p));
         packet.Write(Guild.MaxMembers);
 

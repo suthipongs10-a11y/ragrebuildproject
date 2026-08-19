@@ -54,6 +54,15 @@ public class Guild
     /// </summary>
     public const int MaxTitleLength = 20;
 
+    /// <summary>
+    /// How many emblems there are to choose from, and the highest number one can be.
+    ///
+    /// The pictures live in the client - they are drawn from the icons the game already
+    /// ships - so the server only ever knows the number. It checks the range and nothing
+    /// else, which is all it can honestly check.
+    /// </summary>
+    public const int MaxEmblemId = 30;
+
     /// <summary>How many people may be waiting to be let in at once.</summary>
     public const int MaxPendingRequests = 20;
 
@@ -62,6 +71,9 @@ public class Guild
 
     /// <summary>What the leader chose to hang after the guild's name. May be empty.</summary>
     public string GuildTitle = "";
+
+    /// <summary>The emblem's number in the client's list. Zero means the guild has none.</summary>
+    public int EmblemId;
 
     public Guid LeaderId;
     public readonly List<GuildMember> Members = new();
@@ -79,6 +91,7 @@ public class Guild
     public Guild(DbGuild db) : this(db.Id, db.GuildName, db.LeaderId)
     {
         GuildTitle = db.GuildTitle ?? "";
+        EmblemId = db.Emblem;
     }
 
     public bool IsLeader(Player player) => player.Id == LeaderId;

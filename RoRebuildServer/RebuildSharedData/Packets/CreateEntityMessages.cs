@@ -60,5 +60,8 @@ public partial struct PlayerSpawnParameters
     public string? GuildName { get; set; }
     public string? GuildTitle { get; set; }
 
+    /// <summary>Which emblem the guild chose, as a number into the client's list. 0 is none.</summary>
+    public int GuildEmblem { get; set; }
+
     public CharacterFollowerState Follower { get; set; }
 }

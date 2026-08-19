@@ -1,9 +1,11 @@
 using Assets.Scripts.Network;
 using Assets.Scripts.Objects;
 using Assets.Scripts.UI.ConfigWindow;
+using Assets.Scripts.UI.Guild;
 using RebuildSharedData.Enum;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Assets.Scripts.UI.Hud
 {
@@ -31,6 +33,12 @@ namespace Assets.Scripts.UI.Hud
 
         private bool isHovering;
         private bool isTargeting;
+
+        private Image emblem;
+
+        /// <summary>How big the mark is drawn against the name beside it.</summary>
+        private const float EmblemScale = 1.15f;
+        private const float EmblemGap = 2f;
 
         public void Close()
         {
@@ -73,7 +81,18 @@ namespace Assets.Scripts.UI.Hud
             gameObject.SetActive(false);
         }
 
-        public void UpdateName(string newName) => characterName = newName;
+        public void UpdateName(string newName)
+        {
+            characterName = newName;
+
+            //the name is set again whenever anything on the plate changes, which is also
+            //every moment the emblem could have changed underneath it
+            if (namePlate != null)
+            {
+                namePlate.text = characterName;
+                RefreshEmblem();
+            }
+        }
 
         public void HoverNamePlate()
         {
@@ -109,6 +128,7 @@ namespace Assets.Scripts.UI.Hud
                 return;
             namePlate = Manager.AttachNamePlate(gameObject);
             namePlate.text = characterName;
+            RefreshEmblem();
             gameObject.SetActive(true);
         }
 
@@ -116,8 +136,68 @@ namespace Assets.Scripts.UI.Hud
         {
             if (namePlate == null)
                 return;
+
+            //the emblem is a child of the plate, so it goes back to the pool wearing it -
+            //cleared here rather than left for whoever the plate is handed to next
+            if (emblem != null)
+            {
+                Destroy(emblem.gameObject);
+                emblem = null;
+            }
+
             Manager.ReturnNamePlate(namePlate.gameObject);
             namePlate = null;
+        }
+
+        /// <summary>
+        /// Puts the guild's mark in front of the name, or takes it away again.
+        ///
+        /// Placed against the width of the first line rather than against the plate's rect:
+        /// the plate is as wide as its widest line, which is usually the guild line, and
+        /// anchoring to its edge would leave the mark floating out in front of nothing.
+        ///
+        /// Built here rather than in the prefab because the plate comes from a pool shared
+        /// by every character on screen, most of whom are in no guild - a mark on the prefab
+        /// would be thirty objects switched off for every one switched on.
+        /// </summary>
+        private void RefreshEmblem()
+        {
+            var id = controllable != null ? controllable.GuildEmblem : 0;
+            var sprite = GuildEmblems.Sprite(id);
+
+            if (namePlate == null || sprite == null)
+            {
+                if (emblem != null)
+                    emblem.gameObject.SetActive(false);
+                return;
+            }
+
+            if (emblem == null)
+            {
+                var go = new GameObject("GuildEmblem", typeof(Image));
+                go.transform.SetParent(namePlate.transform, false);
+                emblem = go.GetComponent<Image>();
+                emblem.raycastTarget = false;
+                emblem.preserveAspect = true;
+            }
+
+            emblem.gameObject.SetActive(true);
+            emblem.sprite = sprite;
+
+            var firstLine = characterName;
+            var breakAt = firstLine.IndexOf('\n');
+            if (breakAt > 0)
+                firstLine = firstLine.Substring(0, breakAt);
+
+            var width = namePlate.GetPreferredValues(firstLine).x;
+            var size = namePlate.fontSize * EmblemScale;
+
+            var rect = emblem.rectTransform;
+            rect.anchorMin = rect.anchorMax = rect.pivot = new Vector2(0.5f, 1f);
+            rect.sizeDelta = new Vector2(size, size);
+            //half the line to reach its left edge, then the mark's own width and a gap
+            rect.anchoredPosition = new Vector2(-(width * 0.5f + size * 0.5f + EmblemGap),
+                -namePlate.fontSize * 0.5f + size * 0.5f);
         }
 
         public void StartCasting(float castTime)

@@ -35,6 +35,10 @@ namespace Assets.Scripts.UI.Guild
         private const float RowHeight = 30f;
         private const float RowGap = 3f;
 
+        /// <summary>How big one emblem is in the picker, and the space around it.</summary>
+        private const float EmblemCell = 46f;
+        private const float EmblemGap = 6f;
+
         private const float DotSize = 9f;
         private const float NameLeft = 24f;
         private const float KickWidth = 54f;
@@ -62,6 +66,10 @@ namespace Assets.Scripts.UI.Guild
         private TextMeshProUGUI subtitle;
         private Button leaveButton;
         private Button titleButton;
+        private Button emblemButton;
+
+        /// <summary>Whether the roster has been swapped for the grid of emblems.</summary>
+        private bool pickingEmblem;
         private Button browseButton;
 
         private readonly List<GameObject> rows = new List<GameObject>();
@@ -121,6 +129,17 @@ namespace Assets.Scripts.UI.Guild
             ModernUiTheme.Place((RectTransform)titleButton.transform, new Vector2(1, 1),
                 new Vector2(-Pad, -Pad), new Vector2(96f, ButtonRowHeight));
             titleButton.onClick.AddListener(AskForTitle);
+
+            emblemButton = ModernUiTheme.CreateButton(root, "SetEmblem", "เลือกโลโก้",
+                ModernUiTheme.CardColor, ModernUiTheme.NameColor, ModernUiTheme.SizeLabel);
+            ModernUiTheme.Place((RectTransform)emblemButton.transform, new Vector2(1, 1),
+                new Vector2(-Pad - 100f, -Pad), new Vector2(96f, ButtonRowHeight));
+            ModernUiTheme.AddBorder((RectTransform)emblemButton.transform, ModernUiTheme.CardBorderColor);
+            emblemButton.onClick.AddListener(() =>
+            {
+                pickingEmblem = !pickingEmblem;
+                Redraw();
+            });
 
             //A sunken tray, which is also what catches the drag that scrolls it: the gaps
             //between the rows would otherwise pass the pointer straight through.
@@ -312,7 +331,24 @@ namespace Assets.Scripts.UI.Guild
             //The leader cannot leave, so the button would be a thing that only ever produces
             //a refusal. The server refuses it anyway; this is so it is not offered.
             leaveButton.gameObject.SetActive(!GuildState.IsLeader);
-            titleButton.gameObject.SetActive(GuildState.IsLeader);
+            titleButton.gameObject.SetActive(GuildState.IsLeader && !pickingEmblem);
+            emblemButton.gameObject.SetActive(GuildState.IsLeader);
+
+            var emblemLabel = emblemButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (emblemLabel != null)
+                emblemLabel.text = pickingEmblem ? "ย้อนกลับ" : "เลือกโลโก้";
+
+            //Only a leader has the button, so only a leader can be in the grid - but the
+            //flag survives losing the guild, and a grid over an empty roster would be a
+            //page nothing can get out of.
+            if (pickingEmblem && !GuildState.IsLeader)
+                pickingEmblem = false;
+
+            if (pickingEmblem)
+            {
+                DrawEmblemPicker();
+                return;
+            }
 
             var y = -RowGap;
 
@@ -473,6 +509,80 @@ namespace Assets.Scripts.UI.Guild
             ModernUiTheme.Place((RectTransform)accept.transform, new Vector2(1, 0.5f),
                 new Vector2(-(AnswerWidth + 12f), 0f), new Vector2(AnswerWidth, RowHeight - 6f));
             accept.onClick.AddListener(() => Send(GuildRequestType.ApproveRequest, target));
+        }
+
+        /// <summary>
+        /// Every emblem there is, as a grid, with the one in use marked.
+        ///
+        /// In place of the roster rather than in a window of its own: it is a choice made
+        /// once and looked at while it is being made, and a second floating window on a
+        /// phone is a window covering the one you were reading.
+        /// </summary>
+        private void DrawEmblemPicker()
+        {
+            //the tray is the window less its padding, less the row's own inset
+            var inner = Width - Pad * 2f - RowGap * 2f;
+            var columns = Mathf.Max(1, Mathf.FloorToInt((inner + EmblemGap) / (EmblemCell + EmblemGap)));
+            var used = columns * EmblemCell + (columns - 1) * EmblemGap;
+            var left = (inner - used) * 0.5f;
+
+            BuildHeading("เลือกโลโก้กิลด์  ·  แตะเพื่อใช้เลย", -RowGap);
+
+            var top = -RowGap - HeadingHeight - RowGap;
+            var count = GuildEmblems.MaxId + 1; //0 is "no emblem", and is a choice too
+
+            for (var id = 0; id < count; id++)
+            {
+                var column = id % columns;
+                var row = id / columns;
+
+                BuildEmblemCell(id, left + column * (EmblemCell + EmblemGap),
+                    top - row * (EmblemCell + EmblemGap));
+            }
+
+            //not called "rows": that is the field holding everything drawn, and shadowing it
+            //here would compile and then quietly clear the wrong thing on the next redraw
+            var lines = Mathf.CeilToInt(count / (float)columns);
+            body.sizeDelta = new Vector2(0, -top + lines * (EmblemCell + EmblemGap) + RowGap);
+        }
+
+        private void BuildEmblemCell(int id, float x, float y)
+        {
+            var chosen = GuildState.EmblemId == id;
+
+            var cell = ModernUiTheme.CreateCard(body, "Emblem" + id,
+                chosen ? ModernUiTheme.AccentColor : ModernUiTheme.WindowColor);
+            cell.anchorMin = new Vector2(0, 1);
+            cell.anchorMax = new Vector2(0, 1);
+            cell.pivot = new Vector2(0, 1);
+            cell.sizeDelta = new Vector2(EmblemCell, EmblemCell);
+            cell.anchoredPosition = new Vector2(RowGap + x, y);
+            rows.Add(cell.gameObject);
+
+            var button = cell.gameObject.AddComponent<Button>();
+            button.targetGraphic = cell.GetComponent<Image>();
+            cell.GetComponent<Image>().raycastTarget = true;
+            button.onClick.AddListener(() =>
+            {
+                NetworkManager.Instance.SendGuildAction(GuildRequestType.SetEmblem, id);
+                //drawn as chosen straight away; the server's answer redraws it either way
+                GuildState.EmblemId = id;
+                Redraw();
+            });
+
+            var sprite = GuildEmblems.Sprite(id);
+            if (sprite == null)
+            {
+                //"no emblem" is a cell like any other, so taking one off is as easy as
+                //putting one on
+                var none = ModernUiTheme.CreateText(cell, "None", "ไม่ใส่", ModernUiTheme.SizeSmall,
+                    chosen ? ModernUiTheme.LightInkColor : ModernUiTheme.MutedColor,
+                    TextAlignmentOptions.Center);
+                ModernUiTheme.Stretch(none.rectTransform, 2, 2, -2, -2);
+                return;
+            }
+
+            var icon = ModernUiTheme.CreateIcon(cell, sprite, Color.white, EmblemCell - 10f);
         }
 
         private void BuildHeading(string text, float y)

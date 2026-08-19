@@ -52,6 +52,9 @@ namespace Assets.Scripts.Network
         /// <summary>What the leader hung after the guild's name. Empty until one is set.</summary>
         public static string GuildTitle = "";
 
+        /// <summary>The guild's emblem, as a number into the client's list. 0 is none.</summary>
+        public static int EmblemId;
+
         public static bool IsLeader;
 
         /// <summary>Sent by the server rather than assumed, so the cap lives in one place.</summary>
@@ -130,6 +133,7 @@ namespace Assets.Scripts.Network
             GuildId = 0;
             GuildName = "";
             GuildTitle = "";
+            EmblemId = 0;
             IsLeader = false;
             Members.Clear();
             JoinRequests.Clear();

@@ -72,6 +72,9 @@ namespace Assets.Scripts.Network
         public string GuildName;
         public string GuildTitle;
 
+        /// <summary>Which emblem the guild wears, as a number into the client's list.</summary>
+        public int GuildEmblem;
+
         public GameObject PopupDialog;
         public List<Ragnarok3dEffect> EffectList;
 

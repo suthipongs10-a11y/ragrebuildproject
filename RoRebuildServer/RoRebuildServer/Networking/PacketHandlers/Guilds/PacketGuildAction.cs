@@ -61,6 +61,10 @@ public class PacketGuildAction : IClientPacketHandler
                 SetTitle(connection, player, msg.ReadString());
                 break;
 
+            case GuildRequestType.SetEmblem:
+                SetEmblem(connection, player, msg.ReadInt32());
+                break;
+
             case GuildRequestType.RejectRequest:
                 AnswerRequest(connection, player, msg.ReadString(), false);
                 break;
@@ -190,6 +194,45 @@ public class PacketGuildAction : IClientPacketHandler
             online.Character.Map?.RefreshEntity(online.Character);
         }
 
+    }
+
+    /// <summary>
+    /// The leader picks the guild's mark.
+    ///
+    /// Only the number travels: the pictures are the game's own icons and live in the
+    /// client, so the server has nothing to check but the range. Refusing one outside it
+    /// matters anyway - a number the client has no picture for would leave every member
+    /// wearing nothing, with no way to tell that from having chosen nothing.
+    /// </summary>
+    private static void SetEmblem(NetworkConnection connection, Player player, int emblem)
+    {
+        var guild = player.Guild;
+        if (guild == null || !guild.IsLeader(player))
+        {
+            CommandBuilder.ErrorMessage(connection, "เฉพาะหัวหน้ากิลด์เท่านั้นที่ทำได้");
+            return;
+        }
+
+        if (emblem < 0 || emblem > Guild.MaxEmblemId)
+        {
+            CommandBuilder.ErrorMessage(connection, "ไม่มีโลโก้แบบนั้น");
+            return;
+        }
+
+        guild.EmblemId = emblem;
+        RoDatabase.EnqueueDbRequest(new GuildEmblemRequest(guild.GuildId, emblem));
+
+        //Same as the title: the emblem hangs on every member's name plate, so everyone
+        //online is redrawn rather than left showing the old one until they relog.
+        foreach (var member in guild.Members)
+        {
+            if (!World.Instance.TryFindPlayerByName(member.Name, out var entity))
+                continue;
+
+            var online = entity.Get<Player>();
+            CommandBuilder.SendGuildData(online);
+            online.Character.Map?.RefreshEntity(online.Character);
+        }
     }
 
     private static void Kick(NetworkConnection connection, Player player, string targetName)
