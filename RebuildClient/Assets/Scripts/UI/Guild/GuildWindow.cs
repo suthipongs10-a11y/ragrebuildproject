@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Assets.Scripts.Network;
+using Assets.Scripts.PlayerControl;
 using Assets.Scripts.Sprites;
 using RebuildSharedData.Enum;
 using TMPro;
@@ -37,6 +38,9 @@ namespace Assets.Scripts.UI.Guild
         private const float DotSize = 9f;
         private const float NameLeft = 24f;
         private const float KickWidth = 54f;
+
+        /// <summary>The server's own cap, kept here so the prompt can say it.</summary>
+        private const int MaxTitleLength = 20;
         private const float AnswerWidth = 52f;
         private const float JoinWidth = 82f;
         private const float HeadingHeight = 22f;
@@ -57,6 +61,7 @@ namespace Assets.Scripts.UI.Guild
         private TextMeshProUGUI title;
         private TextMeshProUGUI subtitle;
         private Button leaveButton;
+        private Button titleButton;
         private Button browseButton;
 
         private readonly List<GameObject> rows = new List<GameObject>();
@@ -108,6 +113,14 @@ namespace Assets.Scripts.UI.Guild
             ModernUiTheme.Place((RectTransform)browseButton.transform, new Vector2(1, 1),
                 new Vector2(-Pad, -Pad), new Vector2(96f, ButtonRowHeight));
             browseButton.onClick.AddListener(() => Send(GuildRequestType.ListGuilds));
+
+            //Sits where the other two sit, for the same reason: a leader cannot leave, so
+            //the slot is free on exactly the screens where this belongs.
+            titleButton = ModernUiTheme.CreateButton(root, "SetTitle", "ตั้งฉายา",
+                ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeLabel);
+            ModernUiTheme.Place((RectTransform)titleButton.transform, new Vector2(1, 1),
+                new Vector2(-Pad, -Pad), new Vector2(96f, ButtonRowHeight));
+            titleButton.onClick.AddListener(AskForTitle);
 
             //A sunken tray, which is also what catches the drag that scrolls it: the gaps
             //between the rows would otherwise pass the pointer straight through.
@@ -228,6 +241,33 @@ namespace Assets.Scripts.UI.Guild
             ui.YesNoOptionsWindow.BeginPrompt(question, "ตกลง", "ยกเลิก", onYes, null, false);
         }
 
+        /// <summary>
+        /// Asks the leader what the guild should be called after its name.
+        ///
+        /// Sent empty to take it off again, which is why the prompt says so: a field you
+        /// can only fill and never clear is one people end up leaving wrong.
+        /// </summary>
+        private void AskForTitle()
+        {
+            UiManager.Instance.TextInputWindow.BeginTextInput(
+                $"ตั้งฉายากิลด์ (ไม่เกิน {MaxTitleLength} ตัวอักษร — เว้นว่างเพื่อลบ)",
+                text =>
+                {
+                    text = text == null ? "" : text.Trim();
+
+                    //The server checks this again and refuses; this is so a long one is not
+                    //silently cut down to something the leader did not choose.
+                    if (text.Length > MaxTitleLength)
+                    {
+                        CameraFollower.Instance.AppendError(
+                            $"ฉายายาวได้ไม่เกิน {MaxTitleLength} ตัวอักษร");
+                        return;
+                    }
+
+                    NetworkManager.Instance.SendGuildAction(GuildRequestType.SetTitle, text);
+                });
+        }
+
         private void ConfirmLeave()
         {
             //The wait is the part worth saying out loud. Leaving is the obvious half; that it
@@ -253,7 +293,12 @@ namespace Assets.Scripts.UI.Guild
             }
 
             browseButton.gameObject.SetActive(false);
-            title.text = GuildState.GuildName;
+
+            //The title is shown the way everyone else sees it, so the leader is setting the
+            //thing they are looking at rather than a field whose effect is somewhere else.
+            title.text = string.IsNullOrWhiteSpace(GuildState.GuildTitle)
+                ? GuildState.GuildName
+                : $"{GuildState.GuildName}  <size=-4>~{GuildState.GuildTitle}~</size>";
 
             var online = 0;
             foreach (var member in GuildState.Members)
@@ -267,6 +312,7 @@ namespace Assets.Scripts.UI.Guild
             //The leader cannot leave, so the button would be a thing that only ever produces
             //a refusal. The server refuses it anyway; this is so it is not offered.
             leaveButton.gameObject.SetActive(!GuildState.IsLeader);
+            titleButton.gameObject.SetActive(GuildState.IsLeader);
 
             var y = -RowGap;
 

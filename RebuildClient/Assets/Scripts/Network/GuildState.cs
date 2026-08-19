@@ -48,6 +48,10 @@ namespace Assets.Scripts.Network
         public static bool InGuild;
         public static int GuildId;
         public static string GuildName = "";
+
+        /// <summary>What the leader hung after the guild's name. Empty until one is set.</summary>
+        public static string GuildTitle = "";
+
         public static bool IsLeader;
 
         /// <summary>Sent by the server rather than assumed, so the cap lives in one place.</summary>
@@ -125,6 +129,7 @@ namespace Assets.Scripts.Network
             InGuild = false;
             GuildId = 0;
             GuildName = "";
+            GuildTitle = "";
             IsLeader = false;
             Members.Clear();
             JoinRequests.Clear();

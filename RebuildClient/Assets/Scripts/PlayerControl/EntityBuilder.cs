@@ -198,6 +198,8 @@ namespace Assets.Scripts.PlayerControl
             control.Level = spawn.Level;
             control.WeaponClass = player.WeaponClass;
             control.PartyName = player.PartyName;
+            control.GuildName = player.GuildName;
+            control.GuildTitle = player.GuildTitle;
             control.IsPartyMember = player.PartyId > 0 && player.PartyId == player.PartyId;
             
             

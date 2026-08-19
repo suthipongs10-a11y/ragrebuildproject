@@ -51,5 +51,14 @@ public partial struct PlayerSpawnParameters
     public int Shield { get; set; }
     public int PartyId { get; set; }
     public string? PartyName { get; set; }
+
+    /// <summary>
+    /// The guild this character belongs to and the title its leader gave it, both for the
+    /// name plate. Sent with the character rather than looked up, because a guild is a
+    /// persistent thing the viewer may not be in and so has no other way of knowing about.
+    /// </summary>
+    public string? GuildName { get; set; }
+    public string? GuildTitle { get; set; }
+
     public CharacterFollowerState Follower { get; set; }
 }

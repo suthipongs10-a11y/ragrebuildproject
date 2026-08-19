@@ -65,6 +65,10 @@ namespace Assets.Scripts.Network
         public int WeaponClass;
         public string PartyName;
 
+        /// <summary>The guild this character belongs to, and the title its leader set.</summary>
+        public string GuildName;
+        public string GuildTitle;
+
         public GameObject PopupDialog;
         public List<Ragnarok3dEffect> EffectList;
 
@@ -76,11 +80,35 @@ namespace Assets.Scripts.Network
             {
                 if (CharacterType == CharacterType.NPC || !GameConfig.Data.ShowLevelsInOverlay || Name.StartsWith("[NPC]"))
                     return Name;
-                if (string.IsNullOrWhiteSpace(PartyName))
+                //Party on one line, guild on the next, the way the game this is from does
+                //it. The guild's title hangs off its name rather than getting a line of its
+                //own: three lines over a character's head is a plate that hides the
+                //character, and the title only means anything next to the name it belongs to.
+                var second = string.IsNullOrWhiteSpace(PartyName) ? "" : $"[{PartyName}]";
+                var third = GuildLine();
+
+                if (second.Length == 0 && third.Length == 0)
                     return $"Lv.{Level} {Name}";
 
-                return $"Lv.{Level} {Name}\n<size=-2>[{PartyName}]";
+                var plate = $"Lv.{Level} {Name}\n<size=-2>";
+                if (second.Length > 0)
+                    plate += second;
+                if (third.Length > 0)
+                    plate += (second.Length > 0 ? "\n" : "") + third;
+
+                return plate;
             }
+        }
+
+        /// <summary>"Guild Name" or "Guild Name ~Title~", or nothing at all.</summary>
+        private string GuildLine()
+        {
+            if (string.IsNullOrWhiteSpace(GuildName))
+                return "";
+
+            return string.IsNullOrWhiteSpace(GuildTitle)
+                ? GuildName
+                : $"{GuildName} ~{GuildTitle}~";
         }
 
         [NonSerialized] public Vector3 CounterHitDir;

@@ -57,6 +57,10 @@ public class PacketGuildAction : IClientPacketHandler
                 AnswerRequest(connection, player, msg.ReadString(), true);
                 break;
 
+            case GuildRequestType.SetTitle:
+                SetTitle(connection, player, msg.ReadString());
+                break;
+
             case GuildRequestType.RejectRequest:
                 AnswerRequest(connection, player, msg.ReadString(), false);
                 break;
@@ -132,6 +136,60 @@ public class PacketGuildAction : IClientPacketHandler
             $"ออกจากกิลด์แล้ว เข้ากิลด์ใหม่ได้อีกครั้งใน 24 ชั่วโมง");
         guild.Announce($"{player.Name} ออกจากกิลด์แล้ว");
         CommandBuilder.SendGuildData(player);
+    }
+
+    /// <summary>
+    /// The leader names the guild, a second time.
+    ///
+    /// The title hangs off the guild's name on every member's plate, so setting it changes
+    /// what other people see above forty characters at once. Everyone online in the guild
+    /// is refreshed on the map so the change is visible without relogging - which for a
+    /// name plate is the difference between a feature and a rumour.
+    /// </summary>
+    private static void SetTitle(NetworkConnection connection, Player player, string title)
+    {
+        var guild = player.Guild;
+        if (guild == null || !guild.IsLeader(player))
+        {
+            CommandBuilder.ErrorMessage(connection, "เฉพาะหัวหน้ากิลด์เท่านั้นที่ทำได้");
+            return;
+        }
+
+        title = title.Trim();
+        if (title.Length > Guild.MaxTitleLength)
+        {
+            CommandBuilder.ErrorMessage(connection, $"ฉายายาวได้ไม่เกิน {Guild.MaxTitleLength} ตัวอักษร");
+            return;
+        }
+
+        //The plate is drawn from this, so a title carrying markup would let one player
+        //write coloured text over everyone else's screen. Only the characters a name is
+        //made of are allowed through.
+        foreach (var c in title)
+        {
+            if (char.IsControl(c) || c == '<' || c == '>')
+            {
+                CommandBuilder.ErrorMessage(connection, "ฉายามีตัวอักษรที่ใช้ไม่ได้");
+                return;
+            }
+        }
+
+        guild.GuildTitle = title;
+        RoDatabase.EnqueueDbRequest(new GuildTitleRequest(guild.GuildId, title));
+
+        //Every member online, not just the leader. The window showing the new title is the
+        //confirmation, the same as it is for every other action here, and the refresh on
+        //the map is what redraws the forty name plates the title now hangs on.
+        foreach (var member in guild.Members)
+        {
+            if (!World.Instance.TryFindPlayerByName(member.Name, out var entity))
+                continue;
+
+            var online = entity.Get<Player>();
+            CommandBuilder.SendGuildData(online);
+            online.Character.Map?.RefreshEntity(online.Character);
+        }
+
     }
 
     private static void Kick(NetworkConnection connection, Player player, string targetName)

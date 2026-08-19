@@ -27,6 +27,9 @@ public enum GuildRequestType : byte
 
     /// <summary>Leader only: turn the named applicant away.</summary>
     RejectRequest,
+
+    /// <summary>Leader only: set the guild's title, which every member wears.</summary>
+    SetTitle,
 }
 
 /// <summary>

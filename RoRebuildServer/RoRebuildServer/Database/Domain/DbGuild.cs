@@ -11,6 +11,11 @@ namespace RoRebuildServer.Database.Domain
     {
         [Key] public int Id { get; set; }
         [MaxLength(64)] public required string GuildName { get; set; }
+
+        //Nullable rather than required: every guild that existed before the column did has
+        //no title, and a default of "" would mean rewriting all of them on migration.
+        [MaxLength(32)] public string? GuildTitle { get; set; }
+
         public Guid LeaderId { get; set; }
     }
 }

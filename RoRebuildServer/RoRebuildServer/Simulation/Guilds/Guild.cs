@@ -45,11 +45,24 @@ public class Guild
     public const int MaxMembers = 40;
     public const int MaxNameLength = 24;
 
+    /// <summary>
+    /// How long a guild's title may be.
+    ///
+    /// Shorter than the name because it hangs off the end of one on a name plate, and a
+    /// plate wide enough for two long strings is a plate that covers the character wearing
+    /// it.
+    /// </summary>
+    public const int MaxTitleLength = 20;
+
     /// <summary>How many people may be waiting to be let in at once.</summary>
     public const int MaxPendingRequests = 20;
 
     public int GuildId;
     public string GuildName;
+
+    /// <summary>What the leader chose to hang after the guild's name. May be empty.</summary>
+    public string GuildTitle = "";
+
     public Guid LeaderId;
     public readonly List<GuildMember> Members = new();
     public readonly List<GuildJoinRequest> JoinRequests = new();
@@ -63,7 +76,10 @@ public class Guild
         LeaderId = leaderId;
     }
 
-    public Guild(DbGuild db) : this(db.Id, db.GuildName, db.LeaderId) { }
+    public Guild(DbGuild db) : this(db.Id, db.GuildName, db.LeaderId)
+    {
+        GuildTitle = db.GuildTitle ?? "";
+    }
 
     public bool IsLeader(Player player) => player.Id == LeaderId;
 

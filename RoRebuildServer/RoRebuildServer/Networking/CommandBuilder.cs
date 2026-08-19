@@ -233,6 +233,8 @@ public static class CommandBuilder
                 Shield = player.Equipment.GetEquipmentIdBySlot(EquipSlot.Shield),
                 PartyId = player.Party?.PartyId ?? -1,
                 PartyName = player.Party?.PartyName ?? null,
+                GuildName = player.Guild?.GuildName,
+                GuildTitle = player.Guild?.GuildTitle,
                 Follower = player.PlayerFollower
             };
 
@@ -1670,6 +1672,7 @@ public static class CommandBuilder
         packet.Write(true);
         packet.Write(guild.GuildId);
         packet.Write(guild.GuildName);
+        packet.Write(guild.GuildTitle);
         packet.Write(guild.IsLeader(p));
         packet.Write(Guild.MaxMembers);
 

@@ -50,12 +50,14 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Guilds
             {
                 GuildState.GuildId = 0;
                 GuildState.GuildName = "";
+                GuildState.GuildTitle = "";
                 GuildState.IsLeader = false;
                 return;
             }
 
             GuildState.GuildId = msg.ReadInt32();
             GuildState.GuildName = msg.ReadString();
+            GuildState.GuildTitle = msg.ReadString();
             GuildState.IsLeader = msg.ReadBoolean();
             GuildState.MaxMembers = msg.ReadInt32();
 
