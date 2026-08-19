@@ -825,15 +825,42 @@ namespace Assets.Scripts.UI.Guild
             name.textWrappingMode = TextWrappingModes.NoWrap;
             name.overflowMode = TextOverflowModes.Ellipsis;
             ModernUiTheme.Place(name.rectTransform, new Vector2(0, 0.5f),
-                new Vector2(RowHeight + 4f, 0f), new Vector2(Width - RowHeight - 200f, RowHeight));
+                new Vector2(RowHeight + 4f, 0f), new Vector2(Width - RowHeight - 210f, RowHeight));
 
             var count = item.Count;
-            var give = ModernUiTheme.CreateButton(row, "Give", "ให้ทั้งหมด",
+            var give = ModernUiTheme.CreateButton(row, "Give", count > 1 ? "ทั้งหมด" : "ให้",
                 ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
             ModernUiTheme.Place((RectTransform)give.transform, new Vector2(1, 0.5f),
-                new Vector2(-8f, 0f), new Vector2(96f, RowHeight - 6f));
+                new Vector2(-8f, 0f), new Vector2(72f, RowHeight - 6f));
             give.onClick.AddListener(() =>
                 NetworkManager.Instance.SendGuildDonate(bagId, count));
+
+            //A stack of one has nothing to choose, so the button that asks is left off
+            //rather than shown and refused.
+            if (count <= 1)
+                return;
+
+            var name2 = item.ProperName();
+            var some = ModernUiTheme.CreateButton(row, "GiveSome", "เลือกจำนวน",
+                ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place((RectTransform)some.transform, new Vector2(1, 0.5f),
+                new Vector2(-84f, 0f), new Vector2(88f, RowHeight - 6f));
+            some.onClick.AddListener(() =>
+                UiManager.Instance.TextInputWindow.BeginTextInput(
+                    $"บริจาค {name2} กี่ชิ้น (มี {count})", text =>
+                    {
+                        if (!int.TryParse(text, out var wanted) || wanted <= 0)
+                        {
+                            CameraFollower.Instance.AppendError("ใส่เป็นตัวเลขเท่านั้น");
+                            return;
+                        }
+
+                        //cut down here rather than refused, the same as the daily allowance
+                        if (wanted > count)
+                            wanted = count;
+
+                        NetworkManager.Instance.SendGuildDonate(bagId, wanted);
+                    }));
         }
 
         /// <summary>

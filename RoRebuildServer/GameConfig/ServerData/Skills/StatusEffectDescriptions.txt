@@ -150,3 +150,6 @@ Enemies you face will deal more damage and have higher health, but also give mor
 
 ::AdminHide
 You cannot be seen and you cannot be targeted.
+
+::GuildBuff
+Your guild's skills are helping you. Lasts as long as you are in the guild.

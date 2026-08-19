@@ -850,6 +850,7 @@ public class Player : IEntityAutoReset
         //forever. This runs after the base stats have been set back to what the character
         //actually has, so it cannot leak: leaving a guild simply means nothing is added.
         GuildSkills.ApplyTo(this);
+        GuildSkills.RefreshBuffIcon(this);
 
         //updated aspd chart
         //base attack speed is identical to pre-renewal, 0.4% lower delay per point of agi and 0.1% for dex

@@ -73,6 +73,38 @@ public static class GuildSkills
             player.CombatEntity.AddStat(CharacterStat.AddHpRecoveryPercent, regen * 10);
     }
 
+    /// <summary>Whether this guild has learned anything at all.</summary>
+    public static bool HasAnySkill(Guild guild)
+    {
+        foreach (var level in guild.SkillLevels)
+        {
+            if (level > 0)
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Puts the mark on the buff bar, or takes it off.
+    ///
+    /// Separate from the bonuses on purpose. The bonuses are recalculated and so cannot be
+    /// left behind; a status effect is a thing that is added and removed, and there is no
+    /// way around that - so it is kept to the one thing where being stale is only a wrong
+    /// icon rather than wrong stats. Called from the same place, so the two cannot drift.
+    /// </summary>
+    public static void RefreshBuffIcon(Player player)
+    {
+        var guild = player.Guild;
+        var wanted = guild != null && HasAnySkill(guild);
+        var has = player.CombatEntity.HasStatusEffectOfType(CharacterStatusEffect.GuildBuff);
+
+        if (wanted && !has)
+            player.CombatEntity.AddStatusEffect(CharacterStatusEffect.GuildBuff, int.MaxValue);
+        else if (!wanted && has)
+            player.CombatEntity.RemoveStatusOfTypeIfExists(CharacterStatusEffect.GuildBuff);
+    }
+
     /// <summary>How much more experience a member earns, as a percentage.</summary>
     public static int ExperienceBonus(Player player)
     {

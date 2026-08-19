@@ -9,23 +9,30 @@ namespace RoRebuildServer.Simulation.Guilds;
 /// <summary>
 /// What a pile of junk is worth to a guild.
 ///
-/// The scoring is not a table anybody has to write: the game already knows how often every
-/// item drops, so an item is worth what it costs to find. A Jellopy falls off every Poring
-/// and is worth one; an Oridecon turns up once in a thousand kills and is worth a thousand.
-/// Nobody has to price two and a half thousand items by hand, and nothing can be mispriced
-/// relative to anything else, because the same number decides both.
+/// Priced off what a shop pays for it, not off how often it drops.
 ///
-/// The effect is the point: the things people walk past become the things people pick up,
-/// and a player who cannot fight a boss can still be the reason their guild levelled.
+/// The drop rate was the obvious answer and it does not work on this data: Oridecon,
+/// Elunium, Steel and Iron Ore are all dropped at a hundred percent by something, so
+/// scoring by "how hard is this to find" made all four of them worth exactly what a
+/// Jellopy is worth. Seventy four percent of everything landed on one point, which is a
+/// system with no opinion about anything.
+///
+/// The price is a number somebody chose per item, and it already says what the drop table
+/// here does not: a Jellopy is worth one point, an Oridecon seventeen, a Royal Jelly forty
+/// two. The square root keeps the top from running away - two hundred thousand zeny would
+/// otherwise be worth more than everything else put together.
+///
+/// An item still has to drop from something to be donatable at all. That is what keeps the
+/// seven hundred reward items - which have prices but no source - out of it.
 /// </summary>
 public static class GuildDonation
 {
     /// <summary>
-    /// The most one item can be worth, however rare it is.
+    /// The most one item can be worth, and the shape of the curve below it.
     ///
-    /// Without it the tail of the drop table decides everything - a single item that falls
-    /// one time in ten thousand would be worth a level on its own, and the whole system
-    /// would be "wait for one lucky drop" rather than "bring what you find".
+    /// Points are the square root of the price halved, so the spread runs from one for a
+    /// Jellopy to three hundred for the few things worth hundreds of thousands, with the
+    /// materials people actually carry landing between four and forty.
     /// </summary>
     public const int MaxPointsPerItem = 300;
 
@@ -33,48 +40,32 @@ public static class GuildDonation
     /// simply buy a guild to the top in an afternoon.</summary>
     public const int DailyLimit = 2000;
 
-    private static Dictionary<int, int>? pointsByItem;
+    private static HashSet<int>? droppedItems;
 
     /// <summary>
-    /// Item id to what it is worth, built once from the drop tables.
+    /// Every item any monster drops, built once.
     ///
-    /// An item that several monsters drop is priced off the <b>easiest</b> of them. Scoring
-    /// it off the rarest would make a Jellopy precious the moment some boss also drops one.
+    /// Only whether it drops at all is asked, not how often: the rate decides nothing here
+    /// any more, but "does anything in the world give this out" is exactly the line between
+    /// a thing found while playing and a thing handed out as a reward.
     /// </summary>
-    private static Dictionary<int, int> Points()
+    private static HashSet<int> Dropped()
     {
-        if (pointsByItem != null)
-            return pointsByItem;
+        if (droppedItems != null)
+            return droppedItems;
 
-        var best = new Dictionary<int, int>();
-
+        droppedItems = new HashSet<int>();
         foreach (var (_, drops) in DataManager.MonsterDropData)
         {
             foreach (var entry in drops.DropChances)
             {
-                if (entry.Chance <= 0)
-                    continue;
-
-                if (!best.TryGetValue(entry.Id, out var chance) || entry.Chance > chance)
-                    best[entry.Id] = entry.Chance;
+                if (entry.Chance > 0)
+                    droppedItems.Add(entry.Id);
             }
         }
 
-        pointsByItem = new Dictionary<int, int>(best.Count);
-        foreach (var (id, chance) in best)
-        {
-            //chances are out of ten thousand, so this is "one in how many kills"
-            var points = 10000 / chance;
-            if (points < 1)
-                points = 1;
-            if (points > MaxPointsPerItem)
-                points = MaxPointsPerItem;
-
-            pointsByItem[id] = points;
-        }
-
-        ServerLogger.Log($"Guild donation values built for {pointsByItem.Count} items.");
-        return pointsByItem;
+        ServerLogger.Log($"Guild donation: {droppedItems.Count} items are droppable and so donatable.");
+        return droppedItems;
     }
 
     /// <summary>
@@ -103,12 +94,18 @@ public static class GuildDonation
             return 0;
         }
 
-        if (!Points().TryGetValue(itemId, out var points))
+        if (!Dropped().Contains(itemId))
         {
-            //no monster drops it, so there is no honest price for it
-            refusal = "ของชิ้นนี้ไม่มีมอนสเตอร์ดรอป เลยตีราคาไม่ได้";
+            //nothing in the world gives this out, so it is a reward rather than a find
+            refusal = "ของชิ้นนี้ไม่มีมอนสเตอร์ดรอป บริจาคไม่ได้";
             return 0;
         }
+
+        var points = (int)Math.Round(Math.Sqrt(Math.Max(info.Price, 1)) / 2d);
+        if (points < 1)
+            points = 1;
+        if (points > MaxPointsPerItem)
+            points = MaxPointsPerItem;
 
         return points;
     }
