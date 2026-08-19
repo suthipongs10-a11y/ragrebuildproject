@@ -69,8 +69,17 @@ namespace Assets.Scripts.UI.Guild
         private Button emblemButton;
         private Button donateButton;
 
+        private RectTransform levelBar;
+        private TextMeshProUGUI levelText;
+        private float levelBarWidth;
+
         /// <summary>Whether the roster has been swapped for the bag, to give something away.</summary>
         private bool donating;
+
+        private Button skillButton;
+
+        /// <summary>Whether the roster has been swapped for the guild's own skills.</summary>
+        private bool showingSkills;
 
         /// <summary>Whether the roster has been swapped for the grid of emblems.</summary>
         private bool pickingEmblem;
@@ -142,6 +151,21 @@ namespace Assets.Scripts.UI.Guild
             emblemButton.onClick.AddListener(() =>
             {
                 pickingEmblem = !pickingEmblem;
+                donating = false;
+                showingSkills = false;
+                Redraw();
+            });
+
+            skillButton = ModernUiTheme.CreateButton(root, "Skills", "สกิลกิลด์",
+                ModernUiTheme.CardColor, ModernUiTheme.NameColor, ModernUiTheme.SizeLabel);
+            ModernUiTheme.Place((RectTransform)skillButton.transform, new Vector2(1, 1),
+                new Vector2(-Pad - 300f, -Pad), new Vector2(96f, ButtonRowHeight));
+            ModernUiTheme.AddBorder((RectTransform)skillButton.transform, ModernUiTheme.CardBorderColor);
+            skillButton.onClick.AddListener(() =>
+            {
+                showingSkills = !showingSkills;
+                donating = false;
+                pickingEmblem = false;
                 Redraw();
             });
 
@@ -156,6 +180,7 @@ namespace Assets.Scripts.UI.Guild
             {
                 donating = !donating;
                 pickingEmblem = false;
+                showingSkills = false;
                 Redraw();
             });
 
@@ -321,9 +346,22 @@ namespace Assets.Scripts.UI.Guild
 
             if (!GuildState.InGuild)
             {
+                //no guild, no pages onto one - and the buttons that reach them are hidden
+                //below, so a page left open would have nothing to close it
+                pickingEmblem = false;
+                donating = false;
+                showingSkills = false;
+
                 title.text = "ยังไม่ได้อยู่ในกิลด์";
                 subtitle.text = "สร้างกิลด์ด้วย  /guild create <ชื่อกิลด์>  หรือขอเข้ากิลด์ข้างล่าง";
                 leaveButton.gameObject.SetActive(false);
+                //the three pages belong to a guild, and so do the buttons that reach them
+                emblemButton.gameObject.SetActive(false);
+                donateButton.gameObject.SetActive(false);
+                skillButton.gameObject.SetActive(false);
+                if (levelBar != null)
+                    levelBar.parent.gameObject.SetActive(false);
+
                 browseButton.gameObject.SetActive(true);
                 DrawBrowse();
                 return;
@@ -344,17 +382,14 @@ namespace Assets.Scripts.UI.Guild
                     online++;
             }
 
-            var level = $"Lv.{GuildState.Level}";
-            if (GuildState.ContributionToNext > 0)
-                level += $" ({GuildState.ContributionToNext:N0} แต้มถึงเลเวลถัดไป)";
-            else
-                level += " (สูงสุดแล้ว)";
-
-            if (GuildState.SkillPoints > 0)
-                level += $"  ·  แต้มสกิล {GuildState.SkillPoints}";
-
             subtitle.text = $"สมาชิก {GuildState.Members.Count}/{GuildState.MaxMembers}"
-                            + $"  ·  ออนไลน์ {online}  ·  {level}";
+                            + $"  ·  ออนไลน์ {online}  ·  Lv.{GuildState.Level}"
+                            + (GuildState.SkillPoints > 0 ? $"  ·  แต้มสกิล {GuildState.SkillPoints}" : "");
+
+            if (levelBar != null)
+                levelBar.parent.gameObject.SetActive(true);
+
+            DrawLevelBar();
 
             //The leader cannot leave, so the button would be a thing that only ever produces
             //a refusal. The server refuses it anyway; this is so it is not offered.
@@ -380,13 +415,25 @@ namespace Assets.Scripts.UI.Guild
             if (pickingEmblem)
             {
                 donating = false;
+                showingSkills = false;
                 DrawEmblemPicker();
                 return;
             }
 
+            skillButton.gameObject.SetActive(true);
+            var skillLabel = skillButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (skillLabel != null)
+                skillLabel.text = showingSkills ? "ย้อนกลับ" : "สกิลกิลด์";
+
             if (donating)
             {
                 DrawDonatePicker();
+                return;
+            }
+
+            if (showingSkills)
+            {
+                DrawSkillPage();
                 return;
             }
 
@@ -549,6 +596,164 @@ namespace Assets.Scripts.UI.Guild
             ModernUiTheme.Place((RectTransform)accept.transform, new Vector2(1, 0.5f),
                 new Vector2(-(AnswerWidth + 12f), 0f), new Vector2(AnswerWidth, RowHeight - 6f));
             accept.onClick.AddListener(() => Send(GuildRequestType.ApproveRequest, target));
+        }
+
+        /// <summary>
+        /// How far the guild is through its level, drawn rather than written.
+        ///
+        /// A number of points owed says nothing on its own - a thousand is either nearly
+        /// there or barely started, depending on a figure nobody has memorised. A bar says
+        /// which without being read.
+        /// </summary>
+        private void DrawLevelBar()
+        {
+            if (levelBar == null)
+            {
+                var track = ModernUiTheme.CreateCard((RectTransform)transform, "LevelTrack",
+                    ModernUiTheme.CardDeepColor);
+                ModernUiTheme.Place(track, new Vector2(0, 1), new Vector2(Pad + 2f, -46f),
+                    new Vector2(Width - Pad * 2f - 4f, 12f));
+
+                levelBar = ModernUiTheme.CreateCard(track, "LevelFill", ModernUiTheme.AccentColor);
+                levelBar.anchorMin = new Vector2(0, 0);
+                levelBar.anchorMax = new Vector2(0, 1);
+                levelBar.pivot = new Vector2(0, 0.5f);
+                levelBar.offsetMin = new Vector2(1f, 1f);
+                levelBar.offsetMax = new Vector2(1f, -1f);
+
+                levelText = ModernUiTheme.CreateText(track, "LevelText", "",
+                    ModernUiTheme.SizeSmall, ModernUiTheme.NameColor, TextAlignmentOptions.Center);
+                ModernUiTheme.Stretch(levelText.rectTransform, 0, -3, 0, 3);
+                levelBarWidth = Width - Pad * 2f - 6f;
+            }
+
+            //The bar is how far through THIS level, not how far through the whole climb:
+            //the totals grow by half again each time, so a bar against the grand total
+            //would barely move for the first several levels.
+            var atMax = GuildState.ContributionToNext <= 0;
+            var start = LevelStart(GuildState.Level);
+            var span = LevelStart(GuildState.Level + 1) - start;
+            var into = GuildState.Contribution - start;
+            var fraction = atMax || span <= 0 ? 1f : Mathf.Clamp01(into / (float)span);
+
+            levelBar.sizeDelta = new Vector2(levelBarWidth * fraction, levelBar.sizeDelta.y);
+            levelText.text = atMax
+                ? $"เลเวลสูงสุดแล้ว  ·  สะสม {GuildState.Contribution:N0} แต้ม"
+                : $"{into:N0} / {span:N0}  ·  อีก {GuildState.ContributionToNext:N0} แต้มถึง Lv.{GuildState.Level + 1}";
+        }
+
+        /// <summary>
+        /// The running total a level begins at, worked out the same way the server does.
+        ///
+        /// Duplicated deliberately rather than sent: it is four lines, and sending a curve
+        /// down the wire so a bar can be drawn would be a packet field that exists only to
+        /// avoid writing them.
+        /// </summary>
+        private static long LevelStart(int level)
+        {
+            if (level <= 1)
+                return 0;
+
+            long total = 0;
+            double step = 1000;
+            for (var i = 1; i < level && i < 10; i++)
+            {
+                total += (long)step;
+                step *= 1.5;
+            }
+
+            return total;
+        }
+
+        /// <summary>
+        /// The guild's own skills: what they do, how far they have been taken, and for the
+        /// leader, a button to spend a point.
+        /// </summary>
+        private void DrawSkillPage()
+        {
+            BuildHeading(GuildState.SkillPoints > 0
+                ? $"สกิลกิลด์  ·  มีแต้มเหลือ {GuildState.SkillPoints}"
+                : "สกิลกิลด์  ·  ไม่มีแต้มเหลือ (ขึ้นเลเวลกิลด์เพื่อรับแต้ม)", -RowGap);
+
+            var y = -RowGap - HeadingHeight - RowGap;
+
+            if (GuildState.Skills.Count == 0)
+            {
+                BuildNote("ยังไม่ได้รับข้อมูลสกิลจากเซิร์ฟเวอร์", y);
+                body.sizeDelta = new Vector2(0, RowHeight * 3f);
+                return;
+            }
+
+            foreach (var skill in GuildState.Skills)
+            {
+                BuildSkillRow(skill, y);
+                y -= RowHeight + RowGap;
+            }
+
+            body.sizeDelta = new Vector2(0, -y);
+        }
+
+        private void BuildSkillRow(GuildSkillInfo skill, float y)
+        {
+            var row = NewRow(y);
+
+            var name = ModernUiTheme.CreateText(row, "Name",
+                $"{SkillNameInThai(skill)}  <color=#888888>Lv.{skill.Level}/{skill.MaxLevel}</color>",
+                ModernUiTheme.SizeLabel, ModernUiTheme.NameColor, TextAlignmentOptions.Left);
+            name.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(name.rectTransform, new Vector2(0, 0.5f),
+                new Vector2(10f, 0f), new Vector2(Width - 240f, RowHeight));
+
+            var effect = ModernUiTheme.CreateText(row, "Effect", SkillEffect(skill),
+                ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor, TextAlignmentOptions.Right);
+            effect.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(effect.rectTransform, new Vector2(1, 0.5f),
+                new Vector2(-112f, 0f), new Vector2(180f, RowHeight));
+
+            //only the leader spends, and only while there is something to spend and room
+            //to spend it on
+            if (!GuildState.IsLeader || GuildState.SkillPoints <= 0 || skill.Level >= skill.MaxLevel)
+                return;
+
+            var id = skill.Id;
+            var up = ModernUiTheme.CreateButton(row, "Learn", "+1",
+                ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place((RectTransform)up.transform, new Vector2(1, 0.5f),
+                new Vector2(-8f, 0f), new Vector2(72f, RowHeight - 6f));
+            up.onClick.AddListener(() => NetworkManager.Instance.SendGuildLearnSkill(id));
+        }
+
+        /// <summary>
+        /// What a skill is called here, keyed off the server's own name.
+        ///
+        /// Falls back to the server's name for anything not in this list, so a skill added
+        /// later shows up in English rather than not at all.
+        /// </summary>
+        private static string SkillNameInThai(GuildSkillInfo skill)
+        {
+            switch (skill.Name)
+            {
+                case "Leadership": return "ความเป็นผู้นำ";
+                case "Glory of Guild": return "เกียรติภูมิกิลด์";
+                case "Sharp Gaze": return "สายตาเฉียบคม";
+                case "Regeneration": return "ฟื้นฟูพลัง";
+                case "Guild Blessing": return "พรแห่งกิลด์";
+                default: return skill.Name;
+            }
+        }
+
+        private static string SkillEffect(GuildSkillInfo skill)
+        {
+            var lvl = Mathf.Max(skill.Level, 0);
+            switch (skill.Name)
+            {
+                case "Leadership": return lvl > 0 ? $"STR +{lvl}" : "STR +1 ต่อเลเวล";
+                case "Glory of Guild": return lvl > 0 ? $"VIT +{lvl}" : "VIT +1 ต่อเลเวล";
+                case "Sharp Gaze": return lvl > 0 ? $"DEX +{lvl * 2}" : "DEX +2 ต่อเลเวล";
+                case "Regeneration": return lvl > 0 ? $"ฟื้น HP +{lvl * 10}%" : "ฟื้น HP +10% ต่อเลเวล";
+                case "Guild Blessing": return lvl > 0 ? $"EXP +{lvl * 2}%" : "EXP +2% ต่อเลเวล";
+                default: return "";
+            }
         }
 
         /// <summary>

@@ -19,6 +19,16 @@ namespace Assets.Scripts.Network
         public bool HasDetails => Level >= 0;
     }
 
+    /// <summary>One guild skill as the server describes it: what it is, and how far it has
+    /// been taken. The name comes from the server so the two cannot disagree about it.</summary>
+    public class GuildSkillInfo
+    {
+        public int Id;
+        public string Name = "";
+        public int Level;
+        public int MaxLevel;
+    }
+
     /// <summary>One guild in the browse list: enough to decide whether to knock.</summary>
     public class GuildBrowseEntry
     {
@@ -63,6 +73,9 @@ namespace Assets.Scripts.Network
 
         /// <summary>How much this character may still hand over today.</summary>
         public static int DonationLeftToday;
+
+        /// <summary>Every guild skill there is, learned or not, in the server's order.</summary>
+        public static readonly List<GuildSkillInfo> Skills = new List<GuildSkillInfo>();
 
         public static bool IsLeader;
 
@@ -148,6 +161,7 @@ namespace Assets.Scripts.Network
             ContributionToNext = 0;
             SkillPoints = 0;
             DonationLeftToday = 0;
+            Skills.Clear();
             IsLeader = false;
             Members.Clear();
             JoinRequests.Clear();

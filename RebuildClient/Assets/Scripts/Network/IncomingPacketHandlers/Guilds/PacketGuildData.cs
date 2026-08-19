@@ -43,6 +43,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Guilds
         {
             GuildState.Members.Clear();
             GuildState.JoinRequests.Clear();
+            GuildState.Skills.Clear();
 
             //first, and outside the has-a-guild branch, because it is about the character
             //and not about any guild
@@ -73,6 +74,20 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Guilds
             GuildState.ContributionToNext = msg.ReadInt32();
             GuildState.SkillPoints = msg.ReadInt32();
             GuildState.DonationLeftToday = msg.ReadInt32();
+
+            GuildState.Skills.Clear();
+            var skillCount = msg.ReadByte();
+            for (var i = 0; i < skillCount; i++)
+            {
+                GuildState.Skills.Add(new GuildSkillInfo
+                {
+                    Id = msg.ReadByte(),
+                    Level = msg.ReadByte(),
+                    MaxLevel = msg.ReadByte(),
+                    Name = msg.ReadString(),
+                });
+            }
+
             GuildState.IsLeader = msg.ReadBoolean();
             GuildState.MaxMembers = msg.ReadInt32();
 

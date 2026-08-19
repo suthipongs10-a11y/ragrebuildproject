@@ -1,0 +1,85 @@
+using RebuildSharedData.Enum;
+using RebuildSharedData.Enum.EntityStats;
+using RoRebuildServer.EntityComponents;
+
+namespace RoRebuildServer.Simulation.Guilds;
+
+/// <summary>What one guild skill is and how far it goes.</summary>
+public readonly struct GuildSkillInfo(GuildSkill skill, string name, int maxLevel)
+{
+    public readonly GuildSkill Skill = skill;
+    public readonly string Name = name;
+    public readonly int MaxLevel = maxLevel;
+}
+
+/// <summary>
+/// The skills a guild buys with the levels it earns, and what they do to its members.
+///
+/// The bonuses are applied from inside the player's own stat recalculation rather than
+/// added when a skill is learned and subtracted when somebody leaves. That pairing is the
+/// thing that goes wrong: miss one subtraction - on a kick, on a disband, on a log out
+/// during a level up - and a player walks away with the guild's strength forever, with
+/// nothing to point at afterwards. Recalculation cannot leak, because leaving simply means
+/// there is nothing to add on the next pass.
+/// </summary>
+public static class GuildSkills
+{
+    public static readonly GuildSkillInfo[] All =
+    {
+        new(GuildSkill.Leadership, "Leadership", 5),
+        new(GuildSkill.GloryOfGuild, "Glory of Guild", 5),
+        new(GuildSkill.SharpGaze, "Sharp Gaze", 5),
+        new(GuildSkill.Regeneration, "Regeneration", 3),
+        new(GuildSkill.GuildBlessing, "Guild Blessing", 5),
+    };
+
+    public static int MaxLevelOf(GuildSkill skill)
+    {
+        foreach (var info in All)
+        {
+            if (info.Skill == skill)
+                return info.MaxLevel;
+        }
+
+        return 0;
+    }
+
+    /// <summary>
+    /// Adds what this player's guild gives them.
+    ///
+    /// Called from UpdateStats, after the base stats have been set back to what the
+    /// character actually has, so this is always adding to a clean number.
+    /// </summary>
+    public static void ApplyTo(Player player)
+    {
+        var guild = player.Guild;
+        if (guild == null)
+            return;
+
+        var str = guild.SkillLevel(GuildSkill.Leadership);
+        if (str > 0)
+            player.CombatEntity.AddStat(CharacterStat.AddStr, str);
+
+        var vit = guild.SkillLevel(GuildSkill.GloryOfGuild);
+        if (vit > 0)
+            player.CombatEntity.AddStat(CharacterStat.AddVit, vit);
+
+        var dex = guild.SkillLevel(GuildSkill.SharpGaze);
+        if (dex > 0)
+            player.CombatEntity.AddStat(CharacterStat.AddDex, dex * 2);
+
+        var regen = guild.SkillLevel(GuildSkill.Regeneration);
+        if (regen > 0)
+            player.CombatEntity.AddStat(CharacterStat.AddHpRecoveryPercent, regen * 10);
+    }
+
+    /// <summary>How much more experience a member earns, as a percentage.</summary>
+    public static int ExperienceBonus(Player player)
+    {
+        var guild = player.Guild;
+        if (guild == null)
+            return 0;
+
+        return guild.SkillLevel(GuildSkill.GuildBlessing) * 2;
+    }
+}

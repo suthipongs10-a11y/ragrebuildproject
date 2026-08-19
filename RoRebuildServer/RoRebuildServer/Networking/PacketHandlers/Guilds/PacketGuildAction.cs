@@ -70,6 +70,10 @@ public class PacketGuildAction : IClientPacketHandler
                 Donate(connection, player, msg.ReadInt32(), msg.ReadInt32());
                 break;
 
+            case GuildRequestType.LearnSkill:
+                LearnSkill(connection, player, (GuildSkill)msg.ReadInt32());
+                break;
+
             case GuildRequestType.RejectRequest:
                 AnswerRequest(connection, player, msg.ReadString(), false);
                 break;
@@ -329,6 +333,68 @@ public class PacketGuildAction : IClientPacketHandler
 
         if (after > before)
             Announce(guild, $"กิลด์ {guild.GuildName} ขึ้นเป็นเลเวล {after} แล้ว!");
+    }
+
+    /// <summary>
+    /// The leader spends a point on one of the guild's skills.
+    ///
+    /// Everyone online is recalculated, not just the leader: the whole point of a guild
+    /// skill is that it lands on forty people at once, and a bonus nobody feels until they
+    /// relog is a bonus nobody believes in.
+    /// </summary>
+    private static void LearnSkill(NetworkConnection connection, Player player, GuildSkill skill)
+    {
+        var guild = player.Guild;
+        if (guild == null || !guild.IsLeader(player))
+        {
+            CommandBuilder.ErrorMessage(connection, "เฉพาะหัวหน้ากิลด์เท่านั้นที่ทำได้");
+            return;
+        }
+
+        var max = GuildSkills.MaxLevelOf(skill);
+        if (max <= 0)
+        {
+            CommandBuilder.ErrorMessage(connection, "ไม่มีสกิลนั้น");
+            return;
+        }
+
+        if (guild.SkillPoints <= 0)
+        {
+            CommandBuilder.ErrorMessage(connection, "ไม่มีแต้มสกิลเหลือ");
+            return;
+        }
+
+        var index = (int)skill;
+        if (guild.SkillLevels[index] >= max)
+        {
+            CommandBuilder.ErrorMessage(connection, "สกิลนี้เต็มเลเวลแล้ว");
+            return;
+        }
+
+        guild.SkillLevels[index]++;
+        guild.SkillPoints--;
+
+        RoDatabase.EnqueueDbRequest(new GuildSkillRequest(guild.GuildId, guild.SkillPoints,
+            guild.PackSkills()));
+
+        var name = "";
+        foreach (var info in GuildSkills.All)
+        {
+            if (info.Skill == skill)
+                name = info.Name;
+        }
+
+        foreach (var member in guild.Members)
+        {
+            if (!World.Instance.TryFindPlayerByName(member.Name, out var entity))
+                continue;
+
+            var online = entity.Get<Player>();
+            online.UpdateStats();
+            CommandBuilder.SendGuildData(online);
+            CommandBuilder.SendGuildAnnouncement(online,
+                $"กิลด์ได้สกิล {name} เลเวล {guild.SkillLevels[index]} แล้ว");
+        }
     }
 
     /// <summary>Tells every member who is online, and refreshes what they are looking at.</summary>

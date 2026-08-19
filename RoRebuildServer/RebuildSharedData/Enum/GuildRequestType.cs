@@ -36,6 +36,9 @@ public enum GuildRequestType : byte
 
     /// <summary>Any member: hand a stack of items to the guild for contribution points.</summary>
     Donate,
+
+    /// <summary>Leader only: spend a point raising one of the guild's skills.</summary>
+    LearnSkill,
 }
 
 /// <summary>

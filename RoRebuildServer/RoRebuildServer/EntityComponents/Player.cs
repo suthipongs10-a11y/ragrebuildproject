@@ -19,6 +19,7 @@ using RoRebuildServer.Logging;
 using RoRebuildServer.Networking;
 using RoRebuildServer.ScriptSystem;
 using RoRebuildServer.Simulation;
+using RoRebuildServer.Simulation.Guilds;
 using RoRebuildServer.Simulation.Items;
 using RoRebuildServer.Simulation.Parties;
 using RoRebuildServer.Simulation.Pathfinding;
@@ -629,6 +630,12 @@ public class Player : IEntityAutoReset
         if (CharacterLevel >= 99 || exp == 0)
             return 0;
 
+        //applied here rather than at each of the places experience comes from, so a source
+        //added later cannot quietly miss it
+        var guildBonus = GuildSkills.ExperienceBonus(this);
+        if (guildBonus > 0)
+            exp = exp * (100 + guildBonus) / 100;
+
         var curExp = GetData(PlayerStat.Experience);
         var requiredExp = DataManager.ExpChart.ExpRequired[level];
 
@@ -836,6 +843,13 @@ public class Player : IEntityAutoReset
         SetStat(CharacterStat.Luk, GetData(PlayerStat.Luk));
 
         RefreshJobBonus();
+
+        //Guild skills, added here rather than when they are learned. Adding on learn and
+        //subtracting on leave is the version that goes wrong: miss one subtraction - a
+        //kick, a disband, a log out mid level up - and somebody keeps the guild's strength
+        //forever. This runs after the base stats have been set back to what the character
+        //actually has, so it cannot leak: leaving a guild simply means nothing is added.
+        GuildSkills.ApplyTo(this);
 
         //updated aspd chart
         //base attack speed is identical to pre-renewal, 0.4% lower delay per point of agi and 0.1% for dex

@@ -1519,6 +1519,18 @@ namespace Assets.Scripts.Network
             SendMessage(msg);
         }
 
+        /// <summary>For LearnSkill, which names one of the guild's skills.</summary>
+        public void SendGuildLearnSkill(int skillId)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.GuildAction);
+            msg.Write((byte)GuildRequestType.LearnSkill);
+            msg.Write(skillId);
+
+            SendMessage(msg);
+        }
+
         public void SendMoveRequest(string map, int x = -999, int y = -999, bool forcePosition = false)
         {
             if (map.ToLower() == "debug" || map.ToLower() == "debugroom")

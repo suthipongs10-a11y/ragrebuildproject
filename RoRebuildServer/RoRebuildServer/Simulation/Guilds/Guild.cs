@@ -1,3 +1,4 @@
+using RebuildSharedData.Enum;
 ﻿using RoRebuildServer.Database.Domain;
 using RoRebuildServer.EntityComponents;
 using RoRebuildServer.Networking;
@@ -111,6 +112,46 @@ public class Guild
     public int SkillPoints;
 
     /// <summary>
+    /// What level each guild skill is at, indexed by the skill enum.
+    ///
+    /// A flat array rather than a dictionary because the enum's order is already the save
+    /// format - the levels are written out as numbers in that order - and two things
+    /// agreeing on an order is easier to keep true than two things agreeing on a set of
+    /// keys.
+    /// </summary>
+    public readonly int[] SkillLevels = new int[(int)GuildSkill.Count];
+
+    public int SkillLevel(GuildSkill skill)
+    {
+        var i = (int)skill;
+        return i >= 0 && i < SkillLevels.Length ? SkillLevels[i] : 0;
+    }
+
+    /// <summary>"3,5,0,1,2" - the levels in enum order, for the database.</summary>
+    public string PackSkills() => string.Join(',', SkillLevels);
+
+    /// <summary>
+    /// Reads them back, tolerating a list that is the wrong length.
+    ///
+    /// A guild saved before a skill was added has a short list, and one saved after a skill
+    /// was removed would have a long one. Neither is a reason to lose the rest, so what
+    /// fits is taken and the remainder ignored.
+    /// </summary>
+    public void UnpackSkills(string? packed)
+    {
+        Array.Clear(SkillLevels);
+        if (string.IsNullOrWhiteSpace(packed))
+            return;
+
+        var parts = packed.Split(',');
+        for (var i = 0; i < parts.Length && i < SkillLevels.Length; i++)
+        {
+            if (int.TryParse(parts[i], out var level) && level > 0)
+                SkillLevels[i] = level;
+        }
+    }
+
+    /// <summary>
     /// What the contribution adds up to. Worked out rather than stored, so the curve can be
     /// changed without every guild in the database needing to be rewritten to match.
     /// </summary>
@@ -148,6 +189,7 @@ public class Guild
         EmblemId = db.Emblem;
         Contribution = db.Contribution;
         SkillPoints = db.SkillPoints;
+        UnpackSkills(db.Skills);
     }
 
     public bool IsLeader(Player player) => player.Id == LeaderId;

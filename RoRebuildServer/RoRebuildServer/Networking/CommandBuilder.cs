@@ -1695,6 +1695,19 @@ public static class CommandBuilder
         packet.Write((int)Math.Min(guild.ContributionToNextLevel, int.MaxValue));
         packet.Write(guild.SkillPoints);
         packet.Write(GuildDonation.RemainingToday(p));
+
+        //Every skill, in enum order, whether learned or not. Sending the whole list rather
+        //than only what was learned means the client never has to know which numbers were
+        //left out, and adding a skill later changes the count on both sides at once.
+        packet.Write((byte)GuildSkills.All.Length);
+        foreach (var info in GuildSkills.All)
+        {
+            packet.Write((byte)info.Skill);
+            packet.Write((byte)guild.SkillLevel(info.Skill));
+            packet.Write((byte)info.MaxLevel);
+            packet.Write(info.Name);
+        }
+
         packet.Write(guild.IsLeader(p));
         packet.Write(Guild.MaxMembers);
 

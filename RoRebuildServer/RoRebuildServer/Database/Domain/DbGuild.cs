@@ -26,6 +26,11 @@ namespace RoRebuildServer.Database.Domain
 
         public int SkillPoints { get; set; }
 
+        //The learned levels as "3,5,0,1,2", in the skill enum's order. A string rather than
+        //a table: it is five small numbers that are always read and written together, and
+        //adding a sixth skill later needs no migration at all.
+        [MaxLength(128)] public string? Skills { get; set; }
+
         public Guid LeaderId { get; set; }
     }
 }

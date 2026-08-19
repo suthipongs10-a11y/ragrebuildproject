@@ -223,6 +223,10 @@ namespace RoRebuildServer.Migrations
                     b.Property<int>("SkillPoints")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("Skills")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.ToTable("Guild");
