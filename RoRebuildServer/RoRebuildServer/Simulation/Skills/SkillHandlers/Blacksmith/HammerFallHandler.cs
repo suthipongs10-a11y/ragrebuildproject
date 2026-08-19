@@ -30,7 +30,9 @@ namespace RoRebuildServer.Simulation.Skills.SkillHandlers.Blacksmith
 
             map.GatherEnemiesInArea(source.Character, position, aoeSize, targetList, !isIndirect, true);
 
-            //deal damage to all enemies
+            //Stun them. Hammer Fall deals no damage - not here and not in the game it is
+            //from - and the comment that used to sit here said it did, which is the first
+            //thing anybody reads when asking why nothing takes damage.
             foreach (var e in targetList)
             {
                 if (!e.TryGet<CombatEntity>(out var enemy))
