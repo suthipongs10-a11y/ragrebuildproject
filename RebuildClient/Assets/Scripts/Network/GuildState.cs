@@ -55,6 +55,15 @@ namespace Assets.Scripts.Network
         /// <summary>The guild's emblem, as a number into the client's list. 0 is none.</summary>
         public static int EmblemId;
 
+        /// <summary>What the guild has been raised to, and how it is getting there.</summary>
+        public static int Level = 1;
+        public static int Contribution;
+        public static int ContributionToNext;
+        public static int SkillPoints;
+
+        /// <summary>How much this character may still hand over today.</summary>
+        public static int DonationLeftToday;
+
         public static bool IsLeader;
 
         /// <summary>Sent by the server rather than assumed, so the cap lives in one place.</summary>
@@ -134,6 +143,11 @@ namespace Assets.Scripts.Network
             GuildName = "";
             GuildTitle = "";
             EmblemId = 0;
+            Level = 1;
+            Contribution = 0;
+            ContributionToNext = 0;
+            SkillPoints = 0;
+            DonationLeftToday = 0;
             IsLeader = false;
             Members.Clear();
             JoinRequests.Clear();

@@ -20,6 +20,12 @@ namespace RoRebuildServer.Database.Domain
         //existed reads as having none without anything having to be written to it.
         public int Emblem { get; set; }
 
+        //Everything ever donated. Long rather than int: the score is per item and a guild
+        //that runs for a year would be uncomfortably close to two billion on int.
+        public long Contribution { get; set; }
+
+        public int SkillPoints { get; set; }
+
         public Guid LeaderId { get; set; }
     }
 }

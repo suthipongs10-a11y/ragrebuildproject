@@ -1506,6 +1506,19 @@ namespace Assets.Scripts.Network
             SendMessage(msg);
         }
 
+        /// <summary>For Donate, which names a bag slot and how many out of it.</summary>
+        public void SendGuildDonate(int bagId, int count)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.GuildAction);
+            msg.Write((byte)GuildRequestType.Donate);
+            msg.Write(bagId);
+            msg.Write(count);
+
+            SendMessage(msg);
+        }
+
         public void SendMoveRequest(string map, int x = -999, int y = -999, bool forcePosition = false)
         {
             if (map.ToLower() == "debug" || map.ToLower() == "debugroom")

@@ -33,6 +33,9 @@ public enum GuildRequestType : byte
 
     /// <summary>Leader only: choose the guild's emblem, by its number in the list.</summary>
     SetEmblem,
+
+    /// <summary>Any member: hand a stack of items to the guild for contribution points.</summary>
+    Donate,
 }
 
 /// <summary>
@@ -45,4 +48,13 @@ public enum GuildDataType : byte
 
     /// <summary>The list of guilds you could ask to join.</summary>
     GuildList,
+
+    /// <summary>
+    /// Something the whole guild should hear, already written out.
+    ///
+    /// Free text on the guild's own packet rather than another entry in the event enum:
+    /// what is being said is a name, a count and a number, and an enum would mean the
+    /// client rebuilding the sentence from parts it has to be sent anyway.
+    /// </summary>
+    Announcement,
 }

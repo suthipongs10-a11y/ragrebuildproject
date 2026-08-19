@@ -63,6 +63,35 @@ public class Guild
     /// </summary>
     public const int MaxEmblemId = 60;
 
+    /// <summary>
+    /// How far a guild can be raised, and what each level costs.
+    ///
+    /// The cost grows by half again each time, so the first level is an afternoon of
+    /// picking things up and the last is a project. Ten rather than fifty: every level has
+    /// to be worth something on the day it lands, and fifty levels over this much content
+    /// would be fifty levels of nearly nothing.
+    /// </summary>
+    public const int MaxLevel = 10;
+
+    private const long FirstLevelCost = 1000;
+
+    /// <summary>Total contribution needed to have reached a level. Level 1 is free.</summary>
+    public static long ExpForLevel(int level)
+    {
+        if (level <= 1)
+            return 0;
+
+        long total = 0;
+        double step = FirstLevelCost;
+        for (var i = 1; i < level && i < MaxLevel; i++)
+        {
+            total += (long)step;
+            step *= 1.5;
+        }
+
+        return total;
+    }
+
     /// <summary>How many people may be waiting to be let in at once.</summary>
     public const int MaxPendingRequests = 20;
 
@@ -74,6 +103,31 @@ public class Guild
 
     /// <summary>The emblem's number in the client's list. Zero means the guild has none.</summary>
     public int EmblemId;
+
+    /// <summary>Everything ever donated to this guild, in contribution points.</summary>
+    public long Contribution;
+
+    /// <summary>Points not yet spent on a guild skill.</summary>
+    public int SkillPoints;
+
+    /// <summary>
+    /// What the contribution adds up to. Worked out rather than stored, so the curve can be
+    /// changed without every guild in the database needing to be rewritten to match.
+    /// </summary>
+    public int Level
+    {
+        get
+        {
+            var level = 1;
+            while (level < MaxLevel && Contribution >= ExpForLevel(level + 1))
+                level++;
+            return level;
+        }
+    }
+
+    /// <summary>What is still owed before the next level, or zero at the top.</summary>
+    public long ContributionToNextLevel =>
+        Level >= MaxLevel ? 0 : ExpForLevel(Level + 1) - Contribution;
 
     public Guid LeaderId;
     public readonly List<GuildMember> Members = new();
@@ -92,6 +146,8 @@ public class Guild
     {
         GuildTitle = db.GuildTitle ?? "";
         EmblemId = db.Emblem;
+        Contribution = db.Contribution;
+        SkillPoints = db.SkillPoints;
     }
 
     public bool IsLeader(Player player) => player.Id == LeaderId;

@@ -28,6 +28,12 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Guilds
                 case GuildDataType.GuildList:
                     ReadGuildList(msg);
                     break;
+
+                case GuildDataType.Announcement:
+                    //said to everyone in the guild, so it is written in the colour good
+                    //news is written in rather than the red an error would use
+                    Camera.AppendChatText($"<color=#77FF77>{msg.ReadString()}</color>");
+                    break;
             }
 
             GuildState.Touch();
@@ -52,6 +58,8 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Guilds
                 GuildState.GuildName = "";
                 GuildState.GuildTitle = "";
                 GuildState.EmblemId = 0;
+                GuildState.Level = 1;
+                GuildState.SkillPoints = 0;
                 GuildState.IsLeader = false;
                 return;
             }
@@ -60,6 +68,11 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Guilds
             GuildState.GuildName = msg.ReadString();
             GuildState.GuildTitle = msg.ReadString();
             GuildState.EmblemId = msg.ReadInt32();
+            GuildState.Level = msg.ReadInt32();
+            GuildState.Contribution = msg.ReadInt32();
+            GuildState.ContributionToNext = msg.ReadInt32();
+            GuildState.SkillPoints = msg.ReadInt32();
+            GuildState.DonationLeftToday = msg.ReadInt32();
             GuildState.IsLeader = msg.ReadBoolean();
             GuildState.MaxMembers = msg.ReadInt32();
 

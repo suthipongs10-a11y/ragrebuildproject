@@ -1651,6 +1651,16 @@ public static class CommandBuilder
     /// read from what the guild remembers. A member nobody has seen since the server came
     /// up is sent as unknown, which the window shows as a dash rather than as level zero.
     /// </summary>
+    /// <summary>One line every member should see, in the colour of good news.</summary>
+    public static void SendGuildAnnouncement(Player p, string text)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.GuildData, 128);
+        packet.Write((byte)GuildDataType.Announcement);
+        packet.Write(text);
+
+        NetworkManager.SendMessage(packet, p.Connection);
+    }
+
     public static void SendGuildData(Player p)
     {
         var packet = NetworkManager.StartPacket(PacketType.GuildData, 1024);
@@ -1675,6 +1685,16 @@ public static class CommandBuilder
         packet.Write(guild.GuildName);
         packet.Write(guild.GuildTitle);
         packet.Write(guild.EmblemId);
+        packet.Write(guild.Level);
+        //Stored as a long so a guild running for years cannot overflow it, but sent as an
+        //int: neither side of this connection can read or write a 64 bit number, and the
+        //totals in play here are five figures. Clamped rather than cast, so the day that
+        //stops being true the number shown is wrong by being too small, not by wrapping
+        //round to negative.
+        packet.Write((int)Math.Min(guild.Contribution, int.MaxValue));
+        packet.Write((int)Math.Min(guild.ContributionToNextLevel, int.MaxValue));
+        packet.Write(guild.SkillPoints);
+        packet.Write(GuildDonation.RemainingToday(p));
         packet.Write(guild.IsLeader(p));
         packet.Write(Guild.MaxMembers);
 

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Enum.EntityStats;
 using RebuildSharedData.Networking;
+using RoRebuildServer.Data;
 using RoRebuildServer.Database;
 using RoRebuildServer.Database.Requests;
 using RoRebuildServer.EntityComponents;
@@ -63,6 +64,10 @@ public class PacketGuildAction : IClientPacketHandler
 
             case GuildRequestType.SetEmblem:
                 SetEmblem(connection, player, msg.ReadInt32());
+                break;
+
+            case GuildRequestType.Donate:
+                Donate(connection, player, msg.ReadInt32(), msg.ReadInt32());
                 break;
 
             case GuildRequestType.RejectRequest:
@@ -232,6 +237,111 @@ public class PacketGuildAction : IClientPacketHandler
             var online = entity.Get<Player>();
             CommandBuilder.SendGuildData(online);
             online.Character.Map?.RefreshEntity(online.Character);
+        }
+    }
+
+    /// <summary>
+    /// A member hands a stack of something over, and the guild is worth more for it.
+    ///
+    /// Everything is checked before the items leave the bag, the same as a trade: what is
+    /// worth donating, whether they still have that many, and whether they have anything
+    /// left of today's allowance. Only then does anything move, so a refusal at any point
+    /// costs the player nothing.
+    /// </summary>
+    private static void Donate(NetworkConnection connection, Player player, int bagId, int count)
+    {
+        var guild = player.Guild;
+        if (guild == null)
+        {
+            CommandBuilder.ErrorMessage(connection, "คุณยังไม่ได้อยู่ในกิลด์");
+            return;
+        }
+
+        if (count <= 0)
+            return;
+
+        var bag = player.Inventory;
+        if (bag == null || !bag.GetItem(bagId, out var item) || bag.GetItemCountByBagId(bagId) < count)
+        {
+            CommandBuilder.ErrorMessage(connection, "ของไม่พอ");
+            return;
+        }
+
+        if (player.Equipment != null && player.Equipment.IsItemEquipped(bagId))
+        {
+            CommandBuilder.ErrorMessage(connection, "ของที่ใส่อยู่บริจาคไม่ได้");
+            return;
+        }
+
+        var per = GuildDonation.PointsFor(item.Id, out var refusal);
+        if (per <= 0)
+        {
+            CommandBuilder.ErrorMessage(connection, refusal);
+            return;
+        }
+
+        var remaining = GuildDonation.RemainingToday(player);
+        if (remaining <= 0)
+        {
+            CommandBuilder.ErrorMessage(connection,
+                $"วันนี้บริจาคครบ {GuildDonation.DailyLimit} แต้มแล้ว พรุ่งนี้ค่อยมาใหม่");
+            return;
+        }
+
+        //Cut the stack down to what today's allowance can take rather than refusing the
+        //whole thing: somebody carrying two hundred of something should not have to work
+        //out how many will fit.
+        var affordable = remaining / per;
+        if (affordable <= 0)
+        {
+            CommandBuilder.ErrorMessage(connection, "เหลือโควต้าวันนี้ไม่พอสำหรับของชิ้นนี้");
+            return;
+        }
+
+        if (count > affordable)
+            count = affordable;
+
+        if (player.Inventory == null
+            || !player.Inventory.RemoveItemByBagIdAndGetRemovedItem(bagId, count, out _))
+        {
+            CommandBuilder.ErrorMessage(connection, "ของไม่พอ");
+            return;
+        }
+
+        //--- nothing below here may fail ------------------------------------------
+        var gained = per * count;
+        var before = guild.Level;
+
+        guild.Contribution += gained;
+        GuildDonation.RecordDonation(player, gained);
+
+        var after = guild.Level;
+        if (after > before)
+            guild.SkillPoints += after - before;
+
+        RoDatabase.EnqueueDbRequest(
+            new GuildContributionRequest(guild.GuildId, guild.Contribution, guild.SkillPoints));
+
+        CommandBuilder.SendUpdatePlayerData(player, true, false, player.HasCart);
+
+        var itemName = DataManager.GetItemInfoById(item.Id)?.Name ?? "ของ";
+        Announce(guild, $"{player.Name} บริจาค {itemName} x{count} ให้กิลด์ (+{gained} แต้ม)");
+
+        if (after > before)
+            Announce(guild, $"กิลด์ {guild.GuildName} ขึ้นเป็นเลเวล {after} แล้ว!");
+    }
+
+    /// <summary>Tells every member who is online, and refreshes what they are looking at.</summary>
+    private static void Announce(Guild guild, string text)
+    {
+        foreach (var member in guild.Members)
+        {
+            if (!World.Instance.TryFindPlayerByName(member.Name, out var entity))
+                continue;
+
+            var online = entity.Get<Player>();
+            CommandBuilder.SendGuildData(online);
+            CommandBuilder.SendGuildAnnouncement(online, text);
         }
     }
 

@@ -67,6 +67,10 @@ namespace Assets.Scripts.UI.Guild
         private Button leaveButton;
         private Button titleButton;
         private Button emblemButton;
+        private Button donateButton;
+
+        /// <summary>Whether the roster has been swapped for the bag, to give something away.</summary>
+        private bool donating;
 
         /// <summary>Whether the roster has been swapped for the grid of emblems.</summary>
         private bool pickingEmblem;
@@ -138,6 +142,20 @@ namespace Assets.Scripts.UI.Guild
             emblemButton.onClick.AddListener(() =>
             {
                 pickingEmblem = !pickingEmblem;
+                Redraw();
+            });
+
+            //Every member can donate, not just the leader, so this one sits on the left of
+            //the bar where there is always room rather than in the leader's corner.
+            donateButton = ModernUiTheme.CreateButton(root, "Donate", "บริจาค",
+                ModernUiTheme.CardColor, ModernUiTheme.NameColor, ModernUiTheme.SizeLabel);
+            ModernUiTheme.Place((RectTransform)donateButton.transform, new Vector2(1, 1),
+                new Vector2(-Pad - 200f, -Pad), new Vector2(96f, ButtonRowHeight));
+            ModernUiTheme.AddBorder((RectTransform)donateButton.transform, ModernUiTheme.CardBorderColor);
+            donateButton.onClick.AddListener(() =>
+            {
+                donating = !donating;
+                pickingEmblem = false;
                 Redraw();
             });
 
@@ -326,7 +344,17 @@ namespace Assets.Scripts.UI.Guild
                     online++;
             }
 
-            subtitle.text = $"สมาชิก {GuildState.Members.Count}/{GuildState.MaxMembers}  ·  ออนไลน์ {online}";
+            var level = $"Lv.{GuildState.Level}";
+            if (GuildState.ContributionToNext > 0)
+                level += $" ({GuildState.ContributionToNext:N0} แต้มถึงเลเวลถัดไป)";
+            else
+                level += " (สูงสุดแล้ว)";
+
+            if (GuildState.SkillPoints > 0)
+                level += $"  ·  แต้มสกิล {GuildState.SkillPoints}";
+
+            subtitle.text = $"สมาชิก {GuildState.Members.Count}/{GuildState.MaxMembers}"
+                            + $"  ·  ออนไลน์ {online}  ·  {level}";
 
             //The leader cannot leave, so the button would be a thing that only ever produces
             //a refusal. The server refuses it anyway; this is so it is not offered.
@@ -344,9 +372,21 @@ namespace Assets.Scripts.UI.Guild
             if (pickingEmblem && !GuildState.IsLeader)
                 pickingEmblem = false;
 
+            donateButton.gameObject.SetActive(true);
+            var donateLabel = donateButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (donateLabel != null)
+                donateLabel.text = donating ? "ย้อนกลับ" : "บริจาค";
+
             if (pickingEmblem)
             {
+                donating = false;
                 DrawEmblemPicker();
+                return;
+            }
+
+            if (donating)
+            {
+                DrawDonatePicker();
                 return;
             }
 
@@ -509,6 +549,86 @@ namespace Assets.Scripts.UI.Guild
             ModernUiTheme.Place((RectTransform)accept.transform, new Vector2(1, 0.5f),
                 new Vector2(-(AnswerWidth + 12f), 0f), new Vector2(AnswerWidth, RowHeight - 6f));
             accept.onClick.AddListener(() => Send(GuildRequestType.ApproveRequest, target));
+        }
+
+        /// <summary>
+        /// The bag, filtered down to what the guild will take.
+        ///
+        /// Shows what each stack is worth before it is handed over, because a donation is
+        /// one way: somebody should not learn that four hundred Jellopy were worth four
+        /// hundred points only after they are gone.
+        /// </summary>
+        private void DrawDonatePicker()
+        {
+            BuildHeading($"บริจาคของให้กิลด์  ·  วันนี้เหลือ {GuildState.DonationLeftToday:N0} แต้ม",
+                -RowGap);
+
+            var y = -RowGap - HeadingHeight - RowGap;
+            var state = PlayerState.Instance;
+            var bag = state != null ? state.Inventory : null;
+            var shown = 0;
+
+            if (bag != null)
+            {
+                foreach (var (bagId, item) in bag.GetInventoryData())
+                {
+                    //the client cannot price anything - only the server knows the drop
+                    //tables - so this offers everything stackable and lets the server
+                    //refuse with a reason
+                    if (item.Type != ItemType.RegularItem || item.ItemData == null)
+                        continue;
+
+                    if (item.ItemData.ItemClass == ItemClass.Card
+                        || item.ItemData.ItemClass == ItemClass.Weapon
+                        || item.ItemData.ItemClass == ItemClass.Equipment)
+                        continue;
+
+                    if (state.EquippedBagIdHashes.Contains(bagId))
+                        continue;
+
+                    BuildDonateRow(bagId, item, y);
+                    y -= RowHeight + RowGap;
+                    shown++;
+                }
+            }
+
+            if (shown == 0)
+            {
+                BuildNote("ไม่มีของที่บริจาคได้ในกระเป๋า", y);
+                y -= RowHeight;
+            }
+
+            body.sizeDelta = new Vector2(0, -y);
+        }
+
+        private void BuildDonateRow(int bagId, InventoryItem item, float y)
+        {
+            var row = NewRow(y);
+
+            var sprite = ClientDataLoader.Instance != null
+                ? ClientDataLoader.Instance.GetIconAtlasSprite(item.ItemData.Code)
+                : null;
+            if (sprite != null)
+            {
+                var icon = ModernUiTheme.CreateIcon(row, sprite, Color.white, RowHeight - 8f);
+                ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f),
+                    new Vector2(6f, 0f), new Vector2(RowHeight - 8f, RowHeight - 8f));
+            }
+
+            var name = ModernUiTheme.CreateText(row, "Name", $"{item.ProperName()}  x{item.Count}",
+                ModernUiTheme.SizeLabel, ModernUiTheme.NameColor, TextAlignmentOptions.Left);
+            name.textWrappingMode = TextWrappingModes.NoWrap;
+            name.overflowMode = TextOverflowModes.Ellipsis;
+            ModernUiTheme.Place(name.rectTransform, new Vector2(0, 0.5f),
+                new Vector2(RowHeight + 4f, 0f), new Vector2(Width - RowHeight - 200f, RowHeight));
+
+            var count = item.Count;
+            var give = ModernUiTheme.CreateButton(row, "Give", "ให้ทั้งหมด",
+                ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place((RectTransform)give.transform, new Vector2(1, 0.5f),
+                new Vector2(-8f, 0f), new Vector2(96f, RowHeight - 6f));
+            give.onClick.AddListener(() =>
+                NetworkManager.Instance.SendGuildDonate(bagId, count));
         }
 
         /// <summary>

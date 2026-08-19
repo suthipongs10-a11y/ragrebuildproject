@@ -207,6 +207,9 @@ namespace RoRebuildServer.Migrations
                         .HasMaxLength(64)
                         .HasColumnType("TEXT");
 
+                    b.Property<long>("Contribution")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Emblem")
                         .HasColumnType("INTEGER");
 
@@ -216,6 +219,9 @@ namespace RoRebuildServer.Migrations
 
                     b.Property<Guid>("LeaderId")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("SkillPoints")
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
