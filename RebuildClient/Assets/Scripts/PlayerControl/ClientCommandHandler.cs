@@ -9,6 +9,7 @@ using Assets.Scripts.PlayerControl;
 using Assets.Scripts.Sprites;
 using Assets.Scripts.UI;
 using Assets.Scripts.UI.ConfigWindow;
+using Assets.Scripts.UI.Guild;
 using Assets.Scripts.UI.Mobile;
 using Assets.Scripts.UI.Utility;
 using Assets.Scripts.Utility;
@@ -177,6 +178,14 @@ namespace PlayerControl
                     //Reading the code says a skill put into slot 0 should appear and it does
                     //not, so this asks the running object instead of the source.
                     HotbarReport.Print();
+                    return;
+                }
+
+                if (s[0] == "/emblems")
+                {
+                    //every cell in the guild emblem picker came out empty, and sixty
+                    //failures with one cause reads exactly like sixty missing files
+                    EmblemReport.Print();
                     return;
                 }
 

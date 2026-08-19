@@ -109,6 +109,9 @@ namespace Assets.Scripts.UI.Guild
 
         public static bool IsValid(int id) => id > 0 && id < Icons.Length;
 
+        /// <summary>The atlas name behind a number, for the diagnostic to ask about.</summary>
+        public static string NameOf(int id) => IsValid(id) ? Icons[id] : "";
+
         /// <summary>
         /// The picture for a number, or null for none and for anything out of range.
         ///
