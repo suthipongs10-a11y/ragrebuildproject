@@ -33,9 +33,9 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
                 {
                     var item = State.Inventory.GetInventoryItem(bagId);
                     if(item.Type == ItemType.UniqueItem)
-                        Camera.AppendChatText($"<color=#ed0000>You lost {item.ProperName()}.</color>");
+                        Camera.AppendChatText($"<color=#ed0000>เสีย {item.ProperName()} ไป</color>");
                     else
-                        Camera.AppendChatText($"<color=#ed0000>You lost {change}x {item.ProperName()}.</color>");
+                        Camera.AppendChatText($"<color=#ed0000>เสีย {item.ProperName()} ไป x{change}</color>");
                         
                 }
                 

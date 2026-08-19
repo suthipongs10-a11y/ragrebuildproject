@@ -23,6 +23,9 @@ namespace Assets.Scripts.UI
         public Toggle LockLevelUpButton;
         public Material GrayScaleMaterial;
         public RectTransform TooltipBox;
+
+        //where the prefab put the tooltip, which is where it is measured and where it rests
+        private Transform tooltipHome;
         public TextMeshProUGUI TooltipText;
         public TextMeshProUGUI PointsText;
         public AutoHeightFitter TooltipResizeArea;
@@ -111,8 +114,13 @@ namespace Assets.Scripts.UI
             // Debug.Log($"{entry.transform.localPosition.y} - 60 + {SkillContainer.localPosition.y}");
             var y = entry.transform.localPosition.y - 60 + SkillContainer.localPosition.y;
 
+            //Put back where it was built before measuring: x and y above are in this
+            //window's space, and the box spends the rest of its life on the top layer.
+            if (tooltipHome != null && TooltipBox.parent != tooltipHome)
+                TooltipBox.SetParent(tooltipHome, false);
+
             TooltipBox.localPosition = new Vector3(x, y, TooltipBox.localPosition.z);
-            
+
             //over the skill list rather than under it, whatever order the prefab left the
             //children in
             TooltipBox.SetAsLastSibling();
@@ -121,6 +129,16 @@ namespace Assets.Scripts.UI
             
             Vector2 preferredDimensions = TooltipText.GetPreferredValues(tooltipWidth - 20, 0); //300 minus 20 for margins
             TooltipBox.sizeDelta = new Vector2(tooltipWidth, preferredDimensions.y);
+
+            //Lifted to the top layer keeping the position just worked out, so nothing drawn
+            //after this window can cover it. Last, because everything above measures against
+            //this window and the sizing has to happen before the move.
+            var top = TopLayer();
+            if (top != null && top != TooltipBox.parent)
+            {
+                TooltipBox.SetParent(top, true);
+                TooltipBox.SetAsLastSibling();
+            }
             //
             // LayoutRebuilder.ForceRebuildLayoutImmediate(TooltipBox);
             //
@@ -131,6 +149,12 @@ namespace Assets.Scripts.UI
         public void HideTooltip()
         {
             TooltipBox.gameObject.SetActive(false);
+
+            //Back where it belongs while hidden. Left on the canvas root it would outlive
+            //this window - the hub destroys its tabs - and a tooltip with no owner is one
+            //nothing can ever hide again.
+            if (tooltipHome != null && TooltipBox.parent != tooltipHome)
+                TooltipBox.SetParent(tooltipHome, false);
         }
 
         public void SkillLevelUp(CharacterSkill skillId)
@@ -388,7 +412,28 @@ namespace Assets.Scripts.UI
             TemplateObject.gameObject.SetActive(false);
             tooltipWidth = TooltipBox.sizeDelta.x;
             tooltipTextTemplate = TooltipText.text;
+            tooltipHome = TooltipBox.parent;
             TooltipBox.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// The layer a tooltip has to be on to be seen, which is above every window.
+        ///
+        /// This window is a tab inside the character hub now, and the hub's character model
+        /// sits in a panel added after the tab content - so it draws over it. The tooltip
+        /// opens to the right of the skill list, which is exactly where that panel is, and
+        /// SetAsLastSibling only reorders within this window. So it was being drawn, in the
+        /// right place, underneath the model.
+        /// </summary>
+        private Transform TopLayer()
+        {
+            var follower = CameraFollower.Instance;
+            var canvas = follower != null ? follower.UiCanvas : null;
+            if (canvas == null)
+                return tooltipHome;
+
+            var root = canvas.rootCanvas != null ? canvas.rootCanvas : canvas;
+            return root.transform;
         }
     }
 }

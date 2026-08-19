@@ -1026,6 +1026,29 @@ namespace Assets.Scripts
             return controllable.SpriteAnimator.State == SpriteState.Sit;
         }
 
+        /// <summary>
+        /// Whether the cell the pointer is over is a way off the map.
+        ///
+        /// Asked of the entity list rather than kept in a set of its own: a warp arrives and
+        /// leaves as an entity like anything else, and a second list of cells would be one
+        /// more thing that can disagree with the first. The list is what is on screen, so
+        /// this walks tens of entries, not thousands.
+        /// </summary>
+        private bool IsMapExitAt(Vector2Int cell)
+        {
+            var entities = NetworkManager.Instance != null ? NetworkManager.Instance.EntityList : null;
+            if (entities == null)
+                return false;
+
+            foreach (var entity in entities.Values)
+            {
+                if (entity != null && entity.IsMapWarp && entity.CellPosition == cell)
+                    return true;
+            }
+
+            return false;
+        }
+
         private GameCursorMode ScreenCastV2(bool isOverUi)
         {
             if (tempPath == null)
@@ -1109,6 +1132,15 @@ namespace Assets.Scripts
 
             var displayCursor = canClickEnemy ? GameCursorMode.Attack : GameCursorMode.Normal;
             if (canClickNpc) displayCursor = GameCursorMode.Dialog;
+
+            //Standing over the way out says so. Checked before the skill cursor and after
+            //everything you could click, because a warp is not something you click - it is
+            //somewhere you walk, and the only thing the cursor is doing is telling you what
+            //is under it.
+            if (displayCursor == GameCursorMode.Normal && hasGround && !isOverUi
+                && IsMapExitAt(groundPosition))
+                displayCursor = GameCursorMode.Enter;
+
             if (hasSkillOnCursor) displayCursor = GameCursorMode.SkillTarget;
             if (hasItem && showEntityName && mouseTarget.IsAlly)
                 showEntityName = false; //don't show friendly names if you could instead pick up an item
@@ -1336,7 +1368,7 @@ namespace Assets.Scripts
         public void ResetChat()
         {
             chatMessages.Clear();
-            chatMessages.Add("Welcome to Ragnarok Rebuild!");
+            chatMessages.Add("ยินดีต้อนรับสู่ Ragnarok Rebuild!");
             RefreshChatWindow();
         }
 
@@ -2121,6 +2153,12 @@ namespace Assets.Scripts
             //DoScreenCast(pointerOverUi);
 
             var cursor = ScreenCastV2(pointerOverUi);
+
+            //A piece of interface under the pointer gets the last word, because the screen
+            //cast only knows that the pointer is over "UI" and not what kind.
+            if (UiCursorOverride.HasOverride && cursor != GameCursorMode.SkillTarget)
+                cursor = UiCursorOverride.Mode;
+
             if (cursor != GameCursorMode.SkillTarget)
             {
                 CursorManager.UpdateCursor(cursor);

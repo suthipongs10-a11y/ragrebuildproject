@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 
 namespace Assets.Scripts.UI.Hud
 {
-    public class VendTitleBox : MonoBehaviour, IPointerClickHandler
+    public class VendTitleBox : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
     {
         public int VendOwnerId;
         [NonSerialized] public bool IsChatRoom;
@@ -42,6 +42,18 @@ namespace Assets.Scripts.UI.Hud
             if(FollowObject != null)
                 SnapDialog();
         }
+
+        //A sign is a thing you click, so the cursor says so while it is over one. Released
+        //on disable as well as on exit: a shop closing under a resting pointer sends no
+        //exit event, and the cursor would be left as a hand over open ground.
+        public void OnPointerEnter(PointerEventData eventData) =>
+            UiCursorOverride.Claim(this, GameCursorMode.Interact);
+
+        public void OnPointerExit(PointerEventData eventData) => UiCursorOverride.Release(this);
+
+        public void OnDisable() => UiCursorOverride.Release(this);
+
+        public void OnDestroy() => UiCursorOverride.Release(this);
 
         public void OnPointerClick(PointerEventData eventData)
         {

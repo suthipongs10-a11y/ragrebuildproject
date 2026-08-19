@@ -26,9 +26,9 @@ namespace Assets.Scripts.UI.Hud
             var obtainedText = $"{inventoryItem.ProperName()} - {itemCount} obtained.";
             
             if(itemCount == 1)
-                CameraFollower.Instance.AppendChatText($"<color=#00fbfb>You got {inventoryItem.ProperName()}.</color>");
+                CameraFollower.Instance.AppendChatText($"<color=#00fbfb>ได้รับ {inventoryItem.ProperName()}</color>");
             else
-                CameraFollower.Instance.AppendChatText($"<color=#00fbfb>You got {itemCount}x {inventoryItem.ProperName()}.</color>");
+                CameraFollower.Instance.AppendChatText($"<color=#00fbfb>ได้รับ {inventoryItem.ProperName()} x{itemCount}</color>");
 
             if (chatOnly)
                 return;

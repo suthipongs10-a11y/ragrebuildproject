@@ -265,7 +265,7 @@ namespace Assets.Scripts.UI.Inventory
             var cart = PlayerState.Instance.Cart;
             if (cart == null)
             {
-                CameraFollower.Instance.AppendError("Unable to open the vending window due to an internal error.");
+                CameraFollower.Instance.AppendError("เปิดหน้าต่างร้านไม่ได้ เกิดข้อผิดพลาดภายใน");
                 Destroy(gameObject);
                 return;
             }

@@ -78,7 +78,7 @@ namespace Assets.Scripts.UI
 
             if (!hasDestinations)
             {
-                CameraFollower.Instance.AppendNotice("To cast warp portal you must first use the /memo command to memorize a destination.");
+                CameraFollower.Instance.AppendNotice("ต้องใช้ /memo จำปลายทางก่อนถึงจะเปิด Warp Portal ได้");
                 return;
             }
 
@@ -98,7 +98,7 @@ namespace Assets.Scripts.UI
         {
             if (!PlayerState.Instance.KnownSkills.TryGetValue(CharacterSkill.WarpPortal, out var skillLevel))
             {
-                CameraFollower.Instance.AppendNotice("You cannot use /memo command without knowing the warp portal skill.");
+                CameraFollower.Instance.AppendNotice("ต้องมีสกิล Warp Portal ก่อนถึงจะใช้ /memo ได้");
                 return;
             }
             
@@ -106,7 +106,7 @@ namespace Assets.Scripts.UI
             var mapInfo = ClientDataLoader.Instance.GetMapInfo(mapName);
             if (mapInfo == null)
             {
-                CameraFollower.Instance.AppendNotice("This location is unavailable to use as a warp portal destination.");
+                CameraFollower.Instance.AppendNotice("จุดนี้ใช้เป็นปลายทาง Warp Portal ไม่ได้");
                 return;
             }
 
@@ -117,7 +117,7 @@ namespace Assets.Scripts.UI
                     MapType.Indoor => "Indoor locations cannot be used as a warp portal destination.",
                     MapType.Dungeon => "Dungeons cannot be used as a warp portal destination.",
                     MapType.Field => "This location is too far away from a town or settlement to use as a warp portal destination.",
-                    _ => "This location is unavailable to use as a warp portal destination."
+                    _ => "จุดนี้ใช้เป็นปลายทาง Warp Portal ไม่ได้"
                 };
                 
                 CameraFollower.Instance.AppendNotice(msg);

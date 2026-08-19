@@ -17,16 +17,16 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
             switch (type)
             {
                 case ServerResult.PartyInviteSent:
-                    Camera.AppendChatText($"A party invite has been sent.", TextColor.Party);
+                    Camera.AppendChatText($"ส่งคำชวนเข้าปาร์ตี้แล้ว", TextColor.Party);
                     break;
                 case ServerResult.InviteFailedAlreadyInParty:
-                    Camera.AppendChatText($"Party invite failed, player is already in another party.", TextColor.Error);
+                    Camera.AppendChatText($"ชวนไม่สำเร็จ เขาอยู่ปาร์ตี้อื่นแล้ว", TextColor.Error);
                     break;
                 case ServerResult.InviteFailedRecipientNoBasicSkill:
-                    Camera.AppendChatText($"Party invite failed, player's basic skill level is too low to join.", TextColor.Error);
+                    Camera.AppendChatText($"ชวนไม่สำเร็จ Basic Skill ของเขายังไม่ถึง", TextColor.Error);
                     break;
                 case ServerResult.InviteFailedSenderNoBasicSkill:
-                    Camera.AppendChatText($"You do not have the required basic skill level to join a party.", TextColor.Error);
+                    Camera.AppendChatText($"Basic Skill ของคุณยังไม่ถึงเลเวลที่เข้าปาร์ตี้ได้", TextColor.Error);
                     break;
             }
         }

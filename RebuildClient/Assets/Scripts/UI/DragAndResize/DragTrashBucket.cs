@@ -32,13 +32,13 @@ namespace Assets.Scripts.UI
                 case ItemDragOrigin.ItemWindow:
                     if (UiManager.Instance.EquipmentWindow.isActiveAndEnabled)
                     {
-                        CameraFollower.Instance.AppendNotice($"Cannot drop items while equipment window is open.");
+                        CameraFollower.Instance.AppendNotice($"ทิ้งของไม่ได้ตอนเปิดหน้าต่างอุปกรณ์อยู่");
                         return;
                     }
                     
                     if (StorageUI.Instance != null)
                     {
-                        CameraFollower.Instance.AppendNotice($"Cannot drop items while storage window is open.");
+                        CameraFollower.Instance.AppendNotice($"ทิ้งของไม่ได้ตอนเปิดหน้าต่างคลังอยู่");
                         return;
                     }
 

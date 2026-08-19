@@ -46,7 +46,7 @@ namespace Assets.Scripts.UI.Inventory
         {
             if (!PlayerState.Instance.HasCart)
             {
-                CameraFollower.Instance.AppendNotice("You need a cart before you can open one.");
+                CameraFollower.Instance.AppendNotice("ต้องมีรถเข็นก่อนถึงจะเปิดได้");
                 HideWindow();
                 return;
             }
@@ -66,7 +66,7 @@ namespace Assets.Scripts.UI.Inventory
         {
             if (VendingSetupManager.Instance != null)
             {
-                CameraFollower.Instance.AppendNotice("You can't transfer items with your cart while setting up a vend.");
+                CameraFollower.Instance.AppendNotice("ย้ายของเข้าออกรถเข็นตอนกำลังตั้งร้านไม่ได้");
                 return;
             }
             
@@ -85,7 +85,7 @@ namespace Assets.Scripts.UI.Inventory
         {
             if (VendingSetupManager.Instance != null)
             {
-                CameraFollower.Instance.AppendNotice("You can't transfer items with your cart while setting up a vend.");
+                CameraFollower.Instance.AppendNotice("ย้ายของเข้าออกรถเข็นตอนกำลังตั้งร้านไม่ได้");
                 return;
             }
             

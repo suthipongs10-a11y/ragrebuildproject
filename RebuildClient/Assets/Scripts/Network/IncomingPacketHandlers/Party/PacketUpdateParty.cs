@@ -16,7 +16,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Party
                 case PartyUpdateType.AddPlayer:
                     var newMember = PartyPacketHelpers.LoadPartyMemberInfo(msg);
                     State.RegisterOrUpdatePartyMember(newMember);
-                    Camera.AppendChatText($"<color=#77FF77>{newMember.PlayerName} has joined the party.</color>");
+                    Camera.AppendChatText($"<color=#77FF77>{newMember.PlayerName} เข้าปาร์ตี้แล้ว</color>");
                     UiManager.Instance.PartyPanel.AddPartyMember(newMember);
                     break;
                 case PartyUpdateType.LogIn:
@@ -25,9 +25,9 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Party
                     var memberInfo = PartyPacketHelpers.LoadPartyMemberInfo(msg);
                     
                     if(updateType == PartyUpdateType.LogIn)
-                        Camera.AppendChatText($"<color=#77FF77>{memberInfo.PlayerName} has logged in.</color>");
+                        Camera.AppendChatText($"<color=#77FF77>{memberInfo.PlayerName} ออนไลน์แล้ว</color>");
                     if(updateType == PartyUpdateType.LogOut)
-                        Camera.AppendChatText($"<color=#77FF77>{memberInfo.PlayerName} has logged out.</color>");
+                        Camera.AppendChatText($"<color=#77FF77>{memberInfo.PlayerName} ออฟไลน์แล้ว</color>");
                     State.RegisterOrUpdatePartyMember(memberInfo);
                     UiManager.Instance.PartyPanel.RefreshPartyMember(memberInfo.PartyMemberId);
                     break;
@@ -40,7 +40,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Party
                         goto case PartyUpdateType.LeaveParty;
                     }
                     UiManager.Instance.PartyPanel.RemovePartyMember(removePartyId);
-                    Camera.AppendChatText($"<color=#77FF77>{existing.PlayerName} has left the party.</color>");
+                    Camera.AppendChatText($"<color=#77FF77>{existing.PlayerName} ออกจากปาร์ตี้แล้ว</color>");
                     break;
                 case PartyUpdateType.ChangeLeader:
                     var newLeaderId = msg.ReadInt32();
@@ -54,9 +54,9 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Party
                         State.PartyLeader = newLeaderId;
                         
                         if (newLeaderId == State.PartyMemberId)
-                            Camera.AppendChatText($"<color=#77FF77>You have been promoted to party leader.</color>");
+                            Camera.AppendChatText($"<color=#77FF77>คุณเป็นหัวหน้าปาร์ตี้แล้ว</color>");
                         else
-                            Camera.AppendChatText($"<color=#77FF77>{leader.PlayerName} has been promoted to party leader.</color>");
+                            Camera.AppendChatText($"<color=#77FF77>{leader.PlayerName} เป็นหัวหน้าปาร์ตี้แล้ว</color>");
                         State.UpdatePlayerName(); //add party leader indicator (or remove it)
                         UiManager.Instance.PartyPanel.RefreshPartyMember(newLeaderId);
                         UiManager.Instance.PartyPanel.RefreshPartyMember(oldLeaderId);
@@ -95,15 +95,15 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Party
                 case PartyUpdateType.ChangeExpShare:
                     State.PartyShareExp = msg.ReadByte() == 1;
                     Camera.AppendChatText(State.PartyShareExp
-                        ? "<color=#77FF77>Party experience is now shared between members.</color>"
-                        : "<color=#77FF77>Party experience is no longer shared - everyone keeps their own.</color>");
+                        ? "<color=#77FF77>ปาร์ตี้นี้แบ่ง EXP ให้สมาชิกทุกคนแล้ว</color>"
+                        : "<color=#77FF77>ปาร์ตี้นี้เลิกแบ่ง EXP แล้ว ใครฆ่าคนนั้นได้</color>");
                     break;
                 case PartyUpdateType.LeaveParty:
                 case PartyUpdateType.DisbandParty:
                     if(updateType == PartyUpdateType.LeaveParty)
-                        Camera.AppendChatText($"<color=#77FF77>You have left the party.</color>");
+                        Camera.AppendChatText($"<color=#77FF77>คุณออกจากปาร์ตี้แล้ว</color>");
                     if(updateType == PartyUpdateType.DisbandParty)
-                        Camera.AppendChatText($"<color=#77FF77>The party has disbanded.</color>");
+                        Camera.AppendChatText($"<color=#77FF77>ปาร์ตี้ถูกยุบแล้ว</color>");
                     State.IsInParty = false;
                     State.PartyMembers.Clear();
                     State.PartyMemberEntityLookup.Clear();

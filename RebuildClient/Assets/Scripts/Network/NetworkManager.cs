@@ -891,7 +891,7 @@ namespace Assets.Scripts.Network
 
             // Show exp-gain in chat window if the given setting was activated
             if (GameConfig.Data.ShowExpGainInChat == true && (exp > 0 || job > 0)) {
-                CameraFollower.AppendChatText($"You gained {exp} base and {job} job exp.", TextColor.System);
+                CameraFollower.AppendChatText($"ได้ EXP {exp} และ Job EXP {job}", TextColor.System);
             }
 
             //Debug.Log("Gain Exp:" + exp + " " + total);
@@ -1010,7 +1010,7 @@ namespace Assets.Scripts.Network
             if (!EntityList.TryGetValue(id, out var controllable))
                 return;
 
-            CameraFollower.AppendChatText($"{controllable.Name} has changed their name to {text}.");
+            CameraFollower.AppendChatText($"{controllable.Name} เปลี่ยนชื่อเป็น {text} แล้ว");
             controllable.Name = text;
 
             if (controllable.IsMainCharacter)
@@ -1414,7 +1414,7 @@ namespace Assets.Scripts.Network
         {
             if (type == PlayerChatType.Shout && GameConfig.Data.HideShoutChat)
             {
-                CameraFollower.AppendError("You can't send a shout chat message while you have shout chat disabled in the options.");
+                CameraFollower.AppendError("ตะโกนไม่ได้ เพราะปิดแชทตะโกนไว้ในตั้งค่า");
                 return;
             }
             

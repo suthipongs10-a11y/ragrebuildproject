@@ -65,6 +65,9 @@ namespace Assets.Scripts.Network
         public int WeaponClass;
         public string PartyName;
 
+        /// <summary>Whether this is the way off the map, which the cursor says out loud.</summary>
+        public bool IsMapWarp;
+
         /// <summary>The guild this character belongs to, and the title its leader set.</summary>
         public string GuildName;
         public string GuildTitle;
@@ -1279,7 +1282,7 @@ namespace Assets.Scripts.Network
         public void PlayerDie(Vector2Int position)
         {
             if (IsMainCharacter)
-                CameraFollower.Instance.AppendChatText("You have died! Press R key to respawn at your save point.");
+                CameraFollower.Instance.AppendChatText("คุณตายแล้ว! กด R เพื่อเกิดใหม่ที่จุดเซฟ");
 
             if (CameraFollower.Instance.SelectedTarget == this)
                 CameraFollower.Instance.ClearSelected();

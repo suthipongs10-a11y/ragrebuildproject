@@ -16,7 +16,7 @@ namespace Assets.Scripts.UI.Inventory
         {
             Destroy(gameObject);
             NetworkManager.Instance.VendingEnd();
-            CameraFollower.Instance.AppendChatText("You are no longer vending.", TextColor.Job);
+            CameraFollower.Instance.AppendChatText("ปิดร้านแล้ว", TextColor.Job);
         }
 
         private Dictionary<int, InventoryItem> itemList;
@@ -52,9 +52,9 @@ namespace Assets.Scripts.UI.Inventory
 
             var zeny = price * count;
             if(count == 1)
-                CameraFollower.Instance.AppendChatText($"Sold {saleItem.ProperName()} for {zeny:N0}z.");
+                CameraFollower.Instance.AppendChatText($"ขาย {saleItem.ProperName()} ได้ {zeny:N0}z");
             else
-                CameraFollower.Instance.AppendChatText($"Sold {count}x {saleItem.ProperName()} for {zeny:N0}z.");
+                CameraFollower.Instance.AppendChatText($"ขาย {saleItem.ProperName()} x{count} ได้ {zeny:N0}z");
 
             saleItem.Count -= count;
             if (saleItem.Count <= 0)

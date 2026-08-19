@@ -160,7 +160,7 @@ namespace Assets.Scripts.UI.Hud
         public void LeaveParty()
         {
             if(!PlayerState.Instance.IsInParty)
-                CameraFollower.Instance.AppendChatText($"<color=yellow>You are not currently in a party.</color>");
+                CameraFollower.Instance.AppendChatText($"<color=yellow>คุณยังไม่ได้อยู่ปาร์ตี้</color>");
             else
                 NetworkManager.Instance.LeaveParty();
             HideWindow();
@@ -209,7 +209,7 @@ namespace Assets.Scripts.UI.Hud
             var state = PlayerState.Instance;
             if (!state.KnownSkills.TryGetValue(CharacterSkill.BasicMastery, out var mastery) || mastery < 6)
             {
-                CameraFollower.Instance.AppendError($"You need to have learned Basic Mastery level 6 to form a party.");
+                CameraFollower.Instance.AppendError($"ต้องมี Basic Skill เลเวล 6 ขึ้นไป ถึงจะตั้งปาร์ตี้ได้");
                 return;
             }
             

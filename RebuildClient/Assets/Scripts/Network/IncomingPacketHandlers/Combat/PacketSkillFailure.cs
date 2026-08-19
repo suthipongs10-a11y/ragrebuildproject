@@ -17,91 +17,91 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Combat
             switch (result)
             {
                 case SkillValidationResult.IncorrectAmmunition:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: You don't have the correct ammunition type equipped.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: ใส่กระสุนผิดชนิด</color>");
                     break;
                 case SkillValidationResult.IncorrectWeapon:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: Skill cannot be used with this weapon.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: ใช้กับอาวุธชนิดนี้ไม่ได้</color>");
                     break;
                 case SkillValidationResult.InsufficientSp:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: Insufficient SP.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: SP ไม่พอ</color>");
                     break;
                 case SkillValidationResult.InsufficientZeny:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: Insufficient Zeny.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: เงินไม่พอ</color>");
                     break;
                 case SkillValidationResult.InsufficientItemCount:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: Missing a required item.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: ไม่มีไอเทมที่ต้องใช้</color>");
                     break;
                 case SkillValidationResult.CannotTargetBossMonster:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: The monster is immune to this skill effect.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: มอนสเตอร์ตัวนี้ไม่ติดผลของสกิล</color>");
                     break;
                 case SkillValidationResult.ItemAlreadyStolen:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: An item has already been stolen from this target.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: ขโมยจากตัวนี้ไปแล้ว</color>");
                     break;
                 case SkillValidationResult.Failure:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ</color>");
                     break;
                 case SkillValidationResult.MemoLocationInvalid:
-                    Camera.AppendChatText("<color=#FF7777>This location is unavailable for use as a warp portal destination.</color>");
+                    Camera.AppendChatText("<color=#FF7777>จุดนี้ใช้เป็นปลายทาง Warp Portal ไม่ได้</color>");
                     break;
                 case SkillValidationResult.MemoLocationUnwalkable:
-                    Camera.AppendChatText("<color=#FF7777>Cannot memo current location while standing on un-walkable ground.</color>");
+                    Camera.AppendChatText("<color=#FF7777>จำจุดนี้ไม่ได้ เพราะยืนอยู่บนพื้นที่เดินไม่ได้</color>");
                     break;
                 case SkillValidationResult.MustBeStandingInWater:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: You must have water nearby to use this skill.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: ต้องมีน้ำอยู่ใกล้ ๆ</color>");
                     break;
                 case SkillValidationResult.MissingRequiredItem:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: You are missing a required item or catalyst.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: ไม่มีไอเทมหรือตัวประกอบที่ต้องใช้</color>");
                     break;
                 case SkillValidationResult.SkillNotKnown:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: Skill not learned or available.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: ยังไม่ได้เรียนสกิลนี้</color>");
                     break;
                 case SkillValidationResult.TrapTooClose:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: Too close to another trap, player, or monster.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: ใกล้กับดัก ผู้เล่น หรือมอนสเตอร์อื่นเกินไป</color>");
                     break;
                 case SkillValidationResult.TargetImmuneToEffect:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: The target's equipment blocks this skill.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: อุปกรณ์ของเป้าหมายกันสกิลนี้</color>");
                     break;
                 case SkillValidationResult.TargetAreaOccupied:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: Target area is currently occupied.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: พื้นที่ตรงนั้นถูกใช้อยู่</color>");
                     break;
                 case SkillValidationResult.CannotTargetSelf:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: You can't target yourself with this skill.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: ใช้ใส่ตัวเองไม่ได้</color>");
                     break;
                 case SkillValidationResult.TargetStateIgnoresEffect:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: A status effect on the target prevents them from being targeted by this skill.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: เป้าหมายติดสถานะที่กันสกิลนี้อยู่</color>");
                     break;
                 case SkillValidationResult.UnusableWhileHidden:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: This skill cannot be used while hidden.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: ใช้ตอนซ่อนตัวไม่ได้</color>");
                     break;
                 case SkillValidationResult.MustBeUsedWhileHidden:
-                    Camera.AppendChatText("<color=#FF7777>Skill failed: This skill can only be used while using hiding.</color>");
+                    Camera.AppendChatText("<color=#FF7777>ใช้สกิลไม่สำเร็จ: ใช้ได้เฉพาะตอนซ่อนตัว</color>");
                     break;
                 case SkillValidationResult.CannotTeleportHere:
-                    Camera.AppendChatText("<color=#FF7777>You're unable to teleport in this location.</color>");
+                    Camera.AppendChatText("<color=#FF7777>วาร์ปในจุดนี้ไม่ได้</color>");
                     break;
                 case SkillValidationResult.VendFailedGenericError:
                     VendingSetupManager.Instance?.ResumeVendWindow();
-                    Camera.AppendChatText("Vending failed.", TextColor.Error);
+                    Camera.AppendChatText("เปิดร้านไม่สำเร็จ", TextColor.Error);
                     break;
                 case SkillValidationResult.VendFailedInvalidPrice:
                     VendingSetupManager.Instance?.ResumeVendWindow();
-                    Camera.AppendChatText("Vending failed: One or more of the prices provided were not valid (max 9,999,999z).", TextColor.Error);
+                    Camera.AppendChatText("เปิดร้านไม่สำเร็จ: ตั้งราคาไม่ถูกต้อง (สูงสุด 9,999,999z)", TextColor.Error);
                     break;
                 case SkillValidationResult.VendFailedItemsNotPreset:
                     VendingSetupManager.Instance?.ResumeVendWindow();
-                    Camera.AppendChatText("Vending failed: One or more of the items listed could not be found in your cart.", TextColor.Error);
+                    Camera.AppendChatText("เปิดร้านไม่สำเร็จ: มีของบางชิ้นไม่อยู่ในรถเข็นแล้ว", TextColor.Error);
                     break;
                 case SkillValidationResult.VendFailedNameNotValid:
                     VendingSetupManager.Instance?.ResumeVendWindow();
-                    Camera.AppendChatText("Vending failed: Store name was not valid.", TextColor.Error);
+                    Camera.AppendChatText("เปิดร้านไม่สำเร็จ: ชื่อร้านใช้ไม่ได้", TextColor.Error);
                     break;
                 case SkillValidationResult.VendFailedTooCloseToNpc:
                     VendingSetupManager.Instance?.ResumeVendWindow();
-                    Camera.AppendChatText("Vending failed: Your shop cannot be within 4 tiles of an NPC.", TextColor.Error);
+                    Camera.AppendChatText("เปิดร้านไม่สำเร็จ: ต้องห่างจาก NPC อย่างน้อย 4 ช่อง", TextColor.Error);
                     break;
                 case SkillValidationResult.VendFailedTooManyItems:
                     VendingSetupManager.Instance?.ResumeVendWindow();
-                    Camera.AppendChatText("Vending failed: The number of items exceeds the amount allowed by your learned level of vending.", TextColor.Error);
+                    Camera.AppendChatText("เปิดร้านไม่สำเร็จ: วางของเกินจำนวนที่เลเวล Vending ของคุณวางได้", TextColor.Error);
                     break;
                 default:
                     Debug.Log($"Skill failure (not shown to user): {result}");

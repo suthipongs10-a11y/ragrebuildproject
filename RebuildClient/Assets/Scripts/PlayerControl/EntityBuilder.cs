@@ -408,6 +408,10 @@ namespace Assets.Scripts.PlayerControl
                     WaterBallRiseEffect.LaunchWaterBallRise(obj);
                     break;
                 case NpcEffectType.MapWarp:
+                    //Marked so the cursor can recognise it. A map exit has no collider, so
+                    //it is never what the screen cast hits - it is found by asking which
+                    //entity is standing on the cell the pointer is over.
+                    control.IsMapWarp = true;
                     MapWarpEffect.StartWarp(obj);
                     break;
                 case NpcEffectType.LightOrb:

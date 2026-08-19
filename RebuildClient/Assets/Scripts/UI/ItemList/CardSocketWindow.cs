@@ -122,7 +122,7 @@ namespace Assets.Scripts.UI
 
             if (validItems.Count == 0)
             {
-                CameraFollower.Instance.AppendError($"No equipment available that can socket this card.");
+                CameraFollower.Instance.AppendError($"ไม่มีอุปกรณ์ที่ใส่การ์ดใบนี้ได้");
                 return;
             }
 

@@ -20,14 +20,14 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Party
             var sb = new StringBuilder();
             
             if(isLogIn)
-                sb.AppendLine($"<color=#77FF77>You are in party '{State.PartyName}'</color>");
+                sb.AppendLine($"<color=#77FF77>อยู่ปาร์ตี้ '{State.PartyName}'</color>");
             else
             {
                 sb.AppendLine($"<color=#77FF77>You have joined the party '{State.PartyName}'</color>");
                 sb.AppendLine($"<color=#77FF77>Exp gained will be shared with party members within 10 levels.</color>");
             }
 
-            sb.Append($"<color=#77FF77>Party members: ");
+            sb.Append($"<color=#77FF77>สมาชิกปาร์ตี้: ");
 
             if (CameraFollower.Instance.TargetControllable != null)
             {

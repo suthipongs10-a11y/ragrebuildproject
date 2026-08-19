@@ -21,7 +21,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers
             var prices = new Dictionary<int, int>(entryCount);
             var cart = PlayerState.Instance.Cart;
 
-            CameraFollower.Instance.AppendChatText($"Started vending under the shop name: {name}.", TextColor.Job);
+            CameraFollower.Instance.AppendChatText($"เปิดร้านชื่อ {name} แล้ว", TextColor.Job);
 
             for (var i = 0; i < entryCount; i++)
             {
@@ -38,9 +38,9 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers
                 }
                 item.Count = count;
                 if(item.Count > 1)
-                    CameraFollower.Instance.AppendChatText($"Selling {count}x {item.ProperName()} for {price:N0}z.", TextColor.Job);
+                    CameraFollower.Instance.AppendChatText($"ตั้งขาย {item.ProperName()} x{count} ราคา {price:N0}z", TextColor.Job);
                 else
-                    CameraFollower.Instance.AppendChatText($"Selling {item.ProperName()} for {price:N0}z.", TextColor.Job);
+                    CameraFollower.Instance.AppendChatText($"ตั้งขาย {item.ProperName()} ราคา {price:N0}z", TextColor.Job);
                 
                 list.Add(bagId, item);
                 prices.Add(bagId, price);

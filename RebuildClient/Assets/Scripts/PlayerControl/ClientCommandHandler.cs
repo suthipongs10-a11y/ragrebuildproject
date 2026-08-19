@@ -597,7 +597,7 @@ namespace PlayerControl
                 {
                     if (PlayerState.Instance.IsInParty)
                     {
-                        cameraFollower.AppendChatText($"<color=yellow>You are already in a party. You'll need to /leave to form a new party.</color>");
+                        cameraFollower.AppendChatText($"<color=yellow>คุณอยู่ปาร์ตี้อยู่แล้ว ต้องพิมพ์ /leave ก่อนถึงจะตั้งใหม่ได้</color>");
                         return;
                     }
 
@@ -613,7 +613,7 @@ namespace PlayerControl
                     if (!name.Contains("\""))
                         text.Substring(s[0].Length + 1);
                     if (!PlayerState.Instance.IsInParty)
-                        cameraFollower.AppendChatText($"<color=yellow>You must first create a party with /organize before you can invite a player.</color>");
+                        cameraFollower.AppendChatText($"<color=yellow>ต้องตั้งปาร์ตี้ด้วย /organize ก่อนถึงจะชวนคนได้</color>");
                     else
                         NetworkManager.Instance.PartyInviteByName(name);
                 }
@@ -627,7 +627,7 @@ namespace PlayerControl
                     else
                     {
                         if (PlayerState.Instance.InvitedPartyId < 0)
-                            cameraFollower.AppendChatText($"<color=yellow>You do not have a pending party invite.</color>");
+                            cameraFollower.AppendChatText($"<color=yellow>ไม่มีคำชวนเข้าปาร์ตี้ค้างอยู่</color>");
                         else
                             NetworkManager.Instance.PartyAcceptInvite(PlayerState.Instance.InvitedPartyId);
                     }
@@ -636,7 +636,7 @@ namespace PlayerControl
                 if (s[0] == "/leave" || s[0] == "/leaveparty")
                 {
                     if (!PlayerState.Instance.IsInParty)
-                        cameraFollower.AppendChatText($"<color=yellow>You are not currently in a party.</color>");
+                        cameraFollower.AppendChatText($"<color=yellow>คุณยังไม่ได้อยู่ปาร์ตี้</color>");
                     else
                         NetworkManager.Instance.LeaveParty();
                 }
@@ -646,12 +646,12 @@ namespace PlayerControl
                     var state = PlayerState.Instance;
                     if (!state.IsInParty || state.PartyMembers == null || state.PartyMembers.Count == 0)
                     {
-                        cameraFollower.AppendChatText("You are not currently in a party.");
+                        cameraFollower.AppendChatText("คุณยังไม่ได้อยู่ปาร์ตี้");
                         return;
                     }
 
                     var sb = new StringBuilder();
-                    sb.Append("Party members: ");
+                    sb.Append("สมาชิกปาร์ตี้: ");
 
                     var count = 0;
                     foreach (var (_, member) in state.PartyMembers)

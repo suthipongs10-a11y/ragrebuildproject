@@ -17,25 +17,25 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
             switch (type)
             {
                 case ServerEvent.TradeSuccess:
-                    Camera.AppendChatText($"<color=#00fbfb>The trade completed successfully.</color>");
+                    Camera.AppendChatText($"<color=#00fbfb>แลกเปลี่ยนสำเร็จ</color>");
                     break;
                 case ServerEvent.GetZeny:
                     if (val > 0)
-                        Camera.AppendChatText($"<color=#00fbfb>Obtained {val} zeny.</color>");
+                        Camera.AppendChatText($"<color=#00fbfb>ได้รับ {val} เซนี่</color>");
                     if (val < 0)
-                        Camera.AppendChatText($"<color=#00fbfb>Lost {-val} zeny.</color>");
+                        Camera.AppendChatText($"<color=#00fbfb>เสียไป {-val} เซนี่</color>");
                     break;
                 case ServerEvent.NoAmmoEquipped:
                     if (Camera.TargetControllable.WeaponClass == 12)
-                        Camera.AppendChatText($"<color=#ed0000>You don't have any arrows equipped.</color>");
+                        Camera.AppendChatText($"<color=#ed0000>ยังไม่ได้ใส่ลูกธนู</color>");
                     else
-                        Camera.AppendChatText($"<color=#ed0000>You don't have any ammunition equipped.</color>");
+                        Camera.AppendChatText($"<color=#ed0000>ยังไม่ได้ใส่กระสุน</color>");
                     break;
                 case ServerEvent.WrongAmmoEquipped:
-                    Camera.AppendChatText($"<color=#ed0000>You don't have the right kind of ammunition equipped.</color>");
+                    Camera.AppendChatText($"<color=#ed0000>ใส่กระสุนผิดชนิด</color>");
                     break;
                 case ServerEvent.OutOfAmmo:
-                    Camera.AppendChatText($"<color=#ed0000>You don't have enough ammunition left to fire.</color>");
+                    Camera.AppendChatText($"<color=#ed0000>กระสุนไม่พอยิงแล้ว</color>");
                     break;
                 case ServerEvent.EligibleForJobChange:
                     Camera.AppendChatText($"<color=#99CCFF><i>Congratulations, you've reached job 10! You are now eligible to change jobs. "
@@ -62,12 +62,12 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
                 }
                 case ServerEvent.MemoLocationSaved:
                     if(State.KnownSkills.TryGetValue(CharacterSkill.WarpPortal, out var level) && level > 1)
-                        Camera.AppendChatText($"<color=#00fbfb>Current location has been recorded in slot {val + 1} as a warp portal destination.</color>");
+                        Camera.AppendChatText($"<color=#00fbfb>จำจุดนี้เป็นปลายทาง Warp Portal ช่องที่ {val + 1} แล้ว</color>");
                     else
-                        Camera.AppendChatText($"<color=#00fbfb>Current location has been recorded as your warp portal destination.</color>");
+                        Camera.AppendChatText($"<color=#00fbfb>จำจุดนี้เป็นปลายทาง Warp Portal แล้ว</color>");
                     break;
                 // case ServerEvent.PartyInviteSent:
-                //     Camera.AppendChatText($"<color=#77FF77>A party invite has been sent.</color>");
+                //     Camera.AppendChatText($"<color=#77FF77>ส่งคำชวนเข้าปาร์ตี้แล้ว</color>");
                 //     break;
             }
         }
