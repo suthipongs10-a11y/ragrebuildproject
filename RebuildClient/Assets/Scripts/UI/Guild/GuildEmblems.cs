@@ -6,10 +6,14 @@ namespace Assets.Scripts.UI.Guild
     /// <summary>
     /// The pictures a guild can wear, and their numbers.
     ///
-    /// Every one is an icon the game already ships - the skill icons out of the item atlas,
-    /// which is loaded and drawn from all over the interface already. That was the whole
-    /// point of choosing them: a guild can have a mark today rather than after somebody
-    /// draws thirty of them, and there is no new art to extract, import, or ship.
+    /// Every one is an icon the game already ships, out of the same atlas the rest of the
+    /// interface draws from: first the skill icons, then the rank 4 weapons and the odder
+    /// headgear. That was the whole point of choosing them - a guild can have a mark today
+    /// rather than after somebody draws sixty of them, with no new art to extract or ship.
+    ///
+    /// The item names are Korean because that is what the item data calls them, and the
+    /// atlas is keyed by exactly that. They are not translations and must not be edited:
+    /// change one and the picture is simply not found.
     ///
     /// The number is what travels and what is stored, so <b>the order of this list is a
     /// save format</b>. Add to the end; never reorder, and never remove. A guild whose
@@ -58,6 +62,46 @@ namespace Assets.Scripts.UI.Guild
             "al_holylight",        // 28
             "pr_kyrie",            // 29
             "ht_falcon",           // 30
+
+            //Legendary blades, all rank 4. Two of them - Mysteltainn and Tyrfing - are the
+            //names of bosses as well as of weapons, which is as close to a boss portrait as
+            //this can get: monsters are animated sprite files rendered by their own
+            //renderer, not flat pictures in the icon atlas, so there is nothing to put in
+            //an Image for them.
+            "엑스칼리버",              // 31 Excalibur
+            "무라마사",               // 32 Muramasa
+            "마사무네",               // 33 Masamune
+            "발뭉",                 // 34 Balmung
+            "미스틸테인",              // 35 Mistilteinn
+            "테일핑",                // 36 Tyrfing
+            "드래곤슬레이어",            // 37 Dragon Slayer
+            "네이건",                // 38 Nagan
+            "아이스팔시온",             // 39 Ice Falchion
+            "화이어브랜드",             // 40 Fire Brand
+
+            //the rest of the rank 4 armoury, one of each kind
+            "궁그닐",                // 41 Gungnir
+            "크레센트사이더",            // 42 Crescent Scythe
+            "블러드액스",              // 43 Bloody Axe
+            "등뒤를베는자",             // 44 Infiltrator
+            "카이저너클",              // 45 Kaiser Knuckle
+            "발리스타",               // 46 Ballista
+            "위자드리스태프",            // 47 Wizardry Staff
+            "묵시록",                // 48 Book of the Apocalypse
+            "풍마_대차륜",             // 49 Huuma Giant Wheel Shuriken
+            "카운터단검",              // 50 Dagger of Counter
+            "골든메이스",              // 51 Golden Mace
+
+            //headgear worth looking at, including one an MVP wears
+            "오크히어로투구",            // 52 Orc Hero Helm
+            "발키리투구",              // 53 Valkyrian Helm
+            "프리카서클릿",             // 54 Fricca's Circlet
+            "모르피셔스두건",            // 55 Morpheus's Hood
+            "모리아네헬름",             // 56 Morrigane's Helm
+            "게브네이투구",             // 57 Goibne's Helm
+            "사자탈",                // 58 Mythical Lion Mask
+            "각시탈",                // 59 Bride Mask
+            "검은고양이귀",             // 60 Black Cat Ears
         };
 
         /// <summary>The highest number there is a picture for. Matches the server's cap.</summary>

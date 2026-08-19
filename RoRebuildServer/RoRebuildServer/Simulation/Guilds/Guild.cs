@@ -61,7 +61,7 @@ public class Guild
     /// ships - so the server only ever knows the number. It checks the range and nothing
     /// else, which is all it can honestly check.
     /// </summary>
-    public const int MaxEmblemId = 30;
+    public const int MaxEmblemId = 60;
 
     /// <summary>How many people may be waiting to be let in at once.</summary>
     public const int MaxPendingRequests = 20;
