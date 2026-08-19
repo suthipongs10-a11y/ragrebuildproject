@@ -138,6 +138,7 @@ public class PacketGuildAction : IClientPacketHandler
 
         guild.RemoveMember(player.Id);
         player.Guild = null;
+        player.UpdateStats(); //without this they keep the guild's stats until something else recalculates
         RoDatabase.EnqueueDbRequest(new GuildMembershipRequest(GuildMembershipAction.Leave, player.Id, guild.GuildId));
 
         //Only here, and not where somebody is thrown out: leaving is a choice and waiting a
@@ -441,6 +442,7 @@ public class PacketGuildAction : IClientPacketHandler
         {
             var kicked = kickedEntity.Get<Player>();
             kicked.Guild = null;
+            kicked.UpdateStats(); //without this they keep the guild's stats until something else recalculates
             CommandBuilder.SendGuildData(kicked);
         }
 
@@ -512,6 +514,7 @@ public class PacketGuildAction : IClientPacketHandler
         guild.AddMember(applicant.Id, applicant.Name);
         guild.UpdateMemberDetails(applicant.Id, applicant.GetData(PlayerStat.Job), applicant.CharacterLevel);
         applicant.Guild = guild;
+        applicant.UpdateStats(); //picks up the guild's skills, and the mark that says they are working
         RoDatabase.EnqueueDbRequest(new GuildMembershipRequest(GuildMembershipAction.Join, applicant.Id, guild.GuildId));
 
         guild.Announce($"{applicant.Name} เข้าร่วมกิลด์แล้ว");

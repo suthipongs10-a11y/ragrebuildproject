@@ -163,9 +163,8 @@ namespace Assets.Scripts.UI.Hud
         private void RefreshEmblem()
         {
             var id = controllable != null ? controllable.GuildEmblem : 0;
-            var sprite = GuildEmblems.Sprite(id);
 
-            if (namePlate == null || sprite == null)
+            if (namePlate == null || id <= 0)
             {
                 if (emblem != null)
                     emblem.gameObject.SetActive(false);
@@ -182,7 +181,7 @@ namespace Assets.Scripts.UI.Hud
             }
 
             emblem.gameObject.SetActive(true);
-            emblem.sprite = sprite;
+            GuildEmblems.LoadInto(emblem, id);
 
             var firstLine = characterName;
             var breakAt = firstLine.IndexOf('\n');

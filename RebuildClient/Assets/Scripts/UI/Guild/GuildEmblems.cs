@@ -1,5 +1,8 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Assets.Scripts.Sprites;
+using Assets.Scripts.Utility;
 
 namespace Assets.Scripts.UI.Guild
 {
@@ -111,13 +114,137 @@ namespace Assets.Scripts.UI.Guild
             "Black_Cat_Ears",             // 60 Black Cat Ears
         };
 
-        /// <summary>The highest number there is a picture for. Matches the server's cap.</summary>
-        public static int MaxId => Icons.Length - 1;
+        /// <summary>
+        /// The bosses, as their card artwork.
+        ///
+        /// A monster is an animated sprite file, not a picture, so there is no boss portrait
+        /// in any atlas - but every one of these has a card, and a card has artwork of the
+        /// thing it came from. Thirty two of them, which is every boss whose card the client
+        /// ships an illustration for.
+        ///
+        /// These load one at a time from disk rather than out of the atlas, so they cannot
+        /// be handed back from a function the way the others are - see LoadInto.
+        /// </summary>
+        private static readonly string[] BossCards =
+        {
+            "Ghostring_Card",       // 61
+            "Angeling_Card",        // 62
+            "Deviling_Card",        // 63
+            "Archangeling_Card",    // 64
+            "Baphomet_Card",        // 65
+            "Dracula_Card",         // 66
+            "Osiris_Card",          // 67
+            "Amon_Ra_Card",         // 68
+            "Pharaoh_Card",         // 69
+            "Doppelganger_Card",    // 70
+            "Dark_Lord_Card",       // 71
+            "Dark_Illusion_Card",   // 72
+            "Dark_Priest_Card",     // 73
+            "Eddga_Card",           // 74
+            "Phreeoni_Card",        // 75
+            "Mistress_Card",        // 76
+            "Orc_Lord_Card",        // 77
+            "Drake_Card",           // 78
+            "Maya_Card",            // 79
+            "Gryphon_Card",         // 80
+            "Dragon_Fly_Card",      // 81
+            "Vagabond_Wolf_Card",   // 82
+            "Mastering_Card",       // 83
+            "Owl_Duke_Card",        // 84
+            "Owl_Baron_Card",       // 85
+            "Executioner_Card",     // 86
+            "Eclipse_Card",         // 87
+            "Chimera_Card",         // 88
+            "Tao_Gunka_Card",       // 89
+            "Turtle_General_Card",  // 90
+            "Toad_Card",            // 91
+            "Bloody_Knight_Card",   // 92
+        };
 
-        public static bool IsValid(int id) => id > 0 && id < Icons.Length;
+        /// <summary>Boss art already fetched, so it is fetched once and not per name plate.</summary>
+        private static readonly Dictionary<int, Sprite> BossArt = new();
+
+        /// <summary>Where the numbered bosses start.</summary>
+        private const int FirstBossId = 61;
+
+        /// <summary>The highest number there is a picture for. Matches the server's cap.</summary>
+        public static int MaxId => Icons.Length - 1 + BossCards.Length;
+
+        public static bool IsValid(int id) => id > 0 && id <= MaxId;
+
+        private static bool IsBoss(int id) => id >= FirstBossId && id <= MaxId;
+
+        /// <summary>Whether this number is one of the bosses, whose picture arrives late.</summary>
+        public static bool IsBossEmblem(int id) => IsValid(id) && IsBoss(id);
 
         /// <summary>The atlas name behind a number, for the diagnostic to ask about.</summary>
-        public static string NameOf(int id) => IsValid(id) ? Icons[id] : "";
+        public static string NameOf(int id)
+        {
+            if (!IsValid(id))
+                return "";
+
+            return IsBoss(id) ? BossCards[id - FirstBossId] : Icons[id];
+        }
+
+        /// <summary>
+        /// Puts an emblem into an Image, whichever kind it is.
+        ///
+        /// The two kinds do not arrive the same way. An icon is already in an atlas that is
+        /// in memory, so it can be handed back; a boss is a card illustration loaded from
+        /// disk when it is asked for, and there is nothing to hand back until it arrives.
+        /// Callers get this instead of a sprite, so neither of them has to know which.
+        ///
+        /// The target is checked again when the load returns: a picker rebuilt while a
+        /// picture was in flight would otherwise write into a destroyed object.
+        /// </summary>
+        public static void LoadInto(Image target, int id)
+        {
+            if (target == null)
+                return;
+
+            if (!IsValid(id))
+            {
+                target.enabled = false;
+                return;
+            }
+
+            if (!IsBoss(id))
+            {
+                var sprite = Sprite(id);
+                target.enabled = sprite != null;
+                target.sprite = sprite;
+                return;
+            }
+
+            //Asked for once and remembered after. A name plate refreshes its emblem every
+            //time anything on it changes, and every character on screen has one - without
+            //this, walking past a guild would start a fresh load on each of them.
+            if (BossArt.TryGetValue(id, out var cached))
+            {
+                target.sprite = cached;
+                target.enabled = cached != null;
+                return;
+            }
+
+            //hidden until it arrives, rather than showing a white box for a frame or two
+            target.enabled = false;
+
+            var path = $"Assets/Sprites/Imported/Collections/cardart_{BossCards[id - FirstBossId]}.png";
+            AddressableUtility.LoadSprite(target.gameObject, path,
+                loaded =>
+                {
+                    //a miss is remembered too, so a card whose art was never imported is
+                    //looked for once instead of on every refresh for the rest of the session
+                    BossArt[id] = loaded;
+
+                    if (target == null || loaded == null)
+                        return;
+
+                    target.sprite = loaded;
+                    target.enabled = true;
+                },
+                () => { /* no art for that card; the cell simply stays empty */ });
+        }
 
         /// <summary>
         /// The picture for a number, or null for none and for anything out of range.
@@ -128,7 +255,9 @@ namespace Assets.Scripts.UI.Guild
         /// </summary>
         public static Sprite Sprite(int id)
         {
-            if (!IsValid(id))
+            //A boss is not in the atlas at all, so there is nothing to return for one. Use
+            //LoadInto, which handles both kinds.
+            if (!IsValid(id) || IsBoss(id))
                 return null;
 
             var loader = ClientDataLoader.Instance;

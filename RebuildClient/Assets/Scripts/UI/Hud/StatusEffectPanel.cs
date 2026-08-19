@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assets.Scripts.Network;
 using Assets.Scripts.Sprites;
+using Assets.Scripts.UI.Guild;
 using Assets.Scripts.Utility;
 using RebuildSharedData.Enum;
 using UnityEngine;
@@ -40,6 +42,22 @@ namespace Assets.Scripts.UI.Hud
             }
 
             var icon = ClientDataLoader.Instance.GetIconAtlasSprite($"status_{status}");
+
+            //The guild buff wears the guild's own emblem where it has one, and that is not
+            //only decoration: status_GuildBuff.png exists solely because somebody ran the
+            //icon importer in the editor, and an effect with no icon is dropped below
+            //without a word. A player with a guild skill would see nothing at all and
+            //conclude the skill never took. Gloria's icon is the last resort - it ships
+            //with every other status effect, so there is always something to show.
+            if (status == CharacterStatusEffect.GuildBuff)
+            {
+                var mark = GuildEmblems.Sprite(GuildState.EmblemId);
+                if (mark != null)
+                    icon = mark;
+                if (icon == null)
+                    icon = ClientDataLoader.Instance.GetIconAtlasSprite("status_Gloria");
+            }
+
             if (icon == null)
             {
 #if UNITY_EDITOR
@@ -49,7 +67,9 @@ namespace Assets.Scripts.UI.Hud
             }
 
             var statusInfo = ClientDataLoader.Instance.GetStatusEffect((int)status);
-            var isBuff = statusInfo.Type == "Buff";
+            //A status the client has no entry for still belongs on the bar. Reading Type
+            //off a null here would take down the whole panel over one missing row.
+            var isBuff = statusInfo == null || statusInfo.Type == "Buff";
             var target = isBuff ? BuffPanel : DebuffPanel;
 
             if (isBuff)
@@ -67,8 +87,17 @@ namespace Assets.Scripts.UI.Hud
             newEffect.UpdateTime();
             newEffect.StatusIcon.sprite = icon;
             newEffect.IsBuff = isBuff;
-            if (statusInfo.CanDisable)
+            if (statusInfo != null && statusInfo.CanDisable)
                 newEffect.CanCancel = true;
+
+            //Only for a boss, and only after the sprite above is already in place: boss art
+            //is loaded from addressables rather than sitting in the atlas, so it arrives
+            //later and the icon set above is what fills the gap. Anything else has already
+            //been handled, and calling this for an emblem number this client does not know
+            //would switch the picture off rather than leave the fallback showing.
+            if (status == CharacterStatusEffect.GuildBuff
+                && GuildEmblems.IsBossEmblem(GuildState.EmblemId))
+                GuildEmblems.LoadInto(newEffect.StatusIcon, GuildState.EmblemId);
 
             StatusEffects.Add(newEffect);
             StatusEffectLookup.Add(status, newEffect);

@@ -209,6 +209,7 @@ public static class GuildCommands
 
         guild.AddMember(player.Id, player.Name);
         player.Guild = guild;
+        player.UpdateStats(); //picks up the guild's skills, and the mark that says they are working
         RoDatabase.EnqueueDbRequest(new GuildMembershipRequest(GuildMembershipAction.Join, player.Id, guild.GuildId));
 
         guild.Announce($"{player.Name} has joined the guild.");
@@ -232,7 +233,10 @@ public static class GuildCommands
             {
                 if (World.Instance.TryFindPlayerByName(member.Name, out var entity)
                     && entity.TryGet<Player>(out var online))
+                {
                     online.Guild = null;
+                    online.UpdateStats(); //the guild is gone, so what it was giving has to go with it
+                }
             }
 
             guild.Members.Clear();
@@ -243,6 +247,7 @@ public static class GuildCommands
 
         guild.RemoveMember(player.Id);
         player.Guild = null;
+        player.UpdateStats(); //without this they keep the guild's stats until something else recalculates
         RoDatabase.EnqueueDbRequest(new GuildMembershipRequest(GuildMembershipAction.Leave, player.Id, guild.GuildId));
 
         //typed rather than clicked, but it is the same decision and carries the same wait

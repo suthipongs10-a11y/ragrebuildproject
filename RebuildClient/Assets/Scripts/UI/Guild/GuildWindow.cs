@@ -922,8 +922,7 @@ namespace Assets.Scripts.UI.Guild
                 Redraw();
             });
 
-            var sprite = GuildEmblems.Sprite(id);
-            if (sprite == null)
+            if (id == 0)
             {
                 //"no emblem" is a cell like any other, so taking one off is as easy as
                 //putting one on
@@ -934,7 +933,10 @@ namespace Assets.Scripts.UI.Guild
                 return;
             }
 
-            var icon = ModernUiTheme.CreateIcon(cell, sprite, Color.white, EmblemCell - 10f);
+            //LoadInto rather than a sprite: the bosses are card illustrations read from
+            //disk when asked for, and there is nothing to hand back until they arrive
+            var icon = ModernUiTheme.CreateIcon(cell, null, Color.white, EmblemCell - 10f);
+            GuildEmblems.LoadInto(icon, id);
         }
 
         private void BuildHeading(string text, float y)
