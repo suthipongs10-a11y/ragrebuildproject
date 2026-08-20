@@ -34,6 +34,12 @@ public class RoContext : IdentityDbContext<RoUserAccount, UserRole, int>
                                        .WithOne(u => u.Account)
                                        .HasForeignKey<StorageInventory>(s => s.AccountId);
         builder.Entity<DbCharacter>().HasOne(u => u.Party).WithMany(p => p.Characters).HasForeignKey(u => u.PartyId);
+
+        //The two market queries that run on a timer rather than on a button: everything
+        //waiting for one character, and everything due to pay out. Both would walk the
+        //whole table without these, which is fine at ten rows and not at ten thousand.
+        builder.Entity<DbInboxParcel>().HasIndex(p => p.CharacterId);
+        builder.Entity<DbAuction>().HasIndex(a => new { a.IsSettled, a.EndsAt });
     }
 
 
@@ -42,4 +48,6 @@ public class RoContext : IdentityDbContext<RoUserAccount, UserRole, int>
     public DbSet<DbParty> Parties { get; set; }
     public DbSet<DbGuild> Guilds { get; set; }
     public DbSet<ScriptGlobalVar> ScriptGlobalVars { get; set; }
+    public DbSet<DbAuction> Auctions { get; set; }
+    public DbSet<DbInboxParcel> InboxParcels { get; set; }
 }

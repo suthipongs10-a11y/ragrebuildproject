@@ -200,6 +200,138 @@ namespace RoRebuildServer.Migrations
                     b.ToTable("Character");
                 });
 
+            modelBuilder.Entity("RoRebuildServer.Database.Domain.DbAuction", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("EndsAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("HighBid")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("HighBidderId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("HighBidderName")
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsSettled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsUnique")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte>("ItemFlags")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("ListedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte>("Refine")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SellerName")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Slot0")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Slot1")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Slot2")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Slot3")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("StartPrice")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("UniqueId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsSettled", "EndsAt");
+
+                    b.ToTable("Auction");
+                });
+
+            modelBuilder.Entity("RoRebuildServer.Database.Domain.DbInboxParcel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("CharacterId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FromName")
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsUnique")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte>("ItemFlags")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte>("Reason")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<byte>("Refine")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Slot0")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Slot1")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Slot2")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Slot3")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("UniqueId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Zeny")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CharacterId");
+
+                    b.ToTable("InboxParcel");
+                });
+
             modelBuilder.Entity("RoRebuildServer.Database.Domain.DbGuild", b =>
                 {
                     b.Property<int>("Id")

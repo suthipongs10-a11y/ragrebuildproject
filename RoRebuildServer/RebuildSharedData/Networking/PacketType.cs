@@ -146,6 +146,15 @@ public enum PacketType : byte
     //whatever that action needs, the same shape the guild windows use
     TradeAction,
     TradeUpdate,
+
+    //the parcel box: what an auction pays out into, since the other half of a sale is
+    //usually not logged in when it happens. Same request/answer pair as the rest.
+    InboxAction,
+    InboxData,
+
+    //the auction house. Listing, bidding and browsing all move through one pair.
+    AuctionAction,
+    AuctionData,
 }
 
 public enum MessageType : byte

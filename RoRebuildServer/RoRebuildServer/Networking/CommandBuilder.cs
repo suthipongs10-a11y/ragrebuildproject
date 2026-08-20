@@ -26,7 +26,7 @@ using RoRebuildServer.Simulation.Util;
 
 namespace RoRebuildServer.Networking;
 
-public static class CommandBuilder
+public static partial class CommandBuilder
 {
     [ThreadStatic] private static List<NetworkConnection>? recipients;
 
