@@ -94,7 +94,13 @@ public static class AuctionHouse
             return;
         }
 
-        player.DropZeny(fee); //tells the client on its own way out
+        player.DropZeny(fee); //tells the client about the money on its own way out
+
+        //The bag is a different matter. Taking the item out changed the server's copy and
+        //nothing about that reaches the client on its own, so without this the stack sits
+        //there on screen looking untouched - and the first thing anybody does then is try
+        //to list it again.
+        CommandBuilder.SendUpdatePlayerData(player, true, false, player.HasCart);
 
         var auction = new DbAuction
         {

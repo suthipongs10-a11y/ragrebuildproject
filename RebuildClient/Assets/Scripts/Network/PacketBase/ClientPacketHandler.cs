@@ -27,6 +27,19 @@ namespace Assets.Scripts.Network.PacketBase
         
         public static void Init(NetworkManager network, PlayerState state)
         {
+            //Said out loud once at startup, because the table is generated from inside the
+            //editor and nothing runs that automatically. A client whose scripts have not
+            //been recompiled since a handler was added has an older, shorter table, and
+            //the only symptom is a packet arriving and going nowhere - which reads as the
+            //server never answering. This line is the difference between the two.
+            var known = System.Enum.GetNames(typeof(PacketType)).Length;
+            if (handlers.Length != known)
+                UnityEngine.Debug.LogError($"[Packets] the handler table holds {handlers.Length} "
+                    + $"slots but this client knows {known} packet types. Run Ragnarok > CodeGen > "
+                    + "Update Packet Handlers, or refresh the project if it was just pulled.");
+            else
+                UnityEngine.Debug.Log($"[Packets] handler table ready: {handlers.Length} slots.");
+
             for (var i = 0; i < handlers.Length; i++)
             {
                 handlers[i].Network = network;
