@@ -1,5 +1,5 @@
 using RebuildSharedData.Enum;
-﻿using RoRebuildServer.Database.Domain;
+using RoRebuildServer.Database.Domain;
 using RoRebuildServer.EntityComponents;
 using RoRebuildServer.Networking;
 

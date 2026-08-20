@@ -1,5 +1,7 @@
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
+//OutboundMessage lives under RebuildZoneServer despite sitting in this folder
+using RebuildZoneServer.Networking;
 using RoRebuildServer.Database.Domain;
 using RoRebuildServer.EntityComponents;
 using RoRebuildServer.Simulation.Market;
