@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
 using RoRebuildServer.Database;
