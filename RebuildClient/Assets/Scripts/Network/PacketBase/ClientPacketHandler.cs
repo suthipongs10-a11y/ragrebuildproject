@@ -9,7 +9,19 @@ namespace Assets.Scripts.Network.PacketBase
     {
         private static readonly ClientPacketHandlerBase[] handlers;
 
-        public static bool HasValidHandler(PacketType type) => (int)type <= handlers.Length && handlers[(int)type].GetType() != typeof(InvalidPacket);
+        /// <summary>
+        /// Whether this packet has somewhere to go.
+        ///
+        /// Less than the length, not less than or equal: the guard is the only thing
+        /// standing between a packet number the table does not reach and an index off the
+        /// end of it, and off by one here throws inside the receive loop rather than
+        /// ignoring one packet. The table is shorter than the enum whenever a handler has
+        /// been added and the generator has not been run, which is exactly when this
+        /// matters.
+        /// </summary>
+        public static bool HasValidHandler(PacketType type) =>
+            (int)type >= 0 && (int)type < handlers.Length
+            && handlers[(int)type].GetType() != typeof(InvalidPacket);
 
         public static void Execute(PacketType type, ClientInboundMessage msg) => handlers[(int)type].ReceivePacket(msg);
         

@@ -2,12 +2,14 @@ using Assets.Scripts.Network;
 using Assets.Scripts.Network.PacketBase;
 using Assets.Scripts.Network.IncomingPacketHandlers;
 using Assets.Scripts.Network.IncomingPacketHandlers.Character;
-using Assets.Scripts.Network.IncomingPacketHandlers.Party;
 using Assets.Scripts.Network.IncomingPacketHandlers.Combat;
 using Assets.Scripts.Network.IncomingPacketHandlers.Environment;
 using Assets.Scripts.Network.IncomingPacketHandlers.Guilds;
+using Assets.Scripts.Network.IncomingPacketHandlers.Market;
 using Assets.Scripts.Network.IncomingPacketHandlers.Network;
+using Assets.Scripts.Network.IncomingPacketHandlers.Party;
 using Assets.Scripts.Network.IncomingPacketHandlers.System;
+using Assets.Scripts.Network.IncomingPacketHandlers.Trading;
 using Assets.Scripts.Network.HandlerBase;
 
 namespace Assets.Scripts.Network.PacketBase
@@ -16,7 +18,7 @@ namespace Assets.Scripts.Network.PacketBase
 	{
 		static ClientPacketHandler()
 		{
-			handlers = new ClientPacketHandlerBase[116];
+			handlers = new ClientPacketHandlerBase[122];
 			handlers[0] = new InvalidPacket(); //PlayerReady
 			handlers[1] = new PacketOnEnterServer(); //EnterServer
 			handlers[2] = new InvalidPacket(); //Ping
@@ -133,6 +135,12 @@ namespace Assets.Scripts.Network.PacketBase
 			handlers[113] = new PacketToggleActivatedState(); //ToggleActivatedState
 			handlers[114] = new InvalidPacket(); //GuildAction
 			handlers[115] = new PacketGuildData(); //GuildData
+			handlers[116] = new InvalidPacket(); //TradeAction
+			handlers[117] = new PacketTradeUpdate(); //TradeUpdate
+			handlers[118] = new InvalidPacket(); //InboxAction
+			handlers[119] = new PacketInboxData(); //InboxData
+			handlers[120] = new InvalidPacket(); //AuctionAction
+			handlers[121] = new PacketAuctionData(); //AuctionData
 		}
 	}
 }
