@@ -5,8 +5,6 @@ using System.IO;
 using System.Text;
 using Assets.Scripts.Effects;
 using Assets.Scripts.Effects.EffectHandlers;
-using Assets.Scripts.Network.HandlerBase;
-using Assets.Scripts.Network.IncomingPacketHandlers.Market;
 using Assets.Scripts.Network.PacketBase;
 using Assets.Scripts.Objects;
 using Assets.Scripts.PlayerControl;
@@ -1263,55 +1261,10 @@ namespace Assets.Scripts.Network
                 case PacketType.CreateCastCircle:
                     OnMessageCreateCastCircle(msg);
                     break;
-                //The table checked above is written by an editor menu item, so it can be
-                //older than the code that needs it - and a packet with no slot in it lands
-                //here and is printed as a hex dump, which reads as the server sending
-                //nonsense rather than as this client being behind. These are answered here
-                //as well, so a stale table costs a little duplication and not the feature.
-                case PacketType.InboxData:
-                case PacketType.AuctionData:
-                    HandleWithoutTable(type, msg);
-                    break;
                 default:
                     InvalidPacket(msg, type); //Debug.LogWarning($"Failed to handle packet type: {type}"));
                     break;
             }
-        }
-
-        /// <summary>
-        /// Handlers kept outside the generated table, made once and reused.
-        ///
-        /// Given the same four things the table's own entries are given when it is set up,
-        /// because a handler that reaches for its camera and finds nothing is a worse
-        /// failure than the one this is here to avoid.
-        /// </summary>
-        private readonly Dictionary<PacketType, ClientPacketHandlerBase> untabledHandlers = new();
-
-        private void HandleWithoutTable(PacketType type, ClientInboundMessage msg)
-        {
-            if (!untabledHandlers.TryGetValue(type, out var handler))
-            {
-                switch (type)
-                {
-                    case PacketType.InboxData:
-                        handler = new PacketInboxData();
-                        break;
-                    case PacketType.AuctionData:
-                        handler = new PacketAuctionData();
-                        break;
-                    default:
-                        InvalidPacket(msg, type);
-                        return;
-                }
-
-                handler.Network = this;
-                handler.Camera = CameraFollower.Instance;
-                handler.UiManager = UiManager.Instance;
-                handler.State = PlayerState.Instance;
-                untabledHandlers[type] = handler;
-            }
-
-            handler.ReceivePacket(msg);
         }
 
         private void InvalidPacket(ClientInboundMessage msg, PacketType type)
