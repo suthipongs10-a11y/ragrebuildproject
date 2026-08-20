@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
 using RoRebuildServer.Database;
@@ -34,15 +34,15 @@ public class PacketInboxAction : IClientPacketHandler
         switch (action)
         {
             case InboxRequestType.Refresh:
-                RoDatabase.EnqueueDbRequest(new InboxLoadRequest(player.Id));
+                RoDatabase.EnqueueDbRequest(new InboxLoadRequest(player.Id, player.Name));
                 break;
 
             case InboxRequestType.Claim:
-                RoDatabase.EnqueueDbRequest(new InboxClaimRequest(player.Id, msg.ReadInt32()));
+                RoDatabase.EnqueueDbRequest(new InboxClaimRequest(player.Id, player.Name, msg.ReadInt32()));
                 break;
 
             case InboxRequestType.ClaimAll:
-                RoDatabase.EnqueueDbRequest(new InboxClaimRequest(player.Id, -1));
+                RoDatabase.EnqueueDbRequest(new InboxClaimRequest(player.Id, player.Name, -1));
                 break;
         }
     }

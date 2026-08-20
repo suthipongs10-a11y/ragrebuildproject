@@ -143,12 +143,23 @@ public static class Inbox
     /// <summary>
     /// The player this character id belongs to, if they are online right now.
     ///
-    /// Checked by character id rather than by holding onto a Player: the object is pooled
-    /// and reused, so one kept across a log out would be somebody else by the time it was
-    /// read.
+    /// Looked up by name where one is known, because that is a dictionary the world keeps
+    /// and the same lookup every other system here uses - walking the connection list is
+    /// a scan over a structure whose contents depend on how far through logging in
+    /// somebody is, which is a lot of assumptions for something every answer depends on.
+    /// The id is still checked afterwards: a name can be reused once a character is gone.
+    ///
+    /// Never a held Player reference. The object is pooled and reused, so one kept across
+    /// a log out would be somebody else by the time it was read.
     /// </summary>
-    public static Player? FindOnline(Guid characterId)
+    public static Player? FindOnline(Guid characterId, string? name = null)
     {
+        if (!string.IsNullOrEmpty(name)
+            && World.Instance.TryFindPlayerByName(name, out var entity)
+            && entity.TryGet<Player>(out var byName)
+            && byName.Id == characterId)
+            return byName;
+
         foreach (var (_, connection) in NetworkManager.ConnectedAccounts)
         {
             var player = connection.Player;

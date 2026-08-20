@@ -51,6 +51,17 @@ namespace Assets.Scripts.UI.Market
         /// <summary>Asked for again on this cadence while a page that goes stale is open.</summary>
         private const float RefreshInterval = 10f;
 
+        /// <summary>
+        /// How long a page waits for an answer before saying it did not get one.
+        ///
+        /// Every one of these requests is answered or it is not; there is no partial
+        /// state. Without this the page that was never answered looks exactly like the
+        /// page that is still loading, forever - which is a bug report that says "it says
+        /// loading" and nothing else. Shorter than the refresh above, so the retry that
+        /// follows is the automatic one.
+        /// </summary>
+        private const float AnswerTimeout = 6f;
+
         private enum Page
         {
             Browse,
@@ -83,6 +94,10 @@ namespace Assets.Scripts.UI.Market
 
         private int drawnRevision = -1;
         private float refreshTimer;
+
+        /// <summary>When the page on screen last asked, for the timeout above.</summary>
+        private float askedAt;
+        private bool reportedTimeout;
 
         /// <summary>
         /// When the listings on screen were sent, so the countdown can run down from there.
@@ -230,6 +245,8 @@ namespace Assets.Scripts.UI.Market
                 return;
 
             refreshTimer = RefreshInterval;
+            askedAt = Time.realtimeSinceStartup;
+            reportedTimeout = false;
 
             switch (page)
             {
@@ -255,6 +272,13 @@ namespace Assets.Scripts.UI.Market
                 Redraw();
             }
 
+            //One redraw when the wait turns into a failure, not one every frame after it
+            if (!reportedTimeout && !HasAnswer && Time.realtimeSinceStartup - askedAt > AnswerTimeout)
+            {
+                reportedTimeout = true;
+                Redraw();
+            }
+
             refreshTimer -= Time.deltaTime;
             if (refreshTimer <= 0f)
             {
@@ -266,6 +290,41 @@ namespace Assets.Scripts.UI.Market
                 else
                     refreshTimer = RefreshInterval;
             }
+        }
+
+        /// <summary>Whether the page on screen has been answered at least once.</summary>
+        private bool HasAnswer
+        {
+            get
+            {
+                switch (page)
+                {
+                    case Page.Browse: return MarketState.ListingsReceived;
+                    case Page.Mine: return MarketState.MineReceived;
+                    case Page.Parcels: return MarketState.ParcelsReceived;
+                    default: return true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// What to show in place of a list that has not arrived: still waiting, or waited
+        /// and got nothing. Draws the note and returns, so the caller stops there.
+        /// </summary>
+        private void DrawWaiting()
+        {
+            var late = Time.realtimeSinceStartup - askedAt > AnswerTimeout;
+            BuildNote(late ? "เซิร์ฟเวอร์ไม่ตอบ กำลังลองใหม่..." : "กำลังโหลด...", -RowGap);
+            body.sizeDelta = new Vector2(0, RowHeight);
+
+            if (!late)
+                return;
+
+            var retry = ModernUiTheme.CreateButton(toolRow, "Retry", "ลองใหม่",
+                ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place((RectTransform)retry.transform, new Vector2(1, 0.5f),
+                new Vector2(0f, 0f), new Vector2(80f, ToolRowHeight - 2f));
+            retry.onClick.AddListener(Ask);
         }
 
         // =====================================================================
@@ -357,8 +416,7 @@ namespace Assets.Scripts.UI.Market
             var y = -RowGap;
             if (!MarketState.ListingsReceived)
             {
-                BuildNote("กำลังโหลด...", y);
-                body.sizeDelta = new Vector2(0, RowHeight);
+                DrawWaiting();
                 return;
             }
 
@@ -444,8 +502,7 @@ namespace Assets.Scripts.UI.Market
             var y = -RowGap;
             if (!MarketState.MineReceived)
             {
-                BuildNote("กำลังโหลด...", y);
-                body.sizeDelta = new Vector2(0, RowHeight);
+                DrawWaiting();
                 return;
             }
 
@@ -756,8 +813,7 @@ namespace Assets.Scripts.UI.Market
             var y = -RowGap;
             if (!MarketState.ParcelsReceived)
             {
-                BuildNote("กำลังโหลด...", y);
-                body.sizeDelta = new Vector2(0, RowHeight);
+                DrawWaiting();
                 return;
             }
 

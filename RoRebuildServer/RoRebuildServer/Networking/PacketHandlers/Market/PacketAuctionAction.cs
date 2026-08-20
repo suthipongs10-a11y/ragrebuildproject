@@ -1,4 +1,4 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
 using RoRebuildServer.Database;
@@ -38,13 +38,13 @@ public class PacketAuctionAction : IClientPacketHandler
             {
                 var search = msg.ReadString();
                 var page = msg.ReadByte();
-                RoDatabase.EnqueueDbRequest(new AuctionBrowseRequest(player.Id, search, page,
-                    AuctionHouse.ResolveSearch(search)));
+                RoDatabase.EnqueueDbRequest(new AuctionBrowseRequest(player.Id, player.Name,
+                    search, page, AuctionHouse.ResolveSearch(search)));
                 break;
             }
 
             case AuctionRequestType.Mine:
-                RoDatabase.EnqueueDbRequest(new AuctionMineRequest(player.Id));
+                RoDatabase.EnqueueDbRequest(new AuctionMineRequest(player.Id, player.Name));
                 break;
 
             case AuctionRequestType.Create:
@@ -66,7 +66,7 @@ public class PacketAuctionAction : IClientPacketHandler
             }
 
             case AuctionRequestType.Cancel:
-                RoDatabase.EnqueueDbRequest(new AuctionCancelRequest(player.Id, msg.ReadInt32()));
+                RoDatabase.EnqueueDbRequest(new AuctionCancelRequest(player.Id, player.Name, msg.ReadInt32()));
                 break;
         }
     }

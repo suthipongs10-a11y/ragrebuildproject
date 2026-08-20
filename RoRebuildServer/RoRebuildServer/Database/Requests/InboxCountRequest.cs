@@ -14,8 +14,13 @@ namespace RoRebuildServer.Database.Requests;
 public class InboxCountRequest : IDbRequest
 {
     private readonly Guid characterId;
+    private readonly string ownerName;
 
-    public InboxCountRequest(Guid characterId) => this.characterId = characterId;
+    public InboxCountRequest(Guid characterId, string ownerName)
+    {
+        this.characterId = characterId;
+        this.ownerName = ownerName;
+    }
 
     public async Task ExecuteAsync(RoContext dbContext)
     {
@@ -23,7 +28,7 @@ public class InboxCountRequest : IDbRequest
         if (waiting <= 0)
             return; //nothing to say, and the client starts at zero anyway
 
-        var player = Inbox.FindOnline(characterId);
+        var player = Inbox.FindOnline(characterId, ownerName);
         if (player != null)
             CommandBuilder.SendInboxCount(player, waiting);
     }

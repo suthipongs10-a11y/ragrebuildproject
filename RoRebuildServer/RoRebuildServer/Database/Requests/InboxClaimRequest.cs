@@ -22,13 +22,15 @@ namespace RoRebuildServer.Database.Requests;
 public class InboxClaimRequest : IDbRequest
 {
     private readonly Guid characterId;
+    private readonly string ownerName;
     private readonly int parcelId;
     private readonly bool claimEverything;
 
     /// <summary>Pass -1 as the parcel to take everything that will fit.</summary>
-    public InboxClaimRequest(Guid characterId, int parcelId)
+    public InboxClaimRequest(Guid characterId, string ownerName, int parcelId)
     {
         this.characterId = characterId;
+        this.ownerName = ownerName;
         this.parcelId = parcelId;
         claimEverything = parcelId < 0;
     }
@@ -61,9 +63,10 @@ public class InboxClaimRequest : IDbRequest
         }
 
         var owner = characterId;
+        var who = ownerName;
         World.Instance.MainThreadActions.Push(() =>
         {
-            var player = Inbox.FindOnline(owner);
+            var player = Inbox.FindOnline(owner, who);
             var returned = new List<DbInboxParcel>();
             var taken = 0;
 
@@ -101,7 +104,7 @@ public class InboxClaimRequest : IDbRequest
                 CommandBuilder.ErrorMessage(player.Connection,
                     taken > 0 ? "กระเป๋าเต็ม รับได้บางส่วน" : "กระเป๋าเต็ม รับของไม่ได้");
 
-            RoDatabase.EnqueueDbRequest(new InboxReturnRequest(owner, returned));
+            RoDatabase.EnqueueDbRequest(new InboxReturnRequest(owner, who, returned));
         });
     }
 
@@ -109,7 +112,7 @@ public class InboxClaimRequest : IDbRequest
     private async Task Report(RoContext dbContext)
     {
         var waiting = await dbContext.InboxParcels.CountAsync(p => p.CharacterId == characterId);
-        var player = Inbox.FindOnline(characterId);
+        var player = Inbox.FindOnline(characterId, ownerName);
         if (player != null)
             CommandBuilder.SendInboxCount(player, waiting);
     }
@@ -125,11 +128,13 @@ public class InboxClaimRequest : IDbRequest
 public class InboxReturnRequest : IDbRequest
 {
     private readonly Guid characterId;
+    private readonly string ownerName;
     private readonly List<DbInboxParcel> parcels;
 
-    public InboxReturnRequest(Guid characterId, List<DbInboxParcel> parcels)
+    public InboxReturnRequest(Guid characterId, string ownerName, List<DbInboxParcel> parcels)
     {
         this.characterId = characterId;
+        this.ownerName = ownerName;
         this.parcels = parcels;
     }
 
@@ -146,7 +151,7 @@ public class InboxReturnRequest : IDbRequest
             .OrderBy(p => p.Id)
             .ToListAsync();
 
-        var player = Inbox.FindOnline(characterId);
+        var player = Inbox.FindOnline(characterId, ownerName);
         if (player != null)
             CommandBuilder.SendInboxContents(player, remaining);
     }

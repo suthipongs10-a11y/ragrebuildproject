@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RebuildSharedData.Enum;
+using RoRebuildServer.Logging;
 using RoRebuildServer.Database.Domain;
 using RoRebuildServer.Networking;
 using RoRebuildServer.Simulation.Market;
@@ -32,7 +33,7 @@ public class AuctionCreateRequest : IDbRequest
                 ParcelReason.AuctionCancelled, MarketConfig.ListingFee(auction.StartPrice)));
             await dbContext.SaveChangesAsync();
 
-            var refused = Inbox.FindOnline(auction.SellerId);
+            var refused = Inbox.FindOnline(auction.SellerId, auction.SellerName);
             if (refused != null)
                 CommandBuilder.ErrorMessage(refused.Connection,
                     $"ตั้งประมูลได้ไม่เกิน {MarketConfig.MaxListingsPerCharacter} รายการ ของคืนอยู่ในกล่องพัสดุ");
@@ -42,12 +43,12 @@ public class AuctionCreateRequest : IDbRequest
         dbContext.Auctions.Add(auction);
         await dbContext.SaveChangesAsync();
 
-        var player = Inbox.FindOnline(auction.SellerId);
+        var player = Inbox.FindOnline(auction.SellerId, auction.SellerName);
         if (player == null)
             return;
 
         CommandBuilder.SendServerMessageTo(player, "ตั้งประมูลเรียบร้อยแล้ว");
-        await AuctionQueries.SendMine(dbContext, auction.SellerId);
+        await AuctionQueries.SendMine(dbContext, auction.SellerId, auction.SellerName);
     }
 }
 
@@ -55,6 +56,7 @@ public class AuctionCreateRequest : IDbRequest
 public class AuctionBrowseRequest : IDbRequest
 {
     private readonly Guid characterId;
+    private readonly string viewerName;
     private readonly string search;
     private readonly int page;
     private readonly int[] matchingItemIds;
@@ -64,9 +66,11 @@ public class AuctionBrowseRequest : IDbRequest
     /// item names live in the loaded game data and not in the database - the auction row
     /// only knows an item's number.
     /// </summary>
-    public AuctionBrowseRequest(Guid characterId, string search, int page, int[] matchingItemIds)
+    public AuctionBrowseRequest(Guid characterId, string viewerName, string search, int page,
+        int[] matchingItemIds)
     {
         this.characterId = characterId;
+        this.viewerName = viewerName;
         this.search = search;
         this.page = page < 0 ? 0 : page;
         this.matchingItemIds = matchingItemIds;
@@ -87,9 +91,15 @@ public class AuctionBrowseRequest : IDbRequest
             .Take(MarketConfig.BrowsePageSize)
             .ToListAsync();
 
-        var player = Inbox.FindOnline(characterId);
-        if (player != null)
-            CommandBuilder.SendAuctionListings(player, rows, page, total);
+        var player = Inbox.FindOnline(characterId, viewerName);
+        if (player == null)
+        {
+            ServerLogger.LogWarning($"The auction board was read for {viewerName} ({characterId}) "
+                                    + "but they could not be found online to send it to.");
+            return;
+        }
+
+        CommandBuilder.SendAuctionListings(player, rows, page, total);
     }
 }
 
@@ -97,10 +107,16 @@ public class AuctionBrowseRequest : IDbRequest
 public class AuctionMineRequest : IDbRequest
 {
     private readonly Guid characterId;
+    private readonly string ownerName;
 
-    public AuctionMineRequest(Guid characterId) => this.characterId = characterId;
+    public AuctionMineRequest(Guid characterId, string ownerName)
+    {
+        this.characterId = characterId;
+        this.ownerName = ownerName;
+    }
 
-    public Task ExecuteAsync(RoContext dbContext) => AuctionQueries.SendMine(dbContext, characterId);
+    public Task ExecuteAsync(RoContext dbContext) =>
+        AuctionQueries.SendMine(dbContext, characterId, ownerName);
 }
 
 /// <summary>
@@ -164,7 +180,7 @@ public class AuctionBidRequest : IDbRequest
         auction.HighBidderName = bidderName;
         await dbContext.SaveChangesAsync();
 
-        var player = Inbox.FindOnline(bidderId);
+        var player = Inbox.FindOnline(bidderId, bidderName);
         if (player != null)
             CommandBuilder.SendServerMessageTo(player, $"บิด {bid:N0} Zeny เรียบร้อย");
 
@@ -175,7 +191,7 @@ public class AuctionBidRequest : IDbRequest
     {
         Inbox.RefundZeny(bidderId, bid, ParcelReason.AuctionOutbid, null);
 
-        var player = Inbox.FindOnline(bidderId);
+        var player = Inbox.FindOnline(bidderId, bidderName);
         if (player != null)
             CommandBuilder.ErrorMessage(player.Connection, why);
     }
@@ -190,18 +206,20 @@ public class AuctionBidRequest : IDbRequest
 public class AuctionCancelRequest : IDbRequest
 {
     private readonly Guid sellerId;
+    private readonly string sellerName;
     private readonly int auctionId;
 
-    public AuctionCancelRequest(Guid sellerId, int auctionId)
+    public AuctionCancelRequest(Guid sellerId, string sellerName, int auctionId)
     {
         this.sellerId = sellerId;
+        this.sellerName = sellerName;
         this.auctionId = auctionId;
     }
 
     public async Task ExecuteAsync(RoContext dbContext)
     {
         var auction = await dbContext.Auctions.FirstOrDefaultAsync(a => a.Id == auctionId);
-        var player = Inbox.FindOnline(sellerId);
+        var player = Inbox.FindOnline(sellerId, sellerName);
 
         if (auction == null || auction.IsSettled || auction.SellerId != sellerId)
         {
@@ -229,7 +247,7 @@ public class AuctionCancelRequest : IDbRequest
         if (player != null)
             CommandBuilder.SendServerMessageTo(player, "ยกเลิกรายการแล้ว ของอยู่ในกล่องพัสดุ");
 
-        await AuctionQueries.SendMine(dbContext, sellerId);
+        await AuctionQueries.SendMine(dbContext, sellerId, sellerName);
     }
 }
 
@@ -285,9 +303,9 @@ public class AuctionSettleRequest : IDbRequest
 
         foreach (var auction in due)
         {
-            await AuctionQueries.Notify(dbContext, auction.SellerId);
+            await AuctionQueries.Notify(dbContext, auction.SellerId, auction.SellerName);
             if (auction.HighBidderId != Guid.Empty)
-                await AuctionQueries.Notify(dbContext, auction.HighBidderId);
+                await AuctionQueries.Notify(dbContext, auction.HighBidderId, auction.HighBidderName);
         }
     }
 }

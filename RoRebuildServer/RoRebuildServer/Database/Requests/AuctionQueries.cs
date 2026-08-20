@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using RebuildSharedData.Enum;
+using RoRebuildServer.Logging;
 using RoRebuildServer.Database.Domain;
 using RoRebuildServer.Networking;
 using RoRebuildServer.Simulation.Market;
@@ -47,34 +48,42 @@ public static class AuctionQueries
     /// Both in one answer because they are one page in the window - somebody checking on
     /// an auction wants to know whether they are still winning it in the same glance.
     /// </summary>
-    public static async Task SendMine(RoContext dbContext, Guid characterId)
+    public static async Task SendMine(RoContext dbContext, Guid characterId, string ownerName)
     {
         var rows = await dbContext.Auctions.AsNoTracking()
             .Where(a => !a.IsSettled && (a.SellerId == characterId || a.HighBidderId == characterId))
             .OrderBy(a => a.EndsAt)
             .ToListAsync();
 
-        var player = Inbox.FindOnline(characterId);
-        if (player != null)
-            CommandBuilder.SendAuctionMine(player, rows, characterId);
+        var player = Inbox.FindOnline(characterId, ownerName);
+        if (player == null)
+        {
+            //Same as the parcel box: the window is waiting for this, so not sending it is
+            //worth a line in the log rather than a silent return.
+            ServerLogger.LogWarning($"Auction listings for {ownerName} ({characterId}) were "
+                                    + "read but they could not be found online to send them to.");
+            return;
+        }
+
+        CommandBuilder.SendAuctionMine(player, rows, characterId);
     }
 
     /// <summary>Tells the seller their listing moved, if they are here to be told.</summary>
     public static async Task Announce(RoContext dbContext, DbAuction auction)
     {
-        var seller = Inbox.FindOnline(auction.SellerId);
+        var seller = Inbox.FindOnline(auction.SellerId, auction.SellerName);
         if (seller == null)
             return;
 
         CommandBuilder.SendServerMessageTo(seller,
             $"มีคนบิด {auction.HighBid:N0} Zeny สำหรับของที่คุณตั้งประมูล");
-        await SendMine(dbContext, auction.SellerId);
+        await SendMine(dbContext, auction.SellerId, auction.SellerName);
     }
 
     /// <summary>Tells somebody how much is now waiting in their box.</summary>
-    public static async Task Notify(RoContext dbContext, Guid characterId)
+    public static async Task Notify(RoContext dbContext, Guid characterId, string? name)
     {
-        var player = Inbox.FindOnline(characterId);
+        var player = Inbox.FindOnline(characterId, name);
         if (player == null)
             return;
 

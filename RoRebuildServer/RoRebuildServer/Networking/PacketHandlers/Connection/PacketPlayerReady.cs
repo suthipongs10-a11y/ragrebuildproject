@@ -28,7 +28,7 @@ public class PacketPlayerReady : IClientPacketHandler
         //Nothing else tells them what is in the parcel box until something new arrives in
         //it, so somebody sent five things while they were away would come back to a badge
         //reading nothing and never think to look.
-        RoDatabase.EnqueueDbRequest(new InboxCountRequest(connection.Player.Id));
+        RoDatabase.EnqueueDbRequest(new InboxCountRequest(connection.Player.Id, connection.Player.Name));
 
         connection.Character.SetSpawnImmunity();
         connection.Player.ResetRegenTickTime();

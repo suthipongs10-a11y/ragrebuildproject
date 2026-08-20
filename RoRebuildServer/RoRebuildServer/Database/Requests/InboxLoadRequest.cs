@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using RoRebuildServer.Logging;
 using RoRebuildServer.Networking;
 using RoRebuildServer.Simulation.Market;
 
@@ -14,8 +15,13 @@ namespace RoRebuildServer.Database.Requests;
 public class InboxLoadRequest : IDbRequest
 {
     private readonly Guid characterId;
+    private readonly string ownerName;
 
-    public InboxLoadRequest(Guid characterId) => this.characterId = characterId;
+    public InboxLoadRequest(Guid characterId, string ownerName)
+    {
+        this.characterId = characterId;
+        this.ownerName = ownerName;
+    }
 
     public async Task ExecuteAsync(RoContext dbContext)
     {
@@ -26,8 +32,17 @@ public class InboxLoadRequest : IDbRequest
 
         //Looked up after the query rather than before: the read is the slow part, and a
         //player who logged out while it ran has nowhere to send it anyway.
-        var player = Inbox.FindOnline(characterId);
-        if (player != null)
-            CommandBuilder.SendInboxContents(player, parcels);
+        var player = Inbox.FindOnline(characterId, ownerName);
+        if (player == null)
+        {
+            //Said out loud rather than returned quietly. The window is sitting there
+            //waiting for this answer, and a request that decides not to send one leaves
+            //it waiting forever with nothing anywhere to say why.
+            ServerLogger.LogWarning($"Inbox for {ownerName} ({characterId}) was read but they "
+                                    + "could not be found online to send it to.");
+            return;
+        }
+
+        CommandBuilder.SendInboxContents(player, parcels);
     }
 }
