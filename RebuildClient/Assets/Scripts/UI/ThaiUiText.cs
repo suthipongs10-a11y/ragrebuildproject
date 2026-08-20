@@ -34,6 +34,7 @@ namespace Assets.Scripts.UI
             //English, and the longer Thai for help was being clipped mid word
             { "Help", "คู่มือ" },
             { "Database", "ฐานข้อมูล" },
+            { "Market", "ตลาด" },
             { "Menu", "เมนู" },
             { "Cart", "รถเข็น" },
             { "Storage", "คลังเก็บของ" },

@@ -50,16 +50,24 @@ namespace Assets.Scripts.UI
             ("Warps", "Map", () => ModernUiIcons.Target),
         };
 
-        /// <summary>Everything else, in the order it reads best rather than scene order.</summary>
-        private static readonly (string Button, string Label, System.Func<Sprite> Icon)[] Secondary =
+        /// <summary>
+        /// Everything else, in the order it reads best rather than scene order.
+        ///
+        /// Most of these stand in for a button that already exists in the scene, named in
+        /// the first column. The last column is for the ones that do not: a window built
+        /// entirely in code has no scene button to borrow, so it brings its own action.
+        /// </summary>
+        private static readonly (string Button, string Label, System.Func<Sprite> Icon,
+            System.Action Open)[] Secondary =
         {
-            ("Stats", "Stats", () => ModernUiIcons.Star),
-            ("Skills", "Skills", () => ModernUiIcons.Book),
-            ("Hotbar", "Hotbar", () => ModernUiIcons.Grid),
-            ("Emotes", "Emotes", () => ModernUiIcons.Smile),
-            ("Config", "Config", () => ModernUiIcons.Gear),
-            ("Help", "Help", () => ModernUiIcons.Book),
-            ("Database", "Database", () => ModernUiIcons.Magnifier),
+            ("Stats", "Stats", () => ModernUiIcons.Star, null),
+            ("Skills", "Skills", () => ModernUiIcons.Book, null),
+            ("Market", "Market", () => ModernUiIcons.Bag, Market.MarketWindow.Toggle),
+            ("Hotbar", "Hotbar", () => ModernUiIcons.Grid, null),
+            ("Emotes", "Emotes", () => ModernUiIcons.Smile, null),
+            ("Config", "Config", () => ModernUiIcons.Gear, null),
+            ("Help", "Help", () => ModernUiIcons.Book, null),
+            ("Database", "Database", () => ModernUiIcons.Magnifier, null),
         };
 
         private float searchTimer;
@@ -378,6 +386,8 @@ namespace Assets.Scripts.UI
 
                 if (target != null)
                     row.onClick.AddListener(target.onClick.Invoke);
+                else if (entry.Open != null)
+                    row.onClick.AddListener(() => entry.Open());
                 //picking something is also finishing with the drawer
                 row.onClick.AddListener(CloseMenu);
             }

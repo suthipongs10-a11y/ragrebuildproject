@@ -1,5 +1,7 @@
 ﻿using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
+using RoRebuildServer.Database;
+using RoRebuildServer.Database.Requests;
 using RoRebuildServer.Logging;
 
 namespace RoRebuildServer.Networking.PacketHandlers.Connection;
@@ -22,6 +24,11 @@ public class PacketPlayerReady : IClientPacketHandler
         //connection.Character.Map.SendAddEntityAroundCharacter(ref connection.Entity, connection.Character);
 
         CommandBuilder.SendExpGain(connection.Player, 0); //update their exp
+
+        //Nothing else tells them what is in the parcel box until something new arrives in
+        //it, so somebody sent five things while they were away would come back to a badge
+        //reading nothing and never think to look.
+        RoDatabase.EnqueueDbRequest(new InboxCountRequest(connection.Player.Id));
 
         connection.Character.SetSpawnImmunity();
         connection.Player.ResetRegenTickTime();

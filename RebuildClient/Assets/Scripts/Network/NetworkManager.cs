@@ -431,6 +431,10 @@ namespace Assets.Scripts.Network
             //next character to log in would see the last one's roster until the server got
             //around to correcting it.
             GuildState.Clear();
+
+            //Same reason: the parcel box and the auction board are a character's, and the
+            //next one to log in would be shown the last one's until the server corrected it.
+            MarketState.Clear();
         }
 
         private void StartConnectServer(string serverPath, string username, string password)
@@ -1472,6 +1476,83 @@ namespace Assets.Scripts.Network
         /// Refresh would leave a string sitting in the buffer, and the next packet would be
         /// read starting from the middle of it.
         /// </summary>
+        /// <summary>Refresh and ClaimAll, which say nothing beyond which one they are.</summary>
+        public void SendInboxAction(InboxRequestType action)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.InboxAction);
+            msg.Write((byte)action);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>Claim, which names one parcel.</summary>
+        public void SendInboxAction(InboxRequestType action, int parcelId)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.InboxAction);
+            msg.Write((byte)action);
+            msg.Write(parcelId);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>Mine, which asks for everything this character has a stake in.</summary>
+        public void SendAuctionAction(AuctionRequestType action)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.AuctionAction);
+            msg.Write((byte)action);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>Browse, which is a search box and a page number.</summary>
+        public void SendAuctionBrowse(string search, int page)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.AuctionAction);
+            msg.Write((byte)AuctionRequestType.Browse);
+            msg.Write(search ?? "");
+            msg.Write((byte)Mathf.Clamp(page, 0, byte.MaxValue));
+
+            SendMessage(msg);
+        }
+
+        /// <summary>Putting something up: which stack, how much of it, and for how long.</summary>
+        public void SendAuctionCreate(int bagId, int count, int startPrice, int hours)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.AuctionAction);
+            msg.Write((byte)AuctionRequestType.Create);
+            msg.Write(bagId);
+            msg.Write(count);
+            msg.Write(startPrice);
+            msg.Write((byte)Mathf.Clamp(hours, 0, byte.MaxValue));
+
+            SendMessage(msg);
+        }
+
+        /// <summary>Bidding on one, or taking one of yours down.</summary>
+        public void SendAuctionAction(AuctionRequestType action, int auctionId, int amount = 0)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.AuctionAction);
+            msg.Write((byte)action);
+            msg.Write(auctionId);
+
+            if (action == AuctionRequestType.Bid)
+                msg.Write(amount);
+
+            SendMessage(msg);
+        }
+
         public void SendGuildAction(GuildRequestType action)
         {
             var msg = StartMessage();
