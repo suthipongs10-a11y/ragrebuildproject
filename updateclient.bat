@@ -23,23 +23,46 @@ echo.
 rem --------------------------------------------------------------
 echo [1/6] Getting the latest work from GitHub...
 echo.
-rem The two libraries are kept in the repository but are also rebuilt further
-rem down, so a local build left over from last time is thrown away first. Without
-rem this, git refuses to pull over its own tracked files and the run stalls on
-rem something that was about to be regenerated anyway.
+rem These are kept in the repository but are also written by something on this
+rem machine - the two libraries are rebuilt further down, and the packet table is
+rem written by the Ragnarok/CodeGen menu item in Unity. A local copy left over
+rem from last time is thrown away first, because git refuses to pull over its own
+rem tracked files when they have been changed here, and the whole run then carries
+rem on with yesterday's code.
+rem
+rem That is not a small thing. It cost six rounds of chasing a bug that had
+rem already been fixed, because the pull failed, the run continued, and the only
+rem sign of it was a message several screens up.
 git checkout -- "RebuildClient/Assets/Data/GameConfig.dll" "RebuildClient/Assets/Data/RebuildSharedData.dll" 2>nul
+git checkout -- "RebuildClient/Assets/Scripts/Network/PacketBase/ClientPacketHandlerGenerated.cs" 2>nul
 git pull origin %BRANCH%
 if errorlevel 1 (
     echo.
-    echo   ----------------------------------------------------------
-    echo   COULD NOT PULL. Carrying on with the files already on disk,
-    echo   so nothing you have here is lost - but you may not be
-    echo   testing the newest work. Read the message above:
-    echo     * "local changes would be overwritten" means you have
-    echo       edits here that have not been committed.
-    echo     * "'git' is not recognized" means git is not installed
-    echo       or is not on the PATH.
-    echo   ----------------------------------------------------------
+    echo   **********************************************************
+    echo   *                                                        *
+    echo   *   COULD NOT PULL - YOU ARE ABOUT TO TEST OLD CODE      *
+    echo   *                                                        *
+    echo   **********************************************************
+    echo.
+    echo   Everything below this line still runs, and nothing you have
+    echo   here is lost - but it builds what was already on disk, which
+    echo   is NOT the newest work. A bug you are chasing may already be
+    echo   fixed in a commit this machine has not got.
+    echo.
+    echo   Read the git message a few lines above:
+    echo     * "local changes would be overwritten" - a file here has
+    echo       been changed and not committed. Run:  git status
+    echo       If it is a file the tools write, throw it away with:
+    echo         git checkout -- ^<the file it named^>
+    echo     * "'git' is not recognized" - git is not installed, or is
+    echo       not on the PATH.
+    echo.
+    echo   Whatever you do, do not report a test result from this run
+    echo   without saying the pull failed.
+    echo.
+    echo   Press a key to carry on with the old code, or close this
+    echo   window to stop here.
+    pause >nul
     echo.
 ) else (
     echo.
