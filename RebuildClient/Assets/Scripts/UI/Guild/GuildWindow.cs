@@ -27,11 +27,30 @@ namespace Assets.Scripts.UI.Guild
     public class GuildWindow : WindowBase
     {
         private const float Width = 524f;
-        private const float Height = 404f;
+        //Taller by exactly what the button row took: the buttons moved off the title line
+        //onto one of their own to stop covering the member count, and the list should not
+        //be the thing that pays for it.
+        private const float Height = 448f;
         private const float Pad = 8f;
 
-        private const float HeaderHeight = 52f;
         private const float ButtonRowHeight = 30f;
+
+        /// <summary>
+        /// The header, top down. Each row's top is worked out from the one above it rather
+        /// than typed in, because the two that were typed in ended up overlapping: the
+        /// buttons sat across the same band as the member count and hid the right half of
+        /// it. Moving one row now moves the rest instead of leaving something to find by eye.
+        /// </summary>
+        private const float TitleTop = -4f;
+        private const float TitleHeight = 24f;
+        private const float SubtitleTop = TitleTop - TitleHeight;
+        private const float SubtitleHeight = 18f;
+        private const float ButtonRowTop = SubtitleTop - SubtitleHeight - 2f;
+        private const float LevelBarTop = ButtonRowTop - ButtonRowHeight - 2f;
+        private const float LevelBarHeight = 12f;
+
+        /// <summary>Where the list starts, which is under everything above it.</summary>
+        private const float HeaderHeight = -(LevelBarTop - LevelBarHeight) + 4f;
         private const float RowHeight = 30f;
         private const float RowGap = 3f;
 
@@ -112,18 +131,18 @@ namespace Assets.Scripts.UI.Guild
 
             title = ModernUiTheme.CreateText(root, "GuildName", "", ModernUiTheme.SizeValue,
                 ModernUiTheme.TitleColor, TextAlignmentOptions.TopLeft, FontStyles.Bold);
-            ModernUiTheme.Place(title.rectTransform, new Vector2(0, 1), new Vector2(Pad + 2f, -2f),
-                new Vector2(Width - Pad * 2f - 4f - KickWidth * 2f, 24f));
+            ModernUiTheme.Place(title.rectTransform, new Vector2(0, 1), new Vector2(Pad + 2f, TitleTop),
+                new Vector2(Width - Pad * 2f - 4f, TitleHeight));
 
             subtitle = ModernUiTheme.CreateText(root, "GuildCount", "", ModernUiTheme.SizeLabel,
                 ModernUiTheme.LabelColor, TextAlignmentOptions.TopLeft);
-            ModernUiTheme.Place(subtitle.rectTransform, new Vector2(0, 1), new Vector2(Pad + 2f, -26f),
-                new Vector2(Width - Pad * 2f - 4f, 20f));
+            ModernUiTheme.Place(subtitle.rectTransform, new Vector2(0, 1), new Vector2(Pad + 2f, SubtitleTop),
+                new Vector2(Width - Pad * 2f - 4f, SubtitleHeight));
 
             leaveButton = ModernUiTheme.CreateButton(root, "Leave", "ออกจากกิลด์",
                 ModernUiTheme.CardColor, ModernUiTheme.NameColor, ModernUiTheme.SizeLabel);
             ModernUiTheme.Place((RectTransform)leaveButton.transform, new Vector2(1, 1),
-                new Vector2(-Pad, -Pad), new Vector2(96f, ButtonRowHeight));
+                new Vector2(-Pad, ButtonRowTop), new Vector2(96f, ButtonRowHeight));
             ModernUiTheme.AddBorder((RectTransform)leaveButton.transform, ModernUiTheme.CardBorderColor);
             leaveButton.onClick.AddListener(ConfirmLeave);
 
@@ -132,7 +151,7 @@ namespace Assets.Scripts.UI.Guild
             browseButton = ModernUiTheme.CreateButton(root, "Browse", "ค้นหากิลด์",
                 ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeLabel);
             ModernUiTheme.Place((RectTransform)browseButton.transform, new Vector2(1, 1),
-                new Vector2(-Pad, -Pad), new Vector2(96f, ButtonRowHeight));
+                new Vector2(-Pad, ButtonRowTop), new Vector2(96f, ButtonRowHeight));
             browseButton.onClick.AddListener(() => Send(GuildRequestType.ListGuilds));
 
             //Everybody in a guild has this one, so it moves rather than shares a slot: the
@@ -141,13 +160,13 @@ namespace Assets.Scripts.UI.Guild
             titleButton = ModernUiTheme.CreateButton(root, "SetTitle", "ตั้งฉายา",
                 ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeLabel);
             ModernUiTheme.Place((RectTransform)titleButton.transform, new Vector2(1, 1),
-                new Vector2(-Pad, -Pad), new Vector2(96f, ButtonRowHeight));
+                new Vector2(-Pad, ButtonRowTop), new Vector2(96f, ButtonRowHeight));
             titleButton.onClick.AddListener(AskForTitle);
 
             emblemButton = ModernUiTheme.CreateButton(root, "SetEmblem", "เลือกโลโก้",
                 ModernUiTheme.CardColor, ModernUiTheme.NameColor, ModernUiTheme.SizeLabel);
             ModernUiTheme.Place((RectTransform)emblemButton.transform, new Vector2(1, 1),
-                new Vector2(-Pad - 100f, -Pad), new Vector2(96f, ButtonRowHeight));
+                new Vector2(-Pad - 100f, ButtonRowTop), new Vector2(96f, ButtonRowHeight));
             ModernUiTheme.AddBorder((RectTransform)emblemButton.transform, ModernUiTheme.CardBorderColor);
             emblemButton.onClick.AddListener(() =>
             {
@@ -160,7 +179,7 @@ namespace Assets.Scripts.UI.Guild
             skillButton = ModernUiTheme.CreateButton(root, "Skills", "สกิลกิลด์",
                 ModernUiTheme.CardColor, ModernUiTheme.NameColor, ModernUiTheme.SizeLabel);
             ModernUiTheme.Place((RectTransform)skillButton.transform, new Vector2(1, 1),
-                new Vector2(-Pad - 300f, -Pad), new Vector2(96f, ButtonRowHeight));
+                new Vector2(-Pad - 300f, ButtonRowTop), new Vector2(96f, ButtonRowHeight));
             ModernUiTheme.AddBorder((RectTransform)skillButton.transform, ModernUiTheme.CardBorderColor);
             skillButton.onClick.AddListener(() =>
             {
@@ -175,7 +194,7 @@ namespace Assets.Scripts.UI.Guild
             donateButton = ModernUiTheme.CreateButton(root, "Donate", "บริจาค",
                 ModernUiTheme.CardColor, ModernUiTheme.NameColor, ModernUiTheme.SizeLabel);
             ModernUiTheme.Place((RectTransform)donateButton.transform, new Vector2(1, 1),
-                new Vector2(-Pad - 200f, -Pad), new Vector2(96f, ButtonRowHeight));
+                new Vector2(-Pad - 200f, ButtonRowTop), new Vector2(96f, ButtonRowHeight));
             ModernUiTheme.AddBorder((RectTransform)donateButton.transform, ModernUiTheme.CardBorderColor);
             donateButton.onClick.AddListener(() =>
             {
@@ -403,7 +422,7 @@ namespace Assets.Scripts.UI.Guild
             //corner when there is no leave button in it, and the slot beside it otherwise.
             titleButton.gameObject.SetActive(!pickingEmblem);
             ModernUiTheme.Place((RectTransform)titleButton.transform, new Vector2(1, 1),
-                new Vector2(GuildState.IsLeader ? -Pad : -Pad - 100f, -Pad),
+                new Vector2(GuildState.IsLeader ? -Pad : -Pad - 100f, ButtonRowTop),
                 new Vector2(96f, ButtonRowHeight));
 
             var emblemLabel = emblemButton.GetComponentInChildren<TextMeshProUGUI>();
@@ -620,8 +639,8 @@ namespace Assets.Scripts.UI.Guild
             {
                 var track = ModernUiTheme.CreateCard((RectTransform)transform, "LevelTrack",
                     ModernUiTheme.CardDeepColor);
-                ModernUiTheme.Place(track, new Vector2(0, 1), new Vector2(Pad + 2f, -46f),
-                    new Vector2(Width - Pad * 2f - 4f, 12f));
+                ModernUiTheme.Place(track, new Vector2(0, 1), new Vector2(Pad + 2f, LevelBarTop),
+                    new Vector2(Width - Pad * 2f - 4f, LevelBarHeight));
 
                 levelBar = ModernUiTheme.CreateCard(track, "LevelFill", ModernUiTheme.AccentColor);
                 levelBar.anchorMin = new Vector2(0, 0);
