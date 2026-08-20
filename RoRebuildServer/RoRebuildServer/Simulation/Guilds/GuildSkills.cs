@@ -114,4 +114,21 @@ public static class GuildSkills
 
         return guild.SkillLevel(GuildSkill.GuildBlessing) * 2;
     }
+
+    /// <summary>
+    /// The same amount of experience with the guild's share added on.
+    ///
+    /// Rounded rather than truncated, and that is the whole point of it being here: two
+    /// percent of anything under fifty is less than one, so integer division would hand
+    /// back the number it was given and the skill would look broken on every small kill.
+    /// Widened to long first because the multiply, not the result, is what would overflow.
+    /// </summary>
+    public static int ApplyExperienceBonus(Player player, int exp)
+    {
+        var bonus = ExperienceBonus(player);
+        if (bonus <= 0 || exp <= 0)
+            return exp;
+
+        return (int)Math.Min(((long)exp * (100 + bonus) + 50) / 100, int.MaxValue);
+    }
 }

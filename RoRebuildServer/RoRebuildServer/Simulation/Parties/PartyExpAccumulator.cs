@@ -36,9 +36,13 @@ public class PartyExpAccumulator
         //which is the whole point of the switch: what you kill is yours.
         if (party == null || !party.ShareExp || party.OnlineMembers.Count == 1)
         {
-            player.GainBaseExpFromMonster(baseExp, src);
-            player.GainJobExpFromMonster(jobExp, src);
-            CommandBuilder.SendExpGain(player, baseExp, jobExp);
+            //what was actually granted, not what the monster was worth: the guild bonus is
+            //added inside these two, and telling the client the number from before it means
+            //a member of a guild sees the same figure float up as somebody with no guild at
+            //all, and reasonably concludes the skill does nothing.
+            var gainedBase = player.GainBaseExpFromMonster(baseExp, src);
+            var gainedJob = player.GainJobExpFromMonster(jobExp, src);
+            CommandBuilder.SendExpGain(player, gainedBase, gainedJob);
             return;
         }
 
@@ -138,9 +142,9 @@ public class PartyExpAccumulator
 
             MonsterRewardManager.TriggerOnDistributeExperienceEvent(monster, result.Player, ref baseExp, ref jobExp);
 
-            result.Player.GainBaseExpFromMonster(baseExp, src);
-            result.Player.GainJobExpFromMonster(jobExp, src);
-            CommandBuilder.SendExpGain(result.Player, baseExp, jobExp);
+            var gainedBase = result.Player.GainBaseExpFromMonster(baseExp, src);
+            var gainedJob = result.Player.GainJobExpFromMonster(jobExp, src);
+            CommandBuilder.SendExpGain(result.Player, gainedBase, gainedJob);
         }
 
         Reset();

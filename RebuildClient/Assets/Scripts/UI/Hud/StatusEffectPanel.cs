@@ -26,6 +26,13 @@ namespace Assets.Scripts.UI.Hud
 
         public static StatusEffectPanel Instance;
 
+        /// <summary>
+        /// The blue the guild buff is tinted, and only ever applied to a picture borrowed
+        /// from another status - a guild wearing its own emblem keeps its own colours.
+        /// Kept light so it shifts the hue without dulling the art it multiplies against.
+        /// </summary>
+        private static readonly Color GuildBuffTint = new Color(0.62f, 0.82f, 1f);
+
         void Awake()
         {
             Instance = this;
@@ -47,15 +54,27 @@ namespace Assets.Scripts.UI.Hud
             //only decoration: status_GuildBuff.png exists solely because somebody ran the
             //icon importer in the editor, and an effect with no icon is dropped below
             //without a word. A player with a guild skill would see nothing at all and
-            //conclude the skill never took. Gloria's icon is the last resort - it ships
+            //conclude the skill never took. Blessing's icon is the last resort - it ships
             //with every other status effect, so there is always something to show.
+            var borrowedIcon = false;
             if (status == CharacterStatusEffect.GuildBuff)
             {
                 var mark = GuildEmblems.Sprite(GuildState.EmblemId);
                 if (mark != null)
                     icon = mark;
+                //Two plain checks rather than a null-coalesce: these are UnityEngine
+                //objects, and ?? tests the reference where == asks Unity whether the thing
+                //is still alive, which is the question that matters for an atlas sprite.
+                if (icon == null)
+                    icon = ClientDataLoader.Instance.GetIconAtlasSprite("status_Blessing");
                 if (icon == null)
                     icon = ClientDataLoader.Instance.GetIconAtlasSprite("status_Gloria");
+
+                //Asked of the emblem number rather than of the sprite above, because a boss
+                //emblem has no sprite yet at this point - its picture is still being read
+                //off disk - and tinting on that basis would leave the art stained blue when
+                //it does arrive.
+                borrowedIcon = !GuildEmblems.IsValid(GuildState.EmblemId);
             }
 
             if (icon == null)
@@ -86,6 +105,8 @@ namespace Assets.Scripts.UI.Hud
             newEffect.Expiration = expiration;
             newEffect.UpdateTime();
             newEffect.StatusIcon.sprite = icon;
+            if (borrowedIcon)
+                newEffect.StatusIcon.color = GuildBuffTint;
             newEffect.IsBuff = isBuff;
             if (statusInfo != null && statusInfo.CanDisable)
                 newEffect.CanCancel = true;
@@ -116,7 +137,8 @@ namespace Assets.Scripts.UI.Hud
             Destroy(existing.gameObject);
 
             var statusInfo = ClientDataLoader.Instance.GetStatusEffect((int)status);
-            if (statusInfo.Type == "Buff")
+            //counted the same way it was counted on the way in, missing row and all
+            if (statusInfo == null || statusInfo.Type == "Buff")
                 buffCount--;
             else
                 debuffCount--;

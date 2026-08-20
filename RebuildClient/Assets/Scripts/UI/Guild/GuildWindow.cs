@@ -698,13 +698,13 @@ namespace Assets.Scripts.UI.Guild
             var row = NewRow(y);
 
             var name = ModernUiTheme.CreateText(row, "Name",
-                $"{SkillNameInThai(skill)}  <color=#888888>Lv.{skill.Level}/{skill.MaxLevel}</color>",
+                $"{GuildSkillText.NameInThai(skill)}  <color=#888888>Lv.{skill.Level}/{skill.MaxLevel}</color>",
                 ModernUiTheme.SizeLabel, ModernUiTheme.NameColor, TextAlignmentOptions.Left);
             name.textWrappingMode = TextWrappingModes.NoWrap;
             ModernUiTheme.Place(name.rectTransform, new Vector2(0, 0.5f),
                 new Vector2(10f, 0f), new Vector2(Width - 240f, RowHeight));
 
-            var effect = ModernUiTheme.CreateText(row, "Effect", SkillEffect(skill),
+            var effect = ModernUiTheme.CreateText(row, "Effect", GuildSkillText.Effect(skill),
                 ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor, TextAlignmentOptions.Right);
             effect.textWrappingMode = TextWrappingModes.NoWrap;
             ModernUiTheme.Place(effect.rectTransform, new Vector2(1, 0.5f),
@@ -721,39 +721,6 @@ namespace Assets.Scripts.UI.Guild
             ModernUiTheme.Place((RectTransform)up.transform, new Vector2(1, 0.5f),
                 new Vector2(-8f, 0f), new Vector2(72f, RowHeight - 6f));
             up.onClick.AddListener(() => NetworkManager.Instance.SendGuildLearnSkill(id));
-        }
-
-        /// <summary>
-        /// What a skill is called here, keyed off the server's own name.
-        ///
-        /// Falls back to the server's name for anything not in this list, so a skill added
-        /// later shows up in English rather than not at all.
-        /// </summary>
-        private static string SkillNameInThai(GuildSkillInfo skill)
-        {
-            switch (skill.Name)
-            {
-                case "Leadership": return "ความเป็นผู้นำ";
-                case "Glory of Guild": return "เกียรติภูมิกิลด์";
-                case "Sharp Gaze": return "สายตาเฉียบคม";
-                case "Regeneration": return "ฟื้นฟูพลัง";
-                case "Guild Blessing": return "พรแห่งกิลด์";
-                default: return skill.Name;
-            }
-        }
-
-        private static string SkillEffect(GuildSkillInfo skill)
-        {
-            var lvl = Mathf.Max(skill.Level, 0);
-            switch (skill.Name)
-            {
-                case "Leadership": return lvl > 0 ? $"STR +{lvl}" : "STR +1 ต่อเลเวล";
-                case "Glory of Guild": return lvl > 0 ? $"VIT +{lvl}" : "VIT +1 ต่อเลเวล";
-                case "Sharp Gaze": return lvl > 0 ? $"DEX +{lvl * 2}" : "DEX +2 ต่อเลเวล";
-                case "Regeneration": return lvl > 0 ? $"ฟื้น HP +{lvl * 10}%" : "ฟื้น HP +10% ต่อเลเวล";
-                case "Guild Blessing": return lvl > 0 ? $"EXP +{lvl * 2}%" : "EXP +2% ต่อเลเวล";
-                default: return "";
-            }
         }
 
         /// <summary>

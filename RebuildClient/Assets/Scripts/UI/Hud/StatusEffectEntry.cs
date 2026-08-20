@@ -1,6 +1,7 @@
 ﻿using System;
 using Assets.Scripts.Network;
 using Assets.Scripts.Sprites;
+using Assets.Scripts.UI.Guild;
 using RebuildSharedData.Enum;
 using TMPro;
 using UnityEngine;
@@ -58,10 +59,21 @@ namespace Assets.Scripts.UI.Hud
                 return;
 
             var data = ClientDataLoader.Instance.GetStatusEffect((int)StatusEffect);
-            
-            if (data != null)
+            var desc = data != null ? data.Description : "";
+
+            //The guild buff is the one status whose worth is not fixed by the effect itself
+            //but by what the guild has bought, so the description on its own says only that
+            //something is helping. The levels are read at the moment of hovering, which is
+            //what makes a skill raised a minute ago show up without relogging.
+            if (StatusEffect == CharacterStatusEffect.GuildBuff)
             {
-                var desc = data.Description;
+                var summary = GuildSkillText.BuffSummary();
+                if (!string.IsNullOrEmpty(summary))
+                    desc = string.IsNullOrEmpty(desc) ? summary : desc + "\n\n" + summary;
+            }
+
+            if (!string.IsNullOrEmpty(desc))
+            {
                 if (CanCancel)
                     desc += "\n<size=-6>(Shift-Right Click to Remove)";
                 UiManager.Instance.ShowTooltip(gameObject, desc);

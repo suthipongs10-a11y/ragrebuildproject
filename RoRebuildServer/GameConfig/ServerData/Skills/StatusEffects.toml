@@ -499,12 +499,13 @@ CanDispel = false
 #Worn for as long as the character is in a guild that has learned something. Not a
 #temporary buff at all - it has no duration and cannot be dispelled or dismissed - but it
 #belongs on the buff bar because that is where a player looks to see what is helping them.
-#The icon is Gloria's, shared the way IncreasedMoveSpeed shares one with IncreaseAgi: the
-#importer copies whatever tga is named here to status_GuildBuff.png, so one source file
-#can serve two effects.
+#The icon is Blessing's, shared the way IncreasedMoveSpeed shares one with IncreaseAgi:
+#the importer copies whatever tga is named here to status_GuildBuff.png, so one source
+#file can serve two effects. Blue, because that is what the buff bar tints it to when the
+#icon has not been imported yet - the two should not disagree about what it looks like.
 [GuildBuff]
 Name = "Guild Blessing"
 Type = "Buff"
-Icon = "글로리아"
+Icon = "블레싱"
 CanDisable = false
 CanDispel = false

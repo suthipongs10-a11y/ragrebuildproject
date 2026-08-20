@@ -632,9 +632,7 @@ public class Player : IEntityAutoReset
 
         //applied here rather than at each of the places experience comes from, so a source
         //added later cannot quietly miss it
-        var guildBonus = GuildSkills.ExperienceBonus(this);
-        if (guildBonus > 0)
-            exp = exp * (100 + guildBonus) / 100;
+        exp = GuildSkills.ApplyExperienceBonus(this, exp);
 
         var curExp = GetData(PlayerStat.Experience);
         var requiredExp = DataManager.ExpChart.ExpRequired[level];
@@ -693,6 +691,10 @@ public class Player : IEntityAutoReset
             levelCap = jobInfo.MaxJobLevel;
         if (level >= levelCap)
             return 0;
+
+        //job experience is experience too. The skill says nothing about which bar it fills,
+        //and leaving this out meant half the reward quietly went missing.
+        exp = GuildSkills.ApplyExperienceBonus(this, exp);
 
         var curExp = GetData(PlayerStat.JobExperience);
         var requiredExp = DataManager.ExpChart.RequiredJobExp(job, level);
