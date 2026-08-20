@@ -42,6 +42,7 @@ public class LoadCharacterRequest : IDbRequest
     public ItemEquipState? EquipState;
     public Party? Party;
     public Simulation.Guilds.Guild? Guild;
+    public string GuildTitle = "";
 
     public byte[]? Data;
     public bool HasCharacter;
@@ -82,6 +83,7 @@ public class LoadCharacterRequest : IDbRequest
             DataLength = ch.DataLength;
             CharacterSlot = ch.CharacterSlot;
             SaveVersion = ch.VersionFormat;
+            GuildTitle = ch.GuildTitle ?? "";
 
             //party stuff
             if (ch.PartyId != null)

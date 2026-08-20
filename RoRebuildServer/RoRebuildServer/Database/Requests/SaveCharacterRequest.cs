@@ -30,6 +30,12 @@ public class SaveCharacterRequest : IDbRequest
     private int? partyId;
     private int? guildId;
 
+    //Carried even though a separate request writes it the moment it is set. dbContext.Update
+    //below marks every property on a detached entity as modified, so a field left off this
+    //object is written back as null - the title would survive being set and then be wiped
+    //by the next ordinary save.
+    private string? guildTitle;
+
     public SaveCharacterRequest(string newCharacterName, int accountId)
     {
         AccountId = accountId;
@@ -62,6 +68,7 @@ public class SaveCharacterRequest : IDbRequest
         partyId = player.Party?.PartyId;
         //the save rewrites the whole row, so anything left out here is written as null
         guildId = player.Guild?.GuildId;
+        guildTitle = player.GuildTitle;
 
         //store player data (data, npc flags, learned skills, status effects)
         data = PlayerDataDbHelper.StorePlayerDataForDatabaseUse(player, out dataLength);
@@ -108,6 +115,7 @@ public class SaveCharacterRequest : IDbRequest
             NpcFlagsLength = 0,
             PartyId = partyId,
             GuildId = guildId,
+            GuildTitle = guildTitle,
             VersionFormat = PlayerDataDbHelper.CurrentPlayerSaveVersion
         };
 

@@ -100,7 +100,6 @@ public class Guild
     public string GuildName;
 
     /// <summary>What the leader chose to hang after the guild's name. May be empty.</summary>
-    public string GuildTitle = "";
 
     /// <summary>The emblem's number in the client's list. Zero means the guild has none.</summary>
     public int EmblemId;
@@ -185,7 +184,6 @@ public class Guild
 
     public Guild(DbGuild db) : this(db.Id, db.GuildName, db.LeaderId)
     {
-        GuildTitle = db.GuildTitle ?? "";
         EmblemId = db.Emblem;
         Contribution = db.Contribution;
         SkillPoints = db.SkillPoints;

@@ -68,7 +68,7 @@ namespace Assets.Scripts.Network
         /// <summary>Whether this is the way off the map, which the cursor says out loud.</summary>
         public bool IsMapWarp;
 
-        /// <summary>The guild this character belongs to, and the title its leader set.</summary>
+        /// <summary>The guild this character belongs to, and the title they gave themselves.</summary>
         public string GuildName;
         public string GuildTitle;
 
@@ -87,9 +87,9 @@ namespace Assets.Scripts.Network
                 if (CharacterType == CharacterType.NPC || !GameConfig.Data.ShowLevelsInOverlay || Name.StartsWith("[NPC]"))
                     return Name;
                 //Party on one line, guild on the next, the way the game this is from does
-                //it. The guild's title hangs off its name rather than getting a line of its
+                //it. The title hangs off the guild name rather than getting a line of its
                 //own: three lines over a character's head is a plate that hides the
-                //character, and the title only means anything next to the name it belongs to.
+                //character, and the title only means anything next to the guild it is worn in.
                 var second = string.IsNullOrWhiteSpace(PartyName) ? "" : $"[{PartyName}]";
                 var third = GuildLine();
 

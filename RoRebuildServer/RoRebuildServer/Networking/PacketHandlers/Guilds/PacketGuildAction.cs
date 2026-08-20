@@ -153,19 +153,23 @@ public class PacketGuildAction : IClientPacketHandler
     }
 
     /// <summary>
-    /// The leader names the guild, a second time.
+    /// A member names themselves.
     ///
-    /// The title hangs off the guild's name on every member's plate, so setting it changes
-    /// what other people see above forty characters at once. Everyone online in the guild
-    /// is refreshed on the map so the change is visible without relogging - which for a
-    /// name plate is the difference between a feature and a rumour.
+    /// Anybody in the guild, not only the leader: a title is the thing a player writes to
+    /// be read by other players, and routing forty of those through one person is how a
+    /// feature nobody uses gets built. Being in a guild at all is the whole gate.
+    ///
+    /// What arrives is drawn on a name plate other people are looking at, so it is trimmed,
+    /// capped, and refused if it carries markup or control characters. The map refresh is
+    /// what makes the new title visible without relogging - which for a name plate is the
+    /// difference between a feature and a rumour.
     /// </summary>
     private static void SetTitle(NetworkConnection connection, Player player, string title)
     {
         var guild = player.Guild;
-        if (guild == null || !guild.IsLeader(player))
+        if (guild == null)
         {
-            CommandBuilder.ErrorMessage(connection, "เฉพาะหัวหน้ากิลด์เท่านั้นที่ทำได้");
+            CommandBuilder.ErrorMessage(connection, "คุณยังไม่ได้อยู่ในกิลด์");
             return;
         }
 
@@ -188,22 +192,14 @@ public class PacketGuildAction : IClientPacketHandler
             }
         }
 
-        guild.GuildTitle = title;
-        RoDatabase.EnqueueDbRequest(new GuildTitleRequest(guild.GuildId, title));
+        player.GuildTitle = title;
+        RoDatabase.EnqueueDbRequest(new CharacterTitleRequest(player.Id, title));
 
-        //Every member online, not just the leader. The window showing the new title is the
-        //confirmation, the same as it is for every other action here, and the refresh on
-        //the map is what redraws the forty name plates the title now hangs on.
-        foreach (var member in guild.Members)
-        {
-            if (!World.Instance.TryFindPlayerByName(member.Name, out var entity))
-                continue;
-
-            var online = entity.Get<Player>();
-            CommandBuilder.SendGuildData(online);
-            online.Character.Map?.RefreshEntity(online.Character);
-        }
-
+        //Only this character, unlike the emblem: the title is theirs, so the one plate it
+        //hangs on is the only one that changed. The refresh is what redraws it for everyone
+        //who can see them, and the window coming back is this player's confirmation.
+        CommandBuilder.SendGuildData(player);
+        player.Character.Map?.RefreshEntity(player.Character);
     }
 
     /// <summary>

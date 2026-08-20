@@ -506,6 +506,7 @@ public class World
         player.CharacterSlot = req.CharacterSlot;
         player.Party = req.Party;
         player.Guild = req.Guild;
+        player.GuildTitle = req.GuildTitle;
 
         if (req.SaveVersion < 3)
         {

@@ -59,7 +59,8 @@ namespace Assets.Scripts.Network
         public static int GuildId;
         public static string GuildName = "";
 
-        /// <summary>What the leader hung after the guild's name. Empty until one is set.</summary>
+        /// <summary>What this character calls themselves, hung after the guild's name.
+        /// Their own, not the guild's. Empty until one is set.</summary>
         public static string GuildTitle = "";
 
         /// <summary>The guild's emblem, as a number into the client's list. 0 is none.</summary>

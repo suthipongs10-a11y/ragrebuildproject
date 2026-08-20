@@ -140,6 +140,10 @@ namespace RoRebuildServer.Migrations
                     b.Property<int?>("GuildId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("GuildTitle")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT");
+
                     b.Property<byte[]>("ItemData")
                         .HasColumnType("BLOB");
 

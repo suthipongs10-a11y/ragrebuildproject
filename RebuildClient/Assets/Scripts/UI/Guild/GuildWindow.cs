@@ -135,8 +135,9 @@ namespace Assets.Scripts.UI.Guild
                 new Vector2(-Pad, -Pad), new Vector2(96f, ButtonRowHeight));
             browseButton.onClick.AddListener(() => Send(GuildRequestType.ListGuilds));
 
-            //Sits where the other two sit, for the same reason: a leader cannot leave, so
-            //the slot is free on exactly the screens where this belongs.
+            //Everybody in a guild has this one, so it moves rather than shares a slot: the
+            //corner is the leave button's for a member and free for a leader, who cannot
+            //leave. Which slot it lands in is decided in the refresh, where it is known.
             titleButton = ModernUiTheme.CreateButton(root, "SetTitle", "ตั้งฉายา",
                 ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeLabel);
             ModernUiTheme.Place((RectTransform)titleButton.transform, new Vector2(1, 1),
@@ -304,7 +305,7 @@ namespace Assets.Scripts.UI.Guild
         }
 
         /// <summary>
-        /// Asks the leader what the guild should be called after its name.
+        /// Asks this player what they would like to be called under their guild's name.
         ///
         /// Sent empty to take it off again, which is why the prompt says so: a field you
         /// can only fill and never clear is one people end up leaving wrong.
@@ -312,13 +313,13 @@ namespace Assets.Scripts.UI.Guild
         private void AskForTitle()
         {
             UiManager.Instance.TextInputWindow.BeginTextInput(
-                $"ตั้งฉายากิลด์ (ไม่เกิน {MaxTitleLength} ตัวอักษร — เว้นว่างเพื่อลบ)",
+                $"ตั้งฉายาของคุณ (ไม่เกิน {MaxTitleLength} ตัวอักษร — เว้นว่างเพื่อลบ)",
                 text =>
                 {
                     text = text == null ? "" : text.Trim();
 
                     //The server checks this again and refuses; this is so a long one is not
-                    //silently cut down to something the leader did not choose.
+                    //silently cut down to something the player did not choose.
                     if (text.Length > MaxTitleLength)
                     {
                         CameraFollower.Instance.AppendError(
@@ -356,6 +357,7 @@ namespace Assets.Scripts.UI.Guild
                 subtitle.text = "สร้างกิลด์ด้วย  /guild create <ชื่อกิลด์>  หรือขอเข้ากิลด์ข้างล่าง";
                 leaveButton.gameObject.SetActive(false);
                 //the three pages belong to a guild, and so do the buttons that reach them
+                titleButton.gameObject.SetActive(false);
                 emblemButton.gameObject.SetActive(false);
                 donateButton.gameObject.SetActive(false);
                 skillButton.gameObject.SetActive(false);
@@ -369,8 +371,9 @@ namespace Assets.Scripts.UI.Guild
 
             browseButton.gameObject.SetActive(false);
 
-            //The title is shown the way everyone else sees it, so the leader is setting the
-            //thing they are looking at rather than a field whose effect is somewhere else.
+            //Guild name and then this character's own title, laid out the way it reads over
+            //their head, so what they are setting is the thing they are looking at rather
+            //than a field whose effect is somewhere else.
             title.text = string.IsNullOrWhiteSpace(GuildState.GuildTitle)
                 ? GuildState.GuildName
                 : $"{GuildState.GuildName}  <size=-4>~{GuildState.GuildTitle}~</size>";
@@ -394,8 +397,14 @@ namespace Assets.Scripts.UI.Guild
             //The leader cannot leave, so the button would be a thing that only ever produces
             //a refusal. The server refuses it anyway; this is so it is not offered.
             leaveButton.gameObject.SetActive(!GuildState.IsLeader);
-            titleButton.gameObject.SetActive(GuildState.IsLeader && !pickingEmblem);
             emblemButton.gameObject.SetActive(GuildState.IsLeader);
+
+            //A title is the player's own, so anybody in the guild may set one. It takes the
+            //corner when there is no leave button in it, and the slot beside it otherwise.
+            titleButton.gameObject.SetActive(!pickingEmblem);
+            ModernUiTheme.Place((RectTransform)titleButton.transform, new Vector2(1, 1),
+                new Vector2(GuildState.IsLeader ? -Pad : -Pad - 100f, -Pad),
+                new Vector2(96f, ButtonRowHeight));
 
             var emblemLabel = emblemButton.GetComponentInChildren<TextMeshProUGUI>();
             if (emblemLabel != null)

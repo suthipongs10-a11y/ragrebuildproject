@@ -28,6 +28,10 @@ public class DbCharacter
     public int ItemDataLength { get; set; }
     public int? PartyId { get; set; }
     public int? GuildId { get; set; } //plain column, guilds are resolved in code rather than by a navigation property
+
+    /// <summary>What this character calls themselves, shown after the guild name on their
+    /// plate. Theirs rather than the guild's, so it stays with them across guilds.</summary>
+    [MaxLength(32)] public string? GuildTitle { get; set; }
     public int AccountId { get; set; }
     public int VersionFormat { get; set; }
     public DbParty? Party { get; set; }

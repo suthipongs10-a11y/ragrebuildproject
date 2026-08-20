@@ -234,7 +234,9 @@ public static class CommandBuilder
                 PartyId = player.Party?.PartyId ?? -1,
                 PartyName = player.Party?.PartyName ?? null,
                 GuildName = player.Guild?.GuildName,
-                GuildTitle = player.Guild?.GuildTitle,
+                //only worth sending alongside a guild - the plate draws the line only when
+                //there is a guild name to hang it off, and a title with no guild is noise
+                GuildTitle = player.Guild != null ? player.GuildTitle : null,
                 GuildEmblem = player.Guild?.EmblemId ?? 0,
                 Follower = player.PlayerFollower
             };
@@ -1683,7 +1685,7 @@ public static class CommandBuilder
         packet.Write(true);
         packet.Write(guild.GuildId);
         packet.Write(guild.GuildName);
-        packet.Write(guild.GuildTitle);
+        packet.Write(p.GuildTitle); //this character's, not the guild's
         packet.Write(guild.EmblemId);
         packet.Write(guild.Level);
         //Stored as a long so a guild running for years cannot overflow it, but sent as an

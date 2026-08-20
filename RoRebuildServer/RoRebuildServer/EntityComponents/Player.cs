@@ -78,6 +78,16 @@ public class Player : IEntityAutoReset
     public VendingState? VendingState;
     public Npcs.ChatRoom? ChatRoom; //not persisted, the room dies with the session
     public Simulation.Guilds.Guild? Guild;
+
+    /// <summary>
+    /// What this character calls themselves, hung after the guild name on their plate.
+    ///
+    /// Theirs, not the guild's - anybody in a guild writes their own rather than waiting
+    /// for the leader to write one for everybody. Kept even while they have no guild, so
+    /// joining one again brings it back; the plate only draws the line at all when there
+    /// is a guild name to put in front of it.
+    /// </summary>
+    public string GuildTitle = "";
     public EntityValueList<float> RecentAttackersList = null!;
     private float lastAttackerListCheckUpdate;
     public float ShoutCooldown;
@@ -316,6 +326,7 @@ public class Player : IEntityAutoReset
         VendingState = null;
         ChatRoom = null;
         Guild = null;
+        GuildTitle = "";
 
         isSittingHpTick = false;
         isSittingSpTick = false;
