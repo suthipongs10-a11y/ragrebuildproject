@@ -3,7 +3,7 @@
 ::Poring_Card //id 4001 - slotted on Armor
 LUK +2
 Perfect Dodge +1
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Mastering Card</color>
  FLEE +18, LUK +2
 
@@ -17,25 +17,25 @@ HP +700
 DEX +1, HIT +3
 
 ::Santa_Poring_Card //id 4005 - slotted on Weapon
-+20% physical damage vs. Shadow
+ดาเมจกายภาพ +20% ต่อธาตุมืด
 
 ::Lunatic_Card //id 4006 - slotted on Weapon
 LUK +1
 Perfect Dodge +1
 CRIT +1
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Eclipse Card</color>
  FLEE +18, VIT +2
 
 ::Peco_Peco_Egg_Card //id 4007 - slotted on Weapon
-+20% physical damage vs. Formless
+ดาเมจกายภาพ +20% ต่อไร้รูปร่าง
 
 ::Picky_Card //id 4008 - slotted on Armor
 STR +1, ATK +10
 
 ::Chonchon_Card //id 4009 - slotted on Boots
 AGI +1, FLEE +2
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Dragon Fly Card</color>
  FLEE +18, AGI +2
 
@@ -53,7 +53,7 @@ HP +10%
 
 ::Roda_Frog_Card //id 4014 - slotted on Armor
 HP +400, SP +50
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Toad Card</color>
  FLEE +18, INT +2
 
@@ -64,21 +64,21 @@ FLEE +10
 AGI +1
 
 ::Savage_Babe_Card //id 4017 - slotted on Weapon
-+5% chance of <color=#800000>Stun</color> on physical attack
+โอกาส 5% ทำให้ <color=#800000>สตัน</color> เมื่อโจมตีกายภาพ
 
 ::Andre_Larva_Card //id 4018 - slotted on Weapon
-INT + 1, MaxSP +10
+INT +1, MaxSP +10
 
 ::Hornet_Card //id 4019 - slotted on Weapon
 STR +1, ATK +3
 
 ::Familiar_Card //id 4020 - slotted on Weapon
 ATK +5
-+5% chance of <color=#800000>Blind</color> on physical attack
+โอกาส 5% ทำให้ <color=#800000>ตาบอด</color> เมื่อโจมตีกายภาพ
 
 ::Rocker_Card //id 4021 - slotted on Armor
 DEX +1, ATK +5
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Vocal Card</color>
  FLEE +18, DEX +2
 
@@ -90,11 +90,11 @@ INT +1
 
 ::Plankton_Card //id 4024 - slotted on Weapon
 ATK +5
-5% chance of <color=#800000>Sleep</color> on physical attack
+โอกาส 5% ทำให้ <color=#800000>หลับ</color> เมื่อโจมตีกายภาพ
 
 ::Skeleton_Card //id 4025 - slotted on Weapon
 ATK +10
-+2% chance of <color=#800000>Stun</color> on physical attack
+โอกาส 2% ทำให้ <color=#800000>สตัน</color> เมื่อโจมตีกายภาพ
 
 
 ::Female_Thief_Bug_Card //id 4026 - slotted on Weapon
@@ -105,22 +105,22 @@ AGI +2
 
 ::Tarou_Card //id 4028 - slotted on Accessory
 STR +2
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Cramp Card</color>
  STR +3
 
 ::Wolf_Card //id 4029 - slotted on Weapon
 ATK +15, CRIT +1
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Vagabond Wolf Card</color>
  FLEE +18, STR +2
 
 ::Mandragora_Card //id 4030 - slotted on Weapon
-+20% physical damage vs. Wind
+ดาเมจกายภาพ +20% ต่อธาตุลม
 
 ::Peco_Peco_Card //id 4031 - slotted on Armor
 HP +10%
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Grand Peco Card</color>
  VIT +3, DEF +3
 
@@ -128,62 +128,62 @@ HP +10%
 DEF +2
 
 ::Poporing_Card //id 4033 - slotted on Accessory
-Enables use of <color=#0000FF>Detoxify</color>.
+ใช้ <color=#0000FF>Detoxify</color> ได้
 
 ::Wormtail_Card //id 4034 - slotted on Accessory
 DEX +2
 
 ::Hydra_Card //id 4035 - slotted on Weapon
-+20% physical damage vs. Demi-Human
+ดาเมจกายภาพ +20% ต่อมนุษย์
 
 ::Muka_Card //id 4036 - slotted on Accessory
-HP Regeneration +10%
+ฟื้นฟู HP +10%
 
 ::Boa_Card //id 4037 - slotted on Weapon
 ATK +5
-+5% chance of <color=#800000>Poison</color> on physical attack
+โอกาส 5% ทำให้ <color=#800000>พิษ</color> เมื่อโจมตีกายภาพ
 
 ::Zombie_Card //id 4038 - slotted on Boots
-HP Regeneration +20%
+ฟื้นฟู HP +20%
 
 ::Stainer_Card //id 4039 - slotted on Headgear
 DEF +1
-+50% <color=#800000>Silence</color> resist
+ต้านทาน <color=#800000>ใบ้</color> +50%
 
 ::Creamy_Card //id 4040 - slotted on Accessory
-Enables use of <skill>Teleport</skill>.
+ใช้ <skill>Teleport</skill> ได้
 
 ::Coco_Card //id 4041 - slotted on Headgear
 DEF +1
-+50% <color=#800000>Sleep</color> resist
+ต้านทาน <color=#800000>หลับ</color> +50%
 
 ::Steel_Chonchon_Card //id 4042 - slotted on Armor
 DEF +2
--10% damage from Wind Element
+รับดาเมจธาตุลม -10%
 
 ::Andre_Card //id 4043 - slotted on Weapon
 ATK +20
 
 ::Smokie_Card //id 4044 - slotted on Accessory
-Enables use of <skill>Hide 1</skill>.
+ใช้ <skill>Hide 1</skill> ได้
 
 ::Horn_Card //id 4045 - slotted on Shield
--35% damage from range
+รับดาเมจระยะไกล -35%
 
 ::Martin_Card //id 4046 - slotted on Headgear
 DEF +1
-+50% <color=#800000>Blind</color> resist
--20% damage from Dark Property attacks
+ต้านทาน <color=#800000>ตาบอด</color> +50%
+รับดาเมจธาตุมืด -20%
 
 ::Ghostring_Card //id 4047 - slotted on Armor
-HP Regeneration -25%
-Ghost Property Armor
+ฟื้นฟู HP -25%
+เกราะธาตุผี
 
 ::Poison_Spore_Card //id 4048 - slotted on Accessory
-Enables use of <skill>Envenom 3</skill>.
+ใช้ <skill>Envenom 3</skill> ได้
 
 ::Vadon_Card //id 4049 - slotted on Weapon
-+20% physical damage vs. Fire
+ดาเมจกายภาพ +20% ต่อธาตุไฟ
 
 ::Male_Thief_Bug_Card //id 4050 - slotted on Boots
 AGI +2
@@ -196,95 +196,95 @@ Perfect Dodge +5
 INT +2
 
 ::Vitata_Card //id 4053 - slotted on Accessory
-SP Consumption +15%
-Enables use of <skill>Heal 1</skill>.
+ใช้ SP +15%
+ใช้ <skill>Heal 1</skill> ได้
 
 ::Angeling_Card //id 4054 - slotted on Armor
-Holy Property Armor
+เกราะธาตุศักดิ์สิทธิ์
 
 ::Marina_Card //id 4055 - slotted on Weapon
 ATK +5
-+5% chance of <color=#800000>Freeze</color> on physical attack
+โอกาส 5% ทำให้ <color=#800000>แช่แข็ง</color> เมื่อโจมตีกายภาพ
 
 ::Dustiness_Card //id 4056 - slotted on Garment
 FLEE +5
--30% damage from Wind attacks
+รับดาเมจธาตุลม -30%
 
 ::Metaller_Card //id 4057 - slotted on Weapon
 ATK +5
-+5% chance of <color=#800000>Silence</color> on physical attack
+โอกาส 5% ทำให้ <color=#800000>ใบ้</color> เมื่อโจมตีกายภาพ
 
 ::Thara_Frog_Card //id 4058 - slotted on Shield
--30% damage from Demi-Human
+รับดาเมจจากมนุษย์ -30%
 
 ::Soldier_Andre_Card //id 4059 - slotted on Shield
--30% damage from Plant type monsters
+รับดาเมจจากพืช -30%
 
 ::Mature_Ant_Egg_Card //id 4013 - slotted on Weapon
-+30% physical damage vs. Ants
+ดาเมจกายภาพ +30% ต่อมด
 
 ::Goblin_Card //id 4060 - slotted on Weapon
-+20% physical damage vs. Brute
+ดาเมจกายภาพ +20% ต่อสัตว์
 
 ::Cornutus_Card //id 4061 - slotted on Armor
 DEF +1
-Indestructible Armor
+เกราะไม่แตก
 
 ::Anaconda_Card //id 4062 - slotted on Weapon
-+20% physical damage vs. Poison
+ดาเมจกายภาพ +20% ต่อธาตุพิษ
 
 ::Caramel_Card //id 4063 - slotted on Weapon
-+20% physical damage vs. Insect 
+ดาเมจกายภาพ +20% ต่อแมลง 
 
 ::Zerom_Card //id 4064 - slotted on Accessory
 DEX +3
 
 ::Kaho_Card //id 4065 - slotted on Weapon
-+20% physical damage vs. Earth
+ดาเมจกายภาพ +20% ต่อธาตุดิน
 
 ::Orc_Warrior_Card //id 4066 - slotted on Shield
--30% damage from Brute
+รับดาเมจจากสัตว์ -30%
 
 ::Megalodon_Card //id 4067 - slotted on Shield
 DEF +1
-+50% <color=#800000>Freeze</color> resist
--20% damage from Water Property attacks
+ต้านทาน <color=#800000>แช่แข็ง</color> +50%
+รับดาเมจธาตุน้ำ -20%
 
 ::Scorpion_Card //id 4068 - slotted on Weapon
-+20% physical damage vs. Plant
+ดาเมจกายภาพ +20% ต่อพืช
 
 ::Drainliar_Card //id 4069 - slotted on Weapon
-+20% physical damage vs. Water
+ดาเมจกายภาพ +20% ต่อธาตุน้ำ
 
 ::Eggyra_Card //id 4070 - slotted on Boots
-SP Regeneration +15%
+ฟื้นฟู SP +15%
 
 ::Orc_Zombie_Card //id 4071 - slotted on Garment
 FLEE +5
--30% damage from Undead Property attacks
+รับดาเมจอันเดด -30%
 
 ::Golem_Card //id 4072 - slotted on Weapon
 ATK +5
-Indestructible Weapon
+อาวุธไม่แตก
 
 ::Pirate_Skel_Card //id 4073 - slotted on Accessory
-Enable <color=#0000FF>Discount 5</color>
+ใช้ <color=#0000FF>Discount 5</color> ได้
 
 ::Bigfoot_Card //id 4074 - slotted on Shield
--30% damage from Insect
+รับดาเมจจากแมลง -30%
 
 ::Argos_Card //id 4075 - slotted on Shield
 DEF +1
-+30% <color=#800000>Petrify</color> resist
--30% damage from Poison Property attacks
+ต้านทาน <color=#800000>กลายเป็นหิน</color> +30%
+รับดาเมจธาตุพิษ -30%
 
 ::Magnolia_Card //id 4076 - slotted on Weapon
 ATK +5
-+5% chance of <color=#800000>Curse</color> on physical attack
+โอกาส 5% ทำให้ <color=#800000>สาป</color> เมื่อโจมตีกายภาพ
 
 ::Phen_Card //id 4077 - slotted on Accessory
-Cast Time +10%
-Skill/spell casts becomes uninterruptible
+เวลาร่าย +10%
+ร่ายสกิลไม่ถูกขัดจังหวะ
 
 ::Savage_Card //id 4078 - slotted on Armor
 VIT +3
@@ -293,96 +293,96 @@ VIT +3
 STR +3
 
 ::Flora_Card //id 4080 - slotted on Weapon
-+20% physical damage vs. Fish
+ดาเมจกายภาพ +20% ต่อสัตว์น้ำ
 
 ::Hode_Card //id 4081 - slotted on Garment
 FLEE +5
--30% damage from Earth attacks
+รับดาเมจธาตุดิน -30%
 
 ::Desert_Wolf_Card //id 4082 - slotted on Weapon
 ATK +5
-+15% physical damage vs. Small
+ดาเมจกายภาพ +15% ต่อขนาดเล็ก
 
 ::Rafflesia_Card //id 4083 - slotted on Shield
--30% damage from Fish
+รับดาเมจจากสัตว์น้ำ -30%
 
 ::Marine_Sphere_Card //id 4084 - slotted on Accessory
-Enables use of <skill>Magnum Break 3</skill>.
+ใช้ <skill>Magnum Break 3</skill> ได้
 
 ::Orc_Skeleton_Card //id 4085 - slotted on Weapon
-+20% physical damage vs. Holy
+ดาเมจกายภาพ +20% ต่อธาตุศักดิ์สิทธิ์
 
 ::Soldier_Skeleton_Card //id 4086 - slotted on Weapon
 CRIT +9
 
 ::Giearth_Card //id 4087 - slotted on Headgear
-+100% <color=#800000>Chaos</color> resist
--15% damage from Earth attacks
+ต้านทาน <color=#800000>สับสน</color> +100%
+รับดาเมจธาตุดิน -15%
 
 ::Frilldora_Card //id 4088 - slotted on Garment
-Enables use of <skill>Cloak 1</skill>.
+ใช้ <skill>Cloak 1</skill> ได้
 
 ::Swordfish_Card //id 4089 - slotted on Armor
 DEF +1
-Water Property Armor
+เกราะธาตุน้ำ
 
 ::Munak_Card //id 4090 - slotted on Shield
 DEF +1
-+50% <color=#800000>Petrify</color> resist
--20% damage from Earth attacks
+ต้านทาน <color=#800000>กลายเป็นหิน</color> +50%
+รับดาเมจธาตุดิน -20%
 
 ::Kobold_Card //id 4091 - slotted on Accessory
 STR +1, CRIT +4
 
 ::Skel_Worker_Card //id 4092 - slotted on Weapon
 ATK +5
-+15% physical damage vs. Medium
+ดาเมจกายภาพ +15% ต่อขนาดกลาง
 
 ::Obeaune_Card //id 4093 - slotted on Accessory
-Enables use of <skill>Cure</skill>.
+ใช้ <skill>Cure</skill> ได้
 
 ::Archer_Skeleton_Card //id 4094 - slotted on Weapon
-+10% range physical damage
+ดาเมจกายภาพระยะไกล +10%
 
 ::Marse_Card //id 4095 - slotted on Garment
 FLEE +5
--30% damage from Water attacks
+รับดาเมจธาตุน้ำ -30%
 
 ::Zenorc_Card //id 4096 - slotted on Weapon
 ATK +10
-+4% chance of <color=#800000>Poison</color> on physical attack
+โอกาส 4% ทำให้ <color=#800000>พิษ</color> เมื่อโจมตีกายภาพ
 
 ::Matyr_Card //id 4097 - slotted on Boots
-HP +10%, Agi +1
+HP +10%, AGI +1
 
 ::Dokebi_Card //id 4098 - slotted on Armor
 DEF +1
-Wind Property Armor
+เกราะธาตุลม
 
 ::Pasana_Card //id 4099 - slotted on Armor
 DEF +1
-Fire Property Armor
+เกราะธาตุไฟ
 
 ::Sohee_Card //id 4100 - slotted on Boots
-SP +15%, SP Regeneration +3%
+SP +15%, ฟื้นฟู SP +3%
 
 ::Sandman_Card //id 4101 - slotted on Armor
 DEF +1
-Earth Property Armor
+เกราะธาตุดิน
 
 ::Whisper_Card //id 4102 - slotted on Garment
 FLEE +20
-+50% damage from Ghost attacks
+รับดาเมจธาตุผี +50%
 
 ::Horong_Card //id 4103 - slotted on Accessory
-Enable <skill>Sight 1</skill>
+ใช้ <skill>Sight 1</skill> ได้
 
 ::Requiem_Card //id 4104 - slotted on Weapon
-+5% chance of <color=#800000>Chaos</color> on physical attack
+โอกาส 5% ทำให้ <color=#800000>สับสน</color> เมื่อโจมตีกายภาพ
 
 ::Marc_Card //id 4105 - slotted on Armor
-+100% <color=#800000>Freeze</color> resist
--5% damage from Water attacks
+ต้านทาน <color=#800000>แช่แข็ง</color> +100%
+รับดาเมจธาตุน้ำ -5%
 
 ::Mummy_Card //id 4106 - slotted on Weapon
 HIT +20
@@ -392,618 +392,618 @@ HP +8%, SP +8%
 
 ::Myst_Card //id 4108 - slotted on Garment
 FLEE +5
--30% damage from Poison attacks
+รับดาเมจธาตุพิษ -30%
 
 ::Jakk_Card //id 4109 - slotted on Garment
 FLEE +5
--30% damage from Fire attacks
+รับดาเมจธาตุไฟ -30%
 
 ::Ghoul_Card //id 4110 - slotted on Headgear
 DEF +1
-+30% resist <color=#800000>Poison</color> status
--50% damage from <color=#800000>Poison</color> status
+ต้านทาน <color=#800000>พิษ</color> +30%
+รับดาเมจจากสถานะ <color=#800000>พิษ</color> -50%
 
 ::Strouf_Card //id 4111 - slotted on Weapon
-+20% physical damage vs. Demon
+ดาเมจกายภาพ +20% ต่อปีศาจ
 
 ::Marduk_Card //id 4112 - slotted on Headgear
-+100% <color=#800000>Silence</color> resist
+ต้านทาน <color=#800000>ใบ้</color> +100%
 
 ::Marionette_Card //id 4113 - slotted on Garment
 FLEE +5
--30% damage from Ghost attacks
+รับดาเมจธาตุผี -30%
 
 ::Argiope_Card //id 4114 - slotted on Armor
 DEF +1
-Poison Property Armor
+เกราะธาตุพิษ
 
 ::Hunter_Fly_Card //id 4115 - slotted on Weapon
-+3% chance to recover 15% physical damage as HP
+โอกาส 3% ดูดดาเมจกายภาพ 15% กลับมาเป็น HP
 
 ::Isis_Card //id 4116 - slotted on Garment
 FLEE +5
--30% damage from Shadow attacks
+รับดาเมจธาตุมืด -30%
 
 ::Sidewinder_Card //id 4117 - slotted on Weapon
-Adds a 5% chance to double attack while performing regular attacks.
-If used in combination with Thief's <skill>Double Attack</skill> it also disables the weapon type requirement.
+โอกาส 5% ออก Double Attack เมื่อโจมตีปกติ
+ถ้าใช้คู่กับ <skill>Double Attack</skill> ของ Thief จะไม่จำกัดชนิดอาวุธด้วย
 
 ::Earth_Petite_Card //id 4118 - slotted on Weapon
-+20% physical damage vs. Dragon
+ดาเมจกายภาพ +20% ต่อมังกร
 
 ::Bathory_Card //id 4119 - slotted on Armor
-Shadow Property Armor
+เกราะธาตุมืด
 
 ::Sky_Petite_Card //id 4120 - slotted on Shield
--30% damage from Dragon
+รับดาเมจจากมังกร -30%
 
 ::Phreeoni_Card //id 4121 - slotted on Weapon
 HIT +100
 
 ::Deviruchi_Card //id 4122 - slotted on Headgear
 STR +1
-+100% <color=#800000>Blind</color> resist
+ต้านทาน <color=#800000>ตาบอด</color> +100%
 
 ::Eddga_Card //id 4123 - slotted on Boots
 HP -20%
-Permanent Endure Effect
+ติดผล Endure ตลอดเวลา
 
 ::Medusa_Card //id 4124 - slotted on Shield
--15% damage from Demon
-+100% <color=#800000>Petrify</color> resist
+รับดาเมจจากปีศาจ -15%
+ต้านทาน <color=#800000>กลายเป็นหิน</color> +100%
 
 ::Deviace_Card //id 4125 - slotted on Weapon
-+7% physical damage vs. Demi-Human, Brute, Plant, and Insect
+ดาเมจกายภาพ +7% ต่อมนุษย์, สัตว์, พืช, แมลง
 
 ::Minorous_Card //id 4126 - slotted on Weapon
 ATK +5
-+15% physical damage vs. Large
+ดาเมจกายภาพ +15% ต่อขนาดใหญ่
 
 ::Nightmare_Card //id 4127 - slotted on Headgear
 AGI +1
-+100% <color=#800000>Sleep</color> resist
+ต้านทาน <color=#800000>หลับ</color> +100%
 
 ::Golden_Thief_Bug_Card //id 4128 - slotted on Shield
-SP Consumption +100%
-Magic Immunity
+ใช้ SP +100%
+ภูมิคุ้มกันเวทมนตร์
 
 ::Baphomet_Jr._Card //id 4129 - slotted on Garment
 AGI +3, CRIT +1
 
 ::Moonlight_Flower_Card //id 4131 - slotted on Boots
-Movement Speed +25% (Does not stack with Increase Agi or similar items or skills)
+ความเร็วเดิน +25% (ไม่ซ้อนกับ Increase AGI หรือไอเทม/สกิลที่ให้ผลเดียวกัน)
 
 ::Mistress_Card //id 4132 - slotted on Headgear
-SP Consumption +25%
-Reduce Skill Gemstone Requirement by 1 of Each Gemstone
+ใช้ SP +25%
+ใช้ Gemstone น้อยลงอย่างละ 1 เม็ด
 
 ::Raydric_Card //id 4133 - slotted on Garment
--20% damage from Neutral attacks
+รับดาเมจไร้ธาตุ -20%
 
 ::Dracula_Card //id 4134 - slotted on Weapon
-+10% chance to recover 5% physical damage as SP
+โอกาส 10% ดูดดาเมจกายภาพ 5% กลับมาเป็น SP
 
 ::Orc_Lord_Card //id 4135 - slotted on Armor
-+30% melee damage reflect
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+สะท้อนดาเมจระยะประชิด 30%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Khalitzburg_Card //id 4136 - slotted on Shield
--30% damage from Demon
+รับดาเมจจากปีศาจ -30%
 
 ::Drake_Card //id 4137 - slotted on Weapon
-Reduces 5 of your 6 base stats by 12%, putting half the points removed into the remaining stat. 
-Target stat is determined by where this card is socketed:
-Headgear: Int
-Body: Vit
-Weapon/Shield: Str
-Garment: Agi
-Boots: Dex
-Accessory: Luk
+ลดสเตตัสพื้นฐาน 5 ใน 6 ค่าลง 12% แล้วเอาครึ่งหนึ่งของแต้มที่ลดไปเพิ่มให้ค่าที่เหลือ 
+ค่าที่โดนลดขึ้นกับว่าใส่การ์ดใบนี้ไว้ช่องไหน:
+ช่องหมวก: INT
+ช่องชุด: VIT
+ช่องอาวุธ/โล่: STR
+ช่องผ้าคลุม: AGI
+ช่องรองเท้า: DEX
+ช่องเครื่องประดับ: LUK
 
 ::Anubis_Card //id 4138 - slotted on Shield
--30% damage from Angel
+รับดาเมจจากเทวดา -30%
 
 ::Joker_Card //id 4139 - slotted on Accessory
-Enables use of <skill>Steal 5</skill>.
+ใช้ <skill>Steal 5</skill> ได้
 
 ::Abyssal_Knight_Card //id 4140 - slotted on Weapon
-+25% physical damage vs. Boss
+ดาเมจกายภาพ +25% ต่อบอส
 
 ::Evil_Druid_Card //id 4141 - slotted on Armor
 INT +1, DEF +1
-Undead Property Armor
+เกราะธาตุอันเดด
 
 ::Doppelganger_Card //id 4142 - slotted on Weapon
 ASPD +10%
 
 ::Orc_Hero_Card //id 4143 - slotted on Headgear
 VIT +3
-+100% <color=#800000>Stun</color> resist
+ต้านทาน <color=#800000>สตัน</color> +100%
 
 ::Osiris_Card //id 4144 - slotted on Accessory
-Recover 100% HP and SP on Resurrection
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ฟื้น HP และ SP 100% เมื่อถูกชุบ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Beelzebub_Card //id 4145 - slotted on Accessory
-Cast Time -30%
+เวลาร่าย -30%
 
 ::Maya_Card //id 4146 - slotted on Shield
-+50% chance of single target magic reflect
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 50% สะท้อนเวทเป้าหมายเดียว
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Baphomet_Card //id 4147 - slotted on Weapon
 HIT -10
-splash 3x3 AoE on non-skill attack
+โจมตีปกติกระจายเป็นวง 3x3 ช่อง
 
 ::Pharaoh_Card //id 4148 - slotted on Headgear
-SP Consumption -30%
+ใช้ SP -30%
 
 ::Gargoyle_Card //id 4149 - slotted on Accessory
-+1% chance to find <color=#008080>Box of Thunder</color> on Insect kill
+โอกาส 1% ได้ <color=#008080>Box of Thunder</color> เมื่อฆ่าแมลง
 
 ::Goat_Card //id 4150 - slotted on Armor
-if Refine < 6: DEF +2, MDEF +5
+ถ้าตีบวก < 6: DEF +2, MDEF +5
 
 ::Gajomart_Card //id 4151 - slotted on Boots
-+10% EXP from Plant
-+20% damage from Plant
+EXP จากพืช +10%
+รับดาเมจจากพืช +20%
 
 ::Galapago_Card //id 4152 - slotted on Accessory
-+3% chance to find <color=#008080>Apple Juice</color>, <color=#008080>Banana Juice</color>, <color=#008080>Carrot Juice</color> on Insect kill
-+50% recovery from <color=#008080>Apple Juice</color>, <color=#008080>Banana Juice</color>, <color=#008080>Carrot Juice</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 3% ได้ <color=#008080>Apple Juice</color>, <color=#008080>Banana Juice</color>, <color=#008080>Carrot Juice</color> เมื่อฆ่าแมลง
+ฟื้นฟูจาก <color=#008080>Apple Juice</color>, <color=#008080>Banana Juice</color>, <color=#008080>Carrot Juice</color> +50%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Crab_Card //id 4153 - slotted on Weapon
 ATK +5
-+30% physical damage vs. Aster
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจกายภาพ +30% ต่อAster
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Dumpling_Kid_Card //id 4154 - slotted on Accessory
-+3% chance to find <color=#008080>Candy</color>,
-+1% <color=#008080>Candy Cane</color> on Demi-Human kill
-+50% recovery from <color=#008080>Candy</color>, <color=#008080>Candy Cane</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 3% ได้ <color=#008080>Candy</color>,
+โอกาส 1% ได้ <color=#008080>Candy Cane</color> เมื่อฆ่ามนุษย์
+ฟื้นฟูจาก <color=#008080>Candy</color>, <color=#008080>Candy Cane</color> +50%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Goblin_Leader_Card //id 4155 - slotted on Weapon
-+30% physical damage vs. Goblin
+ดาเมจกายภาพ +30% ต่อก็อบลิน
 
 ::Goblin_Steamrider_Card //id 4156 - slotted on Weapon
-CRIT damage +10%
-CRIT +7 vs. Formless
+ดาเมจ CRIT +10%
+CRIT +7 ต่อไร้รูปร่าง
 
 ::Goblin_Archer_Card //id 4157 - slotted on Weapon
-CRIT damage +10%
-CRIT +7 vs. Undead
+ดาเมจ CRIT +10%
+CRIT +7 ต่ออันเดด
 
 ::Sky_Deleter_Card //id 4158 - slotted on Armor
-HP Regeneration -100%
-recover 100 HP/melee kill
+ฟื้นฟู HP -100%
+ฟื้น HP 100 เมื่อฆ่าด้วยระยะประชิด
 
 ::Nine_Tail_Card //id 4159 - slotted on Garment
 AGI +2
-if Refine > 8: FLEE +20
+ถ้าตีบวก > 8: FLEE +20
 
 ::Firelock_Soldier_Card //id 4160 - slotted on Boots
 STR +2
-if Refine > 8: HP +10%, SP +10%
+ถ้าตีบวก > 8: HP +10%, SP +10%
 
 ::Grand_Peco_Card //id 4161 - slotted on Headgear
-+5% Autospell <color=#0000FF>Gloria 1</color> on receive physical damage
-<color=#800080>Set Bonus</color>
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Gloria 1</color> เมื่อโดนโจมตีกายภาพ
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Peco Peco Card</color>
  VIT +3, DEF +3
 
 ::Grizzly_Card //id 4162 - slotted on Armor
-+3% chance of <color=#800000>Blind</color> on receive physical damage
+โอกาส 3% ทำให้ <color=#800000>ตาบอด</color> เมื่อโดนโจมตีกายภาพ
 
 
 ::Gryphon_Card //id 4163 - slotted on Weapon
 FLEE +2, CRIT +7
-if Swordman:
- +1% Autospell <color=#0000FF>Bowling Bash 5</color> on non-skill attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ถ้าเป็น Swordman:
+ โอกาส 1% ร่ายอัตโนมัติ <color=#0000FF>Bowling Bash 5</color> เมื่อโจมตีปกติ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Gullinbursti_Card //id 4164 - slotted on Boots
-+10% EXP from Fish
-+20% damage from Fish
+EXP จากสัตว์น้ำ +10%
+รับดาเมจจากสัตว์น้ำ +20%
 
 ::Gig_Card //id 4165 - slotted on Weapon
-Recover 5 SP/melee kill vs. Insect
+ฟื้น SP 5 เมื่อฆ่าแมลง ด้วยระยะประชิด
 
 ::Nightmare_Terror_Card //id 4166 - slotted on Armor
-+3% chance of <color=#800000>Curse</color> on receive physical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 3% ทำให้ <color=#800000>สาป</color> เมื่อโดนโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Nereid_Card //id 4167 - slotted on Weapon
-Recover 5 SP/melee kill vs. Brute
+ฟื้น SP 5 เมื่อฆ่าสัตว์ ด้วยระยะประชิด
 //Lose 5 SP/unequip
 
 ::Dark_Lord_Card //id 4168 - slotted on Boots
-+10% Autospell <color=#0000FF>Meteor Storm 5</color> on receive physical damage
-<color=#800080>Set Bonus</color>
+โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Meteor Storm 5</color> เมื่อโดนโจมตีกายภาพ
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Dark Illusion Card</color>
  HP +18%, SP +18%
- Cast Time -8%
+ เวลาร่าย -8%
 
 ::Dark_Illusion_Card //id 4169 - slotted on Headgear
 HP -8%, SP -8%
-Cast Time -12%
-<color=#800080>Set Bonus</color>
+เวลาร่าย -12%
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Dark Lord Card</color>
  HP +18%, SP +18%
- Cast Time -8%
+ เวลาร่าย -8%
 
 ::Dark_Frame_Card //id 4170 - slotted on Armor
-+6% chance of <color=#800000>Petrify</color> on receive physical damage
+โอกาส 6% ทำให้ <color=#800000>กลายเป็นหิน</color> เมื่อโดนโจมตีกายภาพ
 
 ::Dark_Priest_Card //id 4171 - slotted on Weapon
-+5% chance 10% SP drain on physical attack
-if Sage:
- Recover 1 SP/physical attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 5% ดูด SP 10% เมื่อโจมตีกายภาพ
+ถ้าเป็น Sage:
+ ฟื้น SP 1 ต่อการโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::The_Paper_Card //id 4172 - slotted on Weapon
-CRIT damage +20%
+ดาเมจ CRIT +20%
 
 ::Demon_Fungus_Card //id 4173 - slotted on Armor
-+6% chance of <color=#800000>Sleep</color> on receive physical damage
+โอกาส 6% ทำให้ <color=#800000>หลับ</color> เมื่อโดนโจมตีกายภาพ
 
 ::Deviling_Card //id 4174 - slotted on Garment
--40% damage from Neutral attacks
-+50% damage from non-Neutral attacks
+รับดาเมจไร้ธาตุ -40%
+รับดาเมจจากธาตุที่ไม่ใช่ไร้ธาตุ +50%
 
 ::Poisonous_Toad_Card //id 4175 - slotted on Accessory
-+2% Autospell <color=#0000FF>Envenom 1</color> on non-skill attack
-+5 cell knockback on <color=#0000FF>Envenom</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Envenom 1</color> เมื่อโจมตีปกติ
+<color=#0000FF>Envenom</color> ผลักถอย 5 ช่อง
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Dullahan_Card //id 4176 - slotted on Weapon
-CRIT damage +10%
-CRIT +7 vs. Dragon
+ดาเมจ CRIT +10%
+CRIT +7 ต่อมังกร
 
 ::Dryad_Card //id 4177 - slotted on Headgear
--10% damage from Earth attacks
-+1% chance to find <color=#008080>Green Live</color> on Plant kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+รับดาเมจธาตุดิน -10%
+โอกาส 1% ได้ <color=#008080>Green Live</color> เมื่อฆ่าพืช
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Dragon_Tail_Card //id 4178 - slotted on Garment
 AGI +1, FLEE +10
-+10% <color=#0000FF>Double Strafe</color>, <color=#0000FF>Arrow Shower</color> damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Double Strafe</color>, <color=#0000FF>Arrow Shower</color> +10%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Dragon_Fly_Card //id 4179 - slotted on Garment
 AGI +1
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Dragon Fly Card</color>
  FLEE +18, AGI +2
 
 ::Driller_Card //id 4180 - slotted on Weapon
-Recover 5 SP/melee kill vs. Dragon
+ฟื้น SP 5 เมื่อฆ่ามังกร ด้วยระยะประชิด
 
 ::Disguise_Card //id 4181 - slotted on Armor
-+3% chance of <color=#800000>Silence</color> on receive physical damage
-if bVIT > 76:
- +9% chance instead
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color> 
+โอกาส 3% ทำให้ <color=#800000>ใบ้</color> เมื่อโดนโจมตีกายภาพ
+ถ้า VIT พื้นฐาน > 76:
+ โอกาส 9% แทน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color> 
 
 ::Diabolic_Card //id 4182 - slotted on Weapon
-Recover 5 SP/melee kill vs. Demon
+ฟื้น SP 5 เมื่อฆ่าปีศาจ ด้วยระยะประชิด
 
 ::Vagabond_Wolf_Card //id 4183 - slotted on Garment
 STR +1
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Wolf Card</color>
  FLEE +18, STR +2
 
 ::Lava_Golem_Card //id 4184 - slotted on Weapon
-+30% physical damage vs. Golem
+ดาเมจกายภาพ +30% ต่อโกเลม
 
 ::Rideword_Card //id 4185 - slotted on Headgear
 INT +1
-if Acolyte: INT +1, MDEF +1
+ถ้าเป็น Acolyte: INT +1, MDEF +1
 
 ::Raggler_Card //id 4186 - slotted on Boots
 STR +1, VIT +1
 //<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Raydric_Archer_Card //id 4187 - slotted on Accessory
-+1% chance to find <color=#008080>Box of Resentment</color> on Demon kill
+โอกาส 1% ได้ <color=#008080>Box of Resentment</color> เมื่อฆ่าปีศาจ
 
 ::Leib_Olmai_Card //id 4188 - slotted on Headgear
--10% damage from Fire attacks
-+1% chance to find <color=#008080>Red Blood</color> on Brute kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+รับดาเมจธาตุไฟ -10%
+โอกาส 1% ได้ <color=#008080>Red Blood</color> เมื่อฆ่าสัตว์
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Wraith_Dead_Card //id 4189 - slotted on Armor
-+6% chance of <color=#800000>Curse</color> on receive physical damage
+โอกาส 6% ทำให้ <color=#800000>สาป</color> เมื่อโดนโจมตีกายภาพ
 
 ::Wraith_Card //id 4190 - slotted on Accessory
-+1% chance to find <color=#008080>Box of Laughter</color> on Undead kill
+โอกาส 1% ได้ <color=#008080>Box of Laughter</color> เมื่อฆ่าอันเดด
 
 ::Loli_Ruri_Card //id 4191 - slotted on Armor
-+5% autocast <skill>Heal 3</skill> when taking physical damage.
+โอกาส 5% ร่ายอัตโนมัติ <skill>Heal 3</skill> เมื่อโดนโจมตีกายภาพ
 
 ::Rotar_Zairo_Card //id 4192 - slotted on Weapon
-CRIT damage +10%
-CRIT +7 vs. Aquatic
+ดาเมจ CRIT +10%
+CRIT +7 ต่อสัตว์น้ำ
 
 ::Lude_Card //id 4193 - slotted on Accessory
-if Novice:
- +20% Autospell <color=#0000FF>Endure 1</color> on receive physical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ถ้าเป็น Novice:
+ โอกาส 20% ร่ายอัตโนมัติ <color=#0000FF>Endure 1</color> เมื่อโดนโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Rybio_Card //id 4194 - slotted on Armor
-+3% chance of <color=#800000>Stun</color> on receive physical damage
-if bDEX > 76:
- +9% chance instead
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 3% ทำให้ <color=#800000>สตัน</color> เมื่อโดนโจมตีกายภาพ
+ถ้า DEX พื้นฐาน > 76:
+ โอกาส 9% แทน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Leaf_Cat_Card //id 4195 - slotted on Headgear
--10% damage from Water attacks
-+1% chance to find <color=#008080>Crystal Blue</color> on Fish kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+รับดาเมจธาตุน้ำ -10%
+โอกาส 1% ได้ <color=#008080>Crystal Blue</color> เมื่อฆ่าสัตว์น้ำ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Marin_Card //id 4196 - slotted on Accessory
-+20% chance to find <color=#008080>Jellopy</color>,
-+1% <color=#008080>Large Jellopy</color> on monster kill
+โอกาส 20% ได้ <color=#008080>Jellopy</color>,
+โอกาส 1% ได้ <color=#008080>Large Jellopy</color> เมื่อฆ่ามอน
 
 ::Mastering_Card //id 4197 - slotted on Garment
 LUK +1
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Poring Card</color>
  FLEE +18, LUK +2
 
 ::Maya_Purple_Card //id 4198 - slotted on Headgear
-See Hidden Targets
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+มองเห็นศัตรูที่ซ่อนตัว
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Merman_Card //id 4199 - slotted on Boots
-HP Regeneration +10%
-SP Regeneration +10%
+ฟื้นฟู HP +10%
+ฟื้นฟู SP +10%
 
 
 ::Megalith_Card //id 4200 - slotted on Boots
-if Refine < 6: MDEF +7
+ถ้าตีบวก < 6: MDEF +7
 
 ::Majorous_Card //id 4201 - slotted on Armor
-+6% chance of <color=#800000>Stun</color> on receive physical damage
+โอกาส 6% ทำให้ <color=#800000>สตัน</color> เมื่อโดนโจมตีกายภาพ
 
 ::Mao_Guai_Card //id 4202 - slotted on Weapon
-+20% physical damage vs. Ghost
+ดาเมจกายภาพ +20% ต่อธาตุผี
 
 ::Mutant_Dragonoid_Card //id 4203 - slotted on Weapon
 ATK +15
-+5% Autospell <color=#0000FF>Fireball 3</color> on non-skill attack
-if <color=#0000FF>Fireball 10</color>:
- Autospell <color=#0000FF>Fireball 10</color> instead
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Fireball 3</color> เมื่อโจมตีปกติ
+ถ้าได้ <color=#0000FF>Fireball 10</color>:
+ ร่ายอัตโนมัติ <color=#0000FF>Fireball 10</color> แทน
 
 ::Mini_Demon_Card //id 4204 - slotted on Boots
-+10% EXP from Brute
-+20% damage from Brute
+EXP จากสัตว์ +10%
+รับดาเมจจากสัตว์ +20%
 
 ::Mimic_Card //id 4205 - slotted on Accessory
-+0.1% chance to find <color=#008080>Old Blue Box</color> on monster kill
+โอกาส 0.1% ได้ <color=#008080>Old Blue Box</color> เมื่อฆ่ามอน
 
 ::Myst_Case_Card //id 4206 - slotted on Headgear
-+0.3% chance to find <color=#008080>Gift Box</color> on monster kill
+โอกาส 0.3% ได้ <color=#008080>Gift Box</color> เมื่อฆ่ามอน
 
 ::Mistilteinn_Card //id 4207 - slotted on Shield
 DEF +1
--25% damage from Small
+รับดาเมจจากขนาดเล็ก -25%
 
 ::Miyabi_Doll_Card //id 4208 - slotted on Boots
 SP +10%
-+5% <skill>Frost Diver</skill> damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <skill>Frost Diver</skill> +5%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Violy_Card //id 4209 - slotted on Accessory
-+2% Autospell <color=#0000FF>Unbarring Octave 1</color> on non-skill attack
-if <color=#0000FF>Unbarring Octave 5</color>:
- Autospell Unbarring Octave 5 instead
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Unbarring Octave 1</color> เมื่อโจมตีปกติ
+ถ้าได้ <color=#0000FF>Unbarring Octave 5</color>:
+ ร่ายอัตโนมัติ <color=#0000FF>Unbarring Octave 5</color> แทน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Wanderer_Card //id 4210 - slotted on Garment
-+2% Autospell <color=#0000FF>Snatch 1</color> on non-skill attack
-if Thief:
+โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Snatch 1</color> เมื่อโจมตีปกติ
+ถ้าเป็น Thief:
  FLEE +20
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Vocal_Card //id 4211 - slotted on Garment
 MDEF +3
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Rocker Card</color>
  FLEE +18, DEX +2
 
 ::Bongun_Card //id 4212 - slotted on Accessory
-+2% Autospell <color=#0000FF>Bash 1</color> on non-skill attack
-+5 cell knockback on <color=#0000FF>Bash</color>
-+100% damage from Munak
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Bash 1</color> เมื่อโจมตีปกติ
+<color=#0000FF>Bash</color> ผลักถอย 5 ช่อง
+รับดาเมจจากMunak +100%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Brilight_Card //id 4213 - slotted on Armor
-+6% chance of <color=#800000>Silence</color> on receive physical damage
+โอกาส 6% ทำให้ <color=#800000>ใบ้</color> เมื่อโดนโจมตีกายภาพ
 
 ::Bloody_Murderer_Card //id 4214 - slotted on Weapon
-CRIT damage +10%
-CRIT +7 vs. Insect
+ดาเมจ CRIT +10%
+CRIT +7 ต่อแมลง
 
 ::Blazer_Card //id 4215 - slotted on Accessory
-+6% chance to find <color=#008080>Apple</color>,
-+1% chance to find <color=#008080>Banana</color>, <color=#008080>Potato</color>,
-+0.5% chance to find <color=#008080>Pumpkin</color>, <color=#008080>Mochi</color>, <color=#008080>Bao</color>, <color=#008080>Sushi</color>, <color=#008080>Cheese</color>, <color=#008080>Raw Fish</color>, <color=#008080>Ice Cream</color>,
-+0.3% chance to find <color=#008080>Well-baked Cookie</color>, <color=#008080>Carrot Juice</color>, <color=#008080>Grape Juice</color>, <color=#008080>Banana Juice</color>, <color=#008080>Apple Juice</color>,
-+0.1% chance to find <color=#008080>Autumn Red Tea</color>, <color=#008080>Fried Sweet Potato</color>, <color=#008080>Chocolate Mousse Cake</color>, <color=#008080>Clam Soup</color>, <color=#008080>Smooth Noodle</color>, <color=#008080>Seasoned Sticky Webfoot</color>
-+0.05% chance to find 008080Royal Jelly</color> on monster kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 6% ได้ <color=#008080>Apple</color>,
+โอกาส 1% ได้ <color=#008080>Banana</color>, <color=#008080>Potato</color>,
+โอกาส 0.5% ได้ <color=#008080>Pumpkin</color>, <color=#008080>Mochi</color>, <color=#008080>Bao</color>, <color=#008080>Sushi</color>, <color=#008080>Cheese</color>, <color=#008080>Raw Fish</color>, <color=#008080>Ice Cream</color>,
+โอกาส 0.3% ได้ <color=#008080>Well-baked Cookie</color>, <color=#008080>Carrot Juice</color>, <color=#008080>Grape Juice</color>, <color=#008080>Banana Juice</color>, <color=#008080>Apple Juice</color>,
+โอกาส 0.1% ได้ <color=#008080>Autumn Red Tea</color>, <color=#008080>Fried Sweet Potato</color>, <color=#008080>Chocolate Mousse Cake</color>, <color=#008080>Clam Soup</color>, <color=#008080>Smooth Noodle</color>, <color=#008080>Seasoned Sticky Webfoot</color>
+โอกาส 0.05% ได้ <color=#008080>Royal Jelly</color> เมื่อฆ่ามอน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Sasquatch_Card //id 4216 - slotted on Armor
-+6% chance of <color=#800000>Freeze</color> on receive physical damage
+โอกาส 6% ทำให้ <color=#800000>แช่แข็ง</color> เมื่อโดนโจมตีกายภาพ
 
 ::Enchanted_Peach_Tree_Card //id 4217 - slotted on Shield
-+2% Autospell <color=#0000FF>Heal 1</color> (self) on non-skill attack
-if <color=#0000FF>Heal 10</color>:
- Autospell <color=#0000FF>Heal 10</color> instead
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Heal 1</color> (ใส่ตัวเอง) เมื่อโจมตีปกติ
+ถ้าได้ <color=#0000FF>Heal 10</color>:
+ ร่ายอัตโนมัติ <color=#0000FF>Heal 10</color> แทน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Succubus_Card //id 4218 - slotted on Armor
 HP +1000, VIT -3
-HP Regeneration -20%
+ฟื้นฟู HP -20%
 
 ::Sage_Worm_Card //id 4219 - slotted on Accessory
-+0.3% chance to find <color=#008080>Blue Gemstone</color>, <color=#008080>Red Gemstone</color>, <color=#008080>Yellow Gemstone</color> on monster kill
+โอกาส 0.3% ได้ <color=#008080>Blue Gemstone</color>, <color=#008080>Red Gemstone</color>, <color=#008080>Yellow Gemstone</color> เมื่อฆ่ามอน
 
 ::Solider_Card //id 4220 - slotted on Armor
 DEF +2, MDEF +2
 
 ::Skeleton_General_Card //id 4221 - slotted on Boots
-+10% EXP from Insect
-+20% damage from Insect
+EXP จากแมลง +10%
+รับดาเมจจากแมลง +20%
 
 ::Skel_Prisoner_Card //id 4222 - slotted on Armor
-+3% chance of <color=#800000>Sleep</color> on receive physical damage
+โอกาส 3% ทำให้ <color=#800000>หลับ</color> เมื่อโดนโจมตีกายภาพ
 
 ::Stalactic_Golem_Card //id 4223 - slotted on Headgear
 DEF +1
-+30% <color=#800000>Stun</color> resist
+ต้านทาน <color=#800000>สตัน</color> +30%
 
 ::Stem_Worm_Card //id 4224 - slotted on Accessory
-+1% chance to find <color=#008080>Box of Storms</color> on Brute kill
+โอกาส 1% ได้ <color=#008080>Box of Storms</color> เมื่อฆ่าสัตว์
 
 ::Stone_Shooter_Card //id 4225 - slotted on Weapon
 ATK +10, HIT +10
 
 ::Sting_Card //id 4226 - slotted on Shield
 DEF +2
-if Refine > 8: MDEF +5
+ถ้าตีบวก > 8: MDEF +5
 
 ::Spring_Rabbit_Card //id 4227 - slotted on Accessory
-+2% chance to find <color=#008080>Meat</color>, <color=#008080>Monster's Feed</color> on Brute kill
-+50% recovery from <color=#008080>Meat</color>, <color=#008080>Monster's Feed</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 2% ได้ <color=#008080>Meat</color>, <color=#008080>Monster's Feed</color> เมื่อฆ่าสัตว์
+ฟื้นฟูจาก <color=#008080>Meat</color>, <color=#008080>Monster's Feed</color> +50%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Sleeper_Card //id 4228 - slotted on Accessory
-+1% chance to find <color=#008080>Box of Drowsiness</color> on Fish kill
+โอกาส 1% ได้ <color=#008080>Box of Drowsiness</color> เมื่อฆ่าสัตว์น้ำ
 
 ::Cloud_Tower_Manager_Card //id 4229 - slotted on Headgear
 INT +1, MATK +10
-Cast Time -5%
+เวลาร่าย -5%
 
 ::Shinobi_Card //id 4230 - slotted on Accessory
 AGI +1
-+10% autocast <skill>Cloak 5</skill> when taking physical damage.
+โอกาส 10% ร่ายอัตโนมัติ <skill>Cloak 5</skill> เมื่อโดนโจมตีกายภาพ
 
 ::Mi_Gao_Card //id 4231 - slotted on Shield
-+20% damage against flying or airborn enemies.
+ดาเมจต่อศัตรูที่บินได้ +20%
 
 ::Hermit_Plant_Card //id 4232 - slotted on Accessory
-+3% chance to find <color=#008080>Red Herb</color>,
-+2% chance to find <color=#008080>Yellow Herb</color>,
-+1% chance to find <color=#008080>White Herb</color> on Plant kill
-+50% recovery from <color=#008080>Red Herb</color>, <color=#008080>Yellow Herb</color>, <color=#008080>White Herb</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 3% ได้ <color=#008080>Red Herb</color>,
+โอกาส 2% ได้ <color=#008080>Yellow Herb</color>,
+โอกาส 1% ได้ <color=#008080>White Herb</color> เมื่อฆ่าพืช
+ฟื้นฟูจาก <color=#008080>Red Herb</color>, <color=#008080>Yellow Herb</color>, <color=#008080>White Herb</color> +50%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Baby_Leopard_Card //id 4233 - slotted on Armor
 LUK +3
 
 ::Anolian_Card //id 4234 - slotted on Armor
-+3% Autospell <color=#0000FF>Improve Concentration 2</color> on receive physical damage
-if <color=#0000FF>Improve Concentration 10</color>:
- Autospell <color=#0000FF>Improve Concentration 10</color> instead
+โอกาส 3% ร่ายอัตโนมัติ <color=#0000FF>Improve Concentration 2</color> เมื่อโดนโจมตีกายภาพ
+ถ้าได้ <color=#0000FF>Improve Concentration 10</color>:
+ ร่ายอัตโนมัติ <color=#0000FF>Improve Concentration 10</color> แทน
 
 ::Christmas_Cookie_Card //id 4235 - slotted on Boots
-+10% EXP from Angel
-+20% damage from Angel
+EXP จากเทวดา +10%
+รับดาเมจจากเทวดา +20%
 
 ::Amon_Ra_Card //id 4236 - slotted on Boots
 STR, VIT, INT, DEX, AGI, LUK +1
-+3% Autospell <color=#0000FF>Kyrie Eleison 10</color> on receive physical damage
-if bINT = 99:
- +10% Autospell instead
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 3% ร่ายอัตโนมัติ <color=#0000FF>Kyrie Eleison 10</color> เมื่อโดนโจมตีกายภาพ
+ถ้า INT พื้นฐาน = 99:
+ โอกาส 10% แทน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Owl_Duke_Card //id 4237 - slotted on Accessory
-+0.3% Autospell <color=#0000FF>Impositio Manus 3</color> on non-skill attack
-<color=#800080>Set Bonus</color>
+โอกาส 0.3% ร่ายอัตโนมัติ <color=#0000FF>Impositio Manus 3</color> เมื่อโจมตีปกติ
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Owl Baron Card</color>
- +10% Autospell <color=#0000FF>Lightning Bolt 5</color> on non-skill attack
+ โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Lightning Bolt 5</color> เมื่อโจมตีปกติ
 
 ::Owl_Baron_Card //id 4238 - slotted on Accessory
-+3% Autospell <color=#0000FF>Lex Aeterna</color> on non-skill attack
-<color=#800080>Set Bonus</color>
+โอกาส 3% ร่ายอัตโนมัติ <color=#0000FF>Lex Aeterna</color> เมื่อโจมตีปกติ
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Owl Duke Card</color>
- +10% Autospell <color=#0000FF>Lightning Bolt 5</color> on non-skill attack
+ โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Lightning Bolt 5</color> เมื่อโจมตีปกติ
 
 ::Iron_Fist_Card //id 4239 - slotted on Boots
-+10% EXP from Formless
-+20% damage from Formless
+EXP จากไร้รูปร่าง +10%
+รับดาเมจจากไร้รูปร่าง +20%
 
 ::Arclouse_Card //id 4240 - slotted on Shield
-if Refine < 6: DEF +2, MDEF +3
+ถ้าตีบวก < 6: DEF +2, MDEF +3
 
 ::Archangeling_Card //id 4241 - slotted on Headgear
 HP +300
-if bLUK > 76:
- HP Regeneration +100%
- SP Regeneration +100%
+ถ้า LUK พื้นฐาน > 76:
+ ฟื้นฟู HP +100%
+ ฟื้นฟู SP +100%
 
 ::Apocalypse_Card //id 4242 - slotted on Armor
 VIT +2
-if Refine > 8: HP +800
+ถ้าตีบวก > 8: HP +800
 
 ::Antonio_Card //id 4243 - slotted on Armor
-+50% autocast <skill>Teleport 1</skill> on receive physical damage
+โอกาส 50% ร่ายอัตโนมัติ <skill>Teleport 1</skill> เมื่อโดนโจมตีกายภาพ
 
 ::Alarm_Card //id 4244 - slotted on Boots
 HP +300, VIT +1
-+20% Autospell <color=#0000FF>Sight</color> on receive physical damage
+โอกาส 20% ร่ายอัตโนมัติ <color=#0000FF>Sight</color> เมื่อโดนโจมตีกายภาพ
 
 ::Am_Mut_Card //id 4245 - slotted on Boots
-+10% EXP from Demi-Human
-+20% damage from Demi-Human
+EXP จากมนุษย์ +10%
+รับดาเมจจากมนุษย์ +20%
 
 ::Assaulter_Card //id 4246 - slotted on Weapon
-CRIT damage +10%
-CRIT +7 vs. Demi-Human
+ดาเมจ CRIT +10%
+CRIT +7 ต่อมนุษย์
 
 ::Aster_Card //id 4247 - slotted on Weapon
 ATK +5
-+30% physical damage vs. Shell Fish
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจกายภาพ +30% ต่อหอย
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Ancient_Mummy_Card //id 4248 - slotted on Shield
-+3% Autospell <color=#0000FF>Signum Crucis 5</color> on receive physical damage
+โอกาส 3% ร่ายอัตโนมัติ <color=#0000FF>Signum Crucis 5</color> เมื่อโดนโจมตีกายภาพ
 
 ::Ancient_Worm_Card //id 4249 - slotted on Boots
-+10% EXP from Demon
-+20% damage from Demon
+EXP จากปีศาจ +10%
+รับดาเมจจากปีศาจ +20%
 
 ::Executioner_Card //id 4250 - slotted on Shield
 DEF +1
--25% damage from Large
+รับดาเมจจากขนาดใหญ่ -25%
 
 ::Elder_Card //id 4251 - slotted on Shield
--40% damage from flying or airborn enemies.
+รับดาเมจจากศัตรูที่บินได้ -40%
 
 ::Alligator_Card //id 4252 - slotted on Accessory
--5% damage from range
+รับดาเมจระยะไกล -5%
 
 ::Alice_Card //id 4253 - slotted on Shield
--40% damage from Boss
-+40% damage from non-Boss
+รับดาเมจจากบอส -40%
+รับดาเมจจากมอนที่ไม่ใช่บอส +40%
 
 ::Tyrfing_Card //id 4254 - slotted on Shield
 DEF +1
--25% damage from Medium
+รับดาเมจจากขนาดกลาง -25%
 
 ::Orc_Lady_Card //id 4255 - slotted on Weapon
-+30% physical damage vs. Orcs
+ดาเมจกายภาพ +30% ต่อออร์ค
 
 ::Orc_Archer_Card //id 4256 - slotted on Accessory
-+1% chance to find <color=#008080>Box of Panting</color> on Demi-Human kill
+โอกาส 1% ได้ <color=#008080>Box of Panting</color> เมื่อฆ่ามนุษย์
 
 ::Wild_Rose_Card //id 4257 - slotted on Boots
 AGI +1
-if Thief:
+ถ้าเป็น Thief:
  Perfect Dodge +5
 
 ::Evil_Nymph_Card //id 4258 - slotted on Headgear
@@ -1011,910 +1011,910 @@ SP +50, INT +1
 
 ::Wooden_Golem_Card //id 4259 - slotted on Armor
 DEF +1
-HP Regeneration +30%
+ฟื้นฟู HP +30%
 
 ::Wootan_Shooter_Card //id 4260 - slotted on Headgear
 DEF +1
-+20% <color=#800000>Chaos</color> resist
+ต้านทาน <color=#800000>สับสน</color> +20%
 
 ::Wootan_Fighter_Card //id 4261 - slotted on Headgear
 DEF +1
-+20% <color=#800000>Bleed</color> resist
+ต้านทาน <color=#800000>เลือดออก</color> +20%
 
 ::Cloud_Hermit_Card //id 4262 - slotted on Accessory
-+1% chance to find <color=#008080>Box of Gloom</color> on Plant kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 1% ได้ <color=#008080>Box of Gloom</color> เมื่อฆ่าพืช
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Samurai_Specter_Card //id 4263 - slotted on Weapon
-HP Regeneration -100%
-+100% DEF ignore vs. non-Boss
-Lose 666 HP/10 seconds
-Lose 999 HP/unequip
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ฟื้นฟู HP -100%
+เจาะ DEF 100% กับมอนที่ไม่ใช่บอส
+เสีย HP 666 ทุก 10 วินาที
+เสีย HP 999 เมื่อถอด
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Wind_Ghost_Card //id 4264 - slotted on Accessory
-+2% Autospell <color=#0000FF>Jupitel Thunder 3</color> on non-skill attack
-if <color=#0000FF>Jupitel Thunder 10</color>:
- Autospell <color=#0000FF>Jupitel Thunder 10</color> instead
+โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Jupitel Thunder 3</color> เมื่อโจมตีปกติ
+ถ้าได้ <color=#0000FF>Jupitel Thunder 10</color>:
+ ร่ายอัตโนมัติ <color=#0000FF>Jupitel Thunder 10</color> แทน
 
 ::Jing_Guai_Card //id 4265 - slotted on Accessory
-+1% chance to find <color=#008080>Box of Sunlight</color> on Angel kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 1% ได้ <color=#008080>Box of Sunlight</color> เมื่อฆ่าเทวดา
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Eclipse_Card //id 4266 - slotted on Garment
 VIT +1
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Lunatic Card</color>
  FLEE +18, VIT +2
 
 ::Explosion_Card //id 4267 - slotted on Boots
-+10% EXP from Dragon
-+20% damage from Dragon
+EXP จากมังกร +10%
+รับดาเมจจากมังกร +20%
 
 ::Injustice_Card //id 4268 - slotted on Weapon
-+5% Autospell <color=#0000FF>Sonic Blow 1</color> on non-skill attack
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Sonic Blow 1</color> เมื่อโจมตีปกติ
 
 ::Incubus_Card //id 4269 - slotted on Headgear
 SP +150, INT -3
-SP Regeneration -20%
+ฟื้นฟู SP -20%
 
 ::Giant_Spider_Card //id 4270 - slotted on Armor
-+6% chance of <color=#800000>Poison</desc> on receive physical damage
+โอกาส 6% ทำให้ <color=#800000>พิษ</color> เมื่อโดนโจมตีกายภาพ
 
 ::Giant_Hornet_Card //id 4271 - slotted on Headgear
--10% damage from Wind attacks
-+1% chance to find <color=#008080>Wind of Verdure</color> on Insect kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+รับดาเมจธาตุลม -10%
+โอกาส 1% ได้ <color=#008080>Wind of Verdure</color> เมื่อฆ่าแมลง
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Zhu_Po_Long_Card //id 4272 - slotted on Accessory
 AGI +1, CRIT +3
 
 ::Shellfish_Card //id 4273 - slotted on Weapon
 ATK +5
-+30% physical damage vs. Crab
-<color=#800080>Set Bonus</color>
+ดาเมจกายภาพ +30% ต่อปู
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Crab Card</color>
  <color=#008080>Aster Card</color>
- +45% physical damage vs. Water
+ ดาเมจกายภาพ +45% ต่อธาตุน้ำ
 
 
 ::Zombie_Master_Card //id 4274 - slotted on Weapon
-Recover 5 SP/melee kill vs. Undead
+ฟื้น SP 5 เมื่อฆ่าอันเดด ด้วยระยะประชิด
 
 ::Zombie_Prisoner_Card //id 4275 - slotted on Boots
-+10% EXP from Undead
-+20% damage from Undead
+EXP จากอันเดด +10%
+รับดาเมจจากอันเดด +20%
 
 ::Lord_of_The_Dead_Card //id 4276 - slotted on Weapon
-+5% chance of <color=#800000>Stun</color>, <color=#800000>Curse</color>, <color=#800000>Silence</color>, <color=#800000>Poison</color>, <color=#800000>Bleed</color> on melee attack
-+0.01% chance of <color=#800000>Coma</color> on attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 5% ทำให้ <color=#800000>สตัน</color>, <color=#800000>สาป</color>, <color=#800000>ใบ้</color>, <color=#800000>พิษ</color>, <color=#800000>เลือดออก</color> เมื่อโจมตีระยะประชิด
+โอกาส 0.01% ทำให้ <color=#800000>โคม่า</color> เมื่อโจมตี
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Zealotus_Card //id 4277 - slotted on Shield
 LUK +2
-+10% <color=#0000FF>Melody Strike</color>, <color=#0000FF>Sling Arrow</color> damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Melody Strike</color>, <color=#0000FF>Sling Arrow</color> +10%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Gibbet_Card //id 4278 - slotted on Headgear
-if Refine < 6: MDEF +5
+ถ้าตีบวก < 6: MDEF +5
 
 ::Earth_Deleter_Card //id 4279 - slotted on Armor
-SP Regeneration -100%
-Recover 10 SP/melee kill
+ฟื้นฟู SP -100%
+ฟื้น SP 10 เมื่อฆ่าด้วยระยะประชิด
 
 ::Geographer_Card //id 4280 - slotted on Armor
-+3% Autospell <color=#0000FF>Blessing 3</color> (self) on receive physical damage
-if <color=#0000FF>Blessing 10</color>:
- Autospell <color=#0000FF>Blessing 10</color> instead
+โอกาส 3% ร่ายอัตโนมัติ <color=#0000FF>Blessing 3</color> (ใส่ตัวเอง) เมื่อโดนโจมตีกายภาพ
+ถ้าได้ <color=#0000FF>Blessing 10</color>:
+ ร่ายอัตโนมัติ <color=#0000FF>Blessing 10</color> แทน
 
 ::Zipper_Bear_Card //id 4281 - slotted on Weapon
 ATK +30
-Lose 1 SP/physical attack
-if Merchant:
- Indestructible Weapon
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+เสีย SP 1 ต่อการโจมตีกายภาพ
+ถ้าเป็น Merchant:
+ อาวุธไม่แตก
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Tengu_Card //id 4282 - slotted on Accessory
-+6% chance to find <color=#008080>Rice Cake</color>,
-+2% chance to find <color=#008080>Monster's Feed</color>,
-+1% chance to find <color=#008080>Candy</color>,
-+0.5% chance to find <color=#008080>Yam</color>, <color=#008080>Novice Potion</color>,
-+0.3% chance to find <color=#008080>Red Herb</color>, <color=#008080>Green Herb</color>,
-+0.2% chance to find <color=#008080>Red Potion</color>, <color=#008080>Yellow Herb</color>,
-+0.1% chance to find <color=#008080>Condensed Red Potion</color>, <color=#008080>Hinalle Leaflet</color>,
-+0.1% chance to find <color=#008080>Aloe Leaflet</color>, <color=#008080>Mastela Fruit</color> on monster kill
+โอกาส 6% ได้ <color=#008080>Rice Cake</color>,
+โอกาส 2% ได้ <color=#008080>Monster's Feed</color>,
+โอกาส 1% ได้ <color=#008080>Candy</color>,
+โอกาส 0.5% ได้ <color=#008080>Yam</color>, <color=#008080>Novice Potion</color>,
+โอกาส 0.3% ได้ <color=#008080>Red Herb</color>, <color=#008080>Green Herb</color>,
+โอกาส 0.2% ได้ <color=#008080>Red Potion</color>, <color=#008080>Yellow Herb</color>,
+โอกาส 0.1% ได้ <color=#008080>Condensed Red Potion</color>, <color=#008080>Hinalle Leaflet</color>,
+โอกาส 0.1% ได้ <color=#008080>Aloe Leaflet</color>, <color=#008080>Mastela Fruit</color> เมื่อฆ่ามอน
 
 ::Greatest_General_Card //id 4283 - slotted on Accessory
-+0.2% Autospell <color=#0000FF>Summon Spirit Sphere 5</color> on non-skill attack
-if Acolyte:
- 2% Autospell instead
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 0.2% ร่ายอัตโนมัติ <color=#0000FF>Summon Spirit Sphere 5</color> เมื่อโจมตีปกติ
+ถ้าเป็น Acolyte:
+ โอกาส 2% แทน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Chepet_Card //id 4284 - slotted on Weapon
-+5% Autospell <color=#0000FF>Heal 5</color> (enemy) on non-skill attack
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Heal 5</color> (ใส่ศัตรู) เมื่อโจมตีปกติ
 
 ::Choco_Card //id 4285 - slotted on Garment
 FLEE +10
 Perfect Dodge +5
 
 ::Karakasa_Card //id 4286 - slotted on Armor
-+3% chance of <color=#800000>Chaos</color> on receive physical damage
-if bSTR > 76:
- +9% chance instead
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 3% ทำให้ <color=#800000>สับสน</color> เมื่อโดนโจมตีกายภาพ
+ถ้า STR พื้นฐาน > 76:
+ โอกาส 9% แทน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Kappa_Card //id 4287 - slotted on Garment
-if Refine < 6: MDEF +8
+ถ้าตีบวก < 6: MDEF +8
 
 ::Carat_Card //id 4288 - slotted on Headgear
 INT +2
-if Refine > 8: SP +150
+ถ้าตีบวก > 8: SP +150
 
 ::Caterpillar_Card //id 4289 - slotted on Weapon
-Recover 5 SP/melee kill vs. Plant
+ฟื้น SP 5 เมื่อฆ่าพืช ด้วยระยะประชิด
 
 ::Cat_O'_Nine_Tails_Card //id 4290 - slotted on Boots
 MDEF +3
-+5% chance of single target magic reflect
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 5% สะท้อนเวทเป้าหมายเดียว
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Kobold_Leader_Card //id 4291 - slotted on Weapon
-+30% physical damage vs. Kobolds
+ดาเมจกายภาพ +30% ต่อโคบอลด์
 
 ::Kobold_Archer_Card //id 4292 - slotted on Weapon
-CRIT damage +10%
-CRIT +7 vs. Plant
+ดาเมจ CRIT +10%
+CRIT +7 ต่อพืช
 
 ::Cookie_Card //id 4293 - slotted on Accessory
 LUK +2
-+10% <color=#0000FF>Holy Light</color> damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Holy Light</color> +10%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Quve_Card //id 4294 - slotted on Accessory
-if Novice:
- +10% Autospell <color=#0000FF>Increase AGI 1</color> (self) on receive physical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ถ้าเป็น Novice:
+ โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Increase AGI 1</color> (ใส่ตัวเอง) เมื่อโดนโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Kraben_Card //id 4295 - slotted on Armor
-+6% chance of <color=#800000>Blind</color> on receive physical damage
+โอกาส 6% ทำให้ <color=#800000>ตาบอด</color> เมื่อโดนโจมตีกายภาพ
 
 ::Cramp_Card //id 4296 - slotted on Headgear
-+1% chance to find <color=#008080>1~500 zeny</color> on monster kill
-<color=#800080>Set Bonus</color>
+โอกาส 1% ได้ <color=#008080>1~500 zeny</color> เมื่อฆ่ามอน
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Tarou Card</color>
  STR +3
 
 ::Cruiser_Card //id 4297 - slotted on Weapon
-CRIT damage +10%
-CRIT +7 vs. Brute
+ดาเมจ CRIT +10%
+CRIT +7 ต่อสัตว์
 
 ::Creamy_Fear_Card //id 4298 - slotted on Armor
-+6% chance of <color=#800000>Chaos</color> on receive physical damage
+โอกาส 6% ทำให้ <color=#800000>สับสน</color> เมื่อโดนโจมตีกายภาพ
 
 ::Clock_Card //id 4299 - slotted on Armor
-+3% Autospell <color=#0000FF>Guard 3</color> on receive physical damage
-if <color=#0000FF>Guard 10</color>:
- Autospell <color=#0000FF>Guard 10</color> instead
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 3% ร่ายอัตโนมัติ <color=#0000FF>Guard 3</color> เมื่อโดนโจมตีกายภาพ
+ถ้าได้ <color=#0000FF>Guard 10</color>:
+ ร่ายอัตโนมัติ <color=#0000FF>Guard 10</color> แทน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Chimera_Card //id 4300 - slotted on Armor
-+3% chance of <color=#800000>Poison</color> on receive physical damage
-if Assassin:
- +9% chance instead
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 3% ทำให้ <color=#800000>พิษ</color> เมื่อโดนโจมตีกายภาพ
+ถ้าเป็น Assassin:
+ โอกาส 9% แทน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Killer_Mantis_Card //id 4301 - slotted on Armor
-+6% chance of <color=#800000>Bleed</color> on receive physical damage
+โอกาส 6% ทำให้ <color=#800000>เลือดออก</color> เมื่อโดนโจมตีกายภาพ
 
 ::Tao_Gunka_Card //id 4302 - slotted on Armor
 HP +100%, DEF -50, MDEF -50
 
 ::Giant_Whisper_Card //id 4303 - slotted on Garment
 FLEE +10
-if bSTR > 79: ATK +20
-if bVIT > 79: HP +3%
-if bLUK > 79: CRIT +3
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ถ้า STR พื้นฐาน > 79: ATK +20
+ถ้า VIT พื้นฐาน > 79: HP +3%
+ถ้า LUK พื้นฐาน > 79: CRIT +3
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Tamruan_Card //id 4304 - slotted on Shield
 DEF +2
-+10% <color=#0000FF>Smite</color>, <color=#0000FF>Shield Boomerang</color> damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Smite</color>, <color=#0000FF>Shield Boomerang</color> +10%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Turtle_General_Card //id 4305 - slotted on Weapon
-+20% physical damage
-+3% Autospell <color=#0000FF>Magnum Break 10</color> on non-skill attack
+ดาเมจกายภาพ +20%
+โอกาส 3% ร่ายอัตโนมัติ <color=#0000FF>Magnum Break 10</color> เมื่อโจมตีปกติ
 
 ::Toad_Card //id 4306 - slotted on Garment
 Perfect Dodge +1
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Roda Frog Card</color>
  FLEE +18, INT +2
 
 ::Beetle_King_Card //id 4307 - slotted on Weapon
-Recover 5 SP/melee kill vs. Fish
+ฟื้น SP 5 เมื่อฆ่าสัตว์น้ำ ด้วยระยะประชิด
 
 ::Tri_Joint_Card //id 4308 - slotted on Weapon
-Recover 5 SP/melee kill vs. Formless
+ฟื้น SP 5 เมื่อฆ่าไร้รูปร่าง ด้วยระยะประชิด
 
 ::Parasite_Card //id 4309 - slotted on Shield
 DEF +1
--5% damage from Neutral attacks
+รับดาเมจไร้ธาตุ -5%
 
 ::Panzer_Goblin_Card //id 4310 - slotted on Weapon
-CRIT damage +10%
-CRIT +7 vs. Demon
+ดาเมจ CRIT +10%
+CRIT +7 ต่อปีศาจ
 
 ::Permeter_Card //id 4311 - slotted on Headgear
--15% damage from Shadow, Decay attacks
+รับดาเมจธาตุมืด, ธาตุเน่าเปื่อย -15%
  
 ::Fur_Seal_Card //id 4312 - slotted on Weapon
 HIT +10, FLEE +3
-if Acolyte:
- CRIT +9 vs. Undead, Demon
+ถ้าเป็น Acolyte:
+ CRIT +9 ต่ออันเดด, ปีศาจ
 
 ::Punk_Card //id 4313 - slotted on Garment
-+5% Autospell <color=#0000FF>Quagmire 1</color> on receive physical damage
-if <color=#0000FF>Quagmire 5</color>:
- Autospell <color=#0000FF>Quagmire 5</color> instead
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Quagmire 1</color> เมื่อโดนโจมตีกายภาพ
+ถ้าได้ <color=#0000FF>Quagmire 5</color>:
+ ร่ายอัตโนมัติ <color=#0000FF>Quagmire 5</color> แทน
 
 ::Penomena_Card //id 4314 - slotted on Shield
--30% damage from Formless
+รับดาเมจจากไร้รูปร่าง -30%
 
 ::Pest_Card //id 4315 - slotted on Armor
-+3% chance of <color=#800000>Petrify</color> on receive physical damage
-if bINT > 76:
- +9% chance instead
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 3% ทำให้ <color=#800000>กลายเป็นหิน</color> เมื่อโดนโจมตีกายภาพ
+ถ้า INT พื้นฐาน > 76:
+ โอกาส 9% แทน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::False_Angel_Card //id 4316 - slotted on Weapon
-Recover 5 SP/melee kill vs. Angel
+ฟื้น SP 5 เมื่อฆ่าเทวดา ด้วยระยะประชิด
 //Lose 5 SP/unequip
 //<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
 
 ::Mobster_Card //id 4317 - slotted on Weapon
-CRIT damage +15%
-If Thief: CRIT +4
+ดาเมจ CRIT +15%
+ถ้าเป็น Thief: CRIT +4
 
 
 ::Stormy_Knight_Card //id 4318 - slotted on Weapon
-+20% chance of <color=#800000>Freeze</color> on physical attack
-+2% Autospell <color=#0000FF>Storm Gust 2</color> on non-skill attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 20% ทำให้ <color=#800000>แช่แข็ง</color> เมื่อโจมตีกายภาพ
+โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Storm Gust 2</color> เมื่อโจมตีปกติ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Freezer_Card //id 4319 - slotted on Boots
 HP +300
-if Refine > 8:
- +10% <color=#0000FF>Bash</color> damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ถ้าตีบวก > 8:
+ ดาเมจ <color=#0000FF>Bash</color> +10%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Bloody_Knight_Card //id 4320 - slotted on Weapon
-+2% Autospell <color=#0000FF>Meteor Storm 1</color> on non-skill attack
+โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Meteor Storm 1</color> เมื่อโจมตีปกติ
 
 ::Hylozoist_Card //id 4321 - slotted on Accessory
-+1% chance of polymorph vs. non-Boss monster on physical attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 1% แปลงร่างมอนที่ไม่ใช่บอส เมื่อโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::High_Orc_Card //id 4322 - slotted on Shield
 DEF +1
-+5% melee damage reflect
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+สะท้อนดาเมจระยะประชิด 5%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Hati_Baby_Card //id 4323 - slotted on Weapon
-+5% Autospell <color=#0000FF>Frost Diver 3</color> on non-skill attack
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Frost Diver 3</color> เมื่อโจมตีปกติ
 
 ::Hati_Card //id 4324 - slotted on Armor
-+50% chance of <color=#800000>Freeze</color> on receive physical damage
+โอกาส 50% ทำให้ <color=#800000>แช่แข็ง</color> เมื่อโดนโจมตีกายภาพ
 
 ::Harpy_Card //id 4325 - slotted on Garment
-+5% <color=#0000FF>Napalm Beat</color> damage
--15% damage from Neutral attacks
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Napalm Beat</color> +5%
+รับดาเมจไร้ธาตุ -15%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Sea_Otter_Card //id 4326 - slotted on Accessory
-+3% chance to find <color=#008080>Sushi</color>, <color=#008080>Raw Fish</color> on Fish kill
-+50% recovery from <color=#008080>Sushi</color>, <color=#008080>Raw Fish</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 3% ได้ <color=#008080>Sushi</color>, <color=#008080>Raw Fish</color> เมื่อฆ่าสัตว์น้ำ
+ฟื้นฟูจาก <color=#008080>Sushi</color>, <color=#008080>Raw Fish</color> +50%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Bloody_Butterfly_Card //id 4327 - slotted on Accessory
-Cast Time +30%
-+5% <color=#0000FF>Fire Wall</color> damage
-Uninterruptible Cast
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+เวลาร่าย +30%
+ดาเมจ <color=#0000FF>Fire Wall</color> +5%
+ร่ายสกิลไม่ถูกขัดจังหวะ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Yao_Jun_Card //id 4328 - slotted on Garment
 FLEE +15, CRIT +1
 
 ::Phendark_Card //id 4329 - slotted on Weapon
-Recover 5 SP/melee kill vs. Demi-Human
+ฟื้น SP 5 เมื่อฆ่ามนุษย์ ด้วยระยะประชิด
 
 ::Evil_Snake_Lord_Card //id 4330 - slotted on Headgear
 INT +3
-+100% <color=#800000>Blind</color>, <color=#800000>Curse</color> resist
+ต้านทาน <color=#800000>ตาบอด</color>, <color=#800000>สาป</color> +100%
 
 ::Heater_Card //id 4331 - slotted on Accessory
 CRIT +3
-If Swordman:
+ถ้าเป็น Swordman:
  Perfect Dodge +3
 
 ::Waste_Stove_Card //id 4332 - slotted on Armor
 INT +1, ATK +5
 
 ::Venomous_Card //id 4333 - slotted on Armor
-+30% chance of <color=#800000>Poison</color> on receive physical damage
-+30% chance of <color=#800000>Poison</color> (self) on receive physical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 30% ทำให้ <color=#800000>พิษ</color> เมื่อโดนโจมตีกายภาพ
+โอกาส 30% ติด <color=#800000>พิษ</color> เอง เมื่อโดนโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Noxious_Card //id 4334 - slotted on Garment
--10% damage from Neutral attacks
--10% damage from range
+รับดาเมจไร้ธาตุ -10%
+รับดาเมจระยะไกล -10%
 
 ::Pitman_Card //id 4335 - slotted on Weapon
-+5% <color=#0000FF>Earth Spike</color>, <color=#0000FF>Heaven's Drive</color> damage
-Lose 50 SP/unequip
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Earth Spike</color>, <color=#0000FF>Heaven's Drive</color> +5%
+เสีย SP 50 เมื่อถอด
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Ungoliant_Card //id 4336 - slotted on Headgear
-HP Regeneration +10%
-+100% <color=#800000>Bleed</color> resist
+ฟื้นฟู HP +10%
+ต้านทาน <color=#800000>เลือดออก</color> +100%
 
 ::Porcellio_Card //id 4337 - slotted on Armor
 ATK +25, DEF -5
 
 ::Obsidian_Card //id 4338 - slotted on Armor
-VIT +(floor bDEX/18)
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+VIT +(DEX พื้นฐาน/18 ปัดลง)
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Mineral_Card //id 4339 - slotted on Armor
 ATK -25, DEF +3
 
 ::Teddy_Bear_Card //id 4340 - slotted on Shield
--30% damage from Undead
+รับดาเมจจากอันเดด -30%
 
 ::Metaling_Card //id 4341 - slotted on Weapon
-+5% Autospell <color=#0000FF>Divest Weapon 1</color> on non-skill attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Divest Weapon 1</color> เมื่อโจมตีปกติ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::RSX-0806_Card //id 4342 - slotted on Armor
 VIT +3
-Knockback Immunity
-Indestructible Armor
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ไม่ถูกผลักถอยหลัง
+เกราะไม่แตก
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Holden_Card //id 4343 - slotted on Headgear
 LUK +2
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Baby Leopard Card</color>
  <color=#008080>Zipper Bear Card</color>
  <color=#008080>Raggler Card</color>
  <color=#008080>Muka Card</color>
  HP +7%, SP +7%, STR +4
- +20% <color=#0000FF>Mammonite</color> damage
- Recover 1 SP/physical attack
- if Alchemist:
-  +1% Autospell <color=#0000FF>Adrenaline Rush 1</color> on non-skill attack
-  +0.03% chance to find <color=#008080>Glistening Coat</color> on monster kill
-  +0.1% chance to find <color=#008080>Stem</color> on monster kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ ดาเมจ <color=#0000FF>Mammonite</color> +20%
+ ฟื้น SP 1 ต่อการโจมตีกายภาพ
+ ถ้าเป็น Alchemist:
+  โอกาส 1% ร่ายอัตโนมัติ <color=#0000FF>Adrenaline Rush 1</color> เมื่อโจมตีปกติ
+  โอกาส 0.03% ได้ <color=#008080>Glistening Coat</color> เมื่อฆ่ามอน
+  โอกาส 0.1% ได้ <color=#008080>Stem</color> เมื่อฆ่ามอน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Anopheles_Card //id 4344 - slotted on Accessory
-+0.5 chance to find <color=#008080>Tentacle Cheese Gratin</color> on Insect kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 0.5% ได้ <color=#008080>Tentacle Cheese Gratin</color> เมื่อฆ่าแมลง
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Hill_Wind_Card //id 4345 - slotted on Weapon
-+5% <color=#0000FF>Thunderstorm</color>, <color=#0000FF>Jupitel Thunder</color>, <color=#0000FF>Lord of Vermilion</color> damage
-Lose 50 SP/unequip
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Thunderstorm</color>, <color=#0000FF>Jupitel Thunder</color>, <color=#0000FF>Lord of Vermilion</color> +5%
+เสีย SP 50 เมื่อถอด
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Egnigem_Cenia_Card //id 4346 - slotted on Armor
-STR +(floor bINT/18)
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+STR +(INT พื้นฐาน/18 ปัดลง)
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Armeyer_Dinze_Card //id 4347 - slotted on Accessory
-+0.5% chance to find <color=#008080>Clam Soup</color> on Fish kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 0.5% ได้ <color=#008080>Clam Soup</color> เมื่อฆ่าสัตว์น้ำ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Wickebine_Tres_Card //id 4348 - slotted on Accessory
-+5% Autospell <color=#0000FF>Strip Armor 1</color> on non-skill attack
-<color=#800080>Set Bonus</color>
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Strip Armor 1</color> เมื่อโจมตีปกติ
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Wanderer Card</color>
  <color=#008080>Wild Rose Card</color>
  <color=#008080>Stainer Card</color>
  <color=#008080>Shinobi Card</color>
  STR +6, AGI +4
- +10% <color=#0000FF>Backstab</color> damage
- if <color=#0000FF>Divest Armor 5</color>:
-  +5% Autospell <color=#0000FF>Divest Armor 5</color> on non-skill attack
- if Rogue:
-  SP Consumption -20%
-  -2% Autospell <color=#0000FF>Snatch 1</color> on non-skill attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ ดาเมจ <color=#0000FF>Backstab</color> +10%
+ ถ้าได้ <color=#0000FF>Divest Armor 5</color>:
+  โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Divest Armor 5</color> เมื่อโจมตีปกติ
+ ถ้าเป็น Rogue:
+  ใช้ SP -20%
+  โอกาส -2% ร่ายอัตโนมัติ <color=#0000FF>Snatch 1</color> เมื่อโจมตีปกติ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Errende_Ebecee_Card //id 4349 - slotted on Accessory
-+5% Autospell <color=#0000FF>Pneuma</color> on receive physical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Pneuma</color> เมื่อโดนโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Laurell_Weinder_Card //id 4350 - slotted on Weapon
-+5% <color=#0000FF>Frost Nova</color>, <color=#0000FF>Storm Gust</color> damage
-Lose 50 SP/unequip
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Frost Nova</color>, <color=#0000FF>Storm Gust</color> +5%
+เสีย SP 50 เมื่อถอด
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Kavach_Icarus_Card //id 4351 - slotted on Garment
 FLEE +10
-if Refine < 5:
+ถ้าตีบวก < 5:
  FLEE +10
  Perfect Dodge +1
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Swordman_Card //id 4352 - slotted on Boots
 HP +10%, SP +10%
-Recover 50 HP and 10 SP/10 seconds
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ฟื้น HP 50 และ SP 10 ทุก 10 วินาที
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Remover_Card //id 4353 - slotted on Armor
-HP +(800 - 40*Refine)
-HP Regeneration +10%
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+HP +(800 - 40×ตีบวก)
+ฟื้นฟู HP +10%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Gemini-S58_Card //id 4354 - slotted on Headgear
-if bAGI > 89:
- +30% <color=#800000>Stun</color>, <color=#800000>Silence</color> resist
-if bVIT > 79:
- +50% <color=#800000>Petrify</color>, <color=#800000>Sleep</color> resist
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ถ้า AGI พื้นฐาน > 89:
+ ต้านทาน <color=#800000>สตัน</color>, <color=#800000>ใบ้</color> +30%
+ถ้า VIT พื้นฐาน > 79:
+ ต้านทาน <color=#800000>กลายเป็นหิน</color>, <color=#800000>หลับ</color> +50%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Gremlin_Card //id 4355 - slotted on Accessory
-+0.5% chance to find <color=#008080>Bomber Steak</color> on Brute kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 0.5% ได้ <color=#008080>Bomber Steak</color> เมื่อฆ่าสัตว์
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Beholder_Card //id 4356 - slotted on Accessory
-Enable <color=#0000FF>Cast Cancel 1</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ใช้ <color=#0000FF>Cast Cancel 1</color> ได้
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Lord_Knight_Card //id 4357 - slotted on Headgear
 HP -50%
-Enable <color=#0000FF>Berserk</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ใช้ <color=#0000FF>Berserk</color> ได้
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Seyren_Windsor_Card //id 4358 - slotted on Headgear
-STR +(Refine - 6)
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+STR +(ตีบวก - 6)
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Assassin_Cross_Card //id 4359 - slotted on Garment
-Enable <color=#0000FF>Cloak 3</color>
+ใช้ <color=#0000FF>Cloak 3</color> ได้
 
 ::Eremes_Guile_Card //id 4360 - slotted on Weapon
-CRIT +10 vs. Demi-Human
+CRIT +10 ต่อมนุษย์
 
 ::Mastersmith_Card //id 4361 - slotted on Weapon
-+10% chance WpnBreak on physical attack
-+7% chance ArmorBreak on physical attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 10% ทำอาวุธศัตรูแตก เมื่อโจมตีกายภาพ
+โอกาส 7% ทำเกราะศัตรูแตก เมื่อโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Howard_Alt-Eisen_Card //id 4362 - slotted on Weapon
 HIT +30, ASPD -5%
 
 ::High_Priest_Card //id 4363 - slotted on Armor
-+5% Autospell <color=#0000FF>Assumptio 1</color> on receive damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Assumptio 1</color> เมื่อโดนโจมตี
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Margaretha_Sorin_Card //id 4364 - slotted on Headgear
 INT +1
-+15% Autospell <color=#0000FF>Lex Divina 5</color> on receive magical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 15% ร่ายอัตโนมัติ <color=#0000FF>Lex Divina 5</color> เมื่อโดนโจมตีเวท
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::High_Wizard_Card //id 4365 - slotted on Headgear
-SP Regeneration -100%
-Cast Time +100%
-+100% MDEF ignore vs. non-Boss
-Lose 2,000 SP/unequip
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ฟื้นฟู SP -100%
+เวลาร่าย +100%
+เจาะ MDEF 100% กับมอนที่ไม่ใช่บอส
+เสีย SP 2,000 เมื่อถอด
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Kathryne_Keyron_Card //id 4366 - slotted on Headgear
-Cast Time -(Refine)%
-if Refine > 8: MATK +2%
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+เวลาร่าย -(ตีบวก)%
+ถ้าตีบวก > 8: MATK +2%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Sniper_Card //id 4367 - slotted on Weapon
-HP Regeneration -10%
-+5% chance to recover 20% physical damage as HP
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ฟื้นฟู HP -10%
+โอกาส 5% ดูดดาเมจกายภาพ 20% กลับมาเป็น HP
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Cecil_Damon_Card //id 4368 - slotted on Weapon
 HIT -30, ASPD +10%
 
 ::Venatu_Card //id 4369 - slotted on Armor
-LUK +(floor bAGI/18)
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+LUK +(AGI พื้นฐาน/18 ปัดลง)
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Dimik_Card //id 4370 - slotted on Armor
-VIT +(Refine - 5)
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+VIT +(ตีบวก - 5)
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Archdam_Card //id 4371 - slotted on Armor
-ATK +10, Cast Time +20%
-<color=#800080>Set Bonus</color>
+ATK +10, เวลาร่าย +20%
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Permeter Card</color>
  <color=#008080>Freezer Card</color>
  <color=#008080>Heater Card</color>
  STR +1, INT +1, DEF +2
- SP Regeneration +10%
- Cast Time -10%
- +10% <color=#0000FF>Rapid Smiting</color>, <color=#0000FF>Martyr's Reckoning</color> damage
- if Crusader:
-  Holy Property Armor
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ ฟื้นฟู SP +10%
+ เวลาร่าย -10%
+ ดาเมจ <color=#0000FF>Rapid Smiting</color>, <color=#0000FF>Martyr's Reckoning</color> +10%
+ ถ้าเป็น Crusader:
+  เกราะธาตุศักดิ์สิทธิ์
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::White_Lady_Card //id 4372 - slotted on Headgear
-SP Consumption +15%
-+30% <color=#0000FF>heal skill</color> recovery
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ใช้ SP +15%
+ฟื้นฟูจาก <color=#0000FF>heal skill</color> +30%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Green_Maiden_Card //id 4373 - slotted on Garment
-LUK +(Refine - 5)
-CRIT +(Refine)
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+LUK +(ตีบวก - 5)
+CRIT +(ตีบวก)
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Vesper_Card //id 4374 - slotted on Headgear
 DEX +2
-+30% MDEF ignore vs. Boss
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+เจาะ MDEF 30% กับบอส
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Orc_Baby_Card //id 4375 - slotted on Garment
 FLEE +10
--10% damage from Neutral attacks
-if Refine > 8:
+รับดาเมจไร้ธาตุ -10%
+ถ้าตีบวก > 8:
  FLEE +5
- -5% damage from Neutral attacks
+ รับดาเมจไร้ธาตุ -5%
 
 ::Lady_Tanee_Card //id 4376 - slotted on Boots
 HP -40%, SP +50%
-+2% chance to find <color=#008080>Banana</color> on monster kill
-+100% recovery from <color=#008080>Banana</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 2% ได้ <color=#008080>Banana</color> เมื่อฆ่ามอน
+ฟื้นฟูจาก <color=#008080>Banana</color> +100%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Grove_Card //id 4377 - slotted on Accessory
-+0.5% chance to find <color=#008080>Fruit Mix</color> on Formless kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 0.5% ได้ <color=#008080>Fruit Mix</color> เมื่อฆ่าไร้รูปร่าง
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Gold_Acidus_Card //id 4378 - slotted on Boots
 HP +4%, SP +4%
-if Refine < 5:
+ถ้าตีบวก < 5:
  HP +4%, SP +4%
- HP Regeneration +5%
- SP Regeneration +5%
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ ฟื้นฟู HP +5%
+ ฟื้นฟู SP +5%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Blue_Acidus_Card //id 4379 - slotted on Headgear
 SP +40
-if Refine < 5:
- SP +40, SP Regeneration +5%
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ถ้าตีบวก < 5:
+ SP +40, ฟื้นฟู SP +5%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Red_Ferus_Card //id 4380 - slotted on Weapon
-+5% <color=#0000FF>Fire Pillar</color>, <color=#0000FF>Meteor Storm</color> damage
-Lose 50 SP/unequip
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Fire Pillar</color>, <color=#0000FF>Meteor Storm</color> +5%
+เสีย SP 50 เมื่อถอด
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Green_Ferus_Card //id 4381 - slotted on Boots
 HP +10%, VIT +1
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Cruiser Card</color>
  <color=#008080>Anolian Card</color>
  <color=#008080>Dragon Tail Card</color>
  <color=#008080>Alligator Card</color>
  DEX +5
- +5% <color=#0000FF>Arrow Vulcan</color> damage
- +10% <color=#0000FF>Melody Strike</color>, <color=#0000FF>Sling Arrow</color> damage
- if Performer:
-  +5% Autospell <color=#0000FF>Tarot Card of Fate 2</color> on receive physical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ ดาเมจ <color=#0000FF>Arrow Vulcan</color> +5%
+ ดาเมจ <color=#0000FF>Melody Strike</color>, <color=#0000FF>Sling Arrow</color> +10%
+ ถ้าเป็น Performer:
+  โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Tarot Card of Fate 2</color> เมื่อโดนโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Yellow_Novus_Card //id 4382 - slotted on Armor
 HP +500
-HP Regeneration +10%
-<color=#800080>Set Bonus</color>
+ฟื้นฟู HP +10%
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Evil Nymph Card</color>
  <color=#008080>Harpy Card</color>
  <color=#008080>Bloody Butterfly Card</color>
  <color=#008080>Miyabi Doll Card</color>
  INT +3
- +10% <color=#0000FF>Thunderstorm</color>, <color=#0000FF>Heaven's Drive</color> damage
- if Sage:
-  Cast Time -20%
-  +20% chance to reflect single target magic
-  +1% chance to find <color=#008080>Red Gemstone</color>, <color=#008080>Yellow Gemstone</color> on monster kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ ดาเมจ <color=#0000FF>Thunderstorm</color>, <color=#0000FF>Heaven's Drive</color> +10%
+ ถ้าเป็น Sage:
+  เวลาร่าย -20%
+  โอกาส 20% สะท้อนเวทเป้าหมายเดียว
+  โอกาส 1% ได้ <color=#008080>Red Gemstone</color>, <color=#008080>Yellow Gemstone</color> เมื่อฆ่ามอน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Red_Novus_Card //id 4383 - slotted on Armor
-+30% chance of <color=#800000>Chaos</color> on receive physical damage
-+30% chance of <color=#800000>Chaos</color> (self) on receive physical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 30% ทำให้ <color=#800000>สับสน</color> เมื่อโดนโจมตีกายภาพ
+โอกาส 30% ติด <color=#800000>สับสน</color> เอง เมื่อโดนโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Hydrolancer_Card //id 4384 - slotted on Accessory
-+10% Autospell <color=#0000FF>Spell Breaker 1</color> on non-skill attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Spell Breaker 1</color> เมื่อโจมตีปกติ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Dragon_Egg_Card //id 4385 - slotted on Accessory
-+0.5% chance to find <color=#008080>Honey Herbal Tea</color> on Dragon kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 0.5% ได้ <color=#008080>Honey Herbal Tea</color> เมื่อฆ่ามังกร
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Detale_Card //id 4386 - slotted on Armor
 MDEF -20
-+100% <color=#800000>Freeze</color> resist
-+7% Autospell <color=#0000FF>Magnetic Earth 1</color> on receive magical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ต้านทาน <color=#800000>แช่แข็ง</color> +100%
+โอกาส 7% ร่ายอัตโนมัติ <color=#0000FF>Magnetic Earth 1</color> เมื่อโดนโจมตีเวท
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Ancient_Mimic_Card //id 4387 - slotted on Armor
-AGI +(floor bLUK/18)
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+AGI +(LUK พื้นฐาน/18 ปัดลง)
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Death_Word_Card //id 4388 - slotted on Weapon
-+5% <color=#0000FF>Napalm Beat</color>, <color=#0000FF>Soul Strike</color>, <color=#0000FF>Napalm Vulcan</color> damage
-Lose 50 SP/unequip
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Napalm Beat</color>, <color=#0000FF>Soul Strike</color>, <color=#0000FF>Napalm Vulcan</color> +5%
+เสีย SP 50 เมื่อถอด
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Plasma_Card //id 4389 - slotted on Accessory
-+0.5% chance to find <color=#008080>Fireproof Potion</color>, <color=#008080>Coldproof Potion</color>, <color=#008080>Earthproof Potion</color>, <color=#008080>Thunderproof Potion</color> on monster kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 0.5% ได้ <color=#008080>Fireproof Potion</color>, <color=#008080>Coldproof Potion</color>, <color=#008080>Earthproof Potion</color>, <color=#008080>Thunderproof Potion</color> เมื่อฆ่ามอน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Breeze_Card //id 4390 - slotted on Weapon
 ATK +5
-+5% chance of <color=#800000>Bleed</color> on physical attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 5% ทำให้ <color=#800000>เลือดออก</color> เมื่อโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Baroness_of_Retribution_Card //id 4391 - slotted on Accessory
-+0.5% chance to find <color=#008080>Fried Sweet Potato</color> on Angel kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 0.5% ได้ <color=#008080>Fried Sweet Potato</color> เมื่อฆ่าเทวดา
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Dame_of_Sentinel_Card //id 4392 - slotted on Armor
-DEX +(floor bVIT/18)
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+DEX +(VIT พื้นฐาน/18 ปัดลง)
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Mistress_of_Shelter_Card //id 4393 - slotted on Armor
-INT +(floor bSTR/18)
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+INT +(STR พื้นฐาน/18 ปัดลง)
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Lady_Solace_Card //id 4394 - slotted on Weapon
-if Priest:
- +2% Autospell <color=#0000FF>Grand Cross 5</color> on non-skill attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ถ้าเป็น Priest:
+ โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Grand Cross 5</color> เมื่อโจมตีปกติ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Thanatos_Maero_Card //id 4395 - slotted on Weapon
 ATK +5
-+5% Autospell <color=#0000FF>Decrease AGI 3</color> on non-skill attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Decrease AGI 3</color> เมื่อโจมตีปกติ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Thanatos_Odium_Card //id 4396 - slotted on Boots
-AGI +(Refine - 5)
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+AGI +(ตีบวก - 5)
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Thanatos_Despero_Card //id 4397 - slotted on Shield
-INT +(Refine - 6)
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+INT +(ตีบวก - 6)
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Thanatos_Dolor_Card //id 4398 - slotted on Weapon
-+10% magical damage vs. Angel
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจเวท +10% ต่อเทวดา
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Thanatos_Phantom_Card //id 4399 - slotted on Weapon
 DEF -30, FLEE -30
-Physical Damage Scales with Enemy Defense
-Lose 1 SP/physical attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจกายภาพแปรผันตาม DEF ของศัตรู
+เสีย SP 1 ต่อการโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Aliza_Card //id 4400 - slotted on Armor
-+5% Autospell <color=#0000FF>Charming Wink</color> on receive physical damage
-if Dancer:
- 10% Autospell instead
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Charming Wink</color> เมื่อโดนโจมตีกายภาพ
+ถ้าเป็น Dancer:
+ โอกาส 10% แทน
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Alicel_Card //id 4401 - slotted on Armor
 DEF -5, FLEE +10
 
 ::Aliot_Card //id 4402 - slotted on Garment
-if Swordman, Merchant, Thief:
+ถ้าเป็น Swordman, Merchant, Thief:
  HP +5%, STR +2
-if Acolyte, Mage, Archer:
+ถ้าเป็น Acolyte, Mage, Archer:
  SP +5%, INT +2
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Kiel_D-01_Card //id 4403 - slotted on Headgear
-Cast Delay -30%
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดีเลย์หลังร่าย -30%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Skogul_Card //id 4404 - slotted on Armor
-+30% chance of <color=#800000>Bleed</color> on receive physical damage
-+30% chance of <color=#800000>Bleed</color> (self) on receive physical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 30% ทำให้ <color=#800000>เลือดออก</color> เมื่อโดนโจมตีกายภาพ
+โอกาส 30% ติด <color=#800000>เลือดออก</color> เอง เมื่อโดนโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Frus_Card //id 4405 - slotted on Armor
-+(2*Refine)% chance single target magic reflect
-if Mage: MDEF +3
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส (2×ตีบวก)% สะท้อนเวทเป้าหมายเดียว
+ถ้าเป็น Mage: MDEF +3
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Skeggiold_Card //id 4406 - slotted on Weapon
-+2% magical damage vs. Demon
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจเวท +2% ต่อปีศาจ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Valkyrie_Randgris_Card //id 4407 - slotted on Weapon
-+10% physical damage
-+5% Autospell <color=#0000FF>Dispell 1</color> on non-skill attack
-Indestructible Weapon
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจกายภาพ +10%
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Dispell 1</color> เมื่อโจมตีปกติ
+อาวุธไม่แตก
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Gloom_Under_Night_Card //id 4408 - slotted on Armor
-+40% physical damage vs. Holy, Shadow, Angel, Demon
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจกายภาพ +40% ต่อธาตุศักดิ์สิทธิ์, ธาตุมืด, เทวดา, ปีศาจ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Agav_Card //id 4409 - slotted on Armor
 DEF -10, MATK +5%
-if Mage: SP +100
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ถ้าเป็น Mage: SP +100
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Echio_Card //id 4410 - slotted on Armor
 ATK +15
-if Swordman: HP +500
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ถ้าเป็น Swordman: HP +500
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Vanberk_Card //id 4411 - slotted on Headgear
 STR +2
-+0.5% chance of CRIT +100 for 5 seconds on physical attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 0.5% ได้ CRIT +100 นาน 5 วินาที เมื่อโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Isilla_Card //id 4412 - slotted on Headgear
 INT +2
-+5% chance of FLEE +30, Cast Time -50% for 5 seconds on magical attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 5% ได้ FLEE +30, เวลาร่าย -50% นาน 5 วินาที เมื่อโจมตีเวท
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Hodremlin_Card //id 4413 - slotted on Shield
--15% damage from Small, Medium, Large
-+0.3% chance of Perfect Dodge +30 for 10 seconds on receive damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+รับดาเมจจากขนาดเล็ก, ขนาดกลาง, ขนาดใหญ่ -15%
+โอกาส 0.3% ได้ Perfect Dodge +30 นาน 10 วินาที เมื่อโดนโจมตี
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Seeker_Card //id 4414 - slotted on Shield
 MDEF +10
-+30% <color=#800000>Petrify</color> resist
-Enable <color=#0000FF>Stone Curse 1</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ต้านทาน <color=#800000>กลายเป็นหิน</color> +30%
+ใช้ <color=#0000FF>Stone Curse 1</color> ได้
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Snowier_Card //id 4415 - slotted on Accessory
-+20% chance to find <color=#008080>Ice Cream</color> on monster kill
-+100% recovery from <color=#008080>Ice Cream</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 20% ได้ <color=#008080>Ice Cream</color> เมื่อฆ่ามอน
+ฟื้นฟูจาก <color=#008080>Ice Cream</color> +100%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Siroma_Card //id 4416 - slotted on Accessory
-+25% <color=#0000FF>Cold Bolt</color> damage
--25% <color=#0000FF>Cold Bolt</color> Cast Time
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Cold Bolt</color> +25%
+-25% <color=#0000FF>Cold Bolt</color> เวลาร่าย
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Ice_Titan_Card //id 4417 - slotted on Boots
 VIT +2
-+0.3% chance DEF +10 for 10 seconds on receive damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 0.3% ได้ DEF +10 นาน 10 วินาที เมื่อโดนโจมตี
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Gazeti_Card //id 4418 - slotted on Accessory
-+10% Autospell <color=#0000FF>Cold Bolt 2</color> on non-skill attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Cold Bolt 2</color> เมื่อโจมตีปกติ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Ktullanux_Card //id 4419 - slotted on Armor
-+50% physical damage vs. Fire
-+2% Autospell <color=#0000FF>Frost Nova 10</color> on receive damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจกายภาพ +50% ต่อธาตุไฟ
+โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Frost Nova 10</color> เมื่อโดนโจมตี
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Muscipular_Card //id 4420 - slotted on Shield
-+10% Autospell <color=#0000FF>Heal 1</color>, <color=#0000FF>Increase AGI 1</color> on receive physical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Heal 1</color>, <color=#0000FF>Increase AGI 1</color> เมื่อโดนโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Drosera_Card //id 4421 - slotted on Weapon
-CRIT +15 (range attack)
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+CRIT +15 (โจมตีระยะไกล)
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Roween_Card //id 4422 - slotted on Garment
 FLEE +5, Perfect Dodge +3
-+10% physical damage vs. Water
-CRIT +15 vs. Aquatic
+ดาเมจกายภาพ +10% ต่อธาตุน้ำ
+CRIT +15 ต่อสัตว์น้ำ
 
 ::Galion_Card //id 4423 - slotted on Accessory
 HIT +5
-+5% physical damage vs. Water
+ดาเมจกายภาพ +5% ต่อธาตุน้ำ
 
 ::Stapo_Card //id 4424 - slotted on Accessory
-Enable <color=#0000FF>Find Stone</color>, <color=#0000FF>Stone Fling</color>
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ใช้ <color=#0000FF>Find Stone</color>, <color=#0000FF>Stone Fling</color> ได้
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Atroce_Card //id 4425 - slotted on Weapon
 ATK +25
-+1% chance of ASPD +100% for 10 seconds on physical attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 1% ได้ ASPD +100% นาน 10 วินาที เมื่อโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Byorgue_Card //id 4426 - slotted on Armor
-if Rogue:
+ถ้าเป็น Rogue:
  MATK +10%
- +10% physical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ ดาเมจกายภาพ +10%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Sword_Guardian_Card //id 4427 - slotted on Weapon
-if One or Two-Handed Sword:
+ถ้าใช้ดาบมือเดียวหรือสองมือ:
  HIT +5, CRIT +5
- +25% <color=#0000FF>Bowling Bash</color> damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ ดาเมจ <color=#0000FF>Bowling Bash</color> +25%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Bow_Guardian_Card //id 4428 - slotted on Weapon
-if Bow:
+ถ้าใช้ธนู:
  HIT +5, CRIT +5
- +50% <color=#0000FF>Arrow Shower</color> damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ ดาเมจ <color=#0000FF>Arrow Shower</color> +50%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Salamander_Card //id 4429 - slotted on Garment
-+40% <color=#0000FF>Fire Pillar</color>, <color=#0000FF>Meteor Storm</color> damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Fire Pillar</color>, <color=#0000FF>Meteor Storm</color> +40%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Ifrit_Card //id 4430 - slotted on Accessory
-CRIT +0.1*jLv 
-ATK +floor(jLv/10), HIT +floor(jLv/10)
-+1% Autospell <color=#0000FF>Earthquake 2</color> on receive physical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+CRIT +0.1×Job Lv 
+ATK +(Job Lv/10 ปัดลง), HIT +(Job Lv/10 ปัดลง)
+โอกาส 1% ร่ายอัตโนมัติ <color=#0000FF>Earthquake 2</color> เมื่อโดนโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Kasa_Card //id 4431 - slotted on Garment
-+2% Autospell <color=#0000FF>Fireball 5</color>, <color=#0000FF>Fire Bolt 5</color> on non-skill attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Fireball 5</color>, <color=#0000FF>Fire Bolt 5</color> เมื่อโจมตีปกติ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Magmaring_Card //id 4432 - slotted on Garment
 ATK +5
-+10% physical damage vs. Earth
-CRIT +15 vs. Plant, Brute
+ดาเมจกายภาพ +10% ต่อธาตุดิน
+CRIT +15 ต่อพืช, สัตว์
 
 ::Imp_Card //id 4433 - slotted on Accessory
-+25% <color=#0000FF>Fire Bolt</color> damage
--25% <color=#0000FF>Fire Bolt</color> Cast Time
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจ <color=#0000FF>Fire Bolt</color> +25%
+-25% <color=#0000FF>Fire Bolt</color> เวลาร่าย
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Knocker_Card //id 4434 - slotted on Headgear
-+5% physical damage vs. Formless
-+0.1% chance to find <color=#008080>Rough Oridecon</color>, <color=#008080>Rough Elunium</color> on Formless kill
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจกายภาพ +5% ต่อไร้รูปร่าง
+โอกาส 0.1% ได้ <color=#008080>Rough Oridecon</color>, <color=#008080>Rough Elunium</color> เมื่อฆ่าไร้รูปร่าง
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Zombie_Slaughterer_Card //id 4435 - slotted on Boots
-+1% physical, magical damage vs. Demi-Human
-Recover 50 HP/melee kill
-<color=#800080>Set Bonus</color>
+ดาเมจกายภาพและเวท +1% ต่อมนุษย์
+ฟื้น HP 50 เมื่อฆ่าด้วยระยะประชิด
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Ragged Zombie Card</color>
- Recover 2 SP/melee kill vs. Demi-Human
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ ฟื้น SP 2 เมื่อฆ่ามนุษย์ ด้วยระยะประชิด
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Ragged_Zombie_Card //id 4436 - slotted on Accessory
-CRIT +5 vs. Demi-Human
-+1% physical, magical damage vs. Demi-Human
-+0.1% chance of <color=#800000>Bleed</color> (self) on melee attack
-<color=#800080>Set Bonus</color>
+CRIT +5 ต่อมนุษย์
+ดาเมจกายภาพและเวท +1% ต่อมนุษย์
+โอกาส 0.1% ติด <color=#800000>เลือดออก</color> เอง เมื่อโจมตีระยะประชิด
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Zombie Slaughter Card</color>
- Recover 2 SP/melee kill vs. Demi-Human
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ ฟื้น SP 2 เมื่อฆ่ามนุษย์ ด้วยระยะประชิด
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Hell_Poodle_Card //id 4437 - slotted on Accessory
 HIT +1
-+100% recovery from <color=#008080>Meat</color>
-+0.5% chance of <color=#800000>Bleed</color> on melee attack
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ฟื้นฟูจาก <color=#008080>Meat</color> +100%
+โอกาส 0.5% ทำให้ <color=#800000>เลือดออก</color> เมื่อโจมตีระยะประชิด
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Banshee_Card //id 4438 - slotted on Headgear
-if Mage: HP -100, SP +100
-+20% <color=#0000FF>Soul Strike</color>, <color=#0000FF>Napalm Beat</color>, <color=#0000FF>Napalm Vulcan</color> damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ถ้าเป็น Mage: HP -100, SP +100
+ดาเมจ <color=#0000FF>Soul Strike</color>, <color=#0000FF>Napalm Beat</color>, <color=#0000FF>Napalm Vulcan</color> +20%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Flame_Skull_Card //id 4439 - slotted on Shield
-+30% <color=#800000>Stun</color>, <color=#800000>Curse</color>, <color=#800000>Blind</color>, <color=#800000>Petrify</color> resist
-+5% chance of <color=#800000>Stun</color>, <color=#800000>Curse</color>, <color=#800000>Blind</color>, <color=#800000>Petrify</color> on receive physical damage
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ต้านทาน <color=#800000>สตัน</color>, <color=#800000>สาป</color>, <color=#800000>ตาบอด</color>, <color=#800000>กลายเป็นหิน</color> +30%
+โอกาส 5% ทำให้ <color=#800000>สตัน</color>, <color=#800000>สาป</color>, <color=#800000>ตาบอด</color>, <color=#800000>กลายเป็นหิน</color> เมื่อโดนโจมตีกายภาพ
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Necromancer_Card //id 4440 - slotted on Weapon
-if One or Two-Handed Staff:
- INT +1, +2% MDEF ignore
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ถ้าใช้ไม้เท้ามือเดียวหรือสองมือ:
+ INT +1, เจาะ MDEF 2%
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Fallen_Bishop_Card //id 4441 - slotted on Boots
 SP -50%, MATK +10% 
-+50% magical damage vs. Demi-Human, Angel
-<color=#BB3333><i>Some or all of this card's effects do not function as expected.</i></color>
+ดาเมจเวท +50% ต่อมนุษย์, เทวดา
+<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
