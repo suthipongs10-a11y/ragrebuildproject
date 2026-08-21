@@ -2,2258 +2,2258 @@
 
 
 ::Skull_Helm //10001
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Monster_Oxygen_Mask //10002
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Transparent_Head_Protector //10003
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Pacifier //10004
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Wig //10005
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Queen's_Hair_Ornament //10006
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Silk_Ribbon //10007
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Punisher //10008
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Wild_Flower //10009
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Battered_Pot //10010
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Stellar_Hairpin //10011
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Tiny_Egg_Shell //10012
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Poring_Pet_Backpack //10013
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Rocker_Glasses //10014
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Green_Lace //10015
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Golden_Bell //10016
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Bark_Shorts //10017
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Monkey_Circlet //10018
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Red_Scarf //10019
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Grave_Keeper's_Sword //10020
-<desc>An item suitable for a pet, if pets were a thing you could get.</desc>
+<desc>ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ</desc>
 
 ::Ora_Ora //701
-<color=#808080>A trap that uses sticky, sweet scented liquid to lure and ensnare bugs.</color>
+<color=#808080>กับดักที่ใช้ของเหลวเหนียวกลิ่นหวานล่อและดักแมลง</color>
 
 ::Animal_Gore //702
-<color=#808080>Bottled blood from a freshly slain beast.</color>
+<color=#808080>เลือดสัตว์ที่เพิ่งฆ่าสดๆ บรรจุขวด</color>
 
 ::Hinalle //703
-<color=#808080>A plant with healing properties, its leaves give a nice and smoothing sensation.</color>
+<color=#808080>พืชสรรพคุณรักษา ใบให้ความรู้สึกเย็นสบายผ่อนคลาย</color>
 
 ::Aloe //704
-<color=#808080>A plant with curative properties, its leaves are commonly used in medicine and food.</color>
+<color=#808080>พืชสรรพคุณรักษาโรค ใบของมันใช้ทำยาและอาหารกันทั่วไป</color>
 
 ::Clover //705
-<color=#808080>A plant with three heart shaped leaves that is plentiful in meadows.</color>
+<color=#808080>พืชที่มีใบรูปหัวใจสามใบ ขึ้นเต็มทุ่งหญ้า</color>
 
 ::Four_Leaf_Clover //706
-<color=#808080>An extremely rare clover, legend says that merely holding one is a sign of great fortune.</color>
+<color=#808080>โคลเวอร์ที่หายากมาก ตำนานว่าแค่ถือไว้ก็เป็นลางแห่งโชคใหญ่</color>
 
 ::Singing_Plant //707
-<color=#808080>A mysterious plant that sings melancholic songs under a full moon.</color>
+<color=#808080>พืชลึกลับที่ขับขานเพลงเศร้าใต้แสงจันทร์เต็มดวง</color>
 
 ::Ment //708
-<color=#808080>A flower containing oils that relieve pain and aches.</color>
+<color=#808080>ดอกไม้ที่มีน้ำมันช่วยบรรเทาอาการปวดเมื่อย</color>
 
 ::Izidor //709
-<color=#808080>A flower with a very strong scent that induces powerful hallucinations if eaten.</color>
+<color=#808080>ดอกไม้กลิ่นแรงมาก กินแล้วเห็นภาพหลอนหนัก</color>
 
 ::Illusion_Flower //710
-<color=#808080>A flower rarely seen by humans, it shines brilliantly under the light of the moon.</color>
+<color=#808080>ดอกไม้ที่มนุษย์แทบไม่เคยเห็น เปล่งประกายเจิดจ้าใต้แสงจันทร์</color>
 
 ::Shoot //711
-<color=#808080>A delicate and fragile plant that is in the early stages of growth.</color>
+<color=#808080>ต้นอ่อนบอบบางที่เพิ่งเริ่มเติบโต</color>
 
 ::Flower //712
-<color=#808080>An ordinary, thornless wildflower that doesn't have any particular scent.</color>
+<color=#808080>ดอกไม้ป่าธรรมดาไร้หนาม ไม่มีกลิ่นอะไรเป็นพิเศษ</color>
 
 ::Empty_Bottle //713
-<color=#808080>An empty bottle for carrying liquid.</color>
+<color=#808080>ขวดเปล่าไว้ใส่ของเหลว</color>
 
 ::Emperium //714
-<color=#808080>Merely owning this gloriously resplendent gem is a sign of being chosen by fate to wield great power.</color>
+<color=#808080>แค่ได้ครอบครองอัญมณีเปล่งประกายเม็ดนี้ก็เป็นสัญญาณว่าโชคชะตาเลือกให้ถือครองพลังอันยิ่งใหญ่</color>
 
 ::Yellow_Gemstone //715
-<color=#808080>A crystal that acts as catalyst for certain magic spells. Once used, it becomes powerless and is destroyed.</color>
+<color=#808080>คริสตัลที่ใช้เป็นตัวเร่งสำหรับเวทบางอย่าง ใช้แล้วหมดพลังและแตกสลาย</color>
 
 ::Red_Gemstone //716
-<color=#808080>A crystal that acts as catalyst for certain magic spells. Once used, it becomes powerless and is destroyed.</color>
+<color=#808080>คริสตัลที่ใช้เป็นตัวเร่งสำหรับเวทบางอย่าง ใช้แล้วหมดพลังและแตกสลาย</color>
 
 ::Blue_Gemstone //717
-<color=#808080>A crystal that acts as catalyst for certain magic spells. Once used, it becomes powerless and is destroyed.</color>
+<color=#808080>คริสตัลที่ใช้เป็นตัวเร่งสำหรับเวทบางอย่าง ใช้แล้วหมดพลังและแตกสลาย</color>
 
 ::Garnet //718
-<color=#808080>A dark red jewel that is the birthstone for January.</color>
+<color=#808080>อัญมณีสีแดงเข้ม หินประจำเดือนมกราคม</color>
 
 ::Amethyst //719
-<color=#808080>A purple jewel that is the birthstone for February.</color>
+<color=#808080>อัญมณีสีม่วง หินประจำเดือนกุมภาพันธ์</color>
 
 ::Aquamarine //720
-<color=#808080>A sky blue jewel that is the birthstone for March.</color>
+<color=#808080>อัญมณีสีฟ้า หินประจำเดือนมีนาคม</color>
 
 ::Emerald //721
-<color=#808080>A green jewel that is the birthstone for May.</color>
+<color=#808080>อัญมณีสีเขียว หินประจำเดือนพฤษภาคม</color>
 
 ::Pearl //722
-<color=#808080>A pink jewel that is the birthstone for June.</color>
+<color=#808080>อัญมณีสีชมพู หินประจำเดือนมิถุนายน</color>
 
 ::Ruby //723
-<color=#808080>A maroon jewel that is the birthstone for July.</color>
+<color=#808080>อัญมณีสีแดงเลือดหมู หินประจำเดือนกรกฎาคม</color>
 
 ::Cursed_Ruby //724
-<color=#808080>A ruby containing mysterious powers.</color>
+<color=#808080>ทับทิมที่มีพลังลึกลับอยู่ข้างใน</color>
 
 ::Sardonyx //725
-<color=#808080>An onyx jewel that is the birthstone for August.</color>
+<color=#808080>นิลออนิกซ์ หินประจำเดือนสิงหาคม</color>
 
 ::Sapphire //726
-<color=#808080>A dark blue jewel that is the birthstone for September.</color>
+<color=#808080>อัญมณีสีน้ำเงินเข้ม หินประจำเดือนกันยายน</color>
 
 ::Opal //727
-<color=#808080>A rainbow jewel that is the birthstone for October.</color>
+<color=#808080>อัญมณีสีรุ้ง หินประจำเดือนตุลาคม</color>
 
 ::Topaz //728
-<color=#808080>A golden jewel that is the birthstone for November.</color>
+<color=#808080>อัญมณีสีทอง หินประจำเดือนพฤศจิกายน</color>
 
 ::Zircon //729
-<color=#808080>A white blue jewel that is the birthstone for December.</color>
+<color=#808080>อัญมณีสีขาวอมฟ้า หินประจำเดือนธันวาคม</color>
 
 ::1_Carat_Diamond //730
-<color=#808080>A small, twinkling gem that can be sold at a good price.</color>
+<color=#808080>อัญมณีเม็ดเล็กที่ระยิบระยับ ขายได้ราคาดี</color>
 
 ::2_Carat_Diamond //731
-<color=#808080>A medium, sparkling gem that can be sold at a high price.</color>
+<color=#808080>อัญมณีขนาดกลางที่เปล่งประกาย ขายได้ราคาดี</color>
 
 ::3_Carat_Diamond //732
-<color=#808080>A huge, dazzling gem that can be sold at an outrageous price.</color>
+<color=#808080>อัญมณีเม็ดใหญ่เปล่งประกาย ขายได้ราคาโหดมาก</color>
 
 ::Cracked_Diamond //733
-<color=#808080>A damaged diamond with obvious imperfections.</color>
+<color=#808080>เพชรที่เสียหาย มีตำหนิเห็นชัด</color>
 
 ::Red_Frame //734
-<color=#808080>A red frame that would make a nice present.</color>
+<color=#808080>กรอบสีแดง เอาไปให้เป็นของขวัญก็ดี</color>
 
 ::Chung_Jah //735
-<color=#808080>A blue porcelain that would make a nice gift.</color>
+<color=#808080>เครื่องกระเบื้องสีน้ำเงิน เอาไปให้เป็นของขวัญก็ดี</color>
 
 ::China //736
-<color=#808080>A white plate that would make a nice gift.</color>
+<color=#808080>จานสีขาว เอาไปให้เป็นของขวัญก็ดี</color>
 
 ::Black_Ladle //737
-<color=#808080>A black ladle, it is very durable and would make a nice gift.</color>
+<color=#808080>ทัพพีสีดำ ทนทานมาก เอาไปให้เป็นของขวัญก็ดี</color>
 
 ::Pencil_Case //738
-<color=#808080>A pencil case, it'd be a nice gift for artists, writers, and students.</color>
+<color=#808080>กล่องดินสอ เอาไปให้ศิลปิน นักเขียน หรือนักเรียนก็ดี</color>
 
 ::Rouge //739
-<color=#808080>A case of make-up that shines with a lustrous, attractive red color.</color>
+<color=#808080>ตลับเครื่องสำอาง สีแดงเงางามน่ามอง</color>
 
 ::Puppet //740
-<color=#808080>A cute cotton doll that's a frequent favorite for little girls.</color>
+<color=#808080>ตุ๊กตาผ้าฝ้ายน่ารัก เด็กผู้หญิงชอบกันมาก</color>
 
 ::Poring_Doll //741
-<color=#808080>A cute doll that resembles a Poring.</color>
+<color=#808080>ตุ๊กตาน่ารักหน้าตาเหมือน Poring</color>
 
 ::Chonchon_Doll //742
-<color=#808080>A repulsive doll that resembles a Chonchon.</color>
+<color=#808080>ตุ๊กตาน่าขยะแขยงหน้าตาเหมือน Chonchon</color>
 
 ::Spore_Doll //743
-<color=#808080>A stuffy doll that resembles a Spore.</color>
+<color=#808080>ตุ๊กตายัดนุ่นหน้าตาเหมือน Spore</color>
 
 ::Bouquet //744
-<color=#808080>A bunch of flowers given to express love, thanks, or appreciation.</color>
+<color=#808080>ช่อดอกไม้ ไว้มอบให้เพื่อบอกรัก ขอบคุณ หรือแสดงความชื่นชม</color>
 
 ::Wedding_Bouquet //745
-<color=#808080>A small bouquet thrown by brides during the wedding ceremony. Supposedly, the woman who catches it is next to be married.</color>
+<color=#808080>ช่อดอกไม้เล็กที่เจ้าสาวโยนในพิธีแต่งงาน ว่ากันว่าใครรับได้จะได้แต่งงานคนต่อไป</color>
 
 ::Glass_Bead //746
-<color=#808080>A toy for young boys that's sort of like a marble.</color>
+<color=#808080>ของเล่นเด็กผู้ชาย ประมาณลูกแก้ว</color>
 
 ::Crystal_Mirror //747
-<color=#808080>A gorgeous mirror of polished crystal that is an essential for women everywhere.</color>
+<color=#808080>กระจกคริสตัลขัดเงางดงาม ของจำเป็นของผู้หญิงทุกคน</color>
 
 ::Witherless_Rose //748
-<color=#808080>A symbol of eternal love, this enchanted (and expensive) rose will never wither.</color>
+<color=#808080>สัญลักษณ์แห่งรักนิรันดร์ กุหลาบต้องมนตร์ (และแพง) ดอกนี้ไม่มีวันเหี่ยว</color>
 
 ::Frozen_Rose //749
-<color=#808080>A symbol of eternal love, this unique rose of sculpted ice makes a great gift.</color>
+<color=#808080>สัญลักษณ์แห่งรักนิรันดร์ กุหลาบแกะสลักจากน้ำแข็งดอกนี้เป็นของขวัญชั้นเลิศ</color>
 
 ::Baphomet_Doll //750
-<color=#808080>An exquisite doll that resembles Baphomet, enemy of all that is righteous.</color>
+<color=#808080>ตุ๊กตางานประณีตรูป Baphomet ศัตรูของทุกสิ่งที่ชอบธรรม</color>
 
 ::Osiris_Doll //751
-<color=#808080>An exquisite doll that resembles Osiris, king of darkness.</color>
+<color=#808080>ตุ๊กตางานประณีตรูป Osiris ราชาแห่งความมืด</color>
 
 ::Rocker_Doll //752
-<color=#808080>A doll that resembles a Rocker, a grasshopper that plays its violin.</color>
+<color=#808080>ตุ๊กตารูป Rocker ตั๊กแตนที่สีไวโอลินเป็น</color>
 
 ::Yoyo_Doll //753
-<color=#808080>A doll that resembles a Yoyo, a monkey that is familiar with humans.</color>
+<color=#808080>ตุ๊กตารูป Yoyo ลิงที่คุ้นเคยกับมนุษย์</color>
 
 ::Racoon_Doll //754
-<color=#808080>A doll that resembles a Smokie, a raccoon that has the power of invisibility.</color>
+<color=#808080>ตุ๊กตารูป Smokie แรคคูนที่ล่องหนได้</color>
 
 ::Rough_Oridecon //756
-<color=#808080>A raw ore that mostly consists of oridecon.</color>
+<color=#808080>แร่ดิบที่ส่วนใหญ่เป็น Oridecon</color>
 
 ::Rough_Elunium //757
-<color=#808080>A raw ore that mostly consists of elunium.</color>
+<color=#808080>แร่ดิบที่ส่วนใหญ่เป็น Elunium</color>
 
 ::Daenggie //901
-<color=#808080>A braided pigtail that has been cut from the head of a young girl.</color>
+<color=#808080>ผมเปียที่ตัดมาจากหัวเด็กผู้หญิง</color>
 
 ::Tree_Root //902
-<color=#808080>A handful of roots that are fibrous enough to be used as rope.</color>
+<color=#808080>กำรากไม้ที่เหนียวพอจะเอาไปทำเชือกได้</color>
 
 ::Reptile_Tongue //903
-<color=#808080>A reptile's severed tongue.</color>
+<color=#808080>ลิ้นสัตว์เลื้อยคลานที่ถูกตัดออกมา</color>
 
 ::Scorpion_Tail //904
-<color=#808080>A scorpion's severed tail.</color>
+<color=#808080>หางแมงป่องที่ถูกตัดออกมา</color>
 
 ::Stem //905
-<color=#808080>A handful of plant stems that can be used in alchemy.</color>
+<color=#808080>กำก้านพืช ใช้ในวิชาเล่นแร่แปรธาตุได้</color>
 
 ::Pointed_Scale //906
-<color=#808080>A single scale from a Worm Tail.</color>
+<color=#808080>เกล็ดชิ้นเดียวจาก Worm Tail</color>
 
 ::Resin //907
-<color=#808080>A viscous plant substance used in carpentry.</color>
+<color=#808080>ยางไม้เหนียวที่ใช้ในงานช่างไม้</color>
 
 ::Spawn //908
-<color=#808080>A collection of frog eggs.</color>
+<color=#808080>กองไข่กบ</color>
 
 ::Jellopy //909
-<color=#808080>A small crystallization created by monsters.</color>
+<color=#808080>ผลึกเล็กๆ ที่มอนสเตอร์สร้างขึ้น</color>
 
 ::Garlet //910
-<color=#808080>A small crystallization created by monsters.</color>
+<color=#808080>ผลึกเล็กๆ ที่มอนสเตอร์สร้างขึ้น</color>
 
 ::Scell //911
-<color=#808080>A small crystallization created by monsters.</color>
+<color=#808080>ผลึกเล็กๆ ที่มอนสเตอร์สร้างขึ้น</color>
 
 ::Zargon //912
-<color=#808080>A small crystallization created by monsters.</color>
+<color=#808080>ผลึกเล็กๆ ที่มอนสเตอร์สร้างขึ้น</color>
 
 ::Tooth_of_Bat //913
-<color=#808080>A Farmiliar's sharp tooth.</color>
+<color=#808080>เขี้ยวแหลมของ Familiar</color>
 
 ::Fluff //914
-<color=#808080>A clump of monster fur and fuzz that can be used to make thread and fabric.</color>
+<color=#808080>กระจุกขนมอนสเตอร์ เอาไปปั่นเป็นด้ายและผ้าได้</color>
 
 ::Chrysalis //915
-<color=#808080>A larva skin that has been shed or peeled off.</color>
+<color=#808080>คราบตัวอ่อนที่ลอกทิ้งไว้</color>
 
 ::Bird_Feather //916
-<color=#808080>A bird's feather that can be used in decor.</color>
+<color=#808080>ขนนก ใช้ตกแต่งได้</color>
 
 ::Talon //917
-<color=#808080>A sharp talon from a bird's foot.</color>
+<color=#808080>กรงเล็บแหลมจากตีนนก</color>
 
 ::Sticky_Webfoot //918
-<color=#808080>A webbed foot from a monster's leg.</color>
+<color=#808080>ตีนพังผืดจากขามอนสเตอร์</color>
 
 ::Animal_Skin //919
-<color=#808080>An animal hide that can be used in clothes, coverings, or bedding.</color>
+<color=#808080>หนังสัตว์ที่ใช้ทำเสื้อผ้า ผ้าคลุม หรือเครื่องนอนได้</color>
 
 ::Wolf_Claw //920
-<color=#808080>A claw severed from a wolf's paw.</color>
+<color=#808080>กรงเล็บที่ตัดมาจากอุ้งเท้าหมาป่า</color>
 
 ::Mushroom_Spore //921
-<color=#808080>A spore discharged from a mushroom.</color>
+<color=#808080>สปอร์ที่ปล่อยออกมาจากดอกเห็ด</color>
 
 ::Orc's_Fang //922
-<color=#808080>A cuspid wrenched from a gruesome orc's jaw.</color>
+<color=#808080>เขี้ยวที่กระชากมาจากขากรรไกรออร์คน่าขยะแขยง</color>
 
 ::Evil_Horn //923
-<color=#808080>A small goat horn, the symbol of evil.</color>
+<color=#808080>เขาแพะเล็ก สัญลักษณ์ของความชั่วร้าย</color>
 
 ::Powder_of_Butterfly //924
-<color=#808080>A fistful of butterfly wing powder that sparkles with the power of fantasy.</color>
+<color=#808080>กระจุกผงปีกผีเสื้อ แวววาวด้วยพลังแห่งจินตนาการ</color>
 
 ::Bill_of_Bird //925
-<color=#808080>A bird's beak, waste not want not.</color>
+<color=#808080>จะงอยปากนก ของมีค่าอย่าทิ้งขว้าง</color>
 
 ::Snake_Scale //926
-<color=#808080>A handful of snake scales that can make flamboyant clothes.</color>
+<color=#808080>กำเกล็ดงู เอาไปทำเสื้อผ้าฉูดฉาดได้</color>
 
 ::Insect_Feeler //928
-<color=#808080>An antennae that serves as a sensory organ for insects.</color>
+<color=#808080>หนวดที่เป็นอวัยวะรับสัมผัสของแมลง</color>
 
 ::Immortal_Heart //929
-<color=#808080>A heart which won't stop beating, it contains a dreadful power.</color>
+<color=#808080>หัวใจที่เต้นไม่หยุด ข้างในมีพลังน่าสะพรึง</color>
 
 ::Rotten_Bandage //930
-<color=#808080>An old, dirty bandage that's so soiled it's almost worthless.</color>
+<color=#808080>ผ้าพันแผลเก่าสกปรกจนแทบไร้ค่า</color>
 
 ::Orcish_Voucher //931
-<color=#808080>A small sculpture that is a symbol of pride for Orc Warriors.</color>
+<color=#808080>ประติมากรรมชิ้นเล็กที่เป็นความภาคภูมิใจของ Orc Warrior</color>
 
 ::Skel-Bone //932
-<color=#808080>A bone taken from an undead skeleton.</color>
+<color=#808080>กระดูกที่เอามาจากโครงกระดูกอันเดด</color>
 
 ::Memento //934
-<color=#808080>A box that is buried with the dead containing gems and momentos.</color>
+<color=#808080>กล่องที่ฝังไปกับผู้ตาย ข้างในมีอัญมณีและของที่ระลึก</color>
 
 ::Shell //935
-<color=#808080>A hard shell that was used for protection.</color>
+<color=#808080>เปลือกแข็งที่เคยใช้ป้องกันตัว</color>
 
 ::Scale_Shell //936
-<color=#808080>A shell-like piece of tough skin that is covered with hard scales.</color>
+<color=#808080>หนังเหนียวคล้ายเปลือก ปกคลุมด้วยเกล็ดแข็ง</color>
 
 ::Venom_Canine //937
-<color=#808080>A sharp, poisonous fang.</color>
+<color=#808080>เขี้ยวแหลมที่มีพิษ</color>
 
 ::Sticky_Mucus //938
-<color=#808080>A mysteriously sticky liquid.</color>
+<color=#808080>ของเหลวเหนียวอย่างประหลาด</color>
 
 ::Bee_Sting //939
-<color=#808080>A stinger from a hornet or bee.</color>
+<color=#808080>เหล็กในของต่อหรือผึ้ง</color>
 
 ::Grasshopper's_Leg //940
-<color=#808080>A Rocker's hind leg.</color>
+<color=#808080>ขาหลังของ Rocker</color>
 
 ::Nose_Ring //941
-<color=#808080>A ring placed in a cow's nose so that it can be easily steered.</color>
+<color=#808080>ห่วงที่คล้องจมูกวัวไว้จูงง่ายๆ</color>
 
 ::Yoyo_Tail //942
-<color=#808080>A prehensile tail from a Yoyo.</color>
+<color=#808080>หางของ Yoyo ที่ม้วนเกาะได้</color>
 
 ::Solid_Shell //943
-<color=#808080>A solid, durable shell.</color>
+<color=#808080>เปลือกที่แน่นและทนทาน</color>
 
 ::Horseshoe //944
-<color=#808080>A piece of iron fitted on a horse's hoof for its protection.</color>
+<color=#808080>แผ่นเหล็กที่ตอกไว้ใต้กีบม้าเพื่อป้องกัน</color>
 
 ::Raccoon_Leaf //945
-<color=#808080>A leaf that gives Smokies the power to become invisible.</color>
+<color=#808080>ใบไม้ที่ทำให้ Smokie ล่องหนได้</color>
 
 ::Snail's_Shell //946
-<color=#808080>A hard, spiral shaped snail shell.</color>
+<color=#808080>เปลือกหอยทากแข็ง ทรงเกลียว</color>
 
 ::Horn //947
-<color=#808080>A hard and sharp horn.</color>
+<color=#808080>เขาแข็งและแหลมคม</color>
 
 ::Bear's_Footskin //948
-<color=#808080>A bear's foot that is rumored to restore male vigor.</color>
+<color=#808080>ตีนหมี ร่ำลือกันว่าบำรุงกำลังผู้ชาย</color>
 
 ::Soft_Fluff //949
-<color=#808080>Soft down used in making high quality clothes.</color>
+<color=#808080>ขนอ่อนนุ่มที่ใช้ทำเสื้อผ้าคุณภาพสูง</color>
 
 ::Heart_of_Mermaid //950
-<color=#808080>A heart of a mermaid.</color>
+<color=#808080>หัวใจของนางเงือก</color>
 
 ::Fin //951
-<color=#808080>An oily fish fin.</color>
+<color=#808080>ครีบปลาที่มันเยิ้ม</color>
 
 ::Cactus_Needle //952
-<color=#808080>A sharp cactus needle.</color>
+<color=#808080>หนามกระบองเพชรที่แหลมคม</color>
 
 ::Stone_Heart //953
-<color=#808080>A heart constructed entirely out of stone.</color>
+<color=#808080>หัวใจที่ทำจากหินล้วนๆ</color>
 
 ::Shining_Scale //954
-<color=#808080>A shimmering, reflective scale.</color>
+<color=#808080>เกล็ดที่วิบวับสะท้อนแสง</color>
 
 ::Insect_Peeling //955
-<color=#808080>A skin shed from a worm or insect.</color>
+<color=#808080>คราบที่หนอนหรือแมลงลอกทิ้ง</color>
 
 ::Gill //956
-<color=#808080>A part of a fish breathing apparatus.</color>
+<color=#808080>ชิ้นส่วนอวัยวะหายใจของปลา</color>
 
 ::Decayed_Nail //957
-<color=#808080>A putrid and incredibly pungent corpse's nail.</color>
+<color=#808080>เล็บศพที่เน่าเปื่อยและกลิ่นฉุนสุดๆ</color>
 
 ::Horrendous_Mouth //958
-<color=#808080>A complete set of corpse's teeth, well, as complete as it can get.</color>
+<color=#808080>ฟันศพครบชุด เอาเป็นว่าครบเท่าที่จะครบได้</color>
 
 ::Rotten_Scale //959
-<color=#808080>A nasty scale with a horribly offensive odor.</color>
+<color=#808080>เกล็ดน่าขยะแขยงที่กลิ่นเหม็นสุดทน</color>
 
 ::Nipper //960
-<color=#808080>A crustacean's claw.</color>
+<color=#808080>ก้ามสัตว์เปลือกแข็ง</color>
 
 ::Conch //961
-<color=#808080>The shell of a marine mollusk.</color>
+<color=#808080>เปลือกของหอยทะเล</color>
 
 ::Tentacle //962
-<color=#808080>A flexible, prehensile, and boneless appendage.</color>
+<color=#808080>หนวดที่ยืดหยุ่น ม้วนจับของได้ และไม่มีกระดูก</color>
 
 ::Sharp_Scale //963
-<color=#808080>A scale that is much sharper than a razor.</color>
+<color=#808080>เกล็ดที่คมกว่ามีดโกนมาก</color>
 
 ::Crab_Shell //964
-<color=#808080>A hard crab shell that smells horrible.</color>
+<color=#808080>กระดองปูแข็งๆ ที่กลิ่นแย่มาก</color>
 
 ::Clam_Shell //965
-<color=#808080>A hard shell taken from a dead clam.</color>
+<color=#808080>เปลือกแข็งที่แกะมาจากหอยที่ตายแล้ว</color>
 
 ::Clam_Flesh //966
-<color=#808080>A muscular and fatty clam tissue that can be cooked in many ways.</color>
+<color=#808080>เนื้อหอยที่เหนียวและมัน ทำอาหารได้หลายอย่าง</color>
 
 ::Turtle_Shell //967
-<color=#808080>A hard shell that obviously failed to protect a turtle.</color>
+<color=#808080>กระดองแข็งที่เห็นชัดว่าปกป้องเต่าไม่สำเร็จ</color>
 
 ::Heroic_Emblem //968
-<color=#808080>An emblem given to an Orc Hero or Lord that is proof of their heroism.</color>
+<color=#808080>ตราสัญลักษณ์ที่มอบให้ Orc Hero หรือ Orc Lord เป็นเครื่องพิสูจน์วีรกรรม</color>
 
 ::Gold //969
-<color=#808080>A valuable metal used to make coins and jewelry.</color>
+<color=#808080>โลหะมีค่าที่ใช้ทำเหรียญและเครื่องประดับ</color>
 
 ::Alcohol //970
-<color=#808080>This colorless liquid is the secret behind beers and wine.</color>
+<color=#808080>ของเหลวไร้สีที่เป็นความลับเบื้องหลังเบียร์และไวน์</color>
 
 ::Detrimindexta //971
-<color=#808080>A liquid with unique properties that repels water.</color>
+<color=#808080>ของเหลวที่มีคุณสมบัติพิเศษ ผลักน้ำออก</color>
 
 ::Karvodailnirol //972
-<color=#808080>A liquid with unique characteristics that repels water.</color>
+<color=#808080>ของเหลวคุณสมบัติพิเศษที่ผลักน้ำออก</color>
 
 ::Counteragent //973
-<color=#808080>A mixture of chemicals that can only be produced by geniuses.</color>
+<color=#808080>สารเคมีผสมที่มีแต่อัจฉริยะเท่านั้นที่ทำได้</color>
 
 ::Mixture //974
-<color=#808080>A special compound that can only be produced by geniuses.</color>
+<color=#808080>สารประกอบพิเศษที่มีแต่อัจฉริยะเท่านั้นที่ทำได้</color>
 
 ::Scarlet_Dyestuffs //975
-<color=#808080>Red dye made from ground Red Herbs.</color>
+<color=#808080>สีย้อมแดงที่ทำจาก Red Herb บด</color>
 
 ::Lemon_Dyestuffs //976
-<color=#808080>Yellow dye made from ground Yellow Herbs.</color>
+<color=#808080>สีย้อมเหลืองที่ทำจาก Yellow Herb บด</color>
 
 ::Cobaltblue_Dyestuffs //978
-<color=#808080>Blue dye made from ground Blue Herbs.</color>
+<color=#808080>สีย้อมน้ำเงินที่ทำจาก Blue Herb บด</color>
 
 ::Darkgreen_Dyestuffs //979
-<color=#808080>Green dye made from ground Green Herbs.</color>
+<color=#808080>สีย้อมเขียวที่ทำจาก Green Herb บด</color>
 
 ::Orange_Dyestuffs //980
-<color=#808080>Orange dye made from ground Red and Yellow Herbs.</color>
+<color=#808080>สีย้อมส้มที่ทำจาก Red Herb และ Yellow Herb บด</color>
 
 ::Violet_Dyestuffs //981
-<color=#808080>Purple dye made from ground Blue and Red Herbs.</color>
+<color=#808080>สีย้อมม่วงที่ทำจาก Blue Herb และ Red Herb บด</color>
 
 ::White_Dyestuffs //982
-<color=#808080>White dye made from ground White Herbs.</color>
+<color=#808080>สีย้อมขาวที่ทำจาก White Herb บด</color>
 
 ::Black_Dyestuffs //983
-<color=#808080>Black dye made from various ground herbs.</color>
+<color=#808080>สีย้อมดำที่ทำจากสมุนไพรหลายชนิดบด</color>
 
 ::Oridecon //984
-<color=#808080>Pure oridecon, a tough metal used in refining high level weapons.</color>
+<color=#808080>Oridecon บริสุทธิ์ โลหะเหนียวที่ใช้ตีบวกอาวุธระดับสูง</color>
 
 ::Elunium //985
-<color=#808080>Pure elunium, a light, non-toxic metal used in refining armor.</color>
+<color=#808080>Elunium บริสุทธิ์ โลหะเบาไร้พิษที่ใช้ตีบวกเกราะ</color>
 
 ::Anvil //986
-<color=#808080>A smithing tool made of iron on which heated metals are placed and hammered into shape.</color>
+<color=#808080>อุปกรณ์ตีเหล็กทำจากเหล็ก ไว้วางโลหะร้อนแล้วตีขึ้นรูป</color>
 
 ::Oridecon_Anvil //987
-<color=#808080>An oridecon anvil, quality products can be made with this.</color>
+<color=#808080>ทั่ง Oridecon ตีของคุณภาพดีได้ด้วยตัวนี้</color>
 
 ::Golden_Anvil //988
-<color=#808080>A golden anvil, high quality products can be made with this!</color>
+<color=#808080>ทั่งทองคำ ตีของคุณภาพสูงได้ด้วยตัวนี้!</color>
 
 ::Emperium_Anvil //989
-<color=#808080>An emperium anvil, pristine products can be made with this!</color>
+<color=#808080>ทั่ง Emperium ตีของระดับสมบูรณ์แบบได้ด้วยตัวนี้!</color>
 
 ::Red_Blood //990
-<color=#808080>A vivid red ore that glows with the power of a volcano.</color>
+<color=#808080>แร่สีแดงสด เรืองแสงด้วยพลังแห่งภูเขาไฟ</color>
 
 ::Crystal_Blue //991
-<color=#808080>A vivid blue ore that glows with the power of the ocean.</color>
+<color=#808080>แร่สีน้ำเงินสด เรืองแสงด้วยพลังแห่งมหาสมุทร</color>
 
 ::Wind_of_Verdure //992
-<color=#808080>A vivid yellow ore that glows with the power of the sky.</color>
+<color=#808080>แร่สีเหลืองสด เรืองแสงด้วยพลังแห่งท้องฟ้า</color>
 
 ::Green_Live //993
-<color=#808080>A vivid green ore that glows with the power of the earth.</color>
+<color=#808080>แร่สีเขียวสด เรืองแสงด้วยพลังแห่งผืนดิน</color>
 
 ::Flame_Heart //994
-<color=#808080>A dark red, heart shaped stone imbued with fire.</color>
+<color=#808080>หินสีแดงเข้มรูปหัวใจ อาบด้วยธาตุไฟ</color>
 
 ::Mystic_Frozen //995
-<color=#808080>A light blue, crystal stone imbued with water.</color>
+<color=#808080>หินคริสตัลสีฟ้าอ่อน อาบด้วยธาตุน้ำ</color>
 
 ::Rough_Wind //996
-<color=#808080>A pale yellow, lightning bolt shaped stone imbued with wind.</color>
+<color=#808080>หินสีเหลืองอ่อนรูปสายฟ้า อาบด้วยธาตุลม</color>
 
 ::Great_Nature //997
-<color=#808080>A citrus green, bud shaped stone imbued with earth.</color>
+<color=#808080>หินสีเขียวมะนาวรูปดอกตูม อาบด้วยธาตุดิน</color>
 
 ::Iron //998
-<color=#808080>A malleable metal that's easy to temper and is commonly used to create arms and other goods.</color>
+<color=#808080>โลหะอ่อนที่ชุบง่าย ใช้ทำอาวุธและข้าวของทั่วไป</color>
 
 ::Steel //999
-<color=#808080>An iron and carbon alloy known for its structural durability and use in crafting high-quality arms.</color>
+<color=#808080>โลหะผสมเหล็กกับคาร์บอน ขึ้นชื่อเรื่องความทนทานและใช้ตีอาวุธคุณภาพสูง</color>
 
 ::Star_Crumb //1000
-<color=#808080>A small stellar crystal, fallen from the heavens, which can be used to craft strengthened weapons.</color>
+<color=#808080>ผลึกดาวชิ้นเล็กที่ร่วงจากฟากฟ้า ใช้ตีอาวุธเสริมพลังได้</color>
 
 ::Star_Dust //1001
-<color=#808080>A collection of stardust which can be refined into a Star Crumb.</color>
+<color=#808080>ผงดาวที่เอาไปกลั่นเป็น Star Crumb ได้</color>
 
 ::Iron_Ore //1002
-<color=#808080>An impure ore that can be refined into Iron.</color>
+<color=#808080>แร่ไม่บริสุทธิ์ที่ถลุงเป็น Iron ได้</color>
 
 ::Coal //1003
-<color=#808080>A black mineral that can be combined with Iron to craft Steel.</color>
+<color=#808080>แร่สีดำ ผสมกับ Iron แล้วตีเป็น Steel ได้</color>
 
 ::Chivalry_Emblem //1004
-<color=#808080>A token which proves a knight's loyalty to their lord.</color>
+<color=#808080>เครื่องหมายที่พิสูจน์ความภักดีของอัศวินต่อเจ้านาย</color>
 
 ::Hammer_of_Blacksmith //1005
-<color=#808080>A hammer that has been used for refinement.</color>
+<color=#808080>ค้อนที่ใช้ตีบวกของ</color>
 
 ::Old_Magicbook //1006
-<color=#808080>A spell book containing powerful, ancient magic.</color>
+<color=#808080>ตำราเวทที่บรรจุเวทมนตร์โบราณอันทรงพลัง</color>
 
 ::Necklace_of_Wisdom //1007
-<color=#808080>A mysterious necklace that is rumored to possess the power of clairvoyance.</color>
+<color=#808080>สร้อยคอลึกลับ ร่ำลือกันว่ามีพลังหยั่งรู้</color>
 
 ::Necklace_of_Oblivion //1008
-<color=#808080>A necklace given to those capable of joining the Assassin Guild.</color>
+<color=#808080>สร้อยคอที่มอบให้ผู้มีคุณสมบัติเข้าร่วมสมาคม Assassin</color>
 
 ::Hand_of_God //1009
-<color=#808080>A figure of a hand that contains great religious symbolism.</color>
+<color=#808080>รูปปั้นมือที่มีความหมายทางศาสนาลึกซึ้ง</color>
 
 ::Phracon //1010
-<color=#808080>A metal that can be used to refine Lv 1 weapons.</color>
+<color=#808080>โลหะสำหรับตีบวกอาวุธ Lv 1</color>
 
 ::Emveretarcon //1011
-<color=#808080>A metal that can be used to refine Lv 2 weapons.</color>
+<color=#808080>โลหะสำหรับตีบวกอาวุธ Lv 2</color>
 
 ::Frill //1012
-<color=#808080>A scruff of neckskin from a desert lizard.</color>
+<color=#808080>หนังต้นคอของกิ้งก่าทะเลทราย</color>
 
 ::Rainbow_Shell //1013
-<color=#808080>A bug shell that reflects the colors of the rainbow.</color>
+<color=#808080>เปลือกแมลงที่สะท้อนแสงเป็นสีรุ้ง</color>
 
 ::Ant_Jaw //1014
-<color=#808080>A tough, sharp jaw from an ant.</color>
+<color=#808080>กรามมดที่เหนียวและคม</color>
 
 ::Tongue //1015
-<color=#808080>A tongue, it has a disgusting coating of sticky saliva.</color>
+<color=#808080>ลิ้นที่เคลือบด้วยน้ำลายเหนียวน่าขยะแขยง</color>
 
 ::Rat_Tail //1016
-<color=#808080>A thin rat's tail.</color>
+<color=#808080>หางหนูเรียวๆ</color>
 
 ::Mole_Whiskers //1017
-<color=#808080>A fistfull of whiskers from a mole.</color>
+<color=#808080>กระจุกหนวดตัวตุ่น</color>
 
 ::Mole_Claw //1018
-<color=#808080>A mole's claw that is sturdy enough to dig into the ground.</color>
+<color=#808080>เล็บตัวตุ่นที่แข็งแรงพอจะขุดดินได้</color>
 
 ::Trunk //1019
-<color=#808080>A piece of wood, or a Ninja, and you're pretty sure its wood.</color>
+<color=#808080>ท่อนไม้ หรือไม่ก็ Ninja แต่ค่อนข้างมั่นใจว่าเป็นท่อนไม้</color>
 
 ::Black_Hair //1020
-<color=#808080>A lustrous, well brushed, set of hair.</color>
+<color=#808080>ปอยผมเงางาม หวีมาอย่างดี</color>
 
 ::Dokebi_Horn //1021
-<color=#808080>A Dokebi horn rumored to bring great fortune.</color>
+<color=#808080>เขา Dokebi ร่ำลือกันว่านำโชคลาภมาให้</color>
 
 ::Nine_Tails //1022
-<color=#808080>A set of tails that belonged to a fox, but not anymore, obviously.</color>
+<color=#808080>ชุดหางที่เคยเป็นของสุนัขจิ้งจอก แต่ตอนนี้ไม่ใช่แล้ว ก็แหงล่ะ</color>
 
 ::Fish_Tail //1023
-<color=#808080>A stinky fish tail.</color>
+<color=#808080>หางปลาที่เหม็น</color>
 
 ::Squid_Ink //1024
-<color=#808080>A bottle of black squid ink that failed to provide sufficient self defense.</color>
+<color=#808080>ขวดหมึกดำจากปลาหมึก ที่ป้องกันตัวไม่สำเร็จ</color>
 
 ::Cobweb //1025
-<color=#808080>A sticky spider web made of surprisingly strong threadlike fibers.</color>
+<color=#808080>ใยแมงมุมเหนียวที่ทำจากเส้นใยแข็งแรงอย่างน่าประหลาด</color>
 
 ::Acorn //1026
-<color=#808080>A tough, woody shelled nut from an oak tree.</color>
+<color=#808080>ลูกโอ๊กเปลือกไม้แข็ง</color>
 
 ::Porcupine_Quill //1027
-<color=#808080>A fistful of sharp, hollow quills that used to protect a porcupine.</color>
+<color=#808080>กระจุกขนเม่นแหลมกลวง เคยใช้ป้องกันตัว</color>
 
 ::Mane //1028
-<color=#808080>A fistful of bristly, tough hair from a wild boar.</color>
+<color=#808080>กระจุกขนหมูป่า แข็งและเหนียว</color>
 
 ::Tiger_Skin //1029
-<color=#808080>A tiger's hide that's soft, furry, nice, and feral.</color>
+<color=#808080>หนังเสือที่นุ่ม มีขน สวย และดูดิบเถื่อน</color>
 
 ::Tiger_Footskin //1030
-<color=#808080>A tiger's paw known to the elderly as the King of Invigoration.</color>
+<color=#808080>อุ้งเท้าเสือที่ผู้เฒ่าเรียกกันว่าราชาแห่งยาบำรุง</color>
 
 ::Mantis_Scythe //1031
-<color=#808080>A sharp, front limb severed from a Mantis.</color>
+<color=#808080>ขาหน้าที่แหลมคมซึ่งตัดมาจาก Mantis</color>
 
 ::Maneater_Blossom //1032
-<color=#808080>A carnivorous flower with a digestive system similar to a human's.</color>
+<color=#808080>ดอกไม้กินเนื้อ มีระบบย่อยอาหารคล้ายมนุษย์</color>
 
 ::Maneater_Root //1033
-<color=#808080>A pair of roots that almost look capable of walking.</color>
+<color=#808080>รากคู่หนึ่งที่ดูเหมือนจะเดินได้</color>
 
 ::Blue_Hair //1034
-<color=#808080>A fistful of Kobold hair that appears bristly but is actually downy soft.</color>
+<color=#808080>กระจุกขน Kobold ดูแข็งกระด้างแต่จริงๆ นุ่มฟู</color>
 
 ::Dragon_Canine //1035
-<color=#808080>A dragon's cuspid that is sharp enough to pierce dragon scales.</color>
+<color=#808080>เขี้ยวมังกร คมพอจะแทงทะลุเกล็ดมังกรได้</color>
 
 ::Dragon_Scale //1036
-<color=#808080>An iridescent dragon's scale that provides great protection.</color>
+<color=#808080>เกล็ดมังกรสีเหลือบที่ป้องกันได้ดีเยี่ยม</color>
 
 ::Dragon_Tail //1037
-<color=#808080>A tail cut off from a dragon that, sadly, will never grow back.</color>
+<color=#808080>หางที่ตัดมาจากมังกร น่าเศร้าที่มันจะไม่งอกใหม่</color>
 
 ::Little_Evil_Horn //1038
-<color=#808080>A pair of horns from a small demon.</color>
+<color=#808080>เขาคู่หนึ่งจากปีศาจตัวเล็ก</color>
 
 ::Little_Evil_Wing //1039
-<color=#808080>A pair wings from a small demon.</color>
+<color=#808080>ปีกคู่หนึ่งจากปีศาจตัวเล็ก</color>
 
 ::Elder_Pixie's_Moustache //1040
-<color=#808080>A mustache shaved off a dwarf that somehow maintained its shape and form.</color>
+<color=#808080>หนวดที่โกนมาจากคนแคระ ไม่รู้ทำไมยังคงรูปทรงเดิมไว้ได้</color>
 
 ::Lantern //1041
-<color=#808080>A portable case with glass panes that allow a contained light to illuminate dark areas.</color>
+<color=#808080>กล่องพกพาที่มีกระจกใส ให้แสงข้างในส่องสว่างในที่มืด</color>
 
 ::Bug_Leg //1042
-<color=#808080>A hind leg that has been cut from a bug.</color>
+<color=#808080>ขาหลังที่ตัดมาจากแมลง</color>
 
 ::Orc_Claw //1043
-<color=#808080>A thick, sharp fingernail from a decayed orc.</color>
+<color=#808080>เล็บหนาแหลมจากออร์คที่เน่าเปื่อย</color>
 
 ::Zenorc's_Fang //1044
-<color=#808080>A gnarly, sharp cuspid from a cursed orc.</color>
+<color=#808080>เขี้ยวแหลมบิดเบี้ยวจากออร์คต้องคำสาป</color>
 
 ::Cultish_Masque //1045
-<color=#808080>A ceremonial mask used by an ancient shaman.</color>
+<color=#808080>หน้ากากพิธีกรรมของหมอผีโบราณ</color>
 
 ::Scorpion_Nipper //1046
-<color=#808080>A sharp forelimb claw from a scorpion.</color>
+<color=#808080>ก้ามหน้าที่แหลมคมของแมงป่อง</color>
 
 ::Dead_Medusa //1047
-<color=#808080>A medusa head that, naturally, looks sad and depressed.</color>
+<color=#808080>หัวเมดูซ่าที่หน้าตาเศร้าซึม ก็ต้องอย่างนั้นแหละ</color>
 
 ::Horrendous_Hair //1048
-<color=#808080>A lock of medusa hair, that is essentially just a bunch of snakes.</color>
+<color=#808080>ปอยผมเมดูซ่า ซึ่งก็คือกระจุกงูดีๆ นี่เอง</color>
 
 ::Skirt_of_Virgin //1049
-<color=#808080>A traditional skirt that symbolizes virginity.</color>
+<color=#808080>กระโปรงพื้นบ้านที่สื่อถึงความบริสุทธิ์</color>
 
 ::Tendon //1050
-<color=#808080>A bunch of tough, strong tendons.</color>
+<color=#808080>กระจุกเอ็นเหนียวแข็งแรง</color>
 
 ::Detonator //1051
-<color=#808080>A weird organic clump that seems to be a marine sphere brain.</color>
+<color=#808080>ก้อนอินทรีย์ประหลาดที่น่าจะเป็นสมองของ Marine Sphere</color>
 
 ::Single_Cell //1052
-<color=#808080>A single, functioning cell taken from an aquatic lifeform.</color>
+<color=#808080>เซลล์เดี่ยวที่ยังทำงานได้ เก็บมาจากสิ่งมีชีวิตในน้ำ</color>
 
 ::Ancient_Tooth //1053
-<color=#808080>A sharp, serrated tooth pulled from the mouth of a giant deep sea fish.</color>
+<color=#808080>ฟันซี่แหลมหยักที่ถอนมาจากปากปลาน้ำลึกขนาดยักษ์</color>
 
 ::Ancient_Lips //1054
-<color=#808080>A set of fat lips cut from a giant deep sea fish.</color>
+<color=#808080>ริมฝีปากหนาที่ตัดมาจากปลาน้ำลึกขนาดยักษ์</color>
 
 ::Earthworm_Peeling //1055
-<color=#808080>A shed skin peeling from an earthworm.</color>
+<color=#808080>คราบที่ไส้เดือนลอกทิ้ง</color>
 
 ::Grit //1056
-<color=#808080>A cubic grain of sand that sparkles brightly.</color>
+<color=#808080>เม็ดทรายทรงลูกบาศก์ที่แวววาวจ้า</color>
 
 ::Moth_Dust //1057
-<color=#808080>A bottle moth wing powder.</color>
+<color=#808080>ขวดบรรจุผงปีกผีเสื้อกลางคืน</color>
 
 ::Moth_Wings //1058
-<color=#808080>A set of moth wings.</color>
+<color=#808080>ปีกผีเสื้อกลางคืนชุดหนึ่ง</color>
 
 ::Fabric //1059
-<color=#808080>A piece of nearly transparent fabric.</color>
+<color=#808080>ผ้าที่แทบจะโปร่งใส</color>
 
 ::Golden_Hair //1060
-<color=#808080>A beautiful lock of golden human hair.</color>
+<color=#808080>ปอยผมทองของมนุษย์ สวยงาม</color>
 
 ::Witch_Starsand //1061
-<color=#808080>A bottle of sand from witch broom bristles that sparkles like the stars.</color>
+<color=#808080>ขวดทรายจากขนไม้กวาดแม่มด เป็นประกายเหมือนดวงดาว</color>
 
 ::Jack_o'_Pumpkin //1062
-<color=#808080>A pumpkin with a carved, spooky face.</color>
+<color=#808080>ฟักทองแกะสลักหน้าน่าขนลุก</color>
 
 ::Fang //1063
-<color=#808080>A sharp cuspid yanked from an orc archer's mouth.</color>
+<color=#808080>เขี้ยวแหลมที่กระชากมาจากปาก Orc Archer</color>
 
 ::Reins //1064
-<color=#808080>A set of reins that can help steer a mounted animal.</color>
+<color=#808080>ชุดบังเหียนที่ใช้บังคับสัตว์พาหนะ</color>
 
 ::Trap //1065
-<color=#808080>An item used by Hunters, or wanna-be Hunters, to place traps.</color>
+<color=#808080>ของที่ Hunter หรือคนที่อยากเป็น Hunter ใช้วางกับดัก</color>
 
 ::Fine-Grained_Trunk //1066
-<color=#808080>A tree trunk of a high quality; this grain pattern is excellent!</color>
+<color=#808080>ท่อนไม้คุณภาพสูง ลายไม้สวยเยี่ยม!</color>
 
 ::Solid_Trunk //1067
-<color=#808080>A tree trunk of a medium quality; it's nice and solid.</color>
+<color=#808080>ท่อนไม้คุณภาพปานกลาง เนื้อแน่นดีทีเดียว</color>
 
 ::Barren_Trunk //1068
-<color=#808080>A tree trunk of a low quality; knots are everywhere.</color>
+<color=#808080>ท่อนไม้คุณภาพต่ำ ตาไม้เต็มไปหมด</color>
 
 ::Orange_Net_Mushroom //1069
-<color=#808080>A firm, smelly, mushroom used in medicinal purposes.</color>
+<color=#808080>เห็ดเนื้อแน่นกลิ่นแรง ใช้ทำยา</color>
 
 ::Orange_Gooey_Mushroom //1070
-<color=#808080>A gooey, scented, mushroom used in medicinal purposes.</color>
+<color=#808080>เห็ดเหนียวหนึบกลิ่นหอม ใช้ทำยา</color>
 
 ::Unknown_Test_Tube //1071
-<color=#808080>A test tube that contains an unidentified fluid.</color>
+<color=#808080>หลอดทดลองที่บรรจุของเหลวที่ไม่รู้ว่าคืออะไร</color>
 
 ::Delivery_Message //1072
-<color=#808080>A personal letter written by Mahnsoo, chief of the Merchant Guild.</color>
+<color=#808080>จดหมายส่วนตัวที่ Mahnsoo หัวหน้าสมาคม Merchant เขียน</color>
 
 ::Receipt //1073
-<color=#808080>A receipt for a successful delivery.</color>
+<color=#808080>ใบเสร็จยืนยันว่าส่งของสำเร็จ</color>
 
 ::Delivery_Box //1081
-<color=#808080>A small, wooden box marked with the word "Fragile".</color>
+<color=#808080>กล่องไม้ใบเล็กที่เขียนว่า "ระวังแตก"</color>
 
 ::Unknown_Test_Tube_ //1085
-<color=#808080>A test tube that contains an unidentified fluid.</color>
+<color=#808080>หลอดทดลองที่บรรจุของเหลวที่ไม่รู้ว่าคืออะไร</color>
 
 ::Unknown_Test_Tube__ //1086
-<color=#808080>A test tube that contains an unidentified fluid.</color>
+<color=#808080>หลอดทดลองที่บรรจุของเหลวที่ไม่รู้ว่าคืออะไร</color>
 
 ::Unknown_Test_Tube___ //1087
-<color=#808080>A test tube that contains an unidentified fluid.</color>
+<color=#808080>หลอดทดลองที่บรรจุของเหลวที่ไม่รู้ว่าคืออะไร</color>
 
 ::Morroc_Solution //1088
-<color=#808080>A test tube that contains the Morroc solution.</color>
+<color=#808080>หลอดทดลองที่บรรจุสารละลาย Morroc</color>
 
 ::Payon_Solution //1089
-<color=#808080>A test tube that contains the Payon solution.</color>
+<color=#808080>หลอดทดลองที่บรรจุสารละลาย Payon</color>
 
 ::Unknown_Test_Tube____ //1090
-<color=#808080>A test tube that contains an unidentified fluid.</color>
+<color=#808080>หลอดทดลองที่บรรจุของเหลวที่ไม่รู้ว่าคืออะไร</color>
 
 ::Delivery_Box_ //1091
-<color=#808080>A small, wooden box marked with the word "Fragile".</color>
+<color=#808080>กล่องไม้ใบเล็กที่เขียนว่า "ระวังแตก"</color>
 
 ::Empty_Test_Tube //1092
-<color=#808080>An empty test tube.</color>
+<color=#808080>หลอดทดลองเปล่า</color>
 
 ::Empty_Potion_Bottle //1093
-<color=#808080>An empty potion bottle.</color>
+<color=#808080>ขวดยาเปล่า</color>
 
 ::Short_Daenggie //1094
-<color=#808080>A short lock of braided hair.</color>
+<color=#808080>ปอยผมถักสั้นๆ</color>
 
 ::Needle_of_Alarm //1095
-<color=#808080>A set of hands from the clock face.</color>
+<color=#808080>ชุดเข็มนาฬิกาจากหน้าปัด</color>
 
 ::Round_Shell //1096
-<color=#808080>A short, round shell from an insect.</color>
+<color=#808080>เปลือกแมลงทรงกลมสั้น</color>
 
 ::Worn_Out_Page //1097
-<color=#808080>A worn, tattered page torn from an old book.</color>
+<color=#808080>หน้ากระดาษเก่าขาดวิ่นที่ฉีกมาจากหนังสือเล่มเก่า</color>
 
 ::Manacles //1098
-<color=#808080>An old, used prisoner wrist restraint.</color>
+<color=#808080>กุญแจมือนักโทษเก่าที่ผ่านการใช้มาแล้ว</color>
 
 ::Worn_Out_Prison_Uniform //1099
-<color=#808080>An old, used prison uniform.</color>
+<color=#808080>ชุดนักโทษเก่าที่ผ่านการใช้มาแล้ว</color>
 
 ::Ashes_of_Darkness //6000
-<color=#808080>A dark ash imbued with mysterious magical power and darkness.</color>
+<color=#808080>เถ้าถ่านดำที่อาบด้วยพลังเวทลึกลับและความมืด</color>
 
 ::Essence_of_Fire //6001
-<color=#808080>An essence of fire that holds the pure spirit of Thor, god of thunder.</color>
+<color=#808080>แก่นแท้แห่งไฟที่บรรจุวิญญาณบริสุทธิ์ของ Thor เทพสายฟ้า</color>
 
 ::Token_of_Apostle //6002
-<color=#808080>A token that certifies its owner obeys evil; and proves a member of the diabolists.</color>
+<color=#808080>เครื่องหมายที่รับรองว่าเจ้าของสวามิภักดิ์ต่อความชั่วร้าย และเป็นสมาชิกลัทธิบูชาปีศาจ</color>
 
 ::Pendant_of_Spirit //6003
-<color=#808080>A pendant that confined wandering souls from unknown places.</color>
+<color=#808080>จี้ที่กักวิญญาณเร่ร่อนจากที่ที่ไม่มีใครรู้ไว้</color>
 
 ::Cursed_Baphomet_Doll //6004
-<color=#808080>A doll imbued with Baphomet's curse.</color>
+<color=#808080>ตุ๊กตาที่อาบด้วยคำสาปของ Baphomet</color>
 
 ::Hoe //6010
-<color=#808080>A gardening tool that could also be a fearful weapon.</color>
+<color=#808080>อุปกรณ์ทำสวนที่เอามาใช้เป็นอาวุธน่ากลัวได้</color>
 
 ::Fur //6020
-<color=#808080>Beautiful silver colored fur.</color>
+<color=#808080>ขนสีเงินงดงาม</color>
 
 ::Peaked_Hat //6021
-<color=#808080>A small, red colored peaked hat.</color>
+<color=#808080>หมวกทรงแหลมสีแดงใบเล็ก</color>
 
 ::Hard_Skin //6022
-<color=#808080>A hard, gray skin.</color>
+<color=#808080>หนังแข็งสีเทา</color>
 
 ::Mystic_Horn //6023
-<color=#808080>A beautiful long, white colored horn with a magical power.</color>
+<color=#808080>เขาสีขาวยาวสวยงาม มีพลังเวทอยู่ในตัว</color>
 
 ::Crystal_of_Feardom //6027
-<color=#808080>A bloodstained crystal that evokes the feeling of evil.</color>
+<color=#808080>คริสตัลเปื้อนเลือด ให้ความรู้สึกชั่วร้าย</color>
 
 ::Sealed_Scroll //6028
-<color=#808080>A sealed scroll consealing magic spells.</color>
+<color=#808080>ม้วนคาถาที่ผนึกเวทมนตร์ไว้ข้างใน</color>
 
 ::Morroc_Tracing_Log //6029
-<color=#808080>A record of R. Moore, the leader of unsealing Satan Morroc. The writing is second rate at best.
+<color=#808080>บันทึกของ R. Moore ผู้นำในการปลดผนึก Satan Morroc สำนวนการเขียนถือว่างั้นๆ</color>
 
 ::Glittering_Paper //6030
-<color=#808080>This isn't it! Where is the treasure paper?</color>
+<color=#808080>ไม่ใช่อันนี้! กระดาษสมบัติอยู่ไหนกันนะ?</color>
 
 ::Glittering_Paper_ //6031
-<color=#808080>This is it! Run to Pierre before too late!</color>
+<color=#808080>ใช่อันนี้แหละ! รีบวิ่งไปหา Pierre ก่อนจะสายเกินไป!</color>
 
 ::Horn_of_Hillslion //6032
-<color=#808080>A hard horn that grows on Hilsrion's head.</color>
+<color=#808080>เขาแข็งที่งอกบนหัว Hilsrion</color>
 
 ::Horn_of_Tendrilion //6033
-<color=#808080>A hard horn that grows on Tendrilion's head.</color>
+<color=#808080>เขาแข็งที่งอกบนหัว Tendrilion</color>
 
 ::Decaying_Stem //6035
-<color=#808080>An old, decaying stem of a plant.</color>
+<color=#808080>ก้านพืชเก่าที่กำลังเน่าเปื่อย</color>
 
 ::Meeting_Invitation //6036
-<color=#808080>A meeting invite completed by Ryosen, Rune Midgard's investigator.</color>
+<color=#808080>บัตรเชิญประชุมที่ Ryosen ผู้สืบสวนแห่ง Rune Midgard กรอกไว้</color>
 
 ::Messy_File //6037
-<color=#808080>A bundle of ripped and crumpled files.</color>
+<color=#808080>ปึกเอกสารที่ฉีกขาดยับยู่ยี่</color>
 
 ::Neat_Report //6038
-<color=#808080>A nicely sorted file, a small thank you note is attached on the bottom.</color>
+<color=#808080>แฟ้มที่จัดเรียงมาอย่างดี ด้านล่างติดโน้ตขอบคุณใบเล็กไว้</color>
 
 ::Piece_of_Fish //6039
-<color=#808080>A piece of raw fish.</color>
+<color=#808080>เนื้อปลาดิบชิ้นหนึ่ง</color>
 
 ::Part_of_a_Report //6040
-<color=#808080>A part of the expedition report, some parts are destroyed and wrinkled.</color>
+<color=#808080>ส่วนหนึ่งของรายงานการสำรวจ บางส่วนเสียหายและยับ</color>
 
 ::Strong_Vine //6041
-<color=#808080>A strong looking vine with various uses.</color>
+<color=#808080>เถาวัลย์ที่ดูแข็งแรง ใช้ได้สารพัด</color>
 
 ::Ordinary_Branch //6042
-<color=#808080>A strong branch with various uses.</color>
+<color=#808080>กิ่งไม้แข็งแรงที่ใช้ได้สารพัด</color>
 
 ::Letter_from_Lugen //6043
-<color=#808080>A letter written by Lugen to his close friend, Otto.</color>
+<color=#808080>จดหมายที่ Lugen เขียนถึง Otto เพื่อนสนิท</color>
 
 ::Letter_from_Otto //6044
-<color=#808080>A letter written by Otto's in response to Lugen.</color>
+<color=#808080>จดหมายที่ Otto เขียนตอบ Lugen</color>
 
 ::Supply_Box //6045
-<color=#808080>A box with various supplies.</color>
+<color=#808080>กล่องใส่ของใช้จิปาถะ</color>
 
 ::Clothing_Voucher //6046
-<color=#808080>A voucher which may be exchanged for a new clothing style.</color>
+<color=#808080>คูปองที่แลกเปลี่ยนสีชุดใหม่ได้</color>
 
 ::Unidentified_Mineral //6048
-<color=#808080>A mineral not found in Rune Midgard that any scientist would love to study.</color>
+<color=#808080>แร่ที่ไม่มีใน Rune Midgard นักวิทยาศาสตร์คนไหนก็อยากศึกษา</color>
 
 ::Marlin //6049
-<color=#808080>A Marlin fish, it looks a bit different from what you saw in a book.</color>
+<color=#808080>ปลา Marlin หน้าตาต่างจากในหนังสือนิดหน่อย</color>
 
 ::Mould_Powder //7001
-<color=#808080>A handful of soft, powdery mold that is silken to the touch.</color>
+<color=#808080>กำราขุยนุ่ม สัมผัสลื่นเหมือนไหม</color>
 
 ::Ogre_Tooth //7002
-<color=#808080>A tooth extracted from the mouth of a proud Orc Warrior.</color>
+<color=#808080>ฟันที่ถอนมาจากปาก Orc Warrior ผู้ทระนง</color>
 
 ::Anolian_Skin //7003
-<color=#808080>A sticky piece of Anolian skin.</color>
+<color=#808080>เศษหนัง Anolian ที่เหนียวหนึบ</color>
 
 ::Mud_Lump //7004
-<color=#808080>A gloppy, unpleasant lump of wet, dirty mud.</color>
+<color=#808080>ก้อนโคลนเปียกสกปรก เละๆ น่าขยะแขยง</color>
 
 ::Skull //7005
-<color=#808080>A skull taken from a corpse.</color>
+<color=#808080>กะโหลกที่เอามาจากศพ</color>
 
 ::Wing_of_Red_Bat //7006
-<color=#808080>A wing from a red bat.</color>
+<color=#808080>ปีกจากค้างคาวแดง</color>
 
 ::Claw_of_Rat //7007
-<color=#808080>A toe nail from a huge, disease ridden rodent.</color>
+<color=#808080>เล็บเท้าของหนูตัวใหญ่ที่เต็มไปด้วยโรค</color>
 
 ::Stiff_Horn //7008
-<color=#808080>A tough horn that might break, but will never bend.</color>
+<color=#808080>เขาที่เหนียว หักได้แต่ไม่มีวันงอ</color>
 
 ::Glitter_Shell //7009
-<color=#808080>A shell that sparkles with dazzling light.</color>
+<color=#808080>เปลือกหอยที่แวววาวจ้า</color>
 
 ::Tail_of_Steel_Scorpion //7010
-<color=#808080>A stinger ripped out of the body of a steel scorpion.</color>
+<color=#808080>เหล็กในที่ดึงออกมาจากตัวแมงป่องเหล็ก</color>
 
 ::Claw_of_Monkey //7011
-<color=#808080>A monkey's claw that peeled many a banana.</color>
+<color=#808080>เล็บลิงที่ปอกกล้วยมานับไม่ถ้วน</color>
 
 ::Tough_Scalelike_Stem //7012
-<color=#808080>A stem with a tough surface covered with thick, protective scales.</color>
+<color=#808080>ก้านผิวเหนียวที่ปกคลุมด้วยเกล็ดหนาไว้ป้องกัน</color>
 
 ::Coral_Reef //7013
-<color=#808080>A small chunk of a coral reef formed in clear, tropical waters.</color>
+<color=#808080>ก้อนปะการังเล็กๆ ที่ก่อตัวในน้ำทะเลเขตร้อนใสแจ๋ว</color>
 
 ::Old_Portrait //7014
-<color=#808080>An old, fragile portrait of a girl that you can't identify, although she seems very pretty.</color>
+<color=#808080>ภาพวาดเก่าเปราะบางของเด็กสาวที่ไม่รู้ว่าใคร แต่ดูสวยมาก</color>
 
 ::Bookclip_in_Memory //7015
-<color=#808080>An old leaf that is used as a bookmark.</color>
+<color=#808080>ใบไม้เก่าที่ใช้เป็นที่คั่นหนังสือ</color>
 
 ::Spoon_Stub //7016
-<color=#808080>A spoon that was used to dig an underground tunnel.</color>
+<color=#808080>ช้อนที่เคยใช้ขุดอุโมงค์ใต้ดิน</color>
 
 ::Executioner's_Mitten //7017
-<color=#808080>A glove worn during executions that absorbed memories related to death and obligation.</color>
+<color=#808080>ถุงมือที่ใส่ตอนประหารชีวิต ซึมซับความทรงจำเรื่องความตายและหน้าที่เอาไว้</color>
 
 ::Young_Twig //7018
-<color=#808080>A fresh, young twig that evokes feelings of purity and innocence.</color>
+<color=#808080>กิ่งอ่อนสดใหม่ ให้ความรู้สึกบริสุทธิ์ไร้เดียงสา</color>
 
 ::Loki's_Whispers //7019
-<color=#808080>A strange object in which the seductive whispers of Loki can be faintly heard.</color>
+<color=#808080>วัตถุประหลาดที่แว่วเสียงกระซิบยั่วยวนของ Loki</color>
 
 ::Mother's_Nightmare //7020
-<color=#808080>A mother's nightmare that has been given physical form.</color>
+<color=#808080>ฝันร้ายของแม่ที่กลายเป็นรูปร่างขึ้นมาจริงๆ</color>
 
 ::Foolishness_of_the_Blind //7021
-<color=#808080>A symbol of Hod, the blind god who was tricked into killing his brother Balder, god of light.</color>
+<color=#808080>สัญลักษณ์ของ Hod เทพตาบอดที่ถูกหลอกให้สังหาร Balder เทพแห่งแสงผู้เป็นพี่น้อง</color>
 
 ::Old_Hilt //7022
-<color=#808080>An old hilt broken off a heavy sword.</color>
+<color=#808080>ด้ามเก่าที่หักมาจากดาบหนัก</color>
 
 ::Blade_Lost_in_Darkness //7023
-<color=#808080>A blade imbued with a suffocating aura that repels light.</color>
+<color=#808080>ใบมีดอาบออร่าอึดอัด ผลักไสแสงสว่าง</color>
 
 ::Bloody_Edge //7024
-<color=#808080>A blade stained with blood that can't be cleansed.</color>
+<color=#808080>ใบมีดเปื้อนเลือดที่ล้างยังไงก็ไม่ออก</color>
 
 ::Lucifer's_Lament //7025
-<color=#808080>A gem that is key to opening the path to the mysterious, ancient land of Geffenia.</color>
+<color=#808080>อัญมณีที่เป็นกุญแจเปิดทางสู่ดินแดนโบราณลึกลับ Geffenia</color>
 
 ::Key_of_Clock_Tower //7026
-<color=#808080>A key that can unlock the Clock Tower attic.</color>
+<color=#808080>กุญแจไขห้องใต้หลังคาหอนาฬิกา</color>
 
 ::Key_of_Underground //7027
-<color=#808080>A key that can unlock the Clock Tower basement.</color>
+<color=#808080>กุญแจไขชั้นใต้ดินหอนาฬิกา</color>
 
 ::Claw_of_Desert_Wolf //7030
-<color=#808080>A claw pried from a Desert Wolf's paw.</color>
+<color=#808080>กรงเล็บที่งัดมาจากอุ้งเท้า Desert Wolf</color>
 
 ::Old_Frying_Pan //7031
-<color=#808080>An old frying pan that has outlived its usefulness.</color>
+<color=#808080>กระทะเก่าที่หมดประโยชน์ไปแล้ว</color>
 
 ::Piece_of_Egg_Shell //7032
-<color=#808080>An eggshell fragment that protected its egg to the final, tragic end.</color>
+<color=#808080>เศษเปลือกไข่ที่ปกป้องไข่จนวินาทีสุดท้ายอันน่าเศร้า</color>
 
 ::Poison_Spore //7033
-<color=#808080>A clump of spores from a toxic mushroom.</color>
+<color=#808080>กระจุกสปอร์จากเห็ดพิษ</color>
 
 ::Red_Stocking //7034
-<color=#808080>A Christmas stocking where presents were stolen through a hole in the bottom.</color>
+<color=#808080>ถุงเท้าคริสต์มาสที่ของขวัญถูกขโมยไปทางรูก้นถุง</color>
 
 ::Matchstick //7035
-<color=#808080>A phosphorus tipped stick that can start a fire.</color>
+<color=#808080>ไม้ปลายฟอสฟอรัสที่จุดไฟได้</color>
 
 ::Fang_of_Hati //7036
-<color=#808080>A sharp fang dislodged from Hati's mouth.</color>
+<color=#808080>เขี้ยวแหลมที่งัดมาจากปาก Hati</color>
 
 ::Yarn //7038
-<color=#808080>A wound up ball of fluffy knitting yarn.</color>
+<color=#808080>ไหมพรมฟูๆ ที่ม้วนเป็นก้อน</color>
 
 ::Megaphone_ //7040
-<color=#808080>A funnel shaped device that can amplify one's voice.</color>
+<color=#808080>อุปกรณ์ทรงกรวย ใช้ขยายเสียง</color>
 
 ::Fine_Grit //7041
-<color=#808080>A crystal made entirely of fine sand.</color>
+<color=#808080>คริสตัลที่เกิดจากทรายละเอียดล้วนๆ</color>
 
 ::Leather_Bag_of_Infinity //7042
-<color=#808080>A mysterious leather bag that contains a limitless supply of sand.</color>
+<color=#808080>ถุงหนังลึกลับที่มีทรายไม่มีวันหมด</color>
 
 ::Fine_Sand //7043
-<color=#808080>A pocket of sand grains that are so fine that they cannot be gathered by hand.</color>
+<color=#808080>ถุงเม็ดทรายที่ละเอียดจนใช้มือกอบไม่ได้</color>
 
 ::Vigorgra //7044
-<color=#808080>An awesome tonic that brings insurmountable vigor.</color>
+<color=#808080>ยาบำรุงสุดยอดที่ให้พละกำลังเหลือล้น</color>
 
 ::Alice's_Apron //7047
-<color=#808080>An apron worn by Alice, its super cute!</color>
+<color=#808080>ผ้ากันเปื้อนที่ Alice ใส่ น่ารักสุดๆ!</color>
 
 ::Talon_of_Griffon //7048
-<color=#808080>A Griffon's sharp talon.</color>
+<color=#808080>กรงเล็บแหลมคมของ Griffon</color>
 
 ::Stone //7049
-<color=#808080>A simple stone that you can find anywhere.</color>
+<color=#808080>หินธรรมดาที่หาได้ทุกที่</color>
 
 ::Cyfar //7053
-<color=#808080>A blue crystal that faintly shines with muddled light.</color>
+<color=#808080>คริสตัลสีน้ำเงิน เรืองแสงขุ่นๆ จางๆ</color>
 
 ::Brigan //7054
-<color=#808080>A rare, red mineral.</color>
+<color=#808080>แร่สีแดงหายาก</color>
 
 ::Gleipnir //7058
-<color=#808080>Impossibly strong thread woven from impossibly rare items.</color>
+<color=#808080>ด้ายที่แข็งแรงเกินจะเชื่อ ทอจากของที่หายากเกินจะเชื่อ</color>
 
 ::Free_Storage_Voucher //7059
-<color=#808080>A ticket that waives the Kafra Storage service fee.</color>
+<color=#808080>ตั๋วยกเว้นค่าบริการคลังเก็บของ Kafra</color>
 
 ::Free_Transit_Voucher //7060
-<color=#808080>A ticket that waives the Kafra Teleport service fee.</color>
+<color=#808080>ตั๋วยกเว้นค่าบริการวาร์ปของ Kafra</color>
 
 ::Free_Pushcart_Voucher //7061
-<color=#808080>A ticket that waives the Kafra Pushcart rental fee.</color>
+<color=#808080>ตั๋วยกเว้นค่าเช่ารถเข็นของ Kafra</color>
 
 ::Soft_Feather //7063
-<color=#808080>A feather that is soft enough to be used as stuffing in a quilt.</color>
+<color=#808080>ขนที่นุ่มพอจะเอาไปยัดผ้านวมได้</color>
 
 ::Wing_of_Dragonfly //7064
-<color=#808080>A dragonfly wing.</color>
+<color=#808080>ปีกแมลงปอ</color>
 
 ::Sea_Otter_Fur //7065
-<color=#808080>A bunch of sea otter fur that is soft and downy enough to be used in clothing.</color>
+<color=#808080>กระจุกขนนากทะเล นุ่มฟูพอจะเอาไปทำเสื้อผ้าได้</color>
 
 ::Ice_Cubic //7066
-<color=#808080>A miraculous lump of ice that wil never melt.</color>
+<color=#808080>ก้อนน้ำแข็งมหัศจรรย์ที่ไม่มีวันละลาย</color>
 
 ::Stone_Fragment //7067
-<color=#808080>A small piece of rock that has been broken from a larger stone.</color>
+<color=#808080>เศษหินชิ้นเล็กที่แตกมาจากก้อนใหญ่</color>
 
 ::Burnt_Tree //7068
-<color=#808080>A burnt piece of wood has little practical value.</color>
+<color=#808080>ท่อนไม้ไหม้ไฟ แทบไม่มีประโยชน์อะไร</color>
 
 ::Destroyed_Armor //7069
-<color=#808080>A piece of armor that has been damaged beyond repair.</color>
+<color=#808080>เศษเกราะที่เสียหายจนซ่อมไม่ได้</color>
 
 ::Broken_Shell //7070
-<color=#808080>A damaged turtle's shell, that in ancient times, was used to foretell the future.</color>
+<color=#808080>กระดองเต่าที่แตกร้าว สมัยโบราณใช้ทำนายอนาคต</color>
 
 ::Tattered_Clothes //7071
-<color=#808080>Worn out clothes.</color>
+<color=#808080>เสื้อผ้าที่เก่าจนโทรม</color>
 
 ::Old_Shuriken //7072
-<color=#808080>An old, rusty shuriken that has little hope of being thrown by an awesome ninja.</color>
+<color=#808080>ชูริเคนเก่าขึ้นสนิม แทบไม่มีหวังจะได้ให้นินจาเจ๋งๆ ขว้าง</color>
 
 ::Freya's_Jewel //7073
-<color=#808080>A sparkling clear gemstone formed from the tears of the goddess Freya.</color>
+<color=#808080>อัญมณีใสระยิบระยับที่เกิดจากน้ำตาของเทพี Freya</color>
 
 ::Thor's_Gauntlets //7074
-<color=#808080>A pair of steel gauntlets worn by Thor, god of thunder.</color>
+<color=#808080>ถุงมือเหล็กที่ Thor เทพสายฟ้าสวม</color>
 
 ::Iron_Maiden //7075
-<color=#808080>An instrument used for torture.</color>
+<color=#808080>เครื่องมือที่ใช้ทรมาน</color>
 
 ::Wheel_of_the_Unknown //7076
-<color=#808080>A wheel whose purpose is truly mysterious.</color>
+<color=#808080>ล้อที่ไม่รู้จริงๆ ว่าเอาไว้ทำอะไร</color>
 
 ::Silver_Ornament //7077
-<color=#808080>An ornament made with silver.</color>
+<color=#808080>เครื่องประดับที่ทำจากเงิน</color>
 
 ::Wrath_of_Valkyrie //7078
-<color=#808080>A physical manifestation of a valkyrie's rage.</color>
+<color=#808080>รูปธรรมของความเกรี้ยวกราดของวาลคีรี</color>
 
 ::Feather_of_Angel_Wing //7079
-<color=#808080>A feather from an angel's wing.</color>
+<color=#808080>ขนจากปีกเทวดา</color>
 
 ::Cat_Tread //7080
-<color=#808080>A physical manifestation of the sound of cat footsteps.</color>
+<color=#808080>รูปธรรมของเสียงฝีเท้าแมว</color>
 
 ::Woman's_Moustache //7081
-<color=#808080>A grasp of facial hair from a woman, in theory, this should be very rare.</color>
+<color=#808080>กระจุกหนวดของผู้หญิง ตามทฤษฎีแล้วน่าจะหายากมาก</color>
 
 ::Root_of_Stone //7082
-<color=#808080>A bunch of stone roots, a rare item considering stones have been proven to not have any.</color>
+<color=#808080>กระจุกรากหิน ของหายากมาก เพราะพิสูจน์แล้วว่าหินไม่มีราก</color>
 
 ::Spirit_of_Fish //7083
-<color=#808080>A transparent blue bottle that contains a fish spirit.</color>
+<color=#808080>ขวดใสสีน้ำเงินที่บรรจุวิญญาณปลา</color>
 
 ::Sputum_of_Bird //7084
-<color=#808080>A bottle containing bird sputum, a rare item considering that birds do not salivate.</color>
+<color=#808080>ขวดบรรจุน้ำลายนก ของหายากมาก เพราะนกไม่มีน้ำลาย</color>
 
 ::Sinew_of_Bear //7085
-<color=#808080>A small bunch of rare bear sinew.</color>
+<color=#808080>เอ็นหมีหายากมัดเล็กๆ</color>
 
 ::Emblem_of_the_Sun_God //7086
-<color=#808080>A golden, shining bead that is the symbol of the sun god.</color>
+<color=#808080>ลูกปัดทองเปล่งประกาย สัญลักษณ์ของสุริยเทพ</color>
 
 ::Breath_of_Spirit //7087
-<color=#808080>A spirit breath that emits an unnatural chill.</color>
+<color=#808080>ลมหายใจวิญญาณที่แผ่ความเย็นเหนือธรรมชาติ</color>
 
 ::Snow_Crystal //7088
-<color=#808080>A perfect ice crystal from a snowy sky.</color>
+<color=#808080>ผลึกน้ำแข็งสมบูรณ์แบบจากฟ้าที่หิมะตก</color>
 
 ::Omen_of_Tempest //7089
-<color=#808080>A strange orb that can predict when windstorms.</color>
+<color=#808080>ลูกแก้วประหลาดที่ทำนายพายุลมได้</color>
 
 ::Ripple //7090
-<color=#808080>A receptacle that captured a ripple from the ocean.</color>
+<color=#808080>ภาชนะที่กักระลอกคลื่นจากมหาสมุทรไว้</color>
 
 ::Billow //7091
-<color=#808080>A sculpture of a billow crushing against the shore.</color>
+<color=#808080>ประติมากรรมคลื่นลูกใหญ่ที่ซัดเข้าฝั่ง</color>
 
 ::Drifting_Air //7092
-<color=#808080>A sculpture of drifting air captured by a gifted artist.</color>
+<color=#808080>ประติมากรรมสายลมที่พัดผ่าน ผลงานของศิลปินผู้มีพรสวรรค์</color>
 
 ::Cogwheel //7093
-<color=#808080>A cogwheel used in a machine.</color>
+<color=#808080>เฟืองที่ใช้ในเครื่องจักร</color>
 
 ::Fragment //7094
-<color=#808080>A strange object with metal pieces attached.</color>
+<color=#808080>วัตถุประหลาดที่มีชิ้นส่วนโลหะติดอยู่</color>
 
 ::Metal_Fragment //7095
-<color=#808080>An unidentified metal fragment.</color>
+<color=#808080>เศษโลหะที่ระบุไม่ได้ว่าคืออะไร</color>
 
 ::Lava //7096
-<color=#808080>A chunk of smoldering lava.</color>
+<color=#808080>ก้อนลาวาที่ยังคุกรุ่น</color>
 
 ::Burning_Heart //7097
-<color=#808080>A stone heart that is aflame with magic.</color>
+<color=#808080>หัวใจหินที่ลุกโชนด้วยพลังเวท</color>
 
 ::Live_Coal //7098
-<color=#808080>A live coal.</color>
+<color=#808080>ถ่านที่ยังติดไฟอยู่</color>
 
 ::Worn_Out_Magic_Scroll //7099
-<color=#808080>An old, worn out magic scroll that is valuable to the Mage Academy.</color>
+<color=#808080>ม้วนคาถาเก่าโทรม แต่มีค่าสำหรับสถาบัน Mage</color>
 
 ::Sharp_Leaf //7100
-<color=#808080>A sharp leaf.</color>
+<color=#808080>ใบไม้ที่คมกริบ</color>
 
 ::Peco_Peco_Feather //7101
-<color=#808080>A rare feather from the wing of a Peco Peco.</color>
+<color=#808080>ขนหายากจากปีก Peco Peco</color>
 
 ::False_Angel_Wing //7104
-<color=#808080>A wing from a phony angel.</color>
+<color=#808080>ปีกจากเทวดาปลอม</color>
 
 ::False_Heaven_Ring //7105
-<color=#808080>A heavenly halo from a phony angel.</color>
+<color=#808080>วงแหวนสวรรค์จากเทวดาปลอม</color>
 
 ::Antelope_Horn //7106
-<color=#808080>A impressive horn from an antelope.</color>
+<color=#808080>เขาแอนทิโลปที่ดูน่าประทับใจ</color>
 
 ::Antelope_Skin //7107
-<color=#808080>A patch of dirty fur from an antelope.</color>
+<color=#808080>ปื้นขนสกปรกจากแอนทิโลป</color>
 
 ::Piece_of_Shield //7108
-<color=#808080>A piece of shield is strong and durable.</color>
+<color=#808080>ชิ้นส่วนโล่ที่แข็งแรงทนทาน</color>
 
 ::Shining_Spear_Blade //7109
-<color=#808080>A shiny spear blade.</color>
+<color=#808080>ใบหอกเงางาม</color>
 
 ::Broken_Sword //7110
-<color=#808080>A damaged sword that is no longer usable.</color>
+<color=#808080>ดาบที่พังจนใช้ไม่ได้แล้ว</color>
 
 ::Slick_Paper //7111
-<color=#808080>A smooth, sleek paper suitable for writing love letters.</color>
+<color=#808080>กระดาษเนียนลื่น เหมาะกับการเขียนจดหมายรัก</color>
 
 ::Sharp_Paper //7112
-<color=#808080>Incredibly sharp, and stout paper that could be used like a knife.</color>
+<color=#808080>กระดาษที่คมและแข็งอย่างเหลือเชื่อ ใช้แทนมีดได้</color>
 
 ::Broken_Pharaoh_Emblem //7113
-<color=#808080>A broken emblem of Pharaoh that possess a mysterious power.</color>
+<color=#808080>ตราสัญลักษณ์ Pharaoh ที่แตกหัก ยังมีพลังลึกลับอยู่</color>
 
 ::Masque_of_Tutankhamen //7114
-<color=#808080>A golden masque worn by an ancient king.</color>
+<color=#808080>หน้ากากทองคำที่กษัตริย์โบราณสวม</color>
 
 ::Harpy_Feather //7115
-<color=#808080>A feather from a Harpy.</color>
+<color=#808080>ขนของ Harpy</color>
 
 ::Harpy_Talon //7116
-<color=#808080>A talon from a Harpy.</color>
+<color=#808080>กรงเล็บของ Harpy</color>
 
 ::Torn_Magic_Book //7117
-<color=#808080>An old magic book that is seriously damaged.</color>
+<color=#808080>หนังสือเวทเก่าที่เสียหายหนัก</color>
 
 ::Torn_Scroll //7118
-<color=#808080>A piece of a scroll.</color>
+<color=#808080>เศษม้วนกระดาษ</color>
 
 ::Bacillus //7119
-<color=#808080>A sample of aerobic bacteria that resides on metal chains.</color>
+<color=#808080>ตัวอย่างแบคทีเรียที่ใช้ออกซิเจน อาศัยอยู่บนโซ่โลหะ</color>
 
 ::Burning_Horseshoe //7120
-<color=#808080>A burning horseshoe, useful only on burning horses for burning rangers.</color>
+<color=#808080>เกือกม้าที่ลุกเป็นไฟ ใช้ได้แต่กับม้าไฟของนายพรานไฟเท่านั้น</color>
 
 ::Honey_Pot //7121
-<color=#808080>An empty pot that carried honey once upon a time.</color>
+<color=#808080>ไหเปล่าที่เคยใส่น้ำผึ้งเมื่อนานมาแล้ว</color>
 
 ::Burning_Hair //7122
-<color=#808080>A bunch of tussled red hair that looks like it's on fire.</color>
+<color=#808080>กระจุกผมแดงยุ่งเหยิง ดูเหมือนไฟลุก</color>
 
 ::Dragon_Skin //7123
-<color=#808080>A piece of skin from a dragon.</color>
+<color=#808080>เศษหนังมังกร</color>
 
 ::Sand_Clump //7124
-<color=#808080>A lump of wet sand.</color>
+<color=#808080>ก้อนทรายเปียก</color>
 
 ::Scorpion_Claw //7125
-<color=#808080>A claw from a scorpion.</color>
+<color=#808080>ก้ามแมงป่อง</color>
 
 ::Large_Jellopy //7126
-<color=#808080>A huge jellopy.</color>
+<color=#808080>Jellopy ก้อนยักษ์</color>
 
 ::Alcohol_Creation_Guide //7127
-<color=#808080>A book with instructions for creating Alcohol.</color>
+<color=#808080>ตำราสอนทำ Alcohol</color>
 
 ::Bottle_Grenade_Creation_Guide //7128
-<color=#808080>A book with instructions for creating Bottle Grenades.</color>
+<color=#808080>ตำราสอนทำ Bottle Grenade</color>
 
 ::Acid_Bottle_Creation_Guide //7129
-<color=#808080>A book with instructions for creating Acid Bottles.</color>
+<color=#808080>ตำราสอนทำ Acid Bottle</color>
 
 ::Plant_Bottle_Creation_Guide //7130
-<color=#808080>A book with instructions for creating Floras.</color>
+<color=#808080>ตำราสอนทำ Flora</color>
 
 ::Marine_Sphere_Creation_Guide //7131
-<color=#808080>A book with instructions for creating Marine Spheres.</color>
+<color=#808080>ตำราสอนทำ Marine Sphere</color>
 
 ::Coating_Bottle_Creation_Guide //7132
-<color=#808080>A book with instructions for creating Glistening Coats.</color>
+<color=#808080>ตำราสอนทำ Glistening Coat</color>
 
 ::Condensed_Potion_Creation_Guide //7133
-<color=#808080>A book with instructions for creating Condensed Potions.</color>
+<color=#808080>ตำราสอนทำ Condensed Potion</color>
 
 ::Medicine_Bowl //7134
-<color=#808080>A porcelain bowl used for grinding herbs or other substances.</color>
+<color=#808080>ครกกระเบื้องสำหรับบดสมุนไพรและของอื่นๆ</color>
 
 ::Grenade_Bottle //7135
-<color=#808080>A bottle containing flammable liquid.</color>
+<color=#808080>ขวดบรรจุของเหลวไวไฟ</color>
 
 ::Acid_Bottle //7136
-<color=#808080>A bottle containing corrosive acid.</color>
+<color=#808080>ขวดบรรจุกรดกัดกร่อน</color>
 
 ::Plant_Bottle //7137
-<color=#808080>A bottle containing a dormant Flora.</color>
+<color=#808080>ขวดบรรจุ Flora ที่ยังหลับอยู่</color>
 
 ::Marine_Sphere_Bottle //7138
-<color=#808080>A bottle containing a dormant Marine Sphere.</color>
+<color=#808080>ขวดบรรจุ Marine Sphere ที่ยังหลับอยู่</color>
 
 ::Coating_Bottle //7139
-<color=#808080>A bottle containing a shining liquid.</color>
+<color=#808080>ขวดบรรจุของเหลวเรืองแสง</color>
 
 ::Seed_of_Life //7140
-<color=#808080>A seed filled with vitality.</color>
+<color=#808080>เมล็ดที่เปี่ยมด้วยพลังชีวิต</color>
 
 ::Morning_Dew_of_Yggdrasil //7141
-<color=#808080>Morning dew gathered from Yggdrasilberries.</color>
+<color=#808080>น้ำค้างยามเช้าที่เก็บจากผล Yggdrasil</color>
 
 ::Embryo //7142
-<color=#808080>An embryo of a dormant homunculus.</color>
+<color=#808080>ตัวอ่อนของ Homunculus ที่ยังหลับอยู่</color>
 
 ::Glass_Tube //7143
-<color=#808080>An empty tube that can hold a creature.</color>
+<color=#808080>หลอดเปล่าที่ใส่สิ่งมีชีวิตได้</color>
 
 ::Potion_Creation_Gude //7144
-<color=#808080>A book with instructions for creating potions.</color>
+<color=#808080>ตำราสอนทำยา</color>
 
 ::Mother's_Letter //7148
-<color=#808080>A letter of loving words written by a warm hearted mother to her children.</color>
+<color=#808080>จดหมายเปี่ยมความรักที่แม่ใจดีเขียนถึงลูกๆ</color>
 
 ::Yellow_Plate //7149
-<color=#808080>A polished plate made from yellow clay.</color>
+<color=#808080>จานขัดเงาที่ทำจากดินเหนียวสีเหลือง</color>
 
 ::Piece_of_Bamboo //7150
-<color=#808080>A piece of bamboo from a bamboo tree.</color>
+<color=#808080>ปล้องไผ่จากต้นไผ่</color>
 
 ::Oil_Paper //7151
-<color=#808080>A piece of waxy, yellow paper that repels water.</color>
+<color=#808080>กระดาษเคลือบขี้ผึ้งสีเหลืองที่กันน้ำ</color>
 
 ::Glossy_Hair //7152
-<color=#808080>A tied bunch of shining human hair.</color>
+<color=#808080>ช่อผมมนุษย์เงางามที่มัดไว้</color>
 
 ::Worn_Out_Kimono //7153
-<color=#808080>A beautiful but worn out kimono.</color>
+<color=#808080>กิโมโนสวยงาม แต่เก่าจนซอมซ่อ</color>
 
 ::Poisonous_Powder //7154
-<color=#808080>A bottle of powder which could form poison if mixed with water or alcohol.</color>
+<color=#808080>ขวดผงที่ผสมน้ำหรือแอลกอฮอล์แล้วกลายเป็นยาพิษ</color>
 
 ::Poisonous_Toad_Skin //7155
-<color=#808080>A piece of back skin from a poisonous toad.</color>
+<color=#808080>เศษหนังหลังของคางคกพิษ</color>
 
 ::Broken_Shuriken //7156
-<color=#808080>A broken shuriken that is no longer useful.</color>
+<color=#808080>ชูริเคนที่หักจนใช้ไม่ได้แล้ว</color>
 
 ::Dark_Mask //7157
-<color=#808080>A dark colored mask that covers the entire face.</color>
+<color=#808080>หน้ากากสีเข้มที่ปิดทั้งใบหน้า</color>
 
 ::Broken_Liquor_Jar //7158
-<color=#808080>A piece of a broken liquor jar which still reeks of alcohol.</color>
+<color=#808080>เศษไหเหล้าที่แตก ยังมีกลิ่นเหล้าฉุนอยู่</color>
 
 ::Tengu_Nose //7159
-<color=#808080>A nose from a Tengu mask that is quite long and ugly.</color>
+<color=#808080>จมูกจากหน้ากาก Tengu ยาวและน่าเกลียดพอตัว</color>
 
 ::Feudal_Lord_Permit //7160
-<color=#808080>A permit that allows entry into the Amatsu dungeon.</color>
+<color=#808080>ใบอนุญาตเข้าดันเจี้ยน Amatsu</color>
 
 ::Black_Bear_Skin //7161
-<color=#808080>A stinky piece of skin peeled from a black bear.</color>
+<color=#808080>เศษหนังเหม็นที่ลอกมาจากหมีดำ</color>
 
 ::Cloud_Crumb //7162
-<color=#808080>A bottle which contains cloud crumbs.</color>
+<color=#808080>ขวดบรรจุเศษเมฆ</color>
 
 ::Hard_Feeler //7163
-<color=#808080>A sharp, solid feeler.</color>
+<color=#808080>หนวดสัมผัสที่แข็งและแหลม</color>
 
 ::Solid_Peach //7164
-<color=#808080>A peach that is so stout and solid, that it can withstand blows from a sword.</color>
+<color=#808080>ลูกพีชที่แน่นและแข็งจนรับดาบได้</color>
 
 ::Transparent_Celestial_Robe //7165
-<color=#808080>A transparent celestial robe made from light and soft fabric.</color>
+<color=#808080>เสื้อคลุมสวรรค์โปร่งใส ทำจากผ้าเบาและนุ่ม</color>
 
 ::Soft_Silk //7166
-<color=#808080>An expensive fabric that is knit from high quality silk threads.</color>
+<color=#808080>ผ้าราคาแพงที่ทอจากเส้นไหมคุณภาพสูง</color>
 
 ::Strange_Steel_Piece //7167
-<color=#808080>An unidentified piece of steel that could be used as a hinge.</color>
+<color=#808080>ชิ้นเหล็กที่ไม่รู้ว่าคืออะไร น่าจะใช้เป็นบานพับได้</color>
 
 ::Giant_Butterfly_Wing //7168
-<color=#808080>A wing from a giant butterfly that strangly lacks the properties of a normal butterfly wing.</color>
+<color=#808080>ปีกผีเสื้อยักษ์ที่ประหลาดตรงไม่มีคุณสมบัติของปีกผีเสื้อธรรมดาเลย</color>
 
 ::Ba_Gua //7169
-<color=#808080>A talisman with a yin-yang symbol carved in the middle.</color>
+<color=#808080>ยันต์ที่สลักสัญลักษณ์หยินหยางไว้ตรงกลาง</color>
 
 ::Tuxedo //7170
-<color=#808080>A formal suit worn by the groom during a wedding ceremony.</color>
+<color=#808080>ชุดสูทที่เจ้าบ่าวใส่ในพิธีแต่งงาน</color>
 
 ::Leopard_Skin //7171
-<color=#808080>A piece of leopard skin that could serve as a loincloth in a pinch.</color>
+<color=#808080>เศษหนังเสือดาว ยามคับขันเอามาทำผ้าเตี่ยวได้</color>
 
 ::Leopard_Claw //7172
-<color=#808080>A sharp claw extracted from a leopard.</color>
+<color=#808080>กรงเล็บแหลมคมที่ถอนมาจากเสือดาว</color>
 
 ::Wrapping_Lace //7174
-<color=#808080>Long and thin lace used to decorate a gift box.</color>
+<color=#808080>ริบบิ้นเส้นยาวเรียวไว้ตกแต่งกล่องของขวัญ</color>
 
 ::Wrapping_Paper //7175
-<color=#808080>Shiny, beautiful paper used to decorate a gift box.</color>
+<color=#808080>กระดาษเงางามสวยงามไว้ห่อกล่องของขวัญ</color>
 
 ::Crumb_of_Sobbing_Starlight //7177
-<color=#808080>A piece of the sobbing starlight, it might be possible to reassemble it.</color>
+<color=#808080>เศษของแสงดาวที่ร่ำไห้ อาจประกอบกลับคืนได้</color>
 
 ::Sobbing_Starlight //7178
-<color=#808080>A beautiful jewel named after a star, you can barely see a transcription in direct light.</color>
+<color=#808080>อัญมณีงดงามที่ตั้งชื่อตามดวงดาว ส่องกับแสงจ้าๆ จะเห็นตัวอักษรจางๆ</color>
 
 ::Receipt_ //7181
-<color=#808080>A small paper used as a proof of purchase.</color>
+<color=#808080>กระดาษแผ่นเล็กใช้เป็นหลักฐานการซื้อ</color>
 
 ::Cacao //7182
-<color=#808080>A nut from the cacao tree found in warm climates.</color>
+<color=#808080>เมล็ดจากต้นโกโก้ที่ขึ้นในเขตอากาศอบอุ่น</color>
 
 ::Letter_from_Sister //7183
-<color=#808080>A letter written by a younger sister to her brother.</color>
+<color=#808080>จดหมายที่น้องสาวเขียนถึงพี่ชาย</color>
 
 ::Piano_Key //7184
-<color=#808080>A white key that came from a broken piano.</color>
+<color=#808080>คีย์สีขาวที่มาจากเปียโนที่พัง</color>
 
 ::Thin_Trunk //7186
-<color=#808080>A thin trunk used to climb up to higher places.</color>
+<color=#808080>ลำต้นเรียวที่ใช้ปีนขึ้นที่สูง</color>
 
 ::Festival_Mask //7187
-<color=#808080>A mask that is worn during festivals.</color>
+<color=#808080>หน้ากากที่ใส่ในงานเทศกาล</color>
 
 ::Brown_Root //7188
-<color=#808080>A tree root that still has soil clinging to it.</color>
+<color=#808080>รากไม้ที่ยังมีดินติดอยู่</color>
 
 ::Wooden_Heart //7189
-<color=#808080>An artificial wood heart that gave life to a Wooden Golem.</color>
+<color=#808080>หัวใจไม้ประดิษฐ์ที่ให้ชีวิตแก่ Wooden Golem</color>
 
 ::Solid_Husk //7190
-<color=#808080>An insect husk that is hard and stout.</color>
+<color=#808080>เปลือกแมลงที่แข็งและหนา</color>
 
 ::Lamp //7191
-<color=#808080>A beautiful lamp made with red paper.</color>
+<color=#808080>โคมไฟงดงาม ทำจากกระดาษสีแดง</color>
 
 ::Vane //7192
-<color=#808080>A metal pinwheel from a festival with unusually sharp blades.</color>
+<color=#808080>กังหันโลหะจากงานเทศกาล ใบคมผิดปกติ</color>
 
 ::Sprout //7193
-<color=#808080>A sprout grown out of a vegetable seed.</color>
+<color=#808080>ต้นอ่อนที่งอกจากเมล็ดผัก</color>
 
 ::Soft_Blade_of_Grass //7194
-<color=#808080>A soft blade of grass.</color>
+<color=#808080>ใบหญ้าอ่อนนุ่ม</color>
 
 ::Slingshot //7195
-<color=#808080>A primitive weapon consisting of a wooden stick, an elastic band, and small rocks.</color>
+<color=#808080>อาวุธดั้งเดิม ประกอบด้วยไม้ ยางยืด และก้อนหินเล็กๆ</color>
 
 ::Shoulder_Protector //7196
-<color=#808080>A primitive wood garment that is worn on the shoulders.</color>
+<color=#808080>เครื่องสวมไหล่ทำจากไม้แบบดั้งเดิม</color>
 
 ::Tough_Vines //7197
-<color=#808080>A tough vine that can be used as rope.</color>
+<color=#808080>เถาวัลย์เหนียวที่ใช้แทนเชือกได้</color>
 
 ::Huge_Leaf //7198
-<color=#808080>A huge leaf that can be used as a makeshift umbrella.</color>
+<color=#808080>ใบไม้ใบใหญ่ เอามากางเป็นร่มชั่วคราวได้</color>
 
 ::Elastic_Band //7200
-<color=#808080>A flexible material that returns to its original form after being stretched.</color>
+<color=#808080>วัสดุยืดหยุ่นที่ดึงแล้วกลับคืนรูปเดิม</color>
 
 ::Log //7201
-<color=#808080>A woody stem from a tree that's used as lumber.</color>
+<color=#808080>ลำต้นเนื้อไม้ที่ใช้เป็นไม้แปรรูป</color>
 
 ::Pincher_of_Beetle //7202
-<color=#808080>A pincher from a beetle.</color>
+<color=#808080>ก้ามด้วง</color>
 
 ::Strong_Branch //7203
-<color=#808080>A tree branch that can be used as a simple tool.</color>
+<color=#808080>กิ่งไม้ที่ใช้เป็นเครื่องมือง่ายๆ ได้</color>
 
 ::Gunpowder //7204
-<color=#808080>A pile of explosive powder.</color>
+<color=#808080>กองผงระเบิด</color>
 
 ::Piece_of_Black_Cloth //7205
-<color=#808080>A piece of jet black cloth that cannot be seen in the dark.</color>
+<color=#808080>ผ้าสีดำสนิทที่มองไม่เห็นในความมืด</color>
 
 ::Black_Cat_Doll //7206
-<color=#808080>A black cat doll that almost seems alive.</color>
+<color=#808080>ตุ๊กตาแมวดำ เหมือนมีชีวิตยังไงไม่รู้</color>
 
 ::Old_Manteau //7207
-<color=#808080>A old, exhausted manteau.</color>
+<color=#808080>ผ้าคลุมเก่าโทรมจนหมดสภาพ</color>
 
 ::Rusty_Kitchen_Knife //7208
-<color=#808080>A dull edged, rusty kitchen knife stained with blood.</color>
+<color=#808080>มีดครัวขึ้นสนิม คมทื่อ เปื้อนเลือด</color>
 
 ::Helm_of_Dullahan //7209
-<color=#808080>A helm worn by Dullahan.</color>
+<color=#808080>หมวกเกราะที่ Dullahan สวม</color>
 
 ::Armor_Piece_of_Dullahan //7210
-<color=#808080>A broken piece of armor worn by Dullahan.</color>
+<color=#808080>เศษเกราะแตกของ Dullahan</color>
 
 ::Fragment_of_Rossata_Stone //7211
-<color=#808080>A broken piece of a stone with engravings in an ancient language.</color>
+<color=#808080>เศษหินแตกที่สลักภาษาโบราณไว้</color>
 
 ::Hung_Doll //7212
-<color=#808080>A cursed doll hung on a rope.</color>
+<color=#808080>ตุ๊กตาต้องคำสาปที่แขวนอยู่กับเชือก</color>
 
 ::Needle_Packet //7213
-<color=#808080>A fabric packet that holds needles in place.</color>
+<color=#808080>ซองผ้าไว้เก็บเข็ม</color>
 
 ::Bat_Cage //7214
-<color=#808080>A cage which could, emphasis on could, hold a bat.</color>
+<color=#808080>กรงที่ "อาจจะ" ขังค้างคาวได้ เน้นคำว่าอาจจะ</color>
 
 ::Broken_Needle //7215
-<color=#808080>A needle severed into two halves.</color>
+<color=#808080>เข็มที่หักเป็นสองท่อน</color>
 
 ::Red_Muffler //7216
-<color=#808080>A red scarf that protects its wearer from the cold.</color>
+<color=#808080>ผ้าพันคอสีแดงที่กันหนาวให้ผู้สวมใส่</color>
 
 ::Spool //7217
-<color=#808080>A sewing tool on which thread is wound.</color>
+<color=#808080>อุปกรณ์เย็บผ้าที่ใช้พันด้าย</color>
 
 ::Decomposed_Rope //7218
-<color=#808080>An old, rotten rope.</color>
+<color=#808080>เชือกเก่าที่เปื่อยยุ่ย</color>
 
 ::Striped_Sock //7219
-<color=#808080>A sock decorated with colored stripes.</color>
+<color=#808080>ถุงเท้าลายทางหลากสี</color>
 
 ::Ectoplasm //7220
-<color=#808080>A green translucent liquid that is disgustingly sticky.</color>
+<color=#808080>ของเหลวสีเขียวใส เหนียวเหนอะน่าขยะแขยง</color>
 
 ::Tangled_Chains //7221
-<color=#808080>A clump of chains that are hard to untangle.</color>
+<color=#808080>กองโซ่ที่พันกันจนแกะยาก</color>
 
 ::Wooden_Gnarl //7222
-<color=#808080>A gnarl of a tree.</color>
+<color=#808080>ปุ่มปมของต้นไม้</color>
 
 ::Contorted_Self-Portrait //7223
-<color=#808080>A self portrait of someone contorting his facial expression.</color>
+<color=#808080>ภาพวาดตัวเองของคนที่กำลังทำหน้าบิดเบี้ยว</color>
 
 ::Pumpkin_Lantern //7225
-<color=#808080>A jack o' lantern with a smily face.</color>
+<color=#808080>โคมฟักทองแกะสลักหน้ายิ้ม</color>
 
 ::Pellet //7226
-<color=#808080>A pill of medicine that looks as bitter as it tastes.</color>
+<color=#808080>ยาเม็ดที่หน้าตาขมพอๆ กับรสชาติ</color>
 
 ::Spirit_of_Guild //7234
-<color=#808080>A statue that symbolizes comraderie.</color>
+<color=#808080>รูปปั้นที่สื่อถึงมิตรภาพร่วมรบ</color>
 
 ::Spirit_of_Charge //7235
-<color=#808080>A statue that symbolizes bravery.</color>
+<color=#808080>รูปปั้นที่สื่อถึงความกล้าหาญ</color>
 
 ::Spirit_of_Association //7237
-<color=#808080>A statue that symbolizes cooperation.</color>
+<color=#808080>รูปปั้นที่สื่อถึงความร่วมมือ</color>
 
 ::Spirit_of_Coordination //7238
-<color=#808080>A statue that symbolizes harmony.</color>
+<color=#808080>รูปปั้นที่สื่อถึงความกลมเกลียว</color>
 
 ::Spirit_of_Advance //7239
-<color=#808080>A statue that symbolizes leadership.</color>
+<color=#808080>รูปปั้นที่สื่อถึงความเป็นผู้นำ</color>
 
 ::Spirit_of_Trust //7240
-<color=#808080>A statue that symbolizes trust.</color>
+<color=#808080>รูปปั้นที่สื่อถึงความไว้วางใจ</color>
 
 ::Spirit_of_Union //7241
-<color=#808080>A statue that symbolizes spirit.</color>
+<color=#808080>รูปปั้นที่สื่อถึงจิตวิญญาณ</color>
 
 ::Spirit_of_Combination //7242
-<color=#808080>A statue that symbolizes teamwork.</color>
+<color=#808080>รูปปั้นที่สื่อถึงการทำงานเป็นทีม</color>
 
 ::Spirit_of_Solidarity //7244
-<color=#808080>A statue that symbolizes unity.</color>
+<color=#808080>รูปปั้นที่สื่อถึงความเป็นหนึ่งเดียว</color>
 
 ::Spirit_of_Friendship //7245
-<color=#808080>A statue that symbolizes friendship.</color>
+<color=#808080>รูปปั้นที่สื่อถึงมิตรภาพ</color>
 
 ::Spirit_of_Peace //7246
-<color=#808080>A statue that symbolizes peace.</color>
+<color=#808080>รูปปั้นที่สื่อถึงสันติภาพ</color>
 
 ::Spirit_of_Determination //7247
-<color=#808080>A statue that symbolizes challenge.</color>
+<color=#808080>รูปปั้นที่สื่อถึงการท้าทาย</color>
 
 ::Spirit_of_Service //7249
-<color=#808080>A statue that symbolizes sacrifice.</color>
+<color=#808080>รูปปั้นที่สื่อถึงการเสียสละ</color>
 
 ::Spirit_of_Glory //7250
-<color=#808080>A statue that symbolizes achievement.</color>
+<color=#808080>รูปปั้นที่สื่อถึงความสำเร็จ</color>
 
 ::Spirit_of_Victory //7251
-<color=#808080>A statue that symbolizes victory.</color>
+<color=#808080>รูปปั้นที่สื่อถึงชัยชนะ</color>
 
 ::Herbal_Medicine //7252
-<color=#808080>An herbal medicine used in the eastern countries.</color>
+<color=#808080>ยาสมุนไพรที่ใช้กันในดินแดนตะวันออก</color>
 
 ::Folding_Fan_of_Cat_Ghost //7262
-<color=#808080>A folding fan that is useful in summer.</color>
+<color=#808080>พัดพับ ใช้ดีในหน้าร้อน</color>
 
 ::Cat's_Eye //7263
-<color=#808080>A rare and beautiful gem that looks like the eye of a cat.</color>
+<color=#808080>อัญมณีหายากและงดงาม หน้าตาเหมือนตาแมว</color>
 
 ::Dry_Sand //7264
-<color=#808080>A collection of sand that can be found on the street, but somehow, is worth serious coin.</color>
+<color=#808080>กองทรายที่เก็บได้ตามถนน แต่ไม่รู้ทำไมถึงขายได้ราคา</color>
 
 ::Dragon_Horn //7265
-<color=#808080>A decorative horn from a wooden dragon mask.</color>
+<color=#808080>เขาประดับจากหน้ากากมังกรไม้</color>
 
 ::Denture_from_Dragon_Mask //7266
-<color=#808080>A tooth cut from a wooden dragon mask.</color>
+<color=#808080>ฟันที่ตัดมาจากหน้ากากมังกรไม้</color>
 
 ::Tiger_Panty //7267
-<color=#808080>A panty made of tiger skin, what a wild and untamed idea.</color>
+<color=#808080>กางเกงในหนังเสือ ไอเดียป่าเถื่อนดุดันจริงๆ</color>
 
 ::Little_Ghost_Doll //7268
-<color=#808080>A spirit with a red ribbon on its head.</color>
+<color=#808080>วิญญาณที่มีโบว์แดงติดอยู่บนหัว</color>
 
 ::Pinafore //7269
-<color=#808080>A soft cloth worn around an infant's neck to capture spilled milk and baby drool.</color>
+<color=#808080>ผ้านุ่มที่ผูกคอทารกไว้รองน้ำนมและน้ำลาย</color>
 
 ::Nursing_Bottle //7270
-<color=#808080>A bottle of milk for infants.</color>
+<color=#808080>ขวดนมสำหรับทารก</color>
 
 ::Translated_Ancient_Language //7274
-<color=#808080>"The door can be found under the twilight sky near the mage's tower, the key is west of the tower in the grass under the sun."</color>
+<color=#808080>"ประตูอยู่ใต้ฟ้าสนธยาใกล้หอคอยจอมเวท ส่วนกุญแจอยู่ทางตะวันตกของหอคอย ในพงหญ้ากลางแดด"</color>
 
 ::Record_of_Ancient_Language //7275
-<color=#808080>A transcription in an ancient language from the Sobbing Starlight.</color>
+<color=#808080>ข้อความภาษาโบราณที่ถอดมาจาก Sobbing Starlight</color>
 
 ::Doodled_Message //7276
-<color=#808080>A message, with doodles, from a young girl.</color>
+<color=#808080>ข้อความจากเด็กผู้หญิง มีลายเส้นขยุกขยิกด้วย</color>
 
 ::Munak_Doll //7277
-<color=#808080>A doll made in the appearance of a young girl.</color>
+<color=#808080>ตุ๊กตาที่ทำเป็นรูปเด็กผู้หญิง</color>
 
 ::Letter_to_Wife //7278
-<color=#808080>A letter written by an anxious husband to his wife.</color>
+<color=#808080>จดหมายที่สามีผู้เป็นห่วงเขียนถึงภรรยา</color>
 
 ::Holy_Threads //7285
-<color=#808080>A skein of threads which possess a holy power.</color>
+<color=#808080>ไจด้ายที่มีพลังศักดิ์สิทธิ์</color>
 
 ::Red_Chili //7286
-<color=#808080>A vivid red spice that adds a spicy taste to food.</color>
+<color=#808080>เครื่องเทศสีแดงสดที่เพิ่มรสเผ็ดให้อาหาร</color>
 
 ::Holier_Threads //7287
-<color=#808080>A skein of threads which possess a holier power.</color>
+<color=#808080>ไจด้ายที่มีพลังศักดิ์สิทธิ์ยิ่งกว่า</color>
 
 ::Engagement_Ring //7288
-<color=#808080>A solid, beautiful engagement ring engraved with "Slave of Love".</color>
+<color=#808080>แหวนหมั้นเนื้อแน่นสวยงาม สลักว่า "Slave of Love"</color>
 
 ::Peridot //7289
-<color=#808080>An peridot, it symbolizes wisdom.</color>
+<color=#808080>เพริดอต สื่อถึงปัญญา</color>
 
 ::Phlogopite //7290
-<color=#808080>A phlogopite, it symbolizes motherly love.</color>
+<color=#808080>แร่โฟลโกไพต์ สื่อถึงความรักของแม่</color>
 
 ::Agate //7291
-<color=#808080>An agate, it symbolizes protection.</color>
+<color=#808080>โมรา สื่อถึงการปกป้อง</color>
 
 ::Muscovite //7292
-<color=#808080>A muscovite, it symbolizes self motivation.</color>
+<color=#808080>แร่มัสโคไวต์ สื่อถึงแรงผลักดันในตัวเอง</color>
 
 ::Rose_Quartz //7293
-<color=#808080>A rose quartz, it symbolizes self esteem.</color>
+<color=#808080>โรสควอตซ์ สื่อถึงความภาคภูมิใจในตัวเอง</color>
 
 ::Turquoise //7294
-<color=#808080>A turquoise, it symbolizes mental power.</color>
+<color=#808080>เทอร์ควอยซ์ สื่อถึงพลังจิต</color>
 
 ::Citrin //7295
-<color=#808080>A topaz, it symbolizes mental calm.</color>
+<color=#808080>บุษราคัม สื่อถึงความสงบทางใจ</color>
 
 ::Pyroxene //7296
-<color=#808080>A pyroxene, it symbolizes restoration.</color>
+<color=#808080>แร่ไพรอกซีน สื่อถึงการฟื้นฟู</color>
 
 ::Biotite //7297
-<color=#808080>A biotite, it symbolizes spiritual support.</color>
+<color=#808080>แร่ไบโอไทต์ สื่อถึงกำลังใจทางจิตวิญญาณ</color>
 
 ::Fig_Leaf //7298
-<color=#808080>A pair of two giant leaves that could be used as clothes in an emergency.</color>
+<color=#808080>ใบไม้ยักษ์สองใบ ยามฉุกเฉินเอามาใส่แทนเสื้อผ้าได้</color>
 
 ::Straw_Basket //7299
-<color=#808080>A basket made with straws.</color>
+<color=#808080>ตะกร้าสานจากฟาง</color>
 
 ::Gemstone //7300
-<color=#808080>A gem-rich ore, you wonder if it is possible to extract them somehow.</color>
+<color=#808080>แร่ที่มีอัญมณีอยู่เยอะ สงสัยว่าจะสกัดออกมาได้ยังไง</color>
 
 ::Tassel //7301
-<color=#808080>A bunch of short and red threads used for decorating the hilt of a sword.</color>
+<color=#808080>กระจุกด้ายแดงสั้นๆ ไว้ตกแต่งด้ามดาบ</color>
 
 ::Witch's_Spell_Scroll //7304
-<color=#808080>A worn out scroll with text written in an ancient language, the only word you can read is "Kirkana".</color>
+<color=#808080>ม้วนกระดาษเก่าที่เขียนด้วยภาษาโบราณ คำเดียวที่อ่านออกคือ "Kirkana"</color>
 
 ::Symbol_of_the_Nine_Realms //7305
-<color=#808080>An emblem that grants authority to rule over the nine realms of the dead.</color>
+<color=#808080>ตราสัญลักษณ์ที่มอบอำนาจปกครองเก้าภพแห่งความตาย</color>
 
 ::Piece_of_Spirit //7306
-<color=#808080>A strange object with a tiny soul is flickering from within.</color>
+<color=#808080>วัตถุประหลาดที่มีวิญญาณดวงเล็กกะพริบอยู่ข้างใน</color>
 
 ::Spiritual_Whispers //7307
-<color=#808080>A curious object that almost seems alive and it faintly whispers to you.</color>
+<color=#808080>ของประหลาดที่เหมือนมีชีวิต แว่วเสียงกระซิบเบาๆ</color>
 
 ::Witch's_Tonic //7308
-<color=#808080>An enchanted tonic that causes selective memory loss.</color>
+<color=#808080>ยาบำรุงต้องมนตร์ที่ทำให้ลืมความทรงจำบางส่วน</color>
 
 ::Crow_Wing //7309
-<color=#808080>A crow's wing that can temporarily grant a person the power of flight.</color>
+<color=#808080>ปีกอีกา ให้พลังบินได้ชั่วคราว</color>
 
 ::Peco_Voucher //7310
-<color=#808080>A ticket that can waive the fee for a Peco Peco rental.</color>
+<color=#808080>ตั๋วยกเว้นค่าเช่า Peco Peco</color>
 
 ::Airship_Ticket //7311
-<color=#808080>A ticket required to board the Airship.</color>
+<color=#808080>ตั๋วที่ต้องใช้ขึ้นเรือเหาะ</color>
 
 ::Jubilee //7312
-<color=#808080>A crystallization, dropped from monsters, whose name means joyous celebration.</color>
+<color=#808080>ผลึกที่ได้จากมอนสเตอร์ ชื่อของมันแปลว่างานฉลองอันรื่นเริง</color>
 
 ::Witch's_Medal //7313
-<color=#808080>A medal rewarded to honorable witches.</color>
+<color=#808080>เหรียญที่มอบให้แม่มดผู้ทรงเกียรติ</color>
 
 ::The_Sign_ //7314
-<color=#808080>A captivatingly beautiful artifact rewarded by the gods.</color>
+<color=#808080>วัตถุโบราณงดงามตรึงตา รางวัลจากทวยเทพ</color>
 
 ::Dark_Crystal_Fragment //7315
-<color=#808080>A sharp, shiny fragment broken off a dark crystal.</color>
+<color=#808080>เศษเงาวับแหลมคมที่แตกมาจากคริสตัลดำ</color>
 
 ::Insect_Leg //7316
-<color=#808080>A severed bug's leg that is as sharp as a scythe.</color>
+<color=#808080>ขาแมลงที่ตัดมา คมเหมือนเคียว</color>
 
 ::Rusty_Screw //7317
-<color=#808080>A rusty screw that has come off a machine.</color>
+<color=#808080>น็อตขึ้นสนิมที่หลุดมาจากเครื่องจักร</color>
 
 ::Old_Pick //7318
-<color=#808080>A tool used to break rocks or the ground.</color>
+<color=#808080>เครื่องมือสำหรับทุบหินหรือขุดดิน</color>
 
 ::Used_Iron_Plate //7319
-<color=#808080>A battered iron plate that seems to have fallen off a machine.</color>
+<color=#808080>แผ่นเหล็กบุบๆ เหมือนหลุดมาจากเครื่องจักร</color>
 
 ::Dust_Pollutant //7320
-<color=#808080>A collection of small, dry particles that are a major source of environmental pollution.</color>
+<color=#808080>กองฝุ่นละอองแห้งๆ ต้นเหตุสำคัญของมลพิษ</color>
 
 ::Crystal_Fragment //7321
-<color=#808080>A small piece of a pretty crystal that looks like it has a symbol of an eye in its center.</color>
+<color=#808080>เศษคริสตัลสวยชิ้นเล็ก ตรงกลางเหมือนมีสัญลักษณ์รูปตา</color>
 
 ::Toxic_Gas //7322
-<color=#808080>Poisonous gas that can be very harmful, if not lethal, when inhaled.</color>
+<color=#808080>แก๊สพิษที่สูดเข้าไปแล้วอันตรายมาก ถ้าไม่ถึงตาย</color>
 
 ::Battered_Kettle //7323
-<color=#808080>This kettle isn't in the best condition, but it can still be used.</color>
+<color=#808080>กาน้ำใบนี้สภาพไม่ค่อยดี แต่ยังใช้ได้อยู่</color>
 
 ::Flexible_Tube //7325
-<color=#808080>A long, thin, pipe like tube made to transport liquids or gases.</color>
+<color=#808080>ท่อยาวเรียวสำหรับลำเลียงของเหลวหรือแก๊ส</color>
 
 ::Fluorescent_Liquid //7326
-<color=#808080>A sticky, flourescent liquid which glows in the darkness.</color>
+<color=#808080>ของเหลวเรืองแสงเหนียวๆ ที่สว่างในความมืด</color>
 
 ::Flashlight //7327
-<color=#808080>A flashlight that used to be attached to a miner's helmet.</color>
+<color=#808080>ไฟฉายที่เคยติดอยู่บนหมวกคนงานเหมือง</color>
 
 ::Old_Bronze_Key //7329
-<color=#808080>A small bronze key.</color>
+<color=#808080>กุญแจทองแดงเล็ก</color>
 
 ::Complete_Tablet //7332
-<color=#808080>A solid tablet that is cold to the touch.</color>
+<color=#808080>แผ่นจารึกตันที่สัมผัสแล้วเย็น</color>
 
 ::Prontera_Tablet //7333
-<color=#808080>"In the town of Prontera I fell sick, I needed something from forest to make my blood thick" - The First Man</color>
+<color=#808080>"ข้าล้มป่วยที่เมือง Prontera ต้องหาของจากป่ามาบำรุงเลือด" - ชายคนแรก</color>
 
 ::Payon_Tablet //7334
-<color=#808080>"We're on our way now, soon we will venture to the desert in high spirits" - The Second Man</color>
+<color=#808080>"ออกเดินทางแล้ว อีกไม่นานก็จะถึงทะเลทราย ใจคอเบิกบานดี" - ชายคนที่สอง</color>
 
 ::Morroc_Tablet //7335
-<color=#808080>"There is a strange feeling in the air here, almost as if I can do magic myself" - The Third Man</color>
+<color=#808080>"อากาศแถวนี้แปลกๆ เหมือนข้าจะร่ายเวทได้เองเลย" - ชายคนที่สาม</color>
 
 ::Geffen_Tablet //7336
-<color=#808080>"We ventured north of the giant beautiful Jolnir flower, and that's where our journey began" - The Fourth Man</color>
+<color=#808080>"พวกเรามุ่งขึ้นเหนือของดอก Jolnir ยักษ์ และการเดินทางก็เริ่มต้นที่นั่น" - ชายคนที่สี่</color>
 
 ::Eye_of_Hellion //7337
-<color=#808080>An eye from the Hellion Revenant.</color>
+<color=#808080>ดวงตาของ Hellion Revenant</color>
 
 ::Will_of_the_Darkness //7340
-<color=#808080>A dark oval stone with seven red eyes that's believed to act as a monster nucleus.</color>
+<color=#808080>หินรีสีดำที่มีตาแดง 7 ดวง เชื่อกันว่าเป็นแกนกลางของมอนสเตอร์</color>
 
 ::Old_Pendant //7341
-<color=#808080>An old pendant, damaged with age, that confers a feeling of dread for some inexplicable reason.</color>
+<color=#808080>จี้เก่าที่ชำรุดตามกาลเวลา ให้ความรู้สึกน่าหวาดกลัวโดยไม่รู้สาเหตุ</color>
 
 ::File_Folder //7342
-<color=#808080>A file folder that holds unknown documents.</color>
+<color=#808080>แฟ้มเอกสารที่ไม่รู้ว่าข้างในมีอะไร</color>
 
 ::Sealed_File_Folder //7343
-<color=#808080>A file folder, protected by a seal, that contains unknown documents.</color>
+<color=#808080>แฟ้มเอกสารที่ผนึกไว้ ไม่รู้ว่าข้างในมีอะไร</color>
 
 ::Shinokas_Case_File //7344
-<color=#808080>A file containing all of the details of the Shinokas case.</color>
+<color=#808080>แฟ้มที่รวมรายละเอียดทั้งหมดของคดี Shinokas</color>
 
 ::Handcuffs //7345
-<color=#808080>A pair of metal restraints which still smell of blood.</color>
+<color=#808080>เครื่องพันธนาการโลหะที่ยังมีกลิ่นเลือดติดอยู่</color>
 
 ::Ymir's_Heart_Piece //7346
-<color=#808080>A piece of Ymir's Heart that glows with a strange and unearthly light.</color>
+<color=#808080>เศษหัวใจของ Ymir ที่เรืองแสงประหลาดเหนือธรรมชาติ</color>
 
 ::Research_Chart //7347
-<color=#808080>A chart, written in a language you can't recognize, that details research history.</color>
+<color=#808080>แผนภูมิที่เขียนด้วยภาษาที่อ่านไม่ออก บันทึกประวัติการวิจัยไว้</color>
 
 ::Membership_Card //7348
-<color=#808080>A Secret Wing membership card.</color>
+<color=#808080>บัตรสมาชิก Secret Wing</color>
 
 ::Archive_Permit //7349
-<color=#808080>A permit which allows the holder to enter the archive, "738495" is written on the back.</color>
+<color=#808080>ใบอนุญาตเข้าหอจดหมายเหตุ ด้านหลังเขียนว่า "738495"</color>
 
 ::Pass //7350
-<color=#808080>A pass that grants authorization to the Lighthalzen slums.</color>
+<color=#808080>บัตรผ่านเข้าสลัม Lighthalzen</color>
 
 ::Friend's_Diary //7351
-<color=#808080>An old diary in which many petty, personal secrets have been written.</color>
+<color=#808080>ไดอารีเก่าที่เขียนความลับส่วนตัวเล็กๆ น้อยๆ ไว้เยอะแยะ</color>
 
 ::Transparent_Plate_1 //7352
-<color=#808080>A marvelous, light, transparent plate that is etched with strange writing in an unknown language.</color>
+<color=#808080>แผ่นใสน้ำหนักเบาน่าอัศจรรย์ สลักตัวอักษรประหลาดภาษาที่ไม่รู้จัก</color>
 
 ::Transparent_Plate_2 //7353
-<color=#808080>A marvelous, light, transparent plate that is etched with strange writing in an unknown language.</color>
+<color=#808080>แผ่นใสน้ำหนักเบาน่าอัศจรรย์ สลักตัวอักษรประหลาดภาษาที่ไม่รู้จัก</color>
 
 ::Transparent_Plate_3 //7354
-<color=#808080>A marvelous, light, transparent plate that is etched with strange writing in an unknown language.</color>
+<color=#808080>แผ่นใสน้ำหนักเบาน่าอัศจรรย์ สลักตัวอักษรประหลาดภาษาที่ไม่รู้จัก</color>
 
 ::Transparent_Plate_4 //7355
-<color=#808080>A marvelous, light, transparent plate that is etched with strange writing in an unknown language.</color>
+<color=#808080>แผ่นใสน้ำหนักเบาน่าอัศจรรย์ สลักตัวอักษรประหลาดภาษาที่ไม่รู้จัก</color>
 
 ::Crest_Piece_1 //7356
-<color=#808080>A piece of an ancient crest, whose purpose is unknown, that has many spikes nailed on its backside.</color>
+<color=#808080>เศษตราโบราณที่ไม่รู้ว่าใช้ทำอะไร ด้านหลังตอกหนามแหลมไว้เต็มไปหมด</color>
 
 ::Crest_Piece_2 //7357
-<color=#808080>A piece of an ancient crest, whose purpose is unknown, that has many spikes nailed on its backside.</color>
+<color=#808080>เศษตราโบราณที่ไม่รู้ว่าใช้ทำอะไร ด้านหลังตอกหนามแหลมไว้เต็มไปหมด</color>
 
 ::Crest_Piece_3 //7358
-<color=#808080>A piece of an ancient crest, whose purpose is unknown, that has many spikes nailed on its backside.</color>
+<color=#808080>เศษตราโบราณที่ไม่รู้ว่าใช้ทำอะไร ด้านหลังตอกหนามแหลมไว้เต็มไปหมด</color>
 
 ::Crest_Piece_4 //7359
-<color=#808080>A piece of an ancient crest, whose purpose is unknown, that has many spikes nailed on its backside.</color>
+<color=#808080>เศษตราโบราณที่ไม่รู้ว่าใช้ทำอะไร ด้านหลังตอกหนามแหลมไว้เต็มไปหมด</color>
 
 ::Letter_of_Recommendation //7416
-<color=#808080>A well written letter of recommendation recognized by the Assassin Guild.</color>
+<color=#808080>จดหมายแนะนำตัวที่เขียนมาอย่างดี สมาคม Assassin ยอมรับ</color>
 
 ::Written_Request_A //7417
-<color=#808080>A written request from the Dandelion Organization, asking you to capture Raiyan Moore.</color>
+<color=#808080>คำร้องเป็นลายลักษณ์อักษรจากองค์กร Dandelion ขอให้จับกุม Raiyan Moore</color>
 
 ::Written_Request_B //7418
-<color=#808080>A written request from Mr. R, asking you to protect him and help complete his research.</color>
+<color=#808080>คำร้องเป็นลายลักษณ์อักษรจาก Mr. R ขอให้คุ้มครองเขาและช่วยทำงานวิจัยให้เสร็จ</color>
 
 ::Skull_ //7420
-<color=#808080>A skull on which someone's name has been carved.</color>
+<color=#808080>กะโหลกที่มีคนสลักชื่อไว้</color>
 
 ::Red_Key //7421
-<color=#808080>A thin, transparent, and shining red key.</color>
+<color=#808080>กุญแจบางใสเงางามสีแดง</color>
 
 ::Yellow_Key //7422
-<color=#808080>A thin, transparent, and shining yellow key.</color>
+<color=#808080>กุญแจบางใสเงางามสีเหลือง</color>
 
 ::Blue_Key //7423
-<color=#808080>A thin, transparent, and shining blue key.</color>
+<color=#808080>กุญแจบางใสเงางามสีน้ำเงิน</color>
 
 ::Green_Key //7424
-<color=#808080>A thin, transparent, and shining green key.</color>
+<color=#808080>กุญแจบางใสเงางามสีเขียว</color>
 
 ::Black_Key //7425
-<color=#808080>A thin, transparent, and shining black key.</color>
+<color=#808080>กุญแจบางใสเงางามสีดำ</color>
 
 ::Red_Charm_Stone //7426
-<color=#808080>A mysterious red charm stone in which fantastic powers are stored.</color>
+<color=#808080>หินรางลึกลับสีแดง ที่เก็บพลังวิเศษไว้ข้างใน</color>
 
 ::Yellow_Charm_Stone //7427
-<color=#808080>A mysterious yellow charm stone in which fantastic powers are stored.</color>
+<color=#808080>หินรางลึกลับสีเหลือง ที่เก็บพลังวิเศษไว้ข้างใน</color>
 
 ::Blue_Charm_Stone //7428
-<color=#808080>A mysterious blue charm stone in which fantastic powers are stored.</color>
+<color=#808080>หินรางลึกลับสีน้ำเงิน ที่เก็บพลังวิเศษไว้ข้างใน</color>
 
 ::Green_Charm_Stone //7429
-<color=#808080>A mysterious green charm stone in which fantastic powers are stored.</color>
+<color=#808080>หินรางลึกลับสีเขียว ที่เก็บพลังวิเศษไว้ข้างใน</color>
 
 ::Black_Charm_Stone //7430
-<color=#808080>A mysterious black charm stone in which fantastic powers are stored.</color>
+<color=#808080>หินรางลึกลับสีดำ ที่เก็บพลังวิเศษไว้ข้างใน</color>
 
 ::Pile_of_Books //7431
-<color=#808080>A heavy pile of books.</color>
+<color=#808080>กองหนังสือหนักๆ</color>
 
 ::Leather_Pouch //7432
-<color=#808080>A sturdy, leather pouch used to contain goods.</color>
+<color=#808080>ถุงหนังทนทานไว้ใส่ของ</color>
 
 ::Blank_Scroll //7433
-<color=#808080>A blank scroll on which magic spells can be written.</color>
+<color=#808080>ม้วนกระดาษเปล่า ไว้เขียนคาถา</color>
 
 ::Elemental_Potion_Creation_Guide //7434
-<color=#808080>Even Porings can craft Elemental-Proof Potions with this handy, easy to read reference.</color>
+<color=#808080>แม้แต่ Poring ก็ทำ Elemental-Proof Potion ได้ด้วยคู่มืออ่านง่ายเล่มนี้</color>
 
 ::Golden_Ornament //7435
-<color=#808080>A beautiful golden ornament created by an otherworldly power.</color>
+<color=#808080>เครื่องประดับทองคำงดงาม สร้างขึ้นด้วยพลังจากอีกโลกหนึ่ง</color>
 
 ::Fragment_of_Agony //7436
-<color=#808080>A fragment that is the manifestation of sheer agony.</color>
+<color=#808080>เศษชิ้นส่วนที่เป็นรูปธรรมของความเจ็บปวดแสนสาหัส</color>
 
 ::Fragment_of_Misery //7437
-<color=#808080>A fragment that is the manifestation of pure misery.</color>
+<color=#808080>เศษชิ้นส่วนที่เป็นรูปธรรมของความทุกข์ระทมบริสุทธิ์</color>
 
 ::Fragment_of_Hatred //7438
-<color=#808080>A fragment that is the manifestation of intense hatred.</color>
+<color=#808080>เศษชิ้นส่วนที่เป็นรูปธรรมของความเกลียดชังรุนแรง</color>
 
 ::Fragment_of_Despair //7439
-<color=#808080>A fragment that is the manifestation of unfathomable despair.</color>
+<color=#808080>เศษชิ้นส่วนที่เป็นรูปธรรมของความสิ้นหวังอันหยั่งไม่ถึง</color>
 
 ::Red_Feather //7440
-<color=#808080>A large, yet light, white feather that has a red gleam.</color>
+<color=#808080>ขนสีขาวใหญ่แต่เบา มีประกายสีแดง</color>
 
 ::Blue_Feather //7441
-<color=#808080>A large, yet light, white feather that has a blue gleam.</color>
+<color=#808080>ขนสีขาวใหญ่แต่เบา มีประกายสีน้ำเงิน</color>
 
 ::Cursed_Seal //7442
-<color=#808080>A dark heart stamped with a bloody seal.</color>
+<color=#808080>หัวใจสีดำที่ประทับตราเลือดไว้</color>
 
 ::Three-Headed_Dragon's_Head //7443
-<color=#808080>The head from a fearsome three-headed dragon that is still very threatening.</color>
+<color=#808080>หัวจากมังกรสามหัวอันน่าสะพรึง ที่ยังดูน่ากลัวอยู่มาก</color>
 
 ::Treasure_Box //7444
-<color=#808080>A treasure box filled with old coins, ornaments, and jewelry.</color>
+<color=#808080>หีบสมบัติที่เต็มไปด้วยเหรียญเก่า เครื่องประดับ และอัญมณี</color>
 
 ::Green_Bijou //7445
-<color=#808080>A beautiful green bijou that is symbolic of the earth.</color>
+<color=#808080>อัญมณีสีเขียวงดงาม สื่อถึงผืนดิน</color>
 
 ::Blue_Bijou //7446
-<color=#808080>A beautiful blue bijou that is symbolic of the ocean.</color>
+<color=#808080>อัญมณีสีน้ำเงินงดงาม สื่อถึงมหาสมุทร</color>
 
 ::Red_Bijou //7447
-<color=#808080>A beautiful red bijou that is symbolic of a fiery blaze.</color>
+<color=#808080>อัญมณีสีแดงงดงาม สื่อถึงเปลวเพลิง</color>
 
 ::Yellow_Bijou //7448
-<color=#808080>A beautiful gold bijou that is sybolic of the sun.</color>
+<color=#808080>อัญมณีสีทองงดงาม สื่อถึงดวงอาทิตย์</color>
 
 ::Bloody_Page //7449
-<color=#808080>A page with a surface marked with old, dried blood stains.</color>
+<color=#808080>หน้ากระดาษที่มีคราบเลือดแห้งเก่าๆ ติดอยู่</color>
 
 ::Skeletal_Armor_Piece //7450
-<color=#808080>A broken piece of armor worn by a ghostly swordman.</color>
+<color=#808080>เศษเกราะแตกของนักดาบผีสาง</color>
 
 ::Fire_Dragon_Scale //7451
-<color=#808080>A red dragon's scale that seems to possess a magical power.</color>
+<color=#808080>เกล็ดมังกรแดงที่ดูเหมือนจะมีพลังเวทอยู่</color>
 
 ::Yellow_Spice //7452
-<color=#808080>A yellow spice that adds a unique scent and flavor to almost any food.</color>
+<color=#808080>เครื่องเทศสีเหลืองที่เพิ่มกลิ่นและรสอันเป็นเอกลักษณ์ให้อาหารแทบทุกอย่าง</color>
 
 ::Sweet_Sauce //7453
-<color=#808080>A sweet sauce that accentuates the flavor of foods but is disgusting by itself.</color>
+<color=#808080>ซอสหวานที่ชูรสอาหาร แต่กินเปล่าๆ แล้วแย่มาก</color>
 
 ::Savory_Sauce //7454
-<color=#808080>A special sauce that enhances the savory quality of most foods.</color>
+<color=#808080>ซอสสูตรพิเศษที่ชูรสอาหารได้แทบทุกอย่าง</color>
 
 ::Spicy_Sauce //7455
-<color=#808080>An extremely spicy hot sauce that can make people cry just by smelling it.</color>
+<color=#808080>ซอสเผ็ดจัดที่แค่ดมก็น้ำตาไหล</color>
 
 ::Red_Spice //7456
-<color=#808080>A spicy flavoring that complements few foods, but is a necessary ingredient for some dishes.</color>
+<color=#808080>เครื่องปรุงรสเผ็ดที่เข้ากับอาหารไม่กี่อย่าง แต่บางเมนูขาดไม่ได้</color>
 
 ::Cooking_Oil //7457
-<color=#808080>A healthy cooking oil for stir or deep frying.</color>
+<color=#808080>น้ำมันปรุงอาหารเพื่อสุขภาพ ใช้ผัดหรือทอดก็ได้</color>
 
 ::Culinary_Wine //7487
-<color=#808080>A bottle of fine, sweet scented culinary wine.</color>
+<color=#808080>ขวดไวน์ปรุงอาหารชั้นดี กลิ่นหอมหวาน</color>
 
 ::Delivery_Package //7488
-<color=#808080>A delivery package containing a bag of flour and eggs.</color>
+<color=#808080>พัสดุส่งของ ข้างในมีถุงแป้งกับไข่</color>
 
 ::Cottage_Key //7489
-<color=#808080>A extra key for Kiel Hyre's Cottage back door.</color>
+<color=#808080>กุญแจสำรองประตูหลังกระท่อมของ Kiel Hyre</color>
 
 ::Letter_to_Elly //7490
-<color=#808080>A letter that is addressed to Elly and closed with a distinctive red seal.</color>
+<color=#808080>จดหมายจ่าหน้าถึง Elly ผนึกด้วยตราแดงอันเป็นเอกลักษณ์</color>
 
 ::Steel_Box //7491
-<color=#808080>A steel box with a tiny keyhole on the lid, you suspect Kiel Hyre wanted to give this to Elly.</color>
+<color=#808080>กล่องเหล็กที่ฝามีรูกุญแจเล็กๆ สงสัยว่า Kiel Hyre ตั้งใจจะให้ Elly</color>
 
 ::Yellow_Keycard //7492
-<color=#808080>A flat, translucent yellow keycard that grants access to Kiel Hyre laboratory.</color>
+<color=#808080>คีย์การ์ดแบนใสสีเหลือง เข้าห้องแล็บของ Kiel Hyre ได้</color>
 
 ::Golden_Key //7493
-<color=#808080>Elly's golden key which can be used to open a special box.</color>
+<color=#808080>กุญแจทองของ Elly ใช้เปิดกล่องพิเศษได้</color>
 
 ::Luxurious_Button //7494
-<color=#808080>A shiny and elegant gold button engraved with a beautiful rose.</color>
+<color=#808080>กระดุมทองเงางามหรูหรา สลักลายกุหลาบงดงาม</color>
 
 ::Blue_Keycard //7495
-<color=#808080>A flat, translucent blue keycard that grants access to Allysia's hideout.</color>
+<color=#808080>คีย์การ์ดแบนใสสีน้ำเงิน เปิดเข้าที่ซ่อนของ Allysia ได้</color>
 
 ::Red_Keycard //7496
-<color=#808080>A flat, translucent red keycard that grants access to a restricted area.</color>
+<color=#808080>คีย์การ์ดแบนใสสีแดง เข้าเขตหวงห้ามได้</color>
 
 ::Metal_Fragment_ //7497
-<color=#808080>A peculiar looking metallic fragment.</color>
+<color=#808080>เศษโลหะหน้าตาประหลาด</color>
 
 ::Rosimier_Mansion_Keys //7498
-<color=#808080>A keyring for the Rosimier Mansion.</color>
+<color=#808080>พวงกุญแจของคฤหาสน์ Rosimier</color>
 
 ::Family_Portrait //7499
-<color=#808080>A portrait of an elite, high class family with 4 members.</color>
+<color=#808080>ภาพวาดครอบครัวชนชั้นสูง 4 คน</color>
 
 ::Woman's_Portrait //7500
-<color=#808080>A portrait of beautiful woman named Allysia. Her warm, welcoming smile can be felt in the depths of your heart.</color>
+<color=#808080>ภาพวาดหญิงงามชื่อ Allysia รอยยิ้มอบอุ่นของนางสัมผัสได้ถึงก้นบึ้งของหัวใจ</color>
 
 ::K.H.'s_Letter //7501
-<color=#808080>A letter for to Allysia and signed by a man with the initials K.H.</color>
+<color=#808080>จดหมายถึง Allysia ลงชื่อย่อว่า K.H.</color>
 
 ::James's_Note //7502
-<color=#808080>A letter for to Allysia and signed by a man named James.</color>
+<color=#808080>จดหมายถึง Allysia ลงชื่อโดยชายชื่อ James</color>
 
 ::Man's_Portrait //7503
-<color=#808080>A portrait of a young man that looks fairly depressed.</color>
+<color=#808080>ภาพวาดชายหนุ่มที่หน้าตาค่อนข้างหดหู่</color>
 
 ::Power_Device //7504
-<color=#808080>A complex mechanical device that can disrupt the energy in a robot.</color>
+<color=#808080>อุปกรณ์กลไกซับซ้อน ใช้รบกวนพลังงานในหุ่นยนต์</color>
 
 ::Toy_Key //7505
-<color=#808080>An elaborate toy key made of plastic.</color>
+<color=#808080>กุญแจของเล่นพลาสติกที่ทำมาอย่างประณีต</color>
 
 ::Black_Keycard //7506
-<color=#808080>A flat and transparent black key which enables access to a front door.</color>
+<color=#808080>กุญแจแบนใสสีดำ ใช้เปิดประตูหน้า</color>
 
 ::Solid_Iron_Piece //7507
-<color=#808080>A square piece of rusty iron.</color>
+<color=#808080>แผ่นเหล็กขึ้นสนิมทรงสี่เหลี่ยม</color>
 
 ::Allysia's_Ring //7508
-<color=#808080>The engagement ring that belonged to Allysia.</color>
+<color=#808080>แหวนหมั้นที่เคยเป็นของ Allysia</color>
 
 ::Luxurious_Keycard //7509
-<color=#808080>A fancy, rainbow colored key that enables access to Kiel Hyre's Factory and Laboratory.</color>
+<color=#808080>กุญแจสีรุ้งสวยหรู เปิดโรงงานและห้องแล็บของ Kiel Hyre ได้</color>
 
 ::Valhalla's_Flower //7510
-<color=#808080>An enigmantic flower that can only be seen within Valhalla, the sacred battlegrounds of the ancient gods.</color>
+<color=#808080>ดอกไม้ลึกลับที่พบได้เฉพาะใน Valhalla สมรภูมิศักดิ์สิทธิ์ของทวยเทพโบราณ</color>
 
 ::Rune_of_Darkness //7511
-<color=#808080>A glowing, dark black rune with ancient symbols engraved within.</color>
+<color=#808080>รูนเรืองแสงสีดำสนิท สลักสัญลักษณ์โบราณไว้ข้างใน</color>
 
 ::Burnt_Part //7512
-<color=#808080>A burnt part of some device.</color>
+<color=#808080>ชิ้นส่วนไหม้ๆ ของอุปกรณ์อะไรสักอย่าง</color>
 
 ::Pocket_Watch_ //7513
-<color=#808080>An old silver pocket watch.</color>
+<color=#808080>นาฬิกาพกเงินเรือนเก่า</color>
 
 ::Monster_Ticket //7514
-<color=#808080>A confirmation receipt for a bet on a Hugel monster race.</color>
+<color=#808080>ใบยืนยันการวางเดิมพันแข่งมอนที่ Hugel</color>
 
 ::Prize_Medal //7515
-<color=#808080>A medal crafted from a rare and mysterious metal that can only be found in Hugel.</color>
+<color=#808080>เหรียญที่ทำจากโลหะหายากลึกลับ พบได้เฉพาะที่ Hugel</color>
 
 ::Green_Keycard //7516
-<color=#808080>A flat, translucent green keycard that enables access to a secret safe.</color>
+<color=#808080>คีย์การ์ดแบนใสสีเขียว เปิดตู้เซฟลับได้</color>
 
 ::Flame_Stone //7521
-<color=#808080>A bead, imbued with fire, that acts as a catalyst for select Ninja arts.</color>
+<color=#808080>ลูกปัดอาบธาตุไฟ ใช้เป็นตัวเร่งสำหรับวิชา Ninja บางอย่าง</color>
 
 ::Ice_Stone //7522
-<color=#808080>A bead, imbued with water, that acts as a catalyst for select Ninja arts.</color>
+<color=#808080>ลูกปัดอาบธาตุน้ำ ใช้เป็นตัวเร่งสำหรับวิชา Ninja บางอย่าง</color>
 
 ::Wind_Stone //7523
-<color=#808080>A bead, imbued with wind, that acts as a catalyst for select Ninja arts.</color>
+<color=#808080>ลูกปัดอาบธาตุลม ใช้เป็นตัวเร่งสำหรับวิชา Ninja บางอย่าง</color>
 
 ::Shadow_Orb //7524
-<color=#808080>A bead, imbued with shadow, that acts as a catalyst for select Ninja arts.</color>
+<color=#808080>ลูกปัดอาบธาตุมืด ใช้เป็นตัวเร่งสำหรับวิชา Ninja บางอย่าง</color>
 
 ::Poring_Coin //7539
-<color=#808080>A small coin with a Poring engraved on it.</color>
+<color=#808080>เหรียญเล็กที่สลักรูป Poring</color>
 
 ::Water_Lily //7553
-<color=#808080>A delicate flower found in the depths of Brasilis.</color>
+<color=#808080>ดอกไม้บอบบางที่พบในป่าลึกของ Brasilis</color>
 
 ::Glacial_Heart //7561
-<color=#808080>A frozen heart that gives you chill when you touch it.</color>
+<color=#808080>หัวใจเยือกแข็ง แตะแล้วหนาวสั่น</color>
 
 ::Ice_Scale //7562
-<color=#808080>A scale made of thin ice that, mysteriously, won't melt.</color>
+<color=#808080>เกล็ดน้ำแข็งบางที่ไม่ละลายอย่างน่าประหลาด</color>
 
 ::Bloody_Rune //7563
-<color=#808080>A glowing, blood red rune with ancient symbols engraved within.</color>
+<color=#808080>รูนเรืองแสงสีแดงเลือด สลักสัญลักษณ์โบราณไว้ข้างใน</color>
 
 ::Rotten_Meat //7564
-<color=#808080>A rotting piece of meat that is definitely unsafe for you to eat.</color>
+<color=#808080>เนื้อเน่าที่กินเข้าไปไม่ปลอดภัยแน่นอน</color>
 
 ::Sticky_Poison //7565
-<color=#808080>Sticky, poisonous fluid from plants with numerous applications.</color>
+<color=#808080>ของเหลวมีพิษเหนียวจากพืช ใช้ประโยชน์ได้สารพัด</color>
 
 ::Will_of_Red_Darkness //7566
-<color=#808080>A stone embedded with seven bright red eyes, just looking at it makes you feel uneasy.</color>
+<color=#808080>หินที่ฝังตาแดงสดไว้ 7 ดวง แค่มองก็รู้สึกไม่สบายใจ</color>
 
 ::Suspicious_Hat //7567
-<color=#808080>A hat that covers the entire face, but it has two holes that you can see through.</color>
+<color=#808080>หมวกที่คลุมทั้งหน้า แต่เจาะรูไว้สองรูให้มองเห็น</color>
 
 ::White_Mask //7568
-<color=#808080>A spooky mask that effectively conceals the wearer's identity.</color>
+<color=#808080>หน้ากากน่าขนลุกที่ปกปิดตัวตนได้ดี</color>
 
 ::Wind_Hammer //7569
-<color=#808080>A strong, sturdy hammer imbued with the power of wind.</color>
+<color=#808080>ค้อนแข็งแรงทนทานที่อาบด้วยพลังลม</color>
 
 ::Temple_Lottery_Ticket //7570
-<color=#808080>A lottery ticket given to those who contribute to the Rachel Temple restoration effort.</color>
+<color=#808080>สลากที่มอบให้ผู้ร่วมบูรณะวิหาร Rachel</color>
 
 ::Bruspetti's_Diary //7571
-<color=#808080>An effeminate diary with the word, "Bruspetti" written on the cover.</color>
+<color=#808080>ไดอารีลายหวานที่หน้าปกเขียนว่า "Bruspetti"</color>
 
 ::Ashy_Necklace //7572
-<color=#808080>A necklace crafted by skilled Dwarves.</color>
+<color=#808080>สร้อยคอที่คนแคระฝีมือดีทำขึ้น</color>
 
 ::Sparkling_Necklace //7573
-<color=#808080>A glowing necklace enchanted with an ancient magic.</color>
+<color=#808080>สร้อยคอเรืองแสงที่ร่ายเวทโบราณเอาไว้</color>
 
 ::Freezing_Snow_Powder //7574
-<color=#808080>A very cold powder enchanted with very powerful ice magic.</color>
+<color=#808080>ผงเย็นจัดที่ร่ายเวทน้ำแข็งอันทรงพลังไว้</color>
 
 ::Red_Jewel //7575
-<color=#808080>A shiny red jewel.</color>
+<color=#808080>อัญมณีสีแดงเงางาม</color>
 
 ::Blue_Jewel //7576
-<color=#808080>A shiny blue jewel.</color>
+<color=#808080>อัญมณีสีน้ำเงินเงางาม</color>
 
 ::Token_of_Siegfried //7621
-<color=#808080>A manifestation of a soldier who literally willed himself back to life.</color>
+<color=#808080>ร่างที่ปรากฏของทหารผู้ใช้พลังใจล้วนๆ ดึงตัวเองกลับมาจากความตาย</color>
 
 ::Hairstyle_Voucher //7622
-<color=#808080>A voucher which may be exchanged for a new hair style.</color>
+<color=#808080>คูปองที่แลกเปลี่ยนทรงผมใหม่ได้</color>
 
 ::Broken_Thermometer //7704
-<color=#808080>A device that can measure the ground's temperature, however it isn't very reliable.</color>
+<color=#808080>อุปกรณ์วัดอุณหภูมิพื้นดิน แต่ไม่ค่อยแม่นเท่าไหร่</color>
 
 ::Note_of_Geologist //7705
-<color=#808080>A note written by a Geologist (1WN 2ES 2EC).</color>
+<color=#808080>โน้ตที่นักธรณีวิทยาเขียนไว้ (1WN 2ES 2EC)</color>
 
 ::Debt_Note //7722
-<color=#808080>A loan document that includes the amount lended and the signatures of the loaner and lendee.</color>
+<color=#808080>เอกสารกู้ยืมที่ระบุยอดเงินและลายเซ็นของทั้งผู้ให้กู้และผู้กู้</color>
 
 ::Diamond_of_Ruin //7723
-<color=#808080>A diamond that emits an ominous vibe; it seems that it would be incredibly valuable.</color>
+<color=#808080>เพชรที่แผ่ออร่าลางร้าย ดูแล้วน่าจะมีค่ามหาศาล</color>
 
 ::Forbidden_Secret_Art //7724
-<color=#808080>A book that contains forbidden secrets of alchemy and magic.</color>
+<color=#808080>หนังสือบรรจุความลับต้องห้ามของวิชาเล่นแร่แปรธาตุและเวทมนตร์</color>
 
 ::Unlucky_Emerald //7725
-<color=#808080>An emerald that brings an impending sense of great misfortune to whomever holds it.</color>
+<color=#808080>มรกตที่ทำให้ผู้ถือรู้สึกว่าเคราะห์ร้ายใหญ่หลวงกำลังจะมาถึง</color>
 
 ::Token_of_King //7726
-<color=#808080>The perfectly crafted, intricate, and official royal seal of the King of the Rune Midgard Kingdom.</color>
+<color=#808080>ตราประทับหลวงของกษัตริย์แห่งอาณาจักร Rune Midgard ทำมาอย่างประณีตสมบูรณ์แบบ</color>
 
 ::Mission_Ticket_1 //7730
-<color=#808080>A ticket which proves mission completion.</color>
+<color=#808080>ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ</color>
 
 ::Mission_Ticket_2 //7731
-<color=#808080>A ticket which proves mission completion.</color>
+<color=#808080>ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ</color>
 
 ::Mission_Ticket_3 //7732
-<color=#808080>A ticket which proves mission completion.</color>
+<color=#808080>ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ</color>
 
 ::Mission_Ticket_4 //7733
-<color=#808080>A ticket which proves mission completion.</color>
+<color=#808080>ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ</color>
 
 ::Mission_Ticket_5 //7734
-<color=#808080>A ticket which proves mission completion.</color>
+<color=#808080>ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ</color>
 
 ::Mission_Ticket_6 //7735
-<color=#808080>A ticket which proves mission completion.</color>
+<color=#808080>ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ</color>
 
 ::Mission_Ticket_7 //7736
-<color=#808080>A ticket which proves mission completion.</color>
+<color=#808080>ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ</color>
 
 ::Mission_Ticket_8 //7737
-<color=#808080>A ticket which proves mission completion.</color>
+<color=#808080>ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ</color>
 
 ::Mission_Ticket_9 //7738
-<color=#808080>A ticket which proves mission completion.</color>
+<color=#808080>ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ</color>
 
 ::Mission_Ticket_10 //7739
-<color=#808080>A ticket which proves mission completion.</color>
+<color=#808080>ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ</color>
 
 ::Mission_Ticket_11 //7740
-<color=#808080>A ticket which proves mission completion.</color>
+<color=#808080>ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ</color>
 
 ::Mission_Ticket_12 //7741
-<color=#808080>A ticket which proves mission completion.</color>
+<color=#808080>ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ</color>
 
 ::Old_White_Cloth //7751
-<color=#808080>A worn-out white cloth.</color>
+<color=#808080>ผ้าสีขาวที่เก่าจนโทรม</color>
 
 ::Clattering_Skull //7752
-<color=#808080>A clattering skull that occasionally breaks out in song.</color>
+<color=#808080>กะโหลกที่สั่นกึกกัก บางทีก็ร้องเพลงขึ้นมาเฉยๆ</color>
 
 ::Broken_Farming_Utensil //7753
-<color=#808080>A seemingly useless farming tool.</color>
+<color=#808080>อุปกรณ์ทำไร่ที่ดูเหมือนจะไร้ประโยชน์</color>
 
 ::Broken_Crown //7754
-<color=#808080>An antique crown that used to sparkle with magnificence.</color>
+<color=#808080>มงกุฎโบราณที่เคยเปล่งประกายอลังการ</color>
 
 ::Research_Note //7755
-<color=#808080>A note that is barely legible as it is heavily damaged.</color>
+<color=#808080>โน้ตที่เสียหายหนักจนแทบอ่านไม่ออก</color>
 
 ::Magic_Gourd_Bottle //7761
-<color=#808080>A marvelous bottle that can carry languages.</color>
+<color=#808080>ขวดมหัศจรรย์ที่บรรจุภาษาได้</color>
 
 ::Yaga's_Pestle //7762
-<color=#808080>A pestle carried by Baba Yaga that is well worn.</color>
+<color=#808080>สากที่ Baba Yaga พกติดตัว ใช้มาจนสึก</color>
 
 ::Sticky_Herb //7763
-<color=#808080>An herb containing a sticky liquid that can be ground into a glue.</color>
+<color=#808080>สมุนไพรที่มียางเหนียว บดแล้วทำกาวได้</color>
 
 ::High_Strength_Adhesive //7764
-<color=#808080>The highest strength adhesive around.</color>
+<color=#808080>กาวที่เหนียวที่สุดเท่าที่มี</color>
 
 ::Baba_Yaga's_Secret_Medicine //7765
-<color=#808080>A unique liquid made by Baba Yaga that will ensure winter does not come again!</color>
+<color=#808080>ของเหลวสูตรพิเศษของ Baba Yaga ที่รับรองว่าฤดูหนาวจะไม่กลับมาอีก!</color>
 
 ::Gym_Pass //7776
 
 ::Mammi's_Photo_Album //7795
-<color=#808080>A photo album that contains pictures of Mammi, a former envoy of Morroc Public Relations.</color>
+<color=#808080>อัลบั้มรูปของ Mammi อดีตทูตประชาสัมพันธ์ของ Morroc</color>
 
 ::Author's_Autograph //7796
-<color=#808080>A note from Oliver Hilpert, you can tell by his poor handwriting... and by his autograph.</color>
+<color=#808080>โน้ตจาก Oliver Hilpert ดูจากลายมือห่วยๆ ก็รู้... แล้วก็ลายเซ็นด้วย</color>
 
 ::Author's_Memo //7797
-<color=#808080>An ancient weapon with an unknown motive
+<color=#808080>อาวุธโบราณที่ไม่รู้ว่าสร้างมาเพื่ออะไร</color>
 
 ::Fragment_of_Darkness //7798
-<color=#808080>A dark fragment that seems to absorb any light you shine onto it.</color>
+<color=#808080>เศษชิ้นส่วนสีดำที่ดูดกลืนแสงทุกอย่างที่ส่องเข้าไป</color>
 
 ::Crystal_of_Darkness //7799
-<color=#808080>A dark crystal kept in perpetual shadow, regardless of your attempts to place it in sunlight.</color>
+<color=#808080>คริสตัลดำที่อยู่ในเงามืดตลอดเวลา เอาไปตากแดดยังไงก็ไม่เปลี่ยน</color>
 
 ::Morroc_Skin //7820
-<color=#808080>A seared piece of skin from Satan Morroc.</color>
+<color=#808080>เศษหนังไหม้เกรียมของ Satan Morroc</color>
 
 ::Continental_Guard_Paper //7826
-<color=#808080>A certificate that proves an adventurer is a member of the Continental Guard.</color>
+<color=#808080>ใบรับรองว่านักผจญภัยผู้นี้เป็นสมาชิก Continental Guard</color>
 
 ::Badge_of_Bravery //7828
-<color=#808080>A badge provided to warriors who have shown bravery.</color>
+<color=#808080>เหรียญตราสำหรับนักรบผู้กล้าหาญ</color>
 
 ::Badge_of_Valor //7829
-<color=#808080>A badge provided to warriors who have shown valor.</color>
+<color=#808080>เหรียญตราสำหรับนักรบผู้ห้าวหาญ</color>
 
 ::Goddess_Tear //7830
-<color=#808080>A physical manifestation of the tears wept for fallen warriors.</color>
+<color=#808080>รูปธรรมของน้ำตาที่หลั่งให้นักรบผู้ล่วงลับ</color>
 
 ::Valkyrie's_Token //7831
-<color=#808080>A physical manifestation of the trust of the Valkyries.</color>
+<color=#808080>รูปธรรมของความไว้วางใจจากเหล่า Valkyrie</color>
 
 ::Brynhild_Armor_Piece //7832
-<color=#808080>A fragment of armor from the fallen valkyrie, Breunhilt.</color>
+<color=#808080>เศษเกราะของ Breunhilt วาลคีรีผู้ล่วงลับ</color>
 
 ::Hero's_Remains //7833
-<color=#808080>A fragment of ashes of the fallen hero, Siglude.</color>
+<color=#808080>เศษเถ้าถ่านของ Siglude วีรบุรุษผู้ล่วงลับ</color>
 
 ::Andvari's_Ring //7834
-<color=#808080>A fragment of the ring of Andvary protected by the dragon Pavvnir.</color>
+<color=#808080>เศษแหวนของ Andvary ที่มังกร Pavvnir เฝ้าอยู่</color>
 
 ::Dusk_Glow //7835
-<color=#808080>A physical manifestation of a sunset.</color>
+<color=#808080>รูปธรรมของแสงอาทิตย์อัสดง</color>
 
 ::Dawn_Essence //7836
-<color=#808080>A physical manifestation of a sunrise.</color>
+<color=#808080>รูปธรรมของแสงอรุณ</color>
 
 ::Cold_Moonlight //7837
-<color=#808080>A physical manifestation of moonlight.</color>
+<color=#808080>รูปธรรมของแสงจันทร์</color>
 
 ::Hazy_Starlight //7838
-<color=#808080>A physical manifestation of starlight.</color>
+<color=#808080>รูปธรรมของแสงดาว</color>
 
 ::Crystal_Key //7839
-<color=#808080>A piece of crystal required to progress into Okolnir.</color>
+<color=#808080>เศษคริสตัลที่ต้องใช้เพื่อเข้าไปยัง Okolnir</color>
 
 ::Valkyrie's_Gift //7840
-<color=#808080>A flower from Wishmaiden Valkyrie.</color>
+<color=#808080>ดอกไม้จาก Wishmaiden Valkyrie</color>
 
 ::Gold_Key //7876
-<color=#808080>A shiny gold key rumored to be able to open enchanted locks.</color>
+<color=#808080>กุญแจทองเงางาม ร่ำลือกันว่าไขกลอนที่ร่ายเวทไว้ได้</color>
 
 ::Red_Ring //7877
-<color=#808080>Mashenka's red ring, it seems to have a sad story.</color>
+<color=#808080>แหวนแดงของ Mashenka ดูเหมือนจะมีเรื่องเศร้าซ่อนอยู่</color>
 
 ::Lusalka's_Hair //7878
-<color=#808080>Hair of the water fairy Lusalka, who drowned on the eve of her marriage.</color>
+<color=#808080>เส้นผมของภูตน้ำ Lusalka ผู้จมน้ำตายในคืนก่อนวันแต่งงาน</color>
 
 ::Golden_Thread //7879
-<color=#808080>A spool wrapped with fine golden thread.</color>
+<color=#808080>หลอดด้ายที่พันด้วยด้ายทองชั้นดี</color>
 
 ::Baba_Yaga's_Silver_Spoon //7880
-<color=#808080>Baba Yaga's silver spoon stolen by pirates.</color>
+<color=#808080>ช้อนเงินของ Baba Yaga ที่โจรสลัดขโมยไป</color>
 
 ::Mystery_Magic_Book //7881
-<color=#808080>A mysterious magic book published by MOMOTARO Publishing.</color>
+<color=#808080>หนังสือเวทลึกลับ จัดพิมพ์โดยสำนักพิมพ์ MOMOTARO</color>
 
 ::Sharp_Branch //7882
-<color=#808080>A branch broken off from a thornbush.</color>
+<color=#808080>กิ่งที่หักมาจากพุ่มหนาม</color>
 
 ::Wooden_Flute //7883
-<color=#808080>A flute made by a shepherd who has a talent for music.</color>
+<color=#808080>ขลุ่ยที่คนเลี้ยงแกะผู้มีพรสวรรค์ด้านดนตรีทำขึ้น</color>
 
 ::Chef_King_Orleans_Vol.1 //11002
-<color=#808080>A famous novel by a kRO player that details Chef Orleans</color>
+<color=#808080>นิยายชื่อดังที่ผู้เล่น kRO เขียนถึง Chef Orleans</color>
 
 ::Kafra_Legend_Vol.1 //11003
-<color=#808080>A famous novel by a kRO player that details the Kafra Corporation.</color>
+<color=#808080>นิยายชื่อดังที่ผู้เล่น kRO เขียนถึงบริษัท Kafra</color>
 
 ::Expedition_Report //11012
-<color=#808080>The first report of the expedition with the Commander's seal. The report records all the information related to ecological environment, situations of the species and the expedition in another world.</color>
+<color=#808080>รายงานฉบับแรกของคณะสำรวจ ประทับตราผู้บัญชาการ บันทึกข้อมูลระบบนิเวศ สถานการณ์ของสิ่งมีชีวิต และการสำรวจในอีกโลกหนึ่งไว้ทั้งหมด</color>
 
 ::Expedition_Report_Vol1 //11013
-<color=#808080>Expedition Report Vol.1, sorted by Abidal. The information on the expedition's settlement and occupation are all here.</color>
+<color=#808080>รายงานการสำรวจเล่ม 1 เรียบเรียงโดย Abidal ข้อมูลการตั้งฐานและการยึดครองอยู่ในนี้ทั้งหมด</color>
 
 ::Expedition_Report_Vol2 //11014
-<color=#808080>Expedition Report Vol.2 which details the dimensional gorge and the traces of Satan Morroc.</color>
+<color=#808080>รายงานการสำรวจเล่ม 2 ว่าด้วยหุบเหวมิติและร่องรอยของ Satan Morroc</color>
 
 ::Expedition_Report_Vol3 //11015
-<color=#808080>Expedition Report Vol.3 which details the ecological environment and the species.</color>
+<color=#808080>รายงานการสำรวจเล่ม 3 ว่าด้วยระบบนิเวศและสิ่งมีชีวิตต่างๆ</color>
 
 ::Expedition_Report_Vol4 //11016
-<color=#808080>Expedition Report Vol.4 which details the internal investigation.</color>
+<color=#808080>รายงานการสำรวจเล่ม 4 ว่าด้วยการสอบสวนภายใน</color>
 
 ::Okolnir_Key
-<desc>A key used to open the way to the realm of Okolnir.</desc>
-The Valkyrie can use 3 of these keys to open a portal to Okolnir, a challenge dungeon available for all players to join. Once activated there will be a server wide announcement and a 5 minute wait until the portal opens.
-Valkyrie spawn conditions: At least one player has reached level 85 and 8 unique MVPs have been defeated.
+<desc>กุญแจเปิดทางสู่ดินแดน Okolnir</desc>
+Valkyrie ใช้กุญแจนี้ 3 ดอกเปิดประตูมิติสู่ Okolnir ดันเจี้ยนท้าทายที่ผู้เล่นทุกคนเข้าร่วมได้ เมื่อเปิดแล้วจะมีประกาศทั่วเซิร์ฟเวอร์ และรออีก 5 นาทีประตูจึงจะเปิด
+เงื่อนไขการเกิดของ Valkyrie: มีผู้เล่นถึงเลเวล 85 อย่างน้อย 1 คน และปราบ MVP ไม่ซ้ำกันครบ 8 ตัว

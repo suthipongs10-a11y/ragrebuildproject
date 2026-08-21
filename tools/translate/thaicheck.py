@@ -62,17 +62,27 @@ def main(before, after):
     else:
         print("  all %d item link names left in English" % len(links_a))
 
+    #An arrow's element is written in the skill colour, and that one is a word rather
+    #than a name - it is meant to come out in Thai. Everything else in that colour is a
+    #skill and has to survive untouched.
+    elements = {"Neutral", "Water", "Earth", "Fire", "Wind", "Poison", "Holy",
+                "Shadow", "Dark", "Ghost", "Undead"}
     skills_a = [m for l in a for m in SKILL.findall(l)]
     skills_b = [m for l in b for m in SKILL.findall(l)]
-    if skills_a != skills_b:
-        problems.append("skill names changed")
+    changed = [(x, y) for x, y in zip(skills_a, skills_b)
+               if x != y and "".join(x).strip() not in elements]
+    if len(skills_a) != len(skills_b) or changed:
+        problems.append("skill names changed: %s" % changed[:5])
     else:
         print("  all %d skill names left in English" % len(skills_a))
 
-    #balance, per line: a span opened on one line is closed on it in this format
-    for n, y in enumerate(b, 1):
-        if y.count("<color=") != y.lower().count("</color>"):
-            problems.append("line %d has an unbalanced colour span: %s" % (n, y))
+    #A couple of descriptions run across two lines, so a line on its own is allowed to
+    #be unbalanced - what may not change is whether it is.
+    for n, (x, y) in enumerate(zip(a, b), 1):
+        before = x.count("<color=") - x.lower().count("</color>")
+        after = y.count("<color=") - y.lower().count("</color>")
+        if before != after:
+            problems.append("line %d closed its colour spans differently: %s" % (n, y))
 
     blank_a = [n for n, l in enumerate(a) if not l.strip()]
     blank_b = [n for n, l in enumerate(b) if not l.strip()]

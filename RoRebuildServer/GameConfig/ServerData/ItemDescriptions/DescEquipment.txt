@@ -1,876 +1,876 @@
 //Armor
 
 ::Guard //id 2101 - Shield 
-<desc>A square shield that is small, yet effective in combat.</desc>
+<desc>โล่สี่เหลี่ยมขนาดเล็ก แต่ใช้ในการรบได้ผลดี</desc>
 
 ::Guard_ //id 2102 - Shield 
-<desc>A square shield that is small, yet effective in combat.</desc>
+<desc>โล่สี่เหลี่ยมขนาดเล็ก แต่ใช้ในการรบได้ผลดี</desc>
 
 ::Buckler //id 2103 - Shield 
-<desc>A rounded shield that readily absorbs impact from attacks.</desc>
+<desc>โล่ทรงกลมที่ซับแรงกระแทกจากการโจมตีได้ดี</desc>
 
 ::Buckler_ //id 2104 - Shield 
-<desc>A rounded shield that readily absorbs impact from attacks.</desc>
+<desc>โล่ทรงกลมที่ซับแรงกระแทกจากการโจมตีได้ดี</desc>
 
 ::Shield //id 2105 - Shield 
-<desc>A well crafted shield which most attacks cannot penetrate.</desc>
+<desc>โล่ที่ทำมาอย่างดี การโจมตีส่วนใหญ่เจาะไม่เข้า</desc>
 
 ::Shield_ //id 2106 - Shield 
-<desc>A well crafted shield which most attacks cannot penetrate.</desc>
+<desc>โล่ที่ทำมาอย่างดี การโจมตีส่วนใหญ่เจาะไม่เข้า</desc>
 
 ::Mirror_Shield //id 2107 - Shield 
-<desc>A shield with a mirrored surface that defends against harmful magic.</desc>
+<desc>โล่ผิวกระจกที่ป้องกันเวทร้าย</desc>
 MDEF +5
 
 ::Mirror_Shield_ //id 2108 - Shield 
-<desc>A shield with a mirrored surface that defends against harmful magic.</desc>
+<desc>โล่ผิวกระจกที่ป้องกันเวทร้าย</desc>
 MDEF +5
 
 ::Memory_Book //id 2109 - Shield 
-<desc>A magic spellbook that is so large it can be used as a shield.</desc>
+<desc>ตำราเวทที่ใหญ่จนเอามาใช้เป็นโล่ได้</desc>
 INT +1, MDEF +2
 
 ::Holy_Guard //id 2110 - Shield 
-<desc>A blessed guard engraved with God's symbol.</desc>
+<desc>เครื่องป้องกันศักดิ์สิทธิ์ สลักสัญลักษณ์ของพระเจ้า</desc>
 VIT +2, MDEF +2
 
 ::Sacred_Mission //id 2111 - Shield 
-<desc>A shield symbolic of God's gift to the church.</desc>
+<desc>โล่ที่สื่อถึงของประทานจากพระเจ้าแก่ศาสนจักร</desc>
 VIT +3, INT +2, MDEF +3
 
 ::Novice_Guard //id 2112 - Shield 
-<desc>A shield exclusive to the Novice Training Grounds.</desc>
+<desc>โล่เฉพาะของลานฝึก Novice</desc>
 
 ::Novice_Shield //id 2113 - Shield 
-<color=#808080>A shield exclusively for Novices!</color>
+<color=#808080>โล่สำหรับ Novice เท่านั้น!</color>
 
 ::Stone_Buckler //id 2114 - Shield 
-<desc>A stone shield which Thor obtained by killing Hrungnir, king of giants.</desc>
--5% damage from Large
+<desc>โล่หินที่ Thor ได้มาจากการสังหาร Hrungnir ราชาแห่งยักษ์</desc>
+รับดาเมจจากขนาดใหญ่ -5%
 
 ::Valkyrja's_Shield //id 2115 - Shield 
-<desc>A shield used by Gna, messenger of Freyja, when she served as a Valkyrie.</desc>
--20% damage from Water, Fire, Decay, Shadow attacks
+<desc>โล่ที่ Gna ผู้ส่งสารของ Freyja ใช้ตอนเป็น Valkyrie</desc>
+รับดาเมจธาตุน้ำ, ธาตุไฟ, ธาตุเน่าเปื่อย, ธาตุมืด -20%
 MDEF +5
 
 ::Angel's_Guard //id 2116 - Shield 
-<desc>A shield which contains a holy power that can nullify evil.</desc>
--5% damage from Demon
+<desc>โล่ที่มีพลังศักดิ์สิทธิ์ซึ่งลบล้างความชั่วร้ายได้</desc>
+รับดาเมจจากปีศาจ -5%
 
 ::Arm_Guard //id 2117 - Shield 
-<desc>A wrist protector padded with a steel plate for increased durability.</desc>
+<desc>สนับข้อมือที่บุแผ่นเหล็กไว้เพิ่มความทนทาน</desc>
 
 ::Arm_Guard_ //id 2118 - Shield 
-<desc>A wrist protector padded with a steel plate for increased durability.</desc>
+<desc>สนับข้อมือที่บุแผ่นเหล็กไว้เพิ่มความทนทาน</desc>
 
 ::Advanced_Arm_Guard //id 2119 - Shield 
-<desc>A wrist protector enhanced with magic resistance by a gifted artisan.</desc>
+<desc>สนับข้อมือที่ช่างฝีมือผู้มีพรสวรรค์เสริมความต้านทานเวทให้</desc>
 MDEF +5
 
 ::Advanced_Arm_Guard_ //id 2120 - Shield 
-<desc>A wrist protector enhanced with magic resistance by a gifted artisan.</desc>
+<desc>สนับข้อมือที่ช่างฝีมือผู้มีพรสวรรค์เสริมความต้านทานเวทให้</desc>
 MDEF +5
 
 ::Memory_Book_ //id 2121 - Shield 
-<desc>A magic spellbook that is so large it can be used as a shield.</desc>
+<desc>ตำราเวทที่ใหญ่จนเอามาใช้เป็นโล่ได้</desc>
 INT +1, MDEF +2
 
 ::Platinum_Shield //id 2122 - Shield 
-<desc>A magnificent platinum shield reflects harmful magic.</desc>
+<desc>โล่แพลตทินัมงดงาม สะท้อนเวทร้าย</desc>
 MDEF +5
--15% damage from Large, Medium
--10% damage from Undead
+รับดาเมจจากขนาดใหญ่, ขนาดกลาง -15%
+รับดาเมจจากอันเดด -10%
 
 ::Orleans's_Server //id 2123 - Shield 
-<desc>A shiny, round, silver food platter.</desc>
+<desc>ถาดอาหารเงินทรงกลมเงางาม</desc>
 MDEF +2
 
 ::Thorny_Buckler //id 2124 - Shield 
-<desc>A rough shield covered in spikes that deter rushing enemies.</desc>
+<desc>โล่หยาบๆ ที่ปกคลุมด้วยหนามแหลม สกัดศัตรูที่พุ่งเข้ามา</desc>
 MDEF +2
 
 ::Strong_Shield //id 2125 - Shield 
-<desc>A massive shield that can withstand any attack but lacks shock absorption.</desc>
-+20% damage received
-Knockback Immunity
+<desc>โล่ขนาดมหึมาที่รับได้ทุกการโจมตี แต่ไม่ซับแรงกระแทก</desc>
+รับดาเมจ +20%
+ไม่ถูกผลักถอยหลัง
 
 ::Sacred_Mission_ //id 2128 - Shield 
-<desc>A shield symbolic of God's gift to the church.</desc>
+<desc>โล่ที่สื่อถึงของประทานจากพระเจ้าแก่ศาสนจักร</desc>
 VIT +3, INT +2, MDEF +3
 
 ::Exorcism_Bible //id 2129 - Shield 
-<desc>A thick book that details how to perform an exorcism.</desc>
+<desc>หนังสือเล่มหนาที่บอกวิธีทำพิธีไล่ผี</desc>
 INT +1
-HP Regeneration +3%
-SP Regeneration +3%
+ฟื้นฟู HP +3%
+ฟื้นฟู SP +3%
 
 ::Cross_Shield //id 2130 - Shield 
-<desc>A massive, thick cross-shaped shield.</desc>
+<desc>โล่รูปกางเขนขนาดมหึมาและหนา</desc>
 STR +1
-SP Consumption +10%
+ใช้ SP +10%
 
 ::Magic_Bible_Vol1 //id 2131 - Shield 
-<desc>A massive book known as "the spellcasting bible".</desc>
+<desc>หนังสือเล่มมหึมาที่รู้จักกันในชื่อ "คัมภีร์การร่ายเวท"</desc>
 INT +2, MDEF +3
-+10% chance of <color=#800000>Stun</color> on receive physical damage
+โอกาส 10% ทำให้ <color=#800000>สตัน</color> เมื่อโดนโจมตีกายภาพ
 
 ::Tournament_Shield //id 2133 - Shield 
-<desc>A shield used in jousting tournaments, best used with a spear.</desc>
-+1% physical damage
+<desc>โล่ที่ใช้ในการประลองทวน ใช้คู่กับหอกดีที่สุด</desc>
+ดาเมจกายภาพ +1%
 
 ::Shield_of_Naga //id 2134 - Shield 
-<desc>A hard, firm-looking shield made from Naga scales.</desc>
+<desc>โล่แข็งแกร่งดูมั่นคง ทำจากเกล็ด Naga</desc>
 MDEF +3
 
 ::Ahura_Mazdah //id 2199 - Shield 
-<desc>The shield of shields.</desc>
-All Stats + 50
+<desc>โล่แห่งบรรดาโล่ทั้งปวง</desc>
+ทุกสเตตัส +50
 
 ::Sunglasses //id 2201 - Headgear Mid
-<desc>A pair of glasses with darkened lenses that block ultraviolet light.</desc>
-+40% <color=#800000>Blind</color> resist
+<desc>แว่นเลนส์สีเข้มที่กันรังสียูวี</desc>
+ต้านทาน <color=#800000>ตาบอด</color> +40%
 
 ::Sunglasses_ //id 2202 - Headgear Mid
-<desc>A pair of glasses with darkened lenses that block ultraviolet light.</desc>
-+40% <color=#800000>Blind</color> resist
+<desc>แว่นเลนส์สีเข้มที่กันรังสียูวี</desc>
+ต้านทาน <color=#800000>ตาบอด</color> +40%
 
 ::Glasses //id 2203 - Headgear Mid
-<desc>A pair of prescription glasses that compensate for vision defects.</desc>
+<desc>แว่นสายตาที่แก้ปัญหาการมองเห็น</desc>
 
 ::Glasses_ //id 2204 - Headgear Mid
-<desc>A pair of prescription glasses that compensate for vision defects.</desc>
+<desc>แว่นสายตาที่แก้ปัญหาการมองเห็น</desc>
 
 ::Diver_Goggles //id 2205 - Headgear Mid
-<desc>A pair of sturdy goggles worn by ocean divers.</desc>
+<desc>แว่นตาดำน้ำที่แข็งแรง นักดำน้ำใช้กัน</desc>
 
 ::Wedding_Veil //id 2206 - Headgear Top
-<desc>A transparent veil worn by brides on their wedding day.</desc>
+<desc>ผ้าคลุมหน้าโปร่งใสที่เจ้าสาวสวมในวันแต่งงาน</desc>
 MDEF +5
 
 ::Fancy_Flower //id 2207 - Headgear Top
-<desc>A floral decoration that may be worn.</desc>
--10% damage from Plant
+<desc>เครื่องประดับดอกไม้ที่ใส่ได้</desc>
+รับดาเมจจากพืช -10%
 
 ::Ribbon //id 2208 - Headgear Top
-<desc>A blue satin hairpin that wards off harmful magic.</desc>
+<desc>ปิ่นปักผมซาตินสีน้ำเงิน ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Ribbon_ //id 2209 - Headgear Top
-<desc>A blue satin hairpin that wards off harmful magic.</desc>
+<desc>ปิ่นปักผมซาตินสีน้ำเงิน ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Hair_Band //id 2210 - Headgear Top
-<desc>A hairband that holds hair in place, it's cute on gals but on guys it's something else.</desc>
+<desc>ที่คาดผมไว้รวบผม ผู้หญิงใส่แล้วน่ารัก ผู้ชายใส่แล้ว...ก็อีกเรื่องหนึ่ง</desc>
 
 ::Bandana //id 2211 - Headgear Top
-<desc>A common, ivory colored bandana.</desc>
+<desc>ผ้าโพกหัวสีงาช้าง แบบธรรมดา</desc>
 
 ::Eye_Patch //id 2212 - Headgear Mid
-<desc>A patch used to cover one eye.</desc>
+<desc>ผ้าปิดตาข้างเดียว</desc>
 
 ::Kitty_Band //id 2213 - Headgear Top
-<desc>A hairband fashioned with cute kitty ears, meow!</desc>
+<desc>ที่คาดผมติดหูแมวน่ารัก เมี้ยว!</desc>
 
 ::Bunny_Band //id 2214 - Headgear Top
-<desc>A hairband fashioned with rabbit ears, a symbol of good luck.</desc>
+<desc>ที่คาดผมติดหูกระต่าย สัญลักษณ์แห่งโชคดี</desc>
 LUK +2
 
 ::Flower_Band //id 2215 - Headgear Top
-<desc>A fragrant hairband crafted from only the daintiest of flowers.</desc>
+<desc>ที่คาดผมหอมกรุ่น ร้อยจากดอกไม้ที่บอบบางที่สุดเท่านั้น</desc>
 
 ::Biretta //id 2216 - Headgear Top
-<desc>A stiff, squarish formal hat worn by clerics.</desc>
+<desc>หมวกพิธีการทรงเหลี่ยมแข็ง นักบวชสวมกัน</desc>
 
 ::Biretta_ //id 2217 - Headgear Top
-<desc>A stiff, squarish formal hat worn by clerics.</desc>
+<desc>หมวกพิธีการทรงเหลี่ยมแข็ง นักบวชสวมกัน</desc>
 
 ::Flu_Mask //id 2218 - Headgear Bottom
-<desc>A mask worn by considerate people to mitigate an airborn illness.</desc>
-+10% <color=#800000>Silence</color> resist
+<desc>หน้ากากที่คนมีน้ำใจใส่เพื่อลดการแพร่โรคทางอากาศ</desc>
+ต้านทาน <color=#800000>ใบ้</color> +10%
 
 ::Hat //id 2220 - Headgear Top
-<desc>A simple pink hat.</desc>
+<desc>หมวกสีชมพูเรียบง่าย</desc>
 
 ::Hat_ //id 2221 - Headgear Top
-<desc>A simple pink hat.</desc>
+<desc>หมวกสีชมพูเรียบง่าย</desc>
 
 ::Turban //id 2222 - Headgear Top
-<desc>A small, tight fitting headdress made of fine silk.</desc>
+<desc>เครื่องสวมหัวเล็กรัดรูป ทำจากไหมชั้นดี</desc>
 
 ::Turban_ //id 2223 - Headgear Top
-<desc>A small, tight fitting headdress made of fine silk.</desc>
+<desc>เครื่องสวมหัวเล็กรัดรูป ทำจากไหมชั้นดี</desc>
 
 ::Goggles //id 2224 - Headgear TopMid
-<desc>A pair of pilot goggles that protect the eyes.</desc>
+<desc>แว่นตานักบินที่ปกป้องดวงตา</desc>
 
 ::Goggles_ //id 2225 - Headgear TopMid
-<desc>A pair of pilot goggles that protect the eyes.</desc>
+<desc>แว่นตานักบินที่ปกป้องดวงตา</desc>
 
 ::Cap //id 2226 - Headgear Top
-<desc>A brimless hat that offers little in the way of fashion but provide decent defense.</desc>
+<desc>หมวกไม่มีปีก ไม่ค่อยสวย แต่ป้องกันได้ดีพอตัว</desc>
 
 ::Cap_ //id 2227 - Headgear Top
-<desc>A brimless hat that offers little in the way of fashion but provide decent defense.</desc>
+<desc>หมวกไม่มีปีก ไม่ค่อยสวย แต่ป้องกันได้ดีพอตัว</desc>
 
 ::Helm //id 2228 - Headgear Top
-<desc>A steel helmet that offers great protection.</desc>
+<desc>หมวกเกราะเหล็กที่ป้องกันได้ดีเยี่ยม</desc>
 
 ::Helm_ //id 2229 - Headgear Top
-<desc>A steel helmet that offers great protection.</desc>
+<desc>หมวกเกราะเหล็กที่ป้องกันได้ดีเยี่ยม</desc>
 
 ::Gemmed_Sallet //id 2230 - Headgear Top
-<desc>A jeweled headdress that wards off harmful magic.</desc>
+<desc>เครื่องสวมหัวประดับอัญมณี ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Gemmed_Sallet_ //id 2231 - Headgear Top
-<desc>A jeweled headdress that wards off harmful magic.</desc>
+<desc>เครื่องสวมหัวประดับอัญมณี ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Circlet //id 2232 - Headgear Top
-<desc>A jeweled, metal band that wards off harmful magic.</desc>
+<desc>แถบโลหะประดับอัญมณี ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Circlet_ //id 2233 - Headgear Top
-<desc>A jeweled, metal band that wards off harmful magic.</desc>
+<desc>แถบโลหะประดับอัญมณี ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Tiara //id 2234 - Headgear Top
-<desc>A jeweled coronet that grants the wisdom of an ancient queen.</desc>
+<desc>มงกุฎประดับอัญมณีที่ให้ปัญญาของราชินีโบราณ</desc>
 INT +2
 
 ::Crown //id 2235 - Headgear Top
-<desc>A jeweled crown that grants the wisdom of an ancient king.</desc>
+<desc>มงกุฎประดับอัญมณีที่ให้ปัญญาของกษัตริย์โบราณ</desc>
 INT +2
 
 ::Santa_Hat //id 2236 - Headgear Top
-<desc>A red, pompom topped cap associated with the Santa Claus legend.</desc>
+<desc>หมวกแดงมีปอมปอมที่ปลาย ตามตำนานซานตาคลอส</desc>
 LUK +1, MDEF +1
 
 ::Monocle //id 2239 - Headgear Mid
-<desc>An aristrocratically stylish lens that is worn over one eye.</desc>
+<desc>แว่นตาเดี่ยวสไตล์ผู้ดี ใส่ข้างเดียว</desc>
 
 ::Grampa_Beard //id 2241 - Headgear Bottom
-<desc>A white colored moustache, a symbol of experience and sophistication.</desc>
+<desc>หนวดสีขาว สัญลักษณ์ของประสบการณ์และความสง่างาม</desc>
 
 ::Purple_Glasses //id 2242 - Headgear Mid
-<desc>A pair of high quality sunglasses that effectively block the sun.</desc>
-+30% <color=#800000>Blind</color> resist
+<desc>แว่นกันแดดคุณภาพสูงที่กันแดดได้ดีจริง</desc>
+ต้านทาน <color=#800000>ตาบอด</color> +30%
 
 ::Geek_Glasses //id 2243 - Headgear Mid
-<desc>A pair of glasses that make the wearer's eyes look like they're spinning without focus.</desc>
-+15% <color=#800000>Blind</color> resist
+<desc>แว่นที่ใส่แล้วตาดูหมุนติ้วไม่มีโฟกัส</desc>
+ต้านทาน <color=#800000>ตาบอด</color> +15%
 
 ::Big_Ribbon //id 2244 - Headgear Top
-<desc>An oversized red ribbon that contains hidden magical power.</desc>
+<desc>โบว์แดงใบใหญ่เกินขนาดที่ซ่อนพลังเวทไว้</desc>
 MDEF +3
 
 ::Sweet_Gent //id 2245 - Headgear Top
-<desc>A dark and stylish hat that was popularized by smooth crooners.</desc>
+<desc>หมวกสีเข้มดูเท่ ฮิตขึ้นมาเพราะนักร้องเสียงนุ่ม</desc>
 
 ::Golden_Gear //id 2246 - Headgear Top
-<desc>A helmet forged from pure gold which provides effective defense but is also unaffordable.</desc>
+<desc>หมวกเกราะที่ตีจากทองคำบริสุทธิ์ ป้องกันดีแต่แพงจนซื้อไม่ไหว</desc>
 
 ::Romantic_Gent //id 2247 - Headgear Top
-<desc>An ivory hat worn by classy men on classy occasions.</desc>
+<desc>หมวกสีงาช้างที่สุภาพบุรุษผู้มีระดับใส่ในโอกาสพิเศษ</desc>
 
 ::Western_Grace //id 2248 - Headgear Top
-<desc>A broad brimmed casual hat, usually worn by cowboys and ranchers, that is rustically stylish.</desc>
+<desc>หมวกปีกกว้างใส่สบาย คาวบอยกับคนเลี้ยงสัตว์ชอบใส่ ดูเท่แบบลูกทุ่ง</desc>
 
 ::Coronet //id 2249 - Headgear Top
-<desc>A small crown, fashioned out of pure gold, worn by members of nobility.</desc>
+<desc>มงกุฎเล็กที่ทำจากทองคำบริสุทธิ์ ชนชั้นสูงสวมกัน</desc>
 INT +1
 
 ::Cute_Ribbon //id 2250 - Headgear Top
-<desc>A small, decorative ribbon.</desc>
+<desc>โบว์ประดับชิ้นเล็ก</desc>
 SP +20
 
 ::Monk_Hat //id 2251 - Headgear Top
-<desc>A ceremonial hat worn by monks that offers protection from evil.</desc>
+<desc>หมวกพิธีกรรมของนักพรต ป้องกันสิ่งชั่วร้าย</desc>
 MDEF +3
 
 ::Wizard_Hat //id 2252 - Headgear Top
-<desc>A mystic hat for wizards that amplifies pyschic power.</desc>
+<desc>หมวกลี้ลับสำหรับ Wizard ขยายพลังจิต</desc>
 SP +100
 
 ::Sunflower //id 2253 - Headgear Top
-<desc>A headgear designed to look like a sunflower.</desc>
--10% damage from Insect
+<desc>เครื่องสวมหัวออกแบบให้เหมือนดอกทานตะวัน</desc>
+รับดาเมจจากแมลง -10%
 
 ::Angel_Wing //id 2254 - Headgear Top
-<desc>A headband adorned with the wings of an angel that offers protection from dark powers.</desc>
+<desc>ที่คาดหัวประดับปีกเทวดา ป้องกันพลังมืด</desc>
 AGI +1, LUK +1, MDEF +3
--3% damage from Demon
+รับดาเมจจากปีศาจ -3%
 
 ::Evil_Wing //id 2255 - Headgear Top
-<desc>A headgear adorned with the wings of a demon that offers protection from holy powers.</desc>
+<desc>เครื่องสวมหัวประดับปีกปีศาจ ป้องกันพลังศักดิ์สิทธิ์</desc>
 STR +1, MDEF +2
--3% damage from Angel
+รับดาเมจจากเทวดา -3%
 
 ::Majestic_Goat //id 2256 - Headgear Top
-<desc>A helmet that has mighty goat horns.</desc>
+<desc>หมวกเกราะที่มีเขาแพะใหญ่โต</desc>
 STR +1
 
 ::Unicorn_Horn //id 2257 - Headgear Top
-<desc>A pristinely white horn that almost resembles a unicorn.</desc>
+<desc>เขาสีขาวบริสุทธิ์ที่ดูเกือบจะเหมือนยูนิคอร์น</desc>
 
 ::Spiky_Band //id 2258 - Headgear Top
-<desc>A headband with two dangerous, yet fashionable, spikes.</desc>
+<desc>ที่คาดหัวติดหนามแหลมสองอัน อันตรายแต่ดูเท่</desc>
 
 ::Mini_Propeller //id 2259 - Headgear Top
-<desc>A headgear topped with a fashionably experimental propeller.</desc>
+<desc>เครื่องสวมหัวที่มีใบพัดติดอยู่ข้างบน ล้ำสมัยแบบทดลอง</desc>
 
 ::Mini_Glasses //id 2260 - Headgear Mid
-<desc>A pair of sophisticated glasses.</desc>
+<desc>แว่นตาดีไซน์ประณีต</desc>
 
 ::Army_Cap //id 2261 - Headgear Top
-<desc>A squad cap issued by the Prontera Military.</desc>
+<desc>หมวกหน่วยที่กองทัพ Prontera แจก</desc>
 
 ::Clown_Nose //id 2262 - Headgear Bottom
-<desc>A fashion accessory used in clown or town drunk costumes.</desc>
+<desc>เครื่องประดับสำหรับชุดตัวตลกหรือขี้เมาประจำเมือง</desc>
 
 ::Zorro_Masque //id 2263 - Headgear Mid
-<desc>A mask inspired by a legendary fencer who kept his identity as a wealthy don a secret.</desc>
+<desc>หน้ากากที่ได้แรงบันดาลใจจากนักดาบในตำนานผู้ปิดบังตัวตนว่าเป็นดอนผู้มั่งคั่ง</desc>
 
 ::Munak_Hat //id 2264 - Headgear All
-<desc>A replica of Munak's turban, complete with an amulet.</desc>
--10% damage from Undead
+<desc>ของจำลองผ้าโพกหัวของ Munak พร้อมยันต์ครบ</desc>
+รับดาเมจจากอันเดด -10%
 
 ::Gangster_Mask //id 2265 - Headgear Bottom
-<desc>A mask marked with an X that is a popular fashion statement for bona fide street toughs.</desc>
-+15% <color=#800000>Silence</color> resist
+<desc>หน้ากากที่มีเครื่องหมายกากบาท แฟชั่นยอดฮิตของนักเลงข้างถนนตัวจริง</desc>
+ต้านทาน <color=#800000>ใบ้</color> +15%
 
 ::Iron_Cain //id 2266 - Headgear Bottom
-<desc>A specialized face armor that protects the jawline.</desc>
+<desc>เกราะหน้าเฉพาะทางที่ปกป้องแนวขากรรไกร</desc>
 
 ::Cigarette //id 2267 - Headgear Bottom
-<desc>A narrow, short roll of finely cut tobacco wrapped in thin paper.</desc>
--3% damage from Insect
+<desc>ยาสูบหั่นละเอียดม้วนในกระดาษบาง เป็นแท่งสั้นเรียว</desc>
+รับดาเมจจากแมลง -3%
 
 ::Pipe //id 2268 - Headgear Bottom
-<desc>A refined, wooden pipe used for smoking high quality tobacco.</desc>
--3% damage from Insect
+<desc>กล้องยาสูบไม้ทำอย่างประณีต ไว้สูบยาชั้นดี</desc>
+รับดาเมจจากแมลง -3%
 
 ::Romantic_Flower //id 2269 - Headgear Bottom
-<desc>A delicate flower that is placed in the mouth for a seductive look.</desc>
--3% damage from Plant
+<desc>ดอกไม้บอบบางที่คาบไว้ในปากเพื่อความยั่วยวน</desc>
+รับดาเมจจากพืช -3%
 
 ::Romantic_Leaf //id 2270 - Headgear Bottom
-<desc>A slender leaf that is placed in the mouth for a seductive look.</desc>
--3% damage from Plant
+<desc>ใบไม้เรียวที่คาบไว้ในปากเพื่อความยั่วยวน</desc>
+รับดาเมจจากพืช -3%
 
 ::Jack_be_Dandy //id 2271 - Headgear Top
-<desc>A pair of fashionable glasses worn for a charming appearance instead of vision improvement.</desc>
+<desc>แว่นแฟชั่นที่ใส่เพื่อความมีเสน่ห์ ไม่ได้ช่วยเรื่องสายตา</desc>
 
 ::Stop_Post //id 2272 - Headgear Top
-<desc>A signpost that declares disapproval, it causes catastrophes during weddings.</desc>
+<desc>ป้ายประกาศคัดค้าน ก่อหายนะในงานแต่งงาน</desc>
 
 ::Doctor_Band //id 2273 - Headgear Top
-<desc>A headband worn by doctors during medical examinations.</desc>
+<desc>ที่คาดหัวที่หมอใส่ตอนตรวจคนไข้</desc>
 INT +1
 
 ::Ghost_Bandana //id 2274 - Headgear Top
-<desc>A traditional headpiece associated with the afterlife.</desc>
+<desc>เครื่องสวมหัวพื้นบ้านที่เกี่ยวข้องกับโลกหลังความตาย</desc>
 AGI +2
--10% damage from Ghost attacks
+รับดาเมจธาตุผี -10%
 
 ::Red_Bandana //id 2275 - Headgear Top
-<desc>A boldly red bandana that was leftover from the 80's.</desc>
+<desc>ผ้าโพกหัวสีแดงจัด ของตกค้างจากยุค 80</desc>
 
 ::Angled_Glasses //id 2276 - Headgear Mid
-<desc>A pair of glasses with lenses angled upward and outward.</desc>
+<desc>แว่นที่เลนส์เฉียงขึ้นและบานออก</desc>
 
 ::Nurse_Cap //id 2277 - Headgear Top
-<desc>A cap worn by nurses both great and small.</desc>
+<desc>หมวกที่พยาบาลใส่กัน ไม่ว่าเก่งมากหรือเก่งน้อย</desc>
 INT +1
 
 ::Mr._Smile //id 2278 - Headgear MidBottom
-<desc>A simple mask with a smile carved into it.</desc>
+<desc>หน้ากากเรียบง่ายที่แกะสลักรอยยิ้มไว้</desc>
 
 ::Bomb_Wick //id 2279 - Headgear Top
-<desc>A wick-like ornament worn for a dangerous look.</desc>
+<desc>เครื่องประดับคล้ายไส้เทียน ใส่แล้วดูอันตราย</desc>
 
 ::Sakkat //id 2280 - Headgear Top
-<desc>A rustic hat knit from rough reeds and bamboo that shields against the rain and sun.</desc>
+<desc>หมวกสานจากกกและไผ่แบบบ้านๆ กันได้ทั้งฝนทั้งแดด</desc>
 AGI +1
 
 ::Opera_Masque //id 2281 - Headgear MidBottom
-<desc>A mysterious mask worn by opera phantoms.</desc>
+<desc>หน้ากากลึกลับที่ปีศาจแห่งโรงละครสวม</desc>
 
 ::Halo //id 2282 - Headgear Top
-<desc>A spiritual symbol that appears over the heads of the holy.</desc>
--15% damage from Holy attacks
+<desc>สัญลักษณ์ศักดิ์สิทธิ์ที่ลอยอยู่เหนือหัวของผู้บริสุทธิ์</desc>
+รับดาเมจธาตุศักดิ์สิทธิ์ -15%
 
 ::Ear_Muffs //id 2283 - Headgear Top
-<desc>A set of ear coverings that protect them from the cold.</desc>
-+10% <color=#800000>Curse</color> resist
+<desc>ที่ครอบหูกันหนาว</desc>
+ต้านทาน <color=#800000>สาป</color> +10%
 
 ::Antlers //id 2284 - Headgear Top
-<desc>A set of deer antlers that humans can proudly wear.</desc>
+<desc>เขากวางชุดหนึ่งที่มนุษย์สวมได้อย่างภาคภูมิ</desc>
 
 ::Apple_of_Archer //id 2285 - Headgear Top
-<desc>A headgear that honors the legendary archer who shot an apple on friend's head from a great distance.</desc>
+<desc>เครื่องสวมหัวที่ระลึกถึงนักธนูในตำนาน ผู้ยิงแอปเปิลบนหัวเพื่อนจากระยะไกล</desc>
 DEX +3
 
 ::Elven_Ears //id 2286 - Headgear Mid
-<desc>An accessory that gives the ears an elvish look, and for some, it is an incredible turn-on.</desc>
+<desc>เครื่องประดับที่ทำให้หูดูเหมือนเอลฟ์ บางคนเห็นแล้วใจสั่นเลยทีเดียว</desc>
 
 ::Pirate_Bandana //id 2287 - Headgear Top
-<desc>A bandana that is the mark of the lawless ocean pirates.</desc>
+<desc>ผ้าโพกหัว เครื่องหมายของโจรสลัดนอกกฎหมาย</desc>
 STR +1
 
 ::Mr._Scream //id 2288 - Headgear MidBottom
-<desc>A mask that expresses anguish and despair.</desc>
+<desc>หน้ากากที่แสดงความทุกข์ทรมานและสิ้นหวัง</desc>
 
 ::Poo_Poo_Hat //id 2289 - Headgear Top
-<desc>A hat shaped like fecal matter that is guaranteed to end a date on a tragic note.</desc>
--10% damage from Demi-Human
+<desc>หมวกรูปอุจจาระ ใส่ไปเดตรับรองว่าจบไม่สวยแน่นอน</desc>
+รับดาเมจจากมนุษย์ -10%
 
 ::Funeral_Hat //id 2290 - Headgear Top
-<desc>A traditional headdress worn during funeral ceremonies.</desc>
+<desc>เครื่องสวมหัวพื้นบ้านที่ใส่ในงานศพ</desc>
 
 ::Masquerade //id 2291 - Headgear Mid
-<desc>A black leather mask shaped like butterfly wings.</desc>
-+3% damage vs. Demi-Human
+<desc>หน้ากากหนังสีดำ รูปทรงเหมือนปีกผีเสื้อ</desc>
+ดาเมจ +3% ต่อมนุษย์
 
 ::Welding_Mask //id 2292 - Headgear MidBottom
-<desc>A durable mask for welders made from a fat metal plate.</desc>
--10% damage from Fire attacks
+<desc>หน้ากากช่างเชื่อมที่ทนทาน ทำจากแผ่นโลหะหนา</desc>
+รับดาเมจธาตุไฟ -10%
 
 ::Pretend_Murdered //id 2293 - Headgear Top
-<desc>A stage prop that creates the illusion that the wearer has been stabbed.</desc>
+<desc>อุปกรณ์ประกอบฉากที่ทำให้ดูเหมือนผู้ใส่โดนแทง</desc>
 
 ::Stellar //id 2294 - Headgear Top
-<desc>A small, star shaped hairclip that makes a great present for ladies.</desc>
+<desc>กิ๊บติดผมรูปดาวเล็กๆ เอาไปให้สาวๆ เป็นของขวัญได้ดี</desc>
 
 ::Blinder //id 2295 - Headgear Mid
-<desc>A face mask worn by those who have trouble sleeping.</desc>
-+100% <color=#800000>Blind</color> resist
+<desc>ผ้าปิดตาสำหรับคนนอนไม่หลับ</desc>
+ต้านทาน <color=#800000>ตาบอด</color> +100%
 
 ::Binoculars //id 2296 - Headgear Mid
-<desc>An optical tool that enables one to observe objects from a great distance.</desc>
+<desc>อุปกรณ์เลนส์ที่ส่องดูของจากระยะไกลได้</desc>
 DEX +1
 
 ::Goblin_Mask //id 2297 - Headgear MidBottom
-<desc>A mask worn by Goblins to scare and intimidate unsuspecting enemies.</desc>
+<desc>หน้ากากที่ Goblin ใส่ไว้ขู่ศัตรูที่ไม่ทันตั้งตัว</desc>
 
 ::Green_Feeler //id 2298 - Headgear Top
-<desc>A large insect antennae that humans can wear.</desc>
+<desc>หนวดแมลงขนาดใหญ่ที่มนุษย์ใส่ได้</desc>
 
 ::Orc_Helm //id 2299 - Headgear Top
-<desc>A hardy helmet crafted by orc smiths.</desc>
+<desc>หมวกเกราะทนทานที่ช่างตีเหล็กออร์คทำขึ้น</desc>
 
 ::Cotton_Shirt //id 2301 - Armor 
-<desc>A simple, sturdily made shirt of cotton.</desc>
+<desc>เสื้อฝ้ายเรียบง่ายที่ทำมาแข็งแรง</desc>
 
 ::Cotton_Shirt_ //id 2302 - Armor 
-<desc>A simple, sturdily made shirt of cotton.</desc>
+<desc>เสื้อฝ้ายเรียบง่ายที่ทำมาแข็งแรง</desc>
 
 ::Jacket //id 2303 - Armor 
-<desc>A jacket made out of mediocre leather.</desc>
+<desc>แจ็คเก็ตที่ทำจากหนังคุณภาพกลางๆ</desc>
 
 ::Jacket_ //id 2304 - Armor 
-<desc>A jacket made out of mediocre leather.</desc>
+<desc>แจ็คเก็ตที่ทำจากหนังคุณภาพกลางๆ</desc>
 
 ::Adventurer's_Suit //id 2305 - Armor 
-<desc>A light, comfortable suit made just for young adventurers.</desc>
+<desc>ชุดเบาสบาย ทำมาเพื่อนักผจญภัยหน้าใหม่โดยเฉพาะ</desc>
 
 ::Adventurer's_Suit_ //id 2306 - Armor 
-<desc>A light, comfortable suit made just for young adventurers.</desc>
+<desc>ชุดเบาสบาย ทำมาเพื่อนักผจญภัยหน้าใหม่โดยเฉพาะ</desc>
 
 ::Mantle //id 2307 - Armor 
-<desc>A cloak that is simple, yet elegant.</desc>
+<desc>ผ้าคลุมเรียบง่ายแต่ดูดี</desc>
 
 ::Mantle_ //id 2308 - Armor 
-<desc>A cloak that is simple, yet elegant.</desc>
+<desc>ผ้าคลุมเรียบง่ายแต่ดูดี</desc>
 
 ::Coat //id 2309 - Armor 
-<desc>A long coat that provides remarkable warmth in cold weather.</desc>
+<desc>เสื้อโค้ทยาวที่อุ่นมากในอากาศหนาว</desc>
 
 ::Coat_ //id 2310 - Armor 
-<desc>A long coat that provides remarkable warmth in cold weather.</desc>
+<desc>เสื้อโค้ทยาวที่อุ่นมากในอากาศหนาว</desc>
 
 ::Mink_Coat //id 2311 - Armor 
-<desc>A fur coat made from Lunatic hide.</desc>
+<desc>เสื้อขนสัตว์ที่ทำจากหนัง Lunatic</desc>
 
 ::Padded_Armor //id 2312 - Armor 
-<desc>An armor constructed of solid metal plates that have been padded on the inside for comfort.</desc>
+<desc>เกราะที่ทำจากแผ่นโลหะตัน บุด้านในไว้ให้ใส่สบาย</desc>
 
 ::Padded_Armor_ //id 2313 - Armor 
-<desc>An armor constructed of solid metal plates that have been padded on the inside for comfort.</desc>
+<desc>เกราะที่ทำจากแผ่นโลหะตัน บุด้านในไว้ให้ใส่สบาย</desc>
 
 ::Chain_Mail //id 2314 - Armor 
-<desc>A heavy mail made entirely of polished, metal chain links.</desc>
+<desc>เกราะโซ่หนัก ทำจากห่วงโลหะขัดเงาล้วนๆ</desc>
 
 ::Chain_Mail_ //id 2315 - Armor 
-<desc>A heavy mail made entirely of polished, metal chain links.</desc>
+<desc>เกราะโซ่หนัก ทำจากห่วงโลหะขัดเงาล้วนๆ</desc>
 
 ::Full_Plate //id 2316 - Armor 
-<desc>A heavy, solid armor made of durable plates of impenetrable metal.</desc>
+<desc>เกราะหนักแน่นหนา ทำจากแผ่นโลหะทนทานที่เจาะไม่เข้า</desc>
 
 ::Full_Plate_ //id 2317 - Armor 
-<desc>A heavy, solid armor made of durable plates of impenetrable metal.</desc>
+<desc>เกราะหนักแน่นหนา ทำจากแผ่นโลหะทนทานที่เจาะไม่เข้า</desc>
 
 ::Lord's_Clothes //id 2318 - Armor 
-<desc>A Renaissance style suit that evokes thoughts of romance and elegance.</desc>
+<desc>ชุดสไตล์เรอเนสซองส์ ดูโรแมนติกและสง่างาม</desc>
 INT +1, MDEF +5
 
 ::Glittering_Jacket //id 2319 - Armor 
-<desc>A jacket covered in fake, yet glamorous, rhinestones favored by hipsters and lounge singers.</desc>
+<desc>แจ็คเก็ตประดับพลอยเทียมแวววาว ขวัญใจพวกฮิปสเตอร์และนักร้องเลานจ์</desc>
 MDEF +5
-+3% chance of <color=#800000>Blind</color> on physical attack
+โอกาส 3% ทำให้ <color=#800000>ตาบอด</color> เมื่อโจมตีกายภาพ
 
 ::Formal_Suit //id 2320 - Armor 
-<desc>A formal suit for formal occassions.</desc>
+<desc>ชุดสูทสำหรับงานพิธีการ</desc>
 
 ::Silk_Robe //id 2321 - Armor 
-<desc>A finely woven, silk robe that has been enchanted with magic.</desc>
+<desc>เสื้อคลุมไหมทอละเอียด ร่ายเวทเอาไว้</desc>
 MDEF +10
 
 ::Silk_Robe_ //id 2322 - Armor 
-<desc>A finely woven, silk robe that has been enchanted with magic.</desc>
+<desc>เสื้อคลุมไหมทอละเอียด ร่ายเวทเอาไว้</desc>
 MDEF +10
 
 ::Scapulare //id 2323 - Armor 
-<desc>A blessed outer garment worn by clerics for religious ceremonies.</desc>
+<desc>เสื้อคลุมศักดิ์สิทธิ์ นักบวชใส่ในพิธีทางศาสนา</desc>
 
 ::Scapulare_ //id 2324 - Armor 
-<desc>A blessed outer garment worn by clerics for religious ceremonies.</desc>
+<desc>เสื้อคลุมศักดิ์สิทธิ์ นักบวชใส่ในพิธีทางศาสนา</desc>
 
 ::Saint's_Robe //id 2325 - Armor 
-<desc>A robe that has been baptized with saintly power.</desc>
+<desc>เสื้อคลุมที่ผ่านการชำระด้วยพลังนักบุญ</desc>
 MDEF +5
 
 ::Saint's_Robe_ //id 2326 - Armor 
-<desc>A robe that has been baptized with saintly power.</desc>
+<desc>เสื้อคลุมที่ผ่านการชำระด้วยพลังนักบุญ</desc>
 MDEF +5
 
 ::Holy_Robe //id 2327 - Armor 
-<desc>A robe that emanates an aura of holiness.</desc>
+<desc>เสื้อคลุมที่แผ่ออร่าศักดิ์สิทธิ์</desc>
 MDEF +5
--15% damage from Demon
--10% damage from Shadow attacks
+รับดาเมจจากปีศาจ -15%
+รับดาเมจธาตุมืด -10%
 
 ::Wooden_Mail //id 2328 - Armor 
-<desc>A simple set of armor carved out of solid wood.</desc>
+<desc>ชุดเกราะเรียบง่ายที่แกะจากไม้ตัน</desc>
 
 ::Wooden_Mail_ //id 2329 - Armor 
-<desc>A simple set of armor carved out of solid wood.</desc>
+<desc>ชุดเกราะเรียบง่ายที่แกะจากไม้ตัน</desc>
 
 ::Tights //id 2330 - Armor 
-<desc>A skintight, form fitting clothing that allows for easy movement.</desc>
+<desc>ชุดรัดรูปที่เข้ารูป เคลื่อนไหวสะดวก</desc>
 DEX +1
 
 ::Tights_ //id 2331 - Armor 
-<desc>A skintight, form fitting clothing that allows for easy movement.</desc>
+<desc>ชุดรัดรูปที่เข้ารูป เคลื่อนไหวสะดวก</desc>
 DEX +1
 
 ::Silver_Robe //id 2332 - Armor 
-<desc>A robe knit out of silver thread.</desc>
+<desc>เสื้อคลุมที่ถักจากด้ายเงิน</desc>
 
 ::Silver_Robe_ //id 2333 - Armor 
-<desc>A robe knit out of silver thread.</desc>
+<desc>เสื้อคลุมที่ถักจากด้ายเงิน</desc>
 
 ::Mage_Coat //id 2334 - Armor 
-<desc>An exclusive robe for mages that contains magic power.</desc>
+<desc>เสื้อคลุมรุ่นพิเศษสำหรับ Mage ที่บรรจุพลังเวทไว้</desc>
 INT +1, MDEF +5
 
 ::Thief_Clothes //id 2335 - Armor 
-<desc>An extremely light outfit with many pockets, making it handy for stashing stolen goods.</desc>
+<desc>ชุดที่เบามากและมีกระเป๋าเยอะ สะดวกเวลาซุกของที่ขโมยมา</desc>
 AGI +1
 
 ::Thief_Clothes_ //id 2336 - Armor 
-<desc>An extremely light outfit with many pockets, making it handy for stashing stolen goods.</desc>
+<desc>ชุดที่เบามากและมีกระเป๋าเยอะ สะดวกเวลาซุกของที่ขโมยมา</desc>
 AGI +1
 
 ::Ninja_Suit //id 2337 - Armor 
-<desc>An assassin suit that enables the wearer to move quickly and stealthily.</desc>
+<desc>ชุดนักฆ่าที่ทำให้เคลื่อนไหวเร็วและเงียบ</desc>
 AGI +1, MDEF +3
 
 ::Wedding_Dress //id 2338 - Armor 
-<desc>A wedding dress that is immaculately white.</desc>
+<desc>ชุดเจ้าสาวสีขาวไร้ที่ติ</desc>
 MDEF +15
 
 ::Pantie //id 2339 - Armor 
-<desc>A risque undergarment that is comfortable to wear but provides little defense.</desc>
-<color=#800080>Set Bonus</color> with <color=#008080>Undershirt</color> or <color=#008080>Undershirt [1]</color>
+<desc>ชุดชั้นในวาบหวิว ใส่สบายแต่ป้องกันได้น้อย</desc>
+<color=#800080>โบนัสเซ็ต</color> กับ <color=#008080>Undershirt</color> หรือ <color=#008080>Undershirt [1]</color>
  AGI +5, FLEE +10
 
 ::Novice_Breastplate //id 2340 - Armor 
-<desc>A breastplate exclusively for Novices!</desc>
+<desc>เกราะอกสำหรับ Novice เท่านั้น!</desc>
 
 ::Legion_Plate_Armor //id 2341 - Armor 
-<desc>An extremely heavy piece of armor worn by members of the Legion.</desc>
+<desc>เกราะที่หนักมากซึ่งสมาชิก Legion สวม</desc>
 
 ::Legion_Plate_Armor_ //id 2342 - Armor 
-<desc>An extremely heavy piece of armor worn by members of the Legion.</desc>
+<desc>เกราะที่หนักมากซึ่งสมาชิก Legion สวม</desc>
 
 ::Robe_of_Cast //id 2343 - Armor 
-<desc>A robe which reduces magic cast time.</desc>
-MDEF +4, Cast Time -3%
+<desc>เสื้อคลุมที่ลดเวลาร่ายเวท</desc>
+MDEF +4, เวลาร่าย -3%
 
 ::Lucius's_Volcano_Armor //id 2344 - Armor 
-<desc>An armor enchanted with fire.</desc>
+<desc>เกราะที่ร่ายธาตุไฟไว้</desc>
 
 ::Lucius's_Volcano_Armor_ //id 2345 - Armor 
-<desc>An armor enchanted with fire.</desc>
+<desc>เกราะที่ร่ายธาตุไฟไว้</desc>
 
 ::Saphien's_Ocean_Armor //id 2346 - Armor 
-<desc>An armor enchanted with water.</desc>
+<desc>เกราะที่ร่ายธาตุน้ำไว้</desc>
 
 ::Saphien's_Ocean_Armor_ //id 2347 - Armor 
-<desc>An armor enchanted with water.</desc>
+<desc>เกราะที่ร่ายธาตุน้ำไว้</desc>
 
 ::Aebecee's_Typhoon_Armor //id 2348 - Armor 
-<desc>An armor enchanted with wind.</desc>
+<desc>เกราะที่ร่ายธาตุลมไว้</desc>
 
 ::Aebecee's_Typhoon_Armor_ //id 2349 - Armor 
-<desc>An armor enchanted with wind.</desc>
+<desc>เกราะที่ร่ายธาตุลมไว้</desc>
 
 ::Claytos_Earth_Armor //id 2350 - Armor 
-<desc>An armor enchanted with earth.</desc>
+<desc>เกราะที่ร่ายธาตุดินไว้</desc>
 
 ::Claytos_Earth_Armor_ //id 2351 - Armor 
-<desc>An armor that is enchanted with earth.</desc>
+<desc>เกราะที่ร่ายธาตุดินเอาไว้</desc>
 
 ::Novice_Ninja_Suit //id 2352 - Armor 
-<desc>An armor exclusive to the Novice Training Grounds.</desc>
+<desc>เกราะเฉพาะของลานฝึก Novice</desc>
 
 ::Odin's_Blessing //id 2353 - Armor 
-<desc>The main component of the Hermod armor set.</desc>
+<desc>ชิ้นส่วนหลักของชุดเกราะ Hermod</desc>
 
 ::Goibne's_Armor //id 2354 - Armor 
-<desc>An armor accidentally enchanted by Goibne when he spilled the mystic ale of life on it.</desc>
+<desc>เกราะที่ Goibne เผลอร่ายเวทใส่ตอนทำเหล้าแห่งชีวิตหกรด</desc>
 HP +10%, VIT +2
 
 ::Angel's_Protection //id 2355 - Armor 
-<desc>Super Novice Guardian Angel's robe.</desc>
+<desc>เสื้อคลุมของเทวดาผู้พิทักษ์ Super Novice</desc>
 MDEF +20
 
 ::Valkyrian_Armor //id 2357 - Armor 
-<desc>A set of shining armor worn by the Valkyries, Odin's battle maidens.</desc>
+<desc>ชุดเกราะเปล่งประกายที่เหล่า Valkyrie นางรบแห่ง Odin สวม</desc>
 STR, VIT, INT, DEX, AGI, LUK +1
 
 ::Ninja_Suit_ //id 2359 - Armor 
-<desc>An assassin suit that enables the wearer to move quickly and stealthily.</desc>
+<desc>ชุดนักฆ่าที่ทำให้เคลื่อนไหวเร็วและเงียบ</desc>
 AGI +1, MDEF +3
 
 ::Robe_of_Cast_ //id 2360 - Armor 
-<desc>A robe which reduces magic cast time.</desc>
-MDEF +4, Cast Time -3%
+<desc>เสื้อคลุมที่ลดเวลาร่ายเวท</desc>
+MDEF +4, เวลาร่าย -3%
 
 ::Meteo_Plate_Armor //id 2364 - Armor 
-<desc>A plate armor forged from a meteor.</desc>
+<desc>เกราะแผ่นที่ตีจากอุกกาบาต</desc>
 MDEF +3
-+30% <color=#800000>Stun</color>, <color=#800000>Freeze</color> resist
+ต้านทาน <color=#800000>สตัน</color>, <color=#800000>แช่แข็ง</color> +30%
 
 ::Orleans's_Gown //id 2365 - Armor 
-<desc>A uniform worn by an obsessed chef that nobody could stop from talking about cuisine.</desc>
-Cast Time +10%
-Uninterruptible Cast
+<desc>ชุดของเชฟผู้คลั่งไคล้ ที่ไม่มีใครห้ามไม่ให้พูดเรื่องอาหารได้</desc>
+เวลาร่าย +10%
+ร่ายสกิลไม่ถูกขัดจังหวะ
 
 ::Divine_Cloth //id 2366 - Armor 
-<desc>A holy garment purified by a series of religious rituals.</desc>
-+5% <color=#800000>Curse</color>, <color=#800000>Silence</color>, <color=#800000>Sleep</color>, <color=#800000>Stun</color>, <color=#800000>Petrify</color> resist
+<desc>ผ้าคลุมศักดิ์สิทธิ์ที่ชำระล้างผ่านพิธีกรรมทางศาสนาหลายขั้น</desc>
+ต้านทาน <color=#800000>สาป</color>, <color=#800000>ใบ้</color>, <color=#800000>หลับ</color>, <color=#800000>สตัน</color>, <color=#800000>กลายเป็นหิน</color> +5%
 
 ::Pantie_ //id 2371 - Armor 
-<desc>A risque undergarment that is comfortable to wear but provides little defense.</desc>
-<color=#800080>Set Bonus</color> with <color=#008080>Undershirt</color> or <color=#008080>Undershirt [1]</color>
+<desc>ชุดชั้นในวาบหวิว ใส่สบายแต่ป้องกันได้น้อย</desc>
+<color=#800080>โบนัสเซ็ต</color> กับ <color=#008080>Undershirt</color> หรือ <color=#008080>Undershirt [1]</color>
  AGI +5, FLEE +10
 
 ::Mage_Coat_ //id 2372 - Armor 
-<color=#808080>An exclusive robe for mages that contains magic power.</color>
+<color=#808080>เสื้อคลุมรุ่นพิเศษสำหรับ Mage ที่บรรจุพลังเวทไว้</color>
 
 ::Holy_Robe_ //id 2373 - Armor 
-<desc>A robe that emanates an aura of holiness.</desc>
+<desc>เสื้อคลุมที่แผ่ออร่าศักดิ์สิทธิ์</desc>
 MDEF +5
--15% damage from Demon
--10% damage from Shadow attacks
+รับดาเมจจากปีศาจ -15%
+รับดาเมจธาตุมืด -10%
 
 ::Diabolus_Robe //id 2374 - Armor 
-<desc>A robe decorated with unknown letters.</desc>
+<desc>เสื้อคลุมที่ตกแต่งด้วยตัวอักษรที่ไม่รู้จัก</desc>
 SP +150, MDEF +5
-Cast Delay -10%
+ดีเลย์หลังร่าย -10%
 
 ::Diabolus_Armor //id 2375 - Armor 
-<desc>An armor made from an unknown metal.</desc>
+<desc>เกราะที่ทำจากโลหะที่ไม่รู้จัก</desc>
 HP +150, STR +2, DEX +1, MDEF +5
-+5% <color=#800000>Stun</color>, <color=#800000>Petrify</color> resist
+ต้านทาน <color=#800000>สตัน</color>, <color=#800000>กลายเป็นหิน</color> +5%
 
 ::Assaulter_Plate //id 2376 - Armor 
 HP +150, MDEF +2
--2% damage from Demi-Human
+รับดาเมจจากมนุษย์ -2%
 
 ::Elite_Engineer_Armor //id 2377 - Armor 
 HP +150, MDEF +2
--2% damage from Demi-Human
+รับดาเมจจากมนุษย์ -2%
 
 ::Assassin_Robe //id 2378 - Armor 
 HP +150, MDEF +2
--2% damage from Demi-Human
+รับดาเมจจากมนุษย์ -2%
 
 ::Warlock's_Battle_Robe //id 2379 - Armor 
 HP +150, MDEF +2
--2% damage from Demi-Human
+รับดาเมจจากมนุษย์ -2%
 
 ::Medic's_Robe //id 2380 - Armor 
 HP +150, MDEF +2
--2% damage from Demi-Human
+รับดาเมจจากมนุษย์ -2%
 
 ::Elite_Archer_Suit //id 2381 - Armor 
 HP +150, MDEF +2
--2% damage from Demi-Human
+รับดาเมจจากมนุษย์ -2%
 
 ::Elite_Shooter_Suit //id 2382 - Armor 
 HP +150, MDEF +2
--2% damage from Demi-Human
+รับดาเมจจากมนุษย์ -2%
 
 ::Brynhild //id 2383 - Armor 
-<desc>Brynhild, the warrior's armor, inherits its name from the most the valiant of valkyries.</desc>
+<desc>Brynhild เกราะของนักรบ ตั้งชื่อตามวาลคีรีผู้กล้าหาญที่สุด</desc>
 MATK +10%
-+10% physical damage
+ดาเมจกายภาพ +10%
 
 ::Chameleon_Armor //id 2386 - Armor 
-<desc>A miraculous armor that adapts to its wearer.</desc>
+<desc>เกราะมหัศจรรย์ที่ปรับตัวเข้ากับผู้สวมใส่</desc>
 
 ::Sprint_Mail //id 2387 - Armor 
-<desc>A nimble armor that lets you gallop like a Peco Peco.</desc>
+<desc>เกราะคล่องตัวที่ทำให้วิ่งได้เหมือน Peco Peco</desc>
 VIT +1
-HP Regeneration +5% 
+ฟื้นฟู HP +5% 
 
 ::Armor_of_Naga //id 2389 - Armor 
-<desc>An armor made from Naga scales that is both shiny and incredibly sharp.</desc>
+<desc>เกราะที่ทำจากเกล็ด Naga ทั้งเงางามและคมอย่างเหลือเชื่อ</desc>
 MDEF +2
 
 ::Improved_Tights //id 2390 - Armor 
-<desc>An improved tights developed by Rekenber Corp. made from advanced materials.</desc>
+<desc>ชุดรัดรูปรุ่นปรับปรุงที่บริษัท Rekenber พัฒนาจากวัสดุล้ำสมัย</desc>
 MDEF +2, Perfect Dodge +3
 
 ::Life_Link //id 2391 - Armor 
-<desc>A holy armor blessed by the goddess of vitality.</desc>
+<desc>เกราะศักดิ์สิทธิ์ที่เทพีแห่งพลังชีวิตประทานพรไว้</desc>
 VIT +2, MDEF +5
-HP Regeneration +50%
+ฟื้นฟู HP +50%
 
 ::Glorious_Suit //id 2394 - Armor 
 HP +20%
--7% damage from Demi-Human
+รับดาเมจจากมนุษย์ -7%
 
 ::Glorious_Popularized_Suit //id 2395 - Armor 
-HP +600, SP Regeneration +10%
+HP +600, ฟื้นฟู SP +10%
 
 ::Glorious_Mass-Produced_Suit //id 2396 - Armor 
 HP +500
 
 ::Sandals //id 2401 - Boots 
-<desc>A pair of cute, unisex shoes that are a part of a school uniform.</desc>
+<desc>รองเท้าน่ารักใส่ได้ทั้งชายหญิง ส่วนหนึ่งของชุดนักเรียน</desc>
 
 ::Sandals_ //id 2402 - Boots 
-<desc>A pair of cute, unisex shoes that are a part of a school uniform.</desc>
+<desc>รองเท้าน่ารักใส่ได้ทั้งชายหญิง ส่วนหนึ่งของชุดนักเรียน</desc>
 
 ::Shoes //id 2403 - Boots 
-<desc>A pair of shoes made of supple, high quality leather.</desc>
+<desc>รองเท้าหนังคุณภาพสูง เนื้อนุ่ม</desc>
 
 ::Shoes_ //id 2404 - Boots 
-<desc>A pair of shoes made of supple, high quality leather.</desc>
+<desc>รองเท้าหนังคุณภาพสูง เนื้อนุ่ม</desc>
 
 ::Boots //id 2405 - Boots 
-<desc>A pair of heavy leather boots, padded with Lunatic fur.</desc>
+<desc>รองเท้าบูตหนังหนัก บุด้วยขน Lunatic</desc>
 
 ::Boots_ //id 2406 - Boots 
-<desc>A pair of heavy leather boots, padded with Lunatic fur.</desc>
+<desc>รองเท้าบูตหนังหนัก บุด้วยขน Lunatic</desc>
 
 ::Crystal_Pumps //id 2407 - Boots 
-<desc>A pair of feminine high heeled shoes made of fine crystal.</desc>
+<desc>รองเท้าส้นสูงสตรี ทำจากคริสตัลชั้นดี</desc>
 LUK +5, MDEF +10
 
 ::Shackles //id 2408 - Boots 
-<desc>A pair of heavy steel shackles that are clamped on the ankles of prisoners.</desc>
+<desc>โซ่ตรวนเหล็กหนักที่ใส่ข้อเท้านักโทษ</desc>
 
 ::High_Heels //id 2409 - Boots 
-<desc>A pair of striped high heeled shoes worn by a wicked witch to enhanced her magical powers.</desc>
+<desc>รองเท้าส้นสูงลายทางที่แม่มดร้ายใส่เพื่อเสริมพลังเวท</desc>
 MDEF +5
 
 ::Sleipnir //id 2410 - Boots 
-<desc>A pair of shoes named after Odin's trusty steed.</desc>
+<desc>รองเท้าที่ตั้งชื่อตามม้าคู่ใจของ Odin</desc>
 HP +20%, SP +20%, MDEF +10
-SP Regeneration +15%
-Movement Speed +100%
+ฟื้นฟู SP +15%
+ความเร็วเดิน +100%
 
 ::Greaves //id 2411 - Boots 
-<desc>A pair of steel boots which offer dependable protection.</desc>
+<desc>รองเท้าบูตเหล็กที่ป้องกันได้อย่างไว้ใจได้</desc>
 
 ::Greaves_ //id 2412 - Boots 
-<desc>A pair of steel boots which offer dependable protection.</desc>
+<desc>รองเท้าบูตเหล็กที่ป้องกันได้อย่างไว้ใจได้</desc>
 
 ::Novice_Slippers //id 2414 - Boots 
-<desc>A pair of shoes exclusive to the Novice Training Grounds.</desc>
+<desc>รองเท้าเฉพาะของลานฝึก Novice</desc>
 
 ::Novice_Shoes //id 2416 - Boots 
-<desc>A pair of shoes exclusively for Novices!</desc>
+<desc>รองเท้าสำหรับ Novice เท่านั้น!</desc>
 HP +5%
 
 ::Fricco's_Shoes //id 2417 - Boots 
-<desc>A pair of shoes blessed by Freyr, the god of earth.</desc>
+<desc>รองเท้าที่ Freyr เทพแห่งผืนดินประทานพรไว้</desc>
 AGI +2
 
 ::Vidar's_Boots //id 2418 - Boots 
-<desc>The boots worn by Vidar, son of Odin, when he killed the Fenrir Wolf.</desc>
+<desc>รองเท้าบูตที่ Vidar บุตรแห่ง Odin สวมตอนสังหารหมาป่า Fenrir</desc>
 HP +9%, SP +9%
 
 ::Goibne's_Greaves //id 2419 - Boots 
-<desc>A pair of shoes forged by Goibne in response to competition from his rival, Dulb.</desc>
+<desc>รองเท้าที่ Goibne ตีขึ้นเพื่อแข่งกับ Dulb คู่ปรับของเขา</desc>
 HP +5%, SP +5%, MDEF +3
 
 ::Angel's_Reincarnation //id 2420 - Boots 
-<desc>Heavenly sandals worn by the Guardian Angel of Super Novices.</desc>
+<desc>รองเท้าแตะสวรรค์ที่เทวดาผู้พิทักษ์ของ Super Novice สวม</desc>
 HP +100
 
 ::Valkyrian_Shoes //id 2421 - Boots 
-<desc>A pair of shoes worn by the Valkyries, Odin's battle maidens.</desc>
+<desc>รองเท้าที่เหล่า Valkyrie นางรบแห่ง Odin สวม</desc>
 HP +3%, SP +3%
 
 ::High_Fashion_Sandals //id 2422 - Boots 
-<desc>Jeweled, golden strapped sandals that offer casual, yet fashionable, comfort.</desc>
+<desc>รองเท้าแตะสายทองประดับอัญมณี ใส่สบายแบบมีสไตล์</desc>
 MDEF +10
 
 ::Variant_Shoes //id 2423 - Boots 
-<desc>A pair of adaptable boots crafted by an indecisive genius.</desc>
+<desc>รองเท้าบูตที่ปรับได้ ฝีมืออัจฉริยะผู้ตัดสินใจไม่เก่ง</desc>
 
 ::Tidal_Shoes //id 2424 - Boots 
-<desc>A pair of shoes that incorporates a waterproof coating.</desc>
--5% damage from Water
+<desc>รองเท้าที่เคลือบสารกันน้ำ</desc>
+รับดาเมจจากธาตุน้ำ -5%
 
 ::Black_Leather_Boots //id 2425 - Boots 
-<desc>A pair of boots made of light, resilient leather that makes you want to run.</desc>
+<desc>รองเท้าบูตหนังเบาและยืดหยุ่น ใส่แล้วอยากวิ่ง</desc>
 AGI +1
 
 ::Shadow_Walk //id 2426 - Boots 
-<desc>A pair of shadowy shoes enchanted with a spell to protect their wearer from danger.</desc>
+<desc>รองเท้าเงามืดที่ร่ายเวทป้องกันภัยให้ผู้สวมใส่</desc>
 MDEF +10
 
 ::Iron_Boots //id 2429 - Boots 
-<desc>A pair of boots made for those seeking the Golden Key.</desc>
+<desc>รองเท้าบูตสำหรับผู้ตามหา Golden Key</desc>
 
 ::Iron_Boots_ //id 2430 - Boots 
-<desc>A pair of boots made for those seeking the Golden Key.</desc>
+<desc>รองเท้าบูตสำหรับผู้ตามหา Golden Key</desc>
 
 ::High_Heels_ //id 2432 - Boots 
-<desc>A pair of striped high heeled shoes worn by a wicked witch to enhanced her magical powers.</desc>
+<desc>รองเท้าส้นสูงลายทางที่แม่มดร้ายใส่เพื่อเสริมพลังเวท</desc>
 MDEF +5
 
 ::Diabolus_Boots //id 2433 - Boots 
-<color=#808080>A pair of mysterious boots that feel alive and adjust their size to the wearer.</color>
+<color=#808080>รองเท้าบูตลึกลับที่เหมือนมีชีวิต ปรับขนาดตามผู้สวมใส่</color>
 
 ::Black_Leather_Boots_ //id 2434 - Boots 
-<desc>A pair of boots made of light, resilient leather that makes you want to run.</desc>
+<desc>รองเท้าบูตหนังเบาและยืดหยุ่น ใส่แล้วอยากวิ่ง</desc>
 AGI +1
 
 ::Battle_Boots //id 2437 - Boots 
 HP +100, MDEF +1
 
 ::Sprint_Shoes //id 2440 - Boots 
-<desc>A pair of shoes made for running, tighten the laces and you're off to the races!</desc>
+<desc>รองเท้าที่ทำมาเพื่อวิ่ง ผูกเชือกให้แน่นแล้วออกตัวได้เลย!</desc>
 AGI +1
-SP Regeneration +5%
+ฟื้นฟู SP +5%
 
 ::Glorious_Shoes //id 2444 - Boots 
 HP +10%
@@ -882,510 +882,510 @@ HP +5%, SP +5%
 HP +5%
 
 ::Hood //id 2501 - Garment 
-<desc>A simple, soft garment that covers the head and neck.</desc>
+<desc>ผ้าคลุมเนื้อนุ่มเรียบง่ายที่คลุมหัวและคอ</desc>
 
 ::Hood_ //id 2502 - Garment 
-<desc>A simple, soft garment that covers the head and neck.</desc>
+<desc>ผ้าคลุมเนื้อนุ่มเรียบง่ายที่คลุมหัวและคอ</desc>
 
 ::Muffler //id 2503 - Garment 
-<desc>A warm scarf that is worn around the neck and shoulders.</desc>
+<desc>ผ้าพันคออุ่นๆ ที่พันรอบคอและไหล่</desc>
 
 ::Muffler_ //id 2504 - Garment 
-<desc>A warm scarf that is worn around the neck and shoulders.</desc>
+<desc>ผ้าพันคออุ่นๆ ที่พันรอบคอและไหล่</desc>
 
 ::Manteau //id 2505 - Garment 
-<desc>A long, loose cape-like garment that protects its wearer from harsh weather.</desc>
+<desc>ผ้าคลุมยาวหลวมๆ ปกป้องจากสภาพอากาศเลวร้าย</desc>
 
 ::Manteau_ //id 2506 - Garment 
-<desc>A long, loose cape-like garment that protects its wearer from harsh weather.</desc>
+<desc>ผ้าคลุมยาวหลวมๆ ปกป้องจากสภาพอากาศเลวร้าย</desc>
 
 ::Ancient_Cape //id 2507 - Garment 
-<desc>A fancy cape said to have once been worn by marquises long ago.</desc>
+<desc>ผ้าคลุมหรู ว่ากันว่าท่านมาควิสสมัยโบราณเคยใส่</desc>
 AGI +1
 
 ::Ragamuffin_Manteau //id 2508 - Garment 
-<desc>An old, worn-out cape that can protect its wearer from magical harm.</desc>
+<desc>ผ้าคลุมเก่าโทรมที่ปกป้องผู้สวมจากอันตรายทางเวท</desc>
 MDEF +10
 
 ::Survivor's_Manteau //id 2509 - Garment 
-<desc>A manteau which protects its wearer from the elements.</desc>
+<desc>ผ้าคลุมที่ปกป้องผู้สวมจากธาตุต่างๆ</desc>
 VIT +10
 
 ::Somber_Novice_Hood //id 2510 - Garment 
-<desc>A garment exclusive to the Novice Training Grounds.</desc>
+<desc>ผ้าคลุมเฉพาะของลานฝึก Novice</desc>
 
 ::Novice_Manteau //id 2512 - Garment 
-<desc>A manteau exclusively for Novices!</desc>
--10% damage from Neutral
+<desc>ผ้าคลุมสำหรับ Novice เท่านั้น!</desc>
+รับดาเมจจากไร้ธาตุ -10%
 
 ::Heavenly_Maiden_Robe //id 2513 - Garment 
-<desc>A faint, transparent robe worn by celestial maidens when they fly through the heavens.</desc>
+<desc>เสื้อคลุมบางใสที่นางฟ้าสวมตอนเหาะข้ามสวรรค์</desc>
 
 ::Pauldron //id 2514 - Garment 
-<desc>A pair of heavy shoulder coverings that provide effective protection.</desc>
+<desc>เกราะไหล่หนักที่ป้องกันได้ดี</desc>
 
 ::Eagle_Wing //id 2515 - Garment 
-<desc>A robe which helped Odin escape a fatal threat.</desc>
+<desc>เสื้อคลุมที่ช่วยให้ Odin รอดจากภัยถึงตาย</desc>
 
 ::Falcon_Muffler //id 2516 - Garment 
-<desc>A muffler owned by Freyja, daughter of Njord, that was often borrowed by Loki.</desc>
+<desc>ผ้าพันคอของ Freyja ธิดาแห่ง Njord ที่ Loki ชอบมายืมบ่อยๆ</desc>
 FLEE +15
 Perfect Dodge +5
 
 ::Vali's_Manteau //id 2517 - Garment 
-<desc>A manteau once owned by Vali, son of Odin, who defeated Hoedr the warrior despite his blindness.</desc>
--15% damage from Neutral
+<desc>ผ้าคลุมที่เคยเป็นของ Vali บุตรแห่ง Odin ผู้ปราบนักรบ Hoedr ได้ทั้งที่ตาบอด</desc>
+รับดาเมจจากไร้ธาตุ -15%
 
 ::Morpheus's_Shawl //id 2518 - Garment 
-<desc>A shawl marked with ancient conjuration patterns.</desc>
+<desc>ผ้าคลุมไหล่ที่มีลวดลายเรียกวิญญาณโบราณ</desc>
 SP +10%, MDEF +3
 
 ::Morrigane's_Manteau //id 2519 - Garment 
-<desc>A manteau made from gray crow feathers that were enchanted by Morrigane.</desc>
+<desc>ผ้าคลุมที่ทำจากขนอีกาสีเทาซึ่ง Morrigane ร่ายเวทไว้</desc>
 LUK +2
 Perfect Dodge +8
 
 ::Goibne's_Spaulders //id 2520 - Garment 
-<desc>Goibne's first creation, his much prized and precious armor.</desc>
+<desc>ผลงานชิ้นแรกของ Goibne เกราะที่เขาหวงแหนที่สุด</desc>
 VIT +1, MDEF +2
--10% damage from range
+รับดาเมจระยะไกล -10%
 
 ::Angel's_Cardigan //id 2521 - Garment 
-<desc>The Super Novice Guardian Angel's warm and comforatble cardigan.</desc>
-HP Regeneration +5%
+<desc>เสื้อคาร์ดิแกนอุ่นสบายของเทวดาผู้พิทักษ์ Super Novice</desc>
+ฟื้นฟู HP +5%
 
 ::Undershirt //id 2522 - Garment 
-<desc>A lightweight, 100% cotton, shirt that is quite durable.</desc>
+<desc>เสื้อฝ้าย 100% น้ำหนักเบา ทนทานพอตัว</desc>
 MDEF +1
-<color=#800080>Set Bonus</color> with <color=#008080>Pantie</color> or <color=#008080>Pantie [1]</color>
+<color=#800080>โบนัสเซ็ต</color> กับ <color=#008080>Pantie</color> หรือ <color=#008080>Pantie [1]</color>
  AGI +5, FLEE +10
 
 ::Undershirt_ //id 2523 - Garment 
-<desc>A lightweight, 100% cotton, shirt that is quite durable.</desc>
+<desc>เสื้อฝ้าย 100% น้ำหนักเบา ทนทานพอตัว</desc>
 MDEF +1
-<color=#800080>Set Bonus</color> with <color=#008080>Pantie</color> or <color=#008080>Pantie [1]</color>
+<color=#800080>โบนัสเซ็ต</color> กับ <color=#008080>Pantie</color> หรือ <color=#008080>Pantie [1]</color>
  AGI +5, FLEE +10
 
 ::Valkyrian_Manteau //id 2524 - Garment 
-<desc>A manteau worn by the Valkyries, Odin's battle maidens.</desc>
- FLEE +5, -5% damage from range
+<desc>ผ้าคลุมที่เหล่า Valkyrie นางรบแห่ง Odin สวม</desc>
+ FLEE +5, รับดาเมจระยะไกล -5%
 
 ::Ancient_Cape_ //id 2525 - Garment 
-<desc>A fancy cape fashioned after those worn by genteel marquises of a bygone age.</desc>
+<desc>ผ้าคลุมหรู ทำตามแบบที่ท่านมาควิสสมัยก่อนใส่กัน</desc>
 AGI +1
 
 ::Dragon_Breath //id 2527 - Garment 
-<desc>A garment that's so warm, it makes the wearer feel as if a dragon is breathing on them.</desc>
--15% damage from Dragon
+<desc>ผ้าคลุมที่อุ่นจนรู้สึกเหมือนมังกรกำลังพ่นลมหายใจใส่</desc>
+รับดาเมจจากมังกร -15%
 
 ::Wool_Scarf //id 2528 - Garment 
-<desc>A scarf made from the highest quality wool.</desc>
+<desc>ผ้าพันคอที่ทำจากขนแกะคุณภาพสูงสุด</desc>
 MDEF +4
 
 ::Rider_Insignia //id 2529 - Garment 
-<desc>A symbol worn by runners that just makes you want to sprint.</desc>
+<desc>สัญลักษณ์ที่นักวิ่งใส่กัน ใส่แล้วอยากออกวิ่งเต็มที่</desc>
 AGI +2
 
 ::Rider_Insignia_ //id 2530 - Garment 
-<desc>A symbol worn by runners that just makes you want to sprint.</desc>
+<desc>สัญลักษณ์ที่นักวิ่งใส่กัน ใส่แล้วอยากออกวิ่งเต็มที่</desc>
 AGI +2
 
 ::Ulfhedinn //id 2531 - Garment 
-<desc>A mysterious cape enchanted with a protective spell.</desc>
-+2% Autospell <color=#0000FF>Stoneskin 6</color> on receive physical damage
+<desc>ผ้าคลุมลึกลับที่ร่ายเวทป้องกันไว้</desc>
+โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Stoneskin 6</color> เมื่อโดนโจมตีกายภาพ
 
 ::Mithril_Magic_Cape //id 2532 - Garment 
-<desc>A mysterious cape enchanted with a protective spell.</desc>
+<desc>ผ้าคลุมลึกลับที่ร่ายเวทป้องกันไว้</desc>
 MDEF +3
 
 ::Skin_of_Ventus //id 2536 - Garment 
-<desc>A garment fashioned out of Lucifer's skin.</desc>
+<desc>ผ้าคลุมที่ทำจากหนังของ Lucifer</desc>
 HP +200, MDEF +2, FLEE +10
 
 ::Diabolus_Manteau //id 2537 - Garment 
-<desc>A manteau that remains a persistent shadow.</desc>
+<desc>ผ้าคลุมที่คงอยู่เป็นเงาไม่จางหาย</desc>
 HP +100
--5% damage from Neutral
+รับดาเมจจากไร้ธาตุ -5%
 
 ::Sheriff's_Manteau //id 2540 - Garment 
 HP +50, MDEF +1
--1% damage from Demi-Human
+รับดาเมจจากมนุษย์ -1%
 
 ::Asprika //id 2541 - Garment 
-<desc>Asprika, the light of the gods, is a rainbow in physical form.</desc>
+<desc>Asprika แสงแห่งทวยเทพ คือสายรุ้งที่มีรูปร่าง</desc>
 MDEF +5, FLEE +30
--30% damage from physical
+รับดาเมจกายภาพ -30%
 
 ::Flame_Manteau_of_Naght_Sieger //id 2542 - Garment 
-<desc>A manteau of flame worn by Naght Sieger.</desc>
+<desc>ผ้าคลุมเปลวเพลิงที่ Naght Sieger สวม</desc>
 HP +5%, MATK +1%, MDEF +2
--2% damage from Fire attacks
+รับดาเมจธาตุไฟ -2%
 
 ::Leather_of_Tendrilion //id 2544 - Garment 
-<desc>A garment fashioned from Tendrilion leather covered in plant matter.</desc>
--5% damage from Plant, Brute
--5% damage from Earth, Water attacks
+<desc>ผ้าคลุมที่ทำจากหนัง Tendrilion ปกคลุมด้วยเศษพืช</desc>
+รับดาเมจจากพืช, สัตว์ -5%
+รับดาเมจธาตุดิน, ธาตุน้ำ -5%
 
 ::Glorious_Muffler //id 2549 - Garment 
 HP +5%
--5% damage from Demi-Human
+รับดาเมจจากมนุษย์ -5%
 
 ::Ring //id 2601 - Accessory 
-<desc>An enchanted ring that enhances strength.</desc>
+<desc>แหวนต้องมนตร์ที่เพิ่มพละกำลัง</desc>
 STR +2
 
 ::Earring //id 2602 - Accessory 
-<desc>An enchanted earring that enhances intelligence.</desc>
+<desc>ต่างหูต้องมนตร์ที่เพิ่มสติปัญญา</desc>
 INT +2
 
 ::Necklace //id 2603 - Accessory 
-<desc>An enchanted necklace that enhances vitality.</desc>
+<desc>สร้อยคอต้องมนตร์ที่เพิ่มพลังชีวิต</desc>
 VIT +2
 
 ::Glove //id 2604 - Accessory 
-<desc>An enchanted glove that enhances dexterity.</desc>
+<desc>ถุงมือต้องมนตร์ที่เพิ่มความแม่นยำ</desc>
 DEX +2
 
 ::Brooch //id 2605 - Accessory 
-<desc>An enchanted brooch that enhances agility.</desc>
+<desc>เข็มกลัดต้องมนตร์ที่เพิ่มความคล่องแคล่ว</desc>
 AGI +2
 
 ::Clip //id 2607 - Accessory 
-<desc>A versatile clip that can attach to pretty much anything.</desc>
+<desc>คลิปอเนกประสงค์ที่หนีบได้แทบทุกอย่าง</desc>
 SP +10
 
 ::Rosary //id 2608 - Accessory 
-<desc>A string of beads used to count the number of repetitions that prayers are recited.</desc>
+<desc>สายลูกประคำไว้นับจำนวนรอบที่สวดมนต์</desc>
 LUK +2, MDEF +5
 
 ::Skull_Ring //id 2609 - Accessory 
-<desc>A ring engraved with <color=#990000>forever or until death<desc>, be careful using this as a gift!</desc>
+<desc>แหวนที่สลักว่า <color=#990000>ตลอดไปหรือจนกว่าจะตาย</color> ระวังตอนเอาไปให้เป็นของขวัญนะ!</desc>
 
 ::Gold_Ring //id 2610 - Accessory 
-<desc>A simple, common ring made of gold.</desc>
+<desc>แหวนทองธรรมดาทั่วไป</desc>
 
 ::Silver_Ring //id 2611 - Accessory 
-<desc>A simple, modest ring made of silver.</desc>
+<desc>แหวนเงินเรียบง่ายไม่หวือหวา</desc>
 
 ::Flower_Ring //id 2612 - Accessory 
-<desc>A simple, pretty ring made of wildflowers.</desc>
+<desc>แหวนดอกไม้ป่าเรียบง่ายแต่สวย</desc>
 
 ::Diamond_Ring //id 2613 - Accessory 
-<desc>A ring adorned with a diamond which can fetch a hefty price.</desc>
+<desc>แหวนประดับเพชร ขายได้ราคาสูงลิบ</desc>
 
 ::Eye_of_Dullahan //id 2614 - Accessory 
-<desc>Wait, Dullahan has no head, how did I acquire this!?</desc>
--4% damage from Demon, Undead
-+100% <color=#800000>Poison</color> resist
+<desc>เดี๋ยวนะ Dullahan ไม่มีหัวนี่ แล้วได้อันนี้มาได้ยังไง!?</desc>
+รับดาเมจจากปีศาจ, อันเดด -4%
+ต้านทาน <color=#800000>พิษ</color> +100%
 
 ::Safety_Ring //id 2615 - Accessory 
-<desc>A strange ring that raises its wearer's defense.</desc>
+<desc>แหวนประหลาดที่เพิ่มพลังป้องกันให้ผู้สวมใส่</desc>
 MDEF +3
 
 ::Critical_Ring //id 2616 - Accessory 
-<desc>An esoteric ring which enables its wearer to amplify their hidden power.</desc>
+<desc>แหวนลี้ลับที่ช่วยให้ผู้สวมขยายพลังที่ซ่อนอยู่</desc>
 CRIT +5
 
 ::Celebrant's_Mitten //id 2617 - Accessory 
-<desc>A blessed glove that increases intelligence.</desc>
+<desc>ถุงมือศักดิ์สิทธิ์ เพิ่มสติปัญญา</desc>
 INT +1
 
 ::Matyr's_Leash //id 2618 - Accessory 
-<desc>A Matyr's leash.</desc>
+<desc>สายจูงของ Matyr</desc>
 AGI +1
 
 ::Bow_Thimble //id 2619 - Accessory 
-<desc>A thimble for archers that enhances power.</desc>
-+3% range physical damage
+<desc>ปลอกนิ้วสำหรับนักธนู เพิ่มพลัง</desc>
+ดาเมจกายภาพระยะไกล +3%
 
 ::Rogue's_Treasure //id 2620 - Accessory 
-<desc>An exclusive ring for thieves and ninjas.</desc>
+<desc>แหวนรุ่นพิเศษสำหรับ Thief และ Ninja</desc>
 
 ::Ring_ //id 2621 - Accessory 
-<desc>An ancient ring.</desc>
+<desc>แหวนโบราณ</desc>
 STR +1
 
 ::Earring_ //id 2622 - Accessory 
-<desc>An ancient earring.</desc>
+<desc>ต่างหูโบราณ</desc>
 INT +1
 
 ::Necklace_ //id 2623 - Accessory 
-<desc>An ancient necklace.</desc>
+<desc>สร้อยคอโบราณ</desc>
 VIT +1
 
 ::Glove_ //id 2624 - Accessory 
-<desc>An ancient glove.</desc>
+<desc>ถุงมือโบราณ</desc>
 DEX +1
 
 ::Brooch_ //id 2625 - Accessory 
-<desc>An ancient brooch.</desc>
+<desc>เข็มกลัดโบราณ</desc>
 AGI +1
 
 ::Rosary_ //id 2626 - Accessory 
-<desc>An ancient rosary.</desc>
+<desc>ลูกประคำโบราณ</desc>
 LUK +1, MDEF +3
 
 ::Belt //id 2627 - Accessory 
-<desc>A simple, practical belt that has little fashion value.</desc>
+<desc>เข็มขัดเรียบง่ายใช้งานได้จริง แต่ไม่ค่อยสวย</desc>
 
 ::Novice_Armlet //id 2628 - Accessory 
-<desc>An easy to wear bracelet made just for young novices.</desc>
+<desc>กำไลใส่ง่ายที่ทำมาเพื่อ Novice หน้าใหม่โดยเฉพาะ</desc>
 
 ::Megingjard //id 2629 - Accessory 
-<desc>A reproduction of the girdle of might worn by Thor.</desc>
+<desc>ของจำลองเข็มขัดพลังอำนาจที่ Thor คาด</desc>
 STR +40, MDEF +7
 
 ::Brisingamen //id 2630 - Accessory 
-<desc>A reproduction of the necklace of beauty worn by Freya.</desc>
+<desc>ของจำลองสร้อยคอแห่งความงามที่ Freya สวม</desc>
 STR, AGI, VIT, INT +6
 LUK +10, MDEF +5
 
 ::Wedding_Ring //id 2634 - Accessory 
-<desc>A wedding ring for a groom which symbolizes ever-lasting love.</desc>
+<desc>แหวนแต่งงานของเจ้าบ่าว สื่อถึงความรักนิรันดร์</desc>
 
 ::Wedding_Ring_ //id 2635 - Accessory 
-<desc>A wedding ring for a bride which symbolizes ever-lasting trust.</desc>
+<desc>แหวนแต่งงานของเจ้าสาว สื่อถึงความไว้ใจนิรันดร์</desc>
 
 ::Serin's_Gold_Ring //id 2642 - Accessory 
-<desc>A beautiful golden ring engraved with "In celebration of Serin's 17th birthday".</desc>
+<desc>แหวนทองงดงาม สลักว่า "ฉลองวันเกิดปีที่ 17 ของ Serin"</desc>
 
 ::Serin's_Gold_Ring_ //id 2643 - Accessory 
-<desc>A beautiful golden ring engraved with "In celebration of Serin's 17th birthday".</desc>
+<desc>แหวนทองงดงาม สลักว่า "ฉลองวันเกิดปีที่ 17 ของ Serin"</desc>
 
 ::The_Sign //id 2644 - Accessory 
-<desc>A captivatingly beautiful artifact rewarded by the gods.</desc>
+<desc>วัตถุโบราณงดงามตรึงตา รางวัลจากทวยเทพ</desc>
 MATK +5%
-+5% physical damage
+ดาเมจกายภาพ +5%
 
 ::Nile_Rose //id 2647 - Accessory 
 
 ::Morpheus's_Ring //id 2648 - Accessory 
-<desc>A ring, enchanted with the power of the fate stone.</desc>
+<desc>แหวนที่ร่ายพลังของหินแห่งโชคชะตาไว้</desc>
 INT +1, SP +5%
 
 ::Morpheus's_Bracelet //id 2649 - Accessory 
-<desc>A bracelet that is a memento of Morpheus's beloved.</desc>
+<desc>กำไลที่เป็นของที่ระลึกจากคนรักของ Morpheus</desc>
 INT +1, SP +5%
 
 ::Morrigane's_Belt //id 2650 - Accessory 
-<desc>The belt that Morrigane kept as a memento of CuChulain after he perished in battle.</desc>
+<desc>เข็มขัดที่ Morrigane เก็บไว้เป็นที่ระลึกถึง CuChulain หลังเขาสิ้นชีพในสนามรบ</desc>
 ATK +5, CRIT +3
 
 ::Morrigane's_Pendant //id 2651 - Accessory 
-<desc>The pendant that ChuChulain gave to Morrigane when they were in love.</desc>
+<desc>จี้ที่ ChuChulain มอบให้ Morrigane ตอนที่ทั้งคู่ยังรักกัน</desc>
 STR +2, CRIT +3
 
 ::Cursed_Brooch //id 2652 - Accessory 
-<desc>A cursed brooch which, ironically, was owned by the goddess of fortune.</desc>
+<desc>เข็มกลัดต้องคำสาป ที่น่าขันคือเจ้าของเดิมคือเทพีแห่งโชคลาภ</desc>
 CRIT +6
 
 ::Shinobi_Sash //id 2654 - Accessory 
-<desc>Am embroidered sash with a mysterious power that was owned by a renowned ninja.</desc>
+<desc>ผ้าคาดปักลายที่มีพลังลึกลับ เคยเป็นของนินจาชื่อดัง</desc>
 STR +1, AGI +1, MDEF +1
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Ninja Suit</color>
-HP +300, Sp Consumption -20%
+HP +300, ใช้ SP -20%
 
 ::Bloodied_Shackle_Ball //id 2655 - Accessory 
-<desc>A heavy steel ball that kept prisoners from escaping, however some prisoners managed to weaponize it.</desc>
+<desc>ลูกเหล็กหนักที่ใช้ล่ามนักโทษไม่ให้หนี แต่นักโทษบางคนก็เอามาทำเป็นอาวุธจนได้</desc>
 
 ::Armor_Charm //id 2656 - Accessory 
-<desc>A mysterious, ancient artifact that can endow armor with great defensive power.</desc>
+<desc>วัตถุโบราณลึกลับที่เสริมพลังป้องกันให้เกราะได้</desc>
 HP +50, DEF +1
-<color=#800080>Set Bonus</color>
+<color=#800080>โบนัสเซ็ต</color>
  <color=#008080>Padded Armor</color>
 HP +150, DEF +5
 
 ::Laboratory_Permit //id 2657 - Accessory 
-<desc>A pass for Regenschirm Laboratory employees that allows lab access.</desc>
+<desc>บัตรผ่านพนักงานห้องแล็บ Regenschirm ใช้เข้าห้องแล็บได้</desc>
 
 ::Nile_Rose_ //id 2658 - Accessory 
-<desc>A bracelet affixed with a dark red jewel.</desc>
+<desc>กำไลที่ประดับด้วยอัญมณีสีแดงเข้ม</desc>
 HP +10
 
 ::Vesper_Core_01 //id 2659 - Accessory 
-<desc>A fragment of Vesper that endows intelligence.</desc>
+<desc>เศษชิ้นส่วนของ Vesper ที่ให้สติปัญญา</desc>
 SP +5%, INT +2, MDEF +3
 
 ::Vesper_Core_02 //id 2660 - Accessory 
-<desc>A fragment of Vesper which endows strength.</desc>
+<desc>เศษชิ้นส่วนของ Vesper ที่ให้พละกำลัง</desc>
 STR +3, ATK +10, MDEF +3
 
 ::Vesper_Core_03 //id 2661 - Accessory 
-<desc>A fragment of Vesper that endows agility.</desc>
+<desc>เศษชิ้นส่วนของ Vesper ที่ให้ความคล่องแคล่ว</desc>
 AGI +3, MDEF +3, FLEE +5
 
 ::Vesper_Core_04 //id 2662 - Accessory 
-<desc>A fragment of Vesper that endows dexterity.</desc>
+<desc>เศษชิ้นส่วนของ Vesper ที่ให้ความแม่นยำ</desc>
 DEX +3, MDEF +3, HIT +10
 
 ::Bow_Thimble_ //id 2671 - Accessory 
-<desc>A thimble for archers that enhances power.</desc>
-+3% range physical damage
+<desc>ปลอกนิ้วสำหรับนักธนู เพิ่มพลัง</desc>
+ดาเมจกายภาพระยะไกล +3%
 
 ::Spiritual_Ring //id 2677 - Accessory 
-<desc>A beautiful ring imbued with spiritual powers and surprising effects.</desc>
+<desc>แหวนงดงามที่อาบด้วยพลังจิตวิญญาณ ให้ผลเหนือความคาดหมาย</desc>
 INT +2, DEX +1
 
 ::Ring_of_Flame_Lord //id 2678 - Accessory 
-<desc>A ring imbued with the fire spirit's strength.</desc>
+<desc>แหวนที่อาบด้วยพละกำลังของภูตไฟ</desc>
 STR +2, VIT +1, ATK +15
--10% damage from Fire
+รับดาเมจจากธาตุไฟ -10%
 
 ::Ring_of_Resonance //id 2679 - Accessory 
-<desc>A ring imbued with the fire spirit's agility.</desc>
+<desc>แหวนที่อาบด้วยความว่องไวของภูตไฟ</desc>
 AGI +2, VIT +1, MDEF +2
 
 ::Lesser_Elemental_Ring //id 2680 - Accessory 
-<desc>A ring that holds the power of lesser elemental spirits.</desc>
+<desc>แหวนที่กักพลังของภูตธาตุชั้นรองไว้</desc>
 STR, VIT, INT, DEX, AGI, LUK +1
 
 ::Red_Silk_Seal //id 2700 - Accessory 
-<desc>A red silk that a female saint used to seal evil.</desc>
+<desc>ผ้าไหมแดงที่นักบุญหญิงใช้ผนึกความชั่วร้าย</desc>
 
 ::Orleans's_Glove //id 2701 - Accessory 
-<desc>A glove worn by a palace chef with exceptional dexterity.</desc>
+<desc>ถุงมือของเชฟประจำวัง ผู้มีความคล่องแคล่วเป็นเลิศ</desc>
 DEX +2, MATK +3%
 
 ::Bison_Horn //id 2702 - Accessory 
-<desc>An ornament made from wild bison horns.</desc>
+<desc>เครื่องประดับที่ทำจากเขาไบซันป่า</desc>
 AGI +2
 
 ::Expert_Ring //id 2703 - Accessory 
-<desc>This ring promises an ultimate power for a price.</desc>
-Cast Delay -5%
-SP Consumption +5%
+<desc>แหวนวงนี้สัญญาว่าจะให้พลังสูงสุด แลกกับราคาที่ต้องจ่าย</desc>
+ดีเลย์หลังร่าย -5%
+ใช้ SP +5%
 
 ::Gusli //id 2707 - Accessory 
-<desc>This musical instrument from a mysterious old man, its very beautiful.</desc>
+<desc>เครื่องดนตรีชิ้นนี้ได้มาจากชายชราลึกลับ สวยงามมาก</desc>
 
 ::Skull_Ring_ //id 2715 - Accessory 
-<desc>A ring engraved with <color=#990000>forever or until death<desc>, be careful using this as a gift!</desc>
--1% damage from Undead
+<desc>แหวนที่สลักว่า <color=#990000>ตลอดไปหรือจนกว่าจะตาย</color> ระวังตอนเอาไปให้เป็นของขวัญนะ!</desc>
+รับดาเมจจากอันเดด -1%
 
 ::Librarian_Glove //id 2716 - Accessory 
-<desc>A glove that is a favorite amongst librarians.</desc>
+<desc>ถุงมือขวัญใจบรรณารักษ์</desc>
 SP +20
 
 ::Pocket_Watch //id 2717 - Accessory 
-<color=#808080>A silver watch with connecting chain.</color>
+<color=#808080>นาฬิกาเงินพร้อมสายโซ่</color>
 
 ::Lunatic_Brooch //id 2718 - Accessory 
-<desc>A crescent shaped golden brooch.</desc>
+<desc>เข็มกลัดทองรูปพระจันทร์เสี้ยว</desc>
 
 ::Iron_Wrist //id 2719 - Accessory 
-<desc>A strong steel wrist protector.</desc>
+<desc>สนับข้อมือเหล็กที่แข็งแรง</desc>
 
 ::Medal_of_Honor_(Swordman) //id 2720 - Accessory 
 HP +500, SP +50, HIT +10
 MATK +5%
-+5% physical damage
+ดาเมจกายภาพ +5%
 
 ::Medal_of_Honor_(Thief) //id 2721 - Accessory 
 HP +300, SP +80, FLEE +10
 MATK +5%
-+5% physical damage
+ดาเมจกายภาพ +5%
 
 ::Medal_of_Honor_(Acolyte) //id 2722 - Accessory 
 HP +600, MDEF +6 
 MATK +5%
-+5% physical damage
+ดาเมจกายภาพ +5%
 
 ::Medal_of_Honor_(Mage) //id 2723 - Accessory 
 HP +600, MDEF +6
 MATK +5%
-+5% physical damage
+ดาเมจกายภาพ +5%
 
 ::Medal_of_Honor_(Archer) //id 2724 - Accessory 
 HP +300, SP +80, CRIT +10
 MATK +5%
-+5% physical damage
+ดาเมจกายภาพ +5%
 
 ::Medal_of_Honor_(Merchant) //id 2725 - Accessory 
 HP +500, SP +50, ASPD +10%
 MATK +5%
-+5% physical damage
+ดาเมจกายภาพ +5%
 
 ::Cursed_Hand //id 2728 - Accessory 
-<desc>A dried bone hand, it has an air of mystery.</desc>
-HP Regeneration +20%
+<desc>มือกระดูกแห้ง แผ่ความลึกลับออกมา</desc>
+ฟื้นฟู HP +20%
 HIT +10
 
 ::Diabolus_Ring //id 2729 - Accessory 
-<desc>A ring engraved with mysterious letters that evokes mortal desire.</desc>
+<desc>แหวนสลักอักษรลึกลับที่ปลุกกิเลสของมนุษย์</desc>
 HP +100, SP +100
 
 ::Seal_of_Continental_Guard //id 2730 - Accessory 
-<desc>A royal gift to a member of the Continental Guard.</desc>
+<desc>ของขวัญจากราชสำนักแก่สมาชิก Continental Guard</desc>
 HP +50, ASPD +3%
 
 ::Rune_Spellstone //id 2731 - Accessory 
-<desc>A royal gift to a member of the Continental Guard.</desc>
-SP +50, Cast Time -1%
+<desc>ของขวัญจากราชสำนักแก่สมาชิก Continental Guard</desc>
+SP +50, เวลาร่าย -1%
 
 ::Death_Loop //id 2732 - Accessory 
-<desc>A royal gift to a member of the Continental Guard.</desc>
+<desc>ของขวัญจากราชสำนักแก่สมาชิก Continental Guard</desc>
 CRIT +5
 
 ::Medal_of_Honor //id 2733 - Accessory 
 HP +300, SP +80, CRIT +10
 MATK +5%
-+5% physical damage
+ดาเมจกายภาพ +5%
 
 ::Angelic_Ring //id 2743 - Accessory 
-<desc>A ring that responds to healing abilities and strenthens their potency.</desc>
+<desc>แหวนที่ขานรับพลังรักษาและเสริมให้แรงขึ้น</desc>
 INT +2, DEX +1, MDEF +2
 
 ::Sprint_Ring //id 2744 - Accessory 
-<desc>A ring that extrudes the feeling of flying through the wind.</desc>
-Cast Time -10%
-Cast Delay +5%
+<desc>แหวนที่ให้ความรู้สึกเหมือนกำลังโบยบินไปกับสายลม</desc>
+เวลาร่าย -10%
+ดีเลย์หลังร่าย +5%
 
 ::Pinguicula_Corsage //id 2745 - Accessory 
-<desc>A small corsage that resembles a Pinguicula.</desc>
+<desc>ช่อดอกไม้ติดเสื้อเล็กๆ รูป Pinguicula</desc>
 SP +25, MDEF +2
 
 ::Cursed_Star //id 2748 - Accessory 
-<desc>A necklace crafted by a mechanic born under a cursed star for self protection.</desc>
+<desc>สร้อยคอที่ช่างกลผู้เกิดใต้ดาวต้องคำสาปทำขึ้นเพื่อป้องกันตัว</desc>
 DEX +2, LUK -1, MDEF +3
 
 ::Linen_Glove //id 2749 - Accessory 
-<desc>A glove that is amazingly light and is suitable with any weapon.</desc>
+<desc>ถุงมือที่เบาอย่างเหลือเชื่อ เข้ากับอาวุธได้ทุกชนิด</desc>
 AGI +2, DEX +1, MDEF +1
 
 ::Novice_Figure //id 2765 - Accessory 
-<desc>A novice figure that radiates naviety.</desc>
+<desc>ฟิกเกอร์ Novice ที่แผ่รัศมีแห่งความไร้เดียงสา</desc>
 HP +70
 
 ::Swordman_Figure //id 2766 - Accessory 
-<desc>A swordman figure that radiates honor.</desc>
+<desc>ฟิกเกอร์ Swordman ที่แผ่รัศมีแห่งเกียรติยศ</desc>
 VIT +1
 
 ::Acolyte_Figure //id 2767 - Accessory 
-<desc>An acolyte figure that radiates wisdom.</desc>
+<desc>ฟิกเกอร์ Acolyte ที่แผ่รัศมีแห่งปัญญา</desc>
 INT +1
 
 ::Mage_Figure //id 2768 - Accessory 
-<desc>A mage figure that radiates intellect.</desc>
+<desc>ฟิกเกอร์ Mage ที่แผ่รัศมีแห่งปัญญา</desc>
 INT +1
 
 ::Archer_Figure //id 2769 - Accessory 
-<desc>An archer figure that radiates foresight.</desc>
+<desc>ฟิกเกอร์ Archer ที่แผ่รัศมีแห่งการมองการณ์ไกล</desc>
 DEX +1
 
 ::Thief_Figure //id 2770 - Accessory 
-<desc>A thief figure that radiates cunning.</desc>
+<desc>ฟิกเกอร์ Thief ที่แผ่รัศมีแห่งเล่ห์เหลี่ยม</desc>
 AGI +1
 
 ::Merchant_Figure //id 2771 - Accessory 
-<desc>A merchant figure that radiates strength.</desc>
+<desc>ฟิกเกอร์ Merchant ที่แผ่รัศมีแห่งพละกำลัง</desc>
 STR +1
 
 ::Glorious_Ring //id 2772 - Accessory 
 HP +300
 ASPD +5%
-Cast Time -3%
--10% damage from Water, Wind, Earth, Fire
+เวลาร่าย -3%
+รับดาเมจจากธาตุน้ำ, ธาตุลม, ธาตุดิน, ธาตุไฟ -10%
 
 ::Glorious_Popularized_Ring //id 2773 - Accessory 
 STR, VIT, INT, DEX, AGI, LUK +2
@@ -1394,679 +1394,679 @@ STR, VIT, INT, DEX, AGI, LUK +2
 STR, VIT, INT, DEX, AGI, LUK +1
 
 ::Lure //id 2775 - Accessory 
-<desc>A fishing lure.</desc>
+<desc>เหยื่อตกปลา</desc>
 
 ::Headset //id 5001 - Headgear Top
-<desc>A strange device that was invented by an old craftsman.</desc>
-+10% <color=#800000>Curse</color> resist
+<desc>อุปกรณ์ประหลาดที่ช่างฝีมือรุ่นเก่าประดิษฐ์ขึ้น</desc>
+ต้านทาน <color=#800000>สาป</color> +10%
 
 ::Jewel_Crown //id 5002 - Headgear Top
-<desc>A crown adorned with precious gems.</desc>
+<desc>มงกุฎประดับอัญมณีล้ำค่า</desc>
 INT +2, LUK +1, MDEF +3
 
 ::Joker_Jester //id 5003 - Headgear Top
-<desc>A comical hat worn by clowns and jesters.</desc>
+<desc>หมวกตลกๆ ที่ตัวตลกกับจำอวดใส่กัน</desc>
 LUK +2, MDEF +5
 
 ::Oxygen_Mask //id 5004 - Headgear Bottom
-<desc>A mask ideal for polluted locations that supplies pure oxygen.</desc>
-+20% <color=#800000>Poison</color> resist
+<desc>หน้ากากสำหรับที่ที่มีมลพิษ จ่ายออกซิเจนบริสุทธิ์ให้</desc>
+ต้านทาน <color=#800000>พิษ</color> +20%
 
 ::Gas_Mask //id 5005 - Headgear MidBottom
-<desc>A special mask that filters out poisons from the air.</desc>
-+30% <color=#800000>Poison</color> resist
+<desc>หน้ากากพิเศษที่กรองพิษออกจากอากาศ</desc>
+ต้านทาน <color=#800000>พิษ</color> +30%
 
 ::Machoman's_Glasses //id 5006 - Headgear Mid
-<desc>A pair of 70's tough guy style sunglasses that give a manly swagger.</desc>
+<desc>แว่นกันแดดสไตล์นักเลงยุค 70 ใส่แล้วดูแมนเท่</desc>
 
 ::Grand_Circlet //id 5007 - Headgear Top
-<desc>An exquisitely made circlet for rulers or gentry.</desc>
+<desc>มงกุฎวงเล็กงานประณีตสำหรับผู้ปกครองหรือชนชั้นสูง</desc>
 STR +1, INT +1, LUK +1
 MDEF +4
 
 ::Puppy_Love //id 5008 - Headgear Top
-<desc>A wreath of wildflowers made by a woman in love.</desc>
+<desc>พวงมาลัยดอกไม้ป่าที่หญิงผู้กำลังมีความรักทำขึ้น</desc>
 
 ::Safety_Helmet //id 5009 - Headgear Top
-<desc>A durable safety helmet.</desc>
+<desc>หมวกนิรภัยที่ทนทาน</desc>
 MDEF +3
 
 ::Indian_Fillet //id 5010 - Headgear Top
-<desc>A traditional headdress worn by natives.</desc>
+<desc>เครื่องสวมหัวพื้นเมืองที่ชนพื้นเมืองสวม</desc>
 
 ::Aerial //id 5011 - Headgear Top
-<desc>A mysterious object discovered in the depths of the ocean.</desc>
+<desc>วัตถุลึกลับที่ค้นพบในทะเลลึก</desc>
 
 ::Ph.D_Hat //id 5012 - Headgear Top
-<desc>A ceremonial hat worn during one's graduation.</desc>
+<desc>หมวกที่ใส่ตอนจบการศึกษา</desc>
 
 ::Lord_Kaho's_Horns //id 5013 - Headgear Top
-<desc>A special headgear created specifically for Lord Kaho.</desc>
+<desc>เครื่องสวมหัวพิเศษที่ทำขึ้นเพื่อ Lord Kaho โดยเฉพาะ</desc>
 STR +5, AGI +10, VIT +10,
 INT +5, LUK +20, MDEF +10
 
 ::Fin_Helm //id 5014 - Headgear Mid
-<desc>A pair of helment accessories that look just like fins.</desc>
+<desc>เครื่องประดับหมวกเกราะที่หน้าตาเหมือนครีบ</desc>
 
 ::Egg_Shell //id 5015 - Headgear Top
-<desc>A peculiar hat that makes its wearer look freshly hatched.</desc>
+<desc>หมวกประหลาดที่ใส่แล้วดูเหมือนเพิ่งฟักออกจากไข่</desc>
 
 ::Boy's_Cap //id 5016 - Headgear Top
-<desc>A black cap that is part of a schoolboy's uniform.</desc>
+<desc>หมวกดำ ส่วนหนึ่งของชุดนักเรียนชาย</desc>
 
 ::Bone_Helm //id 5017 - Headgear Top
-<desc>A helmet constructed of solid bone that is nearly impenetrable.</desc>
-+15% damage from Shadow attacks
+<desc>หมวกเกราะที่ทำจากกระดูกตัน แทบเจาะไม่เข้า</desc>
+รับดาเมจธาตุมืด +15%
 
 ::Feather_Bonnet //id 5018 - Headgear Top
-<desc>A fabulous, feathered hat that turns men into womanizers and women into manizers.</desc>
+<desc>หมวกขนนกสุดหรู ผู้ชายใส่แล้วเจ้าชู้ ผู้หญิงใส่แล้วก็เจ้าชู้เหมือนกัน</desc>
 AGI +1
 
 ::Corsair //id 5019 - Headgear Top
-<desc>A flamboyant hat worn by the strongest pirates.</desc>
+<desc>หมวกฉูดฉาดของโจรสลัดที่แข็งแกร่งที่สุด</desc>
 VIT +1
 
 ::Grief_for_Greed //id 5021 - Headgear Top
-<desc>A unique headgear that symbolizes a merchant's grief.</desc>
+<desc>เครื่องสวมหัวชิ้นพิเศษที่สื่อถึงความเศร้าของพ่อค้า</desc>
 INT +1, DEX +1
 
 ::Hat_of_the_Sun_God //id 5022 - Headgear TopMid
-<desc>A hat worn by the god of the sun.</desc>
+<desc>หมวกที่สุริยเทพสวม</desc>
 STR +3, INT +2
 
 ::Parcel_Hat //id 5023 - Headgear Top
-<desc>A large piece of cloth wrapped around goods carried on the head.</desc>
+<desc>ผ้าผืนใหญ่ที่ห่อของแล้วทูนไว้บนหัว</desc>
 
 ::Cake_Hat //id 5024 - Headgear Top
-<desc>A birthday cake that is comfortable, yet fashionable. What did you expect?</desc>
+<desc>เค้กวันเกิดที่ใส่สบายและดูดี จะให้เป็นอะไรได้อีกล่ะ?</desc>
 
 ::Helm_of_Angel //id 5025 - Headgear Top
-<desc>A wondrous helmet adorned with angel wings made by a smithing genius.</desc>
+<desc>หมวกเกราะน่าอัศจรรย์ประดับปีกเทวดา ฝีมืออัจฉริยะช่างตีเหล็ก</desc>
 AGI +1, LUK +1, MDEF +3
 
 ::Chef_Hat //id 5026 - Headgear Top
-<desc>A hat to cool a chef's head in a hot kitchen.</desc>
+<desc>หมวกที่ทำให้หัวเชฟเย็นสบายในครัวที่ร้อนอบอ้าว</desc>
 DEX +1
 
 ::Mage_Hat //id 5027 - Headgear Top
-<desc>A stylish formal hat worn by talented magicians.</desc>
+<desc>หมวกพิธีการดูดีที่นักมายากลฝีมือดีสวม</desc>
 INT +2, SP +150
 
 ::Candle //id 5028 - Headgear Top
-<desc>A large, slightly used candlestick that can be worn.</desc>
+<desc>เชิงเทียนขนาดใหญ่ ผ่านการใช้มาบ้าง สวมใส่ได้</desc>
 
 ::Spore_Hat //id 5029 - Headgear Top
-<desc>A cute headgear made in the form of a Spore.</desc>
+<desc>หมวกน่ารักรูป Spore</desc>
 
 ::Panda_Hat //id 5030 - Headgear Top
-<desc>A cute headgear made in the form of a Panda.</desc>
+<desc>หมวกน่ารักรูปแพนด้า</desc>
 
 ::Mine_Hat //id 5031 - Headgear Top
-<desc>A durable safety helmet with a flashlight attachment for exploring dark areas.</desc>
+<desc>หมวกนิรภัยทนทาน ติดไฟฉายไว้สำรวจที่มืด</desc>
 DEX +2
 
 ::Sunday_Hat //id 5032 - Headgear Top
-<desc>A fashionable, wide brimmed hat that's perfect for blocking the sun.</desc>
+<desc>หมวกปีกกว้างทันสมัย บังแดดได้ดีเยี่ยม</desc>
 
 ::Raccoon_Hat //id 5033 - Headgear Top
-<desc>A cute headgear made in the form of a Smokie.</desc>
+<desc>หมวกน่ารักรูป Smokie</desc>
 
 ::Bulb_Band //id 5034 - Headgear Top
-<desc>A hairband with a light bulb attached.</desc>
+<desc>ที่คาดผมติดหลอดไฟ</desc>
 
 ::Poring_Hat //id 5035 - Headgear Top
-<desc>A cute headgear made in the form of a Poring.</desc>
+<desc>หมวกน่ารักรูป Poring</desc>
 
 ::Cross_Hat //id 5036 - Headgear Top
-<desc>A hairband with a cross attached.</desc>
+<desc>ที่คาดผมติดไม้กางเขน</desc>
 
 ::Nut_Shell //id 5037 - Headgear Top
-<desc>A hat fashioned from a nut shell, it provides excellent defence but is very delicate.</desc>
+<desc>หมวกที่ทำจากเปลือกถั่ว ป้องกันดีเยี่ยมแต่เปราะมาก</desc>
 
 ::Deviruchi_Hat //id 5038 - Headgear Top
-<desc>A cute headgear made in the form of a Deviruchi.</desc>
+<desc>หมวกน่ารักรูป Deviruchi</desc>
 STR +1, INT +1
 
 ::Rainbow_Eggshell //id 5039 - Headgear Top
-<desc>A mysteriously colorful egg shell.</desc>
+<desc>เปลือกไข่สีสันประหลาด</desc>
 
 ::Blush //id 5040 - Headgear Mid
-<desc>A pair of red dots that give a blushing impression.</desc>
+<desc>จุดแดงคู่หนึ่งที่ทำให้ดูเหมือนแก้มแดง</desc>
 
 ::Heart_Hairpin //id 5041 - Headgear Top
-<desc>A cute hairpin with a heart attached to it, both adorable and charming!</desc>
+<desc>ปิ่นปักผมน่ารักติดรูปหัวใจ ทั้งน่ารักทั้งมีเสน่ห์!</desc>
 
 ::Bao_Bao //id 5042 - Headgear Top
-<desc>A headgear worn by a great woman warrior in ancient times.</desc>
+<desc>เครื่องสวมหัวที่นักรบหญิงผู้ยิ่งใหญ่ในสมัยโบราณสวม</desc>
 
 ::Opera_Phantom_Mask //id 5043 - Headgear Mid
-<desc>A mask worn by a romantic hero with an unknown fate.</desc>
+<desc>หน้ากากของวีรบุรุษโรแมนติกผู้มีชะตากรรมไม่มีใครรู้</desc>
 
 ::Magician_Hat //id 5045 - Headgear Top
-<desc>A stout hat worn by magicians that contains a seemingly endless supply of rabbits.</desc>
+<desc>หมวกทรงสูงของนักมายากล ที่ดูเหมือนจะมีกระต่ายไม่รู้จบอยู่ข้างใน</desc>
 AGI +1, DEX +1, SP +50
 
 ::Bongun_Hat //id 5046 - Headgear All
-<desc>A replica of Bongun's turban, complete with a torn amulet.</desc>
+<desc>ของจำลองผ้าโพกหัวของ Bongun พร้อมยันต์ที่ขาดวิ่น</desc>
 
 ::Fashionable_Glasses //id 5047 - Headgear Top
-<desc>A pair of fashionable sunglasses.</desc>
+<desc>แว่นกันแดดทันสมัย</desc>
 
 ::Crescent_Hairpin //id 5048 - Headgear Top
-<desc>A hairpin in the shape of a crescent.</desc>
+<desc>ปิ่นปักผมรูปพระจันทร์เสี้ยว</desc>
 
 ::Striped_Hairband //id 5049 - Headgear Top
-<desc>A striped hair band which is good for preventing hair from covering the eyes.</desc>
+<desc>ที่คาดผมลายทาง กันผมปรกตาได้ดี</desc>
 
 ::Wonder_Nutshell //id 5050 - Headgear Top
-<desc>A head piece made from a nutshell that has been cut in half.</desc>
+<desc>เครื่องสวมหัวที่ทำจากเปลือกถั่วผ่าครึ่ง</desc>
 
 ::Blue_Hairband //id 5052 - Headgear Top
-<desc>A blue colored hair band worn with a rakish slant.</desc>
+<desc>ที่คาดผมสีน้ำเงิน ใส่เอียงๆ ดูเท่</desc>
 
 ::Sphinx_Hat //id 5053 - Headgear TopBottom
-<desc>A traditional headpiece that symbolizes the traditional gods.</desc>
+<desc>เครื่องสวมหัวพื้นบ้านที่สื่อถึงเทพเจ้าดั้งเดิม</desc>
 STR +2
 
 ::Novice_Eggshell //id 5055 - Headgear Top
-<desc>A headgear exclusive to the Novice Training Grounds.</desc>
+<desc>เครื่องสวมหัวเฉพาะของลานฝึก Novice</desc>
 
 ::Black_Cat_Ears //id 5057 - Headgear Top
-<desc>A Wickebine inspired hairband with tiny little black ears attached.</desc>
+<desc>ที่คาดผมแบบ Wickebine มีหูดำเล็กๆ ติดอยู่</desc>
 
 ::Drooping_Cat //id 5058 - Headgear Top
-<desc>A cute kitty doll that is just adorable.</desc>
+<desc>ตุ๊กตาแมวน่ารัก น่าเอ็นดูสุดๆ</desc>
 MDEF +15
-+30% <color=#800000>Curse</color> resist
+ต้านทาน <color=#800000>สาป</color> +30%
 
 ::Teddybear_Hat //id 5059 - Headgear Top
-<desc>A hat that looks just like a teddy bear.</desc>
+<desc>หมวกที่หน้าตาเหมือนตุ๊กตาหมี</desc>
 
 ::Party_Hat //id 5060 - Headgear Top
-<desc>A festive hat for celebrations and parties.</desc>
+<desc>หมวกสำหรับงานฉลองและปาร์ตี้</desc>
 LUK +1
 
 ::Flower_Hairpin //id 5061 - Headgear Top
-<desc>A hairpin with a red flower attached.</desc>
+<desc>ปิ่นปักผมติดดอกไม้สีแดง</desc>
 
 ::Straw_Hat //id 5062 - Headgear Top
-<desc>A hat knitted together with straw.</desc>
+<desc>หมวกสานจากฟาง</desc>
 AGI +1
 
 ::Giant_Band_Aid //id 5063 - Headgear Top
-<desc>A hair accessory that looks like two crossed band aids.</desc>
+<desc>เครื่องประดับผมที่ดูเหมือนพลาสเตอร์ยาไขว้กัน</desc>
 
 ::Smokie_Leaf //id 5064 - Headgear Top
-<desc>A leaf worn by the Smokie monster.</desc>
+<desc>ใบไม้ที่มอนสเตอร์ Smokie ใส่</desc>
 
 ::Blue_Fish //id 5065 - Headgear Top
-<desc>A headgear which resembles a fish, smell included!</desc>
-+10% physical damage vs. Aquatic
+<desc>เครื่องสวมหัวรูปปลา กลิ่นมาครบด้วย!</desc>
+ดาเมจกายภาพ +10% ต่อสัตว์น้ำ
 
 ::Succubus_Horn //id 5066 - Headgear Top
-<desc>A headgear which resembles Succubus horns.</desc>
+<desc>เครื่องสวมหัวรูปเขาของ Succubus</desc>
 INT +1, MDEF +10
 
 ::Sombrero //id 5067 - Headgear Top
-<desc>A traditional hat with a wide, round brim.</desc>
+<desc>หมวกพื้นบ้านปีกกว้างทรงกลม</desc>
 AGI +1
 
 ::Evil_Wing_Ears //id 5068 - Headgear Mid
-<desc>An ear accesory with dark, sinister demon wings.</desc>
+<desc>เครื่องประดับหูรูปปีกปีศาจสีดำน่าสะพรึง</desc>
 STR +1
 
 ::Kitsune_Mask //id 5069 - Headgear Top
-<desc>A mask worn by assassins in order to hide themselves.</desc>
+<desc>หน้ากากที่นักฆ่าใส่เพื่อปกปิดตัวตน</desc>
 AGI +1, LUK +1
 
 ::Hot-Blooded_Headband //id 5070 - Headgear Top
-<desc>A headgear which symbolizes hot-blooded battle vigor.</desc>
+<desc>เครื่องสวมหัวที่สื่อถึงเลือดนักสู้อันร้อนแรง</desc>
 STR +2
 
 ::Indian_Headband //id 5071 - Headgear Top
-<desc>A tribal headgear adorned with a long, white feather.</desc>
+<desc>เครื่องสวมหัวชนเผ่าประดับขนนกสีขาวยาว</desc>
 DEX +1
 
 ::Incubus_Horn //id 5072 - Headgear Top
-<desc>A headgear which resembles Incubus horns.</desc>
+<desc>เครื่องสวมหัวรูปเขาของ Incubus</desc>
 AGI +1, MDEF +10
 
 ::Model_Training_Hat //id 5073 - Headgear Top
-<desc>A headgear made to improve the wearer's posture.</desc>
+<desc>เครื่องสวมหัวที่ช่วยให้ท่าทางดูดีขึ้น</desc>
 DEX +2
 
 ::Angel_Wing_Ears //id 5074 - Headgear Mid
-<desc>An ear accesory with white, beautiful angel wings.</desc>
+<desc>เครื่องประดับหูรูปปีกเทวดาสีขาวงดงาม</desc>
 STR +1
 
 ::Cowboy_Hat //id 5075 - Headgear Top
-<desc>A cowboy hat that makes men manly and women cute.</desc>
+<desc>หมวกคาวบอย ผู้ชายใส่แล้วแมน ผู้หญิงใส่แล้วน่ารัก</desc>
 
 ::Beanie //id 5076 - Headgear Top
-<desc>A knit beanie that offers some protection from the cold, but only some.</desc>
+<desc>หมวกไหมพรม กันหนาวได้บ้าง แต่ก็แค่บ้าง</desc>
 LUK +1
 
 ::Tulip_Hairpin //id 5077 - Headgear Top
-<desc>A tiny little hairpin shaped like a tulip.</desc>
+<desc>ปิ่นปักผมจิ๋วรูปดอกทิวลิป</desc>
 
 ::Sea_Otter_Hat //id 5078 - Headgear Top
-<desc>A cute headgear made in the form of a Sea Otter.</desc>
+<desc>หมวกน่ารักรูปนากทะเล</desc>
 VIT +1
 
 ::X_Hairpin //id 5079 - Headgear Top
-<desc>A hair accessory shaped like an X.</desc>
+<desc>เครื่องประดับผมรูปกากบาท</desc>
 
 ::Crown_of_Ancient_Queen //id 5080 - Headgear Top
-<desc>A hair ornament worn by ancient queens.</desc>
+<desc>เครื่องประดับผมที่ราชินีโบราณสวม</desc>
 
 ::Crown_of_Mistress //id 5081 - Headgear Top
-<desc>A crown fashioned after the one worn by Mistress.</desc>
+<desc>มงกุฎที่ทำเลียนแบบของ Mistress</desc>
 INT +2, SP +100
 
 ::Decorative_Mushroom //id 5082 - Headgear Top
-<desc>A headgear fashioned to resemble a mushroom.</desc>
-Increases damage against mushroom and fungus type monsters by +10%
+<desc>เครื่องสวมหัวที่ทำให้เหมือนดอกเห็ด</desc>
+ดาเมจต่อมอนประเภทเห็ดและรา +10%
 
 ::Red_Ribbon //id 5083 - Headgear Top
-<desc>A big red ribbon made in the style of a legendary female shaman who loved nature.</desc>
+<desc>โบว์แดงใบใหญ่ ทำตามแบบหมอผีหญิงในตำนานที่รักธรรมชาติ</desc>
 MDEF +10
 
 ::Lazy_Smokie //id 5084 - Headgear Top
-<desc>A headgear made to look like an annoyed Smokie exhausted by the summer heat.</desc>
-+20% <color=#800000>Sleep</color> resist
+<desc>เครื่องสวมหัวรูป Smokie หน้าหงุดหงิดเพราะร้อนจนหมดแรง</desc>
+ต้านทาน <color=#800000>หลับ</color> +20%
 
 ::Small_Ribbons //id 5085 - Headgear Mid
-<desc>A pair of small red ribbons.</desc>
+<desc>โบว์แดงเล็กๆ คู่หนึ่ง</desc>
 
 ::Alarm_Mask //id 5086 - Headgear MidBottom
-<desc>A mask which resembles an Alarm monster.</desc>
-+50% <color=#800000>Blind</color> resist
+<desc>หน้ากากรูปมอนสเตอร์ Alarm</desc>
+ต้านทาน <color=#800000>ตาบอด</color> +50%
 
 ::Poker_Face //id 5087 - Headgear MidBottom
-<desc>A mask with a blank expression.</desc>
+<desc>หน้ากากหน้าเฉยเมย</desc>
 
 ::Surprised_Mask //id 5088 - Headgear MidBottom
-<desc>A mask with a surprised expression.</desc>
+<desc>หน้ากากหน้าตกใจ</desc>
 
 ::Annoyed_Mask //id 5089 - Headgear MidBottom
-<desc>A mask with an annoyed expression.</desc>
+<desc>หน้ากากหน้าหงุดหงิด</desc>
 
 ::Goblin_Leader_Mask //id 5090 - Headgear MidBottom
-<desc>A mask worn by the Goblin leader, it looks so ferocious it's almost ridiculous.</desc>
+<desc>หน้ากากของหัวหน้า Goblin ดูดุร้ายจนเกือบจะตลก</desc>
 
 ::Decorative_Golden_Bell //id 5091 - Headgear TopMid
-<desc>A hair accessory fashioned after Sohee's golden bells.</desc>
+<desc>เครื่องประดับผมที่ทำตามแบบกระดิ่งทองของ Sohee</desc>
 
 ::Coif //id 5092 - Headgear TopMid
-<desc>A tight-fitting cap worn under a veil.</desc>
+<desc>หมวกรัดศีรษะที่ใส่ไว้ใต้ผ้าคลุมหน้า</desc>
 
 ::Coif_ //id 5093 - Headgear TopMid
-<desc>A tight-fitting cap worn under a veil.</desc>
+<desc>หมวกรัดศีรษะที่ใส่ไว้ใต้ผ้าคลุมหน้า</desc>
 SP +100
 
 ::Orc_Hero_Helm //id 5094 - Headgear TopMid
-<desc>A headgear bestowed only to true Orc Heroes.</desc>
+<desc>เครื่องสวมหัวที่มอบให้เฉพาะ Orc Hero ตัวจริงเท่านั้น</desc>
 STR +2, VIT +1
-<color=#800080>Set Bonus</color> with <color=#008080>Orcish Sword</color>:
+<color=#800080>โบนัสเซ็ต</color> กับ <color=#008080>Orcish Sword</color>:
 MATK +120
-+3% autospell <skill>Grand Thunderstorm</skill> on non-skill attack.
+โอกาส 3% ร่ายอัตโนมัติ <skill>Grand Thunderstorm</skill> เมื่อโจมตีปกติ.
 
 ::Assassin_Mask //id 5096 - Headgear Bottom
-<desc>A dark mask worn by assassins.</desc>
+<desc>หน้ากากสีดำที่นักฆ่าใส่กัน</desc>
 
 ::Holiday_Hat //id 5097 - Headgear Top
-<desc>A festive party hat.</desc>
+<desc>หมวกปาร์ตี้</desc>
 
 ::Dark_Blinder //id 5104 - Headgear Mid
-<desc>A blinder enchanted with dark magic.</desc>
-+100% <color=#800000>Blind</color> resist
-+2% <color=#800000>Stun</color> resist
+<desc>ที่ปิดตาที่ร่ายเวทมืดเอาไว้</desc>
+ต้านทาน <color=#800000>ตาบอด</color> +100%
+ต้านทาน <color=#800000>สตัน</color> +2%
 
 ::Crunch_Toast //id 5107 - Headgear Bottom
-<desc>A noble headgear created in the proud image of crunchy toast, part of a balanced breakfast.</desc>
+<desc>เครื่องสวมหัวสุดโก้ ทำเป็นรูปขนมปังปิ้งกรอบ หนึ่งในมื้อเช้าครบหมู่</desc>
 
 ::Detective's_Cap //id 5108 - Headgear Top
-<desc>A cap worn by a world famous detective.</desc>
+<desc>หมวกของนักสืบชื่อก้องโลก</desc>
 
 ::Red_Bonnet //id 5109 - Headgear Top
-<desc>A bonnet favored by women of nobility, it causes an inexplicable craving for tea.</desc>
+<desc>หมวกบอนเน็ตที่สตรีชั้นสูงชอบใส่ ใส่แล้วอยากดื่มชาขึ้นมาเฉยๆ</desc>
 
 ::Baby_Pacifier //id 5110 - Headgear Bottom
-<desc>A hat that looks just like a pacifier, it brings you back to the good old days of hanging in the crib.</desc>
+<desc>หมวกที่หน้าตาเหมือนจุกนมหลอก ใส่แล้วคิดถึงวันเก่าๆ ตอนนอนอยู่ในเปล</desc>
 
 ::Galapago_Cap //id 5111 - Headgear Top
-<desc>A cute cap that makes its wearer almost as cool as a Galapago, but only almost.</desc>
+<desc>หมวกน่ารักที่ใส่แล้วเท่เกือบเท่า Galapago แค่เกือบนะ</desc>
 
 ::Super_Novice_Hat //id 5112 - Headgear Top
-<desc>A headgear exclusively for Novices!</desc>
+<desc>เครื่องสวมหัวสำหรับ Novice เท่านั้น!</desc>
 STR, VIT, INT, DEX, AGI, LUK +1
 
 ::Angry_Snarl //id 5113 - Headgear Bottom
-<desc>A headgear that allows its wearer to express inner rage or slight disgust.</desc>
+<desc>เครื่องสวมหัวที่ช่วยระบายความโมโหหรือความรำคาญออกมา</desc>
 
 ::Bucket_Hat //id 5114 - Headgear Top
-<desc>A trendy hat based on a style worn by enlisted military men.</desc>
+<desc>หมวกทันสมัยที่ทำตามแบบของทหารเกณฑ์</desc>
 
 ::Winter_Hat //id 5115 - Headgear Top
-<desc>A furry hat that is an all time favorite during the winter.</desc>
-+10% <color=#800000>Freeze</color> resist
+<desc>หมวกขนปุย ขวัญใจตลอดกาลของหน้าหนาว</desc>
+ต้านทาน <color=#800000>แช่แข็ง</color> +10%
 
 ::Banana_Hat //id 5116 - Headgear Top
-<desc>A hat made to resemble a banana peel that causes a primal reaction of pure rage.</desc>
+<desc>หมวกรูปเปลือกกล้วย ใส่แล้วคนเห็นโมโหขึ้นมาโดยสัญชาตญาณ</desc>
 
 ::Mystic_Rose //id 5117 - Headgear Top
-<desc>A white rose that enhances the wearer's beauty.</desc>
--2% damage from Plant
+<desc>กุหลาบขาวที่ขับความงามของผู้สวมใส่</desc>
+รับดาเมจจากพืช -2%
 
 ::Puppy_Headband //id 5118 - Headgear Top
-<desc>A cute pair of adorable puppy ears.</desc>
+<desc>หูลูกหมาน่ารักคู่หนึ่ง</desc>
 
 ::Super_Novice_Hat_ //id 5119 - Headgear Top
-<desc>A headgear exclusively for Novices!</desc>
+<desc>เครื่องสวมหัวสำหรับ Novice เท่านั้น!</desc>
 STR, VIT, INT, DEX, AGI, LUK +1
 
 ::Bucket_Hat_ //id 5120 - Headgear Top
-<desc>A trendy hat based on a style worn by enlisted military men.</desc>
+<desc>หมวกทันสมัยที่ทำตามแบบของทหารเกณฑ์</desc>
 
 ::Zealotus_Mask //id 5121 - Headgear TopMid
-<desc>A mask that makes its wearer feel like looking down on normal human peons.</desc>
-+5% physical damage vs. Demi-Human
--5% damage from Demi-Human
+<desc>หน้ากากที่ใส่แล้วอยากมองมนุษย์ธรรมดาแบบเหยียดๆ</desc>
+ดาเมจกายภาพ +5% ต่อมนุษย์
+รับดาเมจจากมนุษย์ -5%
 
 ::Magni's_Cap //id 5122 - Headgear Top
-<desc>A cap owned by Magni, son of Thor, it grants a measure of Magni's awesome might.</desc>
+<desc>หมวกของ Magni บุตรแห่ง Thor ให้พละกำลังของ Magni มาส่วนหนึ่ง</desc>
 STR +2
 
 ::Ulle's_Cap //id 5123 - Headgear Top
-<desc>A cap owned by Ulle, god of hunting, it makes you feel like you can hunt down any beast.</desc>
+<desc>หมวกของ Ulle เทพแห่งการล่า ใส่แล้วรู้สึกว่าล่าอะไรก็ได้</desc>
 AGI +1, DEX +2
 
 ::Fricca's_Circlet //id 5124 - Headgear Top
-<desc>A circlet blessed by Freyja, mother of Baldur.</desc>
+<desc>มงกุฎวงเล็กที่ Freyja มารดาแห่ง Baldur ประทานพรไว้</desc>
 INT +2, SP +50, MDEF +10
 
 ::Angel's_Kiss //id 5125 - Headgear Top
-<desc>A hair ornament that was kissed by the Super Novice's Guardian Angel.</desc>
-SP Regeneration +3%
+<desc>เครื่องประดับผมที่เทวดาผู้พิทักษ์ของ Super Novice จุมพิตไว้</desc>
+ฟื้นฟู SP +3%
 
 ::Morpheus's_Hood //id 5126 - Headgear Top
-<desc>A hood that grants Morpheus's clarity and foresight.</desc>
+<desc>ฮู้ดที่ให้ความกระจ่างและญาณทัศนะของ Morpheus</desc>
 INT +2
 
 ::Morrigane's_Helm //id 5127 - Headgear Top
-<desc>A helm owned by Morrigane, the goddess of war.</desc>
+<desc>หมวกเกราะของ Morrigane เทพีแห่งสงคราม</desc>
 LUK +2, ATK +3
 
 ::Goibne's_Helm //id 5128 - Headgear Top
-<desc>One of the few armors forged by Goibne, it is said that the gods valued his armors more than his weapons.</desc>
+<desc>หนึ่งในเกราะไม่กี่ชิ้นที่ Goibne ตีขึ้น ว่ากันว่าทวยเทพให้ค่าเกราะของเขามากกว่าอาวุธ</desc>
 VIT +3, MDEF +3
 
 ::Antonio's_Santa_Hat //id 5136 - Headgear Top
-<desc>A hat that Antonio used to wear.</desc>
+<desc>หมวกที่ Antonio เคยใส่</desc>
 
 ::Marionette_Doll //id 5141 - Headgear Top
-<desc>A Marionette doll that gives you chills when you wear it.</desc>
+<desc>ตุ๊กตาหุ่นเชิดที่ใส่แล้วขนลุก</desc>
 STR +1
 
 ::Baseball_Cap //id 5147 - Headgear Top
-<desc>A cap worn to block the sun from your eyes.</desc>
+<desc>หมวกไว้บังแดดไม่ให้เข้าตา</desc>
 
 ::Orc_Helm_ //id 5157 - Headgear Top
-<desc>A hardy helmet crafted by orc smiths.</desc>
+<desc>หมวกเกราะทนทานที่ช่างตีเหล็กออร์คทำขึ้น</desc>
 
 ::Monk_Hat_ //id 5158 - Headgear Top
-<desc>A ceremonial hat worn by monks that offers protection from evil.</desc>
+<desc>หมวกพิธีกรรมของนักพรต ป้องกันสิ่งชั่วร้าย</desc>
 MDEF +3
 
 ::Golden_Gear_ //id 5159 - Headgear Top
-<desc>A helmet forged from pure gold which provides effective defense but is also unaffordable.</desc>
+<desc>หมวกเกราะที่ตีจากทองคำบริสุทธิ์ ป้องกันดีแต่แพงจนซื้อไม่ไหว</desc>
 
 ::Majestic_Goat_ //id 5160 - Headgear Top
-<desc>A helmet that has mighty goat horns.</desc>
+<desc>หมวกเกราะที่มีเขาแพะใหญ่โต</desc>
 STR +1
 
 ::Spiky_Band_ //id 5161 - Headgear Top
-<desc>A headband with two dangerous, yet fashionable, spikes.</desc>
+<desc>ที่คาดหัวติดหนามแหลมสองอัน อันตรายแต่ดูเท่</desc>
 
 ::Bone_Helm_ //id 5162 - Headgear Top
-<desc>A helmet constructed of solid bone that is nearly impenetrable.</desc>
-+15% damage from Shadow attacks
+<desc>หมวกเกราะที่ทำจากกระดูกตัน แทบเจาะไม่เข้า</desc>
+รับดาเมจธาตุมืด +15%
 
 ::Corsair_ //id 5163 - Headgear Top
-<desc>A flamboyant hat worn by the strongest pirates.</desc>
+<desc>หมวกฉูดฉาดของโจรสลัดที่แข็งแกร่งที่สุด</desc>
 VIT +1
 
 ::Tiara_ //id 5164 - Headgear Top
-<desc>A jeweled coronet that grants the wisdom of an ancient queen.</desc>
+<desc>มงกุฎประดับอัญมณีที่ให้ปัญญาของราชินีโบราณ</desc>
 INT +1
 
 ::Crown_ //id 5165 - Headgear Top
-<desc>A jeweled crown that grants the wisdom of an ancient king.</desc>
+<desc>มงกุฎประดับอัญมณีที่ให้ปัญญาของกษัตริย์โบราณ</desc>
 INT +1
 
 ::Sphinx_Hat_ //id 5166 - Headgear TopBottom
-<desc>A traditional headpiece that symbolizes the traditional gods.</desc>
+<desc>เครื่องสวมหัวพื้นบ้านที่สื่อถึงเทพเจ้าดั้งเดิม</desc>
 STR +2
 
 ::Munak_Hat_ //id 5167 - Headgear All
-<desc>A replica of Munak's turban, complete with an amulet.</desc>
--10% damage from Undead
+<desc>ของจำลองผ้าโพกหัวของ Munak พร้อมยันต์ครบ</desc>
+รับดาเมจจากอันเดด -10%
 
 ::Bongun_Hat_ //id 5168 - Headgear All
-<desc>A replica of Bongun's turban, complete with a torn amulet.</desc>
+<desc>ของจำลองผ้าโพกหัวของ Bongun พร้อมยันต์ที่ขาดวิ่น</desc>
 
 ::Bride_Mask //id 5169 - Headgear TopMid
-<desc>A white mask with red blush that is worn by the actor playing the bride in a play.</desc>
+<desc>หน้ากากสีขาวแต้มแก้มแดง ที่นักแสดงบทเจ้าสาวสวมในละคร</desc>
 
 ::Feather_Beret //id 5170 - Headgear Top
-<desc>A fancy, feathered cap made of smooth, sky blue material.</desc>
+<desc>หมวกขนนกหรู ทำจากผ้าเนื้อเนียนสีฟ้า</desc>
 MDEF +1
--10% damage from Demi-Human
+รับดาเมจจากมนุษย์ -10%
 
 ::Valkyrian_Helm //id 5171 - Headgear Top
-<desc>An ornate, winged helmet worn by the Valkyries, Odin's battle maidens.</desc>
+<desc>หมวกเกราะมีปีกลวดลายวิจิตร ที่เหล่า Valkyrie นางรบแห่ง Odin สวม</desc>
 MDEF +5
 
 ::Beret //id 5172 - Headgear Top
-<desc>A bright green, flattened cap that represents bravery.</desc>
--10% damage from Demi-Human
+<desc>หมวกแบนสีเขียวสด สื่อถึงความกล้าหาญ</desc>
+รับดาเมจจากมนุษย์ -10%
 
 ::Magistrate_Hat //id 5173 - Headgear Top
-<desc>A hat that was once worn by Satto, an official from an ancient eastern land.</desc>
+<desc>หมวกที่ Satto ขุนนางจากดินแดนตะวันออกโบราณเคยสวม</desc>
 
 ::Ayam //id 5174 - Headgear Top
-<desc>A red, silken hat that is supposed to be worn by women, but men can wear it too.</desc>
+<desc>หมวกไหมสีแดงที่ควรจะเป็นของผู้หญิง แต่ผู้ชายก็ใส่ได้</desc>
 
 ::Censor_Bar //id 5175 - Headgear Mid
-<desc>A black mosiac to place over your eyes to protect your identity.</desc>
+<desc>แผ่นปิดตาสีดำ ไว้ปกปิดตัวตน</desc>
 MDEF +1, HIT -5
-+5% <color=#800000>Curse</color> resist
+ต้านทาน <color=#800000>สาป</color> +5%
 
 ::Hahoe_Mask //id 5176 - Headgear MidBottom
-<desc>A traditional oriental mask that is always perpetualy smiling.</desc>
+<desc>หน้ากากตะวันออกโบราณที่ยิ้มอยู่ตลอดเวลา</desc>
 
 ::Mythical_Lion_Mask //id 5177 - Headgear TopMid
-<desc>An oriental lion mask with menacing, angry eyes.</desc>
+<desc>หน้ากากสิงโตตะวันออก ดวงตาโกรธเกรี้ยวน่าเกรงขาม</desc>
 
 ::Ribbon__ //id 5191 - Headgear Top
-<desc>A black satin hairpin that wards off harmful magic.</desc>
+<desc>ปิ่นปักผมซาตินสีดำ ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Ribbon___ //id 5192 - Headgear Top
-<desc>A yellow satin hairpin that wards off harmful magic.</desc>
+<desc>ปิ่นปักผมซาตินสีเหลือง ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Ribbon____ //id 5193 - Headgear Top
-<desc>A green satin hairpin that wards off harmful magic.</desc>
+<desc>ปิ่นปักผมซาตินสีเขียว ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Ribbon_____ //id 5194 - Headgear Top
-<desc>A pink satin hairpin that wards off harmful magic.</desc>
+<desc>ปิ่นปักผมซาตินสีชมพู ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Ribbon______ //id 5195 - Headgear Top
-<desc>A red satin hairpin that wards off harmful magic.</desc>
+<desc>ปิ่นปักผมซาตินสีแดง ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Ribbon_______ //id 5196 - Headgear Top
-<desc>A orange satin hairpin that wards off harmful magic.</desc>
+<desc>ปิ่นปักผมซาตินสีส้ม ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Ribbon________ //id 5197 - Headgear Top
-<desc>A white satin hairpin that wards off harmful magic.</desc>
+<desc>ปิ่นปักผมซาตินสีขาว ป้องกันเวทร้าย</desc>
 MDEF +3
 
 ::Romantic_White_Flower //id 5206 - Headgear Bottom
-<desc>A cute and romantic white flower that is both fashionable and functional.</desc>
--3% damage from Plant
+<desc>ดอกไม้ขาวน่ารักโรแมนติก สวยด้วยใช้ได้จริงด้วย</desc>
+รับดาเมจจากพืช -3%
 
 ::Deviruchi_Hat_ //id 5227 - Headgear Top
-<desc>A cute headgear made in the form of a Deviruchi.</desc>
+<desc>หมวกน่ารักรูป Deviruchi</desc>
 STR +1, INT +1
 
 ::Deviruchi_Hat__ //id 5228 - Headgear Top
-<desc>A cute headgear made in the form of a Deviruchi.</desc>
+<desc>หมวกน่ารักรูป Deviruchi</desc>
 STR +1, INT +1
 
 ::Deviruchi_Hat___ //id 5229 - Headgear Top
-<desc>A cute headgear made in the form of a Deviruchi.</desc>
+<desc>หมวกน่ารักรูป Deviruchi</desc>
 STR +1, INT +1
 
 ::Drooping_Cat_ //id 5230 - Headgear Top
-<desc>A cute kitty doll that is just adorable.</desc>
+<desc>ตุ๊กตาแมวน่ารัก น่าเอ็นดูสุดๆ</desc>
 MDEF +15
-+30% <color=#800000>Curse</color> resist
+ต้านทาน <color=#800000>สาป</color> +30%
 
 ::Drooping_Cat__ //id 5231 - Headgear Top
-<desc>A cute kitty doll that is just adorable.</desc>
+<desc>ตุ๊กตาแมวน่ารัก น่าเอ็นดูสุดๆ</desc>
 MDEF +15
-+30% <color=#800000>Curse</color> resist
+ต้านทาน <color=#800000>สาป</color> +30%
 
 ::Drooping_Cat___ //id 5232 - Headgear Top
-<desc>A cute kitty doll that is just adorable.</desc>
+<desc>ตุ๊กตาแมวน่ารัก น่าเอ็นดูสุดๆ</desc>
 MDEF +15
-+30% <color=#800000>Curse</color> resist
+ต้านทาน <color=#800000>สาป</color> +30%
 
 ::Drooping_Cat____ //id 5233 - Headgear Top
-<desc>A cute kitty doll that is just adorable.</desc>
+<desc>ตุ๊กตาแมวน่ารัก น่าเอ็นดูสุดๆ</desc>
 MDEF +15
-+30% <color=#800000>Curse</color> resist
+ต้านทาน <color=#800000>สาป</color> +30%
 
 ::Drooping_Cat_____ //id 5234 - Headgear Top
-<desc>A cute kitty doll that is just adorable.</desc>
+<desc>ตุ๊กตาแมวน่ารัก น่าเอ็นดูสุดๆ</desc>
 MDEF +15
-+30% <color=#800000>Curse</color> resist
+ต้านทาน <color=#800000>สาป</color> +30%
 
 ::Beanie_ //id 5235 - Headgear Top
-<desc>A knit beanie that offers some protection from the cold, but only some.</desc>
+<desc>หมวกไหมพรม กันหนาวได้บ้าง แต่ก็แค่บ้าง</desc>
 LUK +1
 
 ::Beanie__ //id 5236 - Headgear Top
-<desc>A knit beanie that offers some protection from the cold, but only some.</desc>
+<desc>หมวกไหมพรม กันหนาวได้บ้าง แต่ก็แค่บ้าง</desc>
 LUK +1
 
 ::Beanie___ //id 5237 - Headgear Top
-<desc>A knit beanie that offers some protection from the cold, but only some.</desc>
+<desc>หมวกไหมพรม กันหนาวได้บ้าง แต่ก็แค่บ้าง</desc>
 LUK +1
 
 ::Mage_Hat_ //id 5238 - Headgear Top
-<desc>A stylish formal hat worn by talented magicians.</desc>
+<desc>หมวกพิธีการดูดีที่นักมายากลฝีมือดีสวม</desc>
 INT +2, SP +150
 
 ::Mage_Hat__ //id 5239 - Headgear Top
-<desc>A stylish formal hat worn by talented magicians.</desc>
+<desc>หมวกพิธีการดูดีที่นักมายากลฝีมือดีสวม</desc>
 INT +2, SP +150
 
 ::Mage_Hat___ //id 5240 - Headgear Top
-<desc>A stylish formal hat worn by talented magicians.</desc>
+<desc>หมวกพิธีการดูดีที่นักมายากลฝีมือดีสวม</desc>
 INT +2, SP +150
 
 ::Mage_Hat____ //id 5241 - Headgear Top
-<desc>A stylish formal hat worn by talented magicians.</desc>
+<desc>หมวกพิธีการดูดีที่นักมายากลฝีมือดีสวม</desc>
 INT +2, SP +150
 
 ::Mage_Hat_____ //id 5242 - Headgear Top
-<desc>A stylish formal hat worn by talented magicians.</desc>
+<desc>หมวกพิธีการดูดีที่นักมายากลฝีมือดีสวม</desc>
 INT +2, SP +150
 
 ::Shafka //id 5243 - Headgear TopMid
-<desc>A hat made from animal fur that keeps your ears warm in the bitter cold.</desc>
-+10% <color=#800000>Freeze</color> resist
+<desc>หมวกขนสัตว์ที่ทำให้หูอุ่นในอากาศหนาวจัด</desc>
+ต้านทาน <color=#800000>แช่แข็ง</color> +10%
 
 ::Water_Lily_Hat //id 5302 - Headgear Top
-<desc>A hat resembling a blooming water lily.
-Adds a 15% chance to strike twice with any weapon.</desc>
+<desc>หมวกรูปดอกบัวบาน
+โอกาส 15% ตี 2 ครั้ง ไม่ว่าจะใช้อาวุธอะไร</desc>
 
 ::Pirate_Dagger //id 5305 - Headgear Bottom
-<desc>A small silver knife that is held between your teeth.</desc>
+<desc>มีดเงินเล็กที่คาบไว้ระหว่างฟัน</desc>
 ATK +5
 
 ::Ph.D_Hat_ //id 5347 - Headgear Top
-<desc>A ceremonial hat worn during a graduation ceremony.</desc>
+<desc>หมวกที่ใส่ในพิธีรับปริญญา</desc>
 
 ::Big_Ribbon_ //id 5348 - Headgear Top
-<desc>An oversized red ribbon that contains hidden magical power.</desc>
+<desc>โบว์แดงใบใหญ่เกินขนาดที่ซ่อนพลังเวทไว้</desc>
 MDEF +3
 
 ::Boy's_Cap_ //id 5349 - Headgear Top
-<desc>A black cap that is part of a schoolboy's uniform.</desc>
+<desc>หมวกดำ ส่วนหนึ่งของชุดนักเรียนชาย</desc>
 
 ::Pirate_Bandana_ //id 5350 - Headgear Top
-<desc>A bandana that is the mark of the lawless pirates of the oceans.</desc>
+<desc>ผ้าโพกหัว เครื่องหมายของโจรสลัดผู้ไร้กฎเกณฑ์แห่งท้องทะเล</desc>
 STR +1
 
 ::Sunflower_ //id 5351 - Headgear Top
-<desc>A headgear designed to look like a sunflower.</desc>
--10% damage from Insect
+<desc>เครื่องสวมหัวออกแบบให้เหมือนดอกทานตะวัน</desc>
+รับดาเมจจากแมลง -10%
 
 ::Hat_of_the_Sun_God_ //id 5353 - Headgear TopMid
-<desc>A hat worn by the god of the sun.</desc>
+<desc>หมวกที่สุริยเทพสวม</desc>
 STR +3, INT +2
 
 ::Gigantic_Majestic_Goat //id 5374 - Headgear Top
-<desc>A headgear forged from the horns of the Unsealed Baphomet.</desc>
-+12% physical damage vs. Demi-Human
+<desc>เครื่องสวมหัวที่ตีจากเขาของ Baphomet ที่หลุดผนึก</desc>
+ดาเมจกายภาพ +12% ต่อมนุษย์
 
 ::Bone_Head //id 5398 - Headgear Top
-<desc>A headgear made with a dragon's skull.</desc>
+<desc>เครื่องสวมหัวที่ทำจากกะโหลกมังกร</desc>
 STR +2, MDEF +5
-+5% <color=#800000>Stun</color>, <color=#800000>Bleed</color> resist
+ต้านทาน <color=#800000>สตัน</color>, <color=#800000>เลือดออก</color> +5%
 
 ::Mandragora_Cap //id 5399 - Headgear Top
-<desc>A Mandragora has bloomed on this hat, don't even think about plucking the flower!</desc>
+<desc>มี Mandragora ออกดอกอยู่บนหมวกใบนี้ อย่าคิดจะเด็ดเชียวนะ!</desc>
 VIT +3
 
 ::Bride's_Corolla //id 5436 - Headgear Top
-<desc>A neatly made wedding corolla, a huge silk ribbon is attached to the back.</desc>
+<desc>มงกุฎดอกไม้เจ้าสาวที่ทำมาอย่างเรียบร้อย ด้านหลังติดโบว์ไหมใบใหญ่</desc>
 LUK +3, MDEF +2
 
 ::Cute_Ribbon_ //id 5438 - Headgear Top
-<desc>A small green ribbon that emphasizes its wearer's cuteness.</desc>
+<desc>โบว์สีเขียวเล็กๆ ที่ขับความน่ารักของผู้ใส่</desc>
 SP +20
 
 ::Cute_Ribbon__ //id 5439 - Headgear Top
-<desc>A small red ribbon that emphasizes its wearer's cuteness.</desc>
+<desc>โบว์สีแดงเล็กๆ ที่ขับความน่ารักของผู้ใส่</desc>
 SP +20
 
 ::Cute_Ribbon___ //id 5440 - Headgear Top
-<desc>A small blue ribbon that emphasizes its wearer's cuteness.</desc>
+<desc>โบว์สีน้ำเงินเล็กๆ ที่ขับความน่ารักของผู้ใส่</desc>
 SP +20
 
 ::Cute_Ribbon____ //id 5441 - Headgear Top
-<desc>A small white ribbon that emphasizes its wearer's cuteness.</desc>
+<desc>โบว์สีขาวเล็กๆ ที่ขับความน่ารักของผู้ใส่</desc>
 SP +20
 
 ::Necktie //id 5442 - Headgear Top
-<desc>A salaryman's necktie worn as a headband.</desc>
+<desc>เนกไทมนุษย์เงินเดือนที่เอามาคาดหัว</desc>
 
 ::Hair_Brush //id 5444 - Headgear Top
-<desc>A bright red brush worn as a last-minute accessory.</desc>
+<desc>แปรงสีแดงสด ใส่เป็นเครื่องประดับแบบขอไปที</desc>
 CRIT +6
 
 ::Catfoot_Hairpin //id 5446 - Headgear Top
-<desc>A hairpin which resembles the shape of a cat's paw.</desc>
+<desc>ปิ่นปักผมรูปอุ้งเท้าแมว</desc>
 FLEE +5, Perfect Dodge +3
 
 ::Dark_Bacilium //id 5808 - Headgear All
-<desc>A strong diadem reflective of a desire to overcome hardship.</desc>
+<desc>มงกุฎแข็งแกร่งที่สะท้อนความมุ่งมั่นจะฝ่าฟันความยากลำบาก</desc>
 

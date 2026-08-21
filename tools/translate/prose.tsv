@@ -1,0 +1,1768 @@
+# One English sentence, one Thai one, tab separated.
+#
+# Kept as a table rather than translated in place so a sentence that twenty items share
+# reads the same on all twenty. Names that are things in the game - monsters, towns,
+# people, item names other text links to - stay as they are; a player hunting Dokebi is
+# looking for the word Dokebi.
+#
+"In the town of Prontera I fell sick, I needed something from forest to make my blood thick" - The First Man	"ข้าล้มป่วยที่เมือง Prontera ต้องหาของจากป่ามาบำรุงเลือด" - ชายคนแรก
+"The door can be found under the twilight sky near the mage's tower, the key is west of the tower in the grass under the sun."	"ประตูอยู่ใต้ฟ้าสนธยาใกล้หอคอยจอมเวท ส่วนกุญแจอยู่ทางตะวันตกของหอคอย ในพงหญ้ากลางแดด"
+"There is a strange feeling in the air here, almost as if I can do magic myself" - The Third Man	"อากาศแถวนี้แปลกๆ เหมือนข้าจะร่ายเวทได้เองเลย" - ชายคนที่สาม
+"We ventured north of the giant beautiful Jolnir flower, and that's where our journey began" - The Fourth Man	"พวกเรามุ่งขึ้นเหนือของดอก Jolnir ยักษ์ และการเดินทางก็เริ่มต้นที่นั่น" - ชายคนที่สี่
+"We're on our way now, soon we will venture to the desert in high spirits" - The Second Man	"ออกเดินทางแล้ว อีกไม่นานก็จะถึงทะเลทราย ใจคอเบิกบานดี" - ชายคนที่สอง
+6 Seconds	6 วินาที
+A Christmas stocking where presents were stolen through a hole in the bottom.	ถุงเท้าคริสต์มาสที่ของขวัญถูกขโมยไปทางรูก้นถุง
+A Dokebi horn rumored to bring great fortune.	เขา Dokebi ร่ำลือกันว่านำโชคลาภมาให้
+A Farmiliar's sharp tooth.	เขี้ยวแหลมของ Familiar
+A Griffon's sharp talon.	กรงเล็บแหลมคมของ Griffon
+A Kafra card issued by Kafra HQ.	บัตร Kafra ที่ออกโดยสำนักงานใหญ่ Kafra
+A Luoyang speciality, grilled bear foot.	ของขึ้นชื่อเมือง Luoyang ตีนหมีย่าง
+A Mandragora has bloomed on this hat, don't even think about plucking the flower!	มี Mandragora ออกดอกอยู่บนหมวกใบนี้ อย่าคิดจะเด็ดเชียวนะ!
+A Marionette doll that gives you chills when you wear it.	ตุ๊กตาหุ่นเชิดที่ใส่แล้วขนลุก
+A Marlin fish, it looks a bit different from what you saw in a book.	ปลา Marlin หน้าตาต่างจากในหนังสือนิดหน่อย
+A Matyr's leash.	สายจูงของ Matyr
+A Renaissance style suit that evokes thoughts of romance and elegance.	ชุดสไตล์เรอเนสซองส์ ดูโรแมนติกและสง่างาม
+A Rocker's hind leg.	ขาหลังของ Rocker
+A Secret Wing membership card.	บัตรสมาชิก Secret Wing
+A Sweet, luscious, full bodied milk.	นมรสหวานเข้มข้น หอมมัน
+A Wickebine inspired hairband with tiny little black ears attached.	ที่คาดผมแบบ Wickebine มีหูดำเล็กๆ ติดอยู่
+A a popular food in traditional festivals.	ของกินยอดฮิตในงานเทศกาลโบราณ
+A ancient sword said to have the mysterious power to control minds.	ดาบโบราณ ว่ากันว่ามีพลังลึกลับที่ควบคุมจิตใจคนได้
+A badge provided to warriors who have shown bravery.	เหรียญตราสำหรับนักรบผู้กล้าหาญ
+A badge provided to warriors who have shown valor.	เหรียญตราสำหรับนักรบผู้ห้าวหาญ
+A bag of dried grain commonly used in cuisine.	ถุงธัญพืชตากแห้ง ใช้ทำอาหารทั่วไป
+A baked sweet potato with an appetizing scent.	มันเทศอบ กลิ่นหอมชวนกิน
+A bandana that is the mark of the lawless ocean pirates.	ผ้าโพกหัว เครื่องหมายของโจรสลัดนอกกฎหมาย
+A bandana that is the mark of the lawless pirates of the oceans.	ผ้าโพกหัว เครื่องหมายของโจรสลัดผู้ไร้กฎเกณฑ์แห่งท้องทะเล
+A bao that is fried and then seasoned with a spicy sauce.	ซาลาเปาทอด ราดซอสรสเผ็ด
+A basic six chambered pistol.	ปืนพกลูกโม่ 6 นัด แบบพื้นฐาน
+A basic spear that enables slightly longer ranged melee attacks.	หอกพื้นฐาน ตีระยะประชิดได้ไกลขึ้นนิดหน่อย
+A basic sword.	ดาบพื้นฐาน
+A basic, big hammer with spikes, it's excellent for breaking all sorts of things.	ค้อนใหญ่มีหนามแหลม ทุบอะไรก็แตก
+A basket made with straws.	ตะกร้าสานจากฟาง
+A battered iron plate that seems to have fallen off a machine.	แผ่นเหล็กบุบๆ เหมือนหลุดมาจากเครื่องจักร
+A bead, imbued with fire, that acts as a catalyst for select Ninja arts.	ลูกปัดอาบธาตุไฟ ใช้เป็นตัวเร่งสำหรับวิชา Ninja บางอย่าง
+A bead, imbued with shadow, that acts as a catalyst for select Ninja arts.	ลูกปัดอาบธาตุมืด ใช้เป็นตัวเร่งสำหรับวิชา Ninja บางอย่าง
+A bead, imbued with water, that acts as a catalyst for select Ninja arts.	ลูกปัดอาบธาตุน้ำ ใช้เป็นตัวเร่งสำหรับวิชา Ninja บางอย่าง
+A bead, imbued with wind, that acts as a catalyst for select Ninja arts.	ลูกปัดอาบธาตุลม ใช้เป็นตัวเร่งสำหรับวิชา Ninja บางอย่าง
+A bear's foot that is rumored to restore male vigor.	ตีนหมี ร่ำลือกันว่าบำรุงกำลังผู้ชาย
+A beautiful blue bijou that is symbolic of the ocean.	อัญมณีสีน้ำเงินงดงาม สื่อถึงมหาสมุทร
+A beautiful box that contains an unknown accessory.	กล่องสวยงาม ข้างในมีเครื่องประดับที่ไม่รู้ว่าคืออะไร
+A beautiful but worn out kimono.	กิโมโนสวยงาม แต่เก่าจนซอมซ่อ
+A beautiful gold bijou that is sybolic of the sun.	อัญมณีสีทองงดงาม สื่อถึงดวงอาทิตย์
+A beautiful golden ornament created by an otherworldly power.	เครื่องประดับทองคำงดงาม สร้างขึ้นด้วยพลังจากอีกโลกหนึ่ง
+A beautiful golden ring engraved with "In celebration of Serin's 17th birthday".	แหวนทองงดงาม สลักว่า "ฉลองวันเกิดปีที่ 17 ของ Serin"
+A beautiful green bijou that is symbolic of the earth.	อัญมณีสีเขียวงดงาม สื่อถึงผืนดิน
+A beautiful jewel named after a star, you can barely see a transcription in direct light.	อัญมณีงดงามที่ตั้งชื่อตามดวงดาว ส่องกับแสงจ้าๆ จะเห็นตัวอักษรจางๆ
+A beautiful lamp made with red paper.	โคมไฟงดงาม ทำจากกระดาษสีแดง
+A beautiful lock of golden human hair.	ปอยผมทองของมนุษย์ สวยงาม
+A beautiful long, white colored horn with a magical power.	เขาสีขาวยาวสวยงาม มีพลังเวทอยู่ในตัว
+A beautiful red bijou that is symbolic of a fiery blaze.	อัญมณีสีแดงงดงาม สื่อถึงเปลวเพลิง
+A beautiful ring imbued with spiritual powers and surprising effects.	แหวนงดงามที่อาบด้วยพลังจิตวิญญาณ ให้ผลเหนือความคาดหมาย
+A beautifully decorated gift set that contains a taming item and Pet Armor.	ชุดของขวัญตกแต่งสวยงาม ข้างในมีของล่อสัตว์เลี้ยงและ Pet Armor
+A big red ribbon made in the style of a legendary female shaman who loved nature.	โบว์แดงใบใหญ่ ทำตามแบบหมอผีหญิงในตำนานที่รักธรรมชาติ
+A biotite, it symbolizes spiritual support.	แร่ไบโอไทต์ สื่อถึงกำลังใจทางจิตวิญญาณ
+A bird's beak, waste not want not.	จะงอยปากนก ของมีค่าอย่าทิ้งขว้าง
+A bird's feather that can be used in decor.	ขนนก ใช้ตกแต่งได้
+A birthday cake that is comfortable, yet fashionable. What did you expect?	เค้กวันเกิดที่ใส่สบายและดูดี จะให้เป็นอะไรได้อีกล่ะ?
+A bitter green herb which can counteract the effect of some poisons.	สมุนไพรเขียวรสขม แก้พิษได้บางชนิด
+A black cap that is part of a schoolboy's uniform.	หมวกดำ ส่วนหนึ่งของชุดนักเรียนชาย
+A black cat doll that almost seems alive.	ตุ๊กตาแมวดำ เหมือนมีชีวิตยังไงไม่รู้
+A black ladle, it is very durable and would make a nice gift.	ทัพพีสีดำ ทนทานมาก เอาไปให้เป็นของขวัญก็ดี
+A black leather mask shaped like butterfly wings.	หน้ากากหนังสีดำ รูปทรงเหมือนปีกผีเสื้อ
+A black mineral that can be combined with Iron to craft Steel.	แร่สีดำ ผสมกับ Iron แล้วตีเป็น Steel ได้
+A black mosiac to place over your eyes to protect your identity.	แผ่นปิดตาสีดำ ไว้ปกปิดตัวตน
+A black satin hairpin that wards off harmful magic.	ปิ่นปักผมซาตินสีดำ ป้องกันเวทร้าย
+A blade created to cut down stubborn weeds.	ใบมีดที่ทำมาเพื่อฟันวัชพืชดื้อๆ
+A blade imbued with a suffocating aura that repels light.	ใบมีดอาบออร่าอึดอัด ผลักไสแสงสว่าง
+A blade stained with blood that can't be cleansed.	ใบมีดเปื้อนเลือดที่ล้างยังไงก็ไม่ออก
+A blank scroll on which magic spells can be written.	ม้วนกระดาษเปล่า ไว้เขียนคาถา
+A blessed glove that increases intelligence.	ถุงมือศักดิ์สิทธิ์ เพิ่มสติปัญญา
+A blessed guard engraved with God's symbol.	เครื่องป้องกันศักดิ์สิทธิ์ สลักสัญลักษณ์ของพระเจ้า
+A blessed outer garment worn by clerics for religious ceremonies.	เสื้อคลุมศักดิ์สิทธิ์ นักบวชใส่ในพิธีทางศาสนา
+A blinder enchanted with dark magic.	ที่ปิดตาที่ร่ายเวทมืดเอาไว้
+A blood stained weapon created from the claws of Hati.	อาวุธเปื้อนเลือด ทำจากกรงเล็บของ Hati
+A bloodstained crystal that evokes the feeling of evil.	คริสตัลเปื้อนเลือด ให้ความรู้สึกชั่วร้าย
+A bloodthirsty axe that has aided many warriors in battle.	ขวานกระหายเลือด เคยช่วยนักรบมานักต่อนัก
+A bloody red pistol that is rumored to be cursed, but it's only a rumor.	ปืนสีแดงเลือด ร่ำลือว่าต้องคำสาป แต่ก็แค่ข่าวลือ
+A blow from this hefty mace can cause someone to black out.	กระบองหนักหน่วง ฟาดทีเดียวสลบได้
+A blue colored hair band worn with a rakish slant.	ที่คาดผมสีน้ำเงิน ใส่เอียงๆ ดูเท่
+A blue crystal that faintly shines with muddled light.	คริสตัลสีน้ำเงิน เรืองแสงขุ่นๆ จางๆ
+A blue porcelain that would make a nice gift.	เครื่องกระเบื้องสีน้ำเงิน เอาไปให้เป็นของขวัญก็ดี
+A blue satin hairpin that wards off harmful magic.	ปิ่นปักผมซาตินสีน้ำเงิน ป้องกันเวทร้าย
+A boldly red bandana that was leftover from the 80's.	ผ้าโพกหัวสีแดงจัด ของตกค้างจากยุค 80
+A bone taken from an undead skeleton.	กระดูกที่เอามาจากโครงกระดูกอันเดด
+A bonnet favored by women of nobility, it causes an inexplicable craving for tea.	หมวกบอนเน็ตที่สตรีชั้นสูงชอบใส่ ใส่แล้วอยากดื่มชาขึ้นมาเฉยๆ
+A book containing a compilation of ancient and sacred writings.	หนังสือที่รวบรวมบันทึกโบราณอันศักดิ์สิทธิ์
+A book that contains forbidden secrets of alchemy and magic.	หนังสือบรรจุความลับต้องห้ามของวิชาเล่นแร่แปรธาตุและเวทมนตร์
+A book that details prophesies concerning the end of the world.	หนังสือที่บันทึกคำทำนายเรื่องวันสิ้นโลก
+A book that helps students build a strong foundation in magic.	หนังสือที่ช่วยปูพื้นฐานเวทมนตร์ให้แน่น
+A book that's sturdy enough to be wielded as a weapon in an emergency.	หนังสือที่หนาแน่นพอจะใช้เป็นอาวุธยามฉุกเฉินได้
+A book used by demons to kill humans by inscribing their names. The last name, "Hollg--" looks like it wasn't completed.	หนังสือที่ปีศาจใช้ฆ่ามนุษย์ด้วยการเขียนชื่อลงไป ชื่อสุดท้าย "Hollg--" ดูเหมือนเขียนไม่จบ
+A book which details the origin and history of dragons.	หนังสือว่าด้วยกำเนิดและประวัติศาสตร์ของมังกร
+A book with instructions for creating Acid Bottles.	ตำราสอนทำ Acid Bottle
+A book with instructions for creating Alcohol.	ตำราสอนทำ Alcohol
+A book with instructions for creating Bottle Grenades.	ตำราสอนทำ Bottle Grenade
+A book with instructions for creating Condensed Potions.	ตำราสอนทำ Condensed Potion
+A book with instructions for creating Floras.	ตำราสอนทำ Flora
+A book with instructions for creating Glistening Coats.	ตำราสอนทำ Glistening Coat
+A book with instructions for creating Marine Spheres.	ตำราสอนทำ Marine Sphere
+A book with instructions for creating potions.	ตำราสอนทำยา
+A book with the impressive phrase, "There is no royal road to learning" on its cover.	หนังสือที่หน้าปกเขียนไว้เท่ๆ ว่า "การเรียนรู้ไม่มีทางลัด"
+A bottle containing a dormant Flora.	ขวดบรรจุ Flora ที่ยังหลับอยู่
+A bottle containing a dormant Marine Sphere.	ขวดบรรจุ Marine Sphere ที่ยังหลับอยู่
+A bottle containing a shining liquid.	ขวดบรรจุของเหลวเรืองแสง
+A bottle containing bird sputum, a rare item considering that birds do not salivate.	ขวดบรรจุน้ำลายนก ของหายากมาก เพราะนกไม่มีน้ำลาย
+A bottle containing corrosive acid.	ขวดบรรจุกรดกัดกร่อน
+A bottle containing flammable liquid.	ขวดบรรจุของเหลวไวไฟ
+A bottle moth wing powder.	ขวดบรรจุผงปีกผีเสื้อกลางคืน
+A bottle of apple juice that's easy to digest.	น้ำแอปเปิลขวดหนึ่ง ย่อยง่าย
+A bottle of banana juice that's easy to digest.	น้ำกล้วยขวดหนึ่ง ย่อยง่าย
+A bottle of black squid ink that failed to provide sufficient self defense.	ขวดหมึกดำจากปลาหมึก ที่ป้องกันตัวไม่สำเร็จ
+A bottle of blessed water used in sacred ceremonies.	ขวดน้ำมนต์ ใช้ในพิธีศักดิ์สิทธิ์
+A bottle of carrot juice that's easy to digest.	น้ำแครอทขวดหนึ่ง ย่อยง่าย
+A bottle of cursed water.	ขวดน้ำต้องคำสาป
+A bottle of fine, sweet scented culinary wine.	ขวดไวน์ปรุงอาหารชั้นดี กลิ่นหอมหวาน
+A bottle of grape juice that's easy to digest.	น้ำองุ่นขวดหนึ่ง ย่อยง่าย
+A bottle of milk for infants.	ขวดนมสำหรับทารก
+A bottle of pasteurized cow milk that is chock full of bovine goodness.	ขวดนมวัวพาสเจอร์ไรซ์ อัดแน่นด้วยคุณค่า
+A bottle of powder which could form poison if mixed with water or alcohol.	ขวดผงที่ผสมน้ำหรือแอลกอฮอล์แล้วกลายเป็นยาพิษ
+A bottle of sand from witch broom bristles that sparkles like the stars.	ขวดทรายจากขนไม้กวาดแม่มด เป็นประกายเหมือนดวงดาว
+A bottle which contains cloud crumbs.	ขวดบรรจุเศษเมฆ
+A bow constructed out of dragon bone.	ธนูที่ทำจากกระดูกมังกร
+A bow imbued with the sacred essence of Rudra, one of the ancient gods.	ธนูที่อาบด้วยพลังศักดิ์สิทธิ์ของ Rudra หนึ่งในทวยเทพโบราณ
+A bow made famous by its use by Goongso, a legendary archer.	ธนูที่โด่งดังเพราะ Goongso นักธนูในตำนานเคยใช้
+A bow, created just for Thieves, that has excellent range.	ธนูที่สร้างมาเพื่อ Thief โดยเฉพาะ ระยะยิงดีเยี่ยม
+A bowl filled with hot, hearty fish broth and a generous helping of fish cake.	ชามน้ำซุปปลาร้อนๆ เข้มข้น พร้อมลูกชิ้นปลาเต็มชาม
+A box full of something heavy.	กล่องที่ข้างในมีอะไรหนักๆ อยู่
+A box that contains a present.	กล่องที่ข้างในมีของขวัญ
+A box that is buried with the dead containing gems and momentos.	กล่องที่ฝังไปกับผู้ตาย ข้างในมีอัญมณีและของที่ระลึก
+A box with various supplies.	กล่องใส่ของใช้จิปาถะ
+A bracelet affixed with a dark red jewel.	กำไลที่ประดับด้วยอัญมณีสีแดงเข้ม
+A bracelet that is a memento of Morpheus's beloved.	กำไลที่เป็นของที่ระลึกจากคนรักของ Morpheus
+A braided pigtail that has been cut from the head of a young girl.	ผมเปียที่ตัดมาจากหัวเด็กผู้หญิง
+A branch broken off from a thornbush.	กิ่งที่หักมาจากพุ่มหนาม
+A breastplate exclusively for Novices!	เกราะอกสำหรับ Novice เท่านั้น!
+A bright green, flattened cap that represents bravery.	หมวกแบนสีเขียวสด สื่อถึงความกล้าหาญ
+A bright red brush worn as a last-minute accessory.	แปรงสีแดงสด ใส่เป็นเครื่องประดับแบบขอไปที
+A bright yellow fruit with very sour juice and a fresh scent.	ผลไม้สีเหลืองสด น้ำเปรี้ยวจี๊ด กลิ่นสดชื่น
+A brimless hat that offers little in the way of fashion but provide decent defense.	หมวกไม่มีปีก ไม่ค่อยสวย แต่ป้องกันได้ดีพอตัว
+A broad brimmed casual hat, usually worn by cowboys and ranchers, that is rustically stylish.	หมวกปีกกว้างใส่สบาย คาวบอยกับคนเลี้ยงสัตว์ชอบใส่ ดูเท่แบบลูกทุ่ง
+A broken emblem of Pharaoh that possess a mysterious power.	ตราสัญลักษณ์ Pharaoh ที่แตกหัก ยังมีพลังลึกลับอยู่
+A broken piece of a stone with engravings in an ancient language.	เศษหินแตกที่สลักภาษาโบราณไว้
+A broken piece of armor worn by Dullahan.	เศษเกราะแตกของ Dullahan
+A broken piece of armor worn by a ghostly swordman.	เศษเกราะแตกของนักดาบผีสาง
+A broken shuriken that is no longer useful.	ชูริเคนที่หักจนใช้ไม่ได้แล้ว
+A bronze badge given to government officials on business trips, allowing them to rent horses anywhere.	เหรียญทองแดงสำหรับข้าราชการเดินทางราชการ เช่ามาได้ทุกที่
+A bug shell that reflects the colors of the rainbow.	เปลือกแมลงที่สะท้อนแสงเป็นสีรุ้ง
+A bullet cartridge that contains 500 Bloody Bullets.	กล่องกระสุน บรรจุ Bloody Bullet 500 นัด
+A bullet cartridge that contains 500 Silver Bullets.	กล่องกระสุน บรรจุ Silver Bullet 500 นัด
+A bullet cartridge that contains 500 regular Bullets.	กล่องกระสุน บรรจุ Bullet ธรรมดา 500 นัด
+A bunch of flowers given to express love, thanks, or appreciation.	ช่อดอกไม้ ไว้มอบให้เพื่อบอกรัก ขอบคุณ หรือแสดงความชื่นชม
+A bunch of sea otter fur that is soft and downy enough to be used in clothing.	กระจุกขนนากทะเล นุ่มฟูพอจะเอาไปทำเสื้อผ้าได้
+A bunch of short and red threads used for decorating the hilt of a sword.	กระจุกด้ายแดงสั้นๆ ไว้ตกแต่งด้ามดาบ
+A bunch of stone roots, a rare item considering stones have been proven to not have any.	กระจุกรากหิน ของหายากมาก เพราะพิสูจน์แล้วว่าหินไม่มีราก
+A bunch of tough, strong tendons.	กระจุกเอ็นเหนียวแข็งแรง
+A bunch of tussled red hair that looks like it's on fire.	กระจุกผมแดงยุ่งเหยิง ดูเหมือนไฟลุก
+A bundle of ripped and crumpled files.	ปึกเอกสารที่ฉีกขาดยับยู่ยี่
+A burning horseshoe, useful only on burning horses for burning rangers.	เกือกม้าที่ลุกเป็นไฟ ใช้ได้แต่กับม้าไฟของนายพรานไฟเท่านั้น
+A burnt part of some device.	ชิ้นส่วนไหม้ๆ ของอุปกรณ์อะไรสักอย่าง
+A burnt piece of wood has little practical value.	ท่อนไม้ไหม้ไฟ แทบไม่มีประโยชน์อะไร
+A butterfly wing from the Novice Training Grounds.	ปีกผีเสื้อจากลานฝึก Novice
+A cage which could, emphasis on could, hold a bat.	กรงที่ "อาจจะ" ขังค้างคาวได้ เน้นคำว่าอาจจะ
+A candle with a mysterious purpose.	เทียนที่ไม่รู้ว่าเอาไว้ทำอะไร
+A candy cane rumored to bring good luck.	ลูกกวาดไม้เท้า ร่ำลือกันว่านำโชค
+A candy cane that is so sweet, it can melt the human tongue.	ลูกกวาดไม้เท้าที่หวานจนลิ้นแทบละลาย
+A candy rumored to bring good good luck.	ลูกกวาด ร่ำลือกันว่านำโชค
+A cap owned by Magni, son of Thor, it grants a measure of Magni's awesome might.	หมวกของ Magni บุตรแห่ง Thor ให้พละกำลังของ Magni มาส่วนหนึ่ง
+A cap owned by Ulle, god of hunting, it makes you feel like you can hunt down any beast.	หมวกของ Ulle เทพแห่งการล่า ใส่แล้วรู้สึกว่าล่าอะไรก็ได้
+A cap worn by a world famous detective.	หมวกของนักสืบชื่อก้องโลก
+A cap worn by nurses both great and small.	หมวกที่พยาบาลใส่กัน ไม่ว่าเก่งมากหรือเก่งน้อย
+A cap worn to block the sun from your eyes.	หมวกไว้บังแดดไม่ให้เข้าตา
+A captivatingly beautiful artifact rewarded by the gods.	วัตถุโบราณงดงามตรึงตา รางวัลจากทวยเทพ
+A carnivorous flower with a digestive system similar to a human's.	ดอกไม้กินเนื้อ มีระบบย่อยอาหารคล้ายมนุษย์
+A case of make-up that shines with a lustrous, attractive red color.	ตลับเครื่องสำอาง สีแดงเงางามน่ามอง
+A ceremonial axe that possesses a holy power.	ขวานพิธีกรรมที่มีพลังศักดิ์สิทธิ์
+A ceremonial dagger used in exorcisms.	มีดสั้นพิธีกรรม ใช้ไล่ผี
+A ceremonial hat worn by monks that offers protection from evil.	หมวกพิธีกรรมของนักพรต ป้องกันสิ่งชั่วร้าย
+A ceremonial hat worn during a graduation ceremony.	หมวกที่ใส่ในพิธีรับปริญญา
+A ceremonial hat worn during one's graduation.	หมวกที่ใส่ตอนจบการศึกษา
+A ceremonial mask used by an ancient shaman.	หน้ากากพิธีกรรมของหมอผีโบราณ
+A certificate that proves an adventurer is a member of the Continental Guard.	ใบรับรองว่านักผจญภัยผู้นี้เป็นสมาชิก Continental Guard
+A chart, written in a language you can't recognize, that details research history.	แผนภูมิที่เขียนด้วยภาษาที่อ่านไม่ออก บันทึกประวัติการวิจัยไว้
+A chocolate mousse cake with a luxurious flavor that Charles Orleans would be proud of.	เค้กมูสช็อกโกแลตรสหรู ขนาด Charles Orleans ยังต้องภูมิใจ
+A chunk of smoldering lava.	ก้อนลาวาที่ยังคุกรุ่น
+A circlet blessed by Freyja, mother of Baldur.	มงกุฎวงเล็กที่ Freyja มารดาแห่ง Baldur ประทานพรไว้
+A citrus green, bud shaped stone imbued with earth.	หินสีเขียวมะนาวรูปดอกตูม อาบด้วยธาตุดิน
+A classical plucked string instrument that is difficult to tune.	เครื่องดนตรีดีดโบราณ ตั้งสายยาก
+A classical stringed instrument favored by Rocker, who'd rather play music than do actual work.	เครื่องสายโบราณที่ Rocker ชอบเล่น เพราะขี้เกียจทำงานจริงจัง
+A clattering skull that occasionally breaks out in song.	กะโหลกที่สั่นกึกกัก บางทีก็ร้องเพลงขึ้นมาเฉยๆ
+A claw from a scorpion.	ก้ามแมงป่อง
+A claw imbued with the essence of madness.	กรงเล็บที่อาบด้วยความบ้าคลั่ง
+A claw pried from a Desert Wolf's paw.	กรงเล็บที่งัดมาจากอุ้งเท้า Desert Wolf
+A claw severed from a wolf's paw.	กรงเล็บที่ตัดมาจากอุ้งเท้าหมาป่า
+A clean convex mirror that can be used to detect the presence of MVP monsters.	กระจกนูนใสสะอาด ใช้ตรวจจับว่ามี MVP อยู่แถวนี้ไหม
+A cloak that is simple, yet elegant.	ผ้าคลุมเรียบง่ายแต่ดูดี
+A clump of chains that are hard to untangle.	กองโซ่ที่พันกันจนแกะยาก
+A clump of monster fur and fuzz that can be used to make thread and fabric.	กระจุกขนมอนสเตอร์ เอาไปปั่นเป็นด้ายและผ้าได้
+A clump of spores from a toxic mushroom.	กระจุกสปอร์จากเห็ดพิษ
+A cluster of berries with smooth skin that can be fermented to make wine.	พวงผลเบอร์รีเปลือกเนียน หมักทำไวน์ได้
+A cocktail whose unforgettable flavor is as potent as a dragon's breath.	ค็อกเทลรสชาติไม่รู้ลืม แรงพอๆ กับลมหายใจมังกร
+A cogwheel used in a machine.	เฟืองที่ใช้ในเครื่องจักร
+A collection of chocolates gathered in a beautiful arrangement. This is often used in courtship, and sometimes, even used effectively.	ช็อกโกแลตหลายชิ้นจัดเรียงมาอย่างสวยงาม มักใช้จีบกัน และบางทีก็ได้ผลจริงๆ
+A collection of frog eggs.	กองไข่กบ
+A collection of sand that can be found on the street, but somehow, is worth serious coin.	กองทรายที่เก็บได้ตามถนน แต่ไม่รู้ทำไมถึงขายได้ราคา
+A collection of small, dry particles that are a major source of environmental pollution.	กองฝุ่นละอองแห้งๆ ต้นเหตุสำคัญของมลพิษ
+A collection of stardust which can be refined into a Star Crumb.	ผงดาวที่เอาไปกลั่นเป็น Star Crumb ได้
+A comical hat worn by clowns and jesters.	หมวกตลกๆ ที่ตัวตลกกับจำอวดใส่กัน
+A common and normal whip.	แส้ธรรมดาทั่วไป
+A common arrow.	ลูกศรธรรมดา
+A common axe.	ขวานธรรมดา
+A common bow.	ธนูธรรมดา
+A common, humbly made sword that is intended for the use by those without sword expertise.	ดาบธรรมดาทำแบบง่ายๆ สำหรับคนที่ยังใช้ดาบไม่เป็น
+A common, ivory colored bandana.	ผ้าโพกหัวสีงาช้าง แบบธรรมดา
+A common, yet effective claw that's known as the "Tiger's Fang".	กรงเล็บธรรมดาแต่ใช้ได้ดี รู้จักกันในชื่อ "เขี้ยวเสือ"
+A complete set of corpse's teeth, well, as complete as it can get.	ฟันศพครบชุด เอาเป็นว่าครบเท่าที่จะครบได้
+A complex mechanical device that can disrupt the energy in a robot.	อุปกรณ์กลไกซับซ้อน ใช้รบกวนพลังงานในหุ่นยนต์
+A condensed Red Potion that weighs significantly less.	Red Potion เข้มข้น น้ำหนักเบากว่ามาก
+A condensed White Potion that weighs significantly less.	White Potion เข้มข้น น้ำหนักเบากว่ามาก
+A condensed Yellow Potion that weighs significantly less.	Yellow Potion เข้มข้น น้ำหนักเบากว่ามาก
+A confection of sugar, chocolate and other flavors.	ขนมหวานจากน้ำตาล ช็อกโกแลต และรสชาติอื่นๆ
+A confirmation receipt for a bet on a Hugel monster race.	ใบยืนยันการวางเดิมพันแข่งมอนที่ Hugel
+A contract drawn in darkness.	สัญญาที่ร่างขึ้นในความมืด
+A cookie rumored to bring good luck.	คุกกี้ ร่ำลือกันว่านำโชค
+A cowboy hat that makes men manly and women cute.	หมวกคาวบอย ผู้ชายใส่แล้วแมน ผู้หญิงใส่แล้วน่ารัก
+A crescent shaped golden brooch.	เข็มกลัดทองรูปพระจันทร์เสี้ยว
+A crossbow that has improved range.	หน้าไม้ที่ยิงได้ไกลกว่าปกติ
+A crow's wing that can temporarily grant a person the power of flight.	ปีกอีกา ให้พลังบินได้ชั่วคราว
+A crown adorned with precious gems.	มงกุฎประดับอัญมณีล้ำค่า
+A crown fashioned after the one worn by Mistress.	มงกุฎที่ทำเลียนแบบของ Mistress
+A cruciform mace that was blessed by the pope of the Rune Midgard kingdom.	กระบองรูปกางเขนที่สันตะปาปาแห่งอาณาจักร Rune Midgard ประทานพรไว้
+A crustacean's claw.	ก้ามสัตว์เปลือกแข็ง
+A crystal arrow.	ลูกศรคริสตัล
+A crystal made entirely of fine sand.	คริสตัลที่เกิดจากทรายละเอียดล้วนๆ
+A crystal staff that shines beautifully in sunlight.	ไม้เท้าคริสตัลที่ต้องแดดแล้วเปล่งประกายงดงาม
+A crystal that acts as catalyst for certain magic spells. Once used, it becomes powerless and is destroyed.	คริสตัลที่ใช้เป็นตัวเร่งสำหรับเวทบางอย่าง ใช้แล้วหมดพลังและแตกสลาย
+A crystallization, dropped from monsters, whose name means joyous celebration.	ผลึกที่ได้จากมอนสเตอร์ ชื่อของมันแปลว่างานฉลองอันรื่นเริง
+A cubic grain of sand that sparkles brightly.	เม็ดทรายทรงลูกบาศก์ที่แวววาวจ้า
+A curious object that almost seems alive and it faintly whispers to you.	ของประหลาดที่เหมือนมีชีวิต แว่วเสียงกระซิบเบาๆ
+A cursed bow that killed a hero of an ancient nation long ago.	ธนูต้องคำสาปที่เคยสังหารวีรบุรุษของชาติโบราณ
+A cursed brooch which, ironically, was owned by the goddess of fortune.	เข็มกลัดต้องคำสาป ที่น่าขันคือเจ้าของเดิมคือเทพีแห่งโชคลาภ
+A cursed dagger forged out of a monster's tooth that causes insanity to whoever wields it.	มีดสั้นต้องคำสาปที่ตีจากฟันมอนสเตอร์ ใครถือก็เสียสติ
+A cursed doll hung on a rope.	ตุ๊กตาต้องคำสาปที่แขวนอยู่กับเชือก
+A cursed weapon that longs for the destruction of all living beings, including its owner, and secludes them to a life of misery.	อาวุธต้องคำสาปที่กระหายจะทำลายทุกชีวิต รวมถึงเจ้าของเอง และสาปให้เขาอยู่อย่างทุกข์ทรมาน
+A cuspid wrenched from a gruesome orc's jaw.	เขี้ยวที่กระชากมาจากขากรรไกรออร์คน่าขยะแขยง
+A cute and romantic white flower that is both fashionable and functional.	ดอกไม้ขาวน่ารักโรแมนติก สวยด้วยใช้ได้จริงด้วย
+A cute cap that makes its wearer almost as cool as a Galapago, but only almost.	หมวกน่ารักที่ใส่แล้วเท่เกือบเท่า Galapago แค่เกือบนะ
+A cute cotton doll that's a frequent favorite for little girls.	ตุ๊กตาผ้าฝ้ายน่ารัก เด็กผู้หญิงชอบกันมาก
+A cute diary which details a young girl's closest secrets, you can't bear the thought of reading it.	ไดอารีน่ารักที่บันทึกความลับสุดหัวใจของเด็กสาว อ่านไม่ลงจริงๆ
+A cute doll that resembles a Poring.	ตุ๊กตาน่ารักหน้าตาเหมือน Poring
+A cute hairpin with a heart attached to it, both adorable and charming!	ปิ่นปักผมน่ารักติดรูปหัวใจ ทั้งน่ารักทั้งมีเสน่ห์!
+A cute headgear made in the form of a Deviruchi.	หมวกน่ารักรูป Deviruchi
+A cute headgear made in the form of a Panda.	หมวกน่ารักรูปแพนด้า
+A cute headgear made in the form of a Poring.	หมวกน่ารักรูป Poring
+A cute headgear made in the form of a Sea Otter.	หมวกน่ารักรูปนากทะเล
+A cute headgear made in the form of a Smokie.	หมวกน่ารักรูป Smokie
+A cute headgear made in the form of a Spore.	หมวกน่ารักรูป Spore
+A cute kitty doll that is just adorable.	ตุ๊กตาแมวน่ารัก น่าเอ็นดูสุดๆ
+A cute pair of adorable puppy ears.	หูลูกหมาน่ารักคู่หนึ่ง
+A dagger commonly used by assassins.	มีดสั้นที่นักฆ่าใช้กันทั่วไป
+A dagger crafted by pickpockets to assist them in their daily life.	มีดสั้นที่นักล้วงกระเป๋าทำขึ้นใช้ในชีวิตประจำวัน
+A dagger crafted from a dragon's fang that can easily pierce dragon scales.	มีดสั้นที่ทำจากเขี้ยวมังกร แทงทะลุเกล็ดมังกรได้สบาย
+A dagger crafted in the ancient, traditional ways of a small desert tribe.	มีดสั้นที่ทำตามวิถีโบราณของชนเผ่าเล็กๆ ในทะเลทราย
+A dagger held in the left hand to parry attacks.	มีดสั้นที่ถือมือซ้ายไว้ปัดป้องการโจมตี
+A dagger imbued with the lunar spirit that drains the enemy's soul.	มีดสั้นที่อาบด้วยวิญญาณจันทรา ดูดวิญญาณศัตรู
+A dagger invented by a cowardly thief who prioritized defense.	มีดสั้นที่โจรขี้ขลาดคิดค้นขึ้น เพราะเน้นป้องกันตัวไว้ก่อน
+A dagger made from pure obsidian glass that shines eerily.	มีดสั้นที่ทำจากหินออบซิเดียนบริสุทธิ์ เปล่งประกายชวนขนลุก
+A dagger possessed by evil and given power by hatred and malice.	มีดสั้นที่ถูกความชั่วร้ายสิงสู่ ได้พลังจากความเกลียดชังและอาฆาต
+A dagger that can be effectively used to start a fire.	มีดสั้นที่ใช้จุดไฟได้ดี
+A dagger that has a high chance to do critical damage.	มีดสั้นที่ออกคริติคอลบ่อย
+A dagger that has a shining white blade crafted of bone.	มีดสั้นใบมีดขาวเป็นประกาย ทำจากกระดูก
+A dagger that symbolizes the potential of Alchemy.	มีดสั้นที่เป็นสัญลักษณ์ของศักยภาพแห่งวิชาเล่นแร่แปรธาตุ
+A dagger topped with a hook that can catch and break weapons.	มีดสั้นปลายมีตะขอ ไว้เกี่ยวและหักอาวุธศัตรู
+A dagger used by fishermen to catch shellfish and oysters.	มีดสั้นที่ชาวประมงใช้งัดหอย
+A dagger with an unnaturally dark colored blade, there is an instinctive sense of danger wielding this weapon.	มีดสั้นใบมีดดำผิดธรรมชาติ ถือแล้วรู้สึกอันตรายโดยสัญชาตญาณ
+A damaged diamond with obvious imperfections.	เพชรที่เสียหาย มีตำหนิเห็นชัด
+A damaged sword that is no longer usable.	ดาบที่พังจนใช้ไม่ได้แล้ว
+A damaged turtle's shell, that in ancient times, was used to foretell the future.	กระดองเต่าที่แตกร้าว สมัยโบราณใช้ทำนายอนาคต
+A dark and stylish hat that was popularized by smooth crooners.	หมวกสีเข้มดูเท่ ฮิตขึ้นมาเพราะนักร้องเสียงนุ่ม
+A dark ash imbued with mysterious magical power and darkness.	เถ้าถ่านดำที่อาบด้วยพลังเวทลึกลับและความมืด
+A dark blue jewel that is the birthstone for September.	อัญมณีสีน้ำเงินเข้ม หินประจำเดือนกันยายน
+A dark colored mask that covers the entire face.	หน้ากากสีเข้มที่ปิดทั้งใบหน้า
+A dark crystal kept in perpetual shadow, regardless of your attempts to place it in sunlight.	คริสตัลดำที่อยู่ในเงามืดตลอดเวลา เอาไปตากแดดยังไงก็ไม่เปลี่ยน
+A dark dagger whose hilt is crafted from a black dragon scale.	มีดสั้นสีดำ ด้ามทำจากเกล็ดมังกรดำ
+A dark fragment that seems to absorb any light you shine onto it.	เศษชิ้นส่วนสีดำที่ดูดกลืนแสงทุกอย่างที่ส่องเข้าไป
+A dark heart stamped with a bloody seal.	หัวใจสีดำที่ประทับตราเลือดไว้
+A dark mask worn by assassins.	หน้ากากสีดำที่นักฆ่าใส่กัน
+A dark oval stone with seven red eyes that's believed to act as a monster nucleus.	หินรีสีดำที่มีตาแดง 7 ดวง เชื่อกันว่าเป็นแกนกลางของมอนสเตอร์
+A dark red jewel that is the birthstone for January.	อัญมณีสีแดงเข้ม หินประจำเดือนมกราคม
+A dark red, heart shaped stone imbued with fire.	หินสีแดงเข้มรูปหัวใจ อาบด้วยธาตุไฟ
+A dark staff that is covered with thorns.	ไม้เท้าสีดำที่ปกคลุมด้วยหนาม
+A dark, stylish shotgun.	ปืนลูกซองสีเข้ม ดูเท่
+A dazzling guitar that bewitches its user to play songs of passion.	กีตาร์เปล่งประกาย สะกดให้คนเล่นบรรเลงเพลงเร่าร้อน
+A decorative dagger engraved with luxurious emblems.	มีดสั้นประดับ สลักตราสัญลักษณ์หรูหรา
+A decorative horn from a wooden dragon mask.	เขาประดับจากหน้ากากมังกรไม้
+A decorative spear imbued with wind.	หอกประดับที่อาบด้วยธาตุลม
+A decorative, beautiful golden pistol.	ปืนพกทองคำงดงาม ไว้ประดับ
+A delicate and fragile plant that is in the early stages of growth.	ต้นอ่อนบอบบางที่เพิ่งเริ่มเติบโต
+A delicate flower found in the depths of Brasilis.	ดอกไม้บอบบางที่พบในป่าลึกของ Brasilis
+A delicate flower that is placed in the mouth for a seductive look.	ดอกไม้บอบบางที่คาบไว้ในปากเพื่อความยั่วยวน
+A delicious and sweet treat made from ground cacao and milk.	ขนมหวานอร่อย ทำจากผงโกโก้บดกับนม
+A delicious, frosty ice cream that can cause a brain freeze.	ไอศกรีมเย็นเจี๊ยบแสนอร่อย กินเร็วไปแล้วปวดหัว
+A deliciously sweet bread, haunted by flavor.	ขนมปังหวานอร่อย รสชาติหลอนติดลิ้น
+A delivery package containing a bag of flour and eggs.	พัสดุส่งของ ข้างในมีถุงแป้งกับไข่
+A dentist's scalpel that can impede the victim's ability to speak.	มีดผ่าตัดของหมอฟัน ทำให้เหยื่อพูดไม่ได้
+A device that can measure the ground's temperature, however it isn't very reliable.	อุปกรณ์วัดอุณหภูมิพื้นดิน แต่ไม่ค่อยแม่นเท่าไหร่
+A dewy, green moss that grows in cool places.	มอสเขียวชุ่มน้ำค้าง ขึ้นในที่เย็น
+A diamond that emits an ominous vibe; it seems that it would be incredibly valuable.	เพชรที่แผ่ออร่าลางร้าย ดูแล้วน่าจะมีค่ามหาศาล
+A dish that is easy for beginner chefs; it has a fresh, grassy taste.	เมนูง่ายๆ สำหรับมือใหม่หัดทำอาหาร รสชาติสดชื่นแบบผักหญ้า
+A dish that looks unappetizing, but its taste and scent are quite pleasant.	เมนูที่หน้าตาไม่ชวนกิน แต่รสและกลิ่นดีทีเดียว
+A disposable gold hammer that is is used to forge <color=#000088>Lv 2 Weapons</color>.	ค้อนทองแบบใช้ครั้งเดียว ใช้ตี<color=#000088>อาวุธ Lv 2</color>
+A disposable oridecon hammer that is used to forge <color=#000088>Lv 3 Weapons</color>.	ค้อน Oridecon แบบใช้ครั้งเดียว ใช้ตี<color=#000088>อาวุธ Lv 3</color>
+A disposable steel hammer that is is used to forge <color=#000088>Lv 1 Weapons</color>.	ค้อนเหล็กแบบใช้ครั้งเดียว ใช้ตี<color=#000088>อาวุธ Lv 1</color>
+A disposable, miniature blast furnace that can be easily carried and is consumed when forging metals.	เตาหลอมจิ๋วแบบพกพา ใช้ครั้งเดียวหมดตอนหลอมโลหะ
+A doll imbued with Baphomet's curse.	ตุ๊กตาที่อาบด้วยคำสาปของ Baphomet
+A doll made in the appearance of a young girl.	ตุ๊กตาที่ทำเป็นรูปเด็กผู้หญิง
+A doll that resembles a Rocker, a grasshopper that plays its violin.	ตุ๊กตารูป Rocker ตั๊กแตนที่สีไวโอลินเป็น
+A doll that resembles a Smokie, a raccoon that has the power of invisibility.	ตุ๊กตารูป Smokie แรคคูนที่ล่องหนได้
+A doll that resembles a Yoyo, a monkey that is familiar with humans.	ตุ๊กตารูป Yoyo ลิงที่คุ้นเคยกับมนุษย์
+A domestic knife used by housewives, or househusbands, for cooking.	มีดในครัวเรือน แม่บ้านหรือพ่อบ้านใช้ทำกับข้าว
+A double bladed katar that inflicts incurable wounds.	กะทาสองใบมีด สร้างบาดแผลที่รักษาไม่หาย
+A dragon's cuspid that is sharp enough to pierce dragon scales.	เขี้ยวมังกร คมพอจะแทงทะลุเกล็ดมังกรได้
+A dragonfly wing.	ปีกแมลงปอ
+A dreadful dagger that has been soaked in toxin.	มีดสั้นน่าสะพรึงที่แช่ยาพิษมา
+A dried bone hand, it has an air of mystery.	มือกระดูกแห้ง แผ่ความลึกลับออกมา
+A drink made from chocolate and milk from one of the Royal Court Dessert Specialist's recipes. Although the chef wishes for people to drink this treat elegantly, it's usually gulped down.	เครื่องดื่มช็อกโกแลตนม ตามสูตรของผู้เชี่ยวชาญขนมหวานประจำราชสำนัก เชฟอยากให้คนค่อยๆ จิบอย่างสง่างาม แต่ส่วนใหญ่ก็ซดรวดเดียวหมด
+A dull edged, rusty kitchen knife stained with blood.	มีดครัวขึ้นสนิม คมทื่อ เปื้อนเลือด
+A durable mask for welders made from a fat metal plate.	หน้ากากช่างเชื่อมที่ทนทาน ทำจากแผ่นโลหะหนา
+A durable safety helmet with a flashlight attachment for exploring dark areas.	หมวกนิรภัยทนทาน ติดไฟฉายไว้สำรวจที่มืด
+A durable safety helmet.	หมวกนิรภัยที่ทนทาน
+A entree of processed food for monsters.	อาหารแปรรูปสำหรับมอนสเตอร์
+A extra key for Kiel Hyre's Cottage back door.	กุญแจสำรองประตูหลังกระท่อมของ Kiel Hyre
+A fabric packet that holds needles in place.	ซองผ้าไว้เก็บเข็ม
+A fabulous, feathered hat that turns men into womanizers and women into manizers.	หมวกขนนกสุดหรู ผู้ชายใส่แล้วเจ้าชู้ ผู้หญิงใส่แล้วก็เจ้าชู้เหมือนกัน
+A face mask worn by those who have trouble sleeping.	ผ้าปิดตาสำหรับคนนอนไม่หลับ
+A facsimile of the mighty hammer wielded by Thor, god of thunder.	ของจำลองค้อนมหาเทพของ Thor เทพสายฟ้า
+A faint, transparent robe worn by celestial maidens when they fly through the heavens.	เสื้อคลุมบางใสที่นางฟ้าสวมตอนเหาะข้ามสวรรค์
+A famous huuma that is shaped like a wing.	ฮูมะชื่อดัง รูปทรงเหมือนปีก
+A famous novel by a kRO player that details Chef Orleans	นิยายชื่อดังที่ผู้เล่น kRO เขียนถึง Chef Orleans
+A famous novel by a kRO player that details the Kafra Corporation.	นิยายชื่อดังที่ผู้เล่น kRO เขียนถึงบริษัท Kafra
+A famous sword sharp enough to divide oceans or cut the air to make it bleed water.	ดาบชื่อดังที่คมจนผ่ามหาสมุทรได้ ฟันอากาศแล้วอากาศยังเลือดตกเป็นน้ำ
+A fancy cape fashioned after those worn by genteel marquises of a bygone age.	ผ้าคลุมหรู ทำตามแบบที่ท่านมาควิสสมัยก่อนใส่กัน
+A fancy cape said to have once been worn by marquises long ago.	ผ้าคลุมหรู ว่ากันว่าท่านมาควิสสมัยโบราณเคยใส่
+A fancy, feathered cap made of smooth, sky blue material.	หมวกขนนกหรู ทำจากผ้าเนื้อเนียนสีฟ้า
+A fancy, intricately decorated bracelet.	กำไลหรู ตกแต่งอย่างประณีต
+A fancy, rainbow colored key that enables access to Kiel Hyre's Factory and Laboratory.	กุญแจสีรุ้งสวยหรู เปิดโรงงานและห้องแล็บของ Kiel Hyre ได้
+A fashion accessory used in clown or town drunk costumes.	เครื่องประดับสำหรับชุดตัวตลกหรือขี้เมาประจำเมือง
+A fashionable, wide brimmed hat that's perfect for blocking the sun.	หมวกปีกกว้างทันสมัย บังแดดได้ดีเยี่ยม
+A fearsome sword that has slain many warriors in battle.	ดาบน่าสะพรึงที่สังหารนักรบมานับไม่ถ้วน
+A fearsome weapon with a unique curved blade.	อาวุธน่าสะพรึง ใบมีดโค้งเป็นเอกลักษณ์
+A feather from a Harpy.	ขนของ Harpy
+A feather from an angel's wing.	ขนจากปีกเทวดา
+A feather that is soft enough to be used as stuffing in a quilt.	ขนที่นุ่มพอจะเอาไปยัดผ้านวมได้
+A festive hat for celebrations and parties.	หมวกสำหรับงานฉลองและปาร์ตี้
+A festive party hat.	หมวกปาร์ตี้
+A fetid drink made of monster blood.	เครื่องดื่มกลิ่นเหม็นที่ทำจากเลือดมอนสเตอร์
+A figure of a hand that contains great religious symbolism.	รูปปั้นมือที่มีความหมายทางศาสนาลึกซึ้ง
+A file containing all of the details of the Shinokas case.	แฟ้มที่รวมรายละเอียดทั้งหมดของคดี Shinokas
+A file folder that holds unknown documents.	แฟ้มเอกสารที่ไม่รู้ว่าข้างในมีอะไร
+A file folder, protected by a seal, that contains unknown documents.	แฟ้มเอกสารที่ผนึกไว้ ไม่รู้ว่าข้างในมีอะไร
+A finely woven, silk robe that has been enchanted with magic.	เสื้อคลุมไหมทอละเอียด ร่ายเวทเอาไว้
+A firearm used by gunslingers to brave the wilderness.	ปืนที่มือปืนใช้ฝ่าดงถิ่นทุรกันดาร
+A firearm with a focus on range and accuracy.	ปืนที่เน้นระยะยิงและความแม่นยำ
+A firecracker that reads 'Happy Birthday'.	ประทัดที่เขียนว่า 'Happy Birthday'
+A firecracker that reads 'Happy Valentine's Day'.	ประทัดที่เขียนว่า 'Happy Valentine's Day'
+A firecracker that reads 'Happy Whiteday'.	ประทัดที่เขียนว่า 'Happy Whiteday'
+A firecracker that reads 'I love you'.	ประทัดที่เขียนว่า 'I love you'
+A firecracker that reads 'Merry Christmas'.	ประทัดที่เขียนว่า 'Merry Christmas'
+A firm, smelly, mushroom used in medicinal purposes.	เห็ดเนื้อแน่นกลิ่นแรง ใช้ทำยา
+A fishing lure.	เหยื่อตกปลา
+A fist covering that enhances your physical strength.	เครื่องสวมหมัดที่เพิ่มพละกำลัง
+A fistful of Kobold hair that appears bristly but is actually downy soft.	กระจุกขน Kobold ดูแข็งกระด้างแต่จริงๆ นุ่มฟู
+A fistful of bristly, tough hair from a wild boar.	กระจุกขนหมูป่า แข็งและเหนียว
+A fistful of butterfly wing powder that sparkles with the power of fantasy.	กระจุกผงปีกผีเสื้อ แวววาวด้วยพลังแห่งจินตนาการ
+A fistful of sharp, hollow quills that used to protect a porcupine.	กระจุกขนเม่นแหลมกลวง เคยใช้ป้องกันตัว
+A fistfull of whiskers from a mole.	กระจุกหนวดตัวตุ่น
+A flail, entirely covered in spikes, that swing wildly and haphazardly.	กระบองโซ่ที่เต็มไปด้วยหนามแหลม เหวี่ยงมั่วไปหมด
+A flamboyant hat worn by the strongest pirates.	หมวกฉูดฉาดของโจรสลัดที่แข็งแกร่งที่สุด
+A flaming arrow.	ลูกศรเพลิง
+A flaming bow that seems dangerous to grasp but is cool to the touch.	ธนูเพลิงที่ดูเหมือนจับแล้วไหม้ แต่จริงๆ เย็นเฉียบ
+A flanged, solid club that is effective for simple smashing.	กระบองตันมีสัน ทุบอย่างเดียวก็เอาอยู่
+A flashlight that used to be attached to a miner's helmet.	ไฟฉายที่เคยติดอยู่บนหมวกคนงานเหมือง
+A flat and transparent black key which enables access to a front door.	กุญแจแบนใสสีดำ ใช้เปิดประตูหน้า
+A flat, translucent blue keycard that grants access to Allysia's hideout.	คีย์การ์ดแบนใสสีน้ำเงิน เปิดเข้าที่ซ่อนของ Allysia ได้
+A flat, translucent green keycard that enables access to a secret safe.	คีย์การ์ดแบนใสสีเขียว เปิดตู้เซฟลับได้
+A flat, translucent red keycard that grants access to a restricted area.	คีย์การ์ดแบนใสสีแดง เข้าเขตหวงห้ามได้
+A flat, translucent yellow keycard that grants access to Kiel Hyre laboratory.	คีย์การ์ดแบนใสสีเหลือง เข้าห้องแล็บของ Kiel Hyre ได้
+A flexible material that returns to its original form after being stretched.	วัสดุยืดหยุ่นที่ดึงแล้วกลับคืนรูปเดิม
+A flexible, prehensile, and boneless appendage.	หนวดที่ยืดหยุ่น ม้วนจับของได้ และไม่มีกระดูก
+A floral decoration that may be worn.	เครื่องประดับดอกไม้ที่ใส่ได้
+A flower containing oils that relieve pain and aches.	ดอกไม้ที่มีน้ำมันช่วยบรรเทาอาการปวดเมื่อย
+A flower from Wishmaiden Valkyrie.	ดอกไม้จาก Wishmaiden Valkyrie
+A flower rarely seen by humans, it shines brilliantly under the light of the moon.	ดอกไม้ที่มนุษย์แทบไม่เคยเห็น เปล่งประกายเจิดจ้าใต้แสงจันทร์
+A flower that has been miraculously blessed with the gift of song.	ดอกไม้ที่ได้รับพรอัศจรรย์ให้ขับขานบทเพลงได้
+A flower with a very strong scent that induces powerful hallucinations if eaten.	ดอกไม้กลิ่นแรงมาก กินแล้วเห็นภาพหลอนหนัก
+A flute made by a shepherd who has a talent for music.	ขลุ่ยที่คนเลี้ยงแกะผู้มีพรสวรรค์ด้านดนตรีทำขึ้น
+A fly wing from the Novice Training Grounds.	ปีกแมลงวันจากลานฝึก Novice
+A folding fan that is useful in summer.	พัดพับ ใช้ดีในหน้าร้อน
+A food with an acquired taste and unique scent.	อาหารที่ต้องกินให้ชิน กลิ่นเป็นเอกลักษณ์
+A forbidden book that details the secret for summoning high level demons.	หนังสือต้องห้ามที่บอกวิธีเรียกปีศาจชั้นสูง
+A forbidden talisman that can reanimate the dead, resulting in a walking corpse or undead zombie.	ยันต์ต้องห้ามที่ปลุกคนตายให้ลุกขึ้นเดินได้ กลายเป็นศพเดินได้หรือซอมบี้
+A formal decorative sword imbued with fire.	ดาบพิธีการประดับ อาบด้วยธาตุไฟ
+A formal decorative sword imbued with water.	ดาบพิธีการประดับ อาบด้วยธาตุน้ำ
+A formal decorative sword imbued with wind.	ดาบพิธีการประดับ อาบด้วยธาตุลม
+A formal suit for formal occassions.	ชุดสูทสำหรับงานพิธีการ
+A formal suit worn by the groom during a wedding ceremony.	ชุดสูทที่เจ้าบ่าวใส่ในพิธีแต่งงาน
+A formless sword that can ravage the enemy's mind.	ดาบไร้รูปที่บั่นทอนจิตใจศัตรู
+A fragment of Vesper that endows agility.	เศษชิ้นส่วนของ Vesper ที่ให้ความคล่องแคล่ว
+A fragment of Vesper that endows dexterity.	เศษชิ้นส่วนของ Vesper ที่ให้ความแม่นยำ
+A fragment of Vesper that endows intelligence.	เศษชิ้นส่วนของ Vesper ที่ให้สติปัญญา
+A fragment of Vesper which endows strength.	เศษชิ้นส่วนของ Vesper ที่ให้พละกำลัง
+A fragment of armor from the fallen valkyrie, Breunhilt.	เศษเกราะของ Breunhilt วาลคีรีผู้ล่วงลับ
+A fragment of ashes of the fallen hero, Siglude.	เศษเถ้าถ่านของ Siglude วีรบุรุษผู้ล่วงลับ
+A fragment of the ring of Andvary protected by the dragon Pavvnir.	เศษแหวนของ Andvary ที่มังกร Pavvnir เฝ้าอยู่
+A fragment that is the manifestation of intense hatred.	เศษชิ้นส่วนที่เป็นรูปธรรมของความเกลียดชังรุนแรง
+A fragment that is the manifestation of pure misery.	เศษชิ้นส่วนที่เป็นรูปธรรมของความทุกข์ระทมบริสุทธิ์
+A fragment that is the manifestation of sheer agony.	เศษชิ้นส่วนที่เป็นรูปธรรมของความเจ็บปวดแสนสาหัส
+A fragment that is the manifestation of unfathomable despair.	เศษชิ้นส่วนที่เป็นรูปธรรมของความสิ้นหวังอันหยั่งไม่ถึง
+A fragrant carrot colored with all the hues of the rainbow.	แครอทหอมกรุ่นที่มีสีครบทุกสีของรุ้ง
+A fragrant grape and red mushroom wine.	ไวน์องุ่นผสมเห็ดแดง กลิ่นหอม
+A fragrant hairband crafted from only the daintiest of flowers.	ที่คาดผมหอมกรุ่น ร้อยจากดอกไม้ที่บอบบางที่สุดเท่านั้น
+A fresh and juicy satay made from thick tendons.	สะเต๊ะสดฉ่ำ ทำจากเอ็นเนื้อหนา
+A fresh fish that can be cooked in a variety of ways.	ปลาสด เอาไปทำอาหารได้สารพัด
+A fresh loaf of bread that gives off a wholesome scent.	ขนมปังก้อนสดใหม่ กลิ่นหอมน่ากิน
+A fresh, young twig that evokes feelings of purity and innocence.	กิ่งอ่อนสดใหม่ ให้ความรู้สึกบริสุทธิ์ไร้เดียงสา
+A freshly scented and thorny tree fruit.	ผลไม้เปลือกหนาม กลิ่นสดชื่น
+A fried scorpion tail, that is as nutritious as it is tasty.	หางแมงป่องทอด อร่อยและมีประโยชน์พอๆ กัน
+A frozen bow whose drawstring seems too solid to be pulled.	ธนูเยือกแข็ง สายดูแข็งจนน่าจะดึงไม่ขึ้น
+A frozen heart that gives you chill when you touch it.	หัวใจเยือกแข็ง แตะแล้วหนาวสั่น
+A fruit from the Yggdrasil tree, its fantastic taste is full of life.	ผลไม้จากต้น Yggdrasil รสชาติวิเศษ เปี่ยมด้วยพลังชีวิต
+A fruit juice cocktail perfectly chilled.	ค็อกเทลน้ำผลไม้ แช่เย็นกำลังดี
+A funky smelling, and suspicious looking, stew that makes you feel immortal.	สตูว์กลิ่นแปลกๆ หน้าตาน่าสงสัย แต่กินแล้วรู้สึกเป็นอมตะ
+A funnel shaped device that can amplify one's voice.	อุปกรณ์ทรงกรวย ใช้ขยายเสียง
+A fur coat made from Lunatic hide.	เสื้อขนสัตว์ที่ทำจากหนัง Lunatic
+A furry hat that is an all time favorite during the winter.	หมวกขนปุย ขวัญใจตลอดกาลของหน้าหนาว
+A gardening tool that could also be a fearful weapon.	อุปกรณ์ทำสวนที่เอามาใช้เป็นอาวุธน่ากลัวได้
+A garment exclusive to the Novice Training Grounds.	ผ้าคลุมเฉพาะของลานฝึก Novice
+A garment fashioned from Tendrilion leather covered in plant matter.	ผ้าคลุมที่ทำจากหนัง Tendrilion ปกคลุมด้วยเศษพืช
+A garment fashioned out of Lucifer's skin.	ผ้าคลุมที่ทำจากหนังของ Lucifer
+A garment that's so warm, it makes the wearer feel as if a dragon is breathing on them.	ผ้าคลุมที่อุ่นจนรู้สึกเหมือนมังกรกำลังพ่นลมหายใจใส่
+A gatling gun which evokes the image of a lonely traveler.	ปืนกลแกตลิงที่ชวนให้นึกถึงนักเดินทางผู้โดดเดี่ยว
+A gatling gun with enormous destructive power.	ปืนกลแกตลิงที่มีอานุภาพทำลายล้างมหาศาล
+A gem that is key to opening the path to the mysterious, ancient land of Geffenia.	อัญมณีที่เป็นกุญแจเปิดทางสู่ดินแดนโบราณลึกลับ Geffenia
+A gem-rich ore, you wonder if it is possible to extract them somehow.	แร่ที่มีอัญมณีอยู่เยอะ สงสัยว่าจะสกัดออกมาได้ยังไง
+A giant sword used by ancient war generals.	ดาบยักษ์ที่ขุนพลสมัยโบราณใช้
+A giant sword, made from a dragon's tooth, that can easily cut through dragon scales.	ดาบยักษ์ที่ทำจากฟันมังกร ฟันทะลุเกล็ดมังกรได้สบาย
+A gigantic, ridiculously heavy axe that requires great strength to use.	ขวานยักษ์ที่หนักอย่างเหลือเชื่อ ต้องมีพละกำลังมหาศาลถึงจะใช้ได้
+A glittering orb that can light the suroundings with fanciful lights for 30 seconds.	ลูกแก้วเปล่งประกายที่ส่องสว่างรอบตัวด้วยแสงวิบวับ นาน 30 วินาที
+A gloppy, unpleasant lump of wet, dirty mud.	ก้อนโคลนเปียกสกปรก เละๆ น่าขยะแขยง
+A glove that is a favorite amongst librarians.	ถุงมือขวัญใจบรรณารักษ์
+A glove that is amazingly light and is suitable with any weapon.	ถุงมือที่เบาอย่างเหลือเชื่อ เข้ากับอาวุธได้ทุกชนิด
+A glove worn by a palace chef with exceptional dexterity.	ถุงมือของเชฟประจำวัง ผู้มีความคล่องแคล่วเป็นเลิศ
+A glove worn during executions that absorbed memories related to death and obligation.	ถุงมือที่ใส่ตอนประหารชีวิต ซึมซับความทรงจำเรื่องความตายและหน้าที่เอาไว้
+A glowing necklace enchanted with an ancient magic.	สร้อยคอเรืองแสงที่ร่ายเวทโบราณเอาไว้
+A glowing, blood red rune with ancient symbols engraved within.	รูนเรืองแสงสีแดงเลือด สลักสัญลักษณ์โบราณไว้ข้างใน
+A glowing, dark black rune with ancient symbols engraved within.	รูนเรืองแสงสีดำสนิท สลักสัญลักษณ์โบราณไว้ข้างใน
+A gnarl of a tree.	ปุ่มปมของต้นไม้
+A gnarly, sharp cuspid from a cursed orc.	เขี้ยวแหลมบิดเบี้ยวจากออร์คต้องคำสาป
+A golden anvil, high quality products can be made with this!	ทั่งทองคำ ตีของคุณภาพสูงได้ด้วยตัวนี้!
+A golden jewel that is the birthstone for November.	อัญมณีสีทอง หินประจำเดือนพฤศจิกายน
+A golden masque worn by an ancient king.	หน้ากากทองคำที่กษัตริย์โบราณสวม
+A golden, shining bead that is the symbol of the sun god.	ลูกปัดทองเปล่งประกาย สัญลักษณ์ของสุริยเทพ
+A gooey, scented, mushroom used in medicinal purposes.	เห็ดเหนียวหนึบกลิ่นหอม ใช้ทำยา
+A gorgeous mirror of polished crystal that is an essential for women everywhere.	กระจกคริสตัลขัดเงางดงาม ของจำเป็นของผู้หญิงทุกคน
+A grasp of facial hair from a woman, in theory, this should be very rare.	กระจุกหนวดของผู้หญิง ตามทฤษฎีแล้วน่าจะหายากมาก
+A green jewel that is the birthstone for May.	อัญมณีสีเขียว หินประจำเดือนพฤษภาคม
+A green satin hairpin that wards off harmful magic.	ปิ่นปักผมซาตินสีเขียว ป้องกันเวทร้าย
+A green translucent liquid that is disgustingly sticky.	ของเหลวสีเขียวใส เหนียวเหนอะน่าขยะแขยง
+A grenade launcher that propels bullets with hellfire.	เครื่องยิงลูกระเบิดที่ขับกระสุนด้วยไฟนรก
+A grenade pack that contains 500 Blind Grenades.	ห่อลูกระเบิด บรรจุ Blind Grenade 500 ลูก
+A grenade pack that contains 500 Flare Grenades.	ห่อลูกระเบิด บรรจุ Flare Grenade 500 ลูก
+A grenade pack that contains 500 Freezing Grenades.	ห่อลูกระเบิด บรรจุ Freezing Grenade 500 ลูก
+A grenade pack that contains 500 Lightning Grenades.	ห่อลูกระเบิด บรรจุ Lightning Grenade 500 ลูก
+A grenade pack that contains 500 Poison Grenades.	ห่อลูกระเบิด บรรจุ Poison Grenade 500 ลูก
+A grenade shell imbued with the fire property.	ลูกระเบิดที่อาบด้วยธาตุไฟ
+A grenade shell imbued with the shadow property.	ลูกระเบิดที่อาบด้วยธาตุมืด
+A grenade shell imbued with the water property.	ลูกระเบิดที่อาบด้วยธาตุน้ำ
+A grenade shell imbued with the wind property.	ลูกระเบิดที่อาบด้วยธาตุลม
+A grenade shell that contains deadly poison.	ลูกระเบิดที่บรรจุยาพิษร้ายแรง
+A gruesome sword used to behead criminals judged with the death penalty.	ดาบน่าขนลุกที่ใช้ตัดคอนักโทษประหาร
+A hair accessory fashioned after Sohee's golden bells.	เครื่องประดับผมที่ทำตามแบบกระดิ่งทองของ Sohee
+A hair accessory shaped like an X.	เครื่องประดับผมรูปกากบาท
+A hair accessory that looks like two crossed band aids.	เครื่องประดับผมที่ดูเหมือนพลาสเตอร์ยาไขว้กัน
+A hair ornament that was kissed by the Super Novice's Guardian Angel.	เครื่องประดับผมที่เทวดาผู้พิทักษ์ของ Super Novice จุมพิตไว้
+A hair ornament worn by ancient queens.	เครื่องประดับผมที่ราชินีโบราณสวม
+A hairband fashioned with cute kitty ears, meow!	ที่คาดผมติดหูแมวน่ารัก เมี้ยว!
+A hairband fashioned with rabbit ears, a symbol of good luck.	ที่คาดผมติดหูกระต่าย สัญลักษณ์แห่งโชคดี
+A hairband that holds hair in place, it's cute on gals but on guys it's something else.	ที่คาดผมไว้รวบผม ผู้หญิงใส่แล้วน่ารัก ผู้ชายใส่แล้ว...ก็อีกเรื่องหนึ่ง
+A hairband with a cross attached.	ที่คาดผมติดไม้กางเขน
+A hairband with a light bulb attached.	ที่คาดผมติดหลอดไฟ
+A hairpin in the shape of a crescent.	ปิ่นปักผมรูปพระจันทร์เสี้ยว
+A hairpin which resembles the shape of a cat's paw.	ปิ่นปักผมรูปอุ้งเท้าแมว
+A hairpin with a red flower attached.	ปิ่นปักผมติดดอกไม้สีแดง
+A hammer that has been used for refinement.	ค้อนที่ใช้ตีบวกของ
+A handful of plant stems that can be used in alchemy.	กำก้านพืช ใช้ในวิชาเล่นแร่แปรธาตุได้
+A handful of roots that are fibrous enough to be used as rope.	กำรากไม้ที่เหนียวพอจะเอาไปทำเชือกได้
+A handful of snake scales that can make flamboyant clothes.	กำเกล็ดงู เอาไปทำเสื้อผ้าฉูดฉาดได้
+A handful of soft, powdery mold that is silken to the touch.	กำราขุยนุ่ม สัมผัสลื่นเหมือนไหม
+A hard and sharp horn.	เขาแข็งและแหลมคม
+A hard crab shell that smells horrible.	กระดองปูแข็งๆ ที่กลิ่นแย่มาก
+A hard horn that grows on Hilsrion's head.	เขาแข็งที่งอกบนหัว Hilsrion
+A hard horn that grows on Tendrilion's head.	เขาแข็งที่งอกบนหัว Tendrilion
+A hard shell taken from a dead clam.	เปลือกแข็งที่แกะมาจากหอยที่ตายแล้ว
+A hard shell that obviously failed to protect a turtle.	กระดองแข็งที่เห็นชัดว่าปกป้องเต่าไม่สำเร็จ
+A hard shell that was used for protection.	เปลือกแข็งที่เคยใช้ป้องกันตัว
+A hard, firm-looking shield made from Naga scales.	โล่แข็งแกร่งดูมั่นคง ทำจากเกล็ด Naga
+A hard, gray skin.	หนังแข็งสีเทา
+A hard, spiral shaped snail shell.	เปลือกหอยทากแข็ง ทรงเกลียว
+A hardy helmet crafted by orc smiths.	หมวกเกราะทนทานที่ช่างตีเหล็กออร์คทำขึ้น
+A hat fashioned from a nut shell, it provides excellent defence but is very delicate.	หมวกที่ทำจากเปลือกถั่ว ป้องกันดีเยี่ยมแต่เปราะมาก
+A hat knitted together with straw.	หมวกสานจากฟาง
+A hat made from animal fur that keeps your ears warm in the bitter cold.	หมวกขนสัตว์ที่ทำให้หูอุ่นในอากาศหนาวจัด
+A hat made to resemble a banana peel that causes a primal reaction of pure rage.	หมวกรูปเปลือกกล้วย ใส่แล้วคนเห็นโมโหขึ้นมาโดยสัญชาตญาณ
+A hat resembling a blooming water lily.	หมวกรูปดอกบัวบาน
+A hat shaped like fecal matter that is guaranteed to end a date on a tragic note.	หมวกรูปอุจจาระ ใส่ไปเดตรับรองว่าจบไม่สวยแน่นอน
+A hat that Antonio used to wear.	หมวกที่ Antonio เคยใส่
+A hat that covers the entire face, but it has two holes that you can see through.	หมวกที่คลุมทั้งหน้า แต่เจาะรูไว้สองรูให้มองเห็น
+A hat that looks just like a pacifier, it brings you back to the good old days of hanging in the crib.	หมวกที่หน้าตาเหมือนจุกนมหลอก ใส่แล้วคิดถึงวันเก่าๆ ตอนนอนอยู่ในเปล
+A hat that looks just like a teddy bear.	หมวกที่หน้าตาเหมือนตุ๊กตาหมี
+A hat that was once worn by Satto, an official from an ancient eastern land.	หมวกที่ Satto ขุนนางจากดินแดนตะวันออกโบราณเคยสวม
+A hat to cool a chef's head in a hot kitchen.	หมวกที่ทำให้หัวเชฟเย็นสบายในครัวที่ร้อนอบอ้าว
+A hat worn by the god of the sun.	หมวกที่สุริยเทพสวม
+A head piece made from a nutshell that has been cut in half.	เครื่องสวมหัวที่ทำจากเปลือกถั่วผ่าครึ่ง
+A headband adorned with the wings of an angel that offers protection from dark powers.	ที่คาดหัวประดับปีกเทวดา ป้องกันพลังมืด
+A headband with two dangerous, yet fashionable, spikes.	ที่คาดหัวติดหนามแหลมสองอัน อันตรายแต่ดูเท่
+A headband worn by doctors during medical examinations.	ที่คาดหัวที่หมอใส่ตอนตรวจคนไข้
+A headgear adorned with the wings of a demon that offers protection from holy powers.	เครื่องสวมหัวประดับปีกปีศาจ ป้องกันพลังศักดิ์สิทธิ์
+A headgear bestowed only to true Orc Heroes.	เครื่องสวมหัวที่มอบให้เฉพาะ Orc Hero ตัวจริงเท่านั้น
+A headgear designed to look like a sunflower.	เครื่องสวมหัวออกแบบให้เหมือนดอกทานตะวัน
+A headgear exclusive to the Novice Training Grounds.	เครื่องสวมหัวเฉพาะของลานฝึก Novice
+A headgear exclusively for Novices!	เครื่องสวมหัวสำหรับ Novice เท่านั้น!
+A headgear fashioned to resemble a mushroom.	เครื่องสวมหัวที่ทำให้เหมือนดอกเห็ด
+A headgear forged from the horns of the Unsealed Baphomet.	เครื่องสวมหัวที่ตีจากเขาของ Baphomet ที่หลุดผนึก
+A headgear made to improve the wearer's posture.	เครื่องสวมหัวที่ช่วยให้ท่าทางดูดีขึ้น
+A headgear made to look like an annoyed Smokie exhausted by the summer heat.	เครื่องสวมหัวรูป Smokie หน้าหงุดหงิดเพราะร้อนจนหมดแรง
+A headgear made with a dragon's skull.	เครื่องสวมหัวที่ทำจากกะโหลกมังกร
+A headgear that allows its wearer to express inner rage or slight disgust.	เครื่องสวมหัวที่ช่วยระบายความโมโหหรือความรำคาญออกมา
+A headgear that honors the legendary archer who shot an apple on friend's head from a great distance.	เครื่องสวมหัวที่ระลึกถึงนักธนูในตำนาน ผู้ยิงแอปเปิลบนหัวเพื่อนจากระยะไกล
+A headgear topped with a fashionably experimental propeller.	เครื่องสวมหัวที่มีใบพัดติดอยู่ข้างบน ล้ำสมัยแบบทดลอง
+A headgear which resembles Incubus horns.	เครื่องสวมหัวรูปเขาของ Incubus
+A headgear which resembles Succubus horns.	เครื่องสวมหัวรูปเขาของ Succubus
+A headgear which resembles a fish, smell included!	เครื่องสวมหัวรูปปลา กลิ่นมาครบด้วย!
+A headgear which symbolizes hot-blooded battle vigor.	เครื่องสวมหัวที่สื่อถึงเลือดนักสู้อันร้อนแรง
+A headgear worn by a great woman warrior in ancient times.	เครื่องสวมหัวที่นักรบหญิงผู้ยิ่งใหญ่ในสมัยโบราณสวม
+A healthy cooking oil for stir or deep frying.	น้ำมันปรุงอาหารเพื่อสุขภาพ ใช้ผัดหรือทอดก็ได้
+A heart constructed entirely out of stone.	หัวใจที่ทำจากหินล้วนๆ
+A heart of a mermaid.	หัวใจของนางเงือก
+A heart which won't stop beating, it contains a dreadful power.	หัวใจที่เต้นไม่หยุด ข้างในมีพลังน่าสะพรึง
+A heavenly halo from a phony angel.	วงแหวนสวรรค์จากเทวดาปลอม
+A heavy and powerful iron mace with a rounded top.	กระบองเหล็กหนักและทรงพลัง หัวกลม
+A heavy bludgeon that makes a handy weapon in a pinch.	ไม้กระบองหนักๆ ยามคับขันเอามาเป็นอาวุธได้
+A heavy cavalry sword with a slightly curved blade.	ดาบทหารม้าหนักๆ ใบมีดโค้งเล็กน้อย
+A heavy mail made entirely of polished, metal chain links.	เกราะโซ่หนัก ทำจากห่วงโลหะขัดเงาล้วนๆ
+A heavy moonstone bow that deflects attacks.	ธนูมูนสโตนหนักๆ ที่ปัดป้องการโจมตีได้
+A heavy pile of books.	กองหนังสือหนักๆ
+A heavy scythe carried by the Grim Reaper.	เคียวหนักที่ยมทูตถือ
+A heavy shotgun which sounds like flint striking steel.	ปืนลูกซองหนัก เสียงเหมือนหินเหล็กไฟกระทบเหล็ก
+A heavy steel ball that kept prisoners from escaping, however some prisoners managed to weaponize it.	ลูกเหล็กหนักที่ใช้ล่ามนักโทษไม่ให้หนี แต่นักโทษบางคนก็เอามาทำเป็นอาวุธจนได้
+A heavy tool with many practical applications.	เครื่องมือหนักที่ใช้งานได้สารพัด
+A heavy, broad bladed hatchet used by butchers.	ขวานใบกว้างหนักๆ ที่คนขายเนื้อใช้
+A heavy, giant huuma shaped like a bladed wheel.	ฮูมะยักษ์หนักๆ รูปทรงเหมือนล้อใบมีด
+A heavy, round headed club intended for athletic competitions.	กระบองหัวกลมหนักๆ ทำมาเพื่อการแข่งกีฬา
+A heavy, solid armor made of durable plates of impenetrable metal.	เกราะหนักแน่นหนา ทำจากแผ่นโลหะทนทานที่เจาะไม่เข้า
+A hefty hard cover book enchanted wind.	หนังสือปกแข็งเล่มหนาที่ร่ายธาตุลมไว้
+A hefty hard cover book enchanted with earth.	หนังสือปกแข็งเล่มหนาที่ร่ายธาตุดินไว้
+A hefty hard cover book enchanted with fire.	หนังสือปกแข็งเล่มหนาที่ร่ายธาตุไฟไว้
+A hefty hard cover book enchanted with water.	หนังสือปกแข็งเล่มหนาที่ร่ายธาตุน้ำไว้
+A hefty hard cover book enchanted with wind.	หนังสือปกแข็งเล่มหนาที่ร่ายธาตุลมไว้
+A hefty mace with curved, sharp blades.	กระบองหนักที่มีใบมีดโค้งคม
+A hefty whip made from toughened snake skin.	แส้หนักที่ทำจากหนังงูชุบแข็ง
+A helm owned by Morrigane, the goddess of war.	หมวกเกราะของ Morrigane เทพีแห่งสงคราม
+A helm worn by Dullahan.	หมวกเกราะที่ Dullahan สวม
+A helmet constructed of solid bone that is nearly impenetrable.	หมวกเกราะที่ทำจากกระดูกตัน แทบเจาะไม่เข้า
+A helmet forged from pure gold which provides effective defense but is also unaffordable.	หมวกเกราะที่ตีจากทองคำบริสุทธิ์ ป้องกันดีแต่แพงจนซื้อไม่ไหว
+A helmet that has mighty goat horns.	หมวกเกราะที่มีเขาแพะใหญ่โต
+A high performance rifle with great range and power.	ไรเฟิลสมรรถนะสูง ระยะไกลและแรง
+A high quality staff that amplifies psychic power.	ไม้เท้าคุณภาพสูงที่ขยายพลังจิต
+A highly nutritious jelly secreted from honeybees fed to larvae and future queens.	เยลลี่คุณค่าสูงที่ผึ้งผลิตไว้เลี้ยงตัวอ่อนและว่าที่นางพญา
+A hind leg that has been cut from a bug.	ขาหลังที่ตัดมาจากแมลง
+A holy armor blessed by the goddess of vitality.	เกราะศักดิ์สิทธิ์ที่เทพีแห่งพลังชีวิตประทานพรไว้
+A holy garment purified by a series of religious rituals.	ผ้าคลุมศักดิ์สิทธิ์ที่ชำระล้างผ่านพิธีกรรมทางศาสนาหลายขั้น
+A holy stick modified for exorcisms.	ไม้ศักดิ์สิทธิ์ที่ดัดแปลงมาเพื่อไล่ผี
+A hood that grants Morpheus's clarity and foresight.	ฮู้ดที่ให้ความกระจ่างและญาณทัศนะของ Morpheus
+A huge bow inspired by giant siege weapons.	ธนูขนาดยักษ์ ได้แรงบันดาลใจจากอาวุธล้อมเมือง
+A huge guillotine blade welded to a handle for combat use.	ใบมีดกิโยตินขนาดใหญ่ที่เชื่อมติดด้ามไว้ใช้รบ
+A huge jellopy.	Jellopy ก้อนยักษ์
+A huge leaf that can be used as a makeshift umbrella.	ใบไม้ใบใหญ่ เอามากางเป็นร่มชั่วคราวได้
+A huge violet sword made from the twin swords of Naght Sieger.	ดาบสีม่วงขนาดยักษ์ ที่หลอมจากดาบคู่ของ Naght Sieger
+A huge, dazzling gem that can be sold at an outrageous price.	อัญมณีเม็ดใหญ่เปล่งประกาย ขายได้ราคาโหดมาก
+A huge, unwieldy club that can knock enemies unconscious.	กระบองยักษ์เทอะทะ ฟาดทีเดียวศัตรูสลบ
+A humongous, double bladed axe.	ขวานสองคมขนาดมหึมา
+A huuma that enables the user to remain calm in any situation.	ฮูมะที่ทำให้ผู้ใช้สงบนิ่งได้ในทุกสถานการณ์
+A huuma that sparks like a firecracker when it strikes enemies.	ฮูมะที่แตกประกายเหมือนประทัดเมื่อโดนศัตรู
+A impressive horn from an antelope.	เขาแอนทิโลปที่ดูน่าประทับใจ
+A jack o' lantern with a smily face.	โคมฟักทองแกะสลักหน้ายิ้ม
+A jacket covered in fake, yet glamorous, rhinestones favored by hipsters and lounge singers.	แจ็คเก็ตประดับพลอยเทียมแวววาว ขวัญใจพวกฮิปสเตอร์และนักร้องเลานจ์
+A jacket made out of mediocre leather.	แจ็คเก็ตที่ทำจากหนังคุณภาพกลางๆ
+A jeweled coronet that grants the wisdom of an ancient queen.	มงกุฎประดับอัญมณีที่ให้ปัญญาของราชินีโบราณ
+A jeweled crown that grants the wisdom of an ancient king.	มงกุฎประดับอัญมณีที่ให้ปัญญาของกษัตริย์โบราณ
+A jeweled headdress that wards off harmful magic.	เครื่องสวมหัวประดับอัญมณี ป้องกันเวทร้าย
+A jeweled, metal band that wards off harmful magic.	แถบโลหะประดับอัญมณี ป้องกันเวทร้าย
+A jumbo sized burrito for jumbo sized appetites.	เบอร์ริโตไซส์ยักษ์ สำหรับคนหิวไซส์ยักษ์
+A katar crafted from a ghoul's femur that radiates a dark, deathly aura.	กะทาที่ทำจากกระดูกต้นขา Ghoul แผ่ออร่ามรณะออกมา
+A katar designed for quick human assassinations.	กะทาที่ออกแบบมาเพื่อสังหารมนุษย์ให้จบเร็ว
+A katar designed to kill human that evokes a bestial roar when drenched in blood.	กะทาที่ทำมาเพื่อฆ่ามนุษย์ เมื่อชุ่มเลือดจะเปล่งเสียงคำรามดั่งสัตว์ร้าย
+A katar fashioned from a cold, sharp icicle.	กะทาที่ทำจากแท่งน้ำแข็งเย็นเฉียบและแหลมคม
+A katar forged from powerful stormy winds.	กะทาที่หลอมจากลมพายุอันทรงพลัง
+A katar forged out of resentment for the living.	กะทาที่หลอมจากความแค้นที่มีต่อผู้มีชีวิต
+A katar molded from an inferno.	กะทาที่หล่อขึ้นจากเปลวเพลิงนรก
+A katar sculpted from the desert.	กะทาที่ปั้นขึ้นจากผืนทะเลทราย
+A katar with many slots that is difficult to handle.	กะทาที่มีช่องเสียบเยอะ แต่ใช้ยาก
+A katar with two blades that move like scissors to reveal a third blade from within.	กะทาสองใบมีดที่ขยับเหมือนกรรไกร เผยใบมีดที่สามออกมาจากข้างใน
+A key that can unlock the Clock Tower attic.	กุญแจไขห้องใต้หลังคาหอนาฬิกา
+A key that can unlock the Clock Tower basement.	กุญแจไขชั้นใต้ดินหอนาฬิกา
+A key used to open the way to the realm of Okolnir.	กุญแจเปิดทางสู่ดินแดน Okolnir
+A keyring for the Rosimier Mansion.	พวงกุญแจของคฤหาสน์ Rosimier
+A knife made of a special metal alloy that is incredibly strong.	มีดที่ทำจากโลหะผสมพิเศษ แข็งแกร่งอย่างเหลือเชื่อ
+A knife used for cutting.	มีดสำหรับหั่น
+A knife used for stabbing.	มีดสำหรับแทง
+A knife with a gold handle that brings great fortune to whoever holds it.	มีดด้ามทอง ใครถือก็มีโชคลาภ
+A knit beanie that offers some protection from the cold, but only some.	หมวกไหมพรม กันหนาวได้บ้าง แต่ก็แค่บ้าง
+A knuckle blessed by Zephyrus, god of the west wind.	เครื่องสวมหมัดที่ Zephyrus เทพลมตะวันตกประทานพรไว้
+A knuckle engraved with magic glyphs that grant incredible power.	เครื่องสวมหมัดที่สลักอักขระเวท ให้พลังมหาศาล
+A knuckle imbued with the essence of madness.	เครื่องสวมหมัดที่อาบด้วยความบ้าคลั่ง
+A knuckle imbued with the power of Mother Earth.	เครื่องสวมหมัดที่อาบด้วยพลังของพระแม่ธรณี
+A knuckle imbued with the power of a volcano.	เครื่องสวมหมัดที่อาบด้วยพลังภูเขาไฟ
+A knuckle imbued with the power of ice.	เครื่องสวมหมัดที่อาบด้วยพลังน้ำแข็ง
+A knuckle imbued with the power of lightning.	เครื่องสวมหมัดที่อาบด้วยพลังสายฟ้า
+A knuckle shaped like human fingers with long, sharp nails.	เครื่องสวมหมัดรูปนิ้วมือมนุษย์ที่มีเล็บยาวแหลม
+A knuckle with three long steel claws.	เครื่องสวมหมัดที่มีเล็บเหล็กยาวสามอัน
+A kunai coated with deadly poison.	คุไนเคลือบยาพิษร้ายแรง
+A kunai that bites like the cold.	คุไนที่กัดเหมือนความหนาวเหน็บ
+A kunai that burns like a fire.	คุไนที่เผาไหม้เหมือนเปลวไฟ
+A kunai that cuts like the wind.	คุไนที่บาดเหมือนสายลม
+A kunai that hits like the earth.	คุไนที่กระแทกหนักเหมือนแผ่นดิน
+A large insect antennae that humans can wear.	หนวดแมลงขนาดใหญ่ที่มนุษย์ใส่ได้
+A large orange fruit that's used in pies and few other dishes.	ผลไม้สีส้มลูกใหญ่ ใช้ทำพายและอาหารอีกไม่กี่อย่าง
+A large piece of cloth wrapped around goods carried on the head.	ผ้าผืนใหญ่ที่ห่อของแล้วทูนไว้บนหัว
+A large silver mace made for exorcisms.	กระบองเงินขนาดใหญ่ ทำมาเพื่อไล่ผี
+A large, double-edged broad sword that was used by the highlanders.	ดาบใหญ่สองคมขนาดยาว ที่ชาวไฮแลนด์เคยใช้
+A large, powerful bow used by Orc Archers.	ธนูขนาดใหญ่ทรงพลังที่ Orc Archer ใช้
+A large, slightly used candlestick that can be worn.	เชิงเทียนขนาดใหญ่ ผ่านการใช้มาบ้าง สวมใส่ได้
+A large, yet light, white feather that has a blue gleam.	ขนสีขาวใหญ่แต่เบา มีประกายสีน้ำเงิน
+A large, yet light, white feather that has a red gleam.	ขนสีขาวใหญ่แต่เบา มีประกายสีแดง
+A larva skin that has been shed or peeled off.	คราบตัวอ่อนที่ลอกทิ้งไว้
+A leaf cut from a hinalle plant which has a cool, fresh scent.	ใบที่ตัดมาจากต้น Hinalle กลิ่นเย็นสดชื่น
+A leaf cut from an aloe plant that has a thick, moist texture.	ใบที่ตัดมาจากต้น Aloe เนื้อหนาชุ่มน้ำ
+A leaf from the Yggdrasil tree, it can bring life to fallen characters.	ใบไม้จากต้น Yggdrasil ชุบชีวิตคนที่ล้มลงได้
+A leaf that gives Smokies the power to become invisible.	ใบไม้ที่ทำให้ Smokie ล่องหนได้
+A leaf worn by the Smokie monster.	ใบไม้ที่มอนสเตอร์ Smokie ใส่
+A leg of meat that's been cooked to perfection.	ขาเนื้อที่ปรุงมาได้ที่พอดี
+A legendary dagger that is said to have been given to mankind by the gods.	มีดสั้นในตำนาน ว่ากันว่าทวยเทพประทานให้มนุษย์
+A legendary spear known for its accuracy.	หอกในตำนานที่ขึ้นชื่อเรื่องความแม่นยำ
+A legendary spear owned by the tragic soldier, Longinus.	หอกในตำนานของ Longinus ทหารผู้มีชะตากรรมน่าเศร้า
+A legendary weapon with extremely sharp blades.	อาวุธในตำนานที่มีใบมีดคมกริบ
+A letter for to Allysia and signed by a man named James.	จดหมายถึง Allysia ลงชื่อโดยชายชื่อ James
+A letter for to Allysia and signed by a man with the initials K.H.	จดหมายถึง Allysia ลงชื่อย่อว่า K.H.
+A letter of loving words written by a warm hearted mother to her children.	จดหมายเปี่ยมความรักที่แม่ใจดีเขียนถึงลูกๆ
+A letter that is addressed to Elly and closed with a distinctive red seal.	จดหมายจ่าหน้าถึง Elly ผนึกด้วยตราแดงอันเป็นเอกลักษณ์
+A letter written by Lugen to his close friend, Otto.	จดหมายที่ Lugen เขียนถึง Otto เพื่อนสนิท
+A letter written by Otto's in response to Lugen.	จดหมายที่ Otto เขียนตอบ Lugen
+A letter written by a younger sister to her brother.	จดหมายที่น้องสาวเขียนถึงพี่ชาย
+A letter written by an anxious husband to his wife.	จดหมายที่สามีผู้เป็นห่วงเขียนถึงภรรยา
+A life insurance certificate issued by Kafra Headquarters.	กรมธรรม์ประกันชีวิตที่ออกโดยสำนักงานใหญ่ Kafra
+A light blue, crystal stone imbued with water.	หินคริสตัลสีฟ้าอ่อน อาบด้วยธาตุน้ำ
+A light bow that has been enhanced with the power of whirlwinds.	ธนูเบาที่เสริมพลังลมหมุนเข้าไป
+A light spear that can be thrown, its safer to hold on to it though.	หอกเบาที่ขว้างได้ แต่ถือไว้จะปลอดภัยกว่า
+A light, comfortable suit made just for young adventurers.	ชุดเบาสบาย ทำมาเพื่อนักผจญภัยหน้าใหม่โดยเฉพาะ
+A light, windy axe that can be thrown.	ขวานเบาธาตุลมที่ขว้างได้
+A lightweight, 100% cotton, shirt that is quite durable.	เสื้อฝ้าย 100% น้ำหนักเบา ทนทานพอตัว
+A liquid with unique characteristics that repels water.	ของเหลวคุณสมบัติพิเศษที่ผลักน้ำออก
+A liquid with unique properties that repels water.	ของเหลวที่มีคุณสมบัติพิเศษ ผลักน้ำออก
+A live coal.	ถ่านที่ยังติดไฟอยู่
+A loan document that includes the amount lended and the signatures of the loaner and lendee.	เอกสารกู้ยืมที่ระบุยอดเงินและลายเซ็นของทั้งผู้ให้กู้และผู้กู้
+A lock of medusa hair, that is essentially just a bunch of snakes.	ปอยผมเมดูซ่า ซึ่งก็คือกระจุกงูดีๆ นี่เอง
+A loner's guitar which makes a depressing sound when strummed.	กีตาร์ของคนขี้เหงา ดีดแล้วเสียงเศร้า
+A long bladed axe that deflects enemy attacks.	ขวานใบมีดยาวที่ปัดป้องการโจมตีของศัตรูได้
+A long coat that provides remarkable warmth in cold weather.	เสื้อโค้ทยาวที่อุ่นมากในอากาศหนาว
+A long spear issued to foot soldiers.	หอกยาวที่แจกให้ทหารราบ
+A long, loose cape-like garment that protects its wearer from harsh weather.	ผ้าคลุมยาวหลวมๆ ปกป้องจากสภาพอากาศเลวร้าย
+A long, thin blade that is used as a concealed weapon by assassins.	ใบมีดยาวเรียวที่นักฆ่าใช้เป็นอาวุธซ่อน
+A long, thin mace built like a spear.	กระบองยาวเรียว รูปทรงเหมือนหอก
+A long, thin, pipe like tube made to transport liquids or gases.	ท่อยาวเรียวสำหรับลำเลียงของเหลวหรือแก๊ส
+A lottery ticket given to those who contribute to the Rachel Temple restoration effort.	สลากที่มอบให้ผู้ร่วมบูรณะวิหาร Rachel
+A lump of rice which can be eaten for lunch.	ก้อนข้าว กินเป็นมื้อกลางวันได้
+A lump of wet sand.	ก้อนทรายเปียก
+A lustrous, well brushed, set of hair.	ปอยผมเงางาม หวีมาอย่างดี
+A mace forged out of pure gold.	กระบองที่หลอมจากทองคำบริสุทธิ์
+A mage figure that radiates intellect.	ฟิกเกอร์ Mage ที่แผ่รัศมีแห่งปัญญา
+A magic spellbook that is so large it can be used as a shield.	ตำราเวทที่ใหญ่จนเอามาใช้เป็นโล่ได้
+A magical sword that attacks with a variety of elements.	ดาบเวทที่โจมตีได้หลายธาตุ
+A magical sword that emits a dismal black aura.	ดาบเวทที่แผ่ออร่าดำมืดหม่นหมอง
+A magnificent feast fit for the gods.	งานเลี้ยงใหญ่โต สมเป็นอาหารของทวยเทพ
+A magnificent platinum shield reflects harmful magic.	โล่แพลตทินัมงดงาม สะท้อนเวทร้าย
+A magnifying glass from the Novice Training Grounds.	แว่นขยายจากลานฝึก Novice
+A magnifying glass used for scrutinizing objects. Rumor has it that adventurers once needed to use these to identify items.	แว่นขยายไว้ส่องดูของ ร่ำลือกันว่าสมัยก่อนนักผจญภัยต้องใช้ตัวนี้ระบุชื่อของ
+A malleable metal that's easy to temper and is commonly used to create arms and other goods.	โลหะอ่อนที่ชุบง่าย ใช้ทำอาวุธและข้าวของทั่วไป
+A manifestation of a soldier who literally willed himself back to life.	ร่างที่ปรากฏของทหารผู้ใช้พลังใจล้วนๆ ดึงตัวเองกลับมาจากความตาย
+A manteau exclusively for Novices!	ผ้าคลุมสำหรับ Novice เท่านั้น!
+A manteau made from gray crow feathers that were enchanted by Morrigane.	ผ้าคลุมที่ทำจากขนอีกาสีเทาซึ่ง Morrigane ร่ายเวทไว้
+A manteau of flame worn by Naght Sieger.	ผ้าคลุมเปลวเพลิงที่ Naght Sieger สวม
+A manteau once owned by Vali, son of Odin, who defeated Hoedr the warrior despite his blindness.	ผ้าคลุมที่เคยเป็นของ Vali บุตรแห่ง Odin ผู้ปราบนักรบ Hoedr ได้ทั้งที่ตาบอด
+A manteau that remains a persistent shadow.	ผ้าคลุมที่คงอยู่เป็นเงาไม่จางหาย
+A manteau which protects its wearer from the elements.	ผ้าคลุมที่ปกป้องผู้สวมจากธาตุต่างๆ
+A manteau worn by the Valkyries, Odin's battle maidens.	ผ้าคลุมที่เหล่า Valkyrie นางรบแห่ง Odin สวม
+A marinated beef dish that can only be described as shiny.	เนื้อหมักที่บรรยายได้คำเดียวว่า เงาวับ
+A maroon jewel that is the birthstone for July.	อัญมณีสีแดงเลือดหมู หินประจำเดือนกรกฎาคม
+A marvelous bottle that can carry languages.	ขวดมหัศจรรย์ที่บรรจุภาษาได้
+A marvelous, light, transparent plate that is etched with strange writing in an unknown language.	แผ่นใสน้ำหนักเบาน่าอัศจรรย์ สลักตัวอักษรประหลาดภาษาที่ไม่รู้จัก
+A mask ideal for polluted locations that supplies pure oxygen.	หน้ากากสำหรับที่ที่มีมลพิษ จ่ายออกซิเจนบริสุทธิ์ให้
+A mask inspired by a legendary fencer who kept his identity as a wealthy don a secret.	หน้ากากที่ได้แรงบันดาลใจจากนักดาบในตำนานผู้ปิดบังตัวตนว่าเป็นดอนผู้มั่งคั่ง
+A mask marked with an X that is a popular fashion statement for bona fide street toughs.	หน้ากากที่มีเครื่องหมายกากบาท แฟชั่นยอดฮิตของนักเลงข้างถนนตัวจริง
+A mask that expresses anguish and despair.	หน้ากากที่แสดงความทุกข์ทรมานและสิ้นหวัง
+A mask that has been carefully wrapped.	หน้ากากที่ห่อไว้อย่างดี
+A mask that is worn during festivals.	หน้ากากที่ใส่ในงานเทศกาล
+A mask that makes its wearer feel like looking down on normal human peons.	หน้ากากที่ใส่แล้วอยากมองมนุษย์ธรรมดาแบบเหยียดๆ
+A mask which resembles an Alarm monster.	หน้ากากรูปมอนสเตอร์ Alarm
+A mask with a blank expression.	หน้ากากหน้าเฉยเมย
+A mask with a surprised expression.	หน้ากากหน้าตกใจ
+A mask with an annoyed expression.	หน้ากากหน้าหงุดหงิด
+A mask worn by Goblins to scare and intimidate unsuspecting enemies.	หน้ากากที่ Goblin ใส่ไว้ขู่ศัตรูที่ไม่ทันตั้งตัว
+A mask worn by a romantic hero with an unknown fate.	หน้ากากของวีรบุรุษโรแมนติกผู้มีชะตากรรมไม่มีใครรู้
+A mask worn by assassins in order to hide themselves.	หน้ากากที่นักฆ่าใส่เพื่อปกปิดตัวตน
+A mask worn by considerate people to mitigate an airborn illness.	หน้ากากที่คนมีน้ำใจใส่เพื่อลดการแพร่โรคทางอากาศ
+A mask worn by the Goblin leader, it looks so ferocious it's almost ridiculous.	หน้ากากของหัวหน้า Goblin ดูดุร้ายจนเกือบจะตลก
+A massive axe embedded with an orb imbued with the power of a hurricane.	ขวานขนาดมหึมาที่ฝังลูกแก้วอาบพลังพายุเฮอร์ริเคน
+A massive book known as "the spellcasting bible".	หนังสือเล่มมหึมาที่รู้จักกันในชื่อ "คัมภีร์การร่ายเวท"
+A massive shield that can withstand any attack but lacks shock absorption.	โล่ขนาดมหึมาที่รับได้ทุกการโจมตี แต่ไม่ซับแรงกระแทก
+A massive spear that could be mistaken for a temple pillar.	หอกขนาดมหึมาที่คนอาจนึกว่าเป็นเสาวิหาร
+A massive sword wielded by Atroce that is too large to be handled by ordinary warriors.	ดาบมหึมาที่ Atroce ใช้ ใหญ่เกินกว่านักรบธรรมดาจะถือไหว
+A massive, thick cross-shaped shield.	โล่รูปกางเขนขนาดมหึมาและหนา
+A meal for meat lovers, this roast is spiced with a special sauce.	มื้อสำหรับคนรักเนื้อ อบมาพร้อมซอสสูตรพิเศษ
+A medal crafted from a rare and mysterious metal that can only be found in Hugel.	เหรียญที่ทำจากโลหะหายากลึกลับ พบได้เฉพาะที่ Hugel
+A medal rewarded to honorable witches.	เหรียญที่มอบให้แม่มดผู้ทรงเกียรติ
+A medicine made from ground mint that is used to ease pain and relax muscle tension.	ยาที่ทำจากมิ้นต์บด บรรเทาปวดและคลายกล้ามเนื้อ
+A medicine said to have as much healing power as bitterness.	ยาที่ว่ากันว่ายิ่งขมยิ่งรักษาได้ดี
+A medium, sparkling gem that can be sold at a high price.	อัญมณีขนาดกลางที่เปล่งประกาย ขายได้ราคาดี
+A medusa head that, naturally, looks sad and depressed.	หัวเมดูซ่าที่หน้าตาเศร้าซึม ก็ต้องอย่างนั้นแหละ
+A meeting invite completed by Ryosen, Rune Midgard's investigator.	บัตรเชิญประชุมที่ Ryosen ผู้สืบสวนแห่ง Rune Midgard กรอกไว้
+A merchant figure that radiates strength.	ฟิกเกอร์ Merchant ที่แผ่รัศมีแห่งพละกำลัง
+A message, with doodles, from a young girl.	ข้อความจากเด็กผู้หญิง มีลายเส้นขยุกขยิกด้วย
+A metal club topped with a solid steel ball that's covered in spikes.	กระบองโลหะที่หัวเป็นลูกเหล็กตันปกคลุมด้วยหนามแหลม
+A metal pinwheel from a festival with unusually sharp blades.	กังหันโลหะจากงานเทศกาล ใบคมผิดปกติ
+A metal that can be used to refine Lv 1 weapons.	โลหะสำหรับตีบวกอาวุธ Lv 1
+A metal that can be used to refine Lv 2 weapons.	โลหะสำหรับตีบวกอาวุธ Lv 2
+A mighty bow that can only be effectively used by Hunters.	ธนูทรงพลังที่ใช้ได้เต็มประสิทธิภาพเฉพาะ Hunter
+A mighty, yet awfully basic, sword.	ดาบที่ทรงพลัง แต่ก็พื้นๆ ซะเหลือเกิน
+A military knife crafted for battle against humanoids.	มีดทหารที่ทำมาเพื่อสู้กับพวกกึ่งมนุษย์
+A mineral not found in Rune Midgard that any scientist would love to study.	แร่ที่ไม่มีใน Rune Midgard นักวิทยาศาสตร์คนไหนก็อยากศึกษา
+A miraculous armor that adapts to its wearer.	เกราะมหัศจรรย์ที่ปรับตัวเข้ากับผู้สวมใส่
+A miraculous lump of ice that wil never melt.	ก้อนน้ำแข็งมหัศจรรย์ที่ไม่มีวันละลาย
+A mix of various, crisp fruit flavored with light, sweet syrup.	ผลไม้กรอบหลายชนิดคลุกน้ำเชื่อมหวานอ่อนๆ
+A mixed tea made with a refreshingly strong scent that is somehow bland.	ชาผสมกลิ่นแรงสดชื่น แต่รสจืดชืดยังไงไม่รู้
+A mixture of chemicals that can only be produced by geniuses.	สารเคมีผสมที่มีแต่อัจฉริยะเท่านั้นที่ทำได้
+A moist and sticky rice cake prepared in sticks.	ขนมข้าวเหนียวนุ่มหนึบ ทำเป็นแท่ง
+A moisty and sticky rice cake prepared in slices.	ขนมข้าวเหนียวนุ่มหนึบ หั่นเป็นแผ่น
+A mole's claw that is sturdy enough to dig into the ground.	เล็บตัวตุ่นที่แข็งแรงพอจะขุดดินได้
+A monkey's claw that peeled many a banana.	เล็บลิงที่ปอกกล้วยมานับไม่ถ้วน
+A mother's nightmare that has been given physical form.	ฝันร้ายของแม่ที่กลายเป็นรูปร่างขึ้นมาจริงๆ
+A muffler owned by Freyja, daughter of Njord, that was often borrowed by Loki.	ผ้าพันคอของ Freyja ธิดาแห่ง Njord ที่ Loki ชอบมายืมบ่อยๆ
+A muscovite, it symbolizes self motivation.	แร่มัสโคไวต์ สื่อถึงแรงผลักดันในตัวเอง
+A muscular and fatty clam tissue that can be cooked in many ways.	เนื้อหอยที่เหนียวและมัน ทำอาหารได้หลายอย่าง
+A mustache shaved off a dwarf that somehow maintained its shape and form.	หนวดที่โกนมาจากคนแคระ ไม่รู้ทำไมยังคงรูปทรงเดิมไว้ได้
+A mysterious black charm stone in which fantastic powers are stored.	หินรางลึกลับสีดำ ที่เก็บพลังวิเศษไว้ข้างใน
+A mysterious blue box whose appearance resembles Old Blue Box.	กล่องน้ำเงินลึกลับ หน้าตาเหมือน Old Blue Box
+A mysterious blue charm stone in which fantastic powers are stored.	หินรางลึกลับสีน้ำเงิน ที่เก็บพลังวิเศษไว้ข้างใน
+A mysterious cape enchanted with a protective spell.	ผ้าคลุมลึกลับที่ร่ายเวทป้องกันไว้
+A mysterious green charm stone in which fantastic powers are stored.	หินรางลึกลับสีเขียว ที่เก็บพลังวิเศษไว้ข้างใน
+A mysterious leather bag that contains a limitless supply of sand.	ถุงหนังลึกลับที่มีทรายไม่มีวันหมด
+A mysterious magic book published by MOMOTARO Publishing.	หนังสือเวทลึกลับ จัดพิมพ์โดยสำนักพิมพ์ MOMOTARO
+A mysterious mask worn by opera phantoms.	หน้ากากลึกลับที่ปีศาจแห่งโรงละครสวม
+A mysterious necklace that is rumored to possess the power of clairvoyance.	สร้อยคอลึกลับ ร่ำลือกันว่ามีพลังหยั่งรู้
+A mysterious object discovered in the depths of the ocean.	วัตถุลึกลับที่ค้นพบในทะเลลึก
+A mysterious plant that sings melancholic songs under a full moon.	พืชลึกลับที่ขับขานเพลงเศร้าใต้แสงจันทร์เต็มดวง
+A mysterious red charm stone in which fantastic powers are stored.	หินรางลึกลับสีแดง ที่เก็บพลังวิเศษไว้ข้างใน
+A mysterious yellow charm stone in which fantastic powers are stored.	หินรางลึกลับสีเหลือง ที่เก็บพลังวิเศษไว้ข้างใน
+A mysterious, ancient artifact that can endow armor with great defensive power.	วัตถุโบราณลึกลับที่เสริมพลังป้องกันให้เกราะได้
+A mysteriously colorful egg shell.	เปลือกไข่สีสันประหลาด
+A mysteriously sticky liquid.	ของเหลวเหนียวอย่างประหลาด
+A mystic hat for wizards that amplifies pyschic power.	หมวกลี้ลับสำหรับ Wizard ขยายพลังจิต
+A mystic remedy for all illnesses.	ยาลี้ลับที่รักษาได้ทุกโรค
+A narrow, short roll of finely cut tobacco wrapped in thin paper.	ยาสูบหั่นละเอียดม้วนในกระดาษบาง เป็นแท่งสั้นเรียว
+A nasty scale with a horribly offensive odor.	เกล็ดน่าขยะแขยงที่กลิ่นเหม็นสุดทน
+A neatly made wedding corolla, a huge silk ribbon is attached to the back.	มงกุฎดอกไม้เจ้าสาวที่ทำมาอย่างเรียบร้อย ด้านหลังติดโบว์ไหมใบใหญ่
+A necklace crafted by a mechanic born under a cursed star for self protection.	สร้อยคอที่ช่างกลผู้เกิดใต้ดาวต้องคำสาปทำขึ้นเพื่อป้องกันตัว
+A necklace crafted by skilled Dwarves.	สร้อยคอที่คนแคระฝีมือดีทำขึ้น
+A necklace given to those capable of joining the Assassin Guild.	สร้อยคอที่มอบให้ผู้มีคุณสมบัติเข้าร่วมสมาคม Assassin
+A needle severed into two halves.	เข็มที่หักเป็นสองท่อน
+A nicely sorted file, a small thank you note is attached on the bottom.	แฟ้มที่จัดเรียงมาอย่างดี ด้านล่างติดโน้ตขอบคุณใบเล็กไว้
+A nimble armor that lets you gallop like a Peco Peco.	เกราะคล่องตัวที่ทำให้วิ่งได้เหมือน Peco Peco
+A noble headgear created in the proud image of crunchy toast, part of a balanced breakfast.	เครื่องสวมหัวสุดโก้ ทำเป็นรูปขนมปังปิ้งกรอบ หนึ่งในมื้อเช้าครบหมู่
+A nose from a Tengu mask that is quite long and ugly.	จมูกจากหน้ากาก Tengu ยาวและน่าเกลียดพอตัว
+A note from Oliver Hilpert, you can tell by his poor handwriting... and by his autograph.	โน้ตจาก Oliver Hilpert ดูจากลายมือห่วยๆ ก็รู้... แล้วก็ลายเซ็นด้วย
+A note that is barely legible as it is heavily damaged.	โน้ตที่เสียหายหนักจนแทบอ่านไม่ออก
+A note written by a Geologist (1WN 2ES 2EC).	โน้ตที่นักธรณีวิทยาเขียนไว้ (1WN 2ES 2EC)
+A novice figure that radiates naviety.	ฟิกเกอร์ Novice ที่แผ่รัศมีแห่งความไร้เดียงสา
+A nut from the cacao tree found in warm climates.	เมล็ดจากต้นโกโก้ที่ขึ้นในเขตอากาศอบอุ่น
+A old, exhausted manteau.	ผ้าคลุมเก่าโทรมจนหมดสภาพ
+A orange satin hairpin that wards off harmful magic.	ปิ่นปักผมซาตินสีส้ม ป้องกันเวทร้าย
+A page with a surface marked with old, dried blood stains.	หน้ากระดาษที่มีคราบเลือดแห้งเก่าๆ ติดอยู่
+A pair of 70's tough guy style sunglasses that give a manly swagger.	แว่นกันแดดสไตล์นักเลงยุค 70 ใส่แล้วดูแมนเท่
+A pair of adaptable boots crafted by an indecisive genius.	รองเท้าบูตที่ปรับได้ ฝีมืออัจฉริยะผู้ตัดสินใจไม่เก่ง
+A pair of boots made for those seeking the Golden Key.	รองเท้าบูตสำหรับผู้ตามหา Golden Key
+A pair of boots made of light, resilient leather that makes you want to run.	รองเท้าบูตหนังเบาและยืดหยุ่น ใส่แล้วอยากวิ่ง
+A pair of cute, unisex shoes that are a part of a school uniform.	รองเท้าน่ารักใส่ได้ทั้งชายหญิง ส่วนหนึ่งของชุดนักเรียน
+A pair of fashionable glasses worn for a charming appearance instead of vision improvement.	แว่นแฟชั่นที่ใส่เพื่อความมีเสน่ห์ ไม่ได้ช่วยเรื่องสายตา
+A pair of fashionable sunglasses.	แว่นกันแดดทันสมัย
+A pair of feminine high heeled shoes made of fine crystal.	รองเท้าส้นสูงสตรี ทำจากคริสตัลชั้นดี
+A pair of glasses that make the wearer's eyes look like they're spinning without focus.	แว่นที่ใส่แล้วตาดูหมุนติ้วไม่มีโฟกัส
+A pair of glasses with darkened lenses that block ultraviolet light.	แว่นเลนส์สีเข้มที่กันรังสียูวี
+A pair of glasses with lenses angled upward and outward.	แว่นที่เลนส์เฉียงขึ้นและบานออก
+A pair of heavy leather boots, padded with Lunatic fur.	รองเท้าบูตหนังหนัก บุด้วยขน Lunatic
+A pair of heavy shoulder coverings that provide effective protection.	เกราะไหล่หนักที่ป้องกันได้ดี
+A pair of heavy steel shackles that are clamped on the ankles of prisoners.	โซ่ตรวนเหล็กหนักที่ใส่ข้อเท้านักโทษ
+A pair of helment accessories that look just like fins.	เครื่องประดับหมวกเกราะที่หน้าตาเหมือนครีบ
+A pair of high quality sunglasses that effectively block the sun.	แว่นกันแดดคุณภาพสูงที่กันแดดได้ดีจริง
+A pair of horns from a small demon.	เขาคู่หนึ่งจากปีศาจตัวเล็ก
+A pair of metal restraints which still smell of blood.	เครื่องพันธนาการโลหะที่ยังมีกลิ่นเลือดติดอยู่
+A pair of mysterious boots that feel alive and adjust their size to the wearer.	รองเท้าบูตลึกลับที่เหมือนมีชีวิต ปรับขนาดตามผู้สวมใส่
+A pair of pilot goggles that protect the eyes.	แว่นตานักบินที่ปกป้องดวงตา
+A pair of prescription glasses that compensate for vision defects.	แว่นสายตาที่แก้ปัญหาการมองเห็น
+A pair of red dots that give a blushing impression.	จุดแดงคู่หนึ่งที่ทำให้ดูเหมือนแก้มแดง
+A pair of roots that almost look capable of walking.	รากคู่หนึ่งที่ดูเหมือนจะเดินได้
+A pair of shadowy shoes enchanted with a spell to protect their wearer from danger.	รองเท้าเงามืดที่ร่ายเวทป้องกันภัยให้ผู้สวมใส่
+A pair of shoes blessed by Freyr, the god of earth.	รองเท้าที่ Freyr เทพแห่งผืนดินประทานพรไว้
+A pair of shoes exclusive to the Novice Training Grounds.	รองเท้าเฉพาะของลานฝึก Novice
+A pair of shoes exclusively for Novices!	รองเท้าสำหรับ Novice เท่านั้น!
+A pair of shoes forged by Goibne in response to competition from his rival, Dulb.	รองเท้าที่ Goibne ตีขึ้นเพื่อแข่งกับ Dulb คู่ปรับของเขา
+A pair of shoes made for running, tighten the laces and you're off to the races!	รองเท้าที่ทำมาเพื่อวิ่ง ผูกเชือกให้แน่นแล้วออกตัวได้เลย!
+A pair of shoes made of supple, high quality leather.	รองเท้าหนังคุณภาพสูง เนื้อนุ่ม
+A pair of shoes named after Odin's trusty steed.	รองเท้าที่ตั้งชื่อตามม้าคู่ใจของ Odin
+A pair of shoes that incorporates a waterproof coating.	รองเท้าที่เคลือบสารกันน้ำ
+A pair of shoes worn by the Valkyries, Odin's battle maidens.	รองเท้าที่เหล่า Valkyrie นางรบแห่ง Odin สวม
+A pair of small red ribbons.	โบว์แดงเล็กๆ คู่หนึ่ง
+A pair of sophisticated glasses.	แว่นตาดีไซน์ประณีต
+A pair of steel boots which offer dependable protection.	รองเท้าบูตเหล็กที่ป้องกันได้อย่างไว้ใจได้
+A pair of steel gauntlets worn by Thor, god of thunder.	ถุงมือเหล็กที่ Thor เทพสายฟ้าสวม
+A pair of striped high heeled shoes worn by a wicked witch to enhanced her magical powers.	รองเท้าส้นสูงลายทางที่แม่มดร้ายใส่เพื่อเสริมพลังเวท
+A pair of sturdy goggles worn by ocean divers.	แว่นตาดำน้ำที่แข็งแรง นักดำน้ำใช้กัน
+A pair of two giant leaves that could be used as clothes in an emergency.	ใบไม้ยักษ์สองใบ ยามฉุกเฉินเอามาใส่แทนเสื้อผ้าได้
+A pair wings from a small demon.	ปีกคู่หนึ่งจากปีศาจตัวเล็ก
+A pale yellow, lightning bolt shaped stone imbued with wind.	หินสีเหลืองอ่อนรูปสายฟ้า อาบด้วยธาตุลม
+A pancake topped with caviar.	แพนเค้กหน้าคาเวียร์
+A pancake topped with honey.	แพนเค้กหน้าน้ำผึ้ง
+A pancake topped with mushrooms.	แพนเค้กหน้าเห็ด
+A pancake topped with sour cream.	แพนเค้กหน้าซาวครีม
+A pancake topped with strawberry jam.	แพนเค้กหน้าแยมสตรอว์เบอร์รี
+A panty made of tiger skin, what a wild and untamed idea.	กางเกงในหนังเสือ ไอเดียป่าเถื่อนดุดันจริงๆ
+A part of a fish breathing apparatus.	ชิ้นส่วนอวัยวะหายใจของปลา
+A part of the expedition report, some parts are destroyed and wrinkled.	ส่วนหนึ่งของรายงานการสำรวจ บางส่วนเสียหายและยับ
+A pass for Regenschirm Laboratory employees that allows lab access.	บัตรผ่านพนักงานห้องแล็บ Regenschirm ใช้เข้าห้องแล็บได้
+A pass that grants authorization to the Lighthalzen slums.	บัตรผ่านเข้าสลัม Lighthalzen
+A patch of dirty fur from an antelope.	ปื้นขนสกปรกจากแอนทิโลป
+A patch used to cover one eye.	ผ้าปิดตาข้างเดียว
+A peach that is so stout and solid, that it can withstand blows from a sword.	ลูกพีชที่แน่นและแข็งจนรับดาบได้
+A peculiar hat that makes its wearer look freshly hatched.	หมวกประหลาดที่ใส่แล้วดูเหมือนเพิ่งฟักออกจากไข่
+A peculiar looking metallic fragment.	เศษโลหะหน้าตาประหลาด
+A pencil case, it'd be a nice gift for artists, writers, and students.	กล่องดินสอ เอาไปให้ศิลปิน นักเขียน หรือนักเรียนก็ดี
+A pendant that confined wandering souls from unknown places.	จี้ที่กักวิญญาณเร่ร่อนจากที่ที่ไม่มีใครรู้ไว้
+A perfect ice crystal from a snowy sky.	ผลึกน้ำแข็งสมบูรณ์แบบจากฟ้าที่หิมะตก
+A permit that allows entry into the Amatsu dungeon.	ใบอนุญาตเข้าดันเจี้ยน Amatsu
+A permit which allows the holder to enter the archive, "738495" is written on the back.	ใบอนุญาตเข้าหอจดหมายเหตุ ด้านหลังเขียนว่า "738495"
+A personal letter written by Mahnsoo, chief of the Merchant Guild.	จดหมายส่วนตัวที่ Mahnsoo หัวหน้าสมาคม Merchant เขียน
+A pestle carried by Baba Yaga that is well worn.	สากที่ Baba Yaga พกติดตัว ใช้มาจนสึก
+A phlogopite, it symbolizes motherly love.	แร่โฟลโกไพต์ สื่อถึงความรักของแม่
+A phosphorus tipped stick that can start a fire.	ไม้ปลายฟอสฟอรัสที่จุดไฟได้
+A photo album that contains pictures of Mammi, a former envoy of Morroc Public Relations.	อัลบั้มรูปของ Mammi อดีตทูตประชาสัมพันธ์ของ Morroc
+A physical manifestation of a sunrise.	รูปธรรมของแสงอรุณ
+A physical manifestation of a sunset.	รูปธรรมของแสงอาทิตย์อัสดง
+A physical manifestation of a valkyrie's rage.	รูปธรรมของความเกรี้ยวกราดของวาลคีรี
+A physical manifestation of moonlight.	รูปธรรมของแสงจันทร์
+A physical manifestation of starlight.	รูปธรรมของแสงดาว
+A physical manifestation of the sound of cat footsteps.	รูปธรรมของเสียงฝีเท้าแมว
+A physical manifestation of the tears wept for fallen warriors.	รูปธรรมของน้ำตาที่หลั่งให้นักรบผู้ล่วงลับ
+A physical manifestation of the trust of the Valkyries.	รูปธรรมของความไว้วางใจจากเหล่า Valkyrie
+A picture album of memories from a wedding ceremony.	อัลบั้มรูปความทรงจำจากพิธีแต่งงาน
+A pie covered with sweet chocolate, it isn't pretty but the taste is excellent.	พายราดช็อกโกแลตหวาน หน้าตาไม่สวยแต่รสเลิศ
+A piece of Ymir's Heart that glows with a strange and unearthly light.	เศษหัวใจของ Ymir ที่เรืองแสงประหลาดเหนือธรรมชาติ
+A piece of a broken liquor jar which still reeks of alcohol.	เศษไหเหล้าที่แตก ยังมีกลิ่นเหล้าฉุนอยู่
+A piece of a scroll.	เศษม้วนกระดาษ
+A piece of an ancient crest, whose purpose is unknown, that has many spikes nailed on its backside.	เศษตราโบราณที่ไม่รู้ว่าใช้ทำอะไร ด้านหลังตอกหนามแหลมไว้เต็มไปหมด
+A piece of armor that has been damaged beyond repair.	เศษเกราะที่เสียหายจนซ่อมไม่ได้
+A piece of back skin from a poisonous toad.	เศษหนังหลังของคางคกพิษ
+A piece of bamboo from a bamboo tree.	ปล้องไผ่จากต้นไผ่
+A piece of crystal required to progress into Okolnir.	เศษคริสตัลที่ต้องใช้เพื่อเข้าไปยัง Okolnir
+A piece of iron fitted on a horse's hoof for its protection.	แผ่นเหล็กที่ตอกไว้ใต้กีบม้าเพื่อป้องกัน
+A piece of jet black cloth that cannot be seen in the dark.	ผ้าสีดำสนิทที่มองไม่เห็นในความมืด
+A piece of leopard skin that could serve as a loincloth in a pinch.	เศษหนังเสือดาว ยามคับขันเอามาทำผ้าเตี่ยวได้
+A piece of nearly transparent fabric.	ผ้าที่แทบจะโปร่งใส
+A piece of raw fish.	เนื้อปลาดิบชิ้นหนึ่ง
+A piece of shield is strong and durable.	ชิ้นส่วนโล่ที่แข็งแรงทนทาน
+A piece of skin from a dragon.	เศษหนังมังกร
+A piece of the sobbing starlight, it might be possible to reassemble it.	เศษของแสงดาวที่ร่ำไห้ อาจประกอบกลับคืนได้
+A piece of waxy, yellow paper that repels water.	กระดาษเคลือบขี้ผึ้งสีเหลืองที่กันน้ำ
+A piece of wood, or a Ninja, and you're pretty sure its wood.	ท่อนไม้ หรือไม่ก็ Ninja แต่ค่อนข้างมั่นใจว่าเป็นท่อนไม้
+A pile of explosive powder.	กองผงระเบิด
+A pill of medicine that looks as bitter as it tastes.	ยาเม็ดที่หน้าตาขมพอๆ กับรสชาติ
+A pincher from a beetle.	ก้ามด้วง
+A pink jewel that is the birthstone for June.	อัญมณีสีชมพู หินประจำเดือนมิถุนายน
+A pink satin hairpin that wards off harmful magic.	ปิ่นปักผมซาตินสีชมพู ป้องกันเวทร้าย
+A plant with curative properties, its leaves are commonly used in medicine and food.	พืชสรรพคุณรักษาโรค ใบของมันใช้ทำยาและอาหารกันทั่วไป
+A plant with healing properties, its leaves give a nice and smoothing sensation.	พืชสรรพคุณรักษา ใบให้ความรู้สึกเย็นสบายผ่อนคลาย
+A plant with three heart shaped leaves that is plentiful in meadows.	พืชที่มีใบรูปหัวใจสามใบ ขึ้นเต็มทุ่งหญ้า
+A plate armor forged from a meteor.	เกราะแผ่นที่ตีจากอุกกาบาต
+A pocket of sand grains that are so fine that they cannot be gathered by hand.	ถุงเม็ดทรายที่ละเอียดจนใช้มือกอบไม่ได้
+A poisonous plant that would harm most living creatures.	พืชมีพิษที่เป็นอันตรายต่อสิ่งมีชีวิตแทบทุกชนิด
+A polished plate made from yellow clay.	จานขัดเงาที่ทำจากดินเหนียวสีเหลือง
+A porcelain bowl used for grinding herbs or other substances.	ครกกระเบื้องสำหรับบดสมุนไพรและของอื่นๆ
+A portable case with glass panes that allow a contained light to illuminate dark areas.	กล่องพกพาที่มีกระจกใส ให้แสงข้างในส่องสว่างในที่มืด
+A portable incubator that is used to hatch Cute Pet monster eggs.	ตู้ฟักแบบพกพา ใช้ฟักไข่มอนสเตอร์ Cute Pet
+A portrait of a young man that looks fairly depressed.	ภาพวาดชายหนุ่มที่หน้าตาค่อนข้างหดหู่
+A portrait of an elite, high class family with 4 members.	ภาพวาดครอบครัวชนชั้นสูง 4 คน
+A portrait of beautiful woman named Allysia. Her warm, welcoming smile can be felt in the depths of your heart.	ภาพวาดหญิงงามชื่อ Allysia รอยยิ้มอบอุ่นของนางสัมผัสได้ถึงก้นบึ้งของหัวใจ
+A potent tonic that stimulates concentration.	ยาบำรุงฤทธิ์แรงที่กระตุ้นสมาธิ
+A potion for mercenaries that greatly increases attack speed.	ยาสำหรับทหารรับจ้าง เพิ่มความเร็วโจมตีอย่างมาก
+A potion for mercenaries that moderately increases attack speed.	ยาสำหรับทหารรับจ้าง เพิ่มความเร็วโจมตีปานกลาง
+A potion for mercenaries that slightly increases attack speed.	ยาสำหรับทหารรับจ้าง เพิ่มความเร็วโจมตีเล็กน้อย
+A potion from the Novice Training Grounds. Less effective than regular red potions, but lighter.	ยาจากลานฝึก Novice ฟื้นน้อยกว่า Red Potion ปกติ แต่เบากว่า
+A potion made from ground Blue Herbs.	ยาที่ทำจาก Blue Herb บด
+A potion made from ground Green Herbs.	ยาที่ทำจาก Green Herb บด
+A potion made from ground Red Herbs.	ยาที่ทำจาก Red Herb บด
+A potion made from ground Red and Yellow Herbs.	ยาที่ทำจาก Red Herb และ Yellow Herb บด
+A potion made from ground White Herbs.	ยาที่ทำจาก White Herb บด
+A potion made from ground Yellow Herbs.	ยาที่ทำจาก Yellow Herb บด
+A powerful axe that lives up to its mighty appearance.	ขวานทรงพลัง สมกับหน้าตาที่ดูโหด
+A powerful dagger built to catch and destroy weapons.	มีดสั้นทรงพลังที่ทำมาเพื่อเกี่ยวและทำลายอาวุธ
+A powerful siege weapon that is, in essence, a huge crossbow.	อาวุธล้อมเมืองทรงพลัง จริงๆ ก็คือหน้าไม้ยักษ์นั่นแหละ
+A powerful sword with a decoratively wavy, flame-like blade.	ดาบทรงพลัง ใบมีดหยักเป็นคลื่นเหมือนเปลวไฟ
+A powerful tonic that amplifies quickness.	ยาบำรุงฤทธิ์แรงที่เพิ่มความว่องไว
+A powerful whip made of steel chain for heavy duty battles.	แส้ทรงพลังที่ทำจากโซ่เหล็ก ไว้สู้ศึกหนัก
+A prehensile tail from a Yoyo.	หางของ Yoyo ที่ม้วนเกาะได้
+A premium banana grown in the tropics.	กล้วยเกรดพรีเมียมที่ปลูกในเขตร้อน
+A primitive weapon consisting of a wooden stick, an elastic band, and small rocks.	อาวุธดั้งเดิม ประกอบด้วยไม้ ยางยืด และก้อนหินเล็กๆ
+A primitive wood garment that is worn on the shoulders.	เครื่องสวมไหล่ทำจากไม้แบบดั้งเดิม
+A pristinely white horn that almost resembles a unicorn.	เขาสีขาวบริสุทธิ์ที่ดูเกือบจะเหมือนยูนิคอร์น
+A protective covering that shields the back of the hand and forearm.	เครื่องป้องกันที่ครอบหลังมือและท่อนแขน
+A pumpkin with a carved, spooky face.	ฟักทองแกะสลักหน้าน่าขนลุก
+A purple jewel that is the birthstone for February.	อัญมณีสีม่วง หินประจำเดือนกุมภาพันธ์
+A putrid and incredibly pungent corpse's nail.	เล็บศพที่เน่าเปื่อยและกลิ่นฉุนสุดๆ
+A pyroxene, it symbolizes restoration.	แร่ไพรอกซีน สื่อถึงการฟื้นฟู
+A quaint guitar that resonates with the earth itself.	กีตาร์โบราณที่ก้องกังวานไปกับผืนแผ่นดิน
+A quiver that contains 500 arrows.	กระบอกลูกศร บรรจุลูกศร 500 ดอก
+A quiver that contains 500 crystal arrows.	กระบอกลูกศร บรรจุลูกศรคริสตัล 500 ดอก
+A quiver that contains 500 fire arrows.	กระบอกลูกศร บรรจุลูกศรเพลิง 500 ดอก
+A quiver that contains 500 immaterial arrows.	กระบอกลูกศร บรรจุลูกศรไร้รูป 500 ดอก
+A quiver that contains 500 iron arrows.	กระบอกลูกศร บรรจุลูกศรเหล็ก 500 ดอก
+A quiver that contains 500 oridecon arrows.	กระบอกลูกศร บรรจุลูกศร Oridecon 500 ดอก
+A quiver that contains 500 rusty arrows.	กระบอกลูกศร บรรจุลูกศรสนิม 500 ดอก
+A quiver that contains 500 shadow arrows.	กระบอกลูกศร บรรจุลูกศรธาตุมืด 500 ดอก
+A quiver that contains 500 silver arrows.	กระบอกลูกศร บรรจุลูกศรเงิน 500 ดอก
+A quiver that contains 500 steel arrows.	กระบอกลูกศร บรรจุลูกศรเหล็กกล้า 500 ดอก
+A quiver that contains 500 stone arrows.	กระบอกลูกศร บรรจุลูกศรหิน 500 ดอก
+A quiver that contains 500 wind arrows.	กระบอกลูกศร บรรจุลูกศรธาตุลม 500 ดอก
+A rainbow jewel that is the birthstone for October.	อัญมณีสีรุ้ง หินประจำเดือนตุลาคม
+A rare and beautiful gem that looks like the eye of a cat.	อัญมณีหายากและงดงาม หน้าตาเหมือนตาแมว
+A rare feather from the wing of a Peco Peco.	ขนหายากจากปีก Peco Peco
+A rare pistol whose authenticity can be verified by the engraving.	ปืนพกหายาก ดูของแท้ได้จากลายสลัก
+A rare staff that converts psychic energy into brute strength.	ไม้เท้าหายากที่แปลงพลังจิตเป็นพละกำลังดิบ
+A rare, Payon dish that bestows luck to those fortunate enough to eat it.	อาหารหายากของ Payon ใครได้กินก็โชคดี
+A rare, red mineral.	แร่สีแดงหายาก
+A rather suave looking earthworm gifted with womanizing debonairness.	ไส้เดือนหน้าตาเจ้าเสน่ห์ พรสวรรค์ด้านการจีบสาวเต็มเปี่ยม
+A raw ore that mostly consists of elunium.	แร่ดิบที่ส่วนใหญ่เป็น Elunium
+A raw ore that mostly consists of oridecon.	แร่ดิบที่ส่วนใหญ่เป็น Oridecon
+A raw, fresh fish.	ปลาดิบสดๆ
+A really big hammer.	ค้อนที่ใหญ่มาก
+A really, really, big microphone.	ไมโครโฟนที่ใหญ่มากๆๆ
+A receipt for a successful delivery.	ใบเสร็จยืนยันว่าส่งของสำเร็จ
+A receptacle that captured a ripple from the ocean.	ภาชนะที่กักระลอกคลื่นจากมหาสมุทรไว้
+A record of R. Moore, the leader of unsealing Satan Morroc. The writing is second rate at best.	บันทึกของ R. Moore ผู้นำในการปลดผนึก Satan Morroc สำนวนการเขียนถือว่างั้นๆ
+A red berry renown for its slightly sweet and sour taste.	เบอร์รีสีแดงที่ขึ้นชื่อเรื่องรสหวานอมเปรี้ยว
+A red dragon's scale that seems to possess a magical power.	เกล็ดมังกรแดงที่ดูเหมือนจะมีพลังเวทอยู่
+A red envelope containing money given to children on New Year's Day.	ซองแดงใส่เงินที่ให้เด็กๆ ในวันขึ้นปีใหม่
+A red envelope filled given by married couples to friends and family to celebrate.	ซองแดงที่คู่แต่งงานให้เพื่อนและญาติเพื่อร่วมฉลอง
+A red frame that would make a nice present.	กรอบสีแดง เอาไปให้เป็นของขวัญก็ดี
+A red satin hairpin that wards off harmful magic.	ปิ่นปักผมซาตินสีแดง ป้องกันเวทร้าย
+A red scarf that protects its wearer from the cold.	ผ้าพันคอสีแดงที่กันหนาวให้ผู้สวมใส่
+A red silk that a female saint used to seal evil.	ผ้าไหมแดงที่นักบุญหญิงใช้ผนึกความชั่วร้าย
+A red, pompom topped cap associated with the Santa Claus legend.	หมวกแดงมีปอมปอมที่ปลาย ตามตำนานซานตาคลอส
+A red, silken hat that is supposed to be worn by women, but men can wear it too.	หมวกไหมสีแดงที่ควรจะเป็นของผู้หญิง แต่ผู้ชายก็ใส่ได้
+A refined, wooden pipe used for smoking high quality tobacco.	กล้องยาสูบไม้ทำอย่างประณีต ไว้สูบยาชั้นดี
+A replica of Bongun's turban, complete with a torn amulet.	ของจำลองผ้าโพกหัวของ Bongun พร้อมยันต์ที่ขาดวิ่น
+A replica of Munak's turban, complete with an amulet.	ของจำลองผ้าโพกหัวของ Munak พร้อมยันต์ครบ
+A reproduction of the girdle of might worn by Thor.	ของจำลองเข็มขัดพลังอำนาจที่ Thor คาด
+A reproduction of the necklace of beauty worn by Freya.	ของจำลองสร้อยคอแห่งความงามที่ Freya สวม
+A reptile's severed tongue.	ลิ้นสัตว์เลื้อยคลานที่ถูกตัดออกมา
+A repulsive doll that resembles a Chonchon.	ตุ๊กตาน่าขยะแขยงหน้าตาเหมือน Chonchon
+A riceball garnished with strawberries for a delicious taste.	ข้าวปั้นแต่งหน้าสตรอว์เบอร์รี รสชาติอร่อย
+A ring adorned with a diamond which can fetch a hefty price.	แหวนประดับเพชร ขายได้ราคาสูงลิบ
+A ring engraved with <color=#990000>forever or until death</color>, be careful using this as a gift!	แหวนที่สลักว่า <color=#990000>ตลอดไปหรือจนกว่าจะตาย</color> ระวังตอนเอาไปให้เป็นของขวัญนะ!
+A ring engraved with mysterious letters that evokes mortal desire.	แหวนสลักอักษรลึกลับที่ปลุกกิเลสของมนุษย์
+A ring imbued with the fire spirit's agility.	แหวนที่อาบด้วยความว่องไวของภูตไฟ
+A ring imbued with the fire spirit's strength.	แหวนที่อาบด้วยพละกำลังของภูตไฟ
+A ring placed in a cow's nose so that it can be easily steered.	ห่วงที่คล้องจมูกวัวไว้จูงง่ายๆ
+A ring that extrudes the feeling of flying through the wind.	แหวนที่ให้ความรู้สึกเหมือนกำลังโบยบินไปกับสายลม
+A ring that holds the power of lesser elemental spirits.	แหวนที่กักพลังของภูตธาตุชั้นรองไว้
+A ring that responds to healing abilities and strenthens their potency.	แหวนที่ขานรับพลังรักษาและเสริมให้แรงขึ้น
+A ring, enchanted with the power of the fate stone.	แหวนที่ร่ายพลังของหินแห่งโชคชะตาไว้
+A risque undergarment that is comfortable to wear but provides little defense.	ชุดชั้นในวาบหวิว ใส่สบายแต่ป้องกันได้น้อย
+A robe decorated with unknown letters.	เสื้อคลุมที่ตกแต่งด้วยตัวอักษรที่ไม่รู้จัก
+A robe knit out of silver thread.	เสื้อคลุมที่ถักจากด้ายเงิน
+A robe that emanates an aura of holiness.	เสื้อคลุมที่แผ่ออร่าศักดิ์สิทธิ์
+A robe that has been baptized with saintly power.	เสื้อคลุมที่ผ่านการชำระด้วยพลังนักบุญ
+A robe which helped Odin escape a fatal threat.	เสื้อคลุมที่ช่วยให้ Odin รอดจากภัยถึงตาย
+A robe which reduces magic cast time.	เสื้อคลุมที่ลดเวลาร่ายเวท
+A rolled up piece of parchment, now brittle with age, on which faded text can scarcely be read.	แผ่นหนังม้วนที่เปราะเพราะเก่า ตัวอักษรจางจนแทบอ่านไม่ออก
+A rose quartz, it symbolizes self esteem.	โรสควอตซ์ สื่อถึงความภาคภูมิใจในตัวเอง
+A rotting piece of meat that is definitely unsafe for you to eat.	เนื้อเน่าที่กินเข้าไปไม่ปลอดภัยแน่นอน
+A rotting, dirty fish that attracts flies.	ปลาเน่าสกปรกที่แมลงวันตอม
+A rough shield covered in spikes that deter rushing enemies.	โล่หยาบๆ ที่ปกคลุมด้วยหนามแหลม สกัดศัตรูที่พุ่งเข้ามา
+A rough-hewn wand that's great for spell casting.	ไม้กายสิทธิ์เหลาหยาบๆ แต่ร่ายเวทได้ดีเยี่ยม
+A round, edible fruit that, when eaten once a day, keeps the doctor away.	ผลไม้กลมกินได้ กินวันละลูกแล้วไม่ต้องหาหมอ
+A rounded shield that readily absorbs impact from attacks.	โล่ทรงกลมที่ซับแรงกระแทกจากการโจมตีได้ดี
+A royal gift to a member of the Continental Guard.	ของขวัญจากราชสำนักแก่สมาชิก Continental Guard
+A ruby containing mysterious powers.	ทับทิมที่มีพลังลึกลับอยู่ข้างใน
+A rustic hat knit from rough reeds and bamboo that shields against the rain and sun.	หมวกสานจากกกและไผ่แบบบ้านๆ กันได้ทั้งฝนทั้งแดด
+A rusty piece of iron that would only interest scavengers and vermin.	เศษเหล็กขึ้นสนิมที่มีแต่พวกเก็บของเก่ากับหนูเท่านั้นที่สนใจ
+A rusty screw that has come off a machine.	น็อตขึ้นสนิมที่หลุดมาจากเครื่องจักร
+A salaryman's necktie worn as a headband.	เนกไทมนุษย์เงินเดือนที่เอามาคาดหัว
+A sample of aerobic bacteria that resides on metal chains.	ตัวอย่างแบคทีเรียที่ใช้ออกซิเจน อาศัยอยู่บนโซ่โลหะ
+A sandwich made with slices of freshly baked bread, ground meat and cream cheese.	แซนด์วิชขนมปังอบใหม่ สอดไส้เนื้อบดและครีมชีส
+A sawed off shotgun that fires rapidly at the cost of reduced accuracy.	ปืนลูกซองลำกล้องสั้น ยิงรัวได้แต่แม่นน้อยลง
+A scale made of thin ice that, mysteriously, won't melt.	เกล็ดน้ำแข็งบางที่ไม่ละลายอย่างน่าประหลาด
+A scale that is much sharper than a razor.	เกล็ดที่คมกว่ามีดโกนมาก
+A scarf made from the highest quality wool.	ผ้าพันคอที่ทำจากขนแกะคุณภาพสูงสุด
+A scented and thorny tree fruit.	ผลไม้เปลือกหนามที่มีกลิ่นหอม
+A scorpion's severed tail.	หางแมงป่องที่ถูกตัดออกมา
+A scroll in which a single use of Blessing has been recorded.	ม้วนคาถาที่บันทึก Blessing ไว้ใช้ได้ครั้งเดียว
+A scroll in which a single use of Increase AGI has been recorded.	ม้วนคาถาที่บันทึก Increase AGI ไว้ใช้ได้ครั้งเดียว
+A scroll in which a single use of Lv 5 Aspersio has been recorded.	ม้วนคาถาที่บันทึก Aspersio Lv 5 ไว้ใช้ได้ครั้งเดียว
+A scroll in which a single use of Lv 5 Assumptio has been recorded.	ม้วนคาถาที่บันทึก Assumptio Lv 5 ไว้ใช้ได้ครั้งเดียว
+A scroll, exclusive to High Priest, casts Lv 10 Party Increase AGI.	ม้วนคาถาเฉพาะ High Priest ร่าย Party Increase AGI Lv 10
+A scroll, exclusive to High Priests, casts Lv 10 Party Blessing.	ม้วนคาถาเฉพาะ High Priest ร่าย Party Blessing Lv 10
+A scroll, exclusive to High Priests, casts Lv 5 Party Assumptio.	ม้วนคาถาเฉพาะ High Priest ร่าย Party Assumptio Lv 5
+A scruff of neckskin from a desert lizard.	หนังต้นคอของกิ้งก่าทะเลทราย
+A scrumptious cookie.	คุกกี้แสนอร่อย
+A sculpture of a billow crushing against the shore.	ประติมากรรมคลื่นลูกใหญ่ที่ซัดเข้าฝั่ง
+A sculpture of drifting air captured by a gifted artist.	ประติมากรรมสายลมที่พัดผ่าน ผลงานของศิลปินผู้มีพรสวรรค์
+A sealed scroll consealing magic spells.	ม้วนคาถาที่ผนึกเวทมนตร์ไว้ข้างใน
+A seared piece of skin from Satan Morroc.	เศษหนังไหม้เกรียมของ Satan Morroc
+A secret Payon recipe of marinated tender beef with herbs and sauces.	สูตรลับของ Payon เนื้อนุ่มหมักสมุนไพรและซอส
+A seed filled with vitality.	เมล็ดที่เปี่ยมด้วยพลังชีวิต
+A seed from the Yggdrasil tree, it has a strange and energizing pungence.	เมล็ดจากต้น Yggdrasil กลิ่นฉุนแปลกๆ ที่ให้พลัง
+A seemingly useless farming tool.	อุปกรณ์ทำไร่ที่ดูเหมือนจะไร้ประโยชน์
+A self portrait of someone contorting his facial expression.	ภาพวาดตัวเองของคนที่กำลังทำหน้าบิดเบี้ยว
+A set of blades worn on the back of both hands.	ชุดใบมีดที่สวมไว้หลังมือทั้งสองข้าง
+A set of daggers in which the blades are positioned above the knuckles.	ชุดมีดสั้นที่ใบมีดอยู่เหนือข้อนิ้ว
+A set of deer antlers that humans can proudly wear.	เขากวางชุดหนึ่งที่มนุษย์สวมได้อย่างภาคภูมิ
+A set of ear coverings that protect them from the cold.	ที่ครอบหูกันหนาว
+A set of fat lips cut from a giant deep sea fish.	ริมฝีปากหนาที่ตัดมาจากปลาน้ำลึกขนาดยักษ์
+A set of hands from the clock face.	ชุดเข็มนาฬิกาจากหน้าปัด
+A set of moth wings.	ปีกผีเสื้อกลางคืนชุดหนึ่ง
+A set of reins that can help steer a mounted animal.	ชุดบังเหียนที่ใช้บังคับสัตว์พาหนะ
+A set of shining armor worn by the Valkyries, Odin's battle maidens.	ชุดเกราะเปล่งประกายที่เหล่า Valkyrie นางรบแห่ง Odin สวม
+A set of summer clothes that are absolutely perfect for the beach!	ชุดหน้าร้อนที่เหมาะกับชายหาดที่สุด!
+A set of tails that belonged to a fox, but not anymore, obviously.	ชุดหางที่เคยเป็นของสุนัขจิ้งจอก แต่ตอนนี้ไม่ใช่แล้ว ก็แหงล่ะ
+A severed bug's leg that is as sharp as a scythe.	ขาแมลงที่ตัดมา คมเหมือนเคียว
+A sewing tool on which thread is wound.	อุปกรณ์เย็บผ้าที่ใช้พันด้าย
+A shamanic wand topped with a goat's skull.	ไม้กายสิทธิ์ของหมอผี ปลายเป็นกะโหลกแพะ
+A sharp cactus needle.	หนามกระบองเพชรที่แหลมคม
+A sharp claw extracted from a leopard.	กรงเล็บแหลมคมที่ถอนมาจากเสือดาว
+A sharp cuspid yanked from an orc archer's mouth.	เขี้ยวแหลมที่กระชากมาจากปาก Orc Archer
+A sharp dagger built to puncture and destroy armor.	มีดสั้นคมที่ทำมาเพื่อเจาะและทำลายเกราะ
+A sharp fang dislodged from Hati's mouth.	เขี้ยวแหลมที่งัดมาจากปาก Hati
+A sharp forelimb claw from a scorpion.	ก้ามหน้าที่แหลมคมของแมงป่อง
+A sharp leaf.	ใบไม้ที่คมกริบ
+A sharp talon from a bird's foot.	กรงเล็บแหลมจากตีนนก
+A sharp, front limb severed from a Mantis.	ขาหน้าที่แหลมคมซึ่งตัดมาจาก Mantis
+A sharp, poisonous fang.	เขี้ยวแหลมที่มีพิษ
+A sharp, serrated tooth pulled from the mouth of a giant deep sea fish.	ฟันซี่แหลมหยักที่ถอนมาจากปากปลาน้ำลึกขนาดยักษ์
+A sharp, shiny fragment broken off a dark crystal.	เศษเงาวับแหลมคมที่แตกมาจากคริสตัลดำ
+A sharp, solid feeler.	หนวดสัมผัสที่แข็งและแหลม
+A shawl marked with ancient conjuration patterns.	ผ้าคลุมไหล่ที่มีลวดลายเรียกวิญญาณโบราณ
+A shed skin peeling from an earthworm.	คราบที่ไส้เดือนลอกทิ้ง
+A shell that sparkles with dazzling light.	เปลือกหอยที่แวววาวจ้า
+A shell-like piece of tough skin that is covered with hard scales.	หนังเหนียวคล้ายเปลือก ปกคลุมด้วยเกล็ดแข็ง
+A shellfish which has a long tail and many legs. When cooked, the color of the body turns red with a unique scent, and is very tasty.	สัตว์เปลือกแข็งที่มีหางยาวและขาหลายคู่ พอสุกแล้วตัวเป็นสีแดง กลิ่นหอมเป็นเอกลักษณ์ และอร่อยมาก
+A shield exclusive to the Novice Training Grounds.	โล่เฉพาะของลานฝึก Novice
+A shield exclusively for Novices!	โล่สำหรับ Novice เท่านั้น!
+A shield symbolic of God's gift to the church.	โล่ที่สื่อถึงของประทานจากพระเจ้าแก่ศาสนจักร
+A shield used by Gna, messenger of Freyja, when she served as a Valkyrie.	โล่ที่ Gna ผู้ส่งสารของ Freyja ใช้ตอนเป็น Valkyrie
+A shield used in jousting tournaments, best used with a spear.	โล่ที่ใช้ในการประลองทวน ใช้คู่กับหอกดีที่สุด
+A shield which contains a holy power that can nullify evil.	โล่ที่มีพลังศักดิ์สิทธิ์ซึ่งลบล้างความชั่วร้ายได้
+A shield with a mirrored surface that defends against harmful magic.	โล่ผิวกระจกที่ป้องกันเวทร้าย
+A shimmering, reflective scale.	เกล็ดที่วิบวับสะท้อนแสง
+A shiny and elegant gold button engraved with a beautiful rose.	กระดุมทองเงางามหรูหรา สลักลายกุหลาบงดงาม
+A shiny blue jewel.	อัญมณีสีน้ำเงินเงางาม
+A shiny gold key rumored to be able to open enchanted locks.	กุญแจทองเงางาม ร่ำลือกันว่าไขกลอนที่ร่ายเวทไว้ได้
+A shiny red jewel.	อัญมณีสีแดงเงางาม
+A shiny spear blade.	ใบหอกเงางาม
+A shiny, purple fruit picked from the boughs of a mastela tree.	ผลไม้สีม่วงเงางามที่เก็บมาจากกิ่งต้น Mastela
+A shiny, round, silver food platter.	ถาดอาหารเงินทรงกลมเงางาม
+A short barrel rifle suited close quarters combat in the jungle.	ไรเฟิลลำกล้องสั้น เหมาะกับการสู้ระยะใกล้ในป่า
+A short lock of braided hair.	ปอยผมถักสั้นๆ
+A short, round shell from an insect.	เปลือกแมลงทรงกลมสั้น
+A shuriken thas has thorn like barbs.	ชูริเคนที่มีเงี่ยงเหมือนหนาม
+A shuriken that can be thrown easily.	ชูริเคนที่ขว้างง่าย
+A shuriken that cuts like the rain.	ชูริเคนที่บาดเหมือนสายฝน
+A shuriken that is as thin as a leaf.	ชูริเคนที่บางเหมือนใบไม้
+A shuriken that is easy to conceal.	ชูริเคนที่ซ่อนง่าย
+A signpost that declares disapproval, it causes catastrophes during weddings.	ป้ายประกาศคัดค้าน ก่อหายนะในงานแต่งงาน
+A silver knife that is a symbol of a virgin's chastity.	มีดเงินที่เป็นสัญลักษณ์ของความบริสุทธิ์
+A silver tipped arrow.	ลูกศรปลายเงิน
+A silver watch with connecting chain.	นาฬิกาเงินพร้อมสายโซ่
+A silver, spiked knuckle with diamond studs.	เครื่องสวมหมัดเงินมีหนามแหลม ประดับเพชร
+A simple dish made from steamed crab nippers and herbs.	เมนูง่ายๆ ก้ามปูนึ่งกับสมุนไพร
+A simple flail that consists of a thin mace attached to a chain of iron links.	กระบองโซ่แบบง่าย กระบองเรียวต่อกับโซ่เหล็ก
+A simple knife.	มีดธรรมดา
+A simple magic wand.	ไม้กายสิทธิ์แบบธรรมดา
+A simple mask with a smile carved into it.	หน้ากากเรียบง่ายที่แกะสลักรอยยิ้มไว้
+A simple pink hat.	หมวกสีชมพูเรียบง่าย
+A simple set of armor carved out of solid wood.	ชุดเกราะเรียบง่ายที่แกะจากไม้ตัน
+A simple stone that you can find anywhere.	หินธรรมดาที่หาได้ทุกที่
+A simple, common ring made of gold.	แหวนทองธรรมดาทั่วไป
+A simple, modest ring made of silver.	แหวนเงินเรียบง่ายไม่หวือหวา
+A simple, practical belt that has little fashion value.	เข็มขัดเรียบง่ายใช้งานได้จริง แต่ไม่ค่อยสวย
+A simple, pretty ring made of wildflowers.	แหวนดอกไม้ป่าเรียบง่ายแต่สวย
+A simple, soft garment that covers the head and neck.	ผ้าคลุมเนื้อนุ่มเรียบง่ายที่คลุมหัวและคอ
+A simple, sturdily made shirt of cotton.	เสื้อฝ้ายเรียบง่ายที่ทำมาแข็งแรง
+A simply constructed bow that offers balanced performance.	ธนูที่ทำมาแบบเรียบง่าย ประสิทธิภาพสมดุล
+A single scale from a Worm Tail.	เกล็ดชิ้นเดียวจาก Worm Tail
+A single, functioning cell taken from an aquatic lifeform.	เซลล์เดี่ยวที่ยังทำงานได้ เก็บมาจากสิ่งมีชีวิตในน้ำ
+A six stringed instrument that is played by plucking the strings with a pick.	เครื่องดนตรีหกสาย เล่นด้วยการดีดสายด้วยปิ๊ก
+A six-stringed instrument that is played by plucking the strings with a pick.	เครื่องดนตรีหกสาย เล่นโดยใช้ปิ๊กดีดสาย
+A skein of threads which possess a holier power.	ไจด้ายที่มีพลังศักดิ์สิทธิ์ยิ่งกว่า
+A skein of threads which possess a holy power.	ไจด้ายที่มีพลังศักดิ์สิทธิ์
+A skeleton shaped bottle which contains deadly poison.	ขวดรูปโครงกระดูกที่บรรจุยาพิษร้ายแรง
+A skin shed from a worm or insect.	คราบที่หนอนหรือแมลงลอกทิ้ง
+A skintight, form fitting clothing that allows for easy movement.	ชุดรัดรูปที่เข้ารูป เคลื่อนไหวสะดวก
+A skipping rope with wooden handles.	เชือกกระโดดด้ามไม้
+A skull on which someone's name has been carved.	กะโหลกที่มีคนสลักชื่อไว้
+A skull taken from a corpse.	กะโหลกที่เอามาจากศพ
+A sky blue jewel that is the birthstone for March.	อัญมณีสีฟ้า หินประจำเดือนมีนาคม
+A slender leaf that is placed in the mouth for a seductive look.	ใบไม้เรียวที่คาบไว้ในปากเพื่อความยั่วยวน
+A small blood red bullet.	กระสุนเล็กสีแดงเลือด
+A small blue ribbon that emphasizes its wearer's cuteness.	โบว์สีน้ำเงินเล็กๆ ที่ขับความน่ารักของผู้ใส่
+A small bottle of orange juice.	น้ำส้มขวดเล็ก
+A small bouquet thrown by brides during the wedding ceremony. Supposedly, the woman who catches it is next to be married.	ช่อดอกไม้เล็กที่เจ้าสาวโยนในพิธีแต่งงาน ว่ากันว่าใครรับได้จะได้แต่งงานคนต่อไป
+A small bronze key.	กุญแจทองแดงเล็ก
+A small bunch of rare bear sinew.	เอ็นหมีหายากมัดเล็กๆ
+A small chunk of a coral reef formed in clear, tropical waters.	ก้อนปะการังเล็กๆ ที่ก่อตัวในน้ำทะเลเขตร้อนใสแจ๋ว
+A small coin with a Poring engraved on it.	เหรียญเล็กที่สลักรูป Poring
+A small corsage that resembles a Pinguicula.	ช่อดอกไม้ติดเสื้อเล็กๆ รูป Pinguicula
+A small crown, fashioned out of pure gold, worn by members of nobility.	มงกุฎเล็กที่ทำจากทองคำบริสุทธิ์ ชนชั้นสูงสวมกัน
+A small crystallization created by monsters.	ผลึกเล็กๆ ที่มอนสเตอร์สร้างขึ้น
+A small goat horn, the symbol of evil.	เขาแพะเล็ก สัญลักษณ์ของความชั่วร้าย
+A small green ribbon that emphasizes its wearer's cuteness.	โบว์สีเขียวเล็กๆ ที่ขับความน่ารักของผู้ใส่
+A small instrument used in baroque, classical, country, and folk music.	เครื่องดนตรีชิ้นเล็กที่ใช้ในเพลงบาโรก คลาสสิก คันทรี และโฟล์ก
+A small metal bullet.	กระสุนโลหะขนาดเล็ก
+A small paper used as a proof of purchase.	กระดาษแผ่นเล็กใช้เป็นหลักฐานการซื้อ
+A small piece of a pretty crystal that looks like it has a symbol of an eye in its center.	เศษคริสตัลสวยชิ้นเล็ก ตรงกลางเหมือนมีสัญลักษณ์รูปตา
+A small piece of rock that has been broken from a larger stone.	เศษหินชิ้นเล็กที่แตกมาจากก้อนใหญ่
+A small red ribbon that emphasizes its wearer's cuteness.	โบว์สีแดงเล็กๆ ที่ขับความน่ารักของผู้ใส่
+A small sculpture that is a symbol of pride for Orc Warriors.	ประติมากรรมชิ้นเล็กที่เป็นความภาคภูมิใจของ Orc Warrior
+A small silver bullet.	กระสุนเงินขนาดเล็ก
+A small silver knife that is held between your teeth.	มีดเงินเล็กที่คาบไว้ระหว่างฟัน
+A small stellar crystal, fallen from the heavens, which can be used to craft strengthened weapons.	ผลึกดาวชิ้นเล็กที่ร่วงจากฟากฟ้า ใช้ตีอาวุธเสริมพลังได้
+A small white ribbon that emphasizes its wearer's cuteness.	โบว์สีขาวเล็กๆ ที่ขับความน่ารักของผู้ใส่
+A small, decorative ribbon.	โบว์ประดับชิ้นเล็ก
+A small, light, and sharp dagger optimized for swift strikes.	มีดสั้นเล็ก เบา และคม เหมาะกับการจู่โจมฉับไว
+A small, red bag that magically changes your clothes.	ถุงแดงใบเล็กที่เปลี่ยนเสื้อผ้าให้ได้อย่างมหัศจรรย์
+A small, red colored peaked hat.	หมวกทรงแหลมสีแดงใบเล็ก
+A small, star shaped hairclip that makes a great present for ladies.	กิ๊บติดผมรูปดาวเล็กๆ เอาไปให้สาวๆ เป็นของขวัญได้ดี
+A small, tight fitting headdress made of fine silk.	เครื่องสวมหัวเล็กรัดรูป ทำจากไหมชั้นดี
+A small, twinkling gem that can be sold at a good price.	อัญมณีเม็ดเล็กที่ระยิบระยับ ขายได้ราคาดี
+A small, wooden box marked with the word "Fragile".	กล่องไม้ใบเล็กที่เขียนว่า "ระวังแตก"
+A smithing tool made of iron on which heated metals are placed and hammered into shape.	อุปกรณ์ตีเหล็กทำจากเหล็ก ไว้วางโลหะร้อนแล้วตีขึ้นรูป
+A smooth, sleek paper suitable for writing love letters.	กระดาษเนียนลื่น เหมาะกับการเขียนจดหมายรัก
+A snack made out of rice that doesn't contain any fat.	ขนมทำจากข้าว ไม่มีไขมันเลย
+A snack sent from Arunafeltz, it has a spicy taste.	ขนมที่ส่งมาจาก Arunafeltz รสเผ็ด
+A snack sent from Rune Midgard, its flavored with strawberries.	ขนมที่ส่งมาจาก Rune Midgard รสสตรอว์เบอร์รี
+A snack sent from Schwartzwald, its fruit juice cools your whole body.	ขนมที่ส่งมาจาก Schwartzwald น้ำผลไม้ในนั้นทำให้ทั้งตัวเย็นสบาย
+A sniping rifle with a lengthened barrel for improved accuracy.	ไรเฟิลซุ่มยิงลำกล้องยาว เพิ่มความแม่นยำ
+A sock decorated with colored stripes.	ถุงเท้าลายทางหลากสี
+A soft apron that is double stitched for better quality.	ผ้ากันเปื้อนเนื้อนุ่ม เย็บสองชั้นเพื่อคุณภาพที่ดีกว่า
+A soft blade of grass.	ใบหญ้าอ่อนนุ่ม
+A soft cloth worn around an infant's neck to capture spilled milk and baby drool.	ผ้านุ่มที่ผูกคอทารกไว้รองน้ำนมและน้ำลาย
+A solid tablet that is cold to the touch.	แผ่นจารึกตันที่สัมผัสแล้วเย็น
+A solid, beautiful engagement ring engraved with "Slave of Love".	แหวนหมั้นเนื้อแน่นสวยงาม สลักว่า "Slave of Love"
+A solid, durable shell.	เปลือกที่แน่นและทนทาน
+A soup made with boiled clam meat.	ซุปที่ต้มจากเนื้อหอย
+A soup made with squid ink broth and frog eggs.	ซุปน้ำหมึกปลาหมึกใส่ไข่กบ
+A soup that brings good luck when eaten hot.	ซุปที่กินร้อนๆ แล้วนำโชค
+A sparkling clear gemstone formed from the tears of the goddess Freya.	อัญมณีใสระยิบระยับที่เกิดจากน้ำตาของเทพี Freya
+A spear commonly used by mounted knights.	หอกที่อัศวินขี่ม้าใช้กันทั่วไป
+A spear enchanted with the power to summon flame.	หอกที่ร่ายพลังเรียกเปลวเพลิงไว้
+A spear fashioned from a unicorn's horn, enabling it to neutralize poisons and inflict deep wounds.	หอกที่ทำจากเขายูนิคอร์น ล้างพิษได้และสร้างบาดแผลลึก
+A spear that drains the souls of defeated enemies.	หอกที่ดูดวิญญาณศัตรูที่ล้มลง
+A spear that pierces through enemy armor.	หอกที่เจาะทะลุเกราะศัตรู
+A spear that radiates with the warm, glowing light of pure holiness.	หอกที่เปล่งแสงอบอุ่นแห่งความศักดิ์สิทธิ์บริสุทธิ์
+A spear tipped with a hook that can push and pull enemies.	หอกปลายตะขอที่ผลักและดึงศัตรูได้
+A spear topped with a double edged blade.	หอกที่ปลายเป็นใบมีดสองคม
+A spear with a curved blade and puncturing spike that excels in mounted combat.	หอกใบมีดโค้งพร้อมเงี่ยงแทง เก่งเรื่องการรบบนหลังม้า
+A spear with a hooked blade that has proven its versatility in battle.	หอกใบมีดตะขอที่พิสูจน์แล้วว่าใช้ได้สารพัดในสนามรบ
+A spear with a huge sword-like spearhead.	หอกที่ปลายเป็นใบมีดใหญ่เหมือนดาบ
+A spear with a leaf shaped point that inflicts damage with its heavy weight.	หอกปลายรูปใบไม้ที่สร้างดาเมจด้วยน้ำหนักอันมหาศาล
+A spear with a steel spike and axe-blade which enables both piercing and hacking.	หอกที่มีทั้งเงี่ยงเหล็กและใบขวาน แทงก็ได้ ฟันก็ได้
+A spear, created from the body of a dead, giant sea creature.	หอกที่สร้างจากซากสัตว์ทะเลยักษ์
+A special Umbala dish made with steamed alligator meat wrapped in vegetables.	เมนูพิเศษของ Umbala เนื้อจระเข้นึ่งห่อผัก
+A special compound that can only be produced by geniuses.	สารประกอบพิเศษที่มีแต่อัจฉริยะเท่านั้นที่ทำได้
+A special headgear created specifically for Lord Kaho.	เครื่องสวมหัวพิเศษที่ทำขึ้นเพื่อ Lord Kaho โดยเฉพาะ
+A special mask that filters out poisons from the air.	หน้ากากพิเศษที่กรองพิษออกจากอากาศ
+A special sauce that enhances the savory quality of most foods.	ซอสสูตรพิเศษที่ชูรสอาหารได้แทบทุกอย่าง
+A special tonic that combats drowsiness.	ยาบำรุงสูตรพิเศษที่แก้ง่วง
+A specialized face armor that protects the jawline.	เกราะหน้าเฉพาะทางที่ปกป้องแนวขากรรไกร
+A specially bow that uses a mechanical firing mechanism.	ธนูพิเศษที่ใช้กลไกยิงแบบเครื่องกล
+A specialty weapon that beautifully combines combines the power of swords and maces.	อาวุธเฉพาะทางที่ผสานพลังของดาบกับกระบองไว้อย่างลงตัว
+A spectacular sword with a blade forged out of meteorite that shines like starlight during the night.	ดาบตระการตา ใบมีดตีจากอุกกาบาต ยามค่ำคืนเปล่งประกายดั่งแสงดาว
+A spell book containing powerful, ancient magic.	ตำราเวทที่บรรจุเวทมนตร์โบราณอันทรงพลัง
+A spell scroll, that when unraveled, will teleport the reader to Schwaltzwald Guard Camp.	ม้วนคาถาที่พอคลี่ออกจะวาร์ปผู้อ่านไปยังค่ายทหาร Schwaltzwald
+A spicy curry, balanced with pumpkin, known to have the flavor of patience.	แกงกะหรี่รสเผ็ด ตัดรสด้วยฟักทอง ขึ้นชื่อว่ามีรสของความอดทน
+A spicy flavoring that complements few foods, but is a necessary ingredient for some dishes.	เครื่องปรุงรสเผ็ดที่เข้ากับอาหารไม่กี่อย่าง แต่บางเมนูขาดไม่ได้
+A spicy soup with dragon meat which gives one the sensation of vitality.	ซุปรสเผ็ดใส่เนื้อมังกร กินแล้วรู้สึกเปี่ยมพลัง
+A spirit breath that emits an unnatural chill.	ลมหายใจวิญญาณที่แผ่ความเย็นเหนือธรรมชาติ
+A spirit with a red ribbon on its head.	วิญญาณที่มีโบว์แดงติดอยู่บนหัว
+A spiritual symbol that appears over the heads of the holy.	สัญลักษณ์ศักดิ์สิทธิ์ที่ลอยอยู่เหนือหัวของผู้บริสุทธิ์
+A spooky mask that effectively conceals the wearer's identity.	หน้ากากน่าขนลุกที่ปกปิดตัวตนได้ดี
+A spool wrapped with fine golden thread.	หลอดด้ายที่พันด้วยด้ายทองชั้นดี
+A spoon that was used to dig an underground tunnel.	ช้อนที่เคยใช้ขุดอุโมงค์ใต้ดิน
+A spore discharged from a mushroom.	สปอร์ที่ปล่อยออกมาจากดอกเห็ด
+A sprout grown out of a vegetable seed.	ต้นอ่อนที่งอกจากเมล็ดผัก
+A squad cap issued by the Prontera Military.	หมวกหน่วยที่กองทัพ Prontera แจก
+A square piece of rusty iron.	แผ่นเหล็กขึ้นสนิมทรงสี่เหลี่ยม
+A square shield that is small, yet effective in combat.	โล่สี่เหลี่ยมขนาดเล็ก แต่ใช้ในการรบได้ผลดี
+A staff containing a wind fairy that grants the essence of speed.	ไม้เท้าที่มีภูตลมอยู่ข้างใน มอบแก่นแท้ของความเร็ว
+A staff inset with a gem that disrupts magical protection.	ไม้เท้าที่ฝังอัญมณีซึ่งรบกวนเกราะเวท
+A staff made from the Yggdrasil Tree branches with the engraving "Health and Longevity".	ไม้เท้าที่ทำจากกิ่ง Yggdrasil สลักว่า "Health and Longevity"
+A staff owned by a gentleman somewhere long ago.	ไม้เท้าของสุภาพบุรุษคนหนึ่งเมื่อนานมาแล้ว
+A staff that disrupts the cognitive ability of foes.	ไม้เท้าที่รบกวนการรับรู้ของศัตรู
+A staff that is composed of two parts to form a cross.	ไม้เท้าที่ประกอบจากสองส่วนไขว้กันเป็นกางเขน
+A staff with a hypnotizing effect that can make a Novice feel just like a High Wizard, sort of.	ไม้เท้าที่มีผลสะกดจิต ทำให้ Novice รู้สึกเหมือนเป็น High Wizard ประมาณนั้น
+A stage prop that creates the illusion that the wearer has been stabbed.	อุปกรณ์ประกอบฉากที่ทำให้ดูเหมือนผู้ใส่โดนแทง
+A standard whip that's perfect for adventuring Dancers.	แส้มาตรฐานที่เหมาะกับ Dancer สายผจญภัย
+A statue that symbolizes achievement.	รูปปั้นที่สื่อถึงความสำเร็จ
+A statue that symbolizes bravery.	รูปปั้นที่สื่อถึงความกล้าหาญ
+A statue that symbolizes challenge.	รูปปั้นที่สื่อถึงการท้าทาย
+A statue that symbolizes comraderie.	รูปปั้นที่สื่อถึงมิตรภาพร่วมรบ
+A statue that symbolizes cooperation.	รูปปั้นที่สื่อถึงความร่วมมือ
+A statue that symbolizes friendship.	รูปปั้นที่สื่อถึงมิตรภาพ
+A statue that symbolizes harmony.	รูปปั้นที่สื่อถึงความกลมเกลียว
+A statue that symbolizes leadership.	รูปปั้นที่สื่อถึงความเป็นผู้นำ
+A statue that symbolizes peace.	รูปปั้นที่สื่อถึงสันติภาพ
+A statue that symbolizes sacrifice.	รูปปั้นที่สื่อถึงการเสียสละ
+A statue that symbolizes spirit.	รูปปั้นที่สื่อถึงจิตวิญญาณ
+A statue that symbolizes teamwork.	รูปปั้นที่สื่อถึงการทำงานเป็นทีม
+A statue that symbolizes trust.	รูปปั้นที่สื่อถึงความไว้วางใจ
+A statue that symbolizes unity.	รูปปั้นที่สื่อถึงความเป็นหนึ่งเดียว
+A statue that symbolizes victory.	รูปปั้นที่สื่อถึงชัยชนะ
+A steak that looks ordinary, but it is explosively flavorful and juicy.	สเต๊กที่หน้าตาธรรมดา แต่รสชาติระเบิดและฉ่ำมาก
+A steamed dumpling filled with ground meat and is usually served hot.	ซาลาเปานึ่งไส้เนื้อบด มักเสิร์ฟร้อนๆ
+A steel arrow.	ลูกศรเหล็กกล้า
+A steel box with a tiny keyhole on the lid, you suspect Kiel Hyre wanted to give this to Elly.	กล่องเหล็กที่ฝามีรูกุญแจเล็กๆ สงสัยว่า Kiel Hyre ตั้งใจจะให้ Elly
+A steel helmet that offers great protection.	หมวกเกราะเหล็กที่ป้องกันได้ดีเยี่ยม
+A stem with a tough surface covered with thick, protective scales.	ก้านผิวเหนียวที่ปกคลุมด้วยเกล็ดหนาไว้ป้องกัน
+A sticky piece of Anolian skin.	เศษหนัง Anolian ที่เหนียวหนึบ
+A sticky spider web made of surprisingly strong threadlike fibers.	ใยแมงมุมเหนียวที่ทำจากเส้นใยแข็งแรงอย่างน่าประหลาด
+A sticky, flourescent liquid which glows in the darkness.	ของเหลวเรืองแสงเหนียวๆ ที่สว่างในความมืด
+A stiff, squarish formal hat worn by clerics.	หมวกพิธีการทรงเหลี่ยมแข็ง นักบวชสวมกัน
+A stinger from a hornet or bee.	เหล็กในของต่อหรือผึ้ง
+A stinger ripped out of the body of a steel scorpion.	เหล็กในที่ดึงออกมาจากตัวแมงป่องเหล็ก
+A stinky fish tail.	หางปลาที่เหม็น
+A stinky piece of skin peeled from a black bear.	เศษหนังเหม็นที่ลอกมาจากหมีดำ
+A stone arrow.	ลูกศรหิน
+A stone embedded with seven bright red eyes, just looking at it makes you feel uneasy.	หินที่ฝังตาแดงสดไว้ 7 ดวง แค่มองก็รู้สึกไม่สบายใจ
+A stone heart that is aflame with magic.	หัวใจหินที่ลุกโชนด้วยพลังเวท
+A stone shield which Thor obtained by killing Hrungnir, king of giants.	โล่หินที่ Thor ได้มาจากการสังหาร Hrungnir ราชาแห่งยักษ์
+A stone that softly glimmers with faint light.	หินที่เรืองแสงจางๆ นวลตา
+A stout hat worn by magicians that contains a seemingly endless supply of rabbits.	หมวกทรงสูงของนักมายากล ที่ดูเหมือนจะมีกระต่ายไม่รู้จบอยู่ข้างใน
+A straight bladed sword inspired by eastern warriors.	ดาบใบตรงที่ได้แรงบันดาลใจจากนักรบตะวันออก
+A straight bladed sword that can be brutally swung like a baseball bat.	ดาบใบตรงที่เหวี่ยงได้โหดเหมือนไม้เบสบอล
+A strange device that was invented by an old craftsman.	อุปกรณ์ประหลาดที่ช่างฝีมือรุ่นเก่าประดิษฐ์ขึ้น
+A strange object in which the seductive whispers of Loki can be faintly heard.	วัตถุประหลาดที่แว่วเสียงกระซิบยั่วยวนของ Loki
+A strange object with a tiny soul is flickering from within.	วัตถุประหลาดที่มีวิญญาณดวงเล็กกะพริบอยู่ข้างใน
+A strange object with metal pieces attached.	วัตถุประหลาดที่มีชิ้นส่วนโลหะติดอยู่
+A strange orb that can predict when windstorms.	ลูกแก้วประหลาดที่ทำนายพายุลมได้
+A strange ring that raises its wearer's defense.	แหวนประหลาดที่เพิ่มพลังป้องกันให้ผู้สวมใส่
+A string of beads used to count the number of repetitions that prayers are recited.	สายลูกประคำไว้นับจำนวนรอบที่สวดมนต์
+A stringed instrument known for its beautiful sound.	เครื่องสายที่ขึ้นชื่อเรื่องเสียงอันไพเราะ
+A striped cane of peppermint candy.	ไม้เท้าลูกกวาดเปปเปอร์มินต์ลายทาง
+A striped hair band which is good for preventing hair from covering the eyes.	ที่คาดผมลายทาง กันผมปรกตาได้ดี
+A strong branch with various uses.	กิ่งไม้แข็งแรงที่ใช้ได้สารพัด
+A strong dagger crafted by traditional artisans.	มีดสั้นแข็งแรงที่ช่างฝีมือดั้งเดิมทำขึ้น
+A strong diadem reflective of a desire to overcome hardship.	มงกุฎแข็งแกร่งที่สะท้อนความมุ่งมั่นจะฝ่าฟันความยากลำบาก
+A strong looking vine with various uses.	เถาวัลย์ที่ดูแข็งแรง ใช้ได้สารพัด
+A strong steel wrist protector.	สนับข้อมือเหล็กที่แข็งแรง
+A strong, sturdy hammer imbued with the power of wind.	ค้อนแข็งแรงทนทานที่อาบด้วยพลังลม
+A strong, swift sword with a curved blade.	ดาบที่แข็งแกร่งและว่องไว ใบมีดโค้ง
+A strong, thick cord composed of tightly braided fibers.	เชือกหนาแข็งแรงที่ถักจากเส้นใยแน่นๆ
+A stuffy doll that resembles a Spore.	ตุ๊กตายัดนุ่นหน้าตาเหมือน Spore
+A sturdy axe for fighting multiple enemies at once.	ขวานทนทานสำหรับสู้กับศัตรูหลายตัวพร้อมกัน
+A sturdy, leather pouch used to contain goods.	ถุงหนังทนทานไว้ใส่ของ
+A stylish formal hat worn by talented magicians.	หมวกพิธีการดูดีที่นักมายากลฝีมือดีสวม
+A sweet and light scrumptious cake made with peaches grown in Kunlun.	เค้กหวานเบาแสนอร่อย ทำจากลูกพีชที่ปลูกใน Kunlun
+A sweet and sour fruit wine that was invented by a Morroc merchant.	ไวน์ผลไม้รสหวานอมเปรี้ยว พ่อค้าจาก Morroc คิดค้นขึ้น
+A sweet citrus fruit that can be eaten raw, juiced, or cooked into a jam.	ผลไม้ตระกูลส้มรสหวาน กินสด คั้นน้ำ หรือกวนเป็นแยมก็ได้
+A sweet drink that children seem to like with a gross aftertaste.	เครื่องดื่มหวานที่เด็กๆ ชอบ แต่รสติดปลายลิ้นแย่มาก
+A sweet pancake inspired by Thachentze, the kind Lutie chef.	แพนเค้กหวานที่ได้แรงบันดาลใจจาก Thachentze เชฟใจดีแห่ง Lutie
+A sweet product made by bees endowed with yummy flavor and medicinal uses.	ผลผลิตหวานจากผึ้ง อร่อยและใช้เป็นยาได้
+A sweet sauce that accentuates the flavor of foods but is disgusting by itself.	ซอสหวานที่ชูรสอาหาร แต่กินเปล่าๆ แล้วแย่มาก
+A sweet slice of cake covered with icing and topped with a cherry.	เค้กหวานชิ้นหนึ่ง ราดไอซิ่งและวางเชอร์รีไว้ข้างบน
+A sweet tropical fruit made famous by its use in slapstick comedy.	ผลไม้เมืองร้อนรสหวานที่โด่งดังจากมุกตลกคาเฟ่
+A sweetly scented tea of mixed herbs and grape juice.	ชากลิ่นหอมหวานผสมสมุนไพรและน้ำองุ่น
+A sweetly scented tea that is one of Charles Orleans's specialties.	ชากลิ่นหอมหวาน หนึ่งในเมนูเด็ดของ Charles Orleans
+A sword adorned with an engraving of the sun, symbolizing battle spirit and vigor.	ดาบที่สลักลายดวงอาทิตย์ สื่อถึงจิตวิญญาณนักสู้และพละกำลัง
+A sword crafted by orcish smiths that is symbolic to orc tribes.	ดาบที่ช่างตีเหล็กออร์คทำขึ้น เป็นสัญลักษณ์ของเผ่าออร์ค
+A sword inspired by the legendary twig that killed Baldur, god of light.	ดาบที่ได้แรงบันดาลใจจากกิ่งไม้ในตำนานที่สังหาร Baldur เทพแห่งแสง
+A sword passed down from master to master.	ดาบที่สืบทอดจากอาจารย์สู่อาจารย์
+A sword popularized by sea adventurers.	ดาบที่นักผจญภัยทางทะเลทำให้เป็นที่นิยม
+A sword rumored to bring a horrific fate to whoever wields it.	ดาบที่ร่ำลือกันว่านำชะตากรรมอันน่าสยดสยองมาสู่ผู้ถือ
+A sword that looks like a pair of giant scissors.	ดาบที่หน้าตาเหมือนกรรไกรยักษ์
+A sword topped with several extra edges for making wounds deeper and more unsightly.	ดาบที่มีคมเสริมหลายชั้น ทำให้แผลลึกและน่าเกลียดกว่าเดิม
+A sword with a beautiful, transparent blade and a hilt adorned with a princely jewel.	ดาบใบมีดใสงดงาม ด้ามประดับอัญมณีระดับเจ้าชาย
+A sword with a rounded blade.	ดาบใบมีดโค้งมน
+A sword with a thick, flat blade.	ดาบใบมีดหนาและแบน
+A sword with a unique "S" shaped hilt.	ดาบที่ด้ามเป็นรูปตัว "S" อันเป็นเอกลักษณ์
+A sword with a wide, double sided blade.	ดาบใบกว้างสองคม
+A sword with an elaborately designed hilt.	ดาบที่ด้ามออกแบบมาอย่างวิจิตร
+A sword with an elegant blade and cross guard.	ดาบใบมีดสง่างามพร้อมกั้นมือรูปกางเขน
+A sword with an extremely sharp blade.	ดาบใบมีดคมกริบ
+A swordman figure that radiates honor.	ฟิกเกอร์ Swordman ที่แผ่รัศมีแห่งเกียรติยศ
+A symbol of Hod, the blind god who was tricked into killing his brother Balder, god of light.	สัญลักษณ์ของ Hod เทพตาบอดที่ถูกหลอกให้สังหาร Balder เทพแห่งแสงผู้เป็นพี่น้อง
+A symbol of eternal love, this enchanted (and expensive) rose will never wither.	สัญลักษณ์แห่งรักนิรันดร์ กุหลาบต้องมนตร์ (และแพง) ดอกนี้ไม่มีวันเหี่ยว
+A symbol of eternal love, this unique rose of sculpted ice makes a great gift.	สัญลักษณ์แห่งรักนิรันดร์ กุหลาบแกะสลักจากน้ำแข็งดอกนี้เป็นของขวัญชั้นเลิศ
+A symbol of solidarity that evokes feelings of nobility in those who see it.	สัญลักษณ์แห่งความสามัคคีที่ทำให้ผู้พบเห็นรู้สึกสูงส่ง
+A symbol worn by runners that just makes you want to sprint.	สัญลักษณ์ที่นักวิ่งใส่กัน ใส่แล้วอยากออกวิ่งเต็มที่
+A tablet on which the words of the ancients have been engraved and immortalized.	แผ่นจารึกที่สลักถ้อยคำของคนโบราณไว้ให้คงอยู่ชั่วนิรันดร์
+A tail cut off from a dragon that, sadly, will never grow back.	หางที่ตัดมาจากมังกร น่าเศร้าที่มันจะไม่งอกใหม่
+A talisman with a yin-yang symbol carved in the middle.	ยันต์ที่สลักสัญลักษณ์หยินหยางไว้ตรงกลาง
+A talon from a Harpy.	กรงเล็บของ Harpy
+A tasty rice cake made for celebrating the Lunar New Year.	ขนมข้าวเหนียวแสนอร่อย ทำไว้ฉลองตรุษจีน
+A terrifying axe that drenches the battlefield with blood once it cuts flesh.	ขวานน่าสะพรึงที่พอฟันเข้าเนื้อก็ทำให้สนามรบนองเลือด
+A test tube that contains an unidentified fluid.	หลอดทดลองที่บรรจุของเหลวที่ไม่รู้ว่าคืออะไร
+A test tube that contains the Morroc solution.	หลอดทดลองที่บรรจุสารละลาย Morroc
+A test tube that contains the Payon solution.	หลอดทดลองที่บรรจุสารละลาย Payon
+A thick and heavy hardcover book that could really do some harm if swung around.	หนังสือปกแข็งหนาและหนัก เหวี่ยงใส่ใครก็เจ็บจริง
+A thick book that details how to perform an exorcism.	หนังสือเล่มหนาที่บอกวิธีทำพิธีไล่ผี
+A thick, flexible sword forged from an elastic alloy.	ดาบหนาที่ยืดหยุ่น ตีจากโลหะผสมที่ดัดได้
+A thick, heavy arrow.	ลูกศรหนาและหนัก
+A thick, sharp fingernail from a decayed orc.	เล็บหนาแหลมจากออร์คที่เน่าเปื่อย
+A thief figure that radiates cunning.	ฟิกเกอร์ Thief ที่แผ่รัศมีแห่งเล่ห์เหลี่ยม
+A thimble for archers that enhances power.	ปลอกนิ้วสำหรับนักธนู เพิ่มพลัง
+A thin rat's tail.	หางหนูเรียวๆ
+A thin trunk used to climb up to higher places.	ลำต้นเรียวที่ใช้ปีนขึ้นที่สูง
+A thin, sharp blade capable of piercing the strongest of armors.	ใบมีดบางคมที่เจาะทะลุเกราะแข็งแกร่งที่สุดได้
+A thin, transparent, and shining black key.	กุญแจบางใสเงางามสีดำ
+A thin, transparent, and shining blue key.	กุญแจบางใสเงางามสีน้ำเงิน
+A thin, transparent, and shining green key.	กุญแจบางใสเงางามสีเขียว
+A thin, transparent, and shining red key.	กุญแจบางใสเงางามสีแดง
+A thin, transparent, and shining yellow key.	กุญแจบางใสเงางามสีเหลือง
+A three-pronged fork that doubles as a spear, it is lightweight despite its size.	สามง่ามที่ใช้เป็นหอกได้ด้วย ตัวใหญ่แต่เบา
+A throwing knife laced with toxin.	มีดขว้างที่อาบยาพิษ
+A ticket required to board the Airship.	ตั๋วที่ต้องใช้ขึ้นเรือเหาะ
+A ticket that can waive the fee for a Peco Peco rental.	ตั๋วยกเว้นค่าเช่า Peco Peco
+A ticket that waives the Kafra Pushcart rental fee.	ตั๋วยกเว้นค่าเช่ารถเข็นของ Kafra
+A ticket that waives the Kafra Storage service fee.	ตั๋วยกเว้นค่าบริการคลังเก็บของ Kafra
+A ticket that waives the Kafra Teleport service fee.	ตั๋วยกเว้นค่าบริการวาร์ปของ Kafra
+A ticket which proves mission completion.	ตั๋วที่ยืนยันว่าทำภารกิจสำเร็จ
+A tied bunch of shining human hair.	ช่อผมมนุษย์เงางามที่มัดไว้
+A tiger's hide that's soft, furry, nice, and feral.	หนังเสือที่นุ่ม มีขน สวย และดูดิบเถื่อน
+A tiger's paw known to the elderly as the King of Invigoration.	อุ้งเท้าเสือที่ผู้เฒ่าเรียกกันว่าราชาแห่งยาบำรุง
+A tight-fitting cap worn under a veil.	หมวกรัดศีรษะที่ใส่ไว้ใต้ผ้าคลุมหน้า
+A tiny little hairpin shaped like a tulip.	ปิ่นปักผมจิ๋วรูปดอกทิวลิป
+A toe nail from a huge, disease ridden rodent.	เล็บเท้าของหนูตัวใหญ่ที่เต็มไปด้วยโรค
+A token that certifies its owner obeys evil; and proves a member of the diabolists.	เครื่องหมายที่รับรองว่าเจ้าของสวามิภักดิ์ต่อความชั่วร้าย และเป็นสมาชิกลัทธิบูชาปีศาจ
+A token which proves a knight's loyalty to their lord.	เครื่องหมายที่พิสูจน์ความภักดีของอัศวินต่อเจ้านาย
+A tongue, it has a disgusting coating of sticky saliva.	ลิ้นที่เคลือบด้วยน้ำลายเหนียวน่าขยะแขยง
+A tool used to break rocks or the ground.	เครื่องมือสำหรับทุบหินหรือขุดดิน
+A tooth cut from a wooden dragon mask.	ฟันที่ตัดมาจากหน้ากากมังกรไม้
+A tooth extracted from the mouth of a proud Orc Warrior.	ฟันที่ถอนมาจากปาก Orc Warrior ผู้ทระนง
+A top of the line, high performance grenade launcher.	เครื่องยิงลูกระเบิดสมรรถนะสูงระดับท็อป
+A topaz, it symbolizes mental calm.	บุษราคัม สื่อถึงความสงบทางใจ
+A tough horn that might break, but will never bend.	เขาที่เหนียว หักได้แต่ไม่มีวันงอ
+A tough vine that can be used as rope.	เถาวัลย์เหนียวที่ใช้แทนเชือกได้
+A tough, crunchy bone that has been dried in the sun.	กระดูกเหนียวกรอบที่ตากแดดจนแห้ง
+A tough, sharp jaw from an ant.	กรามมดที่เหนียวและคม
+A tough, woody shelled nut from an oak tree.	ลูกโอ๊กเปลือกไม้แข็ง
+A toy for young boys that's sort of like a marble.	ของเล่นเด็กผู้ชาย ประมาณลูกแก้ว
+A traditional chordophone, favored by the aristocracy in days past.	เครื่องสายโบราณที่ชนชั้นสูงสมัยก่อนนิยม
+A traditional food made from rice powder, there are many recipes to make this, but all of them are absolutely delicious.	อาหารพื้นบ้านที่ทำจากแป้งข้าว มีสูตรทำหลายแบบ แต่อร่อยทุกสูตร
+A traditional hat with a wide, round brim.	หมวกพื้นบ้านปีกกว้างทรงกลม
+A traditional headdress worn by natives.	เครื่องสวมหัวพื้นเมืองที่ชนพื้นเมืองสวม
+A traditional headdress worn during funeral ceremonies.	เครื่องสวมหัวพื้นบ้านที่ใส่ในงานศพ
+A traditional headpiece associated with the afterlife.	เครื่องสวมหัวพื้นบ้านที่เกี่ยวข้องกับโลกหลังความตาย
+A traditional headpiece that symbolizes the traditional gods.	เครื่องสวมหัวพื้นบ้านที่สื่อถึงเทพเจ้าดั้งเดิม
+A traditional oriental mask that is always perpetualy smiling.	หน้ากากตะวันออกโบราณที่ยิ้มอยู่ตลอดเวลา
+A traditional skirt that symbolizes virginity.	กระโปรงพื้นบ้านที่สื่อถึงความบริสุทธิ์
+A training rod, it's a bit weak, but its usefulness to weight ratio can't be beat.	ไม้เท้าฝึกหัด อ่อนไปหน่อย แต่คุ้มค่าเมื่อเทียบกับน้ำหนักสุดๆ
+A transcription in an ancient language from the Sobbing Starlight.	ข้อความภาษาโบราณที่ถอดมาจาก Sobbing Starlight
+A transparent blue bottle that contains a fish spirit.	ขวดใสสีน้ำเงินที่บรรจุวิญญาณปลา
+A transparent celestial robe made from light and soft fabric.	เสื้อคลุมสวรรค์โปร่งใส ทำจากผ้าเบาและนุ่ม
+A transparent veil worn by brides on their wedding day.	ผ้าคลุมหน้าโปร่งใสที่เจ้าสาวสวมในวันแต่งงาน
+A trap that uses sticky, sweet scented liquid to lure and ensnare bugs.	กับดักที่ใช้ของเหลวเหนียวกลิ่นหวานล่อและดักแมลง
+A treasure box filled with old coins, ornaments, and jewelry.	หีบสมบัติที่เต็มไปด้วยเหรียญเก่า เครื่องประดับ และอัญมณี
+A tree branch that can be used as a simple tool.	กิ่งไม้ที่ใช้เป็นเครื่องมือง่ายๆ ได้
+A tree root that still has soil clinging to it.	รากไม้ที่ยังมีดินติดอยู่
+A tree trunk of a high quality; this grain pattern is excellent!	ท่อนไม้คุณภาพสูง ลายไม้สวยเยี่ยม!
+A tree trunk of a low quality; knots are everywhere.	ท่อนไม้คุณภาพต่ำ ตาไม้เต็มไปหมด
+A tree trunk of a medium quality; it's nice and solid.	ท่อนไม้คุณภาพปานกลาง เนื้อแน่นดีทีเดียว
+A tremendously powerful staff that can be wielded by the spiritually strong.	ไม้เท้าที่ทรงพลังมหาศาล ใช้ได้เฉพาะผู้มีจิตแข็งแกร่ง
+A trendy green salad topped with sweet Umbala dressing.	สลัดผักสดสไตล์ทันสมัย ราดน้ำสลัดหวานแบบ Umbala
+A trendy hat based on a style worn by enlisted military men.	หมวกทันสมัยที่ทำตามแบบของทหารเกณฑ์
+A tribal headgear adorned with a long, white feather.	เครื่องสวมหัวชนเผ่าประดับขนนกสีขาวยาว
+A triple pronged spear that can also be used for fishing.	หอกสามง่ามที่ใช้แทงปลาได้ด้วย
+A trophy awarded to the bravest of orcs.	ถ้วยรางวัลสำหรับออร์คที่กล้าหาญที่สุด
+A tuber that can be eaten fried, baked, and even boiled.	หัวมันที่กินได้ทั้งทอด อบ หรือแม้แต่ต้ม
+A turquoise, it symbolizes mental power.	เทอร์ควอยซ์ สื่อถึงพลังจิต
+A twig which contains the mysterious power of eternity, capable of summoning a living creature.	กิ่งไม้ที่มีพลังนิรันดร์อันลึกลับ เรียกสิ่งมีชีวิตออกมาได้
+A two handed spear crafted from fine ivory.	หอกสองมือที่ทำจากงาช้างชั้นดี
+A two-handed, double bladed axe.	ขวานสองคมแบบสองมือ
+A uniform worn by an obsessed chef that nobody could stop from talking about cuisine.	ชุดของเชฟผู้คลั่งไคล้ ที่ไม่มีใครห้ามไม่ให้พูดเรื่องอาหารได้
+A unique headgear that symbolizes a merchant's grief.	เครื่องสวมหัวชิ้นพิเศษที่สื่อถึงความเศร้าของพ่อค้า
+A unique liquid made by Baba Yaga that will ensure winter does not come again!	ของเหลวสูตรพิเศษของ Baba Yaga ที่รับรองว่าฤดูหนาวจะไม่กลับมาอีก!
+A unique spear from a desert land.	หอกชิ้นพิเศษจากดินแดนทะเลทราย
+A valuable metal used to make coins and jewelry.	โลหะมีค่าที่ใช้ทำเหรียญและเครื่องประดับ
+A versatile clip that can attach to pretty much anything.	คลิปอเนกประสงค์ที่หนีบได้แทบทุกอย่าง
+A very cold powder enchanted with very powerful ice magic.	ผงเย็นจัดที่ร่ายเวทน้ำแข็งอันทรงพลังไว้
+A viscous plant substance used in carpentry.	ยางไม้เหนียวที่ใช้ในงานช่างไม้
+A vivid blue ore that glows with the power of the ocean.	แร่สีน้ำเงินสด เรืองแสงด้วยพลังแห่งมหาสมุทร
+A vivid green ore that glows with the power of the earth.	แร่สีเขียวสด เรืองแสงด้วยพลังแห่งผืนดิน
+A vivid red ore that glows with the power of a volcano.	แร่สีแดงสด เรืองแสงด้วยพลังแห่งภูเขาไฟ
+A vivid red spice that adds a spicy taste to food.	เครื่องเทศสีแดงสดที่เพิ่มรสเผ็ดให้อาหาร
+A vivid yellow ore that glows with the power of the sky.	แร่สีเหลืองสด เรืองแสงด้วยพลังแห่งท้องฟ้า
+A voucher which may be exchanged for a new clothing style.	คูปองที่แลกเปลี่ยนสีชุดใหม่ได้
+A voucher which may be exchanged for a new hair style.	คูปองที่แลกเปลี่ยนทรงผมใหม่ได้
+A wand crafted from a lich's skull that threatens to curse anyone that harms its owner.	ไม้กายสิทธิ์ที่ทำจากกะโหลกลิช พร้อมสาปใครก็ตามที่ทำร้ายเจ้าของ
+A wand of human bone, its dark aura can be sensed by those who wield it.	ไม้กายสิทธิ์จากกระดูกมนุษย์ ผู้ถือสัมผัสได้ถึงออร่ามืดของมัน
+A warm bow that draws its power from the plains.	ธนูอบอุ่นที่ดึงพลังมาจากผืนทุ่ง
+A warm scarf that is worn around the neck and shoulders.	ผ้าพันคออุ่นๆ ที่พันรอบคอและไหล่
+A weapon that is designed to easily slice muscles.	อาวุธที่ออกแบบมาให้เฉือนกล้ามเนื้อได้ง่าย
+A webbed foot from a monster's leg.	ตีนพังผืดจากขามอนสเตอร์
+A wedding dress that is immaculately white.	ชุดเจ้าสาวสีขาวไร้ที่ติ
+A wedding ring for a bride which symbolizes ever-lasting trust.	แหวนแต่งงานของเจ้าสาว สื่อถึงความไว้ใจนิรันดร์
+A wedding ring for a groom which symbolizes ever-lasting love.	แหวนแต่งงานของเจ้าบ่าว สื่อถึงความรักนิรันดร์
+A weird organic clump that seems to be a marine sphere brain.	ก้อนอินทรีย์ประหลาดที่น่าจะเป็นสมองของ Marine Sphere
+A well crafted shield which most attacks cannot penetrate.	โล่ที่ทำมาอย่างดี การโจมตีส่วนใหญ่เจาะไม่เข้า
+A well written letter of recommendation recognized by the Assassin Guild.	จดหมายแนะนำตัวที่เขียนมาอย่างดี สมาคม Assassin ยอมรับ
+A well written, detailed battle manual.	คู่มือการรบที่เขียนมาอย่างดีและละเอียด
+A wheel whose purpose is truly mysterious.	ล้อที่ไม่รู้จริงๆ ว่าเอาไว้ทำอะไร
+A whimsical guitar that inspires a desire for travel.	กีตาร์ขี้เล่นที่จุดประกายให้อยากออกเดินทาง
+A whip constructed purely of thorny rosebush stems.	แส้ที่ทำจากก้านกุหลาบมีหนามล้วนๆ
+A whip fashioned from a live electric wire.	แส้ที่ทำจากสายไฟที่มีกระแสไหลอยู่
+A whip fashioned from enchanted, eternally frozen, icicles.	แส้ที่ทำจากแท่งน้ำแข็งต้องมนตร์ที่ไม่มีวันละลาย
+A whip fashioned from tough braided tree roots.	แส้ที่ถักจากรากไม้เหนียว
+A whip fashioned from worn, hot leather dried in the desert sun.	แส้ที่ทำจากหนังเก่าตากแดดทะเลทรายจนร้อน
+A whip fashioned out of an animal's tail that brings good fortune.	แส้ที่ทำจากหางสัตว์ นำโชคลาภมาให้
+A whip fit for a queen.	แส้ที่คู่ควรกับราชินี
+A whip made of a flexible wire attached to an iron handle.	แส้ที่ทำจากลวดยืดหยุ่นต่อกับด้ามเหล็ก
+A whip thats the best of the best.	แส้ที่ดีที่สุดในบรรดาที่ดีที่สุด
+A whip with a spiked ball attached at the end.	แส้ที่ปลายติดลูกตุ้มหนามแหลม
+A white blue jewel that is the birthstone for December.	อัญมณีสีขาวอมฟ้า หินประจำเดือนธันวาคม
+A white cacao.	โกโก้ขาว
+A white chocolate used to propose to a girl by a boy during White Day.	ไวต์ช็อกโกแลตที่ผู้ชายใช้สารภาพรักกับผู้หญิงในวัน White Day
+A white colored moustache, a symbol of experience and sophistication.	หนวดสีขาว สัญลักษณ์ของประสบการณ์และความสง่างาม
+A white key that came from a broken piano.	คีย์สีขาวที่มาจากเปียโนที่พัง
+A white mask with red blush that is worn by the actor playing the bride in a play.	หน้ากากสีขาวแต้มแก้มแดง ที่นักแสดงบทเจ้าสาวสวมในละคร
+A white plate that would make a nice gift.	จานสีขาว เอาไปให้เป็นของขวัญก็ดี
+A white rose that enhances the wearer's beauty.	กุหลาบขาวที่ขับความงามของผู้สวมใส่
+A white satin hairpin that wards off harmful magic.	ปิ่นปักผมซาตินสีขาว ป้องกันเวทร้าย
+A wick-like ornament worn for a dangerous look.	เครื่องประดับคล้ายไส้เทียน ใส่แล้วดูอันตราย
+A wide bladed short sword crafted in a western country.	ดาบสั้นใบกว้างที่ทำขึ้นในดินแดนตะวันตก
+A wing from a giant butterfly that strangly lacks the properties of a normal butterfly wing.	ปีกผีเสื้อยักษ์ที่ประหลาดตรงไม่มีคุณสมบัติของปีกผีเสื้อธรรมดาเลย
+A wing from a phony angel.	ปีกจากเทวดาปลอม
+A wing from a red bat.	ปีกจากค้างคาวแดง
+A wire in which blade fragments are interwoven, that makes this whip as sharp as a sword.	ลวดที่ถักเศษใบมีดไว้ข้างใน ทำให้แส้เส้นนี้คมเหมือนดาบ
+A wondrous helmet adorned with angel wings made by a smithing genius.	หมวกเกราะน่าอัศจรรย์ประดับปีกเทวดา ฝีมืออัจฉริยะช่างตีเหล็ก
+A wooden staff adorned with an enchanted jewel.	ไม้เท้าไม้ที่ประดับอัญมณีต้องมนตร์
+A woody stem from a tree that's used as lumber.	ลำต้นเนื้อไม้ที่ใช้เป็นไม้แปรรูป
+A worn out scroll with text written in an ancient language, the only word you can read is "Kirkana".	ม้วนกระดาษเก่าที่เขียนด้วยภาษาโบราณ คำเดียวที่อ่านออกคือ "Kirkana"
+A worn, tattered page torn from an old book.	หน้ากระดาษเก่าขาดวิ่นที่ฉีกมาจากหนังสือเล่มเก่า
+A worn-out white cloth.	ผ้าสีขาวที่เก่าจนโทรม
+A wound up ball of fluffy knitting yarn.	ไหมพรมฟูๆ ที่ม้วนเป็นก้อน
+A wreath of wildflowers made by a woman in love.	พวงมาลัยดอกไม้ป่าที่หญิงผู้กำลังมีความรักทำขึ้น
+A wrist protector enhanced with magic resistance by a gifted artisan.	สนับข้อมือที่ช่างฝีมือผู้มีพรสวรรค์เสริมความต้านทานเวทให้
+A wrist protector padded with a steel plate for increased durability.	สนับข้อมือที่บุแผ่นเหล็กไว้เพิ่มความทนทาน
+A written request from Mr. R, asking you to protect him and help complete his research.	คำร้องเป็นลายลักษณ์อักษรจาก Mr. R ขอให้คุ้มครองเขาและช่วยทำงานวิจัยให้เสร็จ
+A written request from the Dandelion Organization, asking you to capture Raiyan Moore.	คำร้องเป็นลายลักษณ์อักษรจากองค์กร Dandelion ขอให้จับกุม Raiyan Moore
+A yellow satin hairpin that wards off harmful magic.	ปิ่นปักผมซาตินสีเหลือง ป้องกันเวทร้าย
+A yellow spice that adds a unique scent and flavor to almost any food.	เครื่องเทศสีเหลืองที่เพิ่มกลิ่นและรสอันเป็นเอกลักษณ์ให้อาหารแทบทุกอย่าง
+Adds a 15% chance to strike twice with any weapon.	โอกาส 15% ตี 2 ครั้ง ไม่ว่าจะใช้อาวุธอะไร
+All jobs except acolyte	ทุกอาชีพ ยกเว้น Acolyte
+Am embroidered sash with a mysterious power that was owned by a renowned ninja.	ผ้าคาดปักลายที่มีพลังลึกลับ เคยเป็นของนินจาชื่อดัง
+An accessory that gives the ears an elvish look, and for some, it is an incredible turn-on.	เครื่องประดับที่ทำให้หูดูเหมือนเอลฟ์ บางคนเห็นแล้วใจสั่นเลยทีเดียว
+An acolyte figure that radiates wisdom.	ฟิกเกอร์ Acolyte ที่แผ่รัศมีแห่งปัญญา
+An advanced rifle with reinforced explosive power.	ไรเฟิลรุ่นสูงที่เสริมอานุภาพระเบิด
+An agate, it symbolizes protection.	โมรา สื่อถึงการปกป้อง
+An airy arrow.	ลูกศรธาตุลม
+An ancient brooch.	เข็มกลัดโบราณ
+An ancient earring.	ต่างหูโบราณ
+An ancient glove.	ถุงมือโบราณ
+An ancient knife used by highlanders.	มีดโบราณที่ชาวไฮแลนด์ใช้
+An ancient lute seen on display in oriental towns such as Payon, Amatsu or Kunlun.	พิณโบราณที่เห็นตั้งโชว์ในเมืองตะวันออกอย่าง Payon, Amatsu หรือ Kunlun
+An ancient necklace.	สร้อยคอโบราณ
+An ancient ring.	แหวนโบราณ
+An ancient rosary.	ลูกประคำโบราณ
+An ancient weapon with an unknown motive.	อาวุธโบราณที่ไม่รู้ว่าสร้างมาเพื่ออะไร
+An ancient, gnarled branch that summons stronger creatures than regular Dead Branches.	กิ่งไม้โบราณบิดเบี้ยว เรียกสัตว์ที่แข็งแกร่งกว่า Dead Branch ธรรมดา
+An animal hide that can be used in clothes, coverings, or bedding.	หนังสัตว์ที่ใช้ทำเสื้อผ้า ผ้าคลุม หรือเครื่องนอนได้
+An antennae that serves as a sensory organ for insects.	หนวดที่เป็นอวัยวะรับสัมผัสของแมลง
+An antique album which contains an unknown card.	อัลบั้มโบราณที่มีการ์ดที่ไม่รู้ว่าใบอะไรอยู่ข้างใน
+An antique crown that used to sparkle with magnificence.	มงกุฎโบราณที่เคยเปล่งประกายอลังการ
+An apple that isn't ripe enough for humans to eat.	แอปเปิลที่ยังไม่สุกพอให้คนกิน
+An apron worn by Alice, its super cute!	ผ้ากันเปื้อนที่ Alice ใส่ น่ารักสุดๆ!
+An archer figure that radiates foresight.	ฟิกเกอร์ Archer ที่แผ่รัศมีแห่งการมองการณ์ไกล
+An aristrocratically stylish lens that is worn over one eye.	แว่นตาเดี่ยวสไตล์ผู้ดี ใส่ข้างเดียว
+An armor accidentally enchanted by Goibne when he spilled the mystic ale of life on it.	เกราะที่ Goibne เผลอร่ายเวทใส่ตอนทำเหล้าแห่งชีวิตหกรด
+An armor constructed of solid metal plates that have been padded on the inside for comfort.	เกราะที่ทำจากแผ่นโลหะตัน บุด้านในไว้ให้ใส่สบาย
+An armor enchanted with earth.	เกราะที่ร่ายธาตุดินไว้
+An armor enchanted with fire.	เกราะที่ร่ายธาตุไฟไว้
+An armor enchanted with water.	เกราะที่ร่ายธาตุน้ำไว้
+An armor enchanted with wind.	เกราะที่ร่ายธาตุลมไว้
+An armor exclusive to the Novice Training Grounds.	เกราะเฉพาะของลานฝึก Novice
+An armor made from Naga scales that is both shiny and incredibly sharp.	เกราะที่ทำจากเกล็ด Naga ทั้งเงางามและคมอย่างเหลือเชื่อ
+An armor made from an unknown metal.	เกราะที่ทำจากโลหะที่ไม่รู้จัก
+An armor that is enchanted with earth.	เกราะที่ร่ายธาตุดินเอาไว้
+An arrow blessed with holy water.	ลูกศรที่ประพรมน้ำมนต์ไว้
+An arrow coated with a mouth paralyzing chemical.	ลูกศรเคลือบสารที่ทำให้ปากชา
+An arrow enchanted with curse magic.	ลูกศรที่ร่ายเวทคำสาปไว้
+An arrow enchanted with the power of ice.	ลูกศรที่ร่ายพลังน้ำแข็งไว้
+An arrow imbued with the power of darkness.	ลูกศรที่อาบด้วยพลังแห่งความมืด
+An arrow that can render targets unconscious.	ลูกศรที่ทำให้เป้าหมายหมดสติได้
+An arrow that explodes on impact with a flash of light.	ลูกศรที่ระเบิดเป็นแสงวาบเมื่อกระทบ
+An arrow topped with a serrated blade.	ลูกศรที่ปลายเป็นใบมีดหยัก
+An arrow whose tip has been dipped in lethal poison.	ลูกศรที่ปลายจุ่มยาพิษถึงตาย
+An arrow without a discernible shape.	ลูกศรที่ไม่มีรูปร่างชัดเจน
+An artificial wood heart that gave life to a Wooden Golem.	หัวใจไม้ประดิษฐ์ที่ให้ชีวิตแก่ Wooden Golem
+An assassin suit that enables the wearer to move quickly and stealthily.	ชุดนักฆ่าที่ทำให้เคลื่อนไหวเร็วและเงียบ
+An auger-shaped spear designed for striking enemy weak points.	หอกทรงสว่านที่ออกแบบมาแทงจุดอ่อนศัตรู
+An average bow used for small game hunting.	ธนูธรรมดาที่ใช้ล่าสัตว์เล็ก
+An awesome staff crafted by an ancient wizard.	ไม้เท้าสุดยอดที่จอมเวทโบราณสร้างขึ้น
+An awesome tonic that brings insurmountable vigor.	ยาบำรุงสุดยอดที่ให้พละกำลังเหลือล้น
+An axe crafted by orc smiths for orc warriors.	ขวานที่ช่างตีเหล็กออร์คทำให้นักรบออร์ค
+An axe head mounted on a long pole that breaks through thick armored plates.	หัวขวานติดด้ามยาว ทะลวงแผ่นเกราะหนาได้
+An axe that breaks faces like Kafra Jasmine breaks hearts.	ขวานที่ทุบหน้าคนได้พอๆ กับที่ Kafra Jasmine ทุบหัวใจคน
+An axe that brutally slaughters enemies.	ขวานที่สังหารศัตรูอย่างโหดเหี้ยม
+An axe that guides lost souls to the afterlife.	ขวานที่นำทางวิญญาณหลงทางไปสู่ปรโลก
+An axe that summons wind around it, granting unprecedented speed.	ขวานที่เรียกลมมาห้อมล้อม ให้ความเร็วที่ไม่เคยมีมาก่อน
+An ear accesory with dark, sinister demon wings.	เครื่องประดับหูรูปปีกปีศาจสีดำน่าสะพรึง
+An ear accesory with white, beautiful angel wings.	เครื่องประดับหูรูปปีกเทวดาสีขาวงดงาม
+An earthworm that stopped caring about its figure years ago.	ไส้เดือนที่เลิกแคร์หุ่นตัวเองมาหลายปีแล้ว
+An eastern delicacy of marinated rice, dried seaweed, and raw fish.	ของอร่อยจากตะวันออก ข้าวปรุงรสห่อสาหร่ายแห้งกับปลาดิบ
+An easy to wear bracelet made just for young novices.	กำไลใส่ง่ายที่ทำมาเพื่อ Novice หน้าใหม่โดยเฉพาะ
+An edible mushroom that can be eaten raw or cooked.	เห็ดกินได้ กินสดหรือปรุงสุกก็ได้
+An edible plant root that should be eaten slowly to avoid choking.	รากพืชกินได้ ควรค่อยๆ กินไม่งั้นติดคอ
+An effeminate diary with the word, "Bruspetti" written on the cover.	ไดอารีลายหวานที่หน้าปกเขียนว่า "Bruspetti"
+An egg from a bird. It's full of nutrition, making it an ideal food for growing children.	ไข่นก อุดมด้วยสารอาหาร เหมาะกับเด็กที่กำลังโต
+An eggshell fragment that protected its egg to the final, tragic end.	เศษเปลือกไข่ที่ปกป้องไข่จนวินาทีสุดท้ายอันน่าเศร้า
+An elaborate toy key made of plastic.	กุญแจของเล่นพลาสติกที่ทำมาอย่างประณีต
+An electric guitar which amplifies its user's power.	กีตาร์ไฟฟ้าที่ขยายพลังของผู้เล่น
+An emblem given to an Orc Hero or Lord that is proof of their heroism.	ตราสัญลักษณ์ที่มอบให้ Orc Hero หรือ Orc Lord เป็นเครื่องพิสูจน์วีรกรรม
+An emblem that grants authority to rule over the nine realms of the dead.	ตราสัญลักษณ์ที่มอบอำนาจปกครองเก้าภพแห่งความตาย
+An embryo of a dormant homunculus.	ตัวอ่อนของ Homunculus ที่ยังหลับอยู่
+An emerald that brings an impending sense of great misfortune to whomever holds it.	มรกตที่ทำให้ผู้ถือรู้สึกว่าเคราะห์ร้ายใหญ่หลวงกำลังจะมาถึง
+An emperium anvil, pristine products can be made with this!	ทั่ง Emperium ตีของระดับสมบูรณ์แบบได้ด้วยตัวนี้!
+An empty bottle for carrying liquid.	ขวดเปล่าไว้ใส่ของเหลว
+An empty pot that carried honey once upon a time.	ไหเปล่าที่เคยใส่น้ำผึ้งเมื่อนานมาแล้ว
+An empty potion bottle.	ขวดยาเปล่า
+An empty test tube.	หลอดทดลองเปล่า
+An empty tube that can hold a creature.	หลอดเปล่าที่ใส่สิ่งมีชีวิตได้
+An enchanted brooch that enhances agility.	เข็มกลัดต้องมนตร์ที่เพิ่มความคล่องแคล่ว
+An enchanted butterfly's wing that instantly sends its user to their Save Point when waved in the air.	ปีกผีเสื้อต้องมนตร์ โบกในอากาศแล้วส่งผู้ใช้กลับจุดเซฟทันที
+An enchanted earring that enhances intelligence.	ต่างหูต้องมนตร์ที่เพิ่มสติปัญญา
+An enchanted fly's wing that instantly sends its user to a random spot when waved in the air.	ปีกแมลงวันต้องมนตร์ โบกในอากาศแล้วส่งผู้ใช้ไปที่สุ่มทันที
+An enchanted glove that enhances dexterity.	ถุงมือต้องมนตร์ที่เพิ่มความแม่นยำ
+An enchanted necklace that enhances vitality.	สร้อยคอต้องมนตร์ที่เพิ่มพลังชีวิต
+An enchanted ring that enhances strength.	แหวนต้องมนตร์ที่เพิ่มพละกำลัง
+An enchanted stone rumored to transmute matter into gold.	หินต้องมนตร์ที่ร่ำลือกันว่าแปรสสารเป็นทองได้
+An enchanted sword that draws ore from fallen monsters.	ดาบต้องมนตร์ที่ดึงแร่ออกจากมอนสเตอร์ที่ล้มลง
+An enchanted tonic that causes selective memory loss.	ยาบำรุงต้องมนตร์ที่ทำให้ลืมความทรงจำบางส่วน
+An enchanted, giant wing from an ancient creature.	ปีกยักษ์ต้องมนตร์จากสัตว์โบราณ
+An encyclopedia crafted by a Prontera publisher famous for its craftsmanship.	สารานุกรมที่สำนักพิมพ์ Prontera ผู้ขึ้นชื่อเรื่องงานฝีมือจัดทำ
+An enigmantic flower that can only be seen within Valhalla, the sacred battlegrounds of the ancient gods.	ดอกไม้ลึกลับที่พบได้เฉพาะใน Valhalla สมรภูมิศักดิ์สิทธิ์ของทวยเทพโบราณ
+An enormous sword designed for two hands.	ดาบขนาดมหึมาที่ออกแบบมาให้ถือสองมือ
+An entree of sterilized pet food fortified with vitamins and minerals.	อาหารสัตว์เลี้ยงผ่านการฆ่าเชื้อ เสริมวิตามินและแร่ธาตุ
+An esoteric ring which enables its wearer to amplify their hidden power.	แหวนลี้ลับที่ช่วยให้ผู้สวมขยายพลังที่ซ่อนอยู่
+An essence of fire that holds the pure spirit of Thor, god of thunder.	แก่นแท้แห่งไฟที่บรรจุวิญญาณบริสุทธิ์ของ Thor เทพสายฟ้า
+An exclusive main gauche for new adventurers.	Main Gauche รุ่นพิเศษสำหรับนักผจญภัยหน้าใหม่
+An exclusive ring for thieves and ninjas.	แหวนรุ่นพิเศษสำหรับ Thief และ Ninja
+An exclusive robe for mages that contains magic power.	เสื้อคลุมรุ่นพิเศษสำหรับ Mage ที่บรรจุพลังเวทไว้
+An expensive Luoyang dish that tastes absolutely superb.	เมนูราคาแพงของ Luoyang รสชาติเลิศรสสุดๆ
+An expensive fabric that is knit from high quality silk threads.	ผ้าราคาแพงที่ทอจากเส้นไหมคุณภาพสูง
+An explosive which makes beatiful figures in the sky.	ดอกไม้ไฟที่แต่งลวดลายงดงามบนท้องฟ้า
+An exquisite doll that resembles Baphomet, enemy of all that is righteous.	ตุ๊กตางานประณีตรูป Baphomet ศัตรูของทุกสิ่งที่ชอบธรรม
+An exquisite doll that resembles Osiris, king of darkness.	ตุ๊กตางานประณีตรูป Osiris ราชาแห่งความมืด
+An exquisite drink that was presented at the coronation of King Tristan III.	เครื่องดื่มชั้นเลิศที่เสิร์ฟในพิธีราชาภิเษกของ King Tristan III
+An exquisitely made circlet for rulers or gentry.	มงกุฎวงเล็กงานประณีตสำหรับผู้ปกครองหรือชนชั้นสูง
+An extremely heavy piece of armor worn by members of the Legion.	เกราะที่หนักมากซึ่งสมาชิก Legion สวม
+An extremely light outfit with many pockets, making it handy for stashing stolen goods.	ชุดที่เบามากและมีกระเป๋าเยอะ สะดวกเวลาซุกของที่ขโมยมา
+An extremely rare clover, legend says that merely holding one is a sign of great fortune.	โคลเวอร์ที่หายากมาก ตำนานว่าแค่ถือไว้ก็เป็นลางแห่งโชคใหญ่
+An extremely sharp, thin bladed sword easily slices fish.	ดาบใบบางคมกริบ เฉือนปลาได้ง่ายดาย
+An extremely spicy hot sauce that can make people cry just by smelling it.	ซอสเผ็ดจัดที่แค่ดมก็น้ำตาไหล
+An eye from the Hellion Revenant.	ดวงตาของ Hellion Revenant
+An herb containing a sticky liquid that can be ground into a glue.	สมุนไพรที่มียางเหนียว บดแล้วทำกาวได้
+An herb that is too bitter for the human palate.	สมุนไพรที่ขมเกินกว่าลิ้นมนุษย์จะรับไหว
+An herbal emollient made from aloe extract, despite its sour taste, it's addictive if regularly eaten.	ยาบำรุงสมุนไพรจากสารสกัดว่านหางจระเข้ รสเปรี้ยวแต่กินบ่อยๆ แล้วติดใจ
+An herbal medicine from an old eastern country that is rumored to cure every illness.	ยาสมุนไพรจากดินแดนตะวันออกโบราณ ร่ำลือว่ารักษาได้ทุกโรค
+An herbal medicine used in the eastern countries.	ยาสมุนไพรที่ใช้กันในดินแดนตะวันออก
+An herbal tea with royal jelly that has a pungent scent but a refreshing flavor.	ชาสมุนไพรผสมนมผึ้ง กลิ่นฉุนแต่รสสดชื่น
+An improved tights developed by Rekenber Corp. made from advanced materials.	ชุดรัดรูปรุ่นปรับปรุงที่บริษัท Rekenber พัฒนาจากวัสดุล้ำสมัย
+An impure ore that can be refined into Iron.	แร่ไม่บริสุทธิ์ที่ถลุงเป็น Iron ได้
+An incredibly famous soup that has a spicy, sweet and sour taste with shrimp, lemons and chiles.	ซุปชื่อดังสุดๆ รสเผ็ดเปรี้ยวหวาน ใส่กุ้ง มะนาว และพริก
+An insect husk that is hard and stout.	เปลือกแมลงที่แข็งและหนา
+An instrument used for torture.	เครื่องมือที่ใช้ทรมาน
+An invigorating herbal tea enhanced with the sweetness of honey.	ชาสมุนไพรบำรุงกำลัง เพิ่มความหวานด้วยน้ำผึ้ง
+An iridescent dragon's scale that provides great protection.	เกล็ดมังกรสีเหลือบที่ป้องกันได้ดีเยี่ยม
+An iron and carbon alloy known for its structural durability and use in crafting high-quality arms.	โลหะผสมเหล็กกับคาร์บอน ขึ้นชื่อเรื่องความทนทานและใช้ตีอาวุธคุณภาพสูง
+An iron arrow.	ลูกศรเหล็ก
+An irresistable mixed drink of grape juice and honey.	เครื่องดื่มผสมน้ำองุ่นกับน้ำผึ้งที่อดใจไม่ไหว
+An item suitable for a pet, if pets were a thing you could get.	ของที่เหมาะกับสัตว์เลี้ยง ถ้ามีระบบสัตว์เลี้ยงนะ
+An item used by Hunters, or wanna-be Hunters, to place traps.	ของที่ Hunter หรือคนที่อยากเป็น Hunter ใช้วางกับดัก
+An itimidating spiked metal ball that swings freely from a chain.	ลูกตุ้มโลหะหนามแหลมน่าเกรงขาม ห้อยแกว่งอยู่กับโซ่
+An ivory dagger, its sharp tip makes it effective for stabbing.	มีดสั้นงาช้าง ปลายแหลมคมเหมาะกับการแทง
+An ivory hat worn by classy men on classy occasions.	หมวกสีงาช้างที่สุภาพบุรุษผู้มีระดับใส่ในโอกาสพิเศษ
+An oily fish fin.	ครีบปลาที่มันเยิ้ม
+An old blue box with unknown contents.	กล่องน้ำเงินเก่าที่ไม่รู้ว่าข้างในมีอะไร
+An old book enchanted by a girl whose name has been forgotten with time.	หนังสือเก่าที่เด็กสาวคนหนึ่งร่ายเวทไว้ ชื่อของเธอเลือนหายไปตามกาลเวลา
+An old broom that has been handed down through the generations.	ไม้กวาดเก่าที่สืบทอดกันมาหลายชั่วอายุคน
+An old diary in which many petty, personal secrets have been written.	ไดอารีเก่าที่เขียนความลับส่วนตัวเล็กๆ น้อยๆ ไว้เยอะแยะ
+An old frying pan that has outlived its usefulness.	กระทะเก่าที่หมดประโยชน์ไปแล้ว
+An old hilt broken off a heavy sword.	ด้ามเก่าที่หักมาจากดาบหนัก
+An old leaf that is used as a bookmark.	ใบไม้เก่าที่ใช้เป็นที่คั่นหนังสือ
+An old magic book that is seriously damaged.	หนังสือเวทเก่าที่เสียหายหนัก
+An old pendant, damaged with age, that confers a feeling of dread for some inexplicable reason.	จี้เก่าที่ชำรุดตามกาลเวลา ให้ความรู้สึกน่าหวาดกลัวโดยไม่รู้สาเหตุ
+An old purple box with unknown contents. More likely to contain equipment than an old blue box.	กล่องม่วงเก่าที่ไม่รู้ว่าข้างในมีอะไร มีโอกาสได้อุปกรณ์มากกว่ากล่องน้ำเงินเก่า
+An old silver pocket watch.	นาฬิกาพกเงินเรือนเก่า
+An old, decaying stem of a plant.	ก้านพืชเก่าที่กำลังเน่าเปื่อย
+An old, dirty bandage that's so soiled it's almost worthless.	ผ้าพันแผลเก่าสกปรกจนแทบไร้ค่า
+An old, fragile portrait of a girl that you can't identify, although she seems very pretty.	ภาพวาดเก่าเปราะบางของเด็กสาวที่ไม่รู้ว่าใคร แต่ดูสวยมาก
+An old, heartfelt letter with an empty recipient field.	จดหมายเก่าที่เขียนด้วยใจ แต่ช่องผู้รับว่างเปล่า
+An old, large black frying pan.	กระทะดำใบใหญ่เก่าๆ
+An old, rotten rope.	เชือกเก่าที่เปื่อยยุ่ย
+An old, rusty arrow.	ลูกศรเก่าขึ้นสนิม
+An old, rusty shuriken that has little hope of being thrown by an awesome ninja.	ชูริเคนเก่าขึ้นสนิม แทบไม่มีหวังจะได้ให้นินจาเจ๋งๆ ขว้าง
+An old, used prison uniform.	ชุดนักโทษเก่าที่ผ่านการใช้มาแล้ว
+An old, used prisoner wrist restraint.	กุญแจมือนักโทษเก่าที่ผ่านการใช้มาแล้ว
+An old, worn out magic scroll that is valuable to the Mage Academy.	ม้วนคาถาเก่าโทรม แต่มีค่าสำหรับสถาบัน Mage
+An old, worn-out cape that can protect its wearer from magical harm.	ผ้าคลุมเก่าโทรมที่ปกป้องผู้สวมจากอันตรายทางเวท
+An onyx jewel that is the birthstone for August.	นิลออนิกซ์ หินประจำเดือนสิงหาคม
+An optical tool that enables one to observe objects from a great distance.	อุปกรณ์เลนส์ที่ส่องดูของจากระยะไกลได้
+An orange root that is supposedly good for your vision.	รากสีส้มที่ว่ากันว่าดีต่อสายตา
+An ordinary, thornless wildflower that doesn't have any particular scent.	ดอกไม้ป่าธรรมดาไร้หนาม ไม่มีกลิ่นอะไรเป็นพิเศษ
+An oridecon anvil, quality products can be made with this.	ทั่ง Oridecon ตีของคุณภาพดีได้ด้วยตัวนี้
+An oridecon arrow.	ลูกศร Oridecon
+An oriental lion mask with menacing, angry eyes.	หน้ากากสิงโตตะวันออก ดวงตาโกรธเกรี้ยวน่าเกรงขาม
+An oriental sword named after the legendary swordsmith, Masamune.	ดาบตะวันออกที่ตั้งชื่อตาม Masamune ช่างตีดาบในตำนาน
+An oriental sword named after the legendary swordsmith, Muramasa.	ดาบตะวันออกที่ตั้งชื่อตาม Muramasa ช่างตีดาบในตำนาน
+An ornament made from wild bison horns.	เครื่องประดับที่ทำจากเขาไบซันป่า
+An ornament made with silver.	เครื่องประดับที่ทำจากเงิน
+An ornate rifle that fires penetrating shots but reloads slowly.	ไรเฟิลลวดลายวิจิตร ยิงทะลุทะลวงแต่บรรจุกระสุนช้า
+An ornate, elegantly crafted wand.	ไม้กายสิทธิ์ลวดลายวิจิตร ทำมาอย่างสง่างาม
+An ornate, winged helmet worn by the Valkyries, Odin's battle maidens.	หมวกเกราะมีปีกลวดลายวิจิตร ที่เหล่า Valkyrie นางรบแห่ง Odin สวม
+An oversized red ribbon that contains hidden magical power.	โบว์แดงใบใหญ่เกินขนาดที่ซ่อนพลังเวทไว้
+An peridot, it symbolizes wisdom.	เพริดอต สื่อถึงปัญญา
+An unidentified metal fragment.	เศษโลหะที่ระบุไม่ได้ว่าคืออะไร
+An unidentified piece of steel that could be used as a hinge.	ชิ้นเหล็กที่ไม่รู้ว่าคืออะไร น่าจะใช้เป็นบานพับได้
+An unlabeled arrow quiver.	กระบอกลูกศรที่ไม่มีป้ายบอก
+Asprika, the light of the gods, is a rainbow in physical form.	Asprika แสงแห่งทวยเทพ คือสายรุ้งที่มีรูปร่าง
+Assorted seafood that makes people that live near the sea feel homesick.	อาหารทะเลรวมมิตรที่ทำให้คนอยู่ริมทะเลคิดถึงบ้าน
+Baba Yaga's silver spoon stolen by pirates.	ช้อนเงินของ Baba Yaga ที่โจรสลัดขโมยไป
+Beautiful silver colored fur.	ขนสีเงินงดงาม
+Being hit while casting will interrupt the skill, but not consume the item.	ถ้าโดนตีระหว่างร่าย สกิลจะถูกขัด แต่ไม่เสียไอเทม
+Black dye made from various ground herbs.	สีย้อมดำที่ทำจากสมุนไพรหลายชนิดบด
+Blue dye made from ground Blue Herbs.	สีย้อมน้ำเงินที่ทำจาก Blue Herb บด
+Blue herbs found in the wild, these are addictive, consult your local alchemist before use.	สมุนไพรน้ำเงินที่พบในป่า เสพติดได้ ปรึกษา Alchemist แถวบ้านก่อนใช้
+Bottled blood from a freshly slain beast.	เลือดสัตว์ที่เพิ่งฆ่าสดๆ บรรจุขวด
+Brynhild, the warrior's armor, inherits its name from the most the valiant of valkyries.	Brynhild เกราะของนักรบ ตั้งชื่อตามวาลคีรีผู้กล้าหาญที่สุด
+Cannot be used near an existing glittering orb.	ใช้ไม่ได้ถ้ามีลูกแก้วเปล่งประกายอยู่ใกล้ๆ อยู่แล้ว
+Cheese gratin with mixed steamed tentacles.	หนวดปลาหมึกนึ่งรวมมิตรอบชีส
+Crunchy, fried sweet potatoes topped with a light syrup.	มันเทศทอดกรอบราดน้ำเชื่อมบางๆ
+Delicious beef specially marinated in soy sauce.	เนื้อแสนอร่อยที่หมักซีอิ๊วมาเป็นพิเศษ
+Elly's golden key which can be used to open a special box.	กุญแจทองของ Elly ใช้เปิดกล่องพิเศษได้
+Even Porings can craft Elemental-Proof Potions with this handy, easy to read reference.	แม้แต่ Poring ก็ทำ Elemental-Proof Potion ได้ด้วยคู่มืออ่านง่ายเล่มนี้
+Expedition Report Vol.1, sorted by Abidal. The information on the expedition's settlement and occupation are all here.	รายงานการสำรวจเล่ม 1 เรียบเรียงโดย Abidal ข้อมูลการตั้งฐานและการยึดครองอยู่ในนี้ทั้งหมด
+Expedition Report Vol.2 which details the dimensional gorge and the traces of Satan Morroc.	รายงานการสำรวจเล่ม 2 ว่าด้วยหุบเหวมิติและร่องรอยของ Satan Morroc
+Expedition Report Vol.3 which details the ecological environment and the species.	รายงานการสำรวจเล่ม 3 ว่าด้วยระบบนิเวศและสิ่งมีชีวิตต่างๆ
+Expedition Report Vol.4 which details the internal investigation.	รายงานการสำรวจเล่ม 4 ว่าด้วยการสอบสวนภายใน
+Foodstuffs for urgent situations, don't eat it too quickly!	เสบียงสำหรับยามฉุกเฉิน อย่ากินเร็วเกินไปล่ะ!
+Goibne's first creation, his much prized and precious armor.	ผลงานชิ้นแรกของ Goibne เกราะที่เขาหวงแหนที่สุด
+Green dye made from ground Green Herbs.	สีย้อมเขียวที่ทำจาก Green Herb บด
+Hair of the water fairy Lusalka, who drowned on the eve of her marriage.	เส้นผมของภูตน้ำ Lusalka ผู้จมน้ำตายในคืนก่อนวันแต่งงาน
+Heavenly sandals worn by the Guardian Angel of Super Novices.	รองเท้าแตะสวรรค์ที่เทวดาผู้พิทักษ์ของ Super Novice สวม
+Heavenly tasting juice that makes you feel refreshed and relaxed.	น้ำผลไม้รสสวรรค์ที่ทำให้รู้สึกสดชื่นผ่อนคลาย
+Impossibly strong thread woven from impossibly rare items.	ด้ายที่แข็งแรงเกินจะเชื่อ ทอจากของที่หายากเกินจะเชื่อ
+Improved ration A, a meal ready to eat.	เสบียงสูตรปรับปรุง A พร้อมกินทันที
+Improved ration B, a meal ready to eat.	เสบียงสูตรปรับปรุง B พร้อมกินทันที
+Improved ration C, a meal ready to eat.	เสบียงสูตรปรับปรุง C พร้อมกินทันที
+Incredibly sharp, and stout paper that could be used like a knife.	กระดาษที่คมและแข็งอย่างเหลือเชื่อ ใช้แทนมีดได้
+Incredibly smooth, slick, and slippery noodles that are difficult to eat.	เส้นก๋วยเตี๋ยวที่ลื่นมากจนกินยาก
+It fucking slaps	โคตรเด็ด
+Jeweled, golden strapped sandals that offer casual, yet fashionable, comfort.	รองเท้าแตะสายทองประดับอัญมณี ใส่สบายแบบมีสไตล์
+Large toasted bread garnished with huge amounts of meat, cheese, and vegetables.	ขนมปังปิ้งแผ่นใหญ่ อัดแน่นด้วยเนื้อ ชีส และผัก
+Lightly spiced monkey tails deep fried in oil.	หางลิงทอดน้ำมันปรุงรสอ่อนๆ
+Long and thin lace used to decorate a gift box.	ริบบิ้นเส้นยาวเรียวไว้ตกแต่งกล่องของขวัญ
+Luoyang's specialty stew laced with meat that has a tempting scent.	สตูว์สูตรเด็ดของ Luoyang ใส่เนื้อ กลิ่นหอมชวนกิน
+Marinated meat and vegetables roasted on a skewer.	เนื้อและผักหมักเสียบไม้ย่าง
+Mashenka's red ring, it seems to have a sad story.	แหวนแดงของ Mashenka ดูเหมือนจะมีเรื่องเศร้าซ่อนอยู่
+Merely owning this gloriously resplendent gem is a sign of being chosen by fate to wield great power.	แค่ได้ครอบครองอัญมณีเปล่งประกายเม็ดนี้ก็เป็นสัญญาณว่าโชคชะตาเลือกให้ถือครองพลังอันยิ่งใหญ่
+Morning dew gathered from Yggdrasilberries.	น้ำค้างยามเช้าที่เก็บจากผล Yggdrasil
+One of the few armors forged by Goibne, it is said that the gods valued his armors more than his weapons.	หนึ่งในเกราะไม่กี่ชิ้นที่ Goibne ตีขึ้น ว่ากันว่าทวยเทพให้ค่าเกราะของเขามากกว่าอาวุธ
+One of the most powerful common one-handed swords.	หนึ่งในดาบมือเดียวทั่วไปที่ทรงพลังที่สุด
+One of the twin swords of Naght Sieger, this blue blade exerts raw technique.	หนึ่งในดาบคู่ของ Naght Sieger ใบสีน้ำเงินนี้เน้นเชิงชั้นดิบๆ
+One of the twin swords of Naght Sieger, this red blade exerts raw strength.	หนึ่งในดาบคู่ของ Naght Sieger ใบสีแดงนี้เน้นพละกำลังดิบๆ
+One of two staves developed through the united efforts of the Mage Guild and Prontera Church.	หนึ่งในไม้เท้าสองอันที่สมาคม Mage ร่วมกับโบสถ์ Prontera พัฒนาขึ้น
+Orange dye made from ground Red and Yellow Herbs.	สีย้อมส้มที่ทำจาก Red Herb และ Yellow Herb บด
+Poisonous gas that can be very harmful, if not lethal, when inhaled.	แก๊สพิษที่สูดเข้าไปแล้วอันตรายมาก ถ้าไม่ถึงตาย
+Pressing the button on this stick will flash blinding light that seems to cause memory loss.	กดปุ่มบนแท่งนี้แล้วจะมีแสงวาบจ้าจนตาพร่า ดูเหมือนจะทำให้ความจำเสื่อมด้วย
+Pure elunium, a light, non-toxic metal used in refining armor.	Elunium บริสุทธิ์ โลหะเบาไร้พิษที่ใช้ตีบวกเกราะ
+Pure oridecon, a tough metal used in refining high level weapons.	Oridecon บริสุทธิ์ โลหะเหนียวที่ใช้ตีบวกอาวุธระดับสูง
+Purple dye made from ground Blue and Red Herbs.	สีย้อมม่วงที่ทำจาก Blue Herb และ Red Herb บด
+Red dye made from ground Red Herbs.	สีย้อมแดงที่ทำจาก Red Herb บด
+Red herbs found in the wild, often from slain monsters, that have a mild healing effect.	สมุนไพรแดงที่พบในป่า มักได้จากมอนสเตอร์ที่ถูกฆ่า มีสรรพคุณรักษาอ่อนๆ
+Savory pork that is very tempting.	หมูรสกลมกล่อมที่น่ากินมาก
+Shiny, beautiful paper used to decorate a gift box.	กระดาษเงางามสวยงามไว้ห่อกล่องของขวัญ
+Shrimp and chile gratin that is so spicy, it burns.	กุ้งกับพริกอบชีส เผ็ดจนแสบ
+Soft down used in making high quality clothes.	ขนอ่อนนุ่มที่ใช้ทำเสื้อผ้าคุณภาพสูง
+Spicy, cold noodles garnished with sliced pumpkin.	ก๋วยเตี๋ยวเย็นรสเผ็ด โรยหน้าด้วยฟักทองหั่นแว่น
+Steamed fish with ancient lips wrapped in a fresh leaf.	ปลานึ่งริมฝีปากโบราณห่อใบไม้สด
+Steamed pumpkin and bat wings wrapped in a leaflet.	ฟักทองกับปีกค้างคาวนึ่งห่อใบไม้
+Steamed tenacles flavored with herbs and squid ink dressing.	หนวดปลาหมึกนึ่งปรุงรสสมุนไพรราดน้ำหมึก
+Sticky, poisonous fluid from plants with numerous applications.	ของเหลวมีพิษเหนียวจากพืช ใช้ประโยชน์ได้สารพัด
+Super Novice Guardian Angel's robe.	เสื้อคลุมของเทวดาผู้พิทักษ์ Super Novice
+Sweet, tasty, and lucky bubble gum.	หมากฝรั่งหวานอร่อยและนำโชค
+Sword wielded by mighty GOD-POING, the lawless heroine.	ดาบที่ GOD-POING วีรสตรีนอกกฎหมายผู้เกรียงไกรใช้
+Swordsman, Merchant, Mage	Swordsman, Merchant, Mage
+TA modified Gate Keeper with a barrel coated in pure oridecon.	Gate Keeper รุ่นดัดแปลง ลำกล้องเคลือบ Oridecon บริสุทธิ์
+The Real Holy Cross	ไม้กางเขนศักดิ์สิทธิ์ของแท้
+The Super Novice Guardian Angel's warm and comforatble cardigan.	เสื้อคาร์ดิแกนอุ่นสบายของเทวดาผู้พิทักษ์ Super Novice
+The belt that Morrigane kept as a memento of CuChulain after he perished in battle.	เข็มขัดที่ Morrigane เก็บไว้เป็นที่ระลึกถึง CuChulain หลังเขาสิ้นชีพในสนามรบ
+The boots worn by Vidar, son of Odin, when he killed the Fenrir Wolf.	รองเท้าบูตที่ Vidar บุตรแห่ง Odin สวมตอนสังหารหมาป่า Fenrir
+The creator of this formidable spear sacrificed his own life to forge it, resulting in a curse that will try to dominate the wearer's soul.	ผู้สร้างหอกอันน่าเกรงขามนี้สละชีวิตตัวเองเพื่อตีมันขึ้นมา เกิดเป็นคำสาปที่จะพยายามครอบงำวิญญาณผู้ถือ
+The diary of a great sage, published without his knowledge.	ไดอารีของปราชญ์ผู้ยิ่งใหญ่ ที่ถูกตีพิมพ์โดยเจ้าตัวไม่รู้เรื่อง
+The engagement ring that belonged to Allysia.	แหวนหมั้นที่เคยเป็นของ Allysia
+The first report of the expedition with the Commander's seal. The report records all the information related to ecological environment, situations of the species and the expedition in another world.	รายงานฉบับแรกของคณะสำรวจ ประทับตราผู้บัญชาการ บันทึกข้อมูลระบบนิเวศ สถานการณ์ของสิ่งมีชีวิต และการสำรวจในอีกโลกหนึ่งไว้ทั้งหมด
+The head from a fearsome three-headed dragon that is still very threatening.	หัวจากมังกรสามหัวอันน่าสะพรึง ที่ยังดูน่ากลัวอยู่มาก
+The highest strength adhesive around.	กาวที่เหนียวที่สุดเท่าที่มี
+The main component of the Hermod armor set.	ชิ้นส่วนหลักของชุดเกราะ Hermod
+The most powerful shotgun available, a Gunslinger's best friend.	ปืนลูกซองที่ทรงพลังที่สุดเท่าที่มี เพื่อนซี้ของ Gunslinger
+The pendant that ChuChulain gave to Morrigane when they were in love.	จี้ที่ ChuChulain มอบให้ Morrigane ตอนที่ทั้งคู่ยังรักกัน
+The perfectly crafted, intricate, and official royal seal of the King of the Rune Midgard Kingdom.	ตราประทับหลวงของกษัตริย์แห่งอาณาจักร Rune Midgard ทำมาอย่างประณีตสมบูรณ์แบบ
+The shell of a marine mollusk.	เปลือกของหอยทะเล
+The shield of shields.	โล่แห่งบรรดาโล่ทั้งปวง
+The sword of legend that supposedly selects its owner by its own will.	ดาบในตำนานที่ว่ากันว่าเลือกเจ้าของด้วยตัวมันเอง
+This beverage is famous for its pure, amazing taste.	เครื่องดื่มที่ขึ้นชื่อเรื่องรสชาติบริสุทธิ์อันน่าทึ่ง
+This colorless liquid is the secret behind beers and wine.	ของเหลวไร้สีที่เป็นความลับเบื้องหลังเบียร์และไวน์
+This dagger is made from Jujube tree struck by lightning.	มีดสั้นเล่มนี้ทำจากต้นพุทราที่ถูกฟ้าผ่า
+This dish has been left out for so long that you are guranteed to get an upset stomach if you eat it.	อาหารจานนี้ตั้งทิ้งไว้นานจนรับรองว่ากินแล้วท้องเสียแน่
+This dish is cooked with the heat of the desert sand and is the best dish in Sograt Desert cuisine.	อาหารจานนี้ปรุงด้วยความร้อนของทรายทะเลทราย เป็นเมนูที่ดีที่สุดของ Sograt Desert
+This is it! Run to Pierre before too late!	ใช่อันนี้แหละ! รีบวิ่งไปหา Pierre ก่อนจะสายเกินไป!
+This isn't it! Where is the treasure paper?	ไม่ใช่อันนี้! กระดาษสมบัติอยู่ไหนกันนะ?
+This kettle isn't in the best condition, but it can still be used.	กาน้ำใบนี้สภาพไม่ค่อยดี แต่ยังใช้ได้อยู่
+This musical instrument from a mysterious old man, its very beautiful.	เครื่องดนตรีชิ้นนี้ได้มาจากชายชราลึกลับ สวยงามมาก
+This ring promises an ultimate power for a price.	แหวนวงนี้สัญญาว่าจะให้พลังสูงสุด แลกกับราคาที่ต้องจ่าย
+Wait, Dullahan has no head, how did I acquire this!?	เดี๋ยวนะ Dullahan ไม่มีหัวนี่ แล้วได้อันนี้มาได้ยังไง!?
+White dye made from ground White Herbs.	สีย้อมขาวที่ทำจาก White Herb บด
+White herbs found in the wild, as any alchemist can tell you, this is the good stuff.	สมุนไพรขาวที่พบในป่า Alchemist คนไหนก็บอกได้ว่านี่แหละของดี
+Wine distilled from mastela fruit that inspires clarity.	ไวน์ที่กลั่นจากผล Mastela ช่วยให้ความคิดแจ่มใส
+Worn out clothes.	เสื้อผ้าที่เก่าจนโทรม
+Yellow dye made from ground Yellow Herbs.	สีย้อมเหลืองที่ทำจาก Yellow Herb บด
+Yellow herbs found in the wild, these give a slightly stronger hit than Red Herbs.	สมุนไพรเหลืองที่พบในป่า ฟื้นแรงกว่า Red Herb นิดหน่อย
+The Valkyrie can use 3 of these keys to open a portal to Okolnir, a challenge dungeon available for all players to join. Once activated there will be a server wide announcement and a 5 minute wait until the portal opens.	Valkyrie ใช้กุญแจนี้ 3 ดอกเปิดประตูมิติสู่ Okolnir ดันเจี้ยนท้าทายที่ผู้เล่นทุกคนเข้าร่วมได้ เมื่อเปิดแล้วจะมีประกาศทั่วเซิร์ฟเวอร์ และรออีก 5 นาทีประตูจึงจะเปิด
+Valkyrie spawn conditions: At least one player has reached level 85 and 8 unique MVPs have been defeated.	เงื่อนไขการเกิดของ Valkyrie: มีผู้เล่นถึงเลเวล 85 อย่างน้อย 1 คน และปราบ MVP ไม่ซ้ำกันครบ 8 ตัว

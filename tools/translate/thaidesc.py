@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Turns the card descriptions into Thai, and reports whatever it could not turn.
+"""Turns an item description file into Thai, and reports whatever it could not turn.
 
 These lines are templates, not prose - "ATK +5", "+20% physical damage vs. Shadow" - so
 what this holds is a table of phrases rather than a translation. The point of doing it
@@ -18,10 +18,17 @@ Anything else still holding English after the table has run is reported instead 
 written. A line the table does not cover is a line nobody wrote a translation for, and
 that should be visible rather than quietly shipped half done.
 
-  python3 thaicards.py <file>            say what is not covered
-  python3 thaicards.py <file> --apply    write it
+The stat lines are templates and go through the phrase table below. The sentences that
+describe what a thing is are not templates, and go through prose.tsv - one English
+sentence to one Thai one, written by hand, so the same sentence on twenty different
+items reads the same way on all twenty.
+
+  python3 thaidesc.py <file>            say what is not covered
+  python3 thaidesc.py <file> --apply    write it
+  python3 thaidesc.py <file> --dump     list the sentences prose.tsv is missing
 """
 import io
+import os
 import re
 import sys
 
@@ -40,6 +47,9 @@ RACE = {
     "Demi-Human": "มนุษย์", "Brute": "สัตว์", "Insect": "แมลง", "Plant": "พืช",
     "Fish": "สัตว์น้ำ", "Aquatic": "สัตว์น้ำ", "Demon": "ปีศาจ", "Angel": "เทวดา",
     "Dragon": "มังกร", "Formless": "ไร้รูปร่าง", "Undead": "อันเดด",
+    #the weapon file writes several of these in the plural, or in lower case
+    "Plants": "พืช", "Beast": "สัตว์", "Demi-human": "มนุษย์", "beast": "สัตว์",
+    "insect": "แมลง", "dragon": "มังกร", "aquatic": "สัตว์น้ำ", "plant": "พืช",
 }
 
 SIZE = {"Small": "ขนาดเล็ก", "Medium": "ขนาดกลาง", "Large": "ขนาดใหญ่"}
@@ -55,7 +65,8 @@ FAMILY = {
 STATUS = {
     "Stun": "สตัน", "Freeze": "แช่แข็ง", "Curse": "สาป", "Silence": "ใบ้",
     "Blind": "ตาบอด", "Sleep": "หลับ", "Poison": "พิษ", "Petrify": "กลายเป็นหิน",
-    "Chaos": "สับสน", "Bleed": "เลือดออก", "Coma": "โคม่า",
+    "Chaos": "สับสน", "Confusion": "สับสน", "Bleed": "เลือดออก", "Coma": "โคม่า",
+    "Hallucination": "ประสาทหลอน",
 }
 
 #Job names stay as they are - the character select screen says Swordman, so the card
@@ -74,7 +85,8 @@ TARGET.update(FAMILY)
 #would be translating away the word on the stat window.
 KEEP = set("""STR AGI VIT INT DEX LUK ATK DEF MDEF MATK FLEE HIT CRIT HP SP ASPD
 MaxHP MaxSP EXP Zeny zeny Perfect Dodge Endure Double Attack Increase AGI
-Gemstone Autospell Job Lv""".split())
+Gemstone Autospell Job Lv Perfect Hit
+Blessing Provoke Resurrection Improve Concentration Swordsman""".split())
 KEEP.update(JOBS)
 #a few targets are proper names that stay as they are; they are still "translated"
 KEEP.update(v for v in TARGET.values() if re.match(r"^[A-Za-z]", v))
@@ -147,6 +159,7 @@ WHEN = {
     "receive physical damage": "เมื่อโดนโจมตีกายภาพ",
     "receive magical damage": "เมื่อโดนโจมตีเวท",
     "receive damage": "เมื่อโดนโจมตี",
+    "range physical attack": "เมื่อโจมตีกายภาพระยะไกล",
 }
 WHEN_RE = "|".join(sorted((re.escape(k) for k in WHEN), key=len, reverse=True))
 
@@ -190,6 +203,31 @@ add(r"Physical Damage Scales with Enemy Defense", "ดาเมจกายภ�
 add(r"\+(\d+)% damage against flying or airborn enemies\.", r"ดาเมจต่อศัตรูที่บินได้ +\1%")
 add(r"-(\d+)% damage from flying or airborn enemies\.", r"รับดาเมจจากศัตรูที่บินได้ -\1%")
 
+# what a usable item does when you use it
+add(r"\bRecover (\d+)% HP and SP", r"ฟื้น HP และ SP \1%")
+add(r"^Teleports you to a random map location\.?$", "วาร์ปไปแมพแบบสุ่ม")
+add(r"^Returns you to your save location\.?$", "กลับไปยังจุดเซฟ")
+add(r"^Summons (\d+) random monsters?\.?$", r"เรียกมอนสุ่ม \1 ตัว")
+add(r"^Contains a random card\.$", "เปิดแล้วได้การ์ดสุ่ม 1 ใบ")
+add(r"Casts Provoke Lv (\d+) on yourself, reducing DEF by (\d+)% and increasing ATK "
+    r"by (\d+)% for (\d+)s?\.?",
+    r"ร่าย Provoke Lv \1 ใส่ตัวเอง DEF -\2% ATK +\3% นาน \4 วินาที")
+add(r"Increases movement speed by (\d+)% for (\d+) minutes\. Does not stack with "
+    r"Increase (?:AGI|Agi)\.?",
+    r"ความเร็วเดิน +\1% นาน \2 นาที (ไม่ซ้อนกับ Increase AGI)")
+add(r"^Casts (.+?) on yourself when used\.$", r"ใช้แล้วร่าย \1 ใส่ตัวเอง")
+add(r"^Casts:? ", "ร่าย ")
+add(r"^Cast(?=(?:{K}))", "ร่าย ")
+add(r"^Move Quickly for (\d+) seconds?\.?$", r"เดินเร็วขึ้น นาน \1 วินาที")
+add(r"^Move slowly for (\d+) seconds?\.?$", r"เดินช้าลง นาน \1 วินาที")
+add(r"^Enchant weapon with ({E}) for (\d+) minutes?\.?$",
+    lambda m: "เปลี่ยนอาวุธเป็น" + ELEMENT[m.group(1)] + " นาน " + m.group(2) + " นาที")
+add(r"^\[Properties\]Casts: ", "[คุณสมบัติ]ร่าย: ")
+add(r"^\[Properties\]Useable by: ", "[คุณสมบัติ]ใช้ได้: ")
+add(r"^Required Level: ", "เลเวลที่ต้องใช้: ")
+add(r"^Channelled: ", "ร่ายต่อเนื่อง: ")
+add(r"\bLv (\d+)\b", r"Lv \1")
+
 # which slot the card went in
 add(r"^Headgear: Int$", "ช่องหมวก: INT")
 add(r"^Body: Vit$", "ช่องชุด: VIT")
@@ -208,7 +246,7 @@ add(r"\bKnockback Immunity\b", "ไม่ถูกผลักถอยหลั
 add(r"\bPermanent Endure Effect\b", "ติดผล Endure ตลอดเวลา")
 add(r"\bUninterruptible Cast\b", "ร่ายสกิลไม่ถูกขัดจังหวะ")
 add(r"\bSee Hidden Targets\b", "มองเห็นศัตรูที่ซ่อนตัว")
-add(r"\bEnables use of (.+?)\.", r"ใช้ \1 ได้")
+add(r"\bEnables? use of (.+?)\.?$", r"ใช้ \1 ได้")
 add(r"\bEnable (.+?)\.?$", r"ใช้ \1 ได้")
 add(r"splash (\d+)x(\d+) AoE on non-skill attack", r"โจมตีปกติกระจายเป็นวง \1x\2 ช่อง")
 
@@ -269,6 +307,9 @@ add(r"\+(\d+)% physical damage vs\. ((?:{T})(?:,? (?:and )?(?:{T}))*)",
     lambda m: "ดาเมจกายภาพ +" + m.group(1) + "% ต่อ" + targets(m.group(2)))
 add(r"\+(\d+)% magical damage vs\. ((?:{T})(?:,? (?:and )?(?:{T}))*)",
     lambda m: "ดาเมจเวท +" + m.group(1) + "% ต่อ" + targets(m.group(2)))
+add(r"\+(\d+)% physical damage vs\.? ((?:{K})[^.]*?(?:{K}))\.?$",
+    r"ดาเมจกายภาพ +\1% ต่อ\2")
+add(r"(\d+)% defense bypass vs\.? ((?:{K})[^.]*?(?:{K}))\.?$", r"เจาะ DEF \1% ต่อ\2")
 add(r"\+(\d+)% range physical damage", r"ดาเมจกายภาพระยะไกล +\1%")
 add(r"\+(\d+)% physical damage", r"ดาเมจกายภาพ +\1%")
 add(r"\bCRIT \+(\d+) vs\. ((?:{T})(?:,? (?:and )?(?:{T}))*)",
@@ -279,7 +320,7 @@ add(r"\+(\d+)% (DEF|MDEF) ignore vs\. ({T})",
 add(r"\+(\d+)% (DEF|MDEF) ignore", r"เจาะ \2 \1%")
 
 # damage in
-add(r"-(\d+)% damage from range", r"รับดาเมจระยะไกล -\1%")
+add(r"-(\d+)% damage from range(?: attacks)?", r"รับดาเมจระยะไกล -\1%")
 add(r"([+-])(\d+)% damage from non-Neutral attacks",
     r"รับดาเมจจากธาตุที่ไม่ใช่ไร้ธาตุ \1\2%")
 add(r"([+-])(\d+)% damage from ((?:{E})(?:, (?:{E}))*)"
@@ -294,6 +335,22 @@ add(r"\+(\d+)% EXP from ({T})",
 
 # how long a proc lasts, before the chance that starts it
 add(r"\bfor (\d+) seconds\b", r"นาน \1 วินาที")
+
+# autocast and lethal hits are written as "a chance of", so they go in before the rule
+# that reads anything after "chance of" as a status being put on somebody
+add(r"\+?([\d.]+)% chance to auto(?:cast|spell) (.+?) on ({W})\.?",
+    lambda m: "โอกาส " + m.group(1) + "% ร่ายอัตโนมัติ " + m.group(2) + " " + when(m.group(3)))
+add(r"Adds \((\d+) ?\* ?Refine\)% chance to auto(?:cast|spell) (.+?) when receiving melee damage",
+    r"โอกาส (\1×ตีบวก)% ร่ายอัตโนมัติ \2 เมื่อโดนโจมตีระยะประชิด")
+add(r"Adds a (\d+)% chance to strike twice with any weapon\.",
+    r"โอกาส \1% ตี 2 ครั้ง ไม่ว่าจะใช้อาวุธอะไร")
+add(r"\+?([\d.]+)% chance (?:of dealing|to deal) lethal damage to ({T}) on attack",
+    lambda m: "โอกาส " + m.group(1) + "% ออกดาเมจสังหารต่อ" + target(m.group(2)))
+add(r"\+?([\d.]+)% chance (?:of dealing|to deal) lethal damage to on attack",
+    r"โอกาส \1% ออกดาเมจสังหาร")
+add(r"\+(\d+)% chance (?:WeaponBreak|WpnBreak) on physical attack",
+    r"โอกาส \1% ทำอาวุธศัตรูแตก เมื่อโจมตีกายภาพ")
+add(r"\+(\d+)% double attack chance", r"โอกาสออก Double Attack +\1%")
 
 # a chance of something, and what set it off
 add(r"\+?([\d.]+)% chance(?: of)? (.+?) \(self\) on ({W})",
@@ -327,6 +384,56 @@ add(r"\+(\d+) cell knockback on (.+?)$", r"\2 ผลักถอย \1 ช่อ
 add(r"\+(\d+)% ((?:{K})(?:, ?(?:{K}))*) damage$", r"ดาเมจ \2 +\1%")
 add(r"\+(\d+)% ({K}) recovery$", r"ฟื้นฟูจาก \2 +\1%")
 
+# what a potion gives back. The amount sits in its own green span, which is markup by
+# the time this runs, so the rule moves the whole stashed lump rather than the number.
+add(r"\bRecover((?:{K})[\s\d~]+(?:{K}))\s*(HP|SP) and((?:{K})[\s\d~]+(?:{K}))\s*(HP|SP)",
+    r"ฟื้น \2\1 และ \4\3")
+add(r"\bRecover((?:{K})[\s\d~]+(?:{K}))\s*(HP|SP)", r"ฟื้น \2\1")
+add(r"\bRecover (\d+)% (HP|SP)", r"ฟื้น \2 \1%")
+add(r"\bRecover (\d+) (HP|SP)/melee attack vs\. ({T})",
+    lambda m: "ฟื้น " + m.group(2) + " " + m.group(1)
+              + " ต่อการโจมตีระยะประชิดใส่" + target(m.group(3)))
+add(r"\bRecover (\d+) (HP|SP)/melee attack", r"ฟื้น \2 \1 ต่อการโจมตีระยะประชิด")
+add(r"^Cures: ", "แก้อาการ: ")
+add(r"^Contains a random item\.", "เปิดแล้วได้ของสุ่ม 1 ชิ้น")
+add(r"Increases attack speed, reducing the delay between your attacks by (\d+)% "
+    r"for (\d+) minutes\.",
+    r"เพิ่มความเร็วโจมตี ลดดีเลย์ระหว่างการโจมตี \1% นาน \2 นาที")
+
+# arrows
+add(r"^\[Properties\]Arrow Attack: (\d+)", r"[คุณสมบัติ]พลังโจมตีลูกศร: \1")
+add(r"^Arrow Property: ", "ธาตุลูกศร: ")
+
+# weapons and gear
+add(r"\bAll Stats \+ ?(\d+)", r"ทุกสเตตัส +\1")
+add(r"^Indestructible$", "ไม่แตก")
+add(r"\bAttack Range \+(\d+)", r"ระยะโจมตี +\1")
+add(r"\bEnable use of (.+?)\.?$", r"ใช้ \1 ได้")
+add(r"\bASPD \+Refine%", "ASPD +(ตีบวก)%")
+add(r"\bINT \+\(Refine \+ (\d+)\)", r"INT +(ตีบวก + \1)")
+add(r"\bINT \+\((\d+) \+ Refine\)", r"INT +(ตีบวก + \1)")
+add(r"\bEvery (\d+) refine increase MATK by (\d+)%\.", r"ทุกๆ ตีบวก \1 ขั้น MATK +\2%")
+add(r"\bEvery refine increases SP cost by (\d+)%\.", r"ตีบวกทุกขั้น ใช้ SP +\1%")
+add(r"(\d+(?:\.\d+)?)% of physical damage dealt is recovered as (HP|SP)\.",
+    r"ดูดดาเมจกายภาพ \1% กลับมาเป็น \2")
+add(r"(\d+)% defense bypass vs\.? (.+?)\.?$", r"เจาะ DEF \1% ต่อ\2")
+add(r"-\((\d+) \+ Refine\)% damage taken from medium size enemies\.",
+    r"รับดาเมจจากศัตรูขนาดกลาง -(\1 + ตีบวก)%")
+add(r"\bIncreases damage against mushroom and fungus type monsters by \+(\d+)%",
+    r"ดาเมจต่อมอนประเภทเห็ดและรา +\1%")
+add(r"\+(\d+)% damage against ((?:{T})(?:,? (?:and )?(?:{T}))*)(?: monsters)?\.",
+    lambda m: "ดาเมจ +" + m.group(1) + "% ต่อ" + targets(m.group(2)))
+add(r"\+(\d+)% damage received", r"รับดาเมจ +\1%")
+add(r"-(\d+)% damage from physical", r"รับดาเมจกายภาพ -\1%")
+add(r"-(\d+)% damage from range attacks", r"รับดาเมจระยะไกล -\1%")
+add(r"\+(\d+)% damage vs\.? ((?:{T})(?:,? (?:and )?(?:{T}))*)\.?",
+    lambda m: "ดาเมจ +" + m.group(1) + "% ต่อ" + targets(m.group(2)))
+add(r"\+(\d+) CRIT vs\.? ({T})",
+    lambda m: "CRIT +" + m.group(1) + " ต่อ" + target(m.group(2)))
+add(r"(โบนัสเซ็ต(?:{K})) with ", r"\1 กับ ")
+add(r"((?:{K})) or ((?:{K}))", r"\1 หรือ \2")
+add(r"\bSp Consumption\b", "ใช้ SP")
+
 # the plain words
 add(r"\bHP Regeneration\b", "ฟื้นฟู HP")
 add(r"\bSP Regeneration\b", "ฟื้นฟู SP")
@@ -351,21 +458,87 @@ add(r"\bDex\b", "DEX")
 add(r"\bLuk\b", "LUK")
 add(r"\bINT \+ (\d+)", r"INT +\1")
 
+# --- the sentences ------------------------------------------------------------
+
+#What a thing is, as against what it does. One line per sentence, tab separated, so a
+#sentence used by twenty items is translated once and reads the same on all twenty.
+PROSE_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "prose.tsv")
+PROSE = {}
+if os.path.exists(PROSE_FILE):
+    for line in io.open(PROSE_FILE, encoding="utf-8"):
+        line = line.rstrip("\n")
+        if not line or line.startswith("#") or "\t" not in line:
+            continue
+        en, th = line.split("\t", 1)
+        if th.strip():
+            PROSE[en] = th
+
+#Three colours carry describing text rather than numbers: the desc shorthand, the grey
+#the exporter turns it into, and the darker grey used for the notes under a skill.
+OPENERS = r"<desc>|<color=#808080>|<color=#777777>"
+CLOSERS = r"</desc>|</color>"
+#Greedy on purpose: a sentence can have a colour span inside it, and stopping at
+#the first closer would cut the sentence in half and leave the tail untranslated.
+DESC_SPAN = re.compile(r"(%s)(.*)(%s)" % (OPENERS, CLOSERS), re.I)
+#Two entries in the whole corpus run a description across two lines
+DESC_OPEN = re.compile(r"(%s)([^<]+)$" % OPENERS, re.I)
+DESC_CLOSE = re.compile(r"^([^<]+)(%s)" % CLOSERS, re.I)
+HAS_WORD = re.compile(r"[A-Za-z]{2,}")
+
+missing_prose = []
+
+
+def swap(text):
+    """The sentence's Thai, or the English again with a note that it is still needed."""
+    if not HAS_WORD.search(text):
+        return text                     # a number in a coloured span is already Thai
+    if text in PROSE:
+        return PROSE[text]
+    missing_prose.append(text)
+    return text
+
+
+def prose(line):
+    """The describing sentences on this line swapped for their Thai."""
+    line = DESC_SPAN.sub(lambda m: m.group(1) + swap(m.group(2)) + m.group(3), line)
+    line = DESC_OPEN.sub(lambda m: m.group(1) + swap(m.group(2)), line)
+    return DESC_CLOSE.sub(lambda m: swap(m.group(1)) + m.group(2), line)
+
+
 # --- running it ---------------------------------------------------------------
 
 TAGGED = re.compile(r"<color=#008080>.*?</color>|<color=#0000FF>.*?</color>"
-                    r"|<skill>.*?</skill>", re.I)
+                    r"|<skill>.*?</skill>|<desc>.*?</desc>"
+                    r"|<color=#808080>.*?</color>|<color=#777777>.*?</color>", re.I)
 ANYTAG = re.compile(r"</?[a-zA-Z][^>]*>")
-STATUS_SPAN = re.compile(r"(<color=#800000>)([^<]+)(</color>)", re.I)
+#Three spellings of the same thing across the five files: the raw colour, and the two
+#shorthand tags the exporter rewrites into it.
+STATUS_SPAN = re.compile(r"(<color=#800000>|<status>|<element>|<race>)([^<]+)"
+                         r"(</color>|</status>|</element>|</race>)", re.I)
+
+#An arrow's element is written in the skill colour rather than the status one
+ELEM_SPAN = re.compile(r"(<color=#0000FF>)(" + alt(ELEMENT) + r")(</color>)", re.I)
 
 
 def translate(line):
     """One line into Thai, with what must stay English stashed out of the way."""
+    #A sentence with no tag around it at all - two of those exist - is looked up whole.
+    lead = line[:len(line) - len(line.lstrip())]
+    if line.strip() in PROSE:
+        return lead + PROSE[line.strip()]
+
+    #then the describing sentences, so what replaces them is Thai before the phrase
+    #table ever looks at the line
+    line = prose(line)
+
     #status names are ordinary words rather than links, so they are translated first,
     #before the whole span goes into the stash as markup
     line = STATUS_SPAN.sub(
-        lambda m: m.group(1) + STATUS.get(m.group(2), ELEMENT.get(m.group(2), m.group(2)))
+        lambda m: m.group(1) + STATUS.get(m.group(2),
+                                          ELEMENT.get(m.group(2),
+                                                      RACE.get(m.group(2), m.group(2))))
                   + m.group(3), line)
+    line = ELEM_SPAN.sub(lambda m: m.group(1) + ELEMENT[m.group(2)] + m.group(3), line)
 
     stash = []
 
@@ -393,7 +566,7 @@ def residue(line):
     return [w for w in WORD.findall(bare) if w not in KEEP]
 
 
-def main(path, apply_it):
+def main(path, apply_it, dump):
     raw = io.open(path, "rb").read()
     bom = raw.startswith(b"\xef\xbb\xbf")
     lines = raw.decode("utf-8-sig").split("\n")
@@ -406,14 +579,43 @@ def main(path, apply_it):
             continue
         done = translate(line)
         out.append(done)
+
+        #A line that is one hand written sentence has already been decided on, names and
+        #all - checking it for English would report the proper nouns somebody chose to keep
+        if line.strip() in PROSE:
+            continue
+
         left = residue(done)
         if left:
             unhandled.setdefault(line, (n, left))
+
+    if dump:
+        seen = set()
+        for text in missing_prose:
+            if text not in seen:
+                seen.add(text)
+                print(text)
+        return 0
+
+    gaps = False
+
+    if missing_prose:
+        gaps = True
+        seen = sorted(set(missing_prose))
+        print("%d sentence(s) with no Thai in prose.tsv (%d uses)"
+              % (len(seen), len(missing_prose)))
+        for text in seen[:6]:
+            print("   ", text[:100])
+        if len(seen) > 6:
+            print("    ... and %d more; run with --dump to list them all" % (len(seen) - 6))
 
     if unhandled:
         print("%d line(s) the table does not cover:" % len(unhandled))
         for text, (n, left) in sorted(unhandled.items(), key=lambda kv: kv[1][0]):
             print("  %5d  %-72s  %s" % (n, text[:72], ",".join(sorted(set(left)))))
+        gaps = True
+
+    if gaps:
         return 1
 
     print("every line translated")
@@ -426,4 +628,4 @@ def main(path, apply_it):
 
 if __name__ == "__main__":
     files = [a for a in sys.argv[1:] if not a.startswith("--")]
-    sys.exit(main(files[0], "--apply" in sys.argv))
+    sys.exit(main(files[0], "--apply" in sys.argv, "--dump" in sys.argv))

@@ -1,997 +1,997 @@
 //Usable Items
 
 ::Red_Potion //501
-<color=#808080>A potion made from ground Red Herbs.</color>
-Recover<color=#008000> 45~65</color> HP
+<color=#808080>ยาที่ทำจาก Red Herb บด</color>
+ฟื้น HP<color=#008000> 45~65</color>
 
 ::Orange_Potion //502
-<color=#808080>A potion made from ground Red and Yellow Herbs.</color>
-Recover<color=#008000> 105~145</color> HP
+<color=#808080>ยาที่ทำจาก Red Herb และ Yellow Herb บด</color>
+ฟื้น HP<color=#008000> 105~145</color>
 
 ::Yellow_Potion //503
-<color=#808080>A potion made from ground Yellow Herbs.</color>
-Recover<color=#008000> 175~235</color> HP
+<color=#808080>ยาที่ทำจาก Yellow Herb บด</color>
+ฟื้น HP<color=#008000> 175~235</color>
 
 ::White_Potion //504
-<color=#808080>A potion made from ground White Herbs.</color>
-Recover<color=#008000> 325~405</color> HP
+<color=#808080>ยาที่ทำจาก White Herb บด</color>
+ฟื้น HP<color=#008000> 325~405</color>
 
 ::Blue_Potion //505
-<color=#808080>A potion made from ground Blue Herbs.</color>
-Recover<color=#008000> 40~60</color> SP
+<color=#808080>ยาที่ทำจาก Blue Herb บด</color>
+ฟื้น SP<color=#008000> 40~60</color>
 
 ::Green_Potion //506
-<color=#808080>A potion made from ground Green Herbs.</color>
-Cures: <color=#800000>Poison</color>, <color=#800000>Blind</color>, <color=#800000>Silence</color>
+<color=#808080>ยาที่ทำจาก Green Herb บด</color>
+แก้อาการ: <color=#800000>พิษ</color>, <color=#800000>ตาบอด</color>, <color=#800000>ใบ้</color>
 
 ::Red_Herb //507
-<color=#808080>Red herbs found in the wild, often from slain monsters, that have a mild healing effect.</color>
-Recover<color=#008000> 18~28</color> HP
+<color=#808080>สมุนไพรแดงที่พบในป่า มักได้จากมอนสเตอร์ที่ถูกฆ่า มีสรรพคุณรักษาอ่อนๆ</color>
+ฟื้น HP<color=#008000> 18~28</color>
 
 ::Yellow_Herb //508
-<color=#808080>Yellow herbs found in the wild, these give a slightly stronger hit than Red Herbs.</color>
-Recover<color=#008000> 38~58</color> HP
+<color=#808080>สมุนไพรเหลืองที่พบในป่า ฟื้นแรงกว่า Red Herb นิดหน่อย</color>
+ฟื้น HP<color=#008000> 38~58</color>
 
 ::White_Herb //509
-<color=#808080>White herbs found in the wild, as any alchemist can tell you, this is the good stuff.</color>
-Recover<color=#008000> 75~115</color> HP
+<color=#808080>สมุนไพรขาวที่พบในป่า Alchemist คนไหนก็บอกได้ว่านี่แหละของดี</color>
+ฟื้น HP<color=#008000> 75~115</color>
 
 ::Blue_Herb //510
-<color=#808080>Blue herbs found in the wild, these are addictive, consult your local alchemist before use.</color>
-Recover<color=#008000> 15~30</color> SP
+<color=#808080>สมุนไพรน้ำเงินที่พบในป่า เสพติดได้ ปรึกษา Alchemist แถวบ้านก่อนใช้</color>
+ฟื้น SP<color=#008000> 15~30</color>
 
 ::Green_Herb //511
-<desc>A bitter green herb which can counteract the effect of some poisons.</desc>
-Cures: <color=#800000>Poison</color>
+<desc>สมุนไพรเขียวรสขม แก้พิษได้บางชนิด</desc>
+แก้อาการ: <color=#800000>พิษ</color>
 
 ::Apple //512
-<color=#808080>A round, edible fruit that, when eaten once a day, keeps the doctor away.</color>
-Recover<color=#008000> 16~22</color> HP
+<color=#808080>ผลไม้กลมกินได้ กินวันละลูกแล้วไม่ต้องหาหมอ</color>
+ฟื้น HP<color=#008000> 16~22</color>
 
 ::Banana //513
-<color=#808080>A sweet tropical fruit made famous by its use in slapstick comedy.</color>
-Recover<color=#008000> 17~21</color> HP
+<color=#808080>ผลไม้เมืองร้อนรสหวานที่โด่งดังจากมุกตลกคาเฟ่</color>
+ฟื้น HP<color=#008000> 17~21</color>
 
 ::Grape //514
-<color=#808080>A cluster of berries with smooth skin that can be fermented to make wine.</color>
-Recover<color=#008000> 10~15</color> SP
+<color=#808080>พวงผลเบอร์รีเปลือกเนียน หมักทำไวน์ได้</color>
+ฟื้น SP<color=#008000> 10~15</color>
 
 ::Carrot //515
-<color=#808080>An orange root that is supposedly good for your vision.</color>
-Recover<color=#008000> 18~20</color> HP
+<color=#808080>รากสีส้มที่ว่ากันว่าดีต่อสายตา</color>
+ฟื้น HP<color=#008000> 18~20</color>
 
 ::Potato //516
-<color=#808080>A tuber that can be eaten fried, baked, and even boiled.</color>
-Recover<color=#008000> 15~23</color> HP
+<color=#808080>หัวมันที่กินได้ทั้งทอด อบ หรือแม้แต่ต้ม</color>
+ฟื้น HP<color=#008000> 15~23</color>
 
 ::Meat //517
-<color=#808080>A leg of meat that's been cooked to perfection.</color>
-Recover<color=#008000> 70~100</color> HP
+<color=#808080>ขาเนื้อที่ปรุงมาได้ที่พอดี</color>
+ฟื้น HP<color=#008000> 70~100</color>
 
 ::Honey //518
-<color=#808080>A sweet product made by bees endowed with yummy flavor and medicinal uses.</color>
-Recover<color=#008000> 70~100</color> HP and<color=#008000> 20~40</color> SP
+<color=#808080>ผลผลิตหวานจากผึ้ง อร่อยและใช้เป็นยาได้</color>
+ฟื้น HP<color=#008000> 70~100</color> และ SP<color=#008000> 20~40</color>
 
 ::Milk //519
-<color=#808080>A bottle of pasteurized cow milk that is chock full of bovine goodness.</color>
-Recover<color=#008000> 27~37</color> HP
+<color=#808080>ขวดนมวัวพาสเจอร์ไรซ์ อัดแน่นด้วยคุณค่า</color>
+ฟื้น HP<color=#008000> 27~37</color>
 
 ::Hinalle_Leaflet //520
-<color=#808080>A leaf cut from a hinalle plant which has a cool, fresh scent.</color>
-Recover<color=#008000> 175~235</color> HP
+<color=#808080>ใบที่ตัดมาจากต้น Hinalle กลิ่นเย็นสดชื่น</color>
+ฟื้น HP<color=#008000> 175~235</color>
 
 ::Aloe_Leaflet //521
-<color=#808080>A leaf cut from an aloe plant that has a thick, moist texture.</color>
-Recover<color=#008000> 325~405</color> HP
+<color=#808080>ใบที่ตัดมาจากต้น Aloe เนื้อหนาชุ่มน้ำ</color>
+ฟื้น HP<color=#008000> 325~405</color>
 
 ::Mastela_Fruit //522
-<color=#808080>A shiny, purple fruit picked from the boughs of a mastela tree.</color>
-Recover<color=#008000> 400~600</color> HP
+<color=#808080>ผลไม้สีม่วงเงางามที่เก็บมาจากกิ่งต้น Mastela</color>
+ฟื้น HP<color=#008000> 400~600</color>
 
 ::Holy_Water //523
-<color=#808080>A bottle of blessed water used in sacred ceremonies.</color>
-Cures: <color=#800000>Curse</color>
+<color=#808080>ขวดน้ำมนต์ ใช้ในพิธีศักดิ์สิทธิ์</color>
+แก้อาการ: <color=#800000>สาป</color>
 
 ::Panacea //525
-<color=#808080>A mystic remedy for all illnesses.</color>
-Cures: <color=#800000>Poison</color>, <color=#800000>Blind</color>, <color=#800000>Silence</color>, <color=#800000>Curse</color>, <color=#800000>Confusion</color>, <color=#800000>Hallucination</color>
+<color=#808080>ยาลี้ลับที่รักษาได้ทุกโรค</color>
+แก้อาการ: <color=#800000>พิษ</color>, <color=#800000>ตาบอด</color>, <color=#800000>ใบ้</color>, <color=#800000>สาป</color>, <color=#800000>สับสน</color>, <color=#800000>ประสาทหลอน</color>
 
 ::Royal_Jelly //526
-<color=#808080>A highly nutritious jelly secreted from honeybees fed to larvae and future queens.</color>
-Recover<color=#008000> 325~405</color> HP and<color=#008000> 40~60</color> SP
-Cures: <color=#800000>Poison</color>, <color=#800000>Blind</color>, <color=#800000>Silence</color>, <color=#800000>Curse</color>, <color=#800000>Confusion</color>, <color=#800000>Hallucination</color>
+<color=#808080>เยลลี่คุณค่าสูงที่ผึ้งผลิตไว้เลี้ยงตัวอ่อนและว่าที่นางพญา</color>
+ฟื้น HP<color=#008000> 325~405</color> และ SP<color=#008000> 40~60</color>
+แก้อาการ: <color=#800000>พิษ</color>, <color=#800000>ตาบอด</color>, <color=#800000>ใบ้</color>, <color=#800000>สาป</color>, <color=#800000>สับสน</color>, <color=#800000>ประสาทหลอน</color>
 
 ::Monster's_Feed //528
-<color=#808080>A entree of processed food for monsters.</color>
-Recover<color=#008000> 72~108</color> HP
+<color=#808080>อาหารแปรรูปสำหรับมอนสเตอร์</color>
+ฟื้น HP<color=#008000> 72~108</color>
 
 ::Candy //529
-<color=#808080>A confection of sugar, chocolate and other flavors.</color>
-Recover<color=#008000> 45~65</color> HP
+<color=#808080>ขนมหวานจากน้ำตาล ช็อกโกแลต และรสชาติอื่นๆ</color>
+ฟื้น HP<color=#008000> 45~65</color>
 
 ::Candy_Cane //530
-<color=#808080>A striped cane of peppermint candy.</color>
-Recover<color=#008000> 105~145</color> HP
+<color=#808080>ไม้เท้าลูกกวาดเปปเปอร์มินต์ลายทาง</color>
+ฟื้น HP<color=#008000> 105~145</color>
 
 ::Apple_Juice //531
-<color=#808080>A bottle of apple juice that's easy to digest.</color>
-Recover<color=#008000> 25~35</color> HP
+<color=#808080>น้ำแอปเปิลขวดหนึ่ง ย่อยง่าย</color>
+ฟื้น HP<color=#008000> 25~35</color>
 
 ::Banana_Juice //532
-<color=#808080>A bottle of banana juice that's easy to digest.</color>
-Recover<color=#008000> 26~34</color> HP
+<color=#808080>น้ำกล้วยขวดหนึ่ง ย่อยง่าย</color>
+ฟื้น HP<color=#008000> 26~34</color>
 
 ::Grape_Juice //533
-<color=#808080>A bottle of grape juice that's easy to digest.</color>
-Recover<color=#008000> 15~25</color> SP
+<color=#808080>น้ำองุ่นขวดหนึ่ง ย่อยง่าย</color>
+ฟื้น SP<color=#008000> 15~25</color>
 
 ::Carrot_Juice //534
-<color=#808080>A bottle of carrot juice that's easy to digest.</color>
-Recover<color=#008000> 27~33</color> HP
+<color=#808080>น้ำแครอทขวดหนึ่ง ย่อยง่าย</color>
+ฟื้น HP<color=#008000> 27~33</color>
 
 ::Pumpkin //535
-<color=#808080>A large orange fruit that's used in pies and few other dishes.</color>
-Recover<color=#008000> 19</color> HP
+<color=#808080>ผลไม้สีส้มลูกใหญ่ ใช้ทำพายและอาหารอีกไม่กี่อย่าง</color>
+ฟื้น HP<color=#008000> 19</color>
 
 ::Ice_Cream //536
-<color=#808080>A delicious, frosty ice cream that can cause a brain freeze.</color>
-Recover<color=#008000> 105~145</color> HP
+<color=#808080>ไอศกรีมเย็นเจี๊ยบแสนอร่อย กินเร็วไปแล้วปวดหัว</color>
+ฟื้น HP<color=#008000> 105~145</color>
 
 ::Pet_Food //537
-<color=#808080>An entree of sterilized pet food fortified with vitamins and minerals.</color>
-Recover<color=#008000> 50~90</color> HP
+<color=#808080>อาหารสัตว์เลี้ยงผ่านการฆ่าเชื้อ เสริมวิตามินและแร่ธาตุ</color>
+ฟื้น HP<color=#008000> 50~90</color>
 
 ::Well-Baked_Cookie //538
-<color=#808080>A scrumptious cookie.</color>
-Recover<color=#008000> 160~200</color> HP
+<color=#808080>คุกกี้แสนอร่อย</color>
+ฟื้น HP<color=#008000> 160~200</color>
 
 ::Piece_of_Cake //539
-<color=#808080>A sweet slice of cake covered with icing and topped with a cherry.</color>
-Recover<color=#008000> 270~330</color> HP
+<color=#808080>เค้กหวานชิ้นหนึ่ง ราดไอซิ่งและวางเชอร์รีไว้ข้างบน</color>
+ฟื้น HP<color=#008000> 270~330</color>
 
 ::Raw_Fish //544
-<color=#808080>A raw, fresh fish.</color>
-Recover<color=#008000> 25~60</color> HP
+<color=#808080>ปลาดิบสดๆ</color>
+ฟื้น HP<color=#008000> 25~60</color>
 
 ::Condensed_Red_Potion //545
-<color=#808080>A condensed Red Potion that weighs significantly less.</color>
-Recover<color=#008000> 45~65</color> HP
+<color=#808080>Red Potion เข้มข้น น้ำหนักเบากว่ามาก</color>
+ฟื้น HP<color=#008000> 45~65</color>
 
 ::Condensed_Yellow_Potion //546
-<color=#808080>A condensed Yellow Potion that weighs significantly less.</color>
-Recover<color=#008000> 175~235</color> HP
+<color=#808080>Yellow Potion เข้มข้น น้ำหนักเบากว่ามาก</color>
+ฟื้น HP<color=#008000> 175~235</color>
 
 ::Condensed_White_Potion //547
-<color=#808080>A condensed White Potion that weighs significantly less.</color>
-Recover<color=#008000> 325~405</color> HP
+<color=#808080>White Potion เข้มข้น น้ำหนักเบากว่ามาก</color>
+ฟื้น HP<color=#008000> 325~405</color>
 
 ::Cheese //548
-<color=#808080>A food with an acquired taste and unique scent.</color>
-Recover<color=#008000> 10~15</color> SP
+<color=#808080>อาหารที่ต้องกินให้ชิน กลิ่นเป็นเอกลักษณ์</color>
+ฟื้น SP<color=#008000> 10~15</color>
 
 ::Yam //549
-<color=#808080>An edible plant root that should be eaten slowly to avoid choking.</color>
-Recover<color=#008000> 50~100</color> HP
+<color=#808080>รากพืชกินได้ ควรค่อยๆ กินไม่งั้นติดคอ</color>
+ฟื้น HP<color=#008000> 50~100</color>
 
 ::Rice_Cake //550
-<color=#808080>A snack made out of rice that doesn't contain any fat.</color>
-Recover<color=#008000> 10~15</color> HP
+<color=#808080>ขนมทำจากข้าว ไม่มีไขมันเลย</color>
+ฟื้น HP<color=#008000> 10~15</color>
 
 ::Sushi //551
-<color=#808080>An eastern delicacy of marinated rice, dried seaweed, and raw fish.</color>
-Recover<color=#008000> 50~60</color> HP
+<color=#808080>ของอร่อยจากตะวันออก ข้าวปรุงรสห่อสาหร่ายแห้งกับปลาดิบ</color>
+ฟื้น HP<color=#008000> 50~60</color>
 
 ::Bao //553
-<color=#808080>A steamed dumpling filled with ground meat and is usually served hot.</color>
-Recover<color=#008000> 35~70</color> HP
+<color=#808080>ซาลาเปานึ่งไส้เนื้อบด มักเสิร์ฟร้อนๆ</color>
+ฟื้น HP<color=#008000> 35~70</color>
 
 ::Mochi //554
-<color=#808080>A tasty rice cake made for celebrating the Lunar New Year.</color>
-Recover<color=#008000> 105~145</color> HP
+<color=#808080>ขนมข้าวเหนียวแสนอร่อย ทำไว้ฉลองตรุษจีน</color>
+ฟื้น HP<color=#008000> 105~145</color>
 
 ::Traditional_Rice_Cake //555
-<color=#808080>A traditional food made from rice powder, there are many recipes to make this, but all of them are absolutely delicious.</color>
-Recover<color=#008000> 105~145</color> HP
+<color=#808080>อาหารพื้นบ้านที่ทำจากแป้งข้าว มีสูตรทำหลายแบบ แต่อร่อยทุกสูตร</color>
+ฟื้น HP<color=#008000> 105~145</color>
 
 ::Rice_Cake_Stick //556
-<color=#808080>A moist and sticky rice cake prepared in sticks.</color>
-Recover<color=#008000> 20~25</color> HP
+<color=#808080>ขนมข้าวเหนียวนุ่มหนึบ ทำเป็นแท่ง</color>
+ฟื้น HP<color=#008000> 20~25</color>
 
 ::Neatly_Sliced_Rice_Cake //557
-<color=#808080>A moisty and sticky rice cake prepared in slices.</color>
-Recover<color=#008000> 25~30</color> HP
+<color=#808080>ขนมข้าวเหนียวนุ่มหนึบ หั่นเป็นแผ่น</color>
+ฟื้น HP<color=#008000> 25~30</color>
 
 ::Chocolate //558
-<color=#808080>A delicious and sweet treat made from ground cacao and milk.</color>
-Recover<color=#008000> 1</color> HP and<color=#008000> 1</color> SP
+<color=#808080>ขนมหวานอร่อย ทำจากผงโกโก้บดกับนม</color>
+ฟื้น HP<color=#008000> 1</color> และ SP<color=#008000> 1</color>
 
 ::Handmade_Dark_Chocolate //559
-<color=#808080>A collection of chocolates gathered in a beautiful arrangement. This is often used in courtship, and sometimes, even used effectively.</color>
-Recover<color=#008000> 50</color> HP and<color=#008000> 50</color> SP
+<color=#808080>ช็อกโกแลตหลายชิ้นจัดเรียงมาอย่างสวยงาม มักใช้จีบกัน และบางทีก็ได้ผลจริงๆ</color>
+ฟื้น HP<color=#008000> 50</color> และ SP<color=#008000> 50</color>
 
 ::Handmade_White_Chocolate //560
-<color=#808080>A white chocolate used to propose to a girl by a boy during White Day.</color>
-Recover<color=#008000> 50</color> HP and<color=#008000> 50</color> SP
+<color=#808080>ไวต์ช็อกโกแลตที่ผู้ชายใช้สารภาพรักกับผู้หญิงในวัน White Day</color>
+ฟื้น HP<color=#008000> 50</color> และ SP<color=#008000> 50</color>
 
 ::White_Chocolate //561
-<color=#808080>A white cacao.</color>
-Recover<color=#008000> 50</color> HP and<color=#008000> 50</color> SP
+<color=#808080>โกโก้ขาว</color>
+ฟื้น HP<color=#008000> 50</color> และ SP<color=#008000> 50</color>
 
 ::Rice_Ball //564
-<color=#808080>A lump of rice which can be eaten for lunch.</color>
-Recover<color=#008000> 200</color> HP
+<color=#808080>ก้อนข้าว กินเป็นมื้อกลางวันได้</color>
+ฟื้น HP<color=#008000> 200</color>
 
 ::Tom_Yum_Goong //566
-<color=#808080>An incredibly famous soup that has a spicy, sweet and sour taste with shrimp, lemons and chiles.</color>
-Recover<color=#008000> 244~350</color> HP and<color=#008000> 10~30</color> SP
+<color=#808080>ซุปชื่อดังสุดๆ รสเผ็ดเปรี้ยวหวาน ใส่กุ้ง มะนาว และพริก</color>
+ฟื้น HP<color=#008000> 244~350</color> และ SP<color=#008000> 10~30</color>
 
 ::Shrimp //567
-<color=#808080>A shellfish which has a long tail and many legs. When cooked, the color of the body turns red with a unique scent, and is very tasty.</color>
-Recover<color=#008000> 117~192</color> HP
+<color=#808080>สัตว์เปลือกแข็งที่มีหางยาวและขาหลายคู่ พอสุกแล้วตัวเป็นสีแดง กลิ่นหอมเป็นเอกลักษณ์ และอร่อยมาก</color>
+ฟื้น HP<color=#008000> 117~192</color>
 
 ::Lemon //568
-<color=#808080>A bright yellow fruit with very sour juice and a fresh scent.</color>
-Recover<color=#008000> 10~20</color> SP
+<color=#808080>ผลไม้สีเหลืองสด น้ำเปรี้ยวจี๊ด กลิ่นสดชื่น</color>
+ฟื้น SP<color=#008000> 10~20</color>
 
 ::Novice_Potion //569
-<color=#808080>A potion from the Novice Training Grounds. Less effective than regular red potions, but lighter.</color>
-Recover<color=#008000> 22~33</color> HP
+<color=#808080>ยาจากลานฝึก Novice ฟื้นน้อยกว่า Red Potion ปกติ แต่เบากว่า</color>
+ฟื้น HP<color=#008000> 22~33</color>
 
 ::Lucky_Candy //570
-<color=#808080>A candy rumored to bring good good luck.</color>
-Recover<color=#008000> 45~65</color> HP
+<color=#808080>ลูกกวาด ร่ำลือกันว่านำโชค</color>
+ฟื้น HP<color=#008000> 45~65</color>
 
 ::Lucky_Candy_Cane //571
-<color=#808080>A candy cane rumored to bring good luck.</color>
-Recover<color=#008000> 105~145</color> HP
+<color=#808080>ลูกกวาดไม้เท้า ร่ำลือกันว่านำโชค</color>
+ฟื้น HP<color=#008000> 105~145</color>
 
 ::Lucky_Cookie //572
-<color=#808080>A cookie rumored to bring good luck.</color>
-Recover<color=#008000> 160~200</color> HP
+<color=#808080>คุกกี้ ร่ำลือกันว่านำโชค</color>
+ฟื้น HP<color=#008000> 160~200</color>
 
 ::Chocolate_Drink //573
-<color=#808080>A drink made from chocolate and milk from one of the Royal Court Dessert Specialist's recipes. Although the chef wishes for people to drink this treat elegantly, it's usually gulped down.</color>
-Recover<color=#008000> 330~410</color> HP and<color=#008000> 45~65</color> SP
+<color=#808080>เครื่องดื่มช็อกโกแลตนม ตามสูตรของผู้เชี่ยวชาญขนมหวานประจำราชสำนัก เชฟอยากให้คนค่อยๆ จิบอย่างสง่างาม แต่ส่วนใหญ่ก็ซดรวดเดียวหมด</color>
+ฟื้น HP<color=#008000> 330~410</color> และ SP<color=#008000> 45~65</color>
 
 ::Egg //574
-<color=#808080>An egg from a bird. It's full of nutrition, making it an ideal food for growing children.</color>
-Recover<color=#008000> 33~42</color> HP
+<color=#808080>ไข่นก อุดมด้วยสารอาหาร เหมาะกับเด็กที่กำลังโต</color>
+ฟื้น HP<color=#008000> 33~42</color>
 
 ::Prickly_Fruit //576
-<color=#808080>A scented and thorny tree fruit.</color>
-Recover<color=#008000> 150~300</color> HP and<color=#008000> 20~30</color> SP
+<color=#808080>ผลไม้เปลือกหนามที่มีกลิ่นหอม</color>
+ฟื้น HP<color=#008000> 150~300</color> และ SP<color=#008000> 20~30</color>
 
 ::Bag_of_Grain //577
-<color=#808080>A bag of dried grain commonly used in cuisine.</color>
-Recover<color=#008000> 60~70</color> HP
+<color=#808080>ถุงธัญพืชตากแห้ง ใช้ทำอาหารทั่วไป</color>
+ฟื้น HP<color=#008000> 60~70</color>
 
 ::Strawberry //578
-<color=#808080>A red berry renown for its slightly sweet and sour taste.</color>
-Recover<color=#008000> 16~28</color> SP
+<color=#808080>เบอร์รีสีแดงที่ขึ้นชื่อเรื่องรสหวานอมเปรี้ยว</color>
+ฟื้น SP<color=#008000> 16~28</color>
 
 ::Fresh_Fish //579
-<color=#808080>A fresh fish that can be cooked in a variety of ways.</color>
-Recover<color=#008000> 100~150</color> HP
+<color=#808080>ปลาสด เอาไปทำอาหารได้สารพัด</color>
+ฟื้น HP<color=#008000> 100~150</color>
 
 ::Bread //580
-<color=#808080>A fresh loaf of bread that gives off a wholesome scent.</color>
-Recover<color=#008000> 50~90</color> HP
+<color=#808080>ขนมปังก้อนสดใหม่ กลิ่นหอมน่ากิน</color>
+ฟื้น HP<color=#008000> 50~90</color>
 
 ::Edible_Mushroom //581
-<color=#808080>An edible mushroom that can be eaten raw or cooked.</color>
-Recover<color=#008000> 20~30</color> HP
+<color=#808080>เห็ดกินได้ กินสดหรือปรุงสุกก็ได้</color>
+ฟื้น HP<color=#008000> 20~30</color>
 
 ::Orange //582
-<color=#808080>A sweet citrus fruit that can be eaten raw, juiced, or cooked into a jam.</color>
-Recover<color=#008000> 10~20</color> HP and<color=#008000> 10~20</color> SP
+<color=#808080>ผลไม้ตระกูลส้มรสหวาน กินสด คั้นน้ำ หรือกวนเป็นแยมก็ได้</color>
+ฟื้น HP<color=#008000> 10~20</color> และ SP<color=#008000> 10~20</color>
 
 ::Fish_Cake_Soup //584
-<color=#808080>A bowl filled with hot, hearty fish broth and a generous helping of fish cake.</color>
-Recover<color=#008000> 40~70</color> HP
+<color=#808080>ชามน้ำซุปปลาร้อนๆ เข้มข้น พร้อมลูกชิ้นปลาเต็มชาม</color>
+ฟื้น HP<color=#008000> 40~70</color>
 
 ::Red_Prickly_Fruit //587
-<color=#808080>A freshly scented and thorny tree fruit.</color>
-Recover<color=#008000> 270~330</color> HP and<color=#008000> 20~30</color> SP
+<color=#808080>ผลไม้เปลือกหนาม กลิ่นสดชื่น</color>
+ฟื้น HP<color=#008000> 270~330</color> และ SP<color=#008000> 20~30</color>
 
 ::Caviar_Pancake //591
-<color=#808080>A pancake topped with caviar.</color>
-Recover<color=#008000> 325~405</color> HP and<color=#008000> 40~60</color> SP
+<color=#808080>แพนเค้กหน้าคาเวียร์</color>
+ฟื้น HP<color=#008000> 325~405</color> และ SP<color=#008000> 40~60</color>
 
 ::Jam_Pancake //592
-<color=#808080>A pancake topped with strawberry jam.</color>
-Recover<color=#008000> 325~405</color> HP and<color=#008000> 40~60</color> SP
+<color=#808080>แพนเค้กหน้าแยมสตรอว์เบอร์รี</color>
+ฟื้น HP<color=#008000> 325~405</color> และ SP<color=#008000> 40~60</color>
 
 ::Honey_Pancake //593
-<color=#808080>A pancake topped with honey.</color>
-Recover<color=#008000> 325~405</color> HP and<color=#008000> 40~60</color> SP
+<color=#808080>แพนเค้กหน้าน้ำผึ้ง</color>
+ฟื้น HP<color=#008000> 325~405</color> และ SP<color=#008000> 40~60</color>
 
 ::Sour_Cream_Pancake //594
-<color=#808080>A pancake topped with sour cream.</color>
-Recover<color=#008000> 325~405</color> HP and<color=#008000> 40~60</color> SP
+<color=#808080>แพนเค้กหน้าซาวครีม</color>
+ฟื้น HP<color=#008000> 325~405</color> และ SP<color=#008000> 40~60</color>
 
 ::Mushroom_Pancake //595
-<color=#808080>A pancake topped with mushrooms.</color>
-Recover<color=#008000> 325~405</color> HP and<color=#008000> 40~60</color> SP
+<color=#808080>แพนเค้กหน้าเห็ด</color>
+ฟื้น HP<color=#008000> 325~405</color> และ SP<color=#008000> 40~60</color>
 
 ::Fly_Wing //601
-<color=#808080>An enchanted fly's wing that instantly sends its user to a random spot when waved in the air.</color>
-Teleports you to a random map location
+<color=#808080>ปีกแมลงวันต้องมนตร์ โบกในอากาศแล้วส่งผู้ใช้ไปที่สุ่มทันที</color>
+วาร์ปไปแมพแบบสุ่ม
 
 ::Butterfly_Wing //602
-<color=#808080>An enchanted butterfly's wing that instantly sends its user to their Save Point when waved in the air.</color>
-Returns you to your save location
+<color=#808080>ปีกผีเสื้อต้องมนตร์ โบกในอากาศแล้วส่งผู้ใช้กลับจุดเซฟทันที</color>
+กลับไปยังจุดเซฟ
 
 ::Old_Blue_Box //603
-<color=#808080>An old blue box with unknown contents.</color>
-Contains a random item.
+<color=#808080>กล่องน้ำเงินเก่าที่ไม่รู้ว่าข้างในมีอะไร</color>
+เปิดแล้วได้ของสุ่ม 1 ชิ้น
 
 ::Dead_Branch //604
-<color=#808080>A twig which contains the mysterious power of eternity, capable of summoning a living creature.</color>
-Summons 1 random monster
+<color=#808080>กิ่งไม้ที่มีพลังนิรันดร์อันลึกลับ เรียกสิ่งมีชีวิตออกมาได้</color>
+เรียกมอนสุ่ม 1 ตัว
 
 ::Anodyne //605
-<color=#808080>A medicine made from ground mint that is used to ease pain and relax muscle tension.</color>
-Casts Endure Lv 1
+<color=#808080>ยาที่ทำจากมิ้นต์บด บรรเทาปวดและคลายกล้ามเนื้อ</color>
+ร่าย Endure Lv 1
 
 ::Aloevera //606
-<color=#808080>An herbal emollient made from aloe extract, despite its sour taste, it's addictive if regularly eaten.</color>
-Casts Provoke Lv 1 on yourself, reducing DEF by 10% and increasing ATK by 5% for 30s.
+<color=#808080>ยาบำรุงสมุนไพรจากสารสกัดว่านหางจระเข้ รสเปรี้ยวแต่กินบ่อยๆ แล้วติดใจ</color>
+ร่าย Provoke Lv 1 ใส่ตัวเอง DEF -10% ATK +5% นาน 30 วินาที
 
 ::Yggdrasil_Berry //607
-<color=#808080>A fruit from the Yggdrasil tree, its fantastic taste is full of life.</color>
-Recover 100% HP and SP
+<color=#808080>ผลไม้จากต้น Yggdrasil รสชาติวิเศษ เปี่ยมด้วยพลังชีวิต</color>
+ฟื้น HP และ SP 100%
 
 ::Yggdrasil_Seed //608
-<color=#808080>A seed from the Yggdrasil tree, it has a strange and energizing pungence.</color>
-Recover 50% HP and SP
+<color=#808080>เมล็ดจากต้น Yggdrasil กลิ่นฉุนแปลกๆ ที่ให้พลัง</color>
+ฟื้น HP และ SP 50%
 
 ::Amulet //609
-<color=#808080>A forbidden talisman that can reanimate the dead, resulting in a walking corpse or undead zombie.</color>
+<color=#808080>ยันต์ต้องห้ามที่ปลุกคนตายให้ลุกขึ้นเดินได้ กลายเป็นศพเดินได้หรือซอมบี้</color>
 
 ::Yggdrasil_Leaf //610
-<color=#808080>A leaf from the Yggdrasil tree, it can bring life to fallen characters.</color>
-[Properties]Casts: <color=#0000FF>Resurrection Lv 1</color>
-Cast Time: <color=#777777>6 Seconds</color>
-Channelled: <color=#777777>Being hit while casting will interrupt the skill, but not consume the item.</color>
+<color=#808080>ใบไม้จากต้น Yggdrasil ชุบชีวิตคนที่ล้มลงได้</color>
+[คุณสมบัติ]ร่าย: <color=#0000FF>Resurrection Lv 1</color>
+เวลาร่าย: <color=#777777>6 วินาที</color>
+ร่ายต่อเนื่อง: <color=#777777>ถ้าโดนตีระหว่างร่าย สกิลจะถูกขัด แต่ไม่เสียไอเทม</color>
 
 ::Magnifier //611
-<color=#808080>A magnifying glass used for scrutinizing objects. Rumor has it that adventurers once needed to use these to identify items.</color>
+<color=#808080>แว่นขยายไว้ส่องดูของ ร่ำลือกันว่าสมัยก่อนนักผจญภัยต้องใช้ตัวนี้ระบุชื่อของ</color>
 
 ::Mini_Furnace //612
-<color=#808080>A disposable, miniature blast furnace that can be easily carried and is consumed when forging metals.</color>
+<color=#808080>เตาหลอมจิ๋วแบบพกพา ใช้ครั้งเดียวหมดตอนหลอมโลหะ</color>
 
 ::Iron_Hammer //613
-<desc>A disposable steel hammer that is is used to forge <color=#000088>Lv 1 Weapons</color>.</desc>
+<desc>ค้อนเหล็กแบบใช้ครั้งเดียว ใช้ตี<color=#000088>อาวุธ Lv 1</color></desc>
 
 ::Golden_Hammer //614
-<desc>A disposable gold hammer that is is used to forge <color=#000088>Lv 2 Weapons</color>.</desc>
+<desc>ค้อนทองแบบใช้ครั้งเดียว ใช้ตี<color=#000088>อาวุธ Lv 2</color></desc>
 
 ::Oridecon_Hammer //615
-<desc>A disposable oridecon hammer that is used to forge <color=#000088>Lv 3 Weapons</color>.</desc>
+<desc>ค้อน Oridecon แบบใช้ครั้งเดียว ใช้ตี<color=#000088>อาวุธ Lv 3</color></desc>
 
 ::Old_Card_Album //616
-<color=#808080>An antique album which contains an unknown card.</color>
-Contains a random card.
+<color=#808080>อัลบั้มโบราณที่มีการ์ดที่ไม่รู้ว่าใบอะไรอยู่ข้างใน</color>
+เปิดแล้วได้การ์ดสุ่ม 1 ใบ
 
 ::Old_Purple_Box //617
-<color=#808080>An old purple box with unknown contents. More likely to contain equipment than an old blue box.</color>
-Contains a random item.
+<color=#808080>กล่องม่วงเก่าที่ไม่รู้ว่าข้างในมีอะไร มีโอกาสได้อุปกรณ์มากกว่ากล่องน้ำเงินเก่า</color>
+เปิดแล้วได้ของสุ่ม 1 ชิ้น
 
 ::Worn_Out_Scroll //618
-<color=#808080>A rolled up piece of parchment, now brittle with age, on which faded text can scarcely be read.</color>
+<color=#808080>แผ่นหนังม้วนที่เปราะเพราะเก่า ตัวอักษรจางจนแทบอ่านไม่ออก</color>
 
 ::Unripe_Apple //619
-<color=#808080>An apple that isn't ripe enough for humans to eat.</color>
+<color=#808080>แอปเปิลที่ยังไม่สุกพอให้คนกิน</color>
 
 ::Orange_Juice //620
-<color=#808080>A small bottle of orange juice.</color>
+<color=#808080>น้ำส้มขวดเล็ก</color>
 
 ::Bitter_Herb //621
-<color=#808080>An herb that is too bitter for the human palate.</color>
+<color=#808080>สมุนไพรที่ขมเกินกว่าลิ้นมนุษย์จะรับไหว</color>
 
 ::Rainbow_Carrot //622
-<color=#808080>A fragrant carrot colored with all the hues of the rainbow.</color>
+<color=#808080>แครอทหอมกรุ่นที่มีสีครบทุกสีของรุ้ง</color>
 
 ::Earthworm_the_Dude //623
-<color=#808080>A rather suave looking earthworm gifted with womanizing debonairness.</color>
+<color=#808080>ไส้เดือนหน้าตาเจ้าเสน่ห์ พรสวรรค์ด้านการจีบสาวเต็มเปี่ยม</color>
 
 ::Rotten_Fish //624
-<color=#808080>A rotting, dirty fish that attracts flies.</color>
+<color=#808080>ปลาเน่าสกปรกที่แมลงวันตอม</color>
 
 ::Rusty_Iron //625
-<color=#808080>A rusty piece of iron that would only interest scavengers and vermin.</color>
+<color=#808080>เศษเหล็กขึ้นสนิมที่มีแต่พวกเก็บของเก่ากับหนูเท่านั้นที่สนใจ</color>
 
 ::Monster_Juice //626
-<color=#808080>A fetid drink made of monster blood.</color>
+<color=#808080>เครื่องดื่มกลิ่นเหม็นที่ทำจากเลือดมอนสเตอร์</color>
 
 ::Sweet_Milk //627
-<color=#808080>A Sweet, luscious, full bodied milk.</color>
+<color=#808080>นมรสหวานเข้มข้น หอมมัน</color>
 
 ::Well-Dried_Bone //628
-<color=#808080>A tough, crunchy bone that has been dried in the sun.</color>
+<color=#808080>กระดูกเหนียวกรอบที่ตากแดดจนแห้ง</color>
 
 ::Singing_Flower //629
-<color=#808080>A flower that has been miraculously blessed with the gift of song.</color>
+<color=#808080>ดอกไม้ที่ได้รับพรอัศจรรย์ให้ขับขานบทเพลงได้</color>
 
 ::Dew_Laden_Moss //630
-<color=#808080>A dewy, green moss that grows in cool places.</color>
+<color=#808080>มอสเขียวชุ่มน้ำค้าง ขึ้นในที่เย็น</color>
 
 ::Deadly_Noxious_Herb //631
-<color=#808080>A poisonous plant that would harm most living creatures.</color>
+<color=#808080>พืชมีพิษที่เป็นอันตรายต่อสิ่งมีชีวิตแทบทุกชนิด</color>
 
 ::Fatty_Chubby_Earthworm //632
-<color=#808080>An earthworm that stopped caring about its figure years ago.</color>
+<color=#808080>ไส้เดือนที่เลิกแคร์หุ่นตัวเองมาหลายปีแล้ว</color>
 
 ::Sweet_Potato //633
-<color=#808080>A baked sweet potato with an appetizing scent.</color>
+<color=#808080>มันเทศอบ กลิ่นหอมชวนกิน</color>
 
 ::Tropical_Banana //634
-<color=#808080>A premium banana grown in the tropics.</color>
+<color=#808080>กล้วยเกรดพรีเมียมที่ปลูกในเขตร้อน</color>
 
 ::Orc_Trophy //635
-<color=#808080>A trophy awarded to the bravest of orcs.</color>
+<color=#808080>ถ้วยรางวัลสำหรับออร์คที่กล้าหาญที่สุด</color>
 
 ::No_Recipient //636
-<color=#808080>An old, heartfelt letter with an empty recipient field.</color>
+<color=#808080>จดหมายเก่าที่เขียนด้วยใจ แต่ช่องผู้รับว่างเปล่า</color>
 
 ::Old_Broom //637
-<color=#808080>An old broom that has been handed down through the generations.</color>
+<color=#808080>ไม้กวาดเก่าที่สืบทอดกันมาหลายชั่วอายุคน</color>
 
 ::Silver_Knife_of_Chastity //638
-<color=#808080>A silver knife that is a symbol of a virgin's chastity.</color>
+<color=#808080>มีดเงินที่เป็นสัญลักษณ์ของความบริสุทธิ์</color>
 
 ::Armlet_of_Obedience //639
-<color=#808080>A fancy, intricately decorated bracelet.</color>
+<color=#808080>กำไลหรู ตกแต่งอย่างประณีต</color>
 
 ::Shining_Stone //640
-<color=#808080>A stone that softly glimmers with faint light.</color>
+<color=#808080>หินที่เรืองแสงจางๆ นวลตา</color>
 
 ::Contract_in_Shadow //641
-<color=#808080>A contract drawn in darkness.</color>
+<color=#808080>สัญญาที่ร่างขึ้นในความมืด</color>
 
 ::Book_of_the_Devil //642
-<color=#808080>A forbidden book that details the secret for summoning high level demons.</color>
+<color=#808080>หนังสือต้องห้ามที่บอกวิธีเรียกปีศาจชั้นสูง</color>
 
 ::Pet_Incubator //643
-<color=#808080>A portable incubator that is used to hatch Cute Pet monster eggs.</color>
+<color=#808080>ตู้ฟักแบบพกพา ใช้ฟักไข่มอนสเตอร์ Cute Pet</color>
 
 ::Gift_Box //644
-<color=#808080>A box that contains a present.</color>
-Contains a random item.
+<color=#808080>กล่องที่ข้างในมีของขวัญ</color>
+เปิดแล้วได้ของสุ่ม 1 ชิ้น
 
 ::Concentration_Potion //645
-<color=#808080>A potent tonic that stimulates concentration.</color>
-Increases attack speed, reducing the delay between your attacks by 10% for 30 minutes.
+<color=#808080>ยาบำรุงฤทธิ์แรงที่กระตุ้นสมาธิ</color>
+เพิ่มความเร็วโจมตี ลดดีเลย์ระหว่างการโจมตี 10% นาน 30 นาที
 
 ::Awakening_Potion //656 - [Properties] block starts the property section early, allows weight to be appended without extra line spacing
-<color=#808080>A special tonic that combats drowsiness.</color>
-Increases attack speed, reducing the delay between your attacks by 15% for 30 minutes.
-[Properties]Useable by: <color=#777777>All jobs except acolyte</color>
-Required Level: <color=#777777>40</color>
+<color=#808080>ยาบำรุงสูตรพิเศษที่แก้ง่วง</color>
+เพิ่มความเร็วโจมตี ลดดีเลย์ระหว่างการโจมตี 15% นาน 30 นาที
+[คุณสมบัติ]ใช้ได้: <color=#777777>ทุกอาชีพ ยกเว้น Acolyte</color>
+เลเวลที่ต้องใช้: <color=#777777>40</color>
 
 ::Berserk_Potion //657 - [Properties] block starts the property section early, allows weight to be appended without extra line spacing
-<color=#808080>A powerful tonic that amplifies quickness.</color>
-Increases attack speed, reducing the delay between your attacks by 20% for 30 minutes.
-[Properties]Useable by: <color=#777777>Swordsman, Merchant, Mage</color>
-Required Level: <color=#777777>85</color>
+<color=#808080>ยาบำรุงฤทธิ์แรงที่เพิ่มความว่องไว</color>
+เพิ่มความเร็วโจมตี ลดดีเลย์ระหว่างการโจมตี 20% นาน 30 นาที
+[คุณสมบัติ]ใช้ได้: <color=#777777>Swordsman, Merchant, Mage</color>
+เลเวลที่ต้องใช้: <color=#777777>85</color>
 
 ::Union_of_Tribe //658
-<color=#808080>A symbol of solidarity that evokes feelings of nobility in those who see it.</color>
+<color=#808080>สัญลักษณ์แห่งความสามัคคีที่ทำให้ผู้พบเห็นรู้สึกสูงส่ง</color>
 
 ::Her_Heart //659
-<color=#808080>An old book enchanted by a girl whose name has been forgotten with time.</color>
+<color=#808080>หนังสือเก่าที่เด็กสาวคนหนึ่งร่ายเวทไว้ ชื่อของเธอเลือนหายไปตามกาลเวลา</color>
 
 ::Forbidden_Red_Candle //660
-<color=#808080>A candle with a mysterious purpose.</color>
+<color=#808080>เทียนที่ไม่รู้ว่าเอาไว้ทำอะไร</color>
 
 ::Soft_Apron //661
-<color=#808080>A soft apron that is double stitched for better quality.</color>
+<color=#808080>ผ้ากันเปื้อนเนื้อนุ่ม เย็บสองชั้นเพื่อคุณภาพที่ดีกว่า</color>
 
 ::Authoritative_Badge //662
-<color=#808080>A bronze badge given to government officials on business trips, allowing them to rent horses anywhere.</color>
-Increases movement speed by 25% for 3 minutes. Does not stack with Increase Agi.
+<color=#808080>เหรียญทองแดงสำหรับข้าราชการเดินทางราชการ เช่ามาได้ทุกที่</color>
+ความเร็วเดิน +25% นาน 3 นาที (ไม่ซ้อนกับ Increase AGI)
 
 ::Korean_Rice_Cake //663
-<color=#808080>A a popular food in traditional festivals.</color>
-Recover 10% HP
+<color=#808080>ของกินยอดฮิตในงานเทศกาลโบราณ</color>
+ฟื้น HP 10%
 
 ::Gift_Box_ //664
-<color=#808080>A box that contains a present.</color>
+<color=#808080>กล่องที่ข้างในมีของขวัญ</color>
 
 ::Gift_Box__ //665
-<color=#808080>A box that contains a present.</color>
+<color=#808080>กล่องที่ข้างในมีของขวัญ</color>
 
 ::Gift_Box___ //666
-<color=#808080>A box that contains a present.</color>
+<color=#808080>กล่องที่ข้างในมีของขวัญ</color>
 
 ::Gift_Box____ //667
-<color=#808080>A box that contains a present.</color>
+<color=#808080>กล่องที่ข้างในมีของขวัญ</color>
 
 ::Red_Envelope //668
-<color=#808080>A red envelope containing money given to children on New Year's Day.</color>
+<color=#808080>ซองแดงใส่เงินที่ให้เด็กๆ ในวันขึ้นปีใหม่</color>
 
 ::Poison_Bottle //678
-<color=#808080>A skeleton shaped bottle which contains deadly poison.</color>
+<color=#808080>ขวดรูปโครงกระดูกที่บรรจุยาพิษร้ายแรง</color>
 
 ::Pilule //679
-<color=#808080>An herbal medicine from an old eastern country that is rumored to cure every illness.</color>
+<color=#808080>ยาสมุนไพรจากดินแดนตะวันออกโบราณ ร่ำลือว่ารักษาได้ทุกโรค</color>
 
 ::Sweet_Memory_of_Marriage //681
-<color=#808080>A picture album of memories from a wedding ceremony.</color>
+<color=#808080>อัลบั้มรูปความทรงจำจากพิธีแต่งงาน</color>
 
 ::Quiver //12004
-<color=#808080>A quiver that contains 500 arrows.</color>
-[Properties]Arrow Attack: 25
-Arrow Property: <color=#0000FF>Neutral</color>
+<color=#808080>กระบอกลูกศร บรรจุลูกศร 500 ดอก</color>
+[คุณสมบัติ]พลังโจมตีลูกศร: 25
+ธาตุลูกศร: <color=#0000FF>ไร้ธาตุ</color>
 
 ::Iron_Arrow_Quiver //12005
-<color=#808080>A quiver that contains 500 iron arrows.</color>
-[Properties]Arrow Attack: 30
-Arrow Property: <color=#0000FF>Neutral</color>
+<color=#808080>กระบอกลูกศร บรรจุลูกศรเหล็ก 500 ดอก</color>
+[คุณสมบัติ]พลังโจมตีลูกศร: 30
+ธาตุลูกศร: <color=#0000FF>ไร้ธาตุ</color>
 
 ::Steel_Arrow_Quiver //12006
-<color=#808080>A quiver that contains 500 steel arrows.</color>
-[Properties]Arrow Attack: 40
-Arrow Property: <color=#0000FF>Neutral</color>
+<color=#808080>กระบอกลูกศร บรรจุลูกศรเหล็กกล้า 500 ดอก</color>
+[คุณสมบัติ]พลังโจมตีลูกศร: 40
+ธาตุลูกศร: <color=#0000FF>ไร้ธาตุ</color>
 
 ::Oridecon_Arrow_Quiver //12007
-<color=#808080>A quiver that contains 500 oridecon arrows.</color>
-[Properties]Arrow Attack: 50
-Arrow Property: <color=#0000FF>Neutral</color>
+<color=#808080>กระบอกลูกศร บรรจุลูกศร Oridecon 500 ดอก</color>
+[คุณสมบัติ]พลังโจมตีลูกศร: 50
+ธาตุลูกศร: <color=#0000FF>ไร้ธาตุ</color>
 
 ::Fire_Arrow_Quiver //12008
-<color=#808080>A quiver that contains 500 fire arrows.</color>
-[Properties]Arrow Attack: 30
-Arrow Property: <color=#0000FF>Fire</color>
+<color=#808080>กระบอกลูกศร บรรจุลูกศรเพลิง 500 ดอก</color>
+[คุณสมบัติ]พลังโจมตีลูกศร: 30
+ธาตุลูกศร: <color=#0000FF>ธาตุไฟ</color>
 
 ::Silver_Arrow_Quiver //12009
-<color=#808080>A quiver that contains 500 silver arrows.</color>
-[Properties]Arrow Attack: 30
-Arrow Property: <color=#0000FF>Holy</color>
+<color=#808080>กระบอกลูกศร บรรจุลูกศรเงิน 500 ดอก</color>
+[คุณสมบัติ]พลังโจมตีลูกศร: 30
+ธาตุลูกศร: <color=#0000FF>ธาตุศักดิ์สิทธิ์</color>
 
 ::Wind_Arrow_Quiver //12010
-<color=#808080>A quiver that contains 500 wind arrows.</color>
-[Properties]Arrow Attack: 30
-Arrow Property: <color=#0000FF>Wind</color>
+<color=#808080>กระบอกลูกศร บรรจุลูกศรธาตุลม 500 ดอก</color>
+[คุณสมบัติ]พลังโจมตีลูกศร: 30
+ธาตุลูกศร: <color=#0000FF>ธาตุลม</color>
 
 ::Stone_Arrow_Quiver //12011
-<color=#808080>A quiver that contains 500 stone arrows.</color>
-[Properties]Arrow Attack: 30
-Arrow Property: <color=#0000FF>Earth</color>
+<color=#808080>กระบอกลูกศร บรรจุลูกศรหิน 500 ดอก</color>
+[คุณสมบัติ]พลังโจมตีลูกศร: 30
+ธาตุลูกศร: <color=#0000FF>ธาตุดิน</color>
 
 ::Crystal_Arrow_Quiver //12012
-<color=#808080>A quiver that contains 500 crystal arrows.</color>
-[Properties]Arrow Attack: 30
-Arrow Property: <color=#0000FF>Water</color>
+<color=#808080>กระบอกลูกศร บรรจุลูกศรคริสตัล 500 ดอก</color>
+[คุณสมบัติ]พลังโจมตีลูกศร: 30
+ธาตุลูกศร: <color=#0000FF>ธาตุน้ำ</color>
 
 ::Shadow_Arrow_Quiver //12013
-<color=#808080>A quiver that contains 500 shadow arrows.</color>
-[Properties]Arrow Attack: 30
-Arrow Property: <color=#0000FF>Shadow</color>
+<color=#808080>กระบอกลูกศร บรรจุลูกศรธาตุมืด 500 ดอก</color>
+[คุณสมบัติ]พลังโจมตีลูกศร: 30
+ธาตุลูกศร: <color=#0000FF>ธาตุมืด</color>
 
 ::Immaterial_Arrow_Quiver //12014
-<color=#808080>A quiver that contains 500 immaterial arrows.</color>
-[Properties]Arrow Attack: 30
-Arrow Property: <color=#0000FF>Ghost</color>
+<color=#808080>กระบอกลูกศร บรรจุลูกศรไร้รูป 500 ดอก</color>
+[คุณสมบัติ]พลังโจมตีลูกศร: 30
+ธาตุลูกศร: <color=#0000FF>ธาตุผี</color>
 
 ::Rusty_Arrow_Quiver //12015
-<color=#808080>A quiver that contains 500 rusty arrows.</color>
-[Properties]Arrow Attack: 30
-Arrow Property: <color=#0000FF>Poison</color>
+<color=#808080>กระบอกลูกศร บรรจุลูกศรสนิม 500 ดอก</color>
+[คุณสมบัติ]พลังโจมตีลูกศร: 30
+ธาตุลูกศร: <color=#0000FF>ธาตุพิษ</color>
 
 ::Speed_Potion //12016
-Move Quickly for 5 seconds
+เดินเร็วขึ้น นาน 5 วินาที
 
 ::Slow_Potion //12017
-Move slowly for 5 seconds
+เดินช้าลง นาน 5 วินาที
 
 ::Firecracker //12018
-<color=#808080>An explosive which makes beatiful figures in the sky.</color>
+<color=#808080>ดอกไม้ไฟที่แต่งลวดลายงดงามบนท้องฟ้า</color>
 
 ::Cursed_Water //12020
-<color=#808080>A bottle of cursed water.</color>
-Enchant weapon with Dark for 3 minutes
+<color=#808080>ขวดน้ำต้องคำสาป</color>
+เปลี่ยนอาวุธเป็นธาตุมืด นาน 3 นาที
 
 ::Pork //12021
-<color=#808080>Savory pork that is very tempting.</color>
+<color=#808080>หมูรสกลมกล่อมที่น่ากินมาก</color>
 
 ::Galbi //12022
-<color=#808080>Delicious beef specially marinated in soy sauce.</color>
+<color=#808080>เนื้อแสนอร่อยที่หมักซีอิ๊วมาเป็นพิเศษ</color>
 
 ::Box_of_Laughter //12027
-Recover 9% HP
+ฟื้น HP 9%
 
 ::Box_of_Thunder //12028
-Movement Speed +100% for 20 seconds
+ความเร็วเดิน +100% นาน 20 วินาที
 
 ::Box_of_Gloom //12029
-Cast<color=#0000FF> Improve Concentration 1</color>
+ร่าย <color=#0000FF> Improve Concentration 1</color>
 
 ::Box_of_Resentment //12030
-ATK +20 for 60 seconds
+ATK +20 นาน 60 วินาที
 
 ::Box_of_Drowsiness //12031
-MATK +20 for 60 seconds
+MATK +20 นาน 60 วินาที
 
 ::Box_of_Storms //12032
-Enchant weapon with Water for 3 minutes
+เปลี่ยนอาวุธเป็นธาตุน้ำ นาน 3 นาที
 
 ::Box_of_Sunlight //12033
-See Hidden Targets for 30 seconds
+มองเห็นศัตรูที่ซ่อนตัว นาน 30 วินาที
 
 ::Box_of_Panting //12034
-Recover 9% SP
+ฟื้น SP 9%
 
 ::Stone_of_Sage //12040
-<color=#808080>An enchanted stone rumored to transmute matter into gold.</color>
+<color=#808080>หินต้องมนตร์ที่ร่ำลือกันว่าแปรสสารเป็นทองได้</color>
 
 ::Fried_Grasshopper_Legs //12041
-<color=#808080>A dish that is easy for beginner chefs; it has a fresh, grassy taste.</color>
+<color=#808080>เมนูง่ายๆ สำหรับมือใหม่หัดทำอาหาร รสชาติสดชื่นแบบผักหญ้า</color>
 
 ::Seasoned_Sticky_Webfoot //12042
-<color=#808080>A dish that looks unappetizing, but its taste and scent are quite pleasant.</color>
+<color=#808080>เมนูที่หน้าตาไม่ชวนกิน แต่รสและกลิ่นดีทีเดียว</color>
 
 ::Bomber_Steak //12043
-<color=#808080>A steak that looks ordinary, but it is explosively flavorful and juicy.</color>
+<color=#808080>สเต๊กที่หน้าตาธรรมดา แต่รสชาติระเบิดและฉ่ำมาก</color>
 
 ::Herb_Marinade_Beef //12044
-<color=#808080>A secret Payon recipe of marinated tender beef with herbs and sauces.</color>
+<color=#808080>สูตรลับของ Payon เนื้อนุ่มหมักสมุนไพรและซอส</color>
 
 ::Lutie_Lady's_Pancake //12045
-<color=#808080>A sweet pancake inspired by Thachentze, the kind Lutie chef.</color>
+<color=#808080>แพนเค้กหวานที่ได้แรงบันดาลใจจาก Thachentze เชฟใจดีแห่ง Lutie</color>
 
 ::Grape_Juice_Herbal_Tea //12046
-<color=#808080>A sweetly scented tea of mixed herbs and grape juice.</color>
+<color=#808080>ชากลิ่นหอมหวานผสมสมุนไพรและน้ำองุ่น</color>
 
 ::Autumn_Red_Tea //12047
-<color=#808080>A mixed tea made with a refreshingly strong scent that is somehow bland.</color>
+<color=#808080>ชาผสมกลิ่นแรงสดชื่น แต่รสจืดชืดยังไงไม่รู้</color>
 
 ::Honey_Herbal_Tea //12048
-<color=#808080>An invigorating herbal tea enhanced with the sweetness of honey.</color>
+<color=#808080>ชาสมุนไพรบำรุงกำลัง เพิ่มความหวานด้วยน้ำผึ้ง</color>
 
 ::Morroc_Fruit_Wine //12049
-<color=#808080>A sweet and sour fruit wine that was invented by a Morroc merchant.</color>
+<color=#808080>ไวน์ผลไม้รสหวานอมเปรี้ยว พ่อค้าจาก Morroc คิดค้นขึ้น</color>
 
 ::Mastela_Fruit_Wine //12050
-<color=#808080>Wine distilled from mastela fruit that inspires clarity.</color>
+<color=#808080>ไวน์ที่กลั่นจากผล Mastela ช่วยให้ความคิดแจ่มใส</color>
 
 ::Steamed_Crab_Nippers //12051
-<color=#808080>A simple dish made from steamed crab nippers and herbs.</color>
+<color=#808080>เมนูง่ายๆ ก้ามปูนึ่งกับสมุนไพร</color>
 
 ::Assorted_Seafood //12052
-<color=#808080>Assorted seafood that makes people that live near the sea feel homesick.</color>
+<color=#808080>อาหารทะเลรวมมิตรที่ทำให้คนอยู่ริมทะเลคิดถึงบ้าน</color>
 
 ::Clam_Soup //12053
-<color=#808080>A soup made with boiled clam meat.</color>
+<color=#808080>ซุปที่ต้มจากเนื้อหอย</color>
 
 ::Seasoned_Jellyfish //12054
-<color=#808080>Steamed tenacles flavored with herbs and squid ink dressing.</color>
+<color=#808080>หนวดปลาหมึกนึ่งปรุงรสสมุนไพรราดน้ำหมึก</color>
 
 ::Spicy_Fried_Bao //12055
-<color=#808080>A bao that is fried and then seasoned with a spicy sauce.</color>
+<color=#808080>ซาลาเปาทอด ราดซอสรสเผ็ด</color>
 
 ::Frog_Egg_Squid_Ink_Soup //12056
-<color=#808080>A soup made with squid ink broth and frog eggs.</color>
+<color=#808080>ซุปน้ำหมึกปลาหมึกใส่ไข่กบ</color>
 
 ::Smooth_Noodle //12057
-<color=#808080>Incredibly smooth, slick, and slippery noodles that are difficult to eat.</color>
+<color=#808080>เส้นก๋วยเตี๋ยวที่ลื่นมากจนกินยาก</color>
 
 ::Tentacle_Cheese_Gratin //12058
-<color=#808080>Cheese gratin with mixed steamed tentacles.</color>
+<color=#808080>หนวดปลาหมึกนึ่งรวมมิตรอบชีส</color>
 
 ::Lutie_Cold_Noodle //12059
-<color=#808080>Spicy, cold noodles garnished with sliced pumpkin.</color>
+<color=#808080>ก๋วยเตี๋ยวเย็นรสเผ็ด โรยหน้าด้วยฟักทองหั่นแว่น</color>
 
 ::Steamed_Bat_Wing_in_Pumpkin //12060
-<color=#808080>Steamed pumpkin and bat wings wrapped in a leaflet.</color>
+<color=#808080>ฟักทองกับปีกค้างคาวนึ่งห่อใบไม้</color>
 
 ::Honey_Grape_Juice //12061
-<color=#808080>An irresistable mixed drink of grape juice and honey.</color>
+<color=#808080>เครื่องดื่มผสมน้ำองุ่นกับน้ำผึ้งที่อดใจไม่ไหว</color>
 
 ::Chocolate_Mousse_Cake //12062
-<color=#808080>A chocolate mousse cake with a luxurious flavor that Charles Orleans would be proud of.</color>
+<color=#808080>เค้กมูสช็อกโกแลตรสหรู ขนาด Charles Orleans ยังต้องภูมิใจ</color>
 
 ::Fruit_Mix //12063
-<color=#808080>A mix of various, crisp fruit flavored with light, sweet syrup.</color>
+<color=#808080>ผลไม้กรอบหลายชนิดคลุกน้ำเชื่อมหวานอ่อนๆ</color>
 
 ::Cream_Sandwich //12064
-<color=#808080>A sandwich made with slices of freshly baked bread, ground meat and cream cheese.</color>
+<color=#808080>แซนด์วิชขนมปังอบใหม่ สอดไส้เนื้อบดและครีมชีส</color>
 
 ::Green_Salad //12065
-<color=#808080>A trendy green salad topped with sweet Umbala dressing.</color>
+<color=#808080>สลัดผักสดสไตล์ทันสมัย ราดน้ำสลัดหวานแบบ Umbala</color>
 
 ::Fried_Monkey_Tails //12066
-<color=#808080>Lightly spiced monkey tails deep fried in oil.</color>
+<color=#808080>หางลิงทอดน้ำมันปรุงรสอ่อนๆ</color>
 
 ::Mixed_Juice //12067
-<color=#808080>A fruit juice cocktail perfectly chilled.</color>
+<color=#808080>ค็อกเทลน้ำผลไม้ แช่เย็นกำลังดี</color>
 
 ::Fried_Sweet_Potato //12068
-<color=#808080>Crunchy, fried sweet potatoes topped with a light syrup.</color>
+<color=#808080>มันเทศทอดกรอบราดน้ำเชื่อมบางๆ</color>
 
 ::Steamed_Ancient_Lips //12069
-<color=#808080>Steamed fish with ancient lips wrapped in a fresh leaf.</color>
+<color=#808080>ปลานึ่งริมฝีปากโบราณห่อใบไม้สด</color>
 
 ::Fried_Scorpion_Tails //12070
-<color=#808080>A fried scorpion tail, that is as nutritious as it is tasty.</color>
+<color=#808080>หางแมงป่องทอด อร่อยและมีประโยชน์พอๆ กัน</color>
 
 ::Shiny_Marinade_Beef //12071
-<color=#808080>A marinated beef dish that can only be described as shiny.</color>
+<color=#808080>เนื้อหมักที่บรรยายได้คำเดียวว่า เงาวับ</color>
 
 ::Whole_Roast //12072
-<color=#808080>A meal for meat lovers, this roast is spiced with a special sauce.</color>
+<color=#808080>มื้อสำหรับคนรักเนื้อ อบมาพร้อมซอสสูตรพิเศษ</color>
 
 ::Bearfoot_Special //12073
-<color=#808080>A Luoyang speciality, grilled bear foot.</color>
+<color=#808080>ของขึ้นชื่อเมือง Luoyang ตีนหมีย่าง</color>
 
 ::Tendon_Satay //12074
-<color=#808080>A fresh and juicy satay made from thick tendons.</color>
+<color=#808080>สะเต๊ะสดฉ่ำ ทำจากเอ็นเนื้อหนา</color>
 
 ::Steamed_Tongue //12075
-<color=#808080>An expensive Luoyang dish that tastes absolutely superb.</color>
+<color=#808080>เมนูราคาแพงของ Luoyang รสชาติเลิศรสสุดๆ</color>
 
 ::Red_Mushroom_Wine //12076
-<color=#808080>A fragrant grape and red mushroom wine.</color>
+<color=#808080>ไวน์องุ่นผสมเห็ดแดง กลิ่นหอม</color>
 
 ::Special_Royal_Jelly_Herbal_Tea //12077
-<color=#808080>An herbal tea with royal jelly that has a pungent scent but a refreshing flavor.</color>
+<color=#808080>ชาสมุนไพรผสมนมผึ้ง กลิ่นฉุนแต่รสสดชื่น</color>
 
 ::Royal_Family_Tea //12078
-<color=#808080>A sweetly scented tea that is one of Charles Orleans's specialties.</color>
+<color=#808080>ชากลิ่นหอมหวาน หนึ่งในเมนูเด็ดของ Charles Orleans</color>
 
 ::Tristan_III //12079
-<color=#808080>An exquisite drink that was presented at the coronation of King Tristan III.</color>
+<color=#808080>เครื่องดื่มชั้นเลิศที่เสิร์ฟในพิธีราชาภิเษกของ King Tristan III</color>
 
 ::Dragon_Breath_Cocktail //12080
-<color=#808080>A cocktail whose unforgettable flavor is as potent as a dragon's breath.</color>
+<color=#808080>ค็อกเทลรสชาติไม่รู้ลืม แรงพอๆ กับลมหายใจมังกร</color>
 
 ::Awfully_Bitter_Bracer //12081
-<color=#808080>A medicine said to have as much healing power as bitterness.</color>
+<color=#808080>ยาที่ว่ากันว่ายิ่งขมยิ่งรักษาได้ดี</color>
 
 ::Sumptuous_Feast //12082
-<color=#808080>A magnificent feast fit for the gods.</color>
+<color=#808080>งานเลี้ยงใหญ่โต สมเป็นอาหารของทวยเทพ</color>
 
 ::Giant_Burito //12083
-<color=#808080>A jumbo sized burrito for jumbo sized appetites.</color>
+<color=#808080>เบอร์ริโตไซส์ยักษ์ สำหรับคนหิวไซส์ยักษ์</color>
 
 ::Ascending_Dragon_Soup //12084
-<color=#808080>A spicy soup with dragon meat which gives one the sensation of vitality.</color>
+<color=#808080>ซุปรสเผ็ดใส่เนื้อมังกร กินแล้วรู้สึกเปี่ยมพลัง</color>
 
 ::Immortal_Stew //12085
-<color=#808080>A funky smelling, and suspicious looking, stew that makes you feel immortal.</color>
+<color=#808080>สตูว์กลิ่นแปลกๆ หน้าตาน่าสงสัย แต่กินแล้วรู้สึกเป็นอมตะ</color>
 
 ::Chile_Shrimp_Gratin //12086
-<color=#808080>Shrimp and chile gratin that is so spicy, it burns.</color>
+<color=#808080>กุ้งกับพริกอบชีส เผ็ดจนแสบ</color>
 
 ::Steamed_Alligator_with_Vegetable //12087
-<color=#808080>A special Umbala dish made with steamed alligator meat wrapped in vegetables.</color>
+<color=#808080>เมนูพิเศษของ Umbala เนื้อจระเข้นึ่งห่อผัก</color>
 
 ::Incredibly_Spicy_Curry //12088
-<color=#808080>A spicy curry, balanced with pumpkin, known to have the flavor of patience.</color>
+<color=#808080>แกงกะหรี่รสเผ็ด ตัดรสด้วยฟักทอง ขึ้นชื่อว่ามีรสของความอดทน</color>
 
 ::Special_Meat_Stew //12089
-<color=#808080>Luoyang's specialty stew laced with meat that has a tempting scent.</color>
+<color=#808080>สตูว์สูตรเด็ดของ Luoyang ใส่เนื้อ กลิ่นหอมชวนกิน</color>
 
 ::Steamed_Desert_Scorpions //12090
-<color=#808080>This dish is cooked with the heat of the desert sand and is the best dish in Sograt Desert cuisine.</color>
+<color=#808080>อาหารจานนี้ปรุงด้วยความร้อนของทรายทะเลทราย เป็นเมนูที่ดีที่สุดของ Sograt Desert</color>
 
 ::Peach_Cake //12091
-<color=#808080>A sweet and light scrumptious cake made with peaches grown in Kunlun.</color>
+<color=#808080>เค้กหวานเบาแสนอร่อย ทำจากลูกพีชที่ปลูกใน Kunlun</color>
 
 ::Soul_Haunted_Bread //12092
-<color=#808080>A deliciously sweet bread, haunted by flavor.</color>
+<color=#808080>ขนมปังหวานอร่อย รสชาติหลอนติดลิ้น</color>
 
 ::Special_Toast //12093
-<color=#808080>Large toasted bread garnished with huge amounts of meat, cheese, and vegetables.</color>
+<color=#808080>ขนมปังปิ้งแผ่นใหญ่ อัดแน่นด้วยเนื้อ ชีส และผัก</color>
 
 ::Heavenly_Fruit_Juice //12094
-<color=#808080>Heavenly tasting juice that makes you feel refreshed and relaxed.</color>
+<color=#808080>น้ำผลไม้รสสวรรค์ที่ทำให้รู้สึกสดชื่นผ่อนคลาย</color>
 
 ::Hwergelmir's_Tonic //12095
-<color=#808080>This beverage is famous for its pure, amazing taste.</color>
+<color=#808080>เครื่องดื่มที่ขึ้นชื่อเรื่องรสชาติบริสุทธิ์อันน่าทึ่ง</color>
 
 ::Lucky_Soup //12096
-<color=#808080>A soup that brings good luck when eaten hot.</color>
+<color=#808080>ซุปที่กินร้อนๆ แล้วนำโชค</color>
 
 ::Assorted_Shish_Kebob //12097
-<color=#808080>Marinated meat and vegetables roasted on a skewer.</color>
+<color=#808080>เนื้อและผักหมักเสียบไม้ย่าง</color>
 
 ::Strawberry_Flavored_Rice_Ball //12098
-<color=#808080>A riceball garnished with strawberries for a delicious taste.</color>
+<color=#808080>ข้าวปั้นแต่งหน้าสตรอว์เบอร์รี รสชาติอร่อย</color>
 
 ::Blood_Flavored_Soda //12099
-<color=#808080>A sweet drink that children seem to like with a gross aftertaste.</color>
+<color=#808080>เครื่องดื่มหวานที่เด็กๆ ชอบ แต่รสติดปลายลิ้นแย่มาก</color>
 
 ::Cooked_Nine_Tail's_Tails //12100
-<color=#808080>A rare, Payon dish that bestows luck to those fortunate enough to eat it.</color>
+<color=#808080>อาหารหายากของ Payon ใครได้กินก็โชคดี</color>
 
 ::Bloody_Branch //12103
-<color=#808080>An ancient, gnarled branch that summons stronger creatures than regular Dead Branches.</color>
+<color=#808080>กิ่งไม้โบราณบิดเบี้ยว เรียกสัตว์ที่แข็งแกร่งกว่า Dead Branch ธรรมดา</color>
 
 ::Random_Quiver //12104
-<color=#808080>An unlabeled arrow quiver.</color>
+<color=#808080>กระบอกลูกศรที่ไม่มีป้ายบอก</color>
 
 ::Taming_Gift_Set //12105
-<color=#808080>A beautifully decorated gift set that contains a taming item and Pet Armor.</color>
+<color=#808080>ชุดของขวัญตกแต่งสวยงาม ข้างในมีของล่อสัตว์เลี้ยงและ Pet Armor</color>
 
 ::Jewelry_Box //12106
-<color=#808080>A beautiful box that contains an unknown accessory.</color>
+<color=#808080>กล่องสวยงาม ข้างในมีเครื่องประดับที่ไม่รู้ว่าคืออะไร</color>
 
 ::Wrapped_Mask //12107
-<color=#808080>A mask that has been carefully wrapped.</color>
+<color=#808080>หน้ากากที่ห่อไว้อย่างดี</color>
 
 ::Elemental_Converter_Fire //12114
-Enchant weapon with Fire for 10 minutes
+เปลี่ยนอาวุธเป็นธาตุไฟ นาน 10 นาที
 
 ::Elemental_Converter_Water //12115
-Enchant weapon with Water for 10 minutes
+เปลี่ยนอาวุธเป็นธาตุน้ำ นาน 10 นาที
 
 ::Elemental_Converter_Earth //12116
-Enchant weapon with Earth for 10 minutes
+เปลี่ยนอาวุธเป็นธาตุดิน นาน 10 นาที
 
 ::Elemental_Converter_Wind //12117
-Enchant weapon with Wind for 10 minutes
+เปลี่ยนอาวุธเป็นธาตุลม นาน 10 นาที
 
 ::Santa's_Bag //12132
-<color=#808080>A small, red bag that magically changes your clothes.</color>
+<color=#808080>ถุงแดงใบเล็กที่เปลี่ยนเสื้อผ้าให้ได้อย่างมหัศจรรย์</color>
 
 ::Red_Envelope_ //12134
-<color=#808080>A red envelope filled given by married couples to friends and family to celebrate.</color>
+<color=#808080>ซองแดงที่คู่แต่งงานให้เพื่อนและญาติเพื่อร่วมฉลอง</color>
 
 ::Lightning_Grenade_Pack //12144
-<color=#808080>A grenade pack that contains 500 Lightning Grenades.</color>
+<color=#808080>ห่อลูกระเบิด บรรจุ Lightning Grenade 500 ลูก</color>
 
 ::Blind_Grenade_Pack //12145
-<color=#808080>A grenade pack that contains 500 Blind Grenades.</color>
+<color=#808080>ห่อลูกระเบิด บรรจุ Blind Grenade 500 ลูก</color>
 
 ::Poison_Grenade_Pack //12146
-<color=#808080>A grenade pack that contains 500 Poison Grenades.</color>
+<color=#808080>ห่อลูกระเบิด บรรจุ Poison Grenade 500 ลูก</color>
 
 ::Freezing_Grenade_Pack //12147
-<color=#808080>A grenade pack that contains 500 Freezing Grenades.</color>
+<color=#808080>ห่อลูกระเบิด บรรจุ Freezing Grenade 500 ลูก</color>
 
 ::Flare_Grenadee_Pack //12148
-<color=#808080>A grenade pack that contains 500 Flare Grenades.</color>
+<color=#808080>ห่อลูกระเบิด บรรจุ Flare Grenade 500 ลูก</color>
 
 ::Cartridge //12149
-<color=#808080>A bullet cartridge that contains 500 regular Bullets.</color>
+<color=#808080>กล่องกระสุน บรรจุ Bullet ธรรมดา 500 นัด</color>
 
 ::Blood_Cartridge //12150
-<color=#808080>A bullet cartridge that contains 500 Bloody Bullets.</color>
+<color=#808080>กล่องกระสุน บรรจุ Bloody Bullet 500 นัด</color>
 
 ::Silver_Cartridge //12151
-<color=#808080>A bullet cartridge that contains 500 Silver Bullets.</color>
+<color=#808080>กล่องกระสุน บรรจุ Silver Bullet 500 นัด</color>
 
 ::Battle_Manual //12208
-<color=#808080>A well written, detailed battle manual.</color>
+<color=#808080>คู่มือการรบที่เขียนมาอย่างดีและละเอียด</color>
 
 ::Life_Insurance //12209
-<color=#808080>A life insurance certificate issued by Kafra Headquarters.</color>
+<color=#808080>กรมธรรม์ประกันชีวิตที่ออกโดยสำนักงานใหญ่ Kafra</color>
 
 ::Bubble_Gum //12210
-<color=#808080>Sweet, tasty, and lucky bubble gum.</color>
+<color=#808080>หมากฝรั่งหวานอร่อยและนำโชค</color>
 
 ::Kafra_Card //12211
-<color=#808080>A Kafra card issued by Kafra HQ.</color>
+<color=#808080>บัตร Kafra ที่ออกโดยสำนักงานใหญ่ Kafra</color>
 
 ::Giant_Fly_Wing //12212
-<color=#808080>An enchanted, giant wing from an ancient creature.</color>
+<color=#808080>ปีกยักษ์ต้องมนตร์จากสัตว์โบราณ</color>
 
 ::Neuralizer //12213
-<color=#808080>Pressing the button on this stick will flash blinding light that seems to cause memory loss.</color>
+<color=#808080>กดปุ่มบนแท่งนี้แล้วจะมีแสงวาบจ้าจนตาพร่า ดูเหมือนจะทำให้ความจำเสื่อมด้วย</color>
 
 ::Convex_Mirror //12214
-<color=#808080>A clean convex mirror that can be used to detect the presence of MVP monsters.</color>
+<color=#808080>กระจกนูนใสสะอาด ใช้ตรวจจับว่ามี MVP อยู่แถวนี้ไหม</color>
 
 ::Blessing_Scroll //12215
-<color=#808080>A scroll in which a single use of Blessing has been recorded.</color>
-Casts Blessing Lv 10 on yourself when used.
+<color=#808080>ม้วนคาถาที่บันทึก Blessing ไว้ใช้ได้ครั้งเดียว</color>
+ใช้แล้วร่าย Blessing Lv 10 ใส่ตัวเอง
 
 ::Increase_Agi_Scroll //12216
-<color=#808080>A scroll in which a single use of Increase AGI has been recorded.</color>
-Casts Increase AGI Lv 10 on yourself when used.
+<color=#808080>ม้วนคาถาที่บันทึก Increase AGI ไว้ใช้ได้ครั้งเดียว</color>
+ใช้แล้วร่าย Increase AGI Lv 10 ใส่ตัวเอง
 
 ::Aspersio_Scroll //12217
-<color=#808080>A scroll in which a single use of Lv 5 Aspersio has been recorded.</color>
+<color=#808080>ม้วนคาถาที่บันทึก Aspersio Lv 5 ไว้ใช้ได้ครั้งเดียว</color>
 
 ::Assumptio_Scroll //12218
-<color=#808080>A scroll in which a single use of Lv 5 Assumptio has been recorded.</color>
+<color=#808080>ม้วนคาถาที่บันทึก Assumptio Lv 5 ไว้ใช้ได้ครั้งเดียว</color>
 
 ::Megaphone //12221
-<color=#808080>A really, really, big microphone.</color>
+<color=#808080>ไมโครโฟนที่ใหญ่มากๆๆ</color>
 
 ::Sweet_Candy_Cane //12225
-<color=#808080>A candy cane that is so sweet, it can melt the human tongue.</color>
+<color=#808080>ลูกกวาดไม้เท้าที่หวานจนลิ้นแทบละลาย</color>
 
 ::New_Year_Rice_Cake //12238
-<color=#808080>This dish has been left out for so long that you are guranteed to get an upset stomach if you eat it.</color>
+<color=#808080>อาหารจานนี้ตั้งทิ้งไว้นานจนรับรองว่ากินแล้วท้องเสียแน่</color>
 
 ::New_Year_Rice_Cake_ //12239
-<color=#808080>This dish has been left out for so long that you are guranteed to get an upset stomach if you eat it.</color>
+<color=#808080>อาหารจานนี้ตั้งทิ้งไว้นานจนรับรองว่ากินแล้วท้องเสียแน่</color>
 
 ::Mercenary_Concentration_Potion //12241
-<color=#808080>A potion for mercenaries that slightly increases attack speed.</color>
+<color=#808080>ยาสำหรับทหารรับจ้าง เพิ่มความเร็วโจมตีเล็กน้อย</color>
 
 ::Mercenary_Awakening_Potion //12242
-<color=#808080>A potion for mercenaries that moderately increases attack speed.</color>
+<color=#808080>ยาสำหรับทหารรับจ้าง เพิ่มความเร็วโจมตีปานกลาง</color>
 
 ::Mercenary_Berserk_Potion //12243
-<color=#808080>A potion for mercenaries that greatly increases attack speed.</color>
+<color=#808080>ยาสำหรับทหารรับจ้าง เพิ่มความเร็วโจมตีอย่างมาก</color>
 
 ::Cool_Summer_Outfit //12260
-<color=#808080>A set of summer clothes that are absolutely perfect for the beach!</color>
+<color=#808080>ชุดหน้าร้อนที่เหมาะกับชายหาดที่สุด!</color>
 
 ::Tasty_Pink_Ration //12269
-<color=#808080>Foodstuffs for urgent situations, don't eat it too quickly!</color>
+<color=#808080>เสบียงสำหรับยามฉุกเฉิน อย่ากินเร็วเกินไปล่ะ!</color>
 
 ::Tasty_White_Ration //12270
-<color=#808080>Foodstuffs for urgent situations, don't eat it too quickly!</color>
+<color=#808080>เสบียงสำหรับยามฉุกเฉิน อย่ากินเร็วเกินไปล่ะ!</color>
 
 ::Military_Ration_A //12271
-<color=#808080>Improved ration A, a meal ready to eat.</color>
-Recover 5% HP
+<color=#808080>เสบียงสูตรปรับปรุง A พร้อมกินทันที</color>
+ฟื้น HP 5%
 
 ::Military_Ration_B //12272
-<color=#808080>Improved ration B, a meal ready to eat.</color>
+<color=#808080>เสบียงสูตรปรับปรุง B พร้อมกินทันที</color>
 
 ::Military_Ration_C //12273
-<color=#808080>Improved ration C, a meal ready to eat.</color>
+<color=#808080>เสบียงสูตรปรับปรุง C พร้อมกินทันที</color>
 
 ::Rune_Strawberry_Cake //12319
-<color=#808080>A snack sent from Rune Midgard, its flavored with strawberries.</color>
+<color=#808080>ขนมที่ส่งมาจาก Rune Midgard รสสตรอว์เบอร์รี</color>
 
 ::Schwartzwald_Pine_Jubilee //12320
-<color=#808080>A snack sent from Schwartzwald, its fruit juice cools your whole body.</color>
+<color=#808080>ขนมที่ส่งมาจาก Schwartzwald น้ำผลไม้ในนั้นทำให้ทั้งตัวเย็นสบาย</color>
 
 ::Arunafeltz_Desert_Sandwich //12321
-<color=#808080>A snack sent from Arunafeltz, it has a spicy taste.</color>
+<color=#808080>ขนมที่ส่งมาจาก Arunafeltz รสเผ็ด</color>
 
 ::Chocolate_Pie //12322
-<color=#808080>A pie covered with sweet chocolate, it isn't pretty but the taste is excellent.</color>
-Recover 5% HP
+<color=#808080>พายราดช็อกโกแลตหวาน หน้าตาไม่สวยแต่รสเลิศ</color>
+ฟื้น HP 5%
 
 ::Novice_Fly_Wing //12323
-<color=#808080>A fly wing from the Novice Training Grounds.</color>
+<color=#808080>ปีกแมลงวันจากลานฝึก Novice</color>
 
 ::Novice_Butterfly_Wing //12324
-<color=#808080>A butterfly wing from the Novice Training Grounds.</color>
+<color=#808080>ปีกผีเสื้อจากลานฝึก Novice</color>
 
 ::Novice_Magnifier //12325
-<color=#808080>A magnifying glass from the Novice Training Grounds.</color>
+<color=#808080>แว่นขยายจากลานฝึก Novice</color>
 
 ::Old_Navy_Box //12702
-<color=#808080>A mysterious blue box whose appearance resembles Old Blue Box.</color>
+<color=#808080>กล่องน้ำเงินลึกลับ หน้าตาเหมือน Old Blue Box</color>
 
 ::I_Love_You_Firecracker //14546
-<color=#808080>A firecracker that reads 'I love you'.</color>
+<color=#808080>ประทัดที่เขียนว่า 'I love you'</color>
 
 ::Whiteday_Firecracker //14547
-<color=#808080>A firecracker that reads 'Happy Whiteday'.</color>
+<color=#808080>ประทัดที่เขียนว่า 'Happy Whiteday'</color>
 
 ::Valentine's_Day_Firecracker //14548
-<color=#808080>A firecracker that reads 'Happy Valentine's Day'.</color>
+<color=#808080>ประทัดที่เขียนว่า 'Happy Valentine's Day'</color>
 
 ::Birthday_Firecracker //14549
-<color=#808080>A firecracker that reads 'Happy Birthday'.</color>
+<color=#808080>ประทัดที่เขียนว่า 'Happy Birthday'</color>
 
 ::Xmas_Firecracker //14550
-<color=#808080>A firecracker that reads 'Merry Christmas'.</color>
+<color=#808080>ประทัดที่เขียนว่า 'Merry Christmas'</color>
 
 ::Party_Blessing_Scroll //14588
-<color=#808080>A scroll, exclusive to High Priests, casts Lv 10 Party Blessing.</color>
+<color=#808080>ม้วนคาถาเฉพาะ High Priest ร่าย Party Blessing Lv 10</color>
 
 ::Party_Increase_Agi_Scroll //14589
-<color=#808080>A scroll, exclusive to High Priest, casts Lv 10 Party Increase AGI.</color>
+<color=#808080>ม้วนคาถาเฉพาะ High Priest ร่าย Party Increase AGI Lv 10</color>
 
 ::Party_Assumptio_Scroll //14590
-<color=#808080>A scroll, exclusive to High Priests, casts Lv 5 Party Assumptio.</color>
+<color=#808080>ม้วนคาถาเฉพาะ High Priest ร่าย Party Assumptio Lv 5</color>
 
 ::Unsealed_Magic_Spell //14595
-<color=#808080>A spell scroll, that when unraveled, will teleport the reader to Schwaltzwald Guard Camp.</color>
+<color=#808080>ม้วนคาถาที่พอคลี่ออกจะวาร์ปผู้อ่านไปยังค่ายทหาร Schwaltzwald</color>
 
 ::Pierre's_Treasurebox //14596
-<color=#808080>A box full of something heavy.</color>
+<color=#808080>กล่องที่ข้างในมีอะไรหนักๆ อยู่</color>
 
 ::Glittering_Orb //16000
-<color=#777777>A glittering orb that can light the suroundings with fanciful lights for 30 seconds.
-Cannot be used near an existing glittering orb.</color>
+<color=#777777>ลูกแก้วเปล่งประกายที่ส่องสว่างรอบตัวด้วยแสงวิบวับ นาน 30 วินาที
+ใช้ไม่ได้ถ้ามีลูกแก้วเปล่งประกายอยู่ใกล้ๆ อยู่แล้ว</color>

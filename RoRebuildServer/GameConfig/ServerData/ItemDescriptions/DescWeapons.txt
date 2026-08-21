@@ -1,1169 +1,1169 @@
 //Weapons
 
 ::Sword //id 1101 - Sword
-<desc>A basic sword.</desc>
+<desc>ดาบพื้นฐาน</desc>
 
 ::Sword_ //id 1102 - Sword
-<desc>A basic sword.</desc>
+<desc>ดาบพื้นฐาน</desc>
 
 ::Falchion //id 1104 - Sword
-<desc>A sword with a rounded blade.</desc>
+<desc>ดาบใบมีดโค้งมน</desc>
 
 ::Falchion_ //id 1105 - Sword
-<desc>A sword with a rounded blade.</desc>
+<desc>ดาบใบมีดโค้งมน</desc>
 
 ::Blade //id 1107 - Sword
-<desc>A sword with a thick, flat blade.</desc>
+<desc>ดาบใบมีดหนาและแบน</desc>
 
 ::Blade_ //id 1108 - Sword
-<desc>A sword with a thick, flat blade.</desc>
+<desc>ดาบใบมีดหนาและแบน</desc>
 
 ::Rapier //id 1110 - Sword
-<desc>A sword with an elegant blade and cross guard.</desc>
+<desc>ดาบใบมีดสง่างามพร้อมกั้นมือรูปกางเขน</desc>
 
 ::Rapier_ //id 1111 - Sword
-<desc>A sword with an elegant blade and cross guard.</desc>
+<desc>ดาบใบมีดสง่างามพร้อมกั้นมือรูปกางเขน</desc>
 
 ::Scimiter //id 1113 - Sword
-<desc>A strong, swift sword with a curved blade.</desc>
+<desc>ดาบที่แข็งแกร่งและว่องไว ใบมีดโค้ง</desc>
 
 ::Scimiter_ //id 1114 - Sword
-<desc>A strong, swift sword with a curved blade.</desc>
+<desc>ดาบที่แข็งแกร่งและว่องไว ใบมีดโค้ง</desc>
 
 ::Katana //id 1116 - 2HSword
-<desc>A straight bladed sword inspired by eastern warriors.</desc>
+<desc>ดาบใบตรงที่ได้แรงบันดาลใจจากนักรบตะวันออก</desc>
 
 ::Katana_ //id 1117 - 2HSword
-<desc>A straight bladed sword inspired by eastern warriors.</desc>
+<desc>ดาบใบตรงที่ได้แรงบันดาลใจจากนักรบตะวันออก</desc>
 
 ::Tsurugi //id 1119 - Sword
-<desc>One of the most powerful common one-handed swords.</desc>
+<desc>หนึ่งในดาบมือเดียวทั่วไปที่ทรงพลังที่สุด</desc>
 
 ::Tsurugi_ //id 1120 - Sword
-<desc>One of the most powerful common one-handed swords.</desc>
+<desc>หนึ่งในดาบมือเดียวทั่วไปที่ทรงพลังที่สุด</desc>
 
 ::Ring_Pommel_Saber //id 1122 - Sword
-<desc>A sword with an elaborately designed hilt.</desc>
+<desc>ดาบที่ด้ามออกแบบมาอย่างวิจิตร</desc>
 
 ::Haedonggum //id 1123 - Sword
-<desc>A ancient sword said to have the mysterious power to control minds.</desc>
+<desc>ดาบโบราณ ว่ากันว่ามีพลังลึกลับที่ควบคุมจิตใจคนได้</desc>
 INT +3
 
 ::Orcish_Sword //id 1124 - Sword
-<color=#808080>A sword crafted by orcish smiths that is symbolic to orc tribes.</color>
+<color=#808080>ดาบที่ช่างตีเหล็กออร์คทำขึ้น เป็นสัญลักษณ์ของเผ่าออร์ค</color>
 
 ::Ring_Pommel_Saber_ //id 1125 - Sword
-<desc>A sword with an elaborately designed hilt.</desc>
+<desc>ดาบที่ด้ามออกแบบมาอย่างวิจิตร</desc>
 
 ::Saber //id 1126 - Sword
-<desc>A heavy cavalry sword with a slightly curved blade.</desc>
+<desc>ดาบทหารม้าหนักๆ ใบมีดโค้งเล็กน้อย</desc>
 
 ::Saber_ //id 1127 - Sword
-<desc>A heavy cavalry sword with a slightly curved blade.</desc>
+<desc>ดาบทหารม้าหนักๆ ใบมีดโค้งเล็กน้อย</desc>
 
 ::Haedonggum_ //id 1128 - Sword
-<desc>A ancient sword said to have the mysterious power to control minds.</desc>
+<desc>ดาบโบราณ ว่ากันว่ามีพลังลึกลับที่ควบคุมจิตใจคนได้</desc>
 INT +3
 
 ::Flamberge //id 1129 - Sword
-<desc>A powerful sword with a decoratively wavy, flame-like blade.</desc>
+<desc>ดาบทรงพลัง ใบมีดหยักเป็นคลื่นเหมือนเปลวไฟ</desc>
 
 ::Nagan //id 1130 - Sword
-<desc>A sword topped with several extra edges for making wounds deeper and more unsightly.</desc>
-+5% physical damage vs. Demi-Human
-+25% double attack chance
+<desc>ดาบที่มีคมเสริมหลายชั้น ทำให้แผลลึกและน่าเกลียดกว่าเดิม</desc>
+ดาเมจกายภาพ +5% ต่อมนุษย์
+โอกาสออก Double Attack +25%
 
 ::Ice_Falchion //id 1131 - Sword
-<desc>A formal decorative sword imbued with water.</desc>
+<desc>ดาบพิธีการประดับ อาบด้วยธาตุน้ำ</desc>
 MATK +80
-Enables use of <skill>Cold Bolt 3</skill>.
-+10% chance to autocast <skill>Cold Bolt 3</skill> on melee attack.
-+5% chance of <status>Freeze</status> on physical attack.
+ใช้ <skill>Cold Bolt 3</skill> ได้
+โอกาส 10% ร่ายอัตโนมัติ <skill>Cold Bolt 3</skill> เมื่อโจมตีระยะประชิด
+โอกาส 5% ทำให้ <status>แช่แข็ง</status> เมื่อโจมตีกายภาพ.
 
 ::Edge //id 1132 - Sword
-<desc>A sword with an extremely sharp blade.</desc>
-+0.3% chance of <color=#800000>Curse</color> on physical attack
-+0.1% chance of dealing lethal damage to on attack
+<desc>ดาบใบมีดคมกริบ</desc>
+โอกาส 0.3% ทำให้ <color=#800000>สาป</color> เมื่อโจมตีกายภาพ
+โอกาส 0.1% ออกดาเมจสังหาร
 
 ::Fire_Brand //id 1133 - Sword
-<desc>A formal decorative sword imbued with fire.</desc>
+<desc>ดาบพิธีการประดับ อาบด้วยธาตุไฟ</desc>
 MATK +80
-Enables use of <skill>Fire Bolt 3</skill>.
-+10% chance to autocast <skill>Fire Bolt 3</skill> on physical attack.
+ใช้ <skill>Fire Bolt 3</skill> ได้
+โอกาส 10% ร่ายอัตโนมัติ <skill>Fire Bolt 3</skill> เมื่อโจมตีกายภาพ
 
 ::Caesar's_Sword //id 1134 - Sword
-<desc>A sword that looks like a pair of giant scissors.</desc>
-100% defense bypass vs <race>Plants</race>.
-+25% physical damage vs. <race>Plants</race>.
+<desc>ดาบที่หน้าตาเหมือนกรรไกรยักษ์</desc>
+เจาะ DEF 100% ต่อ<race>พืช</race>
+ดาเมจกายภาพ +25% ต่อ<race>พืช</race>
 
 ::Cutlus //id 1135 - Sword
-<color=#808080>A sword popularized by sea adventurers.</color>
+<color=#808080>ดาบที่นักผจญภัยทางทะเลทำให้เป็นที่นิยม</color>
 STR +2, DEF +1
-Enables use of <skill>Bash 5</skill>.
+ใช้ <skill>Bash 5</skill> ได้
 
 ::Solar_Sword //id 1136 - Sword
-<desc>A sword adorned with an engraving of the sun, symbolizing battle spirit and vigor.</desc>
-1% of physical damage dealt is recovered as HP.
-SP Regeneration -20%
+<desc>ดาบที่สลักลายดวงอาทิตย์ สื่อถึงจิตวิญญาณนักสู้และพละกำลัง</desc>
+ดูดดาเมจกายภาพ 1% กลับมาเป็น HP
+ฟื้นฟู SP -20%
 
 ::Excalibur //id 1137 - Sword
-<desc>The sword of legend that supposedly selects its owner by its own will.</desc>
+<desc>ดาบในตำนานที่ว่ากันว่าเลือกเจ้าของด้วยตัวมันเอง</desc>
 LUK +10, INT +5, DEX -1
 
 ::Mistilteinn //id 1138 - Sword
-<desc>A sword inspired by the legendary twig that killed Baldur, god of light.</desc>
+<desc>ดาบที่ได้แรงบันดาลใจจากกิ่งไม้ในตำนานที่สังหาร Baldur เทพแห่งแสง</desc>
 DEX +3
-+30% damage against Demi-human, beast, insect, dragon, aquatic, and plant.
-+10% Autospell <color=#0000FF>Stone Curse 3</color> on non-skill attack
+ดาเมจ +30% ต่อมนุษย์, สัตว์, แมลง, มังกร, สัตว์น้ำ, พืช
+โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Stone Curse 3</color> เมื่อโจมตีปกติ
 
 ::Tyrfing //id 1139 - Sword
-<desc>A sword rumored to bring a horrific fate to whoever wields it.</desc>
+<desc>ดาบที่ร่ำลือกันว่านำชะตากรรมอันน่าสยดสยองมาสู่ผู้ถือ</desc>
 
 ::Byeol-ungeom //id 1140 - Sword
-<desc>A giant sword used by ancient war generals.</desc>
+<desc>ดาบยักษ์ที่ขุนพลสมัยโบราณใช้</desc>
 +2 STR, VIT, INT, DEX, AGI, LUK
-+50% physical damage vs. Boss
-+10% damage from non-Boss
+ดาเมจกายภาพ +50% ต่อบอส
+รับดาเมจจากมอนที่ไม่ใช่บอส +10%
 
 ::Immaterial_Sword //id 1141 - Sword
-<desc>A formless sword that can ravage the enemy's mind.</desc>
-0.3% of physical damage dealt is recovered as SP.
+<desc>ดาบไร้รูปที่บั่นทอนจิตใจศัตรู</desc>
+ดูดดาเมจกายภาพ 0.3% กลับมาเป็น SP
 
 
 ::Jeweled_Sword //id 1142 - Sword
-<desc>A sword with a beautiful, transparent blade and a hilt adorned with a princely jewel.</desc>
+<desc>ดาบใบมีดใสงดงาม ด้ามประดับอัญมณีระดับเจ้าชาย</desc>
 
 ::Gaia_Sword //id 1143 - Sword
-<desc>An enchanted sword that draws ore from fallen monsters.</desc>
+<desc>ดาบต้องมนตร์ที่ดึงแร่ออกจากมอนสเตอร์ที่ล้มลง</desc>
 
 ::Sashimi //id 1144 - Sword
-<desc>An extremely sharp, thin bladed sword easily slices fish.</desc>
+<desc>ดาบใบบางคมกริบ เฉือนปลาได้ง่ายดาย</desc>
 
 ::Holy_Avenger //id 1145 - Sword
 神聖な力で敵を攻撃する剣。
 
 
 ::Town_Sword //id 1146 - Sword
-<desc>A common, humbly made sword that is intended for the use by those without sword expertise.</desc>
+<desc>ดาบธรรมดาทำแบบง่ายๆ สำหรับคนที่ยังใช้ดาบไม่เป็น</desc>
 
 ::Town_Sword_ //id 1147 - Sword
-<desc>A common, humbly made sword that is intended for the use by those without sword expertise.</desc>
+<desc>ดาบธรรมดาทำแบบง่ายๆ สำหรับคนที่ยังใช้ดาบไม่เป็น</desc>
 
 ::Star_Dust_Blade //id 1148 - Sword
-<desc>A spectacular sword with a blade forged out of meteorite that shines like starlight during the night.</desc>
-+5% chance of <color=#800000>Stun</color> on melee attack
+<desc>ดาบตระการตา ใบมีดตีจากอุกกาบาต ยามค่ำคืนเปล่งประกายดั่งแสงดาว</desc>
+โอกาส 5% ทำให้ <color=#800000>สตัน</color> เมื่อโจมตีระยะประชิด
 
 ::Flamberge_ //id 1149 - Sword
-<desc>A powerful sword with a decoratively wavy, flame-like blade.</desc>
+<desc>ดาบทรงพลัง ใบมีดหยักเป็นคลื่นเหมือนเปลวไฟ</desc>
 
 ::Slayer //id 1151 - 2HSword
-<desc>A fearsome sword that has slain many warriors in battle.</desc>
+<desc>ดาบน่าสะพรึงที่สังหารนักรบมานับไม่ถ้วน</desc>
 
 ::Slayer_ //id 1152 - 2HSword
-<desc>A fearsome sword that has slain many warriors in battle.</desc>
+<desc>ดาบน่าสะพรึงที่สังหารนักรบมานับไม่ถ้วน</desc>
 
 ::Bastard_Sword //id 1154 - 2HSword
-<desc>A straight bladed sword that can be brutally swung like a baseball bat.</desc>
+<desc>ดาบใบตรงที่เหวี่ยงได้โหดเหมือนไม้เบสบอล</desc>
 
 ::Bastard_Sword_ //id 1155 - 2HSword
-<desc>A straight bladed sword that can be brutally swung like a baseball bat.</desc>
+<desc>ดาบใบตรงที่เหวี่ยงได้โหดเหมือนไม้เบสบอล</desc>
 
 ::Two-Handed_Sword //id 1157 - 2HSword
-<desc>A mighty, yet awfully basic, sword.</desc>
+<desc>ดาบที่ทรงพลัง แต่ก็พื้นๆ ซะเหลือเกิน</desc>
 
 ::Two-Handed_Sword_ //id 1158 - 2HSword
-<desc>A mighty, yet awfully basic, sword.</desc>
+<desc>ดาบที่ทรงพลัง แต่ก็พื้นๆ ซะเหลือเกิน</desc>
 
 ::Broad_Sword //id 1160 - 2HSword
-<desc>A sword with a wide, double sided blade.</desc>
+<desc>ดาบใบกว้างสองคม</desc>
 DEF +5
 
 ::Balmung //id 1161 - 2HSword
-<desc>Sword wielded by mighty GOD-POING, the lawless heroine.</desc>
+<desc>ดาบที่ GOD-POING วีรสตรีนอกกฎหมายผู้เกรียงไกรใช้</desc>
 INT, LUK +20
 
 ::Broad_Sword_ //id 1162 - 2HSword
-<desc>A sword with a wide, double sided blade.</desc>
+<desc>ดาบใบกว้างสองคม</desc>
 DEF +5
 
 ::Claymore //id 1163 - 2HSword
-<desc>A large, double-edged broad sword that was used by the highlanders.</desc>
+<desc>ดาบใหญ่สองคมขนาดยาว ที่ชาวไฮแลนด์เคยใช้</desc>
 
 ::Muramasa //id 1164 - 2HSword
-<desc>An oriental sword named after the legendary swordsmith, Muramasa.</desc>
+<desc>ดาบตะวันออกที่ตั้งชื่อตาม Muramasa ช่างตีดาบในตำนาน</desc>
 CRIT +30, ASPD +8%
 
 ::Masamune //id 1165 - 2HSword
-<desc>An oriental sword named after the legendary swordsmith, Masamune.</desc>
+<desc>ดาบตะวันออกที่ตั้งชื่อตาม Masamune ช่างตีดาบในตำนาน</desc>
 STR -5, DEF -66%
 ASPD +12%, FLEE +30
 
 ::Dragon_Slayer //id 1166 - 2HSword
-<desc>A giant sword, made from a dragon's tooth, that can easily cut through dragon scales.</desc>
-+15% physical damage vs. Dragon
+<desc>ดาบยักษ์ที่ทำจากฟันมังกร ฟันทะลุเกล็ดมังกรได้สบาย</desc>
+ดาเมจกายภาพ +15% ต่อมังกร
 
 ::Schweizersabel //id 1167 - 2HSword
-<desc>A formal decorative sword imbued with wind.</desc>
+<desc>ดาบพิธีการประดับ อาบด้วยธาตุลม</desc>
 MATK +120, DEF +1
-+10% Autospell <color=#0000FF>Lightning Bolt 3</color> on non-skill attack
+โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Lightning Bolt 3</color> เมื่อโจมตีปกติ
 
 ::Zweihander //id 1168 - 2HSword
-<desc>An enormous sword designed for two hands.</desc>
+<desc>ดาบขนาดมหึมาที่ออกแบบมาให้ถือสองมือ</desc>
 
 ::Executioner //id 1169 - 2HSword
-<desc>A gruesome sword used to behead criminals judged with the death penalty.</desc>
-+100% DEF ignore vs. Demi-Human
-+20% physical damage vs. Demi-Human
-+10% damage from Demi-Human
+<desc>ดาบน่าขนลุกที่ใช้ตัดคอนักโทษประหาร</desc>
+เจาะ DEF 100% กับมนุษย์
+ดาเมจกายภาพ +20% ต่อมนุษย์
+รับดาเมจจากมนุษย์ +10%
 
 ::Katzbalger //id 1170 - 2HSword
-<desc>A sword with a unique "S" shaped hilt.</desc>
+<desc>ดาบที่ด้ามเป็นรูปตัว "S" อันเป็นเอกลักษณ์</desc>
 DEF +10, VIT +5
 
 ::Zweihander_ //id 1171 - 2HSword
-<desc>An enormous sword designed for two hands.</desc>
+<desc>ดาบขนาดมหึมาที่ออกแบบมาให้ถือสองมือ</desc>
 
 ::Claymore_ //id 1172 - 2HSword
-<desc>A large, double-edged broad sword that was used by the highlanders.</desc>
+<desc>ดาบใหญ่สองคมขนาดยาว ที่ชาวไฮแลนด์เคยใช้</desc>
 
 ::Atlas_Weapon //id 1175 - 2HSword
-<desc>A massive sword wielded by Atroce that is too large to be handled by ordinary warriors.</desc>
+<desc>ดาบมหึมาที่ Atroce ใช้ ใหญ่เกินกว่านักรบธรรมดาจะถือไหว</desc>
 CRIT +10
 
 ::Muscle_Cutter //id 1176 - 2HSword
-<desc>A weapon that is designed to easily slice muscles.</desc>
-+3% Autospell <color=#0000FF>Decrease AGI 1</color> on non-skill attack
-+8% chance of <color=#800000>Bleed</color> on melee attack
+<desc>อาวุธที่ออกแบบมาให้เฉือนกล้ามเนื้อได้ง่าย</desc>
+โอกาส 3% ร่ายอัตโนมัติ <color=#0000FF>Decrease AGI 1</color> เมื่อโจมตีปกติ
+โอกาส 8% ทำให้ <color=#800000>เลือดออก</color> เมื่อโจมตีระยะประชิด
 
 ::Schweizersabel_ //id 1178 - 2HSword
-<desc>A formal decorative sword imbued with wind.</desc>
+<desc>ดาบพิธีการประดับ อาบด้วยธาตุลม</desc>
 MATK +120, DEF +1
-+10% Autospell <color=#0000FF>Lightning Bolt 3</color> on non-skill attack
+โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Lightning Bolt 3</color> เมื่อโจมตีปกติ
 
 ::Executioner_ //id 1179 - 2HSword
-<desc>A gruesome sword used to behead criminals judged with the death penalty.</desc>
-+100% DEF ignore vs. Demi-Human
-+20% physical damage vs. Demi-Human
-+10% damage from Demi-Human
+<desc>ดาบน่าขนลุกที่ใช้ตัดคอนักโทษประหาร</desc>
+เจาะ DEF 100% กับมนุษย์
+ดาเมจกายภาพ +20% ต่อมนุษย์
+รับดาเมจจากมนุษย์ +10%
 
 ::Dragon_Slayer_ //id 1180 - 2HSword
-<desc>A giant sword, made from a dragon's tooth, that can easily cut through dragon scales.</desc>
-+100% DEF ignore vs. Dragon
-+15% physical damage vs. Dragon
+<desc>ดาบยักษ์ที่ทำจากฟันมังกร ฟันทะลุเกล็ดมังกรได้สบาย</desc>
+เจาะ DEF 100% กับมังกร
+ดาเมจกายภาพ +15% ต่อมังกร
 
 ::Tae_Goo_Lyeon //id 1181 - 2HSword
-<desc>A sword passed down from master to master.</desc>
+<desc>ดาบที่สืบทอดจากอาจารย์สู่อาจารย์</desc>
 Perfect Dodge +10
 
 ::Bloody_Eater //id 1182 - 2HSword
-<desc>A magical sword that emits a dismal black aura.</desc>
-Recover 100 HP/melee kill
+<desc>ดาบเวทที่แผ่ออร่าดำมืดหม่นหมอง</desc>
+ฟื้น HP 100 เมื่อฆ่าด้วยระยะประชิด
 
 ::Brave_Katzbalger //id 1183 - 2HSword
 STR +2
-+20% DEF ignore vs. Demi-Human
-+55% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +55% ต่อมนุษย์
 
 ::Valorous_Katzbalger //id 1184 - 2HSword
 CRIT +20
-CRIT damage +20%
-+55% physical damage vs. Demi-Human
+ดาเมจ CRIT +20%
+ดาเมจกายภาพ +55% ต่อมนุษย์
 
 ::Violet_Fear //id 1185 - 2HSword
-<desc>A huge violet sword made from the twin swords of Naght Sieger.</desc>
+<desc>ดาบสีม่วงขนาดยักษ์ ที่หลอมจากดาบคู่ของ Naght Sieger</desc>
 
 ::Death_Guidance //id 1186 - 2HSword
-<desc>A cursed weapon that longs for the destruction of all living beings, including its owner, and secludes them to a life of misery.</desc>
+<desc>อาวุธต้องคำสาปที่กระหายจะทำลายทุกชีวิต รวมถึงเจ้าของเอง และสาปให้เขาอยู่อย่างทุกข์ทรมาน</desc>
 STR +5, AGI +2
 Perfect Dodge +20
 
 ::Glorious_Claymore //id 1187 - 2HSword
-+25% DEF ignore vs. Demi-Human
-+70% physical damage vs. Demi-Human
+เจาะ DEF 25% กับมนุษย์
+ดาเมจกายภาพ +70% ต่อมนุษย์
 
 ::Knife //id 1201 - Dagger
-<desc>A simple knife.</desc>
+<desc>มีดธรรมดา</desc>
 
 ::Knife_ //id 1202 - Dagger
-<desc>A simple knife.</desc>
+<desc>มีดธรรมดา</desc>
 
 ::Cutter //id 1204 - Dagger
-<desc>A knife used for cutting.</desc>
+<desc>มีดสำหรับหั่น</desc>
 
 ::Cutter_ //id 1205 - Dagger
-<desc>A knife used for cutting.</desc>
+<desc>มีดสำหรับหั่น</desc>
 
 ::Main_Gauche //id 1207 - Dagger
-<desc>A dagger held in the left hand to parry attacks.</desc>
+<desc>มีดสั้นที่ถือมือซ้ายไว้ปัดป้องการโจมตี</desc>
 
 ::Main_Gauche_ //id 1208 - Dagger
-<desc>A dagger held in the left hand to parry attacks.</desc>
+<desc>มีดสั้นที่ถือมือซ้ายไว้ปัดป้องการโจมตี</desc>
 
 ::Dirk //id 1210 - Dagger
-<desc>An ancient knife used by highlanders.</desc>
+<desc>มีดโบราณที่ชาวไฮแลนด์ใช้</desc>
 
 ::Dirk_ //id 1211 - Dagger
-<desc>An ancient knife used by highlanders.</desc>
+<desc>มีดโบราณที่ชาวไฮแลนด์ใช้</desc>
 
 ::Dagger //id 1213 - Dagger
-<desc>A knife used for stabbing.</desc>
+<desc>มีดสำหรับแทง</desc>
 
 ::Dagger_ //id 1214 - Dagger
-<desc>A knife used for stabbing.</desc>
+<desc>มีดสำหรับแทง</desc>
 
 ::Stiletto //id 1216 - Dagger
-<desc>A long, thin blade that is used as a concealed weapon by assassins.</desc>
+<desc>ใบมีดยาวเรียวที่นักฆ่าใช้เป็นอาวุธซ่อน</desc>
 
 ::Stiletto_ //id 1217 - Dagger
-<desc>A long, thin blade that is used as a concealed weapon by assassins.</desc>
+<desc>ใบมีดยาวเรียวที่นักฆ่าใช้เป็นอาวุธซ่อน</desc>
 
 ::Gladius //id 1219 - Dagger
-<desc>A strong dagger crafted by traditional artisans.</desc>
+<desc>มีดสั้นแข็งแรงที่ช่างฝีมือดั้งเดิมทำขึ้น</desc>
 
 ::Gladius_ //id 1220 - Dagger
-<desc>A strong dagger crafted by traditional artisans.</desc>
+<desc>มีดสั้นแข็งแรงที่ช่างฝีมือดั้งเดิมทำขึ้น</desc>
 
 ::Damascus //id 1222 - Dagger
-<desc>A knife made of a special metal alloy that is incredibly strong.</desc>
+<desc>มีดที่ทำจากโลหะผสมพิเศษ แข็งแกร่งอย่างเหลือเชื่อ</desc>
 
 ::Fortune_Sword //id 1223 - Dagger
-<desc>A knife with a gold handle that brings great fortune to whoever holds it.</desc>
+<desc>มีดด้ามทอง ใครถือก็มีโชคลาภ</desc>
 LUK +5
 Perfect Dodge +20
 
 ::Swordbreaker //id 1224 - Dagger
-<desc>A powerful dagger built to catch and destroy weapons.</desc>
+<desc>มีดสั้นทรงพลังที่ทำมาเพื่อเกี่ยวและทำลายอาวุธ</desc>
 
 ::Mailbreaker //id 1225 - Dagger
-<desc>A sharp dagger built to puncture and destroy armor.</desc>
+<desc>มีดสั้นคมที่ทำมาเพื่อเจาะและทำลายเกราะ</desc>
 
 ::Damascus_ //id 1226 - Dagger
-<desc>A knife made of a special metal alloy that is incredibly strong.</desc>
+<desc>มีดที่ทำจากโลหะผสมพิเศษ แข็งแกร่งอย่างเหลือเชื่อ</desc>
 
 ::Weeder_Knife //id 1227 - Dagger
-<desc>A blade created to cut down stubborn weeds.</desc>
-+100% DEF ignore vs. Plant
-+15% physical damage vs. Plant
--15% damage from Plant
+<desc>ใบมีดที่ทำมาเพื่อฟันวัชพืชดื้อๆ</desc>
+เจาะ DEF 100% กับพืช
+ดาเมจกายภาพ +15% ต่อพืช
+รับดาเมจจากพืช -15%
 
 ::Combat_Knife //id 1228 - Dagger
-<desc>A military knife crafted for battle against humanoids.</desc>
-+100% DEF ignore vs. Demi-Human
-+10% physical damage vs. Demi-Human
--10% damage from Demi-Human
+<desc>มีดทหารที่ทำมาเพื่อสู้กับพวกกึ่งมนุษย์</desc>
+เจาะ DEF 100% กับมนุษย์
+ดาเมจกายภาพ +10% ต่อมนุษย์
+รับดาเมจจากมนุษย์ -10%
 
 ::Kitchen_Knife //id 1229 - Dagger
-<desc>A domestic knife used by housewives, or househusbands, for cooking.</desc>
+<desc>มีดในครัวเรือน แม่บ้านหรือพ่อบ้านใช้ทำกับข้าว</desc>
 CRIT +30
 
 ::Ice_Pick //id 1230 - Dagger
-<desc>A thin, sharp blade capable of piercing the strongest of armors.</desc>
-Physical Damage Scales with Enemy Defense
+<desc>ใบมีดบางคมที่เจาะทะลุเกราะแข็งแกร่งที่สุดได้</desc>
+ดาเมจกายภาพแปรผันตาม DEF ของศัตรู
 
 ::Bazerald //id 1231 - Dagger
-<color=#808080>A decorative dagger engraved with luxurious emblems.</color>
+<color=#808080>มีดสั้นประดับ สลักตราสัญลักษณ์หรูหรา</color>
 INT +5
 MATK +40, MATK +10%
 
 ::Assassin_Dagger //id 1232 - Dagger
-<desc>A dagger commonly used by assassins.</desc>
+<desc>มีดสั้นที่นักฆ่าใช้กันทั่วไป</desc>
 HP +20%, SP +15%, ASPD +2%
 
 ::Exorciser //id 1233 - Dagger
-<desc>A ceremonial dagger used in exorcisms.</desc>
-+100% DEF ignore vs. Demon
-+10% physical damage vs. Demon
--5% damage from Demon
+<desc>มีดสั้นพิธีกรรม ใช้ไล่ผี</desc>
+เจาะ DEF 100% กับปีศาจ
+ดาเมจกายภาพ +10% ต่อปีศาจ
+รับดาเมจจากปีศาจ -5%
 
 ::Moonlight_Dagger //id 1234 - Dagger
-<desc>A dagger imbued with the lunar spirit that drains the enemy's soul.</desc>
+<desc>มีดสั้นที่อาบด้วยวิญญาณจันทรา ดูดวิญญาณศัตรู</desc>
 SP +10%
-Recover 3 SP/melee attack
+ฟื้น SP 3 ต่อการโจมตีระยะประชิด
 
 ::Azoth //id 1235 - Dagger
-<desc>A dagger that symbolizes the potential of Alchemy.</desc>
+<desc>มีดสั้นที่เป็นสัญลักษณ์ของศักยภาพแห่งวิชาเล่นแร่แปรธาตุ</desc>
 
 ::Sucsamad //id 1236 - Dagger
-<color=#808080>A dagger crafted in the ancient, traditional ways of a small desert tribe.</color>
-+25% physical damage vs. Earth
-+25% physical damage vs. Wind
+<color=#808080>มีดสั้นที่ทำตามวิถีโบราณของชนเผ่าเล็กๆ ในทะเลทราย</color>
+ดาเมจกายภาพ +25% ต่อธาตุดิน
+ดาเมจกายภาพ +25% ต่อธาตุลม
 
 ::Grimtooth //id 1237 - Dagger
-<desc>A cursed dagger forged out of a monster's tooth that causes insanity to whoever wields it.</desc>
+<desc>มีดสั้นต้องคำสาปที่ตีจากฟันมอนสเตอร์ ใครถือก็เสียสติ</desc>
 DEF -33%
 FLEE +15
 Perfect Dodge +10
 
 ::Zeny_Knife //id 1238 - Dagger
-<desc>A dagger crafted by pickpockets to assist them in their daily life.</desc>
+<desc>มีดสั้นที่นักล้วงกระเป๋าทำขึ้นใช้ในชีวิตประจำวัน</desc>
 
 ::Poison_Knife //id 1239 - Dagger
-<desc>A dreadful dagger that has been soaked in toxin.</desc>
-+30% chance of <color=#800000>Poison</color> on physical attack
+<desc>มีดสั้นน่าสะพรึงที่แช่ยาพิษมา</desc>
+โอกาส 30% ทำให้ <color=#800000>พิษ</color> เมื่อโจมตีกายภาพ
 
 ::Cursed_Dagger //id 1241 - Dagger
-<desc>A dagger possessed by evil and given power by hatred and malice.</desc>
-+50% chance of <color=#800000>Curse</color> on physical attack
+<desc>มีดสั้นที่ถูกความชั่วร้ายสิงสู่ ได้พลังจากความเกลียดชังและอาฆาต</desc>
+โอกาส 50% ทำให้ <color=#800000>สาป</color> เมื่อโจมตีกายภาพ
 
 ::Dagger_of_Counter //id 1242 - Dagger
-<desc>A dagger that has a high chance to do critical damage.</desc>
+<desc>มีดสั้นที่ออกคริติคอลบ่อย</desc>
 CRIT +90
 
 ::Novice_Main_Gauche //id 1243 - Dagger
-<desc>An exclusive main gauche for new adventurers.</desc>
+<desc>Main Gauche รุ่นพิเศษสำหรับนักผจญภัยหน้าใหม่</desc>
 
 ::Cinquedea //id 1245 - Dagger
-<desc>A wide bladed short sword crafted in a western country.</desc>
+<desc>ดาบสั้นใบกว้างที่ทำขึ้นในดินแดนตะวันตก</desc>
 
 ::Cinquedea_ //id 1246 - Dagger
-<desc>A wide bladed short sword crafted in a western country.</desc>
+<desc>ดาบสั้นใบกว้างที่ทำขึ้นในดินแดนตะวันตก</desc>
 
 ::Kindle_Dagger //id 1247 - Dagger
-<desc>A dagger that can be effectively used to start a fire.</desc>
+<desc>มีดสั้นที่ใช้จุดไฟได้ดี</desc>
 
 ::Obsidian_Dagger //id 1248 - Dagger
-<desc>A dagger made from pure obsidian glass that shines eerily.</desc>
+<desc>มีดสั้นที่ทำจากหินออบซิเดียนบริสุทธิ์ เปล่งประกายชวนขนลุก</desc>
 
 ::Fisherman's_Dagger //id 1249 - Dagger
-<desc>A dagger used by fishermen to catch shellfish and oysters.</desc>
+<desc>มีดสั้นที่ชาวประมงใช้งัดหอย</desc>
 
 ::Jur //id 1250 - Katar
-<desc>A set of blades worn on the back of both hands.</desc>
+<desc>ชุดใบมีดที่สวมไว้หลังมือทั้งสองข้าง</desc>
 
 ::Jur_ //id 1251 - Katar
-<desc>A set of blades worn on the back of both hands.</desc>
+<desc>ชุดใบมีดที่สวมไว้หลังมือทั้งสองข้าง</desc>
 
 ::Katar //id 1252 - Katar
-<desc>A set of daggers in which the blades are positioned above the knuckles.</desc>
+<desc>ชุดมีดสั้นที่ใบมีดอยู่เหนือข้อนิ้ว</desc>
 DEX +1
 
 ::Katar_ //id 1253 - Katar
-<desc>A set of daggers in which the blades are positioned above the knuckles.</desc>
+<desc>ชุดมีดสั้นที่ใบมีดอยู่เหนือข้อนิ้ว</desc>
 DEX +1
 
 ::Jamadhar //id 1254 - Katar
-<desc>A katar with two blades that move like scissors to reveal a third blade from within.</desc>
+<desc>กะทาสองใบมีดที่ขยับเหมือนกรรไกร เผยใบมีดที่สามออกมาจากข้างใน</desc>
 
 ::Jamadhar_ //id 1255 - Katar
-<desc>A katar with two blades that move like scissors to reveal a third blade from within.</desc>
+<desc>กะทาสองใบมีดที่ขยับเหมือนกรรไกร เผยใบมีดที่สามออกมาจากข้างใน</desc>
 
 ::Katar_of_Frozen_Icicle //id 1256 - Katar
-<desc>A katar fashioned from a cold, sharp icicle.</desc>
-+5% chance of <color=#800000>Freeze</color> on physical attack
+<desc>กะทาที่ทำจากแท่งน้ำแข็งเย็นเฉียบและแหลมคม</desc>
+โอกาส 5% ทำให้ <color=#800000>แช่แข็ง</color> เมื่อโจมตีกายภาพ
 
 ::Katar_of_Quaking //id 1257 - Katar
-<desc>A katar sculpted from the desert.</desc>
-+5% chance of <color=#800000>Blind</color> on physical attack
+<desc>กะทาที่ปั้นขึ้นจากผืนทะเลทราย</desc>
+โอกาส 5% ทำให้ <color=#800000>ตาบอด</color> เมื่อโจมตีกายภาพ
 
 ::Katar_of_Raging_Blaze //id 1258 - Katar
-<desc>A katar molded from an inferno.</desc>
-+5% chance of <color=#800000>Silence</color> on physical attack
+<desc>กะทาที่หล่อขึ้นจากเปลวเพลิงนรก</desc>
+โอกาส 5% ทำให้ <color=#800000>ใบ้</color> เมื่อโจมตีกายภาพ
 
 ::Katar_of_Piercing_Wind //id 1259 - Katar
-<desc>A katar forged from powerful stormy winds.</desc>
-+5% chance of <color=#800000>Sleep</color> on physical attack
+<desc>กะทาที่หลอมจากลมพายุอันทรงพลัง</desc>
+โอกาส 5% ทำให้ <color=#800000>หลับ</color> เมื่อโจมตีกายภาพ
 
 ::Sharpened_Legbone_of_Ghoul //id 1260 - Katar
-<desc>A katar crafted from a ghoul's femur that radiates a dark, deathly aura.</desc>
+<desc>กะทาที่ทำจากกระดูกต้นขา Ghoul แผ่ออร่ามรณะออกมา</desc>
 
 ::Infiltrator //id 1261 - Katar
-<desc>A katar designed for quick human assassinations.</desc>
+<desc>กะทาที่ออกแบบมาเพื่อสังหารมนุษย์ให้จบเร็ว</desc>
 DEF +3, FLEE +5
 Perfect Dodge +2
-+50% physical damage vs. Demi-Human
+ดาเมจกายภาพ +50% ต่อมนุษย์
 
 ::Loki's_Nail //id 1262 - Katar
-<desc>A double bladed katar that inflicts incurable wounds.</desc>
-+3% chance of <color=#800000>Bleed</color> on melee attack
+<desc>กะทาสองใบมีด สร้างบาดแผลที่รักษาไม่หาย</desc>
+โอกาส 3% ทำให้ <color=#800000>เลือดออก</color> เมื่อโจมตีระยะประชิด
 
 ::Unholy_Touch //id 1263 - Katar
-<desc>A katar forged out of resentment for the living.</desc>
+<desc>กะทาที่หลอมจากความแค้นที่มีต่อผู้มีชีวิต</desc>
 CRIT -1
-+2% chance of <color=#800000>Curse</color> on melee attack
+โอกาส 2% ทำให้ <color=#800000>สาป</color> เมื่อโจมตีระยะประชิด
 
 ::Specialty_Jur //id 1264 - Katar
-<desc>A katar with many slots that is difficult to handle.</desc>
+<desc>กะทาที่มีช่องเสียบเยอะ แต่ใช้ยาก</desc>
 
 ::Bloody_Roar //id 1265 - Katar
-<desc>A katar designed to kill human that evokes a bestial roar when drenched in blood.</desc>
-+100% DEF ignore vs. Demi-Human
+<desc>กะทาที่ทำมาเพื่อฆ่ามนุษย์ เมื่อชุ่มเลือดจะเปล่งเสียงคำรามดั่งสัตว์ร้าย</desc>
+เจาะ DEF 100% กับมนุษย์
 
 ::Infiltrator_ //id 1266 - Katar
-<desc>A katar designed for quick human assassinations.</desc>
+<desc>กะทาที่ออกแบบมาเพื่อสังหารมนุษย์ให้จบเร็ว</desc>
 DEF +3, FLEE +5
 Perfect Dodge +2
-+50% physical damage vs. Demi-Human
+ดาเมจกายภาพ +50% ต่อมนุษย์
 
 ::Katar_of_Frozen_Icicle_ //id 1275 - Katar
-<desc>A katar fashioned from a cold, sharp icicle.</desc>
-+5% chance of <color=#800000>Freeze</color> on physical attack
+<desc>กะทาที่ทำจากแท่งน้ำแข็งเย็นเฉียบและแหลมคม</desc>
+โอกาส 5% ทำให้ <color=#800000>แช่แข็ง</color> เมื่อโจมตีกายภาพ
 
 ::Katar_of_Quaking_ //id 1276 - Katar
-<desc>A katar sculpted from the desert.</desc>
-+5% chance of <color=#800000>Blind</color> on physical attack
+<desc>กะทาที่ปั้นขึ้นจากผืนทะเลทราย</desc>
+โอกาส 5% ทำให้ <color=#800000>ตาบอด</color> เมื่อโจมตีกายภาพ
 
 ::Katar_of_Raging_Blaze_ //id 1277 - Katar
-<desc>A katar molded from an inferno.</desc>
-+5% chance of <color=#800000>Silence</color> on physical attack
+<desc>กะทาที่หล่อขึ้นจากเปลวเพลิงนรก</desc>
+โอกาส 5% ทำให้ <color=#800000>ใบ้</color> เมื่อโจมตีกายภาพ
 
 ::Katar_of_Piercing_Wind_ //id 1278 - Katar
-<desc>A katar forged from powerful stormy winds.</desc>
-+5% chance of <color=#800000>Sleep</color> on physical attack
+<desc>กะทาที่หลอมจากลมพายุอันทรงพลัง</desc>
+โอกาส 5% ทำให้ <color=#800000>หลับ</color> เมื่อโจมตีกายภาพ
 
 ::Brave_Katar //id 1279 - Katar
 STR +1, DEX +1, LUK +1
-+20% DEF ignore vs. Demi-Human
-+70% physical damage vs. Demi-Human
-Indestructible
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +70% ต่อมนุษย์
+ไม่แตก
 
 ::Valorous_Katar //id 1280 - Katar
 STR +1, DEX +1, LUK +1
 ASPD +5%
-CRIT damage +20%
-+70% physical damage vs. Demi-Human
-Indestructible
+ดาเมจ CRIT +20%
+ดาเมจกายภาพ +70% ต่อมนุษย์
+ไม่แตก
 
 ::Glorious_Bloody_Roar //id 1281 - Katar
-+20% DEF ignore vs. Demi-Human
-+70% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +70% ต่อมนุษย์
 
 ::Glorious_Jamadhar //id 1282 - Katar
-+70% physical damage vs. Demi-Human
-+20% CRIT damage
+ดาเมจกายภาพ +70% ต่อมนุษย์
++20% ดาเมจ CRIT
 
 ::Axe //id 1301 - Axe
-<desc>A common axe.</desc>
+<desc>ขวานธรรมดา</desc>
 
 ::Axe_ //id 1302 - Axe
-<desc>A common axe.</desc>
+<desc>ขวานธรรมดา</desc>
 
 ::Orcish_Axe //id 1304 - Axe
-<desc>An axe crafted by orc smiths for orc warriors.</desc>
+<desc>ขวานที่ช่างตีเหล็กออร์คทำให้นักรบออร์ค</desc>
 
 ::Cleaver //id 1305 - Axe
-<desc>A heavy, broad bladed hatchet used by butchers.</desc>
-+5% physical damage vs. Demi-Human
+<desc>ขวานใบกว้างหนักๆ ที่คนขายเนื้อใช้</desc>
+ดาเมจกายภาพ +5% ต่อมนุษย์
 
 ::War_Axe //id 1306 - Axe
-<desc>A bloodthirsty axe that has aided many warriors in battle.</desc>
+<desc>ขวานกระหายเลือด เคยช่วยนักรบมานักต่อนัก</desc>
 DEX +2, LUK +2
 
 ::Windhawk //id 1307 - Axe
-<desc>An axe that summons wind around it, granting unprecedented speed.</desc>
+<desc>ขวานที่เรียกลมมาห้อมล้อม ให้ความเร็วที่ไม่เคยมีมาก่อน</desc>
 ASPD +5%
 
 ::Orcish_Axe_ //id 1309 - Axe
-<desc>An axe crafted by orc smiths for orc warriors.</desc>
+<desc>ขวานที่ช่างตีเหล็กออร์คทำให้นักรบออร์ค</desc>
 
 ::Glorious_Cleaver //id 1310 - Axe
-+20% DEF ignore vs. Demi-Human
-+75% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +75% ต่อมนุษย์
 
 ::Battle_Axe //id 1351 - 2HAxe
-<desc>A sturdy axe for fighting multiple enemies at once.</desc>
+<desc>ขวานทนทานสำหรับสู้กับศัตรูหลายตัวพร้อมกัน</desc>
 
 ::Battle_Axe_ //id 1352 - 2HAxe
-<desc>A sturdy axe for fighting multiple enemies at once.</desc>
+<desc>ขวานทนทานสำหรับสู้กับศัตรูหลายตัวพร้อมกัน</desc>
 
 ::Hammer //id 1354 - 2HAxe
-<desc>A really big hammer.</desc>
+<desc>ค้อนที่ใหญ่มาก</desc>
 
 ::Hammer_ //id 1355 - 2HAxe
-<desc>A really big hammer.</desc>
+<desc>ค้อนที่ใหญ่มาก</desc>
 
 ::Buster //id 1357 - 2HAxe
-<desc>A powerful axe that lives up to its mighty appearance.</desc>
+<desc>ขวานทรงพลัง สมกับหน้าตาที่ดูโหด</desc>
 
 ::Buster_ //id 1358 - 2HAxe
-<desc>A powerful axe that lives up to its mighty appearance.</desc>
+<desc>ขวานทรงพลัง สมกับหน้าตาที่ดูโหด</desc>
 
 ::Two-Handed_Axe //id 1360 - 2HAxe
-<color=#808080>A two-handed, double bladed axe.</color>
+<color=#808080>ขวานสองคมแบบสองมือ</color>
 
 ::Two-Handed_Axe_ //id 1361 - 2HAxe
-<desc>A two-handed, double bladed axe.</desc>
+<desc>ขวานสองคมแบบสองมือ</desc>
 
 ::Bloody_Axe //id 1363 - 2HAxe
-<desc>A terrifying axe that drenches the battlefield with blood once it cuts flesh.</desc>
+<desc>ขวานน่าสะพรึงที่พอฟันเข้าเนื้อก็ทำให้สนามรบนองเลือด</desc>
 STR +10
-Movement Speed +34%
+ความเร็วเดิน +34%
 
 ::Great_Axe //id 1364 - 2HAxe
-<desc>A humongous, double bladed axe.</desc>
-+15% chance of <color=#800000>Stun</color> on physical attack
+<desc>ขวานสองคมขนาดมหึมา</desc>
+โอกาส 15% ทำให้ <color=#800000>สตัน</color> เมื่อโจมตีกายภาพ
 
 ::Sabbath //id 1365 - 2HAxe
-<desc>An axe that guides lost souls to the afterlife.</desc>
-+50 CRIT vs. Undead
-+0.5% chance to deal lethal damage to Undead on attack
+<desc>ขวานที่นำทางวิญญาณหลงทางไปสู่ปรโลก</desc>
+CRIT +50 ต่ออันเดด
+โอกาส 0.5% ออกดาเมจสังหารต่ออันเดด
 
 ::Light_Epsilon //id 1366 - 2HAxe
-<desc>A ceremonial axe that possesses a holy power.</desc>
-+3% physical damage vs. Demon
-Enable use of <skill>Heal 3</skill>
+<desc>ขวานพิธีกรรมที่มีพลังศักดิ์สิทธิ์</desc>
+ดาเมจกายภาพ +3% ต่อปีศาจ
+ใช้ <skill>Heal 3</skill> ได้
 
 ::Slaughter //id 1367 - 2HAxe
-<desc>An axe that brutally slaughters enemies.</desc>
-+100% DEF ignore vs. Brute
-+0.4% chance to deal lethal damage to Brute on attack
+<desc>ขวานที่สังหารศัตรูอย่างโหดเหี้ยม</desc>
+เจาะ DEF 100% กับสัตว์
+โอกาส 0.4% ออกดาเมจสังหารต่อสัตว์
 
 ::Tomahawk //id 1368 - 2HAxe
-<desc>A light, windy axe that can be thrown.</desc>
+<desc>ขวานเบาธาตุลมที่ขว้างได้</desc>
 
 ::Guillotine //id 1369 - 2HAxe
-<desc>A huge guillotine blade welded to a handle for combat use.</desc>
-Recover 2 SP/melee attack vs. Demi-Human
-Recover 20 SP/melee kill vs. Demi-Human
-+0.3% chance to deal lethal damage to Demi-Human on attack
+<desc>ใบมีดกิโยตินขนาดใหญ่ที่เชื่อมติดด้ามไว้ใช้รบ</desc>
+ฟื้น SP 2 ต่อการโจมตีระยะประชิดใส่มนุษย์
+ฟื้น SP 20 เมื่อฆ่ามนุษย์ ด้วยระยะประชิด
+โอกาส 0.3% ออกดาเมจสังหารต่อมนุษย์
 
 ::Doom_Slayer //id 1370 - 2HAxe
-<desc>A gigantic, ridiculously heavy axe that requires great strength to use.</desc>
+<desc>ขวานยักษ์ที่หนักอย่างเหลือเชื่อ ต้องมีพละกำลังมหาศาลถึงจะใช้ได้</desc>
 
 ::Doom_Slayer_ //id 1371 - 2HAxe
-<desc>A gigantic, ridiculously heavy axe that requires great strength to use.</desc>
+<desc>ขวานยักษ์ที่หนักอย่างเหลือเชื่อ ต้องมีพละกำลังมหาศาลถึงจะใช้ได้</desc>
 
 ::Bardiche //id 1375 - 2HAxe
-<desc>A long bladed axe that deflects enemy attacks.</desc>
--13% damage from Medium
--15% damage from Large
+<desc>ขวานใบมีดยาวที่ปัดป้องการโจมตีของศัตรูได้</desc>
+รับดาเมจจากขนาดกลาง -13%
+รับดาเมจจากขนาดใหญ่ -15%
 
 ::Heart_Breaker //id 1376 - 2HAxe
-<desc>An axe that breaks faces like Kafra Jasmine breaks hearts.</desc>
+<desc>ขวานที่ทุบหน้าคนได้พอๆ กับที่ Kafra Jasmine ทุบหัวใจคน</desc>
 ASPD +5%
 
 ::Hurricane_Fury //id 1377 - 2HAxe
-<desc>A massive axe embedded with an orb imbued with the power of a hurricane.</desc>
-ASPD +Refine%
--(10 + Refine)% damage taken from medium size enemies.
+<desc>ขวานขนาดมหึมาที่ฝังลูกแก้วอาบพลังพายุเฮอร์ริเคน</desc>
+ASPD +(ตีบวก)%
+รับดาเมจจากศัตรูขนาดกลาง -(10 + ตีบวก)%
 
 ::Brave_Battle_Axe //id 1379 - 2HAxe
 STR +3
-+20% DEF ignore vs. Demi-Human
-+55% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +55% ต่อมนุษย์
 
 ::Valorous_Battle_Axe //id 1380 - 2HAxe
 STR +3
-+55% physical damage vs. Demi-Human
+ดาเมจกายภาพ +55% ต่อมนุษย์
 
 ::Glorious_Two-Handed_Axe //id 1382 - 2HAxe
-+25% DEF ignore vs. Demi-Human
-+70% physical damage vs. Demi-Human
+เจาะ DEF 25% กับมนุษย์
+ดาเมจกายภาพ +70% ต่อมนุษย์
 
 ::Javelin //id 1401 - Spear
-<desc>A light spear that can be thrown, its safer to hold on to it though.</desc>
+<desc>หอกเบาที่ขว้างได้ แต่ถือไว้จะปลอดภัยกว่า</desc>
 
 ::Javelin_ //id 1402 - Spear
-<desc>A light spear that can be thrown, its safer to hold on to it though.</desc>
+<desc>หอกเบาที่ขว้างได้ แต่ถือไว้จะปลอดภัยกว่า</desc>
 
 ::Spear //id 1404 - Spear
-<desc>A basic spear that enables slightly longer ranged melee attacks.</desc>
+<desc>หอกพื้นฐาน ตีระยะประชิดได้ไกลขึ้นนิดหน่อย</desc>
 
 ::Spear_ //id 1405 - Spear
-<desc>A basic spear that enables slightly longer ranged melee attacks.</desc>
+<desc>หอกพื้นฐาน ตีระยะประชิดได้ไกลขึ้นนิดหน่อย</desc>
 
 ::Pike //id 1407 - Spear
-<desc>A long spear issued to foot soldiers.</desc>
+<desc>หอกยาวที่แจกให้ทหารราบ</desc>
 
 ::Pike_ //id 1408 - Spear
-<desc>A long spear issued to foot soldiers.</desc>
+<desc>หอกยาวที่แจกให้ทหารราบ</desc>
 
 ::Lance //id 1410 - 2HSpear
-<desc>A spear commonly used by mounted knights.</desc>
+<desc>หอกที่อัศวินขี่ม้าใช้กันทั่วไป</desc>
 
 ::Lance_ //id 1411 - 2HSpear
-<desc>A spear commonly used by mounted knights.</desc>
+<desc>หอกที่อัศวินขี่ม้าใช้กันทั่วไป</desc>
 
 ::Gungnir //id 1413 - Spear
-<desc>A legendary spear known for its accuracy.</desc>
+<desc>หอกในตำนานที่ขึ้นชื่อเรื่องความแม่นยำ</desc>
 HIT +30, Perfect Hit +25
 
 ::Gelerdria //id 1414 - Spear
-<desc>A unique spear from a desert land.</desc>
+<desc>หอกชิ้นพิเศษจากดินแดนทะเลทราย</desc>
 HP +800, SP -50
 
 ::Brocca //id 1415 - Spear
-<desc>A spear that pierces through enemy armor.</desc>
-+100% DEF ignore vs. non-Boss
-+25% damage vs. Neutral
+<desc>หอกที่เจาะทะลุเกราะศัตรู</desc>
+เจาะ DEF 100% กับมอนที่ไม่ใช่บอส
+ดาเมจ +25% ต่อไร้ธาตุ
 
 ::Tjungkuletti //id 1416 - Spear
-<desc>A spear that drains the souls of defeated enemies.</desc>
-Recover 1 SP/melee attack
+<desc>หอกที่ดูดวิญญาณศัตรูที่ล้มลง</desc>
+ฟื้น SP 1 ต่อการโจมตีระยะประชิด
 
 ::Pole_Axe //id 1417 - Spear
-<desc>An axe head mounted on a long pole that breaks through thick armored plates.</desc>
+<desc>หัวขวานติดด้ามยาว ทะลวงแผ่นเกราะหนาได้</desc>
 STR +1, INT +2, DEX +1
 
 ::Gungnir_ //id 1418 - Spear
-<desc>A legendary spear known for its accuracy.</desc>
+<desc>หอกในตำนานที่ขึ้นชื่อเรื่องความแม่นยำ</desc>
 HIT +30, Perfect Hit +25
 
 ::Long_Horn //id 1420 - Spear
-<desc>A spear fashioned from a unicorn's horn, enabling it to neutralize poisons and inflict deep wounds.</desc>
-Enable <color=#0000FF>Detoxify</color>
-+5% chance of <color=#800000>Bleed</color> on melee attack
+<desc>หอกที่ทำจากเขายูนิคอร์น ล้างพิษได้และสร้างบาดแผลลึก</desc>
+ใช้ <color=#0000FF>Detoxify</color> ได้
+โอกาส 5% ทำให้ <color=#800000>เลือดออก</color> เมื่อโจมตีระยะประชิด
 
 ::Battle_Hook //id 1421 - Spear
-<desc>A spear tipped with a hook that can push and pull enemies.</desc>
-+20% physical damage vs. Demi-Human
-+5% chance of <color=#800000>Stun</color> on melee attack
+<desc>หอกปลายตะขอที่ผลักและดึงศัตรูได้</desc>
+ดาเมจกายภาพ +20% ต่อมนุษย์
+โอกาส 5% ทำให้ <color=#800000>สตัน</color> เมื่อโจมตีระยะประชิด
 
 ::Hunting_Spear //id 1422 - Spear
-<desc>A spear with a leaf shaped point that inflicts damage with its heavy weight.</desc>
-+100% DEF ignore vs. Brute
+<desc>หอกปลายรูปใบไม้ที่สร้างดาเมจด้วยน้ำหนักอันมหาศาล</desc>
+เจาะ DEF 100% กับสัตว์
 
 ::Assaulter_Spear //id 1425 - Spear
 STR +2
-+20% DEF ignore vs. Demi-Human
-+95% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +95% ต่อมนุษย์
 
 ::Glorious_Spear //id 1426 - Spear
-+20% DEF ignore vs. Demi-Human
-+95% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +95% ต่อมนุษย์
 
 ::Guisarme //id 1451 - 2HSpear
-<desc>A spear with a curved blade and puncturing spike that excels in mounted combat.</desc>
+<desc>หอกใบมีดโค้งพร้อมเงี่ยงแทง เก่งเรื่องการรบบนหลังม้า</desc>
 
 ::Guisarme_ //id 1452 - 2HSpear
-<desc>A spear with a curved blade and puncturing spike that excels in mounted combat.</desc>
+<desc>หอกใบมีดโค้งพร้อมเงี่ยงแทง เก่งเรื่องการรบบนหลังม้า</desc>
 
 ::Glaive //id 1454 - 2HSpear
-<desc>A spear with a huge sword-like spearhead.</desc>
+<desc>หอกที่ปลายเป็นใบมีดใหญ่เหมือนดาบ</desc>
 
 ::Glaive_ //id 1455 - 2HSpear
-<desc>A spear with a huge sword-like spearhead.</desc>
+<desc>หอกที่ปลายเป็นใบมีดใหญ่เหมือนดาบ</desc>
 
 ::Partizan //id 1457 - 2HSpear
-<desc>A spear topped with a double edged blade.</desc>
+<desc>หอกที่ปลายเป็นใบมีดสองคม</desc>
 
 ::Partizan_ //id 1458 - 2HSpear
-<desc>A spear topped with a double edged blade.</desc>
+<desc>หอกที่ปลายเป็นใบมีดสองคม</desc>
 
 ::Trident //id 1460 - 2HSpear
-<desc>A triple pronged spear that can also be used for fishing.</desc>
+<desc>หอกสามง่ามที่ใช้แทงปลาได้ด้วย</desc>
 
 ::Trident_ //id 1461 - 2HSpear
-<desc>A triple pronged spear that can also be used for fishing.</desc>
+<desc>หอกสามง่ามที่ใช้แทงปลาได้ด้วย</desc>
 
 ::Halberd //id 1463 - 2HSpear
-<desc>A spear with a steel spike and axe-blade which enables both piercing and hacking.</desc>
+<desc>หอกที่มีทั้งเงี่ยงเหล็กและใบขวาน แทงก็ได้ ฟันก็ได้</desc>
 
 ::Halberd_ //id 1464 - 2HSpear
-<desc>A spear with a steel spike and axe-blade which enables both piercing and hacking.</desc>
+<desc>หอกที่มีทั้งเงี่ยงเหล็กและใบขวาน แทงก็ได้ ฟันก็ได้</desc>
 
 ::Crescent_Scythe //id 1466 - 2HSpear
-<desc>A heavy scythe carried by the Grim Reaper.</desc>
+<desc>เคียวหนักที่ยมทูตถือ</desc>
 HIT +10, CRIT +30
 
 ::Bill_Guisarme //id 1467 - 2HSpear
-<desc>A spear with a hooked blade that has proven its versatility in battle.</desc>
-+10% physical damage vs. Brute
-+5% physical damage vs. Demi-Human
+<desc>หอกใบมีดตะขอที่พิสูจน์แล้วว่าใช้ได้สารพัดในสนามรบ</desc>
+ดาเมจกายภาพ +10% ต่อสัตว์
+ดาเมจกายภาพ +5% ต่อมนุษย์
 
 ::Zephyrus //id 1468 - 2HSpear
-<desc>A decorative spear imbued with wind.</desc>
-+10% Autospell <color=#0000FF>Thunderstorm 3</color> on non-skill attack
-+2% chance of <color=#800000>Silence</color> on physical attack
+<desc>หอกประดับที่อาบด้วยธาตุลม</desc>
+โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Thunderstorm 3</color> เมื่อโจมตีปกติ
+โอกาส 2% ทำให้ <color=#800000>ใบ้</color> เมื่อโจมตีกายภาพ
 
 ::Longinus'_Spear //id 1469 - 2HSpear
-<desc>A legendary spear owned by the tragic soldier, Longinus.</desc>
-+10% physical damage vs. Demi-Human, Angel
+<desc>หอกในตำนานของ Longinus ทหารผู้มีชะตากรรมน่าเศร้า</desc>
+ดาเมจกายภาพ +10% ต่อมนุษย์, เทวดา
 
 ::Brionac //id 1470 - 2HSpear
-<desc>A spear that radiates with the warm, glowing light of pure holiness.</desc>
-Enable <color=#0000FF>Heal 5</color>
-+10% Autospell <color=#0000FF>Soul Strike 3</color> on non-skill attack
+<desc>หอกที่เปล่งแสงอบอุ่นแห่งความศักดิ์สิทธิ์บริสุทธิ์</desc>
+ใช้ <color=#0000FF>Heal 5</color> ได้
+โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Soul Strike 3</color> เมื่อโจมตีปกติ
 
 ::Hellfire //id 1471 - 2HSpear
-<desc>A spear enchanted with the power to summon flame.</desc>
+<desc>หอกที่ร่ายพลังเรียกเปลวเพลิงไว้</desc>
 STR +3
-+10% Autospell <color=#0000FF>Fireball 5</color> on non-skill attack
+โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Fireball 5</color> เมื่อโจมตีปกติ
 
 ::Soul_Staff //id 1472 - Rod
-<desc>A high quality staff that amplifies psychic power.</desc>
+<desc>ไม้เท้าคุณภาพสูงที่ขยายพลังจิต</desc>
 AGI +2, INT +5
 MATK +20%
 
 ::Wizardry_Staff //id 1473 - Rod
-<desc>An awesome staff crafted by an ancient wizard.</desc>
+<desc>ไม้เท้าสุดยอดที่จอมเวทโบราณสร้างขึ้น</desc>
 INT +6, DEX +2
 MATK +20%
 
 ::Gae_Bolg //id 1474 - 2HSpear
-<desc>A spear, created from the body of a dead, giant sea creature.</desc>
-+100% DEF ignore vs. Dragon
-+10% physical damage vs. Boss
+<desc>หอกที่สร้างจากซากสัตว์ทะเลยักษ์</desc>
+เจาะ DEF 100% กับมังกร
+ดาเมจกายภาพ +10% ต่อบอส
 
 ::Crescent_Scythe_ //id 1476 - 2HSpear
-<desc>A heavy scythe carried by the Grim Reaper.</desc>
+<desc>เคียวหนักที่ยมทูตถือ</desc>
 HIT +10, CRIT +30
 
 ::Spectral_Spear //id 1477 - 2HSpear
-<desc>The creator of this formidable spear sacrificed his own life to forge it, resulting in a curse that will try to dominate the wearer's soul.</desc>
-+20% physical damage vs. Demon, Shadow, Decay
--10% damage from Demon
--10% damage from Decay, Shadow attacks
+<desc>ผู้สร้างหอกอันน่าเกรงขามนี้สละชีวิตตัวเองเพื่อตีมันขึ้นมา เกิดเป็นคำสาปที่จะพยายามครอบงำวิญญาณผู้ถือ</desc>
+ดาเมจกายภาพ +20% ต่อปีศาจ, ธาตุมืด, ธาตุเน่าเปื่อย
+รับดาเมจจากปีศาจ -10%
+รับดาเมจธาตุเน่าเปื่อย, ธาตุมืด -10%
 
 ::Ahlspiess //id 1478 - 2HSpear
-<desc>An auger-shaped spear designed for striking enemy weak points.</desc>
-+100% DEF ignore
-+10% physical damage vs. Demi-Human
+<desc>หอกทรงสว่านที่ออกแบบมาแทงจุดอ่อนศัตรู</desc>
+เจาะ DEF 100%
+ดาเมจกายภาพ +10% ต่อมนุษย์
 
 ::Spectral_Spear_ //id 1479 - 2HSpear
-<desc>The creator of this formidable spear sacrificed his own life to forge it, resulting in a curse that will try to dominate the wearer's soul.</desc>
-+20% physical damage vs. Demon, Shadow, Decay
--10% damage from Demon
--10% damage from Decay, Shadow attacks
+<desc>ผู้สร้างหอกอันน่าเกรงขามนี้สละชีวิตตัวเองเพื่อตีมันขึ้นมา เกิดเป็นคำสาปที่จะพยายามครอบงำวิญญาณผู้ถือ</desc>
+ดาเมจกายภาพ +20% ต่อปีศาจ, ธาตุมืด, ธาตุเน่าเปื่อย
+รับดาเมจจากปีศาจ -10%
+รับดาเมจธาตุเน่าเปื่อย, ธาตุมืด -10%
 
 ::Gae_Bolg_ //id 1480 - 2HSpear
-<desc>A spear, created from the body of a dead, giant sea creature.</desc>
-+100% DEF ignore vs. Dragon
-+10% physical damage vs. Boss
+<desc>หอกที่สร้างจากซากสัตว์ทะเลยักษ์</desc>
+เจาะ DEF 100% กับมังกร
+ดาเมจกายภาพ +10% ต่อบอส
 
 ::Zephyrus_ //id 1481 - 2HSpear
-<desc>A decorative spear imbued with wind.</desc>
-+10% Autospell <color=#0000FF>Thunderstorm 3</color> on non-skill attack
-+2% chance of <color=#800000>Silence</color> on physical attack
+<desc>หอกประดับที่อาบด้วยธาตุลม</desc>
+โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Thunderstorm 3</color> เมื่อโจมตีปกติ
+โอกาส 2% ทำให้ <color=#800000>ใบ้</color> เมื่อโจมตีกายภาพ
 
 ::Assaulter_Lance //id 1482 - 2HSpear
 STR +2
-+100% DEF ignore vs. Demi-Human
-+25% physical damage vs. Demi-Human
+เจาะ DEF 100% กับมนุษย์
+ดาเมจกายภาพ +25% ต่อมนุษย์
 
 ::Ivory_Lance //id 1483 - 2HSpear
-<desc>A two handed spear crafted from fine ivory.</desc>
+<desc>หอกสองมือที่ทำจากงาช้างชั้นดี</desc>
 AGI +2, ASPD +3%
 
 ::Cardo //id 1484 - 2HSpear
-<desc>A massive spear that could be mistaken for a temple pillar.</desc>
+<desc>หอกขนาดมหึมาที่คนอาจนึกว่าเป็นเสาวิหาร</desc>
 
 ::Battle_Fork //id 1485 - 2HSpear
-<desc>A three-pronged fork that doubles as a spear, it is lightweight despite its size.</desc>
+<desc>สามง่ามที่ใช้เป็นหอกได้ด้วย ตัวใหญ่แต่เบา</desc>
 
 ::Glorious_Lance //id 1486 - 2HSpear
-+25% DEF ignore vs. Demi-Human
-+70% physical damage vs. Demi-Human
+เจาะ DEF 25% กับมนุษย์
+ดาเมจกายภาพ +70% ต่อมนุษย์
 
 ::Club //id 1501 - Mace
-<desc>A heavy bludgeon that makes a handy weapon in a pinch.</desc>
+<desc>ไม้กระบองหนักๆ ยามคับขันเอามาเป็นอาวุธได้</desc>
 
 ::Club_ //id 1502 - Mace
-<desc>A heavy bludgeon that makes a handy weapon in a pinch.</desc>
+<desc>ไม้กระบองหนักๆ ยามคับขันเอามาเป็นอาวุธได้</desc>
 
 ::Mace //id 1504 - Mace
-<desc>A flanged, solid club that is effective for simple smashing.</desc>
+<desc>กระบองตันมีสัน ทุบอย่างเดียวก็เอาอยู่</desc>
 
 ::Mace_ //id 1505 - Mace
-<desc>A flanged, solid club that is effective for simple smashing.</desc>
+<desc>กระบองตันมีสัน ทุบอย่างเดียวก็เอาอยู่</desc>
 
 ::Smasher //id 1507 - Mace
-<desc>A basic, big hammer with spikes, it's excellent for breaking all sorts of things.</desc>
+<desc>ค้อนใหญ่มีหนามแหลม ทุบอะไรก็แตก</desc>
 
 ::Smasher_ //id 1508 - Mace
-<desc>A basic, big hammer with spikes, it's excellent for breaking all sorts of things.</desc>
+<desc>ค้อนใหญ่มีหนามแหลม ทุบอะไรก็แตก</desc>
 
 ::Flail //id 1510 - Mace
-<desc>An itimidating spiked metal ball that swings freely from a chain.</desc>
+<desc>ลูกตุ้มโลหะหนามแหลมน่าเกรงขาม ห้อยแกว่งอยู่กับโซ่</desc>
 
 ::Flail_ //id 1511 - Mace
-<desc>An itimidating spiked metal ball that swings freely from a chain.</desc>
+<desc>ลูกตุ้มโลหะหนามแหลมน่าเกรงขาม ห้อยแกว่งอยู่กับโซ่</desc>
 
 ::Morning_Star //id 1513 - Mace
-<desc>A metal club topped with a solid steel ball that's covered in spikes.</desc>
+<desc>กระบองโลหะที่หัวเป็นลูกเหล็กตันปกคลุมด้วยหนามแหลม</desc>
 
 ::Morning_Star_ //id 1514 - Mace
-<desc>A metal club topped with a solid steel ball that's covered in spikes.</desc>
+<desc>กระบองโลหะที่หัวเป็นลูกเหล็กตันปกคลุมด้วยหนามแหลม</desc>
 
 ::Sword_Mace //id 1516 - Mace
-<desc>A specialty weapon that beautifully combines combines the power of swords and maces.</desc>
+<desc>อาวุธเฉพาะทางที่ผสานพลังของดาบกับกระบองไว้อย่างลงตัว</desc>
 
 ::Sword_Mace_ //id 1517 - Mace
-<desc>A specialty weapon that beautifully combines combines the power of swords and maces.</desc>
+<desc>อาวุธเฉพาะทางที่ผสานพลังของดาบกับกระบองไว้อย่างลงตัว</desc>
 
 ::Chain //id 1519 - Mace
-<desc>A simple flail that consists of a thin mace attached to a chain of iron links.</desc>
+<desc>กระบองโซ่แบบง่าย กระบองเรียวต่อกับโซ่เหล็ก</desc>
 
 ::Chain_ //id 1520 - Mace
-<desc>A simple flail that consists of a thin mace attached to a chain of iron links.</desc>
+<desc>กระบองโซ่แบบง่าย กระบองเรียวต่อกับโซ่เหล็ก</desc>
 
 ::Stunner //id 1522 - Mace
-<desc>A huge, unwieldy club that can knock enemies unconscious.</desc>
-+10% chance of <color=#800000>Stun</color> on physical attack
+<desc>กระบองยักษ์เทอะทะ ฟาดทีเดียวศัตรูสลบ</desc>
+โอกาส 10% ทำให้ <color=#800000>สตัน</color> เมื่อโจมตีกายภาพ
 
 ::Spike //id 1523 - Mace
-<desc>A flail, entirely covered in spikes, that swing wildly and haphazardly.</desc>
+<desc>กระบองโซ่ที่เต็มไปด้วยหนามแหลม เหวี่ยงมั่วไปหมด</desc>
 DEF -66%, CRIT +40
 
 ::Golden_Mace //id 1524 - Mace
-<desc>A mace forged out of pure gold.</desc>
-+20% physical damage vs. Undead
+<desc>กระบองที่หลอมจากทองคำบริสุทธิ์</desc>
+ดาเมจกายภาพ +20% ต่ออันเดด
 
 ::Long_Mace //id 1525 - Mace
-<desc>A long, thin mace built like a spear.</desc>
--10% damage from range attacks
+<desc>กระบองยาวเรียว รูปทรงเหมือนหอก</desc>
+รับดาเมจระยะไกล -10%
 
 ::Slash //id 1526 - Mace
-<desc>A hefty mace with curved, sharp blades.</desc>
-+15% physical damage vs. Undead
-+5% EXP from Undead
-+0.1% chance of dealing lethal damage to Undead on attack
+<desc>กระบองหนักที่มีใบมีดโค้งคม</desc>
+ดาเมจกายภาพ +15% ต่ออันเดด
+EXP จากอันเดด +5%
+โอกาส 0.1% ออกดาเมจสังหารต่ออันเดด
 
 ::Quadrille //id 1527 - Mace
-<desc>A heavy and powerful iron mace with a rounded top.</desc>
-+10% physical damage vs. Demi-Human, Earth, Undead
-Indestructible
+<desc>กระบองเหล็กหนักและทรงพลัง หัวกลม</desc>
+ดาเมจกายภาพ +10% ต่อมนุษย์, ธาตุดิน, อันเดด
+ไม่แตก
 
 ::Grand_Cross //id 1528 - Mace
-<desc>A cruciform mace that was blessed by the pope of the Rune Midgard kingdom.</desc>
-Recover 1 SP/melee attack vs. Undead
+<desc>กระบองรูปกางเขนที่สันตะปาปาแห่งอาณาจักร Rune Midgard ประทานพรไว้</desc>
+ฟื้น SP 1 ต่อการโจมตีระยะประชิดใส่อันเดด
 
 ::Iron_Driver //id 1529 - Mace
-<desc>A heavy, round headed club intended for athletic competitions.</desc>
+<desc>กระบองหัวกลมหนักๆ ทำมาเพื่อการแข่งกีฬา</desc>
 
 ::Mjolnir //id 1530 - Mace
-<desc>A facsimile of the mighty hammer wielded by Thor, god of thunder.</desc>
+<desc>ของจำลองค้อนมหาเทพของ Thor เทพสายฟ้า</desc>
 STR +15, DEX +40, ASPD +10%
 
 ::Wrench //id 1531 - Mace
-<desc>A heavy tool with many practical applications.</desc>
-+1% chance of <color=#800000>Blind</color>, <color=#800000>Freeze</color>, <color=#800000>Poison</color>, <color=#800000>Stun</color> on physical attack
+<desc>เครื่องมือหนักที่ใช้งานได้สารพัด</desc>
+โอกาส 1% ทำให้ <color=#800000>ตาบอด</color>, <color=#800000>แช่แข็ง</color>, <color=#800000>พิษ</color>, <color=#800000>สตัน</color> เมื่อโจมตีกายภาพ
 
 ::Stunner_ //id 1532 - Mace
-<desc>A blow from this hefty mace can cause someone to black out.</desc>
-+10% chance of <color=#800000>Stun</color> on physical attack
+<desc>กระบองหนักหน่วง ฟาดทีเดียวสลบได้</desc>
+โอกาส 10% ทำให้ <color=#800000>สตัน</color> เมื่อโจมตีกายภาพ
 
 ::Spike_ //id 1538 - Mace
-<desc>A flail, entirely covered in spikes, that swing wildly and haphazardly.</desc>
+<desc>กระบองโซ่ที่เต็มไปด้วยหนามแหลม เหวี่ยงมั่วไปหมด</desc>
 DEF -66%, CRIT +40
 
 ::Golden_Mace_ //id 1539 - Mace
-<desc>A mace forged out of pure gold.</desc>
-+20% physical damage vs. Undead
+<desc>กระบองที่หลอมจากทองคำบริสุทธิ์</desc>
+ดาเมจกายภาพ +20% ต่ออันเดด
 
 ::Grand_Cross_ //id 1540 - Mace
-<desc>A cruciform mace that was blessed by the pope of the Rune Midgard kingdom.</desc>
-Recover 1 SP/melee attack vs. Undead
+<desc>กระบองรูปกางเขนที่สันตะปาปาแห่งอาณาจักร Rune Midgard ประทานพรไว้</desc>
+ฟื้น SP 1 ต่อการโจมตีระยะประชิดใส่อันเดด
 
 ::Nemesis //id 1541 - Mace
-<desc>A large silver mace made for exorcisms.</desc>
-+10% physical damage vs. Demon, Shadow
+<desc>กระบองเงินขนาดใหญ่ ทำมาเพื่อไล่ผี</desc>
+ดาเมจกายภาพ +10% ต่อปีศาจ, ธาตุมืด
 
 ::Brave_Morning_Star //id 1542 - Mace
 STR +1, DEX +1
-+20% DEF ignore vs. Demi-Human
-+75% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +75% ต่อมนุษย์
 
 ::Valorous_Morning_Star //id 1543 - Mace
 STR +1, DEX +1
-+75% physical damage vs. Demi-Human
+ดาเมจกายภาพ +75% ต่อมนุษย์
 
 ::Lunakaligo //id 1544 - Mace
-<desc>An old, large black frying pan.</desc>
+<desc>กระทะดำใบใหญ่เก่าๆ</desc>
 
 ::Glorious_Morning_Star //id 1546 - Mace
-+20% DEF ignore vs. Demi-Human
-+75% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +75% ต่อมนุษย์
 
 ::Book //id 1550 - Book
-<desc>A book that's sturdy enough to be wielded as a weapon in an emergency.</desc>
+<desc>หนังสือที่หนาแน่นพอจะใช้เป็นอาวุธยามฉุกเฉินได้</desc>
 
 ::Bible //id 1551 - Book
-<desc>A book containing a compilation of ancient and sacred writings.</desc>
+<desc>หนังสือที่รวบรวมบันทึกโบราณอันศักดิ์สิทธิ์</desc>
 INT +2
 
 ::Tablet //id 1552 - Book
-<desc>A tablet on which the words of the ancients have been engraved and immortalized.</desc>
+<desc>แผ่นจารึกที่สลักถ้อยคำของคนโบราณไว้ให้คงอยู่ชั่วนิรันดร์</desc>
 
 ::Book_of_Billows //id 1553 - Book
-<desc>A hefty hard cover book enchanted with water.</desc>
+<desc>หนังสือปกแข็งเล่มหนาที่ร่ายธาตุน้ำไว้</desc>
 
 ::Book_of_Mother_Earth //id 1554 - Book
-<desc>A hefty hard cover book enchanted with earth.</desc>
+<desc>หนังสือปกแข็งเล่มหนาที่ร่ายธาตุดินไว้</desc>
 
 ::Book_of_Blazing_Sun //id 1555 - Book
-<desc>A hefty hard cover book enchanted with fire.</desc>
+<desc>หนังสือปกแข็งเล่มหนาที่ร่ายธาตุไฟไว้</desc>
 
 ::Book_of_Gust_of_Wind //id 1556 - Book
-<desc>A hefty hard cover book enchanted with wind.</desc>
+<desc>หนังสือปกแข็งเล่มหนาที่ร่ายธาตุลมไว้</desc>
 
 ::Book_of_the_Apocalypse //id 1557 - Book
-<desc>A book that details prophesies concerning the end of the world.</desc>
-+7% physical damage vs. Water, Earth, Fire, Wind
-+5% physical damage vs. Holy
+<desc>หนังสือที่บันทึกคำทำนายเรื่องวันสิ้นโลก</desc>
+ดาเมจกายภาพ +7% ต่อธาตุน้ำ, ธาตุดิน, ธาตุไฟ, ธาตุลม
+ดาเมจกายภาพ +5% ต่อธาตุศักดิ์สิทธิ์
 
 ::Girl's_Diary //id 1558 - Book
-<desc>A cute diary which details a young girl's closest secrets, you can't bear the thought of reading it.</desc>
+<desc>ไดอารีน่ารักที่บันทึกความลับสุดหัวใจของเด็กสาว อ่านไม่ลงจริงๆ</desc>
 
 ::Legacy_of_Dragon //id 1559 - Book
-<desc>A book which details the origin and history of dragons.</desc>
+<desc>หนังสือว่าด้วยกำเนิดและประวัติศาสตร์ของมังกร</desc>
 INT +3
-+100% DEF ignore vs. Dragon
-Recover 10 SP/melee kill vs. Dragon
+เจาะ DEF 100% กับมังกร
+ฟื้น SP 10 เมื่อฆ่ามังกร ด้วยระยะประชิด
 
 ::Sage's_Diary //id 1560 - Book
-<desc>The diary of a great sage, published without his knowledge.</desc>
+<desc>ไดอารีของปราชญ์ผู้ยิ่งใหญ่ ที่ถูกตีพิมพ์โดยเจ้าตัวไม่รู้เรื่อง</desc>
 MATK +15%
 
 ::Hardcover_Book //id 1561 - Book
-<desc>A thick and heavy hardcover book that could really do some harm if swung around.</desc>
+<desc>หนังสือปกแข็งหนาและหนัก เหวี่ยงใส่ใครก็เจ็บจริง</desc>
 STR +3, DEX +2
 
 ::Encyclopedia //id 1564 - Book
-<desc>An encyclopedia crafted by a Prontera publisher famous for its craftsmanship.</desc>
+<desc>สารานุกรมที่สำนักพิมพ์ Prontera ผู้ขึ้นชื่อเรื่องงานฝีมือจัดทำ</desc>
 INT +3, DEX +2
 MATK +15%
 
 ::Ledger_of_Death //id 1565 - Book
-<desc>A book used by demons to kill humans by inscribing their names. The last name, "Hollg--" looks like it wasn't completed.</desc>
+<desc>หนังสือที่ปีศาจใช้ฆ่ามนุษย์ด้วยการเขียนชื่อลงไป ชื่อสุดท้าย "Hollg--" ดูเหมือนเขียนไม่จบ</desc>
 STR +3, INT +3, LUK -20
 
 ::Book_of_Billows_ //id 1568 - Book
-<desc>A hefty hard cover book enchanted with water.</desc>
+<desc>หนังสือปกแข็งเล่มหนาที่ร่ายธาตุน้ำไว้</desc>
 
 ::Book_of_Mother_Earth_ //id 1569 - Book
-<desc>A hefty hard cover book enchanted with earth.</desc>
+<desc>หนังสือปกแข็งเล่มหนาที่ร่ายธาตุดินไว้</desc>
 
 ::Book_of_Blazing_Sun_ //id 1570 - Book
-<desc>A hefty hard cover book enchanted with fire.</desc>
+<desc>หนังสือปกแข็งเล่มหนาที่ร่ายธาตุไฟไว้</desc>
 
 ::Book_of_Gust_of_Wind_ //id 1571 - Book
-<desc>A hefty hard cover book enchanted wind.</desc>
+<desc>หนังสือปกแข็งเล่มหนาที่ร่ายธาตุลมไว้</desc>
 
 ::Principles_of_Magic //id 1572 - Book
-<desc>A book that helps students build a strong foundation in magic.</desc>
+<desc>หนังสือที่ช่วยปูพื้นฐานเวทมนตร์ให้แน่น</desc>
 INT +3, MATK +20%
-SP Regeneration +5%
+ฟื้นฟู SP +5%
 
 ::Ancient_Magic //id 1573 - Book
-<desc>A book with the impressive phrase, "There is no royal road to learning" on its cover.</desc>
+<desc>หนังสือที่หน้าปกเขียนไว้เท่ๆ ว่า "การเรียนรู้ไม่มีทางลัด"</desc>
 INT +4, MATK +15%
 
 ::Brave_Book //id 1574 - Book
 STR +2, INT +1, MATK +15%
-+20% DEF ignore vs. Demi-Human
-+75% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +75% ต่อมนุษย์
 
 ::Valorous_Book //id 1575 - Book
 STR +1, INT +2, MATK +15%
-+25% DEF ignore vs. Demi-Human
-+75% physical damage vs. Demi-Human
+เจาะ DEF 25% กับมนุษย์
+ดาเมจกายภาพ +75% ต่อมนุษย์
 
 ::Glorious_Tablet //id 1576 - Book
 MATK +15%
-+25% DEF ignore vs. Demi-Human
-+80% physical damage vs. Demi-Human
+เจาะ DEF 25% กับมนุษย์
+ดาเมจกายภาพ +80% ต่อมนุษย์
 
 ::Glorious_Book //id 1577 - Book
 MATK +15%
-+25% DEF ignore vs. Demi-Human
-+80% physical damage vs. Demi-Human
+เจาะ DEF 25% กับมนุษย์
+ดาเมจกายภาพ +80% ต่อมนุษย์
 
 ::Angra_Manyu //id 1599 - Mace
-<desc>The Real Holy Cross</desc>
+<desc>ไม้กางเขนศักดิ์สิทธิ์ของแท้</desc>
 ATK + 3000, MATK + 3000
-All Stats + 50
+ทุกสเตตัส +50
 
 ::Gamemaster's_Bow //id 1744 - Bow
-<desc>It fucking slaps</desc>
+<desc>โคตรเด็ด</desc>
 ATK + 2000, MATK + 2000
-All Stats + 80
+ทุกสเตตัส +80
 
 ::Rod //id 1601 - Rod
-<desc>A simple magic wand.</desc>
+<desc>ไม้กายสิทธิ์แบบธรรมดา</desc>
 MATK +15%
 
 ::Rod_ //id 1602 - Rod
-<desc>A simple magic wand.</desc>
+<desc>ไม้กายสิทธิ์แบบธรรมดา</desc>
 MATK +15%
 
 ::Wand //id 1604 - Rod
-<desc>A rough-hewn wand that's great for spell casting.</desc>
+<desc>ไม้กายสิทธิ์เหลาหยาบๆ แต่ร่ายเวทได้ดีเยี่ยม</desc>
 INT +1, MATK +15%
 
 ::Wand_ //id 1605 - Rod
-<desc>A rough-hewn wand that's great for spell casting.</desc>
+<desc>ไม้กายสิทธิ์เหลาหยาบๆ แต่ร่ายเวทได้ดีเยี่ยม</desc>
 INT +1, MATK +15%
 
 ::Staff //id 1607 - Rod
-<desc>A wooden staff adorned with an enchanted jewel.</desc>
+<desc>ไม้เท้าไม้ที่ประดับอัญมณีต้องมนตร์</desc>
 INT +2, MATK +15%
 
 ::Staff_ //id 1608 - Rod
-<desc>A wooden staff adorned with an enchanted jewel.</desc>
+<desc>ไม้เท้าไม้ที่ประดับอัญมณีต้องมนตร์</desc>
 INT +2, MATK +15%
 
 ::Arc_Wand //id 1610 - Rod
-<desc>An ornate, elegantly crafted wand.</desc>
+<desc>ไม้กายสิทธิ์ลวดลายวิจิตร ทำมาอย่างสง่างาม</desc>
 INT +3, MATK +15%
 
 ::Arc_Wand_ //id 1611 - Rod
-<desc>An ornate, elegantly crafted wand.</desc>
+<desc>ไม้กายสิทธิ์ลวดลายวิจิตร ทำมาอย่างสง่างาม</desc>
 INT +3, MATK +15%
 
 ::Mighty_Staff //id 1613 - Rod
-<desc>A rare staff that converts psychic energy into brute strength.</desc>
+<desc>ไม้เท้าหายากที่แปลงพลังจิตเป็นพละกำลังดิบ</desc>
 STR +10, MATK +15%
 
 ::Wand_of_Occult //id 1614 - Rod
-<desc>A shamanic wand topped with a goat's skull.</desc>
+<desc>ไม้กายสิทธิ์ของหมอผี ปลายเป็นกะโหลกแพะ</desc>
 INT +3, MATK +15%
 
 ::Evil_Bone_Wand //id 1615 - Rod
-<desc>A wand of human bone, its dark aura can be sensed by those who wield it.</desc>
+<desc>ไม้กายสิทธิ์จากกระดูกมนุษย์ ผู้ถือสัมผัสได้ถึงออร่ามืดของมัน</desc>
 INT +4, MATK +15%
 
 ::Wing_Staff //id 1616 - Rod
-<desc>A staff containing a wind fairy that grants the essence of speed.</desc>
+<desc>ไม้เท้าที่มีภูตลมอยู่ข้างใน มอบแก่นแท้ของความเร็ว</desc>
 MATK +15%
-Cast Time -5%
+เวลาร่าย -5%
 
 ::Survivor's_Rod //id 1617 - Rod
-<desc>One of two staves developed through the united efforts of the Mage Guild and Prontera Church.</desc>
+<desc>หนึ่งในไม้เท้าสองอันที่สมาคม Mage ร่วมกับโบสถ์ Prontera พัฒนาขึ้น</desc>
 HP +300, DEX +2, MATK +15%
 
 ::Survivor's_Rod_ //id 1618 - Rod
-<desc>One of two staves developed through the united efforts of the Mage Guild and Prontera Church.</desc>
+<desc>หนึ่งในไม้เท้าสองอันที่สมาคม Mage ร่วมกับโบสถ์ Prontera พัฒนาขึ้น</desc>
 HP +400, DEX +3, MATK +15%
 
 ::Survivor's_Rod__ //id 1619 - Rod
-<desc>One of two staves developed through the united efforts of the Mage Guild and Prontera Church.</desc>
+<desc>หนึ่งในไม้เท้าสองอันที่สมาคม Mage ร่วมกับโบสถ์ Prontera พัฒนาขึ้น</desc>
 HP +300, INT +2, MATK +15%
 
 ::Survivor's_Rod___ //id 1620 - Rod
-<desc>One of two staves developed through the united efforts of the Mage Guild and Prontera Church.</desc>
+<desc>หนึ่งในไม้เท้าสองอันที่สมาคม Mage ร่วมกับโบสถ์ Prontera พัฒนาขึ้น</desc>
 HP +400, INT +3, MATK +15%
 
 ::Hypnotist's_Staff //id 1621 - Rod
-<desc>A staff with a hypnotizing effect that can make a Novice feel just like a High Wizard, sort of.</desc>
+<desc>ไม้เท้าที่มีผลสะกดจิต ทำให้ Novice รู้สึกเหมือนเป็น High Wizard ประมาณนั้น</desc>
 INT +1, MATK +25%
 
 ::Hypnotist's_Staff_ //id 1622 - Rod
-<desc>A staff with a hypnotizing effect that can make a Novice feel just like a High Wizard, sort of.</desc>
+<desc>ไม้เท้าที่มีผลสะกดจิต ทำให้ Novice รู้สึกเหมือนเป็น High Wizard ประมาณนั้น</desc>
 INT +1, MATK +25%
 
 ::Lich's_Bone_Wand //id 1624 - Rod
-<desc>A wand crafted from a lich's skull that threatens to curse anyone that harms its owner.</desc>
+<desc>ไม้กายสิทธิ์ที่ทำจากกะโหลกลิช พร้อมสาปใครก็ตามที่ทำร้ายเจ้าของ</desc>
 SP +300, INT +1, DEX +1
 MATK +20%
 
 ::Healing_Staff //id 1625 - Rod
-<desc>A staff made from the Yggdrasil Tree branches with the engraving "Health and Longevity".</desc>
+<desc>ไม้เท้าที่ทำจากกิ่ง Yggdrasil สลักว่า "Health and Longevity"</desc>
 MATK +15%
 
 ::Piercing_Staff //id 1626 - Rod
-<desc>A staff inset with a gem that disrupts magical protection.</desc>
+<desc>ไม้เท้าที่ฝังอัญมณีซึ่งรบกวนเกราะเวท</desc>
 INT +4, MATK +15%
 
 ::Gentleman_Staff //id 1629 - Rod
-<desc>A staff owned by a gentleman somewhere long ago.</desc>
+<desc>ไม้เท้าของสุภาพบุรุษคนหนึ่งเมื่อนานมาแล้ว</desc>
 DEX +1, MATK+15%
 
 ::Release_of_Wish //id 1630 - Rod
-<desc>A crystal staff that shines beautifully in sunlight.</desc>
+<desc>ไม้เท้าคริสตัลที่ต้องแดดแล้วเปล่งประกายงดงาม</desc>
 INT +3, MATK +15%
 
 ::Holy_Stick //id 1631 - Rod
-<desc>A holy stick modified for exorcisms.</desc>
+<desc>ไม้ศักดิ์สิทธิ์ที่ดัดแปลงมาเพื่อไล่ผี</desc>
 MATK +15%
 
 ::Brave_Arc_Wand //id 1632 - Rod
@@ -1179,367 +1179,367 @@ MATK +15%
 INT +3, DEX +2, MATK +15%
 
 ::Thorn_Staff_of_Darkness //id 1636 - Rod
-<desc>A dark staff that is covered with thorns.</desc>
+<desc>ไม้เท้าสีดำที่ปกคลุมด้วยหนาม</desc>
 INT +3, DEX +3, MATK +20%
 
 ::Eraser //id 1637 - Rod
-<desc>A staff that disrupts the cognitive ability of foes.</desc>
+<desc>ไม้เท้าที่รบกวนการรับรู้ของศัตรู</desc>
 INT +3, DEX +2, MATK +20%
 
 ::Novice_Rod //id 1639 - Rod
-<desc>A training rod, it's a bit weak, but its usefulness to weight ratio can't be beat.</desc>
+<desc>ไม้เท้าฝึกหัด อ่อนไปหน่อย แต่คุ้มค่าเมื่อเทียบกับน้ำหนักสุดๆ</desc>
 MATK + 8
 
 ::Glorious_Arc_Wand //id 1640 - Rod
 MATK +15%
-+25% MDEF ignore vs. Demi-Human
-+15% magical damage vs. Demi-Human
+เจาะ MDEF 25% กับมนุษย์
+ดาเมจเวท +15% ต่อมนุษย์
 
 ::Glorious_Recovery_Wand //id 1641 - Rod
 MATK +15%
 
 ::Bow //id 1701 - Bow
-<desc>A common bow.</desc>
+<desc>ธนูธรรมดา</desc>
 
 ::Bow_ //id 1702 - Bow
-<desc>A common bow.</desc>
+<desc>ธนูธรรมดา</desc>
 
 ::Composite_Bow //id 1704 - Bow
-<desc>An average bow used for small game hunting.</desc>
+<desc>ธนูธรรมดาที่ใช้ล่าสัตว์เล็ก</desc>
 
 ::Composite_Bow_ //id 1705 - Bow
-<desc>An average bow used for small game hunting.</desc>
+<desc>ธนูธรรมดาที่ใช้ล่าสัตว์เล็ก</desc>
 
 ::Great_Bow //id 1707 - Bow
-<desc>A simply constructed bow that offers balanced performance.</desc>
+<desc>ธนูที่ทำมาแบบเรียบง่าย ประสิทธิภาพสมดุล</desc>
 
 ::Great_Bow_ //id 1708 - Bow
-<desc>A simply constructed bow that offers balanced performance.</desc>
+<desc>ธนูที่ทำมาแบบเรียบง่าย ประสิทธิภาพสมดุล</desc>
 
 ::Cross_Bow //id 1710 - Bow
-<desc>A specially bow that uses a mechanical firing mechanism.</desc>
+<desc>ธนูพิเศษที่ใช้กลไกยิงแบบเครื่องกล</desc>
 
 ::Cross_Bow_ //id 1711 - Bow
-<desc>A specially bow that uses a mechanical firing mechanism.</desc>
+<desc>ธนูพิเศษที่ใช้กลไกยิงแบบเครื่องกล</desc>
 
 ::Arbalest_Bow //id 1713 - Bow
-<desc>A powerful siege weapon that is, in essence, a huge crossbow.</desc>
+<desc>อาวุธล้อมเมืองทรงพลัง จริงๆ ก็คือหน้าไม้ยักษ์นั่นแหละ</desc>
 DEX +2
 
 ::Gakkung_Bow //id 1714 - Bow
-<desc>A bow made famous by its use by Goongso, a legendary archer.</desc>
+<desc>ธนูที่โด่งดังเพราะ Goongso นักธนูในตำนานเคยใช้</desc>
 
 ::Arbalest_Bow_ //id 1715 - Bow
-<desc>A powerful siege weapon that is, in essence, a huge crossbow.</desc>
+<desc>อาวุธล้อมเมืองทรงพลัง จริงๆ ก็คือหน้าไม้ยักษ์นั่นแหละ</desc>
 DEX +2
 
 ::Gakkung_Bow_ //id 1716 - Bow
-<desc>A bow made famous by its use by Goongso, a legendary archer.</desc>
+<desc>ธนูที่โด่งดังเพราะ Goongso นักธนูในตำนานเคยใช้</desc>
 
 ::Hunter_Bow //id 1718 - Bow
-<desc>A mighty bow that can only be effectively used by Hunters.</desc>
+<desc>ธนูทรงพลังที่ใช้ได้เต็มประสิทธิภาพเฉพาะ Hunter</desc>
 
 ::Roguemaster's_Bow //id 1719 - Bow
-<desc>A bow, created just for Thieves, that has excellent range.</desc>
-Attack Range +6
+<desc>ธนูที่สร้างมาเพื่อ Thief โดยเฉพาะ ระยะยิงดีเยี่ยม</desc>
+ระยะโจมตี +6
 
 ::Rudra_Bow //id 1720 - Bow
-<desc>A bow imbued with the sacred essence of Rudra, one of the ancient gods.</desc>
+<desc>ธนูที่อาบด้วยพลังศักดิ์สิทธิ์ของ Rudra หนึ่งในทวยเทพโบราณ</desc>
 INT +5
-Enable <color=#0000FF>Heal 1</color>, <color=#0000FF>Cure 1</color>
-+50% <color=#800000>Curse</color>, <color=#800000>Poison</color>, <color=#800000>Chaos</color>, <color=#800000>Blind</color>, <color=#800000>Silence</color> resist
+ใช้ <color=#0000FF>Heal 1</color>, <color=#0000FF>Cure 1</color> ได้
+ต้านทาน <color=#800000>สาป</color>, <color=#800000>พิษ</color>, <color=#800000>สับสน</color>, <color=#800000>ตาบอด</color>, <color=#800000>ใบ้</color> +50%
 
 ::Repeating_Crossbow //id 1721 - Bow
-<desc>A crossbow that has improved range.</desc>
-Attack Range +4
+<desc>หน้าไม้ที่ยิงได้ไกลกว่าปกติ</desc>
+ระยะโจมตี +4
 
 ::Ballista //id 1722 - Bow
-<desc>A huge bow inspired by giant siege weapons.</desc>
+<desc>ธนูขนาดยักษ์ ได้แรงบันดาลใจจากอาวุธล้อมเมือง</desc>
 
 ::Luna_Bow //id 1723 - Bow
-<desc>A heavy moonstone bow that deflects attacks.</desc>
+<desc>ธนูมูนสโตนหนักๆ ที่ปัดป้องการโจมตีได้</desc>
 DEF +2
 
 ::Dragon_Wing //id 1724 - Bow
-<desc>A bow constructed out of dragon bone.</desc>
-+100% DEF ignore vs. Dragon
+<desc>ธนูที่ทำจากกระดูกมังกร</desc>
+เจาะ DEF 100% กับมังกร
 
 ::Hunter_Bow_ //id 1726 - Bow
-<desc>A mighty bow that can only be effectively used by Hunters.</desc>
+<desc>ธนูทรงพลังที่ใช้ได้เต็มประสิทธิภาพเฉพาะ Hunter</desc>
 
 ::Ballista_ //id 1727 - Bow
-<desc>A huge bow inspired by giant siege weapons.</desc>
+<desc>ธนูขนาดยักษ์ ได้แรงบันดาลใจจากอาวุธล้อมเมือง</desc>
 
 ::Burning_Bow //id 1730 - Bow
-<desc>A flaming bow that seems dangerous to grasp but is cool to the touch.</desc>
--10% damage from Fire attacks
+<desc>ธนูเพลิงที่ดูเหมือนจับแล้วไหม้ แต่จริงๆ เย็นเฉียบ</desc>
+รับดาเมจธาตุไฟ -10%
 
 ::Frozen_Bow //id 1731 - Bow
-<desc>A frozen bow whose drawstring seems too solid to be pulled.</desc>
-+10% chance of <color=#800000>Freeze</color> on range physical attack
+<desc>ธนูเยือกแข็ง สายดูแข็งจนน่าจะดึงไม่ขึ้น</desc>
+โอกาส 10% ทำให้ <color=#800000>แช่แข็ง</color> เมื่อโจมตีกายภาพระยะไกล
 
 ::Earthen_Bow //id 1732 - Bow
-<desc>A warm bow that draws its power from the plains.</desc>
+<desc>ธนูอบอุ่นที่ดึงพลังมาจากผืนทุ่ง</desc>
 
 ::Gust_Bow //id 1733 - Bow
-<desc>A light bow that has been enhanced with the power of whirlwinds.</desc>
+<desc>ธนูเบาที่เสริมพลังลมหมุนเข้าไป</desc>
 
 ::Orc_Archer_Bow //id 1734 - Bow
-<desc>A large, powerful bow used by Orc Archers.</desc>
-<color=#800080>Set Bonus</color> with <color=#008080>Steel Arrow</color>
- +50% range physical damage
+<desc>ธนูขนาดใหญ่ทรงพลังที่ Orc Archer ใช้</desc>
+<color=#800080>โบนัสเซ็ต</color> กับ <color=#008080>Steel Arrow</color>
+ ดาเมจกายภาพระยะไกล +50%
 
 ::Brave_Cross_Bow //id 1738 - Bow
 DEX +2
-+20% DEF ignore vs. Demi-Human
-+55% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +55% ต่อมนุษย์
 
 ::Valorous_Cross_Bow //id 1739 - Bow
 INT +10, DEX +2
-+55% physical damage vs. Demi-Human
+ดาเมจกายภาพ +55% ต่อมนุษย์
 
 ::Cursed_Lyre //id 1741 - Bow
-<desc>A cursed bow that killed a hero of an ancient nation long ago.</desc>
+<desc>ธนูต้องคำสาปที่เคยสังหารวีรบุรุษของชาติโบราณ</desc>
 LUK -2
-+4% chance of <color=#800000>Curse</color> on range physical attack
+โอกาส 4% ทำให้ <color=#800000>สาป</color> เมื่อโจมตีกายภาพระยะไกล
 
 ::Glorious_Bow //id 1743 - Bow
-CRIT damage +(2*Refine)%
-+20% DEF ignore vs. Demi-Human
-+55% physical damage vs. Demi-Human
+ดาเมจ CRIT +(2×ตีบวก)%
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +55% ต่อมนุษย์
 
 ::Waghnak //id 1801 - Knuckle
-<desc>A common, yet effective claw that's known as the "Tiger's Fang".</desc>
+<desc>กรงเล็บธรรมดาแต่ใช้ได้ดี รู้จักกันในชื่อ "เขี้ยวเสือ"</desc>
 
 ::Waghnak_ //id 1802 - Knuckle
-<desc>A common, yet effective claw that's known as the "Tiger's Fang".</desc>
+<desc>กรงเล็บธรรมดาแต่ใช้ได้ดี รู้จักกันในชื่อ "เขี้ยวเสือ"</desc>
 
 ::Knuckle_Dusters //id 1803 - Knuckle
-<desc>A protective covering that shields the back of the hand and forearm.</desc>
+<desc>เครื่องป้องกันที่ครอบหลังมือและท่อนแขน</desc>
 
 ::Knuckle_Dusters_ //id 1804 - Knuckle
-<desc>A protective covering that shields the back of the hand and forearm.</desc>
+<desc>เครื่องป้องกันที่ครอบหลังมือและท่อนแขน</desc>
 
 ::Studded_Knuckles //id 1805 - Knuckle
-<desc>A silver, spiked knuckle with diamond studs.</desc>
+<desc>เครื่องสวมหมัดเงินมีหนามแหลม ประดับเพชร</desc>
 
 ::Studded_Knuckles_ //id 1806 - Knuckle
-<desc>A silver, spiked knuckle with diamond studs.</desc>
+<desc>เครื่องสวมหมัดเงินมีหนามแหลม ประดับเพชร</desc>
 
 ::Fist //id 1807 - Knuckle
-<desc>A fist covering that enhances your physical strength.</desc>
+<desc>เครื่องสวมหมัดที่เพิ่มพละกำลัง</desc>
 
 ::Fist_ //id 1808 - Knuckle
-<desc>A fist covering that enhances your physical strength.</desc>
+<desc>เครื่องสวมหมัดที่เพิ่มพละกำลัง</desc>
 
 ::Claw //id 1809 - Knuckle
-<desc>A knuckle with three long steel claws.</desc>
+<desc>เครื่องสวมหมัดที่มีเล็บเหล็กยาวสามอัน</desc>
 STR +2
 
 ::Claw_ //id 1810 - Knuckle
-<desc>A knuckle with three long steel claws.</desc>
+<desc>เครื่องสวมหมัดที่มีเล็บเหล็กยาวสามอัน</desc>
 STR +2
 
 ::Finger //id 1811 - Knuckle
-<desc>A knuckle shaped like human fingers with long, sharp nails.</desc>
+<desc>เครื่องสวมหมัดรูปนิ้วมือมนุษย์ที่มีเล็บยาวแหลม</desc>
 
 ::Finger_ //id 1812 - Knuckle
-<desc>A knuckle shaped like human fingers with long, sharp nails.</desc>
+<desc>เครื่องสวมหมัดรูปนิ้วมือมนุษย์ที่มีเล็บยาวแหลม</desc>
 
 ::Kaiser_Knuckle //id 1813 - Knuckle
-<desc>A knuckle blessed by Zephyrus, god of the west wind.</desc>
-+10% physical damage vs. Water, Earth, Fire, Wind
-+5% physical damage vs. Undead
+<desc>เครื่องสวมหมัดที่ Zephyrus เทพลมตะวันตกประทานพรไว้</desc>
+ดาเมจกายภาพ +10% ต่อธาตุน้ำ, ธาตุดิน, ธาตุไฟ, ธาตุลม
+ดาเมจกายภาพ +5% ต่ออันเดด
 
 ::Berserk //id 1814 - Knuckle
-<desc>A knuckle imbued with the essence of madness.</desc>
+<desc>เครื่องสวมหมัดที่อาบด้วยความบ้าคลั่ง</desc>
 ASPD +12%
 
 ::Hati_Claw //id 1815 - Knuckle
-<desc>A blood stained weapon created from the claws of Hati.</desc>
+<desc>อาวุธเปื้อนเลือด ทำจากกรงเล็บของ Hati</desc>
 HP -2%
-+2% chance of <color=#800000>Bleed</color> on melee attack
+โอกาส 2% ทำให้ <color=#800000>เลือดออก</color> เมื่อโจมตีระยะประชิด
 
 ::Berserk_ //id 1816 - Knuckle
-<desc>A claw imbued with the essence of madness.</desc>
+<desc>กรงเล็บที่อาบด้วยความบ้าคลั่ง</desc>
 ASPD +12%
 
 ::Magma_Fist //id 1818 - Knuckle
-<desc>A knuckle imbued with the power of a volcano.</desc>
+<desc>เครื่องสวมหมัดที่อาบด้วยพลังภูเขาไฟ</desc>
 
 ::Icicle_Fist //id 1819 - Knuckle
-<desc>A knuckle imbued with the power of ice.</desc>
+<desc>เครื่องสวมหมัดที่อาบด้วยพลังน้ำแข็ง</desc>
 
 ::Electric_Fist //id 1820 - Knuckle
-<desc>A knuckle imbued with the power of lightning.</desc>
+<desc>เครื่องสวมหมัดที่อาบด้วยพลังสายฟ้า</desc>
 
 ::Seismic_Fist //id 1821 - Knuckle
-<desc>A knuckle imbued with the power of Mother Earth.</desc>
+<desc>เครื่องสวมหมัดที่อาบด้วยพลังของพระแม่ธรณี</desc>
 
 ::Combo_Battle_Glove //id 1822 - Knuckle
-<desc>A knuckle engraved with magic glyphs that grant incredible power.</desc>
+<desc>เครื่องสวมหมัดที่สลักอักขระเวท ให้พลังมหาศาล</desc>
 
 ::Brave_Fist //id 1823 - Knuckle
 STR +2, AGI +1
-+20% DEF ignore vs. Demi-Human
-+95% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +95% ต่อมนุษย์
 
 ::Valorous_Fist //id 1824 - Knuckle
 STR +2, INT +1
-+95% physical damage vs. Demi-Human
+ดาเมจกายภาพ +95% ต่อมนุษย์
 
 ::Glorious_Claw //id 1826 - Knuckle
-+25% DEF ignore vs. Demi-Human
-+95% physical damage vs. Demi-Human
+เจาะ DEF 25% กับมนุษย์
+ดาเมจกายภาพ +95% ต่อมนุษย์
 
 ::Glorious_Fist //id 1827 - Knuckle
-+20% DEF ignore vs. Demi-Human
-+95% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +95% ต่อมนุษย์
 
 ::Violin //id 1901 - Instrument
-<desc>A classical stringed instrument favored by Rocker, who'd rather play music than do actual work.</desc>
+<desc>เครื่องสายโบราณที่ Rocker ชอบเล่น เพราะขี้เกียจทำงานจริงจัง</desc>
 
 ::Violin_ //id 1902 - Instrument
-<desc>A classical stringed instrument favored by Rocker, who'd rather play music than do actual work.</desc>
+<desc>เครื่องสายโบราณที่ Rocker ชอบเล่น เพราะขี้เกียจทำงานจริงจัง</desc>
 
 ::Mandolin //id 1903 - Instrument
-<desc>A small instrument used in baroque, classical, country, and folk music.</desc>
+<desc>เครื่องดนตรีชิ้นเล็กที่ใช้ในเพลงบาโรก คลาสสิก คันทรี และโฟล์ก</desc>
 
 ::Mandolin_ //id 1904 - Instrument
-<desc>A small instrument used in baroque, classical, country, and folk music.</desc>
+<desc>เครื่องดนตรีชิ้นเล็กที่ใช้ในเพลงบาโรก คลาสสิก คันทรี และโฟล์ก</desc>
 
 ::Lute //id 1905 - Instrument
-<desc>A classical plucked string instrument that is difficult to tune.</desc>
+<desc>เครื่องดนตรีดีดโบราณ ตั้งสายยาก</desc>
 
 ::Lute_ //id 1906 - Instrument
-<desc>A classical plucked string instrument that is difficult to tune.</desc>
+<desc>เครื่องดนตรีดีดโบราณ ตั้งสายยาก</desc>
 
 ::Guitar //id 1907 - Instrument
-<desc>A six stringed instrument that is played by plucking the strings with a pick.</desc>
+<desc>เครื่องดนตรีหกสาย เล่นด้วยการดีดสายด้วยปิ๊ก</desc>
 
 ::Guitar_ //id 1908 - Instrument
-<desc>A six-stringed instrument that is played by plucking the strings with a pick.</desc>
+<desc>เครื่องดนตรีหกสาย เล่นโดยใช้ปิ๊กดีดสาย</desc>
 
 ::Harp //id 1909 - Instrument
-<desc>A stringed instrument known for its beautiful sound.</desc>
+<desc>เครื่องสายที่ขึ้นชื่อเรื่องเสียงอันไพเราะ</desc>
 INT +2
 
 ::Harp_ //id 1910 - Instrument
-<desc>A stringed instrument known for its beautiful sound.</desc>
+<desc>เครื่องสายที่ขึ้นชื่อเรื่องเสียงอันไพเราะ</desc>
 INT +2
 
 ::Gumoongoh //id 1911 - Instrument
-<desc>A traditional chordophone, favored by the aristocracy in days past.</desc>
+<desc>เครื่องสายโบราณที่ชนชั้นสูงสมัยก่อนนิยม</desc>
 
 ::Gumoongoh_ //id 1912 - Instrument
-<desc>A traditional chordophone, favored by the aristocracy in days past.</desc>
+<desc>เครื่องสายโบราณที่ชนชั้นสูงสมัยก่อนนิยม</desc>
 
 ::Electric_Guitar //id 1913 - Instrument
-<desc>An electric guitar which amplifies its user's power.</desc>
+<desc>กีตาร์ไฟฟ้าที่ขยายพลังของผู้เล่น</desc>
 AGI +1, INT +2
-Enable <color=#0000FF>Jupitel Thunder 1</color>
-+10% Autospell <color=#0000FF>Jupitel Thunder 1</color> on non-skill attack
+ใช้ <color=#0000FF>Jupitel Thunder 1</color> ได้
+โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Jupitel Thunder 1</color> เมื่อโจมตีปกติ
 
 ::Burning_Passion_Guitar //id 1914 - Instrument
-<desc>A dazzling guitar that bewitches its user to play songs of passion.</desc>
+<desc>กีตาร์เปล่งประกาย สะกดให้คนเล่นบรรเลงเพลงเร่าร้อน</desc>
 
 ::Loner's_Guitar //id 1915 - Instrument
-<desc>A loner's guitar which makes a depressing sound when strummed.</desc>
+<desc>กีตาร์ของคนขี้เหงา ดีดแล้วเสียงเศร้า</desc>
 
 ::Green_Acre_Guitar //id 1916 - Instrument
-<desc>A quaint guitar that resonates with the earth itself.</desc>
+<desc>กีตาร์โบราณที่ก้องกังวานไปกับผืนแผ่นดิน</desc>
 
 ::Gentle_Breeze_Guitar //id 1917 - Instrument
-<desc>A whimsical guitar that inspires a desire for travel.</desc>
+<desc>กีตาร์ขี้เล่นที่จุดประกายให้อยากออกเดินทาง</desc>
 
 ::Oriental_Lute //id 1918 - Instrument
-<desc>An ancient lute seen on display in oriental towns such as Payon, Amatsu or Kunlun.</desc>
+<desc>พิณโบราณที่เห็นตั้งโชว์ในเมืองตะวันออกอย่าง Payon, Amatsu หรือ Kunlun</desc>
 
 ::Oriental_Lute_ //id 1922 - Instrument
-<desc>An ancient lute seen on display in oriental towns such as Payon, Amatsu or Kunlun.</desc>
+<desc>พิณโบราณที่เห็นตั้งโชว์ในเมืองตะวันออกอย่าง Payon, Amatsu หรือ Kunlun</desc>
 
 ::Brave_Guitar //id 1923 - Instrument
 DEX +2
-+20% DEF ignore vs. Demi-Human
-+95% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +95% ต่อมนุษย์
 
 ::Valorous_Guitar //id 1924 - Instrument
 DEX +2
-+20% <color=#0000FF>Arrow Vulcan</color> damage
-+95% physical damage vs. Demi-Human
+ดาเมจ <color=#0000FF>Arrow Vulcan</color> +20%
+ดาเมจกายภาพ +95% ต่อมนุษย์
 
 ::Glorious_Guitar //id 1927 - Instrument
-+95% physical damage vs. Demi-Human
-+20% DEF ignore vs. Demi-Human
+ดาเมจกายภาพ +95% ต่อมนุษย์
+เจาะ DEF 20% กับมนุษย์
 
 ::Rope //id 1950 - Whip
-<color=#808080>A strong, thick cord composed of tightly braided fibers.</color>
+<color=#808080>เชือกหนาแข็งแรงที่ถักจากเส้นใยแน่นๆ</color>
 
 ::Rope_ //id 1951 - Whip
-<color=#808080>A strong, thick cord composed of tightly braided fibers.</color>
+<color=#808080>เชือกหนาแข็งแรงที่ถักจากเส้นใยแน่นๆ</color>
 
 ::Cord //id 1952 - Whip
-<color=#808080>A standard whip that's perfect for adventuring Dancers.</color>
+<color=#808080>แส้มาตรฐานที่เหมาะกับ Dancer สายผจญภัย</color>
 
 ::Cord_ //id 1953 - Whip
-<color=#808080>A standard whip that's perfect for adventuring Dancers.</color>
+<color=#808080>แส้มาตรฐานที่เหมาะกับ Dancer สายผจญภัย</color>
 
 ::Wire_Whip //id 1954 - Whip
-<color=#808080>A whip made of a flexible wire attached to an iron handle.</color>
+<color=#808080>แส้ที่ทำจากลวดยืดหยุ่นต่อกับด้ามเหล็ก</color>
 
 ::Wire_Whip_ //id 1955 - Whip
-<color=#808080>A whip made of a flexible wire attached to an iron handle.</color>
+<color=#808080>แส้ที่ทำจากลวดยืดหยุ่นต่อกับด้ามเหล็ก</color>
 
 ::Rante_Whip //id 1956 - Whip
-<color=#808080>A whip with a spiked ball attached at the end.</color>
+<color=#808080>แส้ที่ปลายติดลูกตุ้มหนามแหลม</color>
 
 ::Rante_Whip_ //id 1957 - Whip
-<color=#808080>A whip with a spiked ball attached at the end.</color>
+<color=#808080>แส้ที่ปลายติดลูกตุ้มหนามแหลม</color>
 
 ::Tail_Whip //id 1958 - Whip
-<color=#808080>A whip fashioned out of an animal's tail that brings good fortune.</color>
+<color=#808080>แส้ที่ทำจากหางสัตว์ นำโชคลาภมาให้</color>
 
 ::Tail_Whip_ //id 1959 - Whip
-<color=#808080>A whip fashioned out of an animal's tail that brings good fortune.</color>
+<color=#808080>แส้ที่ทำจากหางสัตว์ นำโชคลาภมาให้</color>
 
 ::Leather_Whip //id 1960 - Whip
-<color=#808080>A common and normal whip.</color>
+<color=#808080>แส้ธรรมดาทั่วไป</color>
 
 ::Leather_Whip_ //id 1961 - Whip
-<color=#808080>A common and normal whip.</color>
+<color=#808080>แส้ธรรมดาทั่วไป</color>
 
 ::Lariat_Whip //id 1962 - Whip
-<color=#808080>A hefty whip made from toughened snake skin.</color>
+<color=#808080>แส้หนักที่ทำจากหนังงูชุบแข็ง</color>
 
 ::Rapture_Rose //id 1963 - Whip
-<color=#808080>A whip constructed purely of thorny rosebush stems.</color>
+<color=#808080>แส้ที่ทำจากก้านกุหลาบมีหนามล้วนๆ</color>
 
 ::Chemeti_Whip //id 1964 - Whip
-<color=#808080>A powerful whip made of steel chain for heavy duty battles.</color>
+<color=#808080>แส้ทรงพลังที่ทำจากโซ่เหล็ก ไว้สู้ศึกหนัก</color>
 
 ::Red_Flame_Whip //id 1965 - Whip
-<color=#808080>A whip fashioned from worn, hot leather dried in the desert sun.</color>
+<color=#808080>แส้ที่ทำจากหนังเก่าตากแดดทะเลทรายจนร้อน</color>
 
 ::Icicle_Whip //id 1966 - Whip
-<color=#808080>A whip fashioned from enchanted, eternally frozen, icicles.</color>
+<color=#808080>แส้ที่ทำจากแท่งน้ำแข็งต้องมนตร์ที่ไม่มีวันละลาย</color>
 
 ::Gaia_Whip //id 1967 - Whip
-<color=#808080>A whip fashioned from tough braided tree roots.</color>
+<color=#808080>แส้ที่ถักจากรากไม้เหนียว</color>
 
 ::Skipping_Rope //id 1968 - Whip
-<color=#808080>A skipping rope with wooden handles.</color>
+<color=#808080>เชือกกระโดดด้ามไม้</color>
 
 ::Blade_Whip //id 1969 - Whip
-<color=#808080>A wire in which blade fragments are interwoven, that makes this whip as sharp as a sword.</color>
+<color=#808080>ลวดที่ถักเศษใบมีดไว้ข้างใน ทำให้แส้เส้นนี้คมเหมือนดาบ</color>
 
 ::Queen's_Whip //id 1970 - Whip
-<color=#808080>A whip fit for a queen.</color>
+<color=#808080>แส้ที่คู่ควรกับราชินี</color>
 
 ::Electric_Wire //id 1971 - Whip
-<color=#808080>A whip fashioned from a live electric wire.</color>
+<color=#808080>แส้ที่ทำจากสายไฟที่มีกระแสไหลอยู่</color>
 
 ::Queen's_Whip_ //id 1976 - Whip
-<color=#808080>A whip thats the best of the best.</color>
+<color=#808080>แส้ที่ดีที่สุดในบรรดาที่ดีที่สุด</color>
 
 ::Brave_Lariat //id 1977 - Whip
 DEX +2
@@ -1548,124 +1548,124 @@ DEX +2
 DEX +2
 
 ::Glorious_Lariat //id 1981 - Whip
-+20% DEF ignore vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
 
 ::Staff_of_Destruction //id 2000 - 2HRod
-<desc>A tremendously powerful staff that can be wielded by the spiritually strong.</desc>
+<desc>ไม้เท้าที่ทรงพลังมหาศาล ใช้ได้เฉพาะผู้มีจิตแข็งแกร่ง</desc>
 MATK +25%
 AGI +10, INT +3
-Every 2 refine increase MATK by 1%.
-Every refine increases SP cost by 2%.
-Adds (2 * Refine)% chance to autospell Jupitel Thunder 5 when receiving melee damage.
+ทุกๆ ตีบวก 2 ขั้น MATK +1%
+ตีบวกทุกขั้น ใช้ SP +2%
+โอกาส (2×ตีบวก)% ร่ายอัตโนมัติ <color=#0000FF>Jupitel Thunder 5</color> เมื่อโดนโจมตีระยะประชิด.
 
 ::Divine_Cross //id 2001 - 2HRod
-<desc>A staff that is composed of two parts to form a cross.</desc>
+<desc>ไม้เท้าที่ประกอบจากสองส่วนไขว้กันเป็นกางเขน</desc>
 DEX +4, MATK +15%
--15% damage from Undead, Demon
+รับดาเมจจากอันเดด, ปีศาจ -15%
 
 ::Glorious_Staff //id 2002 - 2HRod
 MATK +15%
 
 ::Jujube_Dagger //id 13000 - Dagger
-<desc>This dagger is made from Jujube tree struck by lightning.</desc>
+<desc>มีดสั้นเล่มนี้ทำจากต้นพุทราที่ถูกฟ้าผ่า</desc>
 
 ::Dragon_Killer //id 13001 - Dagger
-<desc>A dagger crafted from a dragon's fang that can easily pierce dragon scales.</desc>
-+100% DEF ignore vs. Dragon
-+10% EXP from Dragon
+<desc>มีดสั้นที่ทำจากเขี้ยวมังกร แทงทะลุเกล็ดมังกรได้สบาย</desc>
+เจาะ DEF 100% กับมังกร
+EXP จากมังกร +10%
 
 ::Ginnungagap //id 13002 - Dagger
-<desc>A dagger with an unnaturally dark colored blade, there is an instinctive sense of danger wielding this weapon.</desc>
-+5% chance of <color=#800000>Blind</color> on melee attack
+<desc>มีดสั้นใบมีดดำผิดธรรมชาติ ถือแล้วรู้สึกอันตรายโดยสัญชาตญาณ</desc>
+โอกาส 5% ทำให้ <color=#800000>ตาบอด</color> เมื่อโจมตีระยะประชิด
 
 ::Cowardice_Blade //id 13003 - Dagger
-<desc>A dagger invented by a cowardly thief who prioritized defense.</desc>
+<desc>มีดสั้นที่โจรขี้ขลาดคิดค้นขึ้น เพราะเน้นป้องกันตัวไว้ก่อน</desc>
 DEF +5
 
 ::Cowardice_Blade_ //id 13004 - Dagger
-<desc>A dagger invented by a cowardly thief who prioritized defense.</desc>
+<desc>มีดสั้นที่โจรขี้ขลาดคิดค้นขึ้น เพราะเน้นป้องกันตัวไว้ก่อน</desc>
 DEF +5
 
 ::Khukri //id 13006 - Dagger
-<desc>A dark dagger whose hilt is crafted from a black dragon scale.</desc>
-+10% chance of <color=#800000>Curse</color> on melee attack
+<desc>มีดสั้นสีดำ ด้ามทำจากเกล็ดมังกรดำ</desc>
+โอกาส 10% ทำให้ <color=#800000>สาป</color> เมื่อโจมตีระยะประชิด
 
 ::Jitte //id 13007 - Dagger
-<desc>A dagger topped with a hook that can catch and break weapons.</desc>
-+2% chance WeaponBreak on physical attack
+<desc>มีดสั้นปลายมีตะขอ ไว้เกี่ยวและหักอาวุธศัตรู</desc>
+โอกาส 2% ทำอาวุธศัตรูแตก เมื่อโจมตีกายภาพ
 
 ::Jitte_ //id 13008 - Dagger
-<desc>A dagger topped with a hook that can catch and break weapons.</desc>
-+2% chance WeaponBreak on physical attack
+<desc>มีดสั้นปลายมีตะขอ ไว้เกี่ยวและหักอาวุธศัตรู</desc>
+โอกาส 2% ทำอาวุธศัตรูแตก เมื่อโจมตีกายภาพ
 
 ::Kamaitachi //id 13009 - Dagger
-<desc>A legendary weapon with extremely sharp blades.</desc>
+<desc>อาวุธในตำนานที่มีใบมีดคมกริบ</desc>
 CRIT +3, ASPD +3%
 
 ::Asura //id 13010 - Dagger
-<desc>A legendary dagger that is said to have been given to mankind by the gods.</desc>
+<desc>มีดสั้นในตำนาน ว่ากันว่าทวยเทพประทานให้มนุษย์</desc>
 MATK +10%
 
 ::Asura_ //id 13011 - Dagger
-<desc>A legendary dagger that is said to have been given to mankind by the gods.</desc>
+<desc>มีดสั้นในตำนาน ว่ากันว่าทวยเทพประทานให้มนุษย์</desc>
 MATK +10%
 
 ::Murasame //id 13012 - Dagger
-<desc>A famous sword sharp enough to divide oceans or cut the air to make it bleed water.</desc>
-CRIT +10 vs. Demi-Human
+<desc>ดาบชื่อดังที่คมจนผ่ามหาสมุทรได้ ฟันอากาศแล้วอากาศยังเลือดตกเป็นน้ำ</desc>
+CRIT +10 ต่อมนุษย์
 
 ::Murasame_ //id 13013 - Dagger
-<desc>A famous sword sharp enough to divide oceans or cut the air to make it bleed water.</desc>
-CRIT +10 vs. Demi-Human
+<desc>ดาบชื่อดังที่คมจนผ่ามหาสมุทรได้ ฟันอากาศแล้วอากาศยังเลือดตกเป็นน้ำ</desc>
+CRIT +10 ต่อมนุษย์
 
 ::Hakujin //id 13014 - Dagger
-<desc>A dagger that has a shining white blade crafted of bone.</desc>
+<desc>มีดสั้นใบมีดขาวเป็นประกาย ทำจากกระดูก</desc>
 INT +2
-+1% Autospell <color=#0000FF>Heal 1</color> (self) on non-skill attack
+โอกาส 1% ร่ายอัตโนมัติ <color=#0000FF>Heal 1</color> (ใส่ตัวเอง) เมื่อโจมตีปกติ
 
 ::Hakujin_ //id 13015 - Dagger
-<desc>A dagger that has a shining white blade crafted of bone.</desc>
+<desc>มีดสั้นใบมีดขาวเป็นประกาย ทำจากกระดูก</desc>
 INT +2
-+1% Autospell <color=#0000FF>Heal 1</color> (self) on non-skill attack
+โอกาส 1% ร่ายอัตโนมัติ <color=#0000FF>Heal 1</color> (ใส่ตัวเอง) เมื่อโจมตีปกติ
 
 ::Poison_Knife_ //id 13016 - Dagger
-<desc>A dreadful dagger that has been soaked in toxin.</desc>
-+30% chance of <color=#800000>Poison</color> on physical attack
+<desc>มีดสั้นน่าสะพรึงที่แช่ยาพิษมา</desc>
+โอกาส 30% ทำให้ <color=#800000>พิษ</color> เมื่อโจมตีกายภาพ
 
 ::Ice_Pick_ //id 13017 - Dagger
-<desc>A thin, sharp blade capable of piercing the strongest of armors.</desc>
-Physical Damage Scales with Enemy Defense
+<desc>ใบมีดบางคมที่เจาะทะลุเกราะแข็งแกร่งที่สุดได้</desc>
+ดาเมจกายภาพแปรผันตาม DEF ของศัตรู
 
 ::Sucsamad_ //id 13018 - Dagger
-<desc>A dagger crafted in the ancient, traditional ways of a small desert tribe.</desc>
-+25% physical damage vs. Earth, Wind
+<desc>มีดสั้นที่ทำตามวิถีโบราณของชนเผ่าเล็กๆ ในทะเลทราย</desc>
+ดาเมจกายภาพ +25% ต่อธาตุดิน, ธาตุลม
 
 ::Ginnungagap_ //id 13019 - Dagger
-<desc>A dagger with an unnaturally dark colored blade, there is an instinctive sense of danger wielding this weapon.</desc>
-+5% chance of <color=#800000>Blind</color> on melee attack
+<desc>มีดสั้นใบมีดดำผิดธรรมชาติ ถือแล้วรู้สึกอันตรายโดยสัญชาตญาณ</desc>
+โอกาส 5% ทำให้ <color=#800000>ตาบอด</color> เมื่อโจมตีระยะประชิด
 
 ::Scalpel //id 13027 - Dagger
-<desc>A small, light, and sharp dagger optimized for swift strikes.</desc>
-+5% chance of <color=#800000>Bleed</color> on melee attack
+<desc>มีดสั้นเล็ก เบา และคม เหมาะกับการจู่โจมฉับไว</desc>
+โอกาส 5% ทำให้ <color=#800000>เลือดออก</color> เมื่อโจมตีระยะประชิด
 
 ::Tooth_Blade //id 13028 - Dagger
-<desc>A dentist's scalpel that can impede the victim's ability to speak.</desc>
-+5% Autospell <color=#0000FF>Slow Cast 1</color> on non-skill attack
-if Refine > 8:
- +7% Autospell <color=#0000FF>Slow Cast 2</color> instead
+<desc>มีดผ่าตัดของหมอฟัน ทำให้เหยื่อพูดไม่ได้</desc>
+โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Slow Cast 1</color> เมื่อโจมตีปกติ
+ถ้าตีบวก > 8:
+ +7% ร่ายอัตโนมัติ <color=#0000FF>Slow Cast 2</color> แทน
 
 ::Dragon_Killer_ //id 13030 - Dagger
-<desc>A dagger crafted from a dragon's fang that can easily pierce dragon scales.</desc>
-+100% DEF ignore vs. Dragon
+<desc>มีดสั้นที่ทำจากเขี้ยวมังกร แทงทะลุเกล็ดมังกรได้สบาย</desc>
+เจาะ DEF 100% กับมังกร
 
 ::Swordbreaker_ //id 13031 - Dagger
-<desc>A powerful dagger built to catch and destroy weapons.</desc>
+<desc>มีดสั้นทรงพลังที่ทำมาเพื่อเกี่ยวและทำลายอาวุธ</desc>
 
 ::Mailbreaker_ //id 13032 - Dagger
-<desc>A sharp dagger built to puncture and destroy armor.</desc>
+<desc>มีดสั้นคมที่ทำมาเพื่อเจาะและทำลายเกราะ</desc>
 
 ::Assassin_Dagger_ //id 13033 - Dagger
-<desc>A dagger commonly used by assassins.</desc>
+<desc>มีดสั้นที่นักฆ่าใช้กันทั่วไป</desc>
 HP +20%, SP +15%, ASPD +2%
 
 ::Brave_Damascus //id 13036 - Dagger
@@ -1675,104 +1675,104 @@ STR +1, AGI +1
 STR +1, AGI +1
 
 ::Ivory_Knife //id 13039 - Dagger
-<desc>An ivory dagger, its sharp tip makes it effective for stabbing.</desc>
+<desc>มีดสั้นงาช้าง ปลายแหลมคมเหมาะกับการแทง</desc>
 AGI +2, ASPD +3%
 
 ::Glorious_Gladius //id 13042 - Dagger
-+20% DEF ignore vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
 
 ::Six_Shooter //id 13100 - Handgun
-<color=#808080>A basic six chambered pistol.</color>
+<color=#808080>ปืนพกลูกโม่ 6 นัด แบบพื้นฐาน</color>
 
 ::Six_Shooter_ //id 13101 - Handgun
-<color=#808080>A basic six chambered pistol.</color>
+<color=#808080>ปืนพกลูกโม่ 6 นัด แบบพื้นฐาน</color>
 
 ::Crimson_Bolt //id 13102 - Handgun
-<color=#808080>A bloody red pistol that is rumored to be cursed, but it's only a rumor.</color>
+<color=#808080>ปืนสีแดงเลือด ร่ำลือว่าต้องคำสาป แต่ก็แค่ข่าวลือ</color>
 
 ::Crimson_Bolt_ //id 13103 - Handgun
-<color=#808080>A bloody red pistol that is rumored to be cursed, but it's only a rumor.</color>
+<color=#808080>ปืนสีแดงเลือด ร่ำลือว่าต้องคำสาป แต่ก็แค่ข่าวลือ</color>
 
 ::Garrison //id 13104 - Handgun
-<color=#808080>A rare pistol whose authenticity can be verified by the engraving.</color>
+<color=#808080>ปืนพกหายาก ดูของแท้ได้จากลายสลัก</color>
 
 ::Garrison_ //id 13105 - Handgun
-<color=#808080>A rare pistol whose authenticity can be verified by the engraving.</color>
+<color=#808080>ปืนพกหายาก ดูของแท้ได้จากลายสลัก</color>
 
 ::Gold_Lux //id 13106 - Handgun
-<color=#808080>A decorative, beautiful golden pistol.</color>
+<color=#808080>ปืนพกทองคำงดงาม ไว้ประดับ</color>
 
 ::Wasteland's_Outlaw //id 13107 - Handgun
-<color=#808080>A firearm used by gunslingers to brave the wilderness.</color>
+<color=#808080>ปืนที่มือปืนใช้ฝ่าดงถิ่นทุรกันดาร</color>
 
 ::Soldier_Pistol //id 13108 - Handgun
 DEX +2, HIT -10
 
 ::Glorious_Pistol //id 13110 - Handgun
-+20% DEF ignore vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
 
 ::Branch //id 13150 - Rifle
-<color=#808080>A firearm with a focus on range and accuracy.</color>
+<color=#808080>ปืนที่เน้นระยะยิงและความแม่นยำ</color>
 
 ::Cyclone //id 13151 - Rifle
-<color=#808080>A high performance rifle with great range and power.</color>
+<color=#808080>ไรเฟิลสมรรถนะสูง ระยะไกลและแรง</color>
 
 ::Cyclone_ //id 13152 - Rifle
-<color=#808080>A high performance rifle with great range and power.</color>
+<color=#808080>ไรเฟิลสมรรถนะสูง ระยะไกลและแรง</color>
 
 ::Dusk //id 13153 - Rifle
-<color=#808080>An advanced rifle with reinforced explosive power.</color>
+<color=#808080>ไรเฟิลรุ่นสูงที่เสริมอานุภาพระเบิด</color>
 
 ::Rolling_Stone //id 13154 - Shotgun
-<color=#808080>A heavy shotgun which sounds like flint striking steel.</color>
+<color=#808080>ปืนลูกซองหนัก เสียงเหมือนหินเหล็กไฟกระทบเหล็ก</color>
 
 ::Black_Rose //id 13155 - Shotgun
-<color=#808080>A dark, stylish shotgun.</color>
+<color=#808080>ปืนลูกซองสีเข้ม ดูเท่</color>
 
 ::Gate_Keeper //id 13156 - Shotgun
-<color=#808080>The most powerful shotgun available, a Gunslinger's best friend.</color>
+<color=#808080>ปืนลูกซองที่ทรงพลังที่สุดเท่าที่มี เพื่อนซี้ของ Gunslinger</color>
 
 ::Drifter //id 13157 - GatlingGun
-<color=#808080>A gatling gun which evokes the image of a lonely traveler.</color>
+<color=#808080>ปืนกลแกตลิงที่ชวนให้นึกถึงนักเดินทางผู้โดดเดี่ยว</color>
 
 ::Butcher //id 13158 - GatlingGun
-<color=#808080>A gatling gun with enormous destructive power.</color>
+<color=#808080>ปืนกลแกตลิงที่มีอานุภาพทำลายล้างมหาศาล</color>
 
 ::Butcher_ //id 13159 - GatlingGun
-<color=#808080>A gatling gun with enormous destructive power.</color>
+<color=#808080>ปืนกลแกตลิงที่มีอานุภาพทำลายล้างมหาศาล</color>
 
 ::Destroyer //id 13160 - Grenade
-<color=#808080>A top of the line, high performance grenade launcher.</color>
+<color=#808080>เครื่องยิงลูกระเบิดสมรรถนะสูงระดับท็อป</color>
 
 ::Destroyer_ //id 13161 - Grenade
-<color=#808080>A top of the line, high performance grenade launcher.</color>
+<color=#808080>เครื่องยิงลูกระเบิดสมรรถนะสูงระดับท็อป</color>
 
 ::Inferno //id 13162 - Grenade
-<color=#808080>A grenade launcher that propels bullets with hellfire.</color>
+<color=#808080>เครื่องยิงลูกระเบิดที่ขับกระสุนด้วยไฟนรก</color>
 
 ::Long_Barrel //id 13163 - Rifle
-<color=#808080>A sniping rifle with a lengthened barrel for improved accuracy.</color>
+<color=#808080>ไรเฟิลซุ่มยิงลำกล้องยาว เพิ่มความแม่นยำ</color>
 
 ::Long_Barrel_ //id 13164 - Rifle
-<color=#808080>A sniping rifle with a lengthened barrel for improved accuracy.</color>
+<color=#808080>ไรเฟิลซุ่มยิงลำกล้องยาว เพิ่มความแม่นยำ</color>
 
 ::Jungle_Carbine //id 13165 - Rifle
-<color=#808080>A short barrel rifle suited close quarters combat in the jungle.</color>
+<color=#808080>ไรเฟิลลำกล้องสั้น เหมาะกับการสู้ระยะใกล้ในป่า</color>
 
 ::Jungle_Carbine_ //id 13166 - Rifle
-<color=#808080>A short barrel rifle suited close quarters combat in the jungle.</color>
+<color=#808080>ไรเฟิลลำกล้องสั้น เหมาะกับการสู้ระยะใกล้ในป่า</color>
 
 ::Gate_Keeper-DD //id 13167 - Shotgun
-<color=#808080>TA modified Gate Keeper with a barrel coated in pure oridecon.</color>
+<color=#808080>Gate Keeper รุ่นดัดแปลง ลำกล้องเคลือบ Oridecon บริสุทธิ์</color>
 
 ::Thunder_P //id 13168 - Shotgun
-<color=#808080>A sawed off shotgun that fires rapidly at the cost of reduced accuracy.</color>
+<color=#808080>ปืนลูกซองลำกล้องสั้น ยิงรัวได้แต่แม่นน้อยลง</color>
 
 ::Thunder_P_ //id 13169 - Shotgun
-<color=#808080>A sawed off shotgun that fires rapidly at the cost of reduced accuracy.</color>
+<color=#808080>ปืนลูกซองลำกล้องสั้น ยิงรัวได้แต่แม่นน้อยลง</color>
 
 ::Lever_Action_Rifle //id 13170 - Rifle
-<color=#808080>An ornate rifle that fires penetrating shots but reloads slowly.</color>
+<color=#808080>ไรเฟิลลวดลายวิจิตร ยิงทะลุทะลวงแต่บรรจุกระสุนช้า</color>
 
 ::Soldier_Rifle //id 13171 - Rifle
 DEX +2, HIT +10, CRIT +10
@@ -1787,31 +1787,31 @@ DEX +2
 DEX +2
 
 ::Glorious_Rifle //id 13176 - Rifle
-+20% DEF ignore vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
 
 ::Glorious_Gatling_Gun //id 13177 - GatlingGun
-+20% DEF ignore vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
 
 ::Glorious_Shotgun //id 13178 - Shotgun
-splash 3x3 AoE on non-skill attack
+โจมตีปกติกระจายเป็นวง 3x3 ช่อง
 
 ::Glorious_Grenade_Launcher //id 13179 - Grenade
-+20% DEF ignore vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
 
 ::Huuma_Wing_Shuriken //id 13300 - Shuriken
-<color=#808080>A famous huuma that is shaped like a wing.</color>
+<color=#808080>ฮูมะชื่อดัง รูปทรงเหมือนปีก</color>
 
 ::Huuma_Giant_Wheel_Shuriken //id 13301 - Shuriken
-<color=#808080>A heavy, giant huuma shaped like a bladed wheel.</color>
+<color=#808080>ฮูมะยักษ์หนักๆ รูปทรงเหมือนล้อใบมีด</color>
 
 ::Huuma_Giant_Wheel_Shuriken_ //id 13302 - Shuriken
-<color=#808080>A heavy, giant huuma shaped like a bladed wheel.</color>
+<color=#808080>ฮูมะยักษ์หนักๆ รูปทรงเหมือนล้อใบมีด</color>
 
 ::Huuma_Blaze_Shuriken //id 13303 - Shuriken
-<color=#808080>A huuma that sparks like a firecracker when it strikes enemies.</color>
+<color=#808080>ฮูมะที่แตกประกายเหมือนประทัดเมื่อโดนศัตรู</color>
 
 ::Huuma_of_Calm_Mind //id 13304 - Shuriken
-<color=#808080>A huuma that enables the user to remain calm in any situation.</color>
+<color=#808080>ฮูมะที่ทำให้ผู้ใช้สงบนิ่งได้ในทุกสถานการณ์</color>
 
 ::Brave_Huuma //id 13305 - Shuriken
 STR +2, DEX +1
@@ -1823,44 +1823,44 @@ STR +2, DEX +1
 MATK +15%
 
 ::Cutlus_ //id 13400 - Sword
-<desc>A sword popularized by sea adventurers.</desc>
+<desc>ดาบที่นักผจญภัยทางทะเลทำให้เป็นที่นิยม</desc>
 STR +2, DEF +1
-Enable <color=#0000FF>Bash 5</color>
+ใช้ <color=#0000FF>Bash 5</color> ได้
 
 ::Platinum_Shotel //id 13404 - Sword
-<desc>A fearsome weapon with a unique curved blade.</desc>
+<desc>อาวุธน่าสะพรึง ใบมีดโค้งเป็นเอกลักษณ์</desc>
 CRIT +50
 
 ::Curved_Sword //id 13405 - Sword
-<desc>A thick, flexible sword forged from an elastic alloy.</desc>
+<desc>ดาบหนาที่ยืดหยุ่น ตีจากโลหะผสมที่ดัดได้</desc>
 ASPD +10%
-+3% chance of <color=#800000>Curse</color> on melee attack
+โอกาส 3% ทำให้ <color=#800000>สาป</color> เมื่อโจมตีระยะประชิด
 
 ::Brave_Blade //id 13410 - Sword
 STR +1, DEX +1
-+20% DEF ignore vs. Demi-Human
-+75% physical damage vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
+ดาเมจกายภาพ +75% ต่อมนุษย์
 
 ::Valorous_Blade //id 13411 - Sword
 STR +1, DEX +1
 
 ::Twin_Edge_of_Naght_Sieger //id 13412 - Sword
-<desc>One of the twin swords of Naght Sieger, this blue blade exerts raw technique.</desc>
+<desc>หนึ่งในดาบคู่ของ Naght Sieger ใบสีน้ำเงินนี้เน้นเชิงชั้นดิบๆ</desc>
 
 ::Twin_Edge_of_Naght_Sieger_ //id 13413 - Sword
-<desc>One of the twin swords of Naght Sieger, this red blade exerts raw strength.</desc>
+<desc>หนึ่งในดาบคู่ของ Naght Sieger ใบสีแดงนี้เน้นพละกำลังดิบๆ</desc>
 
 ::Elemental_Sword //id 13414 - Sword
-<desc>A magical sword that attacks with a variety of elements.</desc>
+<desc>ดาบเวทที่โจมตีได้หลายธาตุ</desc>
 STR +2, INT +4, DEX +1
 MATK +5%
 
 ::Glorious_Flamberge //id 13416 - Sword
-+20% DEF ignore vs. Demi-Human
+เจาะ DEF 20% กับมนุษย์
 
 ::Glorious_Rapier //id 13417 - Sword
-INT +(Refine + 1)
+INT +(ตีบวก + 1)
 
 ::Glorious_Holy_Avenger //id 13418 - Sword
-INT +(1 + Refine)
+INT +(ตีบวก + 1)
 
