@@ -33,8 +33,15 @@ public static class MarketConfig
     /// is more. Without it two people can raise each other by a zeny for an hour.</summary>
     public const int MinimumBidRaisePercent = 5;
 
-    /// <summary>How many listings one character may have running at once.</summary>
-    public const int MaxListingsPerCharacter = 10;
+    /// <summary>
+    /// How many listings one character may have running at once.
+    ///
+    /// One. Not as a technical limit but as a rule of the place: a board where a single
+    /// person can post ten things is a board that one person fills, and everybody else
+    /// scrolls past them to find anything. One at a time means the front page is a page
+    /// of different people.
+    /// </summary>
+    public const int MaxListingsPerCharacter = 1;
 
     /// <summary>How many parcels may wait for one character before the box refuses more.
     /// It never actually refuses - the parcel is written anyway, since the alternative is
@@ -63,8 +70,18 @@ public static class MarketConfig
     /// <summary>How long an order stands before what is left of it is given back.</summary>
     public const int BuyOrderDurationDays = 7;
 
-    /// <summary>How many orders one character may have standing at once.</summary>
-    public const int MaxBuyOrdersPerCharacter = 10;
+    /// <summary>How many orders one character may have standing at once. One, for the
+    /// same reason as the listings above.</summary>
+    public const int MaxBuyOrdersPerCharacter = 1;
+
+    /// <summary>
+    /// How many bids are sent back when somebody opens a listing to see who is on it.
+    ///
+    /// Capped rather than paged. A listing with more bids than this is one where the last
+    /// twenty are the interesting part anyway - what anybody is reading them for is whether
+    /// the thing is being fought over right now, and that is answered by the top of the list.
+    /// </summary>
+    public const int HistoryCount = 20;
 
     /// <summary>The most of one thing a single order may ask for.</summary>
     public const int MaxBuyOrderCount = 5000;

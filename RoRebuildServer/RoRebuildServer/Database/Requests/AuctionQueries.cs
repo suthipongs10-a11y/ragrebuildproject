@@ -80,6 +80,33 @@ public static class AuctionQueries
         await SendMine(dbContext, auction.SellerId, auction.SellerName);
     }
 
+    /// <summary>
+    /// The bids on one listing, newest first.
+    ///
+    /// Sent both when somebody asks for it and straight after they bid, so their own bid
+    /// appears at the top of the list they are looking at rather than on the next refresh
+    /// ten seconds later - which reads as the bid not having gone through.
+    /// </summary>
+    public static async Task SendHistory(RoContext dbContext, Guid viewerId, string? viewerName,
+        int auctionId)
+    {
+        var player = Inbox.FindOnline(viewerId, viewerName);
+        if (player == null)
+        {
+            ServerLogger.LogWarning($"Bid history for auction {auctionId} was read for "
+                                    + $"{viewerName} but they could not be found online.");
+            return;
+        }
+
+        var bids = await dbContext.AuctionBids.AsNoTracking()
+            .Where(b => b.AuctionId == auctionId)
+            .OrderByDescending(b => b.Id)
+            .Take(MarketConfig.HistoryCount)
+            .ToListAsync();
+
+        CommandBuilder.SendAuctionHistory(player, auctionId, bids);
+    }
+
     /// <summary>Tells somebody how much is now waiting in their box.</summary>
     public static async Task Notify(RoContext dbContext, Guid characterId, string? name)
     {

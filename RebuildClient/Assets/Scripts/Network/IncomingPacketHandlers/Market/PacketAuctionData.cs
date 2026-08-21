@@ -33,9 +33,37 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Market
                     ReadInto(msg, MarketState.Mine);
                     MarketState.MineReceived = true;
                     break;
+
+                case AuctionDataType.History:
+                    ReadHistory(msg);
+                    break;
             }
 
             MarketState.Touch();
+        }
+
+        /// <summary>
+        /// The bids on one listing.
+        ///
+        /// Which listing they belong to comes first and is kept, so an answer that arrives
+        /// after somebody has closed the page and opened another is dropped rather than
+        /// drawn under the wrong item.
+        /// </summary>
+        private static void ReadHistory(ClientInboundMessage msg)
+        {
+            MarketState.HistoryFor = msg.ReadInt32();
+            MarketState.History.Clear();
+
+            var count = msg.ReadInt16();
+            for (var i = 0; i < count; i++)
+            {
+                MarketState.History.Add(new AuctionBidEntry
+                {
+                    BidderName = msg.ReadString(),
+                    Amount = msg.ReadInt32(),
+                    SecondsAgo = msg.ReadInt32(),
+                });
+            }
         }
 
         private static void ReadInto(ClientInboundMessage msg, List<AuctionEntry> into)

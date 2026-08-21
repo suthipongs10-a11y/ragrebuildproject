@@ -116,6 +116,36 @@ namespace RoRebuildServer.Migrations
                     b.ToTable("DbUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("RoRebuildServer.Database.Domain.DbAuctionBid", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Amount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AuctionId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("BidderId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BidderName")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("PlacedAt")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuctionId");
+
+                    b.ToTable("AuctionBid");
+                });
+
             modelBuilder.Entity("RoRebuildServer.Database.Domain.DbBuyOrder", b =>
                 {
                     b.Property<int>("Id")

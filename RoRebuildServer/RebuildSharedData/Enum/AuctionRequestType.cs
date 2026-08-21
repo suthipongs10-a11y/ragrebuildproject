@@ -22,6 +22,9 @@ public enum AuctionRequestType : byte
 
     /// <summary>Take one of mine down. Payload: int auctionId.</summary>
     Cancel,
+
+    /// <summary>Who has bid on one of them. Payload: int auctionId.</summary>
+    History,
 }
 
 /// <summary>What an AuctionData packet is carrying.</summary>
@@ -35,4 +38,7 @@ public enum AuctionDataType : byte
 
     /// <summary>One listing changed - somebody bid, or it went away.</summary>
     Updated,
+
+    /// <summary>The bids on one listing, newest first.</summary>
+    History,
 }

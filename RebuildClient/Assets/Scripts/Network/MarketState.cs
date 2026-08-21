@@ -59,6 +59,16 @@ namespace Assets.Scripts.Network
             : HighBid + (HighBid / 20 < 1 ? 1 : HighBid / 20);
     }
 
+    /// <summary>One bid that was made on a listing, winning or not.</summary>
+    public class AuctionBidEntry
+    {
+        public string BidderName = "";
+        public int Amount;
+
+        /// <summary>How long ago it was placed, in seconds when the packet was written.</summary>
+        public int SecondsAgo;
+    }
+
     /// <summary>One standing offer to buy something.</summary>
     public class BuyOrderEntry
     {
@@ -104,6 +114,12 @@ namespace Assets.Scripts.Network
         public static readonly List<AuctionEntry> Mine = new List<AuctionEntry>();
         public static bool MineReceived;
 
+        /// <summary>The bids on whichever listing is open, newest first, and which one
+        /// they belong to - so an answer arriving late for a listing nobody is looking at
+        /// any more is ignored rather than drawn under the wrong item.</summary>
+        public static readonly List<AuctionBidEntry> History = new List<AuctionBidEntry>();
+        public static int HistoryFor = -1;
+
         /// <summary>What people are buying, and the orders this character posted.</summary>
         public static readonly List<BuyOrderEntry> BuyOrders = new List<BuyOrderEntry>();
         public static bool BuyOrdersReceived;
@@ -132,6 +148,8 @@ namespace Assets.Scripts.Network
             BrowseSearch = "";
             Mine.Clear();
             MineReceived = false;
+            History.Clear();
+            HistoryFor = -1;
             BuyOrders.Clear();
             BuyOrdersReceived = false;
             BuyPage = 0;

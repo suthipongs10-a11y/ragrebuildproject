@@ -30,16 +30,73 @@ namespace Assets.Scripts.UI.Market
     /// </summary>
     public class MarketWindow : WindowBase
     {
-        private const float Width = 560f;
-        private const float Height = 470f;
+        private const float Width = 580f;
+        private const float Height = 500f;
         private const float Pad = 8f;
 
         private const float TabHeight = 30f;
         private const float TabGap = 4f;
         private const float ToolRowHeight = 28f;
-        private const float RowHeight = 34f;
-        private const float RowGap = 3f;
+        private const float RowHeight = 38f;
+        private const float RowGap = 4f;
         private const float HeadingHeight = 22f;
+
+        /// <summary>The card at the top of one listing's own page.</summary>
+        private const float DetailHeight = 70f;
+
+        /// <summary>Where the icon sits, clear of the stripe down the left edge.</summary>
+        private const float IconInset = 10f;
+
+        /// <summary>Where the words start, clear of the icon.</summary>
+        private const float TextInset = RowHeight + 4f;
+
+        /// <summary>The button on the right of a row.</summary>
+        private const float ActionWidth = 74f;
+
+        /// <summary>The price and the countdown, right aligned against the button.</summary>
+        private const float MoneyWidth = 150f;
+
+        /// <summary>How wide the words on the left may run before they meet the money.</summary>
+        private const float LabelWidth = Width - TextInset - MoneyWidth - ActionWidth - 48f;
+
+        /// <summary>The same, on a row that has no money column - a picker.</summary>
+        private const float PlainWidth = Width - TextInset - ActionWidth - 32f;
+
+        // -----------------------------------------------------------------
+        // Colours the shared theme has no name for, because only a market needs them.
+
+        /// <summary>Every other row, so a long list reads as rows and not as a wall.</summary>
+        private static readonly Color RowAltColor = new Color(0.937f, 0.957f, 0.980f);
+
+        /// <summary>Money. On a page about money it should be the first thing found.</summary>
+        private static readonly Color MoneyColor = new Color(0.451f, 0.310f, 0.055f);
+
+        /// <summary>Under an hour left. Meant to read as "decide now", not as an error.</summary>
+        private static readonly Color UrgentColor = new Color(0.647f, 0.243f, 0.094f);
+
+        /// <summary>A bid of yours that is leading.</summary>
+        private static readonly Color WinningColor = new Color(0.106f, 0.412f, 0.208f);
+
+        /// <summary>The bar down the left of a row that has something to do with you.</summary>
+        private const float StripeWidth = 3f;
+
+        /// <summary>
+        /// The server's limit of one at a time, mirrored so a button can say so.
+        ///
+        /// The server is what enforces it - this only decides what the button says, so the
+        /// two being out of step costs a refusal message rather than a duplicated item.
+        /// </summary>
+        private const int MaxListings = 1;
+
+        private const int MaxBuyOrders = 1;
+
+        /// <summary>
+        /// How many bids the server sends back for one listing.
+        ///
+        /// Mirrored so the heading can say when it is showing a capped list rather than a
+        /// complete one. Being wrong about it costs a slightly odd heading, nothing more.
+        /// </summary>
+        private const int HistoryCap = 20;
 
         /// <summary>Where the list starts, under the title bar, the tabs and the tool row.</summary>
         private const float BodyTop = ModernUiTheme.TitleBarHeight + TabHeight + TabGap
@@ -112,6 +169,23 @@ namespace Assets.Scripts.UI.Market
         /// <summary>How many the search actually found, before the list was cut down.</summary>
         private int searchFound;
 
+        /// <summary>
+        /// Which listing has its own page open, or -1 for the list.
+        ///
+        /// A state on top of whichever page you came from rather than a page of its own,
+        /// so going back puts you where you were - the board, or your own listings.
+        /// </summary>
+        private int viewingAuction = -1;
+
+        /// <summary>
+        /// That listing as it read when it was opened.
+        ///
+        /// Only drawn when the live one can no longer be found: it sold, or a refresh moved
+        /// it off this page. The last thing known about it beats a blank page that says
+        /// nothing at all about what was there a second ago.
+        /// </summary>
+        private AuctionEntry viewingSnapshot;
+
         private int drawnRevision = -1;
         private float refreshTimer;
 
@@ -153,6 +227,11 @@ namespace Assets.Scripts.UI.Market
             instance.gameObject.SetActive(true);
             instance.MoveToTop();
             instance.FitWindowIntoPlayArea();
+
+            //Opened on the list, never on whatever listing was being read last time - that
+            //one has very likely ended since, and a stale page is a worse greeting than a
+            //board that has moved on.
+            instance.viewingAuction = -1;
             instance.Ask();
         }
 
@@ -194,7 +273,7 @@ namespace Assets.Scripts.UI.Market
                 ModernUiTheme.LabelColor, TextAlignmentOptions.Right);
             window.subtitle.textWrappingMode = TextWrappingModes.NoWrap;
             ModernUiTheme.Place(window.subtitle.rectTransform, new Vector2(1, 1),
-                new Vector2(-52f, -30f), new Vector2(220f, 20f));
+                new Vector2(-52f, -30f), new Vector2(340f, 20f));
 
             window.BuildTabs(rect);
 
@@ -254,6 +333,7 @@ namespace Assets.Scripts.UI.Market
             page = which;
             selling = SellStage.NotSelling;
             posting = BuyStage.NotPosting;
+            viewingAuction = -1;
             Ask();
             Redraw();
         }
@@ -269,6 +349,12 @@ namespace Assets.Scripts.UI.Market
             askedAt = Time.realtimeSinceStartup;
             reportedTimeout = false;
 
+            //Asked for alongside the list underneath, so an open listing's bids keep up
+            //with it instead of freezing at whatever they were when it was opened. This is
+            //the whole point of showing them: somebody else bidding is the news.
+            if (viewingAuction >= 0)
+                net.SendAuctionAction(AuctionRequestType.History, viewingAuction);
+
             switch (page)
             {
                 case Page.Browse:
@@ -276,6 +362,9 @@ namespace Assets.Scripts.UI.Market
                     break;
                 case Page.Buying:
                     net.SendBuyOrderBrowse(MarketState.BuySearch, MarketState.BuyPage);
+                    //and what this character has standing, so the post button knows when it
+                    //is already at its one and the list can mark your own row
+                    net.SendBuyOrderAction(BuyOrderRequestType.Mine);
                     break;
                 case Page.Mine:
                     //Both, because the page shows both - what you are selling and what you
@@ -324,6 +413,10 @@ namespace Assets.Scripts.UI.Market
         {
             get
             {
+                //an open listing is answered by its own request, not by the page under it
+                if (viewingAuction >= 0)
+                    return MarketState.HistoryFor == viewingAuction;
+
                 switch (page)
                 {
                     case Page.Browse: return MarketState.ListingsReceived;
@@ -371,6 +464,14 @@ namespace Assets.Scripts.UI.Market
                 Destroy(toolRow.GetChild(i).gameObject);
 
             PaintTabs();
+
+            //One listing's own page sits on top of whichever list it was opened from, so
+            //going back returns you to the board or to your own listings, as the case was.
+            if (viewingAuction >= 0 && (page == Page.Browse || page == Page.Mine))
+            {
+                DrawAuctionDetail();
+                return;
+            }
 
             switch (page)
             {
@@ -457,15 +558,16 @@ namespace Assets.Scripts.UI.Market
             if (MarketState.Listings.Count == 0)
             {
                 BuildNote(string.IsNullOrEmpty(MarketState.BrowseSearch)
-                    ? "ยังไม่มีใครตั้งประมูล"
+                    ? "ยังไม่มีใครตั้งประมูล  ·  ไปแท็บ ของฉัน เพื่อเป็นคนแรก"
                     : "ไม่พบของที่ค้นหา", y);
                 body.sizeDelta = new Vector2(0, RowHeight);
                 return;
             }
 
+            var index = 0;
             foreach (var entry in MarketState.Listings)
             {
-                BuildListingRow(entry, y, false);
+                BuildListingRow(entry, y, false, index++);
                 y -= RowHeight + RowGap;
             }
 
@@ -479,7 +581,13 @@ namespace Assets.Scripts.UI.Market
             if (pages < 1)
                 pages = 1;
 
-            subtitle.text = $"ทั้งหมด {MarketState.BrowseTotal:N0} รายการ  ·  หน้า {MarketState.BrowsePage + 1}/{pages}";
+            var counts = $"ทั้งหมด {MarketState.BrowseTotal:N0} รายการ  ·  หน้า {MarketState.BrowsePage + 1}/{pages}";
+
+            //Said only while there is something to tap. On an empty board it would be an
+            //instruction for a thing that is not there.
+            subtitle.text = MarketState.Listings.Count > 0
+                ? counts + "  ·  แตะที่รายการเพื่อดูคนบิด"
+                : counts;
 
             if (MarketState.BrowsePage > 0)
             {
@@ -521,17 +629,38 @@ namespace Assets.Scripts.UI.Market
 
         private void DrawMine()
         {
-            var sell = ModernUiTheme.CreateButton(toolRow, "Sell", "ตั้งประมูล",
-                ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
+            //Counted rather than taken from the list's length: this page also carries the
+            //listings you are merely leading, and those are somebody else's one, not yours.
+            var listed = 0;
+            foreach (var mine in MarketState.Mine)
+                if (mine.IsMine)
+                    listed++;
+
+            //The server refuses a second one and hands the item straight back, but the trip
+            //there is four taps and a parcel to collect afterwards. So the button says why
+            //instead of leading somewhere that can only end in a refusal.
+            var full = MarketState.MineReceived && listed >= MaxListings;
+            var sell = ModernUiTheme.CreateButton(toolRow, "Sell",
+                full ? "ตั้งครบแล้ว" : "ตั้งประมูล",
+                full ? ModernUiTheme.CardDeepColor : ModernUiTheme.AccentColor,
+                full ? ModernUiTheme.MutedColor : ModernUiTheme.LightInkColor,
+                ModernUiTheme.SizeSmall);
             ModernUiTheme.Place((RectTransform)sell.transform, new Vector2(0, 0.5f),
                 new Vector2(0f, 0f), new Vector2(110f, ToolRowHeight - 2f));
             sell.onClick.AddListener(() =>
             {
+                if (full)
+                {
+                    CameraFollower.Instance.AppendError(
+                        $"ตั้งประมูลได้ครั้งละ {MaxListings} รายการ รอรายการเดิมจบก่อน");
+                    return;
+                }
+
                 selling = SellStage.PickingItem;
                 Redraw();
             });
 
-            subtitle.text = $"ตั้งได้ไม่เกิน 10 รายการ  ·  ค่าฝาก 1%  ·  ขายได้หัก 3%";
+            subtitle.text = $"ตั้งได้ครั้งละ {MaxListings} รายการ  ·  ค่าฝาก 1%  ·  ขายได้หัก 3%";
 
             var y = -RowGap;
             if (!MarketState.MineReceived)
@@ -552,9 +681,10 @@ namespace Assets.Scripts.UI.Market
                 BuildHeading("ประมูล", y);
                 y -= HeadingHeight + RowGap;
 
+                var index = 0;
                 foreach (var entry in MarketState.Mine)
                 {
-                    BuildListingRow(entry, y, true);
+                    BuildListingRow(entry, y, true, index++);
                     y -= RowHeight + RowGap;
                 }
             }
@@ -567,9 +697,10 @@ namespace Assets.Scripts.UI.Market
                 BuildHeading("รับซื้อ", y);
                 y -= HeadingHeight + RowGap;
 
+                var index = 0;
                 foreach (var order in MarketState.MyBuyOrders)
                 {
-                    BuildBuyOrderRow(order, y, true);
+                    BuildBuyOrderRow(order, y, true, index++);
                     y -= RowHeight + RowGap;
                 }
             }
@@ -584,41 +715,68 @@ namespace Assets.Scripts.UI.Market
         /// Which button appears is decided from who owns it rather than from which page it
         /// is on, so a listing of your own that turns up in a search is not offered a bid
         /// button the server would only refuse.
+        ///
+        /// The row itself is a button as well, opening the listing's own page. The bid and
+        /// cancel buttons sit on top of it and are hit first - which is what makes a tap on
+        /// the right of a row act on it, and a tap anywhere else look at it.
         /// </summary>
-        private void BuildListingRow(AuctionEntry entry, float y, bool ownPage)
+        private void BuildListingRow(AuctionEntry entry, float y, bool ownPage, int index)
         {
-            var row = NewRow(y);
+            var row = NewRow(y, index);
             var data = ClientDataLoader.Instance != null
                 ? ClientDataLoader.Instance.GetItemById(entry.Item.ItemId)
                 : null;
 
-            if (data != null && ClientDataLoader.Instance != null)
-            {
-                var sprite = ClientDataLoader.Instance.GetIconAtlasSprite(data.Code);
-                if (sprite != null)
-                {
-                    var icon = ModernUiTheme.CreateIcon(row, sprite, Color.white, RowHeight - 10f);
-                    ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f),
-                        new Vector2(6f, 0f), new Vector2(RowHeight - 10f, RowHeight - 10f));
-                }
-            }
+            RowIcon(row, data);
+
+            //A bar down the left for the rows that are about you: the ones you put up, and
+            //the ones you are currently winning. On a board of forty rows that is the only
+            //thing anybody is scanning for.
+            var leading = entry.HighBid > 0 && IsMe(entry.HighBidderName);
+            if (entry.IsMine)
+                Stripe(row, ModernUiTheme.AccentColor);
+            else if (leading)
+                Stripe(row, WinningColor);
 
             var name = ModernUiTheme.CreateText(row, "Name", ItemLabel(entry.Item, data),
                 ModernUiTheme.SizeLabel, ModernUiTheme.NameColor, TextAlignmentOptions.TopLeft);
             name.textWrappingMode = TextWrappingModes.NoWrap;
             name.overflowMode = TextOverflowModes.Ellipsis;
             ModernUiTheme.Place(name.rectTransform, new Vector2(0, 1),
-                new Vector2(RowHeight, -3f), new Vector2(Width - RowHeight - 200f, 18f));
+                new Vector2(TextInset, -5f), new Vector2(LabelWidth, 18f));
 
-            var price = entry.HighBid > 0
-                ? $"บิดสูงสุด {entry.HighBid:N0} Zeny โดย {entry.HighBidderName}"
-                : $"ราคาเริ่ม {entry.StartPrice:N0} Zeny · ยังไม่มีคนบิด";
-            var under = ModernUiTheme.CreateText(row, "Price", $"{price}  ·  {TimeLeft(entry)}",
-                ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor, TextAlignmentOptions.TopLeft);
+            string who;
+            var tint = ModernUiTheme.MutedColor;
+
+            if (leading)
+            {
+                who = "คุณนำอยู่";
+                tint = WinningColor;
+            }
+            else if (entry.HighBid > 0)
+                who = $"{entry.HighBidderName} นำอยู่";
+            else
+                who = "ยังไม่มีคนบิด";
+
+            if (!entry.IsMine && !ownPage)
+                who += $"  ·  ขายโดย {entry.SellerName}";
+
+            var under = ModernUiTheme.CreateText(row, "Who", who,
+                ModernUiTheme.SizeSmall, tint, TextAlignmentOptions.TopLeft);
             under.textWrappingMode = TextWrappingModes.NoWrap;
             under.overflowMode = TextOverflowModes.Ellipsis;
             ModernUiTheme.Place(under.rectTransform, new Vector2(0, 1),
-                new Vector2(RowHeight, -18f), new Vector2(Width - RowHeight - 130f, 16f));
+                new Vector2(TextInset, -21f), new Vector2(LabelWidth, 16f));
+
+            //The price gets a column of its own rather than a place in a sentence. It is
+            //the number every one of these rows is really about, and reading it off the end
+            //of a line of words means reading the words first.
+            var left = SecondsLeft(entry);
+            MoneyColumn(row, $"{(entry.HighBid > 0 ? entry.HighBid : entry.StartPrice):N0} Zeny",
+                TimeLeftText(left), left > 0 && left < 3600 ? UrgentColor : ModernUiTheme.MutedColor);
+
+            var opened = entry;
+            MakeRowClickable(row, () => OpenListing(opened));
 
             if (entry.IsMine)
             {
@@ -631,7 +789,7 @@ namespace Assets.Scripts.UI.Market
                 var cancel = ModernUiTheme.CreateButton(row, "Cancel", "ยกเลิก",
                     ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
                 ModernUiTheme.Place((RectTransform)cancel.transform, new Vector2(1, 0.5f),
-                    new Vector2(-8f, 0f), new Vector2(74f, RowHeight - 8f));
+                    new Vector2(-8f, 0f), new Vector2(ActionWidth, RowHeight - 10f));
                 cancel.onClick.AddListener(() =>
                     NetworkManager.Instance.SendAuctionAction(AuctionRequestType.Cancel, id));
                 return;
@@ -640,10 +798,247 @@ namespace Assets.Scripts.UI.Market
             var bid = ModernUiTheme.CreateButton(row, "Bid", "บิด",
                 ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
             ModernUiTheme.Place((RectTransform)bid.transform, new Vector2(1, 0.5f),
-                new Vector2(-8f, 0f), new Vector2(74f, RowHeight - 8f));
+                new Vector2(-8f, 0f), new Vector2(ActionWidth, RowHeight - 10f));
 
             var captured = entry;
             bid.onClick.AddListener(() => AskForBid(captured));
+        }
+
+        /// <summary>Opens one listing's own page, and asks who has bid on it.</summary>
+        private void OpenListing(AuctionEntry entry)
+        {
+            viewingAuction = entry.Id;
+            viewingSnapshot = entry;
+
+            //Emptied rather than left showing the last listing's bids, which would otherwise
+            //be drawn under this one's name for as long as the answer takes to arrive.
+            MarketState.History.Clear();
+            MarketState.HistoryFor = -1;
+
+            Ask();
+            Redraw();
+        }
+
+        // =====================================================================
+        // One listing on its own
+
+        /// <summary>
+        /// Everything known about one listing, which is mostly who has been bidding on it.
+        ///
+        /// The numbers are not the point - the row already showed the leading bid. The
+        /// point is that four different people bid on this in the last ten minutes, which
+        /// is the difference between a noticeboard and a market, and no single row can say
+        /// it.
+        /// </summary>
+        private void DrawAuctionDetail()
+        {
+            var entry = FindViewed();
+
+            var back = ModernUiTheme.CreateButton(toolRow, "BackDetail", "ย้อนกลับ",
+                ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place((RectTransform)back.transform, new Vector2(0, 0.5f),
+                new Vector2(0f, 0f), new Vector2(90f, ToolRowHeight - 2f));
+            back.onClick.AddListener(() =>
+            {
+                viewingAuction = -1;
+                Ask();
+                Redraw();
+            });
+
+            if (entry == null)
+            {
+                //Between the tap and the answer it can have sold. Saying so beats an empty
+                //page, and beats leaving the last owner's numbers on screen.
+                subtitle.text = "";
+                BuildNote("รายการนี้จบไปแล้ว", -RowGap);
+                body.sizeDelta = new Vector2(0, RowHeight);
+                return;
+            }
+
+            if (!entry.IsMine)
+            {
+                var bid = ModernUiTheme.CreateButton(toolRow, "BidDetail",
+                    $"บิด {entry.MinimumBid:N0} Zeny", ModernUiTheme.AccentColor,
+                    ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
+                ModernUiTheme.Place((RectTransform)bid.transform, new Vector2(1, 0.5f),
+                    new Vector2(0f, 0f), new Vector2(170f, ToolRowHeight - 2f));
+
+                var captured = entry;
+                bid.onClick.AddListener(() => AskForBid(captured));
+            }
+            else if (entry.HighBid <= 0)
+            {
+                //Only one nobody has bid on can come down, the same rule as on the row.
+                var id = entry.Id;
+                var cancel = ModernUiTheme.CreateButton(toolRow, "CancelDetail", "ยกเลิกรายการ",
+                    ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
+                ModernUiTheme.Place((RectTransform)cancel.transform, new Vector2(1, 0.5f),
+                    new Vector2(0f, 0f), new Vector2(120f, ToolRowHeight - 2f));
+                cancel.onClick.AddListener(() =>
+                {
+                    NetworkManager.Instance.SendAuctionAction(AuctionRequestType.Cancel, id);
+                    viewingAuction = -1;
+                    Redraw();
+                });
+            }
+
+            subtitle.text = entry.IsMine ? "รายการของคุณ" : $"ผู้ขาย {entry.SellerName}";
+
+            var y = -RowGap;
+            BuildDetailHead(entry, y);
+            y -= DetailHeight + RowGap * 2f;
+
+            if (MarketState.HistoryFor != viewingAuction)
+            {
+                var late = Time.realtimeSinceStartup - askedAt > AnswerTimeout;
+                BuildNote(late ? "เซิร์ฟเวอร์ไม่ตอบ กำลังลองใหม่..." : "กำลังโหลด...", y);
+                body.sizeDelta = new Vector2(0, -y + RowHeight);
+                return;
+            }
+
+            var bids = MarketState.History.Count;
+
+            //The server sends the last twenty and no more. Where it is exactly twenty that
+            //is worth saying, otherwise a listing fought over all day reads as one that was
+            //bid on twenty times.
+            BuildHeading(bids >= HistoryCap ? $"คนที่บิด ({HistoryCap} ครั้งล่าสุด)"
+                : bids > 0 ? $"คนที่บิด ({bids} ครั้ง)" : "คนที่บิด", y);
+            y -= HeadingHeight + RowGap;
+
+            if (bids == 0)
+            {
+                BuildNote(entry.IsMine ? "ยังไม่มีใครบิด" : "ยังไม่มีใครบิด เป็นคนแรกได้เลย", y);
+                body.sizeDelta = new Vector2(0, -y + RowHeight);
+                return;
+            }
+
+            var index = 0;
+            foreach (var made in MarketState.History)
+            {
+                BuildBidRow(made, y, index, index == 0);
+                index++;
+                y -= RowHeight + RowGap;
+            }
+
+            body.sizeDelta = new Vector2(0, -y);
+        }
+
+        /// <summary>
+        /// The listing being read, as it last came off the wire.
+        ///
+        /// Looked up again on each redraw rather than held onto, because the one thing on
+        /// it worth watching - the leading bid - changes underneath while the page is open.
+        /// What it was when it was opened is the fallback, which beats a blank page.
+        /// </summary>
+        private AuctionEntry FindViewed()
+        {
+            foreach (var entry in MarketState.Listings)
+                if (entry.Id == viewingAuction)
+                    return entry;
+
+            foreach (var entry in MarketState.Mine)
+                if (entry.Id == viewingAuction)
+                    return entry;
+
+            return viewingSnapshot != null && viewingSnapshot.Id == viewingAuction
+                ? viewingSnapshot
+                : null;
+        }
+
+        /// <summary>The listing itself, above its bids: what it is, whose, and for how much.</summary>
+        private void BuildDetailHead(AuctionEntry entry, float y)
+        {
+            var card = ModernUiTheme.CreateCard(body, "Head", ModernUiTheme.CardDeepColor);
+            card.anchorMin = new Vector2(0, 1);
+            card.anchorMax = new Vector2(1, 1);
+            card.pivot = new Vector2(0.5f, 1);
+            card.sizeDelta = new Vector2(-RowGap * 2f, DetailHeight);
+            card.anchoredPosition = new Vector2(0, y);
+            card.GetComponent<Image>().raycastTarget = false;
+            rows.Add(card.gameObject);
+
+            var data = ClientDataLoader.Instance != null
+                ? ClientDataLoader.Instance.GetItemById(entry.Item.ItemId)
+                : null;
+
+            if (data != null && ClientDataLoader.Instance != null)
+            {
+                var sprite = ClientDataLoader.Instance.GetIconAtlasSprite(data.Code);
+                if (sprite != null)
+                {
+                    var icon = ModernUiTheme.CreateIcon(card, sprite, Color.white, 44f);
+                    ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f),
+                        new Vector2(12f, 0f), new Vector2(44f, 44f));
+                }
+            }
+
+            var name = ModernUiTheme.CreateText(card, "Name", ItemLabel(entry.Item, data),
+                ModernUiTheme.SizeBody, ModernUiTheme.TitleColor, TextAlignmentOptions.TopLeft,
+                FontStyles.Bold);
+            name.textWrappingMode = TextWrappingModes.NoWrap;
+            name.overflowMode = TextOverflowModes.Ellipsis;
+            ModernUiTheme.Place(name.rectTransform, new Vector2(0, 1),
+                new Vector2(64f, -10f), new Vector2(Width - 284f, 22f));
+
+            var left = SecondsLeft(entry);
+            var who = ModernUiTheme.CreateText(card, "Who",
+                entry.HighBid > 0
+                    ? $"{entry.HighBidderName} นำอยู่  ·  {TimeLeftText(left)}"
+                    : $"ยังไม่มีคนบิด  ·  {TimeLeftText(left)}",
+                ModernUiTheme.SizeSmall,
+                left > 0 && left < 3600 ? UrgentColor : ModernUiTheme.LabelColor,
+                TextAlignmentOptions.TopLeft);
+            who.textWrappingMode = TextWrappingModes.NoWrap;
+            who.overflowMode = TextOverflowModes.Ellipsis;
+            ModernUiTheme.Place(who.rectTransform, new Vector2(0, 1),
+                new Vector2(64f, -36f), new Vector2(Width - 284f, 18f));
+
+            //Bigger here than on a row, because on this page the number is the subject
+            var money = ModernUiTheme.CreateText(card, "Money",
+                $"{(entry.HighBid > 0 ? entry.HighBid : entry.StartPrice):N0} Zeny",
+                ModernUiTheme.SizeValue, MoneyColor, TextAlignmentOptions.TopRight,
+                FontStyles.Bold);
+            money.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(money.rectTransform, new Vector2(1, 1),
+                new Vector2(-12f, -10f), new Vector2(200f, 26f));
+
+            var label = ModernUiTheme.CreateText(card, "MoneyLabel",
+                entry.HighBid > 0 ? $"บิดต่อไปอย่างน้อย {entry.MinimumBid:N0}" : "ราคาเริ่มต้น",
+                ModernUiTheme.SizeSmall, ModernUiTheme.LabelColor, TextAlignmentOptions.TopRight);
+            label.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(label.rectTransform, new Vector2(1, 1),
+                new Vector2(-12f, -38f), new Vector2(200f, 16f));
+        }
+
+        /// <summary>One bid: who made it, how much, how long ago, and whether it still leads.</summary>
+        private void BuildBidRow(AuctionBidEntry made, float y, int index, bool leading)
+        {
+            var row = NewRow(y, index);
+            var mine = IsMe(made.BidderName);
+
+            if (leading)
+                Stripe(row, WinningColor);
+            else if (mine)
+                Stripe(row, ModernUiTheme.AccentColor);
+
+            var name = ModernUiTheme.CreateText(row, "Bidder",
+                mine ? $"{made.BidderName} (คุณ)" : made.BidderName,
+                ModernUiTheme.SizeLabel,
+                leading ? WinningColor : ModernUiTheme.NameColor, TextAlignmentOptions.TopLeft,
+                leading ? FontStyles.Bold : FontStyles.Normal);
+            name.textWrappingMode = TextWrappingModes.NoWrap;
+            name.overflowMode = TextOverflowModes.Ellipsis;
+            ModernUiTheme.Place(name.rectTransform, new Vector2(0, 1),
+                new Vector2(16f, -5f), new Vector2(LabelWidth, 18f));
+
+            var ago = ModernUiTheme.CreateText(row, "Ago", TimeAgoText(made.SecondsAgo),
+                ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor, TextAlignmentOptions.TopLeft);
+            ago.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(ago.rectTransform, new Vector2(0, 1),
+                new Vector2(16f, -21f), new Vector2(LabelWidth, 16f));
+
+            MoneyColumn(row, $"{made.Amount:N0} Zeny", leading ? "นำอยู่" : "ถูกแซงแล้ว",
+                leading ? WinningColor : ModernUiTheme.MutedColor, 12f);
         }
 
         private void AskForBid(AuctionEntry entry)
@@ -675,11 +1070,28 @@ namespace Assets.Scripts.UI.Market
 
         private void DrawBuying()
         {
-            var post = ModernUiTheme.CreateButton(toolRow, "Post", "ตั้งรับซื้อ",
-                ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
+            //Same as the sell button on the other page: one at a time, and the button is
+            //where that is said, rather than at the end of a flow that takes money first.
+            var full = MarketState.MyBuyOrdersReceived
+                       && MarketState.MyBuyOrders.Count >= MaxBuyOrders;
+            var post = ModernUiTheme.CreateButton(toolRow, "Post",
+                full ? "ตั้งครบแล้ว" : "ตั้งรับซื้อ",
+                full ? ModernUiTheme.CardDeepColor : ModernUiTheme.AccentColor,
+                full ? ModernUiTheme.MutedColor : ModernUiTheme.LightInkColor,
+                ModernUiTheme.SizeSmall);
             ModernUiTheme.Place((RectTransform)post.transform, new Vector2(0, 0.5f),
                 new Vector2(0f, 0f), new Vector2(96f, ToolRowHeight - 2f));
-            post.onClick.AddListener(AskWhatToWant);
+            post.onClick.AddListener(() =>
+            {
+                if (full)
+                {
+                    CameraFollower.Instance.AppendError(
+                        $"ตั้งรับซื้อได้ครั้งละ {MaxBuyOrders} รายการ ยกเลิกรายการเดิมก่อน");
+                    return;
+                }
+
+                AskWhatToWant();
+            });
 
             var search = ModernUiTheme.CreateButton(toolRow, "SearchBuy",
                 string.IsNullOrEmpty(MarketState.BuySearch)
@@ -709,15 +1121,16 @@ namespace Assets.Scripts.UI.Market
             if (MarketState.BuyOrders.Count == 0)
             {
                 BuildNote(string.IsNullOrEmpty(MarketState.BuySearch)
-                    ? "ยังไม่มีใครตั้งรับซื้อ"
+                    ? "ยังไม่มีใครตั้งรับซื้อ  ·  กดปุ่ม ตั้งรับซื้อ เพื่อเป็นคนแรก"
                     : "ไม่มีใครรับซื้อของชิ้นนี้", y);
                 body.sizeDelta = new Vector2(0, RowHeight);
                 return;
             }
 
+            var index = 0;
             foreach (var order in MarketState.BuyOrders)
             {
-                BuildBuyOrderRow(order, y, false);
+                BuildBuyOrderRow(order, y, false, index++);
                 y -= RowHeight + RowGap;
             }
 
@@ -730,7 +1143,8 @@ namespace Assets.Scripts.UI.Market
             if (pages < 1)
                 pages = 1;
 
-            subtitle.text = $"รับซื้ออยู่ {MarketState.BuyTotal:N0} รายการ  ·  หน้า {MarketState.BuyPage + 1}/{pages}";
+            subtitle.text = $"รับซื้ออยู่ {MarketState.BuyTotal:N0} รายการ  ·  หน้า {MarketState.BuyPage + 1}/{pages}"
+                            + $"  ·  ตั้งได้ครั้งละ {MaxBuyOrders} รายการ";
 
             if (MarketState.BuyPage > 0)
             {
@@ -764,25 +1178,21 @@ namespace Assets.Scripts.UI.Market
         ///
         /// The sell button is only offered when there is actually something in the bag to
         /// sell into it, because a button whose only outcome is "you have none of those"
-        /// is a button that wastes a tap and teaches nothing.
+        /// is a button that wastes a tap and teaches nothing. Your own order gets none
+        /// either - the server refuses selling to yourself, and rightly.
         /// </summary>
-        private void BuildBuyOrderRow(BuyOrderEntry order, float y, bool ownPage)
+        private void BuildBuyOrderRow(BuyOrderEntry order, float y, bool ownPage, int index)
         {
-            var row = NewRow(y);
+            var row = NewRow(y, index);
             var data = ClientDataLoader.Instance != null
                 ? ClientDataLoader.Instance.GetItemById(order.ItemId)
                 : null;
 
-            if (data != null && ClientDataLoader.Instance != null)
-            {
-                var sprite = ClientDataLoader.Instance.GetIconAtlasSprite(data.Code);
-                if (sprite != null)
-                {
-                    var icon = ModernUiTheme.CreateIcon(row, sprite, Color.white, RowHeight - 10f);
-                    ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f),
-                        new Vector2(6f, 0f), new Vector2(RowHeight - 10f, RowHeight - 10f));
-                }
-            }
+            RowIcon(row, data);
+
+            var mine = ownPage || IsMe(order.BuyerName);
+            if (mine)
+                Stripe(row, ModernUiTheme.AccentColor);
 
             var name = ModernUiTheme.CreateText(row, "Name",
                 data != null ? data.Name : $"#{order.ItemId}",
@@ -790,20 +1200,26 @@ namespace Assets.Scripts.UI.Market
             name.textWrappingMode = TextWrappingModes.NoWrap;
             name.overflowMode = TextOverflowModes.Ellipsis;
             ModernUiTheme.Place(name.rectTransform, new Vector2(0, 1),
-                new Vector2(RowHeight, -3f), new Vector2(Width - RowHeight - 200f, 18f));
+                new Vector2(TextInset, -5f), new Vector2(LabelWidth, 18f));
 
-            var detail = $"รับอีก {order.RemainingCount:N0}/{order.WantedCount:N0} ชิ้น"
-                         + $"  ·  ชิ้นละ {order.PricePer:N0} Zeny";
+            var detail = $"รับอีก {order.RemainingCount:N0}/{order.WantedCount:N0} ชิ้น";
             if (!ownPage)
-                detail += $"  ·  {order.BuyerName}";
-            detail += $"  ·  {TimeLeftText(order.SecondsLeft)}";
+                detail += mine ? "  ·  ของคุณเอง" : $"  ·  โดย {order.BuyerName}";
 
             var under = ModernUiTheme.CreateText(row, "Detail", detail,
-                ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor, TextAlignmentOptions.TopLeft);
+                ModernUiTheme.SizeSmall, mine ? ModernUiTheme.LabelColor : ModernUiTheme.MutedColor,
+                TextAlignmentOptions.TopLeft);
             under.textWrappingMode = TextWrappingModes.NoWrap;
             under.overflowMode = TextOverflowModes.Ellipsis;
             ModernUiTheme.Place(under.rectTransform, new Vector2(0, 1),
-                new Vector2(RowHeight, -18f), new Vector2(Width - RowHeight - 130f, 16f));
+                new Vector2(TextInset, -21f), new Vector2(LabelWidth, 16f));
+
+            //Per piece, not the total: what a seller is deciding is whether to hand over one
+            //of these, and the total on the order is not the number that answers that.
+            MoneyColumn(row, $"ชิ้นละ {order.PricePer:N0} Zeny", TimeLeftText(order.SecondsLeft),
+                order.SecondsLeft > 0 && order.SecondsLeft < 3600
+                    ? UrgentColor
+                    : ModernUiTheme.MutedColor);
 
             if (ownPage)
             {
@@ -811,10 +1227,13 @@ namespace Assets.Scripts.UI.Market
                 var cancel = ModernUiTheme.CreateButton(row, "CancelBuy", "ยกเลิก",
                     ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
                 ModernUiTheme.Place((RectTransform)cancel.transform, new Vector2(1, 0.5f),
-                    new Vector2(-8f, 0f), new Vector2(74f, RowHeight - 8f));
+                    new Vector2(-8f, 0f), new Vector2(ActionWidth, RowHeight - 10f));
                 cancel.onClick.AddListener(() => NetworkManager.Instance.SendBuyOrderCancel(id));
                 return;
             }
+
+            if (mine)
+                return;
 
             if (!TryFindStack(order.ItemId, out var bagId, out var have))
                 return;
@@ -822,7 +1241,7 @@ namespace Assets.Scripts.UI.Market
             var sell = ModernUiTheme.CreateButton(row, "SellInto", "ขาย",
                 ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
             ModernUiTheme.Place((RectTransform)sell.transform, new Vector2(1, 0.5f),
-                new Vector2(-8f, 0f), new Vector2(74f, RowHeight - 8f));
+                new Vector2(-8f, 0f), new Vector2(ActionWidth, RowHeight - 10f));
 
             var captured = order;
             var slot = bagId;
@@ -968,18 +1387,20 @@ namespace Assets.Scripts.UI.Market
                 : $"เจอ {searchMatches.Count} อย่าง  ·  ค่าธรรมเนียม {BuyOrderFeePercent}%";
 
             var y = -RowGap;
+            var index = 0;
             foreach (var item in searchMatches)
             {
-                var row = NewRow(y);
+                var row = NewRow(y, index++);
 
                 if (ClientDataLoader.Instance != null)
                 {
                     var sprite = ClientDataLoader.Instance.GetIconAtlasSprite(item.Code);
                     if (sprite != null)
                     {
-                        var icon = ModernUiTheme.CreateIcon(row, sprite, Color.white, RowHeight - 10f);
+                        var size = RowHeight - 14f;
+                        var icon = ModernUiTheme.CreateIcon(row, sprite, Color.white, size);
                         ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f),
-                            new Vector2(6f, 0f), new Vector2(RowHeight - 10f, RowHeight - 10f));
+                            new Vector2(IconInset, 0f), new Vector2(size, size));
                     }
                 }
 
@@ -988,7 +1409,7 @@ namespace Assets.Scripts.UI.Market
                 name.textWrappingMode = TextWrappingModes.NoWrap;
                 name.overflowMode = TextOverflowModes.Ellipsis;
                 ModernUiTheme.Place(name.rectTransform, new Vector2(0, 1),
-                    new Vector2(RowHeight, -3f), new Vector2(Width - RowHeight - 130f, 18f));
+                    new Vector2(TextInset, -5f), new Vector2(PlainWidth, 18f));
 
                 //The number and what a shop pays, because a name on its own is not enough to
                 //pick by - two things can read almost alike, and the number is what the
@@ -1000,12 +1421,12 @@ namespace Assets.Scripts.UI.Market
                     ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor, TextAlignmentOptions.TopLeft);
                 under.textWrappingMode = TextWrappingModes.NoWrap;
                 ModernUiTheme.Place(under.rectTransform, new Vector2(0, 1),
-                    new Vector2(RowHeight, -18f), new Vector2(Width - RowHeight - 130f, 16f));
+                    new Vector2(TextInset, -21f), new Vector2(PlainWidth, 16f));
 
                 var pick = ModernUiTheme.CreateButton(row, "PickWant", "เลือก",
                     ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
                 ModernUiTheme.Place((RectTransform)pick.transform, new Vector2(1, 0.5f),
-                    new Vector2(-8f, 0f), new Vector2(74f, RowHeight - 8f));
+                    new Vector2(-8f, 0f), new Vector2(ActionWidth, RowHeight - 10f));
 
                 var chosen = item;
                 pick.onClick.AddListener(() => AskWantCount(chosen));
@@ -1108,7 +1529,7 @@ namespace Assets.Scripts.UI.Market
                     if (state.EquippedBagIdHashes.Contains(bagId))
                         continue;
 
-                    BuildSellRow(bagId, item, y);
+                    BuildSellRow(bagId, item, y, shown);
                     y -= RowHeight + RowGap;
                     shown++;
                 }
@@ -1123,18 +1544,19 @@ namespace Assets.Scripts.UI.Market
             body.sizeDelta = new Vector2(0, -y);
         }
 
-        private void BuildSellRow(int bagId, InventoryItem item, float y)
+        private void BuildSellRow(int bagId, InventoryItem item, float y, int index)
         {
-            var row = NewRow(y);
+            var row = NewRow(y, index);
 
             var sprite = ClientDataLoader.Instance != null
                 ? ClientDataLoader.Instance.GetIconAtlasSprite(item.ItemData.Code)
                 : null;
             if (sprite != null)
             {
-                var icon = ModernUiTheme.CreateIcon(row, sprite, Color.white, RowHeight - 10f);
+                var size = RowHeight - 14f;
+                var icon = ModernUiTheme.CreateIcon(row, sprite, Color.white, size);
                 ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f),
-                    new Vector2(6f, 0f), new Vector2(RowHeight - 10f, RowHeight - 10f));
+                    new Vector2(IconInset, 0f), new Vector2(size, size));
             }
 
             var label = item.Count > 1 ? $"{item.ProperName()}  x{item.Count}" : item.ProperName();
@@ -1143,12 +1565,12 @@ namespace Assets.Scripts.UI.Market
             name.textWrappingMode = TextWrappingModes.NoWrap;
             name.overflowMode = TextOverflowModes.Ellipsis;
             ModernUiTheme.Place(name.rectTransform, new Vector2(0, 0.5f),
-                new Vector2(RowHeight, 0f), new Vector2(Width - RowHeight - 130f, RowHeight));
+                new Vector2(TextInset, 0f), new Vector2(PlainWidth, RowHeight));
 
             var pick = ModernUiTheme.CreateButton(row, "Pick", "เลือก",
                 ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
             ModernUiTheme.Place((RectTransform)pick.transform, new Vector2(1, 0.5f),
-                new Vector2(-8f, 0f), new Vector2(74f, RowHeight - 8f));
+                new Vector2(-8f, 0f), new Vector2(ActionWidth, RowHeight - 10f));
 
             var id = bagId;
             var count = item.Count;
@@ -1229,9 +1651,10 @@ namespace Assets.Scripts.UI.Market
                 -RowGap);
 
             var y = -RowGap - HeadingHeight - RowGap;
+            var index = 0;
             foreach (var hours in DurationChoices)
             {
-                var row = NewRow(y);
+                var row = NewRow(y, index++);
                 var pick = ModernUiTheme.CreateButton(row, "Hours" + hours, $"{hours} ชั่วโมง",
                     ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeLabel);
                 ModernUiTheme.Stretch((RectTransform)pick.transform, 8f, 3f, -8f, -3f);
@@ -1284,31 +1707,34 @@ namespace Assets.Scripts.UI.Market
                 return;
             }
 
+            var index = 0;
             foreach (var parcel in MarketState.Parcels)
             {
-                BuildParcelRow(parcel, y);
+                BuildParcelRow(parcel, y, index++);
                 y -= RowHeight + RowGap;
             }
 
             body.sizeDelta = new Vector2(0, -y);
         }
 
-        private void BuildParcelRow(ParcelEntry parcel, float y)
+        private void BuildParcelRow(ParcelEntry parcel, float y, int index)
         {
-            var row = NewRow(y);
+            var row = NewRow(y, index);
             var data = !parcel.IsMoneyOnly && ClientDataLoader.Instance != null
                 ? ClientDataLoader.Instance.GetItemById(parcel.Item.ItemId)
                 : null;
 
-            if (data != null && ClientDataLoader.Instance != null)
+            RowIcon(row, data);
+
+            //Money with no item behind it still gets something to look at, otherwise the
+            //rows that are pure payout are the ones with a hole where the picture goes.
+            if (parcel.IsMoneyOnly)
             {
-                var sprite = ClientDataLoader.Instance.GetIconAtlasSprite(data.Code);
-                if (sprite != null)
-                {
-                    var icon = ModernUiTheme.CreateIcon(row, sprite, Color.white, RowHeight - 10f);
-                    ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f),
-                        new Vector2(6f, 0f), new Vector2(RowHeight - 10f, RowHeight - 10f));
-                }
+                var coin = ModernUiTheme.CreateIcon(row, ModernUiIcons.Coin, MoneyColor,
+                    RowHeight - 16f);
+                ModernUiTheme.Place(coin.rectTransform, new Vector2(0, 0.5f),
+                    new Vector2(IconInset + 1f, 0f),
+                    new Vector2(RowHeight - 16f, RowHeight - 16f));
             }
 
             var what = parcel.IsMoneyOnly
@@ -1320,7 +1746,7 @@ namespace Assets.Scripts.UI.Market
             name.textWrappingMode = TextWrappingModes.NoWrap;
             name.overflowMode = TextOverflowModes.Ellipsis;
             ModernUiTheme.Place(name.rectTransform, new Vector2(0, 1),
-                new Vector2(RowHeight, -3f), new Vector2(Width - RowHeight - 130f, 18f));
+                new Vector2(TextInset, -5f), new Vector2(PlainWidth, 18f));
 
             var why = ReasonText(parcel.Reason);
             if (!string.IsNullOrEmpty(parcel.FromName))
@@ -1331,13 +1757,13 @@ namespace Assets.Scripts.UI.Market
             under.textWrappingMode = TextWrappingModes.NoWrap;
             under.overflowMode = TextOverflowModes.Ellipsis;
             ModernUiTheme.Place(under.rectTransform, new Vector2(0, 1),
-                new Vector2(RowHeight, -18f), new Vector2(Width - RowHeight - 130f, 16f));
+                new Vector2(TextInset, -21f), new Vector2(PlainWidth, 16f));
 
             var id = parcel.Id;
             var take = ModernUiTheme.CreateButton(row, "Take", "รับ",
                 ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
             ModernUiTheme.Place((RectTransform)take.transform, new Vector2(1, 0.5f),
-                new Vector2(-8f, 0f), new Vector2(66f, RowHeight - 8f));
+                new Vector2(-8f, 0f), new Vector2(ActionWidth, RowHeight - 10f));
             take.onClick.AddListener(() =>
                 NetworkManager.Instance.SendInboxAction(InboxRequestType.Claim, id));
         }
@@ -1388,8 +1814,28 @@ namespace Assets.Scripts.UI.Market
         }
 
         /// <summary>How long is left, counted down from when the server said it.</summary>
-        private string TimeLeft(AuctionEntry entry) =>
-            TimeLeftText(entry.SecondsLeft - (int)(Time.realtimeSinceStartup - listingStamp));
+        private int SecondsLeft(AuctionEntry entry) =>
+            entry.SecondsLeft - (int)(Time.realtimeSinceStartup - listingStamp);
+
+        /// <summary>How long ago something happened, as words.</summary>
+        private static string TimeAgoText(int seconds)
+        {
+            if (seconds < 60)
+                return "เมื่อสักครู่";
+            if (seconds < 3600)
+                return $"{seconds / 60} นาทีที่แล้ว";
+            if (seconds < 86400)
+                return $"{seconds / 3600} ชั่วโมงที่แล้ว";
+            return $"{seconds / 86400} วันที่แล้ว";
+        }
+
+        /// <summary>Whether a name on a row is this character's own.</summary>
+        private static bool IsMe(string name)
+        {
+            var state = PlayerState.Instance;
+            return state != null && !string.IsNullOrEmpty(name)
+                   && string.Equals(state.PlayerName, name, StringComparison.Ordinal);
+        }
 
         /// <summary>A length of time as words, coarsening as it gets longer.</summary>
         private static string TimeLeftText(int left)
@@ -1423,16 +1869,110 @@ namespace Assets.Scripts.UI.Market
             ui.YesNoOptionsWindow.BeginPrompt(question, "ตกลง", "ยกเลิก", onYes, null, false);
         }
 
+        /// <summary>The item's own icon at the left of a row, when the client has one.</summary>
+        private static void RowIcon(RectTransform row, RebuildSharedData.ClientTypes.ItemData data)
+        {
+            if (data == null || ClientDataLoader.Instance == null)
+                return;
+
+            var sprite = ClientDataLoader.Instance.GetIconAtlasSprite(data.Code);
+            if (sprite == null)
+                return;
+
+            var size = RowHeight - 14f;
+            var icon = ModernUiTheme.CreateIcon(row, sprite, Color.white, size);
+            ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f),
+                new Vector2(IconInset, 0f), new Vector2(size, size));
+        }
+
+        /// <summary>
+        /// A coloured bar down the left of a row that has something to do with you.
+        ///
+        /// Cheaper to read than a word would be: on a page of forty rows the only question
+        /// being asked is "which of these are mine", and a bar answers it without being
+        /// read at all.
+        /// </summary>
+        private static void Stripe(RectTransform row, Color color)
+        {
+            var bar = ModernUiTheme.CreateCard(row, "Stripe", color);
+            ModernUiTheme.Place(bar, new Vector2(0, 0.5f), new Vector2(3f, 0f),
+                new Vector2(StripeWidth, RowHeight - 12f));
+            bar.GetComponent<Image>().raycastTarget = false;
+        }
+
+        /// <summary>
+        /// The price and the countdown, right aligned in a column of their own.
+        ///
+        /// Given a column rather than a place at the end of a sentence because the price is
+        /// what every one of these rows is actually about, and reading it off the end of a
+        /// line of words means reading the words first.
+        /// </summary>
+        private static void MoneyColumn(RectTransform row, string money, string when,
+            Color whenColor, float rightInset = ActionWidth + 16f)
+        {
+            var price = ModernUiTheme.CreateText(row, "Money", money, ModernUiTheme.SizeLabel,
+                MoneyColor, TextAlignmentOptions.TopRight, FontStyles.Bold);
+            price.textWrappingMode = TextWrappingModes.NoWrap;
+            price.overflowMode = TextOverflowModes.Ellipsis;
+            ModernUiTheme.Place(price.rectTransform, new Vector2(1, 1),
+                new Vector2(-rightInset, -5f), new Vector2(MoneyWidth, 18f));
+
+            var time = ModernUiTheme.CreateText(row, "When", when, ModernUiTheme.SizeSmall,
+                whenColor, TextAlignmentOptions.TopRight);
+            time.textWrappingMode = TextWrappingModes.NoWrap;
+            time.overflowMode = TextOverflowModes.Ellipsis;
+            ModernUiTheme.Place(time.rectTransform, new Vector2(1, 1),
+                new Vector2(-rightInset, -21f), new Vector2(MoneyWidth, 16f));
+        }
+
+        /// <summary>
+        /// Makes a whole row open something, without taking the drag that scrolls the list.
+        ///
+        /// A Button answers a click and implements none of the drag handlers, so a finger
+        /// moving across a row goes past it to the ScrollRect above. Its own buttons are
+        /// drawn over it and so are hit first, which is what makes a tap on the right of a
+        /// row act on it and a tap anywhere else look at it.
+        /// </summary>
+        private static void MakeRowClickable(RectTransform row, Action onClick)
+        {
+            var image = row.GetComponent<Image>();
+            image.raycastTarget = true;
+
+            var button = row.gameObject.AddComponent<Button>();
+            button.targetGraphic = image;
+
+            //Nothing to arrow between: the rows are rebuilt on every refresh, and a
+            //keyboard walking a list that keeps being destroyed lands on nothing.
+            button.navigation = new Navigation { mode = Navigation.Mode.None };
+
+            //multiplied against the row's own colour, so white means leave it alone
+            var colors = button.colors;
+            colors.normalColor = Color.white;
+            colors.highlightedColor = new Color(0.94f, 0.97f, 1f);
+            colors.pressedColor = new Color(0.86f, 0.91f, 0.98f);
+            colors.selectedColor = Color.white;
+            colors.disabledColor = Color.white;
+            colors.fadeDuration = 0.08f;
+            button.colors = colors;
+
+            button.onClick.AddListener(() => onClick());
+        }
+
         /// <summary>
         /// One full width row at the given offset down the list.
         ///
         /// Stretched between the left and right edges and given a negative width, which is
         /// how a rect anchored to both sides is inset - setting offsets after an
         /// anchoredPosition mixes two ways of saying the same thing and one of them wins.
+        ///
+        /// Every other one is a shade lighter. Forty rows of one colour read as a single
+        /// block of text and the eye loses its place halfway across a line; the banding is
+        /// what keeps a price on the right attached to the name on the left.
         /// </summary>
-        private RectTransform NewRow(float y)
+        private RectTransform NewRow(float y, int index = 0)
         {
-            var row = ModernUiTheme.CreateCard(body, "Row", ModernUiTheme.CardColor);
+            var row = ModernUiTheme.CreateCard(body, "Row",
+                (index & 1) == 0 ? ModernUiTheme.CardColor : RowAltColor);
             row.anchorMin = new Vector2(0, 1);
             row.anchorMax = new Vector2(1, 1);
             row.pivot = new Vector2(0.5f, 1);

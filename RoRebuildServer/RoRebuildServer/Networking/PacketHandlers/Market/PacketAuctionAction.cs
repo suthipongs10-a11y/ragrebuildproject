@@ -68,6 +68,11 @@ public class PacketAuctionAction : IClientPacketHandler
             case AuctionRequestType.Cancel:
                 RoDatabase.EnqueueDbRequest(new AuctionCancelRequest(player.Id, player.Name, msg.ReadInt32()));
                 break;
+
+            case AuctionRequestType.History:
+                RoDatabase.EnqueueDbRequest(new AuctionHistoryRequest(player.Id, player.Name,
+                    msg.ReadInt32()));
+                break;
         }
     }
 }

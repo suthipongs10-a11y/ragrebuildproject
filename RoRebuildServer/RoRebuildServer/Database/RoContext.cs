@@ -44,6 +44,9 @@ public class RoContext : IdentityDbContext<RoUserAccount, UserRole, int>
         //what is still being bought, which is both what the browser lists and what the
         //timer looks through for orders that have run out
         builder.Entity<DbBuyOrder>().HasIndex(o => new { o.IsClosed, o.EndsAt });
+
+        //read whenever somebody opens a listing to see who is bidding on it
+        builder.Entity<DbAuctionBid>().HasIndex(b => b.AuctionId);
     }
 
 
@@ -55,4 +58,5 @@ public class RoContext : IdentityDbContext<RoUserAccount, UserRole, int>
     public DbSet<DbAuction> Auctions { get; set; }
     public DbSet<DbInboxParcel> InboxParcels { get; set; }
     public DbSet<DbBuyOrder> BuyOrders { get; set; }
+    public DbSet<DbAuctionBid> AuctionBids { get; set; }
 }

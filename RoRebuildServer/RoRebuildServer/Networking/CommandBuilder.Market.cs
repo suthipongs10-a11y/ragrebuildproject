@@ -87,6 +87,31 @@ public static partial class CommandBuilder
     }
 
     /// <summary>
+    /// Who has bid on one listing, newest first.
+    ///
+    /// The amounts go out as they were bid rather than as differences, so the client has
+    /// nothing to work out and a gap in the list cannot turn into wrong numbers.
+    /// </summary>
+    public static void SendAuctionHistory(Player player, int auctionId, List<DbAuctionBid> bids)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.AuctionData);
+        packet.Write((byte)AuctionDataType.History);
+        packet.Write(auctionId);
+        packet.Write((short)bids.Count);
+
+        foreach (var bid in bids)
+        {
+            packet.Write(bid.BidderName);
+            packet.Write(bid.Amount);
+
+            var ago = (DateTime.UtcNow - bid.PlacedAt).TotalSeconds;
+            packet.Write(ago <= 0 ? 0 : (int)ago);
+        }
+
+        NetworkManager.SendMessage(packet, player.Connection);
+    }
+
+    /// <summary>
     /// A page of standing offers to buy, or the ones this character posted.
     ///
     /// One shape for both, unlike the auction pair: the page and the total go out either

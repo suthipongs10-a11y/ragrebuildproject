@@ -178,11 +178,31 @@ public class AuctionBidRequest : IDbRequest
         auction.HighBid = bid;
         auction.HighBidderId = bidderId;
         auction.HighBidderName = bidderName;
+
+        //Kept after it is beaten. The listing only ever holds the bid that is winning,
+        //because that is the only one the money is on; this is so somebody looking at it
+        //can tell a thing being fought over from one that has sat untouched all day.
+        dbContext.AuctionBids.Add(new DbAuctionBid
+        {
+            AuctionId = auction.Id,
+            BidderId = bidderId,
+            BidderName = bidderName,
+            Amount = bid,
+            PlacedAt = DateTime.UtcNow,
+        });
+
         await dbContext.SaveChangesAsync();
 
         var player = Inbox.FindOnline(bidderId, bidderName);
         if (player != null)
+        {
             CommandBuilder.SendServerMessageTo(player, $"บิด {bid:N0} Zeny เรียบร้อย");
+
+            //Sent unasked, because whoever just bid is almost certainly looking at the very
+            //list this belongs on. Waiting for the next refresh to show their own bid reads
+            //as the bid not having landed.
+            await AuctionQueries.SendHistory(dbContext, bidderId, bidderName, auction.Id);
+        }
 
         await AuctionQueries.Announce(dbContext, auction);
     }
@@ -195,6 +215,24 @@ public class AuctionBidRequest : IDbRequest
         if (player != null)
             CommandBuilder.ErrorMessage(player.Connection, why);
     }
+}
+
+/// <summary>Who has bid on one listing, newest first.</summary>
+public class AuctionHistoryRequest : IDbRequest
+{
+    private readonly Guid viewerId;
+    private readonly string viewerName;
+    private readonly int auctionId;
+
+    public AuctionHistoryRequest(Guid viewerId, string viewerName, int auctionId)
+    {
+        this.viewerId = viewerId;
+        this.viewerName = viewerName;
+        this.auctionId = auctionId;
+    }
+
+    public async Task ExecuteAsync(RoContext dbContext) =>
+        await AuctionQueries.SendHistory(dbContext, viewerId, viewerName, auctionId);
 }
 
 /// <summary>
