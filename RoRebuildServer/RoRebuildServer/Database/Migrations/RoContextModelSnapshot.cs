@@ -116,6 +116,48 @@ namespace RoRebuildServer.Migrations
                     b.ToTable("DbUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("RoRebuildServer.Database.Domain.DbBuyOrder", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("BuyerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BuyerName")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("EndsAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsClosed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("PostedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PricePer")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("RemainingCount")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("WantedCount")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IsClosed", "EndsAt");
+
+                    b.ToTable("BuyOrder");
+                });
+
             modelBuilder.Entity("RoRebuildServer.Database.Domain.DbCharacter", b =>
                 {
                     b.Property<Guid>("Id")

@@ -155,6 +155,11 @@ public enum PacketType : byte
     //the auction house. Listing, bidding and browsing all move through one pair.
     AuctionAction,
     AuctionData,
+
+    //standing offers to buy: posting one, selling into one, and looking at what is
+    //wanted. The other half of the market from the auction house.
+    BuyOrderAction,
+    BuyOrderData,
 }
 
 public enum MessageType : byte

@@ -48,6 +48,9 @@ namespace Assets.Scripts.UI.Market
         /// <summary>The server's own choices, kept here so the buttons can offer exactly them.</summary>
         private static readonly int[] DurationChoices = { 8, 24, 48 };
 
+        /// <summary>The server's own fee, so the confirmation can say the real number.</summary>
+        private const int BuyOrderFeePercent = 5;
+
         /// <summary>Asked for again on this cadence while a page that goes stale is open.</summary>
         private const float RefreshInterval = 10f;
 
@@ -65,6 +68,7 @@ namespace Assets.Scripts.UI.Market
         private enum Page
         {
             Browse,
+            Buying,
             Mine,
             Parcels,
         }
@@ -75,6 +79,13 @@ namespace Assets.Scripts.UI.Market
             NotSelling,
             PickingItem,
             PickingDuration,
+        }
+
+        /// <summary>Whether the buy page is showing orders or the list of things to want.</summary>
+        private enum BuyStage
+        {
+            NotPosting,
+            PickingItem,
         }
 
         private static MarketWindow instance;
@@ -91,6 +102,9 @@ namespace Assets.Scripts.UI.Market
         private int pendingCount;
         private int pendingPrice;
         private string pendingName = "";
+
+        private BuyStage posting = BuyStage.NotPosting;
+        private readonly List<RebuildSharedData.ClientTypes.ItemData> searchMatches = new();
 
         private int drawnRevision = -1;
         private float refreshTimer;
@@ -210,7 +224,7 @@ namespace Assets.Scripts.UI.Market
 
         private void BuildTabs(RectTransform rect)
         {
-            var labels = new[] { "ประมูล", "ของฉัน", "กล่องพัสดุ" };
+            var labels = new[] { "ประมูล", "รับซื้อ", "ของฉัน", "กล่องพัสดุ" };
             var width = (Width - Pad * 2f - TabGap * (labels.Length - 1)) / labels.Length;
 
             for (var i = 0; i < labels.Length; i++)
@@ -233,6 +247,7 @@ namespace Assets.Scripts.UI.Market
         {
             page = which;
             selling = SellStage.NotSelling;
+            posting = BuyStage.NotPosting;
             Ask();
             Redraw();
         }
@@ -253,8 +268,14 @@ namespace Assets.Scripts.UI.Market
                 case Page.Browse:
                     net.SendAuctionBrowse(MarketState.BrowseSearch, MarketState.BrowsePage);
                     break;
+                case Page.Buying:
+                    net.SendBuyOrderBrowse(MarketState.BuySearch, MarketState.BuyPage);
+                    break;
                 case Page.Mine:
+                    //Both, because the page shows both - what you are selling and what you
+                    //are buying are the same question: what have I got going right now.
                     net.SendAuctionAction(AuctionRequestType.Mine);
+                    net.SendBuyOrderAction(BuyOrderRequestType.Mine);
                     break;
                 case Page.Parcels:
                     net.SendInboxAction(InboxRequestType.Refresh);
@@ -300,7 +321,8 @@ namespace Assets.Scripts.UI.Market
                 switch (page)
                 {
                     case Page.Browse: return MarketState.ListingsReceived;
-                    case Page.Mine: return MarketState.MineReceived;
+                    case Page.Buying: return MarketState.BuyOrdersReceived;
+                    case Page.Mine: return MarketState.MineReceived && MarketState.MyBuyOrdersReceived;
                     case Page.Parcels: return MarketState.ParcelsReceived;
                     default: return true;
                 }
@@ -348,6 +370,12 @@ namespace Assets.Scripts.UI.Market
             {
                 case Page.Browse:
                     DrawBrowse();
+                    break;
+                case Page.Buying:
+                    if (posting == BuyStage.PickingItem)
+                        DrawWantPicker();
+                    else
+                        DrawBuying();
                     break;
                 case Page.Mine:
                     if (selling == SellStage.PickingItem)
@@ -506,17 +534,38 @@ namespace Assets.Scripts.UI.Market
                 return;
             }
 
-            if (MarketState.Mine.Count == 0)
+            if (MarketState.Mine.Count == 0 && MarketState.MyBuyOrders.Count == 0)
             {
-                BuildNote("ยังไม่ได้ตั้งประมูล และยังไม่ได้บิดอะไร", y);
+                BuildNote("ยังไม่ได้ตั้งประมูล ตั้งรับซื้อ หรือบิดอะไร", y);
                 body.sizeDelta = new Vector2(0, RowHeight);
                 return;
             }
 
-            foreach (var entry in MarketState.Mine)
+            if (MarketState.Mine.Count > 0)
             {
-                BuildListingRow(entry, y, true);
-                y -= RowHeight + RowGap;
+                BuildHeading("ประมูล", y);
+                y -= HeadingHeight + RowGap;
+
+                foreach (var entry in MarketState.Mine)
+                {
+                    BuildListingRow(entry, y, true);
+                    y -= RowHeight + RowGap;
+                }
+            }
+
+            //Both halves on one page: what you are selling and what you are buying are the
+            //same question - what have I got going right now.
+            if (MarketState.MyBuyOrders.Count > 0)
+            {
+                y -= RowGap;
+                BuildHeading("รับซื้อ", y);
+                y -= HeadingHeight + RowGap;
+
+                foreach (var order in MarketState.MyBuyOrders)
+                {
+                    BuildBuyOrderRow(order, y, true);
+                    y -= RowHeight + RowGap;
+                }
             }
 
             body.sizeDelta = new Vector2(0, -y);
@@ -612,6 +661,365 @@ namespace Assets.Scripts.UI.Market
                     }
 
                     NetworkManager.Instance.SendAuctionAction(AuctionRequestType.Bid, entry.Id, amount);
+                });
+        }
+
+        // =====================================================================
+        // Standing offers to buy
+
+        private void DrawBuying()
+        {
+            var post = ModernUiTheme.CreateButton(toolRow, "Post", "ตั้งรับซื้อ",
+                ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place((RectTransform)post.transform, new Vector2(0, 0.5f),
+                new Vector2(0f, 0f), new Vector2(96f, ToolRowHeight - 2f));
+            post.onClick.AddListener(AskWhatToWant);
+
+            var search = ModernUiTheme.CreateButton(toolRow, "SearchBuy",
+                string.IsNullOrEmpty(MarketState.BuySearch)
+                    ? "ค้นหา"
+                    : $"ค้นหา: {MarketState.BuySearch}",
+                ModernUiTheme.CardColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place((RectTransform)search.transform, new Vector2(0, 0.5f),
+                new Vector2(102f, 0f), new Vector2(160f, ToolRowHeight - 2f));
+            search.onClick.AddListener(() =>
+                UiManager.Instance.TextInputWindow.BeginTextInput(
+                    "ค้นหาของที่มีคนรับซื้อ (เว้นว่างเพื่อดูทั้งหมด)", text =>
+                    {
+                        MarketState.BuySearch = text == null ? "" : text.Trim();
+                        MarketState.BuyPage = 0;
+                        Ask();
+                    }));
+
+            BuildBuyPager();
+
+            var y = -RowGap;
+            if (!MarketState.BuyOrdersReceived)
+            {
+                DrawWaiting();
+                return;
+            }
+
+            if (MarketState.BuyOrders.Count == 0)
+            {
+                BuildNote(string.IsNullOrEmpty(MarketState.BuySearch)
+                    ? "ยังไม่มีใครตั้งรับซื้อ"
+                    : "ไม่มีใครรับซื้อของชิ้นนี้", y);
+                body.sizeDelta = new Vector2(0, RowHeight);
+                return;
+            }
+
+            foreach (var order in MarketState.BuyOrders)
+            {
+                BuildBuyOrderRow(order, y, false);
+                y -= RowHeight + RowGap;
+            }
+
+            body.sizeDelta = new Vector2(0, -y);
+        }
+
+        private void BuildBuyPager()
+        {
+            var pages = (MarketState.BuyTotal + 19) / 20;
+            if (pages < 1)
+                pages = 1;
+
+            subtitle.text = $"รับซื้ออยู่ {MarketState.BuyTotal:N0} รายการ  ·  หน้า {MarketState.BuyPage + 1}/{pages}";
+
+            if (MarketState.BuyPage > 0)
+            {
+                var prev = ModernUiTheme.CreateButton(toolRow, "PrevBuy", "ก่อนหน้า",
+                    ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
+                ModernUiTheme.Place((RectTransform)prev.transform, new Vector2(1, 0.5f),
+                    new Vector2(-86f, 0f), new Vector2(80f, ToolRowHeight - 2f));
+                prev.onClick.AddListener(() =>
+                {
+                    MarketState.BuyPage--;
+                    Ask();
+                });
+            }
+
+            if (MarketState.BuyPage + 1 < pages)
+            {
+                var next = ModernUiTheme.CreateButton(toolRow, "NextBuy", "ถัดไป",
+                    ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
+                ModernUiTheme.Place((RectTransform)next.transform, new Vector2(1, 0.5f),
+                    new Vector2(0f, 0f), new Vector2(80f, ToolRowHeight - 2f));
+                next.onClick.AddListener(() =>
+                {
+                    MarketState.BuyPage++;
+                    Ask();
+                });
+            }
+        }
+
+        /// <summary>
+        /// One standing offer: what is wanted, how much of it is left, and what it pays.
+        ///
+        /// The sell button is only offered when there is actually something in the bag to
+        /// sell into it, because a button whose only outcome is "you have none of those"
+        /// is a button that wastes a tap and teaches nothing.
+        /// </summary>
+        private void BuildBuyOrderRow(BuyOrderEntry order, float y, bool ownPage)
+        {
+            var row = NewRow(y);
+            var data = ClientDataLoader.Instance != null
+                ? ClientDataLoader.Instance.GetItemById(order.ItemId)
+                : null;
+
+            if (data != null && ClientDataLoader.Instance != null)
+            {
+                var sprite = ClientDataLoader.Instance.GetIconAtlasSprite(data.Code);
+                if (sprite != null)
+                {
+                    var icon = ModernUiTheme.CreateIcon(row, sprite, Color.white, RowHeight - 10f);
+                    ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f),
+                        new Vector2(6f, 0f), new Vector2(RowHeight - 10f, RowHeight - 10f));
+                }
+            }
+
+            var name = ModernUiTheme.CreateText(row, "Name",
+                data != null ? data.Name : $"#{order.ItemId}",
+                ModernUiTheme.SizeLabel, ModernUiTheme.NameColor, TextAlignmentOptions.TopLeft);
+            name.textWrappingMode = TextWrappingModes.NoWrap;
+            name.overflowMode = TextOverflowModes.Ellipsis;
+            ModernUiTheme.Place(name.rectTransform, new Vector2(0, 1),
+                new Vector2(RowHeight, -3f), new Vector2(Width - RowHeight - 200f, 18f));
+
+            var detail = $"รับอีก {order.RemainingCount:N0}/{order.WantedCount:N0} ชิ้น"
+                         + $"  ·  ชิ้นละ {order.PricePer:N0} Zeny";
+            if (!ownPage)
+                detail += $"  ·  {order.BuyerName}";
+            detail += $"  ·  {TimeLeftText(order.SecondsLeft)}";
+
+            var under = ModernUiTheme.CreateText(row, "Detail", detail,
+                ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor, TextAlignmentOptions.TopLeft);
+            under.textWrappingMode = TextWrappingModes.NoWrap;
+            under.overflowMode = TextOverflowModes.Ellipsis;
+            ModernUiTheme.Place(under.rectTransform, new Vector2(0, 1),
+                new Vector2(RowHeight, -18f), new Vector2(Width - RowHeight - 130f, 16f));
+
+            if (ownPage)
+            {
+                var id = order.Id;
+                var cancel = ModernUiTheme.CreateButton(row, "CancelBuy", "ยกเลิก",
+                    ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
+                ModernUiTheme.Place((RectTransform)cancel.transform, new Vector2(1, 0.5f),
+                    new Vector2(-8f, 0f), new Vector2(74f, RowHeight - 8f));
+                cancel.onClick.AddListener(() => NetworkManager.Instance.SendBuyOrderCancel(id));
+                return;
+            }
+
+            if (!TryFindStack(order.ItemId, out var bagId, out var have))
+                return;
+
+            var sell = ModernUiTheme.CreateButton(row, "SellInto", "ขาย",
+                ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place((RectTransform)sell.transform, new Vector2(1, 0.5f),
+                new Vector2(-8f, 0f), new Vector2(74f, RowHeight - 8f));
+
+            var captured = order;
+            var slot = bagId;
+            var owned = have;
+            sell.onClick.AddListener(() => AskHowManyToSell(captured, slot, owned));
+        }
+
+        /// <summary>
+        /// The first stack of this item in the bag that is not being worn.
+        ///
+        /// Only regular items: an order names a thing by its number, and gear that shares
+        /// a number can be worth wildly different amounts - the server refuses those, so
+        /// they are not offered here either.
+        /// </summary>
+        private static bool TryFindStack(int itemId, out int bagId, out int count)
+        {
+            bagId = 0;
+            count = 0;
+
+            var state = PlayerState.Instance;
+            var bag = state != null ? state.Inventory : null;
+            if (bag == null)
+                return false;
+
+            foreach (var (id, item) in bag.GetInventoryData())
+            {
+                if (item.Type != ItemType.RegularItem || item.ItemData == null)
+                    continue;
+                if (item.ItemData.Id != itemId)
+                    continue;
+                if (state.EquippedBagIdHashes.Contains(id))
+                    continue;
+
+                bagId = id;
+                count = item.Count;
+                return count > 0;
+            }
+
+            return false;
+        }
+
+        private void AskHowManyToSell(BuyOrderEntry order, int bagId, int owned)
+        {
+            var most = owned < order.RemainingCount ? owned : order.RemainingCount;
+            if (most <= 0)
+                return;
+
+            UiManager.Instance.TextInputWindow.BeginTextInput(
+                $"ขายกี่ชิ้น (มี {owned:N0} · รับอีก {order.RemainingCount:N0} · "
+                + $"ได้ชิ้นละ {order.PricePer:N0})", text =>
+                {
+                    if (!int.TryParse(text, out var wanted) || wanted <= 0)
+                    {
+                        CameraFollower.Instance.AppendError("ใส่เป็นตัวเลขเท่านั้น");
+                        return;
+                    }
+
+                    //Cut down rather than refused. The server gives back anything the order
+                    //cannot take anyway, so this only saves the round trip.
+                    if (wanted > most)
+                        wanted = most;
+
+                    NetworkManager.Instance.SendBuyOrderSell(order.Id, bagId, wanted);
+                });
+        }
+
+        // =====================================================================
+        // Posting one
+
+        private void AskWhatToWant()
+        {
+            UiManager.Instance.TextInputWindow.BeginTextInput("อยากรับซื้ออะไร (พิมพ์ชื่อของ)",
+                text =>
+                {
+                    var needle = text == null ? "" : text.Trim();
+                    if (needle.Length < 2)
+                    {
+                        CameraFollower.Instance.AppendError("พิมพ์อย่างน้อย 2 ตัวอักษร");
+                        return;
+                    }
+
+                    searchMatches.Clear();
+                    var loader = ClientDataLoader.Instance;
+                    if (loader != null)
+                    {
+                        foreach (var (_, item) in loader.ItemIdLookup)
+                        {
+                            if (item == null || item.Id <= 0 || item.IsUnique)
+                                continue; //gear belongs in the auction house
+                            if (item.Name == null)
+                                continue;
+                            if (item.Name.IndexOf(needle, StringComparison.OrdinalIgnoreCase) < 0)
+                                continue;
+
+                            searchMatches.Add(item);
+                            if (searchMatches.Count >= 40)
+                                break;
+                        }
+                    }
+
+                    if (searchMatches.Count == 0)
+                    {
+                        CameraFollower.Instance.AppendError("ไม่พบของชิ้นนี้ หรือเป็นของที่ตั้งรับซื้อไม่ได้");
+                        return;
+                    }
+
+                    posting = BuyStage.PickingItem;
+                    Redraw();
+                });
+        }
+
+        private void DrawWantPicker()
+        {
+            var back = ModernUiTheme.CreateButton(toolRow, "BackBuy", "ย้อนกลับ",
+                ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place((RectTransform)back.transform, new Vector2(0, 0.5f),
+                new Vector2(0f, 0f), new Vector2(90f, ToolRowHeight - 2f));
+            back.onClick.AddListener(() =>
+            {
+                posting = BuyStage.NotPosting;
+                Redraw();
+            });
+
+            subtitle.text = $"เลือกของที่จะรับซื้อ  ·  ค่าธรรมเนียม {BuyOrderFeePercent}%";
+
+            var y = -RowGap;
+            foreach (var item in searchMatches)
+            {
+                var row = NewRow(y);
+
+                if (ClientDataLoader.Instance != null)
+                {
+                    var sprite = ClientDataLoader.Instance.GetIconAtlasSprite(item.Code);
+                    if (sprite != null)
+                    {
+                        var icon = ModernUiTheme.CreateIcon(row, sprite, Color.white, RowHeight - 10f);
+                        ModernUiTheme.Place(icon.rectTransform, new Vector2(0, 0.5f),
+                            new Vector2(6f, 0f), new Vector2(RowHeight - 10f, RowHeight - 10f));
+                    }
+                }
+
+                var name = ModernUiTheme.CreateText(row, "Name", item.Name,
+                    ModernUiTheme.SizeLabel, ModernUiTheme.NameColor, TextAlignmentOptions.Left);
+                name.textWrappingMode = TextWrappingModes.NoWrap;
+                name.overflowMode = TextOverflowModes.Ellipsis;
+                ModernUiTheme.Place(name.rectTransform, new Vector2(0, 0.5f),
+                    new Vector2(RowHeight, 0f), new Vector2(Width - RowHeight - 130f, RowHeight));
+
+                var pick = ModernUiTheme.CreateButton(row, "PickWant", "เลือก",
+                    ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
+                ModernUiTheme.Place((RectTransform)pick.transform, new Vector2(1, 0.5f),
+                    new Vector2(-8f, 0f), new Vector2(74f, RowHeight - 8f));
+
+                var chosen = item;
+                pick.onClick.AddListener(() => AskWantCount(chosen));
+
+                y -= RowHeight + RowGap;
+            }
+
+            body.sizeDelta = new Vector2(0, -y);
+        }
+
+        private void AskWantCount(RebuildSharedData.ClientTypes.ItemData item)
+        {
+            UiManager.Instance.TextInputWindow.BeginTextInput($"รับซื้อ {item.Name} กี่ชิ้น",
+                text =>
+                {
+                    if (!int.TryParse(text, out var count) || count <= 0)
+                    {
+                        CameraFollower.Instance.AppendError("ใส่เป็นตัวเลขเท่านั้น");
+                        return;
+                    }
+
+                    AskWantPrice(item, count);
+                });
+        }
+
+        private void AskWantPrice(RebuildSharedData.ClientTypes.ItemData item, int count)
+        {
+            UiManager.Instance.TextInputWindow.BeginTextInput(
+                $"รับซื้อ {item.Name} ชิ้นละกี่ Zeny", text =>
+                {
+                    if (!int.TryParse(text, out var price) || price < 10)
+                    {
+                        CameraFollower.Instance.AppendError("ราคาต้องเป็นตัวเลข ไม่ต่ำกว่า 10 Zeny");
+                        return;
+                    }
+
+                    //Said before it is taken, not after. The whole amount leaves the purse
+                    //the moment this is posted, and that is not what somebody expects from
+                    //a thing called an offer.
+                    var held = (long)price * count;
+                    var fee = held * BuyOrderFeePercent / 100;
+                    Confirm($"รับซื้อ {item.Name} {count:N0} ชิ้น ชิ้นละ {price:N0} Zeny\n\n"
+                            + $"หักตอนนี้ {held + fee:N0} Zeny\n"
+                            + $"(มัดจำ {held:N0} + ค่าธรรมเนียม {fee:N0})\n\n"
+                            + "มัดจำที่เหลือคืนเมื่อยกเลิกหรือหมดอายุ ค่าธรรมเนียมไม่คืน",
+                        () =>
+                        {
+                            NetworkManager.Instance.SendBuyOrderCreate(item.Id, count, price);
+                            posting = BuyStage.NotPosting;
+                            Redraw();
+                        });
                 });
         }
 
@@ -928,16 +1336,39 @@ namespace Assets.Scripts.UI.Market
         }
 
         /// <summary>How long is left, counted down from when the server said it.</summary>
-        private string TimeLeft(AuctionEntry entry)
+        private string TimeLeft(AuctionEntry entry) =>
+            TimeLeftText(entry.SecondsLeft - (int)(Time.realtimeSinceStartup - listingStamp));
+
+        /// <summary>A length of time as words, coarsening as it gets longer.</summary>
+        private static string TimeLeftText(int left)
         {
-            var left = entry.SecondsLeft - (int)(Time.realtimeSinceStartup - listingStamp);
             if (left <= 0)
                 return "หมดเวลาแล้ว";
             if (left < 60)
                 return $"เหลือ {left} วินาที";
             if (left < 3600)
                 return $"เหลือ {left / 60} นาที";
-            return $"เหลือ {left / 3600} ชั่วโมง";
+            if (left < 86400)
+                return $"เหลือ {left / 3600} ชั่วโมง";
+            return $"เหลือ {left / 86400} วัน";
+        }
+
+        /// <summary>
+        /// Asks before doing something that takes money and cannot be undone for free.
+        ///
+        /// Posting an order is the case that needs it: the whole total leaves the purse
+        /// immediately, which is not what anybody expects from a thing called an offer.
+        /// </summary>
+        private static void Confirm(string question, Action onYes)
+        {
+            var ui = UiManager.Instance;
+            if (ui == null || ui.YesNoOptionsWindow == null)
+            {
+                Debug.LogError("[MarketWindow] No confirmation window, so nothing was done.");
+                return;
+            }
+
+            ui.YesNoOptionsWindow.BeginPrompt(question, "ตกลง", "ยกเลิก", onYes, null, false);
         }
 
         /// <summary>

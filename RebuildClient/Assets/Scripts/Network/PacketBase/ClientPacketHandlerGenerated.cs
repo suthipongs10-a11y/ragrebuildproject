@@ -18,7 +18,7 @@ namespace Assets.Scripts.Network.PacketBase
 	{
 		static ClientPacketHandler()
 		{
-			handlers = new ClientPacketHandlerBase[122];
+			handlers = new ClientPacketHandlerBase[124];
 			handlers[0] = new InvalidPacket(); //PlayerReady
 			handlers[1] = new PacketOnEnterServer(); //EnterServer
 			handlers[2] = new InvalidPacket(); //Ping
@@ -141,6 +141,8 @@ namespace Assets.Scripts.Network.PacketBase
 			handlers[119] = new PacketInboxData(); //InboxData
 			handlers[120] = new InvalidPacket(); //AuctionAction
 			handlers[121] = new PacketAuctionData(); //AuctionData
+			handlers[122] = new InvalidPacket(); //BuyOrderAction
+			handlers[123] = new PacketBuyOrderData(); //BuyOrderData
 		}
 	}
 }

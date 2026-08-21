@@ -48,6 +48,57 @@ public static class MarketConfig
     /// A listing may therefore pay out a few seconds late, which nobody can tell.</summary>
     public const float SettleIntervalSeconds = 15f;
 
+    //--- standing offers to buy -----------------------------------------------
+
+    /// <summary>
+    /// Paid on top of the money set aside, when an order is posted.
+    ///
+    /// Higher than the auction's listing fee, and on purpose: an auction that nobody bids
+    /// on gives the item back and costs its owner a percent, while a buy order that nobody
+    /// fills has held somebody's money out of the economy for a week. The fee is what makes
+    /// posting one a decision.
+    /// </summary>
+    public const int BuyOrderFeePercent = 5;
+
+    /// <summary>How long an order stands before what is left of it is given back.</summary>
+    public const int BuyOrderDurationDays = 7;
+
+    /// <summary>How many orders one character may have standing at once.</summary>
+    public const int MaxBuyOrdersPerCharacter = 10;
+
+    /// <summary>The most of one thing a single order may ask for.</summary>
+    public const int MaxBuyOrderCount = 5000;
+
+    /// <summary>What posting an order costs on top of the money it sets aside.</summary>
+    public static int BuyOrderFee(int pricePer, int count)
+    {
+        var total = (long)pricePer * count;
+        var fee = total * BuyOrderFeePercent / 100;
+        return (int)Math.Min(fee < MinimumListingFee ? MinimumListingFee : fee, int.MaxValue);
+    }
+
+    /// <summary>
+    /// Everything posting an order takes out of the purse: what it may pay out, plus the
+    /// fee. Returns false when that will not fit in a zeny value at all.
+    /// </summary>
+    public static bool TryBuyOrderCost(int pricePer, int count, out int total, out int fee)
+    {
+        total = 0;
+        fee = 0;
+
+        if (pricePer < MinimumPrice || count <= 0 || count > MaxBuyOrderCount)
+            return false;
+
+        var held = (long)pricePer * count;
+        var charge = held + BuyOrderFee(pricePer, count);
+        if (held > MaximumPrice || charge > int.MaxValue)
+            return false;
+
+        total = (int)held;
+        fee = BuyOrderFee(pricePer, count);
+        return true;
+    }
+
     /// <summary>What listing something costs, given what it starts at.</summary>
     public static int ListingFee(int startPrice)
     {

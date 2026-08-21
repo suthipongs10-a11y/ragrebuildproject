@@ -49,6 +49,7 @@ namespace Assets.Scripts.Network.PacketBase
             (PacketType.TradeUpdate, () => new PacketTradeUpdate()),
             (PacketType.InboxData, () => new PacketInboxData()),
             (PacketType.AuctionData, () => new PacketAuctionData()),
+            (PacketType.BuyOrderData, () => new PacketBuyOrderData()),
         };
 
         /// <summary>

@@ -1553,6 +1553,70 @@ namespace Assets.Scripts.Network
             SendMessage(msg);
         }
 
+        /// <summary>Mine, which asks for the orders this character posted.</summary>
+        public void SendBuyOrderAction(BuyOrderRequestType action)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.BuyOrderAction);
+            msg.Write((byte)action);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>Browse, which is a search box and a page number.</summary>
+        public void SendBuyOrderBrowse(string search, int page)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.BuyOrderAction);
+            msg.Write((byte)BuyOrderRequestType.Browse);
+            msg.Write(search ?? "");
+            msg.Write((byte)Mathf.Clamp(page, 0, byte.MaxValue));
+
+            SendMessage(msg);
+        }
+
+        /// <summary>Posting one: what is wanted, how many, and what each is worth.</summary>
+        public void SendBuyOrderCreate(int itemId, int count, int pricePer)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.BuyOrderAction);
+            msg.Write((byte)BuyOrderRequestType.Create);
+            msg.Write(itemId);
+            msg.Write(count);
+            msg.Write(pricePer);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>Selling into one: which order, which stack, and how much of it.</summary>
+        public void SendBuyOrderSell(int orderId, int bagId, int count)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.BuyOrderAction);
+            msg.Write((byte)BuyOrderRequestType.Sell);
+            msg.Write(orderId);
+            msg.Write(bagId);
+            msg.Write(count);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>Taking one of yours down.</summary>
+        public void SendBuyOrderCancel(int orderId)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.BuyOrderAction);
+            msg.Write((byte)BuyOrderRequestType.Cancel);
+            msg.Write(orderId);
+
+            SendMessage(msg);
+        }
+
         public void SendGuildAction(GuildRequestType action)
         {
             var msg = StartMessage();

@@ -87,6 +87,40 @@ public static partial class CommandBuilder
     }
 
     /// <summary>
+    /// A page of standing offers to buy, or the ones this character posted.
+    ///
+    /// One shape for both, unlike the auction pair: the page and the total go out either
+    /// way, with the personal list sending page zero and its own length. Two shapes would
+    /// be two things to keep in step for no gain.
+    /// </summary>
+    public static void SendBuyOrders(Player player, List<DbBuyOrder> rows, BuyOrderDataType type,
+        int page, int total)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.BuyOrderData);
+        packet.Write((byte)type);
+        packet.Write((byte)Math.Clamp(page, 0, byte.MaxValue));
+        packet.Write(total);
+        packet.Write((short)rows.Count);
+
+        foreach (var row in rows)
+        {
+            packet.Write(row.Id);
+            packet.Write(row.BuyerName);
+            packet.Write(row.ItemId);
+            packet.Write(row.WantedCount);
+            packet.Write(row.RemainingCount);
+            packet.Write(row.PricePer);
+
+            //Seconds rather than a moment, for the same reason as an auction: the two
+            //machines do not agree on what time it is.
+            var left = (row.EndsAt - DateTime.UtcNow).TotalSeconds;
+            packet.Write(left <= 0 ? 0 : (int)left);
+        }
+
+        NetworkManager.SendMessage(packet, player.Connection);
+    }
+
+    /// <summary>
     /// One listing, seller's view or bidder's view.
     ///
     /// The time left is sent as seconds rather than as a moment, because the two machines

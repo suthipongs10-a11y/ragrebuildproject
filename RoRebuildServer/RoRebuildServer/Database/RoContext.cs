@@ -40,6 +40,10 @@ public class RoContext : IdentityDbContext<RoUserAccount, UserRole, int>
         //whole table without these, which is fine at ten rows and not at ten thousand.
         builder.Entity<DbInboxParcel>().HasIndex(p => p.CharacterId);
         builder.Entity<DbAuction>().HasIndex(a => new { a.IsSettled, a.EndsAt });
+
+        //what is still being bought, which is both what the browser lists and what the
+        //timer looks through for orders that have run out
+        builder.Entity<DbBuyOrder>().HasIndex(o => new { o.IsClosed, o.EndsAt });
     }
 
 
@@ -50,4 +54,5 @@ public class RoContext : IdentityDbContext<RoUserAccount, UserRole, int>
     public DbSet<ScriptGlobalVar> ScriptGlobalVars { get; set; }
     public DbSet<DbAuction> Auctions { get; set; }
     public DbSet<DbInboxParcel> InboxParcels { get; set; }
+    public DbSet<DbBuyOrder> BuyOrders { get; set; }
 }

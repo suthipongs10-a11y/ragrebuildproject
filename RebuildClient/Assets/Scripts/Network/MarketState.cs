@@ -59,6 +59,21 @@ namespace Assets.Scripts.Network
             : HighBid + (HighBid / 20 < 1 ? 1 : HighBid / 20);
     }
 
+    /// <summary>One standing offer to buy something.</summary>
+    public class BuyOrderEntry
+    {
+        public int Id;
+        public string BuyerName = "";
+        public int ItemId;
+        public int WantedCount;
+        public int RemainingCount;
+        public int PricePer;
+        public int SecondsLeft;
+
+        /// <summary>What is still on the table, for somebody deciding whether to sell.</summary>
+        public long RemainingValue => (long)RemainingCount * PricePer;
+    }
+
     /// <summary>
     /// What this client knows about the market, which is only ever what the server said.
     ///
@@ -89,6 +104,16 @@ namespace Assets.Scripts.Network
         public static readonly List<AuctionEntry> Mine = new List<AuctionEntry>();
         public static bool MineReceived;
 
+        /// <summary>What people are buying, and the orders this character posted.</summary>
+        public static readonly List<BuyOrderEntry> BuyOrders = new List<BuyOrderEntry>();
+        public static bool BuyOrdersReceived;
+        public static int BuyPage;
+        public static int BuyTotal;
+        public static string BuySearch = "";
+
+        public static readonly List<BuyOrderEntry> MyBuyOrders = new List<BuyOrderEntry>();
+        public static bool MyBuyOrdersReceived;
+
         /// <summary>Bumped whenever anything above changes. The window watches this.</summary>
         public static int Revision;
 
@@ -107,6 +132,13 @@ namespace Assets.Scripts.Network
             BrowseSearch = "";
             Mine.Clear();
             MineReceived = false;
+            BuyOrders.Clear();
+            BuyOrdersReceived = false;
+            BuyPage = 0;
+            BuyTotal = 0;
+            BuySearch = "";
+            MyBuyOrders.Clear();
+            MyBuyOrdersReceived = false;
             Revision++;
         }
     }

@@ -186,6 +186,7 @@ public class World
         //be driven from somewhere that runs whether or not anyone is in the market. It
         //throttles itself down to once every several seconds.
         Market.AuctionHouse.Update();
+        Market.BuyOrders.Update();
 
         if (currentDropIndex + 2000 > short.MaxValue)
             currentDropIndex = 5000;
