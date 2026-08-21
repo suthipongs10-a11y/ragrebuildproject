@@ -30,9 +30,22 @@ README ต้นทางแนะนำให้ตัดเพื่อลด�
 
 **วิธีที่ถูก:** ลดจำนวนแมพผ่านเมนู Unity `Ragnarok → Select maps to import` แทน (ผู้ใช้ทำเอง)
 
-### 1.2 ห้ามลืมรัน `updateclient.bat` หลังแก้ CSV
-ทุกครั้งที่แก้ไฟล์ใน `RoRebuildServer/GameConfig/ServerData/` **ต้องรัน `updateclient.bat` ที่ root**
-ไม่งั้น client กับ server จะข้อมูลไม่ตรงกัน → บั๊กประหลาดที่ไล่ไม่เจอ
+### 1.2 ห้ามลืมรัน `updateclient.bat`
+ต้องรัน `updateclient.bat` ที่ root เมื่อแก้ **อย่างใดอย่างหนึ่ง** ต่อไปนี้:
+
+| แก้อะไร | ไม่รันแล้วเป็นยังไง |
+|---|---|
+| `RoRebuildServer/GameConfig/ServerData/` | client กับ server ข้อมูลไม่ตรงกัน → บั๊กประหลาดที่ไล่ไม่เจอ |
+| `RoRebuildServer/RebuildSharedData/` | **Unity เข้า Safe Mode** `'PacketType' does not contain a definition for ...` |
+| `RoRebuildServer/GameConfig.Generator/` | config ที่ generate ออกมาไม่ตรง |
+
+⚠️ **ข้อที่สองพลาดง่ายที่สุด** — client ไม่ได้ compile `RebuildSharedData` จาก source
+แต่ใช้ **DLL ที่ `updateclient.bat` ก๊อปไปวางที่ `Assets/Data/`**
+เพิ่ม enum หรือ `PacketType` ตัวใหม่ = ฝั่งเซิร์ฟเวอร์เห็นทันทีที่ build
+แต่ฝั่ง client **จะไม่เห็นจนกว่าจะรันสคริปต์** และ error ที่ได้จะดูเหมือนโค้ดเขียนผิด
+ทั้งที่โค้ดถูก — แค่ DLL ข้าง ๆ มันเก่ากว่า 1 เวอร์ชัน
+
+> "แก้แต่ `.cs` ไม่ได้แตะ CSV เลยไม่ต้องรัน" — **ผิด** เคยทำให้ build พังมาแล้ว
 
 ### 1.3 ห้ามรัน server ผ่าน IIS / IIS Express
 ต้องเลือก run profile **`RoRebuildServer`** เท่านั้น ไม่งั้น WebSocket ทำงานผิด
