@@ -18,6 +18,7 @@ using RoRebuildServer.EntityComponents.Items;
 using RoRebuildServer.EntityComponents.Monsters;
 using RoRebuildServer.EntityComponents.Npcs;
 using RoRebuildServer.Logging;
+using RoRebuildServer.Simulation.Crafting;
 using Tomlyn;
 
 namespace RoRebuildServer.Data;
@@ -854,6 +855,91 @@ internal class DataLoader
         }
 
         return table;
+    }
+
+    /// <summary>
+    /// What each crafting skill can make.
+    ///
+    /// Keyed by skill because that is how it is asked for: pressing Iron Tempering sends
+    /// one skill and gets back that skill's list. A row naming a skill that is not a
+    /// crafting skill, or an item that does not exist, is dropped with a warning rather
+    /// than throwing - one bad row should not stop the server coming up.
+    ///
+    /// Runs after the item id lookup is built, since every column here is an item code.
+    /// </summary>
+    public ReadOnlyDictionary<CharacterSkill, List<ProduceRecipe>> LoadProduceRecipes()
+    {
+        var bySkill = new Dictionary<CharacterSkill, List<ProduceRecipe>>();
+
+        using var tr = new StreamReader(Path.Combine(ServerConfig.DataConfig.DataPath, @"Db/ProduceRecipes.csv"), Encoding.UTF8) as TextReader;
+        using var csv = new CsvReader(tr, CultureInfo.InvariantCulture);
+
+        var entries = csv.GetRecords<CsvProduceRecipe>().ToList();
+
+        foreach (var entry in entries)
+        {
+            if (!Enum.TryParse<CharacterSkill>(entry.Skill, out var skill) || !CraftingSkills.IsCraftingSkill(skill))
+            {
+                ServerLogger.LogWarning($"ProduceRecipes.csv has a recipe for {entry.Result} using {entry.Skill}, which is not a crafting skill.");
+                continue;
+            }
+
+            if (!DataManager.ItemIdByName.TryGetValue(entry.Result, out var resultId))
+            {
+                ServerLogger.LogWarning($"ProduceRecipes.csv has a recipe making {entry.Result}, but no item by that code exists.");
+                continue;
+            }
+
+            var materials = new List<ProduceMaterial>(3);
+            var broken = false;
+
+            AddMaterial(entry.Material1, entry.Amount1);
+            AddMaterial(entry.Material2, entry.Amount2);
+            AddMaterial(entry.Material3, entry.Amount3);
+
+            void AddMaterial(string? code, int count)
+            {
+                if (string.IsNullOrWhiteSpace(code) || count <= 0)
+                    return;
+
+                if (!DataManager.ItemIdByName.TryGetValue(code, out var id))
+                {
+                    ServerLogger.LogWarning($"ProduceRecipes.csv recipe for {entry.Result} needs {code}, but no item by that code exists.");
+                    broken = true;
+                    return;
+                }
+
+                materials.Add(new ProduceMaterial(id, count));
+            }
+
+            if (broken)
+                continue;
+
+            if (materials.Count == 0)
+            {
+                ServerLogger.LogWarning($"ProduceRecipes.csv recipe for {entry.Result} lists no materials, so it would be free. Skipping it.");
+                continue;
+            }
+
+            if (!bySkill.TryGetValue(skill, out var list))
+            {
+                list = new List<ProduceRecipe>();
+                bySkill.Add(skill, list);
+            }
+
+            list.Add(new ProduceRecipe()
+            {
+                Skill = skill,
+                ResultId = resultId,
+                ResultCount = entry.Count < 1 ? 1 : entry.Count,
+                MinSkillLevel = entry.MinSkillLevel,
+                BaseChance = entry.BaseChance,
+                Zeny = entry.Zeny < 0 ? 0 : entry.Zeny,
+                Materials = materials.ToArray()
+            });
+        }
+
+        return bySkill.AsReadOnly();
     }
 
     public ReadOnlyDictionary<string, int> GenerateItemIdByNameLookup()

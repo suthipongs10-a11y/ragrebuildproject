@@ -195,6 +195,7 @@ Extends = "Merchant"
 [Blacksmith.SkillTree]
 HiltBinding = []
 WeaponryResearch = [["HiltBinding",1]]
+SkinTempering = [["HiltBinding",1]]
 HammerFall = []
 AdrenalineRush = [["HammerFall",2]]
 WeaponPerfection = [["WeaponryResearch",2],["AdrenalineRush",2]]

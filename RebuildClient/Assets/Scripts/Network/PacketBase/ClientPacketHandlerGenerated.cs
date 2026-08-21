@@ -1,8 +1,9 @@
-using Assets.Scripts.Network;
+﻿using Assets.Scripts.Network;
 using Assets.Scripts.Network.PacketBase;
 using Assets.Scripts.Network.IncomingPacketHandlers;
 using Assets.Scripts.Network.IncomingPacketHandlers.Character;
 using Assets.Scripts.Network.IncomingPacketHandlers.Combat;
+using Assets.Scripts.Network.IncomingPacketHandlers.Crafting;
 using Assets.Scripts.Network.IncomingPacketHandlers.Environment;
 using Assets.Scripts.Network.IncomingPacketHandlers.Guilds;
 using Assets.Scripts.Network.IncomingPacketHandlers.Market;
@@ -18,7 +19,7 @@ namespace Assets.Scripts.Network.PacketBase
 	{
 		static ClientPacketHandler()
 		{
-			handlers = new ClientPacketHandlerBase[124];
+			handlers = new ClientPacketHandlerBase[126];
 			handlers[0] = new InvalidPacket(); //PlayerReady
 			handlers[1] = new PacketOnEnterServer(); //EnterServer
 			handlers[2] = new InvalidPacket(); //Ping
@@ -143,6 +144,8 @@ namespace Assets.Scripts.Network.PacketBase
 			handlers[121] = new PacketAuctionData(); //AuctionData
 			handlers[122] = new InvalidPacket(); //BuyOrderAction
 			handlers[123] = new PacketBuyOrderData(); //BuyOrderData
+			handlers[124] = new InvalidPacket(); //CraftAction
+			handlers[125] = new PacketCraftData(); //CraftData
 		}
 	}
 }

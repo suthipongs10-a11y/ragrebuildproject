@@ -1617,6 +1617,36 @@ namespace Assets.Scripts.Network
             SendMessage(msg);
         }
 
+        /// <summary>Asking what a crafting skill can make, which is what opens the forge.</summary>
+        public void SendCraftListRequest(CharacterSkill skill)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.CraftAction);
+            msg.Write((byte)CraftRequestType.RecipeList);
+            msg.Write((byte)skill);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>
+        /// Making one.
+        ///
+        /// Only the skill and what to make are sent. Everything the attempt costs is the
+        /// server's own copy of the recipe, so nothing here can talk it into a discount.
+        /// </summary>
+        public void SendCraftRequest(CharacterSkill skill, int resultItemId)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.CraftAction);
+            msg.Write((byte)CraftRequestType.Craft);
+            msg.Write((byte)skill);
+            msg.Write(resultItemId);
+
+            SendMessage(msg);
+        }
+
         public void SendGuildAction(GuildRequestType action)
         {
             var msg = StartMessage();

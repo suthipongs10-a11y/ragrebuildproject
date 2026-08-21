@@ -2,6 +2,7 @@
 using Assets.Scripts.PlayerControl;
 using Assets.Scripts.Sprites;
 using Assets.Scripts.UI.ConfigWindow;
+using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
 using TMPro;
 using UnityEngine;
@@ -213,7 +214,10 @@ namespace Assets.Scripts.UI.Mobile
             if (skill == null)
                 return;
 
-            if (skill.Target == SkillTarget.Passive)
+            //A crafting skill is passive in the data but does something when it is pressed:
+            //it opens the forge. Refusing it here would leave a blacksmith on a phone with
+            //no way to reach the thing the skill is for.
+            if (skill.Target == SkillTarget.Passive && !CraftingSkills.IsCraftingSkill((CharacterSkill)skillId))
             {
                 Say("สกิลนี้เป็นพาสซีฟ ใส่แถบลัดไม่ได้");
                 return;
@@ -304,8 +308,9 @@ namespace Assets.Scripts.UI.Mobile
                     continue;
 
                 //a passive has nothing to fire, so a slot holding one would be a slot that
-                //does nothing when it is tapped
-                if (skill.Target == SkillTarget.Passive)
+                //does nothing when it is tapped - except a crafting skill, which is passive
+                //in the data and opens the forge when it is pressed
+                if (skill.Target == SkillTarget.Passive && !CraftingSkills.IsCraftingSkill(known.Key))
                     continue;
 
                 anySkill = true;

@@ -13,6 +13,7 @@ using RoRebuildServer.EntityComponents.Monsters;
 using RoRebuildServer.EntityComponents.Npcs;
 using RoRebuildServer.Logging;
 using RoRebuildServer.ScriptSystem;
+using RoRebuildServer.Simulation.Crafting;
 using RoRebuildServer.Simulation.Skills.SkillHandlers.Mage;
 using RoRebuildServer.Simulation.StatusEffects.Setup;
 using RoRebuildServer.Simulation.Util;
@@ -45,6 +46,9 @@ public static class DataManager
     public static ReadOnlyDictionary<int, int[]> JobMaxHpLookup;
     public static ReadOnlyDictionary<int, int[]> JobMaxSpLookup;
     public static ReadOnlyDictionary<string, SavePosition> SavePoints;
+
+    /// <summary>What each crafting skill can make, from Db/ProduceRecipes.csv.</summary>
+    public static ReadOnlyDictionary<CharacterSkill, List<ProduceRecipe>> ProduceRecipes;
 
     public static ReadOnlyDictionary<string, int> WeaponClasses;
     public static ReadOnlyDictionary<string, HashSet<int>> EquipGroupInfo;
@@ -85,6 +89,34 @@ public static class DataManager
     public static int GetWeightForItem(int item) => ItemList.TryGetValue(item, out var itemOut) ? itemOut.Weight : 0;
     public static ItemInfo? GetItemInfoById(int id) => ItemList.TryGetValue(id, out var item) ? item : null;
     public static int GetRefineSuccessForItem(int rank, int startingRefine) => refineSuccessTable[startingRefine * 5 + rank];
+
+    /// <summary>Everything one crafting skill can make, or nothing if it makes nothing.</summary>
+    public static List<ProduceRecipe>? GetProduceRecipesForSkill(CharacterSkill skill) =>
+        ProduceRecipes.TryGetValue(skill, out var list) ? list : null;
+
+    /// <summary>
+    /// One recipe by the skill that makes it and what it makes.
+    ///
+    /// Both halves are checked because a craft request names both, and a player asking one
+    /// skill to make another skill's item must not be answered with the other's recipe.
+    /// </summary>
+    public static bool TryGetProduceRecipe(CharacterSkill skill, int resultId, out ProduceRecipe recipe)
+    {
+        if (ProduceRecipes.TryGetValue(skill, out var list))
+        {
+            foreach (var entry in list)
+            {
+                if (entry.ResultId != resultId)
+                    continue;
+
+                recipe = entry;
+                return true;
+            }
+        }
+
+        recipe = null!;
+        return false;
+    }
     public static Memory<int> GetJobBonusesForLevel(int job, int level) => JobBonusTable.AsMemory(job * 70 * 6 + (level - 1) * 6, 6);
 
     public static List<MonsterAiEntry> GetAiStateMachine(MonsterAiType monsterType)
@@ -211,6 +243,7 @@ public static class DataManager
         ItemList = items.AsReadOnly();
 
         ItemIdByName = loader.GenerateItemIdByNameLookup();
+        ProduceRecipes = loader.LoadProduceRecipes(); //after the id lookup, which it resolves item codes through
         SavePoints = loader.LoadSavePoints().AsReadOnly();
         ElementChart = loader.LoadElementChart();
         MvpMonsterCodes = loader.LoadMvpList();

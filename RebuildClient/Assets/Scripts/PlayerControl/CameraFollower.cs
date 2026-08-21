@@ -15,6 +15,7 @@ using Assets.Scripts.PlayerControl;
 using Assets.Scripts.Sprites;
 using Assets.Scripts.UI;
 using Assets.Scripts.UI.ConfigWindow;
+using Assets.Scripts.UI.Crafting;
 using Assets.Scripts.UI.Hud;
 using Assets.Scripts.UI.Inventory;
 using Assets.Scripts.UI.RefineItem;
@@ -383,6 +384,15 @@ namespace Assets.Scripts
             if (skill == CharacterSkill.Vending)
             {
                 VendingSetupManager.OpenVendSetup();
+                return false;
+            }
+
+            //The ore and stone skills open the forge instead of casting. Their entry in the
+            //skill data is Passive, so without this a press would only warn about casting a
+            //passive - which is what a blacksmith pressing Iron Tempering used to get.
+            if (CraftingSkills.IsCraftingSkill(skill))
+            {
+                ForgeWindow.Toggle(skill);
                 return false;
             }
 

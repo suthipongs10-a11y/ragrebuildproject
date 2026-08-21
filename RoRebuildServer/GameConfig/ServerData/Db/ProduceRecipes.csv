@@ -1,0 +1,10 @@
+Result,Count,Skill,MinSkillLevel,BaseChance,Material1,Amount1,Material2,Amount2,Material3,Amount3,Zeny
+Iron,1,IronTempering,1,4000,Iron_Ore,5,,0,,0,100
+Steel,1,SteelTempering,1,3000,Iron,5,Coal,1,,0,100
+Flame_Heart,1,EnchantedStoneCraft,1,1000,Red_Blood,10,,0,,0,100
+Mystic_Frozen,1,EnchantedStoneCraft,1,1000,Crystal_Blue,10,,0,,0,100
+Rough_Wind,1,EnchantedStoneCraft,1,1000,Wind_of_Verdure,10,,0,,0,100
+Great_Nature,1,EnchantedStoneCraft,1,1000,Green_Live,10,,0,,0,100
+Star_Crumb,1,EnchantedStoneCraft,1,100000,Star_Dust,10,,0,,0,100
+Oridecon,1,OrideconResearch,1,2000,Rough_Oridecon,5,,0,,0,100
+Elunium,1,OrideconResearch,1,2000,Rough_Elunium,5,,0,,0,100

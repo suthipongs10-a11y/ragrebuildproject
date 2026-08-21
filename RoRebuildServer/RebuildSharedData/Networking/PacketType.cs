@@ -160,6 +160,11 @@ public enum PacketType : byte
     //wanted. The other half of the market from the auction house.
     BuyOrderAction,
     BuyOrderData,
+
+    //forging: what a crafting skill can make, and one attempt at making it. Same
+    //request/answer pair the market windows use.
+    CraftAction,
+    CraftData,
 }
 
 public enum MessageType : byte
