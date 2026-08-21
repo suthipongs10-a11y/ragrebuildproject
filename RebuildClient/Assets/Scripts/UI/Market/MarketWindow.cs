@@ -51,6 +51,9 @@ namespace Assets.Scripts.UI.Market
         /// <summary>The server's own fee, so the confirmation can say the real number.</summary>
         private const int BuyOrderFeePercent = 5;
 
+        /// <summary>How many search results are worth scrolling through.</summary>
+        private const int MaxSearchResults = 40;
+
         /// <summary>Asked for again on this cadence while a page that goes stale is open.</summary>
         private const float RefreshInterval = 10f;
 
@@ -105,6 +108,9 @@ namespace Assets.Scripts.UI.Market
 
         private BuyStage posting = BuyStage.NotPosting;
         private readonly List<RebuildSharedData.ClientTypes.ItemData> searchMatches = new();
+
+        /// <summary>How many the search actually found, before the list was cut down.</summary>
+        private int searchFound;
 
         private int drawnRevision = -1;
         private float refreshTimer;
@@ -898,22 +904,22 @@ namespace Assets.Scripts.UI.Market
                         return;
                     }
 
+                    //Searched against the item table the client already has, and what gets
+                    //sent is the number of whatever is picked from it. Nothing typed here
+                    //ever reaches the server - a name spelled wrong finds nothing rather
+                    //than posting an order for something nobody meant.
                     searchMatches.Clear();
                     var loader = ClientDataLoader.Instance;
                     if (loader != null)
                     {
                         foreach (var (_, item) in loader.ItemIdLookup)
                         {
-                            if (item == null || item.Id <= 0 || item.IsUnique)
+                            if (item?.Name == null || item.Id <= 0 || item.IsUnique)
                                 continue; //gear belongs in the auction house
-                            if (item.Name == null)
-                                continue;
                             if (item.Name.IndexOf(needle, StringComparison.OrdinalIgnoreCase) < 0)
                                 continue;
 
                             searchMatches.Add(item);
-                            if (searchMatches.Count >= 40)
-                                break;
                         }
                     }
 
@@ -922,6 +928,23 @@ namespace Assets.Scripts.UI.Market
                         CameraFollower.Instance.AppendError("ไม่พบของชิ้นนี้ หรือเป็นของที่ตั้งรับซื้อไม่ได้");
                         return;
                     }
+
+                    //Collected in full, then ranked, then cut. Cutting while collecting made
+                    //the cut in whatever order the table happens to be in, so searching for
+                    //the exact name of a common thing could miss it entirely behind forty
+                    //others that merely contain the word.
+                    searchMatches.Sort((a, b) =>
+                    {
+                        var byRank = MatchRank(a.Name, needle).CompareTo(MatchRank(b.Name, needle));
+                        return byRank != 0
+                            ? byRank
+                            : string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase);
+                    });
+
+                    searchFound = searchMatches.Count;
+                    if (searchMatches.Count > MaxSearchResults)
+                        searchMatches.RemoveRange(MaxSearchResults,
+                            searchMatches.Count - MaxSearchResults);
 
                     posting = BuyStage.PickingItem;
                     Redraw();
@@ -940,7 +963,9 @@ namespace Assets.Scripts.UI.Market
                 Redraw();
             });
 
-            subtitle.text = $"เลือกของที่จะรับซื้อ  ·  ค่าธรรมเนียม {BuyOrderFeePercent}%";
+            subtitle.text = searchFound > searchMatches.Count
+                ? $"เจอ {searchFound:N0} อย่าง แสดง {searchMatches.Count}  ·  ค่าธรรมเนียม {BuyOrderFeePercent}%"
+                : $"เจอ {searchMatches.Count} อย่าง  ·  ค่าธรรมเนียม {BuyOrderFeePercent}%";
 
             var y = -RowGap;
             foreach (var item in searchMatches)
@@ -959,11 +984,23 @@ namespace Assets.Scripts.UI.Market
                 }
 
                 var name = ModernUiTheme.CreateText(row, "Name", item.Name,
-                    ModernUiTheme.SizeLabel, ModernUiTheme.NameColor, TextAlignmentOptions.Left);
+                    ModernUiTheme.SizeLabel, ModernUiTheme.NameColor, TextAlignmentOptions.TopLeft);
                 name.textWrappingMode = TextWrappingModes.NoWrap;
                 name.overflowMode = TextOverflowModes.Ellipsis;
-                ModernUiTheme.Place(name.rectTransform, new Vector2(0, 0.5f),
-                    new Vector2(RowHeight, 0f), new Vector2(Width - RowHeight - 130f, RowHeight));
+                ModernUiTheme.Place(name.rectTransform, new Vector2(0, 1),
+                    new Vector2(RowHeight, -3f), new Vector2(Width - RowHeight - 130f, 18f));
+
+                //The number and what a shop pays, because a name on its own is not enough to
+                //pick by - two things can read almost alike, and the number is what the
+                //order is actually posted against.
+                var hint = item.SellPrice > 0
+                    ? $"#{item.Id}  ·  ขายร้านค้าได้ {item.SellPrice:N0} Zeny"
+                    : $"#{item.Id}";
+                var under = ModernUiTheme.CreateText(row, "Hint", hint,
+                    ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor, TextAlignmentOptions.TopLeft);
+                under.textWrappingMode = TextWrappingModes.NoWrap;
+                ModernUiTheme.Place(under.rectTransform, new Vector2(0, 1),
+                    new Vector2(RowHeight, -18f), new Vector2(Width - RowHeight - 130f, 16f));
 
                 var pick = ModernUiTheme.CreateButton(row, "PickWant", "เลือก",
                     ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
@@ -977,6 +1014,21 @@ namespace Assets.Scripts.UI.Market
             }
 
             body.sizeDelta = new Vector2(0, -y);
+        }
+
+        /// <summary>
+        /// How well a name answers what was typed: nought for the same name, one for a
+        /// name starting with it, two for a name that merely contains it.
+        ///
+        /// So the thing somebody typed the name of comes first, rather than whichever of
+        /// the forty things containing that word the table happened to reach first.
+        /// </summary>
+        private static int MatchRank(string name, string needle)
+        {
+            if (string.Equals(name, needle, StringComparison.OrdinalIgnoreCase))
+                return 0;
+
+            return name.StartsWith(needle, StringComparison.OrdinalIgnoreCase) ? 1 : 2;
         }
 
         private void AskWantCount(RebuildSharedData.ClientTypes.ItemData item)
