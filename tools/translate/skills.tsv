@@ -1,0 +1,278 @@
+# One English line from a skill or status description, one Thai line.
+#
+# Whole lines rather than phrases: each of these is a sentence somebody wrote about one
+# skill, not a template. Two things are copied through untouched - the [bracketed
+# formulas], because nothing evaluates them and the window prints them as they are, and
+# the markup. Stat shorthand, skill names and job names stay in English, the same way
+# they do on the cards and the items.
+#
+Basic adventuring techniques that unlock various features based on your skill level. You will need to master this skill and reach job level 10 before you can change jobs.	พื้นฐานการผจญภัย ปลดล็อกความสามารถต่างๆ ตามเลเวลสกิล ต้องอัปสกิลนี้ให้เต็มและทำ Job Level ถึง 10 ก่อนถึงจะเปลี่ยนอาชีพได้
+Level 1: Use emotes	Level 1: ใช้อีโมทได้
+Level 2: Use sit (/sit or insert)	Level 2: นั่งได้ (/sit หรือปุ่ม Insert)
+Level 3: Enables trading (not implemented)	Level 3: เทรดของได้ (ยังไม่เปิดใช้)
+Level 4: Join a party	Level 4: เข้าปาร์ตี้ได้
+Level 5: Use Kafra item storage	Level 5: ใช้คลังเก็บของ Kafra ได้
+Level 6: Create a party	Level 6: ตั้งปาร์ตี้ได้
+Level 7: Use shout chat (/shout)	Level 7: ใช้แชทตะโกนได้ (/shout)
+Level 8: Use Kafra zeny storage (not implemented)	Level 8: ใช้คลังฝากเงิน Kafra ได้ (ยังไม่เปิดใช้)
+Heal's yourself by either 5 HP or 2% of your max HP, whichever is higher.	ฟื้น HP ตัวเอง 5 หน่วย หรือ 2% ของ MaxHP แล้วแต่ว่าอันไหนมากกว่า
+Strikes a target for [100 + SkillLevel * 30]% ATK with a +[SkillLevel * 5]% chance to hit.	ฟาดเป้าหมาย [100 + SkillLevel * 30]% ATK พร้อมโอกาสเข้าเป้า +[SkillLevel * 5]%
+SP cost increases from 8 to 15 at level 6 and above.	ค่า SP เพิ่มจาก 8 เป็น 15 ตั้งแต่เลเวล 6 ขึ้นไป
+Resists flinching from enemy attacks, allowing you to escape without being slowed down by damage. Provides +[SkillLevel] MDEF while active.	ทนการโจมตีโดยไม่ชะงัก ทำให้ถอยหนีได้โดยไม่ถูกดาเมจหน่วง และได้ MDEF +[SkillLevel] ระหว่างที่ติดผล
+Lasts [SkillLevel + 2] hits or [7 + SkillLevel * 3] seconds, whichever ends first.	อยู่ได้ [SkillLevel + 2] ครั้งที่โดนตี หรือ [7 + SkillLevel * 3] วินาที แล้วแต่ว่าอันไหนหมดก่อน
+Adds a heal over time effect that recovers [SkillLevel * 5] HP plus [SkillLevel * 0.2]% of your MaxHP per level every 6 seconds. Additionally increases the effectiveness of healing items by 10% per level.	ฟื้น HP ต่อเนื่องทุก 6 วินาที ครั้งละ [SkillLevel * 5] HP บวกอีก [SkillLevel * 0.2]% ของ MaxHP และเพิ่มผลของไอเทมฟื้น HP 10% ต่อเลเวล
+Inflicts [100 + SkillLevel * 20]% fire damage to nearby enemies and knocking them back 2 tiles.	สร้างดาเมจธาตุไฟ [100 + SkillLevel * 20]% ใส่ศัตรูรอบตัว และผลักถอย 2 ช่อง
+For 20 seconds after using the skill all physical attacks will all deal an additional [10 + SkillLevel]% fire damage.	หลังใช้สกิล 20 วินาที การโจมตีกายภาพทุกครั้งจะเพิ่มดาเมจธาตุไฟอีก [10 + SkillLevel]%
+Enrages an enemy by taunting them, causing them drop their guard for 30 seconds.	ยั่วให้ศัตรูโมโหจนเผลอเปิดการ์ด นาน 30 วินาที
+Reduces enemy defense by [5 + SkillLevel * 5]%.	ลด DEF ของศัตรู [5 + SkillLevel * 5]%
+Attacks dealt by the enemy will deal [2 + SkillLevel * 2]% more damage, doubled against the user of provoke.	ศัตรูจะตีแรงขึ้น [2 + SkillLevel * 2]% และแรงเป็นสองเท่าเมื่อตีใส่คนที่ใช้ Provoke
+The effectiveness of this skill is halved on boss type monsters.	ผลของสกิลนี้เหลือครึ่งเดียวเมื่อใช้กับมอนประเภทบอส
+Adds +[SkillLevel * 4] weapon attack power when using a dagger or one-handed sword.	เพิ่มพลังโจมตีอาวุธ +[SkillLevel * 4] เมื่อใช้มีดสั้นหรือดาบมือเดียว
+Adds +[SkillLevel * 4] weapon attack power when using two-handed swords.	เพิ่มพลังโจมตีอาวุธ +[SkillLevel * 4] เมื่อใช้ดาบสองมือ
+Nock two arrows to strike a target for two powerful hits at once.	พาดลูกศรสองดอกยิงเป้าหมายรวดเดียวสองครั้ง
+Deals 2 hits at [90 + SkillLevel * 10]% ATK	โจมตี 2 ครั้ง ครั้งละ [90 + SkillLevel * 10]% ATK
+Fires a powerful shot dealing 150% ATK and knocking the target away 6 tiles.	ยิงลูกศรทรงพลัง ดาเมจ 150% ATK และผลักเป้าหมายถอย 6 ช่อง
+Cast Time: 0.8 seconds.	เวลาร่าย: 0.8 วินาที
+Fires a bundle of arrows, striking targets in a 5x5 area and knocking them back.	ยิงลูกศรชุดใหญ่ โดนศัตรูในพื้นที่ 5x5 และผลักถอย
+Cast time: [1.5 - SkillLevel/10]s	เวลาร่าย: [1.5 - SkillLevel/10] วิ
+Damage (center tile): [150 + SkillLevel * 10]%	ดาเมจ (ช่องกลาง): [150 + SkillLevel * 10]%
+Damage (1 tile away): [100 + SkillLevel * 10]%	ดาเมจ (ห่าง 1 ช่อง): [100 + SkillLevel * 10]%
+Damage (2 tiles away): [80 + SkillLevel * 10]%	ดาเมจ (ห่าง 2 ช่อง): [80 + SkillLevel * 10]%
+Focuses your thoughts granting +[2 + SkillLevel]% AGI and DEX. Any nearby hidden enemies will be revealed when cast.	รวบรวมสมาธิ เพิ่ม AGI และ DEX +[2 + SkillLevel]% และเปิดเผยศัตรูที่ซ่อนตัวอยู่รอบๆ เมื่อร่าย
+Duration: [40 + SkillLevel * 20] seconds.	ระยะเวลา: [40 + SkillLevel * 20] วินาที
+Adds +1 range and hit per level when attacking with a bow.	เพิ่มระยะยิงและ HIT +1 ต่อเลเวล เมื่อใช้ธนู
+Adds +1 DEX per level.	เพิ่ม DEX +1 ต่อเลเวล
+Adds an SP recovery over time effect that recovers [SkillLevel * 3] SP plus [SkillLevel * 0.2]% of your MaxSP every 6 seconds. Additionally increases the effectiveness of SP recovery items by 10% per level.	ฟื้น SP ต่อเนื่องทุก 6 วินาที ครั้งละ [SkillLevel * 3] SP บวกอีก [SkillLevel * 0.2]% ของ MaxSP และเพิ่มผลของไอเทมฟื้น SP 10% ต่อเลเวล
+Deals [SkillLevel] hits at 100% fire element magic damage to a single target.	โจมตีเป้าหมายเดียว [SkillLevel] ครั้ง ครั้งละ 100% ดาเมจเวทธาตุไฟ
+Casting is only interrupted by high damage and skill attacks.	การร่ายจะถูกขัดเฉพาะเมื่อโดนดาเมจหนักหรือโดนสกิลเท่านั้น
+Cast Time: [0.6 + SkillLevel * 0.4]s	เวลาร่าย: [0.6 + SkillLevel * 0.4] วิ
+After Cast Delay: 1s	ดีเลย์หลังร่าย: 1 วิ
+Deals [SkillLevel] hits at 100% water element magic damage to a single target.	โจมตีเป้าหมายเดียว [SkillLevel] ครั้ง ครั้งละ 100% ดาเมจเวทธาตุน้ำ
+Deals [SkillLevel] hits at 100% wind element magic damage to a single target.	โจมตีเป้าหมายเดียว [SkillLevel] ครั้ง ครั้งละ 100% ดาเมจเวทธาตุลม
+Deals [140 + SkillLevel * 20]% magical fire damage to all enemies in a 5x5 area.	สร้างดาเมจเวทธาตุไฟ [140 + SkillLevel * 20]% ใส่ศัตรูทุกตัวในพื้นที่ 5x5
+Enemies at the edge of the area of effect will take reduced damage.	ศัตรูที่อยู่ขอบพื้นที่จะรับดาเมจน้อยลง
+Cast time: 1.5s	เวลาร่าย: 1.5 วิ
+Creates a wall of flame at a targeted location dealing 50% fire magic damage and knocking enemies back upon contact.	สร้างกำแพงเพลิงตรงจุดที่เล็ง สร้างดาเมจเวทธาตุไฟ 50% และผลักศัตรูที่สัมผัสถอยออกไป
+Undead and boss monsters can pass through unimpeded but will take rapid damage while doing so.	มอนอันเดดและบอสเดินผ่านได้ไม่ติด แต่จะโดนดาเมจรัวๆ ระหว่างที่เดินผ่าน
+Only 3 firewalls may be active at a time.	วางกำแพงเพลิงพร้อมกันได้ไม่เกิน 3 อัน
+Wall Durability: [2 + SkillLevel] hits	ความทนของกำแพง: [2 + SkillLevel] ครั้ง
+Duration: [5 + SkillLevel] seconds	ระยะเวลา: [5 + SkillLevel] วินาที
+Cast Time: [2.15 - SkillLevel * 0.15]s	เวลาร่าย: [2.15 - SkillLevel * 0.15] วิ
+Deals [100 + SkillLevel * 10]% water element damage with a [35 + SkillLevel * 3]% chance to freeze.	สร้างดาเมจธาตุน้ำ [100 + SkillLevel * 10]% พร้อมโอกาส [35 + SkillLevel * 3]% ทำให้แช่แข็ง
+Freeze Effect: Target becomes immobilized, water element, DEF-50% and MDEF+25%. The effect ends upon taking damage.	ผลแช่แข็ง: เป้าหมายขยับไม่ได้ กลายเป็นธาตุน้ำ DEF -50% และ MDEF +25% ผลจะหลุดเมื่อโดนโจมตี
+Cast Time: 0.8s	เวลาร่าย: 0.8 วิ
+A ghost property psychokinetic attack dealing physical damage at [100 + SkillLevel * 15]% MATK. Enemies directly adjascent to your target will take 2/3 of the damage your primary target takes. Striking a petrified or frozen target will deal double damage and increase the blast radius to 7x7.	พลังจิตธาตุผีที่สร้างดาเมจกายภาพ [100 + SkillLevel * 15]% MATK ศัตรูที่ติดกับเป้าหมายจะรับดาเมจ 2/3 ของเป้าหมายหลัก ถ้าตีใส่เป้าที่กลายเป็นหินหรือแช่แข็งอยู่ ดาเมจเป็นสองเท่าและพื้นที่ขยายเป็น 7x7
+Cast Time: [1.2 - SkillLevel *0.1]s	เวลาร่าย: [1.2 - SkillLevel *0.1] วิ
+After Cast Delay: [1 - SkillLevel * 0.05]s	ดีเลย์หลังร่าย: [1 - SkillLevel * 0.05] วิ
+A ghost property psychokinetic attack that hits [(1 + SkillLevel) / 2] times at 120% MATK. Deals [5 * SkillLevel]% additional damage against the undead.	พลังจิตธาตุผีที่โจมตี [(1 + SkillLevel) / 2] ครั้ง ครั้งละ 120% MATK และเพิ่มดาเมจอีก [5 * SkillLevel]% เมื่อตีใส่อันเดด
+Cast Time: 0.5s	เวลาร่าย: 0.5 วิ
+After Cast Delay: 1.2s (odd levels), 1s (even levels)	ดีเลย์หลังร่าย: 1.2 วิ (เลเวลคี่), 1 วิ (เลเวลคู่)
+Deals [SkillLevel] hits at 100% wind element magic damage to all enemies in a 5x5 area.	โจมตีศัตรูทุกตัวในพื้นที่ 5x5 [SkillLevel] ครั้ง ครั้งละ 100% ดาเมจเวทธาตุลม
+Cast Time: [1.5 + SkillLevel * 0.5]s	เวลาร่าย: [1.5 + SkillLevel * 0.5] วิ
+After Cast Delay: 1.5s	ดีเลย์หลังร่าย: 1.5 วิ
+A barrier which nullifies short range physical attacks, blocking up to [1 + SkillLevel] hits.	กำแพงที่ลบล้างการโจมตีกายภาพระยะประชิด กันได้สูงสุด [1 + SkillLevel] ครั้ง
+Catalyst: <color=#777777>1 Blue Gemstone</color>	ใช้ไอเทม: <color=#777777>Blue Gemstone 1 เม็ด</color>
+Curse a target to turn to stone, a 5 second long process that ends with the target being petrified. Chance of success is [35 + SkillLevel * 3]%. In the event of failure there is no cooldown and no catalyst is consumed.	สาปเป้าหมายให้กลายเป็นหิน ใช้เวลา 5 วินาทีจึงจะกลายเป็นหินสมบูรณ์ โอกาสสำเร็จ [35 + SkillLevel * 3]% ถ้าล้มเหลวจะไม่มีคูลดาวน์และไม่เสียไอเทม
+Petrifying Effect: Target is greatly slowed and unable to attack or use skills.	ระหว่างกลายเป็นหิน: เป้าหมายช้าลงมากและโจมตีหรือใช้สกิลไม่ได้
+Petrification Effect: Target becomes immobilized and earth element, and receive DEF-50% and MDEF+25%. The next attack will free the target and deal +50% damage.	เมื่อกลายเป็นหินแล้ว: เป้าหมายขยับไม่ได้ กลายเป็นธาตุดิน DEF -50% และ MDEF +25% การโจมตีครั้งถัดไปจะปลดหินและสร้างดาเมจ +50%
+Catalyst: <color=#777777>1 Red Gemstone</color>. The chance of consuming a gemstone on a successful cast is [80 - SkillLevel * 5]%.	ใช้ไอเทม: <color=#777777>Red Gemstone 1 เม็ด</color> เมื่อร่ายสำเร็จ มีโอกาส [80 - SkillLevel * 5]% ที่จะเสียเม็ดนั้นไป
+Conjure a magic flame that reveals hidden monsters and players in a 7x7 area around you. Lasts for 10 seconds.	เสกเปลวไฟเวทที่เปิดเผยมอนและผู้เล่นที่ซ่อนตัวในพื้นที่ 7x7 รอบตัว อยู่ได้ 10 วินาที
+Creates a barrier that consumes sp to reduce physical damage.	สร้างเกราะที่กิน SP เพื่อลดดาเมจกายภาพ
+When your SP is full the barrier reduces damage by 30% at the cost of 3% of your SP. The damage reduction and SP cost both decrease by a percentage equal to the percent of SP you have.	ตอน SP เต็ม เกราะจะลดดาเมจ 30% โดยกิน SP 3% ทั้งการลดดาเมจและ SP ที่กินจะลดลงตามสัดส่วน SP ที่เหลืออยู่
+The barrier ends automatically if run out of SP.	เกราะจะหลุดเองเมื่อ SP หมด
+Duration: 5 minutes	ระยะเวลา: 5 นาที
+Heals an ally. Deals damage when cast on an undead (use shift to target an enemy).	ฟื้น HP ให้เพื่อน ถ้าร่ายใส่อันเดดจะกลายเป็นดาเมจ (กด Shift เพื่อเล็งศัตรู)
+Heal Formula: [4 + 8 * SkillLevel], scaling +100% for every 10 base level + int, plus 1/2 magic attack power.	สูตรฟื้น HP: [4 + 8 * SkillLevel] เพิ่มขึ้น +100% ทุกๆ 10 หน่วยของ Base Level + INT บวกครึ่งหนึ่งของ MATK
+After Cast Delay: 1s	ดีเลย์หลังร่าย: 1 วิ
+Increases movement speed by 25% and grants +[2 + SkillLevel] AGI. 	เพิ่มความเร็วเดิน 25% และ AGI +[2 + SkillLevel] 
+Lowers target's movement speed by 25% and grants -[2 + SkillLevel] AGI, as well as canceling existing movement and attack speed increasing skills.	ลดความเร็วเดินของเป้าหมาย 25% และ AGI -[2 + SkillLevel] พร้อมล้างสกิลเพิ่มความเร็วเดินและความเร็วโจมตีที่ติดอยู่
+Ineffective against some powerful monsters.	ไม่ได้ผลกับมอนที่แข็งแกร่งบางตัว
+Success Rate: [50 + SkillLevel * 3]%. +1% for every 5 caster base level/int, -1% for each point of MDEF on the target.	อัตราสำเร็จ: [50 + SkillLevel * 3]% เพิ่ม +1% ทุกๆ 5 หน่วยของ Base Level/INT ของผู้ร่าย และลด -1% ต่อ MDEF 1 แต้มของเป้าหมาย
+Grants +[SkillLevel] STR, DEX, and INT to a target.	เพิ่ม STR, DEX และ INT +[SkillLevel] ให้เป้าหมาย
+When cast on a demon or undead monster, lowers target's DEX & INT by 50% (use shift to target an enemy).	ถ้าร่ายใส่มอนเผ่าปีศาจหรืออันเดด จะลด DEX และ INT ของมัน 50% (กด Shift เพื่อเล็งศัตรู)
+Reduces damage received from demon and undead races by +1% per level to a max of +10%.	ลดดาเมจที่รับจากเผ่าปีศาจและอันเดด +1% ต่อเลเวล สูงสุด +10%
+Adds +[SkillLevel * 3] weapon attack power when attacking demons and undead property monsters.	เพิ่มพลังโจมตีอาวุธ +[SkillLevel * 3] เมื่อตีมอนเผ่าปีศาจและมอนธาตุอันเดด
+Teleports you to a random location on the map.	วาร์ปตัวเองไปตำแหน่งสุ่มในแมพ
+Returns you to your current save point.	ส่งตัวเองกลับไปยังจุดเซฟปัจจุบัน
+Strikes hidden and invisible enemies, revealing them and dealing 145% holy magic damage.	โจมตีศัตรูที่ซ่อนตัวหรือล่องหน เปิดเผยตัวมันและสร้างดาเมจเวทธาตุศักดิ์สิทธิ์ 145%
+Creates cloud that causes all ranged physical attacks to miss. Affects both friend and foe alike.	สร้างกลุ่มเมฆที่ทำให้การโจมตีกายภาพระยะไกลพลาดทั้งหมด มีผลกับทั้งฝ่ายเราและฝ่ายศัตรู
+Lasts 10 seconds. Cannot overlap another Pneuma or Safety Wall.	อยู่ได้ 10 วินาที วางซ้อนกับ Pneuma หรือ Safety Wall อันอื่นไม่ได้
+Buffs all nearby party members increasing soft defense by [SkillLevel * 5]% and reducing damage taken from demon and undead monsters by[SkillLevel]% (to a maximum equal to your learned level of Divine Protection). Allies that already know Divine Protection are unaffected.	บัฟให้เพื่อนปาร์ตี้รอบตัว เพิ่ม Soft DEF [SkillLevel * 5]% และลดดาเมจที่รับจากมอนปีศาจและอันเดด [SkillLevel]% (สูงสุดเท่ากับเลเวล Divine Protection ที่ผู้ร่ายเรียนไว้) เพื่อนที่เรียน Divine Protection อยู่แล้วจะไม่ได้รับผล
+Duration: [SkillLevel * 30] seconds.	ระยะเวลา: [SkillLevel * 30] วินาที
+Cures blind, silence, and confusion status effects from one target.	ล้างสถานะตาบอด ใบ้ และสับสน ให้เป้าหมาย 1 ตัว
+Permanently lowers the defense of all nearby demons and undead property monsters by -[10 + SkillLevel * 4]%.	ลด DEF ของมอนปีศาจและมอนธาตุอันเดดรอบตัวลง -[10 + SkillLevel * 4]% อย่างถาวร
+Success Rate: [25 + 4 * SkillLevel]%	อัตราสำเร็จ: [25 + 4 * SkillLevel]%
+Summon a Warp Portal that teleports players to a predetermined location.	เรียกประตูวาร์ปที่ส่งผู้เล่นไปยังจุดที่บันทึกไว้ล่วงหน้า
+You may remember up to [SkillLevel] destinations by using /memo to register your current location.	จำจุดหมายได้สูงสุด [SkillLevel] จุด โดยใช้ /memo เพื่อบันทึกตำแหน่งที่ยืนอยู่
+Only town and outdoor locations can be registered. Some locations far away from town may be too unstable to be valid destinations.	บันทึกได้เฉพาะในเมืองและพื้นที่กลางแจ้ง บางจุดที่ไกลจากเมืองมากอาจไม่เสถียรพอจะใช้เป็นจุดหมาย
+The portal will automatically close after [5 + SkillLevel * 5] seconds or when 8 players have entered.	ประตูจะปิดเองหลัง [5 + SkillLevel * 5] วินาที หรือเมื่อมีผู้เล่นเข้าไปครบ 8 คน
+Create holy water. Consumes an empty bottle. You must have water within 2 tiles of you to cast this skill.	สร้างน้ำมนต์ ใช้ขวดเปล่า 1 ใบ ต้องมีน้ำอยู่ในระยะ 2 ช่องรอบตัวถึงจะร่ายได้
+Strikes a designated target with holy property magic at 100% magic attack.	โจมตีเป้าหมายที่เล็งด้วยเวทธาตุศักดิ์สิทธิ์ 100% MATK
+Cast Time: 1s	เวลาร่าย: 1 วิ
+Revives 1 dead player. Player returns to life with 10% Max Hp at level 1, increasing 20% per level up to 80% at level 5.	ชุบชีวิตผู้เล่นที่ตายแล้ว 1 คน ฟื้นมาพร้อม HP 10% ของ MaxHP ที่เลเวล 1 และเพิ่มขึ้นทีละ 20% ต่อเลเวล จนถึง 80% ที่เลเวล 5
+Cast Time: [8 - SkillLvl * 2]s	เวลาร่าย: [8 - SkillLvl * 2] วิ
+Adds a [SkillLevel * 5]% chance to double attack when performing regular melee attacks.	เพิ่มโอกาส [SkillLevel * 5]% ออกดาบสองครั้งเมื่อโจมตีระยะประชิดปกติ
+Increases flee by [SkillLevel * 3].	เพิ่ม FLEE [SkillLevel * 3]
+When used by an Assassin, adds +1 flee per level and +10% move speed.	ถ้าเป็น Assassin จะได้ FLEE เพิ่มอีก +1 ต่อเลเวล และความเร็วเดิน +10%
+Removes poison status from the target. If the target is not currently poisoned, grants Poison Resistance for 1 minute.	ล้างสถานะพิษให้เป้าหมาย ถ้าเป้าหมายไม่ได้ติดพิษอยู่ จะได้ต้านทานพิษแทน นาน 1 นาที
+Poison Resistance Effect: The next attack with a chance to poison will fail and deal half damage.	ผลต้านทานพิษ: การโจมตีที่มีโอกาสทำให้ติดพิษครั้งถัดไปจะล้มเหลว และดาเมจเหลือครึ่งเดียว
+Deals 150% poison type damage with a chance apply poison status. Poisoning chance is reduced by the target's VIT.	สร้างดาเมจธาตุพิษ 150% พร้อมโอกาสทำให้ติดพิษ โอกาสติดพิษจะลดลงตาม VIT ของเป้าหมาย
+Poison Effect: Deals 50% of evenom's damage every 2 seconds, and reduces defense by 25% (10% on bosses.) At low HP or against bosses the damage over time effect will pause if the target has not recently received damage from another source.	ผลพิษ: สร้างดาเมจ 50% ของ Envenom ทุก 2 วินาที และลด DEF 25% (บอสเหลือ 10%) เมื่อ HP เหลือน้อยหรือกับบอส ดาเมจต่อเนื่องจะหยุดชั่วคราวถ้าเป้าหมายไม่ได้โดนดาเมจจากทางอื่นเร็วๆ นี้
+Success rate: [50 + SkillLevel * 5]% chance.	อัตราสำเร็จ: [50 + SkillLevel * 5]%
+Duration: [4 + SkillLevel * 2] seconds (with a minimum of 10s).	ระยะเวลา: [4 + SkillLevel * 2] วินาที (อย่างน้อย 10 วิ)
+Hide below ground to avoid detection. Insect, demon, and boss monsters can see through the skill.	มุดลงใต้ดินเพื่อหลบการตรวจจับ มอนเผ่าแมลง ปีศาจ และบอส มองทะลุสกิลนี้ได้
+SP recovery rate is reduced by 100% while hiding, but HP recovery increases by 50%.	ระหว่างซ่อนตัว การฟื้น SP ลดลง 100% แต่การฟื้น HP เพิ่มขึ้น 50%
+Lasts [30+SkillLevel*15] seconds.	อยู่ได้ [30+SkillLevel*15] วินาที
+Consumes 1 sp every [1+SkillLevel] seconds.	กิน SP 1 หน่วยทุก [1+SkillLevel] วินาที
+Attempts to take an additional item from a monster. The success rate varies based on how your level, dex, and luck compares to your target. Only one item can be stolen and cannot be used on bosses.	พยายามขโมยไอเทมเพิ่มจากมอน อัตราสำเร็จขึ้นกับเลเวล DEX และ LUK ของเราเทียบกับเป้าหมาย ขโมยได้ตัวละ 1 ชิ้น และใช้กับบอสไม่ได้
+Success rate: [4 + SkillLevel * 6]% chance.	อัตราสำเร็จ: [4 + SkillLevel * 6]%
+Immediately jump backwards 5 tiles, based on the direction you're currently facing.	กระโดดถอยหลังทันที 5 ช่อง ตามทิศที่หันหน้าอยู่
+Increases your weight capacity by +200 per skill level.	เพิ่มน้ำหนักที่แบกได้ +200 ต่อเลเวลสกิล
+Spend money to deal damage. Consumes [SkillLevel * 50] zeny to deal [100 + SkillLevel * 50] damage to a single target.	จ่ายเงินแลกดาเมจ ใช้ [SkillLevel * 50] Zeny เพื่อสร้างดาเมจ [100 + SkillLevel * 50] ใส่เป้าหมายเดียว
+Zeny used is affected by your level of Discount.	จำนวน Zeny ที่ใช้ลดลงตามเลเวล Discount
+Authorizes the use of a merchant cart and enables purchasing one from most Kafra employees. Movement speed with a cart is lowered by [50 - SkillLevel * 5]% (no penalty at level 10).	ปลดล็อกให้ใช้รถเข็นพ่อค้า และซื้อได้จากพนักงาน Kafra ส่วนใหญ่ ตอนลากรถเข็นความเร็วเดินลดลง [50 - SkillLevel * 5]% (เลเวล 10 ไม่ลดเลย)
+The cart has a weight capacity of 8000 and can store up to 100 items.	รถเข็นรับน้ำหนักได้ 8000 และเก็บของได้สูงสุด 100 ช่อง
+A new cart design is available at levels 41, 66, 81, and 91. Type "/changecart [1-5]" to swap designs.	แบบรถเข็นใหม่ปลดล็อกที่เลเวล 41, 66, 81 และ 91 พิมพ์ "/changecart [1-5]" เพื่อเปลี่ยนแบบ
+Obtain better sale value of items to the NPC, increasing the sale value of goods by [4 + SkillLevel * 2]%.	ขายของให้ NPC ได้ราคาดีขึ้น เพิ่มราคาขาย [4 + SkillLevel * 2]%
+Obtain a better deal when buying items from the NPC, reducing the cost of goods by [4 + SkillLevel * 2]%.	ซื้อของจาก NPC ได้ถูกลง ลดราคาสินค้า [4 + SkillLevel * 2]%
+Some shops cannot be discounted. Decreases the zeny cost of Mammonite.	ร้านบางร้านลดราคาไม่ได้ และช่วยลดค่า Zeny ของ Mammonite ด้วย
+Strikes a target with your cart, dealing [150 + CartWeight / 80]% damage to all enemies in a 3x3 area and knocking them away 2 tiles.	เหวี่ยงรถเข็นฟาดเป้าหมาย สร้างดาเมจ [150 + CartWeight / 80]% ใส่ศัตรูทุกตัวในพื้นที่ 3x3 และผลักถอย 2 ช่อง
+A keen eye unlocks the hidden potential of items, increasing recovery item effectiveness by +[SkillLevel * 2]% and increasing your weapon's attack power by +[SkillLevel * WeaponLevel].	สายตาแหลมคมดึงศักยภาพที่ซ่อนอยู่ของไอเทมออกมา เพิ่มผลของไอเทมฟื้นฟู +[SkillLevel * 2]% และเพิ่มพลังโจมตีอาวุธ +[SkillLevel * WeaponLevel]
+Psyche yourself up, increasing your STR by 4.	ปลุกใจตัวเอง เพิ่ม STR 4
+Allows you to open up a shop to sell items to other players. You can sell a total of [2 + SkillLevel] items at a time. 	เปิดร้านขายของให้ผู้เล่นคนอื่นได้ ตั้งขายได้ครั้งละ [2 + SkillLevel] ช่อง 
+Shops cannot be created within 3 tiles of an NPC. If you get an npc too close error when there is no obvious npc nearby, it could be a hidden NPC.	ตั้งร้านในระยะ 3 ช่องจาก NPC ไม่ได้ ถ้าขึ้นว่าใกล้ NPC เกินไปทั้งที่ไม่เห็น NPC แถวนั้น อาจเป็น NPC ที่ซ่อนอยู่
+At present you will need to remain online for your shop to stay open.	ตอนนี้ต้องออนไลน์อยู่ ร้านถึงจะเปิดค้างไว้ได้
+Increases attack speed when using two-handed swords, reducing the delay between attacks by 30%.	เพิ่มความเร็วโจมตีเมื่อใช้ดาบสองมือ ลดดีเลย์ระหว่างการโจมตี 30%
+Quickly close the gap to a single target, dealing damage and knocking them back. 	พุ่งเข้าหาเป้าหมายอย่างรวดเร็ว สร้างดาเมจและผลักถอย 
+Cast time scales from 0.1s to 0.5s, and damage from 100% to 500%, depending on the distance traveled. Maximum damage is achieved at 12 tiles.	เวลาร่ายไล่จาก 0.1 ถึง 0.5 วิ และดาเมจจาก 100% ถึง 500% ขึ้นกับระยะที่พุ่งไป ดาเมจสูงสุดที่ระยะ 12 ช่อง
+Skill Range: 14 tiles	ระยะสกิล: 14 ช่อง
+Recast time: 5s	คูลดาวน์: 5 วิ
+Knocks a target back 1 cell and deals 2 hits of [100 + SkillLevel * 50]% physical damage.	ผลักเป้าหมายถอย 1 ช่อง และสร้างดาเมจกายภาพ 2 ครั้ง ครั้งละ [100 + SkillLevel * 50]%
+If the target ends in contact with another enemy, the skill will chain to that target, who will in turn be damaged and knocked back, causing a chain reaction.	ถ้าเป้าหมายถอยไปชนศัตรูตัวอื่น สกิลจะลามไปโดนตัวนั้นต่อ ทั้งดาเมจและผลักถอย เกิดเป็นลูกโซ่
+The chain reaction will continue until each target contacted has taken damage or the chain reaction reaches a length of [SkillLevel - 1] (minimum 1).	ลูกโซ่จะลามต่อไปจนกว่าทุกตัวที่ชนจะโดนดาเมจ หรือลามครบ [SkillLevel - 1] ทอด (อย่างน้อย 1)
+Strike a target far away from you with your s pear dealing [100 + SkillLevel * 50]% ranged physical damage. Requires a spear to be equipped to use.	พุ่งหอกใส่เป้าหมายที่อยู่ไกล สร้างดาเมจกายภาพระยะไกล [100 + SkillLevel * 50]% ต้องใส่หอกถึงจะใช้ได้
+Range: 5/6/8/9/11 cells depending on the skill level	ระยะ: 5/6/8/9/11 ช่อง ตามเลเวลสกิล
+Deals [SkillLevel] hits at 100% earth element magic damage to a single target.	โจมตีเป้าหมายเดียว [SkillLevel] ครั้ง ครั้งละ 100% ดาเมจเวทธาตุดิน
+Deals [SkillLevel] hits at 100% earth element magic damage to all enemies in a 5x5 area. Capable of hitting hidden and burrowed enemies.	โจมตีศัตรูทุกตัวในพื้นที่ 5x5 [SkillLevel] ครั้ง ครั้งละ 100% ดาเมจเวทธาตุดิน โดนศัตรูที่ซ่อนตัวหรือมุดดินอยู่ได้ด้วย
+Cast Time: [1 + SkillLevel * 0.5]s	เวลาร่าย: [1 + SkillLevel * 0.5] วิ
+Pulls water from the surrounding area to strike a single target multiple times for [1 + SkillLevel * 30]% water element magic damage.	ดึงน้ำจากพื้นที่รอบตัวมาถล่มเป้าหมายเดียวหลายครั้ง ครั้งละ [1 + SkillLevel * 30]% ดาเมจเวทธาตุน้ำ
+The number of projectiles is equal to the amount of tiles that contain water in an area around the caster. If no nearby tiles contain water, the skill will fail.	จำนวนลูกน้ำเท่ากับจำนวนช่องที่มีน้ำรอบตัวผู้ร่าย ถ้ารอบตัวไม่มีน้ำเลย สกิลจะล้มเหลว
+Level 1: Max 1 projectile (1x1 area)	Level 1: สูงสุด 1 ลูก (พื้นที่ 1x1)
+Level 2-3: Max 9 projectiles (3x3 area)	Level 2-3: สูงสุด 9 ลูก (พื้นที่ 3x3)
+Level 4-5: Max 25 projectiles (5x5 area)	Level 4-5: สูงสุด 25 ลูก (พื้นที่ 5x5)
+Cast Time: [SkillLevel]s	เวลาร่าย: [SkillLevel] วิ
+Adds +[SkillLevel * 5] weapon attack power when attacking flying, brute and insect type monsters.	เพิ่มพลังโจมตีอาวุธ +[SkillLevel * 5] เมื่อตีมอนที่บินได้ มอนเผ่าสัตว์ และเผ่าแมลง
+Sets a trap that when stepped on immobilizes the enemy for [SkillLevel * 4] seconds.	วางกับดักที่พอเหยียบแล้วศัตรูจะขยับไม่ได้นาน [SkillLevel * 4] วินาที
+Ineffective against enemies that aren't touching the ground when moving. High agility enemies, bosses, and enemies higher level than you will escape faster.	ไม่ได้ผลกับศัตรูที่เคลื่อนที่โดยไม่แตะพื้น ศัตรูที่ AGI สูง บอส และศัตรูที่เลเวลสูงกว่าเราจะดิ้นหลุดเร็วกว่า
+Cannot overlap with another trap or be set next to another player or monster.	วางซ้อนกับกับดักอันอื่นไม่ได้ และวางติดผู้เล่นหรือมอนไม่ได้
+If the trap expires without being triggered the trap item will be returned.	ถ้ากับดักหมดเวลาโดยไม่มีใครเหยียบ จะได้ไอเทมกับดักคืน
+Duration: 50s	ระยะเวลา: 50 วิ
+Uses: <color=#777777>1 Trap</color>	ใช้ไอเทม: <color=#777777>Trap 1 ชิ้น</color>
+Allows you to rent a falcon, giving you access to falcon related skills.	ปลดล็อกให้เช่าเหยี่ยวได้ และเปิดใช้สกิลสายเหยี่ยว
+While using a falcon you gain a chance to trigger Blitz Beat when attacking. When triggered this way damage is reduced when striking multiple targets, and the max skill level activated is limited to [1 + JobLevel / 10]. Chance of activation is [1 + (Luk / 3)]%, with that chance modified by 1% for every point of CRIT added by cards or equipment.	ระหว่างมีเหยี่ยว การโจมตีปกติมีโอกาสออก Blitz Beat เอง เวลาออกแบบนี้ดาเมจจะลดลงถ้าโดนหลายตัว และเลเวลสกิลที่ออกจำกัดที่ [1 + JobLevel / 10] โอกาสออกคือ [1 + (Luk / 3)]% และปรับเพิ่มอีก 1% ต่อ CRIT 1 แต้มที่ได้จากการ์ดหรืออุปกรณ์
+Orders your falcon to attack a target, dealing [SkillLevel] hits to all enemies in a 3x3 area.	สั่งเหยี่ยวโจมตีเป้าหมาย สร้างดาเมจ [SkillLevel] ครั้ง ใส่ศัตรูทุกตัวในพื้นที่ 3x3
+Ignores evasion and defense. Not affected by weapon or damage cards, but damage can be increased with cards and equpment that boost critical damage.	เจาะทะลุการหลบและ DEF ไม่ได้รับผลจากอาวุธหรือการ์ดเพิ่มดาเมจ แต่เพิ่มดาเมจได้ด้วยการ์ดและอุปกรณ์ที่เพิ่มดาเมจ CRIT
+After manually casting Blitz Beat your chance to trigger Blitz Beat when attacking is increased by +[SkillLevel]% for 15 seconds.	หลังกดใช้ Blitz Beat เอง โอกาสออก Blitz Beat จากการโจมตีปกติจะเพิ่มขึ้น +[SkillLevel]% นาน 15 วินาที
+Cast Time: 1.5s	เวลาร่าย: 1.5 วิ
+Damage: [80 + Int + (Dex / 5)] per hit	ดาเมจ: [80 + Int + (Dex / 5)] ต่อครั้ง
+Increases damage of Blitz Beat by [6 * SkillLevel] damage per hit.	เพิ่มดาเมจ Blitz Beat อีก [6 * SkillLevel] ต่อครั้ง
+Deals <element>earth</element> property damage to the first enemy that steps on the trap.	สร้างดาเมจธาตุ<element>ดิน</element>ใส่ศัตรูตัวแรกที่เหยียบกับดัก
+Ignores enemy evasion, defense, and is not modified by equipment or cards that increase weapon damage.	เจาะทะลุการหลบและ DEF ของศัตรู และไม่ได้รับผลจากอุปกรณ์หรือการ์ดที่เพิ่มดาเมจอาวุธ
+Cannot overlap with another trap or be set next to another player or monster. If the trap expires without being triggered the trap item will be returned. Area skills with knockback (such as arrow shower) can move the trap.	วางซ้อนกับกับดักอันอื่นไม่ได้ และวางติดผู้เล่นหรือมอนไม่ได้ ถ้าหมดเวลาโดยไม่มีใครเหยียบจะได้ไอเทมคืน สกิลพื้นที่ที่มีแรงผลัก (เช่น Arrow Shower) ทำให้กับดักเลื่อนได้
+Catalyst: <item>1 Trap</item>	ใช้ไอเทม: <item>Trap 1 ชิ้น</item>
+Damage: [SkillLevel * (50 + Dex / 2) * (1 + Int / 20)]	ดาเมจ: [SkillLevel * (50 + Dex / 2) * (1 + Int / 20)]
+Deals <element>wind</element> property damage to all enemies in a 5x5 area when the trap expires or is stepped on.	สร้างดาเมจธาตุ<element>ลม</element>ใส่ศัตรูทุกตัวในพื้นที่ 5x5 เมื่อกับดักหมดเวลาหรือมีคนเหยียบ
+Cannot overlap with another trap or be set next to another player or monster. Attacking the trap knocks it away, and area skills with knockback (such as arrow shower) can move the trap.	วางซ้อนกับกับดักอันอื่นไม่ได้ และวางติดผู้เล่นหรือมอนไม่ได้ ตีกับดักจะทำให้มันกระเด็น และสกิลพื้นที่ที่มีแรงผลัก (เช่น Arrow Shower) ทำให้กับดักเลื่อนได้
+Duration: 8s	ระยะเวลา: 8 วิ
+Damage: [SkillLevel * (50 + Dex / 2) * (1 + Int / 30)]	ดาเมจ: [SkillLevel * (50 + Dex / 2) * (1 + Int / 30)]
+Deals <element>fire</element> property damage to all enemies in a 7x7 area when they step on the trap. Any claymore traps within that area of effect will also detonate.	สร้างดาเมจธาตุ<element>ไฟ</element>ใส่ศัตรูทุกตัวในพื้นที่ 7x7 เมื่อมีคนเหยียบ และ Claymore Trap อันอื่นที่อยู่ในพื้นที่นั้นจะระเบิดตามไปด้วย
+Cannot overlap with another trap or be set next to another player or monster. This trap will detonate if it receives damage from another claymore trap.	วางซ้อนกับกับดักอันอื่นไม่ได้ และวางติดผู้เล่นหรือมอนไม่ได้ กับดักนี้จะระเบิดถ้าโดนดาเมจจาก Claymore Trap อันอื่น
+Catalyst: <item>2 Traps</item>	ใช้ไอเทม: <item>Trap 2 ชิ้น</item>
+Set a trap that when stepped on pushes any enemy 7 tiles in the set direction.	วางกับดักที่พอเหยียบแล้วผลักศัตรูไป 7 ช่องตามทิศที่ตั้งไว้
+The trap direction is set when placed and is always aimed away from the player.	ทิศของกับดักถูกกำหนดตอนวาง และชี้ออกจากตัวผู้วางเสมอ
+Cannot overlap with another trap or be set next to another player or monster. If the trap expires without being triggered the trap item will be returned. This trap can be moved with area skills that cause knockback (such as arrow shower.)	วางซ้อนกับกับดักอันอื่นไม่ได้ และวางติดผู้เล่นหรือมอนไม่ได้ ถ้าหมดเวลาโดยไม่มีใครเหยียบจะได้ไอเทมคืน กับดักนี้เลื่อนได้ด้วยสกิลพื้นที่ที่มีแรงผลัก (เช่น Arrow Shower)
+Duration: [50 + SkillLevel * 10]s	ระยะเวลา: [50 + SkillLevel * 10] วิ
+Creates a sanctuary that continually heals anyone (including monsters) standing within it. The effect will end after activating [6 + SkillLevel * 2] times.	สร้างเขตศักดิ์สิทธิ์ที่ฟื้น HP ให้ทุกคนที่ยืนอยู่ในนั้นเรื่อยๆ (รวมถึงมอนด้วย) จะหมดผลหลังทำงานครบ [6 + SkillLevel * 2] ครั้ง
+Demon or undead property monsters entering will instead take holy damage equal to half the heal amount, be knocked back, and consume 2 activations.	มอนเผ่าปีศาจหรือธาตุอันเดดที่เข้ามาจะโดนดาเมจธาตุศักดิ์สิทธิ์เท่ากับครึ่งหนึ่งของค่าฟื้น HP โดนผลักถอย และกินโควตา 2 ครั้ง
+Levels 1-7: Heals [SkillLevel * 100]hp	Level 1-7: ฟื้น [SkillLevel * 100] HP
+Levels 8-10: Heals 777hp	Level 8-10: ฟื้น 777 HP
+Duration: [1 + SkillLevel * 3]s	ระยะเวลา: [1 + SkillLevel * 3] วิ
+Deals 8 hits at [50 + SkillLevel * 5]% to a single target, with a +50% increase to accuracy.	โจมตีเป้าหมายเดียว 8 ครั้ง ครั้งละ [50 + SkillLevel * 5]% พร้อมความแม่นยำ +50%
+Additional damage is added in proportion to your attack speed.	ดาเมจเพิ่มขึ้นตามสัดส่วนความเร็วโจมตีของเรา
+Enchant the weapon of yourself or an ally to deal poison property damage. Also adds a [2 + SkillLevel / 2]% chance to poison the enemy when performing melee attacks.	ร่ายอาวุธของตัวเองหรือเพื่อนให้เป็นธาตุพิษ และเพิ่มโอกาส [2 + SkillLevel / 2]% ทำให้ศัตรูติดพิษเมื่อโจมตีระยะประชิด
+Unequipping or swapping weapons will cause the effect to end early.	ถอดหรือเปลี่ยนอาวุธจะทำให้ผลหลุดก่อนกำหนด
+Duration: [15 + SkillLevel * 15]s	ระยะเวลา: [15 + SkillLevel * 15] วิ
+Strikes a target with 100% physical damage and inflict them with a time delayed toxin.	โจมตีเป้าหมายด้วยดาเมจกายภาพ 100% และฝังพิษหน่วงเวลาเอาไว้
+For 12 seconds all physical damage received will be accumulated and dealt again in an explosion dealing poison property damage to the target and 2/3 of the amount to nearby targets.	ตลอด 12 วินาที ดาเมจกายภาพทั้งหมดที่เป้าหมายรับจะถูกสะสมไว้ แล้วระเบิดออกเป็นดาเมจธาตุพิษใส่เป้าหมาย และ 2/3 ของจำนวนนั้นใส่ตัวที่อยู่ใกล้
+The maximum amount of damage that can be stored is [400 + 120 * SkillLevel]% ATK, with the total skill modifier increased by 5% per level of Poison React learned.	ดาเมจที่สะสมได้สูงสุดคือ [400 + 120 * SkillLevel]% ATK และตัวคูณรวมเพิ่มขึ้น 5% ต่อเลเวล Poison React ที่เรียนไว้
+The skill will detonate early if the maximum accumulated damage is reached or the amount exceeds the target's remaining HP.	สกิลจะระเบิดก่อนกำหนดถ้าสะสมดาเมจเต็มเพดาน หรือดาเมจเกิน HP ที่เป้าหมายเหลืออยู่
+Catalyst: <color=#777777>1 Red Gemstone</color>	ใช้ไอเทม: <color=#777777>Red Gemstone 1 เม็ด</color>
+Skill Cooldown: 3s	คูลดาวน์สกิล: 3 วิ
+Places a toxic area on the ground that will poison any non-poison or non-undead enemy that touches it.	วางพื้นที่พิษบนพื้น ศัตรูที่ไม่ใช่ธาตุพิษหรืออันเดดที่เดินโดนจะติดพิษ
+Poison Effect: Deals [50 + SkillLevel * 5]% attack damage every 2 seconds, and reduces defense by 25% (10% on bosses.) At low HP or against bosses the damage over time effect will pause if the target has not recently received damage from another source.	ผลพิษ: สร้างดาเมจ [50 + SkillLevel * 5]% ของ ATK ทุก 2 วินาที และลด DEF 25% (บอสเหลือ 10%) เมื่อ HP เหลือน้อยหรือกับบอส ดาเมจต่อเนื่องจะหยุดชั่วคราวถ้าเป้าหมายไม่ได้โดนดาเมจจากทางอื่นเร็วๆ นี้
+Each time you take melee-range physical damage you have a 50% chance to consume one skill charge to use Envenom on the attacker.	ทุกครั้งที่โดนดาเมจกายภาพระยะประชิด มีโอกาส 50% ที่จะใช้ชาร์จ 1 หน่วยเพื่อสวน Envenom ใส่คนที่ตีเรา
+If a poison property attack is used or poison property monster attacks you, the damage is blocked and all charges are consumed to poison the target and deal [50 + SkillLevel * 10]% attack multiplied by the number of charges remaining.	ถ้าโดนโจมตีธาตุพิษ หรือโดนมอนธาตุพิษตี ดาเมจจะถูกกันไว้ทั้งหมด และใช้ชาร์จที่เหลือทั้งหมดทำให้เป้าหมายติดพิษ พร้อมสร้างดาเมจ [50 + SkillLevel * 10]% ของ ATK คูณด้วยจำนวนชาร์จที่เหลือ
+Poison Effect: Deals 50% of the counter damage every 2 seconds.	ผลพิษ: สร้างดาเมจ 50% ของดาเมจที่สวนกลับ ทุก 2 วินาที
+Charges: [(1 + SkillLevel) / 2]	จำนวนชาร์จ: [(1 + SkillLevel) / 2]
+Duration: [30 + SkillLevel * 15]s	ระยะเวลา: [30 + SkillLevel * 15] วิ
+Adds STR + 1, ATK + 5, and improves the duration of Adrenaline Rush, Power Thrust, and Weapon Perfection by 10%.	เพิ่ม STR +1, ATK +5 และเพิ่มระยะเวลาของ Adrenaline Rush, Power Thrust และ Weapon Perfection อีก 10%
+Strike the earth with a powerful hammer swing that has a [20 + SkillLvl * 10]% chance to stun enemies in a 5x5 area.	ฟาดค้อนลงพื้นอย่างแรง มีโอกาส [20 + SkillLvl * 10]% ทำให้ศัตรูในพื้นที่ 5x5 สตัน
+Increases attack speed with axes and maces, reducing the delay between attacks by 30% for yourself and 25% for party members. 	เพิ่มความเร็วโจมตีเมื่อใช้ขวานและกระบอง ลดดีเลย์ระหว่างการโจมตี 30% สำหรับตัวเอง และ 25% สำหรับเพื่อนปาร์ตี้ 
+Increases your resistance to non-elemental damage by [SkillLvl]% and your resistance to fire element damage by [SkillLvl * 4]%.	เพิ่มความต้านทานดาเมจไร้ธาตุ [SkillLvl]% และความต้านทานดาเมจธาตุไฟ [SkillLvl * 4]%
+Optimizes the weapons of you and your allies to bypass an enemy's defenses.	ปรับแต่งอาวุธของตัวเองและเพื่อนให้เจาะเกราะศัตรูได้
+Increases your physical defense penetration as well as critical damage by [SkillLevel * 1.5]%. An additional [SkillLevel * 0.5]% is added when attacking an enemy of a favorable size for your weapon.	เพิ่มการเจาะ DEF กายภาพและดาเมจ CRIT อีก [SkillLevel * 1.5]% และเพิ่มอีก [SkillLevel * 0.5]% เมื่อตีศัตรูที่ขนาดเข้าทางอาวุธที่ถืออยู่
+Party members receive 1/2 of this bonus.	เพื่อนปาร์ตี้ได้รับโบนัสครึ่งหนึ่ง
+Duration: [SkillLevel + 10]s	ระยะเวลา: [SkillLevel + 10] วิ
+Favorable weapons for enemy size:<br>Small: Dagger, Book, Rod, Gun<br>Medium: 1h Sword, Mace, Katar, Bow, Book, Knuckle, Instrument/Whip<br>Large: 2h Sword, Spear, Axe, Huuma Shuriken	อาวุธที่เข้าทางตามขนาดศัตรู:<br>เล็ก: Dagger, Book, Rod, Gun<br>กลาง: ดาบมือเดียว, Mace, Katar, Bow, Book, Knuckle, เครื่องดนตรี/แส้<br>ใหญ่: ดาบสองมือ, Spear, Axe, Huuma Shuriken
+Adds +[SkillLevel * 2] HIT, increases your accuracy by +[SkillLevel * 2]%, and increases the damage dealt by physical attacks by +[SkillLevel * 3].	เพิ่ม HIT +[SkillLevel * 2] ความแม่นยำ +[SkillLevel * 2]% และดาเมจจากการโจมตีกายภาพ +[SkillLevel * 3]
+A curse is making you weaker and greatly lowering your move speed and luck.	คำสาปทำให้อ่อนแอลง ความเร็วเดินและ LUK ลดลงอย่างมาก
+You are stunned and unable to perform actions.	สตันอยู่ ทำอะไรไม่ได้เลย
+You are fast asleep, unable to perform actions or evade. Taking damage will wake you but has a high chance to deal critical damage.	หลับสนิท ทำอะไรไม่ได้และหลบไม่ได้ โดนตีแล้วจะตื่น แต่มีโอกาสสูงที่จะโดนคริติคอล
+Encased in ice, you are unable to perform actions and vunerable to wind. Lowers DEF and increases MDEF. Breaks upon taking damage.	ถูกน้ำแข็งห่อหุ้ม ทำอะไรไม่ได้และอ่อนแอต่อธาตุลม DEF ลดลง MDEF เพิ่มขึ้น น้ำแข็งจะแตกเมื่อโดนโจมตี
+You are partially blinded, reducing your HIT, FLEE, and lowering the maximum range you can attack and use skills.	ตามัว HIT และ FLEE ลดลง และระยะโจมตีกับระยะใช้สกิลสั้นลง
+You are unable to speak, preventing you from performing skills or cast spells.	พูดไม่ได้ ทำให้ใช้สกิลและร่ายเวทไม่ได้
+You are confused, making it difficult to walk in a straight line.	สับสน เดินตรงๆ ได้ยาก
+Poison is causing you to take damage over time. Poison can reduce your HP to 1 but it cannot deal fatal damage.	พิษกำลังกัดกินทำให้เสีย HP ต่อเนื่อง พิษลด HP ได้ถึง 1 แต่ไม่ทำให้ตาย
+Your skin is rapidly being encased in stone, lowering your agi, dex, move speed and attack speed.	ผิวกำลังกลายเป็นหินอย่างรวดเร็ว AGI, DEX, ความเร็วเดินและความเร็วโจมตีลดลง
+Encased in stone, you are unable to perform actions and are vulnerable to fire. Lowers DEF and increases MDEF. The next hit you take will deal extra damage but end this effect.	กลายเป็นหิน ทำอะไรไม่ได้และอ่อนแอต่อธาตุไฟ DEF ลดลง MDEF เพิ่มขึ้น การโจมตีครั้งถัดไปจะแรงกว่าปกติแต่จะปลดสถานะนี้
+You are enraged, increasing your physical strength but greatly lowering your defense.	โมโหจัด พลังโจมตีกายภาพเพิ่มขึ้นแต่ DEF ลดลงอย่างมาก
+You are enraged, greatly lowering your defense.	โมโหจัด DEF ลดลงอย่างมาก
+Hallucinations are distorting your vision and making it hard to gauge how much damage you are taking.	ประสาทหลอนทำให้ภาพบิดเบี้ยว และดูไม่ออกว่าตัวเองโดนดาเมจไปเท่าไหร่
+Provides additional storage for items.	เพิ่มพื้นที่เก็บของ
+Attack speed with two-hand weapons increased. Ends early if you unequip your two-handed weapon.	ความเร็วโจมตีเมื่อใช้อาวุธสองมือเพิ่มขึ้น ถ้าถอดอาวุธสองมือออก ผลจะหลุดก่อนกำหนด
+Your STR, INT, and DEX are increased.	STR, INT และ DEX เพิ่มขึ้น
+Your move speed and AGI are increased.	ความเร็วเดินและ AGI เพิ่มขึ้น
+Your move speed and AGI are reduced.	ความเร็วเดินและ AGI ลดลง
+Your soft DEF stat is increased and you receive the benefit of the caster's divine protection, reducing damage from demon and undead monsters.	Soft DEF เพิ่มขึ้น และได้รับผลของ Divine Protection จากผู้ร่าย ลดดาเมจจากมอนปีศาจและอันเดด
+Holy light has weakened your defenses.	แสงศักดิ์สิทธิ์ทำให้เกราะป้องกันอ่อนแอลง
+Your AGI and DEX are increased.	AGI และ DEX เพิ่มขึ้น
+You are able to receive damage without flinching and have increased MDEF.	โดนตีแล้วไม่ชะงัก และ MDEF เพิ่มขึ้น
+Your strikes will deal extra fire property damage.	การโจมตีจะเพิ่มดาเมจธาตุไฟ
+You are protected from ranged physical attacks.	ป้องกันการโจมตีกายภาพระยะไกลอยู่
+You are protected from short ranged physical attacks.	ป้องกันการโจมตีกายภาพระยะประชิดอยู่
+You are hiding beneith the ground, unable to be targeted except by demon, insect and boss monsters.	ซ่อนตัวอยู่ใต้ดิน ไม่มีใครเล็งได้ ยกเว้นมอนเผ่าปีศาจ แมลง และบอส
+Your STR is increased.	STR เพิ่มขึ้น
+You are hidden from view, unable to be targeted except by demon, insect and boss monsters. Moving away from a wall will cancel the effect.	ล่องหนอยู่ ไม่มีใครเล็งได้ ยกเว้นมอนเผ่าปีศาจ แมลง และบอส ถ้าเดินห่างจากกำแพงผลจะหลุด
+Damage taken is reduced at the cost of SP. The higher your SP pool the greater the damage reduction and SP cost.	ลดดาเมจที่รับโดยแลกกับ SP ยิ่ง SP เหลือมาก ยิ่งลดดาเมจได้มากและกิน SP มากตาม
+Hidden enemies nearby will be revealed.	ศัตรูที่ซ่อนตัวอยู่ใกล้ๆ จะถูกเปิดเผย
+Hidden enemies nearby will take damage and be revealed.	ศัตรูที่ซ่อนตัวอยู่ใกล้ๆ จะโดนดาเมจและถูกเปิดเผย
+The next poisoning attack will fail and deal half damage.	การโจมตีที่จะทำให้ติดพิษครั้งถัดไปจะล้มเหลว และดาเมจเหลือครึ่งเดียว
+Attack speed with axes and maces increased. Ends early if you switch to another weapon type.	ความเร็วโจมตีเมื่อใช้ขวานและกระบองเพิ่มขึ้น ถ้าเปลี่ยนไปใช้อาวุธชนิดอื่น ผลจะหลุดก่อนกำหนด
+Your move speed is increased.	ความเร็วเดินเพิ่มขึ้น
+Your attack speed is increased.	ความเร็วโจมตีเพิ่มขึ้น
+Your physical attacks deal fire property damage.	การโจมตีกายภาพกลายเป็นดาเมจธาตุไฟ
+Your physical attacks deal water property damage.	การโจมตีกายภาพกลายเป็นดาเมจธาตุน้ำ
+Your physical attacks deal wind property damage.	การโจมตีกายภาพกลายเป็นดาเมจธาตุลม
+Your physical attacks deal earth property damage.	การโจมตีกายภาพกลายเป็นดาเมจธาตุดิน
+Your physical attacks deal dark property damage.	การโจมตีกายภาพกลายเป็นดาเมจธาตุมืด
+Your physical attacks deal poison property damage and has a chance to poison.	การโจมตีกายภาพกลายเป็นดาเมจธาตุพิษ และมีโอกาสทำให้ติดพิษ
+When this effect expires you will be reduced to 1 HP.	เมื่อสถานะนี้หมดเวลา HP จะเหลือ 1
+Attack power greatly increased.	พลังโจมตีเพิ่มขึ้นอย่างมาก
+Move speed and evasion greatly increased.	ความเร็วเดินและการหลบเพิ่มขึ้นอย่างมาก
+All your attacks heal you.	การโจมตีทุกครั้งจะดูดเลือดกลับมาให้
+You are doomed to die in the near future.	ถูกกำหนดชะตาให้ตายในอีกไม่ช้า
+A nearby enemy has entangled the two of you, preventing either of you from moving.	ศัตรูที่อยู่ใกล้ล็อกตัวไว้ด้วยกัน ทำให้ทั้งคู่ขยับไม่ได้
+You've had something recently taken and cannot be stolen from again.	เพิ่งโดนขโมยของไป จะโดนขโมยซ้ำอีกไม่ได้
+A powerful curse is causing this dungeon to be much more dangerous than usual.	คำสาปอันทรงพลังทำให้ดันเจี้ยนนี้อันตรายกว่าปกติมาก
+Enemies you face will deal more damage and have higher health, but also give more experience and drops.	ศัตรูจะตีแรงขึ้นและเลือดหนาขึ้น แต่ก็ให้ Exp และของดรอปมากขึ้นด้วย
+You cannot be seen and you cannot be targeted.	ไม่มีใครมองเห็นและเล็งไม่ได้

@@ -74,10 +74,12 @@ namespace Assets.Scripts.UI
             tooltipBuilder.Clear();
 
             tooltipBuilder.Append($"{data.Name}\n");
-            tooltipBuilder.Append($"<size=-4>Prerequisites: ");
+            //The two words above a description that is now in Thai. Leaving them in English
+            //made the tooltip read as two half finished translations rather than one.
+            tooltipBuilder.Append($"<size=-4>ต้องมีสกิล: ");
             
             if (requiredSkills == null || requiredSkills.Length <= 0 || entry.SkillRank == -1)
-                tooltipBuilder.Append("<color=#4444FF>None</color>");
+                tooltipBuilder.Append("<color=#4444FF>ไม่ต้อง</color>");
             else
             {
                 for (var i = 0; i < requiredSkills.Length; i++)

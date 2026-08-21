@@ -1,155 +1,155 @@
 ::Curse
-A curse is making you weaker and greatly lowering your move speed and luck.
+คำสาปทำให้อ่อนแอลง ความเร็วเดินและ LUK ลดลงอย่างมาก
 
 ::Stun
-You are stunned and unable to perform actions.
+สตันอยู่ ทำอะไรไม่ได้เลย
 
 ::Sleep
-You are fast asleep, unable to perform actions or evade. Taking damage will wake you but has a high chance to deal critical damage.
+หลับสนิท ทำอะไรไม่ได้และหลบไม่ได้ โดนตีแล้วจะตื่น แต่มีโอกาสสูงที่จะโดนคริติคอล
 
 ::Frozen
-Encased in ice, you are unable to perform actions and vunerable to wind. Lowers DEF and increases MDEF. Breaks upon taking damage.
+ถูกน้ำแข็งห่อหุ้ม ทำอะไรไม่ได้และอ่อนแอต่อธาตุลม DEF ลดลง MDEF เพิ่มขึ้น น้ำแข็งจะแตกเมื่อโดนโจมตี
 
 ::Blind
-You are partially blinded, reducing your HIT, FLEE, and lowering the maximum range you can attack and use skills.
+ตามัว HIT และ FLEE ลดลง และระยะโจมตีกับระยะใช้สกิลสั้นลง
 
 ::Silence
-You are unable to speak, preventing you from performing skills or cast spells.
+พูดไม่ได้ ทำให้ใช้สกิลและร่ายเวทไม่ได้
 
 ::Confusion
-You are confused, making it difficult to walk in a straight line.
+สับสน เดินตรงๆ ได้ยาก
 
 ::Poison
-Poison is causing you to take damage over time. Poison can reduce your HP to 1 but it cannot deal fatal damage.
+พิษกำลังกัดกินทำให้เสีย HP ต่อเนื่อง พิษลด HP ได้ถึง 1 แต่ไม่ทำให้ตาย
 
 ::Petrifying
-Your skin is rapidly being encased in stone, lowering your agi, dex, move speed and attack speed.
+ผิวกำลังกลายเป็นหินอย่างรวดเร็ว AGI, DEX, ความเร็วเดินและความเร็วโจมตีลดลง
 
 ::Stone
-Encased in stone, you are unable to perform actions and are vulnerable to fire. Lowers DEF and increases MDEF. The next hit you take will deal extra damage but end this effect.
+กลายเป็นหิน ทำอะไรไม่ได้และอ่อนแอต่อธาตุไฟ DEF ลดลง MDEF เพิ่มขึ้น การโจมตีครั้งถัดไปจะแรงกว่าปกติแต่จะปลดสถานะนี้
 
 ::Provoke
-You are enraged, increasing your physical strength but greatly lowering your defense.
+โมโหจัด พลังโจมตีกายภาพเพิ่มขึ้นแต่ DEF ลดลงอย่างมาก
 
 ::ProvokeNoAtk
-You are enraged, greatly lowering your defense.
+โมโหจัด DEF ลดลงอย่างมาก
 
 ::Hallucination
-Hallucinations are distorting your vision and making it hard to gauge how much damage you are taking.
+ประสาทหลอนทำให้ภาพบิดเบี้ยว และดูไม่ออกว่าตัวเองโดนดาเมจไปเท่าไหร่
 
 ::PushCart
-Provides additional storage for items.
+เพิ่มพื้นที่เก็บของ
 
 ::TwoHandQuicken
-Attack speed with two-hand weapons increased. Ends early if you unequip your two-handed weapon.
+ความเร็วโจมตีเมื่อใช้อาวุธสองมือเพิ่มขึ้น ถ้าถอดอาวุธสองมือออก ผลจะหลุดก่อนกำหนด
 
 ::Blessing
-Your STR, INT, and DEX are increased.
+STR, INT และ DEX เพิ่มขึ้น
 
 ::IncreaseAgi
-Your move speed and AGI are increased.
+ความเร็วเดินและ AGI เพิ่มขึ้น
 
 ::DecreaseAgi
-Your move speed and AGI are reduced.
+ความเร็วเดินและ AGI ลดลง
 
 ::Angelus
-Your soft DEF stat is increased and you receive the benefit of the caster's divine protection, reducing damage from demon and undead monsters.
+Soft DEF เพิ่มขึ้น และได้รับผลของ Divine Protection จากผู้ร่าย ลดดาเมจจากมอนปีศาจและอันเดด
 
 ::SignumCrusis
-Holy light has weakened your defenses.
+แสงศักดิ์สิทธิ์ทำให้เกราะป้องกันอ่อนแอลง
 
 ::ImproveConcentration
-Your AGI and DEX are increased.
+AGI และ DEX เพิ่มขึ้น
 
 ::Endure
-You are able to receive damage without flinching and have increased MDEF.
+โดนตีแล้วไม่ชะงัก และ MDEF เพิ่มขึ้น
 
 ::MagnumBreak
-Your strikes will deal extra fire property damage.
+การโจมตีจะเพิ่มดาเมจธาตุไฟ
 
 ::Pneuma
-You are protected from ranged physical attacks.
+ป้องกันการโจมตีกายภาพระยะไกลอยู่
 
 ::SafetyWall
-You are protected from short ranged physical attacks.
+ป้องกันการโจมตีกายภาพระยะประชิดอยู่
 
 ::Hiding
-You are hiding beneith the ground, unable to be targeted except by demon, insect and boss monsters.
+ซ่อนตัวอยู่ใต้ดิน ไม่มีใครเล็งได้ ยกเว้นมอนเผ่าปีศาจ แมลง และบอส
 
 ::CrazyUproar
-Your STR is increased.
+STR เพิ่มขึ้น
 
 ::Cloaking
-You are hidden from view, unable to be targeted except by demon, insect and boss monsters. Moving away from a wall will cancel the effect.
+ล่องหนอยู่ ไม่มีใครเล็งได้ ยกเว้นมอนเผ่าปีศาจ แมลง และบอส ถ้าเดินห่างจากกำแพงผลจะหลุด
 
 ::EnergyCoat
-Damage taken is reduced at the cost of SP. The higher your SP pool the greater the damage reduction and SP cost.
+ลดดาเมจที่รับโดยแลกกับ SP ยิ่ง SP เหลือมาก ยิ่งลดดาเมจได้มากและกิน SP มากตาม
 
 ::Sight
-Hidden enemies nearby will be revealed.
+ศัตรูที่ซ่อนตัวอยู่ใกล้ๆ จะถูกเปิดเผย
 
 ::Ruwach
-Hidden enemies nearby will take damage and be revealed.
+ศัตรูที่ซ่อนตัวอยู่ใกล้ๆ จะโดนดาเมจและถูกเปิดเผย
 
 ::Detoxify
-The next poisoning attack will fail and deal half damage.
+การโจมตีที่จะทำให้ติดพิษครั้งถัดไปจะล้มเหลว และดาเมจเหลือครึ่งเดียว
 
 ::AdrenalineRush
-Attack speed with axes and maces increased. Ends early if you switch to another weapon type.
+ความเร็วโจมตีเมื่อใช้ขวานและกระบองเพิ่มขึ้น ถ้าเปลี่ยนไปใช้อาวุธชนิดอื่น ผลจะหลุดก่อนกำหนด
 
 ::IncreasedMoveSpeed
-Your move speed is increased.
+ความเร็วเดินเพิ่มขึ้น
 
 ::IncreasedAttackSpeed
-Your attack speed is increased.
+ความเร็วโจมตีเพิ่มขึ้น
 
 ::ElementalConverter
 
 ::ElementalConverterFire
-Your physical attacks deal fire property damage.
+การโจมตีกายภาพกลายเป็นดาเมจธาตุไฟ
 
 ::ElementalConverterWater
-Your physical attacks deal water property damage.
+การโจมตีกายภาพกลายเป็นดาเมจธาตุน้ำ
 
 ::ElementalConverterWind
-Your physical attacks deal wind property damage.
+การโจมตีกายภาพกลายเป็นดาเมจธาตุลม
 
 ::ElementalConverterEarth
-Your physical attacks deal earth property damage.
+การโจมตีกายภาพกลายเป็นดาเมจธาตุดิน
 
 ::CursedWater
-Your physical attacks deal dark property damage.
+การโจมตีกายภาพกลายเป็นดาเมจธาตุมืด
 
 ::EnchantPoison
-Your physical attacks deal poison property damage and has a chance to poison.
+การโจมตีกายภาพกลายเป็นดาเมจธาตุพิษ และมีโอกาสทำให้ติดพิษ
 
 ::DarkBlessing
-When this effect expires you will be reduced to 1 HP.
+เมื่อสถานะนี้หมดเวลา HP จะเหลือ 1
 
 ::PowerUp
-Attack power greatly increased.
+พลังโจมตีเพิ่มขึ้นอย่างมาก
 
 ::SpeedUp
-Move speed and evasion greatly increased.
+ความเร็วเดินและการหลบเพิ่มขึ้นอย่างมาก
 
 ::Vampyrism
-All your attacks heal you.
+การโจมตีทุกครั้งจะดูดเลือดกลับมาให้
 
 ::Doom
-You are doomed to die in the near future.
+ถูกกำหนดชะตาให้ตายในอีกไม่ช้า
 
 ::Stop
-A nearby enemy has entangled the two of you, preventing either of you from moving.
+ศัตรูที่อยู่ใกล้ล็อกตัวไว้ด้วยกัน ทำให้ทั้งคู่ขยับไม่ได้
 
 ::StolenFrom
-You've had something recently taken and cannot be stolen from again.
+เพิ่งโดนขโมยของไป จะโดนขโมยซ้ำอีกไม่ได้
 
 ::DungeonMiasma
-A powerful curse is causing this dungeon to be much more dangerous than usual.
-Enemies you face will deal more damage and have higher health, but also give more experience and drops.
+คำสาปอันทรงพลังทำให้ดันเจี้ยนนี้อันตรายกว่าปกติมาก
+ศัตรูจะตีแรงขึ้นและเลือดหนาขึ้น แต่ก็ให้ Exp และของดรอปมากขึ้นด้วย
 
 ::AdminHide
-You cannot be seen and you cannot be targeted.
+ไม่มีใครมองเห็นและเล็งไม่ได้
 
 ::GuildBuff
 สกิลของกิลด์กำลังช่วยคุณอยู่ ติดตัวตลอดตราบใดที่ยังอยู่ในกิลด์
