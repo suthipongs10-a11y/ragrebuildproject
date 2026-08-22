@@ -600,7 +600,7 @@ namespace Assets.Scripts.MapEditor.Editor
 				{ "외부소품\\트랩03_3.rsm", "ModelBlastMine" },
 				{ "외부소품\\트랩03_4.rsm", "ModelSandmanTrap" },
 				{ "외부소품\\트랩03_5.rsm", "ModelFlasherTrap" },
-				{ "외부소품\\트랩03_6.rsm", "ModelSockwaveTrap" },
+				{ "외부소품\\트랩03_6.rsm", "ModelShockwaveTrap" }, //Shockwave, not Sockwave - the client asks for it by the spelled name
 				{ "외부소품\\트랩04.rsm", "ModelClaymoreTrap" },
 				{ "외부소품\\트랩05.rsm", "ModelTalkieBox" },
 			};

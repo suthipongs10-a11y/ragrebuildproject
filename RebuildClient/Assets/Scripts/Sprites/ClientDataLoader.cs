@@ -1179,9 +1179,25 @@ namespace Assets.Scripts.Sprites
 
         public void AttachPrefabToControllable(ServerControllable target, string prefabName)
         {
+            //Asked before loading, because Addressables answers an unknown key with a thrown
+            //InvalidKeyException rather than an empty handle. The trap models are built from
+            //the GRF by Ragnarok/Load Model Effects and are not in the repository, so a
+            //client that has never run it throws a red error every time a hunter lays a
+            //trap - for a decoration. The trap itself is the server's and works either way.
+            if (!DoesAddressableExist<GameObject>(prefabName))
+            {
+#if UNITY_EDITOR
+                Debug.Log($"No model for {prefabName}. Run Ragnarok/Load Model Effects, then Ragnarok/Update Addressables.");
+#endif
+                return;
+            }
+
             var loader = Addressables.LoadAssetAsync<GameObject>(prefabName);
             loader.Completed += ah =>
             {
+                if (ah.Result == null)
+                    return;
+
                 if (target != null && target.gameObject.activeInHierarchy)
                 {
                     var obj2 = GameObject.Instantiate(ah.Result, target.transform, false);
