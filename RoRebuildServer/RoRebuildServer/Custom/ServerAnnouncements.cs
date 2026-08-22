@@ -88,7 +88,7 @@ public class ServerAnnouncements : ServerConfigScriptHandlerBase
     /// </summary>
     public static void AnnounceCardFound(WorldObject picker, ref GroundItem item)
     {
-        if (string.IsNullOrEmpty(item.DropSourceName) || picker.Player == null)
+        if (item.DropSourceMonsterId <= 0 || picker.Player == null)
             return;
 
         var itemId = item.Type == ItemType.UniqueItem ? item.UniqueItem.Id : item.Item.Id;
@@ -96,13 +96,16 @@ public class ServerAnnouncements : ServerConfigScriptHandlerBase
         if (info == null || info.ItemClass != ItemClass.Card)
             return;
 
+        if (!DataManager.MonsterIdLookup.TryGetValue(item.DropSourceMonsterId, out var source))
+            return;
+
         //The contributor is who the drop was held for, which is who actually made the kill.
         //Somebody else bending down for it after the hold expires still gets their name in
         //gold, but not credit for a kill that was not theirs.
         if (item.ContributorId == picker.Id)
-            Announce($"{picker.Name} กำจัด {item.DropSourceName} ได้รับ {info.Name} !");
+            Announce($"{picker.Name} กำจัด {source.Name} ได้รับ {info.Name} !");
         else
-            Announce($"{picker.Name} ได้รับ {info.Name} จาก {item.DropSourceName} !");
+            Announce($"{picker.Name} ได้รับ {info.Name} จาก {source.Name} !");
     }
 
     /// <summary>

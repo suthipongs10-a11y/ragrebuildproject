@@ -36,15 +36,19 @@ public struct GroundItem : IEquatable<GroundItem>
     public bool FromBoss;
 
     /// <summary>
-    /// The name of the monster whose death put this on the ground, or null when nothing
-    /// died for it - a player's own drop, an NPC handout, or loot a monster had merely
-    /// picked up off the floor first.
+    /// The monster whose death put this on the ground, or 0 when nothing died for it - a
+    /// player's own drop, an NPC handout, or loot a monster had merely picked up off the
+    /// floor first. Monster ids start well above zero, so a zeroed struct reads as "no
+    /// source" on its own.
+    ///
+    /// The id rather than the name because this struct is stack allocated a page at a time
+    /// in FindRandomGroundItemInRange, and one reference field would make that illegal.
     ///
     /// The card announcement reads this rather than the item alone. Going by the item
     /// meant anyone could drop a card, take it back, and put the line across every screen
     /// on the server, over and over, for free.
     /// </summary>
-    public string? DropSourceName;
+    public int DropSourceMonsterId;
 
     public FloatPosition Position;
     public RegularItem Item;
