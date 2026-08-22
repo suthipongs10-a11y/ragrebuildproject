@@ -1620,7 +1620,7 @@ public class Map
 
         //this method also runs when a drop simply expires, which is nobody picking it up
         if (pickerUpper is { Type: CharacterType.Player } && pickerUpper.Player != null)
-            ServerAnnouncements.AnnounceCardFound(pickerUpper.Player, item.Item.Id);
+            ServerAnnouncements.AnnounceCardFound(pickerUpper, ref item);
 
         Chunks[chunkId].RemoveGroundItem(groundId);
         ItemChunkLookup.Remove(groundId);

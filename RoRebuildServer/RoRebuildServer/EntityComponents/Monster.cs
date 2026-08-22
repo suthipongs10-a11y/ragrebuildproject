@@ -611,7 +611,7 @@ public partial class Monster : IEntityAutoReset
                         count = GameRandom.NextInclusive(d.CountMin, d.CountMax);
                     var dropPos = GetNextTileForDrop(dropId);
                     var item = new GroundItem(dropPos, d.Id, count)
-                        { Rarity = RarityOfChance(chance), FromBoss = isBoss };
+                        { Rarity = RarityOfChance(chance), FromBoss = isBoss, DropSourceName = Character.Name };
                     if (topContributor != null)
                         item.SetExclusivePickupTime(topContributor, isMvp ? 8f : 4f);
                     Character.Map.DropGroundItem(ref item);
@@ -632,7 +632,7 @@ public partial class Monster : IEntityAutoReset
 
                     var dropPos = GetNextTileForDrop(dropId);
                     var item = new GroundItem(dropPos, drops.DropChances[i].Id, 1)
-                        { Rarity = RarityOfChance(drops.DropChances[i].Chance), FromBoss = isBoss };
+                        { Rarity = RarityOfChance(drops.DropChances[i].Chance), FromBoss = isBoss, DropSourceName = Character.Name };
                     if (topContributor != null)
                         item.SetExclusivePickupTime(topContributor, isMvp ? 8f : 4f);
                     Character.Map.DropGroundItem(ref item);
@@ -691,7 +691,7 @@ public partial class Monster : IEntityAutoReset
             return;
 
         var dropPos = GetNextTileForDrop(dropId);
-        var ore = new GroundItem(dropPos, itemId, 1);
+        var ore = new GroundItem(dropPos, itemId, 1) { DropSourceName = Character.Name };
         ore.SetExclusivePickupTime(topContributor, 8f);
         Character.Map.DropGroundItem(ref ore);
         dropId++;
@@ -738,7 +738,7 @@ public partial class Monster : IEntityAutoReset
             var itemId = effect.ItemIds[GameRandom.Next(0, effect.ItemIds.Length)];
 
             var dropPos = GetNextTileForDrop(dropId);
-            var item = new GroundItem(dropPos, itemId, 1);
+            var item = new GroundItem(dropPos, itemId, 1) { DropSourceName = Character.Name };
             item.SetExclusivePickupTime(topContributor, 8f);
             Character.Map.DropGroundItem(ref item);
             dropId++;

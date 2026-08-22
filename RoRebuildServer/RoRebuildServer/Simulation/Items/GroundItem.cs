@@ -35,6 +35,17 @@ public struct GroundItem : IEquatable<GroundItem>
     /// </summary>
     public bool FromBoss;
 
+    /// <summary>
+    /// The name of the monster whose death put this on the ground, or null when nothing
+    /// died for it - a player's own drop, an NPC handout, or loot a monster had merely
+    /// picked up off the floor first.
+    ///
+    /// The card announcement reads this rather than the item alone. Going by the item
+    /// meant anyone could drop a card, take it back, and put the line across every screen
+    /// on the server, over and over, for free.
+    /// </summary>
+    public string? DropSourceName;
+
     public FloatPosition Position;
     public RegularItem Item;
     public UniqueItem UniqueItem;

@@ -6,6 +6,7 @@ using RoRebuildServer.EntityComponents;
 using RoRebuildServer.EntityComponents.Monsters;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Networking;
+using RoRebuildServer.Simulation.Items;
 
 namespace RoRebuildServer.Custom;
 
@@ -79,14 +80,29 @@ public class ServerAnnouncements : ServerConfigScriptHandlerBase
     /// Cards are the one drop in the game everybody wants and almost nobody sees, so who
     /// got which one is the news of the evening on a server this size. Said at the pickup
     /// rather than at the drop, because the drop is not yet anybody's.
+    ///
+    /// Only for a card a monster died to leave behind. Announcing whatever was picked up
+    /// meant a player could throw a card on the floor and take it back to put the line
+    /// across every screen on the server, as often as they liked, which is a toy for
+    /// whoever finds it first and noise for everybody else.
     /// </summary>
-    public static void AnnounceCardFound(Player player, int itemId)
+    public static void AnnounceCardFound(WorldObject picker, ref GroundItem item)
     {
+        if (string.IsNullOrEmpty(item.DropSourceName) || picker.Player == null)
+            return;
+
+        var itemId = item.Type == ItemType.UniqueItem ? item.UniqueItem.Id : item.Item.Id;
         var info = DataManager.GetItemInfoById(itemId);
         if (info == null || info.ItemClass != ItemClass.Card)
             return;
 
-        Announce($"{player.Name} ได้รับ {info.Name} !");
+        //The contributor is who the drop was held for, which is who actually made the kill.
+        //Somebody else bending down for it after the hold expires still gets their name in
+        //gold, but not credit for a kill that was not theirs.
+        if (item.ContributorId == picker.Id)
+            Announce($"{picker.Name} กำจัด {item.DropSourceName} ได้รับ {info.Name} !");
+        else
+            Announce($"{picker.Name} ได้รับ {info.Name} จาก {item.DropSourceName} !");
     }
 
     /// <summary>

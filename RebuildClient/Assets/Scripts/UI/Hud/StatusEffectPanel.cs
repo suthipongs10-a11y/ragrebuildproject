@@ -33,6 +33,58 @@ namespace Assets.Scripts.UI.Hud
         /// </summary>
         private static readonly Color GuildBuffTint = new Color(0.62f, 0.82f, 1f);
 
+        /// <summary>
+        /// The grey a stand-in icon wears, so a borrowed picture reads as "something is on
+        /// you, hover it" rather than as the status the picture actually belongs to.
+        /// </summary>
+        public static readonly Color PlaceholderTint = new Color(0.56f, 0.59f, 0.64f);
+
+        /// <summary>
+        /// A status effect's icon, or the nearest thing to one.
+        ///
+        /// The picture is imported into the atlas from the Korean file named on the Icon
+        /// line in StatusEffects.toml, so a status with no Icon line never gets a sprite at
+        /// all. That used to end the entry: no icon, no row, and no tooltip either, leaving
+        /// a buff the player could only confirm by watching their own numbers. Push Cart,
+        /// Sight, Ruwach, Safety Wall and the falcon all fall in that hole. A borrowed
+        /// picture with the right text under it beats a buff that isn't there.
+        /// </summary>
+        public static Sprite GetStatusIcon(CharacterStatusEffect status, out bool isPlaceholder)
+        {
+            var loader = ClientDataLoader.Instance;
+            var icon = loader.GetIconAtlasSprite($"status_{status}");
+
+            //Compared with == rather than ??: these are UnityEngine objects, and a
+            //null-coalesce tests the reference where == asks Unity whether the thing is
+            //still alive, which is the question that matters for an atlas sprite.
+            isPlaceholder = icon == null;
+            if (!isPlaceholder)
+                return icon;
+
+            //A status named after the skill that grants it can wear that skill's own icon,
+            //which is the picture the player already associates with the buff. Push Cart,
+            //Sight, Ruwach and Safety Wall all land here, and it beats a stand-in outright.
+            if (Enum.TryParse<CharacterSkill>(status.ToString(), out var skill)
+                && skill != CharacterSkill.None
+                && loader.SkillData.TryGetValue(skill, out var skillData))
+            {
+                icon = loader.GetIconAtlasSprite(skillData.Icon);
+                if (icon != null)
+                {
+                    isPlaceholder = false;
+                    return icon;
+                }
+            }
+
+            //Blessing ships with every other status effect, so there is always something
+            //to show; Gloria is there for the one importer run that somehow missed it.
+            icon = loader.GetIconAtlasSprite("status_Blessing");
+            if (icon == null)
+                icon = loader.GetIconAtlasSprite("status_Gloria");
+
+            return icon;
+        }
+
         void Awake()
         {
             Instance = this;
@@ -48,27 +100,21 @@ namespace Assets.Scripts.UI.Hud
                 return;
             }
 
-            var icon = ClientDataLoader.Instance.GetIconAtlasSprite($"status_{status}");
+            var icon = GetStatusIcon(status, out var isPlaceholder);
 
             //The guild buff wears the guild's own emblem where it has one, and that is not
             //only decoration: status_GuildBuff.png exists solely because somebody ran the
-            //icon importer in the editor, and an effect with no icon is dropped below
-            //without a word. A player with a guild skill would see nothing at all and
-            //conclude the skill never took. Blessing's icon is the last resort - it ships
-            //with every other status effect, so there is always something to show.
+            //icon importer in the editor. A player with a guild skill and no emblem art
+            //would otherwise see a stand-in and conclude the skill never took.
             var borrowedIcon = false;
             if (status == CharacterStatusEffect.GuildBuff)
             {
                 var mark = GuildEmblems.Sprite(GuildState.EmblemId);
                 if (mark != null)
+                {
                     icon = mark;
-                //Two plain checks rather than a null-coalesce: these are UnityEngine
-                //objects, and ?? tests the reference where == asks Unity whether the thing
-                //is still alive, which is the question that matters for an atlas sprite.
-                if (icon == null)
-                    icon = ClientDataLoader.Instance.GetIconAtlasSprite("status_Blessing");
-                if (icon == null)
-                    icon = ClientDataLoader.Instance.GetIconAtlasSprite("status_Gloria");
+                    isPlaceholder = false;
+                }
 
                 //Asked of the emblem number rather than of the sprite above, because a boss
                 //emblem has no sprite yet at this point - its picture is still being read
@@ -107,6 +153,8 @@ namespace Assets.Scripts.UI.Hud
             newEffect.StatusIcon.sprite = icon;
             if (borrowedIcon)
                 newEffect.StatusIcon.color = GuildBuffTint;
+            else if (isPlaceholder)
+                newEffect.StatusIcon.color = PlaceholderTint;
             newEffect.IsBuff = isBuff;
             if (statusInfo != null && statusInfo.CanDisable)
                 newEffect.CanCancel = true;

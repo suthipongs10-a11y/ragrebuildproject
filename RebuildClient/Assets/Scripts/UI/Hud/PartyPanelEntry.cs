@@ -184,7 +184,9 @@ namespace Assets.Scripts.UI.Hud
                 return;
             }
 
-            var icon = ClientDataLoader.Instance.GetIconAtlasSprite($"status_{status}");
+            //Same stand-in as the player's own bar: a status with no icon of its own still
+            //belongs on the row, greyed, so it can be hovered for what it does.
+            var icon = StatusEffectPanel.GetStatusIcon(status, out var isPlaceholder);
             if (icon == null)
             {
                 Debug.LogWarning($"Status effect {status} could not find icon!");
@@ -192,7 +194,9 @@ namespace Assets.Scripts.UI.Hud
             }
 
             var statusInfo = ClientDataLoader.Instance.GetStatusEffect((int)status);
-            var isBuff = statusInfo.Type == "Buff";
+            //A status the client has no entry for still belongs on the row. Reading Type
+            //off a null here would take down the whole panel over one missing row.
+            var isBuff = statusInfo == null || statusInfo.Type == "Buff";
 
             if(!unusedStatusEffects.TryPop(out var go))
                 go = Instantiate(StatusEffectPrefab);
@@ -208,6 +212,7 @@ namespace Assets.Scripts.UI.Hud
             newEffect.Expiration = expiration;
             newEffect.UpdateTime();
             newEffect.StatusIcon.sprite = icon;
+            newEffect.StatusIcon.color = isPlaceholder ? StatusEffectPanel.PlaceholderTint : Color.white;
             newEffect.CanCancel = false;
             newEffect.IsPartyMember = true;
             
