@@ -901,7 +901,13 @@ namespace Assets.Scripts.Sprites
                     weaponSpriteFile = ctrl.IsMale ? weapon.EffectMale : weapon.EffectFemale;
             }
 
-            if (string.IsNullOrWhiteSpace(weaponSpriteFile) && isEffect)
+            //The blade glow is optional art. Bows and rods have none by design, and a job
+            //whose glow sprite was never extracted from the GRF should simply render the
+            //weapon without it - checked here rather than left to the loader, because a
+            //name that resolves to nothing would take the attachment with it. The weapon
+            //sprite itself is not optional and is not checked this way.
+            if (isEffect && (string.IsNullOrWhiteSpace(weaponSpriteFile)
+                             || !DoesAddressableExist<RoSpriteData>(weaponSpriteFile)))
                 return;
 
             var bodyTransform = ctrl.SpriteAnimator.transform;

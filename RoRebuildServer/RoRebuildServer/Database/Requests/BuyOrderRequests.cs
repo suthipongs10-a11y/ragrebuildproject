@@ -312,8 +312,12 @@ public class BuyOrderCancelRequest : IDbRequest
 
         Inbox.RefundZeny(buyerId, refund, ParcelReason.BuyOrderClosed, null);
 
+        //Says what came back rather than only that something did. The items bought before
+        //this point are already in the parcel box, so the only thing this closing returns
+        //is the deposit nobody sold into.
         if (player != null)
-            CommandBuilder.SendServerMessageTo(player, $"ยกเลิกแล้ว คืนมัดจำ {refund:N0} Zeny");
+            CommandBuilder.SendServerMessageTo(player,
+                $"ปิดคำสั่งซื้อแล้ว คืนมัดจำที่เหลือ {refund:N0} Zeny (ของที่ได้แล้วอยู่ในกล่องพัสดุ)");
 
         await BuyOrderQueries.SendMine(dbContext, buyerId, buyerName);
     }

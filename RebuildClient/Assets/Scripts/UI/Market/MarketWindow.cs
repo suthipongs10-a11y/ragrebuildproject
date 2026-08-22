@@ -1202,7 +1202,12 @@ namespace Assets.Scripts.UI.Market
             ModernUiTheme.Place(name.rectTransform, new Vector2(0, 1),
                 new Vector2(TextInset, -5f), new Vector2(LabelWidth, 18f));
 
-            var detail = $"รับอีก {order.RemainingCount:N0}/{order.WantedCount:N0} ชิ้น";
+            //On your own page what you want to know is how much has arrived; on the browse
+            //page a seller wants to know how much the order will still take.
+            var got = order.WantedCount - order.RemainingCount;
+            var detail = ownPage
+                ? $"ได้แล้ว {got:N0}/{order.WantedCount:N0} ชิ้น  ·  รออีก {order.RemainingCount:N0}"
+                : $"รับอีก {order.RemainingCount:N0}/{order.WantedCount:N0} ชิ้น";
             if (!ownPage)
                 detail += mine ? "  ·  ของคุณเอง" : $"  ·  โดย {order.BuyerName}";
 
@@ -1224,11 +1229,26 @@ namespace Assets.Scripts.UI.Market
             if (ownPage)
             {
                 var id = order.Id;
-                var cancel = ModernUiTheme.CreateButton(row, "CancelBuy", "ยกเลิก",
+                var refund = order.RemainingValue;
+
+                //"รับคืน" rather than "ยกเลิก". What the button does is hand back the part
+                //of the deposit nobody has sold into yet - the pieces already bought with
+                //the rest went to the parcel box the moment each sale happened, and are
+                //not at stake here. Called cancel it read as throwing the order away, so
+                //the one thing a buyer is entitled to do at any time looked like a loss.
+                var collect = ModernUiTheme.CreateButton(row, "CancelBuy", "รับคืน",
                     ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
-                ModernUiTheme.Place((RectTransform)cancel.transform, new Vector2(1, 0.5f),
+                ModernUiTheme.Place((RectTransform)collect.transform, new Vector2(1, 0.5f),
                     new Vector2(-8f, 0f), new Vector2(ActionWidth, RowHeight - 10f));
-                cancel.onClick.AddListener(() => NetworkManager.Instance.SendBuyOrderCancel(id));
+
+                var question = got > 0
+                    ? $"ปิดคำสั่งซื้อนี้แล้วรับของคืน?\n\nของที่ได้แล้ว {got:N0} ชิ้น อยู่ในกล่องพัสดุเรียบร้อยแล้ว\n"
+                      + $"คืนมัดจำที่ยังไม่ได้ใช้ {refund:N0} Zeny\nค่าธรรมเนียมตอนตั้งไม่คืน"
+                    : $"ปิดคำสั่งซื้อนี้?\n\nยังไม่มีใครขายให้เลย\n"
+                      + $"คืนมัดจำ {refund:N0} Zeny\nค่าธรรมเนียมตอนตั้งไม่คืน";
+
+                collect.onClick.AddListener(() =>
+                    Confirm(question, () => NetworkManager.Instance.SendBuyOrderCancel(id)));
                 return;
             }
 
