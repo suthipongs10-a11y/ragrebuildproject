@@ -56,6 +56,11 @@ public static partial class CommandBuilder
         }
 
         NetworkManager.SendMessage(packet, player.Connection);
+
+        //Whoever forged whatever is in the box. Sent after the page rather than with it so
+        //the names are one packet however many rows there are, and so a page with nothing
+        //forged on it costs nothing at all.
+        SendForgedNamesFor(player, parcels.Select(p => p.UniqueId));
     }
 
     /// <summary>One page of the board.</summary>
@@ -71,6 +76,7 @@ public static partial class CommandBuilder
             WriteAuction(packet, row, false);
 
         NetworkManager.SendMessage(packet, player.Connection);
+        SendForgedNamesFor(player, rows.Select(r => r.UniqueId));
     }
 
     /// <summary>What this character listed and what they are winning, in one page.</summary>
@@ -84,6 +90,7 @@ public static partial class CommandBuilder
             WriteAuction(packet, row, row.SellerId == characterId);
 
         NetworkManager.SendMessage(packet, player.Connection);
+        SendForgedNamesFor(player, rows.Select(r => r.UniqueId));
     }
 
     /// <summary>
@@ -183,6 +190,14 @@ public static partial class CommandBuilder
             return;
 
         packet.Write(item.Refine);
+
+        //The flags and the guid were being dropped here, which is what stopped a listing
+        //from reading as what it is: the flags say it was forged and the guid is how the
+        //smith's name is looked up. The columns were always in the row - only the packet
+        //was leaving them behind.
+        packet.Write(item.ItemFlags);
+        packet.Write(item.UniqueId.ToByteArray());
+
         packet.Write(item.Slot0);
         packet.Write(item.Slot1);
         packet.Write(item.Slot2);

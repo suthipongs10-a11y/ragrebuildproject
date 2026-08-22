@@ -107,12 +107,18 @@ public struct GroundItem : IEquatable<GroundItem>
         msg.Write(Id);
         msg.Write(Position.X);
         msg.Write(Position.Y);
+
+        //A unique item used to go down as its id and count alone, which is why a +9 triple
+        //crumb sword lying on the ground read as "Blade". It goes down whole now: the
+        //refine, the cards and the guid the smith's name hangs off are all part of what the
+        //thing on the floor is, and a label that leaves them out is describing a different
+        //item. Thirty-four bytes more, and only on the drops that are unique at all.
+        msg.Write(Type == ItemType.UniqueItem);
+
         if (Type == ItemType.RegularItem)
-        {
             Item.Serialize(msg);
-        }
         else
-            UniqueItem.SerializeAsRegularItem(msg);
+            UniqueItem.Serialize(msg);
 
         msg.Write(Rarity);
         msg.Write(FromBoss);

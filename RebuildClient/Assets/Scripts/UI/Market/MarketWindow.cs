@@ -1793,24 +1793,27 @@ namespace Assets.Scripts.UI.Market
         /// A refine and a card are the whole reason one sword is worth more than the next,
         /// so leaving them off the row would make two very different listings read alike.
         /// </summary>
+        /// <summary>
+        /// What a listing is called.
+        ///
+        /// Built by the same code the inventory uses rather than by hand, which is how the
+        /// cards, the element and the smith who forged it survive the trip through the
+        /// market. This used to spell out "+7 Blade [4 การ์ด]" and say nothing about what
+        /// was actually in those four slots.
+        /// </summary>
         private static string ItemLabel(MarketItemView item, RebuildSharedData.ClientTypes.ItemData data)
         {
-            var name = data != null ? data.Name : $"#{item.ItemId}";
-            if (item.Refine > 0)
-                name = $"+{item.Refine} {name}";
+            if (data == null)
+                return item.Count > 1 ? $"#{item.ItemId}  x{item.Count}" : $"#{item.ItemId}";
+
+            var name = item.IsUnique
+                ? InventoryItem.MakeProperName(item.ToUniqueItem(), data)
+                : data.Name;
 
             if (item.Count > 1)
                 name += $"  x{item.Count}";
 
-            if (!item.IsUnique)
-                return name;
-
-            var cards = 0;
-            for (var i = 0; i < 4; i++)
-                if (item.Slots[i] > 0)
-                    cards++;
-
-            return cards > 0 ? $"{name}  [{cards} การ์ด]" : name;
+            return name;
         }
 
         /// <summary>How long is left, counted down from when the server said it.</summary>

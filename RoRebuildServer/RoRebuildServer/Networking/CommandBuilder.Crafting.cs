@@ -85,28 +85,63 @@ public static partial class CommandBuilder
             return;
 
         forgedScratch.Clear();
+        CollectBag(player.Inventory);
+        CollectBag(player.CartInventory);
+        FlushForgedScratch(player);
+    }
 
-        Collect(player.Inventory);
-        Collect(player.CartInventory);
-
-        if (forgedScratch.Count == 0)
+    /// <summary>One bag's worth, for the storage window and anything else that is not the bag.</summary>
+    public static void SendForgedNamesForBag(Player player, CharacterBag? bag)
+    {
+        if (player.Connection == null || bag == null)
             return;
 
-        SendForgedNames(player, forgedScratch);
-        return;
+        forgedScratch.Clear();
+        CollectBag(bag);
+        FlushForgedScratch(player);
+    }
 
-        void Collect(CharacterBag? bag)
+    private static void CollectBag(CharacterBag? bag)
+    {
+        if (bag == null)
+            return;
+
+        foreach (var (_, item) in bag.UniqueItems)
         {
-            if (bag == null)
-                return;
-
-            foreach (var (_, item) in bag.UniqueItems)
-            {
-                var name = ForgedItemRegistry.NameFor(item.UniqueId);
-                if (name != null)
-                    forgedScratch[item.UniqueId] = name;
-            }
+            var name = ForgedItemRegistry.NameFor(item.UniqueId);
+            if (name != null)
+                forgedScratch[item.UniqueId] = name;
         }
+    }
+
+    private static void FlushForgedScratch(Player player)
+    {
+        if (forgedScratch.Count > 0)
+            SendForgedNames(player, forgedScratch);
+    }
+
+    /// <summary>
+    /// The names behind a set of item guids, for anything that is about to show items the
+    /// player does not own - a market page, a shop, a trade window.
+    ///
+    /// Guids that nobody forged are dropped rather than sent as blanks, so the usual case
+    /// of a page with no forged weapons on it sends nothing at all.
+    /// </summary>
+    public static void SendForgedNamesFor(Player player, IEnumerable<Guid> ids)
+    {
+        if (player.Connection == null)
+            return;
+
+        forgedScratch.Clear();
+
+        foreach (var id in ids)
+        {
+            var name = ForgedItemRegistry.NameFor(id);
+            if (name != null)
+                forgedScratch[id] = name;
+        }
+
+        FlushForgedScratch(player);
     }
 
     /// <summary>One item, for when a single thing arrives rather than the whole bag.</summary>
@@ -122,6 +157,46 @@ public static partial class CommandBuilder
         forgedScratch.Clear();
         forgedScratch[item.UniqueItem.UniqueId] = name;
         SendForgedNames(player, forgedScratch);
+    }
+
+    /// <summary>
+    /// The name behind one guid, for a window that is showing somebody else's item.
+    ///
+    /// Silently does nothing when nobody forged it, which is the usual answer.
+    /// </summary>
+    public static void SendForgedNameForId(Player player, Guid uniqueId)
+    {
+        if (player.Connection == null)
+            return;
+
+        var name = ForgedItemRegistry.NameFor(uniqueId);
+        if (name == null)
+            return;
+
+        forgedScratch.Clear();
+        forgedScratch[uniqueId] = name;
+        SendForgedNames(player, forgedScratch);
+    }
+
+    /// <summary>
+    /// One name to everyone who can see it, for a weapon lying on the ground.
+    ///
+    /// Uses whatever recipient list the caller has already gathered, the same one the drop
+    /// packet itself went to - the people who can see the item are exactly the people who
+    /// need to be able to read it.
+    /// </summary>
+    public static void SendForgedNameMulti(Guid uniqueId)
+    {
+        var name = ForgedItemRegistry.NameFor(uniqueId);
+        if (name == null)
+            return;
+
+        var packet = NetworkManager.StartPacket(PacketType.ForgedNames);
+        packet.Write((short)1);
+        packet.Write(uniqueId.ToByteArray());
+        packet.Write(name);
+
+        NetworkManager.SendMessageMulti(packet, recipients);
     }
 
     /// <summary>Reused between the two above, which never run at the same time.</summary>

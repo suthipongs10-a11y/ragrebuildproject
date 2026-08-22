@@ -67,12 +67,16 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Market
             item.Count = msg.ReadInt16();
             item.IsUnique = msg.ReadBoolean();
             item.Refine = 0;
+            item.Flags = 0;
+            item.UniqueId = System.Guid.Empty;
             item.Slots[0] = item.Slots[1] = item.Slots[2] = item.Slots[3] = 0;
 
             if (!item.IsUnique)
                 return;
 
             item.Refine = msg.ReadByte();
+            item.Flags = msg.ReadByte();
+            item.UniqueId = new System.Guid(msg.ReadBytes(16));
             for (var i = 0; i < 4; i++)
                 item.Slots[i] = msg.ReadInt32();
         }

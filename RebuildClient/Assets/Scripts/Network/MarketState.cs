@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
 
 namespace Assets.Scripts.Network
@@ -16,6 +17,38 @@ namespace Assets.Scripts.Network
         public bool IsUnique;
         public int Refine;
         public readonly int[] Slots = new int[4];
+
+        /// <summary>Crafted, mostly. What tells a forged weapon from an ordinary one.</summary>
+        public byte Flags;
+
+        /// <summary>
+        /// The item's own guid, which is how the smith who forged it is looked up.
+        ///
+        /// Carried through the market tables unchanged rather than regenerated, so a sword
+        /// that goes up for auction and comes back down is still the same sword.
+        /// </summary>
+        public System.Guid UniqueId;
+
+        /// <summary>
+        /// The same item as the inventory would hold it, so it can be named by the one
+        /// piece of code that knows how to name things.
+        /// </summary>
+        public UniqueItem ToUniqueItem()
+        {
+            var item = new UniqueItem
+            {
+                Id = ItemId,
+                Count = (short)(Count > short.MaxValue ? short.MaxValue : Count),
+                Flags = Flags,
+                Refine = (byte)(Refine < 0 ? 0 : Refine > 255 ? 255 : Refine),
+                UniqueId = UniqueId
+            };
+
+            for (var i = 0; i < 4; i++)
+                item.SetSlotData(i, Slots[i]);
+
+            return item;
+        }
     }
 
     /// <summary>One thing waiting in the parcel box.</summary>

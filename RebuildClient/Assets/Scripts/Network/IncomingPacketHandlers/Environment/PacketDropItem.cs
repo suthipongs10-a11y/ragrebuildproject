@@ -12,8 +12,27 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Environment
             var groundId = msg.ReadInt32();
             var pos = new Vector2(msg.ReadFloat(), msg.ReadFloat());
 
-            var id = msg.ReadInt32();
-            var count = (int)msg.ReadInt16();
+            //A unique item comes down whole now rather than as a bare id and count, so what
+            //is on the floor can be named properly - refine, cards, element, and the smith
+            //who forged it.
+            var isUnique = msg.ReadBoolean();
+
+            var id = 0;
+            var count = 0;
+            var unique = default(RebuildSharedData.Data.UniqueItem);
+
+            if (isUnique)
+            {
+                unique = RebuildSharedData.Data.UniqueItem.Deserialize(msg);
+                id = unique.Id;
+                count = unique.Count;
+            }
+            else
+            {
+                id = msg.ReadInt32();
+                count = msg.ReadInt16();
+            }
+
             //how unlikely the drop was, which only the server knows; the client turns it
             //into a light around the item
             var rarity = msg.ReadByte();
@@ -25,7 +44,8 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Environment
                 Debug.LogWarning($"Trying to create DropItem of type ${id} at location {pos}, but that drop already exists in the scene!");
                 return;
             }
-            var item = GroundItem.Create(groundId, id, count, pos, isAnimated, rarity, fromBoss);
+            var item = GroundItem.Create(groundId, id, count, pos, isAnimated, rarity, fromBoss,
+                isUnique, unique);
             Network.GroundItemList.Add(groundId, item);
             
         }

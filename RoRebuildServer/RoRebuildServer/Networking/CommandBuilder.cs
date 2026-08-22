@@ -1577,6 +1577,10 @@ public static partial class CommandBuilder
         }
 
         NetworkManager.SendMessage(packet, p.Connection);
+
+        //A shop is full of other people's things, so the names behind any forged weapons
+        //in it have to come with the page - the viewer has never held them.
+        SendForgedNamesFor(p, vendor.VendingState.SellingItems.Values.Select(i => i.UniqueItem.UniqueId));
     }
 
     public static void SendNpcBeginTrading(Player p, Npc npc, List<NpcTradeItem> set)
@@ -1616,6 +1620,7 @@ public static partial class CommandBuilder
         p.StorageInventory.TryWrite(packet, true);
 
         NetworkManager.SendMessage(packet, p.Connection);
+        SendForgedNamesForBag(p, p.StorageInventory);
     }
 
     public static void SendNpcStorageMoveEvent(Player p, ItemReference item, int bagId, int movedCount, bool moveToStorage)
@@ -1630,6 +1635,7 @@ public static partial class CommandBuilder
         packet.Write(moveToStorage);
 
         NetworkManager.SendMessage(packet, p.Connection);
+        SendForgedNameForItem(p, ref item);
     }
 
     public static void SendNpcShowSprite(Player p, string spriteName, int pos)
@@ -1778,20 +1784,28 @@ public static partial class CommandBuilder
 
     public static void DropItemMulti(GroundItem item, bool isNewDrop)
     {
-        var packet = NetworkManager.StartPacket(PacketType.DropItem, 48);
+        var packet = NetworkManager.StartPacket(PacketType.DropItem, 88);
         item.Serialize(packet);
         packet.Write(isNewDrop);
 
         NetworkManager.SendMessageMulti(packet, recipients);
+
+        //A forged weapon on the floor should still say who made it. Goes to the same
+        //people the drop did, and costs nothing at all for the drops nobody forged.
+        if (item.Type == ItemType.UniqueItem)
+            SendForgedNameMulti(item.UniqueItem.UniqueId);
     }
 
     public static void RevealDropItemForPlayer(GroundItem item, bool isNewDrop, Player p)
     {
-        var packet = NetworkManager.StartPacket(PacketType.DropItem, 48);
+        var packet = NetworkManager.StartPacket(PacketType.DropItem, 88);
         item.Serialize(packet);
         packet.Write(isNewDrop);
 
         NetworkManager.SendMessage(packet, p.Connection);
+
+        if (item.Type == ItemType.UniqueItem)
+            SendForgedNameForId(p, item.UniqueItem.UniqueId);
     }
 
     public static void PickUpOrRemoveItemMulti(WorldObject? pickup, GroundItem item)
@@ -1866,6 +1880,7 @@ public static partial class CommandBuilder
             packet.Write(p.StorageInventory?.BagWeight ?? 0);
 
         NetworkManager.SendMessage(packet, p.Connection);
+        SendForgedNameForItem(p, ref item);
     }
 
     public static void SendMapMemoLocations(Player p)
@@ -2156,6 +2171,11 @@ public static partial class CommandBuilder
         }
 
         NetworkManager.SendMessage(packet, to.Connection);
+
+        //The other side has never held these, so the smiths behind them go across too.
+        //Sent to both sides rather than only the stranger, since it costs nothing and the
+        //owner's own copy of the window reads from the same table.
+        SendForgedNamesFor(to, sendable.Select(e => e.Item.UniqueItem.UniqueId));
     }
 
     /// <summary>Sends both offers to both sides, which is every case that changes one.</summary>

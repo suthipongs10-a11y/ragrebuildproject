@@ -37,7 +37,8 @@ namespace Assets.Scripts.Network
         private static readonly Color[] BatchColors = { Color.white, Color.white, Color.white, Color.white };
 
         public static GroundItem Create(int entityId, int id, int count, Vector2 position, bool showAnimation,
-            int rarity = 0, bool fromBoss = false)
+            int rarity = 0, bool fromBoss = false, bool isUnique = false,
+            RebuildSharedData.Data.UniqueItem unique = default)
         {
             if (spriteMaterial == null)
             {
@@ -60,7 +61,13 @@ namespace Assets.Scripts.Network
                 item.Sprite = ClientDataLoader.Instance.GetIconAtlasSprite("Apple");
             }
 
-            item.ItemName = data.Slots == 0 ? data.Name : $"{data.Name} [{data.Slots}]";
+            //Named by the one piece of code that knows how to name things, so a sword on the
+            //ground reads the same as the same sword in the bag - refine, cards, element and
+            //the smith who made it. Falls back to the old spelling for a stackable item,
+            //which has none of those.
+            item.ItemName = isUnique
+                ? Assets.Scripts.PlayerControl.InventoryItem.MakeProperName(unique, data)
+                : data.Slots == 0 ? data.Name : $"{data.Name} [{data.Slots}]";
             item.EntityId = entityId;
 
             var subObject = new GameObject("Sprite");
