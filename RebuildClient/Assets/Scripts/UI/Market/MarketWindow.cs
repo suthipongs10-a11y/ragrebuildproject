@@ -1235,18 +1235,107 @@ namespace Assets.Scripts.UI.Market
             if (mine)
                 return;
 
-            if (!TryFindStack(order.ItemId, out var bagId, out var have))
-                return;
+            var captured = order;
+            var has = TryFindStack(order.ItemId, out _, out _);
 
+            //Shown whether or not the item is in the bag. It used to appear only when it
+            //was, which meant an order you could not fill looked exactly like one the
+            //window had not finished drawing - and clicking it did nothing, with nothing
+            //anywhere to say why.
             var sell = ModernUiTheme.CreateButton(row, "SellInto", "ขาย",
-                ModernUiTheme.AccentColor, ModernUiTheme.LightInkColor, ModernUiTheme.SizeSmall);
+                has ? ModernUiTheme.AccentColor : ModernUiTheme.CardDeepColor,
+                has ? ModernUiTheme.LightInkColor : ModernUiTheme.MutedColor,
+                ModernUiTheme.SizeSmall);
             ModernUiTheme.Place((RectTransform)sell.transform, new Vector2(1, 0.5f),
                 new Vector2(-8f, 0f), new Vector2(ActionWidth, RowHeight - 10f));
+            sell.onClick.AddListener(() => SellInto(captured));
 
-            var captured = order;
-            var slot = bagId;
-            var owned = have;
-            sell.onClick.AddListener(() => AskHowManyToSell(captured, slot, owned));
+            //The whole row too, because a row with one thing to do about it should do that
+            //thing when it is clicked rather than only on the small button at its end.
+            MakeRowClickable(row, () => SellInto(captured));
+
+            //And dragged into, which is what a player reaches for first: the item is in the
+            //bag beside this window and the obvious move is to pull it across.
+            var drop = row.gameObject.AddComponent<MarketDropZone>();
+            drop.Highlight = row.GetComponent<Image>();
+            drop.IdleColor = drop.Highlight.color;
+            drop.OnDropItem = obj => DropOntoOrder(captured, obj);
+        }
+
+        /// <summary>
+        /// Selling into an order, from the button or from a click on the row.
+        ///
+        /// Refuses here rather than at the server for the two cases the window can see, so
+        /// the answer is immediate and says which item is wanted.
+        /// </summary>
+        private void SellInto(BuyOrderEntry order)
+        {
+            var loader = ClientDataLoader.Instance;
+            var data = loader != null ? loader.GetItemById(order.ItemId) : null;
+            var name = data != null ? data.Name : $"#{order.ItemId}";
+
+            if (IsMe(order.BuyerName))
+            {
+                CameraFollower.Instance.AppendError("ขายเข้าคำสั่งซื้อของตัวเองไม่ได้");
+                return;
+            }
+
+            if (!TryFindStack(order.ItemId, out var bagId, out var have))
+            {
+                CameraFollower.Instance.AppendError($"ไม่มี {name} ในกระเป๋า");
+                return;
+            }
+
+            AskHowManyToSell(order, bagId, have);
+        }
+
+        /// <summary>
+        /// An item dragged out of the bag and dropped on an order.
+        ///
+        /// The dragged object carries the bag slot rather than the item, so what was
+        /// actually picked up is looked up before anything is offered - dropping a Red
+        /// Potion on an order for Iron should say so, not quietly sell the iron sitting
+        /// somewhere else in the bag.
+        /// </summary>
+        private void DropOntoOrder(BuyOrderEntry order, ItemDragObject obj)
+        {
+            var state = PlayerState.Instance;
+            var bag = state != null ? state.Inventory : null;
+            if (obj == null || bag == null)
+                return;
+
+            var loader = ClientDataLoader.Instance;
+            var data = loader != null ? loader.GetItemById(order.ItemId) : null;
+            var wanted = data != null ? data.Name : $"#{order.ItemId}";
+
+            if (IsMe(order.BuyerName))
+            {
+                CameraFollower.Instance.AppendError("ขายเข้าคำสั่งซื้อของตัวเองไม่ได้");
+                return;
+            }
+
+            if (!bag.TryGetInventoryItem(obj.ItemId, out var item) || item.ItemData == null)
+                return;
+
+            if (item.Type != ItemType.RegularItem)
+            {
+                CameraFollower.Instance.AppendError("อาวุธกับชุดเกราะขายเข้าคำสั่งซื้อไม่ได้ ใช้ประมูลแทน");
+                return;
+            }
+
+            if (item.ItemData.Id != order.ItemId)
+            {
+                CameraFollower.Instance.AppendError($"คำสั่งซื้อนี้รับเฉพาะ {wanted}");
+                return;
+            }
+
+            if (state.EquippedBagIdHashes.Contains(obj.ItemId))
+            {
+                CameraFollower.Instance.AppendError("ของที่ใส่อยู่ขายไม่ได้");
+                return;
+            }
+
+            AskHowManyToSell(order, obj.ItemId, item.Count);
         }
 
         /// <summary>
