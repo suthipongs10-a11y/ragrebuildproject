@@ -672,6 +672,11 @@ namespace Assets.Scripts.MapEditor.Editor
                 return;
             }
 
+            var allCodes = new HashSet<string>(maps.Select(m => m.Code), StringComparer.OrdinalIgnoreCase);
+            var dataDir = RagnarokDirectory.GetRagnarokDataDirectory;
+            var skipped = new List<string>();
+            var failed = new List<string>();
+
             int done = 0;
             for (int i = 0; i < maps.Count; i++)
             {
@@ -679,7 +684,7 @@ namespace Assets.Scripts.MapEditor.Editor
 
                 var map = maps[i];
                 var code = map.Code;
-                var gnd = Path.Combine(RagnarokDirectory.GetRagnarokDataDirectory, code + ".gnd");
+                var gnd = Path.Combine(dataDir, code + ".gnd");
 
                 EditorUtility.DisplayProgressBar(
                     "Importing Maps",
@@ -687,27 +692,45 @@ namespace Assets.Scripts.MapEditor.Editor
                     (float)done / total
                 );
 
+                // Checked before anything is deleted, and for every file the import reads
+                // rather than only the first. The cleanup below used to run first, so a map
+                // whose files were never extracted from the GRF lost the assets from its
+                // last good import and came back as open water with nothing to stand on.
+                // A missing .rsw was worse still: it got as far as a null reference.
+                var missing = new List<string>();
+                foreach (var ext in new[] { ".gnd", ".gat", ".rsw" })
+                {
+                    if (!File.Exists(Path.Combine(dataDir, code + ext)))
+                        missing.Add(code + ext);
+                }
+
+                if (missing.Count > 0)
+                {
+                    Debug.LogError($"[Map Import] Skipped {map.Name} ({code}): {string.Join(", ", missing)} "
+                                   + $"not found in {dataDir}. Extract the map from data.grf and import it again. "
+                                   + "Nothing this map already had was touched.");
+                    skipped.Add(code);
+                    continue;
+                }
+
                 try
                 {
                     // Pre-clean any leftover assets from a previous crash
-                    DeleteExistingMapAssets(code);
-
-                    // Ensure file exists
-                    if (!File.Exists(gnd))
-                        throw new FileNotFoundException($"Map file not found: {gnd}");
+                    DeleteExistingMapAssets(code, allCodes);
 
                     // Do the actual import
                     ImportMap(gnd);
                 }
                 catch (Exception ex)
                 {
-                    // Abort on first error
-                    Debug.LogError($"[Map Import] Aborting import of {map.Name} ({code}): {ex}\n{ex.StackTrace}");
-                    EditorUtility.ClearProgressBar();
+                    // One map failing is not a reason to leave the rest of a long batch
+                    // unimported - it is reported at the end instead.
+                    Debug.LogError($"[Map Import] Failed to import {map.Name} ({code}): {ex}\n{ex.StackTrace}");
 
                     // Cleanup any partial assets
-                    DeleteExistingMapAssets(code);
-                    return;
+                    DeleteExistingMapAssets(code, allCodes);
+                    failed.Add(code);
+                    continue;
                 }
 
                 done++;
@@ -716,17 +739,26 @@ namespace Assets.Scripts.MapEditor.Editor
             EditorUtility.ClearProgressBar();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log($"Imported {done} map(s).");
+            Debug.Log($"Imported {done} map(s) of {total}.");
+
+            if (skipped.Count > 0)
+                Debug.LogError($"[Map Import] {skipped.Count} map(s) not in the data folder: {string.Join(", ", skipped)}");
+            if (failed.Count > 0)
+                Debug.LogError($"[Map Import] {failed.Count} map(s) failed while importing: {string.Join(", ", failed)}");
+            if (done > 0)
+                Debug.Log("[Map Import] Run Ragnarok/Update Addressables (Fast) next, or the new scenes will not load.");
         }
 
         // ─── Delete all generated assets for each selected map ────────────────────
         private void CleanSelectedMaps()
         {
+            var allCodes = new HashSet<string>(maps.Select(m => m.Code), StringComparer.OrdinalIgnoreCase);
+
             int cleaned = 0;
             for (int i = 0; i < maps.Count; i++)
             {
                 if (!mapSelected[i]) continue;
-                DeleteExistingMapAssets(maps[i].Code);
+                DeleteExistingMapAssets(maps[i].Code, allCodes);
                 cleaned++;
             }
 
@@ -738,12 +770,41 @@ namespace Assets.Scripts.MapEditor.Editor
         }
 
 // ─── DeleteExistingMapAssets ──────────────────────────────────────────────
-        private static void DeleteExistingMapAssets(string code)
+        /// <summary>
+        /// Whether a generated file belongs to this map, or to one whose code merely starts
+        /// the same way.
+        ///
+        /// Both searches below match by prefix, and map codes nest: cleaning up "izlude"
+        /// also matched izlude_in's scene and walk data, so importing the town quietly took
+        /// the indoors with it. The longest code that starts the file name is the map that
+        /// actually owns the file - izlude_walkdata is izlude's, izlude_in_walkdata is not.
+        /// </summary>
+        private static bool BelongsToMap(string fileName, string code, HashSet<string> allCodes)
+        {
+            if (string.Equals(fileName, code, StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            if (!fileName.StartsWith(code, StringComparison.OrdinalIgnoreCase))
+                return false;
+
+            var owner = code;
+            foreach (var other in allCodes)
+            {
+                if (other.Length > owner.Length && fileName.StartsWith(other, StringComparison.OrdinalIgnoreCase))
+                    owner = other;
+            }
+
+            return string.Equals(owner, code, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static void DeleteExistingMapAssets(string code, HashSet<string> allCodes)
         {
             // 1) Delete any scene assets in Assets/Scenes/Maps
             foreach (var guid in AssetDatabase.FindAssets(code, new[] { "Assets/Scenes/Maps" }))
             {
                 var path = AssetDatabase.GUIDToAssetPath(guid);
+                if (!BelongsToMap(Path.GetFileNameWithoutExtension(path), code, allCodes))
+                    continue;
                 if (AssetDatabase.DeleteAsset(path))
                     Debug.Log($"[Map Cleanup] Deleted scene {path}");
             }
@@ -759,6 +820,9 @@ namespace Assets.Scripts.MapEditor.Editor
                     var rel = abs.Replace("\\", "/");
                     var idx = rel.IndexOf("Assets/");
                     if (idx >= 0) rel = rel.Substring(idx);
+
+                    if (!BelongsToMap(Path.GetFileNameWithoutExtension(rel), code, allCodes))
+                        continue;
 
                     if (AssetDatabase.DeleteAsset(rel))
                         Debug.Log($"[Map Cleanup] Deleted map asset {rel}");
