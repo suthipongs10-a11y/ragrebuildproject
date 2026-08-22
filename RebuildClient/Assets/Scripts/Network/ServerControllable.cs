@@ -63,6 +63,15 @@ namespace Assets.Scripts.Network
         public int Sp;
         public int MaxSp;
         public int WeaponClass;
+
+        /// <summary>
+        /// The element of the weapon in hand, which is what the blade glow is tinted by.
+        ///
+        /// Comes off the wire rather than being worked out from the weapon id: a forged
+        /// sword carries its element in a socket and an endow lends one to any weapon, and
+        /// the client can see neither.
+        /// </summary>
+        public AttackElement WeaponElement;
         public string PartyName;
 
         /// <summary>Whether this is the way off the map, which the cursor says out loud.</summary>

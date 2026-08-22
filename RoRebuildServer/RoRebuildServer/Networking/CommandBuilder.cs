@@ -231,6 +231,7 @@ public static partial class CommandBuilder
                 Headgear3 = player.Equipment.GetEquipmentIdBySlot(EquipSlot.HeadBottom),
                 Weapon = player.Equipment.GetEquipmentIdBySlot(EquipSlot.Weapon),
                 Shield = player.Equipment.GetEquipmentIdBySlot(EquipSlot.Shield),
+                WeaponElement = player.VisibleWeaponElement,
                 PartyId = player.Party?.PartyId ?? -1,
                 PartyName = player.Party?.PartyName ?? null,
                 GuildName = player.Guild?.GuildName,
@@ -574,6 +575,11 @@ public static partial class CommandBuilder
         packet.Write(player.Equipment.GetEquipmentIdBySlot(EquipSlot.Weapon));
         packet.Write(player.Equipment.GetEquipmentIdBySlot(EquipSlot.Shield));
         packet.Write(player.MainWeaponClass);
+
+        //What the blade glow is tinted by. Not derivable from the weapon id on the other
+        //side: a forged sword carries its element in a socket and an endow lends one to any
+        //weapon, so the answer has to come from here.
+        packet.Write((byte)player.VisibleWeaponElement);
 
         player.Character.Map?.AddVisiblePlayersAsPacketRecipients(player.Character);
         EnsureRecipient(player.Entity);

@@ -916,7 +916,18 @@ namespace Assets.Scripts.Sprites
             weaponSprite.Parent = ctrl.SpriteAnimator;
             weaponSprite.SpriteOrder = 8;
             if (isEffect)
+            {
                 weaponSprite.SpriteOrder = 5;
+
+                //The blade glow, tinted by whatever element the weapon is carrying. Set on
+                //the child rather than anywhere outside it because this object is destroyed
+                //and rebuilt on every equipment change, so a tint applied from the outside
+                //would last until the next time the player swapped a hat.
+                //
+                //BaseColor and not Color: UpdateChildColor multiplies the parent's shade and
+                //alpha in on top, so a character fading out on death takes the glow with them.
+                weaponSprite.BaseColor = WeaponAuraColors.For(ctrl.WeaponElement);
+            }
 
             if(!isEffect)
                 ctrl.SpriteAnimator.PreferredAttackMotion = ctrl.IsMale ? weapon.AttackMale : weapon.AttackFemale;

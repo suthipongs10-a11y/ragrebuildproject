@@ -197,6 +197,7 @@ namespace Assets.Scripts.PlayerControl
             control.IsMale = player.IsMale;
             control.Level = spawn.Level;
             control.WeaponClass = player.WeaponClass;
+            control.WeaponElement = player.WeaponElement;
             control.PartyName = player.PartyName;
             control.GuildName = player.GuildName;
             control.GuildTitle = player.GuildTitle;
@@ -224,6 +225,9 @@ namespace Assets.Scripts.PlayerControl
 
             control.ShadowSize = 0.5f;
             control.WeaponClass = player.WeaponClass;
+
+            //Set before the weapon is attached, since that is what reads it to tint the glow.
+            control.WeaponElement = player.WeaponElement;
 
             var weapon = player.Weapon;
             var shield = player.Shield;

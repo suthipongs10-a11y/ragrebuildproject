@@ -205,6 +205,34 @@ public class Player : IEntityAutoReset
     [ScriptUseable] public int GetData(PlayerStat type) => CharData[(int)type];
     [ScriptUseable] public void SetData(PlayerStat type, int val) => CharData[(int)type] = val;
     [ScriptUseable] public int GetStat(CharacterStat type) => CombatEntity.GetStat(type);
+
+    /// <summary>
+    /// The element this character's attacks come out as, which is what the blade glow shows.
+    ///
+    /// Resolved exactly the way the damage code resolves it (CombatEntity.DamageHandling):
+    /// the weapon's own element, then an elemental arrow on a bow, then an endow on top of
+    /// either. Anything else would be a weapon that glows one colour and hits as another.
+    /// </summary>
+    public AttackElement VisibleWeaponElement
+    {
+        get
+        {
+            var element = Equipment.MainHandWeapon.WeaponElement;
+
+            if (MainWeaponClass == (int)RebuildSharedData.Enum.WeaponClass.Bow)
+            {
+                var arrow = Equipment.AmmoElement;
+                if (arrow != AttackElement.None && arrow != AttackElement.Neutral)
+                    element = arrow;
+            }
+
+            var endow = (AttackElement)GetStat(CharacterStat.EndowAttackElement);
+            if (endow > 0)
+                element = endow;
+
+            return element;
+        }
+    }
     [ScriptUseable] public int GetEffectiveStat(CharacterStat type) => CombatEntity.GetEffectiveStat(type);
     [ScriptUseable] public float GetTiming(TimingStat type) => CombatEntity.GetTiming(type);
     [ScriptUseable] public void SetStat(CharacterStat type, int val) => CombatEntity.SetStat(type, val);

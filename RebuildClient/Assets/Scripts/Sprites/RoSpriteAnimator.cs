@@ -752,6 +752,18 @@ namespace Assets.Scripts.Sprites
                 SpriteRenderer.SetColor(c);
         }
 
+        /// <summary>
+        /// A child sprite takes its colour from whoever it is attached to.
+        ///
+        /// Its own BaseColor is multiplied in on top, which is how one layer of a character
+        /// can be tinted without tinting the character - the blade glow on an elemental
+        /// weapon is the reason this exists. White is the identity and the default, so a
+        /// child that never sets it renders exactly as it did before.
+        ///
+        /// BaseColor rather than Color, because the parent's shade and alpha have to keep
+        /// compositing on top: a character fading out on death should take their weapon
+        /// glow with them, not leave a red streak hanging in the air.
+        /// </summary>
         public void UpdateChildColor()
         {
             var c = Parent.Color;
@@ -760,6 +772,7 @@ namespace Assets.Scripts.Sprites
             
             c = new Color(c.r * Parent.CurrentShade, c.g * Parent.CurrentShade, c.b * Parent.CurrentShade, Parent.Alpha);
             c *= Parent.BaseColor;
+            c *= BaseColor;
 
             if (SpriteRenderer != null)
                 SpriteRenderer.SetColor(c);

@@ -3,6 +3,7 @@ using Assets.Scripts.PlayerControl;
 using Assets.Scripts.Sprites;
 using RebuildSharedData.ClientTypes;
 using RebuildSharedData.Enum;
+using RebuildSharedData.Enum.EntityStats;
 using RebuildSharedData.Networking;
 using UnityEngine;
 
@@ -24,7 +25,12 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
             var weapon = msg.ReadInt32();
             var shield = msg.ReadInt32();
             controllable.WeaponClass = msg.ReadInt32();
-            
+
+            //Read before the weapon is rebuilt below, since that is what reads it back to
+            //tint the blade glow. An endow arrives through here too - the weapon id has not
+            //changed, only what it is made of.
+            controllable.WeaponElement = (AttackElement)msg.ReadByte();
+
             var offHand = 0;
             if (shield > 0 && ClientDataLoader.Instance.TryGetItemById(shield, out var item) && item.ItemClass == ItemClass.Weapon)
             {

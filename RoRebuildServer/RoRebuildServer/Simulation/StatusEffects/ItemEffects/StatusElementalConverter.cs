@@ -1,6 +1,7 @@
 ﻿using RebuildSharedData.Enum;
 using RebuildSharedData.Enum.EntityStats;
 using RoRebuildServer.EntityComponents;
+using RoRebuildServer.Networking;
 using RoRebuildServer.Simulation.StatusEffects.Setup;
 
 namespace RoRebuildServer.Simulation.StatusEffects.ItemEffects;
@@ -46,7 +47,15 @@ public class StatusElementalConverter : StatusEffectBase
 
         ch.SetStat(CharacterStat.EndowAttackElement, state.Value1);
         if (ch.Character.Type == CharacterType.Player)
+        {
             state.Value2 = ch.Player.GetItemIdForEquipSlot(EquipSlot.Weapon);
+
+            //The weapon has just changed element without changing at all, so everyone
+            //looking at it has to be told - this is the difference between a blade that
+            //lights up when the converter lands and one that never does.
+            if (ch.Player.Character.Map != null)
+                CommandBuilder.UpdatePlayerAppearanceAuto(ch.Player);
+        }
     }
 
     public override void OnExpiration(CombatEntity ch, ref StatusEffectState state)
@@ -55,5 +64,9 @@ public class StatusElementalConverter : StatusEffectBase
             ch.SetStat(CharacterStat.EndowAttackElement, 0);
         if (state.Type == CharacterStatusEffect.EnchantPoison)
             ch.SubStat(CharacterStat.OnMeleeAttackPoison, state.Value3);
+
+        //and the light goes out again when it wears off
+        if (ch.Character.Type == CharacterType.Player && ch.Player.Character.Map != null)
+            CommandBuilder.UpdatePlayerAppearanceAuto(ch.Player);
     }
 }

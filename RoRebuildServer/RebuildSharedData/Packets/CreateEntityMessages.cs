@@ -1,6 +1,7 @@
 ﻿using MemoryPack;
 using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
+using RebuildSharedData.Enum.EntityStats;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -49,6 +50,16 @@ public partial struct PlayerSpawnParameters
     public int Headgear3 { get; set; }
     public int Weapon { get; set; }
     public int Shield { get; set; }
+
+    /// <summary>
+    /// The element of the weapon in hand, which is what the blade glow is tinted by.
+    ///
+    /// Sent with the character rather than worked out from the weapon id, because it is not
+    /// a property of the weapon: a forged sword carries its element in a socket, and an
+    /// endow puts one on any weapon for half a minute. The client has no way to know either.
+    /// </summary>
+    public AttackElement WeaponElement { get; set; }
+
     public int PartyId { get; set; }
     public string? PartyName { get; set; }
 

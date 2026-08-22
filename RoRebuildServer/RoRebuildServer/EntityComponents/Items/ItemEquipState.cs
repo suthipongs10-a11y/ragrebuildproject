@@ -1161,12 +1161,31 @@ public class ItemEquipState
 
     public bool HasLearnedSkill(CharacterSkill skill, int lvl = 1) => Player.MaxLearnedLevelOfSkill(skill) >= lvl;
 
+    /// <summary>
+    /// Gives the weapon in hand an element it did not have.
+    ///
+    /// Called two ways: by the stone socketed into a forged weapon as it is equipped, and
+    /// by an endow - Elemental Converter, Aspersio - landing on whatever is already held.
+    /// The equip path has an appearance update after it either way, but the endow path does
+    /// not change any equipment id and would otherwise leave everyone looking at a sword
+    /// that has quietly become a fire sword without saying so.
+    ///
+    /// Only sent when the element actually moves, since this runs on every stat pass.
+    /// </summary>
     public void ChangeWeaponElement(AttackElement element)
     {
+        var changed = !isOffHand
+            ? MainHandWeapon.OverrideElement != element
+            : OffHandWeapon.OverrideElement != element;
+
         if (!isOffHand)
             MainHandWeapon.OverrideElement = element;
         else
             OffHandWeapon.OverrideElement = element;
+
+        //the off hand has no glow of its own to tint, so nothing needs telling about it
+        if (changed && !isOffHand && Player.Character.Map != null)
+            CommandBuilder.UpdatePlayerAppearanceAuto(Player);
     }
 
     public bool IsBaseJob(JobType type) => JobTypes.IsBaseJob(Player.JobId, type);
