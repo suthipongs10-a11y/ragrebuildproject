@@ -354,14 +354,46 @@ namespace Assets.Scripts.UI.Crafting
         }
 
         /// <summary>
-        /// The title bar's second line, which says which skill is open.
+        /// What the window is called, which is whatever the pressed skill makes.
         ///
-        /// The bar is built with a placeholder subtitle so that this child exists at all -
+        /// One window serves six skills, so a fixed title said "ตีเหล็ก" over a list of
+        /// spears. The skill's own English name goes on the second line underneath.
+        /// </summary>
+        private static string TitleFor(CharacterSkill skill)
+        {
+            switch (skill)
+            {
+                case CharacterSkill.IronTempering: return "ถลุงเหล็ก";
+                case CharacterSkill.SteelTempering: return "ถลุงเหล็กกล้า";
+                case CharacterSkill.EnchantedStoneCraft: return "คราฟหินธาตุ";
+                case CharacterSkill.SmithBladeWeapon: return "ตีอาวุธมีคม";
+                case CharacterSkill.SmithBluntWeapon: return "ตีอาวุธทู่";
+                case CharacterSkill.SmithPiercingWeapon: return "ตีอาวุธแทง";
+                default: return "ตีเหล็ก";
+            }
+        }
+
+        /// <summary>
+        /// The two lines in the title bar: what is being made, and which skill makes it.
+        ///
+        /// The bar is built with a placeholder subtitle so that child exists at all -
         /// CreateTitleBar only makes one when it is given something to put in it.
         /// </summary>
         private void PaintTitle()
         {
-            var subtitle = transform.Find("ModernTitleBar/Subtitle");
+            var bar = transform.Find("ModernTitleBar");
+            if (bar == null)
+                return;
+
+            var title = bar.Find("Title");
+            if (title != null)
+            {
+                var titleText = title.GetComponent<TextMeshProUGUI>();
+                if (titleText != null)
+                    titleText.text = TitleFor(ForgeState.Skill);
+            }
+
+            var subtitle = bar.Find("Subtitle");
             if (subtitle == null)
                 return;
 

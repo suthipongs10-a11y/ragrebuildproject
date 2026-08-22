@@ -1,4 +1,7 @@
-﻿using TMPro;
+﻿using Assets.Scripts.Sprites;
+using RebuildSharedData.Data;
+using RebuildSharedData.Enum;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -73,9 +76,26 @@ namespace Assets.Scripts.UI
 
         private bool IsValidItemType(ItemDragObject dragObject)
         {
-            if (dragObject.Type == DragItemType.Item || dragObject.Type == DragItemType.Skill)
+            if (dragObject.Type == DragItemType.Item)
                 return true;
-            return false;
+
+            if (dragObject.Type != DragItemType.Skill)
+                return false;
+
+            //A passive has nothing to fire, so a slot holding one is a slot that does
+            //nothing when it is pressed - Ore Discovery on the bar was exactly that. The
+            //crafting skills are the exception: they are passive in the data and open the
+            //forge when pressed, which is the whole reason they are allowed on a bar.
+            var skill = (CharacterSkill)dragObject.ItemId;
+            if (CraftingSkills.IsCraftingSkill(skill))
+                return true;
+
+            //GetSkillTarget rather than GetSkillData, which indexes and throws on a skill
+            //the client's data does not have.
+            if (ClientDataLoader.Instance == null)
+                return true;
+
+            return ClientDataLoader.Instance.GetSkillTarget(skill) != SkillTarget.Passive;
         }
 
         public void DropItem()

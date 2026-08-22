@@ -124,14 +124,24 @@ namespace Assets.Scripts.PlayerControl
 
         private static int OrderOf(CardPrefixData prefix) => prefix?.Order ?? 0;
 
+        /// <summary>The blue the smith's name is written in, so it reads as a person.</summary>
+        private const string ForgerColor = "#2E6FD9";
+
         private static void AppendForger(string forger)
         {
             if (sb.Length > 0)
                 sb.Append(" ");
 
+            //Coloured so the name stands out of the middle of a title that is otherwise all
+            //adjectives - "Very Very Strong Halo's Fire Main Gauche" is hard to read as a
+            //person's name without it. The tag closes, so a line that was already coloured
+            //(the equip and pickup lines in the chat log are) goes back to its own colour.
+            //
             //An apostrophe-s on a name already ending in s is still what the original does,
             //and a rule that tried to be clever about it would be wrong on half of them.
-            sb.Append(forger).Append("'s");
+            sb.Append("<color=").Append(ForgerColor).Append('>')
+              .Append(forger).Append("'s")
+              .Append("</color>");
         }
 
         public string MakeNameWithSockets() => MakeNameWithSockets(UniqueItem, ItemData);
