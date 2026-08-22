@@ -1,6 +1,6 @@
-﻿Code,Prefix,Postfix,Prefix2,Prefix3,Prefix4
-Flame_Heart,Fire,,,,
-Mystic_Frozen,Water,,,,
-Rough_Wind,Wind,,,,
-Great_Nature,Earth,,,,
-Star_Crumb,Strong,,Very Strong,Very Very Strong,
+﻿Code,Prefix,Postfix,Prefix2,Prefix3,Prefix4,Order
+Flame_Heart,Fire,,,,,2
+Mystic_Frozen,Water,,,,,2
+Rough_Wind,Wind,,,,,2
+Great_Nature,Earth,,,,,2
+Star_Crumb,Strong,,Very Strong,Very Very Strong,,0

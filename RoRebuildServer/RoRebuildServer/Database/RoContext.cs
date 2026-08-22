@@ -47,6 +47,11 @@ public class RoContext : IdentityDbContext<RoUserAccount, UserRole, int>
 
         //read whenever somebody opens a listing to see who is bidding on it
         builder.Entity<DbAuctionBid>().HasIndex(b => b.AuctionId);
+
+        //keyed by the item's own guid rather than a row number, since that is what is
+        //looked up and the item already carries it
+        builder.Entity<DbForgedItem>().HasKey(f => f.UniqueId);
+        builder.Entity<DbForgedItem>().Property(f => f.UniqueId).ValueGeneratedNever();
     }
 
 
@@ -59,4 +64,5 @@ public class RoContext : IdentityDbContext<RoUserAccount, UserRole, int>
     public DbSet<DbInboxParcel> InboxParcels { get; set; }
     public DbSet<DbBuyOrder> BuyOrders { get; set; }
     public DbSet<DbAuctionBid> AuctionBids { get; set; }
+    public DbSet<DbForgedItem> ForgedItems { get; set; }
 }

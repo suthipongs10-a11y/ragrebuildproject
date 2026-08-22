@@ -4,6 +4,7 @@ using RebuildSharedData.Networking;
 using RebuildZoneServer.Networking;
 using RoRebuildServer.Data;
 using RoRebuildServer.EntityComponents;
+using RoRebuildServer.EntityComponents.Items;
 using RoRebuildServer.Simulation.Crafting;
 
 namespace RoRebuildServer.Networking;
@@ -61,6 +62,80 @@ public static partial class CommandBuilder
                 packet.Write(material.ItemId);
                 packet.Write((short)material.Count);
             }
+        }
+
+        NetworkManager.SendMessage(packet, player.Connection);
+    }
+
+    /// <summary>
+    /// Who forged the weapons this character is carrying.
+    ///
+    /// Sent beside the items rather than inside them. A UniqueItem is a fixed forty bytes
+    /// and every one of them is spoken for, so the name travels as its own small packet
+    /// keyed on the guid the item already carries, and the client keeps what it is told.
+    ///
+    /// Sent whole rather than incrementally because it is cheap - a name is a couple of
+    /// dozen bytes and nobody is carrying hundreds of forged weapons - and because an
+    /// inventory that has just been replaced wholesale should have its names replaced with
+    /// it rather than merged into whatever was there before.
+    /// </summary>
+    public static void SendForgedNamesForPlayer(Player player)
+    {
+        if (player.Connection == null)
+            return;
+
+        forgedScratch.Clear();
+
+        Collect(player.Inventory);
+        Collect(player.CartInventory);
+
+        if (forgedScratch.Count == 0)
+            return;
+
+        SendForgedNames(player, forgedScratch);
+        return;
+
+        void Collect(CharacterBag? bag)
+        {
+            if (bag == null)
+                return;
+
+            foreach (var (_, item) in bag.UniqueItems)
+            {
+                var name = ForgedItemRegistry.NameFor(item.UniqueId);
+                if (name != null)
+                    forgedScratch[item.UniqueId] = name;
+            }
+        }
+    }
+
+    /// <summary>One item, for when a single thing arrives rather than the whole bag.</summary>
+    public static void SendForgedNameForItem(Player player, ref ItemReference item)
+    {
+        if (player.Connection == null || item.Type != ItemType.UniqueItem)
+            return;
+
+        var name = ForgedItemRegistry.NameFor(item.UniqueItem.UniqueId);
+        if (name == null)
+            return;
+
+        forgedScratch.Clear();
+        forgedScratch[item.UniqueItem.UniqueId] = name;
+        SendForgedNames(player, forgedScratch);
+    }
+
+    /// <summary>Reused between the two above, which never run at the same time.</summary>
+    private static readonly Dictionary<Guid, string> forgedScratch = new();
+
+    private static void SendForgedNames(Player player, Dictionary<Guid, string> forged)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.ForgedNames);
+        packet.Write((short)forged.Count);
+
+        foreach (var (id, name) in forged)
+        {
+            packet.Write(id.ToByteArray());
+            packet.Write(name);
         }
 
         NetworkManager.SendMessage(packet, player.Connection);

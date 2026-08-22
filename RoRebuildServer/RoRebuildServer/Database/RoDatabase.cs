@@ -10,6 +10,7 @@ using RoRebuildServer.Data;
 using RoRebuildServer.Database.Domain;
 using RoRebuildServer.Database.QueryData;
 using RoRebuildServer.Logging;
+using RoRebuildServer.Simulation.Crafting;
 using Serilog;
 
 namespace RoRebuildServer.Database;
@@ -280,6 +281,11 @@ public static class RoDatabase
 
         var db = scope.ServiceProvider.GetRequiredService<RoContext>();
         db.Database.Migrate();
+
+        //Read straight through rather than queued: nothing may hand out a forged weapon
+        //before the names behind them are known, and this is the one moment the server is
+        //allowed to block.
+        ForgedItemRegistry.Load(db);
 
         dbRequestChannel = Channel.CreateUnbounded<IDbRequest>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
 

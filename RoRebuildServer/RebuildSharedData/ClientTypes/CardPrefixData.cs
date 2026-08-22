@@ -12,6 +12,10 @@ public class CardPrefixData
     public string? Prefix2;
     public string? Prefix3;
     public string? Prefix4;
+
+    //Where it sorts among the other prefixes on one item, low first. The forger's name
+    //goes in at order 1, which is what puts it between the star crumbs and the element.
+    public int Order;
 }
 
 [Serializable]

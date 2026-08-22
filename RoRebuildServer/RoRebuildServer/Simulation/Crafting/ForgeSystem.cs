@@ -229,6 +229,11 @@ public static class ForgeSystem
 
             if (stoneId > 0)
                 made.UniqueItem.SetSlotData(slot, stoneId);
+
+            //The smith's name goes on the weapon, which is half of why anyone forges one.
+            //Kept against the item's guid rather than in it - there is no room in a
+            //UniqueItem, and the four slots it does have are full of what went into this.
+            ForgedItemRegistry.Record(made.UniqueItem.UniqueId, player.Id, player.Name);
         }
 
         player.CreateItemInInventory(made);

@@ -114,6 +114,26 @@ namespace Assets.Scripts.PlayerControl
         private static StringBuilder sb = new();
         private static CardPrefixData[] prefixData = new CardPrefixData[4];
 
+        /// <summary>
+        /// Where the smith's name sorts among the prefixes.
+        ///
+        /// Star crumbs are order 0 and elements order 2, so the name lands between them:
+        /// "Very Very Strong Mitmair's Fire Blade".
+        /// </summary>
+        private const int ForgerOrder = 1;
+
+        private static int OrderOf(CardPrefixData prefix) => prefix?.Order ?? 0;
+
+        private static void AppendForger(string forger)
+        {
+            if (sb.Length > 0)
+                sb.Append(" ");
+
+            //An apostrophe-s on a name already ending in s is still what the original does,
+            //and a rule that tried to be clever about it would be wrong on half of them.
+            sb.Append(forger).Append("'s");
+        }
+
         public string MakeNameWithSockets() => MakeNameWithSockets(UniqueItem, ItemData);
 
         //there must be a non-retarded way to do this that doesn't allocate like a hog
@@ -148,13 +168,43 @@ namespace Assets.Scripts.PlayerControl
                 }
             }
 
-            if (uniqueSlot == 0)
+            //Whoever forged it, which goes in the middle of the name rather than in front
+            //of it: three star crumbs, an element and a smith read as "Very Very Strong
+            //Mitmair's Fire Blade". Null for anything nobody made.
+            var forger = ForgedNames.Get(uniqueItem.UniqueId);
+
+            if (uniqueSlot == 0 && forger == null)
                 return data.Name;
 
+            //Sorted so the crumbs come before the smith and the element after, which is
+            //what the Order column in NonCardPrefixes.csv is for. Four entries at most, so
+            //the cheapest sort that is stable is the right one.
+            for (var i = 1; i < uniqueSlot; i++)
+            {
+                for (var j = i; j > 0 && OrderOf(prefixData[j - 1]) > OrderOf(prefixData[j]); j--)
+                {
+                    var swapPrefix = prefixData[j - 1];
+                    prefixData[j - 1] = prefixData[j];
+                    prefixData[j] = swapPrefix;
+
+                    var swapCount = counts[j - 1];
+                    counts[j - 1] = counts[j];
+                    counts[j] = swapCount;
+                }
+            }
+
             sb.Clear();
-            //prefixes
+
+            //prefixes, with the smith's name dropped in at the point the ordering says
+            var namePlaced = forger == null;
             for (var i = 0; i < uniqueSlot; i++)
             {
+                if (!namePlaced && OrderOf(prefixData[i]) >= ForgerOrder)
+                {
+                    AppendForger(forger);
+                    namePlaced = true;
+                }
+
                 if (prefixData[i] != null && !string.IsNullOrWhiteSpace(prefixData[i].Prefix))
                 {
                     if (sb.Length > 0)
@@ -184,6 +234,10 @@ namespace Assets.Scripts.PlayerControl
                     }
                 }
             }
+
+            //nothing sorted after the smith, so they land against the item name
+            if (!namePlaced)
+                AppendForger(forger);
 
             if (sb.Length > 0)
                 sb.Append(" ");
@@ -250,8 +304,9 @@ namespace Assets.Scripts.PlayerControl
                     refine = $"+{item.Refine} ";
                 if (data.Slots == 0 || (item.Flags & (byte)UniqueItemFlags.CraftedItem) > 0)
                 {
-                    if (item.SlotData(0) == 0)
-                        return $"{refine}{data.Name}";
+                    //An empty first slot used to mean there was nothing to add to the name.
+                    //It no longer does: a weapon forged with neither a stone nor a crumb has
+                    //four empty slots and still has a smith's name to carry.
                     return $"{refine}{MakeNameWithSockets(item, data)}";
                 }
 
@@ -271,8 +326,8 @@ namespace Assets.Scripts.PlayerControl
                 var refine = "";
                 if (UniqueItem.Refine > 0)
                     refine = $"+{UniqueItem.Refine} ";
-                if (ItemData.Slots == 0)
-                    return $"{refine}{ItemData.Name}";
+                if (ItemData.Slots == 0 || (UniqueItem.Flags & (byte)UniqueItemFlags.CraftedItem) > 0)
+                    return $"{refine}{MakeNameWithSockets()}";
                 return $"{refine}{MakeNameWithSockets()}[{ItemData.Slots}]";
             }
 

@@ -165,6 +165,10 @@ public enum PacketType : byte
     //request/answer pair the market windows use.
     CraftAction,
     CraftData,
+
+    //who forged the weapons a player is holding. Sent alongside the items rather than
+    //carried inside them - a UniqueItem is a fixed forty bytes with no room for a name.
+    ForgedNames,
 }
 
 public enum MessageType : byte

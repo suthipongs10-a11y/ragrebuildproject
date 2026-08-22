@@ -517,6 +517,12 @@ public static partial class CommandBuilder
         p.SendPlayerUpdateData(packet, sendInventory, sendCart, sendSkills);
 
         NetworkManager.SendMessage(packet, p.Connection);
+
+        //The bag has just been replaced wholesale, so the names of whatever forged weapons
+        //are in it go with it. Here rather than at the eight places that ask for an
+        //inventory, so a ninth cannot forget.
+        if (sendInventory)
+            SendForgedNamesForPlayer(p);
     }
 
     public static void RefreshGrantedSkills(Player p)
@@ -1827,6 +1833,10 @@ public static partial class CommandBuilder
         item.Serialize(packet);
 
         NetworkManager.SendMessage(packet, p.Connection);
+
+        //A forged weapon can arrive one at a time - made, picked up, traded for - and the
+        //name has to be there before anything draws it.
+        SendForgedNameForItem(p, ref item);
     }
 
     public static void RemoveItemFromInventory(Player p, int bagId, int change, bool notifyUser = false)

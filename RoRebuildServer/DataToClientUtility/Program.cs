@@ -618,7 +618,8 @@ class Program
             prefixList.Items.Add(new CardPrefixData()
             {
                 Id = DataManager.ItemIdByName[entry.Code], Prefix = entry.Prefix, Postfix = entry.Postfix,
-                Prefix2 = entry.Prefix2, Prefix3 = entry.Prefix3, Prefix4 = entry.Prefix4
+                Prefix2 = entry.Prefix2, Prefix3 = entry.Prefix3, Prefix4 = entry.Prefix4,
+                Order = entry.Order
             });
         }
 

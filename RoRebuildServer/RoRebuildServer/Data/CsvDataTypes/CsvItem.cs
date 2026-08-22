@@ -137,4 +137,10 @@ public class CsvNonCardPrefixes
     public string? Prefix2 { get; set; }
     public string? Prefix3 { get; set; }
     public string? Prefix4 { get; set; }
+
+    //Where this prefix sits among the others on one item, low first. It matters because a
+    //forged weapon's name has the smith wedged into the middle of it - "Very Very Strong
+    //Mitmair's Fire Blade" - so the star crumbs have to sort before the smith and the
+    //element after. The client puts the name at order 1.
+    public int Order { get; set; }
 }

@@ -435,6 +435,9 @@ namespace Assets.Scripts.Network
             //Same reason: the parcel box and the auction board are a character's, and the
             //next one to log in would be shown the last one's until the server corrected it.
             MarketState.Clear();
+
+            //And the smiths behind the forged weapons, which are the last character's bag.
+            ForgedNames.Clear();
         }
 
         private void StartConnectServer(string serverPath, string username, string password)

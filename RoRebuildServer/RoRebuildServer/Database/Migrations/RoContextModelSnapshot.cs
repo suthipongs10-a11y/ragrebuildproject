@@ -116,6 +116,27 @@ namespace RoRebuildServer.Migrations
                     b.ToTable("DbUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("RoRebuildServer.Database.Domain.DbForgedItem", b =>
+                {
+                    b.Property<Guid>("UniqueId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("ForgedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ForgerId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ForgerName")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("UniqueId");
+
+                    b.ToTable("ForgedItem");
+                });
+
             modelBuilder.Entity("RoRebuildServer.Database.Domain.DbAuctionBid", b =>
                 {
                     b.Property<int>("Id")
