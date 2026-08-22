@@ -50,6 +50,9 @@ public static class DataManager
     /// <summary>What each crafting skill can make, from Db/ProduceRecipes.csv.</summary>
     public static ReadOnlyDictionary<CharacterSkill, List<ProduceRecipe>> ProduceRecipes;
 
+    /// <summary>What Ore Discovery can turn up, from Db/OreDiscovery.csv.</summary>
+    public static List<(int ItemId, int Rate)> OreDiscoveryTable;
+
     public static ReadOnlyDictionary<string, int> WeaponClasses;
     public static ReadOnlyDictionary<string, HashSet<int>> EquipGroupInfo;
     public static ReadOnlyDictionary<int, WeaponInfo> WeaponInfo;
@@ -244,6 +247,7 @@ public static class DataManager
 
         ItemIdByName = loader.GenerateItemIdByNameLookup();
         ProduceRecipes = loader.LoadProduceRecipes(); //after the id lookup, which it resolves item codes through
+        OreDiscoveryTable = loader.LoadOreDiscoveryTable(); //same, it is item codes all the way down
         SavePoints = loader.LoadSavePoints().AsReadOnly();
         ElementChart = loader.LoadElementChart();
         MvpMonsterCodes = loader.LoadMvpList();

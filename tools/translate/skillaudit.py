@@ -15,6 +15,11 @@ So this reports two different holes, which need two different fixes:
 "No handler" alone is not the test. Half the passives never get one: Beast Bane is read
 in the damage code, Discount in the shop code, Basic Mastery in six different packet
 handlers. What matters is whether the skill's name appears in the server at all.
+
+Nor is "named in the server project" the whole test any more. The forging skills are
+driven by a table: what they make is a row of ProduceRecipes.csv, and the only code that
+names them is the shared list of which skills open the forge. A skill with a recipe is a
+skill that does something, so a recipe counts the same as a mention.
 """
 import re
 import sys
@@ -23,6 +28,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 DATA = ROOT / "RoRebuildServer/GameConfig/ServerData/Skills"
 SERVER = ROOT / "RoRebuildServer/RoRebuildServer"
+SHARED = ROOT / "RoRebuildServer/RebuildSharedData"
+RECIPES = ROOT / "RoRebuildServer/GameConfig/ServerData/Db/ProduceRecipes.csv"
 
 ORDER = ["Novice", "Swordsman", "Archer", "Mage", "Acolyte", "Thief", "Merchant",
          "Knight", "Wizard", "Priest", "Hunter", "Assassin", "Blacksmith"]
@@ -48,11 +55,22 @@ def trees():
 
 
 def mentioned():
-    """Every skill the server names anywhere, handler or not."""
+    """Every skill something reads - named in code, or carrying a recipe."""
     seen = set()
-    for path in SERVER.rglob("*.cs"):
-        for m in re.finditer(r"CharacterSkill\.(\w+)", path.read_text(encoding="utf-8-sig")):
-            seen.add(m.group(1))
+    for root in (SERVER, SHARED):
+        for path in root.rglob("*.cs"):
+            for m in re.finditer(r"CharacterSkill\.(\w+)", path.read_text(encoding="utf-8-sig")):
+                seen.add(m.group(1))
+
+    if RECIPES.exists():
+        rows = RECIPES.read_text(encoding="utf-8-sig").splitlines()
+        header = rows[0].split(",")
+        column = header.index("Skill")
+        for row in rows[1:]:
+            fields = row.split(",")
+            if len(fields) > column and fields[column]:
+                seen.add(fields[column])
+
     return seen
 
 

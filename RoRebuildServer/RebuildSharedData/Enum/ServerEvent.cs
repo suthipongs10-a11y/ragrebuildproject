@@ -17,6 +17,8 @@ public enum ServerEvent
     //something a card gave the wearer. Carries the item's name in the string field, or
     //nothing at all when what was found was zeny, in which case the amount is in the value.
     CardBonus,
+    //ore a blacksmith turned up on a kill through Ore Discovery. Carries the item's name.
+    OreDiscovery,
 }
 
 public enum ServerResult

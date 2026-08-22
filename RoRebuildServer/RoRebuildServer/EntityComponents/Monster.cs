@@ -642,6 +642,7 @@ public partial class Monster : IEntityAutoReset
         }
 
         DoKillBonusDrops(topContributor, ref dropId);
+        DoOreDiscoveryDrop(topContributor, ref dropId);
 
         dropId = 3; //bonus drops start north
         if (inventoryCount > 0 && monsterInventory != null)
@@ -657,6 +658,49 @@ public partial class Monster : IEntityAutoReset
             inventoryIndex = 0;
             inventoryCount = 0;
         }
+    }
+
+    /// <summary>
+    /// Ore Discovery: a blacksmith turning up ore on something that had none.
+    ///
+    /// Rolled the way the original does it - one row of the table picked at random, then
+    /// that row's rate rolled out of ten thousand - which is why the table is ordered from
+    /// common to rare rather than weighted. It is a thin chance: around one find in seven
+    /// hundred and fifty kills across the whole table, and an oridecon perhaps once in
+    /// sixty thousand. Raising it means raising the numbers in Db/OreDiscovery.csv.
+    ///
+    /// Goes to the top damage contributor, the same person the monster's own drops are
+    /// reserved for, and lands on the ground beside the corpse for the same reason a card's
+    /// find does: a bonus that vanishes into a full bag is worse than one to bend down for.
+    /// </summary>
+    private void DoOreDiscoveryDrop(WorldObject? topContributor, ref int dropId)
+    {
+        if (topContributor == null || topContributor.Type != CharacterType.Player || Character.Map == null)
+            return;
+
+        var player = topContributor.Player;
+        if (player == null || player.MaxLearnedLevelOfSkill(CharacterSkill.OreDiscovery) < 1)
+            return;
+
+        var table = DataManager.OreDiscoveryTable;
+        if (table == null || table.Count == 0)
+            return;
+
+        var (itemId, rate) = table[GameRandom.Next(0, table.Count)];
+        if (GameRandom.Next(0, 10000) >= rate)
+            return;
+
+        var dropPos = GetNextTileForDrop(dropId);
+        var ore = new GroundItem(dropPos, itemId, 1);
+        ore.SetExclusivePickupTime(topContributor, 8f);
+        Character.Map.DropGroundItem(ref ore);
+        dropId++;
+
+        //Said out loud for the same reason the card bonus is: it lands looking exactly like
+        //the monster's own drops, so without a line there is nothing to tell the blacksmith
+        //the skill did anything at all - and at these odds it will be a while before it does.
+        CommandBuilder.SendServerEvent(player, ServerEvent.OreDiscovery, 1,
+            DataManager.GetItemInfoById(itemId)?.Name ?? "?");
     }
 
     /// <summary>

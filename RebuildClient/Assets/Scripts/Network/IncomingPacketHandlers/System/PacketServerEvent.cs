@@ -60,6 +60,15 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
                         Camera.AppendChatText($"<color=#e0a020>[การ์ด] พบ {found}</color>");
                     break;
                 }
+                case ServerEvent.OreDiscovery:
+                {
+                    //Same reasoning as the card line above: the ore lands on the ground
+                    //looking like any other drop, and at these odds a blacksmith who is not
+                    //told would never know the skill had fired.
+                    var ore = msg.ReadString();
+                    Camera.AppendChatText($"<color=#8fbf6f>[แร่] เจอ {ore}</color>");
+                    break;
+                }
                 case ServerEvent.MemoLocationSaved:
                     if(State.KnownSkills.TryGetValue(CharacterSkill.WarpPortal, out var level) && level > 1)
                         Camera.AppendChatText($"<color=#00fbfb>จำจุดนี้เป็นปลายทาง Warp Portal ช่องที่ {val + 1} แล้ว</color>");

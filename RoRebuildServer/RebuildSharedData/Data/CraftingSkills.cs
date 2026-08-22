@@ -12,6 +12,11 @@ namespace RebuildSharedData.Data;
 ///
 /// The recipes themselves live in Db/ProduceRecipes.csv - this is only which skills are
 /// allowed to have any.
+///
+/// Oridecon Research is deliberately not here. It sounds like an ore skill and is not one:
+/// it raises the success rate of forging level 3 weapons, and the ore it is named after is
+/// combined by the smelting npcs in Prontera, Payon, Morroc and Alberta, free and without
+/// a roll. Putting it here would have offered a worse version of something already free.
 /// </summary>
 public static class CraftingSkills
 {
@@ -20,7 +25,6 @@ public static class CraftingSkills
         CharacterSkill.IronTempering => true,
         CharacterSkill.SteelTempering => true,
         CharacterSkill.EnchantedStoneCraft => true,
-        CharacterSkill.OrideconResearch => true,
         _ => false
     };
 }

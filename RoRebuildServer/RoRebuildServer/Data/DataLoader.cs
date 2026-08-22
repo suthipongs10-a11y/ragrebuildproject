@@ -942,6 +942,49 @@ internal class DataLoader
         return bySkill.AsReadOnly();
     }
 
+    /// <summary>
+    /// The ore a blacksmith with Ore Discovery can turn up on a kill.
+    ///
+    /// Rolled the way the original does it: one row is picked out of the table at random,
+    /// and then its Rate is rolled out of ten thousand. So a row's real chance per kill is
+    /// its rate divided by ten thousand and again by the number of rows - with the twenty
+    /// rows shipped, anything at all turns up about once in seven hundred and fifty kills.
+    ///
+    /// That also means adding a row makes every other row rarer. It is a strange way round,
+    /// but it is the one the numbers in the table were written for, and rewriting the roll
+    /// without rewriting the table would quietly change every rate in it.
+    /// </summary>
+    public List<(int ItemId, int Rate)> LoadOreDiscoveryTable()
+    {
+        var table = new List<(int, int)>();
+
+        using var tr = new StreamReader(Path.Combine(ServerConfig.DataConfig.DataPath, @"Db/OreDiscovery.csv"), Encoding.UTF8) as TextReader;
+        using var csv = new CsvReader(tr, CultureInfo.InvariantCulture);
+
+        foreach (var entry in csv.GetRecords<dynamic>())
+        {
+            if (entry is not IDictionary<string, object> obj)
+                continue;
+
+            var code = (string)obj["Item"];
+            if (!DataManager.ItemIdByName.TryGetValue(code, out var id))
+            {
+                ServerLogger.LogWarning($"OreDiscovery.csv lists {code}, but no item by that code exists.");
+                continue;
+            }
+
+            if (!int.TryParse((string)obj["Rate"], out var rate) || rate <= 0)
+            {
+                ServerLogger.LogWarning($"OreDiscovery.csv gives {code} a rate of zero or less, so it could never drop.");
+                continue;
+            }
+
+            table.Add((id, rate));
+        }
+
+        return table;
+    }
+
     public ReadOnlyDictionary<string, int> GenerateItemIdByNameLookup()
     {
         var lookup = new Dictionary<string, int>();
