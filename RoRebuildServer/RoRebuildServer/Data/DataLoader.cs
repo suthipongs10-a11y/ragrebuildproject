@@ -927,6 +927,8 @@ internal class DataLoader
                 bySkill.Add(skill, list);
             }
 
+            var isWeapon = DataManager.WeaponInfo.TryGetValue(resultId, out var weapon);
+
             list.Add(new ProduceRecipe()
             {
                 Skill = skill,
@@ -935,7 +937,9 @@ internal class DataLoader
                 MinSkillLevel = entry.MinSkillLevel,
                 BaseChance = entry.BaseChance,
                 Zeny = entry.Zeny < 0 ? 0 : entry.Zeny,
-                Materials = materials.ToArray()
+                Materials = materials.ToArray(),
+                IsWeapon = isWeapon,
+                WeaponLevel = isWeapon ? weapon!.WeaponLevel : 0
             });
         }
 
@@ -983,6 +987,39 @@ internal class DataLoader
         }
 
         return table;
+    }
+
+    /// <summary>
+    /// The stones that can be bound into a weapon while it is being forged.
+    /// </summary>
+    /// <remarks>
+    /// A list rather than a rule, because what a stone does when it goes in - the element
+    /// it gives the weapon - is an item effect in Script/Items/MiscEffects.txt and there is
+    /// nothing here to read it from. Adding a stone means a line in both files.
+    /// </remarks>
+    public List<int> LoadForgeStones()
+    {
+        var stones = new List<int>();
+
+        using var tr = new StreamReader(Path.Combine(ServerConfig.DataConfig.DataPath, @"Db/ForgeStones.csv"), Encoding.UTF8) as TextReader;
+        using var csv = new CsvReader(tr, CultureInfo.InvariantCulture);
+
+        foreach (var entry in csv.GetRecords<dynamic>())
+        {
+            if (entry is not IDictionary<string, object> obj)
+                continue;
+
+            var code = (string)obj["Item"];
+            if (!DataManager.ItemIdByName.TryGetValue(code, out var id))
+            {
+                ServerLogger.LogWarning($"ForgeStones.csv lists {code}, but no item by that code exists.");
+                continue;
+            }
+
+            stones.Add(id);
+        }
+
+        return stones;
     }
 
     public ReadOnlyDictionary<string, int> GenerateItemIdByNameLookup()

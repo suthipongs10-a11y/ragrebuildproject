@@ -57,6 +57,8 @@ public class PacketCraftAction : IClientPacketHandler
             case CraftRequestType.Craft:
             {
                 var resultId = msg.ReadInt32();
+                var stoneId = msg.ReadInt32();
+                var starCrumbs = msg.ReadByte();
 
                 if (!player.CanPerformCharacterActions())
                     return;
@@ -65,7 +67,7 @@ public class PacketCraftAction : IClientPacketHandler
                 if (DataManager.TryGetProduceRecipe(skill, resultId, out var recipe))
                     recipeCount = recipe.ResultCount;
 
-                var result = ForgeSystem.AttemptCraft(player, skill, resultId);
+                var result = ForgeSystem.AttemptCraft(player, skill, resultId, stoneId, starCrumbs);
 
                 CommandBuilder.SendCraftResult(player, result, resultId,
                     result == CraftResult.Success ? recipeCount : 0);

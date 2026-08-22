@@ -21,7 +21,15 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Crafting
                 case CraftDataType.RecipeList:
                 {
                     ForgeState.Skill = (CharacterSkill)msg.ReadByte();
+                    ForgeState.CanBindElement = msg.ReadByte() != 0;
+                    ForgeState.MaxStarCrumbs = msg.ReadByte();
+                    ForgeState.StarCrumbId = msg.ReadInt32();
                     ForgeState.Recipes.Clear();
+                    ForgeState.Stones.Clear();
+
+                    var stones = msg.ReadByte();
+                    for (var i = 0; i < stones; i++)
+                        ForgeState.Stones.Add(msg.ReadInt32());
 
                     var count = msg.ReadByte();
                     for (var i = 0; i < count; i++)
@@ -31,7 +39,10 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Crafting
                             ResultId = msg.ReadInt32(),
                             ResultCount = msg.ReadByte(),
                             Chance = msg.ReadInt32(),
-                            Zeny = msg.ReadInt32()
+                            Zeny = msg.ReadInt32(),
+                            IsWeapon = msg.ReadByte() != 0,
+                            ElementPenalty = msg.ReadInt32(),
+                            CrumbPenalty = msg.ReadInt32()
                         };
 
                         var materials = msg.ReadByte();

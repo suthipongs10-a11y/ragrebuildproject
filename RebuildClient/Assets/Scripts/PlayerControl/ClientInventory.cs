@@ -159,12 +159,28 @@ namespace Assets.Scripts.PlayerControl
                 {
                     if (sb.Length > 0)
                         sb.Append(" ");
-                    switch(counts[i])
+                    //A stack of the same thing usually reads "Double X", but some carry
+                    //their own name for it - three star crumbs make a weapon "Very Very
+                    //Strong", never "Triple Strong". Named form first, generic after.
+                    var stacked = counts[i] switch
                     {
-                        default: sb.Append(prefixData[i].Prefix); break;
-                        case 2: sb.Append("Double ").Append(prefixData[i].Prefix); break;
-                        case 3: sb.Append("Triple ").Append(prefixData[i].Prefix); break;
-                        case 4: sb.Append("Quadruple ").Append(prefixData[i].Prefix); break;
+                        2 => prefixData[i].Prefix2,
+                        3 => prefixData[i].Prefix3,
+                        4 => prefixData[i].Prefix4,
+                        _ => null
+                    };
+
+                    if (!string.IsNullOrWhiteSpace(stacked))
+                        sb.Append(stacked);
+                    else
+                    {
+                        switch (counts[i])
+                        {
+                            default: sb.Append(prefixData[i].Prefix); break;
+                            case 2: sb.Append("Double ").Append(prefixData[i].Prefix); break;
+                            case 3: sb.Append("Triple ").Append(prefixData[i].Prefix); break;
+                            case 4: sb.Append("Quadruple ").Append(prefixData[i].Prefix); break;
+                        }
                     }
                 }
             }

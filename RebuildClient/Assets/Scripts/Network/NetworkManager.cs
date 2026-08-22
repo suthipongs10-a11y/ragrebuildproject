@@ -1635,7 +1635,7 @@ namespace Assets.Scripts.Network
         /// Only the skill and what to make are sent. Everything the attempt costs is the
         /// server's own copy of the recipe, so nothing here can talk it into a discount.
         /// </summary>
-        public void SendCraftRequest(CharacterSkill skill, int resultItemId)
+        public void SendCraftRequest(CharacterSkill skill, int resultItemId, int stoneId, int starCrumbs)
         {
             var msg = StartMessage();
 
@@ -1643,6 +1643,8 @@ namespace Assets.Scripts.Network
             msg.Write((byte)CraftRequestType.Craft);
             msg.Write((byte)skill);
             msg.Write(resultItemId);
+            msg.Write(stoneId);
+            msg.Write((byte)Mathf.Clamp(starCrumbs, 0, byte.MaxValue));
 
             SendMessage(msg);
         }

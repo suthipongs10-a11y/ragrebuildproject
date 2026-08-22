@@ -9,7 +9,12 @@ public enum CraftRequestType : byte
     /// <summary>Send me what this skill can make. Payload: byte skill.</summary>
     RecipeList,
 
-    /// <summary>Make one. Payload: byte skill, int resultItemId.</summary>
+    /// <summary>
+    /// Make one. Payload: byte skill, int resultItemId, int elementStoneId, byte starCrumbs.
+    ///
+    /// The stone is zero for none, and the crumbs are zero to three. Both are ignored for
+    /// anything that is not a weapon.
+    /// </summary>
     Craft,
 }
 
@@ -51,4 +56,7 @@ public enum CraftResult : byte
 
     /// <summary>Nowhere to put the result.</summary>
     BagFull,
+
+    /// <summary>A stone was named without Weapon Binding, or one that cannot be bound.</summary>
+    CannotBindElement,
 }

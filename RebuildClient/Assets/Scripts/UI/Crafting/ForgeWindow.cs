@@ -26,8 +26,8 @@ namespace Assets.Scripts.UI.Crafting
     /// </summary>
     public class ForgeWindow : WindowBase
     {
-        private const float Width = 520f;
-        private const float Height = 440f;
+        private const float Width = 560f;
+        private const float Height = 470f;
         private const float Pad = 8f;
 
         private const float RowHeight = 58f;
@@ -36,8 +36,13 @@ namespace Assets.Scripts.UI.Crafting
         /// <summary>The line under the list that says how the last attempt went.</summary>
         private const float NoteHeight = 24f;
 
-        /// <summary>Where the list starts, clear of the title bar.</summary>
+        /// <summary>Where the list starts on an ore skill, clear of the title bar.</summary>
         private const float BodyTop = ModernUiTheme.TitleBarHeight + 2f;
+
+        /// <summary>The two rows of pickers a weapon skill gets, and where they sit.</summary>
+        private const float ToolHeight = 62f;
+        private const float PickRowHeight = 26f;
+        private const float PickGap = 4f;
 
         /// <summary>Where the icon sits on a row.</summary>
         private const float IconInset = 10f;
@@ -66,10 +71,22 @@ namespace Assets.Scripts.UI.Crafting
         private static ForgeWindow instance;
 
         private RectTransform body;
+        private RectTransform viewport;
+        private RectTransform tools;
         private TextMeshProUGUI note;
         private readonly List<GameObject> rows = new List<GameObject>();
 
         private int drawnRevision = -1;
+
+        /// <summary>
+        /// What is about to go into the next weapon: a stone, or zero for none, and how
+        /// many star crumbs.
+        ///
+        /// Kept for the window rather than per row, because it is one decision - what kind
+        /// of weapon am I making today - and every row's odds are shown against it.
+        /// </summary>
+        private int pickedStone;
+        private int pickedCrumbs;
 
         // =====================================================================
         // Opening
@@ -97,6 +114,11 @@ namespace Assets.Scripts.UI.Crafting
             //skill's recipes under another skill's title.
             ForgeState.Clear();
             ForgeState.Skill = skill;
+
+            //Cleared with the list. Carrying a flame heart over from the last time the
+            //window was open would mean spending one without having chosen to.
+            instance.pickedStone = 0;
+            instance.pickedCrumbs = 0;
 
             instance.gameObject.SetActive(true);
             instance.MoveToTop();
@@ -148,11 +170,16 @@ namespace Assets.Scripts.UI.Crafting
             ModernUiTheme.CreateTitleBar(window, "ตีเหล็ก", " ", ModernUiIcons.Spark);
             ModernUiTheme.AttachShadow(rect);
 
+            window.tools = ModernUiTheme.CreateRect("Tools", rect);
+            ModernUiTheme.Place(window.tools, new Vector2(0, 1), new Vector2(Pad, -BodyTop),
+                new Vector2(Width - Pad * 2f, ToolHeight));
+
             //A sunken tray, which is also what catches the drag that scrolls it: the gaps
             //between the rows would otherwise pass the pointer straight through.
             var viewport = ModernUiTheme.CreateCard(rect, "Viewport", ModernUiTheme.CardDeepColor);
             ModernUiTheme.Stretch(viewport, Pad, Pad + NoteHeight, -Pad, -BodyTop);
             viewport.gameObject.AddComponent<RectMask2D>();
+            window.viewport = viewport;
 
             window.body = ModernUiTheme.CreateRect("Rows", viewport);
             window.body.anchorMin = new Vector2(0, 1);
@@ -192,6 +219,23 @@ namespace Assets.Scripts.UI.Crafting
         // =====================================================================
         // Drawing
 
+        /// <summary>
+        /// Whether what is open takes sockets.
+        ///
+        /// Read off the recipes rather than the skill, so the pickers can only appear over
+        /// a list that has something to put them in.
+        /// </summary>
+        private bool HasSockets
+        {
+            get
+            {
+                foreach (var recipe in ForgeState.Recipes)
+                    if (recipe.IsWeapon)
+                        return true;
+                return false;
+            }
+        }
+
         private void Redraw()
         {
             drawnRevision = ForgeState.Revision;
@@ -201,8 +245,21 @@ namespace Assets.Scripts.UI.Crafting
                     Destroy(row);
             rows.Clear();
 
+            for (var i = tools.childCount - 1; i >= 0; i--)
+                Destroy(tools.GetChild(i).gameObject);
+
             PaintTitle();
             PaintNote();
+
+            //The tray starts under the pickers when there are any, and under the title bar
+            //when there are not - an ore list would otherwise open with a strip of nothing.
+            var sockets = HasSockets;
+            tools.gameObject.SetActive(sockets);
+            ModernUiTheme.Stretch(viewport, Pad, Pad + NoteHeight, -Pad,
+                -(sockets ? BodyTop + ToolHeight : BodyTop));
+
+            if (sockets)
+                BuildPickers();
 
             if (!ForgeState.Received)
             {
@@ -226,6 +283,74 @@ namespace Assets.Scripts.UI.Crafting
             }
 
             body.sizeDelta = new Vector2(0, -y);
+        }
+
+        /// <summary>
+        /// The two rows above the list: which stone goes in, and how many star crumbs.
+        ///
+        /// One setting for the window rather than one per weapon. Picking a stone is a
+        /// decision about what you are making today, and every row's odds redraw against
+        /// it, so the cost of the choice is visible before anything is spent.
+        /// </summary>
+        private void BuildPickers()
+        {
+            var loader = ClientDataLoader.Instance;
+
+            var elementLabel = ModernUiTheme.CreateText(tools, "ElementLabel",
+                ForgeState.CanBindElement ? "ธาตุ" : "ธาตุ (ต้องมี Weapon Binding)",
+                ModernUiTheme.SizeSmall, ModernUiTheme.LabelColor, TextAlignmentOptions.Left);
+            elementLabel.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(elementLabel.rectTransform, new Vector2(0, 1),
+                new Vector2(0f, 0f), new Vector2(200f, PickRowHeight));
+
+            var x = 190f;
+            AddPick(0f, "ไม่ใส่", pickedStone == 0, true, () => { pickedStone = 0; Redraw(); }, 62f, ref x);
+
+            foreach (var stone in ForgeState.Stones)
+            {
+                var data = loader != null ? loader.GetItemById(stone) : null;
+                var name = data != null ? data.Name : stone.ToString();
+                var id = stone;
+                AddPick(0f, name, pickedStone == id, ForgeState.CanBindElement,
+                    () => { pickedStone = id; Redraw(); }, 84f, ref x);
+            }
+
+            var crumbLabel = ModernUiTheme.CreateText(tools, "CrumbLabel", "Star Crumb",
+                ModernUiTheme.SizeSmall, ModernUiTheme.LabelColor, TextAlignmentOptions.Left);
+            crumbLabel.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(crumbLabel.rectTransform, new Vector2(0, 1),
+                new Vector2(0f, -(PickRowHeight + PickGap)), new Vector2(200f, PickRowHeight));
+
+            var crumbX = 190f;
+            for (var i = 0; i <= ForgeState.MaxStarCrumbs; i++)
+            {
+                var count = i;
+                AddPick(-(PickRowHeight + PickGap), count.ToString(), pickedCrumbs == count, true,
+                    () => { pickedCrumbs = count; Redraw(); }, 42f, ref crumbX);
+            }
+
+            //Only the last one is worth saying out loud, because it is the one that does not
+            //follow from the others: the third crumb is worth far more than the first two.
+            var hint = ModernUiTheme.CreateText(tools, "CrumbHint", "3 ก้อน = ATK +40",
+                ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor, TextAlignmentOptions.Left);
+            hint.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(hint.rectTransform, new Vector2(0, 1),
+                new Vector2(crumbX + 8f, -(PickRowHeight + PickGap)), new Vector2(160f, PickRowHeight));
+        }
+
+        /// <summary>One button on a picker row, laid out left to right as they are added.</summary>
+        private void AddPick(float y, string label, bool active, bool usable, UnityEngine.Events.UnityAction onClick,
+            float width, ref float x)
+        {
+            var button = ModernUiTheme.CreateButton(tools, "Pick" + label,
+                label, active ? ModernUiTheme.AccentColor : ModernUiTheme.CardColor,
+                active ? ModernUiTheme.AccentTextColor : ModernUiTheme.NameColor,
+                ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place((RectTransform)button.transform, new Vector2(0, 1),
+                new Vector2(x, y), new Vector2(width, PickRowHeight));
+            button.interactable = usable;
+            button.onClick.AddListener(onClick);
+            x += width + PickGap;
         }
 
         /// <summary>
@@ -294,6 +419,10 @@ namespace Assets.Scripts.UI.Crafting
                     note.color = ShortColor;
                     note.text = "กระเป๋าเต็มหรือน้ำหนักเกิน";
                     break;
+                case CraftResult.CannotBindElement:
+                    note.color = ShortColor;
+                    note.text = "ใส่ธาตุไม่ได้ ต้องมีสกิล Weapon Binding ก่อน";
+                    break;
                 default:
                     note.color = ShortColor;
                     note.text = "ทำไม่ได้";
@@ -347,7 +476,7 @@ namespace Assets.Scripts.UI.Crafting
             ModernUiTheme.Place(name.rectTransform, new Vector2(0, 1),
                 new Vector2(TextInset, -8f), new Vector2(LabelWidth, 20f));
 
-            var materials = ModernUiTheme.CreateText(card, "Materials", MaterialsText(recipe, out var enough),
+            var materials = ModernUiTheme.CreateText(card, "Materials", MaterialsText(recipe, StoneFor(recipe), CrumbsFor(recipe), out var enough),
                 ModernUiTheme.SizeSmall, ModernUiTheme.LabelColor, TextAlignmentOptions.TopLeft);
             materials.textWrappingMode = TextWrappingModes.NoWrap;
             materials.overflowMode = TextOverflowModes.Ellipsis;
@@ -358,8 +487,9 @@ namespace Assets.Scripts.UI.Crafting
             //Shown to one decimal because that is the resolution the server sends, and
             //because on the hard recipes whole percent would read as the same number for
             //every blacksmith who ever tried them.
-            var odds = ModernUiTheme.CreateText(card, "Odds", $"{recipe.Chance / 100f:0.0}%",
-                ModernUiTheme.SizeBody, ChanceColor(recipe.Chance), TextAlignmentOptions.TopRight,
+            var chance = recipe.ChanceWith(StoneFor(recipe) > 0, CrumbsFor(recipe));
+            var odds = ModernUiTheme.CreateText(card, "Odds", $"{chance / 100f:0.0}%",
+                ModernUiTheme.SizeBody, ChanceColor(chance), TextAlignmentOptions.TopRight,
                 FontStyles.Bold);
             odds.textWrappingMode = TextWrappingModes.NoWrap;
             ModernUiTheme.Place(odds.rectTransform, new Vector2(1, 1),
@@ -383,8 +513,16 @@ namespace Assets.Scripts.UI.Crafting
             button.interactable = ready;
 
             var id = recipe.ResultId;
-            button.onClick.AddListener(() => Make(id));
+            var stone = StoneFor(recipe);
+            var crumbs = CrumbsFor(recipe);
+            button.onClick.AddListener(() => Make(id, stone, crumbs));
         }
+
+        /// <summary>What would go into this one, which is nothing at all unless it is a weapon.</summary>
+        private int StoneFor(ForgeRecipe recipe) =>
+            recipe.IsWeapon && ForgeState.CanBindElement ? pickedStone : 0;
+
+        private int CrumbsFor(ForgeRecipe recipe) => recipe.IsWeapon ? pickedCrumbs : 0;
 
         /// <summary>
         /// What a recipe eats, with anything the player is short of marked.
@@ -393,33 +531,44 @@ namespace Assets.Scripts.UI.Crafting
         /// about to check - if the two disagree the button is only wrong about being grey,
         /// and the answer that comes back is still the truth.
         /// </summary>
-        private static string MaterialsText(ForgeRecipe recipe, out bool enough)
+        private static string MaterialsText(ForgeRecipe recipe, int stone, int crumbs, out bool enough)
         {
-            enough = true;
-
-            var loader = ClientDataLoader.Instance;
-            var inventory = PlayerState.Instance != null ? PlayerState.Instance.Inventory : null;
             var text = "";
+            var missing = false;
 
             foreach (var material in recipe.Materials)
+                Append(material.ItemId, material.Count);
+
+            //What is being bound in is spent exactly like a material, so it belongs on the
+            //same line - a stone that is short should look the same as an ore that is.
+            if (stone > 0)
+                Append(stone, 1);
+
+            if (crumbs > 0 && ForgeState.StarCrumbId > 0)
+                Append(ForgeState.StarCrumbId, crumbs);
+
+            enough = !missing;
+            return text;
+
+            void Append(int itemId, int count)
             {
-                var data = loader != null ? loader.GetItemById(material.ItemId) : null;
-                var name = data != null ? data.Name : material.ItemId.ToString();
-                var onHand = inventory != null ? inventory.CountItemByItemId(material.ItemId) : 0;
+                var loader = ClientDataLoader.Instance;
+                var inventory = PlayerState.Instance != null ? PlayerState.Instance.Inventory : null;
+                var data = loader != null ? loader.GetItemById(itemId) : null;
+                var name = data != null ? data.Name : itemId.ToString();
+                var onHand = inventory != null ? inventory.CountItemByItemId(itemId) : 0;
 
                 if (text.Length > 0)
                     text += "  ·  ";
 
-                if (onHand < material.Count)
+                if (onHand < count)
                 {
-                    enough = false;
-                    text += $"<color=#A53E18>{name} {onHand}/{material.Count}</color>";
+                    missing = true;
+                    text += $"<color=#A53E18>{name} {onHand}/{count}</color>";
                 }
                 else
-                    text += $"{name} {onHand}/{material.Count}";
+                    text += $"{name} {onHand}/{count}";
             }
-
-            return text;
         }
 
         /// <summary>Green when it is a sure thing, red when it is mostly a donation.</summary>
@@ -467,13 +616,13 @@ namespace Assets.Scripts.UI.Crafting
         // =====================================================================
         // Doing something
 
-        private void Make(int resultId)
+        private void Make(int resultId, int stone, int crumbs)
         {
             var net = NetworkManager.Instance;
             if (net == null)
                 return;
 
-            net.SendCraftRequest(ForgeState.Skill, resultId);
+            net.SendCraftRequest(ForgeState.Skill, resultId, stone, crumbs);
 
             //Asked for again straight after, because the answer to an attempt says how it
             //went and not what is left in the bag - the counts on the rows have to come

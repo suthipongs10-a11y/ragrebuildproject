@@ -615,7 +615,11 @@ class Program
 
         foreach (var entry in GetCsvRows<CsvNonCardPrefixes>("NonCardPrefixes.csv"))
         {
-            prefixList.Items.Add(new CardPrefixData() { Id = DataManager.ItemIdByName[entry.Code], Prefix = entry.Prefix, Postfix = entry.Postfix });
+            prefixList.Items.Add(new CardPrefixData()
+            {
+                Id = DataManager.ItemIdByName[entry.Code], Prefix = entry.Prefix, Postfix = entry.Postfix,
+                Prefix2 = entry.Prefix2, Prefix3 = entry.Prefix3, Prefix4 = entry.Prefix4
+            });
         }
 
         foreach (var entry in GetCsvRows<CsvItemAmmo>("ItemsAmmo.csv"))

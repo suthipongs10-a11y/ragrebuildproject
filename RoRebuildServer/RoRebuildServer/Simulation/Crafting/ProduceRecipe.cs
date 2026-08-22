@@ -24,4 +24,16 @@ public class ProduceRecipe
     public required int BaseChance { get; init; }
     public required int Zeny { get; init; }
     public required ProduceMaterial[] Materials { get; init; }
+
+    /// <summary>
+    /// Whether what comes out is a weapon, and so can take a stone and star crumbs.
+    ///
+    /// Worked out at load from whether the item is in the weapon table rather than written
+    /// in the file, because a recipe that says it makes a weapon and does not would be a
+    /// window offering sockets that the result cannot hold.
+    /// </summary>
+    public required bool IsWeapon { get; init; }
+
+    /// <summary>1 to 3 for a weapon, 0 for everything else. Drives the odds and the bonus.</summary>
+    public required int WeaponLevel { get; init; }
 }

@@ -129,4 +129,12 @@ public class CsvNonCardPrefixes
     public required string Code { get; set; }
     public string? Prefix { get; set; }
     public string? Postfix { get; set; }
+
+    //What to call two, three or four of the same thing socketed into one item. Left blank
+    //the client falls back to "Double"/"Triple"/"Quadruple" in front of the single form,
+    //which is right for cards and wrong for star crumbs - three of those make a weapon
+    //"Very Very Strong", not "Triple Strong".
+    public string? Prefix2 { get; set; }
+    public string? Prefix3 { get; set; }
+    public string? Prefix4 { get; set; }
 }

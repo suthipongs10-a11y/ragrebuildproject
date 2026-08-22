@@ -26,6 +26,22 @@ namespace Assets.Scripts.Network
 
         public int Zeny;
         public readonly List<ForgeMaterial> Materials = new List<ForgeMaterial>();
+
+        /// <summary>Whether a stone and star crumbs can go into this one.</summary>
+        public bool IsWeapon;
+
+        /// <summary>What binding an element costs in odds, sent so the window can follow it.</summary>
+        public int ElementPenalty;
+
+        /// <summary>What each star crumb costs in odds.</summary>
+        public int CrumbPenalty;
+
+        /// <summary>The odds with what is currently picked, on the same ten-thousandth scale.</summary>
+        public int ChanceWith(bool stone, int crumbs)
+        {
+            var chance = Chance - (stone ? ElementPenalty : 0) - crumbs * CrumbPenalty;
+            return chance < 0 ? 0 : chance;
+        }
     }
 
     /// <summary>
@@ -41,6 +57,18 @@ namespace Assets.Scripts.Network
         public static CharacterSkill Skill = CharacterSkill.None;
 
         public static readonly List<ForgeRecipe> Recipes = new List<ForgeRecipe>();
+
+        /// <summary>Whether this character has Weapon Binding, which is what buys the stone slot.</summary>
+        public static bool CanBindElement;
+
+        /// <summary>How many star crumbs one weapon will take.</summary>
+        public static int MaxStarCrumbs;
+
+        /// <summary>Which item a star crumb is, so the window can count them in the bag.</summary>
+        public static int StarCrumbId;
+
+        /// <summary>The stones that may be bound in, in the order to show them.</summary>
+        public static readonly List<int> Stones = new List<int>();
 
         /// <summary>Whether an answer has arrived at all, so the window can say "asking".</summary>
         public static bool Received;
@@ -67,6 +95,10 @@ namespace Assets.Scripts.Network
         {
             Skill = CharacterSkill.None;
             Recipes.Clear();
+            Stones.Clear();
+            CanBindElement = false;
+            MaxStarCrumbs = 0;
+            StarCrumbId = 0;
             Received = false;
             HasResult = false;
             Touch();

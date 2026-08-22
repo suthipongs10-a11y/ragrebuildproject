@@ -25,6 +25,24 @@ public static class CraftingSkills
         CharacterSkill.IronTempering => true,
         CharacterSkill.SteelTempering => true,
         CharacterSkill.EnchantedStoneCraft => true,
+        CharacterSkill.SmithBladeWeapon => true,
+        CharacterSkill.SmithBluntWeapon => true,
+        CharacterSkill.SmithPiercingWeapon => true,
+        _ => false
+    };
+
+    /// <summary>
+    /// Whether a stone or a star crumb may be bound into what this skill makes.
+    ///
+    /// Only the three weapon skills. An ore skill's window has no sockets, and asking the
+    /// client to work that out from whether the result happens to be a weapon would put
+    /// the rule in two places.
+    /// </summary>
+    public static bool IsWeaponSmithingSkill(CharacterSkill skill) => skill switch
+    {
+        CharacterSkill.SmithBladeWeapon => true,
+        CharacterSkill.SmithBluntWeapon => true,
+        CharacterSkill.SmithPiercingWeapon => true,
         _ => false
     };
 }

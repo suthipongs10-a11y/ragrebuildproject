@@ -53,6 +53,9 @@ public static class DataManager
     /// <summary>What Ore Discovery can turn up, from Db/OreDiscovery.csv.</summary>
     public static List<(int ItemId, int Rate)> OreDiscoveryTable;
 
+    /// <summary>The stones a weapon can be forged around, from Db/ForgeStones.csv.</summary>
+    public static List<int> ForgeStones;
+
     public static ReadOnlyDictionary<string, int> WeaponClasses;
     public static ReadOnlyDictionary<string, HashSet<int>> EquipGroupInfo;
     public static ReadOnlyDictionary<int, WeaponInfo> WeaponInfo;
@@ -248,6 +251,7 @@ public static class DataManager
         ItemIdByName = loader.GenerateItemIdByNameLookup();
         ProduceRecipes = loader.LoadProduceRecipes(); //after the id lookup, which it resolves item codes through
         OreDiscoveryTable = loader.LoadOreDiscoveryTable(); //same, it is item codes all the way down
+        ForgeStones = loader.LoadForgeStones();
         SavePoints = loader.LoadSavePoints().AsReadOnly();
         ElementChart = loader.LoadElementChart();
         MvpMonsterCodes = loader.LoadMvpList();

@@ -8,6 +8,7 @@ using RoRebuildServer.Data.CsvDataTypes;
 using RoRebuildServer.Data.Player;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Networking;
+using RoRebuildServer.Simulation.Crafting;
 using RoRebuildServer.Simulation.StatusEffects.Setup;
 using RoRebuildServer.Simulation.Util;
 
@@ -568,6 +569,12 @@ public class ItemEquipState
                 if (overRefine > 0)
                     overRefBonus = overRefine * overRefineAttackBonus[wLvl];
 
+                //Star crumbs forged into the weapon, counted here rather than left to the
+                //slot effects below: five each is easy enough for an effect to hand out, but
+                //the third crumb is worth thirty on its own and an effect fired once per
+                //slot cannot see how many of it there are.
+                refBonus += ForgeSystem.StarCrumbAttackBonus(CountSlotItem(ref item, StarCrumbId));
+
                 var weaponInfo = new WeaponAttackInfo(weapon, refBonus, refBonus + overRefBonus);
 
                 if (slot == EquipSlot.Weapon)
@@ -622,6 +629,38 @@ public class ItemEquipState
         }
 
         OnEquipUpdateItemSets(item.Id);
+    }
+
+    /// <summary>
+    /// Star Crumb's item id, looked up once.
+    ///
+    /// Held rather than looked up per equip because equipping happens on every stat
+    /// refresh, and this is a dictionary hit on a string that never changes.
+    /// </summary>
+    private static int starCrumbId = -1;
+
+    private static int StarCrumbId
+    {
+        get
+        {
+            if (starCrumbId < 0)
+                starCrumbId = DataManager.ItemIdByName.GetValueOrDefault("Star_Crumb", 0);
+            return starCrumbId;
+        }
+    }
+
+    /// <summary>How many of one thing are socketed into an item.</summary>
+    private static int CountSlotItem(ref UniqueItem item, int itemId)
+    {
+        if (itemId <= 0)
+            return 0;
+
+        var count = 0;
+        for (var i = 0; i < 4; i++)
+            if (item.SlotData(i) == itemId)
+                count++;
+
+        return count;
     }
 
     private void AddEquipItemCount(int itemId)
