@@ -10,54 +10,67 @@
 #----------------------------------
 
 [Curse]
+Name = "Curse"
 Type = "Debuff"
 Icon = "hl_curse"
 
 [Stun]
+Name = "Stun"
 Type = "Debuff"
 Icon = "bd_stun"
 
 [Sleep]
+Name = "Sleep"
 Type = "Debuff"
 Icon = "bd_sleep"
 
 [Frozen]
+Name = "Frozen"
 Type = "Debuff"
 Icon = "bd_freezing"
 
 [Blind]
+Name = "Blind"
 Type = "Debuff"
 Icon = "hl_blind"
 
 [Silence]
+Name = "Silence"
 Type = "Debuff"
 Icon = "hl_silence"
 
 [Confusion]
+Name = "Confusion"
 Type = "Debuff"
 Icon = "hl_confusion"
 
 [Poison]
+Name = "Poison"
 Type = "Debuff"
 Icon = "hl_poison"
 
 [Petrifying]
+Name = "Petrifying"
 Type = "Debuff"
 Icon = "bd_stonecurse"
 
 [Stone]
+Name = "Stone Curse"
 Type = "Debuff"
 Icon = "bd_stonecurse"
 
 [Provoke]
+Name = "Provoke"
 Type = "Debuff"
 Icon = "프로보크"
 
 [ProvokeNoAtk]
+Name = "Provoke"
 Type = "Debuff"
 Icon = "프로보크"
 
 [Hallucination]
+Name = "Hallucination"
 Type = "Debuff"
 Icon = "환각"
 
@@ -110,7 +123,7 @@ CanDisable = true
 ImportantJobs = ["SuperNovice","Acolyte","Priest","Monk"]
 
 [SignumCrusis]
-Name = "SignumCrusis"
+Name = "Signum Crusis"
 Type = "Debuff"
 Icon = "시그넘크루시스"
 
@@ -140,7 +153,7 @@ Name = "Pneuma"
 Type = "Buff"
 
 [SafetyWall]
-Name = "Pneuma"
+Name = "Safety Wall"
 Type = "Buff"
 
 [Hiding]
@@ -158,6 +171,7 @@ CanDispel = true
 CanDisable = true
 
 [Cloaking]
+Name = "Cloaking"
 Type = "Buff"
 Icon = "클로킹"
 CanDispel = false
@@ -171,11 +185,13 @@ CanDispel = true
 CanDisable = true
 
 [Sight]
+Name = "Sight"
 Type = "Buff"
 CanDispel = false
 CanDisable = false
 
 [Ruwach]
+Name = "Ruwach"
 Type = "Buff"
 CanDispel = false
 CanDisable = false
@@ -229,6 +245,7 @@ ImportantJobs = ["Blacksmith"]
 
 [AnkleSnare]
 
+Name = "Ankle Snare"
 [EnchantPoison]
 Name = "Enchant Poison"
 Type = "Buff"
@@ -287,6 +304,7 @@ CanDisable = false
 #----------------------------------
 
 [Magnificat]
+Name = "Magnificat"
 Type = "Buff"
 Icon = "마니피캇"
 CanDispel = true
@@ -294,6 +312,7 @@ CanDisable = true
 ImportantJobs = ["Priest"]
 
 [Gloria]
+Name = "Gloria"
 Type = "Buff"
 Icon = "글로리아"
 CanDispel = true
@@ -317,6 +336,7 @@ CanDisable = true
 ImportantJobs = ["Priest"]
 
 [Suffragium]
+Name = "Suffragium"
 Type = "Buff"
 Icon = "수프라기움"
 CanDispel = true
@@ -324,12 +344,14 @@ CanDisable = true
 ImportantJobs = ["Priest"]
 
 [LexAeterna]
+Name = "Lex Aeterna"
 Type = "Debuff"
 Icon = "렉스에테르나"
 CanDispel = true
 CanDisable = false
 
 [Aspersio]
+Name = "Aspersio"
 Type = "Buff"
 Icon = "아스페르시오"
 CanDispel = true
@@ -433,6 +455,7 @@ CanDispel = true
 CanDisable = false
 
 [Vampyrism]
+Name = "Vampyrism"
 Type = "Buff"
 Icon = "icon02"
 CanDispel = true
@@ -463,11 +486,13 @@ CanDispel = true
 CanDisable = false
 
 [StopOwner]
+Name = "Stop"
 CanDispel = false
 CanDisable = false
 
 [Invisible]
 
+Name = "Invisible"
 [Vulnerability] #for special events
 [SpecialTarget] #for special events
 
