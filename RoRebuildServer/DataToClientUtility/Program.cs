@@ -1014,6 +1014,20 @@ class Program
         );
 
 
+        //A sprite is normally just a file name, and lives in its own job's folder. One that
+        //names a folder as well is taken as a path under Weapons/ instead, which is how a
+        //job with no art of its own borrows another job's.
+        //
+        //That is not a hypothetical: Gravity drew the club glow for the first jobs and
+        //never for the second, so a Blacksmith or a Priest swinging a mace has nothing to
+        //light up unless it borrows from the Merchant or Acolyte it grew out of.
+        static string WeaponSpritePath(string job, string gender, string file) =>
+            string.IsNullOrWhiteSpace(file)
+                ? string.Empty
+                : file.Contains('/')
+                    ? "Assets/Sprites/Weapons/" + file
+                    : $"Assets/Sprites/Weapons/{job}/{gender}/" + file;
+
         PlayerWeaponData CsvWeaponDataToClient(CsvJobWeaponInfo w) => new()
         {
             Job = jobs.First(j => j.Name == w.Job).Id,
@@ -1021,10 +1035,10 @@ class Program
             Class2 = !string.IsNullOrWhiteSpace(w.Class2) ? classes.First(c => c.WeaponClass == w.Class2).Id : -1,
             AttackMale = w.AttackMale,
             AttackFemale = w.AttackFemale,
-            SpriteFemale = string.IsNullOrWhiteSpace(w.SpriteFemale) ? string.Empty : $"Assets/Sprites/Weapons/{w.Job}/Female/" + w.SpriteFemale,
-            SpriteMale = string.IsNullOrWhiteSpace(w.SpriteMale) ? string.Empty : $"Assets/Sprites/Weapons/{w.Job}/Male/" + w.SpriteMale,
-            EffectMale = string.IsNullOrWhiteSpace(w.EffectMale) ? string.Empty : $"Assets/Sprites/Weapons/{w.Job}/Male/" + w.EffectMale,
-            EffectFemale = string.IsNullOrWhiteSpace(w.EffectFemale) ? string.Empty : $"Assets/Sprites/Weapons/{w.Job}/Female/" + w.EffectFemale
+            SpriteFemale = WeaponSpritePath(w.Job, "Female", w.SpriteFemale),
+            SpriteMale = WeaponSpritePath(w.Job, "Male", w.SpriteMale),
+            EffectMale = WeaponSpritePath(w.Job, "Male", w.EffectMale),
+            EffectFemale = WeaponSpritePath(w.Job, "Female", w.EffectFemale)
         };
 
         //skill descriptions
