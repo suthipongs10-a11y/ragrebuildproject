@@ -906,9 +906,21 @@ namespace Assets.Scripts.Sprites
             //weapon without it - checked here rather than left to the loader, because a
             //name that resolves to nothing would take the attachment with it. The weapon
             //sprite itself is not optional and is not checked this way.
-            if (isEffect && (string.IsNullOrWhiteSpace(weaponSpriteFile)
-                             || !DoesAddressableExist<RoSpriteData>(weaponSpriteFile)))
-                return;
+            if (isEffect)
+            {
+                if (string.IsNullOrWhiteSpace(weaponSpriteFile))
+                    return; //no glow listed for this job and weapon, which is normal for bows and rods
+
+                if (!DoesAddressableExist<RoSpriteData>(weaponSpriteFile))
+                {
+#if UNITY_EDITOR
+                    //Said out loud, because the alternative is a weapon that simply never
+                    //glows and no way to tell a missing sprite from a missing tint.
+                    Debug.Log($"Blade glow {weaponSpriteFile} is not in the client, so {ctrl.Name} will swing without one.");
+#endif
+                    return;
+                }
+            }
 
             var bodyTransform = ctrl.SpriteAnimator.transform;
 
