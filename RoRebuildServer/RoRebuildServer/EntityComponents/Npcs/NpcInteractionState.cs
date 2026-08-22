@@ -206,7 +206,11 @@ public class NpcInteractionState
     }
     public bool HasLearnedSkill(CharacterSkill skill, int level = 1) => Player?.DoesCharacterKnowSkill(skill, level) ?? false;
     public bool HasCart => ((Player?.GetData(PlayerStat.FollowerType) ?? 0) & (int)CharacterFollowerState.AnyCart) > 0;
-    public bool HasBird => ((Player?.GetData(PlayerStat.FollowerType) ?? 0) & (int)CharacterFollowerState.Falcon) > 0;
+    //Asked of the player rather than of the saved copy, unlike the two beside it. A cart
+    //and a peco are rented and write themselves down; a falcon is granted by Falcon Mastery
+    //and never touches the saved value, so reading that would tell every hunter in the game
+    //that they have no bird.
+    public bool HasBird => Player?.HasBird ?? false;
     public bool HasPeco => ((Player?.GetData(PlayerStat.FollowerType) ?? 0) & (int)CharacterFollowerState.Mounted) > 0;
 
     public void FocusNpc()
@@ -228,6 +232,24 @@ public class NpcInteractionState
     public void GivePeco()
     {
         Player?.StartRidingMount();
+    }
+
+    /// <summary>
+    /// Puts the bird back on a hunter's arm.
+    ///
+    /// Not a rental in the way a cart or a peco is: Falcon Mastery is what grants a falcon,
+    /// and this is the way back for a hunter who dismissed their followers and has been
+    /// hunting without it since - short of logging out and in again, which is not something
+    /// to have to know. Refused without the skill, because the bird is what the skill is.
+    /// </summary>
+    public void GiveFalcon()
+    {
+        if (Player == null || !Player.DoesCharacterKnowSkill(CharacterSkill.FalconMastery, 1))
+            return;
+
+        Player.PlayerFollower |= CharacterFollowerState.Falcon;
+        Player.CombatEntity.AddStatusEffect(CharacterStatusEffect.Falcon, int.MaxValue);
+        CommandBuilder.UpdatePlayerFollowerStateAutoVis(Player);
     }
 
     public void GiveZeny(int val)

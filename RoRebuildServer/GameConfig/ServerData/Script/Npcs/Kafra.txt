@@ -12,7 +12,7 @@ macro Kafra(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %saveLo
 		//Always offered, and the refusal is spoken rather than being a menu entry that
 		//quietly is not there. A service you cannot see is one you cannot tell apart from a
 		//service that was never added, which is exactly how the last version read.
-		Option("Save", "Use Storage", "Teleport Service", "Rent a Cart or a Peco Peco", "Cancel");
+		Option("Save", "Use Storage", "Teleport Service", "Rent a Mount or Call a Falcon", "Cancel");
 		switch(Result)
 		{
 		case 0:
@@ -102,7 +102,42 @@ macro KafraRentMount(%kafraName)
 		return;
 	}
 
-	Dialog(%kafraName, "I am sorry~ Push carts are for merchants and their trades, and a Peco Peco will only carry a knight. Come back when you have taken one of those paths.");
+	if(HasJobType("Hunter"))
+	{
+		//The falcon is not rented the way the other two are - Falcon Mastery grants it, and
+		//dismissing your followers is the only thing that takes it away. This is the way
+		//back from that, which otherwise means logging out and in again.
+		if(!HasLearnedSkill(FalconMastery, 1))
+		{
+			Dialog(%kafraName, "A falcon will only answer a hunter who has been taught to call one. Learn Falcon Mastery and one will come to you on its own~");
+			return;
+		}
+
+		if(HasBird)
+		{
+			Dialog(%kafraName, "Your falcon is right there on your arm~ Do take care of it.");
+			return;
+		}
+
+		Dialog(%kafraName, "Lost your falcon? I can whistle it back for 200 zeny. Shall I?");
+		Option("Yes", "No");
+		switch(Result)
+		{
+		case 0:
+			if(GetZeny() < 200)
+			{
+				Dialog(%kafraName, "Oh dear, you don't have enough money. Please come back when you have at least 200 zeny.");
+				return;
+			}
+			DropZeny(200);
+			GiveFalcon();
+			Dialog(%kafraName, "There it is~ Thank you for using the Kafra Service.");
+			return;
+		}
+		return;
+	}
+
+	Dialog(%kafraName, "I am sorry~ Push carts are for merchants and their trades, a Peco Peco will only carry a knight, and a falcon answers to no one but a hunter. Come back when you have taken one of those paths.");
 	return;
 }
 
@@ -116,7 +151,7 @@ macro KafraNoSave(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %
 		FocusNpc();
 		ShowSprite(%cutin, right);
 		Dialog(name, "Welcome to the Kafra Corporation~ The Kafra Services are always here to support you. So how can I be of service today?");
-		Option("Use Storage", "Teleport Service", "Rent a Cart or a Peco Peco", "Cancel");
+		Option("Use Storage", "Teleport Service", "Rent a Mount or Call a Falcon", "Cancel");
 		switch(Result)
 		{
 		case 0:
