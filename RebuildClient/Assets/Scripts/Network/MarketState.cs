@@ -1,3 +1,4 @@
+﻿using System;
 using System.Collections.Generic;
 using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
@@ -27,7 +28,7 @@ namespace Assets.Scripts.Network
         /// Carried through the market tables unchanged rather than regenerated, so a sword
         /// that goes up for auction and comes back down is still the same sword.
         /// </summary>
-        public System.Guid UniqueId;
+        public Guid UniqueId;
 
         /// <summary>
         /// The same item as the inventory would hold it, so it can be named by the one

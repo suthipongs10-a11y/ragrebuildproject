@@ -21,7 +21,7 @@ echo ==============================================================
 echo.
 
 rem --------------------------------------------------------------
-echo [1/6] Getting the latest work from GitHub...
+echo [1/7] Getting the latest work from GitHub...
 echo.
 rem These are kept in the repository but are also written by something on this
 rem machine - the two libraries are rebuilt further down, and the packet table is
@@ -72,14 +72,14 @@ if errorlevel 1 (
 )
 
 rem --------------------------------------------------------------
-echo [2/6] Building the shared game config...
+echo [2/7] Building the shared game config...
 cd /d "%ROOT%RoRebuildServer\GameConfig"
 dotnet build -c Release --property WarningLevel=0
 if errorlevel 1 goto :build_failed
 echo.
 
 rem --------------------------------------------------------------
-echo [3/6] Building the shared data library and copying it to the client...
+echo [3/7] Building the shared data library and copying it to the client...
 cd /d "%ROOT%RoRebuildServer\RebuildSharedData"
 dotnet build -c Release --property WarningLevel=0
 if errorlevel 1 goto :build_failed
@@ -92,7 +92,7 @@ if errorlevel 1 goto :copy_failed
 echo.
 
 rem --------------------------------------------------------------
-echo [4/6] Exporting the server data to the client...
+echo [4/7] Exporting the server data to the client...
 cd /d "%ROOT%RoRebuildServer\DataToClientUtility"
 dotnet build -c Release --property WarningLevel=0
 if errorlevel 1 goto :build_failed
@@ -102,7 +102,18 @@ if errorlevel 1 goto :export_failed
 echo.
 
 rem --------------------------------------------------------------
-echo [5/6] Opening the network so a phone can reach the server...
+echo [5/7] Building the server...
+rem Built here rather than left to the dotnet run below, so that a compile error
+rem stops this window with the loud message at the bottom instead of scrolling
+rem past in a server window nobody was watching. It cost a round of "it pulled
+rem fine and then nothing happened" to learn that.
+cd /d "%ROOT%RoRebuildServer\RoRebuildServer"
+dotnet build --property WarningLevel=0
+if errorlevel 1 goto :build_failed
+echo.
+
+rem --------------------------------------------------------------
+echo [6/7] Opening the network so a phone can reach the server...
 rem The server listens on every network card now, but Windows still drops the
 rem connection at the firewall unless it has been told not to. Adding the rule
 rem needs administrator rights; without them this quietly does nothing and only
@@ -132,7 +143,7 @@ set "LANIP=%LANIP: =%"
 echo.
 
 rem --------------------------------------------------------------
-echo [6/6] Starting the server...
+echo [7/7] Starting the server...
 rem netstat is asked for the exact port so that a stray 15000 or 50001 does not
 rem read as a server already being up
 set "STALESERVER="
@@ -141,7 +152,10 @@ if not errorlevel 1 (
     set "STALESERVER=1"
     echo   Something is already listening on port 5000, so it is left alone.
 ) else (
-    start "RoRebuild Server" /d "%ROOT%RoRebuildServer\RoRebuildServer" cmd /k dotnet run
+    rem --launch-profile is named rather than left to chance. The IIS Express
+    rem profile in launchSettings.json breaks websockets, and this must never
+    rem pick it up because somebody reordered the file.
+    start "RoRebuild Server" /d "%ROOT%RoRebuildServer\RoRebuildServer" cmd /k dotnet run --launch-profile RoRebuildServer
     echo   Opened in a window of its own.
     echo   Wait there for: Now listening on: http://localhost:5000
 )
