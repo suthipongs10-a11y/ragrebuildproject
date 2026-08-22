@@ -26,7 +26,7 @@ namespace Assets.Scripts.UI.Crafting
     /// </summary>
     public class ForgeWindow : WindowBase
     {
-        private const float Width = 560f;
+        private const float Width = 664f;
         private const float Height = 470f;
         private const float Pad = 8f;
 
@@ -43,6 +43,26 @@ namespace Assets.Scripts.UI.Crafting
         private const float ToolHeight = 62f;
         private const float PickRowHeight = 26f;
         private const float PickGap = 4f;
+
+        /// <summary>
+        /// The column the picker buttons start in, leaving the label to the left of it.
+        ///
+        /// Wide enough for "ธาตุ (ต้องมี Weapon Binding)", which is the longest thing that
+        /// ever goes there, so the buttons never start under their own label.
+        /// </summary>
+        private const float PickLabelWidth = 176f;
+
+        /// <summary>"ไม่ใส่", which is narrower than a stone's name.</summary>
+        private const float NoStoneWidth = 60f;
+
+        /// <summary>
+        /// One stone button. "Mystic Frozen" is the longest of the four and wrapped onto two
+        /// lines at anything less, which is what pushed "Great Nature" off the window.
+        /// </summary>
+        private const float StoneWidth = 96f;
+
+        /// <summary>A star crumb count, which is one digit.</summary>
+        private const float CrumbWidth = 40f;
 
         /// <summary>Where the icon sits on a row.</summary>
         private const float IconInset = 10f;
@@ -300,11 +320,13 @@ namespace Assets.Scripts.UI.Crafting
                 ForgeState.CanBindElement ? "ธาตุ" : "ธาตุ (ต้องมี Weapon Binding)",
                 ModernUiTheme.SizeSmall, ModernUiTheme.LabelColor, TextAlignmentOptions.Left);
             elementLabel.textWrappingMode = TextWrappingModes.NoWrap;
+            elementLabel.overflowMode = TextOverflowModes.Ellipsis;
             ModernUiTheme.Place(elementLabel.rectTransform, new Vector2(0, 1),
-                new Vector2(0f, 0f), new Vector2(200f, PickRowHeight));
+                new Vector2(0f, 0f), new Vector2(PickLabelWidth - PickGap, PickRowHeight));
 
-            var x = 190f;
-            AddPick(0f, "ไม่ใส่", pickedStone == 0, true, () => { pickedStone = 0; Redraw(); }, 62f, ref x);
+            var x = PickLabelWidth;
+            AddPick(0f, "ไม่ใส่", pickedStone == 0, true, () => { pickedStone = 0; Redraw(); },
+                NoStoneWidth, ref x);
 
             foreach (var stone in ForgeState.Stones)
             {
@@ -312,30 +334,35 @@ namespace Assets.Scripts.UI.Crafting
                 var name = data != null ? data.Name : stone.ToString();
                 var id = stone;
                 AddPick(0f, name, pickedStone == id, ForgeState.CanBindElement,
-                    () => { pickedStone = id; Redraw(); }, 84f, ref x);
+                    () => { pickedStone = id; Redraw(); }, StoneWidth, ref x);
             }
 
             var crumbLabel = ModernUiTheme.CreateText(tools, "CrumbLabel", "Star Crumb",
                 ModernUiTheme.SizeSmall, ModernUiTheme.LabelColor, TextAlignmentOptions.Left);
             crumbLabel.textWrappingMode = TextWrappingModes.NoWrap;
             ModernUiTheme.Place(crumbLabel.rectTransform, new Vector2(0, 1),
-                new Vector2(0f, -(PickRowHeight + PickGap)), new Vector2(200f, PickRowHeight));
+                new Vector2(0f, -(PickRowHeight + PickGap)), new Vector2(PickLabelWidth - PickGap, PickRowHeight));
 
-            var crumbX = 190f;
+            var crumbX = PickLabelWidth;
             for (var i = 0; i <= ForgeState.MaxStarCrumbs; i++)
             {
                 var count = i;
                 AddPick(-(PickRowHeight + PickGap), count.ToString(), pickedCrumbs == count, true,
-                    () => { pickedCrumbs = count; Redraw(); }, 42f, ref crumbX);
+                    () => { pickedCrumbs = count; Redraw(); }, CrumbWidth, ref crumbX);
             }
 
-            //Only the last one is worth saying out loud, because it is the one that does not
-            //follow from the others: the third crumb is worth far more than the first two.
-            var hint = ModernUiTheme.CreateText(tools, "CrumbHint", "3 ก้อน = ATK +40",
+            //All three, not just the third. The jump at three is the interesting one, but a
+            //player weighing one crumb against the odds it costs needs the other two numbers
+            //to weigh it against, and the name is spelled out so the row says what it is
+            //buying rather than only how much.
+            var hint = ModernUiTheme.CreateText(tools, "CrumbHint",
+                "Star Crumb  1 = ATK+5  ·  2 = +10  ·  3 = +40",
                 ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor, TextAlignmentOptions.Left);
             hint.textWrappingMode = TextWrappingModes.NoWrap;
+            hint.overflowMode = TextOverflowModes.Ellipsis;
             ModernUiTheme.Place(hint.rectTransform, new Vector2(0, 1),
-                new Vector2(crumbX + 8f, -(PickRowHeight + PickGap)), new Vector2(160f, PickRowHeight));
+                new Vector2(crumbX + 10f, -(PickRowHeight + PickGap)),
+                new Vector2(Width - Pad * 2f - crumbX - 12f, PickRowHeight));
         }
 
         /// <summary>One button on a picker row, laid out left to right as they are added.</summary>
@@ -366,9 +393,9 @@ namespace Assets.Scripts.UI.Crafting
                 case CharacterSkill.IronTempering: return "ถลุงเหล็ก";
                 case CharacterSkill.SteelTempering: return "ถลุงเหล็กกล้า";
                 case CharacterSkill.EnchantedStoneCraft: return "คราฟหินธาตุ";
-                case CharacterSkill.SmithBladeWeapon: return "ตีอาวุธมีคม";
-                case CharacterSkill.SmithBluntWeapon: return "ตีอาวุธทู่";
-                case CharacterSkill.SmithPiercingWeapon: return "ตีอาวุธแทง";
+                case CharacterSkill.SmithBladeWeapon: return "ตีดาบ มีด";
+                case CharacterSkill.SmithBluntWeapon: return "ตีกระบอง ขวาน";
+                case CharacterSkill.SmithPiercingWeapon: return "ตีหอก";
                 default: return "ตีเหล็ก";
             }
         }
