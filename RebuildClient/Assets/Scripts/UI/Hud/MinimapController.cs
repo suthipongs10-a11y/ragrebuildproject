@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts.PlayerControl;
 using RebuildSharedData.Enum;
@@ -386,7 +386,7 @@ namespace Assets.Scripts.UI.Hud
 
             if (!loadWalk.IsDone || !loadWalk.IsValid() || !loadMap.IsDone || !loadMap.IsValid())
             {
-                Debug.LogWarning("Could not load minimap.");
+                Debug.LogWarning("โหลดมินิแมพไม่สำเร็จ");
                 yield break; //give up
             }
 

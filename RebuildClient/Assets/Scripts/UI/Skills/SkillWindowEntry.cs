@@ -1,5 +1,6 @@
 ﻿using System;
 using RebuildSharedData.ClientTypes;
+using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
 using TMPro;
 using UnityEngine;
@@ -82,13 +83,17 @@ namespace Assets.Scripts.UI
 
             if (data.Target == SkillTarget.Passive)
             {
-                SPCost.text = CurrentLevel > 0 ? "Passive" : "";
+                //The crafting skills are passive in the data and open the forge when pressed,
+                //so calling them passive here would be telling the player not to press them.
+                SPCost.text = CurrentLevel > 0
+                    ? (CraftingSkills.IsCraftingSkill(SkillId) ? "กดเพื่อเปิด" : "พาสซีฟ")
+                    : "";
                 return;
             }
 
             if (data.SpCost == null)
             {
-                SPCost.text = "Sp: ???";
+                SPCost.text = "SP: ???";
                 return;
             }
 
@@ -96,10 +101,10 @@ namespace Assets.Scripts.UI
             if (level > 0)
             {
                 var spCost = data.SpCost[level - 1];
-                SPCost.text = CurrentLevel > 0 && spCost > 0 ? $"Sp: {spCost}" : "";
+                SPCost.text = CurrentLevel > 0 && spCost > 0 ? $"SP: {spCost}" : "";
             }
             else
-                SPCost.text = "Sp: 0";
+                SPCost.text = "SP: 0";
         }
 
         public void UpdateLevelUpButton(bool hasPointsToSpend, bool isAllowedToSpendPoints)

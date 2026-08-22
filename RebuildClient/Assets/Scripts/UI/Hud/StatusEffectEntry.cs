@@ -75,7 +75,7 @@ namespace Assets.Scripts.UI.Hud
             if (!string.IsNullOrEmpty(desc))
             {
                 if (CanCancel)
-                    desc += "\n<size=-6>(Shift-Right Click to Remove)";
+                    desc += "\n<size=-6>(Shift + คลิกขวา เพื่อยกเลิก)";
                 UiManager.Instance.ShowTooltip(gameObject, desc);
                 return;
             }
