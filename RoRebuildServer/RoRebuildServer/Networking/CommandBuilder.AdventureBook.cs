@@ -144,7 +144,14 @@ public static partial class CommandBuilder
         NetworkManager.SendMessage(packet, player.Connection);
     }
 
-    /// <summary>One page that moved, so a star landing does not cost a whole book.</summary>
+    /// <summary>
+    /// One page that moved, sent on every kill that counts towards it.
+    /// </summary>
+    /// <remarks>
+    /// Everything in here is read from a cached flag rather than counted, because this runs
+    /// once per kill per player: working the star total out properly means walking every page
+    /// in the book, which is fine when a star lands and absurd on a path this hot.
+    /// </remarks>
     public static void SendAdventureBookPage(Player player, AdventureBookEntry entry)
     {
         if (player.Connection == null)
@@ -156,7 +163,7 @@ public static partial class CommandBuilder
         packet.Write(AdventureBookProgress.GetKills(player, entry));
         packet.Write((byte)AdventureBookProgress.GetStars(player, entry));
         packet.Write((byte)AdventureBookProgress.GetRank(player));
-        packet.Write((short)AdventureBookProgress.CountStars(player));
+        packet.Write((short)AdventureBookProgress.CachedStars(player));
 
         NetworkManager.SendMessage(packet, player.Connection);
     }

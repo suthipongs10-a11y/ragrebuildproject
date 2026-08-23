@@ -186,20 +186,24 @@ public static class AdventureBookProgress
 
         player.SetNpcFlag(entry.ProgressFlag, (kills << StarShift) | (int)(stars | earned));
 
-        if (earned == AdventureBookStars.None)
-            return;
+        if (earned != AdventureBookStars.None)
+        {
+            if ((earned & AdventureBookStars.Hunt) != 0)
+                GiveReward(player, entry, AdventureBookStars.Hunt);
+            if ((earned & AdventureBookStars.HuntLarge) != 0)
+                GiveReward(player, entry, AdventureBookStars.HuntLarge);
 
-        if ((earned & AdventureBookStars.Hunt) != 0)
-            GiveReward(player, entry, AdventureBookStars.Hunt);
-        if ((earned & AdventureBookStars.HuntLarge) != 0)
-            GiveReward(player, entry, AdventureBookStars.HuntLarge);
+            //A page whose last star was a hunting one finishes a region just as surely as a card.
+            CheckRegionComplete(player, entry.Region);
+            RefreshRank(player);
+        }
 
-        //A page whose last star was a hunting one finishes a region just as surely as a card.
-        CheckRegionComplete(player, entry.Region);
-        RefreshRank(player);
-
-        //Only when something actually moved. Sending on every kill would put a packet per
-        //monster per player on the wire for a window most of them do not have open.
+        //Sent on every kill, not only when a star lands. It was the other way round at first,
+        //on the reasoning that a packet per kill is waste for a window most people do not have
+        //open - but a counter that only moves at 100 and 300 is indistinguishable from a
+        //counter that is broken, and that is what it looked like. The packet is ten bytes and
+        //everything in it is read from a cached flag, so there is no walk of the book behind
+        //it either.
         CommandBuilder.SendAdventureBookPage(player, entry);
     }
 
@@ -276,6 +280,16 @@ public static class AdventureBookProgress
     private const string RankFlag = "abrank";
 
     /// <summary>
+    /// The star count, cached beside the rank.
+    /// </summary>
+    /// <remarks>
+    /// Counted the same way and for the same reason: the window's header wants it on every
+    /// kill, and working it out means walking every page in the book. Stored one higher than
+    /// it is so a zero means nobody has counted rather than meaning no stars.
+    /// </remarks>
+    private const string StarFlag = "abstars";
+
+    /// <summary>
     /// A player's adventure rank, counted once and then remembered.
     /// </summary>
     /// <remarks>
@@ -285,6 +299,18 @@ public static class AdventureBookProgress
     /// business being slow. It is recounted at the only moment it can change, which is when a
     /// star is awarded.
     /// </remarks>
+    /// <summary>The star count without walking the book, for anything on a per kill path.</summary>
+    public static int CachedStars(Player player)
+    {
+        var stored = player.GetNpcFlag(StarFlag);
+        if (stored > 0)
+            return stored - 1;
+
+        var stars = CountStars(player);
+        player.SetNpcFlag(StarFlag, stars + 1);
+        return stars;
+    }
+
     public static int GetRank(Player player)
     {
         var stored = player.GetNpcFlag(RankFlag);
@@ -295,8 +321,9 @@ public static class AdventureBookProgress
         //before the rank did. Counted and written down, but nothing is rebuilt from here:
         //this is reached from inside UpdateStats, and asking UpdateStats to run again from
         //the middle of itself is a mess whether or not it terminates.
-        var rank = Count(player);
+        var (rank, stars) = Count(player);
         player.SetNpcFlag(RankFlag, rank + 1);
+        player.SetNpcFlag(StarFlag, stars + 1);
         return rank;
     }
 
@@ -309,7 +336,9 @@ public static class AdventureBookProgress
     /// </remarks>
     public static int RefreshRank(Player player)
     {
-        var rank = Count(player);
+        var (rank, stars) = Count(player);
+        player.SetNpcFlag(StarFlag, stars + 1);
+
         var stored = player.GetNpcFlag(RankFlag);
         if (stored == rank + 1)
             return rank;
@@ -326,8 +355,11 @@ public static class AdventureBookProgress
         return rank;
     }
 
-    private static int Count(Player player) =>
-        AdventureBookRank.RankFor(CountStars(player), HasEveryRegion(player));
+    private static (int Rank, int Stars) Count(Player player)
+    {
+        var stars = CountStars(player);
+        return (AdventureBookRank.RankFor(stars, HasEveryRegion(player)), stars);
+    }
 
     /// <summary>Whether every region in the book has been finished, which is the last rank.</summary>
     public static bool HasEveryRegion(Player player)

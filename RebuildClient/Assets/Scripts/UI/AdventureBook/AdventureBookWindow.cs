@@ -208,7 +208,7 @@ namespace Assets.Scripts.UI.AdventureBook
                 var index = i;
                 var row = NewRow(y, region.Complete ? DoneColor : ModernUiTheme.NameColor,
                     region.Name,
-                    region.Complete ? "ครบแล้ว ✔" : $"{done}/{region.Pages.Count} หน้า",
+                    region.Complete ? "ครบแล้ว" : $"{done}/{region.Pages.Count} หน้า",
                     () => { view = View.Pages; regionIndex = index; Redraw(); });
 
                 rows.Add(row);
@@ -228,7 +228,7 @@ namespace Assets.Scripts.UI.AdventureBook
             }
 
             var region = AdventureBookState.Regions[regionIndex];
-            rows.Add(NewRow(y, ModernUiTheme.AccentInkColor, "◀ ย้อนกลับ", region.Name,
+            rows.Add(NewRow(y, ModernUiTheme.AccentInkColor, "< ย้อนกลับ", region.Name,
                 () => { view = View.Regions; Redraw(); }));
             y += RowHeight + RowGap;
 
@@ -237,8 +237,10 @@ namespace Assets.Scripts.UI.AdventureBook
                 var id = page.PageId;
                 var target = page.HasHunt ? page.HuntTargetLarge : page.HuntTarget;
                 var row = NewRow(y, page.IsComplete ? DoneColor : ModernUiTheme.NameColor,
-                    $"{Stars(page)}  {page.Name}",
-                    page.IsComplete ? "ครบแล้ว" : $"{page.Kills:N0}/{target:N0}",
+                    page.Name,
+                    page.IsComplete
+                        ? $"ครบ {page.MaxStars} ดาว"
+                        : $"{page.StarCount}/{page.MaxStars} ดาว  ·  {page.Kills:N0}/{target:N0}",
                     () => { view = View.Page; pageId = id; Redraw(); });
 
                 rows.Add(row);
@@ -257,7 +259,7 @@ namespace Assets.Scripts.UI.AdventureBook
                 return DrawPages();
             }
 
-            rows.Add(NewRow(y, ModernUiTheme.AccentInkColor, "◀ ย้อนกลับ", $"{page.Name}  Lv {page.Level}",
+            rows.Add(NewRow(y, ModernUiTheme.AccentInkColor, "< ย้อนกลับ", $"{page.Name}  Lv {page.Level}",
                 () => { view = View.Pages; Redraw(); }));
             y += RowHeight + RowGap;
 
@@ -270,25 +272,27 @@ namespace Assets.Scripts.UI.AdventureBook
             }
 
             rows.Add(NewRow(y, page.HasHunt ? EarnedColor : ModernUiTheme.MutedColor,
-                page.HasHunt ? "★ สำเร็จ" : "★",
+                page.HasHunt ? "ดาว 1  สำเร็จ" : "ดาว 1",
                 $"{Mathf.Min(page.Kills, page.HuntTarget):N0}/{page.HuntTarget:N0}", null));
             y += RowHeight + RowGap;
 
             rows.Add(NewRow(y, page.HasHuntLarge ? EarnedColor : ModernUiTheme.MutedColor,
-                page.HasHuntLarge ? "★★ สำเร็จ" : "★★",
+                page.HasHuntLarge ? "ดาว 2  สำเร็จ" : "ดาว 2",
                 $"{Mathf.Min(page.Kills, page.HuntTargetLarge):N0}/{page.HuntTargetLarge:N0}", null));
             y += RowHeight + RowGap;
 
             var cardLine = page.CardItemId <= 0
-                ? "มอนตัวนี้ไม่ดรอปการ์ด"
-                : page.HasCard ? "★★★ สำเร็จ" : "★★★ ต้องมีการ์ดของมอนตัวนี้";
-            rows.Add(NewRow(y, page.HasCard ? EarnedColor : ModernUiTheme.MutedColor, cardLine, "", null));
+                ? "ไม่ดรอปการ์ด หน้านี้จบที่ 2 ดาว"
+                : page.HasCard ? "ดาว 3  สำเร็จ" : "ดาว 3";
+            var cardValue = page.CardItemId <= 0 || page.HasCard ? "" : "ต้องมีการ์ด";
+            rows.Add(NewRow(y, page.HasCard ? EarnedColor : ModernUiTheme.MutedColor, cardLine, cardValue, null));
             y += RowHeight + RowGap;
 
             if (page.Sightings == null || page.Sightings.Count == 0)
                 return y + Pad;
 
-            rows.Add(NewRow(y, ModernUiTheme.LabelColor, "เจอที่", page.HasHunt ? "" : "ต้องได้ ★ ก่อนถึงเดินทางได้", null));
+            rows.Add(NewRow(y, ModernUiTheme.LabelColor, "เจอที่",
+                page.HasHunt ? "" : "ต้องได้ดาว 1 ก่อนถึงเดินทางได้", null));
             y += RowHeight + RowGap;
 
             foreach (var sighting in page.Sightings)
@@ -311,16 +315,6 @@ namespace Assets.Scripts.UI.AdventureBook
             }
 
             return y + Pad;
-        }
-
-        private static string Stars(AdventureBookPage page)
-        {
-            var earned = page.StarCount;
-            var max = page.MaxStars;
-            var s = "";
-            for (var i = 0; i < max; i++)
-                s += i < earned ? "★" : "☆";
-            return s;
         }
 
         /// <summary>
