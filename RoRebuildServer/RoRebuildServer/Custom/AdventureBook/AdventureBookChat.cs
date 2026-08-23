@@ -35,6 +35,12 @@ public static class AdventureBookChat
             return true;
         }
 
+        //Swept every time somebody looks, which catches cards that were already in a bag
+        //before any of this existed as well as any route in that skips AddItemToInventory.
+        var newCards = AdventureBookProgress.ScanInventoryForCards(player);
+        if (newCards > 0)
+            AdventureBookProgress.Announce(player, $"<color=#66FFAA>พบการ์ดในกระเป๋าที่ยังไม่ได้บันทึก {newCards} ใบ บันทึกให้แล้ว</color>");
+
         var search = text.Length > Prefix.Length ? text.Substring(Prefix.Length).Trim() : string.Empty;
 
         if (search.Length > 0)

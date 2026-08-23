@@ -1,4 +1,4 @@
-Item("Memory_Book") { OnEquip: AddStat(AddInt, 1); }
+﻿Item("Memory_Book") { OnEquip: AddStat(AddInt, 1); }
 Item("Holy_Guard") { OnEquip: AddStat(AddVit, 2); }
 Item("Sacred_Mission") { OnEquip: AddStat(AddInt, 2); AddStat(AddVit, 3); }
 Item("Novice_Shield") { OnEquip: AddStat(AddResistElementPoison, 20); AddStat(AddResistElementHoly, 20); AddStat(AddResistElementDark, 20); AddStat(AddResistElementGhost, 20); AddStat(AddResistElementUndead, 20); AddStat(AddResistElementWater, 20); AddStat(AddResistElementEarth, 20); AddStat(AddResistElementFire, 20); AddStat(AddResistElementWind, 20); }
@@ -193,7 +193,7 @@ Item("Succubus_Horn") { OnEquip: AddStat(AddInt, 1); }
 Item("Sombrero") { OnEquip: AddStat(AddAgi, 1); }
 Item("Evil_Wing_Ears") { OnEquip: AddStat(AddStr, 1); }
 Item("Kitsune_Mask") { OnEquip: AddStat(AddAgi, 1); AddStat(AddLuk, 1); }
-Item("Hot-Blooded_Headband") { OnEquip: AddStat(AddStr, 2); }
+Item("Hot-Blooded_Headband") { OnEquip: AddStat(AddStr, 3); AddStat(AddResistElementFire, 15); } //adventure book: Magma Dungeon
 Item("Indian_Headband") { OnEquip: AddStat(AddDex, 1); }
 Item("Incubus_Horn") { OnEquip: AddStat(AddAgi, 1); }
 Item("Model_Training_Hat") { OnEquip: AddStat(AddDex, 2); }
@@ -510,3 +510,33 @@ Item("Ice_Pick_") { OnEquip: AddStat(ReverseDefense, 1); }
 
 Item("Decorative_Mushroom") { OnEquip: AddDamageVsTag("Fungus", 10); }
 Item("Silver_Arrow") { OnEquip: AddDamageVsTag("WeakToSilver", 100); }
+
+
+//Adventure book region rewards. Every one of these is an item nothing else in the game hands
+//out, and every one of them was a bare hat with a point or two of defence and no effect at
+//all - which is not worth the thousands of kills the book asks for. The bonuses lean on what
+//the region is: fire resistance out of the magma, undead resistance out of the pyramid, a
+//scholar's hat out of the city of scholars.
+Item("Detective's_Cap") { OnEquip: AddStat(AddDex, 2); } //Prontera Culverts
+Item("Flower_Hairpin") { OnEquip: AddStat(AddInt, 2); AddStat(AddMaxSp, 30); } //Prontera Fields
+Item("Cowboy_Hat") { OnEquip: AddStat(AddDex, 2); AddStat(AddResistElementFire, 5); } //Morroc Fields
+Item("Ayam") { OnEquip: AddStat(AddInt, 2); AddStat(AddResistElementUndead, 5); } //Payon Fields
+Item("Novice_Eggshell") { OnEquip: AddStat(AddVit, 2); AddStat(AddResistRaceInsect, 10); } //Ant Hell
+Item("Bucket_Hat") { OnEquip: AddStat(AddResistElementWater, 15); } //Izlude Bailan Cave
+Item("Orc_Helm_") { OnEquip: AddStat(AddStr, 2); AddStat(AddResistRaceDemihuman, 5); } //Orc Dungeon
+Item("Wonder_Nutshell") { OnEquip: AddStat(AddVit, 3); } //Mt. Mjolnir
+Item("Bulb_Band") { OnEquip: AddStat(AddInt, 3); AddStat(AddMaxSp, 50); } //Geffen Fields
+Item("Candle") { OnEquip: AddStat(AddResistElementDark, 15); AddStat(ResistBlindStatus, 30); } //Mjolnir Dead Pit
+Item("Banana_Hat") { OnEquip: AddStat(AddResistRacePlant, 15); } //Forest Labyrinth
+Item("Holiday_Hat") { OnEquip: AddStat(AddLuk, 3); } //Lutie
+Item("Ph.D_Hat_") { OnEquip: AddStat(AddInt, 3); AddStat(AddMaxSp, 80); } //Yuno Fields
+Item("Magistrate_Hat") { OnEquip: AddStat(AddResistElementUndead, 15); } //Payon Dungeon
+Item("Pirate_Dagger") { OnEquip: AddStat(AddAgi, 2); AddStat(AddLuk, 2); } //Comodo
+Item("Dark_Bacilium") { OnEquip: AddStat(AddResistElementDark, 20); AddStat(AddResistRaceDemon, 5); } //Geffen Dungeon
+Item("Mythical_Lion_Mask") { OnEquip: AddStat(AddStr, 3); AddStat(AddResistElementEarth, 10); } //Sphinx
+Item("Red_Bonnet") { OnEquip: AddStat(AddResistElementWater, 20); } //Sunken Ship
+Item("Cross_Hat") { OnEquip: AddStat(AddResistElementUndead, 20); AddStat(AddResistRaceUndead, 10); } //Pyramid
+Item("Golden_Gear_") { OnEquip: AddStat(AddDef, 3); AddStat(AddResistRaceFormless, 10); } //Clock Tower
+Item("Bride_Mask") { OnEquip: AddStat(AddAgi, 3); AddStat(AddResistElementGhost, 10); } //Amatsu
+Item("Opera_Phantom_Mask") { OnEquip: AddStat(AddInt, 3); AddStat(AddDex, 3); AddStat(AddResistElementDark, 10); } //Glast Heim
+Item("Spiky_Band_") { OnEquip: AddStat(AddStr, 3); AddStat(AddVit, 3); } //Turtle Island

@@ -42,6 +42,14 @@ public class AdventureBookRegion
 {
     public required string Name { get; init; }
     public required string RewardHeadgear { get; init; }
+
+    /// <summary>
+    /// The npc flag remembering that this region's headgear has been handed over. Built from
+    /// the name rather than a position in a list, so reordering the regions or adding one in
+    /// the middle cannot silently point a player's record at a different place.
+    /// </summary>
+    public required string CompletionFlag { get; init; }
+
     public List<AdventureBookEntry> Entries { get; } = new();
 
     public int AverageLevel => Entries.Count == 0 ? 0 : (int)Entries.Average(e => e.Level);
@@ -53,6 +61,9 @@ public static class AdventureBook
 {
     public static readonly List<AdventureBookRegion> Regions = new();
     public static readonly Dictionary<int, AdventureBookEntry> EntriesByMonsterId = new();
+
+    /// <summary>Card item id to the page it completes, so gaining one is a single lookup.</summary>
+    public static readonly Dictionary<int, AdventureBookEntry> EntriesByCardId = new();
 
     public static bool IsBuilt { get; private set; }
     public static int StarTotal { get; private set; }
@@ -138,6 +149,7 @@ public static class AdventureBook
     {
         Regions.Clear();
         EntriesByMonsterId.Clear();
+        EntriesByCardId.Clear();
         StarTotal = 0;
         IsBuilt = false;
 
@@ -221,7 +233,12 @@ public static class AdventureBook
                     continue;
                 }
 
-                regionLookup[region] = bookRegion = new AdventureBookRegion { Name = region, RewardHeadgear = headgear };
+                regionLookup[region] = bookRegion = new AdventureBookRegion
+                {
+                    Name = region,
+                    RewardHeadgear = headgear,
+                    CompletionFlag = "abr" + region.Replace(" ", "").Replace(".", "")
+                };
             }
 
             var spawnCount = sightings.TryGetValue(code, out var seen) ? seen.Sum(s => s.Count) : 0;
@@ -246,6 +263,11 @@ public static class AdventureBook
 
             bookRegion.Entries.Add(entry);
             EntriesByMonsterId[entry.MonsterId] = entry;
+
+            //Two monsters sharing a card would make the first of them the only one that could
+            //be completed by holding it, so the collision is said out loud rather than hidden.
+            if (entry.CardItemId > 0 && !EntriesByCardId.TryAdd(entry.CardItemId, entry))
+                ServerLogger.LogWarning($"[AdventureBook] {entry.Name} and {EntriesByCardId[entry.CardItemId].Name} both drop item {entry.CardItemId}, so only one page can be filled by it.");
         }
 
         foreach (var region in regionLookup.Values)

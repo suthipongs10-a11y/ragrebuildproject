@@ -532,7 +532,15 @@ public class Player : IEntityAutoReset
     public int AddItemToInventory(ItemReference item)
     {
         Inventory ??= CharacterBag.Borrow();
-        return Inventory.AddItem(item);
+        var result = Inventory.AddItem(item);
+
+        //The one place every item entering a bag passes through, so a card fills in its page
+        //whether it was picked up, traded for, bought off the market or pulled out of
+        //storage. Loading a saved inventory does not come through here, which is what we
+        //want: it rebuilds the bag wholesale rather than gaining anything.
+        Custom.AdventureBook.AdventureBookProgress.OnItemGained(this, item.Id);
+
+        return result;
     }
 
     public bool CanPickUpItem(ItemReference item)
