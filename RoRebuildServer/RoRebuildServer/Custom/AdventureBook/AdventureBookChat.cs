@@ -54,8 +54,12 @@ public static class AdventureBookChat
     private static void ShowSummary(Player player)
     {
         var stars = AdventureBookProgress.CountStars(player);
+        var rank = AdventureBookRank.RankFor(stars, AdventureBookProgress.HasEveryRegion(player));
+        var nextRank = AdventureBookRank.StarsForNextRank(rank);
+        var toNext = nextRank > 0 ? $"  (อีก {nextRank - stars:N0} ดาวถึงระดับ {rank + 1})" : string.Empty;
+
         AdventureBookProgress.Announce(player,
-            $"<color=#66FFAA>สมุดผจญภัย: {stars} ดาว จาก {AdventureBook.StarTotal}</color>");
+            $"<color=#66FFAA>สมุดผจญภัย: {stars} ดาว จาก {AdventureBook.StarTotal}  ·  Adventure ระดับ {rank}</color>{toNext}");
 
         //Whatever is closest to its next star, because that is what somebody asking is
         //deciding whether to go back for. A page never touched has nothing to say yet.

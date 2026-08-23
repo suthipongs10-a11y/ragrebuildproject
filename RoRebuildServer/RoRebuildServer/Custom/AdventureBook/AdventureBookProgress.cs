@@ -201,39 +201,75 @@ public static class AdventureBookProgress
     /// what it costs to kill. Nothing here pays zeny on purpose: money can be earned any
     /// number of ways already, and the point of the book is to hand over things that cannot.
     /// </remarks>
-    private static (Reward hunt, Reward huntLarge) RewardsForLevel(int level) => level switch
+    private static (Reward hunt, Reward huntLarge, Reward card) RewardsForLevel(int level) => level switch
     {
-        < 30 => (new Reward("Concentration_Potion", 5), new Reward("Old_Blue_Box", 1)),
-        < 60 => (new Reward("Awakening_Potion", 5), new Reward("Old_Blue_Box", 2)),
-        _ => (new Reward("Berserk_Potion", 5), new Reward("Old_Violet_Box", 1))
+        < 30 => (new Reward("Concentration_Potion", 5), new Reward("Old_Blue_Box", 1), new Reward("Old_Card_Album", 1)),
+        < 60 => (new Reward("Awakening_Potion", 5), new Reward("Old_Blue_Box", 2), new Reward("Old_Card_Album", 1)),
+        _ => (new Reward("Berserk_Potion", 5), new Reward("Old_Violet_Box", 1), new Reward("Old_Card_Album", 2))
     };
 
     private static void GiveReward(Player player, AdventureBookEntry entry, AdventureBookStars star)
     {
-        var (hunt, huntLarge) = RewardsForLevel(entry.Level);
+        var (hunt, huntLarge, card) = RewardsForLevel(entry.Level);
         var reward = star switch
         {
             AdventureBookStars.Hunt => hunt,
             AdventureBookStars.HuntLarge => huntLarge,
+            AdventureBookStars.Card => card,
             _ => default
         };
 
-        var target = star == AdventureBookStars.Hunt ? entry.HuntTarget : entry.HuntTargetLarge;
-        var stars = star == AdventureBookStars.Hunt ? "★" : "★★";
+        var line = star switch
+        {
+            AdventureBookStars.Hunt => $"สมุดผจญภัย ★ กำจัด {entry.Name} ครบ {entry.HuntTarget:N0} ตัว",
+            AdventureBookStars.HuntLarge => $"สมุดผจญภัย ★★ กำจัด {entry.Name} ครบ {entry.HuntTargetLarge:N0} ตัว",
+            AdventureBookStars.Card => $"สมุดผจญภัย ★★★ บันทึกการ์ดของ {entry.Name} แล้ว",
+            _ => $"สมุดผจญภัย {entry.Name}"
+        };
 
         if (!string.IsNullOrEmpty(reward.Code) && DataManager.ItemIdByName.TryGetValue(reward.Code, out var itemId))
         {
             player.CreateItemInInventory(new ItemReference(itemId, reward.Count));
             var itemName = DataManager.GetItemInfoById(itemId)?.Name ?? reward.Code;
-            Announce(player, $"<color=#66FFAA>สมุดผจญภัย {stars} กำจัด {entry.Name} ครบ {target:N0} ตัว — ได้รับ {itemName} x{reward.Count}</color>");
+            Announce(player, $"<color=#66FFAA>{line} — ได้รับ {itemName} x{reward.Count}</color>");
         }
         else
         {
             //Said out loud rather than swallowed: a star that pays nothing is a content bug,
             //and the player should still be told their star was recorded.
             ServerLogger.LogWarning($"[AdventureBook] The reward '{reward.Code}' for {entry.Name} is not an item, so nothing was given.");
-            Announce(player, $"<color=#66FFAA>สมุดผจญภัย {stars} กำจัด {entry.Name} ครบ {target:N0} ตัว</color>");
+            Announce(player, $"<color=#66FFAA>{line}</color>");
         }
+
+        //Only the third star reaches the whole server. It is the one that needs a card, and a
+        //card is a tenth of a percent of a kill - rare enough that hearing about somebody
+        //else's reads as news rather than as noise. Announcing the hunting stars as well
+        //would put a line on every screen every few minutes and teach everyone to ignore them.
+        if (star == AdventureBookStars.Card)
+            AnnounceThirdStar(player, entry);
+    }
+
+    private static void AnnounceThirdStar(Player player, AdventureBookEntry entry)
+    {
+        var stars = CountStars(player);
+        var rank = AdventureBookRank.RankFor(stars, HasEveryRegion(player));
+
+        ServerAnnouncements.Announce($"ยินดีด้วย {player.Name} [Adventure ระดับ {rank}] ทำเควสระดับ 3 ดาว ของ {entry.Name} สำเร็จ !");
+    }
+
+    /// <summary>Whether every region in the book has been finished, which is the last rank.</summary>
+    public static bool HasEveryRegion(Player player)
+    {
+        if (AdventureBook.Regions.Count == 0)
+            return false;
+
+        foreach (var region in AdventureBook.Regions)
+        {
+            if (player.GetNpcFlag(region.CompletionFlag) == 0)
+                return false;
+        }
+
+        return true;
     }
 
     internal static void Announce(Player player, string message)

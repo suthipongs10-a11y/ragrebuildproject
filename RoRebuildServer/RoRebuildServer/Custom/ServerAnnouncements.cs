@@ -99,13 +99,44 @@ public class ServerAnnouncements : ServerConfigScriptHandlerBase
         if (!DataManager.MonsterIdLookup.TryGetValue(item.DropSourceMonsterId, out var source))
             return;
 
+        var count = item.Type == ItemType.UniqueItem ? 1 : item.Item.Count;
+        var odds = FormatDropChance(source.Code, itemId);
+
         //The contributor is who the drop was held for, which is who actually made the kill.
         //Somebody else bending down for it after the hold expires still gets their name in
         //gold, but not credit for a kill that was not theirs.
         if (item.ContributorId == picker.Id)
-            Announce($"{picker.Name} กำจัด {source.Name} ได้รับ {info.Name} !");
+            Announce($"{picker.Name} กำจัด {source.Name} ได้รับ {info.Name} x {count}{odds}");
         else
-            Announce($"{picker.Name} ได้รับ {info.Name} จาก {source.Name} !");
+            Announce($"{picker.Name} ได้รับ {info.Name} x {count} จาก {source.Name}{odds}");
+    }
+
+    /// <summary>
+    /// The odds the server actually rolls this drop on, ready to append to a line.
+    /// </summary>
+    /// <remarks>
+    /// Read out of the loaded drop table rather than the csv, so it is the number after
+    /// DropRateRemapping and any config script have had their say - which is the number that
+    /// was really rolled. Deliberately not adjusted by the finder's own drop rate bonus: the
+    /// line goes to the whole server, and a figure that changed depending on who was reading
+    /// it would be worse than no figure at all.
+    ///
+    /// Chances are held per ten thousand, so a card at 10 is one tenth of one percent.
+    /// </remarks>
+    private static string FormatDropChance(string monsterCode, int itemId)
+    {
+        if (!DataManager.MonsterDropData.TryGetValue(monsterCode, out var drops))
+            return string.Empty;
+
+        foreach (var drop in drops.DropChances)
+        {
+            if (drop.Id != itemId)
+                continue;
+
+            return $" (โอกาสดรอป {(drop.Chance / 100d).ToString("0.##")}%)";
+        }
+
+        return string.Empty;
     }
 
     /// <summary>
