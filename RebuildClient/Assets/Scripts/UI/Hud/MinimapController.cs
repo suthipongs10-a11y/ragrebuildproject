@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts.PlayerControl;
+using Assets.Scripts.Sprites;
 using RebuildSharedData.Enum;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -378,8 +379,23 @@ namespace Assets.Scripts.UI.Hud
         {
             yield return new WaitForEndOfFrame();
 
-            var loadMap = Addressables.LoadAssetAsync<Sprite>($"Assets/Maps/minimap/{mapName}.png");
-            var loadWalk = Addressables.LoadAssetAsync<Sprite>($"Assets/Maps/minimap/{mapName}_walkmask.png");
+            var mapKey = $"Assets/Maps/minimap/{mapName}.png";
+            var walkKey = $"Assets/Maps/minimap/{mapName}_walkmask.png";
+
+            //Asked before loading, not after. Addressables answers a key it has never heard
+            //of by throwing InvalidKeyException out of LoadAssetAsync, so none of the checks
+            //below ever get to run - the coroutine is already dead. Minimaps are rendered by
+            //the lighting tool one map at a time, so a map that has not been through it yet
+            //is the ordinary case and does not deserve a red line in the console.
+            if (!ClientDataLoader.DoesAddressableExist<Sprite>(mapKey)
+                || !ClientDataLoader.DoesAddressableExist<Sprite>(walkKey))
+            {
+                Debug.Log($"No minimap has been rendered for {mapName} yet, leaving the minimap blank.");
+                yield break;
+            }
+
+            var loadMap = Addressables.LoadAssetAsync<Sprite>(mapKey);
+            var loadWalk = Addressables.LoadAssetAsync<Sprite>(walkKey);
 
             yield return loadMap;
             yield return loadWalk;
