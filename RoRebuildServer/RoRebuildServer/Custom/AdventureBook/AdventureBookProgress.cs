@@ -209,8 +209,6 @@ public static class AdventureBookProgress
 
     private static void GiveReward(Player player, AdventureBookEntry entry, AdventureBookStars star)
     {
-        var reward = AdventureBookRewards.For(entry.Level, star);
-
         var line = star switch
         {
             AdventureBookStars.Hunt => $"สมุดผจญภัย ★ กำจัด {entry.Name} ครบ {entry.HuntTarget:N0} ตัว",
@@ -219,19 +217,25 @@ public static class AdventureBookProgress
             _ => $"สมุดผจญภัย {entry.Name}"
         };
 
-        if (!string.IsNullOrEmpty(reward.Code) && DataManager.ItemIdByName.TryGetValue(reward.Code, out var itemId))
+        var given = new List<string>();
+        foreach (var reward in AdventureBookRewards.For(entry.Level, star))
         {
+            if (!DataManager.ItemIdByName.TryGetValue(reward.Code, out var itemId))
+            {
+                //Said out loud rather than swallowed: a reward that names nothing is a content
+                //bug, and finding out at the moment a player earns it is finding out too late.
+                ServerLogger.LogWarning($"[AdventureBook] The reward '{reward.Code}' for {entry.Name} is not an item, so nothing was given.");
+                continue;
+            }
+
             player.CreateItemInInventory(new ItemReference(itemId, reward.Count));
             var itemName = DataManager.GetItemInfoById(itemId)?.Name ?? reward.Code;
-            Announce(player, $"<color=#66FFAA>{line} — ได้รับ {itemName} x{reward.Count}</color>");
+            given.Add(reward.Count > 1 ? $"{itemName} x{reward.Count}" : itemName);
         }
-        else
-        {
-            //Said out loud rather than swallowed: a star that pays nothing is a content bug,
-            //and the player should still be told their star was recorded.
-            ServerLogger.LogWarning($"[AdventureBook] The reward '{reward.Code}' for {entry.Name} is not an item, so nothing was given.");
-            Announce(player, $"<color=#66FFAA>{line}</color>");
-        }
+
+        Announce(player, given.Count > 0
+            ? $"<color=#66FFAA>{line} — ได้รับ {string.Join(", ", given)}</color>"
+            : $"<color=#66FFAA>{line}</color>");
 
         //Only the third star reaches the whole server. It is the one that needs a card, and a
         //card is a tenth of a percent of a kill - rare enough that hearing about somebody

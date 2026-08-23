@@ -157,12 +157,17 @@ public static class AdventureBookChat
     /// <summary>What a star pays, named rather than coded, so the line is worth reading.</summary>
     private static string RewardText(AdventureBookEntry entry, AdventureBookStars star)
     {
-        var reward = AdventureBookRewards.For(entry.Level, star);
-        var id = reward.ItemId;
-        if (id <= 0)
-            return string.Empty;
+        var parts = new List<string>();
+        foreach (var reward in AdventureBookRewards.For(entry.Level, star))
+        {
+            var id = reward.ItemId;
+            if (id <= 0)
+                continue;
 
-        var name = DataManager.GetItemInfoById(id)?.Name ?? reward.Code;
-        return reward.Count > 1 ? $"({name} x{reward.Count})" : $"({name})";
+            var name = DataManager.GetItemInfoById(id)?.Name ?? reward.Code;
+            parts.Add(reward.Count > 1 ? $"{name} x{reward.Count}" : name);
+        }
+
+        return parts.Count == 0 ? string.Empty : "(" + string.Join(", ", parts) + ")";
     }
 }

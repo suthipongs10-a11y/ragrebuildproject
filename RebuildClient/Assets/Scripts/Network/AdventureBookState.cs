@@ -81,9 +81,9 @@ namespace Assets.Scripts.Network
     public struct AdventureBookRewardBand
     {
         public int MaxLevel;
-        public AdventureBookReward Hunt;
-        public AdventureBookReward HuntLarge;
-        public AdventureBookReward Card;
+        public List<AdventureBookReward> Hunt;
+        public List<AdventureBookReward> HuntLarge;
+        public List<AdventureBookReward> Card;
     }
 
     /// <summary>
@@ -117,11 +117,13 @@ namespace Assets.Scripts.Network
 
         public static void Touch() => Revision++;
 
+        private static readonly List<AdventureBookReward> NoRewards = new List<AdventureBookReward>();
+
         /// <summary>What a page of this level pays for one of its stars.</summary>
-        public static AdventureBookReward RewardFor(int level, int starIndex)
+        public static List<AdventureBookReward> RewardFor(int level, int starIndex)
         {
             if (Bands.Count == 0)
-                return default;
+                return NoRewards;
 
             var band = Bands[Bands.Count - 1];
             for (var i = 0; i < Bands.Count; i++)
@@ -134,10 +136,10 @@ namespace Assets.Scripts.Network
 
             switch (starIndex)
             {
-                case 0: return band.Hunt;
-                case 1: return band.HuntLarge;
-                case 2: return band.Card;
-                default: return default;
+                case 0: return band.Hunt ?? NoRewards;
+                case 1: return band.HuntLarge ?? NoRewards;
+                case 2: return band.Card ?? NoRewards;
+                default: return NoRewards;
             }
         }
 

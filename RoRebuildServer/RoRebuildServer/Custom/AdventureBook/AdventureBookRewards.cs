@@ -25,25 +25,39 @@ public static class AdventureBookRewards
 {
     public readonly record struct Band(
         int MaxLevel,
-        AdventureBookReward Hunt,
-        AdventureBookReward HuntLarge,
-        AdventureBookReward Card);
+        AdventureBookReward[] Hunt,
+        AdventureBookReward[] HuntLarge,
+        AdventureBookReward[] Card);
+
+    /// <summary>
+    /// The ore every star pays on top of whatever else it pays.
+    /// </summary>
+    /// <remarks>
+    /// Refining ore rather than more potions, because ore is the one thing on this server that
+    /// everybody wants and nobody has enough of - and unlike zeny it cannot be farmed by
+    /// standing somewhere convenient. One at a star, two when a card is involved.
+    /// </remarks>
+    private static AdventureBookReward Elunium(int count) => new("Elunium", count);
+    private static AdventureBookReward Oridecon(int count) => new("Oridecon", count);
 
     public static readonly Band[] Bands =
     {
         new(29,
-            new AdventureBookReward("Concentration_Potion", 5),
-            new AdventureBookReward("Old_Blue_Box", 1),
-            new AdventureBookReward("Old_Card_Album", 1)),
+            new[] { new AdventureBookReward("Concentration_Potion", 5), Elunium(1) },
+            new[] { new AdventureBookReward("Old_Blue_Box", 1), Oridecon(1) },
+            new[] { new AdventureBookReward("Old_Card_Album", 1), Elunium(2), Oridecon(2) }),
         new(59,
-            new AdventureBookReward("Awakening_Potion", 5),
-            new AdventureBookReward("Old_Blue_Box", 2),
-            new AdventureBookReward("Old_Card_Album", 1)),
+            new[] { new AdventureBookReward("Awakening_Potion", 5), Elunium(1) },
+            new[] { new AdventureBookReward("Old_Blue_Box", 2), Oridecon(1) },
+            new[] { new AdventureBookReward("Old_Card_Album", 1), Elunium(2), Oridecon(2) }),
         new(int.MaxValue,
-            new AdventureBookReward("Berserk_Potion", 5),
-            new AdventureBookReward("Old_Violet_Box", 1),
-            new AdventureBookReward("Old_Card_Album", 2))
+            new[] { new AdventureBookReward("Berserk_Potion", 5), Elunium(1) },
+            new[] { new AdventureBookReward("Old_Violet_Box", 1), Oridecon(1) },
+            new[] { new AdventureBookReward("Old_Card_Album", 2), Elunium(2), Oridecon(2) })
     };
+
+    /// <summary>The most items any one star pays, so the wire format can be sized.</summary>
+    public const int MaxItemsPerStar = 3;
 
     public static Band BandForLevel(int level)
     {
@@ -54,7 +68,7 @@ public static class AdventureBookRewards
         return Bands[^1];
     }
 
-    public static AdventureBookReward For(int level, AdventureBookStars star)
+    public static AdventureBookReward[] For(int level, AdventureBookStars star)
     {
         var band = BandForLevel(level);
         return star switch
@@ -62,7 +76,7 @@ public static class AdventureBookRewards
             AdventureBookStars.Hunt => band.Hunt,
             AdventureBookStars.HuntLarge => band.HuntLarge,
             AdventureBookStars.Card => band.Card,
-            _ => default
+            _ => Array.Empty<AdventureBookReward>()
         };
     }
 }

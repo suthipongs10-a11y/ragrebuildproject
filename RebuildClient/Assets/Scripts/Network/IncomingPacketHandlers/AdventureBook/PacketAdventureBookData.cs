@@ -67,18 +67,28 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
                 AdventureBookState.Bands.Add(new AdventureBookRewardBand
                 {
                     MaxLevel = msg.ReadInt16(),
-                    Hunt = ReadReward(msg),
-                    HuntLarge = ReadReward(msg),
-                    Card = ReadReward(msg)
+                    Hunt = ReadRewards(msg),
+                    HuntLarge = ReadRewards(msg),
+                    Card = ReadRewards(msg)
                 });
             }
         }
 
-        private static AdventureBookReward ReadReward(ClientInboundMessage msg) => new AdventureBookReward
+        private static List<AdventureBookReward> ReadRewards(ClientInboundMessage msg)
         {
-            ItemId = msg.ReadInt32(),
-            Count = msg.ReadInt16()
-        };
+            var count = msg.ReadByte();
+            var list = new List<AdventureBookReward>(count);
+            for (var i = 0; i < count; i++)
+            {
+                list.Add(new AdventureBookReward
+                {
+                    ItemId = msg.ReadInt32(),
+                    Count = msg.ReadInt16()
+                });
+            }
+
+            return list;
+        }
 
         /// <summary>
         /// One batch of pages, appended to whatever the header started.

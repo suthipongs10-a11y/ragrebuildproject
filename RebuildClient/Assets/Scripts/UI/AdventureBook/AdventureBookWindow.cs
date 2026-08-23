@@ -47,6 +47,14 @@ namespace Assets.Scripts.UI.AdventureBook
 
         private const float StarSize = 18f;
         private const float RewardIconSize = 30f;
+
+        /// <summary>A reward line inside a star row: one icon and the name beside it.</summary>
+        private const float RewardLineHeight = 24f;
+        private const float RewardIconSmall = 22f;
+
+        /// <summary>Where the reward column starts, measured from the left of a row.</summary>
+        private const float RewardColumn = RowWidth - 232f;
+
         private const float GoWidth = 116f;
 
         /// <summary>A star that has been earned, against one that has not.</summary>
@@ -58,7 +66,7 @@ namespace Assets.Scripts.UI.AdventureBook
         private static readonly Color TrackColor = new Color(0.816f, 0.859f, 0.910f);
         private static readonly Color FillColor = new Color(0.235f, 0.545f, 0.851f);
 
-        private enum View { Regions, Pages, Page }
+        private enum View { Regions, Pages, Page, Rewards, Help }
 
         private static AdventureBookWindow instance;
 
@@ -204,6 +212,8 @@ namespace Assets.Scripts.UI.AdventureBook
                 case View.Regions: y = DrawRegions(); break;
                 case View.Pages: y = DrawPages(); break;
                 case View.Page: y = DrawPage(); break;
+                case View.Rewards: y = DrawRewards(); break;
+                case View.Help: y = DrawHelp(); break;
             }
 
             body.sizeDelta = new Vector2(0, y);
@@ -212,6 +222,20 @@ namespace Assets.Scripts.UI.AdventureBook
         private float DrawRegions()
         {
             var y = Pad;
+
+            var rewards = NewCard(y, RowHeight, () => { view = View.Rewards; Redraw(); });
+            Label(rewards, "รางวัลประจำเมืองทั้งหมด", 12f, -(RowHeight - 20f) / 2f, 320f,
+                ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
+            Value(rewards, $"{AdventureBookState.Regions.Count} ชิ้น", -12f, -(RowHeight - 20f) / 2f, 140f,
+                ModernUiTheme.MutedColor);
+            y += RowHeight + RowGap;
+
+            var help = NewCard(y, RowHeight, () => { view = View.Help; Redraw(); });
+            Label(help, "สมุดผจญภัยคืออะไร", 12f, -(RowHeight - 20f) / 2f, 320f,
+                ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
+            Value(help, "คู่มือ", -12f, -(RowHeight - 20f) / 2f, 140f, ModernUiTheme.MutedColor);
+            y += RowHeight + RowGap;
+
             for (var i = 0; i < AdventureBookState.Regions.Count; i++)
             {
                 var region = AdventureBookState.Regions[i];
@@ -351,48 +375,153 @@ namespace Assets.Scripts.UI.AdventureBook
         private float StarRow(float y, AdventureBookPage page, int starIndex, string label,
             bool earned, int kills, int target)
         {
-            var card = NewCard(y, TallRowHeight, null);
+            var rewards = AdventureBookState.RewardFor(page.Level, starIndex);
+
+            //Tall enough for whatever the star pays. Three lines of reward on a row sized for
+            //one is three lines drawn on top of each other.
+            var height = Mathf.Max(TallRowHeight, 16f + rewards.Count * RewardLineHeight);
+            var card = NewCard(y, height, null);
 
             var star = ModernUiTheme.CreateIcon(card, ModernUiIcons.Star, earned ? EarnedColor : UnearnedColor, StarSize);
             ModernUiTheme.Place((RectTransform)star.transform, new Vector2(0, 1),
-                new Vector2(12f, -(TallRowHeight - StarSize) / 2f), new Vector2(StarSize, StarSize));
+                new Vector2(12f, -12f), new Vector2(StarSize, StarSize));
 
-            Label(card, earned ? label + "   สำเร็จ" : label, 12f + StarSize + 10f, -8f, 200f,
+            var textLeft = 12f + StarSize + 10f;
+            Label(card, earned ? label + "   สำเร็จ" : label, textLeft, -10f, 200f,
                 ModernUiTheme.SizeBody, earned ? DoneColor : ModernUiTheme.NameColor);
 
             if (target > 0)
             {
                 var shown = Mathf.Min(kills, target);
-                Label(card, $"{shown:N0}/{target:N0}", 12f + StarSize + 10f, -30f, 200f,
+                Label(card, $"{shown:N0}/{target:N0}", textLeft, -32f, 90f,
                     ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
-                DrawBar(card, 12f + StarSize + 10f + 92f, -34f, 150f, target <= 0 ? 0f : (float)shown / target);
+                DrawBar(card, textLeft + 92f, -36f, 150f, (float)shown / target);
             }
             else if (!earned)
             {
-                Label(card, "ต้องมีการ์ดของมอนตัวนี้", 12f + StarSize + 10f, -30f, 260f,
+                Label(card, "ต้องมีการ์ดของมอนตัวนี้", textLeft, -32f, 260f,
                     ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
             }
 
-            DrawReward(card, AdventureBookState.RewardFor(page.Level, starIndex));
+            for (var i = 0; i < rewards.Count; i++)
+                DrawRewardLine(card, rewards[i], 10f + i * RewardLineHeight);
 
-            return y + TallRowHeight + RowGap;
+            return y + height + RowGap;
         }
 
-        /// <summary>The reward chip on the right of a row: the icon, then what it is.</summary>
-        private void DrawReward(RectTransform card, AdventureBookReward reward)
+        /// <summary>
+        /// One thing a star pays: its own icon, its real name, and how many.
+        /// </summary>
+        /// <remarks>
+        /// Clickable, and what it opens is the game's own item window - so the full properties
+        /// of a reward are one tap away without this window having to know what a hat does.
+        /// </remarks>
+        private void DrawRewardLine(RectTransform card, AdventureBookReward reward, float top)
         {
             if (!reward.HasItem)
                 return;
 
-            var iconLeft = RowWidth - 12f - 190f;
-            DrawItemIcon(card, reward.ItemId, new Vector2(iconLeft, -(TallRowHeight - RewardIconSize) / 2f));
+            var id = reward.ItemId;
+            var drawn = DrawItemIcon(card, id, new Vector2(RewardColumn, -top), RewardIconSmall);
+            var left = RewardColumn + (drawn ? RewardIconSmall + 6f : 0f);
 
-            var name = ItemName(reward.ItemId);
+            var name = ItemName(id);
             if (reward.Count > 1)
                 name += $" x{reward.Count}";
 
-            Label(card, name, iconLeft + RewardIconSize + 8f, -(TallRowHeight - 20f) / 2f, 150f,
-                ModernUiTheme.SizeSmall, ModernUiTheme.NameColor);
+            var label = ModernUiTheme.CreateText(card, "Reward", name, ModernUiTheme.SizeSmall,
+                ModernUiTheme.NameColor, TextAlignmentOptions.Left);
+            label.textWrappingMode = TextWrappingModes.NoWrap;
+            label.overflowMode = TextOverflowModes.Ellipsis;
+            label.raycastTarget = true;
+            ModernUiTheme.Place(label.rectTransform, new Vector2(0, 1), new Vector2(left, -top - 2f),
+                new Vector2(RowWidth - left - 12f, RewardIconSmall));
+
+            var button = label.gameObject.AddComponent<Button>();
+            button.targetGraphic = label;
+            button.onClick.AddListener(() => ShowItem(id));
+        }
+
+        /// <summary>Opens the game's own item window, which already knows how to describe anything.</summary>
+        private static void ShowItem(int itemId)
+        {
+            if (itemId <= 0 || UiManager.Instance == null || UiManager.Instance.ItemDescriptionWindow == null)
+                return;
+
+            UiManager.Instance.ItemDescriptionWindow.ShowItemDescription(itemId);
+        }
+
+        /// <summary>Every region's headgear in one place, which is the page people come for.</summary>
+        private float DrawRewards()
+        {
+            var y = Pad;
+            y = BackRow(y, "รางวัลประจำเมือง", () => { view = View.Regions; Redraw(); });
+
+            var note = NewCard(y, RowHeight, null);
+            Label(note, "ทำครบทุกหน้าของเมืองนั้น ถึงจะได้", 12f, -(RowHeight - 20f) / 2f,
+                RowWidth - 24f, ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
+            y += RowHeight + RowGap;
+
+            foreach (var region in AdventureBookState.Regions)
+            {
+                var id = region.RewardItemId;
+                var card = NewCard(y, TallRowHeight, () => ShowItem(id));
+
+                var drawn = DrawItemIcon(card, id, new Vector2(12f, -(TallRowHeight - RewardIconSize) / 2f));
+                var left = drawn ? 12f + RewardIconSize + 10f : 14f;
+
+                Label(card, ItemName(id), left, -8f, 300f, ModernUiTheme.SizeBody,
+                    region.Complete ? DoneColor : ModernUiTheme.NameColor);
+                Label(card, region.Name, left, -30f, 300f, ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
+
+                Value(card, region.Complete ? "ได้แล้ว" : "ยังไม่ได้", -12f, -(TallRowHeight - 20f) / 2f, 140f,
+                    region.Complete ? DoneColor : ModernUiTheme.MutedColor);
+
+                y += TallRowHeight + RowGap;
+            }
+
+            return y + Pad;
+        }
+
+        /// <summary>
+        /// What the book is for, in the window rather than in a wiki nobody has written.
+        /// </summary>
+        private float DrawHelp()
+        {
+            var y = Pad;
+            y = BackRow(y, "คู่มือ", () => { view = View.Regions; Redraw(); });
+
+            y = HelpLine(y, "สมุดผจญภัยคืออะไร",
+                "บันทึกที่เดินไปเองระหว่างเล่นปกติ ไม่ต้องกดรับเควส ตีมอนไปเรื่อย ๆ แล้ววันหนึ่งเปิดมาก็เสร็จแล้ว");
+            y = HelpLine(y, "1 หน้า = การ์ด 1 ใบ",
+                "มอนที่ดรอปการ์ดใบเดียวกันนับเป็นหน้าเดียว เช่น ก็อบลินทุกแบบใช้ Goblin Card เหมือนกัน");
+            y = HelpLine(y, "ดาว 1 และ ดาว 2",
+                "กำจัดให้ครบตามจำนวน จำนวนไม่เท่ากันทุกตัว มอนที่หายากต้องการน้อยกว่า");
+            y = HelpLine(y, "ดาว 3",
+                "แค่มีการ์ดของมอนตัวนั้นในกระเป๋า ระบบบันทึกให้เอง และไม่ยึดการ์ดไป");
+            y = HelpLine(y, "รางวัลประจำเมือง",
+                "ทำครบทุกหน้าในเมืองนั้น ได้หมวกที่หาจากที่อื่นไม่ได้เลยสักทาง");
+            y = HelpLine(y, "Adventure Rank",
+                "สะสมดาวรวมทั้งเล่ม เพิ่มสเตตัส อัตราดรอป EXP และอัตราตีบวกแบบถาวร");
+            y = HelpLine(y, "วาร์ปไปที่แมพ",
+                "ได้ดาว 1 ของมอนตัวไหนแล้ว วาร์ปไปหามันได้จากในสมุด เสีย Zeny ตามระดับ พอถึง Rank 5 ฟรี");
+            y = HelpLine(y, "พิมพ์ในแชทก็ได้",
+                "!book ดูสรุป  ·  !book <ชื่อมอน> ดูตัวเดียว");
+
+            return y + Pad;
+        }
+
+        private float HelpLine(float y, string title, string text)
+        {
+            var card = NewCard(y, TallRowHeight, null);
+            Label(card, title, 12f, -8f, RowWidth - 24f, ModernUiTheme.SizeBody, ModernUiTheme.NameColor);
+
+            var body = ModernUiTheme.CreateText(card, "Body", text, ModernUiTheme.SizeSmall,
+                ModernUiTheme.MutedColor, TextAlignmentOptions.TopLeft);
+            ModernUiTheme.Place(body.rectTransform, new Vector2(0, 1), new Vector2(12f, -28f),
+                new Vector2(RowWidth - 24f, 26f));
+
+            return y + TallRowHeight + RowGap;
         }
 
         private void DrawStars(RectTransform card, AdventureBookPage page, float left)
@@ -483,7 +612,7 @@ namespace Assets.Scripts.UI.AdventureBook
         /// ordinary state here rather than a broken install - and a blank square where a hat
         /// should be reads worse than a row that simply has no picture.
         /// </remarks>
-        private static bool DrawItemIcon(RectTransform card, int itemId, Vector2 position)
+        private static bool DrawItemIcon(RectTransform card, int itemId, Vector2 position, float size = RewardIconSize)
         {
             if (itemId <= 0 || ClientDataLoader.Instance == null)
                 return false;
@@ -494,9 +623,8 @@ namespace Assets.Scripts.UI.AdventureBook
             if (sprite == null)
                 return false;
 
-            var icon = ModernUiTheme.CreateIcon(card, sprite, Color.white, RewardIconSize);
-            ModernUiTheme.Place((RectTransform)icon.transform, new Vector2(0, 1), position,
-                new Vector2(RewardIconSize, RewardIconSize));
+            var icon = ModernUiTheme.CreateIcon(card, sprite, Color.white, size);
+            ModernUiTheme.Place((RectTransform)icon.transform, new Vector2(0, 1), position, new Vector2(size, size));
             return true;
         }
 

@@ -82,9 +82,9 @@ public static partial class CommandBuilder
         foreach (var band in AdventureBookRewards.Bands)
         {
             header.Write(band.MaxLevel == int.MaxValue ? (short)999 : (short)band.MaxLevel);
-            WriteReward(header, band.Hunt);
-            WriteReward(header, band.HuntLarge);
-            WriteReward(header, band.Card);
+            WriteRewards(header, band.Hunt);
+            WriteRewards(header, band.HuntLarge);
+            WriteRewards(header, band.Card);
         }
 
         NetworkManager.SendMessage(header, player.Connection);
@@ -130,10 +130,16 @@ public static partial class CommandBuilder
         return size;
     }
 
-    private static void WriteReward(OutboundMessage packet, AdventureBookReward reward)
+    private static void WriteRewards(OutboundMessage packet, AdventureBookReward[] rewards)
     {
-        packet.Write(reward.ItemId);
-        packet.Write((short)reward.Count);
+        //Counted rather than a fixed three, so adding a fourth item to one star later is a
+        //change in one table rather than a change in the wire format as well.
+        packet.Write((byte)rewards.Length);
+        foreach (var reward in rewards)
+        {
+            packet.Write(reward.ItemId);
+            packet.Write((short)reward.Count);
+        }
     }
 
     private static void SendPageBatch(Player player, List<(AdventureBookEntry Entry, int Region)> batch)

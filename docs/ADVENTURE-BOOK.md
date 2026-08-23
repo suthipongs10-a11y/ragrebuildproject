@@ -154,10 +154,27 @@
 
 ### ต่อดาว
 
-| ดาว | ได้อะไร |
-|---|---|
+แบ่ง 3 ช่วงตามเลเวลของหน้า — **ทุกดาวมีแร่ตีบวกติดมาด้วยเสมอ**
+
+| ดาว | Lv ≤29 | Lv 30-59 | Lv 60+ |
+|---|---|---|---|
+| ★1 | Concentration Potion ×5 | Awakening Potion ×5 | Berserk Potion ×5 |
+| | + **Elunium ×1** | + **Elunium ×1** | + **Elunium ×1** |
+| ★2 | Old Blue Box ×1 | Old Blue Box ×2 | Old Violet Box ×1 |
+| | + **Oridecon ×1** | + **Oridecon ×1** | + **Oridecon ×1** |
+| ★3 | Old Card Album ×1 | Old Card Album ×1 | Old Card Album ×2 |
+| | + **Elunium ×2, Oridecon ×2** | + **Elunium ×2, Oridecon ×2** | + **Elunium ×2, Oridecon ×2** |
+
+แร่ตีบวกแทนที่จะเป็นยาเพิ่ม เพราะเป็นของที่ทุกคนอยากได้และไม่มีใครมีพอ —
+และต่างจาก Zeny ตรงที่ฟาร์มด้วยการยืนที่สะดวก ๆ ไม่ได้
+
+<details><summary>ของเดิม (ก่อนเพิ่มแร่)</summary>
+
 | ★1 | ยาบัฟ / ของเปลี่ยนธาตุ / Fly Wing |
+|---|---|
 | ★2 | `Old_Blue_Box` ×2 หรือ `Dead_Branch` ×3 |
+
+</details>
 | ★3 | `Old_Card_Album` ×1 (Lv 60+ ได้ ×2) — **และประกาศทั้งเซิร์ฟ** |
 
 ### ทำไมประกาศเฉพาะ ★3
