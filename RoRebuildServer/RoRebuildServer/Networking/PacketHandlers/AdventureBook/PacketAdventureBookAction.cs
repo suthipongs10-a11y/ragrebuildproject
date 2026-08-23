@@ -58,9 +58,9 @@ public class PacketAdventureBookAction : IClientPacketHandler
     /// <remarks>Roughly what the kafra charges, so neither road makes the other pointless.</remarks>
     public static int FareFor(int monsterLevel) => Math.Clamp(500 + monsterLevel * 10, 500, 2000);
 
-    private static void Warp(NetworkConnection connection, Player player, int monsterId, string mapName)
+    private static void Warp(NetworkConnection connection, Player player, int pageId, string mapName)
     {
-        if (!AdventureBook.EntriesByMonsterId.TryGetValue(monsterId, out var entry))
+        if (!AdventureBook.EntriesByPageId.TryGetValue(pageId, out var entry))
         {
             Deny(player, AdventureBookWarpDenial.Unknown);
             return;

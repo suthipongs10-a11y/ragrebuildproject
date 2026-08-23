@@ -46,7 +46,9 @@ public static class AdventureBookProgress
     public static int CountStars(Player player)
     {
         var total = 0;
-        foreach (var entry in AdventureBook.EntriesByMonsterId.Values)
+        //Pages, not monsters. EntriesByMonsterId has five goblins pointing at one page,
+        //and counting through that would score the goblins' stars five times each.
+        foreach (var entry in AdventureBook.EntriesByPageId.Values)
         {
             var stars = (int)GetStars(player, entry);
             //Three ones in a row, so popcount is the star count.
@@ -77,24 +79,20 @@ public static class AdventureBookProgress
     /// whether it was picked up off the floor, traded for, bought off the market or pulled
     /// out of storage. The card is not taken: it is worth real money on the market this
     /// server already has, and a page that eats one is a page nobody dares finish.
+    ///
+    /// One card, one page, because a page is a card - so the goblins that all drop the same
+    /// one are the same page rather than five pages fighting over it.
     /// </remarks>
     public static void OnItemGained(Player player, int itemId)
     {
         if (!AdventureBook.IsBuilt)
             return;
-        if (!AdventureBook.EntriesByCardId.TryGetValue(itemId, out var sharing))
+        if (!AdventureBook.EntriesByCardId.TryGetValue(itemId, out var entry))
+            return;
+        if (HasStar(player, entry, AdventureBookStars.Card))
             return;
 
-        //Every page this card belongs to, not just the first. The goblins all drop the same
-        //one, and filling only whichever of them happened to be built first left the rest of
-        //Geffen Fields permanently one star short of its reward.
-        foreach (var entry in sharing)
-        {
-            if (HasStar(player, entry, AdventureBookStars.Card))
-                continue;
-
-            AwardStar(player, entry, AdventureBookStars.Card);
-        }
+        AwardStar(player, entry, AdventureBookStars.Card);
     }
 
     /// <summary>
@@ -111,19 +109,15 @@ public static class AdventureBookProgress
             return 0;
 
         var found = 0;
-        foreach (var (cardId, sharing) in AdventureBook.EntriesByCardId)
+        foreach (var (cardId, entry) in AdventureBook.EntriesByCardId)
         {
+            if (HasStar(player, entry, AdventureBookStars.Card))
+                continue;
             if (!player.Inventory.HasItem(cardId))
                 continue;
 
-            foreach (var entry in sharing)
-            {
-                if (HasStar(player, entry, AdventureBookStars.Card))
-                    continue;
-
-                AwardStar(player, entry, AdventureBookStars.Card);
-                found++;
-            }
+            AwardStar(player, entry, AdventureBookStars.Card);
+            found++;
         }
 
         return found;

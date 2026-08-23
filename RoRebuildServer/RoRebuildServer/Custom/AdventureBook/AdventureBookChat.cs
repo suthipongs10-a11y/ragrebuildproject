@@ -64,7 +64,7 @@ public static class AdventureBookChat
         //Whatever is closest to its next star, because that is what somebody asking is
         //deciding whether to go back for. A page never touched has nothing to say yet.
         var started = new List<(AdventureBookEntry entry, int kills, int next)>();
-        foreach (var entry in AdventureBook.EntriesByMonsterId.Values)
+        foreach (var entry in AdventureBook.EntriesByPageId.Values)
         {
             var kills = AdventureBookProgress.GetKills(player, entry);
             if (kills <= 0)
@@ -102,7 +102,7 @@ public static class AdventureBookChat
     private static void ShowOneMonster(Player player, string search)
     {
         AdventureBookEntry? found = null;
-        foreach (var entry in AdventureBook.EntriesByMonsterId.Values)
+        foreach (var entry in AdventureBook.EntriesByPageId.Values)
         {
             if (entry.Name.Equals(search, StringComparison.OrdinalIgnoreCase))
             {
@@ -112,7 +112,10 @@ public static class AdventureBookChat
 
             //Held rather than taken, so an exact name later in the list still wins over a
             //partial one found early: typing "Poring" should not land on Poporing.
-            if (found == null && entry.Name.Contains(search, StringComparison.OrdinalIgnoreCase))
+            //Member names count too, so "Flail Goblin" finds the page called Goblin - which
+            //is the whole reason somebody would type the long name.
+            if (found == null && (entry.Name.Contains(search, StringComparison.OrdinalIgnoreCase)
+                                  || entry.Members.Contains(search, StringComparison.OrdinalIgnoreCase)))
                 found = entry;
         }
 
@@ -126,6 +129,8 @@ public static class AdventureBookChat
         var earned = AdventureBookProgress.GetStars(player, found);
 
         AdventureBookProgress.Announce(player, $"<color=#66FFAA>{found.Name}  [{found.Region}]  Lv {found.Level}</color>");
+        if (found.Members.Length > 0)
+            AdventureBookProgress.Announce(player, $"  นับรวม: {found.Members}");
         AdventureBookProgress.Announce(player, $"  ★  {kills:N0}/{found.HuntTarget:N0}" + Mark(earned, AdventureBookStars.Hunt));
         AdventureBookProgress.Announce(player, $"  ★★ {kills:N0}/{found.HuntTargetLarge:N0}" + Mark(earned, AdventureBookStars.HuntLarge));
 

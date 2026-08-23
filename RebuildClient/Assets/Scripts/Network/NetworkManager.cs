@@ -1491,20 +1491,20 @@ namespace Assets.Scripts.Network
         }
 
         /// <summary>
-        /// Asks to be taken to a map this monster stands on.
+        /// Asks to be taken to a map something on this page stands on.
         /// </summary>
         /// <remarks>
         /// The server decides whether this is allowed and what it costs; nothing is checked
         /// here beyond having something to send. Checking on this side as well would only
         /// mean two places to keep in step, and the one that matters is the other one.
         /// </remarks>
-        public void SendAdventureBookWarp(int monsterId, string mapName)
+        public void SendAdventureBookWarp(int pageId, string mapName)
         {
             var msg = StartMessage();
 
             msg.Write((byte)PacketType.AdventureBookAction);
             msg.Write((byte)AdventureBookRequestType.Warp);
-            msg.Write(monsterId);
+            msg.Write(pageId);
             msg.Write(mapName);
 
             SendMessage(msg);

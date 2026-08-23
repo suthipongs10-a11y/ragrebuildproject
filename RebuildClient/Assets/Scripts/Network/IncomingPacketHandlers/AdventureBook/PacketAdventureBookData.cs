@@ -77,9 +77,10 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
             {
                 var page = new AdventureBookPage
                 {
-                    MonsterId = msg.ReadInt32(),
+                    PageId = msg.ReadInt32(),
                     RegionIndex = msg.ReadByte(),
                     Name = msg.ReadString(),
+                    Members = msg.ReadString(),
                     Level = msg.ReadInt16(),
                     HuntTarget = msg.ReadInt16(),
                     HuntTargetLarge = msg.ReadInt16(),
@@ -99,7 +100,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
                     });
                 }
 
-                AdventureBookState.PagesByMonster[page.MonsterId] = page;
+                AdventureBookState.PagesById[page.PageId] = page;
 
                 //A region index the server never sent would be a book built against a
                 //different list, so the page is dropped rather than drawn under the wrong
@@ -111,7 +112,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
 
         private static void ReadPage(ClientInboundMessage msg)
         {
-            var monsterId = msg.ReadInt32();
+            var pageId = msg.ReadInt32();
             var kills = msg.ReadInt32();
             var stars = msg.ReadByte();
             AdventureBookState.Rank = msg.ReadByte();
@@ -120,7 +121,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
             //Only updates a page the book already holds. A page arriving for a book that was
             //never asked for has nowhere to go, and inventing one would leave it without the
             //region it belongs to.
-            if (!AdventureBookState.PagesByMonster.TryGetValue(monsterId, out var page))
+            if (!AdventureBookState.PagesById.TryGetValue(pageId, out var page))
                 return;
 
             page.Kills = kills;

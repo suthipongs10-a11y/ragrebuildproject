@@ -12,9 +12,15 @@ namespace Assets.Scripts.Network
     /// <summary>One page of the adventure book, as far as the client needs to draw it.</summary>
     public class AdventureBookPage
     {
-        public int MonsterId;
+        /// <summary>What the server calls this page: a card's item id, or a monster's id when it drops none.</summary>
+        public int PageId;
+
         public int RegionIndex;
         public string Name;
+
+        /// <summary>The monsters this page covers, when it covers more than one. Empty otherwise.</summary>
+        public string Members;
+
         public int Level;
         public List<AdventureBookSighting> Sightings;
         public int HuntTarget;
@@ -70,7 +76,7 @@ namespace Assets.Scripts.Network
     public static class AdventureBookState
     {
         public static readonly List<AdventureBookRegionInfo> Regions = new List<AdventureBookRegionInfo>();
-        public static readonly Dictionary<int, AdventureBookPage> PagesByMonster = new Dictionary<int, AdventureBookPage>();
+        public static readonly Dictionary<int, AdventureBookPage> PagesById = new Dictionary<int, AdventureBookPage>();
 
         public static int Rank;
         public static int Stars;
@@ -85,7 +91,7 @@ namespace Assets.Scripts.Network
         public static void Clear()
         {
             Regions.Clear();
-            PagesByMonster.Clear();
+            PagesById.Clear();
             Received = false;
         }
     }

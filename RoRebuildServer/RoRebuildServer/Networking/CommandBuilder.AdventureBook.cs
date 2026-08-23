@@ -105,7 +105,7 @@ public static partial class CommandBuilder
     /// <summary>Roughly what one page costs on the wire, erring high.</summary>
     private static int EstimateEntryBytes(AdventureBookEntry entry)
     {
-        var size = 32 + entry.Name.Length * 3;
+        var size = 36 + entry.Name.Length * 3 + entry.Members.Length * 3;
         var shown = Math.Min(entry.Sightings.Length, MaxSightingsSent);
         for (var i = 0; i < shown; i++)
             size += 8 + entry.Sightings[i].Map.Length * 3;
@@ -121,9 +121,10 @@ public static partial class CommandBuilder
 
         foreach (var (entry, region) in batch)
         {
-            packet.Write(entry.MonsterId);
+            packet.Write(entry.PageId);
             packet.Write((byte)region);
             packet.Write(entry.Name);
+            packet.Write(entry.Members);
             packet.Write((short)entry.Level);
             packet.Write((short)entry.HuntTarget);
             packet.Write((short)entry.HuntTargetLarge);
@@ -151,7 +152,7 @@ public static partial class CommandBuilder
 
         var packet = NetworkManager.StartPacket(PacketType.AdventureBookData, 32);
         packet.Write((byte)AdventureBookDataType.PageUpdate);
-        packet.Write(entry.MonsterId);
+        packet.Write(entry.PageId);
         packet.Write(AdventureBookProgress.GetKills(player, entry));
         packet.Write((byte)AdventureBookProgress.GetStars(player, entry));
         packet.Write((byte)AdventureBookProgress.GetRank(player));

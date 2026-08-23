@@ -5,34 +5,67 @@ using RoRebuildServer.Simulation;
 
 namespace RoRebuildServer.Custom.AdventureBook;
 
-/// <summary>Where a monster can be found, and how many of it stand there.</summary>
+/// <summary>Where something can be found, and how many of it stand there.</summary>
 public readonly record struct AdventureBookSighting(string Map, int Count);
 
-/// <summary>One monster's page. Three stars: hunt, hunt again, own its card.</summary>
+/// <summary>
+/// One page. Three stars: hunt, hunt again, own the card.
+/// </summary>
+/// <remarks>
+/// A page is a card rather than a monster. All five goblins drop the Goblin Card, the three
+/// ant soldiers drop Andre's, and Fungus shares with Poison Spore - so filing them separately
+/// meant a card that could only ever fill one of the pages it belonged to, and the rest of
+/// them stuck one star short forever. Grouping by the card removes the collision instead of
+/// working around it, and reads better besides: a hunter thinks of "goblins", not of six
+/// separate monsters that happen to carry different weapons.
+///
+/// A monster with no card at all is its own page, worth two stars.
+/// </remarks>
 public class AdventureBookEntry
 {
-    public required int MonsterId { get; init; }
-    public required string Code { get; init; }
+    /// <summary>
+    /// What the client names when it asks about this page: the card's item id, or the
+    /// monster's id when there is no card. Cards and monsters share a number range, so these
+    /// are never mixed in one lookup - see AdventureBook.EntriesByPageId.
+    /// </summary>
+    public required int PageId { get; init; }
+
+    /// <summary>Every monster whose death counts towards this page.</summary>
+    public required int[] MonsterIds { get; init; }
+
     public required string Name { get; init; }
+
+    /// <summary>
+    /// What the page covers, when it covers more than one thing. Empty for an ordinary page,
+    /// so a window can show "Dagger Goblin, Flail Goblin, ..." only where that is news.
+    /// </summary>
+    public required string Members { get; init; }
+
     public required int Level { get; init; }
     public required string Region { get; init; }
 
-    /// <summary>Spawn slots this monster holds across every map in the world.</summary>
+    /// <summary>Spawn slots everything on this page holds across every map in the world.</summary>
     public required int SpawnCount { get; init; }
 
     public required int HuntTarget { get; init; }
     public required int HuntTargetLarge { get; init; }
 
-    /// <summary>The card this monster drops, or 0 when it has none and the third star is out of reach.</summary>
+    /// <summary>The card, or 0 when there is none and the third star is out of reach.</summary>
     public required int CardItemId { get; init; }
 
     /// <summary>Every map it stands on, most crowded first. This is what the book offers to travel to.</summary>
     public required AdventureBookSighting[] Sightings { get; init; }
 
     /// <summary>
-    /// The npc flag this monster's progress is kept under, worked out once at startup rather
+    /// The npc flag this page's progress is kept under, worked out once at startup rather
     /// than rebuilt on every kill. Every hit a player lands runs through here.
     /// </summary>
+    /// <remarks>
+    /// Built from the lowest monster id on the page rather than from the card, so a page
+    /// covering one monster keeps the flag it always had and nobody loses progress to this
+    /// regrouping. Lowest rather than largest or first so it does not move when spawn data
+    /// changes.
+    /// </remarks>
     public required string ProgressFlag { get; init; }
 
     public int StarCount => CardItemId > 0 ? 3 : 2;
@@ -60,18 +93,15 @@ public class AdventureBookRegion
 public static class AdventureBook
 {
     public static readonly List<AdventureBookRegion> Regions = new();
+
+    /// <summary>Every monster to the page it counts towards. Many monsters, one page.</summary>
     public static readonly Dictionary<int, AdventureBookEntry> EntriesByMonsterId = new();
 
-    /// <summary>
-    /// Card item id to every page it completes, so gaining one is a single lookup.
-    /// </summary>
-    /// <remarks>
-    /// A list rather than one entry, because a card is not one monster's. All five goblins
-    /// drop the Goblin Card, all three ant soldiers drop the Andre Card, and Fungus shares
-    /// with Poison Spore. Keeping only the first meant every other page could never reach its
-    /// third star, which quietly made four of the region rewards impossible to earn.
-    /// </remarks>
-    public static readonly Dictionary<int, List<AdventureBookEntry>> EntriesByCardId = new();
+    /// <summary>Card item id to the one page it fills. One card, one page, by construction.</summary>
+    public static readonly Dictionary<int, AdventureBookEntry> EntriesByCardId = new();
+
+    /// <summary>Page id to page, for a client that names one.</summary>
+    public static readonly Dictionary<int, AdventureBookEntry> EntriesByPageId = new();
 
     public static bool IsBuilt { get; private set; }
     public static int StarTotal { get; private set; }
@@ -139,7 +169,7 @@ public static class AdventureBook
     };
 
     /// <summary>
-    /// How many of a monster the first star asks for, from how much of it the world holds.
+    /// How much hunting the first star asks for, from how much of it the world holds.
     /// </summary>
     /// <remarks>
     /// A flat number would have been simpler to explain but not to play: Poring holds over a
@@ -153,18 +183,30 @@ public static class AdventureBook
         return Math.Clamp(target, 50, 500);
     }
 
+    /// <summary>What one monster contributed, before anything is grouped.</summary>
+    private class Gathered
+    {
+        public required int Id { get; init; }
+        public required string Code { get; init; }
+        public required string Name { get; init; }
+        public required int Level { get; init; }
+        public int CardItemId;
+        public readonly List<AdventureBookSighting> Sightings = new();
+        public readonly Dictionary<string, int> RegionCounts = new(StringComparer.OrdinalIgnoreCase);
+    }
+
     public static void Build()
     {
         Regions.Clear();
         EntriesByMonsterId.Clear();
         EntriesByCardId.Clear();
+        EntriesByPageId.Clear();
         StarTotal = 0;
         IsBuilt = false;
 
         //Read out of the running world rather than the spawn scripts, so the book always
         //describes the maps that actually loaded rather than the ones that were written down.
-        var sightings = new Dictionary<string, List<AdventureBookSighting>>(StringComparer.OrdinalIgnoreCase);
-        var regionCounts = new Dictionary<string, Dictionary<string, int>>(StringComparer.OrdinalIgnoreCase);
+        var gathered = new Dictionary<string, Gathered>(StringComparer.OrdinalIgnoreCase);
         var bosses = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var instance in World.Instance.Instances)
@@ -187,26 +229,33 @@ public static class AdventureBook
                         continue;
                     }
 
-                    if (!sightings.TryGetValue(monster.Code, out var seen))
-                        sightings[monster.Code] = seen = new List<AdventureBookSighting>();
-                    seen.Add(new AdventureBookSighting(map.Name, rule.Count));
+                    if (!gathered.TryGetValue(monster.Code, out var found))
+                    {
+                        gathered[monster.Code] = found = new Gathered
+                        {
+                            Id = monster.Id,
+                            Code = monster.Code,
+                            Name = monster.Name,
+                            Level = monster.Level
+                        };
+                        found.CardItemId = FindCardDroppedBy(monster.Code);
+                    }
+
+                    found.Sightings.Add(new AdventureBookSighting(map.Name, rule.Count));
 
                     if (SkippedRegions.Contains(instance.Name))
                         continue;
 
-                    if (!regionCounts.TryGetValue(monster.Code, out var counts))
-                        regionCounts[monster.Code] = counts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                    counts.TryGetValue(instance.Name, out var running);
-                    counts[instance.Name] = running + rule.Count;
+                    found.RegionCounts.TryGetValue(instance.Name, out var running);
+                    found.RegionCounts[instance.Name] = running + rule.Count;
                 }
             }
         }
 
-        var regionLookup = new Dictionary<string, AdventureBookRegion>(StringComparer.OrdinalIgnoreCase);
-        var homeless = 0;
         var notQuarry = 0;
+        var groups = new Dictionary<int, List<Gathered>>();
 
-        foreach (var (code, counts) in regionCounts)
+        foreach (var (code, found) in gathered)
         {
             if (bosses.Contains(code))
                 continue;
@@ -224,60 +273,103 @@ public static class AdventureBook
                 continue;
             }
 
-            var region = ResolveRegion(code, counts);
-            if (region == null)
+            //Cards and monsters both number in the four thousands, so the two kinds of key
+            //would collide in one dictionary. A monster with no card takes the negative of
+            //its id, which no card can be.
+            var key = found.CardItemId > 0 ? found.CardItemId : -found.Id;
+            if (!groups.TryGetValue(key, out var members))
+                groups[key] = members = new List<Gathered>();
+            members.Add(found);
+        }
+
+        var regionLookup = new Dictionary<string, AdventureBookRegion>(StringComparer.OrdinalIgnoreCase);
+        var homeless = 0;
+        var merged = 0;
+
+        foreach (var (key, members) in groups)
+        {
+            members.Sort((a, b) => a.Id - b.Id);
+
+            var regionCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var mapCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+            var spawnCount = 0;
+
+            foreach (var member in members)
             {
-                homeless++;
+                foreach (var (region, count) in member.RegionCounts)
+                {
+                    regionCounts.TryGetValue(region, out var running);
+                    regionCounts[region] = running + count;
+                }
+
+                foreach (var sighting in member.Sightings)
+                {
+                    mapCounts.TryGetValue(sighting.Map, out var running);
+                    mapCounts[sighting.Map] = running + sighting.Count;
+                    spawnCount += sighting.Count;
+                }
+            }
+
+            var regionName = ResolveRegion(members, regionCounts);
+            if (regionName == null)
+            {
+                homeless += members.Count;
                 continue;
             }
 
-            if (!regionLookup.TryGetValue(region, out var bookRegion))
+            if (!regionLookup.TryGetValue(regionName, out var bookRegion))
             {
-                if (!RegionHeadgear.TryGetValue(region, out var headgear))
+                if (!RegionHeadgear.TryGetValue(regionName, out var headgear))
                 {
                     //A region with nothing to hand out would be a page nobody finishes.
-                    ServerLogger.LogWarning($"[AdventureBook] The region '{region}' has monsters but no reward headgear, so it is left out of the book.");
-                    homeless++;
+                    ServerLogger.LogWarning($"[AdventureBook] The region '{regionName}' has monsters but no reward headgear, so it is left out of the book.");
+                    homeless += members.Count;
                     continue;
                 }
 
-                regionLookup[region] = bookRegion = new AdventureBookRegion
+                regionLookup[regionName] = bookRegion = new AdventureBookRegion
                 {
-                    Name = region,
+                    Name = regionName,
                     RewardHeadgear = headgear,
-                    CompletionFlag = "abr" + region.Replace(" ", "").Replace(".", "")
+                    CompletionFlag = "abr" + regionName.Replace(" ", "").Replace(".", "")
                 };
             }
 
-            var spawnCount = sightings.TryGetValue(code, out var seen) ? seen.Sum(s => s.Count) : 0;
+            var cardId = key > 0 ? key : 0;
             var target = HuntTargetForSpawnCount(spawnCount);
+            if (members.Count > 1)
+                merged += members.Count;
 
             var entry = new AdventureBookEntry
             {
-                MonsterId = monster.Id,
-                Code = monster.Code,
-                Name = monster.Name,
-                Level = monster.Level,
-                Region = region,
+                PageId = key > 0 ? key : members[0].Id,
+                MonsterIds = members.Select(m => m.Id).ToArray(),
+                Name = PageName(members, cardId),
+                Members = members.Count > 1 ? string.Join(", ", members.Select(m => m.Name)) : string.Empty,
+                Level = (int)members.Average(m => m.Level),
+                Region = regionName,
                 SpawnCount = spawnCount,
                 HuntTarget = target,
                 HuntTargetLarge = target * 3,
-                CardItemId = FindCardDroppedBy(code),
-                Sightings = seen == null
-                    ? Array.Empty<AdventureBookSighting>()
-                    : seen.OrderByDescending(s => s.Count).ToArray(),
-                ProgressFlag = "ab" + monster.Id
+                CardItemId = cardId,
+                Sightings = mapCounts
+                    .Select(kv => new AdventureBookSighting(kv.Key, kv.Value))
+                    .OrderByDescending(s => s.Count)
+                    .ToArray(),
+
+                //Lowest id on the page, so a page covering one monster keeps the flag it
+                //already had and this regrouping costs nobody their progress.
+                ProgressFlag = "ab" + members[0].Id
             };
 
             bookRegion.Entries.Add(entry);
-            EntriesByMonsterId[entry.MonsterId] = entry;
+            EntriesByPageId[entry.PageId] = entry;
+
+            foreach (var id in entry.MonsterIds)
+                EntriesByMonsterId[id] = entry;
 
             if (entry.CardItemId > 0)
-            {
-                if (!EntriesByCardId.TryGetValue(entry.CardItemId, out var sharing))
-                    EntriesByCardId[entry.CardItemId] = sharing = new List<AdventureBookEntry>();
-                sharing.Add(entry);
-            }
+                EntriesByCardId[entry.CardItemId] = entry;
         }
 
         foreach (var region in regionLookup.Values)
@@ -291,17 +383,48 @@ public static class AdventureBook
         IsBuilt = Regions.Count > 0;
 
         VerifyRewards();
-        LogSummary(homeless, notQuarry);
+        LogSummary(homeless, notQuarry, merged);
     }
 
-    private static string? ResolveRegion(string code, Dictionary<string, int> counts)
+    /// <summary>
+    /// What to call a page.
+    /// </summary>
+    /// <remarks>
+    /// One monster keeps its own name, which is what somebody looking for it will search for.
+    /// A page covering several is named after the card that binds them, with the word Card
+    /// taken off the end - "Goblin Card" becomes "Goblin", which is what a hunter would have
+    /// called the group anyway. The member names go on the page as well, so nobody has to
+    /// guess whether Festive Goblin is in there.
+    /// </remarks>
+    private static string PageName(List<Gathered> members, int cardId)
     {
-        if (RegionOverrides.TryGetValue(code, out var chosen))
+        if (members.Count == 1)
+            return members[0].Name;
+
+        var card = cardId > 0 ? DataManager.GetItemInfoById(cardId)?.Name : null;
+        if (string.IsNullOrWhiteSpace(card))
+            return members[0].Name;
+
+        const string suffix = " Card";
+        if (card.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
+            card = card[..^suffix.Length];
+
+        return string.IsNullOrWhiteSpace(card) ? members[0].Name : card;
+    }
+
+    private static string? ResolveRegion(List<Gathered> members, Dictionary<string, int> counts)
+    {
+        //A hand written home wins, and any member carrying one speaks for the whole page -
+        //the override table names monsters, and a page can be several of them.
+        foreach (var member in members)
         {
+            if (!RegionOverrides.TryGetValue(member.Code, out var chosen))
+                continue;
+
             if (RegionHeadgear.ContainsKey(chosen))
                 return chosen;
 
-            ServerLogger.LogWarning($"[AdventureBook] {code} is assigned by hand to '{chosen}', which is not a region in the book. Falling back to where it spawns most.");
+            ServerLogger.LogWarning($"[AdventureBook] {member.Code} is assigned by hand to '{chosen}', which is not a region in the book. Falling back to where it spawns most.");
         }
 
         if (counts.Count == 0)
@@ -351,7 +474,7 @@ public static class AdventureBook
         }
     }
 
-    private static void LogSummary(int homeless, int notQuarry)
+    private static void LogSummary(int homeless, int notQuarry, int merged)
     {
         if (!IsBuilt)
         {
@@ -359,29 +482,34 @@ public static class AdventureBook
             return;
         }
 
-        var shared = 0;
-        foreach (var (_, sharing) in EntriesByCardId)
-            if (sharing.Count > 1)
-                shared += sharing.Count;
-
         var entries = Regions.Sum(r => r.Entries.Count);
         var kills = Regions.Sum(r => r.TotalKillsRequired);
         var cardless = Regions.Sum(r => r.Entries.Count(e => e.CardItemId == 0));
 
-        ServerLogger.Log($"[AdventureBook] {entries} monsters across {Regions.Count} regions, {StarTotal} stars, {kills:N0} kills to fill it.");
+        ServerLogger.Log($"[AdventureBook] {entries} pages across {Regions.Count} regions, {StarTotal} stars, {kills:N0} kills to fill it.");
+        if (merged > 0)
+            ServerLogger.Log($"[AdventureBook] {merged} monsters share a card with something else and are grouped onto {CountMergedPages()} pages between them.");
         if (cardless > 0)
-            ServerLogger.Log($"[AdventureBook] {cardless} of those drop no card, so they are worth two stars rather than three.");
+            ServerLogger.Log($"[AdventureBook] {cardless} pages drop no card, so they are worth two stars rather than three.");
         if (homeless > 0)
             ServerLogger.Log($"[AdventureBook] {homeless} monsters were left out because their maps belong to no region in the book.");
         if (notQuarry > 0)
             ServerLogger.Log($"[AdventureBook] {notQuarry} were left out for being worth no experience - plants, mushrooms and training dummies.");
-        if (shared > 0)
-            ServerLogger.Log($"[AdventureBook] {shared} share a card with something else, so one of those fills every page that drops it.");
 
         foreach (var region in Regions)
         {
-            ServerLogger.Log($"[AdventureBook]   {region.Name,-22} {region.Entries.Count,3} monsters  avg lv {region.AverageLevel,3}  "
+            ServerLogger.Log($"[AdventureBook]   {region.Name,-22} {region.Entries.Count,3} pages  avg lv {region.AverageLevel,3}  "
                              + $"{region.StarCount,3} stars  {region.TotalKillsRequired,7:N0} kills  reward {region.RewardHeadgear}");
         }
+    }
+
+    private static int CountMergedPages()
+    {
+        var count = 0;
+        foreach (var (_, entry) in EntriesByPageId)
+            if (entry.MonsterIds.Length > 1)
+                count++;
+
+        return count;
     }
 }

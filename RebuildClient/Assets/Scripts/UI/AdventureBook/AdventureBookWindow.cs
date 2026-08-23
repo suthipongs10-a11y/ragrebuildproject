@@ -51,7 +51,7 @@ namespace Assets.Scripts.UI.AdventureBook
         private TextMeshProUGUI header;
         private View view = View.Regions;
         private int regionIndex = -1;
-        private int monsterId = -1;
+        private int pageId = -1;
         private int drawnRevision = -1;
 
         private readonly List<GameObject> rows = new List<GameObject>();
@@ -86,7 +86,7 @@ namespace Assets.Scripts.UI.AdventureBook
             //an hour ago is rarely the page somebody came back for.
             instance.view = View.Regions;
             instance.regionIndex = -1;
-            instance.monsterId = -1;
+            instance.pageId = -1;
 
             NetworkManager.Instance.SendAdventureBookRefresh();
             instance.Redraw();
@@ -234,12 +234,12 @@ namespace Assets.Scripts.UI.AdventureBook
 
             foreach (var page in region.Pages)
             {
-                var id = page.MonsterId;
+                var id = page.PageId;
                 var target = page.HasHunt ? page.HuntTargetLarge : page.HuntTarget;
                 var row = NewRow(y, page.IsComplete ? DoneColor : ModernUiTheme.NameColor,
                     $"{Stars(page)}  {page.Name}",
                     page.IsComplete ? "ครบแล้ว" : $"{page.Kills:N0}/{target:N0}",
-                    () => { view = View.Page; monsterId = id; Redraw(); });
+                    () => { view = View.Page; pageId = id; Redraw(); });
 
                 rows.Add(row);
                 y += RowHeight + RowGap;
@@ -251,7 +251,7 @@ namespace Assets.Scripts.UI.AdventureBook
         private float DrawPage()
         {
             var y = Pad;
-            if (!AdventureBookState.PagesByMonster.TryGetValue(monsterId, out var page))
+            if (!AdventureBookState.PagesById.TryGetValue(pageId, out var page))
             {
                 view = View.Pages;
                 return DrawPages();
@@ -260,6 +260,14 @@ namespace Assets.Scripts.UI.AdventureBook
             rows.Add(NewRow(y, ModernUiTheme.AccentInkColor, "◀ ย้อนกลับ", $"{page.Name}  Lv {page.Level}",
                 () => { view = View.Pages; Redraw(); }));
             y += RowHeight + RowGap;
+
+            //Only where it is news. A page covering one monster is named after it, so saying
+            //so again would be a row that tells nobody anything.
+            if (!string.IsNullOrEmpty(page.Members))
+            {
+                rows.Add(NewRow(y, ModernUiTheme.LabelColor, "นับรวม", page.Members, null));
+                y += RowHeight + RowGap;
+            }
 
             rows.Add(NewRow(y, page.HasHunt ? EarnedColor : ModernUiTheme.MutedColor,
                 page.HasHunt ? "★ สำเร็จ" : "★",
@@ -286,7 +294,7 @@ namespace Assets.Scripts.UI.AdventureBook
             foreach (var sighting in page.Sightings)
             {
                 var map = sighting.Map;
-                var id = page.MonsterId;
+                var id = page.PageId;
                 var row = NewRow(y, ModernUiTheme.NameColor, map, $"{sighting.Count:N0} ตัว", null);
                 rows.Add(row);
 
