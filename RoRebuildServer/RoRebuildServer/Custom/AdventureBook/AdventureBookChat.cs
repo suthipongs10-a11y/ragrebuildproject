@@ -54,7 +54,7 @@ public static class AdventureBookChat
     private static void ShowSummary(Player player)
     {
         var stars = AdventureBookProgress.CountStars(player);
-        var rank = AdventureBookRank.RankFor(stars, AdventureBookProgress.HasEveryRegion(player));
+        var rank = AdventureBookProgress.RefreshRank(player);
         var nextRank = AdventureBookRank.StarsForNextRank(rank);
         var toNext = nextRank > 0 ? $"  (อีก {nextRank - stars:N0} ดาวถึงระดับ {rank + 1})" : string.Empty;
 

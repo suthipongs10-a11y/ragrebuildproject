@@ -901,6 +901,10 @@ public class Player : IEntityAutoReset
         GuildSkills.ApplyTo(this);
         GuildSkills.RefreshBuffIcon(this);
 
+        //Same reasoning as the guild skills above: laid on after the base stats have been put
+        //back, so a rank that changes never needs unwinding and cannot leak.
+        Custom.AdventureBook.AdventureBookRank.ApplyTo(this);
+
         //updated aspd chart
         //base attack speed is identical to pre-renewal, 0.4% lower delay per point of agi and 0.1% for dex
         //the aspd bonus is handled differently should work out to nearly the same up to +60% aspd

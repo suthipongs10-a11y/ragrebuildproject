@@ -1,3 +1,6 @@
+using RebuildSharedData.Enum.EntityStats;
+using RoRebuildServer.EntityComponents;
+
 namespace RoRebuildServer.Custom.AdventureBook;
 
 /// <summary>
@@ -40,4 +43,71 @@ public static class AdventureBookRank
     /// <summary>How many stars the next rank asks for, or 0 when there is no next rank to reach.</summary>
     public static int StarsForNextRank(int currentRank) =>
         currentRank >= StarsForRank.Length ? 0 : StarsForRank[currentRank];
+
+    /// <summary>What a rank is worth, all of it, rather than what the last rank added.</summary>
+    public readonly record struct RankBonus(int Stats, int DropPercent, int ExpPercent, int RefinePercent);
+
+    public static RankBonus BonusFor(int rank)
+    {
+        if (rank <= 0)
+            return default;
+        if (rank >= MaxRank)
+            return new RankBonus(5, 12, 12, 8);
+
+        return new RankBonus(
+            Math.Min(rank, 3),
+            Math.Clamp(rank - 3, 0, 3) * 3,
+            Math.Clamp(rank - 6, 0, 3) * 3,
+            Math.Clamp(rank - 6, 0, 3) * 2);
+    }
+
+    /// <summary>
+    /// Lays the rank's bonuses over a player's freshly rebuilt stats.
+    /// </summary>
+    /// <remarks>
+    /// Called from UpdateStats, right where the guild skills go on, and for the same reason
+    /// the comment there gives: adding on gain and subtracting on loss is the version that
+    /// leaks. UpdateStats has already set the base stats back to what the character actually
+    /// has, so a rank that changes - or a book that gets switched off - simply stops being
+    /// added rather than needing to be unwound.
+    ///
+    /// Refine chance is not a stat, so it is not applied here; the refine system asks for it
+    /// at the moment somebody swings a hammer.
+    /// </remarks>
+    public static void ApplyTo(Player player)
+    {
+        if (!AdventureBookManager.IsEnabled || !AdventureBook.IsBuilt)
+            return;
+
+        var bonus = BonusFor(AdventureBookProgress.GetRank(player));
+        if (bonus.Stats <= 0 && bonus.DropPercent <= 0 && bonus.ExpPercent <= 0)
+            return;
+
+        var ce = player.CombatEntity;
+
+        if (bonus.Stats > 0)
+        {
+            ce.AddStat(CharacterStat.AddStr, bonus.Stats);
+            ce.AddStat(CharacterStat.AddAgi, bonus.Stats);
+            ce.AddStat(CharacterStat.AddVit, bonus.Stats);
+            ce.AddStat(CharacterStat.AddInt, bonus.Stats);
+            ce.AddStat(CharacterStat.AddDex, bonus.Stats);
+            ce.AddStat(CharacterStat.AddLuk, bonus.Stats);
+        }
+
+        if (bonus.DropPercent > 0)
+            ce.AddStat(CharacterStat.AddDropPercent, bonus.DropPercent);
+
+        if (bonus.ExpPercent > 0)
+            ce.AddStat(CharacterStat.AddExpPercent, bonus.ExpPercent);
+    }
+
+    /// <summary>The percentage points a player's rank adds to a refine attempt.</summary>
+    public static int RefineBonusFor(Player player)
+    {
+        if (!AdventureBookManager.IsEnabled || !AdventureBook.IsBuilt)
+            return 0;
+
+        return BonusFor(AdventureBookProgress.GetRank(player)).RefinePercent;
+    }
 }

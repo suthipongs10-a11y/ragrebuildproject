@@ -65,6 +65,7 @@ public static class AdventureBookProgress
         player.SetNpcFlag(entry.ProgressFlag, stored | (int)star);
         GiveReward(player, entry, star);
         CheckRegionComplete(player, entry.Region);
+        RefreshRank(player);
     }
 
     /// <summary>
@@ -189,6 +190,7 @@ public static class AdventureBookProgress
 
         //A page whose last star was a hunting one finishes a region just as surely as a card.
         CheckRegionComplete(player, entry.Region);
+        RefreshRank(player);
     }
 
     private readonly record struct Reward(string Code, int Count);
@@ -256,6 +258,66 @@ public static class AdventureBookProgress
 
         ServerAnnouncements.Announce($"ยินดีด้วย {player.Name} [Adventure ระดับ {rank}] ทำเควสระดับ 3 ดาว ของ {entry.Name} สำเร็จ !");
     }
+
+    /// <summary>
+    /// The flag holding a cached rank, stored one higher than it is so that a zero means
+    /// nobody has worked it out yet rather than meaning rank zero.
+    /// </summary>
+    private const string RankFlag = "abrank";
+
+    /// <summary>
+    /// A player's adventure rank, counted once and then remembered.
+    /// </summary>
+    /// <remarks>
+    /// Counting means walking every page in the book, and UpdateStats - which is where the
+    /// rank's bonuses go on - runs on every equipment change, every level, and every buff.
+    /// Doing the walk there would put a few hundred dictionary lookups on a path that has no
+    /// business being slow. It is recounted at the only moment it can change, which is when a
+    /// star is awarded.
+    /// </remarks>
+    public static int GetRank(Player player)
+    {
+        var stored = player.GetNpcFlag(RankFlag);
+        if (stored > 0)
+            return stored - 1;
+
+        //Nobody has counted for this character yet, which is every character that existed
+        //before the rank did. Counted and written down, but nothing is rebuilt from here:
+        //this is reached from inside UpdateStats, and asking UpdateStats to run again from
+        //the middle of itself is a mess whether or not it terminates.
+        var rank = Count(player);
+        player.SetNpcFlag(RankFlag, rank + 1);
+        return rank;
+    }
+
+    /// <summary>
+    /// Recounts the rank and, if it moved, rebuilds the stats so the new bonuses are real.
+    /// </summary>
+    /// <remarks>
+    /// Only ever called from outside UpdateStats - when a star lands, or when somebody opens
+    /// their book - so the rebuild it asks for is a plain call rather than a reentrant one.
+    /// </remarks>
+    public static int RefreshRank(Player player)
+    {
+        var rank = Count(player);
+        var stored = player.GetNpcFlag(RankFlag);
+        if (stored == rank + 1)
+            return rank;
+
+        player.SetNpcFlag(RankFlag, rank + 1);
+
+        //The bonuses ride on UpdateStats, so a rank that just went up is worth nothing until
+        //the stats are rebuilt.
+        player.UpdateStats();
+
+        if (stored > 0 && rank > stored - 1)
+            Announce(player, $"<color=#FFD700>Adventure ระดับ {rank} แล้ว !</color>");
+
+        return rank;
+    }
+
+    private static int Count(Player player) =>
+        AdventureBookRank.RankFor(CountStars(player), HasEveryRegion(player));
 
     /// <summary>Whether every region in the book has been finished, which is the last rank.</summary>
     public static bool HasEveryRegion(Player player)

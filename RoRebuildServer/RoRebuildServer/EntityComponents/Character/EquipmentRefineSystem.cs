@@ -56,6 +56,9 @@ public static class EquipmentRefineSystem
         var successRate = DataManager.GetRefineSuccessForItem(rank, item.UniqueItem.Refine);
         var forceSafe = false;
 
+        //Adventure rank pays out here rather than as a stat, because refine chance is not one.
+        successRate += Custom.AdventureBook.AdventureBookRank.RefineBonusFor(player);
+
         if (catalyst > 0)
         {
             inventory.GetItem(catalyst, out var catalystItem);
