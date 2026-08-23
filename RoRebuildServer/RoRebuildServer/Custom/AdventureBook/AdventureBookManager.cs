@@ -1,5 +1,8 @@
+using RebuildSharedData.Enum;
 using RoRebuildServer.Data;
+using RoRebuildServer.Data.Monster;
 using RoRebuildServer.Data.ServerConfigScript;
+using RoRebuildServer.EntityComponents;
 using RoRebuildServer.Logging;
 
 namespace RoRebuildServer.Custom.AdventureBook;
@@ -40,6 +43,49 @@ public class AdventureBookManager : ServerConfigScriptHandlerBase
             //did before, and that is a far better outcome than not starting.
             IsEnabled = false;
             ServerLogger.LogError($"[AdventureBook] Failed to build, so it is switched off for this run: {e}");
+            return;
+        }
+
+        MonsterRewardManager.RegisterKillMonsterEvent(OnKillMonster);
+    }
+
+    /// <summary>
+    /// Marks a kill down for everyone who helped make it.
+    /// </summary>
+    /// <remarks>
+    /// Credit follows damage, the same rule experience already uses, rather than going to
+    /// whoever landed the last hit or to the top contributor alone. A party grinding together
+    /// all fill their books together, which is the behaviour worth encouraging, and standing
+    /// around earns nothing because standing around deals no damage.
+    ///
+    /// Runs on the kill event rather than on the experience event on purpose. Experience is
+    /// paid out through two different paths and the event only fires on the one for parties
+    /// that share, so hooking it would have left everybody playing alone out of the book
+    /// entirely - which is most of a small server, and would have looked like the counter was
+    /// simply broken.
+    /// </remarks>
+    private void OnKillMonster(Monster monster)
+    {
+        if (!IsEnabled || !AdventureBook.IsBuilt)
+            return;
+
+        var damage = monster.TotalDamageReceived;
+        if (damage == null || damage.Count == 0)
+            return;
+
+        if (!AdventureBook.EntriesByMonsterId.TryGetValue(monster.MonsterBase.Id, out var entry))
+            return;
+
+        var map = monster.Character.Map;
+
+        foreach (var (attacker, _) in damage)
+        {
+            if (!attacker.TryGet<Player>(out var player))
+                continue;
+            if (player.Character.Map != map || player.Character.State == CharacterState.Dead || !player.Character.IsActive)
+                continue;
+
+            AdventureBookProgress.RecordKill(player, entry);
         }
     }
 }

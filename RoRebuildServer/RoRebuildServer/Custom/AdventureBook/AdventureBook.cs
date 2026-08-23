@@ -29,6 +29,12 @@ public class AdventureBookEntry
     /// <summary>Every map it stands on, most crowded first. This is what the book offers to travel to.</summary>
     public required AdventureBookSighting[] Sightings { get; init; }
 
+    /// <summary>
+    /// The npc flag this monster's progress is kept under, worked out once at startup rather
+    /// than rebuilt on every kill. Every hit a player lands runs through here.
+    /// </summary>
+    public required string ProgressFlag { get; init; }
+
     public int StarCount => CardItemId > 0 ? 3 : 2;
 }
 
@@ -68,14 +74,6 @@ public static class AdventureBook
         { "POPORING", "Geffen Fields" },
         { "DROPS", "Morroc Fields" },
         { "MARIN", "Lutie" },
-        { "GREEN_PLANT", "Prontera Fields" },
-        { "RED_PLANT", "Morroc Fields" },
-        { "YELLOW_PLANT", "Geffen Fields" },
-        { "WHITE_PLANT", "Payon Fields" },
-        { "BLUE_PLANT", "Mt. Mjolnir" },
-        { "SHINING_PLANT", "Yuno Fields" },
-        { "BLACK_MUSHROOM", "Payon Dungeon" },
-        { "RED_MUSHROOM", "Payon Fields" },
         { "POISON_SPORE", "Payon Fields" },
         { "THIEF_BUG", "Prontera Culverts" },
         { "THIEF_BUG_FEMALE", "Prontera Culverts" },
@@ -186,6 +184,7 @@ public static class AdventureBook
 
         var regionLookup = new Dictionary<string, AdventureBookRegion>(StringComparer.OrdinalIgnoreCase);
         var homeless = 0;
+        var notQuarry = 0;
 
         foreach (var (code, counts) in regionCounts)
         {
@@ -193,6 +192,17 @@ public static class AdventureBook
                 continue;
             if (!DataManager.MonsterCodeLookup.TryGetValue(code, out var monster))
                 continue;
+
+            //Worth no experience means it is scenery or a training dummy rather than
+            //something anybody hunts: plants, mushrooms, and the practice dummy that has a
+            //hundred thousand hit points and respawns every fifteen seconds. A page asking
+            //for three hundred Green Plants is not a challenge, and the dummy would have
+            //been the cheapest star in the game by a wide margin.
+            if (monster.Exp == 0 && monster.JobExp == 0)
+            {
+                notQuarry++;
+                continue;
+            }
 
             var region = ResolveRegion(code, counts);
             if (region == null)
@@ -230,7 +240,8 @@ public static class AdventureBook
                 CardItemId = FindCardDroppedBy(code),
                 Sightings = seen == null
                     ? Array.Empty<AdventureBookSighting>()
-                    : seen.OrderByDescending(s => s.Count).ToArray()
+                    : seen.OrderByDescending(s => s.Count).ToArray(),
+                ProgressFlag = "ab" + monster.Id
             };
 
             bookRegion.Entries.Add(entry);
@@ -248,7 +259,7 @@ public static class AdventureBook
         IsBuilt = Regions.Count > 0;
 
         VerifyRewards();
-        LogSummary(homeless);
+        LogSummary(homeless, notQuarry);
     }
 
     private static string? ResolveRegion(string code, Dictionary<string, int> counts)
@@ -308,7 +319,7 @@ public static class AdventureBook
         }
     }
 
-    private static void LogSummary(int homeless)
+    private static void LogSummary(int homeless, int notQuarry)
     {
         if (!IsBuilt)
         {
@@ -325,6 +336,8 @@ public static class AdventureBook
             ServerLogger.Log($"[AdventureBook] {cardless} of those drop no card, so they are worth two stars rather than three.");
         if (homeless > 0)
             ServerLogger.Log($"[AdventureBook] {homeless} monsters were left out because their maps belong to no region in the book.");
+        if (notQuarry > 0)
+            ServerLogger.Log($"[AdventureBook] {notQuarry} were left out for being worth no experience - plants, mushrooms and training dummies.");
 
         foreach (var region in Regions)
         {
