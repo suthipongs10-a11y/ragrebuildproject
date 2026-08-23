@@ -288,6 +288,21 @@ Item("Wizard_Hat")          { OnEquip: AddStat(AddMaxSp, 100); }
 ได้สามอย่างพร้อมกัน: สมุดให้รางวัลตัวเอง · ตัวละครใหม่ไม่ได้วาร์ปฟรีตั้งแต่วันแรก ·
 คาฟรา `Fly_Wing` `Butterfly_Wing` ยังมีเหตุผลจะมีอยู่
 
+### ทำแล้ว: packet ของตัวเอง
+
+```
+AdventureBookAction  (client -> server)  Refresh / Warp
+AdventureBookData    (server -> client)  Book / PageUpdate
+```
+
+`Warp` ตรวจฝั่งเซิร์ฟเวอร์ครบ **ไม่เชื่อ client สักอย่าง**
+
+1. มีดาว ★ ของมอนตัวนั้นแล้วหรือยัง
+2. มอนตัวนั้นอยู่บนแมพที่ขอมาจริงไหม (เทียบกับ `Sightings` ของเซิร์ฟเวอร์เอง)
+3. Zeny พอไหม — ค่าเดินทาง `500 + Lv×10` (ต่ำสุด 500 สูงสุด 2000) · **ระดับ 5 ขึ้นไปฟรี**
+
+**หักเงินหลังผ่านครบทุกด่านแล้วเท่านั้น** เที่ยวที่ถูกปฏิเสธจะไม่มีวันเป็นเที่ยวที่จ่ายเงินไปแล้ว
+
 ### ⛔ ห้ามใช้ `AdminRequestMove`
 
 ปุ่ม Teleport ในหน้าต่างฐานข้อมูลส่ง `PacketType.AdminRequestMove` ซึ่งเป็นคำสั่ง GM
@@ -399,10 +414,10 @@ ServerAnnouncements.Announce(...)                            // Custom/ServerAnn
 |---|---|---|
 | 0 | ✅ แก้ `NpcFlagStorageSize` ใน `PlayerDataDbHelper` | — |
 | 1 | ✅ `AdventureBookManager` สร้างสมุดตอนบูต + ตาราง override ภูมิภาค | — |
-| 2 | นับ kill + เก็บลง NpcFlags + ★1/★2 + ประกาศตอนสำเร็จ | ✅ ทดสอบได้ |
-| 3 | ★3 การ์ด + NPC รับรางวัล + หมวก 24 ใบ + เอฟเฟกต์หมวก | ✅ ครบวง |
-| 4 | Adventure Rank + บัฟถาวร + แก้อัตราตีบวก | ✅ |
-| 5 | หน้าต่าง UI (`WindowBase` + `UiManager`) + packet วาร์ปของสมุด | ✅ |
+| 2 | ✅ นับ kill + เก็บลง NpcFlags + ★1/★2 + ประกาศตอนสำเร็จ | ✅ |
+| 3 | ✅ ★3 การ์ด + หมวก 24 ใบ + เอฟเฟกต์หมวก (ไม่ต้องมี NPC) | ✅ |
+| 4 | ✅ Adventure Rank + บัฟถาวร + อัตราตีบวก | ✅ |
+| 5 | ✅ หน้าต่าง UI (`WindowBase`) + packet วาร์ปของสมุด | ✅ |
 | 6 | ปิด `EnableWarpCommandForEveryone` แล้วไล่เทสว่าไม่มีอะไรพึ่งมันอยู่ | ก่อน beta |
 
 ขั้น 2 จบแล้วทดสอบได้เลยโดยยังไม่มี UI — ตามหลัก "รันได้ก่อน ครบทีหลัง"
