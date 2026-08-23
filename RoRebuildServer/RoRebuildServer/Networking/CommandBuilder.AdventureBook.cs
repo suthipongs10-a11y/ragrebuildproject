@@ -17,66 +17,126 @@ namespace RoRebuildServer.Networking;
 public static partial class CommandBuilder
 {
     /// <summary>How many places to name for one monster. The window is a page, not an atlas.</summary>
-    private const int MaxSightingsSent = 5;
+    private const int MaxSightingsSent = 4;
 
     /// <summary>
-    /// The whole book and one character's place in it.
+    /// How many bytes of pages to put in one packet.
     /// </summary>
     /// <remarks>
-    /// Sent whole rather than a page at a time, on the reasoning that somebody who opened the
-    /// book is going to read more than one page of it.
+    /// OutboundMessage starts at a kilobyte and doubles until the next doubling would pass
+    /// ten thousand bytes, at which point it asserts - which is a hard stop that takes the
+    /// whole server down, not a dropped packet. The capacity argument StartPacket accepts is
+    /// ignored, so there is no way to ask for a bigger one. That leaves eight kilobytes as
+    /// the real ceiling, and well under a quarter of it leaves room for the estimate above to
+    /// be wrong without anybody finding out the expensive way.
+    /// </remarks>
+    private const int BatchByteBudget = 1800;
+
+    /// <summary>
+    /// The whole book and one character's place in it, in as many packets as it takes.
+    /// </summary>
+    /// <remarks>
+    /// Split because OutboundMessage refuses to grow past a few thousand bytes and asserts
+    /// rather than truncating - which takes the whole server down, not just the request. The
+    /// book is a couple of hundred pages with names and places attached, so it was never
+    /// going to fit in one.
+    ///
+    /// A header first, carrying the regions and their rewards, so the window has something to
+    /// draw immediately. Then the pages in batches sized by a running estimate of the bytes
+    /// each one costs rather than by a count, because a page's size is mostly the length of
+    /// the names on it and those vary by a factor of three.
     ///
     /// The names and the maps are carried even though the client holds a monster database of
     /// its own, because the book's list is not the database's list: it is built from the maps
     /// that actually loaded, and it is the same list the travel request is checked against. A
     /// window offering a map the server will refuse is worse than a slightly larger packet.
-    ///
-    /// Only the five most crowded maps for each monster are sent. The window shows them as
-    /// somewhere to go, and past five it is a list nobody reads attached to a packet
-    /// everybody pays for.
     /// </remarks>
     public static void SendAdventureBook(Player player)
     {
-        var packet = NetworkManager.StartPacket(PacketType.AdventureBookData, 8192);
-        packet.Write((byte)AdventureBookDataType.Book);
+        var header = NetworkManager.StartPacket(PacketType.AdventureBookData, 1024);
+        header.Write((byte)AdventureBookDataType.Header);
 
         var rank = AdventureBookProgress.GetRank(player);
-        packet.Write((byte)rank);
-        packet.Write((short)AdventureBookProgress.CountStars(player));
-        packet.Write((short)AdventureBook.StarTotal);
-        packet.Write((short)AdventureBookRank.StarsForNextRank(rank));
+        header.Write((byte)rank);
+        header.Write((short)AdventureBookProgress.CountStars(player));
+        header.Write((short)AdventureBook.StarTotal);
+        header.Write((short)AdventureBookRank.StarsForNextRank(rank));
 
-        packet.Write((byte)AdventureBook.Regions.Count);
+        header.Write((byte)AdventureBook.Regions.Count);
         foreach (var region in AdventureBook.Regions)
         {
-            packet.Write(region.Name);
-            packet.Write(region.RewardHeadgear);
-            packet.Write((byte)(player.GetNpcFlag(region.CompletionFlag) != 0 ? 1 : 0));
+            header.Write(region.Name);
+            header.Write(region.RewardHeadgear);
+            header.Write((byte)(player.GetNpcFlag(region.CompletionFlag) != 0 ? 1 : 0));
         }
 
-        packet.Write((short)AdventureBook.EntriesByMonsterId.Count);
+        NetworkManager.SendMessage(header, player.Connection);
+
+        var batch = new List<(AdventureBookEntry Entry, int Region)>();
+        var bytes = 0;
+
         for (var i = 0; i < AdventureBook.Regions.Count; i++)
         {
-            var region = AdventureBook.Regions[i];
-            foreach (var entry in region.Entries)
+            foreach (var entry in AdventureBook.Regions[i].Entries)
             {
-                packet.Write(entry.MonsterId);
-                packet.Write((byte)i);
-                packet.Write(entry.Name);
-                packet.Write((short)entry.Level);
-                packet.Write((short)entry.HuntTarget);
-                packet.Write((short)entry.HuntTargetLarge);
-                packet.Write(entry.CardItemId);
-                packet.Write(AdventureBookProgress.GetKills(player, entry));
-                packet.Write((byte)AdventureBookProgress.GetStars(player, entry));
-
-                var shown = Math.Min(entry.Sightings.Length, MaxSightingsSent);
-                packet.Write((byte)shown);
-                for (var s = 0; s < shown; s++)
+                var cost = EstimateEntryBytes(entry);
+                if (bytes + cost > BatchByteBudget && batch.Count > 0)
                 {
-                    packet.Write(entry.Sightings[s].Map);
-                    packet.Write((short)entry.Sightings[s].Count);
+                    SendPageBatch(player, batch);
+                    batch.Clear();
+                    bytes = 0;
                 }
+
+                batch.Add((entry, i));
+                bytes += cost;
+            }
+        }
+
+        if (batch.Count > 0)
+            SendPageBatch(player, batch);
+
+        //Said last, so the window knows it has everything rather than guessing from a count
+        //it would have to be told separately anyway.
+        var done = NetworkManager.StartPacket(PacketType.AdventureBookData, 8);
+        done.Write((byte)AdventureBookDataType.Complete);
+        NetworkManager.SendMessage(done, player.Connection);
+    }
+
+    /// <summary>Roughly what one page costs on the wire, erring high.</summary>
+    private static int EstimateEntryBytes(AdventureBookEntry entry)
+    {
+        var size = 32 + entry.Name.Length * 3;
+        var shown = Math.Min(entry.Sightings.Length, MaxSightingsSent);
+        for (var i = 0; i < shown; i++)
+            size += 8 + entry.Sightings[i].Map.Length * 3;
+
+        return size;
+    }
+
+    private static void SendPageBatch(Player player, List<(AdventureBookEntry Entry, int Region)> batch)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.AdventureBookData, BatchByteBudget * 2);
+        packet.Write((byte)AdventureBookDataType.Pages);
+        packet.Write((short)batch.Count);
+
+        foreach (var (entry, region) in batch)
+        {
+            packet.Write(entry.MonsterId);
+            packet.Write((byte)region);
+            packet.Write(entry.Name);
+            packet.Write((short)entry.Level);
+            packet.Write((short)entry.HuntTarget);
+            packet.Write((short)entry.HuntTargetLarge);
+            packet.Write(entry.CardItemId);
+            packet.Write(AdventureBookProgress.GetKills(player, entry));
+            packet.Write((byte)AdventureBookProgress.GetStars(player, entry));
+
+            var shown = Math.Min(entry.Sightings.Length, MaxSightingsSent);
+            packet.Write((byte)shown);
+            for (var i = 0; i < shown; i++)
+            {
+                packet.Write(entry.Sightings[i].Map);
+                packet.Write((short)entry.Sightings[i].Count);
             }
         }
 

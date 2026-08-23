@@ -13,8 +13,14 @@ public enum AdventureBookRequestType : byte
 /// <summary>What the server is answering with.</summary>
 public enum AdventureBookDataType : byte
 {
-    /// <summary>The whole book: regions, pages, and this character's progress through it.</summary>
-    Book,
+    /// <summary>The regions and their rewards. Clears whatever the window was holding.</summary>
+    Header,
+
+    /// <summary>A batch of pages. However many of these it takes; the book does not fit in one.</summary>
+    Pages,
+
+    /// <summary>That was all of them.</summary>
+    Complete,
 
     /// <summary>One page moved. Cheaper than resending the book every time a star lands.</summary>
     PageUpdate,

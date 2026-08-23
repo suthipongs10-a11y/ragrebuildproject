@@ -21,8 +21,16 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
 
             switch (type)
             {
-                case AdventureBookDataType.Book:
-                    ReadBook(msg);
+                case AdventureBookDataType.Header:
+                    ReadHeader(msg);
+                    break;
+
+                case AdventureBookDataType.Pages:
+                    ReadPages(msg);
+                    break;
+
+                case AdventureBookDataType.Complete:
+                    AdventureBookState.Received = true;
                     break;
 
                 case AdventureBookDataType.PageUpdate:
@@ -33,7 +41,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
             AdventureBookState.Touch();
         }
 
-        private static void ReadBook(ClientInboundMessage msg)
+        private static void ReadHeader(ClientInboundMessage msg)
         {
             AdventureBookState.Clear();
 
@@ -52,7 +60,18 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
                     Complete = msg.ReadByte() != 0
                 });
             }
+        }
 
+        /// <summary>
+        /// One batch of pages, appended to whatever the header started.
+        /// </summary>
+        /// <remarks>
+        /// The book arrives in several of these because the server's outbound buffer refuses
+        /// to grow past a few thousand bytes. Order does not matter: every page names the
+        /// region it belongs to.
+        /// </remarks>
+        private static void ReadPages(ClientInboundMessage msg)
+        {
             var pageCount = msg.ReadInt16();
             for (var i = 0; i < pageCount; i++)
             {
@@ -88,8 +107,6 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
                 if (page.RegionIndex >= 0 && page.RegionIndex < AdventureBookState.Regions.Count)
                     AdventureBookState.Regions[page.RegionIndex].Pages.Add(page);
             }
-
-            AdventureBookState.Received = true;
         }
 
         private static void ReadPage(ClientInboundMessage msg)

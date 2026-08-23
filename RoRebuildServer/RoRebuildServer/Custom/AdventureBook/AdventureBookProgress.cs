@@ -82,12 +82,19 @@ public static class AdventureBookProgress
     {
         if (!AdventureBook.IsBuilt)
             return;
-        if (!AdventureBook.EntriesByCardId.TryGetValue(itemId, out var entry))
-            return;
-        if (HasStar(player, entry, AdventureBookStars.Card))
+        if (!AdventureBook.EntriesByCardId.TryGetValue(itemId, out var sharing))
             return;
 
-        AwardStar(player, entry, AdventureBookStars.Card);
+        //Every page this card belongs to, not just the first. The goblins all drop the same
+        //one, and filling only whichever of them happened to be built first left the rest of
+        //Geffen Fields permanently one star short of its reward.
+        foreach (var entry in sharing)
+        {
+            if (HasStar(player, entry, AdventureBookStars.Card))
+                continue;
+
+            AwardStar(player, entry, AdventureBookStars.Card);
+        }
     }
 
     /// <summary>
@@ -104,15 +111,19 @@ public static class AdventureBookProgress
             return 0;
 
         var found = 0;
-        foreach (var (cardId, entry) in AdventureBook.EntriesByCardId)
+        foreach (var (cardId, sharing) in AdventureBook.EntriesByCardId)
         {
-            if (HasStar(player, entry, AdventureBookStars.Card))
-                continue;
             if (!player.Inventory.HasItem(cardId))
                 continue;
 
-            AwardStar(player, entry, AdventureBookStars.Card);
-            found++;
+            foreach (var entry in sharing)
+            {
+                if (HasStar(player, entry, AdventureBookStars.Card))
+                    continue;
+
+                AwardStar(player, entry, AdventureBookStars.Card);
+                found++;
+            }
         }
 
         return found;

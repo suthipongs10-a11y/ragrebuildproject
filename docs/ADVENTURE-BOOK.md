@@ -292,8 +292,16 @@ Item("Wizard_Hat")          { OnEquip: AddStat(AddMaxSp, 100); }
 
 ```
 AdventureBookAction  (client -> server)  Refresh / Warp
-AdventureBookData    (server -> client)  Book / PageUpdate
+AdventureBookData    (server -> client)  Header / Pages / Complete / PageUpdate
 ```
+
+⛔ **สมุดส่งทีเดียวไม่ได้** — `OutboundMessage` เริ่มที่ 1 KB แล้วคูณสองไปเรื่อย ๆ
+พอจะเกิน 10,000 ไบต์มัน **assert** ซึ่งไม่ใช่ packet หายแต่ **เซิร์ฟเวอร์ตายทั้งตัว**
+(พารามิเตอร์ `capacity` ใน `StartPacket` ไม่ได้ถูกใช้เลย ขอบัฟเฟอร์ใหญ่กว่านี้ไม่ได้)
+
+เพดานจริง ~8 KB สมุด 247 หน้าพร้อมชื่อและแมพ = เกินหลายเท่า
+เลยส่งเป็น `Header` (ภูมิภาค) → `Pages` หลายก้อน (งบก้อนละ 1,800 ไบต์) → `Complete`
+**แบ่งตามขนาดที่ประมาณได้ ไม่ใช่ตามจำนวนหน้า** เพราะขนาดหน้าส่วนใหญ่คือความยาวชื่อ ซึ่งต่างกันได้ 3 เท่า
 
 `Warp` ตรวจฝั่งเซิร์ฟเวอร์ครบ **ไม่เชื่อ client สักอย่าง**
 

@@ -62,8 +62,16 @@ public static class AdventureBook
     public static readonly List<AdventureBookRegion> Regions = new();
     public static readonly Dictionary<int, AdventureBookEntry> EntriesByMonsterId = new();
 
-    /// <summary>Card item id to the page it completes, so gaining one is a single lookup.</summary>
-    public static readonly Dictionary<int, AdventureBookEntry> EntriesByCardId = new();
+    /// <summary>
+    /// Card item id to every page it completes, so gaining one is a single lookup.
+    /// </summary>
+    /// <remarks>
+    /// A list rather than one entry, because a card is not one monster's. All five goblins
+    /// drop the Goblin Card, all three ant soldiers drop the Andre Card, and Fungus shares
+    /// with Poison Spore. Keeping only the first meant every other page could never reach its
+    /// third star, which quietly made four of the region rewards impossible to earn.
+    /// </remarks>
+    public static readonly Dictionary<int, List<AdventureBookEntry>> EntriesByCardId = new();
 
     public static bool IsBuilt { get; private set; }
     public static int StarTotal { get; private set; }
@@ -264,10 +272,12 @@ public static class AdventureBook
             bookRegion.Entries.Add(entry);
             EntriesByMonsterId[entry.MonsterId] = entry;
 
-            //Two monsters sharing a card would make the first of them the only one that could
-            //be completed by holding it, so the collision is said out loud rather than hidden.
-            if (entry.CardItemId > 0 && !EntriesByCardId.TryAdd(entry.CardItemId, entry))
-                ServerLogger.LogWarning($"[AdventureBook] {entry.Name} and {EntriesByCardId[entry.CardItemId].Name} both drop item {entry.CardItemId}, so only one page can be filled by it.");
+            if (entry.CardItemId > 0)
+            {
+                if (!EntriesByCardId.TryGetValue(entry.CardItemId, out var sharing))
+                    EntriesByCardId[entry.CardItemId] = sharing = new List<AdventureBookEntry>();
+                sharing.Add(entry);
+            }
         }
 
         foreach (var region in regionLookup.Values)
@@ -349,6 +359,11 @@ public static class AdventureBook
             return;
         }
 
+        var shared = 0;
+        foreach (var (_, sharing) in EntriesByCardId)
+            if (sharing.Count > 1)
+                shared += sharing.Count;
+
         var entries = Regions.Sum(r => r.Entries.Count);
         var kills = Regions.Sum(r => r.TotalKillsRequired);
         var cardless = Regions.Sum(r => r.Entries.Count(e => e.CardItemId == 0));
@@ -360,6 +375,8 @@ public static class AdventureBook
             ServerLogger.Log($"[AdventureBook] {homeless} monsters were left out because their maps belong to no region in the book.");
         if (notQuarry > 0)
             ServerLogger.Log($"[AdventureBook] {notQuarry} were left out for being worth no experience - plants, mushrooms and training dummies.");
+        if (shared > 0)
+            ServerLogger.Log($"[AdventureBook] {shared} share a card with something else, so one of those fills every page that drops it.");
 
         foreach (var region in Regions)
         {
