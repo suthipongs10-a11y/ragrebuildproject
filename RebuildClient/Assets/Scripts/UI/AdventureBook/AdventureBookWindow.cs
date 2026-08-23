@@ -46,6 +46,7 @@ namespace Assets.Scripts.UI.AdventureBook
         private const float RowWidth = Width - Pad * 4f;
 
         private const float StarSize = 18f;
+        private const float ChevronSize = 16f;
         private const float RewardIconSize = 30f;
 
         /// <summary>A reward line inside a star row: one icon and the name beside it.</summary>
@@ -143,7 +144,7 @@ namespace Assets.Scripts.UI.AdventureBook
             rect.anchoredPosition = Vector2.zero;
             rect.sizeDelta = new Vector2(Width, Height);
 
-            ModernUiTheme.CreateTitleBar(window, "สมุดผจญภัย", "", ModernUiIcons.Book);
+            ModernUiTheme.CreateTitleBar(window, "สมุดผจญภัย", "", ModernUiIcons.Spark);
             ModernUiTheme.AttachShadow(rect);
 
             window.header = ModernUiTheme.CreateText(rect, "Header", "", ModernUiTheme.SizeLabel,
@@ -224,14 +225,14 @@ namespace Assets.Scripts.UI.AdventureBook
             var y = Pad;
 
             var rewards = NewCard(y, RowHeight, () => { view = View.Rewards; Redraw(); });
-            Label(rewards, "รางวัลประจำเมืองทั้งหมด", 12f, -(RowHeight - 20f) / 2f, 320f,
+            Label(rewards, "รางวัลประจำเมืองและดันเจี้ยน", 12f, -(RowHeight - 20f) / 2f, 320f,
                 ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
             Value(rewards, $"{AdventureBookState.Regions.Count} ชิ้น", -12f, -(RowHeight - 20f) / 2f, 140f,
                 ModernUiTheme.MutedColor);
             y += RowHeight + RowGap;
 
             var help = NewCard(y, RowHeight, () => { view = View.Help; Redraw(); });
-            Label(help, "สมุดผจญภัยคืออะไร", 12f, -(RowHeight - 20f) / 2f, 320f,
+            Label(help, "คู่มือนักผจญภัย", 12f, -(RowHeight - 20f) / 2f, 320f,
                 ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
             Value(help, "คู่มือ", -12f, -(RowHeight - 20f) / 2f, 140f, ModernUiTheme.MutedColor);
             y += RowHeight + RowGap;
@@ -455,7 +456,7 @@ namespace Assets.Scripts.UI.AdventureBook
         private float DrawRewards()
         {
             var y = Pad;
-            y = BackRow(y, "รางวัลประจำเมือง", () => { view = View.Regions; Redraw(); });
+            y = BackRow(y, "รางวัลประจำเมืองและดันเจี้ยน", () => { view = View.Regions; Redraw(); });
 
             var note = NewCard(y, RowHeight, null);
             Label(note, "ทำครบทุกหน้าของเมืองนั้น ถึงจะได้", 12f, -(RowHeight - 20f) / 2f,
@@ -489,7 +490,7 @@ namespace Assets.Scripts.UI.AdventureBook
         private float DrawHelp()
         {
             var y = Pad;
-            y = BackRow(y, "คู่มือ", () => { view = View.Regions; Redraw(); });
+            y = BackRow(y, "คู่มือนักผจญภัย", () => { view = View.Regions; Redraw(); });
 
             y = HelpLine(y, "สมุดผจญภัยคืออะไร",
                 "บันทึกที่เดินไปเองระหว่างเล่นปกติ ไม่ต้องกดรับเควส ตีมอนไปเรื่อย ๆ แล้ววันหนึ่งเปิดมาก็เสร็จแล้ว");
@@ -552,11 +553,22 @@ namespace Assets.Scripts.UI.AdventureBook
             fill.GetComponent<Image>().raycastTarget = false;
         }
 
+        /// <summary>
+        /// The row back out of wherever this is, with the theme's own chevron rather than a
+        /// less-than sign - the interface font has no arrow in it, and the sign was standing
+        /// in for one.
+        /// </summary>
         private float BackRow(float y, string title, System.Action onBack)
         {
             var card = NewCard(y, RowHeight, onBack);
-            Label(card, "< ย้อนกลับ", 12f, -(RowHeight - 20f) / 2f, 200f, ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
-            Value(card, title, -12f, -(RowHeight - 20f) / 2f, 300f, ModernUiTheme.LabelColor);
+
+            var chevron = ModernUiTheme.CreateIcon(card, ModernUiIcons.ChevronLeft, ModernUiTheme.AccentInkColor, ChevronSize);
+            ModernUiTheme.Place((RectTransform)chevron.transform, new Vector2(0, 1),
+                new Vector2(12f, -(RowHeight - ChevronSize) / 2f), new Vector2(ChevronSize, ChevronSize));
+
+            Label(card, "ย้อนกลับ", 12f + ChevronSize + 6f, -(RowHeight - 20f) / 2f, 200f,
+                ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
+            Value(card, title, -12f, -(RowHeight - 20f) / 2f, 320f, ModernUiTheme.LabelColor);
             return y + RowHeight + RowGap;
         }
 

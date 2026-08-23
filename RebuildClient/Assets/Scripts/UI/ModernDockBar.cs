@@ -68,7 +68,7 @@ namespace Assets.Scripts.UI
             ("Config", "Config", () => ModernUiIcons.Gear, null),
             ("Help", "Help", () => ModernUiIcons.Book, null),
             ("Database", "Database", () => ModernUiIcons.Magnifier, null),
-            ("AdventureBook", "AdventureBook", () => ModernUiIcons.Star,
+            ("AdventureBook", "AdventureBook", () => ModernUiIcons.Spark,
                 AdventureBook.AdventureBookWindow.Toggle),
         };
 
