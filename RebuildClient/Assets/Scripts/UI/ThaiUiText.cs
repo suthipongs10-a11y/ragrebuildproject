@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -34,6 +34,7 @@ namespace Assets.Scripts.UI
             //English, and the longer Thai for help was being clipped mid word
             { "Help", "คู่มือ" },
             { "Database", "ฐานข้อมูล" },
+            { "AdventureBook", "สมุดผจญภัย" },
             { "Market", "ตลาด" },
             { "Menu", "เมนู" },
             { "Cart", "รถเข็น" },

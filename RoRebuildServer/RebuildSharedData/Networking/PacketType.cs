@@ -169,6 +169,13 @@ public enum PacketType : byte
     //who forged the weapons a player is holding. Sent alongside the items rather than
     //carried inside them - a UniqueItem is a fixed forty bytes with no room for a name.
     ForgedNames,
+
+    //the adventure book: asking for it, and asking to be taken to something in it. The
+    //book itself is sent whole rather than a page at a time, because the client already
+    //holds the monster names and spawn maps and only needs the parts it cannot know -
+    //which region a monster belongs to, what its targets are, and how far along you are.
+    AdventureBookAction,
+    AdventureBookData,
 }
 
 public enum MessageType : byte

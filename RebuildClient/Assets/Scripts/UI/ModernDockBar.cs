@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -68,6 +68,8 @@ namespace Assets.Scripts.UI
             ("Config", "Config", () => ModernUiIcons.Gear, null),
             ("Help", "Help", () => ModernUiIcons.Book, null),
             ("Database", "Database", () => ModernUiIcons.Magnifier, null),
+            ("AdventureBook", "AdventureBook", () => ModernUiIcons.Star,
+                AdventureBook.AdventureBookWindow.Toggle),
         };
 
         private float searchTimer;

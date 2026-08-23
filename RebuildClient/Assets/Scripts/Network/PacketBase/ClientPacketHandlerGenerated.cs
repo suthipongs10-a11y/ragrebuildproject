@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Network;
 using Assets.Scripts.Network.PacketBase;
 using Assets.Scripts.Network.IncomingPacketHandlers;
+using Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook;
 using Assets.Scripts.Network.IncomingPacketHandlers.Character;
 using Assets.Scripts.Network.IncomingPacketHandlers.Combat;
 using Assets.Scripts.Network.IncomingPacketHandlers.Crafting;
@@ -19,7 +20,7 @@ namespace Assets.Scripts.Network.PacketBase
 	{
 		static ClientPacketHandler()
 		{
-			handlers = new ClientPacketHandlerBase[127];
+			handlers = new ClientPacketHandlerBase[129];
 			handlers[0] = new InvalidPacket(); //PlayerReady
 			handlers[1] = new PacketOnEnterServer(); //EnterServer
 			handlers[2] = new InvalidPacket(); //Ping
@@ -147,6 +148,8 @@ namespace Assets.Scripts.Network.PacketBase
 			handlers[124] = new InvalidPacket(); //CraftAction
 			handlers[125] = new PacketCraftData(); //CraftData
 			handlers[126] = new PacketForgedNames(); //ForgedNames
+			handlers[127] = new InvalidPacket(); //AdventureBookAction
+			handlers[128] = new PacketAdventureBookData(); //AdventureBookData
 		}
 	}
 }

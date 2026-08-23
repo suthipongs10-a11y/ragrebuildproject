@@ -66,6 +66,7 @@ public static class AdventureBookProgress
         GiveReward(player, entry, star);
         CheckRegionComplete(player, entry.Region);
         RefreshRank(player);
+        CommandBuilder.SendAdventureBookPage(player, entry);
     }
 
     /// <summary>
@@ -191,6 +192,10 @@ public static class AdventureBookProgress
         //A page whose last star was a hunting one finishes a region just as surely as a card.
         CheckRegionComplete(player, entry.Region);
         RefreshRank(player);
+
+        //Only when something actually moved. Sending on every kill would put a packet per
+        //monster per player on the wire for a window most of them do not have open.
+        CommandBuilder.SendAdventureBookPage(player, entry);
     }
 
     private readonly record struct Reward(string Code, int Count);

@@ -1480,6 +1480,36 @@ namespace Assets.Scripts.Network
         /// read starting from the middle of it.
         /// </summary>
         /// <summary>Refresh and ClaimAll, which say nothing beyond which one they are.</summary>
+        public void SendAdventureBookRefresh()
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.AdventureBookAction);
+            msg.Write((byte)AdventureBookRequestType.Refresh);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>
+        /// Asks to be taken to a map this monster stands on.
+        /// </summary>
+        /// <remarks>
+        /// The server decides whether this is allowed and what it costs; nothing is checked
+        /// here beyond having something to send. Checking on this side as well would only
+        /// mean two places to keep in step, and the one that matters is the other one.
+        /// </remarks>
+        public void SendAdventureBookWarp(int monsterId, string mapName)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.AdventureBookAction);
+            msg.Write((byte)AdventureBookRequestType.Warp);
+            msg.Write(monsterId);
+            msg.Write(mapName);
+
+            SendMessage(msg);
+        }
+
         public void SendInboxAction(InboxRequestType action)
         {
             var msg = StartMessage();
