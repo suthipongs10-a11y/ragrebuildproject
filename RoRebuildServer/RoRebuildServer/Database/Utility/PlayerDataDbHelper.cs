@@ -11,6 +11,7 @@ using RebuildSharedData.Enum.EntityStats;
 using RebuildSharedData.Enum;
 using RoRebuildServer.Data;
 using RoRebuildServer.Database.Domain;
+using System.Text;
 
 namespace RoRebuildServer.Database.Utility;
 
@@ -204,13 +205,37 @@ public static class PlayerDataDbHelper
         return bagData;
     }
 
+    /// <summary>
+    /// How many bytes WriteDictionary will spend on a player's npc flags.
+    /// </summary>
+    /// <remarks>
+    /// Measured rather than guessed at. Every entry costs a length prefix, the key's UTF8
+    /// bytes and the four byte value, so the flat eight bytes this used to reserve covered
+    /// a three character flag name and nothing longer. It has held up only because the
+    /// terms around it reserve more than they use. The buffer below is a MemoryStream over
+    /// a rented array and cannot grow, so the first save that outruns the estimate throws
+    /// out of the character save rather than writing a short record - and nothing in the
+    /// exception would point back here.
+    /// </remarks>
+    private static int NpcFlagStorageSize(Dictionary<string, int>? flags)
+    {
+        var size = 5; //the byte saying the dictionary exists, then the entry count
+        if (flags == null)
+            return size;
+
+        foreach (var flag in flags)
+            size += Encoding.UTF8.GetByteCount(flag.Key) + 8; //7 bit encoded length, then the value
+
+        return size;
+    }
+
     public static byte[] StorePlayerDataForDatabaseUse(Player player, out int decompressedSize)
     {
         var charData = player.CharData;
 
         var dataLen = 32;
         dataLen += charData.Length * sizeof(int);
-        dataLen += player.NpcFlags == null ? 4 : player.NpcFlags.Count * 8;
+        dataLen += NpcFlagStorageSize(player.NpcFlags);
         dataLen += player.LearnedSkills.Count * 32;
         dataLen += player.CombatEntity.StatusContainer == null ? 8 : player.CombatEntity.StatusContainer.TotalStatusEffectCount * 16;
         dataLen += 32 * 4; //space for map memos
