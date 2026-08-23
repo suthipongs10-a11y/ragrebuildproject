@@ -207,33 +207,9 @@ public static class AdventureBookProgress
         CommandBuilder.SendAdventureBookPage(player, entry);
     }
 
-    private readonly record struct Reward(string Code, int Count);
-
-    /// <summary>
-    /// What a star pays, by how dangerous the thing that had to die was.
-    /// </summary>
-    /// <remarks>
-    /// Level rather than region, so a stray high level monster on a beginner map is worth
-    /// what it costs to kill. Nothing here pays zeny on purpose: money can be earned any
-    /// number of ways already, and the point of the book is to hand over things that cannot.
-    /// </remarks>
-    private static (Reward hunt, Reward huntLarge, Reward card) RewardsForLevel(int level) => level switch
-    {
-        < 30 => (new Reward("Concentration_Potion", 5), new Reward("Old_Blue_Box", 1), new Reward("Old_Card_Album", 1)),
-        < 60 => (new Reward("Awakening_Potion", 5), new Reward("Old_Blue_Box", 2), new Reward("Old_Card_Album", 1)),
-        _ => (new Reward("Berserk_Potion", 5), new Reward("Old_Violet_Box", 1), new Reward("Old_Card_Album", 2))
-    };
-
     private static void GiveReward(Player player, AdventureBookEntry entry, AdventureBookStars star)
     {
-        var (hunt, huntLarge, card) = RewardsForLevel(entry.Level);
-        var reward = star switch
-        {
-            AdventureBookStars.Hunt => hunt,
-            AdventureBookStars.HuntLarge => huntLarge,
-            AdventureBookStars.Card => card,
-            _ => default
-        };
+        var reward = AdventureBookRewards.For(entry.Level, star);
 
         var line = star switch
         {

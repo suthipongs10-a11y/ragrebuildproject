@@ -1,3 +1,4 @@
+using RoRebuildServer.Data;
 using RoRebuildServer.EntityComponents;
 
 namespace RoRebuildServer.Custom.AdventureBook;
@@ -131,11 +132,11 @@ public static class AdventureBookChat
         AdventureBookProgress.Announce(player, $"<color=#66FFAA>{found.Name}  [{found.Region}]  Lv {found.Level}</color>");
         if (found.Members.Length > 0)
             AdventureBookProgress.Announce(player, $"  นับรวม: {found.Members}");
-        AdventureBookProgress.Announce(player, $"  ★  {kills:N0}/{found.HuntTarget:N0}" + Mark(earned, AdventureBookStars.Hunt));
-        AdventureBookProgress.Announce(player, $"  ★★ {kills:N0}/{found.HuntTargetLarge:N0}" + Mark(earned, AdventureBookStars.HuntLarge));
+        AdventureBookProgress.Announce(player, $"  ★  {kills:N0}/{found.HuntTarget:N0}   {RewardText(found, AdventureBookStars.Hunt)}" + Mark(earned, AdventureBookStars.Hunt));
+        AdventureBookProgress.Announce(player, $"  ★★ {kills:N0}/{found.HuntTargetLarge:N0}   {RewardText(found, AdventureBookStars.HuntLarge)}" + Mark(earned, AdventureBookStars.HuntLarge));
 
         if (found.CardItemId > 0)
-            AdventureBookProgress.Announce(player, "  ★★★ ต้องมีการ์ดของมอนตัวนี้" + Mark(earned, AdventureBookStars.Card));
+            AdventureBookProgress.Announce(player, $"  ★★★ ต้องมีการ์ดของมอนตัวนี้   {RewardText(found, AdventureBookStars.Card)}" + Mark(earned, AdventureBookStars.Card));
         else
             AdventureBookProgress.Announce(player, "  ★★★ มอนตัวนี้ไม่ดรอปการ์ด หน้านี้จบที่ 2 ดาว");
 
@@ -152,4 +153,16 @@ public static class AdventureBookChat
     }
 
     private static string Mark(AdventureBookStars earned, AdventureBookStars star) => (earned & star) != 0 ? "  ✔" : string.Empty;
+
+    /// <summary>What a star pays, named rather than coded, so the line is worth reading.</summary>
+    private static string RewardText(AdventureBookEntry entry, AdventureBookStars star)
+    {
+        var reward = AdventureBookRewards.For(entry.Level, star);
+        var id = reward.ItemId;
+        if (id <= 0)
+            return string.Empty;
+
+        var name = DataManager.GetItemInfoById(id)?.Name ?? reward.Code;
+        return reward.Count > 1 ? $"({name} x{reward.Count})" : $"({name})";
+    }
 }

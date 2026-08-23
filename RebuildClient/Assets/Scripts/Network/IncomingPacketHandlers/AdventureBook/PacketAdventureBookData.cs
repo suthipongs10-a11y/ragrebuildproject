@@ -56,11 +56,29 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
                 AdventureBookState.Regions.Add(new AdventureBookRegionInfo
                 {
                     Name = msg.ReadString(),
-                    RewardCode = msg.ReadString(),
+                    RewardItemId = msg.ReadInt32(),
                     Complete = msg.ReadByte() != 0
                 });
             }
+
+            var bandCount = msg.ReadByte();
+            for (var i = 0; i < bandCount; i++)
+            {
+                AdventureBookState.Bands.Add(new AdventureBookRewardBand
+                {
+                    MaxLevel = msg.ReadInt16(),
+                    Hunt = ReadReward(msg),
+                    HuntLarge = ReadReward(msg),
+                    Card = ReadReward(msg)
+                });
+            }
         }
+
+        private static AdventureBookReward ReadReward(ClientInboundMessage msg) => new AdventureBookReward
+        {
+            ItemId = msg.ReadInt32(),
+            Count = msg.ReadInt16()
+        };
 
         /// <summary>
         /// One batch of pages, appended to whatever the header started.

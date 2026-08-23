@@ -3,6 +3,7 @@ using RebuildSharedData.Networking;
 //OutboundMessage lives under RebuildZoneServer despite sitting in this folder
 using RebuildZoneServer.Networking;
 using RoRebuildServer.Custom.AdventureBook;
+using RoRebuildServer.Data;
 using RoRebuildServer.EntityComponents;
 
 namespace RoRebuildServer.Networking;
@@ -66,8 +67,24 @@ public static partial class CommandBuilder
         foreach (var region in AdventureBook.Regions)
         {
             header.Write(region.Name);
-            header.Write(region.RewardHeadgear);
+
+            //The item id, not the code. The client holds the whole item table already, so it
+            //can find the name and the icon itself - and an icon is most of why anybody looks
+            //at a reward before deciding to go and earn it.
+            header.Write(DataManager.ItemIdByName.TryGetValue(region.RewardHeadgear, out var hat) ? hat : 0);
             header.Write((byte)(player.GetNpcFlag(region.CompletionFlag) != 0 ? 1 : 0));
+        }
+
+        //The reward bands, once, rather than three rewards attached to every page. They depend
+        //only on a page's level, so the client can pick the right one itself and the book stays
+        //a couple of hundred bytes lighter for it.
+        header.Write((byte)AdventureBookRewards.Bands.Length);
+        foreach (var band in AdventureBookRewards.Bands)
+        {
+            header.Write(band.MaxLevel == int.MaxValue ? (short)999 : (short)band.MaxLevel);
+            WriteReward(header, band.Hunt);
+            WriteReward(header, band.HuntLarge);
+            WriteReward(header, band.Card);
         }
 
         NetworkManager.SendMessage(header, player.Connection);
@@ -111,6 +128,12 @@ public static partial class CommandBuilder
             size += 8 + entry.Sightings[i].Map.Length * 3;
 
         return size;
+    }
+
+    private static void WriteReward(OutboundMessage packet, AdventureBookReward reward)
+    {
+        packet.Write(reward.ItemId);
+        packet.Write((short)reward.Count);
     }
 
     private static void SendPageBatch(Player player, List<(AdventureBookEntry Entry, int Region)> batch)

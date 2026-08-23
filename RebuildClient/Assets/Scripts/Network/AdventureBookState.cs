@@ -54,9 +54,36 @@ namespace Assets.Scripts.Network
     public class AdventureBookRegionInfo
     {
         public string Name;
-        public string RewardCode;
+
+        /// <summary>The headgear finishing this region hands over. The client owns the item table, so this is enough for a name and an icon.</summary>
+        public int RewardItemId;
+
         public bool Complete;
         public readonly List<AdventureBookPage> Pages = new List<AdventureBookPage>();
+    }
+
+    /// <summary>What one star pays: an item and how many of it.</summary>
+    public struct AdventureBookReward
+    {
+        public int ItemId;
+        public int Count;
+
+        public bool HasItem => ItemId > 0 && Count > 0;
+    }
+
+    /// <summary>
+    /// What the three stars pay for pages up to a given level.
+    /// </summary>
+    /// <remarks>
+    /// Sent once rather than attached to every page, because a reward depends only on the
+    /// page's level. The client picks the band itself.
+    /// </remarks>
+    public struct AdventureBookRewardBand
+    {
+        public int MaxLevel;
+        public AdventureBookReward Hunt;
+        public AdventureBookReward HuntLarge;
+        public AdventureBookReward Card;
     }
 
     /// <summary>
@@ -78,6 +105,8 @@ namespace Assets.Scripts.Network
         public static readonly List<AdventureBookRegionInfo> Regions = new List<AdventureBookRegionInfo>();
         public static readonly Dictionary<int, AdventureBookPage> PagesById = new Dictionary<int, AdventureBookPage>();
 
+        public static readonly List<AdventureBookRewardBand> Bands = new List<AdventureBookRewardBand>();
+
         public static int Rank;
         public static int Stars;
         public static int StarTotal;
@@ -88,10 +117,35 @@ namespace Assets.Scripts.Network
 
         public static void Touch() => Revision++;
 
+        /// <summary>What a page of this level pays for one of its stars.</summary>
+        public static AdventureBookReward RewardFor(int level, int starIndex)
+        {
+            if (Bands.Count == 0)
+                return default;
+
+            var band = Bands[Bands.Count - 1];
+            for (var i = 0; i < Bands.Count; i++)
+            {
+                if (level > Bands[i].MaxLevel)
+                    continue;
+                band = Bands[i];
+                break;
+            }
+
+            switch (starIndex)
+            {
+                case 0: return band.Hunt;
+                case 1: return band.HuntLarge;
+                case 2: return band.Card;
+                default: return default;
+            }
+        }
+
         public static void Clear()
         {
             Regions.Clear();
             PagesById.Clear();
+            Bands.Clear();
             Received = false;
         }
     }
