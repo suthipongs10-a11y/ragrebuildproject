@@ -1,4 +1,5 @@
 ﻿using RebuildSharedData.Enum;
+using RoRebuildServer.Custom.AdventureBook;
 using RebuildSharedData.Networking;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Simulation.Util;
@@ -34,6 +35,11 @@ public class PacketSay : IClientPacketHandler
             ServerLogger.Log($"Chat message from [{connection.Player!.Name}]: {text}");
 #endif
         var p = connection.Player;
+
+        //Answered here rather than broadcast. The adventure book has no window yet, and a
+        //line of chat reaches a client nobody rebuilt, which a packet of its own would not.
+        if (AdventureBookChat.TryHandle(p!, text))
+            return;
 
         if (type == PlayerChatType.Party)
         {

@@ -137,7 +137,7 @@ public static class AdventureBookProgress
         }
     }
 
-    private static void Announce(Player player, string message)
+    internal static void Announce(Player player, string message)
     {
         if (player.Connection == null)
             return;
