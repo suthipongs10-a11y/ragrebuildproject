@@ -141,6 +141,16 @@ namespace Assets.Scripts.Objects
                 return; //why would this happen?
             }
 
+            if (clip == null)
+            {
+                //The load finished with nothing in it. Ending the channel now beats leaving it
+                //held open until a length that was read off a null clip says it may go.
+                isLoading = false;
+                isInUse = false;
+                AudioManager.MarkAudioChannelAsFree(ChannelId);
+                return;
+            }
+
             audioSource.clip = clip;
             if(!isDelayed)
                 audioSource.Play();
@@ -160,6 +170,21 @@ namespace Assets.Scripts.Objects
 
             if (isLoading)
             {
+                //An invalid handle means the sound was never in the catalog, so AddressableUtility
+                //declined to start a load rather than letting it throw. Reading Status off one of
+                //those throws in turn, so the channel is handed back here instead: a sound nobody
+                //copied out of their client is silence, not a crash.
+                if (!loadHandle.IsValid())
+                {
+                    isLoading = false;
+                    isInUse = false;
+                    followTarget = null;
+                    hasFollowTarget = false;
+                    gameObject.SetActive(false);
+                    AudioManager.MarkAudioChannelAsFree(ChannelId);
+                    return;
+                }
+
                 if (loadHandle.Status == AsyncOperationStatus.Failed)
                 {
                     AudioManager.MarkAudioChannelAsFree(ChannelId);
