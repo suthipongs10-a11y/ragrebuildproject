@@ -59,6 +59,23 @@ public class ServerAnnouncements : ServerConfigScriptHandlerBase
         CommandBuilder.ClearRecipients();
     }
 
+    /// <summary>
+    /// The same line to everybody, but only into the chat log.
+    /// </summary>
+    /// <remarks>
+    /// For news worth telling that is not worth stopping anybody for. The banner across the
+    /// top is loud on purpose and stops being news if it fires every few minutes; the chat
+    /// copy still reaches every player and is still there to scroll back to.
+    /// </remarks>
+    public static void AnnounceToChat(string text)
+    {
+        var line = $"<color={GoldColor}>{text}</color>";
+
+        CommandBuilder.AddAllPlayersAsRecipients();
+        CommandBuilder.SendServerMessage(line, "", true);
+        CommandBuilder.ClearRecipients();
+    }
+
     private void OnKillMonster(Monster monster)
     {
         var character = monster.Character;

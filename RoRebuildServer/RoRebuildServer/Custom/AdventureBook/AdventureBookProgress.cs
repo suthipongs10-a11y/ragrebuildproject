@@ -236,8 +236,9 @@ public static class AdventureBookProgress
         player.CreateItemInInventory(new ItemReference(itemId, 1));
         var itemName = DataManager.GetItemInfoById(itemId)?.Name ?? region.RewardHeadgear;
 
-        Announce(player, $"<color=#FFD700>สมุดผจญภัย: บันทึก {region.Name} ครบทุกหน้าแล้ว — ได้รับ {itemName}</color>");
-        ServerAnnouncements.Announce($"{player.Name} บันทึก {region.Name} ครบทุกหน้าในสมุดผจญภัย ได้รับ {itemName} !");
+        //Said once, to everybody. The announcement reaches the player who earned it as well,
+        //so a second copy addressed only to them is the same sentence twice in a row.
+        ServerAnnouncements.Announce($"ยินดีด้วย {player.Name} บันทึก {region.Name} ครบทุกหน้าในสมุดผจญภัย ได้รับ {itemName} !");
     }
 
     /// <summary>
@@ -282,12 +283,15 @@ public static class AdventureBookProgress
 
     private static void GiveReward(Player player, AdventureBookEntry entry, AdventureBookStars star)
     {
+        //Said in words rather than with star glyphs. This goes to the banner across the top
+        //of the screen as well as to the chat log, and the two are not drawn in the same font
+        //- the chat font has a star in it and the interface font draws an empty box.
         var line = star switch
         {
-            AdventureBookStars.Hunt => $"สมุดผจญภัย ★ กำจัด {entry.Name} ครบ {entry.HuntTarget:N0} ตัว",
-            AdventureBookStars.HuntLarge => $"สมุดผจญภัย ★★ กำจัด {entry.Name} ครบ {entry.HuntTargetLarge:N0} ตัว",
-            AdventureBookStars.Card => $"สมุดผจญภัย ★★★ บันทึกการ์ดของ {entry.Name} แล้ว",
-            _ => $"สมุดผจญภัย {entry.Name}"
+            AdventureBookStars.Hunt => $"ระดับ 1 ดาว (กำจัด {entry.Name} ครบ {entry.HuntTarget:N0} ตัว)",
+            AdventureBookStars.HuntLarge => $"ระดับ 2 ดาว (กำจัด {entry.Name} ครบ {entry.HuntTargetLarge:N0} ตัว)",
+            AdventureBookStars.Card => $"ระดับ 3 ดาว (เก็บการ์ดของ {entry.Name} ได้)",
+            _ => entry.Name
         };
 
         var given = new List<string>();
@@ -306,25 +310,34 @@ public static class AdventureBookProgress
             given.Add(reward.Count > 1 ? $"{itemName} x{reward.Count}" : itemName);
         }
 
-        Announce(player, given.Count > 0
-            ? $"<color=#66FFAA>{line} — ได้รับ {string.Join(", ", given)}</color>"
-            : $"<color=#66FFAA>{line}</color>");
+        //Every star reaches the whole server, not only the third one.
+        //
+        //It was the third only at first, on the reasoning that a hunting star lands every few
+        //minutes and a line on everybody's screen that often teaches people to ignore all of
+        //them. On a server of a handful of friends that reasoning is backwards: the lines are
+        //what make the place feel occupied, and there is nothing else saying anybody else is
+        //playing. If it ever does get loud, HuntStarsBanner is the one word to change - the
+        //hunting stars then go to the chat log and only the milestones take the banner.
+        var rank = GetRank(player);
+        var earned = given.Count > 0 ? $" ได้รับ {string.Join(", ", given)}" : string.Empty;
+        var news = $"ยินดีด้วย {player.Name} [Adventure ระดับ {rank}] ทำเควสสมุดผจญภัย {entry.Name} {line} สำเร็จ{earned}";
 
-        //Only the third star reaches the whole server. It is the one that needs a card, and a
-        //card is a tenth of a percent of a kill - rare enough that hearing about somebody
-        //else's reads as news rather than as noise. Announcing the hunting stars as well
-        //would put a line on every screen every few minutes and teach everyone to ignore them.
-        if (star == AdventureBookStars.Card)
-            AnnounceThirdStar(player, entry);
+        if (HuntStarsBanner || star == AdventureBookStars.Card)
+            ServerAnnouncements.Announce(news);
+        else
+            ServerAnnouncements.AnnounceToChat(news);
     }
 
-    private static void AnnounceThirdStar(Player player, AdventureBookEntry entry)
-    {
-        var stars = CountStars(player);
-        var rank = AdventureBookRank.RankFor(stars, HasEveryRegion(player));
+    /// <summary>
+    /// Whether a hunting star takes the banner across the top of every screen, or only the
+    /// chat log. The third star and the milestones always take the banner.
+    /// </summary>
+    /// <remarks>
+    /// A field rather than a constant so the branch below it stays live code. A const here
+    /// makes one arm of the test unreachable, and the compiler says so every build.
+    /// </remarks>
+    private static readonly bool HuntStarsBanner = true;
 
-        ServerAnnouncements.Announce($"ยินดีด้วย {player.Name} [Adventure ระดับ {rank}] ทำเควสระดับ 3 ดาว ของ {entry.Name} สำเร็จ !");
-    }
 
     /// <summary>
     /// The flag holding a cached rank, stored one higher than it is so that a zero means
@@ -468,13 +481,14 @@ public static class AdventureBookProgress
             given.Add(reward.Count > 1 ? $"{itemName} x{reward.Count}" : itemName);
         }
 
-        Announce(player, $"<color=#FFD700>Adventure ระดับ {rank} แล้ว !</color>");
-        if (given.Count > 0)
-            Announce(player, $"<color=#FFD700>ได้รับ {string.Join(", ", given)}</color>");
+        //Every rank, not only the last one. A rank is a week of somebody's evenings and the
+        //only thing that ever said so was a line on their own screen.
+        var earned = given.Count > 0 ? $" ได้รับ {string.Join(", ", given)}" : string.Empty;
+        ServerAnnouncements.Announce($"ยินดีด้วย {player.Name} เลื่อนขั้นเป็น Adventure ระดับ {rank} แล้ว !{earned}");
 
-        //The last rank is the whole point of the book, so the server hears about it.
+        //The last rank is the whole point of the book, so it gets a line of its own on top.
         if (rank >= AdventureBookRank.MaxRank)
-            ServerAnnouncements.Announce($"{player.Name} ทำสมุดผจญภัยครบทั้งเล่ม เป็น Adventure ระดับสูงสุดคนแรก !");
+            ServerAnnouncements.Announce($"{player.Name} ทำสมุดผจญภัยครบทั้งเล่ม เป็น Adventure ระดับสูงสุด !");
     }
 
     private static (int Rank, int Stars) Count(Player player)
