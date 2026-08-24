@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using Assets.Scripts.Network;
+using Assets.Scripts.PlayerControl;
 using Assets.Scripts.Sprites;
+using RebuildSharedData.Enum;
+using RebuildSharedData.Enum.EntityStats;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -71,7 +74,7 @@ namespace Assets.Scripts.UI.AdventureBook
         private static readonly Color TrackColor = new Color(0.816f, 0.859f, 0.910f);
         private static readonly Color FillColor = new Color(0.235f, 0.545f, 0.851f);
 
-        private enum View { Regions, Pages, Page, Rewards, Ranks, Help }
+        private enum View { Regions, Pages, Page, Rewards, Ranks, Status, Help }
 
         private static AdventureBookWindow instance;
 
@@ -83,6 +86,7 @@ namespace Assets.Scripts.UI.AdventureBook
         private int regionIndex = -1;
         private int pageId = -1;
         private int drawnRevision = -1;
+        private int statusSignature;
 
         private readonly List<GameObject> rows = new List<GameObject>();
 
@@ -206,7 +210,47 @@ namespace Assets.Scripts.UI.AdventureBook
         private void Update()
         {
             if (drawnRevision != AdventureBookState.Revision)
+            {
                 Redraw();
+                return;
+            }
+
+            //The status page is the only one drawn from numbers the book does not own - a
+            //potion, a hat or a guild skill moves them without touching the book's revision.
+            //Watched by a cheap signature rather than redrawn every frame, because a redraw
+            //here throws away thirty rows and builds thirty more.
+            if (view == View.Status && statusSignature != StatusSignature())
+                Redraw();
+        }
+
+        /// <summary>
+        /// A number that changes when anything the status page shows changes.
+        /// </summary>
+        /// <remarks>
+        /// Not a hash of everything - only of what is actually drawn, so that a stat update
+        /// carrying a hit point change does not rebuild a page where no number moved.
+        /// </remarks>
+        private static int StatusSignature()
+        {
+            var state = PlayerState.Instance;
+            if (state == null)
+                return 0;
+
+            var value = AdventureBookState.Rank * 397 + state.Level * 17 + state.JobId;
+            for (var stat = PlayerStat.Str; stat <= PlayerStat.Luk; stat++)
+                value = value * 31 + state.GetData(stat);
+            for (var stat = CharacterStat.AddStr; stat <= CharacterStat.AddLuk; stat++)
+                value = value * 31 + state.GetStat(stat);
+
+            value = value * 31 + state.GetStat(CharacterStat.AddDropPercent);
+            value = value * 31 + state.GetStat(CharacterStat.AddExpPercent);
+            value = value * 31 + state.GetStat(CharacterStat.Attack);
+            value = value * 31 + state.GetStat(CharacterStat.Def);
+            value = value * 31 + GuildState.Skills.Count;
+            foreach (var skill in GuildState.Skills)
+                value = value * 31 + skill.Level;
+
+            return value;
         }
 
         // =====================================================================
@@ -215,6 +259,7 @@ namespace Assets.Scripts.UI.AdventureBook
         private void Redraw()
         {
             drawnRevision = AdventureBookState.Revision;
+            statusSignature = StatusSignature();
 
             foreach (var row in rows)
                 if (row != null)
@@ -264,6 +309,7 @@ namespace Assets.Scripts.UI.AdventureBook
                 case View.Page: y = DrawPage(); break;
                 case View.Rewards: y = DrawRewards(); break;
                 case View.Ranks: y = DrawRanks(); break;
+                case View.Status: y = DrawStatus(); break;
                 case View.Help: y = DrawHelp(); break;
             }
 
@@ -279,6 +325,12 @@ namespace Assets.Scripts.UI.AdventureBook
                 ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
             Value(rewards, $"{AdventureBookState.Regions.Count} ชิ้น", -12f, -(RowHeight - 20f) / 2f, 140f,
                 ModernUiTheme.MutedColor);
+            y += RowHeight + RowGap;
+
+            var status = NewCard(y, RowHeight, () => { view = View.Status; Redraw(); });
+            Label(status, "สถานะรวมของตัวละคร", 12f, -(RowHeight - 20f) / 2f, 320f,
+                ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
+            Value(status, RateSummary(), -12f, -(RowHeight - 20f) / 2f, 180f, ModernUiTheme.MutedColor);
             y += RowHeight + RowGap;
 
             var ranks = NewCard(y, RowHeight, () => { view = View.Ranks; Redraw(); });
@@ -616,6 +668,240 @@ namespace Assets.Scripts.UI.AdventureBook
         }
 
         /// <summary>
+        /// Everything the character is currently worth, and where it came from.
+        /// </summary>
+        /// <remarks>
+        /// Here rather than in the stats window because most of what it answers is this book's
+        /// doing. Adventure rank hands out stats, drop rate, experience and refine chance; the
+        /// guild hands out more; Battle Manual and Bubble Gum double two of them for half an
+        /// hour. None of it was visible anywhere. A permanent bonus nobody can see is one
+        /// nobody believes in, and the complaint that follows is that the reward does nothing.
+        ///
+        /// The split is only ever as honest as the client can be. Rank is exact - the ladder
+        /// says what each rung gives. Guild is exact - the same table the server adds from is
+        /// read here. Everything left over is equipment, cards and buffs together, and it is
+        /// labelled as that rather than guessed at further.
+        /// </remarks>
+        private float DrawStatus()
+        {
+            var y = Pad;
+            y = BackRow(y, "สถานะรวมของตัวละคร", () => { view = View.Regions; Redraw(); });
+
+            var state = PlayerState.Instance;
+            if (state == null)
+                return y + Pad;
+
+            var rank = RankBonus();
+            var guild = GuildBonus();
+
+            var who = NewCard(y, TallRowHeight, null);
+            Label(who, state.PlayerName, 12f, -8f, RowWidth - 24f, ModernUiTheme.SizeBody, ModernUiTheme.NameColor);
+            //Asked with == null rather than ?., the same way the rest of this file asks: these
+            //are UnityEngine objects and the null-conditional tests the reference where == asks
+            //Unity whether the thing is still alive.
+            var jobName = ClientDataLoader.Instance == null ? "-" : ClientDataLoader.Instance.GetJobNameForId(state.JobId);
+            Label(who, $"{jobName}   ·   Base {state.Level}   ·   Job {state.GetData(PlayerStat.JobLevel)}",
+                12f, -30f, RowWidth - 24f, ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
+            Value(who, $"Adventure {AdventureBookState.Rank}", -12f, -8f, 180f, ModernUiTheme.AccentInkColor);
+            y += TallRowHeight + RowGap;
+
+            y = GroupRow(y, "สเตตัสหลัก");
+            y = StatLine(y, "STR", PlayerStat.Str, CharacterStat.AddStr, rank.Stats, guild.Str);
+            y = StatLine(y, "AGI", PlayerStat.Agi, CharacterStat.AddAgi, rank.Stats, guild.Agi);
+            y = StatLine(y, "VIT", PlayerStat.Vit, CharacterStat.AddVit, rank.Stats, guild.Vit);
+            y = StatLine(y, "INT", PlayerStat.Int, CharacterStat.AddInt, rank.Stats, guild.Int);
+            y = StatLine(y, "DEX", PlayerStat.Dex, CharacterStat.AddDex, rank.Stats, guild.Dex);
+            y = StatLine(y, "LUK", PlayerStat.Luk, CharacterStat.AddLuk, rank.Stats, guild.Luk);
+
+            y = GroupRow(y, "ค่าต่อสู้");
+            y = PlainLine(y, "ATK", $"{state.GetStat(CharacterStat.Attack)} ~ {state.GetStat(CharacterStat.Attack2)}");
+            y = PlainLine(y, "MATK", $"{state.GetStat(CharacterStat.MagicAtkMin)} ~ {state.GetStat(CharacterStat.MagicAtkMax)}");
+            y = PlainLine(y, "DEF / MDEF", $"{state.GetStat(CharacterStat.Def)} / {state.GetStat(CharacterStat.MDef)}");
+            y = PlainLine(y, "HIT", $"{Total(PlayerStat.Dex, CharacterStat.AddDex) + state.Level + state.GetStat(CharacterStat.AddHit)}");
+            y = PlainLine(y, "FLEE", $"{Total(PlayerStat.Agi, CharacterStat.AddAgi) + state.Level + state.GetStat(CharacterStat.AddFlee)} + {state.GetStat(CharacterStat.PerfectDodge)}");
+            y = PlainLine(y, "ASPD", $"{(1f / Mathf.Max(0.0001f, state.AttackSpeed)):F2} ครั้ง/วินาที");
+
+            y = GroupRow(y, "อัตราพิเศษ");
+            y = RateLine(y, "อัตราดรอปไอเทม", state.GetStat(CharacterStat.AddDropPercent), rank.DropPercent, 0);
+            y = RateLine(y, "EXP ที่ได้รับ", state.GetStat(CharacterStat.AddExpPercent) + guild.ExpPercent,
+                rank.ExpPercent, guild.ExpPercent);
+            y = RateLine(y, "โอกาสตีบวกสำเร็จ", rank.RefinePercent, rank.RefinePercent, 0);
+
+            y = GroupRow(y, "ที่มาของโบนัส");
+
+            var rankLine = BonusText(new AdventureBookRankInfo
+            {
+                StatBonus = rank.Stats,
+                DropPercent = rank.DropPercent,
+                ExpPercent = rank.ExpPercent,
+                RefinePercent = rank.RefinePercent
+            });
+            y = SourceRow(y, $"Adventure ระดับ {AdventureBookState.Rank}",
+                string.IsNullOrEmpty(rankLine) ? "ยังไม่ได้โบนัส สะสมดาวให้ถึงระดับ 1 ก่อน" : rankLine);
+
+            y = SourceRow(y, string.IsNullOrEmpty(GuildState.GuildName) ? "กิลด์" : $"กิลด์ {GuildState.GuildName}",
+                guild.Text.Length == 0 ? "ยังไม่มีสกิลกิลด์ที่ให้โบนัส" : guild.Text);
+
+            y = SourceRow(y, "อุปกรณ์ การ์ด และบัฟ",
+                "ส่วนที่เหลือจากตัวเลขด้านบน หลังหักโบนัสของ Adventure และกิลด์ออกแล้ว");
+
+            return y + Pad;
+        }
+
+        /// <summary>The one line that fits beside a button: what the two rates are worth right now.</summary>
+        private static string RateSummary()
+        {
+            var state = PlayerState.Instance;
+            if (state == null)
+                return "";
+
+            var drop = state.GetStat(CharacterStat.AddDropPercent);
+            var exp = state.GetStat(CharacterStat.AddExpPercent) + GuildBonus().ExpPercent;
+            return $"ดรอป +{drop}%  ·  EXP +{exp}%";
+        }
+
+        private static int Total(PlayerStat baseStat, CharacterStat bonusStat)
+        {
+            var state = PlayerState.Instance;
+            return state == null ? 0 : state.GetData(baseStat) + state.GetStat(bonusStat);
+        }
+
+        /// <summary>What the character's rank is worth, straight off the ladder the server sent.</summary>
+        private static AdventureBookRankInfo RankBonus()
+        {
+            var rank = AdventureBookState.Rank;
+            if (rank <= 0 || rank > AdventureBookState.Ranks.Count)
+                return default;
+
+            return AdventureBookState.Ranks[rank - 1];
+        }
+
+        /// <summary>What one stat is worth, split three ways.</summary>
+        private float StatLine(float y, string name, PlayerStat baseStat, CharacterStat bonusStat,
+            int fromRank, int fromGuild)
+        {
+            var state = PlayerState.Instance;
+            var baseValue = state.GetData(baseStat);
+            var bonus = state.GetStat(bonusStat);
+
+            var card = NewCard(y, RowHeight, null);
+            Label(card, name, 12f, -(RowHeight - 20f) / 2f, 80f, ModernUiTheme.SizeBody, ModernUiTheme.NameColor);
+
+            var parts = new List<string>(3);
+            if (fromRank > 0) parts.Add($"Adventure +{fromRank}");
+            if (fromGuild > 0) parts.Add($"กิลด์ +{fromGuild}");
+            var other = bonus - fromRank - fromGuild;
+            if (other != 0) parts.Add($"อุปกรณ์/บัฟ {(other > 0 ? "+" : "")}{other}");
+
+            if (parts.Count > 0)
+                Label(card, string.Join("   ", parts), 92f, -(RowHeight - 20f) / 2f, RewardColumn - 100f,
+                    ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
+
+            Value(card, bonus == 0 ? $"{baseValue}" : $"{baseValue} + {bonus} = {baseValue + bonus}",
+                -12f, -(RowHeight - 20f) / 2f, 200f, ModernUiTheme.NameColor);
+
+            return y + RowHeight + RowGap;
+        }
+
+        /// <summary>A number with nothing to break down: what it is, and that is all.</summary>
+        private float PlainLine(float y, string name, string value)
+        {
+            var card = NewCard(y, RowHeight, null);
+            Label(card, name, 12f, -(RowHeight - 20f) / 2f, 220f, ModernUiTheme.SizeBody, ModernUiTheme.NameColor);
+            Value(card, value, -12f, -(RowHeight - 20f) / 2f, 240f, ModernUiTheme.NameColor);
+            return y + RowHeight + RowGap;
+        }
+
+        /// <summary>A percentage, and which of the things this server added is behind it.</summary>
+        private float RateLine(float y, string name, int total, int fromRank, int fromGuild)
+        {
+            var card = NewCard(y, RowHeight, null);
+            Label(card, name, 12f, -(RowHeight - 20f) / 2f, 200f, ModernUiTheme.SizeBody, ModernUiTheme.NameColor);
+
+            var parts = new List<string>(3);
+            if (fromRank > 0) parts.Add($"Adventure +{fromRank}%");
+            if (fromGuild > 0) parts.Add($"กิลด์ +{fromGuild}%");
+            var other = total - fromRank - fromGuild;
+            if (other != 0) parts.Add($"อื่น ๆ {(other > 0 ? "+" : "")}{other}%");
+
+            if (parts.Count > 0)
+                Label(card, string.Join("   ", parts), 212f, -(RowHeight - 20f) / 2f, RewardColumn - 220f,
+                    ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
+
+            Value(card, $"+{total}%", -12f, -(RowHeight - 20f) / 2f, 140f,
+                total > 0 ? DoneColor : ModernUiTheme.MutedColor);
+
+            return y + RowHeight + RowGap;
+        }
+
+        private float GroupRow(float y, string title)
+        {
+            var card = NewCard(y, 30f, null);
+            Label(card, title, 12f, -5f, RowWidth - 24f, ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
+            return y + 30f + RowGap;
+        }
+
+        private float SourceRow(float y, string title, string text)
+        {
+            var card = NewCard(y, TallRowHeight, null);
+            Label(card, title, 12f, -8f, RowWidth - 24f, ModernUiTheme.SizeBody, ModernUiTheme.NameColor);
+
+            var line = ModernUiTheme.CreateText(card, "Body", text, ModernUiTheme.SizeSmall,
+                ModernUiTheme.MutedColor, TextAlignmentOptions.TopLeft);
+            ModernUiTheme.Place(line.rectTransform, new Vector2(0, 1), new Vector2(12f, -28f),
+                new Vector2(RowWidth - 24f, 26f));
+
+            return y + TallRowHeight + RowGap;
+        }
+
+        /// <summary>What the guild is worth, read from the same table the server adds from.</summary>
+        private readonly struct GuildBonusTotals
+        {
+            public readonly int Str, Agi, Vit, Int, Dex, Luk, ExpPercent;
+            public readonly string Text;
+
+            public GuildBonusTotals(int str, int agi, int vit, int intel, int dex, int luk,
+                int expPercent, string text)
+            {
+                Str = str; Agi = agi; Vit = vit; Int = intel; Dex = dex; Luk = luk;
+                ExpPercent = expPercent; Text = text;
+            }
+        }
+
+        private static GuildBonusTotals GuildBonus()
+        {
+            int str = 0, agi = 0, vit = 0, intel = 0, dex = 0, luk = 0, exp = 0;
+            var parts = new List<string>();
+
+            foreach (var skill in GuildState.Skills)
+            {
+                if (skill.Level <= 0)
+                    continue;
+
+                var effect = GuildSkillBonus.For((GuildSkill)skill.Id);
+                var amount = skill.Level * effect.PerLevel;
+                if (amount == 0)
+                    continue;
+
+                switch (effect.Stat)
+                {
+                    case CharacterStat.AddStr: str += amount; break;
+                    case CharacterStat.AddAgi: agi += amount; break;
+                    case CharacterStat.AddVit: vit += amount; break;
+                    case CharacterStat.AddInt: intel += amount; break;
+                    case CharacterStat.AddDex: dex += amount; break;
+                    case CharacterStat.AddLuk: luk += amount; break;
+                    case CharacterStat.AddExpPercent: exp += amount; break;
+                }
+
+                parts.Add($"{skill.Name} Lv{skill.Level}");
+            }
+
+            return new GuildBonusTotals(str, agi, vit, intel, dex, luk, exp,
+                parts.Count == 0 ? "" : string.Join("   ·   ", parts));
+        }
+
+        /// <summary>
         /// What the book is for, in the window rather than in a wiki nobody has written.
         /// </summary>
         private float DrawHelp()
@@ -637,6 +923,8 @@ namespace Assets.Scripts.UI.AdventureBook
                 "สะสมดาวรวมทั้งเล่ม เพิ่มสเตตัส อัตราดรอป EXP และอัตราตีบวกแบบถาวร ทุกระดับมีของรางวัลให้ด้วย");
             y = HelpLine(y, "วาร์ปไปที่แมพ",
                 "ได้ดาว 1 ของมอนตัวไหนแล้ว วาร์ปไปหามันได้จากในสมุด เสีย Zeny ตามระดับ พอถึง Rank 5 ฟรี");
+            y = HelpLine(y, "สถานะรวม",
+                "หน้าแรกมีปุ่มดูสเตตัสรวม บอกว่าโบนัสแต่ละอย่างมาจาก Adventure กิลด์ หรืออุปกรณ์");
             y = HelpLine(y, "พิมพ์ในแชทก็ได้",
                 "!book ดูสรุป  ·  !book <ชื่อมอน> ดูตัวเดียว");
 

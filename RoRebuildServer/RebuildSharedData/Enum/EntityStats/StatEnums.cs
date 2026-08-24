@@ -454,6 +454,12 @@ public static class PlayerClientStatusDef
         CharacterStat.AddCrit,
         CharacterStat.PerfectDodge,
         CharacterStat.WeightCapacity,
+
+        //The two rates nobody could see. Adventure rank, Battle Manual, Bubble Gum and the
+        //dungeon miasma all move these, and until they were sent the only way to know any of
+        //it was working was to kill things for an hour and squint at the drops.
+        CharacterStat.AddDropPercent,
+        CharacterStat.AddExpPercent,
         //CharacterStat.AddSoftDefPercent //add this later, but it'll force a packet revision update
     };
 }

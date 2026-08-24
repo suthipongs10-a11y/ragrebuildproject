@@ -56,21 +56,22 @@ public static class GuildSkills
         if (guild == null)
             return;
 
-        var str = guild.SkillLevel(GuildSkill.Leadership);
-        if (str > 0)
-            player.CombatEntity.AddStat(CharacterStat.AddStr, str);
+        //Read out of the shared table rather than written out here, so that the window that
+        //tells a player where their strength came from is quoting the same numbers that gave
+        //it to them. Two copies of these figures is two copies that can disagree, and the one
+        //that would be wrong is the explanation - which nobody tests.
+        foreach (var info in All)
+        {
+            var level = guild.SkillLevel(info.Skill);
+            if (level <= 0)
+                continue;
 
-        var vit = guild.SkillLevel(GuildSkill.GloryOfGuild);
-        if (vit > 0)
-            player.CombatEntity.AddStat(CharacterStat.AddVit, vit);
+            var effect = GuildSkillBonus.For(info.Skill);
+            if (!effect.IsStat || effect.PerLevel == 0)
+                continue;
 
-        var dex = guild.SkillLevel(GuildSkill.SharpGaze);
-        if (dex > 0)
-            player.CombatEntity.AddStat(CharacterStat.AddDex, dex * 2);
-
-        var regen = guild.SkillLevel(GuildSkill.Regeneration);
-        if (regen > 0)
-            player.CombatEntity.AddStat(CharacterStat.AddHpRecoveryPercent, regen * 10);
+            player.CombatEntity.AddStat(effect.Stat, level * effect.PerLevel);
+        }
     }
 
     /// <summary>Whether this guild has learned anything at all.</summary>
@@ -112,7 +113,9 @@ public static class GuildSkills
         if (guild == null)
             return 0;
 
-        return guild.SkillLevel(GuildSkill.GuildBlessing) * 2;
+        //The per-level figure comes out of the same table the stat bonuses do, so the summary
+        //window and the experience handout can never quote different numbers.
+        return guild.SkillLevel(GuildSkill.GuildBlessing) * GuildSkillBonus.For(GuildSkill.GuildBlessing).PerLevel;
     }
 
     /// <summary>
