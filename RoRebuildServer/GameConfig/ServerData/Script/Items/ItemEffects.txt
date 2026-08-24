@@ -83,10 +83,15 @@ Item("Old_Purple_Box") { OnUse: UseItemCreationItem("Old_Violet_Box"); }
 Item("Old_Card_Album") { OnUse: UseItemCreationItem("Old_Card_Album"); }
 
 //The MVP box. Dropped by MVPs alone and by nothing else, and it holds the things this
-//server has decided nobody gets any other way - the slotted Hat of the Sun God, and
-//level four weapons that are on no drop table anywhere. Its contents are a table in
+//server has decided nobody gets any other way - the slotted Hat of the Sun God, and level
+//four weapons that are on no drop table anywhere. Its contents are a table in
 //ItemBoxSummonList.csv rather than anything in code, so adding to it is a line of CSV.
-Item("Mvp_Box") { OnUse: UseItemCreationItem("Mvp_Box"); }
+//
+//It is Pierre's Treasurebox under the hood, which had a picture, a description and no way
+//to use it - a gold box sitting in the item table doing nothing. Reusing it rather than
+//inventing an item means the icon is one every client already has, which a new item would
+//not have been: an item nobody's GRF has a picture for draws an apple.
+Item("Pierre's_Treasurebox") { OnUse: UseItemCreationItem("Pierre's_Treasurebox"); }
 Item("Dead_Branch") { OnValidate: return CanUseSummonItem(); OnUse: UseSummonItem("DeadBranch", 1h); }
 Item("Bloody_Branch") { OnValidate: return CanUseSummonItem(); OnUse: UseSummonItem("BloodyBranch", 12h); }
 Item("Anodyne") { OnUse: ItemActivatedSkillSelfTarget(Endure, 1); }
@@ -290,4 +295,3 @@ Item("Party_Blessing_Scroll") { OnValidate: return false; OnUse: }
 Item("Party_Increase_Agi_Scroll") { OnValidate: return false; OnUse: }
 Item("Party_Assumptio_Scroll") { OnValidate: return false; OnUse: }
 Item("Unsealed_Magic_Spell") { OnValidate: return false; OnUse: }
-Item("Pierre's_Treasurebox") { OnValidate: return false; OnUse: }

@@ -555,7 +555,7 @@ public partial class Monster : IEntityAutoReset
     private const int MvpBoxChanceInTenThousand = 100;
 
     /// <summary>The item code the box is, and the id it turns out to be.</summary>
-    private const string MvpBoxCode = "Mvp_Box";
+    private const string MvpBoxCode = "Pierre's_Treasurebox";
     private static int mvpBoxItemId = -1;
 
     /// <summary>

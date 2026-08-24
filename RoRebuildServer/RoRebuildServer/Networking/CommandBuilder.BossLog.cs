@@ -22,7 +22,7 @@ public static partial class CommandBuilder
     private const int MaxBossSightingsSent = 3;
 
     /// <summary>The box the slotted hat comes out of, which the log's page points at.</summary>
-    private const string MvpBoxCode = "Mvp_Box";
+    private const string MvpBoxCode = "Pierre's_Treasurebox";
 
     public static void SendBossLog(Player player)
     {
