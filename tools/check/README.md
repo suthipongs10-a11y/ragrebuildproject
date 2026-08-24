@@ -68,3 +68,18 @@ from the blank lines the enum is grouped by, which is how they are actually writ
 Six stats are still named and all six were checked by hand: confusion and bleeding are
 statuses the game never applies, and the four self-inflicted ones are read from a flag that
 is set and never looked at.
+
+## tools/audit_effects.py
+
+The things an item effect names, and whether they exist.
+
+    python3 tools/audit_effects.py
+
+`audit_stats.py` asks whether a stat is read. This asks the next question down. An effect
+that casts a skill, drops an item, applies a status or hits a tagged monster names something,
+and naming something is not the same as it being there: a card that auto-casts a skill with
+no handler equips cleanly, rolls its chance, and does nothing.
+
+Four checks - skills against the handler list and the passives read off the player, statuses
+against the status handlers, bonus drops against the item table, and damage-versus-tag
+against the tags column of Monsters.csv.

@@ -717,7 +717,11 @@ public class Npc : IEntityAutoReset
         var addItemCount = 0;
         var inventory = player.Inventory;
 
-        var dcLevel = player.MaxLearnedLevelOfSkill(CharacterSkill.Discount);
+        //Available rather than learned, so a card that grants Discount actually discounts.
+        //Every other skill an item hands over is an active one and goes through the cast
+        //path, which already reads both; this is the only passive anything grants, and it
+        //was the only one asking a question that leaves granted skills out.
+        var dcLevel = player.MaxAvailableLevelOfSkill(CharacterSkill.Discount);
         var discount = allowDiscount && dcLevel > 0 ? 5 + dcLevel * 2 : 0;
         if (discount > 24)
             discount = 24;

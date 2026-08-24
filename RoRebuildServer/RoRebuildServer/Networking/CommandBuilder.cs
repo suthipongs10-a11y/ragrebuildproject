@@ -1545,7 +1545,9 @@ public static partial class CommandBuilder
         var count = 0;
         if (npc.ItemsForSale != null)
             count = npc.ItemsForSale.Count;
-        var discount = canDiscount ? p.MaxLearnedLevelOfSkill(CharacterSkill.Discount) : 0;
+        //Matches what the shop actually charges. Reading a different one here would show a
+        //price the till does not agree with, which is worse than no discount at all.
+        var discount = canDiscount ? p.MaxAvailableLevelOfSkill(CharacterSkill.Discount) : 0;
 
         packet.Write((byte)1); //buy from NPC
         packet.Write((byte)discount);
