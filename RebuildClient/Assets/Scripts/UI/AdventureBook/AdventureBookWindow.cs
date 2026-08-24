@@ -91,6 +91,17 @@ namespace Assets.Scripts.UI.AdventureBook
         private static readonly Color MenuRowColor = new Color(0.831f, 0.894f, 0.976f);
         private static readonly Color DoneColor = new Color(0.106f, 0.412f, 0.208f);
         private static readonly Color TrackColor = new Color(0.816f, 0.859f, 0.910f);
+
+        /// <summary>
+        /// The Adventure rank gauge, which is its own colour rather than the experience bar's.
+        /// </summary>
+        /// <remarks>
+        /// It started as GaugeExpColor so it would read as an experience bar, and reading as
+        /// one is exactly the problem: a second gold bar a few pixels from the real one is a
+        /// bar somebody checks twice. Orange is close enough to say "this fills up" and far
+        /// enough to say "this is not your level".
+        /// </remarks>
+        private static readonly Color RankFillColor = new Color(0.937f, 0.478f, 0.129f);
         private static readonly Color FillColor = new Color(0.235f, 0.545f, 0.851f);
 
         private enum View { Regions, Pages, Page, Rewards, Ranks, Status, Bosses, Help }
@@ -234,7 +245,7 @@ namespace Assets.Scripts.UI.AdventureBook
             track.GetComponent<Image>().raycastTarget = false;
             track.gameObject.AddComponent<RectMask2D>();
 
-            window.rankFill = ModernUiTheme.CreateCard(track, "RankFill", ModernUiTheme.GaugeExpColor);
+            window.rankFill = ModernUiTheme.CreateCard(track, "RankFill", RankFillColor);
             ModernUiTheme.Place(window.rankFill, new Vector2(0, 1), Vector2.zero,
                 new Vector2(0f, RankBarHeight));
             window.rankFill.GetComponent<Image>().raycastTarget = false;
