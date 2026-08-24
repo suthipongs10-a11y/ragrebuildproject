@@ -105,6 +105,18 @@ namespace Assets.Scripts.UI.AdventureBook
         private RectTransform rankFill;
         private RectTransform titleBar;
         private UiPlayerSprite portrait;
+
+        /// <summary>
+        /// The appearance the portrait was last built from, so it is not rebuilt for nothing.
+        /// </summary>
+        /// <remarks>
+        /// Preparing the same character twice is not free and it is not safe: each prepare
+        /// resets the counter that says how many parts are still loading, so a second one
+        /// started before the first has finished can have a part counted twice and another
+        /// not at all. Rebuilding only when the character actually looks different avoids
+        /// the question entirely.
+        /// </remarks>
+        private int portraitAppearance = -1;
         private View view = View.Regions;
         private int regionIndex = -1;
         private int pageId = -1;
@@ -145,8 +157,8 @@ namespace Assets.Scripts.UI.AdventureBook
             instance.regionIndex = -1;
             instance.pageId = -1;
 
-            instance.RefreshPortrait();
             NetworkManager.Instance.SendAdventureBookRefresh();
+            instance.RefreshPortrait();
             instance.Redraw();
         }
 
@@ -279,15 +291,41 @@ namespace Assets.Scripts.UI.AdventureBook
         /// </remarks>
         private void RefreshPortrait()
         {
+            //Wrapped, which is not this project's habit and is deliberate here. The portrait
+            //is decoration on a window whose job is to show the book; the character sprite
+            //system it borrows is asynchronous and shared with two other windows, and a throw
+            //from inside it used to take the whole open with it - the book asked for nothing,
+            //received nothing, and sat on "loading" until it was closed. A badge with no face
+            //in it is a far better failure than that.
+            try
+            {
+                BuildPortrait();
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"The adventure book could not draw its character portrait, so it goes without one: {e.Message}");
+            }
+        }
+
+        private void BuildPortrait()
+        {
             var state = PlayerState.Instance;
             if (titleBar == null || state == null)
                 return;
 
+            var appearance = (state.JobId * 397 + state.HairStyleId) * 31 + state.HairColorId * 2
+                             + (state.IsMale ? 1 : 0);
+
             if (portrait != null)
             {
-                //Already built, so this is somebody who changed job with the book open.
-                portrait.PrepareDisplayPlayerCharacter(state.JobId, state.HairStyleId, state.HairColorId,
-                    0, 0, 0, state.IsMale);
+                //Already built. Only worth doing again if the character looks different now.
+                if (appearance != portraitAppearance)
+                {
+                    portraitAppearance = appearance;
+                    portrait.PrepareDisplayPlayerCharacter(state.JobId, state.HairStyleId, state.HairColorId,
+                        0, 0, 0, state.IsMale);
+                }
+
                 return;
             }
 
@@ -313,17 +351,23 @@ namespace Assets.Scripts.UI.AdventureBook
             frame.offsetMax = new Vector2(-2f, -2f);
             frame.gameObject.AddComponent<RectMask2D>();
 
-            var characterHost = new GameObject("Character");
-            characterHost.transform.SetParent(frame, false);
-            characterHost.transform.localScale = new Vector3(PortraitScale, PortraitScale, 1f);
-            characterHost.transform.localPosition = new Vector3(0f, PortraitDrop, 0f);
+            //A rect rather than a plain transform. Everything under a canvas is laid out
+            //through rects, and the sprite parts this hangs are canvas graphics.
+            var characterHost = ModernUiTheme.CreateRect("Character", frame);
+            characterHost.anchorMin = new Vector2(0.5f, 0.5f);
+            characterHost.anchorMax = new Vector2(0.5f, 0.5f);
+            characterHost.pivot = new Vector2(0.5f, 0.5f);
+            characterHost.sizeDelta = new Vector2(PortraitBadgeSize, PortraitBadgeSize);
+            characterHost.anchoredPosition = new Vector2(0f, PortraitDrop);
+            characterHost.localScale = new Vector3(PortraitScale, PortraitScale, 1f);
 
-            portrait = characterHost.AddComponent<UiPlayerSprite>();
+            portrait = characterHost.gameObject.AddComponent<UiPlayerSprite>();
             portrait.Material = source.Material;
             portrait.ViewDirection = Direction.South;
 
             //No headgear. At this size a hat is a smudge on a face, and the face is the part
             //that says which job is reading the book.
+            portraitAppearance = appearance;
             portrait.PrepareDisplayPlayerCharacter(state.JobId, state.HairStyleId, state.HairColorId,
                 0, 0, 0, state.IsMale);
         }

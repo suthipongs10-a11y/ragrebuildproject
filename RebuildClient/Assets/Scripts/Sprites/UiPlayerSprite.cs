@@ -105,6 +105,18 @@ namespace Assets.Scripts.Sprites
                     continue;
                 }
 
+                //A slot can be switched on and still be waiting for its sprite. Two prepares
+                //in quick succession reset the load counter between them, so a callback from
+                //the first can push the count over the line while a part from the second has
+                //not arrived - and then the whole assembly threw on the missing one, taking
+                //whatever called it down with it. It comes in on its own callback moments
+                //later, which reassembles: skipping here costs a frame, not a picture.
+                if (sprites[i].SpriteData == null)
+                {
+                    sr.gameObject.SetActive(false);
+                    continue;
+                }
+
                 sr.SpriteData = sprites[i].SpriteData;
                 sr.ActionId = 0;
                 sr.CurrentFrame = 0;
