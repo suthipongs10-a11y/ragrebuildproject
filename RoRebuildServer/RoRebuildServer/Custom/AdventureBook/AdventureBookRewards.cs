@@ -40,20 +40,33 @@ public static class AdventureBookRewards
     private static AdventureBookReward Elunium(int count) => new("Elunium", count);
     private static AdventureBookReward Oridecon(int count) => new("Oridecon", count);
 
+    /// <remarks>
+    /// The third star pays a purple box rather than a card album, and that is not a taste
+    /// question. A card album is a hundred and twenty eight cards and nothing else, a card
+    /// fills in a third star wherever it came from, and a third star used to pay another
+    /// album - so one album handed to a character with no third stars averaged twelve of
+    /// them and could reach forty three, along with a hundred and seventy pieces of ore, off
+    /// a single click. The third star is meant to be the rare one.
+    ///
+    /// The album is still in the game, still paid for adventure ranks six through nine, and a
+    /// card out of one still fills in a star. It just does not pay for another album, which is
+    /// what turned a nice surprise into a chain reaction. Old Blue Box and Old Purple Box were
+    /// both checked: neither holds a card.
+    /// </remarks>
     public static readonly Band[] Bands =
     {
         new(29,
             new[] { new AdventureBookReward("Concentration_Potion", 5), Elunium(1) },
             new[] { new AdventureBookReward("Old_Blue_Box", 1), Oridecon(1) },
-            new[] { new AdventureBookReward("Old_Card_Album", 1), Elunium(2), Oridecon(2) }),
+            new[] { new AdventureBookReward("Old_Purple_Box", 1), Elunium(2), Oridecon(2) }),
         new(59,
             new[] { new AdventureBookReward("Awakening_Potion", 5), Elunium(1) },
             new[] { new AdventureBookReward("Old_Blue_Box", 2), Oridecon(1) },
-            new[] { new AdventureBookReward("Old_Card_Album", 1), Elunium(2), Oridecon(2) }),
+            new[] { new AdventureBookReward("Old_Purple_Box", 2), Elunium(2), Oridecon(2) }),
         new(int.MaxValue,
             new[] { new AdventureBookReward("Berserk_Potion", 5), Elunium(1) },
             new[] { new AdventureBookReward("Old_Purple_Box", 1), Oridecon(1) },
-            new[] { new AdventureBookReward("Old_Card_Album", 2), Elunium(2), Oridecon(2) })
+            new[] { new AdventureBookReward("Old_Purple_Box", 3), Elunium(3), Oridecon(3) })
     };
 
     /// <summary>The most items any one star pays, so the wire format can be sized.</summary>
