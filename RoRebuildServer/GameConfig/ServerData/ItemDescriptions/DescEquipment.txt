@@ -1513,12 +1513,16 @@ DEX +2
 
 ::Bulb_Band //id 5034 - Headgear Top
 <desc>ที่คาดผมติดหลอดไฟ</desc>
+INT +3
+SP +50
 
 ::Poring_Hat //id 5035 - Headgear Top
 <desc>หมวกน่ารักรูป Poring</desc>
 
 ::Cross_Hat //id 5036 - Headgear Top
 <desc>ที่คาดผมติดไม้กางเขน</desc>
+ต้านทานธาตุอันเดด +20%
+ต้านทานเผ่าอันเดด +10%
 
 ::Nut_Shell //id 5037 - Headgear Top
 <desc>หมวกที่ทำจากเปลือกถั่ว ป้องกันดีเยี่ยมแต่เปราะมาก</desc>
@@ -1541,6 +1545,9 @@ STR +1, INT +1
 
 ::Opera_Phantom_Mask //id 5043 - Headgear Mid
 <desc>หน้ากากของวีรบุรุษโรแมนติกผู้มีชะตากรรมไม่มีใครรู้</desc>
+INT +3
+DEX +3
+ต้านทานธาตุมืด +10%
 
 ::Magician_Hat //id 5045 - Headgear Top
 <desc>หมวกทรงสูงของนักมายากล ที่ดูเหมือนจะมีกระต่ายไม่รู้จบอยู่ข้างใน</desc>
@@ -1621,7 +1628,8 @@ AGI +1, LUK +1
 
 ::Hot-Blooded_Headband //id 5070 - Headgear Top
 <desc>เครื่องสวมหัวที่สื่อถึงเลือดนักสู้อันร้อนแรง</desc>
-STR +2
+STR +3
+ต้านทานธาตุไฟ +15%
 
 ::Indian_Headband //id 5071 - Headgear Top
 <desc>เครื่องสวมหัวชนเผ่าประดับขนนกสีขาวยาว</desc>
@@ -1641,6 +1649,8 @@ STR +1
 
 ::Cowboy_Hat //id 5075 - Headgear Top
 <desc>หมวกคาวบอย ผู้ชายใส่แล้วแมน ผู้หญิงใส่แล้วน่ารัก</desc>
+DEX +2
+ต้านทานธาตุไฟ +5%
 
 ::Beanie //id 5076 - Headgear Top
 <desc>หมวกไหมพรม กันหนาวได้บ้าง แต่ก็แค่บ้าง</desc>
@@ -1703,6 +1713,8 @@ MDEF +10
 ::Coif_ //id 5093 - Headgear TopMid
 <desc>หมวกรัดศีรษะที่ใส่ไว้ใต้ผ้าคลุมหน้า</desc>
 SP +100
+ต้านทานธาตุมืด +15%
+ต้านทานสถานะตาบอด +30%
 
 ::Orc_Hero_Helm //id 5094 - Headgear TopMid
 <desc>เครื่องสวมหัวที่มอบให้เฉพาะ Orc Hero ตัวจริงเท่านั้น</desc>
@@ -1719,17 +1731,20 @@ MATK +120
 
 ::Dark_Blinder //id 5104 - Headgear Mid
 <desc>ที่ปิดตาที่ร่ายเวทมืดเอาไว้</desc>
-ต้านทาน <color=#800000>ตาบอด</color> +100%
-ต้านทาน <color=#800000>สตัน</color> +2%
+VIT +2
+ต้านทานเผ่าแมลง +10%
+ต้านทานสถานะตาบอด +100%
 
 ::Crunch_Toast //id 5107 - Headgear Bottom
 <desc>เครื่องสวมหัวสุดโก้ ทำเป็นรูปขนมปังปิ้งกรอบ หนึ่งในมื้อเช้าครบหมู่</desc>
 
 ::Detective's_Cap //id 5108 - Headgear Top
 <desc>หมวกของนักสืบชื่อก้องโลก</desc>
+DEX +2
 
 ::Red_Bonnet //id 5109 - Headgear Top
 <desc>หมวกบอนเน็ตที่สตรีชั้นสูงชอบใส่ ใส่แล้วอยากดื่มชาขึ้นมาเฉยๆ</desc>
+ต้านทานธาตุน้ำ +20%
 
 ::Baby_Pacifier //id 5110 - Headgear Bottom
 <desc>หมวกที่หน้าตาเหมือนจุกนมหลอก ใส่แล้วคิดถึงวันเก่าๆ ตอนนอนอยู่ในเปล</desc>
@@ -1753,6 +1768,7 @@ STR, VIT, INT, DEX, AGI, LUK +1
 
 ::Banana_Hat //id 5116 - Headgear Top
 <desc>หมวกรูปเปลือกกล้วย ใส่แล้วคนเห็นโมโหขึ้นมาโดยสัญชาตญาณ</desc>
+ต้านทานเผ่าพืช +15%
 
 ::Mystic_Rose //id 5117 - Headgear Top
 <desc>กุหลาบขาวที่ขับความงามของผู้สวมใส่</desc>
@@ -1770,8 +1786,9 @@ STR, VIT, INT, DEX, AGI, LUK +1
 
 ::Zealotus_Mask //id 5121 - Headgear TopMid
 <desc>หน้ากากที่ใส่แล้วอยากมองมนุษย์ธรรมดาแบบเหยียดๆ</desc>
-ดาเมจกายภาพ +5% ต่อมนุษย์
-รับดาเมจจากมนุษย์ -5%
+VIT +3
+ต้านทานเผ่ามนุษย์ +10%
+ดาเมจต่อเผ่ามนุษย์ +5%
 
 ::Magni's_Cap //id 5122 - Headgear Top
 <desc>หมวกของ Magni บุตรแห่ง Thor ให้พละกำลังของ Magni มาส่วนหนึ่ง</desc>
@@ -1813,6 +1830,8 @@ STR +1
 
 ::Orc_Helm_ //id 5157 - Headgear Top
 <desc>หมวกเกราะทนทานที่ช่างตีเหล็กออร์คทำขึ้น</desc>
+STR +2
+ต้านทานเผ่ามนุษย์ +5%
 
 ::Monk_Hat_ //id 5158 - Headgear Top
 <desc>หมวกพิธีกรรมของนักพรต ป้องกันสิ่งชั่วร้าย</desc>
@@ -1820,6 +1839,8 @@ MDEF +3
 
 ::Golden_Gear_ //id 5159 - Headgear Top
 <desc>หมวกเกราะที่ตีจากทองคำบริสุทธิ์ ป้องกันดีแต่แพงจนซื้อไม่ไหว</desc>
+DEF +3
+ต้านทานเผ่าไร้รูปร่าง +10%
 
 ::Majestic_Goat_ //id 5160 - Headgear Top
 <desc>หมวกเกราะที่มีเขาแพะใหญ่โต</desc>
@@ -1827,6 +1848,8 @@ STR +1
 
 ::Spiky_Band_ //id 5161 - Headgear Top
 <desc>ที่คาดหัวติดหนามแหลมสองอัน อันตรายแต่ดูเท่</desc>
+STR +3
+VIT +3
 
 ::Bone_Helm_ //id 5162 - Headgear Top
 <desc>หมวกเกราะที่ทำจากกระดูกตัน แทบเจาะไม่เข้า</desc>
@@ -1846,7 +1869,8 @@ INT +1
 
 ::Sphinx_Hat_ //id 5166 - Headgear TopBottom
 <desc>เครื่องสวมหัวพื้นบ้านที่สื่อถึงเทพเจ้าดั้งเดิม</desc>
-STR +2
+STR +3
+ต้านทานธาตุดิน +10%
 
 ::Munak_Hat_ //id 5167 - Headgear All
 <desc>ของจำลองผ้าโพกหัวของ Munak พร้อมยันต์ครบ</desc>
@@ -1857,6 +1881,8 @@ STR +2
 
 ::Bride_Mask //id 5169 - Headgear TopMid
 <desc>หน้ากากสีขาวแต้มแก้มแดง ที่นักแสดงบทเจ้าสาวสวมในละคร</desc>
+AGI +3
+ต้านทานธาตุผี +10%
 
 ::Feather_Beret //id 5170 - Headgear Top
 <desc>หมวกขนนกหรู ทำจากผ้าเนื้อเนียนสีฟ้า</desc>
@@ -1873,9 +1899,12 @@ MDEF +5
 
 ::Magistrate_Hat //id 5173 - Headgear Top
 <desc>หมวกที่ Satto ขุนนางจากดินแดนตะวันออกโบราณเคยสวม</desc>
+ต้านทานธาตุอันเดด +15%
 
 ::Ayam //id 5174 - Headgear Top
 <desc>หมวกไหมสีแดงที่ควรจะเป็นของผู้หญิง แต่ผู้ชายก็ใส่ได้</desc>
+INT +2
+ต้านทานธาตุอันเดด +5%
 
 ::Censor_Bar //id 5175 - Headgear Mid
 <desc>แผ่นปิดตาสีดำ ไว้ปกปิดตัวตน</desc>
@@ -1887,6 +1916,8 @@ MDEF +1, HIT -5
 
 ::Mythical_Lion_Mask //id 5177 - Headgear TopMid
 <desc>หน้ากากสิงโตตะวันออก ดวงตาโกรธเกรี้ยวน่าเกรงขาม</desc>
+STR +3
+ต้านทานธาตุน้ำ +15%
 
 ::Ribbon__ //id 5191 - Headgear Top
 <desc>ปิ่นปักผมซาตินสีดำ ป้องกันเวทร้าย</desc>
@@ -1918,7 +1949,9 @@ MDEF +3
 
 ::Romantic_White_Flower //id 5206 - Headgear Bottom
 <desc>ดอกไม้ขาวน่ารักโรแมนติก สวยด้วยใช้ได้จริงด้วย</desc>
-รับดาเมจจากพืช -3%
+INT +2
+SP +30
+ต้านทานเผ่าพืช +10%
 
 ::Deviruchi_Hat_ //id 5227 - Headgear Top
 <desc>หมวกน่ารักรูป Deviruchi</desc>
@@ -1991,7 +2024,9 @@ INT +2, SP +150
 
 ::Shafka //id 5243 - Headgear TopMid
 <desc>หมวกขนสัตว์ที่ทำให้หูอุ่นในอากาศหนาวจัด</desc>
-ต้านทาน <color=#800000>แช่แข็ง</color> +10%
+LUK +3
+ต้านทานสถานะแช่แข็ง +50%
+ต้านทานธาตุน้ำ +10%
 
 ::Water_Lily_Hat //id 5302 - Headgear Top
 <desc>หมวกรูปดอกบัวบาน
@@ -2000,9 +2035,13 @@ INT +2, SP +150
 ::Pirate_Dagger //id 5305 - Headgear Bottom
 <desc>มีดเงินเล็กที่คาบไว้ระหว่างฟัน</desc>
 ATK +5
+AGI +2
+LUK +2
 
 ::Ph.D_Hat_ //id 5347 - Headgear Top
 <desc>หมวกที่ใส่ในพิธีรับปริญญา</desc>
+INT +3
+SP +80
 
 ::Big_Ribbon_ //id 5348 - Headgear Top
 <desc>โบว์แดงใบใหญ่เกินขนาดที่ซ่อนพลังเวทไว้</desc>
@@ -2069,4 +2108,6 @@ FLEE +5, Perfect Dodge +3
 
 ::Dark_Bacilium //id 5808 - Headgear All
 <desc>มงกุฎแข็งแกร่งที่สะท้อนความมุ่งมั่นจะฝ่าฟันความยากลำบาก</desc>
+ต้านทานธาตุมืด +20%
+ต้านทานเผ่าปิศาจ +5%
 

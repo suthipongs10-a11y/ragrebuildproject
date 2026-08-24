@@ -505,6 +505,13 @@ Item("Ice_Pick_") { OnEquip: AddStat(ReverseDefense, 1); }
 Item("Decorative_Mushroom") { OnEquip: AddDamageVsTag("Fungus", 10); }
 Item("Silver_Arrow") { OnEquip: AddDamageVsTag("WeakToSilver", 100); }
 
+//Two arrows that said what they did and did not do it. The rest of the quiver is flavour
+//text over an element the ammunition table already carries - a fire arrow is fire because
+//the table says so - but these two name a status in words, and words are a promise. Fifty
+//is what every card and katar that inflicts the same status uses.
+Item("Sleep_Arrow") { OnEquip: AddStat(OnRangedAttackSleep, 50); }
+Item("Mute_Arrow") { OnEquip: AddStat(OnRangedAttackSilence, 50); }
+
 
 //Adventure book region rewards. Every one of these is an item nothing else in the game hands
 //out, and most of them were a bare hat with a point or two of defence and no effect at all -
@@ -529,7 +536,7 @@ Item("Banana_Hat") { OnEquip: AddStat(AddResistRacePlant, 15); } //Forest Labyri
 Item("Shafka") { OnEquip: AddStat(AddLuk, 3); AddStat(ResistFreezeStatus, 50); AddStat(AddResistElementWater, 10); } //Lutie
 Item("Ph.D_Hat_") { OnEquip: AddStat(AddInt, 3); AddStat(AddMaxSp, 80); } //Yuno Fields
 Item("Magistrate_Hat") { OnEquip: AddStat(AddResistElementUndead, 15); } //Payon Dungeon
-Item("Pirate_Dagger") { OnEquip: AddStat(AddAgi, 2); AddStat(AddLuk, 2); } //Comodo
+Item("Pirate_Dagger") { OnEquip: AddStat(AddAttackPower, 5); AddStat(AddAgi, 2); AddStat(AddLuk, 2); } //Comodo
 Item("Dark_Bacilium") { OnEquip: AddStat(AddResistElementDark, 20); AddStat(AddResistRaceDemon, 5); } //Geffen Dungeon
 Item("Sphinx_Hat_") { OnEquip: AddStat(AddStr, 3); AddStat(AddResistElementEarth, 10); } //Sphinx
 Item("Red_Bonnet") { OnEquip: AddStat(AddResistElementWater, 20); } //Sunken Ship

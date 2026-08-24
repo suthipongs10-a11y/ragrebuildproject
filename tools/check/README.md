@@ -24,3 +24,27 @@ takes a git range).
 
 None of them is a compiler. They catch the classes of mistake that have cost this project a
 build round, and nothing else.
+
+---
+
+## tools/audit_items.py
+
+Not a check - it does not pass or fail. It reads every item a player can actually get and
+holds its description against the effect written for it, and prints what disagrees.
+
+    python3 tools/audit_items.py          the list
+    python3 tools/audit_items.py count    the counts only
+
+Two passes. The first finds an item whose description promises something and which has no
+effect at all. The second parses the numbers out of the description - `STR +2`, `HP +700` -
+and compares them with the `AddStat` calls, so a card that says one and gives ten is found
+without anybody reading four hundred cards.
+
+What it knows not to complain about: defence, magic defence and a weapon's attack come off
+the item table rather than a script; a set bonus is written as `ComboItem` and belongs to
+every item named in it; a line that qualifies its bonus - against demihumans, for swordsmen -
+is a different stat and is left to the eye.
+
+What it still gets wrong: flavour prose that happens to contain a verb like "increases" or
+"makes" reads as a promise. Six items do this and all six were checked by hand; the list is
+short enough to keep reading rather than worth another rule.

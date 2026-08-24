@@ -1,10 +1,13 @@
 //cards all the cards!
-Item("Poring_Card") { OnEquip: AddStat(AddLuk, 2); AddStat(PerfectDodge, 10); }
+//Perfect dodge is a straight percentage - the roll is the stat out of a hundred - so ten
+//here was a ten percent chance to shrug off every physical hit in the game, on the card that
+//drops off the first monster anybody meets. The card says one, and one is what it gives.
+Item("Poring_Card") { OnEquip: AddStat(AddLuk, 2); AddStat(PerfectDodge, 1); }
 Item("Fabre_Card") { OnEquip: AddStat(AddVit, 1); AddStat(AddMaxHp, 100); }
 Item("Pupa_Card") { OnEquip: AddStat(AddMaxHp, 700); }
 Item("Drops_Card") { OnEquip: AddStat(AddDex, 1); AddStat(AddHit, 3); }
 Item("Santa_Poring_Card") { OnEquip: AddStat(AddAttackElementDark, 20); }
-Item("Lunatic_Card") { OnEquip: AddStat(AddLuk, 2); AddStat(PerfectDodge, 10); AddStat(AddCrit, 1); }
+Item("Lunatic_Card") { OnEquip: AddStat(AddLuk, 1); AddStat(PerfectDodge, 1); AddStat(AddCrit, 1); }
 Item("Peco_Peco_Egg_Card") { OnEquip: AddStat(AddAttackRaceFormless, 20); }
 Item("Picky_Card") { OnEquip: AddStat(AddStr, 1); AddStat(AddAttackPower, 10); }
 Item("Chonchon_Card") { OnEquip: AddStat(AddAgi, 1); AddStat(AddFlee, 2); }
