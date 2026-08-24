@@ -81,6 +81,12 @@ Item("Butterfly_Wing") { OnValidate: return true; OnUse: ReturnToSavePoint(); }
 Item("Old_Blue_Box") { OnUse: UseItemCreationItem("Old_Blue_Box"); }
 Item("Old_Purple_Box") { OnUse: UseItemCreationItem("Old_Violet_Box"); }
 Item("Old_Card_Album") { OnUse: UseItemCreationItem("Old_Card_Album"); }
+
+//The MVP box. Dropped by MVPs alone and by nothing else, and it holds the things this
+//server has decided nobody gets any other way - the slotted Hat of the Sun God, and
+//level four weapons that are on no drop table anywhere. Its contents are a table in
+//ItemBoxSummonList.csv rather than anything in code, so adding to it is a line of CSV.
+Item("Mvp_Box") { OnUse: UseItemCreationItem("Mvp_Box"); }
 Item("Dead_Branch") { OnValidate: return CanUseSummonItem(); OnUse: UseSummonItem("DeadBranch", 1h); }
 Item("Bloody_Branch") { OnValidate: return CanUseSummonItem(); OnUse: UseSummonItem("BloodyBranch", 12h); }
 Item("Anodyne") { OnUse: ItemActivatedSkillSelfTarget(Endure, 1); }

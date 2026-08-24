@@ -21,6 +21,9 @@ public static partial class CommandBuilder
     /// <summary>How many places to name for one boss.</summary>
     private const int MaxBossSightingsSent = 3;
 
+    /// <summary>The box the slotted hat comes out of, which the log's page points at.</summary>
+    private const string MvpBoxCode = "Mvp_Box";
+
     public static void SendBossLog(Player player)
     {
         if (!BossLogManager.IsEnabled || !BossLog.IsBuilt)
@@ -33,15 +36,12 @@ public static partial class CommandBuilder
         header.Write((short)BossLog.MvpCount);
         header.Write((short)BossLogProgress.CountFound(player));
         header.Write((byte)(BossLogProgress.HasCleared(player) ? 1 : 0));
-        header.Write((byte)(BossLogProgress.HasCrown(player) ? 1 : 0));
-        header.Write((short)BossLogProgress.MvpKillsSinceClear(player));
+        header.Write((short)BossLogProgress.MvpKills(player));
 
-        //The two hats by item id, so the window can find the name and the icon itself.
+        //The three items the page shows, by id, so the window finds the names and icons.
         header.Write(DataManager.ItemIdByName.TryGetValue(BossLogProgress.PlainHatCode, out var plain) ? plain : 0);
         header.Write(DataManager.ItemIdByName.TryGetValue(BossLogProgress.CrownedHatCode, out var crown) ? crown : 0);
-
-        header.Write((short)BossLogProgress.CrownChance);
-        header.Write((short)BossLogProgress.CrownPity);
+        header.Write(DataManager.ItemIdByName.TryGetValue(MvpBoxCode, out var box) ? box : 0);
 
         NetworkManager.SendMessage(header, player.Connection);
 
@@ -105,8 +105,7 @@ public static partial class CommandBuilder
         packet.Write(BossLogProgress.GetKills(player, entry));
         packet.Write((short)BossLogProgress.CountFound(player));
         packet.Write((byte)(BossLogProgress.HasCleared(player) ? 1 : 0));
-        packet.Write((byte)(BossLogProgress.HasCrown(player) ? 1 : 0));
-        packet.Write((short)BossLogProgress.MvpKillsSinceClear(player));
+        packet.Write((short)BossLogProgress.MvpKills(player));
 
         NetworkManager.SendMessage(packet, player.Connection);
     }

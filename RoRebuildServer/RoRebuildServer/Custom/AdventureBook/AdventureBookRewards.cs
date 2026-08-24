@@ -52,7 +52,7 @@ public static class AdventureBookRewards
             new[] { new AdventureBookReward("Old_Card_Album", 1), Elunium(2), Oridecon(2) }),
         new(int.MaxValue,
             new[] { new AdventureBookReward("Berserk_Potion", 5), Elunium(1) },
-            new[] { new AdventureBookReward("Old_Violet_Box", 1), Oridecon(1) },
+            new[] { new AdventureBookReward("Old_Purple_Box", 1), Oridecon(1) },
             new[] { new AdventureBookReward("Old_Card_Album", 2), Elunium(2), Oridecon(2) })
     };
 
@@ -79,9 +79,9 @@ public static class AdventureBookRewards
         //3
         new[] { Elunium(15), Oridecon(15), Manual(3), Gum(3) },
         //4
-        new[] { Elunium(20), Oridecon(20), Manual(4), Gum(4), new AdventureBookReward("Old_Violet_Box", 3) },
+        new[] { Elunium(20), Oridecon(20), Manual(4), Gum(4), new AdventureBookReward("Old_Purple_Box", 3) },
         //5
-        new[] { Elunium(30), Oridecon(30), Manual(5), Gum(5), new AdventureBookReward("Old_Violet_Box", 5) },
+        new[] { Elunium(30), Oridecon(30), Manual(5), Gum(5), new AdventureBookReward("Old_Purple_Box", 5) },
         //6
         new[] { Elunium(40), Oridecon(40), Manual(6), Gum(6), new AdventureBookReward("Old_Card_Album", 3) },
         //7

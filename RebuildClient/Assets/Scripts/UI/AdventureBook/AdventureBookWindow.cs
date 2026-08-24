@@ -1096,21 +1096,18 @@ namespace Assets.Scripts.UI.AdventureBook
             var y = Pad;
             y = BackRow(y, "บันทึกล่าจอมมาร", () => { view = View.Regions; Redraw(); });
 
-            //The two prizes first, because they are why anybody opens this page.
-            y = BossPrizeRow(y, AdventureBookState.BossPlainHatId, "ล่าครบทุกตัวในบันทึก",
+            //The prizes first, because they are why anybody opens this page.
+            y = BossPrizeRow(y, AdventureBookState.BossPlainHatId, "รางวัล: ล่าครบทุกตัวในบันทึก",
                 $"{AdventureBookState.BossFound} / {AdventureBookState.BossTotal} ตัว",
                 AdventureBookState.BossCleared);
 
-            var chance = AdventureBookState.BossCrownChance / 100f;
-            var crownNote = AdventureBookState.BossCrowned
-                ? "ได้แล้ว"
-                : AdventureBookState.BossCleared
-                    ? $"ล่า MVP ไปแล้ว {AdventureBookState.BossMvpKillsSinceClear:N0} ครั้ง"
-                    : "ต้องล่าครบทุกตัวก่อน";
+            //The box, and the hat inside it. Two rows rather than one because they are two
+            //different things to go and get, and the hat is not this log's to hand over.
+            y = BossPrizeRow(y, AdventureBookState.BossBoxItemId, "ดรอปจาก MVP โอกาส 1% ไม่ขึ้นกับบัฟเพิ่มดรอป",
+                $"ล่า MVP แล้ว {AdventureBookState.BossMvpKills:N0} ครั้ง", false);
 
-            y = BossPrizeRow(y, AdventureBookState.BossCrownedHatId,
-                $"โอกาส {chance:0.##}% ทุกครั้งที่ล่า MVP หลังทำบันทึกครบ  ·  รับประกันที่ครั้งที่ {AdventureBookState.BossCrownPity:N0}",
-                crownNote, AdventureBookState.BossCrowned);
+            y = BossPrizeRow(y, AdventureBookState.BossCrownedHatId, "อยู่ในกล่อง MVP  ·  ไม่มีทางอื่นในเกมนี้",
+                "ต้องเปิดกล่องเอา", false);
 
             y = GroupRow(y, $"MVP  ({AdventureBookState.BossMvpTotal} ตัว)");
             var drawnMini = false;
@@ -1200,7 +1197,7 @@ namespace Assets.Scripts.UI.AdventureBook
                 "หน้าแรกมีปุ่มดูสเตตัสรวม บอกว่าโบนัสแต่ละอย่างมาจาก Adventure กิลด์ หรืออุปกรณ์");
             if (AdventureBookState.HasBossLog)
                 y = HelpLine(y, "บันทึกล่าจอมมาร",
-                    "คนละเล่มกับสมุด ไม่นับดาว ล่า MVP และมินิบอสให้ครบทุกตัว ได้ Hat of the Sun God ใบเจาะรูต้องดวงล้วน ๆ");
+                    "คนละเล่มกับสมุด ไม่นับดาว ล่า MVP และมินิบอสให้ครบทุกตัว ได้ Hat of the Sun God ส่วนใบเจาะรูอยู่ในกล่อง MVP อย่างเดียว");
 
             y = HelpLine(y, "พิมพ์ในแชทก็ได้",
                 "!book ดูสรุป  ·  !book <ชื่อมอน> ดูตัวเดียว");

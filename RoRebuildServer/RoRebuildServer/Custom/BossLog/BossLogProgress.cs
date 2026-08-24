@@ -11,46 +11,29 @@ namespace RoRebuildServer.Custom.BossLog;
 /// A player's way through the boss log, and the two hats at the end of it.
 /// </summary>
 /// <remarks>
-/// Two prizes, and they are earned in completely different ways on purpose.
+/// One prize, and it is a certificate: meet every boss in the world once and the plain Hat of
+/// the Sun God is yours, no luck involved. What makes it hard is that bosses respawn once an
+/// hour, so the only way through is a lot of evenings and knowing where everything stands.
 ///
-/// The plain Hat of the Sun God is a certificate: meet every boss in the world once and it is
-/// yours, no luck involved. What makes it hard is that bosses respawn once an hour, so the
-/// only way through is a lot of evenings and knowing where everything stands.
-///
-/// The slotted one is a lottery, and it only opens once the certificate is in hand. Every MVP
-/// killed after that rolls for it. That is the shape a legendary item has in this game - a
-/// number nobody can grind their way past - with one change: a floor under it, so that being
-/// unlucky is a longer wait rather than a permanent no.
+/// The slotted one is not here. It comes out of the MVP box, which drops from MVPs at one
+/// percent and holds it among a dozen other things - a lottery inside a lottery, and nothing
+/// anybody can grind their way past. This log briefly had a lottery of its own for it, with a
+/// guarantee at five hundred MVP kills, and the two could not both exist: a guarantee makes
+/// the box pointless for the one thing that makes the box worth opening.
 /// </remarks>
 public static class BossLogProgress
 {
     /// <summary>Set once the log is full and the plain hat has been handed over.</summary>
     private const string ClearFlag = "blclear";
 
-    /// <summary>Set once the slotted hat has been handed over. It is given once, ever.</summary>
-    private const string CrownFlag = "blcrown";
-
-    /// <summary>MVPs killed since the log was finished, which is what the lottery counts.</summary>
-    private const string MvpSinceClearFlag = "blmvps";
+    /// <summary>MVPs this character has killed, for the log to say so.</summary>
+    private const string MvpKillsFlag = "blmvps";
 
     /// <summary>The plain hat: finish the log, it is yours.</summary>
     public const string PlainHatCode = "Hat_of_the_Sun_God";
 
-    /// <summary>The slotted one. Nothing else in the game hands this out.</summary>
+    /// <summary>The slotted one, which comes out of the MVP box and nowhere else.</summary>
     public const string CrownedHatCode = "Hat_of_the_Sun_God_";
-
-    /// <summary>In ten thousand, per MVP killed once the log is finished. A hundred is one percent.</summary>
-    public const int CrownChance = 100;
-
-    /// <summary>
-    /// The MVP kill it stops being a lottery and is simply given.
-    /// </summary>
-    /// <remarks>
-    /// Five times the average wait. Almost nobody reaches it - the roll lands long before -
-    /// but it is the difference between an item that is rare and an item somebody can spend a
-    /// year not getting, and the second one is not a prize, it is a grudge.
-    /// </remarks>
-    public const int CrownPity = 500;
 
     public static int GetKills(Player player, BossLogEntry entry) => player.GetNpcFlag(entry.ProgressFlag);
 
@@ -58,9 +41,7 @@ public static class BossLogProgress
 
     public static bool HasCleared(Player player) => player.GetNpcFlag(ClearFlag) != 0;
 
-    public static bool HasCrown(Player player) => player.GetNpcFlag(CrownFlag) != 0;
-
-    public static int MvpKillsSinceClear(Player player) => player.GetNpcFlag(MvpSinceClearFlag);
+    public static int MvpKills(Player player) => player.GetNpcFlag(MvpKillsFlag);
 
     /// <summary>How many of the log's entries this character has met at least once.</summary>
     public static int CountFound(Player player)
@@ -90,10 +71,10 @@ public static class BossLogProgress
         if (isFirst && !HasCleared(player))
             CheckCleared(player);
 
-        //The lottery counts MVPs, not mini bosses. A mini boss is half an hour away and an
-        //MVP is an evening, and the prize should cost the evening.
-        if (entry.IsMvp && HasCleared(player))
-            RollForCrown(player);
+        //Counted whether or not the log is finished, because it is the number the log shows
+        //and the number the box's odds are read against.
+        if (entry.IsMvp)
+            player.SetNpcFlag(MvpKillsFlag, player.GetNpcFlag(MvpKillsFlag) + 1);
 
         CommandBuilder.SendBossLogEntry(player, entry);
     }
@@ -111,27 +92,6 @@ public static class BossLogProgress
         ServerAnnouncements.Announce(name == null
             ? $"{player.Name} ล่าจอมมารครบทุกตัวในบันทึกล่าจอมมารแล้ว !"
             : $"ยินดีด้วย {player.Name} ล่าจอมมารครบทั้ง {BossLog.Total} ตัว ได้รับ {name} !");
-    }
-
-    private static void RollForCrown(Player player)
-    {
-        if (HasCrown(player))
-            return;
-
-        var kills = player.GetNpcFlag(MvpSinceClearFlag) + 1;
-        player.SetNpcFlag(MvpSinceClearFlag, kills);
-
-        var won = GameRandom.Next(10000) < CrownChance;
-        if (!won && kills < CrownPity)
-            return;
-
-        player.SetNpcFlag(CrownFlag, 1);
-
-        var name = Give(player, CrownedHatCode);
-        if (name == null)
-            return;
-
-        ServerAnnouncements.Announce($"ตำนานบทใหม่ ! {player.Name} ได้รับ {name} (เจาะรู) จากการล่า MVP ครั้งที่ {kills:N0} !");
     }
 
     /// <summary>

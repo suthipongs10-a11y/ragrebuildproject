@@ -144,14 +144,12 @@ namespace Assets.Scripts.Network
         public static int BossMvpTotal;
         public static int BossFound;
         public static bool BossCleared;
-        public static bool BossCrowned;
-        public static int BossMvpKillsSinceClear;
+        public static int BossMvpKills;
         public static int BossPlainHatId;
         public static int BossCrownedHatId;
 
-        /// <summary>The lottery, in ten thousand, and the kill it stops being one.</summary>
-        public static int BossCrownChance;
-        public static int BossCrownPity;
+        /// <summary>The box the slotted hat comes out of, which is not the log's to give.</summary>
+        public static int BossBoxItemId;
 
         /// <summary>Whether the log arrived at all. It is a separate switch on the server.</summary>
         public static bool HasBossLog;

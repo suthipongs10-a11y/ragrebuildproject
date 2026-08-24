@@ -109,12 +109,10 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
             AdventureBookState.BossMvpTotal = msg.ReadInt16();
             AdventureBookState.BossFound = msg.ReadInt16();
             AdventureBookState.BossCleared = msg.ReadByte() != 0;
-            AdventureBookState.BossCrowned = msg.ReadByte() != 0;
-            AdventureBookState.BossMvpKillsSinceClear = msg.ReadInt16();
+            AdventureBookState.BossMvpKills = msg.ReadInt16();
             AdventureBookState.BossPlainHatId = msg.ReadInt32();
             AdventureBookState.BossCrownedHatId = msg.ReadInt32();
-            AdventureBookState.BossCrownChance = msg.ReadInt16();
-            AdventureBookState.BossCrownPity = msg.ReadInt16();
+            AdventureBookState.BossBoxItemId = msg.ReadInt32();
 
             AdventureBookState.HasBossLog = true;
         }
@@ -150,8 +148,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
 
             AdventureBookState.BossFound = msg.ReadInt16();
             AdventureBookState.BossCleared = msg.ReadByte() != 0;
-            AdventureBookState.BossCrowned = msg.ReadByte() != 0;
-            AdventureBookState.BossMvpKillsSinceClear = msg.ReadInt16();
+            AdventureBookState.BossMvpKills = msg.ReadInt16();
 
             if (AdventureBookState.BossesById.TryGetValue(id, out var page))
                 page.Kills = kills;

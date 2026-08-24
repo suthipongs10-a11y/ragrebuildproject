@@ -551,6 +551,36 @@ public partial class Monster : IEntityAutoReset
     /// player's sense of luck is rather than evenly: anything you see most sessions is not
     /// worth a light, one in a hundred is, and one in five hundred should stop you walking.
     /// </summary>
+    /// <summary>The MVP box, in ten thousand. A hundred is one percent.</summary>
+    private const int MvpBoxChanceInTenThousand = 100;
+
+    /// <summary>The item code the box is, and the id it turns out to be.</summary>
+    private const string MvpBoxCode = "Mvp_Box";
+    private static int mvpBoxItemId = -1;
+
+    /// <summary>
+    /// The MVP box's item id, looked up once.
+    /// </summary>
+    /// <remarks>
+    /// Resolved on first use rather than at load, because this is read on the path a monster
+    /// dies on and the item tables are not up when this type is first touched. Minus one
+    /// means not looked at yet; zero means looked at and not there, which is said once.
+    /// </remarks>
+    private static bool TryGetMvpBoxItemId(out int id)
+    {
+        if (mvpBoxItemId < 0)
+        {
+            if (!DataManager.ItemIdByName.TryGetValue(MvpBoxCode, out mvpBoxItemId))
+            {
+                mvpBoxItemId = 0;
+                ServerLogger.LogWarning($"There is no item called '{MvpBoxCode}', so MVPs will not drop one.");
+            }
+        }
+
+        id = mvpBoxItemId;
+        return id > 0;
+    }
+
     private static byte RarityOfChance(int chance)
     {
         if (chance > 500) return 0;  //better than 5%, an ordinary drop
@@ -633,6 +663,31 @@ public partial class Monster : IEntityAutoReset
                     hasDrop = true;
                     dropId++;
                 }
+            }
+
+            //The MVP box, which is not on any monster's drop table because it is not really a
+            //drop of this monster's - it is a drop of being an MVP at all, so a new MVP added
+            //later carries it without anybody remembering to add a row.
+            //
+            //Deliberately outside the loop above and deliberately not touched by the drop rate
+            //bonus. The box is the rarest thing on the server and the whole point of it is a
+            //number nobody can move: a hat somebody doubled their way to is not a legend.
+            if (isMvp && GameRandom.Next(10000) < MvpBoxChanceInTenThousand && TryGetMvpBoxItemId(out var boxId))
+            {
+                var boxPos = GetNextTileForDrop(dropId);
+                var box = new GroundItem(boxPos, boxId, 1)
+                {
+                    Rarity = RarityOfChance(MvpBoxChanceInTenThousand),
+                    FromBoss = true,
+                    DropSourceMonsterId = MonsterBase.Id
+                };
+
+                if (topContributor != null)
+                    box.SetExclusivePickupTime(topContributor, 8f);
+
+                Character.Map.DropGroundItem(ref box);
+                hasDrop = true;
+                dropId++;
             }
 
             //special event: MVPs are guaranteed to drop at least 1 item, so if none drops, we force one to drop
