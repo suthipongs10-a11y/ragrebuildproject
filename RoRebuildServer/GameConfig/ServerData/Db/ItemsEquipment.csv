@@ -403,16 +403,16 @@ Id,Code,Name,Defense,MagicDef,Slot,Price,Weight,Type,Position,Property,MinLvl,Eq
 5031,Mine_Hat,Mine Hat,4,0,0,20,1500,Headgear,Top,,55,Melee1stJob,Yes,Yes,광산헬멧,광산헬멧
 5032,Sunday_Hat,Sunday Hat,1,0,0,20,800,Headgear,Top,,0,AllExceptNovice,Yes,Yes,나들이모자,나들이모자
 5033,Raccoon_Hat,Raccoon Hat,3,0,0,20,900,Headgear,Top,,50,AllExceptNovice,Yes,Yes,너구리모자,너구리모자
-5034,Bulb_Band,Bulb Band,0,0,0,20,500,Headgear,Top,,0,AllExceptNovice,Yes,Yes,전구머리띠,전구머리띠
+5034,Bulb_Band,Bulb Band,0,0,0,20,500,Headgear,Top,,0,AllJobs,Yes,Yes,전구머리띠,전구머리띠
 5035,Poring_Hat,Poring Hat,2,0,0,20,700,Headgear,Top,,38,AllExceptNovice,Yes,Yes,포링모자,포링모자
-5036,Cross_Hat,Cross Hat,1,0,0,20,250,Headgear,Top,,10,AllExceptNovice,Yes,Yes,십자머리띠,십자머리띠
+5036,Cross_Hat,Cross Hat,1,0,0,20,250,Headgear,Top,,10,AllJobs,Yes,Yes,십자머리띠,십자머리띠
 5037,Nut_Shell,Nut Shell,4,0,0,20,150,Headgear,Top,,5,AllJobs,No,Yes,열매껍질,열매껍질
 5038,Deviruchi_Hat,Deviruchi Hat,2,0,0,20,800,Headgear,Top,,64,AllExceptNovice,Yes,Yes,새끼악마모자,새끼악마모자
 5039,Rainbow_Eggshell,Rainbow Eggshell,4,0,0,20,400,Headgear,Top,,19,AllJobs,No,Yes,알록달록알껍질,알록달록알껍질
 5040,Blush,Blush,0,0,0,20,100,Headgear,Mid,,0,AllJobs,No,Yes,발그레,발그레
 5041,Heart_Hairpin,Heart Hairpin,0,0,0,20,100,Headgear,Top,,0,AllJobs,Yes,Yes,하트머리핀,하트머리핀
 5042,Bao_Bao,Bao Bao,0,0,0,20,150,Headgear,Top,,14,AllExceptNovice,Yes,Yes,머리포자기,머리포자기
-5043,Opera_Phantom_Mask,Opera Phantom Mask,1,0,0,20,200,Headgear,Mid,,20,AllExceptNovice,No,Yes,오페라유령가면,오페라유령가면
+5043,Opera_Phantom_Mask,Opera Phantom Mask,1,0,0,20,200,Headgear,Mid,,20,AllJobs,No,Yes,오페라유령가면,오페라유령가면
 5045,Magician_Hat,Magician Hat,3,0,0,20,500,Headgear,Top,,50,CasterGroup,Yes,Yes,마술사의모자,마술사의모자
 5046,Bongun_Hat,Bongun Hat,5,0,0,20,300,Headgear,All,,0,AllJobs,No,Yes,본건모자,본건모자
 5047,Fashionable_Glasses,Fashionable Glasses,0,0,0,20,100,Headgear,Top,,0,AllExceptNovice,Yes,Yes,패션선글래스,패션선글래스
@@ -435,7 +435,7 @@ Id,Code,Name,Defense,MagicDef,Slot,Price,Weight,Type,Position,Property,MinLvl,Eq
 5067,Sombrero,Sombrero,4,0,0,20,350,Headgear,Top,,0,AllExceptNovice,Yes,Yes,솜브레로,솜브레로
 5068,Evil_Wing_Ears,Evil Wing Ears,1,0,0,20,100,Headgear,Mid,,70,AllJobs,No,Yes,악마날개귀,악마날개귀
 5069,Kitsune_Mask,Kitsune Mask,1,0,0,20,300,Headgear,Top,,0,AllExceptNovice,Yes,Yes,여우가면,여우가면
-5070,Hot-Blooded_Headband,Hot-Blooded Headband,1,0,0,20,100,Headgear,Top,,0,AllExceptNovice,Yes,Yes,열혈머리띠,열혈머리띠
+5070,Hot-Blooded_Headband,Hot-Blooded Headband,1,0,0,20,100,Headgear,Top,,0,AllJobs,Yes,Yes,열혈머리띠,열혈머리띠
 5071,Indian_Headband,Indian Headband,1,0,0,20,200,Headgear,Top,,0,AllExceptNovice,Yes,Yes,인디안머리띠,인디안머리띠
 5072,Incubus_Horn,Incubus Horn,4,10,0,20,800,Headgear,Top,,70,AllExceptNovice,Yes,Yes,인큐버스뿔,인큐버스뿔
 5073,Model_Training_Hat,Model Training Hat,2,0,0,20,700,Headgear,Top,,0,AllExceptNovice,Yes,Yes,자세교정모자,자세교정모자
@@ -458,11 +458,11 @@ Id,Code,Name,Defense,MagicDef,Slot,Price,Weight,Type,Position,Property,MinLvl,Eq
 5090,Goblin_Leader_Mask,Goblin Leader Mask,2,0,0,20,100,Headgear,MidBottom,,0,AllJobs,No,Yes,고블린가면4호,고블린가면4호
 5091,Decorative_Golden_Bell,Decorative Golden Bell,2,0,0,20,200,Headgear,TopMid,,35,AllExceptNovice,Yes,Yes,대형금방울,대형금방울
 5092,Coif,Coif,5,0,0,150000,300,Headgear,TopMid,,65,PriestAssassin,Yes,Yes,수녀모자,수녀모자
-5093,Coif_,Coif,5,0,1,150000,300,Headgear,TopMid,,65,PriestAssassin,Yes,Yes,수녀모자,수녀모자
+5093,Coif_,Coif,5,0,1,150000,300,Headgear,TopMid,,65,AllJobs,Yes,Yes,수녀모자,수녀모자
 5094,Orc_Hero_Helm,Orc Hero Helm,5,0,0,200000,900,Headgear,TopMid,,55,AllExceptNovice,Yes,Yes,오크히어로투구,오크히어로투구
 5096,Assassin_Mask,Assassin Mask,0,0,0,20,100,Headgear,Bottom,,70,PriestAssassin,No,Yes,어새신마스크,어새신마스크
 5097,Holiday_Hat,Holiday Hat,0,0,0,0,400,Headgear,Top,,0,AllJobs,Yes,Yes,꼬깔모자_,꼬깔모자
-5104,Dark_Blinder,Dark Blinder,0,0,0,20,100,Headgear,Mid,,0,AllExceptNovice,No,Yes,검은눈가리개,검은눈가리개
+5104,Dark_Blinder,Dark Blinder,0,0,0,20,100,Headgear,Mid,,0,AllJobs,No,Yes,검은눈가리개,검은눈가리개
 5107,Crunch_Toast,Crunch Toast,0,0,0,20,50,Headgear,Bottom,,0,AllJobs,No,Yes,토스트,토스트
 5108,Detective's_Cap,Detective's Cap,3,0,1,20,350,Headgear,Top,,0,AllJobs,Yes,Yes,탐정모자,탐정모자
 5109,Red_Bonnet,Red Bonnet,2,0,0,20,400,Headgear,Top,,0,AllJobs,Yes,Yes,차양모자,차양모자
@@ -477,7 +477,7 @@ Id,Code,Name,Defense,MagicDef,Slot,Price,Weight,Type,Position,Property,MinLvl,Eq
 5118,Puppy_Headband,Puppy Headband,2,0,0,20,100,Headgear,Top,,0,AllJobs,Yes,Yes,강아지귀,강아지귀
 5119,Super_Novice_Hat_,Super Novice Hat,4,0,1,8500,400,Headgear,Top,,40,NoviceGroup,Yes,Yes,슈노모자,슈노모자
 5120,Bucket_Hat_,Bucket Hat,3,0,1,6000,300,Headgear,Top,,0,AllJobs,Yes,Yes,벙거지모자,벙거지모자
-5121,Zealotus_Mask,Zealotus Mask,3,0,0,20,400,Headgear,TopMid,,70,AllExceptNovice,Yes,Yes,지르타스가면,지르타스가면
+5121,Zealotus_Mask,Zealotus Mask,3,0,0,20,400,Headgear,TopMid,,70,AllJobs,Yes,Yes,지르타스가면,지르타스가면
 5122,Magni's_Cap,Magni's Cap,5,0,0,30000,1000,Headgear,Top,,65,AllExceptNovice,Yes,Yes,메긴캡,메긴캡
 5123,Ulle's_Cap,Ulle's Cap,3,0,1,30000,500,Headgear,Top,,65,AllExceptNovice,Yes,Yes,울캡,울캡
 5124,Fricca's_Circlet,Fricca's Circlet,3,10,0,30000,300,Headgear,Top,,65,AllExceptNovice,Yes,Yes,프리카서클릿,프리카서클릿
@@ -488,16 +488,16 @@ Id,Code,Name,Defense,MagicDef,Slot,Price,Weight,Type,Position,Property,MinLvl,Eq
 5136,Antonio's_Santa_Hat,Antonio's Santa Hat,3,1,0,20,100,Headgear,Top,,0,AllJobs,Yes,Yes,산타모자,산타모자
 5141,Marionette_Doll,Marionette Doll,0,0,1,20,400,Headgear,Top,,30,AllExceptNovice,Yes,Yes,마리오넷모자,마리오넷모자
 5147,Baseball_Cap,Baseball Cap,3,0,1,0,200,Headgear,Top,,0,AllJobs,Yes,Yes,야구모자,야구모자
-5157,Orc_Helm_,Orc Helm,5,0,1,20,500,Headgear,Top,,0,SwordUser1stJob,Yes,Yes,오크족헬름,오크족헬름
+5157,Orc_Helm_,Orc Helm,5,0,1,20,500,Headgear,Top,,0,AllJobs,Yes,Yes,오크족헬름,오크족헬름
 5158,Monk_Hat_,Monk Hat,5,3,1,30000,100,Headgear,Top,,0,Acolyte,Yes,Yes,성직자의모자,성직자의모자
-5159,Golden_Gear_,Golden Gear,5,0,1,20,900,Headgear,Top,,40,AllExceptNovice,Yes,No,골든헤드기어,골든헤드기어
+5159,Golden_Gear_,Golden Gear,5,0,1,20,900,Headgear,Top,,40,AllJobs,Yes,No,골든헤드기어,골든헤드기어
 5160,Majestic_Goat_,Majestic Goat,5,0,1,20,800,Headgear,Top,,0,SwordMerchantTaekwon,Yes,Yes,마제스틱고우트,마제스틱고우트
-5161,Spiky_Band_,Spiky Band,6,0,1,20,1000,Headgear,Top,,50,MeleeJobTaekwon,Yes,Yes,샤프헤드기어,샤프헤드기어
+5161,Spiky_Band_,Spiky Band,6,0,1,20,1000,Headgear,Top,,50,AllJobs,Yes,Yes,샤프헤드기어,샤프헤드기어
 5162,Bone_Helm_,Bone Helm,7,0,1,20,800,Headgear,Top,,70,SwordsmanMerchant,Yes,Yes,본헬름,본헬름
 5163,Corsair_,Corsair,5,0,1,20,500,Headgear,Top,,0,AllExceptNovice,Yes,Yes,커세어,커세어
 5164,Tiara_,Tiara,4,0,1,20,400,Headgear,Top,,45,AllExceptNovice,Yes,Yes,티아라,티아라
 5165,Crown_,Crown,4,0,1,20,400,Headgear,Top,,45,AllExceptNovice,Yes,Yes,크라운,크라운
-5166,Sphinx_Hat_,Sphinx Hat,5,0,1,20,3000,Headgear,TopBottom,,65,Swordsman,No,Yes,스핑크스모자,스핑크스모자
+5166,Sphinx_Hat_,Sphinx Hat,5,0,1,20,3000,Headgear,TopBottom,,65,AllJobs,No,Yes,스핑크스모자,스핑크스모자
 5167,Munak_Hat_,Munak Hat,5,0,1,20,300,Headgear,All,,0,AllJobs,No,Yes,무낙모자,무낙모자
 5168,Bongun_Hat_,Bongun Hat,5,0,1,20,300,Headgear,All,,0,AllJobs,No,Yes,본건모자,본건모자
 5169,Bride_Mask,Bride Mask,4,0,1,30000,500,Headgear,TopMid,,40,AllJobs,Yes,Yes,각시탈,각시탈
@@ -516,7 +516,7 @@ Id,Code,Name,Defense,MagicDef,Slot,Price,Weight,Type,Position,Property,MinLvl,Eq
 5195,Ribbon______,Ribbon,1,3,1,800,100,Headgear,Top,,0,AllJobs,Yes,Yes,리본_빨강,리본_빨강
 5196,Ribbon_______,Ribbon,1,3,1,800,100,Headgear,Top,,0,AllJobs,Yes,Yes,리본_주홍,리본_주홍
 5197,Ribbon________,Ribbon,1,3,1,800,100,Headgear,Top,,0,AllJobs,Yes,Yes,리본_하양,리본_하양
-5206,Romantic_White_Flower,Romantic White Flower,0,0,0,20,100,Headgear,Bottom,,0,AllExceptNovice,No,Yes,하얀꽃잎,하얀꽃잎
+5206,Romantic_White_Flower,Romantic White Flower,0,0,0,20,100,Headgear,Bottom,,0,AllJobs,No,Yes,하얀꽃잎,하얀꽃잎
 5227,Deviruchi_Hat_,Deviruchi Hat,2,0,0,20,800,Headgear,Top,,64,AllExceptNovice,Yes,Yes,빨강새끼악마모자,빨강새끼악마모자
 5228,Deviruchi_Hat__,Deviruchi Hat,2,0,0,20,800,Headgear,Top,,64,AllExceptNovice,Yes,Yes,흰색새끼악마모자,흰색새끼악마모자
 5229,Deviruchi_Hat___,Deviruchi Hat,2,0,0,20,800,Headgear,Top,,64,AllExceptNovice,Yes,Yes,회색새끼악마모자,회색새끼악마모자
@@ -536,7 +536,7 @@ Id,Code,Name,Defense,MagicDef,Slot,Price,Weight,Type,Position,Property,MinLvl,Eq
 5243,Shafka,Shafka,2,0,1,20,800,Headgear,TopMid,,1,AllJobs,Yes,Yes,귀마개모자,귀마개모자
 5302,Water_Lily_Hat,Water Lily Hat,1,0,1,0,100,Headgear,Top,,0,AllJobs,Yes,Yes,연꽃모자,연꽃모자
 5305,Pirate_Dagger,Pirate Dagger,0,0,0,20,100,Headgear,Bottom,,0,AllJobs,No,Yes,해적의대거,해적의대거
-5347,Ph.D_Hat_,Ph.D Hat,3,0,1,20,200,Headgear,Top,,0,AllExceptNovice,Yes,Yes,학사모,학사모
+5347,Ph.D_Hat_,Ph.D Hat,3,0,1,20,200,Headgear,Top,,0,AllJobs,Yes,Yes,학사모,학사모
 5348,Big_Ribbon_,Big Ribbon,2,3,1,15000,200,Headgear,Top,,0,AllExceptNovice,Yes,Yes,왕리본,왕리본
 5349,Boy's_Cap_,Boy's Cap,2,0,1,20,100,Headgear,Top,,0,AllExceptNovice,Yes,Yes,학생모,학생모
 5350,Pirate_Bandana_,Pirate Bandana,3,0,1,20,100,Headgear,Top,,0,AllExceptNovice,Yes,Yes,해적두건,해적두건
@@ -553,4 +553,4 @@ Id,Code,Name,Defense,MagicDef,Slot,Price,Weight,Type,Position,Property,MinLvl,Eq
 5442,Necktie,Necktie,3,0,1,20,100,Headgear,Top,,70,AllJobs,Yes,Yes,넥타이,넥타이
 5444,Hair_Brush,Hair Brush,0,0,0,20,100,Headgear,Top,,0,AllJobs,Yes,Yes,머리빗,머리빗
 5446,Catfoot_Hairpin,Catfoot Hairpin,0,0,1,20,200,Headgear,Top,,0,AllJobs,Yes,Yes,고양이발머리핀,고양이발머리핀
-5808,Dark_Bacilium,Dark Bacilium,5,0,1,20,250,Headgear,All,,0,Trans2ndJob,Yes,Yes,다크바실리움,클로스헬멧
+5808,Dark_Bacilium,Dark Bacilium,5,0,1,20,250,Headgear,All,,0,AllJobs,Yes,Yes,다크바실리움,클로스헬멧

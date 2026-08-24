@@ -152,25 +152,37 @@ public static class AdventureBook
     /// game can give: not a drop, not a shop, not a box, not an npc. That is the whole point
     /// of them, so before changing one, check the replacement is unobtainable too.
     /// </summary>
+    /// <remarks>
+    /// Every one of these is set to AllJobs in ItemsEquipment.csv, several of them changed
+    /// from something narrower to get there. A reward for finishing a whole region that the
+    /// character who finished it cannot put on is not a reward, and the job a hat originally
+    /// belonged to is a detail from a game we are not running.
+    ///
+    /// Three of the six replacements went somewhere other than the hat they replaced,
+    /// because a hat lands better where it means something: the Sphinx Hat is for the
+    /// Sphinx, the Shafka is a pair of earmuffs and Lutie is the snow town, and the Coif is
+    /// a nun's hood which belongs with the undead in the Dead Pit. The Mythical Lion Mask
+    /// the Sphinx gave up moves to Izlude Bailan Cave.
+    /// </remarks>
     private static readonly Dictionary<string, string> RegionHeadgear = new(StringComparer.OrdinalIgnoreCase)
     {
         { "Prontera Culverts", "Detective's_Cap" },
-        { "Prontera Fields", "Flower_Hairpin" },
+        { "Prontera Fields", "Romantic_White_Flower" },
         { "Morroc Fields", "Cowboy_Hat" },
         { "Payon Fields", "Ayam" },
-        { "Ant Hell", "Novice_Eggshell" },
-        { "Izlude Bailan Cave", "Bucket_Hat" },
+        { "Ant Hell", "Dark_Blinder" },
+        { "Izlude Bailan Cave", "Mythical_Lion_Mask" },
         { "Orc Dungeon", "Orc_Helm_" },
-        { "Mt. Mjolnir", "Wonder_Nutshell" },
+        { "Mt. Mjolnir", "Zealotus_Mask" },
         { "Geffen Fields", "Bulb_Band" },
-        { "Mjolnir Dead Pit", "Candle" },
+        { "Mjolnir Dead Pit", "Coif_" },
         { "Forest Labyrinth", "Banana_Hat" },
-        { "Lutie", "Holiday_Hat" },
+        { "Lutie", "Shafka" },
         { "Yuno Fields", "Ph.D_Hat_" },
         { "Payon Dungeon", "Magistrate_Hat" },
         { "Comodo", "Pirate_Dagger" },
         { "Geffen Dungeon", "Dark_Bacilium" },
-        { "Sphinx", "Mythical_Lion_Mask" },
+        { "Sphinx", "Sphinx_Hat_" },
         { "Sunken Ship", "Red_Bonnet" },
         { "Pyramid", "Cross_Hat" },
         { "Clock Tower", "Golden_Gear_" },

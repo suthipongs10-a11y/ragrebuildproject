@@ -202,7 +202,6 @@ Item("Beanie") { OnEquip: AddStat(AddLuk, 1); }
 Item("Sea_Otter_Hat") { OnEquip: AddStat(AddVit, 1); }
 Item("Crown_of_Mistress") { OnEquip: AddStat(AddInt, 2); AddStat(AddMaxSp, 100); }
 Item("Lazy_Smokie") { OnEquip: AddStat(ResistSleepStatus, 20); }
-Item("Dark_Blinder") { OnEquip: AddStat(ResistBlindStatus, 100); AddStat(ResistStunStatus, 2); }
 Item("Super_Novice_Hat") { OnEquip: AddStat(AddStr, 1); AddStat(AddInt, 1); AddStat(AddVit, 1); AddStat(AddDex, 1); AddStat(AddAgi, 1); AddStat(AddLuk, 1); }
 Item("Winter_Hat") { OnEquip: AddStat(ResistFreezeStatus, 10); }
 Item("Mystic_Rose") { OnEquip: AddStat(AddResistRacePlant, 2); }
@@ -224,7 +223,6 @@ Item("Crown_") { OnEquip: AddStat(AddInt, 1); }
 Item("Feather_Beret") { OnEquip: AddStat(AddResistRaceDemihuman, 10); }
 Item("Beret") { OnEquip: AddStat(AddResistRaceDemihuman, 10); }
 Item("Censor_Bar") { OnEquip: AddStat(ResistCurseStatus, 5); AddStat(AddHit, -5); }
-Item("Romantic_White_Flower") { OnEquip: AddStat(AddResistRacePlant, 3); }
 Item("Deviruchi_Hat_") { OnEquip: AddStat(AddStr, 1); AddStat(AddInt, 1); }
 Item("Deviruchi_Hat__") { OnEquip: AddStat(AddStr, 1); AddStat(AddInt, 1); }
 Item("Deviruchi_Hat___") { OnEquip: AddStat(AddStr, 1); AddStat(AddInt, 1); }
@@ -247,14 +245,10 @@ Item("Welding_Mask") { OnEquip: AddStat(AddResistElementFire, 10); }
 Item("Gas_Mask") { OnEquip: AddStat(ResistPoisonStatus, 30); }
 Item("Alarm_Mask") { OnEquip: AddStat(ResistBlindStatus, 50); }
 Item("Sphinx_Hat") { OnEquip: AddStat(AddStr, 2); }
-Item("Sphinx_Hat_") { OnEquip: AddStat(AddStr, 2); }
 Item("Munak_Hat") { OnEquip: AddStat(AddResistRaceUndead, 10); }
 Item("Munak_Hat_") { OnEquip: AddStat(AddResistRaceUndead, 10); }
 Item("Hat_of_the_Sun_God") { OnEquip: AddStat(AddStr, 3); AddStat(AddInt, 2); }
-Item("Coif_") { OnEquip: AddStat(AddMaxSp, 100); }
 Item("Orc_Hero_Helm") { OnEquip: AddStat(AddStr, 2); AddStat(AddVit, 1); }
-Item("Zealotus_Mask") { OnEquip: AddStat(AddResistRaceDemihuman, 5); AddStat(AddAttackRaceDemihuman, 5); }
-Item("Shafka") { OnEquip: AddStat(ResistFreezeStatus, 10); }
 //Antonio's rare drop. The chance stat also lifts the dagger-only restriction on double
 //attack, so the hat is worth wearing whatever the job swings.
 Item("Water_Lily_Hat") { OnEquip: AddStat(DoubleAttackChance, 15); }
@@ -513,30 +507,44 @@ Item("Silver_Arrow") { OnEquip: AddDamageVsTag("WeakToSilver", 100); }
 
 
 //Adventure book region rewards. Every one of these is an item nothing else in the game hands
-//out, and every one of them was a bare hat with a point or two of defence and no effect at
-//all - which is not worth the thousands of kills the book asks for. The bonuses lean on what
-//the region is: fire resistance out of the magma, undead resistance out of the pyramid, a
+//out, and most of them were a bare hat with a point or two of defence and no effect at all -
+//which is not worth the thousands of kills the book asks for. The bonuses lean on what the
+//region is: fire resistance out of the magma, undead resistance out of the pyramid, a
 //scholar's hat out of the city of scholars.
+//
+//Every one is set to AllJobs in ItemsEquipment.csv, fourteen of them changed from something
+//narrower to get there. A reward for finishing a whole region that the character who
+//finished it cannot put on is not a reward.
 Item("Detective's_Cap") { OnEquip: AddStat(AddDex, 2); } //Prontera Culverts
-Item("Flower_Hairpin") { OnEquip: AddStat(AddInt, 2); AddStat(AddMaxSp, 30); } //Prontera Fields
+Item("Romantic_White_Flower") { OnEquip: AddStat(AddInt, 2); AddStat(AddMaxSp, 30); AddStat(AddResistRacePlant, 10); } //Prontera Fields
 Item("Cowboy_Hat") { OnEquip: AddStat(AddDex, 2); AddStat(AddResistElementFire, 5); } //Morroc Fields
 Item("Ayam") { OnEquip: AddStat(AddInt, 2); AddStat(AddResistElementUndead, 5); } //Payon Fields
-Item("Novice_Eggshell") { OnEquip: AddStat(AddVit, 2); AddStat(AddResistRaceInsect, 10); } //Ant Hell
-Item("Bucket_Hat") { OnEquip: AddStat(AddResistElementWater, 15); } //Izlude Bailan Cave
+Item("Dark_Blinder") { OnEquip: AddStat(AddVit, 2); AddStat(AddResistRaceInsect, 10); AddStat(ResistBlindStatus, 100); } //Ant Hell
+Item("Mythical_Lion_Mask") { OnEquip: AddStat(AddStr, 3); AddStat(AddResistElementWater, 15); } //Izlude Bailan Cave
 Item("Orc_Helm_") { OnEquip: AddStat(AddStr, 2); AddStat(AddResistRaceDemihuman, 5); } //Orc Dungeon
-Item("Wonder_Nutshell") { OnEquip: AddStat(AddVit, 3); } //Mt. Mjolnir
+Item("Zealotus_Mask") { OnEquip: AddStat(AddVit, 3); AddStat(AddResistRaceDemihuman, 10); AddStat(AddAttackRaceDemihuman, 5); } //Mt. Mjolnir
 Item("Bulb_Band") { OnEquip: AddStat(AddInt, 3); AddStat(AddMaxSp, 50); } //Geffen Fields
-Item("Candle") { OnEquip: AddStat(AddResistElementDark, 15); AddStat(ResistBlindStatus, 30); } //Mjolnir Dead Pit
+Item("Coif_") { OnEquip: AddStat(AddMaxSp, 100); AddStat(AddResistElementDark, 15); AddStat(ResistBlindStatus, 30); } //Mjolnir Dead Pit
 Item("Banana_Hat") { OnEquip: AddStat(AddResistRacePlant, 15); } //Forest Labyrinth
-Item("Holiday_Hat") { OnEquip: AddStat(AddLuk, 3); } //Lutie
+Item("Shafka") { OnEquip: AddStat(AddLuk, 3); AddStat(ResistFreezeStatus, 50); AddStat(AddResistElementWater, 10); } //Lutie
 Item("Ph.D_Hat_") { OnEquip: AddStat(AddInt, 3); AddStat(AddMaxSp, 80); } //Yuno Fields
 Item("Magistrate_Hat") { OnEquip: AddStat(AddResistElementUndead, 15); } //Payon Dungeon
 Item("Pirate_Dagger") { OnEquip: AddStat(AddAgi, 2); AddStat(AddLuk, 2); } //Comodo
 Item("Dark_Bacilium") { OnEquip: AddStat(AddResistElementDark, 20); AddStat(AddResistRaceDemon, 5); } //Geffen Dungeon
-Item("Mythical_Lion_Mask") { OnEquip: AddStat(AddStr, 3); AddStat(AddResistElementEarth, 10); } //Sphinx
+Item("Sphinx_Hat_") { OnEquip: AddStat(AddStr, 3); AddStat(AddResistElementEarth, 10); } //Sphinx
 Item("Red_Bonnet") { OnEquip: AddStat(AddResistElementWater, 20); } //Sunken Ship
 Item("Cross_Hat") { OnEquip: AddStat(AddResistElementUndead, 20); AddStat(AddResistRaceUndead, 10); } //Pyramid
 Item("Golden_Gear_") { OnEquip: AddStat(AddDef, 3); AddStat(AddResistRaceFormless, 10); } //Clock Tower
 Item("Bride_Mask") { OnEquip: AddStat(AddAgi, 3); AddStat(AddResistElementGhost, 10); } //Amatsu
 Item("Opera_Phantom_Mask") { OnEquip: AddStat(AddInt, 3); AddStat(AddDex, 3); AddStat(AddResistElementDark, 10); } //Glast Heim
 Item("Spiky_Band_") { OnEquip: AddStat(AddStr, 3); AddStat(AddVit, 3); } //Turtle Island
+
+//Six hats that used to be region rewards and are ordinary items again. They keep what the
+//book gave them rather than being put back to nothing: an effect once written is worth
+//keeping, and somebody who earned one before the swap should not find it emptied out.
+Item("Flower_Hairpin") { OnEquip: AddStat(AddInt, 2); AddStat(AddMaxSp, 30); }
+Item("Novice_Eggshell") { OnEquip: AddStat(AddVit, 2); AddStat(AddResistRaceInsect, 10); }
+Item("Bucket_Hat") { OnEquip: AddStat(AddResistElementWater, 15); }
+Item("Wonder_Nutshell") { OnEquip: AddStat(AddVit, 3); }
+Item("Candle") { OnEquip: AddStat(AddResistElementDark, 15); AddStat(ResistBlindStatus, 30); }
+Item("Holiday_Hat") { OnEquip: AddStat(AddLuk, 3); }
