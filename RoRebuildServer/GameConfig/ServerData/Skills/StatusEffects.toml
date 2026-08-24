@@ -540,18 +540,21 @@ CanDispel = false
 #saying the item exists but does nothing. They double experience and drop rate for half an
 #hour, which is exactly what AddExpPercent and AddDropPercent were already wired for.
 #
-#No icon named on purpose. The importer only copies status_{Name}.png when a tga is named
-#here, and naming one that is not in the GRF is an import error at every startup for a
-#picture. The buff bar draws these with its placeholder and the tooltip says what they do,
-#which is the part that matters.
+#The icons are the items' own. texture/effect is a closed set - it holds the status icons
+#the game shipped with, and there was never one for an exp or a drop buff, so naming a tga
+#in there means naming one that is not in anybody's GRF. "item:" says to use the picture off
+#the item instead, which is already in the same atlas and is the picture the player saw on
+#the thing they just used.
 [BattleManual]
 Name = "คู่มือการรบ"
 Type = "Buff"
+Icon = "item:Battle_Manual"
 CanDispel = false
 CanDisable = false
 
 [BubbleGum]
 Name = "หมากฝรั่ง"
 Type = "Buff"
+Icon = "item:Bubble_Gum"
 CanDispel = false
 CanDisable = false

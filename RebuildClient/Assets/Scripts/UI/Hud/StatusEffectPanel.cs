@@ -4,6 +4,7 @@ using Assets.Scripts.Network;
 using Assets.Scripts.Sprites;
 using Assets.Scripts.UI.Guild;
 using Assets.Scripts.Utility;
+using RebuildSharedData.ClientTypes;
 using RebuildSharedData.Enum;
 using UnityEngine;
 
@@ -48,6 +49,10 @@ namespace Assets.Scripts.UI.Hud
         /// a buff the player could only confirm by watching their own numbers. Push Cart,
         /// Sight, Ruwach, Safety Wall and the falcon all fall in that hole. A borrowed
         /// picture with the right text under it beats a buff that isn't there.
+        ///
+        /// Four places are tried, best first: the status's own imported icon, the item the
+        /// Icon line names with "item:", the icon of a skill sharing the status's name, and
+        /// finally Blessing's, greyed, which says "something is on you, hover it".
         /// </summary>
         public static Sprite GetStatusIcon(CharacterStatusEffect status, out bool isPlaceholder)
         {
@@ -60,6 +65,28 @@ namespace Assets.Scripts.UI.Hud
             isPlaceholder = icon == null;
             if (!isPlaceholder)
                 return icon;
+
+            //An Icon line naming an item instead of a file. The item's own picture is already
+            //in this same atlas, so nothing has to be imported and nothing has to be drawn -
+            //and it is the picture the player saw on the thing they just used. ItemData.Sprite
+            //is rewritten to the atlas key when items are loaded, which is why this asks the
+            //item rather than using the code directly.
+            var declared = loader.GetStatusEffect((int)status)?.Icon;
+            if (!string.IsNullOrEmpty(declared) && declared.StartsWith(StatusEffectIcon.ItemIconPrefix, StringComparison.Ordinal))
+            {
+                var code = declared.Substring(StatusEffectIcon.ItemIconPrefix.Length);
+                if (loader.TryGetItemByName(code, out var item) && item != null)
+                {
+                    icon = loader.GetIconAtlasSprite(item.Sprite);
+                    if (icon != null)
+                    {
+                        isPlaceholder = false;
+                        return icon;
+                    }
+                }
+
+                Debug.LogWarning($"Status {status} asks for the icon of item '{code}', which is not an item this client knows.");
+            }
 
             //A status named after the skill that grants it can wear that skill's own icon,
             //which is the picture the player already associates with the buff. Push Cart,

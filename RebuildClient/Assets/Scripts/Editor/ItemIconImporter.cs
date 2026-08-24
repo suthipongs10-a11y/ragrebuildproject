@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Assets.Scripts.MapEditor.Editor;
@@ -274,7 +275,8 @@ namespace Assets.Scripts.Editor
             var statusData = JsonUtility.FromJson<Wrapper<StatusEffectData>>(File.ReadAllText("Assets/StreamingAssets/ClientConfigGenerated/statusinfo.json"));
 
             foreach (var status in statusData.Items)
-                if (!string.IsNullOrWhiteSpace(status.Icon) && !iconNames.Contains(status.Icon))
+                if (!string.IsNullOrWhiteSpace(status.Icon) && !iconNames.Contains(status.Icon)
+                    && !status.Icon.StartsWith(StatusEffectIcon.ItemIconPrefix, StringComparison.Ordinal))
                 {
                     var targetName = status.StatusEffect.ToString();
                     var destPath = $@"Assets/Sprites/Imported/Icons/Sprites/status_{targetName}.png";
