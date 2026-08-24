@@ -706,12 +706,12 @@ namespace Assets.Scripts.UI.AdventureBook
             y += TallRowHeight + RowGap;
 
             y = GroupRow(y, "สเตตัสหลัก");
-            y = StatLine(y, "STR", PlayerStat.Str, CharacterStat.AddStr, rank.Stats, guild.Str);
-            y = StatLine(y, "AGI", PlayerStat.Agi, CharacterStat.AddAgi, rank.Stats, guild.Agi);
-            y = StatLine(y, "VIT", PlayerStat.Vit, CharacterStat.AddVit, rank.Stats, guild.Vit);
-            y = StatLine(y, "INT", PlayerStat.Int, CharacterStat.AddInt, rank.Stats, guild.Int);
-            y = StatLine(y, "DEX", PlayerStat.Dex, CharacterStat.AddDex, rank.Stats, guild.Dex);
-            y = StatLine(y, "LUK", PlayerStat.Luk, CharacterStat.AddLuk, rank.Stats, guild.Luk);
+            y = StatLine(y, "STR", PlayerStat.Str, CharacterStat.AddStr, rank.StatBonus, guild.Str);
+            y = StatLine(y, "AGI", PlayerStat.Agi, CharacterStat.AddAgi, rank.StatBonus, guild.Agi);
+            y = StatLine(y, "VIT", PlayerStat.Vit, CharacterStat.AddVit, rank.StatBonus, guild.Vit);
+            y = StatLine(y, "INT", PlayerStat.Int, CharacterStat.AddInt, rank.StatBonus, guild.Int);
+            y = StatLine(y, "DEX", PlayerStat.Dex, CharacterStat.AddDex, rank.StatBonus, guild.Dex);
+            y = StatLine(y, "LUK", PlayerStat.Luk, CharacterStat.AddLuk, rank.StatBonus, guild.Luk);
 
             y = GroupRow(y, "ค่าต่อสู้");
             y = PlainLine(y, "ATK", $"{state.GetStat(CharacterStat.Attack)} ~ {state.GetStat(CharacterStat.Attack2)}");
@@ -729,13 +729,7 @@ namespace Assets.Scripts.UI.AdventureBook
 
             y = GroupRow(y, "ที่มาของโบนัส");
 
-            var rankLine = BonusText(new AdventureBookRankInfo
-            {
-                StatBonus = rank.Stats,
-                DropPercent = rank.DropPercent,
-                ExpPercent = rank.ExpPercent,
-                RefinePercent = rank.RefinePercent
-            });
+            var rankLine = BonusText(rank);
             y = SourceRow(y, $"Adventure ระดับ {AdventureBookState.Rank}",
                 string.IsNullOrEmpty(rankLine) ? "ยังไม่ได้โบนัส สะสมดาวให้ถึงระดับ 1 ก่อน" : rankLine);
 
