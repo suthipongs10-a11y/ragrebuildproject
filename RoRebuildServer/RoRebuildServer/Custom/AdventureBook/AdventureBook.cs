@@ -61,12 +61,30 @@ public class AdventureBookEntry
     /// than rebuilt on every kill. Every hit a player lands runs through here.
     /// </summary>
     /// <remarks>
-    /// Built from the lowest monster id on the page rather than from the card, so a page
-    /// covering one monster keeps the flag it always had and nobody loses progress to this
-    /// regrouping. Lowest rather than largest or first so it does not move when spawn data
-    /// changes.
+    /// Named after the card, because the card is the one thing about a page that cannot
+    /// move. The obvious choice - the lowest monster id on the page - is not stable: the
+    /// page is built from the monsters standing on maps that actually loaded, so importing
+    /// one more map can put a lower id on the page and rename the flag. A renamed flag is
+    /// not a cosmetic problem. The old progress is orphaned, the page reads zero, and every
+    /// star on it gets paid a second time.
+    ///
+    /// A page with no card keeps "ab" plus its monster id, which is what it always was and
+    /// is stable because such a page only ever has the one monster. Card ids and monster
+    /// ids overlap in the four thousands, so the carded ones take a prefix of their own
+    /// rather than colliding with a monster that happens to share the number.
     /// </remarks>
     public required string ProgressFlag { get; init; }
+
+    /// <summary>
+    /// Where this page's progress used to be kept, for pages that have been renamed.
+    /// </summary>
+    /// <remarks>
+    /// Empty for a page whose flag never moved. When it is not empty the progress under
+    /// these names is merged into the current one the first time the character is seen, so
+    /// that renaming the flag costs nobody their kills - and, more to the point, does not
+    /// hand them their rewards again.
+    /// </remarks>
+    public required string[] LegacyProgressFlags { get; init; }
 
     public int StarCount => CardItemId > 0 ? 3 : 2;
 }
@@ -357,9 +375,16 @@ public static class AdventureBook
                     .OrderByDescending(s => s.Count)
                     .ToArray(),
 
-                //Lowest id on the page, so a page covering one monster keeps the flag it
-                //already had and this regrouping costs nobody their progress.
-                ProgressFlag = "ab" + members[0].Id
+                //Named after the card rather than after whichever monster happens to have the
+                //lowest id today - see the remarks on the field. A page with no card keeps
+                //the name it always had.
+                ProgressFlag = cardId > 0 ? "abc" + cardId : "ab" + members[0].Id,
+
+                //Every name this page's progress could be sitting under from before the flag
+                //was named after the card. Only carded pages ever moved.
+                LegacyProgressFlags = cardId > 0
+                    ? members.Select(m => "ab" + m.Id).ToArray()
+                    : Array.Empty<string>()
             };
 
             bookRegion.Entries.Add(entry);

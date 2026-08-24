@@ -45,6 +45,9 @@ public class PacketAdventureBookAction : IClientPacketHandler
         switch (action)
         {
             case AdventureBookRequestType.Refresh:
+                //Before anything is read, so a character whose pages were renamed by a content
+                //update sees the progress they actually have rather than an empty book.
+                AdventureBookProgress.EnsureMigrated(player);
                 CommandBuilder.SendAdventureBook(player);
                 break;
 

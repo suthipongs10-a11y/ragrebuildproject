@@ -23,10 +23,18 @@ public static class AdventureBookRank
 
     private static readonly int[] StarsForRank = { 30, 90, 175, 280, 390, 490, 580, 650, 700 };
 
-    /// <summary>Rank from stars, where the last rank is not for sale at any number of them.</summary>
+    /// <summary>Rank from stars, where the last rank asks for the book rather than a number.</summary>
+    /// <remarks>
+    /// The star threshold is asked for as well as every region, and that is not belt and
+    /// braces. The regions are the ones the book was built with, and the book is built from
+    /// the maps that loaded - so on a server running a handful of maps, "every region" is a
+    /// far smaller claim than it sounds, and the last rank hands over a Valkyrie set. Asking
+    /// for the stars too means a partial book cannot reach it, which is the right answer:
+    /// the last rank is the whole book, and half a book is not the whole book.
+    /// </remarks>
     public static int RankFor(int stars, bool everyRegionComplete)
     {
-        if (everyRegionComplete)
+        if (everyRegionComplete && stars >= StarsForRank[StarsForRank.Length - 1])
             return MaxRank;
 
         var rank = 0;

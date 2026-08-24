@@ -36,6 +36,10 @@ public static class AdventureBookChat
             return true;
         }
 
+        //Before anything is counted, so a character whose pages were renamed by a content
+        //update is read from the flags they actually hold.
+        AdventureBookProgress.EnsureMigrated(player);
+
         //Swept every time somebody looks, which catches cards that were already in a bag
         //before any of this existed as well as any route in that skips AddItemToInventory.
         var newCards = AdventureBookProgress.ScanInventoryForCards(player);

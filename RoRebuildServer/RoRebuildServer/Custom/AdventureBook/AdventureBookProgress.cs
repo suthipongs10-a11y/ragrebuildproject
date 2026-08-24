@@ -35,6 +35,75 @@ public static class AdventureBookProgress
     private const int StarShift = 3;
     private const int StarMask = 0b111;
 
+    /// <summary>
+    /// Set once a character's pages have been moved to the flag names they use now.
+    /// </summary>
+    /// <remarks>
+    /// One dictionary lookup guards the whole thing, which is why it is safe to ask for it
+    /// on the kill path. Without it a page renamed by a content update reads as untouched,
+    /// and every star on it is paid a second time.
+    /// </remarks>
+    private const string MigrationFlag = "abmoved";
+
+    /// <summary>
+    /// Moves a character's progress onto the flag names the book uses now.
+    /// </summary>
+    /// <remarks>
+    /// Merged rather than copied - the highest kill count and every star either name holds -
+    /// because a page that was renamed twice can have progress under two old names, and
+    /// taking one of them would lose the other. Stars are bits, so merging them can only
+    /// ever fill a page in, never empty it, which is the direction that cannot cost anybody
+    /// a reward they already earned or hand them one they already had.
+    ///
+    /// The old names are cleared afterwards so a later page cannot pick them up again.
+    /// </remarks>
+    public static void EnsureMigrated(Player player)
+    {
+        if (!AdventureBook.IsBuilt || player.GetNpcFlag(MigrationFlag) != 0)
+            return;
+
+        var moved = 0;
+        foreach (var entry in AdventureBook.EntriesByPageId.Values)
+        {
+            if (entry.LegacyProgressFlags.Length == 0)
+                continue;
+
+            var current = player.GetNpcFlag(entry.ProgressFlag);
+            var kills = current >> StarShift;
+            var stars = current & StarMask;
+            var found = false;
+
+            foreach (var old in entry.LegacyProgressFlags)
+            {
+                if (old == entry.ProgressFlag)
+                    continue;
+
+                var value = player.GetNpcFlag(old);
+                if (value == 0)
+                    continue;
+
+                found = true;
+                kills = Math.Max(kills, value >> StarShift);
+                stars |= value & StarMask;
+                player.SetNpcFlag(old, 0);
+            }
+
+            if (!found)
+                continue;
+
+            player.SetNpcFlag(entry.ProgressFlag, (kills << StarShift) | stars);
+            moved++;
+        }
+
+        //Marked done only once it is done. The merge is safe to repeat - the old names are
+        //cleared as they are read, so a second pass finds nothing - so the cost of stopping
+        //halfway is one wasted pass rather than a page of progress nobody can get back.
+        player.SetNpcFlag(MigrationFlag, 1);
+
+        if (moved > 0)
+            ServerLogger.Log($"[AdventureBook] Moved {moved} page(s) of {player.Name}'s progress onto the current flag names.");
+    }
+
     public static int GetKills(Player player, AdventureBookEntry entry) => player.GetNpcFlag(entry.ProgressFlag) >> StarShift;
 
     public static AdventureBookStars GetStars(Player player, AdventureBookEntry entry) =>
@@ -60,6 +129,8 @@ public static class AdventureBookProgress
 
     public static void AwardStar(Player player, AdventureBookEntry entry, AdventureBookStars star)
     {
+        EnsureMigrated(player);
+
         var stored = player.GetNpcFlag(entry.ProgressFlag);
         if (((AdventureBookStars)(stored & StarMask) & star) != 0)
             return; //already paid for
@@ -174,6 +245,8 @@ public static class AdventureBookProgress
     /// </summary>
     public static void RecordKill(Player player, AdventureBookEntry entry)
     {
+        EnsureMigrated(player);
+
         var stored = player.GetNpcFlag(entry.ProgressFlag);
         var kills = (stored >> StarShift) + 1;
         var stars = (AdventureBookStars)(stored & StarMask);
@@ -270,6 +343,21 @@ public static class AdventureBookProgress
     private const string StarFlag = "abstars";
 
     /// <summary>
+    /// The highest rank this character has ever been paid for, stored one higher than it is.
+    /// </summary>
+    /// <remarks>
+    /// Kept apart from the current rank because the current rank can go down, and the pair
+    /// "pay for every rank between the old one and the new one" is only safe if the old one
+    /// never moves backwards. It does. Rank is counted from stars in the book as it stands,
+    /// and the book is built from the maps that loaded - so importing fewer maps lowers
+    /// somebody's star count, and the last rank asks for every region, so adding a region
+    /// takes rank ten away from whoever had it. Both undo themselves later, and without a
+    /// mark that only ever rises, the way back up pays for the whole climb a second time.
+    /// The last rank is a full Valkyrie set.
+    /// </remarks>
+    private const string PaidRankFlag = "abpaid";
+
+    /// <summary>
     /// A player's adventure rank, counted once and then remembered.
     /// </summary>
     /// <remarks>
@@ -323,21 +411,40 @@ public static class AdventureBookProgress
         if (stored == rank + 1)
             return rank;
 
+        //A first count is a character whose rank is being worked out for the first time
+        //rather than one who has just earned it, so it pays nothing and only writes the mark.
+        var isFirstCount = stored == 0;
+
         player.SetNpcFlag(RankFlag, rank + 1);
 
         //The bonuses ride on UpdateStats, so a rank that just went up is worth nothing until
         //the stats are rebuilt.
         player.UpdateStats();
 
-        //Paid for every rank actually crossed, not only the one landed on, so a character who
-        //jumps two at once is not quietly shorted the one in between. Nothing is paid when the
-        //cache was empty: that is a character whose rank is being worked out for the first
-        //time rather than one who has just earned it.
-        if (stored > 0)
+        //Measured against the highest rank ever paid rather than against the rank held a
+        //moment ago. The two are the same while a character is climbing; they part company
+        //the first time the book's contents change under somebody, and it is the second climb
+        //through the same ranks that would otherwise be paid twice.
+        var paid = player.GetNpcFlag(PaidRankFlag) - 1;
+        if (paid < 0)
         {
-            for (var reached = stored; reached <= rank; reached++)
+            //No mark yet: everyone from before this existed. Seeded from the rank they were
+            //already cached at, so nobody is paid again for a climb they have already made.
+            paid = isFirstCount ? rank : stored - 1;
+        }
+
+        if (!isFirstCount)
+        {
+            //Every rank actually crossed, not only the one landed on, so a character who
+            //jumps two at once is not quietly shorted the one in between.
+            for (var reached = paid + 1; reached <= rank; reached++)
                 GiveRankReward(player, reached);
         }
+
+        //Raised, never lowered. A rank lost to a content change stays paid for.
+        if (rank > paid)
+            paid = rank;
+        player.SetNpcFlag(PaidRankFlag, paid + 1);
 
         return rank;
     }
