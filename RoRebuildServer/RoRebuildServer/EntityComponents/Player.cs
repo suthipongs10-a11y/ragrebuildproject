@@ -671,6 +671,30 @@ public class Player : IEntityAutoReset
         return GainBaseExp(exp);
     }
 
+    /// <summary>
+    /// The same experience with whatever is raising this character's rate added on.
+    /// </summary>
+    /// <remarks>
+    /// AddExpPercent is what Battle Manual, the adventure rank and the dungeon miasma all
+    /// write to, and until this existed not one of them did anything. It was being read in
+    /// Monster.RewardExperience - which is a method on the monster, so GetStat there asked
+    /// the monster what its experience bonus was, and a monster has none. It answered zero
+    /// every time and nobody could see that it had.
+    ///
+    /// Here beside the guild's bonus for the reason the comment there gives: this is the one
+    /// place experience arrives, so a source added later cannot quietly miss it.
+    /// </remarks>
+    private int ApplyExperienceRateBonus(int exp)
+    {
+        var bonus = GetStat(CharacterStat.AddExpPercent);
+        if (bonus <= 0 || exp <= 0)
+            return exp;
+
+        //Widened before the multiply, which is the half that would overflow, and rounded
+        //rather than truncated so a small kill is not quietly worth the same as before.
+        return (int)((exp * (100L + bonus) + 50) / 100L);
+    }
+
     public int GainBaseExp(int exp)
     {
         var level = GetData(PlayerStat.Level);
@@ -680,6 +704,7 @@ public class Player : IEntityAutoReset
         //applied here rather than at each of the places experience comes from, so a source
         //added later cannot quietly miss it
         exp = GuildSkills.ApplyExperienceBonus(this, exp);
+        exp = ApplyExperienceRateBonus(exp);
 
         var curExp = GetData(PlayerStat.Experience);
         var requiredExp = DataManager.ExpChart.ExpRequired[level];
@@ -742,6 +767,7 @@ public class Player : IEntityAutoReset
         //job experience is experience too. The skill says nothing about which bar it fills,
         //and leaving this out meant half the reward quietly went missing.
         exp = GuildSkills.ApplyExperienceBonus(this, exp);
+        exp = ApplyExperienceRateBonus(exp);
 
         var curExp = GetData(PlayerStat.JobExperience);
         var requiredExp = DataManager.ExpChart.RequiredJobExp(job, level);

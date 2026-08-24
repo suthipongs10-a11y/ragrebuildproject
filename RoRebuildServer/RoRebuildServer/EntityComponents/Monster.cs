@@ -595,13 +595,28 @@ public partial class Monster : IEntityAutoReset
         var totalChance = 0;
         int dropId = 0;
         var topContributor = GetTopContributor();
+
+        //Whose drop rate applies, which was the question this never asked. It read the stat
+        //off the monster - DoMonsterDrops is a method on Monster, so GetStat here is the
+        //monster's own - and a monster has no drop bonus, so Bubble Gum, the adventure rank
+        //and the dungeon miasma were all worth exactly nothing.
+        //
+        //The top contributor's, because a drop is one item on the ground rather than one per
+        //player, and they are the one who already gets first refusal on picking it up. It is
+        //also the only answer that cannot be gamed by a passer-by hitting the monster once
+        //with a better bonus than the person who actually killed it.
+        var dropBonus = 0;
+        if (topContributor != null && topContributor.Type == CharacterType.Player && topContributor.Player != null)
+            dropBonus = topContributor.Player.GetStat(CharacterStat.AddDropPercent);
+
         if (DataManager.MonsterDropData.TryGetValue(MonsterBase.Code, out var drops))
         {
             for (var i = 0; i < drops.DropChances.Count; i++)
             {
                 var d = drops.DropChances[i];
                 var chance = d.Chance;
-                chance += chance * GetStat(CharacterStat.AddDropPercent) / 100;
+                if (dropBonus > 0)
+                    chance += chance * dropBonus / 100;
 
                 totalChance += chance;
                 if (GameRandom.Next(10000) <= chance)

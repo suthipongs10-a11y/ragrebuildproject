@@ -39,11 +39,27 @@ namespace Assets.Scripts.UI.AdventureBook
         private const float Height = 500f;
         private const float Pad = 8f;
 
-        private const float HeaderHeight = 48f;
+        /// <summary>The rank panel under the title bar, and the pieces inside it.</summary>
+        private const float HeaderHeight = 62f;
 
-        /// <summary>The rank bar under the header line, and how tall it is drawn.</summary>
-        private const float RankBarWidth = Width - Pad * 2f - 4f;
-        private const float RankBarHeight = 8f;
+        private const float RankPanelHeight = 58f;
+        private const float RankBadgeSize = 40f;
+        private const float RankBarLeft = RankBadgeSize + 18f;
+        private const float RankBarWidth = Width - Pad * 2f - RankBarLeft - 12f;
+        private const float RankBarHeight = 20f;
+
+        /// <summary>
+        /// How the character in the title bar is scaled and shifted to sit in its badge.
+        /// </summary>
+        /// <remarks>
+        /// Set by eye rather than measured, because what a player sprite measures depends on
+        /// the job and the hat. These are the two numbers to nudge if the badge shows a chest
+        /// instead of a face: the scale makes the character bigger or smaller, and the drop
+        /// slides it down so the head is what the badge is looking at.
+        /// </remarks>
+        private const float PortraitScale = 0.42f;
+        private const float PortraitDrop = -26f;
+        private const float PortraitBadgeSize = 44f;
         private const float RowHeight = 44f;
         private const float TallRowHeight = 56f;
         private const float RowGap = 5f;
@@ -70,6 +86,9 @@ namespace Assets.Scripts.UI.AdventureBook
         private static readonly Color UnearnedColor = new Color(0.741f, 0.780f, 0.827f);
 
         private static readonly Color RowAltColor = new Color(0.945f, 0.961f, 0.980f);
+
+        /// <summary>What the four things this window does are drawn on, against the list's own card.</summary>
+        private static readonly Color MenuRowColor = new Color(0.831f, 0.894f, 0.976f);
         private static readonly Color DoneColor = new Color(0.106f, 0.412f, 0.208f);
         private static readonly Color TrackColor = new Color(0.816f, 0.859f, 0.910f);
         private static readonly Color FillColor = new Color(0.235f, 0.545f, 0.851f);
@@ -81,7 +100,11 @@ namespace Assets.Scripts.UI.AdventureBook
         private RectTransform body;
         private TextMeshProUGUI header;
         private TextMeshProUGUI rankNote;
+        private TextMeshProUGUI rankBadgeText;
+        private TextMeshProUGUI rankBarText;
         private RectTransform rankFill;
+        private RectTransform titleBar;
+        private UiPlayerSprite portrait;
         private View view = View.Regions;
         private int regionIndex = -1;
         private int pageId = -1;
@@ -122,6 +145,7 @@ namespace Assets.Scripts.UI.AdventureBook
             instance.regionIndex = -1;
             instance.pageId = -1;
 
+            instance.RefreshPortrait();
             NetworkManager.Instance.SendAdventureBookRefresh();
             instance.Redraw();
         }
@@ -154,35 +178,61 @@ namespace Assets.Scripts.UI.AdventureBook
             rect.anchoredPosition = Vector2.zero;
             rect.sizeDelta = new Vector2(Width, Height);
 
-            ModernUiTheme.CreateTitleBar(window, "สมุดผจญภัย", "", ModernUiIcons.Spark);
+            var titleBar = ModernUiTheme.CreateTitleBar(window, "สมุดผจญภัย", "", ModernUiIcons.Spark);
             ModernUiTheme.AttachShadow(rect);
+            window.titleBar = titleBar;
 
-            window.header = ModernUiTheme.CreateText(rect, "Header", "", ModernUiTheme.SizeLabel,
+            //The whole rank block sits on a panel of its own rather than floating on the
+            //window's own sheet. It is a different kind of thing from the list below it -
+            //it is about the reader, not about the book - and a panel is what says so.
+            var panel = ModernUiTheme.CreateCard(rect, "RankPanel", ModernUiTheme.CardDeepColor);
+            ModernUiTheme.Place(panel, new Vector2(0, 1), new Vector2(Pad, -(ModernUiTheme.TitleBarHeight + 2f)),
+                new Vector2(Width - Pad * 2f, RankPanelHeight));
+            panel.GetComponent<Image>().raycastTarget = false;
+
+            //The rank as a number on a badge, which is how a level is read at a glance in
+            //every game that has one - the word beside it is for the first time only.
+            var badge = ModernUiTheme.CreateCard(panel, "RankBadge", ModernUiTheme.AccentColor);
+            ModernUiTheme.Place(badge, new Vector2(0, 1), new Vector2(9f, -9f),
+                new Vector2(RankBadgeSize, RankBadgeSize));
+            badge.GetComponent<Image>().raycastTarget = false;
+
+            window.rankBadgeText = ModernUiTheme.CreateText(badge, "RankNumber", "0", ModernUiTheme.SizeValue,
+                ModernUiTheme.AccentTextColor, TextAlignmentOptions.Center, FontStyles.Bold);
+            ModernUiTheme.Stretch(window.rankBadgeText.rectTransform, 0f, 0f, 0f, 0f);
+
+            window.header = ModernUiTheme.CreateText(panel, "Header", "", ModernUiTheme.SizeLabel,
                 ModernUiTheme.LabelColor, TextAlignmentOptions.Left);
             window.header.textWrappingMode = TextWrappingModes.NoWrap;
             ModernUiTheme.Place(window.header.rectTransform, new Vector2(0, 1),
-                new Vector2(Pad + 2f, -ModernUiTheme.TitleBarHeight),
-                new Vector2(RankBarWidth - 200f, 20f));
+                new Vector2(RankBarLeft, -6f), new Vector2(RankBarWidth * 0.55f, 18f));
 
-            window.rankNote = ModernUiTheme.CreateText(rect, "RankNote", "", ModernUiTheme.SizeLabel,
+            window.rankNote = ModernUiTheme.CreateText(panel, "RankNote", "", ModernUiTheme.SizeLabel,
                 ModernUiTheme.MutedColor, TextAlignmentOptions.Right);
             window.rankNote.textWrappingMode = TextWrappingModes.NoWrap;
             ModernUiTheme.Place(window.rankNote.rectTransform, new Vector2(1, 1),
-                new Vector2(-(Pad + 2f), -ModernUiTheme.TitleBarHeight), new Vector2(200f, 20f));
+                new Vector2(-12f, -6f), new Vector2(RankBarWidth * 0.45f, 18f));
 
-            //The rank bar is built once and only its fill is resized, rather than being drawn
-            //with the rows - it belongs to the window, not to whichever page is open, and a
-            //bar that is destroyed and rebuilt on every redraw flickers on every kill.
-            var track = ModernUiTheme.CreateCard(rect, "RankTrack", TrackColor);
-            ModernUiTheme.Place(track, new Vector2(0, 1),
-                new Vector2(Pad + 2f, -(ModernUiTheme.TitleBarHeight + 24f)),
+            //Built once and only resized, rather than drawn with the rows - it belongs to the
+            //window, not to whichever page is open, and a bar destroyed and rebuilt on every
+            //redraw flickers on every kill.
+            var track = ModernUiTheme.CreateCard(panel, "RankTrack", ModernUiTheme.GaugeTrackColor);
+            ModernUiTheme.Place(track, new Vector2(0, 1), new Vector2(RankBarLeft, -30f),
                 new Vector2(RankBarWidth, RankBarHeight));
             track.GetComponent<Image>().raycastTarget = false;
+            track.gameObject.AddComponent<RectMask2D>();
 
-            window.rankFill = ModernUiTheme.CreateCard(track, "RankFill", FillColor);
+            window.rankFill = ModernUiTheme.CreateCard(track, "RankFill", ModernUiTheme.GaugeExpColor);
             ModernUiTheme.Place(window.rankFill, new Vector2(0, 1), Vector2.zero,
                 new Vector2(0f, RankBarHeight));
             window.rankFill.GetComponent<Image>().raycastTarget = false;
+
+            //Written across the bar rather than beside it, the way an experience bar reads.
+            //It is the same trick that lets the panel stay under sixty pixels tall.
+            window.rankBarText = ModernUiTheme.CreateText(track, "RankBarText", "", ModernUiTheme.SizeSmall,
+                ModernUiTheme.LightInkColor, TextAlignmentOptions.Center, FontStyles.Bold);
+            window.rankBarText.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Stretch(window.rankBarText.rectTransform, 0f, 0f, 0f, 0f);
 
             var viewport = ModernUiTheme.CreateCard(rect, "Viewport", ModernUiTheme.CardDeepColor);
             ModernUiTheme.Stretch(viewport, Pad, Pad, -Pad, -BodyTop);
@@ -204,7 +254,78 @@ namespace Assets.Scripts.UI.AdventureBook
             scroll.scrollSensitivity = 32f;
 
             host.SetActive(true);
+
+            //After the window is live, not while it is being assembled. The character's parts
+            //are loaded through Addressables and the callback that assembles them does not
+            //run against an inactive object, so a portrait built a few lines earlier is a
+            //portrait that never arrives.
+            window.RefreshPortrait();
+
             return window;
+        }
+
+        /// <summary>
+        /// Puts the reader's own character in the badge at the top left of the window.
+        /// </summary>
+        /// <remarks>
+        /// The same component the equipment window uses to draw its paper doll, borrowed
+        /// whole - including its material, which is a serialised reference on a prefab and
+        /// so cannot be created from here. If the equipment window is not in the scene the
+        /// badge keeps the plain icon the title bar gave it, which is the right failure: a
+        /// window that opens with a symbol on it, rather than one that does not open.
+        ///
+        /// Masked and scaled down to a face. A whole character at forty pixels is a smudge,
+        /// and the head is the part that says which job this is.
+        /// </remarks>
+        private void RefreshPortrait()
+        {
+            var state = PlayerState.Instance;
+            if (titleBar == null || state == null)
+                return;
+
+            if (portrait != null)
+            {
+                //Already built, so this is somebody who changed job with the book open.
+                portrait.PrepareDisplayPlayerCharacter(state.JobId, state.HairStyleId, state.HairColorId,
+                    0, 0, 0, state.IsMale);
+                return;
+            }
+
+            var badge = titleBar.Find("Icon") as RectTransform;
+            if (badge == null)
+                return;
+
+            var ui = UiManager.Instance;
+            var source = ui == null || ui.EquipmentWindow == null ? null : ui.EquipmentWindow.PlayerSprite;
+            if (source == null || source.Material == null)
+                return;
+
+            //The badge grows a little to hold a face, and the plain icon it was given goes.
+            badge.sizeDelta = new Vector2(PortraitBadgeSize, PortraitBadgeSize);
+            var plain = badge.Find("Icon");
+            if (plain != null)
+                plain.gameObject.SetActive(false);
+
+            var frame = ModernUiTheme.CreateRect("Portrait", badge);
+            frame.anchorMin = Vector2.zero;
+            frame.anchorMax = Vector2.one;
+            frame.offsetMin = new Vector2(2f, 2f);
+            frame.offsetMax = new Vector2(-2f, -2f);
+            frame.gameObject.AddComponent<RectMask2D>();
+
+            var characterHost = new GameObject("Character");
+            characterHost.transform.SetParent(frame, false);
+            characterHost.transform.localScale = new Vector3(PortraitScale, PortraitScale, 1f);
+            characterHost.transform.localPosition = new Vector3(0f, PortraitDrop, 0f);
+
+            portrait = characterHost.AddComponent<UiPlayerSprite>();
+            portrait.Material = source.Material;
+            portrait.ViewDirection = Direction.South;
+
+            //No headgear. At this size a hat is a smudge on a face, and the face is the part
+            //that says which job is reading the book.
+            portrait.PrepareDisplayPlayerCharacter(state.JobId, state.HairStyleId, state.HairColorId,
+                0, 0, 0, state.IsMale);
         }
 
         private void Update()
@@ -270,11 +391,15 @@ namespace Assets.Scripts.UI.AdventureBook
             {
                 header.text = "กำลังโหลด...";
                 rankNote.text = "";
+                rankBadgeText.text = "-";
+                rankBarText.text = "";
                 rankFill.sizeDelta = new Vector2(0f, RankBarHeight);
                 return;
             }
 
-            header.text = $"Adventure ระดับ {AdventureBookState.Rank}   ·   {AdventureBookState.Stars:N0} / {AdventureBookState.StarTotal:N0} ดาว";
+            rankBadgeText.text = AdventureBookState.Rank.ToString();
+            header.text = "Adventure Rank";
+            rankNote.text = $"{AdventureBookState.Stars:N0} / {AdventureBookState.StarTotal:N0} ดาวทั้งเล่ม";
 
             //Measured between the two ranks rather than against the whole book, so the bar
             //answers the question actually being asked - how far to the next rank - and does
@@ -285,19 +410,19 @@ namespace Assets.Scripts.UI.AdventureBook
             {
                 var span = next - floor;
                 var into = Mathf.Clamp(AdventureBookState.Stars - floor, 0, span);
-                rankNote.text = $"อีก {next - AdventureBookState.Stars:N0} ดาวถึงระดับ {AdventureBookState.Rank + 1}   ({into:N0}/{span:N0})";
+                rankBarText.text = $"{into:N0} / {span:N0}   ·   อีก {next - AdventureBookState.Stars:N0} ดาวถึงระดับ {AdventureBookState.Rank + 1}";
                 rankFill.sizeDelta = new Vector2(RankBarWidth * into / span, RankBarHeight);
             }
             else if (AdventureBookState.Rank < AdventureBookState.Ranks.Count)
             {
                 //The last rank is not for sale at any number of stars - it asks for every
                 //region finished - so a bar towards it would be a bar that never moves.
-                rankNote.text = $"ทำครบทุกเมืองเพื่อไประดับ {AdventureBookState.Ranks.Count}";
+                rankBarText.text = $"ทำครบทุกเมืองเพื่อไประดับ {AdventureBookState.Ranks.Count}";
                 rankFill.sizeDelta = new Vector2(RankBarWidth, RankBarHeight);
             }
             else
             {
-                rankNote.text = "ระดับสูงสุด";
+                rankBarText.text = "ระดับสูงสุดแล้ว";
                 rankFill.sizeDelta = new Vector2(RankBarWidth, RankBarHeight);
             }
 
@@ -320,31 +445,27 @@ namespace Assets.Scripts.UI.AdventureBook
         {
             var y = Pad;
 
-            var rewards = NewCard(y, RowHeight, () => { view = View.Rewards; Redraw(); });
-            Label(rewards, "รางวัลประจำเมืองและดันเจี้ยน", 12f, -(RowHeight - 20f) / 2f, 320f,
-                ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
-            Value(rewards, $"{AdventureBookState.Regions.Count} ชิ้น", -12f, -(RowHeight - 20f) / 2f, 140f,
-                ModernUiTheme.MutedColor);
-            y += RowHeight + RowGap;
+            y = MenuRow(y, ModernUiIcons.Helmet, "รางวัลประจำเมืองและดันเจี้ยน",
+                $"{AdventureBookState.Regions.Count} ชิ้น", () => { view = View.Rewards; Redraw(); });
 
-            var status = NewCard(y, RowHeight, () => { view = View.Status; Redraw(); });
-            Label(status, "สถานะรวมของตัวละคร", 12f, -(RowHeight - 20f) / 2f, 320f,
-                ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
-            Value(status, RateSummary(), -12f, -(RowHeight - 20f) / 2f, 180f, ModernUiTheme.MutedColor);
-            y += RowHeight + RowGap;
+            y = MenuRow(y, ModernUiIcons.Person, "สถานะรวมของตัวละคร", RateSummary(),
+                () => { view = View.Status; Redraw(); });
 
-            var ranks = NewCard(y, RowHeight, () => { view = View.Ranks; Redraw(); });
-            Label(ranks, "รางวัลระดับ Adventure", 12f, -(RowHeight - 20f) / 2f, 320f,
-                ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
-            Value(ranks, $"ระดับ {AdventureBookState.Rank} / {AdventureBookState.Ranks.Count}", -12f,
-                -(RowHeight - 20f) / 2f, 140f, ModernUiTheme.MutedColor);
-            y += RowHeight + RowGap;
+            y = MenuRow(y, ModernUiIcons.Star, "รางวัลระดับ Adventure",
+                $"ระดับ {AdventureBookState.Rank} / {AdventureBookState.Ranks.Count}",
+                () => { view = View.Ranks; Redraw(); });
 
-            var help = NewCard(y, RowHeight, () => { view = View.Help; Redraw(); });
-            Label(help, "คู่มือนักผจญภัย", 12f, -(RowHeight - 20f) / 2f, 320f,
-                ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
-            Value(help, "คู่มือ", -12f, -(RowHeight - 20f) / 2f, 140f, ModernUiTheme.MutedColor);
-            y += RowHeight + RowGap;
+            y = MenuRow(y, ModernUiIcons.Book, "คู่มือนักผจญภัย", "วิธีเล่น",
+                () => { view = View.Help; Redraw(); });
+
+            //A rule between the four things this window can do and the places it lists, so
+            //the eye stops once rather than reading twenty-eight rows as one list.
+            var divider = ModernUiTheme.CreateCard(body, "Divider", ModernUiTheme.CardBorderColor);
+            ModernUiTheme.Place(divider, new Vector2(0, 1), new Vector2(Pad + 4f, -(y + 4f)),
+                new Vector2(RowWidth - 8f, 2f));
+            divider.GetComponent<Image>().raycastTarget = false;
+            rows.Add(divider.gameObject);
+            y += 14f;
 
             for (var i = 0; i < AdventureBookState.Regions.Count; i++)
             {
@@ -620,9 +741,9 @@ namespace Assets.Scripts.UI.AdventureBook
                         if (reward.HasItem)
                             lines++;
 
-                //Room for the three lines on the left as well, so a rank that pays little
-                //does not draw its bonus line off the bottom of its own card.
-                var height = Mathf.Max(TallRowHeight + 20f, 34f + lines * RewardLineHeight);
+                //Room for the four lines on the left as well, so a rank that pays little does
+                //not draw its bonus off the bottom of its own card.
+                var height = Mathf.Max(94f, 38f + lines * RewardLineHeight);
                 var card = NewCard(y, height, null);
 
                 //Said on the rank's own line rather than off on the right, because the right
@@ -634,8 +755,16 @@ namespace Assets.Scripts.UI.AdventureBook
                         : $"ดาว {info.Stars:N0}",
                     12f, -30f, 220f, ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
 
-                Label(card, BonusText(info), 12f, -50f, RewardColumn - 24f,
-                    ModernUiTheme.SizeSmall, ModernUiTheme.AccentInkColor);
+                //Two lines rather than one. Four bonuses joined with separators is wider than
+                //the column that holds them, and the one that fell off the end was the refine
+                //chance - the bonus somebody reads the page for.
+                var parts = BonusParts(info);
+                for (var line = 0; line * 2 < parts.Count; line++)
+                {
+                    var take = parts.GetRange(line * 2, Mathf.Min(2, parts.Count - line * 2));
+                    Label(card, string.Join("   ·   ", take), 12f, -(52f + line * 18f), RewardColumn - 24f,
+                        ModernUiTheme.SizeSmall, ModernUiTheme.AccentInkColor);
+                }
 
                 if (info.Rewards != null)
                 {
@@ -655,8 +784,13 @@ namespace Assets.Scripts.UI.AdventureBook
             return y + Pad;
         }
 
-        /// <summary>What a rank is permanently worth, skipping whatever it is not worth yet.</summary>
-        private static string BonusText(AdventureBookRankInfo info)
+        /// <summary>What a rank is permanently worth, one piece at a time.</summary>
+        /// <remarks>
+        /// Returned in pieces rather than as a sentence so that whoever draws it can decide
+        /// how many fit on a line. Joined into one string, the last of the four ran past the
+        /// end of its column and was quietly cut off.
+        /// </remarks>
+        private static List<string> BonusParts(AdventureBookRankInfo info)
         {
             var parts = new List<string>(4);
             if (info.StatBonus > 0) parts.Add($"สเตตัสทุกช่อง +{info.StatBonus}");
@@ -664,8 +798,11 @@ namespace Assets.Scripts.UI.AdventureBook
             if (info.ExpPercent > 0) parts.Add($"EXP +{info.ExpPercent}%");
             if (info.RefinePercent > 0) parts.Add($"ตีบวก +{info.RefinePercent}%");
 
-            return parts.Count == 0 ? "" : string.Join("  ·  ", parts);
+            return parts;
         }
+
+        private static string BonusText(AdventureBookRankInfo info) =>
+            string.Join("   ·   ", BonusParts(info));
 
         /// <summary>
         /// Everything the character is currently worth, and where it came from.
@@ -992,6 +1129,55 @@ namespace Assets.Scripts.UI.AdventureBook
         /// The whole row is the button rather than a small arrow at the end. This is read on a
         /// phone as often as on a desktop, and a thumb is not a mouse pointer.
         /// </remarks>
+        /// <summary>
+        /// One of the things this window does, as against one of the places it lists.
+        /// </summary>
+        /// <remarks>
+        /// Drawn differently on purpose. These four were the same card in the same colour as
+        /// the twenty-eight regions under them, so the only thing marking them out was being
+        /// at the top - which is not a mark at all once the list has been scrolled. An accent
+        /// panel, a badge with a symbol on it and a chevron saying it opens are what say
+        /// "this is a button" without needing a word for it.
+        /// </remarks>
+        private float MenuRow(float y, Sprite icon, string title, string value, System.Action onClick)
+        {
+            const float height = 46f;
+            const float badge = 30f;
+
+            var card = ModernUiTheme.CreateCard(body, "MenuRow", MenuRowColor);
+            ModernUiTheme.Place(card, new Vector2(0, 1), new Vector2(Pad, -y), new Vector2(RowWidth, height));
+
+            var image = card.GetComponent<Image>();
+            image.raycastTarget = true;
+            var button = card.gameObject.AddComponent<Button>();
+            button.targetGraphic = image;
+            button.onClick.AddListener(() => onClick());
+            rows.Add(card.gameObject);
+
+            var badgeRect = ModernUiTheme.CreateCard(card, "Badge", ModernUiTheme.AccentColor);
+            ModernUiTheme.Place(badgeRect, new Vector2(0, 1), new Vector2(9f, -(height - badge) / 2f),
+                new Vector2(badge, badge));
+            badgeRect.GetComponent<Image>().raycastTarget = false;
+            ModernUiTheme.CreateIcon(badgeRect, icon, ModernUiTheme.AccentTextColor, 17f);
+
+            var label = ModernUiTheme.CreateText(card, "Title", title, ModernUiTheme.SizeBody,
+                ModernUiTheme.TitleColor, TextAlignmentOptions.Left, FontStyles.Bold);
+            label.textWrappingMode = TextWrappingModes.NoWrap;
+            label.overflowMode = TextOverflowModes.Ellipsis;
+            ModernUiTheme.Place(label.rectTransform, new Vector2(0, 1), new Vector2(48f, -(height - 20f) / 2f),
+                new Vector2(280f, 20f));
+
+            if (!string.IsNullOrEmpty(value))
+                Value(card, value, -30f, -(height - 20f) / 2f, 200f, ModernUiTheme.AccentInkColor);
+
+            var chevron = ModernUiTheme.CreateIcon(card, ModernUiIcons.ChevronRight,
+                ModernUiTheme.AccentInkColor, ChevronSize);
+            ModernUiTheme.Place((RectTransform)chevron.transform, new Vector2(1, 1),
+                new Vector2(-10f, -(height - ChevronSize) / 2f), new Vector2(ChevronSize, ChevronSize));
+
+            return y + height + RowGap;
+        }
+
         private RectTransform NewCard(float y, float height, System.Action onClick)
         {
             var card = ModernUiTheme.CreateCard(body, "Row", rows.Count % 2 == 0 ? RowAltColor : ModernUiTheme.CardColor);
