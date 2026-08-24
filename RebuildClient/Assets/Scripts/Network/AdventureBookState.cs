@@ -86,6 +86,19 @@ namespace Assets.Scripts.Network
         public List<AdventureBookReward> Card;
     }
 
+    /// <summary>One boss in the hunter's log, and whether this character has met it.</summary>
+    public class BossLogPage
+    {
+        public int MonsterId;
+        public string Name;
+        public int Level;
+        public bool IsMvp;
+        public int Kills;
+        public List<string> Maps;
+
+        public bool Found => Kills > 0;
+    }
+
     /// <summary>
     /// One rung of the Adventure rank ladder: what it costs, what it is worth, what it pays.
     /// </summary>
@@ -122,6 +135,26 @@ namespace Assets.Scripts.Network
 
         /// <summary>The rank ladder, index zero being rank one.</summary>
         public static readonly List<AdventureBookRankInfo> Ranks = new List<AdventureBookRankInfo>();
+
+        /// <summary>Every boss in the world, MVPs first.</summary>
+        public static readonly List<BossLogPage> Bosses = new List<BossLogPage>();
+        public static readonly Dictionary<int, BossLogPage> BossesById = new Dictionary<int, BossLogPage>();
+
+        public static int BossTotal;
+        public static int BossMvpTotal;
+        public static int BossFound;
+        public static bool BossCleared;
+        public static bool BossCrowned;
+        public static int BossMvpKillsSinceClear;
+        public static int BossPlainHatId;
+        public static int BossCrownedHatId;
+
+        /// <summary>The lottery, in ten thousand, and the kill it stops being one.</summary>
+        public static int BossCrownChance;
+        public static int BossCrownPity;
+
+        /// <summary>Whether the log arrived at all. It is a separate switch on the server.</summary>
+        public static bool HasBossLog;
 
         public static int Rank;
         public static int Stars;
@@ -169,6 +202,21 @@ namespace Assets.Scripts.Network
             Bands.Clear();
             Ranks.Clear();
             Received = false;
+        }
+
+        /// <summary>
+        /// The boss log is cleared on its own header, not on the book's.
+        /// </summary>
+        /// <remarks>
+        /// The two arrive as separate sections of the same reply and either can be switched
+        /// off on the server. Clearing one from the other's header would empty whichever
+        /// happened to arrive first.
+        /// </remarks>
+        public static void ClearBossLog()
+        {
+            Bosses.Clear();
+            BossesById.Clear();
+            HasBossLog = false;
         }
     }
 }

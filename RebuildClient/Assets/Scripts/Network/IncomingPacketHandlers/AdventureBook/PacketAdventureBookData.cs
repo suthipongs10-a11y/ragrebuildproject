@@ -36,6 +36,18 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
                 case AdventureBookDataType.PageUpdate:
                     ReadPage(msg);
                     break;
+
+                case AdventureBookDataType.BossHeader:
+                    ReadBossHeader(msg);
+                    break;
+
+                case AdventureBookDataType.BossPages:
+                    ReadBossPages(msg);
+                    break;
+
+                case AdventureBookDataType.BossUpdate:
+                    ReadBossUpdate(msg);
+                    break;
             }
 
             AdventureBookState.Touch();
@@ -87,6 +99,62 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
                     Rewards = ReadRewards(msg)
                 });
             }
+        }
+
+        private static void ReadBossHeader(ClientInboundMessage msg)
+        {
+            AdventureBookState.ClearBossLog();
+
+            AdventureBookState.BossTotal = msg.ReadInt16();
+            AdventureBookState.BossMvpTotal = msg.ReadInt16();
+            AdventureBookState.BossFound = msg.ReadInt16();
+            AdventureBookState.BossCleared = msg.ReadByte() != 0;
+            AdventureBookState.BossCrowned = msg.ReadByte() != 0;
+            AdventureBookState.BossMvpKillsSinceClear = msg.ReadInt16();
+            AdventureBookState.BossPlainHatId = msg.ReadInt32();
+            AdventureBookState.BossCrownedHatId = msg.ReadInt32();
+            AdventureBookState.BossCrownChance = msg.ReadInt16();
+            AdventureBookState.BossCrownPity = msg.ReadInt16();
+
+            AdventureBookState.HasBossLog = true;
+        }
+
+        private static void ReadBossPages(ClientInboundMessage msg)
+        {
+            var count = msg.ReadInt16();
+            for (var i = 0; i < count; i++)
+            {
+                var page = new BossLogPage
+                {
+                    MonsterId = msg.ReadInt32(),
+                    Name = msg.ReadString(),
+                    Level = msg.ReadInt16(),
+                    IsMvp = msg.ReadByte() != 0,
+                    Kills = msg.ReadInt32(),
+                    Maps = new List<string>()
+                };
+
+                var maps = msg.ReadByte();
+                for (var m = 0; m < maps; m++)
+                    page.Maps.Add(msg.ReadString());
+
+                AdventureBookState.Bosses.Add(page);
+                AdventureBookState.BossesById[page.MonsterId] = page;
+            }
+        }
+
+        private static void ReadBossUpdate(ClientInboundMessage msg)
+        {
+            var id = msg.ReadInt32();
+            var kills = msg.ReadInt32();
+
+            AdventureBookState.BossFound = msg.ReadInt16();
+            AdventureBookState.BossCleared = msg.ReadByte() != 0;
+            AdventureBookState.BossCrowned = msg.ReadByte() != 0;
+            AdventureBookState.BossMvpKillsSinceClear = msg.ReadInt16();
+
+            if (AdventureBookState.BossesById.TryGetValue(id, out var page))
+                page.Kills = kills;
         }
 
         private static List<AdventureBookReward> ReadRewards(ClientInboundMessage msg)

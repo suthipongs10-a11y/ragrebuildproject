@@ -24,6 +24,15 @@ public enum AdventureBookDataType : byte
 
     /// <summary>One page moved. Cheaper than resending the book every time a star lands.</summary>
     PageUpdate,
+
+    /// <summary>The boss hunter's log: what it asks for, and what it pays.</summary>
+    BossHeader,
+
+    /// <summary>A batch of bosses. Same reason the book's pages come in batches.</summary>
+    BossPages,
+
+    /// <summary>One boss moved, after a kill.</summary>
+    BossUpdate,
 }
 
 /// <summary>Why a request to be taken somewhere was turned down.</summary>

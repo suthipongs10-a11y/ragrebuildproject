@@ -93,7 +93,7 @@ namespace Assets.Scripts.UI.AdventureBook
         private static readonly Color TrackColor = new Color(0.816f, 0.859f, 0.910f);
         private static readonly Color FillColor = new Color(0.235f, 0.545f, 0.851f);
 
-        private enum View { Regions, Pages, Page, Rewards, Ranks, Status, Help }
+        private enum View { Regions, Pages, Page, Rewards, Ranks, Status, Bosses, Help }
 
         private static AdventureBookWindow instance;
 
@@ -479,6 +479,7 @@ namespace Assets.Scripts.UI.AdventureBook
                 case View.Rewards: y = DrawRewards(); break;
                 case View.Ranks: y = DrawRanks(); break;
                 case View.Status: y = DrawStatus(); break;
+                case View.Bosses: y = DrawBosses(); break;
                 case View.Help: y = DrawHelp(); break;
             }
 
@@ -498,6 +499,11 @@ namespace Assets.Scripts.UI.AdventureBook
             y = MenuRow(y, ModernUiIcons.Star, "รางวัลระดับ Adventure",
                 $"ระดับ {AdventureBookState.Rank} / {AdventureBookState.Ranks.Count}",
                 () => { view = View.Ranks; Redraw(); });
+
+            if (AdventureBookState.HasBossLog)
+                y = MenuRow(y, ModernUiIcons.Sword, "บันทึกล่าจอมมาร",
+                    $"{AdventureBookState.BossFound} / {AdventureBookState.BossTotal} ตัว",
+                    () => { view = View.Bosses; Redraw(); });
 
             y = MenuRow(y, ModernUiIcons.Book, "คู่มือนักผจญภัย", "วิธีเล่น",
                 () => { view = View.Help; Redraw(); });
@@ -1077,6 +1083,98 @@ namespace Assets.Scripts.UI.AdventureBook
         }
 
         /// <summary>
+        /// Every boss in the world, and whether this character has met it.
+        /// </summary>
+        /// <remarks>
+        /// A separate errand from the book and drawn as one: no stars, no rank, one line per
+        /// boss saying met or not met and how many times. What makes it hard is not the
+        /// counting - it is that these respawn once an hour, so the list is a map of evenings
+        /// rather than of grinding.
+        /// </remarks>
+        private float DrawBosses()
+        {
+            var y = Pad;
+            y = BackRow(y, "บันทึกล่าจอมมาร", () => { view = View.Regions; Redraw(); });
+
+            //The two prizes first, because they are why anybody opens this page.
+            y = BossPrizeRow(y, AdventureBookState.BossPlainHatId, "ล่าครบทุกตัวในบันทึก",
+                $"{AdventureBookState.BossFound} / {AdventureBookState.BossTotal} ตัว",
+                AdventureBookState.BossCleared);
+
+            var chance = AdventureBookState.BossCrownChance / 100f;
+            var crownNote = AdventureBookState.BossCrowned
+                ? "ได้แล้ว"
+                : AdventureBookState.BossCleared
+                    ? $"ล่า MVP ไปแล้ว {AdventureBookState.BossMvpKillsSinceClear:N0} ครั้ง"
+                    : "ต้องล่าครบทุกตัวก่อน";
+
+            y = BossPrizeRow(y, AdventureBookState.BossCrownedHatId,
+                $"โอกาส {chance:0.##}% ทุกครั้งที่ล่า MVP หลังทำบันทึกครบ  ·  รับประกันที่ครั้งที่ {AdventureBookState.BossCrownPity:N0}",
+                crownNote, AdventureBookState.BossCrowned);
+
+            y = GroupRow(y, $"MVP  ({AdventureBookState.BossMvpTotal} ตัว)");
+            var drawnMini = false;
+
+            foreach (var boss in AdventureBookState.Bosses)
+            {
+                if (!boss.IsMvp && !drawnMini)
+                {
+                    drawnMini = true;
+                    y = GroupRow(y, $"มินิบอส  ({AdventureBookState.BossTotal - AdventureBookState.BossMvpTotal} ตัว)");
+                }
+
+                y = BossRow(y, boss);
+            }
+
+            return y + Pad;
+        }
+
+        private float BossPrizeRow(float y, int itemId, string what, string state, bool done)
+        {
+            System.Action onClick = null;
+            if (itemId > 0)
+                onClick = () => ShowItem(itemId);
+
+            var card = NewCard(y, TallRowHeight, onClick);
+
+            var drawn = DrawItemIcon(card, itemId, new Vector2(12f, -(TallRowHeight - RewardIconSize) / 2f));
+            var left = drawn ? 12f + RewardIconSize + 10f : 14f;
+
+            Label(card, ItemName(itemId), left, -8f, 320f, ModernUiTheme.SizeBody,
+                done ? DoneColor : ModernUiTheme.NameColor);
+            Label(card, what, left, -30f, RewardColumn - left, ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
+
+            Value(card, state, -12f, -(TallRowHeight - 20f) / 2f, 200f,
+                done ? DoneColor : ModernUiTheme.MutedColor);
+
+            return y + TallRowHeight + RowGap;
+        }
+
+        private float BossRow(float y, BossLogPage boss)
+        {
+            var card = NewCard(y, RowHeight, null);
+
+            var star = ModernUiTheme.CreateIcon(card, ModernUiIcons.Star,
+                boss.Found ? EarnedColor : UnearnedColor, StarSize);
+            ModernUiTheme.Place((RectTransform)star.transform, new Vector2(0, 1),
+                new Vector2(12f, -(RowHeight - StarSize) / 2f), new Vector2(StarSize, StarSize));
+
+            var left = 12f + StarSize + 10f;
+            Label(card, boss.Name, left, -6f, 240f, ModernUiTheme.SizeBody,
+                boss.Found ? DoneColor : ModernUiTheme.NameColor);
+
+            var where = boss.Maps == null || boss.Maps.Count == 0 ? "-" : string.Join(", ", boss.Maps);
+            Label(card, $"Lv {boss.Level}   ·   {where}", left, -25f, RewardColumn - left,
+                ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
+
+            Value(card, boss.Found ? $"ล่าแล้ว {boss.Kills:N0} ครั้ง" : "ยังไม่เคยล่า",
+                -12f, -(RowHeight - 20f) / 2f, 200f,
+                boss.Found ? DoneColor : ModernUiTheme.MutedColor);
+
+            return y + RowHeight + RowGap;
+        }
+
+        /// <summary>
         /// What the book is for, in the window rather than in a wiki nobody has written.
         /// </summary>
         private float DrawHelp()
@@ -1100,6 +1198,10 @@ namespace Assets.Scripts.UI.AdventureBook
                 "ได้ดาว 1 ของมอนตัวไหนแล้ว วาร์ปไปหามันได้จากในสมุด เสีย Zeny ตามระดับ พอถึง Rank 5 ฟรี");
             y = HelpLine(y, "สถานะรวม",
                 "หน้าแรกมีปุ่มดูสเตตัสรวม บอกว่าโบนัสแต่ละอย่างมาจาก Adventure กิลด์ หรืออุปกรณ์");
+            if (AdventureBookState.HasBossLog)
+                y = HelpLine(y, "บันทึกล่าจอมมาร",
+                    "คนละเล่มกับสมุด ไม่นับดาว ล่า MVP และมินิบอสให้ครบทุกตัว ได้ Hat of the Sun God ใบเจาะรูต้องดวงล้วน ๆ");
+
             y = HelpLine(y, "พิมพ์ในแชทก็ได้",
                 "!book ดูสรุป  ·  !book <ชื่อมอน> ดูตัวเดียว");
 

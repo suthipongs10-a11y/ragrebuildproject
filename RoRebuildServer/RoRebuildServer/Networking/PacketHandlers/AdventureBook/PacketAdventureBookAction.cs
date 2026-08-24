@@ -39,20 +39,31 @@ public class PacketAdventureBookAction : IClientPacketHandler
         var player = connection.Player;
         var action = (AdventureBookRequestType)msg.ReadByte();
 
-        if (!AdventureBookManager.IsEnabled || !AdventureBook.IsBuilt)
+        //The boss log rides in the same window and on the same packet, so a refresh is served
+        //when either of the two is switched on. Everything below the refresh needs the book
+        //itself, and says so where it needs it.
+        var hasBook = AdventureBookManager.IsEnabled && AdventureBook.IsBuilt;
+        var hasBossLog = Custom.BossLog.BossLogManager.IsEnabled && Custom.BossLog.BossLog.IsBuilt;
+        if (!hasBook && !hasBossLog)
             return;
 
         switch (action)
         {
             case AdventureBookRequestType.Refresh:
-                //Before anything is read, so a character whose pages were renamed by a content
-                //update sees the progress they actually have rather than an empty book.
-                AdventureBookProgress.EnsureMigrated(player);
-                CommandBuilder.SendAdventureBook(player);
+                if (hasBook)
+                {
+                    //Before anything is read, so a character whose pages were renamed by a
+                    //content update sees the progress they have rather than an empty book.
+                    AdventureBookProgress.EnsureMigrated(player);
+                    CommandBuilder.SendAdventureBook(player);
+                }
+
+                CommandBuilder.SendBossLog(player);
                 break;
 
             case AdventureBookRequestType.Warp:
-                Warp(connection, player, msg.ReadInt32(), msg.ReadString());
+                if (hasBook)
+                    Warp(connection, player, msg.ReadInt32(), msg.ReadString());
                 break;
         }
     }

@@ -1,0 +1,113 @@
+using RebuildSharedData.Enum;
+using RebuildSharedData.Networking;
+//OutboundMessage lives under RebuildZoneServer despite sitting in this folder
+using RebuildZoneServer.Networking;
+using RoRebuildServer.Custom.BossLog;
+using RoRebuildServer.Data;
+using RoRebuildServer.EntityComponents;
+
+namespace RoRebuildServer.Networking;
+
+/// <summary>
+/// What the boss hunter's log sends down the wire.
+/// </summary>
+/// <remarks>
+/// Carried on the adventure book's packet rather than one of its own. The two are read in the
+/// same window and arrive together, and a packet type is a slot in a table the client keeps by
+/// hand - one worth spending on a new feature, not on a second view of one.
+/// </remarks>
+public static partial class CommandBuilder
+{
+    /// <summary>How many places to name for one boss.</summary>
+    private const int MaxBossSightingsSent = 3;
+
+    public static void SendBossLog(Player player)
+    {
+        if (!BossLogManager.IsEnabled || !BossLog.IsBuilt)
+            return;
+
+        var header = NetworkManager.StartPacket(PacketType.AdventureBookData, 256);
+        header.Write((byte)AdventureBookDataType.BossHeader);
+
+        header.Write((short)BossLog.Total);
+        header.Write((short)BossLog.MvpCount);
+        header.Write((short)BossLogProgress.CountFound(player));
+        header.Write((byte)(BossLogProgress.HasCleared(player) ? 1 : 0));
+        header.Write((byte)(BossLogProgress.HasCrown(player) ? 1 : 0));
+        header.Write((short)BossLogProgress.MvpKillsSinceClear(player));
+
+        //The two hats by item id, so the window can find the name and the icon itself.
+        header.Write(DataManager.ItemIdByName.TryGetValue(BossLogProgress.PlainHatCode, out var plain) ? plain : 0);
+        header.Write(DataManager.ItemIdByName.TryGetValue(BossLogProgress.CrownedHatCode, out var crown) ? crown : 0);
+
+        header.Write((short)BossLogProgress.CrownChance);
+        header.Write((short)BossLogProgress.CrownPity);
+
+        NetworkManager.SendMessage(header, player.Connection);
+
+        var batch = new List<BossLogEntry>();
+        var bytes = 0;
+
+        foreach (var entry in BossLog.Entries)
+        {
+            var cost = 20 + entry.Name.Length * 3;
+            var shown = Math.Min(entry.Sightings.Length, MaxBossSightingsSent);
+            for (var i = 0; i < shown; i++)
+                cost += 6 + entry.Sightings[i].Map.Length * 3;
+
+            if (bytes + cost > BatchByteBudget && batch.Count > 0)
+            {
+                SendBossBatch(player, batch);
+                batch.Clear();
+                bytes = 0;
+            }
+
+            batch.Add(entry);
+            bytes += cost;
+        }
+
+        if (batch.Count > 0)
+            SendBossBatch(player, batch);
+    }
+
+    private static void SendBossBatch(Player player, List<BossLogEntry> batch)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.AdventureBookData, BatchByteBudget * 2);
+        packet.Write((byte)AdventureBookDataType.BossPages);
+        packet.Write((short)batch.Count);
+
+        foreach (var entry in batch)
+        {
+            packet.Write(entry.MonsterId);
+            packet.Write(entry.Name);
+            packet.Write((short)entry.Level);
+            packet.Write((byte)(entry.IsMvp ? 1 : 0));
+            packet.Write(BossLogProgress.GetKills(player, entry));
+
+            var shown = Math.Min(entry.Sightings.Length, MaxBossSightingsSent);
+            packet.Write((byte)shown);
+            for (var i = 0; i < shown; i++)
+                packet.Write(entry.Sightings[i].Map);
+        }
+
+        NetworkManager.SendMessage(packet, player.Connection);
+    }
+
+    /// <summary>One boss, after a kill, rather than the whole log again.</summary>
+    public static void SendBossLogEntry(Player player, BossLogEntry entry)
+    {
+        if (player.Connection == null)
+            return;
+
+        var packet = NetworkManager.StartPacket(PacketType.AdventureBookData, 32);
+        packet.Write((byte)AdventureBookDataType.BossUpdate);
+        packet.Write(entry.MonsterId);
+        packet.Write(BossLogProgress.GetKills(player, entry));
+        packet.Write((short)BossLogProgress.CountFound(player));
+        packet.Write((byte)(BossLogProgress.HasCleared(player) ? 1 : 0));
+        packet.Write((byte)(BossLogProgress.HasCrown(player) ? 1 : 0));
+        packet.Write((short)BossLogProgress.MvpKillsSinceClear(player));
+
+        NetworkManager.SendMessage(packet, player.Connection);
+    }
+}
