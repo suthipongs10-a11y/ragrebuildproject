@@ -162,10 +162,15 @@ public partial class CombatEntity
 
     public void TriggerOnKillEffects(CombatEntity target)
     {
+        //The kill families, not the attack ones. There are four of these and they sit next to
+        //each other, and this read the pair belonging to landing a hit rather than the pair
+        //belonging to finishing one off. The flag that gets here is set by the kill stats, so
+        //every card promising sp back for killing a race switched the check on and then asked
+        //a stat nothing had written - twelve of them, all doing nothing.
         if ((Player.OnAttackTriggerFlags & AttackEffectTriggers.HpOnKill) > 0)
         {
             var val = GetStat(CharacterStat.HpGainOnKill);
-            val += GetStat(CharacterStat.HpGainOnAttackRaceFormless + (int)target.GetRace());
+            val += GetStat(CharacterStat.HpGainOnKillRaceFormless + (int)target.GetRace());
             if (val > 0)
                 HealHp(val, true);
         }
@@ -173,7 +178,7 @@ public partial class CombatEntity
         if ((Player.OnAttackTriggerFlags & AttackEffectTriggers.SpOnKill) > 0)
         {
             var val = GetStat(CharacterStat.SpGainOnKill);
-            val += GetStat(CharacterStat.SpGainOnAttackRaceFormless + (int)target.GetRace());
+            val += GetStat(CharacterStat.SpGainOnKillRaceFormless + (int)target.GetRace());
             if (val > 0)
                 RecoverSp(val);
         }
@@ -395,10 +400,20 @@ public partial class CombatEntity
         var rVal = (mnd + vit) / 2;
         var resist = MathHelper.PowScaleDown(rVal);
 
+        //Every other status reads its own resistance here. Blind did not, so a card saying it
+        //stops blindness stopped nothing - and blind resistance is the commonest one in the
+        //game, on fourteen pieces of gear including the card everybody puts in a hat.
+        var resistChance = 100 - target.GetStat(CharacterStat.ResistBlindStatus);
+        if (resistChance != 100)
+            resist = resist * resistChance / 100;
+
+        var timeResist = MathHelper.PowScaleDown(rVal + GameRandom.Next(0, luk));
+        if (resistChance != 100)
+            timeResist = timeResist * resistChance / 100;
+
         if (!CheckLuckModifiedRandomChanceVsTarget(target, (int)(chanceIn1000 * resist), 1000))
             return false;
 
-        var timeResist = MathHelper.PowScaleDown(rVal + GameRandom.Next(0, luk));
         var len = 30f * timeResist;
 
         var status = StatusEffectState.NewStatusEffect(CharacterStatusEffect.Blind, len);
@@ -417,10 +432,19 @@ public partial class CombatEntity
         var rVal = mnd;
         var resist = MathHelper.PowScaleDown(rVal);
 
+        //Same omission blind had. Four pieces of gear promise sleep resistance and none of
+        //them was ever asked.
+        var resistChance = 100 - target.GetStat(CharacterStat.ResistSleepStatus);
+        if (resistChance != 100)
+            resist = resist * resistChance / 100;
+
+        var timeResist = MathHelper.PowScaleDown(rVal + GameRandom.Next(0, luk));
+        if (resistChance != 100)
+            timeResist = timeResist * resistChance / 100;
+
         if (!CheckLuckModifiedRandomChanceVsTarget(target, (int)(chanceIn1000 * resist), 1000))
             return false;
 
-        var timeResist = MathHelper.PowScaleDown(rVal + GameRandom.Next(0, luk));
         var len = 30f * timeResist;
 
         var status = StatusEffectState.NewStatusEffect(CharacterStatusEffect.Sleep, len);

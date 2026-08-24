@@ -48,3 +48,23 @@ is a different stat and is left to the eye.
 What it still gets wrong: flavour prose that happens to contain a verb like "increases" or
 "makes" reads as a promise. Six items do this and all six were checked by hand; the list is
 short enough to keep reading rather than worth another rule.
+
+## tools/audit_stats.py
+
+Does the server ever read the stat an item writes?
+
+    python3 tools/audit_stats.py
+
+An item effect adds a number to a named stat. Whether that number does anything depends
+entirely on somewhere else asking for that stat, and nothing complains if nobody ever does:
+the card equips, the number is stored, the tooltip is honest, and the effect does not exist.
+This is the failure mode that is impossible to notice by playing - the item looks right in
+every window.
+
+It knows that whole families are read by offset rather than by name - the ten attack
+elements are asked for as `AddAttackElementNeutral + (int)element` - and takes those families
+from the blank lines the enum is grouped by, which is how they are actually written.
+
+Six stats are still named and all six were checked by hand: confusion and bleeding are
+statuses the game never applies, and the four self-inflicted ones are read from a flag that
+is set and never looked at.
