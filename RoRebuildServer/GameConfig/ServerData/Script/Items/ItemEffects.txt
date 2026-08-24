@@ -243,9 +243,9 @@ Item("Flare_Grenadee_Pack") { OnValidate: return false; OnUse: }
 Item("Cartridge") { OnValidate: return false; OnUse: }
 Item("Blood_Cartridge") { OnValidate: return false; OnUse: }
 Item("Silver_Cartridge") { OnValidate: return false; OnUse: }
-Item("Battle_Manual") { OnValidate: return false; OnUse: }
+Item("Battle_Manual") { OnUse: AddStatusEffect(StatusBattleManual, 30m); }
 Item("Life_Insurance") { OnValidate: return false; OnUse: }
-Item("Bubble_Gum") { OnValidate: return false; OnUse: }
+Item("Bubble_Gum") { OnUse: AddStatusEffect(StatusBubbleGum, 30m); }
 Item("Kafra_Card") { OnValidate: return false; OnUse: }
 Item("Giant_Fly_Wing") { OnValidate: return false; OnUse: }
 Item("Neuralizer") { OnValidate: return false; OnUse: }

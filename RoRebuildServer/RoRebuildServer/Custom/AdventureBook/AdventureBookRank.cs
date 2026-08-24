@@ -44,6 +44,17 @@ public static class AdventureBookRank
     public static int StarsForNextRank(int currentRank) =>
         currentRank >= StarsForRank.Length ? 0 : StarsForRank[currentRank];
 
+    /// <summary>
+    /// The star count this rank began at, which is where a bar towards the next one starts.
+    /// </summary>
+    /// <remarks>
+    /// Without this the client can only draw progress as a share of the next threshold, so
+    /// somebody at rank three with 180 of the 280 stars for rank four sees a bar two thirds
+    /// full when they have barely started - which reads as the bar being wrong rather than as
+    /// the rank being hard.
+    /// </remarks>
+    public static int StarsAtRank(int rank) => rank <= 0 ? 0 : StarsForRank[Math.Min(rank, StarsForRank.Length) - 1];
+
     /// <summary>What a rank is worth, all of it, rather than what the last rank added.</summary>
     public readonly record struct RankBonus(int Stats, int DropPercent, int ExpPercent, int RefinePercent);
 

@@ -62,6 +62,7 @@ public static partial class CommandBuilder
         header.Write((short)AdventureBookProgress.CountStars(player));
         header.Write((short)AdventureBook.StarTotal);
         header.Write((short)AdventureBookRank.StarsForNextRank(rank));
+        header.Write((short)AdventureBookRank.StarsAtRank(rank));
 
         header.Write((byte)AdventureBook.Regions.Count);
         foreach (var region in AdventureBook.Regions)
@@ -85,6 +86,21 @@ public static partial class CommandBuilder
             WriteRewards(header, band.Hunt);
             WriteRewards(header, band.HuntLarge);
             WriteRewards(header, band.Card);
+        }
+
+        //And what each rank costs, is worth, and pays. Sent whole rather than only the next
+        //one, because the reason somebody grinds out the eightieth star is that they have
+        //already seen what rank ten hands over.
+        header.Write((byte)AdventureBookRewards.RankRewards.Length);
+        for (var i = 1; i <= AdventureBookRewards.RankRewards.Length; i++)
+        {
+            var bonus = AdventureBookRank.BonusFor(i);
+            header.Write((short)AdventureBookRank.StarsAtRank(i));
+            header.Write((byte)bonus.Stats);
+            header.Write((byte)bonus.DropPercent);
+            header.Write((byte)bonus.ExpPercent);
+            header.Write((byte)bonus.RefinePercent);
+            WriteRewards(header, AdventureBookRewards.ForRank(i));
         }
 
         NetworkManager.SendMessage(header, player.Connection);

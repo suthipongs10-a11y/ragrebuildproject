@@ -329,10 +329,45 @@ public static class AdventureBookProgress
         //the stats are rebuilt.
         player.UpdateStats();
 
-        if (stored > 0 && rank > stored - 1)
-            Announce(player, $"<color=#FFD700>Adventure ระดับ {rank} แล้ว !</color>");
+        //Paid for every rank actually crossed, not only the one landed on, so a character who
+        //jumps two at once is not quietly shorted the one in between. Nothing is paid when the
+        //cache was empty: that is a character whose rank is being worked out for the first
+        //time rather than one who has just earned it.
+        if (stored > 0)
+        {
+            for (var reached = stored; reached <= rank; reached++)
+                GiveRankReward(player, reached);
+        }
 
         return rank;
+    }
+
+    /// <summary>Hands over what a rank pays, and says so loudly enough to feel earned.</summary>
+    private static void GiveRankReward(Player player, int rank)
+    {
+        var rewards = AdventureBookRewards.ForRank(rank);
+        var given = new List<string>();
+
+        foreach (var reward in rewards)
+        {
+            if (!DataManager.ItemIdByName.TryGetValue(reward.Code, out var itemId))
+            {
+                ServerLogger.LogWarning($"[AdventureBook] The rank {rank} reward '{reward.Code}' is not an item, so nothing was given.");
+                continue;
+            }
+
+            player.CreateItemInInventory(new ItemReference(itemId, reward.Count));
+            var itemName = DataManager.GetItemInfoById(itemId)?.Name ?? reward.Code;
+            given.Add(reward.Count > 1 ? $"{itemName} x{reward.Count}" : itemName);
+        }
+
+        Announce(player, $"<color=#FFD700>Adventure ระดับ {rank} แล้ว !</color>");
+        if (given.Count > 0)
+            Announce(player, $"<color=#FFD700>ได้รับ {string.Join(", ", given)}</color>");
+
+        //The last rank is the whole point of the book, so the server hears about it.
+        if (rank >= AdventureBookRank.MaxRank)
+            ServerAnnouncements.Announce($"{player.Name} ทำสมุดผจญภัยครบทั้งเล่ม เป็น Adventure ระดับสูงสุดคนแรก !");
     }
 
     private static (int Rank, int Stars) Count(Player player)

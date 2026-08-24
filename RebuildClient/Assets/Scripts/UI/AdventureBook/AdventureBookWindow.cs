@@ -36,7 +36,11 @@ namespace Assets.Scripts.UI.AdventureBook
         private const float Height = 500f;
         private const float Pad = 8f;
 
-        private const float HeaderHeight = 28f;
+        private const float HeaderHeight = 48f;
+
+        /// <summary>The rank bar under the header line, and how tall it is drawn.</summary>
+        private const float RankBarWidth = Width - Pad * 2f - 4f;
+        private const float RankBarHeight = 8f;
         private const float RowHeight = 44f;
         private const float TallRowHeight = 56f;
         private const float RowGap = 5f;
@@ -67,12 +71,14 @@ namespace Assets.Scripts.UI.AdventureBook
         private static readonly Color TrackColor = new Color(0.816f, 0.859f, 0.910f);
         private static readonly Color FillColor = new Color(0.235f, 0.545f, 0.851f);
 
-        private enum View { Regions, Pages, Page, Rewards, Help }
+        private enum View { Regions, Pages, Page, Rewards, Ranks, Help }
 
         private static AdventureBookWindow instance;
 
         private RectTransform body;
         private TextMeshProUGUI header;
+        private TextMeshProUGUI rankNote;
+        private RectTransform rankFill;
         private View view = View.Regions;
         private int regionIndex = -1;
         private int pageId = -1;
@@ -152,7 +158,27 @@ namespace Assets.Scripts.UI.AdventureBook
             window.header.textWrappingMode = TextWrappingModes.NoWrap;
             ModernUiTheme.Place(window.header.rectTransform, new Vector2(0, 1),
                 new Vector2(Pad + 2f, -ModernUiTheme.TitleBarHeight),
-                new Vector2(Width - Pad * 2f, HeaderHeight));
+                new Vector2(RankBarWidth - 200f, 20f));
+
+            window.rankNote = ModernUiTheme.CreateText(rect, "RankNote", "", ModernUiTheme.SizeLabel,
+                ModernUiTheme.MutedColor, TextAlignmentOptions.Right);
+            window.rankNote.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(window.rankNote.rectTransform, new Vector2(1, 1),
+                new Vector2(-(Pad + 2f), -ModernUiTheme.TitleBarHeight), new Vector2(200f, 20f));
+
+            //The rank bar is built once and only its fill is resized, rather than being drawn
+            //with the rows - it belongs to the window, not to whichever page is open, and a
+            //bar that is destroyed and rebuilt on every redraw flickers on every kill.
+            var track = ModernUiTheme.CreateCard(rect, "RankTrack", TrackColor);
+            ModernUiTheme.Place(track, new Vector2(0, 1),
+                new Vector2(Pad + 2f, -(ModernUiTheme.TitleBarHeight + 24f)),
+                new Vector2(RankBarWidth, RankBarHeight));
+            track.GetComponent<Image>().raycastTarget = false;
+
+            window.rankFill = ModernUiTheme.CreateCard(track, "RankFill", FillColor);
+            ModernUiTheme.Place(window.rankFill, new Vector2(0, 1), Vector2.zero,
+                new Vector2(0f, RankBarHeight));
+            window.rankFill.GetComponent<Image>().raycastTarget = false;
 
             var viewport = ModernUiTheme.CreateCard(rect, "Viewport", ModernUiTheme.CardDeepColor);
             ModernUiTheme.Stretch(viewport, Pad, Pad, -Pad, -BodyTop);
@@ -198,14 +224,37 @@ namespace Assets.Scripts.UI.AdventureBook
             if (!AdventureBookState.Received)
             {
                 header.text = "กำลังโหลด...";
+                rankNote.text = "";
+                rankFill.sizeDelta = new Vector2(0f, RankBarHeight);
                 return;
             }
 
+            header.text = $"Adventure ระดับ {AdventureBookState.Rank}   ·   {AdventureBookState.Stars:N0} / {AdventureBookState.StarTotal:N0} ดาว";
+
+            //Measured between the two ranks rather than against the whole book, so the bar
+            //answers the question actually being asked - how far to the next rank - and does
+            //not crawl for the first thirty stars and then leap.
             var next = AdventureBookState.StarsForNextRank;
-            var toNext = next > 0
-                ? $"   อีก {next - AdventureBookState.Stars:N0} ดาวถึงระดับ {AdventureBookState.Rank + 1}"
-                : "   ระดับสูงสุด";
-            header.text = $"Adventure ระดับ {AdventureBookState.Rank}   ·   {AdventureBookState.Stars:N0} / {AdventureBookState.StarTotal:N0} ดาว{toNext}";
+            var floor = AdventureBookState.StarsAtRank;
+            if (next > floor)
+            {
+                var span = next - floor;
+                var into = Mathf.Clamp(AdventureBookState.Stars - floor, 0, span);
+                rankNote.text = $"อีก {next - AdventureBookState.Stars:N0} ดาวถึงระดับ {AdventureBookState.Rank + 1}   ({into:N0}/{span:N0})";
+                rankFill.sizeDelta = new Vector2(RankBarWidth * into / span, RankBarHeight);
+            }
+            else if (AdventureBookState.Rank < AdventureBookState.Ranks.Count)
+            {
+                //The last rank is not for sale at any number of stars - it asks for every
+                //region finished - so a bar towards it would be a bar that never moves.
+                rankNote.text = $"ทำครบทุกเมืองเพื่อไประดับ {AdventureBookState.Ranks.Count}";
+                rankFill.sizeDelta = new Vector2(RankBarWidth, RankBarHeight);
+            }
+            else
+            {
+                rankNote.text = "ระดับสูงสุด";
+                rankFill.sizeDelta = new Vector2(RankBarWidth, RankBarHeight);
+            }
 
             var y = Pad;
             switch (view)
@@ -214,6 +263,7 @@ namespace Assets.Scripts.UI.AdventureBook
                 case View.Pages: y = DrawPages(); break;
                 case View.Page: y = DrawPage(); break;
                 case View.Rewards: y = DrawRewards(); break;
+                case View.Ranks: y = DrawRanks(); break;
                 case View.Help: y = DrawHelp(); break;
             }
 
@@ -229,6 +279,13 @@ namespace Assets.Scripts.UI.AdventureBook
                 ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
             Value(rewards, $"{AdventureBookState.Regions.Count} ชิ้น", -12f, -(RowHeight - 20f) / 2f, 140f,
                 ModernUiTheme.MutedColor);
+            y += RowHeight + RowGap;
+
+            var ranks = NewCard(y, RowHeight, () => { view = View.Ranks; Redraw(); });
+            Label(ranks, "รางวัลระดับ Adventure", 12f, -(RowHeight - 20f) / 2f, 320f,
+                ModernUiTheme.SizeBody, ModernUiTheme.AccentInkColor);
+            Value(ranks, $"ระดับ {AdventureBookState.Rank} / {AdventureBookState.Ranks.Count}", -12f,
+                -(RowHeight - 20f) / 2f, 140f, ModernUiTheme.MutedColor);
             y += RowHeight + RowGap;
 
             var help = NewCard(y, RowHeight, () => { view = View.Help; Redraw(); });
@@ -485,6 +542,80 @@ namespace Assets.Scripts.UI.AdventureBook
         }
 
         /// <summary>
+        /// The rank ladder: what each rung asks for, what it is permanently worth, and what it
+        /// hands over on the way past.
+        /// </summary>
+        /// <remarks>
+        /// Drawn whole rather than one rung at a time. The stars for rank ten are a month of
+        /// play, and nobody spends a month on a number they have to take on faith - the page
+        /// exists so the Valkyrie set at the top is visible from the bottom.
+        /// </remarks>
+        private float DrawRanks()
+        {
+            var y = Pad;
+            y = BackRow(y, "รางวัลระดับ Adventure", () => { view = View.Regions; Redraw(); });
+
+            for (var i = 0; i < AdventureBookState.Ranks.Count; i++)
+            {
+                var rank = i + 1;
+                var info = AdventureBookState.Ranks[i];
+                var reached = AdventureBookState.Rank >= rank;
+
+                //One line per reward, plus the two the heading takes.
+                var lines = 0;
+                if (info.Rewards != null)
+                    foreach (var reward in info.Rewards)
+                        if (reward.HasItem)
+                            lines++;
+
+                //Room for the three lines on the left as well, so a rank that pays little
+                //does not draw its bonus line off the bottom of its own card.
+                var height = Mathf.Max(TallRowHeight + 20f, 34f + lines * RewardLineHeight);
+                var card = NewCard(y, height, null);
+
+                //Said on the rank's own line rather than off on the right, because the right
+                //of this card is the reward column and a word placed there lands on an icon.
+                Label(card, reached ? $"ระดับ {rank}   ได้แล้ว" : $"ระดับ {rank}", 12f, -8f, 200f,
+                    ModernUiTheme.SizeBody, reached ? DoneColor : ModernUiTheme.NameColor);
+                Label(card, rank >= AdventureBookState.Ranks.Count
+                        ? $"ดาว {info.Stars:N0} และครบทุกเมือง"
+                        : $"ดาว {info.Stars:N0}",
+                    12f, -30f, 220f, ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
+
+                Label(card, BonusText(info), 12f, -50f, RewardColumn - 24f,
+                    ModernUiTheme.SizeSmall, ModernUiTheme.AccentInkColor);
+
+                if (info.Rewards != null)
+                {
+                    var line = 0;
+                    foreach (var reward in info.Rewards)
+                    {
+                        if (!reward.HasItem)
+                            continue;
+                        DrawRewardLine(card, reward, 10f + line * RewardLineHeight);
+                        line++;
+                    }
+                }
+
+                y += height + RowGap;
+            }
+
+            return y + Pad;
+        }
+
+        /// <summary>What a rank is permanently worth, skipping whatever it is not worth yet.</summary>
+        private static string BonusText(AdventureBookRankInfo info)
+        {
+            var parts = new List<string>(4);
+            if (info.StatBonus > 0) parts.Add($"สเตตัสทุกช่อง +{info.StatBonus}");
+            if (info.DropPercent > 0) parts.Add($"ดรอป +{info.DropPercent}%");
+            if (info.ExpPercent > 0) parts.Add($"EXP +{info.ExpPercent}%");
+            if (info.RefinePercent > 0) parts.Add($"ตีบวก +{info.RefinePercent}%");
+
+            return parts.Count == 0 ? "" : string.Join("  ·  ", parts);
+        }
+
+        /// <summary>
         /// What the book is for, in the window rather than in a wiki nobody has written.
         /// </summary>
         private float DrawHelp()
@@ -503,7 +634,7 @@ namespace Assets.Scripts.UI.AdventureBook
             y = HelpLine(y, "รางวัลประจำเมือง",
                 "ทำครบทุกหน้าในเมืองนั้น ได้หมวกที่หาจากที่อื่นไม่ได้เลยสักทาง");
             y = HelpLine(y, "Adventure Rank",
-                "สะสมดาวรวมทั้งเล่ม เพิ่มสเตตัส อัตราดรอป EXP และอัตราตีบวกแบบถาวร");
+                "สะสมดาวรวมทั้งเล่ม เพิ่มสเตตัส อัตราดรอป EXP และอัตราตีบวกแบบถาวร ทุกระดับมีของรางวัลให้ด้วย");
             y = HelpLine(y, "วาร์ปไปที่แมพ",
                 "ได้ดาว 1 ของมอนตัวไหนแล้ว วาร์ปไปหามันได้จากในสมุด เสีย Zeny ตามระดับ พอถึง Rank 5 ฟรี");
             y = HelpLine(y, "พิมพ์ในแชทก็ได้",

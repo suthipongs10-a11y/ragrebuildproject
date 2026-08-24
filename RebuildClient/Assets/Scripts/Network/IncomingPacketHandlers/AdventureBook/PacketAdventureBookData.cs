@@ -49,6 +49,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
             AdventureBookState.Stars = msg.ReadInt16();
             AdventureBookState.StarTotal = msg.ReadInt16();
             AdventureBookState.StarsForNextRank = msg.ReadInt16();
+            AdventureBookState.StarsAtRank = msg.ReadInt16();
 
             var regionCount = msg.ReadByte();
             for (var i = 0; i < regionCount; i++)
@@ -70,6 +71,20 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
                     Hunt = ReadRewards(msg),
                     HuntLarge = ReadRewards(msg),
                     Card = ReadRewards(msg)
+                });
+            }
+
+            var rankCount = msg.ReadByte();
+            for (var i = 0; i < rankCount; i++)
+            {
+                AdventureBookState.Ranks.Add(new AdventureBookRankInfo
+                {
+                    Stars = msg.ReadInt16(),
+                    StatBonus = msg.ReadByte(),
+                    DropPercent = msg.ReadByte(),
+                    ExpPercent = msg.ReadByte(),
+                    RefinePercent = msg.ReadByte(),
+                    Rewards = ReadRewards(msg)
                 });
             }
         }

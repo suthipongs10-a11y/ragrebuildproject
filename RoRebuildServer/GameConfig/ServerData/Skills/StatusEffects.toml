@@ -534,3 +534,24 @@ Type = "Buff"
 Icon = "블레싱"
 CanDisable = false
 CanDispel = false
+
+#The two consumables the game has always listed and never let anybody use: Battle Manual
+#and Bubble Gum both sat in ItemEffects.txt as "OnValidate: return false", which is a stub
+#saying the item exists but does nothing. They double experience and drop rate for half an
+#hour, which is exactly what AddExpPercent and AddDropPercent were already wired for.
+#
+#No icon named on purpose. The importer only copies status_{Name}.png when a tga is named
+#here, and naming one that is not in the GRF is an import error at every startup for a
+#picture. The buff bar draws these with its placeholder and the tooltip says what they do,
+#which is the part that matters.
+[BattleManual]
+Name = "คู่มือการรบ"
+Type = "Buff"
+CanDispel = false
+CanDisable = false
+
+[BubbleGum]
+Name = "หมากฝรั่ง"
+Type = "Buff"
+CanDispel = false
+CanDisable = false

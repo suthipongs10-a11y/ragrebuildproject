@@ -87,6 +87,19 @@ namespace Assets.Scripts.Network
     }
 
     /// <summary>
+    /// One rung of the Adventure rank ladder: what it costs, what it is worth, what it pays.
+    /// </summary>
+    public struct AdventureBookRankInfo
+    {
+        public int Stars;
+        public int StatBonus;
+        public int DropPercent;
+        public int ExpPercent;
+        public int RefinePercent;
+        public List<AdventureBookReward> Rewards;
+    }
+
+    /// <summary>
     /// The adventure book as the client holds it.
     /// </summary>
     /// <remarks>
@@ -107,10 +120,16 @@ namespace Assets.Scripts.Network
 
         public static readonly List<AdventureBookRewardBand> Bands = new List<AdventureBookRewardBand>();
 
+        /// <summary>The rank ladder, index zero being rank one.</summary>
+        public static readonly List<AdventureBookRankInfo> Ranks = new List<AdventureBookRankInfo>();
+
         public static int Rank;
         public static int Stars;
         public static int StarTotal;
         public static int StarsForNextRank;
+
+        /// <summary>Where the current rank began, so the bar measures the stretch actually being walked.</summary>
+        public static int StarsAtRank;
 
         public static bool Received;
         public static int Revision;
@@ -148,6 +167,7 @@ namespace Assets.Scripts.Network
             Regions.Clear();
             PagesById.Clear();
             Bands.Clear();
+            Ranks.Clear();
             Received = false;
         }
     }

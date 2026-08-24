@@ -59,6 +59,56 @@ public static class AdventureBookRewards
     /// <summary>The most items any one star pays, so the wire format can be sized.</summary>
     public const int MaxItemsPerStar = 3;
 
+    /// <summary>
+    /// What reaching a rank pays, once, on the way up.
+    /// </summary>
+    /// <remarks>
+    /// Written out rank by rank rather than as a formula, because these are the numbers most
+    /// likely to be argued about later and a table can be argued with. Index zero is rank one.
+    ///
+    /// Battle Manual and Bubble Gum are here for a reason beyond generosity: both had sat in
+    /// the item tables since the beginning with no effect at all, and a rank reward is a
+    /// better reason to finally write one than a wishlist is.
+    /// </remarks>
+    public static readonly AdventureBookReward[][] RankRewards =
+    {
+        //1
+        new[] { Elunium(5), Oridecon(5), Manual(1), Gum(1) },
+        //2
+        new[] { Elunium(10), Oridecon(10), Manual(2), Gum(2) },
+        //3
+        new[] { Elunium(15), Oridecon(15), Manual(3), Gum(3) },
+        //4
+        new[] { Elunium(20), Oridecon(20), Manual(4), Gum(4), new AdventureBookReward("Old_Violet_Box", 3) },
+        //5
+        new[] { Elunium(30), Oridecon(30), Manual(5), Gum(5), new AdventureBookReward("Old_Violet_Box", 5) },
+        //6
+        new[] { Elunium(40), Oridecon(40), Manual(6), Gum(6), new AdventureBookReward("Old_Card_Album", 3) },
+        //7
+        new[] { Elunium(50), Oridecon(50), Manual(8), Gum(8), new AdventureBookReward("Old_Card_Album", 5) },
+        //8
+        new[] { Elunium(70), Oridecon(70), Manual(10), Gum(10), new AdventureBookReward("Old_Card_Album", 8) },
+        //9
+        new[] { Elunium(100), Oridecon(100), Manual(15), Gum(15), new AdventureBookReward("Old_Card_Album", 12) },
+        //10 - the whole point of the book
+        new[]
+        {
+            new AdventureBookReward("Valkyrian_Helm", 1),
+            new AdventureBookReward("Valkyrian_Armor", 1),
+            new AdventureBookReward("Valkyrian_Manteau", 1),
+            new AdventureBookReward("Valkyrian_Shoes", 1),
+            new AdventureBookReward("Valkyrja's_Shield", 1),
+            Elunium(150), Oridecon(150)
+        }
+    };
+
+    private static AdventureBookReward Manual(int count) => new("Battle_Manual", count);
+    private static AdventureBookReward Gum(int count) => new("Bubble_Gum", count);
+
+    /// <summary>What reaching this rank pays, or nothing when the rank pays nothing.</summary>
+    public static AdventureBookReward[] ForRank(int rank) =>
+        rank >= 1 && rank <= RankRewards.Length ? RankRewards[rank - 1] : Array.Empty<AdventureBookReward>();
+
     public static Band BandForLevel(int level)
     {
         foreach (var band in Bands)
