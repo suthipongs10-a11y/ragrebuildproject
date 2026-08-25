@@ -43,6 +43,12 @@ public static partial class CommandBuilder
         header.Write(DataManager.ItemIdByName.TryGetValue(BossLogProgress.CrownedHatCode, out var crown) ? crown : 0);
         header.Write(DataManager.ItemIdByName.TryGetValue(MvpBoxCode, out var box) ? box : 0);
 
+        //What is in the box and how often, so the window can say so rather than making
+        //somebody open a hundred to find out. The weights are sent raw and the share worked
+        //out at the other end - the table is a list of weights, not percentages, and turning
+        //it into one here would mean two places that both have to be right.
+        WriteBoxContents(header);
+
         NetworkManager.SendMessage(header, player.Connection);
 
         var batch = new List<BossLogEntry>();
@@ -68,6 +74,41 @@ public static partial class CommandBuilder
 
         if (batch.Count > 0)
             SendBossBatch(player, batch);
+    }
+
+    /// <summary>
+    /// The box's table, straight off the data it is rolled from.
+    /// </summary>
+    /// <remarks>
+    /// Read from DataManager rather than written out again, so what the window promises and
+    /// what the box gives are the same list. It is one lookup and the answer is a few hundred
+    /// bytes, which is cheaper than the two lists disagreeing once.
+    ///
+    /// The loader expands a weight into that many copies of the item id, which is exactly
+    /// what makes it easy to count back: how many times an id appears is its weight.
+    /// </remarks>
+    private static void WriteBoxContents(OutboundMessage packet)
+    {
+        if (!DataManager.ItemBoxSummonList.TryGetValue(MvpBoxCode, out var pool) || pool.Count == 0)
+        {
+            packet.Write((byte)0);
+            return;
+        }
+
+        var weights = new Dictionary<int, int>();
+        foreach (var id in pool)
+            weights[id] = weights.GetValueOrDefault(id) + 1;
+
+        var ordered = weights.OrderByDescending(kv => kv.Value).ThenBy(kv => kv.Key).ToList();
+
+        packet.Write((byte)Math.Min(ordered.Count, 60));
+        packet.Write((short)pool.Count);
+
+        for (var i = 0; i < ordered.Count && i < 60; i++)
+        {
+            packet.Write(ordered[i].Key);
+            packet.Write((short)ordered[i].Value);
+        }
     }
 
     private static void SendBossBatch(Player player, List<BossLogEntry> batch)

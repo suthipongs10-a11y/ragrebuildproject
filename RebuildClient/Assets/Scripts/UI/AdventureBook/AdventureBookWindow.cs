@@ -104,7 +104,7 @@ namespace Assets.Scripts.UI.AdventureBook
         private static readonly Color RankFillColor = new Color(0.937f, 0.478f, 0.129f);
         private static readonly Color FillColor = new Color(0.235f, 0.545f, 0.851f);
 
-        private enum View { Regions, Pages, Page, Rewards, Ranks, Status, Bosses, Help }
+        private enum View { Regions, Pages, Page, Rewards, Ranks, Status, Bosses, Box, Help }
 
         private static AdventureBookWindow instance;
 
@@ -491,6 +491,7 @@ namespace Assets.Scripts.UI.AdventureBook
                 case View.Ranks: y = DrawRanks(); break;
                 case View.Status: y = DrawStatus(); break;
                 case View.Bosses: y = DrawBosses(); break;
+                case View.Box: y = DrawBox(); break;
                 case View.Help: y = DrawHelp(); break;
             }
 
@@ -1114,8 +1115,12 @@ namespace Assets.Scripts.UI.AdventureBook
 
             //The box, and the hat inside it. Two rows rather than one because they are two
             //different things to go and get, and the hat is not this log's to hand over.
-            y = BossPrizeRow(y, AdventureBookState.BossBoxItemId, "ดรอปจาก MVP โอกาส 1% ไม่ขึ้นกับบัฟเพิ่มดรอป",
-                $"ล่า MVP แล้ว {AdventureBookState.BossMvpKills:N0} ครั้ง", false);
+            //Opens the contents rather than the item window, because what somebody wants to
+            //know about a box is what comes out of it.
+            y = BossPrizeRow(y, AdventureBookState.BossBoxItemId,
+                "ดรอปจาก MVP โอกาส 1%  ·  กดดูว่าเปิดแล้วได้อะไรบ้าง",
+                $"{AdventureBookState.BoxContents.Count} รายการ", false,
+                () => { view = View.Box; Redraw(); });
 
             y = BossPrizeRow(y, AdventureBookState.BossCrownedHatId, "อยู่ในกล่อง MVP  ·  ไม่มีทางอื่นในเกมนี้",
                 "ต้องเปิดกล่องเอา", false);
@@ -1137,10 +1142,10 @@ namespace Assets.Scripts.UI.AdventureBook
             return y + Pad;
         }
 
-        private float BossPrizeRow(float y, int itemId, string what, string state, bool done)
+        private float BossPrizeRow(float y, int itemId, string what, string state, bool done,
+            System.Action onClick = null)
         {
-            System.Action onClick = null;
-            if (itemId > 0)
+            if (onClick == null && itemId > 0)
                 onClick = () => ShowItem(itemId);
 
             var card = NewCard(y, TallRowHeight, onClick);
@@ -1156,6 +1161,62 @@ namespace Assets.Scripts.UI.AdventureBook
                 done ? DoneColor : ModernUiTheme.MutedColor);
 
             return y + TallRowHeight + RowGap;
+        }
+
+        /// <summary>
+        /// What comes out of the MVP box, and how often.
+        /// </summary>
+        /// <remarks>
+        /// The odds are worked out here from the weights the server sent rather than sent as
+        /// percentages, because the table the box is rolled from is a list of weights and a
+        /// percentage computed anywhere else is a second number that has to stay right.
+        ///
+        /// Sorted by weight, so the thing somebody is actually hoping for is at the bottom
+        /// where the last line of a list is read.
+        /// </remarks>
+        private float DrawBox()
+        {
+            var y = Pad;
+            y = BackRow(y, ItemName(AdventureBookState.BossBoxItemId), () => { view = View.Bosses; Redraw(); });
+
+            var note = NewCard(y, TallRowHeight, null);
+            Label(note, "เปิดได้ 1 ชิ้นต่อกล่อง สุ่มตามอัตราด้านล่าง", 12f, -8f, RowWidth - 24f,
+                ModernUiTheme.SizeBody, ModernUiTheme.NameColor);
+            Label(note, "ทุกชิ้นในกล่องนี้ ไม่มีมอนตัวไหนดรอปและไม่มี NPC ตัวไหนขาย", 12f, -30f,
+                RowWidth - 24f, ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
+            y += TallRowHeight + RowGap;
+
+            var total = AdventureBookState.BoxWeightTotal;
+            if (total <= 0)
+                return y + Pad;
+
+            //Rarest last. The list is sent commonest first and read the other way round.
+            for (var i = AdventureBookState.BoxContents.Count - 1; i >= 0; i--)
+                y = BoxRow(y, AdventureBookState.BoxContents[i], total);
+
+            return y + Pad;
+        }
+
+        private float BoxRow(float y, BoxEntry entry, int total)
+        {
+            var id = entry.ItemId;
+            var card = NewCard(y, RowHeight, () => ShowItem(id));
+
+            var drawn = DrawItemIcon(card, id, new Vector2(10f, -(RowHeight - RewardIconSize) / 2f));
+            var left = drawn ? 10f + RewardIconSize + 10f : 12f;
+
+            var share = entry.Weight * 100f / total;
+            Label(card, ItemName(id), left, -(RowHeight - 20f) / 2f, RewardColumn - left,
+                ModernUiTheme.SizeBody,
+                share < 10f ? DoneColor : ModernUiTheme.NameColor);
+
+            //Two decimals below one percent, because "0%" beside the thing everybody wants
+            //reads as impossible rather than as rare.
+            Value(card, share < 1f ? $"{share:0.00}%" : $"{share:0.#}%",
+                -12f, -(RowHeight - 20f) / 2f, 120f,
+                share < 10f ? DoneColor : ModernUiTheme.MutedColor);
+
+            return y + RowHeight + RowGap;
         }
 
         private float BossRow(float y, BossLogPage boss)

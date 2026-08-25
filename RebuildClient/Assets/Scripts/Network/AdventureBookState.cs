@@ -86,6 +86,13 @@ namespace Assets.Scripts.Network
         public List<AdventureBookReward> Card;
     }
 
+    /// <summary>One thing the MVP box can give, and how often relative to the rest.</summary>
+    public struct BoxEntry
+    {
+        public int ItemId;
+        public int Weight;
+    }
+
     /// <summary>One boss in the hunter's log, and whether this character has met it.</summary>
     public class BossLogPage
     {
@@ -151,6 +158,10 @@ namespace Assets.Scripts.Network
         /// <summary>The box the slotted hat comes out of, which is not the log's to give.</summary>
         public static int BossBoxItemId;
 
+        /// <summary>What the MVP box holds, commonest first, and the weights added up.</summary>
+        public static readonly List<BoxEntry> BoxContents = new List<BoxEntry>();
+        public static int BoxWeightTotal;
+
         /// <summary>Whether the log arrived at all. It is a separate switch on the server.</summary>
         public static bool HasBossLog;
 
@@ -214,6 +225,8 @@ namespace Assets.Scripts.Network
         {
             Bosses.Clear();
             BossesById.Clear();
+            BoxContents.Clear();
+            BoxWeightTotal = 0;
             HasBossLog = false;
         }
     }

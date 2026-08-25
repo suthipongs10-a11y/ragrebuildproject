@@ -391,7 +391,7 @@ Id,Code,Name,Defense,MagicDef,Slot,Price,Weight,Type,Position,Property,MinLvl,Eq
 5018,Feather_Bonnet,Feather Bonnet,4,0,0,20,300,Headgear,Top,,0,ArcherGroup,Yes,Yes,깃털모자,깃털모자
 5019,Corsair,Corsair,5,0,0,20,500,Headgear,Top,,0,AllExceptNovice,Yes,Yes,커세어,커세어
 5021,Grief_for_Greed,Grief for Greed,4,0,0,20,1200,Headgear,Top,,38,Merchant,Yes,Yes,돈잃은자의마음,돈잃은자의마음
-5022,Hat_of_the_Sun_God,Hat of the Sun God,4,0,0,20,2400,Headgear,TopMid,,55,AllExceptNovice,Yes,Yes,태양신의모자,태양신의모자
+5022,Hat_of_the_Sun_God,Hat of the Sun God,4,0,0,20,2400,Headgear,TopMid,,55,AllJobs,Yes,Yes,태양신의모자,태양신의모자
 5023,Parcel_Hat,Parcel Hat,0,0,0,20,1000,Headgear,Top,,0,Merchant,Yes,Yes,보따리모,보따리모
 5024,Cake_Hat,Cake Hat,1,0,0,20,1000,Headgear,Top,,0,AllJobs,Yes,Yes,케이크모자,케이크모자
 5025,Helm_of_Angel,Helm of Angel,5,3,0,20,1600,Headgear,Top,,74,SecondJob,Yes,Yes,천사의투구,천사의투구
@@ -541,7 +541,7 @@ Id,Code,Name,Defense,MagicDef,Slot,Price,Weight,Type,Position,Property,MinLvl,Eq
 5349,Boy's_Cap_,Boy's Cap,2,0,1,20,100,Headgear,Top,,0,AllExceptNovice,Yes,Yes,학생모,학생모
 5350,Pirate_Bandana_,Pirate Bandana,3,0,1,20,100,Headgear,Top,,0,AllExceptNovice,Yes,Yes,해적두건,해적두건
 5351,Sunflower_,Sunflower,1,0,1,20,100,Headgear,Top,,0,AllJobs,No,Yes,장식용해바라기,장식용해바라기
-5353,Hat_of_the_Sun_God_,Hat of the Sun God,4,0,1,20,2400,Headgear,TopMid,,0,SecondJob,Yes,Yes,태양신의모자,태양신의모자
+5353,Hat_of_the_Sun_God_,Hat of the Sun God,4,0,1,20,2400,Headgear,TopMid,,0,AllJobs,Yes,Yes,태양신의모자,태양신의모자
 5374,Gigantic_Majestic_Goat,Gigantic Majestic Goat,5,0,0,20,800,Headgear,Top,,0,AllJobs,Yes,Yes,대형마제스틱고우트,대형마제스틱고우트
 5398,Bone_Head,Bone Head,5,5,1,20,1200,Headgear,Top,,85,JC_089,Yes,No,본헤드,본헤드
 5399,Mandragora_Cap,Mandragora Cap,1,0,1,20,300,Headgear,Top,,85,Trans2ndJob,No,Yes,만드라고라캡,만드라고라캡

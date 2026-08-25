@@ -114,6 +114,17 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.AdventureBook
             AdventureBookState.BossCrownedHatId = msg.ReadInt32();
             AdventureBookState.BossBoxItemId = msg.ReadInt32();
 
+            var contents = msg.ReadByte();
+            AdventureBookState.BoxWeightTotal = contents > 0 ? msg.ReadInt16() : 0;
+            for (var i = 0; i < contents; i++)
+            {
+                AdventureBookState.BoxContents.Add(new BoxEntry
+                {
+                    ItemId = msg.ReadInt32(),
+                    Weight = msg.ReadInt16()
+                });
+            }
+
             AdventureBookState.HasBossLog = true;
         }
 
