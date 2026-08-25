@@ -57,6 +57,19 @@ public partial class CombatEntity : IEntityAutoReset
     public bool GodMode; //for safety's sake, god mode isn't available outside of debug builds
 #endif
 
+    /// <summary>
+    /// Every hit this character lands on a monster kills it outright. Admin only, switched
+    /// on by typing !onehit, never saved and never on by default.
+    /// </summary>
+    /// <remarks>
+    /// For testing everything that hangs off a monster dying - the drop, the adventure book
+    /// page, the boss log, the announcement, the item appearing in the bag. All of that runs
+    /// exactly as it does in play; the only thing skipped is the twenty minutes of grinding
+    /// a boss down first. Deliberately not GodMode's twin: this is available in release
+    /// builds too, because a live server also gets tested, and IsAdmin is the guard.
+    /// </remarks>
+    public bool OneHitKill;
+
     public float GetTiming(TimingStat type) => timingData[(int)type];
     public void SetTiming(TimingStat type, float val) => timingData[(int)type] = val;
 
@@ -109,6 +122,7 @@ public partial class CombatEntity : IEntityAutoReset
 #if DEBUG
         GodMode = false;
 #endif
+        OneHitKill = false;
 
         //Array.Copy(statResetData, statData, statData.Length);
 

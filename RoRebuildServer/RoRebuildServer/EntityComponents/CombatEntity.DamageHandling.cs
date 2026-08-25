@@ -813,6 +813,14 @@ public partial class CombatEntity
 
 #endif
 
+        //The other half of a test: something that dies on command. Only a monster, only from
+        //an admin who asked for it, and only when the blow landed at all - a miss stays a
+        //miss so the attack still has to connect. Everything after this line is the ordinary
+        //death: drops, experience, kill credit, the book, the announcements.
+        if (damage > 0 && Character.Type == CharacterType.Monster
+                       && di.Source.TryGet<CombatEntity>(out var attackerEntity) && attackerEntity.OneHitKill)
+            damage = hp;
+
         hp -= damage;
 
 
