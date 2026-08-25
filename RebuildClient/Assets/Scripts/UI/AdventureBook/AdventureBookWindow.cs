@@ -49,16 +49,27 @@ namespace Assets.Scripts.UI.AdventureBook
         private const float RankBarHeight = 20f;
 
         /// <summary>
-        /// How the character in the title bar is scaled and shifted to sit in its badge.
+        /// How the character in the title bar is scaled and shifted, so the badge holds a face
+        /// rather than a whole person.
         /// </summary>
         /// <remarks>
-        /// Set by eye rather than measured, because what a player sprite measures depends on
-        /// the job and the hat. These are the two numbers to nudge if the badge shows a chest
-        /// instead of a face: the scale makes the character bigger or smaller, and the drop
-        /// slides it down so the head is what the badge is looking at.
+        /// A player sprite is drawn upward from its feet - that is where its anchor is - and
+        /// stands roughly a hundred and ten pixels tall at scale one, of which the head is the
+        /// top four tenths. So to put a head in a forty four pixel badge: scale it until the
+        /// head alone is about that tall, then push the feet down by however far the head then
+        /// sits above them.
+        ///
+        ///     head height  = 110 * 0.4 * scale        44 wants a scale of about 1
+        ///     drop         = -110 * 0.8 * scale       which is where the head's middle is
+        ///
+        /// The first attempt used 0.42 and showed the whole character, which is the same
+        /// picture the equipment window already gives and unreadable at this size.
+        ///
+        /// Still the two numbers to nudge. Bigger scale zooms in; more negative drop slides
+        /// the character down, so the badge looks further up it.
         /// </remarks>
-        private const float PortraitScale = 0.42f;
-        private const float PortraitDrop = -26f;
+        private const float PortraitScale = 1f;
+        private const float PortraitDrop = -88f;
         private const float PortraitBadgeSize = 44f;
         private const float RowHeight = 44f;
         private const float TallRowHeight = 56f;
