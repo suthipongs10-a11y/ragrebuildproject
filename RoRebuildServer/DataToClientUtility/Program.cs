@@ -1002,14 +1002,22 @@ class Program
         weaponClasses = classes;
 
         //job list
+        //Kept alongside the client data because the skill tree export below needs the job
+        //level cap to work out how many points a job earns, and PlayerClassData does not
+        //carry it - the client has no other use for the number.
+        var maxJobLevelByClass = new Dictionary<int, int>();
         var jobs = ConvertToClient<CsvJobs, PlayerClassData>("Jobs.csv", "playerclass.json",
-            jobs => jobs.Select(j => new PlayerClassData()
+            jobs => jobs.Select(j =>
             {
-                Id = j.Id,
-                Name = j.Class,
-                SpriteFemale = j.SpriteFemale,
-                SpriteMale = j.SpriteMale,
-                ExpChart = j.ExpChart
+                maxJobLevelByClass[j.Id] = j.MaxJobLevel;
+                return new PlayerClassData()
+                {
+                    Id = j.Id,
+                    Name = j.Class,
+                    SpriteFemale = j.SpriteFemale,
+                    SpriteMale = j.SpriteMale,
+                    ExpChart = j.ExpChart
+                };
             }).ToList()
         );
 
@@ -1183,6 +1191,24 @@ class Program
                 }
 
             skillTreeOut.Add(entry);
+        }
+
+        //Mirror of the same sum the server does when it loads the tree: every job below this
+        //one hands down (its job level cap - 1) skill points, and the server will not let a
+        //point be spent on this tier until that many have already been spent. Sent to the
+        //client so the skill window can say so instead of just hiding the button.
+        var treeByClass = skillTreeOut.ToDictionary(t => t.ClassId);
+        foreach (var tree in skillTreeOut)
+        {
+            var points = 0;
+            var parent = tree.ExtendsClass;
+            while (parent >= 0 && treeByClass.TryGetValue(parent, out var parentTree))
+            {
+                points += maxJobLevelByClass.TryGetValue(parent, out var cap) ? cap - 1 : 0;
+                parent = parentTree.ExtendsClass;
+            }
+
+            tree.PrereqSkillPoints = points;
         }
 
         SaveToClient("skilltree.json", skillTreeOut);

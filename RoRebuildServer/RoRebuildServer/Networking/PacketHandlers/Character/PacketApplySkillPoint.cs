@@ -36,7 +36,11 @@ namespace RoRebuildServer.Networking.PacketHandlers.Character
             }
 
             if (player.JobSkillTree == null)
+            {
+                //Used to return without a word, which reads to the player as a dead button.
+                CommandBuilder.ErrorMessage(player, "อาชีพนี้ยังไม่มีผังสกิล ใช้แต้มสกิลไม่ได้");
                 return;
+            }
 
             if (player.JobSkillTree.JobRank > 0)
             {
@@ -48,11 +52,16 @@ namespace RoRebuildServer.Networking.PacketHandlers.Character
                 while (!targetTree.SkillTree.ContainsKey(skillId) && targetTree.Parent != null)
                     targetTree = targetTree.Parent;
 
-                var targetRank = targetTree.JobRank;
-                var minUsedPoints = 9 + (targetRank - 1) * 49;
+                //Read off the tree instead of worked out from the rank. The line here used to be
+                //9 + (rank - 1) * 49, which is only right while the novice caps at job 10 and every
+                //first job at job 50. DataLoader already sums (max job level - 1) up the parent
+                //chain into PrereqSkillPoints, and that is the same number the player was handed,
+                //so the gate now moves with Jobs.csv instead of drifting away from it.
+                var minUsedPoints = targetTree.PrereqSkillPoints;
                 if (skillPointsUsed < minUsedPoints)
                 {
-                    CommandBuilder.ErrorMessage(player, "You must apply skill points earned as a previous job before applying points in this skill.");
+                    CommandBuilder.ErrorMessage(player,
+                        $"ต้องใช้แต้มสกิลของอาชีพก่อนหน้าให้ครบ {minUsedPoints} แต้มก่อน จึงจะลงสกิลนี้ได้ (ตอนนี้ใช้ไป {skillPointsUsed} แต้ม)");
                     return;
                 }
             }

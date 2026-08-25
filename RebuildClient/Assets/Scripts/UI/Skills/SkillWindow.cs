@@ -43,6 +43,13 @@ namespace Assets.Scripts.UI
         private float tooltipWidth;
         private string tooltipTextTemplate;
         private int selectedRank;
+
+        //The server refuses a skill point on a job tier until every point the jobs below it
+        //handed down has already been spent. The window had no idea that rule existed, so a
+        //second job's skills simply sat there doing nothing when clicked. Kept per rank so
+        //the same number can grey the button and be named in the tooltip.
+        private readonly Dictionary<int, int> rankPrereqPoints = new();
+        private int spentSkillPoints;
         private int maxRank;
         private StringBuilder tooltipBuilder = new();
 
@@ -94,6 +101,11 @@ namespace Assets.Scripts.UI
                 }
             }
             
+            //A skill can also be held back by the point gate rather than by a missing skill, and
+            //that one showed nowhere at all - the button was simply absent with no reason given.
+            if (IsRankLocked(entry.SkillRank))
+                tooltipBuilder.Append($"\n<color=#FF4444>ต้องลงแต้มสกิลอาชีพก่อนหน้าให้ครบ {RequiredSpentForRank(entry.SkillRank)} แต้มก่อน (ตอนนี้ลงไป {spentSkillPoints})</color>");
+
             if(!string.IsNullOrWhiteSpace(data.DescEn))
             tooltipBuilder.Append($"\n<line-height=5>\n</line-height>{data.DescEn}");
 
@@ -182,6 +194,10 @@ namespace Assets.Scripts.UI
                 else
                     Entries[i].UpdateLevel(entry.MaxLevel, hasPrereqs);
             }
+
+            //Spending a point can be the one that opens the next tier, so the gate is worked
+            //out again here rather than left until the window is next rebuilt.
+            UpdateSkillPointsAndLock();
         }
         
         public SkillWindowEntry AddSkillToSkillWindow(CharacterSkill skill, int currentLevel, int rank, bool meetsPrereqs, SkillWindowEntry existing = null)
@@ -332,6 +348,7 @@ namespace Assets.Scripts.UI
             Initialize();
             HighlightedEntry = null; //safety first
             activeSkills.Clear();
+            rankPrereqPoints.Clear();
             maxRank = 0;
             var curTab = selectedRank;
             
@@ -364,11 +381,13 @@ namespace Assets.Scripts.UI
             Entries.Clear();
             existingEntries = oldEntries.Count;
 
+            rankPrereqPoints[tree.JobRank] = tree.PrereqSkillPoints;
             PopulateSkillTreeCategory(tree.Skills, tree.JobRank, state);
             
             while (tree.ExtendsClass >= 0)
             {
                 tree = ClientDataLoader.Instance.GetSkillTree(tree.ExtendsClass);
+                rankPrereqPoints[tree.JobRank] = tree.PrereqSkillPoints;
                 PopulateSkillTreeCategory(tree.Skills, tree.JobRank, state);
             }
             
@@ -394,12 +413,27 @@ namespace Assets.Scripts.UI
         {
             var points = PlayerState.Instance.SkillPoints; 
             
+            spentSkillPoints = 0;
+            if (PlayerState.Instance.KnownSkills != null)
+            {
+                foreach (var known in PlayerState.Instance.KnownSkills)
+                    spentSkillPoints += known.Value;
+            }
+
             PointsText.text = $"แต้มสกิล {points}";
             for (var i = 0; i < Entries.Count; i++)
             {
-                Entries[i].UpdateLevelUpButton(points > 0, !lockSkillLevelUp);
+                var entry = Entries[i];
+                entry.UpdateLevelUpButton(points > 0, !lockSkillLevelUp && !IsRankLocked(entry.SkillRank));
             }
         }
+
+        //How many points must already be spent before this tier accepts one, matching the sum
+        //the server does over the job's ancestors. Rank 0 and the unranked tab are never gated.
+        public int RequiredSpentForRank(int rank) =>
+            rank > 0 && rankPrereqPoints.TryGetValue(rank, out var needed) ? needed : 0;
+
+        public bool IsRankLocked(int rank) => RequiredSpentForRank(rank) > spentSkillPoints;
 
         public void RefreshSkillAvailability() => UpdateSkillPointsAndLock();
 
