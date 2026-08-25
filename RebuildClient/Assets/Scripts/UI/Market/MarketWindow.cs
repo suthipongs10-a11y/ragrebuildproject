@@ -624,7 +624,7 @@ namespace Assets.Scripts.UI.Market
                     MarketState.BrowseSearch = text == null ? "" : text.Trim();
                     MarketState.BrowsePage = 0;
                     Ask();
-                });
+                }, "ค้นหาของประมูล", ModernUiIcons.Magnifier);
         }
 
         private void DrawMine()
@@ -1041,6 +1041,16 @@ namespace Assets.Scripts.UI.Market
                 leading ? WinningColor : ModernUiTheme.MutedColor, 12f);
         }
 
+        /// <summary>
+        /// Asks for the figure, then asks again whether that is really the figure.
+        /// </summary>
+        /// <remarks>
+        /// The second question is not politeness. The whole amount leaves the purse the
+        /// instant the bid lands - AuctionHouse.Bid calls DropZeny before the request is
+        /// even queued - and there is no taking a bid back. One stray zero on a number
+        /// typed in a hurry is a fortune gone until somebody outbids it, and if nobody
+        /// does, gone for good in exchange for whatever was on offer.
+        /// </remarks>
         private void AskForBid(AuctionEntry entry)
         {
             var minimum = entry.MinimumBid;
@@ -1061,8 +1071,27 @@ namespace Assets.Scripts.UI.Market
                         return;
                     }
 
-                    NetworkManager.Instance.SendAuctionAction(AuctionRequestType.Bid, entry.Id, amount);
-                });
+                    ConfirmBid(entry, amount);
+                }, "บิดประมูล", ModernUiIcons.Coin);
+        }
+
+        private void ConfirmBid(AuctionEntry entry, int amount)
+        {
+            var data = ClientDataLoader.Instance != null
+                ? ClientDataLoader.Instance.GetItemById(entry.Item.ItemId)
+                : null;
+
+            //The full label rather than the plain name, so a bid on a +7 with cards in it
+            //says so. That is most of what the figure is being weighed against.
+            var name = ItemLabel(entry.Item, data);
+
+            Confirm($"บิด <b>{name}</b>\n\n"
+                    + $"<size=+6><b>{amount:N0}</b></size> Zeny\n\n"
+                    + "หัก Zeny ออกจากกระเป๋าทันทีที่กด ตกลง\n"
+                    + "ถ้ามีคนบิดสูงกว่า จะได้เงินคืนทางกล่องพัสดุ\n"
+                    + "<color=#B23A2E>ถอนการบิดเองไม่ได้</color>",
+                () => NetworkManager.Instance.SendAuctionAction(AuctionRequestType.Bid, entry.Id, amount),
+                "ยืนยันการบิด", ModernUiIcons.Coin);
         }
 
         // =====================================================================
@@ -1107,7 +1136,7 @@ namespace Assets.Scripts.UI.Market
                         MarketState.BuySearch = text == null ? "" : text.Trim();
                         MarketState.BuyPage = 0;
                         Ask();
-                    }));
+                    }, "ค้นหาคำสั่งซื้อ", ModernUiIcons.Magnifier));
 
             BuildBuyPager();
 
@@ -1248,7 +1277,8 @@ namespace Assets.Scripts.UI.Market
                       + $"คืนมัดจำ {refund:N0} Zeny\nค่าธรรมเนียมตอนตั้งไม่คืน";
 
                 collect.onClick.AddListener(() =>
-                    Confirm(question, () => NetworkManager.Instance.SendBuyOrderCancel(id)));
+                    Confirm(question, () => NetworkManager.Instance.SendBuyOrderCancel(id),
+                        "ปิดคำสั่งซื้อ", ModernUiIcons.Alert));
                 return;
             }
 
@@ -1414,7 +1444,7 @@ namespace Assets.Scripts.UI.Market
                         wanted = most;
 
                     NetworkManager.Instance.SendBuyOrderSell(order.Id, bagId, wanted);
-                });
+                }, "ขายเข้าคำสั่งซื้อ", ModernUiIcons.Bag);
         }
 
         // =====================================================================
@@ -1476,7 +1506,7 @@ namespace Assets.Scripts.UI.Market
 
                     posting = BuyStage.PickingItem;
                     Redraw();
-                });
+                }, "ตั้งรับซื้อ", ModernUiIcons.Magnifier);
         }
 
         private void DrawWantPicker()
@@ -1573,7 +1603,7 @@ namespace Assets.Scripts.UI.Market
                     }
 
                     AskWantPrice(item, count);
-                });
+                }, "ตั้งรับซื้อ", ModernUiIcons.Bag);
         }
 
         private void AskWantPrice(RebuildSharedData.ClientTypes.ItemData item, int count)
@@ -1592,17 +1622,18 @@ namespace Assets.Scripts.UI.Market
                     //a thing called an offer.
                     var held = (long)price * count;
                     var fee = held * BuyOrderFeePercent / 100;
-                    Confirm($"รับซื้อ {item.Name} {count:N0} ชิ้น ชิ้นละ {price:N0} Zeny\n\n"
-                            + $"หักตอนนี้ {held + fee:N0} Zeny\n"
-                            + $"(มัดจำ {held:N0} + ค่าธรรมเนียม {fee:N0})\n\n"
-                            + "มัดจำที่เหลือคืนเมื่อยกเลิกหรือหมดอายุ ค่าธรรมเนียมไม่คืน",
+                    Confirm($"รับซื้อ <b>{item.Name}</b> {count:N0} ชิ้น  ชิ้นละ {price:N0} Zeny\n\n"
+                            + $"หักตอนนี้ <size=+6><b>{held + fee:N0}</b></size> Zeny\n"
+                            + $"<size=-2>มัดจำ {held:N0}  +  ค่าธรรมเนียม {fee:N0}</size>\n\n"
+                            + "มัดจำที่เหลือคืนเมื่อยกเลิกหรือหมดอายุ\n"
+                            + "<color=#B23A2E>ค่าธรรมเนียมไม่คืน</color>",
                         () =>
                         {
                             NetworkManager.Instance.SendBuyOrderCreate(item.Id, count, price);
                             posting = BuyStage.NotPosting;
                             Redraw();
-                        });
-                });
+                        }, "ยืนยันการตั้งรับซื้อ", ModernUiIcons.Coin);
+                }, "ตั้งรับซื้อ", ModernUiIcons.Coin);
         }
 
         // =====================================================================
@@ -1714,7 +1745,7 @@ namespace Assets.Scripts.UI.Market
                         wanted = available;
 
                     PromptPrice(bagId, wanted, itemName);
-                });
+                }, "ตั้งประมูล", ModernUiIcons.Bag);
         }
 
         private void PromptPrice(int bagId, int count, string itemName)
@@ -1734,7 +1765,7 @@ namespace Assets.Scripts.UI.Market
                     pendingName = itemName;
                     selling = SellStage.PickingDuration;
                     Redraw();
-                });
+                }, "ตั้งประมูล", ModernUiIcons.Coin);
         }
 
         private void DrawDurationPicker()
@@ -1969,7 +2000,7 @@ namespace Assets.Scripts.UI.Market
         /// Posting an order is the case that needs it: the whole total leaves the purse
         /// immediately, which is not what anybody expects from a thing called an offer.
         /// </summary>
-        private static void Confirm(string question, Action onYes)
+        private static void Confirm(string question, Action onYes, string title = null, Sprite icon = null)
         {
             var ui = UiManager.Instance;
             if (ui == null || ui.YesNoOptionsWindow == null)
@@ -1978,7 +2009,8 @@ namespace Assets.Scripts.UI.Market
                 return;
             }
 
-            ui.YesNoOptionsWindow.BeginPrompt(question, "ตกลง", "ยกเลิก", onYes, null, false);
+            ui.YesNoOptionsWindow.BeginPrompt(question, "ตกลง", "ยกเลิก", onYes, null, false, true,
+                title ?? "ยืนยัน", icon ?? ModernUiIcons.Alert);
         }
 
         /// <summary>The item's own icon at the left of a row, when the client has one.</summary>

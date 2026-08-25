@@ -320,7 +320,8 @@ namespace Assets.Scripts.UI.Guild
                 return;
             }
 
-            ui.YesNoOptionsWindow.BeginPrompt(question, "ตกลง", "ยกเลิก", onYes, null, false);
+            ui.YesNoOptionsWindow.BeginPrompt(question, "ตกลง", "ยกเลิก", onYes, null, false, true,
+                "กิลด์", ModernUiIcons.Shield);
         }
 
         /// <summary>

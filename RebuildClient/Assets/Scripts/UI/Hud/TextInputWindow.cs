@@ -29,10 +29,16 @@ namespace Assets.Scripts.UI.Hud
             onSubmitAction = null;
         }
 
-        public void BeginTextInput(string description, Action<string> onSubmit)
+        /// <summary>
+        /// Asks for one line of text. The last two name the band along the top - "ตั้งราคา"
+        /// over a price, "บิด" over a bid - and fall back to the box's own wording when left
+        /// out, so every existing caller reads as it always did.
+        /// </summary>
+        public void BeginTextInput(string description, Action<string> onSubmit, string title = null, Sprite icon = null)
         {
             generation++;
             gameObject.SetActive(true);
+            ModernPromptSkin.SetHeader(gameObject, title, icon);
             onSubmitAction = onSubmit;
             transform.SetAsLastSibling();
             TextTitle.text = description;

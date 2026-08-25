@@ -419,7 +419,7 @@ namespace Assets.Scripts.UI.Trading
                     }
 
                     NetworkManager.Instance.SendTradeAction(TradeAction.SetZeny, amount);
-                });
+                }, "ใส่เงินลงกระดาน", ModernUiIcons.Coin);
         }
 
         /// <summary>

@@ -53,6 +53,8 @@ namespace Assets.Scripts.UI
         public static Sprite Check => Get("Check", CheckShape);
         public static Sprite ChevronLeft => Get("ChevronLeft", ChevronLeftShape);
         public static Sprite ChevronRight => Get("ChevronRight", ChevronRightShape);
+        public static Sprite Alert => Get("Alert", AlertShape);
+        public static Sprite Pencil => Get("Pencil", PencilShape);
 
         //---------------------------------------------------------------- system menu
         public static Sprite Home => Get("Home", HomeShape);
@@ -378,6 +380,26 @@ namespace Assets.Scripts.UI
         }
 
         //---------------------------------------------------------------- primitives
+
+        //An exclamation inside a ring. The one picture a confirmation actually wants, and
+        //one of the few that still reads at seventeen points, where a drawn hand or face
+        //turns into three grey smudges.
+        private static float AlertShape(Vector2 p)
+        {
+            var ring = RingBand(p, new Vector2(0.5f, 0.5f), 0.355f, 0.055f);
+            var stem = Box(p, new Vector2(0.5f, 0.575f), new Vector2(0.048f, 0.15f), 0.045f);
+            var dot = Circle(p, new Vector2(0.5f, 0.335f), 0.055f);
+            return Mathf.Min(ring, Mathf.Min(stem, dot));
+        }
+
+        //Corner to corner rather than upright, because a pencil standing straight up is a
+        //stick; the slant is most of what says which object this is.
+        private static float PencilShape(Vector2 p)
+        {
+            var barrel = Segment(p, new Vector2(0.36f, 0.36f), new Vector2(0.74f, 0.74f), 0.085f);
+            var tip = Convex3(p, new Vector2(0.16f, 0.16f), new Vector2(0.42f, 0.22f), new Vector2(0.22f, 0.42f));
+            return Mathf.Min(barrel, tip);
+        }
 
         private static float Circle(Vector2 p, Vector2 center, float radius)
         {

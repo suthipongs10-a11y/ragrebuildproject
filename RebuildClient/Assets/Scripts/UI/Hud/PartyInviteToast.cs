@@ -20,8 +20,9 @@ namespace Assets.Scripts.UI.Hud
         {
             var promptWindow = UiManager.Instance.YesNoOptionsWindow;
             
-            promptWindow.BeginPrompt($"<color=#007700>{LeaderName}</color> has invited you to join their party '<color=#000077>{PartyName}</color>'.\nWould you like to accept?",
-                "Accept", "Decline", AcceptPartyInvite, DeclinePartyInvite, false);
+            promptWindow.BeginPrompt($"<color=#1B6E3C>{LeaderName}</color> ชวนคุณเข้าปาร์ตี้ '<color=#2A56A8>{PartyName}</color>'\nเข้าร่วมไหม",
+                "เข้าร่วม", "ปฏิเสธ", AcceptPartyInvite, DeclinePartyInvite, false, true,
+                "คำเชิญเข้าปาร์ตี้", ModernUiIcons.Person);
         }
 
         private void AcceptPartyInvite()

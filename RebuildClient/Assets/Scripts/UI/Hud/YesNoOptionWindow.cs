@@ -33,8 +33,16 @@ namespace Assets.Scripts.UI.Hud
             HideWindow();
         }
 
-        public void BeginPrompt(string description, string yesText, string noText, Action onYes, Action onNo, bool runNoActionOnHide, bool playClickSound = true)
+        /// <summary>
+        /// Asks the question. The last two say what the band along the top reads, which is
+        /// how a bid is told apart from a party invite before the sentence itself is; left
+        /// out, it falls back to the plain "confirm" the box was dressed with.
+        /// </summary>
+        public void BeginPrompt(string description, string yesText, string noText, Action onYes, Action onNo,
+            bool runNoActionOnHide, bool playClickSound = true, string title = null, Sprite icon = null)
         {
+            ModernPromptSkin.SetHeader(gameObject, title, icon);
+
             onYesAction = onYes;
             onNoAction = onNo;
             YesButtonText.text = yesText;

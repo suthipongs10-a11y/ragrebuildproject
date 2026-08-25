@@ -1,5 +1,6 @@
 using Assets.Scripts.UI.ClientDatabase;
 using Assets.Scripts.UI.ConfigWindow;
+using Assets.Scripts.UI.Hud;
 using Assets.Scripts.UI.Inventory;
 using TMPro;
 using UnityEngine;
@@ -23,6 +24,7 @@ namespace Assets.Scripts.UI
 
         private EmoteWindow emoteWindow;
         private float translateTimer;
+        private bool promptsSkinned;
 
         //the general pass holds off at first so the windows with a skin of their own get
         //to claim themselves before anything else touches them
@@ -53,6 +55,17 @@ namespace Assets.Scripts.UI
 
             if (ui.ConfigManager != null && !ModernUiTheme.IsSkinned(ui.ConfigManager.gameObject))
                 SkinOptions(ui.ConfigManager);
+
+            //The two boxes that pop up over everything else. Worth naming rather than
+            //leaving to the sweep below: one of them is not a WindowBase at all, and the
+            //sweep only looks at those. Both are in the scene from the start, so once they
+            //have been dressed there is nothing left here to check for the rest of the run.
+            if (!promptsSkinned && ui.YesNoOptionsWindow != null && ui.TextInputWindow != null)
+            {
+                ModernPromptSkin.Skin(ui.YesNoOptionsWindow.gameObject, "ยืนยัน", ModernUiIcons.Alert);
+                ModernPromptSkin.Skin(ui.TextInputWindow.gameObject, "กรอกข้อมูล", ModernUiIcons.Pencil);
+                promptsSkinned = true;
+            }
 
             if (emoteWindow == null)
                 emoteWindow = FindFirstObjectByType<EmoteWindow>(FindObjectsInactive.Include);
@@ -479,6 +492,9 @@ namespace Assets.Scripts.UI
             if (window is ItemDescriptionWindow || window is CardIllustrationWindow
                                                 || window is ClientDatabaseWindow || window is DialogWindow
                                                 || window is CharacterHubWindow)
+                return true;
+
+            if (window == ui.YesNoOptionsWindow)
                 return true;
 
             return window == ui.StatusWindow

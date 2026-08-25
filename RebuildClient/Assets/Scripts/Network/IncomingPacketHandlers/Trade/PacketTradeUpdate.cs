@@ -60,7 +60,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Trading
                         //declined on close as well: a prompt dismissed some other way would
                         //otherwise leave the asker waiting on an answer that never comes, and
                         //both of them unable to trade with anyone else
-                        true);
+                        true, true, "คำขอแลกเปลี่ยน", Assets.Scripts.UI.ModernUiIcons.Bag);
                     break;
                 }
 

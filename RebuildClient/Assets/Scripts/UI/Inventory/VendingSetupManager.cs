@@ -64,8 +64,8 @@ namespace Assets.Scripts.UI.Inventory
             if (!hasZeroValue)
                 FinalizeSubmitVending();
             else
-                UiManager.Instance.YesNoOptionsWindow.BeginPrompt("You have one or more item listed for 0 zeny. Are you sure you want to open shop?", "Yes",
-                    "No", FinalizeSubmitVending, null, false, false);
+                UiManager.Instance.YesNoOptionsWindow.BeginPrompt("มีของอย่างน้อยหนึ่งชิ้นตั้งราคาไว้ 0 Zeny แน่ใจว่าจะเปิดร้านไหม",
+                    "ตกลง", "ยกเลิก", FinalizeSubmitVending, null, false, false, "เปิดร้านขายของ", ModernUiIcons.Coin);
         }
 
         public void FinalizeSubmitVending()

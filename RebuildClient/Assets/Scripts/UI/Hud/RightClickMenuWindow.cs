@@ -192,16 +192,18 @@ namespace Assets.Scripts.UI.Hud
         {
             if (!PlayerState.Instance.PartyMembers.TryGetValue(partyMemberId, out var info))
                 return;
-            UiManager.Instance.YesNoOptionsWindow.BeginPrompt($"Kick {info.PlayerName} from your party?", "Yes", "No", 
-                () => NetworkManager.Instance.PartyUpdateAction(partyMemberId, PartyClientAction.RemovePlayer), null, false);
+            UiManager.Instance.YesNoOptionsWindow.BeginPrompt($"เตะ {info.PlayerName} ออกจากปาร์ตี้?", "ตกลง", "ยกเลิก",
+                () => NetworkManager.Instance.PartyUpdateAction(partyMemberId, PartyClientAction.RemovePlayer), null, false, true,
+                "ปาร์ตี้", ModernUiIcons.Person);
         }
 
         public void PromoteToLeader()
         {
             if (!PlayerState.Instance.PartyMembers.TryGetValue(partyMemberId, out var info))
                 return;
-            UiManager.Instance.YesNoOptionsWindow.BeginPrompt($"Promote {info.PlayerName} to party leader?", "Yes", "No", 
-                () => NetworkManager.Instance.PartyUpdateAction(partyMemberId, PartyClientAction.ChangeLeader), null, false);
+            UiManager.Instance.YesNoOptionsWindow.BeginPrompt($"ยก {info.PlayerName} ขึ้นเป็นหัวหน้าปาร์ตี้?", "ตกลง", "ยกเลิก",
+                () => NetworkManager.Instance.PartyUpdateAction(partyMemberId, PartyClientAction.ChangeLeader), null, false, true,
+                "ปาร์ตี้", ModernUiIcons.Person);
         }
 
         public void FormPartyWith()
@@ -213,7 +215,8 @@ namespace Assets.Scripts.UI.Hud
                 return;
             }
             
-            UiManager.Instance.TextInputWindow.BeginTextInput($"Name your party (must be unique)", FinishCreateParty);
+            UiManager.Instance.TextInputWindow.BeginTextInput("ตั้งชื่อปาร์ตี้ (ห้ามซ้ำกับคนอื่น)", FinishCreateParty,
+                "ตั้งปาร์ตี้", ModernUiIcons.Person);
         }
 
         public void FinishCreateParty(string partyName)

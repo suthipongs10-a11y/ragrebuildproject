@@ -384,7 +384,8 @@ namespace Assets.Scripts.UI.Mobile
             //no party of your own yet, so the offer is to start one with them in it
             Action(row, "ตั้งปาร์ตี้", () =>
                 UiManager.Instance.TextInputWindow.BeginTextInput("ตั้งชื่อปาร์ตี้ (ห้ามซ้ำกับคนอื่น)",
-                    partyName => NetworkManager.Instance.OrganizeParty(partyName, id)));
+                    partyName => NetworkManager.Instance.OrganizeParty(partyName, id),
+                    "ตั้งปาร์ตี้", ModernUiIcons.Person));
         }
 
         private static void Action(RectTransform row, string label, UnityEngine.Events.UnityAction onClick)

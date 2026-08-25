@@ -207,22 +207,22 @@ namespace Assets.Scripts.UI
 
             if (item.UniqueItem.Refine > 0)
             {
-                UiManager.Instance.YesNoOptionsWindow.BeginPrompt($"{item.ProperName()} - This item is refined, are you sure you want to trade it?",
-                    "Yes", "No", CheckAndTryTrade, OnCancel, false, false);
+                UiManager.Instance.YesNoOptionsWindow.BeginPrompt($"{item.ProperName()} — ของชิ้นนี้ตีบวกไว้ แน่ใจว่าจะเอาไปแลกไหม",
+                    "ตกลง", "ยกเลิก", CheckAndTryTrade, OnCancel, false, false, "ยืนยันการแลกของ", ModernUiIcons.Alert);
                 return;
             }
             
             if (item.UniqueItem.SlotData(0) > 0)
             {
-                UiManager.Instance.YesNoOptionsWindow.BeginPrompt($"{item.ProperName()} - This item has cards socketed, are you sure you want to trade it?",
-                    "Yes", "No", CheckAndTryTrade, OnCancel, false, false);
+                UiManager.Instance.YesNoOptionsWindow.BeginPrompt($"{item.ProperName()} — ของชิ้นนี้ใส่การ์ดไว้ แน่ใจว่าจะเอาไปแลกไหม",
+                    "ตกลง", "ยกเลิก", CheckAndTryTrade, OnCancel, false, false, "ยืนยันการแลกของ", ModernUiIcons.Alert);
                 return;
             }
             
             if (PlayerState.Instance.EquippedBagIdHashes.Contains(selectedBagId))
             {
-                UiManager.Instance.YesNoOptionsWindow.BeginPrompt($"{item.ProperName()} - This item is currently equipped, are you sure you want to trade it?",
-                    "Yes", "No", CheckAndTryTrade, OnCancel, false, false);
+                UiManager.Instance.YesNoOptionsWindow.BeginPrompt($"{item.ProperName()} — ของชิ้นนี้กำลังสวมอยู่ แน่ใจว่าจะเอาไปแลกไหม",
+                    "ตกลง", "ยกเลิก", CheckAndTryTrade, OnCancel, false, false, "ยืนยันการแลกของ", ModernUiIcons.Alert);
                 return;
             }
             
