@@ -40,12 +40,9 @@ public static class AdventureBookChat
         //update is read from the flags they actually hold.
         AdventureBookProgress.EnsureMigrated(player);
 
-        //Swept every time somebody looks, which catches cards that were already in a bag
-        //before any of this existed as well as any route in that skips AddItemToInventory.
-        var newCards = AdventureBookProgress.ScanInventoryForCards(player);
-        if (newCards > 0)
-            AdventureBookProgress.Announce(player, $"<color=#66FFAA>พบการ์ดในกระเป๋าที่ยังไม่ได้บันทึก {newCards} ใบ บันทึกให้แล้ว</color>");
-
+        //No bag sweep here any more. A card sitting in a bag says nothing about where it came
+        //from, and reading one meant a page could be filled in by buying the card, or by an
+        //Old Card Album opened in town, without ever meeting the monster.
         var search = text.Length > Prefix.Length ? text.Substring(Prefix.Length).Trim() : string.Empty;
 
         if (search.Length > 0)
@@ -140,7 +137,7 @@ public static class AdventureBookChat
         AdventureBookProgress.Announce(player, $"  ★★ {kills:N0}/{found.HuntTargetLarge:N0}   {RewardText(found, AdventureBookStars.HuntLarge)}" + Mark(earned, AdventureBookStars.HuntLarge));
 
         if (found.CardItemId > 0)
-            AdventureBookProgress.Announce(player, $"  ★★★ ต้องมีการ์ดของมอนตัวนี้   {RewardText(found, AdventureBookStars.Card)}" + Mark(earned, AdventureBookStars.Card));
+            AdventureBookProgress.Announce(player, $"  ★★★ เก็บการ์ดที่มอนตัวนี้ดรอป   {RewardText(found, AdventureBookStars.Card)}" + Mark(earned, AdventureBookStars.Card));
         else
             AdventureBookProgress.Announce(player, "  ★★★ มอนตัวนี้ไม่ดรอปการ์ด หน้านี้จบที่ 2 ดาว");
 

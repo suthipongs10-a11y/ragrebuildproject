@@ -143,55 +143,38 @@ public static class AdventureBookProgress
     }
 
     /// <summary>
-    /// Fills in the third star of whatever page this item completes, if it completes one.
+    /// Fills in the third star of whatever page this card completes, if it completes one.
     /// </summary>
     /// <remarks>
-    /// Called from the one place every item entering a bag passes through, so a card counts
-    /// whether it was picked up off the floor, traded for, bought off the market or pulled
-    /// out of storage. The card is not taken: it is worth real money on the market this
-    /// server already has, and a page that eats one is a page nobody dares finish.
+    /// Only a card a monster died to leave on the ground, taken off that ground by this
+    /// player. Everything else is deliberately worth nothing: a card bought off the market,
+    /// handed over in a trade, pulled out of storage, opened out of an Old Card Album, or
+    /// created by an admin. The page says "collected the card of X", and the only way to
+    /// mean that is to have killed an X.
     ///
-    /// One card, one page, because a page is a card - so the goblins that all drop the same
-    /// one are the same page rather than five pages fighting over it.
+    /// It used to hang off AddItemToInventory instead, which every one of those routes goes
+    /// through. Three stars was then a shopping trip - and worse, the album handed out as a
+    /// three star reward paid for the next three star page, which paid for another album.
+    ///
+    /// The source monster is checked against the page rather than trusted, because a card
+    /// and a page are matched by which monsters drop it: a card off something not on this
+    /// page is a card off a drop table that has moved, and it should not quietly count.
+    ///
+    /// The card itself is not taken. It is worth real money on the market this server
+    /// already has, and a page that eats one is a page nobody dares finish.
     /// </remarks>
-    public static void OnItemGained(Player player, int itemId)
+    public static void OnCardPickedUpFromMonster(Player player, int itemId, int sourceMonsterId)
     {
-        if (!AdventureBook.IsBuilt)
+        if (!AdventureBook.IsBuilt || sourceMonsterId <= 0)
             return;
         if (!AdventureBook.EntriesByCardId.TryGetValue(itemId, out var entry))
             return;
         if (HasStar(player, entry, AdventureBookStars.Card))
             return;
+        if (Array.IndexOf(entry.MonsterIds, sourceMonsterId) < 0)
+            return;
 
         AwardStar(player, entry, AdventureBookStars.Card);
-    }
-
-    /// <summary>
-    /// Sweeps the whole bag for cards whose page is still open.
-    /// </summary>
-    /// <remarks>
-    /// A backstop for cards that were already sitting in a bag before any of this existed,
-    /// and for any route into an inventory that does not pass through AddItemToInventory.
-    /// Cheap enough to run whenever somebody looks at their book.
-    /// </remarks>
-    public static int ScanInventoryForCards(Player player)
-    {
-        if (!AdventureBook.IsBuilt || player.Inventory == null)
-            return 0;
-
-        var found = 0;
-        foreach (var (cardId, entry) in AdventureBook.EntriesByCardId)
-        {
-            if (HasStar(player, entry, AdventureBookStars.Card))
-                continue;
-            if (!player.Inventory.HasItem(cardId))
-                continue;
-
-            AwardStar(player, entry, AdventureBookStars.Card);
-            found++;
-        }
-
-        return found;
     }
 
     /// <summary>

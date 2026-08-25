@@ -534,12 +534,11 @@ public class Player : IEntityAutoReset
         Inventory ??= CharacterBag.Borrow();
         var result = Inventory.AddItem(item);
 
-        //The one place every item entering a bag passes through, so a card fills in its page
-        //whether it was picked up, traded for, bought off the market or pulled out of
-        //storage. Loading a saved inventory does not come through here, which is what we
-        //want: it rebuilds the bag wholesale rather than gaining anything.
-        Custom.AdventureBook.AdventureBookProgress.OnItemGained(this, item.Id);
-
+        //Deliberately no adventure book hook here. Everything reaches a bag through this
+        //method - a trade, a market purchase, a withdrawal from storage, an opened card
+        //album, an admin handing itself an item - and a card off any of those is not a
+        //monster somebody killed. The book is filled in at the pickup instead, where the
+        //ground item still remembers what died for it.
         return result;
     }
 
@@ -2120,6 +2119,11 @@ public class Player : IEntityAutoReset
         Character.Map!.PickUpOrRemoveItem(Character, groundItem.Id);
         Character.AttackCooldown = Time.ElapsedTimeFloat + 0.3f; //no attacking for 0.3s after picking up an item
         CreateItemInInventory(item);
+
+        //The one place a card is known to have come off a monster rather than out of a
+        //trade window, and it is after the checks above, so a bag too full to take the card
+        //does not fill in the page anyway.
+        Custom.AdventureBook.AdventureBookProgress.OnCardPickedUpFromMonster(this, item.Id, groundItem.DropSourceMonsterId);
         return true;
     }
 

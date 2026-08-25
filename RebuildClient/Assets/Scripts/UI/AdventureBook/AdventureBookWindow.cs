@@ -703,7 +703,7 @@ namespace Assets.Scripts.UI.AdventureBook
             }
             else if (!earned)
             {
-                Label(card, "ต้องมีการ์ดของมอนตัวนี้", textLeft, -32f, 260f,
+                Label(card, "เก็บการ์ดที่มอนตัวนี้ดรอป", textLeft, -32f, 260f,
                     ModernUiTheme.SizeSmall, ModernUiTheme.MutedColor);
             }
 
@@ -1269,7 +1269,7 @@ namespace Assets.Scripts.UI.AdventureBook
             y = HelpLine(y, "ดาว 1 และ ดาว 2",
                 "กำจัดให้ครบตามจำนวน จำนวนไม่เท่ากันทุกตัว มอนที่หายากต้องการน้อยกว่า");
             y = HelpLine(y, "ดาว 3",
-                "แค่มีการ์ดของมอนตัวนั้นในกระเป๋า ระบบบันทึกให้เอง และไม่ยึดการ์ดไป");
+                "ต้องเก็บการ์ดที่มอนตัวนั้นดรอปด้วยตัวเอง ระบบบันทึกให้ตอนเก็บขึ้นมา และไม่ยึดการ์ดไป การ์ดที่ซื้อ แลก หรือเปิดจาก Old Card Album ไม่นับ");
             y = HelpLine(y, "รางวัลประจำเมือง",
                 "ทำครบทุกหน้าในเมืองนั้น ได้หมวกที่หาจากที่อื่นไม่ได้เลยสักทาง");
             y = HelpLine(y, "Adventure Rank",
