@@ -66,6 +66,47 @@ namespace Assets.Scripts.PlayerControl
         public Dictionary<int, int> PartyMemberEntityLookup = new(); //member id to entity id
         public Dictionary<int, int> PartyMemberIdLookup = new(); //entity id to member id
 
+        /// <summary>
+        /// Everyone this character has written down, as the server last described them.
+        /// </summary>
+        /// <remarks>
+        /// A list rather than a dictionary because it is drawn far more often than it is
+        /// changed - a window sorts it and walks it, and there are at most sixty of them.
+        /// </remarks>
+        public List<FriendInfo> Friends = new();
+
+        /// <summary>
+        /// Bumped whenever the list changes, so a window can tell whether it needs redrawing
+        /// without holding a reference to anything that might be destroyed underneath it.
+        /// The same trick the market window uses.
+        /// </summary>
+        public int FriendRevision;
+
+        public FriendInfo FindFriend(int entryId)
+        {
+            for (var i = 0; i < Friends.Count; i++)
+            {
+                if (Friends[i].EntryId == entryId)
+                    return Friends[i];
+            }
+
+            return null;
+        }
+
+        public bool IsFriend(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return false;
+
+            for (var i = 0; i < Friends.Count; i++)
+            {
+                if (string.Equals(Friends[i].Name, name, System.StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+
+            return false;
+        }
+
         public int GetData(PlayerStat stat) => CharacterData[(int)stat];
         public int GetStat(CharacterStat stat) => CharacterStats[(int)stat];
 

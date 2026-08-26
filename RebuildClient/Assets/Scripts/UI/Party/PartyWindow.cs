@@ -97,6 +97,12 @@ namespace Assets.Scripts.UI.Party
         private string drawnSignature;
         private float refreshTimer;
 
+        /// <summary>
+        /// The one live page, so a friend logging in can make it redraw at once rather than
+        /// waiting for whatever else happens to change first.
+        /// </summary>
+        private static PartyWindow instance;
+
         public static PartyWindow Create(RectTransform parent)
         {
             var go = new GameObject("PartyWindow", typeof(RectTransform));
@@ -172,8 +178,29 @@ namespace Assets.Scripts.UI.Party
         /// </summary>
         private void OnEnable()
         {
+            instance = this;
             refreshTimer = 0f;
             drawnSignature = null;
+
+            //Asked for on opening as well as pushed on every change. The push is what keeps
+            //it live; this is what makes it right the first time after a reconnect, which is
+            //the one moment a push cannot have reached us.
+            var network = NetworkManager.Instance;
+            if (network != null)
+                network.SendFriendRefresh();
+        }
+
+        private void OnDisable()
+        {
+            if (instance == this)
+                instance = null;
+        }
+
+        /// <summary>Redraw on the next frame, if this page is on screen at all.</summary>
+        public static void RefreshIfOpen()
+        {
+            if (instance != null)
+                instance.drawnSignature = null;
         }
 
         private void Update()
@@ -210,10 +237,16 @@ namespace Assets.Scripts.UI.Party
         private static string Signature()
         {
             var s = PlayerState.Instance;
+
+            //The friend half of the page changes on its own schedule - somebody logging in
+            //three towns away - so its revision is part of what says the page is stale, and
+            //it has to be in both branches or the list never redraws for anybody out of a
+            //party, which is most people most of the time.
             if (!s.IsInParty)
-                return "none";
+                return "none:" + s.FriendRevision;
 
             var sb = new StringBuilder();
+            sb.Append(s.FriendRevision).Append('|');
             sb.Append(s.PartyName).Append('|').Append(s.PartyShareExp ? '1' : '0')
                 .Append('|').Append(s.PartyLeader).Append('|').Append(s.PartyMemberId);
 
@@ -270,6 +303,9 @@ namespace Assets.Scripts.UI.Party
                 note -= HeadingHeight;
                 BuildNote("และเห็นกันบนมินิแมพเป็นจุดสีเขียว", note);
 
+                note -= RowGap;
+                note = DrawFriends(note);
+
                 body.sizeDelta = new Vector2(0, -note + HeadingHeight);
                 return;
             }
@@ -307,6 +343,9 @@ namespace Assets.Scripts.UI.Party
                 BuildRow(member, y);
                 y -= RowHeight + RowGap;
             }
+
+            y -= RowGap * 2f;
+            y = DrawFriends(y);
 
             body.sizeDelta = new Vector2(0, -y);
         }
@@ -427,6 +466,122 @@ namespace Assets.Scripts.UI.Party
                 beyond ? FontStyles.Bold : FontStyles.Normal);
             ModernUiTheme.Place(label.rectTransform, new Vector2(0, 0.5f),
                 new Vector2(ShareLeft, 0f), new Vector2(ShareColumnWidth, RowHeight));
+        }
+
+        /// <summary>
+        /// Everyone this character has written down, under the party they are in.
+        /// </summary>
+        /// <remarks>
+        /// The same page rather than a tab of its own, because the two lists answer one
+        /// question - who is about - and the answer is worth less split in half. A party is
+        /// who you are with now; a friend list is who you would be with if they were on.
+        /// </remarks>
+        private float DrawFriends(float y)
+        {
+            var friends = PlayerState.Instance.Friends;
+
+            var strip = ModernUiTheme.CreateRect("FriendHeading", body);
+            strip.anchorMin = new Vector2(0, 1);
+            strip.anchorMax = new Vector2(1, 1);
+            strip.pivot = new Vector2(0.5f, 1);
+            strip.sizeDelta = new Vector2(-RowGap * 2f, HeadingHeight);
+            strip.anchoredPosition = new Vector2(0, y);
+            rows.Add(strip.gameObject);
+
+            var online = 0;
+            for (var i = 0; i < friends.Count; i++)
+            {
+                if (friends[i].IsOnline)
+                    online++;
+            }
+
+            var heading = ModernUiTheme.CreateText(strip, "FriendTitle",
+                $"เพื่อน  ({online}/{friends.Count} ออนไลน์)", ModernUiTheme.SizeSmall,
+                ModernUiTheme.LabelColor, TextAlignmentOptions.Left, FontStyles.Bold);
+            heading.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(heading.rectTransform, new Vector2(0, 0.5f),
+                new Vector2(NameLeft, 0f), new Vector2(240f, HeadingHeight));
+
+            y -= HeadingHeight;
+
+            if (friends.Count == 0)
+            {
+                BuildNote("คลิกขวาที่ผู้เล่นแล้วเลือก จดจำเพื่อน  ·  บนมือถือใช้ปุ่ม คนรอบตัว", y);
+                return y - HeadingHeight;
+            }
+
+            for (var i = 0; i < friends.Count; i++)
+            {
+                BuildFriendRow(friends[i], y);
+                y -= RowHeight + RowGap;
+            }
+
+            return y;
+        }
+
+        private void BuildFriendRow(FriendInfo friend, float y)
+        {
+            var row = NewRow(y, friend.IsOnline ? ModernUiTheme.WindowColor : ModernUiTheme.CardColor);
+
+            var dot = ModernUiTheme.CreateCard(row, "Dot", friend.IsOnline ? OnlineColor : OfflineColor);
+            ModernUiTheme.Place(dot, new Vector2(0, 0.5f),
+                new Vector2(9f, 0f), new Vector2(DotSize, DotSize));
+
+            var name = ModernUiTheme.CreateText(row, "Name", friend.Name, ModernUiTheme.SizeLabel,
+                friend.IsOnline ? ModernUiTheme.NameColor : ModernUiTheme.MutedColor,
+                TextAlignmentOptions.Left, friend.IsOnline ? FontStyles.Bold : FontStyles.Normal);
+            name.textWrappingMode = TextWrappingModes.NoWrap;
+            name.overflowMode = TextOverflowModes.Ellipsis;
+            ModernUiTheme.Place(name.rectTransform, new Vector2(0, 0.5f),
+                new Vector2(NameLeft, 0f), new Vector2(NameWidth - 20f, RowHeight));
+
+            //A friend nobody has seen since the server came up has no job and no level, and
+            //saying "offline" is the truth where drawing them as a level nothing novice is
+            //not - the same choice the party rows above already make.
+            var detail = friend.Job >= 0
+                ? $"{JobName(friend.Job)}   Lv.{friend.Level}"
+                : "ออฟไลน์";
+
+            var info = ModernUiTheme.CreateText(row, "Detail", detail, ModernUiTheme.SizeLabel,
+                friend.IsOnline ? ModernUiTheme.LabelColor : ModernUiTheme.MutedColor,
+                TextAlignmentOptions.Left);
+            info.textWrappingMode = TextWrappingModes.NoWrap;
+            ModernUiTheme.Place(info.rectTransform, new Vector2(0, 0.5f),
+                new Vector2(DetailLeft - 22f, 0f), new Vector2(DetailWidth + 4f, RowHeight));
+
+            if (!string.IsNullOrEmpty(friend.GuildName))
+            {
+                var guild = ModernUiTheme.CreateText(row, "Guild", friend.GuildName,
+                    ModernUiTheme.SizeSmall, LeaderColor, TextAlignmentOptions.Left);
+                guild.textWrappingMode = TextWrappingModes.NoWrap;
+                guild.overflowMode = TextOverflowModes.Ellipsis;
+                ModernUiTheme.Place(guild.rectTransform, new Vector2(0, 0.5f),
+                    new Vector2(ShareLeft - 20f, 0f), new Vector2(104f, RowHeight));
+            }
+
+            var forget = ModernUiTheme.CreateButton(row, "Forget", "ลบ",
+                ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place(forget, new Vector2(1, 0.5f),
+                new Vector2(-8f, 0f), new Vector2(40f, RowHeight - 8f));
+
+            var entryId = friend.EntryId;
+            var friendName = friend.Name;
+            forget.onClick.AddListener(() =>
+                UiManager.Instance.YesNoOptionsWindow.BeginPrompt($"ลบ {friendName} ออกจากรายชื่อเพื่อน?",
+                    "ตกลง", "ยกเลิก", () => NetworkManager.Instance.SendFriendRemove(entryId), null, false,
+                    true, "ลบเพื่อน", ModernUiIcons.Alert));
+
+            //Only offered to somebody who is here to answer. A message to an empty chair is
+            //refused by the server anyway, and a button that only ever says no is worse than
+            //no button.
+            if (!friend.IsOnline)
+                return;
+
+            var talk = ModernUiTheme.CreateButton(row, "Talk", "คุย",
+                ModernUiTheme.AccentColor, ModernUiTheme.AccentTextColor, ModernUiTheme.SizeSmall);
+            ModernUiTheme.Place(talk, new Vector2(1, 0.5f),
+                new Vector2(-52f, 0f), new Vector2(44f, RowHeight - 8f));
+            talk.onClick.AddListener(() => WhisperWindow.Open(friendName));
         }
 
         private RectTransform NewRow(float y, Color color)

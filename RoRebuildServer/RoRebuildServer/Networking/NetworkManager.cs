@@ -262,6 +262,15 @@ public class NetworkManager
         {
             if (connection.IsAlive && connection.Entity.IsAlive())
             {
+                //Read before the entity is taken apart, and only for somebody who actually
+                //made it into the world. After the line below there is no player to read a
+                //name off - the object is pooled, and by the time the database gets to this
+                //it may already have been handed to whoever logged in next.
+                var leaving = connection.Player;
+                if (leaving != null && leaving.HasEnteredServer)
+                    Database.RoDatabase.EnqueueDbRequest(
+                        new Database.Requests.FriendNotifyPresenceRequest(leaving.Id, leaving.Name, false));
+
                 //var player = connection.Entity.Get<Player>();
                 //var combatEntity = connection.Entity.Get<CombatEntity>();
 

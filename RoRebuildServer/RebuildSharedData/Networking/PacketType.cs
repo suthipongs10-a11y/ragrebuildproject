@@ -176,6 +176,12 @@ public enum PacketType : byte
     //which region a monster belongs to, what its targets are, and how far along you are.
     AdventureBookAction,
     AdventureBookData,
+
+    //the friend list and the private messages that hang off it. Appended at the end
+    //because the byte a packet travels as is its position in here, so anything inserted
+    //above renumbers every packet below it and the two sides stop agreeing mid sentence.
+    FriendAction,
+    FriendData,
 }
 
 public enum MessageType : byte

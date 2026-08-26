@@ -23,6 +23,11 @@ namespace Assets.Scripts.UI.Hud
         private int targetEntityId;
         private int partyMemberId;
 
+        //Kept beside the entity id because the friend list and the private message both work
+        //by name: one has to reach somebody who is not on screen, and the other has to reach
+        //somebody who may not be online at all.
+        private string targetName;
+
         public bool RightClickSelf()
         {
             unusedButtons ??= new Stack<Button>();
@@ -106,6 +111,20 @@ namespace Assets.Scripts.UI.Hud
             if (state.EntityId == target.Id || target.CharacterType == CharacterType.PlayerLikeNpc)
                 return;
 
+            //Remembering somebody and saying something to them come first, because neither
+            //depends on range, on a party, or on who leads one - they are the two things
+            //this menu can always offer, and a menu whose first entry is sometimes there
+            //and sometimes not is one nobody builds muscle memory for.
+            targetName = target.Name;
+            if (!PlayerState.Instance.IsFriend(target.Name))
+            {
+                var friendButton = AddEntry($"จดจำ {target.Name} เป็นเพื่อน");
+                friendButton.onClick.AddListener(RememberFriend);
+            }
+
+            var whisperButton = AddEntry($"คุยกับ {target.Name}");
+            whisperButton.onClick.AddListener(WhisperTo);
+
             //Trading is offered before the party entries because it is the one that does not
             //depend on who leads what: anybody standing close enough can ask anybody else.
             //Out of range it is left off rather than greyed, so a menu entry never appears
@@ -174,6 +193,18 @@ namespace Assets.Scripts.UI.Hud
             var me = CameraFollower.Instance != null ? CameraFollower.Instance.PlayerPosition : Vector2Int.zero;
             var d = target.CellPosition - me;
             return Mathf.RoundToInt(Mathf.Sqrt(d.x * d.x + d.y * d.y));
+        }
+
+        public void RememberFriend()
+        {
+            NetworkManager.Instance.SendFriendAdd(targetName);
+            HideWindow();
+        }
+
+        public void WhisperTo()
+        {
+            Party.WhisperWindow.Open(targetName);
+            HideWindow();
         }
 
         public void TradeWith()

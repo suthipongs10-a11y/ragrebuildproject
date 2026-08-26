@@ -615,7 +615,7 @@ namespace Assets.Scripts.UI
             //had nowhere at all to be looked at - it was announced in chat and then gone.
             //CharacterGuideWindow is still in the project if it is ever wanted back.
             var party = PartyWindow.Create(ui.PrimaryUserWindowContainer);
-            hub.AddPage(party, ThaiUiText.Get("Party"), ModernUiIcons.Heart);
+            hub.AddPage(party, "ปาร์ตี้และเพื่อน", ModernUiIcons.Heart);
 
             //Same reasoning: there is no guild window in the game to take over, because
             //guilds were only ever reachable by typing /guild. The roster arrives from the

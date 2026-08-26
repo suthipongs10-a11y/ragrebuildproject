@@ -1533,6 +1533,57 @@ namespace Assets.Scripts.Network
         }
 
         /// <summary>Mine, which asks for everything this character has a stake in.</summary>
+        /// <summary>Ask for the whole friend list again, which is what opening the window does.</summary>
+        public void SendFriendRefresh()
+        {
+            var msg = StartMessage();
+            msg.Write((byte)PacketType.FriendAction);
+            msg.Write((byte)FriendRequestType.Refresh);
+            SendMessage(msg);
+        }
+
+        /// <summary>Remember somebody, by the name written over their head.</summary>
+        public void SendFriendAdd(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return;
+
+            var msg = StartMessage();
+            msg.Write((byte)PacketType.FriendAction);
+            msg.Write((byte)FriendRequestType.Add);
+            msg.Write(name);
+            SendMessage(msg);
+        }
+
+        public void SendFriendRemove(int entryId)
+        {
+            var msg = StartMessage();
+            msg.Write((byte)PacketType.FriendAction);
+            msg.Write((byte)FriendRequestType.Remove);
+            msg.Write(entryId);
+            SendMessage(msg);
+        }
+
+        /// <summary>
+        /// One line to one person, by name rather than by list entry.
+        /// </summary>
+        /// <remarks>
+        /// By name so that answering a message from somebody who is not on the list works,
+        /// which is most of what private messages are for.
+        /// </remarks>
+        public void SendWhisper(string targetName, string text)
+        {
+            if (string.IsNullOrWhiteSpace(targetName) || string.IsNullOrWhiteSpace(text))
+                return;
+
+            var msg = StartMessage();
+            msg.Write((byte)PacketType.FriendAction);
+            msg.Write((byte)FriendRequestType.Whisper);
+            msg.Write(targetName);
+            msg.Write(text);
+            SendMessage(msg);
+        }
+
         public void SendAuctionAction(AuctionRequestType action)
         {
             var msg = StartMessage();

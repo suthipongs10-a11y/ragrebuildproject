@@ -39,14 +39,26 @@ if not size:
     print("FAIL the generated table has no array to check")
     sys.exit(1)
 
-if int(size.group(1)) != len(names):
-    problems.append(f"the table holds {size.group(1)} slots for {len(names)} packet types - "
-                    f"run Ragnarok > CodeGen > Update Packet Handlers")
+table_size = int(size.group(1))
+if table_size != len(names):
+    #Grown at startup, so this is worth saying but is not a fault: the packets past the end
+    #of the generated table still arrive somewhere.
+    print(f"  note: the table holds {table_size} slots for {len(names)} packet types and is "
+          f"grown at startup - run Ragnarok > CodeGen > Update Packet Handlers to settle it")
 else:
     print(f"  the table has one slot per packet type ({len(names)})")
 
 slots = {int(n): (cls, name) for n, cls, name in
          re.findall(r"handlers\[(\d+)\] = new (\w+)\(\); //(\w+)", table)}
+
+# The dispatcher grows the table at startup and fills anything on its LateAdditions list,
+# so a handler named there is dispatched to whether or not the generated file knows about
+# it. Read here as well, or this check reports a fault the game does not have - and a check
+# that cries wolf is a check people learn to run past.
+dispatch_src = DISPATCH.read_text(encoding="utf-8-sig")
+late = dict(re.findall(r"\(PacketType\.(\w+),\s*\(\)\s*=>\s*new (\w+)\(\)\)", dispatch_src))
+if late:
+    print(f"  {len(late)} handler(s) filled in at startup rather than by the generated table")
 
 #every slot is the packet the enum says it is, in order
 misplaced = [i for i, n in enumerate(names) if i in slots and slots[i][1] != n]
@@ -73,10 +85,14 @@ for packet, (cls, ns) in sorted(found.items()):
         continue
 
     idx = names.index(packet)
+    if late.get(packet) == cls:
+        continue  # filled in at startup, so the generated table not having it is fine
+
     if idx not in slots or slots[idx][0] != cls:
         got = slots.get(idx, ("nothing", ""))[0]
         problems.append(f"{packet} is handled by {cls}, but the table has {got} in slot {idx} "
-                        f"- the packet would arrive and be dropped without a word")
+                        f"and it is not on the startup list either - the packet would arrive "
+                        f"and be dropped without a word")
         continue
 
     if ns and f"using {ns};" not in table:

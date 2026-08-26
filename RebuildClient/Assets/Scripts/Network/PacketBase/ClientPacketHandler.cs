@@ -2,6 +2,7 @@
 using Assets.Scripts.Network.HandlerBase;
 using Assets.Scripts.Network.IncomingPacketHandlers;
 using Assets.Scripts.Network.IncomingPacketHandlers.Market;
+using Assets.Scripts.Network.IncomingPacketHandlers.Social;
 using Assets.Scripts.Network.IncomingPacketHandlers.Trading;
 using Assets.Scripts.PlayerControl;
 using RebuildSharedData.Networking;
@@ -50,6 +51,7 @@ namespace Assets.Scripts.Network.PacketBase
             (PacketType.InboxData, () => new PacketInboxData()),
             (PacketType.AuctionData, () => new PacketAuctionData()),
             (PacketType.BuyOrderData, () => new PacketBuyOrderData()),
+            (PacketType.FriendData, () => new PacketFriendData()),
         };
 
         /// <summary>

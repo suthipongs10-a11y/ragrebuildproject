@@ -371,6 +371,13 @@ namespace Assets.Scripts.UI.Mobile
             var id = person.Id;
             var who = person.Name;
 
+            //Offered on every row whatever else is, because a phone has no right mouse
+            //button and this list is the only place a touch screen can reach a name.
+            if (!state.IsFriend(who))
+                Action(row, "จดจำ", () => NetworkManager.Instance.SendFriendAdd(who));
+            else
+                Action(row, "คุย", () => Party.WhisperWindow.Open(who));
+
             if (state.IsInParty)
             {
                 Action(row, "ชวนเข้าตี้", () =>

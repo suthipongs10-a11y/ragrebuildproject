@@ -40,6 +40,17 @@ public class PacketPlayerReady : IClientPacketHandler
             CommandBuilder.UpdatePartyMembersOnMapOfHpSpChange(connection.Player, false);
         }
 
+        //Once per session, not once per map. Their own list so the window has something in
+        //it, and a word to everybody who has them written down - which is the half that
+        //makes a friend list worth having, since nobody sits watching it waiting for a name
+        //to change colour.
+        if (!connection.Player.HasEnteredServer)
+        {
+            RoDatabase.EnqueueDbRequest(new FriendListRequest(connection.Player.Id, connection.Player.Name));
+            RoDatabase.EnqueueDbRequest(
+                new FriendNotifyPresenceRequest(connection.Player.Id, connection.Player.Name, true));
+        }
+
         connection.Player.HasEnteredServer = true;
 
         ServerLogger.Debug($"Player {connection.Entity} finished loading, spawning him on {connection.Character.Map.Name} at position {connection.Character.Position}.");
