@@ -31,6 +31,12 @@ export async function list() {
   }
 
   const clamped = rows.filter((r) => r.place.respawnWritten);
+
+  // A monster can carry Special=Boss in Monsters.csv while none of its spawn rules
+  // are flagged. AdventureBook and BossLog both key off the spawn flag, so these
+  // behave like bosses in a fight but are filed as ordinary hunts everywhere else.
+  const unflagged = [...new Set(rows.filter((r) => !r.place.flag).map((r) => r.mon.code))]
+    .map((code) => monsters.find((m) => m.code === code));
   const host = document.createElement("div");
   host.innerHTML = `
     <h1>บอสและ MVP</h1>
@@ -61,7 +67,18 @@ export async function list() {
         <code>appsettings.json</code> (ตั้ง 0 = ปิดเพดาน) และแก้ค่าใน
         <code>ServerMilestoneEvent.OnSetMonsterSpawnTime</code>
       </p>
-    </div>`;
+    </div>
+
+    ${unflagged.length ? `<div class="note">
+      <p><strong>${n(unflagged.length)} ตัวเป็นบอสในตัวมันเอง แต่จุดเกิดไม่ได้ติดธงบอส</strong></p>
+      <p>
+        ${unflagged.map((m) => monsterLink(m)).join(" · ")}
+        มี <code>Special = Boss</code> ใน <code>Monsters.csv</code> จึงมีภูมิต้านทานแบบบอส
+        แต่ไม่มีสคริปต์ไหนติดธง Boss ตอนเกิด ผลคือ
+        <strong>ไม่เข้า${link("#/adventurebook/bosslog", "สมุดบอส")}</strong> และ
+        <strong>ถูกนับเป็นมอนธรรมดาใน${link("#/adventurebook", "สมุดผจญภัย")}</strong>
+        รวมถึงไม่ได้เวลาเกิดใหม่แบบ MVP ด้วย
+      </p></div>` : ""}`;
 
   const body = document.createElement("div");
   host.appendChild(body);

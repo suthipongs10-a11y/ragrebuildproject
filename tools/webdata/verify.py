@@ -195,6 +195,73 @@ def main():
           sum(len(m.get("drops", [])) for m in monsters)
           + sum(len(m.get("mvpDrops", [])) for m in monsters))
 
+    print("\n--- respawn windows ---------------------------------------------")
+    MIN_SPAWN, MAX_SPAWN = 2000, 360000
+    MVP_LOW, MVP_HIGH = 14 * 60 * 1000, 15 * 60 * 1000
+    mvp_codes = {m["code"] for m in monsters if m.get("isMvp")}
+    bad_clamp = []
+    for m in maps:
+        for rule in m["spawns"]:
+            lo, hi = rule["respawnMin"], rule["respawnMax"]
+            if rule["code"] in mvp_codes:
+                if (lo, hi) != (MVP_LOW, MVP_HIGH):
+                    bad_clamp.append(f'{m["code"]}/{rule["code"]} mvp window {lo}-{hi}')
+            elif lo < MIN_SPAWN or lo > MAX_SPAWN or hi > MAX_SPAWN or hi < lo:
+                bad_clamp.append(f'{m["code"]}/{rule["code"]} window {lo}-{hi}')
+    check("every spawn window obeys the clamp chain", bad_clamp[:3] or True, True)
+    check("every mvp spawn is the 14-15 minute window",
+          all(r["respawnMin"] == MVP_LOW and r["respawnMax"] == MVP_HIGH
+              for m in maps for r in m["spawns"] if r["code"] in mvp_codes), True)
+
+    print("\n--- adventure book and boss log ---------------------------------")
+    custom = load("custom")
+    if custom:
+        ab, bl = custom["adventureBook"], custom["bossLog"]
+        mons_by_code = {m["code"]: m for m in monsters}
+
+        def hunt_target(spawn_count):
+            return max(50, min((spawn_count // 2 + 49) // 50 * 50, 500))
+
+        check("book star total matches the pages",
+              ab["totalStars"], sum(p["stars"] for p in ab["pages"]))
+        check("book kill total matches the pages", ab["totalKills"],
+              sum(p["huntTarget"] + p["huntTargetLarge"] for p in ab["pages"]))
+        check("every hunt target follows the spawn-count formula",
+              all(p["huntTarget"] == hunt_target(p["spawnCount"])
+                  and p["huntTargetLarge"] == p["huntTarget"] * 3 for p in ab["pages"]), True)
+        check("a page has 3 stars exactly when it has a card",
+              all((p["stars"] == 3) == bool(p["cardId"]) for p in ab["pages"]), True)
+        check("every page names real monsters",
+              all(c in mons_by_code for p in ab["pages"] for c in p["monsters"]), True)
+        # AdventureBook.Build excludes on the spawn rule's DisplayType, not on the
+        # monster's Special column - so a monster that behaves like a boss but whose
+        # spawn is not flagged Boss/MVP does belong in the book. Assert what the
+        # server actually does, and list the three that read oddly because of it.
+        flagged = {r["code"] for m in maps for r in m["spawns"]
+                   if r.get("flag") in ("Boss", "MVP")}
+        check("no spawn-flagged boss ended up in the book",
+              all(c not in flagged for p in ab["pages"] for c in p["monsters"]), True)
+        odd = sorted({c for p in ab["pages"] for c in p["monsters"]
+                      if mons_by_code[c].get("special") == "Boss"})
+        if odd:
+            print(f"     note: {', '.join(odd)} carry Special=Boss in Monsters.csv but no "
+                  f"spawn flags them, so they count as ordinary hunts in the book")
+        check("every page's region hands out a real headgear",
+              all(r["headgear"] in by_id for r in ab["regions"]), True)
+        check("region page and star counts add up to the book",
+              (sum(r["pages"] for r in ab["regions"]), sum(r["stars"] for r in ab["regions"])),
+              (len(ab["pages"]), ab["totalStars"]))
+        check("every rank reward resolves",
+              all(x["id"] in by_id for r in ab["ranks"] for x in r["rewards"]), True)
+        check("every star reward resolves",
+              all(x["id"] in by_id for b in ab["bands"]
+                  for key in ("hunt", "huntLarge", "card") for x in b[key]), True)
+        check("boss log counts add up", bl["mvpCount"] + bl["bossCount"], len(bl["entries"]))
+        check("every boss log entry is a real monster",
+              all(e["code"] in mons_by_code for e in bl["entries"]), True)
+        check("boss log rewards resolve",
+              bl["clearReward"] in by_id and bl["crownedHat"] in by_id, True)
+
     print()
     if failures:
         print(f"{len(failures)} problem(s):")
