@@ -71,6 +71,8 @@ async function start() {
       <li><strong>มอนธรรมดาไม่ใช้สกิล</strong> <code>RestrictMonsterSkillsToBosses</code> เปิดอยู่
         มีแต่ MVP กับตัวที่ติดธง Boss ตอนเกิดเท่านั้นที่ร่ายสกิล</li>
       <li><strong>มอนตีเป็นธาตุไร้ธาตุเสมอ</strong> ไม่ว่าตัวมันจะธาตุอะไร เกราะกันธาตุจึงต้องกัน Neutral</li>
+      <li><strong>บอสเกิดใหม่เร็ว</strong> มินิบอส 6 นาที MVP 14–15 นาที ไม่ใช่ชั่วโมงละครั้ง
+        (${link("#/bosses", "ดูตาราง")})</li>
       <li><strong>มี Antonio (ซานต้า) แจกของทุกแมพที่มีมอน</strong> ไม่โจมตี เลือดน้อย ตายแล้วเกิดใหม่ที่อื่นในแมพเดิม
         ดรอป Gift Box และมีโอกาสน้อย ๆ ได้ Snake Head</li>
       <li><strong>ของประเภท Etc ขายได้แพงขึ้น 2 เท่า</strong> และอาวุธซื้อจาก NPC แพงขึ้น 50%</li>
@@ -270,7 +272,15 @@ async function systems() {
       <li>แบบมีรู (<code>Hat_of_the_Sun_God_</code>) ออกจากกล่อง MVP อย่างเดียว ไม่มีทางอื่น</li>
       <li>ไม่เกี่ยวกับแรงก์นักผจญภัย เป็นคนละระบบ</li>
     </ul>
-    <p class="lede">บอสเกิดใหม่ชั่วโมงละครั้ง เก็บครบเล่มจึงเป็นเรื่องของหลายคืน ไม่ใช่หลายชั่วโมง</p>
+    <div class="note warn">
+      <p><strong>บอสเกิดเร็วกว่าที่คอมเมนต์ในโค้ดบอกมาก</strong></p>
+      <p>
+        คอมเมนต์ในระบบเขียนว่าบอสเกิดชั่วโมงละครั้ง แต่ค่าที่เซิร์ฟใช้จริงคือ
+        <strong>มินิบอส 6 นาที</strong> (โดน <code>MaxSpawnTime</code> ตัด) และ
+        <strong>MVP 14–15 นาที</strong> (โดน <code>OnSetMonsterSpawnTime</code> ทับ)
+        ${link("#/bosses", "ดูตารางเต็มพร้อมคำอธิบาย")}
+      </p>
+    </div>
 
     <h2>ตลาดกลางและการประมูล</h2>
     <div class="tablewrap"><table>

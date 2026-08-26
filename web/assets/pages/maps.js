@@ -1,5 +1,5 @@
 import {
-  data, index, esc, n, table, filterable, link, monsterLink, mapLink,
+  data, index, esc, n, table, filterable, link, monsterLink, mapLink, respawnRange,
 } from "../app.js";
 import { RACE_TH, SIZE_TH, elementLabel } from "./monsters.js";
 
@@ -75,10 +75,15 @@ export async function detail({ rest }) {
   // several spawn blocks can name the same monster on one map; add them up
   const merged = new Map();
   for (const s of map.spawns) {
-    const cur = merged.get(s.code) ?? { code: s.code, count: 0, flags: new Set(), fixed: false };
+    const cur = merged.get(s.code) ?? {
+      code: s.code, count: 0, flags: new Set(), fixed: false,
+      respawnMin: Infinity, respawnMax: 0,
+    };
     cur.count += s.count;
     if (s.flag) cur.flags.add(s.flag);
     if (s.fixed) cur.fixed = true;
+    cur.respawnMin = Math.min(cur.respawnMin, s.respawnMin);
+    cur.respawnMax = Math.max(cur.respawnMax, s.respawnMax);
     merged.set(s.code, cur);
   }
   const spawnRows = [...merged.values()]
@@ -106,6 +111,8 @@ export async function detail({ rest }) {
           render: (r) => esc(SIZE_TH[r.mon?.size] ?? r.mon?.size ?? "") },
         { key: "exp", label: "EXP", num: true, sortValue: (r) => r.mon?.exp ?? 0,
           render: (r) => n(r.mon?.exp ?? 0) },
+        { key: "respawn", label: "เกิดใหม่", num: true, sortValue: (r) => r.respawnMin,
+          render: (r) => esc(respawnRange(r.respawnMin, r.respawnMax)) },
       ], { sort: "count", dir: "desc" }).outerHTML
     : "<p>แมพนี้ไม่มีมอนเกิด</p>";
 
@@ -170,7 +177,11 @@ export async function detail({ rest }) {
     </dl>
 
     ${bosses.length ? `<div class="note warn">
-      <p><strong>มีบอสในแมพนี้</strong> ${bosses.map((b) => monsterLink(b.mon)).join(" · ")}</p>
+      <p><strong>มีบอสในแมพนี้</strong></p>
+      <p>${bosses
+        .map((b) => `${monsterLink(b.mon)} — เกิดใหม่ ${esc(respawnRange(b.respawnMin, b.respawnMax))}`)
+        .join("<br>")}</p>
+      <p>${link("#/bosses", "ดูตารางเวลาเกิดของบอสทั้งหมด")}</p>
     </div>` : ""}
 
     <h2>มอนสเตอร์ในแมพ</h2>

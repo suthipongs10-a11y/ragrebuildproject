@@ -13,6 +13,7 @@ export const routes = {
   item:       page("./pages/items.js", "detail"),
 
   maps:       page("./pages/maps.js", "list"),
+  bosses:     page("./pages/bosses.js", "list"),
   map:        page("./pages/maps.js", "detail"),
 
   jobs:       page("./pages/jobs.js", "list"),

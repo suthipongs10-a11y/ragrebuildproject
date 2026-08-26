@@ -1,5 +1,6 @@
 import {
   data, index, esc, n, pct, ms, table, filterable, link, itemLink, mapLink,
+  duration, respawnRange,
 } from "../app.js";
 
 export const ELEMENT_TH = {
@@ -165,9 +166,16 @@ export async function detail({ rest }) {
       return `<tr><td class="name">${mapLink(m, p.map)}</td>
         <td class="mono">${esc(p.map)}</td>
         <td class="num">${n(p.count)}</td>
+        <td class="num">${esc(respawnRange(p.respawnMin, p.respawnMax))}</td>
+        <td class="num mono">${p.respawnWritten ? esc(duration(p.respawnWritten)) : ""}</td>
         <td>${m ? esc(m.instance || m.mode) : ""}</td></tr>`;
     })
     .join("");
+
+  // the fastest window across every spawn point, which is what a hunter waits on
+  const fastest = (mon.maps ?? []).reduce(
+    (best, p) => (best === null || p.respawnMin < best.respawnMin ? p : best), null);
+  const clamped = (mon.maps ?? []).some((p) => p.respawnWritten);
 
   const skills = (mon.skills ?? [])
     .map(
@@ -202,7 +210,19 @@ export async function detail({ rest }) {
       ["MDEF", n(mon.mdef)],
       ["EXP", n(mon.exp)],
       ["Job EXP", n(mon.jobExp)],
+      ["เกิดใหม่หลังตาย", fastest ? respawnRange(fastest.respawnMin, fastest.respawnMax) : ""],
     ])}
+
+    ${clamped ? `<div class="note warn">
+      <p><strong>เวลาเกิดใหม่ไม่ตรงกับที่เขียนในสคริปต์</strong></p>
+      <p>
+        สคริปต์เขียนไว้ ${esc(duration(fastest.respawnWritten))}
+        แต่ <code>appsettings.json</code> ตั้ง <code>MaxSpawnTime</code> ไว้ที่ 6 นาที
+        ${mon.isMvp
+          ? "และ MVP ถูกทับด้วย <code>ServerMilestoneEvent.OnSetMonsterSpawnTime</code> เป็น 14–15 นาทีอีกที"
+          : "ทุกอย่างที่ไม่ใช่ MVP จึงถูกตัดเหลือ 6 นาที รวมถึงมินิบอสด้วย"}
+        ดูรายละเอียดที่${link("#/bosses", "หน้ารวมบอส")}
+      </p></div>` : ""}
 
     <h2>สเตตัส</h2>
     ${dl([
@@ -266,7 +286,8 @@ export async function detail({ rest }) {
     <h2>ที่เกิด</h2>
     ${places
       ? `<div class="tablewrap"><table>
-          <thead><tr><th>แมพ</th><th>รหัส</th><th class="num">จำนวน</th><th>กลุ่ม</th></tr></thead>
+          <thead><tr><th>แมพ</th><th>รหัส</th><th class="num">จำนวน</th>
+            <th class="num">เกิดใหม่</th><th class="num">สคริปต์เขียนไว้</th><th>กลุ่ม</th></tr></thead>
           <tbody>${places}</tbody></table></div>`
       : "<p>ไม่มีแมพไหนเกิดมอนตัวนี้</p>"}
 

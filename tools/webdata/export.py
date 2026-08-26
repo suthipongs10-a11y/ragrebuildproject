@@ -398,10 +398,76 @@ missing_jobs = defaultdict(set)
 
 SPAWN_MAP_RE = re.compile(r'MapConfig\("([^"]+)"\)')
 SPAWN_RE = re.compile(r'CreateSpawn\("([^"]+)"\s*,\s*(\d+)([^;]*)\)\s*;')
+AREA_RE = re.compile(r'%\([^)]*\)')
+TIME_RE = re.compile(r'^-?[0-9][0-9hms.]*$')
+
+# ServerDebugConfig in appsettings.json. Read once at startup by the server and
+# applied to every spawn rule, so the numbers in the spawn scripts are not the
+# numbers the server ends up using.
+MIN_SPAWN_TIME = 2000
+MAX_SPAWN_TIME = 360000
+
+# ServerMilestoneEvent.OnSetMonsterSpawnTime overrides the clamp for MVPs, and it
+# runs after it - so an MVP ignores MaxSpawnTime entirely.
+MVP_MIN_SPAWN = 14 * 60 * 1000
+MVP_MAX_SPAWN = 15 * 60 * 1000
 
 
-def parse_spawns(monsters):
-    """Script/Spawns/*.txt -> {map: [{code, count, boss}]}"""
+def parse_time(text):
+    """ScriptTreeWalker.ParseDecimal: 5m30s -> 330000. Bare digits are already ms."""
+    text = text.strip()
+    if not TIME_RE.match(text):
+        return None
+    total = 0
+    buf = ""
+    for c in text:
+        if c.isdigit() or c in "-.":
+            buf += c
+            continue
+        if not buf:
+            return None
+        try:
+            value = float(buf)
+        except ValueError:
+            return None
+        if c == "s":
+            total += int(value * 1000)
+        elif c == "m":
+            total += int(value * 60 * 1000)
+        elif c == "h":
+            total += int(value * 60 * 60 * 1000)
+        else:
+            return None
+        buf = ""
+    if buf:
+        try:
+            total += int(float(buf))
+        except ValueError:
+            return None
+    return total
+
+
+def resolve_respawn(respawn, variance, is_mvp):
+    """ServerMapConfig.CreateSpawn, in the order the server runs it."""
+    if MIN_SPAWN_TIME > 0 and respawn < MIN_SPAWN_TIME:
+        respawn = MIN_SPAWN_TIME
+    respawn_max = respawn + variance
+    if MAX_SPAWN_TIME > 0 and respawn > MAX_SPAWN_TIME:
+        respawn = MAX_SPAWN_TIME
+    if MAX_SPAWN_TIME > 0 and respawn_max > MAX_SPAWN_TIME:
+        respawn_max = MAX_SPAWN_TIME
+    if is_mvp:
+        respawn, respawn_max = MVP_MIN_SPAWN, MVP_MAX_SPAWN
+    return respawn, respawn_max
+
+
+def parse_spawns(monsters, mvp_codes):
+    """Script/Spawns/*.txt -> {map: [{code, count, respawn, ...}]}
+
+    CreateSpawn has five overloads and the arguments after the count shift meaning
+    depending on whether a %(x, y, w, h) area is present, so strip the area first
+    and read what is left positionally: respawn, then variance, then flags.
+    """
     spawns = defaultdict(list)
     for path in script_files("Spawns"):
         text = read_text(path)
@@ -426,6 +492,28 @@ def parse_spawns(monsters):
                     entry["flag"] = "Boss"
                 if "%(" in tail:
                     entry["fixed"] = True
+
+                rest = AREA_RE.sub("", tail).lstrip(",")
+                times = []
+                for part in rest.split(","):
+                    part = part.strip()
+                    if not part:
+                        continue
+                    value = parse_time(part)
+                    if value is None:
+                        break          # a flag like Boss / StrictArea - times are done
+                    times.append(value)
+
+                written = times[0] if times else 0
+                variance = times[1] if len(times) > 1 else 0
+                low, high = resolve_respawn(written, variance, code in mvp_codes)
+                entry["respawnMin"] = low
+                entry["respawnMax"] = high
+                if written and (written != low or written + variance != high):
+                    entry["respawnWritten"] = written
+                    if variance:
+                        entry["varianceWritten"] = variance
+
                 spawns[mapname].append(entry)
     return spawns
 
@@ -934,14 +1022,21 @@ def main():
         else:
             missing_monsters[code].add("MonsterSkills")
 
-    spawns = parse_spawns(monsters)
+    mvp_codes = {m["code"] for m in monsters.values() if m.get("isMvp")}
+    spawns = parse_spawns(monsters, mvp_codes)
     maps = build_maps(spawns, parse_warps(), parse_npcs(), monsters)
 
     # where does each monster live, and where does each item drop from
     homes = defaultdict(list)
     for m in maps:
         for s in m["spawns"]:
-            homes[s["code"]].append({"map": m["code"], "count": s["count"]})
+            place = {"map": m["code"], "count": s["count"],
+                     "respawnMin": s["respawnMin"], "respawnMax": s["respawnMax"]}
+            if s.get("flag"):
+                place["flag"] = s["flag"]
+            if s.get("respawnWritten"):
+                place["respawnWritten"] = s["respawnWritten"]
+            homes[s["code"]].append(place)
     for code, places in homes.items():
         monsters[code]["maps"] = sorted(places, key=lambda p: -p["count"])
 

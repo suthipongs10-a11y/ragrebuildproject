@@ -85,6 +85,25 @@ export function pct(perTenThousand, digits = 2) {
   return `${(perTenThousand / 100).toFixed(digits)}%`;
 }
 
+/** Respawn timers, written the way a player would say them. */
+export function duration(msValue) {
+  if (msValue == null) return "";
+  const sec = Math.round(msValue / 1000);
+  if (sec < 60) return `${sec} วิ`;
+  const min = Math.floor(sec / 60);
+  const rest = sec % 60;
+  if (min < 60) return rest ? `${min} นาที ${rest} วิ` : `${min} นาที`;
+  const hr = Math.floor(min / 60);
+  const restMin = min % 60;
+  return restMin ? `${hr} ชม. ${restMin} นาที` : `${hr} ชม.`;
+}
+
+/** "2 นาที" or "14–15 นาที" depending on whether the window has spread. */
+export function respawnRange(low, high) {
+  if (low == null) return "";
+  return low === high ? duration(low) : `${duration(low)} – ${duration(high)}`;
+}
+
 export function ms(value) {
   return value >= 1000 ? `${(value / 1000).toFixed(2)} วิ` : `${value} ms`;
 }
