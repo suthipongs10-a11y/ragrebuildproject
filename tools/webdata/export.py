@@ -625,8 +625,9 @@ def build_skills():
     return skills
 
 
-def build_skill_trees(skills):
+def build_skill_trees(skills, jobs):
     raw = read_toml("SkillTree.toml")
+    max_job_level = {j["name"]: j["maxJobLevel"] for j in jobs}
     trees = {}
     for job, val in raw.items():
         if not isinstance(val, dict):
@@ -646,6 +647,16 @@ def build_skill_trees(skills):
             "extends": val.get("Extends", ""),
             "skills": entries,
         }
+
+    # DataLoader.LoadSkillTree: a job cannot spend points in its own tree until it
+    # has burned through every point the jobs before it could have earned.
+    for job, tree in trees.items():
+        points, parent = 0, tree["extends"]
+        while parent:
+            points += max_job_level.get(parent, 1) - 1
+            parent = trees.get(parent, {}).get("extends", "")
+        tree["prereqSkillPoints"] = points
+
     return trees
 
 
@@ -746,7 +757,8 @@ def build_charts():
     for row in read_csv_rows("JobStatBonuses.csv")[1:]:
         if not row or not row[0].strip():
             continue
-        stat_bonus[row[0].strip()] = [c.strip() for c in row[1:] if c.strip()]
+        # index 0 is job level 1 - keep every cell so the positions stay aligned
+        stat_bonus[row[0].strip()] = [c.strip() for c in row[1:]]
 
     refine = []
     for row in read_csv("RefineSuccess.csv"):
@@ -886,8 +898,9 @@ def main():
     for iid, sellers in sold_by.items():
         items[iid]["soldBy"] = sellers
 
+    jobs = build_jobs()
     skills = build_skills()
-    trees = build_skill_trees(skills)
+    trees = build_skill_trees(skills, jobs)
     tables = build_skill_tables()
     for code, table in tables.items():
         if code in skills:
@@ -902,7 +915,7 @@ def main():
     sizes["skills.json"] = write("skills.json", {"skills": skills, "trees": trees})
     sizes["status.json"] = write("status.json", build_status_effects())
     sizes["shops.json"] = write("shops.json", shops)
-    sizes["jobs.json"] = write("jobs.json", build_jobs())
+    sizes["jobs.json"] = write("jobs.json", jobs)
     sizes["charts.json"] = write("charts.json", build_charts())
     sizes["elements.json"] = write("elements.json", build_elements())
     sizes["reference.json"] = write("reference.json", {
@@ -920,7 +933,7 @@ def main():
             "monsters": len(monsters),
             "maps": len(maps),
             "skills": len(skills),
-            "jobs": len(build_jobs()),
+            "jobs": len(jobs),
             "mapsWithSpawns": sum(1 for m in maps if m["spawns"]),
             "totalSpawnedMonsters": sum(m["monsterCount"] for m in maps),
             "npcs": sum(len(m["npcs"]) for m in maps),
