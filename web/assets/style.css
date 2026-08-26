@@ -284,6 +284,8 @@ td.name a { font-weight: 600; color: var(--accent-ink); }
 .note > :last-child { margin-bottom: 0; }
 
 .desc { white-space: pre-wrap; }
+.desc .flavour { color: var(--muted); font-style: italic; }
+.desc .tagword { color: var(--accent-ink); font-weight: 600; }
 .mono { font-family: var(--mono); font-size: 13px; }
 
 .pager { display: flex; gap: 8px; justify-content: center; align-items: center; margin: 18px 0 0; }

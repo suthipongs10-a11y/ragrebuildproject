@@ -106,6 +106,58 @@ export function mapLink(map, fallbackCode) {
   return `<span class="chip mute" title="แมพนี้ไม่มีใน Maps.csv">${esc(fallbackCode ?? "?")}</span>`;
 }
 
+// --------------------------------------------------- Unity rich text -> HTML
+
+const CARD_BG = [0xDA, 0xEA, 0xF4]; // --card, where descriptions are rendered
+
+function luminance([r, g, b]) {
+  const f = (c) => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+}
+
+function contrast(fg, bg) {
+  const a = luminance(fg);
+  const b = luminance(bg);
+  return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+}
+
+/**
+ * The colours in ItemDescriptions were picked for the in-game panel and several
+ * of them (plain #808080 most of all) do not reach 4.5:1 on this page. Keep the
+ * hue, walk it toward black until it is readable.
+ */
+function readable(hex) {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim());
+  if (!m) return null;
+  const int = parseInt(m[1], 16);
+  let rgb = [(int >> 16) & 255, (int >> 8) & 255, int & 255];
+  for (let i = 0; i < 20 && contrast(rgb, CARD_BG) < 4.5; i++) {
+    rgb = rgb.map((c) => Math.max(0, Math.round(c * 0.85)));
+    if (rgb.every((c) => c === 0)) break;
+  }
+  return `rgb(${rgb.join(",")})`;
+}
+
+/** Render the Unity markup used by ItemDescriptions and SkillDescriptions. */
+export function richText(text) {
+  if (!text) return "";
+  let out = esc(text);
+  out = out.replace(/&lt;color=([^&]+?)&gt;/gi, (_, c) => {
+    const col = readable(c);
+    return col ? `<span style="color:${col}">` : "<span>";
+  });
+  out = out.replace(/&lt;\/color&gt;/gi, "</span>");
+  out = out.replace(/&lt;desc&gt;/gi, '<span class="flavour">')
+           .replace(/&lt;\/desc&gt;/gi, "</span>");
+  out = out.replace(/&lt;(i|b)&gt;/gi, "<$1>").replace(/&lt;\/(i|b)&gt;/gi, "</$1>");
+  out = out.replace(/&lt;(skill|race|status)&gt;/gi, '<span class="tagword">')
+           .replace(/&lt;\/(skill|race|status)&gt;/gi, "</span>");
+  return out;
+}
+
 export function facts(pairs) {
   const cells = pairs
     .filter(([, v]) => v !== undefined && v !== null && v !== "")
