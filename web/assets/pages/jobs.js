@@ -63,7 +63,8 @@ export async function list() {
     table(rows, [
       { key: "name", label: "อาชีพ", cls: "name",
         render: (j) => link(`#/job/${j.name}`, j.name) +
-          (j.playable ? "" : ' <span class="chip warn">ยังไม่มีผังสกิล</span>') },
+          (j.playable ? "" : ' <span class="chip warn">ยังไม่มีผังสกิล</span>') +
+          (j.noHpCurve ? ' <span class="chip mvp">HP 0</span>' : "") },
       { key: "id", label: "id", num: true },
       { key: "rank", label: "ขั้น", num: true },
       { key: "maxJobLevel", label: "Job Lv สูงสุด", num: true },
@@ -158,7 +159,18 @@ export async function detail({ rest }) {
       <span class="chip">ขั้น ${tree ? tree.jobRank : job.expChart}</span>
       <span class="chip">Job Lv สูงสุด ${job.maxJobLevel}</span>
       ${tree ? "" : '<span class="chip warn">ยังไม่มีผังสกิล</span>'}
+      ${job.noHpCurve ? '<span class="chip mvp">ไม่มีตาราง HP</span>' : ""}
     </div>
+
+    ${job.noHpCurve ? `<div class="note bad">
+      <p><strong>อาชีพนี้ HP เป็น 0 ทุกเลเวล</strong></p>
+      <p>
+        <code>JobHpChart.csv</code> ไม่มีคอลัมน์ของอาชีพนี้
+        (${esc(job.name)}${job.name === "Star Gladiator" ? " — ในไฟล์เขียนว่า Star"
+          : job.name === "Soul Linker" ? " — ในไฟล์เขียนว่า Linker" : ""})
+        ตัวโหลดของเซิร์ฟเติมแถวศูนย์ให้ทุกอาชีพก่อนแล้วค่อยทับด้วยคอลัมน์ที่ชื่อตรงกัน
+        อาชีพที่ไม่มีคอลัมน์จึงได้ HP สูงสุด 0 เล่นไม่ได้จริง
+      </p></div>` : ""}
 
     ${tree ? "" : `<div class="note bad">
       <p><strong>อาชีพนี้ยังลงสกิลไม่ได้</strong></p>

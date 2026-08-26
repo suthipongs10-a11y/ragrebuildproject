@@ -394,6 +394,7 @@ def attach_drops(monsters, items, by_code):
 
 missing_monsters = defaultdict(set)
 unreachable_maps = {}
+missing_jobs = defaultdict(set)
 
 SPAWN_MAP_RE = re.compile(r'MapConfig\("([^"]+)"\)')
 SPAWN_RE = re.compile(r'CreateSpawn\("([^"]+)"\s*,\s*(\d+)([^;]*)\)\s*;')
@@ -490,6 +491,35 @@ def parse_shops(by_code):
                     "items": codes,
                 })
     return shops
+
+
+def find_summon_sources(monsters):
+    """Which files call up a monster that no map spawns.
+
+    A monster with no spawn block is not necessarily missing - Antonio is placed by
+    GiftMonsterSpawner in code, the Okolnir bosses come out of an event script, and
+    several are summoned by another monster's skill. Saying "no spawn" about those
+    would be wrong, so record where they actually come from.
+    """
+    sources = defaultdict(set)
+    scan = []
+    for folder in ("Event", "MonsterSkills", "Npcs", "Config"):
+        scan.extend(script_files(folder))
+    custom = os.path.join(ROOT, "RoRebuildServer", "RoRebuildServer", "Custom")
+    for dirpath, _dirs, files in os.walk(custom):
+        for f in sorted(files):
+            if f.endswith(".cs"):
+                scan.append(os.path.join(dirpath, f))
+
+    for path in scan:
+        try:
+            text = read_text(path)
+        except (OSError, UnicodeDecodeError):
+            continue
+        for code in monsters:
+            if f'"{code}"' in text:
+                sources[code].add(os.path.basename(path))
+    return sources
 
 
 def parse_warps():
@@ -606,7 +636,9 @@ def build_skills():
             continue
         entry = {
             "code": key,
-            "name": val.get("Name", re.sub(r"(?<!^)(?=[A-Z])", " ", key)),
+            # DataLoader only substitutes the id when Name is absent, so an explicit
+            # Name = "" (NoEffectAttack) stays blank. Blank is unusable as a heading.
+            "name": val.get("Name") or re.sub(r"(?<!^)(?=[A-Z])", " ", key),
             "icon": val.get("Icon", ""),
             "target": val.get("Target", ""),
             "maxLevel": val.get("MaxLevel", 1),
@@ -722,11 +754,20 @@ def build_jobs():
     return jobs
 
 
-def read_level_chart(name):
-    """JobHpChart / JobSpChart -> {job name: [value per level]} (index 0 unused)."""
+def read_level_chart(name, jobs):
+    """JobHpChart / JobSpChart -> {job name: [value per level]} (index 0 unused).
+
+    DataLoader.ReadHpSpChart pre-fills a zero array for every job in Jobs.csv and
+    only overwrites the columns whose header matches a job name - so a job with no
+    column, or one spelled differently in the two files, ends up with 0 HP at every
+    level on the live server. Reproduce that instead of hiding it, and mark those
+    jobs so the site can say so.
+    """
     rows = read_csv_rows(name)
     header = rows[0]
-    out = {h: [0] * 100 for h in header[1:]}
+    out = {j["name"]: [0] * 100 for j in jobs}
+    for h in header[1:]:
+        out.setdefault(h, [0] * 100)
     for row in rows[1:]:
         if not row or not row[0].strip():
             continue
@@ -739,7 +780,7 @@ def read_level_chart(name):
     return out
 
 
-def build_charts():
+def build_charts(jobs):
     exp = {num(r["Level"]): num(r["Experience"]) for r in read_csv("ExpChart.csv")}
     # ExpJobChart is keyed by job level with one column per job rank (Novice/First/Second)
     jexp_rows = read_csv_rows("ExpJobChart.csv")
@@ -767,8 +808,8 @@ def build_charts():
     return {
         "exp": exp,
         "jobExp": jexp,
-        "hp": read_level_chart("JobHpChart.csv"),
-        "sp": read_level_chart("JobSpChart.csv"),
+        "hp": read_level_chart("JobHpChart.csv", jobs),
+        "sp": read_level_chart("JobSpChart.csv", jobs),
         "statBonus": stat_bonus,
         "refine": refine,
     }
@@ -785,15 +826,43 @@ def build_elements():
     return {"attackElements": header, "chart": chart}
 
 
-def build_equip_groups():
+def build_equip_groups(jobs):
+    """Replicate DataLoader.LoadEquipmentGroups.
+
+    Two behaviours matter and both are easy to miss: a repeated group name merges
+    into the existing set rather than replacing it (BookUser is listed twice), and
+    a cell naming an already-built group expands to that group's jobs. The lookup
+    order is groups-so-far first, then job names - which is why a group called
+    Acolyte listing "Acolyte" resolves to the job, not to itself.
+    """
+    job_names = {j["name"] for j in jobs}
     groups = {}
     for row in read_csv_rows("EquipmentGroups.csv")[1:]:
         if not row or not row[0].strip():
             continue
-        groups[row[0].strip()] = {
-            "label": row[1].strip().strip('"') if len(row) > 1 else "",
-            "jobs": [c.strip() for c in row[2:] if c.strip()],
-        }
+        name = row[0].strip()
+        entry = groups.get(name)
+        if entry is None:
+            entry = groups[name] = {
+                "label": row[1].strip().strip('"') if len(row) > 1 else "",
+                "jobs": [],
+            }
+        for cell in row[2:]:
+            cell = cell.strip()
+            if not cell:
+                continue
+            if cell in groups and cell is not name and groups[cell] is not entry:
+                for j in groups[cell]["jobs"]:
+                    if j not in entry["jobs"]:
+                        entry["jobs"].append(j)
+            elif cell in job_names:
+                if cell not in entry["jobs"]:
+                    entry["jobs"].append(cell)
+            else:
+                # Transcendent classes and the two spaced-out names in Jobs.csv
+                # ("Soul Linker", "Star Gladiator") have no match. The server logs
+                # the same thing at Debug and carries on, so neither do we.
+                missing_jobs[cell].add(name)
     return groups
 
 
@@ -876,9 +945,16 @@ def main():
     for code, places in homes.items():
         monsters[code]["maps"] = sorted(places, key=lambda p: -p["count"])
 
-    # monsters whose only spawn blocks live on maps this server does not have
+    # monsters whose only spawn blocks live on maps this server does not have,
+    # minus the ones something other than a spawn script brings into the world
+    summons = find_summon_sources(monsters)
     for mon in monsters.values():
-        if not mon.get("maps"):
+        if mon.get("maps"):
+            continue
+        called = sorted(summons.get(mon["code"], ()))
+        if called:
+            mon["summonedBy"] = called
+        else:
             mon["noSpawn"] = True
 
     drop_sources = defaultdict(list)
@@ -915,11 +991,17 @@ def main():
     sizes["skills.json"] = write("skills.json", {"skills": skills, "trees": trees})
     sizes["status.json"] = write("status.json", build_status_effects())
     sizes["shops.json"] = write("shops.json", shops)
-    sizes["jobs.json"] = write("jobs.json", jobs)
-    sizes["charts.json"] = write("charts.json", build_charts())
+
+    charts = build_charts(jobs)
+    zero_hp = sorted(j["name"] for j in jobs if not any(charts["hp"].get(j["name"], [])))
+    for job in jobs:
+        if not any(charts["hp"].get(job["name"], [])):
+            job["noHpCurve"] = True
+    sizes["charts.json"] = write("charts.json", charts)
+    sizes["jobs.json"] = write("jobs.json", jobs)   # after the noHpCurve flag is set
     sizes["elements.json"] = write("elements.json", build_elements())
     sizes["reference.json"] = write("reference.json", {
-        "equipGroups": build_equip_groups(),
+        "equipGroups": build_equip_groups(jobs),
         "recipes": build_recipes(by_code),
         "oreDiscovery": build_ore_discovery(by_code),
         "weaponClasses": read_csv("WeaponClass.csv"),
@@ -940,6 +1022,7 @@ def main():
             "warps": sum(len(m["warps"]) for m in maps),
             "unreachableSpawnMaps": len(unreachable_maps),
             "monstersWithoutSpawns": sum(1 for m in monsters.values() if m.get("noSpawn")),
+            "monstersSummonedOnly": sum(1 for m in monsters.values() if m.get("summonedBy")),
             "shops": len(shops),
             "statusEffects": len(build_status_effects()),
         },
@@ -947,6 +1030,8 @@ def main():
         "remapDropRates": True,
         "unreachableSpawnMaps": unreachable_maps,
         "monstersWithoutSpawns": sorted(m["code"] for m in monsters.values() if m.get("noSpawn")),
+        "monstersSummonedOnly": sorted(m["code"] for m in monsters.values() if m.get("summonedBy")),
+        "jobsWithoutHpCurve": zero_hp,
     }
     write("meta.json", meta)
 
@@ -961,6 +1046,12 @@ def main():
         print(f"\n{len(maps_only)} monster code(s) referenced by scripts but absent from "
               f"Monsters.csv (expected - those maps are outside the episode 4 scope):")
         print("   ", ", ".join(maps_only[:20]) + (" ..." if len(maps_only) > 20 else ""))
+
+    if missing_jobs:
+        print(f"\n{len(missing_jobs)} job name(s) used by EquipmentGroups.csv but absent from "
+              f"Jobs.csv (transcendent classes, plus SoulLinker/StarGladiator which are "
+              f"spelled with a space in Jobs.csv):")
+        print("   ", ", ".join(sorted(missing_jobs)))
 
     if warnings:
         print(f"\n{len(warnings)} warning(s):")

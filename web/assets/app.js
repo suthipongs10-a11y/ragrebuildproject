@@ -332,7 +332,8 @@ async function route() {
     else main.innerHTML = view ?? "";
     document.title = (main.querySelector("h1")?.textContent ?? "คู่มือ") +
       " · Ragnarok Rebuild";
-    main.scrollIntoView({ block: "start", behavior: "instant" });
+    // scrollIntoView would tuck the heading under the sticky header, so go to the
+    // very top of the document instead
     window.scrollTo(0, 0);
   } catch (err) {
     if (token !== renderToken) return;

@@ -62,8 +62,10 @@ export async function list() {
         test: (m, v) =>
           v === "mvp" ? !!m.isMvp : v === "normal" ? !m.special && !m.isMvp : m.special === v },
       { key: "spawn", label: "ที่เกิด",
-        options: [["", "ที่เกิด: ทั้งหมด"], ["yes", "มีที่เกิด"], ["no", "ยังไม่มีที่เกิด"]],
-        test: (m, v) => (v === "yes" ? !m.noSpawn : !!m.noSpawn) },
+        options: [["", "ที่เกิด: ทั้งหมด"], ["yes", "เกิดตามแมพ"],
+                  ["summon", "ถูกเรียกด้วยสคริปต์"], ["no", "ยังไม่มีที่เกิด"]],
+        test: (m, v) => (v === "yes" ? !m.noSpawn && !m.summonedBy
+                         : v === "summon" ? !!m.summonedBy : !!m.noSpawn) },
     ],
     render: (rows) =>
       table(rows, [
@@ -72,7 +74,8 @@ export async function list() {
             link(`#/monster/${m.code}`, m.name) +
             (m.isMvp ? ' <span class="chip mvp">MVP</span>'
               : m.special === "Boss" ? ' <span class="chip boss">บอส</span>' : "") +
-            (m.noSpawn ? ' <span class="chip warn">ไม่มีที่เกิด</span>' : "") },
+            (m.noSpawn ? ' <span class="chip warn">ไม่มีที่เกิด</span>' : "") +
+            (m.summonedBy ? ' <span class="chip mute">ถูกเรียก</span>' : "") },
         { key: "level", label: "Lv", num: true },
         { key: "hp", label: "HP", num: true, render: (m) => n(m.hp) },
         { key: "atk", label: "ATK", num: true,
@@ -113,6 +116,7 @@ export async function detail({ rest }) {
   chips.push(`<span class="chip">ขนาด${esc(SIZE_TH[mon.size] ?? mon.size)}</span>`);
   if (mon.tags?.length) for (const t of mon.tags) chips.push(`<span class="chip mute">${esc(t)}</span>`);
   if (mon.noSpawn) chips.push('<span class="chip warn">ยังไม่มีที่เกิด</span>');
+  if (mon.summonedBy) chips.push('<span class="chip mute">ถูกเรียกด้วยสคริปต์</span>');
 
   // The attack element rule that trips everyone up, straight from the damage code.
   const isRanged = mon.range >= 4;
@@ -180,8 +184,14 @@ export async function detail({ rest }) {
 
     ${mon.noSpawn ? `<div class="note bad">
       <p><strong>ตัวนี้ยังไม่มีที่เกิดในเซิร์ฟ</strong></p>
-      <p>สคริปต์ที่เรียกมันอยู่ในแมพที่ไม่มีชื่อใน <code>Maps.csv</code> ตอนนี้จึงหามันไม่เจอ
-      นอกจากจะเรียกด้วยคำสั่ง GM</p></div>` : ""}
+      <p>ไม่มีแมพไหนเกิดมัน และไม่มีสคริปต์หรือโค้ดไหนเรียกมันด้วย
+      ตอนนี้เจอได้ด้วยคำสั่ง GM อย่างเดียว</p></div>` : ""}
+
+    ${mon.summonedBy ? `<div class="note warn">
+      <p><strong>ไม่ได้เกิดตามแมพ แต่ถูกเรียกออกมา</strong></p>
+      <p>ไม่มีสคริปต์เกิดมอนของแมพไหนเรียกมัน แต่มีไฟล์เหล่านี้เรียกมันออกมา:
+      ${mon.summonedBy.map((f) => `<code>${esc(f)}</code>`).join(" ")}
+      — เช่นถูกสกิลของมอนตัวอื่นเรียก เป็นบอสของอีเวนต์ หรือถูกวางด้วยโค้ดตอนเซิร์ฟเปิด</p></div>` : ""}
 
     ${dl([
       ["Level", n(mon.level)],
