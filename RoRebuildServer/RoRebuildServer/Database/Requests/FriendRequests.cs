@@ -9,6 +9,23 @@ using RoRebuildServer.Simulation.Market;
 
 namespace RoRebuildServer.Database.Requests;
 
+/// <summary>
+/// The four columns of a character this list needs, and nothing else.
+/// </summary>
+/// <remarks>
+/// Its own small type rather than a DbCharacter with most of its fields empty. Projecting
+/// a query into an entity type is a thing EF will do and then argue about - it is the
+/// shape it tracks changes against - and a friend list has no business carrying somebody's
+/// inventory blob around to read two numbers out of a summary.
+/// </remarks>
+public class FriendCharacterRow
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = "";
+    public byte[]? CharacterSummary { get; set; }
+    public int? GuildId { get; set; }
+}
+
 /// <summary>What is known about one name on a list, gathered from wherever it currently lives.</summary>
 public struct FriendView
 {
@@ -38,7 +55,7 @@ public static class FriendQueries
     /// written to the database yet - so it is asked first and the saved copy is the
     /// fallback rather than the other way round.
     /// </remarks>
-    public static FriendView Describe(DbFriend row, DbCharacter? saved)
+    public static FriendView Describe(DbFriend row, FriendCharacterRow? saved)
     {
         var view = new FriendView
         {
@@ -56,7 +73,7 @@ public static class FriendQueries
             view.Name = online.Name;
             view.Job = online.GetData(RebuildSharedData.Enum.EntityStats.PlayerStat.Job);
             view.Level = online.GetData(RebuildSharedData.Enum.EntityStats.PlayerStat.Level);
-            view.GuildName = online.Guild != null ? online.Guild.Name : string.Empty;
+            view.GuildName = online.Guild != null ? online.Guild.GuildName : string.Empty;
             view.IsOnline = true;
             return view;
         }
@@ -77,7 +94,7 @@ public static class FriendQueries
         }
 
         if (saved.GuildId.HasValue && GuildManager.TryGetGuild(saved.GuildId.Value, out var guild))
-            view.GuildName = guild.Name;
+            view.GuildName = guild.GuildName;
 
         return view;
     }
@@ -110,7 +127,7 @@ public static class FriendQueries
         var ids = rows.Select(r => r.FriendId).ToList();
         var saved = await dbContext.Character.AsNoTracking()
             .Where(c => ids.Contains(c.Id))
-            .Select(c => new DbCharacter
+            .Select(c => new FriendCharacterRow
             {
                 Id = c.Id, Name = c.Name, CharacterSummary = c.CharacterSummary, GuildId = c.GuildId
             })
@@ -303,7 +320,7 @@ public class FriendNotifyPresenceRequest : IDbRequest
             {
                 job = them.GetData(RebuildSharedData.Enum.EntityStats.PlayerStat.Job);
                 level = them.GetData(RebuildSharedData.Enum.EntityStats.PlayerStat.Level);
-                guildName = them.Guild != null ? them.Guild.Name : string.Empty;
+                guildName = them.Guild != null ? them.Guild.GuildName : string.Empty;
             }
         }
 
