@@ -1,0 +1,57 @@
+# คู่มือและฐานข้อมูลเซิร์ฟเวอร์ (เว็บ)
+
+เว็บ static ล้วน ไม่ต่อกับเซิร์ฟเกม แต่อ่านข้อมูลชุดเดียวกัน
+
+## รันดูในเครื่อง
+
+```
+python3 web/serve.py
+```
+
+แล้วเปิด <http://localhost:8800>
+
+> เปิด `index.html` ตรง ๆ ด้วย `file://` ไม่ได้ เพราะเบราว์เซอร์บล็อกทั้ง ES module และ `fetch`
+> ต้องผ่าน http server เสมอ
+
+## อัปเดตข้อมูลหลังแก้ CSV / สคริปต์
+
+```
+python3 tools/webdata/export.py
+```
+
+สคริปต์นี้อ่านจาก `RoRebuildServer/GameConfig/ServerData/` แล้วเขียนทับ `web/data/*.json`
+รันซ้ำได้ทุกครั้งที่แก้ข้อมูลเกม ไม่ต้องรัน `updateclient.bat` เพราะไม่ได้แตะ
+`ServerData/`, `RebuildSharedData/` หรือ `GameConfig.Generator/`
+
+ถ้ามีปัญหาในข้อมูล เช่นสคริปต์อ้างถึงไอเท็มที่ไม่มีอยู่ สคริปต์จะพิมพ์เตือนออกมาท้าย output
+
+## เอาขึ้นโฮสต์
+
+ก๊อป `web/` ทั้งโฟลเดอร์ไปวางเป็น static site ได้เลย ไม่ต้องมี backend
+ใช้ nginx, GitHub Pages, Cloudflare Pages หรืออะไรก็ได้ที่เสิร์ฟไฟล์ธรรมดา
+
+## โครงไฟล์
+
+```
+web/
+├── index.html            เปลือกหน้าเว็บ
+├── serve.py              http server สำหรับดูในเครื่อง
+├── assets/
+│   ├── style.css         ธีมเดียวกับ ModernUiTheme.cs ในเกม
+│   ├── app.js            โหลดข้อมูล, router, ค้นหา, helper สำหรับตาราง
+│   ├── routes.js         ตาราง route (import หน้าแบบ lazy)
+│   └── pages/*.js        หน้าแต่ละหน้า
+└── data/*.json           ข้อมูลที่ export ออกมา (ห้ามแก้มือ)
+```
+
+## หมายเหตุเรื่องความถูกต้องของข้อมูล
+
+- **อัตราดรอปเป็นอัตราจริง** `appsettings.json` เปิด `RemapDropRates` ไว้
+  ตัวเลขใน `DropData.csv` จึงถูกแปลงก่อนใช้งาน exporter คำนวณด้วยสูตรเดียวกับ
+  `Script/Config/ItemDropAndValueAdjustments.txt`
+- **ราคาซื้อ/ขายเป็นราคาจริง** ผ่าน `OnSetItemPurchasePrice` / `OnSetItemSaleValue` แล้ว
+- **แมพที่ไม่มีใน `Maps.csv` ไม่นับ** สคริปต์เกิดมอนของแมพพวกนั้นไม่ทำงาน
+  มอนที่เกิดเฉพาะในแมพเหล่านั้นจะถูกติดป้ายว่า "ยังไม่มีที่เกิด"
+- **ไอเท็มใน `MvpList.csv` ไม่ถูกโหลด** `DataLoader.LoadMvpList` อ่านแค่คอลัมน์แรก
+  ไฟล์นี้จึงใช้บอกแค่ว่าตัวไหนเป็น MVP ของที่เขียนไว้ในคอลัมน์ถัด ๆ ไปไม่เคยดรอป
+  เว็บจึงไม่แสดงมัน

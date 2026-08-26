@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>คู่มือเซิร์ฟเวอร์ Ragnarok Rebuild</title>
+<meta name="description" content="คู่มือการเล่นและฐานข้อมูลของเซิร์ฟเวอร์ Ragnarok Rebuild - มอนสเตอร์ ไอเท็ม แมพ อาชีพ สกิล และอัตราดรอปจริง">
+<meta name="theme-color" content="#0772A8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230772A8'/%3E%3Ctext x='16' y='22' font-family='sans-serif' font-size='15' font-weight='700' fill='%23fff' text-anchor='middle'%3ERO%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">ข้ามไปเนื้อหา</a>
+
+<header class="topbar">
+  <button class="navtoggle" id="navtoggle" aria-label="เปิดเมนู" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+  <a class="brand" href="#/">
+    <span class="brand-mark" aria-hidden="true">RO</span>
+    <span class="brand-text">
+      <strong>Ragnarok Rebuild</strong>
+      <small>คู่มือและฐานข้อมูล</small>
+    </span>
+  </a>
+  <form class="search" id="searchform" role="search" autocomplete="off">
+    <label class="sr-only" for="q">ค้นหา</label>
+    <input type="search" id="q" placeholder="ค้นหามอนสเตอร์ ไอเท็ม แมพ สกิล…" aria-label="ค้นหา">
+    <div class="suggest" id="suggest" role="listbox" hidden></div>
+  </form>
+</header>
+
+<div class="shell">
+  <nav class="sidenav" id="sidenav" aria-label="เมนูหลัก">
+    <div class="navgroup">
+      <h2>คู่มือ</h2>
+      <a href="#/">หน้าแรก</a>
+      <a href="#/guide/start">เริ่มต้นเล่น</a>
+      <a href="#/guide/combat">สูตรคำนวณการต่อสู้</a>
+      <a href="#/guide/systems">ระบบพิเศษของเซิร์ฟ</a>
+      <a href="#/guide/elements">ตารางธาตุ</a>
+    </div>
+    <div class="navgroup">
+      <h2>ฐานข้อมูล</h2>
+      <a href="#/monsters">มอนสเตอร์</a>
+      <a href="#/items">ไอเท็ม</a>
+      <a href="#/maps">แมพ</a>
+      <a href="#/jobs">อาชีพ</a>
+      <a href="#/skills">สกิล</a>
+      <a href="#/status">สถานะผิดปกติ</a>
+      <a href="#/shops">ร้านค้า NPC</a>
+      <a href="#/recipes">สูตรคราฟ</a>
+    </div>
+    <div class="navgroup">
+      <h2>ตาราง</h2>
+      <a href="#/charts/exp">ค่าประสบการณ์</a>
+      <a href="#/charts/hpsp">HP / SP</a>
+      <a href="#/charts/refine">อัตราตีบวก</a>
+    </div>
+    <p class="navfoot" id="navfoot"></p>
+  </nav>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <main id="main" tabindex="-1">
+    <div class="loading" id="boot">กำลังโหลดข้อมูล…</div>
+  </main>
+</div>
+
+<script type="module" src="assets/app.js"></script>
+</body>
+</html>
