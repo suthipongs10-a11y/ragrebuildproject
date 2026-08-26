@@ -6,7 +6,11 @@ const page = (mod, fn = "render") => async (ctx) => (await import(mod))[fn](ctx)
 export const routes = {
   "":         page("./pages/home.js"),
 
-  monsters:   page("./pages/monsters.js", "list"),
+  // #/monsters is the flat list, #/monsters/by is the classified browse page
+  monsters:   async (ctx) =>
+    ctx.rest[0] === "by"
+      ? (await import("./pages/browse.js")).render(ctx)
+      : (await import("./pages/monsters.js")).list(ctx),
   monster:    page("./pages/monsters.js", "detail"),
 
   items:      page("./pages/items.js", "list"),

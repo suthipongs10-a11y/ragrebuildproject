@@ -3,6 +3,8 @@ import {
   duration, respawnRange,
 } from "../app.js";
 
+// ------------------------------------------------------------------ ตัวช่วย
+
 export const ELEMENT_TH = {
   Neutral: "ไร้ธาตุ", Earth: "ดิน", Water: "น้ำ", Fire: "ไฟ", Wind: "ลม",
   Poison: "พิษ", Undead: "อันเดด", Dark: "มืด", Holy: "ศักดิ์สิทธิ์",
@@ -30,18 +32,29 @@ export function elementLabel(code) {
 
 // --------------------------------------------------------------------- list
 
-export async function list() {
+/** Level bands used by the browse page and the level filter. */
+export const LEVEL_BANDS = [
+  [1, 10], [11, 20], [21, 30], [31, 40], [41, 50],
+  [51, 60], [61, 70], [71, 80], [81, 90], [91, 999],
+];
+
+export const bandLabel = ([lo, hi]) => (hi >= 999 ? `${lo}+` : `${lo}–${hi}`);
+export const bandKey = ([lo, hi]) => `${lo}-${hi}`;
+
+export async function list({ query }) {
   const monsters = await data("monsters");
   const host = document.createElement("div");
   host.innerHTML = `
     <h1>มอนสเตอร์</h1>
-    <p class="lede">${n(monsters.length)} ตัว — คลิกหัวคอลัมน์เพื่อเรียงลำดับ กดชื่อเพื่อดูรายละเอียดและตารางดรอป</p>`;
+    <p class="lede">${n(monsters.length)} ตัว — คลิกหัวคอลัมน์เพื่อเรียงลำดับ กดชื่อเพื่อดูรายละเอียดและตารางดรอป
+    · ${link("#/monsters/by", "ดูแบบแยกประเภท")}</p>`;
 
   const body = document.createElement("div");
   host.appendChild(body);
 
   const elements = [...new Set(monsters.map((m) => splitElement(m.element).base))].sort();
   const races = [...new Set(monsters.map((m) => m.race))].sort();
+  const q = (key) => query.get(key) ?? "";
 
   filterable({
     host: body,
@@ -49,20 +62,31 @@ export async function list() {
     controls: [
       { type: "search", key: "q", placeholder: "ชื่อหรือรหัสมอน…",
         test: (m, v) => `${m.name} ${m.code}`.toLowerCase().includes(v) },
-      { key: "element", label: "ธาตุ",
+      { key: "element", value: q("element"), label: "ธาตุ",
         options: [["", "ธาตุ: ทั้งหมด"], ...elements.map((e) => [e, ELEMENT_TH[e] ?? e])],
         test: (m, v) => splitElement(m.element).base === v },
-      { key: "race", label: "เผ่า",
+      { key: "race", value: q("race"), label: "เผ่า",
         options: [["", "เผ่า: ทั้งหมด"], ...races.map((r) => [r, RACE_TH[r] ?? r])],
         test: (m, v) => m.race === v },
-      { key: "size", label: "ขนาด",
+      { key: "size", value: q("size"), label: "ขนาด",
         options: [["", "ขนาด: ทั้งหมด"], ...Object.entries(SIZE_TH).map(([k, v]) => [k, v])],
         test: (m, v) => m.size === v },
-      { key: "special", label: "ประเภท",
+      { key: "special", value: q("special"), label: "ประเภท",
         options: [["", "ประเภท: ทั้งหมด"], ["mvp", "MVP"], ["Boss", "บอส"], ["normal", "ธรรมดา"]],
         test: (m, v) =>
           v === "mvp" ? !!m.isMvp : v === "normal" ? !m.special && !m.isMvp : m.special === v },
-      { key: "spawn", label: "ที่เกิด",
+      { key: "elementLevel", value: q("elementLevel"), label: "ระดับธาตุ",
+        options: [["", "ระดับธาตุ: ทั้งหมด"], ["1", "ระดับ 1"], ["2", "ระดับ 2"],
+                  ["3", "ระดับ 3"], ["4", "ระดับ 4"]],
+        test: (m, v) => String(splitElement(m.element).level) === v },
+      { key: "level", value: q("level"), label: "ช่วงเลเวล",
+        options: [["", "ช่วงเลเวล: ทั้งหมด"],
+                  ...LEVEL_BANDS.map((b) => [bandKey(b), `Lv ${bandLabel(b)}`])],
+        test: (m, v) => {
+          const [lo, hi] = v.split("-").map(Number);
+          return m.level >= lo && m.level <= hi;
+        } },
+      { key: "spawn", value: q("spawn"), label: "ที่เกิด",
         options: [["", "ที่เกิด: ทั้งหมด"], ["yes", "เกิดตามแมพ"],
                   ["summon", "ถูกเรียกด้วยสคริปต์"], ["no", "ยังไม่มีที่เกิด"]],
         test: (m, v) => (v === "yes" ? !m.noSpawn && !m.summonedBy
@@ -88,6 +112,13 @@ export async function list() {
         { key: "race", label: "เผ่า", render: (m) => esc(RACE_TH[m.race] ?? m.race) },
         { key: "size", label: "ขนาด", render: (m) => esc(SIZE_TH[m.size] ?? m.size) },
         { key: "exp", label: "EXP", num: true, render: (m) => n(m.exp) },
+        { key: "respawn", label: "เกิดใหม่", num: true,
+          sortValue: (m) => (m.maps ?? []).reduce((lo, p) => Math.min(lo, p.respawnMin), Infinity),
+          render: (m) => {
+            const lo = (m.maps ?? []).reduce((x, p) => Math.min(x, p.respawnMin), Infinity);
+            const hi = (m.maps ?? []).reduce((x, p) => Math.max(x, p.respawnMax), 0);
+            return Number.isFinite(lo) ? esc(respawnRange(lo, hi)) : "";
+          } },
         { key: "spawned", label: "เกิดทั้งหมด", num: true,
           sortValue: (m) => (m.maps ?? []).reduce((s, p) => s + p.count, 0),
           render: (m) => n((m.maps ?? []).reduce((s, p) => s + p.count, 0)) },
