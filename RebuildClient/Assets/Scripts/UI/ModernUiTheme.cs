@@ -14,45 +14,47 @@ namespace Assets.Scripts.UI
     /// </summary>
     public static class ModernUiTheme
     {
-        //a soft blue set: the window is a tinted off white, cards step down in two
-        //stages and the header is the most saturated tone so it reads as a header.
-        //The inks are deliberately dark: the canvas draws the whole interface at three
-        //quarter scale, so anything less than strong contrast turns to mush on a phone.
-        public static readonly Color WindowColor = new Color(0.965f, 0.978f, 0.992f, 0.99f);
-        public static readonly Color CardColor = new Color(0.894f, 0.929f, 0.973f);
-        public static readonly Color CardDeepColor = new Color(0.831f, 0.886f, 0.953f);
-        public static readonly Color TitleBarColor = new Color(0.729f, 0.835f, 0.937f);
-        public static readonly Color TabIdleColor = new Color(0.933f, 0.953f, 0.980f);
+        //Aged paper and gold. The window is warm off white, the cards step down in two
+        //stages into tan, and the header is the most saturated tone so it still reads as a
+        //header. The inks are deliberately dark: the canvas draws the whole interface at
+        //three quarter scale, so anything less than strong contrast turns to mush on a phone.
+        public static readonly Color WindowColor = new Color(0.973f, 0.945f, 0.890f, 0.99f);
+        public static readonly Color CardColor = new Color(0.937f, 0.886f, 0.788f);
+        public static readonly Color CardDeepColor = new Color(0.886f, 0.812f, 0.663f);
+        public static readonly Color TitleBarColor = new Color(0.847f, 0.737f, 0.522f);
+        public static readonly Color TabIdleColor = new Color(0.953f, 0.918f, 0.843f);
         //for a panel laid over the game world rather than inside a window: solid enough to
         //read against whatever the player is standing in front of, clear enough that it
         //does not wall off the view
-        public static readonly Color PanelOverlayColor = new Color(0.965f, 0.978f, 0.992f, 0.86f);
-        public static readonly Color CardBorderColor = new Color(0.784f, 0.843f, 0.914f);
+        public static readonly Color PanelOverlayColor = new Color(0.973f, 0.945f, 0.890f, 0.86f);
+        public static readonly Color CardBorderColor = new Color(0.780f, 0.690f, 0.518f);
         //Every ink below was measured against every surface above with the contrast
         //formula from WCAG 2.1 and moved until it cleared 4.5 to 1, the ratio at which
-        //normal sized text stays readable. The quiet greys were the worst offenders: the
-        //muted grey sat at 2.3 to 1 on a card, which is legible on a desk monitor and
-        //gone on a phone in daylight.
-        public static readonly Color TitleColor = new Color(0.055f, 0.129f, 0.235f);
-        public static readonly Color LabelColor = new Color(0.262f, 0.348f, 0.450f);
-        public static readonly Color NameColor = new Color(0.075f, 0.145f, 0.239f);
-        public static readonly Color MutedColor = new Color(0.304f, 0.355f, 0.414f);
-        public static readonly Color HintColor = new Color(0.270f, 0.350f, 0.435f);
-        //darkened just enough that white on it clears the same bar, since it is the fill
-        //behind every primary button and active tab in the interface
-        public static readonly Color AccentColor = new Color(0.165f, 0.435f, 0.780f);
-        public static readonly Color AccentTextColor = Color.white;
-        //A fill and an ink cannot be the same blue. The fill has to stay light enough for
-        //white to read on it and the ink has to go darker to read on a pale card, and one
-        //colour trying to do both lands between the two and fails at each. This is the
-        //ink: the blue for a label, a subtitle or an NPC's name.
-        public static readonly Color AccentInkColor = new Color(0.087f, 0.392f, 0.673f);
+        //normal sized text stays readable. The quiet browns were the ones that had to move:
+        //a mid brown that looks fine on paper white is under the bar by the time it reaches
+        //the header band, which is the most saturated surface in the set.
+        public static readonly Color TitleColor = new Color(0.165f, 0.106f, 0.031f);
+        public static readonly Color LabelColor = new Color(0.353f, 0.267f, 0.137f);
+        public static readonly Color NameColor = new Color(0.200f, 0.137f, 0.051f);
+        public static readonly Color MutedColor = new Color(0.333f, 0.271f, 0.184f);
+        public static readonly Color HintColor = new Color(0.357f, 0.282f, 0.149f);
+        //The fill behind every primary button and active tab. Gold is a pale colour, which
+        //is why the ink that goes on it is the near black one rather than white: white on
+        //gold measures 1.9 to 1 and is unreadable at any size, where the dark brown is 6 to 1.
+        //That is the whole reason this palette reads the way it does and the blue one did not.
+        public static readonly Color AccentColor = new Color(0.784f, 0.569f, 0.180f);
+        public static readonly Color AccentTextColor = new Color(0.165f, 0.106f, 0.031f);
+        //A fill and an ink cannot be the same gold. The fill has to stay bright enough to
+        //read as gold and the ink has to go dark enough to be read on a tan card, and one
+        //colour trying to do both lands between the two and fails at each. This is the ink:
+        //the bronze for a label, a subtitle or an NPC's name.
+        public static readonly Color AccentInkColor = new Color(0.416f, 0.251f, 0.031f);
         //the ink for a surface too dark to take the near black one
-        public static readonly Color LightInkColor = new Color(0.957f, 0.973f, 0.996f);
-        //a gain on a stat used to be drawn green; the interface is blue throughout now
+        public static readonly Color LightInkColor = new Color(0.984f, 0.965f, 0.918f);
+        //a gain on a stat used to be drawn green; the interface is one warm set throughout now
         public static readonly Color PositiveColor = AccentInkColor;
-        public static readonly Color IconColor = new Color(0.165f, 0.435f, 0.780f);
-        public static readonly Color IconMutedColor = new Color(0.396f, 0.475f, 0.561f);
+        public static readonly Color IconColor = new Color(0.416f, 0.251f, 0.031f);
+        public static readonly Color IconMutedColor = new Color(0.349f, 0.290f, 0.192f);
 
         //one place to change how big text is, so a legibility pass is a single edit
         public const float SizeTitle = 30f;
@@ -970,7 +972,7 @@ namespace Assets.Scripts.UI
         /// <summary>
         /// Turns any strongly green element under the root blue. The game's own windows
         /// use green for confirm buttons, highlighted tabs and gains, which fought with
-        /// the blue everything else has moved to.
+        /// the accent everything else has moved to.
         /// </summary>
         public static void RecolorAccents(Transform root)
         {
@@ -1019,7 +1021,7 @@ namespace Assets.Scripts.UI
                         alpha = 0.34f * (1f - t) * (1f - t);
                     }
 
-                    texture.SetPixel(x, y, new Color(0.05f, 0.11f, 0.20f, alpha));
+                    texture.SetPixel(x, y, new Color(0.16f, 0.11f, 0.05f, alpha));
                 }
             }
 
@@ -1032,7 +1034,7 @@ namespace Assets.Scripts.UI
         //white bold text on it clears 4.5 to 1, since the reading is printed across the
         //bar itself, and they are told apart by hue rather than by brightness so that all
         //four sit at the same weight beside each other.
-        public static readonly Color GaugeTrackColor = new Color(0.106f, 0.145f, 0.196f);
+        public static readonly Color GaugeTrackColor = new Color(0.176f, 0.129f, 0.075f);
         public static readonly Color GaugeHealthColor = new Color(0.184f, 0.523f, 0.215f);
         public static readonly Color GaugeManaColor = new Color(0.205f, 0.451f, 0.820f);
         public static readonly Color GaugeExpColor = new Color(0.595f, 0.428f, 0.119f);

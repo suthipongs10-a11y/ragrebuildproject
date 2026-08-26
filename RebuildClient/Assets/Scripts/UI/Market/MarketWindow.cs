@@ -66,7 +66,7 @@ namespace Assets.Scripts.UI.Market
         // Colours the shared theme has no name for, because only a market needs them.
 
         /// <summary>Every other row, so a long list reads as rows and not as a wall.</summary>
-        private static readonly Color RowAltColor = new Color(0.937f, 0.957f, 0.980f);
+        private static readonly Color RowAltColor = new Color(0.965f, 0.933f, 0.867f);
 
         /// <summary>Money. On a page about money it should be the first thing found.</summary>
         private static readonly Color MoneyColor = new Color(0.451f, 0.310f, 0.055f);
@@ -2092,8 +2092,8 @@ namespace Assets.Scripts.UI.Market
             //multiplied against the row's own colour, so white means leave it alone
             var colors = button.colors;
             colors.normalColor = Color.white;
-            colors.highlightedColor = new Color(0.94f, 0.97f, 1f);
-            colors.pressedColor = new Color(0.86f, 0.91f, 0.98f);
+            colors.highlightedColor = new Color(1f, 0.97f, 0.90f);
+            colors.pressedColor = new Color(0.95f, 0.90f, 0.80f);
             colors.selectedColor = Color.white;
             colors.disabledColor = Color.white;
             colors.fadeDuration = 0.08f;

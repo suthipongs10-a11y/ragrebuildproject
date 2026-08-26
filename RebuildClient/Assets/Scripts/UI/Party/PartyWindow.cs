@@ -82,7 +82,7 @@ namespace Assets.Scripts.UI.Party
         private static readonly Color OnlineColor = new Color(0.184f, 0.523f, 0.215f);
         private static readonly Color OfflineColor = new Color(0.604f, 0.643f, 0.690f);
         private static readonly Color LeaderColor = new Color(0.478f, 0.341f, 0.086f);
-        private static readonly Color MeCardColor = new Color(0.894f, 0.929f, 0.973f);
+        private static readonly Color MeCardColor = new Color(0.937f, 0.886f, 0.788f);
         private static readonly Color WarnColor = new Color(0.706f, 0.106f, 0.145f);
         private static readonly Color PartialColor = new Color(0.478f, 0.341f, 0.086f);
 

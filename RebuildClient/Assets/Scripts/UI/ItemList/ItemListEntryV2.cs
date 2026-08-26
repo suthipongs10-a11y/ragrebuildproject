@@ -24,10 +24,13 @@ namespace Assets.Scripts.UI
         [NonSerialized] public bool IsSelected;
         [NonSerialized] public bool IsActive = true;
         
-        //#D5E8FF00
-        public Color HoverColor = new Color(0.83f, 0.91f, 1f, 1f); 
-        public Color SelectedColor = new Color(0.72f, 0.856f, 1f, 1f); 
-        public Color NormalColor = new Color(0.83f, 0.91f, 1f, 0f);
+        //Read from the theme rather than kept on the component. They used to be three public
+        //fields with a pale blue in them, which meant the colours actually used came from
+        //whatever each prefab had serialised years ago - so retinting the interface left every
+        //bag and shop row highlighting in the old blue, with nothing in the code to say why.
+        private static Color HoverColor => new Color(0.937f, 0.878f, 0.749f, 1f);
+        private static Color SelectedColor => new Color(0.886f, 0.796f, 0.616f, 1f);
+        private static Color NormalColor => new Color(0.937f, 0.878f, 0.749f, 0f);
 
         public Action<int> EventOnClick;
         public Action<int> EventOnSelect;

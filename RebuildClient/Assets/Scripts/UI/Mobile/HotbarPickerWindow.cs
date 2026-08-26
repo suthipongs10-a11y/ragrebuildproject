@@ -45,7 +45,7 @@ namespace Assets.Scripts.UI.Mobile
         private const float StripHeight = 34f;
         private const float StripGap = 3f;
 
-        private static readonly Color ChosenColor = new Color(0.165f, 0.435f, 0.780f);
+        private static readonly Color ChosenColor = new Color(0.784f, 0.569f, 0.180f);
 
         private static HotbarPickerWindow instance;
 
