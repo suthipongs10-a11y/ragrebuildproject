@@ -561,7 +561,7 @@ namespace Assets.Scripts.UI.Party
 
             var forget = ModernUiTheme.CreateButton(row, "Forget", "ลบ",
                 ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSmall);
-            ModernUiTheme.Place(forget, new Vector2(1, 0.5f),
+            ModernUiTheme.Place((RectTransform)forget.transform, new Vector2(1, 0.5f),
                 new Vector2(-8f, 0f), new Vector2(40f, RowHeight - 8f));
 
             var entryId = friend.EntryId;
@@ -579,7 +579,7 @@ namespace Assets.Scripts.UI.Party
 
             var talk = ModernUiTheme.CreateButton(row, "Talk", "คุย",
                 ModernUiTheme.AccentColor, ModernUiTheme.AccentTextColor, ModernUiTheme.SizeSmall);
-            ModernUiTheme.Place(talk, new Vector2(1, 0.5f),
+            ModernUiTheme.Place((RectTransform)talk.transform, new Vector2(1, 0.5f),
                 new Vector2(-52f, 0f), new Vector2(44f, RowHeight - 8f));
             talk.onClick.AddListener(() => WhisperWindow.Open(friendName));
         }

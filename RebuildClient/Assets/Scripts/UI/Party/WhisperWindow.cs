@@ -177,7 +177,8 @@ namespace Assets.Scripts.UI.Party
 
             var send = ModernUiTheme.CreateButton(rect, "Send", "ส่ง",
                 ModernUiTheme.AccentColor, ModernUiTheme.AccentTextColor, ModernUiTheme.SizeSmall);
-            ModernUiTheme.Place(send, new Vector2(1, 0), new Vector2(-Pad, Pad), new Vector2(66f, EntryHeight));
+            ModernUiTheme.Place((RectTransform)send.transform, new Vector2(1, 0),
+                new Vector2(-Pad, Pad), new Vector2(66f, EntryHeight));
             send.onClick.AddListener(Send);
         }
 
