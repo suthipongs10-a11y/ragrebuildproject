@@ -27,7 +27,7 @@ namespace Assets.Scripts.UI
         private const float NoticeHeight = 74f;
 
         private static readonly Color NoticeColor = new Color(0.996f, 0.910f, 0.910f);
-        private static readonly Color NoticeInkColor = new Color(0.706f, 0.106f, 0.145f);
+        private static readonly Color NoticeInkColor = new Color(0.681f, 0.102f, 0.140f);
 
         private static EscMenu instance;
 

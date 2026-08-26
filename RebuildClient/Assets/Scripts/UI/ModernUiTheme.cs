@@ -1030,15 +1030,20 @@ namespace Assets.Scripts.UI
                 0, SpriteMeshType.FullRect, new Vector4(30, 30, 30, 30));
         }
 
-        //The gauges along the top of the screen. Each hue is darkened to the point where
-        //white bold text on it clears 4.5 to 1, since the reading is printed across the
-        //bar itself, and they are told apart by hue rather than by brightness so that all
-        //four sit at the same weight beside each other.
+        //The gauges along the top of the screen. Each hue is darkened to the point where the
+        //reading printed across the bar clears 4.5 to 1 on it, and they are told apart by hue
+        //rather than by brightness so that all four sit at the same weight beside each other.
+        //
+        //The ink they were measured against was plain white, and the ink they actually get is
+        //LightInkColor, which in a warm palette is a cream rather than a white. Four hundredths
+        //of a point darker in the ink is a fifth of a point off the ratio, which is what put
+        //all four of these under the bar without anything visibly changing. They are measured
+        //against the ink that is really used now - see tools/check/contrast.py.
         public static readonly Color GaugeTrackColor = new Color(0.176f, 0.129f, 0.075f);
-        public static readonly Color GaugeHealthColor = new Color(0.184f, 0.523f, 0.215f);
-        public static readonly Color GaugeManaColor = new Color(0.205f, 0.451f, 0.820f);
-        public static readonly Color GaugeExpColor = new Color(0.595f, 0.428f, 0.119f);
-        public static readonly Color GaugeJobExpColor = new Color(0.547f, 0.362f, 0.805f);
+        public static readonly Color GaugeHealthColor = new Color(0.177f, 0.502f, 0.206f);
+        public static readonly Color GaugeManaColor = new Color(0.198f, 0.435f, 0.791f);
+        public static readonly Color GaugeExpColor = new Color(0.574f, 0.413f, 0.115f);
+        public static readonly Color GaugeJobExpColor = new Color(0.528f, 0.349f, 0.777f);
 
         private static Sprite gaugeSprite;
 

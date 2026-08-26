@@ -79,12 +79,12 @@ namespace Assets.Scripts.UI.Party
         /// </summary>
         private const float RefreshInterval = 4f;
 
-        private static readonly Color OnlineColor = new Color(0.184f, 0.523f, 0.215f);
-        private static readonly Color OfflineColor = new Color(0.604f, 0.643f, 0.690f);
-        private static readonly Color LeaderColor = new Color(0.478f, 0.341f, 0.086f);
+        private static readonly Color OnlineColor = new Color(0.140f, 0.397f, 0.163f);
+        private static readonly Color OfflineColor = new Color(0.360f, 0.330f, 0.290f);
+        private static readonly Color LeaderColor = new Color(0.454f, 0.324f, 0.082f);
         private static readonly Color MeCardColor = new Color(0.937f, 0.886f, 0.788f);
-        private static readonly Color WarnColor = new Color(0.706f, 0.106f, 0.145f);
-        private static readonly Color PartialColor = new Color(0.478f, 0.341f, 0.086f);
+        private static readonly Color WarnColor = new Color(0.681f, 0.102f, 0.140f);
+        private static readonly Color PartialColor = new Color(0.454f, 0.324f, 0.082f);
 
         private RectTransform body;
         private TextMeshProUGUI title;

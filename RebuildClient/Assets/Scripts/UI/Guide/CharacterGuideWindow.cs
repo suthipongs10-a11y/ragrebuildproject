@@ -38,7 +38,7 @@ namespace Assets.Scripts.UI.Guide
 
         //the gold of the third tier, the same hue the experience gauge uses, so "rare"
         //reads the same way here as it does everywhere else in this interface
-        private static readonly Color RareColor = new Color(0.478f, 0.341f, 0.086f);
+        private static readonly Color RareColor = new Color(0.454f, 0.324f, 0.082f);
 
         private RectTransform body;
         private TextMeshProUGUI title;

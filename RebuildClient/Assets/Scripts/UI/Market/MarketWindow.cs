@@ -72,10 +72,10 @@ namespace Assets.Scripts.UI.Market
         private static readonly Color MoneyColor = new Color(0.451f, 0.310f, 0.055f);
 
         /// <summary>Under an hour left. Meant to read as "decide now", not as an error.</summary>
-        private static readonly Color UrgentColor = new Color(0.647f, 0.243f, 0.094f);
+        private static readonly Color UrgentColor = new Color(0.602f, 0.226f, 0.087f);
 
         /// <summary>A bid of yours that is leading.</summary>
-        private static readonly Color WinningColor = new Color(0.106f, 0.412f, 0.208f);
+        private static readonly Color WinningColor = new Color(0.102f, 0.398f, 0.201f);
 
         /// <summary>The bar down the left of a row that has something to do with you.</summary>
         private const float StripeWidth = 3f;

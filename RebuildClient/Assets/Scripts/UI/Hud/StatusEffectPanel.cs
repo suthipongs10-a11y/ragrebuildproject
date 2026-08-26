@@ -38,7 +38,7 @@ namespace Assets.Scripts.UI.Hud
         /// The grey a stand-in icon wears, so a borrowed picture reads as "something is on
         /// you, hover it" rather than as the status the picture actually belongs to.
         /// </summary>
-        public static readonly Color PlaceholderTint = new Color(0.612f, 0.573f, 0.510f);
+        public static readonly Color PlaceholderTint = new Color(0.477f, 0.447f, 0.398f);
 
         /// <summary>
         /// A status effect's icon, or the nearest thing to one.
