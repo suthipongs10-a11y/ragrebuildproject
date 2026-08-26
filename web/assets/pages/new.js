@@ -19,10 +19,11 @@ export async function render() {
   const regionHats = ab.regions.map((r) => byId.get(r.headgear)).filter(Boolean);
 
   return `
-    <h1>ของใหม่ที่โปรเจกต์นี้สร้าง</h1>
+    <h1>ข้อมูลที่ควรรู้</h1>
     <p class="lede">
-      ทุกอย่างในหน้านี้ไม่มีในเซิร์ฟต้นทาง <code>Doddler/RagnarokRebuildTcp</code>
-      ตัวเลขดึงจากข้อมูลจริง ไม่ได้พิมพ์ไว้ตายตัว
+      สิ่งที่เซิร์ฟนี้มีแต่เซิร์ฟต้นทาง <code>Doddler/RagnarokRebuildTcp</code> ไม่มี
+      อ่านหน้านี้ก่อนแล้วจะไม่งงว่าทำไมหลายอย่างไม่เหมือนที่เคยเล่นมา
+      ตัวเลขทุกตัวดึงจากข้อมูลจริง ไม่ได้พิมพ์ไว้ตายตัว
     </p>
 
     <h2>ระบบที่เพิ่มเข้ามา</h2>

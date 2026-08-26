@@ -350,7 +350,7 @@ async function route() {
     if (view instanceof Node) main.appendChild(view);
     else main.innerHTML = view ?? "";
     document.title = (main.querySelector("h1")?.textContent ?? "คู่มือ") +
-      " · Ragnarok Rebuild";
+      " · Rag Rebuild Alpha Project the Adventure Part";
     // scrollIntoView would tuck the heading under the sticky header, so go to the
     // very top of the document instead
     window.scrollTo(0, 0);
