@@ -124,3 +124,6 @@ Other/RebuildTests/
 Other/RoWikiGenerator/Microsoft.CodeAnalysis.Razor.Compiler/
 RebuildClient/Assets/StreamingAssets/ClientConfigGenerated/
 RebuildClient/Assets/Textures/Import/
+
+# python bytecode from tools/
+tools/**/__pycache__/
