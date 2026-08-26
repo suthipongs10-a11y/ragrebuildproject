@@ -67,6 +67,36 @@ namespace Assets.Scripts.UI.ConfigWindow
         
         public bool EnableXRay = false;
 
+        //graphics
+        /// <summary>
+        /// Which of the presets is selected, or Custom once something is changed by hand.
+        /// Unset on a new install so the first launch can guess from the screen it is on -
+        /// see GraphicsQuality.ApplySaved.
+        /// </summary>
+        public int GraphicsPreset = -1;
+
+        /// <summary>
+        /// What fraction of the screen's real pixels the world is drawn at, 0.5 to 1. The
+        /// interface is drawn at full size either way, so this costs far less than it looks
+        /// like it should and is the single biggest thing on a phone.
+        /// </summary>
+        public float RenderScale = 1f;
+
+        public bool EnableShadows = true;
+        public bool EnableHdr = true;
+        public bool EnableWaterReflection = true;
+        public bool EnableMapEffects = true;
+        public bool ShowOtherPlayers = true;
+        public bool ThrottleDistantAnimation = false;
+
+        /// <summary>Drops every texture to half size, which is the one setting that gives memory back.</summary>
+        public bool HalfTextureMemory = false;
+
+        /// <summary>0 for no cap, otherwise the frames per second to aim for.</summary>
+        public int FrameRateCap = 0;
+
+        public bool ShowFpsCounter = false;
+
         //game
         public bool EnableWASDControls = false;
 

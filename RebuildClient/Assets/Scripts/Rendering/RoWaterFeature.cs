@@ -13,8 +13,16 @@ public class RoWaterFeature : ScriptableRendererFeature
 
     private WaterDepthPass _pass;
 
+    /// <summary>
+    /// The one live copy, so the graphics settings can switch this pass off without having
+    /// to dig the feature list out of the pipeline asset. Set in Create, which URP calls on
+    /// the instance it is actually rendering with.
+    /// </summary>
+    public static RoWaterFeature Instance { get; private set; }
+
     public override void Create()
     {
+        Instance = this;
         _pass = new WaterDepthPass();
     }
 

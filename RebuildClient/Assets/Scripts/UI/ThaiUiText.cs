@@ -35,6 +35,7 @@ namespace Assets.Scripts.UI
             { "Help", "คู่มือ" },
             { "Database", "ฐานข้อมูล" },
             { "AdventureBook", "สมุดผจญภัย" },
+            { "Graphics", "ตั้งค่าภาพ" },
             { "Market", "ตลาด" },
             { "Menu", "เมนู" },
             { "Cart", "รถเข็น" },

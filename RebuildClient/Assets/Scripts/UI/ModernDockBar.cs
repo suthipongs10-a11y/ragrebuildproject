@@ -66,6 +66,7 @@ namespace Assets.Scripts.UI
             ("Hotbar", "Hotbar", () => ModernUiIcons.Grid, null),
             ("Emotes", "Emotes", () => ModernUiIcons.Smile, null),
             ("Config", "Config", () => ModernUiIcons.Gear, null),
+            ("Graphics", "Graphics", () => ModernUiIcons.Bolt, GraphicsSettingsWindow.Toggle),
             ("Help", "Help", () => ModernUiIcons.Book, null),
             ("Database", "Database", () => ModernUiIcons.Magnifier, null),
             ("AdventureBook", "AdventureBook", () => ModernUiIcons.Spark,

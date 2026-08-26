@@ -191,6 +191,26 @@ namespace Assets.Scripts.Network
 
         public bool IsHidden { get; set; }
 
+        /// <summary>
+        /// Whether this is somebody the picture settings are currently leaving out.
+        /// </summary>
+        /// <remarks>
+        /// Kept apart from IsHidden rather than folded into it, because that one belongs to
+        /// the game: it is the Hiding skill, and something coming out of Hiding would clear a
+        /// flag the settings had set and put the player back on screen.
+        ///
+        /// Worked out fresh every frame instead of swept over the entity list when the switch
+        /// changes, so somebody joining the party appears at once and the switch takes effect
+        /// the moment it is pressed. Yourself, your party and every monster, item and npc are
+        /// never touched - it is a crowd of other people's shops in prontera this is for, and
+        /// they are exactly what nobody needs drawn while hunting.
+        /// </remarks>
+        public bool IsHiddenForPerformance =>
+            !Assets.Scripts.Rendering.GraphicsQuality.ShowOtherPlayers
+            && CharacterType == CharacterType.Player
+            && !IsMainCharacter
+            && !IsPartyMember;
+
         public void SkipNextSkillOrAttackMotion(bool val) => skipNextAttackMotion = val;
 
         public void Init()
@@ -1731,11 +1751,12 @@ namespace Assets.Scripts.Network
                 return;
 
 
-            var noShadowState = SpriteAnimator.CurrentMotion == SpriteMotion.Sit || SpriteAnimator.CurrentMotion == SpriteMotion.Dead || IsHidden;
+            var hidden = IsHidden || IsHiddenForPerformance;
+            var noShadowState = SpriteAnimator.CurrentMotion == SpriteMotion.Sit || SpriteAnimator.CurrentMotion == SpriteMotion.Dead || hidden;
             if (shadowSprite != null && (noShadowState != !shadowSprite.gameObject.activeInHierarchy))
                 shadowSprite.gameObject.SetActive(!noShadowState);
 
-            if (SpriteAnimator) SpriteAnimator.SetRenderActive(!IsHidden);
+            if (SpriteAnimator) SpriteAnimator.SetRenderActive(!hidden);
 
             //this is dumb
             tempSpeedTime -= Time.deltaTime;
