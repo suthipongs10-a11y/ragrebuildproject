@@ -45,7 +45,7 @@ namespace Assets.Scripts.UI.Mobile
 
         private static readonly Color AttackColor = new Color(0.78f, 0.20f, 0.20f, 0.45f);
         private static readonly Color PickUpColor = new Color(0.18f, 0.60f, 0.30f, 0.45f);
-        private static readonly Color ZoomColor = new Color(0.33f, 0.28f, 0.20f, 0.35f);
+        private static readonly Color ZoomColor = new Color(0.25f, 0.28f, 0.35f, 0.35f);
         private static readonly Color TalkColor = new Color(0.85f, 0.60f, 0.20f, 0.45f);
 
         private RectTransform controlGroup;
@@ -610,7 +610,7 @@ namespace Assets.Scripts.UI.Mobile
 
             var padImage = padObject.GetComponent<Image>();
             padImage.sprite = circleSprite;
-            padImage.color = new Color(0.33f, 0.28f, 0.20f, 0.25f);
+            padImage.color = new Color(0.25f, 0.28f, 0.35f, 0.25f);
 
             var padRect = padObject.GetComponent<RectTransform>();
             padRect.anchorMin = Vector2.zero;

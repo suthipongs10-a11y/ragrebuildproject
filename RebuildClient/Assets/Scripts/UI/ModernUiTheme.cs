@@ -14,47 +14,50 @@ namespace Assets.Scripts.UI
     /// </summary>
     public static class ModernUiTheme
     {
-        //Aged paper and gold. The window is warm off white, the cards step down in two
-        //stages into tan, and the header is the most saturated tone so it still reads as a
-        //header. The inks are deliberately dark: the canvas draws the whole interface at
-        //three quarter scale, so anything less than strong contrast turns to mush on a phone.
-        public static readonly Color WindowColor = new Color(0.973f, 0.945f, 0.890f, 0.99f);
-        public static readonly Color CardColor = new Color(0.937f, 0.886f, 0.788f);
-        public static readonly Color CardDeepColor = new Color(0.886f, 0.812f, 0.663f);
-        public static readonly Color TitleBarColor = new Color(0.847f, 0.737f, 0.522f);
-        public static readonly Color TabIdleColor = new Color(0.953f, 0.918f, 0.843f);
+        //The window is the pale blue the header was chosen against, the header is that
+        //header, and the cards step down between them. The inks are deliberately dark: the
+        //canvas draws the whole interface at three quarter scale, so anything less than
+        //strong contrast turns to mush on a phone.
+        public static readonly Color WindowColor = new Color(0.929f, 0.965f, 0.980f, 0.99f);
+        public static readonly Color CardColor = new Color(0.855f, 0.918f, 0.957f);
+        public static readonly Color CardDeepColor = new Color(0.769f, 0.867f, 0.925f);
+        //#0772A8. Dark enough that white sits on it at 5.3 to 1, which is what lets the
+        //header carry white lettering rather than the near black the body text uses.
+        public static readonly Color TitleBarColor = new Color(0.027f, 0.447f, 0.659f);
+        public static readonly Color TabIdleColor = new Color(0.890f, 0.941f, 0.973f);
         //for a panel laid over the game world rather than inside a window: solid enough to
         //read against whatever the player is standing in front of, clear enough that it
         //does not wall off the view
-        public static readonly Color PanelOverlayColor = new Color(0.973f, 0.945f, 0.890f, 0.86f);
-        public static readonly Color CardBorderColor = new Color(0.780f, 0.690f, 0.518f);
+        public static readonly Color PanelOverlayColor = new Color(0.929f, 0.965f, 0.980f, 0.86f);
+        public static readonly Color CardBorderColor = new Color(0.686f, 0.812f, 0.890f);
         //Every ink below was measured against every surface above with the contrast
         //formula from WCAG 2.1 and moved until it cleared 4.5 to 1, the ratio at which
-        //normal sized text stays readable. The quiet browns were the ones that had to move:
-        //a mid brown that looks fine on paper white is under the bar by the time it reaches
-        //the header band, which is the most saturated surface in the set.
-        public static readonly Color TitleColor = new Color(0.165f, 0.106f, 0.031f);
-        public static readonly Color LabelColor = new Color(0.353f, 0.267f, 0.137f);
-        public static readonly Color NameColor = new Color(0.200f, 0.137f, 0.051f);
-        public static readonly Color MutedColor = new Color(0.333f, 0.271f, 0.184f);
-        public static readonly Color HintColor = new Color(0.357f, 0.282f, 0.149f);
-        //The fill behind every primary button and active tab. Gold is a pale colour, which
-        //is why the ink that goes on it is the near black one rather than white: white on
-        //gold measures 1.9 to 1 and is unreadable at any size, where the dark brown is 6 to 1.
-        //That is the whole reason this palette reads the way it does and the blue one did not.
-        public static readonly Color AccentColor = new Color(0.784f, 0.569f, 0.180f);
-        public static readonly Color AccentTextColor = new Color(0.165f, 0.106f, 0.031f);
-        //A fill and an ink cannot be the same gold. The fill has to stay bright enough to
-        //read as gold and the ink has to go dark enough to be read on a tan card, and one
-        //colour trying to do both lands between the two and fails at each. This is the ink:
-        //the bronze for a label, a subtitle or an NPC's name.
-        public static readonly Color AccentInkColor = new Color(0.416f, 0.251f, 0.031f);
+        //normal sized text stays readable - see tools/check/contrast.py.
+        public static readonly Color TitleColor = new Color(0.063f, 0.078f, 0.094f);
+        public static readonly Color LabelColor = new Color(0.204f, 0.259f, 0.306f);
+        public static readonly Color NameColor = new Color(0.078f, 0.098f, 0.122f);
+        public static readonly Color MutedColor = new Color(0.227f, 0.278f, 0.314f);
+        public static readonly Color HintColor = new Color(0.208f, 0.263f, 0.310f);
+        //The ink for the header band, and the one thing in the set that is not near black.
+        //TitleColor cannot do this job as well as its own: it is the heading on a pale card
+        //too, and a colour light enough to read on the header is invisible there. Two names
+        //because they are two surfaces, not because they are two shades of the same idea.
+        public static readonly Color TitleBarInkColor = Color.white;
+        //the fill behind every primary button and active tab, which is the header colour so
+        //that a button reads as belonging to the window it is in
+        public static readonly Color AccentColor = new Color(0.027f, 0.447f, 0.659f);
+        public static readonly Color AccentTextColor = Color.white;
+        //A fill and an ink cannot be the same blue. The fill has to stay light enough for
+        //white to read on it and the ink has to go darker to read on a pale card, and one
+        //colour trying to do both lands between the two and fails at each. This is the
+        //ink: the blue for a label, a subtitle or an NPC's name.
+        public static readonly Color AccentInkColor = new Color(0.020f, 0.361f, 0.529f);
         //the ink for a surface too dark to take the near black one
-        public static readonly Color LightInkColor = new Color(0.984f, 0.965f, 0.918f);
-        //a gain on a stat used to be drawn green; the interface is one warm set throughout now
+        public static readonly Color LightInkColor = new Color(0.980f, 0.992f, 1.000f);
+        //a gain on a stat used to be drawn green; the interface is one blue set throughout now
         public static readonly Color PositiveColor = AccentInkColor;
-        public static readonly Color IconColor = new Color(0.416f, 0.251f, 0.031f);
-        public static readonly Color IconMutedColor = new Color(0.349f, 0.290f, 0.192f);
+        public static readonly Color IconColor = new Color(0.020f, 0.361f, 0.529f);
+        public static readonly Color IconMutedColor = new Color(0.271f, 0.325f, 0.369f);
 
         //one place to change how big text is, so a legibility pass is a single edit
         public const float SizeTitle = 30f;
@@ -246,11 +249,22 @@ namespace Assets.Scripts.UI
         /// while keeping the bar (and so moving and closing) fully functional.
         /// Returns the drag bar so callers can skip it when hiding old content.
         /// </summary>
-        public static Transform ApplyWindowChrome(Component window, Sprite icon = null)
-        {
-            var root = (RectTransform)window.transform;
+        public static Transform ApplyWindowChrome(Component window, Sprite icon = null) =>
+            ApplyWindowChrome((RectTransform)window.transform, icon);
 
-            var rootImage = window.GetComponent<Image>();
+        /// <summary>
+        /// The same, given the panel rather than the component that owns it.
+        /// </summary>
+        /// <remarks>
+        /// Needed because a window's script does not always sit on the window. Three of the
+        /// title screen's are on an empty wrapper with the panel one level down, and passing
+        /// the component meant this looked for a background and a header on an object that
+        /// has neither, found nothing, and returned - so those windows went unthemed for as
+        /// long as the theme has existed, with nothing anywhere saying so.
+        /// </remarks>
+        public static Transform ApplyWindowChrome(RectTransform root, Sprite icon = null)
+        {
+            var rootImage = root.GetComponent<Image>();
             //an image the window left clear is there to catch clicks, not to be seen, so
             //painting it would put a panel on screen that was never meant to be there
             if (rootImage != null && rootImage.color.a > 0.1f)
@@ -279,7 +293,7 @@ namespace Assets.Scripts.UI
 
                 foreach (var barText in child.GetComponentsInChildren<TextMeshProUGUI>(true))
                 {
-                    barText.color = TitleColor;
+                    barText.color = TitleBarInkColor;
                     barText.fontStyle = FontStyles.Bold;
                     barText.extraPadding = true;
                 }
@@ -289,9 +303,11 @@ namespace Assets.Scripts.UI
                     if (IsCloseButton(barButton))
                         continue;
 
+                    //a pale chip, because the band under it is the darkest surface in the
+                    //set and a dark grey control on it is a control nobody finds
                     var buttonImage = barButton.GetComponent<Image>();
                     if (buttonImage != null)
-                        buttonImage.color = HintColor;
+                        buttonImage.color = LightInkColor;
                 }
 
                 if (icon != null)
@@ -727,20 +743,23 @@ namespace Assets.Scripts.UI
                 //Lined up with the title rather than centred in the band. The band is not
                 //always the same height, and at 38 tall from 18 down the badge ran past
                 //the foot of a short one and sat on the rule.
-                var badge = CreateCard(bar, "Icon", AccentColor);
+                //A pale chip carrying the accent, not the accent carrying white. The band
+                //is the accent colour itself now, so a chip in that colour is a chip nobody
+                //can see - it has to be the other way round up here.
+                var badge = CreateCard(bar, "Icon", LightInkColor);
                 Place(badge, new Vector2(0, 1), new Vector2(22, -12), new Vector2(34, 34));
-                CreateIcon(badge, icon, AccentTextColor, 20);
+                CreateIcon(badge, icon, AccentColor, 20);
                 textLeft = 72f;
             }
 
-            var label = CreateText(bar, "Title", title, SizeTitle - 2, TitleColor, TextAlignmentOptions.BottomLeft,
-                FontStyles.Bold);
+            var label = CreateText(bar, "Title", title, SizeTitle - 2, TitleBarInkColor,
+                TextAlignmentOptions.BottomLeft, FontStyles.Bold);
             Place((RectTransform)label.transform, new Vector2(0, 1), new Vector2(textLeft, -12), new Vector2(420, 34));
 
             if (!string.IsNullOrEmpty(subtitle))
             {
                 //measured against the band it lands on, not against the window behind it
-                var sub = CreateText(bar, "Subtitle", subtitle, SizeSubtitle, AccentInkOn(TitleBarColor),
+                var sub = CreateText(bar, "Subtitle", subtitle, SizeSubtitle, InkFor(TitleBarColor),
                     TextAlignmentOptions.TopLeft);
                 Place((RectTransform)sub.transform, new Vector2(0, 1), new Vector2(textLeft, -48), new Vector2(420, 22));
             }
@@ -750,7 +769,7 @@ namespace Assets.Scripts.UI
             var rule = new GameObject("Rule", typeof(Image));
             rule.transform.SetParent(bar, false);
             var ruleImage = rule.GetComponent<Image>();
-            ruleImage.color = AccentColor;
+            ruleImage.color = AccentInkColor;
             ruleImage.raycastTarget = false;
 
             var ruleRect = (RectTransform)rule.transform;
@@ -1021,7 +1040,7 @@ namespace Assets.Scripts.UI
                         alpha = 0.34f * (1f - t) * (1f - t);
                     }
 
-                    texture.SetPixel(x, y, new Color(0.16f, 0.11f, 0.05f, alpha));
+                    texture.SetPixel(x, y, new Color(0.05f, 0.11f, 0.20f, alpha));
                 }
             }
 
@@ -1039,7 +1058,7 @@ namespace Assets.Scripts.UI
         //of a point darker in the ink is a fifth of a point off the ratio, which is what put
         //all four of these under the bar without anything visibly changing. They are measured
         //against the ink that is really used now - see tools/check/contrast.py.
-        public static readonly Color GaugeTrackColor = new Color(0.176f, 0.129f, 0.075f);
+        public static readonly Color GaugeTrackColor = new Color(0.106f, 0.145f, 0.196f);
         public static readonly Color GaugeHealthColor = new Color(0.177f, 0.502f, 0.206f);
         public static readonly Color GaugeManaColor = new Color(0.198f, 0.435f, 0.791f);
         public static readonly Color GaugeExpColor = new Color(0.574f, 0.413f, 0.115f);

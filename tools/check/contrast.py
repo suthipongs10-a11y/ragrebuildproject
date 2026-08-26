@@ -46,6 +46,10 @@ def contrast(a, b):
 COLOUR = re.compile(
     r"Color\s+(\w+)\s*=\s*new Color\(\s*([\d.]+)f?\s*,\s*([\d.]+)f?\s*,\s*([\d.]+)f?")
 
+#  the two the palette writes by name rather than by number
+NAMED = re.compile(r"Color\s+(\w+)\s*=\s*Color\.(white|black)\s*;")
+BY_NAME = {"white": (1.0, 1.0, 1.0), "black": (0.0, 0.0, 0.0)}
+
 
 def read_colours():
     """Every named colour constant under Assets/Scripts/UI, keyed file::name."""
@@ -56,12 +60,16 @@ def read_colours():
                 continue
             path = os.path.join(folder, name)
             with open(path, encoding="utf-8-sig") as handle:
+                prefix = os.path.relpath(path, UI).replace(os.sep, "/") + "::"
                 for line in handle:
                     match = COLOUR.search(line)
-                    if not match:
+                    if match:
+                        found[prefix + match.group(1)] = tuple(float(x) for x in match.groups()[1:])
                         continue
-                    key = os.path.relpath(path, UI).replace(os.sep, "/") + "::" + match.group(1)
-                    found[key] = tuple(float(x) for x in match.groups()[1:])
+
+                    match = NAMED.search(line)
+                    if match:
+                        found[prefix + match.group(1)] = BY_NAME[match.group(2)]
     return found
 
 
@@ -72,14 +80,18 @@ THEME = "ModernUiTheme.cs::"
 #  clearing that clears the lighter ones too.
 PAIRS = [
     # the theme's own inks, on every surface the theme puts them on
-    (THEME + "TitleColor", THEME + "TitleBarColor", "text"),
+    #  the header band has an ink of its own; the near black ones never land on it
+    (THEME + "TitleBarInkColor", THEME + "TitleBarColor", "text"),
+    (THEME + "LightInkColor", THEME + "TitleBarColor", "text"),
     (THEME + "TitleColor", THEME + "CardDeepColor", "text"),
     (THEME + "NameColor", THEME + "CardDeepColor", "text"),
-    (THEME + "LabelColor", THEME + "TitleBarColor", "text"),
+    (THEME + "LabelColor", THEME + "CardDeepColor", "text"),
     (THEME + "MutedColor", THEME + "CardDeepColor", "text"),
-    (THEME + "HintColor", THEME + "TitleBarColor", "text"),
-    (THEME + "AccentInkColor", THEME + "TitleBarColor", "text"),
+    (THEME + "HintColor", THEME + "CardDeepColor", "text"),
+    (THEME + "AccentInkColor", THEME + "CardDeepColor", "text"),
     (THEME + "AccentTextColor", THEME + "AccentColor", "text"),
+    #  the badge on the header is a pale chip carrying the accent, not the other way round
+    (THEME + "AccentColor", THEME + "LightInkColor", "graphic"),
     (THEME + "IconColor", THEME + "CardDeepColor", "graphic"),
     (THEME + "IconMutedColor", THEME + "CardDeepColor", "graphic"),
 

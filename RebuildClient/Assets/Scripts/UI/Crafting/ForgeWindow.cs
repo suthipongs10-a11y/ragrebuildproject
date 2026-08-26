@@ -83,7 +83,7 @@ namespace Assets.Scripts.UI.Crafting
         private static readonly Color ShortColor = new Color(0.602f, 0.226f, 0.087f);
 
         /// <summary>Every other row, so a long list reads as rows and not as a wall.</summary>
-        private static readonly Color RowAltColor = new Color(0.965f, 0.933f, 0.867f);
+        private static readonly Color RowAltColor = new Color(0.949f, 0.973f, 0.988f);
 
         /// <summary>It worked.</summary>
         private static readonly Color GoodColor = new Color(0.102f, 0.398f, 0.201f);

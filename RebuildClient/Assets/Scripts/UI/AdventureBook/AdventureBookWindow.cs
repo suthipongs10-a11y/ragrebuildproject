@@ -94,14 +94,14 @@ namespace Assets.Scripts.UI.AdventureBook
 
         /// <summary>A star that has been earned, against one that has not.</summary>
         private static readonly Color EarnedColor = new Color(0.565f, 0.427f, 0.089f);
-        private static readonly Color UnearnedColor = new Color(0.780f, 0.757f, 0.706f);
+        private static readonly Color UnearnedColor = new Color(0.741f, 0.780f, 0.827f);
 
-        private static readonly Color RowAltColor = new Color(0.965f, 0.933f, 0.867f);
+        private static readonly Color RowAltColor = new Color(0.949f, 0.973f, 0.988f);
 
         /// <summary>What the four things this window does are drawn on, against the list's own card.</summary>
-        private static readonly Color MenuRowColor = new Color(0.925f, 0.855f, 0.706f);
+        private static readonly Color MenuRowColor = new Color(0.827f, 0.906f, 0.961f);
         private static readonly Color DoneColor = new Color(0.102f, 0.398f, 0.201f);
-        private static readonly Color TrackColor = new Color(0.855f, 0.792f, 0.667f);
+        private static readonly Color TrackColor = new Color(0.796f, 0.871f, 0.918f);
 
         /// <summary>
         /// The Adventure rank gauge, which is its own colour rather than the experience bar's.
@@ -113,7 +113,7 @@ namespace Assets.Scripts.UI.AdventureBook
         /// enough to say "this is not your level".
         /// </remarks>
         private static readonly Color RankFillColor = new Color(0.612f, 0.255f, 0.094f);
-        private static readonly Color FillColor = new Color(0.565f, 0.369f, 0.106f);
+        private static readonly Color FillColor = new Color(0.098f, 0.404f, 0.596f);
 
         private enum View { Regions, Pages, Page, Rewards, Ranks, Status, Bosses, Box, Help }
 

@@ -50,13 +50,13 @@ namespace Assets.Scripts.UI
         public void ReleaseHighlightSkillBox()
         {
             if(background != null)
-                background.color = new Color(0.784f, 0.569f, 0.180f, 0f);
+                background.color = new Color(0.027f, 0.447f, 0.659f, 0f);
         }
 
         public void HighlightSkillBox()
         {
             parent.HighlightedEntry = this;
-            background.color = new Color(0.784f, 0.569f, 0.180f, 0.32f);
+            background.color = new Color(0.027f, 0.447f, 0.659f, 0.25f);
         }
 
         public void RefreshLevelText()

@@ -24,7 +24,7 @@ namespace Assets.Scripts.UI.Inventory
     public class ModernAmmoSlot : UIBehaviour, IPointerEnterHandler, IPointerExitHandler,
         IPointerClickHandler, IItemDropTarget
     {
-        private static readonly Color32 HoverColor = new Color32(226, 203, 157, 255);
+        private static readonly Color32 HoverColor = new Color32(149, 190, 255, 255);
         private static readonly Color32 Clear = new Color32(0, 0, 0, 0);
 
         private const float RefreshInterval = 0.25f;

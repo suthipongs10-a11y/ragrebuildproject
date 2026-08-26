@@ -66,7 +66,7 @@ namespace Assets.Scripts.UI.Market
         // Colours the shared theme has no name for, because only a market needs them.
 
         /// <summary>Every other row, so a long list reads as rows and not as a wall.</summary>
-        private static readonly Color RowAltColor = new Color(0.965f, 0.933f, 0.867f);
+        private static readonly Color RowAltColor = new Color(0.949f, 0.973f, 0.988f);
 
         /// <summary>Money. On a page about money it should be the first thing found.</summary>
         private static readonly Color MoneyColor = new Color(0.451f, 0.310f, 0.055f);
@@ -1255,7 +1255,11 @@ namespace Assets.Scripts.UI.Market
                     ? UrgentColor
                     : ModernUiTheme.MutedColor);
 
-            if (ownPage)
+            //Offered wherever the order is, not only on your own page. Somebody browsing the
+            //buy board finds their own order sitting in it marked "yours" - and until now
+            //that row was the one row on the board with nothing you could do to it, so the
+            //way to close an order was to know it was on a different tab.
+            if (ownPage || mine)
             {
                 var id = order.Id;
                 var refund = order.RemainingValue;
@@ -1277,13 +1281,18 @@ namespace Assets.Scripts.UI.Market
                       + $"คืนมัดจำ {refund:N0} Zeny\nค่าธรรมเนียมตอนตั้งไม่คืน";
 
                 collect.onClick.AddListener(() =>
-                    Confirm(question, () => NetworkManager.Instance.SendBuyOrderCancel(id),
+                    Confirm(question, () =>
+                        {
+                            NetworkManager.Instance.SendBuyOrderCancel(id);
+
+                            //The server answers a close by re-sending your own list, which is
+                            //not the list being looked at when the close was pressed from the
+                            //board. Asked for again from here so the row goes wherever it was.
+                            Ask();
+                        },
                         "ปิดคำสั่งซื้อ", ModernUiIcons.Alert));
                 return;
             }
-
-            if (mine)
-                return;
 
             var captured = order;
             var has = TryFindStack(order.ItemId, out _, out _);
@@ -2092,8 +2101,8 @@ namespace Assets.Scripts.UI.Market
             //multiplied against the row's own colour, so white means leave it alone
             var colors = button.colors;
             colors.normalColor = Color.white;
-            colors.highlightedColor = new Color(1f, 0.97f, 0.90f);
-            colors.pressedColor = new Color(0.95f, 0.90f, 0.80f);
+            colors.highlightedColor = new Color(0.94f, 0.97f, 1f);
+            colors.pressedColor = new Color(0.86f, 0.91f, 0.98f);
             colors.selectedColor = Color.white;
             colors.disabledColor = Color.white;
             colors.fadeDuration = 0.08f;

@@ -63,8 +63,12 @@ namespace Assets.Scripts.UI.TitleScreen
         {
             ModernUiTheme.MarkSkinned(win.gameObject);
 
-            var root = (RectTransform)win.transform;
-            var bar = ModernUiTheme.ApplyWindowChrome(win, ModernUiIcons.Person);
+            //Not win.transform. The picker's script sits on an empty wrapper with the panel
+            //one level below it, so every one of these calls used to be handed an object with
+            //no background and no header and quietly did nothing - which is why this screen
+            //has looked untouched while every window behind it was themed.
+            var root = ResolvePanel(win.transform);
+            var bar = ModernUiTheme.ApplyWindowChrome(root, ModernUiIcons.Person);
             ModernUiTheme.AttachShadow(root);
             NameTheBar(bar, "เลือกตัวละคร", "Select your Character");
 
@@ -177,8 +181,9 @@ namespace Assets.Scripts.UI.TitleScreen
                 GrowButton(win.SubmitButton);
             }
 
-            if (win.WindowRect != null)
-                NameTheBar(FindDragBar(win.WindowRect), "เข้าสู่ระบบ", "Sign in");
+            var loginPanel = win.WindowRect != null ? win.WindowRect : ResolvePanel(win.transform);
+            ModernUiTheme.ApplyWindowChrome(loginPanel, ModernUiIcons.Person);
+            NameTheBar(FindDragBar(loginPanel), "เข้าสู่ระบบ", "Sign in");
 
             if (win.RememberLoginToggle != null)
             {
@@ -337,7 +342,10 @@ namespace Assets.Scripts.UI.TitleScreen
                     continue;
 
                 label.richText = true;
-                label.text = $"{thai}   <size=-5><color=#6A4008>{english}</color></size>";
+                //#DCF3FF is the lightest tone that still reads as quieter than the white
+                //beside it while clearing 4.6 to 1 on the header. Anything closer to the
+                //header's own blue looks right on a monitor and vanishes on a phone.
+                label.text = $"{thai}   <size=-5><color=#DCF3FF>{english}</color></size>";
                 label.textWrappingMode = TextWrappingModes.NoWrap;
                 return;
             }
@@ -368,6 +376,33 @@ namespace Assets.Scripts.UI.TitleScreen
             }
 
             return null;
+        }
+
+        /// <summary>
+        /// The object that is actually the window, starting from whatever the script is on.
+        /// </summary>
+        /// <remarks>
+        /// A window is the thing with a header on it. Walking down for that rather than
+        /// trusting the script's own object, because on this screen the script is on a
+        /// wrapper - and a wrapper has no background, so everything painted onto it lands
+        /// nowhere and says nothing about having failed.
+        ///
+        /// Only one level down, which is where all three of them are; deeper and it would
+        /// start finding the drag handles of things inside the window.
+        /// </remarks>
+        private static RectTransform ResolvePanel(Transform script)
+        {
+            if (FindDragBar(script) != null)
+                return (RectTransform)script;
+
+            for (var i = 0; i < script.childCount; i++)
+            {
+                var child = script.GetChild(i);
+                if (FindDragBar(child) != null && child is RectTransform rect)
+                    return rect;
+            }
+
+            return (RectTransform)script;
         }
 
         private static void StyleHeadline(TextMeshProUGUI text)

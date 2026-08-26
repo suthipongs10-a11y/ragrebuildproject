@@ -179,6 +179,7 @@ namespace Assets.Scripts.UI
             { "Submit", "ตกลง" },
             { "Delete", "ลบ" },
             { "Select Character", "เลือกตัวละคร" },
+            { "Character Select", "เลือกตัวละคร" },
             { "Job", "อาชีพ" },
             { "Location", "ตำแหน่ง" },
             { "HP", "พลังชีวิต" },

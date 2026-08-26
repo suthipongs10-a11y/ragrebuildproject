@@ -255,8 +255,8 @@ namespace Assets.Scripts.UI.Hud
             //white is what keeps the two above looking like the colours that were chosen
             var colors = button.colors;
             colors.normalColor = Color.white;
-            colors.highlightedColor = new Color(1f, 0.97f, 0.90f);
-            colors.pressedColor = new Color(0.95f, 0.90f, 0.80f);
+            colors.highlightedColor = new Color(0.90f, 0.94f, 1f);
+            colors.pressedColor = new Color(0.80f, 0.86f, 0.95f);
             colors.selectedColor = Color.white;
             button.colors = colors;
 

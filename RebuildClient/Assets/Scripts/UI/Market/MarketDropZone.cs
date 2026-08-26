@@ -21,7 +21,7 @@ namespace Assets.Scripts.UI.Market
     {
         public Image Highlight;
         public Color IdleColor = Color.white;
-        public Color HoverColor = new Color(0.886f, 0.796f, 0.616f);
+        public Color HoverColor = new Color(0.72f, 0.85f, 1f);
 
         /// <summary>Which windows an item may be dragged from into this row.</summary>
         public ItemDragOrigin ValidOrigins = ItemDragOrigin.ItemWindow | ItemDragOrigin.CartWindow;

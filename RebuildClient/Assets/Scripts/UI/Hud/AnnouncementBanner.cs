@@ -29,7 +29,7 @@ namespace Assets.Scripts.UI.Hud
         /// Dark, so gold text sits on it at full strength. The chat log is dark for the
         /// same reason and this has to read against whatever the world is doing behind it.
         /// </summary>
-        private static readonly Color PlateColor = new Color(0.118f, 0.086f, 0.047f, 0.88f);
+        private static readonly Color PlateColor = new Color(0.055f, 0.078f, 0.118f, 0.88f);
 
         private static readonly Color RuleColor = new Color(1f, 0.784f, 0.239f, 0.75f);
 
