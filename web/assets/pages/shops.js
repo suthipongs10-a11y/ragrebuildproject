@@ -8,8 +8,11 @@ export async function list() {
   const host = document.createElement("div");
   host.innerHTML = `
     <h1>ร้านค้า NPC</h1>
-    <p class="lede">${n(shops.length)} ร้าน — ราคาที่โชว์ในหน้าไอเท็มคือราคาหลังปรับด้วย
-    <code>OnSetItemPurchasePrice</code> แล้ว</p>`;
+    <p class="lede">
+      ${n(shops.length)} ร้าน — ราคาปกติคือราคาของไอเท็มหลังปรับด้วย
+      <code>OnSetItemPurchasePrice</code> แล้ว
+      ป้ายราคาที่ติดอยู่ข้างชื่อคือร้านที่ตั้งราคาเองด้วย <code>SellItem(ชื่อ, ราคา)</code>
+    </p>`;
 
   const body = document.createElement("div");
   host.appendChild(body);
@@ -17,7 +20,8 @@ export async function list() {
   const rows = shops.map((s) => ({
     ...s,
     mapName: maps.get(s.map)?.name ?? s.map,
-    itemNames: s.items.map((id) => byId.get(id)?.name ?? "").join(" ").toLowerCase(),
+    itemNames: s.items.map((e) => byId.get(e.id)?.name ?? "").join(" ").toLowerCase(),
+    overrides: s.items.filter((e) => e.price !== undefined).length,
   }));
 
   filterable({
@@ -38,7 +42,10 @@ export async function list() {
           sortValue: (s) => s.items.length, render: (s) => n(s.items.length) },
         { key: "items", label: "ขายอะไรบ้าง",
           sortValue: (s) => s.itemNames,
-          render: (s) => s.items.map((id) => itemLink(byId.get(id))).join(", ") },
+          render: (s) => s.items
+            .map((e) => itemLink(byId.get(e.id)) +
+              (e.price !== undefined ? ` <span class="chip mute">${n(e.price)}z</span>` : ""))
+            .join(", ") },
       ], { sort: "mapName", dir: "asc" }),
   });
 

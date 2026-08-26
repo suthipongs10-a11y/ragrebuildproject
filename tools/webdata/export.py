@@ -141,6 +141,50 @@ def remap_drop_rate(item, rate):
     return min(rate, 10000)
 
 
+SALE_ZERO_RE = re.compile(r'if\s*\((.*?)\)\s*return\s+0\s*;')
+CODE_EQ_RE = re.compile(r'code\s*==\s*"([^"]+)"')
+
+
+def parse_zero_sale_codes():
+    """Items a config script forces to sell back for nothing.
+
+    Script/Config/TesterShopValues.txt does this so the Equipment Tester can hand
+    out starting gear for a single zeny without opening a buy-low-sell-high loop.
+    Npc.SellItem throws at startup if that loop exists, so getting this wrong here
+    would make the site claim a shop the server would refuse to start with.
+    """
+    zero = set()
+    folder = os.path.join(SCRIPT, "Config")
+    if not os.path.isdir(folder):
+        return zero
+    for fname in sorted(os.listdir(folder)):
+        if not fname.endswith(".txt"):
+            continue
+        text = read_text(os.path.join(folder, fname))
+        idx = text.find("OnSetItemSaleValue:")
+        if idx < 0:
+            continue
+        section = text[idx:]
+        end = section.find("\nOn", 1)
+        if end > 0:
+            section = section[:end]
+        for line in section.splitlines():
+            line = line.split("//")[0]
+            m = SALE_ZERO_RE.search(line)
+            if not m:
+                continue
+            codes = CODE_EQ_RE.findall(m.group(1))
+            if codes:
+                zero.update(codes)
+            elif "type ==" not in m.group(1):
+                warn(f"Config: {fname} has a `return 0` in OnSetItemSaleValue "
+                     f"that this exporter does not understand: {line.strip()}")
+    return zero
+
+
+ZERO_SALE_CODES = set()
+
+
 def adjust_prices(item):
     """Replicate OnSetItemPurchasePrice / OnSetItemSaleValue from the same config script."""
     price = item["price"]
@@ -158,6 +202,8 @@ def adjust_prices(item):
     else:
         sell //= 3
     if itype == "Ammo":
+        sell = 0
+    if item["code"] in ZERO_SALE_CODES:
         sell = 0
 
     if sell * 125 // 100 > price * 75 // 100:
@@ -222,6 +268,8 @@ def parse_item_effects():
 
 
 def build_items():
+    global ZERO_SALE_CODES
+    ZERO_SALE_CODES = parse_zero_sale_codes()
     items = {}
     by_code = {}
 
@@ -552,7 +600,9 @@ NPC_RE = re.compile(
 
 TRADER_RE = re.compile(
     r'Trader\(\s*"([^"]+)"\s*,\s*"([^"]*)"\s*,\s*"[^"]*"\s*,\s*(\d+)\s*,\s*(\d+)[^)]*\)\s*\{(.*?)\n\}', re.S)
-SELL_RE = re.compile(r'SellItem\(\s*"([^"]+)"')
+# Npc.SellItem has two overloads: the one-argument form charges the item's own
+# price, the two-argument form names a price and overrides it entirely.
+SELL_RE = re.compile(r'SellItem\(\s*"([^"]+)"\s*(?:,\s*(\d+)\s*)?\)')
 
 
 def parse_shops(by_code):
@@ -561,7 +611,8 @@ def parse_shops(by_code):
     for path in script_files("Npcs"):
         text = read_text(path)
         for m in TRADER_RE.finditer(text):
-            codes = []
+            stock = []
+            seen = set()
             for line in m.group(5).splitlines():
                 line = line.split("//")[0]
                 for sell in SELL_RE.finditer(line):
@@ -570,13 +621,18 @@ def parse_shops(by_code):
                     if item is None:
                         warn(f"Shops: {m.group(2)} sells unknown item {code}")
                         continue
-                    if item["id"] not in codes:
-                        codes.append(item["id"])
-            if codes:
+                    if item["id"] in seen:
+                        continue
+                    seen.add(item["id"])
+                    entry = {"id": item["id"]}
+                    if sell.group(2) is not None:
+                        entry["price"] = num(sell.group(2))
+                    stock.append(entry)
+            if stock:
                 shops.append({
                     "map": m.group(1), "name": m.group(2),
                     "x": num(m.group(3)), "y": num(m.group(4)),
-                    "items": codes,
+                    "items": stock,
                 })
     return shops
 
@@ -999,6 +1055,259 @@ def build_ore_discovery(by_code):
 
 
 # ---------------------------------------------------------------------------
+# the systems this project added
+# ---------------------------------------------------------------------------
+
+# Custom/AdventureBook/AdventureBook.cs
+BOOK_REGION_HEADGEAR = {
+    "Prontera Culverts": "Detective's_Cap", "Prontera Fields": "Romantic_White_Flower",
+    "Morroc Fields": "Cowboy_Hat", "Payon Fields": "Ayam", "Ant Hell": "Dark_Blinder",
+    "Izlude Bailan Cave": "Mythical_Lion_Mask", "Orc Dungeon": "Orc_Helm_",
+    "Mt. Mjolnir": "Zealotus_Mask", "Geffen Fields": "Bulb_Band",
+    "Mjolnir Dead Pit": "Coif_", "Forest Labyrinth": "Banana_Hat", "Lutie": "Shafka",
+    "Yuno Fields": "Ph.D_Hat_", "Payon Dungeon": "Magistrate_Hat", "Comodo": "Pirate_Dagger",
+    "Geffen Dungeon": "Dark_Bacilium", "Sphinx": "Sphinx_Hat_", "Sunken Ship": "Red_Bonnet",
+    "Pyramid": "Cross_Hat", "Clock Tower": "Golden_Gear_", "Amatsu": "Bride_Mask",
+    "Glast Heim": "Opera_Phantom_Mask", "Magma Dungeon": "Hot-Blooded_Headband",
+    "Turtle Island": "Spiky_Band_",
+}
+
+BOOK_SKIPPED_REGIONS = {"towns", "debug room", "prontera guild realm"}
+
+BOOK_REGION_OVERRIDES = {
+    "PORING": "Prontera Fields", "POPORING": "Geffen Fields", "DROPS": "Morroc Fields",
+    "MARIN": "Lutie", "POISON_SPORE": "Payon Fields", "THIEF_BUG": "Prontera Culverts",
+    "THIEF_BUG_FEMALE": "Prontera Culverts", "THIEF_BUG_MALE": "Prontera Culverts",
+}
+
+# AdventureBookRank.StarsForRank, then BonusFor
+BOOK_RANK_STARS = [30, 90, 175, 280, 390, 490, 580, 650, 700]
+
+# AdventureBookRewards.Bands, keyed by the page's max level
+BOOK_REWARD_BANDS = [
+    (29, [("Concentration_Potion", 5), ("Elunium", 1)],
+         [("Old_Blue_Box", 1), ("Oridecon", 1)],
+         [("Old_Purple_Box", 1), ("Elunium", 2), ("Oridecon", 2)]),
+    (59, [("Awakening_Potion", 5), ("Elunium", 1)],
+         [("Old_Blue_Box", 2), ("Oridecon", 1)],
+         [("Old_Purple_Box", 2), ("Elunium", 2), ("Oridecon", 2)]),
+    (None, [("Berserk_Potion", 5), ("Elunium", 1)],
+           [("Old_Purple_Box", 1), ("Oridecon", 1)],
+           [("Old_Purple_Box", 3), ("Elunium", 3), ("Oridecon", 3)]),
+]
+
+BOOK_RANK_REWARDS = [
+    [("Elunium", 5), ("Oridecon", 5), ("Battle_Manual", 1), ("Bubble_Gum", 1)],
+    [("Elunium", 10), ("Oridecon", 10), ("Battle_Manual", 2), ("Bubble_Gum", 2)],
+    [("Elunium", 15), ("Oridecon", 15), ("Battle_Manual", 3), ("Bubble_Gum", 3)],
+    [("Elunium", 20), ("Oridecon", 20), ("Battle_Manual", 4), ("Bubble_Gum", 4), ("Old_Purple_Box", 3)],
+    [("Elunium", 30), ("Oridecon", 30), ("Battle_Manual", 5), ("Bubble_Gum", 5), ("Old_Purple_Box", 5)],
+    [("Elunium", 40), ("Oridecon", 40), ("Battle_Manual", 6), ("Bubble_Gum", 6), ("Old_Card_Album", 3)],
+    [("Elunium", 50), ("Oridecon", 50), ("Battle_Manual", 8), ("Bubble_Gum", 8), ("Old_Card_Album", 5)],
+    [("Elunium", 70), ("Oridecon", 70), ("Battle_Manual", 10), ("Bubble_Gum", 10), ("Old_Card_Album", 8)],
+    [("Elunium", 100), ("Oridecon", 100), ("Battle_Manual", 15), ("Bubble_Gum", 15), ("Old_Card_Album", 12)],
+    [("Valkyrian_Helm", 1), ("Valkyrian_Armor", 1), ("Valkyrian_Manteau", 1),
+     ("Valkyrian_Shoes", 1), ("Valkyrja's_Shield", 1), ("Elunium", 150), ("Oridecon", 150)],
+]
+
+
+def hunt_target(spawn_count):
+    """AdventureBook.HuntTargetForSpawnCount."""
+    target = (spawn_count // 2 + 49) // 50 * 50
+    return max(50, min(target, 500))
+
+
+def rank_bonus(rank):
+    """AdventureBookRank.BonusFor - cumulative, not additive per rank."""
+    if rank <= 0:
+        return (0, 0, 0, 0)
+    if rank >= 10:
+        return (5, 12, 12, 8)
+    return (min(rank, 3),
+            max(0, min(rank - 3, 3)) * 3,
+            max(0, min(rank - 6, 3)) * 3,
+            max(0, min(rank - 6, 3)) * 2)
+
+
+def reward_ids(pairs, by_code):
+    out = []
+    for code, count in pairs:
+        item = by_code.get(code)
+        if item is None:
+            warn(f"AdventureBook: reward item {code} does not exist")
+            continue
+        out.append({"id": item["id"], "count": count})
+    return out
+
+
+def build_adventure_book(monsters, maps, items, by_code):
+    """Replicate AdventureBook.Build against the exported map list.
+
+    The server builds this from the maps that actually loaded, which is the same set
+    Maps.csv gives us here, so the page list and the star total come out identical
+    to what a player sees.
+    """
+    instance_of = {m["code"]: m["instance"] for m in maps}
+
+    gathered = {}
+    bosses = set()
+    for m in maps:
+        for rule in m["spawns"]:
+            if rule["count"] <= 0:
+                continue
+            if rule.get("flag") in ("Boss", "MVP"):
+                bosses.add(rule["code"])
+                continue
+            found = gathered.setdefault(rule["code"], {
+                "code": rule["code"], "sightings": defaultdict(int),
+                "regions": defaultdict(int),
+            })
+            found["sightings"][m["code"]] += rule["count"]
+            region = instance_of.get(m["code"], "")
+            if region and region.lower() not in BOOK_SKIPPED_REGIONS:
+                found["regions"][region] += rule["count"]
+
+    def card_of(code):
+        for drop in monsters[code].get("drops", []):
+            if items[drop["id"]]["type"] == "Card":
+                return drop["id"]
+        return 0
+
+    groups = defaultdict(list)
+    not_quarry = 0
+    for code, found in gathered.items():
+        if code in bosses:
+            continue
+        mon = monsters.get(code)
+        if mon is None:
+            continue
+        if mon["exp"] == 0 and mon["jobExp"] == 0:
+            not_quarry += 1
+            continue
+        card = card_of(code)
+        groups[card if card > 0 else -mon["id"]].append((mon, found))
+
+    pages = []
+    regions = {}
+    homeless = 0
+    for key, members in sorted(groups.items()):
+        members.sort(key=lambda x: x[0]["id"])
+        region_counts = defaultdict(int)
+        map_counts = defaultdict(int)
+        for mon, found in members:
+            for region, count in found["regions"].items():
+                region_counts[region] += count
+            for mp, count in found["sightings"].items():
+                map_counts[mp] += count
+
+        region = None
+        for mon, _ in members:
+            chosen = BOOK_REGION_OVERRIDES.get(mon["code"])
+            if chosen and chosen in BOOK_REGION_HEADGEAR:
+                region = chosen
+                break
+        if region is None and region_counts:
+            region = max(region_counts.items(), key=lambda kv: kv[1])[0]
+        if region is None or region not in BOOK_REGION_HEADGEAR:
+            homeless += len(members)
+            continue
+
+        regions.setdefault(region, {"name": region,
+                                    "headgear": by_code[BOOK_REGION_HEADGEAR[region]]["id"]
+                                    if BOOK_REGION_HEADGEAR[region] in by_code else 0,
+                                    "pages": 0, "stars": 0})
+
+        spawn_count = sum(map_counts.values())
+        target = hunt_target(spawn_count)
+        card_id = key if key > 0 else 0
+        level = sum(m["level"] for m, _ in members) // len(members)
+        stars = 3 if card_id else 2
+
+        regions[region]["pages"] += 1
+        regions[region]["stars"] += stars
+
+        pages.append({
+            "pageId": card_id if card_id else members[0][0]["id"],
+            "name": items[card_id]["name"].replace(" Card", "") if card_id else members[0][0]["name"],
+            "monsters": [m["code"] for m, _ in members],
+            "level": level,
+            "region": region,
+            "cardId": card_id,
+            "spawnCount": spawn_count,
+            "huntTarget": target,
+            "huntTargetLarge": target * 3,
+            "stars": stars,
+            "maps": [{"map": k, "count": v}
+                     for k, v in sorted(map_counts.items(), key=lambda kv: -kv[1])],
+        })
+
+    pages.sort(key=lambda p: (p["region"], p["level"]))
+    total_stars = sum(p["stars"] for p in pages)
+
+    band_rows = []
+    for max_level, hunt, hunt_large, card in BOOK_REWARD_BANDS:
+        band_rows.append({
+            "maxLevel": max_level,
+            "hunt": reward_ids(hunt, by_code),
+            "huntLarge": reward_ids(hunt_large, by_code),
+            "card": reward_ids(card, by_code),
+        })
+
+    ranks = []
+    for rank in range(1, 11):
+        stats, drop, exp, refine = rank_bonus(rank)
+        ranks.append({
+            "rank": rank,
+            "stars": BOOK_RANK_STARS[rank - 1] if rank <= len(BOOK_RANK_STARS) else BOOK_RANK_STARS[-1],
+            "everyRegion": rank == 10,
+            "stats": stats, "dropPercent": drop, "expPercent": exp, "refinePercent": refine,
+            "rewards": reward_ids(BOOK_RANK_REWARDS[rank - 1], by_code),
+        })
+
+    return {
+        "pages": pages,
+        "regions": sorted(regions.values(), key=lambda r: r["name"]),
+        "totalStars": total_stars,
+        "totalKills": sum(p["huntTarget"] + p["huntTargetLarge"] for p in pages),
+        "notQuarry": not_quarry,
+        "homeless": homeless,
+        "bands": band_rows,
+        "ranks": ranks,
+    }
+
+
+def build_boss_log(monsters, maps, by_code):
+    """Replicate BossLog.Build - every spawn rule flagged Boss or MVP."""
+    entries = {}
+    for m in maps:
+        for rule in m["spawns"]:
+            if rule.get("flag") not in ("Boss", "MVP"):
+                continue
+            mon = monsters.get(rule["code"])
+            if mon is None:
+                continue
+            entry = entries.setdefault(rule["code"], {
+                "code": rule["code"], "isMvp": False, "maps": [],
+            })
+            entry["isMvp"] |= (rule["flag"] == "MVP") or bool(mon.get("isMvp"))
+            entry["maps"].append({"map": m["code"], "count": rule["count"],
+                                  "respawnMin": rule["respawnMin"],
+                                  "respawnMax": rule["respawnMax"]})
+
+    ordered = sorted(entries.values(),
+                     key=lambda e: (not e["isMvp"], monsters[e["code"]]["level"]))
+    plain = by_code.get("Hat_of_the_Sun_God")
+    crowned = by_code.get("Hat_of_the_Sun_God_")
+    return {
+        "entries": ordered,
+        "mvpCount": sum(1 for e in ordered if e["isMvp"]),
+        "bossCount": sum(1 for e in ordered if not e["isMvp"]),
+        "clearReward": plain["id"] if plain else 0,
+        "crownedHat": crowned["id"] if crowned else 0,
+    }
+
+
+# ---------------------------------------------------------------------------
 # write
 # ---------------------------------------------------------------------------
 
@@ -1064,8 +1373,11 @@ def main():
     shops = parse_shops(by_code)
     sold_by = defaultdict(list)
     for shop in shops:
-        for iid in shop["items"]:
-            sold_by[iid].append({"map": shop["map"], "name": shop["name"]})
+        for entry in shop["items"]:
+            seller = {"map": shop["map"], "name": shop["name"]}
+            if "price" in entry:
+                seller["price"] = entry["price"]
+            sold_by[entry["id"]].append(seller)
     for iid, sellers in sold_by.items():
         items[iid]["soldBy"] = sellers
 
@@ -1101,6 +1413,11 @@ def main():
         "oreDiscovery": build_ore_discovery(by_code),
         "weaponClasses": read_csv("WeaponClass.csv"),
         "elementNames": [r[0] for r in read_csv_rows("ElementalChart.csv")[1:] if r and r[0].strip()],
+    })
+
+    sizes["custom.json"] = write("custom.json", {
+        "adventureBook": build_adventure_book(monsters, maps, items, by_code),
+        "bossLog": build_boss_log(monsters, maps, by_code),
     })
 
     meta = {

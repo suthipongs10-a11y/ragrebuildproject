@@ -175,7 +175,16 @@ def main():
           all(len(v) == 70 for v in charts["statBonus"].values()), True)
 
     # cross references
-    check("shop items all resolve", all(i in by_id for s in shops for i in s["items"]), True)
+    check("shop items all resolve",
+          all(e["id"] in by_id for s in shops for e in s["items"]), True)
+    # SellItem(name, price) must never let a player buy below the npc buy-back value;
+    # Npc.SellItem throws at startup if it would, so the exported data must agree.
+    check("no shop sells below its own buy-back value",
+          all(by_id[e["id"]]["sellPrice"] - e["price"] * 0.5 <= 0
+              for s in shops for e in s["items"] if "price" in e), True)
+    check("soldBy back-reference matches shop stock",
+          sum(len(i.get("soldBy", [])) for i in items),
+          sum(len(s["items"]) for s in shops))
     check("recipe results all resolve", all(r["result"] in by_id for r in ref["recipes"]), True)
     check("recipe materials all resolve",
           all(m["id"] in by_id for r in ref["recipes"] for m in r["materials"]), True)

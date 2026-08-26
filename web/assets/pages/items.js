@@ -156,7 +156,13 @@ export async function detail({ rest }) {
     .join("");
 
   const shopRows = (item.soldBy ?? [])
-    .map((s) => `<tr><td>${esc(s.name)}</td><td class="name">${mapLink(maps.get(s.map), s.map)}</td></tr>`)
+    .map(
+      (s) => `<tr><td>${esc(s.name)}</td>
+        <td class="name">${mapLink(maps.get(s.map), s.map)}</td>
+        <td class="num">${s.price !== undefined
+          ? `${n(s.price)} z <span class="chip mute">ร้านตั้งราคาเอง</span>`
+          : `${n(item.price)} z`}</td></tr>`
+    )
     .join("");
 
   const makes = ref.recipes.filter((r) => r.result === item.id);
@@ -207,7 +213,7 @@ export async function detail({ rest }) {
         <tbody>${dropRows}</tbody></table></div>` : ""}
     ${shopRows ? `<h3>ร้าน NPC ที่ขาย</h3>
       <div class="tablewrap"><table>
-        <thead><tr><th>ร้าน</th><th>แมพ</th></tr></thead>
+        <thead><tr><th>ร้าน</th><th>แมพ</th><th class="num">ราคาที่ร้านนี้</th></tr></thead>
         <tbody>${shopRows}</tbody></table></div>` : ""}
     ${makes.length ? `<h3>คราฟได้</h3>
       <div class="tablewrap"><table>

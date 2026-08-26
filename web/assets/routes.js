@@ -31,5 +31,7 @@ export const routes = {
   recipes:    page("./pages/recipes.js", "list"),
   charts:     page("./pages/charts.js", "render"),
   guide:      page("./pages/guide.js", "render"),
-  health:     page("./pages/health.js", "list"),
+  health:         page("./pages/health.js", "list"),
+  adventurebook:  page("./pages/adventurebook.js", "render"),
+  new:            page("./pages/new.js", "render"),
 };
