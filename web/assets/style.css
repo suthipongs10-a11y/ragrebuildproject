@@ -265,9 +265,10 @@ td.name a { font-weight: 600; color: var(--accent-ink); }
 
 /* ------------------------------------------------------------------- misc */
 
-.bar { position: relative; height: 16px; border-radius: 4px; background: var(--card-deep); overflow: hidden; min-width: 54px; }
-.bar > i { position: absolute; inset: 0 auto 0 0; background: var(--accent); display: block; }
-.bar > b { position: relative; display: block; text-align: right; padding-right: 5px; font-size: 11px; font-weight: 700; color: var(--title); line-height: 16px; }
+.chance { display: flex; align-items: center; gap: 8px; min-width: 130px; }
+.chance b { flex: none; width: 58px; text-align: right; font-variant-numeric: tabular-nums; font-size: 13px; color: var(--name); }
+.bar { flex: 1 1 auto; height: 10px; border-radius: 999px; background: var(--card-deep); overflow: hidden; min-width: 44px; }
+.bar > i { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
 
 .loading, .empty-state { padding: 40px 10px; text-align: center; color: var(--muted); }
 .error { padding: 16px; border: 1px solid #DFA0A0; background: #FBEDED; color: #7A1414; border-radius: var(--radius); }

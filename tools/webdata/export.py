@@ -549,7 +549,7 @@ def build_maps(spawns, warps, npcs, monsters):
             "code": code,
             "name": row["Name"],
             "mode": row.get("MapMode", ""),
-            "flags": [f for f in (row.get("Flags") or "").split("|") if f],
+            "flags": [f for f in (row.get("Flags") or "").split("|") if f and f != "None"],
             "music": row.get("Music", ""),
             "instance": instances.get(code, ""),
             "spawns": mspawns,
