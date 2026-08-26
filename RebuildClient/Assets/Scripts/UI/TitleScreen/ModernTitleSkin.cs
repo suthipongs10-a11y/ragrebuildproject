@@ -72,6 +72,13 @@ namespace Assets.Scripts.UI.TitleScreen
             ModernUiTheme.AttachShadow(root);
             NameTheBar(bar, "เลือกตัวละคร", "Select your Character");
 
+            //Said out loud because this one has failed silently before. If the picker still
+            //looks untouched, this line says which of the three things went missing: the
+            //panel, the header on it, or the slots.
+            Debug.Log($"[ModernTitleSkin] Character picker: panel '{root.name}', "
+                      + $"header {(bar != null ? bar.name : "NOT FOUND")}, "
+                      + $"{(win.CharacterSlots != null ? win.CharacterSlots.Count : 0)} slot(s).");
+
             foreach (var slot in win.CharacterSlots)
                 StyleSlot(slot);
 
@@ -184,6 +191,7 @@ namespace Assets.Scripts.UI.TitleScreen
             var loginPanel = win.WindowRect != null ? win.WindowRect : ResolvePanel(win.transform);
             ModernUiTheme.ApplyWindowChrome(loginPanel, ModernUiIcons.Person);
             NameTheBar(FindDragBar(loginPanel), "เข้าสู่ระบบ", "Sign in");
+            LayOutLogin(win, loginPanel);
 
             if (win.RememberLoginToggle != null)
             {
@@ -295,6 +303,10 @@ namespace Assets.Scripts.UI.TitleScreen
             var watcher = chip.gameObject.AddComponent<SelectedChip>();
             watcher.Button = slot.Button;
             chip.gameObject.SetActive(false);
+
+            //The list usually arrived before these existed, so the slot is asked to say
+            //again what it was told rather than waiting for it to be told a second time.
+            slot.RefreshSlotLabels();
         }
 
         private static void PinToBottom(RectTransform rect, float bottom, float height)
@@ -363,6 +375,96 @@ namespace Assets.Scripts.UI.TitleScreen
             image.sprite = ModernUiTheme.RoundedSprite;
             image.type = Image.Type.Sliced;
             image.color = color;
+        }
+
+        private const float LoginWidth = 470f;
+        private const float LoginHeight = 300f;
+        private const float LoginPad = 12f;
+        private const float TabGap = 6f;
+
+        /// <summary>
+        /// Makes the login box big enough for what is in it.
+        /// </summary>
+        /// <remarks>
+        /// It was drawn at four hundred by two hundred and thirty for three tabs reading
+        /// "Login", "Register" and "Server", and none of those numbers survived translation:
+        /// the three tabs are a hundred and thirty wide each with two points between them,
+        /// which is three hundred and ninety four of the four hundred there are, and
+        /// "ตั้งค่าเซิร์ฟเวอร์" does not fit in a hundred and thirty at any size worth reading.
+        /// So it wrapped to two lines and came out of the top of its own tab.
+        ///
+        /// Everything inside the box is anchored to an edge or stretched between two, which
+        /// is what makes growing it safe: the header stays on the top, the bottom bar on the
+        /// bottom, the three input rows keep their distance from the header. Only the tabs
+        /// and the button have to be told anything, because those two are placed by number.
+        /// </remarks>
+        private static void LayOutLogin(LoginBox win, RectTransform panel)
+        {
+            if (panel == null)
+                return;
+
+            panel.sizeDelta = new Vector2(LoginWidth, LoginHeight);
+
+            LayOutLoginTabs(win, panel);
+
+            //The bottom row spanned four hundred whatever the box was, so widening the box
+            //left the button floating short of the corner - and the button is anchored to
+            //that row's right edge, not to the window's.
+            var bar = panel.Find("BottomBar") as RectTransform;
+            if (bar != null)
+            {
+                bar.anchorMin = new Vector2(0, 0);
+                bar.anchorMax = new Vector2(1, 0);
+                bar.pivot = new Vector2(0.5f, 0);
+                bar.offsetMin = new Vector2(0f, 14f);
+                bar.offsetMax = new Vector2(0f, 66f);
+            }
+
+            if (win.SubmitButton != null)
+            {
+                var button = (RectTransform)win.SubmitButton.transform;
+                //Pinned by its right edge rather than by its middle, so the gap to the
+                //window's edge is the number written here whatever the button is called.
+                ModernUiTheme.Place(button, new Vector2(1, 0.5f),
+                    new Vector2(-LoginPad - 4f, 0f), new Vector2(150f, 44f));
+            }
+        }
+
+        /// <summary>Three tabs across the full width of the box, sharing what is there evenly.</summary>
+        private static void LayOutLoginTabs(LoginBox win, RectTransform panel)
+        {
+            if (win.Tabs == null || win.Tabs.Count == 0)
+                return;
+
+            var group = panel.Find("TabGroup") as RectTransform;
+            if (group != null)
+                group.sizeDelta = new Vector2(group.sizeDelta.x, 30f);
+
+            var count = win.Tabs.Count;
+            var usable = LoginWidth - LoginPad * 2f - TabGap * (count - 1);
+            var width = usable / count;
+
+            for (var i = 0; i < count; i++)
+            {
+                var tab = win.Tabs[i];
+                if (tab == null)
+                    continue;
+
+                ModernUiTheme.Place((RectTransform)tab.transform, new Vector2(0, 1),
+                    new Vector2(LoginPad + i * (width + TabGap), 0f), new Vector2(width, 30f));
+
+                foreach (var label in tab.GetComponentsInChildren<TextMeshProUGUI>(true))
+                {
+                    //Never wrapped, and allowed to shrink instead. A tab that wraps grows
+                    //upward out of its own chip, which is what put the server tab's second
+                    //line above the row it belongs to.
+                    label.textWrappingMode = TextWrappingModes.NoWrap;
+                    label.enableAutoSizing = true;
+                    label.fontSizeMin = 10f;
+                    label.fontSizeMax = ModernUiTheme.SizeLabel;
+                    label.margin = new Vector4(6f, 0f, 6f, 0f);
+                }
+            }
         }
 
         /// <summary>The band along the top of a window, which every prefab here names "drag".</summary>

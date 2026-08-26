@@ -32,13 +32,33 @@ namespace Assets.Scripts.UI.TitleScreen
 
         private ClientCharacterSummary characterSummary;
 
+        private string slotName = string.Empty;
+        private string slotPlace = string.Empty;
+
         private void WriteSlotLabels(string name, string map)
         {
+            slotName = name ?? string.Empty;
+            slotPlace = map ?? string.Empty;
+            RefreshSlotLabels();
+        }
+
+        /// <summary>
+        /// Writes what this slot was last told onto whatever labels it has now.
+        /// </summary>
+        /// <remarks>
+        /// Which is not the same as writing it when told. The window fills these in the
+        /// moment the character list arrives, and the labels are built by the skin, which
+        /// runs on a half second sweep - so on every login the names arrived before there
+        /// was anywhere to put them and the cards came up blank. Kept as two strings so
+        /// the answer survives until something asks for it.
+        /// </remarks>
+        public void RefreshSlotLabels()
+        {
             if (SlotNameLabel != null)
-                SlotNameLabel.text = name ?? string.Empty;
+                SlotNameLabel.text = slotName;
 
             if (SlotMapLabel != null)
-                SlotMapLabel.text = map ?? string.Empty;
+                SlotMapLabel.text = slotPlace;
         }
 
         public void SetAsUnavailable()

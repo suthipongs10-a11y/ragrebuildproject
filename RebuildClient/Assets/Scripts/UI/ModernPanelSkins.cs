@@ -2,6 +2,9 @@ using Assets.Scripts.UI.ClientDatabase;
 using Assets.Scripts.UI.ConfigWindow;
 using Assets.Scripts.UI.Hud;
 using Assets.Scripts.UI.Inventory;
+//imported rather than written out, because TitleScreen is a class in this project as
+//well as a namespace, and a qualified name starting with it resolves to the class
+using Assets.Scripts.UI.TitleScreen;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -495,6 +498,15 @@ namespace Assets.Scripts.UI
                 return true;
 
             if (window == ui.YesNoOptionsWindow)
+                return true;
+
+            //The character picker, which ModernTitleSkin rebuilds. Whichever of the two passes
+            //reaches a window first marks it and the other leaves it alone, and this one was
+            //left to whoever won: the general pass paints an empty wrapper, finds no
+            //background to paint and moves on, having done nothing except stop the pass that
+            //knows how to find the real one. The other two title screens are not WindowBase
+            //and so were never in this sweep's way.
+            if (window is CharacterSelectWindow)
                 return true;
 
             return window == ui.StatusWindow
