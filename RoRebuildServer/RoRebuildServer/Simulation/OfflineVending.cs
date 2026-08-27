@@ -49,9 +49,9 @@ public static class OfflineVending
     /// Whether this player is standing in a shop right now, offline or otherwise.
     /// </summary>
     /// <remarks>
-    /// All four conditions, because each of them ends a shop on its own: the proxy npc
-    /// expires when the owner walks away or dies, the interaction ends when the last item
-    /// sells, and the vending state is cleared when the shop is closed by hand.
+    /// Every one of these ends a shop on its own: the proxy npc expires when the owner
+    /// walks away or dies, the interaction ends when the last item sells, and the vending
+    /// state is cleared when the shop is closed by hand.
     /// </remarks>
     public static bool IsVending(Player? player)
     {
@@ -71,8 +71,7 @@ public static class OfflineVending
     /// </summary>
     /// <remarks>
     /// Called from DisconnectPlayer, which is the one place a player leaves the world, so
-    /// there is no path that quietly skips this - and no path that runs it twice, since
-    /// the connection is out of the player list by the time this returns.
+    /// there is no path out that quietly skips it.
     /// </remarks>
     public static bool TryTakeOver(NetworkConnection connection)
     {
