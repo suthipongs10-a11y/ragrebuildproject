@@ -61,8 +61,23 @@ namespace Assets.Scripts.UI.TitleScreen
                 SkinCharacterSelect(select);
 
             var login = FindFirstObjectByType<LoginBox>(FindObjectsInactive.Include);
-            if (login != null && !ModernUiTheme.IsSkinned(login.gameObject))
+            if (login == null)
+                return;
+
+            if (!ModernUiTheme.IsSkinned(login.gameObject))
+            {
                 SkinLogin(login);
+                return;
+            }
+
+            //Laid out again whenever the box is not the size this code left it. Changing
+            //tab writes a size straight onto the window - four hundred by two thirty for
+            //signing in, by two seventy for registering - so every tab click undid the
+            //layout underneath it and left the rows, which are placed from that width,
+            //hanging past the edge of a box that had shrunk out from under them.
+            if (login.WindowRect != null
+                && Mathf.Abs(login.WindowRect.sizeDelta.x - LoginWidth) > 0.5f)
+                LayOutLogin(login, login.WindowRect);
         }
 
         private void SkinCharacterSelect(CharacterSelectWindow win)
@@ -501,8 +516,9 @@ namespace Assets.Scripts.UI.TitleScreen
             LayOutLoginRow(win.ServerInputBox);
         }
 
-        private const float FieldLabelWidth = 104f;
-        private const float FieldLabelGap = 8f;
+        private const float FieldLabelWidth = 108f;
+        private const float FieldLabelGap = 10f;
+        private const float FieldRowPad = 4f;
 
         /// <summary>
         /// A row of the login box: the label on the left, the field it names beside it.
@@ -537,11 +553,14 @@ namespace Assets.Scripts.UI.TitleScreen
             if (box.parent != row)
                 box.SetParent(row, false);
 
-            //The row is placed by the prefab and is not stretched either way, so its own
-            //width is a number rather than something that has to be measured after a
-            //layout pass has run.
-            var width = row.rect.width;
+            //The row is anchored to the pane's top left with a centred pivot and is not
+            //stretched, so widening it is two numbers rather than a layout pass. Its height
+            //and its distance down the pane are the prefab's and are left alone.
+            var width = PaneWidth - FieldRowPad * 2f;
             var height = row.rect.height;
+
+            row.sizeDelta = new Vector2(width, row.sizeDelta.y);
+            row.anchoredPosition = new Vector2(PaneWidth * 0.5f, row.anchoredPosition.y);
 
             label.anchorMin = new Vector2(0, 0);
             label.anchorMax = new Vector2(0, 1);
@@ -549,13 +568,24 @@ namespace Assets.Scripts.UI.TitleScreen
             label.sizeDelta = new Vector2(FieldLabelWidth, 0f);
             label.anchoredPosition = Vector2.zero;
 
-            text.alignment = TextAlignmentOptions.MidlineLeft;
+            //Right against the field it names, so however long the word turns out to be in
+            //whatever language, every label in the column ends on the same line - which is
+            //the thing that makes a two column form look laid out rather than assembled.
+            text.alignment = TextAlignmentOptions.MidlineRight;
             text.textWrappingMode = TextWrappingModes.NoWrap;
             text.enableAutoSizing = true;
-            text.fontSizeMin = 10f;
+            text.fontSizeMin = 11f;
             text.fontSizeMax = ModernUiTheme.SizeBody;
+            text.fontStyle = FontStyles.Bold;
             text.color = ModernUiTheme.LabelColor;
             text.extraPadding = true;
+
+            //Cleared, and this is the whole of why the labels did not line up: the prefab
+            //gives Password and Repeat a left margin of minus twenty and ID a margin of
+            //zero, so those two printed twenty points further left than the one above them
+            //and the column read as crooked. A margin is an inset inside the box, and this
+            //code is what decides where the box is, so the box gets to be the whole answer.
+            text.margin = Vector4.zero;
 
             //Ten taller than the row, which is what the prefab gave it: the rows are forty
             //apart and twenty tall, so a field the height of its own row looks like a line
@@ -637,9 +667,16 @@ namespace Assets.Scripts.UI.TitleScreen
             if (pane == null)
                 return;
 
-            pane.offsetMax = new Vector2(pane.offsetMax.x, -top);
-            pane.offsetMin = new Vector2(pane.offsetMin.x, ContentBottom);
+            //Both sides as well as top and bottom now. The prefab left the pane hanging
+            //twelve points past the right edge of the box and its rows sitting well short
+            //of it, so a widened window grew a band of empty paper down the right hand
+            //side that the fields never reached into.
+            pane.offsetMin = new Vector2(LoginPad, ContentBottom);
+            pane.offsetMax = new Vector2(-LoginPad, -top);
         }
+
+        /// <summary>How wide a content pane ends up, without waiting for a layout pass.</summary>
+        private static float PaneWidth => LoginWidth - LoginPad * 2f;
 
         /// <summary>The band along the top of a window, which every prefab here names "drag".</summary>
         private static Transform FindDragBar(Transform root)
