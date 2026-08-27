@@ -50,8 +50,14 @@ namespace Assets.Scripts.UI.TitleScreen
                 return;
             searchTimer = SearchInterval;
 
+            //Keyed on the pane rather than on the game object, because the picker and the
+            //creator are two scripts on one object called CharacterCreator with a pane
+            //each. Marking the shared object meant whichever of the two skins reached it
+            //first claimed it and the other did nothing at all for the rest of the
+            //session - which is why this screen kept coming back untouched.
             var select = FindFirstObjectByType<CharacterSelectWindow>(FindObjectsInactive.Include);
-            if (select != null && !ModernUiTheme.IsSkinned(select.gameObject))
+            if (select != null && select.DisplayPane != null
+                               && !ModernUiTheme.IsSkinned(select.DisplayPane))
                 SkinCharacterSelect(select);
 
             var login = FindFirstObjectByType<LoginBox>(FindObjectsInactive.Include);
@@ -61,7 +67,7 @@ namespace Assets.Scripts.UI.TitleScreen
 
         private void SkinCharacterSelect(CharacterSelectWindow win)
         {
-            ModernUiTheme.MarkSkinned(win.gameObject);
+            ModernUiTheme.MarkSkinned(win.DisplayPane);
 
             //Not win.transform. The picker's script sits on an empty wrapper with the panel
             //one level below it, so every one of these calls used to be handed an object with
@@ -381,6 +387,11 @@ namespace Assets.Scripts.UI.TitleScreen
         private const float LoginHeight = 300f;
         private const float LoginPad = 12f;
         private const float TabGap = 6f;
+        private const float TabHeight = 34f;      //was 30, and the labels had to shrink to fit
+        private const float TabTopGap = 8f;       //the line of daylight under the header
+        private const float ContentGap = 12f;     //and under the tab row
+        private const float ContentBottom = 72f;  //clear of the bottom bar and its button
+        private const float DefaultHeaderHeight = 35f;
 
         /// <summary>
         /// Makes the login box big enough for what is in it.
@@ -407,6 +418,12 @@ namespace Assets.Scripts.UI.TitleScreen
 
             LayOutLoginTabs(win, panel);
 
+            //The two content groups start under the tab row rather than at whatever
+            //distance the prefab happened to use, so moving the row moves them with it.
+            var contentTop = HeaderBottom(panel) + TabTopGap + TabHeight + ContentGap;
+            LayOutContentPane(panel.Find("Login") as RectTransform, contentTop);
+            LayOutContentPane(panel.Find("Server Settings") as RectTransform, contentTop);
+
             //The bottom row spanned four hundred whatever the box was, so widening the box
             //left the button floating short of the corner - and the button is anchored to
             //that row's right edge, not to the window's.
@@ -431,14 +448,28 @@ namespace Assets.Scripts.UI.TitleScreen
         }
 
         /// <summary>Three tabs across the full width of the box, sharing what is there evenly.</summary>
+        /// <remarks>
+        /// The row is pushed clear of the header rather than left where the prefab put it.
+        /// The bar is thirty five tall and the row sat at exactly minus thirty five, so the
+        /// two touched along their whole width with no line between them - the tab chips
+        /// read as part of the header rather than as a row under it.
+        /// </remarks>
         private static void LayOutLoginTabs(LoginBox win, RectTransform panel)
         {
             if (win.Tabs == null || win.Tabs.Count == 0)
                 return;
 
+            var top = HeaderBottom(panel) + TabTopGap;
+
             var group = panel.Find("TabGroup") as RectTransform;
             if (group != null)
-                group.sizeDelta = new Vector2(group.sizeDelta.x, 30f);
+            {
+                group.anchorMin = new Vector2(0, 1);
+                group.anchorMax = new Vector2(1, 1);
+                group.pivot = new Vector2(0, 1);
+                group.sizeDelta = new Vector2(0f, TabHeight);
+                group.anchoredPosition = new Vector2(0f, -top);
+            }
 
             var count = win.Tabs.Count;
             var usable = LoginWidth - LoginPad * 2f - TabGap * (count - 1);
@@ -451,7 +482,7 @@ namespace Assets.Scripts.UI.TitleScreen
                     continue;
 
                 ModernUiTheme.Place((RectTransform)tab.transform, new Vector2(0, 1),
-                    new Vector2(LoginPad + i * (width + TabGap), 0f), new Vector2(width, 30f));
+                    new Vector2(LoginPad + i * (width + TabGap), 0f), new Vector2(width, TabHeight));
 
                 foreach (var label in tab.GetComponentsInChildren<TextMeshProUGUI>(true))
                 {
@@ -460,11 +491,36 @@ namespace Assets.Scripts.UI.TitleScreen
                     //line above the row it belongs to.
                     label.textWrappingMode = TextWrappingModes.NoWrap;
                     label.enableAutoSizing = true;
-                    label.fontSizeMin = 10f;
-                    label.fontSizeMax = ModernUiTheme.SizeLabel;
+                    label.fontSizeMin = 11f;
+                    label.fontSizeMax = ModernUiTheme.SizeBody;
                     label.margin = new Vector4(6f, 0f, 6f, 0f);
                 }
             }
+        }
+
+        /// <summary>How far down the panel the header band ends, measured rather than assumed.</summary>
+        private static float HeaderBottom(RectTransform panel)
+        {
+            var bar = FindDragBar(panel) as RectTransform;
+            return bar != null ? bar.rect.height : DefaultHeaderHeight;
+        }
+
+        /// <summary>
+        /// Hangs a content group between the tab row and the bottom bar.
+        /// </summary>
+        /// <remarks>
+        /// Through offsetMin and offsetMax rather than anchoredPosition, because both of
+        /// these groups are stretched top to bottom with a top left pivot - the one case
+        /// where anchoredPosition does not mean what it looks like it means. The x side is
+        /// read back and put down again so the left and right insets survive untouched.
+        /// </remarks>
+        private static void LayOutContentPane(RectTransform pane, float top)
+        {
+            if (pane == null)
+                return;
+
+            pane.offsetMax = new Vector2(pane.offsetMax.x, -top);
+            pane.offsetMin = new Vector2(pane.offsetMin.x, ContentBottom);
         }
 
         /// <summary>The band along the top of a window, which every prefab here names "drag".</summary>

@@ -139,6 +139,17 @@ namespace Assets.Scripts.UI.AdventureBook
         /// the question entirely.
         /// </remarks>
         private int portraitAppearance = -1;
+
+        /// <summary>
+        /// The plain badge icon, kept alive until the portrait has something to show.
+        /// </summary>
+        /// <remarks>
+        /// UiPlayerSprite loads its parts through Addressables, which answers on a later
+        /// frame and may not answer at all. Switching the plain icon off the moment the
+        /// portrait was requested left the badge as an empty white chip whenever the load
+        /// was slow or failed - and an empty chip is worse than the icon it replaced.
+        /// </remarks>
+        private GameObject plainBadgeIcon;
         private View view = View.Regions;
         private int regionIndex = -1;
         private int pageId = -1;
@@ -360,11 +371,11 @@ namespace Assets.Scripts.UI.AdventureBook
             if (source == null || source.Material == null)
                 return;
 
-            //The badge grows a little to hold a face, and the plain icon it was given goes.
+            //The badge grows a little to hold a face. The plain icon it was given stays on
+            //for now and is taken away by Update once there is a face to take its place.
             badge.sizeDelta = new Vector2(PortraitBadgeSize, PortraitBadgeSize);
             var plain = badge.Find("Icon");
-            if (plain != null)
-                plain.gameObject.SetActive(false);
+            plainBadgeIcon = plain != null ? plain.gameObject : null;
 
             var frame = ModernUiTheme.CreateRect("Portrait", badge);
             frame.anchorMin = Vector2.zero;
@@ -394,8 +405,32 @@ namespace Assets.Scripts.UI.AdventureBook
                 0, 0, 0, state.IsMale);
         }
 
+        /// <summary>True once any part of the character portrait is actually on screen.</summary>
+        private bool PortraitIsShowing()
+        {
+            if (portrait == null)
+                return false;
+
+            //UiPlayerSprite builds five child objects up front and switches on the ones
+            //whose sprite arrives, so an active child is the honest signal that the badge
+            //has a face in it rather than an empty frame.
+            for (var i = 0; i < portrait.transform.childCount; i++)
+            {
+                if (portrait.transform.GetChild(i).gameObject.activeSelf)
+                    return true;
+            }
+
+            return false;
+        }
+
         private void Update()
         {
+            if (plainBadgeIcon != null && PortraitIsShowing())
+            {
+                plainBadgeIcon.SetActive(false);
+                plainBadgeIcon = null;
+            }
+
             if (drawnRevision != AdventureBookState.Revision)
             {
                 Redraw();

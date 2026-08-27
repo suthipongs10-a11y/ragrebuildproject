@@ -73,8 +73,10 @@ namespace Assets.Scripts.UI.TitleScreen
             if (creator != null)
                 return;
 
+            //On the pane, not on the game object. The creator shares CharacterCreator
+            //with the character picker, so marking the object locked the other skin out.
             var found = FindFirstObjectByType<CharacterCreatorWindow>(FindObjectsInactive.Include);
-            if (found == null || ModernUiTheme.IsSkinned(found.gameObject))
+            if (found == null || found.Pane == null || ModernUiTheme.IsSkinned(found.Pane))
                 return;
 
             ApplySkin(found);
@@ -82,11 +84,8 @@ namespace Assets.Scripts.UI.TitleScreen
 
         private void ApplySkin(CharacterCreatorWindow win)
         {
-            ModernUiTheme.MarkSkinned(win.gameObject);
+            ModernUiTheme.MarkSkinned(win.Pane);
             creator = win;
-
-            if (win.Pane == null)
-                return;
 
             var pane = (RectTransform)win.Pane.transform;
 

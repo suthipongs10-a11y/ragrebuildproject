@@ -506,6 +506,8 @@ namespace Assets.Scripts.UI
             //background to paint and moves on, having done nothing except stop the pass that
             //knows how to find the real one. The other two title screens are not WindowBase
             //and so were never in this sweep's way.
+            //CharacterCreatorWindow shares this game object but is a UIBehaviour rather
+            //than a WindowBase, so the picker is the only one the sweep can ever see here.
             if (window is CharacterSelectWindow)
                 return true;
 

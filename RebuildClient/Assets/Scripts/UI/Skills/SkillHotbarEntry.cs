@@ -22,6 +22,14 @@ namespace Assets.Scripts.UI
         public void Awake()
         {
             HighlightImage.SetActive(false);
+
+            //The slot number is the last child in the prefab, and a later sibling draws on
+            //top, so it sat over whatever skill or item was in the slot. Dropped behind the
+            //icon instead: an empty slot still shows its number because there is nothing in
+            //front of it, and a filled one shows the thing you put there.
+            if (HotkeyText != null && DragItem != null
+                                   && HotkeyText.transform.parent == DragItem.transform.parent)
+                HotkeyText.transform.SetSiblingIndex(DragItem.transform.GetSiblingIndex());
         }
 
         public void PressKey()
