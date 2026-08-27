@@ -127,3 +127,6 @@ RebuildClient/Assets/Textures/Import/
 
 # python bytecode from tools/
 tools/**/__pycache__/
+
+# bundle.py output - a build product, rebuilt from web/ whenever it is wanted
+web/dist/
