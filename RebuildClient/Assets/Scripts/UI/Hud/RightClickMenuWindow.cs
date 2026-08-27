@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.UI.Hud
 {
@@ -179,7 +180,7 @@ namespace Assets.Scripts.UI.Hud
         public void LeaveParty()
         {
             if(!PlayerState.Instance.IsInParty)
-                CameraFollower.Instance.AppendChatText($"<color=yellow>คุณยังไม่ได้อยู่ปาร์ตี้</color>");
+                CameraFollower.Instance.AppendChatText($"{ChatColor.System}คุณยังไม่ได้อยู่ปาร์ตี้</color>");
             else
                 NetworkManager.Instance.LeaveParty();
             HideWindow();

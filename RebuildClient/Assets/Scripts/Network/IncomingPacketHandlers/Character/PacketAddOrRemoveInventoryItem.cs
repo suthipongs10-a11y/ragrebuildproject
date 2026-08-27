@@ -2,6 +2,7 @@
 using Assets.Scripts.PlayerControl;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
 {
@@ -33,9 +34,9 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
                 {
                     var item = State.Inventory.GetInventoryItem(bagId);
                     if(item.Type == ItemType.UniqueItem)
-                        Camera.AppendChatText($"<color=#ed0000>เสีย {item.ProperName()} ไป</color>");
+                        Camera.AppendChatText($"{ChatColor.Removed}เสีย {item.ProperName()} ไป</color>");
                     else
-                        Camera.AppendChatText($"<color=#ed0000>เสีย {item.ProperName()} ไป x{change}</color>");
+                        Camera.AppendChatText($"{ChatColor.Removed}เสีย {item.ProperName()} ไป x{change}</color>");
                         
                 }
                 

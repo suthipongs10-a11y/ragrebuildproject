@@ -4,6 +4,7 @@ using Assets.Scripts.Sprites;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.UI.Hud
 {
@@ -56,9 +57,9 @@ namespace Assets.Scripts.UI.Hud
             var name = inventoryItem.ProperName();
 
             if (itemCount == 1)
-                CameraFollower.Instance.AppendChatText($"<color=#00fbfb>ได้รับ {name}</color>");
+                CameraFollower.Instance.AppendChatText($"{ChatColor.Item}ได้รับ {name}</color>");
             else
-                CameraFollower.Instance.AppendChatText($"<color=#00fbfb>ได้รับ {name} x{itemCount}</color>");
+                CameraFollower.Instance.AppendChatText($"{ChatColor.Item}ได้รับ {name} x{itemCount}</color>");
 
             if (chatOnly)
                 return;

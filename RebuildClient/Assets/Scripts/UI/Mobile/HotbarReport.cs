@@ -2,6 +2,7 @@ using System.Text;
 using Assets.Scripts.PlayerControl;
 using UnityEngine;
 using UnityEngine.UI;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.UI.Mobile
 {
@@ -28,18 +29,18 @@ namespace Assets.Scripts.UI.Mobile
             var hotbar = UiManager.Instance != null ? UiManager.Instance.SkillHotbar : null;
             if (hotbar == null)
             {
-                camera.AppendChatText("<color=yellow>hotbar: ไม่มี SkillHotbar</color>");
+                camera.AppendChatText($"{ChatColor.System}hotbar: ไม่มี SkillHotbar</color>");
                 return;
             }
 
             var bar = (RectTransform)hotbar.transform;
-            camera.AppendChatText($"<color=yellow>bar act={On(bar.gameObject)} "
+            camera.AppendChatText($"{ChatColor.System}bar act={On(bar.gameObject)} "
                                   + $"scale={bar.lossyScale.x:0.00} entries={hotbar.EntryCount} "
                                   + $"{Where(bar)}</color>");
 
             var container = hotbar.SkillBarContainer as RectTransform;
             if (container != null)
-                camera.AppendChatText($"<color=yellow>box act={On(container.gameObject)} "
+                camera.AppendChatText($"{ChatColor.System}box act={On(container.gameObject)} "
                                       + $"rows={container.childCount} {Where(container)}</color>");
 
             var shown = 0;
@@ -48,7 +49,7 @@ namespace Assets.Scripts.UI.Mobile
                 var entry = hotbar.GetEntryById(i);
                 if (entry == null)
                 {
-                    camera.AppendChatText($"<color=yellow>{i}: null</color>");
+                    camera.AppendChatText($"{ChatColor.System}{i}: null</color>");
                     shown++;
                     continue;
                 }
@@ -76,7 +77,7 @@ namespace Assets.Scripts.UI.Mobile
                 line.Append(entry.GetComponent<HotbarSlotTap>() != null ? " tap" : " NOTAP");
                 line.Append(' ').Append(Where((RectTransform)entry.transform));
 
-                camera.AppendChatText($"<color=yellow>{line}</color>");
+                camera.AppendChatText($"{ChatColor.System}{line}</color>");
                 shown++;
             }
         }

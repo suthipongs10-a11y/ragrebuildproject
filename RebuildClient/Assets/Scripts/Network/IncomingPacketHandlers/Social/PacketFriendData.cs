@@ -5,6 +5,7 @@ using Assets.Scripts.UI;
 using Assets.Scripts.UI.Party;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.Network.IncomingPacketHandlers.Social
 {
@@ -64,8 +65,8 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Social
 
                     if (wasOnline != friend.IsOnline)
                         CameraFollower.Instance.AppendChatText(friend.IsOnline
-                            ? $"<color=#1B6E3C>{friend.Name} ออนไลน์แล้ว</color>"
-                            : $"<color=#5A6672>{friend.Name} ออฟไลน์แล้ว</color>");
+                            ? $"{ChatColor.Friend}{friend.Name} ออนไลน์แล้ว</color>"
+                            : $"{ChatColor.Friend}{friend.Name} ออฟไลน์แล้ว</color>");
 
                     break;
                 }
@@ -80,7 +81,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Social
                 }
 
                 case FriendDataType.Notice:
-                    CameraFollower.Instance.AppendChatText($"<color=#0B5C87>{msg.ReadString()}</color>");
+                    CameraFollower.Instance.AppendChatText($"{ChatColor.Friend}{msg.ReadString()}</color>");
                     break;
             }
         }

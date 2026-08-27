@@ -2,6 +2,7 @@
 using Assets.Scripts.UI.Hud;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.Network.IncomingPacketHandlers.System
 {
@@ -17,28 +18,28 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
             switch (type)
             {
                 case ServerEvent.TradeSuccess:
-                    Camera.AppendChatText($"<color=#00fbfb>แลกเปลี่ยนสำเร็จ</color>");
+                    Camera.AppendChatText($"{ChatColor.Party}แลกเปลี่ยนสำเร็จ</color>");
                     break;
                 case ServerEvent.GetZeny:
                     if (val > 0)
-                        Camera.AppendChatText($"<color=#00fbfb>ได้รับ {val} เซนี่</color>");
+                        Camera.AppendChatText($"{ChatColor.Item}ได้รับ {val} เซนี่</color>");
                     if (val < 0)
-                        Camera.AppendChatText($"<color=#00fbfb>เสียไป {-val} เซนี่</color>");
+                        Camera.AppendChatText($"{ChatColor.Removed}เสียไป {-val} เซนี่</color>");
                     break;
                 case ServerEvent.NoAmmoEquipped:
                     if (Camera.TargetControllable.WeaponClass == 12)
-                        Camera.AppendChatText($"<color=#ed0000>ยังไม่ได้ใส่ลูกธนู</color>");
+                        Camera.AppendChatText($"{ChatColor.Error}ยังไม่ได้ใส่ลูกธนู</color>");
                     else
-                        Camera.AppendChatText($"<color=#ed0000>ยังไม่ได้ใส่กระสุน</color>");
+                        Camera.AppendChatText($"{ChatColor.Error}ยังไม่ได้ใส่กระสุน</color>");
                     break;
                 case ServerEvent.WrongAmmoEquipped:
-                    Camera.AppendChatText($"<color=#ed0000>ใส่กระสุนผิดชนิด</color>");
+                    Camera.AppendChatText($"{ChatColor.Error}ใส่กระสุนผิดชนิด</color>");
                     break;
                 case ServerEvent.OutOfAmmo:
-                    Camera.AppendChatText($"<color=#ed0000>กระสุนไม่พอยิงแล้ว</color>");
+                    Camera.AppendChatText($"{ChatColor.Error}กระสุนไม่พอยิงแล้ว</color>");
                     break;
                 case ServerEvent.EligibleForJobChange:
-                    Camera.AppendChatText($"<color=#99CCFF><i>Congratulations, you've reached job 10! You are now eligible to change jobs. "
+                    Camera.AppendChatText($"{ChatColor.Job}<i>Congratulations, you've reached job 10! You are now eligible to change jobs. "
                                           + "Speak to the bard south of Prontera to get started.</i></color>");
                     break;
                 case ServerEvent.Announcement:
@@ -53,11 +54,11 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
                     //to tell the player their card had done anything at all.
                     var found = msg.ReadString();
                     if (string.IsNullOrEmpty(found))
-                        Camera.AppendChatText($"<color=#e0a020>[การ์ด] ได้รับ {val} เซนี่</color>");
+                        Camera.AppendChatText($"{ChatColor.Item}[การ์ด] ได้รับ {val} เซนี่</color>");
                     else if (val > 1)
-                        Camera.AppendChatText($"<color=#e0a020>[การ์ด] พบ {val}x {found}</color>");
+                        Camera.AppendChatText($"{ChatColor.Item}[การ์ด] พบ {val}x {found}</color>");
                     else
-                        Camera.AppendChatText($"<color=#e0a020>[การ์ด] พบ {found}</color>");
+                        Camera.AppendChatText($"{ChatColor.Item}[การ์ด] พบ {found}</color>");
                     break;
                 }
                 case ServerEvent.OreDiscovery:
@@ -66,14 +67,14 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
                     //looking like any other drop, and at these odds a blacksmith who is not
                     //told would never know the skill had fired.
                     var ore = msg.ReadString();
-                    Camera.AppendChatText($"<color=#8fbf6f>[แร่] เจอ {ore}</color>");
+                    Camera.AppendChatText($"{ChatColor.Item}[แร่] เจอ {ore}</color>");
                     break;
                 }
                 case ServerEvent.MemoLocationSaved:
                     if(State.KnownSkills.TryGetValue(CharacterSkill.WarpPortal, out var level) && level > 1)
-                        Camera.AppendChatText($"<color=#00fbfb>จำจุดนี้เป็นปลายทาง Warp Portal ช่องที่ {val + 1} แล้ว</color>");
+                        Camera.AppendChatText($"{ChatColor.Skill}จำจุดนี้เป็นปลายทาง Warp Portal ช่องที่ {val + 1} แล้ว</color>");
                     else
-                        Camera.AppendChatText($"<color=#00fbfb>จำจุดนี้เป็นปลายทาง Warp Portal แล้ว</color>");
+                        Camera.AppendChatText($"{ChatColor.Skill}จำจุดนี้เป็นปลายทาง Warp Portal แล้ว</color>");
                     break;
                 // case ServerEvent.PartyInviteSent:
                 //     Camera.AppendChatText($"<color=#77FF77>ส่งคำชวนเข้าปาร์ตี้แล้ว</color>");

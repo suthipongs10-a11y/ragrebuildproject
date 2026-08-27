@@ -3,6 +3,7 @@ using System.Text;
 using Assets.Scripts.PlayerControl;
 using Assets.Scripts.Sprites;
 using UnityEngine;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.UI.Guild
 {
@@ -88,6 +89,6 @@ namespace Assets.Scripts.UI.Guild
         }
 
         private static void Say(CameraFollower camera, string text) =>
-            camera.AppendChatText($"<color=yellow>{text}</color>");
+            camera.AppendChatText($"{ChatColor.System}{text}</color>");
     }
 }

@@ -7,6 +7,7 @@ using RebuildSharedData.Enum;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.UI.Mobile
 {
@@ -270,7 +271,7 @@ namespace Assets.Scripts.UI.Mobile
         {
             var camera = CameraFollower.Instance;
             if (camera != null)
-                camera.AppendChatText($"<color=#77FF77>{text}</color>");
+                camera.AppendChatText($"{ChatColor.Party}{text}</color>");
         }
 
         private void Redraw()

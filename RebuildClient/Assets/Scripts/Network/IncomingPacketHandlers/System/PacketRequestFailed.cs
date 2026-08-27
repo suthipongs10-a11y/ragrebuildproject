@@ -1,6 +1,7 @@
 ﻿using Assets.Scripts.Network.HandlerBase;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.Network.IncomingPacketHandlers.System
 {
@@ -14,22 +15,22 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
             switch (error)
             {
                 case ClientErrorType.InvalidCoordinates:
-                    Camera.AppendChatText("<color=#FF3030>ผิดพลาด</color>: พิกัดไม่ถูกต้อง");
+                    Camera.AppendChatText($"{ChatColor.Error}ผิดพลาด</color>: พิกัดไม่ถูกต้อง");
                     break;
                 case ClientErrorType.TooManyRequests:
-                    Camera.AppendChatText("<color=yellow>ระวัง</color>: สั่งงานถี่เกินไป");
+                    Camera.AppendChatText($"{ChatColor.System}ระวัง</color>: สั่งงานถี่เกินไป");
                     break;
                 case ClientErrorType.UnknownMap:
-                    Camera.AppendChatText("<color=#FF3030>ผิดพลาด</color>: ไม่พบแผนที่");
+                    Camera.AppendChatText($"{ChatColor.Error}ผิดพลาด</color>: ไม่พบแผนที่");
                     break;
                 case ClientErrorType.MalformedRequest:
-                    Camera.AppendChatText("<color=#FF3030>Error</color>: Request could not be completed due to malformed data.");
+                    Camera.AppendChatText($"{ChatColor.Error}Error</color>: Request could not be completed due to malformed data.");
                     break;
                 case ClientErrorType.RequestTooLong:
-                    Camera.AppendChatText("<color=#FF3030>ผิดพลาด</color>: ข้อความยาวเกินไป");
+                    Camera.AppendChatText($"{ChatColor.Error}ผิดพลาด</color>: ข้อความยาวเกินไป");
                     break;
                 case ClientErrorType.InvalidInput:
-                    Camera.AppendChatText("<color=#FF3030>Error</color>: Server request could not be performed as the input was not valid.");
+                    Camera.AppendChatText($"{ChatColor.Error}Error</color>: Server request could not be performed as the input was not valid.");
                     break;
             }
         }

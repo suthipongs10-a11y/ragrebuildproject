@@ -1426,13 +1426,16 @@ namespace Assets.Scripts
 
             var c = color switch
             {
-                TextColor.Party => "<color=#77FF77>",
-                TextColor.Job => "<color=#99CCFF>",
-                TextColor.Skill => "<color=#00fbfb>",
-                TextColor.Equipment => "<color=#00fbfb>",
-                TextColor.Item => "<color=#00fbfb>",
-                TextColor.Error => "<color=#ed0000>",
-                TextColor.System => "<color=#FFFF00>",
+                TextColor.Party => ChatColor.Open(ChatColor.Party),
+                TextColor.Guild => ChatColor.Open(ChatColor.Guild),
+                TextColor.Friend => ChatColor.Open(ChatColor.Friend),
+                TextColor.Job => ChatColor.Open(ChatColor.Job),
+                TextColor.Skill => ChatColor.Open(ChatColor.Skill),
+                TextColor.Equipment => ChatColor.Open(ChatColor.Equipment),
+                TextColor.Item => ChatColor.Open(ChatColor.Item),
+                TextColor.Removed => ChatColor.Open(ChatColor.Removed),
+                TextColor.Error => ChatColor.Open(ChatColor.Error),
+                TextColor.System => ChatColor.Open(ChatColor.System),
                 _ => ""
             };
 
@@ -1447,7 +1450,7 @@ namespace Assets.Scripts
 
         public void AppendNotice(string text)
         {
-            AppendChatText($"<color=yellow><i>{text}</i></color>");
+            AppendChatText(ChatColor.Wrap(ChatColor.System, $"<i>{text}</i>"));
         }
 
         public void AppendError(string txt)
@@ -1455,7 +1458,7 @@ namespace Assets.Scripts
             if (string.IsNullOrWhiteSpace(txt))
                 return;
 
-            chatMessages.Add("<color=red>Error</color>: " + txt);
+            chatMessages.Add(ChatColor.Wrap(ChatColor.Error, "Error") + ": " + txt);
             RefreshChatWindow();
         }
 
@@ -1476,7 +1479,7 @@ namespace Assets.Scripts
             }
             catch (Exception)
             {
-                AppendChatText($"<color=yellow>Error</color>: Command could not be parse.");
+                AppendChatText(ChatColor.Wrap(ChatColor.Error, "Error") + ": Command could not be parse.");
             }
 
             lastMessage = text;

@@ -6,6 +6,7 @@ using RebuildSharedData.Enum;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.UI.Mobile
 {
@@ -383,7 +384,7 @@ namespace Assets.Scripts.UI.Mobile
                 Action(row, "ชวนเข้าตี้", () =>
                 {
                     NetworkManager.Instance.PartyInviteById(id);
-                    CameraFollower.Instance.AppendChatText($"<color=#77FF77>ส่งคำชวนไปที่ {who} แล้ว</color>");
+                    CameraFollower.Instance.AppendChatText($"{ChatColor.Party}ส่งคำชวนไปที่ {who} แล้ว</color>");
                 });
                 return;
             }

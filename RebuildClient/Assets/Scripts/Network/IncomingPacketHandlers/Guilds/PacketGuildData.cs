@@ -1,6 +1,7 @@
 using Assets.Scripts.Network.HandlerBase;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.Network.IncomingPacketHandlers.Guilds
 {
@@ -32,7 +33,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Guilds
                 case GuildDataType.Announcement:
                     //said to everyone in the guild, so it is written in the colour good
                     //news is written in rather than the red an error would use
-                    Camera.AppendChatText($"<color=#77FF77>{msg.ReadString()}</color>");
+                    Camera.AppendChatText($"{ChatColor.Guild}{msg.ReadString()}</color>");
                     break;
             }
 

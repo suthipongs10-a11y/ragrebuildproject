@@ -5,6 +5,7 @@ using Assets.Scripts.UI;
 using Assets.Scripts.UI.Trading;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.Network.IncomingPacketHandlers.Trading
 {
@@ -31,7 +32,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Trading
                     //buffer is read from wherever this leaves off
                     msg.ReadInt32();
 
-                    Camera.AppendChatText($"<color=#77FF77>{who} ขอแลกเปลี่ยนของกับเรา</color>");
+                    Camera.AppendChatText($"{ChatColor.Party}{who} ขอแลกเปลี่ยนของกับเรา</color>");
 
                     //One answer, whichever way it is given.
                     //

@@ -2,6 +2,7 @@
 using Assets.Scripts.Objects;
 using Assets.Scripts.Utility;
 using UnityEngine;
+using Assets.Scripts.UI.Utility;
 
 namespace Assets.Scripts.UI.Hud
 {
@@ -19,7 +20,7 @@ namespace Assets.Scripts.UI.Hud
             if (partyInvites.ContainsKey(leaderName))
                 return;
             
-            CameraFollower.Instance.AppendChatText($"<color=#77FF77>{leaderName} ชวนคุณเข้าปาร์ตี้ '{partyName}'</color>");
+            CameraFollower.Instance.AppendChatText($"{ChatColor.Party}{leaderName} ชวนคุณเข้าปาร์ตี้ '{partyName}'</color>");
             
             var toastObject = GameObject.Instantiate(PartyInvitePrefab, ToastZone);
             var toast = toastObject.GetComponent<PartyInviteToast>();
