@@ -38,6 +38,23 @@ public class NetworkConnection
     public CreatePartyRequest? CreatePartyRequest { get; set; }
     public ActiveDbAction ActiveDbAction { get; set; }
 
+    /// <summary>
+    /// Set while this connection's character is left standing in the world as a shop with
+    /// nobody at the keyboard. See Simulation.OfflineVending.
+    /// </summary>
+    /// <remarks>
+    /// Raised by the packet that asks for it, before the socket goes; read by
+    /// DisconnectPlayer, which is what decides whether the character leaves the world with
+    /// the connection or stays behind without it.
+    /// </remarks>
+    public bool IsOfflineVending;
+
+    /// <summary>When the shop above gives up, measured on the server's own clock.</summary>
+    public double OfflineVendingUntil;
+
+    /// <summary>Set from the login path to ask a standing shop to close on the next tick.</summary>
+    public bool OfflineVendingCloseRequested;
+
     //when this connection has its entity removed from the world it is no longer alive. Used to prevent queueing removal while the entity is awaiting recycling.
     //this happens because the server may remove the player AND the connection might also queue the removal of the player at the same time.
     public bool IsAlive;

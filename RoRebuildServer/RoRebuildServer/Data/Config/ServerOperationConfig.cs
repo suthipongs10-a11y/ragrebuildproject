@@ -22,6 +22,12 @@ public class ServerOperationConfig
     public bool SleepMonsterOnEmptyMap { get; set; } = true;
     public int MapMonsterSleepTimer { get; set; } = 600;
     public CastInterruptionMode DefaultCastInterruptMode { get; set; } = CastInterruptionMode.InterruptOnSkill;
+    //How long a vending shop is allowed to stand after its owner has logged out, in
+    //hours. Zero switches offline shops off entirely and the button that opens one stops
+    //being offered. See Simulation.OfflineVending for what the number actually buys: the
+    //seller's character stays in the world for that long, which keeps the map it is on
+    //awake, so this is a number to keep modest rather than a number to maximise.
+    public int OfflineVendingHours { get; set; } = 12;
     public float EtcItemValueMultiplier { get; set; }
     public List<string> ActiveEvents { get; set; } = new();
     public List<string> FeatureFlags { get; set; } = new();

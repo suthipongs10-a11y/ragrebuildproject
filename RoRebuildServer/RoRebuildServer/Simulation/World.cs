@@ -188,6 +188,10 @@ public class World
         Market.AuctionHouse.Update();
         Market.BuyOrders.Update();
 
+        //And the shops whose owners have logged out, for the same reason only more so:
+        //there is nobody at all behind those, so nothing else would ever end them.
+        OfflineVending.Update();
+
         if (currentDropIndex + 2000 > short.MaxValue)
             currentDropIndex = 5000;
     }

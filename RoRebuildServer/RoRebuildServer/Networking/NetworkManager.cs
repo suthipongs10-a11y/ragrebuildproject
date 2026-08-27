@@ -148,6 +148,10 @@ public class NetworkManager
 
     public static void Shutdown()
     {
+        //First, because closing one saves its owner and takes their character out of the
+        //world - and they are not in the player list below, so nothing else would.
+        OfflineVending.CloseAll();
+
         var players = Players;
         for (var i = 0; i < players.Count; i++)
         {
@@ -248,6 +252,24 @@ public class NetworkManager
         connection.CancellationSource.Cancel();
     }
 
+    /// <summary>
+    /// Frees an account slot held by something other than a live connection.
+    /// </summary>
+    /// <remarks>
+    /// Only a shop left standing needs this. Every other connection gives its slot back
+    /// when its socket loop ends; that one is holding the slot on purpose, so it has to
+    /// hand it over when it closes or its owner can never log in again.
+    ///
+    /// By connection rather than by account number, so this can only ever free a slot
+    /// this connection is the one holding. A request that turns out not to be a shop
+    /// after all comes through here too, and by then somebody may already have logged in
+    /// and taken the slot honestly - throwing them out of it would be worse than the
+    /// leak this is here to prevent.
+    /// </remarks>
+    public static void ReleaseAccount(NetworkConnection connection) =>
+        ConnectedAccounts.TryRemove(
+            new KeyValuePair<int, NetworkConnection>(connection.AccountId, connection));
+
     public static void DisconnectPlayer(NetworkConnection connection)
     {
         if (connection == null)
@@ -270,6 +292,22 @@ public class NetworkManager
                 if (leaving != null && leaving.HasEnteredServer)
                     Database.RoDatabase.EnqueueDbRequest(
                         new Database.Requests.FriendNotifyPresenceRequest(leaving.Id, leaving.Name, false));
+
+                //Somebody who left a shop standing keeps their character in the world. The
+                //connection still comes out of the lists below - it has no socket and there
+                //is nothing to send it - but the entity is left alone, which is the whole
+                //trick: buying from a shop reads the seller, so the seller has to be there.
+                if (OfflineVending.TryTakeOver(connection))
+                {
+                    if (ConnectionLookup.ContainsKey(connection.Socket))
+                        ConnectionLookup.Remove(connection.Socket);
+
+                    if (Players.Contains(connection))
+                        Players.Remove(connection);
+
+                    connection.CancellationSource.Cancel();
+                    return;
+                }
 
                 //var player = connection.Entity.Get<Player>();
                 //var combatEntity = connection.Entity.Get<CombatEntity>();
@@ -334,6 +372,17 @@ public class NetworkManager
             if (item.Client.Confirmed)
             {
                 var type = (PacketType)item.PeekFirstByte();
+
+                //Read off the wire rather than in the handler that answers it. That handler
+                //runs on the map thread and the disconnect it asks for is processed on the
+                //main thread, so a flag raised in there is a flag racing the very disconnect
+                //it caused - and losing that race means the shop closes instead of standing.
+                //Raised here it is up before the packet is even queued, so every way out of
+                //the world sees it. The handler still decides: it clears this again if the
+                //player is not actually in a shop, and OfflineVending checks the world state
+                //itself before holding anything open.
+                if (type == PacketType.VendingGoOffline)
+                    item.Client.IsOfflineVending = true;
 
                 if (type < PacketType.InstancePacketHandlerStart || item.Client.Character == null || item.Client.Character.Map == null)
                     inboundChannel.Enqueue(item);
@@ -752,6 +801,23 @@ public class NetworkManager
 
         if (!ConnectedAccounts.TryAdd(userId, playerConnection))
         {
+            //Coming back to a shop of your own is the ordinary way to close one, so it gets
+            //its own answer rather than the generic one below - "wait a moment" is true of
+            //both, but only one of them tells you what is being waited for.
+            //
+            //Asked rather than done, and then turned away: the world closes the shop on its
+            //next frame and the character save that goes with it is queued behind whatever
+            //the database is already doing, while the character select list is read straight
+            //out of the database with no queue at all. Letting this login through would race
+            //those two and show a character from before the last sale. By the time somebody
+            //has read this line and clicked again, both have landed.
+            if (OfflineVending.RequestClose(userId))
+            {
+                await ReturnServerErrorAndDisconnect(socket,
+                    "ร้านค้า Offline ของคุณกำลังปิดและเก็บของคืนให้ กรุณากดเข้าสู่ระบบอีกครั้ง");
+                return;
+            }
+
             if (ConnectedAccounts.TryGetValue(userId, out var existing))
                 await existing.CancellationSource.CancelAsync(); //if they are currently connected, trigger a disconnect
             else
@@ -844,7 +910,12 @@ public class NetworkManager
         }
 
         playerConnection.Status = ConnectionStatus.Disconnected;
-        ConnectedAccounts.Remove(userId, out var _);
+
+        //A shop left standing keeps the account slot, and gives it back when it closes.
+        //The character is still in the world; letting the account straight back in would
+        //load a second copy of it, with the same cart and the same zeny in two places.
+        if (!playerConnection.IsOfflineVending)
+            ConnectedAccounts.Remove(userId, out var _);
 
         //timeoutToken = new CancellationTokenSource(15000).Token;
 

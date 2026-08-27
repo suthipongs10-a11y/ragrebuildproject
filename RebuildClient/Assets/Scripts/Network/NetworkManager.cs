@@ -2327,6 +2327,23 @@ namespace Assets.Scripts.Network
             SendMessage(msg);
         }
 
+        /// <summary>
+        /// Asks the server to leave the shop standing and log this character out.
+        /// </summary>
+        /// <remarks>
+        /// Sent before the socket is closed, and that order is the whole of it: the server
+        /// raises its flag when this arrives, so by the time the close lands the answer to
+        /// "did they mean to leave a shop behind" is already written down. Nothing comes
+        /// back - the connection ends either way, and a reply racing the end of a
+        /// connection is a reply that may not arrive.
+        /// </remarks>
+        public void VendingGoOffline()
+        {
+            var msg = StartMessage(PacketType.VendingGoOffline);
+
+            SendMessage(msg);
+        }
+
         public void VendingOpenStore(int npcId)
         {
             var msg = StartMessage(PacketType.VendingViewStore);

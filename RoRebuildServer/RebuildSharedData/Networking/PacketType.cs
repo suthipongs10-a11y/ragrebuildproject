@@ -182,6 +182,10 @@ public enum PacketType : byte
     //above renumbers every packet below it and the two sides stop agreeing mid sentence.
     FriendAction,
     FriendData,
+
+    //leaving a vending shop standing after the seller has logged out. Appended here for
+    //the same reason as the pair above: a packet travels as its position in this list.
+    VendingGoOffline,
 }
 
 public enum MessageType : byte
