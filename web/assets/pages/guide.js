@@ -316,6 +316,42 @@ async function systems() {
     </p>
     <p><strong>ปิดคำสั่งก่อนครบเวลาได้</strong> จะได้ของที่มีคนขายมาแล้วกับเงินที่เหลือคืน</p>
 
+    <h2>ของที่ยังใช้งานไม่ได้</h2>
+    <p>
+      ตารางไอเทมยกมาจากเกมต้นฉบับทั้งก้อน มีของอยู่ 2,579 ชิ้น แต่ที่หาได้จริงในเซิร์ฟนี้
+      มีราว 895 ชิ้น ที่เหลือไม่มีมอนดรอป ไม่มีร้านขาย ไม่อยู่ในกล่อง — คือมีชื่ออยู่ในฐานข้อมูล
+      แต่ยังไม่ได้ถูกใส่เข้าเกม
+    </p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>ประเภท</th><th class="num">ทั้งหมด</th><th class="num">หาได้จริง</th><th class="num">หาได้แต่ใช้ไม่ได้</th></tr></thead>
+      <tbody>
+        <tr><td>การ์ด</td><td class="num">441</td><td class="num">130</td><td class="num">0</td></tr>
+        <tr><td>ไอเทมใช้ได้</td><td class="num">288</td><td class="num">106</td><td class="num">31</td></tr>
+        <tr><td>อาวุธ</td><td class="num">503</td><td class="num">172</td><td class="num">0</td></tr>
+        <tr><td>เกราะและของสวมใส่</td><td class="num">555</td><td class="num">207</td><td class="num">0</td></tr>
+      </tbody>
+    </table></div>
+    <p class="lede">
+      <strong>การ์ดที่หาได้ทำงานครบทุกใบ</strong> ส่วนการ์ดที่ยังไม่มีเอฟเฟกต์ (ยุค renewal)
+      ถูกปิดไว้ตั้งแต่ต้น ใส่ไม่ได้เลย ไม่ใช่ใส่แล้วเงียบ
+    </p>
+    <div class="note warn">
+      <p><strong>ไอเทม 31 ชิ้นที่เปิดจากกล่องได้แต่ใช้ไม่ได้ — เกือบทั้งหมดคือของเลี้ยงสัตว์</strong></p>
+      <p>
+        ของอย่าง Unripe Apple, Rotten Fish, Orange Juice, Silver Knife of Chastity ฯลฯ
+        เป็นของล่อสัตว์เลี้ยง ซึ่งเซิร์ฟนี้ยังไม่มีระบบสัตว์เลี้ยง กดใช้แล้วระบบจะปฏิเสธ
+        รวมถึง Magnifier กับ Pet Incubator ที่ซื้อจากร้านได้ด้วย ขายทิ้งได้เลย
+      </p>
+    </div>
+    <p>
+      อีกสองชิ้นมีบรรทัดในเอฟเฟกต์ที่ไม่ทำงาน เพราะไปต้านทานสถานะที่เซิร์ฟนี้ไม่เคยทำให้ติด
+      (สับสน / เลือดไหล) — <strong>Giearth Card</strong> กับ <strong>Rudra Bow</strong>
+      ส่วนโบนัสข้ออื่นของทั้งสองชิ้นใช้ได้ปกติ
+    </p>
+    <p class="lede">
+      ตัวเลขทั้งหมดนี้ตรวจด้วย <code>tools/audit_unusable.py</code> รันใหม่ได้ทุกเมื่อ
+    </p>
+
     <h2>เปลี่ยนอาชีพกับ Class Master</h2>
     <p>
       NPC <strong>Class Master</strong> ยืนอยู่ที่ค่ายใต้ Prontera บนแมพ <code>prt_fild08</code>

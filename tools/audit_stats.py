@@ -25,6 +25,10 @@ for base, _, files in os.walk(SCRIPTS):
             continue
         path = os.path.join(base, f)
         text = io.open(path, encoding='utf-8-sig').read()
+        #Commented out lines are not written by anything. Ice Falchion carries a disabled
+        #AddStat(OnAttackFreezeSelf, 1) after its closing brace, and counting it made a
+        #stat that no live item writes look like a stat some item writes and nothing reads.
+        text = re.sub(r'//[^\n]*', '', text)
         for m in re.finditer(r'AddStat\(\s*([A-Za-z_]\w*)', text):
             line = text.count('\n', 0, m.start()) + 1
             written[m.group(1)].append(f'{f}:{line}')

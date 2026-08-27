@@ -74,6 +74,28 @@ Six stats are still named and all six were checked by hand: confusion and bleedi
 statuses the game never applies, and the four self-inflicted ones are read from a flag that
 is set and never looked at.
 
+## tools/audit_unusable.py
+
+What in the item tables does nothing, and what cannot be got at all.
+
+    python3 tools/audit_unusable.py          the lists
+    python3 tools/audit_unusable.py count    the counts only
+
+The question a player asks after a few hours in: which of these cards actually do
+something, and which of these things can I ever find? Both fail the same way, which is
+silently - a card with no effect equips cleanly and shows a tooltip, and an item nothing
+drops sits in the table looking exactly like one that does.
+
+Four separate questions, because they have four different answers. An item with no effect
+script at all; an item whose effect writes only stats the server never reads (it borrows
+`audit_stats.py` rather than repeating it); an item nothing drops, sells or hands out; and
+an item something drops where nothing that drops it is spawned on any map.
+
+Equipment and weapons are not counted as effectless for having no script - their defence
+and attack are columns in the item table. `RecoveryItem("Red_Potion", ...)` is an effect
+written on one line with no block around it, and seventy two of the potions and the food
+are written that way, so those are read too.
+
 ## tools/audit_effects.py
 
 The things an item effect names, and whether they exist.
