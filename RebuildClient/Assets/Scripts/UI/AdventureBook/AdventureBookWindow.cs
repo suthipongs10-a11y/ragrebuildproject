@@ -48,29 +48,6 @@ namespace Assets.Scripts.UI.AdventureBook
         private const float RankBarWidth = Width - Pad * 2f - RankBarLeft - 12f;
         private const float RankBarHeight = 20f;
 
-        /// <summary>
-        /// How the character in the title bar is scaled and shifted, so the badge holds a face
-        /// rather than a whole person.
-        /// </summary>
-        /// <remarks>
-        /// A player sprite is drawn upward from its feet - that is where its anchor is - and
-        /// stands roughly a hundred and ten pixels tall at scale one, of which the head is the
-        /// top four tenths. So to put a head in a forty four pixel badge: scale it until the
-        /// head alone is about that tall, then push the feet down by however far the head then
-        /// sits above them.
-        ///
-        ///     head height  = 110 * 0.4 * scale        44 wants a scale of about 1
-        ///     drop         = -110 * 0.8 * scale       which is where the head's middle is
-        ///
-        /// The first attempt used 0.42 and showed the whole character, which is the same
-        /// picture the equipment window already gives and unreadable at this size.
-        ///
-        /// Still the two numbers to nudge. Bigger scale zooms in; more negative drop slides
-        /// the character down, so the badge looks further up it.
-        /// </remarks>
-        private const float PortraitScale = 1f;
-        private const float PortraitDrop = -88f;
-        private const float PortraitBadgeSize = 44f;
         private const float RowHeight = 44f;
         private const float TallRowHeight = 56f;
         private const float RowGap = 5f;
@@ -125,31 +102,6 @@ namespace Assets.Scripts.UI.AdventureBook
         private TextMeshProUGUI rankBadgeText;
         private TextMeshProUGUI rankBarText;
         private RectTransform rankFill;
-        private RectTransform titleBar;
-        private UiPlayerSprite portrait;
-
-        /// <summary>
-        /// The appearance the portrait was last built from, so it is not rebuilt for nothing.
-        /// </summary>
-        /// <remarks>
-        /// Preparing the same character twice is not free and it is not safe: each prepare
-        /// resets the counter that says how many parts are still loading, so a second one
-        /// started before the first has finished can have a part counted twice and another
-        /// not at all. Rebuilding only when the character actually looks different avoids
-        /// the question entirely.
-        /// </remarks>
-        private int portraitAppearance = -1;
-
-        /// <summary>
-        /// The plain badge icon, kept alive until the portrait has something to show.
-        /// </summary>
-        /// <remarks>
-        /// UiPlayerSprite loads its parts through Addressables, which answers on a later
-        /// frame and may not answer at all. Switching the plain icon off the moment the
-        /// portrait was requested left the badge as an empty white chip whenever the load
-        /// was slow or failed - and an empty chip is worse than the icon it replaced.
-        /// </remarks>
-        private GameObject plainBadgeIcon;
         private View view = View.Regions;
         private int regionIndex = -1;
         private int pageId = -1;
@@ -191,7 +143,6 @@ namespace Assets.Scripts.UI.AdventureBook
             instance.pageId = -1;
 
             NetworkManager.Instance.SendAdventureBookRefresh();
-            instance.RefreshPortrait();
             instance.Redraw();
         }
 
@@ -223,9 +174,8 @@ namespace Assets.Scripts.UI.AdventureBook
             rect.anchoredPosition = Vector2.zero;
             rect.sizeDelta = new Vector2(Width, Height);
 
-            var titleBar = ModernUiTheme.CreateTitleBar(window, "สมุดผจญภัย", "", ModernUiIcons.Spark);
+            ModernUiTheme.CreateTitleBar(window, "สมุดผจญภัย", "", ModernUiIcons.Spark);
             ModernUiTheme.AttachShadow(rect);
-            window.titleBar = titleBar;
 
             //The whole rank block sits on a panel of its own rather than floating on the
             //window's own sheet. It is a different kind of thing from the list below it -
@@ -299,138 +249,21 @@ namespace Assets.Scripts.UI.AdventureBook
             scroll.scrollSensitivity = 32f;
 
             host.SetActive(true);
-
-            //After the window is live, not while it is being assembled. The character's parts
-            //are loaded through Addressables and the callback that assembles them does not
-            //run against an inactive object, so a portrait built a few lines earlier is a
-            //portrait that never arrives.
-            window.RefreshPortrait();
-
             return window;
         }
 
-        /// <summary>
-        /// Puts the reader's own character in the badge at the top left of the window.
-        /// </summary>
-        /// <remarks>
-        /// The same component the equipment window uses to draw its paper doll, borrowed
-        /// whole - including its material, which is a serialised reference on a prefab and
-        /// so cannot be created from here. If the equipment window is not in the scene the
-        /// badge keeps the plain icon the title bar gave it, which is the right failure: a
-        /// window that opens with a symbol on it, rather than one that does not open.
-        ///
-        /// Masked and scaled down to a face. A whole character at forty pixels is a smudge,
-        /// and the head is the part that says which job this is.
-        /// </remarks>
-        private void RefreshPortrait()
-        {
-            //Wrapped, which is not this project's habit and is deliberate here. The portrait
-            //is decoration on a window whose job is to show the book; the character sprite
-            //system it borrows is asynchronous and shared with two other windows, and a throw
-            //from inside it used to take the whole open with it - the book asked for nothing,
-            //received nothing, and sat on "loading" until it was closed. A badge with no face
-            //in it is a far better failure than that.
-            try
-            {
-                BuildPortrait();
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogWarning($"The adventure book could not draw its character portrait, so it goes without one: {e.Message}");
-            }
-        }
-
-        private void BuildPortrait()
-        {
-            var state = PlayerState.Instance;
-            if (titleBar == null || state == null)
-                return;
-
-            var appearance = (state.JobId * 397 + state.HairStyleId) * 31 + state.HairColorId * 2
-                             + (state.IsMale ? 1 : 0);
-
-            if (portrait != null)
-            {
-                //Already built. Only worth doing again if the character looks different now.
-                if (appearance != portraitAppearance)
-                {
-                    portraitAppearance = appearance;
-                    portrait.PrepareDisplayPlayerCharacter(state.JobId, state.HairStyleId, state.HairColorId,
-                        0, 0, 0, state.IsMale);
-                }
-
-                return;
-            }
-
-            var badge = titleBar.Find("Icon") as RectTransform;
-            if (badge == null)
-                return;
-
-            var ui = UiManager.Instance;
-            var source = ui == null || ui.EquipmentWindow == null ? null : ui.EquipmentWindow.PlayerSprite;
-            if (source == null || source.Material == null)
-                return;
-
-            //The badge grows a little to hold a face. The plain icon it was given stays on
-            //for now and is taken away by Update once there is a face to take its place.
-            badge.sizeDelta = new Vector2(PortraitBadgeSize, PortraitBadgeSize);
-            var plain = badge.Find("Icon");
-            plainBadgeIcon = plain != null ? plain.gameObject : null;
-
-            var frame = ModernUiTheme.CreateRect("Portrait", badge);
-            frame.anchorMin = Vector2.zero;
-            frame.anchorMax = Vector2.one;
-            frame.offsetMin = new Vector2(2f, 2f);
-            frame.offsetMax = new Vector2(-2f, -2f);
-            frame.gameObject.AddComponent<RectMask2D>();
-
-            //A rect rather than a plain transform. Everything under a canvas is laid out
-            //through rects, and the sprite parts this hangs are canvas graphics.
-            var characterHost = ModernUiTheme.CreateRect("Character", frame);
-            characterHost.anchorMin = new Vector2(0.5f, 0.5f);
-            characterHost.anchorMax = new Vector2(0.5f, 0.5f);
-            characterHost.pivot = new Vector2(0.5f, 0.5f);
-            characterHost.sizeDelta = new Vector2(PortraitBadgeSize, PortraitBadgeSize);
-            characterHost.anchoredPosition = new Vector2(0f, PortraitDrop);
-            characterHost.localScale = new Vector3(PortraitScale, PortraitScale, 1f);
-
-            portrait = characterHost.gameObject.AddComponent<UiPlayerSprite>();
-            portrait.Material = source.Material;
-            portrait.ViewDirection = Direction.South;
-
-            //No headgear. At this size a hat is a smudge on a face, and the face is the part
-            //that says which job is reading the book.
-            portraitAppearance = appearance;
-            portrait.PrepareDisplayPlayerCharacter(state.JobId, state.HairStyleId, state.HairColorId,
-                0, 0, 0, state.IsMale);
-        }
-
-        /// <summary>True once any part of the character portrait is actually on screen.</summary>
-        private bool PortraitIsShowing()
-        {
-            if (portrait == null)
-                return false;
-
-            //UiPlayerSprite builds five child objects up front and switches on the ones
-            //whose sprite arrives, so an active child is the honest signal that the badge
-            //has a face in it rather than an empty frame.
-            for (var i = 0; i < portrait.transform.childCount; i++)
-            {
-                if (portrait.transform.GetChild(i).gameObject.activeSelf)
-                    return true;
-            }
-
-            return false;
-        }
+        //The window used to try to draw the reader's own character into that badge, and in
+        //three separate builds it never once appeared. The character sprite arrives through
+        //Addressables on a later frame and is drawn upward from its feet, so fitting a face
+        //into a forty four pixel chip meant masking away everything but a guessed offset -
+        //and every attempt at the guess left the badge either empty or showing a smear. The
+        //last one was worse than none: the check meant to keep the plain icon until there was
+        //a face to replace it read the sprite's own children, which are switched on whether or
+        //not they land inside the mask, so it took the icon away and put nothing there. The
+        //book carries the plain symbol the title bar gives every window instead.
 
         private void Update()
         {
-            if (plainBadgeIcon != null && PortraitIsShowing())
-            {
-                plainBadgeIcon.SetActive(false);
-                plainBadgeIcon = null;
-            }
-
             if (drawnRevision != AdventureBookState.Revision)
             {
                 Redraw();

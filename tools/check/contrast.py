@@ -90,6 +90,9 @@ PAIRS = [
     (THEME + "HintColor", THEME + "CardDeepColor", "text"),
     (THEME + "AccentInkColor", THEME + "CardDeepColor", "text"),
     (THEME + "AccentTextColor", THEME + "AccentColor", "text"),
+    #  the other ink that lands on a filled chip: an active tab, the party's share
+    #  toggle, and the chosen character slot's second line
+    (THEME + "LightInkColor", THEME + "AccentColor", "text"),
     #  the badge on the header is a pale chip carrying the accent, not the other way round
     (THEME + "AccentColor", THEME + "LightInkColor", "graphic"),
     (THEME + "IconColor", THEME + "CardDeepColor", "graphic"),
@@ -137,6 +140,7 @@ PAIRS = [
     ("Hud/AnnouncementBanner.cs::InkColor", "Hud/AnnouncementBanner.cs::PlateColor", "text"),
     ("Hud/AnnouncementBanner.cs::RuleColor", "Hud/AnnouncementBanner.cs::PlateColor", "graphic"),
     ("Hud/StatusEffectPanel.cs::PlaceholderTint", THEME + "CardDeepColor", "graphic"),
+    (THEME + "LightInkColor", "Mobile/HotbarPickerWindow.cs::ChosenColor", "text"),
 ]
 
 

@@ -269,11 +269,18 @@ namespace Assets.Scripts.UI.Market
             ModernUiTheme.CreateTitleBar(window, "ตลาด", "", ModernUiIcons.Bag);
             ModernUiTheme.AttachShadow(rect);
 
+            //On the header's second line, which is what that line is for. It used to hang at
+            //thirty down in a band whose title occupies twelve to forty six, so the running
+            //note was written straight across the middle of the word it belongs under, and
+            //the two read as one crowded smear rather than as a heading with a note beneath.
+            //Ellipsis rather than an overflowing line, because these strings grow with the
+            //numbers in them and the longest of them is wider than the window.
             window.subtitle = ModernUiTheme.CreateText(rect, "Note", "", ModernUiTheme.SizeSmall,
-                ModernUiTheme.LabelColor, TextAlignmentOptions.Right);
+                ModernUiTheme.LightInkColor, TextAlignmentOptions.Right);
             window.subtitle.textWrappingMode = TextWrappingModes.NoWrap;
+            window.subtitle.overflowMode = TextOverflowModes.Ellipsis;
             ModernUiTheme.Place(window.subtitle.rectTransform, new Vector2(1, 1),
-                new Vector2(-52f, -30f), new Vector2(340f, 20f));
+                new Vector2(-16f, -50f), new Vector2(Width - 88f, 22f));
 
             window.BuildTabs(rect);
 

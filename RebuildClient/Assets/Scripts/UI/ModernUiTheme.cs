@@ -139,8 +139,16 @@ namespace Assets.Scripts.UI
 
             var sprite = CreateRoundedSprite(color);
             tintedRounded[color] = sprite;
+            bakedTint[sprite] = color;
             return sprite;
         }
+
+        //Which colour was baked into which of those sprites, so that a pass asking what a
+        //label is standing on gets the answer the eye gets. An image wearing one of these
+        //has to be left on a white tint or the colour would be applied twice, and a white
+        //tint is exactly what says "pale card" to anything reading the colour alone.
+        private static readonly System.Collections.Generic.Dictionary<Sprite, Color> bakedTint =
+            new System.Collections.Generic.Dictionary<Sprite, Color>();
 
         private static TMP_FontAsset themeFont;
 
@@ -661,11 +669,31 @@ namespace Assets.Scripts.UI
                 if (image == null || !image.enabled || image.color.a < 0.5f)
                     continue;
 
-                surface = image.color;
+                surface = SurfaceOf(image);
                 return true;
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// What an image actually looks like, tint and baked colour together.
+        /// </summary>
+        /// <remarks>
+        /// A sprite from TintedRounded carries its colour in its pixels and is worn on a
+        /// white tint, so reading the tint on its own reports every one of them as white -
+        /// and a near black ink would then be chosen for a card that is in fact the accent
+        /// blue. overrideSprite before sprite, because that is where a Selectable puts the
+        /// graphic for the state it is currently in.
+        /// </remarks>
+        private static Color SurfaceOf(Image image)
+        {
+            var sprite = image.overrideSprite != null ? image.overrideSprite : image.sprite;
+            if (sprite == null || !bakedTint.TryGetValue(sprite, out var baked))
+                return image.color;
+
+            var tint = image.color;
+            return new Color(tint.r * baked.r, tint.g * baked.g, tint.b * baked.b, tint.a * baked.a);
         }
 
         /// <summary>

@@ -306,8 +306,15 @@ namespace Assets.Scripts.UI.TitleScreen
                 ModernUiTheme.AccentTextColor, TextAlignmentOptions.Center, FontStyles.Bold);
             ModernUiTheme.Stretch((RectTransform)chipText.transform, 0, 0, 0, 0);
 
-            var watcher = chip.gameObject.AddComponent<SelectedChip>();
-            watcher.Button = slot.Button;
+            //On the card, not on the chip. A component only runs while its own object is
+            //switched on, and the chip below starts switched off, so a watcher living on it
+            //could never be the thing that switched it back on - which is why the marker has
+            //never once appeared on the chosen slot.
+            var watcher = card.gameObject.AddComponent<SlotSelection>();
+            watcher.Slot = slot;
+            watcher.Chip = chip.gameObject;
+            watcher.Name = name;
+            watcher.Map = place;
             chip.gameObject.SetActive(false);
 
             //The list usually arrived before these existed, so the slot is asked to say
@@ -324,16 +331,58 @@ namespace Assets.Scripts.UI.TitleScreen
             rect.offsetMax = new Vector2(-4f, bottom + height);
         }
 
-        /// <summary>Shows the chip exactly while its slot is the highlighted one.</summary>
-        private class SelectedChip : MonoBehaviour
+        /// <summary>
+        /// Keeps a slot's marker and its lettering in step with whether it is the chosen one.
+        /// </summary>
+        /// <remarks>
+        /// The lettering has to turn over with the card because the chosen card is the accent
+        /// blue, and the near black every other card is written in reads at 3.5 to 1 on that -
+        /// under the 4.5 normal text has to clear. No one ink reads on both, so the ink is
+        /// part of the state rather than something set once when the card is built.
+        /// </remarks>
+        private class SlotSelection : MonoBehaviour
         {
-            public Button Button;
+            public CharacterSelectPlayerButton Slot;
+            public GameObject Chip;
+            public TextMeshProUGUI Name;
+            public TextMeshProUGUI Map;
+
+            private bool applied;
+            private bool known;
+
+            /// <summary>
+            /// Switched off is not on its own enough. A slot the account is not entitled to
+            /// is switched off as well, and SetAsUnavailable leaves it wearing the idle card
+            /// rather than the blue one - so reading interactable alone would mark it chosen
+            /// and write white lettering onto a pale card. The card it is actually wearing
+            /// is the thing being asked about, so that is the thing to ask.
+            /// </summary>
+            private bool IsChosen()
+            {
+                if (Slot == null || Slot.Button == null || Slot.Button.interactable)
+                    return false;
+
+                return Slot.SelectedSprite != null
+                       && Slot.Button.spriteState.disabledSprite == Slot.SelectedSprite;
+            }
 
             private void Update()
             {
-                var selected = Button != null && !Button.interactable;
-                if (gameObject.activeSelf != selected)
-                    gameObject.SetActive(selected);
+                var selected = IsChosen();
+                if (known && selected == applied)
+                    return;
+
+                known = true;
+                applied = selected;
+
+                if (Chip != null)
+                    Chip.SetActive(selected);
+
+                if (Name != null)
+                    Name.color = selected ? ModernUiTheme.AccentTextColor : ModernUiTheme.TitleColor;
+
+                if (Map != null)
+                    Map.color = selected ? ModernUiTheme.LightInkColor : ModernUiTheme.MutedColor;
             }
         }
 
@@ -602,7 +651,14 @@ namespace Assets.Scripts.UI.TitleScreen
             if (size.y >= 44f)
                 return;
 
+            //Upward, not downward. Both buttons on the picker's bottom row hang from their
+            //top edge - a pivot y of one - so height added to them comes out of the bottom,
+            //and their bottom edge is already sitting on the foot of the window: fourteen
+            //points of extra height put fourteen points of button outside the frame.
+            //Shifting the anchor by exactly what the pivot moved leaves the foot where the
+            //prefab put it and lets the button grow into the empty space above instead.
             rect.sizeDelta = new Vector2(size.x, 44f);
+            rect.anchoredPosition += new Vector2(0f, (44f - size.y) * rect.pivot.y);
         }
 
         private static void PaintButton(Button button, Color background, Color textColor)
