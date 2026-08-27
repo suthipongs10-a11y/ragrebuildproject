@@ -51,9 +51,6 @@ namespace Assets.Scripts.Sprites
         public float Alpha { get; set; }
         public int SpriteOrder;
 
-        private static bool nextUseSmoothRender = true;
-        private static bool canUpdateRenderer = false;
-
         public List<RoSpriteAnimator> ChildrenSprites = new List<RoSpriteAnimator>();
         public RoSpriteAnimator EffectChild;
 

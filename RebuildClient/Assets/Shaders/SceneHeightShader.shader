@@ -67,7 +67,6 @@ Shader "Unlit/SceneHeightShader"
             v2f vert(appdata v)
             {
                 float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
-                float4 vin = v.vertex;
 
                 float offset = (_Time.x * 1000 * _RoWaterWaveSpeed) % 360 - 180;
                 float x = worldPos.x % 2.0;
@@ -75,14 +74,16 @@ Shader "Unlit/SceneHeightShader"
 
                 float diff = x < 1.0 ? y < 1.0 ? 1.0 : -1.0 : 0.0;
 
-                float pos = worldPos.y + sin((3.1415926 / 180) * (offset + 0.5 * _RoWaterWavePitch * (worldPos.x + worldPos.z + diff))) * _RoWaterWaveHeight;
+                float wave = sin((3.1415926 / 180) * (offset + 0.5 * _RoWaterWavePitch * (worldPos.x + worldPos.z + diff))) * _RoWaterWaveHeight;
 
-                worldPos.y += sin((3.1415926 / 180) * (offset + 0.5 * _RoWaterWavePitch * (worldPos.x + worldPos.z + diff))) * _RoWaterWaveHeight;
+                float pos = worldPos.y + wave;
+                worldPos.y += wave;
 
-                v.vertex = mul(unity_WorldToObject, worldPos);
-
+                // Straight from world space. This used to go back through object space
+                // first, which truncated unity_WorldToObject against a float3 and threw
+                // the translation away - and the result was overwritten on the next line
+                // anyway, so the round trip only ever produced a warning.
                 v2f o = (v2f)0;
-                o.vertex = TransformObjectToHClip(v.vertex.xyz);
                 float4 view = mul(UNITY_MATRIX_V, float4(worldPos, 1));
                 o.vertex = mul(UNITY_MATRIX_P, view);
 

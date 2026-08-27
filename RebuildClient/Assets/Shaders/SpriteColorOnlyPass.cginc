@@ -124,13 +124,10 @@ v2f vert(appdata_t v)
     float4 tempVertex = TransformObjectToHClip(v.positionOS.xyz);
     o.fogFactor = ComputeFogFactor(tempVertex.z);
 
-    #ifdef SMOOTHPIXEL
-    float4 clampedRect = clamp(_ClipRect, -2e10, 2e10);
-    float2 maskUV = (v.positionOS.xy - clampedRect.xy) / (clampedRect.zw - clampedRect.xy);
-    o.texcoord = float4(v.texcoord.x, v.texcoord.y, maskUV.x, maskUV.y);
-    #else
+    // o.texcoord is a float2, so the mask uv this branch used to pack into zw was
+    // truncated away before it ever left the vertex shader, and the fragment side
+    // only ever reads texcoord.xy. Both paths carry the same thing.
     o.texcoord = v.texcoord;
-    #endif
 
     float3 samplingPos = _IsMeshRenderer > 0.5 ? _LightingSamplePosition : mul(unity_ObjectToWorld, float4(0, 0, 0, 1)).xyz;
     o.lighting = half4(ShadeVertexLightsSprite(samplingPos), 1.0);
