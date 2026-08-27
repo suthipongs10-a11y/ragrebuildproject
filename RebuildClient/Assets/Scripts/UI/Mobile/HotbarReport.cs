@@ -29,18 +29,18 @@ namespace Assets.Scripts.UI.Mobile
             var hotbar = UiManager.Instance != null ? UiManager.Instance.SkillHotbar : null;
             if (hotbar == null)
             {
-                camera.AppendChatText($"{ChatColor.System}hotbar: ไม่มี SkillHotbar</color>");
+                camera.AppendChatText($"<color={ChatColor.System}>hotbar: ไม่มี SkillHotbar</color>");
                 return;
             }
 
             var bar = (RectTransform)hotbar.transform;
-            camera.AppendChatText($"{ChatColor.System}bar act={On(bar.gameObject)} "
+            camera.AppendChatText($"<color={ChatColor.System}>bar act={On(bar.gameObject)} "
                                   + $"scale={bar.lossyScale.x:0.00} entries={hotbar.EntryCount} "
                                   + $"{Where(bar)}</color>");
 
             var container = hotbar.SkillBarContainer as RectTransform;
             if (container != null)
-                camera.AppendChatText($"{ChatColor.System}box act={On(container.gameObject)} "
+                camera.AppendChatText($"<color={ChatColor.System}>box act={On(container.gameObject)} "
                                       + $"rows={container.childCount} {Where(container)}</color>");
 
             var shown = 0;
@@ -49,7 +49,7 @@ namespace Assets.Scripts.UI.Mobile
                 var entry = hotbar.GetEntryById(i);
                 if (entry == null)
                 {
-                    camera.AppendChatText($"{ChatColor.System}{i}: null</color>");
+                    camera.AppendChatText($"<color={ChatColor.System}>{i}: null</color>");
                     shown++;
                     continue;
                 }
@@ -77,7 +77,7 @@ namespace Assets.Scripts.UI.Mobile
                 line.Append(entry.GetComponent<HotbarSlotTap>() != null ? " tap" : " NOTAP");
                 line.Append(' ').Append(Where((RectTransform)entry.transform));
 
-                camera.AppendChatText($"{ChatColor.System}{line}</color>");
+                camera.AppendChatText($"<color={ChatColor.System}>{line}</color>");
                 shown++;
             }
         }

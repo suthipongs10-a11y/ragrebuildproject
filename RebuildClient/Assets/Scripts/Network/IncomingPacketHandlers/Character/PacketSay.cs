@@ -42,7 +42,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
             {
                 if (Network.EntityList.TryGetValue(id, out var partyMember))
                     partyMember.DialogBox($"{name}: <i><color=#2FCE2C>{text}</color></i>");
-                Camera.AppendChatText($"{name} บอกปาร์ตี้: <i>{ChatColor.Speech.Party}{text}</color></i>");
+                Camera.AppendChatText($"{name} บอกปาร์ตี้: <i><color={ChatColor.Speech.Party}>{text}</color></i>");
                 return;
             }
 
@@ -50,7 +50,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
             {
                 if (Network.EntityList.TryGetValue(id, out var roomMember))
                     roomMember.DialogBox($"{name}: <i><color=#8CD9FF>{text}</color></i>");
-                Camera.AppendChatText($"{name} พูดในห้อง: <i>{ChatColor.Speech.Room}{text}</color></i>");
+                Camera.AppendChatText($"{name} พูดในห้อง: <i><color={ChatColor.Speech.Room}>{text}</color></i>");
                 return;
             }
 
@@ -59,7 +59,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
                 if (type == PlayerChatType.Shout)
                 {
                     controllable.DialogBox($"{name}: <i><color=#FFB051>{text}</color></i>");
-                    Camera.AppendChatText($"{name} ตะโกน: <i>{ChatColor.Speech.Shout}{text}</color></i>");
+                    Camera.AppendChatText($"{name} ตะโกน: <i><color={ChatColor.Speech.Shout}>{text}</color></i>");
                 }
                 else
                 {
@@ -70,9 +70,9 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
             else
             {
                 if (type == PlayerChatType.Shout)
-                    Camera.AppendChatText($"{name} ตะโกน: <i>{ChatColor.Speech.Shout}{text}</color></i>");
+                    Camera.AppendChatText($"{name} ตะโกน: <i><color={ChatColor.Speech.Shout}>{text}</color></i>");
                 else
-                    Camera.AppendChatText($"{name} พูดใกล้ ๆ: <i>{ChatColor.Speech.Say}{text}</color></i>");
+                    Camera.AppendChatText($"{name} พูดใกล้ ๆ: <i><color={ChatColor.Speech.Say}>{text}</color></i>");
             }
         }
     }

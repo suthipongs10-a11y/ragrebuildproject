@@ -17,67 +17,67 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Combat
             switch (result)
             {
                 case SkillValidationResult.IncorrectAmmunition:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: ใส่กระสุนผิดชนิด</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ใส่กระสุนผิดชนิด</color>");
                     break;
                 case SkillValidationResult.IncorrectWeapon:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: ใช้กับอาวุธชนิดนี้ไม่ได้</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ใช้กับอาวุธชนิดนี้ไม่ได้</color>");
                     break;
                 case SkillValidationResult.InsufficientSp:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: SP ไม่พอ</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: SP ไม่พอ</color>");
                     break;
                 case SkillValidationResult.InsufficientZeny:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: เงินไม่พอ</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: เงินไม่พอ</color>");
                     break;
                 case SkillValidationResult.InsufficientItemCount:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: ไม่มีไอเทมที่ต้องใช้</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ไม่มีไอเทมที่ต้องใช้</color>");
                     break;
                 case SkillValidationResult.CannotTargetBossMonster:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: มอนสเตอร์ตัวนี้ไม่ติดผลของสกิล</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: มอนสเตอร์ตัวนี้ไม่ติดผลของสกิล</color>");
                     break;
                 case SkillValidationResult.ItemAlreadyStolen:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: ขโมยจากตัวนี้ไปแล้ว</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ขโมยจากตัวนี้ไปแล้ว</color>");
                     break;
                 case SkillValidationResult.Failure:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ</color>");
                     break;
                 case SkillValidationResult.MemoLocationInvalid:
-                    Camera.AppendChatText($"{ChatColor.Error}จุดนี้ใช้เป็นปลายทาง Warp Portal ไม่ได้</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>จุดนี้ใช้เป็นปลายทาง Warp Portal ไม่ได้</color>");
                     break;
                 case SkillValidationResult.MemoLocationUnwalkable:
-                    Camera.AppendChatText($"{ChatColor.Error}จำจุดนี้ไม่ได้ เพราะยืนอยู่บนพื้นที่เดินไม่ได้</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>จำจุดนี้ไม่ได้ เพราะยืนอยู่บนพื้นที่เดินไม่ได้</color>");
                     break;
                 case SkillValidationResult.MustBeStandingInWater:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: ต้องมีน้ำอยู่ใกล้ ๆ</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ต้องมีน้ำอยู่ใกล้ ๆ</color>");
                     break;
                 case SkillValidationResult.MissingRequiredItem:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: ไม่มีไอเทมหรือตัวประกอบที่ต้องใช้</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ไม่มีไอเทมหรือตัวประกอบที่ต้องใช้</color>");
                     break;
                 case SkillValidationResult.SkillNotKnown:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: ยังไม่ได้เรียนสกิลนี้</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ยังไม่ได้เรียนสกิลนี้</color>");
                     break;
                 case SkillValidationResult.TrapTooClose:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: ใกล้กับดัก ผู้เล่น หรือมอนสเตอร์อื่นเกินไป</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ใกล้กับดัก ผู้เล่น หรือมอนสเตอร์อื่นเกินไป</color>");
                     break;
                 case SkillValidationResult.TargetImmuneToEffect:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: อุปกรณ์ของเป้าหมายกันสกิลนี้</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: อุปกรณ์ของเป้าหมายกันสกิลนี้</color>");
                     break;
                 case SkillValidationResult.TargetAreaOccupied:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: พื้นที่ตรงนั้นถูกใช้อยู่</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: พื้นที่ตรงนั้นถูกใช้อยู่</color>");
                     break;
                 case SkillValidationResult.CannotTargetSelf:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: ใช้ใส่ตัวเองไม่ได้</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ใช้ใส่ตัวเองไม่ได้</color>");
                     break;
                 case SkillValidationResult.TargetStateIgnoresEffect:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: เป้าหมายติดสถานะที่กันสกิลนี้อยู่</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: เป้าหมายติดสถานะที่กันสกิลนี้อยู่</color>");
                     break;
                 case SkillValidationResult.UnusableWhileHidden:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: ใช้ตอนซ่อนตัวไม่ได้</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ใช้ตอนซ่อนตัวไม่ได้</color>");
                     break;
                 case SkillValidationResult.MustBeUsedWhileHidden:
-                    Camera.AppendChatText($"{ChatColor.Error}ใช้สกิลไม่สำเร็จ: ใช้ได้เฉพาะตอนซ่อนตัว</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ใช้ได้เฉพาะตอนซ่อนตัว</color>");
                     break;
                 case SkillValidationResult.CannotTeleportHere:
-                    Camera.AppendChatText($"{ChatColor.Error}วาร์ปในจุดนี้ไม่ได้</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Error}>วาร์ปในจุดนี้ไม่ได้</color>");
                     break;
                 case SkillValidationResult.VendFailedGenericError:
                     VendingSetupManager.Instance?.ResumeVendWindow();

@@ -19,12 +19,12 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
             {
                 if (isEquip)
                 {
-                    Camera.AppendChatText($"{ChatColor.Equipment}ใส่ {item.ProperName()} แล้ว</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Equipment}>ใส่ {item.ProperName()} แล้ว</color>");
                     State.AmmoId = bagId;
                 }
                 else
                 {
-                    Camera.AppendChatText($"{ChatColor.Removed}ถอด {item.ProperName()} แล้ว</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Removed}>ถอด {item.ProperName()} แล้ว</color>");
                     State.AmmoId = -1;
                 }
                 UiManager.Instance.InventoryWindow.UpdateActiveVisibleBag();
@@ -32,9 +32,9 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Character
             else
             {
                 if (isEquip)
-                    Camera.AppendChatText($"{ChatColor.Equipment}สวม {item.ProperName()} แล้ว</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Equipment}>สวม {item.ProperName()} แล้ว</color>");
                 else
-                    Camera.AppendChatText($"{ChatColor.Removed}ถอด {item.ProperName()} แล้ว</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Removed}>ถอด {item.ProperName()} แล้ว</color>");
             }
             
             if (slot == EquipSlot.Ammunition)

@@ -384,7 +384,7 @@ namespace Assets.Scripts.UI.Mobile
                 Action(row, "ชวนเข้าตี้", () =>
                 {
                     NetworkManager.Instance.PartyInviteById(id);
-                    CameraFollower.Instance.AppendChatText($"{ChatColor.Party}ส่งคำชวนไปที่ {who} แล้ว</color>");
+                    CameraFollower.Instance.AppendChatText($"<color={ChatColor.Party}>ส่งคำชวนไปที่ {who} แล้ว</color>");
                 });
                 return;
             }

@@ -89,6 +89,6 @@ namespace Assets.Scripts.UI.Guild
         }
 
         private static void Say(CameraFollower camera, string text) =>
-            camera.AppendChatText($"{ChatColor.System}{text}</color>");
+            camera.AppendChatText($"<color={ChatColor.System}>{text}</color>");
     }
 }

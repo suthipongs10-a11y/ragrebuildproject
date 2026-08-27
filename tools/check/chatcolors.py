@@ -41,6 +41,9 @@ ENTRY = re.compile(r'public const string (\w+) = "#([0-9A-Fa-f]{6})"')
 SPEECH_BLOCK = re.compile(r"class Speech\s*\{(.*?)\n        \}", re.S)
 CHAT = re.compile(r"Append(?:ChatText|Notice|Error)")
 COLOUR_TAG = re.compile(r"<color=(#?\w+)>")
+#a palette entry is a bare hex string, so it only does anything inside a tag. Written on
+#its own it prints as "#FFC22E" in front of the line, which is exactly what happened.
+NAKED_ENTRY = re.compile(r"(?<!<color=)\{ChatColor\.(?:Speech\.)?\w+\}")
 
 
 def _linear(channel):
@@ -92,6 +95,24 @@ def source_files():
         for name in sorted(files):
             if name.endswith(".cs") and os.path.join(folder, name) != PALETTE:
                 yield os.path.join(folder, name)
+
+
+def naked_palette_uses():
+    """Palette entries interpolated into a string without the tag around them.
+
+    ChatColor.Item is "#FFC22E" and nothing else - the hex, not the markup. Interpolated
+    as {ChatColor.Item} it prints the hex where the colour should have been, and the log
+    reads "#FFC22Eได้รับ Old Purple Box". It looks like a colour bug and is a missing
+    six characters.
+    """
+    found = []
+    for path in source_files():
+        with open(path, encoding="utf-8-sig") as handle:
+            for number, line in enumerate(handle, 1):
+                if NAKED_ENTRY.search(line):
+                    name = os.path.relpath(path, SCRIPTS).replace(os.sep, "/")
+                    found.append(f"{name}:{number}")
+    return found
 
 
 def raw_colours_in_chat():
@@ -148,6 +169,10 @@ def main():
                     problems.append(f"{label}.{name} (#{hex6}) and {label}.{other} "
                                     f"(#{other_hex}) are {gap:.0f} apart, which reads as "
                                     f"one colour - two lines nobody can tell apart")
+
+    for where in naked_palette_uses():
+        problems.append(f"{where}: a ChatColor written into a string without <color=> "
+                        f"around it - it will print as the hex, not colour the line")
 
     for where, colour in raw_colours_in_chat():
         problems.append(f"{where}: <color={colour}> written by hand in a chat call - "

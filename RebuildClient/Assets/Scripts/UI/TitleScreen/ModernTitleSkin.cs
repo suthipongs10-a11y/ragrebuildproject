@@ -1,4 +1,4 @@
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -494,6 +494,75 @@ namespace Assets.Scripts.UI.TitleScreen
                 ModernUiTheme.Place(button, new Vector2(1, 0.5f),
                     new Vector2(-LoginPad - 4f, 0f), new Vector2(150f, 44f));
             }
+
+            LayOutLoginRow(win.UsernameBox);
+            LayOutLoginRow(win.PasswordBox);
+            LayOutLoginRow(win.PasswordRepeatBox);
+            LayOutLoginRow(win.ServerInputBox);
+        }
+
+        private const float FieldLabelWidth = 104f;
+        private const float FieldLabelGap = 8f;
+
+        /// <summary>
+        /// A row of the login box: the label on the left, the field it names beside it.
+        /// </summary>
+        /// <remarks>
+        /// The prefab hangs the field off the label rather than next to it - the input is
+        /// the label's own child - and gives the label a box ninety points wide holding the
+        /// word "ID". Translated, that box has to hold "ชื่อผู้ใช้", which does not fit; and
+        /// because the field is the label's child it is drawn over whatever spilled past
+        /// the box, so the label reads as missing rather than as too long. That is why the
+        /// login screen appeared to have no labels at all.
+        ///
+        /// Lifting the field up to the row is what makes the two layoutable side by side.
+        /// The label is then given a box wide enough for the Thai, and told to shrink
+        /// rather than spill if a longer word ever turns up.
+        /// </remarks>
+        private static void LayOutLoginRow(TMP_InputField field)
+        {
+            if (field == null)
+                return;
+
+            var box = (RectTransform)field.transform;
+            var label = box.parent as RectTransform;
+            var row = label != null ? label.parent as RectTransform : null;
+            if (label == null || row == null)
+                return;
+
+            var text = label.GetComponent<TextMeshProUGUI>();
+            if (text == null)
+                return; //not the shape this expects, so leave it exactly as it was
+
+            if (box.parent != row)
+                box.SetParent(row, false);
+
+            //The row is placed by the prefab and is not stretched either way, so its own
+            //width is a number rather than something that has to be measured after a
+            //layout pass has run.
+            var width = row.rect.width;
+            var height = row.rect.height;
+
+            label.anchorMin = new Vector2(0, 0);
+            label.anchorMax = new Vector2(0, 1);
+            label.pivot = new Vector2(0, 0.5f);
+            label.sizeDelta = new Vector2(FieldLabelWidth, 0f);
+            label.anchoredPosition = Vector2.zero;
+
+            text.alignment = TextAlignmentOptions.MidlineLeft;
+            text.textWrappingMode = TextWrappingModes.NoWrap;
+            text.enableAutoSizing = true;
+            text.fontSizeMin = 10f;
+            text.fontSizeMax = ModernUiTheme.SizeBody;
+            text.color = ModernUiTheme.LabelColor;
+            text.extraPadding = true;
+
+            //Ten taller than the row, which is what the prefab gave it: the rows are forty
+            //apart and twenty tall, so a field the height of its own row looks like a line
+            //rather than a box you can type in.
+            ModernUiTheme.Place(box, new Vector2(0, 0.5f),
+                new Vector2(FieldLabelWidth + FieldLabelGap, 0f),
+                new Vector2(width - FieldLabelWidth - FieldLabelGap, height + 10f));
         }
 
         /// <summary>Three tabs across the full width of the box, sharing what is there evenly.</summary>

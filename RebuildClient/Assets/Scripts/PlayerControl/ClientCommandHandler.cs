@@ -164,12 +164,12 @@ namespace PlayerControl
                         MobileMode.Setting = MobileMode.Auto;
                     else
                     {
-                        cameraFollower.AppendChatText($"{ChatColor.System}โหมดมือถือ: {MobileMode.Describe()}</color>");
-                        cameraFollower.AppendChatText($"{ChatColor.System}ใช้ /mobileui on | off | auto</color>");
+                        cameraFollower.AppendChatText($"<color={ChatColor.System}>โหมดมือถือ: {MobileMode.Describe()}</color>");
+                        cameraFollower.AppendChatText($"<color={ChatColor.System}>ใช้ /mobileui on | off | auto</color>");
                         return;
                     }
 
-                    cameraFollower.AppendChatText($"{ChatColor.System}โหมดมือถือ: {MobileMode.Describe()}  (โหลดหน้าใหม่ถ้าปุ่มยังไม่เปลี่ยน)</color>");
+                    cameraFollower.AppendChatText($"<color={ChatColor.System}>โหมดมือถือ: {MobileMode.Describe()}  (โหลดหน้าใหม่ถ้าปุ่มยังไม่เปลี่ยน)</color>");
                     return;
                 }
 
@@ -444,7 +444,7 @@ namespace PlayerControl
                     if (s.Length > 1 && int.TryParse(s[1], out var speed))
                         NetworkManager.Instance.SendAdminChangeSpeed(speed);
                     else
-                        cameraFollower.AppendChatText($"{ChatColor.Error}Error</color>: Incorrect parameters.");
+                        cameraFollower.AppendChatText($"<color={ChatColor.Error}>Error</color>: Incorrect parameters.");
                 }
 
                 if (s[0] == "/admin")
@@ -510,7 +510,7 @@ namespace PlayerControl
                 {
                     if (!Enum.TryParse<CharacterStatusEffect>(s[1], out var status))
                     {
-                        cameraFollower.AppendChatText($"{ChatColor.Error}Error</color>: Could not find status effect {s[1]}.");
+                        cameraFollower.AppendChatText($"<color={ChatColor.Error}>Error</color>: Could not find status effect {s[1]}.");
                         return;
                     }
 
@@ -592,21 +592,21 @@ namespace PlayerControl
                 {
                     if (s.Length < 3)
                     {
-                        cameraFollower.AppendChatText($"{ChatColor.Error}Incorrect parameters. Usage:</color>/debug valueName value");
+                        cameraFollower.AppendChatText($"<color={ChatColor.Error}>Incorrect parameters. Usage:</color>/debug valueName value");
                         return;
                     }
 
                     if (float.TryParse(s[2], out var f))
                         DebugValueHolder.Set(s[1], f);
                     else
-                        cameraFollower.AppendChatText($"{ChatColor.Error}Incorrect parameters. Usage:</color>/debug valueName float");
+                        cameraFollower.AppendChatText($"<color={ChatColor.Error}>Incorrect parameters. Usage:</color>/debug valueName float");
                 }
 
                 if ((s[0] == "/organize" || s[0] == "/party") && s.Length > 1)
                 {
                     if (PlayerState.Instance.IsInParty)
                     {
-                        cameraFollower.AppendChatText($"{ChatColor.System}คุณอยู่ปาร์ตี้อยู่แล้ว ต้องพิมพ์ /leave ก่อนถึงจะตั้งใหม่ได้</color>");
+                        cameraFollower.AppendChatText($"<color={ChatColor.System}>คุณอยู่ปาร์ตี้อยู่แล้ว ต้องพิมพ์ /leave ก่อนถึงจะตั้งใหม่ได้</color>");
                         return;
                     }
 
@@ -622,7 +622,7 @@ namespace PlayerControl
                     if (!name.Contains("\""))
                         text.Substring(s[0].Length + 1);
                     if (!PlayerState.Instance.IsInParty)
-                        cameraFollower.AppendChatText($"{ChatColor.System}ต้องตั้งปาร์ตี้ด้วย /organize ก่อนถึงจะชวนคนได้</color>");
+                        cameraFollower.AppendChatText($"<color={ChatColor.System}>ต้องตั้งปาร์ตี้ด้วย /organize ก่อนถึงจะชวนคนได้</color>");
                     else
                         NetworkManager.Instance.PartyInviteByName(name);
                 }
@@ -636,7 +636,7 @@ namespace PlayerControl
                     else
                     {
                         if (PlayerState.Instance.InvitedPartyId < 0)
-                            cameraFollower.AppendChatText($"{ChatColor.System}ไม่มีคำชวนเข้าปาร์ตี้ค้างอยู่</color>");
+                            cameraFollower.AppendChatText($"<color={ChatColor.System}>ไม่มีคำชวนเข้าปาร์ตี้ค้างอยู่</color>");
                         else
                             NetworkManager.Instance.PartyAcceptInvite(PlayerState.Instance.InvitedPartyId);
                     }
@@ -645,7 +645,7 @@ namespace PlayerControl
                 if (s[0] == "/leave" || s[0] == "/leaveparty")
                 {
                     if (!PlayerState.Instance.IsInParty)
-                        cameraFollower.AppendChatText($"{ChatColor.System}คุณยังไม่ได้อยู่ปาร์ตี้</color>");
+                        cameraFollower.AppendChatText($"<color={ChatColor.System}>คุณยังไม่ได้อยู่ปาร์ตี้</color>");
                     else
                         NetworkManager.Instance.LeaveParty();
                 }
@@ -768,7 +768,7 @@ namespace PlayerControl
             {
                 if (text.Length > 255)
                 {
-                    cameraFollower.AppendChatText($"{ChatColor.Error}Error</color>: Text too long.");
+                    cameraFollower.AppendChatText($"<color={ChatColor.Error}>Error</color>: Text too long.");
                 }
                 else
                     NetworkManager.Instance.SendSay(text, PlayerChatType.Say);

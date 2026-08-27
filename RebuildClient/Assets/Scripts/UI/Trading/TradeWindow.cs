@@ -183,13 +183,13 @@ namespace Assets.Scripts.UI.Trading
             if (instance != null && camera != null)
             {
                 var who = string.IsNullOrWhiteSpace(instance.partnerName) ? "อีกฝ่าย" : instance.partnerName;
-                camera.AppendChatText($"{ChatColor.Party}แลกเปลี่ยนกับ {who} สำเร็จ</color>");
+                camera.AppendChatText($"<color={ChatColor.Party}>แลกเปลี่ยนกับ {who} สำเร็จ</color>");
 
                 Report(camera, "ได้รับ", instance.theirOffer, instance.theirZeny, ChatColor.Item);
                 Report(camera, "ให้ไป", instance.myOffer, instance.myZeny, ChatColor.Removed);
             }
             else if (camera != null)
-                camera.AppendChatText($"{ChatColor.Party}แลกเปลี่ยนสำเร็จ</color>");
+                camera.AppendChatText($"<color={ChatColor.Party}>แลกเปลี่ยนสำเร็จ</color>");
 
             if (instance != null)
                 instance.HideWindow();
@@ -221,7 +221,7 @@ namespace Assets.Scripts.UI.Trading
         public static void Cancelled(string reason)
         {
             if (!string.IsNullOrWhiteSpace(reason) && CameraFollower.Instance != null)
-                CameraFollower.Instance.AppendChatText($"{ChatColor.Error}{reason}</color>");
+                CameraFollower.Instance.AppendChatText($"<color={ChatColor.Error}>{reason}</color>");
 
             //HideWindow rather than CloseWindow: this is the server telling us the trade is
             //already over, and closing sends a cancel, which would be answering a trade that

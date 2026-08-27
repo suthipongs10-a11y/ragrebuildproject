@@ -271,7 +271,7 @@ namespace Assets.Scripts.UI.Mobile
         {
             var camera = CameraFollower.Instance;
             if (camera != null)
-                camera.AppendChatText($"{ChatColor.Party}{text}</color>");
+                camera.AppendChatText($"<color={ChatColor.Party}>{text}</color>");
         }
 
         private void Redraw()

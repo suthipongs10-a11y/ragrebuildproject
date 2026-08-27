@@ -65,8 +65,8 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Social
 
                     if (wasOnline != friend.IsOnline)
                         CameraFollower.Instance.AppendChatText(friend.IsOnline
-                            ? $"{ChatColor.Friend}{friend.Name} ออนไลน์แล้ว</color>"
-                            : $"{ChatColor.Friend}{friend.Name} ออฟไลน์แล้ว</color>");
+                            ? $"<color={ChatColor.Friend}>{friend.Name} ออนไลน์แล้ว</color>"
+                            : $"<color={ChatColor.Friend}>{friend.Name} ออฟไลน์แล้ว</color>");
 
                     break;
                 }
@@ -81,7 +81,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Social
                 }
 
                 case FriendDataType.Notice:
-                    CameraFollower.Instance.AppendChatText($"{ChatColor.Friend}{msg.ReadString()}</color>");
+                    CameraFollower.Instance.AppendChatText($"<color={ChatColor.Friend}>{msg.ReadString()}</color>");
                     break;
             }
         }

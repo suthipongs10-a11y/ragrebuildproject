@@ -180,7 +180,7 @@ namespace Assets.Scripts.UI.Hud
         public void LeaveParty()
         {
             if(!PlayerState.Instance.IsInParty)
-                CameraFollower.Instance.AppendChatText($"{ChatColor.System}คุณยังไม่ได้อยู่ปาร์ตี้</color>");
+                CameraFollower.Instance.AppendChatText($"<color={ChatColor.System}>คุณยังไม่ได้อยู่ปาร์ตี้</color>");
             else
                 NetworkManager.Instance.LeaveParty();
             HideWindow();

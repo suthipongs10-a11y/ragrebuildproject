@@ -37,8 +37,25 @@ namespace Assets.Scripts.UI.Inventory
             ActiveTradeWindow = null;
         }
 
+        /// <summary>
+        /// The shop a purchase was sent to, kept until the server says it went through.
+        /// </summary>
+        /// <remarks>
+        /// The window is closed the moment the request is sent, so by the time the answer
+        /// arrives there is nothing left holding the shop's name. Without it the buyer is
+        /// told "แลกเปลี่ยนสำเร็จ", which is the wording for trading with a person standing
+        /// in front of you and says nothing about which shop just took the money.
+        ///
+        /// Written down rather than said now, because the server can still turn the
+        /// purchase down - no room, too heavy, not enough zeny, somebody else bought it
+        /// first - and a line saying it worked has to wait until it did.
+        /// </remarks>
+        public static string PendingPurchaseShop;
+
         public void SubmitPurchase()
         {
+            PendingPurchaseShop = LeftTitle != null ? LeftTitle.text : null;
+
             NetworkManager.Instance.SubmitVendingPurchase(rightEntries);
             CloseShop();
         }

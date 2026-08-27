@@ -33,7 +33,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Guilds
                 case GuildDataType.Announcement:
                     //said to everyone in the guild, so it is written in the colour good
                     //news is written in rather than the red an error would use
-                    Camera.AppendChatText($"{ChatColor.Guild}{msg.ReadString()}</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Guild}>{msg.ReadString()}</color>");
                     break;
             }
 

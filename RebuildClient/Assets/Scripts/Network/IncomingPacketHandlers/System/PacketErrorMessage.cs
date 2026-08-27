@@ -10,7 +10,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
         public override void ReceivePacket(ClientInboundMessage msg)
         {
             var text = msg.ReadString();
-            Camera.AppendChatText($"{ChatColor.Error}{text}</color>");
+            Camera.AppendChatText($"<color={ChatColor.Error}>{text}</color>");
         }
     }
 }

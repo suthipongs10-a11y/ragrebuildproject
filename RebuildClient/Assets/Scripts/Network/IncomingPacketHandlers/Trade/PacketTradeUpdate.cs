@@ -32,7 +32,7 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Trading
                     //buffer is read from wherever this leaves off
                     msg.ReadInt32();
 
-                    Camera.AppendChatText($"{ChatColor.Party}{who} ขอแลกเปลี่ยนของกับเรา</color>");
+                    Camera.AppendChatText($"<color={ChatColor.Party}>{who} ขอแลกเปลี่ยนของกับเรา</color>");
 
                     //One answer, whichever way it is given.
                     //

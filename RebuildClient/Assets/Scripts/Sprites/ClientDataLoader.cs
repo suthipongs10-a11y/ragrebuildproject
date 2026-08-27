@@ -163,7 +163,50 @@ namespace Assets.Scripts.Sprites
         public MapViewpoint GetMapViewpoint(string mapName) => MapViewpoints.GetValueOrDefault(mapName);
         public ClientMapEntry GetMapInfo(string mapName) => MapDataLookup.GetValueOrDefault(mapName);
         public MonsterClassData GetMonsterData(int classId) => MonsterClassLookup.GetValueOrDefault(classId);
-        public ItemData GetItemById(int id) => ItemIdLookup.TryGetValue(id, out var item) ? item : ItemIdLookup[-1];
+        private readonly Dictionary<int, ItemData> unknownItems = new();
+
+        /// <summary>
+        /// The item with this id, or a stand-in that says which id could not be found.
+        /// </summary>
+        /// <remarks>
+        /// Named with the id rather than left as a bare "Unknown Item", because the number
+        /// is the only thing that tells the two causes apart. Either items.json is older
+        /// than the server's item tables, which is a run of updateclient.bat, or the server
+        /// handed out an id that is in none of the six item csv files, which is a data
+        /// fault. Without the id in front of you there is no way to know which, and an item
+        /// with no name and an apple for a picture looks the same either way.
+        ///
+        /// One stand-in per id and kept, so the tooltip does not change under the cursor
+        /// when a second unknown item is looked at, and so the warning is said once.
+        /// </remarks>
+        public ItemData GetItemById(int id)
+        {
+            if (ItemIdLookup.TryGetValue(id, out var item))
+                return item;
+
+            if (unknownItems.TryGetValue(id, out var standIn))
+                return standIn;
+
+            Debug.LogWarning($"[Items] Nothing in items.json has the id {id}. Either the "
+                             + "client's item table is older than the server's - run "
+                             + "updateclient.bat - or the server handed out an id that is "
+                             + "in none of the item csv files.");
+
+            var template = ItemIdLookup[-1];
+            standIn = new ItemData()
+            {
+                Code = template.Code,
+                Id = id,
+                IsUnique = template.IsUnique,
+                ItemClass = template.ItemClass,
+                Name = $"Unknown Item (id {id})",
+                Sprite = template.Sprite
+            };
+
+            unknownItems.Add(id, standIn);
+            return standIn;
+        }
+
         public ItemData GetItemByName(string name) => ItemNameLookup[name];
         public bool TryGetItemByName(string name, out ItemData item) => ItemNameLookup.TryGetValue(name, out item);
         public bool TryGetItemById(int id, out ItemData item) => ItemIdLookup.TryGetValue(id, out item);
