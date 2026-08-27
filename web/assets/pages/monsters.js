@@ -1,5 +1,5 @@
 import {
-  data, index, esc, n, pct, ms, table, filterable, link, itemLink, mapLink,
+  data, index, esc, n, pct, ms, table, filterable, link, itemLink, mapLink, itemIcon,
   duration, respawnRange,
 } from "../app.js";
 
@@ -179,7 +179,7 @@ export async function detail({ rest }) {
           const it = items.get(d.id);
           const width = Math.max(2, Math.min(100, d.chance / 100));
           return `<tr>
-            <td class="name">${itemLink(it)}</td>
+            <td class="name">${itemIcon(it?.code)}${itemLink(it)}</td>
             <td>${it ? esc(it.type) : ""}</td>
             <td class="num">${d.max > 1 ? `${d.min}–${d.max}` : "1"}</td>
             <td>

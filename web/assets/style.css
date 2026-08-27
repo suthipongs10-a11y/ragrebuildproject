@@ -269,6 +269,22 @@ tbody tr:hover { background: var(--tab-idle); }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 td.name a { font-weight: 600; color: var(--accent-ink); }
 
+/* ------------------------------------------------------------------ icons */
+
+/* Cut out of one sheet with background-position, sized inline by itemIcon() since
+   only that side knows how wide the sheet is. All of this is optional: without
+   tools/webicons/pack.py there is no --icon-sheet, itemIcon() returns an empty
+   string, and not one of these elements is ever put on the page. */
+.ico {
+  display: inline-block; flex: none; vertical-align: -6px; margin-right: 6px;
+  background-image: var(--icon-sheet); background-repeat: no-repeat;
+  image-rendering: pixelated;
+}
+
+/* the item page's own icon, set beside the heading rather than in the run of text */
+.itemhead { display: flex; align-items: center; gap: 12px; }
+.itemhead .ico { margin: 0; }
+
 /* ------------------------------------------------------------------- misc */
 
 .chance { display: flex; align-items: center; gap: 8px; min-width: 130px; }

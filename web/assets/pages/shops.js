@@ -1,4 +1,4 @@
-import { data, index, esc, n, table, filterable, link, itemLink, mapLink } from "../app.js";
+import { data, index, esc, n, table, filterable, link, itemLink, mapLink, itemIcon } from "../app.js";
 
 export async function list() {
   const [shops, byId, maps] = await Promise.all([
@@ -43,7 +43,7 @@ export async function list() {
         { key: "items", label: "ขายอะไรบ้าง",
           sortValue: (s) => s.itemNames,
           render: (s) => s.items
-            .map((e) => itemLink(byId.get(e.id)) +
+            .map((e) => itemIcon(byId.get(e.id)?.code) + itemLink(byId.get(e.id)) +
               (e.price !== undefined ? ` <span class="chip mute">${n(e.price)}z</span>` : ""))
             .join(", ") },
       ], { sort: "mapName", dir: "asc" }),

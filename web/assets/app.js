@@ -125,6 +125,48 @@ export function mapLink(map, fallbackCode) {
   return `<span class="chip mute" title="แมพนี้ไม่มีใน Maps.csv">${esc(fallbackCode ?? "?")}</span>`;
 }
 
+// ------------------------------------------------------------------- icons
+
+// One sheet of every item icon, built by tools/webicons/pack.py off the extracted
+// client data. It is optional on purpose: the icons are Gravity's artwork and never
+// live in this repository, so a checkout without them has to read exactly the same,
+// just without pictures. Everything below no-ops when there is no sheet.
+
+let sheet = null;
+
+export async function loadIcons() {
+  try {
+    const meta = await data("icons");
+    if (!meta || !meta.items) return;
+    sheet = meta;
+    const url = window.__RAGICONS ?? `data/${meta.sheet}`;
+    const root = document.documentElement.style;
+    root.setProperty("--icon-sheet", `url("${url}")`);
+    document.body.classList.add("has-icons");
+  } catch {
+    // no sheet on this machine, which is the normal state of a fresh clone
+  }
+}
+
+/** The icon for an item code, or nothing at all if there is no sheet to cut it from.
+ *
+ * The whole cut is written inline rather than left to the stylesheet, because scaling
+ * one cell of a sheet means scaling the sheet - and only this side knows how wide it
+ * is. Everything the css contributes is the sheet itself and pixelated scaling.
+ */
+export function itemIcon(code, scale = 1) {
+  if (!sheet) return "";
+  const cell = sheet.items[code];
+  if (cell === undefined) return "";
+
+  const size = sheet.cell * scale;
+  const x = (cell % sheet.cols) * size;
+  const y = Math.floor(cell / sheet.cols) * size;
+  return `<i class="ico" aria-hidden="true" style="width:${size}px;height:${size}px;` +
+    `background-size:${sheet.cols * size}px auto;` +
+    `background-position:-${x}px -${y}px"></i>`;
+}
+
 // --------------------------------------------------- Unity rich text -> HTML
 
 const CARD_BG = [0xDA, 0xEA, 0xF4]; // --card, where descriptions are rendered
@@ -549,4 +591,5 @@ setupNav();
 setupSearch();
 stampFooter();
 if (!location.hash) location.hash = "#/";
-route();
+// icons first, so the first table drawn has them - loadIcons never rejects
+loadIcons().then(route);

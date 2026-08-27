@@ -1,5 +1,5 @@
 import {
-  data, index, esc, n, table, filterable, link, itemLink, monsterLink, mapLink,
+  data, index, esc, n, table, filterable, link, itemLink, monsterLink, mapLink, itemIcon,
 } from "../app.js";
 
 export async function render({ rest }) {
@@ -108,7 +108,7 @@ async function book() {
             <td>${esc(r.name)}</td>
             <td class="num">${n(r.pages)}</td>
             <td class="num">${n(r.stars)}</td>
-            <td class="name">${itemLink(byId.get(r.headgear))}</td>
+            <td class="name">${itemIcon(byId.get(r.headgear)?.code)}${itemLink(byId.get(r.headgear))}</td>
           </tr>`
         )
         .join("")}</tbody>
@@ -140,7 +140,9 @@ async function book() {
     render: (list) =>
       table(list, [
         { key: "name", label: "หน้า", cls: "name",
-          render: (p) => (p.cardId ? itemLink(byId.get(p.cardId)) : esc(p.name)) },
+          render: (p) => (p.cardId
+            ? itemIcon(byId.get(p.cardId)?.code) + itemLink(byId.get(p.cardId))
+            : esc(p.name)) },
         { key: "members", label: "นับมอนตัวไหนบ้าง", sortValue: (p) => p.memberNames,
           render: (p) => p.monsters.map((c) => monsterLink(mons.get(c))).join(", ") },
         { key: "level", label: "Lv", num: true },

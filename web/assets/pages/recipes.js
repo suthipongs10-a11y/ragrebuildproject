@@ -1,4 +1,4 @@
-import { data, index, esc, n, pct, table, filterable, itemLink, link } from "../app.js";
+import { data, index, esc, n, pct, table, filterable, itemLink, link, itemIcon } from "../app.js";
 
 export async function list() {
   const [ref, byId] = await Promise.all([data("reference"), index("itemsById")]);
@@ -31,7 +31,8 @@ export async function list() {
     render: (list) =>
       table(list, [
         { key: "resultName", label: "ได้ของ", cls: "name",
-          render: (r) => itemLink(byId.get(r.result)) + (r.count > 1 ? ` ×${r.count}` : "") },
+          render: (r) => itemIcon(byId.get(r.result)?.code) + itemLink(byId.get(r.result))
+            + (r.count > 1 ? ` ×${r.count}` : "") },
         { key: "skill", label: "สกิลที่ใช้",
           render: (r) => link(`#/skill/${r.skill}`, r.skill) },
         { key: "minSkillLevel", label: "Lv ขั้นต่ำ", num: true },
@@ -51,7 +52,7 @@ export async function list() {
     <div class="tablewrap"><table>
       <thead><tr><th>แร่</th><th class="num">น้ำหนัก</th><th class="num">สัดส่วน</th></tr></thead>
       <tbody>${ore
-        .map((o) => `<tr><td class="name">${itemLink(byId.get(o.id))}</td>
+        .map((o) => `<tr><td class="name">${itemIcon(byId.get(o.id)?.code)}${itemLink(byId.get(o.id))}</td>
           <td class="num">${n(o.rate)}</td>
           <td class="num">${((o.rate / total) * 100).toFixed(1)}%</td></tr>`)
         .join("")}</tbody>

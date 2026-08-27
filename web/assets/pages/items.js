@@ -1,6 +1,6 @@
 import {
   data, index, esc, n, pct, table, filterable, link, richText,
-  itemLink, monsterLink, mapLink,
+  itemLink, monsterLink, mapLink, itemIcon,
 } from "../app.js";
 import { ELEMENT_TH, splitElement } from "./monsters.js";
 
@@ -69,7 +69,7 @@ export async function list({ query }) {
     render: (rows) =>
       table(rows, [
         { key: "name", label: "ชื่อ", cls: "name",
-          render: (i) => link(`#/item/${i.id}`, i.name) +
+          render: (i) => itemIcon(i.code) + link(`#/item/${i.id}`, i.name) +
             (unequippable(i, ref) ? ' <span class="chip warn">ใส่ไม่ได้</span>' : "") },
         { key: "id", label: "id", num: true },
         { key: "type", label: "ประเภท", render: (i) => esc(label(TYPE_TH, i.type)) },
@@ -169,7 +169,7 @@ export async function detail({ rest }) {
   const usedIn = ref.recipes.filter((r) => r.materials.some((m) => m.id === item.id));
 
   const recipeRow = (r) => `<tr>
-    <td class="name">${itemLink(byId.get(r.result))} ${r.count > 1 ? `×${r.count}` : ""}</td>
+    <td class="name">${itemIcon(byId.get(r.result)?.code)}${itemLink(byId.get(r.result))} ${r.count > 1 ? `×${r.count}` : ""}</td>
     <td>${esc(r.skill)} Lv ${r.minSkillLevel}+</td>
     <td class="num">${pct(r.baseChance, 1)}</td>
     <td>${r.materials.map((m) => `${itemLink(byId.get(m.id))} ×${m.amount}`).join("<br>")}</td>
@@ -180,8 +180,10 @@ export async function detail({ rest }) {
 
   return `
     <p class="crumbs">${link("#/items", "ไอเท็ม")} / ${esc(item.name)}</p>
-    <h1>${esc(item.name)}</h1>
-    <p class="lede mono">${esc(item.code)} · id ${item.id}</p>
+    <div class="itemhead">${itemIcon(item.code, 3)}<div>
+      <h1>${esc(item.name)}</h1>
+      <p class="lede mono">${esc(item.code)} · id ${item.id}</p>
+    </div></div>
     <div class="chiprow">${chips.join("")}</div>
 
     ${item.desc ? `<div class="card"><div class="desc">${richText(item.desc)}</div></div>` : ""}

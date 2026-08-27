@@ -31,6 +31,7 @@ object where the helpers should have been, and the home page dies on `data is no
 function`.
 """
 
+import base64
 import json
 import os
 import re
@@ -133,6 +134,15 @@ def main():
         if name.endswith(".json"):
             store[name[:-5]] = json.load(open(os.path.join(DATA, name), encoding="utf-8"))
 
+    #the icon sheet, if this machine has one. It is a png rather than json, so it goes in
+    #as a data uri and app.js reads it off the window instead of guessing a path - see
+    #tools/webicons/pack.py, which is the only thing that ever writes it
+    sheet = os.path.join(DATA, "icons.png")
+    icons = ""
+    if os.path.exists(sheet):
+        raw = base64.b64encode(open(sheet, "rb").read()).decode("ascii")
+        icons = '<script>window.__RAGICONS = "data:image/png;base64,%s";</script>\n' % raw
+
     parts = []
     for path in modules():
         key = canon(path)
@@ -165,8 +175,8 @@ require("app.js");
     head = head.replace('<link rel="stylesheet" href="assets/style.css">',
                         "<style>\n%s\n</style>" % css)
     head = head.replace('<script type="module" src="assets/app.js"></script>',
-                        '<script>window.__RAGDATA = %s;</script>\n<script>%s</script>'
-                        % (blob, loader))
+                        '%s<script>window.__RAGDATA = %s;</script>\n<script>%s</script>'
+                        % (icons, blob, loader))
 
     os.makedirs(os.path.dirname(out), exist_ok=True)
     with open(out, "w", encoding="utf-8") as handle:
@@ -174,7 +184,11 @@ require("app.js");
 
     size = os.path.getsize(out)
     print(f"{out}  {size / 1024 / 1024:.1f} MB  "
-          f"({len(parts)} module(s), {len(store)} data file(s))")
+          f"({len(parts)} module(s), {len(store)} data file(s)"
+          + (f", {len(store['icons']['items'])} item icon(s)" if icons else ", no icons")
+          + ")")
+    if not icons:
+        print("  no icon sheet on this machine - run tools/webicons/pack.py to add one")
     return 0
 
 

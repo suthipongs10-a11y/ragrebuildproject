@@ -130,3 +130,8 @@ tools/**/__pycache__/
 
 # bundle.py output - a build product, rebuilt from web/ whenever it is wanted
 web/dist/
+
+# the item icon sheet - Gravity's artwork out of data.grf, same rule as
+# Assets/Sprites. Built locally by tools/webicons/pack.py, never committed
+web/data/icons.png
+web/data/icons.json
