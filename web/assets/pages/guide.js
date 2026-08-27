@@ -34,6 +34,8 @@ async function start() {
       <li>อาชีพขั้น 2 ที่มีผังสกิลครบแล้วมี 6 สาย: Knight, Wizard, Priest, Hunter, Assassin, Blacksmith
         (${link("#/jobs", "ดูรายการทั้งหมด")})</li>
       <li>อาชีพอื่นเปลี่ยนไปได้แต่ยังลงสกิลไม่ได้ เพราะยังไม่มีผังสกิลในไฟล์</li>
+      <li><strong>อาชีพ 1 เปลี่ยนได้ไม่จำกัด</strong> ตราบใดที่ยังไม่ขึ้นอาชีพ 2 —
+        คุยกับ Class Master ที่ <code>prt_fild08</code> ${link("#/guide/systems", "อ่านกติกาเต็ม")}</li>
     </ul>
 
     <div class="note warn">
@@ -314,6 +316,44 @@ async function systems() {
     </p>
     <p><strong>ปิดคำสั่งก่อนครบเวลาได้</strong> จะได้ของที่มีคนขายมาแล้วกับเงินที่เหลือคืน</p>
 
+    <h2>เปลี่ยนอาชีพกับ Class Master</h2>
+    <p>
+      NPC <strong>Class Master</strong> ยืนอยู่ที่ค่ายใต้ Prontera บนแมพ <code>prt_fild08</code>
+      เมนูแยกการเปลี่ยนอาชีพเป็นสองหัวข้อตั้งแต่ครั้งแรกที่คุย เพราะสองอย่างนี้ไม่ใช่เรื่องเดียวกัน
+      อันหนึ่งกลับคำได้ อีกอันกลับคำไม่ได้
+    </p>
+    <div class="tablewrap"><table>
+      <thead><tr><th></th><th>เปลี่ยนอาชีพ 1</th><th>เปลี่ยนเป็นอาชีพ 2</th></tr></thead>
+      <tbody>
+        <tr><td>เงื่อนไข</td>
+          <td>Novice ต้อง Job Level 10 และลงแต้มสกิลให้หมดก่อน<br>ถ้าเป็นอาชีพ 1 อยู่แล้วเปลี่ยนได้ทันที</td>
+          <td>เป็นอาชีพ 1 + Job Level 50 + ลงแต้มสกิลให้หมด</td></tr>
+        <tr><td>เปลี่ยนได้กี่ครั้ง</td>
+          <td class="num"><strong>ไม่จำกัด</strong></td>
+          <td class="num">ครั้งเดียว แล้วล็อคถาวร</td></tr>
+        <tr><td>Base Level</td><td class="num">ไม่เปลี่ยน</td><td class="num"><strong>ลดเหลือ 10</strong></td></tr>
+        <tr><td>Job Level</td><td class="num">ไม่เปลี่ยน</td><td class="num">กลับไปเริ่มที่ 1</td></tr>
+        <tr><td>สเตตัสกับสกิล</td><td>รีเซ็ต คืนแต้มครบเท่าเดิม</td><td>รีเซ็ต คืนแต้มตามเลเวลใหม่</td></tr>
+        <tr><td>ของที่ใส่อยู่</td><td colspan="2">ถูกถอดกลับเข้ากระเป๋า รถเข็นถูกเก็บ ไอเทมกับเงินไม่หายไปไหน</td></tr>
+      </tbody>
+    </table></div>
+    <div class="note warn">
+      <p><strong>ขึ้นอาชีพ 2 แล้วเปลี่ยนอาชีพไม่ได้อีกเลย</strong></p>
+      <p>
+        ทั้งย้อนกลับไปเป็นอาชีพ 1 และข้ามไปอาชีพ 2 สายอื่น ทำไม่ได้ทั้งคู่ — เมนูยังกดได้อยู่
+        แต่ NPC จะบอกว่าอาชีพถูกล็อคแล้ว ส่วนรีเซ็ตสกิลกับรีเซ็ตสเตตัสยังทำได้ตลอดเหมือนเดิม
+      </p>
+      <p>
+        ตราบใดที่ยังเป็นอาชีพ 1 อยู่ จะสลับสายไปมากี่รอบก็ได้ ไม่เสียเลเวลและไม่เสียแต้ม
+        ลองให้พอใจก่อนแล้วค่อยขึ้นอาชีพ 2
+      </p>
+    </div>
+    <p class="lede">
+      อาชีพ 2 ที่ไปต่อได้ผูกกับอาชีพ 1 ตายตัว — Swordsman→Knight, Archer→Hunter, Mage→Wizard,
+      Acolyte→Priest, Thief→Assassin, Merchant→Blacksmith
+      หกสายนี้คือสายที่มีผังสกิลครบในเซิร์ฟ สายอื่นยังไม่เปิดให้ไป
+    </p>
+
     <h2>ร้านค้าส่วนตัวและร้าน Offline</h2>
     <p>
       พ่อค้าที่มีรถเข็นและสกิล Vending ตั้งร้านขายของในรถเข็นได้ ต่างจากตลาดกลางตรงที่
@@ -338,7 +378,7 @@ async function systems() {
     </p>
     <div class="tablewrap"><table>
       <tbody>
-        <tr><td>ร้านอยู่ได้นาน</td><td class="num">12 ชั่วโมง (ตั้งค่าได้ที่ <code>OfflineVendingHours</code>)</td></tr>
+        <tr><td>ร้านอยู่ได้นาน</td><td class="num">2 วัน (48 ชั่วโมง — ตั้งค่าได้ที่ <code>OfflineVendingHours</code>)</td></tr>
         <tr><td>ร้านปิดเองเมื่อ</td><td class="num">ของหมด / หมดเวลา / เจ้าของกลับมาล็อกอิน / เซิร์ฟรีสตาร์ต</td></tr>
         <tr><td>เงินกับของที่เหลือ</td><td class="num">บันทึกลงฐานข้อมูลทุกครั้งที่ขายได้ 1 รายการ</td></tr>
       </tbody>

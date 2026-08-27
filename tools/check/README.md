@@ -1,6 +1,6 @@
 # tools/check
 
-Nine checks that stand in for a compiler.
+Eleven checks that stand in for a compiler.
 
 Unity only compiles when it feels like it, and a mistake that would have taken a compiler a
 second to catch instead costs a pull, a build, a script run and a look at the Console -
@@ -20,6 +20,7 @@ Run them from the repo root with `python3 tools/check/<name>.py`.
 | `contrast.py` | An ink that cannot be read on what it is written on. A retint breaks nothing that compiles: the only sign is a label somebody cannot read on a phone in daylight, which is not something the person who changed it will see on a desk monitor. Holds every ink and surface pairing against the WCAG 2.1 ratio - 4.5 to 1 for text, 3 to 1 for anything drawn. |
 | `uitypes.py` | A theme builder's result handed to something that does not take it. CreateCard returns a RectTransform and CreateButton returns a Button; Place takes a RectTransform. All four lines read the same and two of them are only wrong at the transform. |
 | `deadscripts.py` | A component in a scene or prefab whose script cannot be one. Unity says `'X' is missing the class attribute 'ExtensionOfNativeClass'!`, which reads like a compile error and is not: the class is fine, the asset is stale, and it happens whenever somebody turns a component into a plain class and leaves the old prefabs behind. Also catches a script file named something other than its class, which Unity cannot resolve at all. `--fix` strips the dead entries and leaves the renames alone, because those are fixed by renaming the file, not by deleting a working component. |
+| `npcscript.py` | An npc script that will not load, or a menu that quietly stops working. The scripts are a language of their own, compiled at server startup and touched by no build step, so the first sign of a broken one is the server refusing to start. Checks that braces and parens close, that every `@Macro()` exists, that no `Option()` runs past the ten the client can show, and that a `while(result < n)` menu loop agrees with the number of entries in the menu it wraps - add an entry and forget the bound and the new entries close the conversation instead of returning to it. |
 | `forgename.py` | What a forged weapon ends up called, assembled from the item's slots, a row of `NonCardPrefixes.csv` and a name sent separately. The order is the whole point - "Very Very Strong Halo's Fire Blade", not "Fire Very Very Strong Halo's Blade" - and it is one integer column away from being wrong in a way nobody notices until they make one. |
 
 `nsresolve.py` takes a list of files; the rest take none (except `needsupdate.py`, which

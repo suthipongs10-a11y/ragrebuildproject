@@ -54,17 +54,51 @@ Dialog(name, "It's a bit rough out there, harder than the last test, but you sho
 			*/
 }
 
-//Novice to first job, and first job to second. Second job needs job level 50 on the
-//first, which is the whole of the first job, and it puts the job level back to 10 so
-//the new tree is learned rather than arriving already finished.
+//Two doors, and they are two entries on the menu rather than one entry with a question
+//behind it, because they are not variations on each other. One can be walked through as
+//often as you like; the other can be walked through exactly once.
+//
+//  First job   always open while the character is a novice or a first job. Stats and
+//              skills come back as points and neither level moves, so what is handed
+//              back is exactly what there was to spend in the first place.
+//  Second job  job level 50 on a first job, and after it the character's job is fixed.
+//              No way back to a first job, no way across to another second job. That is
+//              how it works in the game this is a copy of, and it is the reason the two
+//              are separated on the menu: one of them is a decision.
+//
+//Ids come from Db/Jobs.csv. 0 is Novice, 1 to 6 are the first jobs, and anything from 7
+//up is a second job or a special class - so "7 or more" is the whole of the lock, and it
+//is checked inside each macro rather than at the menu. A guard on the menu is a guard
+//that a second way in walks straight past.
 //
 //The six second jobs offered here are the six the server has a skill tree for. Crusader,
 //Monk, Sage, Rogue, Bard, Dancer and Alchemist have no entry in Skills/SkillTree.toml,
 //so changing into one would leave the player with nothing to spend points on at all.
 macro JobMasterFirstJob()
 {
+	ShowSprite("bard_eland01", right);
+
+	if(JobId >= 7)
+	{
+		Dialog(name, "เธอขึ้นอาชีพ 2 ไปแล้วนะ อาชีพจะถูกล็อคตั้งแต่วันที่เปลี่ยน กลับไปเป็นอาชีพ 1 ไม่ได้แล้ว");
+		Dialog(name, "แต่รีเซ็ตสกิลกับรีเซ็ตสเตตัสยังทำให้ได้ตลอด อยากลองจัดบิลด์ใหม่ก็บอกได้เลย");
+		return;
+	}
+
+	if(JobId == 0 && JobLevel < 10)
+	{
+		Dialog(name, "มาเปลี่ยนอาชีพใช่ไหม? ช่วยได้แน่นอน แต่ต้องทำ Job Level ให้ถึง 10 ก่อนนะ ตอนนี้อยู่ที่ " + JobLevel + " เท่านั้น");
+		return;
+	}
+
+	if(JobId == 0 && UnusedSkillPoints > 0)
+	{
+		Dialog(name, "Job Level 10 แล้วก็จริง แต่ยังเหลือแต้มสกิลอยู่ " + UnusedSkillPoints + " แต้ม ใช้ให้หมดก่อนนะ แล้วค่อยมาใหม่");
+		return;
+	}
+
 	if(GetNpcFlag(bardFlag) > 1)
-		Dialog(name, "อยากเปลี่ยนอาชีพอีกครั้งใช่ไหม? ได้เลย แต่ต้องรีเซ็ตสกิลกับสเตตัสด้วยนะ จะเอาอาชีพอะไรดี?");
+		Dialog(name, "อยากเปลี่ยนอาชีพ 1 อีกครั้งใช่ไหม? ได้เลย เปลี่ยนกี่รอบก็ได้ตราบใดที่ยังไม่ขึ้นอาชีพ 2 จะเอาอาชีพอะไรดี?");
 	else
 		Dialog(name, "มาเปลี่ยนอาชีพใช่ไหม? ดีเลย! คิดจะเป็นอะไรดีล่ะ?");
 
@@ -81,6 +115,15 @@ macro JobMasterFirstJob()
 		Dialog(name, "เลือกได้ดีมาก! แต่เสียใจด้วย นั่นคืออาชีพที่เธอเป็นอยู่แล้ว");
 		return;
 	}
+
+	//Only for somebody who has something to lose. A novice has no stats or skills of
+	//their own worth resetting and the reset below skips them, so reading this list at
+	//them would be warning about something that is not going to happen.
+	if(JobId > 0)
+		Dialog(name, "<color=#CC5500>• สกิลกับสเตตัสถูกรีเซ็ต คืนแต้มให้ครบเท่าเดิม\n" +
+					 "• Base Level กับ Job Level ไม่ลด แต้มที่ได้จึงเท่าเดิมทุกแต้ม\n" +
+					 "• ของที่ใส่อยู่ถูกถอดกลับเข้ากระเป๋า รถเข็นถูกเก็บ\n" +
+					 "• ไอเทมกับเงินไม่หายไปไหน</color>");
 
 	Dialog(name, "แน่ใจนะว่าจะเป็นอาชีพนี้?");
 	Option("แน่ใจ", "ขอคิดดูก่อน");
@@ -128,6 +171,20 @@ macro JobMasterFirstJob()
 
 macro JobMasterSecondJob()
 {
+	ShowSprite("bard_eland01", right);
+
+	if(JobId >= 7)
+	{
+		Dialog(name, "เธอเป็นอาชีพ 2 อยู่แล้ว และอาชีพ 2 เปลี่ยนไม่ได้อีกแล้วนะ ล็อคตั้งแต่วันที่เปลี่ยนเลย");
+		return;
+	}
+
+	if(JobId == 0)
+	{
+		Dialog(name, "ใจเย็นก่อน! ต้องขึ้นอาชีพ 1 ให้ได้ก่อน แล้วทำ Job Level ให้ครบ 50 ค่อยมาคุยเรื่องอาชีพ 2 กัน");
+		return;
+	}
+
 	if(JobLevel < 50)
 	{
 		Dialog(name, "อยากไปอาชีพ 2 ใช่ไหม? ต้องทำ Job Level ให้ครบ 50 ก่อนนะ ตอนนี้เธออยู่ที่ " + JobLevel + " เท่านั้น");
@@ -171,8 +228,11 @@ macro JobMasterSecondJob()
 	Dialog(name, "<color=#CC5500>• <b>Base Level จะถูกลดเหลือ 10</b> (ตอนนี้เธออยู่เลเวล " + Level + ")\n" +
 				 "• Job Level กลับไปเริ่มที่ 1\n" +
 				 "• สกิลและสเตตัสถูกรีเซ็ตทั้งหมด คืนแต้มให้ตามเลเวลใหม่\n" +
+				 "• ของที่ใส่อยู่ถูกถอดกลับเข้ากระเป๋า รถเข็นถูกเก็บ\n" +
+				 "• <b>อาชีพจะถูกล็อคถาวร เปลี่ยนอาชีพไม่ได้อีกเลย</b>\n" +
 				 "• ไอเทมกับเงินไม่หายไปไหน</color>");
-	Dialog(name, "<color=#CC0000>ย้อนกลับไม่ได้นะ</color> จะเปลี่ยนอาชีพเลยไหม?");
+	Dialog(name, "<color=#CC0000>ย้อนกลับไม่ได้นะ</color> ตราบใดที่ยังเป็นอาชีพ 1 เธอจะสลับไปมากี่รอบก็ได้ " +
+				 "แต่พอขึ้นอาชีพ 2 แล้วคือจบ จะเปลี่ยนอาชีพเลยไหม?");
 
 	Option("เอาเลย", "ขอคิดดูก่อน");
 	if(result == 1)
@@ -195,45 +255,6 @@ macro JobMasterSecondJob()
 
 	ShowSprite("bard_eland02", right);
 	Dialog(name, "เรียบร้อย! ยินดีด้วยนะ ไปลุยได้เลย");
-	return;
-}
-
-macro BardChangeJob()
-{
-	ShowSprite("bard_eland01", right);
-
-	if(JobId == 0 && JobLevel < 10)
-	{
-		Dialog(name, "มาเปลี่ยนอาชีพใช่ไหม? ช่วยได้แน่นอน แต่ต้องทำ Job Level ให้ถึง 10 ก่อนนะ");
-		return;
-	}
-
-	if(JobId == 0 && UnusedSkillPoints > 0)
-	{
-		Dialog(name, "Job Level 10 แล้วก็จริง แต่ต้องใช้แต้มสกิลที่เหลือให้หมดก่อน ถึงจะเปลี่ยนอาชีพให้ได้");
-		return;
-	}
-
-	//a novice has only one road out, so it is not worth asking which
-	if(JobId == 0)
-	{
-		@JobMasterFirstJob();
-		return;
-	}
-
-	Option("เปลี่ยนเป็นอาชีพ 2", "เปลี่ยนอาชีพ 1 ใหม่", "ยกเลิก");
-	if(result == 0)
-	{
-		@JobMasterSecondJob();
-		return;
-	}
-	if(result == 1)
-	{
-		@JobMasterFirstJob();
-		return;
-	}
-
-	Dialog(name, "ได้เลย ต้องการอะไรก็บอกได้");
 	return;
 }
 
@@ -435,6 +456,10 @@ Npc("prt_fild08", "Class Master", "1_M_BARD", 153, 357, SE, 1, 1)  //175, 374, S
 		{
 			Dialog(name, "สวัสดี ยินดีต้อนรับ! ข้าคือ <color=#0066CC>Class Master</color> มีหน้าที่เปลี่ยนอาชีพให้นักผจญภัยอย่างเธอ " +
 						 "ทั้งอาชีพ 1 และอาชีพ 2 รวมถึงรีเซ็ตสกิลกับสเตตัสให้ด้วย");
+			Dialog(name, "<color=#CC5500>จำกฎข้อเดียวนี้ไว้ให้ดี</color> — <b>อาชีพ 1 เปลี่ยนกี่รอบก็ได้</b> " +
+						 "อยากลองเป็นอะไรก็มาบอกข้า สกิลกับสเตตัสจะถูกรีเซ็ตคืนแต้มให้ครบ เลเวลไม่ลดสักหน่อย");
+			Dialog(name, "<color=#CC0000>แต่วันที่เธอขึ้นอาชีพ 2 คือวันที่อาชีพถูกล็อค</color> " +
+						 "หลังจากนั้นเปลี่ยนอาชีพไม่ได้อีกเลย ค่อย ๆ คิดให้ดีก่อนนะ");
 			Dialog(name, "มาครั้งแรกสินะ เดี๋ยวข้าให้ของติดตัวไปหน่อย");
 			SetNpcFlag(bardFlag, 1);
 			GiveZeny(1000);
@@ -446,20 +471,31 @@ Npc("prt_fild08", "Class Master", "1_M_BARD", 153, 357, SE, 1, 1)  //175, 374, S
 			Dialog(name, "กลับมาแล้วหรือ! ให้ข้าช่วยอะไรดี?");
 		}
 
+		//Both job changes are named on the menu from the first visit rather than hidden
+		//behind one "change job" entry. They are not the same errand: one of them can be
+		//taken back and the other cannot, and a menu that hides that behind a shared name
+		//is a menu that lets somebody walk into the permanent one by accident.
+		//
+		//The choice is copied out before anything runs, and put back afterwards. Every
+		//macro below asks a question of its own, and asking a question writes the answer
+		//into result - so the loop used to be steered by whatever the last inner menu
+		//happened to return, and cancelling out of the job list quietly ended the whole
+		//conversation. Now the loop only ever reads what was picked here.
+		var choice = 0;
 		result = 0;
-		while(result < 3)
+		while(result < 6)
 		{
-			Option("เกี่ยวกับเซิร์ฟเวอร์", "เปลี่ยนอาชีพ", "รีเซ็ตสกิล", "รีเซ็ตสเตตัส", "เปลี่ยนรูปลักษณ์", "ยกเลิก");
-			switch(result) 
-			{
-				case 0: @BardAboutRebuild();
-				case 1:	@BardChangeJob();
-				case 2: @BardSkillReset();
-				case 3: @BardStatReset();
-				case 4: @BardRandomizeAppearance();
-				//case 5: @BardWarps();
-				//case 5: @FullCharacterReset();
-			}
+			Option("เกี่ยวกับเซิร์ฟเวอร์", "เปลี่ยนอาชีพ 1", "เปลี่ยนเป็นอาชีพ 2", "รีเซ็ตสกิล", "รีเซ็ตสเตตัส", "เปลี่ยนรูปลักษณ์", "ยกเลิก");
+			choice = result;
+
+			if(choice == 0) @BardAboutRebuild();
+			if(choice == 1) @JobMasterFirstJob();
+			if(choice == 2) @JobMasterSecondJob();
+			if(choice == 3) @BardSkillReset();
+			if(choice == 4) @BardStatReset();
+			if(choice == 5) @BardRandomizeAppearance();
+
+			result = choice;
 		}
 
 }
