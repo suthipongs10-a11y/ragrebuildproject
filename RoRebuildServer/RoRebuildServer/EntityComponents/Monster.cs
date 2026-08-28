@@ -551,8 +551,8 @@ public partial class Monster : IEntityAutoReset
     /// player's sense of luck is rather than evenly: anything you see most sessions is not
     /// worth a light, one in a hundred is, and one in five hundred should stop you walking.
     /// </summary>
-    /// <summary>The MVP box, in ten thousand. A hundred is one percent.</summary>
-    private const int MvpBoxChanceInTenThousand = 100;
+    /// <summary>The MVP box, in ten thousand. Two hundred is two percent.</summary>
+    private const int MvpBoxChanceInTenThousand = 200;
 
     /// <summary>The item code the box is, and the id it turns out to be.</summary>
     private const string MvpBoxCode = "Pierre's_Treasurebox";
