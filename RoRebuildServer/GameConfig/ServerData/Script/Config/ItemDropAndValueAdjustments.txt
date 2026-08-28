@@ -1,8 +1,16 @@
 ﻿
 ServerConfig("ItemAdjustments") {
 OnLoadDropData:
-	//if you want to use drop rates as provided in the db, remove this block or replace with return rate;
-	
+	//SWITCHED OFF. appsettings.json has RemapDropRates set to false, so the server never
+	//calls any of this - DropData.csv is the rate, exactly as it is written there, and a
+	//card is the 0.10% it says rather than the 1.21% this used to turn it into. Rare is
+	//meant to be rare.
+	//
+	//Left in place rather than deleted because it is the record of what the boost was, and
+	//because turning it back on is one word in appsettings.json. Nothing below runs until
+	//that word changes back. Note that switching it on again also brings back the Refine
+	//doubling further down, which is part of this block and not a separate setting.
+
 	if(type == Etc && subType == "Quest")
 		return rate;
 

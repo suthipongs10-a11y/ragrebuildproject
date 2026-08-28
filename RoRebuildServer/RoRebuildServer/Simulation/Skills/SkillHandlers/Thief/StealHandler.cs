@@ -2,6 +2,7 @@
 using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Enum.EntityStats;
+using RoRebuildServer.Custom;
 using RoRebuildServer.Data;
 using RoRebuildServer.EntityComponents;
 using RoRebuildServer.EntityComponents.Character;
@@ -65,6 +66,11 @@ public class StealHandler : SkillHandlerBase
             CommandBuilder.SkillExecuteTargetedSkillAutoVis(source.Character, target.Character, CharacterSkill.Steal, lvl, di);
 
             target.AddStatusEffect(CharacterStatusEffect.StolenFrom, int.MaxValue);
+
+            //last, after everything this skill sends of its own, because announcing takes
+            //the recipient list for the whole server and hands it back empty
+            ServerAnnouncements.AnnounceCardStolen(source.Character, d.Id, count,
+                target.Character.Monster.MonsterBase);
 
             return;
         }

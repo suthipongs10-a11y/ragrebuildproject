@@ -108,12 +108,37 @@ def remap(value, from1, to1, from2, to2):
     return int((value - from1) / (to1 - from1) * (to2 - from2) + from2)
 
 
+#appsettings.json is json with // comments in it, which json.load will not read, and the
+#one value wanted here is a bool on a line of its own. Read with a pattern rather than a
+#parser, and fail loudly rather than guess: guessing this wrong means every drop rate on
+#the site is off by up to twelve times and nothing anywhere says so.
+REMAP_FLAG_RE = re.compile(r'"RemapDropRates"\s*:\s*(true|false)')
+
+
+def read_remap_flag():
+    path = os.path.join(ROOT, "RoRebuildServer", "RoRebuildServer", "appsettings.json")
+    with io.open(path, encoding="utf-8-sig") as handle:
+        found = REMAP_FLAG_RE.search(handle.read())
+    if not found:
+        raise SystemExit(f"no RemapDropRates setting in {path} - the site cannot know "
+                         f"which drop rates the server is running")
+    return found.group(1) == "true"
+
+
+REMAP_DROPS = read_remap_flag()
+
+
 def remap_drop_rate(item, rate):
     """Replicate Script/Config/ItemDropAndValueAdjustments.txt -> OnLoadDropData.
 
-    appsettings.json has RemapDropRates: true, so the numbers in DropData.csv are
-    NOT what a player sees. This produces the rate the server actually rolls.
+    When appsettings.json has RemapDropRates on, the numbers in DropData.csv are NOT what
+    a player sees, and this produces the rate the server actually rolls. When it is off,
+    DataLoader never calls the script at all - so neither does this, and that includes the
+    Refine doubling, which lives inside the same block.
     """
+    if not REMAP_DROPS:
+        return rate
+
     itype = item["type"] if item else "Etc"
     sub = item["subCategory"] if item else "None"
     code = item["code"] if item else ""
@@ -1439,7 +1464,9 @@ def main():
             "statusEffects": len(build_status_effects()),
         },
         "sizes": sizes,
-        "remapDropRates": True,
+        #read from appsettings.json rather than written down, so a page can say which rates
+        #it is showing instead of a sentence going stale the day somebody flips the setting
+        "remapDropRates": REMAP_DROPS,
         "unreachableSpawnMaps": unreachable_maps,
         "monstersWithoutSpawns": sorted(m["code"] for m in monsters.values() if m.get("noSpawn")),
         "monstersSummonedOnly": sorted(m["code"] for m in monsters.values() if m.get("summonedBy")),

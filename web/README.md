@@ -116,9 +116,10 @@ web/
 
 ## หมายเหตุเรื่องความถูกต้องของข้อมูล
 
-- **อัตราดรอปเป็นอัตราจริง** `appsettings.json` เปิด `RemapDropRates` ไว้
-  ตัวเลขใน `DropData.csv` จึงถูกแปลงก่อนใช้งาน exporter คำนวณด้วยสูตรเดียวกับ
-  `Script/Config/ItemDropAndValueAdjustments.txt`
+- **อัตราดรอปเป็นอัตราจริง** exporter อ่าน `RemapDropRates` จาก `appsettings.json`
+  ถ้าเปิดอยู่จะคำนวณด้วยสูตรเดียวกับ `Script/Config/ItemDropAndValueAdjustments.txt`
+  ถ้าปิด (ค่าตอนนี้) จะใช้ตัวเลขดิบใน `DropData.csv` ตรง ๆ ทั้งเว็บและหน้าที่อธิบายเรื่องนี้
+  เปลี่ยนตามค่า flag เอง ไม่ต้องไล่แก้ข้อความ
 - **ราคาซื้อ/ขายเป็นราคาจริง** ผ่าน `OnSetItemPurchasePrice` / `OnSetItemSaleValue` แล้ว
 - **แมพที่ไม่มีใน `Maps.csv` ไม่นับ** สคริปต์เกิดมอนของแมพพวกนั้นไม่ทำงาน
   มอนที่เกิดเฉพาะในแมพเหล่านั้นจะถูกติดป้ายว่า "ยังไม่มีที่เกิด"

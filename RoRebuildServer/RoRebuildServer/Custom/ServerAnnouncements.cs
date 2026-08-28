@@ -15,9 +15,13 @@ namespace RoRebuildServer.Custom;
 /// chat with the notice sound behind it.
 ///
 /// A private server lives on the moments the rest of the players see, and there are
-/// exactly three: a card found, a piece of gear taken to the refine level where it could
-/// as easily have shattered, and an MVP going down. Three is the point — a fourth would
-/// start the slide to nobody reading any of them.
+/// exactly three: a card turning up, a piece of gear taken to the refine level where it
+/// could as easily have shattered, and an MVP going down. Three is the point — a fourth
+/// would start the slide to nobody reading any of them.
+///
+/// A card has two ways of turning up - off the ground where a monster died, or out of a
+/// monster's pocket with Steal - and both say so in the same gold. That is one kind of
+/// news told two ways, not two kinds.
 ///
 /// Written in Thai, like the rest of the interface. These are read at a glance in the
 /// middle of a fight, which is the one place a language you have to translate in your head
@@ -140,6 +144,31 @@ public class ServerAnnouncements : ServerConfigScriptHandlerBase
     ///
     /// Chances are held per ten thousand, so a card at 10 is one tenth of one percent.
     /// </remarks>
+    /// <summary>
+    /// Called as a card is taken with Steal, which is the other way one arrives.
+    /// </summary>
+    /// <remarks>
+    /// Said at the theft rather than at a pickup, because a stolen card goes straight into
+    /// the bag and never touches the ground - there is no pickup to hang it on.
+    ///
+    /// No odds on the end, unlike the drop line. What the thief's chance actually was
+    /// depends on their Steal level and on the gap in DEX between them and what they
+    /// robbed, so the only available figure is one that would differ for every reader -
+    /// which is the same reason the drop line refuses to adjust for the finder's own drop
+    /// bonus.
+    ///
+    /// Nothing here can be made to repeat: Process puts StolenFrom on the monster and
+    /// ValidateTarget refuses a second attempt, so one monster is one line at most, ever.
+    /// </remarks>
+    public static void AnnounceCardStolen(WorldObject thief, int itemId, int count, MonsterDatabaseInfo source)
+    {
+        var info = DataManager.GetItemInfoById(itemId);
+        if (info == null || info.ItemClass != ItemClass.Card)
+            return;
+
+        Announce($"{thief.Name} ได้รับ {info.Name} {count} ea จากการ Steal {source.Name}");
+    }
+
     private static string FormatDropChance(string monsterCode, int itemId)
     {
         if (!DataManager.MonsterDropData.TryGetValue(monsterCode, out var drops))

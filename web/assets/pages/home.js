@@ -52,6 +52,7 @@ export async function render() {
       </table>
     </div>
 
+    ${meta.remapDropRates ? `
     <div class="note warn">
       <p><strong>อัตราดรอปที่แสดงคืออัตราจริง</strong></p>
       <p>
@@ -60,7 +61,15 @@ export async function render() {
         <code>Script/Config/ItemDropAndValueAdjustments.txt</code> แล้ว
         เช่นการ์ดที่เขียนไว้ 0.10% จริง ๆ ดรอปที่ 1.21%
       </p>
-    </div>
+    </div>` : `
+    <div class="note">
+      <p><strong>อัตราดรอปเป็นอัตราดิบ ไม่มีการบูสต์</strong></p>
+      <p>
+        <code>RemapDropRates</code> ปิดอยู่ ตัวเลขใน <code>DropData.csv</code> คือตัวเลข
+        ที่เซิร์ฟทอยจริง ๆ ตรง ๆ ไม่ผ่านสูตรแปลงอะไรทั้งนั้น การ์ดอยู่ที่ 0.10%
+        เท่ากันทุกใบ — ของหายากคือหายากจริง
+      </p>
+    </div>`}
 
     <div class="note bad">
       <p><strong>มอน ${n(c.monstersWithoutSpawns)} ตัวยังไม่มีที่เกิด</strong></p>

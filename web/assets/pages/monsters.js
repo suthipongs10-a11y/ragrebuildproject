@@ -136,8 +136,8 @@ export async function detail({ rest }) {
   const mon = mons.get(code);
   if (!mon) return `<h1>ไม่พบมอนสเตอร์</h1><p>ไม่มีมอนรหัส <code>${esc(code)}</code> ในฐานข้อมูล</p>`;
 
-  const [items, maps, elements] = await Promise.all([
-    index("itemsById"), index("mapsByCode"), data("elements"),
+  const [items, maps, elements, meta] = await Promise.all([
+    index("itemsById"), index("mapsByCode"), data("elements"), data("meta"),
   ]);
 
   const chips = [];
@@ -305,8 +305,11 @@ export async function detail({ rest }) {
     </div>
 
     <h2>ของที่ดรอป</h2>
-    <p class="lede">เปอร์เซ็นต์ที่แสดงคืออัตราจริงหลังผ่าน <code>RemapDropRates</code> แล้ว
-    คอลัมน์สุดท้ายคือค่าดิบใน <code>DropData.csv</code> ไว้เทียบ</p>
+    <p class="lede">${meta.remapDropRates
+      ? `เปอร์เซ็นต์ที่แสดงคืออัตราจริงหลังผ่าน <code>RemapDropRates</code> แล้ว
+         คอลัมน์สุดท้ายคือค่าดิบใน <code>DropData.csv</code> ไว้เทียบ`
+      : `เปอร์เซ็นต์ที่แสดงคืออัตราจริงที่เซิร์ฟทอย ตรงกับค่าดิบใน
+         <code>DropData.csv</code> เพราะ <code>RemapDropRates</code> ปิดอยู่`}</p>
     <div class="tablewrap">
       <table>
         <thead><tr><th>ไอเท็ม</th><th>ประเภท</th><th class="num">จำนวน</th><th>โอกาสจริง</th><th class="num">ค่าดิบ</th></tr></thead>
