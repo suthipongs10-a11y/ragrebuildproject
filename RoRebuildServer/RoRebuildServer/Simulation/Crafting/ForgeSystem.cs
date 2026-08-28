@@ -52,13 +52,57 @@ public static class ForgeSystem
     /// An anvil in the bag steadies the work. It is not spent, only carried, and only the
     /// best one counts.
     /// </summary>
+    /// <remarks>
+    /// The bonuses are the original's, in ten-thousandths: an Emperium anvil is worth ten
+    /// percent of the roll and a plain one is worth nothing at all, which is why the plain
+    /// one is in the list rather than left out. It is the anvil somebody buys first and
+    /// finding it does nothing is a thing worth being able to read in one place.
+    ///
+    /// Carried rather than spent, which is the difference between an anvil and a hammer: an
+    /// anvil is bought once and improves every weapon after it, a hammer is stock.
+    /// </remarks>
     private static readonly (string Code, int Bonus)[] anvils =
     [
         ("Emperium_Anvil", 1000),
         ("Golden_Anvil", 500),
-        ("Oridecon_Anvil", 250),
+        ("Oridecon_Anvil", 300),
         ("Anvil", 0)
     ];
+
+    /// <summary>What the smelting skills burn, one per attempt, whatever comes out.</summary>
+    public const string FurnaceCode = "Mini_Furnace";
+
+    /// <summary>The hammer a weapon of each level is beaten out with. Index is the level.</summary>
+    private static readonly string?[] hammersByWeaponLevel =
+    [
+        null,               //no such thing as a level 0 weapon
+        "Iron_Hammer",
+        "Golden_Hammer",
+        "Oridecon_Hammer"
+    ];
+
+    /// <summary>
+    /// The tool one attempt at this recipe consumes, or nothing if it needs none.
+    /// </summary>
+    /// <remarks>
+    /// A rule rather than a column, because it is one: a level two weapon takes a golden
+    /// hammer whatever else is in the recipe, and anything smelted takes a furnace. Written
+    /// into ProduceRecipes.csv it would have been twenty-nine chances to name the wrong
+    /// hammer, and the twenty-ninth would have been found by a player.
+    ///
+    /// The loader turns what this returns into an ordinary material, so it is checked,
+    /// spent and listed in the window by the code that already does all three. Nothing else
+    /// in the forge knows tools exist.
+    /// </remarks>
+    public static string? ToolCodeFor(bool isWeapon, int weaponLevel)
+    {
+        if (!isWeapon)
+            return FurnaceCode;
+
+        return weaponLevel > 0 && weaponLevel < hammersByWeaponLevel.Length
+            ? hammersByWeaponLevel[weaponLevel]
+            : null;
+    }
 
     private static int AnvilBonus(Player player)
     {

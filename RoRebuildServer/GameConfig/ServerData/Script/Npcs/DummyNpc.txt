@@ -422,7 +422,6 @@ Npc("geffen_in", "Aaron", "4_M_SAGE_A", 61, 72, NE) { }
 Npc("geffen_in", "Blacksmith Guildsman", "4_M_JOB_BLACKSMITH", 110, 169, NW) { }
 Npc("geffen_in", "Blacksmith", "1_M_SMITH", 144, 166, S) { }
 Npc("geffen_in", "Blacksmith", "4_M_JOB_BLACKSMITH", 71, 112, W) { }
-Npc("geffen_in", "Christopher", "1_M_SMITH", 110, 172, N) { }
 Npc("geffen_in", "Crumpler", "1_M_HOF", 22, 125, NW) { }
 Npc("geffen_in", "Crusader", "4_M_CRU", 109, 161, SW) { }
 Npc("geffen_in", "Cute Girl", "4_F_KID2", 171, 42, SW) { }

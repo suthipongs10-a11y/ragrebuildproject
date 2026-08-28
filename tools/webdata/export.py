@@ -1035,6 +1035,16 @@ def build_equip_groups(jobs):
     return groups
 
 
+#  The tools the forge spends, one per attempt. Kept beside the function that uses them and
+#  matching ForgeSystem.ToolCodeFor on the server.
+FURNACE_CODE = "Mini_Furnace"
+TOOL_BY_WEAPON_LEVEL = {1: "Iron_Hammer", 2: "Golden_Hammer", 3: "Oridecon_Hammer"}
+
+#  Carried rather than spent, so it is not a material - it is a bonus on the roll, in
+#  ten-thousandths, and only the best one in the bag counts.
+ANVIL_BONUS = [("Emperium_Anvil", 1000), ("Golden_Anvil", 500), ("Oridecon_Anvil", 300), ("Anvil", 0)]
+
+
 def build_recipes(by_code):
     out = []
     for row in read_csv("ProduceRecipes.csv"):
@@ -1054,6 +1064,21 @@ def build_recipes(by_code):
                 warn(f"ProduceRecipes: unknown material {code}")
                 continue
             mats.append({"id": mat["id"], "amount": num(row.get(f"Amount{i}"), 1)})
+
+        # The hammer or the furnace one attempt burns. Derived here the same way the server
+        # derives it in DataLoader rather than read out of the csv, because it is not in the
+        # csv: it is a rule about what kind of thing is being made. Two copies of one rule is
+        # a thing to watch, and the alternative was a column with twenty-nine chances to name
+        # the wrong hammer.
+        is_weapon = result.get("type") == "Weapon"
+        tool = TOOL_BY_WEAPON_LEVEL.get(result.get("rank") or 0) if is_weapon else FURNACE_CODE
+        if tool:
+            item = by_code.get(tool)
+            if item is None:
+                warn(f"ProduceRecipes: recipe for {row['Result']} should use {tool}, which does not exist")
+            else:
+                mats.append({"id": item["id"], "amount": 1, "tool": True})
+
         out.append({
             "result": result["id"],
             "count": num(row.get("Count"), 1),

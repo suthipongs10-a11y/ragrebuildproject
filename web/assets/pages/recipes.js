@@ -6,7 +6,16 @@ export async function list() {
   const host = document.createElement("div");
   host.innerHTML = `
     <h1>สูตรคราฟและการขุดแร่</h1>
-    <p class="lede">${n(ref.recipes.length)} สูตรจาก <code>ProduceRecipes.csv</code></p>`;
+    <p class="lede">${n(ref.recipes.length)} สูตรจาก <code>ProduceRecipes.csv</code></p>
+    <div class="note">
+      <p><b>เครื่องมือหมดไปทุกครั้งที่ตี</b> ไม่ว่าจะสำเร็จหรือไม่ — หลอมแร่กับหลอมธาตุใช้
+      Mini Furnace ส่วนตีอาวุธใช้ค้อนตามระดับอาวุธ: Lv1 ใช้ Iron Hammer · Lv2 ใช้ Golden Hammer ·
+      Lv3 ใช้ Oridecon Hammer (อยู่ในช่องวัตถุดิบด้านล่างแล้ว)</p>
+      <p><b>ทั่งไม่หมด</b> แค่พกไว้ในกระเป๋าก็เพิ่มโอกาสสำเร็จของ<b>อาวุธ</b> นับเฉพาะอันที่ดีที่สุดอันเดียว
+      พกสองอันไม่ได้บวกกัน — Anvil +0% · Oridecon Anvil +3% · Golden Anvil +5% · Emperium Anvil +10%</p>
+      <p>ซื้อได้ที่ <b>Christopher</b> สมาคมช่างตีเหล็ก เมือง Geffen (<code>geffen_in</code> 110, 172)
+      ยกเว้น Emperium Anvil ที่ออกจากกล่องเก่าอย่างเดียว</p>
+    </div>`;
 
   const body = document.createElement("div");
   host.appendChild(body);
@@ -38,7 +47,8 @@ export async function list() {
         { key: "minSkillLevel", label: "Lv ขั้นต่ำ", num: true },
         { key: "baseChance", label: "โอกาสพื้นฐาน", num: true, render: (r) => pct(r.baseChance, 1) },
         { key: "materials", label: "วัตถุดิบ", sortValue: (r) => r.matNames,
-          render: (r) => r.materials.map((m) => `${itemLink(byId.get(m.id))} ×${m.amount}`).join("<br>") },
+          render: (r) => r.materials.map((m) =>
+            `${itemLink(byId.get(m.id))} ×${m.amount}` + (m.tool ? ' <span class="chip">เครื่องมือ</span>' : "")).join("<br>") },
         { key: "zeny", label: "ค่าใช้จ่าย", num: true, render: (r) => `${n(r.zeny)} z` },
       ], { sort: "resultName", dir: "asc" }),
   });

@@ -928,6 +928,25 @@ internal class DataLoader
             }
 
             var isWeapon = DataManager.WeaponInfo.TryGetValue(resultId, out var weapon);
+            var weaponLevel = isWeapon ? weapon!.WeaponLevel : 0;
+
+            //The hammer or the furnace, added as an ordinary material so that everything
+            //downstream - the window's list, the check before an attempt, the removal when
+            //one is made - treats it like any other. Last in the list because that is where
+            //it reads best: what the thing is made of, and then what it is made with.
+            var toolCode = ForgeSystem.ToolCodeFor(isWeapon, weaponLevel);
+            if (toolCode != null)
+            {
+                if (DataManager.ItemIdByName.TryGetValue(toolCode, out var toolId))
+                    materials.Add(new ProduceMaterial(toolId, 1));
+                else
+                    //Warned rather than dropping the recipe. If the tool is gone from the
+                    //item tables then no shop can be selling it either, and refusing the
+                    //recipe would take forging off the server to enforce a requirement
+                    //nobody could have met.
+                    ServerLogger.LogWarning($"ProduceRecipes.csv recipe for {entry.Result} should use {toolCode}, " +
+                                            $"but no item by that code exists - it will be craftable without one.");
+            }
 
             list.Add(new ProduceRecipe()
             {
@@ -939,7 +958,7 @@ internal class DataLoader
                 Zeny = entry.Zeny < 0 ? 0 : entry.Zeny,
                 Materials = materials.ToArray(),
                 IsWeapon = isWeapon,
-                WeaponLevel = isWeapon ? weapon!.WeaponLevel : 0
+                WeaponLevel = weaponLevel
             });
         }
 

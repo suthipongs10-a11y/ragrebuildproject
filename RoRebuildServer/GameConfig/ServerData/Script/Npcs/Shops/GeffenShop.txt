@@ -1,4 +1,4 @@
-
+﻿
 //geffen trader
 Trader("geffen_in", "Tool Dealer", "1_F_03", 77, 167, N) {
 	SellItem("Arrow");
@@ -63,6 +63,27 @@ Trader("geffen_in", "Weapon Dealer", "4_M_02", 22, 171, E) {
 	SellItem("Cinquedea");
 }
 */
+//The Blacksmith Guild's supplier, standing where he has always stood - he was in the npc
+//list already, with nothing behind him.
+//
+//A hammer is stock: one is spent on every attempt, and which one depends on the weapon's
+//level rather than on what it is made of. An anvil is a tool: bought once, never spent, and
+//worth a few percent on every weapon after it, so the plain one is the cheap start and the
+//golden one is what a smith works towards. Only the best anvil in the bag counts, so there
+//is no reason to carry two.
+//
+//No Emperium Anvil here. It comes out of an old box and nowhere else, which is the whole of
+//why it is worth ten percent.
+Trader("geffen_in", "Christopher", "1_M_SMITH", 110, 172, N) {
+	SellItem("Mini_Furnace");
+	SellItem("Iron_Hammer");
+	SellItem("Golden_Hammer");
+	SellItem("Oridecon_Hammer");
+	SellItem("Anvil");
+	SellItem("Oridecon_Anvil");
+	SellItem("Golden_Anvil");
+}
+
 Trader("geffen_in", "Trader", "1_F_01", 74, 144, N) {
 	SellItem("Scell");
 	SellItem("Garlet");
