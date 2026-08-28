@@ -66,4 +66,6 @@ public class RoContext : IdentityDbContext<RoUserAccount, UserRole, int>
     public DbSet<DbAuctionBid> AuctionBids { get; set; }
     public DbSet<DbForgedItem> ForgedItems { get; set; }
     public DbSet<DbFriend> Friends { get; set; }
+    public DbSet<DbBan> Bans { get; set; }
+    public DbSet<DbAccountAddress> AccountAddresses { get; set; }
 }

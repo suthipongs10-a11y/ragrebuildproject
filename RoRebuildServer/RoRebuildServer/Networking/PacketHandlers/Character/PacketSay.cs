@@ -1,6 +1,7 @@
 ﻿using RebuildSharedData.Enum;
 using RoRebuildServer.Custom;
 using RoRebuildServer.Custom.AdventureBook;
+using RoRebuildServer.Custom.Moderation;
 using RebuildSharedData.Networking;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Simulation.Util;
@@ -44,6 +45,11 @@ public class PacketSay : IClientPacketHandler
 
         //Same trick, same reason: a test switch that needs no client build to reach.
         if (AdminTestChat.TryHandle(p!, text))
+            return;
+
+        //And the moderation commands, which have the strongest claim on the trick of all
+        //three: they have to work against whatever client a GM already has open.
+        if (GmCommands.TryHandle(p!, text))
             return;
 
         if (type == PlayerChatType.Party)

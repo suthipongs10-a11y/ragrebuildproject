@@ -31,6 +31,18 @@ public class NetworkConnection
     public float LoginTime { get; set; }
     public double LastKeepAlive { get; set; }
     public bool Confirmed { get; set; } = false;
+
+    /// <summary>
+    /// The address this connection came in from, as the web server reported it.
+    /// </summary>
+    /// <remarks>
+    /// Kept because by the time a GM wants it the HttpContext is long gone: the login path
+    /// has it for a few lines and then the socket loop is all that is left. Empty when the
+    /// server could not be told - behind a reverse proxy without forwarded headers, every
+    /// connection looks like it came from the proxy, and that is worth seeing rather than
+    /// hiding.
+    /// </remarks>
+    public string RemoteAddress { get; set; } = "";
     public CancellationToken Cancellation { get; set; }
     public CancellationTokenSource CancellationSource { get; set; }
     public LoadCharacterRequest? LoadCharacterRequest { get; set; }

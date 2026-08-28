@@ -9,6 +9,7 @@ using RebuildZoneServer.Networking;
 using RoRebuildServer.Data;
 using RoRebuildServer.Database.Domain;
 using RoRebuildServer.Database.QueryData;
+using RoRebuildServer.Custom.Moderation;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Simulation.Crafting;
 using Serilog;
@@ -288,6 +289,16 @@ public static class RoDatabase
         ForgedItemRegistry.Load(db);
 
         dbRequestChannel = Channel.CreateUnbounded<IDbRequest>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
+
+        //Read straight through like the registry above, and for a sharper reason: the first
+        //connection can arrive before the queue has processed anything, and a ban list that
+        //is not loaded yet is a ban list that lets everybody in.
+        //
+        //After the queue is made rather than before, because reading a ban that has already
+        //run out queues the write that takes it off, and a queue that does not exist yet is
+        //a null reference on the first line of the server's life.
+        BanList.Load(db);
+        AddressLog.Load(db);
 
         //dbProcessThread = new Thread(StartDbRequestThread);
         //dbProcessThread.Priority = ThreadPriority.Normal;

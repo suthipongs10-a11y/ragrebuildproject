@@ -11,7 +11,9 @@ using Microsoft.Extensions.ObjectPool;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
 using RebuildZoneServer.Networking;
+using RoRebuildServer.Custom.Moderation;
 using RoRebuildServer.Data;
+using RoRebuildServer.Database.Domain;
 using RoRebuildServer.Database;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Simulation;
@@ -244,6 +246,28 @@ public class NetworkManager
         {
             ServerLogger.Log($"[Network] Player {dc.Entity} has disconnected, removing from world.");
             DisconnectPlayer(dc);
+        }
+    }
+
+    /// <summary>
+    /// A copy of the connection list, taken under the lock that guards it.
+    /// </summary>
+    /// <remarks>
+    /// Players is added to and removed from on whichever thread a socket opened or closed
+    /// on, and read by the moderation commands on the world thread. Walking it directly
+    /// from there is a foreach over a list somebody else is editing, which throws on the
+    /// unlucky frame rather than on the one being tested.
+    /// </remarks>
+    public static List<NetworkConnection> SnapshotConnections()
+    {
+        clientLock.EnterReadLock();
+        try
+        {
+            return new List<NetworkConnection>(Players);
+        }
+        finally
+        {
+            clientLock.ExitReadLock();
         }
     }
 
@@ -681,6 +705,20 @@ public class NetworkManager
         return;
     }
 
+    /// <summary>
+    /// What somebody turned away is told. The reason and the wait are both in it on purpose:
+    /// "connection refused" is what a bot sees and what an honest player misreads as the
+    /// server being down, and either of them makes another account to find out.
+    /// </summary>
+    private static string BanMessage(DbBan ban)
+    {
+        var when = ban.ExpiresAt >= BanList.Forever
+            ? "การแบนนี้เป็นแบบถาวร"
+            : $"แบนหมดอายุ {BanList.Remaining(ban)}";
+
+        return $"บัญชีนี้ถูกระงับการใช้งาน\nเหตุผล: {ban.Reason}\n{when}";
+    }
+
     public static async Task ReceiveConnection(HttpContext context, WebSocket socket)
     {
         var buffer = new byte[1024 * 4];
@@ -688,6 +726,22 @@ public class NetworkManager
         WebSocketReceiveResult result;
 
         ServerLogger.Log("We're seeing a new connection!");
+
+        //Where this came from, kept for the rest of the connection's life. It is only
+        //readable here - the socket loop below has no HttpContext - and a GM asking "who is
+        //that" later has no other way to find out.
+        var address = context.Connection.RemoteIpAddress?.ToString() ?? "";
+
+        //Refused before a single byte is read. An address ban exists for the case where
+        //somebody is opening connections faster than they can be banned one at a time, and
+        //answering that with a database lookup and a login attempt is answering it with
+        //work.
+        if (BanList.TryGetForAddress(address, out var addressBan))
+        {
+            await ReturnServerErrorAndDisconnect(socket, BanMessage(addressBan));
+            ServerLogger.Log($"Refused a connection from banned address {address}.");
+            return;
+        }
 
         try
         {
@@ -792,7 +846,24 @@ public class NetworkManager
             token = userData.AccountToken;
         }
 
+        //Checked here rather than inside the login, because this is the one place that knows
+        //both who they turned out to be and how to tell them why they are not coming in.
+        //ServerConnectResult.Banned exists and was never returned by anything; it carries a
+        //code and no reason, and being told when a ban lifts is the difference between a
+        //player waiting and a player making another account.
+        if (BanList.TryGetForAccount(userId, out var accountBan))
+        {
+            await ReturnServerErrorAndDisconnect(socket, BanMessage(accountBan));
+            ServerLogger.Log($"Refused a connection from banned account {userName} ({userId}).");
+            return;
+        }
+
+        //Written down after the login succeeded, so the log holds addresses that got in
+        //rather than every address that ever guessed at a password.
+        AddressLog.Record(userId, userName, address);
+
         var playerConnection = new NetworkConnection(socket);
+        playerConnection.RemoteAddress = address;
         playerConnection.LastKeepAlive = Time.ElapsedTime + 20;
         playerConnection.Confirmed = true;
         playerConnection.AccountId = userId;
