@@ -327,6 +327,73 @@ namespace Assets.Scripts.UI
             return dragBar;
         }
 
+        /// <summary>The strip the item list windows keep clear along their bottom edge.</summary>
+        public const float FooterHeight = 35f;
+
+        private const string FooterName = "ModernWindowFooter";
+
+        /// <summary>
+        /// Lays a band across the foot of a window, under whatever is already standing there.
+        /// </summary>
+        /// <remarks>
+        /// The item list windows keep a strip clear at the bottom for the running total and
+        /// the two buttons, and nothing was ever drawn in it. Both stood on the same white as
+        /// the list above them with no edge anywhere near, so the window read as cut off
+        /// rather than finished.
+        ///
+        /// First sibling, so the band goes behind the total and the buttons rather than over
+        /// them: it is a surface for them to stand on, not a lid. It takes no pointer input
+        /// for the same reason.
+        ///
+        /// The height is the strip the window already reserves rather than a number picked
+        /// here. The list above stops 35 points short of the bottom, and a band any taller
+        /// would have the list's own backdrop laid across its top edge, taking the one line
+        /// this is here to draw.
+        /// </remarks>
+        public static RectTransform ApplyWindowFooter(RectTransform root, float height = FooterHeight)
+        {
+            if (root == null)
+                return null;
+
+            var existing = root.Find(FooterName);
+            if (existing != null)
+                return (RectTransform)existing;
+
+            var band = CreateCard(root, FooterName, CardDeepColor);
+            band.SetAsFirstSibling();
+
+            var bandImage = band.GetComponent<Image>();
+            bandImage.sprite = FooterSprite;
+            bandImage.raycastTarget = false;
+
+            band.anchorMin = new Vector2(0, 0);
+            band.anchorMax = new Vector2(1, 0);
+            band.pivot = new Vector2(0.5f, 0);
+            band.anchoredPosition = Vector2.zero;
+            band.sizeDelta = new Vector2(0, height);
+
+            //A change of shade on its own is the first thing to go on a phone held at arm's
+            //length in daylight, and this is the line that says where the list stops and the
+            //buttons begin.
+            var rule = new GameObject("ModernFooterRule", typeof(Image));
+            rule.transform.SetParent(band, false);
+
+            var ruleImage = rule.GetComponent<Image>();
+            ruleImage.color = CardBorderColor;
+            ruleImage.raycastTarget = false;
+
+            var ruleRect = (RectTransform)rule.transform;
+            ruleRect.anchorMin = new Vector2(0, 1);
+            ruleRect.anchorMax = new Vector2(1, 1);
+            ruleRect.pivot = new Vector2(0.5f, 1);
+            ruleRect.anchoredPosition = Vector2.zero;
+            //two points, the same weight every other edge in the theme is drawn at. One
+            //point survives being drawn at three quarter scale as a grey blur.
+            ruleRect.sizeDelta = new Vector2(0, 2f);
+
+            return band;
+        }
+
         private const string CloseGlyphName = "ModernCloseGlyph";
 
         /// <summary>
@@ -1547,6 +1614,48 @@ namespace Assets.Scripts.UI
             texture.Apply();
             return Sprite.Create(texture, new Rect(0, 0, PanelSize, PanelSize), new Vector2(0.5f, 0.5f), 100,
                 0, SpriteMeshType.FullRect, new Vector4(12, 2, 12, 12));
+        }
+
+        private static Sprite footerSprite;
+
+        /// <summary>
+        /// The header sprite the other way up: square across the top and rounded along the
+        /// bottom, for a band that has to run straight out of the window body above it and
+        /// meet the window's own corners below.
+        /// </summary>
+        public static Sprite FooterSprite
+        {
+            get
+            {
+                if (footerSprite == null)
+                    footerSprite = CreateFooterSprite();
+                return footerSprite;
+            }
+        }
+
+        private static Sprite CreateFooterSprite()
+        {
+            var texture = new Texture2D(PanelSize, PanelSize, TextureFormat.RGBA32, false);
+            var half = PanelSize * 0.5f;
+
+            for (var y = 0; y < PanelSize; y++)
+            {
+                for (var x = 0; x < PanelSize; x++)
+                {
+                    var dx = Mathf.Abs(x + 0.5f - half) - (half - PanelRadius);
+                    //measured from the bottom, which is the edge with the corners on it
+                    var dy = PanelRadius - (y + 0.5f);
+                    var outside = new Vector2(Mathf.Max(dx, 0f), Mathf.Max(dy, 0f)).magnitude;
+                    var inside = Mathf.Min(Mathf.Max(dx, dy), 0f);
+                    //the second term cuts the shape off flat along the top edge
+                    var distance = Mathf.Max(outside + inside - PanelRadius, -(PanelSize - (y + 0.5f)));
+                    texture.SetPixel(x, y, new Color(1f, 1f, 1f, Mathf.Clamp01(0.5f - distance)));
+                }
+            }
+
+            texture.Apply();
+            return Sprite.Create(texture, new Rect(0, 0, PanelSize, PanelSize), new Vector2(0.5f, 0.5f), 100,
+                0, SpriteMeshType.FullRect, new Vector4(12, 12, 12, 2));
         }
 
         private static Sprite outlineSprite;

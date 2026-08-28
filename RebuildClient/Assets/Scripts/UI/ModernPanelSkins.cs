@@ -468,6 +468,12 @@ namespace Assets.Scripts.UI
                 ModernUiTheme.MarkSkinned(child.gameObject);
                 ModernUiTheme.ApplyWindowChrome(window);
 
+                //An item list is the one window shape that keeps a strip clear at its foot,
+                //for the running total and the two buttons. Every other window here runs its
+                //content to its own edge and has nothing down there to stand on a band.
+                if (window is GenericItemListV2)
+                    ModernUiTheme.ApplyWindowFooter(child);
+
                 var background = child.GetComponent<Image>();
                 if (background != null && background.color.a > 0.5f)
                     ModernUiTheme.AttachShadow(child);

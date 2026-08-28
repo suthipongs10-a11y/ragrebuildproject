@@ -38,31 +38,12 @@ MonoBehaviour:
     - {fileID: 21300000, guid: 26bd0e1b5f5e37e48895f8fce9b393be, type: 3}
     HotSpot: {x: 9, y: 8}
     frameRate: 10
-  - name: Interact Cursor (20 frames at 12fps)
+  - name: Interact Cursor (No Animation)
     CursorType: 2
     AnimFrames:
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 335f4906a1712a64287aa077e7862d3b, type: 3}
-    - {fileID: 21300000, guid: 1a8fd8aa68764b3408bd1f75ce1f3c7b, type: 3}
-    - {fileID: 21300000, guid: e7c3f1694309e604584548c3961e44c6, type: 3}
-    - {fileID: 21300000, guid: 5ce22fb57b595874d9c159205fc397d2, type: 3}
-    - {fileID: 21300000, guid: 67296fca1449fd44d8a0e8108dc06b63, type: 3}
-    - {fileID: 21300000, guid: 26bd0e1b5f5e37e48895f8fce9b393be, type: 3}
-    HotSpot: {x: 0.5, y: 0.6875}
-    frameRate: 12
+    - {fileID: 21300000, guid: dcbf98a2524a4477aa7e7a22aa751f09, type: 3}
+    HotSpot: {x: 14, y: 8}
+    frameRate: 0
   - name: SkillTarget Cursor (20 frames at 10fps)
     CursorType: 8
     AnimFrames:
