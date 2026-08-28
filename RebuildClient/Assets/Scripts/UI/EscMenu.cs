@@ -12,9 +12,9 @@ namespace Assets.Scripts.UI
 {
     /// <summary>
     /// The system menu that escape opens when nothing else is on screen: respawn,
-    /// unstuck, the shortcut bar, and logging out. Built from code in the shared theme
-    /// and registered as a window, so a second press of escape closes it the same way
-    /// it closes anything else.
+    /// unstuck, the shortcut bar, switching characters, and logging out. Built from code
+    /// in the shared theme and registered as a window, so a second press of escape closes
+    /// it the same way it closes anything else.
     /// </summary>
     public class EscMenu : WindowBase
     {
@@ -112,6 +112,7 @@ namespace Assets.Scripts.UI
             menu.respawnButton = menu.AddEntry(rect, "Respawn", ModernUiIcons.Home, menu.OnRespawn, false);
             menu.AddEntry(rect, "Unstuck", ModernUiIcons.Refresh, menu.OnUnstuck, false);
             menu.AddEntry(rect, "Shortcut", ModernUiIcons.Grid, menu.OnShortcut, false);
+            menu.AddEntry(rect, "Character Select", ModernUiIcons.Person, menu.OnCharacterSelect, false);
             menu.AddEntry(rect, "Logout", ModernUiIcons.Exit, menu.OnLogout, false);
             menu.AddEntry(rect, "Cancel", ModernUiIcons.Close, menu.CloseWindow, true);
             menu.LayoutBody(false);
@@ -257,8 +258,22 @@ namespace Assets.Scripts.UI
             CloseWindow();
         }
 
+        /// <summary>
+        /// Goes back to the character select screen, which for a player is picking a
+        /// different character and for the client is the whole login made over again -
+        /// see LoginReconnect for why there is no shorter way there.
+        /// </summary>
+        private void OnCharacterSelect()
+        {
+            LoginReconnect.ReturnToCharacterSelect();
+        }
+
         private void OnLogout()
         {
+            //someone leaving on purpose does not want their password kept for a login that
+            //is not going to happen, and character select is not where they are headed
+            LoginReconnect.Forget();
+
             GameConfig.SaveConfig();
             NetworkManager.Instance.Disconnect();
             SceneManager.LoadScene(0);

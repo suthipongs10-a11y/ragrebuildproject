@@ -61,6 +61,23 @@ namespace Assets.Scripts.UI.TitleScreen
                 RememberLoginToggle.isOn = true;
             }
 
+            //Coming back from the escape menu's character select, the boxes are filled from
+            //the login that is already signed in rather than from whatever was typed last.
+            //They are filled even though the connection below is made without reading them,
+            //so that a login the server turns away still leaves a box that can be submitted
+            //by hand rather than an empty one and a password to remember.
+            if (LoginReconnect.IsResumePending)
+            {
+                UsernameBox.text = LoginReconnect.AccountName;
+
+                var restore = LoginReconnect.PasswordToRestore;
+                if (!string.IsNullOrEmpty(restore))
+                    PasswordBox.text = restore;
+
+                if (LoginReconnect.TryResume())
+                    yield break; //logging in already, nothing here for anyone to type into
+            }
+
             yield return new WaitForSeconds(0.1f);
             EventSystem.current.SetSelectedGameObject(UsernameBox.gameObject);
         }

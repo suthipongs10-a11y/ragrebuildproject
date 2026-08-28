@@ -281,6 +281,10 @@ namespace Assets.Scripts.Network
             isOnLoginScreen = true;
             requestLoginToken = false;
 
+            //a brand new account is an ordinary username and password from here on, so that
+            //is what gets written down - the account creation itself only happens once
+            LoginReconnect.Remember(serverPath, connectUserName, connectPassword, false, false);
+
             socket.OnOpen += OnOpenConnectionNewUser;
             socket.OnClose += OnCloseLoginScreenHandler;
             socket.OnError += OnErrorLoginScreenHandler;
@@ -311,6 +315,9 @@ namespace Assets.Scripts.Network
             // isNewUser = false;
             isInErrorState = false;
             isOnLoginScreen = true;
+
+            //kept so the escape menu can reach character select without asking for it again
+            LoginReconnect.Remember(serverPath, connectUserName, connectPassword, usePasswordToken, askForLoginToken);
 
             socket.OnOpen += OnOpenConnectionRegularLogin;
             socket.OnClose += OnCloseLoginScreenHandler;
