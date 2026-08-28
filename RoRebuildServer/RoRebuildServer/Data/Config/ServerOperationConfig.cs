@@ -29,6 +29,31 @@ public class ServerOperationConfig
     //awake, so this is a number to keep modest rather than a number to maximise.
     public int OfflineVendingHours { get; set; } = 48;
     public float EtcItemValueMultiplier { get; set; }
+    /// <summary>
+    /// Whether this is a server the public can reach.
+    /// </summary>
+    /// <remarks>
+    /// One switch instead of seven. Every cheat door in the settings has to be shut before a
+    /// server opens, they live in two different sections of two different files, and the file
+    /// that is loaded by a plain dotnet run is not the one anybody remembers to check. Left
+    /// as seven things to remember, the question is not whether one gets forgotten.
+    ///
+    /// Set this and the server shuts them itself at startup, whatever the rest of the file
+    /// says - see Custom.Moderation.ServerLockdown. It never opens one, so a live server
+    /// cannot be talked back into debug mode by a stale settings file.
+    /// </remarks>
+    public bool LiveServer { get; set; }
+
+    /// <summary>
+    /// The accounts that are GMs, by the name they log in under.
+    /// </summary>
+    /// <remarks>
+    /// The only way to have a GM once LiveServer is on, and deliberately so: adminify hands
+    /// out admin to whoever knows a passcode, and a passcode is a thing that gets said in
+    /// chat once and then belongs to everybody.
+    /// </remarks>
+    public List<string> AdminAccounts { get; set; } = new();
+
     public List<string> ActiveEvents { get; set; } = new();
     public List<string> FeatureFlags { get; set; } = new();
 }

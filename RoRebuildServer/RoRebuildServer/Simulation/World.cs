@@ -6,6 +6,7 @@ using Microsoft.Extensions.ObjectPool;
 using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Enum.EntityStats;
+using RoRebuildServer.Custom.Moderation;
 using RoRebuildServer.Data;
 using RoRebuildServer.Data.MapData;
 using RoRebuildServer.Data.Monster;
@@ -425,6 +426,13 @@ public class World
         var networkPlayer = playerEntity.Get<Player>();
         networkPlayer.Connection = connection;
         connection.Player = networkPlayer;
+
+        //Here rather than where the rest of the character is set up, because that runs before
+        //the connection is attached and the account name is on the connection. A named GM is
+        //the only kind there is once adminify is off, so this is the line that decides
+        //whether a live server has any GMs at all.
+        if (ServerLockdown.IsAdminAccount(connection.AccountName))
+            networkPlayer.IsAdmin = true;
         CommandBuilder.SendUpdatePlayerData(connection.Player);
 
         playerList[connection.Player.Id] = connection.Entity;
