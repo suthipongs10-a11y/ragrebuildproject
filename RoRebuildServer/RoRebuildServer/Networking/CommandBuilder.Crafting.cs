@@ -6,6 +6,7 @@ using RoRebuildServer.Data;
 using RoRebuildServer.EntityComponents;
 using RoRebuildServer.EntityComponents.Items;
 using RoRebuildServer.Simulation.Crafting;
+using RoRebuildServer.Simulation.Enchanting;
 
 namespace RoRebuildServer.Networking;
 
@@ -85,6 +86,7 @@ public static partial class CommandBuilder
             return;
 
         forgedScratch.Clear();
+        enchantScratch.Clear();
         CollectBag(player.Inventory);
         CollectBag(player.CartInventory);
         FlushForgedScratch(player);
@@ -97,6 +99,7 @@ public static partial class CommandBuilder
             return;
 
         forgedScratch.Clear();
+        enchantScratch.Clear();
         CollectBag(bag);
         FlushForgedScratch(player);
     }
@@ -111,13 +114,33 @@ public static partial class CommandBuilder
             var name = ForgedItemRegistry.NameFor(item.UniqueId);
             if (name != null)
                 forgedScratch[item.UniqueId] = name;
+
+            if (EnchantRegistry.TryGet(item.UniqueId, out var enchant))
+                enchantScratch[item.UniqueId] = enchant;
         }
     }
 
+    /// <summary>
+    /// Sends whatever the two scratch dictionaries picked up, and empties nothing.
+    /// </summary>
+    /// <remarks>
+    /// Both side tables ride along with the same calls because they answer the same
+    /// question - what does the client need to know about these items that is not in the
+    /// items - and every window that shows an item needs both or neither. Hanging the
+    /// enchants off these helpers means the eight places that already ask for forged names
+    /// did not have to learn about a second thing to ask for.
+    ///
+    /// Two packets rather than one. The forged name is a string and the options are
+    /// numbers, they are read by different windows, and an item usually has one or the
+    /// other rather than both.
+    /// </remarks>
     private static void FlushForgedScratch(Player player)
     {
         if (forgedScratch.Count > 0)
             SendForgedNames(player, forgedScratch);
+
+        if (enchantScratch.Count > 0)
+            SendEnchantedItems(player, enchantScratch);
     }
 
     /// <summary>
@@ -133,12 +156,16 @@ public static partial class CommandBuilder
             return;
 
         forgedScratch.Clear();
+        enchantScratch.Clear();
 
         foreach (var id in ids)
         {
             var name = ForgedItemRegistry.NameFor(id);
             if (name != null)
                 forgedScratch[id] = name;
+
+            if (EnchantRegistry.TryGet(id, out var enchant))
+                enchantScratch[id] = enchant;
         }
 
         FlushForgedScratch(player);
@@ -150,32 +177,31 @@ public static partial class CommandBuilder
         if (player.Connection == null || item.Type != ItemType.UniqueItem)
             return;
 
-        var name = ForgedItemRegistry.NameFor(item.UniqueItem.UniqueId);
-        if (name == null)
-            return;
-
-        forgedScratch.Clear();
-        forgedScratch[item.UniqueItem.UniqueId] = name;
-        SendForgedNames(player, forgedScratch);
+        SendForgedNameForId(player, item.UniqueItem.UniqueId);
     }
 
     /// <summary>
-    /// The name behind one guid, for a window that is showing somebody else's item.
+    /// What is known about one guid, for a window that is showing somebody else's item.
     ///
-    /// Silently does nothing when nobody forged it, which is the usual answer.
+    /// Silently does nothing when the item was neither forged nor enchanted, which is the
+    /// usual answer.
     /// </summary>
     public static void SendForgedNameForId(Player player, Guid uniqueId)
     {
         if (player.Connection == null)
             return;
 
-        var name = ForgedItemRegistry.NameFor(uniqueId);
-        if (name == null)
-            return;
-
         forgedScratch.Clear();
-        forgedScratch[uniqueId] = name;
-        SendForgedNames(player, forgedScratch);
+        enchantScratch.Clear();
+
+        var name = ForgedItemRegistry.NameFor(uniqueId);
+        if (name != null)
+            forgedScratch[uniqueId] = name;
+
+        if (EnchantRegistry.TryGet(uniqueId, out var enchant))
+            enchantScratch[uniqueId] = enchant;
+
+        FlushForgedScratch(player);
     }
 
     /// <summary>
@@ -188,19 +214,33 @@ public static partial class CommandBuilder
     public static void SendForgedNameMulti(Guid uniqueId)
     {
         var name = ForgedItemRegistry.NameFor(uniqueId);
-        if (name == null)
+        if (name != null)
+        {
+            var packet = NetworkManager.StartPacket(PacketType.ForgedNames);
+            packet.Write((short)1);
+            packet.Write(uniqueId.ToByteArray());
+            packet.Write(name);
+
+            NetworkManager.SendMessageMulti(packet, recipients);
+        }
+
+        //The options go to the same people for the same reason: whoever can see the item
+        //on the ground is whoever might pick it up and want to read it first.
+        if (!EnchantRegistry.TryGet(uniqueId, out var enchant))
             return;
 
-        var packet = NetworkManager.StartPacket(PacketType.ForgedNames);
-        packet.Write((short)1);
-        packet.Write(uniqueId.ToByteArray());
-        packet.Write(name);
+        var enchantPacket = NetworkManager.StartPacket(PacketType.EnchantedItems);
+        enchantPacket.Write((short)1);
+        WriteEnchant(enchantPacket, uniqueId, enchant);
 
-        NetworkManager.SendMessageMulti(packet, recipients);
+        NetworkManager.SendMessageMulti(enchantPacket, recipients);
     }
 
     /// <summary>Reused between the two above, which never run at the same time.</summary>
     private static readonly Dictionary<Guid, string> forgedScratch = new();
+
+    /// <summary>The same trick for the options, filled by the same calls.</summary>
+    private static readonly Dictionary<Guid, ItemEnchant> enchantScratch = new();
 
     private static void SendForgedNames(Player player, Dictionary<Guid, string> forged)
     {
@@ -214,6 +254,66 @@ public static partial class CommandBuilder
         }
 
         NetworkManager.SendMessage(packet, player.Connection);
+    }
+
+    /// <summary>
+    /// The options on a set of items.
+    /// </summary>
+    /// <remarks>
+    /// Stats travel as their enum number rather than their name. The database stores names
+    /// because it outlives the build that wrote it and CharacterStat can be renumbered
+    /// underneath it; a packet is read by a client built from the same enum in the same
+    /// hour, so the two ends cannot disagree and the number is a quarter of the size.
+    /// </remarks>
+    private static void SendEnchantedItems(Player player, Dictionary<Guid, ItemEnchant> enchants)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.EnchantedItems);
+        packet.Write((short)enchants.Count);
+
+        foreach (var (id, enchant) in enchants)
+            WriteEnchant(packet, id, enchant);
+
+        NetworkManager.SendMessage(packet, player.Connection);
+    }
+
+    /// <summary>
+    /// Tells one player an item has no options any more.
+    /// </summary>
+    /// <remarks>
+    /// Its own call because the ordinary send drops items with nothing on them, which is
+    /// right for a market page full of plain gear and wrong for the one item that just had
+    /// its options wiped - the client would keep showing what it was told last. An entry
+    /// with a count of zero is the client's instruction to forget the item.
+    /// </remarks>
+    public static void SendEnchantCleared(Player player, Guid uniqueId)
+    {
+        if (player.Connection == null)
+            return;
+
+        var packet = NetworkManager.StartPacket(PacketType.EnchantedItems);
+        packet.Write((short)1);
+        packet.Write(uniqueId.ToByteArray());
+        packet.Write((byte)0); //tier
+        packet.Write((byte)0); //no options, which is what makes this a removal
+
+        NetworkManager.SendMessage(packet, player.Connection);
+    }
+
+    /// <summary>
+    /// One item's options. The reading half is the client's PacketEnchantedItems, field
+    /// for field in this order.
+    /// </summary>
+    private static void WriteEnchant(OutboundMessage packet, Guid uniqueId, ItemEnchant enchant)
+    {
+        packet.Write(uniqueId.ToByteArray());
+        packet.Write((byte)enchant.Tier);
+        packet.Write((byte)enchant.Count);
+
+        for (var i = 0; i < enchant.Count; i++)
+        {
+            packet.Write((short)enchant.Options[i].Stat);
+            packet.Write(enchant.Options[i].Value);
+        }
     }
 
     /// <summary>

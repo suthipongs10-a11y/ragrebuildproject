@@ -186,6 +186,11 @@ public enum PacketType : byte
     //leaving a vending shop standing after the seller has logged out. Appended here for
     //the same reason as the pair above: a packet travels as its position in this list.
     VendingGoOffline,
+
+    //the options rolled onto a piece of equipment. Travels beside the items for the same
+    //reason ForgedNames does - there is no room in a UniqueItem - and appended at the end
+    //for the same reason as everything else down here.
+    EnchantedItems,
 }
 
 public enum MessageType : byte

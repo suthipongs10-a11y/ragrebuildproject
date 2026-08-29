@@ -532,6 +532,7 @@ public static class GmCommands
 
         EnchantRegistry.Record(uniqueId, enchant);
         EnchantSystem.RefreshIfWorn(player, uniqueId);
+        CommandBuilder.SendForgedNameForId(player, uniqueId); //so the tooltip reads it too
 
         Tell(player, $"<color=#55FF55>ใส่ออพให้ {itemName} ({slot}) แล้ว</color>");
         DescribeEnchant(player, enchant);
@@ -578,6 +579,7 @@ public static class GmCommands
 
         EnchantRegistry.Clear(uniqueId);
         EnchantSystem.RefreshIfWorn(player, uniqueId);
+        CommandBuilder.SendEnchantCleared(player, uniqueId);
         Tell(player, $"<color=#55FF55>ล้างออพของ {itemName} ({slot}) แล้ว</color>");
     }
 

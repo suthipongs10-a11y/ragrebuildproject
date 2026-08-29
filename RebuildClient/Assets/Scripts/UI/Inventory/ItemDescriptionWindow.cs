@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Assets.Scripts.Network;
 using Assets.Scripts.PlayerControl;
 using Assets.Scripts.Sprites;
 using Assets.Scripts.Utility;
@@ -90,7 +91,11 @@ namespace Assets.Scripts.UI.Inventory
             var item = inventoryItem.ItemData;
 
             ItemName.text = inventoryItem.ProperName();
-            ItemDescription.text = ClientDataLoader.Instance.GetItemDescription(item.Code);
+            //The enchant options go under the printed description rather than into it: the
+            //description is one string per item id, generated once and shared by every copy
+            //of that item, and these belong to this one copy.
+            ItemDescription.text = ClientDataLoader.Instance.GetItemDescription(item.Code)
+                                   + ItemEnchants.DescribeFor(inventoryItem.UniqueItem.UniqueId);
             PortraitContainer.sprite = collection;
 
             ShowWindow();

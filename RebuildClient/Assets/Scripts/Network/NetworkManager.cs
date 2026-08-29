@@ -445,6 +445,9 @@ namespace Assets.Scripts.Network
 
             //And the smiths behind the forged weapons, which are the last character's bag.
             ForgedNames.Clear();
+
+            //Same for the options on them, for the same reason.
+            ItemEnchants.Clear();
         }
 
         private void StartConnectServer(string serverPath, string username, string password)
