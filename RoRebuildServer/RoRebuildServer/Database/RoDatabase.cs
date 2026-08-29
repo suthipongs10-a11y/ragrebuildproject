@@ -12,6 +12,7 @@ using RoRebuildServer.Database.QueryData;
 using RoRebuildServer.Custom.Moderation;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Simulation.Crafting;
+using RoRebuildServer.Simulation.Enchanting;
 using Serilog;
 
 namespace RoRebuildServer.Database;
@@ -287,6 +288,10 @@ public static class RoDatabase
         //before the names behind them are known, and this is the one moment the server is
         //allowed to block.
         ForgedItemRegistry.Load(db);
+
+        //Same rule as the forged names above: an item may be equipped by the first player
+        //to log in, and options that are not loaded yet are options that quietly do nothing.
+        EnchantRegistry.Load(db);
 
         dbRequestChannel = Channel.CreateUnbounded<IDbRequest>(new UnboundedChannelOptions { SingleReader = true, SingleWriter = false });
 

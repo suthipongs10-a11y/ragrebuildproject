@@ -1,8 +1,11 @@
+using RebuildSharedData.Enum;
 using RebuildSharedData.Enum.EntityStats;
+using RoRebuildServer.Data;
 using RoRebuildServer.EntityComponents;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Networking;
 using RoRebuildServer.Simulation;
+using RoRebuildServer.Simulation.Enchanting;
 
 namespace RoRebuildServer.Custom.Moderation;
 
@@ -55,6 +58,9 @@ public static class GmCommands
             case "!bans":
             case "!alt":
             case "!gm":
+            case "!ench":
+            case "!enchshow":
+            case "!enchclear":
                 break;
             default:
                 return false; //not ours - let the chat handler carry on with it
@@ -78,6 +84,9 @@ public static class GmCommands
             case "!unbanip": UnbanIp(player, parts); break;
             case "!bans": Bans(player); break;
             case "!alt": Alt(player, parts); break;
+            case "!ench": Enchant(player, parts); break;
+            case "!enchshow": EnchantShow(player, parts); break;
+            case "!enchclear": EnchantClear(player, parts); break;
         }
 
         return true;
@@ -94,6 +103,11 @@ public static class GmCommands
         Tell(player, "!banip <ชื่อตัวละคร|ไอพี> <เวลา> [เหตุผล] — แบนไอพี แล้วเตะทุกคนที่ใช้ไอพีนั้น");
         Tell(player, "!unban <ชื่อบัญชี> · !unbanip <ไอพี> · !bans — ดูรายการที่แบนอยู่");
         Tell(player, "<color=#AACCFF>เวลา: 30m 2h 7d หรือ perm (ถาวร)</color>");
+        Tell(player, "<color=#FFCC55>คำสั่งทดสอบระบบคัมภีร์</color>");
+        Tell(player, "!ench <ช่อง> <tier> <สเตตัส> <ค่า> [สเตตัส ค่า] [สเตตัส ค่า]");
+        Tell(player, "!enchshow <ช่อง> · !enchclear <ช่อง>");
+        Tell(player, "<color=#AACCFF>ช่อง: weapon shield body headtop headmid headbottom garment footgear accessory1 accessory2</color>");
+        Tell(player, "<color=#AACCFF>tier: 1 ดิน · 2 ฟ้า · 3 สวรรค์ · 4 ตำนาน</color>");
     }
 
     // ---------------------------------------------------------------- who is on
@@ -457,6 +471,168 @@ public static class GmCommands
         }
 
         return AddressLog.TryFindAccount(accountName, out accountId, out name);
+    }
+
+    // ---------------------------------------------------------------- enchant test bench
+
+    /// <summary>
+    /// Puts a block of options on whatever is in an equip slot.
+    /// </summary>
+    /// <remarks>
+    /// A GM command rather than a script command because the scrolls do not exist yet and
+    /// this needs to be testable before they do. Everything past the parsing goes through
+    /// the same two calls the scroll will use, so what is proven here is the real path and
+    /// not a shortcut around it.
+    ///
+    /// It writes the options verbatim - no rolling, no tier limits, no duplicate check. A
+    /// bench that enforced the design rules could not be used to test what happens when
+    /// they are broken.
+    /// </remarks>
+    private static void Enchant(Player player, string[] parts)
+    {
+        //!ench <slot> <tier> <stat> <value> [stat value] [stat value]
+        if (parts.Length < 5 || parts.Length % 2 == 0)
+        {
+            Tell(player, "ใช้: !ench <ช่อง> <tier 1-4> <สเตตัส> <ค่า> [สเตตัส ค่า] [สเตตัส ค่า]");
+            Tell(player, "<color=#AACCFF>ตัวอย่าง: !ench weapon 2 AddStr 3 AddAttackPower 6</color>");
+            return;
+        }
+
+        if (!TryFindWornItem(player, parts[1], out var slot, out var uniqueId, out var itemName))
+            return;
+
+        if (!int.TryParse(parts[2], out var tierNumber) || tierNumber < 1 || tierNumber > 4)
+        {
+            Tell(player, "tier ต้องเป็น 1 ถึง 4 (ดิน ฟ้า สวรรค์ ตำนาน)");
+            return;
+        }
+
+        var enchant = new ItemEnchant((EnchantTier)tierNumber);
+
+        for (var i = 3; i + 1 < parts.Length; i += 2)
+        {
+            if (!System.Enum.TryParse<CharacterStat>(parts[i], true, out var stat))
+            {
+                Tell(player, $"ไม่รู้จักสเตตัสชื่อ {parts[i]}");
+                return;
+            }
+
+            if (!int.TryParse(parts[i + 1], out var value) || value == 0)
+            {
+                Tell(player, $"ค่าของ {parts[i]} ต้องเป็นตัวเลขที่ไม่ใช่ศูนย์");
+                return;
+            }
+
+            if (!enchant.Add(stat, value))
+            {
+                Tell(player, $"ใส่ได้ไม่เกิน {ItemEnchant.MaxOptions} ออพต่อชิ้น");
+                return;
+            }
+        }
+
+        EnchantRegistry.Record(uniqueId, enchant);
+        EnchantSystem.RefreshIfWorn(player, uniqueId);
+
+        Tell(player, $"<color=#55FF55>ใส่ออพให้ {itemName} ({slot}) แล้ว</color>");
+        DescribeEnchant(player, enchant);
+        ServerLogger.Log($"[Enchant] {player.Name} set {enchant.Count} option(s) on their {slot} item.");
+    }
+
+    private static void EnchantShow(Player player, string[] parts)
+    {
+        if (parts.Length < 2)
+        {
+            Tell(player, "ใช้: !enchshow <ช่อง>");
+            return;
+        }
+
+        if (!TryFindWornItem(player, parts[1], out var slot, out var uniqueId, out var itemName))
+            return;
+
+        if (!EnchantRegistry.TryGet(uniqueId, out var enchant))
+        {
+            Tell(player, $"{itemName} ({slot}) ยังไม่มีออพ");
+            return;
+        }
+
+        Tell(player, $"<color=#FFCC55>{itemName} ({slot})</color>");
+        DescribeEnchant(player, enchant);
+    }
+
+    private static void EnchantClear(Player player, string[] parts)
+    {
+        if (parts.Length < 2)
+        {
+            Tell(player, "ใช้: !enchclear <ช่อง>");
+            return;
+        }
+
+        if (!TryFindWornItem(player, parts[1], out var slot, out var uniqueId, out var itemName))
+            return;
+
+        if (!EnchantRegistry.IsEnchanted(uniqueId))
+        {
+            Tell(player, $"{itemName} ({slot}) ไม่มีออพให้ล้างอยู่แล้ว");
+            return;
+        }
+
+        EnchantRegistry.Clear(uniqueId);
+        EnchantSystem.RefreshIfWorn(player, uniqueId);
+        Tell(player, $"<color=#55FF55>ล้างออพของ {itemName} ({slot}) แล้ว</color>");
+    }
+
+    /// <summary>
+    /// Turns a slot name into the item worn there, complaining to the GM if it cannot.
+    /// </summary>
+    /// <remarks>
+    /// The guid is what everything downstream wants, and an item that has never been given
+    /// one cannot be enchanted at all - the options would have nothing to hang off. That is
+    /// worth saying out loud rather than failing quietly, because it is exactly the sort of
+    /// thing an old test character has lying in its bag.
+    /// </remarks>
+    private static bool TryFindWornItem(Player player, string slotName, out EquipSlot slot, out Guid uniqueId, out string itemName)
+    {
+        slot = EquipSlot.None;
+        uniqueId = Guid.Empty;
+        itemName = "";
+
+        //ItemSlots is ten long and EquipSlot runs past that - the costume slots and the
+        //ammunition slot are kept elsewhere. Parsing one of those names and indexing with
+        //it would read off the end of the array, so the range is checked and not just the
+        //name.
+        if (!System.Enum.TryParse(slotName, true, out slot) || (int)slot < 0 || (int)slot >= 10)
+        {
+            Tell(player, $"ไม่รู้จักช่องชื่อ {slotName}");
+            slot = EquipSlot.None;
+            return false;
+        }
+
+        var inventory = player.Inventory;
+        var bagId = player.Equipment.ItemSlots[(int)slot];
+
+        if (inventory == null || bagId <= 0 || !inventory.GetItem(bagId, out var item))
+        {
+            Tell(player, $"ช่อง {slot} ไม่ได้ใส่อะไรอยู่");
+            return false;
+        }
+
+        uniqueId = EnchantSystem.GuidOf(ref item);
+        if (uniqueId == Guid.Empty)
+        {
+            Tell(player, $"ของในช่อง {slot} ไม่มี guid ประจำชิ้น ใส่ออพไม่ได้");
+            return false;
+        }
+
+        itemName = DataManager.ItemList.TryGetValue(item.Id, out var data) ? data.Code : item.Id.ToString();
+        return true;
+    }
+
+    private static void DescribeEnchant(Player player, ItemEnchant enchant)
+    {
+        Tell(player, $"<color=#AACCFF>ระดับ {enchant.Tier} · {enchant.Count} ออพ</color>");
+
+        for (var i = 0; i < enchant.Count; i++)
+            Tell(player, $"  {enchant.Options[i].Stat} +{enchant.Options[i].Value}");
     }
 
     private static void Tell(Player player, string message)

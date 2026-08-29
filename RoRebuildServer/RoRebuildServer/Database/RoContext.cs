@@ -52,6 +52,10 @@ public class RoContext : IdentityDbContext<RoUserAccount, UserRole, int>
         //looked up and the item already carries it
         builder.Entity<DbForgedItem>().HasKey(f => f.UniqueId);
         builder.Entity<DbForgedItem>().Property(f => f.UniqueId).ValueGeneratedNever();
+
+        //enchant options, keyed the same way and for the same reason
+        builder.Entity<DbEnchantedItem>().HasKey(e => e.UniqueId);
+        builder.Entity<DbEnchantedItem>().Property(e => e.UniqueId).ValueGeneratedNever();
     }
 
 
@@ -65,6 +69,7 @@ public class RoContext : IdentityDbContext<RoUserAccount, UserRole, int>
     public DbSet<DbBuyOrder> BuyOrders { get; set; }
     public DbSet<DbAuctionBid> AuctionBids { get; set; }
     public DbSet<DbForgedItem> ForgedItems { get; set; }
+    public DbSet<DbEnchantedItem> EnchantedItems { get; set; }
     public DbSet<DbFriend> Friends { get; set; }
     public DbSet<DbBan> Bans { get; set; }
     public DbSet<DbAccountAddress> AccountAddresses { get; set; }

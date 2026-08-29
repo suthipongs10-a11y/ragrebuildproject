@@ -9,6 +9,7 @@ using RoRebuildServer.Data.Player;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Networking;
 using RoRebuildServer.Simulation.Crafting;
+using RoRebuildServer.Simulation.Enchanting;
 using RoRebuildServer.Simulation.StatusEffects.Setup;
 using RoRebuildServer.Simulation.Util;
 
@@ -612,6 +613,17 @@ public class ItemEquipState
         AddEquipItemCount(item.Id);
 
         data.Interaction?.OnEquip(Player, Player.CombatEntity, this, item, slot);
+
+        //Enchant options, applied through AddStat like anything else an item grants. That
+        //is the whole reason they go here rather than anywhere more convenient: AddStat
+        //records the change against activeSlotId, which is this slot, so taking the item
+        //off takes the options off with it and nothing has to remember to undo them.
+        if (EnchantRegistry.TryGet(item.UniqueId, out var enchant))
+        {
+            for (var e = 0; e < enchant.Count; e++)
+                AddStat(enchant.Options[e].Stat, enchant.Options[e].Value);
+        }
+
         for (var j = 0; j < 4; j++)
         {
             unsafe //all this trouble to ensure all 4 slots are always allocated in sequence in the struct
