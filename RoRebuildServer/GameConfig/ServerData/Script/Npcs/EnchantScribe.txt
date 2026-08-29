@@ -1,0 +1,78 @@
+﻿//The enchant scribe.
+//
+//Placed beside the Class Master on purpose: everything a new character does on this map
+//happens in that one corner, and a system nobody walks past is a system nobody uses.
+//
+//Right now this is the shell only - the scrolls, the card dust and the reset scroll do
+//not exist yet, so the three menu entries that need them say so rather than opening an
+//empty trade window. The dialogue is written for the finished system so the numbers in
+//it can be checked against the design before any of it is built.
+
+Npc("prt_fild08", "Enchant Scribe", "2_M_SAGE_OLD", 156, 356, SE, 1, 1)
+{
+	localstr name = "อาลักษณ์คัมภีร์";
+	localstr seenFlag = "EnchantScribeStatus";
+OnClick:
+	FocusNpc();
+
+	if(GetNpcFlag(seenFlag) == 0)
+	{
+		Dialog(name, "หยุดก่อนสิเจ้าหนู... ข้าคือ <color=#0066CC>อาลักษณ์คัมภีร์</color> " +
+					 "คนที่เปลี่ยนของขยะในกระเป๋าเจ้าให้กลายเป็นพลังบนอุปกรณ์");
+		Dialog(name, "ทองคำ เพชรร้าว ตุ๊กตา ของแปลก ๆ ที่หลุดจากกล่องแล้วไม่รู้จะเอาไปทำอะไร " +
+					 "เอามาให้ข้าหมด ข้าจะจารเป็น<color=#CC5500>คัมภีร์</color>ให้");
+		SetNpcFlag(seenFlag, 1);
+	}
+	else
+	{
+		Dialog(name, "กลับมาอีกแล้วหรือ อยากรู้อะไรอีกล่ะ");
+	}
+
+	//The menu is written out in full from the first visit even though three of the five
+	//do nothing yet. Hiding them until they work would mean nobody discovers the system
+	//exists, and the point of standing here is to be discovered.
+	var choice = 0;
+	result = 0;
+	while(result < 5)
+	{
+		Option("ระบบคัมภีร์คืออะไร", "คัมภีร์มีกี่ระดับ", "จารคัมภีร์", "บดการ์ด", "ล้างออพอุปกรณ์", "ไม่มีอะไร");
+		choice = result;
+
+		if(choice == 0)
+		{
+			Dialog(name, "อุปกรณ์ทุกชิ้นที่เจ้าใส่อยู่ ใส่<color=#CC5500>ออพชั่นเสริม</color>เพิ่มได้ " +
+						 "หมวก เสื้อ อาวุธ โล่ ผ้าคลุม รองเท้า เครื่องประดับ ครบทั้งเจ็ดตำแหน่ง");
+			Dialog(name, "วิธีคือเอาวัตถุดิบมาให้ข้าจารเป็นคัมภีร์ก่อน แล้วเจ้าค่อยเอาคัมภีร์ไปใช้กับของที่อยากเสริม " +
+						 "ออพที่ได้เป็นการสุ่ม ข้าเองก็บอกล่วงหน้าไม่ได้ว่าจะออกอะไร");
+			Dialog(name, "<color=#CC0000>ฟังให้ดี</color> ทั้งตอนจารและตอนใช้ มีโอกาสพลาดทั้งคู่ " +
+						 "แต่<b>อุปกรณ์ของเจ้าจะไม่หายและขั้นตีจะไม่ลด</b>ไม่ว่าจะพลาดกี่ครั้ง อย่างมากก็แค่ออพว่างเปล่า");
+		}
+
+		if(choice == 1)
+		{
+			Dialog(name, "มีสี่ระดับ ยิ่งสูงยิ่งจารยาก\n\n" +
+						 "<color=#8A6234>ดิน</color> — ออพเดียว ค่าน้อย แต่จารติดเกือบทุกครั้ง\n" +
+						 "<color=#1F6E97>ฟ้า</color> — สองออพ เริ่มมีพลังโจมตีกับพลังชีวิตให้สุ่ม");
+			Dialog(name, "<color=#8E6E05>สวรรค์</color> — สองออพ ค่าแรงขึ้น ต้องใช้ผงการ์ดด้วย\n" +
+						 "<color=#A32E45>ตำนาน</color> — สามออพ ค่าสูงสุด และ<b>จารติดแค่หนึ่งในเจ็ด</b>");
+			Dialog(name, "คัมภีร์ระดับตำนานยังหลุดออกมาจากกล่องสมบัติของจอมมารได้อีกทาง " +
+						 "แต่โอกาสน้อยยิ่งกว่าจารเองเสียอีก");
+		}
+
+		if(choice == 2)
+			Dialog(name, "<color=#CC0000>ข้ายังจารไม่ได้</color> หมึกยังไม่แห้ง กระดาษยังไม่มา " +
+						 "กลับมาใหม่อีกทีนะเจ้าหนู");
+
+		if(choice == 3)
+			Dialog(name, "<color=#CC0000>ครกบดการ์ดยังไม่มา</color> เอาไว้ค่อยว่ากัน " +
+						 "แต่เก็บการ์ดที่ไม่ได้ใช้ไว้ให้ดีล่ะ เดี๋ยวจะได้ใช้");
+
+		if(choice == 4)
+			Dialog(name, "<color=#CC0000>ยังล้างให้ไม่ได้</color> ต้องรอให้ข้าจารคัมภีร์เป็นเสียก่อน " +
+						 "ถึงจะมีอะไรให้ล้าง");
+
+		result = choice;
+	}
+
+	Dialog(name, "งั้นก็ตามสบาย ของขยะในกระเป๋าอย่าเพิ่งทิ้งล่ะ");
+}
