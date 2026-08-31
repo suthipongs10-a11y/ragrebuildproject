@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using Assets.Scripts.Network;
 using Assets.Scripts.PlayerControl;
-using Assets.Scripts.UI.ItemList;
-using Assets.Scripts.Utility;
+using Assets.Scripts.Sprites;
 using RebuildSharedData.Enum;
 using UnityEngine;
 

@@ -1,7 +1,7 @@
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
 using RoRebuildServer.Data;
-using RoRebuildServer.EntityComponents.Character;
+using RoRebuildServer.EntityComponents.Util;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Simulation.Enchanting;
 
