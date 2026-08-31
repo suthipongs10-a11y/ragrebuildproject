@@ -735,7 +735,6 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 11015,Expedition_Report_Vol3,Expedition Report Vol3,0,10,None,고대언어문서
 11016,Expedition_Report_Vol4,Expedition Report Vol4,0,10,None,고대언어문서
 11500,Okolnir_Key,Okolnir Key,30000,0,Quest,황금열쇠
-6031,Glittering_Paper_,Glittering Paper,0,10,None,기름종이
 6043,Letter_from_Lugen,Letter from Lugen,0,10,None,안부편지
 6044,Letter_from_Otto,Letter from Otto,0,10,None,상인만수편지
 7148,Mother's_Letter,Mother's Letter,1,10,None,상인만수편지
@@ -747,4 +746,3 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 7428,Blue_Charm_Stone,Blue Charm Stone,0,0,None,마력석_파랑
 7429,Green_Charm_Stone,Green Charm Stone,0,0,None,마력석_초록
 7430,Black_Charm_Stone,Black Charm Stone,0,0,None,마력석_검정
-7431,Pile_of_Books,Pile of Books,0,0,None,여러권의책
