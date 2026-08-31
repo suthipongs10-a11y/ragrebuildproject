@@ -93,6 +93,7 @@ public static class EnchantSystem
             EnchantRegistry.Clear(uniqueId);
             RefreshIfWorn(player, uniqueId);
             CommandBuilder.SendEnchantCleared(player, uniqueId);
+            PlayEffect(player, "Magnificat");
             Announce(player, $"<color=#55FF55>ล้างออพของ {name} เรียบร้อย</color>");
             return true;
         }
@@ -105,11 +106,24 @@ public static class EnchantSystem
         if (rolled.Count == 0)
         {
             CommandBuilder.SendEnchantCleared(player, uniqueId);
+            PlayEffect(player, "RefineFailure");
             Announce(player, $"<color=#FF5555>คัมภีร์สลายไปเปล่า ๆ</color> {name} ไม่ได้ออพสักตัว");
             return true;
         }
 
         CommandBuilder.SendForgedNameForId(player, uniqueId);
+
+        //Same two effects the forge and the refine counter use, for the same reason: they
+        //already read as "a thing was made" and "a thing was lost", and a player who has
+        //watched a smith work knows what they mean without being told.
+        PlayEffect(player, "RefineSuccess");
+
+        //The top two tiers get the level-up angel on top of it. A legendary scroll landing
+        //is rare enough that it should look different from an earth one landing, and it is
+        //the loudest thing in the effects table that is not somebody dying.
+        if (tier >= EnchantTier.Heaven)
+            PlayEffect(player, "LevelUp");
+
         Announce(player, $"<color=#55FF55>จารคัมภีร์ลง {name} สำเร็จ</color>");
 
         for (var i = 0; i < rolled.Count; i++)
@@ -119,6 +133,32 @@ public static class EnchantSystem
         return true;
     }
 
+
+    /// <summary>
+    /// Shows an effect on the player, to them and to anybody watching.
+    /// </summary>
+    /// <remarks>
+    /// The acting player is added by hand as well as through the visible list, because the
+    /// visible list is what the map keeps of other people - a player standing alone in a
+    /// field has an empty one, and the person who used the scroll is the one who most needs
+    /// to see what it did.
+    /// </remarks>
+    private static void PlayEffect(Player player, string effectName)
+    {
+        if (player.Character == null || player.Connection == null)
+            return;
+
+        if (!DataManager.EffectIdForName.TryGetValue(effectName, out var effectId))
+        {
+            ServerLogger.LogWarning($"[Enchant] there is no effect called '{effectName}', so nothing was shown.");
+            return;
+        }
+
+        CommandBuilder.AddRecipient(player.Connection);
+        CommandBuilder.AddRecipients(player.Character.GetVisiblePlayerList());
+        CommandBuilder.SendEffectOnCharacterMulti(player.Character, effectId);
+        CommandBuilder.ClearRecipients();
+    }
 
     private static void Announce(Player player, string message)
     {

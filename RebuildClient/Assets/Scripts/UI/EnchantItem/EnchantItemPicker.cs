@@ -49,8 +49,10 @@ namespace Assets.Scripts.UI.EnchantItem
 
         private GenericItemListV2 window;
         private readonly Dictionary<int, int> bagIdByEntry = new Dictionary<int, int>();
+        private readonly Dictionary<int, ItemListEntryV2> rowByEntry = new Dictionary<int, ItemListEntryV2>();
         private int scrollItemId;
         private ScrollSlot slot;
+        private ItemListEntryV2 selected;
         private int selectedEntry = -1;
 
         public static void Open(int scrollItemId, ItemData scrollData)
@@ -114,12 +116,12 @@ namespace Assets.Scripts.UI.EnchantItem
             window.MoveToTop();
             window.CenterWindow();
             window.ToggleBox.gameObject.SetActive(false);
-            window.InfoAreaText.gameObject.SetActive(false);
             window.TitleBar.text = $"เลือก{NameOfSlot(slot)}ที่จะใช้ {scrollName}";
             window.OkButtonText.text = "จาร";
             window.OnPressCancel = Close;
             window.OnPressOk = Confirm;
             window.SetActive();
+            ShowHint("คลิกเลือกของหนึ่งชิ้น แล้วกด จาร");
 
             var entryId = 0;
             foreach (var (_, item) in state.Inventory.GetInventoryData())
@@ -149,6 +151,7 @@ namespace Assets.Scripts.UI.EnchantItem
                 entry.EventDoubleClick = Pick;
 
                 bagIdByEntry[entryId] = item.BagSlotId;
+                rowByEntry[entryId] = entry;
                 entryId++;
             }
 
@@ -205,12 +208,50 @@ namespace Assets.Scripts.UI.EnchantItem
             }
         }
 
-        private void Select(int entryId) => selectedEntry = entryId;
+        /// <summary>
+        /// One row at a time.
+        /// </summary>
+        /// <remarks>
+        /// A row paints itself selected on click and nothing ever paints it back, so without
+        /// this every row the player tried stayed lit and the window looked like it had
+        /// taken all of them. The list keeps no idea of a current selection - the refine
+        /// counter tracks its own the same way.
+        /// </remarks>
+        private void Select(int entryId)
+        {
+            if (!rowByEntry.TryGetValue(entryId, out var row))
+                return;
+
+            if (selected != null && selected != row)
+                selected.Unselect();
+
+            selected = row;
+            selectedEntry = entryId;
+            ShowHint($"จะจารลง <color=#CC5500>{row.ItemName.text}</color> — กด จาร เพื่อยืนยัน");
+        }
 
         private void Confirm()
         {
             if (selectedEntry >= 0)
+            {
                 Pick(selectedEntry);
+                return;
+            }
+
+            //The list disarms its own ok button before handing control over, so a press with
+            //nothing chosen used to leave a button that could never be pressed again and no
+            //hint as to why. Say what is missing and arm it back up.
+            ShowHint("<color=#CC0000>เลือกของที่จะจารก่อน</color> แล้วค่อยกด จาร");
+            window.SetActive();
+        }
+
+        private void ShowHint(string text)
+        {
+            if (window.InfoAreaText == null)
+                return;
+
+            window.InfoAreaText.gameObject.SetActive(true);
+            window.InfoAreaText.text = text;
         }
 
         private void Pick(int entryId)
