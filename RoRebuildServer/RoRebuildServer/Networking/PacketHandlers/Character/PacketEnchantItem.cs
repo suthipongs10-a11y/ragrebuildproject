@@ -43,7 +43,7 @@ public class PacketEnchantItem : IClientPacketHandler
             return;
         }
 
-        if (!EnchantSystem.TryReadScroll(scroll.Code, out var tier, out var isBlank))
+        if (!EnchantScrolls.TryRead(scroll.Code, out var tier, out var slot, out var isBlank))
         {
             ServerLogger.LogWarning($"Player {player.Name} tried to enchant with {scroll.Code}, which is not a scroll.");
             return;
@@ -67,7 +67,7 @@ public class PacketEnchantItem : IClientPacketHandler
         //Dry run first. TryApplyToItem says no for every reason a player can cause - the
         //wrong kind of item, nothing to wipe - and every one of those should leave the
         //scroll where it is.
-        if (!EnchantSystem.CanApplyToItem(player, targetBagId, isBlank))
+        if (!EnchantSystem.CanApplyToItem(player, targetBagId, slot, isBlank))
             return;
 
         if (!player.TryRemoveItemFromInventory(scrollId, 1))
@@ -78,6 +78,6 @@ public class PacketEnchantItem : IClientPacketHandler
 
         CommandBuilder.RemoveItemFromInventory(player, scrollId, 1);
 
-        EnchantSystem.TryApplyToItem(player, targetBagId, tier, isBlank);
+        EnchantSystem.TryApplyToItem(player, targetBagId, tier, slot, isBlank);
     }
 }

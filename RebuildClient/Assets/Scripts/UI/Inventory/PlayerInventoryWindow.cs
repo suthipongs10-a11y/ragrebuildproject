@@ -125,7 +125,7 @@ namespace Assets.Scripts.UI.Inventory
                 case ItemUseType.UseOnItem:
                     //The target is another item rather than a character, so the picker opens
                     //here and nothing goes to the server until something is chosen.
-                    EnchantItemPicker.Open(item.BagSlotId, item.ItemData.Name);
+                    EnchantItemPicker.Open(item.BagSlotId, item.ItemData);
                     break;
                 default:
                 {

@@ -2,6 +2,7 @@ using RebuildSharedData.Enum;
 using RebuildSharedData.Enum.EntityStats;
 using RoRebuildServer.Data;
 using RoRebuildServer.EntityComponents;
+using RoRebuildServer.EntityComponents.Items;
 using RoRebuildServer.Logging;
 using System.Linq;
 using RoRebuildServer.Networking;
@@ -64,6 +65,7 @@ public static class GmCommands
             case "!enchclear":
             case "!enchroll":
             case "!enchodds":
+            case "!enchscroll":
                 break;
             default:
                 return false; //not ours - let the chat handler carry on with it
@@ -92,6 +94,7 @@ public static class GmCommands
             case "!enchclear": EnchantClear(player, parts); break;
             case "!enchroll": EnchantRoll(player, parts); break;
             case "!enchodds": EnchantOdds(player, parts); break;
+            case "!enchscroll": EnchantScroll(player, parts); break;
         }
 
         return true;
@@ -113,6 +116,7 @@ public static class GmCommands
         Tell(player, "!enchshow <ช่อง> · !enchclear <ช่อง>");
         Tell(player, "!enchroll <ช่อง> <tier> — สุ่มจริงตามตาราง");
         Tell(player, "!enchodds <ช่อง> <tier> [จำนวน] — ลองสุ่มเปล่า ๆ ดูการกระจาย");
+        Tell(player, "!enchscroll <tier|blank> [ช่อง|random] [จำนวน] — หยิบคัมภีร์มาทดสอบ");
         Tell(player, "<color=#AACCFF>ช่อง: weapon shield body headtop headmid headbottom garment footgear accessory1 accessory2</color>");
         Tell(player, "<color=#AACCFF>tier: 1 ดิน · 2 ฟ้า · 3 สวรรค์ · 4 ตำนาน</color>");
     }
@@ -713,6 +717,73 @@ public static class GmCommands
     }
 
     private static int ItemIdInSlot(Player player, EquipSlot slot) => player.Equipment.ItemIds[(int)slot];
+
+    /// <summary>
+    /// Hands the gm a scroll, so the scrolls can be tested before the scribe can write them.
+    /// </summary>
+    /// <remarks>
+    /// Leaving the slot off draws one the way the scribe will - weighted, with the accessory
+    /// and the two lower head slots rare - which makes this the only way to watch that table
+    /// work until the crafting menu exists. Naming a slot picks it outright, for testing one
+    /// particular scroll against one particular item.
+    /// </remarks>
+    private static void EnchantScroll(Player player, string[] parts)
+    {
+        if (parts.Length < 2)
+        {
+            Tell(player, "ใช้: !enchscroll <tier 1-4 หรือ blank> [ช่อง หรือ random] [จำนวน]");
+            Tell(player, "<color=#AACCFF>ตัวอย่าง: !enchscroll 1 weapon 5 / !enchscroll 2 / !enchscroll blank</color>");
+            return;
+        }
+
+        string code;
+        var drawn = false;
+        var slot = EnchantScrollSlot.Weapon;
+
+        if (string.Equals(parts[1], "blank", StringComparison.OrdinalIgnoreCase))
+            code = EnchantScrolls.BlankScrollCode;
+        else
+        {
+            if (!TryReadTier(player, parts[1], out var tier))
+                return;
+
+            if (parts.Length < 3 || string.Equals(parts[2], "random", StringComparison.OrdinalIgnoreCase))
+            {
+                slot = EnchantScrolls.RollSlot();
+                drawn = true;
+            }
+            else if (!EnchantScrolls.TryReadSlotName(parts[2], out slot))
+            {
+                Tell(player, "ช่องที่รู้จัก: weapon armour shield top mid low shoes left right (หรือ random)");
+                return;
+            }
+
+            code = EnchantScrolls.CodeFor(tier, slot);
+        }
+
+        var count = 1;
+        if (parts.Length > 3 && (!int.TryParse(parts[3], out count) || count < 1 || count > 100))
+        {
+            Tell(player, "จำนวนต้องอยู่ระหว่าง 1 ถึง 100");
+            return;
+        }
+
+        if (!DataManager.ItemIdByName.TryGetValue(code, out var itemId))
+        {
+            Tell(player, $"<color=#FF5555>ไม่มีไอเท็มชื่อ {code}</color> — ยังไม่ได้รัน updateclient.bat หรือเปล่า");
+            return;
+        }
+
+        var itemRef = new ItemReference(itemId, count);
+        var bagId = player.AddItemToInventory(itemRef);
+
+        itemRef.Count = player.Inventory?.GetItemCount(itemId) ?? 0;
+        CommandBuilder.AddItemToInventory(player, itemRef, bagId, count);
+
+        var name = DataManager.ItemList.TryGetValue(itemId, out var data) ? data.Name : code;
+        var how = drawn ? $" <color=#AACCFF>(สุ่มได้ {EnchantScrolls.NameOf(slot)} · {EnchantScrolls.WeightOf(slot)}%)</color>" : "";
+        Tell(player, $"<color=#55FF55>ได้ {name} x{count}</color>{how}");
+    }
 
     private static bool TryReadTier(Player player, string text, out EnchantTier tier)
     {

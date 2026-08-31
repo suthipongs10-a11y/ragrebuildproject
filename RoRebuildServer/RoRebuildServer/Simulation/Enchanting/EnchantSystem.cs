@@ -11,58 +11,13 @@ namespace RoRebuildServer.Simulation.Enchanting;
 /// The parts of enchanting that touch a live player rather than the store.
 /// </summary>
 /// <remarks>
-/// Small for now - it holds the one thing both the test command and, later, the scroll
-/// need: making a change to an item that is already being worn actually show up.
+/// Which scroll is which lives in EnchantScrolls and what a scroll rolls lives in
+/// EnchantTables. What is left here is the middle: checking a scroll against the item a
+/// player pointed it at, writing the result down, and making a change to something that is
+/// already being worn actually show up.
 /// </remarks>
 public static class EnchantSystem
 {
-    /// <summary>
-    /// Which tier each scroll writes, by item code.
-    /// </summary>
-    /// <remarks>
-    /// Three scrolls rather than twenty-eight. The stat pool comes from the item being
-    /// enchanted, not from the scroll - FamilyOf reads it off the target - so once the
-    /// player picks the target there is nothing left for the scroll to specify but how
-    /// strong it is.
-    ///
-    /// Kept here rather than in the item script because the packet handler needs it before
-    /// any script runs, and one small table beats a script hook that exists to carry one
-    /// number.
-    /// </remarks>
-    private static readonly (string Code, EnchantTier Tier)[] scrolls =
-    [
-        ("Ench_Earth", EnchantTier.Earth),
-        ("Ench_Sky", EnchantTier.Sky),
-        ("Ench_Heaven", EnchantTier.Heaven),
-        ("Ench_Legend", EnchantTier.Legend)
-    ];
-
-    /// <summary>The code of the scroll that wipes options instead of rolling them.</summary>
-    public const string BlankScrollCode = "Ench_Blank";
-
-    /// <summary>
-    /// What this item does when used on another item, or None if it does nothing.
-    /// </summary>
-    public static bool TryReadScroll(string code, out EnchantTier tier, out bool isBlank)
-    {
-        tier = EnchantTier.None;
-        isBlank = code == BlankScrollCode;
-
-        if (isBlank)
-            return true;
-
-        foreach (var (scrollCode, scrollTier) in scrolls)
-        {
-            if (scrollCode != code)
-                continue;
-
-            tier = scrollTier;
-            return true;
-        }
-
-        return false;
-    }
-
     /// <summary>
     /// Whether a scroll used on this item would do anything, said out loud.
     /// </summary>
@@ -71,8 +26,19 @@ public static class EnchantSystem
     /// player still has. Same split the ordinary item use makes between OnValidate and
     /// OnUse, and for the same reason.
     /// </remarks>
-    public static bool CanApplyToItem(Player player, int targetBagId, bool isBlank)
+    public static bool CanApplyToItem(Player player, int targetBagId, EnchantScrollSlot slot, bool isBlank) =>
+        Validate(player, targetBagId, slot, isBlank, out _, out _);
+
+    /// <summary>
+    /// Everything that can refuse a scroll, in one place so the dry run and the real one
+    /// can never disagree about what is allowed.
+    /// </summary>
+    private static bool Validate(Player player, int targetBagId, EnchantScrollSlot slot, bool isBlank,
+        out Guid uniqueId, out EnchantSlotFamily family)
     {
+        uniqueId = Guid.Empty;
+        family = EnchantSlotFamily.None;
+
         var inventory = player.Inventory;
         if (inventory == null || !inventory.GetItem(targetBagId, out var item))
         {
@@ -80,12 +46,18 @@ public static class EnchantSystem
             return false;
         }
 
-        var uniqueId = GuidOf(ref item);
-        if (uniqueId == Guid.Empty || EnchantTables.FamilyOf(item.Id) == EnchantSlotFamily.None)
+        uniqueId = GuidOf(ref item);
+        family = EnchantTables.FamilyOf(item.Id);
+
+        if (uniqueId == Guid.Empty || family == EnchantSlotFamily.None)
         {
             CommandBuilder.ErrorMessage(player, "ใส่ออพได้เฉพาะอาวุธ เกราะ และเครื่องประดับ");
             return false;
         }
+
+        //The blank scroll has no slot of its own - wiping is wiping whatever it is written on.
+        if (!isBlank && !CheckSlot(player, ref item, uniqueId, slot))
+            return false;
 
         if (isBlank && !EnchantRegistry.IsEnchanted(uniqueId))
         {
@@ -97,46 +69,55 @@ public static class EnchantSystem
     }
 
     /// <summary>
+    /// Whether the item is the kind of thing this scroll names, and on the right side if
+    /// the scroll names a side.
+    /// </summary>
+    /// <remarks>
+    /// Two checks rather than one because they fail for different reasons and a player can
+    /// only fix the second one. Pointing an armour scroll at a bow is a mistake; pointing a
+    /// left accessory scroll at a ring in the bag is a ring that needs putting on first,
+    /// and saying so is the difference between a wasted trip and a wasted scroll.
+    /// </remarks>
+    private static bool CheckSlot(Player player, ref ItemReference item, Guid uniqueId, EnchantScrollSlot slot)
+    {
+        if (!EnchantScrolls.FitsSlot(item.Id, slot))
+        {
+            CommandBuilder.ErrorMessage(player, $"คัมภีร์นี้ใช้ได้กับ {EnchantScrolls.NameOf(slot)} เท่านั้น");
+            return false;
+        }
+
+        var required = EnchantScrolls.RequiredEquipSlot(slot);
+        if (required == EquipSlot.None)
+            return true;
+
+        if (SlotHolding(player, uniqueId) == required)
+            return true;
+
+        var side = slot == EnchantScrollSlot.AccessoryLeft ? "ซ้าย" : "ขวา";
+        CommandBuilder.ErrorMessage(player, $"ต้องสวมเครื่องประดับชิ้นนี้ไว้ที่ช่อง{side}ก่อนถึงจะจารได้");
+        return false;
+    }
+
+    /// <summary>
     /// A scroll used on one chosen item, wherever that item is sitting.
     /// </summary>
     /// <remarks>
     /// Works on anything in the bag rather than only on what is worn, which is the whole
-    /// point of letting the player pick. An item that is being worn is refreshed on the
-    /// spot; one in the bag picks its options up when it next goes on.
+    /// point of letting the player pick - the one exception being the accessory scrolls,
+    /// which name a side and so need the ring on. An item that is being worn is refreshed
+    /// on the spot; one in the bag picks its options up when it next goes on.
     /// </remarks>
-    public static bool TryApplyToItem(Player player, int targetBagId, EnchantTier tier, bool isBlank)
+    public static bool TryApplyToItem(Player player, int targetBagId, EnchantTier tier, EnchantScrollSlot slot, bool isBlank)
     {
-        var inventory = player.Inventory;
-        if (inventory == null || !inventory.GetItem(targetBagId, out var item))
-        {
-            CommandBuilder.ErrorMessage(player, "หาของที่จะจารไม่เจอในกระเป๋า");
+        if (!Validate(player, targetBagId, slot, isBlank, out var uniqueId, out var family))
             return false;
-        }
 
-        var uniqueId = GuidOf(ref item);
-        if (uniqueId == Guid.Empty)
-        {
-            CommandBuilder.ErrorMessage(player, "ของชิ้นนี้ใส่ออพไม่ได้");
-            return false;
-        }
-
-        var family = EnchantTables.FamilyOf(item.Id);
-        if (family == EnchantSlotFamily.None)
-        {
-            CommandBuilder.ErrorMessage(player, "ใส่ออพได้เฉพาะอาวุธ เกราะ และเครื่องประดับ");
-            return false;
-        }
-
-        var name = DataManager.ItemList.TryGetValue(item.Id, out var data) ? data.Code : item.Id.ToString();
+        var inventory = player.Inventory!;
+        inventory.GetItem(targetBagId, out var item);
+        var name = DataManager.ItemList.TryGetValue(item.Id, out var data) ? data.Name : item.Id.ToString();
 
         if (isBlank)
         {
-            if (!EnchantRegistry.IsEnchanted(uniqueId))
-            {
-                CommandBuilder.ErrorMessage(player, "ของชิ้นนั้นไม่มีออพให้ล้างอยู่แล้ว");
-                return false;
-            }
-
             EnchantRegistry.Clear(uniqueId);
             RefreshIfWorn(player, uniqueId);
             CommandBuilder.SendEnchantCleared(player, uniqueId);
@@ -162,7 +143,7 @@ public static class EnchantSystem
         for (var i = 0; i < rolled.Count; i++)
             Announce(player, $"  {rolled.Options[i].Stat} +{rolled.Options[i].Value}");
 
-        ServerLogger.Log($"[Enchant] {player.Name} used a {tier} scroll and got {rolled.Count} option(s).");
+        ServerLogger.Log($"[Enchant] {player.Name} used a {tier} {slot} scroll and got {rolled.Count} option(s).");
         return true;
     }
 

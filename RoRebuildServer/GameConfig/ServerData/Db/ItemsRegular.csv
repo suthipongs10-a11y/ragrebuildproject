@@ -252,7 +252,10 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 6022,Hard_Skin,Hard Skin,884,10,None,딱딱한피부
 6023,Mystic_Horn,Mystic Horn,1000,10,None,마력의뿔
 6027,Crystal_of_Feardom,Crystal of Feardom,0,0,None,피어둠결정체
+6028,Sealed_Scroll,Sealed Scroll,0,0,None,빛의주문서
 6029,Morroc_Tracing_Log,Morroc Tracing Log,0,0,None,고대언어문서
+6030,Glittering_Paper,Glittering Paper,0,10,None,기름종이
+6031,Glittering_Paper_,Glittering Paper,0,10,None,기름종이
 6032,Horn_of_Hillslion,Horn of Hillslion,500,10,None,새하얀뿔
 6033,Horn_of_Tendrilion,Horn of Tendrilion,500,10,None,새하얀뿔
 6035,Decaying_Stem,Decaying Stem,0,0,None,나무뿌리
@@ -512,6 +515,7 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 7299,Straw_Basket,Straw Basket,632,10,None,소쿠리
 7300,Gemstone,Gemstone,1420,10,None,원석
 7301,Tassel,Tassel,798,10,None,칼장식용실
+7304,Witch's_Spell_Scroll,Witch's Spell Scroll,0,0,None,마녀의주문서
 7305,Symbol_of_the_Nine_Realms,Symbol of the Nine Realms,0,0,None,아홉세계의권위
 7306,Piece_of_Spirit,Piece of Spirit,0,0,None,영혼의조각
 7307,Spiritual_Whispers,Spiritual Whispers,0,0,None,영혼의속삭임
@@ -569,6 +573,7 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 7423,Blue_Key,Blue Key,0,0,None,열쇠_파랑
 7424,Green_Key,Green Key,0,0,None,열쇠_초록
 7425,Black_Key,Black Key,0,0,None,열쇠_검정
+7431,Pile_of_Books,Pile of Books,0,0,None,여러권의책
 7432,Leather_Pouch,Leather Pouch,0,0,None,주머니
 7433,Blank_Scroll,Blank Scroll,4000,10,Crafting,낡은두루마리
 7434,Elemental_Potion_Creation_Guide,Elemental Potion Creation Guide,100000,10,None,기뢰병제조책
