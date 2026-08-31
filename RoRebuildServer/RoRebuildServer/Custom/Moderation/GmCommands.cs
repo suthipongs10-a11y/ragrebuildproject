@@ -675,35 +675,41 @@ public static class GmCommands
 
         var attempts = EnchantTables.AttemptsFor(tier);
         var blanks = 0;
+        var full = 0;
         var options = 0;
-        var perStat = new Dictionary<CharacterStat, (int Count, int Total, int Best)>();
+        var perStat = new Dictionary<CharacterStat, (int Count, int Total, int Min, int Max)>();
 
         for (var i = 0; i < samples; i++)
         {
             var rolled = EnchantTables.Roll(tier, family);
             if (rolled.Count == 0)
                 blanks++;
+            if (rolled.Count == attempts)
+                full++;
 
             options += rolled.Count;
 
             for (var j = 0; j < rolled.Count; j++)
             {
                 var opt = rolled.Options[j];
-                perStat.TryGetValue(opt.Stat, out var cur);
-                perStat[opt.Stat] = (cur.Count + 1, cur.Total + opt.Value, int.Max(cur.Best, opt.Value));
+                if (!perStat.TryGetValue(opt.Stat, out var cur))
+                    cur = (0, 0, int.MaxValue, int.MinValue);
+
+                perStat[opt.Stat] = (cur.Count + 1, cur.Total + opt.Value,
+                    int.Min(cur.Min, opt.Value), int.Max(cur.Max, opt.Value));
             }
         }
 
-        var (fail, low, high) = EnchantTables.OddsFor(tier);
-        var filled = (double)options / (samples * attempts);
+        var (empty, curve) = EnchantTables.OddsFor(tier);
 
         Tell(player, $"<color=#FFCC55>สุ่ม {samples:N0} ครั้ง · ระดับ {tier} · พูล {family}</color>");
-        Tell(player, $"ตั้งไว้: พลาด {fail / 100f:0.#}% · หน้าต่ำ {low / 100f:0.#}% · หน้าสูง {high / 100f:0.#}% · {attempts} ออพต่อใบ");
-        Tell(player, $"ออกจริง: ติด {filled * 100:0.0}% ของช่องทั้งหมด (คาด {100f - fail / 100f:0.#}%)");
-        Tell(player, $"ได้ออพว่างทั้งใบ {blanks} ครั้ง ({(double)blanks / samples * 100:0.00}%) · เฉลี่ย {(double)options / samples:0.00} ออพต่อใบ");
+        Tell(player, $"ตั้งไว้: ช่องว่าง {empty / 100f:0.#}% · ความชันค่า {curve:0.0} · {attempts} ช่องต่อใบ");
+        Tell(player, $"<color=#AACCFF>ด่านที่ 1 — ได้ครบทุกช่อง</color> {(double)full / samples * 100:0.0}%  (ว่างทั้งใบ {(double)blanks / samples * 100:0.00}%)");
+        Tell(player, $"เฉลี่ย {(double)options / samples:0.00} ออพต่อใบ จากเต็ม {attempts}");
+        Tell(player, "<color=#AACCFF>ด่านที่ 2 — ค่าที่ได้</color>");
 
         foreach (var (stat, data) in perStat.OrderByDescending(e => e.Value.Count))
-            Tell(player, $"  {stat,-22} {data.Count,5} ครั้ง ({(double)data.Count / options * 100:0.0}%) เฉลี่ย {(double)data.Total / data.Count:0.0} สูงสุด {data.Best}");
+            Tell(player, $"  {stat,-22} {(double)data.Count / options * 100,4:0.0}% · ได้ {data.Min}~{data.Max} เฉลี่ย {(double)data.Total / data.Count:0.00}");
     }
 
     private static int ItemIdInSlot(Player player, EquipSlot slot) => player.Equipment.ItemIds[(int)slot];

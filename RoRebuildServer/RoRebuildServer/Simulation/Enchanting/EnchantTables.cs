@@ -68,21 +68,34 @@ public static class EnchantTables
     private static readonly int[] attemptsByTier = [1, 2, 2, 3];
 
     /// <summary>
-    /// The chance one attempt comes up empty, and the chance it comes up in the lower half
-    /// of its band. Whatever is left over is the high half.
+    /// What one attempt can go wrong at, and how hard it is to roll high.
     /// </summary>
     /// <remarks>
-    /// Rolled per option rather than per scroll, so a legendary scroll rolls three times
-    /// and can leave with fewer than three options - or with none, which is the outcome
-    /// that makes a scroll a gamble rather than a purchase. The equipment itself is never
-    /// touched: refine, cards and the forger's name all survive a scroll that gives nothing.
+    /// Difficulty comes in two steps rather than one, which is the whole shape of this.
+    ///
+    /// The first step is filling the rows at all. An attempt has a small chance of coming
+    /// up empty, and the higher tiers - which attempt more rows - have a larger one, so a
+    /// full legendary block of three is genuinely uncommon while an earth scroll almost
+    /// always writes its single option.
+    ///
+    /// The second step is the number itself. A filled row is never worse than the bottom of
+    /// its band, and every step above the bottom is rarer than the one below it. Curve is
+    /// the exponent that does that: a roll of zero to one raised to it, then stretched
+    /// across the band. One would be flat, and the higher it goes the more the results
+    /// crowd against the floor. It climbs with the tier, so the good numbers on a legendary
+    /// scroll are harder to reach than the good numbers on an earth one, on top of already
+    /// being larger.
+    ///
+    /// Failing outright and getting nothing was the old shape and it punished beginners
+    /// worst: an earth scroll rolls once, so its per-row failure was its whole failure.
+    /// Now the floor is the minimum value and the gamble is how far above it you land.
     /// </remarks>
-    private static readonly (int Fail, int Low)[] oddsByTier =
+    private static readonly (int Empty, double Curve)[] oddsByTier =
     [
-        (1500, 7000), //Earth  15% / 70% / 15%
-        (2000, 6500), //Sky    20% / 65% / 15%
-        (2500, 6200), //Heaven 25% / 62% / 13%
-        (3000, 5800)  //Legend 30% / 58% / 12%
+        (200, 1.5),  //Earth   2% empty
+        (1200, 1.8), //Sky    12%
+        (1800, 2.2), //Heaven 18%
+        (2500, 2.6)  //Legend 25%
     ];
 
     private static readonly EnchantStat[] pool =
@@ -138,19 +151,15 @@ public static class EnchantTables
 
     public static int AttemptsFor(EnchantTier tier) => attemptsByTier[(int)tier - 1];
 
-    public static (int Fail, int Low, int High) OddsFor(EnchantTier tier)
-    {
-        var (fail, low) = oddsByTier[(int)tier - 1];
-        return (fail, low, ChanceScale - fail - low);
-    }
+    public static (int Empty, double Curve) OddsFor(EnchantTier tier) => oddsByTier[(int)tier - 1];
 
     /// <summary>
     /// One scroll's worth of rolling.
     /// </summary>
     /// <remarks>
-    /// Each attempt is independent: it decides whether it produces anything at all first,
-    /// and only then picks what. A failed attempt does not use up a stat, so failing the
-    /// first of three does not make the other two any narrower.
+    /// Each attempt is independent: it decides whether it writes a row at all first, and
+    /// only then picks what goes in it. An empty attempt does not use up a stat, so an
+    /// empty first row does not narrow the other two.
     ///
     /// The stat is drawn evenly from everything the slot and the tier allow and the item
     /// does not already have. Even, with no weighting toward anything - the odds of rolling
@@ -163,14 +172,13 @@ public static class EnchantTables
         if (tier == EnchantTier.None || family == EnchantSlotFamily.None)
             return enchant;
 
-        var (fail, low, _) = OddsFor(tier);
+        var (empty, curve) = OddsFor(tier);
         var attempts = AttemptsFor(tier);
 
         for (var i = 0; i < attempts; i++)
         {
-            var roll = GameRandom.Next(ChanceScale);
-            if (roll < fail)
-                continue; //this one came up empty, and the item is none the worse for it
+            if (GameRandom.Next(ChanceScale) < empty)
+                continue; //this row stayed blank, and the item is none the worse for it
 
             candidates.Clear();
             foreach (var entry in pool)
@@ -189,31 +197,31 @@ public static class EnchantTables
                 break; //nothing left this slot can take, which three options cannot manage today
 
             var pick = candidates[GameRandom.Next(candidates.Count)];
-            var isLow = roll < fail + low;
 
-            enchant.Add(pick.Stat, ValueFor(pick.Band(tier), isLow));
+            enchant.Add(pick.Stat, ValueFor(pick.Band(tier), curve));
         }
 
         return enchant;
     }
 
     /// <summary>
-    /// A number out of the half of the band the roll landed in.
+    /// A number from the band, crowded toward the bottom of it.
     /// </summary>
     /// <remarks>
-    /// Split at the midpoint rather than handing out the two ends of the band, so a stat
-    /// with a wide range - two hundred to three hundred hp - still varies within the result
-    /// it rolled. A band with one value in it gives that value whichever half came up.
+    /// The floor is the minimum, always: a row that got written is never worse than the
+    /// bottom of its band. Above that, a uniform roll raised to the curve leans the result
+    /// down, so every point of the band is rarer than the point below it and the top of a
+    /// wide band is a genuine find rather than a coin flip.
+    ///
+    /// A band with one value in it hands out that value and never touches the random.
     /// </remarks>
-    private static int ValueFor((int Min, int Max) band, bool isLow)
+    private static int ValueFor((int Min, int Max) band, double curve)
     {
         if (band.Min >= band.Max)
             return band.Min;
 
-        var mid = (band.Min + band.Max) / 2;
+        var t = Math.Pow(GameRandom.NextDouble(), curve);
 
-        return isLow
-            ? GameRandom.NextInclusive(band.Min, mid)
-            : GameRandom.NextInclusive(mid + 1, band.Max);
+        return band.Min + (int)Math.Round(t * (band.Max - band.Min), MidpointRounding.AwayFromZero);
     }
 }
