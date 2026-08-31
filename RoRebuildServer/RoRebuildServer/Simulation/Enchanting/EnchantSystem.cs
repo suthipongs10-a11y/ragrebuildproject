@@ -56,8 +56,11 @@ public static class EnchantSystem
         }
 
         //The blank scroll has no slot of its own - wiping is wiping whatever it is written on.
-        if (!isBlank && !CheckSlot(player, ref item, uniqueId, slot))
+        if (!isBlank && !EnchantScrolls.FitsSlot(item.Id, slot))
+        {
+            CommandBuilder.ErrorMessage(player, $"คัมภีร์นี้ใช้ได้กับ {EnchantScrolls.NameOf(slot)} เท่านั้น");
             return false;
+        }
 
         if (isBlank && !EnchantRegistry.IsEnchanted(uniqueId))
         {
@@ -69,43 +72,12 @@ public static class EnchantSystem
     }
 
     /// <summary>
-    /// Whether the item is the kind of thing this scroll names, and on the right side if
-    /// the scroll names a side.
-    /// </summary>
-    /// <remarks>
-    /// Two checks rather than one because they fail for different reasons and a player can
-    /// only fix the second one. Pointing an armour scroll at a bow is a mistake; pointing a
-    /// left accessory scroll at a ring in the bag is a ring that needs putting on first,
-    /// and saying so is the difference between a wasted trip and a wasted scroll.
-    /// </remarks>
-    private static bool CheckSlot(Player player, ref ItemReference item, Guid uniqueId, EnchantScrollSlot slot)
-    {
-        if (!EnchantScrolls.FitsSlot(item.Id, slot))
-        {
-            CommandBuilder.ErrorMessage(player, $"คัมภีร์นี้ใช้ได้กับ {EnchantScrolls.NameOf(slot)} เท่านั้น");
-            return false;
-        }
-
-        var required = EnchantScrolls.RequiredEquipSlot(slot);
-        if (required == EquipSlot.None)
-            return true;
-
-        if (SlotHolding(player, uniqueId) == required)
-            return true;
-
-        var side = slot == EnchantScrollSlot.AccessoryLeft ? "ซ้าย" : "ขวา";
-        CommandBuilder.ErrorMessage(player, $"ต้องสวมเครื่องประดับชิ้นนี้ไว้ที่ช่อง{side}ก่อนถึงจะจารได้");
-        return false;
-    }
-
-    /// <summary>
     /// A scroll used on one chosen item, wherever that item is sitting.
     /// </summary>
     /// <remarks>
     /// Works on anything in the bag rather than only on what is worn, which is the whole
-    /// point of letting the player pick - the one exception being the accessory scrolls,
-    /// which name a side and so need the ring on. An item that is being worn is refreshed
-    /// on the spot; one in the bag picks its options up when it next goes on.
+    /// point of letting the player pick. An item that is being worn is refreshed on the
+    /// spot; one in the bag picks its options up when it next goes on.
     /// </remarks>
     public static bool TryApplyToItem(Player player, int targetBagId, EnchantTier tier, EnchantScrollSlot slot, bool isBlank)
     {

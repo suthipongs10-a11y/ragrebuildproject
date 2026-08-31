@@ -44,8 +44,7 @@ namespace Assets.Scripts.UI.EnchantItem
             HeadMid,
             HeadLow,
             Shoes,
-            AccLeft,
-            AccRight
+            Accessory
         }
 
         private GenericItemListV2 window;
@@ -89,8 +88,7 @@ namespace Assets.Scripts.UI.EnchantItem
                 case "HeadMid": return ScrollSlot.HeadMid;
                 case "HeadLow": return ScrollSlot.HeadLow;
                 case "Shoes": return ScrollSlot.Shoes;
-                case "AccLeft": return ScrollSlot.AccLeft;
-                case "AccRight": return ScrollSlot.AccRight;
+                case "Accessory": return ScrollSlot.Accessory;
                 default: return ScrollSlot.Any;
             }
         }
@@ -106,8 +104,7 @@ namespace Assets.Scripts.UI.EnchantItem
                 case ScrollSlot.HeadMid: return "ของสวมหัว Middle";
                 case ScrollSlot.HeadLow: return "ของสวมหัว Low";
                 case ScrollSlot.Shoes: return "รองเท้า";
-                case ScrollSlot.AccLeft: return "เครื่องประดับช่องซ้าย";
-                case ScrollSlot.AccRight: return "เครื่องประดับช่องขวา";
+                case ScrollSlot.Accessory: return "เครื่องประดับ";
                 default: return "อุปกรณ์";
             }
         }
@@ -127,7 +124,7 @@ namespace Assets.Scripts.UI.EnchantItem
             var entryId = 0;
             foreach (var (_, item) in state.Inventory.GetInventoryData())
             {
-                if (!IsEnchantable(state, item))
+                if (!IsEnchantable(item))
                     continue;
 
                 var sprite = ClientDataLoader.Instance.GetIconAtlasSprite(item.ItemData.Sprite);
@@ -159,16 +156,8 @@ namespace Assets.Scripts.UI.EnchantItem
                 window.TitleBar.text = EmptyMessage(slot);
         }
 
-        private static string EmptyMessage(ScrollSlot slot)
-        {
-            if (slot == ScrollSlot.AccLeft || slot == ScrollSlot.AccRight)
-            {
-                var side = slot == ScrollSlot.AccLeft ? "ซ้าย" : "ขวา";
-                return $"ต้องสวมเครื่องประดับไว้ที่ช่อง{side}ก่อน";
-            }
-
-            return $"ไม่มี{NameOfSlot(slot)}ที่ใส่ออพได้ในกระเป๋า";
-        }
+        private static string EmptyMessage(ScrollSlot slot) =>
+            $"ไม่มี{NameOfSlot(slot)}ที่ใส่ออพได้ในกระเป๋า";
 
         /// <summary>Only things the server would accept for this particular scroll.</summary>
         /// <remarks>
@@ -179,11 +168,8 @@ namespace Assets.Scripts.UI.EnchantItem
         /// A two-handed weapon has the off-hand bit set as well, which is what the class
         /// test is guarding: without it every claymore in the bag would show up under the
         /// shield scroll.
-        ///
-        /// The two accessory scrolls name a side, and nothing about a ring says which side
-        /// it belongs on, so the only thing that can answer is what the player is wearing.
         /// </remarks>
-        private bool IsEnchantable(PlayerState state, InventoryItem item)
+        private bool IsEnchantable(InventoryItem item)
         {
             if (!item.ItemData.IsUnique)
                 return false;
@@ -212,12 +198,8 @@ namespace Assets.Scripts.UI.EnchantItem
                     return (pos & EquipPosition.HeadLower) != 0;
                 case ScrollSlot.Shoes:
                     return (pos & EquipPosition.Footgear) != 0;
-                case ScrollSlot.AccLeft:
-                    return (pos & EquipPosition.Accessory) != 0
-                           && state.EquippedItems[(int)EquipSlot.Accessory1] == item.BagSlotId;
-                case ScrollSlot.AccRight:
-                    return (pos & EquipPosition.Accessory) != 0
-                           && state.EquippedItems[(int)EquipSlot.Accessory2] == item.BagSlotId;
+                case ScrollSlot.Accessory:
+                    return (pos & EquipPosition.Accessory) != 0;
                 default:
                     return false;
             }

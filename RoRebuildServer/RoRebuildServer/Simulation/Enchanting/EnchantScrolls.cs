@@ -9,15 +9,15 @@ namespace RoRebuildServer.Simulation.Enchanting;
 /// The one equipment slot a scroll is written for.
 /// </summary>
 /// <remarks>
-/// Nine, not seven, and not one. A scroll that worked on anything would make the whole
-/// grind a single currency: craft, use on whatever you happen to be holding, done. Naming
-/// the slot on the scroll means the thing a player is short of is a particular scroll
-/// rather than scrolls in general, which is what makes them worth trading.
+/// Eight, not one. A scroll that worked on anything would make the whole grind a single
+/// currency: craft, use on whatever you happen to be holding, done. Naming the slot on the
+/// scroll means the thing a player is short of is a particular scroll rather than scrolls
+/// in general, which is what makes them worth trading.
 ///
-/// The two accessory sides are the odd pair. Nothing in the item data tells a ring apart
-/// from another ring - a ring is a ring and it goes in whichever accessory slot is free -
-/// so the side has to be read off the player rather than off the item, and that means the
-/// accessory has to be worn to be enchanted. Every other slot works on anything in the bag.
+/// One accessory rather than two. The game has two accessory slots but no left and right
+/// accessory: a ring is a ring, it goes in whichever of the two is free, and nothing in the
+/// item data or the equip code tells one side from the other. Two scrolls for it would have
+/// been two names for the same thing.
 ///
 /// Garment has no scroll on purpose: it is not in the list this was built from. The tables
 /// below take one more entry each if it ever should be.
@@ -31,8 +31,7 @@ public enum EnchantScrollSlot : byte
     HeadMid,
     HeadLow,
     Shoes,
-    AccessoryLeft,
-    AccessoryRight
+    Accessory
 }
 
 /// <summary>
@@ -53,19 +52,18 @@ public static class EnchantScrolls
         EnchantScrollSlot.HeadMid,
         EnchantScrollSlot.HeadLow,
         EnchantScrollSlot.Shoes,
-        EnchantScrollSlot.AccessoryLeft,
-        EnchantScrollSlot.AccessoryRight
+        EnchantScrollSlot.Accessory
     ];
 
     /// <summary>The tail of the item code for each slot, matching ItemsUsable.csv.</summary>
     private static readonly string[] slotCodes =
-        ["Weapon", "Armour", "Shield", "HeadTop", "HeadMid", "HeadLow", "Shoes", "AccLeft", "AccRight"];
+        ["Weapon", "Armour", "Shield", "HeadTop", "HeadMid", "HeadLow", "Shoes", "Accessory"];
 
     /// <summary>What to call the slot when talking to the player.</summary>
     private static readonly string[] slotNames =
     [
         "อาวุธ", "ชุดเกราะ", "โล่", "ส่วนหัว Top", "ส่วนหัว Middle", "ส่วนหัว Low",
-        "รองเท้า", "เครื่องประดับ ซ้าย", "เครื่องประดับ ขวา"
+        "รองเท้า", "เครื่องประดับ"
     ];
 
     /// <summary>
@@ -73,16 +71,15 @@ public static class EnchantScrolls
     /// </summary>
     /// <remarks>
     /// The crafting recipe is the same whichever scroll comes out, so this is the only place
-    /// the scroll a player actually wants is made expensive. Accessories carry both stat
-    /// pools and are the strongest thing to enchant, and the two head slots below the top
-    /// one are worth having for the same reason a mid headgear is worth having: it is a slot
-    /// most people leave empty. Those four are a twentieth each; the other five split the
-    /// rest evenly.
+    /// the scroll a player actually wants is made expensive. The accessory carries both stat
+    /// pools and is the strongest thing to enchant, and the two head slots below the top one
+    /// are worth having for the same reason a mid headgear is: they are slots most people
+    /// leave empty. Those three are a twentieth each; the other five split the rest evenly.
     ///
     /// Adds up to a hundred on purpose, so the numbers here are the percentages in the
     /// dialogue without anybody having to work them out again.
     /// </remarks>
-    private static readonly int[] slotWeights = [16, 16, 16, 16, 5, 5, 16, 5, 5];
+    private static readonly int[] slotWeights = [17, 17, 17, 17, 5, 5, 17, 5];
 
     private const int WeightTotal = 100;
 
@@ -151,10 +148,8 @@ public static class EnchantScrolls
             case "low": slot = EnchantScrollSlot.HeadLow; return true;
             case "shoes":
             case "footgear": slot = EnchantScrollSlot.Shoes; return true;
-            case "accleft":
-            case "left": slot = EnchantScrollSlot.AccessoryLeft; return true;
-            case "accright":
-            case "right": slot = EnchantScrollSlot.AccessoryRight; return true;
+            case "accessory":
+            case "acc": slot = EnchantScrollSlot.Accessory; return true;
             default: return false;
         }
     }
@@ -177,25 +172,12 @@ public static class EnchantScrolls
     }
 
     /// <summary>
-    /// The equip slot an item has to be worn in, or None if it does not have to be worn.
-    /// </summary>
-    /// <remarks>
-    /// Accessory1 is the left column of the equipment window and Accessory2 the right, which
-    /// is the only thing "left" and "right" can mean to somebody looking at the screen.
-    /// </remarks>
-    public static EquipSlot RequiredEquipSlot(EnchantScrollSlot slot) => slot switch
-    {
-        EnchantScrollSlot.AccessoryLeft => EquipSlot.Accessory1,
-        EnchantScrollSlot.AccessoryRight => EquipSlot.Accessory2,
-        _ => EquipSlot.None
-    };
-
-    /// <summary>
     /// Whether the item itself is the kind of thing this scroll is written for.
     /// </summary>
     /// <remarks>
     /// The same rules the equip code uses to decide what fits where, read off the item data
-    /// rather than off what the player is wearing, so a scroll works on a spare in the bag.
+    /// rather than off what the player is wearing, so every scroll works on a spare sitting
+    /// in the bag as well as on the piece being worn.
     /// A headgear that covers two slots answers yes to both of them - it really does occupy
     /// both - and a two-handed weapon is a weapon rather than a shield, because it is in the
     /// weapon table and never reaches the armour branch.
@@ -218,8 +200,7 @@ public static class EnchantScrolls
             EnchantScrollSlot.HeadTop => isHeadgear && armor.HeadPosition.HasFlag(HeadgearPosition.Top),
             EnchantScrollSlot.HeadMid => isHeadgear && armor.HeadPosition.HasFlag(HeadgearPosition.Mid),
             EnchantScrollSlot.HeadLow => isHeadgear && armor.HeadPosition.HasFlag(HeadgearPosition.Bottom),
-            EnchantScrollSlot.AccessoryLeft => armor.EquipPosition.HasFlag(EquipPosition.Accessory),
-            EnchantScrollSlot.AccessoryRight => armor.EquipPosition.HasFlag(EquipPosition.Accessory),
+            EnchantScrollSlot.Accessory => armor.EquipPosition.HasFlag(EquipPosition.Accessory),
             _ => false
         };
     }
