@@ -238,4 +238,9 @@ public enum NpcInteractionType
     NpcOpenRefineWindow,
     NpcBeginItemTrade,
     NpcPromptForCount,
+
+    //Appended rather than slotted in beside the refine window it resembles: the value is
+    //the wire format, and moving an existing one renumbers every client that has not had
+    //updateclient.bat run against it.
+    NpcOpenEnchantGuide,
 }

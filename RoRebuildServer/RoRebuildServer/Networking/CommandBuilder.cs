@@ -1539,6 +1539,22 @@ public static partial class CommandBuilder
         NetworkManager.SendMessage(packet, p.Connection);
     }
 
+    /// <summary>
+    /// Opens the enchant handbook on the player's screen.
+    /// </summary>
+    /// <remarks>
+    /// Carries nothing. Everything the guide shows - the recipes, the odds, where a
+    /// material drops - the client already has or can work out, so this is only the shove
+    /// that opens the window.
+    /// </remarks>
+    public static void SendNpcOpenEnchantGuide(Player p)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.NpcInteraction, 8);
+        packet.Write((byte)NpcInteractionType.NpcOpenEnchantGuide);
+
+        NetworkManager.SendMessage(packet, p.Connection);
+    }
+
     public static void SendNpcOpenShop(Player p, Npc npc, bool canDiscount)
     {
         var packet = NetworkManager.StartPacket(PacketType.OpenShop, 128);

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Assets.Scripts.Network.HandlerBase;
 using Assets.Scripts.UI;
+using Assets.Scripts.UI.EnchantGuide;
 using Assets.Scripts.UI.Inventory;
 using Assets.Scripts.UI.RefineItem;
 using RebuildSharedData.Networking;
@@ -75,6 +76,12 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers
                 case NpcInteractionType.NpcOpenRefineWindow:
                     Camera.DialogPanel.GetComponent<DialogWindow>().HideUI();
                     RefineItemWindow.OpenRefineItemWindow();
+                    break;
+                case NpcInteractionType.NpcOpenEnchantGuide:
+                    //Left open on purpose when the conversation ends - NpcEndInteraction
+                    //clears the refine window and the storage window by name, and the guide
+                    //is not one of them, so it stays up to be read after the scribe is done.
+                    EnchantGuideWindow.Open();
                     break;
                 default:
                     Debug.LogError($"Unknown Npc Interaction type: {type}");

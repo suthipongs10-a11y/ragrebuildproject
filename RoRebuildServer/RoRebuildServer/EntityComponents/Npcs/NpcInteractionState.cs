@@ -419,6 +419,21 @@ public class NpcInteractionState
         CommandBuilder.SendNpcOpenRefineDialog(Player);
     }
 
+    /// <summary>
+    /// Opens the enchant handbook. Does not wait for it.
+    /// </summary>
+    /// <remarks>
+    /// Unlike the refine window this is not registered as a waiting function, because there
+    /// is nothing to wait for - the guide is something to read, not something to answer. A
+    /// script that calls it should end the conversation on the same branch, or the option
+    /// menu comes back up on top of the window the player just asked for.
+    /// </remarks>
+    public void OpenEnchantGuide()
+    {
+        if (Player == null) return;
+        CommandBuilder.SendNpcOpenEnchantGuide(Player);
+    }
+
     public void OpenShop(bool hasDiscount = true)
     {
         if (Player == null)
