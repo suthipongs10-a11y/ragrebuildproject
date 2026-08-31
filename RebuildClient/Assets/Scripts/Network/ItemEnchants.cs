@@ -165,7 +165,11 @@ namespace Assets.Scripts.Network
                 case CharacterStat.AddMDef: return "MDEF";
                 case CharacterStat.AddMaxHp: return "MaxHP";
                 case CharacterStat.AddMaxSp: return "MaxSP";
-                case CharacterStat.AddCrit: return "CRIT";
+                //Two separate things on a weapon: how often a crit lands, and how hard it
+                //hits when it does. GetBaseCritRate reads the first, the damage multiplier
+                //in CombatEntity reads the second as a percent.
+                case CharacterStat.AddCrit: return "CRI";
+                case CharacterStat.AddCritDamage: return "CRI DMG";
                 case CharacterStat.AddFlee: return "FLEE";
                 case CharacterStat.AddHit: return "HIT";
                 case CharacterStat.AspdBonus: return "ASPD";
