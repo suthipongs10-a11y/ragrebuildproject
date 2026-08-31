@@ -24,6 +24,7 @@ using RoRebuildServer.Simulation.Items;
 using RoRebuildServer.Simulation.Parties;
 using RoRebuildServer.Simulation.Pathfinding;
 using RoRebuildServer.Simulation.Trading;
+using RoRebuildServer.Simulation.Enchanting;
 using RoRebuildServer.Simulation.Skills;
 using RoRebuildServer.Simulation.Skills.SkillHandlers;
 using RoRebuildServer.Simulation.Util;
@@ -1773,6 +1774,27 @@ public class Player : IEntityAutoReset
         Character.StopMovingImmediately();
         SkillHandler.ExecuteSkill(cast, CombatEntity);
     }
+
+    /// <summary>
+    /// Whether an enchant scroll for this slot family would land on anything.
+    /// </summary>
+    /// <remarks>
+    /// The four of these are what the scroll scripts in Script/Items call. They are thin on
+    /// purpose - everything they do lives in EnchantSystem, and this is only the doorway the
+    /// script language can see through.
+    /// </remarks>
+    [ScriptUseable]
+    public bool CanUseEnchantScroll(string family) => EnchantSystem.CanUseScroll(this, family);
+
+    [ScriptUseable]
+    public void UseEnchantScroll(string family, int tier) =>
+        EnchantSystem.UseScroll(this, family, (EnchantTier)tier);
+
+    [ScriptUseable]
+    public bool CanUseBlankEnchantScroll() => EnchantSystem.CanUseBlankScroll(this);
+
+    [ScriptUseable]
+    public void UseBlankEnchantScroll() => EnchantSystem.BlankScroll(this);
 
     [ScriptUseable]
     public void UseItemCreationItem(string type)

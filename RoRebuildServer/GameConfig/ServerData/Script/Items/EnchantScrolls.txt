@@ -1,0 +1,36 @@
+﻿//The enchant scrolls.
+//
+//A scroll names the slot family it works on, which is why there is no window asking the
+//player which item they meant - the weapon scroll goes on the weapon and that is the end
+//of it. Headgear and accessory cover more than one slot and take the first one that has
+//something in it.
+//
+//OnValidate runs before the scroll leaves the bag, so refusing there costs the player
+//nothing. Once it passes, the scroll is spent whatever the roll comes back with - a scroll
+//that only charged you when it worked would not be a gamble.
+
+//--- Earth: one option, the gentlest values, and it almost never comes up empty ----------
+Item("Ench_Earth_Headgear")  { OnValidate: return CanUseEnchantScroll("Headgear");  OnUse: UseEnchantScroll("Headgear", 1); }
+Item("Ench_Earth_Body")      { OnValidate: return CanUseEnchantScroll("Body");      OnUse: UseEnchantScroll("Body", 1); }
+Item("Ench_Earth_Weapon")    { OnValidate: return CanUseEnchantScroll("Weapon");    OnUse: UseEnchantScroll("Weapon", 1); }
+Item("Ench_Earth_Shield")    { OnValidate: return CanUseEnchantScroll("Shield");    OnUse: UseEnchantScroll("Shield", 1); }
+Item("Ench_Earth_Garment")   { OnValidate: return CanUseEnchantScroll("Garment");   OnUse: UseEnchantScroll("Garment", 1); }
+Item("Ench_Earth_Shoes")     { OnValidate: return CanUseEnchantScroll("Shoes");     OnUse: UseEnchantScroll("Shoes", 1); }
+Item("Ench_Earth_Accessory") { OnValidate: return CanUseEnchantScroll("Accessory"); OnUse: UseEnchantScroll("Accessory", 1); }
+
+//--- Sky: two options, larger values, and a real chance one of the two stays blank -------
+Item("Ench_Sky_Headgear")  { OnValidate: return CanUseEnchantScroll("Headgear");  OnUse: UseEnchantScroll("Headgear", 2); }
+Item("Ench_Sky_Body")      { OnValidate: return CanUseEnchantScroll("Body");      OnUse: UseEnchantScroll("Body", 2); }
+Item("Ench_Sky_Weapon")    { OnValidate: return CanUseEnchantScroll("Weapon");    OnUse: UseEnchantScroll("Weapon", 2); }
+Item("Ench_Sky_Shield")    { OnValidate: return CanUseEnchantScroll("Shield");    OnUse: UseEnchantScroll("Shield", 2); }
+Item("Ench_Sky_Garment")   { OnValidate: return CanUseEnchantScroll("Garment");   OnUse: UseEnchantScroll("Garment", 2); }
+Item("Ench_Sky_Shoes")     { OnValidate: return CanUseEnchantScroll("Shoes");     OnUse: UseEnchantScroll("Shoes", 2); }
+Item("Ench_Sky_Accessory") { OnValidate: return CanUseEnchantScroll("Accessory"); OnUse: UseEnchantScroll("Accessory", 2); }
+
+//--- The blank scroll ---------------------------------------------------------------------
+//
+//One item for all seven slots rather than seven of them: wiping is not a gamble, so there
+//is nothing to gain from making the player carry the right one. It walks the slots in the
+//order the families are declared and wipes the first thing wearing options, and refuses
+//outright when nothing is.
+Item("Ench_Blank") { OnValidate: return CanUseBlankEnchantScroll(); OnUse: UseBlankEnchantScroll(); }

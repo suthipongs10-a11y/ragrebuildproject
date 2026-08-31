@@ -252,10 +252,7 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 6022,Hard_Skin,Hard Skin,884,10,None,딱딱한피부
 6023,Mystic_Horn,Mystic Horn,1000,10,None,마력의뿔
 6027,Crystal_of_Feardom,Crystal of Feardom,0,0,None,피어둠결정체
-6028,Sealed_Scroll,Sealed Scroll,0,0,None,빛의주문서
 6029,Morroc_Tracing_Log,Morroc Tracing Log,0,0,None,고대언어문서
-6030,Glittering_Paper,Glittering Paper,0,10,None,기름종이
-6031,Glittering_Paper_,Glittering Paper,0,10,None,기름종이
 6032,Horn_of_Hillslion,Horn of Hillslion,500,10,None,새하얀뿔
 6033,Horn_of_Tendrilion,Horn of Tendrilion,500,10,None,새하얀뿔
 6035,Decaying_Stem,Decaying Stem,0,0,None,나무뿌리
@@ -266,8 +263,6 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 6040,Part_of_a_Report,Part of a Report,0,10,None,고대언어문서
 6041,Strong_Vine,Strong Vine,30,50,None,질긴나무덩쿨
 6042,Ordinary_Branch,Ordinary Branch,0,10,None,튼튼한나무가지
-6043,Letter_from_Lugen,Letter from Lugen,0,10,None,안부편지
-6044,Letter_from_Otto,Letter from Otto,0,10,None,상인만수편지
 6045,Supply_Box,Supply Box,0,0,None,상인전직상자
 6046,Clothing_Voucher,Clothing Voucher,0,0,None,카프라이용권
 6048,Unidentified_Mineral,Unidentified Mineral,0,10,None,미스릴광석
@@ -401,7 +396,6 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 7142,Embryo,Embryo,10,10,None,엠브리오
 7143,Glass_Tube,Glass Tube,5000,10,None,유리관
 7144,Potion_Creation_Gude,Potion Creation Gude,100000,10,None,일반포션제조책
-7148,Mother's_Letter,Mother's Letter,1,10,None,상인만수편지
 7149,Yellow_Plate,Yellow Plate,220,10,None,노란접시
 7150,Piece_of_Bamboo,Piece of Bamboo,310,10,None,대나무조각
 7151,Oil_Paper,Oil Paper,210,10,None,기름종이
@@ -432,7 +426,6 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 7178,Sobbing_Starlight,Sobbing Starlight,0,0,None,별의흐느낌
 7181,Receipt_,Receipt,0,10,None,물품영수증_01
 7182,Cacao,Cacao,200,20,None,카카오
-7183,Letter_from_Sister,Letter from Sister,0,10,None,편지01
 7184,Piano_Key,Piano Key,0,10,None,건반
 7186,Thin_Trunk,Thin Trunk,380,10,None,가는줄기
 7187,Festival_Mask,Festival Mask,100,10,None,가면
@@ -502,7 +495,6 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 7275,Record_of_Ancient_Language,Record of Ancient Language,0,10,None,고대언어문서
 7276,Doodled_Message,Doodled Message,0,10,None,그림편지
 7277,Munak_Doll,Munak Doll,8900,10,None,무낙인형
-7278,Letter_to_Wife,Letter to Wife,0,10,None,안부편지
 7285,Holy_Threads,Holy Threads,2,10,None,실타래
 7286,Red_Chili,Red Chili,20,10,None,칠리
 7287,Holier_Threads,Holier Threads,2,10,None,실타래
@@ -570,7 +562,6 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 7357,Crest_Piece_2,Crest Piece 2,5000,10,None,문장2
 7358,Crest_Piece_3,Crest Piece 3,5000,10,None,문장3
 7359,Crest_Piece_4,Crest Piece 4,5000,10,None,문장4
-7416,Letter_of_Recommendation,Letter of Recommendation,0,0,None,한석봉소개장
 7417,Written_Request_A,Written Request A,0,0,None,물품영수증_01
 7418,Written_Request_B,Written Request B,0,0,None,물품영수증_01
 7420,Skull_,Skull,0,0,None,해골바가지
@@ -579,12 +570,6 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 7423,Blue_Key,Blue Key,0,0,None,열쇠_파랑
 7424,Green_Key,Green Key,0,0,None,열쇠_초록
 7425,Black_Key,Black Key,0,0,None,열쇠_검정
-7426,Red_Charm_Stone,Red Charm Stone,0,0,None,마력석_빨강
-7427,Yellow_Charm_Stone,Yellow Charm Stone,0,0,None,마력석_노랑
-7428,Blue_Charm_Stone,Blue Charm Stone,0,0,None,마력석_파랑
-7429,Green_Charm_Stone,Green Charm Stone,0,0,None,마력석_초록
-7430,Black_Charm_Stone,Black Charm Stone,0,0,None,마력석_검정
-7431,Pile_of_Books,Pile of Books,0,0,None,여러권의책
 7432,Leather_Pouch,Leather Pouch,0,0,None,주머니
 7433,Blank_Scroll,Blank Scroll,4000,10,Crafting,낡은두루마리
 7434,Elemental_Potion_Creation_Guide,Elemental Potion Creation Guide,100000,10,None,기뢰병제조책
