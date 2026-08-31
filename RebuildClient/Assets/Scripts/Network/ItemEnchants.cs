@@ -49,6 +49,33 @@ namespace Assets.Scripts.Network
 
         private static readonly string[] tierNames = { "", "ดิน", "ฟ้า", "สวรรค์", "ตำนาน" };
 
+        /// <summary>
+        /// The line each tier says for itself.
+        /// </summary>
+        /// <remarks>
+        /// Drawn in one colour for every tier, deliberately not the tier's own. The stat
+        /// lines are the part a player reads for a number and the tier colour is what tells
+        /// them how good it is; this line is not information, and colouring it the same
+        /// would make the block read as one long list of numbers.
+        /// </remarks>
+        private static readonly string[] tierFlavour =
+        {
+            "",
+            "ผืนดินสลักพลังนี้ไว้ให้เจ้าแล้ว",
+            "นี่คือพลังที่ฟ้าประทานให้เจ้า",
+            "สรวงสวรรค์เบิกทางให้เฉพาะผู้ที่คู่ควร",
+            "ตำนานบทใหม่เริ่มต้นขึ้นในมือของเจ้า"
+        };
+
+        private const string FlavourColor = "#6B3FB0"; //arcane violet, apart from all four tier colours
+        private const string NoteColor = "#7A7480";
+
+        /// <summary>
+        /// What takes the options back off, named so a player can read it off the item
+        /// rather than having to go and ask somebody.
+        /// </summary>
+        private const string ResetItemName = "คัมภีร์ล้างออพ";
+
         public static void Set(Guid uniqueId, ItemEnchantEntry entry)
         {
             if (uniqueId == Guid.Empty)
@@ -101,6 +128,15 @@ namespace Assets.Scripts.Network
                   .Append(option.Value >= 0 ? "+" : "").Append(option.Value)
                   .Append("</color>");
             }
+
+            //Tier zero has nothing to say and should never reach here, but a blank pair of
+            //quotation marks is a worse thing to print than nothing at all.
+            if (!string.IsNullOrEmpty(tierFlavour[tier]))
+                sb.Append("\n<color=").Append(FlavourColor).Append("><i>« ")
+                  .Append(tierFlavour[tier]).Append(" »</i></color>");
+
+            sb.Append("\n<size=-4><color=").Append(NoteColor).Append(">ลบออพนี้ได้ด้วย ")
+              .Append(ResetItemName).Append("</color></size>");
 
             return sb.ToString();
         }
