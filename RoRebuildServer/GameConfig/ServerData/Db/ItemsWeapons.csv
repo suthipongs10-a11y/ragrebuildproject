@@ -176,12 +176,12 @@ Id,Code,Name,Attack,Range,Slot,Price,Weight,Type,Position,Property,MinLvl,Rank,E
 1408,Pike_,Pike,60,3,4,3450,1000,Spear,MainHand,Neutral,4,1,Swordsman,Yes,Yes,파이크,
 1410,Lance,Lance,185,3,0,60000,2500,2HSpear,BothHands,Neutral,33,3,Swordsman,Yes,Yes,랜스,1410
 1411,Lance_,Lance,185,3,2,60000,2500,2HSpear,BothHands,Neutral,33,3,Swordsman,Yes,Yes,랜스,1410
-1413,Gungnir,Gungnir,120,3,0,20,500,Spear,MainHand,Wind,4,4,Swordsman,Yes,Yes,궁그닐,
+1413,Gungnir,Gungnir,120,3,0,20,500,Spear,MainHand,Wind,48,4,Swordsman,Yes,Yes,궁그닐,
 1414,Gelerdria,Gelerdria,145,3,0,20,700,Spear,MainHand,Earth,48,4,Swordsman,Yes,Yes,겔러드리아,
 1415,Brocca,Brocca,100,3,0,20,850,Spear,MainHand,Neutral,48,4,Swordsman,Yes,Yes,꼬챙이,
 1416,Tjungkuletti,Tjungkuletti,95,3,0,20,1000,Spear,MainHand,Neutral,48,4,Swordsman,Yes,Yes,튱클레티,
 1417,Pole_Axe,Pole Axe,160,3,1,20,3800,Spear,MainHand,Neutral,71,3,Swordsman,Yes,Yes,폴액스,
-1418,Gungnir_,Gungnir,120,3,2,20,500,Spear,MainHand,Wind,4,4,Swordsman,Yes,Yes,궁그닐,
+1418,Gungnir_,Gungnir,120,3,2,20,500,Spear,MainHand,Wind,48,4,Swordsman,Yes,Yes,궁그닐,
 1420,Long_Horn,Long Horn,150,3,1,10000,1000,Spear,MainHand,Holy,65,4,JC_080,Yes,No,롱혼,
 1421,Battle_Hook,Battle Hook,140,3,1,10000,900,Spear,MainHand,Neutral,65,4,JC_080,Yes,Yes,배틀훅,
 1422,Hunting_Spear,Hunting Spear,180,3,1,10000,4200,Spear,MainHand,Neutral,60,4,JC_080,Yes,Yes,헌팅스피어,

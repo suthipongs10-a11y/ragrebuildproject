@@ -448,7 +448,12 @@ Item("Katar_of_Raging_Blaze_") { OnEquip: AddStat(OnMeleeAttackSilence, 50); Add
 Item("Katar_of_Piercing_Wind_") { OnEquip: AddStat(OnMeleeAttackSleep, 50); AddStat(OnRangedAttackSleep, 50); }
 Item("Brave_Katar") { OnEquip: AddStat(AddStr, 1); AddStat(AddDex, 1); AddStat(AddLuk, 1); AddStat(AddAttackRaceDemihuman, 70); }
 Item("Valorous_Katar") { OnEquip: AddStat(AddStr, 1); AddStat(AddDex, 1); AddStat(AddLuk, 1); AddStat(AddAttackRaceDemihuman, 70); AddStat(AddCritDamage, 20); AddStat(AspdBonus, 5); }
-Item("Bloody_Axe") { OnEquip: AddStat(AddStr, 10); AddStat(MoveSpeedBonus, 34); }
+//The axe is meant to slow the wielder down, not speed them up. MoveSpeedBonus is a
+//divisor - moveBonus is 100/(100+x) - so -25 is 100/75, a third longer per tile,
+//which is the 25% slower the item is supposed to be. It read +34 because that is
+//the Moonlight Flower Card value and it was the only other item in the game using
+//this stat to copy from.
+Item("Bloody_Axe") { OnEquip: AddStat(AddStr, 10); AddStat(MoveSpeedBonus, -25); }
 Item("Great_Axe") { OnEquip: AddStat(OnMeleeAttackStun, 150); AddStat(OnRangedAttackStun, 150); }
 Item("Sabbath") { OnEquip: AddStat(AddCritChanceRaceUndead, 50); }
 Item("Light_Epsilon") { OnEquip: GrantSkill(Heal, 3); AddStat(AddAttackRaceDemon, 3); }
