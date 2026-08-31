@@ -1,6 +1,7 @@
 ﻿using System;
 using Assets.Scripts.Network.HandlerBase;
 using Assets.Scripts.Network.IncomingPacketHandlers;
+using Assets.Scripts.Network.IncomingPacketHandlers.Crafting;
 using Assets.Scripts.Network.IncomingPacketHandlers.Market;
 using Assets.Scripts.Network.IncomingPacketHandlers.Social;
 using Assets.Scripts.Network.IncomingPacketHandlers.Trading;
@@ -52,6 +53,7 @@ namespace Assets.Scripts.Network.PacketBase
             (PacketType.AuctionData, () => new PacketAuctionData()),
             (PacketType.BuyOrderData, () => new PacketBuyOrderData()),
             (PacketType.FriendData, () => new PacketFriendData()),
+            (PacketType.EnchantedItems, () => new PacketEnchantedItems()),
         };
 
         /// <summary>

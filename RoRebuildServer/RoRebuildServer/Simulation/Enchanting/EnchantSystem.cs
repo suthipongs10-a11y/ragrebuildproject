@@ -60,6 +60,13 @@ public static class EnchantSystem
     ///
     /// Nothing is worn is not a failure. An item sitting in the bag needs no refresh - it
     /// picks its options up the next time it is equipped.
+    ///
+    /// UpdateStats at the end because equipping does not do it. EquipItem fills the stat
+    /// array and stops there; every caller in the server does the recalculation itself -
+    /// the equip packet handler, the refine counter, and now this. Without it the options
+    /// sit in the array unread: attack, hp and attack speed are all worked out from the
+    /// stats during that pass, and the pass also sends the numbers to the client. Skipping
+    /// the skill half of it, the same way the refine counter does, since no skill changed.
     /// </remarks>
     public static bool RefreshIfWorn(Player player, Guid uniqueId)
     {
@@ -78,6 +85,7 @@ public static class EnchantSystem
         if (result != EquipChangeResult.Success)
             ServerLogger.LogWarning($"Could not re-equip {player.Name}'s {slot} after an enchant change: {result}.");
 
+        player.UpdateStats(false);
         return true;
     }
 }
