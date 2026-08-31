@@ -3,6 +3,7 @@ using RebuildSharedData.Enum.EntityStats;
 using RoRebuildServer.Data;
 using RoRebuildServer.EntityComponents;
 using RoRebuildServer.Logging;
+using System.Linq;
 using RoRebuildServer.Networking;
 using RoRebuildServer.Simulation;
 using RoRebuildServer.Simulation.Enchanting;
@@ -61,6 +62,8 @@ public static class GmCommands
             case "!ench":
             case "!enchshow":
             case "!enchclear":
+            case "!enchroll":
+            case "!enchodds":
                 break;
             default:
                 return false; //not ours - let the chat handler carry on with it
@@ -87,6 +90,8 @@ public static class GmCommands
             case "!ench": Enchant(player, parts); break;
             case "!enchshow": EnchantShow(player, parts); break;
             case "!enchclear": EnchantClear(player, parts); break;
+            case "!enchroll": EnchantRoll(player, parts); break;
+            case "!enchodds": EnchantOdds(player, parts); break;
         }
 
         return true;
@@ -106,6 +111,8 @@ public static class GmCommands
         Tell(player, "<color=#FFCC55>คำสั่งทดสอบระบบคัมภีร์</color>");
         Tell(player, "!ench <ช่อง> <tier> <สเตตัส> <ค่า> [สเตตัส ค่า] [สเตตัส ค่า]");
         Tell(player, "!enchshow <ช่อง> · !enchclear <ช่อง>");
+        Tell(player, "!enchroll <ช่อง> <tier> — สุ่มจริงตามตาราง");
+        Tell(player, "!enchodds <ช่อง> <tier> [จำนวน] — ลองสุ่มเปล่า ๆ ดูการกระจาย");
         Tell(player, "<color=#AACCFF>ช่อง: weapon shield body headtop headmid headbottom garment footgear accessory1 accessory2</color>");
         Tell(player, "<color=#AACCFF>tier: 1 ดิน · 2 ฟ้า · 3 สวรรค์ · 4 ตำนาน</color>");
     }
@@ -581,6 +588,138 @@ public static class GmCommands
         EnchantSystem.RefreshIfWorn(player, uniqueId);
         CommandBuilder.SendEnchantCleared(player, uniqueId);
         Tell(player, $"<color=#55FF55>ล้างออพของ {itemName} ({slot}) แล้ว</color>");
+    }
+
+    /// <summary>
+    /// Rolls a scroll of the given tier onto whatever is in a slot, for real.
+    /// </summary>
+    /// <remarks>
+    /// The same call the scroll itself will make once the scroll exists, so what is being
+    /// tested here is the shipping path rather than a rehearsal of it. Unlike !ench this
+    /// obeys every rule in the tables: the slot decides the pool, the tier decides the
+    /// values, and an attempt is allowed to come up with nothing.
+    /// </remarks>
+    private static void EnchantRoll(Player player, string[] parts)
+    {
+        if (parts.Length < 3)
+        {
+            Tell(player, "ใช้: !enchroll <ช่อง> <tier 1-4>");
+            return;
+        }
+
+        if (!TryFindWornItem(player, parts[1], out var slot, out var uniqueId, out var itemName))
+            return;
+
+        if (!TryReadTier(player, parts[2], out var tier))
+            return;
+
+        var family = EnchantTables.FamilyOf(ItemIdInSlot(player, slot));
+        if (family == EnchantSlotFamily.None)
+        {
+            Tell(player, $"{itemName} ไม่ใช่ของที่ใส่ออพได้");
+            return;
+        }
+
+        var enchant = EnchantTables.Roll(tier, family);
+
+        EnchantRegistry.Record(uniqueId, enchant);
+        EnchantSystem.RefreshIfWorn(player, uniqueId);
+
+        if (enchant.Count == 0)
+        {
+            CommandBuilder.SendEnchantCleared(player, uniqueId);
+            Tell(player, $"<color=#FF5555>คัมภีร์สลายไปเปล่า ๆ</color> {itemName} ไม่ได้ออพสักตัว");
+            return;
+        }
+
+        CommandBuilder.SendForgedNameForId(player, uniqueId);
+        Tell(player, $"<color=#55FF55>สุ่มออพให้ {itemName} ({slot}) แล้ว</color> — พูล {family}");
+        DescribeEnchant(player, enchant);
+    }
+
+    /// <summary>
+    /// Rolls a great many scrolls without touching anything, and reports what came out.
+    /// </summary>
+    /// <remarks>
+    /// The only honest way to check odds. A handful of rolls in game tells nobody whether
+    /// fifteen percent is really fifteen percent, and the alternative to this is a player
+    /// noticing over a month that something is off.
+    /// </remarks>
+    private static void EnchantOdds(Player player, string[] parts)
+    {
+        if (parts.Length < 3)
+        {
+            Tell(player, "ใช้: !enchodds <ช่อง> <tier 1-4> [จำนวน]");
+            return;
+        }
+
+        if (!TryFindWornItem(player, parts[1], out var slot, out _, out var itemName))
+            return;
+
+        if (!TryReadTier(player, parts[2], out var tier))
+            return;
+
+        var samples = 1000;
+        if (parts.Length > 3 && (!int.TryParse(parts[3], out samples) || samples < 1 || samples > 100000))
+        {
+            Tell(player, "จำนวนต้องอยู่ระหว่าง 1 ถึง 100000");
+            return;
+        }
+
+        var family = EnchantTables.FamilyOf(ItemIdInSlot(player, slot));
+        if (family == EnchantSlotFamily.None)
+        {
+            Tell(player, $"{itemName} ไม่ใช่ของที่ใส่ออพได้");
+            return;
+        }
+
+        var attempts = EnchantTables.AttemptsFor(tier);
+        var blanks = 0;
+        var options = 0;
+        var perStat = new Dictionary<CharacterStat, (int Count, int Total, int Best)>();
+
+        for (var i = 0; i < samples; i++)
+        {
+            var rolled = EnchantTables.Roll(tier, family);
+            if (rolled.Count == 0)
+                blanks++;
+
+            options += rolled.Count;
+
+            for (var j = 0; j < rolled.Count; j++)
+            {
+                var opt = rolled.Options[j];
+                perStat.TryGetValue(opt.Stat, out var cur);
+                perStat[opt.Stat] = (cur.Count + 1, cur.Total + opt.Value, int.Max(cur.Best, opt.Value));
+            }
+        }
+
+        var (fail, low, high) = EnchantTables.OddsFor(tier);
+        var filled = (double)options / (samples * attempts);
+
+        Tell(player, $"<color=#FFCC55>สุ่ม {samples:N0} ครั้ง · ระดับ {tier} · พูล {family}</color>");
+        Tell(player, $"ตั้งไว้: พลาด {fail / 100f:0.#}% · หน้าต่ำ {low / 100f:0.#}% · หน้าสูง {high / 100f:0.#}% · {attempts} ออพต่อใบ");
+        Tell(player, $"ออกจริง: ติด {filled * 100:0.0}% ของช่องทั้งหมด (คาด {100f - fail / 100f:0.#}%)");
+        Tell(player, $"ได้ออพว่างทั้งใบ {blanks} ครั้ง ({(double)blanks / samples * 100:0.00}%) · เฉลี่ย {(double)options / samples:0.00} ออพต่อใบ");
+
+        foreach (var (stat, data) in perStat.OrderByDescending(e => e.Value.Count))
+            Tell(player, $"  {stat,-22} {data.Count,5} ครั้ง ({(double)data.Count / options * 100:0.0}%) เฉลี่ย {(double)data.Total / data.Count:0.0} สูงสุด {data.Best}");
+    }
+
+    private static int ItemIdInSlot(Player player, EquipSlot slot) => player.Equipment.ItemIds[(int)slot];
+
+    private static bool TryReadTier(Player player, string text, out EnchantTier tier)
+    {
+        tier = EnchantTier.None;
+
+        if (!int.TryParse(text, out var number) || number < 1 || number > 4)
+        {
+            Tell(player, "tier ต้องเป็น 1 ถึง 4 (ดิน ฟ้า สวรรค์ ตำนาน)");
+            return false;
+        }
+
+        tier = (EnchantTier)number;
+        return true;
     }
 
     /// <summary>
