@@ -191,6 +191,10 @@ public enum PacketType : byte
     //reason ForgedNames does - there is no room in a UniqueItem - and appended at the end
     //for the same reason as everything else down here.
     EnchantedItems,
+
+    //a scroll being used on one particular item in the bag. Client to server only: the
+    //answer comes back as an EnchantedItems packet like any other change to the options.
+    EnchantItem,
 }
 
 public enum MessageType : byte

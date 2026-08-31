@@ -12,7 +12,12 @@
         NotUsable,
         Use,
         UseOnAlly,
-        UseOnEnemy
+        UseOnEnemy,
+
+        //Used on another item in the bag rather than on a character. The client answers this
+        //by opening an item picker instead of sending the use straight off. Appended at the
+        //end because this travels as a number in the item table.
+        UseOnItem
     }
 
     public enum ItemClass : byte

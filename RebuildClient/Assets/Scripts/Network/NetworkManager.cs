@@ -1899,6 +1899,24 @@ namespace Assets.Scripts.Network
             SendMessage(msg);
         }
 
+        /// <summary>
+        /// A scroll, and the item in the bag it is being written onto.
+        /// </summary>
+        /// <remarks>
+        /// Its own packet rather than the target field on SendUseItem: that one carries an
+        /// entity id for a person, and this carries a bag slot for a thing.
+        /// </remarks>
+        public void SendEnchantItem(int scrollItemId, int targetBagId)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.EnchantItem);
+            msg.Write(scrollItemId);
+            msg.Write(targetBagId);
+
+            SendMessage(msg);
+        }
+
         public void SendEmote(int id)
         {
             var msg = StartMessage();

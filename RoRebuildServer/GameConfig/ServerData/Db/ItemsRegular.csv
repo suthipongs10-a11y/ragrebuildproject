@@ -512,7 +512,6 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 7299,Straw_Basket,Straw Basket,632,10,None,소쿠리
 7300,Gemstone,Gemstone,1420,10,None,원석
 7301,Tassel,Tassel,798,10,None,칼장식용실
-7304,Witch's_Spell_Scroll,Witch's Spell Scroll,0,0,None,마녀의주문서
 7305,Symbol_of_the_Nine_Realms,Symbol of the Nine Realms,0,0,None,아홉세계의권위
 7306,Piece_of_Spirit,Piece of Spirit,0,0,None,영혼의조각
 7307,Spiritual_Whispers,Spiritual Whispers,0,0,None,영혼의속삭임
@@ -736,3 +735,16 @@ Id,Code,Name,Price,Weight,Usage,Sprite
 11015,Expedition_Report_Vol3,Expedition Report Vol3,0,10,None,고대언어문서
 11016,Expedition_Report_Vol4,Expedition Report Vol4,0,10,None,고대언어문서
 11500,Okolnir_Key,Okolnir Key,30000,0,Quest,황금열쇠
+6031,Glittering_Paper_,Glittering Paper,0,10,None,기름종이
+6043,Letter_from_Lugen,Letter from Lugen,0,10,None,안부편지
+6044,Letter_from_Otto,Letter from Otto,0,10,None,상인만수편지
+7148,Mother's_Letter,Mother's Letter,1,10,None,상인만수편지
+7183,Letter_from_Sister,Letter from Sister,0,10,None,편지01
+7278,Letter_to_Wife,Letter to Wife,0,10,None,안부편지
+7416,Letter_of_Recommendation,Letter of Recommendation,0,0,None,한석봉소개장
+7426,Red_Charm_Stone,Red Charm Stone,0,0,None,마력석_빨강
+7427,Yellow_Charm_Stone,Yellow Charm Stone,0,0,None,마력석_노랑
+7428,Blue_Charm_Stone,Blue Charm Stone,0,0,None,마력석_파랑
+7429,Green_Charm_Stone,Green Charm Stone,0,0,None,마력석_초록
+7430,Black_Charm_Stone,Black Charm Stone,0,0,None,마력석_검정
+7431,Pile_of_Books,Pile of Books,0,0,None,여러권의책

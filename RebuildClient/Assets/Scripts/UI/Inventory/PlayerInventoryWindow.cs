@@ -2,6 +2,7 @@
 using System.Linq;
 using Assets.Scripts.Network;
 using Assets.Scripts.PlayerControl;
+using Assets.Scripts.UI.EnchantItem;
 using Assets.Scripts.Sprites;
 using RebuildSharedData.Enum;
 using TMPro;
@@ -120,6 +121,11 @@ namespace Assets.Scripts.UI.Inventory
                     break;
                 case ItemUseType.UseOnEnemy:
                     CameraFollower.Instance.BeginTargetingItem(item.Id, SkillTarget.Enemy);
+                    break;
+                case ItemUseType.UseOnItem:
+                    //The target is another item rather than a character, so the picker opens
+                    //here and nothing goes to the server until something is chosen.
+                    EnchantItemPicker.Open(item.BagSlotId, item.ItemData.Name);
                     break;
                 default:
                 {

@@ -17,82 +17,79 @@ namespace RoRebuildServer.Simulation.Enchanting;
 public static class EnchantSystem
 {
     /// <summary>
-    /// Which slots each kind of scroll looks at, in the order it looks at them.
+    /// Which tier each scroll writes, by item code.
     /// </summary>
     /// <remarks>
-    /// The scroll names the family, so there is no window asking the player which item they
-    /// meant - the weapon scroll goes on the weapon and that is the end of it. Two families
-    /// cover more than one slot, and those take the first slot that has something in it. A
-    /// player wearing two hats who wants the other one enchanted takes the first one off,
-    /// which is a smaller thing to ask than an item picker is to build.
+    /// Three scrolls rather than twenty-eight. The stat pool comes from the item being
+    /// enchanted, not from the scroll - FamilyOf reads it off the target - so once the
+    /// player picks the target there is nothing left for the scroll to specify but how
+    /// strong it is.
     ///
-    /// Names rather than an enum because these are typed into the item script by hand, and
-    /// a misspelling should be a warning in the log rather than a compiler error in a file
-    /// the compiler never sees.
+    /// Kept here rather than in the item script because the packet handler needs it before
+    /// any script runs, and one small table beats a script hook that exists to carry one
+    /// number.
     /// </remarks>
-    private static readonly (string Name, EquipSlot[] Slots)[] families =
+    private static readonly (string Code, EnchantTier Tier)[] scrolls =
     [
-        ("Headgear", [EquipSlot.HeadTop, EquipSlot.HeadMid, EquipSlot.HeadBottom]),
-        ("Body", [EquipSlot.Body]),
-        ("Weapon", [EquipSlot.RightHand]),
-        ("Shield", [EquipSlot.LeftHand]),
-        ("Garment", [EquipSlot.Garment]),
-        ("Shoes", [EquipSlot.Footgear]),
-        ("Accessory", [EquipSlot.Accessory1, EquipSlot.Accessory2])
+        ("Ench_Earth", EnchantTier.Earth),
+        ("Ench_Sky", EnchantTier.Sky),
+        ("Ench_Heaven", EnchantTier.Heaven),
+        ("Ench_Legend", EnchantTier.Legend)
     ];
 
-    /// <summary>What a scroll of this family would land on, if anything.</summary>
-    public static bool TryFindTarget(Player player, string familyName, out EquipSlot slot, out Guid uniqueId, out int itemId)
+    /// <summary>The code of the scroll that wipes options instead of rolling them.</summary>
+    public const string BlankScrollCode = "Ench_Blank";
+
+    /// <summary>
+    /// What this item does when used on another item, or None if it does nothing.
+    /// </summary>
+    public static bool TryReadScroll(string code, out EnchantTier tier, out bool isBlank)
     {
-        slot = EquipSlot.None;
-        uniqueId = Guid.Empty;
-        itemId = 0;
+        tier = EnchantTier.None;
+        isBlank = code == BlankScrollCode;
 
-        var inventory = player.Inventory;
-        if (inventory == null)
-            return false;
+        if (isBlank)
+            return true;
 
-        foreach (var (name, slots) in families)
+        foreach (var (scrollCode, scrollTier) in scrolls)
         {
-            if (!string.Equals(name, familyName, StringComparison.OrdinalIgnoreCase))
+            if (scrollCode != code)
                 continue;
 
-            foreach (var candidate in slots)
-            {
-                var bagId = player.Equipment.ItemSlots[(int)candidate];
-                if (bagId <= 0 || !inventory.GetItem(bagId, out var item))
-                    continue;
-
-                var guid = GuidOf(ref item);
-                if (guid == Guid.Empty)
-                    continue;
-
-                slot = candidate;
-                uniqueId = guid;
-                itemId = item.Id;
-                return true;
-            }
-
-            return false; //the family exists and nothing in it is wearable
+            tier = scrollTier;
+            return true;
         }
 
-        ServerLogger.LogWarning($"An enchant scroll named the slot family '{familyName}', which is not one of the seven.");
         return false;
     }
 
     /// <summary>
-    /// Whether using a scroll of this family would do anything, said out loud.
+    /// Whether a scroll used on this item would do anything, said out loud.
     /// </summary>
     /// <remarks>
-    /// Called before the scroll is taken out of the bag, so every no here is a scroll the
-    /// player still has. The reason is always given: an item that refuses silently gets
-    /// clicked again.
+    /// Run before the scroll is taken out of the bag, so every no here is a scroll the
+    /// player still has. Same split the ordinary item use makes between OnValidate and
+    /// OnUse, and for the same reason.
     /// </remarks>
-    public static bool CanUseScroll(Player player, string familyName)
+    public static bool CanApplyToItem(Player player, int targetBagId, bool isBlank)
     {
-        if (!TryFindTarget(player, familyName, out _, out _, out _))
+        var inventory = player.Inventory;
+        if (inventory == null || !inventory.GetItem(targetBagId, out var item))
         {
-            CommandBuilder.ErrorMessage(player, $"ต้องสวมของในตำแหน่งนั้นก่อนถึงจะใช้คัมภีร์ได้");
+            CommandBuilder.ErrorMessage(player, "หาของที่จะจารไม่เจอในกระเป๋า");
+            return false;
+        }
+
+        var uniqueId = GuidOf(ref item);
+        if (uniqueId == Guid.Empty || EnchantTables.FamilyOf(item.Id) == EnchantSlotFamily.None)
+        {
+            CommandBuilder.ErrorMessage(player, "ใส่ออพได้เฉพาะอาวุธ เกราะ และเครื่องประดับ");
+            return false;
+        }
+
+        if (isBlank && !EnchantRegistry.IsEnchanted(uniqueId))
+        {
+            CommandBuilder.ErrorMessage(player, "ของชิ้นนั้นไม่มีออพให้ล้างอยู่แล้ว");
             return false;
         }
 
@@ -100,26 +97,51 @@ public static class EnchantSystem
     }
 
     /// <summary>
-    /// One scroll, used.
+    /// A scroll used on one chosen item, wherever that item is sitting.
     /// </summary>
     /// <remarks>
-    /// The scroll has already been taken by the time this runs - that is the order the use
-    /// handler works in, and it is the right one: a roll that comes back empty still costs
-    /// the scroll, which is what makes it a gamble.
+    /// Works on anything in the bag rather than only on what is worn, which is the whole
+    /// point of letting the player pick. An item that is being worn is refreshed on the
+    /// spot; one in the bag picks its options up when it next goes on.
     /// </remarks>
-    public static void UseScroll(Player player, string familyName, EnchantTier tier)
+    public static bool TryApplyToItem(Player player, int targetBagId, EnchantTier tier, bool isBlank)
     {
-        if (!TryFindTarget(player, familyName, out var slot, out var uniqueId, out var itemId))
+        var inventory = player.Inventory;
+        if (inventory == null || !inventory.GetItem(targetBagId, out var item))
         {
-            CommandBuilder.ErrorMessage(player, "คัมภีร์สลายไปโดยไม่มีอะไรให้จาร");
-            return;
+            CommandBuilder.ErrorMessage(player, "หาของที่จะจารไม่เจอในกระเป๋า");
+            return false;
         }
 
-        var family = EnchantTables.FamilyOf(itemId);
-        if (family == EnchantSlotFamily.None)
+        var uniqueId = GuidOf(ref item);
+        if (uniqueId == Guid.Empty)
         {
             CommandBuilder.ErrorMessage(player, "ของชิ้นนี้ใส่ออพไม่ได้");
-            return;
+            return false;
+        }
+
+        var family = EnchantTables.FamilyOf(item.Id);
+        if (family == EnchantSlotFamily.None)
+        {
+            CommandBuilder.ErrorMessage(player, "ใส่ออพได้เฉพาะอาวุธ เกราะ และเครื่องประดับ");
+            return false;
+        }
+
+        var name = DataManager.ItemList.TryGetValue(item.Id, out var data) ? data.Code : item.Id.ToString();
+
+        if (isBlank)
+        {
+            if (!EnchantRegistry.IsEnchanted(uniqueId))
+            {
+                CommandBuilder.ErrorMessage(player, "ของชิ้นนั้นไม่มีออพให้ล้างอยู่แล้ว");
+                return false;
+            }
+
+            EnchantRegistry.Clear(uniqueId);
+            RefreshIfWorn(player, uniqueId);
+            CommandBuilder.SendEnchantCleared(player, uniqueId);
+            Announce(player, $"<color=#55FF55>ล้างออพของ {name} เรียบร้อย</color>");
+            return true;
         }
 
         var rolled = EnchantTables.Roll(tier, family);
@@ -127,84 +149,23 @@ public static class EnchantSystem
         EnchantRegistry.Record(uniqueId, rolled);
         RefreshIfWorn(player, uniqueId);
 
-        var name = DataManager.ItemList.TryGetValue(itemId, out var data) ? data.Code : itemId.ToString();
-
         if (rolled.Count == 0)
         {
             CommandBuilder.SendEnchantCleared(player, uniqueId);
             Announce(player, $"<color=#FF5555>คัมภีร์สลายไปเปล่า ๆ</color> {name} ไม่ได้ออพสักตัว");
-            return;
+            return true;
         }
 
         CommandBuilder.SendForgedNameForId(player, uniqueId);
-        Announce(player, $"<color=#55FF55>จารคัมภีร์ลง {name} ({slot}) สำเร็จ</color>");
+        Announce(player, $"<color=#55FF55>จารคัมภีร์ลง {name} สำเร็จ</color>");
 
         for (var i = 0; i < rolled.Count; i++)
             Announce(player, $"  {rolled.Options[i].Stat} +{rolled.Options[i].Value}");
 
-        ServerLogger.Log($"[Enchant] {player.Name} used a {tier} scroll on their {slot} and got {rolled.Count} option(s).");
+        ServerLogger.Log($"[Enchant] {player.Name} used a {tier} scroll and got {rolled.Count} option(s).");
+        return true;
     }
 
-    /// <summary>
-    /// Wipes the options off the first enchanted thing the player is wearing.
-    /// </summary>
-    /// <remarks>
-    /// One blank scroll for all seven slots rather than seven of them. Wiping is not a
-    /// gamble - there is no roll and no tier - so making somebody carry the right one of
-    /// seven buys nothing but a fuller bag.
-    ///
-    /// It walks the families in the order they are declared and takes the first one that
-    /// has options on it, and says which item it landed on. Somebody who wants a specific
-    /// piece wiped takes the ones above it off first, the same rule the headgear scroll
-    /// already works by.
-    ///
-    /// Worth knowing: re-rolling does not need this. A scroll replaces the whole block, so
-    /// the only reason to wipe is to hand somebody a clean item.
-    /// </remarks>
-    public static void BlankScroll(Player player)
-    {
-        if (!TryFindEnchanted(player, out var slot, out var uniqueId, out var itemId))
-        {
-            CommandBuilder.ErrorMessage(player, "คัมภีร์สลายไปโดยไม่มีอะไรให้ล้าง");
-            return;
-        }
-
-        var name = DataManager.ItemList.TryGetValue(itemId, out var data) ? data.Code : itemId.ToString();
-
-        EnchantRegistry.Clear(uniqueId);
-        RefreshIfWorn(player, uniqueId);
-        CommandBuilder.SendEnchantCleared(player, uniqueId);
-        Announce(player, $"<color=#55FF55>ล้างออพของ {name} ({slot}) เรียบร้อย</color>");
-        ServerLogger.Log($"[Enchant] {player.Name} wiped the options off their {slot}.");
-    }
-
-    /// <summary>Whether the player is wearing anything with options on it at all.</summary>
-    public static bool CanUseBlankScroll(Player player)
-    {
-        if (TryFindEnchanted(player, out _, out _, out _))
-            return true;
-
-        CommandBuilder.ErrorMessage(player, "ตอนนี้ไม่ได้สวมของที่มีออพอยู่สักชิ้น");
-        return false;
-    }
-
-    /// <summary>The first worn item carrying options, walking the families in order.</summary>
-    private static bool TryFindEnchanted(Player player, out EquipSlot slot, out Guid uniqueId, out int itemId)
-    {
-        foreach (var (name, _) in families)
-        {
-            if (!TryFindTarget(player, name, out slot, out uniqueId, out itemId))
-                continue;
-
-            if (EnchantRegistry.IsEnchanted(uniqueId))
-                return true;
-        }
-
-        slot = EquipSlot.None;
-        uniqueId = Guid.Empty;
-        itemId = 0;
-        return false;
-    }
 
     private static void Announce(Player player, string message)
     {
