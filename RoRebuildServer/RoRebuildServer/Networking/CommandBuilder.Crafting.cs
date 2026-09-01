@@ -220,6 +220,7 @@ public static partial class CommandBuilder
             packet.Write((short)1);
             packet.Write(uniqueId.ToByteArray());
             packet.Write(name);
+            packet.Write((byte)ForgedItemRegistry.RankFor(uniqueId));
 
             NetworkManager.SendMessageMulti(packet, recipients);
         }
@@ -247,10 +248,13 @@ public static partial class CommandBuilder
         var packet = NetworkManager.StartPacket(PacketType.ForgedNames);
         packet.Write((short)forged.Count);
 
+        //The rank rides along with the name rather than in the scratch dictionary, because
+        //the registry has it and the scratch is a plain name lookup used by four callers.
         foreach (var (id, name) in forged)
         {
             packet.Write(id.ToByteArray());
             packet.Write(name);
+            packet.Write((byte)ForgedItemRegistry.RankFor(id));
         }
 
         NetworkManager.SendMessage(packet, player.Connection);

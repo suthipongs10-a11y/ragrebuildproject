@@ -127,10 +127,18 @@ namespace Assets.Scripts.PlayerControl
         /// <summary>The blue the smith's name is written in, so it reads as a person.</summary>
         private const string ForgerColor = "#2E6FD9";
 
-        private static void AppendForger(string forger)
+        private static void AppendForger(string forger, int rank)
         {
             if (sb.Length > 0)
                 sb.Append(" ");
+
+            //The smith's title goes in front of their name, coloured by how far they have
+            //got: bronze, silver, gold, and one that is meant to be readable across a
+            //marketplace. It is the one thing on a weapon that a card can never have, which
+            //is the whole point of it - a card comes off a monster, this comes off a person.
+            var title = ForgedNames.TitleFor(rank);
+            if (title != null)
+                sb.Append(title).Append(' ');
 
             //Coloured so the name stands out of the middle of a title that is otherwise all
             //adjectives - "Very Very Strong Halo's Fire Main Gauche" is hard to read as a
@@ -182,6 +190,7 @@ namespace Assets.Scripts.PlayerControl
             //of it: three star crumbs, an element and a smith read as "Very Very Strong
             //Mitmair's Fire Blade". Null for anything nobody made.
             var forger = ForgedNames.Get(uniqueItem.UniqueId);
+            var forgerRank = ForgedNames.RankOf(uniqueItem.UniqueId);
 
             if (uniqueSlot == 0 && forger == null)
                 return data.Name;
@@ -211,7 +220,7 @@ namespace Assets.Scripts.PlayerControl
             {
                 if (!namePlaced && OrderOf(prefixData[i]) >= ForgerOrder)
                 {
-                    AppendForger(forger);
+                    AppendForger(forger, forgerRank);
                     namePlaced = true;
                 }
 
@@ -247,7 +256,7 @@ namespace Assets.Scripts.PlayerControl
 
             //nothing sorted after the smith, so they land against the item name
             if (!namePlaced)
-                AppendForger(forger);
+                AppendForger(forger, forgerRank);
 
             if (sb.Length > 0)
                 sb.Append(" ");

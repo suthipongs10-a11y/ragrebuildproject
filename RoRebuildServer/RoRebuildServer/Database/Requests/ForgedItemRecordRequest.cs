@@ -14,13 +14,17 @@ public class ForgedItemRecordRequest : IDbRequest
     private readonly Guid uniqueId;
     private readonly Guid forgerId;
     private readonly string forgerName;
+    private readonly int forgerRank;
+    private readonly int famePoints;
     private readonly DateTime forgedAt;
 
-    public ForgedItemRecordRequest(Guid uniqueId, Guid forgerId, string forgerName, DateTime forgedAt)
+    public ForgedItemRecordRequest(Guid uniqueId, Guid forgerId, string forgerName, int forgerRank, int famePoints, DateTime forgedAt)
     {
         this.uniqueId = uniqueId;
         this.forgerId = forgerId;
         this.forgerName = forgerName;
+        this.forgerRank = forgerRank;
+        this.famePoints = famePoints;
         this.forgedAt = forgedAt;
     }
 
@@ -31,6 +35,8 @@ public class ForgedItemRecordRequest : IDbRequest
             UniqueId = uniqueId,
             ForgerId = forgerId,
             ForgerName = forgerName,
+            ForgerRank = forgerRank,
+            FamePoints = famePoints,
             ForgedAt = forgedAt
         });
 

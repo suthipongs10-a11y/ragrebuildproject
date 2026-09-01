@@ -39,6 +39,9 @@ public static class ForgeSystem
     /// <summary>Three is the limit, and the third is worth far more than the first two.</summary>
     public const int MaxStarCrumbs = 3;
 
+    /// <summary>A full set of crumbs is also worth this much of the weapon's own attack.</summary>
+    public const int TripleCrumbAttackPercent = 25;
+
     /// <summary>
     /// Attack a weapon gains from the crumbs forged into it.
     ///
@@ -46,7 +49,20 @@ public static class ForgeSystem
     /// clamps the total up to forty the moment all three are in. A triple crumb weapon is
     /// meant to be worth the three failures it took to get one.
     /// </summary>
-    public static int StarCrumbAttackBonus(int crumbs) => crumbs >= MaxStarCrumbs ? 40 : crumbs * 5;
+    /// <remarks>
+    /// The share of the weapon's own attack is ours rather than the original's, and it is
+    /// there because a flat forty rewards the wrong weapon. Forty on a Mace of thirty-seven
+    /// attack more than doubles it; forty on a Claymore of a hundred and eighty is a fifth.
+    /// The Claymore is the one that takes four times as many attempts to make - the base
+    /// odds run forty percent at weapon level one and ten at level three - so the flat
+    /// number was paying out in inverse proportion to the work.
+    ///
+    /// A quarter is sized against what a smith can actually forge, which tops out at level
+    /// three: the whole range is thirty-seven to a hundred and eighty-five attack, so this
+    /// adds between nine and forty-six and cannot run away anywhere.
+    /// </remarks>
+    public static int StarCrumbAttackBonus(int crumbs, int weaponAttack) =>
+        crumbs >= MaxStarCrumbs ? 40 + weaponAttack * TripleCrumbAttackPercent / 100 : crumbs * 5;
 
     /// <summary>
     /// An anvil in the bag steadies the work. It is not spent, only carried, and only the
@@ -277,7 +293,16 @@ public static class ForgeSystem
             //The smith's name goes on the weapon, which is half of why anyone forges one.
             //Kept against the item's guid rather than in it - there is no room in a
             //UniqueItem, and the four slots it does have are full of what went into this.
-            ForgedItemRegistry.Record(made.UniqueItem.UniqueId, player.Id, player.Name);
+            //
+            //The rank is read before the points are added, so this weapon is stamped with
+            //the standing its maker had when they started it rather than the one it earned
+            //them. Plain work earns nothing: a weapon with no stone and no crumbs in it is
+            //a weapon anybody could have turned out, and paying for those would make the
+            //fastest route to a title the cheapest recipe in the book.
+            var forgerRank = ForgeFame.RankFor(ForgedItemRegistry.FameFor(player.Id));
+            var famePoints = ForgeFame.PointsFor(recipe.WeaponLevel, stoneId > 0, starCrumbs);
+
+            ForgedItemRegistry.Record(made.UniqueItem.UniqueId, player.Id, player.Name, forgerRank, famePoints);
         }
 
         player.CreateItemInInventory(made);

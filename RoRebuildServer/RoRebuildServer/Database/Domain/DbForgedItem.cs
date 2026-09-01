@@ -26,5 +26,21 @@ public class DbForgedItem
 
     [MaxLength(40)] public string ForgerName { get; set; } = "";
 
+    /// <summary>
+    /// The smith's standing at the moment this was made, not their standing now.
+    /// </summary>
+    /// <remarks>
+    /// A snapshot rather than a lookup, so a weapon is what it was when it was made. The
+    /// alternative - reading the smith's rank live - would quietly restat every weapon they
+    /// ever sold each time they earned a title, and somebody who bought one for what it
+    /// said on the tin would find the tin had changed. It also makes an early piece by a
+    /// smith who later became famous a different object from a late one, which is the sort
+    /// of thing worth collecting.
+    /// </remarks>
+    public int ForgerRank { get; set; }
+
+    /// <summary>What this weapon added to that standing. Zero for plain work.</summary>
+    public int FamePoints { get; set; }
+
     public DateTime ForgedAt { get; set; }
 }

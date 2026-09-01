@@ -132,6 +132,12 @@ namespace RoRebuildServer.Migrations
                         .HasMaxLength(40)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("ForgerRank")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("FamePoints")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("UniqueId");
 
                     b.ToTable("ForgedItem");

@@ -574,7 +574,13 @@ public class ItemEquipState
                 //slot effects below: five each is easy enough for an effect to hand out, but
                 //the third crumb is worth thirty on its own and an effect fired once per
                 //slot cannot see how many of it there are.
-                refBonus += ForgeSystem.StarCrumbAttackBonus(CountSlotItem(ref item, StarCrumbId));
+                refBonus += ForgeSystem.StarCrumbAttackBonus(CountSlotItem(ref item, StarCrumbId), weapon.Attack);
+
+                //And what the smith's name is worth. Kept beside the crumbs because it is
+                //the same kind of thing - attack the weapon has because of how it was made
+                //rather than because of what it is - and because both have to be in the
+                //refine bonus to be multiplied by a skill the way weapon attack is.
+                refBonus += ForgeFame.AttackBonusForRank(ForgedItemRegistry.RankFor(item.UniqueId));
 
                 var weaponInfo = new WeaponAttackInfo(weapon, refBonus, refBonus + overRefBonus);
 

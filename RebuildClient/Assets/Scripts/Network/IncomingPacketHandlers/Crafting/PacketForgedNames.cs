@@ -20,7 +20,9 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Crafting
             for (var i = 0; i < count; i++)
             {
                 var id = new Guid(msg.ReadBytes(16));
-                ForgedNames.Set(id, msg.ReadString());
+                var forger = msg.ReadString();
+
+                ForgedNames.Set(id, forger, msg.ReadByte());
             }
         }
     }
