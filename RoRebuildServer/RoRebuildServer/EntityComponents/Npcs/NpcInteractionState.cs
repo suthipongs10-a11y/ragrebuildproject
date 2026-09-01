@@ -459,6 +459,20 @@ public class NpcInteractionState
         EnchantCraftSystem.TryCraft(Player, (EnchantTier)tier);
     }
 
+    /// <summary>Reads out what a clearing scroll costs.</summary>
+    public void ShowBlankRecipe()
+    {
+        if (Player == null) return;
+        EnchantCraftSystem.DescribeBlank(Player);
+    }
+
+    /// <summary>Makes a clearing scroll. Always works, and costs accordingly.</summary>
+    public void CraftBlankScroll()
+    {
+        if (Player == null) return;
+        EnchantCraftSystem.TryCraftBlank(Player);
+    }
+
     public void OpenShop(bool hasDiscount = true)
     {
         if (Player == null)

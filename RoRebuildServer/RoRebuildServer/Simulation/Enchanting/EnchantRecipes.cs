@@ -61,6 +61,26 @@ public static class EnchantRecipes
         ]
     ];
 
+    /// <summary>
+    /// What clearing a block costs, and it is not a gamble.
+    /// </summary>
+    /// <remarks>
+    /// Twenty-five earth scrolls' worth of stockings for one, which sounds punishing until
+    /// you notice it is the only way to undo anything: a scroll cannot be written over, so
+    /// without this a bad roll is permanent and the piece is finished. Paying heavily to
+    /// take a block off is the price of the block being safe to try in the first place.
+    ///
+    /// No roll. A tool that failed would mean a player who cannot clear an item and cannot
+    /// write on it either, which is a piece of equipment nobody can do anything with.
+    /// </remarks>
+    private static readonly EnchantMaterial[] blankMaterials = [new("Red_Stocking", 500)];
+
+    private const int BlankZeny = 100000;
+
+    public static EnchantMaterial[] BlankRecipe => blankMaterials;
+
+    public static int BlankZenyCost => BlankZeny;
+
     /// <summary>The tiers the scribe will attempt today.</summary>
     public static bool CanCraft(EnchantTier tier) => tier == EnchantTier.Earth || tier == EnchantTier.Sky;
 

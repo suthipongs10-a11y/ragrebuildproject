@@ -130,6 +130,78 @@ public static class EnchantCraftSystem
         return true;
     }
 
+    /// <summary>The clearing scroll's recipe, read out the same way.</summary>
+    public static void DescribeBlank(Player player)
+    {
+        Tell(player, "<color=#FFCC55>สูตรคัมภีร์ล้างออพ</color> — <b>สำเร็จเสมอ ไม่มีพลาด</b>");
+
+        foreach (var mat in EnchantRecipes.BlankRecipe)
+        {
+            var have = CountOf(player, mat.Code);
+            var colour = have >= mat.Count ? "#55FF55" : "#FF5555";
+            Tell(player, $"  <color={colour}>{EnchantRecipes.NameOf(mat.Code)} {have}/{mat.Count}</color>");
+        }
+
+        var hasZeny = player.GetZeny() >= EnchantRecipes.BlankZenyCost;
+        Tell(player, $"  <color={(hasZeny ? "#55FF55" : "#FF5555")}>ค่าจ้าง {EnchantRecipes.BlankZenyCost:n0} zeny</color>");
+        Tell(player, "<size=-3><color=#7A7480>ใช้ล้างออพเดิมออก แล้วถึงจะจารใหม่ได้</color></size>");
+    }
+
+    /// <summary>
+    /// One clearing scroll. Costs a great deal and always works.
+    /// </summary>
+    public static bool TryCraftBlank(Player player)
+    {
+        var recipe = EnchantRecipes.BlankRecipe;
+
+        foreach (var mat in recipe)
+        {
+            if (CountOf(player, mat.Code) >= mat.Count)
+                continue;
+
+            Tell(player, $"<color=#FF5555>{EnchantRecipes.NameOf(mat.Code)} ไม่พอ</color> ต้องมี {mat.Count} ชิ้น");
+            return false;
+        }
+
+        if (player.GetZeny() < EnchantRecipes.BlankZenyCost)
+        {
+            Tell(player, $"<color=#FF5555>เงินไม่พอ</color> ต้องมี {EnchantRecipes.BlankZenyCost:n0} zeny");
+            return false;
+        }
+
+        if (!DataManager.ItemIdByName.TryGetValue(EnchantScrolls.BlankScrollCode, out var scrollId))
+        {
+            ServerLogger.LogWarning($"[Enchant] there is no item called '{EnchantScrolls.BlankScrollCode}'.");
+            return false;
+        }
+
+        if (!player.CanPickUpItem(new ItemReference(scrollId, 1)))
+        {
+            Tell(player, "<color=#FF5555>กระเป๋าเต็ม</color> เอาของออกก่อน");
+            return false;
+        }
+
+        foreach (var mat in recipe)
+            TakeAll(player, mat.Code, mat.Count);
+
+        player.DropZeny(EnchantRecipes.BlankZenyCost);
+        CommandBuilder.SendUpdateZeny(player);
+
+        var itemRef = new ItemReference(scrollId, 1);
+        var bagId = player.AddItemToInventory(itemRef);
+
+        itemRef.Count = player.Inventory?.GetItemCount(scrollId) ?? 1;
+        CommandBuilder.AddItemToInventory(player, itemRef, bagId, 1);
+
+        EnchantSystem.PlayEffect(player, "Magnificat");
+
+        var name = DataManager.ItemList.TryGetValue(scrollId, out var data) ? data.Name : EnchantScrolls.BlankScrollCode;
+        Tell(player, $"<color=#55FF55>ได้ {name}</color>");
+
+        ServerLogger.Log($"[Enchant] {player.Name} crafted a blank scroll.");
+        return true;
+    }
+
     private static int CountOf(Player player, string code) =>
         DataManager.ItemIdByName.TryGetValue(code, out var id)
             ? player.Inventory?.GetItemCount(id) ?? 0
