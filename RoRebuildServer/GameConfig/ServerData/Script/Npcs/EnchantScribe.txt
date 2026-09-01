@@ -33,6 +33,7 @@ OnClick:
 	//never again, the other is what somebody walks across a map to press. Doing goes on the
 	//front, asking goes behind one door.
 	var choice = 0;
+	var craft = 0;
 	var topic = 0;
 	result = 0;
 	while(result < 4)
@@ -44,19 +45,32 @@ OnClick:
 		{
 			Dialog(name, "เอาของมาวางตรงนี้ ข้าจะจารให้เดี๋ยวนี้เลย <color=#CC0000>พลาดแล้ววัตถุดิบหายหมดนะ</color> " +
 						 "และข้าเลือกไม่ได้ว่าจะออกมาเป็นคัมภีร์ชนิดไหน");
-			Option("จารระดับดิน", "จารระดับฟ้า", "จารคัมภีร์ล้างออพ", "ขอดูสูตรก่อน", "ยังไม่เอา");
+			Option("จารระดับดิน", "จารระดับฟ้า", "จารระดับสวรรค์", "จารระดับตำนาน",
+				   "จารคัมภีร์ล้างออพ", "ขอดูสูตรก่อน", "ยังไม่เอา");
+			craft = result;
 
-			if(result == 0) CraftEnchantScroll(1);
-			if(result == 1) CraftEnchantScroll(2);
-			if(result == 2) CraftBlankScroll();
+			if(craft == 0) CraftEnchantScroll(1);
+			if(craft == 1) CraftEnchantScroll(2);
+			if(craft == 2) CraftEnchantScroll(3);
+			if(craft == 3) CraftEnchantScroll(4);
+			if(craft == 4) CraftBlankScroll();
 
-			if(result == 3)
+			//Recipes get their own picker rather than all five at once. Five printed together
+			//is forty-odd lines of chat and the one anybody wanted has scrolled off the top.
+			if(craft == 5)
 			{
-				ShowEnchantRecipe(1);
-				ShowEnchantRecipe(2);
-				ShowBlankRecipe();
-				Dialog(name, "เขียนไว้ในช่องข้อความแล้ว <color=#55FF55>สีเขียว</color>คือมีพอ " +
-							 "<color=#FF5555>สีแดง</color>คือยังขาด");
+				Option("สูตรระดับดิน", "สูตรระดับฟ้า", "สูตรระดับสวรรค์", "สูตรระดับตำนาน",
+					   "สูตรคัมภีร์ล้างออพ", "พอแล้ว");
+
+				if(result == 0) ShowEnchantRecipe(1);
+				if(result == 1) ShowEnchantRecipe(2);
+				if(result == 2) ShowEnchantRecipe(3);
+				if(result == 3) ShowEnchantRecipe(4);
+				if(result == 4) ShowBlankRecipe();
+
+				if(result < 5)
+					Dialog(name, "เขียนไว้ในช่องข้อความแล้ว <color=#55FF55>สีเขียว</color>คือมีพอ " +
+								 "<color=#FF5555>สีแดง</color>คือยังขาด");
 			}
 		}
 
@@ -103,8 +117,10 @@ OnClick:
 							 "<color=#1F6E97>ฟ้า</color> — สองออพ เริ่มมีพลังโจมตีกับพลังชีวิตให้สุ่ม");
 				Dialog(name, "<color=#8E6E05>สวรรค์</color> — สองออพ ค่าแรงขึ้น ต้องใช้ผงการ์ดด้วย\n" +
 							 "<color=#A32E45>ตำนาน</color> — สามออพ ค่าสูงสุด และ<b>จารติดแค่หนึ่งในเจ็ด</b>");
-				Dialog(name, "<color=#CC0000>ตอนนี้ข้าจารได้แค่ดินกับฟ้า</color> สองระดับบนต้องรอของครบก่อน " +
-							 "แต่คัมภีร์ระดับสวรรค์หลุดออกมาจากกล่องสมบัติของจอมมารได้อีกทาง");
+				Dialog(name, "ข้าจารได้ครบทั้งสี่ระดับแล้ว แต่<color=#CC0000>ระดับตำนานต้องเอาคัมภีร์ระดับสวรรค์มาเป็นวัตถุดิบด้วย</color> " +
+							 "ชนิดไหนก็ได้ หนึ่งใบ");
+				Dialog(name, "คัมภีร์ระดับสวรรค์นอกจากจารเอง ยังหลุดออกมาจากกล่องสมบัติของจอมมารได้อีกทาง " +
+							 "แต่<color=#CC0000>กล่องนั้นไม่มีระดับตำนาน</color> ทางเดียวคือมาจารกับข้า");
 			}
 
 			if(topic == 2)

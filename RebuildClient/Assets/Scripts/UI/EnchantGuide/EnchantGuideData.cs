@@ -167,7 +167,7 @@ namespace Assets.Scripts.UI.EnchantGuide
                 new GuideMaterial("Turquoise", 5),
                 new GuideMaterial("Emperium", 5),
                 new GuideMaterial("Card_Dust", 5, "บดการ์ดที่อาลักษณ์"),
-                new GuideMaterial("Ench_Heaven_Weapon", 1, "คัมภีร์สวรรค์ ชนิดไหนก็ได้")
+                new GuideMaterial("Ench_Heaven_Weapon", 1, "คัมภีร์สวรรค์ · ชนิดไหนก็ได้ 1 ใบ")
             })
         };
 

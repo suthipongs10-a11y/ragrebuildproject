@@ -20,9 +20,10 @@ public readonly record struct EnchantMaterial(string Code, int Count);
 /// roll. A failure that cost nothing would make the odds a formality and the scribe a slow
 /// vending machine.
 ///
-/// Only earth and sky can be made. Heaven wants card dust and boss leavings, legend wants a
-/// heaven scroll as an ingredient, and both are meant to arrive once the first two have
-/// been running long enough to know whether the drain is right.
+/// All four can be made now. The top two were held back until the card grinder existed to
+/// feed heaven and until the first two had run long enough to say whether the drain was
+/// right; legend eats a heaven scroll on top of everything else, so it could not open first
+/// even in principle.
 /// </remarks>
 public static class EnchantRecipes
 {
@@ -82,7 +83,22 @@ public static class EnchantRecipes
     public static int BlankZenyCost => BlankZeny;
 
     /// <summary>The tiers the scribe will attempt today.</summary>
-    public static bool CanCraft(EnchantTier tier) => tier == EnchantTier.Earth || tier == EnchantTier.Sky;
+    public static bool CanCraft(EnchantTier tier) => tier >= EnchantTier.Earth && tier <= EnchantTier.Legend;
+
+    /// <summary>
+    /// Legend is written on top of a finished heaven scroll, whichever kind it is.
+    /// </summary>
+    /// <remarks>
+    /// Named as a rule rather than as a material because the material list holds exact item
+    /// codes and there are eight heaven scrolls - a list that wanted "any of these eight"
+    /// is the same problem the card grinder exists to solve, and the same answer applies:
+    /// handle it beside the list rather than inside it.
+    ///
+    /// This is what makes the mvp box an ingredient rather than a shortcut. A box tops out
+    /// at heaven, so the only route to legend runs through one, and somebody who hunts mvps
+    /// but will not craft has something to sell to somebody who will.
+    /// </remarks>
+    public static bool RequiresHeavenScroll(EnchantTier tier) => tier == EnchantTier.Legend;
 
     public static EnchantMaterial[] MaterialsFor(EnchantTier tier) => materials[(int)tier - 1];
 

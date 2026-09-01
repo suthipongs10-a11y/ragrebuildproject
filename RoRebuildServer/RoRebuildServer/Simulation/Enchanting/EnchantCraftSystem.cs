@@ -41,6 +41,12 @@ public static class EnchantCraftSystem
             Tell(player, $"  <color={colour}>{EnchantRecipes.NameOf(mat.Code)} {have}/{mat.Count}</color>");
         }
 
+        if (EnchantRecipes.RequiresHeavenScroll(tier))
+        {
+            var hasScroll = EnchantScrolls.TryFindHeld(player, EnchantTier.Heaven, out _);
+            Tell(player, $"  <color={(hasScroll ? "#55FF55" : "#FF5555")}>คัมภีร์ระดับสวรรค์ 1 ใบ (ชนิดไหนก็ได้)</color>");
+        }
+
         var zeny = EnchantRecipes.ZenyFor(tier);
         var hasZeny = player.GetZeny() >= zeny;
         Tell(player, $"  <color={(hasZeny ? "#55FF55" : "#FF5555")}>ค่าจ้าง {zeny:n0} zeny</color>");
@@ -75,6 +81,16 @@ public static class EnchantCraftSystem
             return false;
         }
 
+        //Checked here with the rest so a legend attempt that is short a heaven scroll fails
+        //before anything is taken, same as being short a stocking.
+        var heavenScrollId = 0;
+        if (EnchantRecipes.RequiresHeavenScroll(tier)
+            && !EnchantScrolls.TryFindHeld(player, EnchantTier.Heaven, out heavenScrollId))
+        {
+            Tell(player, "<color=#FF5555>ต้องมีคัมภีร์ระดับสวรรค์ 1 ใบ</color> ชนิดไหนก็ได้");
+            return false;
+        }
+
         if (player.GetZeny() < zeny)
         {
             Tell(player, $"<color=#FF5555>เงินไม่พอ</color> ต้องมี {zeny:n0} zeny");
@@ -101,6 +117,11 @@ public static class EnchantCraftSystem
 
         foreach (var mat in recipe)
             TakeAll(player, mat.Code, mat.Count);
+
+        //True on the third argument sends the removal itself, the same way TakeAll does for
+        //everything else in the recipe - telling the client twice would leave the count wrong.
+        if (heavenScrollId > 0)
+            player.TryRemoveItemFromInventory(heavenScrollId, 1, true);
 
         player.DropZeny(zeny);
         CommandBuilder.SendUpdateZeny(player);

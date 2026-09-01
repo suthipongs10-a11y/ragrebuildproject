@@ -127,6 +127,37 @@ public static class EnchantScrolls
     }
 
     /// <summary>
+    /// Any scroll of one tier that the player is carrying, whichever slot it names.
+    /// </summary>
+    /// <remarks>
+    /// Walks the eight rather than the bag, because eight lookups is cheaper than a scan
+    /// and the answer only has to be "one of these", not "the best of these" - every kind
+    /// is worth the same as an ingredient.
+    /// </remarks>
+    public static bool TryFindHeld(RoRebuildServer.EntityComponents.Player player, EnchantTier tier, out int itemId)
+    {
+        itemId = 0;
+
+        var inventory = player.Inventory;
+        if (inventory == null)
+            return false;
+
+        foreach (var slot in slots)
+        {
+            if (!DataManager.ItemIdByName.TryGetValue(CodeFor(tier, slot), out var id))
+                continue;
+
+            if (inventory.GetItemCount(id) <= 0)
+                continue;
+
+            itemId = id;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// A slot typed by hand, for the gm commands. Short names as well as the code ones.
     /// </summary>
     public static bool TryReadSlotName(string text, out EnchantScrollSlot slot)
