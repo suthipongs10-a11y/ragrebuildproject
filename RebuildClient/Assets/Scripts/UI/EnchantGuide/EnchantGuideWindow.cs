@@ -120,6 +120,11 @@ namespace Assets.Scripts.UI.EnchantGuide
             window.TitleBar.text = string.Format("คู่มือออพ — ระดับ<color={0}>{1}</color>", t.Colour, t.Thai);
             window.OkButtonText.text = "ระดับถัดไป";
             window.CancelButtonText.text = "ปิด";
+
+            //On from the start, unlike the item picker: the prefab ships this button off
+            //because its usual job is "submit the thing you chose", and here it is a page
+            //turn that is always available.
+            window.OkButton.interactable = true;
             window.InfoAreaText.gameObject.SetActive(true);
             window.InfoAreaText.text = EnchantGuideData.OddsText(tier);
 

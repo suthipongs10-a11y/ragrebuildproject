@@ -227,6 +227,13 @@ namespace Assets.Scripts.UI.EnchantItem
 
             selected = row;
             selectedEntry = entryId;
+
+            //The prefab ships its ok button switched off, which is the list saying "pick
+            //something first" - the refine counter turns it on at exactly this moment and
+            //for exactly this reason. Without this the button is not disabled-looking, it
+            //is simply unclickable, which reads as the window being broken.
+            window.OkButton.interactable = true;
+
             ShowHint($"จะจารลง <color=#CC5500>{row.ItemName.text}</color> — กด จาร เพื่อยืนยัน");
         }
 
