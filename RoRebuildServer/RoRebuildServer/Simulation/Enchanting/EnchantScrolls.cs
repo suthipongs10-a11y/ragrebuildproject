@@ -178,10 +178,36 @@ public static class EnchantScrolls
     /// The same rules the equip code uses to decide what fits where, read off the item data
     /// rather than off what the player is wearing, so every scroll works on a spare sitting
     /// in the bag as well as on the piece being worn.
-    /// A headgear that covers two slots answers yes to both of them - it really does occupy
-    /// both - and a two-handed weapon is a weapon rather than a shield, because it is in the
+    /// A headgear belongs to one layer and one only - see TopmostLayer - and a two-handed
+    /// weapon is a weapon rather than a shield, because it is in the
     /// weapon table and never reaches the armour branch.
     /// </remarks>
+    /// <summary>
+    /// The one layer a headgear counts as, however many it actually covers.
+    /// </summary>
+    /// <remarks>
+    /// A hat that takes the top and the middle used to answer yes to both scrolls, which
+    /// read as a bug from either end: the same hat turned up under two different scrolls,
+    /// and a middle scroll bought for a middle-slot hat could be spent on something wearing
+    /// the top slot as well.
+    ///
+    /// Highest layer wins, which is not an arbitrary pick - it is the rule the equip code
+    /// already uses to decide which slot to put a hat in, so a scroll now names the same
+    /// slot the game itself would name. Nineteen hats cover the top along with something
+    /// else and become top-only; twelve cover the middle and the bottom and become middle.
+    /// </remarks>
+    private static HeadgearPosition TopmostLayer(HeadgearPosition position)
+    {
+        if (position.HasFlag(HeadgearPosition.Top))
+            return HeadgearPosition.Top;
+        if (position.HasFlag(HeadgearPosition.Mid))
+            return HeadgearPosition.Mid;
+        if (position.HasFlag(HeadgearPosition.Bottom))
+            return HeadgearPosition.Bottom;
+
+        return HeadgearPosition.None;
+    }
+
     public static bool FitsSlot(int itemId, EnchantScrollSlot slot)
     {
         if (DataManager.WeaponInfo.ContainsKey(itemId))
@@ -191,15 +217,16 @@ public static class EnchantScrolls
             return false;
 
         var isHeadgear = (armor.EquipPosition & EquipPosition.Headgear) != 0;
+        var head = isHeadgear ? TopmostLayer(armor.HeadPosition) : HeadgearPosition.None;
 
         return slot switch
         {
             EnchantScrollSlot.Armour => armor.EquipPosition.HasFlag(EquipPosition.Armor),
             EnchantScrollSlot.Shield => armor.EquipPosition.HasFlag(EquipPosition.Shield),
             EnchantScrollSlot.Shoes => armor.EquipPosition.HasFlag(EquipPosition.Footgear),
-            EnchantScrollSlot.HeadTop => isHeadgear && armor.HeadPosition.HasFlag(HeadgearPosition.Top),
-            EnchantScrollSlot.HeadMid => isHeadgear && armor.HeadPosition.HasFlag(HeadgearPosition.Mid),
-            EnchantScrollSlot.HeadLow => isHeadgear && armor.HeadPosition.HasFlag(HeadgearPosition.Bottom),
+            EnchantScrollSlot.HeadTop => head == HeadgearPosition.Top,
+            EnchantScrollSlot.HeadMid => head == HeadgearPosition.Mid,
+            EnchantScrollSlot.HeadLow => head == HeadgearPosition.Bottom,
             EnchantScrollSlot.Accessory => armor.EquipPosition.HasFlag(EquipPosition.Accessory),
             _ => false
         };

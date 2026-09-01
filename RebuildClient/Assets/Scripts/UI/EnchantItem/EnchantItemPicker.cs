@@ -211,12 +211,16 @@ namespace Assets.Scripts.UI.EnchantItem
                     return itemClass == ItemClass.Equipment && (pos & EquipPosition.OffHand) != 0;
                 case ScrollSlot.Armour:
                     return (pos & EquipPosition.Body) != 0;
+                //Highest layer only. A hat covering the top and the middle is a top hat as
+                //far as a scroll is concerned - the same rule the equip code uses to pick
+                //which slot to put it in, and the same one the server checks.
                 case ScrollSlot.HeadTop:
                     return (pos & EquipPosition.HeadUpper) != 0;
                 case ScrollSlot.HeadMid:
-                    return (pos & EquipPosition.HeadMid) != 0;
+                    return (pos & EquipPosition.HeadUpper) == 0 && (pos & EquipPosition.HeadMid) != 0;
                 case ScrollSlot.HeadLow:
-                    return (pos & EquipPosition.HeadLower) != 0;
+                    return (pos & (EquipPosition.HeadUpper | EquipPosition.HeadMid)) == 0
+                           && (pos & EquipPosition.HeadLower) != 0;
                 case ScrollSlot.Shoes:
                     return (pos & EquipPosition.Footgear) != 0;
                 case ScrollSlot.Accessory:

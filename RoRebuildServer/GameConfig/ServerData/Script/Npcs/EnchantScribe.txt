@@ -28,102 +28,107 @@ OnClick:
 		Dialog(name, "กลับมาอีกแล้วหรือ อยากรู้อะไรอีกล่ะ");
 	}
 
-	//The menu is written out in full from the first visit even though three of the five
-	//do nothing yet. Hiding them until they work would mean nobody discovers the system
-	//exists, and the point of standing here is to be discovered.
+	//Two menus rather than one. The old one mixed "tell me about it" with "do it now" in a
+	//single list of eight, and the two are not the same kind of thing: one is read once and
+	//never again, the other is what somebody walks across a map to press. Doing goes on the
+	//front, asking goes behind one door.
 	var choice = 0;
+	var topic = 0;
 	result = 0;
-	while(result < 7)
+	while(result < 4)
 	{
-		Option("เปิดคู่มือคัมภีร์", "ระบบคัมภีร์คืออะไร", "คัมภีร์มีกี่ระดับ", "คัมภีร์มีกี่ชนิด", "จารคัมภีร์", "บดการ์ด", "ล้างออพอุปกรณ์", "ไม่มีอะไร");
+		Option("จารคัมภีร์", "บดการ์ด", "เปิดคู่มือคัมภีร์", "ขอถามอะไรหน่อย", "ไม่มีอะไร");
 		choice = result;
 
-		//The handbook is a client window, so the scribe only sends the shove that opens it
-		//and then bows out - leaving the loop running would put the option menu back on top
-		//of the thing the player just asked to read.
 		if(choice == 0)
 		{
-			Dialog(name, "เอ้า ยืมไปอ่านเลย เขียนไว้หมดแล้วว่าระดับไหนใช้ของอะไร หาได้จากมอนตัวไหน แมพอะไร " +
-						 "แล้วก็คัมภีร์แต่ละระดับจารออกมาได้ค่าอะไรบ้าง กี่เปอร์เซ็นต์");
-			Dialog(name, "กดปุ่ม <color=#CC5500>ระดับถัดไป</color> เพื่อพลิกดูระดับอื่น กดที่ชื่อของเพื่อดูว่ามันดรอปจากตัวไหน");
-			OpenEnchantGuide();
+			Dialog(name, "เอาของมาวางตรงนี้ ข้าจะจารให้เดี๋ยวนี้เลย <color=#CC0000>พลาดแล้ววัตถุดิบหายหมดนะ</color> " +
+						 "และข้าเลือกไม่ได้ว่าจะออกมาเป็นคัมภีร์ชนิดไหน");
+			Option("จารระดับดิน", "จารระดับฟ้า", "ขอดูสูตรก่อน", "ยังไม่เอา");
 
-			//Eight rather than seven: seven is the player picking "nothing", which still
-			//gets a goodbye. This one is already reading, so it does not.
-			choice = 8;
+			if(result == 0) CraftEnchantScroll(1);
+			if(result == 1) CraftEnchantScroll(2);
+
+			if(result == 2)
+			{
+				ShowEnchantRecipe(1);
+				ShowEnchantRecipe(2);
+				Dialog(name, "เขียนไว้ในช่องข้อความแล้ว <color=#55FF55>สีเขียว</color>คือมีพอ " +
+							 "<color=#FF5555>สีแดง</color>คือยังขาด");
+			}
 		}
 
 		if(choice == 1)
-		{
-			Dialog(name, "อุปกรณ์ที่เจ้าใส่อยู่ ใส่<color=#CC5500>ออพชั่นเสริม</color>เพิ่มได้ " +
-						 "อาวุธ ชุดเกราะ โล่ รองเท้า ของสวมหัวทั้งสามชั้น และเครื่องประดับ");
-			Dialog(name, "วิธีคือเอาวัตถุดิบมาให้ข้าจารเป็นคัมภีร์ก่อน แล้วเจ้าค่อยเอาคัมภีร์ไปใช้กับของที่อยากเสริม " +
-						 "ออพที่ได้เป็นการสุ่ม ข้าเองก็บอกล่วงหน้าไม่ได้ว่าจะออกอะไร");
-			Dialog(name, "<color=#CC0000>ฟังให้ดี</color> ทั้งตอนจารและตอนใช้ มีโอกาสพลาดทั้งคู่ " +
-						 "แต่<b>อุปกรณ์ของเจ้าจะไม่หายและขั้นตีจะไม่ลด</b>ไม่ว่าจะพลาดกี่ครั้ง อย่างมากก็แค่ออพว่างเปล่า");
-		}
-
-		if(choice == 2)
-		{
-			Dialog(name, "มีสี่ระดับ ยิ่งสูงยิ่งจารยาก\n\n" +
-						 "<color=#8A6234>ดิน</color> — ออพเดียว ค่าน้อย แต่จารติดเกือบทุกครั้ง\n" +
-						 "<color=#1F6E97>ฟ้า</color> — สองออพ เริ่มมีพลังโจมตีกับพลังชีวิตให้สุ่ม");
-			Dialog(name, "<color=#8E6E05>สวรรค์</color> — สองออพ ค่าแรงขึ้น ต้องใช้ผงการ์ดด้วย\n" +
-						 "<color=#A32E45>ตำนาน</color> — สามออพ ค่าสูงสุด และ<b>จารติดแค่หนึ่งในเจ็ด</b>");
-			Dialog(name, "คัมภีร์ระดับตำนานยังหลุดออกมาจากกล่องสมบัติของจอมมารได้อีกทาง " +
-						 "แต่โอกาสน้อยยิ่งกว่าจารเองเสียอีก");
-		}
-
-		//Eight kinds per tier, and the draw is the only place a particular one is made
-		//expensive - the recipe is the same whichever comes out. The numbers here are the
-		//weights in EnchantScrolls, which add to a hundred so they can be read out as they are.
-		if(choice == 3)
-		{
-			Dialog(name, "คัมภีร์หนึ่งม้วนใช้ได้กับ<color=#CC5500>ตำแหน่งเดียว</color>เท่านั้น ข้าเขียนระบุไว้บนม้วนแล้ว " +
-						 "เอาคัมภีร์อาวุธไปใช้กับหมวกไม่ได้ ระดับหนึ่งมีแปดชนิด");
-			Dialog(name, "ชนิดที่ออกบ่อย ชนิดละ <color=#CC5500>17 ใน 100</color>\n" +
-						 "อาวุธ · ชุดเกราะ · โล่ · รองเท้า · ส่วนหัว Top");
-			Dialog(name, "ชนิดที่ออกยาก ชนิดละ <color=#CC0000>5 ใน 100</color>\n" +
-						 "ส่วนหัว Middle · ส่วนหัว Low · เครื่องประดับ");
-			Dialog(name, "ข้าเลือกไม่ได้ว่ามือจะเขียนออกมาเป็นชนิดไหน อยากได้ชนิดที่หายาก ก็ต้องจารหลายรอบหน่อย");
-			Dialog(name, "คัมภีร์ใช้กับของที่อยู่ในกระเป๋าได้เลย ไม่ต้องสวมไว้ก่อน แต่ต้องเป็นของที่ตรงชนิดกับม้วนนั้น");
-			Dialog(name, "อีกอย่าง <color=#CC0000>ข้าจารทับของที่มีออพอยู่แล้วไม่ได้</color> " +
-						 "กระดาษมันไม่ยอมรับรอยจารสองชั้น ถ้าจะจารใหม่ต้องล้างของเก่าออกด้วย<color=#CC5500>คัมภีร์ล้างออพ</color>ก่อน");
-		}
-
-		//Two tiers only for now. The scribe says so rather than hiding the other two,
-		//because a menu that grows later is a menu nobody notices grew.
-		if(choice == 4)
-		{
-			Dialog(name, "เอาของมาวางตรงนี้ ข้าจะดูให้ว่าพอไหม <color=#CC0000>พลาดแล้ววัตถุดิบหายหมดนะ</color> " +
-						 "และข้าเลือกไม่ได้ว่าจะออกมาเป็นคัมภีร์ชนิดไหน");
-			Option("ดูสูตรระดับดิน", "จารระดับดิน", "ดูสูตรระดับฟ้า", "จารระดับฟ้า", "ยังไม่เอา");
-
-			if(result == 0) ShowEnchantRecipe(1);
-			if(result == 1) CraftEnchantScroll(1);
-			if(result == 2) ShowEnchantRecipe(2);
-			if(result == 3) CraftEnchantScroll(2);
-
-			if(result < 4)
-				Dialog(name, "ดูที่ช่องข้อความสิ ข้าเขียนบอกไว้หมดแล้ว");
-		}
-
-		if(choice == 5)
 		{
 			Dialog(name, "การ์ดที่ไม่ได้ใช้มีไหม ข้าบดให้เป็น<color=#CC5500>ผงการ์ด</color>ได้ " +
 						 "หนึ่งใบได้หนึ่งผง เอาไว้ทำคัมภีร์ระดับสวรรค์กับตำนาน");
 			Dialog(name, "<color=#CC0000>การ์ดบอสข้าไม่บดให้นะ</color> ของแบบนั้นบดทิ้งแล้วเจ้าจะเสียใจ");
 			OpenCardGrinder();
-			choice = 8;
+			choice = 9;
 		}
 
-		if(choice == 6)
-			Dialog(name, "<color=#CC5500>คัมภีร์ล้างออพ</color>ข้ายังทำขายไม่ได้ แต่กฎข้อนี้จำไว้ให้ดี — " +
-						 "<color=#CC0000>ของที่มีออพอยู่แล้ว จารทับไม่ได้</color> ต้องล้างให้ว่างก่อนเสมอ");
+		//The handbook is a client window, so the scribe only sends the shove that opens it
+		//and then bows out - leaving the loop running would put the option menu back on top
+		//of the thing the player just asked to read.
+		if(choice == 2)
+		{
+			Dialog(name, "เอ้า ยืมไปอ่านเลย เขียนไว้หมดแล้วว่าระดับไหนใช้ของอะไร หาได้จากมอนตัวไหน แมพอะไร " +
+						 "แล้วก็คัมภีร์แต่ละระดับจารออกมาได้ค่าอะไรบ้าง กี่เปอร์เซ็นต์");
+			Dialog(name, "กดปุ่ม <color=#CC5500>ระดับถัดไป</color> เพื่อพลิกดูระดับอื่น กดที่ชื่อของเพื่อดูว่ามันดรอปจากตัวไหน");
+			OpenEnchantGuide();
+			choice = 9;
+		}
+
+		if(choice == 3)
+		{
+			Option("ระบบคัมภีร์คืออะไร", "คัมภีร์มีกี่ระดับ", "คัมภีร์มีกี่ชนิด", "ทำไมจารทับไม่ได้", "พอแล้ว");
+			topic = result;
+
+			if(topic == 0)
+			{
+				Dialog(name, "อุปกรณ์ที่เจ้าใส่อยู่ ใส่<color=#CC5500>ออพชั่นเสริม</color>เพิ่มได้ " +
+							 "อาวุธ ชุดเกราะ โล่ รองเท้า ของสวมหัวทั้งสามชั้น และเครื่องประดับ");
+				Dialog(name, "วิธีคือเอาวัตถุดิบมาให้ข้าจารเป็นคัมภีร์ก่อน แล้วเจ้าค่อยเอาคัมภีร์ไปใช้กับของที่อยากเสริม " +
+							 "ออพที่ได้เป็นการสุ่ม ข้าเองก็บอกล่วงหน้าไม่ได้ว่าจะออกอะไร");
+				Dialog(name, "<color=#CC0000>ฟังให้ดี</color> ทั้งตอนจารและตอนใช้ มีโอกาสพลาดทั้งคู่ " +
+							 "แต่<b>อุปกรณ์ของเจ้าจะไม่หายและขั้นตีจะไม่ลด</b>ไม่ว่าจะพลาดกี่ครั้ง อย่างมากก็แค่ออพว่างเปล่า");
+			}
+
+			if(topic == 1)
+			{
+				Dialog(name, "มีสี่ระดับ ยิ่งสูงยิ่งจารยาก\n\n" +
+							 "<color=#8A6234>ดิน</color> — ออพเดียว ค่าน้อย แต่จารติดเกือบทุกครั้ง\n" +
+							 "<color=#1F6E97>ฟ้า</color> — สองออพ เริ่มมีพลังโจมตีกับพลังชีวิตให้สุ่ม");
+				Dialog(name, "<color=#8E6E05>สวรรค์</color> — สองออพ ค่าแรงขึ้น ต้องใช้ผงการ์ดด้วย\n" +
+							 "<color=#A32E45>ตำนาน</color> — สามออพ ค่าสูงสุด และ<b>จารติดแค่หนึ่งในเจ็ด</b>");
+				Dialog(name, "<color=#CC0000>ตอนนี้ข้าจารได้แค่ดินกับฟ้า</color> สองระดับบนต้องรอของครบก่อน " +
+							 "แต่คัมภีร์ระดับสวรรค์หลุดออกมาจากกล่องสมบัติของจอมมารได้อีกทาง");
+			}
+
+			if(topic == 2)
+			{
+				Dialog(name, "คัมภีร์หนึ่งม้วนใช้ได้กับ<color=#CC5500>ตำแหน่งเดียว</color>เท่านั้น ข้าเขียนระบุไว้บนม้วนแล้ว " +
+							 "เอาคัมภีร์อาวุธไปใช้กับหมวกไม่ได้ ระดับหนึ่งมีแปดชนิด");
+				Dialog(name, "ชนิดที่ออกบ่อย ชนิดละ <color=#CC5500>17 ใน 100</color>\n" +
+							 "อาวุธ · ชุดเกราะ · โล่ · รองเท้า · ส่วนหัว Top");
+				Dialog(name, "ชนิดที่ออกยาก ชนิดละ <color=#CC0000>5 ใน 100</color>\n" +
+							 "ส่วนหัว Middle · ส่วนหัว Low · เครื่องประดับ");
+				Dialog(name, "หมวกที่กินหลายชั้นพร้อมกัน ข้านับเป็น<color=#CC5500>ชั้นบนสุดที่มันกิน</color>ชั้นเดียว — " +
+							 "หมวกที่กิน Top กับ Middle ต้องใช้คัมภีร์ Top เท่านั้น");
+			}
+
+			if(topic == 3)
+			{
+				Dialog(name, "<color=#CC0000>ของที่มีออพอยู่แล้ว ข้าจารทับให้ไม่ได้</color> " +
+							 "กระดาษมันไม่ยอมรับรอยจารสองชั้น");
+				Dialog(name, "ถ้าอยากจารใหม่ ต้องล้างของเก่าออกด้วย<color=#CC5500>คัมภีร์ล้างออพ</color>ก่อน " +
+							 "ใบนั้นข้ายังทำขายไม่ได้ รอไปก่อนนะ");
+			}
+		}
 
 		result = choice;
 	}
 
-	if(choice != 8)
+	if(choice != 9)
 		Dialog(name, "งั้นก็ตามสบาย ของขยะในกระเป๋าอย่าเพิ่งทิ้งล่ะ");
 }
