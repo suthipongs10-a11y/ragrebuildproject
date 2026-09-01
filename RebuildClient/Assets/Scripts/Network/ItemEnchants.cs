@@ -135,7 +135,7 @@ namespace Assets.Scripts.Network
                 sb.Append("\n<color=").Append(FlavourColor).Append("><i>« ")
                   .Append(tierFlavour[tier]).Append(" »</i></color>");
 
-            sb.Append("\n<size=-4><color=").Append(NoteColor).Append(">ลบออพนี้ได้ด้วย ")
+            sb.Append("\n<size=-4><color=").Append(NoteColor).Append(">จารทับไม่ได้ ต้องล้างก่อนด้วย ")
               .Append(ResetItemName).Append("</color></size>");
 
             return sb.ToString();

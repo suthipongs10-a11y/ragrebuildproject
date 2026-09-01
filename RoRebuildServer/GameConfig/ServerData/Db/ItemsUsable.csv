@@ -287,7 +287,7 @@
 14595,Unsealed_Magic_Spell,Unsealed Magic Spell,0,0,Use,,빛의주문서,
 14596,Pierre's_Treasurebox,MVP Box,100,0,Use,,오래된노란상자,
 16000,Glittering_Orb,Glittering Orb,100,0,Use,,DiscoLights,
-17000,Ench_Blank,คัมภีร์ล้างออพ,10,0,UseOnItem,,섬광막대,enchant scroll
+17000,Ench_Blank,คัมภีร์ล้างออพ,10,0,UseOnItem,,수취인불명,enchant scroll
 17011,Ench_Earth_Weapon,คัมภีร์อาวุธ ระดับดิน,10,0,UseOnItem,,빛의주문서,enchant scroll
 17012,Ench_Earth_Armour,คัมภีร์ชุดเกราะ ระดับดิน,10,0,UseOnItem,,빛의주문서,enchant scroll
 17013,Ench_Earth_Shield,คัมภีร์โล่ ระดับดิน,10,0,UseOnItem,,빛의주문서,enchant scroll
@@ -296,27 +296,27 @@
 17016,Ench_Earth_HeadLow,คัมภีร์ส่วนหัว Low ระดับดิน,10,0,UseOnItem,,빛의주문서,enchant scroll
 17017,Ench_Earth_Shoes,คัมภีร์รองเท้า ระดับดิน,10,0,UseOnItem,,빛의주문서,enchant scroll
 17018,Ench_Earth_Accessory,คัมภีร์เครื่องประดับ ระดับดิน,10,0,UseOnItem,,빛의주문서,enchant scroll
-17021,Ench_Sky_Weapon,คัมภีร์อาวุธ ระดับฟ้า,10,0,UseOnItem,,koko_assu_solo,enchant scroll
-17022,Ench_Sky_Armour,คัมภีร์ชุดเกราะ ระดับฟ้า,10,0,UseOnItem,,koko_assu_solo,enchant scroll
-17023,Ench_Sky_Shield,คัมภีร์โล่ ระดับฟ้า,10,0,UseOnItem,,koko_assu_solo,enchant scroll
-17024,Ench_Sky_HeadTop,คัมภีร์ส่วนหัว Top ระดับฟ้า,10,0,UseOnItem,,koko_assu_solo,enchant scroll
-17025,Ench_Sky_HeadMid,คัมภีร์ส่วนหัว Middle ระดับฟ้า,10,0,UseOnItem,,koko_assu_solo,enchant scroll
-17026,Ench_Sky_HeadLow,คัมภีร์ส่วนหัว Low ระดับฟ้า,10,0,UseOnItem,,koko_assu_solo,enchant scroll
-17027,Ench_Sky_Shoes,คัมภีร์รองเท้า ระดับฟ้า,10,0,UseOnItem,,koko_assu_solo,enchant scroll
-17028,Ench_Sky_Accessory,คัมภีร์เครื่องประดับ ระดับฟ้า,10,0,UseOnItem,,koko_assu_solo,enchant scroll
-17031,Ench_Heaven_Weapon,คัมภีร์อาวุธ ระดับสวรรค์,10,0,UseOnItem,,koko_aspr,enchant scroll
-17032,Ench_Heaven_Armour,คัมภีร์ชุดเกราะ ระดับสวรรค์,10,0,UseOnItem,,koko_aspr,enchant scroll
-17033,Ench_Heaven_Shield,คัมภีร์โล่ ระดับสวรรค์,10,0,UseOnItem,,koko_aspr,enchant scroll
-17034,Ench_Heaven_HeadTop,คัมภีร์ส่วนหัว Top ระดับสวรรค์,10,0,UseOnItem,,koko_aspr,enchant scroll
-17035,Ench_Heaven_HeadMid,คัมภีร์ส่วนหัว Middle ระดับสวรรค์,10,0,UseOnItem,,koko_aspr,enchant scroll
-17036,Ench_Heaven_HeadLow,คัมภีร์ส่วนหัว Low ระดับสวรรค์,10,0,UseOnItem,,koko_aspr,enchant scroll
-17037,Ench_Heaven_Shoes,คัมภีร์รองเท้า ระดับสวรรค์,10,0,UseOnItem,,koko_aspr,enchant scroll
-17038,Ench_Heaven_Accessory,คัมภีร์เครื่องประดับ ระดับสวรรค์,10,0,UseOnItem,,koko_aspr,enchant scroll
-17041,Ench_Legend_Weapon,คัมภีร์อาวุธ ระดับตำนาน,10,0,UseOnItem,,koko_inca_prty,enchant scroll
-17042,Ench_Legend_Armour,คัมภีร์ชุดเกราะ ระดับตำนาน,10,0,UseOnItem,,koko_inca_prty,enchant scroll
-17043,Ench_Legend_Shield,คัมภีร์โล่ ระดับตำนาน,10,0,UseOnItem,,koko_inca_prty,enchant scroll
-17044,Ench_Legend_HeadTop,คัมภีร์ส่วนหัว Top ระดับตำนาน,10,0,UseOnItem,,koko_inca_prty,enchant scroll
-17045,Ench_Legend_HeadMid,คัมภีร์ส่วนหัว Middle ระดับตำนาน,10,0,UseOnItem,,koko_inca_prty,enchant scroll
-17046,Ench_Legend_HeadLow,คัมภีร์ส่วนหัว Low ระดับตำนาน,10,0,UseOnItem,,koko_inca_prty,enchant scroll
-17047,Ench_Legend_Shoes,คัมภีร์รองเท้า ระดับตำนาน,10,0,UseOnItem,,koko_inca_prty,enchant scroll
-17048,Ench_Legend_Accessory,คัมภีร์เครื่องประดับ ระดับตำนาน,10,0,UseOnItem,,koko_inca_prty,enchant scroll
+17021,Ench_Sky_Weapon,คัมภีร์อาวุธ ระดับฟ้า,10,0,UseOnItem,,낡은두루마리,enchant scroll
+17022,Ench_Sky_Armour,คัมภีร์ชุดเกราะ ระดับฟ้า,10,0,UseOnItem,,낡은두루마리,enchant scroll
+17023,Ench_Sky_Shield,คัมภีร์โล่ ระดับฟ้า,10,0,UseOnItem,,낡은두루마리,enchant scroll
+17024,Ench_Sky_HeadTop,คัมภีร์ส่วนหัว Top ระดับฟ้า,10,0,UseOnItem,,낡은두루마리,enchant scroll
+17025,Ench_Sky_HeadMid,คัมภีร์ส่วนหัว Middle ระดับฟ้า,10,0,UseOnItem,,낡은두루마리,enchant scroll
+17026,Ench_Sky_HeadLow,คัมภีร์ส่วนหัว Low ระดับฟ้า,10,0,UseOnItem,,낡은두루마리,enchant scroll
+17027,Ench_Sky_Shoes,คัมภีร์รองเท้า ระดับฟ้า,10,0,UseOnItem,,낡은두루마리,enchant scroll
+17028,Ench_Sky_Accessory,คัมภีร์เครื่องประดับ ระดับฟ้า,10,0,UseOnItem,,낡은두루마리,enchant scroll
+17031,Ench_Heaven_Weapon,คัมภีร์อาวุธ ระดับสวรรค์,10,0,UseOnItem,,반혼부,enchant scroll
+17032,Ench_Heaven_Armour,คัมภีร์ชุดเกราะ ระดับสวรรค์,10,0,UseOnItem,,반혼부,enchant scroll
+17033,Ench_Heaven_Shield,คัมภีร์โล่ ระดับสวรรค์,10,0,UseOnItem,,반혼부,enchant scroll
+17034,Ench_Heaven_HeadTop,คัมภีร์ส่วนหัว Top ระดับสวรรค์,10,0,UseOnItem,,반혼부,enchant scroll
+17035,Ench_Heaven_HeadMid,คัมภีร์ส่วนหัว Middle ระดับสวรรค์,10,0,UseOnItem,,반혼부,enchant scroll
+17036,Ench_Heaven_HeadLow,คัมภีร์ส่วนหัว Low ระดับสวรรค์,10,0,UseOnItem,,반혼부,enchant scroll
+17037,Ench_Heaven_Shoes,คัมภีร์รองเท้า ระดับสวรรค์,10,0,UseOnItem,,반혼부,enchant scroll
+17038,Ench_Heaven_Accessory,คัมภีร์เครื่องประดับ ระดับสวรรค์,10,0,UseOnItem,,반혼부,enchant scroll
+17041,Ench_Legend_Weapon,คัมภีร์อาวุธ ระดับตำนาน,10,0,UseOnItem,,어둠의계약서,enchant scroll
+17042,Ench_Legend_Armour,คัมภีร์ชุดเกราะ ระดับตำนาน,10,0,UseOnItem,,어둠의계약서,enchant scroll
+17043,Ench_Legend_Shield,คัมภีร์โล่ ระดับตำนาน,10,0,UseOnItem,,어둠의계약서,enchant scroll
+17044,Ench_Legend_HeadTop,คัมภีร์ส่วนหัว Top ระดับตำนาน,10,0,UseOnItem,,어둠의계약서,enchant scroll
+17045,Ench_Legend_HeadMid,คัมภีร์ส่วนหัว Middle ระดับตำนาน,10,0,UseOnItem,,어둠의계약서,enchant scroll
+17046,Ench_Legend_HeadLow,คัมภีร์ส่วนหัว Low ระดับตำนาน,10,0,UseOnItem,,어둠의계약서,enchant scroll
+17047,Ench_Legend_Shoes,คัมภีร์รองเท้า ระดับตำนาน,10,0,UseOnItem,,어둠의계약서,enchant scroll
+17048,Ench_Legend_Accessory,คัมภีร์เครื่องประดับ ระดับตำนาน,10,0,UseOnItem,,어둠의계약서,enchant scroll

@@ -50,8 +50,10 @@ namespace Assets.Scripts.UI.EnchantItem
         private GenericItemListV2 window;
         private readonly Dictionary<int, int> bagIdByEntry = new Dictionary<int, int>();
         private readonly Dictionary<int, ItemListEntryV2> rowByEntry = new Dictionary<int, ItemListEntryV2>();
+        private readonly HashSet<int> blockedEntries = new HashSet<int>();
         private int scrollItemId;
         private ScrollSlot slot;
+        private bool isBlank;
         private ItemListEntryV2 selected;
         private int selectedEntry = -1;
 
@@ -68,6 +70,7 @@ namespace Assets.Scripts.UI.EnchantItem
             var picker = go.AddComponent<EnchantItemPicker>();
             picker.scrollItemId = scrollItemId;
             picker.slot = SlotFromCode(scrollData.Code);
+            picker.isBlank = scrollData.Code == "Ench_Blank";
             picker.window = go.GetComponent<GenericItemListV2>();
             picker.Build(state, scrollData.Name);
         }
@@ -141,9 +144,24 @@ namespace Assets.Scripts.UI.EnchantItem
                 else
                     entry.HideCount();
 
-                //What is already on it, so nobody overwrites a good roll by accident.
+                //A scroll only writes on blank equipment, so what is already on a piece
+                //decides whether it can be picked at all. Shown rather than hidden: a ring
+                //missing from the list reads as a bug, a ring that says why it cannot be
+                //used reads as a rule.
                 var existing = ItemEnchants.Get(item.UniqueItem.UniqueId);
-                entry.RightText.text = existing == null ? "" : $"{existing.Options.Count} ออพ";
+                var blocked = isBlank ? existing == null : existing != null;
+
+                if (blocked)
+                {
+                    blockedEntries.Add(entryId);
+                    entry.RightText.text = isBlank
+                        ? "<size=-3><color=#7A7480>ไม่มีออพ</color></size>"
+                        : $"<size=-3><color=#CC0000>{existing.Options.Count} ออพ · ต้องล้างก่อน</color></size>";
+                }
+                else
+                    entry.RightText.text = isBlank
+                        ? $"<size=-3><color=#7A7480>{existing.Options.Count} ออพ</color></size>"
+                        : "";
 
                 entry.CanDrag = false;
                 entry.CanSelect = true;
@@ -226,6 +244,17 @@ namespace Assets.Scripts.UI.EnchantItem
                 selected.Unselect();
 
             selected = row;
+
+            if (blockedEntries.Contains(entryId))
+            {
+                selectedEntry = -1;
+                window.OkButton.interactable = false;
+                ShowHint(isBlank
+                    ? "<color=#CC0000>ของชิ้นนั้นไม่มีออพให้ล้าง</color>"
+                    : "<color=#CC0000>ของชิ้นนี้มีออพอยู่แล้ว</color> ใช้คัมภีร์ล้างออพก่อน แล้วค่อยจารใหม่");
+                return;
+            }
+
             selectedEntry = entryId;
 
             //The prefab ships its ok button switched off, which is the list saying "pick

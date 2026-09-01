@@ -68,6 +68,18 @@ public static class EnchantSystem
             return false;
         }
 
+        //A scroll writes on blank equipment only. Overwriting was the old rule and it made
+        //the blank scroll pointless - if a bad roll could simply be rolled over, nobody
+        //would ever spend five hundred red stockings to clear one. It also made the whole
+        //thing cheaper than it reads: the real cost of a legendary block is not the scroll
+        //that lands it, it is every scroll before that one, and a player who could keep
+        //trying on the same ring was paying that cost once instead of every time.
+        if (!isBlank && EnchantRegistry.IsEnchanted(uniqueId))
+        {
+            CommandBuilder.ErrorMessage(player, "ของชิ้นนี้มีออพอยู่แล้ว — ต้องใช้คัมภีร์ล้างออพก่อนถึงจะจารใหม่ได้");
+            return false;
+        }
+
         return true;
     }
 
