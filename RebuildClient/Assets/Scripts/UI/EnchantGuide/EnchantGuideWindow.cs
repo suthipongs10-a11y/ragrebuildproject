@@ -51,6 +51,8 @@ namespace Assets.Scripts.UI.EnchantGuide
         private GenericItemListV2 window;
         private readonly Dictionary<int, string> detailByEntry = new Dictionary<int, string>();
         private readonly List<ItemListEntryV2> rows = new List<ItemListEntryV2>();
+        private readonly Dictionary<int, ItemListEntryV2> rowByEntry = new Dictionary<int, ItemListEntryV2>();
+        private ItemListEntryV2 selected;
         private int tier;
 
         public static void Open(int startTier = 0)
@@ -117,7 +119,11 @@ namespace Assets.Scripts.UI.EnchantGuide
         {
             var t = EnchantGuideData.Tiers[tier];
 
-            window.TitleBar.text = string.Format("คู่มือออพ — ระดับ<color={0}>{1}</color>", t.Colour, t.Thai);
+            //No colour tags in the title. The bar behind it is the window chrome's blue and
+            //the tier colours are all dark - brown, navy, olive - so a tinted word there is
+            //a word nobody can read. The tier gets its colour on the first row instead,
+            //where the background is white.
+            window.TitleBar.text = "คู่มือออพ — ระดับ" + t.Thai;
             window.OkButtonText.text = "ระดับถัดไป";
             window.CancelButtonText.text = "ปิด";
 
@@ -125,48 +131,92 @@ namespace Assets.Scripts.UI.EnchantGuide
             //because its usual job is "submit the thing you chose", and here it is a page
             //turn that is always available.
             window.OkButton.interactable = true;
+
             window.InfoAreaText.gameObject.SetActive(true);
-            window.InfoAreaText.text = EnchantGuideData.OddsText(tier);
+            window.InfoAreaText.text = "กดที่ชื่อของเพื่อดูว่าดรอปจากมอนตัวไหน แมพอะไร";
 
             ClearRows();
             BuildSourceIndex();
 
-            var loader = ClientDataLoader.Instance;
             var entryId = 0;
+
+            AddTextRow(ref entryId,
+                string.Format("<b><color={0}>คัมภีร์ระดับ{1}</color></b>", t.Colour, t.Thai),
+                string.Format("ค่าจ้าง {0:n0} zeny", t.Zeny), null);
+
+            var loader = ClientDataLoader.Instance;
 
             foreach (var mat in t.Materials)
             {
-                var entry = window.GetNewEntry();
-                rows.Add(entry);
-
                 ItemData itemData = null;
                 if (loader != null)
                     loader.TryGetItemByName(mat.Code, out itemData);
 
-                var sprite = itemData != null ? loader.GetIconAtlasSprite(itemData.Sprite) : null;
-                entry.Assign(DragItemType.None, sprite, itemData != null ? itemData.Id : 0, 1);
+                var name = itemData != null ? itemData.Name : mat.Code;
+                var sources = itemData != null ? SourcesFor(itemData.Id) : null;
+
+                var entry = NewRow(entryId);
+                ShowIcon(entry, true);
+                entry.Assign(DragItemType.None, itemData != null ? loader.GetIconAtlasSprite(itemData.Sprite) : null,
+                    itemData != null ? itemData.Id : 0, 1);
                 entry.HideCount();
 
-                var name = itemData != null ? itemData.Name : mat.Code;
                 entry.ItemName.text = string.Format("{0} <color=#B08A3A><b>x{1}</b></color>", name, mat.Count);
-                entry.ItemName.rectTransform.anchorMax = new Vector2(1, 1);
-
-                var sources = itemData != null ? SourcesFor(itemData.Id) : null;
                 entry.RightText.text = ShortSource(sources, mat.Note);
-
-                entry.CanDrag = false;
-                entry.CanSelect = true;
-                entry.UniqueEntryId = entryId;
-                entry.EventOnSelect = ShowDetail;
-                entry.EventDoubleClick = ShowDetail;
 
                 detailByEntry[entryId] = DetailText(name, mat, sources);
                 entryId++;
             }
 
-            //The fee is not an item so it cannot be a row with an icon, and it is the one
-            //number a player checks before walking to the npc, so it goes in the title.
-            window.TitleBar.text += string.Format("   <size=-2><color=#7A7480>ค่าจ้าง {0:n0} zeny</color></size>", t.Zeny);
+            //The odds go in the list rather than the text strip under it. The strip is two
+            //lines tall and a legendary accessory rolls from eighteen stats; it ran out the
+            //bottom of the window and over the game behind it.
+            foreach (var row in EnchantGuideData.OddsRows(tier))
+                AddTextRow(ref entryId, row.Label, row.Detail, row.IsHeader ? null : row.Label + "   " + row.Detail);
+        }
+
+        /// <summary>A row with no icon, for the things that are not items.</summary>
+        private void AddTextRow(ref int entryId, string label, string detail, string onClick)
+        {
+            var entry = NewRow(entryId);
+            ShowIcon(entry, false);
+            entry.HideCount();
+            entry.ItemName.text = label;
+            entry.RightText.text = string.IsNullOrEmpty(detail)
+                ? ""
+                : "<size=-3><color=#7A7480>" + detail + "</color></size>";
+
+            if (!string.IsNullOrEmpty(onClick))
+                detailByEntry[entryId] = onClick;
+
+            entryId++;
+        }
+
+        /// <summary>
+        /// Rows come back off the list's spare pile with whatever the last page left on
+        /// them, so both kinds set this rather than only the one that turns it off.
+        /// </summary>
+        private static void ShowIcon(ItemListEntryV2 entry, bool visible)
+        {
+            if (entry.ImageDisplayGroup != null)
+                entry.ImageDisplayGroup.SetActive(visible);
+        }
+
+        /// <summary>The bits every row needs, however it is filled in afterwards.</summary>
+        private ItemListEntryV2 NewRow(int entryId)
+        {
+            var entry = window.GetNewEntry();
+            rows.Add(entry);
+
+            entry.ItemName.rectTransform.anchorMax = new Vector2(1, 1);
+            entry.CanDrag = false;
+            entry.CanSelect = true;
+            entry.UniqueEntryId = entryId;
+            entry.EventOnSelect = ShowDetail;
+            entry.EventDoubleClick = ShowDetail;
+
+            rowByEntry[entryId] = entry;
+            return entry;
         }
 
         /// <summary>
@@ -181,6 +231,8 @@ namespace Assets.Scripts.UI.EnchantGuide
         private void ClearRows()
         {
             detailByEntry.Clear();
+            rowByEntry.Clear();
+            selected = null;
 
             foreach (var row in rows)
             {
@@ -192,8 +244,23 @@ namespace Assets.Scripts.UI.EnchantGuide
             rows.Clear();
         }
 
+        /// <summary>
+        /// One row lit at a time, and whatever it has to say goes under the list.
+        /// </summary>
+        /// <remarks>
+        /// A row paints itself selected on click and nothing paints it back, so without the
+        /// unselect every row anybody had ever tried stayed lit.
+        /// </remarks>
         private void ShowDetail(int entryId)
         {
+            if (rowByEntry.TryGetValue(entryId, out var row))
+            {
+                if (selected != null && selected != row)
+                    selected.Unselect();
+
+                selected = row;
+            }
+
             if (detailByEntry.TryGetValue(entryId, out var text))
                 window.InfoAreaText.text = text;
         }

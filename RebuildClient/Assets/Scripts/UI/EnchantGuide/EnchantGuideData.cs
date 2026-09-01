@@ -248,33 +248,50 @@ namespace Assets.Scripts.UI.EnchantGuide
             return sb.ToString();
         }
 
-        /// <summary>The whole odds sheet for one tier, ready to drop into a text box.</summary>
-        public static string OddsText(int tier)
+        /// <summary>One line of the odds sheet, as a row in the list.</summary>
+        /// <remarks>
+        /// Rows rather than one block of text, because the block did not fit. The window's
+        /// text strip is a couple of lines tall and the sheet for a legendary accessory is
+        /// eighteen stats long - it ran straight out the bottom of the window and over the
+        /// game. The list beside it scrolls, and was already the right shape for this.
+        /// </remarks>
+        public class GuideOddsRow
         {
-            var t = Tiers[tier];
-            var sb = new StringBuilder();
+            public readonly string Label;
+            public readonly string Detail;
+            public readonly bool IsHeader;
 
-            sb.Append("<b>คัมภีร์ระดับ<color=").Append(t.Colour).Append(">").Append(t.Thai).Append("</color></b>  ");
-            sb.Append("จาร <b>").Append(t.Rows).Append("</b> ช่อง · แต่ละช่องว่างเปล่า <b>").Append(t.EmptyPerCent).Append("%</b>\n");
-            sb.Append("<size=-3><color=#7A7480>ช่องที่ติดจะไม่ต่ำกว่าค่าต่ำสุดเสมอ ความยากอยู่ที่จะปีนขึ้นไปได้สูงแค่ไหน</color></size>\n\n");
-
-            AppendFamily(sb, tier, GuideFamily.Weapon, "อาวุธ");
-            AppendFamily(sb, tier, GuideFamily.Armour, "ชุดเกราะ · โล่ · ของสวมหัว · รองเท้า");
-            AppendFamily(sb, tier, GuideFamily.Accessory, "เครื่องประดับ (ได้ทั้งสองสาย)");
-
-            sb.Append("<size=-3><color=#7A7480>เปอร์เซ็นต์ข้างชื่อคือโอกาสที่ช่องหนึ่งจะออกสเตตัสนั้น ");
-            sb.Append("ช่องถัดไปจะไม่ออกซ้ำกับที่ได้ไปแล้ว โอกาสของช่องหลังจึงสูงกว่านี้เล็กน้อย</color></size>");
-
-            return sb.ToString();
+            public GuideOddsRow(string label, string detail, bool isHeader = false)
+            {
+                Label = label;
+                Detail = detail;
+                IsHeader = isHeader;
+            }
         }
 
-        private static void AppendFamily(StringBuilder sb, int tier, GuideFamily family, string title)
+        public static List<GuideOddsRow> OddsRows(int tier)
+        {
+            var t = Tiers[tier];
+            var rows = new List<GuideOddsRow>();
+
+            rows.Add(new GuideOddsRow(
+                string.Format("<b>โอกาสออพ</b> — จาร <b>{0}</b> ช่อง", t.Rows),
+                string.Format("ช่องว่าง {0}%", t.EmptyPerCent), true));
+
+            AppendFamily(rows, tier, GuideFamily.Weapon, "อาวุธ");
+            AppendFamily(rows, tier, GuideFamily.Armour, "เกราะ · โล่ · หัว · รองเท้า");
+            AppendFamily(rows, tier, GuideFamily.Accessory, "เครื่องประดับ");
+
+            return rows;
+        }
+
+        private static void AppendFamily(List<GuideOddsRow> rows, int tier, GuideFamily family, string title)
         {
             var pool = PoolSize(tier, family);
             if (pool <= 0)
                 return;
 
-            sb.Append("<b>").Append(title).Append("</b>  <size=-3><color=#7A7480>พูล ").Append(pool).Append(" สเตตัส</color></size>\n");
+            rows.Add(new GuideOddsRow("<b>" + title + "</b>", "พูล " + pool + " สเตตัส", true));
 
             foreach (var stat in Pool)
             {
@@ -285,20 +302,11 @@ namespace Assets.Scripts.UI.EnchantGuide
                 var min = stat.Min[tier];
                 var max = stat.Max[tier];
 
-                sb.Append("  <color=#B08A3A>").Append(chance.ToString("0.#")).Append("%</color>  ").Append(stat.Label);
-                sb.Append("  <b>+").Append(min);
-                if (max > min)
-                    sb.Append('~').Append(max);
-                sb.Append("</b>");
+                var label = string.Format("<color=#B08A3A>{0}%</color>  {1}  <b>+{2}{3}</b>",
+                    chance.ToString("0.#"), stat.Label, min, max > min ? "~" + max : "");
 
-                var spread = Spread(min, max, Tiers[tier].Curve);
-                if (spread.Length > 0)
-                    sb.Append("  <size=-3><color=#7A7480>").Append(spread).Append("</color></size>");
-
-                sb.Append('\n');
+                rows.Add(new GuideOddsRow(label, Spread(min, max, Tiers[tier].Curve)));
             }
-
-            sb.Append('\n');
         }
     }
 }
