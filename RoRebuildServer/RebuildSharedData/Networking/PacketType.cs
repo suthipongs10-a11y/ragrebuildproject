@@ -195,6 +195,10 @@ public enum PacketType : byte
     //a scroll being used on one particular item in the bag. Client to server only: the
     //answer comes back as an EnchantedItems packet like any other change to the options.
     EnchantItem,
+
+    //Appended, like every one before it: the value is the wire format and moving an
+    //existing one renumbers every client that has not had updateclient.bat run against it.
+    GrindCard,
 }
 
 public enum MessageType : byte
@@ -243,4 +247,5 @@ public enum NpcInteractionType
     //the wire format, and moving an existing one renumbers every client that has not had
     //updateclient.bat run against it.
     NpcOpenEnchantGuide,
+    NpcOpenCardGrinder,
 }

@@ -1555,6 +1555,15 @@ public static partial class CommandBuilder
         NetworkManager.SendMessage(packet, p.Connection);
     }
 
+    /// <summary>Opens the card grinder. Carries nothing; the client already has the bag.</summary>
+    public static void SendNpcOpenCardGrinder(Player p)
+    {
+        var packet = NetworkManager.StartPacket(PacketType.NpcInteraction, 8);
+        packet.Write((byte)NpcInteractionType.NpcOpenCardGrinder);
+
+        NetworkManager.SendMessage(packet, p.Connection);
+    }
+
     public static void SendNpcOpenShop(Player p, Npc npc, bool canDiscount)
     {
         var packet = NetworkManager.StartPacket(PacketType.OpenShop, 128);

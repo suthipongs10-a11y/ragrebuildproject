@@ -151,7 +151,7 @@ namespace Assets.Scripts.UI.EnchantGuide
                 new GuideMaterial("Toxic_Gas", 1, "ของหลุดจากบอส"),
                 new GuideMaterial("Tattered_Clothes", 1, "ของหลุดจากบอส"),
                 new GuideMaterial("Black_Dyestuffs", 1, "ของหลุดจากบอส"),
-                new GuideMaterial("Card_Dust", 1, "ผงการ์ด — ยังไม่มีในเกม")
+                new GuideMaterial("Card_Dust", 1, "บดการ์ดที่อาลักษณ์")
             }),
             new GuideTier("ตำนาน", "#A32E45", 3, 25, 2.6f, 1000000, new[]
             {
@@ -166,7 +166,7 @@ namespace Assets.Scripts.UI.EnchantGuide
                 new GuideMaterial("Rose_Quartz", 5),
                 new GuideMaterial("Turquoise", 5),
                 new GuideMaterial("Emperium", 5),
-                new GuideMaterial("Card_Dust", 5, "ผงการ์ด — ยังไม่มีในเกม"),
+                new GuideMaterial("Card_Dust", 5, "บดการ์ดที่อาลักษณ์"),
                 new GuideMaterial("Ench_Heaven_Weapon", 1, "คัมภีร์สวรรค์ ชนิดไหนก็ได้")
             })
         };

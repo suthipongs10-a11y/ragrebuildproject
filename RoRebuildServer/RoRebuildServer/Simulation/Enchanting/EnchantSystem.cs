@@ -155,7 +155,7 @@ public static class EnchantSystem
     /// field has an empty one, and the person who used the scroll is the one who most needs
     /// to see what it did.
     /// </remarks>
-    private static void PlayEffect(Player player, string effectName)
+    internal static void PlayEffect(Player player, string effectName)
     {
         if (player.Character == null || player.Connection == null)
             return;

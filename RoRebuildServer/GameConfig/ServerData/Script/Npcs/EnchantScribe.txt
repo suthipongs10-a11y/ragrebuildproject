@@ -91,17 +91,35 @@ OnClick:
 						 "กระดาษมันไม่ยอมรับรอยจารสองชั้น ถ้าจะจารใหม่ต้องล้างของเก่าออกด้วย<color=#CC5500>คัมภีร์ล้างออพ</color>ก่อน");
 		}
 
+		//Two tiers only for now. The scribe says so rather than hiding the other two,
+		//because a menu that grows later is a menu nobody notices grew.
 		if(choice == 4)
-			Dialog(name, "<color=#CC0000>ข้ายังจารไม่ได้</color> หมึกยังไม่แห้ง กระดาษยังไม่มา " +
-						 "กลับมาใหม่อีกทีนะเจ้าหนู");
+		{
+			Dialog(name, "เอาของมาวางตรงนี้ ข้าจะดูให้ว่าพอไหม <color=#CC0000>พลาดแล้ววัตถุดิบหายหมดนะ</color> " +
+						 "และข้าเลือกไม่ได้ว่าจะออกมาเป็นคัมภีร์ชนิดไหน");
+			Option("ดูสูตรระดับดิน", "จารระดับดิน", "ดูสูตรระดับฟ้า", "จารระดับฟ้า", "ยังไม่เอา");
+
+			if(result == 0) ShowEnchantRecipe(1);
+			if(result == 1) CraftEnchantScroll(1);
+			if(result == 2) ShowEnchantRecipe(2);
+			if(result == 3) CraftEnchantScroll(2);
+
+			if(result < 4)
+				Dialog(name, "ดูที่ช่องข้อความสิ ข้าเขียนบอกไว้หมดแล้ว");
+		}
 
 		if(choice == 5)
-			Dialog(name, "<color=#CC0000>ครกบดการ์ดยังไม่มา</color> เอาไว้ค่อยว่ากัน " +
-						 "แต่เก็บการ์ดที่ไม่ได้ใช้ไว้ให้ดีล่ะ เดี๋ยวจะได้ใช้");
+		{
+			Dialog(name, "การ์ดที่ไม่ได้ใช้มีไหม ข้าบดให้เป็น<color=#CC5500>ผงการ์ด</color>ได้ " +
+						 "หนึ่งใบได้หนึ่งผง เอาไว้ทำคัมภีร์ระดับสวรรค์กับตำนาน");
+			Dialog(name, "<color=#CC0000>การ์ดบอสข้าไม่บดให้นะ</color> ของแบบนั้นบดทิ้งแล้วเจ้าจะเสียใจ");
+			OpenCardGrinder();
+			choice = 8;
+		}
 
 		if(choice == 6)
-			Dialog(name, "<color=#CC0000>ยังล้างให้ไม่ได้</color> ต้องรอให้ข้าจารคัมภีร์เป็นเสียก่อน " +
-						 "ถึงจะมีอะไรให้ล้าง");
+			Dialog(name, "<color=#CC5500>คัมภีร์ล้างออพ</color>ข้ายังทำขายไม่ได้ แต่กฎข้อนี้จำไว้ให้ดี — " +
+						 "<color=#CC0000>ของที่มีออพอยู่แล้ว จารทับไม่ได้</color> ต้องล้างให้ว่างก่อนเสมอ");
 
 		result = choice;
 	}

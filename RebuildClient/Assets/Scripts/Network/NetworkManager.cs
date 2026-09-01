@@ -1917,6 +1917,17 @@ namespace Assets.Scripts.Network
             SendMessage(msg);
         }
 
+        public void SendGrindCard(int itemId, int count)
+        {
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.GrindCard);
+            msg.Write(itemId);
+            msg.Write(count);
+
+            SendMessage(msg);
+        }
+
         public void SendEmote(int id)
         {
             var msg = StartMessage();

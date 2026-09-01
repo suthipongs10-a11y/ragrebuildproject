@@ -3,6 +3,7 @@ using RebuildSharedData.Enum;
 using RoRebuildServer.EntitySystem;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Networking;
+using RoRebuildServer.Simulation.Enchanting;
 using RoRebuildServer.Data;
 using System.Diagnostics;
 using RebuildSharedData.Enum.EntityStats;
@@ -432,6 +433,30 @@ public class NpcInteractionState
     {
         if (Player == null) return;
         CommandBuilder.SendNpcOpenEnchantGuide(Player);
+    }
+
+    /// <summary>Opens the card grinder. Like the guide, it does not wait for the window.</summary>
+    public void OpenCardGrinder()
+    {
+        if (Player == null) return;
+        CommandBuilder.SendNpcOpenCardGrinder(Player);
+    }
+
+    /// <summary>Reads a recipe out with what the player is carrying beside it.</summary>
+    public void ShowEnchantRecipe(int tier)
+    {
+        if (Player == null) return;
+        EnchantCraftSystem.Describe(Player, (EnchantTier)tier);
+    }
+
+    /// <summary>
+    /// One attempt at a scroll. Says everything it does out loud, so the script does not
+    /// have to know whether it worked.
+    /// </summary>
+    public void CraftEnchantScroll(int tier)
+    {
+        if (Player == null) return;
+        EnchantCraftSystem.TryCraft(Player, (EnchantTier)tier);
     }
 
     public void OpenShop(bool hasDiscount = true)
