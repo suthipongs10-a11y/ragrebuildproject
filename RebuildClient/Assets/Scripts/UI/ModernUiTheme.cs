@@ -89,16 +89,32 @@ namespace Assets.Scripts.UI
 
         private static bool? runtimeUiEnabled;
 
+        /// <summary>The editor pref the Ragnarok menu writes. Read back below.</summary>
+        public const string VanillaUiPrefKey = "Ragnarok.VanillaUi";
+
         /// <summary>
         /// Everything this project adds at runtime, the window skins and the touch
         /// controls, can be switched off by putting ?vanillaui=1 in the page address.
         /// A WebGL build takes long enough that being able to tell a fault in this code
         /// apart from one in the game itself without rebuilding is worth the flag.
+        ///
+        /// In the editor there is no page address to put it in, so the same decision comes
+        /// from a menu item instead - see VanillaUiToggle. Nothing is removed either way:
+        /// the skins simply do not run, and the windows the scene already holds draw
+        /// themselves the way the game shipped them.
         /// </summary>
         public static bool RuntimeUiEnabled
         {
             get
             {
+#if UNITY_EDITOR
+                //Read fresh rather than through the cache below. The menu can be flipped
+                //between one Play session and the next, and with domain reloading turned off
+                //a cached answer would outlive the decision that produced it.
+                if (UnityEditor.EditorPrefs.GetBool(VanillaUiPrefKey, false))
+                    return false;
+#endif
+
                 if (runtimeUiEnabled == null)
                 {
                     var url = Application.absoluteURL ?? "";
