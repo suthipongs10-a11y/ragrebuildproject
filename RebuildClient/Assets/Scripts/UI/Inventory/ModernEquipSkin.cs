@@ -56,7 +56,7 @@ namespace Assets.Scripts.UI.Inventory
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
-            if (!ModernUiTheme.RuntimeUiEnabled)
+            if (!ModernUiTheme.SkinsEnabled)
                 return;
 
             if (FindFirstObjectByType<ModernEquipSkin>() != null)

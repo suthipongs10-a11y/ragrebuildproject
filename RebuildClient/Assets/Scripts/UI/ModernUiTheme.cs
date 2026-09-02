@@ -88,33 +88,27 @@ namespace Assets.Scripts.UI
         }
 
         private static bool? runtimeUiEnabled;
+        private static bool? skinsEnabled;
 
         /// <summary>The editor pref the Ragnarok menu writes. Read back below.</summary>
         public const string VanillaUiPrefKey = "Ragnarok.VanillaUi";
 
         /// <summary>
-        /// Everything this project adds at runtime, the window skins and the touch
-        /// controls, can be switched off by putting ?vanillaui=1 in the page address.
-        /// A WebGL build takes long enough that being able to tell a fault in this code
-        /// apart from one in the game itself without rebuilding is worth the flag.
+        /// Whether anything this project adds at runtime exists at all - the window skins,
+        /// the dock bar, the character hub, the touch controls. Off only for ?vanillaui=1 in
+        /// the page address, which is how a fault in this code is told apart from one in the
+        /// game itself without rebuilding a WebGL client.
         ///
-        /// In the editor there is no page address to put it in, so the same decision comes
-        /// from a menu item instead - see VanillaUiToggle. Nothing is removed either way:
-        /// the skins simply do not run, and the windows the scene already holds draw
-        /// themselves the way the game shipped them.
+        /// This is the wrong switch for "give me the old windows back". Several windows the
+        /// project added have no home in the game's own interface - the market, the adventure
+        /// book, the guild and party pages, the graphics settings - and they are reached
+        /// through the dock bar and the character hub, which this turns off along with
+        /// everything else, so they simply vanish. SkinsEnabled is that switch.
         /// </summary>
         public static bool RuntimeUiEnabled
         {
             get
             {
-#if UNITY_EDITOR
-                //Read fresh rather than through the cache below. The menu can be flipped
-                //between one Play session and the next, and with domain reloading turned off
-                //a cached answer would outlive the decision that produced it.
-                if (UnityEditor.EditorPrefs.GetBool(VanillaUiPrefKey, false))
-                    return false;
-#endif
-
                 if (runtimeUiEnabled == null)
                 {
                     var url = Application.absoluteURL ?? "";
@@ -124,6 +118,49 @@ namespace Assets.Scripts.UI
                 }
 
                 return runtimeUiEnabled.Value;
+            }
+        }
+
+        /// <summary>
+        /// Whether the game's own windows get reskinned. Everything the project added stays
+        /// exactly where it is either way.
+        /// </summary>
+        /// <remarks>
+        /// A skin is paint over a window the scene already contains, so switching skins off
+        /// leaves those windows to draw themselves the way the game shipped them - and
+        /// nothing else changes. The market, the adventure book, the guild and party pages,
+        /// the enchant and card windows and the dock bar that reaches them are not skins,
+        /// they are windows in their own right, and they stay. So does the Thai wording,
+        /// which is applied to the game's own buttons rather than painted onto them.
+        ///
+        /// In the editor the answer comes from the Ragnarok menu - see VanillaUiToggle - and
+        /// in a browser from ?vanillaskin=1, the same idea as the flag above with a narrower
+        /// reach.
+        /// </remarks>
+        public static bool SkinsEnabled
+        {
+            get
+            {
+                if (!RuntimeUiEnabled)
+                    return false;
+
+#if UNITY_EDITOR
+                //Read fresh rather than through a cached field. The menu can be flipped
+                //between one Play session and the next, and with domain reloading turned off
+                //a cached answer would outlive the decision that produced it.
+                if (UnityEditor.EditorPrefs.GetBool(VanillaUiPrefKey, false))
+                    return false;
+#endif
+
+                if (skinsEnabled == null)
+                {
+                    var url = Application.absoluteURL ?? "";
+                    skinsEnabled = url.IndexOf("vanillaskin=1", StringComparison.OrdinalIgnoreCase) < 0;
+                    if (!skinsEnabled.Value)
+                        Debug.Log("[ModernUi] Window skins disabled by the vanillaskin flag.");
+                }
+
+                return skinsEnabled.Value;
             }
         }
 

@@ -47,11 +47,39 @@ namespace Assets.Scripts.UI
             host.AddComponent<ModernPanelSkins>();
         }
 
+        /// <summary>
+        /// Swaps the wording on the game's own buttons.
+        /// </summary>
+        /// <remarks>
+        /// The bar along the bottom and the rest of the heads up display are built by the
+        /// scene rather than by a window, and buttons can appear at any point during a
+        /// session, so this runs on its own slower beat instead of once at the start.
+        /// </remarks>
+        private void Translate(UiManager ui)
+        {
+            translateTimer -= Time.deltaTime;
+            if (translateTimer > 0)
+                return;
+
+            translateTimer = TranslateInterval;
+            if (ui.PrimaryUserUIContainer != null)
+                ThaiUiText.ApplyToControls(ui.PrimaryUserUIContainer.transform);
+        }
+
         private void Update()
         {
             var ui = UiManager.Instance;
             if (ui == null)
                 return;
+
+            //With the skins switched off this component keeps running for one job only. The
+            //Thai wording is not a skin - it is applied to the game's own buttons rather than
+            //painted over them - and it is wanted whichever set of windows is on screen.
+            if (!ModernUiTheme.SkinsEnabled)
+            {
+                Translate(ui);
+                return;
+            }
 
             if (ui.SkillManager != null && !ModernUiTheme.IsSkinned(ui.SkillManager.gameObject))
                 SkinSkills(ui.SkillManager);
@@ -75,16 +103,7 @@ namespace Assets.Scripts.UI
             if (emoteWindow != null && !ModernUiTheme.IsSkinned(emoteWindow.gameObject))
                 SkinEmotes(emoteWindow);
 
-            //the bar along the bottom and the rest of the heads up display are built by
-            //the scene rather than by a window, so the wording is swapped on its own
-            //slower beat: buttons can appear at any point during a session
-            translateTimer -= Time.deltaTime;
-            if (translateTimer <= 0)
-            {
-                translateTimer = TranslateInterval;
-                if (ui.PrimaryUserUIContainer != null)
-                    ThaiUiText.ApplyToControls(ui.PrimaryUserUIContainer.transform);
-            }
+            Translate(ui);
 
             //windows built from prefabs appear long after the scene loads, so the general
             //pass runs on a timer rather than only once

@@ -21,7 +21,7 @@ namespace Assets.Scripts.UI.ClientDatabase
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
-            if (!ModernUiTheme.RuntimeUiEnabled)
+            if (!ModernUiTheme.SkinsEnabled)
                 return;
 
             if (FindFirstObjectByType<ModernDatabaseSkin>() != null)

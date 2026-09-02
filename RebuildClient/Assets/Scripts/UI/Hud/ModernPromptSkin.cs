@@ -59,7 +59,7 @@ namespace Assets.Scripts.UI.Hud
         /// <summary>Dresses a prompt box once. Safe to call every frame; it only bites once.</summary>
         public static void Skin(GameObject window, string title, Sprite icon)
         {
-            if (window == null || !ModernUiTheme.RuntimeUiEnabled || ModernUiTheme.IsSkinned(window))
+            if (window == null || !ModernUiTheme.SkinsEnabled || ModernUiTheme.IsSkinned(window))
                 return;
 
             ModernUiTheme.MarkSkinned(window);

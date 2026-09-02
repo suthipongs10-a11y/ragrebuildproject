@@ -28,7 +28,7 @@ namespace Assets.Scripts.UI.Hud
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
-            if (!ModernUiTheme.RuntimeUiEnabled)
+            if (!ModernUiTheme.SkinsEnabled)
                 return;
 
             if (FindFirstObjectByType<ModernHudSkin>() != null)

@@ -24,7 +24,7 @@ namespace Assets.Scripts.UI.TitleScreen
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
         {
-            if (!ModernUiTheme.RuntimeUiEnabled)
+            if (!ModernUiTheme.SkinsEnabled)
                 return;
 
             if (FindFirstObjectByType<ModernTitleSkin>() != null)
