@@ -26,42 +26,55 @@ public static class CardGrindSystem
 {
     public const string DustCode = "Card_Dust";
 
-    /// <summary>Built on first use, from the drop tables the server already has.</summary>
-    private static HashSet<int>? bossCards;
+    /// <summary>Cards a boss drops and nothing ordinary does. Built on first use.</summary>
+    private static HashSet<int>? bossOnlyCards;
 
-    /// <summary>Cards an ordinary monster drops, which makes them ordinary however else they drop.</summary>
-    private static HashSet<int>? commonCards;
+    /// <summary>Cards the scribe will take. A whitelist, not whatever is left over.</summary>
+    private static HashSet<int>? grindableCards;
 
     public static int DustPerCard => 1;
 
     /// <summary>
-    /// Every card that a boss or an mvp drops, worked out once.
+    /// Sorts every card into what the scribe will and will not take, once, out of data the
+    /// server already has.
     /// </summary>
     /// <remarks>
     /// Reading the drop tables rather than naming the cards means this is right by
     /// construction: move a card onto a boss and it becomes unbreakable, take it off and it
     /// does not, with nothing to remember to edit.
     ///
-    /// A card is only a boss card if nothing ordinary drops it. Both lists are collected and
-    /// the ordinary one wins, because "a boss drops it" turned out not to be the same
+    /// Three rules, applied in order.
+    ///
+    /// A card a boss drops and no ordinary monster does is refused. Both lists are collected
+    /// and the ordinary one wins, because "a boss drops it" turned out not to be the same
     /// question as "is it rare" - a Spore Card comes off a Spore at level sixteen and off a
-    /// Deathspore, which is a boss, and refusing it for the second source told a player
+    /// Deathspore, which is a boss, and refusing it for the second source told a player that
     /// their commonest card was too precious to grind.
+    ///
+    /// A card nothing drops and no box holds is refused as well. Those belong to monsters
+    /// with no drop table written yet, so nobody can be holding one - and refusing them now
+    /// means a boss whose drops get filled in later cannot be ground in the window before
+    /// its card reaches a drop table. Five cards sit in that state today, Dark Priest and
+    /// the three Valkyrie realm bosses among them.
+    ///
+    /// Everything else is fine. A box counts as a source, which is how a Kaho Card out of an
+    /// Old Card Album grinds - but only after the first rule has already taken the Ghostring
+    /// and Angeling cards out of that same album.
     /// </remarks>
-    private static HashSet<int> BossCards()
+    private static void SortCards()
     {
-        if (bossCards != null)
-            return bossCards;
+        if (grindableCards != null)
+            return;
 
-        bossCards = new HashSet<int>();
-        commonCards = new HashSet<int>();
+        var boss = new HashSet<int>();
+        var common = new HashSet<int>();
 
         foreach (var (code, drops) in DataManager.MonsterDropData)
         {
             if (!DataManager.MonsterCodeLookup.TryGetValue(code, out var monster))
                 continue;
 
-            var list = monster.Special == CharacterSpecialType.Boss ? bossCards : commonCards;
+            var list = monster.Special == CharacterSpecialType.Boss ? boss : common;
 
             foreach (var drop in drops.DropChances)
             {
@@ -70,10 +83,25 @@ public static class CardGrindSystem
             }
         }
 
-        bossCards.ExceptWith(commonCards);
+        boss.ExceptWith(common);
 
-        ServerLogger.Log($"[CardGrind] {bossCards.Count} card(s) come off bosses alone and cannot be ground.");
-        return bossCards;
+        var grind = new HashSet<int>(common);
+
+        foreach (var (_, contents) in DataManager.ItemBoxSummonList)
+        {
+            foreach (var id in contents)
+            {
+                if (DataManager.ItemList.TryGetValue(id, out var item) && item.ItemClass == ItemClass.Card)
+                    grind.Add(id);
+            }
+        }
+
+        grind.ExceptWith(boss);
+
+        bossOnlyCards = boss;
+        grindableCards = grind;
+
+        ServerLogger.Log($"[CardGrind] {grind.Count} card(s) can be ground, {boss.Count} come off bosses alone.");
     }
 
     /// <summary>Whether this item is a card the scribe will take, and why not if it is not.</summary>
@@ -87,9 +115,17 @@ public static class CardGrindSystem
             return false;
         }
 
-        if (BossCards().Contains(itemId))
+        SortCards();
+
+        if (bossOnlyCards!.Contains(itemId))
         {
             refusal = "การ์ดบอสบดไม่ได้";
+            return false;
+        }
+
+        if (!grindableCards!.Contains(itemId))
+        {
+            refusal = "การ์ดใบนี้ไม่มีมอนธรรมดาตัวไหนดรอป บดไม่ได้";
             return false;
         }
 
