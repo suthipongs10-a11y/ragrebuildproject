@@ -130,11 +130,14 @@ public static class EnchantSystem
         //watched a smith work knows what they mean without being told.
         PlayEffect(player, "RefineSuccess");
 
-        //The top two tiers get the level-up angel on top of it. A legendary scroll landing
-        //is rare enough that it should look different from an earth one landing, and it is
-        //the loudest thing in the effects table that is not somebody dying.
-        if (tier >= EnchantTier.Heaven)
-            PlayEffect(player, "LevelUp");
+        //The top two tiers get a halo on top of it. A legendary scroll landing should not
+        //look like an earth one landing, and the priest light effects read as "something
+        //blessed this" - which is the moment - where the level-up angel reads as "you
+        //levelled up", which is not what happened and looked wrong for it.
+        if (tier == EnchantTier.Heaven)
+            PlayEffect(player, "Angelus");
+        if (tier == EnchantTier.Legend)
+            PlayEffect(player, "Gloria");
 
         Announce(player, $"<color=#55FF55>จารคัมภีร์ลง {name} สำเร็จ</color>");
 

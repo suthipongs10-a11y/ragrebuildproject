@@ -140,8 +140,12 @@ public static class EnchantCraftSystem
         CommandBuilder.AddItemToInventory(player, itemRef, bagId, 1);
 
         EnchantSystem.PlayEffect(player, "RefineSuccess");
-        if (tier >= EnchantTier.Heaven)
-            EnchantSystem.PlayEffect(player, "LevelUp");
+
+        //Same halo the scroll itself uses when it lands, for the same reason.
+        if (tier == EnchantTier.Heaven)
+            EnchantSystem.PlayEffect(player, "Angelus");
+        if (tier == EnchantTier.Legend)
+            EnchantSystem.PlayEffect(player, "Gloria");
 
         var name = DataManager.ItemList.TryGetValue(scrollId, out var data) ? data.Name : code;
         Tell(player, $"<color=#55FF55>จารสำเร็จ</color> ได้ {name}");

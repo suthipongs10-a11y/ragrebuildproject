@@ -18,7 +18,7 @@ namespace RoRebuildServer.Simulation.Enchanting;
 /// and most of a long-running server's cards are ones nobody will ever socket.
 ///
 /// Boss cards are refused. Not by a list kept by hand, which would go stale the first time
-/// a monster changed - by asking what dropped the card and whether that thing was a boss.
+/// a monster changed - by asking what drops the card and whether anything ordinary does.
 /// A card nothing drops is refused too, since that is a card handed out by something other
 /// than hunting and grinding it is not what anybody meant.
 /// </remarks>
@@ -29,6 +29,9 @@ public static class CardGrindSystem
     /// <summary>Built on first use, from the drop tables the server already has.</summary>
     private static HashSet<int>? bossCards;
 
+    /// <summary>Cards an ordinary monster drops, which makes them ordinary however else they drop.</summary>
+    private static HashSet<int>? commonCards;
+
     public static int DustPerCard => 1;
 
     /// <summary>
@@ -38,6 +41,12 @@ public static class CardGrindSystem
     /// Reading the drop tables rather than naming the cards means this is right by
     /// construction: move a card onto a boss and it becomes unbreakable, take it off and it
     /// does not, with nothing to remember to edit.
+    ///
+    /// A card is only a boss card if nothing ordinary drops it. Both lists are collected and
+    /// the ordinary one wins, because "a boss drops it" turned out not to be the same
+    /// question as "is it rare" - a Spore Card comes off a Spore at level sixteen and off a
+    /// Deathspore, which is a boss, and refusing it for the second source told a player
+    /// their commonest card was too precious to grind.
     /// </remarks>
     private static HashSet<int> BossCards()
     {
@@ -45,23 +54,25 @@ public static class CardGrindSystem
             return bossCards;
 
         bossCards = new HashSet<int>();
+        commonCards = new HashSet<int>();
 
         foreach (var (code, drops) in DataManager.MonsterDropData)
         {
             if (!DataManager.MonsterCodeLookup.TryGetValue(code, out var monster))
                 continue;
 
-            if (monster.Special != CharacterSpecialType.Boss)
-                continue;
+            var list = monster.Special == CharacterSpecialType.Boss ? bossCards : commonCards;
 
             foreach (var drop in drops.DropChances)
             {
                 if (DataManager.ItemList.TryGetValue(drop.Id, out var item) && item.ItemClass == ItemClass.Card)
-                    bossCards.Add(drop.Id);
+                    list.Add(drop.Id);
             }
         }
 
-        ServerLogger.Log($"[CardGrind] {bossCards.Count} card(s) come off bosses and cannot be ground.");
+        bossCards.ExceptWith(commonCards);
+
+        ServerLogger.Log($"[CardGrind] {bossCards.Count} card(s) come off bosses alone and cannot be ground.");
         return bossCards;
     }
 

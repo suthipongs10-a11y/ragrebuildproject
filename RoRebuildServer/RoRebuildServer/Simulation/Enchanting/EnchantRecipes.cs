@@ -66,15 +66,17 @@ public static class EnchantRecipes
     /// What clearing a block costs, and it is not a gamble.
     /// </summary>
     /// <remarks>
-    /// Twenty-five earth scrolls' worth of stockings for one, which sounds punishing until
-    /// you notice it is the only way to undo anything: a scroll cannot be written over, so
-    /// without this a bad roll is permanent and the piece is finished. Paying heavily to
-    /// take a block off is the price of the block being safe to try in the first place.
+    /// The zeny is the weight here, not the materials. Five hundred stockings was the first
+    /// number and it was wrong: this is the only way to undo anything, so pricing it out of
+    /// reach makes a bad roll permanent in practice even though the rules say otherwise. A
+    /// hundred thousand still stings, and one card dust means it cannot be made before the
+    /// grinder has been used at least once, which is the gate that actually matters.
     ///
     /// No roll. A tool that failed would mean a player who cannot clear an item and cannot
     /// write on it either, which is a piece of equipment nobody can do anything with.
     /// </remarks>
-    private static readonly EnchantMaterial[] blankMaterials = [new("Red_Stocking", 500)];
+    private static readonly EnchantMaterial[] blankMaterials =
+        [new("Red_Stocking", 20), new("Card_Dust", 1)];
 
     private const int BlankZeny = 100000;
 
