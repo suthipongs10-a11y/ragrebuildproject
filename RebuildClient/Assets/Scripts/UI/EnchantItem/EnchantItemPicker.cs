@@ -63,6 +63,17 @@ namespace Assets.Scripts.UI.EnchantItem
             if (state?.Inventory == null)
                 return;
 
+            //Item use is blocked for as long as an npc has the player's attention - the same
+            //rule a potion obeys - so a picker opened here could only ever end in the server
+            //turning down whatever got chosen. Since the scribe is where scrolls come from,
+            //that is exactly where players try them, and the refusal used to arrive after a
+            //window, a row and a button press. Say it before the window instead.
+            if (IsTalkingToAnNpc())
+            {
+                CameraFollower.Instance.AppendNotice("ปิดบทสนทนากับ NPC ให้จบก่อน แล้วค่อยใช้คัมภีร์");
+                return;
+            }
+
             var prefab = UiManager.Instance.GenericItemListV2Prefab;
             var container = UiManager.Instance.PrimaryUserWindowContainer;
             var go = Instantiate(prefab, container);
@@ -73,6 +84,17 @@ namespace Assets.Scripts.UI.EnchantItem
             picker.isBlank = scrollData.Code == "Ench_Blank";
             picker.window = go.GetComponent<GenericItemListV2>();
             picker.Build(state, scrollData.Name);
+        }
+
+        /// <summary>Whether a dialogue or a menu is up, which is what blocks using an item.</summary>
+        private static bool IsTalkingToAnNpc()
+        {
+            var camera = CameraFollower.Instance;
+            if (camera == null)
+                return false;
+
+            return (camera.DialogPanel != null && camera.DialogPanel.activeInHierarchy)
+                   || (camera.NpcOptionPanel != null && camera.NpcOptionPanel.activeInHierarchy);
         }
 
         private static ScrollSlot SlotFromCode(string code)

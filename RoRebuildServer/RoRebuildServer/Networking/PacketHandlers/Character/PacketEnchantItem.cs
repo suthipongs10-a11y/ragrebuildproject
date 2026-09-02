@@ -29,8 +29,25 @@ public class PacketEnchantItem : IClientPacketHandler
             return;
 
         var player = connection.Player;
-        if (player == null || !player.CanPerformCharacterActions())
+        if (player == null)
             return;
+
+        //Every refusal below this line says so out loud. Using a scroll costs the player a
+        //window, a row to click and a button to press, and a silent return at the end of all
+        //that does not read as "not now" - it reads as the button being broken, which is
+        //exactly how it came back.
+        if (!player.CanPerformCharacterActions())
+        {
+            //Item use is blocked while an npc has the player's attention, everywhere in the
+            //game. The scribe is where scrolls come from, so the spot a player is most
+            //likely to try one is the one spot it cannot work - and the dialogue box sitting
+            //open on screen is the whole reason, which is worth saying rather than leaving
+            //them to guess.
+            CommandBuilder.ErrorMessage(player, player.IsInNpcInteraction
+                ? "ปิดบทสนทนากับ NPC ให้จบก่อน แล้วค่อยใช้คัมภีร์"
+                : "ตอนนี้ยังใช้คัมภีร์ไม่ได้ รอสักครู่แล้วลองใหม่");
+            return;
+        }
 
         var scrollId = msg.ReadInt32();
         var targetBagId = msg.ReadInt32();
@@ -39,12 +56,14 @@ public class PacketEnchantItem : IClientPacketHandler
 
         if (!DataManager.ItemList.TryGetValue(scrollId, out var scroll))
         {
+            CommandBuilder.ErrorMessage(player, "ไม่รู้จักคัมภีร์ใบนั้น");
             ServerLogger.LogWarning($"Player {player.Name} tried to enchant with item {scrollId}, which does not exist.");
             return;
         }
 
         if (!EnchantScrolls.TryRead(scroll.Code, out var tier, out var slot, out var isBlank))
         {
+            CommandBuilder.ErrorMessage(player, $"{scroll.Name} ไม่ใช่คัมภีร์");
             ServerLogger.LogWarning($"Player {player.Name} tried to enchant with {scroll.Code}, which is not a scroll.");
             return;
         }

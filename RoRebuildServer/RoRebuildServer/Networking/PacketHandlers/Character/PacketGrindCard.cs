@@ -20,8 +20,18 @@ public class PacketGrindCard : IClientPacketHandler
             return;
 
         var player = connection.Player;
-        if (player == null || !player.CanPerformCharacterActions())
+        if (player == null)
             return;
+
+        //Same silence the scroll had, for the same reason: the grinder is opened by the
+        //scribe, so the player is standing in the one state that blocks it.
+        if (!player.CanPerformCharacterActions())
+        {
+            CommandBuilder.ErrorMessage(player, player.IsInNpcInteraction
+                ? "ปิดบทสนทนากับ NPC ให้จบก่อน แล้วค่อยบดการ์ด"
+                : "ตอนนี้ยังบดการ์ดไม่ได้ รอสักครู่แล้วลองใหม่");
+            return;
+        }
 
         var itemId = msg.ReadInt32();
         var count = msg.ReadInt32();
