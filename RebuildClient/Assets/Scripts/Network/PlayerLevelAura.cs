@@ -22,8 +22,11 @@ namespace Assets.Scripts.Network
     ///
     /// The quads still dip below the ground plane on the side nearest the camera, which is
     /// why they are drawn without a depth test at all: with one, the terrain in front would
-    /// clip the lower half of the pool off. Nothing here writes depth, and everything sorts
-    /// behind the character sprite, so the feet stay visible and the ground never wins.
+    /// clip the lower half of the pool off. Nothing here writes depth, and everything is
+    /// drawn in the queue before the character sprites, so the feet stay visible and the
+    /// ground never wins. The queue rather than the sorting order, because the first
+    /// version sat one queue after the sprites with a sorting order below them and painted
+    /// straight over the feet: between queues the order is not consulted at all.
     ///
     /// It reads the level off the character rather than being told when to appear. The
     /// client already knows what level everything on screen is - it is in the spawn packet
@@ -208,9 +211,13 @@ namespace Assets.Scripts.Network
 
             var renderer = go.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
-            //behind the character rather than in front of it, so the feet are never covered
-            //and the rays come out from behind the body the way the reference has them
-            renderer.sortingOrder = -1;
+            //Behind the character rather than in front of it, so the feet are never covered
+            //and the rays come out from behind the body the way the reference has them.
+            //Most of that is the material's render queue, which sits just before the
+            //character sprites; this is the tie-break within that queue, and it puts the
+            //aura under the character's shadow as well, so the shadow reads as a grey
+            //oval in the middle of the light the way the reference has it.
+            renderer.sortingOrder = -20;
 
             //no depth test, or the ground in front of the feet clips the bottom off every quad
             var material = GroundItemAura.MaterialFor(tint, true);

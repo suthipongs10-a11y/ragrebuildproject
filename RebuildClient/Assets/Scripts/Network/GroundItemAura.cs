@@ -510,8 +510,13 @@ namespace Assets.Scripts.Network
             var shader = ignoreDepth && cache.AdditiveShaderNoZTest != null ? cache.AdditiveShaderNoZTest : cache.AdditiveShader;
             var material = new Material(shader);
             material.SetColor("_Color", new Color(tint.r, tint.g, tint.b, 1f));
-            //after the world is drawn, the way the skill effects do it
-            material.renderQueue = 3001;
+            //The beams go after the world is drawn, the way the skill effects do it. The
+            //depth-free kind goes just before the character sprites instead: the queue is
+            //what decides the order between a sprite and something drawn beside it - the
+            //sorting order only settles ties within a queue - and an aura in the queue after
+            //the characters paints over their feet. The character shadow sits at this same
+            //queue for the same reason.
+            material.renderQueue = ignoreDepth ? 2999 : 3001;
             materials[tint] = material;
 
             if (!loggedOnce)
