@@ -34,10 +34,22 @@ namespace Assets.Scripts.Network
         //deliberately far wider than the body: the aura is meant to be seen from across a
         //field and to say "that one" before you have read anything, so the haze reaches
         //about three body widths out and everything inside it is stacked toward the middle.
-        private const float HazeWidth = 5.0f;
-        private const float SwirlWidth = 3.8f;
+        private const float HazeWidth = 5.2f;
+        private const float SwirlWidth = 4.0f;
         private const float RingWidth = 2.9f;
-        private const float GlowWidth = 2.2f;
+        private const float InnerWidth = 2.0f;
+
+        /// <summary>
+        /// How much of the middle stays empty, in world units of radius.
+        ///
+        /// The feet are the one part of the character the aura is standing on, and an aura
+        /// painted over them reads as the character sinking into it rather than as light
+        /// coming off the floor around them. Every layer is cut out to this radius, and
+        /// because they are different widths each one is cut at a different fraction of its
+        /// own texture - which is why the number is in world units and divided per layer
+        /// rather than written as a fraction once.
+        /// </summary>
+        private const float FeetRadius = 0.34f;
 
         /// <summary>Off the floor by enough not to fight the ground for the same pixels.</summary>
         private const float Lift = 0.06f;
@@ -50,11 +62,20 @@ namespace Assets.Scripts.Network
         /// from something happening. Twelve rather than the drop aura's eight, because this
         /// is a wider ring and the same number spread over it reads as sparse.
         /// </summary>
-        private const int MoteCount = 12;
+        private const int MoteCount = 22;
 
-        private const float MoteRise = 0.45f;
-        private const float MoteHeight = 2.3f;
-        private const float MoteRadius = 1.05f;
+        private const float MoteRise = 0.72f;
+        private const float MoteHeight = 3.2f;
+        private const float MoteRadius = 1.15f;
+
+        /// <summary>
+        /// How much taller than wide a speck is drawn.
+        ///
+        /// A round speck moving up reads as a round speck that happens to be somewhere else
+        /// this frame. Stretching it along the direction it travels is what the eye reads as
+        /// speed, and it costs nothing - the quad is already facing the camera.
+        /// </summary>
+        private const float MoteStretch = 2.4f;
 
         private const int Size = 160;
         private const int SwirlArms = 6;
@@ -70,6 +91,7 @@ namespace Assets.Scripts.Network
         private static Sprite hazeSprite;
         private static Sprite ringSprite;
         private static Sprite swirlSprite;
+        private static Sprite innerSprite;
         private static Sprite moteSprite;
 
         private ServerControllable owner;
@@ -77,7 +99,7 @@ namespace Assets.Scripts.Network
         private SpriteRenderer haze;
         private SpriteRenderer swirl;
         private SpriteRenderer ring;
-        private SpriteRenderer glow;
+        private SpriteRenderer inner;
         private SpriteRenderer[] motes;
         private float ringAngle;
         private float swirlAngle;
@@ -141,14 +163,19 @@ namespace Assets.Scripts.Network
             haze = MakePart("Haze", HazeSprite, HazeWidth);
             swirl = MakePart("Swirl", SwirlSprite, SwirlWidth);
             ring = MakePart("Ring", RingSprite, RingWidth);
-            glow = MakePart("Glow", HazeSprite, GlowWidth);
+            inner = MakePart("Inner", InnerSprite, InnerWidth);
 
             motes = new SpriteRenderer[MoteCount];
             for (var i = 0; i < MoteCount; i++)
             {
                 //three sizes in rotation, so the column has some depth to it rather than
-                //looking like one speck copied a dozen times
-                motes[i] = MakePart("Mote" + i, MoteSprite, 0.16f + (i % 3) * 0.09f);
+                //looking like one speck copied twenty times
+                var width = 0.15f + (i % 3) * 0.08f;
+                var mote = MakePart("Mote" + i, MoteSprite, width);
+                var scale = mote.transform.localScale;
+                scale.y *= MoteStretch;
+                mote.transform.localScale = scale;
+                motes[i] = mote;
             }
         }
 
@@ -185,13 +212,13 @@ namespace Assets.Scripts.Network
             //that moves and annoyed by something that flashes.
             var pulse = 0.5f + 0.5f * Mathf.Sin(t * 2.2f);
 
-            Paint(haze, 0.34f + pulse * 0.16f);
-            Paint(swirl, 0.62f + pulse * 0.24f);
-            Paint(ring, 0.85f + pulse * 0.15f);
-            Paint(glow, 0.50f + pulse * 0.20f);
+            Paint(haze, 0.46f + pulse * 0.20f);
+            Paint(swirl, 0.72f + pulse * 0.26f);
+            Paint(ring, 0.90f + pulse * 0.10f);
+            Paint(inner, 0.58f + pulse * 0.22f);
 
             LayOnGround(haze, ref swirlAngle, 0f);
-            LayOnGround(glow, ref swirlAngle, 0f);
+            LayOnGround(inner, ref ringAngle, 0f);
             LayOnGround(ring, ref ringAngle, 1f);
             LayOnGround(swirl, ref swirlAngle, -0.7f);
 
@@ -240,7 +267,7 @@ namespace Assets.Scripts.Network
                 //born out of nothing at the foot and gone before the top, so the column has
                 //no hard end to it at either end
                 var fade = Mathf.Sin(life * Mathf.PI);
-                mote.color = new Color(1f, 1f, 1f, fade * 0.85f);
+                mote.color = new Color(1f, 1f, 1f, fade * 0.95f);
             }
         }
 
@@ -274,13 +301,14 @@ namespace Assets.Scripts.Network
         }
 
         /// <summary>
-        /// A broad soft pool with no edge to it, which is what makes the whole thing read as
-        /// glow rather than as a disc lying on the grass.
+        /// The broad spread, and most of what the aura actually is.
         /// </summary>
         /// <remarks>
-        /// The falloff is gentler than a square. Squaring pulls the light into the middle and
-        /// leaves a visible rim where it runs out; a power near one lets it thin out over the
-        /// whole radius instead, so there is no point at which it stops.
+        /// A straight ramp from the clearance out to the rim rather than a curve. Curving it
+        /// pulls the light back toward the middle and leaves the outer half nearly empty,
+        /// which is the opposite of spreading: what makes this read as light thrown across
+        /// the floor is that there is still something out at the edge when it finally runs
+        /// out.
         /// </remarks>
         private static Sprite HazeSprite
         {
@@ -289,8 +317,8 @@ namespace Assets.Scripts.Network
                 if (hazeSprite != null)
                     return hazeSprite;
 
-                hazeSprite = Draw((distance, angle) =>
-                    Mathf.Pow(Mathf.Clamp01(1f - distance), 1.25f) * 0.9f);
+                hazeSprite = Draw(HazeWidth, (distance, angle) =>
+                    Mathf.Clamp01(1f - distance) * 0.85f);
                 return hazeSprite;
             }
         }
@@ -303,9 +331,9 @@ namespace Assets.Scripts.Network
                 if (ringSprite != null)
                     return ringSprite;
 
-                ringSprite = Draw((distance, angle) =>
+                ringSprite = Draw(RingWidth, (distance, angle) =>
                 {
-                    var band = Mathf.Clamp01(1f - Mathf.Abs(distance - 0.78f) / 0.16f);
+                    var band = Mathf.Clamp01(1f - Mathf.Abs(distance - 0.80f) / 0.15f);
                     return band * band;
                 });
                 return ringSprite;
@@ -328,9 +356,9 @@ namespace Assets.Scripts.Network
                 if (swirlSprite != null)
                     return swirlSprite;
 
-                swirlSprite = Draw((distance, angle) =>
+                swirlSprite = Draw(SwirlWidth, (distance, angle) =>
                 {
-                    var band = Mathf.Clamp01(1f - Mathf.Abs(distance - 0.60f) / 0.36f);
+                    var band = Mathf.Clamp01(1f - Mathf.Abs(distance - 0.58f) / 0.42f);
                     band *= band;
                     //never all the way down to nothing between the arms, so the band stays a
                     //band rather than becoming a ring of separate blobs
@@ -338,6 +366,31 @@ namespace Assets.Scripts.Network
                     return band * arms;
                 });
                 return swirlSprite;
+            }
+        }
+
+        /// <summary>
+        /// The bright collar just outside the feet, where the light is coming from.
+        /// </summary>
+        /// <remarks>
+        /// This was a filled pool and it sat squarely on top of the boots. A collar puts the
+        /// same brightness where it belongs - around the feet rather than over them - and
+        /// gives the spread somewhere to start from, so the whole thing reads as light
+        /// pouring off the character outward instead of as a disc they are standing in.
+        /// </remarks>
+        private static Sprite InnerSprite
+        {
+            get
+            {
+                if (innerSprite != null)
+                    return innerSprite;
+
+                innerSprite = Draw(InnerWidth, (distance, angle) =>
+                {
+                    var band = Mathf.Clamp01(1f - Mathf.Abs(distance - 0.62f) / 0.38f);
+                    return band * band;
+                });
+                return innerSprite;
             }
         }
 
@@ -349,7 +402,8 @@ namespace Assets.Scripts.Network
                 if (moteSprite != null)
                     return moteSprite;
 
-                moteSprite = Draw((distance, angle) =>
+                //no clearance on this one: a hollow speck is a ring, not a speck
+                moteSprite = Draw(0f, (distance, angle) =>
                 {
                     var a = Mathf.Clamp01(1f - distance);
                     return a * a;
@@ -359,17 +413,27 @@ namespace Assets.Scripts.Network
         }
 
         /// <summary>
-        /// Builds one of the textures above from a function of radius and angle.
+        /// Builds one of the textures above from a function of radius and angle, with the
+        /// middle cut out so the feet show through.
         /// </summary>
         /// <remarks>
         /// Every one of these fills its texture out to the edge, which is the whole reason
         /// they are drawn here instead of borrowed: a width asked for is then the width that
         /// appears, with no invisible margin to swallow it.
+        ///
+        /// The hole is given in world units and turned into a fraction of this particular
+        /// texture, so four layers of four different widths all clear the same circle on the
+        /// floor. Pass a width of zero for something that should not be hollow at all.
         /// </remarks>
-        private static Sprite Draw(System.Func<float, float, float> shape)
+        private static Sprite Draw(float worldWidth, System.Func<float, float, float> shape)
         {
             var texture = new Texture2D(Size, Size, TextureFormat.RGBA32, false);
             texture.wrapMode = TextureWrapMode.Clamp;
+
+            //the fraction of this texture's radius that the feet take up
+            var clear = worldWidth > 0.0001f ? FeetRadius / (worldWidth * 0.5f) : 0f;
+            //softened over a tenth of the radius, so the hole has an edge you cannot see
+            var fade = Mathf.Max(clear * 0.35f, 0.02f);
 
             var half = Size * 0.5f;
             for (var y = 0; y < Size; y++)
@@ -381,7 +445,12 @@ namespace Assets.Scripts.Network
                     var distance = Mathf.Sqrt(dx * dx + dy * dy);
                     var angle = Mathf.Atan2(dy, dx);
 
-                    texture.SetPixel(x, y, new Color(1f, 1f, 1f, Mathf.Clamp01(shape(distance, angle))));
+                    var alpha = Mathf.Clamp01(shape(distance, angle));
+
+                    if (clear > 0f)
+                        alpha *= Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((distance - clear) / fade));
+
+                    texture.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
                 }
             }
 
