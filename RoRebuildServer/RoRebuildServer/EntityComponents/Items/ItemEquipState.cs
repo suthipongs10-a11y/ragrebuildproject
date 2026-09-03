@@ -4,6 +4,7 @@ using RebuildSharedData.Enum;
 using RebuildSharedData.Enum.EntityStats;
 using RebuildSharedData.Util;
 using RoRebuildServer.Data;
+using RoRebuildServer.EntityComponents.Character;
 using RoRebuildServer.Data.CsvDataTypes;
 using RoRebuildServer.Data.Player;
 using RoRebuildServer.Logging;
@@ -1246,16 +1247,16 @@ public class ItemEquipState
         if (amount <= 0)
             return;
 
-        var di = new RebuildSharedData.Data.DamageInfo()
+        var di = new DamageInfo()
         {
             Damage = amount,
-            Result = RebuildSharedData.Enum.AttackResult.NormalDamage,
+            Result = AttackResult.NormalDamage,
             Source = Player.Entity,
             Target = Player.Entity,
             AttackSkill = CharacterSkill.NoCast,
             HitCount = 1,
             AttackPosition = Player.Character.Position,
-            Flags = RebuildSharedData.Data.DamageApplicationFlags.NoHitLock | RebuildSharedData.Data.DamageApplicationFlags.SkipOnHitTriggers
+            Flags = DamageApplicationFlags.NoHitLock | DamageApplicationFlags.SkipOnHitTriggers
         };
 
         ce.ExecuteCombatResult(di, false, false);
