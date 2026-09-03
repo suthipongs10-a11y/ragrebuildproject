@@ -723,7 +723,11 @@ internal class DataLoader
                 IsUnique = false,
                 ItemClass = ItemClass.Useable,
                 Price = entry.Price,
-                SubCategory = "Useable",
+                //The use effect rather than the constant "Useable", which said nothing the
+                //ItemClass beside it did not already say. It is the one thing that tells a
+                //red potion apart from a treasure box, and the drop rate config script needs
+                //exactly that. Nothing else reads SubCategory for a usable.
+                SubCategory = entry.UseEffect,
                 SellToStoreValue = entry.Price / 2,
                 Weight = entry.Weight,
             };
