@@ -558,3 +558,14 @@ Type = "Buff"
 Icon = "item:Bubble_Gum"
 CanDispel = false
 CanDisable = false
+
+[Bleeding]
+Name = "Bleeding"
+Type = "Debuff"
+Icon = "hl_poison"
+
+[HpDrain]
+Name = "Cursed Blade"
+Type = "Debuff"
+Icon = "hl_curse"
+CanDispel = false

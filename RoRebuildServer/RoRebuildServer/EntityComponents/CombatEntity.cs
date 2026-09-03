@@ -722,6 +722,10 @@ public partial class CombatEntity : IEntityAutoReset
             var race = source.GetRace();
             if (source.GetSpecialType() == CharacterSpecialType.Boss || race == CharacterRace.Demon || race == CharacterRace.Insect)
                 return false;
+            //what Maya Purple grants: the same sight a boss has, and it reaches the map's
+            //visibility filter through here, so a hidden thing is drawn as well as targetable
+            if (source.GetStat(CharacterStat.DetectHidden) > 0)
+                return false;
         }
 
         return (BodyState & BodyStateFlags.AnyHiddenState) > 0;
@@ -751,7 +755,8 @@ public partial class CombatEntity : IEntityAutoReset
             if (source == null)
                 return false;
             var race = source.GetRace();
-            if (source.GetSpecialType() != CharacterSpecialType.Boss && race != CharacterRace.Demon && race != CharacterRace.Insect)
+            if (source.GetSpecialType() != CharacterSpecialType.Boss && race != CharacterRace.Demon && race != CharacterRace.Insect
+                && source.GetStat(CharacterStat.DetectHidden) <= 0)
                 return false;
         }
 

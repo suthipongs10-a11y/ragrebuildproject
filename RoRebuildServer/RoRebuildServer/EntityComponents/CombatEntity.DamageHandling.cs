@@ -164,6 +164,40 @@ public partial class CombatEntity
         return eleMod;
     }
 
+    /// <summary>
+    /// Sends a share of a hit back to whoever landed it.
+    /// </summary>
+    /// <remarks>
+    /// Queued as finished damage rather than run through the attack calculation, for three
+    /// reasons that are really one: it must not be able to reflect again, it must not be
+    /// able to trigger anything, and it must not be able to miss. The attacker is shown the
+    /// number with nobody standing behind it, the way poison ticks are shown.
+    /// </remarks>
+    private void ReflectDamageOnto(CombatEntity attacker, int amount)
+    {
+        if (amount <= 0 || attacker == this || !attacker.Entity.IsAlive() || attacker.Character.State == CharacterState.Dead)
+            return;
+
+        var di = new DamageInfo()
+        {
+            Damage = amount,
+            Result = AttackResult.NormalDamage,
+            Source = Entity,
+            Target = attacker.Entity,
+            AttackSkill = CharacterSkill.NoCast,
+            HitCount = 1,
+            Time = Time.ElapsedTimeFloat + 0.15f,
+            AttackPosition = Character.Position,
+            Flags = DamageApplicationFlags.NoHitLock | DamageApplicationFlags.SkipOnHitTriggers
+        };
+
+        attacker.QueueDamage(di);
+
+        attacker.Character.Map?.AddVisiblePlayersAsPacketRecipients(attacker.Character);
+        CommandBuilder.AttackMulti(null, attacker.Character, di, false);
+        CommandBuilder.ClearRecipients();
+    }
+
     public bool IsAttackRanged(CombatEntity? target, AttackRequest req, bool isPhysical, AttackFlags flags)
     {
         if ((flags & AttackFlags.AutoRange) > 0)
@@ -555,7 +589,9 @@ public partial class CombatEntity
 
                 sizeMod += GetStat(CharacterStat.AddAttackSmallSize + (int)defSize);
 
-                defMod = int.Clamp(100 - GetStat(CharacterStat.IgnoreDefRaceFormless + (int)targetRace) - GetStat(CharacterStat.IgnoreDefSmall + (int)defSize), 0, 100);
+                //an ordinary monster's def can be skipped by gear that says so; a boss's never is
+                var ignoreVsNormal = target.GetSpecialType() == CharacterSpecialType.Boss ? 0 : GetStat(CharacterStat.IgnoreDefVsNormal);
+                defMod = int.Clamp(100 - GetStat(CharacterStat.IgnoreDefRaceFormless + (int)targetRace) - GetStat(CharacterStat.IgnoreDefSmall + (int)defSize) - ignoreVsNormal, 0, 100);
             }
 
             if (Character.Type == CharacterType.Player && (flags & AttackFlags.IgnoreWeaponRefine) == 0)
@@ -624,6 +660,45 @@ public partial class CombatEntity
         {
             damage = 0;
             res = AttackResult.InvisibleMiss;
+        }
+
+        //---------------------------------------
+        // Block and reflect, from the target's gear
+        //---------------------------------------
+        //All three are players-only, like every other defensive card stat, and none of
+        //them run for a hit that is already nothing. Reflected damage is queued straight
+        //onto the attacker rather than calculated as a new attack, so it cannot reflect
+        //again, cannot trigger a card, and cannot miss.
+        if (target.Character.Type == CharacterType.Player && damage > 0 && this != target
+            && (flags & AttackFlags.NoTriggerWhenAttackedEffects) == 0)
+        {
+            if (isPhysical)
+            {
+                var block = target.GetStat(CharacterStat.BlockPhysicalChance);
+                if (block > 0 && GameRandom.Next(0, 100) < block)
+                {
+                    damage = 0;
+                    res = AttackResult.Miss;
+                }
+            }
+
+            if (damage > 0 && isPhysical && !isRanged)
+            {
+                var pct = target.GetStat(CharacterStat.ReflectMeleeDamagePercent);
+                if (pct > 0)
+                    target.ReflectDamageOnto(this, damage * pct / 100);
+            }
+
+            if (damage > 0 && isMagical)
+            {
+                var chance = target.GetStat(CharacterStat.ReflectMagicChance);
+                if (chance > 0 && GameRandom.Next(0, 100) < chance)
+                {
+                    target.ReflectDamageOnto(this, damage);
+                    damage = 0;
+                    res = AttackResult.InvisibleMiss;
+                }
+            }
         }
 
         //---------------------------

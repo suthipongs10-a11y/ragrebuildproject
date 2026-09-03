@@ -400,6 +400,14 @@ public enum CharacterStat
     //inserted above here would renumber every stat after it
     BonusDropOnKill,
     BonusZenyOnKill,
+
+    //What the last of the empty cards needed and had nowhere to put. Appended, for the
+    //reason the two above are.
+    DetectHidden,              //sees through Hiding and Cloaking. Maya Purple.
+    ReflectMeleeDamagePercent, //this much of a melee hit goes back to whoever landed it. Orc Lord, High Orc.
+    ReflectMagicChance,        //per cent chance a spell is turned back on its caster. Maya.
+    BlockPhysicalChance,       //per cent chance a physical hit is stopped outright. Clock.
+    IgnoreDefVsNormal,         //per cent of an ordinary monster's def that is skipped. Samurai Specter.
     CharacterStatsMax,
 }
 

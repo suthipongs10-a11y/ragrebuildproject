@@ -1,4 +1,4 @@
-//Cards
+﻿//Cards
 
 ::Poring_Card //id 4001 - slotted on Armor
 LUK +2
@@ -485,7 +485,6 @@ AGI +3, CRIT +1
 
 ::Orc_Lord_Card //id 4135 - slotted on Armor
 สะท้อนดาเมจระยะประชิด 30%
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Khalitzburg_Card //id 4136 - slotted on Shield
 รับดาเมจจากปีศาจ -30%
@@ -522,14 +521,12 @@ VIT +3
 
 ::Osiris_Card //id 4144 - slotted on Accessory
 ฟื้น HP และ SP 100% เมื่อถูกชุบ
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Beelzebub_Card //id 4145 - slotted on Accessory
 เวลาร่าย -30%
 
 ::Maya_Card //id 4146 - slotted on Shield
-โอกาส 50% สะท้อนเวทเป้าหมายเดียว
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
+โอกาส 50% สะท้อนเวทมนตร์กลับไปยังผู้ร่าย
 
 ::Baphomet_Card //id 4147 - slotted on Weapon
 HIT -10
@@ -550,13 +547,10 @@ EXP จากพืช +10%
 
 ::Galapago_Card //id 4152 - slotted on Accessory
 โอกาส 3% ได้ <color=#008080>Apple Juice</color>, <color=#008080>Banana Juice</color>, <color=#008080>Carrot Juice</color> เมื่อฆ่าแมลง
-ฟื้นฟูจาก <color=#008080>Apple Juice</color>, <color=#008080>Banana Juice</color>, <color=#008080>Carrot Juice</color> +50%
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Crab_Card //id 4153 - slotted on Weapon
 ATK +5
 ดาเมจกายภาพ +30% ต่อAster
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Dumpling_Kid_Card //id 4154 - slotted on Accessory
 โอกาส 3% ได้ <color=#008080>Candy</color>,
@@ -601,7 +595,6 @@ STR +2
 FLEE +2, CRIT +7
 ถ้าเป็น Swordman:
  โอกาส 1% ร่ายอัตโนมัติ <color=#0000FF>Bowling Bash 5</color> เมื่อโจมตีปกติ
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Gullinbursti_Card //id 4164 - slotted on Boots
 EXP จากสัตว์น้ำ +10%
@@ -654,8 +647,6 @@ HP -8%, SP -8%
 
 ::Poisonous_Toad_Card //id 4175 - slotted on Accessory
 โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Envenom 1</color> เมื่อโจมตีปกติ
-<color=#0000FF>Envenom</color> ผลักถอย 5 ช่อง
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Dullahan_Card //id 4176 - slotted on Weapon
 ดาเมจ CRIT +10%
@@ -668,8 +659,6 @@ CRIT +7 ต่อมังกร
 
 ::Dragon_Tail_Card //id 4178 - slotted on Garment
 AGI +1, FLEE +10
-ดาเมจ <color=#0000FF>Double Strafe</color>, <color=#0000FF>Arrow Shower</color> +10%
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Dragon_Fly_Card //id 4179 - slotted on Garment
 AGI +1
@@ -712,7 +701,6 @@ STR +1, VIT +1
 ::Leib_Olmai_Card //id 4188 - slotted on Headgear
 รับดาเมจธาตุไฟ -10%
 โอกาส 1% ได้ <color=#008080>Red Blood</color> เมื่อฆ่าสัตว์
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Wraith_Dead_Card //id 4189 - slotted on Armor
 โอกาส 6% ทำให้ <color=#800000>สาป</color> เมื่อโดนโจมตีกายภาพ
@@ -736,7 +724,6 @@ CRIT +7 ต่อสัตว์น้ำ
 โอกาส 3% ทำให้ <color=#800000>สตัน</color> เมื่อโดนโจมตีกายภาพ
 ถ้า DEX พื้นฐาน > 76:
  โอกาส 9% แทน
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Leaf_Cat_Card //id 4195 - slotted on Headgear
 รับดาเมจธาตุน้ำ -10%
@@ -755,7 +742,6 @@ LUK +1
 
 ::Maya_Purple_Card //id 4198 - slotted on Headgear
 มองเห็นศัตรูที่ซ่อนตัว
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Merman_Card //id 4199 - slotted on Boots
 ฟื้นฟู HP +10%
@@ -793,8 +779,6 @@ DEF +1
 
 ::Miyabi_Doll_Card //id 4208 - slotted on Boots
 SP +10%
-ดาเมจ <skill>Frost Diver</skill> +5%
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Violy_Card //id 4209 - slotted on Accessory
 โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Unbarring Octave 1</color> เมื่อโจมตีปกติ
@@ -803,10 +787,9 @@ SP +10%
 <color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Wanderer_Card //id 4210 - slotted on Garment
-โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Snatch 1</color> เมื่อโจมตีปกติ
+FLEE +10
 ถ้าเป็น Thief:
- FLEE +20
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
+ FLEE +20 แทน
 
 ::Vocal_Card //id 4211 - slotted on Garment
 MDEF +3
@@ -818,7 +801,6 @@ MDEF +3
 โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Bash 1</color> เมื่อโจมตีปกติ
 <color=#0000FF>Bash</color> ผลักถอย 5 ช่อง
 รับดาเมจจากMunak +100%
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Brilight_Card //id 4213 - slotted on Armor
 โอกาส 6% ทำให้ <color=#800000>ใบ้</color> เมื่อโดนโจมตีกายภาพ
@@ -878,8 +860,6 @@ DEF +2
 
 ::Spring_Rabbit_Card //id 4227 - slotted on Accessory
 โอกาส 2% ได้ <color=#008080>Meat</color>, <color=#008080>Monster's Feed</color> เมื่อฆ่าสัตว์
-ฟื้นฟูจาก <color=#008080>Meat</color>, <color=#008080>Monster's Feed</color> +50%
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Sleeper_Card //id 4228 - slotted on Accessory
 โอกาส 1% ได้ <color=#008080>Box of Drowsiness</color> เมื่อฆ่าสัตว์น้ำ
@@ -919,7 +899,6 @@ STR, VIT, INT, DEX, AGI, LUK +1
 โอกาส 3% ร่ายอัตโนมัติ <color=#0000FF>Kyrie Eleison 10</color> เมื่อโดนโจมตีกายภาพ
 ถ้า INT พื้นฐาน = 99:
  โอกาส 10% แทน
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Owl_Duke_Card //id 4237 - slotted on Accessory
 โอกาส 0.3% ร่ายอัตโนมัติ <color=#0000FF>Impositio Manus 3</color> เมื่อโจมตีปกติ
@@ -968,7 +947,6 @@ CRIT +7 ต่อมนุษย์
 ::Aster_Card //id 4247 - slotted on Weapon
 ATK +5
 ดาเมจกายภาพ +30% ต่อหอย
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Ancient_Mummy_Card //id 4248 - slotted on Shield
 โอกาส 3% ร่ายอัตโนมัติ <color=#0000FF>Signum Crucis 5</color> เมื่อโดนโจมตีกายภาพ
@@ -1030,7 +1008,6 @@ DEF +1
 เจาะ DEF 100% กับมอนที่ไม่ใช่บอส
 เสีย HP 666 ทุก 10 วินาที
 เสีย HP 999 เมื่อถอด
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Wind_Ghost_Card //id 4264 - slotted on Accessory
 โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Jupitel Thunder 3</color> เมื่อโจมตีปกติ
@@ -1064,7 +1041,6 @@ SP +150, INT -3
 ::Giant_Hornet_Card //id 4271 - slotted on Headgear
 รับดาเมจธาตุลม -10%
 โอกาส 1% ได้ <color=#008080>Wind of Verdure</color> เมื่อฆ่าแมลง
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Zhu_Po_Long_Card //id 4272 - slotted on Accessory
 AGI +1, CRIT +3
@@ -1092,8 +1068,6 @@ EXP จากอันเดด +10%
 
 ::Zealotus_Card //id 4277 - slotted on Shield
 LUK +2
-ดาเมจ <color=#0000FF>Melody Strike</color>, <color=#0000FF>Sling Arrow</color> +10%
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Gibbet_Card //id 4278 - slotted on Headgear
 ถ้าตีบวก < 6: MDEF +5
@@ -1125,10 +1099,9 @@ ATK +30
 โอกาส 0.1% ได้ <color=#008080>Aloe Leaflet</color>, <color=#008080>Mastela Fruit</color> เมื่อฆ่ามอน
 
 ::Greatest_General_Card //id 4283 - slotted on Accessory
-โอกาส 0.2% ร่ายอัตโนมัติ <color=#0000FF>Summon Spirit Sphere 5</color> เมื่อโจมตีปกติ
+ได้ SP 5 เมื่อฆ่ามอนสเตอร์
 ถ้าเป็น Acolyte:
- โอกาส 2% แทน
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
+ ได้ SP 10 แทน
 
 ::Chepet_Card //id 4284 - slotted on Weapon
 โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Heal 5</color> (ใส่ศัตรู) เมื่อโจมตีปกติ
@@ -1141,7 +1114,6 @@ Perfect Dodge +5
 โอกาส 3% ทำให้ <color=#800000>สับสน</color> เมื่อโดนโจมตีกายภาพ
 ถ้า STR พื้นฐาน > 76:
  โอกาส 9% แทน
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Kappa_Card //id 4287 - slotted on Garment
 ถ้าตีบวก < 6: MDEF +8
@@ -1167,8 +1139,6 @@ CRIT +7 ต่อพืช
 
 ::Cookie_Card //id 4293 - slotted on Accessory
 LUK +2
-ดาเมจ <color=#0000FF>Holy Light</color> +10%
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Quve_Card //id 4294 - slotted on Accessory
 ถ้าเป็น Novice:
@@ -1192,16 +1162,12 @@ CRIT +7 ต่อสัตว์
 โอกาส 6% ทำให้ <color=#800000>สับสน</color> เมื่อโดนโจมตีกายภาพ
 
 ::Clock_Card //id 4299 - slotted on Armor
-โอกาส 3% ร่ายอัตโนมัติ <color=#0000FF>Guard 3</color> เมื่อโดนโจมตีกายภาพ
-ถ้าได้ <color=#0000FF>Guard 10</color>:
- ร่ายอัตโนมัติ <color=#0000FF>Guard 10</color> แทน
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
+โอกาส 3% ป้องกันการโจมตีกายภาพได้ทั้งหมด
 
 ::Chimera_Card //id 4300 - slotted on Armor
 โอกาส 3% ทำให้ <color=#800000>พิษ</color> เมื่อโดนโจมตีกายภาพ
 ถ้าเป็น Assassin:
  โอกาส 9% แทน
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Killer_Mantis_Card //id 4301 - slotted on Armor
 โอกาส 6% ทำให้ <color=#800000>เลือดออก</color> เมื่อโดนโจมตีกายภาพ
@@ -1214,7 +1180,6 @@ FLEE +10
 ถ้า STR พื้นฐาน > 79: ATK +20
 ถ้า VIT พื้นฐาน > 79: HP +3%
 ถ้า LUK พื้นฐาน > 79: CRIT +3
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Tamruan_Card //id 4304 - slotted on Shield
 DEF +2
@@ -1265,7 +1230,6 @@ HIT +10, FLEE +3
 โอกาส 3% ทำให้ <color=#800000>กลายเป็นหิน</color> เมื่อโดนโจมตีกายภาพ
 ถ้า INT พื้นฐาน > 76:
  โอกาส 9% แทน
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::False_Angel_Card //id 4316 - slotted on Weapon
 ฟื้น SP 5 เมื่อฆ่าเทวดา ด้วยระยะประชิด
@@ -1280,13 +1244,9 @@ HIT +10, FLEE +3
 ::Stormy_Knight_Card //id 4318 - slotted on Weapon
 โอกาส 20% ทำให้ <color=#800000>แช่แข็ง</color> เมื่อโจมตีกายภาพ
 โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Storm Gust 2</color> เมื่อโจมตีปกติ
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Freezer_Card //id 4319 - slotted on Boots
 HP +300
-ถ้าตีบวก > 8:
- ดาเมจ <color=#0000FF>Bash</color> +10%
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Bloody_Knight_Card //id 4320 - slotted on Weapon
 โอกาส 2% ร่ายอัตโนมัติ <color=#0000FF>Meteor Storm 1</color> เมื่อโจมตีปกติ
@@ -1298,7 +1258,6 @@ HP +300
 ::High_Orc_Card //id 4322 - slotted on Shield
 DEF +1
 สะท้อนดาเมจระยะประชิด 5%
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Hati_Baby_Card //id 4323 - slotted on Weapon
 โอกาส 5% ร่ายอัตโนมัติ <color=#0000FF>Frost Diver 3</color> เมื่อโจมตีปกติ
@@ -1307,14 +1266,10 @@ DEF +1
 โอกาส 50% ทำให้ <color=#800000>แช่แข็ง</color> เมื่อโดนโจมตีกายภาพ
 
 ::Harpy_Card //id 4325 - slotted on Garment
-ดาเมจ <color=#0000FF>Napalm Beat</color> +5%
 รับดาเมจไร้ธาตุ -15%
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Sea_Otter_Card //id 4326 - slotted on Accessory
 โอกาส 3% ได้ <color=#008080>Sushi</color>, <color=#008080>Raw Fish</color> เมื่อฆ่าสัตว์น้ำ
-ฟื้นฟูจาก <color=#008080>Sushi</color>, <color=#008080>Raw Fish</color> +50%
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Bloody_Butterfly_Card //id 4327 - slotted on Accessory
 เวลาร่าย +30%
@@ -1526,7 +1481,6 @@ HIT -30, ASPD +10%
 
 ::Venatu_Card //id 4369 - slotted on Armor
 LUK +(AGI พื้นฐาน/18 ปัดลง)
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Dimik_Card //id 4370 - slotted on Armor
 VIT +(ตีบวก - 5)
@@ -1791,8 +1745,6 @@ MDEF +10
 
 ::Ice_Titan_Card //id 4417 - slotted on Boots
 VIT +2
-โอกาส 0.3% ได้ DEF +10 นาน 10 วินาที เมื่อโดนโจมตี
-<color=#BB3333><i>ผลของการ์ดใบนี้ยังทำงานไม่ครบ</i></color>
 
 ::Gazeti_Card //id 4418 - slotted on Accessory
 โอกาส 10% ร่ายอัตโนมัติ <color=#0000FF>Cold Bolt 2</color> เมื่อโจมตีปกติ

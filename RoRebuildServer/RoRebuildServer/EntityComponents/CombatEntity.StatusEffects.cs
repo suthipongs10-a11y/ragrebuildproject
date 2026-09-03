@@ -31,10 +31,12 @@ public partial class CombatEntity
                 TryPoisonOnTarget(target, chance, true, useDamage ? (res.Damage * res.HitCount / 2) : 0, 24f, res.TimeInSeconds);
                 break;
             case StatusTriggerFlags.Confusion:
+                TryConfuseTarget(target, chance, res.TimeInSeconds);
                 break;
             case StatusTriggerFlags.HeavyPoison:
                 break;
             case StatusTriggerFlags.Bleeding:
+                TryBleedTarget(target, chance, useDamage ? (res.Damage * res.HitCount / 2) : 0, res.TimeInSeconds);
                 break;
             case StatusTriggerFlags.Stun:
                 TryStunTarget(target, chance, res.TimeInSeconds);
@@ -384,6 +386,91 @@ public partial class CombatEntity
             return false;
 
         var status = StatusEffectState.NewStatusEffect(CharacterStatusEffect.Frozen, len);
+        target.AddStatusEffect(status, false, delayApply);
+        return true;
+    }
+
+    /// <summary>
+    /// Confusion, resisted the way blind is: half int, half vit, and luck buys time off.
+    /// </summary>
+    /// <remarks>
+    /// Three cards inflict this and until now the case for it was empty, so all three did
+    /// nothing. Six seconds at full effect is short on purpose - a monster that wanders for
+    /// six seconds has given up its whole approach, and a player sent the wrong way for
+    /// longer than that is not being hindered, they are being griefed.
+    /// </remarks>
+    public bool TryConfuseTarget(CombatEntity target, int chanceIn1000, float delayApply = 0.3f)
+    {
+        if (target.HasStatusEffectOfType(CharacterStatusEffect.Confusion))
+            return false;
+        if (target.HasBodyState(BodyStateFlags.DisablingState))
+            return false;
+
+        var luk = target.GetEffectiveStat(CharacterStat.Luk);
+        var mnd = target.GetEffectiveStat(CharacterStat.Int);
+        var vit = target.GetEffectiveStat(CharacterStat.Vit);
+
+        var rVal = (mnd + vit) / 2;
+        if (target.GetSpecialType() == CharacterSpecialType.Boss)
+            rVal = rVal * 5 / 2;
+
+        var resist = MathHelper.PowScaleDown(rVal);
+        var resistChance = 100 - target.GetStat(CharacterStat.ResistConfusionStatus);
+        if (resistChance != 100)
+            resist = resist * resistChance / 100;
+
+        if (!CheckLuckModifiedRandomChanceVsTarget(target, (int)(chanceIn1000 * resist), 1000))
+            return false;
+
+        var timeResist = MathHelper.PowScaleDown(rVal + GameRandom.Next(0, luk));
+        var len = 6f * timeResist;
+        if (len <= 0.5f)
+            return false;
+
+        var status = StatusEffectState.NewStatusEffect(CharacterStatusEffect.Confusion, len);
+        target.AddStatusEffect(status, false, delayApply);
+        return true;
+    }
+
+    /// <summary>
+    /// Bleeding, resisted on vit like poison and dealing half the hit that opened it every
+    /// ten seconds for as long as it lasts.
+    /// </summary>
+    /// <remarks>
+    /// The damage is snapshotted from the hit rather than read off the attacker each tick,
+    /// so a wound is as bad as the blow that made it and does not get worse because the
+    /// attacker changed weapons. Nothing to snapshot means nothing to bleed, which is how a
+    /// trigger that arrives without a hit behind it is turned away.
+    /// </remarks>
+    public bool TryBleedTarget(CombatEntity target, int chanceIn1000, int damagePerTick, float delayApply = 0.3f)
+    {
+        if (damagePerTick <= 0)
+            return false;
+        if (target.HasStatusEffectOfType(CharacterStatusEffect.Bleeding))
+            return false;
+
+        var vit = target.GetEffectiveStat(CharacterStat.Vit);
+        var luk = target.GetEffectiveStat(CharacterStat.Luk);
+
+        if (target.Character.Type == CharacterType.Player)
+            vit = vit * 3 / 2;
+        if (target.GetSpecialType() == CharacterSpecialType.Boss)
+            vit *= 2;
+
+        var resist = MathHelper.PowScaleDown(vit);
+        var resistChance = 100 - target.GetStat(CharacterStat.ResistBleedingStatus);
+        if (resistChance != 100)
+            resist = resist * resistChance / 100;
+
+        if (!CheckLuckModifiedRandomChanceVsTarget(target, (int)(chanceIn1000 * resist), 1000))
+            return false;
+
+        var timeResist = MathHelper.PowScaleDown(vit + GameRandom.Next(0, luk));
+        var len = 30f * timeResist;
+        if (len < 10f)
+            return false; //shorter than one tick is a wound that never bleeds
+
+        var status = StatusEffectState.NewStatusEffect(CharacterStatusEffect.Bleeding, len, Character.Id, damagePerTick);
         target.AddStatusEffect(status, false, delayApply);
         return true;
     }

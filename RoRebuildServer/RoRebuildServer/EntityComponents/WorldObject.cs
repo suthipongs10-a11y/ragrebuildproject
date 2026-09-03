@@ -726,6 +726,23 @@ public class WorldObject : IEntityAutoReset
         if (!CanMove())
             return false;
 
+        //A confused walker does not go where it was told. The destination is swapped for
+        //a random cell near where it is standing, which sends a player the wrong way and
+        //has a monster stumble about instead of closing - one status, read in the one
+        //place every walk in the game passes through, so it means the same for both.
+        if (HasCombatEntity && CombatEntity.HasBodyState(BodyStateFlags.Confusion))
+        {
+            for (var i = 0; i < 6; i++)
+            {
+                var stray = new Position(Position.X + GameRandom.Next(-3, 4), Position.Y + GameRandom.Next(-3, 4));
+                if (stray == Position || !Map.WalkData.IsCellWalkable(stray))
+                    continue;
+                target = stray;
+                desiredDistanceToTarget = 0;
+                break;
+            }
+        }
+
         if (!Map.WalkData.IsCellWalkable(target))
             return false;
 

@@ -1229,6 +1229,42 @@ public class ItemEquipState
 
     public void SubStat(CharacterStat stat, int change) => AddStat(stat, -change); //lol
 
+    /// <summary>
+    /// Takes hp off the wearer, down to one and no further, and shows them the number.
+    /// </summary>
+    /// <remarks>
+    /// For the cursed weapon that charges you to put it down. It goes through the same
+    /// path a poison tick does so the hit is visible and the books balance, and it stops
+    /// at one hp because a card that kills you for unequipping it is a support ticket.
+    /// </remarks>
+    public void LoseHp(int amount)
+    {
+        var ce = Player.CombatEntity;
+        var remaining = ce.GetStat(CharacterStat.Hp);
+        if (amount >= remaining)
+            amount = remaining - 1;
+        if (amount <= 0)
+            return;
+
+        var di = new RebuildSharedData.Data.DamageInfo()
+        {
+            Damage = amount,
+            Result = RebuildSharedData.Enum.AttackResult.NormalDamage,
+            Source = Player.Entity,
+            Target = Player.Entity,
+            AttackSkill = CharacterSkill.NoCast,
+            HitCount = 1,
+            AttackPosition = Player.Character.Position,
+            Flags = RebuildSharedData.Data.DamageApplicationFlags.NoHitLock | RebuildSharedData.Data.DamageApplicationFlags.SkipOnHitTriggers
+        };
+
+        ce.ExecuteCombatResult(di, false, false);
+
+        Player.Character.Map?.AddVisiblePlayersAsPacketRecipients(Player.Character);
+        CommandBuilder.AttackMulti(null, Player.Character, di, false);
+        CommandBuilder.ClearRecipients();
+    }
+
     public void AddStatusEffect(CharacterStatusEffect statusEffect, int duration, int val1 = 0, int val2 = 0)
     {
         var status = StatusEffectState.NewStatusEffect(statusEffect, duration / 1000f, val1, val2);
