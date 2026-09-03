@@ -314,29 +314,6 @@ OnClick:
 	StartItemTrade();
 }
 
-Npc("prt_fild08", "Black Market Exchange", "4_F_JOB_ASSASSIN", 152, 377, S)
-{
-	AddTradedItem(CreateTradedItem("Staff_of_Destruction").Requires("Evil_Bone_Wand").Requires("Soul_Staff").Requires("Baphomet_Doll").Requires("Osiris_Doll").Requires("Gold", 2).Costs(50000));
-	AddTradedItem(CreateTradedItem("Hurricane_Fury").Requires("War_Axe").Requires("Old_Hilt").Requires("Peridot").Requires("Emperium", 3).Requires("Gold", 2).Costs(50000));
-	AddTradedItem(CreateTradedItem("Rudra_Bow").Requires("Muscovite").Requires("Peridot").Requires("Rose_Quartz").Requires("Illusion_Flower").Requires("Gold", 2).Costs(50000));
-	AddTradedItem(CreateTradedItem("Ice_Pick").Requires("Biotite").Requires("Muscovite").Requires("Phlogopite").Requires("Chivalry_Emblem", 2).Requires("Gold", 2).Costs(50000));
-	AddTradedItem(CreateTradedItem("Combat_Knife").Requires("Agate").Requires("Citrin").Requires("Muscovite").Requires("Tongue", 15).Requires("Gold", 2).Costs(50000));
-	AddTradedItem(CreateTradedItem("Byeol-ungeom").Requires("Agate").Requires("Citrin").Requires("Muscovite").Requires("Necklace_of_Wisdom", 2).Requires("Gold", 2).Costs(50000));
-	AddTradedItem(CreateTradedItem("Schweizersabel").Requires("Citrin").Requires("Phlogopite").Requires("Pyroxene").Requires("Izidor").Requires("Gold", 2).Costs(50000));
-	AddTradedItem(CreateTradedItem("Guillotine").Requires("Agate").Requires("Peridot").Requires("Turquoise").Requires("Animal_Gore", 3).Requires("Gold", 2).Costs(50000));
-	AddTradedItem(CreateTradedItem("Exorciser").Requires("Phlogopite").Requires("Pyroxene").Requires("Turquoise").Requires("Hand_of_God").Requires("Gold", 2).Costs(50000));
-	AddTradedItem(CreateTradedItem("Excalibur").Requires("Biotite").Requires("Rose_Quartz").Requires("Turquoise").Requires("Silver_Knife_of_Chastity").Requires("Gold", 2).Costs(50000));
-	AddTradedItem(CreateTradedItem("Executioner").Requires("Amulet").Requires("Bloody_Edge").Requires("Necklace_of_Oblivion").Requires("Executioner's_Mitten").Costs(50000));
-	AddTradedItem(CreateTradedItem("Mistilteinn").Requires("Emperium").Requires("Foolishness_of_the_Blind").Requires("Loki's_Whispers").Requires("Mother's_Nightmare").Requires("Young_Twig"));
-	AddTradedItem(CreateTradedItem("Tyrfing").Requires("Emperium").Requires("Peridot").Requires("Contract_in_Shadow").Requires("Blade_Lost_in_Darkness").Costs(50000));
-	AddTradedItem(CreateTradedItem("Hat_of_the_Sun_God").Requires("Rose_Quartz").Requires("Biotite").Requires("Pyroxene").Requires("Gold", 2).Costs(100000));
-	AddTradedItem(CreateTradedItem("Orc_Hero_Helm").Requires("Heroic_Emblem", 3).Requires("Jellopy", 50).Requires("Orcish_Voucher", 150).Costs(50000));
-	AddTradedItem(CreateTradedItem("Valkyrian_Helm").Requires("Valhalla's_Flower").Requires("Angel_Wing").Requires("Gemstone"));
-	@EventRevealedNpc("MilestoneHighLevelWeapons", "black market trader Wickebine Tres"); //this must be at the end of the init section to work!
-OnClick:
-	FocusNpc();
-	StartItemTrade();
-}
 
 /*
 Trader("prt_fild08", "Test NPC", "1_F_MARIA", 176, 359, SW) {

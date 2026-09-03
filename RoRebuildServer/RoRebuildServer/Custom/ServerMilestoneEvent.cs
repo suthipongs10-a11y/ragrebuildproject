@@ -106,7 +106,6 @@ public class ServerMilestoneEvent : ServerConfigScriptHandlerBase
     private bool isFletcherVisible;
     private bool isScholarVisible;
     private bool isHeadgearCraftsmanVisible;
-    private bool isHighLevelWeaponsVisible;
     private bool isValkyrieVisible;
     private bool isOkolnirCleared;
 
@@ -121,7 +120,6 @@ public class ServerMilestoneEvent : ServerConfigScriptHandlerBase
     private const int ValkyrieVisibleMvpReq = 8;
     private const int HeadgearCraftsmanVisibleLevel = 7;
     private const int SmithRevealAchievements = 4;
-    private const int HighLevelWeaponsMvpLevel = 2;
 
     private const string KafraSignalName = "MilestoneKafra";
     private const string RanchVendorSignalName = "MilestoneRanchVendor";
@@ -132,7 +130,6 @@ public class ServerMilestoneEvent : ServerConfigScriptHandlerBase
     private const string FletcherSignalName = "MilestoneFletcher";
     private const string ScholarSignalName = "MilestoneScholar";
     private const string HeadgearCrafterSignalName = "MilestoneHeadgear";
-    private const string HighLevelWeaponsSignalName = "MilestoneHighLevelWeapons";
     private const string ValkyrieSignalName = "MilestoneValkyrie";
     private const string OkolnirClearSignal = "OkolnirFirstClear";
 
@@ -243,8 +240,9 @@ public class ServerMilestoneEvent : ServerConfigScriptHandlerBase
 
     private void CheckAndRevealMvpNpcs(bool isServerUp)
     {
-        if (!isHighLevelWeaponsVisible && mvpMilestones >= HighLevelWeaponsMvpLevel)
-            isHighLevelWeaponsVisible = RevealNpc(HighLevelWeaponsSignalName, !isServerUp);
+        //The black market trader used to be revealed here. She sold the level four weapons
+        //and those are in the mvp treasure box now, so there is no npc left to reveal and a
+        //signal with nobody listening only logs a warning nobody can act on.
 
         if (!isValkyrieVisible && mvpMilestones >= ValkyrieVisibleMvpReq && highestLevelPlayer >= ValkyrieVisibleLevel)
             isValkyrieVisible = RevealNpc(ValkyrieSignalName, !isServerUp);

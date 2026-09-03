@@ -1,4 +1,4 @@
-Type,Code,Chance
+﻿Type,Code,Chance
 Old_Blue_Box,Red_Potion,6
 Old_Blue_Box,Orange_Potion,5
 Old_Blue_Box,Yellow_Potion,5
@@ -1426,6 +1426,16 @@ Pierre's_Treasurebox,Sucsamad,3
 Pierre's_Treasurebox,Dagger_of_Counter,3
 Pierre's_Treasurebox,Combat_Knife,3
 Pierre's_Treasurebox,Bazerald,3
+Pierre's_Treasurebox,Staff_of_Destruction,3
+Pierre's_Treasurebox,Hurricane_Fury,3
+Pierre's_Treasurebox,Ice_Pick,3
+Pierre's_Treasurebox,Byeol-ungeom,3
+Pierre's_Treasurebox,Schweizersabel,3
+Pierre's_Treasurebox,Guillotine,3
+Pierre's_Treasurebox,Exorciser,3
+Pierre's_Treasurebox,Excalibur,3
+Pierre's_Treasurebox,Executioner,3
+Pierre's_Treasurebox,Tyrfing,3
 Pierre's_Treasurebox,Old_Card_Album,12
 Pierre's_Treasurebox,Old_Purple_Box,12
 Pierre's_Treasurebox,Old_Blue_Box,12

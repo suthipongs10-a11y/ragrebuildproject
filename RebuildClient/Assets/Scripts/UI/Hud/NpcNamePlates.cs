@@ -40,6 +40,7 @@ namespace Assets.Scripts.UI.Hud
             "Class Master",
             "Job Master",
             "Kafra",
+            "Enchant Scribe",
         };
 
         /// <summary>

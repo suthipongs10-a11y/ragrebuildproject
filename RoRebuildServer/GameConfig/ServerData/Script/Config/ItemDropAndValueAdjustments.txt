@@ -1,15 +1,16 @@
 ﻿
 ServerConfig("ItemAdjustments") {
 OnLoadDropData:
-	//SWITCHED OFF. appsettings.json has RemapDropRates set to false, so the server never
-	//calls any of this - DropData.csv is the rate, exactly as it is written there, and a
-	//card is the 0.10% it says rather than the 1.21% this used to turn it into. Rare is
-	//meant to be rare.
+	//SWITCHED ON. appsettings.json has RemapDropRates set to true, so every rate in
+	//DropData.csv passes through the curve below on the way in and the numbers in that file
+	//are the raw material rather than the answer: a card written as 1 is 0.01% there and
+	//1.21% in game.
 	//
-	//Left in place rather than deleted because it is the record of what the boost was, and
-	//because turning it back on is one word in appsettings.json. Nothing below runs until
-	//that word changes back. Note that switching it on again also brings back the Refine
-	//doubling further down, which is part of this block and not a separate setting.
+	//This is the rate the project shipped with. It was off for a while, with DropData.csv
+	//multiplied by ten in its place, and both halves of that have been undone - the file is
+	//back to its original numbers and the curve is back in charge of them. Note that this
+	//block also carries the Refine doubling further down; it is part of the same switch and
+	//not a setting of its own.
 
 	if(type == Etc && subType == "Quest")
 		return rate;

@@ -1,14 +1,11 @@
 ﻿//The enchant scribe.
 //
-//Placed beside the Class Master on purpose: everything a new character does on this map
-//happens in that one corner, and a system nobody walks past is a system nobody uses.
-//
-//Right now this is the shell only - the scrolls, the card dust and the reset scroll do
-//not exist yet, so the three menu entries that need them say so rather than opening an
-//empty trade window. The dialogue is written for the finished system so the numbers in
-//it can be checked against the design before any of it is built.
+//Stands where the black market trader used to, against the north wall. She dealt in level
+//four weapons and those are in the mvp box now, so the pitch was empty and it is the better
+//one: a corner of its own, far enough from the class master that the two are not one queue,
+//and still on the road every new character walks.
 
-Npc("prt_fild08", "Enchant Scribe", "2_M_SAGE_OLD", 156, 356, SE, 1, 1)
+Npc("prt_fild08", "Enchant Scribe", "2_M_SAGE_OLD", 152, 377, S, 1, 1)
 {
 	localstr name = "อาลักษณ์คัมภีร์";
 	localstr seenFlag = "EnchantScribeStatus";
