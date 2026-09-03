@@ -44,7 +44,8 @@ namespace Assets.Scripts.UI.EnchantItem
             HeadMid,
             HeadLow,
             Shoes,
-            Accessory
+            Accessory,
+            Garment
         }
 
         private GenericItemListV2 window;
@@ -116,6 +117,7 @@ namespace Assets.Scripts.UI.EnchantItem
                 case "HeadLow": return ScrollSlot.HeadLow;
                 case "Shoes": return ScrollSlot.Shoes;
                 case "Accessory": return ScrollSlot.Accessory;
+                case "Garment": return ScrollSlot.Garment;
                 default: return ScrollSlot.Any;
             }
         }
@@ -132,6 +134,7 @@ namespace Assets.Scripts.UI.EnchantItem
                 case ScrollSlot.HeadLow: return "ของสวมหัว Low";
                 case ScrollSlot.Shoes: return "รองเท้า";
                 case ScrollSlot.Accessory: return "เครื่องประดับ";
+                case ScrollSlot.Garment: return "ผ้าคลุม";
                 default: return "อุปกรณ์";
             }
         }
@@ -247,6 +250,8 @@ namespace Assets.Scripts.UI.EnchantItem
                     return (pos & EquipPosition.Footgear) != 0;
                 case ScrollSlot.Accessory:
                     return (pos & EquipPosition.Accessory) != 0;
+                case ScrollSlot.Garment:
+                    return (pos & EquipPosition.Garment) != 0;
                 default:
                     return false;
             }

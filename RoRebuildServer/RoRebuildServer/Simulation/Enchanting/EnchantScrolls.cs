@@ -9,7 +9,7 @@ namespace RoRebuildServer.Simulation.Enchanting;
 /// The one equipment slot a scroll is written for.
 /// </summary>
 /// <remarks>
-/// Eight, not one. A scroll that worked on anything would make the whole grind a single
+/// Nine, not one. A scroll that worked on anything would make the whole grind a single
 /// currency: craft, use on whatever you happen to be holding, done. Naming the slot on the
 /// scroll means the thing a player is short of is a particular scroll rather than scrolls
 /// in general, which is what makes them worth trading.
@@ -19,8 +19,11 @@ namespace RoRebuildServer.Simulation.Enchanting;
 /// item data or the equip code tells one side from the other. Two scrolls for it would have
 /// been two names for the same thing.
 ///
-/// Garment has no scroll on purpose: it is not in the list this was built from. The tables
-/// below take one more entry each if it ever should be.
+/// Garment came last. It was left out of the first list and nobody noticed until the
+/// scribe had written a few hundred scrolls and not one of them was for a muffler, so it
+/// sits at the end of the enum and of every table below rather than in the middle where
+/// it belongs alphabetically - the item ids and the stored slot numbers were already given
+/// out in this order.
 /// </remarks>
 public enum EnchantScrollSlot : byte
 {
@@ -31,7 +34,8 @@ public enum EnchantScrollSlot : byte
     HeadMid,
     HeadLow,
     Shoes,
-    Accessory
+    Accessory,
+    Garment
 }
 
 /// <summary>
@@ -52,18 +56,19 @@ public static class EnchantScrolls
         EnchantScrollSlot.HeadMid,
         EnchantScrollSlot.HeadLow,
         EnchantScrollSlot.Shoes,
-        EnchantScrollSlot.Accessory
+        EnchantScrollSlot.Accessory,
+        EnchantScrollSlot.Garment
     ];
 
     /// <summary>The tail of the item code for each slot, matching ItemsUsable.csv.</summary>
     private static readonly string[] slotCodes =
-        ["Weapon", "Armour", "Shield", "HeadTop", "HeadMid", "HeadLow", "Shoes", "Accessory"];
+        ["Weapon", "Armour", "Shield", "HeadTop", "HeadMid", "HeadLow", "Shoes", "Accessory", "Garment"];
 
     /// <summary>What to call the slot when talking to the player.</summary>
     private static readonly string[] slotNames =
     [
         "อาวุธ", "ชุดเกราะ", "โล่", "ส่วนหัว Top", "ส่วนหัว Middle", "ส่วนหัว Low",
-        "รองเท้า", "เครื่องประดับ"
+        "รองเท้า", "เครื่องประดับ", "ผ้าคลุม"
     ];
 
     /// <summary>
@@ -74,12 +79,15 @@ public static class EnchantScrolls
     /// the scroll a player actually wants is made expensive. The accessory carries both stat
     /// pools and is the strongest thing to enchant, and the two head slots below the top one
     /// are worth having for the same reason a mid headgear is: they are slots most people
-    /// leave empty. Those three are a twentieth each; the other five split the rest evenly.
+    /// leave empty. Those three are a twentieth each. The garment is a tenth: it is a slot
+    /// nearly everybody fills, but with one of about four things, so a scroll for it is
+    /// worth a little less than one for a slot with real choice in it. The other five split
+    /// the rest evenly.
     ///
     /// Adds up to a hundred on purpose, so the numbers here are the percentages in the
     /// dialogue without anybody having to work them out again.
     /// </remarks>
-    private static readonly int[] slotWeights = [17, 17, 17, 17, 5, 5, 17, 5];
+    private static readonly int[] slotWeights = [15, 15, 15, 15, 5, 5, 15, 5, 10];
 
     private const int WeightTotal = 100;
 
@@ -130,7 +138,7 @@ public static class EnchantScrolls
     /// Any scroll of one tier that the player is carrying, whichever slot it names.
     /// </summary>
     /// <remarks>
-    /// Walks the eight rather than the bag, because eight lookups is cheaper than a scan
+    /// Walks the nine rather than the bag, because nine lookups is cheaper than a scan
     /// and the answer only has to be "one of these", not "the best of these" - every kind
     /// is worth the same as an ingredient.
     /// </remarks>
@@ -181,6 +189,10 @@ public static class EnchantScrolls
             case "footgear": slot = EnchantScrollSlot.Shoes; return true;
             case "accessory":
             case "acc": slot = EnchantScrollSlot.Accessory; return true;
+            case "garment":
+            case "robe":
+            case "cloak":
+            case "muffler": slot = EnchantScrollSlot.Garment; return true;
             default: return false;
         }
     }
@@ -259,6 +271,7 @@ public static class EnchantScrolls
             EnchantScrollSlot.HeadMid => head == HeadgearPosition.Mid,
             EnchantScrollSlot.HeadLow => head == HeadgearPosition.Bottom,
             EnchantScrollSlot.Accessory => armor.EquipPosition.HasFlag(EquipPosition.Accessory),
+            EnchantScrollSlot.Garment => armor.EquipPosition.HasFlag(EquipPosition.Garment),
             _ => false
         };
     }

@@ -1079,6 +1079,16 @@ MATK +20 นาน 60 วินาที
 <color=#B08A3A>100.0%</color> STR AGI VIT INT DEX LUK <b>+1~2</b> <size=-3><color=#7A7480>1→63% · 2→37%</color></size>
 <size=-3><color=#7A7480>ช่องถัดไปไม่ออกซ้ำกับที่ได้ไปแล้ว</color></size>
 
+::Ench_Earth_Garment //id 17019 - enchant scroll
+<desc>คัมภีร์ที่จารพลังของผืนดินลงบนผ้าคลุม</desc>
+<color=#8A6234>ระดับดิน</color> — จาร <b>1</b> ช่อง · แต่ละช่องว่างเปล่า <b>2%</b>
+ใช้ได้กับ<color=#CC5500>ผ้าคลุม</color> เท่านั้น
+<color=#CC0000>ใช้ได้เฉพาะของที่ยังไม่มีออพ</color> — ถ้ามีออพอยู่แล้วต้องล้างด้วยคัมภีร์ล้างออพก่อน
+
+<b>ออกได้ 6 อย่าง</b> <size=-3><color=#7A7480>ตัวเลขคือโอกาสของหนึ่งช่อง</color></size>
+<color=#B08A3A>100.0%</color> STR AGI VIT INT DEX LUK <b>+1~2</b> <size=-3><color=#7A7480>1→63% · 2→37%</color></size>
+<size=-3><color=#7A7480>ช่องถัดไปไม่ออกซ้ำกับที่ได้ไปแล้ว</color></size>
+
 ::Ench_Sky_Weapon //id 17021 - enchant scroll
 <desc>คัมภีร์ผนึกที่จารพลังของฟ้าลงบนอาวุธ</desc>
 <color=#1F6E97>ระดับฟ้า</color> — จาร <b>2</b> ช่อง · แต่ละช่องว่างเปล่า <b>12%</b>
@@ -1191,6 +1201,20 @@ MATK +20 นาน 60 วินาที
 <color=#B08A3A>7.7%</color> MDEF <b>+1~2</b> <size=-3><color=#7A7480>1→68% · 2→32%</color></size>
 <color=#B08A3A>7.7%</color> Max HP <b>+50~80</b> <size=-3><color=#7A7480>เฉลี่ย 61 · แตะ 80 ได้ 0.93%</color></size>
 <color=#B08A3A>7.7%</color> ความเร็วเดิน <b>+3</b>
+<size=-3><color=#7A7480>ช่องถัดไปไม่ออกซ้ำกับที่ได้ไปแล้ว</color></size>
+
+::Ench_Sky_Garment //id 17029 - enchant scroll
+<desc>คัมภีร์ผนึกที่จารพลังของฟ้าลงบนผ้าคลุม</desc>
+<color=#1F6E97>ระดับฟ้า</color> — จาร <b>2</b> ช่อง · แต่ละช่องว่างเปล่า <b>12%</b>
+ใช้ได้กับ<color=#CC5500>ผ้าคลุม</color> เท่านั้น
+<color=#CC0000>ใช้ได้เฉพาะของที่ยังไม่มีออพ</color> — ถ้ามีออพอยู่แล้วต้องล้างด้วยคัมภีร์ล้างออพก่อน
+
+<b>ออกได้ 10 อย่าง</b> <size=-3><color=#7A7480>ตัวเลขคือโอกาสของหนึ่งช่อง</color></size>
+<color=#B08A3A>60.0%</color> STR AGI VIT INT DEX LUK <b>+2~3</b> <size=-3><color=#7A7480>2→68% · 3→32%</color></size>
+<color=#B08A3A>10.0%</color> DEF <b>+1~2</b> <size=-3><color=#7A7480>1→68% · 2→32%</color></size>
+<color=#B08A3A>10.0%</color> MDEF <b>+1~2</b> <size=-3><color=#7A7480>1→68% · 2→32%</color></size>
+<color=#B08A3A>10.0%</color> Max HP <b>+50~80</b> <size=-3><color=#7A7480>เฉลี่ย 61 · แตะ 80 ได้ 0.93%</color></size>
+<color=#B08A3A>10.0%</color> ความเร็วเดิน <b>+3</b>
 <size=-3><color=#7A7480>ช่องถัดไปไม่ออกซ้ำกับที่ได้ไปแล้ว</color></size>
 
 ::Ench_Heaven_Weapon //id 17031 - enchant scroll
@@ -1327,6 +1351,22 @@ MATK +20 นาน 60 วินาที
 <color=#B08A3A>5.6%</color> Max SP <b>+20~30</b> <size=-3><color=#7A7480>เฉลี่ย 23 · แตะ 30 ได้ 2.30%</color></size>
 <size=-3><color=#7A7480>ช่องถัดไปไม่ออกซ้ำกับที่ได้ไปแล้ว</color></size>
 
+::Ench_Heaven_Garment //id 17039 - enchant scroll
+<desc>คัมภีร์ศักดิ์สิทธิ์ที่จารพลังของสรวงสวรรค์ลงบนผ้าคลุม</desc>
+<color=#8E6E05>ระดับสวรรค์</color> — จาร <b>2</b> ช่อง · แต่ละช่องว่างเปล่า <b>18%</b>
+ใช้ได้กับ<color=#CC5500>ผ้าคลุม</color> เท่านั้น
+<color=#CC0000>ใช้ได้เฉพาะของที่ยังไม่มีออพ</color> — ถ้ามีออพอยู่แล้วต้องล้างด้วยคัมภีร์ล้างออพก่อน
+
+<b>ออกได้ 12 อย่าง</b> <size=-3><color=#7A7480>ตัวเลขคือโอกาสของหนึ่งช่อง</color></size>
+<color=#B08A3A>50.0%</color> STR AGI VIT INT DEX LUK <b>+3~4</b> <size=-3><color=#7A7480>3→73% · 4→27%</color></size>
+<color=#B08A3A>8.3%</color> DEF <b>+3~4</b> <size=-3><color=#7A7480>3→73% · 4→27%</color></size>
+<color=#B08A3A>8.3%</color> MDEF <b>+3~4</b> <size=-3><color=#7A7480>3→73% · 4→27%</color></size>
+<color=#B08A3A>8.3%</color> Max HP <b>+100~150</b> <size=-3><color=#7A7480>เฉลี่ย 116 · แตะ 150 ได้ 0.46%</color></size>
+<color=#B08A3A>8.3%</color> ความเร็วเดิน <b>+5</b>
+<color=#B08A3A>8.3%</color> FLEE <b>+3~4</b> <size=-3><color=#7A7480>3→73% · 4→27%</color></size>
+<color=#B08A3A>8.3%</color> Max SP <b>+20~30</b> <size=-3><color=#7A7480>เฉลี่ย 23 · แตะ 30 ได้ 2.30%</color></size>
+<size=-3><color=#7A7480>ช่องถัดไปไม่ออกซ้ำกับที่ได้ไปแล้ว</color></size>
+
 ::Ench_Legend_Weapon //id 17041 - enchant scroll
 <desc>คัมภีร์ตำนานที่จารได้เพียงไม่กี่ใบในโลก สำหรับอาวุธ</desc>
 <color=#A32E45>ระดับตำนาน</color> — จาร <b>3</b> ช่อง · แต่ละช่องว่างเปล่า <b>25%</b>
@@ -1459,6 +1499,22 @@ MATK +20 นาน 60 วินาที
 <color=#B08A3A>5.6%</color> ความเร็วเดิน <b>+8</b>
 <color=#B08A3A>5.6%</color> FLEE <b>+5~7</b> <size=-3><color=#7A7480>5→59% · 6→31% · 7→10%</color></size>
 <color=#B08A3A>5.6%</color> Max SP <b>+50~80</b> <size=-3><color=#7A7480>เฉลี่ย 58 · แตะ 80 ได้ 0.64%</color></size>
+<size=-3><color=#7A7480>ช่องถัดไปไม่ออกซ้ำกับที่ได้ไปแล้ว</color></size>
+
+::Ench_Legend_Garment //id 17049 - enchant scroll
+<desc>คัมภีร์ตำนานที่จารได้เพียงไม่กี่ใบในโลก สำหรับผ้าคลุม</desc>
+<color=#A32E45>ระดับตำนาน</color> — จาร <b>3</b> ช่อง · แต่ละช่องว่างเปล่า <b>25%</b>
+ใช้ได้กับ<color=#CC5500>ผ้าคลุม</color> เท่านั้น
+<color=#CC0000>ใช้ได้เฉพาะของที่ยังไม่มีออพ</color> — ถ้ามีออพอยู่แล้วต้องล้างด้วยคัมภีร์ล้างออพก่อน
+
+<b>ออกได้ 12 อย่าง</b> <size=-3><color=#7A7480>ตัวเลขคือโอกาสของหนึ่งช่อง</color></size>
+<color=#B08A3A>50.0%</color> STR AGI VIT INT DEX LUK <b>+4~5</b> <size=-3><color=#7A7480>4→77% · 5→23%</color></size>
+<color=#B08A3A>8.3%</color> DEF <b>+5~6</b> <size=-3><color=#7A7480>5→77% · 6→23%</color></size>
+<color=#B08A3A>8.3%</color> MDEF <b>+5~6</b> <size=-3><color=#7A7480>5→77% · 6→23%</color></size>
+<color=#B08A3A>8.3%</color> Max HP <b>+200~300</b> <size=-3><color=#7A7480>เฉลี่ย 228 · แตะ 300 ได้ 0.19%</color></size>
+<color=#B08A3A>8.3%</color> ความเร็วเดิน <b>+8</b>
+<color=#B08A3A>8.3%</color> FLEE <b>+5~7</b> <size=-3><color=#7A7480>5→59% · 6→31% · 7→10%</color></size>
+<color=#B08A3A>8.3%</color> Max SP <b>+50~80</b> <size=-3><color=#7A7480>เฉลี่ย 58 · แตะ 80 ได้ 0.64%</color></size>
 <size=-3><color=#7A7480>ช่องถัดไปไม่ออกซ้ำกับที่ได้ไปแล้ว</color></size>
 
 ::Ench_Blank //id 17000 - enchant scroll

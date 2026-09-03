@@ -754,7 +754,7 @@ public static class GmCommands
             }
             else if (!EnchantScrolls.TryReadSlotName(parts[2], out slot))
             {
-                Tell(player, "ช่องที่รู้จัก: weapon armour shield top mid low shoes accessory (หรือ random)");
+                Tell(player, "ช่องที่รู้จัก: weapon armour shield top mid low shoes accessory garment (หรือ random)");
                 return;
             }
 

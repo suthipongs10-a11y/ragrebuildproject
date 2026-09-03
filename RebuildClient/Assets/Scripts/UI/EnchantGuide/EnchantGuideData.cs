@@ -279,7 +279,7 @@ namespace Assets.Scripts.UI.EnchantGuide
                 string.Format("ช่องว่าง {0}%", t.EmptyPerCent), true));
 
             AppendFamily(rows, tier, GuideFamily.Weapon, "อาวุธ");
-            AppendFamily(rows, tier, GuideFamily.Armour, "เกราะ · โล่ · หัว · รองเท้า");
+            AppendFamily(rows, tier, GuideFamily.Armour, "เกราะ · โล่ · หัว · ผ้าคลุม · รองเท้า");
             AppendFamily(rows, tier, GuideFamily.Accessory, "เครื่องประดับ");
 
             return rows;
