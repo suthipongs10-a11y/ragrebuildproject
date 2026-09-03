@@ -3,7 +3,7 @@ using UnityEngine;
 namespace Assets.Scripts.Network
 {
     /// <summary>
-    /// The ring of light under a character who has reached the level cap.
+    /// The burst of light at the feet of a character who has reached the level cap.
     /// </summary>
     /// <remarks>
     /// Drawn here rather than imported. The aura is a standard thing to have and the obvious
@@ -12,12 +12,18 @@ namespace Assets.Scripts.Network
     /// plays once and finishes. This has to sit under somebody for as long as they stand
     /// there, which is the same problem the drop aura solved, so it is solved the same way.
     ///
-    /// The art is its own rather than borrowed from the drop aura. The ring the drop aura
-    /// uses is the client's cast-target decal, and that texture carries a lot of empty
-    /// margin around the circle it draws: asking for a ring a certain number of units across
-    /// gets a texture that wide with a much smaller circle inside it, which is why the first
-    /// attempt at this came out a quarter of the size the numbers said. Everything below
-    /// fills its own texture out to the edge, so a width here is the width on screen.
+    /// Every part of it faces the camera. The first version lay flat on the floor, the way a
+    /// ground decal would, and that was wrong twice over: a flat ring read as a hoop drawn
+    /// round the feet rather than as light coming off them, and on any slope the flat quad
+    /// cut through the ground, so half of it vanished the moment the character walked over
+    /// a change in level. The reference this is built from is a camera-facing flare - a
+    /// bright pool at the feet with soft rays fanning out of it - and a camera-facing quad
+    /// cannot intersect the terrain however the terrain is shaped.
+    ///
+    /// The quads still dip below the ground plane on the side nearest the camera, which is
+    /// why they are drawn without a depth test at all: with one, the terrain in front would
+    /// clip the lower half of the pool off. Nothing here writes depth, and everything sorts
+    /// behind the character sprite, so the feet stay visible and the ground never wins.
     ///
     /// It reads the level off the character rather than being told when to appear. The
     /// client already knows what level everything on screen is - it is in the spawn packet
@@ -30,95 +36,89 @@ namespace Assets.Scripts.Network
         /// <summary>The level that earns it. The one number worth having in one place.</summary>
         private const int AuraLevel = 99;
 
-        //Widths in world units, and a character stands about a unit and a half. These are
-        //deliberately far wider than the body: the aura is meant to be seen from across a
-        //field and to say "that one" before you have read anything, so the haze reaches
-        //about three body widths out and everything inside it is stacked toward the middle.
-        private const float HazeWidth = 5.2f;
-        private const float SwirlWidth = 4.0f;
-        private const float RingWidth = 2.9f;
+        //Widths in world units, and a character stands about a unit and a half. The pool is
+        //a good deal wider than a mounted character, the halo reaches out past everything,
+        //and the rays go further still when they flare.
+        private const float PoolWidth = 3.1f;
+        private const float CoreWidth = 1.6f;
+        private const float HaloWidth = 4.2f;
 
         /// <summary>
-        /// Where the circle actually is, in world units of radius. The haze starts here and
-        /// runs outward, the swirl is centred on it, the wisps rise from it. Inside it there
-        /// is nothing at all, which is the point: the reference is a bright line with grass
-        /// showing through the middle, not a pool somebody is standing in.
+        /// The rays come in two kinds, because the reference has two kinds in it: broad soft
+        /// petals that make the burst, and thin bright spikes that shoot out of it. Petals
+        /// alone were a cloud and spikes alone were a pinwheel; together they are a flare.
         /// </summary>
-        private const float RingRadius = 1.30f;
+        private const int PetalCount = 10;
+        private const int SpikeCount = 12;
+
+        /// <summary>How far each kind reaches from the centre at full stretch, in world units.</summary>
+        private const float PetalLength = 2.0f;
+        private const float SpikeLength = 2.5f;
+
+        /// <summary>How wide each kind is at its foot, in world units.</summary>
+        private const float PetalWidth = 1.5f;
+        private const float SpikeWidth = 0.45f;
 
         /// <summary>
-        /// How much of the middle stays empty, in world units of radius.
-        ///
-        /// The feet are the one part of the character the aura is standing on, and an aura
-        /// painted over them reads as the character sinking into it rather than as light
-        /// coming off the floor around them. Every layer is cut out to this radius, and
-        /// because they are different widths each one is cut at a different fraction of its
-        /// own texture - which is why the number is in world units and divided per layer
-        /// rather than written as a fraction once.
+        /// Degrees a second each fan turns. Slow, and against each other: two fans turning
+        /// the same way would lock into a single wheel, and the rays are meant to cross.
         /// </summary>
-        private const float FeetRadius = 0.34f;
-
-        /// <summary>Off the floor by enough not to fight the ground for the same pixels.</summary>
-        private const float Lift = 0.06f;
-
-        /// <summary>Degrees a second, and the swirl turns against the ring.</summary>
-        private const float Spin = 34f;
+        private const float PetalSpin = 8f;
+        private const float SpikeSpin = -5f;
 
         /// <summary>
-        /// Specks climbing out of the ring, which is most of what separates a lit circle
-        /// from something happening. Twelve rather than the drop aura's eight, because this
-        /// is a wider ring and the same number spread over it reads as sparse.
+        /// Sparks climbing out of the pool, which is most of what separates a lit patch of
+        /// floor from something happening.
         /// </summary>
-        private const int MoteCount = 16;
+        private const int MoteCount = 14;
 
-        private const float MoteRise = 0.72f;
-        private const float MoteHeight = 3.2f;
-        private const float MoteRadius = RingRadius;
+        private const float MoteRise = 0.3f;
+        private const float MoteHeight = 2.8f;
+        private const float MoteRadius = 1.0f;
 
-        /// <summary>
-        /// How much taller than wide a speck is drawn.
-        ///
-        /// A round speck moving up reads as a round speck that happens to be somewhere else
-        /// this frame. Stretching it along the direction it travels is what the eye reads as
-        /// speed, and it costs nothing - the quad is already facing the camera.
-        /// </summary>
-        private const float MoteStretch = 3.0f;
-
-        /// <summary>How far a wisp wanders sideways on the way up, in world units.</summary>
-        private const float MoteSway = 0.16f;
+        /// <summary>How far a spark wanders sideways on the way up, in world units.</summary>
+        private const float MoteSway = 0.22f;
 
         private const int Size = 160;
-        private const int SwirlArms = 6;
 
         /// <summary>
-        /// White, with just enough blue left in it to read as light rather than as paper.
+        /// The body of the light: white, with just enough blue left in it to read as light
+        /// rather than as paper.
         /// </summary>
         /// <remarks>
         /// Written darker than it should look, like every colour in the drop aura and for the
         /// same reason: these are additive layers, so what reaches the screen is the tint
-        /// times however many of them cover the pixel. Written at full brightness the middle
-        /// clips to flat white and the edges go with it; written at about two thirds, the
-        /// core still clips white where the layers pile up and the spread keeps its tint.
+        /// times however many of them cover the pixel. The pool, the core and the feet of a
+        /// dozen rays all pile up on the same few pixels, and that is where it goes white -
+        /// which is right, that is what the reference does - while further out, where only
+        /// one or two layers reach, the tint shows through.
         ///
         /// One colour for now. Splitting it by adventure rank needs the rank of the person
         /// the aura belongs to, and the client only knows its own - so that is a byte in the
         /// player spawn packet, not a change to this file.
         /// </remarks>
-        private static readonly Color AuraColor = new Color(0.62f, 0.72f, 0.80f);
+        private static readonly Color BodyColor = new Color(0.86f, 0.92f, 1.0f);
 
-        private static Sprite hazeSprite;
-        private static Sprite ringSprite;
-        private static Sprite swirlSprite;
-        private static Sprite moteSprite;
+        /// <summary>The fringe: pale cyan, for the rays and the halo, where the white gives out.</summary>
+        private static readonly Color FringeColor = new Color(0.50f, 0.78f, 0.92f);
+
+        private static Sprite poolSprite;
+        private static Sprite coreSprite;
+        private static Sprite haloSprite;
+        private static Sprite petalSprite;
+        private static Sprite spikeSprite;
+        private static Sprite sparkSprite;
 
         private ServerControllable owner;
         private Transform parts;
-        private SpriteRenderer haze;
-        private SpriteRenderer swirl;
-        private SpriteRenderer ring;
+        private SpriteRenderer pool;
+        private SpriteRenderer core;
+        private SpriteRenderer halo;
+        private SpriteRenderer[] petals;
+        private SpriteRenderer[] spikes;
         private SpriteRenderer[] motes;
-        private float ringAngle;
-        private float swirlAngle;
+        private float petalAngle;
+        private float spikeAngle;
         private float phase;
 
         /// <summary>Looked up once. Camera.main is a tag search and this runs every frame.</summary>
@@ -139,6 +139,8 @@ namespace Assets.Scripts.Network
             var aura = control.gameObject.AddComponent<PlayerLevelAura>();
             aura.owner = control;
             aura.phase = Random.value * 10f;
+            aura.petalAngle = Random.value * 360f;
+            aura.spikeAngle = Random.value * 360f;
         }
 
         private void Update()
@@ -150,13 +152,20 @@ namespace Assets.Scripts.Network
                 return;
             }
 
-            var wanted = owner.Level >= AuraLevel && !owner.IsHidden;
+            var wanted = owner.Level >= AuraLevel && !owner.IsHidden && !owner.IsHiddenForPerformance;
 
             if (!wanted)
             {
                 if (parts != null && parts.gameObject.activeSelf)
                     parts.gameObject.SetActive(false);
                 return;
+            }
+
+            if (view == null)
+            {
+                if (Camera.main == null)
+                    return;
+                view = Camera.main.transform;
             }
 
             if (parts == null)
@@ -174,27 +183,24 @@ namespace Assets.Scripts.Network
             go.transform.SetParent(transform, false);
             parts = go.transform;
 
-            //Widest first. They are additive so none of them hides another, but the broad
-            //faint one is what the rest are read against.
-            haze = MakePart("Haze", HazeSprite, HazeWidth);
-            swirl = MakePart("Swirl", SwirlSprite, SwirlWidth);
-            ring = MakePart("Ring", RingSprite, RingWidth);
+            halo = MakePart("Halo", HaloSprite, FringeColor);
+            pool = MakePart("Pool", PoolSprite, BodyColor);
+            core = MakePart("Core", CoreSprite, BodyColor);
+
+            petals = new SpriteRenderer[PetalCount];
+            for (var i = 0; i < PetalCount; i++)
+                petals[i] = MakePart("Petal" + i, PetalSprite, FringeColor);
+
+            spikes = new SpriteRenderer[SpikeCount];
+            for (var i = 0; i < SpikeCount; i++)
+                spikes[i] = MakePart("Spike" + i, SpikeSprite, BodyColor);
 
             motes = new SpriteRenderer[MoteCount];
             for (var i = 0; i < MoteCount; i++)
-            {
-                //three sizes in rotation, so the column has some depth to it rather than
-                //looking like one speck copied twenty times
-                var width = 0.15f + (i % 3) * 0.08f;
-                var mote = MakePart("Mote" + i, MoteSprite, width);
-                var scale = mote.transform.localScale;
-                scale.y *= MoteStretch;
-                mote.transform.localScale = scale;
-                motes[i] = mote;
-            }
+                motes[i] = MakePart("Spark" + i, SparkSprite, BodyColor);
         }
 
-        private SpriteRenderer MakePart(string name, Sprite sprite, float width)
+        private SpriteRenderer MakePart(string name, Sprite sprite, Color tint)
         {
             var go = new GameObject(name);
             go.layer = parts.gameObject.layer;
@@ -202,19 +208,12 @@ namespace Assets.Scripts.Network
 
             var renderer = go.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
-            //under the character rather than over it, so the feet are never covered
+            //behind the character rather than in front of it, so the feet are never covered
+            //and the rays come out from behind the body the way the reference has them
             renderer.sortingOrder = -1;
 
-            //The widths above are world units, and a player object is built at one and a
-            //half, so what is asked for here has to be divided by that or the ring comes out
-            //half again as wide as the number says. Read off the object rather than written
-            //down, because a mounted character is scaled differently again.
-            var parentScale = parts.lossyScale.x;
-            if (parentScale < 0.0001f)
-                parentScale = 1f;
-            renderer.transform.localScale = GroundItemAura.ScaleFor(sprite, width / parentScale);
-
-            var material = GroundItemAura.MaterialFor(AuraColor);
+            //no depth test, or the ground in front of the feet clips the bottom off every quad
+            var material = GroundItemAura.MaterialFor(tint, true);
             if (material != null)
                 renderer.sharedMaterial = material;
 
@@ -223,43 +222,139 @@ namespace Assets.Scripts.Network
 
         private void Apply(float t)
         {
+            var origin = transform.position;
+            var facing = view.rotation;
+            var up = facing * Vector3.up;
+
             //a slow breath, the same one the drop aura uses. The eye is caught by something
             //that moves and annoyed by something that flashes.
-            var pulse = 0.5f + 0.5f * Mathf.Sin(t * 2.2f);
+            var pulse = 0.5f + 0.5f * Mathf.Sin(t * 2.0f);
 
-            //These add. The first attempt had four layers at two thirds or more each, which
-            //came to well over one wherever they overlapped, and over one is white: the ring,
-            //the swirl and the hole in the middle were all in there and none of them could
-            //be seen. The ring is the one thing allowed to reach white. The rest sit far
-            //enough under it that the sum only clips on the line itself.
-            Paint(haze, 0.20f + pulse * 0.08f);
-            Paint(swirl, 0.28f + pulse * 0.12f);
-            Paint(ring, 0.95f + pulse * 0.05f);
+            //The pool is a disc on the floor, drawn as a camera-facing ellipse: squashed by
+            //about the sine of the camera's pitch, which is what a disc on the floor looks
+            //like from that pitch, and squashed a little more than that because the
+            //character's own shadow is drawn flatter than true and the pool should agree
+            //with it rather than with geometry.
+            var pitch = Mathf.Abs(view.forward.y);
+            var squash = Mathf.Clamp(pitch * 0.75f, 0.30f, 0.60f);
 
-            LayOnGround(haze, ref swirlAngle, 0f);
-            LayOnGround(ring, ref ringAngle, 1f);
-            LayOnGround(swirl, ref swirlAngle, -0.7f);
+            Place(halo, origin + up * 0.35f, facing, HaloWidth, HaloWidth * 0.8f);
+            Paint(halo, 0.14f + pulse * 0.05f);
 
-            DriftMotes(t);
+            Place(pool, origin, facing, PoolWidth, PoolWidth * squash);
+            Paint(pool, 0.58f + pulse * 0.14f);
+
+            Place(core, origin + up * 0.12f, facing, CoreWidth, CoreWidth * 0.85f);
+            Paint(core, 0.55f + pulse * 0.16f);
+
+            FanPetals(t, origin, facing, up);
+            FanSpikes(t, origin, facing, up);
+            DriftMotes(t, origin, facing);
         }
 
         /// <summary>
-        /// Carries the specks up out of the ring and fades them out on the way.
+        /// The petals: a fan of broad soft blades round the feet, each on its own flicker.
+        /// </summary>
+        /// <remarks>
+        /// They live in the plane of the screen, turned about the line of sight, so they
+        /// spread out from the feet in every direction on screen and never touch the
+        /// ground. A ray pointing down the screen is one pointing at the camera across the
+        /// floor in front of the feet, and it is shortened for it; one pointing up is going
+        /// away and upward, and gets a little extra. Each one breathes on its own beat -
+        /// ten on the same beat would be a pinwheel, and ten on different beats are a
+        /// flare - and the whole fan drifts round slowly so nothing sits still.
+        /// </remarks>
+        private void FanPetals(float t, Vector3 origin, Quaternion facing, Vector3 up)
+        {
+            if (petals == null)
+                return;
+
+            petalAngle = Mathf.Repeat(petalAngle + Time.deltaTime * PetalSpin, 360f);
+
+            for (var i = 0; i < petals.Length; i++)
+            {
+                var petal = petals[i];
+                if (petal == null)
+                    continue;
+
+                var flicker = 0.5f + 0.5f * Mathf.Sin(t * (1.3f + 0.21f * i) + i * 1.9f);
+                var wobble = Mathf.Sin(t * 0.9f + i * 2.3f) * 6f;
+                var angle = petalAngle + i * (360f / PetalCount) + wobble;
+
+                var reach = PetalLength * (0.6f + 0.5f * flicker) * Reach(angle);
+
+                petal.transform.position = origin + up * 0.05f;
+                petal.transform.rotation = facing * Quaternion.Euler(0f, 0f, angle);
+                SetSize(petal, PetalWidth * (0.7f + 0.4f * flicker), reach);
+                Paint(petal, 0.09f + 0.16f * flicker);
+            }
+        }
+
+        /// <summary>
+        /// The spikes: thin bright rays that shoot out through the petals and pull back.
+        /// </summary>
+        /// <remarks>
+        /// Their flicker is squared, so each one spends most of its time short and dim and
+        /// then lunges out for a moment. That is what the reference does - a few long
+        /// streaks at any instant, never the same ones twice - and it is what makes the
+        /// thing look alive rather than lit.
+        /// </remarks>
+        private void FanSpikes(float t, Vector3 origin, Quaternion facing, Vector3 up)
+        {
+            if (spikes == null)
+                return;
+
+            spikeAngle = Mathf.Repeat(spikeAngle + Time.deltaTime * SpikeSpin, 360f);
+
+            for (var i = 0; i < spikes.Length; i++)
+            {
+                var spike = spikes[i];
+                if (spike == null)
+                    continue;
+
+                var flicker = 0.5f + 0.5f * Mathf.Sin(t * (2.3f + 0.31f * i) + i * 2.7f);
+                flicker *= flicker;
+                var sway = Mathf.Sin(t * 1.3f + i) * 9f;
+                var angle = spikeAngle + i * (360f / SpikeCount) + sway;
+
+                var reach = SpikeLength * (0.4f + 0.6f * flicker) * Reach(angle);
+
+                spike.transform.position = origin + up * 0.05f;
+                spike.transform.rotation = facing * Quaternion.Euler(0f, 0f, angle);
+                SetSize(spike, SpikeWidth * (0.6f + 0.5f * flicker), reach);
+                Paint(spike, 0.10f + 0.35f * flicker);
+            }
+        }
+
+        /// <summary>
+        /// How far a ray at a given angle on screen is allowed to reach, as a factor.
+        /// </summary>
+        /// <remarks>
+        /// Nought degrees is straight up the screen. A ray pointing down the screen is one
+        /// lying across the floor toward the camera, and it is cut to about half; one
+        /// pointing up is going away and upward, and gets a little extra.
+        /// </remarks>
+        private static float Reach(float angle)
+        {
+            var upness = Mathf.Cos(angle * Mathf.Deg2Rad);
+            return upness < 0f ? 1f + 0.5f * upness : 1f + 0.25f * upness;
+        }
+
+        /// <summary>
+        /// Carries the sparks up out of the pool and fades them out on the way.
         /// </summary>
         /// <remarks>
         /// Each one rides its own loop rather than carrying a timer: the fractional part of a
         /// number that only ever grows is a sawtooth from nought to one, and a dozen of them
-        /// offset by a twelfth is a steady stream with nothing to keep track of. They face
-        /// the camera rather than lying flat, because they are meant to read as sparks in the
-        /// air rather than as marks on the floor.
+        /// offset by a twelfth is a steady stream with nothing to keep track of. They rise in
+        /// world terms - straight up, off a circle round the feet - and face the camera,
+        /// because they are meant to read as sparks in the air rather than as marks on the
+        /// floor.
         /// </remarks>
-        private void DriftMotes(float t)
+        private void DriftMotes(float t, Vector3 origin, Quaternion facing)
         {
             if (motes == null)
                 return;
-
-            if (view == null && Camera.main != null)
-                view = Camera.main.transform;
 
             for (var i = 0; i < motes.Length; i++)
             {
@@ -271,26 +366,27 @@ namespace Assets.Scripts.Network
 
                 //a slow spiral inward as it climbs, so the column narrows toward the top and
                 //the whole thing reads as being drawn up rather than blown about
-                var angle = i * 2.1f + life * 2.6f;
-                var radius = MoteRadius * (1f - life * 0.55f);
+                var angle = i * 2.1f + life * 1.8f;
+                var radius = MoteRadius * (1f - life * 0.4f);
 
-                //and a wander on top of that, on its own beat per wisp. Twenty-two things
-                //rising on identical paths read as a machine; the same twenty-two with a
+                //and a wander on top of that, on its own beat per spark. Fourteen things
+                //rising on identical paths read as a machine; the same fourteen with a
                 //waver in them read as fire.
-                var sway = Mathf.Sin(t * 3.1f + i * 1.7f) * MoteSway * life;
+                var sway = Mathf.Sin(t * 2.6f + i * 1.7f) * MoteSway * life;
 
-                mote.transform.position = transform.position + new Vector3(
+                mote.transform.position = origin + new Vector3(
                     Mathf.Cos(angle) * radius + sway,
-                    Lift + life * MoteHeight,
+                    0.1f + life * MoteHeight,
                     Mathf.Sin(angle) * radius);
+                mote.transform.rotation = facing;
 
-                if (view != null)
-                    mote.transform.rotation = view.rotation;
-
-                //born out of nothing at the foot and gone before the top, so the column has
-                //no hard end to it at either end
+                //three sizes in rotation, so the column has some depth to it rather than
+                //looking like one spark copied fourteen times; and each one swells as it is
+                //born and shrinks away as it dies
                 var fade = Mathf.Sin(life * Mathf.PI);
-                mote.color = new Color(1f, 1f, 1f, fade * 0.55f);
+                var width = (0.09f + (i % 3) * 0.04f) * (0.6f + 0.4f * fade);
+                SetSize(mote, width, width);
+                Paint(mote, fade * 0.7f);
             }
         }
 
@@ -301,167 +397,199 @@ namespace Assets.Scripts.Network
         }
 
         /// <summary>
-        /// Keeps a part flat on the floor and turning, whatever the character above it is
-        /// doing.
+        /// Puts a part somewhere, facing the way the camera faces, at a size in world units.
         /// </summary>
         /// <remarks>
         /// Position and rotation are both set in world terms, for the reason the drop aura
-        /// sets them that way: the thing this hangs off carries a billboard that copies the
-        /// camera's rotation outright, pitch included, so underneath it there is no such
-        /// thing as level. A child asked to lie flat in its parent's terms would tilt with
-        /// the camera and a child offset downward would slide sideways as the camera turned.
+        /// sets them that way: the thing this hangs off may carry a billboard that copies
+        /// the camera's rotation outright, and a child placed in its parent's terms would
+        /// slide about as the camera turned.
         /// </remarks>
-        private void LayOnGround(SpriteRenderer renderer, ref float angle, float speed)
+        private void Place(SpriteRenderer renderer, Vector3 position, Quaternion facing, float width, float height)
         {
             if (renderer == null)
                 return;
 
-            if (speed != 0f)
-                angle = Mathf.Repeat(angle + Time.deltaTime * Spin * speed, 360f);
-
-            renderer.transform.position = transform.position + new Vector3(0, Lift, 0);
-            renderer.transform.rotation = Quaternion.Euler(90f, angle, 0f);
+            renderer.transform.position = position;
+            renderer.transform.rotation = facing;
+            SetSize(renderer, width, height);
         }
 
         /// <summary>
-        /// The spread: from the ring outward, and nothing inside it.
+        /// The scale that makes a part come out a given size in world units, each axis on
+        /// its own, whatever the texture's resolution and whatever the character is scaled.
         /// </summary>
         /// <remarks>
-        /// It used to fill the whole disc and so it filled the middle, over the feet, and
-        /// the sum of it and everything else there went to white. Now it starts at the ring
-        /// and runs out as a straight ramp - straight rather than curved because a curve
-        /// pulls the light back in toward the line and leaves the outer half empty, and it
-        /// is the outer half that reads as light thrown across the floor.
+        /// A player object is built at one and a half, so a width asked for here has to be
+        /// divided by that or the pool comes out half again as wide as the number says. Read
+        /// off the object rather than written down, because a mounted character is scaled
+        /// differently again.
         /// </remarks>
-        private static Sprite HazeSprite
+        private void SetSize(SpriteRenderer renderer, float width, float height)
+        {
+            var sprite = renderer.sprite;
+            if (sprite == null)
+                return;
+
+            var natural = sprite.bounds.size;
+            if (natural.x < 0.0001f || natural.y < 0.0001f)
+                return;
+
+            var parentScale = parts.lossyScale.x;
+            if (parentScale < 0.0001f)
+                parentScale = 1f;
+
+            renderer.transform.localScale = new Vector3(
+                width / natural.x / parentScale,
+                height / natural.y / parentScale,
+                1f);
+        }
+
+        /// <summary>
+        /// The lit patch of floor: bright across most of the middle, then gone at the edge.
+        /// </summary>
+        private static Sprite PoolSprite
         {
             get
             {
-                if (hazeSprite != null)
-                    return hazeSprite;
+                if (poolSprite != null)
+                    return poolSprite;
 
-                //where the ring sits, as a fraction of this texture's radius
-                var at = RingRadius / (HazeWidth * 0.5f);
-
-                hazeSprite = Draw(HazeWidth, (distance, angle) =>
+                poolSprite = Bake((dx, dy) =>
                 {
-                    //nothing inside the line, a short soft step up at it, then a ramp down
-                    var inside = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((distance - at * 0.94f) / (at * 0.10f)));
-                    var outward = Mathf.Clamp01((1f - distance) / (1f - at));
-                    return inside * outward * 0.9f;
-                });
-                return hazeSprite;
+                    var distance = Mathf.Sqrt(dx * dx + dy * dy);
+                    return 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((distance - 0.3f) / 0.7f));
+                }, new Vector2(0.5f, 0.5f));
+                return poolSprite;
             }
         }
 
-        /// <summary>The bright line of the circle itself. Thin, and the only thing that clips.</summary>
-        private static Sprite RingSprite
+        /// <summary>The white heart of it, right behind the feet. Small, and the one thing that clips on its own.</summary>
+        private static Sprite CoreSprite
         {
             get
             {
-                if (ringSprite != null)
-                    return ringSprite;
+                if (coreSprite != null)
+                    return coreSprite;
 
-                var at = RingRadius / (RingWidth * 0.5f);
-
-                ringSprite = Draw(RingWidth, (distance, angle) =>
+                coreSprite = Bake((dx, dy) =>
                 {
-                    var band = Mathf.Clamp01(1f - Mathf.Abs(distance - at) / 0.055f);
-                    return band * band;
-                });
-                return ringSprite;
+                    var distance = Mathf.Sqrt(dx * dx + dy * dy);
+                    var soft = Mathf.Clamp01(1f - distance);
+                    return soft * soft * soft;
+                }, new Vector2(0.5f, 0.5f));
+                return coreSprite;
             }
         }
 
         /// <summary>
-        /// A broad turning band centred on the ring, with arms swept round it.
+        /// The spread: faint, wide, and the thing that makes the rest read as glowing
+        /// rather than as painted on.
+        /// </summary>
+        private static Sprite HaloSprite
+        {
+            get
+            {
+                if (haloSprite != null)
+                    return haloSprite;
+
+                haloSprite = Bake((dx, dy) =>
+                {
+                    var distance = Mathf.Sqrt(dx * dx + dy * dy);
+                    var soft = Mathf.Clamp01(1f - distance);
+                    return Mathf.Pow(soft, 1.5f);
+                }, new Vector2(0.5f, 0.5f));
+                return haloSprite;
+            }
+        }
+
+        /// <summary>
+        /// A petal: a broad soft blade of light, wide at the foot and tapering, with its
+        /// pivot at the foot so it can be turned about the point it comes from.
+        /// </summary>
+        private static Sprite PetalSprite
+        {
+            get
+            {
+                if (petalSprite == null)
+                    petalSprite = Blade(0.62f, 1.5f, 1.0f);
+                return petalSprite;
+            }
+        }
+
+        /// <summary>A spike: the same blade drawn thin, with a sharper edge and a longer fade.</summary>
+        private static Sprite SpikeSprite
+        {
+            get
+            {
+                if (spikeSprite == null)
+                    spikeSprite = Blade(0.85f, 2.0f, 1.4f);
+                return spikeSprite;
+            }
+        }
+
+        /// <summary>
+        /// One blade of light, pivot at the foot: wide there, coming to a point at the tip.
         /// </summary>
         /// <remarks>
-        /// A circle of even brightness gives nothing away when it turns - every frame looks
-        /// like the last one - so it reads as a decal sitting there rather than as something
-        /// swirling. Offsetting each arm by the radius bends them into a spiral, so the
-        /// inside of the band appears to lag behind the outside.
+        /// Taper is how much of the width is gone by the tip, edge is how hard the sides
+        /// fall off, and fade is how quickly it dims along its length. It fades in over the
+        /// first tenth of its length rather than starting at full strength, so a dozen of
+        /// them meeting at the same point make a soft heart there and not a hard-edged star.
         /// </remarks>
-        private static Sprite SwirlSprite
+        private static Sprite Blade(float taper, float edge, float fade)
+        {
+            return Bake((dx, dy) =>
+            {
+                //along runs nought at the foot to one at the tip, across minus one to one
+                var along = (dy + 1f) * 0.5f;
+                var across = dx;
+
+                var half = 1f - taper * along;
+                var side = Mathf.Pow(Mathf.Clamp01(1f - Mathf.Abs(across) / Mathf.Max(half, 0.04f)), edge);
+                var length = Mathf.Pow(Mathf.Clamp01(1f - along), fade);
+                var foot = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(along / 0.12f));
+
+                return side * length * foot;
+            }, new Vector2(0.5f, 0f));
+        }
+
+        /// <summary>A spark: a soft dot with the faintest four-pointed star through it.</summary>
+        private static Sprite SparkSprite
         {
             get
             {
-                if (swirlSprite != null)
-                    return swirlSprite;
+                if (sparkSprite != null)
+                    return sparkSprite;
 
-                var at = RingRadius / (SwirlWidth * 0.5f);
-
-                swirlSprite = Draw(SwirlWidth, (distance, angle) =>
+                sparkSprite = Bake((dx, dy) =>
                 {
-                    var band = Mathf.Clamp01(1f - Mathf.Abs(distance - at) / 0.22f);
-                    band *= band;
-                    //never all the way down to nothing between the arms, so the band stays a
-                    //band rather than becoming a ring of separate blobs
-                    var arms = 0.55f + 0.45f * Mathf.Sin(angle * SwirlArms + distance * 7f);
-                    return band * arms;
-                });
-                return swirlSprite;
+                    var distance = Mathf.Sqrt(dx * dx + dy * dy);
+                    var soft = Mathf.Clamp01(1f - distance);
+                    var dot = soft * soft * soft;
+
+                    var angle = Mathf.Atan2(dy, dx);
+                    var star = soft * Mathf.Pow(Mathf.Abs(Mathf.Cos(angle * 2f)), 8f) * 0.7f;
+
+                    return Mathf.Max(dot, star);
+                }, new Vector2(0.5f, 0.5f));
+                return sparkSprite;
             }
         }
 
         /// <summary>
-        /// One wisp: a soft blade of light, wide at the foot and tapering to nothing.
-        /// </summary>
-        /// <remarks>
-        /// Round specks were wrong. What comes off an aura is not a spray of dots, it is
-        /// something more like flame - a shape that is already pointing the way it is going
-        /// before it moves at all - and a tapered blade reads as that standing still, which a
-        /// circle never does however fast you push it.
-        /// </remarks>
-        private static Sprite MoteSprite
-        {
-            get
-            {
-                if (moteSprite != null)
-                    return moteSprite;
-
-                //no clearance on this one: a hollow wisp is an outline, not a wisp
-                moteSprite = Draw(0f, (distance, angle) =>
-                {
-                    var across = distance * Mathf.Cos(angle);
-                    var along = distance * Mathf.Sin(angle);
-
-                    //narrower the higher it goes, so it comes to a point at the tip
-                    var width = 0.34f * (1f - Mathf.Clamp01((along + 1f) * 0.5f) * 0.72f);
-                    var side = Mathf.Clamp01(1f - Mathf.Abs(across) / Mathf.Max(width, 0.03f));
-                    side *= side;
-
-                    //soft at the foot and gone before the top, so it has no hard end
-                    var length = Mathf.Clamp01(1f - Mathf.Abs(along));
-
-                    return side * length;
-                });
-                return moteSprite;
-            }
-        }
-
-        /// <summary>
-        /// Builds one of the textures above from a function of radius and angle, with the
-        /// middle cut out so the feet show through.
+        /// Builds one of the textures above from a function of position, given as a pair of
+        /// coordinates each running minus one to one across the texture.
         /// </summary>
         /// <remarks>
         /// Every one of these fills its texture out to the edge, which is the whole reason
         /// they are drawn here instead of borrowed: a width asked for is then the width that
         /// appears, with no invisible margin to swallow it.
-        ///
-        /// The hole is given in world units and turned into a fraction of this particular
-        /// texture, so four layers of four different widths all clear the same circle on the
-        /// floor. Pass a width of zero for something that should not be hollow at all.
         /// </remarks>
-        private static Sprite Draw(float worldWidth, System.Func<float, float, float> shape)
+        private static Sprite Bake(System.Func<float, float, float> shape, Vector2 pivot)
         {
             var texture = new Texture2D(Size, Size, TextureFormat.RGBA32, false);
             texture.wrapMode = TextureWrapMode.Clamp;
-
-            //the fraction of this texture's radius that the feet take up
-            var clear = worldWidth > 0.0001f ? FeetRadius / (worldWidth * 0.5f) : 0f;
-            //softened over a tenth of the radius, so the hole has an edge you cannot see
-            var fade = Mathf.Max(clear * 0.35f, 0.02f);
 
             var half = Size * 0.5f;
             for (var y = 0; y < Size; y++)
@@ -470,20 +598,14 @@ namespace Assets.Scripts.Network
                 {
                     var dx = (x + 0.5f - half) / half;
                     var dy = (y + 0.5f - half) / half;
-                    var distance = Mathf.Sqrt(dx * dx + dy * dy);
-                    var angle = Mathf.Atan2(dy, dx);
 
-                    var alpha = Mathf.Clamp01(shape(distance, angle));
-
-                    if (clear > 0f)
-                        alpha *= Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((distance - clear) / fade));
-
+                    var alpha = Mathf.Clamp01(shape(dx, dy));
                     texture.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
                 }
             }
 
             texture.Apply();
-            return Sprite.Create(texture, new Rect(0, 0, Size, Size), new Vector2(0.5f, 0.5f), 100);
+            return Sprite.Create(texture, new Rect(0, 0, Size, Size), pivot, 100);
         }
     }
 }

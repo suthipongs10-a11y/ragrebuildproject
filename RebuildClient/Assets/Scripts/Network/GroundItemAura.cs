@@ -112,6 +112,7 @@ namespace Assets.Scripts.Network
         //colour inputs that is certain to arrive, and the beams coming out white is what a
         //tint that did not arrive looks like.
         private static readonly Dictionary<Color, Material> additiveMaterials = new Dictionary<Color, Material>();
+        private static readonly Dictionary<Color, Material> additiveMaterialsNoDepth = new Dictionary<Color, Material>();
         private static bool loggedOnce;
 
         /// <summary>The second ring, turning the other way, and the rising specks.</summary>
@@ -474,7 +475,21 @@ namespace Assets.Scripts.Network
         /// </summary>
         internal static Material MaterialFor(Color tint)
         {
-            if (additiveMaterials.TryGetValue(tint, out var found) && found != null)
+            return MaterialFor(tint, false);
+        }
+
+        /// <summary>
+        /// The same, with the choice of skipping the depth test.
+        ///
+        /// A camera-facing quad at somebody's feet dips below the floor on the side nearest
+        /// the camera, and with a depth test the ground clips that half off. The level aura
+        /// asks for this; the drop beams do not, because a beam that showed through walls
+        /// would give away drops in the next room.
+        /// </summary>
+        internal static Material MaterialFor(Color tint, bool ignoreDepth)
+        {
+            var materials = ignoreDepth ? additiveMaterialsNoDepth : additiveMaterials;
+            if (materials.TryGetValue(tint, out var found) && found != null)
                 return found;
 
             var cache = ShaderCache.Instance;
@@ -490,11 +505,14 @@ namespace Assets.Scripts.Network
                 return null;
             }
 
-            var material = new Material(cache.AdditiveShader);
+            //falls back to the depth-tested one if the scene has no other, which draws
+            //something rather than nothing
+            var shader = ignoreDepth && cache.AdditiveShaderNoZTest != null ? cache.AdditiveShaderNoZTest : cache.AdditiveShader;
+            var material = new Material(shader);
             material.SetColor("_Color", new Color(tint.r, tint.g, tint.b, 1f));
             //after the world is drawn, the way the skill effects do it
             material.renderQueue = 3001;
-            additiveMaterials[tint] = material;
+            materials[tint] = material;
 
             if (!loggedOnce)
             {
