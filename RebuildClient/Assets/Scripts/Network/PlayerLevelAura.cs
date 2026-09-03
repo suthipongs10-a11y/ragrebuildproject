@@ -75,18 +75,29 @@ namespace Assets.Scripts.Network
         /// this frame. Stretching it along the direction it travels is what the eye reads as
         /// speed, and it costs nothing - the quad is already facing the camera.
         /// </summary>
-        private const float MoteStretch = 2.4f;
+        private const float MoteStretch = 3.0f;
+
+        /// <summary>How far a wisp wanders sideways on the way up, in world units.</summary>
+        private const float MoteSway = 0.16f;
 
         private const int Size = 160;
         private const int SwirlArms = 6;
 
         /// <summary>
+        /// White, with just enough blue left in it to read as light rather than as paper.
+        /// </summary>
+        /// <remarks>
         /// Written darker than it should look, like every colour in the drop aura and for the
         /// same reason: these are additive layers, so what reaches the screen is the tint
-        /// times however many of them cover the pixel. A cyan written at full brightness
-        /// comes out white the moment two layers overlap, and white says nothing.
-        /// </summary>
-        private static readonly Color AuraColor = new Color(0.14f, 0.58f, 1.00f);
+        /// times however many of them cover the pixel. Written at full brightness the middle
+        /// clips to flat white and the edges go with it; written at about two thirds, the
+        /// core still clips white where the layers pile up and the spread keeps its tint.
+        ///
+        /// One colour for now. Splitting it by adventure rank needs the rank of the person
+        /// the aura belongs to, and the client only knows its own - so that is a byte in the
+        /// player spawn packet, not a change to this file.
+        /// </remarks>
+        private static readonly Color AuraColor = new Color(0.62f, 0.72f, 0.80f);
 
         private static Sprite hazeSprite;
         private static Sprite ringSprite;
@@ -256,8 +267,13 @@ namespace Assets.Scripts.Network
                 var angle = i * 2.1f + life * 2.6f;
                 var radius = MoteRadius * (1f - life * 0.55f);
 
+                //and a wander on top of that, on its own beat per wisp. Twenty-two things
+                //rising on identical paths read as a machine; the same twenty-two with a
+                //waver in them read as fire.
+                var sway = Mathf.Sin(t * 3.1f + i * 1.7f) * MoteSway * life;
+
                 mote.transform.position = transform.position + new Vector3(
-                    Mathf.Cos(angle) * radius,
+                    Mathf.Cos(angle) * radius + sway,
                     Lift + life * MoteHeight,
                     Mathf.Sin(angle) * radius);
 
@@ -394,7 +410,15 @@ namespace Assets.Scripts.Network
             }
         }
 
-        /// <summary>One speck, soft enough to have no edge at the size it is drawn.</summary>
+        /// <summary>
+        /// One wisp: a soft blade of light, wide at the foot and tapering to nothing.
+        /// </summary>
+        /// <remarks>
+        /// Round specks were wrong. What comes off an aura is not a spray of dots, it is
+        /// something more like flame - a shape that is already pointing the way it is going
+        /// before it moves at all - and a tapered blade reads as that standing still, which a
+        /// circle never does however fast you push it.
+        /// </remarks>
         private static Sprite MoteSprite
         {
             get
@@ -402,11 +426,21 @@ namespace Assets.Scripts.Network
                 if (moteSprite != null)
                     return moteSprite;
 
-                //no clearance on this one: a hollow speck is a ring, not a speck
+                //no clearance on this one: a hollow wisp is an outline, not a wisp
                 moteSprite = Draw(0f, (distance, angle) =>
                 {
-                    var a = Mathf.Clamp01(1f - distance);
-                    return a * a;
+                    var across = distance * Mathf.Cos(angle);
+                    var along = distance * Mathf.Sin(angle);
+
+                    //narrower the higher it goes, so it comes to a point at the tip
+                    var width = 0.34f * (1f - Mathf.Clamp01((along + 1f) * 0.5f) * 0.72f);
+                    var side = Mathf.Clamp01(1f - Mathf.Abs(across) / Mathf.Max(width, 0.03f));
+                    side *= side;
+
+                    //soft at the foot and gone before the top, so it has no hard end
+                    var length = Mathf.Clamp01(1f - Mathf.Abs(along));
+
+                    return side * length;
                 });
                 return moteSprite;
             }
