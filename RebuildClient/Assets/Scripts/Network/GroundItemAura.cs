@@ -63,8 +63,11 @@ namespace Assets.Scripts.Network
         /// <summary>The cast-target decal, which is already a ring drawn to be tinted.</summary>
         private const string RingTexture = "magic_target_grey";
 
-        /// <summary>Degrees a second. Slow enough to be noticed rather than watched.</summary>
-        private const float RingSpin = 24f;
+        /// <summary>Degrees a second. Fast enough to read as turning, slow enough not to spin.</summary>
+        private const float RingSpin = 45f;
+
+        /// <summary>Arms swept round the swirl. Six reads as motion; two reads as a bowtie.</summary>
+        private const int SwirlArms = 6;
 
         /// <summary>
         /// How much bigger the grand aura is than the ordinary one.
@@ -81,7 +84,7 @@ namespace Assets.Scripts.Network
         /// from across a map, and the foot of it is what says where the thing actually is.
         private const float GrandHeight = 1.7f;
 
-        private const float GrandWidth = 1.85f;
+        private const float GrandWidth = 1.3f;
 
         /// <summary>
         /// Specks of light drifting up the shaft, which is what the ordinary aura has none of
@@ -102,6 +105,7 @@ namespace Assets.Scripts.Network
         private static Sprite beamSprite;
         private static Sprite glowSprite;
         private static Sprite ringSprite;
+        private static Sprite swirlSprite;
         private static bool ringResourceMissing;
         //One material per colour rather than one shared by all of them. The colour has to
         //travel in the material's own Tint property: it is the only one of the shader's two
@@ -174,36 +178,41 @@ namespace Assets.Scripts.Network
             //which is exactly what four stacked layers produced. Two passes of a saturated
             //tint fill the strong channels and leave the weak one weak, so the beam is very
             //bright and still gold, or blue, or purple.
-            //Width was the whole problem, not brightness.
             //
-            //The scale numbers are multipliers on the sprite's own size, and the sprite is
-            //32 wide by 256 tall — so the same number means eight times as much height as
-            //width. The old beam came out about half a unit across and seven tall: a needle,
-            //and a needle reads as a faint line however bright it is. A character in this
-            //game stands about a unit and a half. These numbers put the shaft at roughly two
-            //units across and ten tall, which is a pillar you could walk into.
+            //The widths below are measured against the item icon rather than chosen, because
+            //the icon is the one thing that appears in both this game and the recording they
+            //were taken from. There the shaft is about half the width of the icon it stands
+            //on and the circle about three and a half times it: a thin bright line inside a
+            //broad turning ring, where the ring is what catches the eye from across a map
+            //and the line is what says which square the thing is actually on.
+            //
+            //They had been the other way round - a shaft several times wider than the item
+            //with a thin ring lost inside it - and at that width there is no shape left to
+            //read, only a colour. The scale numbers are multipliers on the sprite's own
+            //size, and the beam sprite is 32 pixels at a hundred to the unit, so 0.32 units:
+            //a scale of one is already about half an icon.
             aura.beamHeight = (3.6f + tier * 0.6f) * tall;
             aura.beam = MakeRenderer(go.transform, "Beam", BeamSprite, Vector3.zero, color);
-            aura.beam.transform.localScale = new Vector3((6.5f + tier * 1.2f) * wide, aura.beamHeight, 1f);
+            aura.beam.transform.localScale = new Vector3((1.15f + tier * 0.12f) * wide, aura.beamHeight, 1f);
 
             //The same tint as the shaft around it, not a paler one. Mixing white into the
             //core was a second push toward white on top of the one the stacking already
             //gives, and it is the middle of the beam — the part you actually read the
             //colour off — that it bleached.
             aura.core = MakeRenderer(go.transform, "Core", BeamSprite, Vector3.zero, color);
-            aura.core.transform.localScale = new Vector3((2.6f + tier * 0.4f) * wide, aura.beamHeight * 0.9f, 1f);
+            aura.core.transform.localScale = new Vector3((0.45f + tier * 0.05f) * wide, aura.beamHeight * 0.9f, 1f);
 
             //a pool of light where it is actually lying, so the eye is sent to the item and
             //not to the empty air above it
             aura.glow = MakeRenderer(go.transform, "Glow", GlowSprite, new Vector3(0, 0.05f, 0), color);
-            aura.glow.transform.localScale = Vector3.one * ((4.5f + tier * 0.6f) * wide * 1.2f);
+            aura.glow.transform.localScale = Vector3.one * ((1.5f + tier * 0.2f) * wide);
 
             //A ring drawn on the floor around it, turning slowly. Everything else here faces
             //the camera; this is the one part that lies in the world, and that is what makes
             //it read as a circle around the item rather than a disc behind it.
             aura.ring = MakeRenderer(go.transform, "Ring", RingSprite, Vector3.zero, color);
             if (aura.ring != null)
-                aura.ring.transform.localScale = ScaleFor(aura.ring.sprite, (2.6f + tier * 0.4f) * wide);
+                aura.ring.transform.localScale = ScaleFor(aura.ring.sprite, (1.55f + tier * 0.18f) * wide);
 
             if (aura.grand)
                 aura.BuildGrandParts(go.transform, color, tier, wide);
@@ -221,9 +230,13 @@ namespace Assets.Scripts.Network
         /// </summary>
         private void BuildGrandParts(Transform parent, Color color, int tier, float wide)
         {
-            halo = MakeRenderer(parent, "Halo", RingSprite, Vector3.zero, color);
+            //A broad swirling band just outside the crisp ring, turning the other way. The
+            //ring says where the circle is; this is what makes the circle look like it is
+            //moving, and it is the part of the reference that reads as an aura rather than
+            //as a decal somebody rotated.
+            halo = MakeRenderer(parent, "Halo", SwirlSprite, Vector3.zero, color);
             if (halo != null)
-                halo.transform.localScale = ScaleFor(halo.sprite, (4.1f + tier * 0.5f) * wide);
+                halo.transform.localScale = ScaleFor(halo.sprite, (2.05f + tier * 0.2f) * wide);
 
             motes = new SpriteRenderer[MoteCount];
             for (var i = 0; i < MoteCount; i++)
@@ -599,6 +612,55 @@ namespace Assets.Scripts.Network
             texture.Apply();
             return Sprite.Create(texture, new Rect(0, 0, RingSize, RingSize),
                 new Vector2(0.5f, 0.5f), 100);
+        }
+
+        /// <summary>
+        /// A thick turning band, rather than a drawn line.
+        /// </summary>
+        /// <remarks>
+        /// A circle of even brightness gives nothing away when it turns - every frame looks
+        /// like the last one, so it reads as a decal sitting there rather than as something
+        /// swirling. Sweeping a handful of arms round the band gives the eye bright parts to
+        /// follow, and offsetting each arm by the radius bends them into a spiral so the
+        /// inside of the band appears to lag behind the outside.
+        /// </remarks>
+        private static Sprite SwirlSprite
+        {
+            get
+            {
+                if (swirlSprite != null)
+                    return swirlSprite;
+
+                var texture = new Texture2D(RingSize, RingSize, TextureFormat.RGBA32, false);
+                texture.wrapMode = TextureWrapMode.Clamp;
+
+                var half = RingSize * 0.5f;
+                for (var y = 0; y < RingSize; y++)
+                {
+                    for (var x = 0; x < RingSize; x++)
+                    {
+                        var dx = (x + 0.5f - half) / half;
+                        var dy = (y + 0.5f - half) / half;
+                        var distance = Mathf.Sqrt(dx * dx + dy * dy);
+
+                        //a band about a third of the radius across, soft on both sides
+                        var band = Mathf.Clamp01(1f - Mathf.Abs(distance - 0.64f) / 0.30f);
+                        band *= band;
+
+                        //never all the way down to nothing between the arms, so the band is
+                        //still a band rather than a ring of separate blobs
+                        var angle = Mathf.Atan2(dy, dx);
+                        var arms = 0.55f + 0.45f * Mathf.Sin(angle * SwirlArms + distance * 7f);
+
+                        texture.SetPixel(x, y, new Color(1f, 1f, 1f, band * arms));
+                    }
+                }
+
+                texture.Apply();
+                swirlSprite = Sprite.Create(texture, new Rect(0, 0, RingSize, RingSize),
+                    new Vector2(0.5f, 0.5f), 100);
+                return swirlSprite;
+            }
         }
 
         /// <summary>A soft round pool for the foot of the beam.</summary>
