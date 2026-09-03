@@ -37,7 +37,14 @@ namespace Assets.Scripts.Network
         private const float HazeWidth = 5.2f;
         private const float SwirlWidth = 4.0f;
         private const float RingWidth = 2.9f;
-        private const float InnerWidth = 2.0f;
+
+        /// <summary>
+        /// Where the circle actually is, in world units of radius. The haze starts here and
+        /// runs outward, the swirl is centred on it, the wisps rise from it. Inside it there
+        /// is nothing at all, which is the point: the reference is a bright line with grass
+        /// showing through the middle, not a pool somebody is standing in.
+        /// </summary>
+        private const float RingRadius = 1.30f;
 
         /// <summary>
         /// How much of the middle stays empty, in world units of radius.
@@ -62,11 +69,11 @@ namespace Assets.Scripts.Network
         /// from something happening. Twelve rather than the drop aura's eight, because this
         /// is a wider ring and the same number spread over it reads as sparse.
         /// </summary>
-        private const int MoteCount = 22;
+        private const int MoteCount = 16;
 
         private const float MoteRise = 0.72f;
         private const float MoteHeight = 3.2f;
-        private const float MoteRadius = 1.15f;
+        private const float MoteRadius = RingRadius;
 
         /// <summary>
         /// How much taller than wide a speck is drawn.
@@ -102,7 +109,6 @@ namespace Assets.Scripts.Network
         private static Sprite hazeSprite;
         private static Sprite ringSprite;
         private static Sprite swirlSprite;
-        private static Sprite innerSprite;
         private static Sprite moteSprite;
 
         private ServerControllable owner;
@@ -110,7 +116,6 @@ namespace Assets.Scripts.Network
         private SpriteRenderer haze;
         private SpriteRenderer swirl;
         private SpriteRenderer ring;
-        private SpriteRenderer inner;
         private SpriteRenderer[] motes;
         private float ringAngle;
         private float swirlAngle;
@@ -174,7 +179,6 @@ namespace Assets.Scripts.Network
             haze = MakePart("Haze", HazeSprite, HazeWidth);
             swirl = MakePart("Swirl", SwirlSprite, SwirlWidth);
             ring = MakePart("Ring", RingSprite, RingWidth);
-            inner = MakePart("Inner", InnerSprite, InnerWidth);
 
             motes = new SpriteRenderer[MoteCount];
             for (var i = 0; i < MoteCount; i++)
@@ -223,13 +227,16 @@ namespace Assets.Scripts.Network
             //that moves and annoyed by something that flashes.
             var pulse = 0.5f + 0.5f * Mathf.Sin(t * 2.2f);
 
-            Paint(haze, 0.46f + pulse * 0.20f);
-            Paint(swirl, 0.72f + pulse * 0.26f);
-            Paint(ring, 0.90f + pulse * 0.10f);
-            Paint(inner, 0.58f + pulse * 0.22f);
+            //These add. The first attempt had four layers at two thirds or more each, which
+            //came to well over one wherever they overlapped, and over one is white: the ring,
+            //the swirl and the hole in the middle were all in there and none of them could
+            //be seen. The ring is the one thing allowed to reach white. The rest sit far
+            //enough under it that the sum only clips on the line itself.
+            Paint(haze, 0.20f + pulse * 0.08f);
+            Paint(swirl, 0.28f + pulse * 0.12f);
+            Paint(ring, 0.95f + pulse * 0.05f);
 
             LayOnGround(haze, ref swirlAngle, 0f);
-            LayOnGround(inner, ref ringAngle, 0f);
             LayOnGround(ring, ref ringAngle, 1f);
             LayOnGround(swirl, ref swirlAngle, -0.7f);
 
@@ -283,7 +290,7 @@ namespace Assets.Scripts.Network
                 //born out of nothing at the foot and gone before the top, so the column has
                 //no hard end to it at either end
                 var fade = Mathf.Sin(life * Mathf.PI);
-                mote.color = new Color(1f, 1f, 1f, fade * 0.95f);
+                mote.color = new Color(1f, 1f, 1f, fade * 0.55f);
             }
         }
 
@@ -317,14 +324,14 @@ namespace Assets.Scripts.Network
         }
 
         /// <summary>
-        /// The broad spread, and most of what the aura actually is.
+        /// The spread: from the ring outward, and nothing inside it.
         /// </summary>
         /// <remarks>
-        /// A straight ramp from the clearance out to the rim rather than a curve. Curving it
-        /// pulls the light back toward the middle and leaves the outer half nearly empty,
-        /// which is the opposite of spreading: what makes this read as light thrown across
-        /// the floor is that there is still something out at the edge when it finally runs
-        /// out.
+        /// It used to fill the whole disc and so it filled the middle, over the feet, and
+        /// the sum of it and everything else there went to white. Now it starts at the ring
+        /// and runs out as a straight ramp - straight rather than curved because a curve
+        /// pulls the light back in toward the line and leaves the outer half empty, and it
+        /// is the outer half that reads as light thrown across the floor.
         /// </remarks>
         private static Sprite HazeSprite
         {
@@ -333,13 +340,21 @@ namespace Assets.Scripts.Network
                 if (hazeSprite != null)
                     return hazeSprite;
 
+                //where the ring sits, as a fraction of this texture's radius
+                var at = RingRadius / (HazeWidth * 0.5f);
+
                 hazeSprite = Draw(HazeWidth, (distance, angle) =>
-                    Mathf.Clamp01(1f - distance) * 0.85f);
+                {
+                    //nothing inside the line, a short soft step up at it, then a ramp down
+                    var inside = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((distance - at * 0.94f) / (at * 0.10f)));
+                    var outward = Mathf.Clamp01((1f - distance) / (1f - at));
+                    return inside * outward * 0.9f;
+                });
                 return hazeSprite;
             }
         }
 
-        /// <summary>The bright line of the circle itself, close to the outer edge.</summary>
+        /// <summary>The bright line of the circle itself. Thin, and the only thing that clips.</summary>
         private static Sprite RingSprite
         {
             get
@@ -347,9 +362,11 @@ namespace Assets.Scripts.Network
                 if (ringSprite != null)
                     return ringSprite;
 
+                var at = RingRadius / (RingWidth * 0.5f);
+
                 ringSprite = Draw(RingWidth, (distance, angle) =>
                 {
-                    var band = Mathf.Clamp01(1f - Mathf.Abs(distance - 0.80f) / 0.15f);
+                    var band = Mathf.Clamp01(1f - Mathf.Abs(distance - at) / 0.055f);
                     return band * band;
                 });
                 return ringSprite;
@@ -357,7 +374,7 @@ namespace Assets.Scripts.Network
         }
 
         /// <summary>
-        /// A broad turning band with arms swept round it.
+        /// A broad turning band centred on the ring, with arms swept round it.
         /// </summary>
         /// <remarks>
         /// A circle of even brightness gives nothing away when it turns - every frame looks
@@ -372,9 +389,11 @@ namespace Assets.Scripts.Network
                 if (swirlSprite != null)
                     return swirlSprite;
 
+                var at = RingRadius / (SwirlWidth * 0.5f);
+
                 swirlSprite = Draw(SwirlWidth, (distance, angle) =>
                 {
-                    var band = Mathf.Clamp01(1f - Mathf.Abs(distance - 0.58f) / 0.42f);
+                    var band = Mathf.Clamp01(1f - Mathf.Abs(distance - at) / 0.22f);
                     band *= band;
                     //never all the way down to nothing between the arms, so the band stays a
                     //band rather than becoming a ring of separate blobs
@@ -382,31 +401,6 @@ namespace Assets.Scripts.Network
                     return band * arms;
                 });
                 return swirlSprite;
-            }
-        }
-
-        /// <summary>
-        /// The bright collar just outside the feet, where the light is coming from.
-        /// </summary>
-        /// <remarks>
-        /// This was a filled pool and it sat squarely on top of the boots. A collar puts the
-        /// same brightness where it belongs - around the feet rather than over them - and
-        /// gives the spread somewhere to start from, so the whole thing reads as light
-        /// pouring off the character outward instead of as a disc they are standing in.
-        /// </remarks>
-        private static Sprite InnerSprite
-        {
-            get
-            {
-                if (innerSprite != null)
-                    return innerSprite;
-
-                innerSprite = Draw(InnerWidth, (distance, angle) =>
-                {
-                    var band = Mathf.Clamp01(1f - Mathf.Abs(distance - 0.62f) / 0.38f);
-                    return band * band;
-                });
-                return innerSprite;
             }
         }
 
