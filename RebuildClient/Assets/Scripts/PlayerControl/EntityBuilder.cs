@@ -261,6 +261,11 @@ namespace Assets.Scripts.PlayerControl
             AddressableUtility.LoadRoSpriteData(go, bodySpriteName, bodySprite.OnSpriteDataLoad);
             AddressableUtility.LoadRoSpriteData(go, headSpriteName, headSprite.OnSpriteDataLoad);
             control.AttachShadow(dataLoader.ShadowSprite);
+
+            //Watches the level and lights the feet at ninety-nine. Added to every player
+            //rather than only to the ones already there, so somebody who reaches it while
+            //you are standing next to them lights up without anything being sent.
+            Assets.Scripts.Network.PlayerLevelAura.Attach(control);
             //AddressableUtility.LoadSprite(go, "shadow", control.AttachShadow);
 
             var state = PlayerState.Instance;

@@ -158,12 +158,14 @@ namespace Assets.Scripts.Network
             go.transform.SetParent(parent.transform, false);
 
             var aura = go.AddComponent<GroundItemAura>();
-            //A card, and anything wearable a boss or a mini boss left behind. The tier
-            //number already says how unlikely the drop was and drives every size below it;
-            //this is a step above that, and it is a step you either get or you do not.
+            //A card, and anything wearable. Gear used to have to come off a boss to earn
+            //this, which left an ordinary piece of gear with the small aura and made the two
+            //look like different features rather than the same one at different weights.
+            //A card and a sword are both worth crossing a map for, so they get the same
+            //aura and the colour is what says which is which.
             aura.grand = data.ItemClass == ItemClass.Card
-                         || (fromBoss && (data.ItemClass == ItemClass.Weapon
-                                          || data.ItemClass == ItemClass.Equipment));
+                         || data.ItemClass == ItemClass.Weapon
+                         || data.ItemClass == ItemClass.Equipment;
 
             var tall = aura.grand ? GrandHeight : 1f;
             var wide = aura.grand ? GrandWidth : 1f;
@@ -338,10 +340,12 @@ namespace Assets.Scripts.Network
                 //Everything wearable is lit. The rarity gate that used to be here meant a
                 //piece of gear off an ordinary monster usually had no light at all, which
                 //read as the feature being broken rather than as the drop being ordinary.
-                //How unlikely it was still decides how big and bright the beam is, so the
-                //information is kept without anything being left dark.
+                //
+                //Floored at the same tier a card gets, so the two come out the same size.
+                //How unlikely the drop was still lifts it above that floor, so a rare piece
+                //still stands taller than a common one.
                 color = fromBoss ? BossGearColor : GearColor;
-                tier = Mathf.Max(tier, 1);
+                tier = Mathf.Max(tier, 2);
                 return true;
             }
 
@@ -422,7 +426,7 @@ namespace Assets.Scripts.Network
         /// The scale that makes a sprite come out a given number of units across, whatever
         /// the texture's own resolution and pixels-per-unit turn out to be.
         /// </summary>
-        private static Vector3 ScaleFor(Sprite sprite, float width)
+        internal static Vector3 ScaleFor(Sprite sprite, float width)
         {
             if (sprite == null)
                 return Vector3.one;
@@ -468,7 +472,7 @@ namespace Assets.Scripts.Network
         /// One material per colour, kept for the life of the session. There are about a
         /// dozen colours in this file and drops are short lived, so the cache never grows.
         /// </summary>
-        private static Material MaterialFor(Color tint)
+        internal static Material MaterialFor(Color tint)
         {
             if (additiveMaterials.TryGetValue(tint, out var found) && found != null)
                 return found;
@@ -557,7 +561,7 @@ namespace Assets.Scripts.Network
         /// If it is ever not there, a plain ring is drawn instead. A missing decoration
         /// should cost the decoration, not the feature.
         /// </summary>
-        private static Sprite RingSprite
+        internal static Sprite RingSprite
         {
             get
             {
@@ -624,7 +628,7 @@ namespace Assets.Scripts.Network
         /// follow, and offsetting each arm by the radius bends them into a spiral so the
         /// inside of the band appears to lag behind the outside.
         /// </remarks>
-        private static Sprite SwirlSprite
+        internal static Sprite SwirlSprite
         {
             get
             {
@@ -664,7 +668,7 @@ namespace Assets.Scripts.Network
         }
 
         /// <summary>A soft round pool for the foot of the beam.</summary>
-        private static Sprite GlowSprite
+        internal static Sprite GlowSprite
         {
             get
             {
