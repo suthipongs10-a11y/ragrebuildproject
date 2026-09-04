@@ -2029,8 +2029,9 @@ LUK +3
 ต้านทานธาตุน้ำ +10%
 
 ::Water_Lily_Hat //id 5302 - Headgear Top
-<desc>หมวกรูปดอกบัวบาน
-โอกาส 15% ตี 2 ครั้ง ไม่ว่าจะใช้อาวุธอะไร</desc>
+<desc>หมวกรูปดอกบัวบาน ของหายากที่ Antonio ทำหล่นไว้</desc>
+โอกาส 15% ออก Double Attack เมื่อโจมตีปกติ
+ถ้าใช้คู่กับ <skill>Double Attack</skill> ของ Thief จะไม่จำกัดชนิดอาวุธด้วย
 
 ::Pirate_Dagger //id 5305 - Headgear Bottom
 <desc>มีดเงินเล็กที่คาบไว้ระหว่างฟัน</desc>

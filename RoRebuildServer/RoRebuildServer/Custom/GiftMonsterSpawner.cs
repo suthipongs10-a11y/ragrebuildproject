@@ -5,17 +5,20 @@ using RoRebuildServer.Logging;
 namespace RoRebuildServer.Custom;
 
 /// <summary>
-/// Puts Antonio, the Christmas santa, on every map that has monsters of its own.
+/// Puts Antonio, the Christmas santa, on every map there is.
 ///
 /// He is the one who used to turn up at Christmas handing out gift boxes and stockings,
 /// and here he does it all year. The point is to give somebody grinding Porings a reason
 /// to look around the map, and a small chance at something they could not otherwise
 /// reach. He never attacks and never fights back, he has very little health, and when he
-/// dies he comes back somewhere else on the same map a few minutes later.
+/// dies he comes back somewhere else on the same map a minute later.
 ///
-/// Spawning him from here instead of writing him into all of the spawn scripts means the
-/// list of maps he appears on is always the list of maps that actually have monsters, and
-/// stays right when maps are added or removed.
+/// Every map, towns and interiors included. He used to keep to maps with monsters of
+/// their own, on the thought that a town had nothing to hunt; but a santa wandering the
+/// streets of Prontera or standing in somebody's kitchen is the whole joke, and nothing
+/// in the rules stops a monster being killed in a town. Spawning him from here instead of
+/// writing him into all of the spawn scripts means no map can be forgotten when maps are
+/// added or removed.
 /// </summary>
 public static class GiftMonsterSpawner
 {
@@ -40,11 +43,6 @@ public static class GiftMonsterSpawner
     public static void AddToMap(IServerMapConfig config)
     {
         if (!ServerConfig.OperationConfig.SpawnGiftMonsters)
-            return;
-
-        //a map whose script spawns nothing is a town, an interior, or somewhere the player
-        //is only passing through. Nothing to hunt there, so nothing to reward.
-        if (config.SpawnRules.Count == 0)
             return;
 
         if (!DataManager.MonsterCodeLookup.ContainsKey(MonsterCode))
