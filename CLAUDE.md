@@ -198,6 +198,7 @@ cd RoRebuildServer\RoRebuildServer && dotnet run
 
 ### เฟส 3 — VPS + PWA
 nginx + SSL + `wss://` reverse proxy → manifest + service worker → **UI มือถือ** (ดูข้อ 6)
+ชุดไฟล์และขั้นตอนอยู่ที่ `deploy/` และ `docs/PHASE3-VPS.md` (บัญชี GM สร้างจาก `GmAccount.local.json` ซึ่งอยู่นอก git)
 
 ### เฟส 4 — ปรับเป็น Episode 4
 - ตัด `Jobs.csv` ID 21-25 (Ninja, Gunslinger, Taekwon, Soul Linker, Star Gladiator)

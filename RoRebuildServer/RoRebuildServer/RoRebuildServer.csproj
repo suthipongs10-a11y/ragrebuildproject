@@ -26,6 +26,9 @@
     <None Remove="RoCharacterDatabase.db" />
     <None Remove="RoCharacterDatabase.db-shm" />
     <None Remove="RoCharacterDatabase.db-wal" />
+    <None Update="GmAccount.local.json" Condition="Exists('GmAccount.local.json')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>

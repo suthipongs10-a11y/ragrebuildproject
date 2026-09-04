@@ -797,10 +797,25 @@ public class NetworkManager
             return;
         }
 
-        //isNewCharacter = true;
+        //Too many wrong passwords from this address lately, so it is not given another go
+        //at the database. After the version check, so an out-of-date client is still told
+        //the useful thing.
+        if (ConnectionGate.IsLockedOut(address, out var lockoutReason))
+        {
+            await ReturnServerErrorAndDisconnect(socket, lockoutReason);
+            ServerLogger.Log($"Refused a connection from {address}: too many failed logins.");
+            return;
+        }
 
         if (isNewCharacter)
         {
+            if (!ConnectionGate.CanRegister(address, out var registerReason))
+            {
+                await ReturnServerErrorAndDisconnect(socket, registerReason);
+                ServerLogger.Log($"Refused a new account '{userName}' from {address}: {registerReason}");
+                return;
+            }
+
             var res = await RoDatabase.CreateUser(userName, password);
             if (!res.Succeeded)
             {
@@ -808,6 +823,8 @@ public class NetworkManager
                 ServerLogger.Log($"Failed to create user, disconnecting.");
                 return;
             }
+
+            ConnectionGate.RecordRegistration(address);
         }
 
         if (isTokenConnection)
@@ -836,6 +853,9 @@ public class NetworkManager
                     ServerConnectResult.ServerError => "The server encountered an error and was unable to process your request.",
                     _ => "Failed to login."
                 };
+                if (res == ServerConnectResult.FailedLogin)
+                    ConnectionGate.RecordFailedLogin(address);
+
                 ServerLogger.Log($"User failed to login, disconnecting.");
                 await ReturnServerErrorAndDisconnect(socket, failMessage);
                 return;
@@ -855,6 +875,15 @@ public class NetworkManager
         {
             await ReturnServerErrorAndDisconnect(socket, BanMessage(accountBan));
             ServerLogger.Log($"Refused a connection from banned account {userName} ({userId}).");
+            return;
+        }
+
+        //A seat, checked after the login so the answer can say who was turned away and so
+        //a named GM is let past it.
+        if (!ConnectionGate.HasRoom(userName, out var fullReason))
+        {
+            await ReturnServerErrorAndDisconnect(socket, fullReason);
+            ServerLogger.Log($"Turned away {userName}: the server is full.");
             return;
         }
 

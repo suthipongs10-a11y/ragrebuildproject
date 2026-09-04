@@ -1,0 +1,20 @@
+[Unit]
+Description=Ragnarok Rebuild game server
+After=network.target
+
+[Service]
+Type=simple
+User=rorebuild
+WorkingDirectory=/opt/rorebuild/server
+ExecStart=/usr/bin/dotnet /opt/rorebuild/server/RoRebuildServer.dll
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=DOTNET_CLI_HOME=/opt/rorebuild
+Restart=always
+RestartSec=5
+# SIGINT lets the server finish writing characters before it goes
+KillSignal=SIGINT
+TimeoutStopSec=60
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

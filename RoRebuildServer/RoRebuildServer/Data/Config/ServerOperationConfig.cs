@@ -54,6 +54,31 @@ public class ServerOperationConfig
     /// </remarks>
     public List<string> AdminAccounts { get; set; } = new();
 
+    /// <summary>
+    /// How many players may be online at once, or zero for no limit. A named GM is let in
+    /// past it, so the person who has to fix a full server can always reach it.
+    /// </summary>
+    public int MaxOnlinePlayers { get; set; }
+
+    /// <summary>Whether anybody may still make a new account. Off turns the server into a closed test.</summary>
+    public bool AllowRegistration { get; set; } = true;
+
+    /// <summary>How many accounts may exist in all, or zero for no limit. Registration closes itself at the cap.</summary>
+    public int MaxAccounts { get; set; }
+
+    /// <summary>How many accounts one address may create in a day, or zero for no limit.</summary>
+    public int MaxNewAccountsPerAddressPerDay { get; set; } = 3;
+
+    /// <summary>How many wrong passwords one address may try in ten minutes before it is turned away, or zero for no limit.</summary>
+    public int MaxFailedLoginsPerAddress { get; set; } = 10;
+
+    /// <summary>
+    /// A json file holding the name and password of the GM account the server creates for
+    /// itself on first boot, if nobody has the name yet. Relative to the server folder and
+    /// kept out of git. See Custom.Moderation.GmAccountSeed.
+    /// </summary>
+    public string GmSeedFile { get; set; } = "GmAccount.local.json";
+
     public List<string> ActiveEvents { get; set; } = new();
     public List<string> FeatureFlags { get; set; } = new();
 }

@@ -44,6 +44,11 @@ public static class ServerLockdown
             operation.AdminAccounts.Where(a => !string.IsNullOrWhiteSpace(a)).Select(a => a.Trim()),
             StringComparer.OrdinalIgnoreCase);
 
+        //The seeded GM counts as named even when the settings file forgot it: the file it
+        //comes from is only ever on the machine of whoever set the server up.
+        if (GmAccountSeed.TryRead(out var seededName, out _))
+            adminAccounts.Add(seededName);
+
         if (!IsLive)
         {
             ReportOpenDoors(operation, debug);

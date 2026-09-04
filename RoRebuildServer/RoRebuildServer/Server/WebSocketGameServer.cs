@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.StaticFiles;
+﻿using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Networking;
@@ -21,6 +22,15 @@ internal class WebSocketGameServer
         {
             app.UseDeveloperExceptionPage();
         }
+
+        //Behind nginx every connection arrives from 127.0.0.1, and the address bans, the
+        //per-address limits and the address log would all be looking at the proxy. This
+        //reads the real address out of the header nginx adds. Only a proxy on this same
+        //machine is trusted for it, which is the default and is how deploy/ sets it up.
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+        });
 
         var webSocketOptions = new WebSocketOptions() { KeepAliveInterval = TimeSpan.FromSeconds(30), };
 

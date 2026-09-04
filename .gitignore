@@ -135,3 +135,8 @@ web/dist/
 # Assets/Sprites. Built locally by tools/webicons/pack.py, never committed
 web/data/icons.png
 web/data/icons.json
+
+# the GM account seed and anything else that holds a password stays on the machine it was made on
+*.local.json
+# the publish bundle made by deploy/publish.ps1
+rorebuild-server.zip

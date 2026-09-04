@@ -58,7 +58,7 @@ public static class RoDatabase
                 options.Password.RequireUppercase = false;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequiredUniqueChars = 0;
-                options.Password.RequiredLength = 4; //the worst password policy known to man
+                options.Password.RequiredLength = 6; //still lax, but four was a policy in name only
             })
             .AddEntityFrameworkStores<RoContext>()
             .AddDefaultTokenProviders();
@@ -86,7 +86,43 @@ public static class RoDatabase
         var userManager = scope.ServiceProvider.GetService<UserManager<RoUserAccount>>()!;
 
         var user = new RoUserAccount() { UserName = userName };
-        return await userManager.CreateAsync(user, password);
+        var result = await userManager.CreateAsync(user, password);
+
+        //the gate's count of accounts, kept in step here because this is the one place
+        //accounts are made
+        if (result.Succeeded)
+            Interlocked.Increment(ref ConnectionGate.AccountCount);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Makes the GM account named in the seed file, once, if nobody has the name yet.
+    /// </summary>
+    /// <remarks>
+    /// Blocking on purpose: this runs while the server is coming up, before anything is
+    /// listening, and nothing else is waiting on the database yet.
+    /// </remarks>
+    private static void SeedGmAccount()
+    {
+        if (!GmAccountSeed.TryRead(out var name, out var password))
+            return;
+
+        using var scope = scopeFactory.CreateScope();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<RoUserAccount>>();
+
+        var existing = userManager.FindByNameAsync(name).GetAwaiter().GetResult();
+        if (existing != null)
+        {
+            ServerLogger.Log($"[Lockdown] The GM account '{name}' already exists.");
+            return;
+        }
+
+        var result = CreateUser(name, password).GetAwaiter().GetResult();
+        if (result.Succeeded)
+            ServerLogger.Log($"[Lockdown] Created the GM account '{name}' from {GmAccountSeed.FilePath}. Keep that file out of git.");
+        else
+            ServerLogger.LogError($"[Lockdown] Could not create the GM account '{name}': {string.Join(", ", result.Errors.Select(e => e.Description))}");
     }
 
 
@@ -283,6 +319,13 @@ public static class RoDatabase
 
         var db = scope.ServiceProvider.GetRequiredService<RoContext>();
         db.Database.Migrate();
+
+        //How many accounts there are, for the registration cap: counted once here and kept
+        //in step by CreateUser from then on. Then the GM account, which has to exist before
+        //the first stranger logs in.
+        ConnectionGate.AccountCount = db.Users.Count();
+        SeedGmAccount();
+        ConnectionGate.Report();
 
         //Read straight through rather than queued: nothing may hand out a forged weapon
         //before the names behind them are known, and this is the one moment the server is
