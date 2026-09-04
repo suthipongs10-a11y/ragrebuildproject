@@ -1708,6 +1708,28 @@ public static partial class CommandBuilder
         NetworkManager.SendMessage(packet, p.Connection);
     }
 
+    /// <summary>
+    /// One line of guild chat to everyone gathered as recipients, with who said it.
+    /// </summary>
+    /// <remarks>
+    /// Carries the speaker's entity id as well as their name, so a client that can see
+    /// them floats the line over their head the way a party line is floated; a client on
+    /// another map will not find the id and only writes the line in its log.
+    /// </remarks>
+    public static void SendGuildChatMulti(Player speaker, string text)
+    {
+        if (!HasRecipients())
+            return;
+
+        var packet = NetworkManager.StartPacket(PacketType.GuildData, 364);
+        packet.Write((byte)GuildDataType.Chat);
+        packet.Write(speaker.Character.Id);
+        packet.Write(speaker.Name);
+        packet.Write(text);
+
+        NetworkManager.SendMessageMulti(packet, recipients);
+    }
+
     public static void SendGuildData(Player p)
     {
         var packet = NetworkManager.StartPacket(PacketType.GuildData, 1024);

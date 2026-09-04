@@ -39,6 +39,9 @@ public enum GuildRequestType : byte
 
     /// <summary>Leader only: spend a point raising one of the guild's skills.</summary>
     LearnSkill,
+
+    /// <summary>Any member: say one line to everyone in the guild who is online.</summary>
+    Chat,
 }
 
 /// <summary>
@@ -60,4 +63,7 @@ public enum GuildDataType : byte
     /// client rebuilding the sentence from parts it has to be sent anyway.
     /// </summary>
     Announcement,
+
+    /// <summary>One line of guild chat: who said it, and what.</summary>
+    Chat,
 }

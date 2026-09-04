@@ -77,7 +77,57 @@ public class PacketGuildAction : IClientPacketHandler
             case GuildRequestType.RejectRequest:
                 AnswerRequest(connection, player, msg.ReadString(), false);
                 break;
+
+            case GuildRequestType.Chat:
+                Chat(connection, player, msg.ReadString());
+                break;
         }
+    }
+
+    /// <summary>The same cap ordinary chat has, so a line is a line whichever box it was typed in.</summary>
+    private const int MaxChatLength = 140;
+
+    /// <summary>
+    /// One line to everybody in the guild who is online, the speaker included.
+    /// </summary>
+    /// <remarks>
+    /// The speaker gets their own copy back rather than the client writing it into its log
+    /// locally, for the reason the whisper window gives: a line that never left should not
+    /// appear to have. Members are stored by name because they can be offline, so the ones
+    /// who are here are found the way Guild.Announce finds them.
+    /// </remarks>
+    private static void Chat(NetworkConnection connection, Player player, string text)
+    {
+        var guild = player.Guild;
+        if (guild == null)
+        {
+            CommandBuilder.ErrorMessage(connection, "ยังไม่ได้อยู่ในกิลด์ เลยไม่มีใครให้คุยด้วย");
+            return;
+        }
+
+        text = (text ?? "").Trim();
+        if (text.Length == 0)
+            return;
+
+        if (text.Length > MaxChatLength)
+        {
+            CommandBuilder.SendRequestFailed(player, ClientErrorType.RequestTooLong);
+            return;
+        }
+
+        var hasRecipient = false;
+        foreach (var member in guild.Members)
+        {
+            if (!World.Instance.TryFindPlayerByName(member.Name, out var entity))
+                continue;
+
+            CommandBuilder.AddRecipient(entity);
+            hasRecipient = true;
+        }
+
+        if (hasRecipient)
+            CommandBuilder.SendGuildChatMulti(player, text);
+        CommandBuilder.ClearRecipients();
     }
 
     private static void RequestJoin(NetworkConnection connection, Player player, int guildId)

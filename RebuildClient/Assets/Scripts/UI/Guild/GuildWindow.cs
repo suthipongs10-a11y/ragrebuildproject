@@ -104,6 +104,30 @@ namespace Assets.Scripts.UI.Guild
         private bool pickingEmblem;
         private Button browseButton;
 
+        /// <summary>The line guild chat is typed into, and the button beside it.</summary>
+        private const float ChatEntryHeight = 30f;
+        private const float ChatSendWidth = 66f;
+        private const int MaxChatLength = 140;
+
+        private Button chatButton;
+
+        /// <summary>Whether the roster has been swapped for the guild's own chat.</summary>
+        private bool chatting;
+
+        /// <summary>The sunken tray the pages scroll in, kept so the chat page can make room under it.</summary>
+        private RectTransform viewport;
+
+        private RectTransform chatEntry;
+        private TMP_InputField chatField;
+        private Button chatSendButton;
+
+        /// <summary>The chat page's one piece of text, outside the rows so a refresh does not wipe it.</summary>
+        private TextMeshProUGUI chatLog;
+
+        /// <summary>How many lines had arrived when the log was last written, and when it was last read.</summary>
+        private int drawnChatLines = -1;
+        private int seenChatLines;
+
         private readonly List<GameObject> rows = new List<GameObject>();
 
         private int drawnRevision = -1;
@@ -173,6 +197,7 @@ namespace Assets.Scripts.UI.Guild
                 pickingEmblem = !pickingEmblem;
                 donating = false;
                 showingSkills = false;
+                chatting = false;
                 Redraw();
             });
 
@@ -186,6 +211,7 @@ namespace Assets.Scripts.UI.Guild
                 showingSkills = !showingSkills;
                 donating = false;
                 pickingEmblem = false;
+                chatting = false;
                 Redraw();
             });
 
@@ -201,12 +227,34 @@ namespace Assets.Scripts.UI.Guild
                 donating = !donating;
                 pickingEmblem = false;
                 showingSkills = false;
+                chatting = false;
                 Redraw();
+            });
+
+            //The fifth slot on the row, which is the last one the width has room for. A
+            //page rather than a strip under the roster, because a strip tall enough to
+            //read a conversation in would leave the roster three rows high.
+            chatButton = ModernUiTheme.CreateButton(root, "Chat", "แชท",
+                ModernUiTheme.CardColor, ModernUiTheme.NameColor, ModernUiTheme.SizeLabel);
+            ModernUiTheme.Place((RectTransform)chatButton.transform, new Vector2(1, 1),
+                new Vector2(-Pad - 400f, ButtonRowTop), new Vector2(96f, ButtonRowHeight));
+            ModernUiTheme.AddBorder((RectTransform)chatButton.transform, ModernUiTheme.CardBorderColor);
+            chatButton.onClick.AddListener(() =>
+            {
+                chatting = !chatting;
+                donating = false;
+                pickingEmblem = false;
+                showingSkills = false;
+                Redraw();
+
+                //straight into typing, which is the only thing anybody opens this page to do
+                if (chatting && chatField != null)
+                    chatField.ActivateInputField();
             });
 
             //A sunken tray, which is also what catches the drag that scrolls it: the gaps
             //between the rows would otherwise pass the pointer straight through.
-            var viewport = ModernUiTheme.CreateCard(transform, "Viewport", ModernUiTheme.CardDeepColor);
+            viewport = ModernUiTheme.CreateCard(transform, "Viewport", ModernUiTheme.CardDeepColor);
             ModernUiTheme.Stretch(viewport, Pad, Pad, -Pad, -HeaderHeight);
             viewport.gameObject.AddComponent<RectMask2D>();
 
@@ -224,6 +272,8 @@ namespace Assets.Scripts.UI.Guild
             scroll.vertical = true;
             scroll.movementType = ScrollRect.MovementType.Clamped;
             scroll.scrollSensitivity = 32f;
+
+            BuildChatEntry(root);
         }
 
         /// <summary>
@@ -365,6 +415,10 @@ namespace Assets.Scripts.UI.Guild
         {
             ClearRows();
 
+            //not one of the rows, so it is put away by hand; the chat page brings it back
+            if (chatLog != null)
+                chatLog.gameObject.SetActive(false);
+
             if (!GuildState.InGuild)
             {
                 //no guild, no pages onto one - and the buttons that reach them are hidden
@@ -372,6 +426,7 @@ namespace Assets.Scripts.UI.Guild
                 pickingEmblem = false;
                 donating = false;
                 showingSkills = false;
+                chatting = false;
 
                 title.text = "ยังไม่ได้อยู่ในกิลด์";
                 subtitle.text = "สร้างกิลด์ด้วย  /guild create <ชื่อกิลด์>  หรือขอเข้ากิลด์ข้างล่าง";
@@ -381,6 +436,8 @@ namespace Assets.Scripts.UI.Guild
                 emblemButton.gameObject.SetActive(false);
                 donateButton.gameObject.SetActive(false);
                 skillButton.gameObject.SetActive(false);
+                chatButton.gameObject.SetActive(false);
+                ShowChatEntry(false);
                 if (levelBar != null)
                     levelBar.parent.gameObject.SetActive(false);
 
@@ -440,6 +497,21 @@ namespace Assets.Scripts.UI.Guild
             var donateLabel = donateButton.GetComponentInChildren<TextMeshProUGUI>();
             if (donateLabel != null)
                 donateLabel.text = donating ? "ย้อนกลับ" : "บริจาค";
+
+            chatButton.gameObject.SetActive(true);
+            var chatLabel = chatButton.GetComponentInChildren<TextMeshProUGUI>();
+            if (chatLabel != null)
+                chatLabel.text = chatting ? "ย้อนกลับ" : ChatButtonLabel();
+
+            if (chatting)
+            {
+                //the other page buttons stay up, so any of them is a way off this page
+                skillButton.gameObject.SetActive(true);
+                DrawChatPage();
+                return;
+            }
+
+            ShowChatEntry(false);
 
             if (pickingEmblem)
             {
@@ -933,6 +1005,138 @@ namespace Assets.Scripts.UI.Guild
             //disk when asked for, and there is nothing to hand back until they arrive
             var icon = ModernUiTheme.CreateIcon(cell, null, Color.white, EmblemCell - 10f);
             GuildEmblems.LoadInto(icon, id);
+        }
+
+        /// <summary>"แชท", with how much has been said since the page was last looked at.</summary>
+        private string ChatButtonLabel()
+        {
+            var unread = GuildState.ChatReceived - seenChatLines;
+            if (unread <= 0)
+                return "แชท";
+            return unread > 99 ? "แชท (99+)" : $"แชท ({unread})";
+        }
+
+        /// <summary>
+        /// The line to type into and the button to send it, along the bottom of the window.
+        /// </summary>
+        /// <remarks>
+        /// Built once and shown only on the chat page, rather than rebuilt with the page:
+        /// the roster refreshes every few seconds and a field rebuilt with it would throw
+        /// away whatever was half typed. Enter sends, as the whisper window's does, and the
+        /// button is there for a screen with no Enter key.
+        /// </remarks>
+        private void BuildChatEntry(RectTransform root)
+        {
+            chatEntry = ModernUiTheme.CreateCard(root, "ChatEntry", ModernUiTheme.WindowColor);
+            chatEntry.anchorMin = new Vector2(0, 0);
+            chatEntry.anchorMax = new Vector2(1, 0);
+            chatEntry.pivot = new Vector2(0.5f, 0);
+            chatEntry.offsetMin = new Vector2(Pad, Pad);
+            chatEntry.offsetMax = new Vector2(-(Pad + ChatSendWidth + 6f), Pad + ChatEntryHeight);
+            ModernUiTheme.AddBorder(chatEntry, ModernUiTheme.CardBorderColor);
+
+            var hint = ModernUiTheme.CreateText(chatEntry, "Hint", "พิมพ์ถึงทุกคนในกิลด์...",
+                ModernUiTheme.SizeLabel, ModernUiTheme.MutedColor, TextAlignmentOptions.Left);
+            ModernUiTheme.Stretch(hint.rectTransform, 10f, 4f, -10f, -4f);
+            hint.raycastTarget = false;
+
+            var text = ModernUiTheme.CreateText(chatEntry, "Text", "", ModernUiTheme.SizeLabel,
+                ModernUiTheme.NameColor, TextAlignmentOptions.Left);
+            ModernUiTheme.Stretch(text.rectTransform, 10f, 4f, -10f, -4f);
+            text.raycastTarget = true;
+
+            chatField = chatEntry.gameObject.AddComponent<TMP_InputField>();
+            chatField.textComponent = text;
+            chatField.placeholder = hint;
+            chatField.textViewport = chatEntry;
+            chatField.lineType = TMP_InputField.LineType.SingleLine;
+            chatField.characterLimit = MaxChatLength;
+            chatField.onSubmit.AddListener(_ => SendChat());
+
+            chatSendButton = ModernUiTheme.CreateButton(root, "ChatSend", "ส่ง",
+                ModernUiTheme.AccentColor, ModernUiTheme.AccentTextColor, ModernUiTheme.SizeLabel);
+            ModernUiTheme.Place((RectTransform)chatSendButton.transform, new Vector2(1, 0),
+                new Vector2(-Pad, Pad), new Vector2(ChatSendWidth, ChatEntryHeight));
+            chatSendButton.onClick.AddListener(SendChat);
+
+            ShowChatEntry(false);
+        }
+
+        /// <summary>
+        /// Brings the entry line out or puts it away, and gives the tray above it the room.
+        /// </summary>
+        private void ShowChatEntry(bool shown)
+        {
+            if (chatEntry != null)
+                chatEntry.gameObject.SetActive(shown);
+            if (chatSendButton != null)
+                chatSendButton.gameObject.SetActive(shown);
+            if (viewport != null)
+                ModernUiTheme.Stretch(viewport, Pad, shown ? Pad + ChatEntryHeight + 6f : Pad, -Pad, -HeaderHeight);
+        }
+
+        /// <summary>
+        /// The guild's chat: everything said while this client was on, newest at the bottom.
+        /// </summary>
+        /// <remarks>
+        /// The log is one text rather than a row per line, because lines wrap and a row of
+        /// fixed height would cut the long ones off. It is only rewritten when something
+        /// new has arrived, so the six second refresh that redraws the rest of the window
+        /// does not yank the scroll back to the bottom under somebody reading.
+        /// </remarks>
+        private void DrawChatPage()
+        {
+            ShowChatEntry(true);
+
+            if (chatLog == null)
+            {
+                chatLog = ModernUiTheme.CreateText(body, "ChatLog", "", ModernUiTheme.SizeLabel,
+                    ModernUiTheme.NameColor, TextAlignmentOptions.TopLeft);
+                ModernUiTheme.Stretch(chatLog.rectTransform, 10f, 0f, -10f, -6f);
+                chatLog.textWrappingMode = TextWrappingModes.Normal;
+                chatLog.richText = true;
+                chatLog.raycastTarget = false;
+                drawnChatLines = -1;
+            }
+
+            chatLog.gameObject.SetActive(true);
+
+            var arrived = GuildState.ChatReceived;
+            if (drawnChatLines != arrived)
+            {
+                drawnChatLines = arrived;
+                chatLog.text = GuildState.ChatLines.Count == 0
+                    ? "<color=#5A6470>ยังไม่มีใครพูดอะไร ทักทายเพื่อนในกิลด์ได้เลย\n"
+                      + "จากช่องแชทหลักก็พิมพ์ได้ ขึ้นต้นด้วย $ หรือใช้ /g</color>"
+                    : string.Join("\n", GuildState.ChatLines);
+
+                //measured after the text is in, because a wrapped line is taller than a
+                //short one and the height is the only thing telling the scroll view how far
+                //it goes
+                chatLog.ForceMeshUpdate();
+                var height = Mathf.Max(chatLog.preferredHeight + 14f, 1f);
+                body.sizeDelta = new Vector2(0, height);
+                //to the bottom, where the newest line is; the scroll view clamps it back
+                body.anchoredPosition = new Vector2(body.anchoredPosition.x, height);
+            }
+
+            seenChatLines = arrived;
+        }
+
+        private void SendChat()
+        {
+            var text = chatField != null ? chatField.text : null;
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
+            var network = NetworkManager.Instance;
+            if (network != null)
+                network.SendGuildChat(text.Trim());
+
+            //not written into the log here: the server sends the sender their own copy, so
+            //a line shows once, and only if it actually went
+            chatField.text = string.Empty;
+            chatField.ActivateInputField();
         }
 
         private void BuildHeading(string text, float y)

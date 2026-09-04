@@ -108,6 +108,13 @@ namespace PlayerControl
                     return;
                 }
 
+                //guild chat, short form only: /guild is the command set and stays that way
+                if (text.StartsWith("/g "))
+                {
+                    NetworkManager.Instance.SendGuildChat(text.Substring(3));
+                    return;
+                }
+
                 var s = SplitStringCommand(text);
                 if (s == null)
                 {

@@ -35,9 +35,31 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Guilds
                     //news is written in rather than the red an error would use
                     Camera.AppendChatText($"<color={ChatColor.Guild}>{msg.ReadString()}</color>");
                     break;
+
+                case GuildDataType.Chat:
+                    ReadChat(msg);
+                    break;
             }
 
             GuildState.Touch();
+        }
+
+        /// <summary>
+        /// One line somebody in the guild said. Kept for the guild window's own page and
+        /// written into the main log as well, so it reaches people with the window shut.
+        /// </summary>
+        private void ReadChat(ClientInboundMessage msg)
+        {
+            var id = msg.ReadInt32();
+            var name = msg.ReadString();
+            var text = msg.ReadString();
+
+            GuildState.AddChatLine(name, text);
+            Camera.AppendChatText($"{name} บอกกิลด์: <i><color={ChatColor.Speech.Guild}>{text}</color></i>");
+
+            //over their head as well, if they are in sight, the way a party line is
+            if (id >= 0 && Network.EntityList.TryGetValue(id, out var member))
+                member.DialogBox($"{name}: <i><color=#C9A6FF>{text}</color></i>");
         }
 
         private static void ReadMyGuild(ClientInboundMessage msg)

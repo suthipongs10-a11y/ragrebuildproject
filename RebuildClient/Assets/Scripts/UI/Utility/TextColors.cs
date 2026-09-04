@@ -70,6 +70,7 @@
             public const string Shout = "#FFB24D";  //shouting
             public const string Party = "#7BFF7B";  //a party member
             public const string Room = "#8FDCFF";   //a chat room
+            public const string Guild = "#D9B8FF";  //a guild member, lighter than the guild notice violet
         }
 
         /// <summary>Opens a coloured run. Pair it with <see cref="End"/>.</summary>

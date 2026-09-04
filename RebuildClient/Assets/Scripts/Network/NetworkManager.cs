@@ -1443,6 +1443,13 @@ namespace Assets.Scripts.Network
                 text = text.Substring(1);
             }
 
+            //a dollar sign in front is guild chat, the way the percent sign is party chat
+            if (type == PlayerChatType.Say && text.StartsWith("$"))
+            {
+                SendGuildChat(text.Substring(1));
+                return;
+            }
+
             msg.Write((byte)PacketType.Say);
             msg.Write(text);
             msg.Write((byte)type);
@@ -1786,6 +1793,21 @@ namespace Assets.Scripts.Network
             msg.Write((byte)GuildRequestType.Donate);
             msg.Write(bagId);
             msg.Write(count);
+
+            SendMessage(msg);
+        }
+
+        /// <summary>For Chat, which carries one line to everyone in the guild.</summary>
+        public void SendGuildChat(string text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
+            var msg = StartMessage();
+
+            msg.Write((byte)PacketType.GuildAction);
+            msg.Write((byte)GuildRequestType.Chat);
+            msg.Write(text.Trim());
 
             SendMessage(msg);
         }

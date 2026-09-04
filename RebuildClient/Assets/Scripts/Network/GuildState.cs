@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Assets.Scripts.PlayerControl;
 using UnityEngine;
 
 namespace Assets.Scripts.Network
@@ -93,6 +94,46 @@ namespace Assets.Scripts.Network
         /// <summary>Whether a guild list has ever come back, as against one that came back empty.</summary>
         public static bool BrowseReceived;
 
+        /// <summary>How many lines of chat are kept. Older ones fall off the top.</summary>
+        private const int MaxChatLines = 100;
+
+        /// <summary>
+        /// What the guild has said, newest last, already marked up for the window's log.
+        /// Kept here rather than in the window so it survives the window being closed.
+        /// </summary>
+        public static readonly List<string> ChatLines = new List<string>();
+
+        /// <summary>
+        /// How many lines have ever arrived, which only goes up. The count of the list
+        /// above stops at the cap, so it is no use for telling whether anything is new.
+        /// </summary>
+        public static int ChatReceived;
+
+        /// <summary>
+        /// Files one line of chat, with the time and the speaker in front of it.
+        /// </summary>
+        /// <remarks>
+        /// The speaker's own lines are in a different colour from everyone else's, which
+        /// is what makes a conversation readable at a glance. Anything that looks like a
+        /// tag in the text is defused so somebody typing a bracket cannot recolour the
+        /// rest of the log.
+        /// </remarks>
+        public static void AddChatLine(string name, string text)
+        {
+            var state = PlayerState.Instance;
+            var mine = state != null && state.PlayerName == name;
+            var colour = mine ? "#0B5C87" : "#5B2FA8";
+            var safe = (text ?? "").Replace("<", "<\u200B");
+
+            ChatLines.Add($"<color=#6B7280><size=-3>{System.DateTime.Now:HH:mm}</size></color>  "
+                          + $"<color={colour}><b>{name}</b></color>  {safe}");
+
+            if (ChatLines.Count > MaxChatLines)
+                ChatLines.RemoveRange(0, ChatLines.Count - MaxChatLines);
+
+            ChatReceived++;
+        }
+
         /// <summary>Bumped whenever anything above changes. The window watches this.</summary>
         public static int Revision;
 
@@ -168,6 +209,9 @@ namespace Assets.Scripts.Network
             JoinRequests.Clear();
             Browse.Clear();
             BrowseReceived = false;
+            //what the last guild said is theirs, not the next character's
+            ChatLines.Clear();
+            ChatReceived = 0;
             //the wait belongs to the character that left, not to whoever logs in next
             rejoinSeconds = 0;
             Touch();
