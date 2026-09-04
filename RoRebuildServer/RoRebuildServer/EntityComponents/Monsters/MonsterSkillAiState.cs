@@ -25,6 +25,16 @@ public class MonsterSkillAiState(Monster monsterIn)
     public bool SkillCastSuccess;
     public bool ExecuteEventAtStartOfCast;
 
+    /// <summary>
+    /// Set when a script asked for its post death phase and was refused because the
+    /// boss-only rule keeps this monster from casting. Read back by the death event so
+    /// the hp the script sets afterward does not cancel the death on its own.
+    /// </summary>
+    public bool DeathPhaseRefused;
+
+    /// <summary>How long a post death phase may run before the ordinary death is forced.</summary>
+    public const float PostDeathTimeout = 15f;
+
     public bool FinishedProcessing;
 
     //public CharacterSkillB Test;
@@ -214,6 +224,21 @@ public class MonsterSkillAiState(Monster monsterIn)
         {
             ServerLogger.LogWarning($"Monster {monster.Character} on map {map?.Name} called CancelDeath but it is not actually at 0 hp!");
         }
+
+        //The phase exists to cast something - a Marine Sphere going off - and a monster the
+        //boss-only rule keeps from casting would sit here at nothing hp, untargetable, for
+        //ever: the cast it is waiting on is refused every time it is tried. Such a monster
+        //dies the ordinary way instead, and the flag tells the death event so.
+        if (!MayUseSkills)
+        {
+            DeathPhaseRefused = true;
+            return;
+        }
+
+        //and even a monster allowed to cast gets a deadline, so a cast that never comes -
+        //interrupted, mis-scripted, refused for a reason nobody thought of - cannot leave
+        //it standing there at nothing hp
+        monster.PostDeathDeadline = Time.ElapsedTime + PostDeathTimeout;
 
         monster.CurrentAiState = MonsterAiState.StateSpecial;
         monster.CombatEntity.IsTargetable = false;
@@ -482,18 +507,27 @@ public class MonsterSkillAiState(Monster monsterIn)
     /// </summary>
     private bool IsAllowedToUseSkills(CharacterSkill skill)
     {
-        if (!ServerConfig.OperationConfig.RestrictMonsterSkillsToBosses)
-            return true;
-
         if (skill == CharacterSkill.None || skill == CharacterSkill.NoCast)
             return true;
 
-        var display = monster.Character.DisplayType;
-        if (display == CharacterDisplayType.Mvp || display == CharacterDisplayType.Boss)
-            return true;
+        return MayUseSkills;
+    }
 
-        var mvps = DataManager.MvpMonsterCodes;
-        return mvps != null && mvps.Contains(monster.MonsterBase.Code);
+    /// <summary>Whether this monster keeps its skills under the boss-only rule, whatever the skill.</summary>
+    public bool MayUseSkills
+    {
+        get
+        {
+            if (!ServerConfig.OperationConfig.RestrictMonsterSkillsToBosses)
+                return true;
+
+            var display = monster.Character.DisplayType;
+            if (display == CharacterDisplayType.Mvp || display == CharacterDisplayType.Boss)
+                return true;
+
+            var mvps = DataManager.MvpMonsterCodes;
+            return mvps != null && mvps.Contains(monster.MonsterBase.Code);
+        }
     }
 
     public bool Cast(CharacterSkill skill, int level, int castTime, int delay = 0, MonsterSkillAiFlags flags = MonsterSkillAiFlags.None)

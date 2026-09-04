@@ -189,7 +189,26 @@ public partial class Monster : IEntityAutoReset
     public int GetStat(CharacterStat type) => CombatEntity.GetStat(type);
     public void SetTiming(TimingStat type, float val) => CombatEntity.SetTiming(type, val);
 
-    public void CallDeathEvent() => skillAiHandler?.OnDie(skillState);
+    public void CallDeathEvent()
+    {
+        skillState.DeathPhaseRefused = false;
+        skillAiHandler?.OnDie(skillState);
+
+        //a script that tried to put off its death to cast something the boss-only rule
+        //refuses has been told no; whatever hp it set after asking goes back to nothing,
+        //so the death it was putting off goes ahead
+        if (skillState.DeathPhaseRefused)
+        {
+            skillState.DeathPhaseRefused = false;
+            CombatEntity.SetStat(CharacterStat.Hp, 0);
+        }
+    }
+
+    /// <summary>
+    /// When a post death phase has to be over by, or zero when there is none. Set by the
+    /// skill state when a script enters the phase, checked on every ai update.
+    /// </summary>
+    public double PostDeathDeadline;
     public void ResetIdleWaitTime() => nextMoveUpdate = Time.ElapsedTimeFloat + GameRandom.NextFloat(4f, 6f);
 
     public void ChangeAiSkillHandler(string newHandler)
@@ -975,6 +994,7 @@ public partial class Monster : IEntityAutoReset
 
         CurrentAiState = MonsterAiState.StateDead;
         Character.State = CharacterState.Dead;
+        PostDeathDeadline = 0;
 
         Character.IsActive = false;
         Character.QueuedAction = QueuedAction.None;
@@ -1198,6 +1218,17 @@ public partial class Monster : IEntityAutoReset
 
         //if (CurrentAiState == MonsterAiState.StateChase)
         //    CurrentAiState = CurrentAiState;
+
+        //A monster in its post death phase is waiting on a cast to finish it off. If that
+        //cast never comes it would stand at nothing hp for ever, so the phase has a
+        //deadline and the ordinary death - drops and experience included - follows it.
+        if (CurrentAiState == MonsterAiState.StateSpecial && PostDeathDeadline > 0 && Time.ElapsedTime > PostDeathDeadline)
+        {
+            PostDeathDeadline = 0;
+            ServerLogger.LogWarning($"Monster {Character} on map {Character.Map?.Name} sat in its post death phase past the deadline and was killed outright.");
+            Die();
+            return;
+        }
 
         canResetAttackedState = false;
         var initialState = CurrentAiState;
