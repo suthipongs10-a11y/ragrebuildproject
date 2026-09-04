@@ -930,7 +930,8 @@ VIT +2
 ถ้าตีบวก > 8: HP +800
 
 ::Antonio_Card //id 4243 - slotted on Armor
-โอกาส 50% ร่ายอัตโนมัติ <skill>Teleport 1</skill> เมื่อโดนโจมตีกายภาพ
+โอกาส 5% ร่ายอัตโนมัติ <skill>Teleport 1</skill> เมื่อโดนโจมตีกายภาพ
+<color=#7A7480>ดรอปจาก Antonio ซานต้าที่เดินอยู่ทุกแมพ</color>
 
 ::Alarm_Card //id 4244 - slotted on Boots
 HP +300, VIT +1

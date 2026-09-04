@@ -281,7 +281,9 @@ Item("Iron_Fist_Card") { OnEquip: AddStat(AddExpRaceFormless, 10); AddStat(AddRe
 Item("Arclouse_Card") { OnEquip: if(Refine < 6) {AddStat(AddDef, 2); AddStat(AddMDef, 3);} }
 Item("Archangeling_Card") { OnEquip: AddStat(AddMaxHp, 300); if(GetStat(Luk) >= 77) { AddStat(AddHpRecoveryPercent, 100); AddStat(AddSpRecoveryPercent, 100); } } //should boost hp/sp recovery if your luk is 77 or higher
 Item("Apocalypse_Card") { OnEquip: AddStat(AddVit, 2); if(Refine > 8) {AddStat(AddMaxHp, 800);} }
-Item("Antonio_Card") { OnEquip: AutoSpellWhenAttacked(Teleport, 1, 500); }
+//Official is a one in twenty escape, and the chance here is per thousand: 500 was a
+//units slip that made it fire on every other hit.
+Item("Antonio_Card") { OnEquip: AutoSpellWhenAttacked(Teleport, 1, 50, TargetSelf); }
 Item("Alarm_Card") { OnEquip: AddStat(AddMaxHp, 300); AddStat(AddVit, 1); AutoSpellWhenAttacked(Sight, 1, 200); }
 Item("Am_Mut_Card") { OnEquip: AddStat(AddExpRaceDemihuman, 10); AddStat(AddResistRaceDemihuman, -20); }
 Item("Assaulter_Card") { OnEquip: AddStat(AddCritDamage, 10); AddStat(AddCritChanceRaceDemihuman, 7); }
