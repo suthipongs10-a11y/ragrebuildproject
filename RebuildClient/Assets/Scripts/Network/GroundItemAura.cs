@@ -87,13 +87,14 @@ namespace Assets.Scripts.Network
         private const float GrandWidth = 1.3f;
 
         /// <summary>
-        /// Everything, twice over. The sizes below were measured against the item icon and
-        /// looked right in the editor, and then in play - on a real map, at the distance
-        /// the camera actually sits - the shaft read as a candle. This is one number rather
-        /// than every width and height rewritten, so the proportions that were measured
-        /// stay measured.
+        /// Everything, scaled together. The sizes below were measured against the item icon
+        /// and looked right in the editor, and then in play - on a real map, at the distance
+        /// the camera actually sits - the shaft read as a candle, so it all went up to twice.
+        /// Twice was too much once there were twenty people and a dozen drops on one screen,
+        /// and it came back down by two fifths. One number rather than every width and
+        /// height rewritten, so the proportions that were measured stay measured.
         /// </summary>
-        private const float SizeScale = 2f;
+        private const float SizeScale = 1.2f;
 
         /// <summary>
         /// The shaft alone, half again on top of that. The pool and the rings were right at
@@ -113,14 +114,34 @@ namespace Assets.Scripts.Network
         private const int OnTopOrder = 100;
 
         /// <summary>
-        /// Specks of light drifting up the shaft, which is what the ordinary aura has none of
-        /// and what makes the difference between a lit column and something happening.
+        /// Sparks drifting up out of the pool and away from the shaft, which is what makes
+        /// the difference between a lit column and something happening. Every aura gets
+        /// them; the grand one gets more.
         /// </summary>
-        private const int MoteCount = 8;
+        private const int MoteCount = 14;
 
-        private const float MoteRise = 0.55f;
+        private const int PlainMoteCount = 7;
 
-        private const float MoteSpread = 0.42f;
+        /// <summary>Loops a second a spark makes: about three seconds from the floor to gone.</summary>
+        private const float MoteRise = 0.32f;
+
+        /// <summary>
+        /// How far out from the shaft a spark is born, and how much further it has drifted
+        /// by the time it fades. In units before scaling.
+        /// </summary>
+        private const float MoteSpread = 0.35f;
+
+        private const float MoteDrift = 0.55f;
+
+        /// <summary>
+        /// How high a spark climbs, in units before scaling. Fixed, rather than a share of
+        /// the shaft: the shaft runs off the top of the screen, and sparks spread up its
+        /// whole height are sparks nobody sees.
+        /// </summary>
+        private const float MoteClimb = 2.8f;
+
+        /// <summary>How far a spark wanders sideways on the way up, in units before scaling.</summary>
+        private const float MoteSway = 0.14f;
 
         /// <summary>
         /// The item sits a fifth of a unit off the floor, so the ring has to come back down
@@ -132,6 +153,7 @@ namespace Assets.Scripts.Network
         private static Sprite glowSprite;
         private static Sprite ringSprite;
         private static Sprite swirlSprite;
+        private static Sprite sparkSprite;
         private static bool ringResourceMissing;
         //One material per colour rather than one shared by all of them. The colour has to
         //travel in the material's own Tint property: it is the only one of the shader's two
@@ -143,9 +165,10 @@ namespace Assets.Scripts.Network
         /// <summary>A wide faint copy of the shaft behind it, which is what reads as the shaft glowing rather than being painted.</summary>
         private SpriteRenderer beamHaze;
 
-        /// <summary>The second ring, turning the other way, and the rising specks.</summary>
+        /// <summary>The second ring, turning the other way. The grand aura alone has it.</summary>
         private SpriteRenderer halo;
 
+        /// <summary>The sparks climbing out of the pool. Every aura has some.</summary>
         private SpriteRenderer[] motes;
 
         /// <summary>Each ring turns on its own angle, so the two do not share a number.</summary>
@@ -256,16 +279,15 @@ namespace Assets.Scripts.Network
             if (aura.grand)
                 aura.BuildGrandParts(go.transform, color, tier, wide);
 
+            aura.BuildMotes(go.transform, color, aura.grand ? MoteCount : PlainMoteCount);
+
             aura.Apply(0f);
         }
 
         /// <summary>
-        /// The two things the ordinary aura does not have: a wider ring turning against the
-        /// first, and specks of light drifting up the shaft.
-        ///
-        /// Both are what separate a lit column from something happening. A single ring at one
-        /// speed reads as a decal; two at different speeds read as motion, and anything that
-        /// rises is read as rising even when it is eight quads on a sine.
+        /// The one thing the ordinary aura does not have: a wider ring turning against the
+        /// first. A single ring at one speed reads as a decal; two at different speeds read
+        /// as motion.
         /// </summary>
         private void BuildGrandParts(Transform parent, Color color, int tier, float wide)
         {
@@ -276,24 +298,28 @@ namespace Assets.Scripts.Network
             halo = MakeRenderer(parent, "Halo", SwirlSprite, Vector3.zero, color);
             if (halo != null)
                 halo.transform.localScale = ScaleFor(halo.sprite, (2.05f + tier * 0.2f) * wide);
-
-            motes = new SpriteRenderer[MoteCount];
-            for (var i = 0; i < MoteCount; i++)
-            {
-                var mote = MakeRenderer(parent, "Mote" + i, GlowSprite, Vector3.zero, color);
-                //Each one a different size, so the column has some depth to it rather than
-                //looking like one speck copied eight times.
-                mote.transform.localScale = Vector3.one * (0.35f + (i % 3) * 0.16f) * SizeScale;
-                motes[i] = mote;
-            }
         }
 
         /// <summary>
-        /// Moves the specks up the shaft and fades them out as they go.
+        /// The sparks: soft glinting points that climb out of the pool, drift away from the
+        /// shaft and fade. Anything that rises is read as rising even when it is a dozen
+        /// quads on a sine, and these are what make the beam something happening rather
+        /// than a lit column. Sized and placed every frame, see DriftMotes.
+        /// </summary>
+        private void BuildMotes(Transform parent, Color color, int count)
+        {
+            motes = new SpriteRenderer[count];
+            for (var i = 0; i < count; i++)
+                motes[i] = MakeRenderer(parent, "Mote" + i, SparkSprite, Vector3.zero, color);
+        }
+
+        /// <summary>
+        /// Carries the sparks up out of the pool, out into the air round the shaft, and
+        /// fades them as they go.
         ///
         /// Each one is on its own loop rather than on a timer of its own: the fractional part
-        /// of a number that only ever grows is a sawtooth from nought to one, and eight of
-        /// them offset by an eighth is a steady stream with nothing to keep track of.
+        /// of a number that only ever grows is a sawtooth from nought to one, and a dozen of
+        /// them offset by a twelfth is a steady stream with nothing to keep track of.
         /// </summary>
         private void DriftMotes(float t)
         {
@@ -308,20 +334,32 @@ namespace Assets.Scripts.Network
 
                 var life = Mathf.Repeat(t * MoteRise + i / (float)motes.Length, 1f);
 
-                //a slow spiral rather than a straight line up, which reads as being drawn
-                //upward rather than as falling upward
-                var angle = (i * 2.4f) + life * 3.1f;
-                var radius = MoteSpread * SizeScale * (1f - life * 0.35f);
+                //born close to the shaft and drifting outward as it climbs, so the light
+                //spreads into the air round the beam rather than being drawn up a pipe
+                var angle = i * 2.4f + life * 1.4f;
+                var radius = (MoteSpread + MoteDrift * life) * SizeScale;
+
+                //and a waver on top of that, on its own beat per spark, growing as it goes:
+                //a dozen things rising on identical paths read as a machine
+                var sway = Mathf.Sin(t * 2.3f + i * 1.7f) * MoteSway * SizeScale * (0.3f + life);
 
                 mote.transform.localPosition = new Vector3(
-                    Mathf.Cos(angle) * radius,
-                    life * beamHeight * 0.82f,
+                    Mathf.Cos(angle) * radius + sway,
+                    (0.15f + life * MoteClimb) * SizeScale,
                     Mathf.Sin(angle) * radius);
 
-                //brightest in the middle of the climb: born out of nothing at the foot and
-                //gone before the top, so the shaft has no hard end to it
+                //brightest in the middle of the climb - born out of nothing at the foot and
+                //gone before the top - and glinting on the way: each one flickers at its
+                //own rate, which is what reads as sparkle rather than as dots on a belt
                 var fade = Mathf.Sin(life * Mathf.PI);
-                mote.color = new Color(1f, 1f, 1f, strength * fade * 0.85f);
+                var twinkle = 0.55f + 0.45f * Mathf.Sin(t * (4.5f + (i % 4) * 1.3f) + i * 2.1f);
+
+                //three sizes in rotation, so the cloud has some depth to it rather than
+                //looking like one spark copied a dozen times; and each swells as it is born
+                //and shrinks away as it dies
+                var size = (0.28f + (i % 3) * 0.12f) * SizeScale * (0.6f + 0.4f * fade);
+                mote.transform.localScale = Vector3.one * size;
+                mote.color = new Color(1f, 1f, 1f, strength * fade * twinkle * 0.95f);
             }
         }
 
@@ -421,6 +459,7 @@ namespace Assets.Scripts.Network
             Stretch(beamHaze, beamHeight * 1.08f, pulse);
             Stretch(core, beamHeight * 0.9f, pulse);
             LayOnGround(ring, ref ringAngle);
+            DriftMotes(t);
 
             if (!grand)
                 return;
@@ -429,7 +468,6 @@ namespace Assets.Scripts.Network
             //reads as one turning thing rather than as two copies of a decal
             Paint(halo, 0.55f + pulse * 0.25f);
             LayOnGround(halo, ref haloAngle, -0.6f);
-            DriftMotes(t);
         }
 
         /// <summary>
@@ -731,6 +769,47 @@ namespace Assets.Scripts.Network
                 swirlSprite = Sprite.Create(texture, new Rect(0, 0, RingSize, RingSize),
                     new Vector2(0.5f, 0.5f), 100);
                 return swirlSprite;
+            }
+        }
+
+        /// <summary>
+        /// A spark: a soft dot with a faint four-pointed star through it, which is what
+        /// reads as a glint rather than as a blob.
+        /// </summary>
+        private static Sprite SparkSprite
+        {
+            get
+            {
+                if (sparkSprite != null)
+                    return sparkSprite;
+
+                var texture = new Texture2D(GlowSize, GlowSize, TextureFormat.RGBA32, false);
+                texture.wrapMode = TextureWrapMode.Clamp;
+
+                var half = GlowSize * 0.5f;
+                for (var y = 0; y < GlowSize; y++)
+                {
+                    for (var x = 0; x < GlowSize; x++)
+                    {
+                        var dx = (x + 0.5f - half) / half;
+                        var dy = (y + 0.5f - half) / half;
+                        var distance = Mathf.Sqrt(dx * dx + dy * dy);
+
+                        var soft = Mathf.Clamp01(1f - distance);
+                        var dot = soft * soft * soft;
+
+                        //the star: bright along the two axes, gone between them
+                        var angle = Mathf.Atan2(dy, dx);
+                        var star = soft * Mathf.Pow(Mathf.Abs(Mathf.Cos(angle * 2f)), 8f) * 0.7f;
+
+                        texture.SetPixel(x, y, new Color(1f, 1f, 1f, Mathf.Max(dot, star)));
+                    }
+                }
+
+                texture.Apply();
+                sparkSprite = Sprite.Create(texture, new Rect(0, 0, GlowSize, GlowSize),
+                    new Vector2(0.5f, 0.5f), 100);
+                return sparkSprite;
             }
         }
 
