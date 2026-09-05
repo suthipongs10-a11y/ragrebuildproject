@@ -87,6 +87,15 @@ namespace Assets.Scripts.Network
         private const float GrandWidth = 1.3f;
 
         /// <summary>
+        /// Everything, twice over. The sizes below were measured against the item icon and
+        /// looked right in the editor, and then in play - on a real map, at the distance
+        /// the camera actually sits - the shaft read as a candle. This is one number rather
+        /// than every width and height rewritten, so the proportions that were measured
+        /// stay measured.
+        /// </summary>
+        private const float SizeScale = 2f;
+
+        /// <summary>
         /// Specks of light drifting up the shaft, which is what the ordinary aura has none of
         /// and what makes the difference between a lit column and something happening.
         /// </summary>
@@ -168,8 +177,8 @@ namespace Assets.Scripts.Network
                          || data.ItemClass == ItemClass.Weapon
                          || data.ItemClass == ItemClass.Equipment;
 
-            var tall = aura.grand ? GrandHeight : 1f;
-            var wide = aura.grand ? GrandWidth : 1f;
+            var tall = (aura.grand ? GrandHeight : 1f) * SizeScale;
+            var wide = (aura.grand ? GrandWidth : 1f) * SizeScale;
 
             aura.tint = color;
             aura.strength = 0.72f + tier * 0.06f;
@@ -247,7 +256,7 @@ namespace Assets.Scripts.Network
                 var mote = MakeRenderer(parent, "Mote" + i, GlowSprite, Vector3.zero, color);
                 //Each one a different size, so the column has some depth to it rather than
                 //looking like one speck copied eight times.
-                mote.transform.localScale = Vector3.one * (0.35f + (i % 3) * 0.16f);
+                mote.transform.localScale = Vector3.one * (0.35f + (i % 3) * 0.16f) * SizeScale;
                 motes[i] = mote;
             }
         }
@@ -275,7 +284,7 @@ namespace Assets.Scripts.Network
                 //a slow spiral rather than a straight line up, which reads as being drawn
                 //upward rather than as falling upward
                 var angle = (i * 2.4f) + life * 3.1f;
-                var radius = MoteSpread * (1f - life * 0.35f);
+                var radius = MoteSpread * SizeScale * (1f - life * 0.35f);
 
                 mote.transform.localPosition = new Vector3(
                     Mathf.Cos(angle) * radius,

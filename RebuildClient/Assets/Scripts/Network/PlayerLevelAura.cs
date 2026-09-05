@@ -3,7 +3,9 @@ using UnityEngine;
 namespace Assets.Scripts.Network
 {
     /// <summary>
-    /// The burst of light at the feet of a character who has reached the level cap.
+    /// The light at the feet of a character who has reached the level cap: four white
+    /// waves standing round the boots, each brighter and thicker than the one inside it,
+    /// throwing sparks, with a flare of soft rays off the outermost.
     /// </summary>
     /// <remarks>
     /// Drawn here rather than imported. The aura is a standard thing to have and the obvious
@@ -13,20 +15,25 @@ namespace Assets.Scripts.Network
     /// there, which is the same problem the drop aura solved, so it is solved the same way.
     ///
     /// Every part of it faces the camera. The first version lay flat on the floor, the way a
-    /// ground decal would, and that was wrong twice over: a flat ring read as a hoop drawn
-    /// round the feet rather than as light coming off them, and on any slope the flat quad
-    /// cut through the ground, so half of it vanished the moment the character walked over
-    /// a change in level. The reference this is built from is a camera-facing flare - a
-    /// bright pool at the feet with soft rays fanning out of it - and a camera-facing quad
-    /// cannot intersect the terrain however the terrain is shaped.
+    /// ground decal would, and on any slope the flat quad cut through the ground, so half of
+    /// it vanished the moment the character walked over a change in level. A camera-facing
+    /// quad cannot intersect the terrain however the terrain is shaped, so the waves are
+    /// drawn as ellipses squashed by the camera's pitch, which is what a ring on the floor
+    /// looks like from that pitch.
     ///
     /// The quads still dip below the ground plane on the side nearest the camera, which is
     /// why they are drawn without a depth test at all: with one, the terrain in front would
-    /// clip the lower half of the pool off. Nothing here writes depth, and everything is
+    /// clip the lower half of every wave off. Nothing here writes depth, and everything is
     /// drawn in the queue before the character sprites, so the feet stay visible and the
     /// ground never wins. The queue rather than the sorting order, because the first
     /// version sat one queue after the sprites with a sorting order below them and painted
     /// straight over the feet: between queues the order is not consulted at all.
+    ///
+    /// The waves run faint to bright from the inside out on purpose. The innermost is a
+    /// thread just outside the boots, so the boots are what you see; the outermost is a
+    /// thick band that clips to solid white, so from across a field the character is a
+    /// white circle with somebody standing in it. Each wave throws sparks in proportion,
+    /// and the flare of rays comes off the outer one.
     ///
     /// It reads the level off the character rather than being told when to appear. The
     /// client already knows what level everything on screen is - it is in the spawn packet
@@ -39,17 +46,36 @@ namespace Assets.Scripts.Network
         /// <summary>The level that earns it. The one number worth having in one place.</summary>
         private const int AuraLevel = 99;
 
-        //Widths in world units, and a character stands about a unit and a half. The pool is
-        //a good deal wider than a mounted character, the halo reaches out past everything,
-        //and the rays go further still when they flare.
-        private const float PoolWidth = 3.1f;
-        private const float CoreWidth = 1.6f;
+        /// <summary>
+        /// The waves, inside out. Radius on the floor in world units - a character stands
+        /// about a unit and a half, and a mounted one is about that wide - then how thick
+        /// each is as a fraction of the texture, how bright it is, and how many sparks it
+        /// throws. All four run the same way: the inner wave is thin, faint and quiet, the
+        /// outer one is thick, at full white, and busy.
+        /// </summary>
+        private static readonly float[] WaveRadius = { 0.50f, 0.85f, 1.20f, 1.55f };
+        private static readonly float[] WaveBand = { 0.04f, 0.06f, 0.09f, 0.13f };
+        private static readonly float[] WaveStrength = { 0.28f, 0.50f, 0.75f, 1.00f };
+        private static readonly int[] WaveSparks = { 3, 5, 7, 11 };
+
+        /// <summary>Where in its own texture a wave is drawn, as a fraction of the radius.</summary>
+        private const float WaveEdge = 0.85f;
+
+        /// <summary>
+        /// The waves swell outward one after another, which is what makes them read as
+        /// waves rather than as four painted circles. Speed in radians a second, depth as a
+        /// fraction of radius.
+        /// </summary>
+        private const float RippleSpeed = 1.6f;
+        private const float RippleDepth = 0.05f;
+
         private const float HaloWidth = 4.2f;
 
         /// <summary>
-        /// The rays come in two kinds, because the reference has two kinds in it: broad soft
-        /// petals that make the burst, and thin bright spikes that shoot out of it. Petals
-        /// alone were a cloud and spikes alone were a pinwheel; together they are a flare.
+        /// The rays off the outer wave come in two kinds, because the reference has two
+        /// kinds in it: broad soft petals that make the burst, and thin bright spikes that
+        /// shoot out of it. Petals alone were a cloud and spikes alone were a pinwheel;
+        /// together they are a flare.
         /// </summary>
         private const int PetalCount = 10;
         private const int SpikeCount = 12;
@@ -69,18 +95,11 @@ namespace Assets.Scripts.Network
         private const float PetalSpin = 8f;
         private const float SpikeSpin = -5f;
 
-        /// <summary>
-        /// Sparks climbing out of the pool, which is most of what separates a lit patch of
-        /// floor from something happening.
-        /// </summary>
-        private const int MoteCount = 14;
-
-        private const float MoteRise = 0.3f;
-        private const float MoteHeight = 2.8f;
-        private const float MoteRadius = 1.0f;
+        /// <summary>Loops a second a spark makes - about three seconds from its wave to gone.</summary>
+        private const float SparkRise = 0.3f;
 
         /// <summary>How far a spark wanders sideways on the way up, in world units.</summary>
-        private const float MoteSway = 0.22f;
+        private const float SparkSway = 0.22f;
 
         private const int Size = 160;
 
@@ -91,10 +110,8 @@ namespace Assets.Scripts.Network
         /// <remarks>
         /// Written darker than it should look, like every colour in the drop aura and for the
         /// same reason: these are additive layers, so what reaches the screen is the tint
-        /// times however many of them cover the pixel. The pool, the core and the feet of a
-        /// dozen rays all pile up on the same few pixels, and that is where it goes white -
-        /// which is right, that is what the reference does - while further out, where only
-        /// one or two layers reach, the tint shows through.
+        /// times however many of them cover the pixel. The outer wave is the exception and
+        /// is pure white at full strength - it is meant to clip, that is what "full" means.
         ///
         /// One colour for now. Splitting it by adventure rank needs the rank of the person
         /// the aura belongs to, and the client only knows its own - so that is a byte in the
@@ -105,8 +122,7 @@ namespace Assets.Scripts.Network
         /// <summary>The fringe: pale cyan, for the rays and the halo, where the white gives out.</summary>
         private static readonly Color FringeColor = new Color(0.50f, 0.78f, 0.92f);
 
-        private static Sprite poolSprite;
-        private static Sprite coreSprite;
+        private static readonly Sprite[] waveSprites = new Sprite[4];
         private static Sprite haloSprite;
         private static Sprite petalSprite;
         private static Sprite spikeSprite;
@@ -114,12 +130,15 @@ namespace Assets.Scripts.Network
 
         private ServerControllable owner;
         private Transform parts;
-        private SpriteRenderer pool;
-        private SpriteRenderer core;
         private SpriteRenderer halo;
+        private SpriteRenderer[] waves;
         private SpriteRenderer[] petals;
         private SpriteRenderer[] spikes;
-        private SpriteRenderer[] motes;
+        private SpriteRenderer[] sparks;
+
+        /// <summary>Which wave each spark belongs to, so it rises from that radius at that strength.</summary>
+        private int[] sparkWave;
+
         private float petalAngle;
         private float spikeAngle;
         private float phase;
@@ -187,8 +206,12 @@ namespace Assets.Scripts.Network
             parts = go.transform;
 
             halo = MakePart("Halo", HaloSprite, FringeColor);
-            pool = MakePart("Pool", PoolSprite, BodyColor);
-            core = MakePart("Core", CoreSprite, BodyColor);
+
+            //inside out, the outer one in plain white so that at full strength it is white
+            //and not the blue-tinged white the rest are
+            waves = new SpriteRenderer[WaveRadius.Length];
+            for (var i = 0; i < waves.Length; i++)
+                waves[i] = MakePart("Wave" + i, WaveSprite(i), i == waves.Length - 1 ? Color.white : BodyColor);
 
             petals = new SpriteRenderer[PetalCount];
             for (var i = 0; i < PetalCount; i++)
@@ -198,9 +221,22 @@ namespace Assets.Scripts.Network
             for (var i = 0; i < SpikeCount; i++)
                 spikes[i] = MakePart("Spike" + i, SpikeSprite, BodyColor);
 
-            motes = new SpriteRenderer[MoteCount];
-            for (var i = 0; i < MoteCount; i++)
-                motes[i] = MakePart("Spark" + i, SparkSprite, BodyColor);
+            var total = 0;
+            foreach (var count in WaveSparks)
+                total += count;
+
+            sparks = new SpriteRenderer[total];
+            sparkWave = new int[total];
+            var k = 0;
+            for (var wave = 0; wave < WaveSparks.Length; wave++)
+            {
+                for (var i = 0; i < WaveSparks[wave]; i++)
+                {
+                    sparks[k] = MakePart("Spark" + k, SparkSprite, BodyColor);
+                    sparkWave[k] = wave;
+                    k++;
+                }
+            }
         }
 
         private SpriteRenderer MakePart(string name, Sprite sprite, Color tint)
@@ -237,30 +273,37 @@ namespace Assets.Scripts.Network
             //that moves and annoyed by something that flashes.
             var pulse = 0.5f + 0.5f * Mathf.Sin(t * 2.0f);
 
-            //The pool is a disc on the floor, drawn as a camera-facing ellipse: squashed by
-            //about the sine of the camera's pitch, which is what a disc on the floor looks
+            //A wave is a ring on the floor, drawn as a camera-facing ellipse: squashed by
+            //about the sine of the camera's pitch, which is what a ring on the floor looks
             //like from that pitch, and squashed a little more than that because the
-            //character's own shadow is drawn flatter than true and the pool should agree
+            //character's own shadow is drawn flatter than true and the waves should agree
             //with it rather than with geometry.
             var pitch = Mathf.Abs(view.forward.y);
             var squash = Mathf.Clamp(pitch * 0.75f, 0.30f, 0.60f);
 
             Place(halo, origin + up * 0.35f, facing, HaloWidth, HaloWidth * 0.8f);
-            Paint(halo, 0.14f + pulse * 0.05f);
+            Paint(halo, 0.10f + pulse * 0.04f);
 
-            Place(pool, origin, facing, PoolWidth, PoolWidth * squash);
-            Paint(pool, 0.58f + pulse * 0.14f);
+            if (waves != null)
+            {
+                for (var i = 0; i < waves.Length; i++)
+                {
+                    //each wave a little behind the one inside it, so the swell travels out
+                    var ripple = 1f + RippleDepth * Mathf.Sin(t * RippleSpeed - i * 0.9f);
+                    var width = WaveRadius[i] * 2f / WaveEdge * ripple;
 
-            Place(core, origin + up * 0.12f, facing, CoreWidth, CoreWidth * 0.85f);
-            Paint(core, 0.55f + pulse * 0.16f);
+                    Place(waves[i], origin, facing, width, width * squash);
+                    Paint(waves[i], WaveStrength[i] * (0.92f + 0.08f * Mathf.Sin(t * 2.0f - i * 0.9f)));
+                }
+            }
 
             FanPetals(t, origin, facing, up);
             FanSpikes(t, origin, facing, up);
-            DriftMotes(t, origin, facing);
+            DriftSparks(t, origin, facing);
         }
 
         /// <summary>
-        /// The petals: a fan of broad soft blades round the feet, each on its own flicker.
+        /// The petals: a fan of broad soft blades off the outer wave, each on its own flicker.
         /// </summary>
         /// <remarks>
         /// They live in the plane of the screen, turned about the line of sight, so they
@@ -348,52 +391,53 @@ namespace Assets.Scripts.Network
         }
 
         /// <summary>
-        /// Carries the sparks up out of the pool and fades them out on the way.
+        /// Carries the sparks up and out from their waves and fades them out on the way.
         /// </summary>
         /// <remarks>
-        /// Each one rides its own loop rather than carrying a timer: the fractional part of a
-        /// number that only ever grows is a sawtooth from nought to one, and a dozen of them
-        /// offset by a twelfth is a steady stream with nothing to keep track of. They rise in
-        /// world terms - straight up, off a circle round the feet - and face the camera,
-        /// because they are meant to read as sparks in the air rather than as marks on the
-        /// floor.
+        /// Each spark belongs to one wave and takes that wave's measure: it is born on that
+        /// wave's circle, and the stronger the wave the higher it climbs, the further out it
+        /// drifts, the bigger and the brighter it is. So the inner thread lets go of a few
+        /// dim specks and the outer band boils. Each one rides its own loop rather than
+        /// carrying a timer: the fractional part of a number that only ever grows is a
+        /// sawtooth from nought to one, and a couple of dozen of them offset by a share each
+        /// is a steady stream with nothing to keep track of.
         /// </remarks>
-        private void DriftMotes(float t, Vector3 origin, Quaternion facing)
+        private void DriftSparks(float t, Vector3 origin, Quaternion facing)
         {
-            if (motes == null)
+            if (sparks == null)
                 return;
 
-            for (var i = 0; i < motes.Length; i++)
+            for (var k = 0; k < sparks.Length; k++)
             {
-                var mote = motes[i];
-                if (mote == null)
+                var spark = sparks[k];
+                if (spark == null)
                     continue;
 
-                var life = Mathf.Repeat(t * MoteRise + i / (float)motes.Length, 1f);
+                var wave = sparkWave[k];
+                var strength = WaveStrength[wave];
 
-                //a slow spiral inward as it climbs, so the column narrows toward the top and
-                //the whole thing reads as being drawn up rather than blown about
-                var angle = i * 2.1f + life * 1.8f;
-                var radius = MoteRadius * (1f - life * 0.4f);
+                var life = Mathf.Repeat(t * SparkRise + k / (float)sparks.Length, 1f);
 
-                //and a wander on top of that, on its own beat per spark. Fourteen things
-                //rising on identical paths read as a machine; the same fourteen with a
-                //waver in them read as fire.
-                var sway = Mathf.Sin(t * 2.6f + i * 1.7f) * MoteSway * life;
+                //out from the wave as it climbs, further the stronger the wave, so the light
+                //is thrown outward rather than straight up
+                var angle = k * 2.1f + life * 1.2f;
+                var radius = WaveRadius[wave] * (1f + life * (0.15f + 0.35f * strength));
+                var sway = Mathf.Sin(t * 2.6f + k * 1.7f) * SparkSway * life;
+                var height = 0.1f + life * (0.9f + 2.0f * strength);
 
-                mote.transform.position = origin + new Vector3(
+                spark.transform.position = origin + new Vector3(
                     Mathf.Cos(angle) * radius + sway,
-                    0.1f + life * MoteHeight,
+                    height,
                     Mathf.Sin(angle) * radius);
-                mote.transform.rotation = facing;
+                spark.transform.rotation = facing;
 
                 //three sizes in rotation, so the column has some depth to it rather than
-                //looking like one spark copied fourteen times; and each one swells as it is
-                //born and shrinks away as it dies
+                //looking like one spark copied over; each swells as it is born and shrinks
+                //away as it dies
                 var fade = Mathf.Sin(life * Mathf.PI);
-                var width = (0.09f + (i % 3) * 0.04f) * (0.6f + 0.4f * fade);
-                SetSize(mote, width, width);
-                Paint(mote, fade * 0.7f);
+                var width = (0.06f + 0.06f * strength + (k % 3) * 0.03f) * (0.6f + 0.4f * fade);
+                SetSize(spark, width, width);
+                Paint(spark, fade * (0.30f + 0.50f * strength));
             }
         }
 
@@ -428,7 +472,7 @@ namespace Assets.Scripts.Network
         /// </summary>
         /// <remarks>
         /// A player object is built at one and a half, so a width asked for here has to be
-        /// divided by that or the pool comes out half again as wide as the number says. Read
+        /// divided by that or the wave comes out half again as wide as the number says. Read
         /// off the object rather than written down, because a mounted character is scaled
         /// differently again.
         /// </remarks>
@@ -453,40 +497,23 @@ namespace Assets.Scripts.Network
         }
 
         /// <summary>
-        /// The lit patch of floor: bright across most of the middle, then gone at the edge.
+        /// One wave: a soft ring drawn near the edge of its texture, as thick as its entry
+        /// in the table says. Soft on both sides, so four of them at four sizes read as
+        /// light and not as four drawn lines.
         /// </summary>
-        private static Sprite PoolSprite
+        private static Sprite WaveSprite(int index)
         {
-            get
+            if (waveSprites[index] != null)
+                return waveSprites[index];
+
+            var band = WaveBand[index];
+            waveSprites[index] = Bake((dx, dy) =>
             {
-                if (poolSprite != null)
-                    return poolSprite;
-
-                poolSprite = Bake((dx, dy) =>
-                {
-                    var distance = Mathf.Sqrt(dx * dx + dy * dy);
-                    return 1f - Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((distance - 0.3f) / 0.7f));
-                }, new Vector2(0.5f, 0.5f));
-                return poolSprite;
-            }
-        }
-
-        /// <summary>The white heart of it, right behind the feet. Small, and the one thing that clips on its own.</summary>
-        private static Sprite CoreSprite
-        {
-            get
-            {
-                if (coreSprite != null)
-                    return coreSprite;
-
-                coreSprite = Bake((dx, dy) =>
-                {
-                    var distance = Mathf.Sqrt(dx * dx + dy * dy);
-                    var soft = Mathf.Clamp01(1f - distance);
-                    return soft * soft * soft;
-                }, new Vector2(0.5f, 0.5f));
-                return coreSprite;
-            }
+                var distance = Mathf.Sqrt(dx * dx + dy * dy);
+                var soft = Mathf.Clamp01(1f - Mathf.Abs(distance - WaveEdge) / band);
+                return Mathf.Pow(soft, 1.5f);
+            }, new Vector2(0.5f, 0.5f));
+            return waveSprites[index];
         }
 
         /// <summary>
