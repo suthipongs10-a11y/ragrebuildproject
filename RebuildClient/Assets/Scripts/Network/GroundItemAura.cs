@@ -96,6 +96,23 @@ namespace Assets.Scripts.Network
         private const float SizeScale = 2f;
 
         /// <summary>
+        /// The shaft alone, half again on top of that. The pool and the rings were right at
+        /// twice; the shaft, being the part that has to be seen from across a map, still
+        /// was not.
+        /// </summary>
+        private const float BeamScale = 1.5f;
+
+        /// <summary>
+        /// Drawn over everything: no depth test, a queue after the character sprites and a
+        /// sorting order above them. A beam half hidden behind a hill or a body is a beam
+        /// that says the drop is somewhere else, and being asked to put it on top is being
+        /// asked exactly that. It does mean a beam shows through a wall; that was the
+        /// trade, and it was chosen.
+        /// </summary>
+        private const int OnTopQueue = 3010;
+        private const int OnTopOrder = 100;
+
+        /// <summary>
         /// Specks of light drifting up the shaft, which is what the ordinary aura has none of
         /// and what makes the difference between a lit column and something happening.
         /// </summary>
@@ -120,9 +137,11 @@ namespace Assets.Scripts.Network
         //travel in the material's own Tint property: it is the only one of the shader's two
         //colour inputs that is certain to arrive, and the beams coming out white is what a
         //tint that did not arrive looks like.
-        private static readonly Dictionary<Color, Material> additiveMaterials = new Dictionary<Color, Material>();
-        private static readonly Dictionary<Color, Material> additiveMaterialsNoDepth = new Dictionary<Color, Material>();
+        private static readonly Dictionary<(Color tint, bool ignoreDepth, int queue), Material> additiveMaterials = new();
         private static bool loggedOnce;
+
+        /// <summary>A wide faint copy of the shaft behind it, which is what reads as the shaft glowing rather than being painted.</summary>
+        private SpriteRenderer beamHaze;
 
         /// <summary>The second ring, turning the other way, and the rising specks.</summary>
         private SpriteRenderer halo;
@@ -203,16 +222,24 @@ namespace Assets.Scripts.Network
             //read, only a colour. The scale numbers are multipliers on the sprite's own
             //size, and the beam sprite is 32 pixels at a hundred to the unit, so 0.32 units:
             //a scale of one is already about half an icon.
-            aura.beamHeight = (3.6f + tier * 0.6f) * tall;
+            aura.beamHeight = (3.6f + tier * 0.6f) * tall * BeamScale;
+            var beamWidth = (1.15f + tier * 0.12f) * wide * BeamScale;
+
+            //The haze first, so it sits behind the shaft in the draw order: the same shape,
+            //well over twice as wide and faint, which is the soft edge the shaft itself
+            //cannot have without losing the line down its middle.
+            aura.beamHaze = MakeRenderer(go.transform, "BeamHaze", BeamSprite, Vector3.zero, color);
+            aura.beamHaze.transform.localScale = new Vector3(beamWidth * 2.6f, aura.beamHeight * 1.08f, 1f);
+
             aura.beam = MakeRenderer(go.transform, "Beam", BeamSprite, Vector3.zero, color);
-            aura.beam.transform.localScale = new Vector3((1.15f + tier * 0.12f) * wide, aura.beamHeight, 1f);
+            aura.beam.transform.localScale = new Vector3(beamWidth, aura.beamHeight, 1f);
 
             //The same tint as the shaft around it, not a paler one. Mixing white into the
             //core was a second push toward white on top of the one the stacking already
             //gives, and it is the middle of the beam — the part you actually read the
             //colour off — that it bleached.
             aura.core = MakeRenderer(go.transform, "Core", BeamSprite, Vector3.zero, color);
-            aura.core.transform.localScale = new Vector3((0.45f + tier * 0.05f) * wide, aura.beamHeight * 0.9f, 1f);
+            aura.core.transform.localScale = new Vector3((0.45f + tier * 0.05f) * wide * BeamScale, aura.beamHeight * 0.9f, 1f);
 
             //a pool of light where it is actually lying, so the eye is sent to the item and
             //not to the empty air above it
@@ -308,10 +335,10 @@ namespace Assets.Scripts.Network
 
             var renderer = go.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
-            //behind the icon, so the item reads on top of its own light
-            renderer.sortingOrder = -1;
+            //over everything, see OnTopQueue
+            renderer.sortingOrder = OnTopOrder;
 
-            var material = MaterialFor(tint);
+            var material = MaterialFor(tint, true, OnTopQueue);
             if (material != null)
                 renderer.sharedMaterial = material;
 
@@ -383,6 +410,7 @@ namespace Assets.Scripts.Network
             //and a quarter, which is enough to clip the strongest channel — a bright beam —
             //and not enough to clip the second, which is what keeps the colour.
             Paint(beam, 0.90f + pulse * 0.10f);
+            Paint(beamHaze, 0.16f + pulse * 0.06f);
             Paint(core, 0.30f + pulse * 0.12f);
             Paint(glow, 0.38f + pulse * 0.12f);
             //brighter than the rest because it is a thin line rather than a filled shape, and
@@ -390,6 +418,7 @@ namespace Assets.Scripts.Network
             Paint(ring, 0.80f + pulse * 0.20f);
 
             Stretch(beam, beamHeight, pulse);
+            Stretch(beamHaze, beamHeight * 1.08f, pulse);
             Stretch(core, beamHeight * 0.9f, pulse);
             LayOnGround(ring, ref ringAngle);
 
@@ -484,7 +513,7 @@ namespace Assets.Scripts.Network
         /// </summary>
         internal static Material MaterialFor(Color tint)
         {
-            return MaterialFor(tint, false);
+            return MaterialFor(tint, false, 3001);
         }
 
         /// <summary>
@@ -497,8 +526,20 @@ namespace Assets.Scripts.Network
         /// </summary>
         internal static Material MaterialFor(Color tint, bool ignoreDepth)
         {
-            var materials = ignoreDepth ? additiveMaterialsNoDepth : additiveMaterials;
-            if (materials.TryGetValue(tint, out var found) && found != null)
+            //The depth-free kind goes just before the character sprites by default: the
+            //queue is what decides the order between a sprite and something drawn beside
+            //it - the sorting order only settles ties within a queue - and an aura in the
+            //queue after the characters paints over their feet. The character shadow sits
+            //at this same queue for the same reason. A caller that wants to be on top of
+            //the sprites says so with a queue of its own.
+            return MaterialFor(tint, ignoreDepth, ignoreDepth ? 2999 : 3001);
+        }
+
+        /// <summary>The same again, naming the render queue outright.</summary>
+        internal static Material MaterialFor(Color tint, bool ignoreDepth, int renderQueue)
+        {
+            var key = (tint, ignoreDepth, renderQueue);
+            if (additiveMaterials.TryGetValue(key, out var found) && found != null)
                 return found;
 
             var cache = ShaderCache.Instance;
@@ -519,14 +560,8 @@ namespace Assets.Scripts.Network
             var shader = ignoreDepth && cache.AdditiveShaderNoZTest != null ? cache.AdditiveShaderNoZTest : cache.AdditiveShader;
             var material = new Material(shader);
             material.SetColor("_Color", new Color(tint.r, tint.g, tint.b, 1f));
-            //The beams go after the world is drawn, the way the skill effects do it. The
-            //depth-free kind goes just before the character sprites instead: the queue is
-            //what decides the order between a sprite and something drawn beside it - the
-            //sorting order only settles ties within a queue - and an aura in the queue after
-            //the characters paints over their feet. The character shadow sits at this same
-            //queue for the same reason.
-            material.renderQueue = ignoreDepth ? 2999 : 3001;
-            materials[tint] = material;
+            material.renderQueue = renderQueue;
+            additiveMaterials[key] = material;
 
             if (!loggedOnce)
             {
