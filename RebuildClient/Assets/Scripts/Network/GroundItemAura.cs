@@ -57,6 +57,15 @@ namespace Assets.Scripts.Network
 
         private const int BeamWidth = 32;
         private const int BeamHeight = 256;
+
+        /// <summary>
+        /// How much of the shaft's height it takes to fade in from nothing at the foot.
+        /// A shaft that started at full strength ended in a hard line straight across the
+        /// pool and the ring, and the line was the first thing the eye found. This is a
+        /// fraction of the texture rather than a distance, so it is about a unit on the
+        /// ordinary shaft and about two on the grand one, which the pool at the foot covers.
+        /// </summary>
+        private const float BeamFoot = 0.05f;
         private const int GlowSize = 64;
         private const int RingSize = 128;
 
@@ -612,8 +621,9 @@ namespace Assets.Scripts.Network
         }
 
         /// <summary>
-        /// A shaft of light: brightest where it meets the ground, gone by the top, and soft
-        /// along both edges so it reads as light rather than as a coloured rectangle.
+        /// A shaft of light: brightest just above where it meets the ground, gone by the top,
+        /// soft along both edges and soft at the foot, so it reads as light rather than as
+        /// a coloured rectangle and grows out of the pool rather than cutting across it.
         ///
         /// Drawn rather than imported, like the rest of this. There is no art asset to go
         /// missing from a GRF extract the way a monster sprite can, and one white texture
@@ -631,17 +641,20 @@ namespace Assets.Scripts.Network
 
                 for (var y = 0; y < BeamHeight; y++)
                 {
-                    //full at the foot, nothing at the head, curved so most of the light sits
-                    //in the lower part where the item actually is
+                    //full near the foot, nothing at the head, curved so most of the light
+                    //sits in the lower part where the item actually is
                     var up = y / (float)(BeamHeight - 1);
                     var vertical = Mathf.Pow(1f - up, 1.7f);
+
+                    //and nothing at the very foot, see BeamFoot
+                    var foot = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(up / BeamFoot));
 
                     for (var x = 0; x < BeamWidth; x++)
                     {
                         var across = Mathf.Abs((x + 0.5f) / BeamWidth - 0.5f) * 2f;
                         var horizontal = Mathf.Pow(Mathf.Clamp01(1f - across), 1.4f);
 
-                        texture.SetPixel(x, y, new Color(1f, 1f, 1f, vertical * horizontal));
+                        texture.SetPixel(x, y, new Color(1f, 1f, 1f, vertical * horizontal * foot));
                     }
                 }
 
