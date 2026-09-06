@@ -145,7 +145,7 @@ namespace Assets.Scripts.UI.Hud
             rect.anchoredPosition = Vector2.zero;
             rect.sizeDelta = new Vector2(Width, Height);
 
-            ModernUiTheme.CreateTitleBar(window, ThaiUiText.Get("ChatRoom"), "", ModernUiIcons.Smile);
+            ModernUiTheme.CreateTitleBar(window, ThaiUiText.Get("ChatRoom"), "", ModernUiIcons.Person);
             ModernUiTheme.AttachShadow(rect);
 
             window.BuildCreatePage(rect);
