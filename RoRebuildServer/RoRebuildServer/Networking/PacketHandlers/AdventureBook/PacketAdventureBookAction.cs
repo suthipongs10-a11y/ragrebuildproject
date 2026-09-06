@@ -21,15 +21,16 @@ namespace RoRebuildServer.Networking.PacketHandlers;
 ///
 /// It deliberately does not reuse AdminRequestMove. That packet is gated on being an admin or
 /// on EnableWarpCommandForEveryone, and borrowing it would mean either handing every player a
-/// GM command or leaving that setting on - which would make the kafra's fee, both wing items
-/// and this whole feature pointless at the same time.
+/// GM command or leaving that setting on - which lets anybody go anywhere without the star
+/// the book asks for, and makes the book, the kafra and both wing items pointless at once.
+///
+/// The road is free. For a while it charged a fare below rank five, roughly what the kafra
+/// charges, and the fare bought nothing but a reason not to open the book: the star is the
+/// price of the trip, and it is paid in the field.
 /// </remarks>
 [ClientPacketHandler(PacketType.AdventureBookAction)]
 public class PacketAdventureBookAction : IClientPacketHandler
 {
-    /// <summary>The rank at which the road is free. Below it the book charges a fare.</summary>
-    private const int FreeTravelRank = 5;
-
     public void Process(NetworkConnection connection, InboundMessage msg)
     {
         if (!connection.IsConnectedAndInGame)
@@ -67,10 +68,6 @@ public class PacketAdventureBookAction : IClientPacketHandler
                 break;
         }
     }
-
-    /// <summary>The fare, by how dangerous the thing at the other end is.</summary>
-    /// <remarks>Roughly what the kafra charges, so neither road makes the other pointless.</remarks>
-    public static int FareFor(int monsterLevel) => Math.Clamp(500 + monsterLevel * 10, 500, 2000);
 
     private static void Warp(NetworkConnection connection, Player player, int pageId, string mapName)
     {
@@ -119,18 +116,7 @@ public class PacketAdventureBookAction : IClientPacketHandler
         if (player.IsInNpcInteraction)
             return;
 
-        var fare = AdventureBookProgress.GetRank(player) >= FreeTravelRank ? 0 : FareFor(entry.Level);
-        if (fare > 0 && player.GetZeny() < fare)
-        {
-            Deny(player, AdventureBookWarpDenial.NoZeny);
-            return;
-        }
-
         var pos = map.WalkData.FindWalkableCellOnMap();
-
-        //Charged only once everything else has passed, so a refused trip is never a paid one.
-        if (fare > 0)
-            player.DropZeny(fare);
 
         player.AddInputActionDelay(InputActionCooldownType.Teleport);
         character.ResetState();
@@ -144,9 +130,6 @@ public class PacketAdventureBookAction : IClientPacketHandler
         }
         else
             player.WarpPlayer(mapName, pos.X, pos.Y, 1, 1, false);
-
-        if (fare > 0)
-            CommandBuilder.SendServerMessageTo(player, $"<color=#66FFAA>สมุดผจญภัย: เดินทางไป {mapName} จ่าย {fare:N0} Zeny</color>");
     }
 
     private static void Deny(Player player, AdventureBookWarpDenial reason)
@@ -154,7 +137,6 @@ public class PacketAdventureBookAction : IClientPacketHandler
         var text = reason switch
         {
             AdventureBookWarpDenial.NoStar => "ยังเดินทางไปหามอนตัวนี้ไม่ได้ ต้องได้ ★ แรกของมันก่อน",
-            AdventureBookWarpDenial.NoZeny => "Zeny ไม่พอค่าเดินทาง",
             AdventureBookWarpDenial.NotThere => "มอนตัวนี้ไม่ได้อยู่บนแมพนั้น",
             _ => "ไม่พบมอนตัวนี้ในสมุดผจญภัย"
         };

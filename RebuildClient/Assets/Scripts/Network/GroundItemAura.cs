@@ -17,6 +17,13 @@ namespace Assets.Scripts.Network
     /// What glows is decided here rather than on the server, because the client already
     /// holds the item's class and code. The two things it cannot know — how unlikely the
     /// drop was, and whether a boss dropped it — are what the server sends.
+    ///
+    /// The light goes round the item and never over it. Everything here is drawn after the
+    /// sprites so that no hill or body can hide it, and the item's own icon is one of those
+    /// sprites - so a second copy of the icon is drawn again after the light, sitting in
+    /// the middle of it with nothing on top. The pool at the foot is a ring with a hole the
+    /// size of the icon for the same reason, and the ring on the floor is centred on the
+    /// icon rather than on the ground under it.
     /// </summary>
     public class GroundItemAura : MonoBehaviour
     {
@@ -123,6 +130,18 @@ namespace Assets.Scripts.Network
         private const int OnTopOrder = 100;
 
         /// <summary>
+        /// One further on: where the copy of the item's icon is drawn, so it lands over the
+        /// light rather than under it. The original icon is batched with every other sprite
+        /// in the scene and cannot be pulled out of that batch on its own, which is why it
+        /// is drawn twice rather than moved.
+        /// </summary>
+        private const int IconQueue = OnTopQueue + 1;
+        private const int IconOrder = OnTopOrder + 1;
+
+        /// <summary>The same depth nudge the item gives its own sprite, so the copy sits where the original does.</summary>
+        private const float IconOffset = 0.5f;
+
+        /// <summary>
         /// Sparks drifting up out of the pool and away from the shaft, which is what makes
         /// the difference between a lit column and something happening. Every aura gets
         /// them; the grand one gets more.
@@ -153,13 +172,16 @@ namespace Assets.Scripts.Network
         private const float MoteSway = 0.14f;
 
         /// <summary>
-        /// The item sits a fifth of a unit off the floor, so the ring has to come back down
-        /// by about that much to lie on it rather than through the middle of the icon.
+        /// Where the rings sit relative to the item. Nought: the item is drawn a fifth of a
+        /// unit off the floor, and a ring dropped back down to the floor was centred that
+        /// far below the icon on screen, so the icon sat in the top half of it. A ring
+        /// through the middle of the icon is a ring the icon is in the middle of, and it is
+        /// flat, so nobody can see that it floats.
         /// </summary>
-        private const float RingLift = -0.18f;
+        private const float RingLift = 0f;
 
         private static Sprite beamSprite;
-        private static Sprite glowSprite;
+        private static Sprite poolSprite;
         private static Sprite ringSprite;
         private static Sprite swirlSprite;
         private static Sprite sparkSprite;
@@ -169,6 +191,7 @@ namespace Assets.Scripts.Network
         //colour inputs that is certain to arrive, and the beams coming out white is what a
         //tint that did not arrive looks like.
         private static readonly Dictionary<(Color tint, bool ignoreDepth, int queue), Material> additiveMaterials = new();
+        private static Material iconMaterial;
         private static bool loggedOnce;
 
         /// <summary>A wide faint copy of the shaft behind it, which is what reads as the shaft glowing rather than being painted.</summary>
@@ -179,6 +202,11 @@ namespace Assets.Scripts.Network
 
         /// <summary>The sparks climbing out of the pool. Every aura has some.</summary>
         private SpriteRenderer[] motes;
+
+        /// <summary>The copy of the item's icon drawn over the light, and the icon it copies.</summary>
+        private SpriteRenderer icon;
+
+        private SpriteRenderer iconSource;
 
         /// <summary>Each ring turns on its own angle, so the two do not share a number.</summary>
         private float haloAngle;
@@ -273,9 +301,10 @@ namespace Assets.Scripts.Network
             aura.core = MakeRenderer(go.transform, "Core", BeamSprite, Vector3.zero, color);
             aura.core.transform.localScale = new Vector3((0.45f + tier * 0.05f) * wide * BeamScale, aura.beamHeight * 0.9f, 1f);
 
-            //a pool of light where it is actually lying, so the eye is sent to the item and
-            //not to the empty air above it
-            aura.glow = MakeRenderer(go.transform, "Glow", GlowSprite, new Vector3(0, 0.05f, 0), color);
+            //a pool of light round where it is actually lying, so the eye is sent to the
+            //item and not to the empty air above it. Round rather than under: the middle of
+            //the pool is clear, so the icon sits in a ring of light instead of on a lamp.
+            aura.glow = MakeRenderer(go.transform, "Glow", PoolSprite, Vector3.zero, color);
             aura.glow.transform.localScale = Vector3.one * ((1.5f + tier * 0.2f) * wide);
 
             //A ring drawn on the floor around it, turning slowly. Everything else here faces
@@ -289,6 +318,7 @@ namespace Assets.Scripts.Network
                 aura.BuildGrandParts(go.transform, color, tier, wide);
 
             aura.BuildMotes(go.transform, color, aura.grand ? MoteCount : PlainMoteCount);
+            aura.AttachIcon(parent);
 
             aura.Apply(0f);
         }
@@ -372,6 +402,75 @@ namespace Assets.Scripts.Network
             }
         }
 
+        /// <summary>
+        /// Draws the item's icon a second time, after the light, so the icon is what is on
+        /// top in the middle of it.
+        /// </summary>
+        /// <remarks>
+        /// A child of the item's own sprite object rather than of the aura, so it inherits
+        /// the sprite's scale and rides the little bounce the item does when it lands. The
+        /// original renderer is usually switched off in favour of the scene-wide sprite
+        /// batch, so its sprite and colour are read off it every frame rather than trusted
+        /// once: the colour is what blinks red before the item expires. Skipped quietly if
+        /// there is no sprite shader to draw it with; the light then covers the icon, which
+        /// is the old behaviour and not a crash.
+        /// </remarks>
+        private void AttachIcon(GameObject parent)
+        {
+            var item = parent.GetComponent<GroundItem>();
+            if (item == null || item.SpriteRenderer == null)
+                return;
+
+            var material = IconMaterial;
+            if (material == null)
+                return;
+
+            iconSource = item.SpriteRenderer;
+
+            var go = new GameObject("IconOnTop");
+            go.layer = iconSource.gameObject.layer;
+            go.transform.SetParent(iconSource.transform, false);
+
+            icon = go.AddComponent<SpriteRenderer>();
+            icon.sprite = iconSource.sprite;
+            icon.color = iconSource.color;
+            icon.sortingOrder = IconOrder;
+            icon.sharedMaterial = material;
+        }
+
+        /// <summary>Keeps the copy of the icon showing what the original would.</summary>
+        private void MirrorIcon()
+        {
+            if (icon == null || iconSource == null)
+                return;
+
+            if (icon.sprite != iconSource.sprite)
+                icon.sprite = iconSource.sprite;
+            icon.color = iconSource.color;
+        }
+
+        /// <summary>
+        /// The item's own sprite shader with the same depth nudge the item uses, one queue
+        /// after the light. One for every lit drop, kept for the session.
+        /// </summary>
+        private static Material IconMaterial
+        {
+            get
+            {
+                if (iconMaterial != null)
+                    return iconMaterial;
+
+                var cache = ShaderCache.Instance;
+                if (cache == null || cache.SpriteShader == null)
+                    return null;
+
+                iconMaterial = new Material(cache.SpriteShader);
+                iconMaterial.SetFloat(Shader.PropertyToID("_Offset"), IconOffset);
+                iconMaterial.renderQueue = IconQueue;
+                return iconMaterial;
+            }
+        }
+
         private static SpriteRenderer MakeRenderer(Transform parent, string name, Sprite sprite, Vector3 offset,
             Color tint)
         {
@@ -439,6 +538,7 @@ namespace Assets.Scripts.Network
         private void Update()
         {
             Apply(Time.time + phase);
+            MirrorIcon();
         }
 
         private void Apply(float t)
@@ -826,13 +926,18 @@ namespace Assets.Scripts.Network
             }
         }
 
-        /// <summary>A soft round pool for the foot of the beam.</summary>
-        internal static Sprite GlowSprite
+        /// <summary>
+        /// A soft pool of light for the foot of the beam, with a hole in the middle: nothing
+        /// out to about a third of the radius, brightest just past that, gone at the edge.
+        /// The hole is about the size of the icon at the sizes the pool is drawn at, so the
+        /// light sits round the item rather than behind it.
+        /// </summary>
+        private static Sprite PoolSprite
         {
             get
             {
-                if (glowSprite != null)
-                    return glowSprite;
+                if (poolSprite != null)
+                    return poolSprite;
 
                 var texture = new Texture2D(GlowSize, GlowSize, TextureFormat.RGBA32, false);
                 texture.wrapMode = TextureWrapMode.Clamp;
@@ -846,17 +951,18 @@ namespace Assets.Scripts.Network
                         var dy = (y + 0.5f - half) / half;
                         var distance = Mathf.Sqrt(dx * dx + dy * dy);
 
-                        var alpha = Mathf.Clamp01(1f - distance);
-                        alpha *= alpha;
+                        var outer = Mathf.Clamp01(1f - distance);
+                        outer *= outer;
+                        var hole = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01((distance - 0.32f) / 0.28f));
 
-                        texture.SetPixel(x, y, new Color(1f, 1f, 1f, alpha));
+                        texture.SetPixel(x, y, new Color(1f, 1f, 1f, outer * hole));
                     }
                 }
 
                 texture.Apply();
-                glowSprite = Sprite.Create(texture, new Rect(0, 0, GlowSize, GlowSize),
+                poolSprite = Sprite.Create(texture, new Rect(0, 0, GlowSize, GlowSize),
                     new Vector2(0.5f, 0.5f), 100);
-                return glowSprite;
+                return poolSprite;
             }
         }
     }
