@@ -71,6 +71,7 @@ namespace Assets.Scripts.UI
             ("Database", "Database", () => ModernUiIcons.Magnifier, null),
             ("AdventureBook", "AdventureBook", () => ModernUiIcons.Spark,
                 AdventureBook.AdventureBookWindow.Toggle),
+            ("ChatRoom", "ChatRoom", () => ModernUiIcons.Smile, Hud.ChatRoomWindow.Toggle),
         };
 
         private float searchTimer;

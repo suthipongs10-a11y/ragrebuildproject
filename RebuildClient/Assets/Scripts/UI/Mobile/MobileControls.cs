@@ -13,6 +13,15 @@ namespace Assets.Scripts.UI.Mobile
     /// scene and prefabs stay untouched, and the whole thing only spawns on a device that
     /// actually reports touch input.
     ///
+    /// It is laid out twice, because a phone is held both ways and the two shapes have
+    /// nothing in common. Upright there is height to spare and none to waste sideways, so
+    /// the buttons stack three wide above the stick and the bottom menu wraps onto two
+    /// rows. Turned over that block is taller than the screen, so it narrows to two columns
+    /// down the left edge, the two action buttons sit side by side under the right thumb,
+    /// and the menu straightens out into a single row along the bottom. Nothing is rebuilt
+    /// when the phone turns - the same buttons are moved - so a rotation costs a few
+    /// assignments rather than a rebuild.
+    ///
     /// There is no minimap here. There was one, drawn from the walk data as a stand-in back
     /// when the game's own minimap could not be reached on a phone; the real one works there
     /// now, so the stand-in was a second map drawn over the first, on the only kind of screen
@@ -35,13 +44,34 @@ namespace Assets.Scripts.UI.Mobile
         private const float UtilGap = 8f;
         private const float UtilOriginX = 24f;
         private const float UtilOriginY = 410f;
-        private const int UtilRows = 4;
+
+        /// <summary>How wide the block of small buttons is, held each way.</summary>
+        private const int UtilColumns = 3;
+        private const int LandscapeUtilColumns = 2;
+
+        /// <summary>
+        /// Where the block starts sideways: hard against the left edge, and low enough that
+        /// the stick sits under it rather than in it.
+        /// </summary>
+        private const float LandscapeUtilOriginX = 16f;
+        private const float LandscapeUtilOriginY = 208f;
 
         //the bottom menu wraps to this many buttons per row so it fits a phone screen
         private const int MenuColumns = 5;
+
+        /// <summary>
+        /// Sideways there is room for the lot in one row, which is worth having: two rows
+        /// of menu is two rows of the map you are standing on that you cannot see.
+        /// </summary>
+        private const int LandscapeMenuColumns = 10;
+
         private const float MenuCellWidth = 100f;
         private const float MenuCellHeight = 30f;
         private const float MenuSpacing = 4f;
+
+        /// <summary>The canvas is authored against a phone, one shape or the other.</summary>
+        private static readonly Vector2 PortraitReference = new Vector2(720, 1280);
+        private static readonly Vector2 LandscapeReference = new Vector2(1280, 720);
 
         private static readonly Color AttackColor = new Color(0.78f, 0.20f, 0.20f, 0.45f);
         private static readonly Color PickUpColor = new Color(0.18f, 0.60f, 0.30f, 0.45f);
@@ -63,6 +93,22 @@ namespace Assets.Scripts.UI.Mobile
         private RectTransform toggleButton;
         private RectTransform sendButton;
         private bool wasInGame;
+
+        /// <summary>
+        /// The small buttons above the stick, in the order they were made. Their place in
+        /// this list is their place in the block, so the same list lays out both shapes.
+        /// </summary>
+        private readonly System.Collections.Generic.List<RectTransform> utilButtons =
+            new System.Collections.Generic.List<RectTransform>();
+
+        private RectTransform attackButton;
+        private RectTransform pickUpButton;
+        private RectTransform joystickRect;
+        private CanvasScaler scaler;
+
+        /// <summary>Which way round everything is currently placed, so a turn is noticed.</summary>
+        private bool laidOutLandscape;
+        private bool hasLayout;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Bootstrap()
@@ -94,9 +140,9 @@ namespace Assets.Scripts.UI.Mobile
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
             canvas.sortingOrder = 500; //above the game's own windows
 
-            var scaler = canvasObject.GetComponent<CanvasScaler>();
+            scaler = canvasObject.GetComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-            scaler.referenceResolution = new Vector2(720, 1280);
+            scaler.referenceResolution = PortraitReference;
             scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
             scaler.matchWidthOrHeight = 0.5f;
 
@@ -112,35 +158,41 @@ namespace Assets.Scripts.UI.Mobile
             controlGroup.offsetMax = Vector2.zero;
 
             //right thumb: the two buttons used constantly while fighting
-            CreateButton(controlGroup, new Vector2(-24, 170), AttackSize, AttackColor, CreateSwordSprite(), OnAttack);
-            CreateButton(controlGroup, new Vector2(-34, 300), PickUpSize, PickUpColor, CreateHandSprite(), OnPickUp);
+            attackButton = CreateButton(controlGroup, new Vector2(-24, 170), AttackSize, AttackColor,
+                CreateSwordSprite(), OnAttack);
+            pickUpButton = CreateButton(controlGroup, new Vector2(-34, 300), PickUpSize, PickUpColor,
+                CreateHandSprite(), OnPickUp);
 
             //left thumb: the stick, with every other control stacked above it
             CreateJoystick(controlGroup);
 
-            CreateButton(controlGroup, UtilSlot(0, 0), UtilSize, TalkColor, null, OpenChat, ThaiUiText.Get("Chat"), true);
-            CreateButton(controlGroup, UtilSlot(1, 0), UtilSize, TalkColor, null, OpenChatRoomCommand, ThaiUiText.Get("Room"), true);
-            CreateButton(controlGroup, UtilSlot(2, 0), UtilSize, ZoomColor, null, PressEscape, "ESC", true);
+            //Made in reading order and placed afterwards, because where any of them goes
+            //depends on which way the phone is being held. Their order here is their order
+            //in the block, both ways round.
+            AddUtil(TalkColor, null, OpenChat, ThaiUiText.Get("Chat"));
+            AddUtil(TalkColor, null, OpenChatRoomCommand, ThaiUiText.Get("Room"));
+            AddUtil(ZoomColor, null, PressEscape, "ESC");
 
-            CreateButton(controlGroup, UtilSlot(0, 1), UtilSize, ZoomColor, null, ToggleFullscreen, "[ ]", true);
-            CreateButton(controlGroup, UtilSlot(1, 1), UtilSize, ZoomColor, null, OnSit, "Zz", true);
-            CreateButton(controlGroup, UtilSlot(2, 1), UtilSize, TalkColor, null, OnTalk, "...", true);
+            AddUtil(ZoomColor, null, ToggleFullscreen, "[ ]");
+            AddUtil(ZoomColor, null, OnSit, "Zz");
+            AddUtil(TalkColor, null, OnTalk, "...");
 
-            CreateButton(controlGroup, UtilSlot(0, 2), UtilSize, ZoomColor, null, () => RotateCamera(-45f), "<", true);
-            CreateButton(controlGroup, UtilSlot(1, 2), UtilSize, ZoomColor, null, ResetCamera, "o", true);
-            CreateButton(controlGroup, UtilSlot(2, 2), UtilSize, ZoomColor, null, () => RotateCamera(45f), ">", true);
+            AddUtil(ZoomColor, null, () => RotateCamera(-45f), "<");
+            AddUtil(ZoomColor, null, ResetCamera, "o");
+            AddUtil(ZoomColor, null, () => RotateCamera(45f), ">");
 
-            CreateButton(controlGroup, UtilSlot(0, 3), UtilSize, ZoomColor, null, () => Zoom(-6f), "+", true);
-            CreateButton(controlGroup, UtilSlot(1, 3), UtilSize, ZoomColor, null, () => Zoom(6f), "-", true);
+            AddUtil(ZoomColor, null, () => Zoom(-6f), "+");
+            AddUtil(ZoomColor, null, () => Zoom(6f), "-");
 
-            //The last free slot in the block, and the one thing a phone had no way to do at
-            //all: pick out a particular person. Every other button here chooses its own
-            //target and always the nearest one, which is right for swinging a sword and
-            //wrong for anything aimed at somebody in particular.
-            CreateButton(controlGroup, UtilSlot(2, 3), UtilSize, TalkColor, CreatePeopleSprite(),
-                NearbyPeopleWindow.Toggle, null, true);
+            //The last one in the block, and the one thing a phone had no way to do at all:
+            //pick out a particular person. Every other button here chooses its own target
+            //and always the nearest one, which is right for swinging a sword and wrong for
+            //anything aimed at somebody in particular.
+            AddUtil(TalkColor, CreatePeopleSprite(), NearbyPeopleWindow.Toggle, null);
 
             toggleButton = CreateButton(root, new Vector2(-24, 96), ToggleSize, ZoomColor, CreateMenuSprite(), ToggleControls);
+
+            ApplyLayout();
 
             //nothing is shown until a character is actually in the world, and even then
             //the pad stays folded away behind the toggle until it is asked for
@@ -171,16 +223,92 @@ namespace Assets.Scripts.UI.Mobile
                 controlGroup.gameObject.SetActive(false);
         }
 
-        //row 0 is the top row of the block, so it fills upward from the joystick
-        private static Vector2 UtilSlot(int column, int row) => new Vector2(
-            UtilOriginX + column * (UtilSize + UtilGap),
-            UtilOriginY + (UtilRows - 1 - row) * (UtilSize + UtilGap));
+        /// <summary>One more small button in the block, placed later by ApplyLayout.</summary>
+        private void AddUtil(Color color, Sprite icon, UnityEngine.Events.UnityAction action, string label)
+        {
+            var button = CreateButton(controlGroup, Vector2.zero, UtilSize, color, icon, action, label, true);
+            utilButtons.Add(button);
+        }
+
+        /// <summary>
+        /// Puts everything where the shape of the screen says it goes.
+        /// </summary>
+        /// <remarks>
+        /// Upright: three columns of small buttons stacked above the stick in the bottom
+        /// left, and the two action buttons one above the other on the right, because a
+        /// thumb reaching across a tall screen has more room vertically than across.
+        ///
+        /// Sideways: the same buttons in two columns hard against the left edge, since the
+        /// screen is now shorter than that block was tall, and the action buttons side by
+        /// side in the bottom right where the right thumb already rests. Sizes do not
+        /// change between the two, so the labels drawn into them stay the size they were
+        /// measured at.
+        /// </remarks>
+        private void ApplyLayout()
+        {
+            laidOutLandscape = MobileMode.IsLandscape;
+            hasLayout = true;
+
+            if (scaler != null)
+                scaler.referenceResolution = laidOutLandscape ? LandscapeReference : PortraitReference;
+
+            var columns = laidOutLandscape ? LandscapeUtilColumns : UtilColumns;
+            var rows = Mathf.Max(1, Mathf.CeilToInt(utilButtons.Count / (float)columns));
+            var originX = laidOutLandscape ? LandscapeUtilOriginX : UtilOriginX;
+            var originY = laidOutLandscape ? LandscapeUtilOriginY : UtilOriginY;
+
+            for (var i = 0; i < utilButtons.Count; i++)
+            {
+                var button = utilButtons[i];
+                if (button == null)
+                    continue;
+
+                //row 0 is the top row of the block, so it fills upward from the stick
+                var column = i % columns;
+                var row = i / columns;
+                button.anchoredPosition = new Vector2(
+                    originX + column * (UtilSize + UtilGap),
+                    originY + (rows - 1 - row) * (UtilSize + UtilGap));
+            }
+
+            if (joystickRect != null)
+                joystickRect.anchoredPosition = laidOutLandscape
+                    ? new Vector2(115, 116)
+                    : new Vector2(130, 230);
+
+            //Sideways they sit next to each other rather than stacked: the loot button
+            //stacked above the attack button would be up where the fingers holding the
+            //phone are.
+            if (attackButton != null)
+                attackButton.anchoredPosition = laidOutLandscape
+                    ? new Vector2(-24, 108)
+                    : new Vector2(-24, 170);
+
+            if (pickUpButton != null)
+                pickUpButton.anchoredPosition = laidOutLandscape
+                    ? new Vector2(-148, 122)
+                    : new Vector2(-34, 300);
+
+            //clear of the menu row below it either way, which is a different height in each
+            if (toggleButton != null)
+                toggleButton.anchoredPosition = laidOutLandscape
+                    ? new Vector2(-24, 48)
+                    : new Vector2(-24, 96);
+
+            //the menu is measured against the screen, so a turn has to make it measure again
+            menuFitWidth = -1f;
+        }
 
         private void Update()
         {
             RefreshVisibility();
             if (!wasInGame)
                 return;
+
+            //a phone can be turned over at any moment, and a browser window dragged from
+            //one shape to the other without anything reloading
+            if (!hasLayout || laidOutLandscape != MobileMode.IsLandscape)
+                ApplyLayout();
 
             RestructureBottomMenu();
             UpdateJoystickWalk();
@@ -269,7 +397,6 @@ namespace Assets.Scripts.UI.Mobile
                     menuGrid.startAxis = GridLayoutGroup.Axis.Horizontal;
                     menuGrid.childAlignment = TextAnchor.UpperCenter;
                     menuGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-                    menuGrid.constraintCount = MenuColumns;
 
                     //long labels like Equipment must shrink to fit a narrow cell, not clip
                     foreach (var label in bar.GetComponentsInChildren<TMP_Text>(true))
@@ -295,13 +422,30 @@ namespace Assets.Scripts.UI.Mobile
                 return;
             menuFitWidth = available;
 
-            var cell = Mathf.Min(MenuCellWidth, (available - (MenuColumns - 1) * MenuSpacing) / MenuColumns);
+            //Sideways the whole menu fits on one line, so it is given the columns to do it
+            //with; upright it wraps, and how many rows that comes to is counted rather than
+            //assumed, or the bar is anchored to a height it does not have.
+            var columns = laidOutLandscape ? LandscapeMenuColumns : MenuColumns;
+            var cell = Mathf.Min(MenuCellWidth, (available - (columns - 1) * MenuSpacing) / columns);
+            menuGrid.constraintCount = columns;
             menuGrid.cellSize = new Vector2(cell, MenuCellHeight);
+
+            //Only the buttons that are actually shown, because the grid lays out only those
+            //and a row counted for a hidden one is a gap under the bar.
+            var shown = 0;
+            for (var i = 0; i < menuRect.childCount; i++)
+            {
+                if (menuRect.GetChild(i).gameObject.activeSelf)
+                    shown++;
+            }
+
+            var rows = Mathf.Max(1, Mathf.CeilToInt(shown / (float)columns));
 
             menuRect.anchorMin = new Vector2(1f, 0f);
             menuRect.anchorMax = new Vector2(1f, 0f);
             menuRect.pivot = new Vector2(1f, 0f);
-            menuRect.sizeDelta = new Vector2(cell * MenuColumns + (MenuColumns - 1) * MenuSpacing, MenuCellHeight * 2 + MenuSpacing);
+            menuRect.sizeDelta = new Vector2(cell * columns + (columns - 1) * MenuSpacing,
+                MenuCellHeight * rows + (rows - 1) * MenuSpacing);
             menuRect.anchoredPosition = new Vector2(-10f, 8f);
         }
 
@@ -474,19 +618,15 @@ namespace Assets.Scripts.UI.Mobile
         }
 
         /// <summary>
-        /// Prefills the chat room command. Typing a title after it opens a room,
-        /// sending it bare leaves or closes the one you're in.
+        /// Opens the chat room window, which is where a room is named and sized.
         /// </summary>
-        private void OpenChatRoomCommand()
-        {
-            var camera = CameraFollower.Instance;
-            if (camera == null || camera.TextBoxInputField == null)
-                return;
-
-            camera.TextBoxInputField.text = "/chat ";
-            camera.TextBoxInputField.ActivateInputField();
-            camera.TextBoxInputField.caretPosition = camera.TextBoxInputField.text.Length;
-        }
+        /// <remarks>
+        /// This used to prefill "/chat " into the chat bar and leave the rest to the
+        /// player. On a phone that means the soft keyboard over half the screen and a
+        /// command whose spelling you have to already know - and no way at all to set how
+        /// many people the room takes, or a password.
+        /// </remarks>
+        private void OpenChatRoomCommand() => Hud.ChatRoomWindow.Toggle();
 
         private void PressEscape()
         {
@@ -635,6 +775,7 @@ namespace Assets.Scripts.UI.Mobile
             joystick = padObject.GetComponent<JoystickPad>();
             joystick.Knob = knobRect;
             joystick.Radius = 58f;
+            joystickRect = padRect;
         }
 
         private class JoystickPad : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler

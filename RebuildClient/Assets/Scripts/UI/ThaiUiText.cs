@@ -45,6 +45,7 @@ namespace Assets.Scripts.UI
             { "Guild", "กิลด์" },
             { "Chat", "แชท" },
             { "Room", "ห้อง" },
+            { "ChatRoom", "ห้องแชท" },
 
             //--- headers the rebuilt windows put under their titles
             { "Guide", "คำแนะนำ" },

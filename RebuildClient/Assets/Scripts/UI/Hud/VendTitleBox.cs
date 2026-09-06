@@ -11,6 +11,9 @@ namespace Assets.Scripts.UI.Hud
     {
         public int VendOwnerId;
         [NonSerialized] public bool IsChatRoom;
+
+        /// <summary>A chat room that asked for a password, which is knocked on differently.</summary>
+        [NonSerialized] public bool IsLocked;
         [NonSerialized] public GameObject FollowObject;
         
         public RectTransform Parent;
@@ -64,7 +67,9 @@ namespace Assets.Scripts.UI.Hud
             //double click, and the sign is a small label that drifts with the player it
             //belongs to - asking for two hits on it is asking for none. Opening a shop only
             //shows what is for sale, so a click landing by accident costs nothing.
-            if (IsChatRoom)
+            if (IsLocked)
+                ChatRoomWindow.OpenForJoin(VendOwnerId, Text != null ? Text.text : "");
+            else if (IsChatRoom)
                 NetworkManager.Instance.SendNpcClick(VendOwnerId);
             else
                 NetworkManager.Instance.VendingOpenStore(VendOwnerId);

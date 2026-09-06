@@ -62,14 +62,11 @@ public class PacketClientTextCommand : IClientPacketHandler
 
         if (type == ClientTextCommand.ChatRoom)
         {
-            var title = msg.ReadString();
+            var arguments = msg.ReadString();
             if (connection.Character == null || connection.Player == null)
                 return;
 
-            if (string.IsNullOrWhiteSpace(title))
-                EntityComponents.Npcs.ChatRoomNpcProxy.LeaveRoom(connection.Player);
-            else
-                EntityComponents.Npcs.ChatRoomNpcProxy.CreateRoom(connection.Player, title.Trim());
+            HandleChatRoom(connection.Player, arguments);
             return;
         }
 
@@ -121,5 +118,53 @@ public class PacketClientTextCommand : IClientPacketHandler
             CommandBuilder.SendServerMessage(text);
             CommandBuilder.ClearRecipients();
         }
+    }
+
+    /// <summary>
+    /// Everything the chat room window and the /chat command ask for, which all arrives as
+    /// one string.
+    /// </summary>
+    /// <remarks>
+    /// One command rather than three because a new command is a new value in a shared enum,
+    /// and a shared enum reaches the client as a compiled library that has to be copied
+    /// across by hand - so a feature that could be spelled inside the string it already
+    /// sends is spelled there instead.
+    ///
+    /// The separator is a control character on purpose: it cannot be typed into a room
+    /// title, so an ordinary "/chat my room" can never be mistaken for a structured
+    /// request, and a title containing anything at all still arrives whole.
+    /// </remarks>
+    private static void HandleChatRoom(EntityComponents.Player player, string arguments)
+    {
+        const char sep = '\u001f';
+
+        //bare: close the room you own, or step out of the one you joined
+        if (string.IsNullOrWhiteSpace(arguments))
+        {
+            EntityComponents.Npcs.ChatRoomNpcProxy.LeaveRoom(player);
+            return;
+        }
+
+        var parts = arguments.Split(sep);
+
+        //"c" title limit password - the window's create button
+        if (parts.Length == 4 && parts[0] == "c")
+        {
+            if (!int.TryParse(parts[2], out var limit))
+                limit = EntityComponents.Npcs.ChatRoomNpcProxy.MaxMembers;
+            EntityComponents.Npcs.ChatRoomNpcProxy.CreateRoom(player, parts[1].Trim(), limit, parts[3]);
+            return;
+        }
+
+        //"j" npcId password - knocking on a room that asked for one
+        if (parts.Length == 3 && parts[0] == "j")
+        {
+            if (int.TryParse(parts[1], out var npcId))
+                EntityComponents.Npcs.ChatRoomNpcProxy.JoinRoom(player, npcId, parts[2]);
+            return;
+        }
+
+        //anything else is a title typed straight into chat, which is how this started
+        EntityComponents.Npcs.ChatRoomNpcProxy.CreateRoom(player, arguments.Trim());
     }
 }
