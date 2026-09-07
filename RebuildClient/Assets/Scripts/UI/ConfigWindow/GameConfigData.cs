@@ -38,6 +38,24 @@ namespace Assets.Scripts.UI.ConfigWindow
         /// </summary>
         public int MobileUiMode = 0;
 
+        /// <summary>
+        /// Where the player dragged each hotbar slot, as "id:x:y", one entry per slot moved.
+        /// </summary>
+        /// <remarks>
+        /// A list of strings rather than a list of a small struct, because this file is
+        /// serialized by Unity's own json writer and every shape it cannot handle comes back
+        /// as a silently empty field. A string it can always handle, and a slot whose entry
+        /// will not parse simply goes back to the column it came from.
+        ///
+        /// Only slots that were actually moved appear. Everything else is laid out by
+        /// MobileHudLayout as it always was, so a player who never drags anything has an
+        /// empty list here and the default bar.
+        /// </remarks>
+        public List<string> MobileSkillSlotPositions = new();
+
+        /// <summary>Whether the character readout is folded away, on a phone.</summary>
+        public bool MobileHideReadout = false;
+
         public bool AutoLockSkillWindow = false;
         public bool ShowAllSkillsInSkillWindow = false;
         //character overlay

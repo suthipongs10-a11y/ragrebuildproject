@@ -206,6 +206,13 @@ namespace Assets.Scripts.UI
             if (entry.DragItem.Type == DragItemType.Skill)
             {
                 var onCursor = CameraFollower.Instance.PressSkillButton((CharacterSkill)entry.DragItem.ItemId, entry.DragItem.ItemCount);
+
+                //On a phone an armed skill has nothing to aim it with, so it aims itself at
+                //whatever is nearest and goes off on the same tap. Friendly skills are left
+                //alone and still wait to be pointed at somebody, see MobileTargeting.
+                if (onCursor && Mobile.MobileMode.IsActive && Mobile.MobileTargeting.TryFireAtNearest())
+                    onCursor = false;
+
                 if (onCursor && entry.gameObject.activeInHierarchy)
                 {
                     if (pressedEntry != null)

@@ -171,6 +171,33 @@ namespace Assets.Scripts
         public bool HasSkillOnCursor => hasSkillOnCursor;
         public SkillTarget CursorSkillTarget => cursorSkillTarget;
 
+        /// <summary>What is waiting on the cursor, for a caller that means to aim it itself.</summary>
+        /// <remarks>
+        /// The phone does exactly that: there is no cursor to carry a skill to a monster, so
+        /// pressing a skill button picks the nearest target and fires it there and then. It
+        /// reads what the press decided rather than working the level out again, because the
+        /// clamping against what the character has actually learnt lives in PressSkillButton
+        /// and doing it twice is one of the two copies going stale later.
+        /// </remarks>
+        public CharacterSkill CursorSkill => cursorSkill;
+        public int CursorSkillLevel => cursorSkillLvl;
+        public bool IsCursorSkillItem => isCursorSkillItem;
+        public int CursorItemId => cursorItemId;
+
+        /// <summary>
+        /// Puts down whatever is on the cursor, the same way a click on empty ground does.
+        /// </summary>
+        public void CancelSkillOnCursor()
+        {
+            if (!hasSkillOnCursor)
+                return;
+
+            hasSkillOnCursor = false;
+            isCursorSkillItem = false;
+            if (UiManager.Instance != null && UiManager.Instance.PartyPanel != null)
+                UiManager.Instance.PartyPanel.EndSkillOnCursor();
+        }
+
         public bool CinemachineMode;
         public VideoRecorder Recorder;
 

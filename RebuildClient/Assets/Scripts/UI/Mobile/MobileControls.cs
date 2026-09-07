@@ -34,10 +34,10 @@ namespace Assets.Scripts.UI.Mobile
         private const float TalkSearchRange = 15f;
 
         //action buttons sit under the right thumb, everything else is grouped bottom left
-        private const float AttackSize = 110f;
-        private const float PickUpSize = 90f;
-        private const float ToggleSize = 52f;
-        private const float UtilSize = 62f;
+        private const float AttackSize = 118f;
+        private const float PickUpSize = 96f;
+        private const float ToggleSize = 58f;
+        private const float UtilSize = 68f;
 
         /// <summary>Small enough to sit inside the chat bar rather than over it.</summary>
         private const float SendSize = 40f;
@@ -47,7 +47,12 @@ namespace Assets.Scripts.UI.Mobile
 
         /// <summary>How wide the block of small buttons is, held each way.</summary>
         private const int UtilColumns = 3;
-        private const int LandscapeUtilColumns = 2;
+
+        /// <summary>
+        /// Sideways the block is three wide as well. It was two, which was right when there
+        /// were twelve buttons and is a column longer than the screen now there are more.
+        /// </summary>
+        private const int LandscapeUtilColumns = 3;
 
         /// <summary>
         /// Where the block starts sideways: hard against the left edge, and low enough that
@@ -73,14 +78,23 @@ namespace Assets.Scripts.UI.Mobile
         private static readonly Vector2 PortraitReference = new Vector2(720, 1280);
         private static readonly Vector2 LandscapeReference = new Vector2(1280, 720);
 
-        private static readonly Color AttackColor = new Color(0.78f, 0.20f, 0.20f, 0.45f);
-        private static readonly Color PickUpColor = new Color(0.18f, 0.60f, 0.30f, 0.45f);
-        private static readonly Color ZoomColor = new Color(0.25f, 0.28f, 0.35f, 0.35f);
-        private static readonly Color TalkColor = new Color(0.85f, 0.60f, 0.20f, 0.45f);
+        //Nearly solid, and darker than they look here, because a touch control is drawn
+        //over a bright green field in daylight on a screen held at arm's length. They were
+        //painted at a third to a half opaque so as not to cover the game, and at that
+        //strength they did not read as buttons at all - a grey ring you cannot see is worse
+        //at not covering the game than one you can, because you hit it by accident.
+        private static readonly Color AttackColor = new Color(0.62f, 0.13f, 0.13f, 0.88f);
+        private static readonly Color PickUpColor = new Color(0.11f, 0.44f, 0.22f, 0.88f);
+        private static readonly Color ZoomColor = new Color(0.13f, 0.16f, 0.22f, 0.85f);
+        private static readonly Color TalkColor = new Color(0.66f, 0.42f, 0.09f, 0.88f);
+
+        /// <summary>The rim every button wears, which is what gives it an edge to find.</summary>
+        private static readonly Color RimColor = new Color(1f, 1f, 1f, 0.75f);
 
         private RectTransform controlGroup;
 
         private Sprite circleSprite;
+        private Sprite ringSprite;
         private GridLayoutGroup menuGrid;
         private RectTransform menuRect;
         private float menuFitWidth = -1f;
@@ -132,6 +146,7 @@ namespace Assets.Scripts.UI.Mobile
         private void Awake()
         {
             circleSprite = CreateCircleSprite();
+            ringSprite = CreateRingSprite();
 
             var canvasObject = new GameObject("MobileCanvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
             canvasObject.transform.SetParent(transform, false);
@@ -184,11 +199,16 @@ namespace Assets.Scripts.UI.Mobile
             AddUtil(ZoomColor, null, () => Zoom(-6f), "+");
             AddUtil(ZoomColor, null, () => Zoom(6f), "-");
 
-            //The last one in the block, and the one thing a phone had no way to do at all:
-            //pick out a particular person. Every other button here chooses its own target
-            //and always the nearest one, which is right for swinging a sword and wrong for
-            //anything aimed at somebody in particular.
+            //The one thing a phone had no way to do at all: pick out a particular person.
+            //Every other button here chooses its own target and always the nearest one,
+            //which is right for swinging a sword and wrong for anything aimed at somebody
+            //in particular.
             AddUtil(TalkColor, CreatePeopleSprite(), NearbyPeopleWindow.Toggle, null);
+
+            //The two that change the screen rather than the character: fold the readout
+            //away, and pick the skill buttons up and put them where they are wanted.
+            AddUtil(ZoomColor, null, ToggleReadout, "HP");
+            AddUtil(ZoomColor, null, ToggleArrange, ThaiUiText.Get("Arrange"));
 
             toggleButton = CreateButton(root, new Vector2(-24, 96), ToggleSize, ZoomColor, CreateMenuSprite(), ToggleControls);
 
@@ -628,6 +648,32 @@ namespace Assets.Scripts.UI.Mobile
         /// </remarks>
         private void OpenChatRoomCommand() => Hud.ChatRoomWindow.Toggle();
 
+        /// <summary>Folds the character readout away, or brings it back.</summary>
+        private static void ToggleReadout() => MobileHudVisibility.ToggleReadout();
+
+        /// <summary>
+        /// Turns the skill buttons into things you move rather than things you press.
+        /// </summary>
+        /// <remarks>
+        /// Says out loud what just happened, because the only visible difference is that
+        /// the buttons stopped working - which without a word of explanation is a bug
+        /// rather than a mode. A double tap on the same button while already arranging puts
+        /// everything back where the automatic layout wanted it, which is the way out for
+        /// somebody who has dragged a skill off the edge of the screen.
+        /// </remarks>
+        private static void ToggleArrange()
+        {
+            MobileSlotArranger.ToggleArrangeMode();
+
+            var camera = CameraFollower.Instance;
+            if (camera == null)
+                return;
+
+            camera.AppendChatText(MobileSlotArranger.ArrangeMode
+                ? "<color=#FFD479>ลากไอคอนสกิลไปวางตรงไหนก็ได้ กดปุ่มนี้อีกครั้งเมื่อจัดเสร็จ</color>"
+                : "<color=#9FE870>จัดปุ่มเสร็จแล้ว กดสกิลเพื่อใช้งานได้ตามปกติ</color>");
+        }
+
         private void PressEscape()
         {
             if (UiManager.Instance == null)
@@ -698,6 +744,23 @@ namespace Assets.Scripts.UI.Mobile
 
             buttonObject.GetComponent<Button>().onClick.AddListener(action);
 
+            //A pale rim around the fill. The fill alone is a coloured blob that disappears
+            //against anything of a similar brightness, and the map under it is every
+            //brightness at once; an outline is the one thing that reads over all of them.
+            var rimObject = new GameObject("Rim", typeof(Image));
+            rimObject.transform.SetParent(rect, false);
+
+            var rim = rimObject.GetComponent<Image>();
+            rim.sprite = ringSprite;
+            rim.color = RimColor;
+            rim.raycastTarget = false;
+
+            var rimRect = rimObject.GetComponent<RectTransform>();
+            rimRect.anchorMin = Vector2.zero;
+            rimRect.anchorMax = Vector2.one;
+            rimRect.offsetMin = Vector2.zero;
+            rimRect.offsetMax = Vector2.zero;
+
             if (icon != null)
             {
                 var iconObject = new GameObject("Icon", typeof(Image));
@@ -726,8 +789,11 @@ namespace Assets.Scripts.UI.Mobile
             text.font = font;
             text.text = label;
             text.alignment = TextAlignmentOptions.Center;
-            text.fontSize = size * (label.Length > 2 ? 0.28f : 0.4f);
-            text.color = new Color(1, 1, 1, 0.9f);
+            text.fontSize = size * (label.Length > 2 ? 0.3f : 0.44f);
+            //white, opaque and bold: the label is two or three characters on a small circle
+            //and there is no room for it to be subtle
+            text.color = Color.white;
+            text.fontStyle = FontStyles.Bold;
             text.raycastTarget = false;
 
             var textRect = textObject.GetComponent<RectTransform>();
@@ -829,6 +895,30 @@ namespace Assets.Scripts.UI.Mobile
                 {
                     var distance = Vector2.Distance(new Vector2(x, y), new Vector2(center, center));
                     pixels[y * IconResolution + x] = new Color(1, 1, 1, Mathf.Clamp01(radius - distance));
+                }
+            }
+
+            return BuildSprite(pixels);
+        }
+
+        /// <summary>
+        /// A ring: the outline of the circle above, a few pixels thick and soft on both
+        /// sides so it does not come out as a staircase at the size it is drawn.
+        /// </summary>
+        private static Sprite CreateRingSprite()
+        {
+            var pixels = NewTransparentBuffer();
+            var center = (IconResolution - 1) * 0.5f;
+            var radius = center - 1.5f;
+            var thickness = IconResolution * 0.055f;
+
+            for (var y = 0; y < IconResolution; y++)
+            {
+                for (var x = 0; x < IconResolution; x++)
+                {
+                    var distance = Vector2.Distance(new Vector2(x, y), new Vector2(center, center));
+                    var alpha = Mathf.Clamp01(thickness - Mathf.Abs(distance - radius + thickness * 0.5f));
+                    pixels[y * IconResolution + x] = new Color(1, 1, 1, alpha);
                 }
             }
 

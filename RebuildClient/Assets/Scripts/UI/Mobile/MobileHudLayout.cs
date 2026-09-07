@@ -34,9 +34,22 @@ namespace Assets.Scripts.UI.Mobile
 
         /// <summary>
         /// The share of the width the readout may take before the minimap gets the rest.
-        /// It carries seven lines of text and degrades worse than a picture does.
+        ///
+        /// It carries seven lines of text and degrades worse than a picture does, which is
+        /// why it used to get well over half the width. On a phone that is most of the top
+        /// of the screen given to numbers that do not change from one second to the next,
+        /// so it takes a smaller share now and folds away entirely at a tap.
         /// </summary>
-        private const float ReadoutShare = 0.56f;
+        private const float ReadoutShare = 0.4f;
+
+        /// <summary>
+        /// What the minimap keeps of the room left over.
+        ///
+        /// The map is a picture and reads perfectly well small, and the room this gives back
+        /// is the top right corner of the screen - which is where the thing you are walking
+        /// towards usually is.
+        /// </summary>
+        private const float MinimapShrink = 0.8f;
 
         /// <summary>
         /// The most of the screen's height the hotbar column may run down, measured from the
@@ -87,6 +100,7 @@ namespace Assets.Scripts.UI.Mobile
 
         private float applyTimer;
         private bool reportedOnce;
+        private bool subscribed;
 
         //reused rather than allocated on every layout pass, which runs on a timer forever
         private readonly List<RectTransform> slots = new List<RectTransform>();
@@ -107,6 +121,16 @@ namespace Assets.Scripts.UI.Mobile
 
         private void Update()
         {
+            //A mode the player just turned on has to take effect now rather than within the
+            //second this otherwise runs on: the only sign it is on is that the buttons
+            //behave differently, and a second of them behaving the old way reads as the
+            //button not having worked.
+            if (!subscribed)
+            {
+                subscribed = true;
+                MobileSlotArranger.ModeChanged += () => applyTimer = 0f;
+            }
+
             applyTimer -= Time.deltaTime;
             if (applyTimer > 0f)
                 return;
@@ -178,6 +202,20 @@ namespace Assets.Scripts.UI.Mobile
 
             if (readoutRect != null)
             {
+                //Folded away rather than scaled to nothing: the numbers are worth having
+                //when they are wanted, and the rest of the time they are the largest thing
+                //on screen. The toggle that flips this lives on the touch controls.
+                var wanted = !MobileHudVisibility.ReadoutHidden;
+                if (readoutRect.gameObject.activeSelf != wanted)
+                    readoutRect.gameObject.SetActive(wanted);
+
+                //with it away the hotbar starts at the top of the screen in its place
+                if (!wanted)
+                    readoutRect = null;
+            }
+
+            if (readoutRect != null)
+            {
                 var natural = readoutRect.rect.size;
                 if (natural.x < 1f || natural.y < 1f)
                 {
@@ -213,7 +251,7 @@ namespace Assets.Scripts.UI.Mobile
                 var natural = minimapRect.rect.size;
                 var scale = natural.x > 1f ? Mathf.Min(available / natural.x, 1f) : 1f;
 
-                minimapRect.localScale = Vector3.one * scale;
+                minimapRect.localScale = Vector3.one * scale * MinimapShrink;
                 PinToCorner(canvas, minimapRect, new Vector2(1, 1));
             }
 
@@ -298,10 +336,21 @@ namespace Assets.Scripts.UI.Mobile
             //capped: the cap decides how wide, this decides how deep.
             perColumn = Mathf.CeilToInt(slots.Count / (float)columns);
 
+            //Anything the player dragged somewhere keeps its place; everything else fills
+            //the column, and the column closes up behind whatever was taken out of it.
+            var placed = 0;
             for (var i = 0; i < slots.Count; i++)
             {
-                var column = i / perColumn;
-                var row = i % perColumn;
+                var entry = slots[i].GetComponent<SkillHotbarEntry>();
+                if (entry != null && MobileSlotArranger.TryGetPosition(entry.Id, out var custom))
+                {
+                    Place(slots[i], new Vector2(0, 1), custom, slot);
+                    continue;
+                }
+
+                var column = placed / perColumn;
+                var row = placed % perColumn;
+                placed++;
 
                 Place(slots[i], new Vector2(0, 1),
                     new Vector2(column * (slot.x + SlotGap), -row * (slot.y + SlotGap)), slot);
@@ -324,9 +373,20 @@ namespace Assets.Scripts.UI.Mobile
             if (band > 1f && height * scale > band)
                 scale = Mathf.Min(scale, band / height);
 
-            bar.localScale = Vector3.one * Mathf.Clamp(scale, MinSlotScale, 1f);
-
-            PinToCorner(canvas, bar, new Vector2(0, 1), readoutHeight + Gap);
+            //Once anything has been placed by hand the bar is left at full size and pinned
+            //to the top left corner without an inset, because a saved position is measured
+            //from that corner: shrinking or shifting the bar afterwards would carry every
+            //button the player placed along with it.
+            if (MobileSlotArranger.HasAny)
+            {
+                bar.localScale = Vector3.one;
+                PinToCorner(canvas, bar, new Vector2(0, 1));
+            }
+            else
+            {
+                bar.localScale = Vector3.one * Mathf.Clamp(scale, MinSlotScale, 1f);
+                PinToCorner(canvas, bar, new Vector2(0, 1), readoutHeight + Gap);
+            }
         }
 
         /// <summary>
@@ -349,10 +409,30 @@ namespace Assets.Scripts.UI.Mobile
             if (hotbar == null)
                 return;
 
+            var arranging = touch && MobileSlotArranger.ArrangeMode;
+
             foreach (var entry in hotbar.GetComponentsInChildren<SkillHotbarEntry>(true))
             {
                 if (entry.DragItem != null)
+                {
                     entry.DragItem.ActivateOnSingleClick = touch;
+
+                    //Switched off rather than worked around: while it is on it answers every
+                    //touch that lands on a slot, and a disabled behaviour is skipped when the
+                    //event system looks for who wants the drag - which is what lets the slot
+                    //underneath it hear one at all.
+                    if (entry.DragItem.enabled == arranging)
+                        entry.DragItem.enabled = !arranging;
+                }
+
+                var mover = entry.GetComponent<MobileSlotDragger>();
+                if (touch && mover == null)
+                {
+                    mover = entry.gameObject.AddComponent<MobileSlotDragger>();
+                    mover.Entry = entry;
+                }
+                else if (!touch && mover != null)
+                    Destroy(mover);
 
                 if (entry.HotkeyText != null && entry.HotkeyText.gameObject.activeSelf == touch)
                     entry.HotkeyText.gameObject.SetActive(!touch);
