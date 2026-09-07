@@ -87,7 +87,7 @@ public class Player : IEntityAutoReset
     /// joining one again brings it back; the plate only draws the line at all when there
     /// is a guild name to put in front of it.
     /// </summary>
-    public string GuildTitle = "";
+    [EntityIgnoreNullCheck] public string GuildTitle = "";
     public EntityValueList<float> RecentAttackersList = null!;
     private float lastAttackerListCheckUpdate;
     public float ShoutCooldown;
