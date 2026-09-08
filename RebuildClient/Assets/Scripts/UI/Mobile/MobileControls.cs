@@ -208,6 +208,7 @@ namespace Assets.Scripts.UI.Mobile
             //The two that change the screen rather than the character: fold the readout
             //away, and pick the skill buttons up and put them where they are wanted.
             AddUtil(ZoomColor, null, ToggleReadout, "HP");
+            AddUtil(ZoomColor, null, MobileHudVisibility.ToggleHotbar, ThaiUiText.Get("Bar"));
             AddUtil(ZoomColor, null, ToggleArrange, ThaiUiText.Get("Arrange"));
 
             toggleButton = CreateButton(root, new Vector2(-24, 96), ToggleSize, ZoomColor, CreateMenuSprite(), ToggleControls);

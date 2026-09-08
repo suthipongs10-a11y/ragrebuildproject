@@ -56,6 +56,11 @@ namespace Assets.Scripts.UI.ConfigWindow
         /// <summary>Whether the character readout is folded away, on a phone.</summary>
         public bool MobileHideReadout = false;
 
+        /// <summary>
+        /// Whether the hotbar column is put away, leaving only the slots dragged out of it.
+        /// </summary>
+        public bool MobileHideHotbar = false;
+
         public bool AutoLockSkillWindow = false;
         public bool ShowAllSkillsInSkillWindow = false;
         //character overlay

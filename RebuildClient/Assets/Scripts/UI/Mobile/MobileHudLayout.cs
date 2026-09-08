@@ -293,6 +293,8 @@ namespace Assets.Scripts.UI.Mobile
             if (hotbar.ResizeHandle != null && hotbar.ResizeHandle.gameObject.activeSelf)
                 hotbar.ResizeHandle.gameObject.SetActive(false);
 
+            var bar = (RectTransform)hotbar.transform;
+
             var slot = FirstSlotSize(container);
             if (slot.x <= 1f || slot.y <= 1f)
                 return;
@@ -338,11 +340,18 @@ namespace Assets.Scripts.UI.Mobile
 
             //Anything the player dragged somewhere keeps its place; everything else fills
             //the column, and the column closes up behind whatever was taken out of it.
+            var hideColumn = MobileHudVisibility.HotbarHidden;
             var placed = 0;
             for (var i = 0; i < slots.Count; i++)
             {
                 var entry = slots[i].GetComponent<SkillHotbarEntry>();
-                if (entry != null && MobileSlotArranger.TryGetPosition(entry.Id, out var custom))
+                var moved = entry != null && MobileSlotArranger.TryGetPosition(entry.Id, out var custom);
+
+                //A slot that was dragged out is its own button now and survives the bar
+                //being put away; the rest of the column goes with the bar.
+                SetSlotShown(slots[i], moved || !hideColumn);
+
+                if (moved)
                 {
                     Place(slots[i], new Vector2(0, 1), custom, slot);
                     continue;
@@ -356,11 +365,13 @@ namespace Assets.Scripts.UI.Mobile
                     new Vector2(column * (slot.x + SlotGap), -row * (slot.y + SlotGap)), slot);
             }
 
+            //the frame the column stood in, which has nothing left to frame
+            SetFrameShown(bar, container, !hideColumn);
+
             var width = columns * slot.x + (columns - 1) * SlotGap;
             var height = Mathf.Min(perColumn, slots.Count) * slot.y
                          + (Mathf.Min(perColumn, slots.Count) - 1) * SlotGap;
 
-            var bar = (RectTransform)hotbar.transform;
             Place(container, new Vector2(0, 1), Vector2.zero, new Vector2(width, height));
             Place(bar, new Vector2(0, 1), Vector2.zero, new Vector2(width, height));
 
@@ -449,6 +460,53 @@ namespace Assets.Scripts.UI.Mobile
                 else if (!touch && tap != null)
                     Destroy(tap);
             }
+        }
+
+        /// <summary>
+        /// Shows or hides one slot without deactivating it.
+        /// </summary>
+        /// <remarks>
+        /// Through a canvas group rather than SetActive, because the pass that gathers the
+        /// slots only looks at the ones that are active - switch one off and it is not
+        /// there to be switched back on, so the bar could be put away and never recovered.
+        /// A group at zero alpha that refuses the pointer is invisible and untouchable and
+        /// still, as far as everything else is concerned, present.
+        /// </remarks>
+        private static void SetSlotShown(RectTransform slot, bool shown)
+        {
+            var group = slot.GetComponent<CanvasGroup>();
+            if (group == null)
+            {
+                if (shown)
+                    return;
+
+                group = slot.gameObject.AddComponent<CanvasGroup>();
+            }
+
+            var alpha = shown ? 1f : 0f;
+            if (!Mathf.Approximately(group.alpha, alpha))
+                group.alpha = alpha;
+            if (group.blocksRaycasts != shown)
+                group.blocksRaycasts = shown;
+            if (group.interactable != shown)
+                group.interactable = shown;
+        }
+
+        /// <summary>
+        /// Shows or hides the bar's own backing, which is drawn on the bar and the container
+        /// rather than on any slot.
+        /// </summary>
+        private static void SetFrameShown(RectTransform bar, RectTransform container, bool shown)
+        {
+            SetImageShown(bar, shown);
+            SetImageShown(container, shown);
+        }
+
+        private static void SetImageShown(RectTransform rect, bool shown)
+        {
+            var image = rect.GetComponent<Image>();
+            if (image != null && image.enabled != shown)
+                image.enabled = shown;
         }
 
         /// <summary>The size of the first slot found, which every other one shares.</summary>

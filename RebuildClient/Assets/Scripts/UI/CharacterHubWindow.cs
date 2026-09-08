@@ -40,6 +40,9 @@ namespace Assets.Scripts.UI
         //point: you can read your stats or your skills and still see who you are reading
         //them for.
         private const float StageWidth = 292f;
+
+        /// <summary>How much of its full size this window is drawn at on a phone.</summary>
+        private const float MobileScale = 0.85f;
         private const float StageGap = 16f;
 
         private readonly List<WindowBase> pages = new List<WindowBase>();
@@ -365,6 +368,12 @@ namespace Assets.Scripts.UI
 
             var root = (RectTransform)transform;
             root.sizeDelta = new Vector2(width, height);
+
+            //On a phone the window is sized for the pages inside it and comes out covering
+            //the whole screen, which for a window you open to check one number and close
+            //again is more of the game hidden than it is worth. Scaled rather than resized,
+            //so every page inside keeps the proportions it was laid out with.
+            root.localScale = Vector3.one * (Mobile.MobileMode.IsActive ? MobileScale : 1f);
 
             LayoutTabs();
         }

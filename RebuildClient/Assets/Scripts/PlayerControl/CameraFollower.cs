@@ -511,8 +511,13 @@ namespace Assets.Scripts
                 Rotation = PlayerPrefs.GetFloat("cameraX", 0);
                 Height = PlayerPrefs.GetFloat("cameraY", 50);
                 TargetRotation = Rotation;
-                Distance = 60;
                 zoomRange = new Vector2(30, 90);
+                //As far out as the map allows. It used to start two thirds of the way in,
+                //which on a phone is a view of the character and the four tiles around
+                //them - and what a player needs to see is where the monsters are coming
+                //from. Anybody who prefers it close pinches in and stays there: this only
+                //decides where the camera starts.
+                Distance = zoomRange.y;
                 lockCamera = false;
             }
 
@@ -523,10 +528,10 @@ namespace Assets.Scripts
                 DefaultRotation = 45;
                 TargetRotation = Rotation;
                 lockCamera = true;
-                Distance = 55;
                 rotationRange = new Vector2(40, 60);
                 heightRange = new Vector2(35, 65);
                 zoomRange = new Vector2(25, 80);
+                Distance = zoomRange.y;
             }
 
 #if UNITY_EDITOR

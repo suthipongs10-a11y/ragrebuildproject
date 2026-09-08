@@ -48,6 +48,7 @@ namespace Assets.Scripts.UI
             { "ChatRoom", "ห้องแชท" },
             //on the touch controls, where a label has room for about three characters
             { "Arrange", "จัด" },
+            { "Bar", "ลัด" },
 
             //--- headers the rebuilt windows put under their titles
             { "Guide", "คำแนะนำ" },

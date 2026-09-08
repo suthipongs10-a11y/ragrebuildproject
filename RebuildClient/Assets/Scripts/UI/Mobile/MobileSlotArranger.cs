@@ -148,6 +148,35 @@ namespace Assets.Scripts.UI.Mobile
     /// </remarks>
     public static class MobileHudVisibility
     {
+        /// <summary>
+        /// Whether the hotbar column is put away.
+        /// </summary>
+        /// <remarks>
+        /// Only the column. Anything the player dragged out of it stays exactly where they
+        /// put it and keeps working, which is the whole point of putting the bar away: the
+        /// four skills somebody actually uses end up under their thumbs, and the rest of
+        /// the bar is a row of empty squares over the map until it is asked for again.
+        /// </remarks>
+        public static bool HotbarHidden
+        {
+            get
+            {
+                GameConfig.InitializeIfNecessary();
+                return GameConfig.Data != null && GameConfig.Data.MobileHideHotbar;
+            }
+            set
+            {
+                GameConfig.InitializeIfNecessary();
+                if (GameConfig.Data == null || GameConfig.Data.MobileHideHotbar == value)
+                    return;
+
+                GameConfig.Data.MobileHideHotbar = value;
+                GameConfig.SaveConfig();
+            }
+        }
+
+        public static void ToggleHotbar() => HotbarHidden = !HotbarHidden;
+
         public static bool ReadoutHidden
         {
             get
