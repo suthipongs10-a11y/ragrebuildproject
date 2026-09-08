@@ -34,6 +34,21 @@ namespace Assets.Scripts.UI.Mobile
         /// <summary>Raised when the mode turns on or off, so the layout can re-apply itself.</summary>
         public static System.Action ModeChanged;
 
+        /// <summary>
+        /// Which way a saved position is measured, written into every line.
+        /// </summary>
+        /// <remarks>
+        /// Bumped when the meaning changes, which is the only way a number kept between
+        /// sessions can be reinterpreted safely: a stale line is dropped rather than read
+        /// as something it never was.
+        /// </remarks>
+        private const string Version = "2";
+
+        //Every position is an offset from the top left corner of the screen, in canvas
+        //units, rather than from the hotbar it came out of. The hotbar is scaled to fit and
+        //pinned under a readout that folds away, so a position measured from it means
+        //something different every time either of those changes - which is how a button
+        //dropped in the middle of the screen ended up above the top of it.
         private static readonly Dictionary<int, Vector2> positions = new Dictionary<int, Vector2>();
         private static bool loaded;
 
@@ -78,6 +93,52 @@ namespace Assets.Scripts.UI.Mobile
         }
 
         // =====================================================================
+        // Measured against the screen
+
+        /// <summary>The canvas everything is placed against, asked for the same way twice.</summary>
+        private static RectTransform CanvasRect()
+        {
+            var follower = CameraFollower.Instance;
+            var canvas = follower != null ? follower.UiCanvas : null;
+            if (canvas == null)
+                return null;
+
+            var root = canvas.rootCanvas != null ? canvas.rootCanvas : canvas;
+            return root.transform as RectTransform;
+        }
+
+        /// <summary>
+        /// How far a rect's top left corner sits from the screen's, in canvas units, with
+        /// y counted downward.
+        /// </summary>
+        public static bool TryReadScreenOffset(RectTransform rect, out Vector2 offset)
+        {
+            offset = Vector2.zero;
+
+            var canvas = CanvasRect();
+            if (canvas == null || rect == null)
+                return false;
+
+            var local = (Vector2)canvas.InverseTransformPoint(rect.position);
+            var bounds = canvas.rect;
+            offset = new Vector2(local.x - bounds.xMin, bounds.yMax - local.y);
+            return true;
+        }
+
+        /// <summary>Puts a rect back at an offset read by TryReadScreenOffset.</summary>
+        public static bool ApplyScreenOffset(RectTransform rect, Vector2 offset)
+        {
+            var canvas = CanvasRect();
+            if (canvas == null || rect == null)
+                return false;
+
+            var bounds = canvas.rect;
+            rect.position = canvas.TransformPoint(
+                new Vector3(bounds.xMin + offset.x, bounds.yMax - offset.y, 0f));
+            return true;
+        }
+
+        // =====================================================================
         // Kept between sessions
 
         private static void Load()
@@ -97,11 +158,13 @@ namespace Assets.Scripts.UI.Mobile
                 if (string.IsNullOrEmpty(line))
                     continue;
 
-                //"id:x:y", and anything that is not that is a line from an older build or a
-                //hand edited file - dropped rather than argued with, which costs one button
-                //its place instead of costing the bar its layout
+                //"id:x:y:2", and anything that is not that is dropped rather than argued
+                //with, which costs one button its place instead of costing the bar its
+                //layout. The trailing 2 is the version: the first build measured a position
+                //from the corner of the hotbar, which moves and is scaled, so those numbers
+                //mean nothing now and three-part lines are left behind on purpose.
                 var parts = line.Split(':');
-                if (parts.Length != 3)
+                if (parts.Length != 4 || parts[3] != Version)
                     continue;
 
                 if (!int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out var id)
@@ -129,8 +192,8 @@ namespace Assets.Scripts.UI.Mobile
             saved.Clear();
             foreach (var pair in positions)
             {
-                saved.Add(string.Format(CultureInfo.InvariantCulture, "{0}:{1:0.##}:{2:0.##}",
-                    pair.Key, pair.Value.x, pair.Value.y));
+                saved.Add(string.Format(CultureInfo.InvariantCulture, "{0}:{1:0.##}:{2:0.##}:{3}",
+                    pair.Key, pair.Value.x, pair.Value.y, Version));
             }
 
             GameConfig.SaveConfig();
@@ -211,50 +274,60 @@ namespace Assets.Scripts.UI.Mobile
     /// </remarks>
     public class MobileSlotDragger : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
     {
+        /// <summary>The slot this drag moves, which is not always the object it lands on.</summary>
+        public RectTransform Target;
+
         public SkillHotbarEntry Entry;
 
         private Vector2 grabOffset;
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if (!MobileSlotArranger.ArrangeMode)
-                return;
-
-            var rect = (RectTransform)transform;
-            var parent = rect.parent as RectTransform;
-            if (parent == null)
+            if (!MobileSlotArranger.ArrangeMode || Target == null)
                 return;
 
             //where inside the slot the finger landed, so the button does not jump its own
             //width the moment it is picked up
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parent, eventData.position,
-                    eventData.pressEventCamera, out var local))
-                grabOffset = rect.anchoredPosition - local;
+            if (TryPoint(eventData, out var local))
+                grabOffset = Target.anchoredPosition - local;
 
-            rect.SetAsLastSibling();
+            Target.SetAsLastSibling();
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (!MobileSlotArranger.ArrangeMode)
+            if (!MobileSlotArranger.ArrangeMode || Target == null)
                 return;
 
-            var rect = (RectTransform)transform;
-            var parent = rect.parent as RectTransform;
-            if (parent == null)
-                return;
-
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(parent, eventData.position,
-                    eventData.pressEventCamera, out var local))
-                rect.anchoredPosition = local + grabOffset;
+            if (TryPoint(eventData, out var local))
+                Target.anchoredPosition = local + grabOffset;
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            if (!MobileSlotArranger.ArrangeMode || Entry == null)
+            if (!MobileSlotArranger.ArrangeMode || Target == null || Entry == null)
                 return;
 
-            MobileSlotArranger.SetPosition(Entry.Id, ((RectTransform)transform).anchoredPosition);
+            //Recorded against the screen rather than against the bar, so the button stays
+            //where it was let go of whatever the bar does afterwards.
+            if (MobileSlotArranger.TryReadScreenOffset(Target, out var offset))
+                MobileSlotArranger.SetPosition(Entry.Id, offset);
+        }
+
+        /// <summary>
+        /// Where the finger is, in the units the slot's own position is written in.
+        /// </summary>
+        /// <remarks>
+        /// Asked of the parent rather than accumulated from deltas: a delta is in screen
+        /// pixels and the parent may be scaled, so over a long drag the two drift apart and
+        /// the button ends up somewhere the finger never was.
+        /// </remarks>
+        private bool TryPoint(PointerEventData eventData, out Vector2 local)
+        {
+            local = Vector2.zero;
+            var parent = Target.parent as RectTransform;
+            return parent != null && RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                parent, eventData.position, eventData.pressEventCamera, out local);
         }
     }
 }

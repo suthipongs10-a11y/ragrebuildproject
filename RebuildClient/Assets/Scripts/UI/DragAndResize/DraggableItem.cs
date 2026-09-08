@@ -55,11 +55,28 @@ namespace Assets.Scripts.UI
             manager = UiManager.Instance;
         }
 
+        /// <summary>
+        /// Stops this from answering a drag, without switching the component off.
+        /// </summary>
+        /// <remarks>
+        /// The phone's arrange mode needs the drag to reach the slot rather than the thing
+        /// inside it, and the first version of that disabled this component to get out of
+        /// the way. That loses the drag halfway through: a disabled behaviour is never sent
+        /// OnEndDrag, so the icon hidden by OnBeginDrag was never shown again and the skill
+        /// looked like it had been deleted. Refusing the drag while staying enabled means
+        /// the end of one always arrives.
+        /// </remarks>
+        [NonSerialized] public bool SuppressDrag;
+
+        /// <summary>Whether a drag of this item is actually in flight, see SuppressDrag.</summary>
+        private bool dragging;
+
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if (Type == DragItemType.SocketedItem)
+            if (Type == DragItemType.SocketedItem || SuppressDrag)
                 return;
-            
+
+            dragging = true;
             manager.StartItemDrag(this);
             manager.DragItemObject.Origin = Origin;
             manager.DragItemObject.OriginId = OriginId;
@@ -70,11 +87,17 @@ namespace Assets.Scripts.UI
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            manager.EndItemDrag();
-
+            //Shown again first and unconditionally: whatever happened to the drag in
+            //between, the icon being visible is never the wrong answer at the end of one.
             Image.enabled = true;
             if(CountText != null)
                 CountText.enabled = true;
+
+            if (!dragging)
+                return;
+
+            dragging = false;
+            manager.EndItemDrag();
         }
 
         public void OnDrag(PointerEventData eventData)

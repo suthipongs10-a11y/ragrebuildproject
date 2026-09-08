@@ -346,19 +346,18 @@ namespace Assets.Scripts.UI.Mobile
             {
                 var entry = slots[i].GetComponent<SkillHotbarEntry>();
 
-                //Declared up here rather than inside the test: written as an out on the
-                //right of an && it is only assigned when the left side passed, and the
-                //compiler will not take "moved is true so it must have been" for an answer.
-                var custom = Vector2.zero;
-                var moved = entry != null && MobileSlotArranger.TryGetPosition(entry.Id, out custom);
+                var moved = entry != null && MobileSlotArranger.TryGetPosition(entry.Id, out _);
 
                 //A slot that was dragged out is its own button now and survives the bar
                 //being put away; the rest of the column goes with the bar.
                 SetSlotShown(slots[i], moved || !hideColumn);
 
+                //Sized and anchored like any other slot; where it actually goes is settled
+                //after the bar has finished moving, because the offset it was left at is
+                //measured from the corner of the screen rather than from the bar.
                 if (moved)
                 {
-                    Place(slots[i], new Vector2(0, 1), custom, slot);
+                    Place(slots[i], new Vector2(0, 1), Vector2.zero, slot);
                     continue;
                 }
 
@@ -389,19 +388,17 @@ namespace Assets.Scripts.UI.Mobile
             if (band > 1f && height * scale > band)
                 scale = Mathf.Min(scale, band / height);
 
-            //Once anything has been placed by hand the bar is left at full size and pinned
-            //to the top left corner without an inset, because a saved position is measured
-            //from that corner: shrinking or shifting the bar afterwards would carry every
-            //button the player placed along with it.
-            if (MobileSlotArranger.HasAny)
+            bar.localScale = Vector3.one * Mathf.Clamp(scale, MinSlotScale, 1f);
+            PinToCorner(canvas, bar, new Vector2(0, 1), readoutHeight + Gap);
+
+            //Last, because the bar has only now finished moving and being scaled, and a
+            //slot placed against the screen has to be put back afterwards or it is carried
+            //along with the bar it is no longer part of.
+            for (var i = 0; i < slots.Count; i++)
             {
-                bar.localScale = Vector3.one;
-                PinToCorner(canvas, bar, new Vector2(0, 1));
-            }
-            else
-            {
-                bar.localScale = Vector3.one * Mathf.Clamp(scale, MinSlotScale, 1f);
-                PinToCorner(canvas, bar, new Vector2(0, 1), readoutHeight + Gap);
+                var entry = slots[i].GetComponent<SkillHotbarEntry>();
+                if (entry != null && MobileSlotArranger.TryGetPosition(entry.Id, out var placedAt))
+                    MobileSlotArranger.ApplyScreenOffset(slots[i], placedAt);
             }
         }
 
@@ -433,22 +430,24 @@ namespace Assets.Scripts.UI.Mobile
                 {
                     entry.DragItem.ActivateOnSingleClick = touch;
 
-                    //Switched off rather than worked around: while it is on it answers every
-                    //touch that lands on a slot, and a disabled behaviour is skipped when the
-                    //event system looks for who wants the drag - which is what lets the slot
-                    //underneath it hear one at all.
-                    if (entry.DragItem.enabled == arranging)
-                        entry.DragItem.enabled = !arranging;
+                    //Told to refuse the drag rather than switched off. A disabled behaviour
+                    //never hears the end of a drag it already started, and this one hides
+                    //the icon at the start of one and shows it again at the end - so
+                    //switching it off midway left the slot looking empty for good.
+                    entry.DragItem.SuppressDrag = arranging;
+
+                    //And if one was lost that way before this existed, put it back.
+                    if (!arranging && entry.DragItem.Image != null && !entry.DragItem.Image.enabled)
+                        entry.DragItem.Image.enabled = true;
                 }
 
-                var mover = entry.GetComponent<MobileSlotDragger>();
-                if (touch && mover == null)
-                {
-                    mover = entry.gameObject.AddComponent<MobileSlotDragger>();
-                    mover.Entry = entry;
-                }
-                else if (!touch && mover != null)
-                    Destroy(mover);
+                //One mover on the slot and one on the icon inside it. The event system
+                //hands a drag to the first object up the chain that wants it, and while a
+                //slot holds something that object is the icon; an empty slot has its icon
+                //switched off entirely, so there the slot itself is what gets asked.
+                AttachMover(entry.gameObject, entry, touch);
+                if (entry.DragItem != null)
+                    AttachMover(entry.DragItem.gameObject, entry, touch);
 
                 if (entry.HotkeyText != null && entry.HotkeyText.gameObject.activeSelf == touch)
                     entry.HotkeyText.gameObject.SetActive(!touch);
@@ -465,6 +464,25 @@ namespace Assets.Scripts.UI.Mobile
                 else if (!touch && tap != null)
                     Destroy(tap);
             }
+        }
+
+        /// <summary>Puts a mover on one object, or takes the one that is there away.</summary>
+        private static void AttachMover(GameObject host, SkillHotbarEntry entry, bool wanted)
+        {
+            var mover = host.GetComponent<MobileSlotDragger>();
+
+            if (wanted)
+            {
+                if (mover == null)
+                    mover = host.AddComponent<MobileSlotDragger>();
+
+                mover.Entry = entry;
+                mover.Target = (RectTransform)entry.transform;
+                return;
+            }
+
+            if (mover != null)
+                Destroy(mover);
         }
 
         /// <summary>
