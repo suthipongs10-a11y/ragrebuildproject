@@ -452,8 +452,13 @@ public partial class CombatEntity
 
         var eleMod = 100;
         if (!evade && !flags.HasFlag(AttackFlags.NoElement) && attackElement != AttackElement.Special)
-            eleMod = target.GetElementalReductionForReceivedAttack(this, attackElement,
-                attackerType == CharacterType.Monster && target.Character.Type == CharacterType.Player);
+            //Ghost armor used to be zeroed out here specifically when a monster hit a
+            //player, which made Ghostring Card do nothing against the attacks it exists
+            //for. It now gets the same partial reduction (25% against an unelemental
+            //physical hit, per Ghost1's own row in the elemental chart) that it already
+            //gave against everything else - real, but not the near-immunity the card has
+            //in other versions of this game.
+            eleMod = target.GetElementalReductionForReceivedAttack(this, attackElement);
 
         //{
         //    //attacks made with AttackElement.None will take the attacker's weapon element or arrow element for bows. Monsters just default neutral.
