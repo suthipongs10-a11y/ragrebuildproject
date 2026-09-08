@@ -345,7 +345,12 @@ namespace Assets.Scripts.UI.Mobile
             for (var i = 0; i < slots.Count; i++)
             {
                 var entry = slots[i].GetComponent<SkillHotbarEntry>();
-                var moved = entry != null && MobileSlotArranger.TryGetPosition(entry.Id, out var custom);
+
+                //Declared up here rather than inside the test: written as an out on the
+                //right of an && it is only assigned when the left side passed, and the
+                //compiler will not take "moved is true so it must have been" for an answer.
+                var custom = Vector2.zero;
+                var moved = entry != null && MobileSlotArranger.TryGetPosition(entry.Id, out custom);
 
                 //A slot that was dragged out is its own button now and survives the bar
                 //being put away; the rest of the column goes with the bar.
