@@ -266,6 +266,11 @@ namespace Assets.Scripts.PlayerControl
             //rather than only to the ones already there, so somebody who reaches it while
             //you are standing next to them lights up without anything being sent.
             Assets.Scripts.Network.PlayerLevelAura.Attach(control);
+
+            //Same idea for Adventure Book rank, except the server only ever tells a client
+            //its own rank, so this only keeps itself attached on the local player - Attach
+            //drops the request for anybody else.
+            Assets.Scripts.Network.AdventureRankAura.Attach(control);
             //AddressableUtility.LoadSprite(go, "shadow", control.AttachShadow);
 
             var state = PlayerState.Instance;
