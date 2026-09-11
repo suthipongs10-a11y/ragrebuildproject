@@ -1,0 +1,163 @@
+//A priest who walks the starting field handing out buffs to anybody she runs into.
+//
+//Built on the same pathing block the Mipp npc in NpcTest3 uses: the npc wanders, looks for
+//somebody within sight, walks over and talks. What is new here is BuffTarget, which hands a
+//skill to the player it found through that player's own indirect cast queue - so every buff
+//is the real skill with the real handler behind it, not a copy of one.
+//
+//Every line she says is picked out of a handful, and the buffs past the first two are rolled
+//for, so two visits in a row do not read as the same npc playing back the same tape.
+//
+//Suffragium is capped at level 3 on purpose: its duration is 40 - lvl * 10 seconds, so level
+//four and up would hand over a buff that has already expired.
+
+macro SisterGreet()
+{
+	LookAtTarget();
+	Wait(0.6s);
+
+	var pick = Random(0, 5);
+	if(pick == 0) Say("อ้าว! เจอคนพอดี รอเดี๋ยวนะ");
+	if(pick == 1) Say("สวัสดีจ้า นักผจญภัย!");
+	if(pick == 2) Say("เฮ้ ๆ ตรงนั้น! อย่าเพิ่งไปไหนนะ");
+	if(pick == 3) Say("ขอโทษที่ขัดจังหวะนะ แต่เห็นแล้วอดไม่ได้");
+	if(pick == 4) Say("วันนี้อากาศดี เหมาะกับการแจกบัฟมาก");
+	Wait(1.2s);
+
+	Emote(3); //heart
+	PathToTarget(2);
+	LookAtTarget();
+	Wait(0.8s);
+
+	var pick = Random(0, 5);
+	if(pick == 0) Say("ข้าชื่อลูน่า เป็นซิสเตอร์เร่ร่อน ไม่รับเงินนะ รับแต่รอยยิ้ม");
+	if(pick == 1) Say("ยืนนิ่ง ๆ แป๊บนึงนะ เดี๋ยวจัดชุดใหญ่ให้");
+	if(pick == 2) Say("เห็นเดินตัวเปล่าแบบนี้ไม่ได้ เดี๋ยวข้าเสริมให้หน่อย");
+	if(pick == 3) Say("มาพอดีเลย ข้าเพิ่งสวดมนต์เสร็จ พลังเหลือเยอะ");
+	if(pick == 4) Say("ไม่ต้องเกรงใจ ของฟรีทั้งนั้น");
+	Wait(1.4s);
+}
+
+macro SisterBuffs()
+{
+	var pick = Random(0, 4);
+	if(pick == 0) Say("เอาล่ะ... ขอพรจากเทพเจ้าจงสถิตกับเจ้า");
+	if(pick == 1) Say("หลับตาสักครู่นะ");
+	if(pick == 2) Say("มาแล้วนะ ตั้งรับดี ๆ");
+	if(pick == 3) Say("สูดหายใจลึก ๆ...");
+	Wait(0.8s);
+
+	//The two nobody ever turns down, then a few more out of the hat. Each one is handed
+	//over with its own delay so they land one after another instead of all in one frame -
+	//a row of effects reads as a blessing, one frame of overlapping effects reads as a bug.
+	BuffTarget("Blessing", 10, 200);
+	BuffTarget("IncreaseAgility", 10, 900);
+
+	if(Random(0, 100) < 60) BuffTarget("Angelus", 10, 1600);
+	if(Random(0, 100) < 55) BuffTarget("KyrieEleison", 10, 2300);
+	if(Random(0, 100) < 50) BuffTarget("Magnificat", 5, 3000);
+	if(Random(0, 100) < 50) BuffTarget("Gloria", 5, 3700);
+	if(Random(0, 100) < 45) BuffTarget("ImpositioManus", 5, 4400);
+	if(Random(0, 100) < 45) BuffTarget("Aspersio", 5, 5100);
+	if(Random(0, 100) < 35) BuffTarget("Suffragium", 3, 5800);
+
+	//and the heal last, so the numbers pop after the lights have finished
+	BuffTarget("Heal", 10, 6500);
+
+	Wait(2s);
+	var pick = Random(0, 5);
+	if(pick == 0) Say("เบส อไจ มาครบแล้วนะ");
+	if(pick == 1) Say("โอ๊ะ วันนี้มือขึ้น ได้เยอะกว่าปกติ");
+	if(pick == 2) Say("รู้สึกตัวเบาขึ้นไหม? นั่นแหละอไจ");
+	if(pick == 3) Say("เดี๋ยวมีของแถมอีกนิดหน่อย");
+	if(pick == 4) Say("ยังไม่หมดนะ รออีกแป๊บ");
+	Wait(2.5s);
+
+	var pick = Random(0, 5);
+	if(pick == 0) Say("เรียบร้อย! ครบชุดแล้วจ้า");
+	if(pick == 1) Say("เสร็จแล้ว ไปได้เลย");
+	if(pick == 2) Say("จัดเต็มให้แล้วนะ อย่าเพิ่งไปตายล่ะ");
+	if(pick == 3) Say("แถมฮีลปิดท้ายให้ด้วย เลือดเต็มพร้อมลุย");
+	if(pick == 4) Say("พลังของข้าหมดพอดีเป๊ะ");
+	Wait(1.5s);
+}
+
+macro SisterFarewell()
+{
+	LookAtTarget();
+
+	var pick = Random(0, 6);
+	if(pick == 0) Say("เล่นให้สนุกนะ!");
+	if(pick == 1) Say("ขอให้สนุกกับการผจญภัยนะ เจอกันใหม่!");
+	if(pick == 2) Say("เล่นให้สนุกนะ ระวังตัวด้วยล่ะ");
+	if(pick == 3) Say("โชคดีนะนักผจญภัย เล่นให้สนุก!");
+	if(pick == 4) Say("ถ้าบัฟหมดก็เดินมาหาข้าใหม่ได้ ข้าวนอยู่แถวนี้แหละ");
+	if(pick == 5) Say("ไปล่ะนะ เล่นให้สนุก!");
+	Wait(1.2s);
+
+	var pick = Random(0, 4);
+	if(pick == 0) Emote(15); //thanks
+	if(pick == 1) Emote(21); //nice
+	if(pick == 2) Emote(33); //ok
+	if(pick == 3) Emote(14); //heart2
+	Wait(1s);
+}
+
+//Said to nobody in particular while she walks, because an npc that only ever speaks when
+//spoken to reads as furniture. Kept short and not every lap - see the roll in OnPath.
+macro SisterIdleChatter()
+{
+	var pick = Random(0, 8);
+	if(pick == 0) Say("วันนี้มีใครอยู่แถวนี้บ้างนะ...");
+	if(pick == 1) Say("เดินมาทั้งวันแล้ว ยังไม่เจอใครเลย");
+	if(pick == 2) Say("ลา ลั้น ลา~");
+	if(pick == 3) Say("บัฟเหลือเยอะ ใครก็ได้มารับหน่อยเถอะ");
+	if(pick == 4) Say("แถวนี้มอนไม่ค่อยดุ เหมาะกับมือใหม่นะ");
+	if(pick == 5) Say("ถ้าเจอใครต้องรีบแจกก่อนพลังจะหมด");
+	if(pick == 6) Say("ลมเย็นดีจัง");
+	if(pick == 7) Say("เดินไปทางโน้นดีกว่า เผื่อมีคน");
+	Wait(1.5s);
+}
+
+//The name is in plain letters because the compiler builds this npc's class name out of it,
+//and it does that by dropping every character that is not a letter or a digit - a Thai name
+//would clean down to nothing at all and leave the class unnamed. Everything she says is Thai;
+//it is only the label over her head that has to be spelled this way.
+Npc("prt_fild08", "Sister Luna", "CLEAR_NPC", 156, 356, SE)
+{
+	//Dressed as what she hands out. CLEAR_NPC is the sprite that shows nothing on its own,
+	//so what is on screen is entirely this costume.
+	SetPlayerAppearance(50, "Priest", "Female", 12, 6, "Halo", "Angel_Wing_Ears", "");
+	HideNpc();
+	ShowNpc(); //so anybody already watching gets the costume rather than the empty sprite
+
+	StartPath();
+
+OnPath:
+	SetSpeed(150);
+
+	//Wandered rather than routed. A written route needs cells picked off a map nobody has
+	//surveyed, and a cell picked wrong is a cell PathTo teleports to.
+	PathToRandomTile(14);
+	Wait(0.5s);
+
+	if(FindPlayerNearby(9))
+	{
+		@SisterGreet();
+		@SisterBuffs();
+		@SisterFarewell();
+
+		//A pause after somebody has been served, so a player standing still is not buffed
+		//on a loop and the effects have room to be seen.
+		Wait(Random(25s, 50s));
+	}
+	else
+	{
+		if(Random(0, 100) < 35)
+			@SisterIdleChatter();
+
+		Wait(Random(5s, 12s));
+	}
+
+	StartPath(); //round again
+}

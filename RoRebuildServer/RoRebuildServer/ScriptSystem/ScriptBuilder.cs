@@ -936,6 +936,7 @@ public class ScriptBuilder
             pathingFunctions.Add("Wait", NpcPathUpdateResult.WaitForTime);
             pathingFunctions.Add("PathTo", NpcPathUpdateResult.WaitForMove);
             pathingFunctions.Add("PathToTarget", NpcPathUpdateResult.WaitForMove);
+            pathingFunctions.Add("PathToRandomTile", NpcPathUpdateResult.WaitForMove);
 
             return;
         }
