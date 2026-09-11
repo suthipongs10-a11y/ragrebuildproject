@@ -22,11 +22,40 @@ if (Test-Path $walk) {
     Write-Warning "No walk data at $walk - import the maps in Unity first. Without it every map is treated as fully walkable."
 }
 
-$web = Join-Path $root "RebuildClient\WebGL"
-if (Test-Path (Join-Path $web "index.html")) {
-    Copy-Item $web (Join-Path $out "WebClient") -Recurse
+# Where MOBILE.md sends the build, and where the server reads it from when you play
+# locally, so the same folder that works on this machine is the one that ships. The second
+# is where builds went before that was settled - still accepted, because a bundle quietly
+# missing its web client is only discovered on the VPS.
+$webCandidates = @(
+    (Join-Path $srv "bin\Debug\net9.0\WebClient"),
+    (Join-Path $root "RebuildClient\WebGL")
+)
+$web = $webCandidates | Where-Object { Test-Path (Join-Path $_ "index.html") } | Select-Object -First 1
+
+if ($web) {
+    Write-Host "Browser build: $web"
+    $webOut = Join-Path $out "WebClient"
+    Copy-Item $web $webOut -Recurse
+
+    # Every build leaves a new Build_<timestamp> folder and none of them are cleaned up, so
+    # a folder built in five times holds five copies of the game and index.html names one.
+    # Dropping the other four off the copy is several hundred megabytes that do not have to
+    # be zipped, uploaded over a home connection, and unpacked on a 2 GB box.
+    $match = Select-String -Path (Join-Path $webOut "index.html") -Pattern 'buildUrl\s*=\s*"([^"]+)"' | Select-Object -First 1
+    $wanted = if ($match) { $match.Matches[0].Groups[1].Value } else { $null }
+    if ($wanted) {
+        Get-ChildItem $webOut -Directory -Filter "Build_*" | Where-Object { $_.Name -ne $wanted } | ForEach-Object {
+            Write-Host "  dropping stale build $($_.Name)"
+            Remove-Item $_.FullName -Recurse -Force
+        }
+        if (-not (Test-Path (Join-Path $webOut $wanted))) {
+            throw "index.html asks for $wanted and there is no such folder. The page would load and sit on 'Loading...' forever. Delete the old Build_* folders and build again."
+        }
+    }
 } else {
-    Write-Warning "No WebGL build at $web - browser play is off until one is built there (File > Build Settings > WebGL, output folder RebuildClient\WebGL)."
+    Write-Warning "No browser build found - players will not be able to play from a browser."
+    Write-Warning "  Looked in: $($webCandidates -join ' and ')"
+    Write-Warning "  Build one with File > Build Profiles > Web > Build, into the first of those. See MOBILE.md."
 }
 
 $gm = Join-Path $srv "GmAccount.local.json"

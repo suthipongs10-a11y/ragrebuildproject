@@ -25,7 +25,15 @@
 
 1. ดึงโค้ดล่าสุด แล้วรัน `updateclient.bat`
 2. รันสคริปต์ playtest ให้ build ผ่าน แล้วลองเข้าเกมในเครื่องหนึ่งรอบ ใน log ตอนบูตต้องเห็น `[Lockdown] Created the GM account 'gmrebuild'` และ `[Gate] Online players: ...`
-3. **Build WebGL** ใน Unity: File → Build Settings → WebGL → Build ไปที่โฟลเดอร์ `RebuildClient\WebGL` (ต้องมี `index.html` ในนั้น) ใช้ template `Ragnarok` เปิด Compression Brotli หรือ Gzip ได้ เซิร์ฟเวอร์ใส่ header ให้เอง
+3. **Build ตัวเกมเป็น Web** ใน Unity — ขั้นตอนเต็มอยู่ที่ `MOBILE.md` อ่านอันนั้น อย่าเดา
+
+   สรุปสั้น ๆ: Unity 6 ไม่มี `Build Settings` แล้ว ใช้ `File → Build Profiles` platform ชื่อ **`Web`** (ไม่ใช่ `WebGL`) ก่อนกด Build ต้อง build Addressables ก่อนทุกครั้ง และโฟลเดอร์ปลายทางต้องเป็น
+
+   ```
+   RoRebuildServer\RoRebuildServer\bin\Debug\net9.0\WebClient
+   ```
+
+   ที่เดียวกับตอนเล่นในเครื่อง — **ไม่ใช่ `RebuildClient\WebGL`** ซึ่งเป็นที่เก่า
    - ถ้ายังไม่ build ก็ขึ้น VPS ได้ แต่คนจะเล่นผ่านเบราว์เซอร์ไม่ได้ ต้องใช้ client จาก Unity/Windows ชี้ `wss://โดเมน/ws`
 4. เช็คว่ามี `RebuildClient\Assets\Maps\exportdata` (walk data จากการ import แมพ) แมพไหนไม่มี เซิร์ฟเวอร์จะถือว่าเดินได้ทั้งแมพ
 5. สร้างชุดไฟล์
@@ -36,9 +44,24 @@ powershell -ExecutionPolicy Bypass -File deploy\publish.ps1
 
    ได้ `rorebuild-server.zip` ที่ root ของ repo (GmAccount.local.json ติดไปด้วยถ้าวางไว้ที่ `RoRebuildServer\RoRebuildServer\`)
 
+   **อ่านสิ่งที่มันพิมพ์ออกมาให้ครบก่อนอัป** บรรทัดที่ต้องเห็น:
+
+   | บรรทัด | แปลว่า |
+   |---|---|
+   | `Browser build: ...\WebClient` | เจอตัวเกมแล้ว เล่นผ่านเบราว์เซอร์ได้ |
+   | `dropping stale build Build_...` | ตัดตัวเกมรอบเก่าที่ไม่ได้ใช้ออกจาก zip (ปกติ ดีด้วย) |
+   | `Bundle ready: ...zip` | เสร็จ |
+
+   ถ้าขึ้น `WARNING: No browser build found` **อย่าเพิ่งอัป** — build ยังไม่ได้ลงที่ที่ควรอยู่ กลับไปข้อ 3
+
 ### B. บน VPS (Ubuntu 22.04 / 24.04, RAM 2 GB ขึ้นไป)
 
-1. ชี้ DNS ของโดเมนมาที่ IP ของ VPS ก่อน รอจน `ping โดเมน` ได้ IP ถูก
+> **ยังไม่จดโดเมนก็ทดสอบได้** ใส่ IP ของ VPS แทนชื่อโดเมนในข้อ 3 แล้ว**ข้ามข้อ 5 (certbot)** ไป
+> เปิดเล่นที่ `http://IP/` ตัว client อ่าน address จากหน้าเว็บที่มันถูกโหลดมา จึงต่อ `ws://IP/ws` ให้เอง ไม่ต้องตั้งอะไร
+> ข้อเสียคือไม่มี SSL — รหัสผ่านวิ่งแบบไม่เข้ารหัส ใช้ได้เฉพาะรอบทดสอบกับคนรู้จัก อย่าใช้รหัสผ่านซ้ำกับที่อื่น
+> พอจดโดเมนแล้วค่อยรัน `vps-setup.sh` ซ้ำด้วยชื่อโดเมน แล้วรัน certbot
+
+1. ชี้ DNS ของโดเมนมาที่ IP ของ VPS ก่อน รอจน `ping โดเมน` ได้ IP ถูก (ข้ามได้ถ้ายังไม่จด)
 2. คัดลอก `deploy/` และ `rorebuild-server.zip` ขึ้นไป เช่น `scp -r deploy rorebuild-server.zip root@IP:/root/`
 3. ตั้งค่าครั้งแรก
 
