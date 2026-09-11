@@ -178,6 +178,12 @@ namespace Assets.Scripts.UI.ClientDatabase
         /// </remarks>
         private bool TryTakeTeleport()
         {
+            //Held shift skips the wait kept here. It is not a way past the rule - the server
+            //keeps its own copy and only lets a GM through - it is the way a GM gets to ask
+            //at all, since the client is never told which of the two it is talking for.
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+                return true;
+
             var left = TeleportWaitLeft;
             if (left > 0f)
             {
@@ -208,9 +214,10 @@ namespace Assets.Scripts.UI.ClientDatabase
             var left = TeleportWaitLeft;
             var ready = left <= 0f;
 
-            if (TeleportButton.interactable != ready)
-                TeleportButton.interactable = ready;
-
+            //Left pressable on purpose, even while it is counting down: a greyed out button
+            //swallows the click before anything sees it, and shift clicking it is the only
+            //way a GM has of asking for the trip they are owed. Pressing it early without
+            //shift still says no - see TryTakeTeleport - it just says so out loud.
             if (teleportButtonLabel == null)
                 return;
 

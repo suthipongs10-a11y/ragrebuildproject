@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Numerics;
 using RebuildSharedData.ClientTypes;
 using RebuildSharedData.Data;
@@ -91,6 +91,16 @@ public class Player : IEntityAutoReset
     public EntityValueList<float> RecentAttackersList = null!;
     private float lastAttackerListCheckUpdate;
     public float ShoutCooldown;
+
+    /// <summary>
+    /// When this character may next warp out of the database window.
+    /// </summary>
+    /// <remarks>
+    /// Its own timer rather than the input action cooldown, which is one shared
+    /// counter for every action a player takes - putting half a minute into that
+    /// would stop them clicking, walking and picking things up for half a minute too.
+    /// </remarks>
+    public float MapWarpCooldown;
     private Memory<int>? jobStatBonuses;
 
     public SpecialPlayerActionState SpecialState;
@@ -314,6 +324,7 @@ public class Player : IEntityAutoReset
         Array.Clear(CharData);
         PlayerStatData.Clear();
         LastEmoteTime = 0;
+        MapWarpCooldown = 0f;
         StorageId = -1;
         HasEnteredServer = false;
         LearnedSkills = null!;

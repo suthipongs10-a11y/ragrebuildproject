@@ -1,4 +1,4 @@
-﻿//
+//
 //Milestone event: once certain milestones are reached, npcs are added to the camp south of prontera
 //
 //Once someone reaches level 10 : Unlock Kafra Staff
@@ -88,8 +88,9 @@ Npc("prt_fild08", "Blacksmith Guildsman#MilestoneSmith", "4_F_JOB_BLACKSMITH", 1
 {
 	localstr name = "Mitmair";
 
-	AddItemToTradeSet("Ore", CreateTradedItem("Iron").Requires("Iron_Ore", 5).Costs(100));
-	AddItemToTradeSet("Ore", CreateTradedItem("Steel").Requires("Iron", 5).Requires("Coal", 1).Costs(100));
+	//No Iron and no Steel. A blacksmith makes those at their own anvil and monsters
+	//drop them; selling them over a counter is the quickest way to make the trade
+	//worth nothing to the people who learned it.
 	AddItemToTradeSet("Ore", CreateTradedItem("Flame_Heart").Requires("Red_Blood", 10).Costs(100));
 	AddItemToTradeSet("Ore", CreateTradedItem("Mystic_Frozen").Requires("Crystal_Blue", 10).Costs(100));
 	AddItemToTradeSet("Ore", CreateTradedItem("Rough_Wind").Requires("Wind_of_Verdure", 10).Costs(100));

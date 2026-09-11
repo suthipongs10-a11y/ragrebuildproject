@@ -1,9 +1,10 @@
-﻿using RebuildSharedData.Data;
+using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Networking;
 using RoRebuildServer.Data;
 using RoRebuildServer.EntityComponents.Util;
 using RoRebuildServer.Logging;
+using RoRebuildServer.Simulation.Util;
 using System.Diagnostics;
 
 namespace RoRebuildServer.Networking.PacketHandlers.Admin;
@@ -12,6 +13,9 @@ namespace RoRebuildServer.Networking.PacketHandlers.Admin;
 [ClientPacketHandler(PacketType.AdminRequestMove)]
 public class PacketAdminRequestMove : IClientPacketHandler
 {
+    /// <summary>How long a player waits between one trip out of the database and the next.</summary>
+    private const float MapWarpCooldownTime = 30f;
+
     public void Process(NetworkConnection connection, InboundMessage msg)
     {
         if (!connection.IsPlayerAlive)
@@ -24,9 +28,6 @@ public class PacketAdminRequestMove : IClientPacketHandler
         if (!connection.Player.CanPerformCharacterActions())
             return;
 
-        if (!connection.IsAdmin && !ServerConfig.DebugConfig.EnableWarpCommandForEveryone)
-            return;
-
         var player = connection.Player;
         var ce = player.CombatEntity;
         var ch = connection.Character;
@@ -35,6 +36,23 @@ public class PacketAdminRequestMove : IClientPacketHandler
         var posX = msg.ReadInt16();
         var posY = msg.ReadInt16();
         var force = msg.ReadBoolean();
+
+        //Everybody may travel from the database window; what separates a player from an
+        //admin is the wait, and the wait is kept here rather than in the window that sends
+        //this because a window is the half of the game a player can edit.
+        var isAdmin = connection.IsAdmin || ServerConfig.DebugConfig.EnableWarpCommandForEveryone;
+        if (!isAdmin)
+        {
+            if (player.MapWarpCooldown > Time.ElapsedTimeFloat)
+            {
+                CommandBuilder.SendRequestFailed(player, ClientErrorType.TooManyRequests);
+                return;
+            }
+
+            //An admin tool: it drops the character on the named cell whether or not anything
+            //can stand there, clamped only to the map's own edges.
+            force = false;
+        }
 
         ServerLogger.Log($"Player {connection.Player.Name} requested move to map {mapName}.");
 
@@ -80,6 +98,9 @@ public class PacketAdminRequestMove : IClientPacketHandler
         }
 
         //CommandBuilder.SendHealSingle(player, 0, HealType.None); //heal amount is 0, but we set hp to max so it will update without the effect
+
+        if (!isAdmin)
+            player.MapWarpCooldown = Time.ElapsedTimeFloat + MapWarpCooldownTime;
 
         if (ch.Map.Name == mapName)
         {

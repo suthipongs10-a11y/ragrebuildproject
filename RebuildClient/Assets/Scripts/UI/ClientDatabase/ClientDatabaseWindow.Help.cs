@@ -35,7 +35,9 @@ namespace Assets.Scripts.UI.ClientDatabase
             sb.Append("<color=#444444>#itemclass=weapon #slots>=4</color>\n");
             sb.Append("<color=#444444>#description=<noparse>\"</noparse>fire bolt<noparse>\"</noparse></color>\n\n");
 
-            sb.Append("<b>GM only:</b>\nRight click on monsters to spawn them.\nRight click on items to receive them.\nRight click on a map to warp somewhere on it.\nRight click on NPCs to warp to them.\n<color=#444444>Warping has a 30 second wait between trips.</color>");
+            sb.Append("<b>travel:</b>\nRight click a map to warp somewhere on it.\nRight click an NPC to warp to them.\n");
+            sb.Append("<color=#444444>30 second wait between trips. GM: hold shift to skip it.</color>\n\n");
+            sb.Append("<b>GM only:</b>\nRight click on monsters to spawn them.\nRight click on items to receive them.");
 
             return sb.ToString();
         }
