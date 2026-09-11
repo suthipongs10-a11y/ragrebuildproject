@@ -60,6 +60,10 @@ namespace Assets.Scripts.UI.TitleScreen
                                && !ModernUiTheme.IsSkinned(select.DisplayPane))
                 SkinCharacterSelect(select);
 
+            var title = FindFirstObjectByType<TitleScreen>(FindObjectsInactive.Include);
+            if (title != null && !ModernUiTheme.IsSkinned(title.gameObject))
+                SkinTitleScreen(title);
+
             var login = FindFirstObjectByType<LoginBox>(FindObjectsInactive.Include);
             if (login == null)
                 return;
@@ -170,6 +174,57 @@ namespace Assets.Scripts.UI.TitleScreen
             ThaiUiText.Apply(root);
 
             Debug.Log("[ModernTitleSkin] Retinted the character select window.");
+        }
+
+        /// <summary>The project's own name, replacing the protocol-version line Awake sets.</summary>
+        private const string CustomTitleText = "Rag Rebuild Alpha Project";
+
+        /// <summary>
+        /// Where the splash art goes if somebody drops one in. Filed under Resources so this
+        /// works without touching the scene: a name here that nothing has supplied yet just
+        /// loads null, and TitleScreen's own randomly-picked art stays exactly as it was.
+        /// </summary>
+        private const string CustomBackgroundResource = "CustomUI/TitleBackground";
+
+        /// <summary>
+        /// Where the button below the login box sends a player. Left blank on purpose - a
+        /// guessed link is worse than no button at all - so the button quietly does not
+        /// build itself until this is filled in.
+        /// </summary>
+        private const string CommunityUrl = "";
+
+        private static void SkinTitleScreen(TitleScreen title)
+        {
+            ModernUiTheme.MarkSkinned(title.gameObject);
+
+            if (title.ProjectTitleText != null)
+                title.ProjectTitleText.text = CustomTitleText;
+
+            //Awake already ran and picked one of the game's own splash pieces before this
+            //ever gets a look in, so this only overwrites it once there is something to
+            //overwrite it with.
+            var custom = Resources.Load<Sprite>(CustomBackgroundResource);
+            if (custom != null && title.BackgroundArea != null)
+                title.BackgroundArea.sprite = custom;
+
+            if (!string.IsNullOrEmpty(CommunityUrl))
+                AddCommunityButton(title);
+        }
+
+        private const float CommunityButtonWidth = 220f;
+        private const float CommunityButtonHeight = 40f;
+
+        /// <summary>A single button along the bottom edge of the screen, under everything else.</summary>
+        private static void AddCommunityButton(TitleScreen title)
+        {
+            var button = ModernUiTheme.CreateButton(title.transform, "CommunityLink",
+                "เข้าร่วมพูดคุย", ModernUiTheme.AccentColor, ModernUiTheme.AccentTextColor);
+
+            ModernUiTheme.Place((RectTransform)button.transform, new Vector2(0.5f, 0f),
+                new Vector2(0f, 24f), new Vector2(CommunityButtonWidth, CommunityButtonHeight));
+
+            button.transform.SetAsLastSibling();
+            button.onClick.AddListener(() => Application.OpenURL(CommunityUrl));
         }
 
         private static void SkinLogin(LoginBox win)
