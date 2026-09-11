@@ -286,8 +286,18 @@ namespace Assets.Scripts.UI.ClientDatabase
             //window's own layout is ever rearranged.
             var scroll = win.mapConnectionsContent?.transform.parent?.parent as RectTransform;
             var pane = scroll?.parent as RectTransform;
-            if (pane == null || pane.Find(TeleportButtonName) != null)
+            if (pane == null)
                 return;
+
+            //Built once, but the window still needs the reference every time this runs: it
+            //greys the button out and counts down on it, and a skin pass that found the
+            //button already there used to leave the window holding nothing.
+            var existing = pane.Find(TeleportButtonName);
+            if (existing != null)
+            {
+                win.TeleportButton = existing.GetComponent<Button>();
+                return;
+            }
 
             scroll.sizeDelta = new Vector2(scroll.sizeDelta.x, scroll.sizeDelta.y - ButtonHeight - Gap);
 
@@ -305,6 +315,10 @@ namespace Assets.Scripts.UI.ClientDatabase
                 scroll.anchoredPosition.y - scroll.sizeDelta.y - Gap);
 
             button.onClick.AddListener(win.TeleportToShownMap);
+
+            //handed over so the window can grey it out and count down on it while the warp
+            //it just took is still being waited out
+            win.TeleportButton = button;
         }
 
         private const string TeleportButtonName = "ModernMapTeleport";

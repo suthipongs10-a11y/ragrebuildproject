@@ -120,7 +120,7 @@ namespace Assets.Scripts.UI.ClientDatabase
             row.GetComponentInChildren<TextMeshProUGUI>(true).text = label;
             var captured = n;
             row.GetComponent<Button>().onClick.AddListener(() => ShowNpcDetail(captured));
-            AttachRightClick(row, () => NetworkManager.Instance.SendMoveRequest(captured.Map, captured.X, captured.Y));
+            AttachRightClick(row, () => RequestWarp(captured.Map, captured.X, captured.Y));
             npcRowEntries.Add((row, n, $"{n.Id} {n.Name} {n.Map} {mapLabel} {n.SpriteCode}"));
         }
 

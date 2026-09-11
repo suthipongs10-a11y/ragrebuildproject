@@ -210,7 +210,7 @@ namespace Assets.Scripts.UI.ClientDatabase
             {
                 var captured = map;
                 row.GetComponent<Button>().onClick.AddListener(() => JumpToMap(captured));
-                AttachRightClick(row, () => NetworkManager.Instance.SendMoveRequest(captured.Code));
+                AttachRightClick(row, () => RequestWarp(captured.Code));
             }
         }
 

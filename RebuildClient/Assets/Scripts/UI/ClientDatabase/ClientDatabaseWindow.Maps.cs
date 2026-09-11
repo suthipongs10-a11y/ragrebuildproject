@@ -94,45 +94,129 @@ namespace Assets.Scripts.UI.ClientDatabase
         }
 
         /// <summary>
-        /// Warps to the map being shown, letting the server pick the arrival spot. Right
-        /// clicking the picture already went to a chosen tile, but only somebody who knew
-        /// that was there would ever find it, and often the point is just to get there.
+        /// How long one warp out of this window locks out the next.
+        /// </summary>
+        /// <remarks>
+        /// Held statically rather than on the window, because the window is built and thrown
+        /// away as it is opened and closed - a wait kept on the instance would be a wait you
+        /// skip by closing the database and opening it again, which is no wait at all. It
+        /// belongs to the character either way, not to the panel they happened to press it on.
+        /// </remarks>
+        private const float TeleportCooldown = 30f;
+
+        private static float teleportReadyAt;
+
+        /// <summary>The teleport button, handed over by the skin that builds it.</summary>
+        internal Button TeleportButton;
+
+        private TMP_Text teleportButtonLabel;
+        private string teleportButtonText;
+
+        private static float TeleportWaitLeft => Mathf.Max(0f, teleportReadyAt - Time.unscaledTime);
+
+        /// <summary>
+        /// Warps to the map being shown, letting the server pick the arrival spot.
         /// </summary>
         internal void TeleportToShownMap()
         {
-            if (string.IsNullOrEmpty(currentMapDetailCode))
-                return;
-
-            NetworkManager.Instance.SendMoveRequest(currentMapDetailCode);
+            RequestWarp(currentMapDetailCode);
         }
 
+        /// <summary>
+        /// Right clicking the picture goes to the map, not to the cell under the cursor.
+        /// </summary>
+        /// <remarks>
+        /// It used to read the cursor back into map coordinates and ask to be put exactly
+        /// there, which made the database a targeting device: any cell of any map, picked off
+        /// a picture, with whatever stands in the way skipped. Sending no position asks the
+        /// server for a walkable cell of its own choosing instead - the same arrival the
+        /// button gives, through the same wait.
+        /// </remarks>
         private void OnMinimapRightClick()
         {
-            if (string.IsNullOrEmpty(currentMapDetailCode)) return;
-            if (mapDetailMinimap == null || mapDetailMinimap.sprite == null) return;
+            RequestWarp(currentMapDetailCode);
+        }
 
-            var rt = mapDetailMinimap.rectTransform;
-            var cam = mapDetailMinimap.canvas != null ? mapDetailMinimap.canvas.worldCamera : null;
-            if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rt, Input.mousePosition, cam, out var local)) return;
+        /// <summary>
+        /// The one way out of this window, so the wait is one wait rather than nine.
+        /// </summary>
+        /// <remarks>
+        /// Every right click in the database that moves the character comes through here -
+        /// the map list, the spawn lists, the npc rows, the portrait, the button and the
+        /// picture. They were nine separate calls into the network manager, and a wait put on
+        /// any one of them is a wait the other eight walk straight past.
+        /// </remarks>
+        private void RequestWarp(string map)
+        {
+            if (string.IsNullOrEmpty(map) || !TryTakeTeleport())
+                return;
 
-            var rect = rt.rect;
-            var pxFromLeft = local.x - rect.xMin;
-            var pyFromTop = rect.yMax - local.y;
+            NetworkManager.Instance.SendMoveRequest(map);
+        }
 
-            var sprW = mapDetailMinimap.sprite.texture.width;
-            var sprH = mapDetailMinimap.sprite.texture.height;
-            var scale = Mathf.Min(rect.width / sprW, rect.height / sprH);
-            var letterboxX = (rect.width - sprW * scale) * 0.5f;
-            var letterboxY = (rect.height - sprH * scale) * 0.5f;
+        /// <summary>
+        /// The same, for the rows that lead somewhere named - an npc, a shop - where the
+        /// point is the thing standing there rather than the spot itself.
+        /// </summary>
+        private void RequestWarp(string map, int x, int y)
+        {
+            if (string.IsNullOrEmpty(map) || !TryTakeTeleport())
+                return;
 
-            var pixelX = (pxFromLeft - letterboxX) / scale;
-            var pixelYFromTop = (pyFromTop - letterboxY) / scale;
-            if (pixelX < 0 || pixelX >= sprW || pixelYFromTop < 0 || pixelYFromTop >= sprH) return;
+            NetworkManager.Instance.SendMoveRequest(map, x, y);
+        }
 
-            var tileX = (int)(pixelX / MinimapPxPerTile);
-            var tileY = (int)((sprH - pixelYFromTop) / MinimapPxPerTile);
+        /// <summary>
+        /// Whether a warp is owed right now, starting the next wait if it is and saying how
+        /// much is left if it is not.
+        /// </summary>
+        /// <remarks>
+        /// The wait starts when the request is sent rather than when the character lands,
+        /// because the client is never told which of the two happened - the server drops a
+        /// request it does not like without an answer. Counting from the press is the version
+        /// that cannot be spammed.
+        /// </remarks>
+        private bool TryTakeTeleport()
+        {
+            var left = TeleportWaitLeft;
+            if (left > 0f)
+            {
+                if (CameraFollower.Instance != null)
+                    CameraFollower.Instance.AppendChatText($"ยังวาร์ปไม่ได้ รออีก {Mathf.CeilToInt(left)} วินาที");
+                return false;
+            }
 
-            NetworkManager.Instance.SendMoveRequest(currentMapDetailCode, tileX, tileY);
+            teleportReadyAt = Time.unscaledTime + TeleportCooldown;
+            return true;
+        }
+
+        /// <summary>
+        /// Keeps the button showing whether it can be pressed and how long until it can.
+        /// </summary>
+        private void TickTeleportButton()
+        {
+            if (TeleportButton == null)
+                return;
+
+            if (teleportButtonLabel == null)
+            {
+                teleportButtonLabel = TeleportButton.GetComponentInChildren<TMP_Text>(true);
+                if (teleportButtonLabel != null)
+                    teleportButtonText = teleportButtonLabel.text;
+            }
+
+            var left = TeleportWaitLeft;
+            var ready = left <= 0f;
+
+            if (TeleportButton.interactable != ready)
+                TeleportButton.interactable = ready;
+
+            if (teleportButtonLabel == null)
+                return;
+
+            var wanted = ready ? teleportButtonText : $"รออีก {Mathf.CeilToInt(left)} วินาที";
+            if (teleportButtonLabel.text != wanted)
+                teleportButtonLabel.text = wanted;
         }
 
         private void PopulateMapList()
@@ -162,7 +246,7 @@ namespace Assets.Scripts.UI.ClientDatabase
             row.GetComponentInChildren<TextMeshProUGUI>(true).text = FormatMapLabel(map.Code);
             var captured = map;
             row.GetComponent<Button>().onClick.AddListener(() => ShowMapDetail(captured));
-            AttachRightClick(row, () => NetworkManager.Instance.SendMoveRequest(captured.Code));
+            AttachRightClick(row, () => RequestWarp(captured.Code));
             mapRowEntries.Add((row, map, $"{map.Code} {map.Name}"));
         }
 
@@ -307,7 +391,7 @@ namespace Assets.Scripts.UI.ClientDatabase
                 {
                     var captured = targetMap;
                     row.GetComponent<Button>().onClick.AddListener(() => ShowMapDetail(captured));
-                    AttachRightClick(row, () => NetworkManager.Instance.SendMoveRequest(captured.Code));
+                    AttachRightClick(row, () => RequestWarp(captured.Code));
                 }
             }
         }
@@ -359,7 +443,7 @@ namespace Assets.Scripts.UI.ClientDatabase
                     $"<b>{markerIndex}.</b>  {npc.Name}{(npc.IsTrader ? "  <size=80%><color=#888888>[Trader]</color></size>" : "")}";
                 var captured = npc;
                 row.GetComponent<Button>().onClick.AddListener(() => JumpToNpc(captured));
-                AttachRightClick(row, () => NetworkManager.Instance.SendMoveRequest(captured.Map, captured.X, captured.Y));
+                AttachRightClick(row, () => RequestWarp(captured.Map, captured.X, captured.Y));
             }
         }
 

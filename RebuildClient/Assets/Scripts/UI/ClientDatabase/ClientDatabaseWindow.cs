@@ -98,6 +98,7 @@ namespace Assets.Scripts.UI.ClientDatabase
             }
 
             HandleAutocompleteInput();
+            TickTeleportButton();
         }
         
         private void WireDetailPortraitClicks()
@@ -125,7 +126,7 @@ namespace Assets.Scripts.UI.ClientDatabase
                 AttachRightClick(npcSpriteHost.transform.parent.gameObject, () =>
                 {
                     if (npcLookup.TryGetValue(currentNpcDetailId, out var n))
-                        NetworkManager.Instance.SendMoveRequest(n.Map, n.X, n.Y);
+                        RequestWarp(n.Map, n.X, n.Y);
                 });
             }
         }

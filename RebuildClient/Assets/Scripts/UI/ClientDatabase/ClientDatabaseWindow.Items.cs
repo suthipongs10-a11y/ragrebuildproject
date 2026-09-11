@@ -216,7 +216,7 @@ namespace Assets.Scripts.UI.ClientDatabase
             {
                 var captured = npc;
                 row.GetComponent<Button>().onClick.AddListener(() => JumpToNpc(captured));
-                AttachRightClick(row, () => NetworkManager.Instance.SendMoveRequest(captured.Map, captured.X, captured.Y));
+                AttachRightClick(row, () => RequestWarp(captured.Map, captured.X, captured.Y));
             }
         }
 
