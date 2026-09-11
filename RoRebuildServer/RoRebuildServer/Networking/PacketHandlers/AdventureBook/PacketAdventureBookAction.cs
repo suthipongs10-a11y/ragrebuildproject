@@ -4,6 +4,7 @@ using RebuildSharedData.Networking;
 using RoRebuildServer.Custom.AdventureBook;
 using RoRebuildServer.EntityComponents;
 using RoRebuildServer.EntityComponents.Util;
+using RoRebuildServer.Simulation.Util;
 
 //Namespaced one level up rather than matching the folder, deliberately. A namespace called
 //AdventureBook sitting beside a class called AdventureBook means the simple name resolves to
@@ -83,6 +84,18 @@ public class PacketAdventureBookAction : IClientPacketHandler
             return;
         }
 
+        //How well the page is filled in decides how often the road may be used. One star
+        //opens it, the second shortens the wait and the third takes the wait away - so the
+        //monsters somebody has actually finished are the ones they travel to freely, and the
+        //page is worth finishing after the first kill count is met.
+        var wait = BookWarpWaitFor(player, entry);
+        if (wait > 0f && player.BookWarpCooldown > Time.ElapsedTimeFloat)
+        {
+            var left = (int)Math.Ceiling(player.BookWarpCooldown - Time.ElapsedTimeFloat);
+            CommandBuilder.SendServerMessageTo(player, $"เดินทางต่อเนื่องไม่ได้ รออีก {left} วินาที");
+            return;
+        }
+
         //Asked of the book rather than of the world: the client sends a map name, and without
         //this it could send any name at all and be taken there for the price of a Creamy.
         var stands = false;
@@ -118,6 +131,9 @@ public class PacketAdventureBookAction : IClientPacketHandler
 
         var pos = map.WalkData.FindWalkableCellOnMap();
 
+        if (wait > 0f)
+            player.BookWarpCooldown = Time.ElapsedTimeFloat + wait;
+
         player.AddInputActionDelay(InputActionCooldownType.Teleport);
         character.ResetState();
         character.SetSpawnImmunity();
@@ -130,6 +146,23 @@ public class PacketAdventureBookAction : IClientPacketHandler
         }
         else
             player.WarpPlayer(mapName, pos.X, pos.Y, 1, 1, false);
+    }
+
+    /// <summary>
+    /// The wait a page has earned its way out of, in seconds.
+    /// </summary>
+    /// <remarks>
+    /// Read off the stars on that one page rather than off the character's rank, because the
+    /// road being asked for is that monster's - somebody who has finished Andre has finished
+    /// the trip to Andre, whatever the rest of the book looks like.
+    /// </remarks>
+    private static float BookWarpWaitFor(Player player, AdventureBookEntry entry)
+    {
+        if (AdventureBookProgress.HasStar(player, entry, AdventureBookStars.Card))
+            return 0f;
+        if (AdventureBookProgress.HasStar(player, entry, AdventureBookStars.HuntLarge))
+            return 3f;
+        return 5f;
     }
 
     private static void Deny(Player player, AdventureBookWarpDenial reason)

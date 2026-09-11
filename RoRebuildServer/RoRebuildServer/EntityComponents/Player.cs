@@ -101,6 +101,16 @@ public class Player : IEntityAutoReset
     /// would stop them clicking, walking and picking things up for half a minute too.
     /// </remarks>
     public float MapWarpCooldown;
+
+    /// <summary>
+    /// When this character may next travel out of the adventure book.
+    /// </summary>
+    /// <remarks>
+    /// Kept apart from MapWarpCooldown so the two do not block each other. The book is
+    /// the road somebody earned a star to open, and having the database's half minute
+    /// close it would make the star worth less than the window that needs none.
+    /// </remarks>
+    public float BookWarpCooldown;
     private Memory<int>? jobStatBonuses;
 
     public SpecialPlayerActionState SpecialState;
@@ -325,6 +335,7 @@ public class Player : IEntityAutoReset
         PlayerStatData.Clear();
         LastEmoteTime = 0;
         MapWarpCooldown = 0f;
+        BookWarpCooldown = 0f;
         StorageId = -1;
         HasEnteredServer = false;
         LearnedSkills = null!;

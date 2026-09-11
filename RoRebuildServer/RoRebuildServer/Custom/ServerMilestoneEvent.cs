@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using RebuildSharedData.Enum;
@@ -585,12 +585,21 @@ public class ServerMilestoneEvent : ServerConfigScriptHandlerBase
         }
     }
 
+    /// <summary>What a boss's comeback is timed from, and how far either side of it it lands.</summary>
+    private const int BossRespawnBase = 15 * 60 * 1000;
+    private const int BossRespawnSwing = 5 * 60 * 1000;
+
     public override void OnSetMonsterSpawnTime(MonsterDatabaseInfo monster, string mapName, ref int minTime, ref int maxTime)
     {
         if (DataManager.MvpMonsterCodes.Contains(monster.Code))
         {
-            minTime = 14 * 60 * 1000;
-            maxTime = 15 * 60 * 1000;
+            //A minute wide window is a fifteen minute alarm clock: somebody stands on the
+            //spot, waits for it and takes the kill off whoever is actually hunting. Five
+            //minutes either side is long enough that standing still costs more than looking
+            //does, which is the whole point of the swap. Monster.cs rolls a fresh time out
+            //of this range on every death, so no two comebacks line up.
+            minTime = BossRespawnBase - BossRespawnSwing;
+            maxTime = BossRespawnBase + BossRespawnSwing;
         }
     }
 }

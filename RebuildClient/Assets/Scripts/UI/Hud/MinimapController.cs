@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using Assets.Scripts.PlayerControl;
 using Assets.Scripts.Sprites;
@@ -28,6 +28,7 @@ namespace Assets.Scripts.UI.Hud
         public Slider ZoomSlider;
     
         private GameObject playerMapIconObject;
+        private GameObject bossPresenceIcon;
         private Dictionary<int, MinimapEntityData> mapIcons = new();
 
         public MapType MapType;
@@ -98,6 +99,7 @@ namespace Assets.Scripts.UI.Hud
             foreach(var icon in mapIcons)
                 Destroy(icon.Value.MapIcon);
             mapIcons.Clear();
+            RefreshBossPresence();
         }
 
         public void RemoveEntity(int entityId)
@@ -106,6 +108,67 @@ namespace Assets.Scripts.UI.Hud
                 return;
 
             Destroy(mapIcon.MapIcon);
+
+            if (mapIcon.Type == CharacterDisplayType.Boss || mapIcon.Type == CharacterDisplayType.Mvp)
+                RefreshBossPresence();
+        }
+
+        /// <summary>
+        /// Shows a badge in the corner of the minimap while something worth hunting is still
+        /// standing on this map, and takes it away when it is not.
+        /// </summary>
+        /// <remarks>
+        /// Pinned to the viewport rather than to the picture, because the picture scrolls and
+        /// scales underneath as the player moves and zooms - a badge parented to it would
+        /// drift off the panel. Which is the point: it is the one marker here that carries no
+        /// position on purpose.
+        /// </remarks>
+        private void RefreshBossPresence()
+        {
+            var wanted = false;
+            if (mapIcons != null)
+            {
+                foreach (var (_, entry) in mapIcons)
+                {
+                    if (entry.Type != CharacterDisplayType.Boss && entry.Type != CharacterDisplayType.Mvp)
+                        continue;
+                    wanted = true;
+                    break;
+                }
+            }
+
+            if (!wanted)
+            {
+                if (bossPresenceIcon != null)
+                    bossPresenceIcon.SetActive(false);
+                return;
+            }
+
+            if (bossPresenceIcon == null)
+            {
+                var host = Viewport != null ? Viewport : gameObject;
+
+                bossPresenceIcon = new GameObject("BossPresence");
+                bossPresenceIcon.transform.SetParent(host.transform, false);
+
+                var img = bossPresenceIcon.AddComponent<Image>();
+                img.sprite = MvpIcon != null ? MvpIcon : BossIcon;
+                img.raycastTarget = false;
+                img.preserveAspect = true;
+
+                //top left of the panel, clear of the zoom slider down the other side
+                var rect = (RectTransform)bossPresenceIcon.transform;
+                rect.anchorMin = new Vector2(0, 1);
+                rect.anchorMax = new Vector2(0, 1);
+                rect.pivot = new Vector2(0, 1);
+                rect.anchoredPosition = new Vector2(4, -4);
+                rect.sizeDelta = new Vector2(16, 16);
+            }
+
+            bossPresenceIcon.transform.SetAsLastSibling();
+
+            if (!bossPresenceIcon.activeSelf)
+                bossPresenceIcon.SetActive(true);
         }
 
         /// <summary>
@@ -154,6 +217,22 @@ namespace Assets.Scripts.UI.Hud
             //stored position, so a stale one would put everybody where they used to be.
             iconData.Position = pos;
             iconData.Type = type;
+
+            //A boss is tracked but never drawn where it stands. The server reports these map
+            //wide rather than by sight, so a marker on the picture was a compass needle
+            //pointing at the thing the map is supposed to make you hunt for. What is left is
+            //the badge below: it says one is out there, and nothing about where.
+            if (type == CharacterDisplayType.Boss || type == CharacterDisplayType.Mvp)
+            {
+                if (iconData.MapIcon != null)
+                {
+                    Destroy(iconData.MapIcon);
+                    iconData.MapIcon = null;
+                }
+
+                RefreshBossPresence();
+                return;
+            }
 
             if (!gameObject.activeInHierarchy || MapImage == null || mapSprite == null)
                 return;
