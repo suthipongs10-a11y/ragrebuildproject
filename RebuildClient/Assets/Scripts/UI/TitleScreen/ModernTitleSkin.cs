@@ -186,12 +186,8 @@ namespace Assets.Scripts.UI.TitleScreen
         /// </summary>
         private const string CustomBackgroundResource = "CustomUI/TitleBackground";
 
-        /// <summary>
-        /// Where the button below the login box sends a player. Left blank on purpose - a
-        /// guessed link is worse than no button at all - so the button quietly does not
-        /// build itself until this is filled in.
-        /// </summary>
-        private const string CommunityUrl = "";
+        /// <summary>Where the button below the login box sends a player: the project's Facebook group.</summary>
+        private const string CommunityUrl = "https://www.facebook.com/groups/2443940029461323";
 
         private static void SkinTitleScreen(TitleScreen title)
         {
@@ -211,17 +207,35 @@ namespace Assets.Scripts.UI.TitleScreen
                 AddCommunityButton(title);
         }
 
-        private const float CommunityButtonWidth = 220f;
-        private const float CommunityButtonHeight = 40f;
+        private const float CommunityButtonWidth = 300f;
+        private const float CommunityButtonHeight = 56f;
 
-        /// <summary>A single button along the bottom edge of the screen, under everything else.</summary>
+        /// <summary>
+        /// A single button along the bottom edge of the screen, dressed as the one thing on
+        /// this screen worth noticing besides the login box itself: bigger than an ordinary
+        /// button, with the icon, the shadow and the border everything else here earns by
+        /// being a whole window, because this is the only chance a brand new player gets to
+        /// find the community before they have even logged in once.
+        /// </summary>
         private static void AddCommunityButton(TitleScreen title)
         {
-            var button = ModernUiTheme.CreateButton(title.transform, "CommunityLink",
-                "เข้าร่วมพูดคุย", ModernUiTheme.AccentColor, ModernUiTheme.AccentTextColor);
+            var button = ModernUiTheme.CreateIconButton(title.transform, "CommunityLink",
+                "เข้าร่วมพูดคุย", ModernUiIcons.Chat, ModernUiTheme.AccentColor, ModernUiTheme.AccentTextColor,
+                ModernUiTheme.SizeSubtitle);
 
-            ModernUiTheme.Place((RectTransform)button.transform, new Vector2(0.5f, 0f),
-                new Vector2(0f, 24f), new Vector2(CommunityButtonWidth, CommunityButtonHeight));
+            var rect = (RectTransform)button.transform;
+            ModernUiTheme.Place(rect, new Vector2(0.5f, 0f), new Vector2(0f, 28f),
+                new Vector2(CommunityButtonWidth, CommunityButtonHeight));
+
+            var image = button.GetComponent<Image>();
+            if (image != null)
+            {
+                image.sprite = ModernUiTheme.RoundedSprite;
+                image.type = Image.Type.Sliced;
+            }
+
+            ModernUiTheme.AddBorder(rect, ModernUiTheme.AccentTextColor);
+            ModernUiTheme.AttachShadow(rect);
 
             button.transform.SetAsLastSibling();
             button.onClick.AddListener(() => Application.OpenURL(CommunityUrl));

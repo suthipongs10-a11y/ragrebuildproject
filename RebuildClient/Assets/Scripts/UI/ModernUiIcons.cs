@@ -63,6 +63,7 @@ namespace Assets.Scripts.UI
         public static Sprite Exit => Get("Exit", ExitShape);
         public static Sprite Magnifier => Get("Magnifier", MagnifierShape);
         public static Sprite Grip => Get("Grip", GripShape);
+        public static Sprite Chat => Get("Chat", ChatShape);
 
         private static Sprite Get(string name, Func<Vector2, float> shape)
         {
@@ -417,6 +418,23 @@ namespace Assets.Scripts.UI
             var qy = Mathf.Abs(p.y - center.y) - (half.y - round);
             var outside = new Vector2(Mathf.Max(qx, 0f), Mathf.Max(qy, 0f)).magnitude;
             return outside + Mathf.Min(Mathf.Max(qx, qy), 0f) - round;
+        }
+
+        private static float BoxBand(Vector2 p, Vector2 center, Vector2 half, float round, float thickness)
+        {
+            return Mathf.Abs(Box(p, center, half, round)) - thickness;
+        }
+
+        /// <summary>A speech bubble: an outlined body with a small tail, and three dots
+        /// inside standing for a conversation in progress.</summary>
+        private static float ChatShape(Vector2 p)
+        {
+            var body = BoxBand(p, new Vector2(0.5f, 0.58f), new Vector2(0.34f, 0.22f), 0.11f, 0.05f);
+            var tail = BoxBand(p, new Vector2(0.30f, 0.28f), new Vector2(0.07f, 0.10f), 0.02f, 0.05f);
+            var dots = Mathf.Min(Circle(p, new Vector2(0.38f, 0.58f), 0.035f),
+                Mathf.Min(Circle(p, new Vector2(0.50f, 0.58f), 0.035f),
+                          Circle(p, new Vector2(0.62f, 0.58f), 0.035f)));
+            return Mathf.Min(Mathf.Min(body, tail), dots);
         }
 
         private static float Segment(Vector2 p, Vector2 a, Vector2 b, float thickness)
