@@ -1,4 +1,4 @@
-﻿using MemoryPack;
+using MemoryPack;
 using System.Diagnostics;
 using RebuildSharedData.ClientTypes;
 using RebuildSharedData.Data;
@@ -1011,6 +1011,26 @@ public static partial class CommandBuilder
 
     //    NetworkManager.SendMessageMulti(packet, recipients);
     //}
+    /// <summary>
+    /// Where a tracked entity is reported to be, which for a boss is nowhere in particular.
+    /// </summary>
+    /// <remarks>
+    /// This packet goes to everybody on the map rather than to whoever can see the entity, so
+    /// for a boss it was a map wide position feed. Not drawing it on the minimap hides it from
+    /// the player looking at the minimap and from nobody else: the number still arrived, and
+    /// anything reading the socket could point straight at the boss from across the map. The
+    /// position is what leaks, so the position is what is withheld. The id, the fact that one
+    /// is standing here, and the removal when it dies all still go - which is everything the
+    /// "a boss is alive on this map" badge is built out of, and nothing more.
+    ///
+    /// Coming into view is separate and still honest: an entity a player can actually see is
+    /// spawned to them by the ordinary path, with its real position.
+    /// </remarks>
+    private static Position TrackedPositionFor(WorldObject o) =>
+        o.DisplayType == CharacterDisplayType.Boss || o.DisplayType == CharacterDisplayType.Mvp
+            ? Position.Zero
+            : o.Position;
+
     public static void SendAllMapImportantEntities(Player p, EntityList mapImportantEntities)
     {
         var packet = NetworkManager.StartPacket(PacketType.UpdateMapImportantEntityTracking, 64);
@@ -1021,7 +1041,7 @@ public static partial class CommandBuilder
         {
             var chara = mapImportantEntities[i].Get<WorldObject>();
             packet.Write(chara.Id);
-            packet.Write(chara.Position);
+            packet.Write(TrackedPositionFor(chara));
             packet.Write((byte)chara.DisplayType);
             if (chara.DisplayType == CharacterDisplayType.Effect)
                 packet.Write(chara.Type == CharacterType.NPC && chara.Npc.ParamString != null ? chara.Npc.ParamString : chara.Name);
@@ -1036,7 +1056,7 @@ public static partial class CommandBuilder
 
         packet.Write((short)1);
         packet.Write(o.Id);
-        packet.Write(o.Position);
+        packet.Write(TrackedPositionFor(o));
         packet.Write((byte)o.DisplayType);
         if (o.DisplayType == CharacterDisplayType.Effect)
             packet.Write(o.Type == CharacterType.NPC && o.Npc.ParamString != null ? o.Npc.ParamString : o.Name);
