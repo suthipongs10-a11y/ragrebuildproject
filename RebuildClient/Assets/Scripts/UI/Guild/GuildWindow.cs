@@ -46,8 +46,18 @@ namespace Assets.Scripts.UI.Guild
         private const float SubtitleTop = TitleTop - TitleHeight;
         private const float SubtitleHeight = 18f;
         private const float ButtonRowTop = SubtitleTop - SubtitleHeight - 2f;
-        private const float LevelBarTop = ButtonRowTop - ButtonRowHeight - 2f;
-        private const float LevelBarHeight = 12f;
+        private const float LevelBarTop = ButtonRowTop - ButtonRowHeight - 4f;
+
+        /// <summary>
+        /// Tall enough for the figures inside it to be read.
+        ///
+        /// It was twelve, and the label - which is drawn over the bar, not beside it - is
+        /// taller than that, so it hung out of both ends of the track and landed on the
+        /// button row above. Small enough to squint at and overlapping something else at
+        /// the same time. The header height below is worked out from this, so the roster
+        /// moves down on its own.
+        /// </summary>
+        private const float LevelBarHeight = 24f;
 
         /// <summary>Where the list starts, which is under everything above it.</summary>
         private const float HeaderHeight = -(LevelBarTop - LevelBarHeight) + 4f;
@@ -70,6 +80,17 @@ namespace Assets.Scripts.UI.Guild
 
         /// <summary>How often the roster is asked for again while the tab is on screen.</summary>
         private const float RefreshInterval = 6f;
+
+        /// <summary>
+        /// Orange on dark brown, rather than the window's blue accent on the pale track.
+        ///
+        /// The point of the bar is to be read across a busy window at a glance, and the
+        /// figures sit on top of it: white reads on both of these, where it would vanish
+        /// on the pale track the rest of the window uses. The orange is a shade under a
+        /// signal orange for the same reason - white on the brighter one is thin.
+        /// </summary>
+        private static readonly Color LevelTrackColor = new Color(0.239f, 0.157f, 0.086f);
+        private static readonly Color LevelFillColor = new Color(0.878f, 0.431f, 0.059f);
 
         private static readonly Color OnlineColor = new Color(0.140f, 0.397f, 0.163f);
         private static readonly Color OfflineColor = new Color(0.360f, 0.330f, 0.290f);
@@ -711,21 +732,24 @@ namespace Assets.Scripts.UI.Guild
             if (levelBar == null)
             {
                 var track = ModernUiTheme.CreateCard((RectTransform)transform, "LevelTrack",
-                    ModernUiTheme.CardDeepColor);
+                    LevelTrackColor);
                 ModernUiTheme.Place(track, new Vector2(0, 1), new Vector2(Pad + 2f, LevelBarTop),
                     new Vector2(Width - Pad * 2f - 4f, LevelBarHeight));
 
-                levelBar = ModernUiTheme.CreateCard(track, "LevelFill", ModernUiTheme.AccentColor);
+                levelBar = ModernUiTheme.CreateCard(track, "LevelFill", LevelFillColor);
                 levelBar.anchorMin = new Vector2(0, 0);
                 levelBar.anchorMax = new Vector2(0, 1);
                 levelBar.pivot = new Vector2(0, 0.5f);
-                levelBar.offsetMin = new Vector2(1f, 1f);
-                levelBar.offsetMax = new Vector2(1f, -1f);
+                levelBar.offsetMin = new Vector2(2f, 2f);
+                levelBar.offsetMax = new Vector2(2f, -2f);
 
                 levelText = ModernUiTheme.CreateText(track, "LevelText", "",
-                    ModernUiTheme.SizeSmall, ModernUiTheme.NameColor, TextAlignmentOptions.Center);
-                ModernUiTheme.Stretch(levelText.rectTransform, 0, -3, 0, 3);
-                levelBarWidth = Width - Pad * 2f - 6f;
+                    ModernUiTheme.SizeSubtitle, Color.white, TextAlignmentOptions.Center,
+                    FontStyles.Bold);
+                //kept inside the track. Spilling past it is what put this line on top of
+                //the buttons above.
+                ModernUiTheme.Stretch(levelText.rectTransform, 2, 0, -2, 0);
+                levelBarWidth = Width - Pad * 2f - 8f;
             }
 
             //The bar is how far through THIS level, not how far through the whole climb:
