@@ -1,4 +1,4 @@
-﻿using RebuildSharedData.ClientTypes;
+using RebuildSharedData.ClientTypes;
 using RebuildSharedData.Data;
 using RebuildSharedData.Enum;
 using RebuildSharedData.Enum.EntityStats;
@@ -793,6 +793,12 @@ public partial class CombatEntity : IEntityAutoReset
     {
         if (range == -1)
             range = GetEffectiveStat(CharacterStat.Range);
+        //Something standing on another map is not a target. A position means nothing without
+        //the map it belongs to, so measuring one against this map's cells reads as "near
+        //enough to hit" whenever the numbers happen to be small, and walks off the end of
+        //the walk data whenever they are not.
+        if (Character.Map == null || target.Map != Character.Map)
+            return false;
         if (!target.CombatEntity.IsTargetable)
             return false;
         if (DistanceCache.IntDistance(Character.Position, target.Position) > range)
@@ -806,6 +812,8 @@ public partial class CombatEntity : IEntityAutoReset
 
     public bool CanAttackTargetFromPosition(WorldObject target, Position position)
     {
+        if (Character.Map == null || target.Map != Character.Map)
+            return false;
         if (!target.CombatEntity.IsTargetable)
             return false;
         if (DistanceCache.IntDistance(position, target.Position) > GetEffectiveStat(CharacterStat.Range))

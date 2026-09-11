@@ -1,4 +1,4 @@
-﻿using RebuildSharedData.Data;
+using RebuildSharedData.Data;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Simulation.Pathfinding;
 
@@ -26,14 +26,20 @@ public class MapWalkData
 
     public bool IsPositionInBounds(Position p) => p.X >= 0 && p.X < Width && p.Y >= 0 && p.Y < Height;
     public bool IsPositionInBounds(int x, int y) => x >= 0 && x < Width && y >= 0 && y < Height;
-    public bool IsCellWalkable(int x, int y) => x < Width && y < Height && (cellData[x + y * Width] & 1) == 1;
-    public bool IsCellWalkable(Position p) => (cellData[p.X + p.Y * Width] & 1) == 1;
-    public bool IsCellSnipable(int x, int y) => (cellData[x + y * Width] & 4) == 4;
-    public bool IsCellSnipable(Position p) => (cellData[p.X + p.Y * Width] & 4) == 4;
+    //Every one of these is asked about a cell that may not exist. A position is only
+    //meaningful on the map it came from, and one belonging to another map arrives here
+    //whenever something holds onto a character that walked through a portal, used a wing or
+    //was warped - so the index runs off the end of the array and takes the whole zone worker
+    //with it. Out of bounds is not a special case worth crashing over: there is no floor
+    //there, so nothing can stand on it, nothing can be shot across it, and it stops sight.
+    public bool IsCellWalkable(int x, int y) => IsPositionInBounds(x, y) && (cellData[x + y * Width] & 1) == 1;
+    public bool IsCellWalkable(Position p) => IsPositionInBounds(p) && (cellData[p.X + p.Y * Width] & 1) == 1;
+    public bool IsCellSnipable(int x, int y) => IsPositionInBounds(x, y) && (cellData[x + y * Width] & 4) == 4;
+    public bool IsCellSnipable(Position p) => IsPositionInBounds(p) && (cellData[p.X + p.Y * Width] & 4) == 4;
     public bool IsCellInWater(int x, int y) => guaranteedWater || (!noWater && IsPositionInBounds(x, y) && (cellData[x + y * Width] & 2) == 2);
     public bool IsCellInWater(Position p) => guaranteedWater || (!noWater && IsPositionInBounds(p) && (cellData[p.X + p.Y * Width] & 2) == 2);
-    public bool DoesCellBlockLos(int x, int y) => (cellData[x + y * Width] & (byte)CellType.SeeThrough) == 0;
-    public bool DoesCellBlockLos(Position p) => (cellData[p.X + p.Y * Width] & (byte)CellType.SeeThrough) == 0;
+    public bool DoesCellBlockLos(int x, int y) => !IsPositionInBounds(x, y) || (cellData[x + y * Width] & (byte)CellType.SeeThrough) == 0;
+    public bool DoesCellBlockLos(Position p) => !IsPositionInBounds(p) || (cellData[p.X + p.Y * Width] & (byte)CellType.SeeThrough) == 0;
 
     public int CountNearbyWaterTiles(Position p, int distance)
     {
