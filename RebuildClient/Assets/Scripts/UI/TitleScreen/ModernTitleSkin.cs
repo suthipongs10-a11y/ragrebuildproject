@@ -202,9 +202,32 @@ namespace Assets.Scripts.UI.TitleScreen
             var custom = Resources.Load<Sprite>(CustomBackgroundResource);
             if (custom != null && title.BackgroundArea != null)
                 title.BackgroundArea.sprite = custom;
+            else
+                ReportMissingBackground();
 
             if (!string.IsNullOrEmpty(CommunityUrl))
                 AddCommunityButton(title);
+        }
+
+        /// <summary>
+        /// Says why the splash art did not appear, because the usual reason looks like
+        /// nothing happening at all.
+        ///
+        /// Unity imports a dropped-in png as a plain Texture unless told otherwise, and
+        /// Resources.Load&lt;Sprite&gt; on a plain Texture returns null rather than
+        /// complaining. The file is sitting right there in the folder with the right name,
+        /// the screen shows the game's own art, and there is nothing anywhere to say the
+        /// two facts are connected. So: if a texture is at the path but a sprite is not,
+        /// that is the import setting and this says which one to change.
+        /// </summary>
+        private static void ReportMissingBackground()
+        {
+            if (Resources.Load<Texture2D>(CustomBackgroundResource) != null)
+                Debug.LogWarning($"[ModernTitleSkin] Found {CustomBackgroundResource} but it is not a sprite. "
+                                 + "Select it in the Project window and set Texture Type to 'Sprite (2D and UI)', then Apply.");
+            else
+                Debug.Log($"[ModernTitleSkin] No splash art at Assets/Resources/{CustomBackgroundResource} - "
+                          + "keeping the game's own title art.");
         }
 
         private const float CommunityButtonWidth = 300f;
