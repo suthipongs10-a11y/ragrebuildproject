@@ -34,14 +34,6 @@ namespace Assets.Scripts.Network
         /// <summary>Rank five and up gets the bigger, warmer version.</summary>
         private const int BigRankThreshold = 5;
 
-        /// <summary>
-        /// Mirrors AdventureBookRank.MaxRank on the server. Not shared code - the server
-        /// project isn't visible from the client - so if the book's ladder ever grows past
-        /// ten this stops being the true ceiling for the debug preview below, though the
-        /// live rank read off the wire is never bound by it.
-        /// </summary>
-        private const int MaxRankForPreview = 10;
-
         private const float RingEdge = 0.85f;
 
         // Tier one: rank one through four. Sized a step past the level aura's own rings so
@@ -109,9 +101,6 @@ namespace Assets.Scripts.Network
 
         private Transform view;
 
-        /// <summary>Editor-only preview so a rank ten testing pass doesn't need ten weeks of stars.</summary>
-        private static int debugPreviewRank = -1;
-
         /// <summary>
         /// Puts the watcher on a character - but only ever keeps it if that character is the
         /// local player, since rank is the one stat this client only ever has for itself.
@@ -141,9 +130,6 @@ namespace Assets.Scripts.Network
 
             var rank = AdventureBookState.Received ? AdventureBookState.Rank : 0;
 
-            if (Application.isEditor)
-                rank = ReadDebugPreview(rank);
-
             var wanted = rank >= MinRank && !owner.IsHidden && !owner.IsHiddenForPerformance;
 
             if (!wanted)
@@ -171,38 +157,6 @@ namespace Assets.Scripts.Network
                 Retint(big);
 
             Apply(Time.time + phase, big);
-        }
-
-        /// <summary>
-        /// F7 steps a local preview rank down, F8 steps it up; below zero it is off and the
-        /// real rank shows. Editor-only - see Application.isEditor at the call site - so it
-        /// never ships with a build a player could stumble onto.
-        /// </summary>
-        private int ReadDebugPreview(int realRank)
-        {
-            if (Input.GetKeyDown(KeyCode.F7))
-            {
-                debugPreviewRank = debugPreviewRank <= 0 ? -1 : debugPreviewRank - 1;
-                AnnouncePreview();
-            }
-            else if (Input.GetKeyDown(KeyCode.F8))
-            {
-                debugPreviewRank = Mathf.Clamp(debugPreviewRank + 1, 0, MaxRankForPreview);
-                AnnouncePreview();
-            }
-
-            return debugPreviewRank >= 0 ? debugPreviewRank : realRank;
-        }
-
-        private void AnnouncePreview()
-        {
-            if (CameraFollower.Instance == null)
-                return;
-
-            var text = debugPreviewRank < 0
-                ? "[Debug] ออร่า Adventure: ปิดพรีวิว ใช้อันดับจริง"
-                : $"[Debug] ออร่า Adventure: พรีวิวอันดับ {debugPreviewRank} (F7 ลด, F8 เพิ่ม, ต่ำกว่า 0 = ปิด)";
-            CameraFollower.Instance.AppendChatText(text);
         }
 
         private void Build()
