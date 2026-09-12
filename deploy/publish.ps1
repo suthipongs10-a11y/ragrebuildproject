@@ -13,7 +13,19 @@ if (Test-Path $out) { Remove-Item $out -Recurse -Force }
 dotnet publish (Join-Path $srv "RoRebuildServer.csproj") -c Release -o $out
 if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed" }
 
-Copy-Item (Join-Path $root "RoRebuildServer\GameConfig\ServerData") (Join-Path $out "ServerData") -Recurse
+# The published output already has a ServerData, and Copy-Item onto a folder that
+# exists puts the source *inside* it rather than over it - so the bundle ends up
+# with the build's copy at ServerData and the real one buried at
+# ServerData\ServerData. The server reads the first, and the one file the build
+# leaves out is missing from it. Clearing the destination first makes this copy
+# mean what it reads as: the bundle's ServerData is the source folder, entire.
+$serverData = Join-Path $out "ServerData"
+if (Test-Path $serverData) { Remove-Item $serverData -Recurse -Force }
+Copy-Item (Join-Path $root "RoRebuildServer\GameConfig\ServerData") $serverData -Recurse
+
+$missing = @("Db\WeaponClass.csv", "Db\Maps.csv", "Db\Monsters.csv") |
+    Where-Object { -not (Test-Path (Join-Path $serverData $_)) }
+if ($missing) { throw "ServerData is incomplete - missing: $($missing -join ', ')" }
 
 $walk = Join-Path $root "RebuildClient\Assets\Maps\exportdata"
 if (Test-Path $walk) {

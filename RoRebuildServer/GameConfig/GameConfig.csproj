@@ -19,7 +19,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <AdditionalFiles Include="ServerData\Db\WeaponClass.csv" />
+	  <AdditionalFiles Include="ServerData\Db\WeaponClass.csv">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </AdditionalFiles>
 	  <AdditionalFiles Include="ServerData\Skills\Skills.toml">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </AdditionalFiles>
