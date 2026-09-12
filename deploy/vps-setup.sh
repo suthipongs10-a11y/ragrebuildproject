@@ -24,12 +24,44 @@ apt-get update
 APT_KEEP=(-o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold)
 apt-get install -y "${APT_KEEP[@]}" nginx certbot python3-certbot-nginx sqlite3 unzip wget
 
-if ! command -v dotnet >/dev/null 2>&1; then
+# Asked by runtime, not by whether a dotnet binary exists: a box with .NET 8 on it
+# has the binary and still cannot run this server.
+have_aspnet9() { dotnet --list-runtimes 2>/dev/null | grep -q "Microsoft.AspNetCore.App 9\."; }
+
+# Three sources, tried in order, because which one has it depends on the release.
+#
+# On 22.04 the Microsoft feed carries the runtime and the first attempt is the end
+# of it. On 24.04 it does not: that feed is published and updates cleanly, and holds
+# no .NET 9 package at all - which apt reports as "Unable to locate package", the
+# same words it uses for a typo. Ubuntu's own archives do not carry it either, in
+# main, universe, updates or backports. So the ppa is tried next, and Microsoft's
+# own installer last, which needs no archive and works anywhere.
+if ! have_aspnet9; then
   . /etc/os-release
-  wget -q "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/packages-microsoft-prod.deb" -O /tmp/packages-microsoft-prod.deb
-  dpkg -i /tmp/packages-microsoft-prod.deb
-  apt-get update
-  apt-get install -y "${APT_KEEP[@]}" aspnetcore-runtime-9.0
+  wget -q "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/packages-microsoft-prod.deb" -O /tmp/packages-microsoft-prod.deb || true
+  if [ -s /tmp/packages-microsoft-prod.deb ]; then dpkg -i /tmp/packages-microsoft-prod.deb || true; fi
+  apt-get update || true
+  apt-get install -y "${APT_KEEP[@]}" aspnetcore-runtime-9.0 || true
+fi
+
+if ! have_aspnet9; then
+  echo "Not in this release's archives - trying the dotnet backports ppa."
+  apt-get install -y "${APT_KEEP[@]}" software-properties-common || true
+  add-apt-repository -y ppa:dotnet/backports || true
+  apt-get update || true
+  apt-get install -y "${APT_KEEP[@]}" aspnetcore-runtime-9.0 || true
+fi
+
+if ! have_aspnet9; then
+  echo "Still not there - installing from Microsoft's own script instead of a package."
+  wget -q https://dot.net/v1/dotnet-install.sh -O /tmp/dotnet-install.sh
+  bash /tmp/dotnet-install.sh --channel 9.0 --runtime aspnetcore --install-dir /usr/share/dotnet --no-path
+  ln -sf /usr/share/dotnet/dotnet /usr/bin/dotnet
+fi
+
+if ! have_aspnet9; then
+  echo "Could not install the ASP.NET Core 9 runtime by any route. The server cannot start without it." >&2
+  exit 1
 fi
 dotnet --list-runtimes
 
