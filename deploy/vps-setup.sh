@@ -9,15 +9,27 @@ set -euo pipefail
 DOMAIN="${1:?usage: vps-setup.sh <domain>}"
 HERE="$(cd "$(dirname "$0")" && pwd)"
 
+# No package may stop to ask a question. This is meant to be started and left, and
+# on 24.04 apt has two habits that break that: debconf draws a notice about the
+# pending kernel, and needrestart asks which services to restart. Both open
+# /dev/tty directly, so they appear on screen even with output redirected to a
+# file - and if this was started in the background, reading that terminal earns a
+# SIGTTIN and the whole run stops dead behind a dialog that will not take a
+# keypress, looking for all the world like a hang.
+export DEBIAN_FRONTEND=noninteractive
+export NEEDRESTART_MODE=a
+export NEEDRESTART_SUSPEND=1
+
 apt-get update
-apt-get install -y nginx certbot python3-certbot-nginx sqlite3 unzip wget
+APT_KEEP=(-o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold)
+apt-get install -y "${APT_KEEP[@]}" nginx certbot python3-certbot-nginx sqlite3 unzip wget
 
 if ! command -v dotnet >/dev/null 2>&1; then
   . /etc/os-release
   wget -q "https://packages.microsoft.com/config/ubuntu/${VERSION_ID}/packages-microsoft-prod.deb" -O /tmp/packages-microsoft-prod.deb
   dpkg -i /tmp/packages-microsoft-prod.deb
   apt-get update
-  apt-get install -y aspnetcore-runtime-9.0
+  apt-get install -y "${APT_KEEP[@]}" aspnetcore-runtime-9.0
 fi
 dotnet --list-runtimes
 
