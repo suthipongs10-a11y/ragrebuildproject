@@ -4,3 +4,17 @@
 # from depending on how each person happens to have git configured.
 *.bat text eol=crlf
 *.cmd text eol=crlf
+
+# The mirror image of the rule above, for the files a Linux box runs. Git for
+# Windows defaults to core.autocrlf=true, which rewrites these on checkout, and
+# scp then copies the carriage returns straight onto the server.
+#
+# bash reads "set -euo pipefail\r" as an option named "pipefail\r" and stops, which
+# at least says something. systemd is the dangerous one: it reads
+# "Environment=ASPNETCORE_ENVIRONMENT=Production\r" as an environment named
+# Production-with-a-carriage-return, that matches no appsettings file, and the
+# server comes up on the developer defaults - every cheat flag on, no player
+# limit - on a public address, saying nothing about why.
+*.sh text eol=lf
+*.service text eol=lf
+*.conf text eol=lf

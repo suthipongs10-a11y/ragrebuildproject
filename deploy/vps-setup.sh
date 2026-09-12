@@ -23,14 +23,20 @@ dotnet --list-runtimes
 
 id -u rorebuild >/dev/null 2>&1 || useradd --system --create-home --home-dir /opt/rorebuild --shell /usr/sbin/nologin rorebuild
 mkdir -p /opt/rorebuild/server /opt/rorebuild/backup
-install -m 755 "$HERE/backup.sh" /opt/rorebuild/backup.sh
+# Carriage returns are stripped on the way in rather than trusted to be absent.
+# .gitattributes keeps them out of a checkout, but these files also get copied by
+# hand, and a stray \r in the service file means the server silently starts with
+# the developer settings instead of the live ones.
+sed 's/\r$//' "$HERE/backup.sh" > /opt/rorebuild/backup.sh
+chmod 755 /opt/rorebuild/backup.sh
 chown -R rorebuild:rorebuild /opt/rorebuild
 
-install -m 644 "$HERE/systemd/rorebuild.service" /etc/systemd/system/rorebuild.service
+sed 's/\r$//' "$HERE/systemd/rorebuild.service" > /etc/systemd/system/rorebuild.service
+chmod 644 /etc/systemd/system/rorebuild.service
 systemctl daemon-reload
 systemctl enable rorebuild
 
-sed "s/example.com/${DOMAIN}/g" "$HERE/nginx/rorebuild.conf" > /etc/nginx/sites-available/rorebuild.conf
+sed -e 's/\r$//' -e "s/example.com/${DOMAIN}/g" "$HERE/nginx/rorebuild.conf" > /etc/nginx/sites-available/rorebuild.conf
 ln -sf /etc/nginx/sites-available/rorebuild.conf /etc/nginx/sites-enabled/rorebuild.conf
 rm -f /etc/nginx/sites-enabled/default
 nginx -t
