@@ -61,6 +61,10 @@ $targets = @(
     @{ Path = 'RebuildClient\Logs';                      Why = 'log' }
     @{ Path = 'RebuildClient\MemoryCaptures';            Why = 'memory capture' }
     @{ Path = 'RoRebuildServer\RoRebuildServer\bin\Debug\net9.0\WebClient'; Why = 'output ที่ค้างจาก build ที่พัง' }
+    #ของสองอย่างนี้คือชุดไฟล์สำหรับขึ้น VPS ที่ publish.ps1 สร้าง — ตัวเกมทั้งตัวอยู่ในนั้น
+    #สองชุด (กองที่ก๊อปไป กับ zip ที่บีบแล้ว) สั่ง publish.ps1 ใหม่ก็ได้คืนทั้งคู่
+    @{ Path = 'RoRebuildServer\RoRebuildServer\bin\publish';   Why = 'กองไฟล์ที่ publish.ps1 ก๊อปไว้ก่อนบีบ zip' }
+    @{ Path = 'rorebuild-server.zip';                            Why = 'zip สำหรับขึ้น VPS สร้างใหม่ได้' }
 )
 
 if ($IncludeDotnet) {
