@@ -68,9 +68,17 @@ OnClick:
 }
 
 //for this macro to work, you need to put it at the end of the init section
+//
+//The HideNpc that used to be here is gone on purpose. Upstream, the camp filled up as
+//the server hit milestones and every one of these stood invisible until then; on a
+//server this size that means a new player walks into an empty field and has nowhere to
+//buy a fly wing. They are all present from the first boot now. What each one will
+//actually do for you is still decided in its own dialogue.
+//
+//The signal handling below is left alone so the announcement still goes out when a
+//milestone is genuinely reached. ShowNpc on something already shown does nothing.
 macro EventRevealedNpc(%signalName, %npcName) {
 	RegisterGlobalSignal(%signalName);
-	HideNpc();
 OnSignal:
 	if(Signal == "RevealOnServerUp")
 		ShowNpc();
@@ -80,7 +88,7 @@ OnTimer 20s:
 	ShowNpc();
 	PlayEffectAtMyLocation("PuffOfSmoke");
 OnTimer 22s:
-	ServerWideMessage("<color=#FF99FF>The " + %npcName + " has joined the camp south of Prontera!</color>", "", true);
+	ServerWideMessage("<color=#FF99FF>A server milestone has been reached: the " + %npcName + "!</color>", "", true);
 	StopTimer();
 }
 

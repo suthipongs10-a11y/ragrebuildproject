@@ -2,7 +2,7 @@
 
 Npc("prt_fild08", "Ultra Shady Merchant", "1_M_SIGNROGUE", 127, 362, SE, 1, 1) 
 {
-	HideNpc();
+	//visible from the start like the rest of the camp
 	SellItem("Dead_Branch", 8000);
 	AddTradedItem(CreateTradedItem("Bloody_Branch").Requires("Okolnir_Key", 1));
 OnSignal:

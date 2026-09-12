@@ -8,7 +8,8 @@ Npc("prt_fild08", "Valkyrie", "4_F_VALKYRIE", 133, 340, SE)
 {
 	local okolnir = 0;
 	RegisterGlobalSignal("MilestoneValkyrie");
-	HideNpc();
+	//She stands in the camp from the first boot like everyone else. The dungeon behind
+	//her is a separate question and the answer to that one is still no - see OnClick.
 OnSignal:
 	if(Signal == "RevealOnServerUp")
 		ShowNpc();
@@ -29,7 +30,7 @@ OnTimer 20s:
 	ShowNpc();
 	PlayEffectAtMyLocation("PuffOfSmoke");
 OnTimer 22s:
-	ServerWideMessage("<color=#FF99FF>The Valkyrie has joined the camp south of Prontera!</color>", "", true);
+	ServerWideMessage("<color=#FF99FF>A server milestone has been reached: the Valkyrie!</color>", "", true);
 	StopTimer();
 OnClick:
 	FocusNpc();
@@ -51,15 +52,20 @@ OnClick:
 	}
 	if(okolnir == 0)
 	{
-		if(GetItemCount("Okolnir_Key") >= 3)
-		{
-			Dialog(Name, "You have the three keys required to open the door to Okolnir. Are you interested in opening the portal?");
-			openOption = "Open the Portal";
-		}
-		else
-		{
-			Dialog(Name, "Welcome adventurer. I can grant you access to the realm of Okolnir, if you can prove your worth.");
-		}
+		//Okolnir stays shut for this round of the server, so the option to open it is not
+		//offered at all. This is the only place that sends "Open" to #okolnirentrance, and
+		//that npc keeps its own HideNpc, so the portal cannot appear by any other route.
+		//
+		//Leaving openOption empty is exactly the state a player without three keys was
+		//already in, so nothing below this changes. To open the dungeon again, restore the
+		//key check that was here:
+		//
+		//  if(GetItemCount("Okolnir_Key") >= 3)
+		//  {
+		//      Dialog(Name, "You have the three keys required to open the door to Okolnir. Are you interested in opening the portal?");
+		//      openOption = "Open the Portal";
+		//  }
+		Dialog(Name, "Welcome adventurer. The realm of Okolnir is sealed for the time being - three keys would not turn that lock today. Come and find me when word goes out that the way has opened.");
 	}
 
 	Option(openOption, "Explain Okolnir", "Cancel")

@@ -18,7 +18,8 @@ Npc("prt_fild08", "Kafra Staff", "4_F_KAFRA1", 158, 362, S)
 {
 	RegisterAsKafra();
 	RegisterGlobalSignal("MilestoneKafra");
-	HideNpc();
+	//present from the first boot rather than unlocked at level 10 - see the note on
+	//EventRevealedNpc in MilestoneEvent.txt
 	localstr name = "Kafra Defolty - Kafra Employee";
 OnSignal:
 	if(Signal == "RevealOnServerUp") ShowNpc();	else StartTimer(1s);
@@ -26,7 +27,7 @@ OnTimer 20s:
 	ShowNpc();
 	PlayEffectAtMyLocation("PuffOfSmoke");
 OnTimer 22s:
-	ServerWideMessage("<color=#FF99FF>The Kafra Staff Defolty has joined the camp south of Prontera!</color>", "", true);
+	ServerWideMessage("<color=#FF99FF>A server milestone has been reached: the Kafra Staff!</color>", "", true);
 	StopTimer();
 OnClick:
 	FocusNpc();
