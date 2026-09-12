@@ -87,12 +87,20 @@ nginx -t
 systemctl reload nginx
 
 if command -v ufw >/dev/null 2>&1; then
-  ufw allow OpenSSH >/dev/null
-  ufw allow 'Nginx Full' >/dev/null
+  ufw allow OpenSSH >/dev/null || echo "Could not add the ufw rule for ssh - carrying on."
+  ufw allow 'Nginx Full' >/dev/null || echo "Could not add the ufw rule for nginx - carrying on."
 fi
 
-# a database backup every six hours, two weeks kept
-( crontab -u root -l 2>/dev/null | grep -v rorebuild/backup.sh; echo "0 */6 * * * /opt/rorebuild/backup.sh" ) | crontab -u root -
+# A database backup every six hours, two weeks kept.
+#
+# The "|| true" is the whole point of this comment. On a machine where root has no
+# crontab yet - which is every machine this runs on, the first time - "crontab -l"
+# exits 1, grep then reads nothing and exits 1 as well, and under "set -e" the
+# subshell dies there, before the echo that adds the line. So the backup was never
+# scheduled, and the script stopped on the spot: everything above it done,
+# everything below it, including the message saying what to do next, never printed.
+( crontab -u root -l 2>/dev/null | grep -v rorebuild/backup.sh || true
+  echo "0 */6 * * * /opt/rorebuild/backup.sh" ) | crontab -u root -
 
 cat <<EOM
 
