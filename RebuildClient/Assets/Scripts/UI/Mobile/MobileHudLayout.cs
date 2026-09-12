@@ -39,8 +39,13 @@ namespace Assets.Scripts.UI.Mobile
         /// why it used to get well over half the width. On a phone that is most of the top
         /// of the screen given to numbers that do not change from one second to the next,
         /// so it takes a smaller share now and folds away entirely at a tap.
+        ///
+        /// Two fifths was still a quarter of a phone screen spent on a panel that changes
+        /// about once a minute, and on a handset held sideways it is the first thing
+        /// anyone says is too big. Nothing here is lost by shrinking it: the numbers are
+        /// short, and the toggle is there for the times they are not wanted at all.
         /// </summary>
-        private const float ReadoutShare = 0.4f;
+        private const float ReadoutShare = 0.27f;
 
         /// <summary>
         /// What the minimap keeps of the room left over.

@@ -28,6 +28,9 @@ namespace Assets.Scripts.UI.TitleScreen
         private const float StatRowHeight = 42f;
         private const float StatRowGap = 6f;
 
+        /// <summary>Space left around the pane when it has to be shrunk to fit.</summary>
+        private const float FitMargin = 12f;
+
         private static readonly string[] StatNames = { "STR", "AGI", "VIT", "INT", "DEX", "LUK" };
 
         private static Sprite[] StatIcons => new[]
@@ -57,6 +60,8 @@ namespace Assets.Scripts.UI.TitleScreen
 
         private void Update()
         {
+            FitPaneToScreen();
+
             //the style number is the one readout the window doesn't expose a field for,
             //so it is polled off the public hairStyle value instead
             if (creator != null && hairStyleLabel != null && creator.hairStyle != shownHairStyle)
@@ -82,6 +87,50 @@ namespace Assets.Scripts.UI.TitleScreen
             ApplySkin(found);
         }
 
+        /// <summary>
+        /// Shrinks the pane until it is inside the screen, and leaves it alone otherwise.
+        /// </summary>
+        /// <remarks>
+        /// The pane is authored at a fixed 900 by 580, which is a comfortable size on a
+        /// monitor and taller than a phone held sideways has room for - a handset in
+        /// landscape is often under 450 points high. Centred, that put the top of the pane,
+        /// where the name field is, off the top of the screen with no way to reach it: you
+        /// could see the stats and the create button and not the box you have to type in.
+        ///
+        /// Checked every frame rather than once when the skin is applied, because the thing
+        /// it depends on changes without anything being rebuilt - a phone gets turned over,
+        /// a browser window gets dragged wider. It is two rect reads and a compare when
+        /// nothing has moved.
+        ///
+        /// Never scales up. On a monitor the authored size is the right size.
+        /// </remarks>
+        private void FitPaneToScreen()
+        {
+            if (creator == null || creator.Pane == null)
+                return;
+
+            var pane = (RectTransform)creator.Pane.transform;
+
+            //localScale is relative to the parent, so the room available has to be measured
+            //in the parent's units too - the canvas rect would be the wrong ruler if
+            //anything between the two carries a scale.
+            var area = pane.parent as RectTransform;
+            if (area == null)
+                return;
+
+            var room = area.rect.size;
+            if (room.x < 1f || room.y < 1f)
+                return; //not laid out yet
+
+            var fit = Mathf.Min((room.x - FitMargin * 2f) / PaneWidth,
+                                (room.y - FitMargin * 2f) / PaneHeight, 1f);
+            if (fit <= 0f)
+                return;
+
+            if (Mathf.Abs(pane.localScale.x - fit) > 0.001f)
+                pane.localScale = Vector3.one * fit;
+        }
+
         private void ApplySkin(CharacterCreatorWindow win)
         {
             ModernUiTheme.MarkSkinned(win.Pane);
@@ -96,7 +145,7 @@ namespace Assets.Scripts.UI.TitleScreen
             pane.pivot = new Vector2(0.5f, 0.5f);
             pane.sizeDelta = new Vector2(PaneWidth, PaneHeight);
             pane.anchoredPosition = Vector2.zero;
-            pane.localScale = Vector3.one;
+            pane.localScale = Vector3.one; //FitPaneToScreen takes it down from here if it has to
 
             //the starting values were written into the old texts by the window's Awake,
             //so they are read back here rather than assumed
