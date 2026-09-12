@@ -180,7 +180,9 @@ namespace Assets.Scripts.Editor
                 var report = new StringBuilder();
                 report.AppendLine($"[MonsterSpriteAudit] {notAddressable.Count} monster(s) have their sprite on "
                                   + "disk but no addressable entry, so the client cannot load it and will draw a "
-                                  + "Poring. Run Ragnarok -> Update Addressables (Fast):");
+                                  + "Poring. Run Build -> Full Addressables Rebuild -> Build WebGL, which is the "
+                                  + "menu that registers them - the Groups window's own Build only rebuilds "
+                                  + "entries that already exist:");
                 foreach (var line in notAddressable)
                     report.AppendLine($"  {line}");
                 Debug.LogWarning(report.ToString());

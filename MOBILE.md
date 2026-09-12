@@ -69,9 +69,19 @@ Unity build เป็น WebGL ใช้เวลานาน (เป็นส�
 
 ทำ 2 อย่างนี้ก่อนกด Build เสมอ:
 
-1. `Ragnarok → Update Addressables (Fast)` — ลงทะเบียนสไปรต์ที่เพิ่งแก้/เพิ่ม
-2. `Window → Asset Management → Addressables → Groups`
-   → ในหน้าต่างนั้นกด `Build → New Build → Default Build Script`
+**`Build → Full Addressables Rebuild → Build WebGL`** — เมนูเดียวจบ
+
+มันทำ 3 อย่างเรียงกัน: ล้างของเก่า → **ลงทะเบียนสไปรต์ใหม่** → build ใหม่ทั้งชุด
+
+> ⛔ **อย่าใช้ `Addressables → Groups → Build → New Build → Default Build Script` อย่างเดียว**
+>
+> อันนั้น build จาก**รายการที่ลงทะเบียนไว้แล้วเท่านั้น** สไปรต์ที่ยังไม่เคยลงทะเบียน
+> จะไม่ถูกเพิ่มเข้าไป — client หาไม่เจอแล้ววาด **Poring** แทน โดยไม่มี error อะไรเลย
+> ขั้นที่ลงทะเบียนคือ `RagnarokMapImporterWindow.UpdateAddressables()` ซึ่งเรียกได้จาก
+> เมนู `Build →` ข้างบนเท่านั้น
+>
+> (เอกสารนี้เคยเขียนว่าให้กด `Ragnarok → Update Addressables (Fast)` — **เมนูนั้นไม่มีอยู่จริง**
+> ใครทำตามก็จะข้ามขั้นลงทะเบียนไปโดยไม่รู้ตัว)
 
 > ⛔ **ทำมือทั้งสองข้อ อย่าไปหวังหน้าต่างที่เด้งถาม**
 >

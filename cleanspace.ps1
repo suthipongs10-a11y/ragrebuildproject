@@ -164,9 +164,10 @@ Write-Host ("เสร็จ — ไดรฟ์ ${drive}: $freeBefore GB -> $fr
 Write-Host ""
 Write-Host "ขั้นต่อไป:" -ForegroundColor Yellow
 Write-Host "  1. เปิด Unity (ครั้งนี้จะช้าหน่อย เพราะ cache ตอน build ถูกลบไป — สไปรต์ไม่ได้ import ใหม่)"
-Write-Host "  2. Ragnarok -> Update Addressables (Fast)"
-Write-Host "  3. Window -> Asset Management -> Addressables -> Groups -> Build -> New Build -> Default Build Script"
-Write-Host "  4. File -> Build Profiles -> Build  (สร้างโฟลเดอร์ WebClient ใหม่ด้วย)"
+Write-Host "  2. Build -> Full Addressables Rebuild -> Build WebGL"
+Write-Host "     (เมนูนี้ลงทะเบียนสไปรต์ใหม่ด้วย - Groups -> Build อย่างเดียวไม่ลงทะเบียน"
+Write-Host "      สไปรต์ที่ยังไม่มีใน catalog จะกลายเป็น Poring ในเกม)" -ForegroundColor DarkGray
+Write-Host "  3. File -> Build Profiles -> Build  (สร้างโฟลเดอร์ WebClient ใหม่ด้วย)"
 if ($IncludeDotnet) {
     Write-Host "  0. อย่าลืม dotnet build ที่ RoRebuildServer ก่อนรันเซิร์ฟเวอร์" -ForegroundColor Red
 }
