@@ -55,6 +55,15 @@ namespace Assets.Scripts.UI.Hud
                 return;
             }
 
+            //Same reason HideNamePlate destroys it: the mark is a child of the plate and
+            //the plate goes back to a pool shared with every monster on the map. Missed
+            //here, and the next character handed this plate wears the last one's guild.
+            if (emblem != null)
+            {
+                Destroy(emblem.gameObject);
+                emblem = null;
+            }
+
             if (namePlate != null) Manager.ReturnNamePlate(namePlate.gameObject);
             if (castBar != null) Manager.ReturnCastBar(castBar.gameObject);
             if (hpBar != null) Manager.ReturnHpBar(hpBar.gameObject);
@@ -162,6 +171,18 @@ namespace Assets.Scripts.UI.Hud
         /// </summary>
         private void RefreshEmblem()
         {
+            //A plate can arrive from the pool already wearing somebody else's mark, so
+            //whatever is on it is adopted before anything is decided. Without this the
+            //check below reads a null field, concludes there is nothing to hide, and
+            //leaves a stray emblem sitting in front of a monster's name - which is how
+            //every poring in the field came to be flying a guild's colours.
+            if (emblem == null && namePlate != null)
+            {
+                var stray = namePlate.transform.Find("GuildEmblem");
+                if (stray != null)
+                    emblem = stray.GetComponent<Image>();
+            }
+
             var id = controllable != null ? controllable.GuildEmblem : 0;
 
             if (namePlate == null || id <= 0)

@@ -450,7 +450,7 @@ namespace Assets.Scripts.UI.Guild
                 chatting = false;
 
                 title.text = "ยังไม่ได้อยู่ในกิลด์";
-                subtitle.text = "สร้างกิลด์ด้วย  /guild create <ชื่อกิลด์>  หรือขอเข้ากิลด์ข้างล่าง";
+                subtitle.text = "สร้างกิลด์ด้วย  /guild create <ชื่อกิลด์>  (ใช้ Emperium 1 ชิ้น)  หรือขอเข้ากิลด์ข้างล่าง";
                 leaveButton.gameObject.SetActive(false);
                 //the three pages belong to a guild, and so do the buttons that reach them
                 titleButton.gameObject.SetActive(false);

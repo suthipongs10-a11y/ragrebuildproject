@@ -1,4 +1,6 @@
 using System.Text;
+using RoRebuildServer.Data;
+using RoRebuildServer.Logging;
 using RoRebuildServer.Database;
 using RoRebuildServer.Database.Requests;
 using RoRebuildServer.EntityComponents;
@@ -52,6 +54,21 @@ public static class GuildCommands
             "Guild commands: /guild create <name>, /guild info, /guild invite <player>, /guild join, /guild leave");
     }
 
+
+    /// <summary>
+    /// What founding a guild costs, named rather than numbered so it survives the item
+    /// table being renumbered. One is taken when the guild is actually created, not when
+    /// the command is typed - see CreateGuildRequest.
+    /// </summary>
+    public const string CharterItemCode = "Emperium";
+
+    public static bool TryGetCharterItem(out int itemId)
+    {
+        itemId = 0;
+        return DataManager.ItemIdByName != null
+               && DataManager.ItemIdByName.TryGetValue(CharterItemCode, out itemId);
+    }
+
     private static void CreateGuild(NetworkConnection connection, Player player, string name)
     {
         if (player.Guild != null)
@@ -69,6 +86,23 @@ public static class GuildCommands
         if (name.Length > Guild.MaxNameLength)
         {
             CommandBuilder.ErrorMessage(connection, $"A guild name can be at most {Guild.MaxNameLength} characters long.");
+            return;
+        }
+
+        //Asked here so somebody without one is told so straight away, rather than after a
+        //trip to the database. It is asked again on the other side and that is the one that
+        //counts: this runs now and the guild is created later, and in between the player
+        //can sell the thing.
+        if (!TryGetCharterItem(out var charterId))
+        {
+            ServerLogger.LogWarning($"No item called {CharterItemCode} in the item table, so no guild can be founded.");
+            CommandBuilder.ErrorMessage(connection, "Guilds cannot be founded right now. Tell a GM.");
+            return;
+        }
+
+        if (player.Inventory == null || !player.Inventory.HasItem(charterId))
+        {
+            CommandBuilder.ErrorMessage(connection, "Founding a guild takes an Emperium. Bring one and try again.");
             return;
         }
 
