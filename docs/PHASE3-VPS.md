@@ -76,11 +76,11 @@ bash vps-setup.sh play.example.com
 4. แตกไฟล์เซิร์ฟเวอร์แล้วเริ่ม
 
 ```bash
-unzip -o /root/rorebuild-server.zip -d /opt/rorebuild/server
-chown -R rorebuild:rorebuild /opt/rorebuild
-systemctl start rorebuild
-journalctl -u rorebuild -f
+bash /root/deploy/install-bundle.sh
+journalctl -u rorebuild -n 60 --no-pager
 ```
+
+   ⛔ **อย่า `unzip` เองด้วยมือ** — `Compress-Archive` ของ Windows ไม่เก็บสิทธิ์แบบ unix ลงใน zip ไฟล์ `.so` จะแตกออกมาโดยไม่มี execute bit แล้วเซิร์ฟเวอร์จะตายตอนเรียกฐานข้อมูลครั้งแรกด้วย `Unable to load shared library 'e_sqlite3'` ทั้งที่ไฟล์อยู่ตรงนั้นครบ สคริปต์นี้ `chmod` ให้
 
    ต้องเห็น `[Lockdown] LiveServer is on`, `[Lockdown] Created the GM account 'gmrebuild'` (เฉพาะครั้งแรก), `[Gate] Online players: 25 ...` และ `Server started`
 
@@ -94,12 +94,13 @@ certbot --nginx -d play.example.com
 
 ### C. อัปเดตรอบถัดไป
 
+อัป zip ตัวใหม่ขึ้นไปทับ แล้วคำสั่งเดียวจบ:
+
 ```bash
-systemctl stop rorebuild
-unzip -o /root/rorebuild-server.zip -d /opt/rorebuild/server
-chown -R rorebuild:rorebuild /opt/rorebuild
-systemctl start rorebuild
+bash /root/deploy/install-bundle.sh
 ```
+
+มันหยุด service, แตกไฟล์ทับ, ตั้ง owner กับสิทธิ์, สตาร์ตใหม่ แล้วบอกว่าขึ้นหรือไม่ขึ้น (ถ้าไม่ขึ้นมันพิมพ์ท้าย log ให้เลย)
 
 `RoCharacterDatabase.db`, `Keys/`, `Cache/` ไม่อยู่ใน zip จึงไม่ถูกทับ ถ้าเปลี่ยน `::ServerVersion` ใน `ServerData/Config/ServerClientConfig.txt` ทุกคนต้องรีเฟรชหน้าเว็บแบบล้างแคช (Ctrl+F5)
 
