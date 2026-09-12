@@ -1,6 +1,6 @@
 # Builds the server bundle for the VPS on the Windows machine. Run from anywhere:
 #   powershell -ExecutionPolicy Bypass -File deploy\publish.ps1
-# Output: rorebuild-server.zip in the repo root, holding the published server, ServerData,
+# Output: rorebuild-server.tar in the repo root, holding the published server, ServerData,
 # the walk data, the WebGL build (if one exists) and the GM seed file (if one exists).
 $ErrorActionPreference = "Stop"
 
