@@ -45,7 +45,7 @@
 powershell -ExecutionPolicy Bypass -File deploy\publish.ps1
 ```
 
-   ได้ `rorebuild-server.zip` ที่ root ของ repo (GmAccount.local.json ติดไปด้วยถ้าวางไว้ที่ `RoRebuildServer\RoRebuildServer\`)
+   ได้ `rorebuild-server.tar` ที่ root ของ repo (GmAccount.local.json ติดไปด้วยถ้าวางไว้ที่ `RoRebuildServer\RoRebuildServer\`)
 
    **อ่านสิ่งที่มันพิมพ์ออกมาให้ครบก่อนอัป** บรรทัดที่ต้องเห็น:
 
@@ -65,7 +65,7 @@ powershell -ExecutionPolicy Bypass -File deploy\publish.ps1
 > พอจดโดเมนแล้วค่อยรัน `vps-setup.sh` ซ้ำด้วยชื่อโดเมน แล้วรัน certbot
 
 1. ชี้ DNS ของโดเมนมาที่ IP ของ VPS ก่อน รอจน `ping โดเมน` ได้ IP ถูก (ข้ามได้ถ้ายังไม่จด)
-2. คัดลอก `deploy/` และ `rorebuild-server.zip` ขึ้นไป เช่น `scp -r deploy rorebuild-server.zip root@IP:/root/`
+2. คัดลอก `deploy/` และ `rorebuild-server.tar` ขึ้นไป เช่น `scp -r deploy rorebuild-server.tar root@IP:/root/`
 3. ตั้งค่าครั้งแรก
 
 ```bash
@@ -80,7 +80,7 @@ bash /root/deploy/install-bundle.sh
 journalctl -u rorebuild -n 60 --no-pager
 ```
 
-   ⛔ **อย่า `unzip` เองด้วยมือ** — `Compress-Archive` ของ Windows ไม่เก็บสิทธิ์แบบ unix ลงใน zip ไฟล์ `.so` จะแตกออกมาโดยไม่มี execute bit แล้วเซิร์ฟเวอร์จะตายตอนเรียกฐานข้อมูลครั้งแรกด้วย `Unable to load shared library 'e_sqlite3'` ทั้งที่ไฟล์อยู่ตรงนั้นครบ สคริปต์นี้ `chmod` ให้
+   ⛔ **อย่า `unzip` เองด้วยมือ** — สคริปต์นี้ `chmod` ไฟล์ `.so` ให้ (ไม่งั้นเซิร์ฟเวอร์ตายตอนเรียกฐานข้อมูลด้วย `Unable to load shared library 'e_sqlite3'` ทั้งที่ไฟล์ครบ)
 
    ต้องเห็น `[Lockdown] LiveServer is on`, `[Lockdown] Created the GM account 'gmrebuild'` (เฉพาะครั้งแรก), `[Gate] Online players: 25 ...` และ `Server started`
 

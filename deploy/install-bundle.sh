@@ -2,8 +2,8 @@
 # Unpacks a server bundle over the installed one and restarts the service. Run as
 # root on the VPS:
 #
-#     bash install-bundle.sh                       # uses /root/rorebuild-server.zip
-#     bash install-bundle.sh /path/to/bundle.zip
+#     bash install-bundle.sh                       # uses /root/rorebuild-server.tar
+#     bash install-bundle.sh /path/to/bundle.tar
 #
 # The chmod near the bottom is why this is a script rather than three lines in a
 # document. Compress-Archive on Windows writes no unix permissions into the zip, so
@@ -15,19 +15,44 @@
 # there, readable, in the directory it just named. Nothing in that says chmod.
 set -euo pipefail
 
-ZIP="${1:-/root/rorebuild-server.zip}"
 DEST=/opt/rorebuild/server
 
-[ -f "$ZIP" ] || { echo "No bundle at $ZIP" >&2; exit 1; }
+BUNDLE="${1:-}"
+if [ -z "$BUNDLE" ]; then
+    if   [ -f /root/rorebuild-server.tar ]; then BUNDLE=/root/rorebuild-server.tar
+    elif [ -f /root/rorebuild-server.zip ]; then BUNDLE=/root/rorebuild-server.zip
+    else echo "No bundle at /root/rorebuild-server.tar or .zip" >&2; exit 1
+    fi
+fi
+
+[ -f "$BUNDLE" ] || { echo "No bundle at $BUNDLE" >&2; exit 1; }
 [ -d "$DEST" ] || { echo "No server folder at $DEST - run vps-setup.sh first." >&2; exit 1; }
 
 echo "Stopping the server..."
 systemctl stop rorebuild 2>/dev/null || true
 
-echo "Unpacking $ZIP..."
+echo "Unpacking $BUNDLE..."
 # The character database, the data protection keys and the script cache are not in
 # the bundle, so they are left exactly as they are by unpacking over the top.
-unzip -q -o "$ZIP" -d "$DEST"
+case "$BUNDLE" in
+    *.tar|*.tar.gz|*.tgz)
+        tar -xf "$BUNDLE" -C "$DEST"
+        ;;
+    *.zip)
+        # A zip built on Windows carries its names as UTF-8 and unzip reads them back
+        # through a legacy codepage, so every sprite with a Korean name - which is
+        # every player sprite - lands under a mangled one and the player character
+        # does not render. The file count still matches, so nothing looks wrong.
+        # publish.ps1 makes a .tar now; this branch is for an old bundle.
+        echo "WARNING: this is a zip. Korean sprite file names will be mangled and player" >&2
+        echo "         characters will not render. Build the bundle again with the current" >&2
+        echo "         publish.ps1, which writes a .tar." >&2
+        unzip -q -o "$BUNDLE" -d "$DEST"
+        ;;
+    *)
+        echo "Do not know how to unpack $BUNDLE" >&2; exit 1
+        ;;
+esac
 
 echo "Setting ownership and permissions..."
 chown -R rorebuild:rorebuild /opt/rorebuild

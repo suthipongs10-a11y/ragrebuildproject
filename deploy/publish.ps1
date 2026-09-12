@@ -84,7 +84,39 @@ foreach ($dir in @("Keys", "Cache", "Logs")) {
     if (Test-Path $d) { Remove-Item $d -Recurse -Force }
 }
 
-$zip = Join-Path $root "rorebuild-server.zip"
-if (Test-Path $zip) { Remove-Item $zip }
-Compress-Archive -Path (Join-Path $out "*") -DestinationPath $zip
-Write-Host "Bundle ready: $zip"
+# tar, not Compress-Archive.
+#
+# Compress-Archive writes the names into the zip as UTF-8 and Info-ZIP's unzip on the
+# server reads them back through a legacy codepage, so every sprite with a Korean
+# name - which is every player sprite - lands under a mangled one: 10_\uB0A8.spr became
+# 10_\u044B\u0412\u0438.spr. The catalogue still asks for the real name, nothing is there under it,
+# and the player character simply does not render, while monsters and npcs, whose
+# names are ascii, are all fine. The file count matches exactly, so nothing reads as
+# missing and there is no error anywhere that mentions a name.
+#
+# Compress-Archive also cannot write an archive past 2 GB, and this bundle is at 1.8.
+#
+# tar has shipped with Windows since 10 1803 and passes the name bytes through
+# untouched, which is the whole requirement.
+$bundle = Join-Path $root "rorebuild-server.tar"
+if (Test-Path $bundle) { Remove-Item $bundle }
+
+if (-not (Get-Command tar -ErrorAction SilentlyContinue)) {
+    throw "tar is not on the path. It ships with Windows 10 1803 and later; without it the bundle cannot be built safely, because Compress-Archive corrupts the Korean sprite names."
+}
+
+Push-Location $out
+try {
+    & tar.exe -cf $bundle .
+    if ($LASTEXITCODE -ne 0) { throw "tar failed with exit code $LASTEXITCODE" }
+}
+finally { Pop-Location }
+
+#The old zip would otherwise sit next to the new tar and get deployed by mistake.
+$stale = Join-Path $root "rorebuild-server.zip"
+if (Test-Path $stale) {
+    Remove-Item $stale
+    Write-Host "Removed the old rorebuild-server.zip - the bundle is a .tar now."
+}
+
+Write-Host "Bundle ready: $bundle"
