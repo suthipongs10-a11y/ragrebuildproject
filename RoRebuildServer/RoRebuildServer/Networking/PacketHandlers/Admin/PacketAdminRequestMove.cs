@@ -13,6 +13,9 @@ namespace RoRebuildServer.Networking.PacketHandlers.Admin;
 [ClientPacketHandler(PacketType.AdminRequestMove)]
 public class PacketAdminRequestMove : IClientPacketHandler
 {
+    /// <summary>How long a player waits between one trip out of the database and the next.</summary>
+    private const float MapWarpCooldownTime = 30f;
+
     public void Process(NetworkConnection connection, InboundMessage msg)
     {
         if (!connection.IsPlayerAlive)
@@ -34,20 +37,27 @@ public class PacketAdminRequestMove : IClientPacketHandler
         var posY = msg.ReadInt16();
         var force = msg.ReadBoolean();
 
-        //Travelling anywhere for nothing is a GM tool, not a way to play. A wait between
-        //trips was not enough, because the trip is the problem rather than how often it can
-        //be taken: it skips the walk, the field in between and whatever a warp costs. So the
-        //packet is closed to players outright rather than slowed down.
+        //Everybody may travel from the database window; what separates a player from an
+        //admin is the wait, and the wait is kept here rather than in the window that sends
+        //this because a window is the half of the game a player can edit.
         //
-        //It is closed here rather than in the windows that send it because a window is the
-        //half of the game a player can edit - the button this used to sit behind comes back
-        //on its own with ?vanillaui=1, and the packet can be sent with no window at all.
-        //EnableWarpCommandForEveryone reopens it for testing.
+        //The wait is the whole rule, so do not turn this into an admin-only packet: the
+        //database's map pages are meant to work for players and they come through here. What
+        //was removed instead is the bottom bar's tile for the admin warp list, which is a
+        //button per map in the game and made this the fastest way anywhere. One trip every
+        //half minute, found by looking the map up, is the shape that was wanted.
         var isAdmin = connection.IsAdmin || ServerConfig.DebugConfig.EnableWarpCommandForEveryone;
         if (!isAdmin)
         {
-            CommandBuilder.SendRequestFailed(player, ClientErrorType.CommandUnavailable);
-            return;
+            if (player.MapWarpCooldown > Time.ElapsedTimeFloat)
+            {
+                CommandBuilder.SendRequestFailed(player, ClientErrorType.TooManyRequests);
+                return;
+            }
+
+            //An admin tool: it drops the character on the named cell whether or not anything
+            //can stand there, clamped only to the map's own edges.
+            force = false;
         }
 
         ServerLogger.Log($"Player {connection.Player.Name} requested move to map {mapName}.");
@@ -94,6 +104,9 @@ public class PacketAdminRequestMove : IClientPacketHandler
         }
 
         //CommandBuilder.SendHealSingle(player, 0, HealType.None); //heal amount is 0, but we set hp to max so it will update without the effect
+
+        if (!isAdmin)
+            player.MapWarpCooldown = Time.ElapsedTimeFloat + MapWarpCooldownTime;
 
         if (ch.Map.Name == mapName)
         {

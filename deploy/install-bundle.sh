@@ -31,9 +31,26 @@ fi
 echo "Stopping the server..."
 systemctl stop rorebuild 2>/dev/null || true
 
+echo "Clearing the folders the bundle replaces..."
+# Unpacking over the top leaves behind every file the bundle no longer has. That is not
+# a tidiness question: a test NPC was taken out upstream by renaming its script to
+# _TestFinale.txt, the rename arrived as a new file, the old TestFinale.txt stayed where
+# it was, and the server went on compiling it - the NPC was still standing in the field
+# on a server built from a tree that had not held it for days. Anything dropped or
+# renamed upstream needs the same treatment, so the folders the bundle owns whole are
+# cleared first rather than merged into.
+#
+# Cache is in that list because it holds the compiled script assembly. Leaving a script
+# build keyed to the files that were here last time is how a stale NPC survives even a
+# clean ServerData.
+#
+# The character database, the data protection keys and the logs belong to this machine
+# and are not in the bundle, so they are not touched.
+for dir in ServerData WebClient walkdata Cache; do
+    rm -rf "${DEST:?}/$dir"
+done
+
 echo "Unpacking $BUNDLE..."
-# The character database, the data protection keys and the script cache are not in
-# the bundle, so they are left exactly as they are by unpacking over the top.
 case "$BUNDLE" in
     *.tar|*.tar.gz|*.tgz)
         tar -xf "$BUNDLE" -C "$DEST"
