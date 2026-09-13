@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
+using RoRebuildServer.Custom.Moderation;
+using RoRebuildServer.Data;
 using RoRebuildServer.Logging;
 using RoRebuildServer.Networking;
+using System.Text.Json;
 
 namespace RoRebuildServer.Server;
 
@@ -48,7 +51,52 @@ internal class WebSocketGameServer
             }
         }));
 
+        ServeStatus(app);
+
         ServeWebClient(app, config);
+    }
+
+    /// <summary>
+    /// One small public JSON document saying whether anybody can play right now.
+    /// </summary>
+    /// <remarks>
+    /// The front page lives on the bare domain and the game on a subdomain of it, which
+    /// are different origins, so the page cannot read this without being told it may -
+    /// hence the allow-origin header. It is open to everyone because everything in the
+    /// answer is already public: a player count anyone can see by logging in, a cap that
+    /// is announced, and whether the door is open. Nothing here is per-account and no
+    /// cookie is read, so there is nothing for a hostile page to borrow.
+    ///
+    /// Mapped beside the socket rather than left to the file server, because the file
+    /// server would look for a file called status, not find one, and hand back the
+    /// browser build's index page - a page, with status 200, that the front end would
+    /// then try to read as JSON.
+    /// </remarks>
+    private static void ServeStatus(IApplicationBuilder app)
+    {
+        app.Map("/status", status => status.Run(async context =>
+        {
+            var config = ServerConfig.OperationConfig;
+
+            var registration = !config.AllowRegistration ? "closed"
+                : config.MaxAccounts > 0 && ConnectionGate.AccountCount >= config.MaxAccounts ? "full"
+                : "open";
+
+            var body = JsonSerializer.Serialize(new
+            {
+                online = true,
+                players = NetworkManager.PlayerCount,
+                maxPlayers = config.MaxOnlinePlayers, //0 means no limit
+                registration
+            });
+
+            context.Response.ContentType = "application/json; charset=utf-8";
+            //A cached answer is a wrong answer within seconds, and this is polled.
+            context.Response.Headers.CacheControl = "no-store";
+            context.Response.Headers.AccessControlAllowOrigin = "*";
+
+            await context.Response.WriteAsync(body);
+        }));
     }
 
     /// <summary>

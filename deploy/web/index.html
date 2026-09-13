@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rag Rebuild — เซิร์ฟเวอร์</title>
+<meta name="description" content="Ragnarok Online เล่นผ่านเบราว์เซอร์ ไม่ต้องติดตั้ง รองรับมือถือ ทำเล่นไม่เชิงพาณิชย์">
+<meta name="color-scheme" content="dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&family=Sarabun:wght@400;600&display=swap">
+<style>
+/* One committed look rather than two half-designed ones: this is a game portal and it
+   is dark on purpose, so every colour is stated outright and nothing is inherited from
+   whatever the browser would have picked. */
+:root {
+  --ground:  #0e1320;
+  --panel:   #171e30;
+  --panel-2: #1d2640;
+  --edge:    #2a3250;
+  --ink:     #e9e7e2;
+  --dim:     #949db3;
+  --gold:    #e2a93f;
+  --gold-dim:#8a6b2c;
+  --gold-bg: rgba(226, 169, 63, .12);
+  --online:  #4ade80;
+  --offline: #f87171;
+  --wait:    #8b93a8;
+  --radius:  12px;
+}
+
+* { box-sizing: border-box; }
+
+html { background: var(--ground); }
+
+body {
+  margin: 0;
+  padding-block: 56px 40px;
+  padding-inline: 20px;
+  background: var(--ground);
+  /* A faint light behind the title, the way the game's own login screen sits on a
+     lit sky. Fixed so it does not slide under the content when the page scrolls. */
+  background-image: radial-gradient(900px 420px at 50% -160px, #1d2846 0%, transparent 70%);
+  background-repeat: no-repeat;
+  color: var(--ink);
+  font-family: Sarabun, "Noto Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+main { max-width: 660px; margin: 0 auto; }
+
+/* ---- hero ---- */
+
+.mark {
+  display: block;
+  width: 56px; height: 56px;
+  margin: 0 auto 22px;
+  border: 2px solid var(--gold-dim);
+  border-radius: 50%;
+  background: var(--gold-bg);
+  color: var(--gold);
+  font-family: Kanit, sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 52px;
+  text-align: center;
+  letter-spacing: .02em;
+}
+
+h1 {
+  margin: 0;
+  font-family: Kanit, sans-serif;
+  font-weight: 700;
+  font-size: clamp(34px, 8vw, 52px);
+  line-height: 1.15;
+  letter-spacing: -.01em;
+  text-align: center;
+  text-wrap: balance;
+  color: var(--gold);
+}
+
+.tagline {
+  margin: 14px auto 0;
+  max-width: 40ch;
+  text-align: center;
+  color: var(--dim);
+  text-wrap: balance;
+}
+
+/* ---- section headings ---- */
+
+h2 {
+  margin: 52px 0 14px;
+  font-family: Kanit, sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ---- server card ---- */
+
+.server {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  background: var(--panel);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color .15s, background .15s, transform .15s;
+}
+.server:hover, .server:focus-visible {
+  border-color: var(--gold-dim);
+  background: var(--panel-2);
+  transform: translateY(-1px);
+}
+.server:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+.badge {
+  flex: none;
+  width: 46px; height: 46px;
+  display: grid; place-items: center;
+  border-radius: 10px;
+  background: var(--gold-bg);
+  border: 1px solid var(--gold-dim);
+  color: var(--gold);
+  font-family: Kanit, sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+
+.who { flex: 1 1 auto; min-width: 0; }
+
+.name {
+  font-family: Kanit, sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.host {
+  font-size: 13px;
+  color: var(--dim);
+  word-break: break-all;
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 3px;
+  font-size: 13.5px;
+  font-variant-numeric: tabular-nums;
+  color: var(--wait);
+}
+.dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.state.up      { color: var(--online); }
+.state.down    { color: var(--offline); }
+
+.go {
+  flex: none;
+  font-family: Kanit, sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--gold);
+  white-space: nowrap;
+}
+
+/* On a phone the row runs out of width before the label does, so the arrow drops and
+   the name keeps the space instead of both being squeezed. */
+@media (max-width: 420px) {
+  .server { flex-wrap: wrap; }
+  .go { width: 100%; text-align: right; }
+}
+
+/* ---- about ---- */
+
+.facts {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+}
+.facts li {
+  display: flex;
+  gap: 12px;
+  padding: 13px 16px;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+  background: var(--panel);
+}
+.facts b {
+  font-family: Kanit, sans-serif;
+  font-weight: 600;
+  color: var(--gold);
+  flex: none;
+  width: 7.5em;
+}
+.facts span { color: var(--dim); }
+
+@media (max-width: 480px) {
+  .facts li { flex-direction: column; gap: 2px; }
+  .facts b { width: auto; }
+}
+
+/* ---- community ---- */
+
+.community {
+  display: block;
+  margin-top: 14px;
+  padding: 15px;
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius);
+  background: var(--gold-bg);
+  color: var(--gold);
+  font-family: Kanit, sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  text-align: center;
+  text-decoration: none;
+  transition: background .15s;
+}
+.community:hover, .community:focus-visible { background: rgba(226, 169, 63, .2); }
+.community:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+/* ---- footer ---- */
+
+footer {
+  margin-top: 56px;
+  padding-top: 22px;
+  border-top: 1px solid var(--edge);
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: #6f7890;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; }
+}
+</style>
+</head>
+<body>
+<main>
+
+  <span class="mark" aria-hidden="true">RR</span>
+  <h1>Rag Rebuild</h1>
+  <p class="tagline">Ragnarok Online เล่นผ่านเบราว์เซอร์ ไม่ต้องติดตั้งอะไรทั้งนั้น เปิดบนมือถือก็ได้</p>
+
+  <h2>เซิร์ฟเวอร์</h2>
+
+  <div id="servers"></div>
+
+  <h2>เกี่ยวกับโปรเจกต์</h2>
+
+  <ul class="facts">
+    <li><b>เล่นยังไง</b><span>กดที่เซิร์ฟเวอร์ข้างบน สมัครในเกมได้เลย ไม่ต้องโหลดไฟล์</span></li>
+    <li><b>มือถือ</b><span>เล่นผ่านเบราว์เซอร์บนมือถือได้ ปุ่มและหน้าต่างปรับให้แล้ว</span></li>
+    <li><b>ยุคของเกม</b><span>Pre-renewal เล็งไว้ที่ราว ๆ Episode 4</span></li>
+    <li><b>ค่าใช้จ่าย</b><span>ไม่มี ทำเล่นล้วน ๆ ไม่มีไอเทมมอลล์ ไม่มีการเก็บเงินใด ๆ</span></li>
+  </ul>
+
+  <h2>พูดคุย</h2>
+
+  <a class="community" href="https://www.facebook.com/groups/2443940029461323"
+     target="_blank" rel="noopener">เข้ากลุ่มพูดคุย →</a>
+
+  <footer>
+    สร้างจากโปรเจกต์โอเพนซอร์ส Ragnarok Rebuild<br>
+    None Official Work — Not affiliated with Gravity Co., Ltd.
+  </footer>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  // Where the game lives, worked out from the address this page was opened at rather
+  // than written down. Registering a different domain later, or moving the page to
+  // one, then needs nothing changed in here.
+  //
+  // Opened at a bare IP there is no domain to hang a subdomain off, so the same host
+  // is used - which is how the server is reached today, before a domain exists at all.
+  var here = location.hostname.replace(/^www\./, "");
+  var isAddress = here === "localhost" || here === "" || /^[\d.]+$/.test(here) || here.indexOf(":") >= 0;
+  var host = isAddress ? (here || "43.228.86.7") : "play." + here;
+
+  var SERVERS = [
+    { code: "SEA", name: "(Web) SEA-01", host: host }
+  ];
+
+  var TIMEOUT_MS = 6000;     // a server that is hung answers no faster than one that is off
+  var POLL_MS = 30000;
+
+  var list = document.getElementById("servers");
+
+  SERVERS.forEach(function (server) {
+    var scheme = location.protocol === "https:" ? "https:" : "http:";
+    var base = scheme + "//" + server.host;
+
+    var card = document.createElement("a");
+    card.className = "server";
+    card.href = base + "/";
+
+    card.innerHTML =
+      '<span class="badge">' + server.code + "</span>" +
+      '<span class="who">' +
+        '<span class="name"></span>' +
+        '<span class="host"></span>' +
+        '<span class="state"><span class="dot"></span><span class="label"></span></span>' +
+      "</span>" +
+      '<span class="go">เข้าเล่น ▶</span>';
+
+    card.querySelector(".name").textContent = server.name;
+    card.querySelector(".host").textContent = server.host;
+
+    var state = card.querySelector(".state");
+    var label = card.querySelector(".label");
+    label.textContent = "กำลังตรวจสอบ…";
+
+    list.appendChild(card);
+
+    function paint(cls, text) {
+      state.className = "state" + (cls ? " " + cls : "");
+      label.textContent = text;
+    }
+
+    function check() {
+      // fetch on its own waits as long as the browser feels like, and a page that says
+      // "checking..." forever reads as broken. The abort is what turns silence into an
+      // answer.
+      var stop = new AbortController();
+      var timer = setTimeout(function () { stop.abort(); }, TIMEOUT_MS);
+
+      fetch(base + "/status", { signal: stop.signal, cache: "no-store" })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+        .then(function (s) {
+          var text = "ออนไลน์";
+          if (typeof s.players === "number") {
+            text += " · " + s.players + (s.maxPlayers > 0 ? "/" + s.maxPlayers : "") + " คน";
+          }
+          if (s.registration === "closed" || s.registration === "full") {
+            text += " · ปิดรับสมัคร";
+          }
+          paint("up", text);
+        })
+        .catch(function () {
+          paint("down", "ออฟไลน์");
+        })
+        .then(function () { clearTimeout(timer); });
+    }
+
+    check();
+    setInterval(check, POLL_MS);
+  });
+})();
+</script>
+</body>
+</html>

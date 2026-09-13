@@ -107,5 +107,8 @@ cat <<EOM
 Done. Next:
   1. unzip rorebuild-server.zip into /opt/rorebuild/server  (then: chown -R rorebuild:rorebuild /opt/rorebuild)
   2. systemctl start rorebuild    and watch:  journalctl -u rorebuild -f
-  3. certbot --nginx -d ${DOMAIN}
+  3. when a domain is registered and its DNS points here:
+       bash domain-setup.sh <your-domain>
+     which puts the front page up and gets the certificates. Until then the
+     server answers on this machine's bare address over plain http.
 EOM
