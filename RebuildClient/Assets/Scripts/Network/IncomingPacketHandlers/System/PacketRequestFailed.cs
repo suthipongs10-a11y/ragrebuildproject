@@ -29,6 +29,9 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
                 case ClientErrorType.RequestTooLong:
                     Camera.AppendChatText($"<color={ChatColor.Error}>ผิดพลาด</color>: ข้อความยาวเกินไป");
                     break;
+                case ClientErrorType.CommandUnavailable:
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ผิดพลาด</color>: คำสั่งนี้ใช้ไม่ได้");
+                    break;
                 case ClientErrorType.InvalidInput:
                     Camera.AppendChatText($"<color={ChatColor.Error}>Error</color>: Server request could not be performed as the input was not valid.");
                     break;

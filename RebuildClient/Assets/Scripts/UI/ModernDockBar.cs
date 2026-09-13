@@ -6,10 +6,10 @@ using UnityEngine.UI;
 namespace Assets.Scripts.UI
 {
     /// <summary>
-    /// Folds the row of ten window buttons along the bottom of the screen into four.
+    /// Folds the row of ten window buttons along the bottom of the screen into three.
     ///
     /// Ten of them was a list of every window the client has, in the order they were
-    /// written, and most of them are opened once a session. Three get pulled out because
+    /// written, and most of them are opened once a session. Two get pulled out because
     /// they are the ones reached constantly, and everything else goes behind a menu. That
     /// is worth doing on a desktop and it is the difference between usable and not on a
     /// phone, where those ten buttons were most of the bottom of the screen.
@@ -40,14 +40,21 @@ namespace Assets.Scripts.UI
         private const float ScreenMargin = 6f;
 
         /// <summary>
-        /// The three kept out in front, by the name of the button in the scene, and the
+        /// The two kept out in front, by the name of the button in the scene, and the
         /// icon and label each one takes.
         /// </summary>
+        /// <remarks>
+        /// The scene's Warps button is deliberately not among them and is not in the drawer
+        /// either. It opens the admin warp list, which travels to any map in the game for
+        /// nothing, and a tile on the bottom bar made that the fastest way to get anywhere -
+        /// past the walk, the field and the warp's price. The window it opens is left in the
+        /// client for the editor's Shift+W; the server refuses the packet for anyone who is
+        /// not a GM, which is what actually closes it.
+        /// </remarks>
         private static readonly (string Button, string Label, System.Func<Sprite> Icon)[] Primary =
         {
             ("Equipment", "Character", () => ModernUiIcons.Person),
             ("Inventory", "Inventory", () => ModernUiIcons.Bag),
-            ("Warps", "Map", () => ModernUiIcons.Target),
         };
 
         /// <summary>

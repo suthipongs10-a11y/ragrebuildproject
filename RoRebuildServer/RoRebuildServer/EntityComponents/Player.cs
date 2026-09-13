@@ -93,22 +93,12 @@ public class Player : IEntityAutoReset
     public float ShoutCooldown;
 
     /// <summary>
-    /// When this character may next warp out of the database window.
-    /// </summary>
-    /// <remarks>
-    /// Its own timer rather than the input action cooldown, which is one shared
-    /// counter for every action a player takes - putting half a minute into that
-    /// would stop them clicking, walking and picking things up for half a minute too.
-    /// </remarks>
-    public float MapWarpCooldown;
-
-    /// <summary>
     /// When this character may next travel out of the adventure book.
     /// </summary>
     /// <remarks>
-    /// Kept apart from MapWarpCooldown so the two do not block each other. The book is
-    /// the road somebody earned a star to open, and having the database's half minute
-    /// close it would make the star worth less than the window that needs none.
+    /// Its own timer rather than the input action cooldown, which is one shared
+    /// counter for every action a player takes - putting the book's wait into that
+    /// would stop them clicking, walking and picking things up for just as long.
     /// </remarks>
     public float BookWarpCooldown;
     private Memory<int>? jobStatBonuses;
@@ -334,7 +324,6 @@ public class Player : IEntityAutoReset
         Array.Clear(CharData);
         PlayerStatData.Clear();
         LastEmoteTime = 0;
-        MapWarpCooldown = 0f;
         BookWarpCooldown = 0f;
         StorageId = -1;
         HasEnteredServer = false;
