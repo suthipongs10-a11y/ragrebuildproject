@@ -8,7 +8,7 @@ OnClick:
 	ShowSprite("kafra_06", right);
     if(prog == 0)
     {
-        Dialog("Kafra Staff", "You're about to have a bad time, buddy.");
+        Dialog("พนักงาน Kafra", "เตรียมตัวเจอของหนักได้เลยเพื่อน");
 
         SummonMobsNearby(5, "POISON_SPORE", 7, 7);
 
@@ -16,7 +16,7 @@ OnClick:
     }
     else
     {
-        Dialog("Kafra Staff", "Damn dude you killed them all");
+        Dialog("พนักงาน Kafra", "โหดจริงพวก เก็บเรียบหมดเลย");
 
         prog = 0;
     }

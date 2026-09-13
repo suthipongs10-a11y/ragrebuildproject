@@ -20,41 +20,41 @@ Npc("prt_fild08", "Kafra Staff", "4_F_KAFRA1", 158, 362, S)
 	RegisterGlobalSignal("MilestoneKafra");
 	//present from the first boot rather than unlocked at level 10 - see the note on
 	//EventRevealedNpc in MilestoneEvent.txt
-	localstr name = "Kafra Defolty - Kafra Employee";
+	localstr name = "Kafra Defolty - พนักงาน Kafra";
 OnSignal:
 	if(Signal == "RevealOnServerUp") ShowNpc();	else StartTimer(1s);
 OnTimer 20s:
 	ShowNpc();
 	PlayEffectAtMyLocation("PuffOfSmoke");
 OnTimer 22s:
-	ServerWideMessage("<color=#FF99FF>A server milestone has been reached: the Kafra Staff!</color>", "", true);
+	ServerWideMessage("<color=#FF99FF>เซิร์ฟเวอร์ถึงหมุดหมายใหม่แล้ว: Kafra Staff เปิดให้บริการ!</color>", "", true);
 	StopTimer();
 OnClick:
 	FocusNpc();
 	ShowSprite("kafra_01", right);
-	Dialog(name, "Welcome to the Kafra Corporation~ The Kafra Services are always here to support you. So how can I be of service today?");
+	Dialog(name, "ยินดีต้อนรับสู่ Kafra Corporation~ บริการ Kafra พร้อมดูแลคุณอยู่เสมอค่ะ วันนี้ให้ช่วยอะไรดีคะ?");
 	//Always offered, and every refusal below is spoken. An entry that disappears when it
 	//does not apply cannot be told apart from one that was never written, and it shifts
 	//what Cancel is worth underneath it.
-	Option("Save", "Use Storage", "Teleport Service", "Rent a Cart or Call a Falcon", "Cancel");
+	Option("บันทึกจุดเกิด", "ใช้คลังเก็บของ", "บริการวาร์ป", "เช่า Push Cart หรือเรียกเหยี่ยว", "ยกเลิก");
 	switch(Result) 	
 	{
 	case 0:
 		SaveSpawnPoint("South of Prontera");
-		Dialog(name, "Your Respawn Point has been saved south of Prontera. Thank you for using the Kafra Service.");
+		Dialog(name, "บันทึกจุดเกิดใหม่ของคุณไว้ทางใต้ของ Prontera แล้วค่ะ ขอบคุณที่ใช้บริการ Kafra ค่ะ");
 		return;
 	case 1:
 		if(JobId == 0 && JobLevel < 5)
 		{
-			Dialog(name, "Sorry, only adventurers who have reached job level 5 are allowed to access Kafra storage. Please come back when you have a few more levels.");
+			Dialog(name, "ขออภัยค่ะ คลังเก็บของ Kafra เปิดให้เฉพาะนักผจญภัยที่ job level 5 ขึ้นไปเท่านั้น กลับมาใหม่ตอนเลเวลสูงกว่านี้นะคะ");
 			return;
 		}
 		ReleaseFocus();
 		OpenStorage();
 		return;
 	case 2:
-		Dialog(name, "Please choose your destination.");
-		Option("Izlude", "Geffen", "Payon", "Morroc", "Orc Dungeon", "Alberta", "Cancel" );
+		Dialog(name, "เลือกจุดหมายปลายทางได้เลยค่ะ");
+		Option("Izlude", "Geffen", "Payon", "Morroc", "Orc Dungeon", "Alberta", "ยกเลิก" );
 		switch(Result)
 		{
 			case 0: @TeleportCase("izlude", 91, 105, 600);
@@ -72,29 +72,29 @@ OnClick:
 		{
 			if(!HasLearnedSkill(FalconMastery, 1))
 			{
-				Dialog(name, "A falcon will only answer a hunter who has been taught to call one. Learn Falcon Mastery and one will come to you on its own~");
+				Dialog(name, "เหยี่ยวจะเชื่อฟังเฉพาะ Hunter ที่เรียนวิธีเรียกมันมาแล้วเท่านั้นค่ะ ไปเรียน Falcon Mastery สิคะ แล้วมันจะบินมาหาคุณเอง~");
 				return;
 			}
 
 			if(HasBird)
 			{
-				Dialog(name, "Your falcon is right there on your arm~ Do take care of it.");
+				Dialog(name, "เหยี่ยวของคุณเกาะอยู่บนแขนนั่นไงคะ~ ดูแลมันดี ๆ นะคะ");
 				return;
 			}
 
-			Dialog(name, "Lost your falcon? I can whistle it back for 200 zeny. Shall I?");
-			Option("Yes", "No");
+			Dialog(name, "เหยี่ยวหายไปเหรอคะ? จ่าย 200 zeny แล้วเดี๋ยวผิวปากเรียกมันกลับมาให้ เอาไหมคะ?");
+			Option("ตกลง", "ไม่ล่ะ");
 			switch(Result)
 			{
 			case 0:
 				if(GetZeny() < 200)
 				{
-					Dialog(name, "Oh dear, you don't have enough money. Please come back when you have at least 200 zeny.");
+					Dialog(name, "แหม เงินไม่พอนี่คะ กลับมาใหม่ตอนมีอย่างน้อย 200 zeny นะคะ");
 					return;
 				}
 				DropZeny(200);
 				GiveFalcon();
-				Dialog(name, "There it is~ Thank you for using the Kafra Service.");
+				Dialog(name, "มาแล้วค่ะ~ ขอบคุณที่ใช้บริการ Kafra ค่ะ");
 				return;
 			}
 			return;
@@ -102,30 +102,30 @@ OnClick:
 
 		if(!HasJobType("Merchant"))
 		{
-			Dialog(name, "I am sorry~ Push carts are for merchants and their trades, and a falcon answers to no one but a hunter. Come back when you have taken one of those paths.");
+			Dialog(name, "ขออภัยค่ะ~ Push Cart มีไว้ให้ Merchant ใช้ทำการค้า ส่วนเหยี่ยวเชื่อฟังแต่ Hunter เท่านั้น กลับมาใหม่ตอนคุณเลือกเดินสายใดสายหนึ่งแล้วนะคะ");
 			return;
 		}
 
 		if(HasCart)
 		{
-			Dialog(name, "You already have a push cart. Do take care of it~");
+			Dialog(name, "คุณมี Push Cart อยู่แล้วนี่คะ ดูแลมันดี ๆ นะคะ~");
 			return;
 		}
 
 		if(!HasLearnedSkill(PushCart, 1))
 		{
-			Dialog(name, "A push cart is no use to you until you have learned to push one~ Come back once you know the Push Cart skill.");
+			Dialog(name, "Push Cart จะไม่มีประโยชน์เลยถ้าคุณยังเข็นไม่เป็นค่ะ~ กลับมาใหม่ตอนเรียนสกิล Push Cart แล้วนะคะ");
 			return;
 		}
 
-		Dialog(name, "The fee to rent a push cart is 850 zeny. Is that alright?");
-		Option("Yes", "No");
+		Dialog(name, "ค่าเช่า Push Cart อยู่ที่ 850 zeny ค่ะ ตกลงไหมคะ?");
+		Option("ตกลง", "ไม่ล่ะ");
 		switch(Result)
 		{
 		case 0:
 			if(GetZeny() < 850)
 			{
-				Dialog(name, "Oh dear, you don't have enough money. Please come back when you have at least 850 zeny.");
+				Dialog(name, "แหม เงินไม่พอนี่คะ กลับมาใหม่ตอนมีอย่างน้อย 850 zeny นะคะ");
 				return;
 			}
 			DropZeny(850);

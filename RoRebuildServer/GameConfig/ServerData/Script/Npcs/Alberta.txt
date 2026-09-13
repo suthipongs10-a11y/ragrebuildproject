@@ -9,22 +9,22 @@ Npc("alberta", "Sailor", "4_M_SEAMAN", 247, 122, S)
     localstr name = "Gotanblue";
 OnClick:
     FocusNpc();
-    Dialog(name, "Heh... I can see it in your eyes...\nI can tell you're curious about Turtle Island. I'm not sure where you heard about it, but I can help you out.");
-    Option("Turtle Island -> 5000z", "Cancel" );
+    Dialog(name, "เฮอะ... ข้าดูออกจากแววตาเจ้าเลยล่ะ...\nเจ้ากำลังสนใจ Turtle Island อยู่ใช่ไหม ไม่รู้ว่าไปได้ยินมาจากไหน แต่ข้าพาเจ้าไปได้นะ");
+    Option("ไป Turtle Island -> 5000z", "ยกเลิก" );
     switch(Result)
     {
         case 0:
             if(GetZeny() < 5000)
             {
-                Dialog(name, "Hmm... Sorry, but you don't have enough zeny. I hope you understand I can't let my expertise and experience be undervalued...");
+                Dialog(name, "อืม... ขอโทษที เจ้ามี zeny ไม่พอ หวังว่าเจ้าจะเข้าใจนะ ฝีมือกับประสบการณ์ของข้าก็มีราคาของมัน...");
                 return;
             }
-            Dialog(name, "Alright!!\nYou've made your choice! With my experience, we'll arrive without fail! I appreciate your spirit!\n<color=#3355FF>- choo-choo -</color>");
+            Dialog(name, "เอาล่ะ!!\nเจ้าตัดสินใจแล้วสินะ! ด้วยประสบการณ์ของข้า รับรองว่าถึงที่หมายแน่นอน! ข้าชอบใจในความกล้าของเจ้า!\n<color=#3355FF>- ปู๊นน ปู๊นน -</color>");
             DropZeny(5000);
             MoveTo("tur_dun01", 157, 39);
             return;
         case 1:
-            Dialog(name, "Alright then...\nWell, should the spirit of adventure grab you, I'll be here waiting.");
+            Dialog(name, "งั้นก็ได้...\nถ้าวันไหนใจอยากออกผจญภัยขึ้นมา ข้าจะรออยู่ตรงนี้แหละ");
     }
 }
 
@@ -34,12 +34,12 @@ Npc("tur_dun01", "Sailor", "4_M_SEAMAN", 165, 29, S)
     localstr name = "Gotanblue";
 OnClick:
     FocusNpc();
-    Dialog(name, "Do you want to return to Alberta?");
-    Option("Go to Alberta", "Not yet" );
+    Dialog(name, "อยากกลับ Alberta แล้วหรือยัง?");
+    Option("กลับ Alberta", "ยังก่อน" );
     switch(Result)
     {
         case 0: 
-            Dialog(name, "Heh heh... I hope you've found what you were looking for. Alright, even an adventurer needs to return home every now and then.\n<color=#3355FF>- choo-choo -</color>");
+            Dialog(name, "เฮอะ เฮอะ... หวังว่าเจ้าจะได้สิ่งที่ตามหานะ เอาล่ะ ต่อให้เป็นนักผจญภัยก็ต้องกลับบ้านบ้างแหละ\n<color=#3355FF>- ปู๊นน ปู๊นน -</color>");
             MoveTo("alberta", 241, 115);
     }
 }
@@ -54,17 +54,17 @@ Npc("alberta", "Overseas Captain", "4_M_SEAMAN", 245, 93, SW)
     localstr name = "Sea Captain";
 OnClick:
     FocusNpc();
-    Dialog(name, "Hey, there. You've heard of Amatsu, the land beyond the sea? I wasn't planning on making the voyage any time soon, but I could get you there if you're willing to pay.");
-    Option("Travel to Amatsu -> 3000z", "Cancel");
+    Dialog(name, "ว่าไง เคยได้ยินชื่อ Amatsu ดินแดนอีกฟากของทะเลไหม? ข้าไม่ได้คิดจะออกเรือเร็ว ๆ นี้หรอก แต่ถ้าเจ้ายอมจ่าย ข้าก็พาไปได้");
+    Option("เดินทางไป Amatsu -> 3000z", "ยกเลิก");
     switch(Result)
     {
         case 0:
             if(GetZeny() < 3000)
             {
-                Dialog(name, "Were you even listening? 10,000 zeny. You're an adventurer right? Go loot some dungeon or shipwreck or something and come back when you got the money.");
+                Dialog(name, "ฟังข้าอยู่หรือเปล่าเนี่ย? 10,000 zeny ไง เจ้าเป็นนักผจญภัยไม่ใช่เหรอ? ไปเก็บของในดันเจี้ยนหรือซากเรือมาขายสักหน่อย แล้วค่อยกลับมาตอนมีเงิน");
                 return;
             }
-            Dialog(name, "Alright, I'll start the engine!");
+            Dialog(name, "เอาล่ะ ข้าจะติดเครื่องเดี๋ยวนี้แหละ!");
             DropZeny(3000);
             MoveTo("amatsu", 197, 83);
     }
@@ -77,14 +77,14 @@ OnClick:
 Npc("alberta", "Fisk", "4W_SAILOR", 189, 151, SE) { 
 OnClick:
     FocusNpc();
-    Dialog(Name, "Ahoy mate, where'd ya wanna go?");
-    Option("Sunken Ship -> 250 zeny.", "Izlude Marina -> 500 zeny.", "Never mind.");
+    Dialog(Name, "เฮ้ย เพื่อนยาก อยากไปไหนล่ะ?");
+    Option("ไป Sunken Ship -> 250 zeny.", "ไปท่าเรือ Izlude -> 500 zeny.", "ไม่ล่ะ ขอบใจ");
     switch(Result)
     {
         case 0:
             if(GetZeny() < 250)
             {
-                Dialog(Name, "Hey now, don't try to cheat me! I said 250 zeny!");
+                Dialog(Name, "เฮ้ย อย่ามาตุกติกนะ! ข้าบอกแล้วว่า 250 zeny!");
                 return;
             }
             DropZeny(250);
@@ -92,21 +92,21 @@ OnClick:
         case 1:
             if(GetZeny() < 500)
             {
-                Dialog(Name, "Ain't no way yer getting there without the 500 zeny first!");
+                Dialog(Name, "ไม่มี 500 zeny มาก่อน ก็อย่าหวังว่าจะได้ไป!");
                 return;
             }
             DropZeny(500);
             MoveTo("izlude", 176, 182);
         case 2:
-            Dialog(Name, "Alright... Landlubber.");
+            Dialog(Name, "ก็ได้... ไอ้หนอนบก");
     }
 }
 
 Npc("alb2trea", "Fisk", "4W_SAILOR", 39, 50, E) { 
 OnClick:
     FocusNpc();
-    Dialog(Name, "So you wanna head back to the mainland in Alberta, eh?");
-    Option("Yes please.", "I changed my mind." );
+    Dialog(Name, "อยากกลับขึ้นฝั่งที่ Alberta แล้วสินะ?");
+    Option("ใช่ พาไปที", "เปลี่ยนใจแล้ว" );
     switch(Result)
     {
         case 0: MoveTo("alberta", 192, 169);
@@ -121,8 +121,8 @@ Npc("alberta_in", "Fredrik", "4_M_03", 28, 58, N)
 {
 OnClick:
     FocusNpc();
-	Dialog(Name, "I'm " + Name + ", the Armsmith.\nI can refine all kinds of weapons, armor and equipment, so let me know if you want me to refine something.");
-	Option("Refine Gear", "Cancel");
+	Dialog(Name, "ข้าชื่อ " + Name + " ช่างตีเหล็กประจำเมืองนี้เอง\nข้าตีบวกได้ทั้งอาวุธ เกราะ และเครื่องประดับทุกชนิด ถ้าอยากตีบวกอะไรก็บอกได้เลย");
+	Option("ตีบวกอุปกรณ์", "ยกเลิก");
 	if(result > 0)
 		return;
 
@@ -136,11 +136,11 @@ Npc("alberta_in", "Xenophon", "4_M_02", 21, 63, SE) {
 OnClick:
 	FocusNpc();
 	if(InventoryItemCount > MaxItemCount - 1) {
-		Dialog(Name, "Whoa, you sure are carrying a lot! Come back when you have a few less items on you.");
+		Dialog(Name, "โอ้โห แบกของมาเยอะจริง! ลดของในกระเป๋าลงหน่อยแล้วค่อยกลับมาใหม่นะ");
 		return;
 	}
-	Dialog(Name, "I can purify your Rough Oridecon or Rough Elunium stones. I'll need 5 Rough stones to make 1 pure one for you.");
-	Option("Trade", "Cancel");
+	Dialog(Name, "ข้าช่วยสกัด Rough Oridecon หรือ Rough Elunium ให้ได้นะ ใช้หินดิบ 5 ชิ้น แลกเป็นแร่บริสุทธิ์ 1 ชิ้น");
+	Option("แลกเปลี่ยน", "ยกเลิก");
 	if(result == 0) StartItemTrade();
 }
 
@@ -150,13 +150,13 @@ Npc("alberta_in", "Kahlamanlith", "4_M_04", 13, 71, SW) {
 OnClick:
 	FocusNpc();
 	if(HasJobType("Merchant"))
-		Dialog(Name, "I sell 2 kinds of Metal for tempering weaponry.\nI have <color=#007777>Phracon<color=#000000> for Level 1 Weapons," +
-					" and <color=#007777>Emveretarcon<color=#000000> for Level 2 Weapons. No discounts though, sorry.");
+		Dialog(Name, "ข้าขายแร่สำหรับตีบวกอาวุธอยู่ 2 ชนิด\nมี <color=#007777>Phracon<color=#000000> สำหรับอาวุธ Level 1" +
+					" และ <color=#007777>Emveretarcon<color=#000000> สำหรับอาวุธ Level 2 แต่ไม่มีส่วนลดนะ ขอโทษด้วย");
 	else
-		Dialog(Name, "I sell 2 kinds of Metal for tempering weaponry.\nI have <color=#007777>Phracon<color=#000000> for Level 1 Weapons," +
-		            " and <color=#007777>Emveretarcon<color=#000000> for Level 2 Weapons.");
+		Dialog(Name, "ข้าขายแร่สำหรับตีบวกอาวุธอยู่ 2 ชนิด\nมี <color=#007777>Phracon<color=#000000> สำหรับอาวุธ Level 1" +
+		            " และ <color=#007777>Emveretarcon<color=#000000> สำหรับอาวุธ Level 2");
 	
-	Option("Buy ores", "Cancel");
+	Option("ซื้อแร่", "ยกเลิก");
 	if(result == 0)
 		OpenShop(false); //false makes the shop not apply discount
 }
@@ -165,5 +165,5 @@ Npc("alberta_in", "Repair Man", "4_M_04", 31, 65, S)
 {
 OnClick:
     FocusNpc();
-	Dialog(Name, "Normally I'd help you out if you needed your gear repaired, but for some reason nothing ever breaks! You guys sure do have it lucky.");
+	Dialog(Name, "ปกติถ้าของเจ้าพัง ข้าก็ซ่อมให้ได้นะ แต่ไม่รู้ทำไมของมันไม่เคยพังเลยสักที! พวกเจ้านี่โชคดีจริง ๆ");
 }

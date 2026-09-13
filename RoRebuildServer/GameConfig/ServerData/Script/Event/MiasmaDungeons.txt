@@ -11,7 +11,7 @@ macro MiasmaMap(%mapName, %signalName, %spawnInfo, %cleanupEvent)
 		{
 			RegisterMapWideEffect("MiasmaClouds");
 			SetMapWideStatusEffect(StatusDungeonMiasma);
-			MapWideMessage("A powerful curse decends upon this dungeon...");
+			MapWideMessage("คำสาปอันทรงพลังแผ่ปกคลุมดันเจี้ยนแห่งนี้...");
 
 			StartTimer(1s);
 
@@ -23,7 +23,7 @@ macro MiasmaMap(%mapName, %signalName, %spawnInfo, %cleanupEvent)
 			StopTimer();
 			KillMyMobs();
 			RemoveMapWideStatusEffect();
-			MapWideMessage("The curse affecting this dungeon has been lifted.");
+			MapWideMessage("คำสาปที่ปกคลุมดันเจี้ยนแห่งนี้ถูกปลดแล้ว");
 			@%cleanupEvent();
 			ServerLog(%mapName + " miasma disabled.");
 		}
@@ -199,7 +199,7 @@ macro MiasmaGeffenTower01()
 macro MiasmaGeffenTower02()
 {
 	SignalNpc("#geffendunwarp006", "Open");
-	MapWideMessage("The door to Geffenia has opened.");
+	MapWideMessage("ประตูสู่ Geffenia เปิดออกแล้ว");
 	SummonMobsWithRespawn(20, "NIGHTMARE_TERROR");
 	SummonMobsWithRespawn(10, "SUCCUBUS");
 	SummonMobsWithRespawn(10, "INCUBUS");
@@ -242,7 +242,7 @@ macro CloseGeffenia()
 
 macro EjectGeffenia()
 {
-	MapWideMessage("You will soon be forced to leave this place...");
+	MapWideMessage("อีกไม่นานเจ้าจะถูกบังคับให้ออกจากที่แห่งนี้...");
 	SignalNpc("#GeffeniaKicker", "Close");
 }
 

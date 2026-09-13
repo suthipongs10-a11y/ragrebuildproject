@@ -23,11 +23,11 @@ OnClick:
 	boardInfo = GetGlobalString("MvpMilestones");
 	if(IsStringEmpty(boardInfo))
 	{
-		Dialog("Message Board", "No MVP bosses have been killed yet.\nThe first player to kill a boss will have their name recorded here. When an MVP is killed for the first time, all logged in players will receive a bonus.");
+		Dialog("กระดานข่าว", "ยังไม่มีบอส MVP ตัวใดถูกล้มเลย\nผู้เล่นคนแรกที่ล้มบอสได้จะถูกบันทึกชื่อไว้ที่นี่ และเมื่อ MVP ถูกล้มเป็นครั้งแรก ผู้เล่นที่ออนไลน์อยู่ทุกคนจะได้รับโบนัส");
 	}
 	else
 	{
-			DialogBig("First Kill Achievements for MVP Bosses", boardInfo);
+			DialogBig("สถิติผู้ล้มบอส MVP ได้เป็นคนแรก", boardInfo);
 	}
 }
 
@@ -39,11 +39,11 @@ OnClick:
 	boardInfo = GetGlobalString("MinibossMilestones");
 	if(IsStringEmpty(boardInfo))
 	{
-		Dialog("Message Board", "No minibosses have been killed yet.\nThe first player to kill a boss will have their name recorded here. When a miniboss is killed for the first time, all logged in players will receive a bonus.");
+		Dialog("กระดานข่าว", "ยังไม่มีมินิบอสตัวใดถูกล้มเลย\nผู้เล่นคนแรกที่ล้มบอสได้จะถูกบันทึกชื่อไว้ที่นี่ และเมื่อมินิบอสถูกล้มเป็นครั้งแรก ผู้เล่นที่ออนไลน์อยู่ทุกคนจะได้รับโบนัส");
 	}
 	else
 	{
-			DialogBig("First Kill Achievements for Mini Bosses", boardInfo);
+			DialogBig("สถิติผู้ล้มมินิบอสได้เป็นคนแรก", boardInfo);
 	}
 }
 
@@ -52,17 +52,17 @@ Npc("prt_fild08", "Leveling Milestones", "2_BULLETIN_BOARD", 145, 356, SE, 1, 1)
 	localstr boardInfo = "";
 
 OnClick:
-	Option("Top 10 Player Levels", "First to Level Achievements", "Cancel");
+	Option("10 อันดับเลเวลผู้เล่น", "ผู้ไปถึงเลเวลเป็นคนแรก", "ยกเลิก");
 	switch(Result) {
 	case 0:
 		boardInfo = GetGlobalString("Top10List");
-		Dialog("Top 10 Highest Level Players", boardInfo);
+		Dialog("10 อันดับผู้เล่นเลเวลสูงสุด", boardInfo);
 	case 1:
 		boardInfo = GetGlobalString("LevelMilestones");
 		if(IsStringEmpty(boardInfo))
-			Dialog("Message Board", "No player has reached a leveling milestone yet. The first player to reach specific levels will have their name recorded here.\nMilestone levels are every 10 levels, 95, and level 99.");
+			Dialog("กระดานข่าว", "ยังไม่มีผู้เล่นคนใดไปถึงหมุดหมายเลเวลเลย ผู้เล่นคนแรกที่ไปถึงเลเวลที่กำหนดจะถูกบันทึกชื่อไว้ที่นี่\nเลเวลหมุดหมายคือทุก ๆ 10 เลเวล, เลเวล 95 และเลเวล 99");
 		else
-			Dialog("First to Level Achievements", boardInfo);
+			Dialog("สถิติผู้ไปถึงเลเวลเป็นคนแรก", boardInfo);
 	
 	}
 }
@@ -88,7 +88,7 @@ OnTimer 20s:
 	ShowNpc();
 	PlayEffectAtMyLocation("PuffOfSmoke");
 OnTimer 22s:
-	ServerWideMessage("<color=#FF99FF>A server milestone has been reached: the " + %npcName + "!</color>", "", true);
+	ServerWideMessage("<color=#FF99FF>เซิร์ฟเวอร์บรรลุหมุดหมายใหม่แล้ว: " + %npcName + "!</color>", "", true);
 	StopTimer();
 }
 
@@ -105,20 +105,20 @@ Npc("prt_fild08", "Blacksmith Guildsman#MilestoneSmith", "4_F_JOB_BLACKSMITH", 1
 	AddItemToTradeSet("Ore", CreateTradedItem("Great_Nature").Requires("Green_Live", 10).Costs(100));
 	AddItemToTradeSet("Ore", CreateTradedItem("Gold").Requires("Burnt_Tree", 5).Requires("Coal", 5).Requires("Fine_Sand", 5).Requires("Rough_Elunium", 3).Requires("Rough_Oridecon", 3).Costs(10000));
 
-	@EventRevealedNpc("MilestoneSmith", "blacksmith guildsman Mitmair"); //this must be at the end of the init section to work!
+	@EventRevealedNpc("MilestoneSmith", "ช่างตีเหล็กแห่งสมาคม Mitmair"); //this must be at the end of the init section to work!
 OnClick:
 	FocusNpc();
-	Dialog(name, "Mitmair's the name, blacksmith by trade. I heard there were interesting things going on here so I made the trip, and I can't say I've been disappointed.");
-	Dialog(name, "I'll run ore through the furnace for you, and I'll not charge much for it. Weapons though - a blacksmith forges those with their own two hands, and their own name goes on them.");
-	Dialog(name, "Learn the trade and you'll never need me for it. Until then, what have you brought me?");
+	Dialog(name, "ข้าชื่อ Mitmair เป็นช่างตีเหล็ก ได้ยินว่าแถวนี้มีอะไรน่าสนใจเลยเดินทางมาดู แล้วก็ต้องบอกว่าไม่ผิดหวังเลย");
+	Dialog(name, "ข้าหลอมแร่ให้เจ้าได้ แล้วก็คิดราคาไม่แพงด้วย แต่อาวุธน่ะ ช่างตีเหล็กต้องตีขึ้นมาด้วยมือตัวเอง แล้วสลักชื่อตัวเองลงไป");
+	Dialog(name, "ถ้าเจ้าเรียนวิชานี้ได้ ก็ไม่ต้องพึ่งข้าอีกเลย แต่ระหว่างนี้ เจ้าเอาอะไรมาให้ข้าดูล่ะ");
 
-	Option("Refine Ore", "Cancel");
+	Option("หลอมแร่", "ยกเลิก");
 
 	switch(result)
 	{
 		case 0: StartItemTrade("Ore"); return;
 		case 1:
-			Dialog(name, "Do come back if you need anything smelted!");
+			Dialog(name, "ถ้าต้องการหลอมอะไรอีก แวะมาได้เลยนะ!");
 			return;
 	}
 }
@@ -133,10 +133,10 @@ Npc("prt_fild08", "Ranch Vendor", "4_F_01", 150, 350, NE, 1, 1) {
 	SellItem("Pumpkin");
 	SellItem("Meat");
 	SellItem("Monster's_Feed");
-	@EventRevealedNpc("MilestoneRanchVendor", "friendly ranch vendor Mary"); //this must be at the end of the init section to work!
+	@EventRevealedNpc("MilestoneRanchVendor", "แม่ค้าฟาร์มใจดี Mary"); //this must be at the end of the init section to work!
 OnClick:
 	FocusNpc();
-	Option("Buy", "Sell", "Cancel");
+	Option("ซื้อ", "ขาย", "ยกเลิก");
 	switch(Result)
 	{
 		case 0: OpenShop();
@@ -153,10 +153,10 @@ Npc("prt_fild08", "General Vendor", "8_F", 151, 347, NE, 1, 1) {
 	SellItem("Butterfly_Wing");
 	SellItem("Yggdrasil_Leaf");
 	SellItem("Trap");
-	@EventRevealedNpc("MilestoneGeneralVendor", "general vendor Ipore"); //this must be at the end of the init section to work!
+	@EventRevealedNpc("MilestoneGeneralVendor", "แม่ค้าของทั่วไป Ipore"); //this must be at the end of the init section to work!
 OnClick:
 	FocusNpc();
-	Option("Buy", "Sell", "Cancel");
+	Option("ซื้อ", "ขาย", "ยกเลิก");
 	switch(Result)
 	{
 		case 0: OpenShop();
@@ -184,10 +184,10 @@ Npc("prt_fild08", "Diligent Alchemist", "4_M_ALCHE_C", 145, 346, SW, 1, 1)
 	SellItem("Red_Gemstone");
 	SellItem("Yellow_Gemstone");
 	SellItem("Authoritative_Badge");
-	@EventRevealedNpc("MilestoneAlchemist", "diligent alchemist Gregory"); //this must be at the end of the init section to work!
+	@EventRevealedNpc("MilestoneAlchemist", "นักเล่นแร่แปรธาตุผู้ขยัน Gregory"); //this must be at the end of the init section to work!
 OnClick:
 	FocusNpc();
-	Option("Buy", "Sell", "Cancel");
+	Option("ซื้อ", "ขาย", "ยกเลิก");
 	switch(Result)
 	{
 		case 0: OpenShop();
@@ -208,7 +208,7 @@ Npc("prt_fild08", "Shady Alchemist", "4_M_ALCHE_B", 139, 361, SW)
 	AddTradedItem(CreateTradedItem("Aloevera", 10).Requires("Karvodailnirol", 2).Requires("Aloe", 1).Requires("Empty_Bottle", 5));
 	AddTradedItem(CreateTradedItem("Cursed_Water", 10).Requires("Detrimindexta", 1).Requires("Memento", 1).Requires("Empty_Bottle", 5));
 	
-	@EventRevealedNpc("MilestoneMixer", "shady alchemist Melkaba"); //this must be at the end of the init section to work!
+	@EventRevealedNpc("MilestoneMixer", "นักเล่นแร่แปรธาตุลึกลับ Melkaba"); //this must be at the end of the init section to work!
 OnClick:
 	FocusNpc();
 	StartItemTrade();
@@ -244,10 +244,10 @@ Npc("prt_fild08", "Expert Fletcher", "4_F_JOB_HUNTER", 143, 342, NE)
 	//SellItem("Shadow_Arrow_Quiver", 4000);
 	//SellItem("Immaterial_Arrow_Quiver", 4000);
 
-	@EventRevealedNpc("MilestoneFletcher", "expert fletcher Seisner"); //this must be at the end of the init section to work!
+	@EventRevealedNpc("MilestoneFletcher", "ช่างทำลูกธนูผู้ช่ำชอง Seisner"); //this must be at the end of the init section to work!
 OnClick:
 	FocusNpc();
-	Option("Buy", "Sell", "Trade", "Cancel");
+	Option("ซื้อ", "ขาย", "แลกเปลี่ยน", "ยกเลิก");
 	switch(Result)
 	{
 		case 0: OpenShop();
@@ -273,10 +273,10 @@ Npc("prt_fild08", "Master Scholar", "4_M_SAGE_C", 141, 370, SE)
 
 	SellItem("Blank_Scroll");
 
-	@EventRevealedNpc("MilestoneScholar", "master scholar Mischna"); //this must be at the end of the init section to work!
+	@EventRevealedNpc("MilestoneScholar", "ปราชญ์ผู้เชี่ยวชาญ Mischna"); //this must be at the end of the init section to work!
 OnClick:
 	FocusNpc();
-	Option("Buy", "Sell", "Trade", "Cancel");
+	Option("ซื้อ", "ขาย", "แลกเปลี่ยน", "ยกเลิก");
 	switch(Result)
 	{
 		case 0: OpenShop();
@@ -317,7 +317,7 @@ Npc("prt_fild08", "Apprentice Hat-Maker", "4_F_KHELLY", 150, 368, NE)
 	AddTradedItem(CreateTradedItem("Boy's_Cap").Requires("Tiger_Footskin").Costs(20000));
 	AddTradedItem(CreateTradedItem("Deviruchi_Hat").Requires("Little_Evil_Horn", 50).Requires("Talon_of_Griffon"));
 	AddTradedItem(CreateTradedItem("Bao_Bao").Requires("Silk_Ribbon").Requires("Heroic_Emblem"));
-	@EventRevealedNpc("MilestoneHeadgear", "apprentice hat-maker Elly"); //this must be at the end of the init section to work!
+	@EventRevealedNpc("MilestoneHeadgear", "ช่างทำหมวกฝึกหัด Elly"); //this must be at the end of the init section to work!
 OnClick:
 	FocusNpc();
 	StartItemTrade();

@@ -9,25 +9,25 @@
 
 macro BardAboutRebuild()
 {
-	Dialog(name, "Welcome to the second public test for Ragnarok Rebuild! If you're new here, you should check out the information site over at " +
-				 "http:/dodsrv.com/ragnarok/db/ as it has all the info on what's on offer this time.");
+	Dialog(name, "ยินดีต้อนรับสู่การทดสอบสาธารณะรอบที่สองของ Ragnarok Rebuild! ถ้าเพิ่งมาครั้งแรก ลองแวะดูเว็บข้อมูลที่ " +
+				 "http:/dodsrv.com/ragnarok/db/ ได้เลย มีข้อมูลครบว่ารอบนี้มีอะไรให้เล่นบ้าง");
 
-	Dialog(name, "This test is a little less cheaty than last time, if you were around for that you'll be a little sad at the loss of the warp command. " +
-				 "The difficulty is also a little higher because of the new skills and adjusted exp chart, but it's not by much.");
+	Dialog(name, "รอบนี้โกงได้น้อยกว่าคราวก่อนนิดหน่อย ถ้าเคยเล่นรอบที่แล้วอาจจะเสียดายที่คำสั่ง warp หายไป " +
+				 "ความยากก็ขยับขึ้นนิดหน่อยเพราะมีสกิลใหม่กับตาราง exp ที่ปรับใหม่ แต่ก็ไม่ได้ยากขึ้นมากนัก");
 
-	Dialog(name, "On the other hand, a lot more things work, you should be able to enjoy almost all the 1st job skills, and even some 2nd job skills. " +
-				 "Partying is in, so now you need to be in a party together to share exp. The way exp share works, it's probably best to always play in groups.");
+	Dialog(name, "แต่ของที่ใช้งานได้ก็เยอะขึ้นมาก สกิลอาชีพ 1 เล่นได้เกือบครบ สกิลอาชีพ 2 ก็ใช้ได้บางส่วนแล้ว " +
+				 "ระบบปาร์ตี้มาแล้ว ต้องอยู่ปาร์ตี้เดียวกันถึงจะแชร์ exp ได้ ด้วยวิธีแชร์ exp แบบนี้ เล่นเป็นกลุ่มไว้น่าจะดีที่สุด");
 
-	Dialog(name, "I haven't removed the ability to reset stats or skills, and you can even change your character's job freely without losing base or job levels, " +
-				 "so feel free to experiment however you like. Sadly there's no player-to-player trading yet... but vending is in, so you can use a merchant to sell goods.");
+	Dialog(name, "ข้ายังไม่ได้ปิดการรีเซ็ตสเตตัสกับสกิลนะ แถมยังเปลี่ยนอาชีพได้อิสระโดยไม่เสีย Base Level หรือ Job Level ด้วย " +
+				 "อยากลองจัดบิลด์แปลก ๆ ก็ตามสบายเลย น่าเสียดายที่ยังเทรดของระหว่างผู้เล่นไม่ได้... แต่เปิดแผงขายได้แล้ว ใช้ Merchant ขายของได้");
 
-	Dialog(name, "There's also this camp here that's new, it's a specially made for this test. As players on the server level up and kill hard monsters, " +
-				 "new npcs will join that offer different services. There's also a special final server-wide challenge that unlocks after players are strong enough to kill mvps.");
+	Dialog(name, "แล้วก็มีแคมป์ตรงนี้ที่เพิ่งทำใหม่ ทำมาเพื่อการทดสอบรอบนี้โดยเฉพาะ พอผู้เล่นในเซิร์ฟเวอร์เลเวลสูงขึ้นและล้มมอนสเตอร์ยาก ๆ ได้ " +
+				 "จะมี NPC ใหม่ ๆ ย้ายเข้ามาเปิดบริการเพิ่ม แล้วยังมีภารกิจสุดท้ายของทั้งเซิร์ฟเวอร์ที่จะปลดล็อกเมื่อผู้เล่นแข็งแกร่งพอจะล้ม MVP ได้ด้วย");
 
 	ShowSprite("bard_eland02", right);
 
-	Dialog(name, "I'm always happy to hear feedback, so if you have a fun time during the test consider dropping by or giving me a shout on twitter under @RoDoddler, " +
-				 "or this time there's even a public discord where you can offer feedback report issues, or just hang out The invite url is: https://discord.gg/sEpPKsPPpd. Have fun!");
+	Dialog(name, "ข้าดีใจเสมอที่ได้ฟังความเห็น ถ้าสนุกกับการทดสอบรอบนี้ก็แวะมาคุยหรือทักทายกันได้ที่ twitter @RoDoddler " +
+				 "หรือรอบนี้มี discord สาธารณะด้วยนะ จะมาเสนอความเห็น แจ้งปัญหา หรือแค่มานั่งเล่นก็ได้ ลิงก์เชิญคือ: https://discord.gg/sEpPKsPPpd ขอให้สนุก!");
 /*
 	Dialog(name, "Ragnarok Rebuild is a remake of sorts, the whole thing including the client and server were built from the ground up. "
 			+ "It's not completely faithful to the original, but it should still feel pretty familiar if you've played before.");
@@ -263,22 +263,22 @@ macro BardSkillReset()
 	ShowSprite("bard_eland01", right);
 	if(JobId == 0)
 	{
-		Dialog(name, "Looking to reset your skills are you? Unfortunately I can't reset your novice skills so I can't help you out much there.");
+		Dialog(name, "มารีเซ็ตสกิลสินะ? น่าเสียดายที่ข้ารีเซ็ตสกิลของ Novice ให้ไม่ได้ เลยช่วยอะไรเธอได้ไม่มากนัก");
 		return;
 	}
 	else
 	{
-		Dialog(name, "You're looking to reset your skills are you? I can reset all of your skill points you used, except those put into your novice skills. Are you sure you want to?");
-		Option("Reset Skills", "No thanks");
+		Dialog(name, "มารีเซ็ตสกิลสินะ? ข้าคืนแต้มสกิลที่ใช้ไปแล้วให้ได้ทั้งหมด ยกเว้นแต้มที่ลงในสกิลของ Novice แน่ใจนะว่าจะรีเซ็ต?");
+		Option("รีเซ็ตสกิล", "ไม่เอาดีกว่า");
 
 		if(result == 0)
 		{
 			SkillReset();
-			Dialog(name, "It's done! Be sure to be more careful with those skill points next time.");
+			Dialog(name, "เรียบร้อย! คราวหน้าลงแต้มสกิลให้รอบคอบขึ้นอีกนิดนะ");
 			return;
 		}
 
-		Dialog(name, "That's fine by me, let me know if you ever want that skill reset sometime.");
+		Dialog(name, "ไม่เป็นไร ถ้าอยากรีเซ็ตสกิลเมื่อไหร่ก็มาบอกได้เลย");
 
 	}
 }
@@ -288,25 +288,25 @@ macro BardStatReset()
 {
 	ShowSprite("bard_eland01", right);
 
-	Dialog(name, "You're looking to reset your stat points are you? I can reset all of your stats back to level 1 for you to reapply your points. How about it?");
-	Option("Reset Stats", "No thanks");
+	Dialog(name, "มารีเซ็ตสเตตัสสินะ? ข้าคืนค่าสเตตัสทั้งหมดกลับไปที่ระดับ 1 ให้ เธอจะได้ลงแต้มใหม่ทั้งหมด เอาไหมล่ะ?");
+	Option("รีเซ็ตสเตตัส", "ไม่เอาดีกว่า");
 
 	if(result == 0)
 	{
 		StatPointReset();
-		Dialog(name, "It's done! Be sure to be more careful with those stat points next time.");
+		Dialog(name, "เรียบร้อย! คราวหน้าลงแต้มสเตตัสให้รอบคอบขึ้นอีกนิดนะ");
 		return;
 	}
 
-	Dialog(name, "That's fine by me, let me know if you ever want that stat reset sometime.");
+	Dialog(name, "ไม่เป็นไร ถ้าอยากรีเซ็ตสเตตัสเมื่อไหร่ก็มาบอกได้เลย");
 }
 
 
 macro BardRandomizeAppearance()
 {
 	ShowSprite("bard_eland01", right);
-	Dialog(name, "You want to randomize your appearance? Sure, what exactly do you want to change?");
-	Option("Change Gender", "Randomize Hair Style", "Randomize Hair Color", "Cancel");
+	Dialog(name, "อยากสุ่มรูปลักษณ์ใหม่สินะ? ได้เลย จะเปลี่ยนตรงไหนดี?");
+	Option("เปลี่ยนเพศ", "สุ่มทรงผม", "สุ่มสีผม", "ยกเลิก");
 
 	switch(result)
 	{
@@ -314,24 +314,24 @@ macro BardRandomizeAppearance()
 		case 1: ReleaseFocus(); ChangePlayerHairToRandom();
 		case 2: ReleaseFocus(); ChangePlayerHairColorToRandom();
 		case 3: 
-			Dialog(name, "No pressure, just let me know if you change your mind.");
+			Dialog(name, "ไม่ต้องรีบ เปลี่ยนใจเมื่อไหร่ก็มาบอกได้");
 			return;
 	}
 
 	ShowSprite("bard_eland02", right);
-	Dialog(name, "We're done! Enjoy the new you, and let me know if you ever need a change.");
+	Dialog(name, "เรียบร้อย! ขอให้ชอบลุคใหม่นะ อยากเปลี่ยนอีกเมื่อไหร่ก็มาบอกได้เลย");
 	return;
 }
 
 macro FullCharacterReset()
 {
 	ShowSprite("bard_eland01", right);
-	Dialog(name, "Woah, you want to do a full character reset? Are you sure? You know I can change your job at any time, and do skill and stat resets, right?");
-	Option("I'd like to reset", "Cancel");
+	Dialog(name, "โอ้โห อยากรีเซ็ตตัวละครทั้งหมดเลยเหรอ? แน่ใจนะ? รู้ใช่ไหมว่าข้าเปลี่ยนอาชีพให้เมื่อไหร่ก็ได้ แถมรีเซ็ตสกิลกับสเตตัสให้ได้ด้วย");
+	Option("ขอรีเซ็ต", "ยกเลิก");
 	if(result == 0)
 	{
-		Dialog(name, "<color=#FF5555>Resetting your character will <i>set you to level 1 and reset all of your skills.</i>\nAre you <i>really</i> sure?</color>");
-		Option("<color=#FF5555>Reset my character</color>", "Cancel");
+		Dialog(name, "<color=#FF5555>การรีเซ็ตตัวละครจะ<i>ทำให้เธอกลับไปเลเวล 1 และรีเซ็ตสกิลทั้งหมด</i>\nแน่ใจ<i>จริง ๆ</i> นะ?</color>");
+		Option("<color=#FF5555>รีเซ็ตตัวละครของฉัน</color>", "ยกเลิก");
 		if(result == 0)
 		{
 			ResetCharacterToInitialState();
@@ -342,9 +342,9 @@ macro FullCharacterReset()
 
 macro BardWarps1to10()
 {
-	Option("North of Morroc (Picky, Pecopeco Egg)", "South of Payon (Willow, Spore)", "North Geffen (Chonchon, Rodafrog)", "South-West of Prontera (Rocker)", "Cancel");
+	Option("เหนือ Morroc (Picky, Pecopeco Egg)", "ใต้ Payon (Willow, Spore)", "เหนือ Geffen (Chonchon, Rodafrog)", "ตะวันตกเฉียงใต้ของ Prontera (Rocker)", "ยกเลิก");
 	if(result < 4)
-		Dialog(name, "I'll send you right over! <i>Hocus-Pocus!</i>");
+		Dialog(name, "เดี๋ยวส่งไปให้เลย! <i>ฮอคัส-โพคัส!</i>");
 	switch(result)
 	{
 		case 0: MoveTo("moc_fild07", 198, 38);
@@ -356,10 +356,10 @@ macro BardWarps1to10()
 
 macro BardWarps11to20()
 {
-	Option("North Morroc (Muka, Pecopeco)", "Mt. Mjolnir (Horn, Wolf)", "Byalan Dungeon (Vadon, Kukre)", "Prontera Culverts 2F (Thief Bug)",
-		   "Payon Dungeon 1F (Skeleton, Zombie)", "South-East Payon (Elder Willow)", "Ant Hell (Ants, More Ants)", "Cancel");
+	Option("เหนือ Morroc (Muka, Pecopeco)", "Mt. Mjolnir (Horn, Wolf)", "ดันเจี้ยน Byalan (Vadon, Kukre)", "ท่อใต้ดิน Prontera ชั้น 2 (Thief Bug)",
+		   "ดันเจี้ยน Payon ชั้น 1 (Skeleton, Zombie)", "ตะวันออกเฉียงใต้ของ Payon (Elder Willow)", "Ant Hell (มด, มดอีกเพียบ)", "ยกเลิก");
 	if(result < 7)
-		Dialog(name, "I'll send you right over! <i>Hocus-Pocus!</i>");
+		Dialog(name, "เดี๋ยวส่งไปให้เลย! <i>ฮอคัส-โพคัส!</i>");
 	switch(result)
 	{
 		case 0: MoveTo("moc_fild06", 31, 204);
@@ -374,10 +374,10 @@ macro BardWarps11to20()
 
 macro BardWarps21to30()
 {
-	Option("Geffen Dungeon 1f (Poison Spore)", "Sphinx 1F (Anacondaq, Scorpion)", "Culverts 4F (Male Thiefbug)", "South Morroc Field (Hodes)",
-		   "Orc Dungeon 1F (Orc Zombie)", "Goblin Forest (goblins)", "Cancel");
+	Option("ดันเจี้ยน Geffen ชั้น 1 (Poison Spore)", "Sphinx ชั้น 1 (Anacondaq, Scorpion)", "ท่อใต้ดินชั้น 4 (Male Thiefbug)", "ทุ่ง Morroc ตอนใต้ (Hodes)",
+		   "ดันเจี้ยน Orc ชั้น 1 (Orc Zombie)", "ป่า Goblin (พวก Goblin)", "ยกเลิก");
 	if(result < 6)
-		Dialog(name, "I'll send you right over! <i>Hocus-Pocus!</i>");
+		Dialog(name, "เดี๋ยวส่งไปให้เลย! <i>ฮอคัส-โพคัส!</i>");
 	switch(result)
 	{
 		case 0: MoveTo("gef_dun00", 104, 99);
@@ -391,10 +391,10 @@ macro BardWarps21to30()
 
 macro BardWarps31to40()
 {
-	Option("Pyramids 2F-3F (Skeletons, Mummies)", "Assassin's Guild (Sandman)", "Payon Dungeon 3F (Munak, Bongun)", "West Geffen Fields (Kobolds)",
-		   "Byalan Dungeon 4F (Marc, Swordfish)", "Cancel");
+	Option("Pyramid ชั้น 2-3 (Skeleton, Mummy)", "Assassin Guild (Sandman)", "ดันเจี้ยน Payon ชั้น 3 (Munak, Bongun)", "ทุ่ง Geffen ฝั่งตะวันตก (Kobold)",
+		   "ดันเจี้ยน Byalan ชั้น 4 (Marc, Swordfish)", "ยกเลิก");
 	if(result < 5)
-		Dialog(name, "I'll send you right over! <i>Hocus-Pocus!</i>");
+		Dialog(name, "เดี๋ยวส่งไปให้เลย! <i>ฮอคัส-โพคัส!</i>");
 	switch(result)
 	{
 		case 0: MoveTo("moc_pryd02", 10, 190);
@@ -407,20 +407,20 @@ macro BardWarps31to40()
 
 macro BardWarp41AndAbove()
 {
-	Dialog(name, "Ah sorry, I wasn't able to get a full list of warps set up for anything level 61 and above. There's some spots worth checking out though you can warp to yourself like clocktower, Glast Heim church and catacombs (for anolians), orc village (geffen 14), bathories, etc.");
+	Dialog(name, "ขอโทษที ข้ายังทำรายการวาร์ปสำหรับเลเวล 61 ขึ้นไปได้ไม่ครบ แต่ก็มีที่น่าไปอยู่หลายแห่งที่เธอวาร์ปไปเองได้ เช่น Clocktower, โบสถ์กับสุสานใต้ดินของ Glast Heim (มี Anolian), หมู่บ้าน Orc (geffen 14), รังของ Bathory เป็นต้น");
 	return;
 }
 
 macro BardWarps()
 {
 	ShowSprite("bard_eland01", right);
-	Dialog(name, "You can use that warp button in the bottom right to go anywhere you want, but maybe you'd rather have suggestions?");
-	Option("Recommend me somewhere", "I'd like to chose", "Cancel");
+	Dialog(name, "เธอกดปุ่ม warp ตรงมุมขวาล่างไปที่ไหนก็ได้อยู่แล้ว แต่อยากให้ข้าแนะนำที่เที่ยวสักหน่อยไหม?");
+	Option("ช่วยแนะนำที่ให้หน่อย", "ขอเลือกเอง", "ยกเลิก");
 	if(result == 2) return;
 	var range = 0;
 	if(result == 0)
 	{
-		Dialog(name, "Lets see, you're level " + Level + ", right? How about one of these maps?");
+		Dialog(name, "ดูซิ เธอเลเวล " + Level + " ใช่ไหม? ลองแมพพวกนี้เป็นไง?");
 		if(Level < 15) range = 0;
 		else if(Level < 30) range = 1;
 		else if(Level < 45) range = 2;
@@ -431,7 +431,7 @@ macro BardWarps()
 	}
 	else
 	{
-		Option("Level 1-15", "Level 16-30", "Level 31-45", "Level 46-60", "As hard as it gets", "Cancel");
+		Option("เลเวล 1-15", "เลเวล 16-30", "เลเวล 31-45", "เลเวล 46-60", "ยากที่สุดเท่าที่มี", "ยกเลิก");
 		if(result > 6) return;
 		range = result;
 	}

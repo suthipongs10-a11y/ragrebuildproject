@@ -6,8 +6,8 @@
 Npc("morocc_in", "Aragham", "4W_M_03", 73, 38, W) {
 OnClick:
     FocusNpc();
-	Dialog(Name, "I'm " + Name + ", the Armsmith.\nI can refine all kinds of weapons, armor and equipment, so let me know if you want me to refine something.");
-	Option("Refine Gear", "Cancel");
+	Dialog(Name, "ผมชื่อ " + Name + " ช่างตีเหล็กประจำเมืองครับ\nตีบวกอาวุธ เกราะ และเครื่องประดับได้ทุกชนิด อยากตีบวกอะไรบอกได้เลย");
+	Option("ตีบวกอุปกรณ์", "ยกเลิก");
 	if(result > 0)
 		return;
 
@@ -20,11 +20,11 @@ Npc("morocc_in", "Abdul", "4W_M_03", 72, 32, W) {
 OnClick:
 	FocusNpc();
 	if(InventoryItemCount > MaxItemCount - 1) {
-		Dialog(Name, "Whoa, you sure are carrying a lot! Come back when you have a few less items on you.");
+		Dialog(Name, "โอ้โห แบกของมาเยอะเลยนะ! ลดของในกระเป๋าลงหน่อยแล้วค่อยกลับมาใหม่นะ");
 		return;
 	}
-	Dialog(Name, "I can purify your Rough Oridecon or Rough Elunium stones. I'll need 5 Rough stones to make 1 pure one for you.");
-	Option("Trade", "Cancel");
+	Dialog(Name, "ผมช่วยสกัด Rough Oridecon กับ Rough Elunium ให้ได้นะ ใช้หินดิบ 5 ก้อน แลกเป็นของบริสุทธิ์ 1 ชิ้น");
+	Option("แลกเปลี่ยน", "ยกเลิก");
 	if(result == 0) StartItemTrade();
 }
 
@@ -34,13 +34,13 @@ Npc("morocc_in", "Sade", "4W_M_03", 63, 32, E) {
 OnClick:
 	FocusNpc();
 	if(HasJobType("Merchant"))
-		Dialog(Name, "I sell 2 kinds of Metal for tempering weaponry.\nI have <color=#007777>Phracon<color=#000000> for Level 1 Weapons," +
-					" and <color=#007777>Emveretarcon<color=#000000> for Level 2 Weapons. No discounts though, sorry.");
+		Dialog(Name, "ผมขายแร่สำหรับตีบวกอาวุธ 2 ชนิดครับ\nมี <color=#007777>Phracon<color=#000000> สำหรับอาวุธ Level 1," +
+					" และ <color=#007777>Emveretarcon<color=#000000> สำหรับอาวุธ Level 2 ขอโทษด้วยนะ ไม่มีส่วนลดให้");
 	else
-		Dialog(Name, "I sell 2 kinds of Metal for tempering weaponry.\nI have <color=#007777>Phracon<color=#000000> for Level 1 Weapons," +
-		            " and <color=#007777>Emveretarcon<color=#000000> for Level 2 Weapons.");
+		Dialog(Name, "ผมขายแร่สำหรับตีบวกอาวุธ 2 ชนิดครับ\nมี <color=#007777>Phracon<color=#000000> สำหรับอาวุธ Level 1," +
+		            " และ <color=#007777>Emveretarcon<color=#000000> สำหรับอาวุธ Level 2");
 	
-	Option("Buy ores", "Cancel");
+	Option("ซื้อแร่", "ยกเลิก");
 	if(result == 0)
 		OpenShop(false); //false makes the shop not apply discount
 }
@@ -48,5 +48,5 @@ OnClick:
 Npc("morocc_in", "Repair Man", "4W_M_03", 71, 41, S) {
 OnClick:
     FocusNpc();
-	Dialog(Name, "Normally I'd help you out if you needed your gear repaired, but for some reason nothing ever breaks! You guys sure do have it lucky.");
+	Dialog(Name, "ปกติถ้าอุปกรณ์พังผมก็ซ่อมให้ได้นะ แต่ไม่รู้ทำไมของที่นี่ไม่เคยพังเลยสักชิ้น! พวกคุณโชคดีจริง ๆ");
 }

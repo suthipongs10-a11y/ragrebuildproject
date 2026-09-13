@@ -2,17 +2,17 @@
 //A free healer beside the Prontera Kafra so trips back from the field stay short.
 Npc("prontera", "Nurse", "4_F_SISTER", 152, 89, S)
 {
-	localstr name = "Nurse";
+	localstr name = "พยาบาล";
 OnClick:
 	FocusNpc();
-	Dialog(name, "Welcome! You look a little worn out from your adventures. Would you like me to patch you up? It's free!");
-	Option("Heal me please", "No thanks");
+	Dialog(name, "ยินดีต้อนรับ! ดูท่าจะบอบช้ำจากการผจญภัยมาไม่น้อยนะ ให้ช่วยรักษาให้ไหม? ฟรีนะ!");
+	Option("ขอรักษาหน่อย", "ไม่ล่ะ ขอบคุณ");
 	if(Result == 0)
 	{
 		HealPlayerFull();
-		Dialog(name, "All done! Your HP and SP are fully restored. Do be careful out there~");
+		Dialog(name, "เรียบร้อย! HP และ SP เต็มแล้ว ออกไปข้างนอกระวังตัวด้วยนะ~");
 		return;
 	}
-	Dialog(name, "Alright then, come see me any time you're hurt!");
+	Dialog(name, "ได้เลย ถ้าบาดเจ็บเมื่อไหร่ก็แวะมาหาได้ตลอดนะ!");
 	return;
 }

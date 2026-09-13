@@ -4,7 +4,7 @@ macro ShipCase(%map, %x, %y, %zeny)
 {
     if(GetZeny() < %zeny)
     {
-        Dialog(Name, %zeny + " zeny! Only " + %zeny + " zeny to ride!");
+        Dialog(Name, %zeny + " zeny! แค่ " + %zeny + " zeny ก็ได้นั่งเรือแล้ว!");
         return;
     }
     DropZeny(%zeny);
@@ -17,8 +17,8 @@ Npc("izlude", "Sailor", "4W_SAILOR", 201, 181, W)
     RegisterAsWarpNpc();
 OnClick:
     FocusNpc();
-    Dialog(Name, "Everybody! Attention, attention! Step on up and ride the winds on the fastest ship in Rune-Midgard!");
-    Option("Byalan Island -> 150z", "Alberta Marina -> 500z", "Cancel" );
+    Dialog(Name, "ทุกคนโปรดทราบ! เชิญขึ้นมาโลดแล่นไปกับสายลม บนเรือที่เร็วที่สุดใน Rune-Midgard!");
+    Option("เกาะ Byalan -> 150z", "ท่าเรือ Alberta -> 500z", "ยกเลิก" );
     switch(Result)
     {
         case 0: @ShipCase("izlu2dun", 107, 50, 150);
@@ -31,8 +31,8 @@ Npc("izlu2dun", "Sailor", "4W_SAILOR", 108, 27, N)
     RegisterAsWarpNpc();
 OnClick:
     FocusNpc();
-    Dialog(Name, "Wanna head back?");
-    Option("Yeah, I'm tired as heck.", "Nope, I love this place!" );
+    Dialog(Name, "อยากกลับฝั่งแล้วเหรอ?");
+    Option("ใช่ เหนื่อยจะแย่แล้ว", "ไม่ล่ะ ฉันชอบที่นี่!" );
     switch(Result)
     {
         case 0: MoveTo("izlude", 176, 182);

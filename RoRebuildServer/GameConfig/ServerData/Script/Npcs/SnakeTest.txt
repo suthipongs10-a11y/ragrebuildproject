@@ -28,10 +28,10 @@ Npc("guild_vs3", "Kafra Staff#Master", "4_F_KAFRA1", 61, 61, SW, 1, 1)
 OnClick:
 	FocusNpc();
 	ShowSprite("kafra_01", right);
-	Dialog("Kafra Staff", "Are you ready to play?");
-	Option("Hell yeah!", "No way!");
+	Dialog("พนักงาน Kafra", "พร้อมจะเล่นหรือยัง?");
+	Option("เอาสิ!", "ไม่เอาหรอก!");
 	if(Result == 0)	{
-		Dialog("Kafra Staff", "Here we go!");
+		Dialog("พนักงาน Kafra", "เริ่มเลย!");
 		KillMyMobs(); //just a safety
 		SignalNpc("Turn Left#Control", "On");
 		SignalNpc("Turn Right#Control", "On");

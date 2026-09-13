@@ -30,7 +30,7 @@ OnTimer 20s:
 	ShowNpc();
 	PlayEffectAtMyLocation("PuffOfSmoke");
 OnTimer 22s:
-	ServerWideMessage("<color=#FF99FF>A server milestone has been reached: the Valkyrie!</color>", "", true);
+	ServerWideMessage("<color=#FF99FF>เซิร์ฟเวอร์บรรลุหมุดหมายใหม่แล้ว: Valkyrie!</color>", "", true);
 	StopTimer();
 OnClick:
 	FocusNpc();
@@ -38,16 +38,16 @@ OnClick:
 
 	if(okolnir == 1)
 	{
-		Dialog(Name, "The door to okolnir will open shortly, please be patient. Once the portal is open all players will be able to enter freely until it is cleared.");
+		Dialog(Name, "ประตูสู่ Okolnir กำลังจะเปิดแล้ว รอสักครู่นะ เมื่อประตูมิติเปิดแล้ว ผู้เล่นทุกคนจะเข้าได้อย่างอิสระจนกว่าจะเคลียร์สำเร็จ");
 		return;
 	}
 	if(okolnir == 2)
 	{
-		Dialog(Name, "The door to okolnir is open. Good luck.");
+		Dialog(Name, "ประตูสู่ Okolnir เปิดแล้ว ขอให้โชคดี");
 	}
 	if(okolnir == 3)
 	{
-		Dialog(Name, "Congratulations on clearing the okolnir challenge dungeon. There's a delay of about 5 minutes after a clear before you can try again.");
+		Dialog(Name, "ยินดีด้วยที่เคลียร์ดันเจี้ยนท้าทาย Okolnir สำเร็จ หลังเคลียร์แล้วต้องรออีกประมาณ 5 นาทีจึงจะลองใหม่ได้");
 		return;
 	}
 	if(okolnir == 0)
@@ -65,26 +65,26 @@ OnClick:
 		//      Dialog(Name, "You have the three keys required to open the door to Okolnir. Are you interested in opening the portal?");
 		//      openOption = "Open the Portal";
 		//  }
-		Dialog(Name, "Welcome adventurer. The realm of Okolnir is sealed for the time being - three keys would not turn that lock today. Come and find me when word goes out that the way has opened.");
+		Dialog(Name, "ยินดีต้อนรับนักผจญภัย ดินแดน Okolnir ถูกผนึกไว้ชั่วคราว ต่อให้มีกุญแจครบสามดอกก็ไขไม่ออกในตอนนี้ เมื่อใดมีข่าวว่าทางเปิดแล้ว ค่อยมาหาข้าอีกครั้งนะ");
 	}
 
-	Option(openOption, "Explain Okolnir", "Cancel")
+	Option(openOption, "อธิบายเรื่อง Okolnir", "ยกเลิก")
 	switch(result)
 	{
 		case 0:
-			Dialog(Name, "The Okolnir challenge dungeon is not easy, and there is no limit to the number of participants. If you would prefer to wait until more players are available to enter that might be best.");
-			Dialog(Name, "If you choose to proceed all online players will be notified, and the portal will open up here 5 minutes later. Anyone can enter, and the portal will stay open until the final objective is complete.");
-			Option("Proceed", "Cancel");
+			Dialog(Name, "ดันเจี้ยนท้าทาย Okolnir ไม่ใช่เรื่องง่าย และไม่จำกัดจำนวนผู้เข้าร่วม ถ้าอยากรอให้มีผู้เล่นพร้อมมากกว่านี้ก่อนค่อยเข้า ก็น่าจะดีกว่านะ");
+			Dialog(Name, "ถ้าเลือกดำเนินการต่อ ผู้เล่นที่ออนไลน์อยู่ทุกคนจะได้รับแจ้ง และประตูมิติจะเปิดขึ้นตรงนี้ในอีก 5 นาที ใครก็เข้าได้ และประตูจะเปิดค้างไว้จนกว่าภารกิจสุดท้ายจะสำเร็จ");
+			Option("ดำเนินการต่อ", "ยกเลิก");
 			if(result == 0)
 			{
 				TakeItem("Okolnir_Key", 3);
-				ServerWideMessage("<color=#FF99FF>The player " + PlayerName + " is opening the portal to Okolnir!</color>", "", true);
+				ServerWideMessage("<color=#FF99FF>ผู้เล่น " + PlayerName + " กำลังเปิดประตูมิติสู่ Okolnir!</color>", "", true);
 				SignalNpc("#okolnirentrance", "Open");
 				okolnir = 1;
 			}
 		case 1:
-			Dialog(Name, "Okolnir is a challenge event available for all players to participate in. One player must have 3 Okolnir keys to open the door.");
-			Dialog(Name, "The door will remain open until the event is cleared, or the server goes offline. When opening the door there will be a 5 minute warning sent to all players so they can gather to participate.");
+			Dialog(Name, "Okolnir คืออีเวนต์ท้าทายที่ผู้เล่นทุกคนเข้าร่วมได้ ต้องมีผู้เล่นคนหนึ่งถือกุญแจ Okolnir 3 ดอกเพื่อเปิดประตู");
+			Dialog(Name, "ประตูจะเปิดค้างไว้จนกว่าอีเวนต์จะถูกเคลียร์ หรือจนกว่าเซิร์ฟเวอร์จะปิด ตอนเปิดประตูจะมีการแจ้งเตือนล่วงหน้า 5 นาทีถึงผู้เล่นทุกคน เพื่อให้รวมตัวกันมาร่วมได้ทัน");
 	}
 }
 
@@ -105,13 +105,13 @@ OnSignal:
 		StopTimer();
 	}
 OnTimer 5s:
-	ServerWideMessage("<color=#FF99FF>Okolnir is a challenge event all players can participate in. The portal will appear next to the Valkyrie south of prontera in 5 minutes.</color>", "", true);
+	ServerWideMessage("<color=#FF99FF>Okolnir คืออีเวนต์ท้าทายที่ผู้เล่นทุกคนเข้าร่วมได้ ประตูมิติจะปรากฏข้าง Valkyrie ทางใต้ของ prontera ในอีก 5 นาที</color>", "", true);
 OnTimer 50s:
 	SendGlobalSignal("OkolnirReset", "Reset");
 OnTimer 300s:
 	ShowNpc();
 	StopTimer();
-	ServerWideMessage("<color=#FF99FF>The portal to Okolnir is now open!</color>", "", true);
+	ServerWideMessage("<color=#FF99FF>ประตูมิติสู่ Okolnir เปิดแล้ว!</color>", "", true);
 	SignalNpc("Valkyrie", "Open");
 OnTouch:
 	MoveTo("que_qsch01", 58, 305);
@@ -456,7 +456,7 @@ OnSignal:
 	if(Signal == "Start")
 	{
 		RegisterMapWideEffect("OkolnirUnsafeZone");
-		MapWideMessage("The area around the center platform has become unsafe!");
+		MapWideMessage("พื้นที่รอบแท่นกลางกลายเป็นเขตอันตรายแล้ว!");
 		StartTimer(1s);
 	}
 	
@@ -475,7 +475,7 @@ OnTimer 2s:
 	CreateEvent("OkolnirDamageZone", 5, 5, "", false);
 OnTimer 8s:
 	//activate dangerzone
-	MapWideMessage("Valkyrie Randgris joins the battle!");
+	MapWideMessage("Valkyrie Randgris เข้าร่วมการต่อสู้แล้ว!");
 OnTimer 10s:
 	DescendSummonMonster("RANDGRIS", 132, 135, 0, 0, S, "EVENT_RANDGRIS");
 	MoveLockAllMyMonsters(%(132, 136, 16, 16));
@@ -492,7 +492,7 @@ OnMobKill:
 		SignalNpc("#ReopenTimer", "Start");
 		SendGlobalSignal("MilestoneValkyrie", "Close");
 		if(GetGlobalInt("OkolnirFirstClear") > 1)
-			MapWideMessage("The Okolnir event has been cleared!");
+			MapWideMessage("อีเวนต์ Okolnir ถูกเคลียร์แล้ว!");
 	}
 }
 
@@ -516,11 +516,11 @@ OnSignal:
 //OnTimer 5s:
 	//ServerWideMessage("<color=#FF99FF>The Okolnir challenge dungeon has been cleared!</color>", "", true);
 OnTimer 15s:
-	ServerWideMessage("<color=#FF99FF>A thanks to all participants of the Rangarok Rebuild test, I hope everyone has enjoyed their time here.</color>", "", true);
+	ServerWideMessage("<color=#FF99FF>ขอบคุณผู้เข้าร่วมทดสอบ Rangarok Rebuild ทุกคน หวังว่าทุกคนจะสนุกกับช่วงเวลาที่นี่นะ</color>", "", true);
 OnTimer 28s:
-	ServerWideMessage("<color=#FF99FF>The Okolnir event represents the final challenge prepared for the test, but the server will continue until the end of the test duration. The event can be re-started by talking to the Valkyrie with 3 keys.</color>", "", true);
+	ServerWideMessage("<color=#FF99FF>อีเวนต์ Okolnir คือบททดสอบสุดท้ายที่เตรียมไว้สำหรับการทดสอบครั้งนี้ แต่เซิร์ฟเวอร์จะเปิดต่อไปจนจบช่วงทดสอบ เริ่มอีเวนต์ใหม่ได้โดยคุยกับ Valkyrie พร้อมกุญแจ 3 ดอก</color>", "", true);
 OnTimer 42s:
-	ServerWideMessage("<color=#FF99FF>I'd love to hear your feedback about what you like and disliked about the test. Thanks again for joining and giving this a try!</color>", "", true);
+	ServerWideMessage("<color=#FF99FF>อยากฟังความเห็นของทุกคนว่าชอบหรือไม่ชอบอะไรในการทดสอบครั้งนี้ ขอบคุณอีกครั้งที่เข้าร่วมและมาลองเล่นกันนะ!</color>", "", true);
 	SetGlobalInt("OkolnirFirstClear", 2);
 	StopTimer();
 }

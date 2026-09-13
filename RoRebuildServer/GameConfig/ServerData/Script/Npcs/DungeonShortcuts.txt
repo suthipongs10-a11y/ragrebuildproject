@@ -2,32 +2,32 @@
 
 Npc("mjo_dun02", "Sign Board", "2_BULLETIN_BOARD", 334, 370, SW) { 
 OnClick:
-	Dialog("Sign Board", "\n<align=center><size=+20>Shortcut Passage</size>");
+	Dialog("ป้ายบอกทาง", "\n<align=center><size=+20>ทางลัด</size>");
 	if(GetItemCount("Old_Pick") <= 0)
 	{
-		Dialog("", "<i>This sign has an arrow pointing to a passage through the wall. Rocks block the way, but if you had an <color=blue>Old Pick</color> you would be able to get through.");
+		Dialog("", "<i>ป้ายนี้มีลูกศรชี้ไปยังช่องทางทะลุกำแพง มีก้อนหินขวางอยู่ แต่ถ้ามี <color=blue>Old Pick</color> ก็น่าจะเจาะผ่านไปได้");
 		return;
 	}
 
-	Dialog("", "<i>This sign has an arrow pointing to a passage through the wall. Rocks block the way, but you can use the <color=blue>Old Pick</color> in your inventory to get through.");
+	Dialog("", "<i>ป้ายนี้มีลูกศรชี้ไปยังช่องทางทะลุกำแพง มีก้อนหินขวางอยู่ แต่คุณใช้ <color=blue>Old Pick</color> ในกระเป๋าเจาะผ่านไปได้");
 
-	Option("Take Shortcut", "Leave");
+	Option("ใช้ทางลัด", "ออกไป");
 	if(result == 0)
 		MoveTo("mjo_dun02", 155, 21);
 }
 
 Npc("ama_dun01", "Suspicious Tile", "CLEAR_NPC", 8, 62, E) { 
 OnClick:
-	Dialog("", "It looks like there's some kind of secret passage hidden here...");
+	Dialog("", "ดูเหมือนจะมีทางลับบางอย่างซ่อนอยู่ตรงนี้...");
 	if(GetItemCount("Shinobi_Sash") <= 0)
 	{
-		Dialog("", "There seems to be some kind of trick to it though. Maybe it would open if you had something that belonged to a shinobi...?");
+		Dialog("", "แต่เหมือนจะมีกลไกอะไรบางอย่างอยู่ ถ้ามีของที่เคยเป็นของ shinobi มันอาจจะเปิดออกก็ได้...?");
 		return;
 	}
 
-	Dialog("", "Reacting to something in your inventory, the passage opens.");
+	Dialog("", "บางอย่างในกระเป๋าของคุณทำปฏิกิริยา แล้วทางลับก็เปิดออก");
 
-	Option("Take Shortcut", "Leave");
+	Option("ใช้ทางลัด", "ออกไป");
 	if(result == 0)
 		MoveTo("ama_dun01", 233, 222);
 }

@@ -8,21 +8,21 @@ macro Kafra(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %saveLo
 	OnClick:
 		FocusNpc();
 		ShowSprite(%cutin, right);
-		Dialog(name, "Welcome to the Kafra Corporation~ The Kafra Services are always here to support you. So how can I be of service today?");
+		Dialog(name, "ยินดีต้อนรับสู่ Kafra Corporation~ บริการ Kafra พร้อมดูแลคุณอยู่เสมอค่ะ วันนี้ให้ช่วยอะไรดีคะ?");
 		//Always offered, and the refusal is spoken rather than being a menu entry that
 		//quietly is not there. A service you cannot see is one you cannot tell apart from a
 		//service that was never added, which is exactly how the last version read.
-		Option("Save", "Use Storage", "Teleport Service", "Rent a Mount or Call a Falcon", "Cancel");
+		Option("บันทึกจุดเกิด", "ใช้คลังเก็บของ", "บริการวาร์ป", "เช่าพาหนะหรือเรียกเหยี่ยว", "ยกเลิก");
 		switch(Result)
 		{
 		case 0:
 			SaveSpawnPoint(%saveLocation);
-			Dialog(name, "Your Respawn Point has been saved " + %saveDesc + ". Thank you for using the Kafra Service.");
+			Dialog(name, "บันทึกจุดเกิดใหม่ของคุณไว้" + %saveDesc + " แล้วค่ะ ขอบคุณที่ใช้บริการ Kafra ค่ะ");
 			return;
 		case 1:
 			if(JobId == 0 && JobLevel < 5)
 			{
-				Dialog(name, "Sorry, only adventurers who have reached job level 5 are allowed to access Kafra storage. Please come back when you have a few more levels.");
+				Dialog(name, "ขออภัยค่ะ คลังเก็บของ Kafra เปิดให้เฉพาะนักผจญภัยที่ job level 5 ขึ้นไปเท่านั้น กลับมาใหม่ตอนเลเวลสูงกว่านี้นะคะ");
 				return;
 			}
 			ReleaseFocus();
@@ -30,7 +30,7 @@ macro Kafra(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %saveLo
 			//Dialog(name, "Sorry, currently our storage service is unavailable. Please try back some other time.");
 			return;
 		case 2:
-			Dialog(name, "Please choose your destination.");
+			Dialog(name, "เลือกจุดหมายปลายทางได้เลยค่ะ");
 			@%teleportMacro();
 		case 3:
 			@KafraRentMount(name);
@@ -52,12 +52,12 @@ macro KafraRentMount(%kafraName)
 	{
 		if(HasCart)
 		{
-			Dialog(%kafraName, "You already have a push cart. Do take care of it~");
+			Dialog(%kafraName, "คุณมี Push Cart อยู่แล้วนี่คะ ดูแลมันดี ๆ นะคะ~");
 			return;
 		}
 
-		Dialog(%kafraName, "A push cart is 200 zeny to rent, and it is yours to keep. Shall I fetch one?");
-		Option("Yes", "No");
+		Dialog(%kafraName, "เช่า Push Cart ราคา 200 zeny และเป็นของคุณไปเลยค่ะ จะให้ไปเอามาให้ไหมคะ?");
+		Option("ตกลง", "ไม่ล่ะ");
 		switch(Result)
 		{
 		case 0:
@@ -65,12 +65,12 @@ macro KafraRentMount(%kafraName)
 			//over, so a character who cannot afford it walks away no poorer
 			if(GetZeny() < 200)
 			{
-				Dialog(%kafraName, "Oh dear, you don't have enough money. Please come back when you have at least 200 zeny.");
+				Dialog(%kafraName, "แหม เงินไม่พอนี่คะ กลับมาใหม่ตอนมีอย่างน้อย 200 zeny นะคะ");
 				return;
 			}
 			DropZeny(200);
 			EquipPushCart();
-			Dialog(%kafraName, "There you are~ Thank you for using the Kafra Service.");
+			Dialog(%kafraName, "เรียบร้อยค่ะ~ ขอบคุณที่ใช้บริการ Kafra ค่ะ");
 			return;
 		}
 		return;
@@ -80,23 +80,23 @@ macro KafraRentMount(%kafraName)
 	{
 		if(HasPeco)
 		{
-			Dialog(%kafraName, "You are already riding a Peco Peco. Do take care of it~");
+			Dialog(%kafraName, "คุณขี่ Peco Peco อยู่แล้วนี่คะ ดูแลมันดี ๆ นะคะ~");
 			return;
 		}
 
-		Dialog(%kafraName, "A Peco Peco is 500 zeny to rent. Shall I bring one out?");
-		Option("Yes", "No");
+		Dialog(%kafraName, "เช่า Peco Peco ราคา 500 zeny ค่ะ จะให้จูงออกมาให้ไหมคะ?");
+		Option("ตกลง", "ไม่ล่ะ");
 		switch(Result)
 		{
 		case 0:
 			if(GetZeny() < 500)
 			{
-				Dialog(%kafraName, "Oh dear, you don't have enough money. Please come back when you have at least 500 zeny.");
+				Dialog(%kafraName, "แหม เงินไม่พอนี่คะ กลับมาใหม่ตอนมีอย่างน้อย 500 zeny นะคะ");
 				return;
 			}
 			DropZeny(500);
 			GivePeco();
-			Dialog(%kafraName, "Do take care of it~ Thank you for using the Kafra Service.");
+			Dialog(%kafraName, "ดูแลมันดี ๆ นะคะ~ ขอบคุณที่ใช้บริการ Kafra ค่ะ");
 			return;
 		}
 		return;
@@ -109,35 +109,35 @@ macro KafraRentMount(%kafraName)
 		//back from that, which otherwise means logging out and in again.
 		if(!HasLearnedSkill(FalconMastery, 1))
 		{
-			Dialog(%kafraName, "A falcon will only answer a hunter who has been taught to call one. Learn Falcon Mastery and one will come to you on its own~");
+			Dialog(%kafraName, "เหยี่ยวจะเชื่อฟังเฉพาะ Hunter ที่เรียนวิธีเรียกมันมาแล้วเท่านั้นค่ะ ไปเรียน Falcon Mastery สิคะ แล้วมันจะบินมาหาคุณเอง~");
 			return;
 		}
 
 		if(HasBird)
 		{
-			Dialog(%kafraName, "Your falcon is right there on your arm~ Do take care of it.");
+			Dialog(%kafraName, "เหยี่ยวของคุณเกาะอยู่บนแขนนั่นไงคะ~ ดูแลมันดี ๆ นะคะ");
 			return;
 		}
 
-		Dialog(%kafraName, "Lost your falcon? I can whistle it back for 200 zeny. Shall I?");
-		Option("Yes", "No");
+		Dialog(%kafraName, "เหยี่ยวหายไปเหรอคะ? จ่าย 200 zeny แล้วเดี๋ยวผิวปากเรียกมันกลับมาให้ เอาไหมคะ?");
+		Option("ตกลง", "ไม่ล่ะ");
 		switch(Result)
 		{
 		case 0:
 			if(GetZeny() < 200)
 			{
-				Dialog(%kafraName, "Oh dear, you don't have enough money. Please come back when you have at least 200 zeny.");
+				Dialog(%kafraName, "แหม เงินไม่พอนี่คะ กลับมาใหม่ตอนมีอย่างน้อย 200 zeny นะคะ");
 				return;
 			}
 			DropZeny(200);
 			GiveFalcon();
-			Dialog(%kafraName, "There it is~ Thank you for using the Kafra Service.");
+			Dialog(%kafraName, "มาแล้วค่ะ~ ขอบคุณที่ใช้บริการ Kafra ค่ะ");
 			return;
 		}
 		return;
 	}
 
-	Dialog(%kafraName, "I am sorry~ Push carts are for merchants and their trades, a Peco Peco will only carry a knight, and a falcon answers to no one but a hunter. Come back when you have taken one of those paths.");
+	Dialog(%kafraName, "ขออภัยค่ะ~ Push Cart มีไว้ให้ Merchant ใช้ทำการค้า Peco Peco ก็ยอมให้เฉพาะ Knight ขี่ ส่วนเหยี่ยวเชื่อฟังแต่ Hunter เท่านั้น กลับมาใหม่ตอนคุณเลือกเดินสายใดสายหนึ่งแล้วนะคะ");
 	return;
 }
 
@@ -150,21 +150,21 @@ macro KafraNoSave(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %
 	OnClick:
 		FocusNpc();
 		ShowSprite(%cutin, right);
-		Dialog(name, "Welcome to the Kafra Corporation~ The Kafra Services are always here to support you. So how can I be of service today?");
-		Option("Use Storage", "Teleport Service", "Rent a Mount or Call a Falcon", "Cancel");
+		Dialog(name, "ยินดีต้อนรับสู่ Kafra Corporation~ บริการ Kafra พร้อมดูแลคุณอยู่เสมอค่ะ วันนี้ให้ช่วยอะไรดีคะ?");
+		Option("ใช้คลังเก็บของ", "บริการวาร์ป", "เช่าพาหนะหรือเรียกเหยี่ยว", "ยกเลิก");
 		switch(Result)
 		{
 		case 0:
 			if(JobId == 0 && JobLevel < 5)
 			{
-				Dialog(name, "Sorry, only adventurers who have reached job level 5 are allowed to access Kafra storage. Please come back when you have a few more levels.");
+				Dialog(name, "ขออภัยค่ะ คลังเก็บของ Kafra เปิดให้เฉพาะนักผจญภัยที่ job level 5 ขึ้นไปเท่านั้น กลับมาใหม่ตอนเลเวลสูงกว่านี้นะคะ");
 				return;
 			}
 			ReleaseFocus();
 			OpenStorage();
 			return;
 		case 1:
-			Dialog(name, "Please choose your destination.");
+			Dialog(name, "เลือกจุดหมายปลายทางได้เลยค่ะ");
 			@%teleportMacro();
 		case 2:
 			@KafraRentMount(name);
@@ -175,7 +175,7 @@ macro KafraNoSave(%map, %x, %y, %facing, %npcName, %chatName, %sprite, %cutin, %
 macro KafraTeleportListProntera()
 {
 	//Option("Izlude → 600z", "Geffen → 1200z", "Payon → 1200z", "Morroc → 1200z", "Orc Dungeon → 1700z", "Alberta → 1800z", "Cancel" );
-	Option("Izlude", "Geffen", "Payon", "Morroc", "Orc Dungeon", "Alberta", "Cancel" );
+	Option("Izlude", "Geffen", "Payon", "Morroc", "Orc Dungeon", "Alberta", "ยกเลิก" );
 	switch(Result)
 	{
 		case 0: @TeleportCase("izlude", 91, 105, 600);
@@ -190,7 +190,7 @@ macro KafraTeleportListProntera()
 macro KafraTeleportListAlberta()
 {
 	//Option("Payon → 1200z", "Morroc → 1800z", "Prontera → 1800z", "Cancel" );
-	Option("Payon", "Morroc", "Prontera", "Cancel" );
+	Option("Payon", "Morroc", "Prontera", "ยกเลิก" );
 	switch(Result)
 	{
 		case 0: @TeleportCase("payon", 161, 58, 1200);
@@ -202,7 +202,7 @@ macro KafraTeleportListAlberta()
 macro KafraTeleportListMorroc()
 {
 	//Option("Prontera → 1200z", "Payon → 1200z", "Alberta → 1800z", "Comodo → 1800z", "Paros Lighthouse → 1200z", "Cancel" );
-	Option("Prontera", "Payon", "Alberta", "Comodo", "Paros Lighthouse", "Cancel" );
+	Option("Prontera", "Payon", "Alberta", "Comodo", "Paros Lighthouse", "ยกเลิก" );
 	switch(Result)
 	{
 		case 0: @TeleportCase("prontera", 116, 72, 1200);
@@ -216,7 +216,7 @@ macro KafraTeleportListMorroc()
 macro KafraTeleportListGeffen()
 {
 	//Option("Prontera → 1200z", "Al De Baran → 1200z", "Orc Dungeon → 1800z", "Mjolnir Dead Pit → 1800z", "Cancel" );
-	Option("Prontera", "Al De Baran", "Orc Dungeon", "Mjolnir Dead Pit", "Cancel" );
+	Option("Prontera", "Al De Baran", "Orc Dungeon", "Mjolnir Dead Pit", "ยกเลิก" );
 	switch(Result)
 	{
 		case 0: @TeleportCase("prontera", 116, 72, 1200);
@@ -229,7 +229,7 @@ macro KafraTeleportListGeffen()
 macro KafraTeleportListPayon()
 {
 	//Option("Archer Village → 200z", "Prontera → 1200z", "Alberta → 1200z", "Morroc → 1200z", "Cancel" );
-	Option("Archer Village", "Prontera", "Alberta", "Morroc", "Cancel" );
+	Option("Archer Village", "Prontera", "Alberta", "Morroc", "ยกเลิก" );
 	switch(Result)
 	{
 		case 0: @TeleportCase("pay_arche", 65, 138, 200);
@@ -242,7 +242,7 @@ macro KafraTeleportListPayon()
 macro KafraTeleportListComodo()
 {
 	//Option("Morroc→ 1200z", "Alberta → 1800z", "Paros Lighthouse → 1200z", "Cancel" );
-	Option("Morroc", "Alberta", "Paros Lighthouse", "Cancel" );
+	Option("Morroc", "Alberta", "Paros Lighthouse", "ยกเลิก" );
 	switch(Result)
 	{
 		case 0: @TeleportCase("morocc", 156, 46, 1200);
@@ -254,7 +254,7 @@ macro KafraTeleportListComodo()
 macro KafraTeleportListIzlude()
 {
 	//Option("Geffen → 1200z", "Payon → 1200z", "Morroc → 1200z", "Al De Baran → 1800z", "Cancel" );
-	Option("Geffen", "Payon", "Morroc", "Al De Baran", "Cancel" );
+	Option("Geffen", "Payon", "Morroc", "Al De Baran", "ยกเลิก" );
 	switch(Result)
 	{
 		case 0: @TeleportCase("geffen", 120, 39, 1200);
@@ -267,7 +267,7 @@ macro KafraTeleportListIzlude()
 macro KafraTeleportListAldebaran()
 {
 	//Option("Geffen → 1200z", "Juno → 1200z", "Izlude → 1200z", "Mjolnir Dead Pit → 1700z", "Cancel" );
-	Option("Geffen", "Juno", "Izlude", "Mjolnir Dead Pit", "Cancel" );
+	Option("Geffen", "Juno", "Izlude", "Mjolnir Dead Pit", "ยกเลิก" );
 	switch(Result)
 	{
 		case 0: @TeleportCase("geffen", 120, 39, 1200);
@@ -280,7 +280,7 @@ macro KafraTeleportListAldebaran()
 macro KafraTeleportListArcherVillage()
 {
 	//Option("Payon → 200z", "Prontera → 1200z", "Alberta → 1200z", "Morroc → 1200z", "Cancel" );
-	Option("Payon", "Prontera", "Alberta", "Morroc", "Cancel" );
+	Option("Payon", "Prontera", "Alberta", "Morroc", "ยกเลิก" );
 	switch(Result)
 	{
 		case 0: @TeleportCase("payon", 161, 58, 200);
@@ -293,7 +293,7 @@ macro KafraTeleportListArcherVillage()
 macro KafraTeleportListOrcDungeon()
 {
 	//Option("Geffen → 1200z", "Prontera → 1200z", "Cancel" );
-	Option("Geffen", "Prontera", "Cancel" );
+	Option("Geffen", "Prontera", "ยกเลิก" );
 	switch(Result)
 	{
 		case 0: @TeleportCase("geffen", 120, 39, 1200);
@@ -314,29 +314,29 @@ macro TeleportCase(%map, %x, %y, %zeny)
 }
 
 
-@Kafra("prontera", 146, 89, E, "Kafra Staff", "Kafra Defolty - Kafra Employee", "4_F_KAFRA1", "kafra_01", "Prontera Southwest Benches", "in the city of Prontera", KafraTeleportListProntera);
-@KafraNoSave("prontera", 248, 42, N, "Kafra Staff", "Kafra Telling - Kafra Employee", "4_F_KAFRA2", "kafra_02", KafraTeleportListProntera);
-@Kafra("prontera", 151, 29, N, "Kafra Staff", "Kafra Sorin - Kafra Employee", "4_F_KAFRA3", "kafra_03", "Prontera South", "in the city of Prontera", KafraTeleportListProntera);
-@Kafra("prontera", 282, 200, W, "Kafra Staff", "Kafra Bennit - Kafra Employee", "4_F_KAFRA4", "kafra_04", "Prontera East", "in the city of Prontera", KafraTeleportListProntera);
-@Kafra("prontera", 29, 207, E, "Kafra Staff", "Kafra Glaris - Kafra Employee", "4_F_KAFRA5", "kafra_05", "Prontera West", "in the city of Prontera", KafraTeleportListProntera);
-@Kafra("prontera", 152, 326, SE, "Kafra Staff", "Kafra W - Kafra Employee", "4_F_KAFRA6", "kafra_06", "Prontera North", "in the city of Prontera", KafraTeleportListProntera);
+@Kafra("prontera", 146, 89, E, "Kafra Staff", "Kafra Defolty - พนักงาน Kafra", "4_F_KAFRA1", "kafra_01", "Prontera Southwest Benches", "ในเมือง Prontera", KafraTeleportListProntera);
+@KafraNoSave("prontera", 248, 42, N, "Kafra Staff", "Kafra Telling - พนักงาน Kafra", "4_F_KAFRA2", "kafra_02", KafraTeleportListProntera);
+@Kafra("prontera", 151, 29, N, "Kafra Staff", "Kafra Sorin - พนักงาน Kafra", "4_F_KAFRA3", "kafra_03", "Prontera South", "ในเมือง Prontera", KafraTeleportListProntera);
+@Kafra("prontera", 282, 200, W, "Kafra Staff", "Kafra Bennit - พนักงาน Kafra", "4_F_KAFRA4", "kafra_04", "Prontera East", "ในเมือง Prontera", KafraTeleportListProntera);
+@Kafra("prontera", 29, 207, E, "Kafra Staff", "Kafra Glaris - พนักงาน Kafra", "4_F_KAFRA5", "kafra_05", "Prontera West", "ในเมือง Prontera", KafraTeleportListProntera);
+@Kafra("prontera", 152, 326, SE, "Kafra Staff", "Kafra W - พนักงาน Kafra", "4_F_KAFRA6", "kafra_06", "Prontera North", "ในเมือง Prontera", KafraTeleportListProntera);
 
-@Kafra("pay_fild03", 405, 59, N, "Kafra Staff", "Kafra Employee", "4_F_KAFRA2", "kafra_02", "Alberta North", "in the city of Alberta", KafraTeleportListAlberta);
-@Kafra("alberta", 28, 229, N, "Kafra Staff", "Kafra Employee", "4_F_KAFRA2", "kafra_02", "Alberta North", "in the city of Alberta", KafraTeleportListAlberta);
-@Kafra("alberta", 113, 60, E, "Kafra Staff", "Kafra Employee", "4_F_KAFRA6", "kafra_06", "Alberta South", "in the city of Alberta", KafraTeleportListAlberta);
+@Kafra("pay_fild03", 405, 59, N, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA2", "kafra_02", "Alberta North", "ในเมือง Alberta", KafraTeleportListAlberta);
+@Kafra("alberta", 28, 229, N, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA2", "kafra_02", "Alberta North", "ในเมือง Alberta", KafraTeleportListAlberta);
+@Kafra("alberta", 113, 60, E, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA6", "kafra_06", "Alberta South", "ในเมือง Alberta", KafraTeleportListAlberta);
 
-@Kafra("morocc", 160, 258, S, "Kafra Staff", "Kafra Employee", "4_F_KAFRA4", "kafra_04", "Morroc North", "in the city of Morroc", KafraTeleportListMorroc);
-@Kafra("morocc", 156, 97, S, "Kafra Staff", "Kafra Employee", "4_F_KAFRA5", "kafra_05", "Morroc South", "in the city of Morroc", KafraTeleportListMorroc);
+@Kafra("morocc", 160, 258, S, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA4", "kafra_04", "Morroc North", "ในเมือง Morroc", KafraTeleportListMorroc);
+@Kafra("morocc", 156, 97, S, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA5", "kafra_05", "Morroc South", "ในเมือง Morroc", KafraTeleportListMorroc);
 
-@KafraNoSave("gef_fild10", 73, 340, SE, "Kafra Staff", "Kafra Employee", "4_F_KAFRA2", "kafra_02", KafraTeleportListOrcDungeon);
+@KafraNoSave("gef_fild10", 73, 340, SE, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA2", "kafra_02", KafraTeleportListOrcDungeon);
 
-@Kafra("geffen", 120, 62, N, "Kafra Staff", "Kafra Employee", "4_F_KAFRA3", "kafra_03", "Geffen South", "in the city of Geffen", KafraTeleportListGeffen);
-@Kafra("geffen", 203, 123, W, "Kafra Staff", "Kafra Employee", "4_F_KAFRA4", "kafra_04", "Geffen South", "in the city of Geffen", KafraTeleportListGeffen); //east kafra, doesn't have it's own save
+@Kafra("geffen", 120, 62, N, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA3", "kafra_03", "Geffen South", "ในเมือง Geffen", KafraTeleportListGeffen);
+@Kafra("geffen", 203, 123, W, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA4", "kafra_04", "Geffen South", "ในเมือง Geffen", KafraTeleportListGeffen); //east kafra, doesn't have it's own save
 
-@Kafra("payon", 181, 104, S, "Kafra Staff", "Kafra Employee", "4_F_KAFRA5", "kafra_05", "Payon South", "in the city of Payon", KafraTeleportListPayon);
-@Kafra("payon", 175, 226, S, "Kafra Staff", "Kafra Employee", "4_F_KAFRA2", "kafra_02", "Payon North", "in the city of Payon", KafraTeleportListPayon);
-@Kafra("pay_arche", 55, 123, NW, "Kafra Staff", "Kafra Employee", "4_F_KAFRA1", "kafra_01", "Archer Village", "in the Archer Village", KafraTeleportListArcherVillage);
+@Kafra("payon", 181, 104, S, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA5", "kafra_05", "Payon South", "ในเมือง Payon", KafraTeleportListPayon);
+@Kafra("payon", 175, 226, S, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA2", "kafra_02", "Payon North", "ในเมือง Payon", KafraTeleportListPayon);
+@Kafra("pay_arche", 55, 123, NW, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA1", "kafra_01", "Archer Village", "ที่ Archer Village", KafraTeleportListArcherVillage);
 
-@Kafra("izlude", 134, 88, W, "Kafra Staff", "Kafra Employee", "4_F_KAFRA1", "kafra_01", "Izlude", "in the town of Izlude", KafraTeleportListIzlude);
-@Kafra("comodo", 195, 150, S, "Kafra Staff", "Kafra Employee", "4_F_KAFRA7", "kafra_07", "Comodo", "in the town of Comodo", KafraTeleportListComodo);
-@Kafra("aldebaran", 143, 119, S, "Kafra Staff", "Kafra Employee", "4_F_KAFRA5", "kafra_05", "Aldebaran", "in the city of Aldebaran", KafraTeleportListAldebaran);
+@Kafra("izlude", 134, 88, W, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA1", "kafra_01", "Izlude", "ในเมือง Izlude", KafraTeleportListIzlude);
+@Kafra("comodo", 195, 150, S, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA7", "kafra_07", "Comodo", "ในเมือง Comodo", KafraTeleportListComodo);
+@Kafra("aldebaran", 143, 119, S, "Kafra Staff", "พนักงาน Kafra", "4_F_KAFRA5", "kafra_05", "Aldebaran", "ในเมือง Aldebaran", KafraTeleportListAldebaran);
