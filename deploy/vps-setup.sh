@@ -97,10 +97,27 @@ systemctl reload nginx
 # command to add it returned zero, which it also does when ufw is not managing ssh at
 # all. If the rule is not there the firewall is left off, which is no worse than it was.
 if command -v ufw >/dev/null 2>&1; then
-  ufw allow OpenSSH >/dev/null || echo "Could not add the ufw rule for ssh - carrying on."
-  ufw allow 'Nginx Full' >/dev/null || echo "Could not add the ufw rule for nginx - carrying on."
+  # Both the name and the number, because the two can disagree: OpenSSH is an
+  # application profile, a file under /etc/ufw/applications.d, and a machine that does
+  # not have it gets no rule from that line at all - while the line still succeeds.
+  # Being wrong about this ends the session that is running it, so the port is opened
+  # by number as well and the two back each other up.
+  for rule in OpenSSH 22/tcp 'Nginx Full' 80/tcp 443/tcp; do
+      ufw allow "$rule" >/dev/null 2>&1 || true
+  done
 
-  if ufw status | grep -Eq '(^|[[:space:]])(OpenSSH|22(/tcp)?)([[:space:]]|$)'; then
+  # `ufw status` lists nothing while ufw is disabled - it prints "Status: inactive" and
+  # stops. So the old check here, which read `ufw status` for the ssh rule, could never
+  # pass on the one machine it was written for: the one with the firewall still off. It
+  # reported that it was leaving the firewall alone to avoid locking anyone out, which
+  # read like caution and was a script that could not do its job. `ufw show added` is
+  # the one that lists rules whether or not the firewall is running.
+  have_ssh_rule() {
+      { ufw show added 2>/dev/null; ufw status 2>/dev/null; } \
+          | grep -Eq 'OpenSSH|(^|[[:space:]])22(/tcp)?([[:space:]]|$)'
+  }
+
+  if have_ssh_rule; then
     ufw --force enable >/dev/null
     echo "  Firewall on: ssh, http and https only."
   else

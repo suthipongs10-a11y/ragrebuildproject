@@ -23,15 +23,29 @@ echo "==> Firewall"
 if ! command -v ufw >/dev/null 2>&1; then
     echo "    ufw is not installed - skipping. (apt-get install -y ufw, then run this again)"
 else
-    ufw allow OpenSSH >/dev/null 2>&1 || true
-    ufw allow 'Nginx Full' >/dev/null 2>&1 || true
+    # Both the name and the number, because the two can disagree: OpenSSH is an
+    # application profile, a file under /etc/ufw/applications.d, and a machine that does
+    # not have it gets no rule from that line at all - while the line still succeeds.
+    # Being wrong about this ends the session that is running it, so the port is opened
+    # by number as well and the two back each other up.
+    for rule in OpenSSH 22/tcp 'Nginx Full' 80/tcp 443/tcp; do
+        ufw allow "$rule" >/dev/null 2>&1 || true
+    done
+
+    # `ufw status` lists nothing while ufw is disabled - it prints "Status: inactive" and
+    # stops. So the old check here, which read `ufw status` for the ssh rule, could never
+    # pass on the one machine it was written for: the one with the firewall still off. It
+    # reported that it was leaving the firewall alone to avoid locking anyone out, which
+    # read like caution and was a script that could not do its job. `ufw show added` is
+    # the one that lists rules whether or not the firewall is running.
+    have_ssh_rule() {
+        { ufw show added 2>/dev/null; ufw status 2>/dev/null; } \
+            | grep -Eq 'OpenSSH|(^|[[:space:]])22(/tcp)?([[:space:]]|$)'
+    }
 
     if ufw status | grep -q "Status: active"; then
         echo "    Already on."
-    # Enabling is the one step here that can end this ssh session for good, so the ssh
-    # rule is confirmed present in the list first. Checking that "ufw allow" returned
-    # zero is not the same thing - it does that whether or not the rule took.
-    elif ufw status | grep -Eq '(^|[[:space:]])(OpenSSH|22(/tcp)?)([[:space:]]|$)'; then
+    elif have_ssh_rule; then
         ufw --force enable >/dev/null
         echo "    Turned on - ssh, http and https only."
     else
