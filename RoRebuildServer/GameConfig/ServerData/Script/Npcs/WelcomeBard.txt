@@ -432,7 +432,7 @@ macro BardWarps()
 	else
 	{
 		Option("เลเวล 1-15", "เลเวล 16-30", "เลเวล 31-45", "เลเวล 46-60", "ยากที่สุดเท่าที่มี", "ยกเลิก");
-		if(result > 6) return;
+		if(result > 4) return; //option 5 is Cancel
 		range = result;
 	}
 	
