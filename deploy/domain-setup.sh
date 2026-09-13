@@ -22,7 +22,7 @@ set -euo pipefail
 
 DOMAIN="${1:?usage: domain-setup.sh <domain>   (for example: domain-setup.sh example.com)}"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-WEB=/opt/rorebuild/web
+WEB=/var/www/rorebuild
 
 # A bare name, no scheme and no path: everything below builds www. and play. on top of
 # it, and "https://example.com/" would turn into "play.https://example.com/".
@@ -40,11 +40,16 @@ fi
 echo "==> Front page"
 mkdir -p "$WEB"
 sed 's/\r$//' "$HERE/web/index.html" > "$WEB/index.html"
-# nginx reads these as www-data, which is neither the owner nor in the group, so the
-# world bit is the one that matters. /opt/rorebuild is chowned to the game's user by
-# install-bundle.sh and that is fine - it only ever has to be readable from here.
-chmod 755 "$WEB"
+# nginx reads this as www-data, which owns none of it, so the world bits are the ones
+# that matter - on the file and on every folder above it, since a folder that cannot be
+# stepped into hides what is inside just as well as a missing file.
+chmod 755 /var/www "$WEB"
 chmod 644 "$WEB/index.html"
+
+# The first version of this put the page under /opt/rorebuild/web, which nginx could not
+# read. Clear that away so there are not two copies and a later edit lands on the one
+# nobody serves.
+rm -rf /opt/rorebuild/web
 echo "    $WEB/index.html"
 
 echo "==> nginx"
@@ -91,7 +96,13 @@ done
 
 if [ "$READY" -eq 1 ]; then
     echo "==> Certificates"
-    certbot --nginx --non-interactive --agree-tos --redirect \
+    # --keep-until-expiring is what makes a second run work. Rewriting the nginx file
+    # above throws away the ssl blocks certbot put in it last time, and certbot asked to
+    # issue a certificate it already holds stops to ask what you meant - which in
+    # --non-interactive is not a question, it is an error, and the site would be left on
+    # plain http with nothing listening on 443. With the flag it keeps the certificate it
+    # has and installs it into the file again, which is exactly the repair wanted.
+    certbot --nginx --non-interactive --agree-tos --redirect --keep-until-expiring \
         -d "$DOMAIN" -d "www.$DOMAIN" -d "play.$DOMAIN" \
         --register-unsafely-without-email
     systemctl reload nginx
