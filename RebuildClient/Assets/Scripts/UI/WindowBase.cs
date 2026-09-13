@@ -41,20 +41,90 @@ namespace Assets.Scripts.UI
             UiManager.Instance.MoveToLast(this);
         }
 
+        /// <summary>How small a window may be shrunk before it is left alone.</summary>
+        private const float MinFitScale = 0.4f;
+
+        /// <summary>
+        /// The scale this window was built at, so shrinking it is undone when there is room
+        /// again. Without it a phone turned sideways, or a browser window dragged wider,
+        /// would keep whatever size the narrowest moment of the session decided on.
+        /// </summary>
+        private Vector3 fitBaseScale;
+        private bool hasFitBaseScale;
+
+        /// <summary>
+        /// Brings a window back inside the screen, shrinking it first if it cannot fit.
+        /// </summary>
+        /// <remarks>
+        /// Measured off the window's own corners rather than worked out from sizeDelta and
+        /// a guess at where the pivot is. The arithmetic this replaces assumed one pivot
+        /// for the horizontal edge and another for the vertical, so it was only ever right
+        /// for windows that happened to be built that way.
+        ///
+        /// The rest is what a phone needs. A window laid out for a monitor can be taller
+        /// than a handset screen, and it cannot be dragged into view because there is
+        /// nowhere for it to go - the storage chest arrived with its title bar, and so its
+        /// close button, above the top of the screen and no way to reach either. So an
+        /// oversized window is scaled down until it fits, and where it still does not, the
+        /// top edge wins: the bottom of a list can be scrolled to, a close button that is
+        /// off the screen cannot be got at by any means at all.
+        ///
+        /// Only ever shrinks. On a monitor everything already fits and this does nothing.
+        /// </remarks>
         public void FitWindowIntoPlayArea()
         {
             if (!AutomaticallyFitIntoPlayArea)
                 return;
 
             var rect = GetComponent<RectTransform>();
+            if (rect == null || Screen.width < 1 || Screen.height < 1)
+                return;
 
-            var pos = transform.position;
-            var halfx = rect.sizeDelta.x * rect.transform.lossyScale.x / 2f;
+            if (!hasFitBaseScale)
+            {
+                fitBaseScale = transform.localScale;
+                hasFitBaseScale = true;
+            }
 
-            pos = new Vector3(Mathf.Clamp(pos.x, -halfx, Screen.width - halfx),
-                Mathf.Clamp(pos.y, rect.sizeDelta.y * rect.transform.lossyScale.y / 2f, Screen.height), pos.z);
+            //Measured at the size it was built at every time, rather than at whatever this
+            //left it at last time. Otherwise each pass shrinks what the pass before shrank
+            //and the window walks away to nothing.
+            transform.localScale = fitBaseScale;
 
-            transform.position = pos;
+            var corners = new Vector3[4];
+            rect.GetWorldCorners(corners); //0 bottom left, 1 top left, 2 top right, 3 bottom right
+
+            var width = corners[2].x - corners[0].x;
+            var height = corners[1].y - corners[0].y;
+            if (width < 1f || height < 1f)
+                return; //not laid out yet
+
+            var fit = Mathf.Min(Screen.width / width, Screen.height / height, 1f);
+            if (fit < 1f)
+            {
+                transform.localScale = fitBaseScale * Mathf.Max(fit, MinFitScale);
+
+                //the corners moved, so they have to be asked again before anything is
+                //placed against them
+                rect.GetWorldCorners(corners);
+            }
+
+            var shift = Vector3.zero;
+
+            if (corners[0].x < 0f)
+                shift.x = -corners[0].x;
+            else if (corners[2].x > Screen.width)
+                shift.x = Screen.width - corners[2].x;
+
+            //top first and on its own where the window is still too tall, because that edge
+            //carries the title bar and the close button with it
+            if (corners[1].y > Screen.height)
+                shift.y = Screen.height - corners[1].y;
+            else if (corners[0].y < 0f)
+                shift.y = Mathf.Min(-corners[0].y, Screen.height - corners[1].y);
+
+            if (shift != Vector3.zero)
+                transform.position += shift;
         }
 
         public void ToggleVisibility()

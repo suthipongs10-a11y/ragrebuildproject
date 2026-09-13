@@ -443,6 +443,26 @@ namespace Assets.Scripts.UI
             UpdateSkillPointsAndLock();
         }
 
+        /// <summary>
+        /// Takes the tooltip down with the window.
+        ///
+        /// The tooltip is moved out of this window when it is shown - it has to be, or the
+        /// character model in the hub draws over it - and once it is a child of the canvas
+        /// instead, closing this window no longer closes it. So it stayed on screen over
+        /// the map, describing a skill from a list that was no longer there, until
+        /// something else happened to hide it.
+        ///
+        /// OnDisable rather than an override of HideWindow, because the window also goes
+        /// away by having its tab switched and by the hub closing, and neither of those
+        /// goes through HideWindow.
+        /// </summary>
+        public void OnDisable()
+        {
+            //the scene can be coming apart, and the tooltip may already be gone
+            if (TooltipBox != null)
+                HideTooltip();
+        }
+
         public void Awake()
         {
             TemplateObject.gameObject.SetActive(false);
