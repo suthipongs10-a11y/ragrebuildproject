@@ -11,4 +11,5 @@
 | `web/index.html` | VPS (หน้าแรก) | หน้ารวมเซิร์ฟเวอร์ เช็คสถานะสดจาก `/status` แล้วลิงก์ไปหน้าเล่น |
 | `nginx/rorebuild.conf` | VPS | 2 vhost — โดเมนหลัก = หน้าแรก, `play.` = ตัวเกม + WebSocket `/ws` |
 | `systemd/rorebuild.service` | VPS | รันเซิร์ฟเวอร์เป็น service รีสตาร์ตเองเมื่อล้ม |
+| `harden.sh` | VPS (รันซ้ำได้) | เปิด firewall, ลง fail2ban, ตั้ง cron backup, เตือน reboot ที่ค้าง |
 | `backup.sh` | VPS (cron ทุก 6 ชม.) | สำรอง SQLite แบบปลอดภัยขณะรัน เก็บ 14 วัน |

@@ -22,7 +22,7 @@ export NEEDRESTART_SUSPEND=1
 
 apt-get update
 APT_KEEP=(-o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold)
-apt-get install -y "${APT_KEEP[@]}" nginx certbot python3-certbot-nginx sqlite3 unzip wget
+apt-get install -y "${APT_KEEP[@]}" nginx certbot python3-certbot-nginx sqlite3 unzip wget fail2ban
 
 # Asked by runtime, not by whether a dotnet binary exists: a box with .NET 8 on it
 # has the binary and still cannot run this server.
@@ -86,9 +86,35 @@ rm -f /etc/nginx/sites-enabled/default
 nginx -t
 systemctl reload nginx
 
+# The firewall, switched on rather than merely configured.
+#
+# This used to add the two rules and stop, which does nothing at all: ufw ships
+# disabled, and rules in a disabled firewall are a list nobody reads. It looked done
+# from the output and from the script, and `ufw status` said inactive for weeks.
+#
+# Enabling is the step that can lock this session out of the machine, so it is done
+# only after checking the ssh rule is really in the list - not after checking that the
+# command to add it returned zero, which it also does when ufw is not managing ssh at
+# all. If the rule is not there the firewall is left off, which is no worse than it was.
 if command -v ufw >/dev/null 2>&1; then
   ufw allow OpenSSH >/dev/null || echo "Could not add the ufw rule for ssh - carrying on."
   ufw allow 'Nginx Full' >/dev/null || echo "Could not add the ufw rule for nginx - carrying on."
+
+  if ufw status | grep -Eq '(^|[[:space:]])(OpenSSH|22(/tcp)?)([[:space:]]|$)'; then
+    ufw --force enable >/dev/null
+    echo "  Firewall on: ssh, http and https only."
+  else
+    echo "  LEAVING THE FIREWALL OFF - no ssh rule was found, and turning it on now"
+    echo "  would end this session and lock you out. Add the rule by hand and enable it:"
+    echo "    ufw allow OpenSSH && ufw allow 'Nginx Full' && ufw --force enable"
+  fi
+fi
+
+# Bans an address that keeps guessing the ssh password. Port 22 on a public address is
+# probed around the clock by machines that do nothing else; this is the difference
+# between a password that is eventually guessed and one that is not worth guessing at.
+if command -v fail2ban-client >/dev/null 2>&1; then
+  systemctl enable --now fail2ban >/dev/null 2>&1 || echo "  Could not start fail2ban - carrying on."
 fi
 
 # A database backup every six hours, two weeks kept.
