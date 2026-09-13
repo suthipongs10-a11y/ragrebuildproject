@@ -136,7 +136,15 @@ h2 {
   letter-spacing: .04em;
 }
 
-.who { flex: 1 1 auto; min-width: 0; }
+/* A column, because the three lines inside are spans and spans sit next to each other:
+   the name, the address and the status all ran together into one unreadable line. */
+.who {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
 .name {
   font-family: Kanit, sans-serif;
@@ -351,7 +359,10 @@ footer {
         .then(function (s) {
           var text = "ออนไลน์";
           if (typeof s.players === "number") {
-            text += " · " + s.players + (s.maxPlayers > 0 ? "/" + s.maxPlayers : "") + " คน";
+            // The count, not the cap. How full the server is is nobody's business but
+            // the server's, and "0/25" reads as an empty room where "0 คน" reads as a
+            // quiet one. /status still reports maxPlayers for whoever wants it.
+            text += " · " + s.players + " คน";
           }
           if (s.registration === "closed" || s.registration === "full") {
             text += " · ปิดรับสมัคร";
