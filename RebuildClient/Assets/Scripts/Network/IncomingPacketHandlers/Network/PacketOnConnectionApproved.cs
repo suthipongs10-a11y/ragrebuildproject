@@ -15,7 +15,16 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Network
         public override void ReceivePacket(ClientInboundMessage msg)
         {
             if (msg.ReadBoolean()) //hasToken
-                GameConfig.Data.SavedLoginToken = Convert.ToBase64String(msg.ReadBytes(msg.ReadInt32()));
+            {
+                var token = Convert.ToBase64String(msg.ReadBytes(msg.ReadInt32()));
+                GameConfig.Data.SavedLoginToken = token;
+
+                //The name is read back from where AttemptLogin put it a moment ago, which is
+                //the account this approval belongs to. Recorded against the token rather
+                //than left as a single pair, so a second login does not evict the first -
+                //people here run two or three and swapping meant typing a password again.
+                SavedAccountStore.Remember(PlayerPrefs.GetString("LoginUsername", ""), token);
+            }
             else
                 GameConfig.Data.SavedLoginToken = null;
 

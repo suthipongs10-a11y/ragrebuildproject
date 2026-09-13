@@ -155,6 +155,35 @@ namespace Assets.Scripts.UI.TitleScreen
             currentTab = id;
         }
 
+        /// <summary>
+        /// Signs in as an account the player has already used here, without a password.
+        /// </summary>
+        /// <remarks>
+        /// Deliberately goes through the boxes and AttemptLogin rather than calling the
+        /// network directly: that path already knows how to send a token, how to report a
+        /// refusal, and how to start the timer that gives up. A second way in would be a
+        /// second set of those to keep working.
+        ///
+        /// SavedLoginToken is set on the way past because it is what that path reads. It
+        /// holds whichever account was used last, which is exactly what this is choosing.
+        /// </remarks>
+        public void LoginAsSavedAccount(string accountName)
+        {
+            var token = SavedAccountStore.TokenFor(accountName);
+            if (string.IsNullOrWhiteSpace(token))
+                return;
+
+            ChangeTabs(0);
+            UsernameBox.text = accountName;
+            PasswordBox.text = TokenLoginPass;
+            if (RememberLoginToggle != null)
+                RememberLoginToggle.isOn = true;
+            if (GameConfig.Data != null)
+                GameConfig.Data.SavedLoginToken = token;
+
+            AttemptLogin();
+        }
+
         public void AttemptLogin()
         {
             var url = ServerInputBox.text;

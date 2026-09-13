@@ -22,6 +22,14 @@ namespace Assets.Scripts.UI.ConfigWindow
         public byte[] UniqueItem;
     }
     
+    /// <summary>One remembered login: the name to put in the box and the token to send.</summary>
+    [Serializable]
+    public class SavedAccount
+    {
+        public string Name;
+        public string Token;
+    }
+
     [Serializable]
     public class GameConfigData : ISerializationCallbackReceiver
     {
@@ -138,6 +146,13 @@ namespace Assets.Scripts.UI.ConfigWindow
 
         //user
         [CanBeNull] public string SavedLoginToken;
+
+        /// <summary>
+        /// Every account this machine has been told to remember, most recently used first.
+        /// See SavedAccountStore - and note that what is stored is a login token, which the
+        /// server replaces on every use, never a password.
+        /// </summary>
+        public List<SavedAccount> SavedAccounts = new();
 
         public HotBarSaveData[] GetHotBarDataForCharacter(string name)
         {

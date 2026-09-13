@@ -82,6 +82,139 @@ namespace Assets.Scripts.UI.TitleScreen
             if (login.WindowRect != null
                 && Mathf.Abs(login.WindowRect.sizeDelta.x - LoginWidth) > 0.5f)
                 LayOutLogin(login, login.WindowRect);
+
+            RefreshSavedAccounts(login);
+        }
+
+        private const float SavedRowHeight = 32f;
+        private const float SavedRowGap = 4f;
+        private const float SavedHeaderHeight = 24f;
+        private const float SavedPad = 8f;
+        private const float SavedForgetWidth = 32f;
+        private const float SavedGapToLogin = 10f;
+
+        /// <summary>The cross that forgets a row. Red enough to be read as undoing something.</summary>
+        private static readonly Color SavedForgetColor = new Color(0.681f, 0.102f, 0.140f);
+
+        private GameObject savedPanel;
+        private string savedSignature;
+
+        /// <summary>
+        /// The list of accounts already used here, above the login box, one tap each.
+        /// </summary>
+        /// <remarks>
+        /// Built from the skin rather than from the prefab because the prefab is a scene
+        /// asset and this is a list whose length is not known until it is read - and the
+        /// rest of this screen is already assembled here, so the two stay in one place.
+        ///
+        /// Rebuilt only when what it would show has changed, which is what the signature is
+        /// for: this runs twice a second and tearing down a panel that nobody has touched
+        /// would take the button under the player's finger with it.
+        /// </remarks>
+        private void RefreshSavedAccounts(LoginBox win)
+        {
+            if (win == null || win.WindowRect == null)
+                return;
+
+            var accounts = SavedAccountStore.All;
+
+            //Only over the sign-in tab. On Create ID or Server Info it would be a list of
+            //logins floating over a form it has nothing to do with.
+            var onLoginTab = win.LoginSection == null || win.LoginSection.activeInHierarchy;
+
+            var signature = onLoginTab ? string.Join("\u0000", accounts.ConvertAll(a => a?.Name)) : "<hidden>";
+            if (savedPanel != null && signature == savedSignature)
+                return;
+
+            savedSignature = signature;
+
+            if (savedPanel != null)
+                Destroy(savedPanel);
+            savedPanel = null;
+
+            if (!onLoginTab || accounts.Count == 0)
+                return;
+
+            var height = SavedPad * 2f + SavedHeaderHeight
+                         + accounts.Count * SavedRowHeight + (accounts.Count - 1) * SavedRowGap;
+
+            var card = ModernUiTheme.CreateCard(win.WindowRect, "SavedAccounts", ModernUiTheme.CardColor);
+            savedPanel = card.gameObject;
+            ModernUiTheme.AddBorder(card, ModernUiTheme.CardBorderColor);
+
+            //Above the box where there is room, below it where there is not. A phone held
+            //sideways has very little screen above the middle, and the character creator
+            //already taught us what a panel put somewhere it does not fit looks like: the
+            //part you need is off the top and there is no way to reach it.
+            var area = win.WindowRect.parent as RectTransform;
+            var roomAbove = area != null
+                ? area.rect.height * 0.5f + win.WindowRect.anchoredPosition.y - win.WindowRect.rect.height * 0.5f
+                : float.MaxValue;
+
+            if (roomAbove >= height + SavedGapToLogin)
+            {
+                //anchored and pivoted on the window's top edge, pushed up by its own height
+                //plus the gap, so it clears the window instead of covering it
+                ModernUiTheme.Place(card, new Vector2(0.5f, 1f),
+                    new Vector2(0f, height + SavedGapToLogin), new Vector2(LoginWidth, height));
+            }
+            else
+            {
+                //Place cannot do this one: the anchor wants the window's bottom and the
+                //pivot wants the card's top, and it sets the two to the same corner.
+                card.anchorMin = card.anchorMax = new Vector2(0.5f, 0f);
+                card.pivot = new Vector2(0.5f, 1f);
+                card.sizeDelta = new Vector2(LoginWidth, height);
+                card.anchoredPosition = new Vector2(0f, -SavedGapToLogin);
+            }
+
+            var header = ModernUiTheme.CreateText(card, "Header", "บัญชีที่บันทึกไว้",
+                ModernUiTheme.SizeLabel, ModernUiTheme.MutedColor, TextAlignmentOptions.Left);
+            ModernUiTheme.Place((RectTransform)header.transform, new Vector2(0, 1),
+                new Vector2(SavedPad + 2f, -SavedPad), new Vector2(LoginWidth - SavedPad * 2f, SavedHeaderHeight));
+
+            for (var i = 0; i < accounts.Count; i++)
+            {
+                var account = accounts[i];
+                if (account == null || string.IsNullOrWhiteSpace(account.Name))
+                    continue;
+
+                var name = account.Name;
+                var y = -(SavedPad + SavedHeaderHeight + i * (SavedRowHeight + SavedRowGap));
+                var rowWidth = LoginWidth - SavedPad * 2f - SavedForgetWidth - SavedRowGap;
+
+                //the whole row signs in, rather than a row you select and a button you then
+                //press - one tap is the entire point of this
+                var enter = ModernUiTheme.CreateButton(card, $"Account{i}", $"{i + 1}.  {name}",
+                    ModernUiTheme.CardDeepColor, ModernUiTheme.NameColor, ModernUiTheme.SizeSubtitle,
+                    FontStyles.Normal);
+                ModernUiTheme.Place((RectTransform)enter.transform, new Vector2(0, 1),
+                    new Vector2(SavedPad, y), new Vector2(rowWidth, SavedRowHeight));
+                AlignLabelLeft(enter);
+                enter.onClick.AddListener(() => win.LoginAsSavedAccount(name));
+
+                var forget = ModernUiTheme.CreateButton(card, $"Forget{i}", "\u00d7",
+                    ModernUiTheme.CardDeepColor, SavedForgetColor, ModernUiTheme.SizeSubtitle);
+                ModernUiTheme.Place((RectTransform)forget.transform, new Vector2(0, 1),
+                    new Vector2(SavedPad + rowWidth + SavedRowGap, y),
+                    new Vector2(SavedForgetWidth, SavedRowHeight));
+                forget.onClick.AddListener(() =>
+                {
+                    SavedAccountStore.Forget(name);
+                    savedSignature = null; //so the next poll rebuilds without this row
+                });
+            }
+        }
+
+        /// <summary>Puts a button's label against its left edge instead of its middle.</summary>
+        private static void AlignLabelLeft(Button button)
+        {
+            var label = button.GetComponentInChildren<TextMeshProUGUI>();
+            if (label == null)
+                return;
+
+            label.alignment = TextAlignmentOptions.Left;
+            label.rectTransform.offsetMin = new Vector2(10f, label.rectTransform.offsetMin.y);
         }
 
         private void SkinCharacterSelect(CharacterSelectWindow win)
