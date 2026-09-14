@@ -228,7 +228,7 @@ namespace Assets.Scripts.UI.Hud
             if (controllable.SpriteAnimator?.SpriteData != null)
             {
                 StandingHeight = controllable.SpriteAnimator.SpriteData.StandingHeight;
-                StandingHeight = StandingHeight * 1.5f * (1 / GameConfig.Data.MasterUIScale) + 15;
+                StandingHeight = StandingHeight * 1.5f * (1 / GameConfig.UiScale) + 15;
                 if (StandingHeight < 40)
                     StandingHeight = 40;
                 if (controllable.CharacterType == CharacterType.Player)
@@ -297,7 +297,7 @@ namespace Assets.Scripts.UI.Hud
             if (controllable.SpriteAnimator?.SpriteData != null)
             {
                 StandingHeight = controllable.SpriteAnimator.SpriteData.StandingHeight;
-                StandingHeight = StandingHeight * 1.5f * (1 / GameConfig.Data.MasterUIScale) + 15;
+                StandingHeight = StandingHeight * 1.5f * (1 / GameConfig.UiScale) + 15;
                 if (StandingHeight < 40)
                     StandingHeight = 40;
                 if (controllable.CharacterType == CharacterType.Player)

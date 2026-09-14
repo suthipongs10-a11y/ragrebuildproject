@@ -738,7 +738,7 @@ namespace Assets.Scripts
             if (Screen.width == 0)
                 return; //wut?
             var scale = 1f / (1080f / Screen.height);
-            CanvasScaler.scaleFactor = GameConfig.Data.MasterUIScale;
+            CanvasScaler.scaleFactor = GameConfig.UiScale;
             lastWidth = Screen.width;
             lastHeight = Screen.height;
             UiManager.Instance.FitFloatingWindowsIntoPlayArea();

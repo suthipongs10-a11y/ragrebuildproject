@@ -31,6 +31,11 @@ namespace Assets.Scripts.UI.TitleScreen
         /// <summary>Space left around the pane when it has to be shrunk to fit.</summary>
         private const float FitMargin = 12f;
 
+        /// <summary>How small the pane is allowed to get before legibility loses to fitting.</summary>
+        private const float MinFitScale = 0.35f;
+
+        private readonly Vector3[] paneCorners = new Vector3[4];
+
         private static readonly string[] StatNames = { "STR", "AGI", "VIT", "INT", "DEX", "LUK" };
 
         private static Sprite[] StatIcons => new[]
@@ -129,6 +134,25 @@ namespace Assets.Scripts.UI.TitleScreen
 
             if (Mathf.Abs(pane.localScale.x - fit) > 0.001f)
                 pane.localScale = Vector3.one * fit;
+
+            //And then check the answer against the screen, because the parent's rect is the
+            //right ruler only while the parent is the screen. It has not been: the pane came
+            //out fitted by that measure and still ran off the top, which from a screenshot
+            //looks exactly like no fitting at all. Rather than work out which of the parent,
+            //the canvas and the scale is responsible, the result is measured where it
+            //actually landed and taken down further if it is still over an edge - which is
+            //right whatever the cause, and self-corrects on the next frame since this runs
+            //every one.
+            pane.GetWorldCorners(paneCorners);
+            var shownWidth = paneCorners[2].x - paneCorners[0].x;
+            var shownHeight = paneCorners[1].y - paneCorners[0].y;
+            if (shownWidth < 1f || shownHeight < 1f)
+                return;
+
+            var spare = Mathf.Min((Screen.width - FitMargin * 2f) / shownWidth,
+                                  (Screen.height - FitMargin * 2f) / shownHeight, 1f);
+            if (spare < 0.999f)
+                pane.localScale = Vector3.one * Mathf.Max(pane.localScale.x * spare, MinFitScale);
         }
 
         private void ApplySkin(CharacterCreatorWindow win)

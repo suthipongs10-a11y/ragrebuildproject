@@ -215,7 +215,7 @@ namespace Assets.Scripts.UI.Hud
                 return 40f;
 
             var height = target.SpriteAnimator.SpriteData.StandingHeight
-                         * 1.5f * (1 / GameConfig.Data.MasterUIScale) + 15;
+                         * 1.5f * (1 / GameConfig.UiScale) + 15;
             return height < 40 ? 40 : height;
         }
 

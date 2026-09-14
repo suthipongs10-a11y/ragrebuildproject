@@ -218,7 +218,7 @@ public class UiManager : MonoBehaviour
         var initialScreenPos = canvas.transform.TransformPoint(screenPos);
         screenPos = initialScreenPos;
 
-        var scale = GameConfig.Data.MasterUIScale;
+        var scale = GameConfig.UiScale;
         var height = TooltipOverlay.RectTransform.rect.yMax * scale;
         var width = TooltipOverlay.RectTransform.rect.xMax * scale;
 
