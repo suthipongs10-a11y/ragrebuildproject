@@ -35,6 +35,67 @@
       </div>
     </div>
 
+    <div id="unity-diag"></div>
+
+    <script>
+      // A console for the machines that do not have one.
+      //
+      // Safari on a phone cannot be opened to a developer console without a Mac plugged
+      // into it, so on an iPhone a crash is a black screen and a sentence, and every
+      // theory about why is a guess. This prints what went wrong onto the page itself,
+      // and keeps the last of it in localStorage - which matters more than it sounds,
+      // because a tab that is killed takes its overlay with it. Reopen with the flag
+      // still on and the previous run's last words are the first thing on screen.
+      //
+      // Off unless ?debug=1 is on the address, and every line of it inside a try, so
+      // that the worst this can do to a normal visit is nothing at all.
+      (function () {
+        try {
+          var on = /[?&]debug=1/.test(location.search);
+          var box = document.getElementById("unity-diag");
+          if (!box) return;
+
+          var KEY = "rrDiag";
+          var lines = [];
+
+          function paint() {
+            box.textContent = lines.join("\n");
+            try { localStorage.setItem(KEY, lines.slice(-40).join("\n")); } catch (e) {}
+          }
+
+          window.rrDiag = function (text) {
+            if (!on) return;
+            lines.push(text);
+            if (lines.length > 60) lines.shift();
+            paint();
+          };
+
+          if (!on) return;
+
+          box.style.cssText = "position:fixed;left:0;right:0;top:0;max-height:45%;"
+            + "overflow:auto;z-index:99999;background:rgba(0,0,0,.85);color:#7CFC98;"
+            + "font:11px/1.45 monospace;white-space:pre-wrap;padding:6px;"
+            + "-webkit-user-select:text;user-select:text";
+
+          var previous = "";
+          try { previous = localStorage.getItem(KEY) || ""; } catch (e) {}
+          if (previous) lines.push("--- previous run ---", previous, "--- this run ---");
+
+          window.rrDiag("ua: " + navigator.userAgent);
+          window.rrDiag("screen: " + screen.width + "x" + screen.height
+            + " dpr " + window.devicePixelRatio);
+
+          window.addEventListener("error", function (e) {
+            window.rrDiag("ERROR: " + (e.message || e.type)
+              + " @ " + (e.filename || "?") + ":" + (e.lineno || "?"));
+          });
+          window.addEventListener("unhandledrejection", function (e) {
+            window.rrDiag("REJECT: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
+          });
+        } catch (e) {}
+      })();
+    </script>
+
     <script>
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
@@ -99,7 +160,25 @@
           fullscreenButton.onclick = () => {
             unityInstance.SetFullscreen(1);
           };
+
+          // The size of the wasm heap, which is the number an out-of-memory argument
+          // turns on. performance.memory is Chrome's and Safari does not have it, but
+          // the heap belongs to the build rather than to the browser, so this reads the
+          // same everywhere - including on the phone that cannot be plugged into
+          // anything. The peak is kept because the last value before a kill is not
+          // necessarily the highest one.
+          try {
+            var peak = 0;
+            setInterval(function () {
+              try {
+                var mb = unityInstance.Module.HEAP8.byteLength / 1048576;
+                if (mb > peak) peak = mb;
+                if (window.rrDiag) window.rrDiag("heap " + mb.toFixed(0) + " MB (peak " + peak.toFixed(0) + ")");
+              } catch (e) {}
+            }, 2000);
+          } catch (e) {}
         }).catch((message) => {
+          if (window.rrDiag) window.rrDiag("LOAD FAILED: " + message);
           alert(message);
         });
       };
