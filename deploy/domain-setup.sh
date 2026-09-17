@@ -39,18 +39,23 @@ fi
 
 echo "==> Front page"
 mkdir -p "$WEB"
-sed 's/\r$//' "$HERE/web/index.html" > "$WEB/index.html"
-# nginx reads this as www-data, which owns none of it, so the world bits are the ones
-# that matter - on the file and on every folder above it, since a folder that cannot be
-# stepped into hides what is inside just as well as a missing file.
+# Every .html page the site currently has, copied the same way: CRLF stripped (a
+# Windows checkout of the repo would otherwise hand nginx files it opens fine and
+# certbot's ACME challenge does not), then made world-readable.
+for page in index privacy; do
+    sed 's/\r$//' "$HERE/web/$page.html" > "$WEB/$page.html"
+done
+# nginx reads these as www-data, which owns none of it, so the world bits are the ones
+# that matter - on the files and on every folder above them, since a folder that cannot
+# be stepped into hides what is inside just as well as a missing file.
 chmod 755 /var/www "$WEB"
-chmod 644 "$WEB/index.html"
+chmod 644 "$WEB"/*.html
 
 # The first version of this put the page under /opt/rorebuild/web, which nginx could not
 # read. Clear that away so there are not two copies and a later edit lands on the one
 # nobody serves.
 rm -rf /opt/rorebuild/web
-echo "    $WEB/index.html"
+echo "    $WEB/index.html, $WEB/privacy.html"
 
 echo "==> nginx"
 sed -e 's/\r$//' -e "s/example\.com/${DOMAIN}/g" "$HERE/nginx/rorebuild.conf" \
