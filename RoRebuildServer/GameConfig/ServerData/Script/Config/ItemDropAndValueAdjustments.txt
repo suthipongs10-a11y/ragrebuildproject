@@ -4,7 +4,7 @@ OnLoadDropData:
 	//SWITCHED ON. appsettings.json has RemapDropRates set to true, so every rate in
 	//DropData.csv passes through the curve below on the way in and the numbers in that file
 	//are the raw material rather than the answer: a card written as 1 is 0.01% there and
-	//1.21% in game.
+	//0.5% in game.
 	//
 	//This is the rate the project shipped with. It was off for a while, with DropData.csv
 	//multiplied by ten in its place, and both halves of that have been undone - the file is
@@ -45,20 +45,24 @@ OnLoadDropData:
 	if(type == Useable && (subType == "RedPotion" || subType == "YellowPotion" || subType == "WhitePotion" || subType == "BluePotion" || subType == "GreenPotion" || subType == "FruitHp" || subType == "FruitSp" || subType == "HealLow" || subType == "HealMid" || subType == "HealHigh"))
 		return rate;
 
-	//And then half of that, for everything that is not junk.
+	//And then half of that, for everything that is not junk and not a card.
 	//
 	//The curve above is worth keeping for its shape - it lifts a rare drop far more than a
 	//common one, which is what stops the bottom of the table being unreachable - but the
-	//height it landed at was too generous for a server that wants a card to mean something.
-	//Halving after the remap rather than before keeps the shape and moves only the height,
-	//and it is the only way to reach a quarter of a percent at all: the raw rate on almost
-	//every card in DropData.csv is 1, and half of 1 is 0.
+	//height it landed at was too generous for a server that wants gear to mean something.
+	//Halving after the remap rather than before keeps the shape and moves only the height:
+	//the raw rate on almost every card in DropData.csv is 1, and half of 1 is 0, so halving
+	//first would leave nothing for the curve to lift.
+	//
+	//Cards are the one exception and stay at the height the curve gave them. Every card in
+	//DropData.csv is written as 1, which the curve lifts to 50 - a flat 0.5% - and that is the
+	//rate the server wants cards to drop at. Halving it again would put them back at 0.25%.
 	//
 	//Junk is left where it is on purpose. It is what feeds the scribe, the forge and every
 	//other recipe, and a recipe that asks for eighty of something is a different kind of
 	//grind from a card that asks for one. The three items named above keep their authored
 	//rates either way, since they return before they ever reach here.
-	if(type != Etc)
+	if(type != Etc && type != Card)
 		rate /= 2;
 
 OnSetItemPurchasePrice:
