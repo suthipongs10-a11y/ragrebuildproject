@@ -3,6 +3,9 @@
 //zeny. The server refuses to let an npc sell anything below what it can be sold back
 //for, so the gear it stocks is made worthless to npc shopkeepers instead. That closes
 //the buy-at-1z-sell-at-full-price loop without having to weaken the check itself.
+//
+//The Card Tester beside the Class Master does the same for cards, at 100z a card. Almost every
+//card is priced 20 and sells back for 10, so only the thirty-five priced 10000 are listed.
 ServerConfig("TesterShopValues") {
 OnSetItemSaleValue:
 
@@ -33,4 +36,15 @@ OnSetItemSaleValue:
 
 	//ninja and gunslinger
 	if(code == "Murasame_" || code == "Gate_Keeper") return 0;
+
+	//the card tester: cards priced 10000 in ItemsCards.csv, which would sell back for 5000
+	if(code == "Gloom_Under_Night_Card" || code == "Agav_Card" || code == "Echio_Card" || code == "Vanberk_Card") return 0;
+	if(code == "Isilla_Card" || code == "Hodremlin_Card" || code == "Seeker_Card" || code == "Snowier_Card") return 0;
+	if(code == "Siroma_Card" || code == "Ice_Titan_Card" || code == "Gazeti_Card" || code == "Ktullanux_Card") return 0;
+	if(code == "Muscipular_Card" || code == "Drosera_Card" || code == "Roween_Card" || code == "Galion_Card") return 0;
+	if(code == "Stapo_Card" || code == "Atroce_Card" || code == "Byorgue_Card" || code == "Sword_Guardian_Card") return 0;
+	if(code == "Bow_Guardian_Card" || code == "Salamander_Card" || code == "Ifrit_Card" || code == "Kasa_Card") return 0;
+	if(code == "Magmaring_Card" || code == "Imp_Card" || code == "Knocker_Card" || code == "Zombie_Slaughterer_Card") return 0;
+	if(code == "Ragged_Zombie_Card" || code == "Hell_Poodle_Card" || code == "Banshee_Card" || code == "Flame_Skull_Card") return 0;
+	if(code == "Necromancer_Card" || code == "Fallen_Bishop_Card" || code == "Mature_Ant_Egg_Card") return 0;
 }
