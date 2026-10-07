@@ -27,10 +27,10 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Network
             
             UiManager.OnLogIn();
 
-            if(ClientDataLoader.Instance.LatestPatchNotes != GameConfig.Data.LastViewedPatchNotes)
-                UiManager.Instance.HelpWindow.ShowWindow();
-            else
-                UiManager.Instance.HelpWindow.HideWindow();
+            //The manual - this server's welcome poster - used to open itself here whenever the
+            //patch notes had changed since the player last looked. It no longer opens on entering
+            //the game; the manual button still shows it.
+            UiManager.Instance.HelpWindow.HideWindow();
             GameConfig.Data.LastViewedPatchNotes = ClientDataLoader.Instance.LatestPatchNotes;
             
             SceneTransitioner.Instance.LoadScene(Network.CurrentMap, Network.OnMapLoad);
