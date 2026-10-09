@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { Cell, TILE, checkExit, createHero, exitsOf, stepHero, aliveSpawns, pruneDefeated, unstick, P,
   type EntityData, type HeroState, type LevelData, type MotionEnv, type MotionEvent, type TileGrid } from '@shared/platformer';
-import { createRng, moveSpeed, type HeroBuild } from '@shared/index';
+import { createRng, moveSpeed } from '@shared/index';
 import type { ContentBundle } from '@shared/content/types';
 import { queueMonsters, queueZone, type ZoneId } from '../assets/packs';
 import type { Controls } from '../input/Controls';
@@ -14,6 +14,12 @@ import { spawnEntityView, type Interactable } from '../world/EntityViews';
 import { CombatController } from '../combat/CombatController';
 import { HeroRig, type HeroClip } from '../rig/HeroRig';
 import { Hud } from '../ui/Hud';
+import { RoomInteractions } from '../world/RoomInteractions';
+import { HeroSession } from '../hero/HeroSession';
+import { handleSkillInput, playLevelUps } from '../hero/HeroPlay';
+import type { Menu, MenuTab } from '../ui/menu/Menu';
+import { SkillButtons } from '../ui/SkillButtons';
+import { popNumber } from '../vfx/DamageText';
 
 /** Where the hero appears when a room loads. */
 export type Place =
@@ -22,29 +28,32 @@ export type Place =
   | { kind: 'pos'; x: number; y: number }
   | { kind: 'default' };
 
-const BUILD: HeroBuild = { level: 1, stats: { str: 1, agi: 1, vit: 1, int: 1, dex: 1, luk: 1 }, weaponAtk: 6, bonusAtk: 0, bonusDef: 0, bonusHp: 0, bonusCrit: 0 };
 
 /** Phase 1 world: LDtk rooms, platforming, transitions, gates, respawn rules. Combat arrives in Phase 2. */
 export class WorldScene extends Phaser.Scene {
   hero!: HeroState;
   level!: LevelData;
-  private grid!: TileGrid;
-  private controls!: Controls;
+  grid!: TileGrid;
+  controls!: Controls;
+  readonly room = new RoomInteractions(this);
   private rig!: HeroRig;
   combat!: CombatController;
+  session!: HeroSession;
   private bars!: Hud;
+  private skillBtns = new SkillButtons();
+  private menu!: Menu;
   private deadT = 0;
-  private view!: LevelVisuals;
+  view!: LevelVisuals;
   private dialog!: DialogBox;
   private hud!: Phaser.GameObjects.Text;
   private toastText!: Phaser.GameObjects.Text;
-  private prompt!: Phaser.GameObjects.Text;
+  prompt!: Phaser.GameObjects.Text;
   private toastUntil = 0;
   private busy = false;
-  private interactables: Interactable[] = [];
-  private pickups: { id: string; x: number; y: number; obj: Phaser.GameObjects.Image }[] = [];
-  private abilities = new Set<Ability>();
-  private save!: SaveData;
+  interactables: Interactable[] = [];
+  pickups: { id: string; x: number; y: number; obj: Phaser.GameObjects.Image }[] = [];
+  abilities = new Set<Ability>();
+  save!: SaveData;
   private levels!: Map<string, LevelData>;
   private msgCooldown: Record<string, number> = {};
   private initData: { room?: string; place?: Place } = {};
@@ -69,7 +78,7 @@ export class WorldScene extends Phaser.Scene {
     const roomId = data.room ?? (this.registry.get('startRoom') as string);
     this.level = this.levels.get(roomId) ?? (this.levels.get('town') as LevelData);
     this.grid = this.level.grid.clone();
-    for (const k of Object.keys(this.save.broken)) if (k === this.level.id) this.clearRocks(false);
+    for (const k of Object.keys(this.save.broken)) if (k === this.level.id) this.room.clearRocks(false);
     this.busy = false; this.interactables = []; this.pickups = []; this.deadT = 0;
 
     const { width: vw, height: vh } = this.scale;
@@ -77,7 +86,9 @@ export class WorldScene extends Phaser.Scene {
     this.view = buildLevelVisuals(this, this.level, this.grid, vw, vh, (id) => t(this.levels.get(id)?.name ?? id));
     for (const k of this.view.rocks.keys()) if (this.save.broken[this.level.id]) this.view.rocks.get(k)?.destroy();
     const content = this.registry.get('content') as ContentBundle;
-    this.combat = new CombatController(this, this.level, this.grid, content, this.save, BUILD, createRng((Date.now() & 0xffffff) ^ 0x5eed), () => this.flush());
+    if (!this.registry.has('session')) this.registry.set('session', new HeroSession(content, this.save));
+    this.session = this.registry.get('session') as HeroSession;
+    this.combat = new CombatController(this, this.level, this.grid, this.session, this.save, createRng((Date.now() & 0xffffff) ^ 0x5eed), () => this.flush());
     this.spawnEntities();
     // ?stress=30 — performance test: extra monsters spread across the room
     const stress = Number(new URLSearchParams(location.search).get('stress') ?? 0);
@@ -85,6 +96,7 @@ export class WorldScene extends Phaser.Scene {
 
     this.hero = this.placeHero(data.place ?? { kind: 'default' });
     this.rig = new HeroRig(this, 10);
+    this.applyLook();
     this.rig.update(0, this.hero.x + this.hero.w / 2, this.hero.y + this.hero.h, this.hero.dir);
     this.cameras.main.startFollow(this.rig.root, true, 0.12, 0.12, 0, 60);
     this.cameras.main.setScroll(Math.max(0, this.hero.x - vw / 2), 0);
@@ -96,6 +108,13 @@ export class WorldScene extends Phaser.Scene {
     this.prompt = this.add.text(0, 0, '▲', { ...f, fontSize: '26px', color: '#ffd88a' }).setOrigin(0.5, 1).setDepth(50).setVisible(false);
     this.dialog = new DialogBox(this);
     this.bars = new Hud(this);
+    this.menu = this.registry.get('menu') as Menu;
+    this.menu.attach({
+      session: this.session, save: this.save, flush: () => this.flush(),
+      pause: () => this.scene.pause(), resume: () => { this.controls.reset(); this.scene.resume(); },
+      applyUse: (fx) => this.applyUse(fx), onEquipChanged: () => this.applyLook(),
+      onJobChanged: () => { this.combat.heal(); this.applyLook(); this.toast(t('menu.jobChanged').replace('{job}', t(`job.${this.session.data.job}`))); },
+    });
     this.showBanner(t(this.level.name));
 
     this.save.room = this.level.id; this.save.seen[this.level.id] = true; this.flush();
@@ -166,7 +185,7 @@ export class WorldScene extends Phaser.Scene {
     return h;
   }
 
-  private goRoom(roomId: string, place: Place, fadeMs = 150): void {
+  goRoom(roomId: string, place: Place, fadeMs = 150): void {
     if (this.busy) return;
     this.busy = true;
     this.carry = { vx: this.hero.vx, vy: this.hero.vy, dir: this.hero.dir };
@@ -191,24 +210,24 @@ export class WorldScene extends Phaser.Scene {
     const talking = this.dialog.isOpen;
     if (talking && (c.pressed('jump') || c.pressed('atk') || c.pressed('up'))) this.dialog.next();
 
-    const near = talking ? null : this.nearestInteractable();
+    const near = talking ? null : this.room.nearestInteractable();
     this.prompt.setText('▲').setVisible(!!near);
     if (near) this.prompt.setPosition(near.e.x, near.e.y - near.height - 6 + Math.sin(this.time.now / 140) * 3);
 
     let jumpPressed = !talking && c.pressed('jump');
     if (near && c.pressed('up')) { near.use(); jumpPressed = false; } // ▲ near an object = interact, not jump
     // next to a rock wall: attack OR ▲ smashes it (players kept missing the attack key)
-    const rockSide = this.touchingRock(1) ? 1 : this.touchingRock(-1) ? -1 : 0;
+    const rockSide = this.room.touchingRock(1) ? 1 : this.room.touchingRock(-1) ? -1 : 0;
     if (!talking && rockSide && !near) {
       this.prompt.setText(this.abilities.has('break') ? t('rock.prompt') : '✖').setVisible(true)
         .setPosition(this.hero.x + this.hero.w / 2, this.hero.y - 20 + Math.sin(this.time.now / 140) * 3);
-      if (c.pressed('up')) { jumpPressed = false; this.hero.dir = rockSide as 1 | -1; this.swing(); }
+      if (c.pressed('up')) { jumpPressed = false; this.hero.dir = rockSide as 1 | -1; this.room.swing(); }
     }
 
     const dead = this.combat.combat.dead;
     const frozen = this.combat.hitstop > 0;
     const dir = talking || dead ? 0 : (((c.state.right ? 1 : 0) - (c.state.left ? 1 : 0)) as -1 | 0 | 1);
-    const env: MotionEnv = { grid: this.grid, water: this.level.water, abilities: { double: this.abilities.has('double'), dive: this.abilities.has('dive') }, moveSpeed: moveSpeed(BUILD), exits: exitsOf(this.level) };
+    const env: MotionEnv = { grid: this.grid, water: this.level.water, abilities: { double: this.abilities.has('double'), dive: this.abilities.has('dive') }, moveSpeed: moveSpeed(this.session.derived.build), exits: exitsOf(this.level) };
     if (!frozen) {
       const events = stepHero(this.hero, { dir, jumpPressed: jumpPressed && !dead, jumpHeld: !talking && !dead && c.state.jump, down: c.state.down }, env, dt);
       this.onEvents(events);
@@ -216,15 +235,18 @@ export class WorldScene extends Phaser.Scene {
     const atkOk = !talking && !dead;
     const fight = this.combat.update(dt, this.hero, { attackPressed: atkOk && c.pressed('atk'), attackHeld: atkOk && c.state.atk, jumpHeld: c.state.jump }, this.time.now / 1000);
     for (const ev of fight) {
-      if (ev.kind === 'swing') { this.rig.play(ev.spec.clip, true); this.swing(); }
+      if (ev.kind === 'swing') { this.rig.play(ev.spec.clip, true); this.room.swing(); }
       if (ev.kind === 'hurt') this.rig.play('hurt', true);
       if (ev.kind === 'died') { this.rig.play('death', true); this.deadT = 1.8; }
     }
+    if (c.pressed('menu') && !dead) { this.menu.open(); c.endFrame(); return; }
+    if (!talking && !dead) handleSkillInput(c, this.session, this.combat, this.hero, this.rig, (k, m) => this.hint(k, m));
+    playLevelUps(this, this.combat, this.session, this.hero, (m) => this.toast(m));
     if (dead && this.deadT > 0) { this.deadT -= dt; if (this.deadT <= 0) this.respawnAfterDeath(); }
 
-    if (dir && this.touchingRock(dir)) this.hint('rockTouch', t(this.abilities.has('break') ? 'rock.touch' : 'rock.needUrl'));
-    if (!talking && !dead) this.checkPipes();
-    this.collectPickups();
+    if (dir && this.room.touchingRock(dir)) this.hint('rockTouch', t(this.abilities.has('break') ? 'rock.touch' : 'rock.needUrl'));
+    if (!talking && !dead) this.room.checkPipes();
+    this.room.collectPickups();
 
     const ex = dead ? null : checkExit(this.hero, env);
     if (ex === 'fall') this.fallRespawn();
@@ -237,10 +259,11 @@ export class WorldScene extends Phaser.Scene {
     if (!dead) this.rig.play(this.pickClip());
     this.rig.update(frozen ? 0 : dt, h.x + h.w / 2, h.y + h.h, h.dir);
     this.rig.setAlpha(this.combat.combat.inv > 0 && !dead && Math.floor(this.time.now / 50) % 2 ? 0.35 : 1);
-    this.bars.update(this.combat.combat.hp, this.combat.maxHp, this.save.zeny, this.save.exp);
+    this.skillBtns.update(this.session);
+    this.bars.update(this.combat.combat.hp, this.combat.maxHp, this.session.rt.sp, this.combat.maxSp, this.session.data, this.save.zeny, this.session.rt.cast);
     const boss = this.combat.boss;
     this.bars.boss(boss ? t(boss.def.name_key) : null, boss?.hp, boss?.def.hp, boss?.def.tier === 'mvp');
-    this.hud.setText(`${t(this.level.name)} · ${Math.round(this.game.loop.actualFps)} fps\n${this.abilityLine()}`);
+    this.hud.setText(`${t(this.level.name)} · ${Math.round(this.game.loop.actualFps)} fps\n${this.room.abilityLine()}`);
     if (this.toastUntil && this.time.now > this.toastUntil) { this.toastUntil = 0; this.tweens.add({ targets: this.toastText, alpha: 0, duration: 300 }); }
     c.endFrame();
   }
@@ -283,85 +306,21 @@ export class WorldScene extends Phaser.Scene {
     this.toast(t('fall.sky'));
   }
 
-  // ───────────────────────── interaction ─────────────────────────
-  private nearestInteractable(): Interactable | null {
-    const h = this.hero, cx = h.x + h.w / 2, cy = h.y + h.h;
-    let best: Interactable | null = null, bd = 1e9;
-    for (const it of this.interactables) {
-      if (Math.abs(cx - it.e.x) > 40 || Math.abs(cy - it.e.y) > 44) continue;
-      const d = Math.abs(cx - it.e.x);
-      if (d < bd) { bd = d; best = it; }
-    }
-    return best;
-  }
-
-  private checkPipes(): void {
-    const h = this.hero, c = this.controls, cx = h.x + h.w / 2;
-    for (const e of this.level.entities) {
-      if (e.type !== 'Pipe') continue;
-      const inX = cx > e.x - e.w / 2 && cx < e.x + e.w / 2;
-      const target = String(e.fields.target), tx = Number(e.fields.tx), ty = Number(e.fields.ty);
-      const onTop = e.fields.dir === 'down' && inX && h.onGround && Math.abs(h.y + h.h - (e.y - e.h)) < 6;
-      const under = e.fields.dir === 'up' && inX && h.y < e.y + 48;
-      if (onTop || (e.fields.dir === 'up' && inX && h.y < e.y + 200)) {
-        this.prompt.setText(onTop ? '▼' : '▲').setVisible(true).setPosition(e.x, (onTop ? e.y - e.h - 64 : e.y + 40) + Math.sin(this.time.now / 140) * 3);
-      }
-      if (onTop && c.pressed('down')) {
-        this.toast(t('pipe.down')); this.goRoom(target, { kind: 'tile', x: tx, y: ty, fromAbove: true }, 300); return;
-      }
-      if (under && c.pressed('up')) {
-        this.toast(t('pipe.up')); this.goRoom(target, { kind: 'tile', x: tx, y: ty, fromAbove: false }, 300); return;
-      }
-    }
-  }
-
-  /** Attack key in Phase 1 only smashes rocks (needs the `break` ability). */
-  private swing(): void {
-    const h = this.hero, reach = 44;
-    const x0 = h.dir > 0 ? h.x + h.w : h.x - reach, x1 = x0 + reach;
-    let rock = false;
-    for (let ty = Math.floor(h.y / TILE); ty <= Math.floor((h.y + h.h) / TILE); ty++)
-      for (let tx = Math.floor(x0 / TILE); tx <= Math.floor(x1 / TILE); tx++) if (this.grid.get(tx, ty) === Cell.Rock) rock = true;
-    if (!rock) return;
-    if (this.abilities.has('break')) {
-      this.clearRocks(true); this.save.broken[this.level.id] = true; this.flush(); this.cameras.main.shake(260, 0.008);
-      this.toast(t('rock.broken'));
-    } else this.hint('rock', t('rock.need'));
-  }
-
-  private abilityLine(): string {
-    const a = this.abilities;
-    return `${t('abil.title')} ${a.has('double') ? '🌪️✓' : '🌪️✗'} ${a.has('dive') ? '💧✓' : '💧✗'} ${a.has('break') ? '🔥✓' : '🔥✗'}`;
-  }
-
-  private touchingRock(dir: number): boolean {
-    const h = this.hero, tx = Math.floor((dir > 0 ? h.x + h.w + 2 : h.x - 2) / TILE);
-    for (let ty = Math.floor(h.y / TILE); ty <= Math.floor((h.y + h.h - 1) / TILE); ty++) if (this.grid.get(tx, ty) === Cell.Rock) return true;
-    return false;
-  }
-
-  private clearRocks(animate: boolean): void {
-    for (let y = 0; y < this.grid.h; y++) for (let x = 0; x < this.grid.w; x++) if (this.grid.get(x, y) === Cell.Rock) this.grid.set(x, y, Cell.Empty);
-    if (!this.view) return;
-    for (const r of this.view.rocks.values()) {
-      if (animate) this.tweens.add({ targets: r, alpha: 0, duration: 350, onComplete: () => r.destroy() }); else r.destroy();
-    }
-    this.view.rocks.clear();
-  }
-
-  private collectPickups(): void {
-    const h = this.hero, cx = h.x + h.w / 2, cy = h.y + h.h / 2;
-    for (const p of [...this.pickups]) {
-      if (Math.abs(cx - p.x) < 28 && Math.abs(cy - p.y) < 40) {
-        this.save.items[p.id] = true; this.flush(); p.obj.destroy();
-        this.pickups = this.pickups.filter((q) => q !== p);
-        this.toast(t('item.stone'));
-      }
-    }
-  }
-
   // ───────────────────────── ui helpers ─────────────────────────
   openDialog(title: string, pages: string[]): void { this.dialog.open(title, pages); }
+  openMenu(tab: MenuTab): void { this.menu.open(tab); }
+
+  applyLook(): void {
+    const d = this.session.data, w = d.bag.find((b) => b.uid === d.equip.weapon);
+    this.rig.setLook(d.job, this.session.content.items.find((i) => i.id === w?.id)?.subtype ?? 'sword');
+  }
+
+  /** Potion from the bag: heal HP/SP with a green number. */
+  applyUse(fx: Record<string, number>): void {
+    const cb = this.combat.combat, h = this.hero;
+    if (fx.heal) { cb.hp = Math.min(this.combat.maxHp, cb.hp + fx.heal); popNumber(this, h.x + h.w / 2, h.y - 6, fx.heal, 'heal'); }
+    if (fx.sp) this.session.rt.sp = Math.min(this.combat.maxSp, this.session.rt.sp + fx.sp);
+  }
   toast(msg: string): void {
     this.toastText.setText(msg).setAlpha(1); this.toastUntil = this.time.now + 2600;
   }

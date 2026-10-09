@@ -51,7 +51,7 @@ export function moveSpeed(b: HeroBuild): number {
 
 /** Base exp needed to go from `level` to `level + 1`. */
 export function expToNext(level: number): number {
-  return Math.floor(30 * Math.pow(level, 1.5));
+  return Math.floor(12 * Math.pow(level, 1.35)); // Lv 10 ≈ 100 forest kills, tuned to monsters.csv exp
 }
 
 export function statPointsForLevelUp(newLevel: number): number {
@@ -65,7 +65,7 @@ export function magicAttack(b: HeroBuild): number {
 
 /** Job exp needed for the next job level (novice levels faster). */
 export function jobExpToNext(jobLevel: number, tier: number): number {
-  return Math.floor((tier === 0 ? 12 : 22) * Math.pow(jobLevel, 1.45));
+  return Math.floor(tier === 0 ? 3 * Math.pow(jobLevel, 1.2) : 10 * Math.pow(jobLevel, 1.4)); // novice job 10 ≈ 25 kills
 }
 
 /** RO-style cost to raise a stat from `value` to `value + 1`. */

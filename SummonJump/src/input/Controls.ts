@@ -24,6 +24,9 @@ export class Controls {
 
   private press(k: InputKey): void { if (!this.state[k]) this.latched.add(k); this.state[k] = true; }
 
+  /** Forget everything held (after a menu closed or the page lost focus). */
+  reset(): void { for (const k of Object.keys(this.state) as InputKey[]) this.state[k] = false; this.prev = { ...this.state }; this.latched.clear(); }
+
   pressed(k: InputKey): boolean { return this.latched.has(k) || (this.state[k] && !this.prev[k]); }
   /** Call once at the end of every game step. */
   endFrame(): void { this.prev = { ...this.state }; this.latched.clear(); }

@@ -1,7 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 
 type W = { __game: { scene: { isActive: (k: string) => boolean; getScene: (k: string) => WorldLike } } };
-interface WorldLike { hero: { x: number; y: number; onGround: boolean }; level: { id: string }; cameras: { main: { scrollX: number } }; save: { broken: Record<string, boolean>; defeated: Record<string, number>; exp: number }; combat: { enemies: { x: number; y: number; def: { id: string } }[]; combat: { hp: number } }; abilities: Set<string>; debugKillAll(): void; scene: { isActive(): boolean } }
+interface WorldLike { hero: { x: number; y: number; onGround: boolean }; level: { id: string }; cameras: { main: { scrollX: number } }; save: { broken: Record<string, boolean>; defeated: Record<string, number>; exp: number }; session: { data: { baseExp: number; baseLv: number } }; combat: { enemies: { x: number; y: number; def: { id: string } }[]; combat: { hp: number } }; abilities: Set<string>; debugKillAll(): void; scene: { isActive(): boolean } }
 
 const world = <T,>(page: Page, fn: (w: WorldLike) => T) => page.evaluate((src) => new Function('w', `return (${src})(w)`)((window as unknown as W).__game.scene.getScene('World')), fn.toString());
 
@@ -109,12 +109,12 @@ test('home button returns to town', async ({ page, isMobile }) => {
 test('attacking a poring kills it and gives EXP', async ({ page, isMobile }) => {
   test.skip(isMobile, 'keyboard-driven');
   const errors = await boot(page, '?map=forest');
-  for (let i = 0; i < 40 && (await world(page, (w) => w.save.exp)) === 0; i++) {
+  for (let i = 0; i < 40 && (await world(page, (w) => w.session.data.baseExp + w.session.data.baseLv)) === 1; i++) {
     // stand just left of the nearest ground poring, facing it, and swing
     await world(page, (w) => { const p = w.combat.enemies.find((e) => e.def.id === 'poring' && e.y > 400); if (p) { w.hero.x = p.x - 30; w.hero.y = p.y + 32 - 56; } });
     await page.keyboard.down('KeyX'); await page.waitForTimeout(90); await page.keyboard.up('KeyX'); await page.waitForTimeout(160);
   }
-  expect(await world(page, (w) => w.save.exp)).toBeGreaterThan(0);
+  expect(await world(page, (w) => w.session.data.baseExp + w.session.data.baseLv)).toBeGreaterThan(1);
   expect(errors).toEqual([]);
 });
 
@@ -123,5 +123,31 @@ test('stress: 30 extra monsters run without errors', async ({ page, isMobile }) 
   const errors = await boot(page, '?map=test_wide&stress=30');
   expect(await world(page, (w) => w.combat.enemies.length)).toBeGreaterThanOrEqual(30);
   await page.waitForTimeout(2000);
+  expect(errors).toEqual([]);
+});
+
+test('phase 3: novice changes job at the priest menu and gets the starter weapon', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=town&hero=novice:10');
+  await page.evaluate(() => (window as unknown as { __game: { scene: { getScene: (k: string) => { openMenu: (t: string) => void } } } }).__game.scene.getScene('World').openMenu('job'));
+  await page.click('[data-act="job:mage"]');
+  const r = await page.evaluate(() => { const w = (window as unknown as { __game: { scene: { getScene: (k: string) => { session: { data: { job: string; equip: { weapon: number }; bag: { uid: number; id: string }[] } } } } } }).__game.scene.getScene('World'); const d = w.session.data; return { job: d.job, weapon: d.bag.find((b) => b.uid === d.equip.weapon)?.id }; });
+  expect(r).toEqual({ job: 'mage', weapon: 'wpn_staff_wood' });
+  await page.click('[data-act="close"]');
+  expect(errors).toEqual([]);
+});
+
+test('phase 3: archer skill spends SP and the menu opens with M', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=forest&hero=archer:20');
+  const sp = () => page.evaluate(() => (window as unknown as { __game: { scene: { getScene: (k: string) => { session: { rt: { sp: number } } } } } }).__game.scene.getScene('World').session.rt.sp);
+  const sp0 = await sp();
+  await page.keyboard.down('KeyV'); await page.waitForTimeout(80); await page.keyboard.up('KeyV');
+  await page.waitForTimeout(300);
+  expect(await sp()).toBeLessThan(sp0);
+  await page.keyboard.press('KeyM');
+  await expect(page.locator('#menu')).toBeVisible();
+  await page.keyboard.press('KeyM');
+  await expect(page.locator('#menu')).toBeHidden();
   expect(errors).toEqual([]);
 });

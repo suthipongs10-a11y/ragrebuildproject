@@ -36,3 +36,9 @@ html, body { height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100
   .pad { position: fixed; left: 0; right: 0; bottom: calc(6px + env(safe-area-inset-bottom, 0px)); padding-inline: calc(16px + env(safe-area-inset-left, 0px)) calc(16px + env(safe-area-inset-right, 0px)); pointer-events: none; }
   .pad .joy, .pad .pb { pointer-events: auto; opacity: .85; }
 }
+
+/* skill buttons: name + cooldown sweep */
+.pb.sk { position: relative; overflow: hidden; font-size: 12px; line-height: 1.05; padding: 2px; }
+.pb.sk .cd { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, .55); pointer-events: none; }
+.pb.sk.empty { opacity: .45; }
+.home.menu { right: 64px; }

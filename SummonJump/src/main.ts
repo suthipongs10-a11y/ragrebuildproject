@@ -4,6 +4,7 @@ import { WorldScene } from './scenes/WorldScene';
 import { Controls } from './input/Controls';
 import { t } from './i18n';
 import { lockZoom } from './ui/noZoom';
+import { Menu } from './ui/menu/Menu';
 
 lockZoom();
 
@@ -29,6 +30,9 @@ const game = new Phaser.Game({
   scene: [BootScene, WorldScene],
 });
 game.registry.set('controls', controls);
+const menu = new Menu();
+game.registry.set('menu', menu);
+document.getElementById('b_menu')?.addEventListener('pointerup', (e) => { e.preventDefault(); if (menu.isOpen) menu.close(); else menu.open(); });
 
 // expose for smoke tests / debugging
 (window as unknown as { __game: Phaser.Game }).__game = game;

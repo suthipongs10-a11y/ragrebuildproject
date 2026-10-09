@@ -41,7 +41,7 @@ describe('stats', () => {
   it('level 1 starter matches prototype ballpark', () => {
     expect(attack(build())).toBe(8 + 2 + 0 + 1 + 6);
     expect(maxHp(build())).toBe(110);
-    expect(expToNext(1)).toBe(30);
+    expect(expToNext(1)).toBe(12);
   });
 });
 

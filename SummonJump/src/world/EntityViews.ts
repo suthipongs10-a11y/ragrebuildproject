@@ -27,7 +27,7 @@ export function spawnEntityView(scene: WorldScene, e: EntityData, save: SaveData
       img.setScale(ic.h / img.height);
       const use = e.type === 'Sign' ? () => scene.openDialog('', [t(String(f.text))])
         : e.type === 'Altar' ? () => scene.openDialog('', [t('altar.soon')])
-        : e.type === 'Anvil' ? () => scene.openDialog('', [t('anvil.soon')])
+        : e.type === 'Anvil' ? () => scene.openMenu('refine')
         : () => scene.setSpawn(e);
       return { e, height: ic.h, use };
     }
@@ -51,7 +51,12 @@ export function spawnEntityView(scene: WorldScene, e: EntityData, save: SaveData
       scene.add.circle(e.x, e.y - 68, 14, 0xf4d6b0).setStrokeStyle(3, 0x2a1a0a).setDepth(7);
       scene.add.text(e.x, e.y - 92, t(`npc.${id}.name`), { fontFamily: 'Itim', fontSize: '16px', color: '#fff6e2', stroke: '#2a1a0a', strokeThickness: 4 }).setOrigin(0.5).setDepth(7);
       void body;
-      return { e, height: 96, use: () => scene.openDialog(t(`npc.${id}.name`), [1, 2].map((n) => t(`npc.${id}.${n}`)).filter((x) => !x.startsWith('npc.'))) };
+      const talk = () => scene.openDialog(t(`npc.${id}.name`), [1, 2].map((n) => t(`npc.${id}.${n}`)).filter((x) => !x.startsWith('npc.')));
+      const use = id === 'smith' ? () => scene.openMenu('refine')
+        : id === 'merchant' ? () => scene.openMenu('shop')
+        : id === 'priest' ? () => (scene.session.data.job === 'novice' ? scene.openMenu('job') : talk())
+        : talk;
+      return { e, height: 96, use };
     }
     default: return null;
   }

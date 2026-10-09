@@ -1,22 +1,25 @@
 import Phaser from 'phaser';
 import {
-  createEnemy, createHeroCombat, MAX_STEP, stepEnemy, stepHeroCombat, stepShots, rollKill, markDefeated, maxHp, isSolidCell, TILE, moveBody,
-  type Enemy, type EnemyCtx, type EnemyEvent, type HeroCombat, type HeroBuild, type HeroState, type LevelData, type Rng, type Shot, type TileGrid, type Body, type CombatEvent,
+  addItem, createEnemy, createHeroCombat, MAX_STEP, stepEnemy, stepHeroCombat, stepShots, stepSkills, useSkill, rollKill, markDefeated, maxHp, maxSp, isSolidCell, TILE, moveBody,
+  type Enemy, type EnemyCtx, type EnemyEvent, type HeroCombat, type HeroState, type LevelData, type Rng, type Shot, type TileGrid, type Body, type CombatEvent, type SkillCtx, type SkillEvent,
 } from '@shared/index';
-import type { ContentBundle, MonsterDef } from '@shared/content/types';
+import type { MonsterDef } from '@shared/content/types';
 import type { SaveData } from '../save/local';
+import type { HeroSession } from '../hero/HeroSession';
 import { EnemyView } from '../actors/EnemyView';
 import { popInfo, popNumber } from '../vfx/DamageText';
 import { burst, ELEMENT_COLOR, ring, slash, spark } from '../vfx/Effects';
+import { SkillFx } from '../vfx/SkillFx';
 import { t } from '../i18n';
 
 const MAX_FRAME = 1 / 20;
 
 interface Pickup extends Body { kind: 'item' | 'card'; id: string; count: number; age: number; obj: Phaser.GameObjects.Image }
+export type LevelUpEvent = { kind: 'levelup'; base: number; job: number };
 
 /**
- * Owns everything that fights in a room: enemies (sim + views), hostile shots, drops, the hero's combat state.
- * The scene calls `update()` once per frame and reads `hitstop` / `combat` for rig and feel.
+ * Owns everything that fights in a room: enemies (sim + views), shots, skill zones, drops and the hero's combat state.
+ * Rewards go to the HeroSession (levels, bag). The scene calls `update()` once per frame.
  */
 export class CombatController {
   readonly enemies: Enemy[] = [];
@@ -24,23 +27,26 @@ export class CombatController {
   hitstop = 0;
   private readonly views = new Map<string, EnemyView>();
   private readonly shots: Shot[] = [];
-  private readonly shotGfx: Phaser.GameObjects.Graphics;
+  private readonly fx: SkillFx;
   private readonly pickups: Pickup[] = [];
   private readonly defs: Map<string, MonsterDef>;
   private summonN = 0;
+  private buffCheck = 0;
+  readonly levelUps: LevelUpEvent[] = [];
 
   constructor(
     private readonly scene: Phaser.Scene, private readonly level: LevelData, private readonly grid: TileGrid,
-    private readonly content: ContentBundle, private readonly save: SaveData, private readonly build: HeroBuild, private readonly rng: Rng,
-    private readonly onSave: () => void,
+    private readonly session: HeroSession, private readonly save: SaveData, private readonly rng: Rng, private readonly onSave: () => void,
   ) {
-    this.defs = new Map(content.monsters.map((m) => [m.id, m]));
-    this.combat = createHeroCombat(build);
-    if (save.hp !== null && save.hp > 0) this.combat.hp = Math.min(save.hp, maxHp(build));
-    this.shotGfx = scene.add.graphics().setDepth(25).setBlendMode(Phaser.BlendModes.ADD);
+    this.defs = new Map(session.content.monsters.map((m) => [m.id, m]));
+    this.combat = createHeroCombat(session.derived.build);
+    const hp = session.data.hp;
+    if (hp !== null && hp > 0) this.combat.hp = Math.min(hp, this.maxHp);
+    this.fx = new SkillFx(scene);
   }
 
-  get maxHp(): number { return maxHp(this.build); }
+  get maxHp(): number { return maxHp(this.session.derived.build); }
+  get maxSp(): number { return maxSp(this.session.derived.build); }
 
   /** The mini-boss / MVP in this room (shown with a big HP bar), if alive. */
   get boss(): Enemy | undefined { return this.enemies.find((e) => !e.dead && e.def.tier !== 'normal'); }
@@ -53,7 +59,19 @@ export class CombatController {
     this.views.set(e.id, new EnemyView(this.scene, e));
   }
 
-  update(rawDt: number, hero: HeroState, inp: { attackPressed: boolean; attackHeld: boolean; jumpHeld: boolean }, time: number): CombatEvent[] {
+  private skillCtx(hero: HeroState): SkillCtx {
+    const s = this.session;
+    return { hero, combat: this.combat, data: s.data, derived: s.derived, content: s.content, enemies: this.enemies, shots: this.shots, grid: this.grid, rng: this.rng };
+  }
+
+  /** On-screen skill button / key. Returns the events so the scene can play rig clips and messages. */
+  cast(hero: HeroState, id: string): SkillEvent[] {
+    const ev = useSkill(this.session.rt, this.skillCtx(hero), id);
+    this.handleSkillEvents(ev);
+    return ev;
+  }
+
+  update(rawDt: number, hero: HeroState, inp: { attackPressed: boolean; attackHeld: boolean; jumpHeld: boolean }, time: number): (CombatEvent | SkillEvent)[] {
     if (this.hitstop > 0) { this.hitstop -= rawDt; this.draw(time); return []; }
     const dt = Math.min(rawDt, MAX_FRAME);
     const events: EnemyEvent[] = [];
@@ -68,20 +86,35 @@ export class CombatController {
       if (ev.kind === 'slam') { this.scene.cameras.main.shake(180, 0.006); ring(this.scene, ev.x, ev.y, 0xffd6e6, 80); burst(this.scene, ev.x, ev.y, 0xe8d6b0, 10, 200); }
     }
     stepShots(this.shots, dt);
-    for (const s of this.shots) if (!s.ghost && isSolidCell(this.grid.get(Math.floor(s.x / TILE), Math.floor(s.y / TILE)))) s.life = 0;
+    for (const s of this.shots) if (!s.ghost && (s.delay ?? 0) <= 0 && isSolidCell(this.grid.get(Math.floor(s.x / TILE), Math.floor(s.y / TILE)))) s.life = 0;
 
-    const out = stepHeroCombat(this.combat, hero, this.build, this.enemies, this.shots, inp, this.level.water, this.rng, dt);
+    const s = this.session, d = s.derived;
+    const skillEv = stepSkills(s.rt, this.skillCtx(hero), dt);
+    this.handleSkillEvents(skillEv);
+    const out = stepHeroCombat(this.combat, hero, d.build, this.enemies, this.shots, inp, this.level.water, this.rng, dt,
+      { element: d.element, ranged: d.ranged, range: d.range, noKnockback: d.noKnockback, blocked: !!s.rt.cast });
     for (const ev of out) this.feedback(ev);
+    // buffs expire → recompute derived stats
+    this.buffCheck -= dt;
+    if (this.buffCheck <= 0) { this.buffCheck = 0.5; const n = s.rt.buffs.length; s.rt.buffs = s.rt.buffs.filter((b) => b.until > s.rt.time); if (n !== s.rt.buffs.length) s.recompute(); }
     this.removeDead();
     this.updatePickups(dt, hero);
-    this.save.hp = this.combat.hp;
+    s.data.hp = this.combat.hp; s.data.sp = s.rt.sp;
     this.draw(time);
-    return out;
+    return [...skillEv, ...out];
   }
 
-  private feedback(ev: CombatEvent): void {
+  private handleSkillEvents(ev: SkillEvent[]): void {
+    for (const e of ev) {
+      this.fx.play(e);
+      if (e.kind === 'buff') this.session.recompute();
+      if (e.kind === 'hit' || e.kind === 'hurt') this.feedback(e);
+    }
+  }
+
+  private feedback(ev: CombatEvent | SkillEvent): void {
     const sc = this.scene;
-    if (ev.kind === 'swing') slash(sc, ev.x, ev.y, ev.dir, ELEMENT_COLOR.neutral as number, ev.spec.clip === 'attack3', ev.spec.clip === 'attack2');
+    if (ev.kind === 'swing') { if (!this.session.derived.ranged) slash(sc, ev.x, ev.y, ev.dir, ELEMENT_COLOR[this.session.derived.element] as number, ev.spec.clip === 'attack3', ev.spec.clip === 'attack2'); }
     else if (ev.kind === 'hit') {
       popNumber(sc, ev.x, ev.y - 10, ev.amount, ev.dmg === 'normal' ? 'normal' : ev.dmg);
       spark(sc, ev.x + (Math.random() - 0.5) * 8, ev.y + 14, ELEMENT_COLOR[ev.enemy.def.element] ?? 0xffffff, ev.dmg === 'crit' ? 1.6 : 1);
@@ -101,9 +134,11 @@ export class CombatController {
     ring(sc, cx, cy, boss ? 0xffd88a : 0xffffff, boss ? 160 : 60, 400);
     if (boss) { this.hitstop = Math.max(this.hitstop, 0.18); sc.cameras.main.flash(300, 255, 243, 208); sc.cameras.main.shake(400, 0.01); }
     this.views.get(e.id)?.die(); this.views.delete(e.id);
-    if (!e.id.includes('#summon')) markDefeated(this.save.defeated, e.id, e.def.tier, e.def.respawn_sec, Date.now());
-    const r = rollKill(e.def, this.content.drops, this.rng);
-    this.save.exp += r.exp; this.save.zeny += r.zeny;
+    if (!e.id.includes('#summon') && !e.id.startsWith('stress#')) markDefeated(this.save.defeated, e.id, e.def.tier, e.def.respawn_sec, Date.now());
+    const r = rollKill(e.def, this.session.content.drops, this.rng, 1 + this.session.derived.build.stats.luk * 0.03);
+    this.save.zeny += r.zeny;
+    const lv = this.session.reward(r.exp, r.jobExp);
+    if (lv.baseUps || lv.jobUps) this.levelUps.push({ kind: 'levelup', base: lv.baseUps, job: lv.jobUps });
     popInfo(sc, cx, e.y - 20, `${t('combat.exp').replace('{n}', String(r.exp))}  ${t('combat.zeny').replace('{n}', String(r.zeny))}`);
     for (const d of r.drops) this.dropPickup(cx, cy, d.kind, d.id, d.count);
     if (boss) popInfo(sc, cx, e.y - 50, t('combat.boss').replace('{name}', t(e.def.name_key)), '#ffd88a');
@@ -116,8 +151,8 @@ export class CombatController {
   }
 
   private dropPickup(x: number, y: number, kind: 'item' | 'card', id: string, count: number): void {
-    const key = kind === 'card' ? 'icon_card' : 'icon_chest';
-    const obj = this.scene.add.image(x, y, key).setDepth(9).setScale(28 / 128);
+    const icon = kind === 'card' ? 'icon_card' : (this.session.content.items.find((i) => i.id === id)?.type === 'consumable' ? 'icon_potion_r' : 'icon_chest');
+    const obj = this.scene.add.image(x, y, this.scene.textures.exists(icon) ? icon : 'icon_chest').setDepth(9).setScale(28 / 128);
     this.pickups.push({ x: x - 10, y: y - 10, w: 20, h: 20, vx: (this.rng.next() - 0.5) * 200, vy: -400, onGround: false, kind, id, count, age: 0, obj });
   }
 
@@ -128,12 +163,13 @@ export class CombatController {
       if (this.level.water && p.vy > 120) p.vy = 120;
       p.obj.setPosition(p.x + p.w / 2, p.y + p.h / 2 - (p.onGround ? 4 + Math.sin(p.age * 5) * 3 : 0));
       if (p.age > 0.35 && p.x < hero.x + hero.w + 8 && p.x + p.w > hero.x - 8 && p.y < hero.y + hero.h && p.y + p.h > hero.y) {
-        const bag = p.kind === 'card' ? this.save.cards : this.save.inv;
-        bag[p.id] = (bag[p.id] ?? 0) + p.count;
+        if (p.kind === 'card') this.save.cards[p.id] = (this.save.cards[p.id] ?? 0) + p.count;
+        else if (!addItem(this.session.data, this.session.content, p.id, p.count)) { popInfo(this.scene, p.x, p.y - 10, t('combat.bagfull'), '#ff9b9b'); continue; }
         const name = t(p.kind === 'card' ? `card.${p.id.replace(/^card_/, '')}` : `item.${p.id}`);
         popInfo(this.scene, p.x + p.w / 2, p.y - 10, t(p.kind === 'card' ? 'combat.card' : 'combat.got').replace('{name}', name), p.kind === 'card' ? '#e2d2ff' : '#ffd88a');
         burst(this.scene, p.x + p.w / 2, p.y + p.h / 2, p.kind === 'card' ? 0xe2d2ff : 0xffd88a, 10, 200);
         p.obj.destroy(); this.pickups.splice(this.pickups.indexOf(p), 1);
+        this.session.emit();
         this.onSave();
       }
     }
@@ -141,8 +177,7 @@ export class CombatController {
 
   private draw(time: number): void {
     for (const e of this.enemies) this.views.get(e.id)?.sync(e, time);
-    const g = this.shotGfx.clear();
-    for (const s of this.shots) { g.fillStyle(s.color, 0.9).fillCircle(s.x, s.y, s.r); g.fillStyle(0xffffff, 0.6).fillCircle(s.x, s.y, s.r * 0.45); }
+    this.fx.draw(this.shots, this.session.rt.zones, time);
   }
 
   /** Debug / tests: defeat every monster (goes through the normal kill path). */
@@ -151,5 +186,5 @@ export class CombatController {
     this.removeDead();
   }
 
-  heal(): void { this.combat.hp = this.maxHp; this.combat.dead = false; this.save.hp = this.combat.hp; }
+  heal(): void { this.combat.hp = this.maxHp; this.combat.dead = false; this.session.rt.sp = this.maxSp; this.session.data.hp = this.combat.hp; }
 }

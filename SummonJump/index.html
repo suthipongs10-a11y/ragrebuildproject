@@ -12,16 +12,16 @@
 </head>
 <body>
   <div id="app">
-    <div id="stage"><button class="home" id="b_home" aria-label="home">🏠</button><div class="keys" id="keys"></div></div>
+    <div id="stage"><button class="home" id="b_home" aria-label="home">🏠</button><button class="home menu" id="b_menu" aria-label="menu">☰</button><div id="menu" class="menu-root" hidden></div><div class="keys" id="keys"></div></div>
     <div class="rotate" id="rotate"></div>
     <div class="pad" id="pad">
       <div class="joy" id="joy"><div class="knob" id="knob"></div></div>
       <div class="btns">
-        <button class="pb" data-k="sk1" aria-label="skill 1">S1</button>
-        <button class="pb" data-k="sk2" aria-label="skill 2">S2</button>
-        <button class="pb ult" data-k="ult" aria-label="spirit">✦</button>
+        <button class="pb sk" data-k="sk1" data-slot="0" aria-label="skill 1">S1</button>
+        <button class="pb sk" data-k="sk2" data-slot="1" aria-label="skill 2">S2</button>
+        <button class="pb sk" data-k="sk3" data-slot="2" aria-label="skill 3">S3</button>
         <button class="pb big" data-k="atk" id="b_atk"></button>
-        <span></span>
+        <button class="pb ult" data-k="ult" aria-label="spirit">✦</button>
         <button class="pb big jump" data-k="jump" id="b_jump"></button>
       </div>
     </div>

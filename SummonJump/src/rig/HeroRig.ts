@@ -21,6 +21,7 @@ export class HeroRig {
   private prev: Pose | null = null;
   private fadeT = 0;
   private last: Pose = {};
+  private readonly parts: Partial<Record<Part, Phaser.GameObjects.Image[]>> = {};
 
   constructor(scene: Phaser.Scene, depth = 10) {
     this.root = scene.add.container(0, 0).setDepth(depth);
@@ -50,7 +51,9 @@ export class HeroRig {
   private part(scene: Phaser.Scene, k: Part): Phaser.GameObjects.Image {
     const key = `hero_part_${k}`, m = art(key).meta as { sheetX: number; sheetY: number; sheetW: number; sheetH: number };
     const [px, py] = rig.pivots[k] as [number, number];
-    return scene.add.image(0, 0, key).setOrigin((px - m.sheetX) / m.sheetW, (py - m.sheetY) / m.sheetH).setDisplaySize(m.sheetW, m.sheetH);
+    const img = scene.add.image(0, 0, key).setOrigin((px - m.sheetX) / m.sheetW, (py - m.sheetY) / m.sheetH).setDisplaySize(m.sheetW, m.sheetH);
+    (this.parts[k] ??= []).push(img);
+    return img;
   }
 
   /** Switch clip (restarts non-looping clips when `restart`). Cross-fades from the current pose. */
@@ -77,5 +80,16 @@ export class HeroRig {
   }
 
   setAlpha(a: number): void { this.root.setAlpha(a); }
+
+  /**
+   * Job / weapon look. Until the P03 job parts sheets arrive this tints the clothing pieces per job
+   * and the weapon piece per weapon type (placeholder for real part swaps).
+   */
+  setLook(job: string, weaponType: string): void {
+    const cloth: Record<string, number> = { swordsman: 0xc8d4ec, mage: 0x9a88f0, archer: 0x9ad08a, acolyte: 0xfff0d8 };
+    const wpn: Record<string, number> = { staff: 0xb07a3a, bow: 0x8ad070, mace: 0xb8b8c8 };
+    for (const k of ['torso', 'uarm', 'thigh'] as Part[]) for (const img of this.parts[k] ?? []) { if (cloth[job]) img.setTint(cloth[job]); else img.clearTint(); }
+    for (const img of this.parts.sword ?? []) { if (wpn[weaponType]) img.setTint(wpn[weaponType]); else img.clearTint(); }
+  }
   setVisible(v: boolean): void { this.root.setVisible(v); }
 }

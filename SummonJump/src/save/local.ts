@@ -1,4 +1,5 @@
 import type { DefeatedMap } from '@shared/platformer';
+import type { HeroData } from '@shared/progression/hero';
 
 /** Local (pre-server) save. Every storage access is wrapped: private windows / blocked storage must not break the game. */
 export interface SaveData {
@@ -15,10 +16,13 @@ export interface SaveData {
   zeny: number;
   inv: Record<string, number>;
   cards: Record<string, number>;
+  /** Phase 3 hero (levels, job, skills, bag, equipment). null = create on first load (migrates exp/inv). */
+  hero: HeroData | null;
 }
 
-const KEY = 'summonjump-save-v1';
-export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {}, hp: null, exp: 0, zeny: 0, inv: {}, cards: {} });
+/** `?hero=job:lv` test heroes use their own slot so they never overwrite the real save. */
+const KEY = new URLSearchParams(typeof location === 'undefined' ? '' : location.search).has('hero') ? 'summonjump-save-test' : 'summonjump-save-v1';
+export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {}, hp: null, exp: 0, zeny: 0, inv: {}, cards: {}, hero: null });
 
 export function loadSave(): SaveData {
   try {
