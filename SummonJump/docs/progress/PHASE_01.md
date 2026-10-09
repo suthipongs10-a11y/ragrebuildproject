@@ -1,6 +1,6 @@
 # Phase 1 — Platforming & world · progress
 
-Status: **in progress** (started 2026-10-09)
+Status: **done** — owner walked the maps and said "go" (2026-10-09)
 
 Art brief: `art-briefs/ART_P01_World_Props.md` (29 images, 2 zips) — owner sends to ChatGPT; code uses placeholders until it arrives.
 
@@ -21,13 +21,13 @@ Art brief: `art-briefs/ART_P01_World_Props.md` (29 images, 2 zips) — owner sen
 - [x] Port the 8 prototype maps into LDtk
 - [x] Local save (room, broken rocks, defeated timers)
 - [x] Tests: motion, loader, level validation, walk-through (snag) test, respawn; e2e smoke
-- [ ] CI green; owner phone test
+- [x] CI green; owner phone test
 
 ## Exit gate
-- [ ] Walk all 8 maps on phone at 60 fps
-- [ ] Every gate works
-- [ ] No collision snags in a 10-min run (owner) — automated walk test passes (Claude)
-- [ ] Owner says "go" for Phase 2
+- [x] Walk all 8 maps on phone at 60 fps
+- [x] Every gate works
+- [x] No collision snags in a 10-min run (owner) — automated walk test passes (Claude)
+- [x] Owner says "go" for Phase 2
 
 ## Known issues / questions
 - LDtk file is generated (`npm run levels`) in LDtk 1.5 layout; **not yet opened in the real LDtk editor** (not available in the cloud). If LDtk complains, tell Claude; the game does not depend on the editor.
