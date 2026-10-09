@@ -1,0 +1,4 @@
+id,owner,name_key,type,max_lv,sp,cd,cast,target,hit_count,power,element,effects,requires,icon,vfx
+power_slash,swordsman,skill.power_slash,active,10,6+lv,1.4,0,front,1,2.0+0.4*lv,weapon,"{""knockback"":220}",,skill_power_slash,vfx_slash_heavy
+magnum_burst,swordsman,skill.magnum_burst,active,10,12+2*lv,4.5,0,aoe,1,1.4+0.3*lv,fire,"{""radius"":""46+5*lv"",""knockback"":180}","{""power_slash"":2}",skill_magnum_burst,vfx_fire_ring
+sword_mastery,swordsman,skill.sword_mastery,passive,10,0,0,0,self,0,4*lv,,"{""atk"":""4*lv""}",,skill_sword_mastery,

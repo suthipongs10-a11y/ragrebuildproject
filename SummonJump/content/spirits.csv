@@ -1,0 +1,6 @@
+id,family,name_key,element,base_star,hp,atk,def,spd,auto_skill,ult_skill,leader_skill,ability,awaken_to,art_small,art_big
+buddy,poring,spirit.buddy,neutral,1,300,40,20,100,jelly_shot,giant_slam,lead_hp10,none,,40_baby_poring,spirit_big_buddy
+wind,sylph,spirit.wind,wind,3,420,70,30,110,wind_bolt,tornado,lead_aspd15,double,,41_wind_spirit,spirit_big_wind
+water,undine,spirit.water,water,3,480,64,40,100,water_bolt,tidal_wave,lead_def30,dive,,42_water_spirit,spirit_big_water
+fire,salamander,spirit.fire,fire,3,400,90,25,105,fire_bolt,meteor_rain,lead_atk12,break,,43_fire_spirit,spirit_big_fire
+angel,angeling,spirit.angel,holy,4,520,40,45,100,holy_bolt,holy_pillar,lead_regen,none,,44_angeling,spirit_big_angel

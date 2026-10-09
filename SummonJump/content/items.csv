@@ -1,0 +1,16 @@
+id,name_key,type,subtype,tier,job_mask,level_req,atk,def,hp,str,agi,vit,int,dex,luk,crit,element,slots,refineable,price,icon,rig_parts
+w_train,item.w_train,weapon,sword,common,novice|swords,1,6,0,0,0,0,0,0,0,0,0,,1,true,30,wpn_01_training_sword,
+w_iron,item.w_iron,weapon,sword,common,swords,5,16,0,0,0,0,0,0,0,0,0,,1,true,96,wpn_02_iron_sword,
+w_flame,item.w_flame,weapon,sword,rare,swords,15,24,0,0,0,0,0,0,0,0,0,fire,0,true,180,wpn_03_flame_sword,
+w_gale,item.w_gale,weapon,sword,rare,swords,12,22,0,0,0,0,0,0,0,0,0,wind,1,true,170,wpn_04_gale_sword,
+w_tide,item.w_tide,weapon,sword,rare,swords,14,22,0,0,0,0,0,0,0,0,0,water,1,true,170,wpn_05_tide_sword,
+w_king,item.w_king,weapon,sword,legend,swords,12,36,0,0,0,0,0,0,0,0,0,,2,true,400,wpn_06_king_greatsword,
+w_kraken,item.w_kraken,weapon,sword,mvp,swords,22,58,0,0,0,0,0,0,0,0,0,water,2,true,900,wpn_07_kraken_blade,
+a_cotton,item.a_cotton,armor,,common,all,1,0,2,0,0,0,0,0,0,0,0,,1,true,20,arm_01_cotton_tunic,
+a_leather,item.a_leather,armor,,common,all,5,0,6,25,0,0,0,0,0,0,0,,1,true,80,arm_02_leather_armor,arm_02
+a_knight,item.a_knight,armor,,rare,swords,15,0,12,50,0,0,0,0,0,0,0,,1,true,250,arm_03_knight_armor,arm_03
+a_royal,item.a_royal,armor,,mvp,all,22,0,20,100,0,0,0,0,0,0,0,,2,true,800,arm_04_royal_armor,arm_04
+r_power,item.r_power,acc,ring,common,all,5,0,0,0,3,0,0,0,0,0,0,,1,false,90,acc_power_ring,
+b_wind,item.b_wind,acc,brooch,common,all,8,0,0,0,0,3,0,0,0,0,0,,1,false,90,acc_wind_brooch,
+n_luck,item.n_luck,acc,necklace,common,all,3,0,0,0,0,0,0,0,0,4,0,,1,false,90,acc_luck_necklace,
+e_light,item.e_light,acc,earring,common,all,10,0,0,0,0,0,0,3,0,0,0,,1,false,90,acc_light_earring,

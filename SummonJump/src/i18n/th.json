@@ -1,0 +1,13 @@
+{
+  "ui.attack": "ฟัน",
+  "ui.jump": "โดด",
+  "ui.rotate": "หมุนมือถือเป็นแนวนอนจะเล่นง่ายขึ้น",
+  "ui.loading": "กำลังโหลด…",
+  "zone.forest": "ป่าโพริง",
+  "zone.deep": "ป่าลึก",
+  "zone.town": "เมืองกลาง",
+  "zone.sky": "เมืองฟ้า",
+  "zone.abyss": "เมืองบาดาล",
+  "zone.desert": "ทะเลทราย",
+  "debug.phase0": "Phase 0 · ← → เดิน · Space กระโดด · 1-6 เปลี่ยนโซน"
+}

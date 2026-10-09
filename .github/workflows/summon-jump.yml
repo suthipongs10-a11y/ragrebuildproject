@@ -1,0 +1,45 @@
+name: Summon Jump
+
+on:
+  push:
+    branches: [claude/summon-jump, main]
+    paths: ['SummonJump/**', '.github/workflows/summon-jump.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: summon-jump-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SummonJump
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: SummonJump/package-lock.json
+      - run: npm ci
+      - run: npm run test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-screenshots
+          path: SummonJump/test-results/
+      - name: Deploy playable build to gh-pages/summon-jump
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: SummonJump/dist
+          destination_dir: summon-jump
+          keep_files: true

@@ -1,0 +1,9 @@
+id,name_key,tier,zone,level,hp,atk,def,element,element_lv,size,ai,ai_params,stompable,exp,job_exp,zeny_min,zeny_max,card_id,card_rate,respawn_sec,art_pack,hitbox,draw_h
+poring,mon.poring,normal,forest,3,22,7,0,water,1,small,hopper,"{""hop"":240,""range"":170}",true,8,5,4,9,card_poring,0.01,0,P00_legacy,20x16,24
+mantis,mon.mantis,normal,forest,8,60,12,3,earth,1,medium,walker,"{""speed"":32,""chase"":48,""range"":130}",false,18,12,9,16,card_mantis,0.01,0,P00_legacy,22x30,44
+king,mon.king,mini,deep,12,420,18,5,water,2,large,boss,"{""script"":""king_slam""}",true,140,90,80,80,card_king,1,1200,P00_legacy,50x44,62
+bird,mon.bird,normal,sky,10,28,10,1,wind,1,small,flyer,"{""speed"":45,""range"":70,""amp"":14}",true,14,9,6,12,card_bird,0.01,0,P00_legacy,24x18,30
+harpy,mon.harpy,mini,sky,16,650,22,8,wind,2,medium,boss,"{""script"":""harpy_dive""}",true,240,150,120,120,card_harpy,1,1800,P00_legacy,40x36,58
+fish,mon.fish,normal,abyss,14,48,15,4,water,1,small,swimmer,"{""speed"":35,""chase"":55,""range"":110}",false,20,14,9,15,card_fish,0.01,0,P00_legacy,28x16,24
+kraken,mon.kraken,mvp,abyss,22,1300,28,12,water,3,large,boss,"{""script"":""kraken_ink""}",false,600,400,300,300,card_kraken,1,7200,P00_legacy,84x76,104
+scorpion,mon.scorpion,normal,desert,18,80,17,6,earth,1,medium,charger,"{""speed"":32,""charge"":64,""range"":130}",false,26,18,12,20,card_scorpion,0.01,0,P00_legacy,32x18,30

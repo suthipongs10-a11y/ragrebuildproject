@@ -1,0 +1,250 @@
+{
+"forest": {
+"far": "forest_far.webp",
+"mid": "forest_mid.webp",
+"near": "forest_near.webp",
+"ground": "forest_ground.webp",
+"groundTop": 0.38372093023255816,
+"groundAR": 0.16796875,
+"plat": "forest_plat.webp",
+"platTop": 0.25,
+"platAR": 0.3984375
+},
+"deep": {
+"far": "deep_far.webp",
+"mid": "deep_mid.webp",
+"near": "deep_near.webp",
+"ground": "deep_ground.webp",
+"groundTop": 0.2236024844720497,
+"groundAR": 0.1572265625,
+"plat": "deep_plat.webp",
+"platTop": 0.38082901554404147,
+"platAR": 0.376953125
+},
+"town": {
+"far": "town_far.webp",
+"mid": "town_mid.webp",
+"near": "town_near.webp",
+"ground": "town_ground.webp",
+"groundTop": 0.3390804597701149,
+"groundAR": 0.169921875,
+"plat": "town_plat.webp",
+"platTop": 0.14814814814814814,
+"platAR": 0.369140625
+},
+"sky": {
+"far": "sky_far.webp",
+"mid": "sky_mid.webp",
+"near": "sky_near.webp",
+"ground": "sky_ground.webp",
+"groundTop": 0.4512820512820513,
+"groundAR": 0.1904296875,
+"plat": "sky_plat.webp",
+"platTop": 0.1783783783783784,
+"platAR": 0.361328125
+},
+"abyss": {
+"far": "abyss_far.webp",
+"mid": "abyss_mid.webp",
+"near": "abyss_near.webp",
+"ground": "abyss_ground.webp",
+"groundTop": 0.5130434782608696,
+"groundAR": 0.224609375,
+"plat": "abyss_plat.webp",
+"platTop": 0.2004950495049505,
+"platAR": 0.39453125
+},
+"desert": {
+"far": "desert_far.webp",
+"mid": "desert_mid.webp",
+"near": "desert_near.webp",
+"ground": "desert_ground.webp",
+"groundTop": 0.1796875,
+"groundAR": 0.125,
+"plat": "desert_plat.webp",
+"platTop": 0.1927710843373494,
+"platAR": 0.32421875
+},
+"sprites": {
+"hero": {
+"src": "spr_hero.webp",
+"ar": 0.646875
+},
+"poring": {
+"src": "spr_poring.webp",
+"ar": 1.3492063492063493
+},
+"king": {
+"src": "spr_king.webp",
+"ar": 1.024
+},
+"mantis": {
+"src": "spr_mantis.webp",
+"ar": 0.946875
+},
+"bird": {
+"src": "spr_bird.webp",
+"ar": 0.95703125
+},
+"harpy": {
+"src": "spr_harpy.webp",
+"ar": 0.9635416666666666
+},
+"fish": {
+"src": "spr_fish.webp",
+"ar": 1.695364238410596
+},
+"scorpion": {
+"src": "spr_scorpion.webp",
+"ar": 1.1594202898550725
+},
+"kraken": {
+"src": "spr_kraken.webp",
+"ar": 1.0442890442890442
+},
+"buddy": {
+"src": "spr_buddy.webp",
+"ar": 1.0062893081761006
+},
+"wind": {
+"src": "spr_wind.webp",
+"ar": 0.7875
+},
+"water": {
+"src": "spr_water.webp",
+"ar": 0.625
+},
+"fire": {
+"src": "spr_fire.webp",
+"ar": 0.625
+},
+"angel": {
+"src": "spr_angel.webp",
+"ar": 1.4678899082568808
+}
+},
+"icons": {
+"crystal": {
+"src": "ic_crystal.webp",
+"ar": 0.75
+},
+"coin": {
+"src": "ic_coin.webp",
+"ar": 0.9765625
+},
+"sword": {
+"src": "ic_sword.webp",
+"ar": 0.875
+},
+"sword2": {
+"src": "ic_sword2.webp",
+"ar": 0.8125
+},
+"anvil": {
+"src": "ic_anvil.webp",
+"ar": 1.1428571428571428
+},
+"card": {
+"src": "ic_card.webp",
+"ar": 0.9765625
+},
+"potion_r": {
+"src": "ic_potion_r.webp",
+"ar": 0.7890625
+},
+"potion_b": {
+"src": "ic_potion_b.webp",
+"ar": 0.765625
+},
+"chest": {
+"src": "ic_chest.webp",
+"ar": 1.2307692307692308
+},
+"fountain": {
+"src": "ic_fountain.webp",
+"ar": 0.984375
+},
+"altar": {
+"src": "ic_altar.webp",
+"ar": 1.032258064516129
+},
+"sign": {
+"src": "ic_sign.webp",
+"ar": 0.984375
+},
+"e_wind": {
+"src": "ic_e_wind.webp",
+"ar": 1.0
+},
+"e_water": {
+"src": "ic_e_water.webp",
+"ar": 0.9765625
+},
+"e_fire": {
+"src": "ic_e_fire.webp",
+"ar": 0.9921875
+},
+"crown": {
+"src": "ic_crown.webp",
+"ar": 1.103448275862069
+}
+},
+"parts": {
+"head": {
+"src": "hero_head.webp",
+"x": 53,
+"y": 67,
+"w": 386,
+"h": 353
+},
+"torso": {
+"src": "hero_torso.webp",
+"x": 476,
+"y": 58,
+"w": 359,
+"h": 450
+},
+"uarm": {
+"src": "hero_uarm.webp",
+"x": 953,
+"y": 136,
+"w": 203,
+"h": 342
+},
+"farm": {
+"src": "hero_farm.webp",
+"x": 1305,
+"y": 137,
+"w": 202,
+"h": 356
+},
+"thigh": {
+"src": "hero_thigh.webp",
+"x": 64,
+"y": 545,
+"w": 204,
+"h": 389
+},
+"shin": {
+"src": "hero_shin.webp",
+"x": 433,
+"y": 563,
+"w": 208,
+"h": 386
+},
+"scarf": {
+"src": "hero_scarf.webp",
+"x": 700,
+"y": 578,
+"w": 425,
+"h": 357
+},
+"sword": {
+"src": "hero_sword.webp",
+"x": 1194,
+"y": 589,
+"w": 322,
+"h": 357
+}
+}
+}

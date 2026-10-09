@@ -1,0 +1,9 @@
+id,name_key,slot_type,effects,set_id,art
+card_poring,card.poring,armor,"{""luk"":2,""hp"":20}",,card_poring
+card_mantis,card.mantis,weapon,"{""str"":2,""atk"":5}",,card_mantis
+card_bird,card.bird,shoes,"{""agi"":3}",,card_bird
+card_fish,card.fish,armor,"{""def"":3}",,card_fish
+card_scorpion,card.scorpion,weapon,"{""atk"":6,""crit"":3}",,card_scorpion
+card_king,card.king,armor,"{""hp"":80,""vit"":3}",,card_king
+card_harpy,card.harpy,acc,"{""agi"":4,""crit"":5}",,card_harpy
+card_kraken,card.kraken,weapon,"{""atk"":12,""def"":6}",,card_kraken

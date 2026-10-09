@@ -1,0 +1,33 @@
+{
+  "name": "summon-jump",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run content && tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "e2e": "playwright test",
+    "content": "tsx tools/content-build.ts",
+    "art:import": "tsx tools/art-import/index.ts"
+  },
+  "dependencies": {
+    "phaser": "4.2.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "@types/adm-zip": "0.5.7",
+    "@types/node": "22.18.0",
+    "@types/papaparse": "5.3.16",
+    "adm-zip": "0.5.16",
+    "papaparse": "5.5.3",
+    "sharp": "0.34.4",
+    "tsx": "4.20.6",
+    "typescript": "5.9.3",
+    "vite": "7.1.12",
+    "vitest": "3.2.4"
+  }
+}

@@ -1,0 +1,494 @@
+{
+ "hero_design": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_hero.webp",
+  "w": 207,
+  "h": 320
+ },
+ "hero_part_farm": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/hero_farm.webp",
+  "w": 60,
+  "h": 106,
+  "meta": {
+   "sheetX": 1305,
+   "sheetY": 137,
+   "sheetW": 202,
+   "sheetH": 356
+  }
+ },
+ "hero_part_head": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/hero_head.webp",
+  "w": 115,
+  "h": 105,
+  "meta": {
+   "sheetX": 53,
+   "sheetY": 67,
+   "sheetW": 386,
+   "sheetH": 353
+  }
+ },
+ "hero_part_scarf": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/hero_scarf.webp",
+  "w": 127,
+  "h": 107,
+  "meta": {
+   "sheetX": 700,
+   "sheetY": 578,
+   "sheetW": 425,
+   "sheetH": 357
+  }
+ },
+ "hero_part_shin": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/hero_shin.webp",
+  "w": 62,
+  "h": 115,
+  "meta": {
+   "sheetX": 433,
+   "sheetY": 563,
+   "sheetW": 208,
+   "sheetH": 386
+  }
+ },
+ "hero_part_sword": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/hero_sword.webp",
+  "w": 96,
+  "h": 107,
+  "meta": {
+   "sheetX": 1194,
+   "sheetY": 589,
+   "sheetW": 322,
+   "sheetH": 357
+  }
+ },
+ "hero_part_thigh": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/hero_thigh.webp",
+  "w": 61,
+  "h": 116,
+  "meta": {
+   "sheetX": 64,
+   "sheetY": 545,
+   "sheetW": 204,
+   "sheetH": 389
+  }
+ },
+ "hero_part_torso": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/hero_torso.webp",
+  "w": 107,
+  "h": 135,
+  "meta": {
+   "sheetX": 476,
+   "sheetY": 58,
+   "sheetW": 359,
+   "sheetH": 450
+  }
+ },
+ "hero_part_uarm": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/hero_uarm.webp",
+  "w": 60,
+  "h": 102,
+  "meta": {
+   "sheetX": 953,
+   "sheetY": 136,
+   "sheetW": 203,
+   "sheetH": 342
+  }
+ },
+ "icon_altar": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_altar.webp",
+  "w": 128,
+  "h": 124
+ },
+ "icon_anvil": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_anvil.webp",
+  "w": 128,
+  "h": 112
+ },
+ "icon_card": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_card.webp",
+  "w": 125,
+  "h": 128
+ },
+ "icon_chest": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_chest.webp",
+  "w": 128,
+  "h": 104
+ },
+ "icon_coin": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_coin.webp",
+  "w": 125,
+  "h": 128
+ },
+ "icon_crown": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_crown.webp",
+  "w": 128,
+  "h": 116
+ },
+ "icon_crystal": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_crystal.webp",
+  "w": 96,
+  "h": 128
+ },
+ "icon_e_fire": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_e_fire.webp",
+  "w": 127,
+  "h": 128
+ },
+ "icon_e_water": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_e_water.webp",
+  "w": 125,
+  "h": 128
+ },
+ "icon_e_wind": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_e_wind.webp",
+  "w": 128,
+  "h": 128
+ },
+ "icon_fountain": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_fountain.webp",
+  "w": 126,
+  "h": 128
+ },
+ "icon_potion_b": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_potion_b.webp",
+  "w": 98,
+  "h": 128
+ },
+ "icon_potion_r": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_potion_r.webp",
+  "w": 101,
+  "h": 128
+ },
+ "icon_sign": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_sign.webp",
+  "w": 126,
+  "h": 128
+ },
+ "icon_sword": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_sword.webp",
+  "w": 112,
+  "h": 128
+ },
+ "icon_sword2": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/ic_sword2.webp",
+  "w": 104,
+  "h": 128
+ },
+ "legacy_angel": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_angel.webp",
+  "w": 160,
+  "h": 109
+ },
+ "legacy_bird": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_bird.webp",
+  "w": 245,
+  "h": 256
+ },
+ "legacy_buddy": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_buddy.webp",
+  "w": 160,
+  "h": 159
+ },
+ "legacy_fire": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_fire.webp",
+  "w": 100,
+  "h": 160
+ },
+ "legacy_fish": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_fish.webp",
+  "w": 256,
+  "h": 151
+ },
+ "legacy_harpy": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_harpy.webp",
+  "w": 370,
+  "h": 384
+ },
+ "legacy_king": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_king.webp",
+  "w": 384,
+  "h": 375
+ },
+ "legacy_kraken": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_kraken.webp",
+  "w": 448,
+  "h": 429
+ },
+ "legacy_mantis": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_mantis.webp",
+  "w": 303,
+  "h": 320
+ },
+ "legacy_poring": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_poring.webp",
+  "w": 255,
+  "h": 189
+ },
+ "legacy_scorpion": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_scorpion.webp",
+  "w": 320,
+  "h": 276
+ },
+ "legacy_water": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_water.webp",
+  "w": 100,
+  "h": 160
+ },
+ "legacy_wind": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/spr_wind.webp",
+  "w": 126,
+  "h": 160
+ },
+ "zone_abyss_far": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/abyss_far.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_abyss_ground": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/abyss_ground.webp",
+  "w": 1024,
+  "h": 230,
+  "meta": {
+   "top": 0.5130434782608696
+  }
+ },
+ "zone_abyss_mid": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/abyss_mid.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_abyss_near": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/abyss_near.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_abyss_plat": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/abyss_plat.webp",
+  "w": 512,
+  "h": 202,
+  "meta": {
+   "top": 0.2004950495049505
+  }
+ },
+ "zone_deep_far": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/deep_far.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_deep_ground": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/deep_ground.webp",
+  "w": 1024,
+  "h": 161,
+  "meta": {
+   "top": 0.2236024844720497
+  }
+ },
+ "zone_deep_mid": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/deep_mid.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_deep_near": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/deep_near.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_deep_plat": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/deep_plat.webp",
+  "w": 512,
+  "h": 193,
+  "meta": {
+   "top": 0.38082901554404147
+  }
+ },
+ "zone_desert_far": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/desert_far.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_desert_ground": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/desert_ground.webp",
+  "w": 1024,
+  "h": 128,
+  "meta": {
+   "top": 0.1796875
+  }
+ },
+ "zone_desert_mid": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/desert_mid.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_desert_near": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/desert_near.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_desert_plat": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/desert_plat.webp",
+  "w": 512,
+  "h": 166,
+  "meta": {
+   "top": 0.1927710843373494
+  }
+ },
+ "zone_forest_far": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/forest_far.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_forest_ground": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/forest_ground.webp",
+  "w": 1024,
+  "h": 172,
+  "meta": {
+   "top": 0.38372093023255816
+  }
+ },
+ "zone_forest_mid": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/forest_mid.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_forest_near": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/forest_near.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_forest_plat": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/forest_plat.webp",
+  "w": 512,
+  "h": 204,
+  "meta": {
+   "top": 0.25
+  }
+ },
+ "zone_sky_far": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/sky_far.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_sky_ground": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/sky_ground.webp",
+  "w": 1024,
+  "h": 195,
+  "meta": {
+   "top": 0.4512820512820513
+  }
+ },
+ "zone_sky_mid": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/sky_mid.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_sky_near": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/sky_near.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_sky_plat": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/sky_plat.webp",
+  "w": 512,
+  "h": 185,
+  "meta": {
+   "top": 0.1783783783783784
+  }
+ },
+ "zone_town_far": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/town_far.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_town_ground": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/town_ground.webp",
+  "w": 1024,
+  "h": 174,
+  "meta": {
+   "top": 0.3390804597701149
+  }
+ },
+ "zone_town_mid": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/town_mid.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_town_near": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/town_near.webp",
+  "w": 1024,
+  "h": 576
+ },
+ "zone_town_plat": {
+  "pack": "P00_legacy",
+  "url": "assets/P00_legacy/town_plat.webp",
+  "w": 512,
+  "h": 189,
+  "meta": {
+   "top": 0.14814814814814814
+  }
+ }
+}
