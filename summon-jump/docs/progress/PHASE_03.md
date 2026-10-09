@@ -39,6 +39,8 @@ Also still open: `ART_P03_Gear_Cards_VFX.md` (swords, armor, cards, base VFX). P
 ## Owner test round 1
 - Phone (4G): deep forest showed Phaser's green "missing texture" boxes and some `?hero=` links didn't open. Not reproducible on desktop Chromium (also with slow-network emulation). Likely failed image downloads on mobile data. Fixes: every room's textures load with retries (`loadTextures`), a room that still misses textures fetches them before it starts, a clear "โหลดภาพไม่ครบ / ลองใหม่" screen instead of broken art, on-screen error box for script errors, reload after iOS WebGL context loss. Test heroes now each have their own save slot (`?hero=` value).
 
+- Phone: no way to talk to NPCs (▲ = joystick up was not discoverable). Added a contextual action button (💬 คุย / 📜 อ่าน / 🔨 ตีบวก / 🛒 ร้านค้า / ▼ ลงท่อ / 🔥 ทุบหิน) that appears at the bottom-centre when something is in reach, and tapping an NPC/sign/chest directly also works (hero must be within ~7 tiles).
+
 ## How to test
 - New game: start as Novice Lv 1 (Skill S1 = First Aid). Farm to Job Lv 10, learn Basic Skill 9 in ☰ > สกิล, talk to the priest (นักบวช) in town → choose a job.
 - Test heroes (separate save slot, never overwrite the real one): `?hero=swordsman:30`, `?hero=mage:30`, `?hero=archer:30`, `?hero=acolyte:30` (add `&map=forest` etc.).
