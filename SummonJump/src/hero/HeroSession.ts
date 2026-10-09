@@ -1,5 +1,5 @@
 import {
-  addItem, changeJob, expToNext, derive, gainExp, jobOf, learnSkill, maxHp, maxSp, newHero, newSkillRuntime, raiseStat,
+  addItem, changeJob, equip, expToNext, derive, gainExp, jobOf, learnSkill, maxHp, maxSp, newHero, newSkillRuntime, raiseStat,
   type ContentBundle, type Derived, type HeroData, type JobId, type LevelUpResult, type SkillRuntime, type StatKey,
 } from '@shared/index';
 import type { SaveData } from '../save/local';
@@ -43,7 +43,7 @@ export class HeroSession {
 /** First load after Phase 2: build the hero from the old counters. */
 function migrate(save: SaveData, content: ContentBundle): HeroData {
   const debug = new URLSearchParams(typeof location === 'undefined' ? '' : location.search).get('hero');
-  if (debug) return testHero(content, debug);
+  if (debug) { save.zeny = Math.max(save.zeny, 20000); for (const c of content.cards) save.cards[c.id] = 1; return testHero(content, debug); }
   const h = newHero(content);
   gainExp(h, content, save.exp, Math.round(save.exp * 0.6));
   for (const [id, n] of Object.entries(save.inv)) addItem(h, content, id, n);
@@ -66,5 +66,22 @@ export function testHero(content: ContentBundle, spec: string): HeroData {
   const keys = MAIN[job];
   for (let i = 0; h.statPoints > 1 && i < 500; i++) raiseStat(h, keys[i % keys.length] as StatKey);
   for (let pass = 0; pass < 12 && h.skillPoints > 0; pass++) for (const s of jobOf(content, job).skills) learnSkill(h, content, s);
+  // ready-to-play gear: the best item this job can wear in every slot at this level, plus potions
+  const slots: Record<string, string[]> = { weapon: ['weapon'], offhand: ['offhand'], head: ['head'], armor: ['armor'], cape: ['cape'], shoes: ['shoes'], acc: ['acc', 'acc'] };
+  for (const types of Object.values(slots)) {
+    const used = new Set<string>();
+    for (const type of types) {
+      const best = content.items
+        .filter((d) => d.type === type && !used.has(d.id) && d.level_req <= lv && (d.job_mask.includes('all') || d.job_mask.includes(job)) && (type !== 'weapon' || jobOf(content, job).weapons.includes(d.subtype)))
+        .sort((a, b) => b.level_req - a.level_req || b.price - a.price)[0];
+      if (!best) continue;
+      used.add(best.id);
+      const it = addItem(h, content, best.id);
+      if (it) { if (type === 'weapon') it.refine = 4; equip(h, content, it.uid); }
+    }
+  }
+  const PICK: Record<JobId, string[]> = { novice: ['first_aid'], swordsman: ['power_slash', 'magnum_burst', 'dash_strike'], mage: ['fire_bolt', 'frost_nova', 'fire_wall'], archer: ['double_strafe', 'arrow_shower', 'ankle_trap'], acolyte: ['heal', 'holy_light', 'blessing'] };
+  h.slots = [0, 1, 2].map((i) => { const id = PICK[job][i]; return id && (h.skills[id] ?? 0) > 0 ? id : (h.slots[i] ?? null); });
+  addItem(h, content, 'potion_red', 15); addItem(h, content, 'potion_orange', 10); addItem(h, content, 'potion_blue', 5);
   return h;
 }

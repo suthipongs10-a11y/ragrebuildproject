@@ -21,7 +21,8 @@ export interface SaveData {
 }
 
 /** `?hero=job:lv` test heroes use their own slot so they never overwrite the real save. */
-const KEY = new URLSearchParams(typeof location === 'undefined' ? '' : location.search).has('hero') ? 'summonjump-save-test' : 'summonjump-save-v1';
+const HERO_PARAM = new URLSearchParams(typeof location === 'undefined' ? '' : location.search).get('hero');
+const KEY = HERO_PARAM ? `summonjump-save-test-${HERO_PARAM.replace(/[^a-z0-9:]/gi, '')}` : 'summonjump-save-v1';
 export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {}, hp: null, exp: 0, zeny: 0, inv: {}, cards: {}, hero: null });
 
 export function loadSave(): SaveData {
