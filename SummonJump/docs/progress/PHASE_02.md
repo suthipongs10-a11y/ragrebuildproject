@@ -28,6 +28,11 @@ VFX use code-drawn additive shapes until the P03 VFX pack (`ART_P03_Gear_Cards_V
 - Levels/EXP curve are Phase 3: EXP and zeny are counted and saved, items/cards go to a saved bag (no menu yet).
 - Headless CI renders in software (~17 fps baseline), so 60 fps must be checked by the owner on a phone: `?map=test_wide&stress=30`.
 
+## Owner test round 1 (fixed)
+- Room edges were swapped since Phase 1: walking left out of town put the hero on the forest's LEFT edge, so he fell straight into the deep forest. Now you enter on the correct side (e2e test added).
+- Bosses (King / Harpy / Kraken) now show a big HP bar with their name at the top of the screen.
+- Attack animation polish is planned: the clips are JSON (`src/rig/hero.rig.json`) and get tuned with the job parts in Phase 3.
+
 ## How to test
 - `?map=forest` — porings (hop), mantis (walks, telegraphs a lunge). `?map=deep` — Poring King (jump slam, summons porings below half HP).
 - `?map=sky1` birds (swoop), `?map=sky2` Harpy (dive + feather shots), `?map=abyss1&abil=dive` fish, `?map=abyss2&abil=dive` Kraken (ink shots).

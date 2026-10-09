@@ -23,7 +23,6 @@ export type Place =
   | { kind: 'default' };
 
 const BUILD: HeroBuild = { level: 1, stats: { str: 1, agi: 1, vit: 1, int: 1, dex: 1, luk: 1 }, weaponAtk: 6, bonusAtk: 0, bonusDef: 0, bonusHp: 0, bonusCrit: 0 };
-const OPPOSITE = { left: 'right', right: 'left', up: 'down', down: 'up' } as const;
 
 /** Phase 1 world: LDtk rooms, platforming, transitions, gates, respawn rules. Combat arrives in Phase 2. */
 export class WorldScene extends Phaser.Scene {
@@ -140,7 +139,7 @@ export class WorldScene extends Phaser.Scene {
     const clampX = (x: number) => Phaser.Math.Clamp(x, 0, l.grid.pxW - h.w);
     switch (place.kind) {
       case 'edge': {
-        // arriving from `dir` side of the previous room: we enter on the opposite side of this one
+        // left the previous room through its `dir` edge: appear on the opposite edge of this one (walk left → enter from the right)
         if (place.dir === 'left') h.x = l.grid.pxW - h.w - 1;
         else if (place.dir === 'right') h.x = 1;
         else h.x = clampX(place.x);
@@ -231,7 +230,7 @@ export class WorldScene extends Phaser.Scene {
     if (ex === 'fall') this.fallRespawn();
     else if (ex) {
       const to = this.level.exitTo[ex];
-      if (to) this.goRoom(to, { kind: 'edge', dir: OPPOSITE[ex], x: this.hero.x, y: this.hero.y, vx: 0, vy: 0 });
+      if (to) this.goRoom(to, { kind: 'edge', dir: ex, x: this.hero.x, y: this.hero.y, vx: 0, vy: 0 });
     }
 
     const h = this.hero;
@@ -239,6 +238,8 @@ export class WorldScene extends Phaser.Scene {
     this.rig.update(frozen ? 0 : dt, h.x + h.w / 2, h.y + h.h, h.dir);
     this.rig.setAlpha(this.combat.combat.inv > 0 && !dead && Math.floor(this.time.now / 50) % 2 ? 0.35 : 1);
     this.bars.update(this.combat.combat.hp, this.combat.maxHp, this.save.zeny, this.save.exp);
+    const boss = this.combat.boss;
+    this.bars.boss(boss ? t(boss.def.name_key) : null, boss?.hp, boss?.def.hp, boss?.def.tier === 'mvp');
     this.hud.setText(`${t(this.level.name)} · ${Math.round(this.game.loop.actualFps)} fps\n${this.abilityLine()}`);
     if (this.toastUntil && this.time.now > this.toastUntil) { this.toastUntil = 0; this.tweens.add({ targets: this.toastText, alpha: 0, duration: 300 }); }
     c.endFrame();

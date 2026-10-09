@@ -42,6 +42,9 @@ export class CombatController {
 
   get maxHp(): number { return maxHp(this.build); }
 
+  /** The mini-boss / MVP in this room (shown with a big HP bar), if alive. */
+  get boss(): Enemy | undefined { return this.enemies.find((e) => !e.dead && e.def.tier !== 'normal'); }
+
   spawn(id: string, monster: string, x: number, y: number): void {
     const def = this.defs.get(monster);
     if (!def) return;

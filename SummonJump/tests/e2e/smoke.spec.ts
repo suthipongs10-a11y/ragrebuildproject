@@ -46,7 +46,20 @@ test('walking off the left edge enters the next room', async ({ page, isMobile }
   await page.keyboard.up('ArrowRight');
   await page.waitForFunction(() => (window as unknown as W).__game.scene.getScene('World').level.id === 'town', null, { timeout: 15_000 });
   expect(await world(page, (w) => w.level.id)).toBe('town');
+  expect(await world(page, (w) => w.hero.x)).toBeLessThan(120); // walked right → enters town at its LEFT edge
   expect(errors).toEqual([]);
+});
+
+test('walking left from town lands at the right edge of the forest and stays there', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'keyboard-driven');
+  await boot(page, '?map=town');
+  await world(page, (w) => { w.hero.x = 40; });
+  await page.keyboard.down('ArrowLeft');
+  await page.waitForFunction(() => (window as unknown as W).__game.scene.getScene('World').level.id === 'forest', null, { timeout: 10_000 });
+  await page.keyboard.up('ArrowLeft');
+  await page.waitForTimeout(500);
+  expect(await world(page, (w) => w.level.id)).toBe('forest');
+  expect(await world(page, (w) => w.hero.x)).toBeGreaterThan(700);
 });
 
 test('scrolling camera follows the hero in a wide room', async ({ page, isMobile }) => {
