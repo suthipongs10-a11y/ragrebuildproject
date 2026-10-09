@@ -7,13 +7,13 @@ import { ART } from '../../assets/manifest.generated';
 import { t } from '../../i18n';
 import type { HeroSession } from '../../hero/HeroSession';
 import type { SaveData } from '../../save/local';
-import { cardsTab, equipTab, jobTab, refineTab, shopTab, skillsTab, statusTab } from './tabs';
-import { newSpiritMenuState, spiritsTab, summonTab } from './spiritTabs';
+import { bagTab, cardsTab, equipTab, jobTab, refineTab, shopTab, skillsTab, statusTab } from './tabs';
+import { bookTab, newSpiritMenuState, spiritsTab, summonTab } from './spiritTabs';
 import { spiritAct } from './spiritActions';
 import './spirits.css';
 
-export type MenuTab = 'status' | 'skills' | 'equip' | 'cards' | 'spirits' | 'job' | 'refine' | 'shop' | 'summon';
-const MAIN_TABS: MenuTab[] = ['status', 'skills', 'equip', 'cards', 'spirits', 'summon'];
+export type MenuTab = 'status' | 'skills' | 'equip' | 'bag' | 'cards' | 'spirits' | 'book' | 'job' | 'refine' | 'shop' | 'summon';
+const MAIN_TABS: MenuTab[] = ['status', 'skills', 'equip', 'bag', 'cards', 'spirits', 'book', 'summon'];
 
 export interface MenuHost {
   session: HeroSession; save: SaveData;
@@ -72,7 +72,8 @@ export class Menu {
     const tabs = (MAIN_TABS.includes(this.tab) ? MAIN_TABS : [...MAIN_TABS, this.tab]).map((x) => `<button class="mn-tab${x === this.tab ? ' on' : ''}" data-act="tab:${x}">${t(`tab.${x}`)}</button>`).join('');
     const body = { status: () => statusTab(h.session), skills: () => skillsTab(h.session), equip: () => equipTab(h.session, h.save), cards: () => cardsTab(h.session, h.save),
       job: () => jobTab(h.session), refine: () => refineTab(h.session, h.save), shop: () => shopTab(h.session, h.save),
-      spirits: () => spiritsTab(h.session, h.save, this.sp), summon: () => summonTab(h.session, this.sp) }[this.tab]();
+      spirits: () => spiritsTab(h.session, h.save, this.sp), summon: () => summonTab(h.session, this.sp),
+      bag: () => bagTab(h.session, h.save), book: () => bookTab(h.session, this.sp) }[this.tab]();
     const scroll = this.root.querySelector('.mn-body')?.scrollTop ?? 0;
     this.root.innerHTML = `<div class="mn"><div class="mn-top"><div class="mn-tabs">${tabs}</div><button class="mn-x" data-act="close" aria-label="close">✕</button></div>
       ${this.note ? `<div class="mn-note" style="color:#ffd88a">${this.note}</div>` : ''}<div class="mn-body">${body}</div></div>`;
@@ -92,7 +93,7 @@ export class Menu {
     const sn = spiritAct(verb ?? '', x, y, this.sp, h, this.rng);
     if (sn !== null) {
       if (sn) this.note = sn;
-      if (verb === 'spsel' || verb === 'spmode' || verb === 'sum') this.root.querySelector('.mn-body')?.scrollTo(0, 0); // new view starts at the top
+      if (verb === 'spsel' || verb === 'spmode' || verb === 'sum' || verb === 'book') this.root.querySelector('.mn-body')?.scrollTo(0, 0); // new view starts at the top
       this.render(); return;
     }
     let changed = true;

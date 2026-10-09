@@ -42,6 +42,8 @@ Placeholders until the zips arrive: the 5 old small spirits (`P00_legacy`), tint
 ## Fixed after owner test
 - ☰ after using the altar reopened only the Summon tab (status / equipment gone). Now ☰ / M always reopen a main tab, and Summon is a main tab.
 - Changing the team now warns when the new team loses an exploration ability.
+- Portrait phones hid the ภูต / อัญเชิญ tabs off-screen (tab bar scrolled sideways): tabs now wrap onto more rows.
+- New tabs: กระเป๋า (potions, scrolls, essences — separate from ของสวมใส่ which now holds only gear) and สมุดภูต (encyclopedia: all 15 families × elements, owned ✓, stats Lv1→max, all 4 skills, where to summon).
 
 ## Known issues / notes
 - Element variants are a hue shift of one painting per family (cheap, consistent). If a variant looks wrong we can order that one painting separately later.

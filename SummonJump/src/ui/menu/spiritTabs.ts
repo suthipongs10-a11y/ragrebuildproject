@@ -13,8 +13,10 @@ import { iconHtml } from './tabs';
 export interface SpiritMenuState {
   sel: number | null; mode: 'info' | 'runes' | 'starup'; fodder: number[]; slot: number | null;
   pickEl: string; results: { uid: number; star: number; pity: boolean }[]; anim: number;
+  /** encyclopedia: family being viewed */
+  book: string | null;
 }
-export const newSpiritMenuState = (): SpiritMenuState => ({ sel: null, mode: 'info', fodder: [], slot: null, pickEl: 'fire', results: [], anim: 0 });
+export const newSpiritMenuState = (): SpiritMenuState => ({ sel: null, mode: 'info', fodder: [], slot: null, pickEl: 'fire', results: [], anim: 0, book: null });
 
 const btn = (act: string, label: string, ok = true, sec = false) => `<button class="mn-btn${sec ? ' sec' : ''}" data-act="${act}"${ok ? '' : ' disabled'}>${label}</button>`;
 const stars = (n: number, awk = false) => `<span class="sp-stars${awk ? ' awk' : ''}">${'★'.repeat(n)}</span>`;
@@ -142,4 +144,34 @@ export function summonTab(s: HeroSession, st: SpiritMenuState): string {
   return `${res ? `<div class="sm-res" data-anim="${st.anim}"><div class="sm-portal"></div><div class="sm-cards">${res}</div></div>` : `<div class="mn-note">${t('sum.hint')}</div>`}
     <div class="mn-h">${t('sum.title')}</div>${rows}
     <div class="sp-btns">${btn('tab:spirits', `🐾 ${t('tab.spirits')}`, true, true)}</div>`;
+}
+
+/** Encyclopedia: every family and element variant in the game, which ones you own, stats and skills. */
+export function bookTab(s: HeroSession, st: SpiritMenuState): string {
+  const c = s.content, b = s.box;
+  const owned = new Set(b.spirits.map((x) => `${x.id}:${x.el}`));
+  const total = c.spirits.reduce((n, f) => n + f.elements.length, 0);
+  const fams = c.spirits.filter((f) => b.spirits.some((x) => x.id === f.id)).length;
+  const grid = [...c.spirits].sort((a, z) => a.base_star - z.base_star).map((f) => {
+    const have = f.elements.filter((e) => owned.has(`${f.id}:${e}`));
+    const dots = f.elements.map((e) => `<i class="bk-dot el-${e}${owned.has(`${f.id}:${e}`) ? ' on' : ''}">●</i>`).join('');
+    return `<button class="sp-card${st.book === f.id ? ' on' : ''}${have.length ? '' : ' bk-unknown'}" data-act="book:${f.id}">${portraitHtml(c, { id: f.id, el: f.element, awk: false }, 52)}${stars(f.base_star)}<span class="sp-nm">${t(f.name_key)}</span><span class="bk-dots">${dots}</span></button>`;
+  }).join('');
+  const f = c.spirits.find((x) => x.id === st.book);
+  let detail = `<div class="mn-note">${t('book.hint')}</div>`;
+  if (f) {
+    const lv1 = { uid: 0, id: f.id, el: f.element, star: f.base_star, lv: 1, exp: 0, awk: false };
+    const max = { ...lv1, lv: maxLevel(f.base_star) };
+    const a = spiritStats(c, lv1), z = spiritStats(c, max);
+    const variants = f.elements.map((e) => `<div class="bk-var${owned.has(`${f.id}:${e}`) ? ' on' : ''}">${portraitHtml(c, { id: f.id, el: e, awk: false }, 48)}<small class="el-${e}">${t(`el.${e}`)}</small><small>${owned.has(`${f.id}:${e}`) ? '✓' : '—'}</small></div>`).join('');
+    const src = c.summon.filter((d) => (d.rates[f.base_star - 1] ?? 0) > 0).map((d) => t(d.name_key)).join(', ');
+    const skill = (icon: string, id: string) => { const d = sskillOf(c, id); return `<div class="mn-row"><span class="grow">${icon} ${t(d?.name_key ?? id)}<small>${skillText(d)}</small></span></div>`; };
+    detail = `<div class="sp-detail"><div class="sp-head">${portraitHtml(c, { id: f.id, el: f.element, awk: false }, 96)}<div class="grow">
+      <div class="sp-title">${t(f.name_key)} ${stars(f.base_star)}</div><small>${t(`role.${f.role}`)}${f.ability !== 'none' ? ` · ${t(`ability.${f.ability}`)}` : ''}</small>
+      <div class="mn-kv"><div>HP <b>${a.hp}→${z.hp}</b></div><div>ATK <b>${a.atk}→${z.atk}</b></div><div>DEF <b>${a.def}→${z.def}</b></div><div>SPD <b>${a.spd}</b></div><div>${t('menu.crit')} <b>${a.crit}%</b></div><div>Lv <b>1→${maxLevel(f.base_star)}</b></div></div></div></div>
+      <div class="bk-vars">${variants}</div>
+      ${skill('①', f.auto)}${skill('①🌟', f.awk_auto)}${skill('✦', f.ult)}${skill('👑', f.leader)}
+      <div class="mn-note">${t('book.from')}: ${src || '—'}</div></div>`;
+  }
+  return `${detail}<div class="mn-h">${t('book.title')} · ${t('book.count').replace('{f}', String(fams)).replace('{fn}', String(c.spirits.length)).replace('{v}', String(owned.size)).replace('{vn}', String(total))}</div><div class="sp-grid">${grid}</div>`;
 }

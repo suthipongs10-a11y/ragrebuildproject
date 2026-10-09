@@ -15,6 +15,7 @@ export function spiritAct(verb: string, x: string, y: string, st: SpiritMenuStat
   const rune = (uid: string) => b.runes.find((r) => r.uid === Number(uid));
   let note = '';
   switch (verb) {
+    case 'book': st.book = x; return '';
     case 'spsel': st.sel = Number(x); st.mode = 'info'; st.fodder = []; return '';
     case 'spmode': st.mode = x as SpiritMenuState['mode']; st.fodder = []; st.slot = null; return '';
     case 'spteam': case 'spout': {

@@ -1,7 +1,7 @@
 /* Spirits / runes / summon menus. */
 .sp-team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
-.sp-team .sp-card { flex-direction: row; min-height: 60px; gap: 6px; justify-content: flex-start; text-align: left; }
-.sp-team .sp-card .sp-pic { width: 44px !important; height: 44px !important; }
+.sp-team .sp-card { min-height: 78px; padding: 4px 2px; }
+.sp-team .sp-card .sp-pic { width: 40px !important; height: 40px !important; }
 .sp-tslot small { display: block; color: var(--muted); font-size: 12px; margin: 0 0 2px 4px; }
 .sp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; margin-bottom: 8px; }
 .sp-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 4px; min-height: 96px; width: 100%;
@@ -36,4 +36,13 @@
 .sm-res.still .sm-portal { display: none; }
 @keyframes smportal { 0% { transform: scale(.1) rotate(0); opacity: 0; } 40% { opacity: 1; } 100% { transform: scale(1.6) rotate(200deg); opacity: 0; } }
 @keyframes smcard { from { opacity: 0; transform: scale(.3) rotateY(90deg); } to { opacity: 1; transform: scale(1) rotateY(0); } }
-.sp-detail .mn-kv { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sp-detail .mn-kv { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+/* encyclopedia */
+.bk-unknown .sp-pic { filter: grayscale(1) brightness(.45) !important; }
+.bk-dots { font-size: 9px; letter-spacing: 1px; }
+.bk-dot { font-style: normal; opacity: .25; }
+.bk-dot.on { opacity: 1; }
+.bk-vars { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.bk-var { display: flex; flex-direction: column; align-items: center; padding: 4px 6px; border-radius: 10px; border: 2px solid #4a3a26; opacity: .55; }
+.bk-var.on { opacity: 1; border-color: #ffd88a; }
+.sp-head .grow { flex: 1; min-width: 0; }

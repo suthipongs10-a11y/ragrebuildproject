@@ -214,3 +214,20 @@ test('phase 4: full gauge + F plays the ultimate on monsters on screen', async (
   expect(await ws(page, (w) => w.combat.enemies.some((e: Any) => e.hp < e.def.hp * 50))).toBe(true);
   expect(errors).toEqual([]);
 });
+
+test('phase 4: bag and equipment are separate tabs; spirit book lists every family', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=town');
+  await page.keyboard.press('KeyM');
+  await page.click('[data-act="tab:bag"]');
+  await expect(page.locator('.mn-body')).toContainText('ยาแดง');
+  await page.click('[data-act="tab:equip"]');
+  await expect(page.locator('.mn-body')).not.toContainText('ยาแดง');
+  await page.click('[data-act="tab:book"]');
+  const n = await ws(page, (w) => w.session.content.spirits.length);
+  await expect(page.locator('.sp-grid .sp-card')).toHaveCount(n);
+  await page.click('[data-act="book:dragon"]');
+  await expect(page.locator('.sp-detail')).toContainText('มังกรฟ้า');
+  await page.keyboard.press('KeyM');
+  expect(errors).toEqual([]);
+});

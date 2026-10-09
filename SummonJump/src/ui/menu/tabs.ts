@@ -1,5 +1,5 @@
 import {
-  attack, attackCooldown, canChangeJob, canEquip, canLearn, canSocket, critRate, defense, EQUIP_SLOTS, instance, isEquipped, itemDef, learnableSkills,
+  attack, attackCooldown, BAG_SIZE, canChangeJob, canEquip, canLearn, canSocket, critRate, defense, EQUIP_SLOTS, instance, isEquipped, itemDef, learnableSkills,
   magicAttack, maxHp, maxSp, refineChance, refineCost, skillDef, spCost, statCost, STAT_KEYS, type ContentBundle, type HeroData, type ItemInstance,
 } from '@shared/index';
 import { ART } from '../../assets/manifest.generated';
@@ -64,14 +64,29 @@ export function skillsTab(s: HeroSession): string {
   return `<div class="mn-h">${t('menu.skillpoints')} <b>${h.skillPoints}</b> · ${t('menu.slotsHint')}</div>${rows}`;
 }
 
+const GEAR = new Set(['weapon', 'offhand', 'head', 'armor', 'cape', 'shoes', 'acc']);
+const isGear = (c: ContentBundle, it: ItemInstance) => GEAR.has(itemDef(c, it.id)?.type ?? '');
+
+/** Equipment only: the 8 slots + gear in the bag. Potions, materials and scrolls live in the Bag tab. */
 export function equipTab(s: HeroSession, save: SaveData): string {
   const h = s.data, c = s.content;
   const slots = EQUIP_SLOTS.map((slot) => {
     const it = instance(h, h.equip[slot]);
     return `<div class="mn-row">${it ? itemIcon(c, it) : '<span class="mn-icon">·</span>'}<span class="grow"><small>${t(`slot.${slot}`)}</small>${it ? esc(itemName(c, it)) : '—'}</span>${it ? btn(`unequip:${slot}`, t('menu.remove'), true, true) : ''}</div>`;
   }).join('');
-  const bag = h.bag.filter((it) => !isEquipped(h, it.uid)).map((it) => bagRow(s, save, it)).join('') || `<div class="mn-note">${t('menu.bagEmpty')}</div>`;
-  return `<div class="mn-h">${t('menu.equipped')}</div><div class="mn-grid">${slots}</div><div class="mn-h">${t('menu.bag')} (${h.bag.length})</div>${bag}`;
+  const gear = h.bag.filter((it) => !isEquipped(h, it.uid) && isGear(c, it));
+  const rows = gear.map((it) => bagRow(s, save, it)).join('') || `<div class="mn-note">${t('menu.noGear')}</div>`;
+  return `<div class="mn-h">${t('menu.equipped')}</div><div class="mn-grid">${slots}</div><div class="mn-h">${t('menu.gearBag')} (${gear.length})</div>${rows}`;
+}
+
+/** Everything that isn't gear: potions (use), scrolls (summon), essences and other materials. */
+export function bagTab(s: HeroSession, save: SaveData): string {
+  const h = s.data, c = s.content;
+  const order = ['consumable', 'scroll', 'material'];
+  const items = h.bag.filter((it) => !isGear(c, it))
+    .sort((a, z) => order.indexOf(itemDef(c, a.id)?.type ?? '') - order.indexOf(itemDef(c, z.id)?.type ?? '') || a.id.localeCompare(z.id));
+  const rows = items.map((it) => bagRow(s, save, it)).join('') || `<div class="mn-note">${t('menu.bagEmpty')}</div>`;
+  return `<div class="mn-h">${t('menu.bag')} (${h.bag.length}/${BAG_SIZE}) · ${save.zeny}z</div>${rows}`;
 }
 
 function bagRow(s: HeroSession, save: SaveData, it: ItemInstance): string {
@@ -82,7 +97,7 @@ function bagRow(s: HeroSession, save: SaveData, it: ItemInstance): string {
   else if (d && d.type !== 'material') acts.push(btn(`equip:${it.uid}`, t('menu.equip'), canEquip(h, c, it.uid) === null));
   const card = Object.keys(save.cards).find((cid) => (save.cards[cid] ?? 0) > 0 && canSocket(h, c, it.uid, cid) === null);
   if (card) acts.push(btn(`socket:${it.uid}:${card}`, `🃏 ${t(`card.${card.replace(/^card_/, '')}`)}`, true, true));
-  const why = d && !d.use ? canEquip(h, c, it.uid) : null;
+  const why = d && GEAR.has(d.type) ? canEquip(h, c, it.uid) : null;
   return `<div class="mn-row">${itemIcon(c, it)}<span class="grow"><span class="t-${d?.tier ?? 'common'}">${esc(itemName(c, it))}</span><small>${itemStats(c, it)}${why && why !== 'missing' ? ` · ${t(`why.${why}`)}` : ''}</small></span>${acts.join('')}</div>`;
 }
 
