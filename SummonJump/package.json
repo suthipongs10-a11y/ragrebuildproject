@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run content && tsc --noEmit && vite build",
+    "build": "npm run content && tsc --noEmit && vite build && tsx tools/publish-docs.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",

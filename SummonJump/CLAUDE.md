@@ -87,3 +87,4 @@ npm run server:up      # docker compose up nakama + postgres (Phase 6+)
 - This project lives in `SummonJump/` inside the `ragrebuildproject` repo, which also holds an unrelated Unity/C# Ragnarok rebuild. **Never touch files outside `SummonJump/`** (except `.github/workflows/summon-jump.yml`). The root `CLAUDE.md` rules belong to the other project.
 - Branch: `claude/summon-jump`. Playable build: GitHub Pages → `/summon-jump/` (deployed by CI from the `gh-pages` branch).
 - Run commands from `SummonJump/`. Local Playwright in the cloud sandbox: `PW_CHROMIUM=/opt/pw-browsers/chromium npx playwright test`.
+- New session? Read `START.md` first. The build copies `START.md`, `CLAUDE.md`, `docs/` and `art-briefs/` into the Pages site: `/summon-jump/START.md`, `/summon-jump/project/` (index).
