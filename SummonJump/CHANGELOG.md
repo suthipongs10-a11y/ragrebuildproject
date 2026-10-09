@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-09 — Art packs
+- UI Kit complete (40/40, pack `P00_UI_Kit`); Monster Actions imported (42/42, pack `P02_Monster_Actions`).
+- art:import brief check now reads only the File column (no false 'missing' from reference names).
+
 ## 2026-10-09 — UI Kit art (partial)
 - Imported UI Kit Part 1 (22/40 images) into pack `P00_UI_Kit`; added `art-briefs/ART_P00_UI_Kit_REDO.md` for the 18 missing images.
 

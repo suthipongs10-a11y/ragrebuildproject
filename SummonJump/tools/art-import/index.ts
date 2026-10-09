@@ -51,7 +51,8 @@ function bbox(data: Buffer, w: number, h: number) {
 
 function expectedFromBrief(path: string): string[] {
   const md = readFileSync(join(ROOT, path), 'utf8');
-  return [...md.matchAll(/`([a-z0-9_]+\.png)`/g)].map((m) => m[1] as string);
+  // only the File column of table rows: `| 12 | `name.png` | ...` (ignores reference names inside descriptions)
+  return [...md.matchAll(/^\|\s*\d+\s*\|\s*`([a-z0-9_]+\.png)`/gm)].map((m) => m[1] as string);
 }
 
 async function main() {

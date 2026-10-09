@@ -33,3 +33,8 @@ Status: **done, waiting for owner check on a real phone** (exit gate below)
 - Imported `SJ_P00_UI_Kit_Part1` (from ChatGPT, sent as `..._INCOMPLETE`) → pack `P00_UI_Kit`: **22 of 40** images OK (#1–#22).
 - Missing 18: #23 `ui_slot_card`, #24 `ui_portrait_frame`, #25–28 rarity overlays, #29–34 element badges, #35–36 stars, #37–38 gem/scroll, #39–40 number sheets.
 - Redo brief: `art-briefs/ART_P00_UI_Kit_REDO.md` (Part2 = #25–40, Part3 = #23–24).
+- UI Kit complete: Part1 (24) + Part2 (16) = 40/40 imported into pack `P00_UI_Kit`. Redo brief no longer needed.
+- Note: ChatGPT flagged 11 Part-1 items `redo-suggested` (9-slice edges approximate, a few engravings/tab trim differ). Test stretch in-engine before asking for redo.
+
+## Monster Actions art (ART_P02) — imported early
+- 42/42 images in pack `P02_Monster_Actions` (8 monsters × poses, 3 forest monsters, kraken parts + design). Used in Phase 2.

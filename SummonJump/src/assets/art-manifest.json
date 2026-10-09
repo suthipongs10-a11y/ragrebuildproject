@@ -1,4 +1,16 @@
 {
+ "boss_kraken_design": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/boss_kraken_design.webp",
+  "w": 540,
+  "h": 512
+ },
+ "boss_kraken_parts": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/boss_kraken_parts.webp",
+  "w": 640,
+  "h": 415
+ },
  "hero_design": {
   "pack": "P00_legacy",
   "url": "assets/P00_legacy/spr_hero.webp",
@@ -275,6 +287,246 @@
   "w": 126,
   "h": 160
  },
+ "mon_bird_attack": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_bird_attack.webp",
+  "w": 584,
+  "h": 512
+ },
+ "mon_bird_hurt": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_bird_hurt.webp",
+  "w": 584,
+  "h": 512
+ },
+ "mon_bird_idle": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_bird_idle.webp",
+  "w": 584,
+  "h": 512
+ },
+ "mon_bird_idle2": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_bird_idle2.webp",
+  "w": 584,
+  "h": 512
+ },
+ "mon_boar_attack": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_boar_attack.webp",
+  "w": 640,
+  "h": 436
+ },
+ "mon_boar_hurt": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_boar_hurt.webp",
+  "w": 640,
+  "h": 436
+ },
+ "mon_boar_idle": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_boar_idle.webp",
+  "w": 640,
+  "h": 436
+ },
+ "mon_boar_windup": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_boar_windup.webp",
+  "w": 640,
+  "h": 436
+ },
+ "mon_fish_attack": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_fish_attack.webp",
+  "w": 605,
+  "h": 512
+ },
+ "mon_fish_hurt": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_fish_hurt.webp",
+  "w": 605,
+  "h": 512
+ },
+ "mon_fish_idle": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_fish_idle.webp",
+  "w": 605,
+  "h": 512
+ },
+ "mon_fish_windup": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_fish_windup.webp",
+  "w": 605,
+  "h": 512
+ },
+ "mon_harpy_attack": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_harpy_attack.webp",
+  "w": 534,
+  "h": 512
+ },
+ "mon_harpy_hurt": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_harpy_hurt.webp",
+  "w": 534,
+  "h": 512
+ },
+ "mon_harpy_idle": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_harpy_idle.webp",
+  "w": 534,
+  "h": 512
+ },
+ "mon_harpy_windup": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_harpy_windup.webp",
+  "w": 534,
+  "h": 512
+ },
+ "mon_king_attack": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_king_attack.webp",
+  "w": 537,
+  "h": 512
+ },
+ "mon_king_hurt": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_king_hurt.webp",
+  "w": 537,
+  "h": 512
+ },
+ "mon_king_idle": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_king_idle.webp",
+  "w": 537,
+  "h": 512
+ },
+ "mon_king_windup": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_king_windup.webp",
+  "w": 537,
+  "h": 512
+ },
+ "mon_mantis_attack": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_mantis_attack.webp",
+  "w": 529,
+  "h": 512
+ },
+ "mon_mantis_hurt": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_mantis_hurt.webp",
+  "w": 529,
+  "h": 512
+ },
+ "mon_mantis_idle": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_mantis_idle.webp",
+  "w": 529,
+  "h": 512
+ },
+ "mon_mantis_windup": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_mantis_windup.webp",
+  "w": 529,
+  "h": 512
+ },
+ "mon_mushroom_attack": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_mushroom_attack.webp",
+  "w": 640,
+  "h": 466
+ },
+ "mon_mushroom_hurt": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_mushroom_hurt.webp",
+  "w": 640,
+  "h": 466
+ },
+ "mon_mushroom_idle": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_mushroom_idle.webp",
+  "w": 640,
+  "h": 466
+ },
+ "mon_mushroom_windup": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_mushroom_windup.webp",
+  "w": 640,
+  "h": 466
+ },
+ "mon_poring_attack": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_poring_attack.webp",
+  "w": 640,
+  "h": 466
+ },
+ "mon_poring_hurt": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_poring_hurt.webp",
+  "w": 640,
+  "h": 466
+ },
+ "mon_poring_idle": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_poring_idle.webp",
+  "w": 640,
+  "h": 466
+ },
+ "mon_poring_windup": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_poring_windup.webp",
+  "w": 640,
+  "h": 466
+ },
+ "mon_scorpion_attack": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_scorpion_attack.webp",
+  "w": 596,
+  "h": 512
+ },
+ "mon_scorpion_hurt": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_scorpion_hurt.webp",
+  "w": 596,
+  "h": 512
+ },
+ "mon_scorpion_idle": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_scorpion_idle.webp",
+  "w": 596,
+  "h": 512
+ },
+ "mon_scorpion_windup": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_scorpion_windup.webp",
+  "w": 596,
+  "h": 512
+ },
+ "mon_wisp_attack": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_wisp_attack.webp",
+  "w": 640,
+  "h": 408
+ },
+ "mon_wisp_hurt": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_wisp_hurt.webp",
+  "w": 640,
+  "h": 408
+ },
+ "mon_wisp_idle": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_wisp_idle.webp",
+  "w": 640,
+  "h": 408
+ },
+ "mon_wisp_windup": {
+  "pack": "P02_Monster_Actions",
+  "url": "assets/P02_Monster_Actions/mon_wisp_windup.webp",
+  "w": 640,
+  "h": 408
+ },
  "ui_bar_fill_exp": {
   "pack": "P00_UI_Kit",
   "url": "assets/P00_UI_Kit/ui_bar_fill_exp.webp",
@@ -327,13 +579,13 @@
   "pack": "P00_UI_Kit",
   "url": "assets/P00_UI_Kit/ui_btn_round_big.webp",
   "w": 256,
-  "h": 253
+  "h": 254
  },
  "ui_btn_round_jump": {
   "pack": "P00_UI_Kit",
   "url": "assets/P00_UI_Kit/ui_btn_round_jump.webp",
   "w": 256,
-  "h": 255
+  "h": 254
  },
  "ui_btn_secondary": {
   "pack": "P00_UI_Kit",
@@ -351,6 +603,54 @@
   "pack": "P00_UI_Kit",
   "url": "assets/P00_UI_Kit/ui_btn_spirit_ready.webp",
   "w": 256,
+  "h": 254
+ },
+ "ui_cur_gem": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_cur_gem.webp",
+  "w": 208,
+  "h": 254
+ },
+ "ui_cur_scroll": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_cur_scroll.webp",
+  "w": 255,
+  "h": 217
+ },
+ "ui_elem_dark": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_elem_dark.webp",
+  "w": 254,
+  "h": 253
+ },
+ "ui_elem_earth": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_elem_earth.webp",
+  "w": 254,
+  "h": 250
+ },
+ "ui_elem_fire": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_elem_fire.webp",
+  "w": 254,
+  "h": 252
+ },
+ "ui_elem_holy": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_elem_holy.webp",
+  "w": 254,
+  "h": 252
+ },
+ "ui_elem_water": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_elem_water.webp",
+  "w": 254,
+  "h": 252
+ },
+ "ui_elem_wind": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_elem_wind.webp",
+  "w": 254,
   "h": 253
  },
  "ui_header_ribbon": {
@@ -371,6 +671,18 @@
   "w": 254,
   "h": 254
  },
+ "ui_numbers_crit": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_numbers_crit.webp",
+  "w": 1024,
+  "h": 256
+ },
+ "ui_numbers_white": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_numbers_white.webp",
+  "w": 1024,
+  "h": 256
+ },
  "ui_panel_main": {
   "pack": "P00_UI_Kit",
   "url": "assets/P00_UI_Kit/ui_panel_main.webp",
@@ -389,11 +701,59 @@
   "w": 512,
   "h": 256
  },
+ "ui_portrait_frame": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_portrait_frame.webp",
+  "w": 250,
+  "h": 256
+ },
+ "ui_rarity_common": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_rarity_common.webp",
+  "w": 256,
+  "h": 256
+ },
+ "ui_rarity_legend": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_rarity_legend.webp",
+  "w": 256,
+  "h": 256
+ },
+ "ui_rarity_mvp": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_rarity_mvp.webp",
+  "w": 256,
+  "h": 256
+ },
+ "ui_rarity_rare": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_rarity_rare.webp",
+  "w": 256,
+  "h": 256
+ },
+ "ui_slot_card": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_slot_card.webp",
+  "w": 170,
+  "h": 254
+ },
  "ui_slot_item": {
   "pack": "P00_UI_Kit",
   "url": "assets/P00_UI_Kit/ui_slot_item.webp",
   "w": 254,
   "h": 241
+ },
+ "ui_star": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_star.webp",
+  "w": 128,
+  "h": 127
+ },
+ "ui_star_empty": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_star_empty.webp",
+  "w": 128,
+  "h": 128
  },
  "ui_tab_off": {
   "pack": "P00_UI_Kit",
