@@ -1,0 +1,44 @@
+# Phase 5 — World content v1 · progress
+
+Status: **in progress** (started 2026-10-10, owner said "go" after Phase 4: "ท่าไม้ตายภูตแรงดีมาก go")
+
+Art (6 briefs, placeholders until the zips arrive):
+- Zones: `ART_P05_Zone_Pack_forest.md`, `ART_P05_Zone_Pack_sky.md`, `ART_P05_Zone_Pack_abyss.md` — 3 more background variations per zone + props
+- Monsters: `ART_P05_Monsters_forest.md`, `ART_P05_Monsters_sky.md`, `ART_P05_Monsters_abyss.md` — new monsters (4 poses), mini-bosses (+skill pose), MVP Storm Roc (parts sheet), cards
+
+## Design (decided)
+Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15–26)**, hub = town. Desert stays a 1-map teaser (zone 4 later).
+
+| Zone | Maps | Normal monsters | Mini-bosses | MVP |
+|---|---|---|---|---|
+| 1 Forest | forest 1–4, deep 1–2 (6) | poring, drops, poporing, rocker, mushroom, wisp, mantis, boar, willow (9) | King Poring, Spore Mother | — |
+| 2 Sky | sky 1–6 (6) | bird, sky poring, cloud imp, sky snail, fire hawk, thunder puff, griffin (7) | Harpy Queen, Thunder Ram | **#1 Storm Roc** (sky 6) |
+| 3 Abyss | abyss 1–6 (6) | fish, marin, jellyfish, crab, eel, gold fish, urchin, angler (8) | Siren, Sawtooth Shark | **#2 Kraken** (abyss 6) |
+
+= 18 new/old maps + town + desert ≈ 20 maps · 25 normal monster types (with scorpion) · 6 mini-bosses · 2 MVPs.
+- Recolours first (RO style: Drops / Poporing / Marin are Poring recolours): a monster row can point at another monster's art + a tint (`art`, `tint` columns). New monsters use a tinted look-alike until their art arrives, then switch automatically.
+- Mini-bosses respawn 10–30 min, MVPs 60–120 min (per player); MVP rooms show the respawn timer.
+- **MVP phase scripts:** Storm Roc (dive → feather volley → tornado phase under 50 % HP), Kraken gets a 2nd phase (enrage + more ink + tentacle slams under 50 %).
+- **Adventure Book** (`content/book.csv`): kill counts per monster, cards collected, spirit dex, maps discovered → milestones give **permanent stats** (claim in the menu).
+- **Daily dungeon (offline prototype):** portal NPC in town, element of the day (Mon water … Sun dark), 3 entries/day, waves → essences + runes.
+- **Tower 1–20 (offline):** one arena room per floor, monsters scale per floor, first clear rewards (scrolls, runes, zeny).
+- **Balance sheet** `docs/BALANCE.md` + `tools/balance.ts` (time-to-kill, EXP per minute, level at each zone, time to MVP #2 ≈ 3–4 h).
+- Level design guard: an automatic reachability test (every exit reachable with the abilities a room requires).
+
+## Checklist
+- [x] Art briefs written (6 files)
+- [ ] Monsters: 25 normal types, 6 minis, 2 MVPs in `monsters.csv` (+ art/tint fallback), cards, drops, AI for new types
+- [ ] Mini-boss scripts (Spore Mother, Thunder Ram, Siren, Shark) + MVP phase scripts (Storm Roc, Kraken phase 2)
+- [ ] Levels: forest 1–4 + deep 1–2, sky 1–6, abyss 1–6 (background variations), reachability test
+- [ ] MVP / mini respawn timers shown in the room
+- [ ] Adventure Book (tracking + milestones + permanent stats + menu tab)
+- [ ] Daily dungeon (offline prototype)
+- [ ] Tower floors 1–20 (offline)
+- [ ] Balance sheet + simulation tool; tune EXP / HP / drops
+- [ ] Tests (unit: book, dungeon/tower rules, reachability; e2e: travel through zones, MVP fight, book claim)
+
+## Exit gate
+- [ ] 3–4 hours of offline content from a new game to MVP #2 (owner plays)
+- [ ] Balance sheet reviewed by the owner
+
+## Known issues / notes

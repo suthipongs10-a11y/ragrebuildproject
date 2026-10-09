@@ -1,6 +1,6 @@
 # Phase 4 — Spirits (SW) · progress
 
-Status: **in progress** (started 2026-10-09, owner said "go" after Phase 3)
+Status: **done** (owner: "ใช้ท่าไม้ตายภูตได้แล้วครับ แรงดีมาก go" — 2026-10-10) (started 2026-10-09, owner said "go" after Phase 3)
 
 Art: `art-briefs/ART_P04_Spirits.md` (79 images, 4 zips: awakened forms of the 5 old spirits, 10 new spirit families × 4 forms, scrolls/essences/runes/summon VFX).
 Placeholders until the zips arrive: the 5 old small spirits (`P00_legacy`), tinted per element; new families use a tinted placeholder orb.
@@ -30,8 +30,8 @@ Placeholders until the zips arrive: the 5 old small spirits (`P00_legacy`), tint
 - [x] Tests: unit (stats, star-up, awaken, runes, team, summon 100k) + e2e (summon, team ability opens a gate, ultimate)
 
 ## Exit gate
-- [ ] Collect / upgrade / awaken loop works offline — **owner to test on the phone**
-- [ ] Ultimate cinematic for every family — every family has one (6 effect styles: slam, vortex, wave, rain, pillar, burst); big art comes with the P04 zips — **owner to check**
+- [x] Collect / upgrade / awaken loop works offline (owner tested)
+- [x] Ultimate cinematic for every family (owner: strong) — big art comes with the P04 zips
 - [x] Summon rates verified by a 100k-roll test (`tests/spirits.test.ts`: every scroll within ±0.5 %, pity never exceeded)
 
 ## How to test (phone)

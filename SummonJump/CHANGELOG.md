@@ -1,6 +1,9 @@
 # Changelog
 
-## Phase 4 (in progress) — 2026-10-09
+## Phase 5 (in progress) — 2026-10-10
+- Phase checklist + 6 art briefs (3 zone packs, 3 monster packs).
+
+## Phase 4 (done) — 2026-10-09
 - 15 spirit families × element variants (`spirits.csv`, `spirit_skills.csv`, `spirit_elements.csv`, `spirit_config.csv`).
 - `shared/spirits`: stats by star/level/awakening/element, EXP, star-up with fodder, awakening with essences, runes (6 slots, 8 sets, +15 upgrade), team + leader skill + exploration abilities.
 - `shared/rules/summon.ts`: 4 scroll types with rates + pity (100k-roll test).
