@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { art, type ZoneId } from '../assets/packs';
 
 /** Builds the painted 5-layer zone: far / mid / near backdrops + ground strip + returns the floor Y. */
-export function buildZoneBackdrop(scene: Phaser.Scene, zone: ZoneId, roomW: number, viewW: number, viewH: number, floorY: number): void {
+export function buildZoneBackdrop(scene: Phaser.Scene, zone: ZoneId, roomW: number, viewW: number, viewH: number, floorY: number | null): void {
   // far: single image, barely moves
   const far = scene.add.image(0, 0, `zone_${zone}_far`).setOrigin(0, 0).setScrollFactor(0.12, 0);
   const farScale = (viewH / far.height) * 1.12;
@@ -22,6 +22,7 @@ export function buildZoneBackdrop(scene: Phaser.Scene, zone: ZoneId, roomW: numb
   tiled(`zone_${zone}_mid`, 0.45);
   tiled(`zone_${zone}_near`, 0.75);
 
+  if (floorY === null) return; // open-air room (no ground strip)
   // ground strip: one strip per screen width, painted surface aligned to floorY
   const groundKey = `zone_${zone}_ground`;
   const top = (art(groundKey).meta?.top as number | undefined) ?? 0.35;
@@ -35,15 +36,11 @@ export function buildZoneBackdrop(scene: Phaser.Scene, zone: ZoneId, roomW: numb
   scene.add.rectangle(0, floorY - top * gh + gh - 2, roomW, viewH, 0x2a1d12).setOrigin(0, 0).setDepth(4);
 }
 
-/** Painted floating platform (one-way). Returns the static physics body owner. */
-export function addPlatform(scene: Phaser.Scene, zone: ZoneId, x: number, y: number, width: number, group: Phaser.Physics.Arcade.StaticGroup): void {
+/** Painted floating platform (visual only; collision comes from the level grid). `y` is the walkable top. */
+export function drawPlatform(scene: Phaser.Scene, zone: ZoneId, x: number, y: number, width: number): void {
   const key = `zone_${zone}_plat`;
   const top = (art(key).meta?.top as number | undefined) ?? 0.25;
   const img = scene.add.image(x, y, key).setOrigin(0, 0).setDepth(6);
   img.setScale(width / img.width);
   img.y = y - top * img.displayHeight;
-  const body = scene.add.rectangle(x + 6, y, width - 12, 10).setOrigin(0, 0).setVisible(false);
-  group.add(body);
-  const b = body.body as Phaser.Physics.Arcade.StaticBody;
-  b.checkCollision.down = false; b.checkCollision.left = false; b.checkCollision.right = false;
 }

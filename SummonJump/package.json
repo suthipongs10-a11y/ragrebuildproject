@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run content && tsc --noEmit && vite build && tsx tools/publish-docs.ts",
+    "build": "npm run content && npm run levels && tsc --noEmit && vite build && tsx tools/publish-docs.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
     "test": "vitest run",
     "e2e": "playwright test",
     "content": "tsx tools/content-build.ts",
+    "levels": "tsx tools/levels/build-levels.ts",
     "art:import": "tsx tools/art-import/index.ts"
   },
   "dependencies": {

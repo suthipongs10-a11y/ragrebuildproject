@@ -10,24 +10,28 @@ const KEYMAP: Record<string, InputKey> = {
 export class Controls {
   readonly state: Record<InputKey, boolean> = { left: false, right: false, up: false, down: false, jump: false, atk: false, sk1: false, sk2: false, sk3: false, ult: false, menu: false };
   private prev: Record<InputKey, boolean> = { ...this.state };
+  /** presses that started and ended between two frames still count as one press */
+  private latched = new Set<InputKey>();
 
   constructor() {
     // ↑ / W also jump (most players expect it); Phase 1 gives "interact" priority when standing at an object
-    addEventListener('keydown', (e) => { const k = KEYMAP[e.code]; if (k) { this.state[k] = true; if (k === 'up') this.state.jump = true; e.preventDefault(); } });
+    addEventListener('keydown', (e) => { const k = KEYMAP[e.code]; if (k) { this.press(k); if (k === 'up') this.press('jump'); e.preventDefault(); } });
     addEventListener('keyup', (e) => { const k = KEYMAP[e.code]; if (k) { this.state[k] = false; if (k === 'up') this.state.jump = false; } });
     addEventListener('blur', () => { for (const k of Object.keys(this.state) as InputKey[]) this.state[k] = false; });
     this.bindButtons();
     this.bindJoystick();
   }
 
-  pressed(k: InputKey): boolean { return this.state[k] && !this.prev[k]; }
+  private press(k: InputKey): void { if (!this.state[k]) this.latched.add(k); this.state[k] = true; }
+
+  pressed(k: InputKey): boolean { return this.latched.has(k) || (this.state[k] && !this.prev[k]); }
   /** Call once at the end of every game step. */
-  endFrame(): void { this.prev = { ...this.state }; }
+  endFrame(): void { this.prev = { ...this.state }; this.latched.clear(); }
 
   private bindButtons(): void {
     document.querySelectorAll<HTMLButtonElement>('.pb[data-k]').forEach((b) => {
       const k = b.dataset.k as InputKey;
-      const on = (e: PointerEvent) => { e.preventDefault(); this.state[k] = true; b.classList.add('held'); try { b.setPointerCapture(e.pointerId); } catch { /* ignore */ } };
+      const on = (e: PointerEvent) => { e.preventDefault(); this.press(k); b.classList.add('held'); try { b.setPointerCapture(e.pointerId); } catch { /* ignore */ } };
       const off = () => { this.state[k] = false; b.classList.remove('held'); };
       b.addEventListener('pointerdown', on);
       for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) b.addEventListener(ev, off);
@@ -44,6 +48,7 @@ export class Controls {
       dx *= s; dy *= s;
       knob.style.transform = `translate(${dx}px,${dy}px)`;
       const nx = dx / r, ny = dy / r;
+      if (ny < -0.65) this.press('up'); if (ny > 0.65) this.press('down');
       this.state.left = nx < -0.3; this.state.right = nx > 0.3; this.state.up = ny < -0.65; this.state.down = ny > 0.65;
     };
     joy.addEventListener('pointerdown', (e) => {

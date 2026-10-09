@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
-import { queueKeys, queueZone } from '../assets/packs';
+import { queueKeys, queueZone, type ZoneId } from '../assets/packs';
+import { parseLdtk, type LdtkProject, type LevelData } from '@shared/platformer';
+import { loadSave } from '../save/local';
 import { t } from '../i18n';
 import type { ContentBundle } from '@shared/content/types';
 
@@ -16,13 +18,21 @@ export class BootScene extends Phaser.Scene {
     this.load.on('complete', () => label.destroy());
 
     this.load.json('content', 'content/content.json');
-    queueZone(this, 'forest');
-    queueKeys(this, ['hero_design']);
+    this.load.json('world', 'levels/world.ldtk');
+    queueKeys(this, ['hero_design', 'icon_sign', 'icon_altar', 'icon_anvil', 'icon_chest', 'icon_fountain', 'icon_crystal', 'icon_e_wind', 'icon_e_water', 'icon_e_fire',
+      ...['poring', 'mantis', 'king', 'bird', 'harpy', 'fish', 'kraken', 'scorpion'].map((m) => `legacy_${m}`)]);
   }
 
   create(): void {
     const content = this.cache.json.get('content') as ContentBundle | undefined;
     this.registry.set('content', content);
-    this.scene.start('World', { zone: 'forest' });
+    const levels = parseLdtk(this.cache.json.get('world') as LdtkProject);
+    this.registry.set('levels', levels);
+    // start room: ?map=<id> (debug) > saved room > town. Load its zone pack first.
+    const wanted = new URLSearchParams(location.search).get('map') ?? loadSave().room;
+    const start = levels.get(wanted) ?? (levels.get('town') as LevelData);
+    this.registry.set('startRoom', start.id);
+    const go = () => this.scene.start('World', {});
+    if (queueZone(this, start.zone as ZoneId)) { this.load.once('complete', go); this.load.start(); } else go();
   }
 }
