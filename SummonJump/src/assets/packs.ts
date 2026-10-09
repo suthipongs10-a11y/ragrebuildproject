@@ -24,3 +24,20 @@ export function queueZone(scene: Phaser.Scene, zone: ZoneId): boolean {
 export function queueKeys(scene: Phaser.Scene, keys: string[]): void {
   for (const k of keys) if (!scene.textures.exists(k)) scene.load.image(k, art(k).url);
 }
+
+const SUMMONS: Record<string, string[]> = { king: ['poring'], kraken: ['fish'] };
+
+/** Texture keys of a monster: P02 pose set when imported, else the legacy sprite. */
+export function monsterKeys(id: string): string[] {
+  const keys = (['idle', 'windup', 'attack', 'hurt', 'idle2'] as const).map((p) => `mon_${id}_${p}`).filter((k) => ART[k]);
+  if (!keys.length) keys.push(ART[`boss_${id}_design`] ? `boss_${id}_design` : `legacy_${id}`);
+  return keys;
+}
+
+/** Queue every monster texture a room needs (its spawns + boss summons). Returns true if anything was queued. */
+export function queueMonsters(scene: Phaser.Scene, monsterIds: string[]): boolean {
+  let queued = false;
+  const all = new Set(monsterIds.flatMap((m) => [m, ...(SUMMONS[m] ?? [])]));
+  for (const m of all) for (const k of monsterKeys(m)) if (!scene.textures.exists(k)) { scene.load.image(k, art(k).url); queued = true; }
+  return queued;
+}

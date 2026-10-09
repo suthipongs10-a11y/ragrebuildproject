@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
-import { Cell, TILE, checkExit, createHero, exitsOf, stepHero, markDefeated, aliveSpawns, pruneDefeated, unstick, P,
+import { Cell, TILE, checkExit, createHero, exitsOf, stepHero, aliveSpawns, pruneDefeated, unstick, P,
   type EntityData, type HeroState, type LevelData, type MotionEnv, type MotionEvent, type TileGrid } from '@shared/platformer';
-import { moveSpeed, type HeroBuild } from '@shared/index';
-import type { ContentBundle, MonsterDef } from '@shared/content/types';
-import { queueKeys, queueZone, type ZoneId } from '../assets/packs';
+import { createRng, moveSpeed, type HeroBuild } from '@shared/index';
+import type { ContentBundle } from '@shared/content/types';
+import { queueMonsters, queueZone, type ZoneId } from '../assets/packs';
 import type { Controls } from '../input/Controls';
 import { t } from '../i18n';
 import { DialogBox } from '../ui/DialogBox';
@@ -11,6 +11,9 @@ import { loadSave, writeSave, type SaveData } from '../save/local';
 import { abilitiesFromUrl, type Ability } from '../world/abilities';
 import { buildLevelVisuals, type LevelVisuals } from '../world/LevelView';
 import { spawnEntityView, type Interactable } from '../world/EntityViews';
+import { CombatController } from '../combat/CombatController';
+import { HeroRig, type HeroClip } from '../rig/HeroRig';
+import { Hud } from '../ui/Hud';
 
 /** Where the hero appears when a room loads. */
 export type Place =
@@ -28,7 +31,10 @@ export class WorldScene extends Phaser.Scene {
   level!: LevelData;
   private grid!: TileGrid;
   private controls!: Controls;
-  private sprite!: Phaser.GameObjects.Image;
+  private rig!: HeroRig;
+  combat!: CombatController;
+  private bars!: Hud;
+  private deadT = 0;
   private view!: LevelVisuals;
   private dialog!: DialogBox;
   private hud!: Phaser.GameObjects.Text;
@@ -37,7 +43,6 @@ export class WorldScene extends Phaser.Scene {
   private toastUntil = 0;
   private busy = false;
   private interactables: Interactable[] = [];
-  private monsterViews: { id: string; def: MonsterDef | undefined; obj: Phaser.GameObjects.Image }[] = [];
   private pickups: { id: string; x: number; y: number; obj: Phaser.GameObjects.Image }[] = [];
   private abilities = new Set<Ability>();
   private save!: SaveData;
@@ -66,18 +71,23 @@ export class WorldScene extends Phaser.Scene {
     this.level = this.levels.get(roomId) ?? (this.levels.get('town') as LevelData);
     this.grid = this.level.grid.clone();
     for (const k of Object.keys(this.save.broken)) if (k === this.level.id) this.clearRocks(false);
-    this.busy = false; this.interactables = []; this.monsterViews = []; this.pickups = [];
+    this.busy = false; this.interactables = []; this.pickups = []; this.deadT = 0;
 
     const { width: vw, height: vh } = this.scale;
     this.cameras.main.setBounds(0, 0, this.grid.pxW, Math.max(vh, this.grid.pxH));
     this.view = buildLevelVisuals(this, this.level, this.grid, vw, vh, (id) => t(this.levels.get(id)?.name ?? id));
     for (const k of this.view.rocks.keys()) if (this.save.broken[this.level.id]) this.view.rocks.get(k)?.destroy();
+    const content = this.registry.get('content') as ContentBundle;
+    this.combat = new CombatController(this, this.level, this.grid, content, this.save, BUILD, createRng((Date.now() & 0xffffff) ^ 0x5eed), () => this.flush());
     this.spawnEntities();
+    // ?stress=30 — performance test: extra monsters spread across the room
+    const stress = Number(new URLSearchParams(location.search).get('stress') ?? 0);
+    for (let i = 0; i < Math.min(60, stress); i++) this.combat.spawn(`stress#${i}`, i % 3 ? 'poring' : 'mantis', 80 + ((i * 97) % (this.grid.pxW - 160)), (this.level.floorRow ?? 10) * TILE);
 
     this.hero = this.placeHero(data.place ?? { kind: 'default' });
-    this.sprite = this.add.image(0, 0, 'hero_design').setOrigin(0.5, 1).setDepth(10);
-    this.sprite.setScale(84 / this.sprite.height);
-    this.cameras.main.startFollow(this.sprite, true, 0.12, 0.12, 0, 60);
+    this.rig = new HeroRig(this, 10);
+    this.rig.update(0, this.hero.x + this.hero.w / 2, this.hero.y + this.hero.h, this.hero.dir);
+    this.cameras.main.startFollow(this.rig.root, true, 0.12, 0.12, 0, 60);
     this.cameras.main.setScroll(Math.max(0, this.hero.x - vw / 2), 0);
     this.cameras.main.fadeIn(180, 0, 0, 0);
 
@@ -86,6 +96,7 @@ export class WorldScene extends Phaser.Scene {
     this.toastText = this.add.text(vw / 2, 90, '', { ...f, fontSize: '26px', strokeThickness: 5 }).setOrigin(0.5).setScrollFactor(0).setDepth(100).setAlpha(0);
     this.prompt = this.add.text(0, 0, '▲', { ...f, fontSize: '26px', color: '#ffd88a' }).setOrigin(0.5, 1).setDepth(50).setVisible(false);
     this.dialog = new DialogBox(this);
+    this.bars = new Hud(this);
     this.showBanner(t(this.level.name));
 
     this.save.room = this.level.id; this.save.seen[this.level.id] = true; this.flush();
@@ -105,20 +116,10 @@ export class WorldScene extends Phaser.Scene {
 
   // ───────────────────────── room setup ─────────────────────────
   private spawnEntities(): void {
-    const content = this.registry.get('content') as ContentBundle | undefined;
-    const defs = new Map(content?.monsters.map((m) => [m.id, m]) ?? []);
     const now = Date.now();
     pruneDefeated(this.save.defeated, now);
     const monsters = this.level.entities.filter((e) => e.type === 'Monster');
-    for (const e of aliveSpawns(monsters, this.save.defeated, now)) {
-      const def = defs.get(String(e.fields.monster));
-      const flies = def?.ai === 'flyer' || def?.ai === 'swimmer';
-      const drawH = def?.draw_h ?? 44;
-      const obj = this.add.image(e.x, flies ? e.y - drawH : e.y, `legacy_${e.fields.monster}`).setOrigin(0.5, 1).setDepth(8).setFlipX(true);
-      obj.setScale((drawH * 2) / obj.height); // content draw_h is prototype scale
-      this.tweens.add({ targets: obj, y: obj.y - (flies ? 14 : 3), duration: flies ? 900 : 500, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-      this.monsterViews.push({ id: e.id, def, obj });
-    }
+    for (const e of aliveSpawns(monsters, this.save.defeated, now)) this.combat.spawn(e.id, String(e.fields.monster), e.x, e.y);
     for (const e of this.level.entities) {
       if (e.type === 'Item') {
         if (this.save.items[e.id]) continue;
@@ -176,7 +177,9 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.fadeOut(fadeMs, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       const go = () => this.scene.restart({ room: roomId, place });
-      if (queueZone(this, target.zone as ZoneId)) { this.load.once('complete', go); this.load.start(); } else go();
+      const z = queueZone(this, target.zone as ZoneId);
+      const m = queueMonsters(this, target.entities.filter((e) => e.type === 'Monster').map((e) => String(e.fields.monster)));
+      if (z || m) { this.load.once('complete', go); this.load.start(); } else go();
     });
   }
 
@@ -203,17 +206,28 @@ export class WorldScene extends Phaser.Scene {
       if (c.pressed('up')) { jumpPressed = false; this.hero.dir = rockSide as 1 | -1; this.swing(); }
     }
 
-    const dir = talking ? 0 : (((c.state.right ? 1 : 0) - (c.state.left ? 1 : 0)) as -1 | 0 | 1);
+    const dead = this.combat.combat.dead;
+    const frozen = this.combat.hitstop > 0;
+    const dir = talking || dead ? 0 : (((c.state.right ? 1 : 0) - (c.state.left ? 1 : 0)) as -1 | 0 | 1);
     const env: MotionEnv = { grid: this.grid, water: this.level.water, abilities: { double: this.abilities.has('double'), dive: this.abilities.has('dive') }, moveSpeed: moveSpeed(BUILD), exits: exitsOf(this.level) };
-    const events = stepHero(this.hero, { dir, jumpPressed, jumpHeld: !talking && c.state.jump, down: c.state.down }, env, dt);
-    this.onEvents(events);
+    if (!frozen) {
+      const events = stepHero(this.hero, { dir, jumpPressed: jumpPressed && !dead, jumpHeld: !talking && !dead && c.state.jump, down: c.state.down }, env, dt);
+      this.onEvents(events);
+    }
+    const atkOk = !talking && !dead;
+    const fight = this.combat.update(dt, this.hero, { attackPressed: atkOk && c.pressed('atk'), attackHeld: atkOk && c.state.atk, jumpHeld: c.state.jump }, this.time.now / 1000);
+    for (const ev of fight) {
+      if (ev.kind === 'swing') { this.rig.play(ev.spec.clip, true); this.swing(); }
+      if (ev.kind === 'hurt') this.rig.play('hurt', true);
+      if (ev.kind === 'died') { this.rig.play('death', true); this.deadT = 1.8; }
+    }
+    if (dead && this.deadT > 0) { this.deadT -= dt; if (this.deadT <= 0) this.respawnAfterDeath(); }
 
-    if (!talking && c.pressed('atk')) this.swing();
     if (dir && this.touchingRock(dir)) this.hint('rockTouch', t(this.abilities.has('break') ? 'rock.touch' : 'rock.needUrl'));
-    if (!talking) this.checkPipes();
+    if (!talking && !dead) this.checkPipes();
     this.collectPickups();
 
-    const ex = checkExit(this.hero, env);
+    const ex = dead ? null : checkExit(this.hero, env);
     if (ex === 'fall') this.fallRespawn();
     else if (ex) {
       const to = this.level.exitTo[ex];
@@ -221,11 +235,29 @@ export class WorldScene extends Phaser.Scene {
     }
 
     const h = this.hero;
-    this.sprite.setPosition(h.x + h.w / 2, h.y + h.h).setFlipX(h.dir < 0);
-    this.sprite.setAngle(h.onGround && Math.abs(h.vx) > 20 ? Math.sin(this.time.now / 60) * 3 : 0);
+    if (!dead) this.rig.play(this.pickClip());
+    this.rig.update(frozen ? 0 : dt, h.x + h.w / 2, h.y + h.h, h.dir);
+    this.rig.setAlpha(this.combat.combat.inv > 0 && !dead && Math.floor(this.time.now / 50) % 2 ? 0.35 : 1);
+    this.bars.update(this.combat.combat.hp, this.combat.maxHp, this.save.zeny, this.save.exp);
     this.hud.setText(`${t(this.level.name)} · ${Math.round(this.game.loop.actualFps)} fps\n${this.abilityLine()}`);
     if (this.toastUntil && this.time.now > this.toastUntil) { this.toastUntil = 0; this.tweens.add({ targets: this.toastText, alpha: 0, duration: 300 }); }
     c.endFrame();
+  }
+
+  /** Which rig clip fits the hero right now (attacks/hurt are started by combat events and run to completion). */
+  private pickClip(): HeroClip {
+    const h = this.hero, cur = this.rig.current, cb = this.combat.combat;
+    if (cur.startsWith('attack') && cb.atkT > 0) return cur;
+    if (cur === 'hurt' && cb.inv > 0.75) return cur;
+    if (!h.onGround && !this.level.water) return h.vy < 0 ? 'jump' : 'fall';
+    if (cb.atkCd > 0.08 && cb.chainT > 0) return 'guard';
+    return h.onGround && Math.abs(h.vx) > 30 ? 'run' : 'idle';
+  }
+
+  private respawnAfterDeath(): void {
+    this.combat.heal();
+    this.flush();
+    this.goHome(t('combat.dead'));
   }
 
   private onEvents(events: MotionEvent[]): void {
@@ -357,12 +389,7 @@ export class WorldScene extends Phaser.Scene {
     });
   }
 
-  /** Shift+K: defeat every monster in the room (tests the respawn rules before Phase 2 combat exists). */
-  debugKillAll(): void {
-    for (const m of this.monsterViews) {
-      markDefeated(this.save.defeated, m.id, m.def?.tier ?? 'normal', m.def?.respawn_sec ?? 0, Date.now());
-      m.obj.destroy();
-    }
-    this.monsterViews = []; this.flush();
-  }
+  /** Shift+K: defeat every monster in the room (tests respawn rules and drops). */
+  debugKillAll(): void { this.combat.killAll(); this.flush(); }
+
 }

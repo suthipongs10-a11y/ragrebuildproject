@@ -10,10 +10,15 @@ export interface SaveData {
   items: Record<string, true>;
   chests: Record<string, true>;
   seen: Record<string, true>;
+  hp: number | null;
+  exp: number;
+  zeny: number;
+  inv: Record<string, number>;
+  cards: Record<string, number>;
 }
 
 const KEY = 'summonjump-save-v1';
-export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {} });
+export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {}, hp: null, exp: 0, zeny: 0, inv: {}, cards: {} });
 
 export function loadSave(): SaveData {
   try {

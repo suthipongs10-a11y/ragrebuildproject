@@ -5,3 +5,6 @@ export * from './formulas/damage';
 export * from './formulas/refine';
 export * from './content/types';
 export * from './platformer';
+export * from './sim/enemy';
+export * from './sim/combat';
+export * from './rules/drops';

@@ -1,5 +1,10 @@
 # Changelog
 
+## Phase 2 (in progress) — 2026-10-09
+- Cut-out hero rig with JSON clips (idle/run/jump/fall/attack1-3/guard/hurt/death/cast).
+- Combat sim in `shared/sim` (enemy AI for every `ai` type + 3 boss scripts, 3-hit combo, stomp, i-frames, shots), drops in `shared/rules/drops.ts`.
+- RO damage numbers, crit starburst, slash/spark/ring VFX, hit-stop, shake, monster pose swap + dissolve, HP bar, death → respawn.
+
 ## Phase 1 (in progress) — 2026-10-09
 - Platforming core in `shared/platformer` (tile collision, sub-stepped, coyote/buffer/variable jump/double jump/swim/drop-through), LDtk loader + validator, respawn rules.
 - 8 prototype maps ported to `levels/world.ldtk` (`npm run levels`), room transitions, pipes, rock smash, signs/NPCs/chest, local save, scrolling camera.
