@@ -275,6 +275,138 @@
   "w": 126,
   "h": 160
  },
+ "ui_bar_fill_exp": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_bar_fill_exp.webp",
+  "w": 1024,
+  "h": 64
+ },
+ "ui_bar_fill_hp": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_bar_fill_hp.webp",
+  "w": 1024,
+  "h": 64
+ },
+ "ui_bar_fill_sp": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_bar_fill_sp.webp",
+  "w": 1024,
+  "h": 64
+ },
+ "ui_bar_fill_spirit": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_bar_fill_spirit.webp",
+  "w": 1024,
+  "h": 64
+ },
+ "ui_bar_frame": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_bar_frame.webp",
+  "w": 1024,
+  "h": 128
+ },
+ "ui_btn_danger": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_btn_danger.webp",
+  "w": 512,
+  "h": 160
+ },
+ "ui_btn_primary": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_btn_primary.webp",
+  "w": 512,
+  "h": 160
+ },
+ "ui_btn_round": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_btn_round.webp",
+  "w": 256,
+  "h": 250
+ },
+ "ui_btn_round_big": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_btn_round_big.webp",
+  "w": 256,
+  "h": 253
+ },
+ "ui_btn_round_jump": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_btn_round_jump.webp",
+  "w": 256,
+  "h": 255
+ },
+ "ui_btn_secondary": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_btn_secondary.webp",
+  "w": 512,
+  "h": 160
+ },
+ "ui_btn_spirit": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_btn_spirit.webp",
+  "w": 256,
+  "h": 253
+ },
+ "ui_btn_spirit_ready": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_btn_spirit_ready.webp",
+  "w": 256,
+  "h": 253
+ },
+ "ui_header_ribbon": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_header_ribbon.webp",
+  "w": 1024,
+  "h": 256
+ },
+ "ui_joystick_base": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_joystick_base.webp",
+  "w": 256,
+  "h": 251
+ },
+ "ui_joystick_knob": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_joystick_knob.webp",
+  "w": 254,
+  "h": 254
+ },
+ "ui_panel_main": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_panel_main.webp",
+  "w": 512,
+  "h": 512
+ },
+ "ui_panel_parchment": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_panel_parchment.webp",
+  "w": 512,
+  "h": 512
+ },
+ "ui_panel_small": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_panel_small.webp",
+  "w": 512,
+  "h": 256
+ },
+ "ui_slot_item": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_slot_item.webp",
+  "w": 254,
+  "h": 241
+ },
+ "ui_tab_off": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_tab_off.webp",
+  "w": 256,
+  "h": 67
+ },
+ "ui_tab_on": {
+  "pack": "P00_UI_Kit",
+  "url": "assets/P00_UI_Kit/ui_tab_on.webp",
+  "w": 256,
+  "h": 69
+ },
  "zone_abyss_far": {
   "pack": "P00_legacy",
   "url": "assets/P00_legacy/abyss_far.webp",
