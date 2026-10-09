@@ -1,4 +1,4 @@
-/** Big contextual button above the touch pad ("💬 คุย", "▼ ลงท่อ", "🔥 ทุบหิน"); hidden when there is nothing to do. */
+/** Contextual button (top-right) shown only next to an NPC/pipe/rock ("💬 คุย", "▼ ลงท่อ", "🔥 ทุบหิน"); hidden when there is nothing to do. */
 export class ActionButton {
   private readonly el = document.getElementById('b_act') as HTMLButtonElement | null;
   private label: string | null = null;
@@ -15,6 +15,8 @@ export class ActionButton {
     if (label) this.el.textContent = label;
     if (!label) this.queued = false;
   }
+
+  get visible(): boolean { return !!this.label; }
 
   /** True once per tap. */
   take(): boolean { const q = this.queued; this.queued = false; return q; }

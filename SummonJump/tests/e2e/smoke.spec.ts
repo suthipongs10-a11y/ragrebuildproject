@@ -156,6 +156,8 @@ test('phase 3: archer skill spends SP and the menu opens with M', async ({ page,
 test('phone: talk button appears next to an NPC and opens it', async ({ page, isMobile }) => {
   test.skip(!isMobile, 'phone only');
   const errors = await boot(page, '?map=town&hero=novice:10');
+  await world(page, (w) => { w.hero.x = 13 * 32; }); // between the altar and the priest: nothing close
+  await expect(page.locator('#b_act')).toBeHidden();
   await world(page, (w) => { w.hero.x = 15.5 * 32 + 4; });
   await expect(page.locator('#b_act')).toBeVisible();
   await page.locator('#b_act').dispatchEvent('pointerdown');

@@ -32,6 +32,9 @@ export type Place =
 
 
 /** Phase 1 world: LDtk rooms, platforming, transitions, gates, respawn rules. Combat arrives in Phase 2. */
+/** Objects that get the on-screen action button (phones). */
+const BUTTON_TYPES = new Set(['Npc', 'Anvil', 'Altar', 'SavePoint', 'Chest']);
+
 export class WorldScene extends Phaser.Scene {
   hero!: HeroState;
   level!: LevelData;
@@ -262,8 +265,12 @@ export class WorldScene extends Phaser.Scene {
     if (dir && this.room.touchingRock(dir)) this.hint('rockTouch', t(this.abilities.has('break') ? 'rock.touch' : 'rock.needUrl'));
     if (!talking && !dead) this.room.checkPipes();
     // contextual action button (phones): talk / read / pipe / smash
+    // only for NPCs/stations the hero stands right next to (signs & gate runes: tap them or ▲),
+    // with hysteresis so it doesn't flicker, never mid-air
+    const hb = this.hero, reach = this.actionBtn.visible ? 28 : 20;
+    const close = near && BUTTON_TYPES.has(near.e.type) && hb.onGround && Math.abs(hb.x + hb.w / 2 - near.e.x) < reach ? near : null;
     const action = talking || dead ? null
-      : near ? { label: near.label, run: near.use }
+      : close ? { label: close.label, run: close.use }
       : this.room.pipeAction
       ?? (rockSide ? { label: t('act.smash'), run: () => { this.hero.dir = rockSide as 1 | -1; this.room.swing(); } } : null);
     this.actionBtn.show(action?.label ?? null);

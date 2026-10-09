@@ -5,6 +5,7 @@
 - `shared/progression` (levels, stats, skills, equip, cards, refine), `shared/sim/skills` (bolt/aoe/dash/rain/zone/heal/buff, SP, cast, cooldowns), bows shoot arrows.
 - DOM menus with UI kit frame: Status, Skills, Equipment+bag, Cards, Job change, Refine (smith), Shop (merchant). Skill buttons S1–S3, HP/SP/EXP HUD, level-up pillar.
 - Art brief `ART_P03_Jobs.md` (76 images).
+- Phone action button (talk/shop/refine/pipe/smash) only when standing next to an NPC or station; sits top-right. Tap NPCs/signs directly.
 
 ## Phase 2 (in progress) — 2026-10-09
 - Cut-out hero rig with JSON clips (idle/run/jump/fall/attack1-3/guard/hurt/death/cast).

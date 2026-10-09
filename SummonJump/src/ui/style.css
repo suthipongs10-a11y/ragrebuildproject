@@ -43,9 +43,9 @@ html, body { height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100
 .pb.sk.empty { opacity: .45; }
 .home.menu { right: 64px; }
 
-/* contextual action button: centred low on the stage, big enough for a thumb */
-.act { position: absolute; left: 50%; bottom: 2%; transform: translateX(-50%); z-index: 6; min-height: 56px; min-width: 120px; padding: 0 22px;
-  border-radius: 28px; border: 2px solid #8a6a36; background: linear-gradient(#e8b85a, #b0802e); color: #2a1a00; font: 600 20px var(--f-ui);
+/* contextual action button: top-right under the menu buttons, out of the play view */
+.act { position: absolute; right: 8px; top: 64px; z-index: 6; min-height: 56px; min-width: 96px; padding: 0 16px;
+  border-radius: 28px; border: 2px solid #8a6a36; background: linear-gradient(#e8b85a, #b0802e); color: #2a1a00; font: 600 18px var(--f-ui);
   box-shadow: 0 4px 14px rgba(0,0,0,.45); touch-action: none; animation: actpop .18s ease-out; }
 .act[hidden] { display: none; }
-@keyframes actpop { from { transform: translateX(-50%) scale(.7); opacity: 0; } to { transform: translateX(-50%) scale(1); opacity: 1; } }
+@keyframes actpop { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
