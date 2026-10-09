@@ -15,9 +15,15 @@ export interface Enemy extends Body {
   state: EnemyState; t: number; timer: number; ph: number;
   ox: number; oy: number; stun: number; flash: number; jumps: number; air: number; shotT: number;
   dead: boolean; hitWall: boolean; pose: EnemyPose;
+  /** provoke: fraction of DEF removed, seconds left */
+  defDown: number; defDownT: number;
 }
 
-export interface Shot { x: number; y: number; vx: number; vy: number; r: number; color: number; dmg: number; life: number; hostile: boolean; ghost: boolean; el: string }
+export interface Shot {
+  x: number; y: number; vx: number; vy: number; r: number; color: number; dmg: number; life: number; hostile: boolean; ghost: boolean; el: string;
+  /** friendly shots (hero skills / arrows): damage multiplier base, magic flag, knockback, delay before it starts moving, visual kind */
+  base?: number; magic?: boolean; kb?: number; delay?: number; kind?: string; pierce?: boolean; hit?: string[];
+}
 
 export interface EnemyCtx {
   grid: TileGrid; rng: Rng;
@@ -43,7 +49,7 @@ export function createEnemy(id: string, def: MonsterDef, x: number, y: number, r
   return {
     id, def, hp: def.hp, dir: -1, x: ex, y: ey, w, h, vx: 0, vy: 0, onGround: false,
     state: fly && def.ai === 'boss' ? 'hover' : 'idle', t: 0, timer: rng.range(0.5, 1.5), ph: rng.next() * 6,
-    ox: ex, oy: ey, stun: 0, flash: 0, jumps: 0, air: 0, shotT: 1.5, dead: false, hitWall: false, pose: 'idle',
+    ox: ex, oy: ey, stun: 0, flash: 0, jumps: 0, air: 0, shotT: 1.5, dead: false, hitWall: false, pose: 'idle', defDown: 0, defDownT: 0,
   };
 }
 
@@ -67,6 +73,7 @@ export function stepEnemy(e: Enemy, ctx: EnemyCtx, dt: number): void {
   if (e.dead) return;
   const d = e.def, hx = ctx.hero.x + ctx.hero.w / 2, ex = e.x + e.w / 2, dx = hx - ex, dy = ctx.hero.y - e.y;
   e.ph += dt; e.t += dt;
+  if (e.defDownT > 0) { e.defDownT -= dt; if (e.defDownT <= 0) e.defDown = 0; }
   if (e.flash > 0) e.flash -= dt;
   if (e.stun > 0) {
     e.stun -= dt; e.pose = 'hurt';

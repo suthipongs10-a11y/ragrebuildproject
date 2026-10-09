@@ -10,3 +10,4 @@ export * from './sim/combat';
 export * from './rules/drops';
 export * from './progression/hero';
 export * from './formulas/expr';
+export * from './sim/skills';
