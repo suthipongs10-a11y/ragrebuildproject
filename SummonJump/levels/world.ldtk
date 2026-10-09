@@ -453,6 +453,13 @@
          "__value": "up",
          "defUid": 0,
          "realEditorValues": []
+        },
+        {
+         "__identifier": "note",
+         "__type": "String",
+         "__value": "hint.sky",
+         "defUid": 0,
+         "realEditorValues": []
         }
        ]
       },

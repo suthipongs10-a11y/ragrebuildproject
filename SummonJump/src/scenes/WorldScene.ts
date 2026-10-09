@@ -202,6 +202,7 @@ export class WorldScene extends Phaser.Scene {
     this.onEvents(events);
 
     if (!talking && c.pressed('atk')) this.swing();
+    if (dir && this.touchingRock(dir)) this.hint('rockTouch', t(this.abilities.has('break') ? 'rock.touch' : 'rock.need'));
     if (!talking) this.checkPipes();
     this.collectPickups();
 
@@ -286,6 +287,12 @@ export class WorldScene extends Phaser.Scene {
       this.clearRocks(true); this.save.broken[this.level.id] = true; this.flush(); this.cameras.main.shake(260, 0.008);
       this.toast(t('rock.broken'));
     } else this.hint('rock', t('rock.need'));
+  }
+
+  private touchingRock(dir: number): boolean {
+    const h = this.hero, tx = Math.floor((dir > 0 ? h.x + h.w + 2 : h.x - 2) / TILE);
+    for (let ty = Math.floor(h.y / TILE); ty <= Math.floor((h.y + h.h - 1) / TILE); ty++) if (this.grid.get(tx, ty) === Cell.Rock) return true;
+    return false;
   }
 
   private clearRocks(animate: boolean): void {

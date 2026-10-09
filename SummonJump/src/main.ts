@@ -11,6 +11,7 @@ const controls = new Controls();
 (document.getElementById('b_atk') as HTMLElement).textContent = t('ui.attack');
 (document.getElementById('b_jump') as HTMLElement).textContent = t('ui.jump');
 (document.getElementById('rotate') as HTMLElement).textContent = t('ui.rotate');
+(document.getElementById('keys') as HTMLElement).textContent = t('keys.desktop');
 
 const game = new Phaser.Game({
   type: Phaser.AUTO,

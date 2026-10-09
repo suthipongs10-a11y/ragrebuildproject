@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { Cell, TILE, type EntityData, type LevelData, type TileGrid } from '@shared/platformer';
 import type { ZoneId } from '../assets/packs';
 import { buildZoneBackdrop, drawPlatform } from './Parallax';
+import { t } from '../i18n';
 
 const SOLID_COLOR: Record<string, number> = { forest: 0x5a4630, deep: 0x3d3a2a, town: 0x7a6248, sky: 0xd9e4ee, abyss: 0x2f4a5a, desert: 0xb88f55 };
 
@@ -41,6 +42,7 @@ export function buildLevelVisuals(scene: Phaser.Scene, level: LevelData, grid: T
   }
   for (const e of level.entities) if (e.type === 'Pipe') drawPipe(scene, e, level, roomName(String(e.fields.target)));
   drawExitHints(scene, level, grid, roomName);
+  labelRocks(scene, rocks);
   if (level.water) scene.add.rectangle(0, 0, grid.pxW, grid.pxH, 0x2a8fbf, 0.28).setOrigin(0, 0).setDepth(12);
   return { rocks };
 }
@@ -72,8 +74,22 @@ function drawExitHints(scene: Phaser.Scene, level: LevelData, grid: TileGrid, ro
     const p = spot[dir];
     if (!p || !to) continue;
     const label = dir === 'right' ? `${roomName(to)} ${arrow[dir]}` : `${arrow[dir]} ${roomName(to)}`;
-    const tx = scene.add.text(p[0], p[1], label, { fontFamily: 'Itim', fontSize: '22px', color: '#fff6e2', stroke: '#2a1a0a', strokeThickness: 5 }).setOrigin(p[2], 0.5).setDepth(40).setAlpha(0.9);
+    const note = level.entities.find((e) => e.type === 'ExitHint' && e.fields.dir === dir)?.fields.note;
+    const full = note ? `${label}\n${t(String(note))}` : label;
+    const tx = scene.add.text(p[0], p[1], full, { fontFamily: 'Itim', fontSize: '22px', color: '#fff6e2', stroke: '#2a1a0a', strokeThickness: 5, align: 'center' }).setOrigin(p[2], 0.5).setDepth(40).setAlpha(0.9);
+    p[0] = Phaser.Math.Clamp(p[0], tx.width * p[2] + 8, grid.pxW - tx.width * (1 - p[2]) - 8); // keep the label on screen
+    tx.x = p[0];
     const dx = dir === 'left' ? -6 : dir === 'right' ? 6 : 0, dy = dir === 'up' ? -6 : dir === 'down' ? 6 : 0;
     scene.tweens.add({ targets: tx, x: p[0] + dx, y: p[1] + dy, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
   }
+}
+
+/** "smash me" label on a rock wall; stored with the rocks so it disappears when they break. */
+function labelRocks(scene: Phaser.Scene, rocks: Map<string, Phaser.GameObjects.GameObject>): void {
+  if (!rocks.size) return;
+  let minX = Infinity, maxY = -Infinity;
+  for (const k of rocks.keys()) { const [x, y] = k.split(',').map(Number) as [number, number]; minX = Math.min(minX, x); maxY = Math.max(maxY, y); }
+  const lbl = scene.add.text(minX * TILE - 8, maxY * TILE - 30, t('hint.rock'), { fontFamily: 'Itim', fontSize: '20px', color: '#ffd0a0', stroke: '#2a1a0a', strokeThickness: 5 })
+    .setOrigin(1, 0.5).setDepth(40);
+  rocks.set('label', lbl);
 }
