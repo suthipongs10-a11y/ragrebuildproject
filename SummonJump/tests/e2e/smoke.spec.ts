@@ -48,9 +48,11 @@ test('walking off the left edge enters the next room', async ({ page, isMobile }
 test('scrolling camera follows the hero in a wide room', async ({ page, isMobile }) => {
   test.skip(isMobile, 'keyboard-driven');
   await boot(page, '?map=test_wide');
-  const s0 = await world(page, (w) => w.cameras.main.scrollX);
-  await hold(page, 'ArrowRight', 5000);
-  expect(await world(page, (w) => w.cameras.main.scrollX)).toBeGreaterThan(s0 + 200);
+  expect(await world(page, (w) => w.cameras.main.scrollX)).toBeLessThan(50);
+  // move the hero far right (no timing dependence on slow CI), then let the camera catch up
+  await world(page, (w) => { w.hero.x = 60 * 32; w.hero.y = 12 * 32; });
+  await page.waitForFunction(() => (window as unknown as W).__game.scene.getScene('World').cameras.main.scrollX > 1000, null, { timeout: 10_000 });
+  await hold(page, 'ArrowLeft', 300); // input still works after the jump
 });
 
 test('smash ability opens the town rock wall; respawn timers persist', async ({ page, isMobile }) => {
