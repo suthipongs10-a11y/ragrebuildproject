@@ -1,5 +1,9 @@
 import Phaser from 'phaser';
-import { queueKeys, queueMonsters, queueZone, type ZoneId } from '../assets/packs';
+import { loadTextures, queueKeys, roomKeys } from '../assets/packs';
+import { showLoadProblem } from '../ui/errors';
+
+const BASE_KEYS = ['hero_design', 'icon_sign', 'icon_altar', 'icon_anvil', 'icon_chest', 'icon_fountain', 'icon_crystal', 'icon_e_wind', 'icon_e_water', 'icon_e_fire', 'icon_card', 'icon_potion_r', 'icon_potion_b',
+  ...['head', 'torso', 'uarm', 'farm', 'thigh', 'shin', 'scarf', 'sword'].map((p) => `hero_part_${p}`)];
 import { parseLdtk, type LdtkProject, type LevelData } from '@shared/platformer';
 import { loadSave } from '../save/local';
 import { t } from '../i18n';
@@ -19,8 +23,7 @@ export class BootScene extends Phaser.Scene {
 
     this.load.json('content', 'content/content.json');
     this.load.json('world', 'levels/world.ldtk');
-    queueKeys(this, ['hero_design', 'icon_sign', 'icon_altar', 'icon_anvil', 'icon_chest', 'icon_fountain', 'icon_crystal', 'icon_e_wind', 'icon_e_water', 'icon_e_fire',
-      'icon_card', ...['hero_part_head', 'hero_part_torso', 'hero_part_uarm', 'hero_part_farm', 'hero_part_thigh', 'hero_part_shin', 'hero_part_scarf', 'hero_part_sword']]);
+    queueKeys(this, BASE_KEYS);
   }
 
   create(): void {
@@ -32,9 +35,9 @@ export class BootScene extends Phaser.Scene {
     const wanted = new URLSearchParams(location.search).get('map') ?? loadSave().room;
     const start = levels.get(wanted) ?? (levels.get('town') as LevelData);
     this.registry.set('startRoom', start.id);
-    const go = () => this.scene.start('World', {});
-    const z = queueZone(this, start.zone as ZoneId);
-    const m = queueMonsters(this, start.entities.filter((e) => e.type === 'Monster').map((e) => String(e.fields.monster)));
-    if (z || m) { this.load.once('complete', go); this.load.start(); } else go();
+    loadTextures(this, [...BASE_KEYS, ...roomKeys(start)], (missing) => {
+      if (missing.length) showLoadProblem(missing);
+      else this.scene.start('World', {});
+    });
   }
 }

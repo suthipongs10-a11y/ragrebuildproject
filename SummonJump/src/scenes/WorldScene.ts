@@ -3,7 +3,8 @@ import { Cell, TILE, checkExit, createHero, exitsOf, stepHero, aliveSpawns, prun
   type EntityData, type HeroState, type LevelData, type MotionEnv, type MotionEvent, type TileGrid } from '@shared/platformer';
 import { createRng, moveSpeed } from '@shared/index';
 import type { ContentBundle } from '@shared/content/types';
-import { queueMonsters, queueZone, type ZoneId } from '../assets/packs';
+import { loadTextures, roomKeys } from '../assets/packs';
+import { setLoading, showLoadProblem } from '../ui/errors';
 import type { Controls } from '../input/Controls';
 import { t } from '../i18n';
 import { DialogBox } from '../ui/DialogBox';
@@ -56,13 +57,14 @@ export class WorldScene extends Phaser.Scene {
   save!: SaveData;
   private levels!: Map<string, LevelData>;
   private msgCooldown: Record<string, number> = {};
-  private initData: { room?: string; place?: Place } = {};
+  private initData: { room?: string; place?: Place; retried?: boolean } = {};
   private drownTicks = 0;
+  private ready = false;
   private carry = { vx: 0, vy: 0, dir: 1 as 1 | -1 };
 
   constructor() { super('World'); }
 
-  init(data: { room?: string; place?: Place }): void {
+  init(data: { room?: string; place?: Place; retried?: boolean }): void {
     this.save = (this.registry.get('save') as SaveData | undefined) ?? loadSave();
     this.registry.set('save', this.save);
     this.initData = data;
@@ -77,6 +79,14 @@ export class WorldScene extends Phaser.Scene {
 
     const roomId = data.room ?? (this.registry.get('startRoom') as string);
     this.level = this.levels.get(roomId) ?? (this.levels.get('town') as LevelData);
+    this.ready = false;
+    // safety net: if any texture of this room is missing (failed download), fetch it and come back
+    const need = roomKeys(this.level).filter((k) => !this.textures.exists(k));
+    if (need.length && !data.retried) {
+      setLoading(true);
+      loadTextures(this, need, (missing) => { setLoading(false); if (missing.length) showLoadProblem(missing); else this.scene.restart({ ...data, retried: true }); });
+      return;
+    }
     this.grid = this.level.grid.clone();
     for (const k of Object.keys(this.save.broken)) if (k === this.level.id) this.room.clearRocks(false);
     this.busy = false; this.interactables = []; this.pickups = []; this.deadT = 0;
@@ -122,6 +132,7 @@ export class WorldScene extends Phaser.Scene {
     const home = document.getElementById('b_home');
     if (home) home.onpointerup = (e) => { e.preventDefault(); this.goHome(); };
     this.drownTicks = 0;
+    this.ready = true;
   }
 
   /** 🏠 button / H key: back to the town save point (escape hatch while there is no death/HP yet). */
@@ -194,10 +205,12 @@ export class WorldScene extends Phaser.Scene {
     if (!target) { this.busy = false; return; }
     this.cameras.main.fadeOut(fadeMs, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      const go = () => this.scene.restart({ room: roomId, place });
-      const z = queueZone(this, target.zone as ZoneId);
-      const m = queueMonsters(this, target.entities.filter((e) => e.type === 'Monster').map((e) => String(e.fields.monster)));
-      if (z || m) { this.load.once('complete', go); this.load.start(); } else go();
+      setLoading(true);
+      loadTextures(this, roomKeys(target), (missing) => {
+        setLoading(false);
+        if (missing.length) showLoadProblem(missing);
+        else this.scene.restart({ room: roomId, place });
+      });
     });
   }
 
@@ -205,7 +218,7 @@ export class WorldScene extends Phaser.Scene {
   override update(_t: number, dtMs: number): void {
     const c = this.controls;
     const dt = dtMs / 1000;
-    if (this.busy) { c.endFrame(); return; }
+    if (this.busy || !this.ready) { c.endFrame(); return; }
 
     const talking = this.dialog.isOpen;
     if (talking && (c.pressed('jump') || c.pressed('atk') || c.pressed('up'))) this.dialog.next();

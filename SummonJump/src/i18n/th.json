@@ -280,5 +280,7 @@
   "el.wind": "ลม",
   "el.holy": "แสง",
   "el.dark": "มืด",
-  "refine.breakRisk": "พลาดแล้วแตก!"
+  "refine.breakRisk": "พลาดแล้วแตก!",
+  "ui.loadFail": "โหลดภาพไม่ครบ (สัญญาณเน็ตอาจไม่ดี)",
+  "ui.retry": "ลองใหม่"
 }

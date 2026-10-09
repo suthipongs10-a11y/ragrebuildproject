@@ -4,9 +4,11 @@ import { WorldScene } from './scenes/WorldScene';
 import { Controls } from './input/Controls';
 import { t } from './i18n';
 import { lockZoom } from './ui/noZoom';
+import { installErrorOverlay } from './ui/errors';
 import { Menu } from './ui/menu/Menu';
 
 lockZoom();
+installErrorOverlay();
 
 export const GAME_W = 960;
 export const GAME_H = 540;
@@ -36,3 +38,8 @@ document.getElementById('b_menu')?.addEventListener('pointerup', (e) => { e.prev
 
 // expose for smoke tests / debugging
 (window as unknown as { __game: Phaser.Game }).__game = game;
+
+// iOS can drop the WebGL context when the app goes to the background; textures do not survive that. Reload cleanly.
+game.events.once('ready', () => {
+  game.canvas?.addEventListener('webglcontextrestored', () => location.reload());
+});
