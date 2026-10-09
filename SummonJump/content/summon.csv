@@ -1,0 +1,5 @@
+id,item,name_key,elements,r1,r2,r3,r4,r5,pity_n,pity_star
+normal,scroll_normal,summon.normal,water|fire|earth|wind,0.6,0.3,0.1,0,0,0,0
+mystic,scroll_mystic,summon.mystic,water|fire|earth|wind,0,0,0.915,0.08,0.005,100,5
+element,scroll_element,summon.element,pick,0,0,0.915,0.08,0.005,100,5
+ld,scroll_ld,summon.ld,holy|dark,0,0,0,0.93,0.07,30,5

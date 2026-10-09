@@ -21,7 +21,8 @@ export interface Exits { left: boolean; right: boolean; up: boolean; down: boole
 export interface MotionEnv {
   grid: TileGrid;
   water: boolean;
-  abilities: { double: boolean; dive: boolean };
+  /** glide: holding jump while falling slows the fall (cloud spirits) */
+  abilities: { double: boolean; dive: boolean; glide?: boolean };
   /** prototype-scale speed (see shared moveSpeed); ×2 is applied here */
   moveSpeed: number;
   exits: Exits;
@@ -34,7 +35,7 @@ export const MAX_STEP = 1 / 120;
 const MAX_FRAME = 1 / 20;
 
 export const P = {
-  jump: 860, doubleJump: 820, cutJump: 340, gravity: 2800, maxFall: 860,
+  jump: 860, doubleJump: 820, cutJump: 340, gravity: 2800, maxFall: 860, glideFall: 150,
   waterJump: 460, waterGravity: 1800, waterFall: 340, diveGravity: 760, diveFall: 180, diveStroke: 420,
   accelGround: 14, accelAir: 8, frictionGround: 0.0005, frictionAir: 0.05,
   coyote: 0.09, buffer: 0.12, dropTime: 0.2, breath: 5, landSpeed: 600,
@@ -119,7 +120,8 @@ function substep(s: HeroState, inp: MotionInput, env: MotionEnv, dt: number, ev:
   if (!water && !inp.jumpHeld && s.vy < -P.cutJump) s.vy = -P.cutJump; // variable jump height
 
   const g = water ? (dive ? P.diveGravity : P.waterGravity) : P.gravity;
-  const maxFall = water ? (dive ? P.diveFall : P.waterFall) : P.maxFall;
+  const glide = !water && env.abilities.glide && inp.jumpHeld && s.vy > 0;
+  const maxFall = water ? (dive ? P.diveFall : P.waterFall) : glide ? P.glideFall : P.maxFall;
   s.vy = Math.min(maxFall, s.vy + g * dt);
 
   const wasAir = !s.onGround, vyBefore = s.vy, prevBottom = s.y + s.h;

@@ -1,6 +1,6 @@
 import type { Rng } from '../rng';
 import type { Element } from '../formulas/elements';
-import { rollDamage, type DamageKind } from '../formulas/damage';
+import { rollDamage, CRIT_MULTIPLIER, type DamageKind } from '../formulas/damage';
 import { attack, attackCooldown, critRate, defense, magicAttack, maxHp, type HeroBuild } from '../formulas/stats';
 import type { Body } from '../platformer/motion';
 import type { Enemy, Shot } from './enemy';
@@ -26,7 +26,7 @@ const CHAIN_WINDOW = 0.45;
 
 export type CombatEvent =
   | { kind: 'swing'; spec: AttackSpec; x: number; y: number; dir: number }
-  | { kind: 'hit'; enemy: Enemy; amount: number; dmg: DamageKind; x: number; y: number; hitstop: number; killed: boolean; stomp: boolean }
+  | { kind: 'hit'; enemy: Enemy; amount: number; dmg: DamageKind; x: number; y: number; hitstop: number; killed: boolean; stomp: boolean; spirit?: boolean }
   | { kind: 'hurt'; amount: number; x: number; y: number }
   | { kind: 'died' };
 
@@ -102,6 +102,7 @@ export function stepHeroCombat(
     if (s.hostile) { if (overlap(box, hero)) { hurtHero(c, hero, build, s.dmg, s.x, water, rng, ev, opts.noKnockback); s.life = 0; } continue; }
     for (const e of enemies) {
       if (e.dead || !overlap(box, e) || s.hit?.includes(e.id)) continue;
+      if (s.power !== undefined) { ev.push(spiritHit(e, s, rng)); if (s.pierce) (s.hit ??= []).push(e.id); else { s.life = 0; break; } continue; }
       const base = (s.magic ? magicAttack(build) : attack(build)) * (s.base ?? 1);
       ev.push(hitEnemy(e, base, s.el as Element, build, rng, s.kb ?? 0, 0.03, s.x - s.vx * 0.01, false, s.magic));
       if (s.pierce) (s.hit ??= []).push(e.id); else { s.life = 0; break; }
@@ -119,6 +120,19 @@ export function hitEnemy(e: Enemy, base: number, el: Element, build: HeroBuild, 
   const killed = e.hp <= 0;
   if (killed) e.dead = true;
   return { kind: 'hit', enemy: e, amount: r.amount, dmg: r.kind, x: e.x + e.w / 2, y: e.y + e.h * 0.3, hitstop: r.crit ? Math.max(hitstop, 0.07) : hitstop, killed, stomp };
+}
+
+/** A spirit's hit (auto skill shot, aoe or ultimate): flat base, the spirit's own crit, optional stun / DEF-down. */
+export function spiritHit(e: Enemy, s: Pick<Shot, 'power' | 'crit' | 'critDmg' | 'el' | 'stun' | 'defDown' | 'x'>, rng: Rng, hitstop = 0.02): CombatEvent {
+  const def = e.def.def * (1 - e.defDown);
+  const r = rollDamage({ base: s.power ?? 1, attackElement: s.el as Element, defendElement: e.def.element, defense: def, critRate: s.crit ?? 0, dex: 0 }, rng);
+  const amount = r.crit ? Math.round((r.amount * (1 + (s.critDmg ?? 60) / 100)) / CRIT_MULTIPLIER) : r.amount; // crit damage % from runes replaces the default x1.6
+  e.hp -= amount; e.flash = 0.14;
+  if (e.def.tier === 'normal' && s.stun) e.stun = Math.max(e.stun, s.stun);
+  if (s.defDown) { e.defDown = Math.max(e.defDown, s.defDown); e.defDownT = Math.max(e.defDownT, 6); }
+  const killed = e.hp <= 0;
+  if (killed) e.dead = true;
+  return { kind: 'hit', enemy: e, amount: Math.max(1, amount), dmg: r.kind, x: e.x + e.w / 2, y: e.y + e.h * 0.3, hitstop: r.crit ? 0.05 : hitstop, killed, stomp: false, spirit: true };
 }
 
 export function hurtHero(c: HeroCombat, hero: Body, build: HeroBuild, atk: number, srcX: number, water: boolean, rng: Rng, ev: CombatEvent[], noKnockback = false): void {

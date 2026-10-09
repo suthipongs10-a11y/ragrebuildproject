@@ -23,6 +23,8 @@ export interface Shot {
   x: number; y: number; vx: number; vy: number; r: number; color: number; dmg: number; life: number; hostile: boolean; ghost: boolean; el: string;
   /** friendly shots (hero skills / arrows): damage multiplier base, magic flag, knockback, delay before it starts moving, visual kind */
   base?: number; magic?: boolean; kb?: number; delay?: number; kind?: string; pierce?: boolean; hit?: string[];
+  /** spirit shots: flat damage base (spirit ATK x power), crit rate, on-hit stun seconds / DEF-down fraction */
+  power?: number; crit?: number; critDmg?: number; stun?: number; defDown?: number;
 }
 
 export interface EnemyCtx {

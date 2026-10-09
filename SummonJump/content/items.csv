@@ -37,3 +37,14 @@ shield_kite,item.shield_kite,offhand,shield,rare,swordsman,15,0,0,7,40,0,0,0,0,0
 potion_red,item.potion_red,consumable,,common,all,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,25,icon_potion_r,,"{""heal"":45,""sp"":0}"
 potion_orange,item.potion_orange,consumable,,common,all,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,60,icon_potion_r,,"{""heal"":105,""sp"":0}"
 potion_blue,item.potion_blue,consumable,,common,all,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,250,icon_potion_b,,"{""heal"":0,""sp"":40}"
+ess_water,item.ess_water,material,,common,all,1,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,120,ess_water,,
+ess_fire,item.ess_fire,material,,common,all,1,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,120,ess_fire,,
+ess_earth,item.ess_earth,material,,common,all,1,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,120,ess_earth,,
+ess_wind,item.ess_wind,material,,common,all,1,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,120,ess_wind,,
+ess_holy,item.ess_holy,material,,rare,all,1,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,400,ess_holy,,
+ess_dark,item.ess_dark,material,,rare,all,1,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,400,ess_dark,,
+ess_magic,item.ess_magic,material,,common,all,1,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,60,ess_magic,,
+scroll_normal,item.scroll_normal,scroll,,common,all,1,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,600,scroll_normal,,
+scroll_mystic,item.scroll_mystic,scroll,,rare,all,1,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,0,scroll_mystic,,
+scroll_element,item.scroll_element,scroll,,rare,all,1,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,0,scroll_element,,
+scroll_ld,item.scroll_ld,scroll,,legend,all,1,0,0,0,0,0,0,0,0,0,0,0,0,,0,false,0,scroll_ld,,

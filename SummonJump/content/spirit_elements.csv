@@ -1,0 +1,7 @@
+element,hp,atk,def,spd,essence,color
+water,1.08,1,1,1,ess_water,6ab8ff
+fire,1,1.08,1,1,ess_fire,ff7a3a
+earth,1,1,1.12,1,ess_earth,c9a14a
+wind,1,1,1,1.06,ess_wind,7ae8b0
+holy,1.05,1.05,1.05,1,ess_holy,fff2b0
+dark,1,1.1,1,1.03,ess_dark,b07aff

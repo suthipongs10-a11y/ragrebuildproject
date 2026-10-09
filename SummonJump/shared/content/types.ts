@@ -31,12 +31,30 @@ export interface JobDef {
 
 export interface CardDef { id: string; name_key: string; slot_type: string; effects: Record<string, unknown>; set_id: string | null; art: string }
 
+export type SpiritRole = 'attacker' | 'tank' | 'support' | 'healer';
+export type SpiritAbility = 'double' | 'dive' | 'break' | 'cloud' | 'reveal' | 'none';
+
+/** One spirit family (spirits.csv). Element variants come from `elements` (1-3★: 4 basic, 4-5★: + holy/dark). */
 export interface SpiritDef {
-  id: string; family: string; name_key: string; element: Element; base_star: number;
-  hp: number; atk: number; def: number; spd: number;
-  auto_skill: string; ult_skill: string; leader_skill: string; ability: string;
-  awaken_to: string | null; art_small: string; art_big: string;
+  id: string; name_key: string; element: Element; elements: Element[]; base_star: number; role: SpiritRole;
+  hp: number; atk: number; def: number; spd: number; crit: number;
+  auto: string; awk_auto: string; ult: string; leader: string; ability: SpiritAbility;
+  awk_ess: number; awk_magic: number;
+  art_small: string; art_big: string; art_awk_small: string; art_awk_big: string;
 }
+
+/** spirit_skills.csv — auto (skill 1), ult (skill 3), leader. power = x spirit ATK per hit. */
+export interface SpiritSkillDef {
+  id: string; name_key: string; type: 'auto' | 'ult' | 'leader'; cd: number; target: 'bolt' | 'aoe' | 'all' | 'none';
+  hits: number; power: number; effects: Record<string, number>; vfx: string;
+}
+export interface SpiritElementDef { element: Element; hp: number; atk: number; def: number; spd: number; essence: string; color: number }
+export interface RuneSetDef { id: string; name_key: string; pieces: number; bonus: Record<string, number> }
+export interface RuneStatDef { stat: string; name_key: string; flat: boolean; main_slots: number[]; main_lo: number; main_hi: number; sub_lo: number; sub_hi: number }
+export interface RuneUpgradeDef { lv: number; rate: number; zeny: number }
+export interface RuneDropDef { tier: string; chance: number; star_lo: number; star_hi: number; rarity: number[] }
+/** summon.csv: rates[i] = chance of (i+1)★; elements 'pick' = player chooses. */
+export interface SummonDef { id: string; item: string; name_key: string; elements: string[]; rates: number[]; pity_n: number; pity_star: number }
 
 export interface SkillDef {
   id: string; owner: string; name_key: string; type: 'active' | 'passive' | 'ult' | 'leader';
@@ -54,4 +72,12 @@ export interface ContentBundle {
   spirits: SpiritDef[];
   skills: SkillDef[];
   jobs: JobDef[];
+  spiritSkills: SpiritSkillDef[];
+  spiritElements: SpiritElementDef[];
+  spiritConfig: Record<string, string>;
+  summon: SummonDef[];
+  runeSets: RuneSetDef[];
+  runeStats: RuneStatDef[];
+  runeUpgrade: RuneUpgradeDef[];
+  runeDrop: RuneDropDef[];
 }

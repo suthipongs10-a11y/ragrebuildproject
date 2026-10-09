@@ -1,0 +1,9 @@
+id,name_key,pieces,bonus
+energy,rune.set.energy,2,"{""hp_p"":15}"
+guard,rune.set.guard,2,"{""def_p"":15}"
+blade,rune.set.blade,2,"{""crit"":12}"
+focus,rune.set.focus,2,"{""gauge"":20}"
+fatal,rune.set.fatal,4,"{""atk_p"":35}"
+swift,rune.set.swift,4,"{""spd"":25}"
+rage,rune.set.rage,4,"{""crit_dmg"":40}"
+vampire,rune.set.vampire,4,"{""lifesteal"":10}"

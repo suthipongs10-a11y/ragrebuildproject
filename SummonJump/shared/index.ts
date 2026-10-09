@@ -11,3 +11,8 @@ export * from './rules/drops';
 export * from './progression/hero';
 export * from './formulas/expr';
 export * from './sim/skills';
+export * from './spirits/model';
+export * from './spirits/box';
+export * from './spirits/runes';
+export * from './rules/summon';
+export * from './sim/spirits';

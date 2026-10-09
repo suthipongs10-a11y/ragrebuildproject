@@ -1,0 +1,10 @@
+stat,name_key,flat,main_slots,main_lo,main_hi,sub_lo,sub_hi
+atk,rstat.atk,true,1,3,18,2,5
+def,rstat.def,true,3,3,18,2,5
+hp,rstat.hp,true,5,40,220,30,60
+atk_p,rstat.atk_p,false,2|4|6,4,63,4,8
+def_p,rstat.def_p,false,2|4|6,4,63,4,8
+hp_p,rstat.hp_p,false,2|4|6,4,63,4,8
+spd,rstat.spd,false,2,3,42,2,6
+crit,rstat.crit,false,4,3,58,3,6
+crit_dmg,rstat.crit_dmg,false,4,4,80,4,7

@@ -1,5 +1,5 @@
 import type { ContentBundle, ItemDef, JobDef, JobId, SkillDef } from '../content/types';
-import { expToNext, jobExpToNext, statCost, statPointsForLevelUp, MAX_BASE_LEVEL, MAX_STAT, STAT_KEYS, type HeroBuild, type StatKey, type Stats } from '../formulas/stats';
+import { attack, defense, expToNext, jobExpToNext, maxHp, statCost, statPointsForLevelUp, MAX_BASE_LEVEL, MAX_STAT, STAT_KEYS, type HeroBuild, type StatKey, type Stats } from '../formulas/stats';
 import { refineAttackBonus } from '../formulas/refine';
 import { fx } from '../formulas/expr';
 import type { Element } from '../formulas/elements';
@@ -141,6 +141,21 @@ export function addItem(h: HeroData, c: ContentBundle, id: string, count = 1): I
   return it;
 }
 
+/** Stack count of an item in the bag (0 if none). */
+export const countItem = (h: HeroData, id: string): number => h.bag.filter((x) => x.id === id).reduce((n, x) => n + x.count, 0);
+
+/** Take `n` of a stackable item from the bag; false (and nothing removed) if there are not enough. */
+export function removeItem(h: HeroData, id: string, n: number): boolean {
+  if (countItem(h, id) < n) return false;
+  for (const it of [...h.bag]) {
+    if (it.id !== id || n <= 0) continue;
+    const take = Math.min(n, it.count);
+    it.count -= take; n -= take;
+    if (it.count <= 0) h.bag.splice(h.bag.indexOf(it), 1);
+  }
+  return true;
+}
+
 export const instance = (h: HeroData, uid: number | undefined): ItemInstance | undefined => (uid === undefined ? undefined : h.bag.find((x) => x.uid === uid));
 export const isEquipped = (h: HeroData, uid: number): boolean => Object.values(h.equip).includes(uid);
 
@@ -207,8 +222,11 @@ export interface Derived { build: HeroBuild; element: Element; hpRegen: number; 
 
 const add = (o: Record<string, number>, k: string, v: number) => { o[k] = (o[k] ?? 0) + v; };
 
-/** Everything that changes numbers: base stats + job + equipment (+refine) + cards + passives + active buffs. */
-export function derive(h: HeroData, c: ContentBundle, buffs: Buff[] = [], now = 0): Derived {
+/** Spirit team leader: element for a weapon without one + leader skill bonuses (atk_p/def_p/hp_p in %). */
+export interface TeamBonus { element: Element | null; effects: Record<string, number> }
+
+/** Everything that changes numbers: base stats + job + equipment (+refine) + cards + passives + active buffs + spirit leader. */
+export function derive(h: HeroData, c: ContentBundle, buffs: Buff[] = [], now = 0, team?: TeamBonus): Derived {
   const bonus: Record<string, number> = {};
   let weaponAtk = 0, weaponMatk = 0, element: Element = 'neutral', weaponType = '';
   for (const slot of EQUIP_SLOTS) {
@@ -226,6 +244,8 @@ export function derive(h: HeroData, c: ContentBundle, buffs: Buff[] = [], now = 
     if (s?.type === 'passive' && lv > 0) for (const [k, v] of Object.entries(s.effects)) add(bonus, k, fx(v, lv));
   }
   for (const b of buffs) if (b.until > now) for (const [k, v] of Object.entries(b.effects)) add(bonus, k, v);
+  for (const [k, v] of Object.entries(team?.effects ?? {})) add(bonus, k, v);
+  if (element === 'neutral' && team?.element) element = team.element;
   const stats = { ...h.stats };
   for (const k of STAT_KEYS) stats[k] += bonus[k] ?? 0;
   const job = jobOf(c, h.job);
@@ -234,6 +254,10 @@ export function derive(h: HeroData, c: ContentBundle, buffs: Buff[] = [], now = 
     hpFactor: job.hp_factor, spFactor: job.sp_factor, aspdFactor: job.aspd_factor, weaponMatk, bonusMatk: bonus.matk ?? 0, bonusSp: bonus.sp ?? 0,
     bonusAspd: bonus.aspd ?? 0, bonusSpeed: bonus.speed ?? 0,
   };
+  // percent bonuses (spirit leader skills) on top of everything else
+  if (bonus.atk_p) build.bonusAtk += Math.round((attack(build) * bonus.atk_p) / 100);
+  if (bonus.def_p) build.bonusDef += Math.round((defense(build) * bonus.def_p) / 100);
+  if (bonus.hp_p) build.bonusHp += Math.round((maxHp(build) * bonus.hp_p) / 100);
   return {
     build, element, hpRegen: bonus.hp_regen ?? 0, spRegen: bonus.sp_regen ?? 0, range: 300 + (bonus.range ?? 0),
     ranged: weaponType === 'bow', magic: weaponType === 'staff', noKnockback: (bonus.no_knockback ?? 0) > 0, shield: bonus.absorb ?? 0,
