@@ -1,5 +1,14 @@
 # Changelog
 
+## Phase 4 (in progress) — 2026-10-09
+- 15 spirit families × element variants (`spirits.csv`, `spirit_skills.csv`, `spirit_elements.csv`, `spirit_config.csv`).
+- `shared/spirits`: stats by star/level/awakening/element, EXP, star-up with fodder, awakening with essences, runes (6 slots, 8 sets, +15 upgrade), team + leader skill + exploration abilities.
+- `shared/rules/summon.ts`: 4 scroll types with rates + pity (100k-roll test).
+- World: team follows the hero and auto-casts, gauge → ✦ ultimate cinematic (+COMBO), spirits share kill EXP, monsters drop runes / essences / scrolls.
+- Menus: ภูต (team, detail, runes, star-up, awaken) and อัญเชิญ (altar) with a reveal animation.
+- Abilities now come from the spirit team (debug `?abil=` still works); cloud glide and hidden treasure (reveal).
+- Art brief `ART_P04_Spirits.md` (79 images).
+
 ## Phase 3 (in progress) — 2026-10-09
 - Jobs (Novice → Swordsman/Mage/Archer/Acolyte), 34 skills, job weapons, hats/capes/shoes/shields, potions (content CSV).
 - `shared/progression` (levels, stats, skills, equip, cards, refine), `shared/sim/skills` (bolt/aoe/dash/rain/zone/heal/buff, SP, cast, cooldowns), bows shoot arrows.

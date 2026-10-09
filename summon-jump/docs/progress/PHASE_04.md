@@ -20,19 +20,27 @@ Placeholders until the zips arrive: the 5 old small spirits (`P00_legacy`), tint
 
 ## Checklist
 - [x] Art brief written (`ART_P04_Spirits.md`)
-- [ ] Content: `spirits.csv` (15 families), `spirit_elements.csv`, spirit skills (auto / awakened auto / ult / leader) in `skills.csv`, runes tables, `summon.csv`, essences + scrolls in `items.csv`, drops; content-build validation
-- [ ] `shared/spirits`: collection, stats, level/EXP, star-up, awaken, runes (roll, equip, upgrade, set bonuses), team + leader + abilities
-- [ ] `shared/rules/summon.ts`: scroll rates, pity; **100k-roll test**
-- [ ] Save: spirit box (spirits, runes, team, pity, gauge) + migration (starter team for old saves)
-- [ ] World: followers, auto skill, abilities from the team (replaces the debug `?abil=`), leader element/buff on the hero
-- [ ] Spirit gauge + ✦ button + ultimate cinematic for every family + COMBO
-- [ ] Menus: Spirits (list, detail, team, star-up, awaken, runes), Summon (altar) with summon animation
-- [ ] Tests: unit (stats, star-up, awaken, runes, team, summon 100k) + e2e (summon, team ability opens a gate, ultimate)
+- [x] Content: `spirits.csv` (15 families), `spirit_elements.csv`, spirit skills (auto / awakened auto / ult / leader) in `skills.csv`, runes tables, `summon.csv`, essences + scrolls in `items.csv`, drops; content-build validation
+- [x] `shared/spirits`: collection, stats, level/EXP, star-up, awaken, runes (roll, equip, upgrade, set bonuses), team + leader + abilities
+- [x] `shared/rules/summon.ts`: scroll rates, pity; **100k-roll test**
+- [x] Save: spirit box (spirits, runes, team, pity, gauge) + migration (starter team for old saves)
+- [x] World: followers, auto skill, abilities from the team (replaces the debug `?abil=`), leader element/buff on the hero
+- [x] Spirit gauge + ✦ button + ultimate cinematic for every family + COMBO
+- [x] Menus: Spirits (list, detail, team, star-up, awaken, runes), Summon (altar) with summon animation
+- [x] Tests: unit (stats, star-up, awaken, runes, team, summon 100k) + e2e (summon, team ability opens a gate, ultimate)
 
 ## Exit gate
-- [ ] Collect / upgrade / awaken loop works offline
-- [ ] Ultimate cinematic for every family
-- [ ] Summon rates verified by a 100k-roll test
+- [ ] Collect / upgrade / awaken loop works offline — **owner to test on the phone**
+- [ ] Ultimate cinematic for every family — every family has one (6 effect styles: slam, vortex, wave, rain, pillar, burst); big art comes with the P04 zips — **owner to check**
+- [x] Summon rates verified by a 100k-roll test (`tests/spirits.test.ts`: every scroll within ±0.5 %, pity never exceeded)
+
+## How to test (phone)
+- Normal save: the starter team (Sylph / Undine / Salamander) follows you and shoots monsters; ☰ → ภูต to see the team, ✨ อัญเชิญ for the altar (10 normal + 3 mystic scrolls).
+- Fight until ✦ is full (it glows) → tap ✦ for the ultimate. Use a skill right before = COMBO.
+- `?hero=mage:30` (test slot): one of every family, 30 mystic + other scrolls, essences for awakening, 18 runes.
 
 ## Known issues / notes
 - Element variants are a hue shift of one painting per family (cheap, consistent). If a variant looks wrong we can order that one painting separately later.
+- New families show a coloured orb until `ART_P04_Spirits` arrives; big forms use the small picture until then.
+- Hidden treasure (👁️ reveal: Pixie / Sage Owl): forest (mystic scroll) and sky 1 (light-dark scroll).
+- Cloud glide (☁️ Cloud Sheep / Unicorn): hold jump while falling. No level needs it yet (Phase 5 content).
