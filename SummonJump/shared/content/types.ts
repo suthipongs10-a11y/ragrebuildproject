@@ -16,9 +16,17 @@ export interface DropDef { monster_id: string; item_id: string; rate: number; mi
 
 export interface ItemDef {
   id: string; name_key: string; type: string; subtype: string; tier: string; job_mask: string[];
-  level_req: number; atk: number; def: number; hp: number;
+  level_req: number; atk: number; matk: number; def: number; hp: number; sp: number;
   str: number; agi: number; vit: number; int: number; dex: number; luk: number; crit: number;
   element: Element | null; slots: number; refineable: boolean; price: number; icon: string; rig_parts: string | null;
+  /** consumables: {"heal":45,"sp":0} */
+  use: Record<string, number> | null;
+}
+
+export type JobId = 'novice' | 'swordsman' | 'mage' | 'archer' | 'acolyte';
+export interface JobDef {
+  id: JobId; name_key: string; tier: number; from_job: JobId | null; job_lv_req: number; job_max: number;
+  hp_factor: number; sp_factor: number; aspd_factor: number; weapons: string[]; starter_weapon: string; parts_set: string; skills: string[];
 }
 
 export interface CardDef { id: string; name_key: string; slot_type: string; effects: Record<string, unknown>; set_id: string | null; art: string }
@@ -45,4 +53,5 @@ export interface ContentBundle {
   cards: CardDef[];
   spirits: SpiritDef[];
   skills: SkillDef[];
+  jobs: JobDef[];
 }

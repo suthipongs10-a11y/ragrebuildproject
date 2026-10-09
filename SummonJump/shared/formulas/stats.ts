@@ -10,16 +10,21 @@ export interface HeroBuild {
   bonusDef: number;
   bonusHp: number;
   bonusCrit: number;
+  /** job multipliers (Phase 3); default 1 */
+  hpFactor?: number; spFactor?: number; aspdFactor?: number;
+  weaponMatk?: number; bonusMatk?: number; bonusSp?: number;
+  /** fractions: 0.1 = 10 % faster */
+  bonusAspd?: number; bonusSpeed?: number;
 }
 
 export const STAT_KEYS: readonly StatKey[] = ['str', 'agi', 'vit', 'int', 'dex', 'luk'];
 
 export function maxHp(b: HeroBuild): number {
-  return Math.round(90 + b.stats.vit * 10 + b.level * 10 + b.bonusHp);
+  return Math.round(90 + b.stats.vit * 10 + b.level * 10 * (b.hpFactor ?? 1) + b.bonusHp);
 }
 
 export function maxSp(b: HeroBuild): number {
-  return 20 + b.stats.int * 4 + b.level * 2;
+  return Math.round(20 + b.stats.int * 4 + b.level * 2 * (b.spFactor ?? 1) + (b.bonusSp ?? 0));
 }
 
 export function attack(b: HeroBuild): number {
@@ -37,11 +42,11 @@ export function critRate(b: HeroBuild): number {
 
 /** Seconds between normal attacks. */
 export function attackCooldown(b: HeroBuild): number {
-  return 0.34 * (1 - Math.min(0.4, b.stats.agi * 0.012));
+  return (0.34 * (1 - Math.min(0.4, b.stats.agi * 0.012)) * (1 - Math.min(0.3, b.bonusAspd ?? 0))) / (b.aspdFactor ?? 1);
 }
 
 export function moveSpeed(b: HeroBuild): number {
-  return 112 + Math.min(40, b.stats.agi * 0.8);
+  return (112 + Math.min(40, b.stats.agi * 0.8)) * (1 + (b.bonusSpeed ?? 0));
 }
 
 /** Base exp needed to go from `level` to `level + 1`. */
@@ -52,3 +57,21 @@ export function expToNext(level: number): number {
 export function statPointsForLevelUp(newLevel: number): number {
   return newLevel < 20 ? 3 : newLevel < 50 ? 4 : 5;
 }
+
+/** Magic attack (mage bolts, holy light). */
+export function magicAttack(b: HeroBuild): number {
+  return Math.round((b.weaponMatk ?? 0) + b.stats.int * 2 + Math.floor(b.stats.int / 5) ** 2 + (b.bonusMatk ?? 0) + b.level);
+}
+
+/** Job exp needed for the next job level (novice levels faster). */
+export function jobExpToNext(jobLevel: number, tier: number): number {
+  return Math.floor((tier === 0 ? 12 : 22) * Math.pow(jobLevel, 1.45));
+}
+
+/** RO-style cost to raise a stat from `value` to `value + 1`. */
+export function statCost(value: number): number {
+  return Math.floor((value - 1) / 10) + 2;
+}
+
+export const MAX_BASE_LEVEL = 99;
+export const MAX_STAT = 99;

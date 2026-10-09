@@ -8,3 +8,5 @@ export * from './platformer';
 export * from './sim/enemy';
 export * from './sim/combat';
 export * from './rules/drops';
+export * from './progression/hero';
+export * from './formulas/expr';

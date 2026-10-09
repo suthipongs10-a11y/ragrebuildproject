@@ -6,7 +6,8 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import Papa from 'papaparse';
 import { isElement } from '../shared/formulas/elements';
-import type { ContentBundle, MonsterDef, DropDef, ItemDef, CardDef, SpiritDef, SkillDef } from '../shared/content/types';
+import type { ContentBundle, MonsterDef, DropDef, ItemDef, CardDef, SpiritDef, SkillDef, JobDef } from '../shared/content/types';
+import { evalExpr } from '../shared/formulas/expr';
 
 const ROOT = join(import.meta.dirname, '..');
 const SRC = join(ROOT, 'content');
@@ -63,10 +64,10 @@ const drops: DropDef[] = read('drops').map((r) => ({
 const items: ItemDef[] = read('items').map((r) => ({
   id: r.id ?? '', name_key: r.name_key ?? '', type: r.type ?? '', subtype: r.subtype ?? '', tier: r.tier ?? 'common',
   job_mask: (r.job_mask ?? 'all').split('|'), level_req: num(r, 'level_req', 'item'),
-  atk: num(r, 'atk', 'item'), def: num(r, 'def', 'item'), hp: num(r, 'hp', 'item'),
+  atk: num(r, 'atk', 'item'), matk: num(r, 'matk', 'item'), def: num(r, 'def', 'item'), hp: num(r, 'hp', 'item'), sp: num(r, 'sp', 'item'),
   str: num(r, 'str', 'item'), agi: num(r, 'agi', 'item'), vit: num(r, 'vit', 'item'), int: num(r, 'int', 'item'), dex: num(r, 'dex', 'item'), luk: num(r, 'luk', 'item'), crit: num(r, 'crit', 'item'),
   element: el(r, 'element', 'item'), slots: num(r, 'slots', 'item'), refineable: bool(r, 'refineable'), price: num(r, 'price', 'item'),
-  icon: r.icon ?? '', rig_parts: r.rig_parts || null,
+  icon: r.icon ?? '', rig_parts: r.rig_parts || null, use: r.use ? (json(r, 'use', 'item') as Record<string, number>) : null,
 }));
 const cards: CardDef[] = read('cards').map((r) => ({
   id: r.id ?? '', name_key: r.name_key ?? '', slot_type: r.slot_type ?? 'any', effects: json(r, 'effects', 'card'), set_id: r.set_id || null, art: r.art ?? '',
@@ -84,7 +85,14 @@ const skills: SkillDef[] = read('skills').map((r) => ({
   icon: r.icon ?? '', vfx: r.vfx || null,
 }));
 
-uniqueIds(monsters, 'monsters'); uniqueIds(items, 'items'); uniqueIds(cards, 'cards'); uniqueIds(spirits, 'spirits'); uniqueIds(skills, 'skills');
+const jobs: JobDef[] = read('jobs').map((r) => ({
+  id: (r.id ?? '') as JobDef['id'], name_key: r.name_key ?? '', tier: num(r, 'tier', 'job'), from_job: (r.from_job || null) as JobDef['from_job'],
+  job_lv_req: num(r, 'job_lv_req', 'job'), job_max: num(r, 'job_max', 'job'), hp_factor: num(r, 'hp_factor', 'job'), sp_factor: num(r, 'sp_factor', 'job'),
+  aspd_factor: num(r, 'aspd_factor', 'job'), weapons: (r.weapons ?? '').split('|').filter(Boolean), starter_weapon: r.starter_weapon ?? '',
+  parts_set: r.parts_set ?? '', skills: (r.skills ?? '').split('|').filter(Boolean),
+}));
+
+uniqueIds(monsters, 'monsters'); uniqueIds(jobs, 'jobs'); uniqueIds(items, 'items'); uniqueIds(cards, 'cards'); uniqueIds(spirits, 'spirits'); uniqueIds(skills, 'skills');
 const itemIds = new Set(items.map((i) => i.id)), cardIds = new Set(cards.map((c) => c.id)), monIds = new Set(monsters.map((m) => m.id));
 for (const m of monsters) {
   if (m.card_id && !cardIds.has(m.card_id)) err(`monster ${m.id}: unknown card_id ${m.card_id}`);
@@ -97,13 +105,25 @@ for (const d of drops) {
   if (d.rate < 0 || d.rate > 1) err(`drop ${d.monster_id}/${d.item_id}: rate out of range`);
 }
 const skillIds = new Set(skills.map((s) => s.id));
-for (const s of skills) for (const req of Object.keys(s.requires)) if (!skillIds.has(req)) err(`skill ${s.id}: requires unknown skill ${req}`);
+const jobIds = new Set(jobs.map((j) => j.id));
+const formula = (f: unknown, where: string) => { if (typeof f !== 'string') return; try { evalExpr(f, { lv: 1, int: 1, dex: 1 }); } catch (e) { err(`${where}: ${(e as Error).message}`); } };
+for (const s of skills) {
+  for (const req of Object.keys(s.requires)) if (!skillIds.has(req)) err(`skill ${s.id}: requires unknown skill ${req}`);
+  if (!jobIds.has(s.owner as JobDef['id'])) err(`skill ${s.id}: unknown owner job ${s.owner}`);
+  formula(s.sp, `skill ${s.id} sp`); formula(s.power, `skill ${s.id} power`);
+  for (const [k, v] of Object.entries(s.effects)) if (k !== 'buff' && k !== 'debuff') formula(v, `skill ${s.id} effect ${k}`);
+}
+for (const j of jobs) {
+  if (j.from_job && !jobIds.has(j.from_job)) err(`job ${j.id}: unknown from_job ${j.from_job}`);
+  if (!itemIds.has(j.starter_weapon)) err(`job ${j.id}: unknown starter weapon ${j.starter_weapon}`);
+  for (const s of j.skills) { const d = skills.find((x) => x.id === s); if (!d) err(`job ${j.id}: unknown skill ${s}`); else if (d.owner !== j.id) err(`job ${j.id}: skill ${s} belongs to ${d.owner}`); }
+}
 
 if (errors.length) {
   console.error(`content: ${errors.length} error(s)\n - ${errors.join('\n - ')}`);
   process.exit(1);
 }
-const bundle: ContentBundle = { contentVersion: new Date().toISOString().slice(0, 10), monsters, drops, items, cards, spirits, skills };
+const bundle: ContentBundle = { contentVersion: new Date().toISOString().slice(0, 10), monsters, drops, items, cards, spirits, skills, jobs };
 mkdirSync(OUT, { recursive: true });
 writeFileSync(join(OUT, 'content.json'), JSON.stringify(bundle));
-console.log(`content: ok — ${monsters.length} monsters, ${items.length} items, ${cards.length} cards, ${spirits.length} spirits, ${skills.length} skills, ${drops.length} drops`);
+console.log(`content: ok — ${monsters.length} monsters, ${items.length} items, ${cards.length} cards, ${spirits.length} spirits, ${skills.length} skills, ${jobs.length} jobs, ${drops.length} drops`);
