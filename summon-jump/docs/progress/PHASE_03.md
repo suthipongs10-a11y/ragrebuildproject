@@ -36,6 +36,9 @@ Also still open: `ART_P03_Gear_Cards_VFX.md` (swords, armor, cards, base VFX). P
 - Weapon art (staff/bow/mace) and skill icons/VFX use placeholders until `ART_P03_Jobs` + `ART_P03_Gear_Cards_VFX` arrive.
 - Balance pass: EXP curve retuned to our monsters (`expToNext = 12·lv^1.35`, Novice job 10 ≈ 25 kills). Lv 30 needs ~14k EXP — later zones (Phase 5) supply higher-EXP monsters; for now `?hero=job:lv` makes test heroes.
 
+## Owner test round 1
+- Phone (4G): deep forest showed Phaser's green "missing texture" boxes and some `?hero=` links didn't open. Not reproducible on desktop Chromium (also with slow-network emulation). Likely failed image downloads on mobile data. Fixes: every room's textures load with retries (`loadTextures`), a room that still misses textures fetches them before it starts, a clear "โหลดภาพไม่ครบ / ลองใหม่" screen instead of broken art, on-screen error box for script errors, reload after iOS WebGL context loss. Test heroes now each have their own save slot (`?hero=` value).
+
 ## How to test
 - New game: start as Novice Lv 1 (Skill S1 = First Aid). Farm to Job Lv 10, learn Basic Skill 9 in ☰ > สกิล, talk to the priest (นักบวช) in town → choose a job.
 - Test heroes (separate save slot, never overwrite the real one): `?hero=swordsman:30`, `?hero=mage:30`, `?hero=archer:30`, `?hero=acolyte:30` (add `&map=forest` etc.).
