@@ -12,8 +12,9 @@ export class Controls {
   private prev: Record<InputKey, boolean> = { ...this.state };
 
   constructor() {
-    addEventListener('keydown', (e) => { const k = KEYMAP[e.code]; if (k) { this.state[k] = true; e.preventDefault(); } });
-    addEventListener('keyup', (e) => { const k = KEYMAP[e.code]; if (k) this.state[k] = false; });
+    // ↑ / W also jump (most players expect it); Phase 1 gives "interact" priority when standing at an object
+    addEventListener('keydown', (e) => { const k = KEYMAP[e.code]; if (k) { this.state[k] = true; if (k === 'up') this.state.jump = true; e.preventDefault(); } });
+    addEventListener('keyup', (e) => { const k = KEYMAP[e.code]; if (k) { this.state[k] = false; if (k === 'up') this.state.jump = false; } });
     addEventListener('blur', () => { for (const k of Object.keys(this.state) as InputKey[]) this.state[k] = false; });
     this.bindButtons();
     this.bindJoystick();
