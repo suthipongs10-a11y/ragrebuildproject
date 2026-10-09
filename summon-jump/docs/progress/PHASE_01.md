@@ -43,5 +43,9 @@ Play link: https://suthipongs10-a11y.github.io/ragrebuildproject/summon-jump/
 - Desktop keys: 7/8/9 toggle double/dive/break; Shift+K = defeat all monsters in the room (respawn test).
 - On phone: ▲ = push joystick up near a sign/NPC/chest/pipe; ▼ = push down on a pipe top; down + jump button on a wooden platform = drop through.
 
+## Owner test round 1 (fixed)
+- Hero could double-jump over the town rock wall into the desert, then got stuck inside the wall when coming back → wall now reaches the ceiling + `unstick()` on every room entry.
+- No visible way back from the abyss → exit arrows with room names at every exit, labels on pipes, ▲/▼ prompt at pipes, sign in the abyss, 🏠 button (and H key) returns to town; drowning without the water ability sends you back to town.
+
 ## Tests
 - 33 unit tests (motion feel, one-way, tunnelling at 20 fps, LDtk loader, level validation, walk-through every room, ability gates, respawn) + 5 e2e (boot, room change, scrolling camera, rock smash, respawn timer).
