@@ -20,15 +20,19 @@ test('boots into the town and the hero moves', async ({ page, isMobile }) => {
   const errors = await boot(page);
   expect(await world(page, (w) => w.level.id)).toBe('town');
   const x0 = await world(page, (w) => w.hero.x);
+  const moved = () => page.waitForFunction((x) => (window as unknown as W).__game.scene.getScene('World').hero.x > x + 50, x0, { timeout: 10_000 });
   if (isMobile) {
     const box = (await page.locator('#joy').boundingBox())!;
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
     await page.mouse.move(box.x + box.width - 4, box.y + box.height / 2, { steps: 4 });
-    await page.waitForTimeout(800);
+    await moved();
     await page.mouse.up();
-  } else await hold(page, 'ArrowRight', 800);
-  expect(await world(page, (w) => w.hero.x)).toBeGreaterThan(x0 + 50);
+  } else {
+    await page.keyboard.down('ArrowRight');
+    await moved();
+    await page.keyboard.up('ArrowRight');
+  }
   await page.screenshot({ path: `test-results/smoke-${isMobile ? 'phone' : 'desktop'}.png` });
   expect(errors).toEqual([]);
 });
@@ -74,8 +78,9 @@ test('entering town from the desert never leaves the hero inside the rock wall',
   test.skip(isMobile, 'keyboard-driven');
   await boot(page, '?map=desert');
   await world(page, (w) => { w.hero.x = 1; w.hero.y = 9 * 32; });
-  await hold(page, 'ArrowLeft', 400);
+  await page.keyboard.down('ArrowLeft');
   await page.waitForFunction(() => (window as unknown as W).__game.scene.getScene('World').level.id === 'town', null, { timeout: 10_000 });
+  await page.keyboard.up('ArrowLeft');
   await page.waitForTimeout(400);
   const x = await world(page, (w) => w.hero.x + 24);
   expect(x).toBeLessThanOrEqual(28 * 32 + 0.5);
