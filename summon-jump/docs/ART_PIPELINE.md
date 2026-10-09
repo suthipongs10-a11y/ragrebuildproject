@@ -26,7 +26,7 @@
 - Monsters: `mon_<id>_idle.png`, `mon_<id>_windup.png`, `mon_<id>_attack.png`, `mon_<id>_hurt.png`
 - Bosses (rigged): `boss_<id>_parts.png` + `boss_<id>_design.png`
 - Hero/job parts: `job_<job>_parts.png`, `job_<job>_design.png`, armor: `arm_<set>_<part>.png`
-- Spirits: `spr_<family>_<element>_small.png`, `..._big.png`, `..._awk_small.png`, `..._awk_big.png`
+- Spirits: `spr_<family>_small.png`, `..._big.png`, `..._awk_small.png`, `..._awk_big.png` — one painting per family; element variants are made in the game by hue shift
 - Items: `wpn_`, `arm_`, `acc_`, `hat_`, `cape_`, `shoe_`, `card_<monster>.png`
 - Skills: `skill_<id>.png`; VFX: `vfx_<id>.png`; UI: `ui_<id>.png`
 - Zones: `zone_<zone>_<map>_{far,mid,near,ground,plat}.png`
