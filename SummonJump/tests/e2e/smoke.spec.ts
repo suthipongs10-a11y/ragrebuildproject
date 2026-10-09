@@ -69,3 +69,21 @@ test('smash ability opens the town rock wall; respawn timers persist', async ({ 
   const keys = await world(page, (w) => Object.keys(w.save.defeated));
   expect(keys.length).toBe(1); // only the mini-boss (king) is timed; normal monsters are never persisted
 });
+
+test('entering town from the desert never leaves the hero inside the rock wall', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'keyboard-driven');
+  await boot(page, '?map=desert');
+  await world(page, (w) => { w.hero.x = 1; w.hero.y = 9 * 32; });
+  await hold(page, 'ArrowLeft', 400);
+  await page.waitForFunction(() => (window as unknown as W).__game.scene.getScene('World').level.id === 'town', null, { timeout: 10_000 });
+  await page.waitForTimeout(400);
+  const x = await world(page, (w) => w.hero.x + 24);
+  expect(x).toBeLessThanOrEqual(28 * 32 + 0.5);
+});
+
+test('home button returns to town', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'covered on desktop');
+  await boot(page, '?map=abyss1');
+  await page.locator('#b_home').click();
+  await page.waitForFunction(() => (window as unknown as W).__game.scene.getScene('World').level.id === 'town', null, { timeout: 10_000 });
+});

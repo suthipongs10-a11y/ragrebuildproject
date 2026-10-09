@@ -16,7 +16,7 @@ let uid = 100;
 const nextUid = () => uid++;
 const iid = (n: string) => `${n}-${(uid++).toString(16).padStart(8, '0')}`;
 
-const ENTITY_DEFS = ['Sign', 'Monster', 'Item', 'SavePoint', 'Anvil', 'Altar', 'Chest', 'Pipe', 'Gate', 'Npc'].map((identifier) => ({ identifier, uid: nextUid(), width: GRID, height: GRID, color: '#E8B04A', pivotX: 0.5, pivotY: 1 }));
+const ENTITY_DEFS = ['Sign', 'Monster', 'Item', 'SavePoint', 'Anvil', 'Altar', 'Chest', 'Pipe', 'Gate', 'Npc', 'ExitHint'].map((identifier) => ({ identifier, uid: nextUid(), width: GRID, height: GRID, color: '#E8B04A', pivotX: 0.5, pivotY: 1 }));
 const defUid = (id: string) => ENTITY_DEFS.find((d) => d.identifier === id)?.uid ?? 0;
 const COLLISION_UID = nextUid(), ENTITIES_UID = nextUid();
 const LEVEL_FIELDS = ['zone', 'name', 'exitLeft', 'exitRight', 'exitUp', 'exitDown'].map((identifier) => ({ identifier, __type: 'String', uid: nextUid() }))

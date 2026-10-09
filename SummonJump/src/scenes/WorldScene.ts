@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { Cell, TILE, checkExit, createHero, exitsOf, stepHero, markDefeated, aliveSpawns, pruneDefeated, P,
+import { Cell, TILE, checkExit, createHero, exitsOf, stepHero, markDefeated, aliveSpawns, pruneDefeated, unstick, P,
   type EntityData, type HeroState, type LevelData, type MotionEnv, type MotionEvent, type TileGrid } from '@shared/platformer';
 import { moveSpeed, type HeroBuild } from '@shared/index';
 import type { ContentBundle, MonsterDef } from '@shared/content/types';
@@ -44,6 +44,7 @@ export class WorldScene extends Phaser.Scene {
   private levels!: Map<string, LevelData>;
   private msgCooldown: Record<string, number> = {};
   private initData: { room?: string; place?: Place } = {};
+  private drownTicks = 0;
   private carry = { vx: 0, vy: 0, dir: 1 as 1 | -1 };
 
   constructor() { super('World'); }
@@ -69,7 +70,7 @@ export class WorldScene extends Phaser.Scene {
 
     const { width: vw, height: vh } = this.scale;
     this.cameras.main.setBounds(0, 0, this.grid.pxW, Math.max(vh, this.grid.pxH));
-    this.view = buildLevelVisuals(this, this.level, this.grid, vw, vh);
+    this.view = buildLevelVisuals(this, this.level, this.grid, vw, vh, (id) => t(this.levels.get(id)?.name ?? id));
     for (const k of this.view.rocks.keys()) if (this.save.broken[this.level.id]) this.view.rocks.get(k)?.destroy();
     this.spawnEntities();
 
@@ -89,6 +90,17 @@ export class WorldScene extends Phaser.Scene {
 
     this.save.room = this.level.id; this.save.seen[this.level.id] = true; this.flush();
     this.bindDebugKeys();
+    const home = document.getElementById('b_home');
+    if (home) home.onclick = (e) => { e.preventDefault(); this.goHome(); };
+    this.drownTicks = 0;
+  }
+
+  /** 🏠 button / H key: back to the town save point (escape hatch while there is no death/HP yet). */
+  goHome(msg = t('home.go')): void {
+    if (this.busy) return;
+    this.toast(msg);
+    this.carry = { vx: 0, vy: 0, dir: 1 };
+    this.goRoom('town', { kind: 'default' }, 250);
   }
 
   // ───────────────────────── room setup ─────────────────────────
@@ -148,6 +160,8 @@ export class WorldScene extends Phaser.Scene {
         h.vx = h.vy = 0;
       }
     }
+    // never start inside a wall (e.g. entering town from the desert while the rock wall is still standing)
+    unstick(h, this.grid, place.kind === 'edge' && place.dir === 'right' ? 1 : -1);
     h.prevBottom = h.y + h.h;
     return h;
   }
@@ -176,7 +190,7 @@ export class WorldScene extends Phaser.Scene {
     if (talking && (c.pressed('jump') || c.pressed('atk') || c.pressed('up'))) this.dialog.next();
 
     const near = talking ? null : this.nearestInteractable();
-    this.prompt.setVisible(!!near);
+    this.prompt.setText('▲').setVisible(!!near);
     if (near) this.prompt.setPosition(near.e.x, near.e.y - near.height - 6 + Math.sin(this.time.now / 140) * 3);
 
     let jumpPressed = !talking && c.pressed('jump');
@@ -208,7 +222,10 @@ export class WorldScene extends Phaser.Scene {
 
   private onEvents(events: MotionEvent[]): void {
     for (const e of events) {
-      if (e === 'drown') this.hint('drown', t('drown.need'));
+      if (e === 'drown') {
+        this.hint('drown', t('drown.need'));
+        if (++this.drownTicks >= 4) this.goHome(t('drown.out'));
+      }
       if (e === 'doubleJump') this.puff(0x8ff0bf);
       if (e === 'land') this.puff(0xe8d6b0);
     }
@@ -243,10 +260,15 @@ export class WorldScene extends Phaser.Scene {
       if (e.type !== 'Pipe') continue;
       const inX = cx > e.x - e.w / 2 && cx < e.x + e.w / 2;
       const target = String(e.fields.target), tx = Number(e.fields.tx), ty = Number(e.fields.ty);
-      if (e.fields.dir === 'down' && inX && h.onGround && Math.abs(h.y + h.h - (e.y - e.h)) < 6 && c.pressed('down')) {
+      const onTop = e.fields.dir === 'down' && inX && h.onGround && Math.abs(h.y + h.h - (e.y - e.h)) < 6;
+      const under = e.fields.dir === 'up' && inX && h.y < e.y + 48;
+      if (onTop || (e.fields.dir === 'up' && inX && h.y < e.y + 200)) {
+        this.prompt.setText(onTop ? '▼' : '▲').setVisible(true).setPosition(e.x, (onTop ? e.y - e.h - 64 : e.y + 40) + Math.sin(this.time.now / 140) * 3);
+      }
+      if (onTop && c.pressed('down')) {
         this.toast(t('pipe.down')); this.goRoom(target, { kind: 'tile', x: tx, y: ty, fromAbove: true }, 300); return;
       }
-      if (e.fields.dir === 'up' && inX && h.y < e.y + 20 && c.pressed('up')) {
+      if (under && c.pressed('up')) {
         this.toast(t('pipe.up')); this.goRoom(target, { kind: 'tile', x: tx, y: ty, fromAbove: false }, 300); return;
       }
     }
@@ -312,6 +334,7 @@ export class WorldScene extends Phaser.Scene {
       const a = map[e.code];
       if (a) { if (this.abilities.has(a)) this.abilities.delete(a); else this.abilities.add(a); this.toast(`${a}: ${this.abilities.has(a) ? 'ON' : 'off'}`); }
       if (e.code === 'KeyK' && e.shiftKey) this.debugKillAll();
+      if (e.code === 'KeyH') this.goHome();
     });
   }
 

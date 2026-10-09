@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Cell, TILE, TileGrid, checkExit, createHero, stepHero, type MotionEnv, type MotionInput } from '@shared/platformer';
+import { Cell, TILE, TileGrid, checkExit, createHero, stepHero, overlapsSolid, unstick, type MotionEnv, type MotionInput } from '@shared/platformer';
 
 const idle: MotionInput = { dir: 0, jumpPressed: false, jumpHeld: false, down: false };
 const noExits = { left: false, right: false, up: false, down: false };
@@ -130,5 +130,14 @@ describe('hero motion', () => {
     expect(ev2).not.toContain('drown');
     const before = d.y; stepHero(d, { ...idle, jumpPressed: true, jumpHeld: true }, e2, 1 / 60);
     expect(d.vy).toBeLessThan(0); expect(d.y).toBeLessThanOrEqual(before + 1);
+  });
+
+  it('unstick moves a hero out of a wall it spawned in', () => {
+    const g = room((gg) => { for (let y = 0; y < 15; y++) { gg.set(28, y, Cell.Rock); gg.set(29, y, Cell.Rock); } });
+    const s = createHero(g.pxW - 25, 15 * TILE - 56);
+    expect(overlapsSolid(s, g)).toBe(true);
+    expect(unstick(s, g, -1)).toBe(true);
+    expect(overlapsSolid(s, g)).toBe(false);
+    expect(s.x + s.w).toBeLessThanOrEqual(28 * TILE);
   });
 });

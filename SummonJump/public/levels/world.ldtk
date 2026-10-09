@@ -11,7 +11,7 @@
  "iid": "summon-jump-world-00000001",
  "jsonVersion": "1.5.3",
  "appBuildId": 0,
- "nextUid": 1201,
+ "nextUid": 1204,
  "identifierStyle": "Capitalize",
  "toc": [],
  "worldLayout": "Free",
@@ -46,7 +46,7 @@
     "__type": "Entities",
     "identifier": "Entities",
     "type": "Entities",
-    "uid": 111,
+    "uid": 112,
     "gridSize": 32,
     "displayOpacity": 1,
     "intGridValues": [],
@@ -61,7 +61,7 @@
     "__type": "IntGrid",
     "identifier": "Collision",
     "type": "IntGrid",
-    "uid": 110,
+    "uid": 111,
     "gridSize": 32,
     "displayOpacity": 1,
     "autoRuleGroups": [],
@@ -192,6 +192,15 @@
     "color": "#E8B04A",
     "pivotX": 0.5,
     "pivotY": 1
+   },
+   {
+    "identifier": "ExitHint",
+    "uid": 110,
+    "width": 32,
+    "height": 32,
+    "color": "#E8B04A",
+    "pivotX": 0.5,
+    "pivotY": 1
    }
   ],
   "tilesets": [],
@@ -201,60 +210,60 @@
    {
     "identifier": "zone",
     "__type": "String",
-    "uid": 112
+    "uid": 113
    },
    {
     "identifier": "name",
     "__type": "String",
-    "uid": 113
+    "uid": 114
    },
    {
     "identifier": "exitLeft",
     "__type": "String",
-    "uid": 114
+    "uid": 115
    },
    {
     "identifier": "exitRight",
     "__type": "String",
-    "uid": 115
+    "uid": 116
    },
    {
     "identifier": "exitUp",
     "__type": "String",
-    "uid": 116
+    "uid": 117
    },
    {
     "identifier": "exitDown",
     "__type": "String",
-    "uid": 117
+    "uid": 118
    },
    {
     "identifier": "water",
     "__type": "Bool",
-    "uid": 118
+    "uid": 119
    },
    {
     "identifier": "test",
     "__type": "Bool",
-    "uid": 119
+    "uid": 120
    },
    {
     "identifier": "safeX",
     "__type": "Int",
-    "uid": 120
+    "uid": 121
    },
    {
     "identifier": "safeY",
     "__type": "Int",
-    "uid": 121
+    "uid": 122
    }
   ]
  },
  "levels": [
   {
    "identifier": "town",
-   "iid": "lvl-00000087",
-   "uid": 136,
+   "iid": "lvl-00000089",
+   "uid": 138,
    "worldX": 0,
    "worldY": 0,
    "worldDepth": 0,
@@ -269,7 +278,7 @@
      "__type": "String",
      "__value": "town",
      "__tile": null,
-     "defUid": 112,
+     "defUid": 113,
      "realEditorValues": []
     },
     {
@@ -277,7 +286,7 @@
      "__type": "String",
      "__value": "zone.town",
      "__tile": null,
-     "defUid": 113,
+     "defUid": 114,
      "realEditorValues": []
     },
     {
@@ -285,7 +294,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 118,
+     "defUid": 119,
      "realEditorValues": []
     },
     {
@@ -293,7 +302,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 119,
+     "defUid": 120,
      "realEditorValues": []
     },
     {
@@ -301,7 +310,7 @@
      "__type": "String",
      "__value": "forest",
      "__tile": null,
-     "defUid": 114,
+     "defUid": 115,
      "realEditorValues": []
     },
     {
@@ -309,7 +318,7 @@
      "__type": "String",
      "__value": "desert",
      "__tile": null,
-     "defUid": 115,
+     "defUid": 116,
      "realEditorValues": []
     },
     {
@@ -317,7 +326,7 @@
      "__type": "String",
      "__value": "sky1",
      "__tile": null,
-     "defUid": 116,
+     "defUid": 117,
      "realEditorValues": []
     },
     {
@@ -325,7 +334,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 117,
+     "defUid": 118,
      "realEditorValues": []
     },
     {
@@ -333,7 +342,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 120,
+     "defUid": 121,
      "realEditorValues": []
     },
     {
@@ -341,7 +350,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 121,
+     "defUid": 122,
      "realEditorValues": []
     }
    ],
@@ -357,9 +366,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-00000089",
+     "iid": "lay-0000008b",
      "levelId": 0,
-     "layerDefUid": 111,
+     "layerDefUid": 112,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -383,7 +392,7 @@
        "__tags": [],
        "__worldX": 48,
        "__worldY": 480,
-       "iid": "ent-0000007a",
+       "iid": "ent-0000007b",
        "width": 32,
        "height": 32,
        "defUid": 103,
@@ -406,7 +415,7 @@
        "__tags": [],
        "__worldX": 336,
        "__worldY": 480,
-       "iid": "ent-0000007b",
+       "iid": "ent-0000007c",
        "width": 32,
        "height": 32,
        "defUid": 104,
@@ -415,6 +424,37 @@
         480
        ],
        "fieldInstances": []
+      },
+      {
+       "__identifier": "ExitHint",
+       "__grid": [
+        5,
+        3
+       ],
+       "__pivot": [
+        0.5,
+        1
+       ],
+       "__tags": [],
+       "__worldX": 176,
+       "__worldY": 128,
+       "iid": "ent-0000007d",
+       "width": 32,
+       "height": 32,
+       "defUid": 110,
+       "px": [
+        176,
+        128
+       ],
+       "fieldInstances": [
+        {
+         "__identifier": "dir",
+         "__type": "String",
+         "__value": "up",
+         "defUid": 0,
+         "realEditorValues": []
+        }
+       ]
       },
       {
        "__identifier": "Altar",
@@ -429,7 +469,7 @@
        "__tags": [],
        "__worldX": 464,
        "__worldY": 480,
-       "iid": "ent-0000007c",
+       "iid": "ent-0000007e",
        "width": 32,
        "height": 32,
        "defUid": 105,
@@ -452,7 +492,7 @@
        "__tags": [],
        "__worldX": 176,
        "__worldY": 480,
-       "iid": "ent-0000007d",
+       "iid": "ent-0000007f",
        "width": 32,
        "height": 32,
        "defUid": 100,
@@ -483,7 +523,7 @@
        "__tags": [],
        "__worldX": 560,
        "__worldY": 480,
-       "iid": "ent-0000007e",
+       "iid": "ent-00000080",
        "width": 32,
        "height": 32,
        "defUid": 100,
@@ -514,7 +554,7 @@
        "__tags": [],
        "__worldX": 816,
        "__worldY": 480,
-       "iid": "ent-0000007f",
+       "iid": "ent-00000081",
        "width": 32,
        "height": 32,
        "defUid": 100,
@@ -545,7 +585,7 @@
        "__tags": [],
        "__worldX": 640,
        "__worldY": 416,
-       "iid": "ent-00000080",
+       "iid": "ent-00000082",
        "width": 64,
        "height": 32,
        "defUid": 107,
@@ -597,7 +637,7 @@
        "__tags": [],
        "__worldX": 176,
        "__worldY": 480,
-       "iid": "ent-00000081",
+       "iid": "ent-00000083",
        "width": 32,
        "height": 32,
        "defUid": 108,
@@ -635,7 +675,7 @@
        "__tags": [],
        "__worldX": 720,
        "__worldY": 480,
-       "iid": "ent-00000082",
+       "iid": "ent-00000084",
        "width": 32,
        "height": 32,
        "defUid": 108,
@@ -673,7 +713,7 @@
        "__tags": [],
        "__worldX": 384,
        "__worldY": 480,
-       "iid": "ent-00000083",
+       "iid": "ent-00000085",
        "width": 32,
        "height": 32,
        "defUid": 109,
@@ -704,7 +744,7 @@
        "__tags": [],
        "__worldX": 512,
        "__worldY": 480,
-       "iid": "ent-00000084",
+       "iid": "ent-00000086",
        "width": 32,
        "height": 32,
        "defUid": 109,
@@ -735,7 +775,7 @@
        "__tags": [],
        "__worldX": 752,
        "__worldY": 480,
-       "iid": "ent-00000085",
+       "iid": "ent-00000087",
        "width": 32,
        "height": 32,
        "defUid": 109,
@@ -766,7 +806,7 @@
        "__tags": [],
        "__worldX": 112,
        "__worldY": 480,
-       "iid": "ent-00000086",
+       "iid": "ent-00000088",
        "width": 32,
        "height": 32,
        "defUid": 109,
@@ -797,9 +837,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-0000008a",
+     "iid": "lay-0000008c",
      "levelId": 0,
-     "layerDefUid": 110,
+     "layerDefUid": 111,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -833,6 +873,8 @@
       0,
       0,
       0,
+      3,
+      3,
       0,
       0,
       0,
@@ -861,6 +903,8 @@
       0,
       0,
       0,
+      3,
+      3,
       0,
       0,
       0,
@@ -889,6 +933,8 @@
       0,
       0,
       0,
+      3,
+      3,
       0,
       0,
       0,
@@ -917,14 +963,8 @@
       0,
       0,
       0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
-      0,
+      3,
+      3,
       0,
       0,
       0,
@@ -1327,8 +1367,8 @@
   },
   {
    "identifier": "forest",
-   "iid": "lvl-00000092",
-   "uid": 147,
+   "iid": "lvl-00000094",
+   "uid": 149,
    "worldX": 3000,
    "worldY": 0,
    "worldDepth": 0,
@@ -1343,7 +1383,7 @@
      "__type": "String",
      "__value": "forest",
      "__tile": null,
-     "defUid": 112,
+     "defUid": 113,
      "realEditorValues": []
     },
     {
@@ -1351,7 +1391,7 @@
      "__type": "String",
      "__value": "zone.forest",
      "__tile": null,
-     "defUid": 113,
+     "defUid": 114,
      "realEditorValues": []
     },
     {
@@ -1359,7 +1399,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 118,
+     "defUid": 119,
      "realEditorValues": []
     },
     {
@@ -1367,7 +1407,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 119,
+     "defUid": 120,
      "realEditorValues": []
     },
     {
@@ -1375,7 +1415,7 @@
      "__type": "String",
      "__value": "deep",
      "__tile": null,
-     "defUid": 114,
+     "defUid": 115,
      "realEditorValues": []
     },
     {
@@ -1383,7 +1423,7 @@
      "__type": "String",
      "__value": "town",
      "__tile": null,
-     "defUid": 115,
+     "defUid": 116,
      "realEditorValues": []
     },
     {
@@ -1391,7 +1431,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 116,
+     "defUid": 117,
      "realEditorValues": []
     },
     {
@@ -1399,7 +1439,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 117,
+     "defUid": 118,
      "realEditorValues": []
     },
     {
@@ -1407,7 +1447,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 120,
+     "defUid": 121,
      "realEditorValues": []
     },
     {
@@ -1415,7 +1455,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 121,
+     "defUid": 122,
      "realEditorValues": []
     }
    ],
@@ -1431,9 +1471,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-00000094",
+     "iid": "lay-00000096",
      "levelId": 0,
-     "layerDefUid": 111,
+     "layerDefUid": 112,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -1457,7 +1497,7 @@
        "__tags": [],
        "__worldX": 80,
        "__worldY": 480,
-       "iid": "ent-0000008b",
+       "iid": "ent-0000008d",
        "width": 32,
        "height": 32,
        "defUid": 100,
@@ -1488,7 +1528,7 @@
        "__tags": [],
        "__worldX": 272,
        "__worldY": 480,
-       "iid": "ent-0000008c",
+       "iid": "ent-0000008e",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -1519,7 +1559,7 @@
        "__tags": [],
        "__worldX": 688,
        "__worldY": 480,
-       "iid": "ent-0000008d",
+       "iid": "ent-0000008f",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -1550,7 +1590,7 @@
        "__tags": [],
        "__worldX": 848,
        "__worldY": 480,
-       "iid": "ent-0000008e",
+       "iid": "ent-00000090",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -1581,7 +1621,7 @@
        "__tags": [],
        "__worldX": 432,
        "__worldY": 480,
-       "iid": "ent-0000008f",
+       "iid": "ent-00000091",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -1612,7 +1652,7 @@
        "__tags": [],
        "__worldX": 400,
        "__worldY": 288,
-       "iid": "ent-00000090",
+       "iid": "ent-00000092",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -1643,7 +1683,7 @@
        "__tags": [],
        "__worldX": 784,
        "__worldY": 384,
-       "iid": "ent-00000091",
+       "iid": "ent-00000093",
        "width": 32,
        "height": 32,
        "defUid": 102,
@@ -1674,9 +1714,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-00000095",
+     "iid": "lay-00000097",
      "levelId": 0,
-     "layerDefUid": 110,
+     "layerDefUid": 111,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -2204,8 +2244,8 @@
   },
   {
    "identifier": "deep",
-   "iid": "lvl-00000099",
-   "uid": 154,
+   "iid": "lvl-0000009b",
+   "uid": 156,
    "worldX": 6000,
    "worldY": 0,
    "worldDepth": 0,
@@ -2220,7 +2260,7 @@
      "__type": "String",
      "__value": "deep",
      "__tile": null,
-     "defUid": 112,
+     "defUid": 113,
      "realEditorValues": []
     },
     {
@@ -2228,7 +2268,7 @@
      "__type": "String",
      "__value": "zone.deep",
      "__tile": null,
-     "defUid": 113,
+     "defUid": 114,
      "realEditorValues": []
     },
     {
@@ -2236,7 +2276,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 118,
+     "defUid": 119,
      "realEditorValues": []
     },
     {
@@ -2244,7 +2284,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 119,
+     "defUid": 120,
      "realEditorValues": []
     },
     {
@@ -2252,7 +2292,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 114,
+     "defUid": 115,
      "realEditorValues": []
     },
     {
@@ -2260,7 +2300,7 @@
      "__type": "String",
      "__value": "forest",
      "__tile": null,
-     "defUid": 115,
+     "defUid": 116,
      "realEditorValues": []
     },
     {
@@ -2268,7 +2308,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 116,
+     "defUid": 117,
      "realEditorValues": []
     },
     {
@@ -2276,7 +2316,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 117,
+     "defUid": 118,
      "realEditorValues": []
     },
     {
@@ -2284,7 +2324,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 120,
+     "defUid": 121,
      "realEditorValues": []
     },
     {
@@ -2292,7 +2332,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 121,
+     "defUid": 122,
      "realEditorValues": []
     }
    ],
@@ -2308,9 +2348,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-0000009b",
+     "iid": "lay-0000009d",
      "levelId": 0,
-     "layerDefUid": 111,
+     "layerDefUid": 112,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -2334,7 +2374,7 @@
        "__tags": [],
        "__worldX": 464,
        "__worldY": 480,
-       "iid": "ent-00000096",
+       "iid": "ent-00000098",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -2365,7 +2405,7 @@
        "__tags": [],
        "__worldX": 784,
        "__worldY": 480,
-       "iid": "ent-00000097",
+       "iid": "ent-00000099",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -2396,7 +2436,7 @@
        "__tags": [],
        "__worldX": 272,
        "__worldY": 480,
-       "iid": "ent-00000098",
+       "iid": "ent-0000009a",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -2427,9 +2467,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-0000009c",
+     "iid": "lay-0000009e",
      "levelId": 0,
-     "layerDefUid": 110,
+     "layerDefUid": 111,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -2957,8 +2997,8 @@
   },
   {
    "identifier": "sky1",
-   "iid": "lvl-000000a1",
-   "uid": 162,
+   "iid": "lvl-000000a3",
+   "uid": 164,
    "worldX": 9000,
    "worldY": 0,
    "worldDepth": 0,
@@ -2973,7 +3013,7 @@
      "__type": "String",
      "__value": "sky",
      "__tile": null,
-     "defUid": 112,
+     "defUid": 113,
      "realEditorValues": []
     },
     {
@@ -2981,7 +3021,7 @@
      "__type": "String",
      "__value": "zone.sky",
      "__tile": null,
-     "defUid": 113,
+     "defUid": 114,
      "realEditorValues": []
     },
     {
@@ -2989,7 +3029,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 118,
+     "defUid": 119,
      "realEditorValues": []
     },
     {
@@ -2997,7 +3037,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 119,
+     "defUid": 120,
      "realEditorValues": []
     },
     {
@@ -3005,7 +3045,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 114,
+     "defUid": 115,
      "realEditorValues": []
     },
     {
@@ -3013,7 +3053,7 @@
      "__type": "String",
      "__value": "sky2",
      "__tile": null,
-     "defUid": 115,
+     "defUid": 116,
      "realEditorValues": []
     },
     {
@@ -3021,7 +3061,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 116,
+     "defUid": 117,
      "realEditorValues": []
     },
     {
@@ -3029,7 +3069,7 @@
      "__type": "String",
      "__value": "town",
      "__tile": null,
-     "defUid": 117,
+     "defUid": 118,
      "realEditorValues": []
     },
     {
@@ -3037,7 +3077,7 @@
      "__type": "Int",
      "__value": 2,
      "__tile": null,
-     "defUid": 120,
+     "defUid": 121,
      "realEditorValues": []
     },
     {
@@ -3045,7 +3085,7 @@
      "__type": "Int",
      "__value": 13,
      "__tile": null,
-     "defUid": 121,
+     "defUid": 122,
      "realEditorValues": []
     }
    ],
@@ -3061,9 +3101,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-000000a3",
+     "iid": "lay-000000a5",
      "levelId": 0,
-     "layerDefUid": 111,
+     "layerDefUid": 112,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -3087,7 +3127,7 @@
        "__tags": [],
        "__worldX": 336,
        "__worldY": 320,
-       "iid": "ent-0000009d",
+       "iid": "ent-0000009f",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -3118,7 +3158,7 @@
        "__tags": [],
        "__worldX": 720,
        "__worldY": 160,
-       "iid": "ent-0000009e",
+       "iid": "ent-000000a0",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -3149,7 +3189,7 @@
        "__tags": [],
        "__worldX": 144,
        "__worldY": 352,
-       "iid": "ent-0000009f",
+       "iid": "ent-000000a1",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -3180,7 +3220,7 @@
        "__tags": [],
        "__worldX": 560,
        "__worldY": 352,
-       "iid": "ent-000000a0",
+       "iid": "ent-000000a2",
        "width": 32,
        "height": 32,
        "defUid": 102,
@@ -3211,9 +3251,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-000000a4",
+     "iid": "lay-000000a6",
      "levelId": 0,
-     "layerDefUid": 110,
+     "layerDefUid": 111,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -3741,8 +3781,8 @@
   },
   {
    "identifier": "sky2",
-   "iid": "lvl-000000a6",
-   "uid": 167,
+   "iid": "lvl-000000a8",
+   "uid": 169,
    "worldX": 0,
    "worldY": 1000,
    "worldDepth": 0,
@@ -3757,7 +3797,7 @@
      "__type": "String",
      "__value": "sky",
      "__tile": null,
-     "defUid": 112,
+     "defUid": 113,
      "realEditorValues": []
     },
     {
@@ -3765,7 +3805,7 @@
      "__type": "String",
      "__value": "zone.sky2",
      "__tile": null,
-     "defUid": 113,
+     "defUid": 114,
      "realEditorValues": []
     },
     {
@@ -3773,7 +3813,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 118,
+     "defUid": 119,
      "realEditorValues": []
     },
     {
@@ -3781,7 +3821,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 119,
+     "defUid": 120,
      "realEditorValues": []
     },
     {
@@ -3789,7 +3829,7 @@
      "__type": "String",
      "__value": "sky1",
      "__tile": null,
-     "defUid": 114,
+     "defUid": 115,
      "realEditorValues": []
     },
     {
@@ -3797,7 +3837,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 115,
+     "defUid": 116,
      "realEditorValues": []
     },
     {
@@ -3805,7 +3845,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 116,
+     "defUid": 117,
      "realEditorValues": []
     },
     {
@@ -3813,7 +3853,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 117,
+     "defUid": 118,
      "realEditorValues": []
     },
     {
@@ -3821,7 +3861,7 @@
      "__type": "Int",
      "__value": 14,
      "__tile": null,
-     "defUid": 120,
+     "defUid": 121,
      "realEditorValues": []
     },
     {
@@ -3829,7 +3869,7 @@
      "__type": "Int",
      "__value": 12,
      "__tile": null,
-     "defUid": 121,
+     "defUid": 122,
      "realEditorValues": []
     }
    ],
@@ -3845,9 +3885,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-000000a8",
+     "iid": "lay-000000aa",
      "levelId": 0,
-     "layerDefUid": 111,
+     "layerDefUid": 112,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -3871,7 +3911,7 @@
        "__tags": [],
        "__worldX": 496,
        "__worldY": 192,
-       "iid": "ent-000000a5",
+       "iid": "ent-000000a7",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -3902,9 +3942,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-000000a9",
+     "iid": "lay-000000ab",
      "levelId": 0,
-     "layerDefUid": 110,
+     "layerDefUid": 111,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -4432,8 +4472,8 @@
   },
   {
    "identifier": "abyss1",
-   "iid": "lvl-000000b0",
-   "uid": 177,
+   "iid": "lvl-000000b3",
+   "uid": 180,
    "worldX": 3000,
    "worldY": 1000,
    "worldDepth": 0,
@@ -4448,7 +4488,7 @@
      "__type": "String",
      "__value": "abyss",
      "__tile": null,
-     "defUid": 112,
+     "defUid": 113,
      "realEditorValues": []
     },
     {
@@ -4456,7 +4496,7 @@
      "__type": "String",
      "__value": "zone.abyss",
      "__tile": null,
-     "defUid": 113,
+     "defUid": 114,
      "realEditorValues": []
     },
     {
@@ -4464,7 +4504,7 @@
      "__type": "Bool",
      "__value": true,
      "__tile": null,
-     "defUid": 118,
+     "defUid": 119,
      "realEditorValues": []
     },
     {
@@ -4472,7 +4512,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 119,
+     "defUid": 120,
      "realEditorValues": []
     },
     {
@@ -4480,7 +4520,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 114,
+     "defUid": 115,
      "realEditorValues": []
     },
     {
@@ -4488,7 +4528,7 @@
      "__type": "String",
      "__value": "abyss2",
      "__tile": null,
-     "defUid": 115,
+     "defUid": 116,
      "realEditorValues": []
     },
     {
@@ -4496,7 +4536,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 116,
+     "defUid": 117,
      "realEditorValues": []
     },
     {
@@ -4504,7 +4544,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 117,
+     "defUid": 118,
      "realEditorValues": []
     },
     {
@@ -4512,7 +4552,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 120,
+     "defUid": 121,
      "realEditorValues": []
     },
     {
@@ -4520,7 +4560,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 121,
+     "defUid": 122,
      "realEditorValues": []
     }
    ],
@@ -4536,9 +4576,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-000000b2",
+     "iid": "lay-000000b5",
      "levelId": 0,
-     "layerDefUid": 111,
+     "layerDefUid": 112,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -4562,7 +4602,7 @@
        "__tags": [],
        "__worldX": 640,
        "__worldY": 64,
-       "iid": "ent-000000aa",
+       "iid": "ent-000000ac",
        "width": 64,
        "height": 64,
        "defUid": 107,
@@ -4602,6 +4642,37 @@
        ]
       },
       {
+       "__identifier": "Sign",
+       "__grid": [
+        3,
+        14
+       ],
+       "__pivot": [
+        0.5,
+        1
+       ],
+       "__tags": [],
+       "__worldX": 112,
+       "__worldY": 480,
+       "iid": "ent-000000ad",
+       "width": 32,
+       "height": 32,
+       "defUid": 100,
+       "px": [
+        112,
+        480
+       ],
+       "fieldInstances": [
+        {
+         "__identifier": "text",
+         "__type": "String",
+         "__value": "sign.abyss.pipe",
+         "defUid": 0,
+         "realEditorValues": []
+        }
+       ]
+      },
+      {
        "__identifier": "Monster",
        "__grid": [
         11,
@@ -4614,7 +4685,7 @@
        "__tags": [],
        "__worldX": 368,
        "__worldY": 192,
-       "iid": "ent-000000ab",
+       "iid": "ent-000000ae",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -4645,7 +4716,7 @@
        "__tags": [],
        "__worldX": 720,
        "__worldY": 224,
-       "iid": "ent-000000ac",
+       "iid": "ent-000000af",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -4676,7 +4747,7 @@
        "__tags": [],
        "__worldX": 144,
        "__worldY": 320,
-       "iid": "ent-000000ad",
+       "iid": "ent-000000b0",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -4707,7 +4778,7 @@
        "__tags": [],
        "__worldX": 592,
        "__worldY": 416,
-       "iid": "ent-000000ae",
+       "iid": "ent-000000b1",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -4738,7 +4809,7 @@
        "__tags": [],
        "__worldX": 464,
        "__worldY": 256,
-       "iid": "ent-000000af",
+       "iid": "ent-000000b2",
        "width": 32,
        "height": 32,
        "defUid": 102,
@@ -4769,9 +4840,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-000000b3",
+     "iid": "lay-000000b6",
      "levelId": 0,
-     "layerDefUid": 110,
+     "layerDefUid": 111,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -5299,8 +5370,8 @@
   },
   {
    "identifier": "abyss2",
-   "iid": "lvl-000000b5",
-   "uid": 182,
+   "iid": "lvl-000000b8",
+   "uid": 185,
    "worldX": 6000,
    "worldY": 1000,
    "worldDepth": 0,
@@ -5315,7 +5386,7 @@
      "__type": "String",
      "__value": "abyss",
      "__tile": null,
-     "defUid": 112,
+     "defUid": 113,
      "realEditorValues": []
     },
     {
@@ -5323,7 +5394,7 @@
      "__type": "String",
      "__value": "zone.abyss2",
      "__tile": null,
-     "defUid": 113,
+     "defUid": 114,
      "realEditorValues": []
     },
     {
@@ -5331,7 +5402,7 @@
      "__type": "Bool",
      "__value": true,
      "__tile": null,
-     "defUid": 118,
+     "defUid": 119,
      "realEditorValues": []
     },
     {
@@ -5339,7 +5410,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 119,
+     "defUid": 120,
      "realEditorValues": []
     },
     {
@@ -5347,7 +5418,7 @@
      "__type": "String",
      "__value": "abyss1",
      "__tile": null,
-     "defUid": 114,
+     "defUid": 115,
      "realEditorValues": []
     },
     {
@@ -5355,7 +5426,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 115,
+     "defUid": 116,
      "realEditorValues": []
     },
     {
@@ -5363,7 +5434,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 116,
+     "defUid": 117,
      "realEditorValues": []
     },
     {
@@ -5371,7 +5442,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 117,
+     "defUid": 118,
      "realEditorValues": []
     },
     {
@@ -5379,7 +5450,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 120,
+     "defUid": 121,
      "realEditorValues": []
     },
     {
@@ -5387,7 +5458,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 121,
+     "defUid": 122,
      "realEditorValues": []
     }
    ],
@@ -5403,9 +5474,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-000000b7",
+     "iid": "lay-000000ba",
      "levelId": 0,
-     "layerDefUid": 111,
+     "layerDefUid": 112,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -5429,7 +5500,7 @@
        "__tags": [],
        "__worldX": 688,
        "__worldY": 288,
-       "iid": "ent-000000b4",
+       "iid": "ent-000000b7",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -5460,9 +5531,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-000000b8",
+     "iid": "lay-000000bb",
      "levelId": 0,
-     "layerDefUid": 110,
+     "layerDefUid": 111,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -5990,8 +6061,8 @@
   },
   {
    "identifier": "desert",
-   "iid": "lvl-000000be",
-   "uid": 191,
+   "iid": "lvl-000000c1",
+   "uid": 194,
    "worldX": 9000,
    "worldY": 1000,
    "worldDepth": 0,
@@ -6006,7 +6077,7 @@
      "__type": "String",
      "__value": "desert",
      "__tile": null,
-     "defUid": 112,
+     "defUid": 113,
      "realEditorValues": []
     },
     {
@@ -6014,7 +6085,7 @@
      "__type": "String",
      "__value": "zone.desert",
      "__tile": null,
-     "defUid": 113,
+     "defUid": 114,
      "realEditorValues": []
     },
     {
@@ -6022,7 +6093,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 118,
+     "defUid": 119,
      "realEditorValues": []
     },
     {
@@ -6030,7 +6101,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 119,
+     "defUid": 120,
      "realEditorValues": []
     },
     {
@@ -6038,7 +6109,7 @@
      "__type": "String",
      "__value": "town",
      "__tile": null,
-     "defUid": 114,
+     "defUid": 115,
      "realEditorValues": []
     },
     {
@@ -6046,7 +6117,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 115,
+     "defUid": 116,
      "realEditorValues": []
     },
     {
@@ -6054,7 +6125,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 116,
+     "defUid": 117,
      "realEditorValues": []
     },
     {
@@ -6062,7 +6133,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 117,
+     "defUid": 118,
      "realEditorValues": []
     },
     {
@@ -6070,7 +6141,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 120,
+     "defUid": 121,
      "realEditorValues": []
     },
     {
@@ -6078,7 +6149,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 121,
+     "defUid": 122,
      "realEditorValues": []
     }
    ],
@@ -6094,9 +6165,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-000000c0",
+     "iid": "lay-000000c3",
      "levelId": 0,
-     "layerDefUid": 111,
+     "layerDefUid": 112,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -6120,7 +6191,7 @@
        "__tags": [],
        "__worldX": 112,
        "__worldY": 480,
-       "iid": "ent-000000b9",
+       "iid": "ent-000000bc",
        "width": 32,
        "height": 32,
        "defUid": 100,
@@ -6151,7 +6222,7 @@
        "__tags": [],
        "__worldX": 784,
        "__worldY": 480,
-       "iid": "ent-000000ba",
+       "iid": "ent-000000bd",
        "width": 32,
        "height": 32,
        "defUid": 106,
@@ -6174,7 +6245,7 @@
        "__tags": [],
        "__worldX": 464,
        "__worldY": 480,
-       "iid": "ent-000000bb",
+       "iid": "ent-000000be",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -6205,7 +6276,7 @@
        "__tags": [],
        "__worldX": 688,
        "__worldY": 480,
-       "iid": "ent-000000bc",
+       "iid": "ent-000000bf",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -6236,7 +6307,7 @@
        "__tags": [],
        "__worldX": 592,
        "__worldY": 352,
-       "iid": "ent-000000bd",
+       "iid": "ent-000000c0",
        "width": 32,
        "height": 32,
        "defUid": 102,
@@ -6267,9 +6338,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-000000c1",
+     "iid": "lay-000000c4",
      "levelId": 0,
-     "layerDefUid": 110,
+     "layerDefUid": 111,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -6797,8 +6868,8 @@
   },
   {
    "identifier": "test_wide",
-   "iid": "lvl-000000c5",
-   "uid": 198,
+   "iid": "lvl-000000c8",
+   "uid": 201,
    "worldX": 0,
    "worldY": 2000,
    "worldDepth": 0,
@@ -6813,7 +6884,7 @@
      "__type": "String",
      "__value": "forest",
      "__tile": null,
-     "defUid": 112,
+     "defUid": 113,
      "realEditorValues": []
     },
     {
@@ -6821,7 +6892,7 @@
      "__type": "String",
      "__value": "zone.forest",
      "__tile": null,
-     "defUid": 113,
+     "defUid": 114,
      "realEditorValues": []
     },
     {
@@ -6829,7 +6900,7 @@
      "__type": "Bool",
      "__value": false,
      "__tile": null,
-     "defUid": 118,
+     "defUid": 119,
      "realEditorValues": []
     },
     {
@@ -6837,7 +6908,7 @@
      "__type": "Bool",
      "__value": true,
      "__tile": null,
-     "defUid": 119,
+     "defUid": 120,
      "realEditorValues": []
     },
     {
@@ -6845,7 +6916,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 114,
+     "defUid": 115,
      "realEditorValues": []
     },
     {
@@ -6853,7 +6924,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 115,
+     "defUid": 116,
      "realEditorValues": []
     },
     {
@@ -6861,7 +6932,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 116,
+     "defUid": 117,
      "realEditorValues": []
     },
     {
@@ -6869,7 +6940,7 @@
      "__type": "String",
      "__value": null,
      "__tile": null,
-     "defUid": 117,
+     "defUid": 118,
      "realEditorValues": []
     },
     {
@@ -6877,7 +6948,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 120,
+     "defUid": 121,
      "realEditorValues": []
     },
     {
@@ -6885,7 +6956,7 @@
      "__type": "Int",
      "__value": null,
      "__tile": null,
-     "defUid": 121,
+     "defUid": 122,
      "realEditorValues": []
     }
    ],
@@ -6901,9 +6972,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-000000c7",
+     "iid": "lay-000000ca",
      "levelId": 0,
-     "layerDefUid": 111,
+     "layerDefUid": 112,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,
@@ -6927,7 +6998,7 @@
        "__tags": [],
        "__worldX": 80,
        "__worldY": 480,
-       "iid": "ent-000000c2",
+       "iid": "ent-000000c5",
        "width": 32,
        "height": 32,
        "defUid": 100,
@@ -6958,7 +7029,7 @@
        "__tags": [],
        "__worldX": 1296,
        "__worldY": 480,
-       "iid": "ent-000000c3",
+       "iid": "ent-000000c6",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -6989,7 +7060,7 @@
        "__tags": [],
        "__worldX": 2256,
        "__worldY": 480,
-       "iid": "ent-000000c4",
+       "iid": "ent-000000c7",
        "width": 32,
        "height": 32,
        "defUid": 101,
@@ -7020,9 +7091,9 @@
      "__pxTotalOffsetY": 0,
      "__tilesetDefUid": null,
      "__tilesetRelPath": null,
-     "iid": "lay-000000c8",
+     "iid": "lay-000000cb",
      "levelId": 0,
-     "layerDefUid": 110,
+     "layerDefUid": 111,
      "pxOffsetX": 0,
      "pxOffsetY": 0,
      "visible": true,

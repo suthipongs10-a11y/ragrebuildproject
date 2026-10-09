@@ -163,3 +163,29 @@ export function checkExit(s: Body, env: Pick<MotionEnv, 'exits' | 'grid'>): Exit
   if (s.y > grid.pxH) return exits.down ? 'down' : 'fall';
   return null;
 }
+
+/** True when the body overlaps any solid cell. */
+export function overlapsSolid(b: Body, grid: TileGrid): boolean {
+  const x0 = Math.floor(b.x / TILE), x1 = Math.floor((b.x + b.w - 0.01) / TILE);
+  const y0 = Math.floor(b.y / TILE), y1 = Math.floor((b.y + b.h - 0.01) / TILE);
+  for (let ty = y0; ty <= y1; ty++) for (let tx = x0; tx <= x1; tx++) if (isSolidCell(grid.get(tx, ty))) return true;
+  return false;
+}
+
+/**
+ * Move a body that spawned inside walls (e.g. entering a room next to an unbroken rock wall) to the
+ * nearest free spot: tries tile steps inward (preferring `prefer` direction), then upward. Returns true if moved.
+ */
+export function unstick(b: Body, grid: TileGrid, prefer: 1 | -1 = -1): boolean {
+  if (!overlapsSolid(b, grid)) return false;
+  const ox = b.x, oy = b.y;
+  for (let r = 1; r <= Math.max(grid.w, grid.h); r++) {
+    for (const [dx, dy] of [[prefer * r, 0], [-prefer * r, 0], [0, -r], [prefer * r, -r], [-prefer * r, -r]] as const) {
+      b.x = Math.min(Math.max(0, ox + dx * TILE), grid.pxW - b.w);
+      b.y = oy + dy * TILE;
+      if (!overlapsSolid(b, grid)) { b.vx = 0; b.vy = 0; return true; }
+    }
+  }
+  b.x = ox; b.y = oy;
+  return false;
+}

@@ -19,9 +19,9 @@ const item = (x: number, y: number): EntitySrc => ({ type: 'Item', x, y, fields:
 
 export const ROOMS: RoomSrc[] = [
   { id: 'town', zone: 'town', name: 'zone.town', exits: { left: 'forest', right: 'desert', up: 'sky1' },
-    fill: [[0, 15, 29, 16, '#'], [3, 12, 7, 12, '-'], [8, 9, 12, 9, '-'], [3, 6, 7, 6, '-'], [19, 12, 20, 12, 'T'], [19, 13, 20, 14, 'P'], [28, 4, 29, 14, 'X']],
+    fill: [[0, 15, 29, 16, '#'], [3, 12, 7, 12, '-'], [8, 9, 12, 9, '-'], [3, 6, 7, 6, '-'], [19, 12, 20, 12, 'T'], [19, 13, 20, 14, 'P'], [28, 0, 29, 14, 'X']],
     entities: [
-      { type: 'SavePoint', x: 1, y: 14 }, { type: 'Anvil', x: 10, y: 14 }, { type: 'Altar', x: 14, y: 14 },
+      { type: 'SavePoint', x: 1, y: 14 }, { type: 'Anvil', x: 10, y: 14 }, { type: 'ExitHint', x: 5, y: 3, fields: { dir: 'up' } }, { type: 'Altar', x: 14, y: 14 },
       sign(5, 14, 'sign.town.sky'), sign(17, 14, 'sign.town.pipe'), sign(25, 14, 'sign.town.rock'),
       { type: 'Pipe', x: 19.5, y: 12, w: 2, h: 1, fields: { dir: 'down', target: 'abyss1', tx: 20, ty: 2 } },
       { type: 'Gate', x: 5, y: 14, fields: { ability: 'double', text: 'gate.double' } },
@@ -45,6 +45,7 @@ export const ROOMS: RoomSrc[] = [
     fill: [[0, 15, 29, 16, '#'], [0, 0, 1, 14, '#'], [0, 0, 29, 0, '#'], [19, 0, 20, 1, 'U'], [6, 11, 9, 14, '#'], [13, 8, 16, 8, '='], [24, 12, 26, 14, '#']],
     entities: [
       { type: 'Pipe', x: 19.5, y: 1, w: 2, h: 2, fields: { dir: 'up', target: 'town', tx: 20, ty: 12 } },
+      sign(3, 14, 'sign.abyss.pipe'),
       mon('fish', 11, 5), mon('fish', 22, 6), mon('fish', 4, 9), mon('fish', 18, 12), item(14, 7)] },
   { id: 'abyss2', zone: 'abyss', name: 'zone.abyss2', water: true, exits: { left: 'abyss1' },
     fill: [[0, 15, 29, 16, '#'], [0, 0, 29, 0, '#'], [28, 0, 29, 14, '#'], [4, 10, 8, 10, '='], [12, 7, 15, 7, '=']],

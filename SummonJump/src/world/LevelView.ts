@@ -14,7 +14,7 @@ export interface LevelVisuals {
  * Builds everything you see for a room: painted parallax backdrop, platform art, placeholder blocks
  * (rocks, pipes, walls — replaced by the P01 art pack later) and the water tint.
  */
-export function buildLevelVisuals(scene: Phaser.Scene, level: LevelData, grid: TileGrid, viewW: number, viewH: number): LevelVisuals {
+export function buildLevelVisuals(scene: Phaser.Scene, level: LevelData, grid: TileGrid, viewW: number, viewH: number, roomName: (id: string) => string): LevelVisuals {
   const zone = level.zone as ZoneId;
   const floorY = level.floorRow === null ? null : level.floorRow * TILE;
   buildZoneBackdrop(scene, zone, grid.pxW, viewW, viewH, floorY);
@@ -39,12 +39,13 @@ export function buildLevelVisuals(scene: Phaser.Scene, level: LevelData, grid: T
       }
     }
   }
-  for (const e of level.entities) if (e.type === 'Pipe') drawPipe(scene, e, level);
+  for (const e of level.entities) if (e.type === 'Pipe') drawPipe(scene, e, level, roomName(String(e.fields.target)));
+  drawExitHints(scene, level, grid, roomName);
   if (level.water) scene.add.rectangle(0, 0, grid.pxW, grid.pxH, 0x2a8fbf, 0.28).setOrigin(0, 0).setDepth(12);
   return { rocks };
 }
 
-function drawPipe(scene: Phaser.Scene, e: EntityData, level: LevelData): void {
+function drawPipe(scene: Phaser.Scene, e: EntityData, level: LevelData, targetName: string): void {
   const left = e.x - e.w / 2, top = e.y - e.h;
   const g = scene.add.graphics().setDepth(6);
   if (e.fields.dir === 'down') {
@@ -53,5 +54,26 @@ function drawPipe(scene: Phaser.Scene, e: EntityData, level: LevelData): void {
     g.fillStyle(0x3fa66b, 1).fillRoundedRect(left, top, e.w, e.h, 6).lineStyle(2, 0x1d5b3a, 1).strokeRoundedRect(left, top, e.w, e.h, 6);
   } else {
     g.fillStyle(0x3fa66b, 1).fillRoundedRect(left, top, e.w, e.h, 6).lineStyle(2, 0x1d5b3a, 1).strokeRoundedRect(left, top, e.w, e.h, 6);
+  }
+  const down = e.fields.dir === 'down';
+  scene.add.text(e.x, down ? top - 40 : e.y + 70, `${down ? '▼' : '▲'} ${targetName}`, { fontFamily: 'Itim', fontSize: '20px', color: '#c8ffd8', stroke: '#0f2a1a', strokeThickness: 5 })
+    .setOrigin(0.5).setDepth(40).setAlpha(0.9);
+}
+
+/** Arrow + destination name at every exit so players can see where to go. `ExitHint` entities override the spot. */
+function drawExitHints(scene: Phaser.Scene, level: LevelData, grid: TileGrid, roomName: (id: string) => string): void {
+  const groundY = level.floorRow === null ? grid.pxH / 2 : level.floorRow * TILE - 110;
+  const spot: Record<string, [number, number, 0 | 0.5 | 1]> = {
+    left: [12, groundY, 0], right: [grid.pxW - 12, groundY, 1], up: [grid.pxW / 2, 70, 0.5], down: [grid.pxW / 2, grid.pxH - 40, 0.5],
+  };
+  for (const e of level.entities) if (e.type === 'ExitHint') spot[String(e.fields.dir)] = [e.x, e.y - TILE / 2, 0.5];
+  const arrow: Record<string, string> = { left: '◀', right: '▶', up: '▲', down: '▼' };
+  for (const [dir, to] of Object.entries(level.exitTo)) {
+    const p = spot[dir];
+    if (!p || !to) continue;
+    const label = dir === 'right' ? `${roomName(to)} ${arrow[dir]}` : `${arrow[dir]} ${roomName(to)}`;
+    const tx = scene.add.text(p[0], p[1], label, { fontFamily: 'Itim', fontSize: '22px', color: '#fff6e2', stroke: '#2a1a0a', strokeThickness: 5 }).setOrigin(p[2], 0.5).setDepth(40).setAlpha(0.9);
+    const dx = dir === 'left' ? -6 : dir === 'right' ? 6 : 0, dy = dir === 'up' ? -6 : dir === 'down' ? 6 : 0;
+    scene.tweens.add({ targets: tx, x: p[0] + dx, y: p[1] + dy, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
   }
 }
