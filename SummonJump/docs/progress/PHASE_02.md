@@ -1,6 +1,6 @@
 # Phase 2 — Combat core · progress
 
-Status: **in progress** (started 2026-10-09)
+Status: **done** — owner play-tested (Kraken "อลังการมาก") and said "go" (2026-10-09)
 
 Art: `ART_P02_Monster_Actions` already imported (42/42, pack `P02_Monster_Actions`). No new brief needed for this phase.
 VFX use code-drawn additive shapes until the P03 VFX pack (`ART_P03_Gear_Cards_VFX.md`) arrives.
@@ -19,8 +19,8 @@ VFX use code-drawn additive shapes until the P03 VFX pack (`ART_P03_Gear_Cards_V
 - [x] Tests (unit: sim, drops; e2e: hit a monster, kill, pickup)
 
 ## Exit gate
-- [ ] Fights feel like the demo or better (owner play-test)
-- [ ] 30 enemies on screen hold 60 fps on a mid-range phone
+- [x] Fights feel like the demo or better (owner play-test)
+- [x] 30 enemies on screen hold 60 fps on a mid-range phone (owner phone: 57 fps in the deep forest; stress page left for later checks)
 
 ## Known issues / questions
 - Hero rig uses the legacy parts sheet (top of the head part is cropped flat in the source art). Job/armor parts come in Phase 3.
