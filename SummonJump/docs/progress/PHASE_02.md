@@ -33,6 +33,8 @@ VFX use code-drawn additive shapes until the P03 VFX pack (`ART_P03_Gear_Cards_V
 - Bosses (King / Harpy / Kraken) now show a big HP bar with their name at the top of the screen.
 - Attack animation polish is planned: the clips are JSON (`src/rig/hero.rig.json`) and get tuned with the job parts in Phase 3.
 
+- Phone page zoomed in while playing (iOS ignores `user-scalable=no`): `src/ui/noZoom.ts` blocks pinch / double-tap / ctrl+wheel zoom and snaps back if the browser still zooms. 🏠 uses pointerup.
+
 ## How to test
 - `?map=forest` — porings (hop), mantis (walks, telegraphs a lunge). `?map=deep` — Poring King (jump slam, summons porings below half HP).
 - `?map=sky1` birds (swoop), `?map=sky2` Harpy (dive + feather shots), `?map=abyss1&abil=dive` fish, `?map=abyss2&abil=dive` Kraken (ink shots).

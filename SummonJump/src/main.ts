@@ -3,6 +3,9 @@ import { BootScene } from './boot/BootScene';
 import { WorldScene } from './scenes/WorldScene';
 import { Controls } from './input/Controls';
 import { t } from './i18n';
+import { lockZoom } from './ui/noZoom';
+
+lockZoom();
 
 export const GAME_W = 960;
 export const GAME_H = 540;

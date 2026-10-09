@@ -101,7 +101,7 @@ export class WorldScene extends Phaser.Scene {
     this.save.room = this.level.id; this.save.seen[this.level.id] = true; this.flush();
     this.bindDebugKeys();
     const home = document.getElementById('b_home');
-    if (home) home.onclick = (e) => { e.preventDefault(); this.goHome(); };
+    if (home) home.onpointerup = (e) => { e.preventDefault(); this.goHome(); };
     this.drownTicks = 0;
   }
 
