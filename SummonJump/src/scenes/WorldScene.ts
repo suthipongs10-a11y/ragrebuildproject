@@ -195,6 +195,13 @@ export class WorldScene extends Phaser.Scene {
 
     let jumpPressed = !talking && c.pressed('jump');
     if (near && c.pressed('up')) { near.use(); jumpPressed = false; } // ▲ near an object = interact, not jump
+    // next to a rock wall: attack OR ▲ smashes it (players kept missing the attack key)
+    const rockSide = this.touchingRock(1) ? 1 : this.touchingRock(-1) ? -1 : 0;
+    if (!talking && rockSide && !near) {
+      this.prompt.setText(this.abilities.has('break') ? t('rock.prompt') : '✖').setVisible(true)
+        .setPosition(this.hero.x + this.hero.w / 2, this.hero.y - 20 + Math.sin(this.time.now / 140) * 3);
+      if (c.pressed('up')) { jumpPressed = false; this.hero.dir = rockSide as 1 | -1; this.swing(); }
+    }
 
     const dir = talking ? 0 : (((c.state.right ? 1 : 0) - (c.state.left ? 1 : 0)) as -1 | 0 | 1);
     const env: MotionEnv = { grid: this.grid, water: this.level.water, abilities: { double: this.abilities.has('double'), dive: this.abilities.has('dive') }, moveSpeed: moveSpeed(BUILD), exits: exitsOf(this.level) };
@@ -202,7 +209,7 @@ export class WorldScene extends Phaser.Scene {
     this.onEvents(events);
 
     if (!talking && c.pressed('atk')) this.swing();
-    if (dir && this.touchingRock(dir)) this.hint('rockTouch', t(this.abilities.has('break') ? 'rock.touch' : 'rock.need'));
+    if (dir && this.touchingRock(dir)) this.hint('rockTouch', t(this.abilities.has('break') ? 'rock.touch' : 'rock.needUrl'));
     if (!talking) this.checkPipes();
     this.collectPickups();
 
@@ -216,7 +223,7 @@ export class WorldScene extends Phaser.Scene {
     const h = this.hero;
     this.sprite.setPosition(h.x + h.w / 2, h.y + h.h).setFlipX(h.dir < 0);
     this.sprite.setAngle(h.onGround && Math.abs(h.vx) > 20 ? Math.sin(this.time.now / 60) * 3 : 0);
-    this.hud.setText(`${t(this.level.name)} · ${Math.round(this.game.loop.actualFps)} fps`);
+    this.hud.setText(`${t(this.level.name)} · ${Math.round(this.game.loop.actualFps)} fps\n${this.abilityLine()}`);
     if (this.toastUntil && this.time.now > this.toastUntil) { this.toastUntil = 0; this.tweens.add({ targets: this.toastText, alpha: 0, duration: 300 }); }
     c.endFrame();
   }
@@ -287,6 +294,11 @@ export class WorldScene extends Phaser.Scene {
       this.clearRocks(true); this.save.broken[this.level.id] = true; this.flush(); this.cameras.main.shake(260, 0.008);
       this.toast(t('rock.broken'));
     } else this.hint('rock', t('rock.need'));
+  }
+
+  private abilityLine(): string {
+    const a = this.abilities;
+    return `${t('abil.title')} ${a.has('double') ? '🌪️✓' : '🌪️✗'} ${a.has('dive') ? '💧✓' : '💧✗'} ${a.has('break') ? '🔥✓' : '🔥✗'}`;
   }
 
   private touchingRock(dir: number): boolean {
