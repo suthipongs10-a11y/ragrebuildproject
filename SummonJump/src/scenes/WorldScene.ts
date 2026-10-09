@@ -20,6 +20,7 @@ import { HeroSession } from '../hero/HeroSession';
 import { handleSkillInput, playLevelUps } from '../hero/HeroPlay';
 import type { Menu, MenuTab } from '../ui/menu/Menu';
 import { SkillButtons } from '../ui/SkillButtons';
+import { ActionButton } from '../ui/ActionButton';
 import { popNumber } from '../vfx/DamageText';
 
 /** Where the hero appears when a room loads. */
@@ -42,6 +43,7 @@ export class WorldScene extends Phaser.Scene {
   session!: HeroSession;
   private bars!: Hud;
   private skillBtns = new SkillButtons();
+  private actionBtn = new ActionButton();
   private menu!: Menu;
   private deadT = 0;
   view!: LevelVisuals;
@@ -259,6 +261,13 @@ export class WorldScene extends Phaser.Scene {
 
     if (dir && this.room.touchingRock(dir)) this.hint('rockTouch', t(this.abilities.has('break') ? 'rock.touch' : 'rock.needUrl'));
     if (!talking && !dead) this.room.checkPipes();
+    // contextual action button (phones): talk / read / pipe / smash
+    const action = talking || dead ? null
+      : near ? { label: near.label, run: near.use }
+      : this.room.pipeAction
+      ?? (rockSide ? { label: t('act.smash'), run: () => { this.hero.dir = rockSide as 1 | -1; this.room.swing(); } } : null);
+    this.actionBtn.show(action?.label ?? null);
+    if (action && this.actionBtn.take()) action.run();
     this.room.collectPickups();
 
     const ex = dead ? null : checkExit(this.hero, env);
@@ -322,6 +331,14 @@ export class WorldScene extends Phaser.Scene {
   // ───────────────────────── ui helpers ─────────────────────────
   openDialog(title: string, pages: string[]): void { this.dialog.open(title, pages); }
   openMenu(tab: MenuTab): void { this.menu.open(tab); }
+
+  /** Tap on an NPC / sign / chest: interact when the hero is close enough. */
+  tapInteract(it: Interactable): void {
+    if (!this.ready || this.busy || this.dialog.isOpen || this.menu.isOpen || this.combat.combat.dead) return;
+    const h = this.hero;
+    if (Math.abs(h.x + h.w / 2 - it.e.x) < 220 && Math.abs(h.y + h.h - it.e.y) < 160) it.use();
+    else this.hint('far', t('act.far'));
+  }
 
   applyLook(): void {
     const d = this.session.data, w = d.bag.find((b) => b.uid === d.equip.weapon);

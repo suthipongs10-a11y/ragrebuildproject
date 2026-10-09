@@ -282,5 +282,16 @@
   "el.dark": "มืด",
   "refine.breakRisk": "พลาดแล้วแตก!",
   "ui.loadFail": "โหลดภาพไม่ครบ (สัญญาณเน็ตอาจไม่ดี)",
-  "ui.retry": "ลองใหม่"
+  "ui.retry": "ลองใหม่",
+  "act.talk": "💬 คุย",
+  "act.read": "📜 อ่าน",
+  "act.open": "🎁 เปิด",
+  "act.save": "💾 บันทึก",
+  "act.use": "✋ ใช้",
+  "act.refine": "🔨 ตีบวก",
+  "act.shop": "🛒 ร้านค้า",
+  "act.smash": "🔥 ทุบหิน",
+  "act.pipeDown": "▼ ลงท่อ",
+  "act.pipeUp": "▲ ขึ้นท่อ",
+  "act.far": "เดินเข้าไปใกล้อีกนิด"
 }

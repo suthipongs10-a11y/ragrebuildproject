@@ -152,3 +152,13 @@ test('phase 3: archer skill spends SP and the menu opens with M', async ({ page,
   await expect(page.locator('#menu')).toBeHidden();
   expect(errors).toEqual([]);
 });
+
+test('phone: talk button appears next to an NPC and opens it', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phone only');
+  const errors = await boot(page, '?map=town&hero=novice:10');
+  await world(page, (w) => { w.hero.x = 15.5 * 32 + 4; });
+  await expect(page.locator('#b_act')).toBeVisible();
+  await page.locator('#b_act').dispatchEvent('pointerdown');
+  await expect(page.locator('#menu')).toBeVisible(); // priest opens job change for a novice
+  expect(errors).toEqual([]);
+});

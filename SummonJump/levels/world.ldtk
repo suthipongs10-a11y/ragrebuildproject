@@ -428,23 +428,23 @@
       {
        "__identifier": "ExitHint",
        "__grid": [
-        5,
-        3
+        9,
+        4
        ],
        "__pivot": [
         0.5,
         1
        ],
        "__tags": [],
-       "__worldX": 176,
-       "__worldY": 128,
+       "__worldX": 304,
+       "__worldY": 160,
        "iid": "ent-0000007d",
        "width": 32,
        "height": 32,
        "defUid": 110,
        "px": [
-        176,
-        128
+        304,
+        160
        ],
        "fieldInstances": [
         {

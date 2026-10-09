@@ -18,8 +18,12 @@ export class RoomInteractions {
     return best;
   }
 
+  /** Pipe the hero can use right now (for the on-screen action button). */
+  pipeAction: { label: string; run: () => void } | null = null;
+
   checkPipes(): void {
     const h = this.s.hero, c = this.s.controls, cx = h.x + h.w / 2;
+    this.pipeAction = null;
     for (const e of this.s.level.entities) {
       if (e.type !== 'Pipe') continue;
       const inX = cx > e.x - e.w / 2 && cx < e.x + e.w / 2;
@@ -29,12 +33,12 @@ export class RoomInteractions {
       if (onTop || (e.fields.dir === 'up' && inX && h.y < e.y + 200)) {
         this.s.prompt.setText(onTop ? '▼' : '▲').setVisible(true).setPosition(e.x, (onTop ? e.y - e.h - 64 : e.y + 40) + Math.sin(this.s.time.now / 140) * 3);
       }
-      if (onTop && c.pressed('down')) {
-        this.s.toast(t('pipe.down')); this.s.goRoom(target, { kind: 'tile', x: tx, y: ty, fromAbove: true }, 300); return;
-      }
-      if (under && c.pressed('up')) {
-        this.s.toast(t('pipe.up')); this.s.goRoom(target, { kind: 'tile', x: tx, y: ty, fromAbove: false }, 300); return;
-      }
+      const down = () => { this.s.toast(t('pipe.down')); this.s.goRoom(target, { kind: 'tile', x: tx, y: ty, fromAbove: true }, 300); };
+      const up = () => { this.s.toast(t('pipe.up')); this.s.goRoom(target, { kind: 'tile', x: tx, y: ty, fromAbove: false }, 300); };
+      if (onTop) this.pipeAction = { label: t('act.pipeDown'), run: down };
+      if (under) this.pipeAction = { label: t('act.pipeUp'), run: up };
+      if (onTop && c.pressed('down')) { down(); return; }
+      if (under && c.pressed('up')) { up(); return; }
     }
   }
 
