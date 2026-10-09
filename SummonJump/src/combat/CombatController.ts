@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
 import {
   addItem, createEnemy, createHeroCombat, MAX_STEP, stepEnemy, stepHeroCombat, stepShots, stepSkills, useSkill, rollKill, markDefeated, maxHp, maxSp, isSolidCell, TILE, moveBody,
+  addGauge, addRune, createSpiritWorld, followSpirits, rollRuneDrop, spiritLifesteal, stepSpirits, teamExp, ultimate,
   type Enemy, type EnemyCtx, type EnemyEvent, type HeroCombat, type HeroState, type LevelData, type Rng, type Shot, type TileGrid, type Body, type CombatEvent, type SkillCtx, type SkillEvent,
+  type SpiritEvent, type SpiritStepCtx, type SpiritWorld, type UltResult,
 } from '@shared/index';
 import type { MonsterDef } from '@shared/content/types';
 import type { SaveData } from '../save/local';
@@ -11,6 +13,7 @@ import { popInfo, popNumber } from '../vfx/DamageText';
 import { burst, ELEMENT_COLOR, ring, slash, spark } from '../vfx/Effects';
 import { SkillFx } from '../vfx/SkillFx';
 import { t } from '../i18n';
+import { SpiritViews } from '../spirits/SpiritViews';
 
 const MAX_FRAME = 1 / 20;
 
@@ -33,6 +36,9 @@ export class CombatController {
   private summonN = 0;
   private buffCheck = 0;
   readonly levelUps: LevelUpEvent[] = [];
+  spirits: SpiritWorld;
+  private readonly spiritViews: SpiritViews;
+  private heroDir = 1;
 
   constructor(
     private readonly scene: Phaser.Scene, private readonly level: LevelData, private readonly grid: TileGrid,
@@ -43,7 +49,29 @@ export class CombatController {
     const hp = session.data.hp;
     if (hp !== null && hp > 0) this.combat.hp = Math.min(hp, this.maxHp);
     this.fx = new SkillFx(scene);
+    this.spirits = createSpiritWorld(session.box, session.content, { x: 0, y: 0, w: 0, h: 0, vx: 0, vy: 0, onGround: false });
+    this.spiritViews = new SpiritViews(scene, session.content);
   }
+
+  /** (Re)build the team around the hero: room start and after team / rune / awaken changes. */
+  resetSpirits(hero: Body): void {
+    this.spirits = createSpiritWorld(this.session.box, this.session.content, hero, this.spirits);
+  }
+
+  private spiritCtx(): SpiritStepCtx {
+    const s = this.session;
+    return { content: s.content, enemies: this.enemies, shots: this.shots, rng: this.rng, combat: this.combat, build: s.derived.build };
+  }
+
+  /** Leader's ultimate on the given monsters (on screen). Hits are already applied; play them with `ultHit`. */
+  ultimate(targets: Enemy[]): UltResult | null {
+    const r = ultimate(this.spirits, this.spiritCtx(), targets, this.session.rt.time);
+    if (r) this.session.box.gauge = 0;
+    return r;
+  }
+
+  /** Show one ultimate hit (numbers, sparks, kill rewards) — called by the cinematic, wave by wave. */
+  ultHit(ev: CombatEvent): void { this.feedback(ev, false); }
 
   get maxHp(): number { return maxHp(this.session.derived.build); }
   get maxSp(): number { return maxSp(this.session.derived.build); }
@@ -67,6 +95,7 @@ export class CombatController {
   /** On-screen skill button / key. Returns the events so the scene can play rig clips and messages. */
   cast(hero: HeroState, id: string): SkillEvent[] {
     const ev = useSkill(this.session.rt, this.skillCtx(hero), id);
+    if (ev.some((e) => e.kind === 'cast' || e.kind === 'cast_start')) this.spirits.lastSkill = this.session.rt.time; // COMBO window
     this.handleSkillEvents(ev);
     return ev;
   }
@@ -94,6 +123,10 @@ export class CombatController {
     const out = stepHeroCombat(this.combat, hero, d.build, this.enemies, this.shots, inp, this.level.water, this.rng, dt,
       { element: d.element, ranged: d.ranged, range: d.range, noKnockback: d.noKnockback, blocked: !!s.rt.cast });
     for (const ev of out) this.feedback(ev);
+    followSpirits(this.spirits, hero, time, dt);
+    this.heroDir = hero.dir;
+    const sev = stepSpirits(this.spirits, this.spiritCtx(), dt);
+    for (const ev of sev) this.spiritFeedback(ev);
     // buffs expire → recompute derived stats
     this.buffCheck -= dt;
     if (this.buffCheck <= 0) { this.buffCheck = 0.5; const n = s.rt.buffs.length; s.rt.buffs = s.rt.buffs.filter((b) => b.until > s.rt.time); if (n !== s.rt.buffs.length) s.recompute(); }
@@ -112,8 +145,23 @@ export class CombatController {
     }
   }
 
-  private feedback(ev: CombatEvent | SkillEvent): void {
+  private spiritFeedback(ev: CombatEvent | SpiritEvent): void {
     const sc = this.scene;
+    if (ev.kind === 'scast') burst(sc, ev.actor.x, ev.actor.y, ELEMENT_COLOR[ev.actor.el] ?? 0xffffff, 6, 120);
+    else if (ev.kind === 'sheal') popNumber(sc, ev.x, ev.y - 10, ev.amount, 'heal');
+    else if (ev.kind === 'sshield') ring(sc, ev.x, ev.y, 0x9ad8ff, 30, 300);
+    else this.feedback(ev);
+  }
+
+  private feedback(ev: CombatEvent | SkillEvent, gauge = true): void {
+    const sc = this.scene;
+    if (ev.kind === 'hit' && gauge) {
+      const c = this.session.content;
+      addGauge(this.spirits, c, ev.spirit ? 'spirit' : 'hero');
+      if (ev.killed) addGauge(this.spirits, c, 'kill');
+      if (ev.spirit) { const heal = spiritLifesteal(this.spirits, ev.amount); if (heal > 0) this.combat.hp = Math.min(this.maxHp, this.combat.hp + heal); }
+      this.session.box.gauge = this.spirits.gauge;
+    }
     if (ev.kind === 'swing') { if (!this.session.derived.ranged) slash(sc, ev.x, ev.y, ev.dir, ELEMENT_COLOR[this.session.derived.element] as number, ev.spec.clip === 'attack3', ev.spec.clip === 'attack2'); }
     else if (ev.kind === 'hit') {
       popNumber(sc, ev.x, ev.y - 10, ev.amount, ev.dmg === 'normal' ? 'normal' : ev.dmg);
@@ -139,6 +187,10 @@ export class CombatController {
     this.save.zeny += r.zeny;
     const lv = this.session.reward(r.exp, r.jobExp);
     if (lv.baseUps || lv.jobUps) this.levelUps.push({ kind: 'levelup', base: lv.baseUps, job: lv.jobUps });
+    const box = this.session.box;
+    if (teamExp(box, r.exp).length) { popInfo(sc, cx, e.y - 70, t('spirit.levelup'), '#8ff0bf'); this.resetSpirits({ x: cx, y: cy, w: 0, h: 0, vx: 0, vy: 0, onGround: false }); }
+    const rune = rollRuneDrop(this.session.content, e.def.tier, this.rng, 1 + this.session.derived.build.stats.luk * 0.02);
+    if (rune) { addRune(box, rune); popInfo(sc, cx, e.y - 95, t('spirit.runeDrop').replace('{n}', String(rune.star)), '#c9a6ff'); }
     popInfo(sc, cx, e.y - 20, `${t('combat.exp').replace('{n}', String(r.exp))}  ${t('combat.zeny').replace('{n}', String(r.zeny))}`);
     for (const d of r.drops) this.dropPickup(cx, cy, d.kind, d.id, d.count);
     if (boss) popInfo(sc, cx, e.y - 50, t('combat.boss').replace('{name}', t(e.def.name_key)), '#ffd88a');
@@ -178,7 +230,10 @@ export class CombatController {
   private draw(time: number): void {
     for (const e of this.enemies) this.views.get(e.id)?.sync(e, time);
     this.fx.draw(this.shots, this.session.rt.zones, time);
+    this.spiritViews.sync(this.spirits, this.session.box, this.heroDir);
   }
+
+  setSpiritsVisible(on: boolean): void { this.spiritViews.setVisible(on); }
 
   /** Debug / tests: defeat every monster (goes through the normal kill path). */
   killAll(): void {

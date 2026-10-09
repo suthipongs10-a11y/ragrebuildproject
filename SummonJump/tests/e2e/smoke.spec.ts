@@ -164,3 +164,46 @@ test('phone: talk button appears next to an NPC and opens it', async ({ page, is
   await expect(page.locator('#menu')).toBeVisible(); // priest opens job change for a novice
   expect(errors).toEqual([]);
 });
+
+// ───────────── Phase 4: spirits ─────────────
+type Any = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+const ws = <T,>(page: Page, fn: (w: Any) => T) => page.evaluate((src) => new Function('w', `return (${src})(w)`)((window as unknown as Any).__game.scene.getScene('World')), fn.toString()) as Promise<T>;
+
+test('phase 4: starter team follows the hero and gives double jump / dive / smash', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=town');
+  expect(await ws(page, (w) => w.combat.spirits.actors.length)).toBe(3);
+  expect(await ws(page, (w) => [...w.abilities].sort().join(','))).toBe('break,dive,double');
+  // take the sylph out of the team: no more double jump
+  await ws(page, (w) => { const b = w.session.box; const s = b.spirits.find((x: Any) => x.id === 'sylph'); b.team = b.team.map((u: number) => (u === s.uid ? null : u)); w.onSpiritsChanged(); });
+  expect(await ws(page, (w) => w.abilities.has('double'))).toBe(false);
+  expect(await ws(page, (w) => w.combat.spirits.actors.length)).toBe(2);
+  expect(errors).toEqual([]);
+});
+
+test('phase 4: altar summon with a mystic scroll adds a 3★+ spirit', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=town');
+  const n0 = await ws(page, (w) => w.session.box.spirits.length);
+  await ws(page, (w) => w.openMenu('summon'));
+  await page.click('[data-act="sum:mystic:1"]');
+  await expect(page.locator('.sm-card')).toHaveCount(1);
+  expect(await ws(page, (w) => w.session.box.spirits.length)).toBe(n0 + 1);
+  expect(await ws(page, (w) => w.session.box.spirits[w.session.box.spirits.length - 1].star)).toBeGreaterThanOrEqual(3);
+  await page.click('[data-act="tab:spirits"]');
+  await expect(page.locator('.sp-grid .sp-card')).toHaveCount(n0 + 1);
+  await page.click('[data-act="close"]');
+  expect(errors).toEqual([]);
+});
+
+test('phase 4: full gauge + F plays the ultimate on monsters on screen', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=forest');
+  await ws(page, (w) => { w.combat.spirits.gauge = w.combat.spirits.gaugeMax; for (const e of w.combat.enemies) e.hp = e.def.hp * 50; });
+  await page.keyboard.down('KeyF'); await page.waitForTimeout(80); await page.keyboard.up('KeyF');
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').busy === true, null, { timeout: 3000 });
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').busy === false, null, { timeout: 8000 });
+  expect(await ws(page, (w) => w.combat.spirits.gauge)).toBeLessThan(10);
+  expect(await ws(page, (w) => w.combat.enemies.some((e: Any) => e.hp < e.def.hp * 50))).toBe(true);
+  expect(errors).toEqual([]);
+});

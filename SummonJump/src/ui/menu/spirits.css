@@ -1,0 +1,39 @@
+/* Spirits / runes / summon menus. */
+.sp-team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+.sp-team .sp-card { flex-direction: row; min-height: 60px; gap: 6px; justify-content: flex-start; text-align: left; }
+.sp-team .sp-card .sp-pic { width: 44px !important; height: 44px !important; }
+.sp-tslot small { display: block; color: var(--muted); font-size: 12px; margin: 0 0 2px 4px; }
+.sp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; margin-bottom: 8px; }
+.sp-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 4px; min-height: 96px; width: 100%;
+  border-radius: 12px; border: 2px solid #5a4630; background: rgba(23, 18, 12, .55); color: var(--ink); font: 500 13px var(--f-ui); }
+.sp-card.on { border-color: #ffd88a; background: rgba(201, 154, 74, .25); }
+.sp-card.empty { justify-content: center; color: var(--muted); }
+.sp-nm { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sp-lv { color: var(--muted); font-size: 11px; }
+.sp-pic { display: inline-block; flex: none; background: center / contain no-repeat; border-radius: 50%; }
+.sp-stars { color: #ffd84a; font-size: 12px; letter-spacing: -1px; text-shadow: 0 1px 0 #2a1a00; }
+.sp-stars.awk { color: #ff9ad8; }
+.sp-detail { padding: 8px; border-radius: 12px; background: rgba(23, 18, 12, .35); margin-bottom: 8px; }
+.sp-head { display: flex; gap: 10px; align-items: flex-start; }
+.sp-title { font-size: 18px; }
+.sp-btns { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.el-water { color: #7fd0ff !important; } .el-fire { color: #ff8a3d !important; } .el-earth { color: #d9b36a !important; }
+.el-wind { color: #8ff0bf !important; } .el-holy { color: #fff3c0 !important; } .el-dark { color: #b48cff !important; }
+.rn-ic { position: relative; width: 40px; height: 40px; flex: none; }
+.rn-ic .mn-icon { position: absolute; inset: 0; background-color: transparent; }
+.rn-ic .mn-icon:first-child { background-color: #3a3a4a; border-radius: 10px; color: #c9d2ff; }
+/* summon reveal */
+.sm-res { position: relative; padding: 10px 4px; min-height: 140px; }
+.sm-portal { position: absolute; left: 50%; top: 50%; width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 246, 210, .95) 0 12%, rgba(201, 166, 255, .55) 30%, rgba(255, 216, 138, .25) 55%, transparent 70%);
+  animation: smportal 1s ease-out forwards; }
+.sm-cards { position: relative; display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; }
+.sm-card { display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 6px 4px; border-radius: 12px; border: 2px solid #5a4630;
+  background: rgba(23, 18, 12, .7); font-size: 13px; opacity: 0; animation: smcard .45s cubic-bezier(.2, 1.6, .4, 1) forwards; }
+.sm-card.s4 { border-color: #c9a6ff; box-shadow: 0 0 14px rgba(201, 166, 255, .7); }
+.sm-card.s5 { border-color: #ffd84a; box-shadow: 0 0 22px rgba(255, 216, 74, .9); background: rgba(90, 60, 10, .8); }
+.sm-res.still .sm-card { animation: none; opacity: 1; }
+.sm-res.still .sm-portal { display: none; }
+@keyframes smportal { 0% { transform: scale(.1) rotate(0); opacity: 0; } 40% { opacity: 1; } 100% { transform: scale(1.6) rotate(200deg); opacity: 0; } }
+@keyframes smcard { from { opacity: 0; transform: scale(.3) rotateY(90deg); } to { opacity: 1; transform: scale(1) rotateY(0); } }
+.sp-detail .mn-kv { grid-template-columns: repeat(3, minmax(0, 1fr)); }

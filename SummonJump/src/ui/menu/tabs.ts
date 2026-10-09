@@ -10,7 +10,7 @@ import type { SaveData } from '../../save/local';
 /** HTML for each menu tab. Buttons carry `data-act="verb:arg"`; Menu.ts dispatches them. */
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c] as string);
 const btn = (act: string, label: string, ok = true, sec = false) => `<button class="mn-btn${sec ? ' sec' : ''}" data-act="${act}"${ok ? '' : ' disabled'}>${esc(label)}</button>`;
-const EMOJI: Record<string, string> = { sword: '⚔️', staff: '🪄', bow: '🏹', mace: '🔨', head: '🎩', armor: '🥋', cape: '🧥', shoes: '👢', acc: '💍', offhand: '🛡️', consumable: '🧪' };
+const EMOJI: Record<string, string> = { scroll: '📜', material: '💎', sword: '⚔️', staff: '🪄', bow: '🏹', mace: '🔨', head: '🎩', armor: '🥋', cape: '🧥', shoes: '👢', acc: '💍', offhand: '🛡️', consumable: '🧪' };
 
 export function iconHtml(key: string, fallback: string): string {
   const a = ART[key];
@@ -78,6 +78,7 @@ function bagRow(s: HeroSession, save: SaveData, it: ItemInstance): string {
   const c = s.content, h = s.data, d = itemDef(c, it.id);
   const acts: string[] = [];
   if (d?.use) acts.push(btn(`use:${it.uid}`, t('menu.use')));
+  else if (d?.type === 'scroll') acts.push(btn('tab:summon', t('tab.summon')));
   else if (d && d.type !== 'material') acts.push(btn(`equip:${it.uid}`, t('menu.equip'), canEquip(h, c, it.uid) === null));
   const card = Object.keys(save.cards).find((cid) => (save.cards[cid] ?? 0) > 0 && canSocket(h, c, it.uid, cid) === null);
   if (card) acts.push(btn(`socket:${it.uid}:${card}`, `🃏 ${t(`card.${card.replace(/^card_/, '')}`)}`, true, true));
@@ -113,7 +114,7 @@ export function refineTab(s: HeroSession, save: SaveData): string {
   return `<div class="mn-h">${t('menu.refineTitle')} · ${save.zeny}z</div>${rows || `<div class="mn-note">${t('menu.bagEmpty')}</div>`}`;
 }
 
-export const SHOP = ['potion_red', 'potion_orange', 'potion_blue', 'hat_leather_cap', 'cape_traveler', 'shoe_sandals', 'shield_buckler', 'w_train', 'wpn_staff_wood', 'wpn_bow_short', 'wpn_mace_iron'];
+export const SHOP = ['potion_red', 'potion_orange', 'potion_blue', 'scroll_normal', 'ess_fire', 'ess_holy', 'ess_dark', 'hat_leather_cap', 'cape_traveler', 'shoe_sandals', 'shield_buckler', 'w_train', 'wpn_staff_wood', 'wpn_bow_short', 'wpn_mace_iron'];
 
 export function shopTab(s: HeroSession, save: SaveData): string {
   const c = s.content, h: HeroData = s.data;

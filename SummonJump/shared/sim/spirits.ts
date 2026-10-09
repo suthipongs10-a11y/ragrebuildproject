@@ -30,10 +30,13 @@ export type SpiritEvent =
   | { kind: 'sshield'; amount: number; x: number; y: number };
 
 export function createSpiritWorld(b: SpiritBox, c: ContentBundle, hero: Body, prev?: SpiritWorld): SpiritWorld {
-  const actors = teamSpirits(b).map((s, i): SpiritActor => ({
-    uid: s.uid, id: s.id, el: s.el, slot: i, x: hero.x - 30 - i * 30, y: hero.y - 20, cd: 0.6 + i * 0.4, flash: 0,
-    stats: spiritStats(c, s, b.runes), skill: autoSkill(c, s),
-  }));
+  const actors = teamSpirits(b).map((s, i): SpiritActor => {
+    const old = prev?.actors.find((a) => a.uid === s.uid); // keep position / cooldown when only stats changed
+    return {
+      uid: s.uid, id: s.id, el: s.el, slot: i, x: old?.x ?? hero.x - 30 - i * 30, y: old?.y ?? hero.y - 20, cd: old?.cd ?? 0.6 + i * 0.4, flash: 0,
+      stats: spiritStats(c, s, b.runes), skill: autoSkill(c, s),
+    };
+  });
   const leaderGauge = sskillOf(c, familyOf(c, actors[0]?.id ?? '')?.leader ?? '')?.effects.gauge ?? 0;
   const gaugeBonus = (actors.reduce((n, a) => n + a.stats.gauge, 0) + leaderGauge) / 100;
   return { actors, gauge: Math.min(b.gauge, cfg(c, 'gauge_max', 100)), gaugeMax: cfg(c, 'gauge_max', 100), gaugeBonus, lastSkill: prev?.lastSkill ?? -99 };

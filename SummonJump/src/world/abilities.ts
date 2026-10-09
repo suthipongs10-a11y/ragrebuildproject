@@ -1,6 +1,6 @@
-/** Team abilities that open gates. Phase 4 spirits will provide them; until then a debug set is used. */
-export type Ability = 'double' | 'dive' | 'break';
-export const ABILITIES: readonly Ability[] = ['double', 'dive', 'break'];
+/** Exploration abilities from the spirit team (Phase 4) + `?abil=` / debug keys for testing. */
+export type Ability = 'double' | 'dive' | 'break' | 'cloud' | 'reveal';
+export const ABILITIES: readonly Ability[] = ['double', 'dive', 'break', 'cloud', 'reveal'];
 
 /** `?abil=double,dive,break` (debug / owner testing). */
 export function abilitiesFromUrl(search: string): Set<Ability> {

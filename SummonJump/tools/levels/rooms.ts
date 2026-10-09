@@ -16,6 +16,8 @@ export interface RoomSrc {
 const sign = (x: number, y: number, key: string): EntitySrc => ({ type: 'Sign', x, y, fields: { text: key } });
 const mon = (monster: string, x: number, y: number): EntitySrc => ({ type: 'Monster', x, y, fields: { monster } });
 const item = (x: number, y: number): EntitySrc => ({ type: 'Item', x, y, fields: { item: 'stone' } });
+/** Only visible with a 'reveal' spirit (Pixie / Sage Owl) in the team. */
+const hidden = (x: number, y: number, it: string): EntitySrc => ({ type: 'Item', x, y, fields: { item: it, hidden: true } });
 
 export const ROOMS: RoomSrc[] = [
   { id: 'town', zone: 'town', name: 'zone.town', exits: { left: 'forest', right: 'desert', up: 'sky1' },
@@ -31,13 +33,13 @@ export const ROOMS: RoomSrc[] = [
     ] },
   { id: 'forest', zone: 'forest', name: 'zone.forest', exits: { left: 'deep', right: 'town' },
     fill: [[0, 15, 29, 16, '#'], [4, 12, 7, 12, '-'], [10, 9, 14, 9, '-'], [22, 12, 25, 12, '-'], [17, 13, 18, 14, '#']],
-    entities: [sign(2, 14, 'sign.forest.deep'), mon('poring', 8, 14), mon('poring', 21, 14), mon('poring', 26, 14), mon('mantis', 13, 14), mon('poring', 12, 8), item(24, 11)] },
+    entities: [sign(2, 14, 'sign.forest.deep'), mon('poring', 8, 14), mon('poring', 21, 14), mon('poring', 26, 14), mon('mantis', 13, 14), mon('poring', 12, 8), item(24, 11), hidden(5, 11, 'scroll_mystic')] },
   { id: 'deep', zone: 'deep', name: 'zone.deep', exits: { right: 'forest' },
     fill: [[0, 15, 29, 16, '#'], [0, 0, 1, 14, '#'], [6, 11, 10, 11, '-'], [19, 11, 23, 11, '-']],
     entities: [mon('king', 14, 14), mon('poring', 24, 14), mon('mantis', 8, 14)] },
   { id: 'sky1', zone: 'sky', name: 'zone.sky', exits: { down: 'town', right: 'sky2' }, safe: [2, 13],
     fill: [[0, 14, 14, 14, '-'], [15, 11, 19, 11, '-'], [21, 8, 25, 8, '-'], [26, 7, 29, 7, '-'], [23, 13, 29, 13, '-']],
-    entities: [mon('bird', 10, 9), mon('bird', 22, 4), mon('bird', 4, 10), item(17, 10)] },
+    entities: [mon('bird', 10, 9), mon('bird', 22, 4), mon('bird', 4, 10), item(17, 10), hidden(27, 6, 'scroll_ld')] },
   { id: 'sky2', zone: 'sky', name: 'zone.sky2', exits: { left: 'sky1' }, safe: [14, 12],
     fill: [[0, 13, 29, 16, 'c'], [4, 9, 8, 9, '-'], [21, 9, 25, 9, '-']],
     entities: [mon('harpy', 15, 5)] },

@@ -22,6 +22,8 @@ import type { Menu, MenuTab } from '../ui/menu/Menu';
 import { SkillButtons } from '../ui/SkillButtons';
 import { ActionButton } from '../ui/ActionButton';
 import { popNumber } from '../vfx/DamageText';
+import { bindDebugKeys } from './debugKeys';
+import { loadTeamArt, spiritArtKeys, teamAbilitySet, tryUltimate, UltButton, type UltHost } from '../spirits/SpiritPlay';
 
 /** Where the hero appears when a room loads. */
 export type Place =
@@ -30,11 +32,10 @@ export type Place =
   | { kind: 'pos'; x: number; y: number }
   | { kind: 'default' };
 
-
-/** Phase 1 world: LDtk rooms, platforming, transitions, gates, respawn rules. Combat arrives in Phase 2. */
 /** Objects that get the on-screen action button (phones). */
 const BUTTON_TYPES = new Set(['Npc', 'Anvil', 'Altar', 'SavePoint', 'Chest']);
 
+/** The world: LDtk rooms, platforming, transitions, gates, combat, hero + spirits, menus. */
 export class WorldScene extends Phaser.Scene {
   hero!: HeroState;
   level!: LevelData;
@@ -47,6 +48,7 @@ export class WorldScene extends Phaser.Scene {
   private bars!: Hud;
   private skillBtns = new SkillButtons();
   private actionBtn = new ActionButton();
+  private ultBtn = new UltButton();
   private menu!: Menu;
   private deadT = 0;
   view!: LevelVisuals;
@@ -55,9 +57,9 @@ export class WorldScene extends Phaser.Scene {
   private toastText!: Phaser.GameObjects.Text;
   prompt!: Phaser.GameObjects.Text;
   private toastUntil = 0;
-  private busy = false;
+  busy = false;
   interactables: Interactable[] = [];
-  pickups: { id: string; x: number; y: number; obj: Phaser.GameObjects.Image }[] = [];
+  pickups: { id: string; item: string; x: number; y: number; obj: Phaser.GameObjects.Image }[] = [];
   abilities = new Set<Ability>();
   save!: SaveData;
   private levels!: Map<string, LevelData>;
@@ -78,15 +80,18 @@ export class WorldScene extends Phaser.Scene {
   create(): void {
     const data = this.initData;
     this.controls = this.registry.get('controls') as Controls;
-    if (!this.registry.has('abilities')) this.registry.set('abilities', abilitiesFromUrl(location.search));
-    this.abilities = this.registry.get('abilities') as Set<Ability>;
+    if (!this.registry.has('abilDebug')) this.registry.set('abilDebug', abilitiesFromUrl(location.search));
+    const content = this.registry.get('content') as ContentBundle;
+    if (!this.registry.has('session')) this.registry.set('session', new HeroSession(content, this.save));
+    this.session = this.registry.get('session') as HeroSession;
+    this.abilities = teamAbilitySet(this.session, this.registry.get('abilDebug') as Set<Ability>);
     this.levels = this.registry.get('levels') as Map<string, LevelData>;
 
     const roomId = data.room ?? (this.registry.get('startRoom') as string);
     this.level = this.levels.get(roomId) ?? (this.levels.get('town') as LevelData);
     this.ready = false;
     // safety net: if any texture of this room is missing (failed download), fetch it and come back
-    const need = roomKeys(this.level).filter((k) => !this.textures.exists(k));
+    const need = [...roomKeys(this.level), ...spiritArtKeys(this.session)].filter((k) => !this.textures.exists(k));
     if (need.length && !data.retried) {
       setLoading(true);
       loadTextures(this, need, (missing) => { setLoading(false); if (missing.length) showLoadProblem(missing); else this.scene.restart({ ...data, retried: true }); });
@@ -100,9 +105,6 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, this.grid.pxW, Math.max(vh, this.grid.pxH));
     this.view = buildLevelVisuals(this, this.level, this.grid, vw, vh, (id) => t(this.levels.get(id)?.name ?? id));
     for (const k of this.view.rocks.keys()) if (this.save.broken[this.level.id]) this.view.rocks.get(k)?.destroy();
-    const content = this.registry.get('content') as ContentBundle;
-    if (!this.registry.has('session')) this.registry.set('session', new HeroSession(content, this.save));
-    this.session = this.registry.get('session') as HeroSession;
     this.combat = new CombatController(this, this.level, this.grid, this.session, this.save, createRng((Date.now() & 0xffffff) ^ 0x5eed), () => this.flush());
     this.spawnEntities();
     // ?stress=30 — performance test: extra monsters spread across the room
@@ -110,6 +112,7 @@ export class WorldScene extends Phaser.Scene {
     for (let i = 0; i < Math.min(60, stress); i++) this.combat.spawn(`stress#${i}`, i % 3 ? 'poring' : 'mantis', 80 + ((i * 97) % (this.grid.pxW - 160)), (this.level.floorRow ?? 10) * TILE);
 
     this.hero = this.placeHero(data.place ?? { kind: 'default' });
+    this.combat.resetSpirits(this.hero);
     this.rig = new HeroRig(this, 10);
     this.applyLook();
     this.rig.update(0, this.hero.x + this.hero.w / 2, this.hero.y + this.hero.h, this.hero.dir);
@@ -127,13 +130,13 @@ export class WorldScene extends Phaser.Scene {
     this.menu.attach({
       session: this.session, save: this.save, flush: () => this.flush(),
       pause: () => this.scene.pause(), resume: () => { this.controls.reset(); this.scene.resume(); },
-      applyUse: (fx) => this.applyUse(fx), onEquipChanged: () => this.applyLook(),
+      applyUse: (fx) => this.applyUse(fx), onEquipChanged: () => this.applyLook(), onSpiritsChanged: () => this.onSpiritsChanged(),
       onJobChanged: () => { this.combat.heal(); this.applyLook(); this.toast(t('menu.jobChanged').replace('{job}', t(`job.${this.session.data.job}`))); },
     });
     this.showBanner(t(this.level.name));
 
     this.save.room = this.level.id; this.save.seen[this.level.id] = true; this.flush();
-    this.bindDebugKeys();
+    bindDebugKeys(this);
     const home = document.getElementById('b_home');
     if (home) home.onpointerup = (e) => { e.preventDefault(); this.goHome(); };
     this.drownTicks = 0;
@@ -156,10 +159,10 @@ export class WorldScene extends Phaser.Scene {
     for (const e of aliveSpawns(monsters, this.save.defeated, now)) this.combat.spawn(e.id, String(e.fields.monster), e.x, e.y);
     for (const e of this.level.entities) {
       if (e.type === 'Item') {
-        if (this.save.items[e.id]) continue;
-        const obj = this.add.image(e.x, e.y - 6, 'icon_crystal').setOrigin(0.5, 1).setDepth(8).setScale(34 / 128);
+        if (this.save.items[e.id] || (e.fields.hidden && !this.abilities.has('reveal'))) continue;
+        const obj = this.add.image(e.x, e.y - 6, 'icon_crystal').setOrigin(0.5, 1).setDepth(8).setScale(34 / 128).setTint(e.fields.hidden ? 0xc9a6ff : 0xffffff);
         this.tweens.add({ targets: obj, y: obj.y - 8, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-        this.pickups.push({ id: e.id, x: e.x, y: e.y - 22, obj });
+        this.pickups.push({ id: e.id, item: String(e.fields.item ?? 'stone'), x: e.x, y: e.y - 22, obj });
       } else if (e.type !== 'Monster' && e.type !== 'Pipe') {
         const it = spawnEntityView(this, e, this.save, this.abilities);
         if (it) this.interactables.push(it);
@@ -211,7 +214,7 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.fadeOut(fadeMs, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       setLoading(true);
-      loadTextures(this, roomKeys(target), (missing) => {
+      loadTextures(this, [...roomKeys(target), ...spiritArtKeys(this.session)], (missing) => {
         setLoading(false);
         if (missing.length) showLoadProblem(missing);
         else this.scene.restart({ room: roomId, place });
@@ -245,7 +248,7 @@ export class WorldScene extends Phaser.Scene {
     const dead = this.combat.combat.dead;
     const frozen = this.combat.hitstop > 0;
     const dir = talking || dead ? 0 : (((c.state.right ? 1 : 0) - (c.state.left ? 1 : 0)) as -1 | 0 | 1);
-    const env: MotionEnv = { grid: this.grid, water: this.level.water, abilities: { double: this.abilities.has('double'), dive: this.abilities.has('dive') }, moveSpeed: moveSpeed(this.session.derived.build), exits: exitsOf(this.level) };
+    const env: MotionEnv = { grid: this.grid, water: this.level.water, abilities: { double: this.abilities.has('double'), dive: this.abilities.has('dive'), glide: this.abilities.has('cloud') }, moveSpeed: moveSpeed(this.session.derived.build), exits: exitsOf(this.level) };
     if (!frozen) {
       const events = stepHero(this.hero, { dir, jumpPressed: jumpPressed && !dead, jumpHeld: !talking && !dead && c.state.jump, down: c.state.down }, env, dt);
       this.onEvents(events);
@@ -258,6 +261,7 @@ export class WorldScene extends Phaser.Scene {
       if (ev.kind === 'died') { this.rig.play('death', true); this.deadT = 1.8; }
     }
     if (c.pressed('menu') && !dead) { this.menu.open(); c.endFrame(); return; }
+    if (c.pressed('ult') && !talking && !dead) { tryUltimate(this.ultHost()); if (this.busy) { c.endFrame(); return; } }
     if (!talking && !dead) handleSkillInput(c, this.session, this.combat, this.hero, this.rig, (k, m) => this.hint(k, m));
     playLevelUps(this, this.combat, this.session, this.hero, (m) => this.toast(m));
     if (dead && this.deadT > 0) { this.deadT -= dt; if (this.deadT <= 0) this.respawnAfterDeath(); }
@@ -289,6 +293,7 @@ export class WorldScene extends Phaser.Scene {
     this.rig.update(frozen ? 0 : dt, h.x + h.w / 2, h.y + h.h, h.dir);
     this.rig.setAlpha(this.combat.combat.inv > 0 && !dead && Math.floor(this.time.now / 50) % 2 ? 0.35 : 1);
     this.skillBtns.update(this.session);
+    this.ultBtn.update(this.combat);
     this.bars.update(this.combat.combat.hp, this.combat.maxHp, this.session.rt.sp, this.combat.maxSp, this.session.data, this.save.zeny, this.session.rt.cast);
     const boss = this.combat.boss;
     this.bars.boss(boss ? t(boss.def.name_key) : null, boss?.hp, boss?.def.hp, boss?.def.tier === 'mvp');
@@ -372,21 +377,21 @@ export class WorldScene extends Phaser.Scene {
   flush(): void { writeSave(this.save); }
   setSpawn(e: EntityData): void { this.save.spawn = { room: this.level.id, x: e.x + 40, y: e.y - this.hero.h }; this.flush(); this.toast(t('save.point')); }
 
-  // ───────────────────────── debug (owner testing) ─────────────────────────
-  private bindDebugKeys(): void {
-    const kb = this.input.keyboard;
-    if (!kb) return;
-    kb.removeAllListeners('keydown');
-    kb.on('keydown', (e: KeyboardEvent) => {
-      const map: Record<string, Ability> = { Digit7: 'double', Digit8: 'dive', Digit9: 'break' };
-      const a = map[e.code];
-      if (a) { if (this.abilities.has(a)) this.abilities.delete(a); else this.abilities.add(a); this.toast(`${a}: ${this.abilities.has(a) ? 'ON' : 'off'}`); }
-      if (e.code === 'KeyK' && e.shiftKey) this.debugKillAll();
-      if (e.code === 'KeyH') this.goHome();
-    });
+  /** Team / runes / awakening changed in the menu: new followers, abilities and leader bonus. */
+  private onSpiritsChanged(): void {
+    this.session.recompute();
+    this.combat.resetSpirits(this.hero);
+    this.refreshAbilities();
+    loadTeamArt(this, this.session);
+  }
+
+  private ultHost(): UltHost {
+    return { scene: this, session: this.session, combat: this.combat, hero: this.hero, setBusy: (on) => { this.busy = on; }, hint: (k, m) => this.hint(k, m), flush: () => this.flush() };
   }
 
   /** Shift+K: defeat every monster in the room (tests respawn rules and drops). */
   debugKillAll(): void { this.combat.killAll(); this.flush(); }
+
+  refreshAbilities(): void { this.abilities = teamAbilitySet(this.session, this.registry.get('abilDebug') as Set<Ability>); }
 
 }

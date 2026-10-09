@@ -1,6 +1,6 @@
 import {
-  addItem, changeJob, equip, expToNext, derive, gainExp, jobOf, learnSkill, maxHp, maxSp, newHero, newSkillRuntime, raiseStat,
-  type ContentBundle, type Derived, type HeroData, type JobId, type LevelUpResult, type SkillRuntime, type StatKey,
+  addItem, addRune, addSpirit, changeJob, createRng, rollRune, equip, expToNext, derive, gainExp, jobOf, leaderBonus, learnSkill, maxHp, maxSp, newHero, newSkillRuntime, raiseStat, starterBox,
+  type ContentBundle, type Derived, type HeroData, type JobId, type LevelUpResult, type SkillRuntime, type SpiritBox, type StatKey,
 } from '@shared/index';
 import type { SaveData } from '../save/local';
 
@@ -15,14 +15,16 @@ export class HeroSession {
 
   constructor(readonly content: ContentBundle, readonly save: SaveData) {
     if (!save.hero) save.hero = migrate(save, content);
+    if (!save.spirits) save.spirits = newBox(content, save.hero);
     this.recompute();
     this.rt = newSkillRuntime(save.hero.sp ?? maxSp(this.derived.build));
   }
 
   get data(): HeroData { return this.save.hero as HeroData; }
+  get box(): SpiritBox { return this.save.spirits as SpiritBox; }
 
   recompute(): void {
-    this.derived = derive(this.data, this.content, this.rt?.buffs ?? [], this.rt?.time ?? 0);
+    this.derived = derive(this.data, this.content, this.rt?.buffs ?? [], this.rt?.time ?? 0, leaderBonus(this.box, this.content));
     const mh = maxHp(this.derived.build), ms = maxSp(this.derived.build);
     if (this.rt) this.rt.sp = Math.min(this.rt.sp, ms);
     if (this.data.hp !== null) this.data.hp = Math.min(this.data.hp, mh);
@@ -38,6 +40,19 @@ export class HeroSession {
     if (r.baseUps || r.jobUps) this.recompute();
     return r;
   }
+}
+
+/** Starter spirits (Phase 4). `?hero=` test heroes also get one of every family + scrolls and essences to try everything. */
+function newBox(content: ContentBundle, hero: HeroData): SpiritBox {
+  const b = starterBox(content, hero);
+  if (new URLSearchParams(typeof location === 'undefined' ? '' : location.search).get('hero')) {
+    for (const f of content.spirits) if (!b.spirits.some((s) => s.id === f.id)) addSpirit(b, content, f.id, f.element);
+    for (const [id, n] of [['scroll_mystic', 30], ['scroll_element', 10], ['scroll_ld', 10], ['scroll_normal', 20], ['ess_magic', 60]] as const) addItem(hero, content, id, n);
+    for (const e of content.spiritElements) addItem(hero, content, e.essence, 40);
+    const rng = createRng(7);
+    for (let i = 0; i < 18; i++) addRune(b, rollRune(content, rng, 3 + (i % 4), i % 5, undefined, 1 + (i % 6)));
+  }
+  return b;
 }
 
 /** First load after Phase 2: build the hero from the old counters. */

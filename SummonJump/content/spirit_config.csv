@@ -7,7 +7,7 @@ combo_window,2,seconds after a hero skill that count as COMBO
 combo_mult,1.3,COMBO damage multiplier
 ult_hero_atk,0.5,share of hero ATK added to each ultimate hit
 ult_member_atk,0.5,share of the other team members' ATK added to each ultimate hit
-auto_range,380,auto skill range (px)
+auto_range,320,auto skill range (px)
 aoe_radius,110,auto aoe radius around the target (px)
 level_growth,0.06,stats +6% per level
 awaken_mult,1.15,stats multiplier after awakening

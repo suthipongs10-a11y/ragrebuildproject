@@ -49,3 +49,8 @@ html, body { height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100
   box-shadow: 0 4px 14px rgba(0,0,0,.45); touch-action: none; animation: actpop .18s ease-out; }
 .act[hidden] { display: none; }
 @keyframes actpop { from { transform: scale(.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+/* ✦ spirit ultimate: conic fill = gauge, glows when full */
+.pb.ult { background: conic-gradient(rgba(201, 166, 255, .9) calc(var(--g, 0) * 1%), rgba(51, 39, 26, .85) 0); font-size: 24px; }
+.pb.ult.ready { color: #fff; border-color: #fff; animation: ultglow .7s ease-in-out infinite alternate; }
+@keyframes ultglow { from { box-shadow: 0 0 6px #c9a6ff; } to { box-shadow: 0 0 22px #efe2ff, 0 0 40px #c9a6ff; } }

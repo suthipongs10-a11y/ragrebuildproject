@@ -8,15 +8,18 @@ import { t } from '../../i18n';
 import type { HeroSession } from '../../hero/HeroSession';
 import type { SaveData } from '../../save/local';
 import { cardsTab, equipTab, jobTab, refineTab, shopTab, skillsTab, statusTab } from './tabs';
+import { newSpiritMenuState, spiritsTab, summonTab } from './spiritTabs';
+import { spiritAct } from './spiritActions';
+import './spirits.css';
 
-export type MenuTab = 'status' | 'skills' | 'equip' | 'cards' | 'job' | 'refine' | 'shop';
-const MAIN_TABS: MenuTab[] = ['status', 'skills', 'equip', 'cards'];
+export type MenuTab = 'status' | 'skills' | 'equip' | 'cards' | 'spirits' | 'job' | 'refine' | 'shop' | 'summon';
+const MAIN_TABS: MenuTab[] = ['status', 'skills', 'equip', 'cards', 'spirits'];
 
 export interface MenuHost {
   session: HeroSession; save: SaveData;
   pause(): void; resume(): void; flush(): void;
   /** potion effects and job change need the live scene (HP bar, rig) */
-  applyUse(effect: Record<string, number>): void; onJobChanged(): void; onEquipChanged(): void;
+  applyUse(effect: Record<string, number>): void; onJobChanged(): void; onEquipChanged(): void; onSpiritsChanged(): void;
 }
 
 /** One DOM overlay for every hero menu. Opened by ☰ / M / Esc or by NPCs (job, refine, shop). */
@@ -27,6 +30,8 @@ export class Menu {
   private note = '';
   private readonly rng = createRng(Date.now() & 0xffffff);
   private unsub: (() => void) | null = null;
+  private readonly sp = newSpiritMenuState();
+  private lastAnim = 0;
 
   constructor() {
     this.root.addEventListener('click', (e) => {
@@ -65,7 +70,8 @@ export class Menu {
     const h = this.host; if (!h) return;
     const tabs = (MAIN_TABS.includes(this.tab) ? MAIN_TABS : [this.tab]).map((x) => `<button class="mn-tab${x === this.tab ? ' on' : ''}" data-act="tab:${x}">${t(`tab.${x}`)}</button>`).join('');
     const body = { status: () => statusTab(h.session), skills: () => skillsTab(h.session), equip: () => equipTab(h.session, h.save), cards: () => cardsTab(h.session, h.save),
-      job: () => jobTab(h.session), refine: () => refineTab(h.session, h.save), shop: () => shopTab(h.session, h.save) }[this.tab]();
+      job: () => jobTab(h.session), refine: () => refineTab(h.session, h.save), shop: () => shopTab(h.session, h.save),
+      spirits: () => spiritsTab(h.session, h.save, this.sp), summon: () => summonTab(h.session, this.sp) }[this.tab]();
     const scroll = this.root.querySelector('.mn-body')?.scrollTop ?? 0;
     this.root.innerHTML = `<div class="mn"><div class="mn-top"><div class="mn-tabs">${tabs}</div><button class="mn-x" data-act="close" aria-label="close">✕</button></div>
       ${this.note ? `<div class="mn-note" style="color:#ffd88a">${this.note}</div>` : ''}<div class="mn-body">${body}</div></div>`;
@@ -73,16 +79,25 @@ export class Menu {
     const art = ART.ui_panel_main;
     if (panel && art) panel.style.borderImageSource = `url(${art.url})`;
     const b = this.root.querySelector('.mn-body'); if (b) b.scrollTop = scroll;
+    // the summon reveal animation plays once per summon, not on every re-render
+    if (this.sp.anim === this.lastAnim) this.root.querySelector('.sm-res')?.classList.add('still');
+    this.lastAnim = this.sp.anim;
   }
 
   private act(a: string): void {
     const h = this.host; if (!h) return;
     const [verb, x = '', y = ''] = a.split(':');
     const s = h.session, d = s.data, c = s.content;
+    const sn = spiritAct(verb ?? '', x, y, this.sp, h, this.rng);
+    if (sn !== null) {
+      if (sn) this.note = sn;
+      if (verb === 'spsel' || verb === 'spmode' || verb === 'sum') this.root.querySelector('.mn-body')?.scrollTo(0, 0); // new view starts at the top
+      this.render(); return;
+    }
     let changed = true;
     switch (verb) {
       case 'close': this.close(); return;
-      case 'tab': this.tab = x as MenuTab; this.note = ''; changed = false; break;
+      case 'tab': this.tab = x as MenuTab; this.note = ''; this.sp.results = []; changed = false; this.root.querySelector('.mn-body')?.scrollTo(0, 0); break;
       case 'stat': raiseStat(d, x as StatKey); break;
       case 'learn': learnSkill(d, c, x); break;
       case 'slot': setSlot(d, c, Number(x), y); break;

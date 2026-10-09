@@ -1,4 +1,5 @@
 import { Cell, TILE } from '@shared/platformer';
+import { addItem } from '@shared/index';
 import type { Interactable } from './EntityViews';
 import type { WorldScene } from '../scenes/WorldScene';
 import { t } from '../i18n';
@@ -58,7 +59,7 @@ export class RoomInteractions {
 
   abilityLine(): string {
     const a = this.s.abilities;
-    return `${t('abil.title')} ${a.has('double') ? '🌪️✓' : '🌪️✗'} ${a.has('dive') ? '💧✓' : '💧✗'} ${a.has('break') ? '🔥✓' : '🔥✗'}`;
+    return `${t('abil.title')} ${a.has('double') ? '🌪️✓' : '🌪️✗'} ${a.has('dive') ? '💧✓' : '💧✗'} ${a.has('break') ? '🔥✓' : '🔥✗'}${a.has('cloud') ? ' ☁️✓' : ''}${a.has('reveal') ? ' 👁️✓' : ''}`;
   }
 
   touchingRock(dir: number): boolean {
@@ -82,7 +83,8 @@ export class RoomInteractions {
       if (Math.abs(cx - p.x) < 28 && Math.abs(cy - p.y) < 40) {
         this.s.save.items[p.id] = true; this.s.flush(); p.obj.destroy();
         this.s.pickups = this.s.pickups.filter((q) => q !== p);
-        this.s.toast(t('item.stone'));
+        const got = p.item !== 'stone' && addItem(this.s.session.data, this.s.session.content, p.item, 1);
+        this.s.toast(got ? t('combat.got').replace('{name}', t(`item.${p.item}`)) : t('item.stone'));
       }
     }
   }

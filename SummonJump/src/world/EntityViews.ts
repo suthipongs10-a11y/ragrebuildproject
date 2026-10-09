@@ -32,10 +32,10 @@ export function spawnEntityView(scene: WorldScene, e: EntityData, save: SaveData
       const img = scene.add.image(e.x, e.y, ic.key).setOrigin(0.5, 1).setDepth(7);
       img.setScale(ic.h / img.height);
       const use = e.type === 'Sign' ? () => scene.openDialog('', [t(String(f.text))])
-        : e.type === 'Altar' ? () => scene.openDialog('', [t('altar.soon')])
+        : e.type === 'Altar' ? () => scene.openMenu('summon')
         : e.type === 'Anvil' ? () => scene.openMenu('refine')
         : () => scene.setSpawn(e);
-      const it: Interactable = { e, height: ic.h, use, label: t(e.type === 'Sign' ? 'act.read' : e.type === 'SavePoint' ? 'act.save' : 'act.use') };
+      const it: Interactable = { e, height: ic.h, use, label: t(e.type === 'Sign' ? 'act.read' : e.type === 'SavePoint' ? 'act.save' : e.type === 'Altar' ? 'act.summon' : 'act.use') };
       tappable(scene, img, () => it);
       return it;
     }

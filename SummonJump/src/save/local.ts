@@ -1,5 +1,6 @@
 import type { DefeatedMap } from '@shared/platformer';
 import type { HeroData } from '@shared/progression/hero';
+import type { SpiritBox } from '@shared/spirits/model';
 
 /** Local (pre-server) save. Every storage access is wrapped: private windows / blocked storage must not break the game. */
 export interface SaveData {
@@ -18,12 +19,14 @@ export interface SaveData {
   cards: Record<string, number>;
   /** Phase 3 hero (levels, job, skills, bag, equipment). null = create on first load (migrates exp/inv). */
   hero: HeroData | null;
+  /** Phase 4 spirits (collection, runes, team, pity, gauge). null = starter box on next load. */
+  spirits: SpiritBox | null;
 }
 
 /** `?hero=job:lv` test heroes use their own slot so they never overwrite the real save. */
 const HERO_PARAM = new URLSearchParams(typeof location === 'undefined' ? '' : location.search).get('hero');
 const KEY = HERO_PARAM ? `summonjump-save-test-${HERO_PARAM.replace(/[^a-z0-9:]/gi, '')}` : 'summonjump-save-v1';
-export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {}, hp: null, exp: 0, zeny: 0, inv: {}, cards: {}, hero: null });
+export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {}, hp: null, exp: 0, zeny: 0, inv: {}, cards: {}, hero: null, spirits: null });
 
 export function loadSave(): SaveData {
   try {
