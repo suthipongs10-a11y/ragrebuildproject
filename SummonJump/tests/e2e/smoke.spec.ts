@@ -193,6 +193,13 @@ test('phase 4: altar summon with a mystic scroll adds a 3★+ spirit', async ({ 
   await page.click('[data-act="tab:spirits"]');
   await expect(page.locator('.sp-grid .sp-card')).toHaveCount(n0 + 1);
   await page.click('[data-act="close"]');
+  // reopening with M after the altar still shows the hero tabs (status, equipment ...)
+  await ws(page, (w) => w.openMenu('summon'));
+  await page.click('[data-act="close"]');
+  await page.keyboard.press('KeyM');
+  await expect(page.locator('[data-act="tab:status"]')).toBeVisible();
+  await expect(page.locator('[data-act="tab:equip"]')).toBeVisible();
+  await page.keyboard.press('KeyM');
   expect(errors).toEqual([]);
 });
 

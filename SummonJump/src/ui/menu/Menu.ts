@@ -13,7 +13,7 @@ import { spiritAct } from './spiritActions';
 import './spirits.css';
 
 export type MenuTab = 'status' | 'skills' | 'equip' | 'cards' | 'spirits' | 'job' | 'refine' | 'shop' | 'summon';
-const MAIN_TABS: MenuTab[] = ['status', 'skills', 'equip', 'cards', 'spirits'];
+const MAIN_TABS: MenuTab[] = ['status', 'skills', 'equip', 'cards', 'spirits', 'summon'];
 
 export interface MenuHost {
   session: HeroSession; save: SaveData;
@@ -51,9 +51,10 @@ export class Menu {
     this.unsub = host.session.onChange(() => { if (this.isOpen) this.render(); });
   }
 
-  open(tab: MenuTab = this.tab): void {
+  /** ☰ / M reopen the last main tab; NPCs (job, refine, shop) and the altar pass their own tab. */
+  open(tab?: MenuTab): void {
     if (!this.host) return;
-    this.tab = tab; this.note = '';
+    this.tab = tab ?? (MAIN_TABS.includes(this.tab) ? this.tab : 'status'); this.note = '';
     this.root.hidden = false;
     this.host.pause();
     this.render();
@@ -68,7 +69,7 @@ export class Menu {
 
   private render(): void {
     const h = this.host; if (!h) return;
-    const tabs = (MAIN_TABS.includes(this.tab) ? MAIN_TABS : [this.tab]).map((x) => `<button class="mn-tab${x === this.tab ? ' on' : ''}" data-act="tab:${x}">${t(`tab.${x}`)}</button>`).join('');
+    const tabs = (MAIN_TABS.includes(this.tab) ? MAIN_TABS : [...MAIN_TABS, this.tab]).map((x) => `<button class="mn-tab${x === this.tab ? ' on' : ''}" data-act="tab:${x}">${t(`tab.${x}`)}</button>`).join('');
     const body = { status: () => statusTab(h.session), skills: () => skillsTab(h.session), equip: () => equipTab(h.session, h.save), cards: () => cardsTab(h.session, h.save),
       job: () => jobTab(h.session), refine: () => refineTab(h.session, h.save), shop: () => shopTab(h.session, h.save),
       spirits: () => spiritsTab(h.session, h.save, this.sp), summon: () => summonTab(h.session, this.sp) }[this.tab]();

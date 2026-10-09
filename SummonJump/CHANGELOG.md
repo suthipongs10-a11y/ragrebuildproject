@@ -8,6 +8,7 @@
 - Menus: ภูต (team, detail, runes, star-up, awaken) and อัญเชิญ (altar) with a reveal animation.
 - Abilities now come from the spirit team (debug `?abil=` still works); cloud glide and hidden treasure (reveal).
 - Art brief `ART_P04_Spirits.md` (79 images).
+- Fix: menu after the altar kept only the Summon tab; Summon is now a main tab; warning when a team change loses an ability.
 
 ## Phase 3 (in progress) — 2026-10-09
 - Jobs (Novice → Swordsman/Mage/Archer/Acolyte), 34 skills, job weapons, hats/capes/shoes/shields, potions (content CSV).

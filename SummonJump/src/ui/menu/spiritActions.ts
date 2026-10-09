@@ -1,5 +1,5 @@
 import {
-  awaken, equipRune, familyOf, fodderNeeded, sellRune, setTeam, spiritOf, starUp, summon, unequipRune, upgradeCost, upgradeRune,
+  awaken, equipRune, familyOf, teamAbilities, fodderNeeded, sellRune, setTeam, spiritOf, starUp, summon, unequipRune, upgradeCost, upgradeRune,
   type Element, type Rng,
 } from '@shared/index';
 import { t } from '../../i18n';
@@ -17,8 +17,14 @@ export function spiritAct(verb: string, x: string, y: string, st: SpiritMenuStat
   switch (verb) {
     case 'spsel': st.sel = Number(x); st.mode = 'info'; st.fodder = []; return '';
     case 'spmode': st.mode = x as SpiritMenuState['mode']; st.fodder = []; st.slot = null; return '';
-    case 'spteam': setTeam(b, Number(x), Number(y)); break;
-    case 'spout': { const i = b.team.indexOf(Number(x)); if (i >= 0) setTeam(b, i, null); break; }
+    case 'spteam': case 'spout': {
+      const before = teamAbilities(b, c);
+      if (verb === 'spteam') setTeam(b, Number(x), Number(y));
+      else { const i = b.team.indexOf(Number(x)); if (i >= 0) setTeam(b, i, null); }
+      const lost = [...before].filter((a) => !teamAbilities(b, c).has(a));
+      if (lost.length) note = t('sp.lostAbility').replace('{a}', lost.map((a) => t(`ability.${a}`)).join(', '));
+      break;
+    }
     case 'spfod': {
       const uid = Number(x), sel = spiritOf(b, st.sel);
       if (st.fodder.includes(uid)) st.fodder = st.fodder.filter((u) => u !== uid);

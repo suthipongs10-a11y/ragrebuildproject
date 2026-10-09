@@ -39,6 +39,10 @@ Placeholders until the zips arrive: the 5 old small spirits (`P00_legacy`), tint
 - Fight until ✦ is full (it glows) → tap ✦ for the ultimate. Use a skill right before = COMBO.
 - `?hero=mage:30` (test slot): one of every family, 30 mystic + other scrolls, essences for awakening, 18 runes.
 
+## Fixed after owner test
+- ☰ after using the altar reopened only the Summon tab (status / equipment gone). Now ☰ / M always reopen a main tab, and Summon is a main tab.
+- Changing the team now warns when the new team loses an exploration ability.
+
 ## Known issues / notes
 - Element variants are a hue shift of one painting per family (cheap, consistent). If a variant looks wrong we can order that one painting separately later.
 - New families show a coloured orb until `ART_P04_Spirits` arrives; big forms use the small picture until then.
