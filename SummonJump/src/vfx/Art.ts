@@ -1,8 +1,11 @@
 import Phaser from 'phaser';
 
-/** Painted VFX (P03 part 3 + P04 part 4), drawn on black and added with additive light. Loaded with the base pack. */
+/** Painted VFX (P03 part 3, P03 Jobs part 4, P04 part 4), drawn on black and added with additive light. Loaded with the base pack. */
 export const VFX_KEYS = ['vfx_slash', 'vfx_slash_heavy', 'vfx_hit_spark', 'vfx_crit_burst', 'vfx_magic_circle', 'vfx_fire_ring', 'vfx_tornado', 'vfx_wave',
-  'vfx_meteor', 'vfx_holy_pillar', 'vfx_levelup', 'vfx_jelly_splash', 'vfx_element_wind', 'vfx_element_water', 'vfx_element_fire', 'vfx_ult_aura', 'env_pipe', 'env_boulder'];
+  'vfx_meteor', 'vfx_holy_pillar', 'vfx_levelup', 'vfx_jelly_splash', 'vfx_element_wind', 'vfx_element_water', 'vfx_element_fire', 'vfx_ult_aura', 'env_pipe', 'env_boulder',
+  // P03 Jobs part 4: skill effects + the arrow
+  'vfx_fire_bolt', 'vfx_cold_bolt', 'vfx_lightning_bolt', 'vfx_soul_strike', 'vfx_fire_wall', 'vfx_frost_nova', 'vfx_energy_shield', 'vfx_arrow_trail',
+  'vfx_arrow_shower', 'vfx_ankle_trap', 'vfx_heal', 'vfx_blessing', 'vfx_holy_light', 'vfx_pneuma', 'vfx_whirlwind', 'vfx_dash', 'prj_arrow'];
 
 /** skills.csv `vfx` names without their own painting yet → the closest painted effect (+ tint). */
 const ALIAS: Record<string, [string, number | null]> = {

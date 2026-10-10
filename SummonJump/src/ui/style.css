@@ -41,6 +41,8 @@ html, body { height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100
 .pb.sk { position: relative; overflow: hidden; font-size: 12px; line-height: 1.05; padding: 2px; }
 .pb.sk .cd { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, .55); pointer-events: none; }
 .pb.sk.empty { opacity: .45; }
+.pb.sk.icon { background-size: cover; background-position: center; }
+.pb.sk.icon .nm { position: absolute; left: 0; right: 0; bottom: 3px; font-size: 10px; text-shadow: 0 0 3px #000, 0 0 3px #000; }
 .home.menu { right: 64px; }
 .home.auto { right: 120px; font: 700 12px var(--f-ui); letter-spacing: .5px; }
 .home.auto.on { background: linear-gradient(#e8b85a, #b0802e); color: #2a1a00; border-color: #ffe2a0; box-shadow: 0 0 12px rgba(255, 210, 120, .8); }

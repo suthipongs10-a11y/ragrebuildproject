@@ -1,8 +1,9 @@
 import { cooldownLeft, type SkillDef } from '@shared/index';
 import type { HeroSession } from '../hero/HeroSession';
 import { t } from '../i18n';
+import { ART } from '../assets/manifest.generated';
 
-/** Shows the slotted skill's short name on S1–S3 and a cooldown curtain. Cheap: touches the DOM only when values change. */
+/** Shows the slotted skill's icon (P03 art) + short name on S1–S3 and a cooldown curtain. Cheap: touches the DOM only when values change. */
 export class SkillButtons {
   private readonly btns = [...document.querySelectorAll<HTMLButtonElement>('.pb.sk')];
   private last = '';
@@ -19,7 +20,10 @@ export class SkillButtons {
       const name = def ? t(`skill.${def.id}`) : `S${i + 1}`;
       const left = def ? cooldownLeft(rt, def.id) : 0;
       const pct = def && def.cd > 0 ? Math.min(100, (left / def.cd) * 100) : 0;
-      b.innerHTML = `<span>${short(name)}</span>${pct > 0 ? `<span class="cd" style="height:${pct}%"></span>` : ''}`;
+      const icon = def ? ART[def.icon] : undefined;
+      b.classList.toggle('icon', !!icon);
+      b.style.backgroundImage = icon ? `url(${icon.url})` : '';
+      b.innerHTML = `<span class="nm">${short(name)}</span>${pct > 0 ? `<span class="cd" style="height:${pct}%"></span>` : ''}`;
     });
   }
 }

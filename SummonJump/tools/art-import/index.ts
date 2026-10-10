@@ -12,7 +12,7 @@ import { ROOT, loadManifest, saveManifest, type ArtManifest } from './manifest';
 const args = process.argv.slice(2);
 const briefIdx = args.indexOf('--brief');
 const briefPath = briefIdx >= 0 ? args[briefIdx + 1] : undefined;
-const zips = args.filter((a, i) => a.endsWith('.zip') && i !== briefIdx + 1);
+const zips = args.filter((a, i) => a.endsWith('.zip') && (briefIdx < 0 || i !== briefIdx + 1));
 if (!zips.length) { console.error('usage: npm run art:import -- <zip...> [--brief art-briefs/ART_PXX.md]'); process.exit(1); }
 
 const report: string[] = [];

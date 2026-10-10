@@ -1,4 +1,88 @@
 {
+ "acc_light_earring": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/acc_light_earring.webp",
+  "w": 197,
+  "h": 256
+ },
+ "acc_luck_necklace": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/acc_luck_necklace.webp",
+  "w": 220,
+  "h": 256
+ },
+ "acc_power_ring": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/acc_power_ring.webp",
+  "w": 256,
+  "h": 212
+ },
+ "acc_wind_brooch": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/acc_wind_brooch.webp",
+  "w": 241,
+  "h": 256
+ },
+ "arm_01_cotton_tunic": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/arm_01_cotton_tunic.webp",
+  "w": 256,
+  "h": 190
+ },
+ "arm_02_leather_armor": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/arm_02_leather_armor.webp",
+  "w": 239,
+  "h": 256
+ },
+ "arm_02_torso": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/arm_02_torso.webp",
+  "w": 406,
+  "h": 512
+ },
+ "arm_02_uarm": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/arm_02_uarm.webp",
+  "w": 343,
+  "h": 491
+ },
+ "arm_03_knight_armor": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/arm_03_knight_armor.webp",
+  "w": 231,
+  "h": 256
+ },
+ "arm_03_torso": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/arm_03_torso.webp",
+  "w": 406,
+  "h": 512
+ },
+ "arm_03_uarm": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/arm_03_uarm.webp",
+  "w": 304,
+  "h": 512
+ },
+ "arm_04_royal_armor": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/arm_04_royal_armor.webp",
+  "w": 230,
+  "h": 256
+ },
+ "arm_04_torso": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/arm_04_torso.webp",
+  "w": 397,
+  "h": 512
+ },
+ "arm_04_uarm": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/arm_04_uarm.webp",
+  "w": 448,
+  "h": 512
+ },
  "boss_kraken_design": {
   "pack": "P02_Monster_Actions",
   "url": "assets/P02_Monster_Actions/boss_kraken_design.webp",
@@ -10,6 +94,66 @@
   "url": "assets/P02_Monster_Actions/boss_kraken_parts.webp",
   "w": 640,
   "h": 415
+ },
+ "cape_hood": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/cape_hood.webp",
+  "w": 229,
+  "h": 256
+ },
+ "cape_traveler": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/cape_traveler.webp",
+  "w": 241,
+  "h": 256
+ },
+ "card_bird": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/card_bird.webp",
+  "w": 379,
+  "h": 512
+ },
+ "card_fish": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/card_fish.webp",
+  "w": 376,
+  "h": 512
+ },
+ "card_harpy": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/card_harpy.webp",
+  "w": 384,
+  "h": 512
+ },
+ "card_king": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/card_king.webp",
+  "w": 384,
+  "h": 512
+ },
+ "card_kraken": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/card_kraken.webp",
+  "w": 384,
+  "h": 500
+ },
+ "card_mantis": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/card_mantis.webp",
+  "w": 382,
+  "h": 512
+ },
+ "card_poring": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/card_poring.webp",
+  "w": 377,
+  "h": 512
+ },
+ "card_scorpion": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/card_scorpion.webp",
+  "w": 378,
+  "h": 512
  },
  "env_boulder": {
   "pack": "P03_VFX_Env",
@@ -64,6 +208,30 @@
   "url": "assets/P04_Spirits/ess_wind.webp",
   "w": 175,
   "h": 227
+ },
+ "hat_circlet": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/hat_circlet.webp",
+  "w": 256,
+  "h": 124
+ },
+ "hat_feather": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/hat_feather.webp",
+  "w": 256,
+  "h": 231
+ },
+ "hat_leather_cap": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/hat_leather_cap.webp",
+  "w": 256,
+  "h": 195
+ },
+ "hat_wizard": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/hat_wizard.webp",
+  "w": 256,
+  "h": 232
  },
  "hero_design": {
   "pack": "P00_legacy",
@@ -581,6 +749,12 @@
   "w": 640,
   "h": 408
  },
+ "prj_arrow": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/prj_arrow.webp",
+  "w": 256,
+  "h": 49
+ },
  "rune_set_blade": {
   "pack": "P04_Spirits",
   "url": "assets/P04_Spirits/rune_set_blade.webp",
@@ -688,6 +862,270 @@
   "url": "assets/P04_Spirits/scroll_normal.webp",
   "w": 227,
   "h": 162
+ },
+ "shield_buckler": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/shield_buckler.webp",
+  "w": 256,
+  "h": 254
+ },
+ "shield_kite": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/shield_kite.webp",
+  "w": 202,
+  "h": 256
+ },
+ "shoe_boots": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/shoe_boots.webp",
+  "w": 256,
+  "h": 247
+ },
+ "shoe_sandals": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/shoe_sandals.webp",
+  "w": 256,
+  "h": 228
+ },
+ "shoe_wind": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/shoe_wind.webp",
+  "w": 256,
+  "h": 250
+ },
+ "skill_angelus": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_angelus.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_ankle_trap": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_ankle_trap.webp",
+  "w": 256,
+  "h": 253
+ },
+ "skill_arrow_rain": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_arrow_rain.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_arrow_shower": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_arrow_shower.webp",
+  "w": 256,
+  "h": 250
+ },
+ "skill_basic_skill": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_basic_skill.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_blessing": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_blessing.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_charge_arrow": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_charge_arrow.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_cold_bolt": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_cold_bolt.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_dash_strike": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_dash_strike.webp",
+  "w": 256,
+  "h": 253
+ },
+ "skill_divine_protection": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_divine_protection.webp",
+  "w": 256,
+  "h": 253
+ },
+ "skill_double_strafe": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_double_strafe.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_endure": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_endure.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_energy_shield": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_energy_shield.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_fire_bolt": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_fire_bolt.webp",
+  "w": 256,
+  "h": 251
+ },
+ "skill_fire_wall": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_fire_wall.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_first_aid": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_first_aid.webp",
+  "w": 256,
+  "h": 253
+ },
+ "skill_focus": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_focus.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_frost_nova": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_frost_nova.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_heal": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_heal.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_holy_light": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_holy_light.webp",
+  "w": 256,
+  "h": 251
+ },
+ "skill_hp_recovery": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_hp_recovery.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_increase_agi": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_increase_agi.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_lightning_bolt": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_lightning_bolt.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_magnum_burst": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/skill_magnum_burst.webp",
+  "w": 256,
+  "h": 245
+ },
+ "skill_owl_eye": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_owl_eye.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_pneuma": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_pneuma.webp",
+  "w": 256,
+  "h": 250
+ },
+ "skill_power_slash": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/skill_power_slash.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_provoke": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_provoke.webp",
+  "w": 256,
+  "h": 247
+ },
+ "skill_ruwach": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_ruwach.webp",
+  "w": 256,
+  "h": 253
+ },
+ "skill_soul_strike": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_soul_strike.webp",
+  "w": 256,
+  "h": 253
+ },
+ "skill_sp_recovery": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_sp_recovery.webp",
+  "w": 256,
+  "h": 252
+ },
+ "skill_sword_mastery": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/skill_sword_mastery.webp",
+  "w": 256,
+  "h": 253
+ },
+ "skill_vulture_eye": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_vulture_eye.webp",
+  "w": 256,
+  "h": 253
+ },
+ "skill_whirlwind": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/skill_whirlwind.webp",
+  "w": 256,
+  "h": 250
+ },
+ "spirit_big_angel": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/spirit_big_angel.webp",
+  "w": 577,
+  "h": 512
+ },
+ "spirit_big_buddy": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/spirit_big_buddy.webp",
+  "w": 561,
+  "h": 512
+ },
+ "spirit_big_fire": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/spirit_big_fire.webp",
+  "w": 503,
+  "h": 512
+ },
+ "spirit_big_water": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/spirit_big_water.webp",
+  "w": 494,
+  "h": 512
+ },
+ "spirit_big_wind": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/spirit_big_wind.webp",
+  "w": 515,
+  "h": 512
  },
  "spr_angel_awk_big": {
   "pack": "P04_Spirits",
@@ -1229,9 +1667,93 @@
   "w": 256,
   "h": 69
  },
+ "ult_angel": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/ult_angel.webp",
+  "w": 256,
+  "h": 253
+ },
+ "ult_buddy": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/ult_buddy.webp",
+  "w": 256,
+  "h": 252
+ },
+ "ult_fire": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/ult_fire.webp",
+  "w": 256,
+  "h": 253
+ },
+ "ult_water": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/ult_water.webp",
+  "w": 256,
+  "h": 248
+ },
+ "ult_wind": {
+  "pack": "P03_Cards_Skills",
+  "url": "assets/P03_Cards_Skills/ult_wind.webp",
+  "w": 256,
+  "h": 253
+ },
+ "vfx_ankle_trap": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_ankle_trap.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_arrow_shower": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_arrow_shower.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_arrow_trail": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_arrow_trail.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_blessing": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_blessing.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_cold_bolt": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_cold_bolt.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
  "vfx_crit_burst": {
   "pack": "P03_VFX_Env",
   "url": "assets/P03_VFX_Env/vfx_crit_burst.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_dash": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_dash.webp",
   "w": 512,
   "h": 512,
   "meta": {
@@ -1265,6 +1787,24 @@
    "blend": "add"
   }
  },
+ "vfx_energy_shield": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_energy_shield.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_fire_bolt": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_fire_bolt.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
  "vfx_fire_ring": {
   "pack": "P03_VFX_Env",
   "url": "assets/P03_VFX_Env/vfx_fire_ring.webp",
@@ -1274,9 +1814,45 @@
    "blend": "add"
   }
  },
+ "vfx_fire_wall": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_fire_wall.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_frost_nova": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_frost_nova.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_heal": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_heal.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
  "vfx_hit_spark": {
   "pack": "P03_VFX_Env",
   "url": "assets/P03_VFX_Env/vfx_hit_spark.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_holy_light": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_holy_light.webp",
   "w": 512,
   "h": 512,
   "meta": {
@@ -1310,6 +1886,15 @@
    "blend": "add"
   }
  },
+ "vfx_lightning_bolt": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_lightning_bolt.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
  "vfx_magic_circle": {
   "pack": "P03_VFX_Env",
   "url": "assets/P03_VFX_Env/vfx_magic_circle.webp",
@@ -1328,6 +1913,15 @@
    "blend": "add"
   }
  },
+ "vfx_pneuma": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_pneuma.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
  "vfx_slash": {
   "pack": "P03_VFX_Env",
   "url": "assets/P03_VFX_Env/vfx_slash.webp",
@@ -1340,6 +1934,15 @@
  "vfx_slash_heavy": {
   "pack": "P03_VFX_Env",
   "url": "assets/P03_VFX_Env/vfx_slash_heavy.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_soul_strike": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_soul_strike.webp",
   "w": 512,
   "h": 512,
   "meta": {
@@ -1399,6 +2002,111 @@
   "meta": {
    "blend": "add"
   }
+ },
+ "vfx_whirlwind": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/vfx_whirlwind.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "wpn_01_training_sword": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/wpn_01_training_sword.webp",
+  "w": 460,
+  "h": 512
+ },
+ "wpn_02_iron_sword": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/wpn_02_iron_sword.webp",
+  "w": 489,
+  "h": 512
+ },
+ "wpn_03_flame_sword": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/wpn_03_flame_sword.webp",
+  "w": 479,
+  "h": 512
+ },
+ "wpn_04_gale_sword": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/wpn_04_gale_sword.webp",
+  "w": 489,
+  "h": 512
+ },
+ "wpn_05_tide_sword": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/wpn_05_tide_sword.webp",
+  "w": 478,
+  "h": 512
+ },
+ "wpn_06_king_greatsword": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/wpn_06_king_greatsword.webp",
+  "w": 489,
+  "h": 512
+ },
+ "wpn_07_kraken_blade": {
+  "pack": "P03_Gear",
+  "url": "assets/P03_Gear/wpn_07_kraken_blade.webp",
+  "w": 500,
+  "h": 512
+ },
+ "wpn_bow_composite": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/wpn_bow_composite.webp",
+  "w": 504,
+  "h": 512
+ },
+ "wpn_bow_gale": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/wpn_bow_gale.webp",
+  "w": 512,
+  "h": 511
+ },
+ "wpn_bow_short": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/wpn_bow_short.webp",
+  "w": 512,
+  "h": 508
+ },
+ "wpn_mace_holy": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/wpn_mace_holy.webp",
+  "w": 512,
+  "h": 510
+ },
+ "wpn_mace_iron": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/wpn_mace_iron.webp",
+  "w": 512,
+  "h": 501
+ },
+ "wpn_mace_star": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/wpn_mace_star.webp",
+  "w": 512,
+  "h": 500
+ },
+ "wpn_staff_crystal": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/wpn_staff_crystal.webp",
+  "w": 512,
+  "h": 489
+ },
+ "wpn_staff_flame": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/wpn_staff_flame.webp",
+  "w": 512,
+  "h": 508
+ },
+ "wpn_staff_wood": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/wpn_staff_wood.webp",
+  "w": 512,
+  "h": 480
  },
  "zone_abyss_far": {
   "pack": "P00_legacy",

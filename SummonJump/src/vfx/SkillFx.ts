@@ -3,21 +3,25 @@ import type { Shot, SkillEvent, Zone } from '@shared/index';
 import { burst, ELEMENT_COLOR, ring, slash } from './Effects';
 import { popNumber } from './DamageText';
 import { fxImg, vfxArt } from './Art';
+import { ShotSprites } from './ShotSprites';
 
 /** Draws hostile/friendly shots and skill zones each frame, and one-shot cast effects. Code shapes until P03 VFX art. */
 export class SkillFx {
   private readonly g: Phaser.GameObjects.Graphics;
   private readonly zg: Phaser.GameObjects.Graphics;
+  private readonly sprites: ShotSprites;
 
   constructor(private readonly scene: Phaser.Scene) {
     this.g = scene.add.graphics().setDepth(25).setBlendMode(Phaser.BlendModes.ADD);
     this.zg = scene.add.graphics().setDepth(7).setBlendMode(Phaser.BlendModes.ADD);
+    this.sprites = new ShotSprites(scene);
   }
 
   draw(shots: Shot[], zones: Zone[], time: number): void {
     const g = this.g.clear();
+    this.sprites.sync(shots, zones, time);
     for (const s of shots) {
-      if ((s.delay ?? 0) > 0) continue;
+      if ((s.delay ?? 0) > 0 || this.sprites.artFor(s)) continue;
       if (s.hostile && s.kind === 'tornado') { // Storm Roc: a spinning funnel of wind
         for (let i = 0; i < 5; i++) { const w = s.r * (0.5 + i * 0.28), yy = s.y + 26 - i * 14, o = Math.sin(time * 9 + i) * 6; g.lineStyle(4, s.color, 0.75 - i * 0.08).strokeEllipse(s.x + o, yy, w * 2, w * 0.6); }
         continue;
@@ -34,6 +38,7 @@ export class SkillFx {
     }
     const z = this.zg.clear();
     for (const zone of zones) {
+      if (this.sprites.hasZoneArt(zone)) continue;
       if (zone.pneuma) { z.fillStyle(0xffffff, 0.12).fillEllipse(zone.x + zone.w / 2, zone.y + zone.h / 2, zone.w, zone.h); z.lineStyle(3, 0xfff3c0, 0.6).strokeEllipse(zone.x + zone.w / 2, zone.y + zone.h / 2, zone.w, zone.h); continue; }
       if (zone.trap) { z.fillStyle(0xb9b4ac, 0.9).fillRect(zone.x + zone.w / 2 - 14, zone.y + zone.h - 8, 28, 8); continue; }
       const c = ELEMENT_COLOR[zone.el] ?? 0xff8a3d;
