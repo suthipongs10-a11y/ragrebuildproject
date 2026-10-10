@@ -22,7 +22,7 @@ export function arenaTab(s: HeroSession, a: ArenaState): string {
     if (f.floor > next + 2) return '';
     const mons = f.monsters.map((m) => `${t(c.monsters.find((x) => x.id === m.id)?.name_key ?? '')}${m.n > 1 ? ` ×${m.n}` : ''}`).join(', ');
     return `<div class="mn-row${done ? ' adv-done' : ''}"><span class="mn-icon">${f.floor % 5 === 0 ? '👑' : f.floor}</span><span class="grow">${t('arena.floor').replace('{n}', String(f.floor))}${done ? ' ✓' : ''}
-      <small>${mons}${done ? '' : ` · ${t('arena.firstClear')}: ${rewardItems(c, f.reward)} · ${f.zeny}z`}</small></span>${btn(`arena:tower:${f.floor}`, done ? t('arena.replay') : t('arena.enter'), open, done)}</div>`;
+      <small>${mons}${done ? '' : ` · ${t('arena.firstClear')}: ${rewardItems(c, f.reward)} · ${f.soul}${t('hud.soul')}`}</small></span>${btn(`arena:tower:${f.floor}`, done ? t('arena.replay') : t('arena.enter'), open, done)}</div>`;
   }).join('');
   return `${dungeon}<div class="mn-h">🗼 ${t('arena.tower')} · ${t('arena.best').replace('{n}', String(a.tower)).replace('{max}', String(c.tower.length))}</div>${floors}`;
 }

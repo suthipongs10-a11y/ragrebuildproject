@@ -86,7 +86,7 @@ export function bagTab(s: HeroSession, save: SaveData): string {
   const items = h.bag.filter((it) => !isGear(c, it))
     .sort((a, z) => order.indexOf(itemDef(c, a.id)?.type ?? '') - order.indexOf(itemDef(c, z.id)?.type ?? '') || a.id.localeCompare(z.id));
   const rows = items.map((it) => bagRow(s, save, it)).join('') || `<div class="mn-note">${t('menu.bagEmpty')}</div>`;
-  return `<div class="mn-h">${t('menu.bag')} (${h.bag.length}/${BAG_SIZE}) · ${save.zeny}z</div>${rows}`;
+  return `<div class="mn-h">${t('menu.bag')} (${h.bag.length}/${BAG_SIZE}) · ${save.soul}${t('hud.soul')}</div>${rows}`;
 }
 
 function bagRow(s: HeroSession, save: SaveData, it: ItemInstance): string {
@@ -115,9 +115,9 @@ export function refineTab(s: HeroSession, save: SaveData): string {
   const rows = h.bag.filter((it) => itemDef(c, it.id)?.refineable).map((it) => {
     const cost = refineCost(it.refine), chance = Math.round(refineChance(it.refine) * 100);
     const risk = it.refine >= 10 ? t('refine.breakRisk') : it.refine >= 5 ? t('refine.down') : t('refine.safe');
-    return `<div class="mn-row">${itemIcon(c, it)}<span class="grow">${esc(itemName(c, it))}${isEquipped(h, it.uid) ? `<span class="mn-tag">E</span>` : ''}<small>${chance}% · ${cost}z · ${risk}</small></span>${btn(`refine:${it.uid}`, t('menu.refine'), save.zeny >= cost && it.refine < 15)}</div>`;
+    return `<div class="mn-row">${itemIcon(c, it)}<span class="grow">${esc(itemName(c, it))}${isEquipped(h, it.uid) ? `<span class="mn-tag">E</span>` : ''}<small>${chance}% · ${cost}${t('hud.soul')} · ${risk}</small></span>${btn(`refine:${it.uid}`, t('menu.refine'), save.soul >= cost && it.refine < 15)}</div>`;
   }).join('');
-  return `<div class="mn-h">${t('menu.refineTitle')} · ${save.zeny}z</div>${rows || `<div class="mn-note">${t('menu.bagEmpty')}</div>`}`;
+  return `<div class="mn-h">${t('menu.refineTitle')} · ${save.soul}${t('hud.soul')}</div>${rows || `<div class="mn-note">${t('menu.bagEmpty')}</div>`}`;
 }
 
 export const SHOP = ['potion_red', 'potion_orange', 'potion_blue', 'scroll_normal', 'ess_fire', 'ess_holy', 'ess_dark', 'hat_leather_cap', 'cape_traveler', 'shoe_sandals', 'shield_buckler', 'w_train', 'wpn_staff_wood', 'wpn_bow_short', 'wpn_mace_iron'];
@@ -126,13 +126,13 @@ export function shopTab(s: HeroSession, save: SaveData): string {
   const c = s.content, h: HeroData = s.data;
   const buy = SHOP.map((id) => {
     const d = itemDef(c, id); if (!d) return '';
-    return `<div class="mn-row">${iconHtml(d.icon, EMOJI[d.type === 'weapon' ? d.subtype : d.type] ?? '📦')}<span class="grow">${t(d.name_key)}<small>${d.price}z</small></span>${btn(`buy:${id}`, t('menu.buy'), save.zeny >= d.price)}</div>`;
+    return `<div class="mn-row">${iconHtml(d.icon, EMOJI[d.type === 'weapon' ? d.subtype : d.type] ?? '📦')}<span class="grow">${t(d.name_key)}<small>${d.price}${t('hud.soul')}</small></span>${btn(`buy:${id}`, t('menu.buy'), save.soul >= d.price)}</div>`;
   }).join('');
   const sell = h.bag.filter((it) => !isEquipped(h, it.uid)).map((it) => {
     const d = itemDef(c, it.id), price = Math.floor((d?.price ?? 0) / 2);
-    return `<div class="mn-row">${itemIcon(c, it)}<span class="grow">${esc(itemName(c, it))}<small>${price}z</small></span>${btn(`sell:${it.uid}`, t('menu.sell'), true, true)}</div>`;
+    return `<div class="mn-row">${itemIcon(c, it)}<span class="grow">${esc(itemName(c, it))}<small>${price}${t('hud.soul')}</small></span>${btn(`sell:${it.uid}`, t('menu.sell'), true, true)}</div>`;
   }).join('');
-  return `<div class="mn-h">${t('menu.shopTitle')} · ${save.zeny}z</div>${buy}<div class="mn-h">${t('menu.sellTitle')}</div>${sell}`;
+  return `<div class="mn-h">${t('menu.shopTitle')} · ${save.soul}${t('hud.soul')}</div>${buy}<div class="mn-h">${t('menu.sellTitle')}</div>${sell}`;
 }
 
 export { skillDef };

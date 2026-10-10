@@ -7,7 +7,7 @@ export interface MonsterDef {
   id: string; name_key: string; tier: MonsterTier; zone: string; level: number;
   hp: number; atk: number; def: number; element: Element; element_lv: number;
   size: 'small' | 'medium' | 'large'; ai: MonsterAi; ai_params: Record<string, unknown>;
-  stompable: boolean; exp: number; job_exp: number; zeny_min: number; zeny_max: number;
+  stompable: boolean; exp: number; job_exp: number; soul_min: number; soul_max: number;
   card_id: string; card_rate: number; respawn_sec: number; art_pack: string;
   hitbox: { w: number; h: number }; draw_h: number;
   /** look-alike until the monster's own art exists: another monster's id + a tint (RGB) */
@@ -55,19 +55,19 @@ export interface SpiritSkillDef {
 export interface SpiritElementDef { element: Element; hp: number; atk: number; def: number; spd: number; essence: string; color: number }
 export interface RuneSetDef { id: string; name_key: string; pieces: number; bonus: Record<string, number> }
 export interface RuneStatDef { stat: string; name_key: string; flat: boolean; main_slots: number[]; main_lo: number; main_hi: number; sub_lo: number; sub_hi: number }
-export interface RuneUpgradeDef { lv: number; rate: number; zeny: number }
+export interface RuneUpgradeDef { lv: number; rate: number; soul: number }
 export interface RuneDropDef { tier: string; chance: number; star_lo: number; star_hi: number; rarity: number[] }
 /** book.csv: Adventure Book milestones (permanent stat rewards). target: monster id, 'any', or room ids for maps. */
-export interface BookEntryDef { id: string; kind: 'kill' | 'card' | 'spirit' | 'map'; target: string[]; count: number; reward: Record<string, number>; note: string }
+export interface BookEntryDef { id: string; kind: 'kill' | 'card' | 'spirit' | 'map'; target: string[]; count: number; reward: Record<string, number>; note: string; /** soul stones paid once on claim */ soul: number }
 
 /** dungeon.csv: daily dungeon per weekday (0 = Sunday). */
 export interface DungeonDayDef { day: number; element: string; essence: string; monsters: string[] }
 /** tower.csv: one floor; monsters as id x count, stat scale, first-clear reward items. */
-export interface TowerFloorDef { floor: number; monsters: { id: string; n: number }[]; scale: number; reward: Record<string, number>; zeny: number }
+export interface TowerFloorDef { floor: number; monsters: { id: string; n: number }[]; scale: number; reward: Record<string, number>; soul: number }
 
 /** unlocks.csv: features that open at a base level (so new players aren't buried in menus). */
 export interface UnlockDef { feature: string; level: number; name_key: string }
-/** quests.csv: the guided main-story chain. kind: kill / level / summon / visit / job / tower. reward: items + zeny. */
+/** quests.csv: the guided main-story chain. kind: kill / level / summon / visit / job / tower. reward: items + soul. */
 export interface QuestDef { id: string; kind: string; target: string; count: number; reward: Record<string, number>; text_key: string }
 
 /** summon.csv: rates[i] = chance of (i+1)★; elements 'pick' = player chooses. */

@@ -64,7 +64,7 @@ function newBox(content: ContentBundle, hero: HeroData): SpiritBox {
 /** First load after Phase 2: build the hero from the old counters. */
 function migrate(save: SaveData, content: ContentBundle): HeroData {
   const debug = new URLSearchParams(typeof location === 'undefined' ? '' : location.search).get('hero');
-  if (debug) { save.zeny = Math.max(save.zeny, 20000); for (const c of content.cards) save.cards[c.id] = 1; return testHero(content, debug); }
+  if (debug) { save.soul = Math.max(save.soul, 20000); for (const c of content.cards) save.cards[c.id] = 1; return testHero(content, debug); }
   const h = newHero(content);
   gainExp(h, content, save.exp, Math.round(save.exp * 0.6));
   for (const [id, n] of Object.entries(save.inv)) addItem(h, content, id, n);

@@ -90,8 +90,9 @@ export class RoomInteractions {
       if (Math.abs(cx - p.x) < 28 && Math.abs(cy - p.y) < 40) {
         this.s.save.items[p.id] = true; this.s.flush(); p.obj.destroy();
         this.s.pickups = this.s.pickups.filter((q) => q !== p);
-        const got = p.item !== 'stone' && addItem(this.s.session.data, this.s.session.content, p.item, 1);
-        this.s.toast(got ? t('combat.got').replace('{name}', t(`item.${p.item}`)) : t('item.stone'));
+        if (p.item === 'stone') { this.s.save.soul += p.amount; this.s.toast(t('item.stone').replace('{n}', String(p.amount))); continue; } // soul stones
+        const got = addItem(this.s.session.data, this.s.session.content, p.item, 1);
+        this.s.toast(got ? t('combat.got').replace('{name}', t(`item.${p.item}`)) : t('item.stone').replace('{n}', '0'));
       }
     }
   }

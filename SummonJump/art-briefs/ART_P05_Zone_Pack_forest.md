@@ -14,7 +14,7 @@ This is a **zone pack** for my game **Summon Jump** (the painted fantasy platfor
 
 ## 1. Global style
 - Hand-painted digital painting, soft visible brushstrokes, warm golden-hour light, muted ochre / sand / sage / dusty peach palette, richer contrast on the subject (same world as everything earlier in this chat, style reference = the golden valley painting).
-- Cute-but-cool RO-like fantasy, readable silhouettes at 64 px on a phone.
+- Cute-but-cool **original** fantasy, readable silhouettes at 64 px on a phone. **Original designs only: do not copy or imitate monsters, characters or items from Ragnarok Online, Summoners War or any other game.**
 - **No text, letters, numbers, logos or watermark. No ground shadow** (except the far background paintings, which are full scenes).
 
 ## 2. Background rules

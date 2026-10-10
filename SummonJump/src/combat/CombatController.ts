@@ -189,7 +189,7 @@ export class CombatController {
     this.views.get(e.id)?.die(); this.views.delete(e.id);
     if (!e.id.includes('#summon') && !e.id.startsWith('stress#') && !e.id.startsWith('arena#')) markDefeated(this.save.defeated, e.id, e.def.tier, e.def.respawn_sec, Date.now());
     const r = rollKill(e.def, this.session.content.drops, this.rng, 1 + this.session.derived.build.stats.luk * 0.03);
-    this.save.zeny += r.zeny;
+    this.save.soul += r.soul;
     const lv = this.session.reward(r.exp, r.jobExp);
     if (lv.baseUps || lv.jobUps) this.levelUps.push({ kind: 'levelup', base: lv.baseUps, job: lv.jobUps });
     noteKill(this.session.book, e.def.id);
@@ -197,7 +197,7 @@ export class CombatController {
     if (teamExp(box, r.exp).length) { popInfo(sc, cx, e.y - 70, t('spirit.levelup'), '#8ff0bf'); this.resetSpirits({ x: cx, y: cy, w: 0, h: 0, vx: 0, vy: 0, onGround: false }); }
     const rune = rollRuneDrop(this.session.content, e.def.tier, this.rng, 1 + this.session.derived.build.stats.luk * 0.02);
     if (rune) { addRune(box, rune); popInfo(sc, cx, e.y - 95, t('spirit.runeDrop').replace('{n}', String(rune.star)), '#c9a6ff'); }
-    popInfo(sc, cx, e.y - 20, `${t('combat.exp').replace('{n}', String(r.exp))}  ${t('combat.zeny').replace('{n}', String(r.zeny))}`);
+    popInfo(sc, cx, e.y - 20, `${t('combat.exp').replace('{n}', String(r.exp))}  ${t('combat.soul').replace('{n}', String(r.soul))}`);
     for (const d of r.drops) this.dropPickup(cx, cy, d.kind, d.id, d.count);
     if (boss) popInfo(sc, cx, e.y - 50, t('combat.boss').replace('{name}', t(e.def.name_key)), '#ffd88a');
     this.onSave();

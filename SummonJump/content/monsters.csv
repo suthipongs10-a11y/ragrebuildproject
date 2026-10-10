@@ -1,4 +1,4 @@
-id,name_key,tier,zone,level,hp,atk,def,element,element_lv,size,ai,ai_params,stompable,exp,job_exp,zeny_min,zeny_max,card_id,card_rate,respawn_sec,art_pack,hitbox,draw_h,art,tint
+id,name_key,tier,zone,level,hp,atk,def,element,element_lv,size,ai,ai_params,stompable,exp,job_exp,soul_min,soul_max,card_id,card_rate,respawn_sec,art_pack,hitbox,draw_h,art,tint
 poring,mon.poring,normal,forest,3,66,7,0,water,1,small,hopper,"{""hop"":240,""range"":170}",true,4,2,4,9,card_poring,0.01,0,P00_legacy,20x16,24,,
 rocker,mon.rocker,normal,forest,4,90,8,1,earth,1,small,hopper,"{""hop"":320,""range"":200}",true,5,3,5,9,card_rocker,0.01,0,P05,18x18,24,mantis,9ad86a
 drops,mon.drops,normal,forest,5,108,9,1,fire,1,small,hopper,"{""hop"":250,""range"":180}",true,5,3,5,11,card_drops,0.01,0,P05,20x16,24,poring,ffa040

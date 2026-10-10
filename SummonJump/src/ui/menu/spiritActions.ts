@@ -41,13 +41,13 @@ export function spiritAct(verb: string, x: string, y: string, st: SpiritMenuStat
     case 'runeslot': st.slot = Number(x) || null; return '';
     case 'runeon': if (st.sel !== null) equipRune(b, Number(x), st.sel); break;
     case 'runeoff': unequipRune(b, Number(x)); break;
-    case 'runesell': h.save.zeny += sellRune(b, Number(x)); break;
+    case 'runesell': h.save.soul += sellRune(b, Number(x)); break;
     case 'runeup': {
       const r = rune(x);
       if (!r) break;
       const cost = upgradeCost(c, r);
-      if (h.save.zeny < cost) break;
-      h.save.zeny -= cost;
+      if (h.save.soul < cost) break;
+      h.save.soul -= cost;
       note = upgradeRune(c, r, rng) ? t('rune.upOk').replace('{n}', String(r.lv)) : t('rune.upFail');
       break;
     }

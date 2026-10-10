@@ -44,7 +44,7 @@ export class Guide {
     if (done) {
       const got: string[] = [];
       for (const [id, n] of Object.entries(done.reward)) {
-        if (id === 'zeny') { this.save.zeny += n; got.push(`${n}z`); } else if (addItem(s.data, c, id, n)) got.push(`${t(itemDef(c, id)?.name_key ?? id)} ×${n}`);
+        if (id === 'soul') { this.save.soul += n; got.push(`${n}${t('hud.soul')}`); } else if (addItem(s.data, c, id, n)) got.push(`${t(itemDef(c, id)?.name_key ?? id)} ×${n}`);
       }
       this.toast(t('quest.done').replace('{name}', t(done.text_key)).replace('{got}', got.join(', ')));
       s.emit(); this.flush();

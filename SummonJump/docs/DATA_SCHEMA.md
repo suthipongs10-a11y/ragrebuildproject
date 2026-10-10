@@ -22,7 +22,7 @@ IDs are lowercase snake_case and **never change** once shipped. Thai display nam
 | stompable | bool | true | |
 | exp | int | 8 | base exp |
 | job_exp | int | 5 | |
-| zeny_min, zeny_max | int | 4, 9 | |
+| soul_min, soul_max | int | 4, 9 | |
 | card_id | string | card_poring | |
 | card_rate | float | 0.01 | |
 | respawn_sec | int | 0 | 0 = on room re-entry; mini/mvp use seconds |
@@ -57,7 +57,7 @@ Element variants: 1–3★ families water/fire/earth/wind; 4–5★ also holy/da
 ## runes.csv · rune_stats.csv · rune_upgrade.csv · rune_drop.csv
 - `runes`: `id, name_key, pieces (2/4), bonus (json)` — rune sets
 - `rune_stats`: `stat, name_key, flat, main_slots, main_lo, main_hi (6★ +0 / +15), sub_lo, sub_hi (6★ roll)`; lower stars scale down
-- `rune_upgrade`: `lv (1-15), rate, zeny (6★)`
+- `rune_upgrade`: `lv (1-15), rate, soul (6★)`
 - `rune_drop`: `tier, chance, star_lo, star_hi, r0..r4 (rarity weights = 0-4 starting subs)`
 
 ## jobs.csv
@@ -70,7 +70,7 @@ Element variants: 1–3★ families water/fire/earth/wind; 4–5★ also holy/da
 `feature, level, name_key` — base level that opens a feature (summon, adventure, runes, dungeon, tower). Locked tabs/buttons say "🔒 … เปิดที่ Lv N".
 
 ## quests.csv (Phase 5 — main guide chain)
-`id, kind (kill/level/summon/visit/job/tower), target, count, reward (json, item ids or zeny), text_key` — played in order; the HUD shows the current one, `text_key.hint` is the tap-to-read hint.
+`id, kind (kill/level/summon/visit/job/tower), target, count, reward (json, item ids or soul), text_key` — played in order; the HUD shows the current one, `text_key.hint` is the tap-to-read hint.
 
 ## missions.csv / login_calendar.csv (Phase 6)
 Standard reward tables: `id, type, goal (json), reward (json), reset (daily/weekly/none)`.

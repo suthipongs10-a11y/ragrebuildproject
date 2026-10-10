@@ -17,7 +17,7 @@ export interface SaveData {
   seen: Record<string, true>;
   hp: number | null;
   exp: number;
-  zeny: number;
+  soul: number;
   inv: Record<string, number>;
   cards: Record<string, number>;
   /** Phase 3 hero (levels, job, skills, bag, equipment). null = create on first load (migrates exp/inv). */
@@ -35,14 +35,16 @@ export interface SaveData {
 /** `?hero=job:lv` test heroes use their own slot so they never overwrite the real save. */
 const HERO_PARAM = new URLSearchParams(typeof location === 'undefined' ? '' : location.search).get('hero');
 const KEY = HERO_PARAM ? `summonjump-save-test-${HERO_PARAM.replace(/[^a-z0-9:]/gi, '')}` : 'summonjump-save-v1';
-export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {}, hp: null, exp: 0, zeny: 0, inv: {}, cards: {}, hero: null, spirits: null, book: null, arena: null, quest: null });
+export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {}, hp: null, exp: 0, soul: 0, inv: {}, cards: {}, hero: null, spirits: null, book: null, arena: null, quest: null });
 
 export function loadSave(): SaveData {
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return emptySave();
-    const d = JSON.parse(raw) as Partial<SaveData>;
+    const d = JSON.parse(raw) as Partial<SaveData> & { zeny?: number };
     if (d.v !== 1) return emptySave();
+    // the old coin became soul stones (same amount)
+    if (d.soul === undefined && typeof d.zeny === 'number') { d.soul = d.zeny; delete d.zeny; }
     return { ...emptySave(), ...d };
   } catch { return emptySave(); }
 }

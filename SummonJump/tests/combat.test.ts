@@ -91,9 +91,9 @@ describe('drops', () => {
     for (let i = 0; i < N; i++) if (rollKill(def('poring'), content.drops, rng).drops.some((d) => d.kind === 'card')) cards++;
     expect(cards / N).toBeGreaterThan(0.007); expect(cards / N).toBeLessThan(0.013);
   });
-  it('zeny stays within the monster range', () => {
+  it('soul stays within the monster range', () => {
     const m = def('mantis'), rng = createRng(3);
-    for (let i = 0; i < 500; i++) { const z = rollKill(m, content.drops, rng).zeny; expect(z).toBeGreaterThanOrEqual(m.zeny_min); expect(z).toBeLessThanOrEqual(m.zeny_max); }
+    for (let i = 0; i < 500; i++) { const z = rollKill(m, content.drops, rng).soul; expect(z).toBeGreaterThanOrEqual(m.soul_min); expect(z).toBeLessThanOrEqual(m.soul_max); }
   });
 });
 

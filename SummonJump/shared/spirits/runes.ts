@@ -4,7 +4,7 @@ import { spiritOf, MAX_RUNE_LV, RUNE_SLOTS, type RuneInst, type RuneStat, type S
 
 /**
  * SW-style runes: slot 1/3/5 fixed flat main stat (ATK/DEF/HP), 2/4/6 random; up to 4 sub stats;
- * upgrade +1..+15 (zeny + success rate from rune_upgrade.csv), at +3/6/9/12 a sub stat is added (or one is raised).
+ * upgrade +1..+15 (soul + success rate from rune_upgrade.csv), at +3/6/9/12 a sub stat is added (or one is raised).
  * Lower-star runes scale every value by STAR_SCALE.
  */
 export const STAR_SCALE = [0.35, 0.5, 0.62, 0.75, 0.87, 1];
@@ -59,7 +59,7 @@ export function rollRuneDrop(c: ContentBundle, tier: string, rng: Rng, luck = 1)
 
 export const upgradeCost = (c: ContentBundle, r: RuneInst): number => {
   const u = c.runeUpgrade.find((x) => x.lv === r.lv + 1);
-  return u ? Math.max(10, Math.round((u.zeny * r.star) / 6)) : 0;
+  return u ? Math.max(10, Math.round((u.soul * r.star) / 6)) : 0;
 };
 export const upgradeRate = (c: ContentBundle, r: RuneInst): number => c.runeUpgrade.find((x) => x.lv === r.lv + 1)?.rate ?? 0;
 

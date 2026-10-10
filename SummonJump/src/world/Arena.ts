@@ -50,8 +50,8 @@ export class ArenaController {
     const lines = [t('arena.clear')];
     if (r) {
       for (const [id, n] of Object.entries(r.items)) addItem(s.session.data, c, id, n);
-      s.save.zeny += r.zeny;
-      lines.push(`${rewardItems(c, r.items)} · ${r.zeny}z`);
+      s.save.soul += r.soul;
+      lines.push(`${rewardItems(c, r.items)} · ${r.soul}${t('hud.soul')}`);
       if (r.runeStar) { addRune(s.session.box, rollRune(c, this.rng, r.runeStar, Math.floor(this.rng.next() * 4))); lines.push(t('spirit.runeDrop').replace('{n}', String(r.runeStar))); }
     } else lines.push(t('arena.noReward'));
     s.session.emit();

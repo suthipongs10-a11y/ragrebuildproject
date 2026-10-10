@@ -41,12 +41,12 @@ export function dungeonWaves(c: ContentBundle, day: DungeonDayDef, heroLv: numbe
   return [3, 4, 5].map((n, w) => Array.from({ length: n }, (_, i) => spawn(w === 2 && i === 0)));
 }
 
-export interface ArenaReward { items: Record<string, number>; zeny: number; runeStar: number | null }
+export interface ArenaReward { items: Record<string, number>; soul: number; runeStar: number | null }
 
 export function dungeonReward(day: DungeonDayDef, heroLv: number, rng: Rng): ArenaReward {
   const items: Record<string, number> = { [day.essence]: 3 + Math.floor(heroLv / 5) };
   items.ess_magic = (items.ess_magic ?? 0) + 2 + Math.floor(heroLv / 10);
-  return { items, zeny: 40 * heroLv, runeStar: rng.chance(0.5) ? Math.min(6, 1 + Math.floor(heroLv / 8)) : null };
+  return { items, soul: 40 * heroLv, runeStar: rng.chance(0.5) ? Math.min(6, 1 + Math.floor(heroLv / 8)) : null };
 }
 
 export function towerWaves(c: ContentBundle, floor: number): WaveSpawn[][] {
@@ -59,7 +59,7 @@ export function clearTower(c: ContentBundle, a: ArenaState, floor: number): Aren
   const f = c.tower.find((x) => x.floor === floor);
   if (!f || floor !== a.tower + 1) return null;
   a.tower = floor;
-  return { items: { ...f.reward }, zeny: f.zeny, runeStar: floor % 5 === 0 ? Math.min(6, 2 + floor / 5) : null };
+  return { items: { ...f.reward }, soul: f.soul, runeStar: floor % 5 === 0 ? Math.min(6, 2 + floor / 5) : null };
 }
 
 export const canEnterTower = (c: ContentBundle, a: ArenaState, floor: number): boolean => floor >= 1 && floor <= Math.min(a.tower + 1, c.tower.length);

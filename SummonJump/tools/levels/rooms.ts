@@ -110,3 +110,7 @@ export const ROOMS: RoomSrc[] = [
     fill: [[0, 15, 79, 16, '#'], [10, 12, 14, 12, '-'], [30, 9, 34, 9, '-'], [50, 12, 55, 12, '-'], [60, 13, 63, 14, '#'], [79, 0, 79, 14, '#']],
     entities: [sign(2, 14, 'sign.forest.deep'), mon('poring', 40, 14), mon('poring', 70, 14)] },
 ];
+
+/** Soul stones in each crystal pickup (map items with item 'stone'), by zone. */
+const STONES: Record<string, number> = { town: 20, forest: 30, deep: 50, sky: 80, abyss: 120, desert: 60 };
+for (const r of ROOMS) for (const e of r.entities) if (e.type === 'Item' && e.fields?.item === 'stone') e.fields.amount ??= STONES[r.zone] ?? 30;

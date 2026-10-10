@@ -111,7 +111,7 @@ function runeIcon(r: RuneInst): string {
 function runeRow(s: HeroSession, save: SaveData, r: RuneInst, on: boolean): string {
   const c = s.content, cost = upgradeCost(c, r), rate = Math.round(upgradeRate(c, r) * 100);
   const acts = on
-    ? btn(`runeup:${r.uid}`, r.lv >= MAX_RUNE_LV ? 'MAX' : `+1 · ${cost}z · ${rate}%`, r.lv < MAX_RUNE_LV && save.zeny >= cost) + btn(`runeoff:${r.uid}`, t('menu.remove'), true, true)
+    ? btn(`runeup:${r.uid}`, r.lv >= MAX_RUNE_LV ? 'MAX' : `+1 · ${cost}${t('hud.soul')} · ${rate}%`, r.lv < MAX_RUNE_LV && save.soul >= cost) + btn(`runeoff:${r.uid}`, t('menu.remove'), true, true)
     : btn(`runeon:${r.uid}`, t('menu.equip')) + btn(`runesell:${r.uid}`, t('menu.sell'), true, true);
   return `<div class="mn-row">${runeIcon(r)}<span class="grow">${t(`rune.set.${r.set}`)} · ${t('sp.slot')} ${r.slot} · ${'★'.repeat(r.star)} <b>+${r.lv}</b>
     <small>${runeText(c, r)}</small></span>${acts}</div>`;
@@ -127,7 +127,7 @@ function runesView(s: HeroSession, save: SaveData, sp: SpiritInst, st: SpiritMen
   const bag = b.runes.filter((r) => r.on === null && (st.slot === null || r.slot === st.slot)).sort((a, z) => z.star - a.star || z.lv - a.lv);
   const filters = [null, 1, 2, 3, 4, 5, 6].map((n) => btn(`runeslot:${n ?? 0}`, n === null ? t('sp.allSlots') : String(n), true, st.slot !== n)).join('');
   return `<div class="sp-detail"><div class="mn-h">💠 ${spiritName(c, sp)} · ${t('sp.sets')}: ${sets} ${btn('spmode:info', t('sp.back'), true, true)}</div>${slots}
-    <div class="mn-h">${t('sp.runeBag')} (${b.runes.filter((r) => r.on === null).length}) · ${save.zeny}z</div><div class="sp-btns">${filters}</div>
+    <div class="mn-h">${t('sp.runeBag')} (${b.runes.filter((r) => r.on === null).length}) · ${save.soul}${t('hud.soul')}</div><div class="sp-btns">${filters}</div>
     ${bag.map((r) => runeRow(s, save, r, false)).join('') || `<div class="mn-note">${t('sp.noRunes')}</div>`}</div>`;
 }
 

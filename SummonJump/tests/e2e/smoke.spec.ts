@@ -282,7 +282,7 @@ test('phase 5: a new hero sees locked summon / tower and a guide quest', async (
   await ws(page, (w) => w.openMenu('arena'));
   await expect(page.locator('[data-act="arena:tower:1"]')).toHaveCount(0);
   await page.click('[data-act="close"]');
-  expect(await ws(page, (w) => w.guide.shown)).toContain('โพริ่ง');
+  expect(await ws(page, (w) => w.guide.shown)).toContain('บุ๋ม');
   expect(errors).toEqual([]);
 });
 
@@ -300,5 +300,19 @@ test('phase 5: AUTO (key T) faces and hits a nearby monster without pressing att
   await page.waitForFunction((id) => { const e = (window as unknown as Any).__game.scene.getScene('World').combat.enemies.find((x: Any) => x.id === id); return !e || e.hp < e.def.hp * 50; }, hit, { timeout: 5000 });
   await page.keyboard.press('KeyT');
   await expect(page.locator('#b_auto')).not.toHaveClass(/on/);
+  expect(errors).toEqual([]);
+});
+
+test('soul stones: old coin saves carry over, crystals on the map pay out', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.addInitScript(() => { try { if (!sessionStorage.getItem('seeded')) { localStorage.clear(); localStorage.setItem('summonjump-save-v1', JSON.stringify({ v: 1, room: 'forest', zeny: 1234 })); sessionStorage.setItem('seeded', '1'); } } catch { /* ignore */ } });
+  await page.goto('./?map=forest');
+  await page.waitForFunction(() => !!(window as unknown as Any).__game?.scene.getScene('World')?.ready, null, { timeout: 30_000 });
+  expect(await ws(page, (w) => w.save.soul)).toBe(1234);
+  const pick = await ws(page, (w) => { const p = w.pickups.find((x: Any) => x.item === 'stone'); w.hero.x = p.x - w.hero.w / 2; w.hero.y = p.y - w.hero.h / 2; w.hero.vy = 0; return p.amount; });
+  expect(pick).toBeGreaterThan(0);
+  await page.waitForFunction((n) => (window as unknown as Any).__game.scene.getScene('World').save.soul === 1234 + n, pick, { timeout: 5000 });
   expect(errors).toEqual([]);
 });

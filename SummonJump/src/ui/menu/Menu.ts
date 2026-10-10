@@ -115,8 +115,8 @@ export class Menu {
       case 'socket': if (socketCard(d, c, Number(x), y, h.save.cards)) this.note = t('menu.socketed'); break;
       case 'use': { const fx = useItem(d, c, Number(x)); if (fx) h.applyUse(fx); break; }
       case 'job': if (changeJob(d, c, x as JobId)) { this.note = t('menu.jobChanged').replace('{job}', t(`job.${x}`)); h.onJobChanged(); this.tab = 'skills'; } break;
-      case 'buy': { const it = itemDef(c, x); if (it && h.save.zeny >= it.price && addItem(d, c, x, 1)) { h.save.zeny -= it.price; this.note = t('combat.got').replace('{name}', t(it.name_key)); } break; }
-      case 'sell': { const it = instance(d, Number(x)); if (it) { const def = itemDef(c, it.id); h.save.zeny += Math.floor((def?.price ?? 0) / 2) * it.count; d.bag.splice(d.bag.indexOf(it), 1); } break; }
+      case 'buy': { const it = itemDef(c, x); if (it && h.save.soul >= it.price && addItem(d, c, x, 1)) { h.save.soul -= it.price; this.note = t('combat.got').replace('{name}', t(it.name_key)); } break; }
+      case 'sell': { const it = instance(d, Number(x)); if (it) { const def = itemDef(c, it.id); h.save.soul += Math.floor((def?.price ?? 0) / 2) * it.count; d.bag.splice(d.bag.indexOf(it), 1); } break; }
       case 'refine': this.refine(Number(x)); break;
       case 'arena': {
         const run: ArenaRun = x === 'tower' ? { mode: 'tower', floor: Number(y) } : { mode: 'dungeon', day: new Date().getDay(), heroLv: d.baseLv };
@@ -124,7 +124,7 @@ export class Menu {
         if (why) this.note = why; else { this.close(); return; }
         changed = false; break;
       }
-      case 'bookclaim': if (claimBook(c, s.book, x, h.save.seen)) this.note = t('adv.claimed'); break;
+      case 'bookclaim': if (claimBook(c, s.book, x, h.save.seen)) { const n = c.book.find((e) => e.id === x)?.soul ?? 0; h.save.soul += n; this.note = `${t('adv.claimed')}${n ? ` +${n}${t('hud.soul')}` : ''}`; } break;
       default: changed = false;
     }
     if (changed) { s.recompute(); h.flush(); h.onEquipChanged(); }
@@ -135,8 +135,8 @@ export class Menu {
     const h = this.host as MenuHost, d = h.session.data, it = instance(d, uid);
     if (!it) return;
     const cost = refineCost(it.refine);
-    if (h.save.zeny < cost) return;
-    h.save.zeny -= cost;
+    if (h.save.soul < cost) return;
+    h.save.soul -= cost;
     const r = rollRefine(it.refine, this.rng);
     it.refine = r.level;
     if (r.outcome === 'break') {

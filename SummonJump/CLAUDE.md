@@ -45,6 +45,7 @@ Read these before any work:
 - **Landscape-first UI**: virtual joystick left; Attack / Jump / Skill 1–3 / Spirit buttons right; every button ≥ 56 px; safe-area aware.
 - **Thai-first text**: all player-facing strings in `src/i18n/th.json` (English file kept in sync later). Fonts must support Thai.
 - **No real-time multiplayer.** All online features are asynchronous (SW style).
+- **Original names and designs only**: no names coined by Ragnarok Online or Summoners War (Poring, Drops, Marin, Rocker, Willow, Spore, Angeling, Zeny, Pneuma, Ruwach, Angelus, Magnum, Mana Stone, Crystals, Mystical Scroll, Light & Darkness scroll, Essence of …, the SW rune-set names). Mythology and plain words are fine. Currency = **หินวิญญาณ 💠** (`soul` in code/data). Art briefs say "original designs only".
 - Keep files small (< 400 lines). One system per folder.
 
 ## 4. Feel targets (from the approved demo)

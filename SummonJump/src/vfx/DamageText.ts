@@ -45,7 +45,7 @@ export function starburst(scene: Phaser.Scene, x: number, y: number): Phaser.Gam
   return g;
 }
 
-/** Small info text (EXP / zeny / item). */
+/** Small info text (EXP / soul / item). */
 export function popInfo(scene: Phaser.Scene, x: number, y: number, s: string, color = '#ffd88a'): void {
   const txt = scene.add.text(x, y, s, { fontFamily: 'Itim', fontSize: '18px', color, stroke: '#2a1a0a', strokeThickness: 4 }).setOrigin(0.5).setDepth(58);
   scene.tweens.add({ targets: txt, y: y - 50, alpha: 0, duration: 1300, ease: 'Quad.out', onComplete: () => txt.destroy() });

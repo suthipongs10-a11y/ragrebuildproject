@@ -55,7 +55,7 @@ const monsters: MonsterDef[] = read('monsters').map((r) => {
     level: num(r, 'level', 'monster'), hp: num(r, 'hp', 'monster'), atk: num(r, 'atk', 'monster'), def: num(r, 'def', 'monster'),
     element: e, element_lv: num(r, 'element_lv', 'monster'), size: (r.size ?? 'small') as MonsterDef['size'],
     ai: (r.ai ?? 'walker') as MonsterDef['ai'], ai_params: json(r, 'ai_params', 'monster'), stompable: bool(r, 'stompable'),
-    exp: num(r, 'exp', 'monster'), job_exp: num(r, 'job_exp', 'monster'), zeny_min: num(r, 'zeny_min', 'monster'), zeny_max: num(r, 'zeny_max', 'monster'),
+    exp: num(r, 'exp', 'monster'), job_exp: num(r, 'job_exp', 'monster'), soul_min: num(r, 'soul_min', 'monster'), soul_max: num(r, 'soul_max', 'monster'),
     card_id: r.card_id ?? '', card_rate: num(r, 'card_rate', 'monster'), respawn_sec: num(r, 'respawn_sec', 'monster'),
     art_pack: r.art_pack ?? '', hitbox: { w: w ?? 16, h: h ?? 16 }, draw_h: num(r, 'draw_h', 'monster'),
     art: r.art || null, tint: r.tint ? parseInt(r.tint, 16) : null,
@@ -105,7 +105,7 @@ const runeStats: RuneStatDef[] = read('rune_stats').map((r) => ({
   stat: r.stat ?? '', name_key: r.name_key ?? '', flat: bool(r, 'flat'), main_slots: (r.main_slots ?? '').split('|').filter(Boolean).map(Number),
   main_lo: num(r, 'main_lo', 'rune stat'), main_hi: num(r, 'main_hi', 'rune stat'), sub_lo: num(r, 'sub_lo', 'rune stat'), sub_hi: num(r, 'sub_hi', 'rune stat'),
 }));
-const runeUpgrade: RuneUpgradeDef[] = read('rune_upgrade').map((r) => ({ lv: num(r, 'lv', 'rune upgrade'), rate: num(r, 'rate', 'rune upgrade'), zeny: num(r, 'zeny', 'rune upgrade') }));
+const runeUpgrade: RuneUpgradeDef[] = read('rune_upgrade').map((r) => ({ lv: num(r, 'lv', 'rune upgrade'), rate: num(r, 'rate', 'rune upgrade'), soul: num(r, 'soul', 'rune upgrade') }));
 const runeDrop: RuneDropDef[] = read('rune_drop').map((r) => ({
   tier: r.tier ?? '', chance: num(r, 'chance', 'rune drop'), star_lo: num(r, 'star_lo', 'rune drop'), star_hi: num(r, 'star_hi', 'rune drop'),
   rarity: [0, 1, 2, 3, 4].map((i) => num(r, `r${i}`, 'rune drop')),
@@ -157,7 +157,7 @@ for (const j of jobs) {
 }
 const book: BookEntryDef[] = read('book').map((r) => ({
   id: r.id ?? '', kind: (r.kind ?? 'kill') as BookEntryDef['kind'], target: (r.target ?? '').split('|').filter(Boolean), count: num(r, 'count', 'book'),
-  reward: json(r, 'reward', 'book') as Record<string, number>, note: r.note ?? '',
+  reward: json(r, 'reward', 'book') as Record<string, number>, note: r.note ?? '', soul: Number(r.soul ?? 0) || 0,
 }));
 uniqueIds(book, 'book');
 for (const b of book) {
@@ -167,7 +167,7 @@ for (const b of book) {
 }
 const dungeon: DungeonDayDef[] = read('dungeon').map((r) => ({ day: num(r, 'day', 'dungeon'), element: r.element ?? 'neutral', essence: r.essence ?? '', monsters: (r.monsters ?? '').split('|').filter(Boolean) }));
 const tower: TowerFloorDef[] = read('tower').map((r) => ({
-  floor: num(r, 'floor', 'tower'), scale: num(r, 'scale', 'tower'), zeny: num(r, 'zeny', 'tower'), reward: json(r, 'reward', 'tower') as Record<string, number>,
+  floor: num(r, 'floor', 'tower'), scale: num(r, 'scale', 'tower'), soul: num(r, 'soul', 'tower'), reward: json(r, 'reward', 'tower') as Record<string, number>,
   monsters: (r.monsters ?? '').split('|').filter(Boolean).map((p) => { const [id = '', n = '1'] = p.split(':'); return { id, n: Number(n) }; }),
 }));
 if (dungeon.length !== 7) err('dungeon.csv: need 7 days');
@@ -185,7 +185,7 @@ uniqueIds(quests, 'quests');
 for (const q of quests) {
   if (!['kill', 'level', 'summon', 'visit', 'job', 'tower'].includes(q.kind)) err(`quest ${q.id}: unknown kind ${q.kind}`);
   if (q.kind === 'kill' && !monIds.has(q.target)) err(`quest ${q.id}: unknown monster ${q.target}`);
-  for (const k of Object.keys(q.reward)) if (k !== 'zeny' && !itemIds.has(k)) err(`quest ${q.id}: unknown reward item ${k}`);
+  for (const k of Object.keys(q.reward)) if (k !== 'soul' && !itemIds.has(k)) err(`quest ${q.id}: unknown reward item ${k}`);
 }
 
 // ── spirits / summon / runes ──

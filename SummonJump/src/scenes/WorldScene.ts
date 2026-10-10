@@ -67,7 +67,7 @@ export class WorldScene extends Phaser.Scene {
   private toastUntil = 0;
   busy = false;
   interactables: Interactable[] = [];
-  pickups: { id: string; item: string; x: number; y: number; obj: Phaser.GameObjects.Image }[] = [];
+  pickups: { id: string; item: string; amount: number; x: number; y: number; obj: Phaser.GameObjects.Image }[] = [];
   abilities = new Set<Ability>();
   save!: SaveData;
   private levels!: Map<string, LevelData>;
@@ -178,7 +178,7 @@ export class WorldScene extends Phaser.Scene {
         if (this.save.items[e.id] || (e.fields.hidden && !this.abilities.has('reveal'))) continue;
         const obj = this.add.image(e.x, e.y - 6, 'icon_crystal').setOrigin(0.5, 1).setDepth(8).setScale(34 / 128).setTint(e.fields.hidden ? 0xc9a6ff : 0xffffff);
         this.tweens.add({ targets: obj, y: obj.y - 8, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.inOut' });
-        this.pickups.push({ id: e.id, item: String(e.fields.item ?? 'stone'), x: e.x, y: e.y - 22, obj });
+        this.pickups.push({ id: e.id, item: String(e.fields.item ?? 'stone'), amount: Number(e.fields.amount ?? 0), x: e.x, y: e.y - 22, obj });
       } else if (e.type !== 'Monster' && e.type !== 'Pipe') {
         const it = spawnEntityView(this, e, this.save, this.abilities);
         if (it) this.interactables.push(it);
@@ -314,7 +314,7 @@ export class WorldScene extends Phaser.Scene {
     this.rig.setAlpha(this.combat.combat.inv > 0 && !dead && Math.floor(this.time.now / 50) % 2 ? 0.35 : 1);
     this.skillBtns.update(this.session);
     this.ultBtn.update(this.combat);
-    this.bars.update(this.combat.combat.hp, this.combat.maxHp, this.session.rt.sp, this.combat.maxSp, this.session.data, this.save.zeny, this.session.rt.cast);
+    this.bars.update(this.combat.combat.hp, this.combat.maxHp, this.session.rt.sp, this.combat.maxSp, this.session.data, this.save.soul, this.session.rt.cast);
     const boss = this.combat.boss;
     this.bars.boss(boss ? t(boss.def.name_key) : null, boss?.hp, boss?.def.hp, boss?.def.tier === 'mvp');
     this.hud.setText(`${t(this.level.name)} · ${Math.round(this.game.loop.actualFps)} fps\n${this.room.abilityLine()}`);
