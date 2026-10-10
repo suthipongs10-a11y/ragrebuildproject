@@ -47,6 +47,6 @@ Placeholders until the zips arrive: the 5 old small spirits (`P00_legacy`), tint
 
 ## Known issues / notes
 - Element variants are a hue shift of one painting per family (cheap, consistent). If a variant looks wrong we can order that one painting separately later.
-- New families show a coloured orb until `ART_P04_Spirits` arrives; big forms use the small picture until then.
+- ~~New families show a coloured orb until `ART_P04_Spirits` arrives~~ — imported 2026-10-10 (all 79 files, 4 zips): every family has small/big/awakened art; scrolls, essences, rune icons and summon VFX are painted. The 5 original families still use the small picture for their big (ultimate) form until `ART_P03_Gear_Cards_VFX` Part 2 (`spirit_big_*`).
 - Hidden treasure (👁️ reveal: Pixie / Sage Owl): forest (mystic scroll) and sky 1 (light-dark scroll).
 - Cloud glide (☁️ Cloud Sheep / Unicorn): hold jump while falling. No level needs it yet (Phase 5 content).
