@@ -2,7 +2,7 @@
 
 Status: **in progress** (started 2026-10-10, owner said "go" after Phase 4: "ท่าไม้ตายภูตแรงดีมาก go")
 
-Art (6 briefs, placeholders until the zips arrive):
+Art (7 briefs, placeholders until the zips arrive) — also `ART_P05_NPC_Portal.md` (portal keeper NPC + gate, 3 images):
 - Zones: `ART_P05_Zone_Pack_forest.md`, `ART_P05_Zone_Pack_sky.md`, `ART_P05_Zone_Pack_abyss.md` — 3 more background variations per zone + props
 - Monsters: `ART_P05_Monsters_forest.md`, `ART_P05_Monsters_sky.md`, `ART_P05_Monsters_abyss.md` — new monsters (4 poses), mini-bosses (+skill pose), MVP Storm Roc (parts sheet), cards
 
