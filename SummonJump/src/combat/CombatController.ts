@@ -125,7 +125,7 @@ export class CombatController {
     const skillEv = stepSkills(s.rt, this.skillCtx(hero), dt);
     this.handleSkillEvents(skillEv);
     const out = stepHeroCombat(this.combat, hero, d.build, this.enemies, this.shots, inp, this.level.water, this.rng, dt,
-      { element: d.element, ranged: d.ranged, range: d.range, noKnockback: d.noKnockback, blocked: !!s.rt.cast });
+      { element: d.element, ranged: d.ranged, range: d.range, noKnockback: d.noKnockback, blocked: !!s.rt.cast, magicShot: d.magic });
     for (const ev of out) this.feedback(ev);
     followSpirits(this.spirits, hero, time, dt);
     this.heroDir = hero.dir;

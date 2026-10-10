@@ -79,14 +79,16 @@ export function validateLevels(levels: Map<string, LevelData>, knownMonsters: Re
       const t = levels.get(to as string);
       if (!t) { errs.push(`${at}: exit ${dir} -> missing level ${to}`); continue; }
       const back = ({ left: 'right', right: 'left', up: 'down', down: 'up' } as const)[dir as 'left'];
-      if (t.exitTo[back] !== l.id) errs.push(`${at}: exit ${dir} -> ${to} has no matching return exit`);
+      // the way back is the opposite edge, or a pipe (sky1: town ↑ sky1, back down by the cloud pipe)
+      const pipeBack = (dir === 'up' || dir === 'down') && t.entities.some((o) => o.type === 'Pipe' && o.fields.target === l.id);
+      if (t.exitTo[back] !== l.id && !pipeBack) errs.push(`${at}: exit ${dir} -> ${to} has no matching return exit`);
       if (t.grid.h !== l.grid.h && (dir === 'left' || dir === 'right')) errs.push(`${at}: height differs from ${to} (side exits need equal height)`);
     }
     for (const e of l.entities) {
       if (e.type === 'Pipe') {
         const t = levels.get(String(e.fields.target));
         if (!t) errs.push(`${at}: pipe -> missing level ${e.fields.target}`);
-        else if (!t.entities.some((o) => o.type === 'Pipe' && o.fields.target === l.id)) errs.push(`${at}: pipe -> ${t.id} has no return pipe`);
+        else if (!t.entities.some((o) => o.type === 'Pipe' && o.fields.target === l.id) && !Object.values(t.exitTo).includes(l.id)) errs.push(`${at}: pipe -> ${t.id} has no way back`);
       }
       if (e.x < 0 || e.y < 0 || e.x > l.grid.pxW || e.y > l.grid.pxH + TILE) errs.push(`${at}: entity ${e.type} outside the room`);
     }

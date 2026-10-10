@@ -57,6 +57,13 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Level unlocks (`content/unlocks.csv`) + guide quest chain (`content/quests.csv`, `shared/progression/guide.ts`, `src/hero/Guide.ts`).
 - [x] ROADMAP: world chat, rare-drop/MVP broadcast, offline farming, rested EXP → Phase 6; backlog list.
 
+## Owner request: RO-style attack stats + solid sky ground (2026-10-10)
+- [x] ATK follows the weapon like RO pre-renewal: melee + staff → STR ×2 + (STR/10)² + DEX/5 + LUK/5; bow → DEX ×2 + (DEX/10)² + STR/5 + LUK/5. MATK = INT only (+ weapon MATK) and a staff adds +15 % (RO rods/staves). Status tab shows which stat drives ATK / MATK.
+- [x] Staff normal attack = a short-range magic shot (230 px, painted soul-strike orb), still a physical STR hit as a rod's normal attack in RO — mages/acolytes without STR hit weakly, spells scale with INT.
+- [x] RO weapon access (no daggers yet, the two basic swords stand in): swordsman sword/mace, mage staff/sword, archer bow/sword, acolyte mace/staff/sword. Arrow skills need a bow ("ต้องถือธนู").
+- [x] Sky Isles: every sky room stands on one continuous cloud ground (no gaps → no fall/respawn flicker); sky1 goes back to town through a cloud pipe (level validation accepts edge ↔ pipe pairs).
+- Balance: swordsman route unchanged (1.9 → 1.8 h sim to the Kraken).
+
 ## Art imported (2026-10-10)
 - `SJ_P04_Spirits_Part1–4` → pack `P04_Spirits` (79/79 files, no warnings): spirit art is picked up from `spirits.csv`, item/rune icons from `items.csv` and rune names.
 - `Summon_Jump_v3_Part3_VFX_Env` (P03 brief Part 3, imported as `SJ_P03_VFX_Env_Part3`) → pack `P03_VFX_Env` (17/17): painted sword slashes, hit spark / critical burst, skill casts (`skills.csv` `vfx`, closest painting via an alias table in `src/vfx/Art.ts`), ultimate hits (jelly splash, tornado, meteor, holy pillar, wave), ultimate aura, level-up pillar, spirit element casts, poring-family death splash, painted pipe and boulder wall. Code-drawn effects stay as the fallback.

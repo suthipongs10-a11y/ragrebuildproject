@@ -1,14 +1,15 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { Cell, TILE, TileGrid, createEnemy, createHero, createHeroCombat, createRng, derive, newHero, newSkillRuntime, stepHeroCombat, stepShots, stepSkills, useSkill, maxSp, type ContentBundle, type Enemy, type HeroData, type SkillCtx, type Shot } from '@shared/index';
+import { addItem, equip, Cell, TILE, TileGrid, createEnemy, createHero, createHeroCombat, createRng, derive, newHero, newSkillRuntime, stepHeroCombat, stepShots, stepSkills, useSkill, maxSp, type ContentBundle, type Enemy, type HeroData, type SkillCtx, type Shot } from '@shared/index';
 
 const content = JSON.parse(readFileSync(join(import.meta.dirname, '..', 'public', 'content', 'content.json'), 'utf8')) as ContentBundle;
 const def = (id: string) => content.monsters.find((m) => m.id === id)!;
 
-function setup(job: HeroData['job'], skills: Record<string, number>) {
+function setup(job: HeroData['job'], skills: Record<string, number>, weapon?: string) {
   const g = new TileGrid(30, 17); for (let x = 0; x < 30; x++) { g.set(x, 15, Cell.Solid); g.set(x, 16, Cell.Solid); }
   const data = newHero(content); data.job = job; data.baseLv = 20; data.skills = { ...data.skills, ...skills }; data.stats.int = 20; data.stats.dex = 10;
+  if (weapon) { const w = addItem(data, content, weapon, 1); if (w) equip(data, content, w.uid); }
   const derived = derive(data, content);
   const hero = createHero(8 * TILE, 15 * TILE - 56); hero.onGround = true; hero.dir = 1;
   const combat = createHeroCombat(derived.build);
@@ -47,7 +48,9 @@ describe('skills runtime', () => {
     expect(s.enemies[0]!.hp).toBeLessThan(hp0);
   });
   it('archer double strafe fires two arrows', () => {
-    const s = setup('archer', { double_strafe: 1 });
+    const bare = setup('archer', { double_strafe: 1 });
+    expect(useSkill(bare.rt, bare.ctx, 'double_strafe')[0]).toMatchObject({ kind: 'fail', why: 'weapon' }); // RO: arrow skills need a bow
+    const s = setup('archer', { double_strafe: 1 }, 'wpn_bow_short');
     useSkill(s.rt, s.ctx, 'double_strafe');
     expect(s.shots.filter((x) => !x.hostile).length).toBe(2);
     const hp0 = s.enemies[0]!.hp; tick(s, 1); expect(s.enemies[0]!.hp).toBeLessThan(hp0);

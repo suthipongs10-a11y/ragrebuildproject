@@ -46,7 +46,7 @@ export function statusTab(s: HeroSession): string {
       <small>${t('menu.cost')} ${cost}</small>${btn(`stat:${k}`, '+', h.statPoints >= cost)}</div>`;
   }).join('');
   return `<div class="mn-h">${t(`job.${h.job}`)} · Lv ${h.baseLv} · Job ${h.jobLv} · ${t('menu.points')} <b>${h.statPoints}</b></div>
-    <div class="mn-kv"><div>ATK <b>${attack(b)}</b></div><div>MATK <b>${magicAttack(b)}</b></div><div>DEF <b>${defense(b)}</b></div><div>HP <b>${maxHp(b)}</b></div>
+    <div class="mn-kv"><div>ATK <b>${attack(b)}</b> <small>${b.atkStat === 'dex' ? 'DEX' : 'STR'}</small></div><div>MATK <b>${magicAttack(b)}</b> <small>INT${b.staffMatk ? ` +${Math.round(b.staffMatk * 100)}%` : ''}</small></div><div>DEF <b>${defense(b)}</b></div><div>HP <b>${maxHp(b)}</b></div>
     <div>SP <b>${maxSp(b)}</b></div><div>${t('menu.crit')} <b>${critRate(b).toFixed(1)}%</b></div><div>${t('menu.aspd')} <b>${(1 / attackCooldown(b)).toFixed(1)}/s</b></div><div>${t('menu.element')} <b>${t(`el.${s.derived.element}`)}</b></div></div>
     ${rows}`;
 }

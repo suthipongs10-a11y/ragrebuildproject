@@ -20,7 +20,7 @@ export interface SkillRuntime {
   cast: { id: string; t: number; total: number } | null; regenT: number; zoneN: number;
 }
 
-export type SkillFail = 'sp' | 'cooldown' | 'casting' | 'passive' | 'unknown' | 'dead';
+export type SkillFail = 'sp' | 'cooldown' | 'casting' | 'passive' | 'unknown' | 'dead' | 'weapon';
 export type SkillEvent =
   | { kind: 'cast_start'; id: string; total: number }
   | { kind: 'cast'; skill: SkillDef; x: number; y: number; dir: number }
@@ -50,6 +50,8 @@ export function useSkill(rt: SkillRuntime, ctx: SkillCtx, id: string): SkillEven
   if (s.type !== 'active') return [{ kind: 'fail', id, why: 'passive' }];
   if (rt.cast) return [{ kind: 'fail', id, why: 'casting' }];
   if ((rt.cds[id] ?? 0) > rt.time) return [{ kind: 'fail', id, why: 'cooldown' }];
+  // RO: arrow skills need a bow in hand
+  if (s.effects.bow && !(ctx.derived.ranged && !ctx.derived.magic)) return [{ kind: 'fail', id, why: 'weapon' }];
   const cost = spCost(s, lv);
   if (rt.sp < cost) return [{ kind: 'fail', id, why: 'sp' }];
   rt.sp -= cost; rt.cds[id] = rt.time + s.cd;

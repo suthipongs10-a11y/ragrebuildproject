@@ -1,5 +1,5 @@
 import type { ContentBundle, ItemDef, JobDef, JobId, SkillDef } from '../content/types';
-import { attack, defense, expToNext, jobExpToNext, maxHp, statCost, statPointsForLevelUp, MAX_BASE_LEVEL, MAX_STAT, STAT_KEYS, type HeroBuild, type StatKey, type Stats } from '../formulas/stats';
+import { attack, defense, expToNext, jobExpToNext, maxHp, statCost, statPointsForLevelUp, MAX_BASE_LEVEL, MAX_STAT, STAFF_MATK, STAT_KEYS, type HeroBuild, type StatKey, type Stats } from '../formulas/stats';
 import { refineAttackBonus } from '../formulas/refine';
 import { fx } from '../formulas/expr';
 import type { Element } from '../formulas/elements';
@@ -226,6 +226,9 @@ const add = (o: Record<string, number>, k: string, v: number) => { o[k] = (o[k] 
 export interface TeamBonus { element: Element | null; effects: Record<string, number> }
 
 /** Everything that changes numbers: base stats + job + equipment (+refine) + cards + passives + active buffs + spirit leader. */
+/** Staff normal attack reach (bows: 300). */
+export const STAFF_RANGE = 230;
+
 export function derive(h: HeroData, c: ContentBundle, buffs: Buff[] = [], now = 0, team?: TeamBonus): Derived {
   const bonus: Record<string, number> = {};
   let weaponAtk = 0, weaponMatk = 0, element: Element = 'neutral', weaponType = '';
@@ -253,13 +256,15 @@ export function derive(h: HeroData, c: ContentBundle, buffs: Buff[] = [], now = 
     level: h.baseLv, stats, weaponAtk, bonusAtk: bonus.atk ?? 0, bonusDef: bonus.def ?? 0, bonusHp: bonus.hp ?? 0, bonusCrit: bonus.crit ?? 0,
     hpFactor: job.hp_factor, spFactor: job.sp_factor, aspdFactor: job.aspd_factor, weaponMatk, bonusMatk: bonus.matk ?? 0, bonusSp: bonus.sp ?? 0,
     bonusAspd: bonus.aspd ?? 0, bonusSpeed: bonus.speed ?? 0,
+    atkStat: weaponType === 'bow' ? 'dex' : 'str', staffMatk: weaponType === 'staff' ? STAFF_MATK : 0,
   };
   // percent bonuses (spirit leader skills) on top of everything else
   if (bonus.atk_p) build.bonusAtk += Math.round((attack(build) * bonus.atk_p) / 100);
   if (bonus.def_p) build.bonusDef += Math.round((defense(build) * bonus.def_p) / 100);
   if (bonus.hp_p) build.bonusHp += Math.round((maxHp(build) * bonus.hp_p) / 100);
   return {
-    build, element, hpRegen: bonus.hp_regen ?? 0, spRegen: bonus.sp_regen ?? 0, range: 300 + (bonus.range ?? 0),
-    ranged: weaponType === 'bow', magic: weaponType === 'staff', noKnockback: (bonus.no_knockback ?? 0) > 0, shield: bonus.absorb ?? 0,
+    build, element, hpRegen: bonus.hp_regen ?? 0, spRegen: bonus.sp_regen ?? 0, range: (weaponType === 'staff' ? STAFF_RANGE : 300) + (bonus.range ?? 0),
+    // bows shoot arrows; staves shoot a small bolt of magic (still a physical STR hit, as a rod's normal attack in RO)
+    ranged: weaponType === 'bow' || weaponType === 'staff', magic: weaponType === 'staff', noKnockback: (bonus.no_knockback ?? 0) > 0, shield: bonus.absorb ?? 0,
   };
 }

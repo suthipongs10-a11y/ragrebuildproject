@@ -103,6 +103,7 @@
   "skill.fail.passive": "สกิลติดตัว ใช้กดไม่ได้",
   "skill.fail.unknown": "ยังไม่ได้เรียนสกิลนี้",
   "skill.fail.dead": "",
+  "skill.fail.weapon": "ต้องถือธนูถึงจะใช้สกิลนี้ได้",
   "lvl.base": "เลเวลอัป! Lv {n}",
   "lvl.job": "Job Lv {n}",
   "lvl.points": "(แจกแต้มในเมนู ☰)",

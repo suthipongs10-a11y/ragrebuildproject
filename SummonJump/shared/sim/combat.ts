@@ -44,8 +44,8 @@ export function attackBox(h: Body & { dir: number }, spec: AttackSpec): Box {
 }
 
 export interface HeroCombatInput { attackPressed: boolean; attackHeld: boolean; jumpHeld: boolean }
-/** Equipment-derived options: weapon element, bows shoot arrows, Endure ignores knockback. */
-export interface HeroCombatOpts { element?: Element; ranged?: boolean; range?: number; noKnockback?: boolean; blocked?: boolean }
+/** Equipment-derived options: weapon element, bows shoot arrows (staves: magic bolts), Endure ignores knockback. */
+export interface HeroCombatOpts { element?: Element; ranged?: boolean; range?: number; noKnockback?: boolean; blocked?: boolean; /** staff: the shot looks like magic */ magicShot?: boolean }
 
 /**
  * Advance timers, start attacks, resolve hero hitboxes and contact/stomp/shots against enemies.
@@ -69,9 +69,9 @@ export function stepHeroCombat(
     const spec = currentSpec(c);
     c.atkT = spec.dur; c.atkCd = attackCooldown(build) * (c.combo === 2 ? 1.6 : 1); c.hitSet = new Set();
     ev.push({ kind: 'swing', spec, x: hero.x + hero.w / 2 + hero.dir * 16, y: hero.y + hero.h * 0.42, dir: hero.dir });
-    if (opts.ranged) { // bows: every attack is an arrow instead of a melee box
+    if (opts.ranged) { // bows / staves: every attack is a shot instead of a melee box
       shots.push({ x: hero.x + hero.w / 2 + hero.dir * 20, y: hero.y + hero.h * 0.4, vx: hero.dir * 760, vy: 0, r: 8, color: 0xfff2cc, dmg: 0, life: (opts.range ?? 300) / 760 + 0.15,
-        hostile: false, ghost: false, el, base: spec.mult, kb: spec.kb, kind: 'arrow' });
+        hostile: false, ghost: false, el, base: spec.mult, kb: spec.kb, kind: opts.magicShot ? 'magic_shot' : 'arrow' });
       c.hitSet.add('*');
     }
   }

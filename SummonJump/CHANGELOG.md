@@ -17,6 +17,8 @@
 - Roadmap: world chat + rare-drop/MVP broadcast, offline farming and rested EXP added to Phase 6; backlog section.
 - Art: P04 spirits (79 images: 15 families incl. awakened forms, scrolls, essences, runes, summon VFX) and P03 VFX/environment (17: slashes, sparks, crit burst, skill/ultimate effects, level-up, pipe, boulder) imported and wired; summon reveal uses the painted portal/beam/star.
 - Art: job characters on the rig (painted parts per job, weapon pictures, battle-shout / hurt faces), painted NPCs and world props, item / card / skill icons, painted arrows, bolts and skill zones; `art:import` no longer skips the first zip.
+- RO-style stats: ATK from STR (melee, staff shots) or DEX (bows), MATK from INT with a +15 % staff bonus; staves shoot magic bolts; RO weapon access per job; arrow skills need a bow.
+- Sky Isles: continuous cloud ground in every room, cloud pipe from sky1 back to town.
 
 ## Phase 4 (done) — 2026-10-09
 - 15 spirit families × element variants (`spirits.csv`, `spirit_skills.csv`, `spirit_elements.csv`, `spirit_config.csv`).

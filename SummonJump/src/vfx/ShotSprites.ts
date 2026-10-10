@@ -6,11 +6,11 @@ import type { Shot, Zone } from '@shared/index';
  * One pooled image per live shot/zone; returns false for things without art so the caller keeps drawing shapes.
  */
 const SHOT_ART: Record<string, string> = {
-  arrow: 'prj_arrow', vfx_arrow_trail: 'vfx_arrow_trail', vfx_arrow_shower: 'vfx_arrow_trail', tornado: 'vfx_tornado',
+  arrow: 'prj_arrow', magic_shot: 'vfx_soul_strike', vfx_arrow_trail: 'vfx_arrow_trail', vfx_arrow_shower: 'vfx_arrow_trail', tornado: 'vfx_tornado',
   vfx_fire_bolt: 'vfx_fire_bolt', vfx_cold_bolt: 'vfx_cold_bolt', vfx_lightning_bolt: 'vfx_lightning_bolt', vfx_soul_strike: 'vfx_soul_strike', vfx_holy_light: 'vfx_soul_strike',
 };
 /** px length of the painting along its flight direction, per shot radius */
-const SHOT_LEN: Record<string, number> = { prj_arrow: 5.5, vfx_arrow_trail: 6, vfx_tornado: 4, vfx_lightning_bolt: 7 };
+const SHOT_LEN: Record<string, number> = { vfx_soul_strike: 6.5, prj_arrow: 5.5, vfx_arrow_trail: 6, vfx_tornado: 4, vfx_lightning_bolt: 7 };
 /** direction the painting itself points (degrees clockwise from →) */
 const SHOT_ANGLE: Record<string, number> = { vfx_fire_bolt: 35, vfx_cold_bolt: 55, vfx_lightning_bolt: 90 };
 const ZONE_ART = (z: Zone): string => (z.pneuma ? 'vfx_pneuma' : z.trap ? 'vfx_ankle_trap' : 'vfx_fire_wall');
