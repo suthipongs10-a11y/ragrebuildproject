@@ -89,6 +89,11 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Sky Isles: every sky room stands on one continuous cloud ground (no gaps → no fall/respawn flicker); sky1 goes back to town through a cloud pipe (level validation accepts edge ↔ pipe pairs).
 - Balance: swordsman route unchanged (1.9 → 1.8 h sim to the Kraken).
 
+## Owner request: lock-on, loot magnet, crit burst (2026-10-10)
+- [x] Click / tap a monster = lock-on: the hero keeps attacking with normal attacks (normal damage) until it dies, RO style.
+- [x] Loot magnet: drops pop out for 0.45 s, then fly into the hero by themselves (no walking over them). With a full bag they stop and wait on the ground.
+- [x] Critical number like the owner's reference picture: big yellow digits with a black outline on a spiky orange-red burst (darker rim, lighter core, uneven spikes); slams in, hangs, floats up.
+
 ## Art imported (2026-10-10)
 - `SJ_P04_Spirits_Part1–4` → pack `P04_Spirits` (79/79 files, no warnings): spirit art is picked up from `spirits.csv`, item/rune icons from `items.csv` and rune names.
 - `Summon_Jump_v3_Part3_VFX_Env` (P03 brief Part 3, imported as `SJ_P03_VFX_Env_Part3`) → pack `P03_VFX_Env` (17/17): painted sword slashes, hit spark / critical burst, skill casts (`skills.csv` `vfx`, closest painting via an alias table in `src/vfx/Art.ts`), ultimate hits (jelly splash, tornado, meteor, holy pillar, wave), ultimate aura, level-up pillar, spirit element casts, poring-family death splash, painted pipe and boulder wall. Code-drawn effects stay as the fallback.
