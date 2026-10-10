@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
-import type { HeroState, SkillEvent } from '@shared/index';
+import type { HeroCombat, HeroState, SkillEvent } from '@shared/index';
 import type { Controls, InputKey } from '../input/Controls';
 import type { CombatController } from '../combat/CombatController';
 import type { HeroSession } from './HeroSession';
-import type { HeroRig } from '../rig/HeroRig';
+import type { HeroClip, HeroRig } from '../rig/HeroRig';
 import { burst, ring } from '../vfx/Effects';
 import { t } from '../i18n';
 
@@ -44,4 +44,13 @@ export function playLevelUps(scene: Phaser.Scene, combat: CombatController, sess
     toast(`${parts.join(' · ')} ${t('lvl.points')}`);
     combat.heal();
   }
+}
+
+/** Which rig clip fits the hero right now (attacks/hurt are started by combat events and run to completion). */
+export function pickClip(h: HeroState, cur: HeroClip, cb: HeroCombat, water: boolean): HeroClip {
+  if (cur.startsWith('attack') && cb.atkT > 0) return cur;
+  if (cur === 'hurt' && cb.inv > 0.75) return cur;
+  if (!h.onGround && !water) return h.vy < 0 ? 'jump' : 'fall';
+  if (cb.atkCd > 0.08 && cb.chainT > 0) return 'guard';
+  return h.onGround && Math.abs(h.vx) > 30 ? 'run' : 'idle';
 }

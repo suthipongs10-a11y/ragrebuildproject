@@ -2,6 +2,10 @@
 
 ## Phase 5 (in progress) — 2026-10-10
 - Phase checklist + 6 art briefs (3 zone packs, 3 monster packs).
+- 33 monster types (25 normal, 6 mini-bosses, 2 MVPs) with cards and drops; recoloured look-alikes until their art arrives.
+- Boss scripts: Spore Mother, Thunder Ram, Siren, Sawtooth Shark, Storm Roc (MVP, tornado phase), Kraken phase 2; every boss enrages under 50 %.
+- 18 maps in zones 1–3 (forest/deep, sky, abyss) with background variations; reachability test with real physics.
+- Mini-boss / MVP respawn timer shown in the room, boss returns when it hits zero.
 
 ## Phase 4 (done) — 2026-10-09
 - 15 spirit families × element variants (`spirits.csv`, `spirit_skills.csv`, `spirit_elements.csv`, `spirit_config.csv`).

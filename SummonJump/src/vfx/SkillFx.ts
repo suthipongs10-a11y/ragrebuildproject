@@ -17,6 +17,10 @@ export class SkillFx {
     const g = this.g.clear();
     for (const s of shots) {
       if ((s.delay ?? 0) > 0) continue;
+      if (s.hostile && s.kind === 'tornado') { // Storm Roc: a spinning funnel of wind
+        for (let i = 0; i < 5; i++) { const w = s.r * (0.5 + i * 0.28), yy = s.y + 26 - i * 14, o = Math.sin(time * 9 + i) * 6; g.lineStyle(4, s.color, 0.75 - i * 0.08).strokeEllipse(s.x + o, yy, w * 2, w * 0.6); }
+        continue;
+      }
       if (s.hostile) { g.fillStyle(s.color, 0.9).fillCircle(s.x, s.y, s.r); g.fillStyle(0xffffff, 0.6).fillCircle(s.x, s.y, s.r * 0.45); continue; }
       const c = ELEMENT_COLOR[s.el] ?? 0xfff2cc, len = Math.hypot(s.vx, s.vy) || 1, ux = s.vx / len, uy = s.vy / len;
       if (s.kind === 'arrow' || s.kind === 'vfx_arrow_trail' || s.kind === 'vfx_arrow_shower') {

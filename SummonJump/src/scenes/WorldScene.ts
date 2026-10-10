@@ -13,16 +13,17 @@ import { abilitiesFromUrl, type Ability } from '../world/abilities';
 import { buildLevelVisuals, type LevelVisuals } from '../world/LevelView';
 import { spawnEntityView, type Interactable } from '../world/EntityViews';
 import { CombatController } from '../combat/CombatController';
-import { HeroRig, type HeroClip } from '../rig/HeroRig';
+import { HeroRig } from '../rig/HeroRig';
 import { Hud } from '../ui/Hud';
 import { RoomInteractions } from '../world/RoomInteractions';
 import { HeroSession } from '../hero/HeroSession';
-import { handleSkillInput, playLevelUps } from '../hero/HeroPlay';
+import { handleSkillInput, pickClip, playLevelUps } from '../hero/HeroPlay';
 import type { Menu, MenuTab } from '../ui/menu/Menu';
 import { SkillButtons } from '../ui/SkillButtons';
 import { ActionButton } from '../ui/ActionButton';
 import { popNumber } from '../vfx/DamageText';
 import { bindDebugKeys } from './debugKeys';
+import { BossTimers } from '../world/BossTimers';
 import { loadTeamArt, spiritArtKeys, teamAbilitySet, tryUltimate, UltButton, type UltHost } from '../spirits/SpiritPlay';
 
 /** Where the hero appears when a room loads. */
@@ -49,6 +50,7 @@ export class WorldScene extends Phaser.Scene {
   private skillBtns = new SkillButtons();
   private actionBtn = new ActionButton();
   private ultBtn = new UltButton();
+  private bossTimers!: BossTimers;
   private menu!: Menu;
   private deadT = 0;
   view!: LevelVisuals;
@@ -157,6 +159,7 @@ export class WorldScene extends Phaser.Scene {
     pruneDefeated(this.save.defeated, now);
     const monsters = this.level.entities.filter((e) => e.type === 'Monster');
     for (const e of aliveSpawns(monsters, this.save.defeated, now)) this.combat.spawn(e.id, String(e.fields.monster), e.x, e.y);
+    this.bossTimers = new BossTimers(this, this.level, this.save.defeated, this.session.content, (e) => this.combat.spawn(e.id, String(e.fields.monster), e.x, e.y));
     for (const e of this.level.entities) {
       if (e.type === 'Item') {
         if (this.save.items[e.id] || (e.fields.hidden && !this.abilities.has('reveal'))) continue;
@@ -280,6 +283,7 @@ export class WorldScene extends Phaser.Scene {
     this.actionBtn.show(action?.label ?? null);
     if (action && this.actionBtn.take()) action.run();
     this.room.collectPickups();
+    this.bossTimers.update();
 
     const ex = dead ? null : checkExit(this.hero, env);
     if (ex === 'fall') this.fallRespawn();
@@ -289,7 +293,7 @@ export class WorldScene extends Phaser.Scene {
     }
 
     const h = this.hero;
-    if (!dead) this.rig.play(this.pickClip());
+    if (!dead) this.rig.play(pickClip(h, this.rig.current, this.combat.combat, this.level.water));
     this.rig.update(frozen ? 0 : dt, h.x + h.w / 2, h.y + h.h, h.dir);
     this.rig.setAlpha(this.combat.combat.inv > 0 && !dead && Math.floor(this.time.now / 50) % 2 ? 0.35 : 1);
     this.skillBtns.update(this.session);
@@ -300,16 +304,6 @@ export class WorldScene extends Phaser.Scene {
     this.hud.setText(`${t(this.level.name)} · ${Math.round(this.game.loop.actualFps)} fps\n${this.room.abilityLine()}`);
     if (this.toastUntil && this.time.now > this.toastUntil) { this.toastUntil = 0; this.tweens.add({ targets: this.toastText, alpha: 0, duration: 300 }); }
     c.endFrame();
-  }
-
-  /** Which rig clip fits the hero right now (attacks/hurt are started by combat events and run to completion). */
-  private pickClip(): HeroClip {
-    const h = this.hero, cur = this.rig.current, cb = this.combat.combat;
-    if (cur.startsWith('attack') && cb.atkT > 0) return cur;
-    if (cur === 'hurt' && cb.inv > 0.75) return cur;
-    if (!h.onGround && !this.level.water) return h.vy < 0 ? 'jump' : 'fall';
-    if (cb.atkCd > 0.08 && cb.chainT > 0) return 'guard';
-    return h.onGround && Math.abs(h.vx) > 30 ? 'run' : 'idle';
   }
 
   private respawnAfterDeath(): void {

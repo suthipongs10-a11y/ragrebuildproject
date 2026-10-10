@@ -58,6 +58,7 @@ const monsters: MonsterDef[] = read('monsters').map((r) => {
     exp: num(r, 'exp', 'monster'), job_exp: num(r, 'job_exp', 'monster'), zeny_min: num(r, 'zeny_min', 'monster'), zeny_max: num(r, 'zeny_max', 'monster'),
     card_id: r.card_id ?? '', card_rate: num(r, 'card_rate', 'monster'), respawn_sec: num(r, 'respawn_sec', 'monster'),
     art_pack: r.art_pack ?? '', hitbox: { w: w ?? 16, h: h ?? 16 }, draw_h: num(r, 'draw_h', 'monster'),
+    art: r.art || null, tint: r.tint ? parseInt(r.tint, 16) : null,
   };
 });
 const drops: DropDef[] = read('drops').map((r) => ({
@@ -129,6 +130,7 @@ for (const m of monsters) {
   if (m.card_id && !cardIds.has(m.card_id)) err(`monster ${m.id}: unknown card_id ${m.card_id}`);
   if (m.card_rate < 0 || m.card_rate > 1) err(`monster ${m.id}: card_rate out of range`);
   if (m.hp <= 0) err(`monster ${m.id}: hp must be > 0`);
+  if (m.art && (!monIds.has(m.art) || monsters.find((x) => x.id === m.art)?.art)) err(`monster ${m.id}: art must be another monster with its own art (${m.art})`);
 }
 for (const d of drops) {
   if (!monIds.has(d.monster_id)) err(`drop: unknown monster ${d.monster_id}`);

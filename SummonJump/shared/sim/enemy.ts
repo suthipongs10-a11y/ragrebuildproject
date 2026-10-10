@@ -2,12 +2,13 @@ import type { MonsterDef } from '../content/types';
 import type { Rng } from '../rng';
 import { Cell, isSolidCell, TILE, type TileGrid } from '../platformer/grid';
 import { moveBody, type Body } from '../platformer/motion';
+import { BOSSES, enterPhase2, rainOnHero } from './bosses';
 
 /**
  * Monster brains. Pure + seeded RNG so the server can re-simulate. Numbers are the prototype's at 2x scale.
  * `ai` comes from monsters.csv: hopper, walker, charger, flyer, swimmer, turret, boss (+ ai_params.script).
  */
-export type EnemyPose = 'idle' | 'windup' | 'attack' | 'hurt';
+export type EnemyPose = 'idle' | 'windup' | 'attack' | 'hurt' | 'skill';
 export type EnemyState = 'idle' | 'move' | 'windup' | 'attack' | 'recover' | 'hover' | 'dive' | 'rise';
 
 export interface Enemy extends Body {
@@ -17,6 +18,8 @@ export interface Enemy extends Body {
   dead: boolean; hitWall: boolean; pose: EnemyPose;
   /** provoke: fraction of DEF removed, seconds left */
   defDown: number; defDownT: number;
+  /** boss phase (1, then 2 below 50 % HP) */
+  phase: number;
 }
 
 export interface Shot {
@@ -37,11 +40,12 @@ export interface EnemyCtx {
   count: (monsterId: string) => number;
   events: EnemyEvent[];
 }
-export type EnemyEvent = { kind: 'slam'; x: number; y: number } | { kind: 'shoot'; x: number; y: number };
+export type EnemyEvent = { kind: 'slam'; x: number; y: number } | { kind: 'shoot'; x: number; y: number } | { kind: 'phase'; enemy: Enemy };
 
 const G = 2200, MAX_FALL = 800;
-const num = (d: MonsterDef, k: string, dflt: number): number => (typeof d.ai_params[k] === 'number' ? (d.ai_params[k] as number) : dflt);
-export const isFlying = (d: MonsterDef): boolean => d.ai === 'flyer' || d.ai === 'swimmer' || d.ai_params.script === 'harpy_dive' || d.ai_params.script === 'kraken_ink';
+export const num = (d: MonsterDef, k: string, dflt: number): number => (typeof d.ai_params[k] === 'number' ? (d.ai_params[k] as number) : dflt);
+const FLYING_SCRIPTS = new Set(['harpy_dive', 'kraken_ink', 'storm_roc', 'siren', 'shark']);
+export const isFlying = (d: MonsterDef): boolean => d.ai === 'flyer' || d.ai === 'swimmer' || FLYING_SCRIPTS.has(String(d.ai_params.script ?? ''));
 
 /** `x` = bottom-center spawn point (ground monsters stand on it, flyers hover around it). */
 export function createEnemy(id: string, def: MonsterDef, x: number, y: number, rng: Rng): Enemy {
@@ -51,19 +55,19 @@ export function createEnemy(id: string, def: MonsterDef, x: number, y: number, r
   return {
     id, def, hp: def.hp, dir: -1, x: ex, y: ey, w, h, vx: 0, vy: 0, onGround: false,
     state: fly && def.ai === 'boss' ? 'hover' : 'idle', t: 0, timer: rng.range(0.5, 1.5), ph: rng.next() * 6,
-    ox: ex, oy: ey, stun: 0, flash: 0, jumps: 0, air: 0, shotT: 1.5, dead: false, hitWall: false, pose: 'idle', defDown: 0, defDownT: 0,
+    ox: ex, oy: ey, stun: 0, flash: 0, jumps: 0, air: 0, shotT: 1.5, dead: false, hitWall: false, pose: 'idle', defDown: 0, defDownT: 0, phase: 1,
   };
 }
 
-function setState(e: Enemy, s: EnemyState, t = 0): void { e.state = s; e.t = t; }
+export function setState(e: Enemy, s: EnemyState, t = 0): void { e.state = s; e.t = t; }
 
-function fall(e: Enemy, dt: number, grid: TileGrid, maxFall = MAX_FALL): void {
+export function fall(e: Enemy, dt: number, grid: TileGrid, maxFall = MAX_FALL): void {
   e.vy = Math.min(maxFall, e.vy + G * dt);
   e.hitWall = moveBody(e, dt, grid, false, e.y + e.h);
 }
 
 /** Wall or ledge ahead (ground walkers turn around). */
-function blockedAhead(e: Enemy, grid: TileGrid): boolean {
+export function blockedAhead(e: Enemy, grid: TileGrid): boolean {
   if (e.hitWall) return true;
   if (!e.onGround) return false;
   const fx = e.dir > 0 ? e.x + e.w + 1 : e.x - 1;
@@ -90,12 +94,14 @@ export function stepEnemy(e: Enemy, ctx: EnemyCtx, dt: number): void {
   else if (d.ai === 'turret') turret(e, ctx, dt, dx);
   else if (script === 'harpy_dive') harpy(e, ctx, dt, dx, hx);
   else if (script === 'kraken_ink') kraken(e, ctx, dt, dx);
+  else if (BOSSES[script]) BOSSES[script](e, ctx, dt, dx, dy);
   else fall(e, dt, ctx.grid);
   e.x = Math.max(0, Math.min(ctx.grid.pxW - e.w, e.x));
 }
 
 function hopper(e: Enemy, ctx: EnemyCtx, dt: number, dx: number, king: boolean): void {
   const d = e.def, wasAir = !e.onGround;
+  if (king) enterPhase2(e, ctx);
   if (e.onGround) {
     e.vx *= Math.pow(king ? 0.01 : 0.02, dt);
     e.timer -= dt;
@@ -180,11 +186,12 @@ function turret(e: Enemy, ctx: EnemyCtx, dt: number, dx: number): void {
   e.dir = (Math.sign(dx) || -1) as 1 | -1;
   e.timer -= dt;
   e.pose = e.timer < 0.4 ? 'windup' : 'idle';
-  if (e.timer <= 0 && Math.abs(dx) < 420) { shootAt(e, ctx, [0], 260, 0x8a5a2a); e.timer = 2; e.pose = 'attack'; }
+  if (e.timer <= 0 && Math.abs(dx) < num(e.def, 'range', 420)) { shootAt(e, ctx, [0], 260, 0x8a5a2a); e.timer = num(e.def, 'cd', 2); e.pose = 'attack'; }
 }
 
 function harpy(e: Enemy, ctx: EnemyCtx, dt: number, dx: number, hx: number): void {
   const d = e.def;
+  enterPhase2(e, ctx);
   if (e.state === 'hover') {
     const tx = hx + Math.sin(e.ph * 0.8) * 160 - e.w / 2, ty = 92 + Math.sin(e.ph * 2) * 16;
     e.x += Math.sign(tx - e.x) * Math.min(Math.abs(tx - e.x), 180 * dt);
@@ -207,20 +214,24 @@ function kraken(e: Enemy, ctx: EnemyCtx, dt: number, dx: number): void {
   const d = e.def;
   e.y = e.oy + Math.sin(e.ph * 1.2) * 20; e.dir = (Math.sign(dx) || -1) as 1 | -1; e.timer -= dt;
   e.pose = e.timer < 0.5 ? 'windup' : e.timer > 1.8 ? 'attack' : 'idle';
+  enterPhase2(e, ctx);
   if (e.timer <= 0) {
-    shootAt(e, ctx, [-0.3, 0, 0.3], 230, 0x2a1838);
-    e.timer = e.hp < d.hp / 2 ? 1.4 : 2.3;
-    if (e.hp < d.hp / 2 && ctx.count('fish') < 2 && ctx.rng.chance(0.4)) ctx.summon('fish', e.x, e.y + e.h);
+    e.jumps++;
+    // phase 2: every 3rd attack is an ink rain over the hero instead of the 3-way spray
+    if (e.phase === 2 && e.jumps % 3 === 0) { rainOnHero(ctx, e, 7, 0x2a1838); e.pose = 'skill'; ctx.events.push({ kind: 'slam', x: e.x + e.w / 2, y: e.y + e.h }); }
+    else shootAt(e, ctx, e.phase === 2 ? [-0.45, -0.15, 0.15, 0.45] : [-0.3, 0, 0.3], 230, 0x2a1838);
+    e.timer = e.phase === 2 ? 1.2 : 2.3;
+    if (e.phase === 2 && ctx.count('fish') < 3 && ctx.rng.chance(0.4)) ctx.summon('fish', e.x, e.y + e.h);
   }
 }
 
-function shootAt(e: Enemy, ctx: EnemyCtx, spread: number[], speed: number, color: number): void {
+export function shootAt(e: Enemy, ctx: EnemyCtx, spread: number[], speed: number, color: number): void {
   const sx = e.x + e.w / 2, sy = e.y + e.h * 0.5;
   const a = Math.atan2(ctx.hero.y + ctx.hero.h / 2 - sy, ctx.hero.x + ctx.hero.w / 2 - sx);
   for (const o of spread) ctx.shots.push({ x: sx, y: sy, vx: Math.cos(a + o) * speed, vy: Math.sin(a + o) * speed, r: 9, color, dmg: e.def.atk, life: 4, hostile: true, ghost: true, el: e.def.element });
   ctx.events.push({ kind: 'shoot', x: sx, y: sy });
 }
 
-function hitsSolid(e: Enemy, grid: TileGrid): boolean {
+export function hitsSolid(e: Enemy, grid: TileGrid): boolean {
   return isSolidCell(grid.get(Math.floor((e.x + e.w / 2) / TILE), Math.floor((e.y + e.h) / TILE)));
 }

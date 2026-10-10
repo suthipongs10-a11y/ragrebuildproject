@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import type { Enemy } from '@shared/sim/enemy';
 import { isFlying } from '@shared/sim/enemy';
-import { monsterKeys } from '../assets/packs';
+import { artSource, monsterKeys, monsterTint } from '../assets/packs';
+import { recolored } from './recolor';
 
 /**
  * Draws one monster: pose swap (idle/windup/attack/hurt) + code tweens (squash, lunge, bob), hit flash,
@@ -15,13 +16,18 @@ export class EnemyView {
   private readonly keys: Set<string>;
   private readonly fallback: string;
   private readonly fly: boolean;
+  /** monster whose pose pictures we use (itself, or a look-alike until its art arrives) */
+  private readonly src: string;
+  private readonly tint: number | null;
 
   constructor(private readonly scene: Phaser.Scene, e: Enemy) {
+    this.src = artSource(e.def.id);
+    this.tint = monsterTint(e.def.id);
     this.keys = new Set(monsterKeys(e.def.id));
     this.fallback = [...this.keys][0] as string;
     this.fly = isFlying(e.def);
-    const idle = this.keys.has(`mon_${e.def.id}_idle`) ? `mon_${e.def.id}_idle` : this.fallback;
-    this.img = scene.add.image(0, 0, idle).setOrigin(0.5, 1).setDepth(8);
+    const idle = this.keys.has(`mon_${this.src}_idle`) ? `mon_${this.src}_idle` : this.fallback;
+    this.img = scene.add.image(0, 0, this.tint !== null ? recolored(scene, idle, this.tint) : idle).setOrigin(0.5, 1).setDepth(8);
     this.base = (e.def.draw_h * 2 * 1.15) / this.img.height;
     this.img.setScale(this.base);
     const boss = e.def.tier !== 'normal';
@@ -31,11 +37,11 @@ export class EnemyView {
   }
 
   private texFor(e: Enemy, time: number): string {
-    const id = e.def.id;
+    const id = this.src;
     let k = `mon_${id}_${e.pose}`;
     if (e.pose === 'idle' && this.keys.has(`mon_${id}_idle2`) && Math.sin(time * 14) > 0) k = `mon_${id}_idle2`; // wing flap
     if (!this.keys.has(k)) k = this.keys.has(`mon_${id}_idle`) ? `mon_${id}_idle` : this.fallback;
-    return k;
+    return this.tint !== null ? recolored(this.scene, k, this.tint) : k;
   }
 
   sync(e: Enemy, time: number): void {
@@ -46,6 +52,7 @@ export class EnemyView {
     let sx = 1, sy = 1, ox = 0;
     if (e.pose === 'windup') { sx = 1.12; sy = 0.88; }
     else if (e.pose === 'attack') { sx = 0.92; sy = 1.1; ox = e.dir * 10; }
+    else if (e.pose === 'skill') { sx = 1.06; sy = 1.06; }
     else if (e.pose === 'hurt') { sx = 1.08; sy = 0.92; ox = -e.dir * 6; }
     else if (!this.fly && e.onGround) { const b = Math.sin(time * 5 + e.ph) * 0.03; sx = 1 + b; sy = 1 - b; }
     this.img.setScale(this.base * sx, this.base * sy);

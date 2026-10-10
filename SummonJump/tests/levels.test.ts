@@ -8,8 +8,12 @@ const levels = parseLdtk(JSON.parse(readFileSync(join(root, 'levels', 'world.ldt
 const monsters = new Set(readFileSync(join(root, 'content', 'monsters.csv'), 'utf8').split('\n').slice(1).map((l) => l.split(',')[0] as string).filter(Boolean));
 
 describe('LDtk world', () => {
-  it('has the 8 prototype maps plus the wide test room', () => {
-    expect([...levels.keys()].sort()).toEqual(['abyss1', 'abyss2', 'deep', 'desert', 'forest', 'sky1', 'sky2', 'test_wide', 'town']);
+  it('has town, desert, zones 1–3 (6 maps each) and the wide test room', () => {
+    const zone = (p: string) => [...levels.keys()].filter((k) => k.startsWith(p));
+    expect(zone('forest').length + zone('deep').length).toBe(6);
+    expect(zone('sky').length).toBe(6);
+    expect(zone('abyss').length).toBe(6);
+    expect(levels.has('town') && levels.has('desert')).toBe(true);
     expect(levels.get('test_wide')?.grid.w).toBe(80);
   });
   it('passes level validation (exits, pipes, monsters)', () => {
@@ -55,7 +59,7 @@ function walk(l: LevelData, dir: 1 | -1, abilities = { double: false, dive: fals
 }
 
 describe('walk-through (no collision snags)', () => {
-  for (const id of ['forest', 'deep', 'desert', 'sky2', 'test_wide']) {
+  for (const id of ['forest', 'deep', 'desert', 'sky3', 'test_wide']) {
     it(`${id}: can cross left→right and back`, () => {
       const l = levels.get(id) as LevelData;
       // rooms with solid end-walls are crossed up to the wall: the walker only needs to reach the edge or exit

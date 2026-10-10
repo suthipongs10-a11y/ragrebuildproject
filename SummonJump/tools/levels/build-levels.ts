@@ -19,7 +19,7 @@ const iid = (n: string) => `${n}-${(uid++).toString(16).padStart(8, '0')}`;
 const ENTITY_DEFS = ['Sign', 'Monster', 'Item', 'SavePoint', 'Anvil', 'Altar', 'Chest', 'Pipe', 'Gate', 'Npc', 'ExitHint'].map((identifier) => ({ identifier, uid: nextUid(), width: GRID, height: GRID, color: '#E8B04A', pivotX: 0.5, pivotY: 1 }));
 const defUid = (id: string) => ENTITY_DEFS.find((d) => d.identifier === id)?.uid ?? 0;
 const COLLISION_UID = nextUid(), ENTITIES_UID = nextUid();
-const LEVEL_FIELDS = ['zone', 'name', 'exitLeft', 'exitRight', 'exitUp', 'exitDown'].map((identifier) => ({ identifier, __type: 'String', uid: nextUid() }))
+const LEVEL_FIELDS = ['zone', 'variant', 'name', 'exitLeft', 'exitRight', 'exitUp', 'exitDown'].map((identifier) => ({ identifier, __type: 'String', uid: nextUid() }))
   .concat(['water', 'test'].map((identifier) => ({ identifier, __type: 'Bool', uid: nextUid() })))
   .concat(['safeX', 'safeY'].map((identifier) => ({ identifier, __type: 'Int', uid: nextUid() })));
 
@@ -46,7 +46,7 @@ function level(r: RoomSrc, i: number) {
   return {
     identifier: r.id, iid: iid('lvl'), uid: nextUid(), worldX: (i % 4) * 3000, worldY: Math.floor(i / 4) * 1000, worldDepth: 0, pxWid: w * GRID, pxHei: h * GRID,
     __bgColor: '#696A79', bgRelPath: null, externalRelPath: null, fieldInstances: [
-      field('zone', 'String', r.zone), field('name', 'String', r.name), field('water', 'Bool', !!r.water), field('test', 'Bool', !!r.test),
+      field('zone', 'String', r.zone), field('variant', 'String', r.variant ?? null), field('name', 'String', r.name), field('water', 'Bool', !!r.water), field('test', 'Bool', !!r.test),
       field('exitLeft', 'String', ex.left ?? null), field('exitRight', 'String', ex.right ?? null), field('exitUp', 'String', ex.up ?? null), field('exitDown', 'String', ex.down ?? null),
       field('safeX', 'Int', r.safe?.[0] ?? null), field('safeY', 'Int', r.safe?.[1] ?? null),
     ],

@@ -10,6 +10,8 @@ export interface EntityData {
 }
 export interface LevelData {
   id: string; zone: string; name: string; water: boolean; test: boolean;
+  /** background variation (b/c/d) from the P05 zone packs, null = original layers */
+  variant: string | null;
   grid: TileGrid;
   exitTo: Partial<Record<'left' | 'right' | 'up' | 'down', string>>;
   safe: { x: number; y: number } | null;
@@ -43,7 +45,7 @@ export function parseLdtk(project: LdtkProject): Map<string, LevelData> {
     }
     const sx = f.safeX, sy = f.safeY;
     out.set(lv.identifier, {
-      id: lv.identifier, zone: str(f.zone) ?? 'forest', name: str(f.name) ?? lv.identifier, water: f.water === true, test: f.test === true, grid, exitTo,
+      id: lv.identifier, zone: str(f.zone) ?? 'forest', variant: str(f.variant) ?? null, name: str(f.name) ?? lv.identifier, water: f.water === true, test: f.test === true, grid, exitTo,
       safe: typeof sx === 'number' && typeof sy === 'number' ? { x: sx, y: sy } : null,
       floorRow: findFloorRow(grid),
       entities: (ents?.entityInstances ?? []).map((e, i) => ({

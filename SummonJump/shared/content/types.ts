@@ -10,6 +10,8 @@ export interface MonsterDef {
   stompable: boolean; exp: number; job_exp: number; zeny_min: number; zeny_max: number;
   card_id: string; card_rate: number; respawn_sec: number; art_pack: string;
   hitbox: { w: number; h: number }; draw_h: number;
+  /** look-alike until the monster's own art exists: another monster's id + a tint (RGB) */
+  art: string | null; tint: number | null;
 }
 
 export interface DropDef { monster_id: string; item_id: string; rate: number; min: number; max: number }

@@ -113,6 +113,7 @@ export class CombatController {
     for (let left = dt; left > 1e-6; left -= MAX_STEP) for (const e of [...this.enemies]) stepEnemy(e, ctx, Math.min(left, MAX_STEP));
     for (const ev of events) {
       if (ev.kind === 'slam') { this.scene.cameras.main.shake(180, 0.006); ring(this.scene, ev.x, ev.y, 0xffd6e6, 80); burst(this.scene, ev.x, ev.y, 0xe8d6b0, 10, 200); }
+      if (ev.kind === 'phase') { const e = ev.enemy; this.scene.cameras.main.flash(250, 255, 120, 120); this.scene.cameras.main.shake(350, 0.01); popInfo(this.scene, e.x + e.w / 2, e.y - 40, t('combat.enraged').replace('{name}', t(e.def.name_key)), '#ff8a6a'); }
     }
     stepShots(this.shots, dt);
     for (const s of this.shots) if (!s.ghost && (s.delay ?? 0) <= 0 && isSolidCell(this.grid.get(Math.floor(s.x / TILE), Math.floor(s.y / TILE)))) s.life = 0;

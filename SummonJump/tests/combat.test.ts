@@ -109,3 +109,21 @@ describe('rig clips', () => {
     expect(sampleClip(run, 0).tf).toBeCloseTo(sampleClip(run, run.dur).tf as number, 5);
   });
 });
+
+describe('boss scripts (Phase 5)', () => {
+  it('every mini-boss / MVP attacks, enters phase 2 under half HP and stays sane', () => {
+    for (const m of content.monsters.filter((x) => x.tier !== 'normal')) {
+      const g = floorGrid(), list: Enemy[] = [], shots: Shot[] = [];
+      const e = createEnemy(m.id, m, 15 * TILE, 15 * TILE, createRng(3)); list.push(e);
+      const ctx = ctxFor(g, { x: 11 * TILE, y: 15 * TILE - 56, w: 24, h: 56 }, list, shots);
+      run(e, ctx, 5);
+      e.hp = m.hp * 0.4;
+      run(e, ctx, 10);
+      expect(ctx.events.some((ev) => ev.kind === 'phase'), `${m.id} phase 2`).toBe(true);
+      const acted = shots.length > 0 || list.length > 1 || ctx.events.some((ev) => ev.kind === 'slam') || e.pose !== 'idle';
+      expect(acted, `${m.id} does something`).toBe(true);
+      expect(Number.isFinite(e.x) && Number.isFinite(e.y), m.id).toBe(true);
+      expect(e.phase).toBe(2);
+    }
+  });
+});

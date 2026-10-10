@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { Cell, TILE, type EntityData, type LevelData, type TileGrid } from '@shared/platformer';
-import type { ZoneId } from '../assets/packs';
+import { zoneKey } from '../assets/packs';
 import { buildZoneBackdrop, drawPlatform } from './Parallax';
 import { t } from '../i18n';
 
@@ -16,9 +16,9 @@ export interface LevelVisuals {
  * (rocks, pipes, walls — replaced by the P01 art pack later) and the water tint.
  */
 export function buildLevelVisuals(scene: Phaser.Scene, level: LevelData, grid: TileGrid, viewW: number, viewH: number, roomName: (id: string) => string): LevelVisuals {
-  const zone = level.zone as ZoneId;
+  const layer = (l: string) => zoneKey(level.zone, level.variant, l);
   const floorY = level.floorRow === null ? null : level.floorRow * TILE;
-  buildZoneBackdrop(scene, zone, grid.pxW, viewW, viewH, floorY);
+  buildZoneBackdrop(scene, layer, grid.pxW, viewW, viewH, floorY);
 
   const rocks = new Map<string, Phaser.GameObjects.GameObject>();
   const g = scene.add.graphics().setDepth(5.5);
@@ -29,11 +29,19 @@ export function buildLevelVisuals(scene: Phaser.Scene, level: LevelData, grid: T
       if (c === Cell.OneWay) {
         let run = 1;
         while (grid.get(tx + run, ty) === Cell.OneWay) run++;
-        drawPlatform(scene, zone, tx * TILE, ty * TILE, run * TILE);
+        drawPlatform(scene, layer('plat'), tx * TILE, ty * TILE, run * TILE);
         tx += run - 1;
       } else if (c === Cell.Rock) {
         const r = scene.add.rectangle(tx * TILE, ty * TILE, TILE, TILE, 0x8a8478).setOrigin(0, 0).setStrokeStyle(2, 0x4a443a).setDepth(6);
         rocks.set(`${tx},${ty}`, r);
+      } else if (level.zone === 'sky' && c === Cell.Solid && (level.floorRow === null || ty < level.floorRow)) {
+        // cloud floors: painted platform on the top surface, soft cloud body below (no block grid)
+        if (grid.get(tx, ty - 1) !== Cell.Solid) {
+          let run = 1;
+          while (grid.get(tx + run, ty) === Cell.Solid && grid.get(tx + run, ty - 1) !== Cell.Solid) run++;
+          drawPlatform(scene, layer('plat'), tx * TILE, ty * TILE, run * TILE);
+          tx += run - 1;
+        } else g.fillStyle(0xf6efe2, 0.5).fillRect(tx * TILE, ty * TILE, TILE, TILE);
       } else if ((c === Cell.Solid || c === Cell.PipeTop) && (level.floorRow === null || ty < level.floorRow)) {
         g.fillStyle(c === Cell.PipeTop ? 0x3fa66b : solid, 1).fillRect(tx * TILE, ty * TILE, TILE, TILE);
         g.lineStyle(1, 0x000000, 0.25).strokeRect(tx * TILE, ty * TILE, TILE, TILE);

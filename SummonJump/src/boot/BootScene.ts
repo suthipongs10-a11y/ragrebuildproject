@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { loadTextures, queueKeys, roomKeys } from '../assets/packs';
+import { loadTextures, queueKeys, roomKeys, setMonsterLooks } from '../assets/packs';
 import { showLoadProblem } from '../ui/errors';
 
 const BASE_KEYS = ['hero_design', 'icon_sign', 'icon_altar', 'icon_anvil', 'icon_chest', 'icon_fountain', 'icon_crystal', 'icon_e_wind', 'icon_e_water', 'icon_e_fire', 'icon_card', 'icon_potion_r', 'icon_potion_b',
@@ -29,6 +29,7 @@ export class BootScene extends Phaser.Scene {
   create(): void {
     const content = this.cache.json.get('content') as ContentBundle | undefined;
     this.registry.set('content', content);
+    if (content) setMonsterLooks(content.monsters);
     const levels = parseLdtk(this.cache.json.get('world') as LdtkProject);
     this.registry.set('levels', levels);
     // start room: ?map=<id> (debug) > saved room > town. Load its zone pack first.
