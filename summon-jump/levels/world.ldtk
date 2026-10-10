@@ -1757,6 +1757,13 @@
          "__value": "stone",
          "defUid": 0,
          "realEditorValues": []
+        },
+        {
+         "__identifier": "amount",
+         "__type": "Int",
+         "__value": 30,
+         "defUid": 0,
+         "realEditorValues": []
         }
        ]
       },
@@ -2709,6 +2716,13 @@
          "__identifier": "item",
          "__type": "String",
          "__value": "stone",
+         "defUid": 0,
+         "realEditorValues": []
+        },
+        {
+         "__identifier": "amount",
+         "__type": "Int",
+         "__value": 30,
          "defUid": 0,
          "realEditorValues": []
         }
@@ -7832,6 +7846,13 @@
          "__identifier": "item",
          "__type": "String",
          "__value": "stone",
+         "defUid": 0,
+         "realEditorValues": []
+        },
+        {
+         "__identifier": "amount",
+         "__type": "Int",
+         "__value": 80,
          "defUid": 0,
          "realEditorValues": []
         }
@@ -13765,6 +13786,13 @@
          "__value": "stone",
          "defUid": 0,
          "realEditorValues": []
+        },
+        {
+         "__identifier": "amount",
+         "__type": "Int",
+         "__value": 120,
+         "defUid": 0,
+         "realEditorValues": []
         }
        ]
       }
@@ -19494,6 +19522,13 @@
          "__identifier": "item",
          "__type": "String",
          "__value": "stone",
+         "defUid": 0,
+         "realEditorValues": []
+        },
+        {
+         "__identifier": "amount",
+         "__type": "Int",
+         "__value": 60,
          "defUid": 0,
          "realEditorValues": []
         }

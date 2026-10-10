@@ -57,6 +57,12 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Level unlocks (`content/unlocks.csv`) + guide quest chain (`content/quests.csv`, `shared/progression/guide.ts`, `src/hero/Guide.ts`).
 - [x] ROADMAP: world chat, rare-drop/MVP broadcast, offline farming, rested EXP → Phase 6; backlog list.
 
+## Owner request: own names + soul stones (2026-10-10)
+- [x] Currency **หินวิญญาณ 💠** replaces Zeny everywhere (`soul` in code, saves and CSVs: `soul_min/soul_max`, tower/rune-upgrade `soul`, quest reward key `soul`). Old saves carry their coins over.
+- [x] Sources: monster kills, selling items/runes, guide quests, daily dungeon, tower first clears, **map crystals** (now pay 20–120 by zone), **Adventure Book milestones** (`book.csv` `soul`: kill 100, map 150, card 200, dex 250). Sinks: shop, refine, rune upgrades.
+- [x] Renamed RO/SW-coined names (display text only; internal ids unchanged): jelly family → บุ๋ม (ชมพู/ส้ม/พิษ/ทะเล/เมฆ, ราชาบุ๋ม, ภูตบุ๋มน้อย, ป่าบุ๋ม), Rocker → ตั๊กแตนใบมีด, Willow → ตอไม้ขี้โมโห, Spore → เห็ดฝุ่นพิษ, Angeling → เทวดาน้อย; skills ระเบิดพสุธา / ม่านลมศักดิ์สิทธิ์ / บทสวดคุ้มกาย / แสงเปิดเผย; ม้วนดวงดาว, ม้วนสุริยจันทรา, เกล็ดธาตุ / เกล็ดเวท; rune sets พฤกษา หินผา เขี้ยว ตาเหยี่ยว อสนี วายุ พิโรธ ปลิงเลือด; MVP → 👑 บอสตำนาน.
+- [x] Pending P05 art briefs: original-designs rule, Leafblade Hopper instead of a violin grasshopper, Grumpy Stump, Dust-cap Queen, jelly cards described as our own "Bumm" family (leaf sprout).
+
 ## Owner request: RO-style attack stats + solid sky ground (2026-10-10)
 - [x] ATK follows the weapon like RO pre-renewal: melee + staff → STR ×2 + (STR/10)² + DEX/5 + LUK/5; bow → DEX ×2 + (DEX/10)² + STR/5 + LUK/5. MATK = INT only (+ weapon MATK) and a staff adds +15 % (RO rods/staves). Status tab shows which stat drives ATK / MATK.
 - [x] Staff normal attack = a short-range magic shot (230 px, painted soul-strike orb), still a physical STR hit as a rod's normal attack in RO — mages/acolytes without STR hit weakly, spells scale with INT.

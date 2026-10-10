@@ -12,11 +12,11 @@ New monsters for **Sky Isles (zone 2)** of my game **Summon Jump** (the painted 
 
 **Pose rules (same as `ART_P02_Monster_Actions`):** every pose of one monster = the same character, same size, same colours, **facing LEFT, side view**, standing on the **same invisible ground line**. Poses: `idle` (relaxed), `windup` (anticipation before attacking), `attack` (peak of the hit, lunging left), `hurt` (recoiling right, eyes squeezed). Mini-bosses also get `skill` (their special move, most dramatic pose). Size **1024×1024**, transparent, same scale and margin for all poses of one monster.
 
-**Cards (768×1024, transparent outside the card):** the same card design as `card_poring.png` from the v3 brief — vertical card, rounded corners, ornate antique gold frame, parchment inner border, painted portrait of the monster inside, small gem on top, no text. Frame: **normal** (gold), **boss** (extra gold ornaments), **MVP** (dark gold with crimson gems, most luxurious).
+**Cards (768×1024, transparent outside the card):** the same card design as the pink jelly card `card_poring.png` from the v3 brief — vertical card, rounded corners, ornate antique gold frame, parchment inner border, painted portrait of the monster inside, small gem on top, no text. Frame: **normal** (gold), **boss** (extra gold ornaments), **MVP** (dark gold with crimson gems, most luxurious).
 
 ## 1. Global style
 - Hand-painted digital painting, soft visible brushstrokes, warm golden-hour light, muted ochre / sand / sage / dusty peach palette, richer contrast on the subject (same world as everything earlier in this chat, style reference = the golden valley painting).
-- Cute-but-cool RO-like fantasy, readable silhouettes at 64 px on a phone.
+- Cute-but-cool **original** fantasy, readable silhouettes at 64 px on a phone. **Original designs only: do not copy or imitate monsters, characters or items from Ragnarok Online, Summoners War or any other game.**
 - **No text, letters, numbers, logos or watermark. No ground shadow** (except the far background paintings, which are full scenes).
 
 ## 2. Background rules
@@ -65,7 +65,7 @@ Exact sizes from the table, subject centred with a small empty margin, never cro
 ### PART 3 — Cards (8 images) → `SJ_P05_Monsters_sky_Part3.zip`
 | # | File | Size | Description |
 |---|---|---|---|
-| 24 | `card_sky_poring.png` | 768×1024 | Sky-blue jelly blob with a little cloud on its head (Poring recolour). **Normal frame.** |
+| 24 | `card_sky_poring.png` | 768×1024 | **Cloud Bumm** — sky-blue jelly blob with a little cloud on its head (same shape as our pink jelly). **Normal frame.** |
 | 25 | `card_fire_hawk.png` | 768×1024 | Red-orange hawk (a recolour of the teal wind bird `35_wind_bird.png`, fiery feathers). **Normal frame.** |
 | 26 | `card_cloud_imp.png` | 768×1024 | Cloud Imp (from this brief). **Normal frame.** |
 | 27 | `card_sky_snail.png` | 768×1024 | Sky Snail (from this brief). **Normal frame.** |
