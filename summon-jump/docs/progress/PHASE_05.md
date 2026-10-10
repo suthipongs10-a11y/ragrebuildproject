@@ -32,8 +32,8 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Levels: forest 1–4 + deep 1–2, sky 1–6, abyss 1–6 (background variations), reachability test
 - [x] MVP / mini respawn timers shown in the room
 - [x] Adventure Book (tracking + milestones + permanent stats + menu tab)
-- [ ] Daily dungeon (offline prototype)
-- [ ] Tower floors 1–20 (offline)
+- [x] Daily dungeon (offline prototype) — portal NPC in town (🌀), element by weekday, 3 entries/day, 3 waves scaled to the hero
+- [x] Tower floors 1–20 (offline) — `content/tower.csv`, boss every 5th floor, first-clear rewards
 - [ ] Balance sheet + simulation tool; tune EXP / HP / drops
 - [ ] Tests (unit: book, dungeon/tower rules, reachability; e2e: travel through zones, MVP fight, book claim)
 
