@@ -10,6 +10,11 @@
 - Balance: `npm run balance` writes `docs/BALANCE.md`; monsters HP ×3 / EXP ×0.22 (bosses ×2.5 / ×0.5) → ~3–4 h of real play to the Kraken.
 - Portal NPC (ประตูมิติ) in town: daily elemental dungeon (3 runs/day) and tower floors 1–20 in a new arena room.
 - Adventure Book (สมุดผจญภัย): 46 milestones (kills per monster, cards, spirit dex, maps per zone) → permanent stats.
+- AUTO button (next to ☰, key T): faces the nearest monster, attacks in reach, casts slotted skills (heal < 60 % HP, buffs, attacks); the player still walks.
+- New job-change screen: one card per job with rating bars (damage / tank / range / support / ease), strengths ✓ / weaknesses ✗, weapon and skills (`jobs.csv` `ratings`).
+- Level unlocks (`unlocks.csv`): summon Lv 5, adventure book Lv 3, runes Lv 10, daily dungeon Lv 12, tower Lv 15 — locked tabs show 🔒 and the level.
+- Guide quest chain (`quests.csv`, 12 steps from "kill 5 Poring" to the Kraken) on the HUD, tap for a hint, auto-claimed rewards.
+- Roadmap: world chat + rare-drop/MVP broadcast, offline farming and rested EXP added to Phase 6; backlog section.
 
 ## Phase 4 (done) — 2026-10-09
 - 15 spirit families × element variants (`spirits.csv`, `spirit_skills.csv`, `spirit_elements.csv`, `spirit_config.csv`).

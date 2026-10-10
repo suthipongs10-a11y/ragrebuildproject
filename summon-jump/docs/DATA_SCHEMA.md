@@ -61,12 +61,18 @@ Element variants: 1–3★ families water/fire/earth/wind; 4–5★ also holy/da
 - `rune_drop`: `tier, chance, star_lo, star_hi, r0..r4 (rarity weights = 0-4 starting subs)`
 
 ## jobs.csv
-`id, name_key, tier (0/1/2), from_job, job_lv_req, hp_factor, sp_factor, weapons (list), parts_set, skills (list)`
+`id, name_key, tier (0/1/2), from_job, job_lv_req, hp_factor, sp_factor, weapons (list), parts_set, skills (list), ratings` — ratings = `dmg:N|tank:N|range:N|support:N|ease:N` (1–5, job-change screen bars)
 
 ## maps.csv
 `id, zone, name_key, ldtk_file, music, bg_pack, exits (json), spawns_override (json), mvp (monster id), gate_abilities (list)`
 
-## quests.csv / missions.csv / login_calendar.csv
+## unlocks.csv (Phase 5)
+`feature, level, name_key` — base level that opens a feature (summon, adventure, runes, dungeon, tower). Locked tabs/buttons say "🔒 … เปิดที่ Lv N".
+
+## quests.csv (Phase 5 — main guide chain)
+`id, kind (kill/level/summon/visit/job/tower), target, count, reward (json, item ids or zeny), text_key` — played in order; the HUD shows the current one, `text_key.hint` is the tap-to-read hint.
+
+## missions.csv / login_calendar.csv (Phase 6)
 Standard reward tables: `id, type, goal (json), reward (json), reset (daily/weekly/none)`.
 
 ## Validation (`npm run content` fails if)
