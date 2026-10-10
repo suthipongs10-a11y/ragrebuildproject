@@ -127,3 +127,21 @@ describe('boss scripts (Phase 5)', () => {
     }
   });
 });
+
+describe('hero moves (moves.ts)', () => {
+  it('every weapon has a 3-hit combo and every skill type has a clip; poses are complete and finite', async () => {
+    const { moveFor } = await import('../src/rig/moves');
+    for (const w of ['sword', 'staff', 'bow', 'mace'] as const) {
+      for (const name of ['attack1', 'attack2', 'attack3', 'skill_front', 'skill_aoe', 'skill_bolt', 'skill_rain', 'skill_heal', 'skill_buff', 'skill_dash', 'skill_zone', 'channel', 'land', 'idle', 'hurt']) {
+        const c = moveFor(w, name);
+        expect(c, `${w} ${name}`).not.toBeNull();
+        for (let t = 0; t <= c!.dur; t += c!.dur / 10) for (const v of Object.values(sampleClip(c!, t))) expect(Number.isFinite(v)).toBe(true);
+      }
+    }
+    // sword combo: crouch (anticipation) before the lunge
+    const a1 = moveFor('sword', 'attack1')!;
+    const crouch = sampleClip(a1, a1.dur * 0.16), strike = sampleClip(a1, a1.dur * 0.38);
+    expect(crouch.bob!).toBeGreaterThan(40);
+    expect(strike.dx!).toBeGreaterThan(crouch.dx! + 40);
+  });
+});

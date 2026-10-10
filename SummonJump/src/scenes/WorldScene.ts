@@ -302,7 +302,7 @@ export class WorldScene extends Phaser.Scene {
     }
 
     const h = this.hero;
-    if (!dead) this.rig.play(pickClip(h, this.rig.current, this.combat.combat, this.level.water));
+    if (!dead && !(this.rig.current === 'channel' && this.session.rt.cast)) this.rig.play(pickClip(h, this.rig.current, this.combat.combat, this.level.water, this.rig.acting));
     this.rig.update(frozen ? 0 : dt, h.x + h.w / 2, h.y + h.h, h.dir);
     this.rig.setAlpha(this.combat.combat.inv > 0 && !dead && Math.floor(this.time.now / 50) % 2 ? 0.35 : 1);
     this.skillBtns.update(this.session);
@@ -328,7 +328,7 @@ export class WorldScene extends Phaser.Scene {
         if (++this.drownTicks >= 4) this.goHome(t('drown.out'));
       }
       if (e === 'doubleJump') this.puff(0x8ff0bf);
-      if (e === 'land') this.puff(0xe8d6b0);
+      if (e === 'land') { this.puff(0xe8d6b0); if (!this.rig.acting) this.rig.play('land', true); }
     }
   }
 

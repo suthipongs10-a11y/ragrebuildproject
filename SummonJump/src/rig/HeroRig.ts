@@ -2,10 +2,12 @@ import Phaser from 'phaser';
 import { art } from '../assets/packs';
 import rig from './hero.rig.json';
 import { blendPose, sampleClip, type Clip, type Pose } from './clips';
+import { moveFor, weaponKind, type WeaponKind } from './moves';
 
 type Part = 'head' | 'torso' | 'uarm' | 'farm' | 'thigh' | 'shin' | 'scarf' | 'sword';
-export type HeroClip = keyof typeof rig.clips;
-const CLIPS = rig.clips as unknown as Record<HeroClip, Clip>;
+/** JSON clips (run, jump, fall, guard, death…) + code-built moves (moves.ts: combos per weapon, skills, idle, hurt, land). */
+export type HeroClip = string;
+const CLIPS = rig.clips as unknown as Record<string, Clip>;
 const XFADE = 0.08;
 
 /**
@@ -17,6 +19,8 @@ export class HeroRig {
   private readonly body: Phaser.GameObjects.Container;
   private readonly j: Record<string, Phaser.GameObjects.Container> = {};
   private clip: HeroClip = 'idle';
+  private weapon: WeaponKind = 'sword';
+  private cur: Clip = CLIPS.idle as Clip;
   private clipT = 0;
   private prev: Pose | null = null;
   private fadeT = 0;
@@ -61,18 +65,23 @@ export class HeroRig {
     if (clip === this.clip && !restart) return;
     this.prev = this.last; this.fadeT = XFADE;
     this.clip = clip; this.clipT = 0;
+    this.cur = moveFor(this.weapon, clip) ?? CLIPS[clip] ?? (CLIPS.idle as Clip);
   }
 
   get current(): HeroClip { return this.clip; }
+  /** A one-shot clip (attack, skill, hurt, land) still playing. */
+  get acting(): boolean { return !this.cur.loop && this.clipT < this.cur.dur; }
 
   update(dt: number, x: number, feetY: number, dir: number): void {
     this.clipT += dt;
-    let p = sampleClip(CLIPS[this.clip], this.clipT);
+    let p = sampleClip(this.cur, this.clipT);
     if (this.prev && this.fadeT > 0) { this.fadeT -= dt; p = blendPose(this.prev, p, 1 - Math.max(0, this.fadeT) / XFADE); }
     this.last = p;
     const j = this.j as Record<string, Phaser.GameObjects.Container>;
-    this.root.setPosition(x, feetY).setScale(rig.scale * (dir < 0 ? -1 : 1), rig.scale).setRotation((p.rot ?? 0) * (dir < 0 ? -1 : 1));
+    const sq = p.sq ?? 0; // squash (+) / stretch (−), anchored at the feet
+    this.root.setPosition(x, feetY).setScale(rig.scale * (1 + sq * 0.6) * (dir < 0 ? -1 : 1), rig.scale * (1 - sq)).setRotation((p.rot ?? 0) * (dir < 0 ? -1 : 1));
     this.body.y = rig.hip + (p.bob ?? 0);
+    this.body.x = p.dx ?? 0;
     j.backThigh!.rotation = p.tb ?? 0; j.backShin!.rotation = p.sb ?? 0;
     j.frontThigh!.rotation = p.tf ?? 0; j.frontShin!.rotation = p.sf ?? 0;
     j.torso!.rotation = p.lean ?? 0; j.backArm!.rotation = p.ba ?? 0; j.scarf!.rotation = p.scarf ?? 0; j.head!.rotation = p.head ?? 0;
@@ -86,6 +95,7 @@ export class HeroRig {
    * and the weapon piece per weapon type (placeholder for real part swaps).
    */
   setLook(job: string, weaponType: string): void {
+    if (this.weapon !== weaponKind(weaponType)) { this.weapon = weaponKind(weaponType); this.play(this.clip, true); }
     const cloth: Record<string, number> = { swordsman: 0xc8d4ec, mage: 0x9a88f0, archer: 0x9ad08a, acolyte: 0xfff0d8 };
     const wpn: Record<string, number> = { staff: 0xb07a3a, bow: 0x8ad070, mace: 0xb8b8c8 };
     for (const k of ['torso', 'uarm', 'thigh'] as Part[]) for (const img of this.parts[k] ?? []) { if (cloth[job]) img.setTint(cloth[job]); else img.clearTint(); }

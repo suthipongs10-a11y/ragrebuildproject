@@ -18,15 +18,17 @@ export function handleSkillInput(c: Controls, session: HeroSession, combat: Comb
     const ev = combat.cast(hero, id);
     for (const e of ev) {
       if (e.kind === 'fail') hint(`fail_${e.why}`, t(`skill.fail.${e.why}`));
-      if (e.kind === 'cast_start') rig.play('cast', true);
+      if (e.kind === 'cast_start') rig.play('channel', true);
       if (e.kind === 'cast') rig.play(clipFor(e), true);
     }
   });
 }
 
-function clipFor(e: Extract<SkillEvent, { kind: 'cast' }>): 'attack3' | 'attack1' | 'cast' {
+/** Skill animation by skills.csv `target` (moves.ts). */
+function clipFor(e: Extract<SkillEvent, { kind: 'cast' }>): string {
   const tg = e.skill.target;
-  return tg === 'front' || tg === 'dash' ? 'attack3' : tg === 'aoe' && !e.skill.effects.magic ? 'attack1' : 'cast';
+  if (tg === 'aoe' && e.skill.effects.magic) return 'skill_bolt';
+  return ['front', 'aoe', 'bolt', 'rain', 'heal', 'buff', 'dash', 'zone'].includes(tg) ? `skill_${tg}` : 'skill_bolt';
 }
 
 /** Golden pillar + text for every level / job level gained this frame. */
@@ -47,9 +49,9 @@ export function playLevelUps(scene: Phaser.Scene, combat: CombatController, sess
 }
 
 /** Which rig clip fits the hero right now (attacks/hurt are started by combat events and run to completion). */
-export function pickClip(h: HeroState, cur: HeroClip, cb: HeroCombat, water: boolean): HeroClip {
-  if (cur.startsWith('attack') && cb.atkT > 0) return cur;
-  if (cur === 'hurt' && cb.inv > 0.75) return cur;
+export function pickClip(h: HeroState, cur: HeroClip, cb: HeroCombat, water: boolean, acting: boolean): HeroClip {
+  // attacks, skills, hurt and landing play to the end (anticipation and follow-through are part of the move)
+  if (acting && (cur.startsWith('attack') || cur.startsWith('skill') || cur === 'hurt' || (cur === 'land' && h.onGround))) return cur;
   if (!h.onGround && !water) return h.vy < 0 ? 'jump' : 'fall';
   if (cb.atkCd > 0.08 && cb.chainT > 0) return 'guard';
   return h.onGround && Math.abs(h.vx) > 30 ? 'run' : 'idle';

@@ -28,6 +28,7 @@ export function sampleClip(clip: Clip, time: number): Pose {
 /** Blend two poses (cross-fade between clips). */
 export function blendPose(a: Pose, b: Pose, f: number): Pose {
   const out: Pose = {};
-  for (const j of Object.keys(b)) out[j] = (a[j] ?? (b[j] as number)) + ((b[j] as number) - (a[j] ?? (b[j] as number))) * f;
+  // params missing on one side (e.g. dx / sq only in code-built clips) blend from / to 0
+  for (const j of new Set([...Object.keys(a), ...Object.keys(b)])) { const x = a[j] ?? 0, y = b[j] ?? 0; out[j] = x + (y - x) * f; }
   return out;
 }
