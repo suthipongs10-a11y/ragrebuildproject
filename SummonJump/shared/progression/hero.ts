@@ -117,24 +117,35 @@ export function changeJob(h: HeroData, c: ContentBundle, to: JobId): boolean {
   if (canChangeJob(h, c, to) !== null) return false;
   h.job = to; h.jobLv = 1; h.jobExp = 0; h.skillPoints = 0;
   const target = jobOf(c, to);
-  const w = addItem(h, c, target.starter_weapon, 1);
+  const w = addItem(h, c, target.starter_weapon, 1, true);
   if (w) { unequip(h, 'weapon'); equip(h, c, w.uid); }
   h.slots = h.slots.map((s) => (s && skillDef(c, s)?.owner === 'novice' ? s : null));
   return true;
+}
+
+/** Repair for saves from before the bag-limit fix: a job without any weapon of its main type gets its starter weapon in hand. */
+export function ensureJobWeapon(h: HeroData, c: ContentBundle): boolean {
+  if (h.job === 'novice') return false;
+  const job = jobOf(c, h.job), main = job.weapons[0];
+  if (h.bag.some((it) => itemDef(c, it.id)?.subtype === main)) return false;
+  const w = addItem(h, c, job.starter_weapon, 1, true);
+  if (w) { unequip(h, 'weapon'); equip(h, c, w.uid); }
+  return !!w;
 }
 
 // ───────────── items ─────────────
 const stackable = (d: ItemDef) => d.type === 'consumable' || d.type === 'material' || d.type === 'scroll';
 export const BAG_SIZE = 60;
 
-export function addItem(h: HeroData, c: ContentBundle, id: string, count = 1): ItemInstance | null {
+/** `force`: ignore the bag limit (the job's starter weapon must always arrive). */
+export function addItem(h: HeroData, c: ContentBundle, id: string, count = 1, force = false): ItemInstance | null {
   const d = itemDef(c, id);
   if (!d) return null;
   if (stackable(d)) {
     const s = h.bag.find((x) => x.id === id);
     if (s) { s.count += count; return s; }
   }
-  if (h.bag.length >= BAG_SIZE) return null;
+  if (h.bag.length >= BAG_SIZE && !force) return null;
   const it: ItemInstance = { uid: h.nextUid++, id, count: stackable(d) ? count : 1, refine: 0, cards: [] };
   h.bag.push(it);
   if (!stackable(d)) for (let i = 1; i < count; i++) addItem(h, c, id, 1);

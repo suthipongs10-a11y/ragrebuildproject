@@ -1,4 +1,5 @@
 import {
+  ensureJobWeapon,
   addItem, addRune, addSpirit, bookBonus, changeJob, emptyArena, emptyBook, noteDex, createRng, rollRune, equip, expToNext, derive, gainExp, jobOf, leaderBonus, learnSkill, maxHp, maxSp, newHero, newSkillRuntime, raiseStat, starterBox,
   type ContentBundle, type Derived, type HeroData, type JobId, type LevelUpResult, type SkillRuntime, type SpiritBox, type StatKey, type BookData, type ArenaState,
 } from '@shared/index';
@@ -15,6 +16,7 @@ export class HeroSession {
 
   constructor(readonly content: ContentBundle, readonly save: SaveData) {
     if (!save.hero) save.hero = migrate(save, content);
+    ensureJobWeapon(save.hero, content);
     if (!save.spirits) save.spirits = newBox(content, save.hero);
     if (!save.book) { save.book = emptyBook(); for (const id of Object.keys(save.cards)) save.book.cards[id] = true; }
     noteDex(save.book, save.spirits);

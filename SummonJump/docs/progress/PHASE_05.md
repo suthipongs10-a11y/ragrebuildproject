@@ -57,6 +57,13 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Level unlocks (`content/unlocks.csv`) + guide quest chain (`content/quests.csv`, `shared/progression/guide.ts`, `src/hero/Guide.ts`).
 - [x] ROADMAP: world chat, rare-drop/MVP broadcast, offline farming, rested EXP → Phase 6; backlog list.
 
+## Owner play-test fixes (2026-10-10)
+- [x] Job change while the bag is full kept the old sword: the starter weapon now always arrives (bag limit ignored for it); saves that lost it get it back on load. The rig also gets the new weapon picture while the menu has the game paused.
+- [x] Job change asks "แน่ใจแล้วนะ?" (confirm / cancel) before it happens.
+- [x] Potions: the menu shows live HP / SP bars (+ soul stones); a potion is not used when that bar is already full.
+- [x] PC: left mouse click attacks (hold = keep attacking); menu hotkeys I bag · E equipment · U status · Y skills · P spirits (press again to close), letters shown on the tabs; double-click a bag / equipment row to use or equip; bigger menu window on big screens.
+- [x] Town: the sky-exit hint no longer covers the quest line / HP bars.
+
 ## Owner request: own names + soul stones (2026-10-10)
 - [x] Currency **หินวิญญาณ 💠** replaces Zeny everywhere (`soul` in code, saves and CSVs: `soul_min/soul_max`, tower/rune-upgrade `soul`, quest reward key `soul`). Old saves carry their coins over.
 - [x] Sources: monster kills, selling items/runes, guide quests, daily dungeon, tower first clears, **map crystals** (now pay 20–120 by zone), **Adventure Book milestones** (`book.csv` `soul`: kill 100, map 150, card 200, dex 250). Sinks: shop, refine, rune upgrades.

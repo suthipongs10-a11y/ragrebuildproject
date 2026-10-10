@@ -29,5 +29,6 @@ export function applyHeroLook(scene: Phaser.Scene, session: HeroSession, rig: He
   const set = () => { const w = weapon(session); rig.setLook(session.data.job, w.subtype, w.icon); };
   const need = heroArtKeys(session).filter((k) => !scene.textures.exists(k));
   set();
-  if (need.length) loadTextures(scene, need, () => { if (scene.scene.isActive()) set(); });
+  // the menu pauses the scene (job change, equip): still dress the rig when the pictures arrive
+  if (need.length) loadTextures(scene, need, () => { if (scene.sys.isActive() || scene.sys.isPaused()) set(); });
 }

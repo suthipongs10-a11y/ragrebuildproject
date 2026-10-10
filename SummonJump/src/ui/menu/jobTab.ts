@@ -11,7 +11,7 @@ const RATINGS = ['dmg', 'tank', 'range', 'support', 'ease'];
 const bar = (k: string, n: number) => `<div class="jb-bar"><span>${t(`jobrate.${k}`)}</span><i>${'<b class="on"></b>'.repeat(n)}${'<b></b>'.repeat(5 - n)}</i></div>`;
 const list = (key: string, mark: string, cls: string) => t(key).split('|').map((x) => `<li class="${cls}">${mark} ${x}</li>`).join('');
 
-export function jobTab(s: HeroSession): string {
+export function jobTab(s: HeroSession, ask = ''): string {
   const h = s.data, c = s.content;
   const jobs = c.jobs.filter((j) => j.from_job === h.job);
   if (!jobs.length) return `<div class="mn-h">${t('menu.jobTitle')}</div><div class="mn-note">${t('menu.jobDone')}</div>`;
@@ -26,7 +26,9 @@ export function jobTab(s: HeroSession): string {
       <div class="jb-bars">${RATINGS.map((k) => bar(k, j.ratings[k] ?? 0)).join('')}</div>
       <ul class="jb-pc">${list(`job.${j.id}.pros`, '✓', 'pro')}${list(`job.${j.id}.cons`, '✗', 'con')}</ul>
       <div class="jb-skills"><small>${t('jobinfo.weapon')}: ${j.weapons.map((w) => t(`wtype.${w}`)).join(', ')} · ${t('jobinfo.skills')}</small>${skills}</div>
-      <button class="mn-btn jb-go" data-act="job:${j.id}"${why ? ' disabled' : ''}>${why ? t(`jobwhy.${why}`) : `${t('menu.become')}${t(j.name_key)}`}</button>
+      ${ask === j.id && !why ? `<div class="jb-ask">${t('job.confirm').replace('{job}', t(j.name_key))}
+        <div class="jb-ask-btns"><button class="mn-btn" data-act="job:${j.id}">${t('job.yes')}</button><button class="mn-btn sec" data-act="jobno">${t('job.no')}</button></div></div>`
+      : `<button class="mn-btn jb-go" data-act="jobask:${j.id}"${why ? ' disabled' : ''}>${why ? t(`jobwhy.${why}`) : `${t('menu.become')}${t(j.name_key)}`}</button>`}
     </div>`;
   }).join('');
   return `<div class="mn-h">${t('menu.jobTitle')}</div>${req}<div class="jb-grid">${cards}</div>`;

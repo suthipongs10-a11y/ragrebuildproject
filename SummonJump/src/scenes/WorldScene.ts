@@ -139,7 +139,7 @@ export class WorldScene extends Phaser.Scene {
     this.menu.attach({
       session: this.session, save: this.save, flush: () => this.flush(),
       pause: () => this.scene.pause(), resume: () => { this.controls.reset(); this.scene.resume(); },
-      applyUse: (fx) => this.applyUse(fx), onEquipChanged: () => this.applyLook(), onSpiritsChanged: () => this.onSpiritsChanged(),
+      applyUse: (fx) => this.applyUse(fx), onEquipChanged: () => this.applyLook(), onSpiritsChanged: () => this.onSpiritsChanged(), vitals: () => ({ hp: this.combat.combat.hp, maxHp: this.combat.maxHp, sp: this.session.rt.sp, maxSp: this.combat.maxSp }),
       arena: () => this.session.arena, enterArena: (run) => enterArena(this, run),
       onJobChanged: () => { this.combat.heal(); this.applyLook(); this.toast(t('menu.jobChanged').replace('{job}', t(`job.${this.session.data.job}`))); },
     });

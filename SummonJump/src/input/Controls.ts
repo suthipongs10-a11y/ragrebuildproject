@@ -20,6 +20,16 @@ export class Controls {
     addEventListener('blur', () => { for (const k of Object.keys(this.state) as InputKey[]) this.state[k] = false; });
     this.bindButtons();
     this.bindJoystick();
+    this.bindMouse();
+  }
+
+  /** Desktop mouse: left button on the game = attack (held = keep attacking). Touch keeps the on-screen buttons. */
+  private bindMouse(): void {
+    addEventListener('pointerdown', (e) => {
+      if (e.pointerType !== 'mouse' || e.button !== 0 || !(e.target instanceof HTMLCanvasElement)) return;
+      this.press('atk');
+    }, true); // capture: Phaser stops the event on the canvas
+    addEventListener('pointerup', (e) => { if (e.pointerType === 'mouse' && e.button === 0) this.state.atk = false; }, true);
   }
 
   private press(k: InputKey): void { if (!this.state[k]) this.latched.add(k); this.state[k] = true; }

@@ -19,3 +19,6 @@
 .jb-skills small { display: block; color: var(--muted); font-size: 12px; margin-bottom: 4px; }
 .jb-chip { display: inline-block; font-size: 12px; padding: 2px 8px; margin: 0 4px 4px 0; border-radius: 10px; background: #3a2c1c; }
 .jb-go { width: 100%; }
+.jb-ask { border: 2px solid #c99a4a; border-radius: 10px; padding: 8px; background: rgba(90, 60, 10, .45); color: #ffe9b0; font-size: 14px; }
+.jb-ask-btns { display: flex; gap: 8px; margin-top: 8px; }
+.jb-ask-btns .mn-btn { flex: 1; }

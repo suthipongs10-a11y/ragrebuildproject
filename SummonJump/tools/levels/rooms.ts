@@ -25,7 +25,7 @@ export const ROOMS: RoomSrc[] = [
   { id: 'town', zone: 'town', name: 'zone.town', exits: { left: 'forest', right: 'desert', up: 'sky1' },
     fill: [[0, 15, 29, 16, '#'], [3, 12, 7, 12, '-'], [8, 9, 12, 9, '-'], [3, 6, 7, 6, '-'], [19, 12, 20, 12, 'T'], [19, 13, 20, 14, 'P'], [28, 0, 29, 14, 'X']],
     entities: [
-      { type: 'SavePoint', x: 1, y: 14 }, { type: 'Anvil', x: 10, y: 14 }, { type: 'ExitHint', x: 9, y: 4, fields: { dir: 'up', note: 'hint.sky' } }, { type: 'Altar', x: 14, y: 14 },
+      { type: 'SavePoint', x: 1, y: 14 }, { type: 'Anvil', x: 10, y: 14 }, { type: 'ExitHint', x: 18, y: 3, fields: { dir: 'up', note: 'hint.sky' } }, { type: 'Altar', x: 14, y: 14 },
       sign(5, 14, 'sign.town.sky'), sign(17, 14, 'sign.town.pipe'), sign(25, 14, 'sign.town.rock'),
       { type: 'Pipe', x: 19.5, y: 12, w: 2, h: 1, fields: { dir: 'down', target: 'abyss1', tx: 20, ty: 2 } },
       { type: 'Gate', x: 5, y: 14, fields: { ability: 'double', text: 'gate.double' } },

@@ -133,6 +133,8 @@ test('phase 3: novice changes job at the priest menu and gets the starter weapon
   await page.evaluate(() => (window as unknown as { __game: { scene: { getScene: (k: string) => { openMenu: (t: string) => void } } } }).__game.scene.getScene('World').openMenu('job'));
   await expect(page.locator('.jb-card')).toHaveCount(4);
   await expect(page.locator('.jb-card').first().locator('.jb-bar')).toHaveCount(5);
+  await page.click('[data-act="jobask:mage"]');
+  await expect(page.locator('.jb-ask')).toContainText('แน่ใจ');
   await page.click('[data-act="job:mage"]');
   const r = await page.evaluate(() => { const w = (window as unknown as { __game: { scene: { getScene: (k: string) => { session: { data: { job: string; equip: { weapon: number }; bag: { uid: number; id: string }[] } } } } } }).__game.scene.getScene('World'); const d = w.session.data; return { job: d.job, weapon: d.bag.find((b) => b.uid === d.equip.weapon)?.id }; });
   expect(r).toEqual({ job: 'mage', weapon: 'wpn_staff_wood' });
@@ -314,5 +316,52 @@ test('soul stones: old coin saves carry over, crystals on the map pay out', asyn
   const pick = await ws(page, (w) => { const p = w.pickups.find((x: Any) => x.item === 'stone'); w.hero.x = p.x - w.hero.w / 2; w.hero.y = p.y - w.hero.h / 2; w.hero.vy = 0; return p.amount; });
   expect(pick).toBeGreaterThan(0);
   await page.waitForFunction((n) => (window as unknown as Any).__game.scene.getScene('World').save.soul === 1234 + n, pick, { timeout: 5000 });
+  expect(errors).toEqual([]);
+});
+
+test('fixes: job change with a full bag still hands over the bow; rig holds it', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=town&hero=novice:10');
+  await ws(page, (w) => { const d = w.session.data; while (d.bag.length < 60) d.bag.push({ uid: d.nextUid++, id: 'hat_leather_cap', count: 1, refine: 0, cards: [] }); w.openMenu('job'); });
+  await page.click('[data-act="jobask:archer"]');
+  await page.click('[data-act="jobno"]');
+  expect(await ws(page, (w) => w.session.data.job)).toBe('novice');
+  await page.click('[data-act="jobask:archer"]');
+  await page.click('[data-act="job:archer"]');
+  expect(await ws(page, (w) => { const d = w.session.data; return d.bag.find((b: Any) => b.uid === d.equip.weapon)?.id; })).toBe('wpn_bow_short');
+  // the menu pauses the scene: the bow picture must still reach the rig
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').rig.parts.sword[0].texture.key === 'wpn_bow_short', null, { timeout: 8000 });
+  expect(errors).toEqual([]);
+});
+
+test('fixes: potions show HP live in the menu and are not wasted at full HP', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=town&hero=swordsman:20');
+  const potions = () => ws(page, (w) => w.session.data.bag.find((b: Any) => b.id === 'potion_red')?.count ?? 0);
+  await ws(page, (w) => { w.combat.combat.hp = 10; });
+  await page.keyboard.press('KeyI'); // PC hotkey: bag
+  await expect(page.locator('.mn-tab.on')).toContainText('กระเป๋า');
+  await expect(page.locator('.mn-vit')).toContainText('HP 10/');
+  const n0 = await potions();
+  const uid = await ws(page, (w) => w.session.data.bag.find((b: Any) => b.id === 'potion_red').uid);
+  await page.click(`[data-act="use:${uid}"]`);
+  await expect(page.locator('.mn-vit')).not.toContainText('HP 10/');
+  expect(await potions()).toBe(n0 - 1);
+  await ws(page, (w) => { w.combat.combat.hp = w.combat.maxHp; });
+  await page.click(`[data-act="use:${uid}"]`);
+  await expect(page.locator('.mn-note')).toContainText('HP เต็ม');
+  expect(await potions()).toBe(n0 - 1);
+  await page.keyboard.press('KeyI'); // same key closes
+  await expect(page.locator('#menu')).toBeHidden();
+  expect(errors).toEqual([]);
+});
+
+test('fixes: left mouse click on the game attacks', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=forest&hero=swordsman:20');
+  const box = await page.locator('canvas').boundingBox();
+  expect(await ws(page, (w) => w.combat.combat.atkCd)).toBeLessThanOrEqual(0);
+  await page.mouse.click((box?.x ?? 0) + (box?.width ?? 0) * 0.6, (box?.y ?? 0) + (box?.height ?? 0) * 0.6); // empty spot (not the HUD / an NPC)
+  await page.waitForFunction(() => { const w = (window as unknown as Any).__game.scene.getScene('World'); return w.combat.combat.atkCd > 0 || w.rig.current.startsWith('attack'); }, null, { timeout: 3000 });
   expect(errors).toEqual([]);
 });
