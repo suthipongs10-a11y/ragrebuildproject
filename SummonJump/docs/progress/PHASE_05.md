@@ -64,7 +64,7 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 
 ## Owner request: easier to play (2026-10-10, ideas 1 2 8 10; idea 5 removed)
 - [x] **AUTO hunt** (`src/hero/AutoPilot.ts`): AUTO now walks to the nearest monster, hops walls / up to platforms (double jump when the team has it), drops through thin platforms, fights with skills, then collects map crystals; gives up on unreachable targets for 8 s; any direction / jump input takes over.
-- [x] **Tap / click a monster** → walk there and hit it (▼ marker), also with AUTO off.
+- [x] **Tap / click a monster** → lock on (▼ marker), walk / hop there and keep attacking until it dies, also with AUTO off (bigger tap area; tap empty ground to let go; gives up only after 4 s of being stuck). Tested melee, bow, staff, mace, flying monsters.
 - ~~One-tap growth / better-gear prompt~~ — removed again (owner: building your own character is part of the fun; drops stay as they are).
 - [x] **🧭 พาไป** next to the quest line: warps to the quest's room (monster's room, room to visit, town for summon / job / tower, a room at the hero's level for level quests).
 - [x] **Gentler start:** forest-zone monsters hit 30 % softer; out of combat (4 s without damage) +6 % HP / +4 % SP every 2 s; dying = get up at the room's safe spot with full HP (arena runs still end in town).

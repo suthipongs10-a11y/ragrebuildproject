@@ -23,10 +23,11 @@ function state(s: WorldScene): PilotState {
   st = { forced: null, banned: new Map(), lastX: 0, stuckT: 0, holdT: 0, marker, cleared: false };
   STATE.set(s, st);
   const pick = st;
-  // tap / click a monster: walk there and fight it
+  // tap / click a monster: lock on, walk there and keep hitting it until it dies (RO style). Tap empty ground = let go.
   s.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
-    const e = s.combat.enemies.find((x) => !x.dead && p.worldX > x.x - 20 && p.worldX < x.x + x.w + 20 && p.worldY > x.y - 30 && p.worldY < x.y + x.h + 20);
-    if (e) { pick.forced = e.id; pick.banned.delete(e.id); }
+    const pad = 36, e = s.combat.enemies.filter((x) => !x.dead && p.worldX > x.x - pad && p.worldX < x.x + x.w + pad && p.worldY > x.y - pad && p.worldY < x.y + x.h + pad)
+      .sort((a, b) => Math.abs(centre(a).x - p.worldX) + Math.abs(centre(a).y - p.worldY) - Math.abs(centre(b).x - p.worldX) - Math.abs(centre(b).y - p.worldY))[0];
+    if (e) { pick.forced = e.id; pick.banned.delete(e.id); pick.stuckT = 0; } else pick.forced = null;
   });
   return st;
 }
@@ -79,7 +80,9 @@ export function autoPilot(s: WorldScene, steering: boolean, dt: number): Pilot {
   const reach = !tgt ? 6 : d.ranged ? Math.min(d.range * 0.7, 220) : (h.w + tgt.w) / 2 + 26;
   const lined = !tgt || !d.ranged || Math.abs(dy) < 60; // arrows fly straight: get level with the target
   if (Math.abs(dx) > reach || !lined) out.dir = (Math.sign(dx) || h.dir) as -1 | 1;
-  else if (tgt) { h.dir = (dx >= 0 ? 1 : -1); if (forced && !on) out.attack = Math.abs(dy) < 70; }
+  else if (tgt) h.dir = (dx >= 0 ? 1 : -1);
+  // locked target: swing whenever it is within reach (also mid-jump), until it dies
+  if (forced && !on) out.attack = Math.abs(dx) <= reach + 12 && Math.abs(dy) < (d.ranged ? 60 : 95);
   // hops: walls, targets above, drop through thin platforms to targets below
   st.holdT = Math.max(0, st.holdT - dt);
   const wantUp = dy < -70 && Math.abs(dx) < 170;
@@ -90,6 +93,11 @@ export function autoPilot(s: WorldScene, steering: boolean, dt: number): Pilot {
   // stuck (wall too high, pit): give up on that target for a while
   if (out.dir && Math.abs(h.x - st.lastX) < 1.5) st.stuckT += dt; else st.stuckT = 0;
   st.lastX = h.x;
-  if (st.stuckT > 1.4 && tgt) { st.banned.set(tgt.id, now + 8); if (forced) st.forced = null; st.stuckT = 0; }
+  // a locked target is chased harder: hop when blocked, give up only after 4 s
+  if (forced && st.stuckT > 0.6 && h.onGround) { out.jump = true; st.holdT = 0.35; }
+  if (st.stuckT > (forced ? 4 : 1.4) && tgt) {
+    st.banned.set(tgt.id, now + 8); st.stuckT = 0;
+    if (forced) { st.forced = null; s.hint('lockLost', t('auto.lockLost')); }
+  }
   return out;
 }

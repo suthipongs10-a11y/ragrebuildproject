@@ -409,3 +409,20 @@ test('expedition: send spare spirits, loot piles up while away, claim it', async
   expect(await ws(page, (w) => w.save.explore)).toBeNull();
   expect(errors).toEqual([]);
 });
+
+for (const job of ['swordsman', 'archer']) {
+  test(`click a monster (${job}): walks there and keeps attacking until it dies`, async ({ page, isMobile }) => {
+    test.skip(isMobile, 'desktop only');
+    const errors = await boot(page, `?map=forest&hero=${job}:12`);
+    const tgt = await ws(page, (w) => {
+      const cam = w.cameras.main, h = w.hero;
+      const e = w.combat.enemies.filter((x: Any) => !x.dead && x.def.tier === 'normal').sort((a: Any, b: Any) => Math.abs(b.x - h.x) - Math.abs(a.x - h.x)).find((x: Any) => Math.abs(x.x - h.x) < 700);
+      e.hp = e.def.hp * 3; // takes several hits
+      return { id: e.id, sx: e.x + e.w / 2 - cam.scrollX, sy: e.y + e.h / 2 - cam.scrollY, gw: w.scale.width, gh: w.scale.height };
+    });
+    const box = await page.locator('canvas').boundingBox();
+    await page.mouse.click((box?.x ?? 0) + (tgt.sx / tgt.gw) * (box?.width ?? 0), (box?.y ?? 0) + (tgt.sy / tgt.gh) * (box?.height ?? 0));
+    await page.waitForFunction((id) => { const w = (window as unknown as Any).__game.scene.getScene('World'); return !w.combat.enemies.some((e: Any) => e.id === id && !e.dead); }, tgt.id, { timeout: 40_000 });
+    expect(errors).toEqual([]);
+  });
+}
