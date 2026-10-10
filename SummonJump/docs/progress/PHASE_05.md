@@ -42,13 +42,20 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [ ] Balance sheet reviewed by the owner
 
 ## How to test (phone)
-- New save or `?hero=swordsman:20`: forest → forest 2–4 → deep (King Poring) → deep 2 (Spore Mother); town ↑ sky 1–6 (Harpy, Thunder Ram, **Storm Roc**); town pipe ↓ abyss 1–6 (Siren, Shark, **Kraken**).
+- New save: follow the 🎯 quest line (top-left, tap for a hint); summon opens at Lv 5, dungeon Lv 12, tower Lv 15. Press T / AUTO to auto-fight.
+- Or `?hero=swordsman:20`: forest → forest 2–4 → deep (King Poring) → deep 2 (Spore Mother); town ↑ sky 1–6 (Harpy, Thunder Ram, **Storm Roc**); town pipe ↓ abyss 1–6 (Siren, Shark, **Kraken**).
 - ☰ → สมุดผจญภัย: claim milestones. Town NPC 🌀 ผู้เฝ้าประตูมิติ: daily dungeon + tower.
 
 ## Owner request: livelier hero animation (2026-10-10)
 - [x] New move sets in code (`src/rig/moves.ts`): fighting stance idle, 3-hit combo per weapon — sword (crouch → lunge cut → rising cut → leap smash), staff (thrust → swing → overhead slam), bow (draw → release recoil → hop-back shot), mace (overhead smash with impact squash) — plus one clip per skill type (front, aoe, bolt, rain, heal, buff, dash, zone), channel while casting, landing squash, knock-back hurt. Rig gained forward shift (`dx`) and squash/stretch (`sq`); clips play to the end.
 - [x] `ART_P03_Jobs.md` revised: every job a distinct-looking character (outfit, colours, signature item) + Part 5 expression heads (attack shout / hurt) — 86 images, 5 zips.
 - [ ] Wire job parts sheets + expression heads when the P03 Jobs zips are imported.
+
+## Owner request: easier play (2026-10-10, "ทำเลย")
+- [x] AUTO button (☰ row, key T, remembered per browser) — `shared/sim/auto.ts` plans, `src/hero/AutoBattle.ts` applies; ultimate stays manual.
+- [x] Job-change screen with rating bars, pros/cons, weapon, skills (`src/ui/menu/jobTab.ts`, `jobs.csv` `ratings`).
+- [x] Level unlocks (`content/unlocks.csv`) + guide quest chain (`content/quests.csv`, `shared/progression/guide.ts`, `src/hero/Guide.ts`).
+- [x] ROADMAP: world chat, rare-drop/MVP broadcast, offline farming, rested EXP → Phase 6; backlog list.
 
 ## Known issues / notes
 - New monsters without art use a recoloured look-alike (`art` + `tint` in monsters.csv), e.g. Crab = red Scorpion, Siren = teal Harpy, Storm Roc = slate Bird. They switch to their own art automatically when `ART_P05_Monsters_*` is imported.

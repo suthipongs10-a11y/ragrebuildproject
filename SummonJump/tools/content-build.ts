@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import Papa from 'papaparse';
 import { isElement } from '../shared/formulas/elements';
 import type {
-  ContentBundle, MonsterDef, DropDef, ItemDef, CardDef, SpiritDef, SkillDef, JobDef, SpiritSkillDef, SpiritElementDef, SummonDef, RuneSetDef, RuneStatDef, RuneUpgradeDef, RuneDropDef, BookEntryDef, DungeonDayDef, TowerFloorDef,
+  ContentBundle, MonsterDef, DropDef, ItemDef, CardDef, SpiritDef, SkillDef, JobDef, SpiritSkillDef, SpiritElementDef, SummonDef, RuneSetDef, RuneStatDef, RuneUpgradeDef, RuneDropDef, BookEntryDef, DungeonDayDef, TowerFloorDef, UnlockDef, QuestDef,
 } from '../shared/content/types';
 import { evalExpr } from '../shared/formulas/expr';
 
@@ -122,6 +122,7 @@ const jobs: JobDef[] = read('jobs').map((r) => ({
   job_lv_req: num(r, 'job_lv_req', 'job'), job_max: num(r, 'job_max', 'job'), hp_factor: num(r, 'hp_factor', 'job'), sp_factor: num(r, 'sp_factor', 'job'),
   aspd_factor: num(r, 'aspd_factor', 'job'), weapons: (r.weapons ?? '').split('|').filter(Boolean), starter_weapon: r.starter_weapon ?? '',
   parts_set: r.parts_set ?? '', skills: (r.skills ?? '').split('|').filter(Boolean),
+  ratings: Object.fromEntries((r.ratings ?? '').split('|').filter(Boolean).map((p) => { const [k, v] = p.split(':'); return [k ?? '', Number(v)]; })),
 }));
 
 uniqueIds(monsters, 'monsters'); uniqueIds(jobs, 'jobs'); uniqueIds(items, 'items'); uniqueIds(cards, 'cards'); uniqueIds(spirits, 'spirits'); uniqueIds(skills, 'skills');
@@ -146,9 +147,12 @@ for (const s of skills) {
   formula(s.sp, `skill ${s.id} sp`); formula(s.power, `skill ${s.id} power`);
   for (const [k, v] of Object.entries(s.effects)) if (k !== 'buff' && k !== 'debuff') formula(v, `skill ${s.id} effect ${k}`);
 }
+const JOB_RATINGS = ['dmg', 'tank', 'range', 'support', 'ease'];
 for (const j of jobs) {
   if (j.from_job && !jobIds.has(j.from_job)) err(`job ${j.id}: unknown from_job ${j.from_job}`);
   if (!itemIds.has(j.starter_weapon)) err(`job ${j.id}: unknown starter weapon ${j.starter_weapon}`);
+  for (const [k, v] of Object.entries(j.ratings)) if (!JOB_RATINGS.includes(k) || !(v >= 1 && v <= 5)) err(`job ${j.id}: bad rating ${k}:${v}`);
+  if (j.tier > 0 && Object.keys(j.ratings).length !== JOB_RATINGS.length) err(`job ${j.id}: needs all ratings (${JOB_RATINGS.join(', ')})`);
   for (const s of j.skills) { const d = skills.find((x) => x.id === s); if (!d) err(`job ${j.id}: unknown skill ${s}`); else if (d.owner !== j.id) err(`job ${j.id}: skill ${s} belongs to ${d.owner}`); }
 }
 const book: BookEntryDef[] = read('book').map((r) => ({
@@ -173,6 +177,16 @@ tower.forEach((f, i) => {
   for (const m of f.monsters) if (!monIds.has(m.id) || !(m.n > 0)) err(`tower floor ${f.floor}: bad monster ${m.id}`);
   for (const k of Object.keys(f.reward)) if (!itemIds.has(k)) err(`tower floor ${f.floor}: unknown reward item ${k}`);
 });
+const unlocks: UnlockDef[] = read('unlocks').map((r) => ({ feature: r.feature ?? '', level: num(r, 'level', 'unlock'), name_key: r.name_key ?? '' }));
+const quests: QuestDef[] = read('quests').map((r) => ({
+  id: r.id ?? '', kind: r.kind ?? '', target: r.target ?? '', count: num(r, 'count', 'quest'), reward: json(r, 'reward', 'quest') as Record<string, number>, text_key: r.text_key ?? '',
+}));
+uniqueIds(quests, 'quests');
+for (const q of quests) {
+  if (!['kill', 'level', 'summon', 'visit', 'job', 'tower'].includes(q.kind)) err(`quest ${q.id}: unknown kind ${q.kind}`);
+  if (q.kind === 'kill' && !monIds.has(q.target)) err(`quest ${q.id}: unknown monster ${q.target}`);
+  for (const k of Object.keys(q.reward)) if (k !== 'zeny' && !itemIds.has(k)) err(`quest ${q.id}: unknown reward item ${k}`);
+}
 
 // ── spirits / summon / runes ──
 const sskill = new Map(spiritSkills.map((s) => [s.id, s]));
@@ -213,7 +227,7 @@ if (errors.length) {
 }
 const bundle: ContentBundle = {
   contentVersion: new Date().toISOString().slice(0, 10), monsters, drops, items, cards, spirits, skills, jobs,
-  spiritSkills, spiritElements, spiritConfig, summon, runeSets, runeStats, runeUpgrade, runeDrop, book, dungeon, tower,
+  spiritSkills, spiritElements, spiritConfig, summon, runeSets, runeStats, runeUpgrade, runeDrop, book, dungeon, tower, unlocks, quests,
 };
 mkdirSync(OUT, { recursive: true });
 writeFileSync(join(OUT, 'content.json'), JSON.stringify(bundle));

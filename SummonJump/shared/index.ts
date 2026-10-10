@@ -18,3 +18,5 @@ export * from './rules/summon';
 export * from './sim/spirits';
 export * from './progression/book';
 export * from './rules/arena';
+export * from './progression/guide';
+export * from './sim/auto';

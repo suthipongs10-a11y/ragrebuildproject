@@ -6,6 +6,7 @@ import type { HeroSession } from './HeroSession';
 import type { HeroClip, HeroRig } from '../rig/HeroRig';
 import { burst, ring } from '../vfx/Effects';
 import { t } from '../i18n';
+import { popNumber } from '../vfx/DamageText';
 
 const SLOT_KEYS: InputKey[] = ['sk1', 'sk2', 'sk3'];
 
@@ -15,13 +16,19 @@ export function handleSkillInput(c: Controls, session: HeroSession, combat: Comb
     if (!c.pressed(k)) return;
     const id = session.data.slots[i];
     if (!id) { hint('noskill', t('skill.empty')); return; }
-    const ev = combat.cast(hero, id);
-    for (const e of ev) {
-      if (e.kind === 'fail') hint(`fail_${e.why}`, t(`skill.fail.${e.why}`));
-      if (e.kind === 'cast_start') rig.play('channel', true);
-      if (e.kind === 'cast') rig.play(clipFor(e), true);
-    }
+    castSkill(combat, hero, rig, id, hint);
   });
+}
+
+/** Cast one skill and start its rig clip (skill buttons and Auto). */
+export function castSkill(combat: CombatController, hero: HeroState, rig: HeroRig, id: string, hint?: (k: string, m: string) => void): boolean {
+  let ok = false;
+  for (const e of combat.cast(hero, id)) {
+    if (e.kind === 'fail') hint?.(`fail_${e.why}`, t(`skill.fail.${e.why}`));
+    if (e.kind === 'cast_start') { rig.play('channel', true); ok = true; }
+    if (e.kind === 'cast') { rig.play(clipFor(e), true); ok = true; }
+  }
+  return ok;
 }
 
 /** Skill animation by skills.csv `target` (moves.ts). */
@@ -55,4 +62,11 @@ export function pickClip(h: HeroState, cur: HeroClip, cb: HeroCombat, water: boo
   if (!h.onGround && !water) return h.vy < 0 ? 'jump' : 'fall';
   if (cb.atkCd > 0.08 && cb.chainT > 0) return 'guard';
   return h.onGround && Math.abs(h.vx) > 30 ? 'run' : 'idle';
+}
+
+/** Potion from the bag: heal HP/SP with a green number. */
+export function applyPotion(scene: Phaser.Scene, combat: CombatController, session: HeroSession, h: HeroState, fx: Record<string, number>): void {
+  const cb = combat.combat;
+  if (fx.heal) { cb.hp = Math.min(combat.maxHp, cb.hp + fx.heal); popNumber(scene, h.x + h.w / 2, h.y - 6, fx.heal, 'heal'); }
+  if (fx.sp) session.rt.sp = Math.min(combat.maxSp, session.rt.sp + fx.sp);
 }

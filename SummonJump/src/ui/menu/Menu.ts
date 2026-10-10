@@ -7,12 +7,14 @@ import { ART } from '../../assets/manifest.generated';
 import { t } from '../../i18n';
 import type { HeroSession } from '../../hero/HeroSession';
 import type { SaveData } from '../../save/local';
-import { bagTab, cardsTab, equipTab, jobTab, refineTab, shopTab, skillsTab, statusTab } from './tabs';
+import { jobTab } from './jobTab';
+import { bagTab, cardsTab, equipTab, refineTab, shopTab, skillsTab, statusTab } from './tabs';
 import { bookTab, newSpiritMenuState, spiritsTab, summonTab } from './spiritTabs';
 import { spiritAct } from './spiritActions';
 import './spirits.css';
 import { adventureTab } from './adventureTab';
 import { arenaTab } from './arenaTab';
+import { lockedBody, lockMsg } from './lock';
 
 export type MenuTab = 'status' | 'skills' | 'equip' | 'bag' | 'cards' | 'spirits' | 'book' | 'adventure' | 'arena' | 'job' | 'refine' | 'shop' | 'summon';
 const MAIN_TABS: MenuTab[] = ['status', 'skills', 'equip', 'bag', 'cards', 'spirits', 'book', 'summon', 'adventure'];
@@ -72,11 +74,13 @@ export class Menu {
 
   private render(): void {
     const h = this.host; if (!h) return;
-    const tabs = (MAIN_TABS.includes(this.tab) ? MAIN_TABS : [...MAIN_TABS, this.tab]).map((x) => `<button class="mn-tab${x === this.tab ? ' on' : ''}" data-act="tab:${x}">${t(`tab.${x}`)}</button>`).join('');
-    const body = { status: () => statusTab(h.session), skills: () => skillsTab(h.session), equip: () => equipTab(h.session, h.save), cards: () => cardsTab(h.session, h.save),
+    const tabs = (MAIN_TABS.includes(this.tab) ? MAIN_TABS : [...MAIN_TABS, this.tab]).map((x) => `<button class="mn-tab${x === this.tab ? ' on' : ''}" data-act="tab:${x}">${t(`tab.${x}`)}${(x === 'summon' || x === 'adventure') && lockMsg(h.session, x) ? '🔒' : ''}</button>`).join('');
+    const bodies = { status: () => statusTab(h.session), skills: () => skillsTab(h.session), equip: () => equipTab(h.session, h.save), cards: () => cardsTab(h.session, h.save),
       job: () => jobTab(h.session), refine: () => refineTab(h.session, h.save), shop: () => shopTab(h.session, h.save),
       spirits: () => spiritsTab(h.session, h.save, this.sp), summon: () => summonTab(h.session, this.sp),
-      bag: () => bagTab(h.session, h.save), book: () => bookTab(h.session, this.sp), adventure: () => adventureTab(h.session, h.save), arena: () => arenaTab(h.session, h.arena()) }[this.tab]();
+      bag: () => bagTab(h.session, h.save), book: () => bookTab(h.session, this.sp), adventure: () => adventureTab(h.session, h.save), arena: () => arenaTab(h.session, h.arena()) };
+    const lock = this.tab === 'summon' || this.tab === 'adventure' ? lockMsg(h.session, this.tab) : null;
+    const body = lock ? lockedBody(lock) : bodies[this.tab]();
     const scroll = this.root.querySelector('.mn-body')?.scrollTop ?? 0;
     this.root.innerHTML = `<div class="mn"><div class="mn-top"><div class="mn-tabs">${tabs}</div><button class="mn-x" data-act="close" aria-label="close">✕</button></div>
       ${this.note ? `<div class="mn-note" style="color:#ffd88a">${this.note}</div>` : ''}<div class="mn-body">${body}</div></div>`;
@@ -116,7 +120,7 @@ export class Menu {
       case 'refine': this.refine(Number(x)); break;
       case 'arena': {
         const run: ArenaRun = x === 'tower' ? { mode: 'tower', floor: Number(y) } : { mode: 'dungeon', day: new Date().getDay(), heroLv: d.baseLv };
-        const why = h.enterArena(run);
+        const why = lockMsg(s, run.mode) ?? h.enterArena(run);
         if (why) this.note = why; else { this.close(); return; }
         changed = false; break;
       }

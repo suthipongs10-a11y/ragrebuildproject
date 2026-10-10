@@ -1,0 +1,13 @@
+id,kind,target,count,reward,text_key
+q_poring,kill,poring,5,"{""potion_red"":5}",quest.poring
+q_lv5,level,,5,"{""scroll_normal"":3}",quest.lv5
+q_summon,summon,,1,"{""ess_magic"":3,""zeny"":200}",quest.summon
+q_forest2,visit,forest2,1,"{""zeny"":300}",quest.forest2
+q_king,kill,king,1,"{""scroll_mystic"":1}",quest.king
+q_job,job,,1,"{""potion_orange"":5}",quest.job
+q_sky,visit,sky1,1,"{""zeny"":500}",quest.sky
+q_harpy,kill,harpy,1,"{""scroll_mystic"":1}",quest.harpy
+q_abyss,visit,abyss1,1,"{""zeny"":800}",quest.abyss
+q_tower,tower,,1,"{""scroll_normal"":5}",quest.tower
+q_roc,kill,storm_roc,1,"{""scroll_ld"":1}",quest.roc
+q_kraken,kill,kraken,1,"{""scroll_mystic"":3}",quest.kraken

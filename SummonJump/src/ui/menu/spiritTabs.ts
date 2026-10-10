@@ -3,6 +3,7 @@ import {
   spiritExpToNext, spiritOf, spiritStats, sskillOf, upgradeCost, upgradeRate, MAX_RUNE_LV, RUNE_SLOTS,
   type ContentBundle, type RuneInst, type SpiritInst, type SpiritSkillDef,
 } from '@shared/index';
+import { lockMsg } from './lock';
 import { t } from '../../i18n';
 import type { HeroSession } from '../../hero/HeroSession';
 import type { SaveData } from '../../save/local';
@@ -77,7 +78,7 @@ function infoView(s: HeroSession, sp: SpiritInst): string {
     <div class="mn-row"><span class="grow">✦ ${t(sskillOf(c, f.ult)?.name_key ?? '')}<small>${skillText(sskillOf(c, f.ult))}</small></span></div>
     <div class="mn-row"><span class="grow">👑 ${t(sskillOf(c, f.leader)?.name_key ?? '')}<small>${skillText(sskillOf(c, f.leader))}</small></span></div>
     <div class="sp-btns">${teamBtns}</div>
-    <div class="sp-btns">${btn('spmode:runes', `💠 ${t('sp.runes')} (${runesOn(b, sp.uid).length}/6)`)}
+    <div class="sp-btns">${btn('spmode:runes', `💠 ${t('sp.runes')} (${runesOn(b, sp.uid).length}/6)${lockMsg(s, 'runes') ? ' 🔒' : ''}`, !lockMsg(s, 'runes'))}
       ${btn('spmode:starup', `⭐ ${t('sp.starUp')}`, sp.star < 6 && sp.lv >= cap && cands >= need)}
       ${btn(`spawk:${sp.uid}`, `🌟 ${t('sp.awaken')}`, awkWhy === null)}</div>
     <div class="mn-note">${sp.star < 6 ? t('sp.starUpHint').replace('{lv}', String(cap)).replace('{n}', String(need)).replace('{s}', String(sp.star)) : t('sp.maxStar')}${sp.awk ? '' : ` · ${t('sp.awakenCost')}: ${cost}`}</div>

@@ -1,0 +1,6 @@
+feature,level,name_key
+adventure,3,tab.adventure
+summon,5,tab.summon
+runes,10,sp.runes
+dungeon,12,arena.dungeon
+tower,15,arena.tower

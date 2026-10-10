@@ -2,6 +2,7 @@ import { dailyLeft, dayKey, dungeonOf, itemDef, DAILY_ENTRIES, type ArenaState }
 import { t } from '../../i18n';
 import type { HeroSession } from '../../hero/HeroSession';
 import { rewardItems } from './arenaText';
+import { lockMsg } from './lock';
 
 /** Portal NPC: today's elemental dungeon (3 entries a day) and the tower (floors 1–20). */
 const btn = (act: string, label: string, ok = true, sec = false) => `<button class="mn-btn${sec ? ' sec' : ''}" data-act="${act}"${ok ? '' : ' disabled'}>${label}</button>`;
@@ -12,7 +13,9 @@ export function arenaTab(s: HeroSession, a: ArenaState): string {
   const ess = t(itemDef(c, day?.essence ?? '')?.name_key ?? '');
   const dungeon = `<div class="mn-h">🌀 ${t('arena.dungeon')} · ${t(`day.${now.getDay()}`)}</div>
     <div class="mn-row"><span class="grow">${t('arena.todayEl').replace('{el}', t(`el.${el}`))}<small>${t('arena.dungeonInfo').replace('{ess}', ess)} · ${t('arena.left').replace('{n}', String(left)).replace('{max}', String(DAILY_ENTRIES))}</small></span>
-    ${btn('arena:dungeon', t('arena.enter'), left > 0)}</div>`;
+    ${lockMsg(s, 'dungeon') ? `<small>${lockMsg(s, 'dungeon')}</small>` : btn('arena:dungeon', t('arena.enter'), left > 0)}</div>`;
+  const towerLock = lockMsg(s, 'tower');
+  if (towerLock) return `${dungeon}<div class="mn-h">🗼 ${t('arena.tower')}</div><div class="mn-row"><span class="mn-icon">🔒</span><span class="grow">${towerLock}</span></div>`;
   const next = Math.min(a.tower + 1, c.tower.length);
   const floors = c.tower.map((f) => {
     const done = f.floor <= a.tower, open = f.floor <= next;

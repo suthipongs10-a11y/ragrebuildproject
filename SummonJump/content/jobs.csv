@@ -1,6 +1,6 @@
-id,name_key,tier,from_job,job_lv_req,job_max,hp_factor,sp_factor,aspd_factor,weapons,starter_weapon,parts_set,skills
-novice,job.novice,0,,0,10,1.0,1.0,1.0,sword,w_train,hero,first_aid|basic_skill
-swordsman,job.swordsman,1,novice,10,50,1.6,0.8,1.0,sword,w_iron,swordsman,power_slash|magnum_burst|sword_mastery|hp_recovery|provoke|endure|dash_strike|whirlwind
-mage,job.mage,1,novice,10,50,0.9,2.0,0.85,staff,wpn_staff_wood,mage,fire_bolt|cold_bolt|lightning_bolt|soul_strike|fire_wall|frost_nova|sp_recovery|energy_shield
-archer,job.archer,1,novice,10,50,1.1,1.1,1.1,bow,wpn_bow_short,archer,double_strafe|arrow_shower|charge_arrow|owl_eye|vulture_eye|focus|ankle_trap|arrow_rain
-acolyte,job.acolyte,1,novice,10,50,1.2,1.5,0.95,mace,wpn_mace_iron,acolyte,heal|blessing|increase_agi|holy_light|pneuma|divine_protection|angelus|ruwach
+id,name_key,tier,from_job,job_lv_req,job_max,hp_factor,sp_factor,aspd_factor,weapons,starter_weapon,parts_set,skills,ratings
+novice,job.novice,0,,0,10,1.0,1.0,1.0,sword,w_train,hero,first_aid|basic_skill,
+swordsman,job.swordsman,1,novice,10,50,1.6,0.8,1.0,sword,w_iron,swordsman,power_slash|magnum_burst|sword_mastery|hp_recovery|provoke|endure|dash_strike|whirlwind,dmg:3|tank:5|range:1|support:1|ease:5
+mage,job.mage,1,novice,10,50,0.9,2.0,0.85,staff,wpn_staff_wood,mage,fire_bolt|cold_bolt|lightning_bolt|soul_strike|fire_wall|frost_nova|sp_recovery|energy_shield,dmg:5|tank:1|range:4|support:1|ease:2
+archer,job.archer,1,novice,10,50,1.1,1.1,1.1,bow,wpn_bow_short,archer,double_strafe|arrow_shower|charge_arrow|owl_eye|vulture_eye|focus|ankle_trap|arrow_rain,dmg:4|tank:2|range:5|support:1|ease:4
+acolyte,job.acolyte,1,novice,10,50,1.2,1.5,0.95,mace,wpn_mace_iron,acolyte,heal|blessing|increase_agi|holy_light|pneuma|divine_protection|angelus|ruwach,dmg:2|tank:3|range:2|support:5|ease:3

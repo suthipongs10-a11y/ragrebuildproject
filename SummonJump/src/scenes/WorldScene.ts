@@ -17,7 +17,7 @@ import { HeroRig } from '../rig/HeroRig';
 import { Hud } from '../ui/Hud';
 import { RoomInteractions } from '../world/RoomInteractions';
 import { HeroSession } from '../hero/HeroSession';
-import { handleSkillInput, pickClip, playLevelUps } from '../hero/HeroPlay';
+import { applyPotion, handleSkillInput, pickClip, playLevelUps } from '../hero/HeroPlay';
 import type { Menu, MenuTab } from '../ui/menu/Menu';
 import { SkillButtons } from '../ui/SkillButtons';
 import { ActionButton } from '../ui/ActionButton';
@@ -25,6 +25,8 @@ import { popNumber } from '../vfx/DamageText';
 import { bindDebugKeys } from './debugKeys';
 import { BossTimers } from '../world/BossTimers';
 import { ArenaController, arenaKeys, enterArena } from '../world/Arena';
+import { autoStep } from '../hero/AutoBattle';
+import { Guide } from '../hero/Guide';
 import { loadTeamArt, spiritArtKeys, teamAbilitySet, tryUltimate, ultHost, UltButton } from '../spirits/SpiritPlay';
 
 /** Where the hero appears when a room loads. */
@@ -53,6 +55,7 @@ export class WorldScene extends Phaser.Scene {
   private ultBtn = new UltButton();
   private bossTimers!: BossTimers;
   private arena: ArenaController | null = null;
+  private guide!: Guide;
   private menu!: Menu;
   private deadT = 0;
   view!: LevelVisuals;
@@ -130,6 +133,7 @@ export class WorldScene extends Phaser.Scene {
     this.prompt = this.add.text(0, 0, '▲', { ...f, fontSize: '26px', color: '#ffd88a' }).setOrigin(0.5, 1).setDepth(50).setVisible(false);
     this.dialog = new DialogBox(this);
     this.bars = new Hud(this);
+    this.guide = new Guide(this, this.session, this.save, (m) => this.toast(m), () => this.flush(), (txt) => this.openDialog('', [txt]));
     this.menu = this.registry.get('menu') as Menu;
     this.menu.attach({
       session: this.session, save: this.save, flush: () => this.flush(),
@@ -265,7 +269,8 @@ export class WorldScene extends Phaser.Scene {
       this.onEvents(events);
     }
     const atkOk = !talking && !dead;
-    const fight = this.combat.update(dt, this.hero, { attackPressed: atkOk && c.pressed('atk'), attackHeld: atkOk && c.state.atk, jumpHeld: c.state.jump }, this.time.now / 1000);
+    const auto = atkOk && !frozen && autoStep(this.session, this.combat, this.hero, this.rig, dir !== 0, dt);
+    const fight = this.combat.update(dt, this.hero, { attackPressed: atkOk && c.pressed('atk'), attackHeld: atkOk && (c.state.atk || auto), jumpHeld: c.state.jump }, this.time.now / 1000);
     for (const ev of fight) {
       if (ev.kind === 'swing') { this.rig.play(ev.spec.clip, true); this.room.swing(); }
       if (ev.kind === 'hurt') this.rig.play('hurt', true);
@@ -293,6 +298,7 @@ export class WorldScene extends Phaser.Scene {
     this.room.collectPickups();
     this.bossTimers.update();
     this.arena?.update(dt);
+    this.guide.update(dt);
 
     const ex = dead ? null : checkExit(this.hero, env);
     if (ex === 'fall') this.fallRespawn();
@@ -360,12 +366,7 @@ export class WorldScene extends Phaser.Scene {
     this.rig.setLook(d.job, this.session.content.items.find((i) => i.id === w?.id)?.subtype ?? 'sword');
   }
 
-  /** Potion from the bag: heal HP/SP with a green number. */
-  applyUse(fx: Record<string, number>): void {
-    const cb = this.combat.combat, h = this.hero;
-    if (fx.heal) { cb.hp = Math.min(this.combat.maxHp, cb.hp + fx.heal); popNumber(this, h.x + h.w / 2, h.y - 6, fx.heal, 'heal'); }
-    if (fx.sp) this.session.rt.sp = Math.min(this.combat.maxSp, this.session.rt.sp + fx.sp);
-  }
+  applyUse(fx: Record<string, number>): void { applyPotion(this, this.combat, this.session, this.hero, fx); }
   toast(msg: string): void {
     this.toastText.setText(msg).setAlpha(1); this.toastUntil = this.time.now + 2600;
   }

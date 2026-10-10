@@ -131,6 +131,8 @@ test('phase 3: novice changes job at the priest menu and gets the starter weapon
   test.skip(isMobile, 'desktop only');
   const errors = await boot(page, '?map=town&hero=novice:10');
   await page.evaluate(() => (window as unknown as { __game: { scene: { getScene: (k: string) => { openMenu: (t: string) => void } } } }).__game.scene.getScene('World').openMenu('job'));
+  await expect(page.locator('.jb-card')).toHaveCount(4);
+  await expect(page.locator('.jb-card').first().locator('.jb-bar')).toHaveCount(5);
   await page.click('[data-act="job:mage"]');
   const r = await page.evaluate(() => { const w = (window as unknown as { __game: { scene: { getScene: (k: string) => { session: { data: { job: string; equip: { weapon: number }; bag: { uid: number; id: string }[] } } } } } }).__game.scene.getScene('World'); const d = w.session.data; return { job: d.job, weapon: d.bag.find((b) => b.uid === d.equip.weapon)?.id }; });
   expect(r).toEqual({ job: 'mage', weapon: 'wpn_staff_wood' });
@@ -183,7 +185,7 @@ test('phase 4: starter team follows the hero and gives double jump / dive / smas
 
 test('phase 4: altar summon with a mystic scroll adds a 3★+ spirit', async ({ page, isMobile }) => {
   test.skip(isMobile, 'desktop only');
-  const errors = await boot(page, '?map=town');
+  const errors = await boot(page, '?map=town&hero=swordsman:20');
   const n0 = await ws(page, (w) => w.session.box.spirits.length);
   await ws(page, (w) => w.openMenu('summon'));
   await page.click('[data-act="sum:mystic:1"]');
@@ -234,7 +236,7 @@ test('phase 4: bag and equipment are separate tabs; spirit book lists every fami
 
 test('phase 5: adventure book milestone can be claimed for a permanent bonus', async ({ page, isMobile }) => {
   test.skip(isMobile, 'desktop only');
-  const errors = await boot(page, '?map=town');
+  const errors = await boot(page, '?map=town&hero=swordsman:20');
   await ws(page, (w) => { w.session.book.kills.poring = 50; });
   const hp0 = await ws(page, (w) => w.combat.maxHp);
   await ws(page, (w) => w.openMenu('adventure'));
@@ -247,7 +249,7 @@ test('phase 5: adventure book milestone can be claimed for a permanent bonus', a
 
 test('phase 5: tower floor 1 from the portal: waves, clear reward, back to town', async ({ page, isMobile }) => {
   test.skip(isMobile, 'desktop only');
-  const errors = await boot(page, '?map=town');
+  const errors = await boot(page, '?map=town&hero=swordsman:20');
   await ws(page, (w) => w.openMenu('arena'));
   await page.click('[data-act="arena:tower:1"]');
   await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').level?.id === 'arena', null, { timeout: 10_000 });
@@ -262,11 +264,41 @@ test('phase 5: tower floor 1 from the portal: waves, clear reward, back to town'
 
 test('phase 5: daily dungeon uses an entry and its monsters are drawn', async ({ page, isMobile }) => {
   test.skip(isMobile, 'desktop only');
-  const errors = await boot(page, '?map=town');
+  const errors = await boot(page, '?map=town&hero=swordsman:20');
   await ws(page, (w) => w.openMenu('arena'));
   await page.click('[data-act="arena:dungeon"]');
   await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').combat?.enemies.some((e: Any) => e.id.startsWith('arena#')), null, { timeout: 15_000 });
   expect(await ws(page, (w) => w.session.arena.daily.used)).toBe(1);
   expect(await ws(page, (w) => w.children.list.filter((o: Any) => o.texture?.key === '__MISSING').length)).toBe(0);
+  expect(errors).toEqual([]);
+});
+
+test('phase 5: a new hero sees locked summon / tower and a guide quest', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=town');
+  await ws(page, (w) => w.openMenu('summon'));
+  await expect(page.locator('.mn-body')).toContainText('Lv 5');
+  await expect(page.locator('[data-act="sum:mystic:1"]')).toHaveCount(0);
+  await ws(page, (w) => w.openMenu('arena'));
+  await expect(page.locator('[data-act="arena:tower:1"]')).toHaveCount(0);
+  await page.click('[data-act="close"]');
+  expect(await ws(page, (w) => w.guide.shown)).toContain('โพริ่ง');
+  expect(errors).toEqual([]);
+});
+
+test('phase 5: AUTO (key T) faces and hits a nearby monster without pressing attack', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=forest&hero=swordsman:20');
+  await page.keyboard.press('KeyT');
+  await expect(page.locator('#b_auto')).toHaveClass(/on/);
+  const hit = await ws(page, (w) => {
+    const e = w.combat.enemies.find((x: Any) => !x.dead);
+    e.hp = e.def.hp * 50;
+    w.hero.x = e.x - 60; w.hero.y = e.y + e.h - w.hero.h; w.hero.dir = -1;
+    return e.id;
+  });
+  await page.waitForFunction((id) => { const e = (window as unknown as Any).__game.scene.getScene('World').combat.enemies.find((x: Any) => x.id === id); return !e || e.hp < e.def.hp * 50; }, hit, { timeout: 5000 });
+  await page.keyboard.press('KeyT');
+  await expect(page.locator('#b_auto')).not.toHaveClass(/on/);
   expect(errors).toEqual([]);
 });

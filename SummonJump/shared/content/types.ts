@@ -29,6 +29,8 @@ export type JobId = 'novice' | 'swordsman' | 'mage' | 'archer' | 'acolyte';
 export interface JobDef {
   id: JobId; name_key: string; tier: number; from_job: JobId | null; job_lv_req: number; job_max: number;
   hp_factor: number; sp_factor: number; aspd_factor: number; weapons: string[]; starter_weapon: string; parts_set: string; skills: string[];
+  /** job-change screen bars, 1–5: dmg, tank, range, support, ease */
+  ratings: Record<string, number>;
 }
 
 export interface CardDef { id: string; name_key: string; slot_type: string; effects: Record<string, unknown>; set_id: string | null; art: string }
@@ -63,6 +65,11 @@ export interface DungeonDayDef { day: number; element: string; essence: string; 
 /** tower.csv: one floor; monsters as id x count, stat scale, first-clear reward items. */
 export interface TowerFloorDef { floor: number; monsters: { id: string; n: number }[]; scale: number; reward: Record<string, number>; zeny: number }
 
+/** unlocks.csv: features that open at a base level (so new players aren't buried in menus). */
+export interface UnlockDef { feature: string; level: number; name_key: string }
+/** quests.csv: the guided main-story chain. kind: kill / level / summon / visit / job / tower. reward: items + zeny. */
+export interface QuestDef { id: string; kind: string; target: string; count: number; reward: Record<string, number>; text_key: string }
+
 /** summon.csv: rates[i] = chance of (i+1)★; elements 'pick' = player chooses. */
 export interface SummonDef { id: string; item: string; name_key: string; elements: string[]; rates: number[]; pity_n: number; pity_star: number }
 
@@ -93,4 +100,6 @@ export interface ContentBundle {
   book: BookEntryDef[];
   dungeon: DungeonDayDef[];
   tower: TowerFloorDef[];
+  unlocks: UnlockDef[];
+  quests: QuestDef[];
 }

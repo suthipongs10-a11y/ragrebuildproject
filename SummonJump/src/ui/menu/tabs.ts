@@ -1,5 +1,5 @@
 import {
-  attack, attackCooldown, BAG_SIZE, canChangeJob, canEquip, canLearn, canSocket, critRate, defense, EQUIP_SLOTS, instance, isEquipped, itemDef, learnableSkills,
+  attack, attackCooldown, BAG_SIZE, canEquip, canLearn, canSocket, critRate, defense, EQUIP_SLOTS, instance, isEquipped, itemDef, learnableSkills,
   magicAttack, maxHp, maxSp, refineChance, refineCost, skillDef, spCost, statCost, STAT_KEYS, type ContentBundle, type HeroData, type ItemInstance,
 } from '@shared/index';
 import { ART } from '../../assets/manifest.generated';
@@ -108,15 +108,6 @@ export function cardsTab(s: HeroSession, save: SaveData): string {
     return `<div class="mn-row">${iconHtml(card?.art ?? '', '🃏')}<span class="grow">${t(card?.name_key ?? id)} ×${n}<small>${t(`slot.${card?.slot_type ?? 'any'}`)} · ${fx}</small></span></div>`;
   }).join('');
   return `<div class="mn-h">${t('menu.cardsHint')}</div>${rows || `<div class="mn-note">${t('menu.noCards')}</div>`}`;
-}
-
-export function jobTab(s: HeroSession): string {
-  const h = s.data, c = s.content;
-  const rows = c.jobs.filter((j) => j.from_job === h.job).map((j) => {
-    const why = canChangeJob(h, c, j.id);
-    return `<div class="mn-row"><span class="mn-icon">${{ swordsman: '⚔️', mage: '🪄', archer: '🏹', acolyte: '✝️' }[j.id as string] ?? '⭐'}</span><span class="grow">${t(j.name_key)}<small>${t(`job.${j.id}.desc`)}</small>${why ? `<small>${t(`jobwhy.${why}`)}</small>` : ''}</span>${btn(`job:${j.id}`, t('menu.become'), why === null)}</div>`;
-  }).join('');
-  return `<div class="mn-h">${t('menu.jobTitle')}</div>${rows || `<div class="mn-note">${t('menu.jobDone')}</div>`}`;
 }
 
 export function refineTab(s: HeroSession, save: SaveData): string {

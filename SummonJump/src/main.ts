@@ -6,6 +6,7 @@ import { t } from './i18n';
 import { lockZoom } from './ui/noZoom';
 import { installErrorOverlay } from './ui/errors';
 import { Menu } from './ui/menu/Menu';
+import { bindAuto } from './hero/AutoBattle';
 
 lockZoom();
 installErrorOverlay();
@@ -35,6 +36,7 @@ game.registry.set('controls', controls);
 const menu = new Menu();
 game.registry.set('menu', menu);
 document.getElementById('b_menu')?.addEventListener('pointerup', (e) => { e.preventDefault(); if (menu.isOpen) menu.close(); else menu.open(); });
+bindAuto();
 
 // expose for smoke tests / debugging
 (window as unknown as { __game: Phaser.Game }).__game = game;
