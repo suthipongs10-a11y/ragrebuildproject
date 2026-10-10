@@ -24,6 +24,7 @@ import { ActionButton } from '../ui/ActionButton';
 import { popNumber } from '../vfx/DamageText';
 import { bindDebugKeys } from './debugKeys';
 import { BossTimers } from '../world/BossTimers';
+import { FieldSpawner } from '../world/FieldSpawner';
 import { ArenaController, arenaKeys, enterArena } from '../world/Arena';
 import { autoPilot, NO_PILOT } from '../hero/AutoPilot';
 import { applyHeroLook, sessionArtKeys } from '../hero/HeroArt';
@@ -56,6 +57,7 @@ export class WorldScene extends Phaser.Scene {
   private actionBtn = new ActionButton();
   private ultBtn = new UltButton();
   private bossTimers!: BossTimers;
+  private field!: FieldSpawner;
   private arena: ArenaController | null = null;
   private guide!: Guide;
   private menu!: Menu;
@@ -173,7 +175,8 @@ export class WorldScene extends Phaser.Scene {
     const now = Date.now();
     pruneDefeated(this.save.defeated, now);
     const monsters = this.level.entities.filter((e) => e.type === 'Monster');
-    for (const e of aliveSpawns(monsters, this.save.defeated, now)) this.combat.spawn(e.id, String(e.fields.monster), e.x, e.y);
+    this.field = new FieldSpawner(this.level, this.session.content, (s, poof) => this.combat.spawn(s.id, s.monster, s.x, s.y, 1, poof), (id) => this.combat.alive(id));
+    for (const e of aliveSpawns(monsters, this.save.defeated, now)) if (!this.field.owns(e.id)) this.combat.spawn(e.id, String(e.fields.monster), e.x, e.y);
     this.bossTimers = new BossTimers(this, this.level, this.save.defeated, this.session.content, (e) => this.combat.spawn(e.id, String(e.fields.monster), e.x, e.y));
     for (const e of this.level.entities) {
       if (e.type === 'Item') {
@@ -296,6 +299,7 @@ export class WorldScene extends Phaser.Scene {
     if (action && this.actionBtn.take()) action.run();
     this.room.collectPickups();
     this.bossTimers.update();
+    this.field.update(dt, this.hero.x + this.hero.w / 2);
     this.arena?.update(dt);
     this.guide.update(dt);
 

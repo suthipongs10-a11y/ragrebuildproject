@@ -82,15 +82,19 @@ export class CombatController {
   /** The mini-boss / MVP in this room (shown with a big HP bar), if alive. */
   get boss(): Enemy | undefined { return this.enemies.find((e) => !e.dead && e.def.tier !== 'normal'); }
 
-  /** `scale` (arena modes) multiplies HP / ATK / DEF / rewards. */
-  spawn(id: string, monster: string, x: number, y: number, scale = 1): void {
+  /** `scale` (arena modes) multiplies HP / ATK / DEF / rewards; `poof` = a field respawn (small puff). */
+  spawn(id: string, monster: string, x: number, y: number, scale = 1, poof = false): void {
     const base = this.defs.get(monster);
     if (!base) return;
     const def = scaledDef(base, scale);
     const e = createEnemy(id, def, x, y, this.rng);
     this.enemies.push(e);
     this.views.set(e.id, new EnemyView(this.scene, e));
+    if (poof) { ring(this.scene, x, y - e.h / 2, 0xfff2cc, 50, 350); burst(this.scene, x, y - e.h / 2, 0xfff2cc, 8, 160); }
   }
+
+  /** Alive monster with this id (field respawns). */
+  alive(id: string): boolean { return this.enemies.some((e) => e.id === id && !e.dead); }
 
   private skillCtx(hero: HeroState): SkillCtx {
     const s = this.session;

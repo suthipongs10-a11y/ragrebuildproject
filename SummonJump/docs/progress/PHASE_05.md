@@ -89,6 +89,12 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Sky Isles: every sky room stands on one continuous cloud ground (no gaps → no fall/respawn flicker); sky1 goes back to town through a cloud pipe (level validation accepts edge ↔ pipe pairs).
 - Balance: swordsman route unchanged (1.9 → 1.8 h sim to the Kraken).
 
+## Owner request: more monsters, endless farming, stronger normals (2026-10-10)
+- [x] Normal monsters come back by themselves: 12 s after one dies it reappears at its spawn point with a small puff (`monsters.csv` `respawn_sec`), never on top of the hero (waits until the hero is 260 px away). Still respawn on room entry too; bosses keep their long persisted timers.
+- [x] More monsters: each spawn point now holds a pack (`monsters.csv` new `pack` column: 2 for normal monsters, 1 for turrets and bosses) → about twice as many monsters per room.
+- [x] Normal monsters HP ×2 and ATK ×2 (EXP unchanged — owner: slow levels / rare drops are fine).
+- Check: a fresh Lv 1 character on AUTO in the forest for 90 s → Lv 4, lowest HP 74/140, 5–6 monsters alive at all times. Balance sim: 2.0 → 2.5 h to the Kraken (real play ≈ 3.8–5 h; the sim doesn't count the walking saved by respawns).
+
 ## Owner request: tougher bosses — AUTO is for farming (2026-10-10)
 - [x] Mini-bosses / MVPs HP ×4 and ATK ×1.5 (e.g. ราชาบุ๋ม 1300 → 5200, Storm Roc 10500 → 42000, Kraken 15000 → 60000).
 - [x] Every boss calls its own minions (`monsters.csv` `ai_params`: `minion`, `minion_max`, `minion_cd`): 2 per call, 3 per call and faster in phase 2, only while the hero is near; "{name} เรียกลูกน้อง!" pops up. Hard-coded summons removed from the scripts. Called minions give no EXP / drops / soul (RO slaves) so a boss can't be farmed.

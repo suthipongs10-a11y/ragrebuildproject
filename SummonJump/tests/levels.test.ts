@@ -1,7 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { Cell, TILE, checkExit, createHero, exitsOf, parseLdtk, stepHero, validateLevels, aliveSpawns, isSpawnAlive, markDefeated, pruneDefeated, type LdtkProject, type LevelData, type MotionInput } from '@shared/platformer';
+import type { MonsterDef } from '@shared/content/types';
+import { Cell, TILE, checkExit, createHero, exitsOf, parseLdtk, stepHero, validateLevels, aliveSpawns, isSpawnAlive, markDefeated, pruneDefeated, fieldSlots, fieldDue, FIELD_CLEAR, type LdtkProject, type LevelData, type MotionInput } from '@shared/platformer';
 
 const root = join(import.meta.dirname, '..');
 const levels = parseLdtk(JSON.parse(readFileSync(join(root, 'levels', 'world.ldtk'), 'utf8')) as LdtkProject);
@@ -86,6 +87,22 @@ describe('respawn', () => {
     expect(isSpawnAlive(d, 'c', now + 7200_000)).toBe(true);
     pruneDefeated(d, now + 1200_000);
     expect(Object.keys(d)).toEqual(['c']);
+  });
+  it('field: normal monsters spawn in packs and come back in the room after respawn_sec, never on top of the hero', () => {
+    const defs: Record<string, Partial<MonsterDef>> = { poring: { tier: 'normal', pack: 2, respawn_sec: 12 }, willow: { tier: 'normal', pack: 1, respawn_sec: 12 }, king: { tier: 'mini', pack: 1, respawn_sec: 90 } };
+    const slots = fieldSlots([{ id: 'r#0', x: 400, y: 480, monster: 'poring' }, { id: 'r#1', x: 900, y: 480, monster: 'willow' }, { id: 'r#2', x: 600, y: 480, monster: 'king' }], (id) => defs[id] as MonsterDef);
+    expect(slots.map((s) => [s.id, s.x])).toEqual([['r#0', 380], ['r#0~1', 420], ['r#1', 900]]); // bosses keep their own timers
+    const alive = new Set(['r#0', 'r#1']), timers = new Map<string, number>();
+    const due = (heroX: number, dt: number) => fieldDue(slots, timers, (id) => alive.has(id), heroX, dt).map((s) => s.id);
+    expect(due(0, 11)).toEqual([]);              // r#0~1 died: waits 12 s
+    expect(due(420, 2)).toEqual([]);             // ready, but the hero stands on the spot
+    expect(due(420 + FIELD_CLEAR + 1, 0.1)).toEqual(['r#0~1']);
+    alive.add('r#0~1');
+    expect(due(0, 30)).toEqual([]);              // everything alive: nothing to do
+  });
+  it('content: every normal monster respawns in the room and comes in a pack', () => {
+    const c = JSON.parse(readFileSync(join(root, 'public', 'content', 'content.json'), 'utf8')) as { monsters: MonsterDef[] };
+    for (const m of c.monsters.filter((x) => x.tier === 'normal')) { expect(m.respawn_sec, m.id).toBeGreaterThan(0); expect(m.pack, m.id).toBeGreaterThanOrEqual(1); }
   });
 });
 

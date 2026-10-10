@@ -4,65 +4,65 @@ Simulated new player on the main route (plain swordsman: natural levels, best co
 Kill time = monster HP ÷ (hero DPS + spirit DPS), plus 2.5 s per kill for moving and 6 s per room re-entry.
 The player leaves a room once they reach the level of the next room's monsters.
 
-**Simulated time from a new game to MVP #2 (Kraken): 2.0 h** · final level 26
-Real play on a phone (dodging, deaths, menus, exploring) is usually 1.5–2× the simulation → **about 3.0–4.1 h** (target 3–4 h), not counting the daily dungeon, tower and spirit summoning.
+**Simulated time from a new game to MVP #2 (Kraken): 2.5 h** · final level 26
+Real play on a phone (dodging, deaths, menus, exploring) is usually 1.5–2× the simulation → **about 3.8–5.1 h** (target 3–4 h), not counting the daily dungeon, tower and spirit summoning.
 
-Tuning (Phase 5): normal monsters HP ×3 and EXP ×0.22 (a bit more below Lv 12 so the first rooms don't drag), mini-bosses / MVPs HP ×2.5 and EXP ×0.5 compared with the Phase 2–4 values; then the boss pass (owner: AUTO is for normal monsters, bosses need real play) made bosses HP ×4 and ATK ×1.5 more, with minion calls, faster attacks when hurt (×1.2 phase 2, ×1.4 under 25 %) and 80 % stun/freeze resistance. Boss kill times below assume full damage the whole fight; with dodging and minions expect about 2×.
+Tuning (Phase 5): normal monsters HP ×3 and EXP ×0.22 (a bit more below Lv 12 so the first rooms don't drag), mini-bosses / MVPs HP ×2.5 and EXP ×0.5 compared with the Phase 2–4 values; then the boss pass (owner: AUTO is for normal monsters, bosses need real play) made bosses HP ×4 and ATK ×1.5 more, with minion calls, faster attacks when hurt (×1.2 phase 2, ×1.4 under 25 %) and 80 % stun/freeze resistance. Boss kill times below assume full damage the whole fight; with dodging and minions expect about 2×. Farming pass (owner): normal monsters HP ×2 and ATK ×2 (EXP unchanged), 2 per spawn point (turrets 1) and they come back in the room 12 s after dying, so real play spends less time walking than this route sim assumes.
 
 ## Route
 | Room | Boss | Monster Lv | Arrive Lv | Leave Lv | Kills | Minutes |
 |---|---|---|---|---|---|---|
-| forest | — | 3.6 | 1 | 8 | 135 | 10.0 |
-| forest2 | — | 6.0 | 8 | 10 | 77 | 5.6 |
-| forest3 | — | 8.6 | 10 | 10 | 7 | 0.5 |
-| deep | king | 6.5 | 10 | 13 | 143 | 16.2 |
-| forest4 | — | 11.1 | 13 | 13 | 7 | 0.6 |
+| forest | — | 3.6 | 1 | 8 | 135 | 11.7 |
+| forest2 | — | 6.0 | 8 | 10 | 77 | 6.8 |
+| forest3 | — | 8.6 | 10 | 10 | 7 | 0.7 |
+| deep | king | 6.5 | 10 | 13 | 143 | 18.4 |
+| forest4 | — | 11.1 | 13 | 13 | 7 | 0.8 |
 | deep2 | spore_mother | 6.0 | 13 | 13 | 3 | 1.5 |
-| sky1 | — | 10.5 | 13 | 13 | 4 | 0.3 |
-| sky2 | — | 11.8 | 13 | 14 | 30 | 2.5 |
+| sky1 | — | 10.5 | 13 | 13 | 4 | 0.4 |
+| sky2 | — | 11.8 | 13 | 14 | 30 | 3.3 |
 | sky3 | harpy | — | 14 | 14 | 1 | 1.4 |
-| sky4 | — | 14.2 | 14 | 18 | 276 | 22.6 |
-| sky5 | thunder_ram | 16.8 | 18 | 20 | 125 | 13.8 |
+| sky4 | — | 14.2 | 14 | 18 | 276 | 29.1 |
+| sky5 | thunder_ram | 16.8 | 18 | 20 | 125 | 17.8 |
 | sky6 | storm_roc | — | 20 | 20 | 1 | 4.0 |
 | abyss1 | — | 15.5 | 20 | 20 | 4 | 0.4 |
-| abyss2 | — | 16.8 | 20 | 21 | 18 | 1.6 |
+| abyss2 | — | 16.8 | 20 | 21 | 18 | 2.1 |
 | abyss3 | siren | — | 21 | 21 | 1 | 1.8 |
-| abyss4 | — | 20.6 | 21 | 24 | 196 | 18.8 |
-| abyss5 | shark | 22.5 | 24 | 26 | 121 | 15.5 |
+| abyss4 | — | 20.6 | 21 | 24 | 196 | 26.6 |
+| abyss5 | shark | 22.5 | 24 | 26 | 121 | 21.0 |
 | abyss6 | kraken | — | 26 | 26 | 1 | 4.7 |
 
 ## Monsters at their own level
 | Monster | Tier | Lv | HP | EXP | Kill time | DPS hero + spirits | Hero HP at that level |
 |---|---|---|---|---|---|---|---|
-| poring | normal | 3 | 66 | 4 | 0.8 s | 61 + 25 | 160 |
-| rocker | normal | 4 | 90 | 5 | 1.0 s | 66 + 25 | 170 |
-| drops | normal | 5 | 108 | 5 | 1.1 s | 69 + 26 | 215 |
-| mushroom | normal | 6 | 138 | 6 | 1.1 s | 94 + 27 | 261 |
-| poporing | normal | 8 | 174 | 6 | 1.3 s | 102 + 29 | 323 |
-| wisp | normal | 9 | 156 | 6 | 1.1 s | 109 + 32 | 339 |
-| mantis | normal | 10 | 216 | 7 | 1.5 s | 112 + 31 | 355 |
-| boar | normal | 11 | 288 | 8 | 2.0 s | 115 + 31 | 381 |
-| willow | normal | 13 | 390 | 8 | 2.5 s | 123 + 31 | 413 |
+| poring | normal | 3 | 132 | 4 | 1.5 s | 61 + 25 | 160 |
+| rocker | normal | 4 | 180 | 5 | 2.0 s | 66 + 25 | 170 |
+| drops | normal | 5 | 216 | 5 | 2.3 s | 69 + 26 | 215 |
+| mushroom | normal | 6 | 276 | 6 | 2.3 s | 94 + 27 | 261 |
+| poporing | normal | 8 | 348 | 6 | 2.7 s | 102 + 29 | 323 |
+| wisp | normal | 9 | 312 | 6 | 2.2 s | 109 + 32 | 339 |
+| mantis | normal | 10 | 432 | 7 | 3.0 s | 112 + 31 | 355 |
+| boar | normal | 11 | 576 | 8 | 4.0 s | 115 + 31 | 381 |
+| willow | normal | 13 | 780 | 8 | 5.1 s | 123 + 31 | 413 |
 | king | mini | 12 | 5200 | 80 | 34.0 s | 121 + 32 | 397 |
 | spore_mother | mini | 15 | 9000 | 130 | 54.8 s | 131 + 33 | 455 |
-| bird | normal | 10 | 156 | 6 | 1.1 s | 114 + 33 | 355 |
-| sky_poring | normal | 11 | 216 | 6 | 1.5 s | 116 + 32 | 381 |
-| cloud_imp | normal | 12 | 192 | 5 | 1.2 s | 123 + 34 | 397 |
-| sky_snail | normal | 13 | 360 | 6 | 2.5 s | 119 + 27 | 413 |
-| fire_hawk | normal | 15 | 252 | 7 | 1.5 s | 134 + 36 | 455 |
-| thunder_puff | normal | 16 | 288 | 7 | 1.6 s | 139 + 37 | 471 |
-| griffin | normal | 18 | 450 | 10 | 2.5 s | 144 + 36 | 513 |
+| bird | normal | 10 | 312 | 6 | 2.1 s | 114 + 33 | 355 |
+| sky_poring | normal | 11 | 432 | 6 | 2.9 s | 116 + 32 | 381 |
+| cloud_imp | normal | 12 | 384 | 5 | 2.4 s | 123 + 34 | 397 |
+| sky_snail | normal | 13 | 720 | 6 | 4.9 s | 119 + 27 | 413 |
+| fire_hawk | normal | 15 | 504 | 7 | 3.0 s | 134 + 36 | 455 |
+| thunder_puff | normal | 16 | 576 | 7 | 3.3 s | 139 + 37 | 471 |
+| griffin | normal | 18 | 900 | 10 | 5.0 s | 144 + 36 | 513 |
 | harpy | mini | 16 | 10000 | 140 | 58.3 s | 137 + 35 | 471 |
 | thunder_ram | mini | 19 | 13000 | 180 | 71.8 s | 147 + 35 | 529 |
 | storm_roc | mvp | 22 | 42000 | 550 | 198.7 s | 173 + 39 | 587 |
-| fish | normal | 16 | 270 | 7 | 1.5 s | 140 + 38 | 471 |
-| marin | normal | 15 | 252 | 7 | 1.5 s | 135 + 37 | 455 |
-| jellyfish | normal | 17 | 312 | 8 | 1.7 s | 147 + 40 | 487 |
-| crab | normal | 18 | 510 | 9 | 3.0 s | 139 + 31 | 513 |
-| eel | normal | 20 | 450 | 11 | 2.3 s | 159 + 40 | 545 |
-| gold_fish | normal | 21 | 480 | 11 | 2.4 s | 162 + 40 | 571 |
-| urchin | normal | 22 | 570 | 12 | 2.9 s | 167 + 33 | 587 |
-| angler | normal | 24 | 750 | 14 | 3.3 s | 183 + 41 | 629 |
+| fish | normal | 16 | 540 | 7 | 3.0 s | 140 + 38 | 471 |
+| marin | normal | 15 | 504 | 7 | 2.9 s | 135 + 37 | 455 |
+| jellyfish | normal | 17 | 624 | 8 | 3.3 s | 147 + 40 | 487 |
+| crab | normal | 18 | 1020 | 9 | 6.0 s | 139 + 31 | 513 |
+| eel | normal | 20 | 900 | 11 | 4.5 s | 159 + 40 | 545 |
+| gold_fish | normal | 21 | 960 | 11 | 4.8 s | 162 + 40 | 571 |
+| urchin | normal | 22 | 1140 | 12 | 5.7 s | 167 + 33 | 587 |
+| angler | normal | 24 | 1500 | 14 | 6.7 s | 183 + 41 | 629 |
 | siren | mini | 23 | 17000 | 210 | 78.4 s | 177 + 40 | 613 |
 | shark | mini | 25 | 21000 | 240 | 92.3 s | 187 + 40 | 645 |
 | kraken | mvp | 28 | 60000 | 900 | 253.7 s | 198 + 38 | 703 |

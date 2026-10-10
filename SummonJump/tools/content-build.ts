@@ -56,7 +56,7 @@ const monsters: MonsterDef[] = read('monsters').map((r) => {
     element: e, element_lv: num(r, 'element_lv', 'monster'), size: (r.size ?? 'small') as MonsterDef['size'],
     ai: (r.ai ?? 'walker') as MonsterDef['ai'], ai_params: json(r, 'ai_params', 'monster'), stompable: bool(r, 'stompable'),
     exp: num(r, 'exp', 'monster'), job_exp: num(r, 'job_exp', 'monster'), soul_min: num(r, 'soul_min', 'monster'), soul_max: num(r, 'soul_max', 'monster'),
-    card_id: r.card_id ?? '', card_rate: num(r, 'card_rate', 'monster'), respawn_sec: num(r, 'respawn_sec', 'monster'),
+    card_id: r.card_id ?? '', card_rate: num(r, 'card_rate', 'monster'), respawn_sec: num(r, 'respawn_sec', 'monster'), pack: r.pack ? num(r, 'pack', 'monster') : 1,
     art_pack: r.art_pack ?? '', hitbox: { w: w ?? 16, h: h ?? 16 }, draw_h: num(r, 'draw_h', 'monster'),
     art: r.art || null, tint: r.tint ? parseInt(r.tint, 16) : null,
   };

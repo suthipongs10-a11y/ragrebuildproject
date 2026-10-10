@@ -25,10 +25,11 @@ IDs are lowercase snake_case and **never change** once shipped. Thai display nam
 | soul_min, soul_max | int | 4, 9 | |
 | card_id | string | card_poring | |
 | card_rate | float | 0.01 | |
-| respawn_sec | int | 0 | 0 = on room re-entry; mini/mvp use seconds |
+| respawn_sec | int | 12 | normal: comes back in the room this many seconds after it dies (also on every room entry); mini/mvp: persisted timer in seconds |
 | art_pack | string | P00_legacy | where poses live |
 | hitbox | string | 20x16 | w x h in world px |
 | draw_h | int | 24 | sprite draw height |
+| pack | int | 2 | normal monsters spawned at each spawn point (turrets 1, bosses 1) |
 
 ## drops.csv
 `monster_id, item_id, rate, min, max` — multiple rows per monster. Rates are base; LUK and events multiply in `shared/rules/drops.ts`.

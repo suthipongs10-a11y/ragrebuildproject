@@ -26,6 +26,7 @@
 - Click / tap a monster: lock on and keep attacking until it dies (RO style), any job, flying monsters included.
 - Drops fly into the hero by themselves (stop when the bag is full); critical hits show a big yellow number on a spiky red burst.
 - Tougher bosses: HP ×4, ATK ×1.5, every boss calls minions (no EXP/drops from them), shorter cooldowns, shockwaves, rage speed-up when hurt, stun/freeze resistance.
+- Endless farming: normal monsters respawn in the room 12 s after dying, 2 per spawn point, HP and ATK ×2.
 
 ## Phase 4 (done) — 2026-10-09
 - 15 spirit families × element variants (`spirits.csv`, `spirit_skills.csv`, `spirit_elements.csv`, `spirit_config.csv`).

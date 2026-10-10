@@ -9,6 +9,8 @@ export interface MonsterDef {
   size: 'small' | 'medium' | 'large'; ai: MonsterAi; ai_params: Record<string, unknown>;
   stompable: boolean; exp: number; job_exp: number; soul_min: number; soul_max: number;
   card_id: string; card_rate: number; respawn_sec: number; art_pack: string;
+  /** normal monsters: how many spawn at each spawn point of a room */
+  pack: number;
   hitbox: { w: number; h: number }; draw_h: number;
   /** look-alike until the monster's own art exists: another monster's id + a tint (RGB) */
   art: string | null; tint: number | null;
