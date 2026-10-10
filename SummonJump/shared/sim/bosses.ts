@@ -4,12 +4,38 @@ import { blockedAhead, fall, hitsSolid, num, setState, shootAt } from './enemy';
 /**
  * Phase 5 boss scripts (monsters.csv `ai_params.script`). Same rules as enemy.ts: pure, seeded RNG, fixed step.
  * Every boss gets a 2nd phase under 50 % HP (announced once with a `phase` event).
+ * Owner request "บอสต้องเก่งขึ้น 3-5 เท่า": bosses also call minions (ai_params `minion`, `minion_max`, `minion_cd`)
+ * and fight faster when hurt (`bossRage`), so AUTO farms normal monsters but a boss needs real play.
  */
 type Script = (e: Enemy, ctx: EnemyCtx, dt: number, dx: number, dy: number) => void;
 
 /** Switch to phase 2 once HP drops under half. */
 export function enterPhase2(e: Enemy, ctx: EnemyCtx): void {
   if (e.phase === 1 && e.hp < e.def.hp / 2) { e.phase = 2; ctx.events.push({ kind: 'phase', enemy: e }); }
+}
+
+/** Time speed-up for a boss script: x1.2 in phase 2, x1.4 under 25 % HP. */
+export function bossRage(e: Enemy): number {
+  return e.def.tier === 'normal' ? 1 : e.hp < e.def.hp * 0.25 ? 1.4 : e.phase === 2 ? 1.2 : 1;
+}
+
+/** Minion calls for every boss: two at a time on `minion_cd`, three at a time and faster in phase 2, up to `minion_max`. */
+export function callMinions(e: Enemy, ctx: EnemyCtx, dt: number, dx: number): void {
+  const m = e.def.ai_params.minion;
+  if (typeof m !== 'string' || Math.abs(dx) > 700) return;
+  const cd = num(e.def, 'minion_cd', 10), max = num(e.def, 'minion_max', 3);
+  e.callT -= dt;
+  if (e.callT > 0) return;
+  e.callT = e.phase === 2 ? cd * 0.6 : cd;
+  let n = 0;
+  for (let i = 0; i < (e.phase === 2 ? 3 : 2) && ctx.count(m) < max; i++, n++) ctx.summon(m, e.x + e.w / 2 + (i - 1) * 40 * e.dir, e.y + e.h);
+  if (n) ctx.events.push({ kind: 'call', enemy: e });
+}
+
+/** Ground shockwaves running out both ways from a landing / crash: punishes standing next to the boss. */
+export function shockwave(ctx: EnemyCtx, e: Enemy, speed = 300): void {
+  const x = e.x + e.w / 2, y = e.y + e.h - 14;
+  for (const d of [-1, 1]) ctx.shots.push({ x, y, vx: d * speed, vy: 0, r: 14, color: 0xffd6a0, dmg: e.def.atk, life: 1.6, hostile: true, ghost: true, el: e.def.element });
 }
 
 /** Shots falling from above around the hero (ink rain, lightning, feathers). */
@@ -32,11 +58,10 @@ const sporeMother: Script = (e, ctx, dt, dx) => {
       if (e.t > 0.6) {
         setState(e, 'attack');
         shootAt(e, ctx, p2 ? [-0.8, -0.4, 0, 0.4, 0.8] : [-0.5, 0, 0.5], 190, 0xb070e0);
-        if (p2 && ctx.count('mushroom') < 3) ctx.summon('mushroom', e.x + e.w / 2, e.y + e.h);
       }
       break;
     case 'attack': e.pose = 'attack'; if (e.t > 0.4) setState(e, 'recover'); break;
-    case 'recover': e.pose = 'idle'; if (e.t > 0.6) { setState(e, 'move'); e.timer = p2 ? 1.8 : 2.8; } break;
+    case 'recover': e.pose = 'idle'; if (e.t > 0.6) { setState(e, 'move'); e.timer = p2 ? 1.3 : 2.1; } break;
     default:
       e.pose = 'idle'; e.dir = (Math.sign(dx) || 1) as 1 | -1;
       e.vx = Math.abs(dx) > 90 ? e.dir * 40 : 0;
@@ -61,12 +86,13 @@ const ramCharge: Script = (e, ctx, dt, dx) => {
       if (e.hitWall || e.t > 1.5) {
         e.vx = -e.dir * 120; e.vy = -260; setState(e, 'recover');
         ctx.events.push({ kind: 'slam', x: e.x + e.w / 2, y: e.y + e.h });
-        if (p2) { e.pose = 'skill'; rainOnHero(ctx, e, 3, 0xffe060, 220); }
+        shockwave(ctx, e);
+        if (p2) { e.pose = 'skill'; rainOnHero(ctx, e, 4, 0xffe060, 260); }
       }
       break;
     case 'recover':
       e.pose = e.t < 0.3 && p2 ? 'skill' : 'hurt'; e.vx *= Math.pow(0.05, dt);
-      if (e.t > 1.1) { setState(e, 'move'); e.timer = p2 ? 1.2 : 2; }
+      if (e.t > 1.1) { setState(e, 'move'); e.timer = p2 ? 0.9 : 1.5; }
       break;
     default:
       e.pose = 'idle'; e.dir = (Math.sign(dx) || 1) as 1 | -1; e.vx = 0;
@@ -93,8 +119,7 @@ const siren: Script = (e, ctx, dt, dx) => {
       ctx.shots.push({ x: sx, y: sy, vx: Math.cos(a) * 170, vy: Math.sin(a) * 170, r: 9, color: 0x6ad8d8, dmg: e.def.atk, life: 3.5, hostile: true, ghost: true, el: e.def.element });
     }
     ctx.events.push({ kind: 'shoot', x: sx, y: sy });
-    e.timer = p2 ? 1.6 : 2.4;
-    if (p2 && ctx.count('jellyfish') < 2 && ctx.rng.chance(0.5)) ctx.summon('jellyfish', sx, e.y + e.h);
+    e.timer = p2 ? 1.3 : 2;
   }
 };
 
@@ -118,7 +143,7 @@ const shark: Script = (e, ctx, dt, dx, dy) => {
       e.pose = 'idle';
       e.x += Math.sign(e.ox - e.x) * Math.min(Math.abs(e.ox - e.x), 140 * dt);
       e.y += Math.sign(e.oy - e.y) * Math.min(Math.abs(e.oy - e.y), 120 * dt);
-      if (e.t > 1) { setState(e, 'idle'); e.timer = p2 ? 1.2 : 2; }
+      if (e.t > 1) { setState(e, 'idle'); e.timer = p2 ? 0.9 : 1.6; }
       break;
     default:
       e.pose = 'idle'; e.dir = (Math.sign(dx) || 1) as 1 | -1;
@@ -139,10 +164,10 @@ const stormRoc: Script = (e, ctx, dt, dx) => {
   const top = num(e.def, 'top', 80), floor = ctx.hero.y + ctx.hero.h;
   if (e.state === 'dive') {
     e.pose = 'attack'; e.x += e.vx * dt; e.y += e.vy * dt;
-    if (e.t > 0.8 || e.y + e.h > floor + 10 || hitsSolid(e, ctx.grid)) setState(e, 'rise');
+    if (e.t > 0.8 || e.y + e.h > floor + 10 || hitsSolid(e, ctx.grid)) { if (p2) shockwave(ctx, e); setState(e, 'rise'); }
   } else if (e.state === 'rise') {
     e.pose = 'idle'; e.y -= 300 * dt;
-    if (e.y < top + 20) { setState(e, 'hover'); e.timer = ctx.rng.range(p2 ? 1.2 : 1.8, p2 ? 2 : 2.8); }
+    if (e.y < top + 20) { setState(e, 'hover'); e.timer = ctx.rng.range(p2 ? 1 : 1.4, p2 ? 1.6 : 2.2); }
   } else {
     const tx = hx + Math.sin(e.ph * 0.7) * 200 - e.w / 2, ty = top + Math.sin(e.ph * 2) * 18;
     e.x += Math.sign(tx - e.x) * Math.min(Math.abs(tx - e.x), 200 * dt);
@@ -160,7 +185,6 @@ const stormRoc: Script = (e, ctx, dt, dx) => {
         const dir = Math.sign(hx - (e.x + e.w / 2)) || 1;
         ctx.shots.push({ x: e.x + e.w / 2, y: floor - 30, vx: dir * 150, vy: 0, r: 28, color: 0xbfd8ff, dmg: Math.round(e.def.atk * 1.2), life: 6, hostile: true, ghost: true, el: e.def.element, kind: 'tornado' });
         rainOnHero(ctx, e, 4, 0xffe060, 360);
-        if (ctx.count('fire_hawk') < 2) ctx.summon('fire_hawk', e.x + e.w / 2, e.y + e.h);
         e.timer = 1.6;
       }
     }

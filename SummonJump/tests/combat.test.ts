@@ -126,6 +126,23 @@ describe('boss scripts (Phase 5)', () => {
       expect(e.phase).toBe(2);
     }
   });
+  it('every boss calls its own minions (more in phase 2, never over the cap) and only when the hero is near', () => {
+    for (const m of content.monsters.filter((x) => x.tier !== 'normal')) {
+      const minion = String(m.ai_params.minion), max = Number(m.ai_params.minion_max);
+      const g = floorGrid(), list: Enemy[] = [];
+      const e = createEnemy(m.id, m, 15 * TILE, 15 * TILE, createRng(3)); list.push(e);
+      const near = ctxFor(g, { x: 11 * TILE, y: 15 * TILE - 56, w: 24, h: 56 }, list);
+      e.hp = m.hp * 0.4;
+      run(e, near, 30);
+      const called = list.filter((q) => q.def.id === minion).length;
+      expect(called, `${m.id} calls ${minion}`).toBeGreaterThan(0);
+      expect(called, `${m.id} cap`).toBeLessThanOrEqual(max);
+      expect(near.events.some((ev) => ev.kind === 'call'), m.id).toBe(true);
+    }
+    const far: Enemy[] = [], k = createEnemy('k', def('king'), 2 * TILE, 15 * TILE, createRng(3)); far.push(k);
+    run(k, ctxFor(floorGrid(), { x: 9999, y: 0, w: 24, h: 56 }, far), 20);
+    expect(far.length).toBe(1);
+  });
 });
 
 describe('hero moves (moves.ts)', () => {

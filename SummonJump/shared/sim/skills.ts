@@ -9,6 +9,9 @@ import type { Buff, Derived, HeroData } from '../progression/hero';
 import { hitEnemy, overlap, type Box, type CombatEvent, type HeroCombat } from './combat';
 import type { Enemy, Shot } from './enemy';
 
+/** Bosses shrug off stun / freeze (RO bosses are status-immune): 20 % of the duration. */
+const statusMult = (e: Enemy): number => (e.def.tier === 'normal' ? 1 : 0.2);
+
 /**
  * Active skills at runtime: SP, cooldowns, cast time, and the effect kinds used by skills.csv `target`:
  * heal, buff, front, aoe, dash, bolt, rain, zone. Passives are applied by `derive()`.
@@ -90,7 +93,7 @@ export function stepSkills(rt: SkillRuntime, ctx: SkillCtx, dt: number): SkillEv
       if (e.dead || !overlap(z, e)) continue;
       hitAny = true;
       ev.push(hitEnemy(e, z.base, z.el, b, ctx.rng, z.trap ? 0 : 120, 0.02, z.x + z.w / 2, false, z.magic));
-      if (z.stun > 0) e.stun = Math.max(e.stun, z.stun);
+      if (z.stun > 0) e.stun = Math.max(e.stun, z.stun * statusMult(e));
     }
     if (z.trap) { if (hitAny) z.until = 0; } else z.nextTick = rt.time + z.tick;
   }
@@ -112,7 +115,7 @@ function fire(rt: SkillRuntime, ctx: SkillCtx, s: SkillDef, lv: number): SkillEv
       const inside = center ? Math.hypot(en.x + en.w / 2 - cx, en.y + en.h / 2 - cy) < r + en.w / 2 : overlap(box, en);
       if (!inside) continue;
       if (e.debuff === 'provoke') { en.defDown = fx(e.def_down, lv); en.defDownT = fx(e.dur, lv); en.flash = 0.2; continue; }
-      if (e.freeze) en.stun = Math.max(en.stun, fx(e.freeze, lv));
+      if (e.freeze) en.stun = Math.max(en.stun, fx(e.freeze, lv) * statusMult(en));
       for (let i = 0; i < hits && !en.dead; i++) ev.push(hitEnemy(en, base, el, b, ctx.rng, kb, 0.06, cx, false, magic));
     }
   };

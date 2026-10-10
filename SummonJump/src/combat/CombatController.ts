@@ -118,6 +118,7 @@ export class CombatController {
     for (let left = dt; left > 1e-6; left -= MAX_STEP) for (const e of [...this.enemies]) stepEnemy(e, ctx, Math.min(left, MAX_STEP));
     for (const ev of events) {
       if (ev.kind === 'slam') { this.scene.cameras.main.shake(180, 0.006); ring(this.scene, ev.x, ev.y, 0xffd6e6, 80); burst(this.scene, ev.x, ev.y, 0xe8d6b0, 10, 200); }
+      if (ev.kind === 'call') { const e = ev.enemy; ring(this.scene, e.x + e.w / 2, e.y + e.h, 0xc9a6ff, 120, 400); popInfo(this.scene, e.x + e.w / 2, e.y - 40, t('combat.call').replace('{name}', t(e.def.name_key)), '#c9a6ff'); }
       if (ev.kind === 'phase') { const e = ev.enemy; this.scene.cameras.main.flash(250, 255, 120, 120); this.scene.cameras.main.shake(350, 0.01); popInfo(this.scene, e.x + e.w / 2, e.y - 40, t('combat.enraged').replace('{name}', t(e.def.name_key)), '#ff8a6a'); }
     }
     stepShots(this.shots, dt);
@@ -189,7 +190,8 @@ export class CombatController {
     if ([e.def.id, e.def.art].some((k) => k?.includes('poring'))) fxImg(sc, 'vfx_jelly_splash', cx, cy, { size: boss ? 260 : 130, life: 420, tint: e.def.tint, from: 0.4 }); // jelly monsters burst
     if (boss) { this.hitstop = Math.max(this.hitstop, 0.18); sc.cameras.main.flash(300, 255, 243, 208); sc.cameras.main.shake(400, 0.01); }
     this.views.get(e.id)?.die(); this.views.delete(e.id);
-    if (!e.id.includes('#summon') && !e.id.startsWith('stress#') && !e.id.startsWith('arena#')) markDefeated(this.save.defeated, e.id, e.def.tier, e.def.respawn_sec, Date.now());
+    if (e.id.includes('#summon')) return; // called minions give no EXP / drops (RO slaves), so a boss can't be farmed for them
+    if ( !e.id.startsWith('stress#') && !e.id.startsWith('arena#')) markDefeated(this.save.defeated, e.id, e.def.tier, e.def.respawn_sec, Date.now());
     const r = rollKill(e.def, this.session.content.drops, this.rng, 1 + this.session.derived.build.stats.luk * 0.03);
     this.save.soul += r.soul;
     const lv = this.session.reward(r.exp, r.jobExp);

@@ -2,7 +2,7 @@ import type { MonsterDef } from '../content/types';
 import type { Rng } from '../rng';
 import { Cell, isSolidCell, TILE, type TileGrid } from '../platformer/grid';
 import { moveBody, type Body } from '../platformer/motion';
-import { BOSSES, enterPhase2, rainOnHero } from './bosses';
+import { BOSSES, bossRage, callMinions, enterPhase2, rainOnHero, shockwave } from './bosses';
 
 /**
  * Monster brains. Pure + seeded RNG so the server can re-simulate. Numbers are the prototype's at 2x scale.
@@ -20,6 +20,8 @@ export interface Enemy extends Body {
   defDown: number; defDownT: number;
   /** boss phase (1, then 2 below 50 % HP) */
   phase: number;
+  /** seconds to the next minion call (bosses) */
+  callT: number;
 }
 
 export interface Shot {
@@ -40,7 +42,7 @@ export interface EnemyCtx {
   count: (monsterId: string) => number;
   events: EnemyEvent[];
 }
-export type EnemyEvent = { kind: 'slam'; x: number; y: number } | { kind: 'shoot'; x: number; y: number } | { kind: 'phase'; enemy: Enemy };
+export type EnemyEvent = { kind: 'slam'; x: number; y: number } | { kind: 'shoot'; x: number; y: number } | { kind: 'phase'; enemy: Enemy } | { kind: 'call'; enemy: Enemy };
 
 const G = 2200, MAX_FALL = 800;
 export const num = (d: MonsterDef, k: string, dflt: number): number => (typeof d.ai_params[k] === 'number' ? (d.ai_params[k] as number) : dflt);
@@ -56,6 +58,7 @@ export function createEnemy(id: string, def: MonsterDef, x: number, y: number, r
     id, def, hp: def.hp, dir: -1, x: ex, y: ey, w, h, vx: 0, vy: 0, onGround: false,
     state: fly && def.ai === 'boss' ? 'hover' : 'idle', t: 0, timer: rng.range(0.5, 1.5), ph: rng.next() * 6,
     ox: ex, oy: ey, stun: 0, flash: 0, jumps: 0, air: 0, shotT: 1.5, dead: false, hitWall: false, pose: 'idle', defDown: 0, defDownT: 0, phase: 1,
+    callT: num(def, 'minion_cd', 10) * 0.5,
   };
 }
 
@@ -87,6 +90,7 @@ export function stepEnemy(e: Enemy, ctx: EnemyCtx, dt: number): void {
     return;
   }
   const script = d.ai === 'boss' ? String(d.ai_params.script ?? '') : '';
+  if (d.tier !== 'normal') { dt *= bossRage(e); callMinions(e, ctx, dt, dx); }
   if (d.ai === 'hopper' || script === 'king_slam') hopper(e, ctx, dt, dx, script === 'king_slam');
   else if (d.ai === 'walker' || d.ai === 'charger') walker(e, ctx, dt, dx, dy, d.ai === 'charger');
   else if (d.ai === 'flyer') flyer(e, ctx, dt, dx, dy);
@@ -112,13 +116,12 @@ function hopper(e: Enemy, ctx: EnemyCtx, dt: number, dx: number, king: boolean):
       e.vx = e.dir * (king ? 190 : num(d, 'hop', 240) * 0.46);
       e.vy = king ? -800 : -480;
       const enraged = king && e.hp < d.hp / 2;
-      e.timer = king ? (enraged ? 1.0 : 1.5) : ctx.rng.range(0.8, 2);
+      e.timer = king ? (enraged ? 0.8 : 1.2) : ctx.rng.range(0.8, 2);
       e.jumps++;
-      if (enraged && e.jumps % 3 === 0 && ctx.count('poring') < 3) ctx.summon('poring', e.x + e.w / 2 - 20, e.y + e.h);
     }
   } else e.pose = e.vy < 0 ? 'attack' : 'idle';
   fall(e, dt, ctx.grid, king ? 1000 : MAX_FALL);
-  if (king && wasAir && e.onGround && e.air > 0.2) ctx.events.push({ kind: 'slam', x: e.x + e.w / 2, y: e.y + e.h });
+  if (king && wasAir && e.onGround && e.air > 0.2) { ctx.events.push({ kind: 'slam', x: e.x + e.w / 2, y: e.y + e.h }); if (e.phase === 2) shockwave(ctx, e); }
   e.air = e.onGround ? 0 : e.air + dt;
 }
 
@@ -198,14 +201,14 @@ function harpy(e: Enemy, ctx: EnemyCtx, dt: number, dx: number, hx: number): voi
     e.y += Math.sign(ty - e.y) * Math.min(Math.abs(ty - e.y), 140 * dt);
     e.timer -= dt; e.dir = (Math.sign(dx) || 1) as 1 | -1; e.shotT -= dt;
     e.pose = e.timer < 0.4 ? 'windup' : 'idle';
-    if (e.hp < d.hp / 2 && e.shotT <= 0) { e.shotT = 1.5; shootAt(e, ctx, [-0.25, 0, 0.25], 280, 0xc9a6ff); }
+    if (e.shotT <= 0) { e.shotT = e.hp < d.hp / 2 ? 1.1 : 2.2; shootAt(e, ctx, e.hp < d.hp / 2 ? [-0.4, -0.2, 0, 0.2, 0.4] : [-0.2, 0.2], 280, 0xc9a6ff); }
     if (e.timer <= 0) { setState(e, 'dive'); const a = Math.atan2(ctx.hero.y + 20 - (e.y + e.h / 2), dx); e.vx = Math.cos(a) * 540; e.vy = Math.sin(a) * 540; }
   } else if (e.state === 'dive') {
     e.pose = 'attack'; e.x += e.vx * dt; e.y += e.vy * dt;
     if (e.t > 0.85 || e.y > 360) setState(e, 'rise');
   } else {
     e.pose = 'idle'; e.y -= 260 * dt;
-    if (e.y < 112) { setState(e, 'hover'); e.timer = ctx.rng.range(2, 3.2); }
+    if (e.y < 112) { setState(e, 'hover'); e.timer = ctx.rng.range(1.5, 2.4); }
   }
   e.y = Math.max(16, Math.min(400 - e.h, e.y));
 }
@@ -220,8 +223,7 @@ function kraken(e: Enemy, ctx: EnemyCtx, dt: number, dx: number): void {
     // phase 2: every 3rd attack is an ink rain over the hero instead of the 3-way spray
     if (e.phase === 2 && e.jumps % 3 === 0) { rainOnHero(ctx, e, 7, 0x2a1838); e.pose = 'skill'; ctx.events.push({ kind: 'slam', x: e.x + e.w / 2, y: e.y + e.h }); }
     else shootAt(e, ctx, e.phase === 2 ? [-0.45, -0.15, 0.15, 0.45] : [-0.3, 0, 0.3], 230, 0x2a1838);
-    e.timer = e.phase === 2 ? 1.2 : 2.3;
-    if (e.phase === 2 && ctx.count('fish') < 3 && ctx.rng.chance(0.4)) ctx.summon('fish', e.x, e.y + e.h);
+    e.timer = e.phase === 2 ? 1 : 1.8;
   }
 }
 

@@ -132,6 +132,8 @@ for (const m of monsters) {
   if (m.card_rate < 0 || m.card_rate > 1) err(`monster ${m.id}: card_rate out of range`);
   if (m.hp <= 0) err(`monster ${m.id}: hp must be > 0`);
   if (m.art && (!monIds.has(m.art) || monsters.find((x) => x.id === m.art)?.art)) err(`monster ${m.id}: art must be another monster with its own art (${m.art})`);
+  const minion = m.ai_params.minion;
+  if (minion !== undefined && (typeof minion !== 'string' || !monIds.has(minion) || monsters.find((x) => x.id === minion)?.tier !== 'normal')) err(`monster ${m.id}: minion must be a normal monster id (${String(minion)})`);
 }
 for (const d of drops) {
   if (!monIds.has(d.monster_id)) err(`drop: unknown monster ${d.monster_id}`);
