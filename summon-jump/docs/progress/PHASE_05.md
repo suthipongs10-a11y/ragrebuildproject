@@ -34,12 +34,16 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Adventure Book (tracking + milestones + permanent stats + menu tab)
 - [x] Daily dungeon (offline prototype) — portal NPC in town (🌀), element by weekday, 3 entries/day, 3 waves scaled to the hero
 - [x] Tower floors 1–20 (offline) — `content/tower.csv`, boss every 5th floor, first-clear rewards
-- [ ] Balance sheet + simulation tool; tune EXP / HP / drops
-- [ ] Tests (unit: book, dungeon/tower rules, reachability; e2e: travel through zones, MVP fight, book claim)
+- [x] Balance sheet + simulation tool (`npm run balance` → `docs/BALANCE.md`); tuned monster HP ×3 / EXP ×0.22 (bosses HP ×2.5 / EXP ×0.5)
+- [x] Tests (unit: bosses, book, dungeon/tower rules, reachability; e2e: book claim, tower floor, daily dungeon)
 
 ## Exit gate
 - [ ] 3–4 hours of offline content from a new game to MVP #2 (owner plays)
 - [ ] Balance sheet reviewed by the owner
+
+## How to test (phone)
+- New save or `?hero=swordsman:20`: forest → forest 2–4 → deep (King Poring) → deep 2 (Spore Mother); town ↑ sky 1–6 (Harpy, Thunder Ram, **Storm Roc**); town pipe ↓ abyss 1–6 (Siren, Shark, **Kraken**).
+- ☰ → สมุดผจญภัย: claim milestones. Town NPC 🌀 ผู้เฝ้าประตูมิติ: daily dungeon + tower.
 
 ## Known issues / notes
 - New monsters without art use a recoloured look-alike (`art` + `tint` in monsters.csv), e.g. Crab = red Scorpion, Siren = teal Harpy, Storm Roc = slate Bird. They switch to their own art automatically when `ART_P05_Monsters_*` is imported.

@@ -73,6 +73,7 @@ npm run test           # vitest
 npm run e2e            # playwright smoke tests
 npm run content        # CSV -> JSON content build + validation
 npm run levels         # tools/levels/rooms.ts -> levels/world.ldtk (+ public/levels/)
+npm run balance        # route simulation -> docs/BALANCE.md (time to MVP, kill times)
 npm run art:import -- <zip> --brief art-briefs/ART_PXX.md   # import a ChatGPT art zip
 npm run server:up      # docker compose up nakama + postgres (Phase 6+)
 ```
