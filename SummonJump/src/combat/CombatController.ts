@@ -11,6 +11,7 @@ import type { HeroSession } from '../hero/HeroSession';
 import { EnemyView } from '../actors/EnemyView';
 import { popInfo, popNumber } from '../vfx/DamageText';
 import { burst, ELEMENT_COLOR, ring, slash, spark } from '../vfx/Effects';
+import { fxImg } from '../vfx/Art';
 import { SkillFx } from '../vfx/SkillFx';
 import { t } from '../i18n';
 import { SpiritViews } from '../spirits/SpiritViews';
@@ -150,7 +151,7 @@ export class CombatController {
 
   private spiritFeedback(ev: CombatEvent | SpiritEvent): void {
     const sc = this.scene;
-    if (ev.kind === 'scast') burst(sc, ev.actor.x, ev.actor.y, ELEMENT_COLOR[ev.actor.el] ?? 0xffffff, 6, 120);
+    if (ev.kind === 'scast') { if (!fxImg(sc, `vfx_element_${ev.actor.el}`, ev.actor.x, ev.actor.y, { size: 80, life: 300, from: 0.3 })) burst(sc, ev.actor.x, ev.actor.y, ELEMENT_COLOR[ev.actor.el] ?? 0xffffff, 6, 120); }
     else if (ev.kind === 'sheal') popNumber(sc, ev.x, ev.y - 10, ev.amount, 'heal');
     else if (ev.kind === 'sshield') ring(sc, ev.x, ev.y, 0x9ad8ff, 30, 300);
     else this.feedback(ev);
@@ -183,6 +184,7 @@ export class CombatController {
     const sc = this.scene, cx = e.x + e.w / 2, cy = e.y + e.h / 2, boss = e.def.tier !== 'normal';
     burst(sc, cx, cy, boss ? 0xffd88a : 0xfff2cc, boss ? 40 : 14, boss ? 480 : 280);
     ring(sc, cx, cy, boss ? 0xffd88a : 0xffffff, boss ? 160 : 60, 400);
+    if ([e.def.id, e.def.art].some((k) => k?.includes('poring'))) fxImg(sc, 'vfx_jelly_splash', cx, cy, { size: boss ? 260 : 130, life: 420, tint: e.def.tint, from: 0.4 }); // jelly monsters burst
     if (boss) { this.hitstop = Math.max(this.hitstop, 0.18); sc.cameras.main.flash(300, 255, 243, 208); sc.cameras.main.shake(400, 0.01); }
     this.views.get(e.id)?.die(); this.views.delete(e.id);
     if (!e.id.includes('#summon') && !e.id.startsWith('stress#') && !e.id.startsWith('arena#')) markDefeated(this.save.defeated, e.id, e.def.tier, e.def.respawn_sec, Date.now());

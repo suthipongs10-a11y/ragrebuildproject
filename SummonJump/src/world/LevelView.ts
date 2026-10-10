@@ -32,8 +32,14 @@ export function buildLevelVisuals(scene: Phaser.Scene, level: LevelData, grid: T
         drawPlatform(scene, layer('plat'), tx * TILE, ty * TILE, run * TILE);
         tx += run - 1;
       } else if (c === Cell.Rock) {
-        const r = scene.add.rectangle(tx * TILE, ty * TILE, TILE, TILE, 0x8a8478).setOrigin(0, 0).setStrokeStyle(2, 0x4a443a).setDepth(6);
-        rocks.set(`${tx},${ty}`, r);
+        if (rocks.has(`${tx},${ty}`)) continue;
+        // painted boulder column (P03 env art) over the whole run of rock cells, else grey blocks
+        let n = 1;
+        while (grid.get(tx, ty + n) === Cell.Rock) n++;
+        const r: Phaser.GameObjects.GameObject = scene.textures.exists('env_boulder')
+          ? scene.add.image(tx * TILE + TILE / 2, (ty + n) * TILE + 4, 'env_boulder').setOrigin(0.5, 1).setDisplaySize(TILE * 1.9, n * TILE + 10).setDepth(6)
+          : scene.add.rectangle(tx * TILE, ty * TILE, TILE, TILE * n, 0x8a8478).setOrigin(0, 0).setStrokeStyle(2, 0x4a443a).setDepth(6);
+        for (let i = 0; i < n; i++) rocks.set(`${tx},${ty + i}`, r);
       } else if (level.zone === 'sky' && c === Cell.Solid && (level.floorRow === null || ty < level.floorRow)) {
         // cloud floors: painted platform on the top surface, soft cloud body below (no block grid)
         if (grid.get(tx, ty - 1) !== Cell.Solid) {
@@ -57,17 +63,25 @@ export function buildLevelVisuals(scene: Phaser.Scene, level: LevelData, grid: T
 
 function drawPipe(scene: Phaser.Scene, e: EntityData, level: LevelData, targetName: string): void {
   const left = e.x - e.w / 2, top = e.y - e.h;
+  const down = e.fields.dir === 'down';
+  const label = () => scene.add.text(e.x, down ? top - 40 : e.y + 70, `${down ? '▼' : '▲'} ${targetName}`, { fontFamily: 'Itim', fontSize: '20px', color: '#c8ffd8', stroke: '#0f2a1a', strokeThickness: 5 })
+    .setOrigin(0.5).setDepth(40).setAlpha(0.9);
+  if (scene.textures.exists('env_pipe')) {
+    // painted pipe: standing on the floor (down) or hanging from the ceiling (up)
+    const y0 = down ? top : 0, y1 = down ? (level.floorRow ?? 15) * TILE : e.y;
+    scene.add.image(e.x, y0, 'env_pipe').setOrigin(0.5, 0).setDisplaySize(e.w + 12, y1 - y0).setFlipY(!down).setDepth(6);
+    label();
+    return;
+  }
   const g = scene.add.graphics().setDepth(6);
-  if (e.fields.dir === 'down') {
+  if (down) {
     const bottom = (level.floorRow ?? 15) * TILE;
     g.fillStyle(0x2f8a58, 1).fillRect(left + 4, top + e.h, e.w - 8, bottom - top - e.h);
     g.fillStyle(0x3fa66b, 1).fillRoundedRect(left, top, e.w, e.h, 6).lineStyle(2, 0x1d5b3a, 1).strokeRoundedRect(left, top, e.w, e.h, 6);
   } else {
     g.fillStyle(0x3fa66b, 1).fillRoundedRect(left, top, e.w, e.h, 6).lineStyle(2, 0x1d5b3a, 1).strokeRoundedRect(left, top, e.w, e.h, 6);
   }
-  const down = e.fields.dir === 'down';
-  scene.add.text(e.x, down ? top - 40 : e.y + 70, `${down ? '▼' : '▲'} ${targetName}`, { fontFamily: 'Itim', fontSize: '20px', color: '#c8ffd8', stroke: '#0f2a1a', strokeThickness: 5 })
-    .setOrigin(0.5).setDepth(40).setAlpha(0.9);
+  label();
 }
 
 /** Arrow + destination name at every exit so players can see where to go. `ExitHint` entities override the spot. */

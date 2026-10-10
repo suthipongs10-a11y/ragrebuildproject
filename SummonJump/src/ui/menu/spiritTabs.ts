@@ -9,6 +9,10 @@ import type { HeroSession } from '../../hero/HeroSession';
 import type { SaveData } from '../../save/local';
 import { portraitHtml } from '../../spirits/art';
 import { iconHtml } from './tabs';
+import { ART } from '../../assets/manifest.generated';
+
+/** Painted summon VFX (black background, screen-blended over the dark menu). */
+const artBg = (key: string, cls: string): string => (ART[key] ? `<div class="${cls}" style="background-image:url(${ART[key].url})"></div>` : '');
 
 /** Spirits tab (team, collection, detail, runes, star-up) and Summon tab. Buttons carry `data-act`; spiritActions.ts handles them. */
 export interface SpiritMenuState {
@@ -139,10 +143,11 @@ export function summonTab(s: HeroSession, st: SpiritMenuState): string {
   }).join('');
   const res = st.results.map((r, i) => {
     const sp = spiritOf(b, r.uid);
-    return sp ? `<div class="sm-card s${r.star}" style="animation-delay:${0.35 + i * 0.12}s">${portraitHtml(c, sp, 60)}${stars(r.star)}<span class="sp-nm">${t(familyOf(c, sp.id)?.name_key ?? '')}</span><small class="el-${sp.el}">${t(`el.${sp.el}`)}</small>${r.pity ? `<span class="mn-tag">${t('sum.pityHit')}</span>` : ''}</div>` : '';
+    const glow = r.star >= 5 ? artBg('vfx_summon_star', 'sm-glow') : r.star >= 4 ? artBg('vfx_summon_beam', 'sm-glow') : '';
+    return sp ? `<div class="sm-card s${r.star}" style="animation-delay:${0.35 + i * 0.12}s">${glow}${portraitHtml(c, sp, 60)}${stars(r.star)}<span class="sp-nm">${t(familyOf(c, sp.id)?.name_key ?? '')}</span><small class="el-${sp.el}">${t(`el.${sp.el}`)}</small>${r.pity ? `<span class="mn-tag">${t('sum.pityHit')}</span>` : ''}</div>` : '';
   }).join('');
   // results first: on a phone the reveal must be on screen without scrolling
-  return `${res ? `<div class="sm-res" data-anim="${st.anim}"><div class="sm-portal"></div><div class="sm-cards">${res}</div></div>` : `<div class="mn-note">${t('sum.hint')}</div>`}
+  return `${res ? `<div class="sm-res" data-anim="${st.anim}">${artBg('vfx_summon_portal', 'sm-portal art') || '<div class="sm-portal"></div>'}<div class="sm-cards">${res}</div></div>` : `<div class="mn-note">${t('sum.hint')}</div>`}
     <div class="mn-h">${t('sum.title')}</div>${rows}
     <div class="sp-btns">${btn('tab:spirits', `🐾 ${t('tab.spirits')}`, true, true)}</div>`;
 }

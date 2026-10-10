@@ -11,6 +11,60 @@
   "w": 640,
   "h": 415
  },
+ "env_boulder": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/env_boulder.webp",
+  "w": 84,
+  "h": 256
+ },
+ "env_pipe": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/env_pipe.webp",
+  "w": 104,
+  "h": 256
+ },
+ "ess_dark": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/ess_dark.webp",
+  "w": 156,
+  "h": 227
+ },
+ "ess_earth": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/ess_earth.webp",
+  "w": 163,
+  "h": 227
+ },
+ "ess_fire": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/ess_fire.webp",
+  "w": 173,
+  "h": 227
+ },
+ "ess_holy": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/ess_holy.webp",
+  "w": 168,
+  "h": 227
+ },
+ "ess_magic": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/ess_magic.webp",
+  "w": 161,
+  "h": 227
+ },
+ "ess_water": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/ess_water.webp",
+  "w": 167,
+  "h": 227
+ },
+ "ess_wind": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/ess_wind.webp",
+  "w": 175,
+  "h": 227
+ },
  "hero_design": {
   "pack": "P00_legacy",
   "url": "assets/P00_legacy/spr_hero.webp",
@@ -527,6 +581,414 @@
   "w": 640,
   "h": 408
  },
+ "rune_set_blade": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_set_blade.webp",
+  "w": 223,
+  "h": 212
+ },
+ "rune_set_energy": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_set_energy.webp",
+  "w": 225,
+  "h": 206
+ },
+ "rune_set_fatal": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_set_fatal.webp",
+  "w": 225,
+  "h": 224
+ },
+ "rune_set_focus": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_set_focus.webp",
+  "w": 227,
+  "h": 214
+ },
+ "rune_set_guard": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_set_guard.webp",
+  "w": 203,
+  "h": 227
+ },
+ "rune_set_rage": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_set_rage.webp",
+  "w": 225,
+  "h": 214
+ },
+ "rune_set_swift": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_set_swift.webp",
+  "w": 225,
+  "h": 209
+ },
+ "rune_set_vampire": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_set_vampire.webp",
+  "w": 225,
+  "h": 85
+ },
+ "rune_slot1": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_slot1.webp",
+  "w": 227,
+  "h": 225
+ },
+ "rune_slot2": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_slot2.webp",
+  "w": 227,
+  "h": 219
+ },
+ "rune_slot3": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_slot3.webp",
+  "w": 227,
+  "h": 196
+ },
+ "rune_slot4": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_slot4.webp",
+  "w": 227,
+  "h": 224
+ },
+ "rune_slot5": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_slot5.webp",
+  "w": 227,
+  "h": 212
+ },
+ "rune_slot6": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/rune_slot6.webp",
+  "w": 208,
+  "h": 227
+ },
+ "scroll_element": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/scroll_element.webp",
+  "w": 227,
+  "h": 162
+ },
+ "scroll_ld": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/scroll_ld.webp",
+  "w": 224,
+  "h": 162
+ },
+ "scroll_mystic": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/scroll_mystic.webp",
+  "w": 227,
+  "h": 162
+ },
+ "scroll_normal": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/scroll_normal.webp",
+  "w": 227,
+  "h": 162
+ },
+ "spr_angel_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_angel_awk_big.webp",
+  "w": 551,
+  "h": 512
+ },
+ "spr_angel_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_angel_awk_small.webp",
+  "w": 442,
+  "h": 326
+ },
+ "spr_dragon_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_dragon_awk_big.webp",
+  "w": 514,
+  "h": 512
+ },
+ "spr_dragon_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_dragon_awk_small.webp",
+  "w": 442,
+  "h": 350
+ },
+ "spr_dragon_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_dragon_big.webp",
+  "w": 616,
+  "h": 512
+ },
+ "spr_dragon_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_dragon_small.webp",
+  "w": 423,
+  "h": 304
+ },
+ "spr_fluffy_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_fluffy_awk_big.webp",
+  "w": 525,
+  "h": 512
+ },
+ "spr_fluffy_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_fluffy_awk_small.webp",
+  "w": 441,
+  "h": 351
+ },
+ "spr_fluffy_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_fluffy_big.webp",
+  "w": 557,
+  "h": 512
+ },
+ "spr_fluffy_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_fluffy_small.webp",
+  "w": 442,
+  "h": 318
+ },
+ "spr_golem_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_golem_awk_big.webp",
+  "w": 542,
+  "h": 512
+ },
+ "spr_golem_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_golem_awk_small.webp",
+  "w": 442,
+  "h": 411
+ },
+ "spr_golem_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_golem_big.webp",
+  "w": 554,
+  "h": 512
+ },
+ "spr_golem_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_golem_small.webp",
+  "w": 437,
+  "h": 388
+ },
+ "spr_kitsune_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_kitsune_awk_big.webp",
+  "w": 543,
+  "h": 512
+ },
+ "spr_kitsune_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_kitsune_awk_small.webp",
+  "w": 442,
+  "h": 363
+ },
+ "spr_kitsune_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_kitsune_big.webp",
+  "w": 526,
+  "h": 512
+ },
+ "spr_kitsune_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_kitsune_small.webp",
+  "w": 431,
+  "h": 325
+ },
+ "spr_owl_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_owl_awk_big.webp",
+  "w": 525,
+  "h": 512
+ },
+ "spr_owl_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_owl_awk_small.webp",
+  "w": 439,
+  "h": 440
+ },
+ "spr_owl_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_owl_big.webp",
+  "w": 572,
+  "h": 512
+ },
+ "spr_owl_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_owl_small.webp",
+  "w": 375,
+  "h": 390
+ },
+ "spr_phoenix_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_phoenix_awk_big.webp",
+  "w": 525,
+  "h": 512
+ },
+ "spr_phoenix_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_phoenix_awk_small.webp",
+  "w": 442,
+  "h": 331
+ },
+ "spr_phoenix_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_phoenix_big.webp",
+  "w": 541,
+  "h": 512
+ },
+ "spr_phoenix_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_phoenix_small.webp",
+  "w": 433,
+  "h": 318
+ },
+ "spr_pixie_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_pixie_awk_big.webp",
+  "w": 516,
+  "h": 512
+ },
+ "spr_pixie_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_pixie_awk_small.webp",
+  "w": 442,
+  "h": 368
+ },
+ "spr_pixie_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_pixie_big.webp",
+  "w": 501,
+  "h": 512
+ },
+ "spr_pixie_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_pixie_small.webp",
+  "w": 401,
+  "h": 361
+ },
+ "spr_poring_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_poring_awk_big.webp",
+  "w": 554,
+  "h": 512
+ },
+ "spr_poring_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_poring_awk_small.webp",
+  "w": 442,
+  "h": 350
+ },
+ "spr_salamander_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_salamander_awk_big.webp",
+  "w": 520,
+  "h": 512
+ },
+ "spr_salamander_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_salamander_awk_small.webp",
+  "w": 293,
+  "h": 442
+ },
+ "spr_sylph_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_sylph_awk_big.webp",
+  "w": 504,
+  "h": 512
+ },
+ "spr_sylph_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_sylph_awk_small.webp",
+  "w": 395,
+  "h": 442
+ },
+ "spr_turtle_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_turtle_awk_big.webp",
+  "w": 604,
+  "h": 512
+ },
+ "spr_turtle_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_turtle_awk_small.webp",
+  "w": 442,
+  "h": 369
+ },
+ "spr_turtle_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_turtle_big.webp",
+  "w": 629,
+  "h": 512
+ },
+ "spr_turtle_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_turtle_small.webp",
+  "w": 432,
+  "h": 350
+ },
+ "spr_undine_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_undine_awk_big.webp",
+  "w": 449,
+  "h": 512
+ },
+ "spr_undine_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_undine_awk_small.webp",
+  "w": 305,
+  "h": 442
+ },
+ "spr_unicorn_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_unicorn_awk_big.webp",
+  "w": 522,
+  "h": 512
+ },
+ "spr_unicorn_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_unicorn_awk_small.webp",
+  "w": 442,
+  "h": 302
+ },
+ "spr_unicorn_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_unicorn_big.webp",
+  "w": 412,
+  "h": 512
+ },
+ "spr_unicorn_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_unicorn_small.webp",
+  "w": 440,
+  "h": 301
+ },
+ "spr_wolf_awk_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_wolf_awk_big.webp",
+  "w": 389,
+  "h": 512
+ },
+ "spr_wolf_awk_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_wolf_awk_small.webp",
+  "w": 442,
+  "h": 361
+ },
+ "spr_wolf_big": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_wolf_big.webp",
+  "w": 389,
+  "h": 512
+ },
+ "spr_wolf_small": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/spr_wolf_small.webp",
+  "w": 440,
+  "h": 360
+ },
  "ui_bar_fill_exp": {
   "pack": "P00_UI_Kit",
   "url": "assets/P00_UI_Kit/ui_bar_fill_exp.webp",
@@ -766,6 +1228,177 @@
   "url": "assets/P00_UI_Kit/ui_tab_on.webp",
   "w": 256,
   "h": 69
+ },
+ "vfx_crit_burst": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_crit_burst.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_element_fire": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_element_fire.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_element_water": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_element_water.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_element_wind": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_element_wind.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_fire_ring": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_fire_ring.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_hit_spark": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_hit_spark.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_holy_pillar": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_holy_pillar.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_jelly_splash": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_jelly_splash.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_levelup": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_levelup.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_magic_circle": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_magic_circle.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_meteor": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_meteor.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_slash": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_slash.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_slash_heavy": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_slash_heavy.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_summon_beam": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/vfx_summon_beam.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_summon_portal": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/vfx_summon_portal.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_summon_star": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/vfx_summon_star.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_tornado": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_tornado.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_ult_aura": {
+  "pack": "P04_Spirits",
+  "url": "assets/P04_Spirits/vfx_ult_aura.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
+ },
+ "vfx_wave": {
+  "pack": "P03_VFX_Env",
+  "url": "assets/P03_VFX_Env/vfx_wave.webp",
+  "w": 512,
+  "h": 512,
+  "meta": {
+   "blend": "add"
+  }
  },
  "zone_abyss_far": {
   "pack": "P00_legacy",

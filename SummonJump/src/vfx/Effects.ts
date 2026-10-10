@@ -1,9 +1,12 @@
 import Phaser from 'phaser';
+import { fxImg } from './Art';
 
-/** Code-drawn additive VFX (slash arcs, sparks, rings, particles). Replaced by P03 VFX art later. */
+/** Additive VFX: painted P03 art when loaded (slash, hit spark, crit burst), code-drawn arcs/sparks/rings/particles otherwise. */
 export const ELEMENT_COLOR: Record<string, number> = { neutral: 0xfff2cc, water: 0x7fd0ff, fire: 0xff8a3d, earth: 0xd9b36a, wind: 0x8ff0bf, holy: 0xfff3c0, dark: 0xb48cff };
 
 export function slash(scene: Phaser.Scene, x: number, y: number, dir: number, color: number, heavy: boolean, flip: boolean): void {
+  const tint = color === 0xfff2cc ? null : color;
+  if (fxImg(scene, heavy ? 'vfx_slash_heavy' : 'vfx_slash', x + dir * (heavy ? 22 : 16), y, { size: heavy ? 150 : 110, life: heavy ? 260 : 190, tint, flipX: dir < 0, flipY: flip, from: 0.7 })) return;
   const g = scene.add.graphics({ x, y }).setDepth(30).setBlendMode(Phaser.BlendModes.ADD);
   const R = heavy ? 64 : 46, life = heavy ? 260 : 180;
   const st = { k: 0 };
@@ -25,6 +28,8 @@ export function slash(scene: Phaser.Scene, x: number, y: number, dir: number, co
 }
 
 export function spark(scene: Phaser.Scene, x: number, y: number, color: number, size = 1): void {
+  const crit = size >= 1.5;
+  if (fxImg(scene, crit ? 'vfx_crit_burst' : 'vfx_hit_spark', x, y, { size: (crit ? 120 : 70) * size, life: crit ? 300 : 200, tint: crit || color === 0xffffff ? null : color, from: 0.4, spin: Math.random() * 60 - 30, depth: 31 })) return;
   const g = scene.add.graphics({ x, y }).setDepth(31).setBlendMode(Phaser.BlendModes.ADD);
   const pts: Phaser.Math.Vector2[] = [];
   for (let i = 0; i < 12; i++) { const r = i % 2 ? 6 : 28, a = (i * Math.PI) / 6; pts.push(new Phaser.Math.Vector2(Math.cos(a) * r, Math.sin(a) * r)); }

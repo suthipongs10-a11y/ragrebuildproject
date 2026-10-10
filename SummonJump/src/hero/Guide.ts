@@ -17,7 +17,7 @@ export class Guide {
   constructor(scene: Phaser.Scene, private readonly session: HeroSession, private readonly save: SaveData,
     private readonly toast: (m: string) => void, private readonly flush: () => void, openHint: (text: string) => void) {
     this.lastLv = session.data.baseLv;
-    this.text = scene.add.text(16, 136, '', { fontFamily: 'Itim', fontSize: '15px', color: '#ffe9b0', stroke: '#2a1a0a', strokeThickness: 4, wordWrap: { width: 300 } })
+    this.text = scene.add.text(16, 136, '', { fontFamily: 'Itim', fontSize: '15px', color: '#ffe9b0', stroke: '#2a1a0a', strokeThickness: 4, wordWrap: { width: 300 }, backgroundColor: 'rgba(20, 12, 4, 0.55)', padding: { x: 6, y: 2 } })
       .setScrollFactor(0).setDepth(101).setInteractive({ useHandCursor: true });
     this.text.on('pointerup', () => { const q = currentQuest(session.content, this.state); if (q) openHint(t(`${q.text_key}.hint`)); });
     if (!save.quest) { save.quest = { i: 0, base: 0 }; const q = currentQuest(session.content, save.quest); if (q) save.quest.base = questBase(q, this.facts()); }

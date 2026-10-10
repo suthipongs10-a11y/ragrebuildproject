@@ -6,6 +6,7 @@ import { burst, ring, spark } from '../vfx/Effects';
 import { popInfo, popNumber } from '../vfx/DamageText';
 import { t } from '../i18n';
 import { elementColor, spiritTexture } from './art';
+import { fxImg } from '../vfx/Art';
 
 const WAVE_MS = 190;
 
@@ -32,6 +33,10 @@ export function playUltimate(scene: Phaser.Scene, content: ContentBundle, box: S
     : keep(drawCircle(scene, cx, cy, color));
   scene.tweens.add({ targets: circle, scale: circle instanceof Phaser.GameObjects.Image ? (vh * 0.9) / Math.max(1, circle.height) : 1, angle: 120, duration: 900, ease: 'Cubic.out' });
 
+  if (s && scene.textures.exists('vfx_ult_aura')) {
+    const aura = keep(scene.add.image(cx, cy, 'vfx_ult_aura').setScrollFactor(0).setDepth(191.5).setBlendMode(Phaser.BlendModes.ADD).setTint(color).setAlpha(0).setScale((vh * 0.4) / 512));
+    scene.tweens.add({ targets: aura, alpha: 0.9, scale: (vh * 0.95) / 512, duration: 520, ease: 'Cubic.out' });
+  }
   if (s) {
     const tex = spiritTexture(scene, content, s, true);
     const big = keep(scene.add.image(cx, cy + 20, tex.key).setScrollFactor(0).setDepth(192).setAlpha(0));
@@ -96,7 +101,15 @@ function sweep(scene: Phaser.Scene, cam: Phaser.Cameras.Scene2D.Camera, color: n
 }
 
 /** Per-target effect: `x` centre, `foot` ground under the monster, `y` hit point. */
+const ULT_ART: Record<string, string> = { slam: 'vfx_jelly_splash', vortex: 'vfx_tornado', rain: 'vfx_meteor', pillar: 'vfx_holy_pillar', wave: 'vfx_wave' };
+
 function hitFx(scene: Phaser.Scene, kind: string, x: number, foot: number, y: number, color: number): void {
+  const art = ULT_ART[kind] ?? 'vfx_crit_burst';
+  const base = kind === 'pillar' || kind === 'vortex' || kind === 'slam';
+  if (fxImg(scene, art, x, base ? foot : y, { size: kind === 'pillar' ? 300 : kind === 'rain' ? 170 : 200, life: 420, tint: kind === 'slam' || kind === 'pillar' ? null : color, from: 0.4, depth: 40, origin: base ? [0.5, 0.9] : undefined })) {
+    if (kind === 'slam') ring(scene, x, foot, color, 110, 380);
+    return;
+  }
   switch (kind) {
     case 'slam': ring(scene, x, foot, color, 110, 380); burst(scene, x, foot, 0xe8d6b0, 14, 300); break;
     case 'vortex': {

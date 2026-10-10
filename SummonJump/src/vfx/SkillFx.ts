@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import type { Shot, SkillEvent, Zone } from '@shared/index';
 import { burst, ELEMENT_COLOR, ring, slash } from './Effects';
 import { popNumber } from './DamageText';
+import { fxImg, vfxArt } from './Art';
 
 /** Draws hostile/friendly shots and skill zones each frame, and one-shot cast effects. Code shapes until P03 VFX art. */
 export class SkillFx {
@@ -48,10 +49,27 @@ export class SkillFx {
     const sc = this.scene;
     if (ev.kind === 'cast') {
       const c = ELEMENT_COLOR[ev.skill.element ?? 'neutral'] ?? 0xfff2cc;
+      if (this.painted(ev, c)) return;
       if (ev.skill.target === 'front') slash(sc, ev.x + ev.dir * 20, ev.y, ev.dir, c, true, false);
       else if (ev.skill.target === 'aoe') { ring(sc, ev.x, ev.y + 20, c, Number(ev.skill.effects.radius ?? 120) + 20, 420); burst(sc, ev.x, ev.y + 20, c, 20, 360); }
       else if (ev.skill.target === 'dash') burst(sc, ev.x, ev.y, 0xfff2cc, 12, 260);
       else if (ev.skill.target === 'buff') { ring(sc, ev.x, ev.y + 30, 0xffd88a, 60, 500); burst(sc, ev.x, ev.y, 0xffe2a0, 14, 160); }
     } else if (ev.kind === 'heal') { popNumber(sc, ev.x, ev.y - 6, ev.amount, 'heal'); burst(sc, ev.x, ev.y + 30, 0x7dff9a, 16, 160); }
+  }
+
+  /** Painted cast effect for the skill's `vfx` (skills.csv) when its art is loaded; false → code shapes. */
+  private painted(ev: Extract<SkillEvent, { kind: 'cast' }>, c: number): boolean {
+    const a = vfxArt(this.scene, ev.skill.vfx), sc = this.scene, tg = ev.skill.target;
+    if (!a || tg === 'bolt' || tg === 'rain' || tg === 'zone') return false; // projectiles and zones keep their per-frame drawing
+    const tint = a.tint ?? (ev.skill.element && ev.skill.element !== 'weapon' && ev.skill.element !== 'neutral' ? c : null);
+    const foot = ev.y + 40;
+    if (tg === 'front' || tg === 'dash') return fxImg(sc, a.key, ev.x + ev.dir * 50, ev.y, { size: 190, life: 300, tint, flipX: ev.dir < 0, from: 0.6 });
+    if (tg === 'aoe') {
+      const r = Number(ev.skill.effects.radius ?? 120);
+      burst(sc, ev.x, ev.y + 20, c, 12, 300);
+      return fxImg(sc, a.key, ev.x, a.key === 'vfx_tornado' ? foot : ev.y + 20, { size: r * 2.4, life: 480, tint, from: 0.3, origin: a.key === 'vfx_tornado' ? [0.5, 0.95] : undefined });
+    }
+    // heal / buff: a pillar or circle at the hero's feet
+    return fxImg(sc, a.key, ev.x, foot, { size: 200, life: 620, tint, from: 0.5, origin: [0.5, 0.92], depth: 29 });
   }
 }

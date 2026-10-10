@@ -5,6 +5,7 @@ import type { CombatController } from '../combat/CombatController';
 import type { HeroSession } from './HeroSession';
 import type { HeroClip, HeroRig } from '../rig/HeroRig';
 import { burst, ring } from '../vfx/Effects';
+import { fxImg } from '../vfx/Art';
 import { t } from '../i18n';
 import { popNumber } from '../vfx/DamageText';
 
@@ -46,6 +47,7 @@ export function playLevelUps(scene: Phaser.Scene, combat: CombatController, sess
     const pillar = scene.add.rectangle(x, y, 60, 10, 0xffd88a, 0.75).setOrigin(0.5, 1).setDepth(29).setBlendMode(Phaser.BlendModes.ADD);
     scene.tweens.add({ targets: pillar, height: 220, alpha: 0, duration: 1100, ease: 'Quad.out', onComplete: () => pillar.destroy() });
     ring(scene, x, y, 0xffd88a, 90, 600); burst(scene, x, y - 40, 0xffe2a0, 26, 320);
+    fxImg(scene, 'vfx_levelup', x, y + 6, { size: 260, life: 1100, from: 0.5, origin: [0.5, 0.95], depth: 29 });
     const d = session.data;
     const parts = [];
     if (lu.base) parts.push(t('lvl.base').replace('{n}', String(d.baseLv)));

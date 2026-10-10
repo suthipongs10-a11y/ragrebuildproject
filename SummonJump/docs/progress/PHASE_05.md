@@ -57,6 +57,12 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Level unlocks (`content/unlocks.csv`) + guide quest chain (`content/quests.csv`, `shared/progression/guide.ts`, `src/hero/Guide.ts`).
 - [x] ROADMAP: world chat, rare-drop/MVP broadcast, offline farming, rested EXP → Phase 6; backlog list.
 
+## Art imported (2026-10-10)
+- `SJ_P04_Spirits_Part1–4` → pack `P04_Spirits` (79/79 files, no warnings): spirit art is picked up from `spirits.csv`, item/rune icons from `items.csv` and rune names.
+- `Summon_Jump_v3_Part3_VFX_Env` (P03 brief Part 3, imported as `SJ_P03_VFX_Env_Part3`) → pack `P03_VFX_Env` (17/17): painted sword slashes, hit spark / critical burst, skill casts (`skills.csv` `vfx`, closest painting via an alias table in `src/vfx/Art.ts`), ultimate hits (jelly splash, tornado, meteor, holy pillar, wave), ultimate aura, level-up pillar, spirit element casts, poring-family death splash, painted pipe and boulder wall. Code-drawn effects stay as the fallback.
+- Summon reveal: painted portal + beam (4★) / star (5★) behind the cards.
+- Still waiting: P03 Part 1 (gear) + Part 2 (cards, skill icons, big forms of the 5 original spirits), P01 World Props, P03 Jobs, P05 monsters / zones / portal NPC.
+
 ## Known issues / notes
 - New monsters without art use a recoloured look-alike (`art` + `tint` in monsters.csv), e.g. Crab = red Scorpion, Siren = teal Harpy, Storm Roc = slate Bird. They switch to their own art automatically when `ART_P05_Monsters_*` is imported.
 - Background variations B/C/D fall back to the original zone layers until `ART_P05_Zone_Pack_*` arrives.

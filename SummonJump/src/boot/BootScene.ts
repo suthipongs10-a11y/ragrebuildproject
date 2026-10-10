@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
 import { loadTextures, queueKeys, roomKeys, setMonsterLooks } from '../assets/packs';
 import { showLoadProblem } from '../ui/errors';
+import { VFX_KEYS } from '../vfx/Art';
 
 const BASE_KEYS = ['hero_design', 'icon_sign', 'icon_altar', 'icon_anvil', 'icon_chest', 'icon_fountain', 'icon_crystal', 'icon_e_wind', 'icon_e_water', 'icon_e_fire', 'icon_card', 'icon_potion_r', 'icon_potion_b',
-  ...['head', 'torso', 'uarm', 'farm', 'thigh', 'shin', 'scarf', 'sword'].map((p) => `hero_part_${p}`)];
+  ...['head', 'torso', 'uarm', 'farm', 'thigh', 'shin', 'scarf', 'sword'].map((p) => `hero_part_${p}`), ...VFX_KEYS];
 import { parseLdtk, type LdtkProject, type LevelData } from '@shared/platformer';
 import { loadSave } from '../save/local';
 import { t } from '../i18n';
