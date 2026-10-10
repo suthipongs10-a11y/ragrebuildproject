@@ -21,6 +21,7 @@
 - Sky Isles: continuous cloud ground in every room, cloud pipe from sky1 back to town.
 - Own names: currency หินวิญญาณ 💠 (old saves converted; map crystals and Adventure Book milestones now pay it), RO/SW-coined monster, spirit, skill, scroll, essence and rune-set names replaced; pending art briefs ask for original designs.
 - Play-test fixes: job change always hands over the new weapon (full bag, paused menu) and asks for confirmation; live HP/SP in the menu, potions not wasted at full; PC left-click attack, menu hotkeys (I/E/U/Y/P), double-click to use/equip, larger menu on big screens.
+- Easier play: AUTO hunt (walks, jumps, fights, collects), tap/click a monster to attack it, one-tap stats/skills/best gear + auto growth on level-up + better-gear prompt, 🧭 quest travel, softer forest monsters, out-of-combat regen, revive in the same room.
 
 ## Phase 4 (done) — 2026-10-09
 - 15 spirit families × element variants (`spirits.csv`, `spirit_skills.csv`, `spirit_elements.csv`, `spirit_config.csv`).

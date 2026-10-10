@@ -61,7 +61,7 @@ Element variants: 1–3★ families water/fire/earth/wind; 4–5★ also holy/da
 - `rune_drop`: `tier, chance, star_lo, star_hi, r0..r4 (rarity weights = 0-4 starting subs)`
 
 ## jobs.csv
-`id, name_key, tier (0/1/2), from_job, job_lv_req, hp_factor, sp_factor, weapons (list: weapon subtypes the job may hold — RO access), parts_set, skills (list), ratings` — ratings = `dmg:N|tank:N|range:N|support:N|ease:N` (1–5, job-change screen bars)
+`id, name_key, tier (0/1/2), from_job, job_lv_req, hp_factor, sp_factor, weapons (list: weapon subtypes the job may hold — RO access), parts_set, skills (list), ratings, auto_stats, auto_skills` — ratings = `dmg:N|tank:N|range:N|support:N|ease:N` (1–5, job-change screen bars); auto_stats = stat weights for one-tap / automatic stat points (`int:5|dex:3|vit:2`); auto_skills = skill plan in order (`fire_bolt:5|cold_bolt:3|…`, skill:target level)
 
 ## maps.csv
 `id, zone, name_key, ldtk_file, music, bg_pack, exits (json), spawns_override (json), mvp (monster id), gate_abilities (list)`
