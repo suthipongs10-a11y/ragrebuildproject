@@ -1,0 +1,212 @@
+[
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "wpn_01_training_sword.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "wpn_02_iron_sword.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "wpn_03_flame_sword.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "wpn_04_gale_sword.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "wpn_05_tide_sword.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "wpn_06_king_greatsword.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "wpn_07_kraken_blade.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "arm_01_cotton_tunic.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "arm_02_leather_armor.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "arm_03_knight_armor.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "arm_04_royal_armor.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "arm_02_torso.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "arm_02_uarm.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "arm_03_torso.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "arm_03_uarm.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "arm_04_torso.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "arm_04_uarm.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "acc_power_ring.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "acc_wind_brooch.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "acc_luck_necklace.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Gear_Part1",
+  "file": "acc_light_earring.png",
+  "size": "1254x1254"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "card_poring.png",
+  "size": "768x1024"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "card_mantis.png",
+  "size": "768x1024"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "card_bird.png",
+  "size": "768x1024"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "card_fish.png",
+  "size": "768x1024"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "card_scorpion.png",
+  "size": "768x1024"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "card_king.png",
+  "size": "768x1024"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "card_harpy.png",
+  "size": "768x1024"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "card_kraken.png",
+  "size": "768x1024"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "skill_power_slash.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "skill_magnum_burst.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "skill_sword_mastery.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "ult_buddy.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "ult_wind.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "ult_water.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "ult_fire.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "ult_angel.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "spirit_big_buddy.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "spirit_big_wind.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "spirit_big_water.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "spirit_big_fire.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P03_Cards_Skills_Part2",
+  "file": "spirit_big_angel.png",
+  "size": "1024x1024"
+ }
+]

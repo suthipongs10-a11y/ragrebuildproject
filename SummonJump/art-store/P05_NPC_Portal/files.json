@@ -1,0 +1,17 @@
+[
+ {
+  "zip": "SJ_P05_NPC_Portal",
+  "file": "npc_portal_idle.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P05_NPC_Portal",
+  "file": "npc_portal_talk.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P05_NPC_Portal",
+  "file": "prop_portal_gate.png",
+  "size": "1024x1024"
+ }
+]

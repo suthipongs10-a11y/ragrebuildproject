@@ -1,0 +1,432 @@
+[
+ {
+  "part": 1,
+  "file": "job_swordsman_design.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 1,
+  "file": "job_swordsman_parts.png",
+  "size": "1536x1024"
+ },
+ {
+  "part": 1,
+  "file": "job_mage_design.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 1,
+  "file": "job_mage_parts.png",
+  "size": "1536x1024"
+ },
+ {
+  "part": 1,
+  "file": "job_archer_design.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 1,
+  "file": "job_archer_parts.png",
+  "size": "1536x1024"
+ },
+ {
+  "part": 1,
+  "file": "job_acolyte_design.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 1,
+  "file": "job_acolyte_parts.png",
+  "size": "1536x1024"
+ },
+ {
+  "part": 2,
+  "file": "wpn_staff_wood.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 2,
+  "file": "wpn_staff_crystal.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 2,
+  "file": "wpn_staff_flame.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 2,
+  "file": "wpn_bow_short.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 2,
+  "file": "wpn_bow_composite.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 2,
+  "file": "wpn_bow_gale.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 2,
+  "file": "wpn_mace_iron.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 2,
+  "file": "wpn_mace_holy.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 2,
+  "file": "wpn_mace_star.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 2,
+  "file": "prj_arrow.png",
+  "size": "512x256"
+ },
+ {
+  "part": 2,
+  "file": "hat_leather_cap.png",
+  "size": "512x512"
+ },
+ {
+  "part": 2,
+  "file": "hat_wizard.png",
+  "size": "512x512"
+ },
+ {
+  "part": 2,
+  "file": "hat_feather.png",
+  "size": "512x512"
+ },
+ {
+  "part": 2,
+  "file": "hat_circlet.png",
+  "size": "512x512"
+ },
+ {
+  "part": 2,
+  "file": "cape_traveler.png",
+  "size": "512x512"
+ },
+ {
+  "part": 2,
+  "file": "cape_hood.png",
+  "size": "512x512"
+ },
+ {
+  "part": 2,
+  "file": "shoe_sandals.png",
+  "size": "512x512"
+ },
+ {
+  "part": 2,
+  "file": "shoe_boots.png",
+  "size": "512x512"
+ },
+ {
+  "part": 2,
+  "file": "shoe_wind.png",
+  "size": "512x512"
+ },
+ {
+  "part": 2,
+  "file": "shield_buckler.png",
+  "size": "512x512"
+ },
+ {
+  "part": 2,
+  "file": "shield_kite.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_first_aid.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_basic_skill.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_hp_recovery.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_endure.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_dash_strike.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_whirlwind.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_provoke.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_fire_bolt.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_cold_bolt.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_lightning_bolt.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_soul_strike.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_fire_wall.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_frost_nova.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_sp_recovery.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_energy_shield.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_double_strafe.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_arrow_shower.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_charge_arrow.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_owl_eye.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_vulture_eye.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_focus.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_ankle_trap.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_arrow_rain.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_heal.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_blessing.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_increase_agi.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_holy_light.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_pneuma.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_divine_protection.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_angelus.png",
+  "size": "512x512"
+ },
+ {
+  "part": 3,
+  "file": "skill_ruwach.png",
+  "size": "512x512"
+ },
+ {
+  "part": 4,
+  "file": "vfx_fire_bolt.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_cold_bolt.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_lightning_bolt.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_soul_strike.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_fire_wall.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_frost_nova.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_energy_shield.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_arrow_trail.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_arrow_shower.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_ankle_trap.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_heal.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_blessing.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_holy_light.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_pneuma.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_whirlwind.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 4,
+  "file": "vfx_dash.png",
+  "size": "1024x1024"
+ },
+ {
+  "part": 5,
+  "file": "hero_head_attack.png",
+  "size": "512x512"
+ },
+ {
+  "part": 5,
+  "file": "hero_head_hurt.png",
+  "size": "512x512"
+ },
+ {
+  "part": 5,
+  "file": "job_swordsman_head_attack.png",
+  "size": "512x512"
+ },
+ {
+  "part": 5,
+  "file": "job_swordsman_head_hurt.png",
+  "size": "512x512"
+ },
+ {
+  "part": 5,
+  "file": "job_mage_head_attack.png",
+  "size": "512x512"
+ },
+ {
+  "part": 5,
+  "file": "job_mage_head_hurt.png",
+  "size": "512x512"
+ },
+ {
+  "part": 5,
+  "file": "job_archer_head_attack.png",
+  "size": "512x512"
+ },
+ {
+  "part": 5,
+  "file": "job_archer_head_hurt.png",
+  "size": "512x512"
+ },
+ {
+  "part": 5,
+  "file": "job_acolyte_head_attack.png",
+  "size": "512x512"
+ },
+ {
+  "part": 5,
+  "file": "job_acolyte_head_hurt.png",
+  "size": "512x512"
+ }
+]

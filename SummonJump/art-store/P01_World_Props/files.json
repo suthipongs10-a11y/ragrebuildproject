@@ -1,0 +1,147 @@
+[
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_pipe_top.png",
+  "size": "512x256"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_pipe_body.png",
+  "size": "512x256"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_rock_wall.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_rock_debris.png",
+  "size": "512x256"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_gate_closed.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_gate_open.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_sign_wood.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_sign_stone.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_chest_closed.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_chest_open.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_statue_off.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_statue_on.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_fountain.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_anvil.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_altar.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part1",
+  "file": "prop_ladder.png",
+  "size": "256x512"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "prop_water_surface.png",
+  "size": "1024x128"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "prop_door_wood.png",
+  "size": "512x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "prop_rune_wind.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "prop_rune_water.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "prop_rune_fire.png",
+  "size": "512x512"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "npc_smith_idle.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "npc_smith_talk.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "npc_priest_idle.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "npc_priest_talk.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "npc_merchant_idle.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "npc_merchant_talk.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "npc_guide_idle.png",
+  "size": "1024x1024"
+ },
+ {
+  "zip": "SJ_P01_World_Props_Part2",
+  "file": "npc_guide_talk.png",
+  "size": "1024x1024"
+ }
+]
