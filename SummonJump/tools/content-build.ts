@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import Papa from 'papaparse';
 import { isElement } from '../shared/formulas/elements';
 import type {
-  ContentBundle, MonsterDef, DropDef, ItemDef, CardDef, SpiritDef, SkillDef, JobDef, SpiritSkillDef, SpiritElementDef, SummonDef, RuneSetDef, RuneStatDef, RuneUpgradeDef, RuneDropDef, BookEntryDef,
+  ContentBundle, MonsterDef, DropDef, ItemDef, CardDef, SpiritDef, SkillDef, JobDef, SpiritSkillDef, SpiritElementDef, SummonDef, RuneSetDef, RuneStatDef, RuneUpgradeDef, RuneDropDef, BookEntryDef, DungeonDayDef, TowerFloorDef,
 } from '../shared/content/types';
 import { evalExpr } from '../shared/formulas/expr';
 
@@ -161,6 +161,18 @@ for (const b of book) {
   if (b.kind === 'kill' && !monIds.has(b.target[0] ?? '')) err(`book ${b.id}: unknown monster ${b.target[0]}`);
   if (!Object.keys(b.reward).length) err(`book ${b.id}: no reward`);
 }
+const dungeon: DungeonDayDef[] = read('dungeon').map((r) => ({ day: num(r, 'day', 'dungeon'), element: r.element ?? 'neutral', essence: r.essence ?? '', monsters: (r.monsters ?? '').split('|').filter(Boolean) }));
+const tower: TowerFloorDef[] = read('tower').map((r) => ({
+  floor: num(r, 'floor', 'tower'), scale: num(r, 'scale', 'tower'), zeny: num(r, 'zeny', 'tower'), reward: json(r, 'reward', 'tower') as Record<string, number>,
+  monsters: (r.monsters ?? '').split('|').filter(Boolean).map((p) => { const [id = '', n = '1'] = p.split(':'); return { id, n: Number(n) }; }),
+}));
+if (dungeon.length !== 7) err('dungeon.csv: need 7 days');
+for (const d of dungeon) { if (!itemIds.has(d.essence)) err(`dungeon day ${d.day}: unknown essence ${d.essence}`); for (const m of d.monsters) if (!monIds.has(m)) err(`dungeon day ${d.day}: unknown monster ${m}`); }
+tower.forEach((f, i) => {
+  if (f.floor !== i + 1) err(`tower.csv: floors must be 1..n in order (row ${i + 1})`);
+  for (const m of f.monsters) if (!monIds.has(m.id) || !(m.n > 0)) err(`tower floor ${f.floor}: bad monster ${m.id}`);
+  for (const k of Object.keys(f.reward)) if (!itemIds.has(k)) err(`tower floor ${f.floor}: unknown reward item ${k}`);
+});
 
 // ── spirits / summon / runes ──
 const sskill = new Map(spiritSkills.map((s) => [s.id, s]));
@@ -201,7 +213,7 @@ if (errors.length) {
 }
 const bundle: ContentBundle = {
   contentVersion: new Date().toISOString().slice(0, 10), monsters, drops, items, cards, spirits, skills, jobs,
-  spiritSkills, spiritElements, spiritConfig, summon, runeSets, runeStats, runeUpgrade, runeDrop, book,
+  spiritSkills, spiritElements, spiritConfig, summon, runeSets, runeStats, runeUpgrade, runeDrop, book, dungeon, tower,
 };
 mkdirSync(OUT, { recursive: true });
 writeFileSync(join(OUT, 'content.json'), JSON.stringify(bundle));

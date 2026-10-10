@@ -18,7 +18,7 @@ const ICON: Record<string, { key: string; h: number }> = {
   Chest: { key: 'icon_chest', h: 46 }, SavePoint: { key: 'icon_fountain', h: 84 },
 };
 const GATE_ICON: Record<string, string> = { double: 'icon_e_wind', dive: 'icon_e_water', break: 'icon_e_fire' };
-const NPC_COLOR: Record<string, number> = { smith: 0xc2683a, priest: 0xe8e0c0, merchant: 0x6aa86a, guide: 0x6aa0d8 };
+const NPC_COLOR: Record<string, number> = { smith: 0xc2683a, priest: 0xe8e0c0, merchant: 0x6aa86a, guide: 0x6aa0d8, portal: 0x9a6ad8 };
 
 /**
  * Placeholder visuals for room objects (legacy icons / simple shapes until the P01 art pack arrives)
@@ -65,9 +65,10 @@ export function spawnEntityView(scene: WorldScene, e: EntityData, save: SaveData
       const talk = () => scene.openDialog(t(`npc.${id}.name`), [1, 2].map((n) => t(`npc.${id}.${n}`)).filter((x) => !x.startsWith('npc.')));
       const use = id === 'smith' ? () => scene.openMenu('refine')
         : id === 'merchant' ? () => scene.openMenu('shop')
+        : id === 'portal' ? () => scene.openMenu('arena')
         : id === 'priest' ? () => (scene.session.data.job === 'novice' ? scene.openMenu('job') : talk())
         : talk;
-      const it: Interactable = { e, height: 96, use, label: t(id === 'smith' ? 'act.refine' : id === 'merchant' ? 'act.shop' : 'act.talk') };
+      const it: Interactable = { e, height: 96, use, label: t(id === 'smith' ? 'act.refine' : id === 'merchant' ? 'act.shop' : id === 'portal' ? 'act.arena' : 'act.talk') };
       for (const o of [body, head, name]) tappable(scene, o, () => it);
       return it;
     }

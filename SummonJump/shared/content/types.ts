@@ -58,6 +58,11 @@ export interface RuneDropDef { tier: string; chance: number; star_lo: number; st
 /** book.csv: Adventure Book milestones (permanent stat rewards). target: monster id, 'any', or room ids for maps. */
 export interface BookEntryDef { id: string; kind: 'kill' | 'card' | 'spirit' | 'map'; target: string[]; count: number; reward: Record<string, number>; note: string }
 
+/** dungeon.csv: daily dungeon per weekday (0 = Sunday). */
+export interface DungeonDayDef { day: number; element: string; essence: string; monsters: string[] }
+/** tower.csv: one floor; monsters as id x count, stat scale, first-clear reward items. */
+export interface TowerFloorDef { floor: number; monsters: { id: string; n: number }[]; scale: number; reward: Record<string, number>; zeny: number }
+
 /** summon.csv: rates[i] = chance of (i+1)★; elements 'pick' = player chooses. */
 export interface SummonDef { id: string; item: string; name_key: string; elements: string[]; rates: number[]; pity_n: number; pity_star: number }
 
@@ -86,4 +91,6 @@ export interface ContentBundle {
   runeUpgrade: RuneUpgradeDef[];
   runeDrop: RuneDropDef[];
   book: BookEntryDef[];
+  dungeon: DungeonDayDef[];
+  tower: TowerFloorDef[];
 }

@@ -1,0 +1,8 @@
+day,element,essence,monsters
+0,neutral,ess_magic,poring|drops|mushroom|bird|fish|crab|griffin
+1,water,ess_water,poring|marin|fish|jellyfish|gold_fish
+2,fire,ess_fire,drops|wisp|fire_hawk
+3,earth,ess_earth,rocker|mushroom|poporing|mantis|boar|willow
+4,wind,ess_wind,bird|sky_poring|cloud_imp|thunder_puff|griffin|eel
+5,holy,ess_holy,wisp|cloud_imp|sky_snail|marin
+6,dark,ess_dark,angler|willow|eel|jellyfish

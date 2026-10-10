@@ -1,6 +1,6 @@
 import {
-  addItem, addRune, addSpirit, bookBonus, changeJob, emptyBook, noteDex, createRng, rollRune, equip, expToNext, derive, gainExp, jobOf, leaderBonus, learnSkill, maxHp, maxSp, newHero, newSkillRuntime, raiseStat, starterBox,
-  type ContentBundle, type Derived, type HeroData, type JobId, type LevelUpResult, type SkillRuntime, type SpiritBox, type StatKey, type BookData,
+  addItem, addRune, addSpirit, bookBonus, changeJob, emptyArena, emptyBook, noteDex, createRng, rollRune, equip, expToNext, derive, gainExp, jobOf, leaderBonus, learnSkill, maxHp, maxSp, newHero, newSkillRuntime, raiseStat, starterBox,
+  type ContentBundle, type Derived, type HeroData, type JobId, type LevelUpResult, type SkillRuntime, type SpiritBox, type StatKey, type BookData, type ArenaState,
 } from '@shared/index';
 import type { SaveData } from '../save/local';
 
@@ -25,6 +25,7 @@ export class HeroSession {
   get data(): HeroData { return this.save.hero as HeroData; }
   get box(): SpiritBox { return this.save.spirits as SpiritBox; }
   get book(): BookData { return this.save.book as BookData; }
+  get arena(): ArenaState { this.save.arena ??= emptyArena(); return this.save.arena; }
 
   recompute(): void {
     const lead = leaderBonus(this.box, this.content), perm = bookBonus(this.content, this.book);

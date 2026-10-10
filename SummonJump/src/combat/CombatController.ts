@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import {
   addItem, createEnemy, createHeroCombat, MAX_STEP, stepEnemy, stepHeroCombat, stepShots, stepSkills, useSkill, rollKill, markDefeated, maxHp, maxSp, isSolidCell, TILE, moveBody,
-  addGauge, addRune, noteCard, noteKill, createSpiritWorld, followSpirits, rollRuneDrop, spiritLifesteal, stepSpirits, teamExp, ultimate,
+  addGauge, addRune, noteCard, noteKill, scaledDef, createSpiritWorld, followSpirits, rollRuneDrop, spiritLifesteal, stepSpirits, teamExp, ultimate,
   type Enemy, type EnemyCtx, type EnemyEvent, type HeroCombat, type HeroState, type LevelData, type Rng, type Shot, type TileGrid, type Body, type CombatEvent, type SkillCtx, type SkillEvent,
   type SpiritEvent, type SpiritStepCtx, type SpiritWorld, type UltResult,
 } from '@shared/index';
@@ -79,9 +79,11 @@ export class CombatController {
   /** The mini-boss / MVP in this room (shown with a big HP bar), if alive. */
   get boss(): Enemy | undefined { return this.enemies.find((e) => !e.dead && e.def.tier !== 'normal'); }
 
-  spawn(id: string, monster: string, x: number, y: number): void {
-    const def = this.defs.get(monster);
-    if (!def) return;
+  /** `scale` (arena modes) multiplies HP / ATK / DEF / rewards. */
+  spawn(id: string, monster: string, x: number, y: number, scale = 1): void {
+    const base = this.defs.get(monster);
+    if (!base) return;
+    const def = scaledDef(base, scale);
     const e = createEnemy(id, def, x, y, this.rng);
     this.enemies.push(e);
     this.views.set(e.id, new EnemyView(this.scene, e));
@@ -183,7 +185,7 @@ export class CombatController {
     ring(sc, cx, cy, boss ? 0xffd88a : 0xffffff, boss ? 160 : 60, 400);
     if (boss) { this.hitstop = Math.max(this.hitstop, 0.18); sc.cameras.main.flash(300, 255, 243, 208); sc.cameras.main.shake(400, 0.01); }
     this.views.get(e.id)?.die(); this.views.delete(e.id);
-    if (!e.id.includes('#summon') && !e.id.startsWith('stress#')) markDefeated(this.save.defeated, e.id, e.def.tier, e.def.respawn_sec, Date.now());
+    if (!e.id.includes('#summon') && !e.id.startsWith('stress#') && !e.id.startsWith('arena#')) markDefeated(this.save.defeated, e.id, e.def.tier, e.def.respawn_sec, Date.now());
     const r = rollKill(e.def, this.session.content.drops, this.rng, 1 + this.session.derived.build.stats.luk * 0.03);
     this.save.zeny += r.zeny;
     const lv = this.session.reward(r.exp, r.jobExp);

@@ -244,3 +244,29 @@ test('phase 5: adventure book milestone can be claimed for a permanent bonus', a
   await page.click('[data-act="close"]');
   expect(errors).toEqual([]);
 });
+
+test('phase 5: tower floor 1 from the portal: waves, clear reward, back to town', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=town');
+  await ws(page, (w) => w.openMenu('arena'));
+  await page.click('[data-act="arena:tower:1"]');
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').level?.id === 'arena', null, { timeout: 10_000 });
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').combat.enemies.some((e: Any) => e.id.startsWith('arena#')), null, { timeout: 10_000 });
+  // every monster picture is loaded (the arena room has no spawns of its own)
+  expect(await ws(page, (w) => w.children.list.filter((o: Any) => o.texture?.key === '__MISSING').length)).toBe(0);
+  await ws(page, (w) => w.debugKillAll());
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').session.arena.tower === 1, null, { timeout: 10_000 });
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').level?.id === 'town', null, { timeout: 15_000 });
+  expect(errors).toEqual([]);
+});
+
+test('phase 5: daily dungeon uses an entry and its monsters are drawn', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=town');
+  await ws(page, (w) => w.openMenu('arena'));
+  await page.click('[data-act="arena:dungeon"]');
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').combat?.enemies.some((e: Any) => e.id.startsWith('arena#')), null, { timeout: 15_000 });
+  expect(await ws(page, (w) => w.session.arena.daily.used)).toBe(1);
+  expect(await ws(page, (w) => w.children.list.filter((o: Any) => o.texture?.key === '__MISSING').length)).toBe(0);
+  expect(errors).toEqual([]);
+});

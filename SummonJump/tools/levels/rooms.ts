@@ -32,6 +32,7 @@ export const ROOMS: RoomSrc[] = [
       { type: 'Gate', x: 22, y: 14, fields: { ability: 'dive', text: 'gate.dive' } },
       { type: 'Npc', x: 11.5, y: 14, fields: { npc: 'smith' } }, { type: 'Npc', x: 15.5, y: 14, fields: { npc: 'priest' } },
       { type: 'Npc', x: 23, y: 14, fields: { npc: 'merchant' } }, { type: 'Npc', x: 3, y: 14, fields: { npc: 'guide' } },
+      { type: 'Npc', x: 7.5, y: 14, fields: { npc: 'portal' } },
     ] },
   // ───────── Zone 1: Forest (Lv 1–14) — town ← forest ← forest2 ← forest3 ← deep (King) ← forest4 ← deep2 (Spore Mother)
   { id: 'forest', zone: 'forest', name: 'zone.forest', exits: { left: 'forest2', right: 'town' },
@@ -97,6 +98,10 @@ export const ROOMS: RoomSrc[] = [
   { id: 'desert', zone: 'desert', name: 'zone.desert', exits: { left: 'town' },
     fill: [[0, 15, 29, 16, '#'], [28, 0, 29, 14, '#'], [8, 14, 11, 14, '#'], [9, 13, 10, 13, '#'], [16, 11, 20, 11, '-']],
     entities: [sign(3, 14, 'sign.desert.pyramid'), { type: 'Chest', x: 24, y: 14 }, mon('scorpion', 14, 14), mon('scorpion', 21, 14), item(18, 10)] },
+  // arena for the daily dungeon and the tower (reached from the portal NPC in town, no exits)
+  { id: 'arena', zone: 'town', name: 'zone.arena', exits: {},
+    fill: [[0, 15, 29, 16, '#'], [4, 12, 8, 12, '-'], [21, 12, 25, 12, '-'], [12, 9, 17, 9, '-']],
+    entities: [] },
   // wide test room (not linked): exercises the scrolling camera
   { id: 'test_wide', zone: 'forest', name: 'zone.forest', w: 80, test: true, exits: {},
     fill: [[0, 15, 79, 16, '#'], [10, 12, 14, 12, '-'], [30, 9, 34, 9, '-'], [50, 12, 55, 12, '-'], [60, 13, 63, 14, '#'], [79, 0, 79, 14, '#']],

@@ -24,7 +24,7 @@ describe('LDtk world', () => {
     expect(town.grid.get(28, 4)).toBe(Cell.Rock);
     expect(town.grid.get(19, 12)).toBe(Cell.PipeTop);
     expect(town.grid.get(3, 12)).toBe(Cell.OneWay);
-    expect(town.entities.filter((e) => e.type === 'Npc').length).toBe(4);
+    expect(town.entities.filter((e) => e.type === 'Npc').length).toBe(5);
     expect(levels.get('abyss1')?.water).toBe(true);
     expect(levels.get('forest')?.water).toBe(false);
   });

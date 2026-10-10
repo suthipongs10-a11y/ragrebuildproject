@@ -90,7 +90,7 @@ export function validateLevels(levels: Map<string, LevelData>, knownMonsters: Re
       }
       if (e.x < 0 || e.y < 0 || e.x > l.grid.pxW || e.y > l.grid.pxH + TILE) errs.push(`${at}: entity ${e.type} outside the room`);
     }
-    if (!l.test && !Object.keys(l.exitTo).length && !l.entities.some((e) => e.type === 'Pipe')) errs.push(`${at}: unreachable (no exits)`);
+    if (!l.test && l.id !== 'arena' && !Object.keys(l.exitTo).length && !l.entities.some((e) => e.type === 'Pipe')) errs.push(`${at}: unreachable (no exits)`); // arena: reached through the portal NPC
   }
   return errs;
 }

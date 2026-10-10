@@ -62,6 +62,12 @@ export function queueMonsters(scene: Phaser.Scene, monsterIds: string[]): boolea
   return queued;
 }
 
+/** Textures for a list of monsters (with their boss summons) — arena runs spawn monsters the room itself doesn't list. */
+export function monsterSetKeys(ids: readonly string[]): string[] {
+  const all = new Set(ids.flatMap((m) => [m, ...(SUMMONS[m] ?? [])]));
+  return [...all].flatMap((m) => monsterKeys(m));
+}
+
 /** Every texture a room needs: its zone's painted layers + its monsters (with boss summons). */
 export function roomKeys(level: { zone: string; variant?: string | null; entities: { type: string; fields: Record<string, unknown> }[] }): string[] {
   const keys = ZONE_LAYERS.map((l) => zoneKey(level.zone, level.variant ?? null, l));

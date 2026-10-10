@@ -57,3 +57,7 @@ export function tryUltimate(h: UltHost): void {
   h.setBusy(true);
   playUltimate(h.scene, h.session.content, h.session.box, h.combat, r, { x: h.hero.x + h.hero.w / 2, y: h.hero.y }, () => { h.setBusy(false); h.flush(); });
 }
+
+export function ultHost(s: { session: HeroSession; combat: CombatController; hero: HeroState; busy: boolean; hint(k: string, m: string): void; flush(): void } & Phaser.Scene): UltHost {
+  return { scene: s, session: s.session, combat: s.combat, hero: s.hero, setBusy: (on) => { s.busy = on; }, hint: (k, m) => s.hint(k, m), flush: () => s.flush() };
+}
