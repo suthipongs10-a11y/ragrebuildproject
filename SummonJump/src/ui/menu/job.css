@@ -6,6 +6,7 @@
 .jb-top b { font-size: 18px; color: #ffd88a; }
 .jb-top small { color: var(--muted); display: block; font-size: 12px; }
 .jb-icon { width: 52px; height: 52px; flex: none; border-radius: 12px; background: #241a10; display: grid; place-items: center; font-size: 30px; }
+.jb-icon.art { width: 76px; height: 96px; background: #241a10 center / contain no-repeat; }
 .jb-bars { display: grid; gap: 3px; }
 .jb-bar { display: flex; align-items: center; gap: 8px; font-size: 13px; }
 .jb-bar span { width: 78px; flex: none; color: var(--muted); }

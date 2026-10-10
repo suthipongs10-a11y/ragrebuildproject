@@ -9,6 +9,9 @@ type Part = 'head' | 'torso' | 'uarm' | 'farm' | 'thigh' | 'shin' | 'scarf' | 's
 export type HeroClip = string;
 const CLIPS = rig.clips as unknown as Record<string, Clip>;
 const XFADE = 0.08;
+/** diagonal of the hero's sword piece in sheet px (weapon pictures are sized to match) */
+const SWORD_DIAG = 481;
+interface SheetMeta { sheetX: number; sheetY: number; sheetW: number; sheetH: number; pivotX?: number; pivotY?: number }
 
 /**
  * Cut-out hero rig: nested containers in parts-sheet units (same hierarchy as the v3 prototype),
@@ -26,6 +29,8 @@ export class HeroRig {
   private fadeT = 0;
   private last: Pose = {};
   private readonly parts: Partial<Record<Part, Phaser.GameObjects.Image[]>> = {};
+  private job = '';
+  private face = '';
 
   constructor(scene: Phaser.Scene, depth = 10) {
     this.root = scene.add.container(0, 0).setDepth(depth);
@@ -53,11 +58,17 @@ export class HeroRig {
   }
 
   private part(scene: Phaser.Scene, k: Part): Phaser.GameObjects.Image {
-    const key = `hero_part_${k}`, m = art(key).meta as { sheetX: number; sheetY: number; sheetW: number; sheetH: number };
-    const [px, py] = rig.pivots[k] as [number, number];
-    const img = scene.add.image(0, 0, key).setOrigin((px - m.sheetX) / m.sheetW, (py - m.sheetY) / m.sheetH).setDisplaySize(m.sheetW, m.sheetH);
+    const img = scene.add.image(0, 0, `hero_part_${k}`);
     (this.parts[k] ??= []).push(img);
+    this.dress(img, k, `hero_part_${k}`);
     return img;
+  }
+
+  /** Put a sheet-space piece on an image: texture + origin at its joint pivot + size in sheet units. */
+  private dress(img: Phaser.GameObjects.Image, k: Part, key: string): void {
+    const m = art(key).meta as unknown as SheetMeta;
+    const [px, py] = m.pivotX !== undefined ? [m.pivotX, m.pivotY as number] : (rig.pivots[k] as [number, number]);
+    img.setTexture(key).setOrigin((px - m.sheetX) / m.sheetW, (py - m.sheetY) / m.sheetH).setDisplaySize(m.sheetW, m.sheetH);
   }
 
   /** Switch clip (restarts non-looping clips when `restart`). Cross-fades from the current pose. */
@@ -77,6 +88,7 @@ export class HeroRig {
     let p = sampleClip(this.cur, this.clipT);
     if (this.prev && this.fadeT > 0) { this.fadeT -= dt; p = blendPose(this.prev, p, 1 - Math.max(0, this.fadeT) / XFADE); }
     this.last = p;
+    this.updateFace();
     const j = this.j as Record<string, Phaser.GameObjects.Container>;
     const sq = p.sq ?? 0; // squash (+) / stretch (−), anchored at the feet
     this.root.setPosition(x, feetY).setScale(rig.scale * (1 + sq * 0.6) * (dir < 0 ? -1 : 1), rig.scale * (1 - sq)).setRotation((p.rot ?? 0) * (dir < 0 ? -1 : 1));
@@ -91,15 +103,46 @@ export class HeroRig {
   setAlpha(a: number): void { this.root.setAlpha(a); }
 
   /**
-   * Job / weapon look. Until the P03 job parts sheets arrive this tints the clothing pieces per job
-   * and the weapon piece per weapon type (placeholder for real part swaps).
+   * Job / weapon look: the job's painted parts (P03 Jobs, `job_<job>_<part>`) and the equipped weapon's own picture
+   * (`weaponIcon`, drawn in the sword pose). Missing art → the hero's pieces, tinted per job / weapon type.
    */
-  setLook(job: string, weaponType: string): void {
+  setLook(job: string, weaponType: string, weaponIcon?: string): void {
     if (this.weapon !== weaponKind(weaponType)) { this.weapon = weaponKind(weaponType); this.play(this.clip, true); }
+    const scene = this.root.scene;
+    this.job = scene.textures.exists(`job_${job}_head`) ? job : '';
     const cloth: Record<string, number> = { swordsman: 0xc8d4ec, mage: 0x9a88f0, archer: 0x9ad08a, acolyte: 0xfff0d8 };
-    const wpn: Record<string, number> = { staff: 0xb07a3a, bow: 0x8ad070, mace: 0xb8b8c8 };
-    for (const k of ['torso', 'uarm', 'thigh'] as Part[]) for (const img of this.parts[k] ?? []) { if (cloth[job]) img.setTint(cloth[job]); else img.clearTint(); }
-    for (const img of this.parts.sword ?? []) { if (wpn[weaponType]) img.setTint(wpn[weaponType]); else img.clearTint(); }
+    for (const k of ['head', 'torso', 'uarm', 'farm', 'thigh', 'shin', 'scarf'] as Part[]) {
+      const key = this.job ? `job_${job}_${k}` : `hero_part_${k}`;
+      for (const img of this.parts[k] ?? []) {
+        this.dress(img, k, key);
+        if (!this.job && cloth[job] && (k === 'torso' || k === 'uarm' || k === 'thigh')) img.setTint(cloth[job]); else img.clearTint();
+      }
+    }
+    this.face = '';
+    const wpn = this.parts.sword?.[0];
+    if (!wpn) return;
+    if (weaponIcon && scene.textures.exists(weaponIcon)) {
+      // weapon paintings: handle top-left, tip bottom-right (like the hero's sword piece); bows are held in the middle
+      const kind = weaponKind(weaponType), len = SWORD_DIAG * ({ sword: 1, staff: 1.25, bow: 1.1, mace: 1 } as const)[kind];
+      wpn.setTexture(weaponIcon).clearTint();
+      const k = len / Math.hypot(wpn.width, wpn.height);
+      wpn.setOrigin(kind === 'bow' ? 0.5 : 0.19, kind === 'bow' ? 0.5 : 0.16).setDisplaySize(wpn.width * k, wpn.height * k);
+    } else {
+      this.dress(wpn, 'sword', 'hero_part_sword');
+      const tint: Record<string, number> = { staff: 0xb07a3a, bow: 0x8ad070, mace: 0xb8b8c8 };
+      if (tint[weaponType]) wpn.setTint(tint[weaponType]); else wpn.clearTint();
+    }
+  }
+
+  /** Battle-shout face while attacking / casting, pained face when hit (P03 Jobs part 5). */
+  private updateFace(): void {
+    const c = this.clip;
+    const mood = c.startsWith('attack') || c.startsWith('skill') || c === 'channel' ? 'attack' : c === 'hurt' || c === 'death' ? 'hurt' : '';
+    if (mood === this.face) return;
+    this.face = mood;
+    const base = this.job ? `job_${this.job}_head` : 'hero_part_head';
+    const key = mood && this.root.scene.textures.exists(`${base}_${mood}`) ? `${base}_${mood}` : base;
+    for (const img of this.parts.head ?? []) this.dress(img, 'head', key);
   }
   setVisible(v: boolean): void { this.root.setVisible(v); }
 }

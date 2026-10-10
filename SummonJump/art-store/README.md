@@ -1,7 +1,7 @@
-# art-store — received art, not wired yet
+# art-store — full-resolution sources of received art
 
-Owner asked to keep these zips and wire them later ("เก็บไว้ก่อน ค่อยทำ"). Zips are never committed, so the PNGs are kept here
-as full-resolution WebP (same file names, `.webp`). Nothing here is loaded by the game; the build ignores this folder.
+Zips are never committed, so the PNGs are kept here as full-resolution WebP (same file names, `.webp`). The game never loads
+this folder (the build ignores it); `npm run art:jobs` cuts the job rig pieces from `P03_Jobs`. Everything listed is wired as of 2026-10-10.
 Each folder has `files.json` (source zip, file name, original size). All sets passed the brief check (names, sizes, backgrounds).
 
 | Folder | Brief | Zips | Files |

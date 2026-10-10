@@ -26,8 +26,9 @@ import { bindDebugKeys } from './debugKeys';
 import { BossTimers } from '../world/BossTimers';
 import { ArenaController, arenaKeys, enterArena } from '../world/Arena';
 import { autoStep } from '../hero/AutoBattle';
+import { applyHeroLook, sessionArtKeys } from '../hero/HeroArt';
 import { Guide } from '../hero/Guide';
-import { loadTeamArt, spiritArtKeys, teamAbilitySet, tryUltimate, ultHost, UltButton } from '../spirits/SpiritPlay';
+import { loadTeamArt, teamAbilitySet, tryUltimate, ultHost, UltButton } from '../spirits/SpiritPlay';
 
 /** Where the hero appears when a room loads. */
 export type Place =
@@ -98,7 +99,7 @@ export class WorldScene extends Phaser.Scene {
     this.level = this.levels.get(roomId) ?? (this.levels.get('town') as LevelData);
     this.ready = false;
     // safety net: if any texture of this room is missing (failed download), fetch it and come back
-    const need = [...roomKeys(this.level), ...spiritArtKeys(this.session), ...arenaKeys(this, this.level.id)].filter((k) => !this.textures.exists(k));
+    const need = [...roomKeys(this.level), ...sessionArtKeys(this.session), ...arenaKeys(this, this.level.id)].filter((k) => !this.textures.exists(k));
     if (need.length && !data.retried) {
       setLoading(true);
       loadTextures(this, need, (missing) => { setLoading(false); if (missing.length) showLoadProblem(missing); else this.scene.restart({ ...data, retried: true }); });
@@ -229,7 +230,7 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.fadeOut(fadeMs, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       setLoading(true);
-      loadTextures(this, [...roomKeys(target), ...spiritArtKeys(this.session), ...arenaKeys(this, roomId)], (missing) => {
+      loadTextures(this, [...roomKeys(target), ...sessionArtKeys(this.session), ...arenaKeys(this, roomId)], (missing) => {
         setLoading(false);
         if (missing.length) showLoadProblem(missing);
         else this.scene.restart({ room: roomId, place });
@@ -361,10 +362,7 @@ export class WorldScene extends Phaser.Scene {
     else this.hint('far', t('act.far'));
   }
 
-  applyLook(): void {
-    const d = this.session.data, w = d.bag.find((b) => b.uid === d.equip.weapon);
-    this.rig.setLook(d.job, this.session.content.items.find((i) => i.id === w?.id)?.subtype ?? 'sword');
-  }
+  applyLook(): void { applyHeroLook(this, this.session, this.rig); }
 
   applyUse(fx: Record<string, number>): void { applyPotion(this, this.combat, this.session, this.hero, fx); }
   toast(msg: string): void {

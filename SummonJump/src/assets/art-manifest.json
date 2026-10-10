@@ -263,6 +263,34 @@
    "sheetH": 353
   }
  },
+ "hero_part_head_attack": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/hero_part_head_attack.webp",
+  "w": 124,
+  "h": 112,
+  "meta": {
+   "sheetX": 57,
+   "sheetY": 75,
+   "sheetW": 372,
+   "sheetH": 337,
+   "pivotX": 225,
+   "pivotY": 392
+  }
+ },
+ "hero_part_head_hurt": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/hero_part_head_hurt.webp",
+  "w": 120,
+  "h": 116,
+  "meta": {
+   "sheetX": 61,
+   "sheetY": 71,
+   "sheetW": 359,
+   "sheetH": 347,
+   "pivotX": 225,
+   "pivotY": 392
+  }
+ },
  "hero_part_scarf": {
   "pack": "P00_legacy",
   "url": "assets/P00_legacy/hero_scarf.webp",
@@ -430,6 +458,538 @@
   "url": "assets/P00_legacy/ic_sword2.webp",
   "w": 104,
   "h": 128
+ },
+ "job_acolyte_design": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_acolyte_design.webp",
+  "w": 230,
+  "h": 384,
+  "meta": {}
+ },
+ "job_acolyte_farm": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_acolyte_farm.webp",
+  "w": 64,
+  "h": 152,
+  "meta": {
+   "sheetX": 1310,
+   "sheetY": 110,
+   "sheetW": 192,
+   "sheetH": 456,
+   "pivotX": 1383,
+   "pivotY": 148
+  }
+ },
+ "job_acolyte_head": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_acolyte_head.webp",
+  "w": 129,
+  "h": 141,
+  "meta": {
+   "sheetX": 38,
+   "sheetY": 14,
+   "sheetW": 388,
+   "sheetH": 424,
+   "pivotX": 202,
+   "pivotY": 410
+  }
+ },
+ "job_acolyte_head_attack": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_acolyte_head_attack.webp",
+  "w": 122,
+  "h": 116,
+  "meta": {
+   "sheetX": 40,
+   "sheetY": 24,
+   "sheetW": 366,
+   "sheetH": 348,
+   "pivotX": 202,
+   "pivotY": 410
+  }
+ },
+ "job_acolyte_head_hurt": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_acolyte_head_hurt.webp",
+  "w": 124,
+  "h": 113,
+  "meta": {
+   "sheetX": 40,
+   "sheetY": 20,
+   "sheetW": 372,
+   "sheetH": 339,
+   "pivotX": 202,
+   "pivotY": 410
+  }
+ },
+ "job_acolyte_scarf": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_acolyte_scarf.webp",
+  "w": 183,
+  "h": 129,
+  "meta": {
+   "sheetX": 574,
+   "sheetY": 610,
+   "sheetW": 548,
+   "sheetH": 388,
+   "pivotX": 1087,
+   "pivotY": 642
+  }
+ },
+ "job_acolyte_shin": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_acolyte_shin.webp",
+  "w": 77,
+  "h": 127,
+  "meta": {
+   "sheetX": 394,
+   "sheetY": 598,
+   "sheetW": 232,
+   "sheetH": 380,
+   "pivotX": 488,
+   "pivotY": 628
+  }
+ },
+ "job_acolyte_thigh": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_acolyte_thigh.webp",
+  "w": 107,
+  "h": 140,
+  "meta": {
+   "sheetX": 26,
+   "sheetY": 570,
+   "sheetW": 320,
+   "sheetH": 420,
+   "pivotX": 231,
+   "pivotY": 598
+  }
+ },
+ "job_acolyte_torso": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_acolyte_torso.webp",
+  "w": 161,
+  "h": 157,
+  "meta": {
+   "sheetX": 458,
+   "sheetY": 50,
+   "sheetW": 484,
+   "sheetH": 472,
+   "pivotX": 672,
+   "pivotY": 483
+  }
+ },
+ "job_acolyte_uarm": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_acolyte_uarm.webp",
+  "w": 72,
+  "h": 133,
+  "meta": {
+   "sheetX": 974,
+   "sheetY": 118,
+   "sheetW": 216,
+   "sheetH": 400,
+   "pivotX": 1078,
+   "pivotY": 159
+  }
+ },
+ "job_archer_design": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_archer_design.webp",
+  "w": 315,
+  "h": 384,
+  "meta": {}
+ },
+ "job_archer_farm": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_archer_farm.webp",
+  "w": 71,
+  "h": 120,
+  "meta": {
+   "sheetX": 1302,
+   "sheetY": 142,
+   "sheetW": 212,
+   "sheetH": 360,
+   "pivotX": 1336,
+   "pivotY": 176
+  }
+ },
+ "job_archer_head": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_archer_head.webp",
+  "w": 152,
+  "h": 132,
+  "meta": {
+   "sheetX": 58,
+   "sheetY": 62,
+   "sheetW": 456,
+   "sheetH": 396,
+   "pivotX": 277,
+   "pivotY": 422
+  }
+ },
+ "job_archer_head_attack": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_archer_head_attack.webp",
+  "w": 146,
+  "h": 132,
+  "meta": {
+   "sheetX": 68,
+   "sheetY": 56,
+   "sheetW": 437,
+   "sheetH": 395,
+   "pivotX": 277,
+   "pivotY": 422
+  }
+ },
+ "job_archer_head_hurt": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_archer_head_hurt.webp",
+  "w": 139,
+  "h": 130,
+  "meta": {
+   "sheetX": 84,
+   "sheetY": 64,
+   "sheetW": 417,
+   "sheetH": 389,
+   "pivotX": 277,
+   "pivotY": 422
+  }
+ },
+ "job_archer_scarf": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_archer_scarf.webp",
+  "w": 199,
+  "h": 151,
+  "meta": {
+   "sheetX": 590,
+   "sheetY": 546,
+   "sheetW": 596,
+   "sheetH": 452,
+   "pivotX": 1151,
+   "pivotY": 609
+  }
+ },
+ "job_archer_shin": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_archer_shin.webp",
+  "w": 77,
+  "h": 136,
+  "meta": {
+   "sheetX": 382,
+   "sheetY": 566,
+   "sheetW": 232,
+   "sheetH": 408,
+   "pivotX": 512,
+   "pivotY": 599
+  }
+ },
+ "job_archer_thigh": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_archer_thigh.webp",
+  "w": 93,
+  "h": 140,
+  "meta": {
+   "sheetX": 38,
+   "sheetY": 522,
+   "sheetW": 280,
+   "sheetH": 420,
+   "pivotX": 170,
+   "pivotY": 563
+  }
+ },
+ "job_archer_torso": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_archer_torso.webp",
+  "w": 147,
+  "h": 183,
+  "meta": {
+   "sheetX": 502,
+   "sheetY": 22,
+   "sheetW": 440,
+   "sheetH": 548,
+   "pivotX": 797,
+   "pivotY": 486
+  }
+ },
+ "job_archer_uarm": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_archer_uarm.webp",
+  "w": 61,
+  "h": 111,
+  "meta": {
+   "sheetX": 998,
+   "sheetY": 142,
+   "sheetW": 184,
+   "sheetH": 332,
+   "pivotX": 1068,
+   "pivotY": 123
+  }
+ },
+ "job_mage_design": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_mage_design.webp",
+  "w": 309,
+  "h": 384,
+  "meta": {}
+ },
+ "job_mage_farm": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_mage_farm.webp",
+  "w": 85,
+  "h": 133,
+  "meta": {
+   "sheetX": 1278,
+   "sheetY": 138,
+   "sheetW": 256,
+   "sheetH": 400,
+   "pivotX": 1331,
+   "pivotY": 169
+  }
+ },
+ "job_mage_head": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_mage_head.webp",
+  "w": 180,
+  "h": 131,
+  "meta": {
+   "sheetX": 22,
+   "sheetY": 58,
+   "sheetW": 540,
+   "sheetH": 392,
+   "pivotX": 259,
+   "pivotY": 437
+  }
+ },
+ "job_mage_head_attack": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_mage_head_attack.webp",
+  "w": 177,
+  "h": 127,
+  "meta": {
+   "sheetX": 28,
+   "sheetY": 64,
+   "sheetW": 530,
+   "sheetH": 381,
+   "pivotX": 259,
+   "pivotY": 437
+  }
+ },
+ "job_mage_head_hurt": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_mage_head_hurt.webp",
+  "w": 163,
+  "h": 119,
+  "meta": {
+   "sheetX": 40,
+   "sheetY": 64,
+   "sheetW": 488,
+   "sheetH": 358,
+   "pivotX": 259,
+   "pivotY": 437
+  }
+ },
+ "job_mage_scarf": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_mage_scarf.webp",
+  "w": 197,
+  "h": 143,
+  "meta": {
+   "sheetX": 554,
+   "sheetY": 546,
+   "sheetW": 592,
+   "sheetH": 428,
+   "pivotX": 1105,
+   "pivotY": 587
+  }
+ },
+ "job_mage_shin": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_mage_shin.webp",
+  "w": 84,
+  "h": 131,
+  "meta": {
+   "sheetX": 342,
+   "sheetY": 566,
+   "sheetW": 252,
+   "sheetH": 392,
+   "pivotX": 426,
+   "pivotY": 597
+  }
+ },
+ "job_mage_thigh": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_mage_thigh.webp",
+  "w": 69,
+  "h": 143,
+  "meta": {
+   "sheetX": 74,
+   "sheetY": 530,
+   "sheetW": 208,
+   "sheetH": 428,
+   "pivotX": 178,
+   "pivotY": 559
+  }
+ },
+ "job_mage_torso": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_mage_torso.webp",
+  "w": 132,
+  "h": 163,
+  "meta": {
+   "sheetX": 526,
+   "sheetY": 50,
+   "sheetW": 396,
+   "sheetH": 488,
+   "pivotX": 698,
+   "pivotY": 492
+  }
+ },
+ "job_mage_uarm": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_mage_uarm.webp",
+  "w": 83,
+  "h": 119,
+  "meta": {
+   "sheetX": 942,
+   "sheetY": 114,
+   "sheetW": 248,
+   "sheetH": 356,
+   "pivotX": 1074,
+   "pivotY": 92
+  }
+ },
+ "job_swordsman_design": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_swordsman_design.webp",
+  "w": 291,
+  "h": 384,
+  "meta": {}
+ },
+ "job_swordsman_farm": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_swordsman_farm.webp",
+  "w": 68,
+  "h": 123,
+  "meta": {
+   "sheetX": 1306,
+   "sheetY": 130,
+   "sheetW": 204,
+   "sheetH": 368,
+   "pivotX": 1347,
+   "pivotY": 170
+  }
+ },
+ "job_swordsman_head": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_swordsman_head.webp",
+  "w": 128,
+  "h": 117,
+  "meta": {
+   "sheetX": 58,
+   "sheetY": 66,
+   "sheetW": 384,
+   "sheetH": 352,
+   "pivotX": 208,
+   "pivotY": 397
+  }
+ },
+ "job_swordsman_head_attack": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_swordsman_head_attack.webp",
+  "w": 124,
+  "h": 111,
+  "meta": {
+   "sheetX": 60,
+   "sheetY": 72,
+   "sheetW": 372,
+   "sheetH": 333,
+   "pivotX": 208,
+   "pivotY": 397
+  }
+ },
+ "job_swordsman_head_hurt": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_swordsman_head_hurt.webp",
+  "w": 123,
+  "h": 111,
+  "meta": {
+   "sheetX": 52,
+   "sheetY": 80,
+   "sheetW": 370,
+   "sheetH": 334,
+   "pivotX": 208,
+   "pivotY": 397
+  }
+ },
+ "job_swordsman_scarf": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_swordsman_scarf.webp",
+  "w": 147,
+  "h": 123,
+  "meta": {
+   "sheetX": 690,
+   "sheetY": 574,
+   "sheetW": 440,
+   "sheetH": 368,
+   "pivotX": 1094,
+   "pivotY": 628
+  }
+ },
+ "job_swordsman_shin": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_swordsman_shin.webp",
+  "w": 75,
+  "h": 136,
+  "meta": {
+   "sheetX": 438,
+   "sheetY": 558,
+   "sheetW": 224,
+   "sheetH": 408,
+   "pivotX": 522,
+   "pivotY": 598
+  }
+ },
+ "job_swordsman_thigh": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_swordsman_thigh.webp",
+  "w": 73,
+  "h": 132,
+  "meta": {
+   "sheetX": 62,
+   "sheetY": 542,
+   "sheetW": 220,
+   "sheetH": 396,
+   "pivotX": 179,
+   "pivotY": 581
+  }
+ },
+ "job_swordsman_torso": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_swordsman_torso.webp",
+  "w": 123,
+  "h": 156,
+  "meta": {
+   "sheetX": 474,
+   "sheetY": 50,
+   "sheetW": 368,
+   "sheetH": 468,
+   "pivotX": 714,
+   "pivotY": 482
+  }
+ },
+ "job_swordsman_uarm": {
+  "pack": "P03_Jobs",
+  "url": "assets/P03_Jobs/job_swordsman_uarm.webp",
+  "w": 71,
+  "h": 116,
+  "meta": {
+   "sheetX": 946,
+   "sheetY": 130,
+   "sheetW": 212,
+   "sheetH": 348,
+   "pivotX": 1055,
+   "pivotY": 164
+  }
  },
  "legacy_angel": {
   "pack": "P00_legacy",

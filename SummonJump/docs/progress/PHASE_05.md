@@ -61,7 +61,11 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - `SJ_P04_Spirits_Part1–4` → pack `P04_Spirits` (79/79 files, no warnings): spirit art is picked up from `spirits.csv`, item/rune icons from `items.csv` and rune names.
 - `Summon_Jump_v3_Part3_VFX_Env` (P03 brief Part 3, imported as `SJ_P03_VFX_Env_Part3`) → pack `P03_VFX_Env` (17/17): painted sword slashes, hit spark / critical burst, skill casts (`skills.csv` `vfx`, closest painting via an alias table in `src/vfx/Art.ts`), ultimate hits (jelly splash, tornado, meteor, holy pillar, wave), ultimate aura, level-up pillar, spirit element casts, poring-family death splash, painted pipe and boulder wall. Code-drawn effects stay as the fallback.
 - Summon reveal: painted portal + beam (4★) / star (5★) behind the cards.
-- Received and checked, **stored for later** (owner: "เก็บไว้ก่อน ค่อยทำ") in `art-store/` (see its README): P03 Jobs (86/86), P01 World Props (29/29), P05 Portal NPC (3/3), P03 Gear + Cards/Skills (42/42). All names, sizes and backgrounds match the briefs.
+- Received and checked (all names, sizes and backgrounds match the briefs), sources kept in `art-store/`, then wired (owner: "ใช้เฉพาะภาพที่ได้ ลุยทำเกมต่อ"):
+  - P03 Gear + Cards/Skills (42) and P03 Jobs parts 2–4: item, card and skill icons (menus + HUD skill buttons), big ultimate forms of the 5 original spirits, painted projectiles/zones (arrow, fire/cold/lightning bolt, soul strike, fire wall, ankle trap, pneuma, tornado) and cast effects.
+  - P01 World Props (29) + P05 Portal NPC (3): painted NPCs with a talk pose, signs, altar, anvil, save statue (lights up when used), chests (open), rune plates, portal gate, rock rubble.
+  - P03 Jobs part 1 + 5: `npm run art:jobs` cuts each job's parts sheet into rig pieces (`tools/art-import/job-parts.json`: piece rects + joint pivots from the dots), masks out neighbouring pieces, and lines up the expression heads. The rig wears the job's parts, the equipped weapon's own painting, a battle-shout face while attacking/casting and a pained face when hit. Job-change cards show each job's design picture.
+- Not used yet: `prop_pipe_top/body`, `prop_rock_wall`, `prop_gate_*`, `prop_fountain`, `prop_ladder`, `prop_water_surface`, `prop_door_wood`, `arm_0X_torso/uarm` armour overlays, spirit `ult_*` icons.
 - Still waiting: P05 monsters (forest / sky / abyss) and zone packs.
 
 ## Known issues / notes

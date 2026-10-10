@@ -14,7 +14,8 @@
     "content": "tsx tools/content-build.ts",
     "levels": "tsx tools/levels/build-levels.ts",
     "balance": "tsx tools/balance.ts",
-    "art:import": "tsx tools/art-import/index.ts"
+    "art:import": "tsx tools/art-import/index.ts",
+    "art:jobs": "tsx tools/art-import/jobParts.ts"
   },
   "dependencies": {
     "phaser": "4.2.1"

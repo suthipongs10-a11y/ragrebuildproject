@@ -1,5 +1,6 @@
 import { canChangeJob, skillDef, type JobId } from '@shared/index';
 import { t } from '../../i18n';
+import { ART } from '../../assets/manifest.generated';
 import type { HeroSession } from '../../hero/HeroSession';
 import './job.css';
 
@@ -21,7 +22,7 @@ export function jobTab(s: HeroSession): string {
     const why = canChangeJob(h, c, j.id as JobId);
     const skills = j.skills.map((id) => skillDef(c, id)).filter((d) => d && d.type === 'active').map((d) => `<span class="jb-chip">${t(d?.name_key ?? '')}</span>`).join('');
     return `<div class="jb-card">
-      <div class="jb-top"><span class="jb-icon">${ICON[j.id] ?? '⭐'}</span><span class="grow"><b>${t(j.name_key)}</b><small>${t(`job.${j.id}.desc`)}</small></span></div>
+      <div class="jb-top">${ART[`job_${j.id}_design`] ? `<span class="jb-icon art" style="background-image:url(${ART[`job_${j.id}_design`]?.url})"></span>` : `<span class="jb-icon">${ICON[j.id] ?? '⭐'}</span>`}<span class="grow"><b>${t(j.name_key)}</b><small>${t(`job.${j.id}.desc`)}</small></span></div>
       <div class="jb-bars">${RATINGS.map((k) => bar(k, j.ratings[k] ?? 0)).join('')}</div>
       <ul class="jb-pc">${list(`job.${j.id}.pros`, '✓', 'pro')}${list(`job.${j.id}.cons`, '✗', 'con')}</ul>
       <div class="jb-skills"><small>${t('jobinfo.weapon')}: ${j.weapons.map((w) => t(`wtype.${w}`)).join(', ')} · ${t('jobinfo.skills')}</small>${skills}</div>
