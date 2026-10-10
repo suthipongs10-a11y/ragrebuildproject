@@ -1,6 +1,6 @@
 import './menu.css';
 import {
-  addItem, changeJob, createRng, equip, instance, itemDef, learnSkill, raiseStat, refineCost, rollRefine, setSlot, socketCard, unequip, useItem, EQUIP_SLOTS,
+  addItem, changeJob, claimBook, createRng, equip, instance, itemDef, learnSkill, raiseStat, refineCost, rollRefine, setSlot, socketCard, unequip, useItem, EQUIP_SLOTS,
   type EquipSlot, type JobId, type StatKey,
 } from '@shared/index';
 import { ART } from '../../assets/manifest.generated';
@@ -11,9 +11,10 @@ import { bagTab, cardsTab, equipTab, jobTab, refineTab, shopTab, skillsTab, stat
 import { bookTab, newSpiritMenuState, spiritsTab, summonTab } from './spiritTabs';
 import { spiritAct } from './spiritActions';
 import './spirits.css';
+import { adventureTab } from './adventureTab';
 
-export type MenuTab = 'status' | 'skills' | 'equip' | 'bag' | 'cards' | 'spirits' | 'book' | 'job' | 'refine' | 'shop' | 'summon';
-const MAIN_TABS: MenuTab[] = ['status', 'skills', 'equip', 'bag', 'cards', 'spirits', 'book', 'summon'];
+export type MenuTab = 'status' | 'skills' | 'equip' | 'bag' | 'cards' | 'spirits' | 'book' | 'adventure' | 'job' | 'refine' | 'shop' | 'summon';
+const MAIN_TABS: MenuTab[] = ['status', 'skills', 'equip', 'bag', 'cards', 'spirits', 'book', 'summon', 'adventure'];
 
 export interface MenuHost {
   session: HeroSession; save: SaveData;
@@ -73,7 +74,7 @@ export class Menu {
     const body = { status: () => statusTab(h.session), skills: () => skillsTab(h.session), equip: () => equipTab(h.session, h.save), cards: () => cardsTab(h.session, h.save),
       job: () => jobTab(h.session), refine: () => refineTab(h.session, h.save), shop: () => shopTab(h.session, h.save),
       spirits: () => spiritsTab(h.session, h.save, this.sp), summon: () => summonTab(h.session, this.sp),
-      bag: () => bagTab(h.session, h.save), book: () => bookTab(h.session, this.sp) }[this.tab]();
+      bag: () => bagTab(h.session, h.save), book: () => bookTab(h.session, this.sp), adventure: () => adventureTab(h.session, h.save) }[this.tab]();
     const scroll = this.root.querySelector('.mn-body')?.scrollTop ?? 0;
     this.root.innerHTML = `<div class="mn"><div class="mn-top"><div class="mn-tabs">${tabs}</div><button class="mn-x" data-act="close" aria-label="close">✕</button></div>
       ${this.note ? `<div class="mn-note" style="color:#ffd88a">${this.note}</div>` : ''}<div class="mn-body">${body}</div></div>`;
@@ -111,6 +112,7 @@ export class Menu {
       case 'buy': { const it = itemDef(c, x); if (it && h.save.zeny >= it.price && addItem(d, c, x, 1)) { h.save.zeny -= it.price; this.note = t('combat.got').replace('{name}', t(it.name_key)); } break; }
       case 'sell': { const it = instance(d, Number(x)); if (it) { const def = itemDef(c, it.id); h.save.zeny += Math.floor((def?.price ?? 0) / 2) * it.count; d.bag.splice(d.bag.indexOf(it), 1); } break; }
       case 'refine': this.refine(Number(x)); break;
+      case 'bookclaim': if (claimBook(c, s.book, x, h.save.seen)) this.note = t('adv.claimed'); break;
       default: changed = false;
     }
     if (changed) { s.recompute(); h.flush(); h.onEquipChanged(); }

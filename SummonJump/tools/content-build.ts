@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import Papa from 'papaparse';
 import { isElement } from '../shared/formulas/elements';
 import type {
-  ContentBundle, MonsterDef, DropDef, ItemDef, CardDef, SpiritDef, SkillDef, JobDef, SpiritSkillDef, SpiritElementDef, SummonDef, RuneSetDef, RuneStatDef, RuneUpgradeDef, RuneDropDef,
+  ContentBundle, MonsterDef, DropDef, ItemDef, CardDef, SpiritDef, SkillDef, JobDef, SpiritSkillDef, SpiritElementDef, SummonDef, RuneSetDef, RuneStatDef, RuneUpgradeDef, RuneDropDef, BookEntryDef,
 } from '../shared/content/types';
 import { evalExpr } from '../shared/formulas/expr';
 
@@ -151,6 +151,16 @@ for (const j of jobs) {
   if (!itemIds.has(j.starter_weapon)) err(`job ${j.id}: unknown starter weapon ${j.starter_weapon}`);
   for (const s of j.skills) { const d = skills.find((x) => x.id === s); if (!d) err(`job ${j.id}: unknown skill ${s}`); else if (d.owner !== j.id) err(`job ${j.id}: skill ${s} belongs to ${d.owner}`); }
 }
+const book: BookEntryDef[] = read('book').map((r) => ({
+  id: r.id ?? '', kind: (r.kind ?? 'kill') as BookEntryDef['kind'], target: (r.target ?? '').split('|').filter(Boolean), count: num(r, 'count', 'book'),
+  reward: json(r, 'reward', 'book') as Record<string, number>, note: r.note ?? '',
+}));
+uniqueIds(book, 'book');
+for (const b of book) {
+  if (!['kill', 'card', 'spirit', 'map'].includes(b.kind)) err(`book ${b.id}: unknown kind ${b.kind}`);
+  if (b.kind === 'kill' && !monIds.has(b.target[0] ?? '')) err(`book ${b.id}: unknown monster ${b.target[0]}`);
+  if (!Object.keys(b.reward).length) err(`book ${b.id}: no reward`);
+}
 
 // ── spirits / summon / runes ──
 const sskill = new Map(spiritSkills.map((s) => [s.id, s]));
@@ -191,7 +201,7 @@ if (errors.length) {
 }
 const bundle: ContentBundle = {
   contentVersion: new Date().toISOString().slice(0, 10), monsters, drops, items, cards, spirits, skills, jobs,
-  spiritSkills, spiritElements, spiritConfig, summon, runeSets, runeStats, runeUpgrade, runeDrop,
+  spiritSkills, spiritElements, spiritConfig, summon, runeSets, runeStats, runeUpgrade, runeDrop, book,
 };
 mkdirSync(OUT, { recursive: true });
 writeFileSync(join(OUT, 'content.json'), JSON.stringify(bundle));

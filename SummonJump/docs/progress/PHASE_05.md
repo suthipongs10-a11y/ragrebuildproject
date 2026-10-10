@@ -31,7 +31,7 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Mini-boss scripts (Spore Mother, Thunder Ram, Siren, Shark) + MVP phase scripts (Storm Roc, Kraken phase 2)
 - [x] Levels: forest 1–4 + deep 1–2, sky 1–6, abyss 1–6 (background variations), reachability test
 - [x] MVP / mini respawn timers shown in the room
-- [ ] Adventure Book (tracking + milestones + permanent stats + menu tab)
+- [x] Adventure Book (tracking + milestones + permanent stats + menu tab)
 - [ ] Daily dungeon (offline prototype)
 - [ ] Tower floors 1–20 (offline)
 - [ ] Balance sheet + simulation tool; tune EXP / HP / drops

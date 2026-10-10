@@ -6,6 +6,7 @@
 - Boss scripts: Spore Mother, Thunder Ram, Siren, Sawtooth Shark, Storm Roc (MVP, tornado phase), Kraken phase 2; every boss enrages under 50 %.
 - 18 maps in zones 1–3 (forest/deep, sky, abyss) with background variations; reachability test with real physics.
 - Mini-boss / MVP respawn timer shown in the room, boss returns when it hits zero.
+- Adventure Book (สมุดผจญภัย): 46 milestones (kills per monster, cards, spirit dex, maps per zone) → permanent stats.
 
 ## Phase 4 (done) — 2026-10-09
 - 15 spirit families × element variants (`spirits.csv`, `spirit_skills.csv`, `spirit_elements.csv`, `spirit_config.csv`).

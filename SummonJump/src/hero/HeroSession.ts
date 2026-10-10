@@ -1,6 +1,6 @@
 import {
-  addItem, addRune, addSpirit, changeJob, createRng, rollRune, equip, expToNext, derive, gainExp, jobOf, leaderBonus, learnSkill, maxHp, maxSp, newHero, newSkillRuntime, raiseStat, starterBox,
-  type ContentBundle, type Derived, type HeroData, type JobId, type LevelUpResult, type SkillRuntime, type SpiritBox, type StatKey,
+  addItem, addRune, addSpirit, bookBonus, changeJob, emptyBook, noteDex, createRng, rollRune, equip, expToNext, derive, gainExp, jobOf, leaderBonus, learnSkill, maxHp, maxSp, newHero, newSkillRuntime, raiseStat, starterBox,
+  type ContentBundle, type Derived, type HeroData, type JobId, type LevelUpResult, type SkillRuntime, type SpiritBox, type StatKey, type BookData,
 } from '@shared/index';
 import type { SaveData } from '../save/local';
 
@@ -16,15 +16,20 @@ export class HeroSession {
   constructor(readonly content: ContentBundle, readonly save: SaveData) {
     if (!save.hero) save.hero = migrate(save, content);
     if (!save.spirits) save.spirits = newBox(content, save.hero);
+    if (!save.book) { save.book = emptyBook(); for (const id of Object.keys(save.cards)) save.book.cards[id] = true; }
+    noteDex(save.book, save.spirits);
     this.recompute();
     this.rt = newSkillRuntime(save.hero.sp ?? maxSp(this.derived.build));
   }
 
   get data(): HeroData { return this.save.hero as HeroData; }
   get box(): SpiritBox { return this.save.spirits as SpiritBox; }
+  get book(): BookData { return this.save.book as BookData; }
 
   recompute(): void {
-    this.derived = derive(this.data, this.content, this.rt?.buffs ?? [], this.rt?.time ?? 0, leaderBonus(this.box, this.content));
+    const lead = leaderBonus(this.box, this.content), perm = bookBonus(this.content, this.book);
+    for (const [k, v] of Object.entries(lead.effects)) perm[k] = (perm[k] ?? 0) + v;
+    this.derived = derive(this.data, this.content, this.rt?.buffs ?? [], this.rt?.time ?? 0, { element: lead.element, effects: perm });
     const mh = maxHp(this.derived.build), ms = maxSp(this.derived.build);
     if (this.rt) this.rt.sp = Math.min(this.rt.sp, ms);
     if (this.data.hp !== null) this.data.hp = Math.min(this.data.hp, mh);

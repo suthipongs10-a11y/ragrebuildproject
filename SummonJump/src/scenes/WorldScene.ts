@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { Cell, TILE, checkExit, createHero, exitsOf, stepHero, aliveSpawns, pruneDefeated, unstick, P,
   type EntityData, type HeroState, type LevelData, type MotionEnv, type MotionEvent, type TileGrid } from '@shared/platformer';
-import { createRng, moveSpeed } from '@shared/index';
+import { createRng, moveSpeed, noteDex } from '@shared/index';
 import type { ContentBundle } from '@shared/content/types';
 import { loadTextures, roomKeys } from '../assets/packs';
 import { setLoading, showLoadProblem } from '../ui/errors';
@@ -373,6 +373,7 @@ export class WorldScene extends Phaser.Scene {
 
   /** Team / runes / awakening changed in the menu: new followers, abilities and leader bonus. */
   private onSpiritsChanged(): void {
+    noteDex(this.session.book, this.session.box);
     this.session.recompute();
     this.combat.resetSpirits(this.hero);
     this.refreshAbilities();

@@ -231,3 +231,16 @@ test('phase 4: bag and equipment are separate tabs; spirit book lists every fami
   await page.keyboard.press('KeyM');
   expect(errors).toEqual([]);
 });
+
+test('phase 5: adventure book milestone can be claimed for a permanent bonus', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=town');
+  await ws(page, (w) => { w.session.book.kills.poring = 50; });
+  const hp0 = await ws(page, (w) => w.combat.maxHp);
+  await ws(page, (w) => w.openMenu('adventure'));
+  await page.click('[data-act="bookclaim:kill_poring"]');
+  expect(await ws(page, (w) => !!w.session.book.claimed.kill_poring)).toBe(true);
+  expect(await ws(page, (w) => w.combat.maxHp)).toBe(hp0 + 20);
+  await page.click('[data-act="close"]');
+  expect(errors).toEqual([]);
+});

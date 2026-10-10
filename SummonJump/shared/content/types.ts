@@ -55,6 +55,9 @@ export interface RuneSetDef { id: string; name_key: string; pieces: number; bonu
 export interface RuneStatDef { stat: string; name_key: string; flat: boolean; main_slots: number[]; main_lo: number; main_hi: number; sub_lo: number; sub_hi: number }
 export interface RuneUpgradeDef { lv: number; rate: number; zeny: number }
 export interface RuneDropDef { tier: string; chance: number; star_lo: number; star_hi: number; rarity: number[] }
+/** book.csv: Adventure Book milestones (permanent stat rewards). target: monster id, 'any', or room ids for maps. */
+export interface BookEntryDef { id: string; kind: 'kill' | 'card' | 'spirit' | 'map'; target: string[]; count: number; reward: Record<string, number>; note: string }
+
 /** summon.csv: rates[i] = chance of (i+1)★; elements 'pick' = player chooses. */
 export interface SummonDef { id: string; item: string; name_key: string; elements: string[]; rates: number[]; pity_n: number; pity_star: number }
 
@@ -82,4 +85,5 @@ export interface ContentBundle {
   runeStats: RuneStatDef[];
   runeUpgrade: RuneUpgradeDef[];
   runeDrop: RuneDropDef[];
+  book: BookEntryDef[];
 }

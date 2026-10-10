@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import {
   addItem, createEnemy, createHeroCombat, MAX_STEP, stepEnemy, stepHeroCombat, stepShots, stepSkills, useSkill, rollKill, markDefeated, maxHp, maxSp, isSolidCell, TILE, moveBody,
-  addGauge, addRune, createSpiritWorld, followSpirits, rollRuneDrop, spiritLifesteal, stepSpirits, teamExp, ultimate,
+  addGauge, addRune, noteCard, noteKill, createSpiritWorld, followSpirits, rollRuneDrop, spiritLifesteal, stepSpirits, teamExp, ultimate,
   type Enemy, type EnemyCtx, type EnemyEvent, type HeroCombat, type HeroState, type LevelData, type Rng, type Shot, type TileGrid, type Body, type CombatEvent, type SkillCtx, type SkillEvent,
   type SpiritEvent, type SpiritStepCtx, type SpiritWorld, type UltResult,
 } from '@shared/index';
@@ -188,6 +188,7 @@ export class CombatController {
     this.save.zeny += r.zeny;
     const lv = this.session.reward(r.exp, r.jobExp);
     if (lv.baseUps || lv.jobUps) this.levelUps.push({ kind: 'levelup', base: lv.baseUps, job: lv.jobUps });
+    noteKill(this.session.book, e.def.id);
     const box = this.session.box;
     if (teamExp(box, r.exp).length) { popInfo(sc, cx, e.y - 70, t('spirit.levelup'), '#8ff0bf'); this.resetSpirits({ x: cx, y: cy, w: 0, h: 0, vx: 0, vy: 0, onGround: false }); }
     const rune = rollRuneDrop(this.session.content, e.def.tier, this.rng, 1 + this.session.derived.build.stats.luk * 0.02);
@@ -216,7 +217,7 @@ export class CombatController {
       if (this.level.water && p.vy > 120) p.vy = 120;
       p.obj.setPosition(p.x + p.w / 2, p.y + p.h / 2 - (p.onGround ? 4 + Math.sin(p.age * 5) * 3 : 0));
       if (p.age > 0.35 && p.x < hero.x + hero.w + 8 && p.x + p.w > hero.x - 8 && p.y < hero.y + hero.h && p.y + p.h > hero.y) {
-        if (p.kind === 'card') this.save.cards[p.id] = (this.save.cards[p.id] ?? 0) + p.count;
+        if (p.kind === 'card') { this.save.cards[p.id] = (this.save.cards[p.id] ?? 0) + p.count; noteCard(this.session.book, p.id); }
         else if (!addItem(this.session.data, this.session.content, p.id, p.count)) { popInfo(this.scene, p.x, p.y - 10, t('combat.bagfull'), '#ff9b9b'); continue; }
         const name = t(p.kind === 'card' ? `card.${p.id.replace(/^card_/, '')}` : `item.${p.id}`);
         popInfo(this.scene, p.x + p.w / 2, p.y - 10, t(p.kind === 'card' ? 'combat.card' : 'combat.got').replace('{name}', name), p.kind === 'card' ? '#e2d2ff' : '#ffd88a');

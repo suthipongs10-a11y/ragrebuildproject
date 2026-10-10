@@ -25,3 +25,6 @@
 .mn-note { color: var(--muted); font-size: 13px; padding: 4px 8px; }
 .mn-tag { font-size: 11px; padding: 1px 6px; border-radius: 6px; background: #4a3a26; margin-left: 4px; }
 .t-rare { color: #8fc8ff; } .t-legend { color: #ffd88a; } .t-mvp { color: #ff8fb1; }
+.adv-bar { display: block; height: 5px; border-radius: 3px; background: rgba(0, 0, 0, .35); margin-top: 3px; overflow: hidden; }
+.adv-bar i { display: block; height: 100%; background: #c99a4a; }
+.adv-done { opacity: .55; }
