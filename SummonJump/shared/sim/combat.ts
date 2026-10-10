@@ -8,6 +8,8 @@ import type { Enemy, Shot } from './enemy';
 /** Hero side of combat: 3-hit combo, hitboxes, stomp, contact damage, i-frames. Pure; the client renders events. */
 export interface HeroCombat {
   hp: number; inv: number; atkT: number; atkCd: number;
+  /** seconds since the hero last took damage (out-of-combat regen) */
+  calm: number;
   /** 0,1,2 = attack1..3 of the current combo; reset when the chain window closes */
   combo: number; chainT: number; hitSet: Set<string>; dead: boolean;
   /** energy shield pool (absorbs damage) */
@@ -34,7 +36,7 @@ export interface Box { x: number; y: number; w: number; h: number }
 export const overlap = (a: Box, b: Box): boolean => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
 
 export function createHeroCombat(build: HeroBuild): HeroCombat {
-  return { hp: maxHp(build), inv: 0, atkT: 0, atkCd: 0, combo: 0, chainT: 0, hitSet: new Set(), dead: false, buf: 0, shield: 0 };
+  return { hp: maxHp(build), inv: 0, calm: 0, atkT: 0, atkCd: 0, combo: 0, chainT: 0, hitSet: new Set(), dead: false, buf: 0, shield: 0 };
 }
 
 export const currentSpec = (c: HeroCombat): AttackSpec => COMBO[c.combo] as AttackSpec;
@@ -59,6 +61,7 @@ export function stepHeroCombat(
   const ev: CombatEvent[] = [];
   if (c.dead) return ev;
   if (c.inv > 0) c.inv -= dt;
+  c.calm += dt;
   if (c.atkCd > 0) c.atkCd -= dt;
   if (c.chainT > 0) c.chainT -= dt; else if (c.atkT <= 0) c.combo = 0;
 
@@ -139,7 +142,7 @@ export function hurtHero(c: HeroCombat, hero: Body, build: HeroBuild, atk: numbe
   if (c.inv > 0 || c.dead) return;
   let amount = Math.max(1, Math.round(atk * rng.range(0.9, 1.1) - defense(build) * 0.6));
   if (c.shield > 0) { const a = Math.min(c.shield, amount); c.shield -= a; amount -= a; }
-  c.hp -= amount; c.inv = 1;
+  c.hp -= amount; c.inv = 1; c.calm = 0;
   if (!noKnockback) { hero.vx = (hero.x + hero.w / 2 < srcX ? -1 : 1) * 320; hero.vy = water ? -240 : -440; }
   ev.push({ kind: 'hurt', amount, x: hero.x + hero.w / 2, y: hero.y });
   if (c.hp <= 0) { c.hp = 0; c.dead = true; ev.push({ kind: 'died' }); }

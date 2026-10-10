@@ -25,7 +25,7 @@ import { popNumber } from '../vfx/DamageText';
 import { bindDebugKeys } from './debugKeys';
 import { BossTimers } from '../world/BossTimers';
 import { ArenaController, arenaKeys, enterArena } from '../world/Arena';
-import { autoStep } from '../hero/AutoBattle';
+import { autoPilot, NO_PILOT } from '../hero/AutoPilot';
 import { applyHeroLook, sessionArtKeys } from '../hero/HeroArt';
 import { Guide } from '../hero/Guide';
 import { loadTeamArt, teamAbilitySet, tryUltimate, ultHost, UltButton } from '../spirits/SpiritPlay';
@@ -47,7 +47,7 @@ export class WorldScene extends Phaser.Scene {
   grid!: TileGrid;
   controls!: Controls;
   readonly room = new RoomInteractions(this);
-  private rig!: HeroRig;
+  rig!: HeroRig;
   combat!: CombatController;
   session!: HeroSession;
   private bars!: Hud;
@@ -134,7 +134,8 @@ export class WorldScene extends Phaser.Scene {
     this.prompt = this.add.text(0, 0, '▲', { ...f, fontSize: '26px', color: '#ffd88a' }).setOrigin(0.5, 1).setDepth(50).setVisible(false);
     this.dialog = new DialogBox(this);
     this.bars = new Hud(this);
-    this.guide = new Guide(this, this.session, this.save, (m) => this.toast(m), () => this.flush(), (txt) => this.openDialog('', [txt]));
+    this.guide = new Guide(this, this.session, this.save, (m) => this.toast(m), () => this.flush(), (txt) => this.openDialog('', [txt]), () => this.applyLook(),
+      () => this.level.id, (r) => (this.level.id === 'arena' || this.combat.combat.dead ? this.toast(t('quest.noGo')) : this.goRoom(r, { kind: 'default' }, 250)));
     this.menu = this.registry.get('menu') as Menu;
     this.menu.attach({
       session: this.session, save: this.save, flush: () => this.flush(),
@@ -253,25 +254,21 @@ export class WorldScene extends Phaser.Scene {
 
     let jumpPressed = !talking && c.pressed('jump');
     if (near && c.pressed('up')) { near.use(); jumpPressed = false; } // ▲ near an object = interact, not jump
-    // next to a rock wall: attack OR ▲ smashes it (players kept missing the attack key)
-    const rockSide = this.room.touchingRock(1) ? 1 : this.room.touchingRock(-1) ? -1 : 0;
-    if (!talking && rockSide && !near) {
-      this.prompt.setText(this.abilities.has('break') ? t('rock.prompt') : '✖').setVisible(true)
-        .setPosition(this.hero.x + this.hero.w / 2, this.hero.y - 20 + Math.sin(this.time.now / 140) * 3);
-      if (c.pressed('up')) { jumpPressed = false; this.hero.dir = rockSide as 1 | -1; this.room.swing(); }
-    }
+    const rockSide = this.room.rockPrompt(talking, near, c);
+    if (rockSide && c.pressed('up')) jumpPressed = false;
 
     const dead = this.combat.combat.dead;
     const frozen = this.combat.hitstop > 0;
-    const dir = talking || dead ? 0 : (((c.state.right ? 1 : 0) - (c.state.left ? 1 : 0)) as -1 | 0 | 1);
+    const steer = talking || dead ? 0 : (((c.state.right ? 1 : 0) - (c.state.left ? 1 : 0)) as -1 | 0 | 1);
+    const pilot = !talking && !dead && !frozen ? autoPilot(this, steer !== 0 || c.state.jump, dt) : NO_PILOT; // AUTO hunt / tapped target
+    const dir = steer || pilot.dir;
     const env: MotionEnv = { grid: this.grid, water: this.level.water, abilities: { double: this.abilities.has('double'), dive: this.abilities.has('dive'), glide: this.abilities.has('cloud') }, moveSpeed: moveSpeed(this.session.derived.build), exits: exitsOf(this.level) };
     if (!frozen) {
-      const events = stepHero(this.hero, { dir, jumpPressed: jumpPressed && !dead, jumpHeld: !talking && !dead && c.state.jump, down: c.state.down }, env, dt);
+      const events = stepHero(this.hero, { dir, jumpPressed: (jumpPressed || pilot.jump) && !dead, jumpHeld: !talking && !dead && (c.state.jump || pilot.hold), down: c.state.down || pilot.down }, env, dt);
       this.onEvents(events);
     }
     const atkOk = !talking && !dead;
-    const auto = atkOk && !frozen && autoStep(this.session, this.combat, this.hero, this.rig, dir !== 0, dt);
-    const fight = this.combat.update(dt, this.hero, { attackPressed: atkOk && c.pressed('atk'), attackHeld: atkOk && (c.state.atk || auto), jumpHeld: c.state.jump }, this.time.now / 1000);
+    const fight = this.combat.update(dt, this.hero, { attackPressed: atkOk && c.pressed('atk'), attackHeld: atkOk && (c.state.atk || pilot.attack), jumpHeld: c.state.jump }, this.time.now / 1000);
     for (const ev of fight) {
       if (ev.kind === 'swing') { this.rig.play(ev.spec.clip, true); this.room.swing(); }
       if (ev.kind === 'hurt') this.rig.play('hurt', true);
@@ -322,10 +319,11 @@ export class WorldScene extends Phaser.Scene {
     c.endFrame();
   }
 
+  /** Easier dying: get back up at this room's safe spot with full HP (arena runs still end in town). */
   private respawnAfterDeath(): void {
-    this.combat.heal();
-    this.flush();
-    this.goHome(t('combat.dead'));
+    this.combat.heal(); this.flush();
+    if (this.level.id === 'arena') { this.goHome(t('combat.dead')); return; }
+    this.fallRespawn(t('combat.revive')); this.combat.combat.inv = 2.5; this.rig.play('idle', true);
   }
 
   private onEvents(events: MotionEvent[]): void {
@@ -344,10 +342,10 @@ export class WorldScene extends Phaser.Scene {
     this.tweens.add({ targets: r, scale: 3, alpha: 0, duration: 280, onComplete: () => r.destroy() });
   }
 
-  private fallRespawn(): void {
+  private fallRespawn(msg = t('fall.sky')): void {
     const h = this.hero, s = this.level.safe ?? { x: 2, y: 4 };
     h.x = s.x * TILE; h.y = (s.y + 1) * TILE - h.h; h.vx = h.vy = 0;
-    this.toast(t('fall.sky'));
+    this.toast(msg);
   }
 
   // ───────────────────────── ui helpers ─────────────────────────

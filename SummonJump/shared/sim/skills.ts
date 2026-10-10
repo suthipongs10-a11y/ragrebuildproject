@@ -60,6 +60,9 @@ export function useSkill(rt: SkillRuntime, ctx: SkillCtx, id: string): SkillEven
   return fire(rt, ctx, s, lv);
 }
 
+/** Out-of-combat regen: after this many seconds without damage, +6 % HP and +4 % SP every 2 s. */
+export const CALM_AFTER = 4, CALM_HP = 0.06, CALM_SP = 0.04;
+
 /** Advance cast bars, zones, buffs, regen. Call every frame. */
 export function stepSkills(rt: SkillRuntime, ctx: SkillCtx, dt: number): SkillEvent[] {
   const ev: SkillEvent[] = [];
@@ -74,7 +77,10 @@ export function stepSkills(rt: SkillRuntime, ctx: SkillCtx, dt: number): SkillEv
   if (rt.regenT >= 2 && !ctx.combat.dead) {
     rt.regenT = 0;
     rt.sp = Math.min(maxSp(b), rt.sp + 1 + b.stats.int / 6 + ctx.derived.spRegen);
-    if (ctx.combat.inv <= 0) ctx.combat.hp = Math.min(maxHp(b), ctx.combat.hp + Math.max(1, maxHp(b) / 200) + ctx.derived.hpRegen * 2);
+    // out of combat (no hit for 4 s): fast regen so players rarely need potions between fights
+    const calm = (ctx.combat.calm ?? 0) >= CALM_AFTER;
+    if (ctx.combat.inv <= 0) ctx.combat.hp = Math.min(maxHp(b), ctx.combat.hp + Math.max(1, maxHp(b) / 200) + ctx.derived.hpRegen * 2 + (calm ? maxHp(b) * CALM_HP : 0));
+    if (calm) rt.sp = Math.min(maxSp(b), rt.sp + maxSp(b) * CALM_SP);
   }
   for (const z of rt.zones) {
     if (z.pneuma) { for (const s of ctx.shots) if (s.hostile && overlap({ x: s.x - s.r, y: s.y - s.r, w: s.r * 2, h: s.r * 2 }, z)) s.life = 0; continue; }

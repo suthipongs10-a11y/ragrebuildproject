@@ -30,12 +30,14 @@ export interface SaveData {
   arena: ArenaState | null;
   /** main quest chain position (quests.csv) */
   quest: QuestState | null;
+  /** spend stat / skill points by the job plan on every level-up */
+  autoGrow: boolean;
 }
 
 /** `?hero=job:lv` test heroes use their own slot so they never overwrite the real save. */
 const HERO_PARAM = new URLSearchParams(typeof location === 'undefined' ? '' : location.search).get('hero');
 const KEY = HERO_PARAM ? `summonjump-save-test-${HERO_PARAM.replace(/[^a-z0-9:]/gi, '')}` : 'summonjump-save-v1';
-export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {}, hp: null, exp: 0, soul: 0, inv: {}, cards: {}, hero: null, spirits: null, book: null, arena: null, quest: null });
+export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {}, hp: null, exp: 0, soul: 0, inv: {}, cards: {}, hero: null, spirits: null, book: null, arena: null, quest: null, autoGrow: true });
 
 export function loadSave(): SaveData {
   try {

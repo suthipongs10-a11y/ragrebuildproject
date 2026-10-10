@@ -57,6 +57,13 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Level unlocks (`content/unlocks.csv`) + guide quest chain (`content/quests.csv`, `shared/progression/guide.ts`, `src/hero/Guide.ts`).
 - [x] ROADMAP: world chat, rare-drop/MVP broadcast, offline farming, rested EXP → Phase 6; backlog list.
 
+## Owner request: easier to play (2026-10-10, ideas 1 2 5 8 10)
+- [x] **AUTO hunt** (`src/hero/AutoPilot.ts`): AUTO now walks to the nearest monster, hops walls / up to platforms (double jump when the team has it), drops through thin platforms, fights with skills, then collects map crystals; gives up on unreachable targets for 8 s; any direction / jump input takes over.
+- [x] **Tap / click a monster** → walk there and hit it (▼ marker), also with AUTO off.
+- [x] **One-tap growth** (`shared/progression/autoGrow.ts`, `jobs.csv` `auto_stats` / `auto_skills`): ⚡ แจกแต้มอัตโนมัติ (status), ⚡ เรียนสกิลแนะนำ (skills), ⚡ สวมของที่ดีที่สุด (equipment); switch "อัตโนมัติทุกครั้งที่เลเวลอัป" (on by default); "ของดีกว่า! สวมเลย" chip when a better item lands in the bag.
+- [x] **🧭 พาไป** next to the quest line: warps to the quest's room (monster's room, room to visit, town for summon / job / tower, a room at the hero's level for level quests).
+- [x] **Gentler start:** forest-zone monsters hit 30 % softer; out of combat (4 s without damage) +6 % HP / +4 % SP every 2 s; dying = get up at the room's safe spot with full HP (arena runs still end in town).
+
 ## Owner play-test fixes (2026-10-10)
 - [x] Job change while the bag is full kept the old sword: the starter weapon now always arrives (bag limit ignored for it); saves that lost it get it back on load. The rig also gets the new weapon picture while the menu has the game paused.
 - [x] Job change asks "แน่ใจแล้วนะ?" (confirm / cancel) before it happens.

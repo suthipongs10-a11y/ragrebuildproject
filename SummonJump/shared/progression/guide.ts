@@ -42,3 +42,28 @@ export function advanceQuest(c: ContentBundle, s: QuestState, f: QuestFacts): Qu
   s.base = next ? questBase(next, f) : 0;
   return q;
 }
+
+/** A room as the guide sees it: its id and the monsters spawned in it. */
+export interface GuideRoom { id: string; monsters: string[] }
+
+/**
+ * Where the current quest happens (for "🧭 พาไป"): the first room with the monster to beat, the room to visit,
+ * town for summon / job / tower, and for "reach level N" a room whose monsters fit the hero's level.
+ */
+export function questRoom(c: ContentBundle, q: QuestDef, rooms: readonly GuideRoom[], heroLv: number): string | null {
+  if (q.kind === 'kill') return rooms.find((r) => r.monsters.includes(q.target))?.id ?? null;
+  if (q.kind === 'visit') return rooms.some((r) => r.id === q.target) ? q.target : null;
+  if (q.kind === 'level') {
+    const lvOf = (id: string) => c.monsters.find((m) => m.id === id)?.level ?? 99;
+    let best: string | null = null, bestLv = -1, easiest: string | null = null, easiestLv = Infinity;
+    for (const r of rooms) {
+      const lvs = r.monsters.map(lvOf).filter((l) => l < 99);
+      if (!lvs.length) continue;
+      const avg = lvs.reduce((a, b) => a + b, 0) / lvs.length;
+      if (avg <= heroLv + 1 && avg > bestLv) { bestLv = avg; best = r.id; }
+      if (avg < easiestLv) { easiestLv = avg; easiest = r.id; }
+    }
+    return best ?? easiest; // nothing at the hero's level yet: the easiest room
+  }
+  return 'town';
+}

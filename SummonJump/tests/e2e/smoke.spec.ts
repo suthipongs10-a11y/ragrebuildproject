@@ -365,3 +365,35 @@ test('fixes: left mouse click on the game attacks', async ({ page, isMobile }) =
   await page.waitForFunction(() => { const w = (window as unknown as Any).__game.scene.getScene('World'); return w.combat.combat.atkCd > 0 || w.rig.current.startsWith('attack'); }, null, { timeout: 3000 });
   expect(errors).toEqual([]);
 });
+
+test('easy: AUTO hunts the room clean without any input', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=forest&hero=swordsman:12');
+  await page.keyboard.press('KeyT');
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').combat.enemies.every((e: Any) => e.dead), null, { timeout: 40_000 });
+  await page.keyboard.press('KeyT');
+  expect(errors).toEqual([]);
+});
+
+test('easy: quest 🧭 button travels, death respawns in the same room', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=town');
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').guide?.dest === 'forest', null, { timeout: 5000 });
+  await ws(page, (w) => w.guide.go.emit('pointerup'));
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').level?.id === 'forest', null, { timeout: 10_000 });
+  await ws(page, (w) => { w.combat.combat.hp = 0; w.combat.combat.dead = true; w.deadT = 0.05; });
+  await page.waitForFunction(() => { const w = (window as unknown as Any).__game.scene.getScene('World'); return !w.combat.combat.dead && w.combat.combat.hp > 0; }, null, { timeout: 5000 });
+  expect(await ws(page, (w) => w.level.id)).toBe('forest');
+  expect(errors).toEqual([]);
+});
+
+test('easy: one-tap stats in the status tab', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=town&hero=mage:20');
+  await ws(page, (w) => { w.save.autoGrow = false; w.session.data.statPoints = 40; w.openMenu('status'); });
+  await page.click('[data-act="autostat"]');
+  expect(await ws(page, (w) => w.session.data.statPoints)).toBeLessThan(10);
+  await page.click('[data-act="autogrow"]');
+  expect(await ws(page, (w) => w.save.autoGrow)).toBe(true);
+  expect(errors).toEqual([]);
+});

@@ -1,5 +1,6 @@
 import './menu.css';
 import {
+  autoSkills, autoStats, equipBest,
   addItem, changeJob, claimBook, createRng, equip, instance, itemDef, learnSkill, raiseStat, refineCost, rollRefine, setSlot, socketCard, unequip, useItem, EQUIP_SLOTS,
   type ArenaRun, type ArenaState, type EquipSlot, type JobId, type StatKey,
 } from '@shared/index';
@@ -94,7 +95,7 @@ export class Menu {
   private render(): void {
     const h = this.host; if (!h) return;
     const tabs = (MAIN_TABS.includes(this.tab) ? MAIN_TABS : [...MAIN_TABS, this.tab]).map((x) => `<button class="mn-tab${x === this.tab ? ' on' : ''}" data-act="tab:${x}">${t(`tab.${x}`)}${KEY_OF[x] ? `<kbd>${KEY_OF[x]}</kbd>` : ''}${(x === 'summon' || x === 'adventure') && lockMsg(h.session, x) ? '🔒' : ''}</button>`).join('');
-    const bodies = { status: () => statusTab(h.session), skills: () => skillsTab(h.session), equip: () => equipTab(h.session, h.save), cards: () => cardsTab(h.session, h.save),
+    const bodies = { status: () => statusTab(h.session, h.save), skills: () => skillsTab(h.session, h.save), equip: () => equipTab(h.session, h.save), cards: () => cardsTab(h.session, h.save),
       job: () => jobTab(h.session, this.jobAsk), refine: () => refineTab(h.session, h.save), shop: () => shopTab(h.session, h.save),
       spirits: () => spiritsTab(h.session, h.save, this.sp), summon: () => summonTab(h.session, this.sp),
       bag: () => bagTab(h.session, h.save), book: () => bookTab(h.session, this.sp), adventure: () => adventureTab(h.session, h.save), arena: () => arenaTab(h.session, h.arena()) };
@@ -129,6 +130,10 @@ export class Menu {
       case 'close': this.close(); return;
       case 'tab': this.tab = x as MenuTab; this.note = ''; this.jobAsk = ''; this.sp.results = []; changed = false; this.root.querySelector('.mn-body')?.scrollTo(0, 0); break;
       case 'stat': raiseStat(d, x as StatKey); break;
+      case 'autostat': this.note = t('auto.done').replace('{n}', String(autoStats(d, c))); break;
+      case 'autoskill': this.note = t('auto.done').replace('{n}', String(autoSkills(d, c))); break;
+      case 'autoequip': this.note = t('auto.equipped').replace('{n}', String(equipBest(d, c))); break;
+      case 'autogrow': h.save.autoGrow = !h.save.autoGrow; break;
       case 'learn': learnSkill(d, c, x); break;
       case 'slot': setSlot(d, c, Number(x), y); break;
       case 'equip': equip(d, c, Number(x)); break;

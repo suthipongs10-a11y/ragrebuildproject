@@ -43,6 +43,17 @@ export class RoomInteractions {
     }
   }
 
+  /** Next to the rock wall: show the prompt; ▲ (or attack) smashes it. Returns the wall side (0 = none). */
+  rockPrompt(talking: boolean, near: unknown, c: { pressed(k: 'up'): boolean }): number {
+    const side = this.touchingRock(1) ? 1 : this.touchingRock(-1) ? -1 : 0;
+    if (talking || !side || near) return side;
+    const h = this.s.hero;
+    this.s.prompt.setText(this.s.abilities.has('break') ? t('rock.prompt') : '✖').setVisible(true)
+      .setPosition(h.x + h.w / 2, h.y - 20 + Math.sin(this.s.time.now / 140) * 3);
+    if (c.pressed('up')) { h.dir = side as 1 | -1; this.swing(); }
+    return side;
+  }
+
   /** Attack key in Phase 1 only smashes rocks (needs the `break` ability). */
   swing(): void {
     const h = this.s.hero, reach = 44;

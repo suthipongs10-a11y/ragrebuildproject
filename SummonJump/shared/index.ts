@@ -20,3 +20,4 @@ export * from './progression/book';
 export * from './rules/arena';
 export * from './progression/guide';
 export * from './sim/auto';
+export * from './progression/autoGrow';

@@ -58,3 +58,12 @@ html, body { height: 100%; -webkit-text-size-adjust: 100%; text-size-adjust: 100
 .pb.ult { background: conic-gradient(rgba(201, 166, 255, .9) calc(var(--g, 0) * 1%), rgba(51, 39, 26, .85) 0); font-size: 24px; }
 .pb.ult.ready { color: #fff; border-color: #fff; animation: ultglow .7s ease-in-out infinite alternate; }
 @keyframes ultglow { from { box-shadow: 0 0 6px #c9a6ff; } to { box-shadow: 0 0 22px #efe2ff, 0 0 40px #c9a6ff; } }
+
+/* better-gear prompt */
+.upg { position: absolute; left: 50%; bottom: 56px; transform: translateX(-50%); z-index: 7; display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 10px;
+  border-radius: 14px; border: 2px solid #c99a4a; background: rgba(33, 24, 14, .92); color: var(--ink); font: 500 15px var(--f-ui); box-shadow: 0 4px 14px rgba(0,0,0,.5); animation: actpop .18s ease-out; }
+.upg[hidden] { display: none; }
+.upg-ic { width: 40px; height: 40px; flex: none; background: center / contain no-repeat; }
+.upg-tx b { color: #ffd88a; margin-right: 4px; }
+.upg-go { min-height: 44px; padding: 0 16px; border-radius: 12px; border: 2px solid #8a6a36; background: linear-gradient(#e8b85a, #b0802e); color: #2a1a00; font: 600 16px var(--f-ui); }
+.upg-x { width: 40px; height: 40px; border-radius: 50%; border: 0; background: #4a3a26; color: var(--ink); font-size: 16px; }

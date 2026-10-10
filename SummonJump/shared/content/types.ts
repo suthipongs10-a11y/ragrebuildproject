@@ -31,6 +31,8 @@ export interface JobDef {
   hp_factor: number; sp_factor: number; aspd_factor: number; weapons: string[]; starter_weapon: string; parts_set: string; skills: string[];
   /** job-change screen bars, 1–5: dmg, tank, range, support, ease */
   ratings: Record<string, number>;
+  /** auto growth: stat weights (str:5|vit:3…) and skill plan in order (skill:target level|…) */
+  auto_stats: Record<string, number>; auto_skills: { id: string; lv: number }[];
 }
 
 export interface CardDef { id: string; name_key: string; slot_type: string; effects: Record<string, unknown>; set_id: string | null; art: string }
