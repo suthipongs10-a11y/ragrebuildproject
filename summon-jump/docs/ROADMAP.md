@@ -72,7 +72,7 @@ Art already available (from the prototype): 6 zones × 5 layers, hero design + p
 - Mail/inbox, content bundle served by server (hot balance updates).
 - Migration of local saves to the cloud on first login.
 - **World chat** (Nakama channel) + system broadcasts for rare drops / MVP kills; profanity filter, rate limit, block & report. *(added 2026-10-10, owner request — moved up from Phase 9)*
-- **Offline farming:** spirits explore while the game is closed; rewards by time away (cap 12 h) × best cleared map, timestamps checked on the server. *(added 2026-10-10)*
+- **Offline farming:** spirits explore while the game is closed (client prototype already in Phase 5: ☰ → สำรวจ); Phase 6 moves the timestamps and the loot roll to the server. *(added 2026-10-10)*
 - **Rested EXP:** time away builds a ×2 EXP bonus for the next N kills. *(added 2026-10-10)*
 **Art brief:** `ART_P06_Account_UI.md` — login screen key art, avatar frames, profile card, mail icons.
 **Exit gate:** tampered client cannot add items/currency (tested); 2 devices share one account; server restart loses nothing; 2 phones see each other's world chat; offline rewards cannot be faked by changing the phone clock.
