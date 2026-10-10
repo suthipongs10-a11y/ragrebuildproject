@@ -27,10 +27,10 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 
 ## Checklist
 - [x] Art briefs written (6 files)
-- [ ] Monsters: 25 normal types, 6 minis, 2 MVPs in `monsters.csv` (+ art/tint fallback), cards, drops, AI for new types
-- [ ] Mini-boss scripts (Spore Mother, Thunder Ram, Siren, Shark) + MVP phase scripts (Storm Roc, Kraken phase 2)
-- [ ] Levels: forest 1–4 + deep 1–2, sky 1–6, abyss 1–6 (background variations), reachability test
-- [ ] MVP / mini respawn timers shown in the room
+- [x] Monsters: 25 normal types, 6 minis, 2 MVPs in `monsters.csv` (+ art/tint fallback), cards, drops, AI for new types
+- [x] Mini-boss scripts (Spore Mother, Thunder Ram, Siren, Shark) + MVP phase scripts (Storm Roc, Kraken phase 2)
+- [x] Levels: forest 1–4 + deep 1–2, sky 1–6, abyss 1–6 (background variations), reachability test
+- [x] MVP / mini respawn timers shown in the room
 - [ ] Adventure Book (tracking + milestones + permanent stats + menu tab)
 - [ ] Daily dungeon (offline prototype)
 - [ ] Tower floors 1–20 (offline)
@@ -42,3 +42,6 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [ ] Balance sheet reviewed by the owner
 
 ## Known issues / notes
+- New monsters without art use a recoloured look-alike (`art` + `tint` in monsters.csv), e.g. Crab = red Scorpion, Siren = teal Harpy, Storm Roc = slate Bird. They switch to their own art automatically when `ART_P05_Monsters_*` is imported.
+- Background variations B/C/D fall back to the original zone layers until `ART_P05_Zone_Pack_*` arrives.
+- `tests/reach.test.ts` checks every land room with the real physics (Lv 1 speed + double jump): every exit reachable from every entrance.
