@@ -387,13 +387,25 @@ test('easy: quest 🧭 button travels, death respawns in the same room', async (
   expect(errors).toEqual([]);
 });
 
-test('easy: one-tap stats in the status tab', async ({ page, isMobile }) => {
+
+test('expedition: send spare spirits, loot piles up while away, claim it', async ({ page, isMobile }) => {
   test.skip(isMobile, 'desktop only');
-  const errors = await boot(page, '?map=town&hero=mage:20');
-  await ws(page, (w) => { w.save.autoGrow = false; w.session.data.statPoints = 40; w.openMenu('status'); });
-  await page.click('[data-act="autostat"]');
-  expect(await ws(page, (w) => w.session.data.statPoints)).toBeLessThan(10);
-  await page.click('[data-act="autogrow"]');
-  expect(await ws(page, (w) => w.save.autoGrow)).toBe(true);
+  const errors = await boot(page, '?map=town&hero=swordsman:20');
+  await ws(page, (w) => { w.save.seen.forest = true; w.openMenu('explore'); });
+  await page.click('[data-act="exroom:forest"]');
+  const free = await ws(page, (w) => { const b = w.session.box; return b.spirits.filter((s: Any) => !b.team.includes(s.uid)).slice(0, 3).map((s: Any) => s.uid); });
+  for (const u of free) await page.click(`[data-act="expick:${u}"]`);
+  await page.click('[data-act="exgo"]');
+  expect(await ws(page, (w) => w.save.explore?.uids.length)).toBe(3);
+  // a team slot can't take a spirit that is away
+  expect(await ws(page, (w) => w.save.explore.room)).toBe('forest');
+  const soul0 = await ws(page, (w) => w.save.soul);
+  await ws(page, (w) => { w.save.explore.start -= 3 * 3_600_000; w.openMenu('explore'); }); // 3 hours later
+  await expect(page.locator('.mn-body')).toContainText('ปราบได้');
+  await page.click('[data-act="exclaim"]');
+  expect(await ws(page, (w) => w.save.soul)).toBeGreaterThan(soul0);
+  expect(await ws(page, (w) => w.save.explore?.room)).toBe('forest'); // keeps exploring
+  await page.click('[data-act="exstop"]');
+  expect(await ws(page, (w) => w.save.explore)).toBeNull();
   expect(errors).toEqual([]);
 });

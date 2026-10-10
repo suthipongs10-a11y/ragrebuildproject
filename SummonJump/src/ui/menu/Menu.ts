@@ -1,6 +1,5 @@
 import './menu.css';
 import {
-  autoSkills, autoStats, equipBest,
   addItem, changeJob, claimBook, createRng, equip, instance, itemDef, learnSkill, raiseStat, refineCost, rollRefine, setSlot, socketCard, unequip, useItem, EQUIP_SLOTS,
   type ArenaRun, type ArenaState, type EquipSlot, type JobId, type StatKey,
 } from '@shared/index';
@@ -15,13 +14,14 @@ import { spiritAct } from './spiritActions';
 import './spirits.css';
 import { adventureTab } from './adventureTab';
 import { arenaTab } from './arenaTab';
+import { exploreAct, exploreTab, newExploreState, type ExploreRoom } from './exploreTab';
 import { lockedBody, lockMsg } from './lock';
 
-export type MenuTab = 'status' | 'skills' | 'equip' | 'bag' | 'cards' | 'spirits' | 'book' | 'adventure' | 'arena' | 'job' | 'refine' | 'shop' | 'summon';
+export type MenuTab = 'explore' | 'status' | 'skills' | 'equip' | 'bag' | 'cards' | 'spirits' | 'book' | 'adventure' | 'arena' | 'job' | 'refine' | 'shop' | 'summon';
 /** PC shortcuts: open (or close) a menu tab straight from the game. */
 const HOTKEYS: Record<string, MenuTab> = { KeyI: 'bag', KeyE: 'equip', KeyU: 'status', KeyY: 'skills', KeyP: 'spirits' };
 const KEY_OF = Object.fromEntries(Object.entries(HOTKEYS).map(([k, tab]) => [tab, k.slice(3)])) as Partial<Record<MenuTab, string>>;
-const MAIN_TABS: MenuTab[] = ['status', 'skills', 'equip', 'bag', 'cards', 'spirits', 'book', 'summon', 'adventure'];
+const MAIN_TABS: MenuTab[] = ['status', 'skills', 'equip', 'bag', 'cards', 'spirits', 'explore', 'book', 'summon', 'adventure'];
 
 export interface MenuHost {
   session: HeroSession; save: SaveData;
@@ -31,6 +31,8 @@ export interface MenuHost {
   arena(): ArenaState; enterArena(run: ArenaRun): string | null;
   /** live HP / SP (shown in the menu, potions check them) */
   vitals(): { hp: number; maxHp: number; sp: number; maxSp: number };
+  /** world rooms (id, shown name, monsters) for the expedition tab */
+  rooms(): ExploreRoom[];
 }
 
 /** One DOM overlay for every hero menu. Opened by ☰ / M / Esc or by NPCs (job, refine, shop). */
@@ -44,6 +46,7 @@ export class Menu {
   private readonly rng = createRng(Date.now() & 0xffffff);
   private unsub: (() => void) | null = null;
   private readonly sp = newSpiritMenuState();
+  private readonly ex = newExploreState();
   private lastAnim = 0;
 
   constructor() {
@@ -94,12 +97,12 @@ export class Menu {
 
   private render(): void {
     const h = this.host; if (!h) return;
-    const tabs = (MAIN_TABS.includes(this.tab) ? MAIN_TABS : [...MAIN_TABS, this.tab]).map((x) => `<button class="mn-tab${x === this.tab ? ' on' : ''}" data-act="tab:${x}">${t(`tab.${x}`)}${KEY_OF[x] ? `<kbd>${KEY_OF[x]}</kbd>` : ''}${(x === 'summon' || x === 'adventure') && lockMsg(h.session, x) ? '🔒' : ''}</button>`).join('');
-    const bodies = { status: () => statusTab(h.session, h.save), skills: () => skillsTab(h.session, h.save), equip: () => equipTab(h.session, h.save), cards: () => cardsTab(h.session, h.save),
+    const tabs = (MAIN_TABS.includes(this.tab) ? MAIN_TABS : [...MAIN_TABS, this.tab]).map((x) => `<button class="mn-tab${x === this.tab ? ' on' : ''}" data-act="tab:${x}">${t(`tab.${x}`)}${KEY_OF[x] ? `<kbd>${KEY_OF[x]}</kbd>` : ''}${(x === 'summon' || x === 'adventure' || x === 'explore') && lockMsg(h.session, x) ? '🔒' : ''}</button>`).join('');
+    const bodies = { status: () => statusTab(h.session), skills: () => skillsTab(h.session), equip: () => equipTab(h.session, h.save), cards: () => cardsTab(h.session, h.save),
       job: () => jobTab(h.session, this.jobAsk), refine: () => refineTab(h.session, h.save), shop: () => shopTab(h.session, h.save),
       spirits: () => spiritsTab(h.session, h.save, this.sp), summon: () => summonTab(h.session, this.sp),
-      bag: () => bagTab(h.session, h.save), book: () => bookTab(h.session, this.sp), adventure: () => adventureTab(h.session, h.save), arena: () => arenaTab(h.session, h.arena()) };
-    const lock = this.tab === 'summon' || this.tab === 'adventure' ? lockMsg(h.session, this.tab) : null;
+      bag: () => bagTab(h.session, h.save), book: () => bookTab(h.session, this.sp), adventure: () => adventureTab(h.session, h.save), arena: () => arenaTab(h.session, h.arena()), explore: () => exploreTab(h.session, h.save, h.rooms(), this.ex, Date.now()) };
+    const lock = this.tab === 'summon' || this.tab === 'adventure' || this.tab === 'explore' ? lockMsg(h.session, this.tab) : null;
     const body = lock ? lockedBody(lock) : bodies[this.tab]();
     const scroll = this.root.querySelector('.mn-body')?.scrollTop ?? 0;
     const v = h.vitals(), pct = (a: number, b: number) => Math.round((100 * Math.max(0, a)) / Math.max(1, b));
@@ -119,6 +122,8 @@ export class Menu {
     const h = this.host; if (!h) return;
     const [verb, x = '', y = ''] = a.split(':');
     const s = h.session, d = s.data, c = s.content;
+    const en = exploreAct(verb ?? '', x, s, h.save, h.rooms(), this.ex, Date.now());
+    if (en !== null) { if (en) this.note = en; s.recompute(); h.flush(); this.render(); return; }
     const sn = spiritAct(verb ?? '', x, y, this.sp, h, this.rng);
     if (sn !== null) {
       if (sn) this.note = sn;
@@ -130,10 +135,6 @@ export class Menu {
       case 'close': this.close(); return;
       case 'tab': this.tab = x as MenuTab; this.note = ''; this.jobAsk = ''; this.sp.results = []; changed = false; this.root.querySelector('.mn-body')?.scrollTo(0, 0); break;
       case 'stat': raiseStat(d, x as StatKey); break;
-      case 'autostat': this.note = t('auto.done').replace('{n}', String(autoStats(d, c))); break;
-      case 'autoskill': this.note = t('auto.done').replace('{n}', String(autoSkills(d, c))); break;
-      case 'autoequip': this.note = t('auto.equipped').replace('{n}', String(equipBest(d, c))); break;
-      case 'autogrow': h.save.autoGrow = !h.save.autoGrow; break;
       case 'learn': learnSkill(d, c, x); break;
       case 'slot': setSlot(d, c, Number(x), y); break;
       case 'equip': equip(d, c, Number(x)); break;

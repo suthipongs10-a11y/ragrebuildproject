@@ -12,7 +12,7 @@ describe('unlocks + guide quests', () => {
     expect(isUnlocked(content, 'summon', 4)).toBe(false);
     expect(isUnlocked(content, 'summon', 5)).toBe(true);
     expect(isUnlocked(content, 'unknown', 1)).toBe(true);
-    expect(newUnlocks(content, 4, 12).map((u) => u.feature).sort()).toEqual(['dungeon', 'runes', 'summon']);
+    expect(newUnlocks(content, 4, 12).map((u) => u.feature).sort()).toEqual(['dungeon', 'explore', 'runes', 'summon']);
   });
 
   it('every quest and unlock has text', () => {

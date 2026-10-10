@@ -27,6 +27,7 @@ import { BossTimers } from '../world/BossTimers';
 import { ArenaController, arenaKeys, enterArena } from '../world/Arena';
 import { autoPilot, NO_PILOT } from '../hero/AutoPilot';
 import { applyHeroLook, sessionArtKeys } from '../hero/HeroArt';
+import { worldRooms } from '../world/roomList';
 import { Guide } from '../hero/Guide';
 import { loadTeamArt, teamAbilitySet, tryUltimate, ultHost, UltButton } from '../spirits/SpiritPlay';
 
@@ -134,13 +135,13 @@ export class WorldScene extends Phaser.Scene {
     this.prompt = this.add.text(0, 0, '▲', { ...f, fontSize: '26px', color: '#ffd88a' }).setOrigin(0.5, 1).setDepth(50).setVisible(false);
     this.dialog = new DialogBox(this);
     this.bars = new Hud(this);
-    this.guide = new Guide(this, this.session, this.save, (m) => this.toast(m), () => this.flush(), (txt) => this.openDialog('', [txt]), () => this.applyLook(),
+    this.guide = new Guide(this, this.session, this.save, (m) => this.toast(m), () => this.flush(), (txt) => this.openDialog('', [txt]),
       () => this.level.id, (r) => (this.level.id === 'arena' || this.combat.combat.dead ? this.toast(t('quest.noGo')) : this.goRoom(r, { kind: 'default' }, 250)));
     this.menu = this.registry.get('menu') as Menu;
     this.menu.attach({
       session: this.session, save: this.save, flush: () => this.flush(),
       pause: () => this.scene.pause(), resume: () => { this.controls.reset(); this.scene.resume(); },
-      applyUse: (fx) => this.applyUse(fx), onEquipChanged: () => this.applyLook(), onSpiritsChanged: () => this.onSpiritsChanged(), vitals: () => ({ hp: this.combat.combat.hp, maxHp: this.combat.maxHp, sp: this.session.rt.sp, maxSp: this.combat.maxSp }),
+      applyUse: (fx) => this.applyUse(fx), onEquipChanged: () => this.applyLook(), onSpiritsChanged: () => this.onSpiritsChanged(), vitals: () => ({ hp: this.combat.combat.hp, maxHp: this.combat.maxHp, sp: this.session.rt.sp, maxSp: this.combat.maxSp }), rooms: () => worldRooms(this),
       arena: () => this.session.arena, enterArena: (run) => enterArena(this, run),
       onJobChanged: () => { this.combat.heal(); this.applyLook(); this.toast(t('menu.jobChanged').replace('{job}', t(`job.${this.session.data.job}`))); },
     });

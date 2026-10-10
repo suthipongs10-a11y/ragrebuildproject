@@ -51,3 +51,6 @@
 .bk-var { display: flex; flex-direction: column; align-items: center; padding: 4px 6px; border-radius: 10px; border: 2px solid #4a3a26; opacity: .55; }
 .bk-var.on { opacity: 1; border-color: #ffd88a; }
 .sp-head .grow { flex: 1; min-width: 0; }
+/* expedition */
+.ex-rooms .ex-room { flex: 0 0 auto; }
+.ex-room small { opacity: .75; margin-left: 4px; }

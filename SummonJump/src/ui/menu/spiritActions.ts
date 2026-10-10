@@ -19,6 +19,7 @@ export function spiritAct(verb: string, x: string, y: string, st: SpiritMenuStat
     case 'spsel': st.sel = Number(x); st.mode = 'info'; st.fodder = []; return '';
     case 'spmode': st.mode = x as SpiritMenuState['mode']; st.fodder = []; st.slot = null; return '';
     case 'spteam': case 'spout': {
+      if (verb === 'spteam' && h.save.explore?.uids.includes(Number(y))) return t('ex.busy'); // away on an expedition
       const before = teamAbilities(b, c);
       if (verb === 'spteam') setTeam(b, Number(x), Number(y));
       else { const i = b.team.indexOf(Number(x)); if (i >= 0) setTeam(b, i, null); }
@@ -28,6 +29,7 @@ export function spiritAct(verb: string, x: string, y: string, st: SpiritMenuStat
     }
     case 'spfod': {
       const uid = Number(x), sel = spiritOf(b, st.sel);
+      if (h.save.explore?.uids.includes(uid)) return t('ex.busy');
       if (st.fodder.includes(uid)) st.fodder = st.fodder.filter((u) => u !== uid);
       else if (sel && st.fodder.length < fodderNeeded(sel)) st.fodder.push(uid);
       return '';

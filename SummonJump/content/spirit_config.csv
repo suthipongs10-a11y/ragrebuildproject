@@ -15,3 +15,7 @@ star_mul,1|1.25|1.55|1.9|2.3|2.8,stat multiplier per star 1-6
 starter_team,sylph:wind|undine:water|salamander:fire,new save team (family:element)
 starter_box,poring:water,new save extra spirits
 starter_items,scroll_normal:10|scroll_mystic:3,new save items
+explore_cap_h,12,expedition: most hours that count while away
+explore_kills_h,40,expedition: monsters beaten per hour by a full team at full strength
+explore_exp_share,0.6,expedition: share of the monsters' EXP split between the sent spirits
+explore_min_eff,0.25,expedition: efficiency floor when the spirits are far below the map's level

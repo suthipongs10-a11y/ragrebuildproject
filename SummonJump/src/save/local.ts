@@ -4,6 +4,7 @@ import type { SpiritBox } from '@shared/spirits/model';
 import type { BookData } from '@shared/progression/book';
 import type { ArenaState } from '@shared/rules/arena';
 import type { QuestState } from '@shared/progression/guide';
+import type { ExploreState } from '@shared/rules/explore';
 
 /** Local (pre-server) save. Every storage access is wrapped: private windows / blocked storage must not break the game. */
 export interface SaveData {
@@ -30,14 +31,14 @@ export interface SaveData {
   arena: ArenaState | null;
   /** main quest chain position (quests.csv) */
   quest: QuestState | null;
-  /** spend stat / skill points by the job plan on every level-up */
-  autoGrow: boolean;
+  /** spirit expedition (farming while away) */
+  explore: ExploreState | null;
 }
 
 /** `?hero=job:lv` test heroes use their own slot so they never overwrite the real save. */
 const HERO_PARAM = new URLSearchParams(typeof location === 'undefined' ? '' : location.search).get('hero');
 const KEY = HERO_PARAM ? `summonjump-save-test-${HERO_PARAM.replace(/[^a-z0-9:]/gi, '')}` : 'summonjump-save-v1';
-export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {}, hp: null, exp: 0, soul: 0, inv: {}, cards: {}, hero: null, spirits: null, book: null, arena: null, quest: null, autoGrow: true });
+export const emptySave = (): SaveData => ({ v: 1, room: 'town', spawn: null, broken: {}, defeated: {}, items: {}, chests: {}, seen: {}, hp: null, exp: 0, soul: 0, inv: {}, cards: {}, hero: null, spirits: null, book: null, arena: null, quest: null, explore: null });
 
 export function loadSave(): SaveData {
   try {

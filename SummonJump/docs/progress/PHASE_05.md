@@ -57,10 +57,15 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Level unlocks (`content/unlocks.csv`) + guide quest chain (`content/quests.csv`, `shared/progression/guide.ts`, `src/hero/Guide.ts`).
 - [x] ROADMAP: world chat, rare-drop/MVP broadcast, offline farming, rested EXP → Phase 6; backlog list.
 
-## Owner request: easier to play (2026-10-10, ideas 1 2 5 8 10)
+## Owner request: spirit expedition — farm while offline (2026-10-10)
+- [x] ☰ → **สำรวจ** (unlocks at Lv 5): send up to 3 spirits that are not in the team to a visited map; they beat its normal monsters while time passes, game open or closed, up to 12 h (`spirit_config.csv` `explore_*`). Loot = that map's normal drop tables (same rates, cards included) + soul stones + a share of the EXP for the sent spirits. Efficiency from spirit level/star vs the map's monster level and how many went.
+- [x] Claim (keep exploring) or recall; welcome-back toast on load; a spirit that is away can't join the team or be used as star-up fodder.
+- [x] Pure + seeded (`shared/rules/explore.ts`): Phase 6 moves the clock and the roll to the server (the phone clock can be changed today).
+
+## Owner request: easier to play (2026-10-10, ideas 1 2 8 10; idea 5 removed)
 - [x] **AUTO hunt** (`src/hero/AutoPilot.ts`): AUTO now walks to the nearest monster, hops walls / up to platforms (double jump when the team has it), drops through thin platforms, fights with skills, then collects map crystals; gives up on unreachable targets for 8 s; any direction / jump input takes over.
 - [x] **Tap / click a monster** → walk there and hit it (▼ marker), also with AUTO off.
-- [x] **One-tap growth** (`shared/progression/autoGrow.ts`, `jobs.csv` `auto_stats` / `auto_skills`): ⚡ แจกแต้มอัตโนมัติ (status), ⚡ เรียนสกิลแนะนำ (skills), ⚡ สวมของที่ดีที่สุด (equipment); switch "อัตโนมัติทุกครั้งที่เลเวลอัป" (on by default); "ของดีกว่า! สวมเลย" chip when a better item lands in the bag.
+- ~~One-tap growth / better-gear prompt~~ — removed again (owner: building your own character is part of the fun; drops stay as they are).
 - [x] **🧭 พาไป** next to the quest line: warps to the quest's room (monster's room, room to visit, town for summon / job / tower, a room at the hero's level for level quests).
 - [x] **Gentler start:** forest-zone monsters hit 30 % softer; out of combat (4 s without damage) +6 % HP / +4 % SP every 2 s; dying = get up at the room's safe spot with full HP (arena runs still end in town).
 

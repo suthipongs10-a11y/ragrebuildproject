@@ -10,7 +10,6 @@ import type {
   ContentBundle, MonsterDef, DropDef, ItemDef, CardDef, SpiritDef, SkillDef, JobDef, SpiritSkillDef, SpiritElementDef, SummonDef, RuneSetDef, RuneStatDef, RuneUpgradeDef, RuneDropDef, BookEntryDef, DungeonDayDef, TowerFloorDef, UnlockDef, QuestDef,
 } from '../shared/content/types';
 import { evalExpr } from '../shared/formulas/expr';
-import { STAT_KEYS } from '../shared/formulas/stats';
 
 const ROOT = join(import.meta.dirname, '..');
 const SRC = join(ROOT, 'content');
@@ -124,8 +123,6 @@ const jobs: JobDef[] = read('jobs').map((r) => ({
   aspd_factor: num(r, 'aspd_factor', 'job'), weapons: (r.weapons ?? '').split('|').filter(Boolean), starter_weapon: r.starter_weapon ?? '',
   parts_set: r.parts_set ?? '', skills: (r.skills ?? '').split('|').filter(Boolean),
   ratings: Object.fromEntries((r.ratings ?? '').split('|').filter(Boolean).map((p) => { const [k, v] = p.split(':'); return [k ?? '', Number(v)]; })),
-  auto_stats: Object.fromEntries((r.auto_stats ?? '').split('|').filter(Boolean).map((p) => { const [k, v] = p.split(':'); return [k ?? '', Number(v)]; })),
-  auto_skills: (r.auto_skills ?? '').split('|').filter(Boolean).map((p) => { const [id, lv] = p.split(':'); return { id: id ?? '', lv: Number(lv) }; }),
 }));
 
 uniqueIds(monsters, 'monsters'); uniqueIds(jobs, 'jobs'); uniqueIds(items, 'items'); uniqueIds(cards, 'cards'); uniqueIds(spirits, 'spirits'); uniqueIds(skills, 'skills');
@@ -155,8 +152,6 @@ for (const j of jobs) {
   if (j.from_job && !jobIds.has(j.from_job)) err(`job ${j.id}: unknown from_job ${j.from_job}`);
   if (!itemIds.has(j.starter_weapon)) err(`job ${j.id}: unknown starter weapon ${j.starter_weapon}`);
   for (const [k, v] of Object.entries(j.ratings)) if (!JOB_RATINGS.includes(k) || !(v >= 1 && v <= 5)) err(`job ${j.id}: bad rating ${k}:${v}`);
-  for (const k of Object.keys(j.auto_stats)) if (!(STAT_KEYS as readonly string[]).includes(k)) err(`job ${j.id}: auto_stats unknown stat ${k}`);
-  for (const a of j.auto_skills) { const d = skills.find((x) => x.id === a.id); if (!d || (d.owner !== j.id)) err(`job ${j.id}: auto_skills ${a.id} is not this job's skill`); else if (!(a.lv >= 1 && a.lv <= d.max_lv)) err(`job ${j.id}: auto_skills ${a.id}:${a.lv} out of range`); }
   if (j.tier > 0 && Object.keys(j.ratings).length !== JOB_RATINGS.length) err(`job ${j.id}: needs all ratings (${JOB_RATINGS.join(', ')})`);
   for (const s of j.skills) { const d = skills.find((x) => x.id === s); if (!d) err(`job ${j.id}: unknown skill ${s}`); else if (d.owner !== j.id) err(`job ${j.id}: skill ${s} belongs to ${d.owner}`); }
 }
@@ -218,7 +213,7 @@ for (const s of summon) {
 for (const r of runeStats) for (const sl of r.main_slots) if (sl < 1 || sl > 6) err(`rune stat ${r.stat}: bad slot ${sl}`);
 for (let sl = 1; sl <= 6; sl++) if (!runeStats.some((r) => r.main_slots.includes(sl))) err(`rune stats: no main stat for slot ${sl}`);
 if (runeUpgrade.length !== 15) err('rune_upgrade.csv must have 15 rows (+1..+15)');
-for (const key of ['gauge_max', 'gauge_hero_hit', 'gauge_spirit_hit', 'gauge_kill', 'combo_window', 'combo_mult', 'star_mul', 'starter_team', 'starter_items'])
+for (const key of ['gauge_max', 'gauge_hero_hit', 'gauge_spirit_hit', 'gauge_kill', 'combo_window', 'combo_mult', 'star_mul', 'starter_team', 'starter_items', 'explore_cap_h', 'explore_kills_h', 'explore_exp_share', 'explore_min_eff'])
   if (!(key in spiritConfig)) err(`spirit_config: missing ${key}`);
 for (const part of [...(spiritConfig.starter_team ?? '').split('|'), ...(spiritConfig.starter_box ?? '').split('|')].filter(Boolean)) {
   const [fam, e] = part.split(':'); const sp = spirits.find((x) => x.id === fam);

@@ -1,5 +1,4 @@
 import {
-  isUpgrade,
   attack, attackCooldown, BAG_SIZE, canEquip, canLearn, canSocket, critRate, defense, EQUIP_SLOTS, instance, isEquipped, itemDef, learnableSkills,
   magicAttack, maxHp, maxSp, refineChance, refineCost, skillDef, spCost, statCost, STAT_KEYS, type ContentBundle, type HeroData, type ItemInstance,
 } from '@shared/index';
@@ -39,7 +38,7 @@ function itemStats(c: ContentBundle, it: ItemInstance): string {
   return parts.join(' · ');
 }
 
-export function statusTab(s: HeroSession, save: SaveData): string {
+export function statusTab(s: HeroSession): string {
   const h = s.data, b = s.derived.build;
   const rows = STAT_KEYS.map((k) => {
     const cost = statCost(h.stats[k]), bonus = b.stats[k] - h.stats[k];
@@ -47,13 +46,12 @@ export function statusTab(s: HeroSession, save: SaveData): string {
       <small>${t('menu.cost')} ${cost}</small>${btn(`stat:${k}`, '+', h.statPoints >= cost)}</div>`;
   }).join('');
   return `<div class="mn-h">${t(`job.${h.job}`)} · Lv ${h.baseLv} · Job ${h.jobLv} · ${t('menu.points')} <b>${h.statPoints}</b></div>
-    ${autoBar(s, save, `${btn('autostat', t('auto.stats'), h.statPoints > 0)}`)}
     <div class="mn-kv"><div>ATK <b>${attack(b)}</b> <small>${b.atkStat === 'dex' ? 'DEX' : 'STR'}</small></div><div>MATK <b>${magicAttack(b)}</b> <small>INT${b.staffMatk ? ` +${Math.round(b.staffMatk * 100)}%` : ''}</small></div><div>DEF <b>${defense(b)}</b></div><div>HP <b>${maxHp(b)}</b></div>
     <div>SP <b>${maxSp(b)}</b></div><div>${t('menu.crit')} <b>${critRate(b).toFixed(1)}%</b></div><div>${t('menu.aspd')} <b>${(1 / attackCooldown(b)).toFixed(1)}/s</b></div><div>${t('menu.element')} <b>${t(`el.${s.derived.element}`)}</b></div></div>
     ${rows}`;
 }
 
-export function skillsTab(s: HeroSession, save: SaveData): string {
+export function skillsTab(s: HeroSession): string {
   const h = s.data, c = s.content;
   const rows = learnableSkills(h, c).map((d) => {
     const lv = h.skills[d.id] ?? 0, why = canLearn(h, c, d.id);
@@ -63,12 +61,8 @@ export function skillsTab(s: HeroSession, save: SaveData): string {
     return `<div class="mn-row">${iconHtml(d.icon, d.type === 'passive' ? '✨' : '⚡')}<span class="grow">${t(d.name_key)} <b>${lv}/${d.max_lv}</b>${d.type === 'passive' ? `<span class="mn-tag">${t('menu.passive')}</span>` : ''}
       <small>${t(`${d.name_key}.desc`)}${sp}${req ? ` · ${t('menu.needs')} ${req}` : ''}</small></span>${slotBtns}${d.effects.free ? '' : btn(`learn:${d.id}`, '+', why === null)}</div>`;
   }).join('');
-  return `<div class="mn-h">${t('menu.skillpoints')} <b>${h.skillPoints}</b> · ${t('menu.slotsHint')}</div>${autoBar(s, save, btn('autoskill', t('auto.skills'), h.skillPoints > 0))}${rows}`;
+  return `<div class="mn-h">${t('menu.skillpoints')} <b>${h.skillPoints}</b> · ${t('menu.slotsHint')}</div>${rows}`;
 }
-
-/** One-tap growth row: the action button + the "grow automatically on level-up" switch. */
-const autoBar = (s: HeroSession, save: SaveData, action: string) =>
-  `<div class="sp-btns">${action}${btn('autogrow', `${save.autoGrow ? '✅' : '⬜'} ${t('auto.grow')}`, true, true)}</div>`;
 
 const GEAR = new Set(['weapon', 'offhand', 'head', 'armor', 'cape', 'shoes', 'acc']);
 const isGear = (c: ContentBundle, it: ItemInstance) => GEAR.has(itemDef(c, it.id)?.type ?? '');
@@ -82,7 +76,7 @@ export function equipTab(s: HeroSession, save: SaveData): string {
   }).join('');
   const gear = h.bag.filter((it) => !isEquipped(h, it.uid) && isGear(c, it));
   const rows = gear.map((it) => bagRow(s, save, it)).join('') || `<div class="mn-note">${t('menu.noGear')}</div>`;
-  return `<div class="mn-h">${t('menu.equipped')}</div><div class="sp-btns">${btn('autoequip', t('auto.equip'), h.bag.some((it) => isUpgrade(h, c, it.uid)))}</div><div class="mn-grid">${slots}</div><div class="mn-h">${t('menu.gearBag')} (${gear.length})</div>${rows}`;
+  return `<div class="mn-h">${t('menu.equipped')}</div><div class="mn-grid">${slots}</div><div class="mn-h">${t('menu.gearBag')} (${gear.length})</div>${rows}`;
 }
 
 /** Everything that isn't gear: potions (use), scrolls (summon), essences and other materials. */
