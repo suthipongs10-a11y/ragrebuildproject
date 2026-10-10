@@ -13,6 +13,7 @@
     "e2e": "playwright test",
     "content": "tsx tools/content-build.ts",
     "levels": "tsx tools/levels/build-levels.ts",
+    "balance": "tsx tools/balance.ts",
     "art:import": "tsx tools/art-import/index.ts"
   },
   "dependencies": {
