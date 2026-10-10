@@ -89,6 +89,13 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Sky Isles: every sky room stands on one continuous cloud ground (no gaps → no fall/respawn flicker); sky1 goes back to town through a cloud pipe (level validation accepts edge ↔ pipe pairs).
 - Balance: swordsman route unchanged (1.9 → 1.8 h sim to the Kraken).
 
+## Owner request: tougher bosses — AUTO is for farming (2026-10-10)
+- [x] Mini-bosses / MVPs HP ×4 and ATK ×1.5 (e.g. ราชาบุ๋ม 1300 → 5200, Storm Roc 10500 → 42000, Kraken 15000 → 60000).
+- [x] Every boss calls its own minions (`monsters.csv` `ai_params`: `minion`, `minion_max`, `minion_cd`): 2 per call, 3 per call and faster in phase 2, only while the hero is near; "{name} เรียกลูกน้อง!" pops up. Hard-coded summons removed from the scripts. Called minions give no EXP / drops / soul (RO slaves) so a boss can't be farmed.
+- [x] Harsher skills: shorter cooldowns for every boss, ground shockwaves on slams/crashes (King phase 2, Thunder Ram, Storm Roc phase 2 dives), harpy shoots in phase 1 too, rage speed ×1.2 in phase 2 and ×1.4 under 25 % HP.
+- [x] Bosses resist stun / freeze from skills (20 % of the duration).
+- Check (Lv 20 test hero, all cards + spirits, AUTO only, no potions): Storm Roc lost 28 % HP in 60 s while the hero lost 65 % → AUTO alone can't solo a boss; potions and dodging are needed. Balance sim: route time unchanged (2.0 h), Kraken fight 4.2 min at full damage.
+
 ## Owner request: lock-on, loot magnet, crit burst (2026-10-10)
 - [x] Click / tap a monster = lock-on: the hero keeps attacking with normal attacks (normal damage) until it dies, RO style.
 - [x] Loot magnet: drops pop out for 0.45 s, then fly into the hero by themselves (no walking over them). With a full bag they stop and wait on the ground.
