@@ -441,23 +441,23 @@
       {
        "__identifier": "ExitHint",
        "__grid": [
-        9,
-        4
+        18,
+        3
        ],
        "__pivot": [
         0.5,
         1
        ],
        "__tags": [],
-       "__worldX": 304,
-       "__worldY": 160,
+       "__worldX": 592,
+       "__worldY": 128,
        "iid": "ent-0000007e",
        "width": 32,
        "height": 32,
        "defUid": 110,
        "px": [
-        304,
-        160
+        592,
+        128
        ],
        "fieldInstances": [
         {
