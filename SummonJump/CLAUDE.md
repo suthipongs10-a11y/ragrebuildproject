@@ -51,7 +51,7 @@ Read these before any work:
 ## 4. Feel targets (from the approved demo)
 
 - Painted parallax zones (far / mid / near / ground strip / platforms), ambient particles per zone.
-- **RO-style damage numbers**: big bold outlined numbers that pop and arc; **critical = red with yellow edge + starburst + "CRITICAL"**; weak-element = orange; resisted = grey; damage taken = pink; heal = green.
+- **RO-style damage numbers**: big bold outlined numbers that pop and arc; **critical = bold yellow number (black outline) on a spiky orange-red burst (darker rim, lighter core)**; weak-element = orange; resisted = grey; damage taken = pink; heal = green.
 - Hit-stop on hits (35–180 ms), screen shake, additive glow VFX, enemy flash + dissolve on death.
 - Spirit ultimate = cinematic: dim screen, magic circle, big spirit appears, multi-hit on all enemies.
 - Normal monsters respawn when the player re-enters a map; mini-bosses on a short timer; MVPs on a long timer (RO style).

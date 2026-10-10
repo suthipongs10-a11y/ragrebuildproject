@@ -18,7 +18,9 @@ import { SpiritViews } from '../spirits/SpiritViews';
 
 const MAX_FRAME = 1 / 20;
 
-interface Pickup extends Body { kind: 'item' | 'card'; id: string; count: number; age: number; obj: Phaser.GameObjects.Image }
+interface Pickup extends Body { kind: 'item' | 'card'; id: string; count: number; age: number; obj: Phaser.GameObjects.Image; /** bag was full: stop flying */ full?: boolean }
+/** seconds a drop pops out before it flies to the hero */
+const MAGNET_AFTER = 0.45;
 export type LevelUpEvent = { kind: 'levelup'; base: number; job: number };
 
 /**
@@ -217,12 +219,20 @@ export class CombatController {
   private updatePickups(dt: number, hero: HeroState): void {
     for (const p of [...this.pickups]) {
       p.age += dt;
-      if (!p.onGround) { p.vy = Math.min(800, p.vy + 1800 * dt); moveBody(p, dt, this.grid, false, p.y + p.h); if (p.onGround) p.vx = 0; }
-      if (this.level.water && p.vy > 120) p.vy = 120;
-      p.obj.setPosition(p.x + p.w / 2, p.y + p.h / 2 - (p.onGround ? 4 + Math.sin(p.age * 5) * 3 : 0));
+      const hx = hero.x + hero.w / 2, hy = hero.y + hero.h / 2;
+      if (p.age > MAGNET_AFTER && !p.full) {
+        // loot flies to the hero by itself (owner request): pop out, then home in faster and faster
+        const dx = hx - (p.x + p.w / 2), dy = hy - (p.y + p.h / 2), d = Math.hypot(dx, dy) || 1, sp = Math.min(d, (260 + (p.age - MAGNET_AFTER) * 1400) * dt);
+        p.x += (dx / d) * sp; p.y += (dy / d) * sp;
+        p.obj.setPosition(p.x + p.w / 2, p.y + p.h / 2).setAngle(p.age * 400);
+      } else {
+        if (!p.onGround) { p.vy = Math.min(800, p.vy + 1800 * dt); moveBody(p, dt, this.grid, false, p.y + p.h); if (p.onGround) p.vx = 0; }
+        if (this.level.water && p.vy > 120) p.vy = 120;
+        p.obj.setPosition(p.x + p.w / 2, p.y + p.h / 2 - (p.onGround ? 4 + Math.sin(p.age * 5) * 3 : 0)).setAngle(0);
+      }
       if (p.age > 0.35 && p.x < hero.x + hero.w + 8 && p.x + p.w > hero.x - 8 && p.y < hero.y + hero.h && p.y + p.h > hero.y) {
         if (p.kind === 'card') { this.save.cards[p.id] = (this.save.cards[p.id] ?? 0) + p.count; noteCard(this.session.book, p.id); }
-        else if (!addItem(this.session.data, this.session.content, p.id, p.count)) { popInfo(this.scene, p.x, p.y - 10, t('combat.bagfull'), '#ff9b9b'); continue; }
+        else if (!addItem(this.session.data, this.session.content, p.id, p.count)) { if (!p.full) popInfo(this.scene, p.x, p.y - 10, t('combat.bagfull'), '#ff9b9b'); p.full = true; continue; } // bag full: it drops and waits
         const name = t(p.kind === 'card' ? `card.${p.id.replace(/^card_/, '')}` : `item.${p.id}`);
         popInfo(this.scene, p.x + p.w / 2, p.y - 10, t(p.kind === 'card' ? 'combat.card' : 'combat.got').replace('{name}', name), p.kind === 'card' ? '#e2d2ff' : '#ffd88a');
         burst(this.scene, p.x + p.w / 2, p.y + p.h / 2, p.kind === 'card' ? 0xe2d2ff : 0xffd88a, 10, 200);

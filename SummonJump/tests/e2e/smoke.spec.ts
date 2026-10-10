@@ -426,3 +426,14 @@ for (const job of ['swordsman', 'archer']) {
     expect(errors).toEqual([]);
   });
 }
+
+test('loot flies to the hero by itself', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'desktop only');
+  const errors = await boot(page, '?map=forest&hero=swordsman:12');
+  const count = () => ws(page, (w) => w.session.data.bag.reduce((a: number, it: Any) => a + it.count, 0) + Object.values(w.save.cards as Record<string, number>).reduce((a, n) => a + n, 0));
+  const n0 = await count();
+  await ws(page, (w) => { for (const d of w.session.content.drops) d.rate = 1; w.debugKillAll(); });
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').combat.pickups.length === 0, null, { timeout: 8000 });
+  expect(await count()).toBeGreaterThan(n0);
+  expect(errors).toEqual([]);
+});
