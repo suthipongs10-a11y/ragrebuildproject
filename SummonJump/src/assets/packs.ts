@@ -1,5 +1,6 @@
 import type Phaser from 'phaser';
 import { ART, type ArtEntry } from './manifest.generated';
+import { propKeys } from './props';
 
 export const ZONES = ['forest', 'deep', 'town', 'sky', 'abyss', 'desert'] as const;
 export type ZoneId = (typeof ZONES)[number];
@@ -74,6 +75,7 @@ export function roomKeys(level: { zone: string; variant?: string | null; entitie
   const mons = new Set(level.entities.filter((e) => e.type === 'Monster').map((e) => String(e.fields.monster)));
   for (const m of [...mons]) for (const s of SUMMONS[m] ?? []) mons.add(s);
   for (const m of mons) keys.push(...monsterKeys(m));
+  keys.push(...propKeys(level.entities));
   return keys.filter((k) => ART[k]);
 }
 

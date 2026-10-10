@@ -26,10 +26,14 @@ function target(name: string): { maxW: number; maxH: number } {
   if (name.startsWith('vfx_')) return { maxW: 512, maxH: 512 };
   if (/^ui_(panel|header|bar|btn_(primary|secondary|danger)|numbers)/.test(name)) return { maxW: 1024, maxH: 512 };
   if (name.startsWith('card_')) return { maxW: 384, maxH: 512 };
+  if (/^npc_/.test(name) || /^prop_(gate|statue|fountain|altar|portal_gate|door)/.test(name)) return { maxW: 512, maxH: 512 };
+  if (name === 'prop_water_surface') return { maxW: 1024, maxH: 128 };
+  if (name.startsWith('prop_')) return { maxW: 384, maxH: 384 };
   return { maxW: 256, maxH: 256 };
 }
 const noTrim = (n: string) => /^ui_(panel|header|bar|btn_(primary|secondary|danger)|numbers|rarity)/.test(n) || n.startsWith('zone_') && n.endsWith('_far');
-const groupKey = (n: string) => /^mon_([a-z0-9]+)_/.exec(n)?.[1];
+// pose pairs share one crop box so swapping idle/talk or closed/open never jumps
+const groupKey = (n: string) => /^mon_([a-z0-9]+)_/.exec(n)?.[1] ?? /^(npc_[a-z]+)_(idle|talk)$/.exec(n)?.[1] ?? /^(prop_(?:chest|statue|gate))_/.exec(n)?.[1];
 
 async function cleanAlpha(buf: Buffer): Promise<{ data: Buffer; w: number; h: number; opaqueCorners: boolean }> {
   const img = sharp(buf).ensureAlpha();

@@ -749,11 +749,203 @@
   "w": 640,
   "h": 408
  },
+ "npc_guide_idle": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/npc_guide_idle.webp",
+  "w": 223,
+  "h": 512
+ },
+ "npc_guide_talk": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/npc_guide_talk.webp",
+  "w": 223,
+  "h": 512
+ },
+ "npc_merchant_idle": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/npc_merchant_idle.webp",
+  "w": 340,
+  "h": 512
+ },
+ "npc_merchant_talk": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/npc_merchant_talk.webp",
+  "w": 340,
+  "h": 512
+ },
+ "npc_portal_idle": {
+  "pack": "P05_NPC_Portal",
+  "url": "assets/P05_NPC_Portal/npc_portal_idle.webp",
+  "w": 293,
+  "h": 512
+ },
+ "npc_portal_talk": {
+  "pack": "P05_NPC_Portal",
+  "url": "assets/P05_NPC_Portal/npc_portal_talk.webp",
+  "w": 293,
+  "h": 512
+ },
+ "npc_priest_idle": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/npc_priest_idle.webp",
+  "w": 293,
+  "h": 512
+ },
+ "npc_priest_talk": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/npc_priest_talk.webp",
+  "w": 293,
+  "h": 512
+ },
+ "npc_smith_idle": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/npc_smith_idle.webp",
+  "w": 326,
+  "h": 512
+ },
+ "npc_smith_talk": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/npc_smith_talk.webp",
+  "w": 326,
+  "h": 512
+ },
  "prj_arrow": {
   "pack": "P03_Jobs",
   "url": "assets/P03_Jobs/prj_arrow.webp",
   "w": 256,
   "h": 49
+ },
+ "prop_altar": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_altar.webp",
+  "w": 512,
+  "h": 235
+ },
+ "prop_anvil": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_anvil.webp",
+  "w": 384,
+  "h": 310
+ },
+ "prop_chest_closed": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_chest_closed.webp",
+  "w": 384,
+  "h": 328
+ },
+ "prop_chest_open": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_chest_open.webp",
+  "w": 384,
+  "h": 328
+ },
+ "prop_door_wood": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_door_wood.webp",
+  "w": 309,
+  "h": 512
+ },
+ "prop_fountain": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_fountain.webp",
+  "w": 512,
+  "h": 293
+ },
+ "prop_gate_closed": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_gate_closed.webp",
+  "w": 512,
+  "h": 456
+ },
+ "prop_gate_open": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_gate_open.webp",
+  "w": 512,
+  "h": 456
+ },
+ "prop_ladder": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_ladder.webp",
+  "w": 170,
+  "h": 384
+ },
+ "prop_pipe_body": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_pipe_body.webp",
+  "w": 384,
+  "h": 222
+ },
+ "prop_pipe_top": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_pipe_top.webp",
+  "w": 384,
+  "h": 140
+ },
+ "prop_portal_gate": {
+  "pack": "P05_NPC_Portal",
+  "url": "assets/P05_NPC_Portal/prop_portal_gate.webp",
+  "w": 452,
+  "h": 512
+ },
+ "prop_rock_debris": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_rock_debris.webp",
+  "w": 384,
+  "h": 117
+ },
+ "prop_rock_wall": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_rock_wall.webp",
+  "w": 332,
+  "h": 384
+ },
+ "prop_rune_fire": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_rune_fire.webp",
+  "w": 384,
+  "h": 152
+ },
+ "prop_rune_water": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_rune_water.webp",
+  "w": 384,
+  "h": 147
+ },
+ "prop_rune_wind": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_rune_wind.webp",
+  "w": 384,
+  "h": 143
+ },
+ "prop_sign_stone": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_sign_stone.webp",
+  "w": 384,
+  "h": 370
+ },
+ "prop_sign_wood": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_sign_wood.webp",
+  "w": 368,
+  "h": 384
+ },
+ "prop_statue_off": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_statue_off.webp",
+  "w": 308,
+  "h": 512
+ },
+ "prop_statue_on": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_statue_on.webp",
+  "w": 308,
+  "h": 512
+ },
+ "prop_water_surface": {
+  "pack": "P01_World_Props",
+  "url": "assets/P01_World_Props/prop_water_surface.webp",
+  "w": 1024,
+  "h": 128
  },
  "rune_set_blade": {
   "pack": "P04_Spirits",

@@ -69,7 +69,14 @@ export class RoomInteractions {
   }
 
   clearRocks(animate: boolean): void {
-    for (let y = 0; y < this.s.grid.h; y++) for (let x = 0; x < this.s.grid.w; x++) if (this.s.grid.get(x, y) === Cell.Rock) this.s.grid.set(x, y, Cell.Empty);
+    // rubble where each rock column stood (P01 prop_rock_debris)
+    const base = new Map<number, number>();
+    for (let y = 0; y < this.s.grid.h; y++) for (let x = 0; x < this.s.grid.w; x++) if (this.s.grid.get(x, y) === Cell.Rock) { this.s.grid.set(x, y, Cell.Empty); base.set(x, Math.max(base.get(x) ?? 0, y)); }
+    if (this.s.textures.exists('prop_rock_debris')) for (const [x, y] of base) {
+      const d = this.s.add.image(x * TILE + TILE / 2, (y + 1) * TILE + 4, 'prop_rock_debris').setOrigin(0.5, 1).setDepth(6).setAlpha(animate ? 0 : 1);
+      d.setScale((TILE * 2.6) / d.width);
+      if (animate) this.s.tweens.add({ targets: d, alpha: 1, duration: 300, delay: 150 });
+    }
     if (!this.s.view) return;
     for (const r of this.s.view.rocks.values()) {
       if (animate) this.s.tweens.add({ targets: r, alpha: 0, duration: 350, onComplete: () => r.destroy() }); else r.destroy();
