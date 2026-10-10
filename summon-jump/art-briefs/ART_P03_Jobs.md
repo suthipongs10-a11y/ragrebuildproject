@@ -2,7 +2,7 @@
 
 > **ข้อความถึงผู้ใช้:** แนบไฟล์นี้ในแชท ChatGPT เดิม แล้วพิมพ์ว่า
 > **"อ่านไฟล์นี้แล้วทำตามทั้งหมด เริ่ม Part 1 ได้เลย"**
-> ถ้าหยุดกลางทางให้พิมพ์ **"ทำต่อจากที่ค้าง"** · ได้ zip 4 ไฟล์ ส่งให้ Claude ไม่ต้องเปลี่ยนชื่อ
+> ถ้าหยุดกลางทางให้พิมพ์ **"ทำต่อจากที่ค้าง"** · ได้ zip 5 ไฟล์ ส่งให้ Claude ไม่ต้องเปลี่ยนชื่อ
 > ถ้ายังไม่ได้ทำ brief เก่า `ART_P03_Gear_Cards_VFX.md` (ดาบ เกราะ การ์ด VFX พื้นฐาน) ให้ทำอันนั้นด้วย — ไม่ซ้ำกับไฟล์นี้
 > เกมใช้ภาพชั่วคราวไปก่อน ไม่ต้องรีบ
 
@@ -10,9 +10,11 @@
 
 ## 0. Instructions to ChatGPT
 
-This is the **job pack** for my game **Summon Jump** (the painted fantasy platformer you already made art for in this chat). The hero can change job to **Swordsman, Mage, Archer or Acolyte**. This brief has **4 parts, 76 images**. Do Part 1 → 4. After each part, zip that part's PNGs **plus `manifest.json`** with the exact zip name given, give me the link, then continue automatically. If you hit a limit, stop after a complete image and tell me the number to continue from.
+This is the **job pack** for my game **Summon Jump** (the painted fantasy platformer you already made art for in this chat). The hero can change job to **Swordsman, Mage, Archer or Acolyte**. This brief has **5 parts, 86 images**. Do Part 1 → 4. After each part, zip that part's PNGs **plus `manifest.json`** with the exact zip name given, give me the link, then continue automatically. If you hit a limit, stop after a complete image and tell me the number to continue from.
 
 References from earlier in this chat: the **golden valley style painting**, the hero **`30_hero_design.png`** and the hero parts sheet **`31_hero_parts.png`**. If you no longer have them, tell me and I will attach them again.
+
+**Each job must look like its own character** (different outfit, silhouette, colour theme and signature accessory — readable even as a tiny silhouette on a phone), while keeping the hero's face and body proportions so the game can animate the same pieces.
 
 **Most important rule (Part 1):** every `job_*_parts.png` must use **exactly the same layout as `31_hero_parts.png`** — same piece positions on the sheet, same piece sizes, same joint dots — because the game animates the pieces with fixed pivot points. Only clothing, hair and colours change. Leave the weapon slot empty (weapons come separately).
 
@@ -39,13 +41,13 @@ Use the size in the table; keep the subject centred with a small empty margin; n
 
 | # | File | Size | Description |
 |---|---|---|---|
-| 1 | `job_swordsman_design.png` | 1024×1024 | **Swordsman** — the same boy hero from `30_hero_design.png` (same face, same body proportions, same side view facing right) dressed as a sturdy young swordsman: steel-and-leather breastplate over the blue tunic, steel pauldrons, gauntlets, short red cape-scarf, bandana; sword at the hip. Full body standing pose. |
+| 1 | `job_swordsman_design.png` | 1024×1024 | **Swordsman — knight in training.** The same boy hero from `30_hero_design.png` (same face, same body proportions, side view facing right) but he must look like **a different, heroic warrior at first glance**: polished silver breastplate over a royal-blue tabard with a gold trim, one big rounded steel pauldron on the front shoulder, steel gauntlets and greaves, a long **red cape-scarf** flowing behind, spiky hair held by a steel headband with a small blue gem. Colour theme: steel + royal blue + red. Confident stance, chest out. Full body standing pose, sword at the hip. |
 | 2 | `job_swordsman_parts.png` | 1536×1024 | **Swordsman parts sheet** — exactly the same **layout, piece positions, piece sizes and skin-coloured joint dots** as `31_hero_parts.png` (head, torso, upper arm, forearm+hand, thigh, shin+boot, scarf/cape, and the weapon slot left EMPTY), only the clothes/hair change to match `job_swordsman_design.png`. Pieces separated by large gaps. |
-| 3 | `job_mage_design.png` | 1024×1024 | **Mage** — the same boy hero from `30_hero_design.png` (same face, same body proportions, same side view facing right) dressed as a young mage: deep indigo robe with gold trim, wide sleeves, tall pointed hat with a soft brim (hat drawn as part of the head piece), glowing amber belt gem. Full body standing pose. |
+| 3 | `job_mage_design.png` | 1024×1024 | **Mage — young wizard.** The same boy hero (same face and proportions, side view facing right) but instantly recognisable as a spell-caster: a **tall wide-brimmed pointed hat** with small embroidered stars (hat drawn as part of the head piece), deep indigo robe with glowing violet rune lines on the hem, long flowing sleeves, a crystal amulet on the chest, a scroll pouch on the belt, soft violet glow around the hands. Colour theme: indigo + gold + violet glow. Calm, focused stance. Full body standing pose. |
 | 4 | `job_mage_parts.png` | 1536×1024 | **Mage parts sheet** — exactly the same **layout, piece positions, piece sizes and skin-coloured joint dots** as `31_hero_parts.png` (head, torso, upper arm, forearm+hand, thigh, shin+boot, scarf/cape, and the weapon slot left EMPTY), only the clothes/hair change to match `job_mage_design.png`. Pieces separated by large gaps. |
-| 5 | `job_archer_design.png` | 1024×1024 | **Archer** — the same boy hero from `30_hero_design.png` (same face, same body proportions, same side view facing right) dressed as a nimble archer: forest-green leather jerkin, brown hood folded on the shoulders, arm guard, quiver strap across the chest, feather in the hair. Full body standing pose. |
+| 5 | `job_archer_design.png` | 1024×1024 | **Archer — forest ranger.** The same boy hero (same face and proportions, side view facing right) as an agile ranger: forest-green hooded cloak with the hood down, short leather vest, a **quiver full of orange-feathered arrows on the back** (drawn on the torso piece), leather arm guard, fingerless gloves, a long feather tucked in the hair, a green scarf around the neck. Colour theme: forest green + brown leather + orange feathers. Light, ready-to-move stance. Full body standing pose. |
 | 6 | `job_archer_parts.png` | 1536×1024 | **Archer parts sheet** — exactly the same **layout, piece positions, piece sizes and skin-coloured joint dots** as `31_hero_parts.png` (head, torso, upper arm, forearm+hand, thigh, shin+boot, scarf/cape, and the weapon slot left EMPTY), only the clothes/hair change to match `job_archer_design.png`. Pieces separated by large gaps. |
-| 7 | `job_acolyte_design.png` | 1024×1024 | **Acolyte** — the same boy hero from `30_hero_design.png` (same face, same body proportions, same side view facing right) dressed as a gentle acolyte/priest: white-and-gold cassock, blue sash, small holy pendant, short cape, soft cap. Full body standing pose. |
+| 7 | `job_acolyte_design.png` | 1024×1024 | **Acolyte — young priest.** The same boy hero (same face and proportions, side view facing right) as a holy healer: **white-and-gold cassock** with a tall collar, sky-blue sash, a golden holy-sun pendant on the chest, prayer beads on the wrist, a small white-and-gold cap, a short white cape with gold embroidery, a soft warm golden glow around him. Colour theme: white + gold + sky blue. Gentle, upright stance. Full body standing pose. |
 | 8 | `job_acolyte_parts.png` | 1536×1024 | **Acolyte parts sheet** — exactly the same **layout, piece positions, piece sizes and skin-coloured joint dots** as `31_hero_parts.png` (head, torso, upper arm, forearm+hand, thigh, shin+boot, scarf/cape, and the weapon slot left EMPTY), only the clothes/hair change to match `job_acolyte_design.png`. Pieces separated by large gaps. |
 
 ➡ Zip 1–8 + `manifest.json` as **`SJ_P03_Jobs_Part1.zip`**, give the link, continue.
@@ -137,7 +139,25 @@ Use the size in the table; keep the subject centred with a small empty margin; n
 | 75 | `vfx_whirlwind.png` | 1024×1024 | A horizontal ring of sword wind (white-blue arcs) spinning, side view. |
 | 76 | `vfx_dash.png` | 1024×1024 | Horizontal speed streaks and dust burst, moving to the RIGHT. |
 
-➡ Zip 61–76 + `manifest.json` as **`SJ_P03_Jobs_Part4.zip`**, give the link.
+➡ Zip 61–76 + `manifest.json` as **`SJ_P03_Jobs_Part4.zip`**, give the link, continue.
+
+### PART 5 — Expression heads (10 images) → `SJ_P03_Jobs_Part5.zip`
+The game swaps the head piece during actions so the hero shouts when attacking and winces when hit. Each image = **only the head (with hat/hair/headband of that job), seen from the side facing right, exactly the same size, angle and drawing as the head piece in that job's parts sheet**, neck stump at the bottom centre. 512×512, transparent, head centred with the neck touching the bottom margin.
+
+| # | File | Size | Description |
+|---|---|---|---|
+| 77 | `hero_head_attack.png` | 512×512 | Base hero (`30_hero_design.png`) head: **battle shout** — mouth open wide, eyebrows down, fierce eyes. |
+| 78 | `hero_head_hurt.png` | 512×512 | Base hero head: **hurt** — eyes squeezed shut, teeth clenched, head slightly tilted back. |
+| 79 | `job_swordsman_head_attack.png` | 512×512 | Swordsman head (headband) — battle shout. |
+| 80 | `job_swordsman_head_hurt.png` | 512×512 | Swordsman head — hurt. |
+| 81 | `job_mage_head_attack.png` | 512×512 | Mage head (pointed hat) — focused casting face: eyes glowing violet, mouth open chanting. |
+| 82 | `job_mage_head_hurt.png` | 512×512 | Mage head — hurt, hat knocked a little crooked. |
+| 83 | `job_archer_head_attack.png` | 512×512 | Archer head (feather) — one eye closed aiming, determined grin. |
+| 84 | `job_archer_head_hurt.png` | 512×512 | Archer head — hurt. |
+| 85 | `job_acolyte_head_attack.png` | 512×512 | Acolyte head (cap) — determined prayer face, mouth open, eyes glowing gold. |
+| 86 | `job_acolyte_head_hurt.png` | 512×512 | Acolyte head — hurt. |
+
+➡ Zip 77–86 + `manifest.json` as **`SJ_P03_Jobs_Part5.zip`** and give the link.
 
 ## 5. manifest.json
 ```json
@@ -149,7 +169,9 @@ Use `"status":"redo-suggested"` + `"note"` when something didn't come out right.
 - [ ] Exact file names; PNG; transparency (black only for `vfx_*`).
 - [ ] Parts sheets: identical layout to `31_hero_parts.png`, joint dots present, weapon slot empty.
 - [ ] Weapons: same pose and handle position as the original sword piece.
+- [ ] Each job reads as a different character (outfit, colours, signature item) but with the same face and proportions.
+- [ ] Expression heads: same size and angle as the head piece of that job.
 - [ ] No text or letters anywhere.
 
 ## 7. Final reply
-Give all 4 zip links and list any files that need a redo.
+Give all 5 zip links and list any files that need a redo.
