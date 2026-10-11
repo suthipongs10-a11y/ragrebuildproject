@@ -1,0 +1,23 @@
+/* Turn battle: team picker + result panels (same frame as the game menu), and the field HUD hidden while fighting. */
+body.tb #pad, body.tb #b_auto, body.tb #b_menu, body.tb #b_home, body.tb #keys, body.tb #b_act { display: none !important; }
+.tb-panel .mn { height: auto; max-height: min(560px, 100%); }
+.tb-foes { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 4px 8px; }
+.tb-foe { padding: 4px 10px; border-radius: 10px; background: rgba(120, 30, 20, .45); font-size: 14px; }
+.tb-team { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.tb-slot { width: 96px; min-height: 120px; border-radius: 12px; background: rgba(23, 18, 12, .55); border: 2px solid #5ae0d0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; font-size: 12px; text-align: center; }
+.tb-slot.lead { border-color: #ffd23f; box-shadow: 0 0 10px rgba(255, 210, 63, .5); }
+.tb-slot.empty { border-style: dashed; opacity: .5; justify-content: center; }
+.tb-slot button { min-height: 28px; font-size: 12px; padding: 0 8px; }
+.tb-box { display: flex; flex-wrap: wrap; gap: 6px; }
+.tb-pick { width: 74px; border-radius: 10px; background: rgba(23, 18, 12, .45); border: 2px solid transparent; color: var(--ink); font: 12px var(--f-ui); padding: 4px 2px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.tb-pick.on { border-color: #5ae0d0; background: rgba(40, 90, 85, .55); }
+.tb-pick:disabled { opacity: .4; }
+.tb-pick .adv { color: #8ff08f; font-size: 11px; }
+.tb-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; flex-wrap: wrap; }
+/* team picker: the start button stays in view while the spirit list scrolls */
+.tb-panel .mn-body > .tb-actions { position: sticky; bottom: -10px; padding: 8px 0; background: linear-gradient(transparent, #33271a 30%); }
+.tb-actions .mn-btn { min-height: 48px; font-size: 17px; }
+.tb-res { text-align: center; font-size: 16px; line-height: 1.6; white-space: pre-line; }
+.tb-res h2 { margin: 4px 0 8px; font-size: 30px; color: #ffd88a; }
+.tb-res.lose h2 { color: #c9b6d8; }
+.tb-banner { display: block; width: min(360px, 70%); margin: 0 auto -10px; }

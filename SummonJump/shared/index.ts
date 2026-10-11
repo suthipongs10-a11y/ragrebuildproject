@@ -21,3 +21,4 @@ export * from './rules/arena';
 export * from './progression/guide';
 export * from './sim/auto';
 export * from './rules/explore';
+export * from './battle';

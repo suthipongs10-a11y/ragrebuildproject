@@ -32,12 +32,17 @@ export function queueKeys(scene: Phaser.Scene, keys: string[]): void {
   for (const k of keys) if (!scene.textures.exists(k)) scene.load.image(k, art(k).url);
 }
 
-const SUMMONS: Record<string, string[]> = { king: ['poring'], kraken: ['fish'], spore_mother: ['mushroom'], siren: ['jellyfish'], storm_roc: ['fire_hawk'] };
+/** Boss → minion it calls (monsters.csv `ai_params.minion`), filled from content at boot. */
+const SUMMONS: Record<string, string[]> = {};
 
 /** monsters.csv `art` / `tint`: a look-alike (another monster's art, tinted) until the monster's own art is imported. */
 const LOOK = new Map<string, { art: string | null; tint: number | null }>();
-export function setMonsterLooks(defs: readonly { id: string; art: string | null; tint: number | null }[]): void {
-  for (const d of defs) LOOK.set(d.id, { art: d.art, tint: d.tint });
+export function setMonsterLooks(defs: readonly { id: string; art: string | null; tint: number | null; ai_params?: Record<string, unknown> }[]): void {
+  for (const d of defs) {
+    LOOK.set(d.id, { art: d.art, tint: d.tint });
+    const m = d.ai_params?.minion;
+    if (typeof m === 'string') SUMMONS[d.id] = [m];
+  }
 }
 const ownKeys = (id: string) => (['idle', 'windup', 'attack', 'hurt', 'idle2', 'skill'] as const).map((p) => `mon_${id}_${p}`).filter((k) => ART[k]);
 const hasOwnArt = (id: string) => ownKeys(id).length > 0 || !!ART[`boss_${id}_design`] || !!ART[`legacy_${id}`];

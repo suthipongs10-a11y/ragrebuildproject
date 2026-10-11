@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { Cell, TILE, checkExit, createHero, exitsOf, stepHero, aliveSpawns, pruneDefeated, unstick, P,
   type EntityData, type HeroState, type LevelData, type MotionEnv, type MotionEvent, type TileGrid } from '@shared/platformer';
-import { createRng, moveSpeed, noteDex, type ArenaRun } from '@shared/index';
+import { createRng, moveSpeed, noteDex } from '@shared/index';
 import type { ContentBundle } from '@shared/content/types';
 import { loadTextures, roomKeys } from '../assets/packs';
 import { setLoading, showLoadProblem } from '../ui/errors';
@@ -25,7 +25,7 @@ import { popNumber } from '../vfx/DamageText';
 import { bindDebugKeys } from './debugKeys';
 import { BossTimers } from '../world/BossTimers';
 import { FieldSpawner } from '../world/FieldSpawner';
-import { ArenaController, arenaKeys, enterArena } from '../world/Arena';
+import { enterArena } from '../world/Arena';
 import { autoPilot, NO_PILOT } from '../hero/AutoPilot';
 import { applyHeroLook, sessionArtKeys } from '../hero/HeroArt';
 import { worldRooms } from '../world/roomList';
@@ -58,7 +58,6 @@ export class WorldScene extends Phaser.Scene {
   private ultBtn = new UltButton();
   private bossTimers!: BossTimers;
   private field!: FieldSpawner;
-  private arena: ArenaController | null = null;
   private guide!: Guide;
   private menu!: Menu;
   private deadT = 0;
@@ -102,7 +101,7 @@ export class WorldScene extends Phaser.Scene {
     this.level = this.levels.get(roomId) ?? (this.levels.get('town') as LevelData);
     this.ready = false;
     // safety net: if any texture of this room is missing (failed download), fetch it and come back
-    const need = [...roomKeys(this.level), ...sessionArtKeys(this.session), ...arenaKeys(this, this.level.id)].filter((k) => !this.textures.exists(k));
+    const need = [...roomKeys(this.level), ...sessionArtKeys(this.session)].filter((k) => !this.textures.exists(k));
     if (need.length && !data.retried) {
       setLoading(true);
       loadTextures(this, need, (missing) => { setLoading(false); if (missing.length) showLoadProblem(missing); else this.scene.restart({ ...data, retried: true }); });
@@ -152,9 +151,6 @@ export class WorldScene extends Phaser.Scene {
     // the arena is entered from the portal NPC only: never save it as the room to load into
     if (this.level.id !== 'arena') this.save.room = this.level.id;
     this.save.seen[this.level.id] = true; this.flush();
-    const run = this.registry.get('arenaRun') as ArenaRun | undefined;
-    this.arena = this.level.id === 'arena' && run ? new ArenaController(this, run) : null;
-    this.registry.remove('arenaRun');
     bindDebugKeys(this);
     const home = document.getElementById('b_home');
     if (home) home.onpointerup = (e) => { e.preventDefault(); this.goHome(); };
@@ -235,7 +231,7 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.fadeOut(fadeMs, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       setLoading(true);
-      loadTextures(this, [...roomKeys(target), ...sessionArtKeys(this.session), ...arenaKeys(this, roomId)], (missing) => {
+      loadTextures(this, [...roomKeys(target), ...sessionArtKeys(this.session)], (missing) => {
         setLoading(false);
         if (missing.length) showLoadProblem(missing);
         else this.scene.restart({ room: roomId, place });
@@ -300,7 +296,6 @@ export class WorldScene extends Phaser.Scene {
     this.room.collectPickups();
     this.bossTimers.update();
     this.field.update(dt, this.hero.x + this.hero.w / 2);
-    this.arena?.update(dt);
     this.guide.update(dt);
 
     const ex = dead ? null : checkExit(this.hero, env);

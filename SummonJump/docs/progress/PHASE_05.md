@@ -89,6 +89,17 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
 - [x] Sky Isles: every sky room stands on one continuous cloud ground (no gaps → no fall/respawn flicker); sky1 goes back to town through a cloud pipe (level validation accepts edge ↔ pipe pairs).
 - Balance: swordsman route unchanged (1.9 → 1.8 h sim to the Kraken).
 
+## Owner request: tower + daily dungeon = SW-style turn battle with spirits (2026-10-11)
+- [x] Design: GDD §4.1, ROADMAP Phase 5 note. Art brief `art-briefs/ART_P05_TurnBattle.md` (21 images: tower / shrine stages, 6 element shrines, win/lose emblems, rings, target, skill frames, status icons) — placeholders until it arrives (zone far layer as the stage, code-drawn rings and buttons).
+- [x] Engine `shared/battle/` (pure, seeded): attack bars fill with SPD, the fullest acts; spirit skill 1 (every turn) + ultimate (all enemies, every 4th turn); stun / heal / shield / DEF break / crit / pierce / lifesteal from the existing skill and rune data; leader skill; monsters converted from their field stats (`spirit_config.csv` `tb_*`); bosses: whole-team attack every 3 turns, rage under 50 % (SPD ×1.3) and call their minion (no EXP); waves (big tower floors split into ≤ 4–5).
+- [x] Battle team of 4 (separate from the 3 field spirits), picked before every fight; slot 1 = leader; spirits on an expedition can't join; "ได้เปรียบธาตุ" badge vs the enemies.
+- [x] Battle scene: turn-order strip, HP / shield / attack bars, status icons, tap a monster to hit it, tap the ultimate to blast everyone, AUTO, speed ×1/×2/×3, leave (= loss), painted skill effects, RO damage numbers (crit burst), wave / rage / minion pop-ups.
+- [x] Rewards as before (tower first clear, dungeon essences + soul + rune) **+ EXP for every spirit in the team**; loss keeps the dungeon entry spent (SW), tower retry is free; result buttons: next floor / again / retry / town.
+- [x] Old action arena run removed (`ArenaController`); the portal NPC opens the turn battle.
+- Balance (AUTO, 20 seeds, starter spirits): tower floors 1–14 easy with a matching 3★ team, floor 15 close, floors 19–20 need 4★ (100 % at 4★ Lv 28); daily dungeon ≈ 80–85 % for a matching 3★ team, 100 % at 4★. Covered by `tests/battle.test.ts`.
+- [x] Fix: boss minion pictures come from `monsters.csv` (harpy's birds, thunder ram's puffs and shark's fish were not loaded).
+- [x] Fix: click lock-on with a bow / staff: shots fly at the locked monster and pass through others (packs of 2 used to soak every arrow).
+
 ## Owner request: more monsters, endless farming, stronger normals (2026-10-10)
 - [x] Normal monsters come back by themselves: 12 s after one dies it reappears at its spawn point with a small puff (`monsters.csv` `respawn_sec`), never on top of the hero (waits until the hero is 260 px away). Still respawn on room entry too; bosses keep their long persisted timers.
 - [x] More monsters: each spawn point now holds a pack (`monsters.csv` new `pack` column: 2 for normal monsters, 1 for turrets and bosses) → about twice as many monsters per room.
@@ -116,7 +127,7 @@ Zones 1–3 = **Forest (Lv 1–14) → Sky Isles (Lv 10–20) → Abyss (Lv 15�
   - P01 World Props (29) + P05 Portal NPC (3): painted NPCs with a talk pose, signs, altar, anvil, save statue (lights up when used), chests (open), rune plates, portal gate, rock rubble.
   - P03 Jobs part 1 + 5: `npm run art:jobs` cuts each job's parts sheet into rig pieces (`tools/art-import/job-parts.json`: piece rects + joint pivots from the dots), masks out neighbouring pieces, and lines up the expression heads. The rig wears the job's parts, the equipped weapon's own painting, a battle-shout face while attacking/casting and a pained face when hit. Job-change cards show each job's design picture.
 - Not used yet: `prop_pipe_top/body`, `prop_rock_wall`, `prop_gate_*`, `prop_fountain`, `prop_ladder`, `prop_water_surface`, `prop_door_wood`, `arm_0X_torso/uarm` armour overlays, spirit `ult_*` icons.
-- Still waiting: P05 monsters (forest / sky / abyss) and zone packs.
+- Still waiting: P05 monsters (forest / sky / abyss), zone packs and `ART_P05_TurnBattle` (battle stages + UI).
 
 ## Known issues / notes
 - New monsters without art use a recoloured look-alike (`art` + `tint` in monsters.csv), e.g. Crab = red Scorpion, Siren = teal Harpy, Storm Roc = slate Bird. They switch to their own art automatically when `ART_P05_Monsters_*` is imported.

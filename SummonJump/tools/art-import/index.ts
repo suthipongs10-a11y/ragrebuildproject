@@ -20,7 +20,9 @@ const manifest: ArtManifest = loadManifest();
 
 /** Longest side / height targets per category (px). */
 function target(name: string): { maxW: number; maxH: number } {
-  if (name.startsWith('zone_')) return { maxW: 1920, maxH: 1080 };
+  if (name.startsWith('zone_') || name.startsWith('tb_stage_')) return { maxW: 1920, maxH: 1080 };
+  if (name.startsWith('tb_banner_')) return { maxW: 1024, maxH: 512 };
+  if (name.startsWith('tb_ring_')) return { maxW: 384, maxH: 192 };
   if (/^(mon|boss|spr|spirit)_/.test(name)) return { maxW: 640, maxH: 512 };
   if (/^(wpn|arm_\d+_(torso|uarm))/.test(name)) return { maxW: 512, maxH: 512 };
   if (name.startsWith('vfx_')) return { maxW: 512, maxH: 512 };
@@ -31,7 +33,7 @@ function target(name: string): { maxW: number; maxH: number } {
   if (name.startsWith('prop_')) return { maxW: 384, maxH: 384 };
   return { maxW: 256, maxH: 256 };
 }
-const noTrim = (n: string) => /^ui_(panel|header|bar|btn_(primary|secondary|danger)|numbers|rarity)/.test(n) || n.startsWith('zone_') && n.endsWith('_far');
+const noTrim = (n: string) => /^ui_(panel|header|bar|btn_(primary|secondary|danger)|numbers|rarity)/.test(n) || n.startsWith('zone_') && n.endsWith('_far') || n.startsWith('tb_stage_');
 // pose pairs share one crop box so swapping idle/talk or closed/open never jumps
 const groupKey = (n: string) => /^mon_([a-z0-9]+)_/.exec(n)?.[1] ?? /^(npc_[a-z]+)_(idle|talk)$/.exec(n)?.[1] ?? /^(prop_(?:chest|statue|gate))_/.exec(n)?.[1];
 
@@ -97,7 +99,7 @@ async function main() {
         out = s.resize({ width: t.maxW, height: t.maxH, fit: 'inside', withoutEnlargement: true }).webp({ quality: 80 });
       } else {
         const d = decoded.get(name)!;
-        if (d.opaqueCorners && !name.endsWith('_far')) report.push(`- ⚠️ \`${name}\`: corners are opaque — background probably not transparent`);
+        if (d.opaqueCorners && !name.endsWith('_far') && !name.startsWith('tb_stage_')) report.push(`- ⚠️ \`${name}\`: corners are opaque — background probably not transparent`);
         const g = groupKey(name);
         const b = noTrim(name) ? { x0: 0, y0: 0, x1: d.w - 1, y1: d.h - 1 } : (g ? groupBox.get(g)! : bbox(d.data, d.w, d.h));
         const pad = noTrim(name) ? 0 : 6;

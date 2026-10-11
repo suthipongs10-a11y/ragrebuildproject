@@ -20,6 +20,8 @@ export interface SpiritBox {
   /** pulls since the last pity-star result, per summon id */
   pity: Record<string, number>;
   gauge: number;
+  /** turn-battle team (tower + daily dungeon), slot 0 = leader; missing on old saves */
+  battle?: number[];
 }
 
 export const TEAM_SIZE = 3;

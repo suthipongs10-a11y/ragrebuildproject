@@ -110,6 +110,22 @@ describe('rig clips', () => {
   });
 });
 
+describe('click lock-on (ranged)', () => {
+  it('a bow shot at the locked monster flies past the one in front and hits only the target', () => {
+    const g = floorGrid(), hero = createHero(5 * TILE, 15 * TILE - 56); hero.onGround = true; hero.dir = 1;
+    const front = createEnemy('front', def('poring'), 9 * TILE, 15 * TILE, createRng(1)), back = createEnemy('back', def('poring'), 12 * TILE, 15 * TILE, createRng(2));
+    for (const e of [front, back]) { e.def = { ...e.def, hp: 9999 }; e.hp = 9999; }
+    const c = createHeroCombat(BUILD), shots: Shot[] = [], rng = createRng(3);
+    const hits: string[] = [];
+    for (let i = 0; i < 120; i++) {
+      const ev = stepHeroCombat(c, hero, BUILD, [front, back], shots, { attackPressed: i === 0, attackHeld: false, jumpHeld: false }, false, rng, 1 / 120, { ranged: true, range: 400, lock: back });
+      for (const x of ev) if (x.kind === 'hit') hits.push(x.enemy.id);
+      for (const s of shots) { s.x += s.vx / 120; s.y += s.vy / 120; s.life -= 1 / 120; }
+    }
+    expect(hits).toEqual(['back']);
+  });
+});
+
 describe('boss scripts (Phase 5)', () => {
   it('every mini-boss / MVP attacks, enters phase 2 under half HP and stays sane', () => {
     for (const m of content.monsters.filter((x) => x.tier !== 'normal')) {

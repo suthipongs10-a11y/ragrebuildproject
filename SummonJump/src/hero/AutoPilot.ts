@@ -58,6 +58,7 @@ export function autoPilot(s: WorldScene, steering: boolean, dt: number): Pilot {
   const st = state(s), now = s.time.now / 1000, h = s.hero, d = s.session.derived;
   let forced = st.forced ? s.combat.enemies.find((e) => e.id === st.forced && !e.dead) ?? null : null;
   if (st.forced && !forced) st.forced = null;
+  s.combat.lockId = forced?.id ?? null;
   const on = autoOn();
   if (!on && !forced) { st.marker.setVisible(false); return IDLE; }
   const out: Pilot = { ...IDLE };

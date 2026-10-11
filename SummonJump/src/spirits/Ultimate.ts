@@ -103,7 +103,7 @@ function sweep(scene: Phaser.Scene, cam: Phaser.Cameras.Scene2D.Camera, color: n
 /** Per-target effect: `x` centre, `foot` ground under the monster, `y` hit point. */
 const ULT_ART: Record<string, string> = { slam: 'vfx_jelly_splash', vortex: 'vfx_tornado', rain: 'vfx_meteor', pillar: 'vfx_holy_pillar', wave: 'vfx_wave' };
 
-function hitFx(scene: Phaser.Scene, kind: string, x: number, foot: number, y: number, color: number): void {
+export function hitFx(scene: Phaser.Scene, kind: string, x: number, foot: number, y: number, color: number): void {
   const art = ULT_ART[kind] ?? 'vfx_crit_burst';
   const base = kind === 'pillar' || kind === 'vortex' || kind === 'slam';
   if (fxImg(scene, art, x, base ? foot : y, { size: kind === 'pillar' ? 300 : kind === 'rain' ? 170 : 200, life: 420, tint: kind === 'slam' || kind === 'pillar' ? null : color, from: 0.4, depth: 40, origin: base ? [0.5, 0.9] : undefined })) {

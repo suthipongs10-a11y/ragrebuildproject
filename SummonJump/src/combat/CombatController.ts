@@ -42,6 +42,8 @@ export class CombatController {
   spirits: SpiritWorld;
   private readonly spiritViews: SpiritViews;
   private heroDir = 1;
+  /** monster the player clicked / tapped (AutoPilot): ranged shots home in on it */
+  lockId: string | null = null;
 
   constructor(
     private readonly scene: Phaser.Scene, private readonly level: LevelData, private readonly grid: TileGrid,
@@ -132,7 +134,8 @@ export class CombatController {
     const skillEv = stepSkills(s.rt, this.skillCtx(hero), dt);
     this.handleSkillEvents(skillEv);
     const out = stepHeroCombat(this.combat, hero, d.build, this.enemies, this.shots, inp, this.level.water, this.rng, dt,
-      { element: d.element, ranged: d.ranged, range: d.range, noKnockback: d.noKnockback, blocked: !!s.rt.cast, magicShot: d.magic });
+      { element: d.element, ranged: d.ranged, range: d.range, noKnockback: d.noKnockback, blocked: !!s.rt.cast, magicShot: d.magic,
+        lock: this.lockId ? this.enemies.find((e) => e.id === this.lockId && !e.dead) : null });
     for (const ev of out) this.feedback(ev);
     followSpirits(this.spirits, hero, time, dt);
     this.heroDir = hero.dir;

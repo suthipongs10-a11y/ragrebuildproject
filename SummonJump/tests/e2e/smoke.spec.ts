@@ -249,29 +249,53 @@ test('phase 5: adventure book milestone can be claimed for a permanent bonus', a
   expect(errors).toEqual([]);
 });
 
-test('phase 5: tower floor 1 from the portal: waves, clear reward, back to town', async ({ page, isMobile }) => {
+/** Run `fn` against the turn-battle scene in the page. */
+const tbs = <T,>(page: Page, fn: (s: Any) => T) => page.evaluate((src) => new Function('s', `return (${src})(s)`)((window as unknown as Any).__game.scene.getScene('TurnBattle')), fn.toString()) as Promise<T>;
+
+test('phase 5: tower floor 1 is a turn battle with spirits: pick the team, hit a monster by hand, AUTO wins, reward, back to town', async ({ page, isMobile }) => {
   test.skip(isMobile, 'desktop only');
   const errors = await boot(page, '?map=town&hero=swordsman:20');
+  await page.evaluate(() => { localStorage.setItem('sj_tb_auto', '0'); localStorage.setItem('sj_tb_speed', '3'); });
   await ws(page, (w) => w.openMenu('arena'));
   await page.click('[data-act="arena:tower:1"]');
-  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').level?.id === 'arena', null, { timeout: 10_000 });
-  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').combat.enemies.some((e: Any) => e.id.startsWith('arena#')), null, { timeout: 10_000 });
-  // every monster picture is loaded (the arena room has no spawns of its own)
-  expect(await ws(page, (w) => w.children.list.filter((o: Any) => o.texture?.key === '__MISSING').length)).toBe(0);
-  await ws(page, (w) => w.debugKillAll());
-  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').session.arena.tower === 1, null, { timeout: 10_000 });
-  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').level?.id === 'town', null, { timeout: 15_000 });
+  await page.waitForSelector('.tb-panel [data-tb="start"]', { timeout: 15_000 });
+  // team picker: take the leader out and put it back (4 slots max)
+  const first = await page.locator('.tb-slot [data-tb^="out:"]').first().getAttribute('data-tb');
+  await page.click(`.tb-slot [data-tb="${first}"]`);
+  await expect(page.locator('.tb-slot.empty')).toHaveCount(1);
+  await page.click(`.tb-pick[data-tb="tog:${(first ?? '').split(':')[1]}"]`);
+  await expect(page.locator('.tb-slot.empty')).toHaveCount(0);
+  await page.click('.tb-panel [data-tb="start"]');
+  // wait for a spirit's turn, then tap the first monster on the canvas
+  await page.waitForFunction(() => { const s = (window as unknown as Any).__game.scene.getScene('TurnBattle'); return !!s.pick && s.b?.active?.side === 'ally'; }, null, { timeout: 15_000 });
+  const box = (await page.locator('canvas').boundingBox())!;
+  const hp0 = await tbs(page, (s) => s.b.units.filter((u: Any) => u.side === 'enemy').reduce((a: number, u: Any) => a + u.hp, 0));
+  await page.mouse.click(box.x + (650 / 960) * box.width, box.y + (340 / 540) * box.height);
+  await page.waitForFunction((h) => (window as unknown as Any).__game.scene.getScene('TurnBattle').b.units.filter((u: Any) => u.side === 'enemy').reduce((a: number, u: Any) => a + u.hp, 0) < h, hp0, { timeout: 10_000 });
+  expect(await tbs(page, (s) => s.children.list.filter((o: Any) => o.texture?.key === '__MISSING').length)).toBe(0);
+  await tbs(page, (s) => s.toggleAuto());
+  await page.waitForSelector('.tb-res', { timeout: 60_000 });
+  await expect(page.locator('.tb-res h2')).toHaveText('ชนะ!');
+  expect(await page.evaluate(() => (window as unknown as Any).__game.registry.get('session').arena.tower)).toBe(1);
+  await page.click('.tb-res .mn-btn.sec'); // กลับเมือง
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').sys.isActive() && (window as unknown as Any).__game.scene.getScene('World').level?.id === 'town', null, { timeout: 15_000 });
+  expect(await page.evaluate(() => document.body.classList.contains('tb'))).toBe(false);
   expect(errors).toEqual([]);
 });
 
-test('phase 5: daily dungeon uses an entry and its monsters are drawn', async ({ page, isMobile }) => {
+test('phase 5: daily dungeon uses an entry, draws its monsters, leaving counts as a loss', async ({ page, isMobile }) => {
   test.skip(isMobile, 'desktop only');
   const errors = await boot(page, '?map=town&hero=swordsman:20');
   await ws(page, (w) => w.openMenu('arena'));
   await page.click('[data-act="arena:dungeon"]');
-  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('World').combat?.enemies.some((e: Any) => e.id.startsWith('arena#')), null, { timeout: 15_000 });
-  expect(await ws(page, (w) => w.session.arena.daily.used)).toBe(1);
-  expect(await ws(page, (w) => w.children.list.filter((o: Any) => o.texture?.key === '__MISSING').length)).toBe(0);
+  await page.waitForSelector('.tb-panel [data-tb="start"]', { timeout: 15_000 });
+  expect(await page.evaluate(() => (window as unknown as Any).__game.registry.get('session').arena.daily.used)).toBe(1);
+  await page.click('.tb-panel [data-tb="start"]');
+  await page.waitForFunction(() => (window as unknown as Any).__game.scene.getScene('TurnBattle').b?.units.some((u: Any) => u.side === 'enemy'), null, { timeout: 15_000 });
+  await page.waitForTimeout(400);
+  expect(await tbs(page, (s) => s.children.list.filter((o: Any) => o.texture?.key === '__MISSING').length)).toBe(0);
+  await tbs(page, (s) => s.leave());
+  await expect(page.locator('.tb-res h2')).toHaveText('แพ้แล้ว…');
   expect(errors).toEqual([]);
 });
 

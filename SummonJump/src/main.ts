@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { BootScene } from './boot/BootScene';
 import { WorldScene } from './scenes/WorldScene';
+import { TurnBattleScene } from './battle/TurnBattleScene';
 import { Controls } from './input/Controls';
 import { t } from './i18n';
 import { lockZoom } from './ui/noZoom';
@@ -30,7 +31,7 @@ const game = new Phaser.Game({
   physics: { default: 'arcade', arcade: { gravity: { x: 0, y: 1400 }, debug: false, fixedStep: false } },
   render: { antialias: true, pixelArt: false },
   fps: { smoothStep: false },
-  scene: [BootScene, WorldScene],
+  scene: [BootScene, WorldScene, TurnBattleScene],
 });
 game.registry.set('controls', controls);
 const menu = new Menu();

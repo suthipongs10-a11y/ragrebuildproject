@@ -30,6 +30,8 @@ export interface Shot {
   base?: number; magic?: boolean; kb?: number; delay?: number; kind?: string; pierce?: boolean; hit?: string[];
   /** spirit shots: flat damage base (spirit ATK x power), crit rate, on-hit stun seconds / DEF-down fraction */
   power?: number; crit?: number; critDmg?: number; stun?: number; defDown?: number;
+  /** locked-on hero shot: flies at this enemy and only hits it (RO: a targeted attack can't be blocked by another monster) */
+  target?: string;
 }
 
 export interface EnemyCtx {

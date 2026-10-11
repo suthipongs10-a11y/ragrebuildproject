@@ -27,6 +27,8 @@
 - Drops fly into the hero by themselves (stop when the bag is full); critical hits show a big yellow number on a spiky red burst.
 - Tougher bosses: HP ×4, ATK ×1.5, every boss calls minions (no EXP/drops from them), shorter cooldowns, shockwaves, rage speed-up when hurt, stun/freeze resistance.
 - Endless farming: normal monsters respawn in the room 12 s after dying, 2 per spawn point, HP and ATK ×2.
+- Tower + daily dungeon are now SW-style turn battles with a 4-spirit team (turn order by SPD, skill 1 + ultimate, leader skill, boss rage and minions, AUTO and ×3 speed, spirit EXP rewards); art brief `ART_P05_TurnBattle`.
+- Fixes: bow / staff shots at a clicked monster pass through others; boss minion pictures load for every boss.
 
 ## Phase 4 (done) — 2026-10-09
 - 15 spirit families × element variants (`spirits.csv`, `spirit_skills.csv`, `spirit_elements.csv`, `spirit_config.csv`).

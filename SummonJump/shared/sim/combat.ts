@@ -47,7 +47,8 @@ export function attackBox(h: Body & { dir: number }, spec: AttackSpec): Box {
 
 export interface HeroCombatInput { attackPressed: boolean; attackHeld: boolean; jumpHeld: boolean }
 /** Equipment-derived options: weapon element, bows shoot arrows (staves: magic bolts), Endure ignores knockback. */
-export interface HeroCombatOpts { element?: Element; ranged?: boolean; range?: number; noKnockback?: boolean; blocked?: boolean; /** staff: the shot looks like magic */ magicShot?: boolean }
+export interface HeroCombatOpts { element?: Element; ranged?: boolean; range?: number; noKnockback?: boolean; blocked?: boolean; /** staff: the shot looks like magic */ magicShot?: boolean;
+  /** clicked / tapped target: bow and staff shots home in on it and pass through other monsters */ lock?: Enemy | null }
 
 /**
  * Advance timers, start attacks, resolve hero hitboxes and contact/stomp/shots against enemies.
@@ -73,8 +74,10 @@ export function stepHeroCombat(
     c.atkT = spec.dur; c.atkCd = attackCooldown(build) * (c.combo === 2 ? 1.6 : 1); c.hitSet = new Set();
     ev.push({ kind: 'swing', spec, x: hero.x + hero.w / 2 + hero.dir * 16, y: hero.y + hero.h * 0.42, dir: hero.dir });
     if (opts.ranged) { // bows / staves: every attack is a shot instead of a melee box
-      shots.push({ x: hero.x + hero.w / 2 + hero.dir * 20, y: hero.y + hero.h * 0.4, vx: hero.dir * 760, vy: 0, r: 8, color: 0xfff2cc, dmg: 0, life: (opts.range ?? 300) / 760 + 0.15,
-        hostile: false, ghost: false, el, base: spec.mult, kb: spec.kb, kind: opts.magicShot ? 'magic_shot' : 'arrow' });
+      const sx = hero.x + hero.w / 2 + hero.dir * 20, sy = hero.y + hero.h * 0.4, L = opts.lock;
+      const ldx = L ? L.x + L.w / 2 - sx : 0, ldy = L ? L.y + L.h / 2 - sy : 0, aim = !!L && Math.sign(ldx) === hero.dir, d = Math.hypot(ldx, ldy) || 1;
+      shots.push({ x: sx, y: sy, vx: aim ? (ldx / d) * 760 : hero.dir * 760, vy: aim ? (ldy / d) * 760 : 0, r: 8, color: 0xfff2cc, dmg: 0, life: (opts.range ?? 300) / 760 + 0.15,
+        hostile: false, ghost: aim, el, base: spec.mult, kb: spec.kb, kind: opts.magicShot ? 'magic_shot' : 'arrow', target: aim ? L.id : undefined });
       c.hitSet.add('*');
     }
   }
@@ -104,7 +107,7 @@ export function stepHeroCombat(
     const box = { x: s.x - s.r, y: s.y - s.r, w: s.r * 2, h: s.r * 2 };
     if (s.hostile) { if (overlap(box, hero)) { hurtHero(c, hero, build, s.dmg, s.x, water, rng, ev, opts.noKnockback); s.life = 0; } continue; }
     for (const e of enemies) {
-      if (e.dead || !overlap(box, e) || s.hit?.includes(e.id)) continue;
+      if (e.dead || (s.target && e.id !== s.target) || !overlap(box, e) || s.hit?.includes(e.id)) continue;
       if (s.power !== undefined) { ev.push(spiritHit(e, s, rng)); if (s.pierce) (s.hit ??= []).push(e.id); else { s.life = 0; break; } continue; }
       const base = (s.magic ? magicAttack(build) : attack(build)) * (s.base ?? 1);
       ev.push(hitEnemy(e, base, s.el as Element, build, rng, s.kb ?? 0, 0.03, s.x - s.vx * 0.01, false, s.magic));

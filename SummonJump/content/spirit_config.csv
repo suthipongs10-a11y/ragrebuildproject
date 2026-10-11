@@ -19,3 +19,24 @@ explore_cap_h,12,expedition: most hours that count while away
 explore_kills_h,40,expedition: monsters beaten per hour by a full team at full strength
 explore_exp_share,0.6,expedition: share of the monsters' EXP split between the sent spirits
 explore_min_eff,0.25,expedition: efficiency floor when the spirits are far below the map's level
+tb_team,4,turn battle (tower + daily dungeon): spirits in the battle team
+tb_ult_cd,4,turn battle: ultimate usable every N turns
+tb_ult_mult,0.6,turn battle: ultimate damage = power x hits x this (per enemy)
+tb_aoe_mult,0.6,turn battle: area skill 1 damage multiplier (hits every enemy)
+tb_heal_mult,4,turn battle: skill 1 heal / shield = effect x this (weakest ally); ultimates use the effect as is on every ally
+tb_stun_mult,0.6,turn battle: stun chance = effect seconds x this (bosses x0.3)
+tb_defdown_mult,2,turn battle: DEF removed = effect x this (max 70 %)
+tb_mon_hp,0.5,turn battle: normal monster HP = field HP x this / (1 + level x tb_hp_lv)
+tb_boss_hp,0.15,turn battle: mini-boss / MVP HP = field HP x this / (1 + level x tb_hp_lv)
+tb_hp_lv,0.08,turn battle: HP level divisor (field HP grows faster than spirit ATK)
+tb_atk_lv,0.04,turn battle: ATK level divisor
+tb_scale,0.6,turn battle: share of the arena level scale that applies (daily dungeon scales to the hero)
+tb_mon_atk,2,turn battle: normal monster ATK = field ATK x this / (1 + level x tb_atk_lv)
+tb_boss_atk,2,turn battle: boss ATK = field ATK x this / (1 + level x tb_atk_lv)
+tb_mon_spd,90,turn battle: monster SPD = this + monster level
+tb_boss_spd,10,turn battle: extra SPD for bosses
+tb_boss_aoe,0.7,turn battle: boss whole-team attack power
+tb_boss_cd,3,turn battle: boss whole-team attack every N boss turns
+tb_boss_stun,0.25,turn battle: stun chance of the boss attack
+tb_boss_rage,1.3,turn battle: boss SPD multiplier under 50 % HP (also calls its minion)
+tb_exp,1,turn battle: spirit EXP on a win = monsters' EXP x this (every team member)

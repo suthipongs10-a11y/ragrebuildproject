@@ -62,6 +62,7 @@ Art already available (from the prototype): 6 zones × 5 layers, hero design + p
 - Zones 1–3 complete (≈20 maps), 25 monsters, 6 mini-bosses, 2 MVPs with phase scripts, MVP timers.
 - Adventure Book (kill counts, card collection, spirit dex, map discovery) with permanent stat rewards.
 - Daily dungeon prototype (offline), tower floors 1–20 (offline).
+- *(added 2026-10-11, owner request)* Daily dungeon + tower use a **SW-style turn battle with spirits** (`shared/battle/`, GDD §4.1); art brief `ART_P05_TurnBattle.md`. Phase 8 arena may reuse the same engine (decide then).
 **Art brief:** `ART_P05_Zone_Pack_<zone>.md` per new zone (5 layers × 4–6 maps variations, props) + `ART_P05_Monsters_<zone>.md` (monster pose sets, cards, boss parts sheets).
 **Exit gate:** 3–4 hours of offline content from new game to MVP #2; balance sheet reviewed.
 
