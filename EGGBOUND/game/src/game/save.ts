@@ -1,5 +1,5 @@
 // SaveService: local only in P0 (swap for a server-backed implementation in P2).
-import { STARTERS, natStars, SPECIES } from '../core/data';
+import { STARTERS, natStars, SPECIES, levelCap } from '../core/data';
 import type { EggTier } from '../core/data';
 
 /** one owned monster (SW style: copies are separate units — food for skill-ups and evolution). sk = skill levels */
@@ -40,7 +40,7 @@ export function loadSave(): SaveData {
         const d: SaveData = Object.assign(newSave(), s);
         for (const e of d.eggs) if (!e.kind) e.kind = 'named'; // P0 eggs were all species-known
         d.mons = d.mons.filter(m => SPECIES[m.sid]);
-        for (const m of d.mons) { m.stars = Math.max(m.stars, natStars(m.sid)); m.sk ||= [1, 1, 1]; } // natural stars by rarity (2026-10-12)
+        for (const m of d.mons) { m.stars = Math.max(m.stars, natStars(m.sid)); m.sk ||= [1, 1, 1]; m.lvl = Math.min(m.lvl, levelCap(m.stars)); } // level caps per star (SW) // natural stars by rarity (2026-10-12)
         d.team = d.team.filter(u => d.mons.some(m => m.uid === u));
         return d;
       }
