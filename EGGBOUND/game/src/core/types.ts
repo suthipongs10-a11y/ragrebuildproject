@@ -40,7 +40,7 @@ export interface SpeciesDef {
   scale?: number;               // render scale multiplier
   art?: string;                 // sprite set key; absent → placeholder recolor
 }
-export interface MonsterRef { sid: string; lvl: number; stars: number }
+export interface MonsterRef { sid: string; lvl: number; stars: number; sk?: number[] }  // sk = skill levels (default 1)
 export interface EnemyRef extends MonsterRef { hpMult?: number; atkMult?: number }
 export interface StageDef {
   id: string; name: string; desc: string;

@@ -2,7 +2,7 @@
 // Turtle home scene: an ancient turtle swimming through a sea of clouds, carrying the player's buildings and monsters.
 // Uses the ChatGPT art set (batch 04, imported by tools/import_home.py) when present; the code-drawn versions stay as fallback.
 import { E, run, tween, burst, ring, text, shake, flash, addP, drawParts, screenTransform, clamp, lerp, rnd, easeOut, easeBack } from './engine';
-import { spr, mk, dot, PAL, PIV, TAU, TIER_COL, IMG } from './assets';
+import { spr, mk, dot, PAL, PIV, TAU, TIER_COL, IMG, lookOf } from './assets';
 import { sfx } from './audio';
 import { SPECIES } from '../core/data';
 import { BUILDINGS, BDEF, TURTLE_SCALE, home, mineStored, mineCap, unlocked, ELEMS } from '../game/home';
@@ -249,10 +249,12 @@ export class HomeView {
     this.syncMons();
   }
   syncMons() {
-    const owned = Object.keys(this.S.mons).filter(sid => SPECIES[sid] && !SPECIES[sid].boss);
-    const ordered = [...this.S.team.filter(s => owned.includes(s)), ...owned.filter(s => !this.S.team.includes(s))].slice(0, MAX_HOME_MONS);
-    const keep = this.mons.filter(m => ordered.includes(m.sid));
-    for (const sid of ordered) if (!keep.find(m => m.sid === sid)) { const p = this.freePoint(); keep.push({ sid, x: p[0], y: p[1], tx: p[0], ty: p[1], wait: rnd(.2, 2), flip: Math.random() < .5, back: false, walk: 0, hop: 0, vz: 0, z: 0, emo: null, emoT: rnd(3, 10), ph: Math.random() * 9 }); }
+    // one walker per owned unit (team first, then the strongest), drawn with its star look
+    const units = this.S.mons.filter(m => SPECIES[m.sid] && !SPECIES[m.sid].boss), inTeam = u => this.S.team.includes(u.uid);
+    const ordered = [...units.filter(inTeam), ...units.filter(u => !inTeam(u)).sort((a, b) => b.stars - a.stars || b.lvl - a.lvl)].slice(0, MAX_HOME_MONS);
+    const keep = this.mons.filter(m => ordered.some(u => u.uid === m.uid));
+    for (const k of keep) { const u = ordered.find(x => x.uid === k.uid); k.sid = lookOf(u.sid, u.stars); }
+    for (const u of ordered) if (!keep.find(m => m.uid === u.uid)) { const p = this.freePoint(); keep.push({ uid: u.uid, sid: lookOf(u.sid, u.stars), x: p[0], y: p[1], tx: p[0], ty: p[1], wait: rnd(.2, 2), flip: Math.random() < .5, back: false, walk: 0, hop: 0, vz: 0, z: 0, emo: null, emoT: rnd(3, 10), ph: Math.random() * 9 }); }
     this.mons = keep;
   }
   freePoint() {

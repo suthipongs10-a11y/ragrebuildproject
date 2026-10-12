@@ -1,16 +1,19 @@
 // SaveService: local only in P0 (swap for a server-backed implementation in P2).
-import { STARTERS, natStars } from '../core/data';
+import { STARTERS, natStars, SPECIES } from '../core/data';
 import type { EggTier } from '../core/data';
 
-export interface MonSave { lvl: number; exp: number; stars: number; rare?: boolean }
+/** one owned monster (SW style: copies are separate units — food for skill-ups and evolution). sk = skill levels */
+export interface MonSave { uid: number; sid: string; lvl: number; exp: number; stars: number; sk: number[]; rare?: boolean }
 /** named = species known (crafted / starter) · mystery = species hidden until hatch, tier = shell pattern.
  *  sid and rare are rolled when the egg is created, so reloading can't re-roll a hatch. */
 export interface EggSave { id: number; sid: string; kind: 'named' | 'mystery'; tier?: EggTier; rare?: boolean }
 export interface SaveData {
-  v: 1;
+  v: 2;
   gold: number;
-  mons: Record<string, MonSave>;
-  team: string[];
+  mons: MonSave[];
+  team: number[];                   // monster uids, leader first
+  nextUid: number;
+  items: { soul: number };          // soul crystal: +1 skill level on any monster
   eggs: EggSave[];
   eggPity: number;                  // mystery eggs in a row without gold+
   frags: Record<string, number>;
@@ -20,10 +23,11 @@ export interface SaveData {
 }
 const KEY = 'eggbound-p0-save';
 
+export const newMon = (uid: number, sid: string, lvl = 1, stars = natStars(sid), rare = false): MonSave =>
+  ({ uid, sid, lvl, exp: 0, stars, sk: [1, 1, 1], ...(rare ? { rare } : {}) });
 export function newSave(): SaveData {
-  const mons: Record<string, MonSave> = {};
-  for (const sid of STARTERS) mons[sid] = { lvl: 5, exp: 0, stars: 1 };
-  return { v: 1, gold: 500, mons, team: ['A01', 'A02', 'A03', 'A04'], eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, stages: {}, nextEggId: 2,
+  const mons = STARTERS.map((sid, i) => newMon(i + 1, sid, 5, 1));
+  return { v: 2, gold: 500, mons, team: [1, 2, 3, 4], nextUid: mons.length + 1, items: { soul: 0 }, eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, stages: {}, nextEggId: 2,
     settings: { sound: true, quality: 'high', skipUlt: false, speed: 1, auto: false } };
 }
 export function loadSave(): SaveData {
@@ -31,15 +35,24 @@ export function loadSave(): SaveData {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const s = JSON.parse(raw);
-      if (s && s.v === 1) {
+      if (s && (s.v === 1 || s.v === 2)) {
+        if (s.v === 1) migrateV1(s);
         const d: SaveData = Object.assign(newSave(), s);
         for (const e of d.eggs) if (!e.kind) e.kind = 'named'; // P0 eggs were all species-known
-        for (const sid in d.mons) d.mons[sid].stars = Math.max(d.mons[sid].stars, natStars(sid)); // natural stars by rarity (2026-10-12)
+        d.mons = d.mons.filter(m => SPECIES[m.sid]);
+        for (const m of d.mons) { m.stars = Math.max(m.stars, natStars(m.sid)); m.sk ||= [1, 1, 1]; } // natural stars by rarity (2026-10-12)
+        d.team = d.team.filter(u => d.mons.some(m => m.uid === u));
         return d;
       }
     }
   } catch (e) { /* storage unavailable */ }
   return newSave();
+}
+/** v1 kept one entry per species ({sid: {lvl,exp,stars}}) and a team of species ids → v2 units with uids */
+function migrateV1(s: any) {
+  const mons: MonSave[] = []; let uid = 1; const map: Record<string, number> = {};
+  for (const sid of Object.keys(s.mons || {})) { const m = s.mons[sid]; map[sid] = uid; mons.push({ uid: uid++, sid, lvl: m.lvl, exp: m.exp || 0, stars: Math.min(6, m.stars || 1), sk: [1, 1, 1], ...(m.rare ? { rare: true } : {}) }); }
+  s.mons = mons; s.team = (s.team || []).map((sid: string) => map[sid]).filter(Boolean); s.nextUid = uid; s.items = { soul: 0 }; s.v = 2;
 }
 export function writeSave(s: SaveData) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) { /* ignore */ } }
 export function resetSave(): SaveData { try { localStorage.removeItem(KEY); } catch (e) { /* ignore */ } return newSave(); }

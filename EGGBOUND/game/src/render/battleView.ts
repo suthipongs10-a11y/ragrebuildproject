@@ -2,7 +2,7 @@
 // Battle scene: plays battle-core TurnStart/ActionResult events as animation + VFX, and collects player commands.
 import { Battle, REACTION_NAME } from '../core/battle';
 import { SPECIES } from '../core/data';
-import { PAL, PIV, ANCH, anchOf, TAU, spr, silOf, glowOf, GP, dot, portrait, IMG, fx } from './assets';
+import { PAL, PIV, ANCH, anchOf, TAU, spr, silOf, glowOf, GP, dot, portrait, IMG, fx, lookOf } from './assets';
 import { sfx } from './audio';
 import {
   E, SQ, clamp, lerp, rnd, easeOut, easeIn, easeIO, easeBack, run, tween, waitAll, waitUntil, addP, burst, ring, text, shake, flash,
@@ -22,7 +22,7 @@ export class BattleView {
   // ---------- views ----------
   makeView(u, pos, drop) {
     const s = SPECIES[u.sid];
-    const v = { uid: u.uid, sid: u.sid, team: u.team, elem: u.elem, boss: u.boss, name: u.name, stars: u.stars, lvl: u.lvl,
+    const v = { uid: u.uid, sid: lookOf(u.sid, u.stars), team: u.team, elem: u.elem, boss: u.boss, name: u.name, stars: u.stars, lvl: u.lvl,
       x: pos[0], y: pos[1], hx: pos[0], hy: pos[1], hop: drop ? -620 : 0, sx: 1, sy: 1, rot: 0, k: .4 * (s.scale || 1),
       back: u.team === 0, flip: u.team === 1, hb: u.team === 0, hf: u.team === 1, pose: 'idle', alpha: drop ? 0 : 1, flash: 0, ghosts: [], glowF: 0,
       dead: false, deathT: 0, hitT: 0, kvx: 0, kvy: 0, hp: u.hp, maxHp: u.maxHp, shown: u.hp, st: new Set(), marks: new Set(), busy: !!drop, ph: Math.random() * 9, emberT: 0, atb: 0, shieldAmt: 0 };
@@ -404,7 +404,7 @@ export class BattleView {
       if (!v.busy) { v.x = lerp(v.x, v.hx, 1 - Math.exp(-dt * 7)); v.y = lerp(v.y, v.hy, 1 - Math.exp(-dt * 7)); v.back = v.hb; v.flip = v.hf; }
       if (v.hitT > 0) { v.hitT -= dt; if (!v.busy) v.pose = 'hit'; } else if (!v.busy) v.pose = (v.st.has('sleep') || v.st.has('stun')) ? 'hit' : 'idle';
       if (!v.busy) { v.hop = lerp(v.hop, 0, 1 - Math.exp(-dt * 14)); v.rot = lerp(v.rot, 0, 1 - Math.exp(-dt * 10)); const b = Math.sin(E.time * 2.6 + v.ph); v.sy = 1 + b * .018; v.sx = 1 - b * .012; }
-      if (v.stars >= 3 && v.alpha > .5) { v.emberT -= dt; while (v.emberT <= 0) { v.emberT += v.stars >= 5 ? .05 : .13; const b = this.anc(v, 'body'), P = PAL[v.elem]; addP({ x: b[0] + rnd(-40, 40) * v.k / .4, y: v.y + rnd(-5, 5), z: v.y - b[1] + rnd(-40, 30) * v.k / .4, vz: rnd(30, 70), vx: rnd(-10, 10), life: rnd(.6, 1.1), size: rnd(4, 9), size2: 0, color: Math.random() < .3 ? P.core : P.aura }); } }
+      if (v.stars >= 3 && v.alpha > .5) { v.emberT -= dt; while (v.emberT <= 0) { v.emberT += v.stars >= 5 ? .05 : .13; const b = this.anc(v, 'body'), P = PAL[v.elem]; addP({ x: b[0] + rnd(-40, 40) * v.k / .4, y: v.y + rnd(-5, 5), z: v.y - b[1] + rnd(-40, 30) * v.k / .4, vz: rnd(30, 70), vx: rnd(-10, 10), life: rnd(.6, 1.1), size: rnd(4, 9), size2: 0, color: v.stars >= 6 && Math.random() < .5 ? '#ffd24a' : Math.random() < .3 ? P.core : P.aura }); } }
     }
   }
   render() {

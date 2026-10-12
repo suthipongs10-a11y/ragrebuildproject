@@ -1,6 +1,6 @@
 // P0 game data: 6 starters + realm boss + 3 stages of "ทุ่งไข่ป่วน".
 // All numbers are starting values for playtest (see GAME_CONFIG_v2.json).
-import type { SpeciesDef, StageDef, Elem, Rarity } from './types';
+import type { SpeciesDef, StageDef, Elem, Rarity, SkillDef } from './types';
 
 export const ELEM_NAME: Record<Elem, string> = { fire: 'ไฟ', water: 'น้ำ', wind: 'ลม', earth: 'ดิน', light: 'แสง', dark: 'มืด' };
 export const ROLE_NAME: Record<string, string> = { Attacker: 'จู่โจม', Defender: 'ป้องกัน', Support: 'สนับสนุน', Healer: 'ฟื้นฟู', Controller: 'ควบคุม' };
@@ -203,52 +203,66 @@ export const STAGES: StageDef[] = [
     waves: [
       [{ sid: 'A02', lvl: 5, stars: 1 }, { sid: 'A02', lvl: 5, stars: 1 }, { sid: 'A06', lvl: 5, stars: 1 }],
       [{ sid: 'A03', lvl: 5, stars: 1 }, { sid: 'A02', lvl: 6, stars: 1 }, { sid: 'A01', lvl: 5, stars: 1 }],
-      [{ sid: 'A03', lvl: 6, stars: 1 }, { sid: 'A02', lvl: 6, stars: 2 }, { sid: 'A04', lvl: 6, stars: 1 }],
+      [{ sid: 'A03', lvl: 6, stars: 1 }, { sid: 'A02', lvl: 8, stars: 1 }, { sid: 'A04', lvl: 6, stars: 1 }],
     ] },
   { id: '1-3', name: 'รังรากไม้', desc: 'บอสอสูรรากไม้ยักษ์ ระวังรากรัดทำให้มึน', stamina: 6,
     reward: { gold: 800, exp: 340 },
     waves: [
       [{ sid: 'A06', lvl: 8, stars: 1 }, { sid: 'A06', lvl: 8, stars: 1 }, { sid: 'A04', lvl: 8, stars: 1 }],
       [{ sid: 'A04', lvl: 8, stars: 1 }, { sid: 'A05', lvl: 8, stars: 1 }, { sid: 'A01', lvl: 8, stars: 1 }],
-      [{ sid: 'A06', lvl: 8, stars: 1 }, { sid: 'BOSS_ROOT', lvl: 11, stars: 2, hpMult: 5, atkMult: 0.95 }, { sid: 'A06', lvl: 8, stars: 1 }],
+      [{ sid: 'A06', lvl: 8, stars: 1 }, { sid: 'BOSS_ROOT', lvl: 14, stars: 1, hpMult: 5, atkMult: 0.95 }, { sid: 'A06', lvl: 8, stars: 1 }],
     ] },
 ];
 
-export function statAt(base: number, lvl: number, stars: number): number {
-  return Math.round(base * (1 + 0.065 * (lvl - 1)) * (1 + 0.07 * (stars - 1)));
+// Stats, Summoners-War style: each star grade has its own level cap; evolving (★+1) resets the level to 1 at a slightly
+// lower multiplier than the previous grade's max, so a max-level evolve is always a big step up. ★6 max ≈ 8× ★1 Lv1.
+export const STAR_CAP = [0, 15, 20, 25, 30, 35, 40];
+export const STAR_MUL: [number, number][] = [[1, 1], [1, 1.6], [1.5, 2.3], [2.15, 3.2], [3, 4.4], [4.1, 6], [5.6, 8.2]];
+export const levelCap = (stars: number) => STAR_CAP[Math.max(1, Math.min(6, stars))];
+export function statMul(lvl: number, stars: number): number {
+  const s = Math.max(1, Math.min(6, stars)), [lo, hi] = STAR_MUL[s], cap = STAR_CAP[s];
+  return lo + (hi - lo) * (Math.min(lvl, cap) - 1) / (cap - 1);
 }
+export function statAt(base: number, lvl: number, stars: number): number { return Math.round(base * statMul(lvl, stars)); }
 export function spdAt(base: number, lvl: number, stars: number): number {
-  return base + (stars - 1) * 2 + Math.floor(lvl / 10);
+  return base + (stars - 1) * 3 + Math.floor(lvl / 10);
 }
 export const expToNext = (lvl: number) => 40 + lvl * 25;
-export const levelCap = (stars: number) => [0, 20, 30, 40, 50, 60, 70][stars] || 20;
-// Stars, Summoners-War style (decided 2026-10-12): a monster hatches at its rarity's natural stars and any monster can
-// be raised to MAX_STARS, so a common one can still reach the top with effort.
+// Evolution (อัปดาว): a max-level monster + `stars` food monsters of the same star grade (any species, any level) + gold.
+export const EVO_GOLD = [0, 300, 1000, 3000, 8000, 20000]; // by current stars
+// Skill levels: feeding a copy of the same species = +1 to a random skill that isn't maxed (a soul crystal works on anyone).
+// Each level: +SKILL_STEP to damage multiplier and heal/shield/drain values; the max level of a cooldown skill also cuts 1 turn.
+export const SKILL_MAX = [5, 4, 3];
+export const SKILL_STEP = 0.1;
+export function skillAt(k: SkillDef, lv: number, slot: number): SkillDef {
+  if (!lv || lv <= 1) return k;
+  const f = 1 + SKILL_STEP * (Math.min(lv, SKILL_MAX[slot]) - 1), max = lv >= SKILL_MAX[slot];
+  return { ...k, mult: k.mult * f, cd: max && k.cd > 2 ? k.cd - 1 : k.cd,
+    effects: k.effects.map(e => (e.kind === 'heal' || e.kind === 'shield' || e.kind === 'drain') && e.value ? { ...e, value: e.value * f } : e) };
+}
 export const NAT_STARS: Record<Rarity, number> = { common: 1, rare: 2, epic: 3, legendary: 4 };
 export const MAX_STARS = 6;
 export const natStars = (sid: string) => NAT_STARS[SPECIES[sid]?.rarity] || 1;
 
 // ---- eggs (P1 M0) ----
 // Mystery egg: species unknown until it hatches; only the shell pattern (tier) shows the rarity.
-// A new monster hatches at its natural stars (NAT_STARS by rarity); stars = stars a duplicate adds
-// (overflow past MAX_STARS → DUP_OVERFLOW_GOLD each).
+// Every hatch is a new monster at its natural stars (NAT_STARS by rarity); copies are food for skill-ups / evolution.
 // incubateMin > 0 → must sit in a hatchery slot that long (scaled by hatchery speed) before it can hatch.
 export type EggTier = 'common' | 'silver' | 'gold' | 'rainbow';
-export interface EggTierDef { name: string; stars: number; incubateMin: number; rareForm: number; rarityW: Partial<Record<Rarity, number>> }
+export interface EggTierDef { name: string; incubateMin: number; rareForm: number; rarityW: Partial<Record<Rarity, number>> }
 export const EGG_TIER_ORDER: EggTier[] = ['common', 'silver', 'gold', 'rainbow'];
 // rarityW = % chance of each monster rarity: every tier can roll every rarity — cheap shells low odds, rarer shells better odds.
 // Tuned to an epic:legendary ratio of ~18:1 per egg (SW Mystical Scroll nat4:nat5 is 16:1); see `npm run rates`.
 export const EGG_TIERS: Record<EggTier, EggTierDef> = {
-  common: { name: 'ลายธรรมดา', stars: 1, incubateMin: 0, rareForm: 0.03, rarityW: { common: 90, rare: 8.5, epic: 1.45, legendary: 0.05 } },
-  silver: { name: 'ลายเงิน', stars: 1, incubateMin: 0, rareForm: 0.04, rarityW: { common: 66, rare: 28, epic: 5.8, legendary: 0.2 } },
-  gold: { name: 'ลายทอง', stars: 1, incubateMin: 120, rareForm: 0.05, rarityW: { common: 25, rare: 50, epic: 23.5, legendary: 1.5 } },
-  rainbow: { name: 'ลายรุ้ง', stars: 1, incubateMin: 480, rareForm: 0.08, rarityW: { rare: 40, epic: 54, legendary: 6 } },
+  common: { name: 'ลายธรรมดา', incubateMin: 0, rareForm: 0.03, rarityW: { common: 90, rare: 8.5, epic: 1.45, legendary: 0.05 } },
+  silver: { name: 'ลายเงิน', incubateMin: 0, rareForm: 0.04, rarityW: { common: 66, rare: 28, epic: 5.8, legendary: 0.2 } },
+  gold: { name: 'ลายทอง', incubateMin: 120, rareForm: 0.05, rarityW: { common: 25, rare: 50, epic: 23.5, legendary: 1.5 } },
+  rainbow: { name: 'ลายรุ้ง', incubateMin: 480, rareForm: 0.08, rarityW: { rare: 40, epic: 54, legendary: 6 } },
 };
 /** stage drop: one roll per win (first clear always drops). pity = the Nth mystery egg in a row without gold+ is forced gold+ */
 export const EGG_DROP = { chance: 0.3, bossChance: 0.6, tierW: { common: 68, silver: 24, gold: 7, rainbow: 1 } as Record<EggTier, number>, pity: 20 };
 /** named egg (crafted from fragments): species known, small chance of the rare form (special colour/aura, +1 trait slot later) */
 export const NAMED_RARE_FORM = 0.04;
-export const DUP_OVERFLOW_GOLD = 500;
 
 // ---- stage-end treasure chest: light colour = best item inside ----
 export type LootGrade = 'common' | 'rare' | 'epic' | 'legendary';

@@ -49,8 +49,16 @@ function hueShift(img, E) {
   x.putImageData(d, 0, 0); return c;
 }
 
+// ---- looks by star grade (evolution): ★1-3 base art · ★4 recoloured · ★5-6 evolved-form art (key + 'e', BATCH08) when it
+// exists, otherwise a stronger recolour. A "look id" is `sid~stars` (e.g. 'B05~4'); plain sid = base look. ----
+export const baseOf = (sid: string) => sid.split('~')[0];
+const SP = sid => SPECIES[baseOf(sid)];
+const lookLv = sid => +(sid.split('~')[1] || 0);
+export const lookOf = (sid: string, stars: number) => stars >= 4 ? sid + '~' + Math.min(6, stars) : sid;
+const VAR_E = { 4: { dh: .09, sat: 1.22, lit: 1, all: 1.02 }, 5: { dh: .09, sat: 1.3, lit: 1.03, all: 1.05 }, 6: { dh: .09, sat: 1.3, lit: 1.03, all: 1.05 } };
+const evoArt = sid => { const L = lookLv(sid), s = SP(sid); return L >= 5 && s.art && IMG[s.art + 'e_front_idle'] ? s.art + 'e' : null; };
 /** does this species have its own final art? */
-export const hasArt = sid => { const s = SPECIES[sid]; return !!(s && s.art && (IMG[s.art + '_front_idle'] || IMG[s.art + '_master'])); };
+export const hasArt = sid => { const s = SP(sid); return !!(s && s.art && (IMG[s.art + '_front_idle'] || IMG[s.art + '_master'])); };
 const SPR = {};
 /** a pose that may be missing from a set (damaged file awaiting re-export): same view's idle → master → other view's idle */
 function artPose(art, key) {
@@ -60,6 +68,7 @@ function artPose(art, key) {
 /** sprite canvas/image for a species & pose key like 'front_idle' */
 export function spr(sid, key) {
   const k = sid + key; if (SPR[k]) return SPR[k];
+  if (lookLv(sid)) { const ea = evoArt(sid); return (SPR[k] = ea ? artPose(ea, key) : hueShift(spr(baseOf(sid), key), VAR_E[lookLv(sid)])); }
   const s = SPECIES[sid];
   if (hasArt(sid)) return (SPR[k] = artPose(s.art, key));
   return (SPR[k] = hueShift(IMG['mon001_' + key], PAL[s.elem]));
@@ -96,27 +105,28 @@ function bbox(img, key) {
 const ANC2 = {};
 /** mouth/body anchors (relative to feet pivot) for a species & pose; fox uses hand-tuned values, other art is auto-derived */
 export function anchOf(sid, key) {
-  const s = SPECIES[sid];
-  if (!hasArt(sid) || s.art === 'mon001') return ANCH[key];
-  const k = s.art + key; if (ANC2[k]) return ANC2[k];
+  const s = SP(sid);
+  if (!hasArt(sid) || (s.art === 'mon001' && !evoArt(sid))) return ANCH[key];
+  const k = sid + key; if (ANC2[k]) return ANC2[k];
   const [x0, y0, x1, y1] = bbox(spr(sid, key), k), w = x1 - x0, h = y1 - y0, cx = (x0 + x1) / 2;
   return (ANC2[k] = { mouth: [cx + w * .18 - PIV[0], y0 + h * .36 - PIV[1]], body: [cx - PIV[0], y0 + h * .58 - PIV[1]] });
 }
 const PORT = {};
 export function portrait(sid) {
   if (PORT[sid]) return PORT[sid];
-  const s = SPECIES[sid];
-  const src = hasArt(sid) && IMG[s.art + '_master'] ? IMG[s.art + '_master'] : hueShift(IMG.mon001_master, PAL[s.elem]);
+  const s = SP(sid), ea = evoArt(sid), L = lookLv(sid);
+  let src = ea && IMG[ea + '_master'] ? IMG[ea + '_master'] : hasArt(sid) && IMG[s.art + '_master'] ? IMG[s.art + '_master'] : hueShift(IMG.mon001_master, PAL[s.elem]);
+  if (L && !ea) src = hueShift(src, VAR_E[L]);
   const c = mk(256, 256), x = c.getContext('2d');
-  const f = src.width / 512, own = hasArt(sid) && !!IMG[s.art + '_master'];
+  const f = src.width / 512, own = hasArt(sid) && (!!IMG[s.art + '_master'] || !!ea);
   let cr = [200, 70, 300]; // fox: head-centred crop
-  if (own && s.art !== 'mon001') { const [x0, y0, x1, y1] = bbox(src, s.art + '_master'), side = Math.min(512, Math.max(x1 - x0, (y1 - y0) * .8) * 1.04); cr = [(x0 + x1) / 2 - side / 2, y0 - side * .04, side]; }
+  if (own && (s.art !== 'mon001' || ea)) { const [x0, y0, x1, y1] = bbox(src, sid + '_master'), side = Math.min(512, Math.max(x1 - x0, (y1 - y0) * .8) * 1.04); cr = [(x0 + x1) / 2 - side / 2, y0 - side * .04, side]; }
   x.drawImage(src, cr[0] * f, cr[1] * f, cr[2] * f, cr[2] * f, 0, 0, 256, 256);
   return (PORT[sid] = c.toDataURL('image/webp', .85));
 }
 const EGG = {};
 export function eggImg(sid) {
-  if (EGG[sid]) return EGG[sid];
+  sid = baseOf(sid); if (EGG[sid]) return EGG[sid];
   const s = SPECIES[sid];
   const own = s.art && IMG['egg' + s.art.replace('mon', '')];
   return (EGG[sid] = own || hueShift(IMG.egg001, PAL[s.elem]));

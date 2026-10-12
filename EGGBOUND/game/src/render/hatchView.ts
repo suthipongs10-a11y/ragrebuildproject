@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Hatch scene: egg on a rune pedestal → wobble → 3 crack stages → light rays → burst → silhouette → reveal.
 import { SPECIES, LOOT_GRADES, LOOT_ORDER } from '../core/data';
-import { PAL, PIV, TAU, spr, silOf, glowOf, GP, dot, eggImg, mk, TIER_COL, IMG, fx, tinted, colored } from './assets';
+import { PAL, PIV, TAU, spr, silOf, glowOf, GP, dot, eggImg, mk, TIER_COL, IMG, fx, tinted, colored, baseOf } from './assets';
 import { sfx } from './audio';
 import { E, SQ, lerp, rnd, clamp, easeOut, easeBack, run, tween, addP, burst, ring, shake, flash, drawParts, drawDecals, drawGround, drawLantern, drawBush, drawLanternPools, drawFlies, LANTERNS, BUSHES, worldTransform, screenTransform, drawOverlays } from './engine';
 
@@ -41,14 +41,15 @@ export class HatchView {
   // awakening (after the reveal): charge → gold burst + lightning → stars stamp in one by one. Grander with rarity.
   fromStars = 0; toStars = 1; aT = 0; bolts = []; goldRays = 0; awGlow = 0; dark = 0; stamps = []; awBurst = false; nSpray = 0; nArc = 0; nStrike = 0;
   // epic+ pre-hatch: crystals gather power → fire into the egg → egg overloads (lightning, power aura, light shafts) → BOOM
+  auraW = 66; auraH = 130; arcK = 1; bannerText = null; bannerCol = null; drawExtra = null; // hooks for EvolveView
   pt = 0; preDone = false; gatherK = 0; beamK = 0; auraK = 0; shots = []; fired = 0; nEggArc = 0; nSky = 0; nCryArc = 0;
   constructor(sid, opts) {
-    this.sid = sid; this.P = PAL[SPECIES[sid].elem]; Object.assign(this, opts);
+    this.sid = sid; const SPc = SPECIES[baseOf(sid)]; this.P = PAL[SPc.elem]; Object.assign(this, opts);
     this.egg = { x: PED.x, y: PED.y - 38, rot: 0, hop: 0, sx: 1, sy: 1, glow: 0, white: 0, vis: true, cracks: [], cv: mk(512, 512), stage: 0, t: 0 };
-    this.mon = { x: PED.x, y: PED.y - 38, hop: 0, sx: .3, sy: .3, sil: 1, vis: false, k: .4 * (SPECIES[sid].scale || 1) };
+    this.mon = { x: PED.x, y: PED.y - 38, hop: 0, sx: .3, sy: .3, sil: 1, vis: false, k: .4 * (SPc.scale || 1) };
     // mystery eggs glow in their tier colour so the element stays hidden until the reveal
     // monster rarity drives how grand the hatch is: 0 common · 1 rare · 2 epic · 3 legendary
-    this.rk = Math.max(0, LOOT_ORDER.indexOf(this.rarityOverride || SPECIES[sid].rarity));
+    this.rk = Math.max(0, LOOT_ORDER.indexOf(this.rarityOverride || SPc.rarity));
     this.EP = this.tier ? { aura: TIER_COL[this.tier], core: '#fff6e0' } : this.P;
     if (!this.eggSrc) this.eggSrc = eggImg(sid);
   }
@@ -123,7 +124,7 @@ export class HatchView {
   }
   /** lightning crawling over the egg's shell */
   eggArc() {
-    const [ex, ey] = this.eggC(), p = a => [ex + Math.cos(a) * rnd(44, 66), ey + Math.sin(a) * rnd(56, 80)], a0 = rnd(0, TAU);
+    const [ex, ey] = this.eggC(), K = this.arcK, p = a => [ex + Math.cos(a) * rnd(44, 66) * K, ey + Math.sin(a) * rnd(56, 80) * K], a0 = rnd(0, TAU);
     this.bolts.push({ pts: jag(p(a0), p(a0 + rnd(.9, 2.4) * (Math.random() < .5 ? -1 : 1)), 26, 4), br: [], t: 0, life: rnd(.08, .15), w: .6 });
   }
   /** crystals: spiralling light while gathering */
@@ -282,9 +283,9 @@ export class HatchView {
     const m = this.mon; if (!m.vis) return; const ctx = E.ctx;
     if (this.rk > 0 && this.revealed) { // rarity banner pops in above the monster
       const sz = (this.rk >= 3 ? 40 : this.rk === 2 ? 34 : 28) * (0.6 + 0.4 * easeBack(Math.min(1, (this.bannerT = (this.bannerT || 0) + .016) * 3)));
-      const txt = LOOT_GRADES[LOOT_ORDER[this.rk]].name + (this.rk >= 3 ? '!!' : '!'), ty = m.y - 270 * m.k / .4;
+      const txt = this.bannerText || LOOT_GRADES[LOOT_ORDER[this.rk]].name + (this.rk >= 3 ? '!!' : '!'), ty = m.y - 270 * m.k / .4;
       ctx.save(); ctx.font = `700 ${sz}px Mitr, sans-serif`; ctx.textAlign = 'center'; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.lineWidth = 6; ctx.strokeText(txt, m.x, ty);
-      ctx.fillStyle = this.rk >= 3 ? PRISM[Math.floor(E.time * 6) % PRISM.length] : LOOT_GRADES[LOOT_ORDER[this.rk]].col; ctx.fillText(txt, m.x, ty); ctx.restore();
+      ctx.fillStyle = this.bannerCol || (this.rk >= 3 ? PRISM[Math.floor(E.time * 6) % PRISM.length] : LOOT_GRADES[LOOT_ORDER[this.rk]].col); ctx.fillText(txt, m.x, ty); ctx.restore();
     }
     for (const st of this.stamps) { // gold stars: slam in big, settle, shine
       const [x, y] = this.starPos(st.i), q = st.slam ? clamp(st.t / .22, 0, 1) : 1, sc = st.slam ? lerp(3.2, 1, easeOut(q)) : 1, r = 15 * sc;
@@ -348,7 +349,7 @@ export class HatchView {
       es.sort((a, b) => a.y - b.y); this.drawGather(); this.drawPowerBeams(); // beams run into the egg, aura flares behind it
       const [ex] = this.eggC();
       if (this.auraK > 0) { const ctx = E.ctx; ctx.save(); ctx.translate(this.egg.x, this.egg.y + 4); ctx.scale(1, .38); fx(ctx, 'fx_aura_burst_ground', this.col(), 0, 0, 380 * (1 + .06 * Math.sin(E.time * 20)), 380 * (1 + .06 * Math.sin(E.time * 20)), this.auraK * .9, E.time * .6); ctx.restore(); }
-      this.drawPowerAura(ex, this.egg.y + 4, 66, 130, this.col(), this.auraK); for (const e of es) e.d();
+      this.drawPowerAura(ex, this.egg.y + 4, this.auraW, this.auraH, this.col(), this.auraK); for (const e of es) e.d(); this.drawExtra && this.drawExtra();
     } else if (this.dark > 0 || this.goldRays > 0) { // awakening: dim the scene, monster on top
       this.drawDark(); this.drawGoldRays();
       if (this.rk >= 2 && this.awBurst) { const m = this.mon; this.drawPowerAura(m.x, m.y, 105 * m.k / .4, 150 * m.k / .4, AW_GOLD, this.goldRays * .9); }

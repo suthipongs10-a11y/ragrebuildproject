@@ -1,7 +1,7 @@
-// Egg system checks (P1 M0): mystery tiers + pity, incubation slots, hatch stars / overflow, rare form, save migration.
-import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS } from '../src/core/data';
-import { newSave, loadSave, writeSave } from '../src/game/save';
-import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf } from '../src/game/progression';
+// Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
+import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt } from '../src/core/data';
+import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
+import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp } from '../src/game/progression';
 import { startIncub, incubLeft, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
 
 export function eggTests(): number {
@@ -32,24 +32,41 @@ export function eggTests(): number {
     ok(startIncub(s, 10, t0) && incubSlots(s) === 1 && !startIncub(s, 11, t0), 'one slot at hatchery Lv1');
     const ms = EGG_TIERS.gold.incubateMin * 60000 * HATCH_SPEED[1];
     ok(incubLeft(s, 10, t0 + ms - 1)! > 0 && !canHatch(s, g1, t0 + ms - 1), 'still incubating');
-    const before = s.mons.A03.stars, r = hatchEgg(s, 10, t0 + ms);
-    ok(!!r && r.dup && r.stars === Math.min(MAX_STARS, before + EGG_TIERS.gold.stars), 'gold dup adds tier stars');
+    const n0 = s.mons.length, r = hatchEgg(s, 10, t0 + ms);
+    ok(!!r && r.copies === 1 && s.mons.length === n0 + 1 && monOf(s, r.uid)!.stars === 1 && monOf(s, 3)!.stars === 1, 'duplicate = new separate unit, no auto star-up');
     ok(home(s).incub.length === 0 && !s.eggs.some(e => e.id === 10), 'slot + egg freed after hatch');
     const rc = hatchEgg(s, 12, t0); ok(!!rc, 'common hatches instantly'); }
 
-  // new monster at its natural stars + rare form; overflow past ★6 → gold
-  { const s = newSave(); delete s.mons.A06; s.eggs = [{ id: 20, sid: 'A06', kind: 'mystery', tier: 'silver', rare: true }];
-    const r = hatchEgg(s, 20)!; ok(!r.dup && s.mons.A06.stars === 1 && s.mons.A06.rare === true && r.rareNew, 'new rare-form monster');
-    s.mons.A01.stars = MAX_STARS; const g = s.gold; s.eggs = [{ id: 21, sid: 'A01', kind: 'mystery', tier: 'rainbow' }];
-    home(s).incub.push({ id: 21, start: 0, end: 0 });
-    const r2 = hatchEgg(s, 21, 1)!; ok(r2.stars === MAX_STARS && r2.gold === 500 && s.gold === g + 500, 'overflow stars → gold'); }
+  // natural stars by rarity + rare form
+  { const s = newSave(); s.eggs = [{ id: 30, sid: 'A09', kind: 'named', rare: true }, { id: 31, sid: 'B05', kind: 'named' }];
+    const r = hatchEgg(s, 30)!; ok(r.stars === NAT_STARS.epic && monOf(s, r.uid)!.rare === true && r.copies === 0, 'epic hatches at ★3 (rare form kept)');
+    ok(hatchEgg(s, 31)!.stars === 2, 'rare hatches at ★2'); }
 
-  // natural stars by rarity: epic hatches at ★3, rare at ★2; old saves are raised to their natural stars
-  { const s = newSave(); s.eggs = [{ id: 30, sid: 'A09', kind: 'named' }, { id: 31, sid: 'B05', kind: 'named' }];
-    ok(hatchEgg(s, 30)!.stars === 3 && s.mons.A09.stars === NAT_STARS.epic, 'epic hatches at ★3');
-    ok(hatchEgg(s, 31)!.stars === 2, 'rare hatches at ★2');
-    const store: Record<string, string> = {}; (globalThis as any).localStorage = { getItem: (k: string) => store[k] ?? null, setItem: (k: string, v: string) => { store[k] = v; }, removeItem: (k: string) => { delete store[k]; } };
-    s.mons.A09.stars = 1; writeSave(s); ok(loadSave().mons.A09.stars === 3, 'migration raises stars to natural'); delete (globalThis as any).localStorage; }
+  // evolution: max level + `stars` food of the same grade + gold → ★+1, Lv1, food consumed
+  { const s = newSave(); s.gold = 99999; const t = monOf(s, 1)!;
+    ok(!evoCheck(s, 1, [5]).ok, 'evolve needs max level'); t.lvl = levelCap(1);
+    ok(!evoCheck(s, 1, [1]).ok, 'cannot eat itself');
+    const before = statAt(SPECIES.A01.base.atk, t.lvl, t.stars), m = evolve(s, 1, [5])!;
+    ok(!!m && m.stars === 2 && m.lvl === 1 && !monOf(s, 5) && s.gold === 99999 - EVO_GOLD[1], 'evolve ★1→★2 with 1 food');
+    ok(statAt(SPECIES.A01.base.atk, 1, 2) > before * .9, 'new grade Lv1 ≈ old grade max');
+    m.lvl = levelCap(2); s.mons.push(newMon(50, 'A02', 1, 2), newMon(51, 'B01', 1, 1));
+    ok(!evoCheck(s, 1, [50, 51]).ok, 'food must share the star grade'); s.mons.find(x => x.uid === 51)!.stars = 2;
+    ok(!!evolve(s, 1, [50, 51]) && m.stars === 3 && s.team.every(u => monOf(s, u)), 'evolve ★2→★3 with 2 food, team cleaned'); }
+
+  // skill-ups: same-species copy or a soul crystal → +1 to a non-maxed skill; damage scales, max level cuts the cooldown
+  { const s = newSave(); s.mons.push(newMon(60, 'A01'), newMon(61, 'A02'));
+    ok(skillUp(s, 1, 61) === -1, 'skill-up needs the same species');
+    const slot = skillUp(s, 1, 60, () => 0); ok(slot === 0 && monOf(s, 1)!.sk[0] === 2 && !monOf(s, 60), 'copy eaten, +1 skill');
+    ok(skillUp(s, 1, null) === -1, 'no soul crystal'); s.items.soul = 1; ok(skillUp(s, 1, null, () => .99) === 2 && s.items.soul === 0, 'soul crystal works');
+    const k = SPECIES.A01.skills[2], top = skillAt(k, SKILL_MAX[2], 2); ok(top.mult > k.mult && top.cd === k.cd - 1, 'max skill: more damage, -1 cooldown'); }
+
+  // v1 save (one entry per species) → v2 units
+  { const store: Record<string, string> = {}; (globalThis as any).localStorage = { getItem: (k: string) => store[k] ?? null, setItem: (k: string, v: string) => { store[k] = v; }, removeItem: (k: string) => { delete store[k]; } };
+    const v1: any = { ...newSave(), v: 1, mons: { A01: { lvl: 7, exp: 3, stars: 1 }, A09: { lvl: 2, exp: 0, stars: 1, rare: true } }, team: ['A09', 'A01'] };
+    delete v1.nextUid; delete v1.items; store['eggbound-p0-save'] = JSON.stringify(v1);
+    const d = loadSave(), a9 = d.mons.find(m => m.sid === 'A09')!;
+    ok(d.v === 2 && d.mons.length === 2 && a9.stars === 3 && a9.rare === true && d.team[0] === a9.uid && d.nextUid === 3 && d.items.soul === 0, 'v1 save migrates to units');
+    delete (globalThis as any).localStorage; }
 
   // first clear always drops a mystery egg
   { const s = newSave(); const r = grantRewards(s, '1-1', true, 3, ['A02', 'A06'], 7); ok(r.eggs.length === 1 && r.eggs[0].kind === 'mystery', 'first clear drops a mystery egg'); }
