@@ -120,12 +120,13 @@ export const levelCap = (stars: number) => [0, 20, 30, 40, 50, 60][stars] || 20;
 export type EggTier = 'common' | 'silver' | 'gold' | 'rainbow';
 export interface EggTierDef { name: string; stars: number; incubateMin: number; rareForm: number; rarityW: Partial<Record<Rarity, number>> }
 export const EGG_TIER_ORDER: EggTier[] = ['common', 'silver', 'gold', 'rainbow'];
-// rarityW = % chance of each monster rarity: every tier can roll every rarity — cheap shells low odds, rarer shells better odds
+// rarityW = % chance of each monster rarity: every tier can roll every rarity — cheap shells low odds, rarer shells better odds.
+// Tuned to an epic:legendary ratio of ~18:1 per egg (SW Mystical Scroll nat4:nat5 is 16:1); see `npm run rates`.
 export const EGG_TIERS: Record<EggTier, EggTierDef> = {
-  common: { name: 'ลายธรรมดา', stars: 1, incubateMin: 0, rareForm: 0.03, rarityW: { common: 92, rare: 7, epic: 0.9, legendary: 0.1 } },
-  silver: { name: 'ลายเงิน', stars: 1, incubateMin: 0, rareForm: 0.04, rarityW: { common: 70, rare: 25, epic: 4.5, legendary: 0.5 } },
-  gold: { name: 'ลายทอง', stars: 1, incubateMin: 120, rareForm: 0.05, rarityW: { common: 30, rare: 50, epic: 17, legendary: 3 } },
-  rainbow: { name: 'ลายรุ้ง', stars: 1, incubateMin: 480, rareForm: 0.08, rarityW: { rare: 50, epic: 40, legendary: 10 } },
+  common: { name: 'ลายธรรมดา', stars: 1, incubateMin: 0, rareForm: 0.03, rarityW: { common: 90, rare: 8.5, epic: 1.45, legendary: 0.05 } },
+  silver: { name: 'ลายเงิน', stars: 1, incubateMin: 0, rareForm: 0.04, rarityW: { common: 66, rare: 28, epic: 5.8, legendary: 0.2 } },
+  gold: { name: 'ลายทอง', stars: 1, incubateMin: 120, rareForm: 0.05, rarityW: { common: 25, rare: 50, epic: 23.5, legendary: 1.5 } },
+  rainbow: { name: 'ลายรุ้ง', stars: 1, incubateMin: 480, rareForm: 0.08, rarityW: { rare: 40, epic: 54, legendary: 6 } },
 };
 /** stage drop: one roll per win (first clear always drops). pity = the Nth mystery egg in a row without gold+ is forced gold+ */
 export const EGG_DROP = { chance: 0.3, bossChance: 0.6, tierW: { common: 68, silver: 24, gold: 7, rainbow: 1 } as Record<EggTier, number>, pity: 20 };
