@@ -71,6 +71,7 @@ cd game && npm install
 npm run build      # → dist/index.html ไฟล์เดียว ฝังภาพเป็น data URI (~3MB)
 npm test           # determinism + balance
 npm run typecheck  # tsc (core + tests)
+npm run rates      # ตารางอัตราฟักไข่ปริศนาทั้งหมด (คำนวณ + จำลอง 2 ล้านฟองรวมการันตี)
 ```
 - ทดสอบ UI: เปิด dist/index.html ผ่าน local server (ต้องห่อด้วย `<!doctype html><meta charset="utf-8">` ถ้าไม่ได้ใช้ผ่าน Artifact) · มี `window.__eb` = {S, battle, hatch, startBattle, startHatch, show} ไว้สั่งจากสคริปต์ทดสอบ
 - ทดสอบทั้งจอแนวนอน (1280×760) และมือถือ (390×780) ทุกครั้งที่แตะ UI/layout

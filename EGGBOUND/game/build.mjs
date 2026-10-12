@@ -7,6 +7,10 @@ import path from 'node:path';
 const root = path.dirname(new URL(import.meta.url).pathname);
 fs.mkdirSync(path.join(root, 'dist'), { recursive: true });
 
+if (process.argv.includes('--rates')) {
+  await build({ entryPoints: [path.join(root, 'tests/eggRates.ts')], bundle: true, platform: 'node', format: 'esm', outfile: path.join(root, 'dist/rates.mjs'), logLevel: 'warning' });
+  process.exit(0);
+}
 if (process.argv.includes('--test')) {
   await build({ entryPoints: [path.join(root, 'tests/sim.ts')], bundle: true, platform: 'node', format: 'esm', outfile: path.join(root, 'dist/sim.mjs'), logLevel: 'warning' });
   process.exit(0);

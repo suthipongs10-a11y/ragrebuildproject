@@ -180,6 +180,8 @@ function drawSite(x, b, t) { // locked / coming soon: construction site
 
 // ---------- monsters wandering ----------
 const EMO = ['♥', '♪', 'z', '!', '★'];
+// monster size on the turtle: half the P0 size (.27) so the roster can grow; MR scales hops / hit boxes with it
+const MON_SCALE = .135, MR = MON_SCALE / .27, MAX_HOME_MONS = 16;
 export class HomeView {
   constructor(S, opts = {}) {
     this.S = S; this.opts = opts; this.sel = null; this.t = 0; this.pan = 0;
@@ -192,7 +194,7 @@ export class HomeView {
   }
   syncMons() {
     const owned = Object.keys(this.S.mons).filter(sid => SPECIES[sid] && !SPECIES[sid].boss);
-    const ordered = [...this.S.team.filter(s => owned.includes(s)), ...owned.filter(s => !this.S.team.includes(s))].slice(0, 8);
+    const ordered = [...this.S.team.filter(s => owned.includes(s)), ...owned.filter(s => !this.S.team.includes(s))].slice(0, MAX_HOME_MONS);
     const keep = this.mons.filter(m => ordered.includes(m.sid));
     for (const sid of ordered) if (!keep.find(m => m.sid === sid)) { const p = this.freePoint(); keep.push({ sid, x: p[0], y: p[1], tx: p[0], ty: p[1], wait: rnd(.2, 2), flip: Math.random() < .5, back: false, walk: 0, hop: 0, vz: 0, z: 0, emo: null, emoT: rnd(3, 10), ph: Math.random() * 9 }); }
     this.mons = keep;
@@ -337,18 +339,18 @@ export class HomeView {
     ctx.fillStyle = this.sel === bd.id ? '#ffe9a0' : '#f7f0e3'; ctx.fillText(str, x, ly + fs * .18);
   }
   drawMon(ctx, m, t) {
-    const s = this.scaleShow, [x, y] = this.L(m.x, m.y), k = .27 * s;
-    const walking = m.walk > 0, hop = walking ? Math.abs(Math.sin(m.walk * 9)) * 9 : 0, sq = walking ? 1 + Math.sin(m.walk * 18) * .04 : 1 + Math.sin(t * 2.2 + m.ph) * .02;
+    const s = this.scaleShow, [x, y] = this.L(m.x, m.y), k = MON_SCALE * s;
+    const walking = m.walk > 0, hop = walking ? Math.abs(Math.sin(m.walk * 9)) * 9 * MR : 0, sq = walking ? 1 + Math.sin(m.walk * 18) * .04 : 1 + Math.sin(t * 2.2 + m.ph) * .02;
     ctx.fillStyle = 'rgba(30,40,10,.3)'; ctx.beginPath(); ctx.ellipse(x, y + 2, 40 * k * 2, 14 * k * 2, 0, 0, TAU); ctx.fill();
-    ctx.save(); ctx.translate(x, y - (hop + m.z) * s); ctx.scale(k * (m.flip ? -1 : 1) / sq, k * sq);
+    ctx.save(); ctx.translate(x, y - (hop + m.z * MR) * s); ctx.scale(k * (m.flip ? -1 : 1) / sq, k * sq);
     ctx.drawImage(spr(m.sid, (m.back ? 'back' : 'front') + '_idle'), -PIV[0], -PIV[1]);
     ctx.restore();
-    if (m.emo) { const u = 1 - m.emo.t / 1.6, by = y - 110 * k * 2 - (hop + m.z) * s - u * 10; ctx.globalAlpha = Math.min(1, m.emo.t * 2); ctx.fillStyle = '#fffaf0'; ctx.beginPath(); ctx.arc(x + 14 * s, by, 13 * s + 3, 0, TAU); ctx.fill(); ctx.fillStyle = m.emo.c === '♥' ? '#ff5a7a' : '#5a4630'; ctx.font = `600 ${15 * s + 3}px Mitr, sans-serif`; ctx.textAlign = 'center'; ctx.fillText(m.emo.c, x + 14 * s, by + 5 * s); ctx.globalAlpha = 1; }
+    if (m.emo) { const u = 1 - m.emo.t / 1.6, by = y - 110 * k * 2 - (hop + m.z * MR) * s - u * 10; ctx.globalAlpha = Math.min(1, m.emo.t * 2); ctx.fillStyle = '#fffaf0'; ctx.beginPath(); ctx.arc(x + 9 * s, by, 10 * s + 3, 0, TAU); ctx.fill(); ctx.fillStyle = m.emo.c === '♥' ? '#ff5a7a' : '#5a4630'; ctx.font = `600 ${12 * s + 3}px Mitr, sans-serif`; ctx.textAlign = 'center'; ctx.fillText(m.emo.c, x + 9 * s, by + 5 * s); ctx.globalAlpha = 1; }
   }
   // ---------- input ----------
   hit(wx, wy) {
     const s = this.scaleShow;
-    for (const m of this.mons) { const [x, y] = this.L(m.x, m.y); if (Math.abs(wx - x) < 34 * s && wy < y + 8 && wy > y - 80 * s) return { mon: m }; }
+    for (const m of this.mons) { const [x, y] = this.L(m.x, m.y); if (Math.abs(wx - x) < 34 * MR * s + 6 && wy < y + 8 && wy > y - 80 * MR * s - 6) return { mon: m }; }
     let best = null, bd = 1e9;
     for (const b of BUILDINGS) { const [x, y] = this.bPos(b), dx = (wx - x) / (b.r * s), dy = (wy - (y - 30 * s)) / (b.r * s * .9), d = dx * dx + dy * dy; if (d < 1.1 && d < bd) { bd = d; best = b; } }
     if (best) return { b: best };
@@ -357,7 +359,7 @@ export class HomeView {
   }
   tap(wx, wy) {
     const r = this.hit(wx, wy);
-    if (r?.mon) { const m = r.mon, [x, y] = this.L(m.x, m.y); m.vz = 260; m.z = .01; m.emo = { c: '♥', t: 1.6 }; burst(x, y - 60 * this.scaleShow, 0, 8, '#ff7a9a', 120, 9, .7, { grav: -40 }); text(x, y - 90 * this.scaleShow, SPECIES[m.sid].name, '#fff3d0', 16); sfx.chime(); this.opts.onMon?.(m.sid); return; }
+    if (r?.mon) { const m = r.mon, [x, y] = this.L(m.x, m.y); m.vz = 260; m.z = .01; m.emo = { c: '♥', t: 1.6 }; burst(x, y - 60 * MR * this.scaleShow, 0, 8, '#ff7a9a', 120, 9, .7, { grav: -40 }); text(x, y - 90 * MR * this.scaleShow, SPECIES[m.sid].name, '#fff3d0', 16); sfx.chime(); this.opts.onMon?.(m.sid); return; }
     if (r?.head) { this.hum = 1.4; sfx.hum(); const [x, y] = this.L(0, 330); for (let i = 0; i < 6; i++) addP({ type: 'text', x: x + rnd(-40, 40), y: y - 40, z: 0, vz: rnd(50, 90), vx: rnd(-30, 30), life: 1.4, str: '♪', color: '#fff3d0', size: 22, add: false, keep: true }); this.opts.onHead?.(); return; }
     if (r?.b) { this.sel = r.b.id; sfx.click(); this.opts.onSelect?.(r.b.id); return; }
     this.sel = null; this.opts.onSelect?.(null);

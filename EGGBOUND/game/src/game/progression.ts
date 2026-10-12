@@ -58,13 +58,18 @@ export function rollSpecies(rarity: Rarity, rnd: () => number): string {
   for (const k of order) { const ps = pool.filter(x => x.rarity === RARITY_ORDER[k]); if (ps.length) return ps[Math.floor(rnd() * ps.length)].id; }
   return pool[0].id;
 }
-export function rollMysteryEgg(s: SaveData, rnd: () => number): EggSave {
+/** shell tier of the next mystery egg, applying (and updating) the gold+ pity counter */
+export function rollTier(s: SaveData, rnd: () => number): EggTier {
   const w = EGG_DROP.tierW, hi = (t: EggTier) => t === 'gold' || t === 'rainbow';
   let tier = pickW(w, rnd());
   if (!hi(tier) && (s.eggPity || 0) + 1 >= EGG_DROP.pity) tier = pickW({ gold: w.gold, rainbow: w.rainbow }, rnd());
   s.eggPity = hi(tier) ? 0 : (s.eggPity || 0) + 1;
-  const T = EGG_TIERS[tier];
-  return { id: s.nextEggId++, sid: rollSpecies(pickW(T.rarityW, rnd()), rnd), kind: 'mystery', tier, rare: rnd() < T.rareForm };
+  return tier;
+}
+export const rollRarity = (tier: EggTier, rnd: () => number) => pickW(EGG_TIERS[tier].rarityW, rnd()) as Rarity;
+export function rollMysteryEgg(s: SaveData, rnd: () => number): EggSave {
+  const tier = rollTier(s, rnd), T = EGG_TIERS[tier];
+  return { id: s.nextEggId++, sid: rollSpecies(rollRarity(tier, rnd), rnd), kind: 'mystery', tier, rare: rnd() < T.rareForm };
 }
 /** disclosed odds of a mystery egg drop, per tier (0..1) */
 export function eggOdds() {

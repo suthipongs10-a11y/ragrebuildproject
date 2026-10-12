@@ -9,10 +9,13 @@ Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`,
 
   | tier | drop | monster rarity | incubation | rare form |
   |---|---|---|---|---|
-  | ลายธรรมดา | 68% | common 100 | instant | 3% |
-  | ลายเงิน | 24% | common 75 · rare 25 | instant | 4% |
-  | ลายทอง | 7% | common 35 · rare 50 · epic 15 | 2 h | 5% |
-  | ลายรุ้ง | 1% | rare 40 · epic 45 · legendary 15 | 8 h | 8% |
+  | ลายธรรมดา | 68% | common 92 · rare 7 · epic 0.9 · legendary 0.1 | instant | 3% |
+  | ลายเงิน | 24% | common 70 · rare 25 · epic 4.5 · legendary 0.5 | instant | 4% |
+  | ลายทอง | 7% | common 30 · rare 50 · epic 17 · legendary 3 | 2 h | 5% |
+  | ลายรุ้ง | 1% | rare 50 · epic 40 · legendary 10 | 8 h | 8% |
+
+  Every shell can roll every rarity (SW-scroll style: cheap shell = tiny odds). Per mystery egg incl. pity:
+  common 80.4% · rare 15.5% · epic 3.6% (1 in 28) · legendary 0.57% (1 in 176). Full report: `npm run rates`.
 
   All wild/mystery eggs hatch at ★1 (★2 start is reserved for Starborn eggs, per GAME_CONFIG_v2).
 
@@ -30,4 +33,7 @@ Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`,
 
 ## Not in M0
 - Starborn eggs (premium gacha) · friends rubbing eggs to speed up · rare-form recolour in battle (comes with the M2 aura system)
-- Turtle home final art (batch 04 not received yet)
+- Turtle home final art (batch 04 in progress by the owner)
+
+## Home tweaks
+- Monsters walking on the turtle are half size (`MON_SCALE` .27 → .135 in `homeView.ts`), up to 16 shown (was 8).
