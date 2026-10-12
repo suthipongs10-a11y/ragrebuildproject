@@ -2,7 +2,7 @@
 // Battle scene: plays battle-core TurnStart/ActionResult events as animation + VFX, and collects player commands.
 import { Battle, REACTION_NAME } from '../core/battle';
 import { SPECIES } from '../core/data';
-import { PAL, PIV, ANCH, anchOf, TAU, spr, silOf, glowOf, GP, dot, portrait } from './assets';
+import { PAL, PIV, ANCH, anchOf, TAU, spr, silOf, glowOf, GP, dot, portrait, IMG, fx } from './assets';
 import { sfx } from './audio';
 import {
   E, SQ, clamp, lerp, rnd, easeOut, easeIn, easeIO, easeBack, run, tween, waitAll, waitUntil, addP, burst, ring, text, shake, flash,
@@ -16,7 +16,7 @@ const OFFS = { 1: [0], 2: [-60, 60], 3: [-110, 0, 110], 4: [-150, -50, 50, 150] 
 
 export class BattleView {
   b: Battle; V = new Map(); phase = 'intro'; active = null; speed = 1; auto = false; skipUlt = false;
-  pending = null; sel = 0; aim = null; focus = []; camF = null; env = { x: 0, y: 0 }; wipe = 0; onEnd = null; onHud = null; ended = false; stage;
+  pending = null; sel = 0; aim = null; focus = []; camF = null; camK = .45; cine = null; env = { x: 0, y: 0 }; wipe = 0; onEnd = null; onHud = null; ended = false; stage;
   constructor(b, stage, opts) { this.b = b; this.stage = stage; Object.assign(this, opts); }
 
   // ---------- views ----------
@@ -199,13 +199,43 @@ export class BattleView {
     yield .2;
   }
   actName(v, sk) { this.onAct && this.onAct(v.name + ' · ' + sk.name, v.team); }
+  /** ultimate cinematic: the world darkens and the camera rushes in on the caster, it gathers power, snaps into its
+   *  burst pose with a flash (speed lines, element rays behind it, skill-name cut-in), then the camera pulls back out */
   *ultIntro(v, sk) {
-    const P = this.P(v); E.dimT = .62; E.zoomT = 1.14; this.focus = [v]; this.camF = { x: v.x, y: v.y - 60 }; v.pose = 'burst'; v.glowF = 1; v.busy = true; sfx.charge();
+    const P = this.P(v), flame = (n = 1) => { for (let i = 0; i < n; i++) addP({ type: 'flame', x: v.x + rnd(-60, 60) * v.k / .4, y: v.y + rnd(-8, 8), z: rnd(0, 20), vz: rnd(120, 280), life: rnd(.4, .7), size: rnd(18, 32), color: P.aura, core: P.core, drag: .5 }); };
+    this.focus = [v]; v.busy = true; v.glowF = .6; this.camK = 1; this.camF = { x: v.x, y: v.y - 70 * v.k / .4 };
+    this.cine = { v, t: 0, col: P.aura, hot: P.hot, pose: 0 };
+    v.pose = 'cast'; E.dimT = .86; E.zoomT = 2; sfx.charge();
+    yield* tween(.42, p => { v.sx = 1 + .08 * p; v.sy = 1 - .1 * p; if (Math.random() < .8) flame(); });
+    v.pose = 'burst'; v.glowF = 1; v.sx = v.sy = 1; this.cine.pose = 1e-6; flash(.55, P.hot); shake(10); sfx.whoosh(); sfx.perfect();
+    ring(v.x, v.y, 10, 260, P.aura, .5, 12); ring(v.x, v.y, 10, 180, P.hot, .4, 6); burst(v.x, v.y, 60, 30, P.aura, 520, 18, .7);
     this.onCutin && this.onCutin(v.sid, sk.name, P.cut);
-    yield* tween(.85, p => { if (Math.random() < .7) addP({ type: 'flame', x: v.x + rnd(-60, 60) * v.k / .4, y: v.y + rnd(-8, 8), z: rnd(0, 20), vz: rnd(120, 260), life: rnd(.4, .7), size: rnd(18, 30), color: P.aura, core: P.core, drag: .5 }); v.sx = 1 + .05 * p + Math.sin(E.time * 40) * .015 * p; v.sy = 1 - .05 * p; });
-    E.dimT = .3; this.camF = null; v.busy = false;
+    yield* tween(.8, p => { v.sy = 1 + .025 * Math.sin(p * 24); v.sx = 2 - v.sy; if (Math.random() < .9) flame(2); });
+    this.cine = null; this.camK = .45; this.camF = null; E.zoomT = 1.08; E.dimT = .3; v.busy = false;
   }
-  ultOutro(v) { E.dimT = 0; E.zoomT = 1; this.focus = []; this.camF = null; v.glowF = 0; }
+  ultOutro(v) { E.dimT = 0; E.zoomT = 1; this.focus = []; this.camF = null; this.camK = .45; this.cine = null; v.glowF = 0; }
+  /** behind the caster during the cinematic: rotating element rays, a soft orb and the burst flash */
+  drawCineBack() {
+    const c = this.cine; if (!c) return; const v = c.v, ctx = E.ctx, k = v.k / .4, y = v.y - 70 * k, a = Math.min(1, c.t * 3);
+    if (!fx(ctx, 'fx_rays', c.col, v.x, y, 760 * k, 760 * k, a * (c.pose ? .95 : .45), E.time * .6)) {
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(v.x, y);
+      for (let i = 0; i < 16; i++) { const ang = i / 16 * TAU + E.time * .6, len = 380 * k, w = .06; ctx.globalAlpha = a * .35; ctx.fillStyle = c.col; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(ang - w) * len, Math.sin(ang - w) * len); ctx.lineTo(Math.cos(ang + w) * len, Math.sin(ang + w) * len); ctx.closePath(); ctx.fill(); }
+      ctx.restore();
+    }
+    fx(ctx, 'fx_orb', c.col, v.x, y, 420 * k, 420 * k, a * .8);
+    if (c.pose) fx(ctx, 'fx_burst', c.hot, v.x, y, (300 + c.pose * 1600) * k, (300 + c.pose * 1600) * k, Math.max(0, 1 - c.pose * 2.2), .3);
+  }
+  /** screen-space anime speed lines framing the zoomed-in caster */
+  drawSpeedLines() {
+    const c = this.cine; if (!c) return; const ctx = E.ctx, R = Math.max(E.W, E.H), a = Math.min(1, c.t * 4);
+    ctx.save(); screenTransform();
+    if (!fx(ctx, 'fx_speedlines', '#ffffff', E.W / 2, E.H / 2, R * 1.5, R * 1.5, a * .85, Math.floor(E.time * 20) * .21)) {
+      ctx.globalCompositeOperation = 'lighter'; ctx.translate(E.W / 2, E.H / 2); let sd = Math.floor(E.time * 20) * 7919;
+      const r = () => ((sd = (sd * 16807) % 2147483647) / 2147483647);
+      for (let i = 0; i < 70; i++) { const ang = r() * TAU, r0 = R * (.32 + r() * .2), w = .004 + r() * .01; ctx.globalAlpha = a * (.25 + r() * .45); ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.moveTo(Math.cos(ang) * r0, Math.sin(ang) * r0); ctx.lineTo(Math.cos(ang - w) * R, Math.sin(ang - w) * R); ctx.lineTo(Math.cos(ang + w) * R, Math.sin(ang + w) * R); ctx.closePath(); ctx.fill(); }
+    }
+    ctx.restore(); worldTransform();
+  }
   slashFx(x, y, dir, P, s = 1) { addP({ type: 'slash', x, y, z: 44, life: .28, size: 70 * s, rot: Math.atan2(dir[1], dir[0]) - .9, color: P.aura, w: 16 * s }); addP({ type: 'slash', x, y, z: 44, life: .22, size: 58 * s, rot: Math.atan2(dir[1], dir[0]) - .7, color: P.hot, w: 6 * s }); burst(x, y, 44, 16, P.aura, 420 * s, 16, .4); burst(x, y, 44, 8, P.hot, 300, 10, .3); ring(x, y, 10, 70 * s, P.core, .3, 5); }
   explode(x, y, P, big) { ring(x, y, 10, big ? 160 : 90, P.aura, .45, big ? 10 : 7); ring(x, y, 6, big ? 110 : 60, P.hot, .3, 4); burst(x, y, 30, big ? 44 : 22, P.aura, big ? 520 : 360, big ? 30 : 20, .6); burst(x, y, 30, big ? 20 : 10, P.hot, 300, 14, .4); for (let i = 0; i < (big ? 10 : 5); i++) addP({ type: 'flame', x: x + rnd(-30, 30), y: y + rnd(-12, 12), z: 10, vz: rnd(80, 180), life: rnd(.5, .9), size: rnd(16, 28), color: P.aura, core: P.core, drag: 1 }); }
   charge(v, P, n = 2) { const m = this.anc(v, 'mouth'); for (let i = 0; i < n; i++) { const a = Math.random() * TAU, r = rnd(60, 120); addP({ type: 'streak', x: m[0] + Math.cos(a) * r, y: v.y, z: v.y - m[1] + Math.sin(a) * r * .6, vx: -Math.cos(a) * r * 4, vz: -Math.sin(a) * r * .6 * 4, life: .25, size: 3, color: P.core }); } addP({ x: m[0], y: v.y, z: v.y - m[1], life: .12, size: 30, size2: 0, color: P.aura }); }
@@ -364,7 +394,8 @@ export class BattleView {
 
   // ---------- per-frame ----------
   update(dt) {
-    E.camT.x = this.camF ? this.camF.x * .45 : 0; E.camT.y = this.camF ? lerp(-25, this.camF.y, .45) : -25;
+    E.camT.x = this.camF ? this.camF.x * this.camK : 0; E.camT.y = this.camF ? lerp(-25, this.camF.y, this.camK) : -25;
+    if (this.cine) { this.cine.t += dt; if (this.cine.pose) this.cine.pose += dt; E.cam.x = lerp(E.cam.x, E.camT.x, 1 - Math.exp(-dt * 9)); E.cam.y = lerp(E.cam.y, E.camT.y, 1 - Math.exp(-dt * 9)); E.zoom = lerp(E.zoom, E.zoomT, 1 - Math.exp(-dt * 6)); }
     for (const v of this.V.values()) {
       v.flash = Math.max(0, v.flash - dt * 5); for (let i = v.ghosts.length - 1; i >= 0; i--) { v.ghosts[i].life -= dt; if (v.ghosts[i].life <= 0) v.ghosts.splice(i, 1); }
       v.x += v.kvx * dt; v.y += v.kvy * dt; const dm = Math.exp(-dt * 10); v.kvx *= dm; v.kvy *= dm;
@@ -384,11 +415,11 @@ export class BattleView {
     const ents = []; for (const v of this.V.values()) ents.push({ y: v.y, v }); for (const L of LANTERNS) ents.push({ y: L.y + ey, d: () => envd(() => drawLantern(L)) }); for (const b of BUSHES) ents.push({ y: b.y + ey, d: () => envd(() => drawBush(b)) });
     ents.sort((a, b) => a.y - b.y); const dimOn = E.dim > .02;
     for (const e of ents) { if (e.v) { if (dimOn && this.focus.includes(e.v)) continue; this.drawUnit(e.v); } else e.d(); }
-    if (dimOn) { ctx.save(); screenTransform(); ctx.fillStyle = `rgba(8,6,14,${E.dim})`; ctx.fillRect(0, 0, E.W, E.H); ctx.restore(); worldTransform(); for (const v of this.focus) this.drawUnit(v); }
-    drawProjs(); drawParts(); envd(drawFlies);
-    if (this.phase !== 'intro') for (const v of this.V.values()) this.drawBars(v);
+    if (dimOn) { ctx.save(); screenTransform(); ctx.fillStyle = `rgba(8,6,14,${E.dim})`; ctx.fillRect(0, 0, E.W, E.H); ctx.restore(); worldTransform(); this.drawCineBack(); for (const v of this.focus) this.drawUnit(v); }
+    drawProjs(); drawParts(); envd(drawFlies); this.drawSpeedLines();
+    if (this.phase !== 'intro' && !this.cine) for (const v of this.V.values()) this.drawBars(v); // the cinematic keeps the screen clean
     const a = this.active && this.V.get(this.active);
-    if (a && !a.dead && this.phase !== 'end') { const y = this.headY(a) - 36 + Math.sin(E.time * 6) * 4; ctx.fillStyle = '#ffd27a'; ctx.beginPath(); ctx.moveTo(a.x - 9, y - 10); ctx.lineTo(a.x + 9, y - 10); ctx.lineTo(a.x, y); ctx.closePath(); ctx.fill(); }
+    if (a && !a.dead && this.phase !== 'end' && !this.cine) { const y = this.headY(a) - 36 + Math.sin(E.time * 6) * 4; ctx.fillStyle = '#ffd27a'; ctx.beginPath(); ctx.moveTo(a.x - 9, y - 10); ctx.lineTo(a.x + 9, y - 10); ctx.lineTo(a.x, y); ctx.closePath(); ctx.fill(); }
     drawOverlays();
     if (this.wipe > 0) { const g = ctx.createLinearGradient(0, 0, E.W, E.H); g.addColorStop(0, `rgba(250,244,226,${this.wipe})`); g.addColorStop(1, `rgba(214,232,200,${this.wipe})`); ctx.fillStyle = g; ctx.fillRect(0, 0, E.W, E.H); }
     // boss bar

@@ -64,3 +64,11 @@ Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`,
   (legendary: rainbow rings + white-out + fanfare); epic/legendary add a sky light pillar, twinkles and a rarity banner.
 - Settings → test buttons preview each rarity (prototype only).
 - Battle: "Lv.N" plate under every monster's feet (green = ours, red = enemy, gold = boss) with an element dot.
+
+## Ultimate cinematic
+- Ultimates: screen darkens, camera rushes in (2x zoom, centred on the caster), it crouches gathering power, snaps into
+  its burst pose with flash + shockwave + shake, element-coloured rotating rays + orb behind it, anime speed lines, skill-name
+  cut-in; then the camera pulls back and the skill plays. HP bars/level plates hidden during the cinematic.
+- Uses fx_rays / fx_orb / fx_burst (batch 06) and fx_speedlines (batch 09, code-drawn lines until it arrives).
+- Next when batch 09 lands: per-element ultimate effects (flame wave/bird, tidal wave/serpent, tornado/blades, rock spikes/
+  ground shatter, divine star, shadow vortex, slash).
