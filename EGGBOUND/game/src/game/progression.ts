@@ -1,5 +1,5 @@
 // Rewards, levels, fragments, eggs, star-ups.
-import { STAGES, SPECIES, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, DUP_OVERFLOW_GOLD, EGG_LOOT_GRADE, LOOT_ORDER } from '../core/data';
+import { STAGES, SPECIES, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, DUP_OVERFLOW_GOLD, MAX_STARS, natStars, EGG_LOOT_GRADE, LOOT_ORDER } from '../core/data';
 import type { EggTier, LootGrade } from '../core/data';
 import type { Rarity } from '../core/types';
 import type { SaveData, EggSave } from './save';
@@ -78,17 +78,17 @@ export function eggOdds() {
 }
 
 export interface HatchResult { sid: string; egg: EggSave; dup: boolean; before: number; stars: number; gold: number; rare: boolean; rareNew: boolean }
-/** stars an egg gives: hatch grade for a new monster, star-ups for a duplicate */
+/** stars a duplicate egg adds (a new monster hatches at its natural stars instead) */
 export const eggStars = (e: EggSave) => e.kind === 'mystery' && e.tier ? EGG_TIERS[e.tier].stars : 1;
-/** hatch an egg: a new species joins at the egg's star grade; a duplicate gains that many stars (max ★5, overflow → gold).
+/** hatch an egg: a new species joins at its natural stars (by rarity); a duplicate gains eggStars (max ★6, overflow → gold).
  *  A rare-form egg turns the monster into its rare form. Eggs still incubating can't hatch. */
 export function hatchEgg(s: SaveData, eggId: number, now = Date.now()): HatchResult | null {
   const i = s.eggs.findIndex(e => e.id === eggId); if (i < 0 || !canHatch(s, s.eggs[i], now)) return null;
   const egg = s.eggs[i], { sid } = egg, add = eggStars(egg), rare = !!egg.rare;
   s.eggs.splice(i, 1); endIncub(s, eggId);
   const m = s.mons[sid];
-  if (!m) { s.mons[sid] = { lvl: 1, exp: 0, stars: add, ...(rare ? { rare } : {}) }; return { sid, egg, dup: false, before: 0, stars: add, gold: 0, rare, rareNew: rare }; }
-  const before = m.stars, to = Math.min(5, before + add), gold = (before + add - to) * DUP_OVERFLOW_GOLD;
+  if (!m) { const st = natStars(sid); s.mons[sid] = { lvl: 1, exp: 0, stars: st, ...(rare ? { rare } : {}) }; return { sid, egg, dup: false, before: 0, stars: st, gold: 0, rare, rareNew: rare }; }
+  const before = m.stars, to = Math.min(MAX_STARS, before + add), gold = (before + add - to) * DUP_OVERFLOW_GOLD;
   m.stars = to; s.gold += gold;
   const rareNew = rare && !m.rare; if (rare) m.rare = true;
   return { sid, egg, dup: true, before, stars: to, gold, rare, rareNew };

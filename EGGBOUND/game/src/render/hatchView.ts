@@ -3,7 +3,7 @@
 import { SPECIES, LOOT_GRADES, LOOT_ORDER } from '../core/data';
 import { PAL, PIV, TAU, spr, silOf, glowOf, GP, dot, eggImg, mk, TIER_COL, IMG, fx, tinted, colored } from './assets';
 import { sfx } from './audio';
-import { E, SQ, lerp, rnd, clamp, easeOut, easeBack, run, tween, addP, burst, ring, shake, flash, drawParts, drawDecals, drawGround, drawLantern, drawBush, drawLanternPools, drawFlies, LANTERNS, BUSHES, worldTransform, drawOverlays } from './engine';
+import { E, SQ, lerp, rnd, clamp, easeOut, easeBack, run, tween, addP, burst, ring, shake, flash, drawParts, drawDecals, drawGround, drawLantern, drawBush, drawLanternPools, drawFlies, LANTERNS, BUSHES, worldTransform, screenTransform, drawOverlays } from './engine';
 
 const PED = { x: 0, y: -40 }, EGGK = .42;
 const PRISM = ['#ff6b6b', '#ffb84d', '#ffe66b', '#6bdc8a', '#5bb8ff', '#a98bff'];
@@ -18,6 +18,14 @@ const CRYSTALS_ART = [[-190, -58, 0], [190, -58, 1.7], [-222, 74, 3.1], [222, 74
 const crystals = () => ART() ? CRYSTALS_ART : CRYSTALS;
 const lighten = (hex, f) => { const n = parseInt(hex.slice(1), 16), m = c => Math.round(c + (255 - c) * f); return '#' + [m(n >> 16 & 255), m(n >> 8 & 255), m(n & 255)].map(v => v.toString(16).padStart(2, '0')).join(''); };
 const IDLE_COL = '#7fe8ff', GOLD = ['#fff0b8', '#e8b84a', '#8a5a14'];
+const AW_GOLD = '#ffd24a', AW_PALE = '#fff3c0';
+/** jagged lightning polyline from a to b (midpoint displacement) */
+function jag(a, b, disp, depth = 5) {
+  if (depth === 0) return [a, b];
+  const m = [(a[0] + b[0]) / 2 + rnd(-disp, disp), (a[1] + b[1]) / 2 + rnd(-disp, disp) * .6];
+  return [...jag(a, m, disp / 2, depth - 1), ...jag(m, b, disp / 2, depth - 1).slice(1)];
+}
+function starPath(ctx, x, y, r) { ctx.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .45 : r; ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr); } ctx.closePath(); }
 const colC = {};
 /** soft light column sprite (fades at the sides and toward the top), cached per colour */
 function column(c) {
@@ -30,6 +38,8 @@ function column(c) {
 const RUNES = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ'];
 export class HatchView {
   sid; P; EP; egg; mon; fxs = []; phase = 'ready'; rays = 0; onDone = null; dup = false; newStars = 1; eggSrc = null; tier = null; rare = false; revealed = false; rarityOverride = null; rk = 0; step = 0; postT = 0;
+  // awakening (after the reveal): charge → gold burst + lightning → stars stamp in one by one. Grander with rarity.
+  fromStars = 0; toStars = 1; aT = 0; bolts = []; goldRays = 0; awGlow = 0; dark = 0; stamps = []; awBurst = false; nSpray = 0; nArc = 0; nStrike = 0;
   constructor(sid, opts) {
     this.sid = sid; this.P = PAL[SPECIES[sid].elem]; Object.assign(this, opts);
     this.egg = { x: PED.x, y: PED.y - 38, rot: 0, hop: 0, sx: 1, sy: 1, glow: 0, white: 0, vis: true, cracks: [], cv: mk(512, 512), stage: 0, t: 0 };
@@ -69,12 +79,125 @@ export class HatchView {
     this.postT += dt; if (this.postT > 3.5) return; const m = this.mon;
     if (Math.random() < dt * (10 + this.rk * 8)) this.addFx('fx_sparkle', this.col(Math.random() * 6 | 0), m.x + rnd(-170, 170), m.y - rnd(20, 300), 20, rnd(50, 110), .6, rnd(0, 1));
   }
+  /** awakening timeline (seconds after the reveal) */
+  tl() {
+    const rk = this.rk, C = [0, .55, .75, .95][rk], burstAt = rk ? .35 + C : .25, S = [0, .7, 1.3, 1.9][rk];
+    const stamp0 = burstAt + (rk ? .3 : 0), gap = .3, stampEnd = stamp0 + Math.max(1, this.toStars - this.fromStars) * gap;
+    return { C, burstAt, S, stamp0, gap, end: Math.max(burstAt + S, stampEnd) + .9 };
+  }
+  bodyH() { return 75 * this.mon.k / .4; }
+  /** lightning from the sky onto a ground point (x,y), optionally ending at height z */
+  strike(x, y, z = 0, w = 1) {
+    const top = [x + rnd(-90, 90), y - z - 760], end = [x, y - z], pts = jag(top, end, 90);
+    const br = []; for (let i = 0; i < 2; i++) { const k = 4 + (Math.random() * (pts.length - 8) | 0), a = pts[k]; br.push(jag(a, [a[0] + rnd(-120, 120), a[1] + rnd(40, 140)], 40, 3)); }
+    this.bolts.push({ pts, br, t: 0, life: rnd(.3, .45), w });
+    burst(x, y, z, 10, AW_GOLD, 340, 12, .5); ring(x, y, 6, 70 * w, AW_PALE, .35, 4);
+  }
+  /** a short crackling arc around the monster's body */
+  arc() {
+    const m = this.mon, bh = this.bodyH(), R = 95 * m.k / .4, a0 = rnd(0, TAU), a1 = a0 + rnd(.8, 2.2) * (Math.random() < .5 ? -1 : 1);
+    const p = a => [m.x + Math.cos(a) * R * rnd(.8, 1.15), m.y - bh + Math.sin(a) * R * 1.1];
+    this.bolts.push({ pts: jag(p(a0), p(a1), 34, 4), br: [], t: 0, life: rnd(.1, .18), w: .55 });
+  }
+  starPos(i) { const m = this.mon, n = this.toStars, sp = 36; return [m.x + (i - (n - 1) / 2) * sp, m.y - 222 * m.k / .4]; }
+  awaken(dt) {
+    const a = this.aT, T = this.tl(), rk = this.rk, m = this.mon, bh = this.bodyH();
+    if (rk && a > .35 && a < T.burstAt) { // charge: the world darkens, gold motes rush into the monster, it crouches
+      const q = (a - .35) / T.C; this.dark = Math.min(.55, q * .65); this.awGlow = q;
+      E.zoomT = 1.15 + q * (rk >= 2 ? .3 : .15); E.camT.y = PED.y - 40 - 60 * q; shake(1 + rk * q * 2.5);
+      m.sx = 1 + .07 * q; m.sy = 1 - .08 * q;
+      for (let n = 0; n < (40 + rk * 35) * dt + Math.random(); n++) {
+        const ang = rnd(0, TAU), r = rnd(170, 340), z0 = bh + rnd(-70, 160), life = rnd(.32, .45);
+        addP({ type: Math.random() < .5 ? 'streak' : 'glow', x: m.x + Math.cos(ang) * r, y: m.y + Math.sin(ang) * r * SQ, z: z0, vx: -Math.cos(ang) * r / life, vy: -Math.sin(ang) * r * SQ / life, vz: (bh - z0) / life, life, size: rnd(3, 8), size2: 2, color: Math.random() < .5 ? AW_GOLD : AW_PALE });
+      }
+      if (rk >= 2 && a > this.nArc) { this.arc(); this.nArc = a + .13; }
+    }
+    if (rk && !this.awBurst && a >= T.burstAt) { // BURST: gold explosion + lightning strikes all around
+      this.awBurst = true; this.goldRays = 1; this.dark = .62; this.awGlow = 1; m.sx = .88; m.sy = 1.16;
+      flash(.75, '#fff1b8'); shake(14 + rk * 5); sfx.boom(); sfx.zap(); if (rk >= 2) setTimeout(() => sfx.zap(), 140); if (rk >= 3) setTimeout(() => sfx.win(), 300);
+      this.addFx('fx_burst', AW_GOLD, m.x, m.y - bh, 120, 900 + rk * 260, .75, Math.random());
+      this.addFx('fx_burst', '#ffffff', m.x, m.y - bh, 60, 340 + rk * 80, .35, Math.random());
+      for (let i = 0; i < rk + 2; i++) this.addFx('fx_ring', i % 2 ? AW_GOLD : AW_PALE, m.x, m.y - bh, 60, 700 + i * 280, .6 + i * .14);
+      if (rk >= 3) PRISM.forEach((pc, i) => this.addFx('fx_ring', pc, m.x, m.y - bh, 60, 760 + i * 150, .9 + i * .07));
+      ring(m.x, m.y, 10, 300 + rk * 70, AW_GOLD, .8, 10); ring(m.x, m.y, 10, 200 + rk * 50, AW_PALE, .6, 5);
+      this.strike(m.x, m.y, bh * .6, 1.6);
+      for (let i = 0; i < rk * 2; i++) { const ang = rnd(0, TAU), r = rnd(110, 260); this.strike(m.x + Math.cos(ang) * r, m.y + Math.sin(ang) * r * SQ); }
+      burst(m.x, m.y, bh, 40 + rk * 15, AW_GOLD, 620, 14, .8); burst(m.x, m.y, bh, 20, '#ffffff', 420, 10, .6);
+      this.nSpray = 0; this.nArc = 0; this.nStrike = .25;
+    }
+    if (this.awBurst) {
+      const s = a - T.burstAt;
+      m.sx = lerp(m.sx, 1, 1 - Math.exp(-dt * 9)); m.sy = lerp(m.sy, 1, 1 - Math.exp(-dt * 9));
+      this.goldRays = clamp(1 - (s - T.S) / 1.1, 0, 1);
+      if (s < T.S) { // power keeps pouring out: gold streaks shoot in every direction, arcs crackle, bolts keep striking
+        while (this.nSpray <= s) {
+          this.nSpray += .05;
+          for (let k = 0; k < 5 + rk * 3; k++) { const ang = rnd(0, TAU), sp = rnd(520, 1150); addP({ type: 'streak', x: m.x, y: m.y, z: bh + rnd(-40, 40), vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp * SQ, vz: rnd(-250, 800), life: rnd(.32, .55), size: rnd(2.5, 5.5), color: Math.random() < .6 ? AW_GOLD : AW_PALE, drag: 1.6 }); }
+          if (Math.random() < .5) burst(m.x, m.y, bh + rnd(-30, 60), 3, AW_GOLD, 320, 10, .6);
+        }
+        if (s > this.nArc) { this.arc(); if (rk >= 2) this.arc(); this.nArc = s + [.2, .15, .1, .07][rk]; }
+        if (rk >= 2 && s > this.nStrike) { const ang = rnd(0, TAU), r = rnd(90, 280); this.strike(m.x + Math.cos(ang) * r, m.y + Math.sin(ang) * r * SQ); if (Math.random() < .5) sfx.zap(); shake(5 + rk); this.nStrike = s + rnd(.12, .26) / (rk - 1); }
+        shake(2 + rk); this.awGlow = 1;
+      } else {
+        this.awGlow = Math.max(.35, this.awGlow - dt * .9);
+        if (rk >= 2 && a < T.end - .5 && s > this.nArc) { this.arc(); this.nArc = s + .3; }
+      }
+      this.dark = s < T.S ? .62 : Math.max(0, .62 - (s - T.S) * .45);
+    }
+    // stars stamp in one by one above the monster (★ = rarity's natural stars; a duplicate keeps its old ones and slams the new)
+    for (let i = this.stamps.length; i < this.toStars; i++) {
+      const old = i < this.fromStars, at = old ? T.stamp0 : T.stamp0 + (i - this.fromStars) * T.gap; if (a < at) break;
+      this.stamps.push({ i, t: 0, slam: !old }); if (old) continue;
+      const [sx, sy] = this.starPos(i), last = i === this.toStars - 1, h = m.y - sy;
+      sfx.perfect(); flash(.18 + rk * .05, AW_GOLD); burst(sx, m.y, h, 14 + rk * 4, AW_GOLD, 260, 10, .55); ring(sx, m.y, 4, 60, AW_PALE, .3, 3);
+      if (rk >= 2) this.bolts.push({ pts: jag([sx + rnd(-60, 60), sy - 520], [sx, sy], 70), br: [], t: 0, life: .22, w: .9 });
+      if (last) { sfx.starup(); shake(5 + rk * 2); burst(sx, m.y, h, 30, '#ffffff', 380, 10, .7); }
+    }
+    if (rk && a > T.end - .6) { E.zoomT = 1.15; E.camT.y = PED.y - 40; }
+  }
+  drawDark() { if (this.dark <= 0) return; const ctx = E.ctx; ctx.save(); screenTransform(); ctx.fillStyle = `rgba(10,6,0,${this.dark})`; ctx.fillRect(0, 0, E.W, E.H); ctx.restore(); }
+  drawGoldRays() {
+    const g = this.goldRays; if (g <= 0) return; const ctx = E.ctx, m = this.mon, by = m.y - this.bodyH(), pulse = 1 + .06 * Math.sin(E.time * 18);
+    fx(ctx, 'fx_rays', AW_GOLD, m.x, by, 1350 * pulse, 1350 * pulse, g * .85, E.time * 1.1);
+    fx(ctx, 'fx_rays', AW_PALE, m.x, by, 820, 820, g * .5, -E.time * .8);
+    if (this.rk >= 3) fx(ctx, 'fx_rays', PRISM[Math.floor(E.time * 6) % PRISM.length], m.x, by, 1100, 1100, g * .5, E.time * .5);
+    fx(ctx, 'fx_burst', AW_GOLD, m.x, by, 420 * pulse, 420 * pulse, g * .5, E.time * .7);
+  }
+  drawBolts() {
+    if (!this.bolts.length) return; const ctx = E.ctx; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+    const line = pts => { ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); };
+    for (const b of this.bolts) {
+      const a = (1 - b.t / b.life) * (.65 + .35 * Math.random());
+      for (const [w, c, al] of [[24, AW_GOLD, .18], [9, AW_GOLD, .6], [3, '#ffffff', 1]]) { ctx.globalAlpha = a * al; ctx.strokeStyle = c; ctx.lineWidth = w * b.w; line(b.pts); for (const br of b.br) { ctx.lineWidth = w * b.w * .5; line(br); } }
+    }
+    ctx.restore();
+  }
+  drawLabels() {
+    const m = this.mon; if (!m.vis) return; const ctx = E.ctx;
+    if (this.rk > 0 && this.revealed) { // rarity banner pops in above the monster
+      const sz = (this.rk >= 3 ? 40 : this.rk === 2 ? 34 : 28) * (0.6 + 0.4 * easeBack(Math.min(1, (this.bannerT = (this.bannerT || 0) + .016) * 3)));
+      const txt = LOOT_GRADES[LOOT_ORDER[this.rk]].name + (this.rk >= 3 ? '!!' : '!'), ty = m.y - 270 * m.k / .4;
+      ctx.save(); ctx.font = `700 ${sz}px Mitr, sans-serif`; ctx.textAlign = 'center'; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.lineWidth = 6; ctx.strokeText(txt, m.x, ty);
+      ctx.fillStyle = this.rk >= 3 ? PRISM[Math.floor(E.time * 6) % PRISM.length] : LOOT_GRADES[LOOT_ORDER[this.rk]].col; ctx.fillText(txt, m.x, ty); ctx.restore();
+    }
+    for (const st of this.stamps) { // gold stars: slam in big, settle, shine
+      const [x, y] = this.starPos(st.i), q = st.slam ? clamp(st.t / .22, 0, 1) : 1, sc = st.slam ? lerp(3.2, 1, easeOut(q)) : 1, r = 15 * sc;
+      ctx.save(); ctx.globalAlpha = st.slam ? Math.min(1, st.t * 7) : 1;
+      ctx.globalCompositeOperation = 'lighter'; ctx.drawImage(dot(AW_GOLD), x - r * 2.4, y - r * 2.4, r * 4.8, r * 4.8); ctx.globalCompositeOperation = 'source-over';
+      const g = ctx.createLinearGradient(x, y - r, x, y + r); g.addColorStop(0, '#fff8d6'); g.addColorStop(.5, '#ffd24a'); g.addColorStop(1, '#c47d12');
+      starPath(ctx, x, y, r); ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = 2.2; ctx.strokeStyle = '#6a3a06'; ctx.stroke();
+      if (st.slam && st.t < .5) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1 - st.t * 2; starPath(ctx, x, y, r * (1 + st.t * 2)); ctx.strokeStyle = AW_PALE; ctx.lineWidth = 3; ctx.stroke(); }
+      ctx.restore();
+    }
+    if (this.rare && this.revealed) { ctx.save(); ctx.font = '700 24px "IBM Plex Sans Thai",sans-serif'; ctx.textAlign = 'center'; const ty = m.y - 318 * m.k / .4 + Math.sin(E.time * 3) * 4; ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.lineWidth = 5; ctx.strokeText('ร่างหายาก!', m.x, ty); ctx.fillStyle = PRISM[Math.floor(E.time * 4) % PRISM.length]; ctx.fillText('ร่างหายาก!', m.x, ty); ctx.restore(); }
+  }
   drawSky() {
     if (this.rk < 2 || !this.revealed || this.postT > 4) return; const m = this.mon, a = Math.min(1, this.postT * 3) * Math.max(0, 1 - Math.max(0, this.postT - 3));
     fx(E.ctx, 'fx_column', this.col(), m.x, m.y - 430, 200 + this.rk * 50, 980, a * .55);
   }
   update(dt) {
     for (const f of this.fxs) f.t += dt; this.fxs = this.fxs.filter(f => f.t < f.dur);
+    for (const b of this.bolts) b.t += dt; this.bolts = this.bolts.filter(b => b.t < b.life); for (const st of this.stamps) st.t += dt;
     if (this.phase === 'hatching' && this.egg.vis && ART() && Math.random() < dt * (4 + this.egg.glow * 14)) this.addFx('fx_sparkle', this.col(), PED.x + rnd(-70, 70), PED.y - 90 + rnd(-70, 50), 20, rnd(50, 90), .5, rnd(0, 1));
     const g = this.egg, m = this.mon, P = this.P;
     g.t += dt; const t = g.t;
@@ -98,10 +221,10 @@ export class HatchView {
         const u = h - 3.0; const pop = clamp(u / .45, 0, 1); const s = easeBack(pop); m.sx = m.sy = Math.max(.3, s);
         this.rays = Math.max(0, 1.2 - u * .5);
         if (u > .7 && m.sil > 0) { m.sil = Math.max(0, 1 - (u - .7) / .45); if (m.sil === 0) { burst(m.x, m.y, 70, 40, P.core, 320, 14, .8); sfx.chime(); this.revealed = true; if (this.rare) { PRISM.forEach((c, i) => { ring(m.x, m.y, 10, 150 + i * 22, c, .5 + i * .06, 5); burst(m.x, m.y, 70, 10, c, 380, 12, .9); }); flash(.5, '#ffffff'); sfx.starup(); } this.onReveal && this.onReveal(); } }
-        if (u > 1.25 && u < 1.75) { const q = (u - 1.25) / .5; m.hop = -Math.sin(q * Math.PI) * 26; m.sy = 1 + Math.sin(q * Math.PI * 2) * .08; m.sx = 2 - m.sy; }
-        if (this.dup && u > 1.9 && !this.starFx) { this.starFx = true; sfx.starup(); ring(m.x, m.y, 10, 220, '#ffd27a', .7, 10); addP({ type: 'beam', x: m.x, y: m.y + 1, life: 1, size: 90, color: P.aura }); burst(m.x, m.y, 80, 50, '#ffe39a', 420, 16, .9); flash(.6, P.hot); }
+        if (this.rk === 0 && u > 1.25 && u < 1.75) { const q = (u - 1.25) / .5; m.hop = -Math.sin(q * Math.PI) * 26; m.sy = 1 + Math.sin(q * Math.PI * 2) * .08; m.sx = 2 - m.sy; }
+        if (this.revealed) { this.aT += dt; this.awaken(dt); }
         if (this.revealed && this.rk >= 2) this.afterFx(dt);
-        if (u > (this.dup ? 3.2 : 2.4) + this.rk * .6 && this.phase !== 'done') { this.phase = 'done'; this.onDone && this.onDone(); }
+        if (this.revealed && this.aT > this.tl().end && this.phase !== 'done') { this.phase = 'done'; this.onDone && this.onDone(); }
       }
     }
   }
@@ -113,7 +236,8 @@ export class HatchView {
     ents.push({ y: ay + .7, d: () => this.drawBeams() }, { y: ay + .9, d: () => this.drawSky() });
     for (const L of LANTERNS) ents.push({ y: L.y, d: () => drawLantern(L) }); for (const b of BUSHES) ents.push({ y: b.y, d: () => drawBush(b) });
     ents.sort((a, b) => a.y - b.y); for (const e of ents) e.d();
-    this.drawRays(); this.drawFx(); drawParts(); drawFlies(); drawOverlays();
+    if (this.dark > 0 || this.goldRays > 0) { this.drawDark(); this.drawGoldRays(); this.drawMon(); } // awakening: dim the scene, monster on top
+    this.drawRays(); this.drawFx(); drawParts(); this.drawBolts(); this.drawLabels(); drawFlies(); drawOverlays();
   }
   cyl(x, yB, rx, h, top, side, ry) { const ctx = E.ctx; const g = ctx.createLinearGradient(x - rx, 0, x + rx, 0); g.addColorStop(0, '#5a5246'); g.addColorStop(.35, side); g.addColorStop(1, '#4a4238'); ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(x + rx, yB - h); ctx.lineTo(x + rx, yB); ctx.ellipse(x, yB, rx, ry, 0, 0, Math.PI); ctx.lineTo(x - rx, yB - h); ctx.closePath(); ctx.fill(); ctx.fillStyle = top; ctx.beginPath(); ctx.ellipse(x, yB - h, rx, ry, 0, 0, TAU); ctx.fill(); ctx.strokeStyle = 'rgba(50,40,30,.5)'; ctx.lineWidth = 1.5; ctx.stroke(); }
   /** altar colour: teal while idle, the egg's colour while hatching (rainbow eggs cycle) */
@@ -226,16 +350,11 @@ export class HatchView {
     ctx.save(); ctx.translate(m.x, m.y + m.hop); ctx.scale(m.sx * m.k, m.sy * m.k);
     if (this.rare && this.revealed) { const i = Math.floor(E.time * 4) % PRISM.length; ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = .7 + .3 * Math.sin(E.time * 6); ctx.drawImage(glowOf(this.sid, key, PRISM[i]), -PIV[0] - GP, -PIV[1] - GP); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; }
     if (m.sil > 0) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = m.sil; ctx.drawImage(glowOf(this.sid, key, P.aura), -PIV[0] - GP, -PIV[1] - GP); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; }
+    if (this.awGlow > 0) { const t = E.time, gw = glowOf(this.sid, key, AW_GOLD); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = this.awGlow * (.75 + .25 * Math.sin(t * 16)); ctx.drawImage(gw, -PIV[0] - GP, -PIV[1] - GP);
+      ctx.save(); ctx.translate(0, 0); ctx.scale(1.1 + .04 * Math.sin(t * 11), 1.14 + .06 * Math.sin(t * 9)); ctx.globalAlpha = this.awGlow * .45; ctx.drawImage(gw, -PIV[0] - GP, -PIV[1] - GP); ctx.restore(); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; }
     ctx.drawImage(spr(this.sid, key), -PIV[0], -PIV[1]);
     if (m.sil > 0) { ctx.globalAlpha = m.sil; ctx.drawImage(silOf(this.sid, key, '#1a0f08'), -PIV[0], -PIV[1]); }
     ctx.restore();
-    if (this.rk > 0 && this.revealed) { // rarity banner pops in above the monster
-      const sz = (this.rk >= 3 ? 40 : this.rk === 2 ? 34 : 28) * (0.6 + 0.4 * easeBack(Math.min(1, (this.bannerT = (this.bannerT || 0) + .016) * 3)));
-      const txt = LOOT_GRADES[LOOT_ORDER[this.rk]].name + (this.rk >= 3 ? '!!' : '!'), ty = m.y - 270 * m.k / .4;
-      ctx.save(); ctx.font = `700 ${sz}px Mitr, sans-serif`; ctx.textAlign = 'center'; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.lineWidth = 6; ctx.strokeText(txt, m.x, ty);
-      ctx.fillStyle = this.rk >= 3 ? PRISM[Math.floor(E.time * 6) % PRISM.length] : LOOT_GRADES[LOOT_ORDER[this.rk]].col; ctx.fillText(txt, m.x, ty); ctx.restore();
-    }
-    if (this.rare && this.revealed) { ctx.save(); ctx.font = '700 24px "IBM Plex Sans Thai",sans-serif'; ctx.textAlign = 'center'; const ty = m.y - 210 * m.k / .4 + Math.sin(E.time * 3) * 4; ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.lineWidth = 5; ctx.strokeText('ร่างหายาก!', m.x, ty); ctx.fillStyle = PRISM[Math.floor(E.time * 4) % PRISM.length]; ctx.fillText('ร่างหายาก!', m.x, ty); ctx.restore(); }
   }
   drawRays() {
     if (this.rays <= 0) return;

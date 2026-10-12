@@ -1,6 +1,6 @@
 // Egg system checks (P1 M0): mystery tiers + pity, incubation slots, hatch stars / overflow, rare form, save migration.
-import { EGG_DROP, EGG_TIERS, SPECIES } from '../src/core/data';
-import { newSave, loadSave } from '../src/game/save';
+import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS } from '../src/core/data';
+import { newSave, loadSave, writeSave } from '../src/game/save';
 import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf } from '../src/game/progression';
 import { startIncub, incubLeft, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
 
@@ -33,16 +33,23 @@ export function eggTests(): number {
     const ms = EGG_TIERS.gold.incubateMin * 60000 * HATCH_SPEED[1];
     ok(incubLeft(s, 10, t0 + ms - 1)! > 0 && !canHatch(s, g1, t0 + ms - 1), 'still incubating');
     const before = s.mons.A03.stars, r = hatchEgg(s, 10, t0 + ms);
-    ok(!!r && r.dup && r.stars === Math.min(5, before + EGG_TIERS.gold.stars), 'gold dup adds tier stars');
+    ok(!!r && r.dup && r.stars === Math.min(MAX_STARS, before + EGG_TIERS.gold.stars), 'gold dup adds tier stars');
     ok(home(s).incub.length === 0 && !s.eggs.some(e => e.id === 10), 'slot + egg freed after hatch');
     const rc = hatchEgg(s, 12, t0); ok(!!rc, 'common hatches instantly'); }
 
-  // new monster at tier stars + rare form; overflow past ★5 → gold
+  // new monster at its natural stars + rare form; overflow past ★6 → gold
   { const s = newSave(); delete s.mons.A06; s.eggs = [{ id: 20, sid: 'A06', kind: 'mystery', tier: 'silver', rare: true }];
     const r = hatchEgg(s, 20)!; ok(!r.dup && s.mons.A06.stars === 1 && s.mons.A06.rare === true && r.rareNew, 'new rare-form monster');
-    s.mons.A01.stars = 5; const g = s.gold; s.eggs = [{ id: 21, sid: 'A01', kind: 'mystery', tier: 'rainbow' }];
+    s.mons.A01.stars = MAX_STARS; const g = s.gold; s.eggs = [{ id: 21, sid: 'A01', kind: 'mystery', tier: 'rainbow' }];
     home(s).incub.push({ id: 21, start: 0, end: 0 });
-    const r2 = hatchEgg(s, 21, 1)!; ok(r2.stars === 5 && r2.gold === 500 && s.gold === g + 500, 'overflow stars → gold'); }
+    const r2 = hatchEgg(s, 21, 1)!; ok(r2.stars === MAX_STARS && r2.gold === 500 && s.gold === g + 500, 'overflow stars → gold'); }
+
+  // natural stars by rarity: epic hatches at ★3, rare at ★2; old saves are raised to their natural stars
+  { const s = newSave(); s.eggs = [{ id: 30, sid: 'A09', kind: 'named' }, { id: 31, sid: 'B05', kind: 'named' }];
+    ok(hatchEgg(s, 30)!.stars === 3 && s.mons.A09.stars === NAT_STARS.epic, 'epic hatches at ★3');
+    ok(hatchEgg(s, 31)!.stars === 2, 'rare hatches at ★2');
+    const store: Record<string, string> = {}; (globalThis as any).localStorage = { getItem: (k: string) => store[k] ?? null, setItem: (k: string, v: string) => { store[k] = v; }, removeItem: (k: string) => { delete store[k]; } };
+    s.mons.A09.stars = 1; writeSave(s); ok(loadSave().mons.A09.stars === 3, 'migration raises stars to natural'); delete (globalThis as any).localStorage; }
 
   // first clear always drops a mystery egg
   { const s = newSave(); const r = grantRewards(s, '1-1', true, 3, ['A02', 'A06'], 7); ok(r.eggs.length === 1 && r.eggs[0].kind === 'mystery', 'first clear drops a mystery egg'); }

@@ -1,5 +1,5 @@
 // SaveService: local only in P0 (swap for a server-backed implementation in P2).
-import { STARTERS } from '../core/data';
+import { STARTERS, natStars } from '../core/data';
 import type { EggTier } from '../core/data';
 
 export interface MonSave { lvl: number; exp: number; stars: number; rare?: boolean }
@@ -34,6 +34,7 @@ export function loadSave(): SaveData {
       if (s && s.v === 1) {
         const d: SaveData = Object.assign(newSave(), s);
         for (const e of d.eggs) if (!e.kind) e.kind = 'named'; // P0 eggs were all species-known
+        for (const sid in d.mons) d.mons[sid].stars = Math.max(d.mons[sid].stars, natStars(sid)); // natural stars by rarity (2026-10-12)
         return d;
       }
     }

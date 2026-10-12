@@ -79,6 +79,10 @@ h2.sec{margin:0;font-family:var(--f-display);font-weight:500;font-size:.8rem;let
 .mcard .pic img{width:100%;height:100%;display:block}
 .mcard .n{font-weight:600;text-align:center;line-height:1.2;min-height:2.4em;display:flex;align-items:center}
 .mcard .lv{color:var(--ink-dim);font-variant-numeric:tabular-nums}
+.mcard[style*="--rc"] .pic{border-color:var(--rc);box-shadow:0 0 12px -2px var(--rc)}
+.mcard.legendary,.mcard.epic{background:linear-gradient(180deg,color-mix(in srgb,var(--rc) 14%,var(--panel)),var(--panel) 60%)}
+.chip.rar{white-space:nowrap;flex:0 0 auto}
+.chip.rar[style*="--rc"]{color:var(--rc);border-color:var(--rc);font-weight:700}
 .mcard .tag{position:absolute;top:6px;left:6px;font-size:.6rem;background:var(--gold);color:#2a1a08;border-radius:6px;padding:1px 6px;font-weight:700}
 .mcard .ph{position:absolute;top:6px;right:6px;font-size:.58rem;color:var(--ink-faint)}
 .chip{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;padding:1px 8px;border-radius:99px;background:var(--panel-hi);border:1px solid var(--line);color:var(--ink-dim)}

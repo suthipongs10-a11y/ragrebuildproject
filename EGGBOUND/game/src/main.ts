@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
-import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, DUP_OVERFLOW_GOLD } from './core/data';
+import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, DUP_OVERFLOW_GOLD, NAT_STARS, MAX_STARS, natStars } from './core/data';
 import { Battle } from './core/battle';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
@@ -11,7 +11,7 @@ import { HomeView } from './render/homeView';
 import { showChest } from './render/chestView';
 import { home, BDEF, upgrade, upgradeCost, maxLevelNow, mineStored, mineCap, collectMine, MINE_RATE, MINE_CAP_MIN, TURTLE_SCALE, CASTLE_COST, BUILDINGS, ELEMS, shrineCost, shrineUp, shrineMax, SHRINE_ATK, SHRINE_REACT, RELICS, buyRelic, equipRelic, homeMods, unlocked, needsIncub, incubSlots, incubOf, incubMs, startIncub, canHatch, HATCH_SPEED } from './game/home';
 import { loadSave, writeSave, resetSave } from './game/save';
-import { grantRewards, stageUnlocked, craftEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg, lootOf } from './game/progression';
+import { grantRewards, stageUnlocked, craftEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg, lootOf, eggStars } from './game/progression';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -40,7 +40,7 @@ function renderNav() {
 }
 function actionableEggs() { const free = incubSlots(S) - home(S).incub.length; let n = 0, inc = 0; for (const e of S.eggs) { if (canHatch(S, e)) n++; else if (!incubOf(S, e.id)) inc++; } return n + Math.min(free, inc); }
 function show(id) { cur = id; teamCtx = id === 'team' ? teamCtx : null; render(); }
-const starStr = (n, max = 5) => Array.from({ length: max }, (_, i) => i < n ? '★' : '<span class="off">★</span>').join('');
+const starStr = (n, max = MAX_STARS) => Array.from({ length: max }, (_, i) => i < n ? '★' : '<span class="off">★</span>').join('');
 const elDot = el => `<span class="ed" style="background:${PAL[el].aura}" title="${ELEM_NAME[el]}"></span>`;
 function render() {
   const el = $('#screens'); renderNav(); $('#nav').hidden = false; $('#bhud').hidden = true;
@@ -57,9 +57,12 @@ function mapHTML() {
   }).join('')}</div><p class="note">ดาวของด่าน: ★ ผ่านด่าน · ★ ไม่มีมอนตาย · ★ ทำปฏิกิริยาธาตุได้อย่างน้อย 1 ครั้ง (เช่น เครื่องหมายไฟ + ลม = ไฟลาม · เปียก + ลม = พายุฟ้าคะนอง · เปียก + ไฟ = ไอน้ำ · ดิน + ไฟ = ลาวา · แสง/มืด = สุริยคราส)</p>
 </div></section>`;
 }
+/** rarity colour (shared with the chest/hatch colour language) as a CSS var; common stays neutral */
+const rcVar = s => s.rarity === 'common' ? '' : `--rc:${LOOT_GRADES[s.rarity].col}`;
+const rarChip = s => `<span class="chip rar" style="${rcVar(s)}">${RARITY_NAME[s.rarity]}</span>`;
 function monCard(sid, opts = {}) {
   const s = SPECIES[sid], m = S.mons[sid];
-  return `<button type="button" class="mcard ${opts.on ? 'on' : ''}" data-mon="${sid}">${opts.tag ? `<span class="tag">${opts.tag}</span>` : ''}${m.rare ? '<span class="rf" title="ร่างหายาก">✦</span>' : ''}<span class="pic ${m.rare ? 'rfp' : ''}"><img src="${portrait(sid)}" alt=""></span><span class="n">${esc(s.name)}</span><span class="stars" style="font-size:.7rem">${starStr(m.stars)}</span><span class="lv">Lv.${m.lvl} ${elDot(s.elem)}</span></button>`;
+  return `<button type="button" class="mcard ${opts.on ? 'on' : ''} ${s.rarity}" style="${rcVar(s)}" data-mon="${sid}">${opts.tag ? `<span class="tag">${opts.tag}</span>` : ''}${m.rare ? '<span class="rf" title="ร่างหายาก">✦</span>' : ''}<span class="pic ${m.rare ? 'rfp' : ''}"><img src="${portrait(sid)}" alt=""></span><span class="n">${esc(s.name)}</span><span class="stars" style="font-size:.7rem">${starStr(m.stars)}</span><span class="lv">Lv.${m.lvl} ${elDot(s.elem)}</span></button>`;
 }
 function teamHTML() {
   const owned = Object.keys(S.mons);
@@ -76,7 +79,7 @@ function monsHTML() {
   const owned = Object.keys(S.mons); if (!selMon || !S.mons[selMon]) selMon = owned[0];
   const s = SPECIES[selMon], m = S.mons[selMon], st = stats(selMon), fr = S.frags[selMon] || 0;
   return `<section class="scr dim"><div class="wrap">${topbar('คลังมอน', owned.length + ' ตัว')}
-  <div class="detail"><span class="big"><img src="${portrait(selMon)}" alt=""></span><div style="min-width:0"><h3>${esc(s.name)}</h3><div class="row" style="gap:6px;flex:0 0 auto;margin:6px 0"><span class="chip">${elDot(s.elem)} ${ELEM_NAME[s.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span><span class="chip">${RARITY_NAME[s.rarity]}</span>${m.rare ? '<span class="chip rfc">✦ ร่างหายาก</span>' : ''}</div>
+  <div class="detail"><span class="big"><img src="${portrait(selMon)}" alt=""></span><div style="min-width:0"><h3>${esc(s.name)}</h3><div class="row" style="gap:6px;flex:0 0 auto;margin:6px 0"><span class="chip">${elDot(s.elem)} ${ELEM_NAME[s.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}${m.rare ? '<span class="chip rfc">✦ ร่างหายาก</span>' : ''}</div>
   <div class="stars">${starStr(m.stars)}</div><div class="note">Lv.${m.lvl} / ${levelCap(m.stars)} · EXP ${m.exp}/${expToNext(m.lvl)}</div><div class="bar" style="margin-top:4px"><i style="transform:scaleX(${m.exp / expToNext(m.lvl)})"></i></div>
   <div class="stat"><div>HP<b>${st.hp}</b></div><div>ATK<b>${st.atk}</b></div><div>DEF<b>${st.def}</b></div><div>SPD<b>${st.spd}</b></div></div></div>
   <div class="skl">${s.skills.map((k, i) => `<div><b>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)} · ${esc(k.name)}</b>${esc(k.desc)}${k.cd ? `<em>คูลดาวน์ ${k.cd}</em>` : ''}</div>`).join('')}${s.leader ? `<div><b>ผู้นำ</b>${esc(s.leader.text)}</div>` : ''}
@@ -89,7 +92,7 @@ const eggName = e => e.kind === 'mystery' ? 'ไข่ปริศนา' + EGG_
 /** what hatching this egg gives, as far as the player is allowed to know */
 function eggGain(e) {
   if (e.kind === 'mystery') return '<span class="chip">??? · ตัวปริศนา</span>';
-  const m = S.mons[e.sid]; return `<span class="chip">${m ? (m.stars < 5 ? `★${m.stars} → ★${m.stars + 1}` : 'ดาวเต็ม → ทอง') : 'ตัวใหม่!'}</span>`;
+  const m = S.mons[e.sid]; return `<span class="chip">${m ? (m.stars < MAX_STARS ? `★${m.stars} → ★${m.stars + 1}` : 'ดาวเต็ม → ทอง') : 'ตัวใหม่!'}</span>`;
 }
 const timer = x => `data-start="${x.start}" data-end="${x.end}"`;
 function hatchHTML() {
@@ -118,7 +121,7 @@ function oddsHTML() {
   return `<details class="odds"><summary>อัตราไข่ปริศนา และการันตี</summary>
   <p class="note">ชนะด่านมีโอกาสได้ไข่ปริศนา ${pct(EGG_DROP.chance)} (ด่านบอส ${pct(EGG_DROP.bossChance)}) · ผ่านด่านครั้งแรกได้แน่นอน</p>
   <table><thead><tr><th>ลาย</th><th>โอกาส</th><th>บ่ม</th><th>ร่างหายาก</th></tr></thead><tbody>${EGG_TIER_ORDER.map(t => { const T = EGG_TIERS[t]; return `<tr><td><span class="ed" style="background:${TIER_COL[t]}"></span> ${T.name}</td><td>${pct(o[t])}</td><td>${T.incubateMin ? fmtDur(T.incubateMin * 60000) : 'ฟักทันที'}</td><td>${pct(T.rareForm)}</td></tr><tr class="sub"><td colspan="4">ความหายากของมอน: ${rw(T.rarityW)}</td></tr>`; }).join('')}</tbody></table>
-  <p class="note"><b>การันตี:</b> ไข่ปริศนาฟองที่ ${EGG_DROP.pity} ที่ยังไม่เจอลายทองขึ้นไป จะเป็นลายทองหรือรุ้งแน่นอน · อีก <b>${left}</b> ฟอง<br>ไข่ระบุชื่อ (ประกอบจากเศษ) มีโอกาสเป็นร่างหายาก ${pct(NAMED_RARE_FORM)} · ไข่ป่าทุกลายฟักได้ ★1 · ไข่ซ้ำ +1 ดาว ดาวที่เกิน ★5 แลกเป็นทอง ${DUP_OVERFLOW_GOLD}<br>ตอนนี้ยังไม่มีมอนระดับหายากขึ้นไป ถ้าสุ่มได้ระดับที่ยังไม่มี จะได้ระดับใกล้ที่สุดที่มีแทน</p></details>`;
+  <p class="note"><b>การันตี:</b> ไข่ปริศนาฟองที่ ${EGG_DROP.pity} ที่ยังไม่เจอลายทองขึ้นไป จะเป็นลายทองหรือรุ้งแน่นอน · อีก <b>${left}</b> ฟอง<br>ไข่ระบุชื่อ (ประกอบจากเศษ) มีโอกาสเป็นร่างหายาก ${pct(NAMED_RARE_FORM)} · ฟักได้ดาวตามความหายาก (ธรรมดา ★1 · หายาก ★2 · มหากาพย์ ★3 · ตำนาน ★4) · ไข่ซ้ำ +1 ดาว สูงสุด ★${MAX_STARS} ดาวที่เกินแลกเป็นทอง ${DUP_OVERFLOW_GOLD}<br>ตอนนี้ยังไม่มีมอนระดับตำนาน ถ้าสุ่มได้ จะได้ระดับมหากาพย์แทน</p></details>`;
 }
 function settingsHTML() {
   const st = S.settings;
@@ -261,14 +264,16 @@ function startHatch(eggId, forceRarity = null) {
   const egg = S.eggs.find(e => e.id === eggId); if (!egg || !canHatch(S, egg)) return;
   clearAll();
   const before = S.mons[egg.sid] ? S.mons[egg.sid].stars : 0;
-  hatch = new HatchView(egg.sid, { dup: before > 0 && before < 5, eggSrc: eggOf(egg), tier: egg.kind === 'mystery' ? egg.tier : null, rare: !!egg.rare, rarityOverride: forceRarity });
+  // dev preview (forceRarity) always plays as a brand-new monster of that rarity
+  const nat = forceRarity ? NAT_STARS[forceRarity] : natStars(egg.sid), from = forceRarity ? 0 : before, toStars = from ? Math.min(MAX_STARS, from + eggStars(egg)) : nat;
+  hatch = new HatchView(egg.sid, { dup: from > 0 && from < MAX_STARS, fromStars: from, toStars, eggSrc: eggOf(egg), tier: egg.kind === 'mystery' ? egg.tier : null, rare: !!egg.rare, rarityOverride: forceRarity });
   hatch.onDone = () => {
     const r = hatchEgg(S, eggId); save(); if (!r) return;
     const s = SPECIES[r.sid], more = S.eggs.filter(e => canHatch(S, e)).length;
     const title = r.dup ? (r.stars > r.before ? 'อัปดาว!' : 'ดาวเต็มแล้ว') : 'ฟักสำเร็จ!';
     const note = r.dup ? [r.stars > r.before ? `★${r.before} → ★${r.stars} · ออร่าและค่าสเตตัสเพิ่มขึ้น` : '', r.gold ? `ได้รับทอง +${r.gold.toLocaleString()} จากดาวที่เกิน` : ''].filter(Boolean).join(' · ') : `${ELEM_NAME[s.elem]} · ${ROLE_NAME[s.role]} · เข้าคลังมอนแล้ว`;
     const modal = document.createElement('div'); modal.className = 'modal'; modal.id = 'hatchModal'; modal.style.background = 'rgba(6,8,6,.25)'; modal.style.alignItems = 'end';
-    modal.innerHTML = `<div class="card" style="margin-bottom:calc(env(safe-area-inset-bottom,0px) + 12px)"><h2>${title}</h2><p style="text-align:center;margin:0;font-family:var(--f-display);font-size:1.3rem">${esc(s.name)}</p>${r.rare ? `<p class="rfnote">${r.rareNew ? '✦ ร่างหายาก! สีและออร่าพิเศษ' : '✦ ร่างหายาก (มีอยู่แล้ว)'}</p>` : ''}<div class="bigstars">${Array.from({ length: 5 }, (_, i) => `<span class="${i < r.stars ? '' : 'off'}" style="animation-delay:${.1 + i * .12}s">★</span>`).join('')}</div><p class="note" style="text-align:center">${note}</p><div class="row"><button class="go" type="button" data-h="more">${more ? `ฟักต่อ (${more})` : 'กลับหน้าฟักไข่'}</button><button class="alt" type="button" data-h="map">แผนที่</button></div></div>`;
+    modal.innerHTML = `<div class="card" style="margin-bottom:calc(env(safe-area-inset-bottom,0px) + 12px)"><h2>${title}</h2><p style="text-align:center;margin:0;font-family:var(--f-display);font-size:1.3rem">${esc(s.name)}</p><p style="text-align:center;margin:4px 0 0">${rarChip(s)}</p>${r.rare ? `<p class="rfnote">${r.rareNew ? '✦ ร่างหายาก! สีและออร่าพิเศษ' : '✦ ร่างหายาก (มีอยู่แล้ว)'}</p>` : ''}<div class="bigstars">${Array.from({ length: MAX_STARS }, (_, i) => `<span class="${i < r.stars ? '' : 'off'}" style="animation-delay:${.1 + i * .12}s">★</span>`).join('')}</div><p class="note" style="text-align:center">${note}</p><div class="row"><button class="go" type="button" data-h="more">${more ? `ฟักต่อ (${more})` : 'กลับหน้าฟักไข่'}</button><button class="alt" type="button" data-h="map">แผนที่</button></div></div>`;
     document.body.appendChild(modal);
   };
   scene = hatch; hatch.start(); $('#screens').innerHTML = ''; $('#nav').hidden = true;
@@ -278,7 +283,7 @@ function leaveHatch() { hatch = null; clearAll(); scene = idleScene; $('#hatchMo
 // prototype-only test tools (remove before the public playtest)
 function devTool(k) {
   if (k === 'eggs') { for (const t of EGG_TIER_ORDER) { let e; do { e = rollMysteryEgg({ ...S, eggPity: 0 }, Math.random); } while (e.tier !== t); e.id = S.nextEggId++; S.eggs.push(e); } }
-  if (k === 'mons') { for (const sid of Object.keys(SPECIES)) if (!SPECIES[sid].boss && !S.mons[sid]) S.mons[sid] = { lvl: 5, exp: 0, stars: 1 }; save(); sfx.chime(); show('mons'); return; }
+  if (k === 'mons') { for (const sid of Object.keys(SPECIES)) if (!SPECIES[sid].boss && !S.mons[sid]) S.mons[sid] = { lvl: 5, exp: 0, stars: natStars(sid) }; save(); sfx.chime(); show('mons'); return; }
   if (k === 'incub') for (const x of home(S).incub) x.end = Date.now();
   if (k.startsWith('hatch:')) { // preview the hatch effect of a monster rarity (hatches a gold egg of an owned monster)
     const g = k.slice(6), pool = Object.values(SPECIES).filter(x => !x.boss && x.rarity === g), sid = pool.length ? pool[Math.floor(Math.random() * pool.length)].id : 'A03';

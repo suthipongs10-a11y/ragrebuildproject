@@ -221,12 +221,17 @@ export function spdAt(base: number, lvl: number, stars: number): number {
   return base + (stars - 1) * 2 + Math.floor(lvl / 10);
 }
 export const expToNext = (lvl: number) => 40 + lvl * 25;
-export const levelCap = (stars: number) => [0, 20, 30, 40, 50, 60][stars] || 20;
+export const levelCap = (stars: number) => [0, 20, 30, 40, 50, 60, 70][stars] || 20;
+// Stars, Summoners-War style (decided 2026-10-12): a monster hatches at its rarity's natural stars and any monster can
+// be raised to MAX_STARS, so a common one can still reach the top with effort.
+export const NAT_STARS: Record<Rarity, number> = { common: 1, rare: 2, epic: 3, legendary: 4 };
+export const MAX_STARS = 6;
+export const natStars = (sid: string) => NAT_STARS[SPECIES[sid]?.rarity] || 1;
 
 // ---- eggs (P1 M0) ----
 // Mystery egg: species unknown until it hatches; only the shell pattern (tier) shows the rarity.
-// stars = hatch star grade for a new monster, and stars added on a duplicate (overflow past ★5 → DUP_OVERFLOW_GOLD each).
-// Wild/mystery eggs all start at ★1 — a ★2 start is the Starborn egg's selling point (GAME_CONFIG_v2 eggs.wild_vs_starborn).
+// A new monster hatches at its natural stars (NAT_STARS by rarity); stars = stars a duplicate adds
+// (overflow past MAX_STARS → DUP_OVERFLOW_GOLD each).
 // incubateMin > 0 → must sit in a hatchery slot that long (scaled by hatchery speed) before it can hatch.
 export type EggTier = 'common' | 'silver' | 'gold' | 'rainbow';
 export interface EggTierDef { name: string; stars: number; incubateMin: number; rareForm: number; rarityW: Partial<Record<Rarity, number>> }
