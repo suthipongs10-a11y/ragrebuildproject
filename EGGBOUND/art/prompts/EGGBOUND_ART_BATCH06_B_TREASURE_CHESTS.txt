@@ -1,0 +1,141 @@
+=====================================================================
+EGGBOUND — ART BATCH 06-B : STAGE-END TREASURE CHESTS (หีบสมบัติจบด่าน)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- เปิดแชทใหม่ใน ChatGPT สำหรับไฟล์นี้ (1 ไฟล์ = 1 แชท) ทำหลังไฟล์ A
+- แนบ: ไฟล์นี้ + hatch_altar.png (จากไฟล์ A) + bld_castle_4.png (จากชุดบ้านเต่า) เป็นภาพอ้างอิงสไตล์
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ"
+- หีบมี 2 แบบ: หีบไม้ (ด่านปกติ) และหีบบอส (ด่านบอส) แบบละ 3 ท่า: ปิด / แง้ม / เปิด
+- สีแสงตอนเปิด (ขาว/ฟ้า/ม่วง/ทอง-รุ้ง) โค้ดใส่เองตามของที่ได้ ภาพหีบจึงต้องไม่มีแสง และข้างในหีบว่าง
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D monster RPG. Generate 6 images,
+ONE IMAGE PER TURN, in the order below. These images are placed and
+animated by code, so EXACT camera angle, scale, centering and pivot
+position matter more than creativity. Never add things that the
+instructions say code will draw.
+
+The chest appears after every won battle. The player taps it, it shakes,
+light leaks from the seam, then it bursts open. It must look TEMPTING,
+chunky and satisfying — the kind of chest you can't wait to open.
+
+Work order:
+  1. Generate image #01 and wait for my "OK".
+  2. After "OK", generate the rest one by one, each time using the
+     approved images as reference for style, palette and camera.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Chunky, slightly stylized proportions (a bit wider and rounder than a real
+chest), strong readable shapes at small size on a phone.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: cast shadow on the ground, glow halos, light rays, light coming
+out of the chest, aura, particles, sparks, coins or items flying, motion
+lines, text, letters, numbers, watermark, frame, characters, people.
+(Code adds all light, rays, coins and items in the colour of the loot.)
+ORIGINAL DESIGN — do not copy or resemble any existing game, film or anime
+asset (Summoners War, Clash of Clans, Clash Royale, Zelda, Genshin Impact,
+Diablo, etc.). The egg-oval emblem is this game's own motif.
+
+---------------------------------------------------------------------
+2. CAMERA
+---------------------------------------------------------------------
+CAMERA (identical for every image in this batch):
+Front 3/4 view: camera about 25 degrees above, looking straight at the
+FRONT of the chest (no turn to the side, the front face is a clean
+rectangle facing the viewer). Very mild perspective. The top of the lid and
+a thin strip of the chest's top edge are visible.
+
+PIVOT RULES (every image):
+- Canvas 1024 x 1024, transparent.
+- Chest centered at x = 512. Front-bottom edge of the chest at y = 860.
+- Chest body width ≈ 62% of canvas (≈ 640 px), same for both chests.
+- The CLOSED, AJAR and OPEN images of the same chest are pixel-aligned:
+  the BODY (everything below the lid hinge line) is IDENTICAL in all three;
+  only the lid changes.
+- Lid hinge line (top edge of the body) at about y = 560.
+
+---------------------------------------------------------------------
+3. IMAGES (one per turn)
+---------------------------------------------------------------------
+#01  chest_wood_closed.png
+WOODEN TREASURE CHEST — CLOSED (normal stages) — MASTER
+- Body: warm honey-brown planks with visible wood grain, iron-dark rivets,
+  thick polished BRASS/GOLD straps (two vertical straps, a bottom trim band),
+  rounded gold corner caps on all four corners.
+- Lid: a rounded barrel-dome lid, same planks, two gold straps continuing
+  over the dome, a gold rim along its bottom edge.
+- Front center: a big gold lock plate shaped like an EGG with a keyhole,
+  slightly overlapping the lid and the body.
+- Feels sturdy and generous, not shabby.
+
+#02  chest_wood_ajar.png
+WOODEN CHEST — LID AJAR
+EXACT copy of #01 (same body pixels); the lid is lifted about 15 degrees at
+the front (hinged at the back), showing a dark narrow gap between lid and
+body. The gap is DARK (the game fills it with coloured light). The lock
+plate has popped open.
+
+#03  chest_wood_open.png
+WOODEN CHEST — FULLY OPEN
+EXACT copy of #01 (same body pixels); the lid is swung fully back, past
+vertical (about 110 degrees), so we see the lid's INNER face (dark wood,
+gold rim) standing up behind the opening. The inside of the chest is an
+EMPTY dark cavity with a velvet-red lining at the top edge. NO gold, NO
+items, NO light inside (the game adds the light and the loot).
+The top of the open lid reaches about y = 220.
+
+#04  chest_boss_closed.png
+BOSS TREASURE CHEST — CLOSED (boss stages)
+Same size, camera, pivot and silhouette proportions as #01, but GRAND and
+royal: deep crimson lacquer panels framed in ornate polished gold
+filigree, small jewel studs (ruby and sapphire) along the straps, a raised
+golden sun-ray crest on the dome lid, and a large golden egg-shaped lock
+with a clear white crystal set in it. Four gold claw feet.
+Clearly more precious than the wooden chest at a glance.
+
+#05  chest_boss_ajar.png
+BOSS CHEST — LID AJAR
+EXACT copy of #04 body; lid lifted about 15 degrees at the front, dark gap
+between lid and body, lock popped open. Same rules as #02.
+
+#06  chest_boss_open.png
+BOSS CHEST — FULLY OPEN
+EXACT copy of #04 body; lid swung fully back (about 110 degrees) showing its
+inner face (dark red lacquer with gold border). Inside: EMPTY dark cavity
+with a royal-purple velvet lining at the top edge. NO treasure, NO light.
+The top of the open lid reaches about y = 200.
+
+---------------------------------------------------------------------
+QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] Background is fully transparent (no white box, no checkerboard drawn in)
+  [ ] Same camera for all six (front 3/4, ~25 degrees)
+  [ ] Chest centered at x = 512, front-bottom edge at y = 860, width ≈ 640 px
+  [ ] Closed / ajar / open of the same chest have the IDENTICAL body
+      (overlay them to check) — only the lid differs
+  [ ] No light, glow, rays, coins or items anywhere; the open chests are empty
+  [ ] No text, no shadows on the ground
+
+---------------------------------------------------------------------
+PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_HATCH_B_CHESTS.zip
+Exact file names (lowercase, PNG):
+  chest_wood_closed.png
+  chest_wood_ajar.png
+  chest_wood_open.png
+  chest_boss_closed.png
+  chest_boss_ajar.png
+  chest_boss_open.png
+Add notes.txt listing any image you regenerated and why.

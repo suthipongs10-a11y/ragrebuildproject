@@ -1,0 +1,161 @@
+=====================================================================
+EGGBOUND — ART BATCH 06-A : THE HATCHING ALTAR (แท่นฟักไข่)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- เปิดแชทใหม่ใน ChatGPT สำหรับไฟล์นี้ (1 ไฟล์ = 1 แชท) ทำตามลำดับ A → B → C
+- แนบ: ไฟล์นี้ + bld_hatchery_3.png + bld_shrine.png (จากชุดบ้านเต่า) + egg001.webp (ไข่จิ้งจอก) เป็นภาพอ้างอิงสไตล์
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ"
+- ตรวจภาพ #01 ให้ดีก่อนตอบ "OK" (เป็นภาพหลักของทั้งชุด)
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+- ส่วนที่เปลี่ยนสีได้ (คริสตัล อัญมณี ร่องรูน) ตั้งใจให้วาดเป็นสีขาว/ใส เพราะโค้ดจะย้อมสีตามไข่ที่ฟัก (ฟ้าคราม/ทอง/ม่วง/รุ้ง)
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D monster RPG. Generate 5 images,
+ONE IMAGE PER TURN, in the order below. These images are placed and
+animated by code, so EXACT camera angle, scale, centering and pivot
+position matter more than creativity. Never add things that the
+instructions say code will draw.
+
+This is the most important scene of the game: the player hatches every
+monster here. It must feel SACRED, GRAND and MAGICAL — a legendary altar,
+not a garden decoration.
+
+Work order:
+  1. Generate image #01 and wait for my "OK".
+  2. After "OK", generate the rest one by one, each time using the
+     approved images as reference for style, palette and camera.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Majestic, mystical, awe-inspiring, but still warm and inviting.
+Rich ornament with a clear hierarchy (big shapes first, detail second).
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: cast shadow on the ground, glow halos, aura, particles, sparks,
+smoke, light beams, motion lines, text, letters, numbers, watermark, frame,
+characters, creatures, people, an egg on the altar.
+(Code adds all glow, beams, sparkles, the egg and the colour of the magic.)
+ORIGINAL DESIGN — do not copy or resemble any existing game, film or anime
+asset (Summoners War, Genshin Impact, Pokemon, Final Fantasy, etc.).
+Theme: a cosmic-egg sanctuary — the world was born from a cosmic egg
+(public-domain creation myths: Hindu Hiranyagarbha, Chinese Pangu egg,
+Orphic world-egg). Motifs: egg ovals, star points, concentric rings,
+sun-ray fans, cloud spirals. A blend of Thai/Chinese temple ornament and
+ancient European stone carving, like the turtle home buildings.
+
+---------------------------------------------------------------------
+2. CAMERA
+---------------------------------------------------------------------
+CAMERA (identical for every image in this batch except the noted items):
+3/4 view, camera elevation about 22 degrees above the horizon (LOWER than
+the turtle home — this is a close-up ceremony view). Orthographic feel.
+A circle on the ground appears as an ellipse with height/width ratio ≈ 0.38.
+The front of every object faces the viewer (toward the bottom of the image).
+
+---------------------------------------------------------------------
+3. PALETTE
+---------------------------------------------------------------------
+- Ivory / pale moon-white carved stone, very clean, with faint blue-grey
+  shadows (NOT mossy — this place is kept pure)
+- Polished GOLD trims, inlays and filigree (warm, bright, the main accent)
+- Deep night-blue lapis inlay as a secondary accent in small amounts
+- All "magic" parts (crystals, gems, rune grooves) are COLOURLESS:
+  clear white crystal / white-silver, so the game can tint them to any
+  colour. Do NOT paint them blue, gold, green or any hue.
+
+---------------------------------------------------------------------
+4. IMAGES (one per turn)
+---------------------------------------------------------------------
+#01  hatch_altar.png
+THE HATCHING ALTAR — MASTER IMAGE
+Canvas 1024 x 1024, transparent.
+A grand round altar of THREE stacked circular tiers, each smaller than the
+one below (like a wedding cake of carved stone):
+- Bottom tier: wide round stone base with three short steps in front,
+  carved panels between gold pilasters, a large clear-white diamond-shaped
+  crystal gem set in the front center inside a gold sun-ray mount, and two
+  smaller gems left and right.
+- Middle tier: a ring of carved egg-oval medallions and gold filigree.
+- Top tier: a shallow, perfectly FLAT round dish with a raised gold rim and
+  a white-crystal inlaid ring groove on its surface. The dish is EMPTY
+  (the game places the egg on it).
+- Four tall gold-capped corner finials / small spires rising from the
+  bottom tier at the back-left, back-right, front-left, front-right edges
+  (the front ones must NOT cover the top dish).
+Pivot rules:
+- Altar centered at x = 512. Front-most edge of the bottom tier at y = 900.
+- Bottom tier ellipse width ≈ 74% of canvas (≈ 760 px).
+- Top dish: ellipse about 300 px wide, centered at (512, 540).
+  Nothing may overlap the space ABOVE the dish (the egg sits there).
+- Highest finial tip no higher than y = 300.
+
+#02  hatch_altar_glow.png
+GLOW MASK for #01 (used by code for the colour-changing light)
+Canvas 1024 x 1024, background PURE BLACK #000000 (not transparent).
+EXACT same altar position and size as #01, pixel-aligned.
+Only the parts that should LIGHT UP are painted, in pure WHITE / light
+grey with soft falloff: the three gems, the crystal ring groove on the top
+dish, thin carved channels/lines between the tiers, the inner faces of the
+egg-oval medallions. EVERYTHING ELSE is pure black (stone, gold, outline).
+Think of it as "what glows when the altar is powered".
+
+#03  hatch_crystal.png
+FLOATING CRYSTAL OBELISK (code makes 4 of them float around the altar)
+Canvas 512 x 512, transparent.
+A single tall elongated hexagonal crystal, pointed at both ends, clear
+WHITE / ice-silver with internal facets and refraction (colourless — the
+game tints it). A thin gold band with a small egg emblem wraps its middle.
+- Crystal centered at x = 256, upper tip at about y = 50, lower tip at
+  about y = 470, widest part ≈ 150 px.
+- It floats: no base, no ground, no glow.
+
+#04  hatch_crystal_stand.png
+CRYSTAL STAND (the crystal hovers above it)
+Canvas 512 x 512, transparent.
+A short round pedestal matching the altar (ivory stone + gold rim), with a
+small concave crystal-white "socket" disc on top (EMPTY, nothing standing on it).
+- Centered at x = 256, front-most edge of its base at y = 470.
+- Base ellipse width ≈ 50% of canvas (≈ 256 px). Top disc at about y = 330.
+
+#05  hatch_floor.png
+CEREMONY FLOOR (lies under the altar)
+Canvas 1536 x 1024, transparent.
+A large round floor platform of polished ivory stone tiles with gold seams,
+seen with the same camera (ellipse ratio ≈ 0.38): concentric rings of
+tiles, an outer gold ring with eight small egg-oval inlays, and an engraved
+groove ring (colourless white-silver) where runes would be.
+- Ellipse centered at (768, 560), width ≈ 1440 px, height ≈ 547 px.
+- Center area (where the altar stands) plain tiles, nothing drawn on top.
+- No altar, no crystals, no objects on the floor.
+
+---------------------------------------------------------------------
+QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] #01 #03 #04 #05 background is fully transparent (no white box,
+      no checkerboard drawn in); #02 background is PURE BLACK
+  [ ] Same camera angle for all (ground ellipse ratio ≈ 0.38)
+  [ ] Pivot / size rules of each image are respected (see each item)
+  [ ] Crystals, gems and rune grooves are colourless white (no hue)
+  [ ] No egg, no glow halos, no beams, no particles, no text
+  [ ] The top dish of the altar is empty and nothing covers the space above it
+  [ ] #02 lines up exactly with #01 (overlay them to check)
+
+---------------------------------------------------------------------
+PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_HATCH_A_ALTAR.zip
+Exact file names (lowercase, PNG):
+  hatch_altar.png
+  hatch_altar_glow.png
+  hatch_crystal.png
+  hatch_crystal_stand.png
+  hatch_floor.png
+Add notes.txt listing any image you regenerated and why.

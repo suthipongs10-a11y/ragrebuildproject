@@ -1,0 +1,113 @@
+=====================================================================
+EGGBOUND — ART BATCH 06-C : LIGHT EFFECT SPRITES (เอฟเฟ็คแสง)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- เปิดแชทใหม่ใน ChatGPT สำหรับไฟล์นี้ (1 ไฟล์ = 1 แชท) ทำหลังไฟล์ B
+- แนบ: ไฟล์นี้อย่างเดียวก็พอ (ภาพชุดนี้เป็นแสงล้วน ไม่ต้องอ้างอิงสไตล์ตัวละคร)
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ"
+- ภาพชุดนี้ "พื้นหลังดำสนิท" และ "แสงสีขาว" โดยตั้งใจ: โค้ดจะเอามาซ้อนแบบเพิ่มแสง (additive) แล้วย้อมเป็นสีของไข่หรือหีบ
+  (ขาว/ฟ้า/ม่วง/ทอง/รุ้ง) ภาพเดียวจึงใช้ได้ทุกสี ใช้ทั้งตอนฟักไข่ เปิดหีบ และสกิลในอนาคต
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the VFX artist for a 2.5D monster RPG. Generate 7 images,
+ONE IMAGE PER TURN, in the order below. These are LIGHT LAYERS that the
+game adds on top of the scene with additive blending and tints to any
+colour, so they must be pure light on pure black.
+
+Work order:
+  1. Generate image #01 and wait for my "OK".
+  2. After "OK", generate the rest one by one in the same look.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: high-quality anime game VFX, painterly but clean: bright hot-white
+core, soft luminous falloff, a few crisp sharp highlights, elegant shapes.
+COLOUR: GREYSCALE ONLY — white and greys. NO hue at all (no blue, no gold,
+no rainbow). Brightness = intensity of the light.
+BACKGROUND: PURE BLACK #000000 everywhere outside the light. NOT transparent,
+NOT dark blue, NOT a gradient; black must be exactly 0,0,0 so it disappears
+when added.
+FORBIDDEN: objects, chests, eggs, characters, ground, scenery, text, letters,
+numbers, logos, frames, watermarks, coloured tints, vignettes.
+Each effect is centered on its canvas and must NOT touch the canvas edges
+(fade to black at least 40 px before every edge).
+
+---------------------------------------------------------------------
+2. IMAGES (one per turn)
+---------------------------------------------------------------------
+#01  fx_rays.png
+GOD-RAY FAN (behind an opening chest / hatching egg; code rotates it slowly)
+Canvas 1024 x 1024. 16–20 long tapered light rays radiating from the exact
+center (512, 512), uneven lengths and widths for a natural look, bright
+near the center, fading to black before the edges. Small bright core.
+
+#02  fx_burst.png
+EXPLOSION FLASH (the instant the chest bursts open / the egg breaks)
+Canvas 1024 x 1024. A hot white starburst at the center: a bright round
+core, 8 sharp needle spikes (4 long, 4 short) and a soft round bloom,
+plus a faint shock ring around it. Centered at (512, 512).
+
+#03  fx_column.png
+LIGHT PILLAR (rises from the chest / altar into the sky)
+Canvas 512 x 1024 (portrait). A vertical beam of light: brightest and
+widest at the BOTTOM center (256, 980), narrowing and fading toward the
+top, soft edges, a few faint vertical streaks inside. Bottom edge glows
+like the light comes out of an opening.
+
+#04  fx_ring.png
+SHOCKWAVE RING (code scales it up quickly)
+Canvas 1024 x 1024. A thin bright circular ring of light (radius ≈ 400 px)
+centered at (512, 512), crisp on the outside, soft bloom on the inside,
+slightly uneven brightness around the ring. Empty black inside.
+
+#05  fx_sparkle.png
+TWINKLE STAR (small sparkles; code scatters many of them)
+Canvas 256 x 256. A four-point star sparkle: two long thin spikes
+(vertical and horizontal) and two short diagonal ones, tiny hot core,
+soft halo. Centered at (128, 128).
+
+#06  fx_rune_circle.png
+MAGIC RUNE CIRCLE (lies flat on the floor under the hatching altar; code rotates it)
+Canvas 1024 x 1024, seen from DIRECTLY ABOVE as a perfect circle (code
+squashes it into the floor perspective).
+Two concentric thin rings (outer radius ≈ 470 px, inner ≈ 380 px), a band
+of 12 ornate abstract magic glyphs evenly spaced between them (original
+glyph shapes — NOT real letters of any alphabet, not readable text),
+a six-pointed star made of two triangles inside the inner ring, small
+dots at the star tips, and a small circle at the center. Line art made of
+light, crisp lines with soft glow.
+
+#07  fx_orb.png
+SOFT MAGIC ORB (energy ball, floating motes, egg aura)
+Canvas 256 x 256. A round glowing orb: hot white center, smooth bloom
+falling off to black, a faint inner swirl. Centered at (128, 128).
+
+---------------------------------------------------------------------
+QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] Background is PURE BLACK #000000 (not transparent, not dark blue)
+  [ ] Greyscale only — no colour anywhere
+  [ ] Centered as specified; nothing touches the canvas edges
+  [ ] No objects, no text, no letters (glyphs on #06 are abstract, not an alphabet)
+  [ ] #01 rays and #06 circle are centered exactly (code rotates them)
+
+---------------------------------------------------------------------
+PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_HATCH_C_FX.zip
+Exact file names (lowercase, PNG):
+  fx_rays.png
+  fx_burst.png
+  fx_column.png
+  fx_ring.png
+  fx_sparkle.png
+  fx_rune_circle.png
+  fx_orb.png
+Add notes.txt listing any image you regenerated and why.
