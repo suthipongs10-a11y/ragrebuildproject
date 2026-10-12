@@ -40,9 +40,9 @@ export function eggTests(): number {
   // new monster at tier stars + rare form; overflow past ★5 → gold
   { const s = newSave(); delete s.mons.A06; s.eggs = [{ id: 20, sid: 'A06', kind: 'mystery', tier: 'silver', rare: true }];
     const r = hatchEgg(s, 20)!; ok(!r.dup && s.mons.A06.stars === 1 && s.mons.A06.rare === true && r.rareNew, 'new rare-form monster');
-    s.mons.A01.stars = 4; const g = s.gold; s.eggs = [{ id: 21, sid: 'A01', kind: 'mystery', tier: 'rainbow' }];
+    s.mons.A01.stars = 5; const g = s.gold; s.eggs = [{ id: 21, sid: 'A01', kind: 'mystery', tier: 'rainbow' }];
     home(s).incub.push({ id: 21, start: 0, end: 0 });
-    const r2 = hatchEgg(s, 21, 1)!; ok(r2.stars === 5 && r2.gold === 2 * 500 && s.gold === g + 1000, 'overflow stars → gold'); }
+    const r2 = hatchEgg(s, 21, 1)!; ok(r2.stars === 5 && r2.gold === 500 && s.gold === g + 500, 'overflow stars → gold'); }
 
   // first clear always drops a mystery egg
   { const s = newSave(); const r = grantRewards(s, '1-1', true, 3, ['A02', 'A06'], 7); ok(r.eggs.length === 1 && r.eggs[0].kind === 'mystery', 'first clear drops a mystery egg'); }

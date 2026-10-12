@@ -7,18 +7,20 @@ Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`,
   Species + rare form are rolled when the egg is created (no re-roll by reloading).
 - Mystery tiers by shell pattern — values in `src/core/data.ts` (`EGG_TIERS`, `EGG_DROP`):
 
-  | tier | drop | ★ on hatch / dup | incubation | rare form |
+  | tier | drop | monster rarity | incubation | rare form |
   |---|---|---|---|---|
-  | ลายธรรมดา | 68% | ★1 | instant | 3% |
-  | ลายเงิน | 24% | ★1 | instant | 4% |
-  | ลายทอง | 7% | ★2 | 2 h | 5% |
-  | ลายรุ้ง | 1% | ★3 | 8 h | 8% |
+  | ลายธรรมดา | 68% | common 100 | instant | 3% |
+  | ลายเงิน | 24% | common 75 · rare 25 | instant | 4% |
+  | ลายทอง | 7% | common 35 · rare 50 · epic 15 | 2 h | 5% |
+  | ลายรุ้ง | 1% | rare 40 · epic 45 · legendary 15 | 8 h | 8% |
 
-  Win → 30% egg (boss stage 60%), first clear always. **Pity:** the 20th mystery egg in a row without gold+ is gold/rainbow.
+  All wild/mystery eggs hatch at ★1 (★2 start is reserved for Starborn eggs, per GAME_CONFIG_v2).
+
+  Win → 30% egg (boss stage 60%), first clear always. (Blueprint table totals ~12%/clear; kept higher for the 3-stage prototype, close to P0's old wild-egg rate.) **Pity:** the 20th mystery egg in a row without gold+ is gold/rainbow.
   Each tier rolls monster rarity (common…legendary); a rarity with no species yet falls back to the nearest one (all 6 species are common for now).
 - Named eggs: 4% rare form. Rare form = flag `MonSave.rare` (badge in collection + prismatic reveal). Trait slot +1 comes with the trait system.
-- Duplicates gain the egg's ★ (max ★5); stars past ★5 → 500 gold each.
-- Hatchery: slots = level (1–3), speed ×1 / ×0.8 / ×0.65 (`HATCH_SPEED` in `src/game/home.ts`). End time is fixed when the egg goes in.
+- Duplicates +1★ (max ★5); a duplicate at ★5 → 500 gold.
+- Hatchery: slots = level (1–3, as in the P0 home code; GAME_CONFIG_v2 says incubator 3→6 — pick one with the owner), speed ×1 / ×0.8 / ×0.65 (`HATCH_SPEED` in `src/game/home.ts`). End time is fixed when the egg goes in.
   The nest on the turtle shows incubating eggs in their tier colour, pulsing when ready. Live timers on the egg screen + hatchery panel.
 - Odds + pity counter disclosed on the egg screen ("อัตราไข่ปริศนา และการันตี").
 - Mystery shells are code-drawn for now (`mysteryEggImg` in `src/render/assets.ts`); final art ordered in `art/prompts/EGGBOUND_ART_BATCH05_MYSTERY_EGGS.txt`.

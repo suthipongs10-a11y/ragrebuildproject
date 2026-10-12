@@ -94,5 +94,4 @@ P0 เสร็จ: 3 ด่าน (1-3 บอส), มอนเริ่มต�
 - ฟอนต์ Google อาจโหลดไม่ได้ในบางที่ → มี timeout ไม่ให้เกมค้าง
 - localStorage ใช้ไม่ได้บางบริบท → ทุกการอ่าน/เขียนครอบ try/catch แล้ว
 - `#loading{display:grid}` ทับ attribute `hidden` → ต้องมี `[hidden]{display:none!important}` ใน template (นอก Artifact หน้าโหลดค้าง)
-- โฟลเดอร์ `docs/` และ `art/prompts/` ชุดเก่าไม่ได้อยู่ใน zip ส่งต่อ P0 → ถ้าต้องใช้ ให้เจ้าของอัปโหลดเพิ่ม
 - mkUnit ต้องตั้ง max = hp จริง (เคยทำฮีลเพี้ยน)

@@ -10,7 +10,7 @@ import { HatchView } from './render/hatchView';
 import { HomeView } from './render/homeView';
 import { home, BDEF, upgrade, upgradeCost, maxLevelNow, mineStored, mineCap, collectMine, MINE_RATE, MINE_CAP_MIN, TURTLE_SCALE, CASTLE_COST, BUILDINGS, ELEMS, shrineCost, shrineUp, shrineMax, SHRINE_ATK, SHRINE_REACT, RELICS, buyRelic, equipRelic, homeMods, unlocked, needsIncub, incubSlots, incubOf, incubMs, startIncub, canHatch, HATCH_SPEED } from './game/home';
 import { loadSave, writeSave, resetSave } from './game/save';
-import { grantRewards, stageUnlocked, craftEgg, hatchEgg, FRAGS_TO_CRAFT, eggStars, eggOdds, rollMysteryEgg } from './game/progression';
+import { grantRewards, stageUnlocked, craftEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg } from './game/progression';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -87,7 +87,7 @@ const fmtDur = ms => { const m = Math.round(ms / 60000); return m >= 60 ? `${+(m
 const eggName = e => e.kind === 'mystery' ? 'ไข่ปริศนา' + EGG_TIERS[e.tier].name : 'ไข่' + SPECIES[e.sid].name;
 /** what hatching this egg gives, as far as the player is allowed to know */
 function eggGain(e) {
-  if (e.kind === 'mystery') return `<span class="chip">${'★'.repeat(eggStars(e))} · ปริศนา</span>`;
+  if (e.kind === 'mystery') return '<span class="chip">??? · ตัวปริศนา</span>';
   const m = S.mons[e.sid]; return `<span class="chip">${m ? (m.stars < 5 ? `★${m.stars} → ★${m.stars + 1}` : 'ดาวเต็ม → ทอง') : 'ตัวใหม่!'}</span>`;
 }
 const timer = x => `data-start="${x.start}" data-end="${x.end}"`;
@@ -116,8 +116,8 @@ function oddsHTML() {
   const rw = w => Object.entries(w).map(([k, v]) => `${RARITY_NAME[k]} ${v}%`).join(' · ');
   return `<details class="odds"><summary>อัตราไข่ปริศนา และการันตี</summary>
   <p class="note">ชนะด่านมีโอกาสได้ไข่ปริศนา ${pct(EGG_DROP.chance)} (ด่านบอส ${pct(EGG_DROP.bossChance)}) · ผ่านด่านครั้งแรกได้แน่นอน</p>
-  <table><thead><tr><th>ลาย</th><th>โอกาส</th><th>ดาว</th><th>บ่ม</th><th>ร่างหายาก</th></tr></thead><tbody>${EGG_TIER_ORDER.map(t => { const T = EGG_TIERS[t]; return `<tr><td><span class="ed" style="background:${TIER_COL[t]}"></span> ${T.name}</td><td>${pct(o[t])}</td><td>★${T.stars}</td><td>${T.incubateMin ? fmtDur(T.incubateMin * 60000) : 'ฟักทันที'}</td><td>${pct(T.rareForm)}</td></tr><tr class="sub"><td colspan="5">ความหายากของมอน: ${rw(T.rarityW)}</td></tr>`; }).join('')}</tbody></table>
-  <p class="note"><b>การันตี:</b> ไข่ปริศนาฟองที่ ${EGG_DROP.pity} ที่ยังไม่เจอลายทองขึ้นไป จะเป็นลายทองหรือรุ้งแน่นอน · อีก <b>${left}</b> ฟอง<br>ไข่ระบุชื่อ (ประกอบจากเศษ) มีโอกาสเป็นร่างหายาก ${pct(NAMED_RARE_FORM)} · ไข่ซ้ำให้ดาวตามลายไข่ ดาวที่เกิน ★5 แลกเป็นทอง ${DUP_OVERFLOW_GOLD}/ดาว<br>ตอนนี้ยังไม่มีมอนระดับหายากขึ้นไป ถ้าสุ่มได้ระดับที่ยังไม่มี จะได้ระดับใกล้ที่สุดที่มีแทน</p></details>`;
+  <table><thead><tr><th>ลาย</th><th>โอกาส</th><th>บ่ม</th><th>ร่างหายาก</th></tr></thead><tbody>${EGG_TIER_ORDER.map(t => { const T = EGG_TIERS[t]; return `<tr><td><span class="ed" style="background:${TIER_COL[t]}"></span> ${T.name}</td><td>${pct(o[t])}</td><td>${T.incubateMin ? fmtDur(T.incubateMin * 60000) : 'ฟักทันที'}</td><td>${pct(T.rareForm)}</td></tr><tr class="sub"><td colspan="4">ความหายากของมอน: ${rw(T.rarityW)}</td></tr>`; }).join('')}</tbody></table>
+  <p class="note"><b>การันตี:</b> ไข่ปริศนาฟองที่ ${EGG_DROP.pity} ที่ยังไม่เจอลายทองขึ้นไป จะเป็นลายทองหรือรุ้งแน่นอน · อีก <b>${left}</b> ฟอง<br>ไข่ระบุชื่อ (ประกอบจากเศษ) มีโอกาสเป็นร่างหายาก ${pct(NAMED_RARE_FORM)} · ไข่ป่าทุกลายฟักได้ ★1 · ไข่ซ้ำ +1 ดาว ดาวที่เกิน ★5 แลกเป็นทอง ${DUP_OVERFLOW_GOLD}<br>ตอนนี้ยังไม่มีมอนระดับหายากขึ้นไป ถ้าสุ่มได้ระดับที่ยังไม่มี จะได้ระดับใกล้ที่สุดที่มีแทน</p></details>`;
 }
 function settingsHTML() {
   const st = S.settings;
