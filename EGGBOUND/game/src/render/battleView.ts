@@ -22,7 +22,7 @@ export class BattleView {
   // ---------- views ----------
   makeView(u, pos, drop) {
     const s = SPECIES[u.sid];
-    const v = { uid: u.uid, sid: u.sid, team: u.team, elem: u.elem, boss: u.boss, name: u.name, stars: u.stars,
+    const v = { uid: u.uid, sid: u.sid, team: u.team, elem: u.elem, boss: u.boss, name: u.name, stars: u.stars, lvl: u.lvl,
       x: pos[0], y: pos[1], hx: pos[0], hy: pos[1], hop: drop ? -620 : 0, sx: 1, sy: 1, rot: 0, k: .4 * (s.scale || 1),
       back: u.team === 0, flip: u.team === 1, hb: u.team === 0, hf: u.team === 1, pose: 'idle', alpha: drop ? 0 : 1, flash: 0, ghosts: [], glowF: 0,
       dead: false, deathT: 0, hitT: 0, kvx: 0, kvy: 0, hp: u.hp, maxHp: u.maxHp, shown: u.hp, st: new Set(), marks: new Set(), busy: !!drop, ph: Math.random() * 9, emberT: 0, atb: 0, shieldAmt: 0 };
@@ -419,6 +419,16 @@ export class BattleView {
     ctx.restore(); ctx.globalAlpha = 1;
     if (v.shieldAmt > 0 && !v.dead) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = .25 + .1 * Math.sin(t * 4); ctx.strokeStyle = '#bfe6ff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(v.x, v.y - 150 * v.k, 170 * v.k, 210 * v.k, 0, 0, TAU); ctx.stroke(); ctx.restore(); }
   }
+  /** "Lv.N" plate under the feet: green rim = our team, red = enemy, dot = element */
+  drawLevel(v) {
+    const ctx = E.ctx, str = 'Lv.' + v.lvl, y = v.y + 16 + (v.boss ? 6 : 0);
+    ctx.save(); ctx.font = `700 ${v.boss ? 15 : 13}px Mitr, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const tw = ctx.measureText(str).width, w = tw + 24, h = v.boss ? 21 : 19, x = v.x - w / 2;
+    ctx.globalAlpha = v.alpha; ctx.fillStyle = 'rgba(12,10,8,.78)'; ctx.beginPath(); ctx.roundRect(x, y - h / 2, w, h, h / 2); ctx.fill();
+    ctx.strokeStyle = v.boss ? '#ffd27a' : v.team === 0 ? '#5fd864' : '#ef4a3c'; ctx.lineWidth = 1.6; ctx.stroke();
+    ctx.fillStyle = PAL[v.elem].aura; ctx.beginPath(); ctx.arc(x + 9, y, 4, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#fff6e0'; ctx.fillText(str, v.x + 5, y + 1); ctx.restore();
+  }
   drawBars(v) {
     if (v.dead || v.alpha < .5) return; const ctx = E.ctx, w = v.boss ? 120 : 74, x = v.x - w / 2, y = this.headY(v) - 12;
     ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(x - 1, y - 1, w + 2, 9); ctx.fillStyle = '#f3e6c8'; ctx.fillRect(x, y, w * Math.max(0, v.shown) / v.maxHp, 7); ctx.fillStyle = v.team === 0 ? '#5fd864' : '#ef4a3c'; ctx.fillRect(x, y, w * v.hp / v.maxHp, 7);
@@ -427,6 +437,7 @@ export class BattleView {
     let ix = x; const iy = y - 11;
     for (const m of v.marks) { ctx.fillStyle = PAL[m].aura; ctx.beginPath(); ctx.arc(ix + 5, iy, 5, 0, TAU); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2; ctx.stroke(); ix += 13; }
     for (const s of v.st) { if (s === 'shield') continue; ctx.fillStyle = STATUS_COL[s] || '#fff'; ctx.fillRect(ix, iy - 4, 9, 9); ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.font = '700 8px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(({ burn: 'F', poison: 'P', stun: '!', sleep: 'z', blind: 'B', def_down: 'D', atk_down: 'A', spd_down: 'S', atk_up: 'A', def_up: 'D', spd_up: 'S', crit_up: 'C', regen: '+' })[s] || '', ix + 4.5, iy + 3); ix += 11; }
+    this.drawLevel(v);
     if (v.st.has('stun')) for (let i = 0; i < 3; i++) { const a = E.time * 4 + i * TAU / 3; ctx.fillStyle = '#ffe066'; ctx.beginPath(); ctx.arc(v.x + Math.cos(a) * 22, this.headY(v) + 8 + Math.sin(a) * 7, 3.2, 0, TAU); ctx.fill(); }
   }
 }

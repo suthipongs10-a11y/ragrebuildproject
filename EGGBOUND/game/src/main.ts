@@ -129,6 +129,7 @@ function settingsHTML() {
   <div class="set"><span>ข้ามฉากสกิลสุดยอด</span>${seg('skipUlt', [[false, 'ไม่ข้าม'], [true, 'ข้าม']])}</div>
   <div class="set"><span>เริ่มเกมใหม่ (ลบความคืบหน้า)</span>${confirmReset ? `<span class="confirm">ลบจริงไหม? <button class="alt" type="button" data-act="resetYes">ลบ</button><button class="alt" type="button" data-act="resetNo">ยกเลิก</button></span>` : `<button class="alt" type="button" data-act="reset">รีเซ็ต</button>`}</div>
   <div class="set"><span>ทดสอบ (prototype): ไข่ปริศนา</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="eggs">รับไข่ 4 ลาย</button><button class="alt" type="button" data-dev="incub">บ่มเสร็จทันที</button></span></div>
+  <div class="set"><span>ทดสอบ (prototype): ฟักมอนระดับ</span><span class="row" style="flex:0 0 auto">${['common', 'rare', 'epic', 'legendary'].map(g => `<button class="alt" type="button" data-dev="hatch:${g}">${LOOT_GRADES[g].name}</button>`).join('')}</span></div>
   <div class="set"><span>ทดสอบ (prototype): หีบสมบัติ</span><span class="row" style="flex:0 0 auto">${['common', 'rare', 'epic', 'legendary'].map(g => `<button class="alt" type="button" data-dev="chest:${g}">${LOOT_GRADES[g].name}</button>`).join('')}</span></div>
   <p class="note">P0 เซฟในเครื่องนี้เท่านั้น · ระบบต่อสู้ทำงานแบบ deterministic (seed เดิม + คำสั่งเดิม = ผลเดิม) เพื่อให้เซิร์ฟเวอร์ตรวจผลได้ในเฟสออนไลน์</p></div></section>`;
 }
@@ -255,11 +256,11 @@ function resultModal(r, win, stars) {
 function leaveBattle() { chestUI?.close(); chestUI = null; battle = null; clearAll(); scene = cur === 'home' && homeV ? homeV : idleScene; $('#resModal')?.remove(); $('#bhud').hidden = true; }
 
 // ---------- hatch ----------
-function startHatch(eggId) {
+function startHatch(eggId, forceRarity = null) {
   const egg = S.eggs.find(e => e.id === eggId); if (!egg || !canHatch(S, egg)) return;
   clearAll();
   const before = S.mons[egg.sid] ? S.mons[egg.sid].stars : 0;
-  hatch = new HatchView(egg.sid, { dup: before > 0 && before < 5, eggSrc: eggOf(egg), tier: egg.kind === 'mystery' ? egg.tier : null, rare: !!egg.rare });
+  hatch = new HatchView(egg.sid, { dup: before > 0 && before < 5, eggSrc: eggOf(egg), tier: egg.kind === 'mystery' ? egg.tier : null, rare: !!egg.rare, rarityOverride: forceRarity });
   hatch.onDone = () => {
     const r = hatchEgg(S, eggId); save(); if (!r) return;
     const s = SPECIES[r.sid], more = S.eggs.filter(e => canHatch(S, e)).length;
@@ -277,6 +278,10 @@ function leaveHatch() { hatch = null; clearAll(); scene = idleScene; $('#hatchMo
 function devTool(k) {
   if (k === 'eggs') { for (const t of EGG_TIER_ORDER) { let e; do { e = rollMysteryEgg({ ...S, eggPity: 0 }, Math.random); } while (e.tier !== t); e.id = S.nextEggId++; S.eggs.push(e); } }
   if (k === 'incub') for (const x of home(S).incub) x.end = Date.now();
+  if (k.startsWith('hatch:')) { // preview the hatch effect of a monster rarity (hatches a gold egg of an owned monster)
+    const g = k.slice(6), e = { id: S.nextEggId++, sid: 'A03', kind: 'mystery', tier: { common: 'silver', rare: 'silver', epic: 'gold', legendary: 'rainbow' }[g] };
+    S.eggs.push(e); home(S).incub.push({ id: e.id, tier: e.tier, start: 0, end: 1 }); save(); startHatch(e.id, g); return;
+  }
   if (k.startsWith('chest:')) { // preview a chest of that grade (no rewards granted)
     const g = k.slice(6), tier = { rare: 'silver', epic: 'gold', legendary: 'rainbow' }[g];
     const items = [{ icon: coinURL(), label: 'ทอง 640', sub: 'โบนัสผ่านครั้งแรก', grade: 'common' }, ...['A02', 'A06', 'A03'].map(sid => ({ icon: eggURL(sid), label: 'เศษไข่ ×1', sub: SPECIES[sid].name, grade: 'common' }))];

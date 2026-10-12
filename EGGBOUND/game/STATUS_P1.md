@@ -57,3 +57,10 @@ Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`,
   rays, burst + shockwave rings when the egg breaks, sparkles while it cracks. Code-drawn version remains as fallback.
 - Chest: closed → lid rattles closed/ajar with light leaking from the gap while charging → open sprite with light from the cavity,
   rays, burst + rings (rainbow rings for legendary), ring per rare item. Boss stages use the red/gold chest.
+
+## Hatch by monster rarity + battle level plates
+- Hatch grandeur follows the monster's rarity (SPECIES rarity): while the egg cracks the light steps up white → blue → purple → gold
+  (same colours as the chest) and the build-up is slower the rarer it is; the burst gets bigger with more shockwaves
+  (legendary: rainbow rings + white-out + fanfare); epic/legendary add a sky light pillar, twinkles and a rarity banner.
+- Settings → test buttons preview each rarity (prototype only).
+- Battle: "Lv.N" plate under every monster's feet (green = ours, red = enemy, gold = boss) with an element dot.

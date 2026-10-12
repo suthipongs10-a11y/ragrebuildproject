@@ -1,6 +1,6 @@
 // @ts-nocheck
 // Hatch scene: egg on a rune pedestal → wobble → 3 crack stages → light rays → burst → silhouette → reveal.
-import { SPECIES } from '../core/data';
+import { SPECIES, LOOT_GRADES, LOOT_ORDER } from '../core/data';
 import { PAL, PIV, TAU, spr, silOf, glowOf, GP, dot, eggImg, mk, TIER_COL, IMG, fx, tinted, colored } from './assets';
 import { sfx } from './audio';
 import { E, SQ, lerp, rnd, clamp, easeOut, easeBack, run, tween, addP, burst, ring, shake, flash, drawParts, drawDecals, drawGround, drawLantern, drawBush, drawLanternPools, drawFlies, LANTERNS, BUSHES, worldTransform, drawOverlays } from './engine';
@@ -29,12 +29,14 @@ function column(c) {
 }
 const RUNES = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ'];
 export class HatchView {
-  sid; P; EP; egg; mon; fxs = []; phase = 'ready'; rays = 0; onDone = null; dup = false; newStars = 1; eggSrc = null; tier = null; rare = false; revealed = false;
+  sid; P; EP; egg; mon; fxs = []; phase = 'ready'; rays = 0; onDone = null; dup = false; newStars = 1; eggSrc = null; tier = null; rare = false; revealed = false; rarityOverride = null; rk = 0; step = 0; postT = 0;
   constructor(sid, opts) {
     this.sid = sid; this.P = PAL[SPECIES[sid].elem]; Object.assign(this, opts);
     this.egg = { x: PED.x, y: PED.y - 38, rot: 0, hop: 0, sx: 1, sy: 1, glow: 0, white: 0, vis: true, cracks: [], cv: mk(512, 512), stage: 0, t: 0 };
     this.mon = { x: PED.x, y: PED.y - 38, hop: 0, sx: .3, sy: .3, sil: 1, vis: false, k: .4 * (SPECIES[sid].scale || 1) };
     // mystery eggs glow in their tier colour so the element stays hidden until the reveal
+    // monster rarity drives how grand the hatch is: 0 common · 1 rare · 2 epic · 3 legendary
+    this.rk = Math.max(0, LOOT_ORDER.indexOf(this.rarityOverride || SPECIES[sid].rarity));
     this.EP = this.tier ? { aura: TIER_COL[this.tier], core: '#fff6e0' } : this.P;
     if (!this.eggSrc) this.eggSrc = eggImg(sid);
   }
@@ -55,9 +57,21 @@ export class HatchView {
     sfx.crack(); shake(2 + stage * 1.5);
   }
   addFx(name, col, x, y, s0, s1, dur, rot = 0, a = 1) { if (IMG[name]) this.fxs.push({ name, col, x, y, s0, s1, dur, rot, a, t: 0 }); }
-  breakFx() { // the egg bursts: hot flash + two shockwaves in the egg's colour
-    const x = PED.x, y = PED.y - 90, c = this.col();
-    this.addFx('fx_burst', c, x, y, 220, 900, .55, Math.random()); this.addFx('fx_ring', c, x, y, 80, 980, .7); this.addFx('fx_ring', '#ffffff', x, y, 40, 620, .5);
+  breakFx() { // the egg bursts: hot flash + shockwaves in the egg's colour, bigger and more of them the rarer the monster
+    const x = PED.x, y = PED.y - 90, c = this.col(), rk = this.rk;
+    this.addFx('fx_burst', c, x, y, 220, 900 * (1 + rk * .35), .55 + rk * .1, Math.random()); this.addFx('fx_ring', '#ffffff', x, y, 40, 620, .5);
+    for (let i = 0; i <= rk; i++) this.addFx('fx_ring', rk >= 3 ? PRISM[i * 2 % PRISM.length] : c, x, y, 80, 980 + i * 260, .7 + i * .12);
+    if (rk >= 3) PRISM.forEach((pc, i) => this.addFx('fx_ring', pc, x, y, 60, 700 + i * 140, .9 + i * .06));
+    if (rk >= 1) { shake(8 + rk * 6); this.rays = 1.2 + rk * .3; }
+    if (rk === 2) sfx.react(); if (rk >= 3) { sfx.starup(); setTimeout(() => sfx.win(), 450); flash(1, '#fff6d0'); }
+  }
+  afterFx(dt) { // epic / legendary: a light pillar from the sky and twinkles around the new monster for a few seconds
+    this.postT += dt; if (this.postT > 3.5) return; const m = this.mon;
+    if (Math.random() < dt * (10 + this.rk * 8)) this.addFx('fx_sparkle', this.col(Math.random() * 6 | 0), m.x + rnd(-170, 170), m.y - rnd(20, 300), 20, rnd(50, 110), .6, rnd(0, 1));
+  }
+  drawSky() {
+    if (this.rk < 2 || !this.revealed || this.postT > 4) return; const m = this.mon, a = Math.min(1, this.postT * 3) * Math.max(0, 1 - Math.max(0, this.postT - 3));
+    fx(E.ctx, 'fx_column', this.col(), m.x, m.y - 430, 200 + this.rk * 50, 980, a * .55);
   }
   update(dt) {
     for (const f of this.fxs) f.t += dt; this.fxs = this.fxs.filter(f => f.t < f.dur);
@@ -66,7 +80,9 @@ export class HatchView {
     g.t += dt; const t = g.t;
     if (this.phase === 'ready') { g.rot = Math.sin(t * 2) * .02 + (t % 3.2 > 2.8 ? Math.sin(t * 40) * .05 : 0); g.glow = .25 + .15 * Math.sin(t * 2.4); return; }
     if (this.phase === 'hatching') {
-      if (!this.ht) this.ht = 0; this.ht += dt; const h = this.ht;
+      if (!this.ht) this.ht = 0; this.ht += this.ht < 2.7 ? dt * [1, .85, .7, .55][this.rk] : dt; const h = this.ht;
+      // the light steps up through the rarity colours (same language as the treasure chest) until it reaches the real one
+      if (this.rk > 0 && h < 2.7) { const s = Math.min(this.rk, Math.floor(h / (2.6 / (this.rk + 1)))); if (s > this.step) { this.step = s; sfx.perfect(); flash(.25, LOOT_GRADES[LOOT_ORDER[s]].col); this.addFx('fx_ring', this.col(), PED.x, PED.y - 90, 60, 420 + s * 120, .55); } }
       if (h < 2.7) { const amp = .025 + h / 2.7 * .17, fr = 7 + h * 5; g.rot = Math.sin(h * fr) * amp; g.hop = Math.max(0, Math.sin(h * fr * .5)) * h * 3; g.sx = 1 + Math.sin(h * fr * 2) * .02 * h; g.sy = 2 - g.sx; g.glow = h / 2.7;
         const st = h > 2.1 ? 3 : h > 1.4 ? 2 : h > .7 ? 1 : 0; while (g.stage < st) { g.stage++; this.crack(g.stage); }
         this.rays = Math.max(0, (h - 1.3) / 1.4);
@@ -84,7 +100,8 @@ export class HatchView {
         if (u > .7 && m.sil > 0) { m.sil = Math.max(0, 1 - (u - .7) / .45); if (m.sil === 0) { burst(m.x, m.y, 70, 40, P.core, 320, 14, .8); sfx.chime(); this.revealed = true; if (this.rare) { PRISM.forEach((c, i) => { ring(m.x, m.y, 10, 150 + i * 22, c, .5 + i * .06, 5); burst(m.x, m.y, 70, 10, c, 380, 12, .9); }); flash(.5, '#ffffff'); sfx.starup(); } this.onReveal && this.onReveal(); } }
         if (u > 1.25 && u < 1.75) { const q = (u - 1.25) / .5; m.hop = -Math.sin(q * Math.PI) * 26; m.sy = 1 + Math.sin(q * Math.PI * 2) * .08; m.sx = 2 - m.sy; }
         if (this.dup && u > 1.9 && !this.starFx) { this.starFx = true; sfx.starup(); ring(m.x, m.y, 10, 220, '#ffd27a', .7, 10); addP({ type: 'beam', x: m.x, y: m.y + 1, life: 1, size: 90, color: P.aura }); burst(m.x, m.y, 80, 50, '#ffe39a', 420, 16, .9); flash(.6, P.hot); }
-        if (u > (this.dup ? 3.2 : 2.4) && this.phase !== 'done') { this.phase = 'done'; this.onDone && this.onDone(); }
+        if (this.revealed && this.rk >= 2) this.afterFx(dt);
+        if (u > (this.dup ? 3.2 : 2.4) + this.rk * .6 && this.phase !== 'done') { this.phase = 'done'; this.onDone && this.onDone(); }
       }
     }
   }
@@ -93,14 +110,18 @@ export class HatchView {
     const art = ART(), ay = art ? PED.y + 55 : PED.y; // the sprite altar's footprint centre sits lower
     const ents = [{ y: art ? -1e9 : PED.y - 1, d: () => this.drawRuneCircle() }, { y: ay, d: () => this.drawPedestal() }, { y: ay + .5, d: () => this.drawEgg() }, { y: ay + 1, d: () => this.drawMon() }];
     for (const c of crystals()) ents.push({ y: PED.y + c[1], d: () => this.drawCrystal(c) });
-    ents.push({ y: ay + .7, d: () => this.drawBeams() });
+    ents.push({ y: ay + .7, d: () => this.drawBeams() }, { y: ay + .9, d: () => this.drawSky() });
     for (const L of LANTERNS) ents.push({ y: L.y, d: () => drawLantern(L) }); for (const b of BUSHES) ents.push({ y: b.y, d: () => drawBush(b) });
     ents.sort((a, b) => a.y - b.y); for (const e of ents) e.d();
     this.drawRays(); this.drawFx(); drawParts(); drawFlies(); drawOverlays();
   }
   cyl(x, yB, rx, h, top, side, ry) { const ctx = E.ctx; const g = ctx.createLinearGradient(x - rx, 0, x + rx, 0); g.addColorStop(0, '#5a5246'); g.addColorStop(.35, side); g.addColorStop(1, '#4a4238'); ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(x + rx, yB - h); ctx.lineTo(x + rx, yB); ctx.ellipse(x, yB, rx, ry, 0, 0, Math.PI); ctx.lineTo(x - rx, yB - h); ctx.closePath(); ctx.fill(); ctx.fillStyle = top; ctx.beginPath(); ctx.ellipse(x, yB - h, rx, ry, 0, 0, TAU); ctx.fill(); ctx.strokeStyle = 'rgba(50,40,30,.5)'; ctx.lineWidth = 1.5; ctx.stroke(); }
   /** altar colour: teal while idle, the egg's colour while hatching (rainbow eggs cycle) */
-  col(i = 0) { return this.phase === 'ready' ? IDLE_COL : this.tier === 'rainbow' ? PRISM[(Math.floor(E.time * 5) + i) % PRISM.length] : this.EP.aura; }
+  col(i = 0) {
+    if (this.phase === 'ready') return IDLE_COL;
+    if (this.rk > 0 && this.step > 0) return this.step >= 3 ? PRISM[(Math.floor(E.time * 6) + i) % PRISM.length] : LOOT_GRADES[LOOT_ORDER[this.step]].col;
+    return this.tier === 'rainbow' ? PRISM[(Math.floor(E.time * 5) + i) % PRISM.length] : this.EP.aura;
+  }
   power() { return this.phase === 'ready' ? .45 + .15 * Math.sin(E.time * 2) : clamp(.6 + this.egg.glow * .9 + (this.egg.vis ? 0 : .6), 0, 1.6); }
   drawRuneCircle() { // big engraved rune circle on the ground, rotating glyph ring
     if (ART()) {
@@ -208,6 +229,12 @@ export class HatchView {
     ctx.drawImage(spr(this.sid, key), -PIV[0], -PIV[1]);
     if (m.sil > 0) { ctx.globalAlpha = m.sil; ctx.drawImage(silOf(this.sid, key, '#1a0f08'), -PIV[0], -PIV[1]); }
     ctx.restore();
+    if (this.rk > 0 && this.revealed) { // rarity banner pops in above the monster
+      const sz = (this.rk >= 3 ? 40 : this.rk === 2 ? 34 : 28) * (0.6 + 0.4 * easeBack(Math.min(1, (this.bannerT = (this.bannerT || 0) + .016) * 3)));
+      const txt = LOOT_GRADES[LOOT_ORDER[this.rk]].name + (this.rk >= 3 ? '!!' : '!'), ty = m.y - 270 * m.k / .4;
+      ctx.save(); ctx.font = `700 ${sz}px Mitr, sans-serif`; ctx.textAlign = 'center'; ctx.strokeStyle = 'rgba(0,0,0,.7)'; ctx.lineWidth = 6; ctx.strokeText(txt, m.x, ty);
+      ctx.fillStyle = this.rk >= 3 ? PRISM[Math.floor(E.time * 6) % PRISM.length] : LOOT_GRADES[LOOT_ORDER[this.rk]].col; ctx.fillText(txt, m.x, ty); ctx.restore();
+    }
     if (this.rare && this.revealed) { ctx.save(); ctx.font = '700 24px "IBM Plex Sans Thai",sans-serif'; ctx.textAlign = 'center'; const ty = m.y - 210 * m.k / .4 + Math.sin(E.time * 3) * 4; ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.lineWidth = 5; ctx.strokeText('ร่างหายาก!', m.x, ty); ctx.fillStyle = PRISM[Math.floor(E.time * 4) % PRISM.length]; ctx.fillText('ร่างหายาก!', m.x, ty); ctx.restore(); }
   }
   drawRays() {
