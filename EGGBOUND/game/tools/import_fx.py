@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Import art batch 06 (hatching altar, treasure chests, light FX) into game/assets/.
+"""Import art batch 06 (hatching altar, treasure chests, light FX) and batch 12 (hatch power-up FX) into game/assets/.
 
 usage: python3 tools/import_fx.py <batch06_dir>      (the folder holding A_ALTAR/ B_CHESTS/ C_FX/, or one flat folder)
 
@@ -19,6 +19,9 @@ OBJ = {  # name -> output size
 LIGHT = {
     'hatch_altar_glow': (768, 768), 'fx_rays': (512, 512), 'fx_burst': (512, 512), 'fx_ring': (512, 512),
     'fx_rune_circle': (768, 768), 'fx_column': (256, 512), 'fx_sparkle': (128, 128), 'fx_orb': (128, 128),
+    # BATCH12 hatch power-up (epic+ hatch): used automatically by hatchView when present, code drawing otherwise
+    'fx_aura_flame': (512, 768), 'fx_aura_flame_b': (512, 768), 'fx_light_shaft': (128, 512), 'fx_energy_beam': (512, 128),
+    'fx_vortex_spiral': (256, 512), 'fx_arc_ring': (512, 512), 'fx_aura_burst_ground': (512, 512),
 }
 
 

@@ -14,6 +14,8 @@ function tone(type, f0, f1, dur, vol, dl = 0) { if (!AU.on || !AU.ctx) return; c
 export const sfx = {
   hit(b) { nz(.14, 'bandpass', 1800, 500, b ? .9 : .55); tone('sine', b ? 140 : 180, 50, .18, b ? .8 : .45); },
   whoosh() { nz(.22, 'bandpass', 500, 2400, .3); },
+  charge(d) { tone('sawtooth', 70, 520, d, .06); tone('sine', 110, 880, d, .08); nz(d, 'bandpass', 300, 3200, .16); },
+  beam() { nz(.5, 'bandpass', 900, 200, .5); tone('square', 220, 1200, .3, .08); tone('sine', 60, 40, .5, .5); },
   boom() { nz(.8, 'lowpass', 2400, 90, .9); tone('sine', 90, 35, .7, .8); },
   fire() { nz(.45, 'lowpass', 1400, 300, .42); },
   charge() { tone('sawtooth', 110, 440, .7, .1); nz(.7, 'bandpass', 300, 1800, .26); },

@@ -40,6 +40,8 @@ export class HatchView {
   sid; P; EP; egg; mon; fxs = []; phase = 'ready'; rays = 0; onDone = null; dup = false; newStars = 1; eggSrc = null; tier = null; rare = false; revealed = false; rarityOverride = null; rk = 0; step = 0; postT = 0;
   // awakening (after the reveal): charge → gold burst + lightning → stars stamp in one by one. Grander with rarity.
   fromStars = 0; toStars = 1; aT = 0; bolts = []; goldRays = 0; awGlow = 0; dark = 0; stamps = []; awBurst = false; nSpray = 0; nArc = 0; nStrike = 0;
+  // epic+ pre-hatch: crystals gather power → fire into the egg → egg overloads (lightning, power aura, light shafts) → BOOM
+  pt = 0; preDone = false; gatherK = 0; beamK = 0; auraK = 0; shots = []; fired = 0; nEggArc = 0; nSky = 0; nCryArc = 0;
   constructor(sid, opts) {
     this.sid = sid; this.P = PAL[SPECIES[sid].elem]; Object.assign(this, opts);
     this.egg = { x: PED.x, y: PED.y - 38, rot: 0, hop: 0, sx: 1, sy: 1, glow: 0, white: 0, vis: true, cracks: [], cv: mk(512, 512), stage: 0, t: 0 };
@@ -80,12 +82,116 @@ export class HatchView {
     if (Math.random() < dt * (10 + this.rk * 8)) this.addFx('fx_sparkle', this.col(Math.random() * 6 | 0), m.x + rnd(-170, 170), m.y - rnd(20, 300), 20, rnd(50, 110), .6, rnd(0, 1));
   }
   /** awakening timeline (seconds after the reveal) */
-  tl() {
-    const rk = this.rk, C = [0, .55, .75, .95][rk], burstAt = rk ? .35 + C : .25, S = [0, .7, 1.3, 1.9][rk];
+  tl() { // epic+ already charged before the egg broke, so their burst comes right after the reveal
+    const rk = this.rk, C = [0, .55, 0, 0][rk], burstAt = rk === 1 ? .35 + C : rk ? .15 : .25, S = [0, .7, 1.1, 1.5][rk];
     const stamp0 = burstAt + (rk ? .3 : 0), gap = .3, stampEnd = stamp0 + Math.max(1, this.toStars - this.fromStars) * gap;
     return { C, burstAt, S, stamp0, gap, end: Math.max(burstAt + S, stampEnd) + .9 };
   }
   bodyH() { return 75 * this.mon.k / .4; }
+  preTl() { const L = this.rk >= 3; return { G: L ? 2.1 : 1.7, F: .5, O: L ? 2.5 : 2.0, W: .35 }; }
+  eggC() { return [this.egg.x, this.egg.y - 52]; }
+  /** epic / legendary: the four crystals gather power, fire it into the egg, the egg overloads, then the normal break (ht = 3) */
+  epicPre(dt) {
+    const g = this.egg, rk = this.rk, T = this.preTl(), t = (this.pt += dt), [ex, ey] = this.eggC(), cr = crystals();
+    const s = Math.min(rk, Math.floor(t / (T.G / (rk + 1)))); // the light steps up through the rarity colours while gathering
+    if (s > this.step) { this.step = s; sfx.perfect(); flash(.2, LOOT_GRADES[LOOT_ORDER[s]].col); this.addFx('fx_ring', this.col(), PED.x, PED.y - 90, 60, 420 + s * 120, .55); }
+    if (t < dt * 1.5) sfx.charge(T.G + T.F);
+    g.glow = clamp(t / (T.G + T.F + T.O), 0, 1);
+    if (t < T.G) { // GATHER: light spirals up around each crystal, sparks crackle on them
+      const q = t / T.G; this.gatherK = q; this.dark = .5 * q;
+      g.rot = Math.sin(t * 9) * .025 * q;
+      if (t > this.nCryArc) { const c = cr[Math.random() * 4 | 0], [cx, cy] = this.crystalPos(c), a0 = rnd(0, TAU); this.bolts.push({ pts: jag([cx + Math.cos(a0) * 40, cy + Math.sin(a0) * 60], [cx + rnd(-40, 40), cy + rnd(-70, 70)], 22, 3), br: [], t: 0, life: .12, w: .45 }); this.nCryArc = t + .25 - .18 * q; }
+      for (const c of cr) if (Math.random() < dt * (6 + 14 * q)) { const [cx, cy] = this.crystalPos(c); addP({ x: cx + rnd(-50, 50), y: PED.y + c[1], z: PED.y + c[1] - cy + rnd(-60, 20), vz: rnd(80, 200), life: rnd(.5, .9), size: rnd(4, 8), size2: 0, color: this.col() }); }
+    } else if (t < T.G + T.F) { // FIRE: each crystal shoots its gathered power into the egg
+      const f = t - T.G; this.gatherK = Math.max(.45, 1 - f * 1.2);
+      while (this.fired < 4 && f >= this.fired * .08) { const [cx, cy] = this.crystalPos(cr[this.fired]); this.shots.push({ i: this.fired, t: 0 }); burst(cx, PED.y + cr[this.fired][1], PED.y + cr[this.fired][1] - cy, 16, this.col(), 300, 12, .5); this.fired++; sfx.zap(); shake(7); }
+      if (f > .3 && !this.hitEgg) { this.hitEgg = true; sfx.beam(); flash(.45, this.col()); shake(12); this.beamK = 1; this.addFx('fx_burst', this.col(), ex, ey, 60, 520, .45, Math.random()); ring(g.x, g.y, 10, 260, this.col(), .6, 8); }
+      this.dark = .55;
+    } else if (t < T.G + T.F + T.O) { // OVERLOAD: lightning crackles over the egg, power aura and light shafts erupt, cracks spread
+      const q = (t - T.G - T.F) / T.O; this.auraK = Math.min(1, q * 2.2); this.beamK = 1; this.dark = .55 + .1 * q; this.rays = q * .45;
+      E.zoomT = 1.15 + .14 * q; E.camT.y = PED.y - 40 - 25 * q; shake(2 + 5 * q);
+      const amp = .03 + q * .14, fr = 11 + q * 14; g.rot = Math.sin(t * fr) * amp; g.hop = Math.max(0, Math.sin(t * fr * .5)) * q * 7; g.sx = 1 + Math.sin(t * fr * 2) * .03 * q; g.sy = 2 - g.sx;
+      const st = q > .72 ? 3 : q > .42 ? 2 : q > .12 ? 1 : 0; while (g.stage < st) { g.stage++; this.crack(g.stage); }
+      if (t > this.nEggArc) { this.eggArc(); if (q > .5) this.eggArc(); this.nEggArc = t + .11 - .07 * q; if (Math.random() < .3) sfx.zap(); }
+      if (t > this.nSky) { const a = rnd(0, TAU), r = rnd(120, 300); this.strike(g.x + Math.cos(a) * r, g.y + 10 + Math.sin(a) * r * SQ); shake(6 + rk * 2); this.nSky = t + rnd(.3, .55) / (rk - 1) / (.6 + q); }
+      for (let n = 0; n < (14 + 26 * q) * dt + Math.random(); n++) { const a = rnd(0, TAU), r = rnd(40, 80); addP({ type: 'streak', x: g.x + Math.cos(a) * r, y: g.y + Math.sin(a) * r * SQ, z: rnd(0, 60), vz: rnd(500, 900), vx: rnd(-40, 40), life: rnd(.3, .5), size: rnd(2, 4), color: Math.random() < .7 ? this.col() : AW_PALE, drag: 1 }); }
+    } else if (t < T.G + T.F + T.O + T.W) { // WHITE-OUT just before the break
+      const q = (t - T.G - T.F - T.O) / T.W; g.white = q; g.sx = 1 + q * .5; g.sy = 1 + q * .3; g.rot *= .8; this.rays = 1.2; shake(8);
+      if (t > this.nEggArc) { this.eggArc(); this.eggArc(); this.nEggArc = t + .04; }
+    } else { this.preDone = true; this.ht = 3.0; this.beamK = 0; this.auraK = 0; this.gatherK = 0; }
+    for (const sh of this.shots) sh.t += dt;
+  }
+  /** lightning crawling over the egg's shell */
+  eggArc() {
+    const [ex, ey] = this.eggC(), p = a => [ex + Math.cos(a) * rnd(44, 66), ey + Math.sin(a) * rnd(56, 80)], a0 = rnd(0, TAU);
+    this.bolts.push({ pts: jag(p(a0), p(a0 + rnd(.9, 2.4) * (Math.random() < .5 ? -1 : 1)), 26, 4), br: [], t: 0, life: rnd(.08, .15), w: .6 });
+  }
+  /** crystals: spiralling light while gathering */
+  drawGather() {
+    if (this.gatherK <= 0) return; const ctx = E.ctx, t = E.time, q = this.gatherK;
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    crystals().forEach((c, i) => {
+      const [cx, cy] = this.crystalPos(c), col = this.col(i), base = PED.y + c[1];
+      fx(ctx, 'fx_orb', col, cx, cy, 160 + 160 * q, 160 + 160 * q, q * .8);
+      if (fx(ctx, 'fx_vortex_spiral', col, cx, (base + cy) / 2 - 20, 150, 300, q * .9, 0)) return;
+      for (let k = 0; k < 3; k++) { // three helix ribbons climbing the crystal
+        ctx.beginPath(); for (let j = 0; j <= 24; j++) { const s = j / 24, a = t * (5 + q * 6) + k * TAU / 3 + s * 9, r = 52 * (1 - s * .45), x = cx + Math.cos(a) * r, y = base - s * (base - cy + 90) + Math.sin(a) * r * .3; j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+        ctx.strokeStyle = col; ctx.lineWidth = 5; ctx.globalAlpha = q * .35; ctx.stroke(); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.6; ctx.globalAlpha = q * .8; ctx.stroke();
+      }
+      for (let k = 0; k < 8; k++) { const s = (t * .9 + k / 8) % 1, a = t * 7 + k * 2.4, r = 60 * (1 - s * .5); ctx.globalAlpha = q * Math.sin(s * Math.PI); ctx.drawImage(dot(col), cx + Math.cos(a) * r - 9, base - s * (base - cy + 90) + Math.sin(a) * r * .3 - 9, 18, 18); }
+    });
+    ctx.restore();
+  }
+  /** the crystals' power streams into the egg: thick beams with lightning running along them */
+  drawPowerBeams() {
+    if (this.beamK <= 0 && !this.shots.length || !this.egg.vis) return; const ctx = E.ctx, [ex, ey] = this.eggC(), cr = crystals();
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    for (const sh of this.shots) {
+      const [sx, sy] = this.crystalPos(cr[sh.i]), col = this.col(sh.i), u = clamp(sh.t / .18, 0, 1), k = this.beamK > 0 ? this.beamK : u;
+      const hx = lerp(sx, ex, u), hy = lerp(sy, ey, u), len = Math.hypot(hx - sx, hy - sy), ang = Math.atan2(hy - sy, hx - sx), fl = .8 + .2 * Math.sin(E.time * 40 + sh.i);
+      if (!fx(ctx, 'fx_energy_beam', col, (sx + hx) / 2, (sy + hy) / 2, len, 60 * k * fl, k, ang)) {
+        for (const [w, c, a] of [[30, col, .22], [12, col, .7], [4, '#ffffff', 1]]) { ctx.globalAlpha = a * k * fl; ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(hx, hy); ctx.stroke(); }
+      }
+      if (u > .1) { const pts = jag([sx, sy], [hx, hy], 26, 4); for (const [w, c, a] of [[5, col, .5], [1.6, '#ffffff', .9]]) { ctx.globalAlpha = a * k; ctx.strokeStyle = c; ctx.lineWidth = w; ctx.beginPath(); pts.forEach((p, j) => j ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); } }
+      if (u < 1) { ctx.globalAlpha = 1; ctx.drawImage(dot(col), hx - 40, hy - 40, 80, 80); ctx.drawImage(dot('#ffffff'), hx - 16, hy - 16, 32, 32); }
+    }
+    ctx.restore();
+  }
+  /** power-up aura (code version; uses fx_aura_flame / fx_light_shaft art when present): rising flame tongues hugging the body,
+   *  sharp light shafts shooting up, and light ribbons spiralling around it. (x, yB) = feet, w/h = body size, k = strength */
+  drawPowerAura(x, yB, w, h, col, k) {
+    if (k <= 0) return; const ctx = E.ctx, t = E.time;
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = k * .3; ctx.drawImage(dot(col), x - w * 1.5, yB - h * .5 - w * 1.5, w * 3, w * 3);
+    const flick = Math.floor(t * 16) % 2;
+    if (!fx(ctx, flick ? 'fx_aura_flame' : 'fx_aura_flame_b', col, x, yB - h * .95, w * 2.6, h * 2.4, k, 0) && !fx(ctx, 'fx_aura_flame', col, x, yB - h * .95, w * 2.6, h * 2.4, k, 0)) {
+      // flame tongues rooted along the body outline, leaning out and licking upward (tallest over the top), like an anime power-up
+      const cx = x, cy = yB - h * .45, rx = w * .78, ry = h * .58, N = 26;
+      ctx.globalAlpha = k * .55; ctx.strokeStyle = col; ctx.lineWidth = w * .12; ctx.beginPath(); ctx.ellipse(cx, cy, rx * .92, ry * .95, 0, 0, TAU); ctx.stroke();
+      for (let i = 0; i < N; i++) {
+        const v = (i + .5) / N, ang = Math.PI * (.5 + v * 2) - Math.PI, bx = cx + Math.cos(ang + Math.PI / 2) * rx, by = cy - Math.sin(ang + Math.PI / 2) * ry;
+        const side = (bx - cx) / rx, up = clamp((cy - by) / ry * .5 + .5, 0, 1), nz = .5 + .5 * Math.sin(t * 11 + i * 2.1) * Math.sin(t * 6.7 + i * 1.3);
+        const L = h * (.25 + .55 * up + .45 * nz), wd = w * (.1 + .05 * nz), lean = side * w * .35 + Math.sin(t * 14 + i) * w * .08, tx = bx + lean, ty = by - L;
+        const gr = ctx.createLinearGradient(bx, by, tx, ty); gr.addColorStop(0, col); gr.addColorStop(.35, col + 'cc'); gr.addColorStop(1, col + '00');
+        ctx.globalAlpha = k * (.45 + .3 * nz); ctx.fillStyle = gr;
+        ctx.beginPath(); ctx.moveTo(bx - wd, by + wd * .5); ctx.quadraticCurveTo(bx - wd * .4 + lean * .4, by - L * .5, tx, ty); ctx.quadraticCurveTo(bx + wd * .4 + lean * .4, by - L * .5, bx + wd, by + wd * .5); ctx.closePath(); ctx.fill();
+        ctx.globalAlpha = k * .5 * nz; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(bx, by); ctx.quadraticCurveTo(bx + lean * .4, by - L * .5, tx, ty); ctx.stroke();
+      }
+    }
+    for (let i = 0; i < 12; i++) { // sharp light shafts that shoot up and vanish, each at a new spot every cycle
+      const per = .42 + (i % 4) * .07, cyc = Math.floor((t + i * .137) / per), u = ((t + i * .137) % per) / per, rr = Math.sin(cyc * 12.9898 + i * 78.233) * 43758.5453, rn = rr - Math.floor(rr);
+      const a = rn * TAU, px = x + Math.cos(a) * w * (.35 + rn * .5), by = yB + Math.sin(a) * w * .15, len = h * (1.6 + rn * 1.6) * easeOut(Math.min(1, u * 3)), al = k * (1 - u) * .95;
+      if (fx(ctx, 'fx_light_shaft', col, px, by - len / 2, w * .35, len, al, 0)) continue;
+      const gr = ctx.createLinearGradient(0, by, 0, by - len); gr.addColorStop(0, '#ffffff'); gr.addColorStop(.4, col); gr.addColorStop(1, col + '00');
+      ctx.globalAlpha = al; ctx.fillStyle = gr; const ww = w * (.05 + rn * .05); ctx.beginPath(); ctx.moveTo(px - ww, by); ctx.lineTo(px, by - len); ctx.lineTo(px + ww, by); ctx.closePath(); ctx.fill();
+    }
+    for (let r = 0; r < 3; r++) { // ribbons spiralling up around the body
+      ctx.beginPath(); for (let j = 0; j <= 30; j++) { const s = j / 30, a = t * 7 + r * TAU / 3 + s * 8, rad = w * .8 * (1 - s * .35), px = x + Math.cos(a) * rad, py = yB - s * h * 1.6 + Math.sin(a) * rad * .3; j ? ctx.lineTo(px, py) : ctx.moveTo(px, py); }
+      ctx.strokeStyle = col; ctx.lineWidth = 6; ctx.globalAlpha = k * .3; ctx.stroke(); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.8; ctx.globalAlpha = k * .75; ctx.stroke();
+    }
+    fx(ctx, 'fx_arc_ring', col, x, yB - h * .5, w * 1.9, h * 1.5, k * (.5 + .5 * Math.random()), Math.random() < .5 ? 0 : Math.PI); // electric sheath art (flips to flicker)
+    ctx.restore();
+  }
   /** lightning from the sky onto a ground point (x,y), optionally ending at height z */
   strike(x, y, z = 0, w = 1) {
     const top = [x + rnd(-90, 90), y - z - 760], end = [x, y - z], pts = jag(top, end, 90);
@@ -114,8 +220,8 @@ export class HatchView {
     }
     if (rk && !this.awBurst && a >= T.burstAt) { // BURST: gold explosion + lightning strikes all around
       this.awBurst = true; this.goldRays = 1; this.dark = .62; this.awGlow = 1; m.sx = .88; m.sy = 1.16;
-      flash(.75, '#fff1b8'); shake(14 + rk * 5); sfx.boom(); sfx.zap(); if (rk >= 2) setTimeout(() => sfx.zap(), 140); if (rk >= 3) setTimeout(() => sfx.win(), 300);
-      this.addFx('fx_burst', AW_GOLD, m.x, m.y - bh, 120, 900 + rk * 260, .75, Math.random());
+      flash(rk >= 2 ? .35 : .75, '#fff1b8'); shake(rk >= 2 ? 10 : 14 + rk * 5); sfx.boom(); sfx.zap(); if (rk >= 2) setTimeout(() => sfx.zap(), 140); if (rk >= 3) setTimeout(() => sfx.win(), 300);
+      this.addFx('fx_burst', AW_GOLD, m.x, m.y - bh, 120, rk >= 2 ? 700 : 900 + rk * 260, rk >= 2 ? .5 : .75, Math.random());
       this.addFx('fx_burst', '#ffffff', m.x, m.y - bh, 60, 340 + rk * 80, .35, Math.random());
       for (let i = 0; i < rk + 2; i++) this.addFx('fx_ring', i % 2 ? AW_GOLD : AW_PALE, m.x, m.y - bh, 60, 700 + i * 280, .6 + i * .14);
       if (rk >= 3) PRISM.forEach((pc, i) => this.addFx('fx_ring', pc, m.x, m.y - bh, 60, 760 + i * 150, .9 + i * .07));
@@ -159,9 +265,9 @@ export class HatchView {
   drawGoldRays() {
     const g = this.goldRays; if (g <= 0) return; const ctx = E.ctx, m = this.mon, by = m.y - this.bodyH(), pulse = 1 + .06 * Math.sin(E.time * 18);
     fx(ctx, 'fx_rays', AW_GOLD, m.x, by, 1350 * pulse, 1350 * pulse, g * .85, E.time * 1.1);
-    fx(ctx, 'fx_rays', AW_PALE, m.x, by, 820, 820, g * .5, -E.time * .8);
+    fx(ctx, 'fx_rays', AW_PALE, m.x, by, 820, 820, g * .35, -E.time * .8);
     if (this.rk >= 3) fx(ctx, 'fx_rays', PRISM[Math.floor(E.time * 6) % PRISM.length], m.x, by, 1100, 1100, g * .5, E.time * .5);
-    fx(ctx, 'fx_burst', AW_GOLD, m.x, by, 420 * pulse, 420 * pulse, g * .5, E.time * .7);
+    fx(ctx, 'fx_burst', AW_GOLD, m.x, by, 420 * pulse, 420 * pulse, g * .25, E.time * .7);
   }
   drawBolts() {
     if (!this.bolts.length) return; const ctx = E.ctx; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
@@ -202,6 +308,7 @@ export class HatchView {
     const g = this.egg, m = this.mon, P = this.P;
     g.t += dt; const t = g.t;
     if (this.phase === 'ready') { g.rot = Math.sin(t * 2) * .02 + (t % 3.2 > 2.8 ? Math.sin(t * 40) * .05 : 0); g.glow = .25 + .15 * Math.sin(t * 2.4); return; }
+    if (this.phase === 'hatching' && this.rk >= 2 && !this.preDone) { this.epicPre(dt); return; }
     if (this.phase === 'hatching') {
       if (!this.ht) this.ht = 0; this.ht += this.ht < 2.7 ? dt * [1, .85, .7, .55][this.rk] : dt; const h = this.ht;
       // the light steps up through the rarity colours (same language as the treasure chest) until it reaches the real one
@@ -236,7 +343,17 @@ export class HatchView {
     ents.push({ y: ay + .7, d: () => this.drawBeams() }, { y: ay + .9, d: () => this.drawSky() });
     for (const L of LANTERNS) ents.push({ y: L.y, d: () => drawLantern(L) }); for (const b of BUSHES) ents.push({ y: b.y, d: () => drawBush(b) });
     ents.sort((a, b) => a.y - b.y); for (const e of ents) e.d();
-    if (this.dark > 0 || this.goldRays > 0) { this.drawDark(); this.drawGoldRays(); this.drawMon(); } // awakening: dim the scene, monster on top
+    if (this.egg.vis && this.rk >= 2 && this.phase === 'hatching') { // epic+ pre-hatch: dim the scene, crystals + egg stay lit on top
+      this.drawDark(); const es = [{ y: (art ? PED.y + 55 : PED.y) + .5, d: () => this.drawEgg() }]; for (const c of crystals()) es.push({ y: PED.y + c[1], d: () => this.drawCrystal(c) });
+      es.sort((a, b) => a.y - b.y); this.drawGather(); this.drawPowerBeams(); // beams run into the egg, aura flares behind it
+      const [ex] = this.eggC();
+      if (this.auraK > 0) { const ctx = E.ctx; ctx.save(); ctx.translate(this.egg.x, this.egg.y + 4); ctx.scale(1, .38); fx(ctx, 'fx_aura_burst_ground', this.col(), 0, 0, 380 * (1 + .06 * Math.sin(E.time * 20)), 380 * (1 + .06 * Math.sin(E.time * 20)), this.auraK * .9, E.time * .6); ctx.restore(); }
+      this.drawPowerAura(ex, this.egg.y + 4, 66, 130, this.col(), this.auraK); for (const e of es) e.d();
+    } else if (this.dark > 0 || this.goldRays > 0) { // awakening: dim the scene, monster on top
+      this.drawDark(); this.drawGoldRays();
+      if (this.rk >= 2 && this.awBurst) { const m = this.mon; this.drawPowerAura(m.x, m.y, 105 * m.k / .4, 150 * m.k / .4, AW_GOLD, this.goldRays * .9); }
+      this.drawMon();
+    }
     this.drawRays(); this.drawFx(); drawParts(); this.drawBolts(); this.drawLabels(); drawFlies(); drawOverlays();
   }
   cyl(x, yB, rx, h, top, side, ry) { const ctx = E.ctx; const g = ctx.createLinearGradient(x - rx, 0, x + rx, 0); g.addColorStop(0, '#5a5246'); g.addColorStop(.35, side); g.addColorStop(1, '#4a4238'); ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(x + rx, yB - h); ctx.lineTo(x + rx, yB); ctx.ellipse(x, yB, rx, ry, 0, 0, Math.PI); ctx.lineTo(x - rx, yB - h); ctx.closePath(); ctx.fill(); ctx.fillStyle = top; ctx.beginPath(); ctx.ellipse(x, yB - h, rx, ry, 0, 0, TAU); ctx.fill(); ctx.strokeStyle = 'rgba(50,40,30,.5)'; ctx.lineWidth = 1.5; ctx.stroke(); }
@@ -328,7 +445,7 @@ export class HatchView {
     ctx.restore();
   }
   drawBeams() { // energy streams from the crystals into the egg while it hatches
-    if (this.phase === 'ready' || !this.egg.vis) return; const ctx = E.ctx, t = E.time, k = clamp(this.egg.glow, 0, 1), ex = this.egg.x, ey = this.egg.y - 55;
+    if (this.phase === 'ready' || !this.egg.vis || this.rk >= 2) return; const ctx = E.ctx, t = E.time, k = clamp(this.egg.glow, 0, 1), ex = this.egg.x, ey = this.egg.y - 55;
     ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
     crystals().forEach((cr, i) => { const [sx, sy] = this.crystalPos(cr), mx = (sx + ex) / 2, my = Math.min(sy, ey) - 60; const c = this.col(i);
       for (const [w, a] of [[9, .25], [3, .9]]) { ctx.globalAlpha = k * a * (.7 + .3 * Math.sin(t * 20 + i)); ctx.strokeStyle = w > 4 ? c : '#ffffff'; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.quadraticCurveTo(mx + Math.sin(t * 9 + i) * 20, my, ex, ey); ctx.stroke(); } });
@@ -338,7 +455,7 @@ export class HatchView {
     const g = this.egg; if (!g.vis) return; const ctx = E.ctx, P = this.EP;
     ctx.fillStyle = 'rgba(15,10,5,.35)'; ctx.beginPath(); ctx.ellipse(g.x, g.y + 2, 44, 13, 0, 0, TAU); ctx.fill();
     ctx.save(); ctx.translate(g.x, g.y - g.hop); ctx.rotate(g.rot); ctx.scale(EGGK * g.sx, EGGK * g.sy);
-    ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, g.glow * .9); ctx.drawImage(dot(P.aura), -260, -133 - 260, 520, 520); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(this.rk >= 2 ? .4 : 1, g.glow * .9); ctx.drawImage(dot(P.aura), -260, -133 - 260, 520, 520); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
     ctx.drawImage(this.eggSrc, -254, -433, 512, 512); ctx.drawImage(g.cv, -254, -433);
     if (g.cracks.length) { ctx.globalCompositeOperation = 'lighter'; ctx.strokeStyle = P.core; ctx.lineCap = 'round'; ctx.globalAlpha = Math.min(1, (this.ht || 0) / 2.2); ctx.lineWidth = 5; for (const c of g.cracks) { ctx.beginPath(); c.forEach((q, i) => i ? ctx.lineTo(q[0] - 254, q[1] - 433) : ctx.moveTo(q[0] - 254, q[1] - 433)); ctx.stroke(); } ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; }
     if (g.white > 0) { ctx.globalAlpha = g.white; ctx.globalCompositeOperation = 'lighter'; ctx.drawImage(dot('#ffffff'), -300, -133 - 300, 600, 600); }

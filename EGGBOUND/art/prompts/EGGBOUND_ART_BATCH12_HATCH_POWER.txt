@@ -1,0 +1,126 @@
+=====================================================================
+EGGBOUND — ART BATCH 12 : HATCH POWER-UP EFFECTS (เอฟเฟ็คปลุกพลังตอนฟักไข่ระดับสูง)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ใช้ตอนฟักมอนระดับมหากาพย์/ตำนาน: เสา 4 ต้นรวมพลังหมุนวน → ยิงพลังใส่ไข่ → ไข่มีออร่าพลังลุกโชน + สายฟ้า + ลำแสงพุ่งขึ้น → ตูม
+  (ตอนนี้เกมวาดด้วยโค้ดไปก่อนแล้ว ภาพชุดนี้จะมาแทนให้สวยขึ้น ใส่แล้วเกมใช้เองอัตโนมัติ)
+- เปิดแชทใหม่ใน ChatGPT 1 แชท · แนบ: ไฟล์นี้ + fx_burst.png และ fx_rays.png จากชุด 06-C (ให้เห็นสไตล์แสงที่ผ่านแล้ว)
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ก่อนตอบ "OK"
+- เหมือนชุด 06-C/09: พื้นดำสนิท + แสงขาวเทาล้วน โค้ดจะย้อมสีตามระดับ (ม่วง/ทอง/รุ้ง) แล้วซ้อนแบบเพิ่มแสง
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the VFX artist for a 2.5D monster RPG. Generate 7 images, ONE IMAGE
+PER TURN, in the order below. They are LIGHT LAYERS for the most exciting
+moment of the game: hatching an epic or legendary monster. Four crystal
+pillars gather power, fire it into the egg, the egg erupts with a roaring
+power-up aura, lightning and shafts of light, then explodes into the monster.
+The game adds these layers with additive blending, tints them, and animates
+them (flicker, scale, rotate, fade).
+
+The mood: a classic shonen-anime power-up — violent, roaring energy that
+blasts upward around a body, crackling electricity, sharp light shafts.
+Make every effect POWERFUL, dynamic and beautiful. ORIGINAL DESIGN — do not
+copy any existing game, anime or film effect or character.
+
+Work order:
+  1. Generate image #01 and wait for my "OK".
+  2. After "OK", generate the rest one by one in the same look.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: high-quality anime game VFX, painterly but clean: hot white cores,
+soft luminous falloff, crisp sharp highlights, strong flowing shapes, clear
+upward motion. Readable at small size on a phone.
+COLOUR: GREYSCALE ONLY — white and greys. NO hue at all. Brightness = light.
+BACKGROUND: PURE BLACK #000000 everywhere outside the effect (exactly 0,0,0).
+NOT transparent, NOT dark blue, NOT a gradient.
+FORBIDDEN: characters, monsters, eggs, objects, faces, ground, scenery,
+text, letters, numbers, logos, frames, watermarks, coloured tints.
+Every effect fades to black at least 30 px before every canvas edge
+(except where stated).
+
+---------------------------------------------------------------------
+2. IMAGES (one per turn)
+---------------------------------------------------------------------
+#01  fx_aura_flame.png
+POWER-UP AURA (wraps around an egg or a monster and blasts upward)
+Canvas 1024 x 1536 (portrait). Imagine an INVISIBLE rounded body standing in
+the lower middle: its bottom at y ≈ 1380, its top at y ≈ 740, about 560 px
+wide, centered at x = 512. Draw a roaring aura of energy flames wrapped
+around that silhouette: brightest along the body's outline, many sharp
+flame tongues bursting UPWARD, the tallest ones above the top of the body
+reaching up to y ≈ 100, side flames leaning slightly outward. The INSIDE of
+the body area stays mostly dark (the body will be drawn there).
+Energetic, spiky, slightly asymmetric — like a power-up aura at full blast.
+
+#02  fx_aura_flame_b.png
+SAME AURA, SECOND FRAME (the game alternates #01 and #02 fast to make it
+roar). Same size, position, overall shape and brightness as #01, but every
+flame tongue in a different position / length — like the next frame of the
+same fire.
+
+#03  fx_light_shaft.png
+LIGHT SHAFT (many shoot up around the egg, each lasting a split second)
+Canvas 256 x 1024 (portrait). One sharp spike of light shooting straight
+up: widest and brightest at the BOTTOM center (128, 1000) — about 60 px
+wide there — tapering to a needle-thin point near the top (y ≈ 40), a hot
+white core line, soft glow around it. The bottom may touch the bottom edge.
+
+#04  fx_energy_beam.png
+ENERGY BEAM (each crystal pillar fires one into the egg)
+Canvas 1024 x 256. A powerful horizontal beam of energy running from the
+LEFT edge to the RIGHT edge (it may touch both side edges), centered on
+y = 128: a hot white core about 24 px thick, a brighter outer sheath with
+twisting energy streaks and small crackles along it, soft glow fading out
+before the top and bottom edges.
+
+#05  fx_vortex_spiral.png
+GATHERING VORTEX (light spiralling up around each crystal pillar while it
+charges)
+Canvas 512 x 1024 (portrait). Two or three ribbons of light spiralling
+upward around an invisible vertical pillar in the centre (x = 256), seen
+slightly from above so the loops look like tilted ellipses: wide loops at
+the bottom (≈ 380 px wide at y ≈ 900), narrowing toward the top (≈ 160 px
+at y ≈ 120), with small sparks and glowing dots along the ribbons.
+
+#06  fx_arc_ring.png
+ELECTRIC SHEATH (crackling electricity wrapped around the egg)
+Canvas 1024 x 1024. Jagged branching lightning arcs forming a rough ring
+around an EMPTY round centre (empty radius ≈ 330 px, arcs between radius
+≈ 340 and 470 px), the arcs crawling around the ring with small branches
+and bright contact sparks. The centre stays black.
+
+#07  fx_aura_burst_ground.png
+GROUND ERUPTION (lies flat on the floor under the egg, seen from above)
+Canvas 1024 x 1024, seen from DIRECTLY ABOVE (code squashes it into the
+floor perspective). A bright round impact core in the centre with a ring
+of jagged energy spikes and cracks radiating outward, small flying light
+fragments, fading out before the edges.
+
+---------------------------------------------------------------------
+QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] Background is PURE BLACK #000000 (not transparent, not dark blue)
+  [ ] Greyscale only — no colour anywhere
+  [ ] Canvas sizes exactly as listed; nothing touches the edges unless stated
+  [ ] #01/#02: same position and overall size; the body area inside is dark
+  [ ] #06: centre is empty black
+  [ ] No faces, no characters, no objects, no text
+
+---------------------------------------------------------------------
+PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_HATCH_POWER.zip
+Exact file names (lowercase, PNG):
+  fx_aura_flame.png       fx_aura_flame_b.png
+  fx_light_shaft.png      fx_energy_beam.png
+  fx_vortex_spiral.png    fx_arc_ring.png
+  fx_aura_burst_ground.png
+Add notes.txt listing any image you regenerated and why.
