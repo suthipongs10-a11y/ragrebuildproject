@@ -1,7 +1,7 @@
 // Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
 import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
-import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies } from '../src/game/progression';
+import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
 import { startIncub, incubLeft, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
 
 export function eggTests(): number {
@@ -59,6 +59,14 @@ export function eggTests(): number {
     const slot = skillUp(s, 1, 60, () => 0); ok(slot === 0 && monOf(s, 1)!.sk[0] === 2 && !monOf(s, 60), 'copy eaten, +1 skill');
     ok(skillUp(s, 1, null) === -1, 'no soul crystal'); s.items.soul = 1; ok(skillUp(s, 1, null, () => .99) === 2 && s.items.soul === 0, 'soul crystal works');
     const k = SPECIES.A01.skills[2], top = skillAt(k, SKILL_MAX[2], 2); ok(top.mult > k.mult && top.cd === k.cd - 1, 'max skill: more damage, -1 cooldown'); }
+
+  // power-up: food gives EXP by level/stars, stops at the level cap, food consumed and gold paid
+  { const s = newSave(); s.gold = 9999; s.mons.push(newMon(80, 'B01', 10, 1), newMon(81, 'A02', 1, 1)); s.team = [1, 80];
+    const v = feedValue(s.mons.find(m => m.uid === 80)!); ok(v > feedValue(s.mons.find(m => m.uid === 81)!), 'higher-level food gives more EXP');
+    ok(!feedPreview(s, 1, []).ok && !feedPreview(s, 1, [1]).ok, 'needs valid food');
+    const r = feed(s, 1, [80, 81])!; const t = s.mons.find(m => m.uid === 1)!;
+    ok(!!r && t.lvl === r.toLvl && t.lvl > 5 && !s.mons.some(m => m.uid === 80 || m.uid === 81) && s.team.join() === '1' && s.gold === 9999 - 110, 'feed levels up, eats food, pays gold');
+    t.lvl = 15; ok(!feedPreview(s, 1, [2]).ok, 'max level cannot be fed'); }
 
   // team rule: one per species; a saved team holding two copies is cleaned on load
   { const s = newSave(); s.mons.push(newMon(70, 'A01')); ok(teamHasSpecies(s, 'A01') && !teamHasSpecies(s, 'A05') && !teamHasSpecies(s, 'A01', 1), 'team species check');

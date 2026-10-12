@@ -1,5 +1,5 @@
 // Rewards, levels, fragments, eggs, evolution (star-ups) and skill-ups.
-import { STAGES, SPECIES, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, MAX_STARS, EVO_GOLD, SKILL_MAX, EGG_LOOT_GRADE, LOOT_ORDER } from '../core/data';
+import { STAGES, SPECIES, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, MAX_STARS, EVO_GOLD, SKILL_MAX, FEED_MAX, FEED_K, FEED_BASE, FEED_GOLD, cumExp, EGG_LOOT_GRADE, LOOT_ORDER } from '../core/data';
 import type { EggTier, LootGrade } from '../core/data';
 import type { Rarity } from '../core/types';
 import type { SaveData, EggSave, MonSave } from './save';
@@ -113,6 +113,26 @@ export function evolve(s: SaveData, uid: number, food: number[]): MonSave | null
   const t = monOf(s, uid)!; s.gold -= EVO_GOLD[t.stars];
   s.mons = s.mons.filter(m => !food.includes(m.uid)); s.team = s.team.filter(u => !food.includes(u));
   t.stars++; t.lvl = 1; t.exp = 0; return t;
+}
+/** EXP a food monster gives (by its level and stars) */
+export const feedValue = (m: MonSave) => Math.round(FEED_K * cumExp(m.lvl) + FEED_BASE * m.stars * m.stars);
+export type FeedPreview = { ok: boolean; gain: number; gold: number; toLvl: number; toExp: number; wasted: number; why?: string };
+/** what feeding these food uids to `uid` would do (level-ups stop at the star's level cap; the rest is wasted) */
+export function feedPreview(s: SaveData, uid: number, food: number[]): FeedPreview {
+  const t = monOf(s, uid), fs = food.map(u => monOf(s, u));
+  if (!t) return { ok: false, gain: 0, gold: 0, toLvl: 0, toExp: 0, wasted: 0, why: 'ไม่พบมอน' };
+  const gain = fs.reduce((a, f) => a + (f ? feedValue(f) : 0), 0), gold = fs.reduce((a, f) => a + (f ? f.lvl * FEED_GOLD : 0), 0), cap = levelCap(t.stars);
+  let lvl = t.lvl, exp = t.exp + gain;
+  while (lvl < cap && exp >= expToNext(lvl)) { exp -= expToNext(lvl); lvl++; }
+  const wasted = lvl >= cap ? exp : 0; if (lvl >= cap) exp = 0;
+  const why = t.lvl >= cap ? 'เลเวลเต็มแล้ว (อัปดาวก่อน)' : !food.length ? 'เลือกมอนที่จะป้อน' : food.length > FEED_MAX ? `ได้สูงสุด ${FEED_MAX} ตัว` : fs.some(f => !f || f.uid === uid) ? 'เลือกไม่ถูกต้อง' : s.gold < gold ? 'ทองไม่พอ' : undefined;
+  return { ok: !why, gain, gold, toLvl: lvl, toExp: exp, wasted, why };
+}
+/** power-up: food monsters are consumed (and leave the team), the target gains their EXP */
+export function feed(s: SaveData, uid: number, food: number[]): FeedPreview | null {
+  const p = feedPreview(s, uid, food); if (!p.ok) return null;
+  const t = monOf(s, uid)!; s.gold -= p.gold; s.mons = s.mons.filter(m => !food.includes(m.uid)); s.team = s.team.filter(u => !food.includes(u));
+  t.lvl = p.toLvl; t.exp = p.toExp; return p;
 }
 export const skillMaxed = (m: MonSave) => m.sk.every((l, i) => l >= SKILL_MAX[i]);
 /** feed a copy of the same species (or a soul crystal when food is null): +1 to a random non-maxed skill. Returns the skill slot. */

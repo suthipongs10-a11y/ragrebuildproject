@@ -228,6 +228,10 @@ export function spdAt(base: number, lvl: number, stars: number): number {
   return base + (stars - 1) * 3 + Math.floor(lvl / 10);
 }
 export const expToNext = (lvl: number) => 40 + lvl * 25;
+// Power-up (เพิ่มเลเวล): feed up to FEED_MAX unwanted monsters; each gives EXP by its level and stars:
+// FEED_K × (EXP it took to reach its level) + FEED_BASE × stars². Costs FEED_GOLD per food level.
+export const FEED_MAX = 5, FEED_K = 0.8, FEED_BASE = 60, FEED_GOLD = 10;
+export const cumExp = (lvl: number) => 40 * (lvl - 1) + 25 * (lvl - 1) * lvl / 2; // total EXP from Lv1 to lvl
 // Evolution (อัปดาว): a max-level monster + `stars` food monsters of the same star grade (any species, any level) + gold.
 export const EVO_GOLD = [0, 300, 1000, 3000, 8000, 20000]; // by current stars
 // Skill levels: feeding a copy of the same species = +1 to a random skill that isn't maxed (a soul crystal works on anyone).

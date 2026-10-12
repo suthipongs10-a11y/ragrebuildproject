@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
-import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP } from './core/data';
+import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX } from './core/data';
 import { Battle } from './core/battle';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
@@ -11,7 +11,7 @@ import { HomeView } from './render/homeView';
 import { showChest } from './render/chestView';
 import { home, BDEF, upgrade, upgradeCost, maxLevelNow, mineStored, mineCap, collectMine, MINE_RATE, MINE_CAP_MIN, TURTLE_SCALE, CASTLE_COST, BUILDINGS, ELEMS, shrineCost, shrineUp, shrineMax, SHRINE_ATK, SHRINE_REACT, RELICS, buyRelic, equipRelic, homeMods, unlocked, needsIncub, incubSlots, incubOf, incubMs, startIncub, canHatch, HATCH_SPEED } from './game/home';
 import { loadSave, writeSave, resetSave, newMon } from './game/save';
-import { grantRewards, stageUnlocked, craftEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg, lootOf, monOf, copiesOf, teamHasSpecies, evoCheck, evolve, skillUp, skillMaxed } from './game/progression';
+import { grantRewards, stageUnlocked, craftEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg, lootOf, monOf, copiesOf, teamHasSpecies, feedPreview, feed, feedValue, evoCheck, evolve, skillUp, skillMaxed } from './game/progression';
 import { EvolveView } from './render/evolveView';
 
 const $ = s => document.querySelector(s);
@@ -115,7 +115,7 @@ function monsHTML() {
   <div class="detail"><span class="big"><img src="${portrait(look(m))}" alt=""></span><div style="min-width:0"><h3>${esc(s.name)}</h3><div class="row" style="gap:6px;flex:0 0 auto;margin:6px 0"><span class="chip">${elDot(s.elem)} ${ELEM_NAME[s.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}${m.rare ? '<span class="chip rfc">✦ ร่างหายาก</span>' : ''}</div>
   <div class="stars">${starStr(m.stars)}</div><div class="note">Lv.${m.lvl} / ${cap}${m.lvl >= cap ? ' · <b style="color:var(--gold)">เลเวลเต็ม</b>' : ` · EXP ${m.exp}/${expToNext(m.lvl)}`}</div><div class="bar" style="margin-top:4px"><i style="transform:scaleX(${m.lvl >= cap ? 1 : m.exp / expToNext(m.lvl)})"></i></div>
   <div class="stat"><div>HP<b>${st.hp}</b></div><div>ATK<b>${st.atk}</b></div><div>DEF<b>${st.def}</b></div><div>SPD<b>${st.spd}</b></div></div>
-  <div class="row grow" style="margin-top:8px"><button class="${monMode === 'evo' ? 'go' : 'alt'}" type="button" data-mm="evo" ${m.stars >= MAX_STARS ? 'disabled' : ''}>★ อัปดาว</button><button class="${monMode === 'skill' ? 'go' : 'alt'}" type="button" data-mm="skill">อัปสกิล${copies > 0 ? ` (${copies})` : ''}</button></div></div>
+  <div class="row grow" style="margin-top:8px"><button class="${monMode === 'feed' ? 'go' : 'alt'}" type="button" data-mm="feed">⬆ เลเวล</button><button class="${monMode === 'evo' ? 'go' : 'alt'}" type="button" data-mm="evo" ${m.stars >= MAX_STARS ? 'disabled' : ''}>★ อัปดาว</button><button class="${monMode === 'skill' ? 'go' : 'alt'}" type="button" data-mm="skill">อัปสกิล${copies > 0 ? ` (${copies})` : ''}</button></div></div>
   ${monMode ? growHTML(m) : ''}
   <div class="skl">${s.skills.map((k, i) => `<div><b>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)} · ${esc(k.name)} ${skLv(m, i)}</b>${esc(k.desc)}${k.cd ? `<em>คูลดาวน์ ${k.cd - (m.sk[i] >= SKILL_MAX[i] && k.cd > 2 ? 1 : 0)}</em>` : ''}${m.sk[i] > 1 ? `<em>พลัง +${Math.round((m.sk[i] - 1) * SKILL_STEP * 100)}%</em>` : ''}</div>`).join('')}${s.leader ? `<div><b>ผู้นำ</b>${esc(s.leader.text)}</div>` : ''}
   <div><b>เศษไข่</b>${fr}/${FRAGS_TO_CRAFT} <div class="bar fr" style="margin-top:6px"><i style="transform:scaleX(${Math.min(1, fr / FRAGS_TO_CRAFT)})"></i></div></div></div></div>
@@ -123,6 +123,14 @@ function monsHTML() {
 }
 /** evolution / skill-up panel: pick food monsters from the grid below */
 function growHTML(m) {
+  if (monMode === 'feed') {
+    const p = feedPreview(S, m.uid, food), cap = levelCap(m.stars);
+    return `<div class="grow-p"><h4>เพิ่มเลเวล (ป้อนมอน)</h4>
+    <div class="req"><span class="${food.length ? 'ok' : ''}">อาหาร ${food.length}/${FEED_MAX}</span><span class="ok">EXP +${p.gain.toLocaleString()}</span><span class="${S.gold >= p.gold ? 'ok' : ''}">ทอง ${p.gold.toLocaleString()}</span></div>
+    <p class="note">แตะมอนที่ไม่ใช้ด้านล่าง (สูงสุด ${FEED_MAX} ตัว) · ตัวที่เลเวล/ดาวสูงให้ EXP มากกว่า · อาหารจะหายไป</p>
+    <div class="cmp">Lv.${m.lvl} → <b>Lv.${p.toLvl}</b> / ${cap}${p.wasted ? ` · <span style="color:#ffb3a8">EXP เกินเพดาน ${p.wasted.toLocaleString()} จะหายไป</span>` : ''}</div>
+    <div class="row"><button class="go" type="button" data-feed="go" ${p.ok ? '' : 'disabled'}>${p.ok ? 'ป้อนเลย!' : esc(p.why)}</button><button class="alt" type="button" data-mm="close">ปิด</button></div></div>`;
+  }
   if (monMode === 'evo') {
     const c = evoCheck(S, m.uid, food), cap = levelCap(m.stars), now = stats(m, m.stars, cap);
     return `<div class="grow-p"><h4>อัปดาว ★${m.stars} → ★${m.stars + 1}</h4>
@@ -334,6 +342,7 @@ function pickMon(uid) {
   sfx.click(); const m = monOf(S, selMon);
   if (monMode === 'evo' && uid !== selMon) { const f = monOf(S, uid); if (f.stars !== m.stars) return; const i = food.indexOf(uid); if (i >= 0) food.splice(i, 1); else if (food.length < m.stars) food.push(uid); render(); return; }
   if (monMode === 'skill' && uid !== selMon && monOf(S, uid).sid === m.sid) { food = [uid]; render(); return; }
+  if (monMode === 'feed' && uid !== selMon) { const i = food.indexOf(uid); if (i >= 0) food.splice(i, 1); else if (food.length < FEED_MAX) food.push(uid); render(); return; }
   selMon = uid; monMode = null; food = []; render();
 }
 let evo = null;
@@ -402,6 +411,7 @@ document.addEventListener('click', e => {
   else if (d.dex !== undefined && cur === 'mons') { sfx.click(); dexSel = d.dex || null; render(); if (dexSel) document.querySelector('.dexd')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
   else if (d.mm) { sfx.click(); monMode = d.mm === 'close' || monMode === d.mm ? null : d.mm; food = []; skFlash = -1; render(); }
   else if (d.evo === 'go') { startEvolve(selMon, [...food]); }
+  else if (d.feed === 'go') { const m = monOf(S, selMon), from = m.lvl, r = feed(S, selMon, [...food]); if (r) { save(); food = []; sfx.starup(); toast(r.toLvl > from ? `เลเวลอัป! Lv.${from} → Lv.${r.toLvl}` : `EXP +${r.gain.toLocaleString()}`); render(); } }
   else if (d.sku) { const slot = skillUp(S, selMon, d.sku === 'soul' ? null : +d.sku); if (slot >= 0) { save(); sfx.starup(); skFlash = slot; food = []; render(); setTimeout(() => { skFlash = -1; }, 50); } }
   else if (d.egg) { sfx.click(); startHatch(+d.egg); }
   else if (d.incub) { if (startIncub(S, +d.incub)) { save(); sfx.chime(); render(); } }
