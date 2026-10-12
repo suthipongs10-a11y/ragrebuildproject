@@ -1,7 +1,7 @@
 // Egg system checks (P1 M0): mystery tiers + pity, incubation slots, hatch stars / overflow, rare form, save migration.
 import { EGG_DROP, EGG_TIERS, SPECIES } from '../src/core/data';
 import { newSave, loadSave } from '../src/game/save';
-import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT } from '../src/game/progression';
+import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf } from '../src/game/progression';
 import { startIncub, incubLeft, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
 
 export function eggTests(): number {
@@ -46,6 +46,12 @@ export function eggTests(): number {
 
   // first clear always drops a mystery egg
   { const s = newSave(); const r = grantRewards(s, '1-1', true, 3, ['A02', 'A06'], 7); ok(r.eggs.length === 1 && r.eggs[0].kind === 'mystery', 'first clear drops a mystery egg'); }
+
+  // chest: grade = best item, best item last
+  { const base = { win: true, stars: 3, firstClear: false, gold: 300, gains: [], frags: { A02: 1 }, eggs: [] as any[] };
+    ok(lootOf(base).grade === 'common' && lootOf(base).items.length === 2, 'chest common without eggs');
+    const L = lootOf({ ...base, eggs: [{ id: 1, sid: 'A01', kind: 'mystery', tier: 'rainbow' }, { id: 2, sid: 'A02', kind: 'mystery', tier: 'silver' }] });
+    ok(L.grade === 'legendary' && L.items[L.items.length - 1].kind === 'egg' && L.items[0].kind === 'gold', 'chest legendary, best last'); }
 
   // named craft
   { const s = newSave(); s.frags.A02 = FRAGS_TO_CRAFT; ok(craftEgg(s, 'A02', () => 0) && s.eggs[s.eggs.length - 1].kind === 'named' && s.eggs[s.eggs.length - 1].rare === true, 'craft named egg (rare roll)'); }

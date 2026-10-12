@@ -7,6 +7,19 @@ import { E, SQ, lerp, rnd, clamp, easeOut, easeBack, run, tween, addP, burst, ri
 
 const PED = { x: 0, y: -40 }, EGGK = .42;
 const PRISM = ['#ff6b6b', '#ffb84d', '#ffe66b', '#6bdc8a', '#5bb8ff', '#a98bff'];
+// 4 floating crystal obelisks around the altar: [x, y offset from the pedestal, phase] — two behind, two in front at the sides
+const CRYSTALS = [[-178, -72, 0], [178, -72, 1.7], [-196, 52, 3.1], [196, 52, 4.4]];
+const IDLE_COL = '#7fe8ff', GOLD = ['#fff0b8', '#e8b84a', '#8a5a14'];
+const colC = {};
+/** soft light column sprite (fades at the sides and toward the top), cached per colour */
+function column(c) {
+  if (colC[c]) return colC[c];
+  const cv = mk(64, 256), x = cv.getContext('2d'); let g = x.createLinearGradient(0, 0, 64, 0);
+  g.addColorStop(0, c + '00'); g.addColorStop(.5, c + 'aa'); g.addColorStop(1, c + '00'); x.fillStyle = g; x.fillRect(0, 0, 64, 256);
+  x.globalCompositeOperation = 'destination-in'; g = x.createLinearGradient(0, 0, 0, 256); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,1)'); x.fillStyle = g; x.fillRect(0, 0, 64, 256);
+  return (colC[c] = cv);
+}
+const RUNES = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ'];
 export class HatchView {
   sid; P; EP; egg; mon; phase = 'ready'; rays = 0; onDone = null; dup = false; newStars = 1; eggSrc = null; tier = null; rare = false; revealed = false;
   constructor(sid, opts) {
@@ -62,19 +75,69 @@ export class HatchView {
   }
   render() {
     const ctx = E.ctx; worldTransform(); drawGround(); drawDecals(); drawLanternPools();
-    const ents = [{ y: PED.y, d: () => this.drawPedestal() }, { y: PED.y + .5, d: () => this.drawEgg() }, { y: PED.y + 1, d: () => this.drawMon() }];
+    const ents = [{ y: PED.y - 1, d: () => this.drawRuneCircle() }, { y: PED.y, d: () => this.drawPedestal() }, { y: PED.y + .5, d: () => this.drawEgg() }, { y: PED.y + 1, d: () => this.drawMon() }];
+    for (const c of CRYSTALS) ents.push({ y: PED.y + c[1], d: () => this.drawCrystal(c) });
+    ents.push({ y: PED.y + .7, d: () => this.drawBeams() });
     for (const L of LANTERNS) ents.push({ y: L.y, d: () => drawLantern(L) }); for (const b of BUSHES) ents.push({ y: b.y, d: () => drawBush(b) });
     ents.sort((a, b) => a.y - b.y); for (const e of ents) e.d();
     this.drawRays(); drawParts(); drawFlies(); drawOverlays();
   }
   cyl(x, yB, rx, h, top, side, ry) { const ctx = E.ctx; const g = ctx.createLinearGradient(x - rx, 0, x + rx, 0); g.addColorStop(0, '#5a5246'); g.addColorStop(.35, side); g.addColorStop(1, '#4a4238'); ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(x + rx, yB - h); ctx.lineTo(x + rx, yB); ctx.ellipse(x, yB, rx, ry, 0, 0, Math.PI); ctx.lineTo(x - rx, yB - h); ctx.closePath(); ctx.fill(); ctx.fillStyle = top; ctx.beginPath(); ctx.ellipse(x, yB - h, rx, ry, 0, 0, TAU); ctx.fill(); ctx.strokeStyle = 'rgba(50,40,30,.5)'; ctx.lineWidth = 1.5; ctx.stroke(); }
-  drawPedestal() {
-    const ctx = E.ctx, x = PED.x, y = PED.y, t = E.time, P = this.EP;
-    ctx.fillStyle = 'rgba(15,12,8,.4)'; ctx.beginPath(); ctx.ellipse(x, y + 8, 112, 40, 0, 0, TAU); ctx.fill();
-    this.cyl(x, y, 100, 20, '#a49a86', '#7d7464', 34); this.cyl(x, y - 20, 78, 18, '#b8ae98', '#8b8272', 28);
-    const hatching = this.phase !== 'ready', inten = hatching ? .5 + this.egg.glow * .8 : .45 + .2 * Math.sin(t * 2);
-    ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(x, y - 38); ctx.strokeStyle = hatching ? P.aura : '#5fe0d0'; ctx.globalAlpha = inten; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(0, 0, 64, 24, 0, 0, TAU); ctx.stroke();
-    for (let i = 0; i < 10; i++) { const a = i / 10 * TAU + t * .4; ctx.globalAlpha = inten * (.6 + .4 * Math.sin(t * 3 + i)); ctx.drawImage(dot(hatching ? P.aura : '#5fe0d0'), Math.cos(a) * 64 - 9, Math.sin(a) * 24 - 9, 18, 18); }
+  /** altar colour: teal while idle, the egg's colour while hatching (rainbow eggs cycle) */
+  col(i = 0) { return this.phase === 'ready' ? IDLE_COL : this.tier === 'rainbow' ? PRISM[(Math.floor(E.time * 5) + i) % PRISM.length] : this.EP.aura; }
+  power() { return this.phase === 'ready' ? .45 + .15 * Math.sin(E.time * 2) : clamp(.6 + this.egg.glow * .9 + (this.egg.vis ? 0 : .6), 0, 1.6); }
+  drawRuneCircle() { // big engraved rune circle on the ground, rotating glyph ring
+    const ctx = E.ctx, x = PED.x, y = PED.y + 6, t = E.time, pw = this.power(), c = this.col();
+    ctx.save(); ctx.translate(x, y);
+    ctx.fillStyle = 'rgba(12,10,8,.35)'; ctx.beginPath(); ctx.ellipse(0, 4, 300, 118, 0, 0, TAU); ctx.fill();
+    ctx.globalCompositeOperation = 'lighter';
+    for (const [r, wd, a] of [[285, 3, .55], [250, 1.5, .4], [175, 2, .5]]) { ctx.globalAlpha = a * pw; ctx.strokeStyle = c; ctx.lineWidth = wd; ctx.beginPath(); ctx.ellipse(0, 0, r, r * .39, 0, 0, TAU); ctx.stroke(); }
+    // hexagram between the rings
+    ctx.globalAlpha = .35 * pw; ctx.lineWidth = 1.5; for (let k = 0; k < 2; k++) { ctx.beginPath(); for (let i = 0; i <= 3; i++) { const a = (i / 3) * TAU + k * Math.PI / 3 - t * .15; ctx.lineTo(Math.cos(a) * 245, Math.sin(a) * 245 * .39); } ctx.stroke(); }
+    // rotating runes
+    ctx.font = '600 22px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = c;
+    for (let i = 0; i < 12; i++) { const a = i / 12 * TAU + t * .25, px = Math.cos(a) * 268, py = Math.sin(a) * 268 * .39; ctx.globalAlpha = pw * (.55 + .45 * Math.sin(t * 3 + i)); ctx.save(); ctx.translate(px, py); ctx.scale(1, .55); ctx.fillText(RUNES[i], 0, 0); ctx.restore(); }
+    ctx.restore();
+  }
+  drawPedestal() { // three-tier carved altar with gold trim and a glowing core gem
+    const ctx = E.ctx, x = PED.x, y = PED.y, t = E.time, c = this.col(), pw = this.power();
+    this.cyl(x, y, 150, 16, '#b5ab96', '#857b6a', 54); this.trim(x, y - 16, 150, 54);
+    this.cyl(x, y - 16, 114, 14, '#c6bca6', '#91877a', 41); this.trim(x, y - 30, 114, 41);
+    this.cyl(x, y - 30, 86, 8, '#d6ccb6', '#9d9384', 31); this.trim(x, y - 38, 86, 31);
+    // carved front panels on the base tier + glowing gems
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    for (const gx of [-90, 0, 90]) { const gy = y + 2 - Math.abs(gx) * .12 - 6, big = gx === 0; ctx.globalAlpha = Math.min(1, pw) * (big ? 1 : .7); ctx.drawImage(dot(c), gx - (big ? 22 : 14), gy - (big ? 22 : 14), big ? 44 : 28, big ? 44 : 28); }
+    ctx.restore();
+    ctx.fillStyle = GOLD[1]; for (const gx of [-90, 0, 90]) { const gy = y + 2 - Math.abs(gx) * .12 - 6, r = gx === 0 ? 7 : 4.5; ctx.beginPath(); ctx.moveTo(gx, gy - r * 1.6); ctx.lineTo(gx + r, gy); ctx.lineTo(gx, gy + r * 1.6); ctx.lineTo(gx - r, gy); ctx.closePath(); ctx.fill(); ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(gx - r * .2, gy - r * .4, r * .3, 0, TAU); ctx.fill(); ctx.fillStyle = GOLD[1]; }
+    // glowing ring on the top tier under the egg
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(x, y - 38); ctx.strokeStyle = c; ctx.globalAlpha = Math.min(1, pw); ctx.lineWidth = 2.5; ctx.beginPath(); ctx.ellipse(0, 0, 64, 23, 0, 0, TAU); ctx.stroke();
+    for (let i = 0; i < 10; i++) { const a = i / 10 * TAU + t * .5; ctx.globalAlpha = Math.min(1, pw) * (.6 + .4 * Math.sin(t * 3 + i)); ctx.drawImage(dot(this.col(i)), Math.cos(a) * 64 - 9, Math.sin(a) * 23 - 9, 18, 18); }
+    ctx.restore();
+    // halo: light column + tilted spinning rings around the egg
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = Math.min(1, pw * .85); ctx.drawImage(column(c), x - 90, y - 440, 180, 404);
+    for (const [ry, sp, rr] of [[-110, .9, 92], [-160, -1.3, 72]]) { ctx.save(); ctx.translate(x, y + ry); ctx.rotate(Math.sin(t * .7) * .15); ctx.globalAlpha = Math.min(1, pw) * .55; ctx.strokeStyle = c; ctx.lineWidth = 2; ctx.setLineDash([14, 10]); ctx.lineDashOffset = t * 40 * sp; ctx.beginPath(); ctx.ellipse(0, 0, rr, rr * .28, 0, 0, TAU); ctx.stroke(); ctx.restore(); }
+    ctx.restore();
+    // rising motes
+    if (Math.random() < .25 + pw * .4) { const a = Math.random() * TAU, r = rnd(40, 250); addP({ x: x + Math.cos(a) * r, y: y + Math.sin(a) * r * .39, z: 0, vz: rnd(40, 110), life: rnd(1, 1.8), size: rnd(5, 10), size2: 0, color: this.col() }); }
+  }
+  trim(x, yT, rx, ry) { const ctx = E.ctx; ctx.strokeStyle = GOLD[1]; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(x, yT, rx - 2, ry - 1, 0, 0, Math.PI); ctx.stroke(); ctx.strokeStyle = 'rgba(255,240,190,.55)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(x, yT - 1, rx - 6, ry - 3, 0, Math.PI * 1.05, Math.PI * 1.95); ctx.stroke(); }
+  drawCrystal([cx, oy, ph]) { // floating crystal obelisk on a small carved stand
+    const ctx = E.ctx, t = E.time, y = PED.y + oy, c = this.col(ph | 0), pw = this.power(), bob = Math.sin(t * 1.6 + ph) * 6, hy = y - 70 + bob;
+    ctx.fillStyle = 'rgba(12,10,8,.35)'; ctx.beginPath(); ctx.ellipse(cx, y + 3, 30, 11, 0, 0, TAU); ctx.fill();
+    this.cyl(cx, y, 24, 22, '#c6bca6', '#8d8372', 9); ctx.strokeStyle = GOLD[1]; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(cx, y - 22, 23, 8, 0, 0, Math.PI); ctx.stroke();
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, pw); ctx.drawImage(dot(c), cx - 46, hy - 50, 92, 92); ctx.restore();
+    ctx.save(); ctx.translate(cx, hy); ctx.rotate(Math.sin(t * .8 + ph) * .06);
+    const g = ctx.createLinearGradient(-14, -48, 14, 30); g.addColorStop(0, '#ffffff'); g.addColorStop(.35, c); g.addColorStop(1, '#1d2a40');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, -48); ctx.lineTo(14, -18); ctx.lineTo(11, 22); ctx.lineTo(0, 32); ctx.lineTo(-11, 22); ctx.lineTo(-14, -18); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,.45)'; ctx.beginPath(); ctx.moveTo(0, -48); ctx.lineTo(-14, -18); ctx.lineTo(-3, 18); ctx.lineTo(0, -10); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+  drawBeams() { // energy streams from the crystals into the egg while it hatches
+    if (this.phase === 'ready' || !this.egg.vis) return; const ctx = E.ctx, t = E.time, k = clamp(this.egg.glow, 0, 1), ex = this.egg.x, ey = this.egg.y - 55;
+    ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
+    CRYSTALS.forEach(([cx, oy, ph], i) => { const sx = cx, sy = PED.y + oy - 70 + Math.sin(t * 1.6 + ph) * 6, mx = (sx + ex) / 2, my = Math.min(sy, ey) - 60; const c = this.col(i);
+      for (const [w, a] of [[9, .25], [3, .9]]) { ctx.globalAlpha = k * a * (.7 + .3 * Math.sin(t * 20 + i)); ctx.strokeStyle = w > 4 ? c : '#ffffff'; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.quadraticCurveTo(mx + Math.sin(t * 9 + i) * 20, my, ex, ey); ctx.stroke(); } });
     ctx.restore();
   }
   drawEgg() {

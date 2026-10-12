@@ -1,6 +1,6 @@
 // Rewards, levels, fragments, eggs, star-ups.
-import { STAGES, SPECIES, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, DUP_OVERFLOW_GOLD } from '../core/data';
-import type { EggTier } from '../core/data';
+import { STAGES, SPECIES, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, DUP_OVERFLOW_GOLD, EGG_LOOT_GRADE, LOOT_ORDER } from '../core/data';
+import type { EggTier, LootGrade } from '../core/data';
 import type { Rarity } from '../core/types';
 import type { SaveData, EggSave } from './save';
 import { canHatch, endIncub } from './home';
@@ -92,4 +92,19 @@ export function hatchEgg(s: SaveData, eggId: number, now = Date.now()): HatchRes
   m.stars = to; s.gold += gold;
   const rareNew = rare && !m.rare; if (rare) m.rare = true;
   return { sid, egg, dup: true, before, stars: to, gold, rare, rareNew };
+}
+
+// ---- stage-end chest contents ----
+export type LootItem = { kind: 'gold'; grade: LootGrade; qty: number; first: boolean }
+  | { kind: 'frag'; grade: LootGrade; qty: number; sid: string }
+  | { kind: 'egg'; grade: LootGrade; egg: EggSave };
+/** chest items, worst first so the best one pops out last; chest grade = the best item's grade */
+export function lootOf(r: Reward): { items: LootItem[]; grade: LootGrade } {
+  const items: LootItem[] = [];
+  if (r.gold) items.push({ kind: 'gold', grade: 'common', qty: r.gold, first: r.firstClear });
+  for (const [sid, n] of Object.entries(r.frags)) items.push({ kind: 'frag', grade: 'common', qty: n, sid });
+  for (const egg of r.eggs) items.push({ kind: 'egg', grade: egg.kind === 'mystery' && egg.tier ? EGG_LOOT_GRADE[egg.tier] : 'rare', egg });
+  const rank = (g: LootGrade) => LOOT_ORDER.indexOf(g);
+  items.sort((a, b) => rank(a.grade) - rank(b.grade));
+  return { items, grade: items.length ? items[items.length - 1].grade : 'common' };
 }

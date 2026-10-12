@@ -39,3 +39,14 @@ Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`,
   Code overlays on top: eggs in the nest (tier colour), portal swirl clipped to the gate opening, shrine orbs, floating relic on the altar.
   Import with `tools/import_home.py`; code-drawn art remains as fallback. Build is now ~4.4 MB.
 - Monsters walking on the turtle are half size (`MON_SCALE` .27 → .135 in `homeView.ts`), up to 16 shown (was 8).
+
+## Stage-end treasure chest
+- Win → chest drops in (boss stage = red/gold chest) → tap → shakes while light leaks from the seam, stepping white → blue → purple → gold
+  up to the real grade → bursts open (rays, light pillar, coins) → items fly out one by one, best last → "ต่อไป" → result card.
+- Grade = best item (`lootOf` in progression.ts, colours `LOOT_GRADES` in data.ts): gold/shards = white · common/silver egg = blue ·
+  gold egg = purple · rainbow egg = gold + rainbow. Monster cards (M4) will be legendary.
+- Settings → test buttons preview each chest colour (prototype only).
+
+## Hatching altar
+- Code-drawn: 3-tier gold-trimmed altar, rotating rune circle, 4 floating crystal obelisks, soft light column + spinning rings,
+  energy beams from the crystals into the egg while it cracks. Teal while idle; egg colour while hatching (rainbow eggs cycle).

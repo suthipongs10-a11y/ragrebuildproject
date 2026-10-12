@@ -132,6 +132,23 @@ h2.sec{margin:0;font-family:var(--f-display);font-weight:500;font-size:.8rem;let
 .rfp{box-shadow:0 0 0 2px #ff9ad8,0 0 10px rgba(255,154,216,.6)}
 .chip.rfc,.rfnote{background:linear-gradient(90deg,rgba(255,107,107,.25),rgba(107,220,138,.25),rgba(169,139,255,.25));color:#fff;border-color:#ff9ad8}
 .rfnote{margin:0;text-align:center;border:1px solid #ff9ad8;border-radius:10px;padding:4px 8px;font-weight:600}
+.chestfx{position:fixed;inset:0;z-index:45;touch-action:none}
+.chestfx canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.chestfx .ctop{position:absolute;left:0;right:0;top:calc(env(safe-area-inset-top,0px) + 16px);text-align:center;pointer-events:none}
+.chestfx .ctop h2{margin:0;font-family:var(--f-display);font-weight:600;font-size:2.2rem;color:var(--gold);text-shadow:0 0 18px rgba(255,190,80,.6)}
+.chint{position:absolute;left:0;right:0;top:59%;margin:0;text-align:center;font-family:var(--f-display);font-size:1.1rem;color:#fff6e0;text-shadow:0 2px 6px #000;opacity:0;transition:opacity .3s;pointer-events:none}
+.chint.show{opacity:1;animation:pulse 1.2s ease-in-out infinite}.chint.off{opacity:0;animation:none}
+@keyframes pulse{50%{transform:scale(1.08)}}
+.loots{position:absolute;left:50%;top:58%;transform:translateX(-50%);width:min(560px,94vw);display:flex;flex-wrap:wrap;justify-content:center;gap:8px;pointer-events:none}
+.loot{--g:#fff0c8;box-sizing:border-box;width:80px;display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(18,16,12,.88);border:1.5px solid color-mix(in srgb,var(--g) 70%,transparent);border-radius:14px;padding:6px 4px;font-size:.68rem;text-align:center;box-shadow:0 0 14px color-mix(in srgb,var(--g) 45%,transparent)}
+.loot .li{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--g) 45%,transparent),transparent 70%)}
+.loot img{width:44px;height:44px;object-fit:contain}
+.loot b{font-weight:600;line-height:1.2}.loot small{color:var(--ink-dim);font-size:.6rem;line-height:1.2}
+.loot.g-epic,.loot.g-legendary{border-width:2px;animation:lootglow 1.4s ease-in-out infinite}
+.loot.g-legendary{background:linear-gradient(rgba(18,16,12,.92),rgba(18,16,12,.92)) padding-box,linear-gradient(90deg,#ff6b6b,#ffe66b,#6bdc8a,#5bb8ff,#a98bff) border-box;border-color:transparent}
+@keyframes lootglow{50%{box-shadow:0 0 26px var(--g)}}
+.cnext{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);display:flex;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
+.cnext.show{opacity:1;pointer-events:auto}.cnext .go{min-width:180px;font-size:1.05rem}
 .empty{color:var(--ink-faint);font-size:.85rem;background:var(--panel);border:1px dashed var(--line);border-radius:14px;padding:16px;text-align:center}
 
 /* reveal / result */

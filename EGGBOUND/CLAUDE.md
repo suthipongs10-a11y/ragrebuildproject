@@ -53,7 +53,7 @@
 ## 5. โครงโค้ด (`game/`)
 ```
 src/core/      battle-core: TypeScript ล้วน ไม่แตะ DOM — types, rng (mulberry32), data (SPECIES/STAGES/สูตรค่า), battle
-src/render/    engine (canvas, particles, coroutine scripts), battleView, hatchView, assets (sprites/recolor/anchors/portrait), audio (WebAudio synth)
+src/render/    engine (canvas, particles, coroutine scripts), battleView, hatchView (แท่นฟักไข่), chestView (หีบสมบัติจบด่าน), homeView, assets (sprites/recolor/anchors/portrait), audio (WebAudio synth)
 src/game/      save (localStorage, v1), progression (รางวัล/เลเวล/เศษไข่/ไข่ปริศนา/ฟัก), home (บ้านเต่า + ช่องบ่มไข่)
 src/main.ts    app shell: หน้าจอ DOM, input, loop
 src/index.template.html  CSS + โครง HUD (มี /*ASSETS*/ และ /*BUNDLE*/ ให้ build แทนที่)
@@ -63,7 +63,7 @@ tests/sim.ts   ตรวจ determinism + จำลองสมดุลหล�
 ```
 กฎสถาปัตยกรรม:
 - **Battle core deterministic:** seed เดียว + คำสั่งเดียว = ผลเดียว · AI ใช้ RNG แยกต่อทีม (`aiRng`) คำสั่งผู้เล่นจะได้ไม่ทำให้ลูกเต๋าต่อสู้เลื่อน · core ส่ง `ActionResult` + event log ให้ renderer เล่น — renderer ห้ามคำนวณผลเอง (เตรียมให้เซิร์ฟเวอร์ replay ตรวจโกงใน P2)
-- ค่าสมดุลอยู่ใน `data.ts` / config ไม่ฝังใน renderer (ไข่: `EGG_TIERS`, `EGG_DROP`, `NAMED_RARE_FORM` ใน data.ts · `HATCH_SPEED` ใน home.ts)
+- ค่าสมดุลอยู่ใน `data.ts` / config ไม่ฝังใน renderer (ไข่: `EGG_TIERS`, `EGG_DROP`, `NAMED_RARE_FORM` ใน data.ts · `HATCH_SPEED` ใน home.ts · สีหีบสมบัติ: `LOOT_GRADES`, `EGG_LOOT_GRADE` ใน data.ts — การ์ดมอน (M4) ให้เกรด legendary)
 - ทุกการแก้ core ต้องรัน `npm test` ให้ผ่าน determinism
 
 ## 6. คำสั่ง

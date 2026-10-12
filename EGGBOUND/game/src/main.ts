@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
-import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, DUP_OVERFLOW_GOLD } from './core/data';
+import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, DUP_OVERFLOW_GOLD } from './core/data';
 import { Battle } from './core/battle';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
@@ -8,9 +8,10 @@ import { E, initCanvas, toWorld, updScripts, updParts, tickEngine, clearAll, wor
 import { BattleView } from './render/battleView';
 import { HatchView } from './render/hatchView';
 import { HomeView } from './render/homeView';
+import { showChest } from './render/chestView';
 import { home, BDEF, upgrade, upgradeCost, maxLevelNow, mineStored, mineCap, collectMine, MINE_RATE, MINE_CAP_MIN, TURTLE_SCALE, CASTLE_COST, BUILDINGS, ELEMS, shrineCost, shrineUp, shrineMax, SHRINE_ATK, SHRINE_REACT, RELICS, buyRelic, equipRelic, homeMods, unlocked, needsIncub, incubSlots, incubOf, incubMs, startIncub, canHatch, HATCH_SPEED } from './game/home';
 import { loadSave, writeSave, resetSave } from './game/save';
-import { grantRewards, stageUnlocked, craftEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg } from './game/progression';
+import { grantRewards, stageUnlocked, craftEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg, lootOf } from './game/progression';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -128,6 +129,7 @@ function settingsHTML() {
   <div class="set"><span>ข้ามฉากสกิลสุดยอด</span>${seg('skipUlt', [[false, 'ไม่ข้าม'], [true, 'ข้าม']])}</div>
   <div class="set"><span>เริ่มเกมใหม่ (ลบความคืบหน้า)</span>${confirmReset ? `<span class="confirm">ลบจริงไหม? <button class="alt" type="button" data-act="resetYes">ลบ</button><button class="alt" type="button" data-act="resetNo">ยกเลิก</button></span>` : `<button class="alt" type="button" data-act="reset">รีเซ็ต</button>`}</div>
   <div class="set"><span>ทดสอบ (prototype): ไข่ปริศนา</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="eggs">รับไข่ 4 ลาย</button><button class="alt" type="button" data-dev="incub">บ่มเสร็จทันที</button></span></div>
+  <div class="set"><span>ทดสอบ (prototype): หีบสมบัติ</span><span class="row" style="flex:0 0 auto">${['common', 'rare', 'epic', 'legendary'].map(g => `<button class="alt" type="button" data-dev="chest:${g}">${LOOT_GRADES[g].name}</button>`).join('')}</span></div>
   <p class="note">P0 เซฟในเครื่องนี้เท่านั้น · ระบบต่อสู้ทำงานแบบ deterministic (seed เดิม + คำสั่งเดิม = ผลเดิม) เพื่อให้เซิร์ฟเวอร์ตรวจผลได้ในเฟสออนไลน์</p></div></section>`;
 }
 
@@ -220,6 +222,25 @@ function renderOrder() {
 function endBattle(win, stars, seed, b) {
   const seen = []; for (const w of STAGES.find(x => x.id === curStageId).waves) for (const m of w) seen.push(m.sid);
   const r = grantRewards(S, curStageId, win, stars, seen, seed); save();
+  $('#skills').hidden = true;
+  if (!win) { resultModal(r, win, stars); return; }
+  // win: treasure chest first (light colour = best drop), then the result card
+  const st = STAGES.find(x => x.id === curStageId), boss = st.waves.some(w => w.some(m => SPECIES[m.sid]?.boss));
+  const { items, grade } = lootOf(r);
+  const view = items.map(it => it.kind === 'gold' ? { icon: coinURL(), label: `ทอง ${it.qty.toLocaleString()}`, sub: it.first ? 'โบนัสผ่านครั้งแรก' : '', grade: it.grade }
+    : it.kind === 'frag' ? { icon: eggURL(it.sid), label: `เศษไข่ ×${it.qty}`, sub: SPECIES[it.sid].name, grade: it.grade }
+    : { icon: eggURLOf(it.egg), label: eggName(it.egg), sub: it.egg.kind === 'mystery' ? 'ไข่ปริศนา!' : '', grade: it.grade });
+  chestUI = showChest({ items: view, grade, boss, stars, onDone: () => { chestUI = null; resultModal(r, win, stars); } });
+}
+let chestUI = null, coinU = null;
+function coinURL() {
+  if (coinU) return coinU;
+  const c = document.createElement('canvas'); c.width = c.height = 96; const x = c.getContext('2d'), g = x.createRadialGradient(38, 36, 4, 48, 48, 40);
+  g.addColorStop(0, '#fff3c4'); g.addColorStop(.45, '#f2c14e'); g.addColorStop(1, '#a87a1e'); x.fillStyle = g; x.beginPath(); x.arc(48, 48, 38, 0, Math.PI * 2); x.fill();
+  x.strokeStyle = '#8a5a10'; x.lineWidth = 4; x.stroke(); x.fillStyle = '#fff6c8'; x.fillRect(44, 26, 8, 44);
+  return (coinU = c.toDataURL());
+}
+function resultModal(r, win, stars) {
   const idx = STAGES.findIndex(x => x.id === curStageId), next = STAGES[idx + 1];
   const modal = document.createElement('div'); modal.className = 'modal'; modal.id = 'resModal';
   modal.innerHTML = `<div class="card"><h2 class="${win ? '' : 'lose'}">${win ? 'ชนะ!' : 'แพ้'}</h2>${win ? `<div class="bigstars">${[0, 1, 2].map(i => `<span class="${i < stars ? '' : 'off'}" style="animation-delay:${.2 + i * .25}s">★</span>`).join('')}</div>` : '<p class="note" style="text-align:center">ลองเลเวลอัปที่ด่านก่อนหน้า หรือจัดทีมให้มีธาตุที่ได้เปรียบ</p>'}
@@ -228,10 +249,10 @@ function endBattle(win, stars, seed, b) {
   ${Object.keys(r.frags).length || r.eggs.length ? `<div class="drops">${Object.entries(r.frags).map(([sid, n]) => `<span class="drop"><img src="${eggURL(sid)}" alt="">เศษไข่${esc(SPECIES[sid].name)} ×${n}</span>`).join('')}${r.eggs.map(e => `<span class="drop" style="border-color:${TIER_COL[e.tier]}"><img src="${eggURLOf(e)}" alt="">${esc(eggName(e))}!</span>`).join('')}</div>` : ''}
   <div class="row"><button class="go" type="button" data-r="again">เล่นอีกครั้ง</button>${win && next ? `<button class="go" type="button" data-r="next">ด่านถัดไป</button>` : ''}</div>
   <div class="row">${S.eggs.length ? `<button class="alt" type="button" data-r="hatch">ฟักไข่ (${S.eggs.length})</button>` : ''}<button class="alt" type="button" data-r="map">แผนที่</button></div></div>`;
-  document.body.appendChild(modal); $('#skills').hidden = true;
+  document.body.appendChild(modal);
   if (win && stars) sfx.coin();
 }
-function leaveBattle() { battle = null; clearAll(); scene = cur === 'home' && homeV ? homeV : idleScene; $('#resModal')?.remove(); $('#bhud').hidden = true; }
+function leaveBattle() { chestUI?.close(); chestUI = null; battle = null; clearAll(); scene = cur === 'home' && homeV ? homeV : idleScene; $('#resModal')?.remove(); $('#bhud').hidden = true; }
 
 // ---------- hatch ----------
 function startHatch(eggId) {
@@ -256,6 +277,12 @@ function leaveHatch() { hatch = null; clearAll(); scene = idleScene; $('#hatchMo
 function devTool(k) {
   if (k === 'eggs') { for (const t of EGG_TIER_ORDER) { let e; do { e = rollMysteryEgg({ ...S, eggPity: 0 }, Math.random); } while (e.tier !== t); e.id = S.nextEggId++; S.eggs.push(e); } }
   if (k === 'incub') for (const x of home(S).incub) x.end = Date.now();
+  if (k.startsWith('chest:')) { // preview a chest of that grade (no rewards granted)
+    const g = k.slice(6), tier = { rare: 'silver', epic: 'gold', legendary: 'rainbow' }[g];
+    const items = [{ icon: coinURL(), label: 'ทอง 640', sub: 'โบนัสผ่านครั้งแรก', grade: 'common' }, ...['A02', 'A06', 'A03'].map(sid => ({ icon: eggURL(sid), label: 'เศษไข่ ×1', sub: SPECIES[sid].name, grade: 'common' }))];
+    if (tier) items.push({ icon: eggURLOf({ kind: 'mystery', tier }), label: 'ไข่ปริศนา' + EGG_TIERS[tier].name, sub: 'ไข่ปริศนา!', grade: g });
+    chestUI = showChest({ items, grade: g, boss: g === 'legendary', stars: 3, onDone: () => { chestUI = null; } }); return;
+  }
   save(); sfx.chime(); show('hatch');
 }
 /** live incubation timers: any element with data-start/data-end; re-render when one finishes */
@@ -335,6 +362,6 @@ function frame(now) {
     initCanvas($('#game'));
     $('#loading').hidden = true; render(); requestAnimationFrame(frame);
     (window as any).__w2s = id => { const [x, y] = homeV.bPos(BDEF[id]); const z = E.base * E.zoom; return [(x - E.cam.x) * z + E.W / 2, (y - 30 * homeV.scaleShow - E.cam.y) * z + E.H / 2]; };
-    (window as any).__eb = { get S() { return S; }, get battle() { return battle; }, get hatch() { return hatch; }, startBattle, startHatch, show, devTool, get homeV() { return homeV; }, selectB(id) { homeV.sel = id; selB = id; renderPanel(); } };
+    (window as any).__eb = { get S() { return S; }, get battle() { return battle; }, get hatch() { return hatch; }, startBattle, startHatch, show, devTool, get homeV() { return homeV; }, get chest() { return chestUI; }, selectB(id) { homeV.sel = id; selB = id; renderPanel(); } };
   } catch (err) { $('#loading').textContent = 'โหลดไม่สำเร็จ: ' + err.message; console.error(err); }
 })();

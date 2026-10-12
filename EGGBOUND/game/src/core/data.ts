@@ -133,3 +133,14 @@ export const EGG_DROP = { chance: 0.3, bossChance: 0.6, tierW: { common: 68, sil
 /** named egg (crafted from fragments): species known, small chance of the rare form (special colour/aura, +1 trait slot later) */
 export const NAMED_RARE_FORM = 0.04;
 export const DUP_OVERFLOW_GOLD = 500;
+
+// ---- stage-end treasure chest: light colour = best item inside ----
+export type LootGrade = 'common' | 'rare' | 'epic' | 'legendary';
+export const LOOT_ORDER: LootGrade[] = ['common', 'rare', 'epic', 'legendary'];
+export const LOOT_GRADES: Record<LootGrade, { name: string; col: string }> = {
+  common: { name: 'ธรรมดา', col: '#fff0c8' },     // warm white — gold / egg shards only
+  rare: { name: 'หายาก', col: '#5fb8ff' },        // blue — plain or silver mystery egg
+  epic: { name: 'มหากาพย์', col: '#c27bff' },     // purple — gold mystery egg
+  legendary: { name: 'ตำนาน', col: '#ffcf4a' },   // gold + rainbow — rainbow egg (monster cards in M4 go here too)
+};
+export const EGG_LOOT_GRADE: Record<EggTier, LootGrade> = { common: 'rare', silver: 'rare', gold: 'epic', rainbow: 'legendary' };
