@@ -26,7 +26,7 @@ Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`,
 - Hatchery: slots = level (1–3, as in the P0 home code; GAME_CONFIG_v2 says incubator 3→6 — pick one with the owner), speed ×1 / ×0.8 / ×0.65 (`HATCH_SPEED` in `src/game/home.ts`). End time is fixed when the egg goes in.
   The nest on the turtle shows incubating eggs in their tier colour, pulsing when ready. Live timers on the egg screen + hatchery panel.
 - Odds + pity counter disclosed on the egg screen ("อัตราไข่ปริศนา และการันตี").
-- Mystery shells are code-drawn for now (`mysteryEggImg` in `src/render/assets.ts`); final art ordered in `art/prompts/EGGBOUND_ART_BATCH05_MYSTERY_EGGS.txt`.
+- Mystery shells are code-drawn for now (`mysteryEggImg` in `src/render/assets.ts`); final art ordered in `art/prompts/EGGBOUND_ART_BATCH11_EGGS.txt` (replaces batch 05).
 - Save stays v1: old eggs migrate to `kind: 'named'`, missing `eggPity` / `home.incub` are filled in.
 - Prototype test tools in Settings: get one egg of each tier, finish incubation now (remove before the public playtest).
 - Fix: `[hidden]{display:none!important}` — the loading overlay never hid outside the Artifact host.

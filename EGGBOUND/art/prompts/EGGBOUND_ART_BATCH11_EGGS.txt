@@ -1,0 +1,136 @@
+=====================================================================
+EGGBOUND — ART BATCH 11 : PREMIUM EGGS (ไข่ปริศนา 4 ลาย + ไข่ดารา + ชิ้นส่วน)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ชุดนี้ใช้แทน BATCH05 เดิม (ไข่ที่วาดด้วยโค้ดตอนนี้ยังไม่สวย)
+- เปิดแชทใหม่ใน ChatGPT 1 แชทสำหรับไฟล์นี้
+- แนบ: ไฟล์นี้ + egg001.webp และ eggA03.webp (ไข่ของมอนที่มีอยู่ ไฟล์อยู่ที่ EGGBOUND/game/assets/) เป็นภาพอ้างอิงสไตล์และขนาด
+  + hatch_altar.png (แท่นฟักไข่ชุด 06) เพื่อให้ไข่เข้ากับแท่น
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ก่อนตอบ "OK"
+- ลำดับความหรู: ธรรมดา < เงิน < ทอง < รุ้ง (ไข่ดาราเป็นของพิเศษอีกสายหนึ่ง) แต่ละขั้นต้องเห็นชัดว่าแพงขึ้น
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D monster-collecting RPG. Eggs are the
+HEART of this game: players collect them, wait for them, and hatch them on
+a grand altar. Generate 7 images, ONE IMAGE PER TURN, in the order below.
+
+Each egg must look like a precious COLLECTIBLE treasure — jewel-like,
+beautifully crafted, something players are excited to receive. Each tier
+must look clearly more valuable than the one before, readable even as a
+small 48 px icon on a phone.
+
+The player must NOT know which monster is inside: the shells show only
+the RARITY TIER — no element hints (no flames, leaves, water, monster
+features) on the mystery eggs.
+
+Work order:
+  1. Generate image #01 and wait for my "OK".
+  2. After "OK", generate the rest one by one, using #01 for the exact
+     egg shape, size, camera and lighting.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art, premium collectible quality.
+Glossy dimensional shading, crisp edges, rich material detail (enamel,
+pearl, polished metal, cut gems), clean readable silhouette, no blur.
+Lighting: warm key light from TOP-LEFT with a crisp specular highlight,
+soft cool fill from right, a thin bright rim light on the right edge.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: ground, cast shadow, pedestal, nest, cracks, glow halos outside
+the egg, aura, sparkle particles floating outside the egg, text, letters,
+numbers, logos, watermark, frame, creatures.
+(The game adds aura, sparkles, light rays and cracking in code.)
+ORIGINAL DESIGN — do not copy or resemble any existing game, film or anime
+egg or item (Pokemon, Dragon Quest, Summoners War, Easter-egg brands, etc.).
+
+EGG SHAPE & PIVOT (identical for all five eggs #01–#05):
+- Canvas 1024 x 1024 PNG.
+- A classic upright egg, slightly narrower at the top, standing upright.
+- Egg centered at x = 512, bottom of the egg at y ≈ 870.
+- Egg height ≈ 560 px (≈ 55% of the canvas), width ≈ 410 px.
+- Same shape, size, position, camera (front view, very slightly from
+  above) for #01–#05 so they swap cleanly in the game.
+
+---------------------------------------------------------------------
+2. IMAGES (one per turn)
+---------------------------------------------------------------------
+#01  eggM_common.png  — MYSTERY EGG, COMMON tier (ลายธรรมดา) — MASTER
+Warm cream-ivory porcelain shell with soft speckles in caramel brown,
+a delicate hand-painted band of simple vine-and-dot ornament around the
+middle in muted bronze, a small embossed question-mark-like rune (abstract,
+not a letter) on the front. Simple but lovingly crafted — the humble
+starting egg, still pretty.
+
+#02  eggM_silver.png  — MYSTERY EGG, SILVER tier (ลายเงิน)
+Pearlescent silver-white shell with a soft blue-lilac sheen like
+mother-of-pearl, three elegant engraved silver filigree bands with flowing
+wave scrollwork, a small round moonstone cabochon on the front set in a
+silver bezel. Cool, refined, noticeably finer than #01.
+
+#03  eggM_gold.png  — MYSTERY EGG, GOLD tier (ลายทอง)
+Rich polished gold shell with warm amber depth, an ornate crown-like
+raised gold band around the middle with tiny pearl beads, sun-ray
+engravings radiating from a large faceted orange-red gem (like a fire
+opal) on the front, small red and white gem studs along the band, deep
+reflections. Luxurious, royal, clearly precious.
+
+#04  eggM_rainbow.png  — MYSTERY EGG, RAINBOW tier (ลายรุ้ง) — the jackpot
+An iridescent OPAL shell: swirling prismatic colors (rose, gold, mint,
+sky blue, violet) flowing under a glassy clear coat, faceted crystal
+panels like a cut gemstone on the upper half, delicate platinum filigree
+framing the facets, a brilliant multi-faceted diamond-like gem on the
+front with tiny rainbow refractions painted inside it, small star-shaped
+platinum studs. Dazzling, magical, the egg every player dreams of.
+
+#05  egg_starborn.png  — STARBORN EGG (ไข่ดารา, premium egg of the
+"Starborn Legends")
+Deep midnight-indigo shell like a night sky, painted with a galaxy of
+tiny stars and a soft nebula swirl, thin GOLD constellation lines linking
+star points across the shell, a gold crescent-moon-and-star crest on the
+front set with a pale sapphire, a gold rim band at the base. Mysterious,
+celestial, legendary — clearly a different family from the mystery eggs.
+
+#06  starborn_shard.png  — STARBORN EGG SHARD (ชิ้นส่วนไข่ดารา, item icon)
+Canvas 512 x 512, item centered, fills about 70%.
+A single curved fragment of the Starborn egg shell (same midnight-indigo
+galaxy pattern and gold constellation line), jagged clean edges, a small
+gold star on it, floating at a slight tilt. Players collect these in a
+special dungeon and combine them into an egg.
+
+#07  star_point.png  — STAR POINT (แต้มดารา, exchange currency icon)
+Canvas 512 x 512, item centered, fills about 70%.
+A round gold-and-indigo medallion coin with an embossed eight-pointed
+star in the center, a ring of tiny engraved stars around the edge,
+polished gold rim, slight 3/4 tilt showing its thickness.
+
+---------------------------------------------------------------------
+QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] Background fully transparent (no white box, no checkerboard drawn in)
+  [ ] #01–#05: identical egg shape, size and position (bottom at y ≈ 870,
+      centered at x = 512); overlay them to check
+  [ ] Value ladder is obvious at a glance: common < silver < gold < rainbow
+  [ ] Mystery eggs show NO element or monster hints
+  [ ] No cracks, no glow outside the egg, no particles, no shadow, no text
+  [ ] Readable as a small icon (shrink to 48 px and check)
+
+---------------------------------------------------------------------
+PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_EGGS_PREMIUM.zip
+Exact file names (lowercase, PNG):
+  eggM_common.png
+  eggM_silver.png
+  eggM_gold.png
+  eggM_rainbow.png
+  egg_starborn.png
+  starborn_shard.png
+  star_point.png
+Add notes.txt listing any image you regenerated and why.
