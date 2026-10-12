@@ -9,6 +9,9 @@ import {
   drawParts, drawDecals, drawProjs, drawGround, drawLantern, drawBush, drawLanternPools, drawFlies, LANTERNS, BUSHES, worldTransform, screenTransform, drawOverlays,
 } from './engine';
 
+const PRISM = ['#ff6b6b', '#ffb84d', '#ffe66b', '#6bdc8a', '#5bb8ff', '#a98bff'];
+/** rare forms cast their ultimate in radiant gold (with prismatic rings on top) instead of their element colour */
+const RARE_PAL = { name: 'ร่างหายาก', aura: '#ffcf3a', core: '#fff3c0', hot: '#ffffff', rune: '#ffe27a', cut: '#b8860b', dh: 0, sat: 1, lit: 1, all: 1 };
 const STATUS_TH = { burn: 'เผาไหม้', poison: 'พิษ', stun: 'มึน', sleep: 'หลับ', blind: 'ตาบอด', def_down: 'DEF ↓', atk_down: 'ATK ↓', spd_down: 'SPD ↓', atk_up: 'ATK ↑', def_up: 'DEF ↑', spd_up: 'SPD ↑', crit_up: 'คริ ↑', shield: 'โล่', regen: 'ฟื้นฟู' };
 const STATUS_COL = { burn: '#ffae6a', poison: '#b8f06a', stun: '#ffe066', sleep: '#c9b8ff', blind: '#a8a8c8', def_down: '#ff8a7a', atk_down: '#ff8a7a', spd_down: '#9fd8ff', atk_up: '#ff7a5a', def_up: '#9fd0ff', spd_up: '#9fffcf', crit_up: '#ffd27a', shield: '#bfe6ff', regen: '#7dffb0' };
 const ALLY_C = [-245, 165], ENEMY_C = [245, -115], PERP = [.6, .8];
@@ -22,7 +25,7 @@ export class BattleView {
   // ---------- views ----------
   makeView(u, pos, drop) {
     const s = SPECIES[u.sid];
-    const v = { uid: u.uid, sid: lookOf(u.sid, u.stars), team: u.team, elem: u.elem, boss: u.boss, name: u.name, stars: u.stars, lvl: u.lvl,
+    const v = { uid: u.uid, sid: lookOf(u.sid, u.stars, !!u.rare), rare: !!u.rare, team: u.team, elem: u.elem, boss: u.boss, name: u.name, stars: u.stars, lvl: u.lvl,
       x: pos[0], y: pos[1], hx: pos[0], hy: pos[1], hop: drop ? -620 : 0, sx: 1, sy: 1, rot: 0, k: .4 * (s.scale || 1),
       back: u.team === 0, flip: u.team === 1, hb: u.team === 0, hf: u.team === 1, pose: 'idle', alpha: drop ? 0 : 1, flash: 0, ghosts: [], glowF: 0,
       dead: false, deathT: 0, hitT: 0, kvx: 0, kvy: 0, hp: u.hp, maxHp: u.maxHp, shown: u.hp, st: new Set(), marks: new Set(), busy: !!drop, ph: Math.random() * 9, emberT: 0, atb: 0, shieldAmt: 0,
@@ -38,7 +41,7 @@ export class BattleView {
     if (port) return units.map((u, i) => [u, [C[0] + offs[i] * 1.18, C[1] + (n > 2 ? (i % 2 ? 26 : -26) * (team ? -1 : 1) : 0) + offs[i] * .05]]);
     return units.map((u, i) => [u, [C[0] + PP[0] * offs[i], C[1] + PP[1] * offs[i]]]);
   }
-  P(v) { return PAL[v.elem]; }
+  P(v) { return v.rare && v.ultOn ? RARE_PAL : PAL[v.elem]; }
   key(v) { return poseKey(v.sid, v.back ? 'back' : 'front', v.pose); }
   l2w(v, lx, ly) { const sx = v.sx * v.k * (v.flip ? -1 : 1), sy = v.sy * v.k, c = Math.cos(v.rot), s = Math.sin(v.rot); const x = lx * sx, y = ly * sy; return [v.x + x * c - y * s, v.y + v.hop + x * s + y * c]; }
   anc(v, n) { const a = anchOf(v.sid, this.key(v))[n]; return this.l2w(v, a[0], a[1]); }
@@ -139,6 +142,9 @@ export class BattleView {
       case 'atb': if (!v) return; v.atb = e.atb; text(v.x + 28, this.headY(v) + 6, e.delta > 0 ? `เกจ +${e.delta}` : `เกจ ${e.delta}`, e.delta > 0 ? '#9fffcf' : '#9fd8ff', 14, { vz: 40 }); break;
       case 'cleanse': if (!v) return; text(v.x, this.headY(v) - 18, 'ล้างสถานะ', '#bff8ff', 14, { vz: 40 }); for (let i = 0; i < 6; i++) addP({ type: 'twinkle', x: v.x + rnd(-50, 50), y: v.y, z: rnd(20, 120), life: .7, size: rnd(6, 10), color: '#ffffff' }); break;
       case 'reaction': this.playReaction(e); break;
+      case 'passive': { const pv = this.V.get(e.uid); if (!pv || pv.dead) break; // rare-form passive fired: rainbow banner + ring
+        addP({ type: 'banner', x: pv.x, y: this.headY(pv) - 54, str: '✦ ' + e.name, color: PRISM[(this.pvc = ((this.pvc || 0) + 1) % PRISM.length)], size: 19, life: 1.3, keep: true });
+        PRISM.forEach((c, i) => ring(pv.x, pv.y, 8, 70 + i * 14, c, .35 + i * .04, 3)); pv.glowF = Math.max(pv.glowF, .7); setTimeout(() => { if (!pv.busy) pv.glowF = 0; }, 450); sfx.perfect(); break; }
       case 'death': { const d = this.V.get(e.uid); if (d && !d.dead) { d.dead = true; d.deathT = 0; d.pose = 'down'; d.bendV -= 500; sfx.die(); burst(d.x, d.y, 60 * d.k / .4, 26, PAL[d.elem].aura, 280, 16, .8); } break; }
     }
   }
@@ -177,6 +183,7 @@ export class BattleView {
     const impact = (uid) => { if (applied.has(uid)) return; applied.add(uid); for (const e of res.impacts[uid] || []) this.applyEv(e); };
     const tv = res.targets.map(id => this.V.get(id)).filter(Boolean);
     this.actName(v, sk);
+    if (res.ult && v.rare) v.ultOn = true;
     if (res.ult && v.team === 0) this.onUlt && this.onUlt();
     if (res.ult && !this.skipUlt) yield* this.ultIntro(v, sk);
     else if (res.ult) { v.glowF = .8; }
@@ -200,7 +207,7 @@ export class BattleView {
     }
     for (const id of Object.keys(res.impacts)) impact(+id);
     if (res.ult) this.ultOutro(v);
-    v.glowF = 0;
+    v.ultOn = false; v.glowF = 0;
     yield .2;
   }
   actName(v, sk) { this.onAct && this.onAct(v.name + ' · ' + sk.name, v.team); }
@@ -209,11 +216,12 @@ export class BattleView {
   *ultIntro(v, sk) {
     const P = this.P(v), flame = (n = 1) => { for (let i = 0; i < n; i++) addP({ type: 'flame', x: v.x + rnd(-60, 60) * v.k / .4, y: v.y + rnd(-8, 8), z: rnd(0, 20), vz: rnd(120, 280), life: rnd(.4, .7), size: rnd(18, 32), color: P.aura, core: P.core, drag: .5 }); };
     this.focus = [v]; v.busy = true; v.glowF = .6; this.camK = 1; this.camF = { x: v.x, y: v.y - 70 * v.k / .4 };
-    this.cine = { v, t: 0, col: P.aura, hot: P.hot, pose: 0 };
+    this.cine = { v, t: 0, col: P.aura, hot: P.hot, pose: 0, rare: !!v.ultOn };
     v.pose = 'cast'; E.dimT = .86; E.zoomT = 2; sfx.charge();
     yield* tween(.42, p => { v.sx = 1 + .08 * p; v.sy = 1 - .1 * p; if (Math.random() < .8) flame(); });
     v.pose = 'burst'; v.glowF = 1; v.sx = v.sy = 1; this.cine.pose = 1e-6; flash(.55, P.hot); shake(10); sfx.whoosh(); sfx.perfect();
     ring(v.x, v.y, 10, 260, P.aura, .5, 12); ring(v.x, v.y, 10, 180, P.hot, .4, 6); burst(v.x, v.y, 60, 30, P.aura, 520, 18, .7);
+    if (v.ultOn) { PRISM.forEach((c, i) => { ring(v.x, v.y, 10, 200 + i * 34, c, .45 + i * .05, 5); burst(v.x, v.y, 40, 6, c, 420 + i * 40, 14, .8); }); flash(.3, '#fff3c0'); }
     this.onCutin && this.onCutin(v.sid, sk.name, P.cut);
     yield* tween(.8, p => { v.sy = 1 + .025 * Math.sin(p * 24); v.sx = 2 - v.sy; if (Math.random() < .9) flame(2); });
     this.cine = null; this.camK = .45; this.camF = null; E.zoomT = 1.08; E.dimT = .3; v.busy = false;
@@ -225,6 +233,11 @@ export class BattleView {
     if (!fx(ctx, 'fx_rays', c.col, v.x, y, 760 * k, 760 * k, a * (c.pose ? .95 : .45), E.time * .6)) {
       ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(v.x, y);
       for (let i = 0; i < 16; i++) { const ang = i / 16 * TAU + E.time * .6, len = 380 * k, w = .06; ctx.globalAlpha = a * .35; ctx.fillStyle = c.col; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(ang - w) * len, Math.sin(ang - w) * len); ctx.lineTo(Math.cos(ang + w) * len, Math.sin(ang + w) * len); ctx.closePath(); ctx.fill(); }
+      ctx.restore();
+    }
+    if (c.rare) { // prismatic spokes rotating against the gold rays
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(v.x, y);
+      for (let i = 0; i < 12; i++) { const ang = i / 12 * TAU - E.time * .9, len = 440 * k, w = .035; ctx.globalAlpha = a * (c.pose ? .42 : .22); ctx.fillStyle = PRISM[i % PRISM.length]; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(ang - w) * len, Math.sin(ang - w) * len); ctx.lineTo(Math.cos(ang + w) * len, Math.sin(ang + w) * len); ctx.closePath(); ctx.fill(); }
       ctx.restore();
     }
     fx(ctx, 'fx_orb', c.col, v.x, y, 420 * k, 420 * k, a * .8);
@@ -508,6 +521,7 @@ export class BattleView {
   drawGroundFx(v) {
     if (v.alpha < .05) return; const ctx = E.ctx, P = PAL[v.elem], t = E.time, rk = v.k / .4;
     ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    if (v.rare && !v.dead) { for (let i = 0; i < 6; i++) { const a0 = t * 1.2 + i * TAU / 6; ctx.strokeStyle = PRISM[i]; ctx.globalAlpha = .55 * v.alpha; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.ellipse(v.x, v.y, 66 * rk, 24 * rk, 0, a0, a0 + TAU / 6 - .08); ctx.stroke(); } }
     if (v.stars >= 2 && !v.dead) { const pul = .5 + .5 * Math.sin(t * 3 + v.ph); ctx.strokeStyle = P.aura; ctx.globalAlpha = (.35 + .3 * pul) * v.alpha; ctx.lineWidth = 2.2; ctx.beginPath(); ctx.ellipse(v.x, v.y, (58 + pul * 5) * rk, (21 + pul * 2) * rk, 0, 0, TAU); ctx.stroke(); }
     if (v.stars >= 5 && !v.dead) { ctx.globalAlpha = .45; ctx.strokeStyle = P.rune; ctx.lineWidth = 1.6; const R = 72 * rk, rot = t * .8; ctx.beginPath(); ctx.ellipse(v.x, v.y, R, R * .38, 0, 0, TAU); ctx.stroke(); for (let i = 0; i < 12; i++) { const a = i / 12 * TAU + rot, a2 = a + .18; ctx.beginPath(); ctx.moveTo(v.x + Math.cos(a) * R * .8, v.y + Math.sin(a) * R * .3); ctx.lineTo(v.x + Math.cos(a2) * R * .98, v.y + Math.sin(a2) * R * .375); ctx.stroke(); } }
     if (this.active === v.uid && !v.dead && this.phase !== 'end') { ctx.globalAlpha = .85; ctx.strokeStyle = '#ffd27a'; ctx.lineWidth = 3; const R = 78 * rk; ctx.beginPath(); ctx.ellipse(v.x, v.y, R, R * .38, 0, 0, TAU); ctx.stroke(); }
@@ -519,6 +533,7 @@ export class BattleView {
     const sh = 1 - Math.min(.5, -v.hop / 90); ctx.globalAlpha = v.alpha; ctx.fillStyle = 'rgba(18,12,6,.36)'; ctx.beginPath(); ctx.ellipse(v.x, v.y + 2, 115 * v.k * sh * v.sx, 34 * v.k * sh, 0, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
     for (const g of v.ghosts) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (g.life / g.max) * .38; ctx.translate(g.x, g.y + g.hop); ctx.rotate(g.rot); ctx.scale(g.sx * g.k * (g.flip ? -1 : 1), g.sy * g.k); ctx.drawImage(silOf(v.sid, g.key, P.aura), -PIV[0], -PIV[1]); ctx.restore(); }
     ctx.save(); ctx.translate(v.x, v.y + v.hop); ctx.rotate(v.rot); ctx.scale(v.sx * v.k * (v.flip ? -1 : 1), v.sy * v.k);
+    if (v.rare && !v.dead) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (.38 + .14 * Math.sin(t * 3 + v.ph)) * v.alpha; ctx.drawImage(glowOf(v.sid, key, PRISM[Math.floor(t * 5 + v.ph) % PRISM.length]), -PIV[0] - GP, -PIV[1] - GP); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; }
     let gl = v.stars >= 4 ? .5 + .2 * Math.sin(t * 4 + v.ph) : 0; gl = Math.max(gl, v.glowF);
     if (gl > 0 && !v.dead) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = gl * v.alpha; ctx.drawImage(glowOf(v.sid, key, P.aura), -PIV[0] - GP, -PIV[1] - GP); if (v.stars >= 5 || v.glowF > .5) { ctx.save(); ctx.scale(1.07, 1.16 + .05 * Math.sin(t * 9)); ctx.globalAlpha = .32 * v.alpha; ctx.drawImage(glowOf(v.sid, key, P.aura), -PIV[0] - GP, -PIV[1] - GP); ctx.restore(); } ctx.globalCompositeOperation = 'source-over'; }
     const W = { bend: v.bend, breathe: v.br, wave: v.wave, wph: v.wph };

@@ -19,6 +19,7 @@ export interface SaveData {
   gems: number;                     // เพชร: buy gold eggs, rush incubation
   stats: Stats;                     // lifetime counters for the adventure book
   quests: string[];                 // adventure-book quests already claimed
+  dexRare: string[];                // species whose rare form was ever obtained (reveals its rare passive in the book)
   dex: string[];                    // species ever obtained (monster book) — kept even after a unit is used as food
   eggs: EggSave[];
   eggPity: number;                  // mystery eggs in a row without gold+
@@ -33,7 +34,7 @@ export const newMon = (uid: number, sid: string, lvl = 1, stars = natStars(sid),
   ({ uid, sid, lvl, exp: 0, stars, sk: [1, 1, 1], ...(rare ? { rare } : {}) });
 export function newSave(): SaveData {
   const mons = STARTERS.map((sid, i) => newMon(i + 1, sid, 5, 1));
-  return { v: 2, gold: 500, mons, team: [1, 2, 3, 4], nextUid: mons.length + 1, items: { soul: 0 }, gems: 0, stats: newStats(), quests: [], dex: [...STARTERS], eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, stages: {}, nextEggId: 2,
+  return { v: 2, gold: 500, mons, team: [1, 2, 3, 4], nextUid: mons.length + 1, items: { soul: 0 }, gems: 0, stats: newStats(), quests: [], dexRare: [], dex: [...STARTERS], eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, stages: {}, nextEggId: 2,
     settings: { sound: true, quality: 'high', skipUlt: false, speed: 1, auto: false } };
 }
 export function loadSave(): SaveData {
@@ -48,6 +49,7 @@ export function loadSave(): SaveData {
         d.mons = d.mons.filter(m => SPECIES[m.sid]);
         for (const m of d.mons) { m.stars = Math.max(m.stars, natStars(m.sid)); m.sk ||= [1, 1, 1]; m.lvl = Math.min(m.lvl, levelCap(m.stars)); } // level caps per star (SW) // natural stars by rarity (2026-10-12)
         d.stats = { ...newStats(), ...(s.stats || {}) };
+        d.dexRare = [...new Set([...(d.dexRare || []), ...d.mons.filter(m => m.rare).map(m => m.sid)])];
         d.dex = [...new Set([...(d.dex || []), ...d.mons.map(m => m.sid)])]; // monster book: everything owned counts as seen
         const seen = new Set<string>(); // team rule: one per species (older saves could hold copies)
         d.team = d.team.filter(u => { const m = d.mons.find(x => x.uid === u); if (!m || seen.has(m.sid)) return false; seen.add(m.sid); return true; });

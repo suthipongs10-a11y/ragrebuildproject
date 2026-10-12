@@ -91,7 +91,7 @@ export function hatchEgg(s: SaveData, eggId: number, now = Date.now()): HatchRes
   const egg = s.eggs[i], { sid } = egg, rare = !!egg.rare, copies = copiesOf(s, sid);
   s.eggs.splice(i, 1); endIncub(s, eggId);
   s.stats.hatch++;
-  const fresh = !s.dex.includes(sid), m = newMon(s.nextUid++, sid, 1, undefined, rare); s.mons.push(m); if (fresh) s.dex.push(sid);
+  const fresh = !s.dex.includes(sid), m = newMon(s.nextUid++, sid, 1, undefined, rare); s.mons.push(m); if (fresh) s.dex.push(sid); if (rare && !s.dexRare.includes(sid)) s.dexRare.push(sid);
   return { uid: m.uid, sid, egg, stars: m.stars, copies, rare, newDex: fresh };
 }
 

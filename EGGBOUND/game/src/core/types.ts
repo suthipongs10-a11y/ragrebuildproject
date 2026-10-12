@@ -29,6 +29,26 @@ export interface SkillDef {
   anim: AnimId;
   ult?: boolean;
 }
+/** rare-form passive (สกิลร่างหายาก): the 4th skill only a rare-form monster has. Works on its own in battle. */
+export type PassiveKind =
+  | 'hitStatusAtb'   // hitting a target that has `status` → `chance` to gain `value` turn gauge
+  | 'healCleanse'    // its heals also remove 1 negative status (`chance`)
+  | 'hitAtbDrain'    // every hit lowers the target's turn gauge by `value`
+  | 'guard'          // takes `value` less damage while above half HP
+  | 'startAtb'       // battle start: all allies +`value` turn gauge
+  | 'debuffExtend'   // negative statuses it inflicts last +`value` turn
+  | 'deathGift'      // when it falls: allies heal `value` of max HP and +30 turn gauge
+  | 'revive'         // once per battle the first ally to fall comes back with `value` HP
+  | 'thorns'         // reflects `value` of damage taken to the attacker (cannot kill)
+  | 'endure'         // once per battle survives a lethal blow at 1 HP and gains a `value` shield
+  | 'curseOnHit'     // when hit: `chance` to give the attacker `status`
+  | 'turnHeal'       // each of its turns: heals the weakest ally `value` of max HP
+  | 'killTurn'       // defeating an enemy grants another turn right away
+  | 'counter'        // when hit: `chance` to strike back with skill 1 at `value` power
+  | 'startShield'    // battle start: all allies get a `value` shield for 2 turns
+  | 'critDebuff'     // its critical hits inflict `status`
+  | 'overheal';      // overflow from its heals becomes a shield (up to `value` of max HP)
+export interface PassiveDef { kind: PassiveKind; name: string; desc: string; chance?: number; value?: number; status?: StatusId }
 export interface LeaderSkill { stat: 'atk' | 'hp' | 'def' | 'spd' | 'crit' | 'res'; value: number; text: string }
 export interface SpeciesDef {
   id: string; name: string; nameEn: string;
@@ -36,11 +56,12 @@ export interface SpeciesDef {
   base: { hp: number; atk: number; def: number; spd: number };
   skills: [SkillDef, SkillDef, SkillDef];
   leader?: LeaderSkill;
+  rarePassive?: PassiveDef;     // unlocked only by the rare form
   boss?: boolean;
   scale?: number;               // render scale multiplier
   art?: string;                 // sprite set key; absent → placeholder recolor
 }
-export interface MonsterRef { sid: string; lvl: number; stars: number; sk?: number[] }  // sk = skill levels (default 1)
+export interface MonsterRef { sid: string; lvl: number; stars: number; sk?: number[]; rare?: boolean }  // sk = skill levels (default 1)
 export interface EnemyRef extends MonsterRef { hpMult?: number; atkMult?: number }
 export interface StageDef {
   id: string; name: string; desc: string;
@@ -60,6 +81,7 @@ export interface Unit {
   atb: number; cds: number[]; skills: SkillDef[];
   statuses: Status[]; marks: Mark[];
   alive: boolean; leader: boolean;
+  rare?: boolean; passive?: PassiveDef; pUsed?: boolean;
 }
 
 // ---- events ----
@@ -77,6 +99,7 @@ export type Ev =
   | { t: 'dot'; tgt: number; id: StatusId; dmg: number; hp: number }
   | { t: 'skip'; uid: number; reason: StatusId | 'dead' }
   | { t: 'wave'; wave: number; units: number[] }
+  | { t: 'passive'; uid: number; name: string }
   | { t: 'end'; win: boolean };
 export type ReactionId = 'wildfire' | 'storm' | 'steam' | 'lava' | 'eclipse';
 

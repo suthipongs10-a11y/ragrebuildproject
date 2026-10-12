@@ -58,8 +58,11 @@ export const uiSrc = (name: string) => IMG[name] ? IMG[name].src : null;
 export const masterURL = (sid: string) => { const s = SPECIES[sid]; return s && s.art && IMG[s.art + '_master'] ? IMG[s.art + '_master'].src : null; };
 export const baseOf = (sid: string) => sid.split('~')[0];
 const SP = sid => SPECIES[baseOf(sid)];
-const lookLv = sid => +(sid.split('~')[1] || 0);
-export const lookOf = (sid: string, stars: number) => stars >= 4 ? sid + '~' + Math.min(6, stars) : sid;
+const lookLv = sid => parseInt(sid.split('~')[1] || '0') || 0;
+const lookRare = sid => sid.includes('~') && sid.endsWith('r');
+/** look id: `sid~<stars>` from ★4, plus `r` for the rare form (its own colours, like a shiny) */
+export const lookOf = (sid: string, stars: number, rare = false) => stars >= 4 || rare ? sid + '~' + (stars >= 4 ? Math.min(6, stars) : 0) + (rare ? 'r' : '') : sid;
+const VAR_R = { dh: .5, sat: 1.18, lit: 1.04, all: 1.04 }; // rare form: opposite hue, a little richer
 const VAR_E = { 4: { dh: .09, sat: 1.22, lit: 1, all: 1.02 }, 5: { dh: .09, sat: 1.3, lit: 1.03, all: 1.05 }, 6: { dh: .09, sat: 1.3, lit: 1.03, all: 1.05 } };
 const evoArt = sid => { const L = lookLv(sid), s = SP(sid); return L >= 5 && s.art && IMG[s.art + 'e_front_idle'] ? s.art + 'e' : null; };
 /** does this species have its own final art? */
@@ -93,7 +96,8 @@ export function warpDraw(ctx, img, w) {
 /** sprite canvas/image for a species & pose key like 'front_idle' */
 export function spr(sid, key) {
   const k = sid + key; if (SPR[k]) return SPR[k];
-  if (lookLv(sid)) { const ea = evoArt(sid); return (SPR[k] = ea ? artPose(ea, key) : hueShift(spr(baseOf(sid), key), VAR_E[lookLv(sid)])); }
+  if (sid.includes('~')) { const ea = evoArt(sid), base = ea ? artPose(ea, key) : spr(baseOf(sid), key);
+    return (SPR[k] = lookRare(sid) ? hueShift(base, VAR_R) : ea ? base : hueShift(base, VAR_E[lookLv(sid)])); }
   const s = SPECIES[sid];
   if (hasArt(sid)) return (SPR[k] = artPose(s.art, key));
   return (SPR[k] = hueShift(IMG['mon001_' + key], PAL[s.elem]));
@@ -141,7 +145,7 @@ export function portrait(sid) {
   if (PORT[sid]) return PORT[sid];
   const s = SP(sid), ea = evoArt(sid), L = lookLv(sid);
   let src = ea && IMG[ea + '_master'] ? IMG[ea + '_master'] : hasArt(sid) && IMG[s.art + '_master'] ? IMG[s.art + '_master'] : hueShift(IMG.mon001_master, PAL[s.elem]);
-  if (L && !ea) src = hueShift(src, VAR_E[L]);
+  if (lookRare(sid)) src = hueShift(src, VAR_R); else if (L && !ea) src = hueShift(src, VAR_E[L]);
   const c = mk(256, 256), x = c.getContext('2d');
   const f = src.width / 512, own = hasArt(sid) && (!!IMG[s.art + '_master'] || !!ea);
   let cr = [200, 70, 300]; // fox: head-centred crop

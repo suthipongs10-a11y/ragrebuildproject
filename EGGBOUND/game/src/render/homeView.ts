@@ -253,8 +253,8 @@ export class HomeView {
     const units = this.S.mons.filter(m => SPECIES[m.sid] && !SPECIES[m.sid].boss), inTeam = u => this.S.team.includes(u.uid);
     const ordered = [...units.filter(inTeam), ...units.filter(u => !inTeam(u)).sort((a, b) => b.stars - a.stars || b.lvl - a.lvl)].slice(0, MAX_HOME_MONS);
     const keep = this.mons.filter(m => ordered.some(u => u.uid === m.uid));
-    for (const k of keep) { const u = ordered.find(x => x.uid === k.uid); k.sid = lookOf(u.sid, u.stars); }
-    for (const u of ordered) if (!keep.find(m => m.uid === u.uid)) { const p = this.freePoint(); keep.push({ uid: u.uid, sid: lookOf(u.sid, u.stars), x: p[0], y: p[1], tx: p[0], ty: p[1], wait: rnd(.2, 2), flip: Math.random() < .5, back: false, walk: 0, hop: 0, vz: 0, z: 0, emo: null, emoT: rnd(3, 10), ph: Math.random() * 9 }); }
+    for (const k of keep) { const u = ordered.find(x => x.uid === k.uid); k.sid = lookOf(u.sid, u.stars, !!u.rare); }
+    for (const u of ordered) if (!keep.find(m => m.uid === u.uid)) { const p = this.freePoint(); keep.push({ uid: u.uid, sid: lookOf(u.sid, u.stars, !!u.rare), x: p[0], y: p[1], tx: p[0], ty: p[1], wait: rnd(.2, 2), flip: Math.random() < .5, back: false, walk: 0, hop: 0, vz: 0, z: 0, emo: null, emoT: rnd(3, 10), ph: Math.random() * 9 }); }
     this.mons = keep;
   }
   freePoint() {
