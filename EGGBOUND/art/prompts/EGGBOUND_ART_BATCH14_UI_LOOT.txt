@@ -1,0 +1,95 @@
+=====================================================================
+EGGBOUND — ART BATCH 14 : LOOT UI (ดาว · เหรียญทอง · กรอบการ์ดของรางวัล)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ใช้ในหน้าเปิดหีบสมบัติจบด่าน การ์ดผลการต่อสู้ และการ์ดฟักไข่: ดาวผลด่าน, เหรียญทอง, กรอบการ์ดทองสำหรับของหายาก
+  (ตอนนี้เกมวาดด้วยโค้ดไปก่อนแล้ว ภาพชุดนี้มาแทนให้สวยขึ้น ใส่แล้วเกมใช้เองอัตโนมัติ)
+- เปิดแชทใหม่ใน ChatGPT 1 แชท · แนบ: ไฟล์นี้ + chest_boss_open.png (หีบชุด 06-B) ให้เห็นสไตล์ทองที่ใช้อยู่
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ก่อนตอบ "OK"
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the UI artist for a premium 2.5D monster RPG (the polish level of
+top mobile monster RPGs). Generate 6 UI images, ONE IMAGE PER TURN. They
+appear small on phones, so every piece must be bold, clean and readable
+at 40–90 px, with rich gold material when you zoom in.
+
+Work order:
+  1. Generate #01 and wait for my "OK".
+  2. After "OK", generate the rest one by one in the same material style.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (every image)
+---------------------------------------------------------------------
+STYLE: painterly fantasy game UI, premium polished GOLD like the attached
+chest: warm yellow-gold with orange depth, crisp bright specular edges,
+subtle engraved ornament, small inset gems (ruby red / sapphire blue).
+Lighting from TOP-LEFT, a clean bright rim on the edges.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: text, letters, numbers, logos, watermark, drop shadow on the
+background, glow halo outside the object, sparkle particles outside the
+object, characters. (The game adds glow, rays and sparkles in code.)
+ORIGINAL DESIGN — do not copy any existing game's UI.
+
+---------------------------------------------------------------------
+2. IMAGES (one per turn)
+---------------------------------------------------------------------
+#01  ui_star.png — RESULT STAR (filled)
+Canvas 512 x 512, star centered, filling about 80%.
+A chunky five-pointed star of polished gold with soft rounded tips,
+a raised bevel, a lighter faceted top surface, a thin darker gold
+outline, a small painted white highlight glint on the upper-left
+point. Bold, happy, juicy — the reward star of the game.
+
+#02  ui_star_empty.png — EMPTY STAR SLOT
+Same canvas, same star shape, size and position as #01, but an EMPTY
+socket: dark bronze / smoky stone, slightly sunken, faint worn edge,
+no shine. It must read clearly as "not earned".
+
+#03  ui_coin.png — GOLD COIN (icon)
+Canvas 512 x 512, one coin centered, filling about 75%, seen at a
+slight 3/4 tilt so the thick milled edge shows. Polished gold with an
+embossed emblem in the middle: a small stylised TURTLE SHELL with a
+star on it (the game's home is a giant cloud turtle). Bright rim light.
+
+#04  ui_coin_pile.png — PILE OF GOLD (big gold reward)
+Canvas 512 x 512, filling about 80%. A small heap of the same coins
+(#03), some standing on edge, a few tumbling, one sparkling gem among
+them. Rich and generous.
+
+#05  ui_frame_gold.png — RARE ITEM CARD FRAME
+Canvas 512 x 640 (portrait 4:5). An ornate GOLD frame around a card:
+the frame band about 34 px thick along all four sides, decorated
+corner pieces with a small round gem in each corner, a crest/crown
+ornament at the top centre, a small gem at the bottom centre.
+The INSIDE of the frame (the whole card window) must be FULLY
+TRANSPARENT — the game draws the card content there. Symmetric.
+
+#06  ui_frame_plain.png — COMMON ITEM CARD FRAME
+Same canvas, same outer size and band thickness as #05, but a simple,
+clean dark-bronze frame with plain rounded corners, no gems, no crest.
+Inside fully transparent. It must look clearly lower value than #05.
+
+---------------------------------------------------------------------
+3. QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] Background fully transparent (#05/#06: the card window too)
+  [ ] #01 and #02 identical star shape, size and position
+  [ ] #05 and #06 identical outer size and band thickness
+  [ ] Readable when shrunk to 40 px (stars, coin) / 90 px wide (frames)
+  [ ] No text, no glow outside the object, no particles, no shadow
+
+---------------------------------------------------------------------
+4. PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_UI_LOOT.zip
+Exact file names (lowercase, PNG):
+  ui_star.png        ui_star_empty.png
+  ui_coin.png        ui_coin_pile.png
+  ui_frame_gold.png  ui_frame_plain.png
+Add notes.txt listing any image you regenerated and why.

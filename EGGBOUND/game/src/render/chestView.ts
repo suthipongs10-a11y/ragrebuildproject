@@ -5,7 +5,7 @@
 import { LOOT_GRADES, LOOT_ORDER } from '../core/data';
 import { sfx } from './audio';
 import { RM } from './engine';
-import { IMG, fx } from './assets';
+import { IMG, fx, starHTML, uiSrc } from './assets';
 
 const TAU = Math.PI * 2, PRISM = ['#ff6b6b', '#ffb84d', '#ffe66b', '#6bdc8a', '#5bb8ff', '#a98bff'];
 const rnd = (a, b) => a + Math.random() * (b - a), clamp = (v, a, b) => v < a ? a : v > b ? b : v;
@@ -15,7 +15,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 /** items: [{ icon, label, sub?, grade }] worst → best · grade: chest grade · boss: golden chest */
 export function showChest({ items, grade, boss, stars, onDone }) {
   const root = document.createElement('div'); root.className = 'chestfx'; root.innerHTML =
-    `<canvas></canvas><div class="ctop"><h2>ชนะ!</h2><div class="bigstars">${[0, 1, 2].map(i => `<span class="${i < stars ? '' : 'off'}" style="animation-delay:${.15 + i * .2}s">★</span>`).join('')}</div></div>
+    `<canvas></canvas><div class="ctop"><h2>ชนะ!</h2><div class="bigstars">${[0, 1, 2].map(i => `<span class="${i < stars ? '' : 'off'}" style="animation-delay:${.15 + i * .2}s">${starHTML(i < stars)}</span>`).join('')}</div></div>
      <p class="chint">แตะหีบเพื่อเปิด</p><div class="loots"></div><div class="cnext"><button class="go" type="button">ต่อไป</button></div>`;
   document.body.appendChild(root);
   const cv = root.querySelector('canvas'), ctx = cv.getContext('2d'), hint = root.querySelector('.chint'), row = root.querySelector('.loots'), next = root.querySelector('.cnext');
@@ -46,8 +46,10 @@ export function showChest({ items, grade, boss, stars, onDone }) {
   // ---------- items (DOM cards that fly out of the chest into the row) ----------
   function popItem(i, fast) {
     const it = items[i], el = document.createElement('div');
-    el.className = 'loot g-' + it.grade; el.style.setProperty('--g', colOf(it.grade));
-    el.innerHTML = `<span class="li"><img src="${it.icon}" alt=""></span><b>${esc(it.label)}</b>${it.sub ? `<small>${esc(it.sub)}</small>` : ''}`;
+    // anything better than common gets the gold frame: spinning gold rim, light rays behind, shine sweep, twinkles
+    const gold = it.grade !== 'common', fr = uiSrc(gold ? 'ui_frame_gold' : 'ui_frame_plain');
+    el.className = 'loot g-' + it.grade + (gold ? ' gold' : '') + (fr ? ' art' : ''); el.style.setProperty('--g', colOf(it.grade));
+    el.innerHTML = `${gold ? '<span class="lray"></span>' : ''}<span class="lbg"></span>${fr ? `<img class="lfr" src="${fr}" alt="">` : ''}<span class="li"><img src="${it.icon}" alt=""></span><b>${esc(it.label)}</b>${it.sub ? `<small>${esc(it.sub)}</small>` : ''}${gold ? '<i class="tw"></i><i class="tw t2"></i>' : ''}`;
     row.appendChild(el);
     const r = el.getBoundingClientRect(), dx = cx - (r.left + r.width / 2), dy = cy - S * .1 - (r.top + r.height / 2);
     el.style.transform = `translate(${dx}px,${dy}px) scale(.2)`; el.style.opacity = '0';

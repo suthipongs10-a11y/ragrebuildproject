@@ -51,6 +51,9 @@ function hueShift(img, E) {
 
 // ---- looks by star grade (evolution): ★1-3 base art · ★4 recoloured · ★5-6 evolved-form art (key + 'e', BATCH08) when it
 // exists, otherwise a stronger recolour. A "look id" is `sid~stars` (e.g. 'B05~4'); plain sid = base look. ----
+/** result / reward star: BATCH14 art when present, else a glyph styled by CSS (.bigstars) */
+export const starHTML = (on: boolean) => { const im = IMG[on ? 'ui_star' : 'ui_star_empty']; return im ? `<img src="${im.src}" alt="">` : '★'; };
+export const uiSrc = (name: string) => IMG[name] ? IMG[name].src : null;
 export const baseOf = (sid: string) => sid.split('~')[0];
 const SP = sid => SPECIES[baseOf(sid)];
 const lookLv = sid => +(sid.split('~')[1] || 0);

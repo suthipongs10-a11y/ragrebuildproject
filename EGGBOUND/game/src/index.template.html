@@ -160,13 +160,30 @@ h2.sec{margin:0;font-family:var(--f-display);font-weight:500;font-size:.8rem;let
 .chint.show{opacity:1;animation:pulse 1.2s ease-in-out infinite}.chint.off{opacity:0;animation:none}
 @keyframes pulse{50%{transform:scale(1.08)}}
 .loots{position:absolute;left:50%;top:58%;transform:translateX(-50%);width:min(560px,94vw);display:flex;flex-wrap:wrap;justify-content:center;gap:8px;pointer-events:none}
-.loot{--g:#fff0c8;box-sizing:border-box;width:80px;display:flex;flex-direction:column;align-items:center;gap:2px;background:rgba(18,16,12,.88);border:1.5px solid color-mix(in srgb,var(--g) 70%,transparent);border-radius:14px;padding:6px 4px;font-size:.68rem;text-align:center;box-shadow:0 0 14px color-mix(in srgb,var(--g) 45%,transparent)}
-.loot .li{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--g) 45%,transparent),transparent 70%)}
-.loot img{width:44px;height:44px;object-fit:contain}
+.loot{--g:#fff0c8;position:relative;isolation:isolate;box-sizing:border-box;width:84px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 5px 7px;font-size:.68rem;text-align:center;color:var(--ink)}
+.loot .lbg{position:absolute;inset:0;z-index:-1;border-radius:14px;background:rgba(18,16,12,.9);border:1.5px solid rgba(200,180,140,.35)}
+.loot .li{width:48px;height:48px;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--g) 45%,transparent),transparent 70%)}
+.loot .li img{width:46px;height:46px;object-fit:contain}
 .loot b{font-weight:600;line-height:1.2}.loot small{color:var(--ink-dim);font-size:.6rem;line-height:1.2}
-.loot.g-epic,.loot.g-legendary{border-width:2px;animation:lootglow 1.4s ease-in-out infinite}
-.loot.g-legendary{background:linear-gradient(rgba(18,16,12,.92),rgba(18,16,12,.92)) padding-box,linear-gradient(90deg,#ff6b6b,#ffe66b,#6bdc8a,#5bb8ff,#a98bff) border-box;border-color:transparent}
-@keyframes lootglow{50%{box-shadow:0 0 26px var(--g)}}
+/* rare and better: a gold frame that glows — spinning gold rim, corner gems in the grade colour, rays behind, shine sweep, twinkles */
+@property --ga{syntax:'<angle>';inherits:false;initial-value:0deg}
+.loot.gold .lbg{border:2.5px solid transparent;background:radial-gradient(circle at 5px 5px,var(--g) 2.6px,transparent 3.6px),radial-gradient(circle at calc(100% - 5px) 5px,var(--g) 2.6px,transparent 3.6px),radial-gradient(circle at 5px calc(100% - 5px),var(--g) 2.6px,transparent 3.6px),radial-gradient(circle at calc(100% - 5px) calc(100% - 5px),var(--g) 2.6px,transparent 3.6px),linear-gradient(170deg,color-mix(in srgb,var(--g) 22%,#1d1710),#120e09 70%) padding-box,conic-gradient(from var(--ga),#fff7cc,#e9b94a,#8a5a14,#ffd96b,#fffbe6,#c48a2c,#fff7cc) border-box;box-shadow:0 0 16px -2px var(--g),0 0 4px #ffd96b,inset 0 0 14px color-mix(in srgb,var(--g) 35%,transparent);animation:goldspin 2.6s linear infinite}
+.loot.gold .lbg::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(105deg,transparent 38%,rgba(255,250,220,.4) 50%,transparent 62%) 0 0/260% 100% no-repeat;animation:lshine 2.4s ease-in-out infinite}
+.loot.gold .lray{position:absolute;left:50%;top:42%;width:200%;aspect-ratio:1;translate:-50% -50%;z-index:-2;border-radius:50%;pointer-events:none;background:repeating-conic-gradient(color-mix(in srgb,var(--g) 60%,transparent) 0 5deg,transparent 5deg 18deg);-webkit-mask:radial-gradient(circle,#000 18%,transparent 66%);mask:radial-gradient(circle,#000 18%,transparent 66%);animation:lrays 9s linear infinite;opacity:.85}
+.loot.gold b{color:#ffe28a}
+.loot.g-legendary .lbg{box-shadow:0 0 22px 2px var(--g),0 0 6px #fff3b0,inset 0 0 18px color-mix(in srgb,var(--g) 45%,transparent)}
+.loot.g-legendary .lray{background:repeating-conic-gradient(#ff8a8a 0 4deg,transparent 4deg 12deg,#ffe66b 12deg 16deg,transparent 16deg 24deg,#7be0a0 24deg 28deg,transparent 28deg 36deg,#7cc4ff 36deg 40deg,transparent 40deg 48deg,#c3a6ff 48deg 52deg,transparent 52deg 60deg)}
+.loot .tw{position:absolute;width:14px;height:14px;top:-5px;right:-4px;background:#fffbe6;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);filter:drop-shadow(0 0 4px var(--g));animation:ltw 1.6s ease-in-out infinite;pointer-events:none}
+.loot .tw.t2{top:auto;right:auto;bottom:16px;left:-5px;width:10px;height:10px;animation-delay:.8s}
+.loot.art .lbg{border-color:transparent;box-shadow:none;background:linear-gradient(170deg,color-mix(in srgb,var(--g) 22%,#1d1710),#120e09 70%);inset:6px}
+.loot.art.gold .lbg{box-shadow:0 0 18px var(--g)}
+.loot .lfr{position:absolute;inset:-6px -5px;width:calc(100% + 10px);height:calc(100% + 12px);z-index:0;pointer-events:none;object-fit:fill}
+.loot.art.gold .lfr{filter:drop-shadow(0 0 6px var(--g))}
+.loot>.li,.loot>b,.loot>small{position:relative;z-index:1}
+@keyframes goldspin{to{--ga:360deg}}
+@keyframes lshine{0%{background-position:160% 0}55%,100%{background-position:-60% 0}}
+@keyframes lrays{to{rotate:360deg}}
+@keyframes ltw{0%,100%{transform:scale(.3) rotate(0);opacity:.2}50%{transform:scale(1.15) rotate(45deg);opacity:1}}
 .cnext{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 22px);display:flex;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s}
 .cnext.show{opacity:1;pointer-events:auto}.cnext .go{min-width:180px;font-size:1.05rem}
 .empty{color:var(--ink-faint);font-size:.85rem;background:var(--panel);border:1px dashed var(--line);border-radius:14px;padding:16px;text-align:center}
@@ -177,8 +194,10 @@ h2.sec{margin:0;font-family:var(--f-display);font-weight:500;font-size:.8rem;let
 .card h2{margin:0;text-align:center;font-family:var(--f-display);font-weight:600;font-size:2rem;color:var(--gold);text-shadow:0 0 18px rgba(255,190,80,.6)}
 .card h2.lose{color:#c9c2b4;text-shadow:none}
 .bigstars{text-align:center;font-size:2rem;letter-spacing:6px}
-.bigstars span{display:inline-block;animation:pop .4s both;color:var(--gold);text-shadow:0 0 12px rgba(255,190,80,.8)}
-.bigstars span.off{color:rgba(247,240,227,.18);text-shadow:none}
+.bigstars span{display:inline-block;animation:pop .4s both;font-size:1.25em;line-height:1;background:linear-gradient(#fffbe0,#ffd84a 45%,#e0870f);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-stroke:1.2px #7a4300;filter:drop-shadow(0 0 9px rgba(255,190,80,.85)) drop-shadow(0 2px 0 rgba(90,40,0,.6))}
+.bigstars span.off{background:linear-gradient(#5d554b,#36302a);-webkit-background-clip:text;background-clip:text;-webkit-text-stroke:1.2px rgba(0,0,0,.45);filter:none}
+.bigstars span img{width:1.15em;height:1.15em;vertical-align:middle;filter:drop-shadow(0 0 9px rgba(255,190,80,.85))}
+.bigstars span.off img{filter:none}
 @keyframes pop{0%{transform:scale(0) rotate(-40deg);opacity:0}70%{transform:scale(1.35)}100%{transform:scale(1);opacity:1}}
 .gains{display:grid;gap:6px}
 .gain{display:grid;grid-template-columns:40px 1fr auto;gap:10px;align-items:center;font-size:.8rem}

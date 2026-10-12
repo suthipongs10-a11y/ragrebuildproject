@@ -15,6 +15,8 @@ OBJ = {  # name -> output size
     'hatch_altar': (768, 768), 'hatch_crystal': (256, 256), 'hatch_crystal_stand': (256, 256), 'hatch_floor': (1024, 683),
     'chest_wood_closed': (768, 768), 'chest_wood_ajar': (768, 768), 'chest_wood_open': (768, 768),
     'chest_boss_closed': (768, 768), 'chest_boss_ajar': (768, 768), 'chest_boss_open': (768, 768),
+    # BATCH14 loot UI
+    'ui_star': (128, 128), 'ui_star_empty': (128, 128), 'ui_coin': (128, 128), 'ui_coin_pile': (192, 192), 'ui_frame_gold': (256, 320), 'ui_frame_plain': (256, 320),
 }
 LIGHT = {
     'hatch_altar_glow': (768, 768), 'fx_rays': (512, 512), 'fx_burst': (512, 512), 'fx_ring': (512, 512),
