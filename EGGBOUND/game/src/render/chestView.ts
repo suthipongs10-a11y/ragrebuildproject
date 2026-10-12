@@ -5,6 +5,7 @@
 import { LOOT_GRADES, LOOT_ORDER } from '../core/data';
 import { sfx } from './audio';
 import { RM } from './engine';
+import { IMG, fx } from './assets';
 
 const TAU = Math.PI * 2, PRISM = ['#ff6b6b', '#ffb84d', '#ffe66b', '#6bdc8a', '#5bb8ff', '#a98bff'];
 const rnd = (a, b) => a + Math.random() * (b - a), clamp = (v, a, b) => v < a ? a : v > b ? b : v;
@@ -24,7 +25,8 @@ export function showChest({ items, grade, boss, stars, onDone }) {
 
   const gi = LOOT_ORDER.indexOf(grade), colOf = g => LOOT_GRADES[g].col;
   const st = { phase: 'drop', t: 0, y: -1, vy: 0, lid: 0, shake: 0, glow: 0, step: 0, col: colOf('common'), rays: 0, flash: 0, flashC: '#fff', shown: 0, nextAt: 0 };
-  const parts = [];
+  const parts = [], fxs = [], ART = !!IMG.chest_wood_closed;
+  const addFx = (name, col, x, y, s0, s1, dur, rot = 0) => { if (IMG[name]) fxs.push({ name, col, x, y, s0, s1, dur, rot, t: 0 }); };
   const P = (o) => parts.push(Object.assign({ x: cx, y: cy, vx: 0, vy: 0, g: 0, life: 1, max: 1, size: 6, color: '#fff', add: true }, o));
   const burst = (n, color, spd, size, life, o = {}) => { for (let i = 0; i < n; i++) { const a = Math.random() * TAU, s = spd * rnd(.3, 1); P(Object.assign({ x: cx, y: cy - S * .05, vx: Math.cos(a) * s, vy: Math.sin(a) * s - spd * .25, g: 380, life, max: life, size: size * rnd(.5, 1.2), color }, o)); } };
   const legend = () => grade === 'legendary';
@@ -53,6 +55,7 @@ export function showChest({ items, grade, boss, stars, onDone }) {
     if (fast) return;
     const gr = LOOT_ORDER.indexOf(it.grade);
     burst(10 + gr * 8, colOf(it.grade), 260 + gr * 60, 7, .8);
+    if (gr >= 1) addFx('fx_ring', colOf(it.grade), cx, cy - S * .2, S * .2, S * (1.6 + gr * .6), .5);
     if (gr >= 2) { st.flash = .35; st.flashC = colOf(it.grade); sfx.chime(); } else if (it.grade === 'rare') sfx.perfect(); else sfx.coin();
   }
 
@@ -83,11 +86,15 @@ export function showChest({ items, grade, boss, stars, onDone }) {
     }
     if (st.phase === 'done') st.shake = 0;
     st.flash = Math.max(0, st.flash - dt * 1.6);
+    for (const f of fxs) f.t += dt; for (let i = fxs.length - 1; i >= 0; i--) if (fxs[i].t >= fxs[i].dur) fxs.splice(i, 1);
     for (let i = parts.length - 1; i >= 0; i--) { const p = parts[i]; p.life -= dt; if (p.life <= 0) { parts.splice(i, 1); continue; } p.vy += p.g * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.vx *= .985; }
   }
   function open() {
     st.phase = 'open'; st.t = 0; st.col = colOf(grade); st.flash = legend() ? 1 : .8; st.flashC = st.col; st.shake = 16 + gi * 6;
     sfx.boom(); if (legend()) { sfx.starup(); setTimeout(() => sfx.win(), 250); } else if (gi === 2) sfx.react(); else sfx.chime();
+    const fy = cy - S * .2;
+    addFx('fx_burst', st.col, cx, fy, S * .8, S * 4, .6, Math.random()); addFx('fx_ring', st.col, cx, fy, S * .3, S * 5, .75); addFx('fx_ring', '#ffffff', cx, fy, S * .2, S * 3, .5);
+    if (legend()) PRISM.forEach((c, i) => addFx('fx_ring', c, cx, fy, S * .2, S * (3 + i * .5), .7 + i * .08));
     const cols = legend() ? PRISM : [st.col, '#ffffff'];
     cols.forEach((c, i) => burst(Math.round((30 + gi * 25) / cols.length), c, 420 + gi * 120, 9, 1.3));
     for (let i = 0; i < 18 + gi * 8; i++) P({ x: cx + rnd(-S * .3, S * .3), y: cy - S * .1, vx: rnd(-60, 60), vy: rnd(-520, -260), g: 520, life: 1.4, max: 1.4, size: rnd(5, 10), color: '#ffd76a', coin: true, add: false });
@@ -96,6 +103,7 @@ export function showChest({ items, grade, boss, stars, onDone }) {
   // ---------- draw ----------
   function rays() {
     const a = st.rays; if (a <= 0) return; const R = Math.max(W, H);
+    if (ART && IMG.fx_rays) { fx(ctx, 'fx_rays', curCol(), cx, cy - S * .2, R * 1.15, R * 1.15, a * .95, st.t * (.2 + gi * .06)); fx(ctx, 'fx_rays', '#fff6dc', cx, cy - S * .2, R * .7, R * .7, a * .45, -st.t * .15); return; }
     ctx.save(); ctx.translate(cx, cy - S * .1); ctx.globalCompositeOperation = 'lighter';
     const n = 18;
     for (let i = 0; i < n; i++) {
@@ -109,7 +117,27 @@ export function showChest({ items, grade, boss, stars, onDone }) {
     ctx.restore();
   }
   function glowDot(x, y, r, c, a) { const g = ctx.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, c); g.addColorStop(.35, c + '88'); g.addColorStop(1, c + '00'); ctx.globalAlpha = a; ctx.fillStyle = g; ctx.fillRect(x - r, y - r, r * 2, r * 2); }
+  function chestArt() {
+    const sh = st.shake && !RM ? st.shake : 0, ox = rnd(-sh, sh) * .4, rot = Math.sin(st.t * 40) * sh * .002;
+    const K = S / 640, bottom = st.y * H + cy + S * .5, hinge = -300 * K, cav = -318 * K, col = curCol(), open = st.lid, pre = boss ? 'chest_boss_' : 'chest_wood_';
+    let frame = 'closed';
+    if (st.phase === 'charge' && st.t > .12 && Math.sin(st.t * (24 + st.step * 8)) > .15) frame = 'ajar'; // the lid rattles
+    if (open > 0) frame = 'open';
+    ctx.save(); ctx.translate(cx + ox, bottom); ctx.rotate(rot);
+    ctx.globalAlpha = .5 * clamp(1 + st.y * 3, 0, 1); ctx.fillStyle = '#000'; ctx.beginPath(); ctx.ellipse(0, -4, S * .62, S * .09, 0, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
+    fx(ctx, 'fx_orb', col, 0, cav, S * (1.6 + st.glow * 1.2), S * (1.6 + st.glow * 1.2), .2 + st.glow * .35);
+    if (open > 0) fx(ctx, 'fx_column', col, 0, cav - H * .4, S * 1.1, H * .82, open * .9);
+    ctx.drawImage(IMG[pre + frame] || IMG[pre + 'closed'], -512 * K, -860 * K, 1024 * K, 1024 * K);
+    if (open > 0) { fx(ctx, 'fx_orb', col, 0, cav, S * 1.15, S * .42, open); fx(ctx, 'fx_orb', '#ffffff', 0, cav, S * .7, S * .22, open * .9); }
+    if (st.phase === 'charge') {
+      const k = clamp(st.glow, 0, 1.2), ajar = frame === 'ajar';
+      fx(ctx, 'fx_orb', st.col, 0, hinge, S * (ajar ? 1.2 : .9), S * (ajar ? .22 : .1), k);
+      if (ajar) fx(ctx, 'fx_burst', st.col, 0, hinge, S * 1.9, S * .45, k * .7);
+    }
+    ctx.restore();
+  }
   function chest() {
+    if (ART) return chestArt();
     const sh = st.shake && !RM ? st.shake : 0, ox = rnd(-sh, sh) * .4, rot = Math.sin(st.t * 40) * sh * .002;
     const y0 = (st.y * H) + cy, w = S, bh = S * .56, lh = S * .36, top = y0 - S * .06, L = -w / 2, R = w / 2;
     const wood = boss ? ['#c23040', '#8e1f2a', '#5a1018'] : ['#b47a42', '#8a5a2e', '#5a3818'], metal = boss ? ['#fff0b8', '#ffd27a', '#a8781e'] : ['#f2d48a', '#d0a24a', '#7d5a20'];
@@ -159,9 +187,11 @@ export function showChest({ items, grade, boss, stars, onDone }) {
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0); ctx.clearRect(0, 0, W, H);
     const bg = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * .7); bg.addColorStop(0, 'rgba(22,18,12,.78)'); bg.addColorStop(1, 'rgba(4,4,6,.94)'); ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H);
     rays(); chest();
+    for (const f of fxs) { const u = f.t / f.dur, s = f.s0 + (f.s1 - f.s0) * easeOut(u); fx(ctx, f.name, f.col, f.x, f.y, s, s, 1 - u * u, f.rot); }
     for (const p of parts) {
       const a = clamp(p.life / p.max, 0, 1); ctx.globalAlpha = a; ctx.globalCompositeOperation = p.add ? 'lighter' : 'source-over';
       if (p.coin) { ctx.fillStyle = p.color; ctx.beginPath(); ctx.ellipse(p.x, p.y, p.size, p.size * Math.abs(Math.sin(p.life * 12)) + 1, 0, 0, TAU); ctx.fill(); }
+      else if (p.add && ART && IMG.fx_sparkle && p.color[0] === '#') { const r = p.size * 3.4; fx(ctx, 'fx_sparkle', p.color, p.x, p.y, r, r, a, p.life * 2); ctx.globalAlpha = a; }
       else { const r = p.size * (p.add ? 2.2 : 1); if (p.add) { const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r); g.addColorStop(0, '#fff'); g.addColorStop(.3, p.color); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(p.x - r, p.y - r, r * 2, r * 2); } else { ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, TAU); ctx.fill(); } }
     }
     ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over';

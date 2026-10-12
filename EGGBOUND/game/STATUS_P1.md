@@ -50,3 +50,10 @@ Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`,
 ## Hatching altar
 - Code-drawn: 3-tier gold-trimmed altar, rotating rune circle, 4 floating crystal obelisks, soft light column + spinning rings,
   energy beams from the crystals into the egg while it cracks. Teal while idle; egg colour while hatching (rainbow eggs cycle).
+
+## Batch 06 art (hatching altar, chests, light FX) — in
+- `tools/import_fx.py` imports 18 images; light layers become white+alpha and are tinted at runtime (`tinted`, `fx`, `colored` in assets.ts).
+- Hatch scene: ceremony floor + rotating rune circle, 4 tinted crystals on stands, altar sprite + tinted glow mask, light column,
+  rays, burst + shockwave rings when the egg breaks, sparkles while it cracks. Code-drawn version remains as fallback.
+- Chest: closed → lid rattles closed/ajar with light leaking from the gap while charging → open sprite with light from the cavity,
+  rays, burst + rings (rainbow rings for legendary), ring per rare item. Boss stages use the red/gold chest.

@@ -36,6 +36,7 @@
 - วัตถุศักดิ์สิทธิ์ = สกิลติดตัวทีม เลือกพกได้ 1 ชิ้น/ทีม (ตราสุริยัน, ขนนกวายุ, เกล็ดกระดอง, น้ำเต้าอมฤต)
 - โค้ด: `src/game/home.ts` (ข้อมูล/สูตร) · `src/render/homeView.ts` (ฉาก ใช้ภาพชุด BATCH04 แล้ว ถ้าไม่มีภาพจะวาดด้วยโค้ดแทน · ตำแหน่งภาพอยู่ในค่าคงที่ `SHELL_K/HEAD_*/FLIP_K/BLD_K/NEST/ART_TOP`) · Battle รับ `HomeMods` เป็นพารามิเตอร์ที่ 4
 - นำเข้าภาพบ้านเต่าชุดใหม่: `python3 game/tools/import_home.py <dir A> <dir B> <dir C>` (ย่อ + webp + mask ช่องประตูภพ) แล้ว `npm run build`
+- แท่นฟักไข่ หีบสมบัติ เอฟเฟ็คแสง (BATCH06): `python3 game/tools/import_fx.py <โฟลเดอร์ batch06>` · ภาพแสง (fx_*, hatch_altar_glow) แปลงเป็นขาว+alpha แล้วย้อมสีในเกมด้วย `tinted()/fx()` ใน assets.ts วาดแบบ 'lighter' · คริสตัลไม่มีสี ย้อมด้วย `colored()` · ใช้ซ้ำกับ VFX สกิลได้
 - ทำเงิน: สกินเต่า/ปราสาท ของแต่งกระดอง ธีมเทศกาล · ภายหลังเพื่อนแวะชมเกาะแบบ async
 ### ไข่ (ตัดสินใจแล้ว · M0 ทำแล้ว ยกเว้นไข่ดารา/ลูบไข่ — ดู `game/STATUS_P1.md`)
 - ไข่ปริศนา: ดรอปจากด่าน/ภารกิจ ไม่รู้ตัว รู้แค่ความหายากจากลายเปลือก (ธรรมดา/เงิน/ทอง/รุ้ง)
@@ -69,7 +70,7 @@ tests/sim.ts   ตรวจ determinism + จำลองสมดุลหล�
 ## 6. คำสั่ง
 ```
 cd game && npm install
-npm run build      # → dist/index.html ไฟล์เดียว ฝังภาพเป็น data URI (~3MB)
+npm run build      # → dist/index.html ไฟล์เดียว ฝังภาพเป็น data URI (~5.7MB)
 npm test           # determinism + balance
 npm run typecheck  # tsc (core + tests)
 npm run rates      # ตารางอัตราฟักไข่ปริศนาทั้งหมด (คำนวณ + จำลอง 2 ล้านฟองรวมการันตี)

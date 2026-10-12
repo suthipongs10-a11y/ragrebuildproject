@@ -162,3 +162,32 @@ export function mysteryEggImg(tier) {
 export const eggOf = egg => egg.kind === 'mystery' ? mysteryEggImg(egg.tier) : eggImg(egg.sid);
 const MEGGU = {};
 export const eggURLOf = egg => egg.kind === 'mystery' ? (MEGGU[egg.tier] || (MEGGU[egg.tier] = mysteryEggImg(egg.tier).toDataURL('image/webp', .9))) : eggURL(egg.sid);
+
+// ---- light sprites (batch 06): white + alpha images tinted to any colour, drawn additively ----
+const TINT = {};
+/** a white light sprite (fx_*, hatch_altar_glow) recoloured to `color` (cached); null without the art */
+export function tinted(name, color) {
+  const img = IMG[name]; if (!img) return null;
+  const k = name + color; if (TINT[k]) return TINT[k];
+  const c = mk(img.width, img.height), x = c.getContext('2d');
+  x.drawImage(img, 0, 0); x.globalCompositeOperation = 'source-in'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height);
+  return (TINT[k] = c);
+}
+/** draw a light sprite centred at (x, y) with size w×h: tinted glow + a fainter white-hot core, additive */
+export function fx(ctx, name, color, x, y, w, h, alpha = 1, rot = 0) {
+  const t = tinted(name, color); if (!t || alpha <= 0) return false;
+  ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(x, y); if (rot) ctx.rotate(rot);
+  ctx.globalAlpha = Math.min(1, alpha); ctx.drawImage(t, -w / 2, -h / 2, w, h);
+  ctx.globalAlpha = Math.min(1, alpha) * .35; ctx.drawImage(IMG[name], -w / 2, -h / 2, w, h);
+  ctx.restore(); return true;
+}
+const MULT = {};
+/** a colourless object sprite (hatch_crystal) multiplied by `color`, keeping its own alpha (cached) */
+export function colored(name, color) {
+  const img = IMG[name]; if (!img) return null;
+  const k = name + color; if (MULT[k]) return MULT[k];
+  const c = mk(img.width, img.height), x = c.getContext('2d');
+  x.drawImage(img, 0, 0); x.globalCompositeOperation = 'multiply'; x.fillStyle = color; x.fillRect(0, 0, c.width, c.height);
+  x.globalCompositeOperation = 'destination-in'; x.drawImage(img, 0, 0);
+  return (MULT[k] = c);
+}

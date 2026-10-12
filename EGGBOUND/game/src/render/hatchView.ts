@@ -1,7 +1,7 @@
 // @ts-nocheck
 // Hatch scene: egg on a rune pedestal → wobble → 3 crack stages → light rays → burst → silhouette → reveal.
 import { SPECIES } from '../core/data';
-import { PAL, PIV, TAU, spr, silOf, glowOf, GP, dot, eggImg, mk, TIER_COL } from './assets';
+import { PAL, PIV, TAU, spr, silOf, glowOf, GP, dot, eggImg, mk, TIER_COL, IMG, fx, tinted, colored } from './assets';
 import { sfx } from './audio';
 import { E, SQ, lerp, rnd, clamp, easeOut, easeBack, run, tween, addP, burst, ring, shake, flash, drawParts, drawDecals, drawGround, drawLantern, drawBush, drawLanternPools, drawFlies, LANTERNS, BUSHES, worldTransform, drawOverlays } from './engine';
 
@@ -9,6 +9,14 @@ const PED = { x: 0, y: -40 }, EGGK = .42;
 const PRISM = ['#ff6b6b', '#ffb84d', '#ffe66b', '#6bdc8a', '#5bb8ff', '#a98bff'];
 // 4 floating crystal obelisks around the altar: [x, y offset from the pedestal, phase] — two behind, two in front at the sides
 const CRYSTALS = [[-178, -72, 0], [178, -72, 1.7], [-196, 52, 3.1], [196, 52, 4.4]];
+// ---- batch 06 art (tools/import_fx.py): positions in the original canvas px ----
+const ART = () => !!IMG.hatch_altar;
+const ALT_K = .45, DISH = [511, 548];            // altar 1024²: egg sits on the dish centre
+const FLOOR_K = .5, FLOOR_C = [768, 560], FLOOR_Y = 50; // floor 1536×1024, ellipse centre → PED.y + FLOOR_Y
+const STAND_K = .25, CRY_K = .27;                 // stand 512² (base front y=470, top disc y=300) · crystal 512² (tips y=50..470)
+const CRYSTALS_ART = [[-190, -58, 0], [190, -58, 1.7], [-222, 74, 3.1], [222, 74, 4.4]];
+const crystals = () => ART() ? CRYSTALS_ART : CRYSTALS;
+const lighten = (hex, f) => { const n = parseInt(hex.slice(1), 16), m = c => Math.round(c + (255 - c) * f); return '#' + [m(n >> 16 & 255), m(n >> 8 & 255), m(n & 255)].map(v => v.toString(16).padStart(2, '0')).join(''); };
 const IDLE_COL = '#7fe8ff', GOLD = ['#fff0b8', '#e8b84a', '#8a5a14'];
 const colC = {};
 /** soft light column sprite (fades at the sides and toward the top), cached per colour */
@@ -21,7 +29,7 @@ function column(c) {
 }
 const RUNES = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ'];
 export class HatchView {
-  sid; P; EP; egg; mon; phase = 'ready'; rays = 0; onDone = null; dup = false; newStars = 1; eggSrc = null; tier = null; rare = false; revealed = false;
+  sid; P; EP; egg; mon; fxs = []; phase = 'ready'; rays = 0; onDone = null; dup = false; newStars = 1; eggSrc = null; tier = null; rare = false; revealed = false;
   constructor(sid, opts) {
     this.sid = sid; this.P = PAL[SPECIES[sid].elem]; Object.assign(this, opts);
     this.egg = { x: PED.x, y: PED.y - 38, rot: 0, hop: 0, sx: 1, sy: 1, glow: 0, white: 0, vis: true, cracks: [], cv: mk(512, 512), stage: 0, t: 0 };
@@ -46,7 +54,14 @@ export class HatchView {
     const w = this.eggWorld(254, 300); burst(w[0], g.y, w[1], 10, '#f6e6cc', 200, 5, .6, { add: false, type: 'chip', grav: 700, vz: 160 }); burst(w[0], g.y, w[1], 8, this.EP.core, 160, 14, .4);
     sfx.crack(); shake(2 + stage * 1.5);
   }
+  addFx(name, col, x, y, s0, s1, dur, rot = 0, a = 1) { if (IMG[name]) this.fxs.push({ name, col, x, y, s0, s1, dur, rot, a, t: 0 }); }
+  breakFx() { // the egg bursts: hot flash + two shockwaves in the egg's colour
+    const x = PED.x, y = PED.y - 90, c = this.col();
+    this.addFx('fx_burst', c, x, y, 220, 900, .55, Math.random()); this.addFx('fx_ring', c, x, y, 80, 980, .7); this.addFx('fx_ring', '#ffffff', x, y, 40, 620, .5);
+  }
   update(dt) {
+    for (const f of this.fxs) f.t += dt; this.fxs = this.fxs.filter(f => f.t < f.dur);
+    if (this.phase === 'hatching' && this.egg.vis && ART() && Math.random() < dt * (4 + this.egg.glow * 14)) this.addFx('fx_sparkle', this.col(), PED.x + rnd(-70, 70), PED.y - 90 + rnd(-70, 50), 20, rnd(50, 90), .5, rnd(0, 1));
     const g = this.egg, m = this.mon, P = this.P;
     g.t += dt; const t = g.t;
     if (this.phase === 'ready') { g.rot = Math.sin(t * 2) * .02 + (t % 3.2 > 2.8 ? Math.sin(t * 40) * .05 : 0); g.glow = .25 + .15 * Math.sin(t * 2.4); return; }
@@ -58,7 +73,7 @@ export class HatchView {
         if (Math.random() < dt * 20 * g.glow) { const w = this.eggWorld(254 + rnd(-80, 80), 300 + rnd(-80, 80)); addP({ x: w[0], y: g.y, z: w[1], vz: rnd(60, 140), vx: rnd(-30, 30), life: .8, size: rnd(8, 14), size2: 0, color: this.EP.core }); } }
       else if (h < 3.0) { g.rot *= .8; g.white = (h - 2.7) / .3; g.sx = 1 + (h - 2.7) * .5; g.sy = 1 + (h - 2.7) * .3; this.rays = 1.2; }
       else if (g.vis) {
-        g.vis = false; flash(1); shake(12); sfx.boom();
+        g.vis = false; flash(1); shake(12); sfx.boom(); this.breakFx();
         const cols = ['#f7ecd9', P.aura, P.core, '#fff6e8', P.rune];
         for (let i = 0; i < 40; i++) { const a = Math.random() * TAU, s = rnd(140, 420); addP({ type: 'chip', add: false, x: g.x, y: g.y, z: 55, vx: Math.cos(a) * s, vy: Math.sin(a) * s * SQ, vz: rnd(180, 480), grav: 1000, life: rnd(1.2, 1.8), size: rnd(6, 14), color: cols[i % cols.length], rot: rnd(0, TAU), vr: rnd(-12, 12), drag: .6, keep: true }); }
         ring(g.x, g.y, 10, 240, P.aura, .6, 12); ring(g.x, g.y, 10, 170, P.hot, .45, 5); burst(g.x, g.y, 60, 60, P.aura, 560, 22, .8); burst(g.x, g.y, 60, 30, P.hot, 380, 12, .6);
@@ -75,18 +90,25 @@ export class HatchView {
   }
   render() {
     const ctx = E.ctx; worldTransform(); drawGround(); drawDecals(); drawLanternPools();
-    const ents = [{ y: PED.y - 1, d: () => this.drawRuneCircle() }, { y: PED.y, d: () => this.drawPedestal() }, { y: PED.y + .5, d: () => this.drawEgg() }, { y: PED.y + 1, d: () => this.drawMon() }];
-    for (const c of CRYSTALS) ents.push({ y: PED.y + c[1], d: () => this.drawCrystal(c) });
-    ents.push({ y: PED.y + .7, d: () => this.drawBeams() });
+    const art = ART(), ay = art ? PED.y + 55 : PED.y; // the sprite altar's footprint centre sits lower
+    const ents = [{ y: art ? -1e9 : PED.y - 1, d: () => this.drawRuneCircle() }, { y: ay, d: () => this.drawPedestal() }, { y: ay + .5, d: () => this.drawEgg() }, { y: ay + 1, d: () => this.drawMon() }];
+    for (const c of crystals()) ents.push({ y: PED.y + c[1], d: () => this.drawCrystal(c) });
+    ents.push({ y: ay + .7, d: () => this.drawBeams() });
     for (const L of LANTERNS) ents.push({ y: L.y, d: () => drawLantern(L) }); for (const b of BUSHES) ents.push({ y: b.y, d: () => drawBush(b) });
     ents.sort((a, b) => a.y - b.y); for (const e of ents) e.d();
-    this.drawRays(); drawParts(); drawFlies(); drawOverlays();
+    this.drawRays(); this.drawFx(); drawParts(); drawFlies(); drawOverlays();
   }
   cyl(x, yB, rx, h, top, side, ry) { const ctx = E.ctx; const g = ctx.createLinearGradient(x - rx, 0, x + rx, 0); g.addColorStop(0, '#5a5246'); g.addColorStop(.35, side); g.addColorStop(1, '#4a4238'); ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(x + rx, yB - h); ctx.lineTo(x + rx, yB); ctx.ellipse(x, yB, rx, ry, 0, 0, Math.PI); ctx.lineTo(x - rx, yB - h); ctx.closePath(); ctx.fill(); ctx.fillStyle = top; ctx.beginPath(); ctx.ellipse(x, yB - h, rx, ry, 0, 0, TAU); ctx.fill(); ctx.strokeStyle = 'rgba(50,40,30,.5)'; ctx.lineWidth = 1.5; ctx.stroke(); }
   /** altar colour: teal while idle, the egg's colour while hatching (rainbow eggs cycle) */
   col(i = 0) { return this.phase === 'ready' ? IDLE_COL : this.tier === 'rainbow' ? PRISM[(Math.floor(E.time * 5) + i) % PRISM.length] : this.EP.aura; }
   power() { return this.phase === 'ready' ? .45 + .15 * Math.sin(E.time * 2) : clamp(.6 + this.egg.glow * .9 + (this.egg.vis ? 0 : .6), 0, 1.6); }
   drawRuneCircle() { // big engraved rune circle on the ground, rotating glyph ring
+    if (ART()) {
+      const ctx = E.ctx, fy = PED.y + FLOOR_Y, pw = this.power();
+      if (IMG.hatch_floor) ctx.drawImage(IMG.hatch_floor, PED.x - FLOOR_C[0] * FLOOR_K, fy - FLOOR_C[1] * FLOOR_K, 1536 * FLOOR_K, 1024 * FLOOR_K);
+      ctx.save(); ctx.translate(PED.x, fy); ctx.scale(1, .38); fx(ctx, 'fx_rune_circle', this.col(), 0, 0, 640, 640, Math.min(1, pw * .95), E.time * .12); ctx.restore();
+      return;
+    }
     const ctx = E.ctx, x = PED.x, y = PED.y + 6, t = E.time, pw = this.power(), c = this.col();
     ctx.save(); ctx.translate(x, y);
     ctx.fillStyle = 'rgba(12,10,8,.35)'; ctx.beginPath(); ctx.ellipse(0, 4, 300, 118, 0, 0, TAU); ctx.fill();
@@ -100,6 +122,7 @@ export class HatchView {
     ctx.restore();
   }
   drawPedestal() { // three-tier carved altar with gold trim and a glowing core gem
+    if (ART()) return this.drawAltarArt();
     const ctx = E.ctx, x = PED.x, y = PED.y, t = E.time, c = this.col(), pw = this.power();
     this.cyl(x, y, 150, 16, '#b5ab96', '#857b6a', 54); this.trim(x, y - 16, 150, 54);
     this.cyl(x, y - 16, 114, 14, '#c6bca6', '#91877a', 41); this.trim(x, y - 30, 114, 41);
@@ -121,8 +144,34 @@ export class HatchView {
     // rising motes
     if (Math.random() < .25 + pw * .4) { const a = Math.random() * TAU, r = rnd(40, 250); addP({ x: x + Math.cos(a) * r, y: y + Math.sin(a) * r * .39, z: 0, vz: rnd(40, 110), life: rnd(1, 1.8), size: rnd(5, 10), size2: 0, color: this.col() }); }
   }
+  drawAltarArt() {
+    const ctx = E.ctx, t = E.time, c = this.col(), pw = this.power(), K = ALT_K, ox = PED.x - DISH[0] * K, oy = PED.y - 38 - DISH[1] * K, sz = 1024 * K;
+    ctx.drawImage(IMG.hatch_altar, ox, oy, sz, sz);
+    const gl = tinted('hatch_altar_glow', c);
+    if (gl) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, pw); ctx.drawImage(gl, ox, oy, sz, sz); ctx.globalAlpha = Math.min(1, pw) * .45; ctx.drawImage(IMG.hatch_altar_glow, ox, oy, sz, sz); ctx.restore(); }
+    fx(ctx, 'fx_column', c, PED.x, PED.y - 38 - 205, 170, 430, Math.min(1, pw * .75));
+    for (const [ry, sp, rr] of [[-110, .9, 92], [-160, -1.3, 72]]) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(PED.x, PED.y + ry); ctx.rotate(Math.sin(t * .7) * .15); ctx.globalAlpha = Math.min(1, pw) * .5; ctx.strokeStyle = c; ctx.lineWidth = 2; ctx.setLineDash([14, 10]); ctx.lineDashOffset = t * 40 * sp; ctx.beginPath(); ctx.ellipse(0, 0, rr, rr * .28, 0, 0, TAU); ctx.stroke(); ctx.restore(); }
+    if (Math.random() < .25 + pw * .4) { const a = Math.random() * TAU, r = rnd(60, 300); addP({ x: PED.x + Math.cos(a) * r, y: PED.y + FLOOR_Y + Math.sin(a) * r * .38, z: 0, vz: rnd(40, 110), life: rnd(1, 1.8), size: rnd(5, 10), size2: 0, color: this.col() }); }
+  }
+  /** centre of a crystal (it hovers above its stand) */
+  crystalPos([cx, oy, ph]) {
+    const y = PED.y + oy, bob = Math.sin(E.time * 1.6 + ph) * 6;
+    if (!ART()) return [cx, y - 70 + bob];
+    return [cx, y - (470 - 300) * STAND_K - 12 + bob - 210 * CRY_K];
+  }
+  drawFx() { const ctx = E.ctx; for (const f of this.fxs) { const u = f.t / f.dur, s = lerp(f.s0, f.s1, easeOut(u)); fx(ctx, f.name, f.col, f.x, f.y, s, s, f.a * (1 - u * u), f.rot); } }
   trim(x, yT, rx, ry) { const ctx = E.ctx; ctx.strokeStyle = GOLD[1]; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(x, yT, rx - 2, ry - 1, 0, 0, Math.PI); ctx.stroke(); ctx.strokeStyle = 'rgba(255,240,190,.55)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.ellipse(x, yT - 1, rx - 6, ry - 3, 0, Math.PI * 1.05, Math.PI * 1.95); ctx.stroke(); }
   drawCrystal([cx, oy, ph]) { // floating crystal obelisk on a small carved stand
+    if (ART() && IMG.hatch_crystal) {
+      const ctx = E.ctx, y = PED.y + oy, c = this.col(ph | 0), pw = this.power(), [, my] = this.crystalPos([cx, oy, ph]);
+      ctx.fillStyle = 'rgba(12,10,8,.3)'; ctx.beginPath(); ctx.ellipse(cx, y + 2, 34, 11, 0, 0, TAU); ctx.fill();
+      if (IMG.hatch_crystal_stand) ctx.drawImage(IMG.hatch_crystal_stand, cx - 256 * STAND_K, y - 470 * STAND_K, 512 * STAND_K, 512 * STAND_K);
+      fx(ctx, 'fx_orb', c, cx, my, 120, 120, Math.min(1, pw * .9));
+      const cr = colored('hatch_crystal', lighten(c, .4)), top = my - 260 * CRY_K, sz = 512 * CRY_K;
+      ctx.drawImage(cr, cx - 256 * CRY_K, top, sz, sz);
+      ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, pw) * .35; ctx.drawImage(cr, cx - 256 * CRY_K, top, sz, sz); ctx.restore();
+      return;
+    }
     const ctx = E.ctx, t = E.time, y = PED.y + oy, c = this.col(ph | 0), pw = this.power(), bob = Math.sin(t * 1.6 + ph) * 6, hy = y - 70 + bob;
     ctx.fillStyle = 'rgba(12,10,8,.35)'; ctx.beginPath(); ctx.ellipse(cx, y + 3, 30, 11, 0, 0, TAU); ctx.fill();
     this.cyl(cx, y, 24, 22, '#c6bca6', '#8d8372', 9); ctx.strokeStyle = GOLD[1]; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(cx, y - 22, 23, 8, 0, 0, Math.PI); ctx.stroke();
@@ -136,7 +185,7 @@ export class HatchView {
   drawBeams() { // energy streams from the crystals into the egg while it hatches
     if (this.phase === 'ready' || !this.egg.vis) return; const ctx = E.ctx, t = E.time, k = clamp(this.egg.glow, 0, 1), ex = this.egg.x, ey = this.egg.y - 55;
     ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineCap = 'round';
-    CRYSTALS.forEach(([cx, oy, ph], i) => { const sx = cx, sy = PED.y + oy - 70 + Math.sin(t * 1.6 + ph) * 6, mx = (sx + ex) / 2, my = Math.min(sy, ey) - 60; const c = this.col(i);
+    crystals().forEach((cr, i) => { const [sx, sy] = this.crystalPos(cr), mx = (sx + ex) / 2, my = Math.min(sy, ey) - 60; const c = this.col(i);
       for (const [w, a] of [[9, .25], [3, .9]]) { ctx.globalAlpha = k * a * (.7 + .3 * Math.sin(t * 20 + i)); ctx.strokeStyle = w > 4 ? c : '#ffffff'; ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(sx, sy); ctx.quadraticCurveTo(mx + Math.sin(t * 9 + i) * 20, my, ex, ey); ctx.stroke(); } });
     ctx.restore();
   }
@@ -162,7 +211,8 @@ export class HatchView {
     if (this.rare && this.revealed) { ctx.save(); ctx.font = '700 24px "IBM Plex Sans Thai",sans-serif'; ctx.textAlign = 'center'; const ty = m.y - 210 * m.k / .4 + Math.sin(E.time * 3) * 4; ctx.strokeStyle = 'rgba(0,0,0,.6)'; ctx.lineWidth = 5; ctx.strokeText('ร่างหายาก!', m.x, ty); ctx.fillStyle = PRISM[Math.floor(E.time * 4) % PRISM.length]; ctx.fillText('ร่างหายาก!', m.x, ty); ctx.restore(); }
   }
   drawRays() {
-    if (this.rays <= 0) return; const ctx = E.ctx, cx = PED.x, cy = PED.y - 90;
+    if (this.rays <= 0) return;
+    if (fx(E.ctx, 'fx_rays', this.col(), PED.x, PED.y - 90, 820 * Math.min(1.2, this.rays), 820 * Math.min(1.2, this.rays), Math.min(1, this.rays) * .9, E.time * .3)) { fx(E.ctx, 'fx_rays', '#fff6dc', PED.x, PED.y - 90, 520 * Math.min(1.2, this.rays), 520 * Math.min(1.2, this.rays), Math.min(1, this.rays) * .5, -E.time * .2); return; } const ctx = E.ctx, cx = PED.x, cy = PED.y - 90;
     ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(cx, cy);
     for (let i = 0; i < 14; i++) { const a = i / 14 * TAU + E.time * .35 + (i % 2) * .1, len = (260 + ((i * 73) % 5) * 60) * Math.min(1.2, this.rays), w = .05 + ((i * 37) % 4) * .02; const g = ctx.createLinearGradient(0, 0, Math.cos(a) * len, Math.sin(a) * len); g.addColorStop(0, 'rgba(255,236,190,.5)'); g.addColorStop(1, 'rgba(255,200,120,0)'); ctx.fillStyle = g; ctx.globalAlpha = Math.min(1, this.rays) * (.5 + .5 * Math.sin(E.time * 4 + i)); ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(a - w) * len, Math.sin(a - w) * len); ctx.lineTo(Math.cos(a + w) * len, Math.sin(a + w) * len); ctx.closePath(); ctx.fill(); }
     ctx.restore();
