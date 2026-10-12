@@ -22,6 +22,8 @@ LIGHT = {
     # BATCH12 hatch power-up (epic+ hatch): used automatically by hatchView when present, code drawing otherwise
     'fx_aura_flame': (512, 768), 'fx_aura_flame_b': (512, 768), 'fx_light_shaft': (128, 512), 'fx_energy_beam': (512, 128),
     'fx_vortex_spiral': (256, 512), 'fx_arc_ring': (512, 512), 'fx_aura_burst_ground': (512, 512),
+    # BATCH13 fox prototype skill FX + shared hit sparks
+    'fx_foxfire': (256, 384), 'fx_bite': (512, 512), 'fx_fire_trail': (768, 256), 'fx_hit_spark': (512, 512), 'fx_hit_spark_b': (512, 512), 'fx_slash_arc': (512, 512),
 }
 
 

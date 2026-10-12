@@ -7,6 +7,9 @@ Usage: python3 tools/import_art.py <set_dir> <ID> [target_height_px] [--mirror n
  - damaged (truncated) or missing PNGs are skipped and reported; the game falls back to another pose (assets.ts spr()).
  - egg: scaled to egg001 height (254px), bottom at y=425.
  - --key: asset key when it differs from mon<ID> (e.g. --key monA09e for an evolved form).
+ - extra motion poses (BATCH13+: windup, strike, follow, cast2, joy, down — front/back) are imported when present.
+ - add-on sets without front_idle: include mon<ID>_front_idle_ref.png (a redraw of the idle); its height is matched to the
+   EXISTING assets/<key>_front_idle.webp so new poses keep the in-game scale (target height is then ignored).
 """
 import sys, os, glob
 from PIL import Image
@@ -47,21 +50,32 @@ def place(im, s, anchor_src, anchor_dst):
     return c
 
 
-poses = ['master'] + [f'{v}_{p}' for v in ('front', 'back') for p in ('idle', 'attack', 'cast', 'hit', 'burst')]
+BASE = ['master'] + [f'{v}_{p}' for v in ('front', 'back') for p in ('idle', 'attack', 'cast', 'hit', 'burst')]
+EXTRA = [f'{v}_{p}' for v in ('front', 'back') for p in ('windup', 'strike', 'follow', 'cast2', 'joy', 'down')]
+present = lambda p: f'mon{ID}_{p}.png' in files
+idle_ref = load(f'mon{ID}_front_idle_ref') if present('front_idle_ref') else None
+poses = [p for p in BASE if not idle_ref or present(p)] + [p for p in EXTRA if present(p)]
 imgs = {p: load(f'mon{ID}_{p}') for p in poses}
-ref = imgs['front_idle'] or imgs['master'] or imgs['back_idle']
-if ref is None: sys.exit(f'{ID}: no usable front_idle/master/back_idle')
-rb = bbox(ref)
-s = target / (rb[3] - rb[1])
-if imgs['front_idle'] is None: s *= .92  # master is drawn a bit bigger than idle
+if idle_ref is not None:  # add-on set: match the in-game idle height
+    cur = Image.open(os.path.join(out, f'{key}_front_idle.webp')).convert('RGBA'); cb0 = bbox(cur); rb = bbox(idle_ref)
+    s = (cb0[3] - cb0[1]) / (rb[3] - rb[1]); FEET_Y = cb0[3]  # e.g. the fox's feet sit at y=416, not 435
+else:
+    FEET_Y = 435
+    ref = imgs.get('front_idle') or imgs.get('master') or imgs.get('back_idle')
+    if ref is None: sys.exit(f'{ID}: no usable front_idle/master/back_idle')
+    rb = bbox(ref)
+    s = target / (rb[3] - rb[1])
+    if imgs.get('front_idle') is None: s *= .92  # master is drawn a bit bigger than idle
+AIR = ('strike', 'joy')  # airborne poses keep their height above the feet line of the idle reference
 for p, im in imgs.items():
     if im is None: continue
     b = bbox(im)
-    c = place(im, s, (im.width / 2, b[3]), (256, 435))
+    feet = b[3] if not p.endswith(AIR) or idle_ref is None else bbox(idle_ref)[3]
+    c = place(im, s, (im.width / 2, feet), (256, FEET_Y))
     cb = bbox(c)
     if cb[0] == 0 or cb[1] == 0 or cb[2] == 512: print('WARN clipped', p, cb)
     c.save(os.path.join(out, f'{key}_{p}.webp'), 'WEBP', quality=82, alpha_quality=70, method=6)
-egg = load(f'egg{ID}')
+egg = load(f'egg{ID}') if present('egg' + ID) or not idle_ref else None
 if egg is not None:
     eb = bbox(egg)
     c = place(egg, 254 / (eb[3] - eb[1]), ((eb[0] + eb[2]) / 2, eb[3]), (268, 425))

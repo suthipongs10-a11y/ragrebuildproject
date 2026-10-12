@@ -1,0 +1,144 @@
+=====================================================================
+EGGBOUND — ART BATCH 13-A : FOX PROTOTYPE — MOTION POSES (จิ้งจอกต้นแบบ ท่าเคลื่อนไหวเพิ่ม)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ชุดนี้คือ "ตัวต้นแบบ" ยกระดับการเคลื่อนไหวให้ใกล้ SW: ท่าโจมตี 3 จังหวะ (ง้าง → ฟาด → ตามแรง),
+  ท่าร่ายสกิล 2, ท่าดีใจ, ท่าล้ม — ถ้าผ่าน จะใช้สูตรเดียวกันกับมอนตัวอื่น
+- เปิดแชทใหม่ใน ChatGPT 1 แชท
+- แนบ 4 ไฟล์จาก EGGBOUND/game/assets/: mon001_master.webp, mon001_front_idle.webp,
+  mon001_back_idle.webp, mon001_front_attack.webp (นี่คือตัวละครเดิม ต้องเป็นตัวเดียวกันเป๊ะ)
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ภาพแรก (#00) คือวาดท่ายืนเดิมซ้ำเพื่อเทียบขนาด ตรวจว่าเหมือนตัวเดิมก่อนตอบ "OK"
+- สำคัญ: ภาพต้องเป็น "จิ้งจอกตัวเดิม" ขนาดเท่าเดิม ถ้าหน้าตา/สี/ขนาดเพี้ยน ให้สั่งทำใหม่
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the key-pose animator for a 2.5D turn-based monster RPG with the
+action quality of top mobile monster RPGs. The attached images show the
+EXISTING character (a small fire fox, "Dawnflame Fox"). First redraw its idle
+pose as a size/style check (#00), then draw 11 NEW POSES
+of this exact same character. The game animates between poses in code
+(squash, stretch, motion smears, timing), so each pose must be a strong,
+readable, exaggerated KEY POSE with great silhouette and line of action.
+
+Generate ONE IMAGE PER TURN, in the order below:
+  1. Generate #00 and wait for my "OK".
+  2. After "OK", generate #01–#11 one by one, matching #00 exactly.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (same as the attached images — every image)
+---------------------------------------------------------------------
+STYLE: identical to the attached images — painterly anime fantasy game art,
+soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Camera: HIGH ANGLE about 55 degrees looking down, orthographic feel.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: ground, cast shadow, glow, aura, fire/particles/sparks, motion
+lines, speed lines, text, letters, watermark, frame, second character.
+(Fire effects, smears and glows are added by the game in code.)
+ORIGINAL DESIGN — do not copy or resemble any existing game, film, anime
+or novel character.
+
+CHARACTER: EXACTLY the fox in the attached images — same face, eye shape,
+colors, fur markings, flame-shaped solid-fur tail tip, proportions and
+SIZE. Same scale as mon001_front_idle (do not draw it bigger or smaller).
+
+Technical rules:
+- Canvas 1024 x 1024 px PNG, character centered, at least 80 px margin.
+- Lowest point (paws on the ground) on an invisible ground line at
+  y ≈ 870 px. For jumping poses, keep the body at the height it reaches
+  but never cut anything off.
+
+VIEWS:
+FRONT VIEW = 3/4 front view from the 55° camera, body facing BOTTOM-RIGHT
+             (like mon001_front_idle).
+BACK VIEW  = 3/4 back view from the same camera, body facing TOP-RIGHT
+             (like mon001_back_idle).
+
+POSE PRINCIPLES (very important):
+- Push every pose to the extreme — strong anticipation, full extension,
+  big follow-through. Clear line of action through the whole body.
+- The tail and ears must also act (they lag behind and overshoot).
+- Each attack pose must read clearly even as a black silhouette.
+
+---------------------------------------------------------------------
+2. IMAGE LIST
+---------------------------------------------------------------------
+For every image start the prompt with:
+"Using the attached images as the EXACT same character (same design,
+colors, markings, proportions, scale, line style and lighting),
+following all MASTER STYLE rules:"
+
+SIZE & STYLE CHECK:
+#00  FRONT VIEW — IDLE REFERENCE
+     Redraw mon001_front_idle as faithfully as possible: same pose, same
+     size, same position. It is used to lock the scale of all other poses.
+
+ATTACK IN THREE BEATS (the fox's bite attack, toward bottom-right):
+#01  FRONT VIEW — WINDUP (anticipation)
+     Coiled like a spring: body crouched very low and pulled BACK toward
+     top-left, weight on the hind legs, front paws digging in, head low
+     with eyes locked forward, ears pinned back, tail raised high and
+     arched forward over the back, mouth closed in a determined grin.
+#02  FRONT VIEW — STRIKE (the instant of the bite)
+     Fully extended forward toward bottom-right, all four paws off the
+     ground, body stretched into a straight diagonal line, jaws snapping
+     shut, eyes fierce, ears streaming back, tail stretched straight
+     behind. The most extreme, fastest-looking pose of the set.
+#03  FRONT VIEW — FOLLOW-THROUGH (landing after the bite)
+     Landed past the target on the front paws, body twisting around
+     with the momentum, hind legs swinging, tail whipping around in a
+     big curve, head turned back over the shoulder with a cocky smirk.
+#04  BACK VIEW — WINDUP   (same idea as #01, BACK VIEW, pulled back toward bottom-left)
+#05  BACK VIEW — STRIKE   (same idea as #02, BACK VIEW, flying toward top-right)
+#06  BACK VIEW — FOLLOW-THROUGH (same idea as #03, BACK VIEW)
+
+SKILL 2 — FOXFIRE (the fox summons fox-fire orbs; the game adds the fire):
+#07  FRONT VIEW — CAST 2
+     Sitting up proudly on the hind legs, chest out, one front paw raised
+     high as if commanding, tail fanned up and spread wide behind like a
+     fan, eyes half-closed and confident, a small smile. Leave empty space
+     around the raised paw and tail (the game draws flames there).
+#08  BACK VIEW — CAST 2   (same idea as #07, BACK VIEW)
+
+VICTORY & DEFEAT:
+#09  FRONT VIEW — JOY (victory)
+     Jumping happily in the air, all paws tucked, eyes closed in a big
+     happy smile (^ ^), mouth open laughing, ears perked, tail swishing up
+     in a heart-like curl. Pure delight.
+#10  FRONT VIEW — DOWN (knocked out)
+     Lying flat on its side on the ground line, eyes as dizzy spirals,
+     tongue slightly out, tail limp, paws loose. Comical, not violent.
+#11  BACK VIEW — DOWN (same idea as #10, BACK VIEW)
+
+---------------------------------------------------------------------
+3. QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] It is EXACTLY the attached fox (face, colors, markings, tail) in every image
+  [ ] Same scale as mon001_front_idle; paws on y ≈ 870 px (except jumps)
+  [ ] Correct facing (FRONT → bottom-right, BACK → top-right)
+  [ ] Poses are extreme and readable as silhouettes; tail and ears act too
+  [ ] No ground, shadow, glow, fire, particles, motion lines or text
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Nothing cropped
+
+---------------------------------------------------------------------
+4. FILE NAMES & ZIP
+---------------------------------------------------------------------
+  #00 mon001_front_idle_ref.png
+  #01 mon001_front_windup.png     #04 mon001_back_windup.png
+  #02 mon001_front_strike.png     #05 mon001_back_strike.png
+  #03 mon001_front_follow.png     #06 mon001_back_follow.png
+  #07 mon001_front_cast2.png      #08 mon001_back_cast2.png
+  #09 mon001_front_joy.png
+  #10 mon001_front_down.png       #11 mon001_back_down.png
+
+ZIP name: EGGBOUND_FOX_MOTION.zip (all PNGs in the root) + notes.txt
+listing each file and any image regenerated and why.
+=====================================================================
+END OF FILE
+=====================================================================

@@ -1,6 +1,6 @@
 // @ts-nocheck
 // Shared canvas engine: camera, ground/world props, particles, decals, projectiles, coroutine scripts.
-import { TAU, mk, dot } from './assets';
+import { TAU, mk, dot, fx } from './assets';
 
 export const SQ = .6;
 export const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -34,6 +34,10 @@ export function addP(o) {
 export function burst(x, y, z, n, color, spd, size, life, o = {}) { for (let i = 0; i < n; i++) { const a = Math.random() * TAU, s = spd * (.3 + Math.random() * .7); addP(Object.assign({ x, y, z, vx: Math.cos(a) * s, vy: Math.sin(a) * s * SQ, vz: rnd(-.2, .6) * s, size: size * rnd(.6, 1.2), size2: 0, life: life * rnd(.6, 1.1), color, drag: 2.5 }, o)); } }
 export function ring(x, y, r0, r1, color, life, w = 6) { addP({ type: 'ring', x, y, size: r0, size2: r1, life, color, w, keep: true }); }
 export function text(x, y, str, color, size = 20, o = {}) { addP(Object.assign({ type: 'text', x, y, z: 0, vz: 80, vx: rnd(-25, 25), life: .95, str, color, size, add: false, grav: 110, keep: true }, o)); }
+/** SW-style damage number: pops in big, settles, floats a little and fades (crit = bigger, gold, tilted, with a flash) */
+export function dmgText(x, y, n, crit = false, o = {}) { addP(Object.assign({ type: 'dmg', x, y, z: 0, vz: 55, vx: rnd(-18, 18), life: crit ? 1.15 : .95, str: '' + n, crit, size: crit ? 40 : 30, add: false, grav: 40, drag: 2, keep: true }, o)); }
+/** sprite light particle (fx_* images): grows from size to size2 (width), ar = height/width, rot/vr rotation */
+export function fxP(name, x, y, z, color, size, size2, life, o = {}) { addP(Object.assign({ type: 'fx', name, x, y, z, color, size, size2, life, ar: 1, rot: 0, keep: true }, o)); }
 export function shake(v) { if (!RM) E.shake = Math.max(E.shake, v); }
 export function flash(a, c = '#fff') { E.flash = Math.max(E.flash, RM ? Math.min(a, .25) : a); E.flashC = c; }
 export function updParts(dt) {
@@ -58,6 +62,17 @@ export function drawParts() {
       case 'bolt': { ctx.globalAlpha = a; ctx.strokeStyle = p.color; ctx.lineWidth = 3 * (1 - u) + 1; ctx.lineJoin = 'round'; ctx.beginPath(); const pts = p.pts; ctx.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]); ctx.stroke(); ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.2; ctx.stroke(); break; }
       case 'arrow': { ctx.globalAlpha = a; ctx.fillStyle = p.color; const s = sz; ctx.beginPath(); ctx.moveTo(X, Y - s); ctx.lineTo(X + s * .8, Y); ctx.lineTo(X + s * .3, Y); ctx.lineTo(X + s * .3, Y + s); ctx.lineTo(X - s * .3, Y + s); ctx.lineTo(X - s * .3, Y); ctx.lineTo(X - s * .8, Y); ctx.closePath(); ctx.fill(); break; }
       case 'banner': { ctx.globalCompositeOperation = 'source-over'; const pop = u < .12 ? easeBack(u / .12) : 1; ctx.globalAlpha = Math.min(1, (1 - u) * 3); ctx.save(); ctx.translate(X, Y); ctx.scale(pop, pop); ctx.font = `600 ${p.size}px Mitr, sans-serif`; ctx.textAlign = 'center'; ctx.lineJoin = 'round'; ctx.lineWidth = 7; ctx.strokeStyle = p.stroke || 'rgba(20,8,30,.9)'; ctx.strokeText(p.str, 0, 0); ctx.fillStyle = p.color; ctx.fillText(p.str, 0, 0); ctx.restore(); break; }
+      case 'fx': { const s = lerp(p.size, p.size2 ?? p.size, easeOut(u)); fx(ctx, p.name, p.color, X, Y, s, s * p.ar, (p.fade === false ? 1 : 1 - u * u) * p.alpha, p.rot); break; }
+      case 'dmg': { // big bold number with a dark outline and a light gradient; crits are gold, tilted and ring-flashed
+        ctx.globalCompositeOperation = 'source-over'; const pop = u < .12 ? lerp(2.1, 1, easeBack(u / .12)) : 1, fs = p.size;
+        ctx.globalAlpha = Math.min(1, (1 - u) * 3); ctx.save(); ctx.translate(X, Y); ctx.rotate(p.crit ? -.12 : 0); ctx.scale(pop, pop);
+        if (p.crit && u < .3) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (1 - u / .3) * .8; ctx.drawImage(dot('#ffb83a'), -fs * 1.8, -fs * 1.6, fs * 3.6, fs * 2.6); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = Math.min(1, (1 - u) * 3); }
+        ctx.font = `800 ${fs}px Mitr, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+        ctx.lineWidth = fs * .26; ctx.strokeStyle = p.crit ? '#5a1a00' : 'rgba(25,10,4,.92)'; ctx.strokeText(p.str, 0, 0);
+        const g = ctx.createLinearGradient(0, -fs * .45, 0, fs * .45); if (p.crit) { g.addColorStop(0, '#fffbe0'); g.addColorStop(.45, '#ffd84a'); g.addColorStop(1, '#ff7a1a'); } else if (p.weak) { g.addColorStop(0, '#f2f4ff'); g.addColorStop(1, '#a9b4cf'); } else { g.addColorStop(0, '#ffffff'); g.addColorStop(1, '#ffe2b8'); }
+        ctx.fillStyle = g; ctx.fillText(p.str, 0, 0);
+        if (p.crit) { ctx.font = `800 ${fs * .42}px Mitr, sans-serif`; ctx.lineWidth = 4; ctx.strokeStyle = '#5a1a00'; ctx.strokeText('CRITICAL', 0, -fs * .78); ctx.fillStyle = '#ffe680'; ctx.fillText('CRITICAL', 0, -fs * .78); }
+        ctx.restore(); break; }
       case 'text': { ctx.globalCompositeOperation = 'source-over'; const pop = u < .15 ? easeBack(u / .15) : 1; ctx.globalAlpha = Math.min(1, (1 - u) * 2.2); ctx.save(); ctx.translate(X, Y); ctx.scale(pop, pop); ctx.font = `600 ${p.size}px Mitr, sans-serif`; ctx.textAlign = 'center'; ctx.lineJoin = 'round'; ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(30,10,4,.85)'; ctx.strokeText(p.str, 0, 0); ctx.fillStyle = p.color; ctx.fillText(p.str, 0, 0); ctx.restore(); break; }
     }
   }

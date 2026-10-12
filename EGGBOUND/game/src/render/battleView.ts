@@ -2,10 +2,10 @@
 // Battle scene: plays battle-core TurnStart/ActionResult events as animation + VFX, and collects player commands.
 import { Battle, REACTION_NAME } from '../core/battle';
 import { SPECIES } from '../core/data';
-import { PAL, PIV, ANCH, anchOf, TAU, spr, silOf, glowOf, GP, dot, portrait, IMG, fx, lookOf } from './assets';
+import { PAL, PIV, ANCH, anchOf, TAU, spr, silOf, glowOf, GP, dot, portrait, IMG, fx, lookOf, poseKey, warpDraw } from './assets';
 import { sfx } from './audio';
 import {
-  E, SQ, clamp, lerp, rnd, easeOut, easeIn, easeIO, easeBack, run, tween, waitAll, waitUntil, addP, burst, ring, text, shake, flash,
+  E, SQ, clamp, lerp, rnd, easeOut, easeIn, easeIO, easeBack, run, tween, waitAll, waitUntil, addP, burst, ring, text, dmgText, fxP, shake, flash,
   drawParts, drawDecals, drawProjs, drawGround, drawLantern, drawBush, drawLanternPools, drawFlies, LANTERNS, BUSHES, worldTransform, screenTransform, drawOverlays,
 } from './engine';
 
@@ -25,7 +25,8 @@ export class BattleView {
     const v = { uid: u.uid, sid: lookOf(u.sid, u.stars), team: u.team, elem: u.elem, boss: u.boss, name: u.name, stars: u.stars, lvl: u.lvl,
       x: pos[0], y: pos[1], hx: pos[0], hy: pos[1], hop: drop ? -620 : 0, sx: 1, sy: 1, rot: 0, k: .4 * (s.scale || 1),
       back: u.team === 0, flip: u.team === 1, hb: u.team === 0, hf: u.team === 1, pose: 'idle', alpha: drop ? 0 : 1, flash: 0, ghosts: [], glowF: 0,
-      dead: false, deathT: 0, hitT: 0, kvx: 0, kvy: 0, hp: u.hp, maxHp: u.maxHp, shown: u.hp, st: new Set(), marks: new Set(), busy: !!drop, ph: Math.random() * 9, emberT: 0, atb: 0, shieldAmt: 0 };
+      dead: false, deathT: 0, hitT: 0, kvx: 0, kvy: 0, hp: u.hp, maxHp: u.maxHp, shown: u.hp, st: new Set(), marks: new Set(), busy: !!drop, ph: Math.random() * 9, emberT: 0, atb: 0, shieldAmt: 0,
+      bend: 0, bendV: 0, bendT: 0, wave: 0, wph: 0, br: 0 }; // living-sprite springs (lean / recoil / ripple / breathing)
     this.V.set(u.uid, v); return v;
   }
   layout(team) {
@@ -38,7 +39,7 @@ export class BattleView {
     return units.map((u, i) => [u, [C[0] + PP[0] * offs[i], C[1] + PP[1] * offs[i]]]);
   }
   P(v) { return PAL[v.elem]; }
-  key(v) { return (v.back ? 'back' : 'front') + '_' + v.pose; }
+  key(v) { return poseKey(v.sid, v.back ? 'back' : 'front', v.pose); }
   l2w(v, lx, ly) { const sx = v.sx * v.k * (v.flip ? -1 : 1), sy = v.sy * v.k, c = Math.cos(v.rot), s = Math.sin(v.rot); const x = lx * sx, y = ly * sy; return [v.x + x * c - y * s, v.y + v.hop + x * s + y * c]; }
   anc(v, n) { const a = anchOf(v.sid, this.key(v))[n]; return this.l2w(v, a[0], a[1]); }
   headY(v) { return v.y + v.hop - 385 * v.k; }
@@ -122,9 +123,10 @@ export class BattleView {
         if (!v) return; const src = this.V.get(e.src);
         if (e.miss) { text(v.x, this.headY(v) + 10, 'พลาด', '#c8c8d8', 18); return; }
         v.hp = e.hp; v.flash = 1; v.hitT = .3; if (src) { const dx = v.x - src.x, dy = v.y - src.y, l = Math.hypot(dx, dy) || 1; const k = v.boss ? .35 : 1; v.kvx += dx / l * 170 * k; v.kvy += dy / l * 110 * k; }
+        v.bendV -= (e.crit ? 950 : 620) * (v.boss ? .45 : 1); v.wave = e.crit ? 22 : 13; v.wph = 0; // recoil + jelly ripple
+        this.hitSpark(v, src, e.crit);
         const hy = this.headY(v) + 18;
-        text(v.x + rnd(-10, 10), hy, e.crit ? e.dmg + '!' : '' + e.dmg, e.crit ? '#ffe066' : '#fff4e6', e.crit ? 30 : 21);
-        if (e.crit) text(v.x, hy - 30, 'คริติคอล', '#ffd27a', 14, { vz: 60 });
+        dmgText(v.x + rnd(-12, 12), hy, e.dmg, e.crit, { weak: e.em < 1 });
         if (e.em > 1) text(v.x + 34, hy - 12, 'ได้เปรียบธาตุ', '#9ff58a', 13, { vz: 50 }); else if (e.em < 1) text(v.x + 34, hy - 12, 'ต้านทาน', '#b9c3d6', 13, { vz: 50 });
         if (e.shieldAbs) { ring(v.x, v.y - 60 * v.k / .4, 20, 70, '#bfe6ff', .35, 4); }
         break;
@@ -137,7 +139,7 @@ export class BattleView {
       case 'atb': if (!v) return; v.atb = e.atb; text(v.x + 28, this.headY(v) + 6, e.delta > 0 ? `เกจ +${e.delta}` : `เกจ ${e.delta}`, e.delta > 0 ? '#9fffcf' : '#9fd8ff', 14, { vz: 40 }); break;
       case 'cleanse': if (!v) return; text(v.x, this.headY(v) - 18, 'ล้างสถานะ', '#bff8ff', 14, { vz: 40 }); for (let i = 0; i < 6; i++) addP({ type: 'twinkle', x: v.x + rnd(-50, 50), y: v.y, z: rnd(20, 120), life: .7, size: rnd(6, 10), color: '#ffffff' }); break;
       case 'reaction': this.playReaction(e); break;
-      case 'death': { const d = this.V.get(e.uid); if (d && !d.dead) { d.dead = true; d.deathT = 0; d.pose = 'hit'; sfx.die(); burst(d.x, d.y, 60 * d.k / .4, 26, PAL[d.elem].aura, 280, 16, .8); } break; }
+      case 'death': { const d = this.V.get(e.uid); if (d && !d.dead) { d.dead = true; d.deathT = 0; d.pose = 'down'; d.bendV -= 500; sfx.die(); burst(d.x, d.y, 60 * d.k / .4, 26, PAL[d.elem].aura, 280, 16, .8); } break; }
     }
   }
   playReaction(e) {
@@ -177,7 +179,9 @@ export class BattleView {
     this.actName(v, sk);
     if (res.ult && !this.skipUlt) yield* this.ultIntro(v, sk);
     else if (res.ult) { v.glowF = .8; }
-    switch (sk.anim) {
+    const custom = this['sk_' + sk.id]; // signature skill choreography (per monster) when it exists
+    if (custom) yield* custom.call(this, v, tv, impact);
+    else switch (sk.anim) {
       case 'melee': yield* this.aMelee(v, tv[0], impact); break;
       case 'shot': yield* this.aShot(v, tv[0], impact); break;
       case 'volley': yield* this.aVolley(v, tv, impact); break;
@@ -244,29 +248,97 @@ export class BattleView {
     const x0 = p.x, y0 = p.y, z0 = p.z, side = o.side || 0, h = o.h ?? 90;
     return run(function* () { yield* tween(o.dur || .5, q => { const e = q * q * (3 - 2 * q); p.x = lerp(x0, t.x, e) + Math.sin(q * Math.PI) * side; p.y = lerp(y0, t.y, e); p.z = lerp(z0, 40 * t.k / .4, e) + Math.sin(q * Math.PI) * h; addP({ x: p.x + rnd(-4, 4), y: p.y, z: p.z + rnd(-4, 4), life: .35, size: p.size, size2: 0, color: P.aura, vz: rnd(-10, 20) }); if (o.swirl) addP({ x: p.x + Math.cos(E.time * 20) * 14, y: p.y, z: p.z + Math.sin(E.time * 20) * 14, life: .3, size: 8, size2: 0, color: P.core }); }); E.projs.splice(E.projs.indexOf(p), 1); o.onHit && o.onHit(); }());
   }
-  *aMelee(v, t, impact) {
+  /** hit spark on a struck unit (fx_hit_spark art, alternating variants; code sparks otherwise) */
+  hitSpark(t, src, crit) {
+    const P = src ? this.P(src) : PAL.fire, z = 70 * t.k / .4, k = (crit ? 1.45 : 1) * (t.boss ? 1.3 : 1), name = (this.spk = !this.spk) ? 'fx_hit_spark' : 'fx_hit_spark_b';
+    if (IMG[name]) { fxP(name, t.x, t.y, z, P.hot, 70 * k, 300 * k, .2, { rot: rnd(0, TAU) }); fxP(name, t.x, t.y, z, '#ffffff', 40 * k, 170 * k, .14, { rot: rnd(0, TAU) }); }
+    else { for (let i = 0; i < (crit ? 12 : 7); i++) { const a = rnd(0, TAU), sp = rnd(500, 900) * k; addP({ type: 'streak', x: t.x, y: t.y, z, vx: Math.cos(a) * sp, vz: Math.sin(a) * sp * .8, life: .14, size: rnd(2, 4), color: i % 3 ? '#ffffff' : P.hot, drag: 6 }); } addP({ x: t.x, y: t.y, z, life: .12, size: 55 * k, size2: 10, color: '#ffffff' }); }
+  }
+  /** a quick swipe smear along the attack direction */
+  smear(x, y, z, dir, P, s = 1) {
+    if (IMG.fx_slash_arc) fxP('fx_slash_arc', x, y, z, P.hot, 140 * s, 230 * s, .2, { rot: Math.atan2(dir[1], dir[0]) - .6 });
+    else addP({ type: 'slash', x, y, z, life: .2, size: 80 * s, rot: Math.atan2(dir[1], dir[0]) - 1.1, color: P.hot, w: 10 * s });
+  }
+  /** melee in three beats like a real key-pose animation: run in → WINDUP (coil back) → STRIKE (snap forward, smear,
+   *  hit-stop) → FOLLOW-THROUGH (slide past, spring settles) → hop home. o.onImpact replaces the default impact effect. */
+  *aMelee(v, t, impact, o = {}) {
     if (!t) return; v.busy = true; const P = this.P(v), ox = v.x, oy = v.y; this.face(v, t);
-    const dx = t.x - v.x, dy = t.y - v.y, l = Math.hypot(dx, dy), dir = [dx / l, dy / l], stop = l - (70 + t.k * 220); const tx = v.x + dir[0] * stop, ty = v.y + dir[1] * stop;
-    yield* tween(clamp(stop / 900, .22, .38), p => { const e = easeIO(p); v.x = lerp(ox, tx, e); v.y = lerp(oy, ty, e); v.hop = -Math.abs(Math.sin(p * Math.PI * 3)) * 14; v.pose = 'idle'; });
-    v.sx = 1.14; v.sy = .86; yield .07;
-    v.pose = 'attack'; sfx.whoosh(); yield* tween(.1, p => { v.x = tx + dir[0] * 34 * p; v.y = ty + dir[1] * 34 * p; v.sx = 1.15; v.sy = .9; v.hop = -Math.sin(p * Math.PI) * 16; this.ghost(v, .18); });
-    E.hitstop = .08; if (v.elem === 'earth') { E.decals.push({ type: 'crack', x: t.x, y: t.y, t: 0, life: 1.1, color: P.aura, pts: this.crackPts(t.x, t.y).map(q => [lerp(t.x, q[0], .6), q[1]]) }); burst(t.x, t.y, 10, 14, '#a08a6a', 260, 12, .6, { add: false, type: 'chip', grav: 700, vz: 200, color: '#8a7a5a' }); }
-    this.slashFx(t.x, t.y - 10 * t.k / .4, dir, P, t.boss ? 1.3 : 1); impact(t.uid); shake(5); sfx.hit(false);
-    yield .22; v.pose = 'idle'; const bx = v.x, by = v.y;
+    const dx = t.x - v.x, dy = t.y - v.y, l = Math.hypot(dx, dy), dir = [dx / l, dy / l], stop = l - (80 + t.k * 220); const tx = v.x + dir[0] * stop, ty = v.y + dir[1] * stop;
+    v.bendT = 16; // lean into the run
+    yield* tween(clamp(stop / 1000, .2, .34), p => { const e = easeIO(p); v.x = lerp(ox, tx, e); v.y = lerp(oy, ty, e); v.hop = -Math.abs(Math.sin(p * Math.PI * 3)) * 14; v.pose = 'idle'; });
+    v.pose = 'windup'; v.bendT = -38; v.bendV -= 300; v.hop = 0;
+    yield* tween(.14, p => { const e = easeOut(p); v.x = tx - dir[0] * 16 * e; v.y = ty - dir[1] * 16 * e; v.sx = lerp(1, 1.12, e); v.sy = lerp(1, .86, e); });
+    v.pose = 'strike'; v.bendT = 30; v.bendV += 900; sfx.whoosh(); const sx0 = v.x, sy0 = v.y;
+    this.smear(t.x - dir[0] * 40, t.y - dir[1] * 40, 70 * v.k / .4, dir, P, t.boss ? 1.3 : 1);
+    yield* tween(.075, p => { v.x = sx0 + dir[0] * 64 * p; v.y = sy0 + dir[1] * 64 * p; v.sx = 1.24; v.sy = .82; v.hop = -Math.sin(p * Math.PI) * 18; this.ghost(v, .22); });
+    E.hitstop = .1;
+    if (v.elem === 'earth') { E.decals.push({ type: 'crack', x: t.x, y: t.y, t: 0, life: 1.1, color: P.aura, pts: this.crackPts(t.x, t.y).map(q => [lerp(t.x, q[0], .6), q[1]]) }); burst(t.x, t.y, 10, 14, '#a08a6a', 260, 12, .6, { add: false, type: 'chip', grav: 700, vz: 200, color: '#8a7a5a' }); }
+    if (o.onImpact) o.onImpact(t, dir); else this.slashFx(t.x, t.y - 10 * t.k / .4, dir, P, t.boss ? 1.3 : 1);
+    impact(t.uid); shake(6); sfx.hit(false);
+    v.pose = 'follow'; v.bendT = -8; const fx0 = v.x, fy0 = v.y;
+    yield* tween(.18, p => { const e = easeOut(p); v.x = fx0 + dir[0] * 26 * e; v.y = fy0 + dir[1] * 26 * e; v.sx = lerp(1.18, 1, e); v.sy = lerp(.88, 1, e); v.hop = 0; });
+    yield .12; v.pose = 'idle'; v.bendT = 0; const bx = v.x, by = v.y;
     yield* tween(.3, p => { v.x = lerp(bx, ox, easeOut(p)); v.y = lerp(by, oy, easeOut(p)); v.hop = -Math.sin(p * Math.PI) * 40; v.sx = lerp(1.08, 1, p); v.sy = lerp(.94, 1, p); });
     v.hop = 0; v.busy = false;
   }
+  // ---------- signature skills (BATCH13 prototype: Dawnflame Fox). Art layers are used when present, code otherwise ----------
+  /** S1 กัดพุ่ง: the three-beat melee with jaws of light snapping shut on the target */
+  *sk_fox_bite(v, tv, impact) {
+    const P = this.P(v);
+    yield* this.aMelee(v, tv[0], impact, { onImpact: (t, dir) => {
+      const z = 70 * t.k / .4;
+      if (IMG.fx_bite) { fxP('fx_bite', t.x, t.y, z, P.hot, 90, 250, .28, { rot: Math.atan2(dir[1], dir[0]) * .3 }); fxP('fx_bite', t.x, t.y, z, '#ffffff', 60, 150, .16); }
+      else { for (const sgn of [-1, 1]) addP({ type: 'slash', x: t.x, y: t.y + sgn * 18, z, life: .22, size: 60, rot: sgn > 0 ? -2.6 : .5, color: P.hot, w: 12 }); }
+      burst(t.x, t.y, z, 20, P.aura, 420, 16, .45); for (let i = 0; i < 6; i++) addP({ type: 'flame', x: t.x + rnd(-24, 24), y: t.y, z: z - 20, vz: rnd(100, 200), life: rnd(.4, .7), size: rnd(14, 24), color: P.aura, core: P.core, drag: 1 });
+    } });
+  }
+  /** S2 ลูกไฟจิ้งจอก: fox-fire wisps appear and circle the fox, then fly one by one in arcs at every enemy */
+  *sk_fox_fireball(v, tv, impact) {
+    v.busy = true; const P = this.P(v), k = v.k / .4; v.pose = 'cast2'; v.bendT = -14; sfx.charge();
+    const orbs = tv.map((t, i) => ({ t, a: i / tv.length * TAU, r: 0, x: v.x, y: v.y, z: 130 * k, live: true }));
+    const drawOrb = o => { if (IMG.fx_foxfire) fxP('fx_foxfire', o.x, o.y, o.z + 22 * k, P.aura, 62 * k, 62 * k, .05, { ar: 1.5, fade: false }); else { addP({ type: 'flame', x: o.x + rnd(-4, 4), y: o.y, z: o.z, vz: rnd(30, 80), life: .3, size: 22 * k, color: P.aura, core: P.core }); } addP({ x: o.x, y: o.y, z: o.z, life: .06, size: 26 * k, size2: 22 * k, color: P.hot }); };
+    yield* tween(.75, p => { for (const o of orbs) { o.a += .09 + p * .12; o.r = 95 * k * easeOut(Math.min(1, p * 1.6)); o.x = v.x + Math.cos(o.a) * o.r; o.y = v.y + Math.sin(o.a) * o.r * .42; o.z = 130 * k + Math.sin(o.a * 2 + E.time * 3) * 10; drawOrb(o); } });
+    v.bendT = 0; v.bendV += 700; sfx.fire();
+    const flights = orbs.map((o, i) => run((function* () {
+      yield i * .09; const x0 = o.x, y0 = o.y, z0 = o.z, t = o.t, side = (i % 2 ? 1 : -1) * 70;
+      yield* tween(.42, q => { const e = q * q * (3 - 2 * q); o.x = lerp(x0, t.x, e) + Math.sin(q * Math.PI) * side; o.y = lerp(y0, t.y, e); o.z = lerp(z0, 50 * t.k / .4, e) + Math.sin(q * Math.PI) * 110; drawOrb(o); addP({ x: o.x, y: o.y, z: o.z, life: .3, size: 14 * k, size2: 0, color: P.aura }); });
+      this.explode(t.x, t.y, P, false); impact(t.uid); sfx.hit(false); shake(3);
+    }).call(this)));
+    yield* waitAll(flights); yield .1; v.pose = 'idle'; v.busy = false;
+  }
+  /** ULT อรุณเพลิงทะยาน: coils, then streaks through every enemy leaving a trail of dawn fire, leaps and lands; the trail erupts */
+  *sk_fox_dawn(v, tv, impact) {
+    v.busy = true; const P = this.P(v), ox = v.x, oy = v.y, k = v.k / .4;
+    v.pose = 'windup'; v.bendT = -40; v.bendV -= 400;
+    yield* tween(.22, p => { v.sx = lerp(1, 1.14, p); v.sy = lerp(1, .84, p); for (let i = 0; i < 2; i++) addP({ type: 'flame', x: v.x + rnd(-50, 50) * k, y: v.y, z: rnd(0, 30), vz: rnd(150, 300), life: .5, size: rnd(16, 28), color: P.aura, core: P.core }); });
+    const path = [];
+    for (const t of tv) {
+      if (!t) continue; const fx0 = v.x, fy0 = v.y, dx = t.x - fx0, dy = t.y - fy0, l = Math.hypot(dx, dy) || 1, ex = t.x + dx / l * 70, ey = t.y + dy / l * 40;
+      this.face(v, t); v.pose = 'strike'; v.bendT = 34; v.bendV += 700; sfx.whoosh();
+      yield* tween(.12, p => { const e = easeOut(p); v.x = lerp(fx0, ex, e); v.y = lerp(fy0, ey, e); v.sx = 1.26; v.sy = .8; v.hop = -Math.sin(p * Math.PI) * 26; this.ghost(v, .32); E.decals.push({ type: 'fire', x: v.x + rnd(-8, 8), y: v.y + rnd(-4, 4), t: 0, life: 1.6, color: P.aura, core: P.core }); });
+      const ang = Math.atan2(ey - fy0, ex - fx0), len = Math.hypot(ex - fx0, ey - fy0); path.push(t);
+      if (IMG.fx_fire_trail) fxP('fx_fire_trail', (fx0 + ex) / 2, (fy0 + ey) / 2, 40 * k, P.aura, len * 1.1, len * 1.15, .55, { ar: .33, rot: ang });
+      E.hitstop = .06; this.hitSpark(t, v, true); this.explode(t.x, t.y, P, true); impact(t.uid); shake(10); sfx.hit(true); yield .05;
+    }
+    // leap up and land with the follow-through pose, then every trail point erupts
+    v.pose = 'follow'; v.bendT = -10; const bx = v.x, by = v.y;
+    yield* tween(.32, p => { v.x = lerp(bx, (bx + ox) / 2, p); v.y = lerp(by, (by + oy) / 2, p); v.hop = -Math.sin(p * Math.PI) * 90; v.sx = v.sy = 1; });
+    v.pose = 'burst'; v.bendV -= 500; flash(.45, P.hot); shake(12); sfx.boom();
+    for (const t of path) { ring(t.x, t.y, 10, 170, P.aura, .55, 10); for (let i = 0; i < 12; i++) addP({ type: 'flame', x: t.x + rnd(-40, 40), y: t.y + rnd(-10, 10), z: 5, vz: rnd(260, 520), life: rnd(.5, .9), size: rnd(22, 38), color: P.aura, core: P.core, drag: 1 }); if (IMG.fx_column) fxP('fx_column', t.x, t.y, 160 * k, P.aura, 120 * k, 150 * k, .55, { ar: 2.6 }); }
+    yield .35; v.pose = 'idle'; v.back = v.hb; v.flip = v.hf; const cx = v.x, cy = v.y;
+    yield* tween(.36, p => { v.x = lerp(cx, ox, easeOut(p)); v.y = lerp(cy, oy, easeOut(p)); v.hop = -Math.sin(p * Math.PI) * 50; }); v.hop = 0; v.sx = v.sy = 1; v.bendT = 0; v.busy = false;
+  }
   *aShot(v, t, impact) {
-    if (!t) return; v.busy = true; const P = this.P(v); this.face(v, t); v.pose = 'cast';
+    if (!t) return; v.busy = true; const P = this.P(v); this.face(v, t); v.pose = 'cast'; v.bendT = -22;
     yield* tween(.3, p => { v.hop = -p * 8; this.charge(v, P, 1); });
-    const m = this.anc(v, 'mouth'); sfx.whoosh();
+    const m = this.anc(v, 'mouth'); sfx.whoosh(); v.bendT = 0; v.bendV += 650;
     const s = this.proj(m, v.y, t, P, { dur: .38, h: 30, size: 18, swirl: v.elem === 'wind' || v.elem === 'dark', onHit: () => { this.explode(t.x, t.y, P, false); impact(t.uid); shake(3); sfx.hit(false); } });
     yield* waitAll([s]); v.pose = 'idle'; yield* tween(.15, p => { v.hop = lerp(-8, 0, p); }); v.busy = false;
   }
   *aVolley(v, tv, impact) {
-    v.busy = true; const P = this.P(v); v.pose = 'cast'; sfx.charge();
+    v.busy = true; const P = this.P(v); v.pose = 'cast2'; sfx.charge(); v.bendT = -26;
     yield* tween(.45, p => { v.hop = -p * 10; this.charge(v, P, 2); });
-    const m = this.anc(v, 'mouth'), ps = []; sfx.fire(); burst(m[0], v.y, v.y - m[1], 16, P.aura, 300, 18, .4);
+    const m = this.anc(v, 'mouth'), ps = []; sfx.fire(); v.bendT = 0; v.bendV += 800; burst(m[0], v.y, v.y - m[1], 16, P.aura, 300, 18, .4);
     tv.forEach((t, i) => ps.push(this.proj(m, v.y, t, P, { dur: .48 + i * .06, side: (i - 1.5) * 50, h: 70 + i * 20, swirl: v.elem === 'wind' || v.elem === 'dark', onHit: () => { this.explode(t.x, t.y, P, false); impact(t.uid); sfx.hit(false); } })));
     yield* waitAll(ps); shake(4); v.pose = 'idle'; yield* tween(.18, p => { v.hop = lerp(-10, 0, p); }); v.busy = false;
   }
@@ -385,7 +457,7 @@ export class BattleView {
   *dropIn(v) { v.alpha = 1; yield* tween(v.boss ? .55 : .42, p => { v.hop = -620 * (1 - easeIn(p)); }); v.hop = 0; v.sx = 1.25; v.sy = .75; ring(v.x, v.y, 10, v.boss ? 220 : 110, '#e8dcc0', .5, v.boss ? 8 : 4); burst(v.x, v.y, 4, v.boss ? 24 : 10, '#d8c8a8', v.boss ? 260 : 140, 22, .6, { add: false, type: 'smoke', alpha: .35 }); shake(v.boss ? 14 : 4); sfx.hit(v.boss); yield* tween(.25, p => { v.sx = lerp(1.25, 1, p); v.sy = lerp(.75, 1, p); }); v.busy = false; }
   *finish() {
     this.phase = 'end'; this.hud(); const win = this.b.win;
-    if (win) { sfx.win(); for (const v of this.V.values()) if (v.team === 0 && !v.dead) run((function* () { v.busy = true; v.back = false; for (let i = 0; i < 3; i++) { v.pose = 'cast'; yield* tween(.35, p => { v.hop = -Math.sin(p * Math.PI) * 36; }); v.pose = 'idle'; yield .12; } v.busy = false; })()); }
+    if (win) { sfx.win(); for (const v of this.V.values()) if (v.team === 0 && !v.dead) run((function* () { v.busy = true; v.back = false; for (let i = 0; i < 3; i++) { v.pose = 'joy'; v.bendV += 400; yield* tween(.38, p => { v.hop = -Math.sin(p * Math.PI) * 44; v.sy = 1 + Math.sin(p * Math.PI) * .06; v.sx = 2 - v.sy; }); v.pose = 'idle'; v.sx = 1.12; v.sy = .88; v.wave = 10; yield .14; } v.busy = false; })()); }
     else sfx.lose();
     yield win ? 1.8 : 1.2;
     this.ended = true; this.onEnd && this.onEnd(win, this.b.stars());
@@ -403,7 +475,11 @@ export class BattleView {
       if (v.dead) { v.deathT += dt; v.alpha = Math.max(0, 1 - v.deathT / .9); if (v.deathT < .9 && Math.random() < dt * 30) { const b = this.anc(v, 'body'); addP({ x: b[0] + rnd(-40, 40) * v.k / .4, y: v.y, z: v.y - b[1] + rnd(-30, 30), vz: rnd(60, 120), life: .8, size: rnd(6, 12), size2: 0, color: PAL[v.elem].aura }); } continue; }
       if (!v.busy) { v.x = lerp(v.x, v.hx, 1 - Math.exp(-dt * 7)); v.y = lerp(v.y, v.hy, 1 - Math.exp(-dt * 7)); v.back = v.hb; v.flip = v.hf; }
       if (v.hitT > 0) { v.hitT -= dt; if (!v.busy) v.pose = 'hit'; } else if (!v.busy) v.pose = (v.st.has('sleep') || v.st.has('stun')) ? 'hit' : 'idle';
-      if (!v.busy) { v.hop = lerp(v.hop, 0, 1 - Math.exp(-dt * 14)); v.rot = lerp(v.rot, 0, 1 - Math.exp(-dt * 10)); const b = Math.sin(E.time * 2.6 + v.ph); v.sy = 1 + b * .018; v.sx = 1 - b * .012; }
+      if (!v.busy) { v.hop = lerp(v.hop, 0, 1 - Math.exp(-dt * 14)); v.rot = lerp(v.rot, 0, 1 - Math.exp(-dt * 10)); const b = Math.sin(E.time * 2.6 + v.ph); v.sy = 1 + b * .008; v.sx = 1 - b * .005; }
+      // living sprite: lean spring (overshoots = follow-through), idle sway, travelling ripple, breathing
+      const sway = v.busy ? 0 : Math.sin(E.time * 1.15 + v.ph) * 5, sdt = Math.min(dt, 1 / 30);
+      v.bendV += ((v.bendT + sway) - v.bend) * 170 * sdt - v.bendV * 12 * sdt; v.bend += v.bendV * sdt;
+      v.wave *= Math.exp(-dt * 2.6); v.wph += dt * 12; v.br = Math.sin(E.time * 2.3 + v.ph) * (v.busy ? .015 : .035);
       if (v.stars >= 3 && v.alpha > .5) { v.emberT -= dt; while (v.emberT <= 0) { v.emberT += v.stars >= 5 ? .05 : .13; const b = this.anc(v, 'body'), P = PAL[v.elem]; addP({ x: b[0] + rnd(-40, 40) * v.k / .4, y: v.y + rnd(-5, 5), z: v.y - b[1] + rnd(-40, 30) * v.k / .4, vz: rnd(30, 70), vx: rnd(-10, 10), life: rnd(.6, 1.1), size: rnd(4, 9), size2: 0, color: v.stars >= 6 && Math.random() < .5 ? '#ffd24a' : Math.random() < .3 ? P.core : P.aura }); } }
     }
   }
@@ -444,9 +520,10 @@ export class BattleView {
     ctx.save(); ctx.translate(v.x, v.y + v.hop); ctx.rotate(v.rot); ctx.scale(v.sx * v.k * (v.flip ? -1 : 1), v.sy * v.k);
     let gl = v.stars >= 4 ? .5 + .2 * Math.sin(t * 4 + v.ph) : 0; gl = Math.max(gl, v.glowF);
     if (gl > 0 && !v.dead) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = gl * v.alpha; ctx.drawImage(glowOf(v.sid, key, P.aura), -PIV[0] - GP, -PIV[1] - GP); if (v.stars >= 5 || v.glowF > .5) { ctx.save(); ctx.scale(1.07, 1.16 + .05 * Math.sin(t * 9)); ctx.globalAlpha = .32 * v.alpha; ctx.drawImage(glowOf(v.sid, key, P.aura), -PIV[0] - GP, -PIV[1] - GP); ctx.restore(); } ctx.globalCompositeOperation = 'source-over'; }
-    ctx.globalAlpha = v.alpha; ctx.drawImage(spr(v.sid, key), -PIV[0], -PIV[1]);
-    if (v.dead) { ctx.globalAlpha = Math.min(1, v.deathT * 1.5) * v.alpha; ctx.drawImage(silOf(v.sid, key, P.aura), -PIV[0], -PIV[1]); }
-    if (v.flash > 0) { ctx.globalAlpha = v.flash * .85; ctx.drawImage(silOf(v.sid, key, '#ffffff'), -PIV[0], -PIV[1]); }
+    const W = { bend: v.bend, breathe: v.br, wave: v.wave, wph: v.wph };
+    ctx.globalAlpha = v.alpha; warpDraw(ctx, spr(v.sid, key), W);
+    if (v.dead) { ctx.globalAlpha = Math.min(1, v.deathT * 1.5) * v.alpha; warpDraw(ctx, silOf(v.sid, key, P.aura), W); }
+    if (v.flash > 0) { ctx.globalAlpha = v.flash * .85; warpDraw(ctx, silOf(v.sid, key, '#ffffff'), W); }
     ctx.restore(); ctx.globalAlpha = 1;
     if (v.shieldAmt > 0 && !v.dead) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = .25 + .1 * Math.sin(t * 4); ctx.strokeStyle = '#bfe6ff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(v.x, v.y - 150 * v.k, 170 * v.k, 210 * v.k, 0, 0, TAU); ctx.stroke(); ctx.restore(); }
   }

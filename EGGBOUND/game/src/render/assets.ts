@@ -65,6 +65,26 @@ function artPose(art, key) {
   const view = key.split('_')[0], other = view === 'front' ? 'back' : 'front';
   return IMG[art + '_' + key] || IMG[art + '_' + view + '_idle'] || IMG[art + '_master'] || IMG[art + '_' + other + '_idle'];
 }
+// extra motion poses (BATCH13+) fall back to the classic five when a set doesn't have them yet
+const POSE_FALLBACK = { windup: 'idle', strike: 'attack', follow: 'attack', cast2: 'cast', joy: 'cast', down: 'hit' };
+/** pose key for a view: the requested pose if this species' art has it, else its fallback */
+export function poseKey(sid, view, pose) {
+  const s = SP(sid), art = evoArt(sid) || (hasArt(sid) ? s.art : 'mon001');
+  return view + '_' + (IMG[art + '_' + view + '_' + pose] || !POSE_FALLBACK[pose] ? pose : POSE_FALLBACK[pose]);
+}
+/** "living sprite": draw a 512² sprite (pivot 256,435) in horizontal strips so it can breathe (chest swells, upper body
+ *  lifts), bend (top sways sideways — lean / recoil, driven by a spring) and wave (a travelling ripple for follow-through).
+ *  Call inside the unit's local transform (same place as drawImage(img, -PIV[0], -PIV[1])). */
+export function warpDraw(ctx, img, w) {
+  if (!w || (Math.abs(w.bend) < .3 && Math.abs(w.breathe) < .002 && Math.abs(w.wave) < .3)) { ctx.drawImage(img, -PIV[0], -PIV[1]); return; }
+  const N = 16, H = 512, f = img.width / 512, hOf = y => Math.max(0, Math.min(1.15, (PIV[1] - y) / 400));
+  const Y = y => y - w.breathe * 46 * hOf(y), X = y => { const h = hOf(y); return w.bend * h * h + w.wave * Math.sin(w.wph - h * 3.4) * h; };
+  for (let i = 0; i < N; i++) {
+    const y0 = i * H / N, y1 = (i + 1) * H / N, ym = (y0 + y1) / 2, h = hOf(ym);
+    const sx = 1 + w.breathe * Math.exp(-(((h - .5) / .28) ** 2)), dx = X(ym), dy0 = Y(y0), dy1 = Y(y1);
+    ctx.drawImage(img, 0, y0 * f, 512 * f, (y1 - y0) * f, -PIV[0] * sx + dx, dy0 - PIV[1] - .5, 512 * sx, dy1 - dy0 + 1);
+  }
+}
 /** sprite canvas/image for a species & pose key like 'front_idle' */
 export function spr(sid, key) {
   const k = sid + key; if (SPR[k]) return SPR[k];

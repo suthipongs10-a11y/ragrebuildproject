@@ -1,0 +1,99 @@
+=====================================================================
+EGGBOUND — ART BATCH 13-B : FOX PROTOTYPE — SKILL & HIT EFFECTS (เอฟเฟ็คสกิลจิ้งจอก + เอฟเฟ็คโดนตี)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- เอฟเฟ็คเฉพาะสกิลของจิ้งจอก (ไฟจิ้งจอก รอยเขี้ยว ทางไฟตอนพุ่ง) + ประกายตอนโดนตีที่มอนทุกตัวใช้ร่วมกัน
+- เปิดแชทใหม่ใน ChatGPT 1 แชท (แยกจากแชทท่าจิ้งจอก)
+- แนบ: ไฟล์นี้ + fx_burst.png และ fx_rays.png จากชุด 06-C (ให้เห็นสไตล์แสงที่ผ่านแล้ว)
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ก่อนตอบ "OK"
+- เหมือนชุด 06-C/09/12: พื้นดำสนิท + แสงขาวเทาล้วน โค้ดจะย้อมสี (ไฟส้ม/ทอง) แล้วซ้อนแบบเพิ่มแสง
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the VFX artist for a 2.5D monster RPG with the effect quality of
+top mobile monster RPGs. Generate 6 images, ONE IMAGE PER TURN. They are
+LIGHT LAYERS: the game tints them, adds them with additive blending and
+animates them (scale, rotate, stretch, flicker, fade).
+
+Work order:
+  1. Generate image #01 and wait for my "OK".
+  2. After "OK", generate the rest one by one in the same look.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (every image)
+---------------------------------------------------------------------
+STYLE: high-quality anime game VFX, painterly but clean: hot white cores,
+soft luminous falloff, crisp sharp highlights, strong flowing shapes.
+Readable at small size on a phone.
+COLOUR: GREYSCALE ONLY — white and greys. NO hue at all. Brightness = light.
+BACKGROUND: PURE BLACK #000000 everywhere outside the effect (exactly 0,0,0).
+NOT transparent, NOT dark blue, NOT a gradient.
+FORBIDDEN: characters, animals, faces, eyes, objects, ground, scenery,
+text, letters, numbers, logos, frames, watermarks, coloured tints.
+Every effect fades to black at least 30 px before every canvas edge.
+ORIGINAL DESIGN — do not copy effects from any existing game or anime.
+
+---------------------------------------------------------------------
+2. IMAGES (one per turn)
+---------------------------------------------------------------------
+#01  fx_foxfire.png
+FOX-FIRE WISP (magic flame orbs that circle the fox and fly at enemies)
+Canvas 512 x 768 (portrait). One magical flame wisp: a round glowing
+core in the lower part (centre ≈ 256, 520, radius ≈ 90) with an elegant
+flickering flame tongue rising from it and curling at the tip like a
+teardrop flame, two or three small side licks. Mystical, not destructive.
+
+#02  fx_bite.png
+BITE MARK FLASH (the moment the fox's jaws snap shut on a target)
+Canvas 1024 x 1024. Two opposing jagged crescent arcs (an upper and a
+lower jaw shape) snapping together at the centre, each made of 3–4
+sharp fang-like spikes of light, with a bright impact flash where they
+meet and a few short sharp sparks flying out.
+
+#03  fx_fire_trail.png
+DASH TRAIL (left behind when the fox dashes through enemies)
+Canvas 1536 x 512. A long horizontal streak of flame energy, thin and
+sharp at the RIGHT end (the front), widening and breaking into wispy
+flame tongues toward the LEFT end (the back), with small flying embers
+along it. Centred on y = 256.
+
+#04  fx_hit_spark.png
+HIT SPARK (used by every monster when a blow lands)
+Canvas 1024 x 1024. A sharp comic-style impact star: a hot white core,
+6–8 irregular long sharp spikes of different lengths radiating out,
+a thin broken shock ring, and small flying shards. Very punchy.
+
+#05  fx_hit_spark_b.png
+HIT SPARK, VARIANT (the game alternates #04 and #05 so hits don't repeat)
+Same size and centre as #04, different spike arrangement: more spikes,
+slightly rotated, with two short curved slash marks crossing the core.
+
+#06  fx_slash_arc.png
+SWIPE SMEAR (a quick curved swipe behind claws, tails or weapons)
+Canvas 1024 x 1024. One crescent arc of light sweeping from the upper
+left around to the lower right (like a fast claw swipe), razor-bright
+thin leading edge on the outside, soft feathered trail on the inside,
+fading out along its length.
+
+---------------------------------------------------------------------
+3. QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] Background is PURE BLACK #000000 (not transparent, not dark blue)
+  [ ] Greyscale only — no colour anywhere
+  [ ] Canvas sizes exactly as listed; nothing touches the edges
+  [ ] No faces, eyes, animals, objects or text
+  [ ] #03 front (thin sharp end) on the RIGHT
+
+---------------------------------------------------------------------
+4. PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_FOX_SKILL_FX.zip
+Exact file names (lowercase, PNG):
+  fx_foxfire.png    fx_bite.png        fx_fire_trail.png
+  fx_hit_spark.png  fx_hit_spark_b.png fx_slash_arc.png
+Add notes.txt listing any image you regenerated and why.
