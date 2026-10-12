@@ -1,0 +1,123 @@
+=====================================================================
+EGGBOUND — ART BATCH 03 : MON_A04 "Mossstone Golem" (โกเลมศิลามรกต)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- เปิดแชทใหม่ใน ChatGPT 1 แชทต่อมอน 1 ตัว (ห้ามรวมหลายตัวในแชทเดียว ตัวจะปนกัน)
+- แนบ 2 อย่าง: ไฟล์นี้ + mon001_master.png (จิ้งจอกจากชุดแรก) ใช้เป็น "ภาพอ้างอิงสไตล์" เท่านั้น
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ"
+- ได้ zip แล้วส่งกลับมาที่แชท Claude (ส่งทีละตัวหรือรวมกันก็ได้)
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D turn-based monster RPG. Generate 12
+images, ONE IMAGE PER TURN, in the order below. The images are animated
+by code, so CONSISTENCY matters more than creativity: every image must
+show the exact same character.
+
+The attached mon001_master.png (a fire fox) is a STYLE REFERENCE ONLY:
+match its art style, shading, line quality, lighting, camera angle and
+level of detail. Do NOT copy the fox's design, colors or body.
+
+Work order:
+  1. Generate #01 (MASTER). Show it and wait for my "OK".
+  2. After "OK", generate #02–#12 one by one, each time using #01 as the
+     character reference.
+  3. Run the QUALITY CHECK, then package the ZIP (section 6).
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Cute-but-cool proportions: slightly big head, expressive eyes, strong pose.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Camera: HIGH ANGLE about 55 degrees looking down, orthographic feel.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: ground, cast shadow, glow, aura, fire/particles/sparks, motion lines,
+text, watermark, frame, second character.
+ORIGINAL DESIGN - do not copy or resemble any existing game, film, anime
+or novel character (Dota, League of Legends, Summoners War, Pokemon, etc.).
+
+Technical rules:
+- Canvas 1024 x 1024 px PNG, subject centered, at least 80 px empty margin.
+- The lowest point (feet / bottom of body) sits on an invisible ground
+  line at y ≈ 870 px in EVERY image.
+- SAME SCALE in every image of this set.
+
+---------------------------------------------------------------------
+2. CHARACTER SHEET — MON_A04 Mossstone Golem
+---------------------------------------------------------------------
+- Species: chunky stone golem monster, element EARTH, role Defender (protective, gentle giant, cute).
+- Body: rounded boulder torso made of smooth grey-brown stones, very big chunky stone
+  arms with rounded fists, short stubby stone legs. Small head block on top.
+- Moss: patches of soft green moss on the shoulders, head and arms, with a few tiny
+  white and yellow flowers growing in the moss.
+- Chest: a faceted EMERALD crystal set in the middle of the chest (painted bright green,
+  no glow effect).
+- Face: two simple round bright-white eyes carved in the stone with a friendly look,
+  no mouth (or a tiny carved smile line).
+- Head: a little two-leaf sprout growing on top.
+- Size: Common class but wide - body height about 58-62% of the canvas.
+
+---------------------------------------------------------------------
+3. VIEWS
+---------------------------------------------------------------------
+FRONT VIEW = 3/4 front view from the high 55° camera, body facing
+             BOTTOM-RIGHT. We see the face and front.
+BACK VIEW  = 3/4 back view from the same camera, body facing TOP-RIGHT.
+             We see the back and only part of the side of the face.
+
+---------------------------------------------------------------------
+4. IMAGE LIST
+---------------------------------------------------------------------
+For #02–#11 start every prompt with:
+"Using the attached reference as the EXACT same character (same design,
+colors, markings, proportions, scale, line style and lighting),
+following all MASTER STYLE rules:"
+
+#01  MASTER (FRONT VIEW) — full-body character design in the idle pose.
+     This image defines the character for all others.
+#02  FRONT VIEW — IDLE:   Standing solid, arms hanging down beside the body with fists resting near the ground, friendly eyes.
+#03  FRONT VIEW — ATTACK: Big overhead punch: one huge fist raised and swinging forward toward bottom-right, body leaning in.
+#04  FRONT VIEW — CAST:   Both arms raised up and crossed in front like forming a wall, moss and flowers visible, eyes determined.
+#05  FRONT VIEW — HIT:    Rocking backward, a small stone chip breaking off the shoulder (painted), eyes squeezed into lines.
+#06  FRONT VIEW — BURST:  Ground-smash ready pose: both fists raised high above the head, legs wide, emerald chest prominent, fierce eyes.
+#07  BACK VIEW — IDLE    (same pose idea as #02, BACK VIEW)
+#08  BACK VIEW — ATTACK  (same pose idea as #03, moving toward TOP-RIGHT)
+#09  BACK VIEW — CAST    (same pose idea as #04, BACK VIEW)
+#10  BACK VIEW — HIT     (same pose idea as #05, recoiling toward bottom-left)
+#11  BACK VIEW — BURST   (same pose idea as #06, BACK VIEW)
+#12  EGG — Grey stone-textured egg with green moss patches, two tiny flowers and a small emerald crystal on the front.
+     Oval egg standing upright, height ~55% of canvas, bottom at y ≈ 870 px,
+     same art style and lighting, no nest, no cracks, no glow.
+
+---------------------------------------------------------------------
+5. QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] Same face, colors, markings and proportions as #01 in every image
+  [ ] Same scale; lowest point at ~y 870 px
+  [ ] Correct facing (FRONT → bottom-right, BACK → top-right)
+  [ ] No ground, shadow, glow, particles, motion lines or text
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Nothing cropped; style matches the fox reference
+  [ ] Does not resemble any existing game/anime character
+
+---------------------------------------------------------------------
+6. FILE NAMES & ZIP
+---------------------------------------------------------------------
+  #01 monA04_master.png
+  #02 monA04_front_idle.png      #07 monA04_back_idle.png
+  #03 monA04_front_attack.png    #08 monA04_back_attack.png
+  #04 monA04_front_cast.png      #09 monA04_back_cast.png
+  #05 monA04_front_hit.png       #10 monA04_back_hit.png
+  #06 monA04_front_burst.png     #11 monA04_back_burst.png
+  #12 eggA04.png
+
+ZIP name: EGGBOUND_MONA04_SET.zip (all PNGs in the root) + notes.txt listing
+each file, background type, and any image regenerated and why.
+=====================================================================
+END OF FILE
+=====================================================================

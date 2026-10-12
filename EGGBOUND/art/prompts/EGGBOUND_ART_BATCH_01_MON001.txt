@@ -1,0 +1,210 @@
+=====================================================================
+EGGBOUND — ART BATCH 01 : MON_001 "Dawnflame Fox" (จิ้งจอกเพลิงอรุณ)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้ / NOTE FOR THE HUMAN]
+- วางไฟล์นี้ทั้งไฟล์ให้ ChatGPT ในแชทใหม่ แล้วพิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ"
+- ถ้า ChatGPT ทำ zip ให้ไม่ได้ ให้ดาวน์โหลดทีละภาพ ตั้งชื่อตามตาราง FILE LIST แล้ว zip เอง
+- ส่ง zip กลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D fantasy monster-collecting RPG.
+Generate 17 images, ONE IMAGE PER TURN, in the exact order below.
+These images will be cut into game sprites and animated by code, so
+CONSISTENCY matters more than creativity. Every image of the fox must
+look like the exact same character.
+
+Work order:
+  1. Generate image #01 (MASTER). Show it to me and wait for "OK"
+     before continuing. If I ask for changes, redo #01 only.
+  2. After "OK", generate #02 to #17 one by one. For every image
+     after #01, use image #01 as the visual reference for the
+     character's design, colors, proportions and line style.
+  3. After all 17 images are done, package them into a ZIP
+     (see section 6).
+
+---------------------------------------------------------------------
+1. GLOBAL RULES (apply to EVERY image)
+---------------------------------------------------------------------
+- Canvas: 1024 x 1024 px, square, PNG.
+- Background: FULLY TRANSPARENT.
+  If transparency is not possible, use a perfectly flat solid
+  magenta background #FF00FF (no gradient, no texture, no vignette).
+- Art style: painterly anime fantasy game art, soft dimensional
+  shading, clean readable silhouette, crisp edges (no blur, no
+  depth-of-field). Matches high-quality isometric mobile RPG art.
+- Lighting: warm key light from the TOP-LEFT, soft cool fill from
+  the right. Same lighting in every image.
+- Camera: HIGH ANGLE, about 55 degrees looking down (oblique
+  top-down, like an isometric RPG). Orthographic feel, no strong
+  perspective distortion.
+- Framing: one subject only, centered horizontally. Full body inside
+  the canvas with at least 80 px empty margin on every side.
+  Subject height ~ 60–70% of canvas height.
+- Baseline: the paws/feet must touch an invisible ground line at
+  ~85% of canvas height (about y = 870 px) in every character image.
+- SAME SCALE in every fox image (the fox must not grow or shrink).
+- STRICTLY FORBIDDEN in every image:
+  ground, floor, grass, cast shadow, contact shadow, glow, aura,
+  fire particles, sparks, smoke, motion lines, speed lines, magic
+  effects, text, letters, watermark, border, frame, UI, second
+  character. (All effects and shadows are added later by code.)
+
+---------------------------------------------------------------------
+2. CHARACTER SHEET — MON_001 Dawnflame Fox
+---------------------------------------------------------------------
+- Species: small fire fox monster companion, element FIRE, role
+  Striker (fast attacker).
+- Personality: cute but brave and energetic.
+- Proportions: chibi-ish — big head (~40% of body height), compact
+  body, short sturdy legs, large fluffy tail about as big as the body.
+- Fur: cream-white base. Warm orange-to-red gradient on the ear tips,
+  the four paws and the last third of the tail.
+- Tail tip: shaped like a stylized flame, but drawn as SOLID FUR
+  shapes (3 curling flame-like fur locks). NOT real fire, no glow.
+- Face: large amber eyes with a bright highlight, small dark nose,
+  small fang visible when mouth is open.
+- Forehead: a small diamond-shaped amber ember gem.
+- Ears: large, pointed, with fluffy cream inner fur.
+- Chest: a fluffy cream ruff.
+- No clothing, no accessories (equipment is drawn separately).
+
+---------------------------------------------------------------------
+3. VIEW DEFINITIONS
+---------------------------------------------------------------------
+FRONT VIEW = 3/4 front view from the high 55° camera. The fox's body
+             faces BOTTOM-RIGHT of the canvas. We see its face, chest
+             and right side.
+BACK VIEW  = 3/4 back view from the same high 55° camera. The fox's
+             body faces TOP-RIGHT of the canvas. We see its back, the
+             tail, and only part of the side of its face/one eye.
+
+---------------------------------------------------------------------
+4. IMAGE LIST — FOX (generate in this order)
+---------------------------------------------------------------------
+For #02–#11 start every prompt with:
+"Using the attached reference fox as the EXACT same character (same
+design, colors, markings, proportions, scale, line style and
+lighting), following all GLOBAL RULES:"
+
+#01  MASTER  (FRONT VIEW)
+     Full-body character design, standing idle pose, tail curled up
+     behind, calm confident expression. This image defines the
+     character for all others.
+
+#02  FRONT VIEW — IDLE
+     Relaxed standing pose, weight evenly on four paws, tail curled
+     upward, ears up, slight friendly smile, mouth closed.
+
+#03  FRONT VIEW — ATTACK
+     Mid-lunge bite: body stretched forward toward bottom-right, front
+     paws reaching forward off the ground, hind legs pushing, ears
+     pinned back, mouth wide open showing the small fang, tail
+     streaming straight behind. (No motion lines.)
+
+#04  FRONT VIEW — CAST
+     Rearing up on hind legs, chest out, head raised to the sky, mouth
+     open as if howling, front paws lifted, tail flared up and spread
+     wide. (No fire, no effects — just the pose.)
+
+#05  FRONT VIEW — HIT
+     Flinching backward from a blow: body recoiling toward top-left,
+     eyes squeezed shut, ears flattened, mouth in a pained grimace,
+     tail tucked low. Paws still on the baseline.
+
+#06  FRONT VIEW — BURST
+     Dramatic heroic power pose: crouched low ready to spring, chest
+     near the ground, rear raised, tail fanned wide like a flame,
+     fierce determined eyes, fang showing.
+
+#07  BACK VIEW — IDLE        (same pose idea as #02, BACK VIEW)
+#08  BACK VIEW — ATTACK      (same pose idea as #03, lunging toward top-right, BACK VIEW)
+#09  BACK VIEW — CAST        (same pose idea as #04, BACK VIEW)
+#10  BACK VIEW — HIT         (same pose idea as #05, recoiling toward bottom-left, BACK VIEW)
+#11  BACK VIEW — BURST       (same pose idea as #06, BACK VIEW)
+
+---------------------------------------------------------------------
+5. IMAGE LIST — EGG & TEST EQUIPMENT
+---------------------------------------------------------------------
+Same GLOBAL RULES (style, lighting, 55° camera, transparent
+background, no shadow, no glow, no effects).
+
+#12  EGG — Dawnflame Fox Egg
+     Oval monster egg, height ~55% of canvas, centered, standing
+     upright, bottom at y ≈ 870 px. Cream-white glossy shell with
+     orange-red flame-shaped patterns wrapping around it (matching the
+     fox's colors) and a small diamond amber ember gem on the front.
+     Subtle surface texture. No nest, no cracks.
+
+#13  EQUIPMENT — HAT (FRONT VIEW)
+     A small adventurer's cap sized for the fox's head: deep red
+     felt with a golden band and one orange feather. Drawn ALONE
+     (no fox), seen in the FRONT VIEW angle (as if worn by a fox
+     facing bottom-right). Object ~35% of canvas, centered.
+
+#14  EQUIPMENT — HAT (BACK VIEW)
+     The SAME hat as #13, seen from the BACK VIEW angle (as if worn
+     by a fox facing top-right). Same size and centering as #13.
+
+#15  EQUIPMENT — COLLAR (FRONT VIEW)
+     A leather collar with a golden buckle and a small round red
+     gem pendant, shaped as a ring as if worn around a small fox
+     neck. Drawn ALONE, FRONT VIEW angle. Object ~35% of canvas.
+
+#16  EQUIPMENT — COLLAR (BACK VIEW)
+     The SAME collar as #15 from the BACK VIEW angle (pendant mostly
+     hidden, buckle visible). Same size and centering as #15.
+
+#17  EQUIPMENT — CHARM
+     A floating charm: small brass lantern with a warm orange crystal
+     inside, ornate tiny filigree, a short ribbon tail. Drawn alone,
+     ~30% of canvas, centered. (No glow — the crystal is just bright
+     orange paint.)
+
+---------------------------------------------------------------------
+6. FILE LIST & ZIP PACKAGING
+---------------------------------------------------------------------
+Name the files EXACTLY like this:
+
+  #01  mon001_master.png
+  #02  mon001_front_idle.png
+  #03  mon001_front_attack.png
+  #04  mon001_front_cast.png
+  #05  mon001_front_hit.png
+  #06  mon001_front_burst.png
+  #07  mon001_back_idle.png
+  #08  mon001_back_attack.png
+  #09  mon001_back_cast.png
+  #10  mon001_back_hit.png
+  #11  mon001_back_burst.png
+  #12  egg001.png
+  #13  gear_hat01_front.png
+  #14  gear_hat01_back.png
+  #15  gear_collar01_front.png
+  #16  gear_collar01_back.png
+  #17  gear_charm01.png
+
+ZIP name: EGGBOUND_BATCH01_MON001.zip
+Put all 17 PNG files in the ZIP root (no sub-folders), plus a
+text file "notes.txt" that lists:
+  - each file name
+  - background type used (transparent or magenta #FF00FF)
+  - any image you had to regenerate and why
+
+---------------------------------------------------------------------
+7. QUALITY CHECK BEFORE ZIPPING
+---------------------------------------------------------------------
+Check every fox image against #01 and regenerate any image that fails:
+  [ ] Same face, eye color, ember gem, fur colors and tail-tip shape
+  [ ] Same size / scale; paws on the baseline (~y 870 px)
+  [ ] Correct view direction (FRONT = faces bottom-right,
+      BACK = faces top-right)
+  [ ] No shadow, no ground, no glow, no fire, no particles, no text
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Whole body inside the canvas with margin (nothing cropped)
+=====================================================================
+END OF FILE
+=====================================================================

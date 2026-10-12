@@ -1,0 +1,23 @@
+EGGBOUND — ART BATCH 05: MYSTERY EGG SHELLS (ไข่ปริศนา 4 ลาย)
+
+Original design, do not copy any existing game/film character or item.
+
+Context: mobile monster-collecting game, hand-painted 2D style that matches the existing egg art
+(soft painterly shading, warm rim light, clean silhouette). The player must NOT be able to tell which
+monster is inside — the shell pattern only tells the rarity tier. No element hints (no flames, leaves, water).
+
+Deliver 4 separate PNG files, transparent background, 1024x1024, egg centred horizontally,
+egg bottom resting at y = 850 (same baseline for all four), egg about 360 px wide x 500 px tall,
+no cast shadow, no pedestal, no text, no letters.
+
+1) eggM_common.png  — "ลายธรรมดา": cream / eggshell white, scattered small brown speckles, matte.
+2) eggM_silver.png  — "ลายเงิน": pearly silver-blue shell, 2–3 soft wavy engraved bands, gentle sheen.
+3) eggM_gold.png    — "ลายทอง": warm gold shell, one ornate zig-zag crown band around the middle with
+                      tiny pearl dots, a small orange-red gem on the upper half, subtle sparkle.
+4) eggM_rainbow.png — "ลายรุ้ง": white shell with diagonal pastel rainbow stripes (red, orange, yellow,
+                      green, blue, violet, pink), a few small four-point star glints, faint iridescent glow
+                      kept inside the egg outline (no glow outside the silhouette).
+
+Each egg may carry a faint embossed question-mark-like rune (abstract, not a letter) on the front.
+Keep all four the same egg shape and size so they swap cleanly in the game.
+Zip the 4 files and send back.

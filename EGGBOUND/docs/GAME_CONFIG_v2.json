@@ -1,0 +1,93 @@
+{
+  "project": {"working_title": "Eggbound", "blueprint_version": "2.0", "status": "DESIGN_ONLY", "date": "2026-10-11", "genre": "turn-based monster-collecting RPG (SW-style) with RO systems"},
+  "team": {"size": 4, "leader_skill_slot": 0, "duplicate_species_allowed": false},
+  "battle": {
+    "atb_gauge_max": 100,
+    "atb_fill_per_second_per_spd": 0.9,
+    "skill_slots": 3,
+    "passive_slots": 1,
+    "waves_per_stage": 3,
+    "speed_options": [1, 2, 3],
+    "auto_battle": true,
+    "skip_ultimate_cutin": true,
+    "perfect_timing_bonus": 0.15,
+    "damage_formula": "SkillMult*ATK*3*100/(100+DEF*(1-DefBreak))*Element*Crit*Reaction*rand(0.92,1.08)",
+    "crit_multiplier_base": 1.5,
+    "crit_dmg_per_dex": 0.002,
+    "deterministic_seeded_rng": true,
+    "caps": {"crit_rate": 0.8, "def_break": 0.7, "atk_buff": 0.5, "spd_buff": 0.4, "status_chance_min_vs_normal": 0.15}
+  },
+  "elements": {
+    "names": ["fire", "water", "wind", "earth", "light", "dark"],
+    "advantage": [["fire","wind"],["wind","earth"],["earth","water"],["water","fire"],["light","dark"],["dark","light"]],
+    "advantage_multiplier": 1.3,
+    "disadvantage_multiplier": 0.85,
+    "light_dark_disadvantage": false,
+    "mark_duration_turns": 2
+  },
+  "reactions": [
+    {"id": "storm", "mark": "wet", "trigger": "wind", "name_th": "พายุฟ้าคะนอง", "effect": "chain_lightning_3_targets", "mult": 0.6, "debuff": "spd_down"},
+    {"id": "steam", "mark": "wet", "trigger": "fire", "name_th": "ไอน้ำ", "effect": "blind", "turns": 2},
+    {"id": "wildfire", "mark": "burn", "trigger": "wind", "name_th": "ไฟลาม", "effect": "burn_all_enemies", "turns": 2},
+    {"id": "mud", "mark": "earth", "trigger": "water", "name_th": "โคลนดูด", "effect": "atb_down", "value": 30},
+    {"id": "lava", "mark": "earth", "trigger": "fire", "name_th": "ลาวา", "effect": "def_break_and_burn", "turns": 2},
+    {"id": "eclipse", "mark": "light", "trigger": "dark", "name_th": "สุริยคราส", "effect": "true_damage", "mult": 1.2, "symmetric": true},
+    {"id": "shatter", "mark": "frozen", "trigger": "earth", "name_th": "ทุบน้ำแข็ง", "effect": "damage_x2"}
+  ],
+  "statuses": {
+    "debuffs": ["burn","poison","freeze","stone","sleep","stun","silence","blind","heal_block","atk_down","def_down","spd_down","atb_down"],
+    "buffs": ["atk_up","def_up","spd_up","crit_up","shield","regen","immortal","immunity","reflect","taunt"],
+    "values": {"burn_pct_maxhp": 0.06, "poison_pct_maxhp": 0.05, "blind_miss": 0.5, "atk_up": 0.3, "def_up": 0.4, "spd_up": 0.3, "def_down": 0.5, "atk_down": 0.3, "spd_down": 0.3, "stone_def_up": 0.5}
+  },
+  "monster": {
+    "rarities": {"common": 1.0, "rare": 1.1, "epic": 1.2, "legendary": 1.3},
+    "stars_max": 5,
+    "level_cap_by_star": {"1": 20, "2": 30, "3": 40, "4": 50, "5": 60},
+    "stat_points_per_level": 3,
+    "stats": ["STR","AGI","VIT","INT","DEX","LUK"],
+    "stat_effects": {"STR": "atk", "AGI": "spd+evasion", "VIT": "hp+def", "INT": "skill_power+status_chance", "DEX": "accuracy+crit_damage", "LUK": "crit_rate+status_resist"},
+    "evolution_branch_unlock_star": 3,
+    "bond_max": 10,
+    "duo_burst_min_bond": 5,
+    "star5_ultimate_vfx_upgrade": true,
+    "aura_tiers": {"1": "none", "2": "ground_ring", "3": "element_particles", "4": "rim_glow+afterimage", "5": "full_aura+orbit_motes+rune_circle+idle_flourish"}
+  },
+  "eggs": {
+    "wild_vs_starborn": {
+      "wild": {"upgrade_cost_mult": 0.6, "bond_gain_mult": 1.3, "wild_trait_slot": true, "tradeable_unhatched": true, "breedable": true, "start_star": 1},
+      "starborn": {"upgrade_cost_mult": 1.0, "starborn_skin": true, "aura_from_star1": true, "alt_skill_visuals": true, "tradeable": false, "start_star": 2}
+    },
+    "drop": {
+      "common":    {"stage_drop": 0.08, "fragments_per_clear": 1, "fragments_to_craft": 20,  "hatch_seconds": 30},
+      "rare":      {"stage_drop": 0.03, "fragments_per_clear": 1, "fragments_to_craft": 40,  "hatch_seconds": 300},
+      "epic":      {"stage_drop": 0.01, "fragments_per_clear": 1, "fragments_to_craft": 80,  "hatch_seconds": 1800},
+      "legendary": {"boss_drop": [0.005, 0.01], "fragments_per_clear": [1, 2], "fragments_to_craft": 120, "hatch_seconds": 7200}
+    },
+    "incubator_slots": {"start": 3, "max": 6},
+    "starborn_gacha": {"pity_every": 80, "show_rates": true, "mileage_exchange": true}
+  },
+  "equipment": {
+    "slots": ["head","neck","charm","core"],
+    "visible_slots": ["charm"],
+    "grades": ["white","green","blue","purple","gold","rainbow"],
+    "substats_by_grade": {"white": 0, "green": 1, "blue": 2, "purple": 3, "gold": 4, "rainbow": 4},
+    "card_sockets_by_grade": {"white": 0, "green": 0, "blue": 1, "purple": 1, "gold": 2, "rainbow": 2},
+    "upgrade_max": 15,
+    "upgrade_safe_until": 9,
+    "upgrade_downgrade_from": 12,
+    "item_breaks": false,
+    "sets": {"blaze": {"2": "burn_on_hit_15pct", "4": "fire_footprints_vfx+burn_on_hit_35pct"}, "gale": {"2": "spd_10", "4": "spd_20+wind_trail_vfx"}, "guardian": {"2": "def_15", "4": "start_shield_20pct"}, "storm": {"2": "reaction_dmg_15", "4": "reaction_dmg_25+spark_vfx"}, "rebirth": {"4": "revive_once_30pct"}}
+  },
+  "cards": {"stage_drop": 0.005, "boss_drop": 0.02, "mvp_rank_drop_top": 10, "tradeable": true, "unsocket_item": "card_remover"},
+  "stamina": {"regen_seconds": 300, "cap": 120, "stage_cost_range": [3, 8]},
+  "pvp": {"arena_attacks_per_day": 5, "arena_defense_ai": true, "woe_castles": 6, "woe_window_hours_per_week": 2, "guild_size": 30},
+  "world_boss_mvp": {"id": "BOSS_01", "respawn_hours": 4, "attempts_per_player": 3, "level_up_per_kill": 1, "participation_reward": "immortal_fruit_revive_once", "server_kill_threshold_for_egg_roll": 3},
+  "content_targets": {
+    "P0": {"species": 6, "realms": 1, "stages": 3},
+    "P1_MVP": {"species": 24, "realms": 2, "stages": 16},
+    "P3_EARLY_ACCESS": {"species": 48, "realms": 5},
+    "P4_V1_0": {"species": 72, "realms": 8},
+    "EXPANSION": {"species": 144, "realms": 9}
+  },
+  "graphics_quality": {"low": {"particles_mult": 0.35, "bloom": false}, "mid": {"particles_mult": 0.7, "bloom": false}, "high": {"particles_mult": 1.0, "bloom": true}}
+}

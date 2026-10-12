@@ -1,0 +1,22 @@
+// Determinism + balance sanity: run each stage many times with the default team.
+import { simulate } from '../src/core/battle';
+import { STAGES } from '../src/core/data';
+import { eggTests } from './eggs';
+const team = (lvl: number, stars = 1) => ['A01', 'A02', 'A03', 'A04'].map(sid => ({ sid, lvl, stars }));
+let fail = 0;
+for (const st of STAGES) {
+  const a = simulate(1234, team(5), st), b = simulate(1234, team(5), st);
+  const same = a.rng === b.rng && a.log.join('|') === b.log.join('|');
+  if (!same) { fail++; console.log('NON-DETERMINISTIC', st.id); }
+}
+const plan: Record<string, number> = { '1-1': 5, '1-2': 7, '1-3': 10 };
+for (const st of STAGES) {
+  for (const lvl of [plan[st.id] - 1, plan[st.id], plan[st.id] + 2]) {
+    let w = 0, turns = 0, stars = 0, react = 0; const N = 400;
+    for (let i = 0; i < N; i++) { const r = simulate(1000 + i, team(lvl), st); if (r.win) w++; turns += r.turns; stars += r.stars; react += r.reactions; }
+    console.log(`${st.id} team Lv${lvl}: win ${(w / N * 100).toFixed(0)}%  avgTurns ${(turns / N).toFixed(0)}  avgStars ${(stars / N).toFixed(2)}  reactions/battle ${(react / N).toFixed(1)}`);
+  }
+}
+console.log(fail ? 'DETERMINISM FAILED' : 'determinism OK');
+fail += eggTests();
+(globalThis as any).process?.exit(fail ? 1 : 0);

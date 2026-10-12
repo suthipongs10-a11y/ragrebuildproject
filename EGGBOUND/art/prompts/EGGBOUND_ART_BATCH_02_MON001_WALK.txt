@@ -1,0 +1,151 @@
+=====================================================================
+EGGBOUND — ART BATCH 02 : MON_001 "Dawnflame Fox" — WALK CYCLE
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้ / NOTE FOR THE HUMAN]
+- เปิดแชทใหม่ใน ChatGPT แล้วแนบ 3 อย่าง: ไฟล์นี้ + mon001_front_idle.png + mon001_back_idle.png
+  (สองภาพนี้อยู่ใน zip ชุดแรก EGGBOUND_BATCH01_MON001.zip)
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ"
+- ถ้า ChatGPT ทำ zip ไม่ได้ ให้ดาวน์โหลดภาพ ตั้งชื่อตาม FILE LIST แล้ว zip เอง ส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D fantasy monster-collecting RPG.
+The attached images show the finished character "Dawnflame Fox":
+  - mon001_front_idle.png = FRONT VIEW reference
+  - mon001_back_idle.png  = BACK VIEW reference
+Your job: draw its WALK CYCLE as sprite sheets that will be sliced
+and played as animation frames in the game. The fox must look like the
+EXACT same character in every frame (same design, colors, markings,
+proportions, line style, lighting). Only the legs, body bob, head and
+tail sway change between frames.
+
+Work order (one image per turn):
+  1. Generate image #01 (FRONT walk sheet). Show it and wait for "OK".
+  2. After "OK", generate image #02 (BACK walk sheet).
+  3. If I approve both, generate the optional images #03 and #04 (RUN
+     sheets) only if I say "do the run too".
+  4. Package into a ZIP (section 6).
+
+---------------------------------------------------------------------
+1. SHEET LAYOUT (very important — the game slices it automatically)
+---------------------------------------------------------------------
+- Canvas: 1024 x 1024 px, square, PNG.
+- A 2 x 2 GRID of four equal cells, each 512 x 512 px:
+      cell A (top-left)     = frame 1
+      cell B (top-right)    = frame 2
+      cell C (bottom-left)  = frame 3
+      cell D (bottom-right) = frame 4
+  Reading order: A → B → C → D, then it loops back to A.
+- Do NOT draw grid lines, borders, numbers or labels. The grid is
+  invisible; just place one fox in the middle of each cell.
+- In every cell:
+  * the fox is centered horizontally in its cell
+  * the whole fox (tail tips and ear tips included) stays inside its
+    own cell with at least 24 px empty margin — nothing crosses into
+    another cell
+  * the paws that touch the ground sit on an invisible ground line at
+    ~85% of the cell height (y ≈ 435 px inside each cell)
+  * the fox is the SAME SIZE in all four cells (about 80% of the cell
+    width from nose to tail tip)
+
+---------------------------------------------------------------------
+2. GLOBAL RULES
+---------------------------------------------------------------------
+- Background: FULLY TRANSPARENT. If impossible, use perfectly flat
+  solid magenta #FF00FF everywhere (no gradient, no texture).
+- Style: identical to the reference — painterly anime fantasy game
+  art, soft dimensional shading, crisp clean edges, no blur.
+- Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+- Camera: high angle ~55° looking down (oblique top-down), same as
+  the reference images.
+- STRICTLY FORBIDDEN: ground, grass, cast shadow, contact shadow, glow,
+  aura, fire, particles, sparks, dust, motion lines, speed lines, text,
+  numbers, watermark, borders, grid lines, a second character,
+  clothing or accessories.
+
+---------------------------------------------------------------------
+3. WALK CYCLE — WHAT EACH FRAME SHOWS
+---------------------------------------------------------------------
+A cute, bouncy quadruped walk (diagonal leg pairs move together, like
+a trotting puppy). Clear leg positions so the motion reads at small
+size.
+
+frame 1 (cell A) — CONTACT 1
+  Front-LEFT paw reaching forward and touching down, back-RIGHT paw
+  reaching forward and touching down. The other two legs are pushed
+  back. Body at normal height. Tail swings slightly to one side.
+
+frame 2 (cell B) — PASSING 1
+  Legs gathered under the body (front legs close together, back legs
+  close together), one front paw slightly lifted. Body RAISED a little
+  (about 10 px higher than frame 1). Ears perk up. Tail centered.
+
+frame 3 (cell C) — CONTACT 2
+  Mirror of frame 1 leg pattern: front-RIGHT paw forward and touching
+  down, back-LEFT paw forward and touching down, other legs pushed
+  back. Body at normal height. Tail swings slightly to the other side.
+
+frame 4 (cell D) — PASSING 2
+  Like frame 2 but the OTHER front paw is slightly lifted. Body raised
+  a little. Tail centered.
+
+Keep the head mostly level (small natural bob only), happy relaxed
+expression, mouth closed, eyes open.
+
+---------------------------------------------------------------------
+4. IMAGE LIST
+---------------------------------------------------------------------
+#01  FRONT VIEW WALK SHEET
+     Use mon001_front_idle.png as the reference.
+     FRONT VIEW = 3/4 front view from the high 55° camera; the fox's
+     body faces BOTTOM-RIGHT and walks toward the bottom-right in all
+     four frames. We see its face, chest and right side.
+
+#02  BACK VIEW WALK SHEET
+     Use mon001_back_idle.png as the reference.
+     BACK VIEW = 3/4 back view from the same high camera; the fox's
+     body faces TOP-RIGHT and walks toward the top-right in all four
+     frames. We see its back, the big tail, and only part of one side
+     of the face.
+
+(optional — only when I ask)
+#03  FRONT VIEW RUN SHEET
+     Same layout and view as #01 but a fast gallop: frame 1 all legs
+     stretched (front forward, back backward, body long and low);
+     frame 2 legs gathered under the body, body arched, airborne;
+     frame 3 front paws landing; frame 4 back paws pushing off. Ears
+     back, tail streaming behind.
+#04  BACK VIEW RUN SHEET
+     Same gallop as #03 in the BACK VIEW of #02.
+
+---------------------------------------------------------------------
+5. QUALITY CHECK BEFORE MOVING ON (redo the sheet if any fails)
+---------------------------------------------------------------------
+  [ ] Exactly 4 foxes, one per cell, none touching or crossing cells
+  [ ] Same face, eye color, ember gem, fur colors, tail-tip shape as
+      the reference
+  [ ] Same size in all four cells; ground paws at ~85% cell height
+  [ ] Leg positions clearly different: frames 1 and 3 are opposite
+      diagonal pairs; frames 2 and 4 have legs under the body
+  [ ] Correct facing (FRONT sheet → bottom-right, BACK → top-right)
+  [ ] No shadow, ground, dust, glow, motion lines, text or grid lines
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+
+---------------------------------------------------------------------
+6. FILE LIST & ZIP
+---------------------------------------------------------------------
+  #01  mon001_front_walk_sheet.png
+  #02  mon001_back_walk_sheet.png
+  #03  mon001_front_run_sheet.png   (optional)
+  #04  mon001_back_run_sheet.png    (optional)
+
+ZIP name: EGGBOUND_BATCH02_MON001_WALK.zip
+All PNG files in the ZIP root (no sub-folders) plus "notes.txt"
+listing each file, the background type used, and any image you
+regenerated and why.
+=====================================================================
+END OF FILE
+=====================================================================

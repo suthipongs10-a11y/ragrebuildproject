@@ -1,0 +1,176 @@
+=====================================================================
+EGGBOUND — ART BATCH 04-B : HOME BUILDINGS part 1 (castle, gate, nest, site)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- เปิดแชทใหม่ใน ChatGPT สำหรับไฟล์นี้ (1 ไฟล์ = 1 แชท) ทำตามลำดับ A → B → C
+- แนบ: ไฟล์นี้ + mon001_master.png + home_turtle_shell.png (จากไฟล์ A) เป็นภาพอ้างอิงสไตล์และมุมกล้อง
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ"
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+- ต้องทำไฟล์ A ให้เสร็จก่อน
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D monster RPG. Generate 9 images,
+ONE IMAGE PER TURN, in the order below. These images are placed and
+animated by code, so EXACT camera angle, scale, centering and pivot
+position matter more than creativity. Never add things that the
+instructions say code will draw.
+
+Work order:
+  1. Generate image #01 and wait for my "OK".
+  2. After "OK", generate the rest one by one, each time using the
+     approved images as reference for style, palette and camera.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Warm, cozy, storybook mood. Rich but not noisy detail.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: cast shadow on the ground, glow halos, aura, particles, sparks, smoke,
+motion lines, text, letters, numbers, watermark, frame, characters/creatures
+(unless the item IS the creature), people.
+ORIGINAL DESIGN — do not copy or resemble any existing game, film or anime
+asset (Summoners War, Clash of Clans, Pokemon, Studio Ghibli, etc.).
+The home is based on the public-domain myth of the giant sea turtles that
+carry the islands of the immortals (Chinese myth of Ao / Penglai) and the
+world-turtle Kurma (Hindu myth).
+
+---------------------------------------------------------------------
+2. CAMERA
+---------------------------------------------------------------------
+CAMERA (identical for every image in this batch):
+High 3/4 view, camera elevation about 35 degrees above the horizon, looking
+slightly down. Orthographic feel, no strong perspective distortion.
+A circle on the ground appears as an ellipse with height/width ratio ≈ 0.55.
+The front of every object faces the viewer (toward the bottom of the image).
+
+---------------------------------------------------------------------
+3. PALETTE
+---------------------------------------------------------------------
+SHARED PALETTE / MATERIALS (so all buildings feel like one world):
+- Cream / warm-white carved stone with soft moss at the base
+- Terracotta-red roofs; special roofs in deep blue or gold
+- Bronze and gold trims, small egg-shaped emblems as the home's motif
+- Wood: warm honey brown. Fabric: red and cream banners (no writing)
+- Architecture = a gentle blend of European storybook castle + Thai/Chinese
+  curved tiered eaves and finials. Elegant, not overly ornate.
+
+BUILDING PIVOT RULES (every building image):
+- Canvas 1024 x 1024, transparent.
+- Each building stands on its own small round base (stone or grass rim)
+  that is part of the drawing. The FRONT-most edge of that base is at
+  y ≈ 900 and the base is centered at x = 512.
+- No ground plane beyond the base, no cast shadow (code adds shadows).
+- Scale: the base ellipse width is given per item as % of canvas width.
+- Upgrade levels of the same building keep the SAME base size and
+  position; only what stands on it grows richer.
+
+---------------------------------------------------------------------
+4. IMAGES (one per turn)
+---------------------------------------------------------------------
+
+#01  bld_castle_1.png
+COVENANT KEEP Lv.1 (ป้อมพันธสัญญา) — MASTER
+Base width ≈ 70% of canvas.
+A small cozy cream-stone keep with ONE central round tower and a
+terracotta-red conical roof with a small flag (no symbol on the flag).
+Wooden arched door, two warm-lit windows, a cream egg-shaped emblem
+with a bronze ring above the door. Low crenellated wall ring on the base.
+
+
+#02  bld_castle_2.png
+COVENANT KEEP Lv.2
+Match image #01's style, palette, camera and scale exactly:
+Same base and central keep as #01, now with TWO side towers (red roofs)
+joined by a short wall, more banners (red/cream, no writing).
+
+
+#03  bld_castle_3.png
+COVENANT KEEP Lv.3
+Match image #01's style, palette, camera and scale exactly:
+Same as #02 plus two outer towers with deep-blue roofs, small stone
+bridges between towers, hanging lanterns, the egg emblem now bronze-gold.
+
+
+#04  bld_castle_4.png
+COVENANT KEEP Lv.4
+Match image #01's style, palette, camera and scale exactly:
+Same layout as #03 but grand: the central tower gains a GOLD
+tiered roof with gently curved Thai/Chinese-style eaves and a gold finial,
+gold trims everywhere, large golden egg emblem, more glowing windows.
+Same base size — it must still fit the same footprint.
+
+
+#05  bld_gate.png
+REALM GATE (ประตูภพ)
+Match image #01's style, palette, camera and scale exactly:
+Base width ≈ 48%.
+An ancient tall stone arch on a round stone platform, carved with cloud
+spirals and small egg motifs, moss on the stones, a bronze keystone.
+IMPORTANT: the inside of the arch opening must be EMPTY / TRANSPARENT
+(the game draws a swirling portal behind it).
+
+
+#06  bld_hatchery_1.png
+EGG NEST Lv.1 (รังฟักไข่)
+Match image #01's style, palette, camera and scale exactly:
+Base width ≈ 50%.
+A large woven twig-and-straw nest on a low mossy stone pedestal.
+The nest is EMPTY (the game draws the eggs inside).
+A small carved egg-shaped stone totem beside it.
+
+
+#07  bld_hatchery_2.png
+EGG NEST Lv.2
+Match image #01's style, palette, camera and scale exactly:
+Same as #06 plus a wooden canopy on two posts above the nest with two
+paper lanterns (unlit look, warm paper color). Nest still EMPTY.
+
+
+#08  bld_hatchery_3.png
+EGG NEST Lv.3
+Match image #01's style, palette, camera and scale exactly:
+Same as #07 but upgraded: gold-trimmed nest rim, a curved tiled roof
+over the canopy, small warm amber crystal stones around the nest that
+keep eggs warm. Nest still EMPTY.
+
+
+#09  bld_site.png
+CONSTRUCTION SITE (locked building)
+Match image #01's style, palette, camera and scale exactly:
+Base width ≈ 50%.
+A round patch of packed earth with wooden scaffolding, stacked planks,
+a coil of rope, a small hammer and a blank wooden sign board (NO text).
+
+---------------------------------------------------------------------
+QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] Background is fully transparent (no white box, no checkerboard drawn in)
+  [ ] Same camera angle as image #01 (ground ellipse ratio ≈ 0.55)
+  [ ] Pivot / size rules of each image are respected (see each item)
+  [ ] No text, no shadows on the ground, no glow halos, no particles
+  [ ] All 4 castle levels share the same base size/position
+  [ ] Gate opening is transparent; nests are empty
+
+---------------------------------------------------------------------
+PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_HOME_B_BUILDINGS1.zip
+Exact file names (lowercase, PNG):
+  bld_castle_1.png
+  bld_castle_2.png
+  bld_castle_3.png
+  bld_castle_4.png
+  bld_gate.png
+  bld_hatchery_1.png
+  bld_hatchery_2.png
+  bld_hatchery_3.png
+  bld_site.png
+Add notes.txt listing any image you regenerated and why.

@@ -1,0 +1,168 @@
+=====================================================================
+EGGBOUND — ART BATCH 04-A : THE ANCIENT CLOUD TURTLE (home base)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- เปิดแชทใหม่ใน ChatGPT สำหรับไฟล์นี้ (1 ไฟล์ = 1 แชท) ทำตามลำดับ A → B → C
+- แนบ: ไฟล์นี้ + mon001_master.png (จิ้งจอก) เป็นภาพอ้างอิงสไตล์
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ"
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D monster RPG. Generate 6 images,
+ONE IMAGE PER TURN, in the order below. These images are placed and
+animated by code, so EXACT camera angle, scale, centering and pivot
+position matter more than creativity. Never add things that the
+instructions say code will draw.
+
+Work order:
+  1. Generate image #01 and wait for my "OK".
+  2. After "OK", generate the rest one by one, each time using the
+     approved images as reference for style, palette and camera.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Warm, cozy, storybook mood. Rich but not noisy detail.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: cast shadow on the ground, glow halos, aura, particles, sparks, smoke,
+motion lines, text, letters, numbers, watermark, frame, characters/creatures
+(unless the item IS the creature), people.
+ORIGINAL DESIGN — do not copy or resemble any existing game, film or anime
+asset (Summoners War, Clash of Clans, Pokemon, Studio Ghibli, etc.).
+The home is based on the public-domain myth of the giant sea turtles that
+carry the islands of the immortals (Chinese myth of Ao / Penglai) and the
+world-turtle Kurma (Hindu myth).
+
+---------------------------------------------------------------------
+2. CAMERA
+---------------------------------------------------------------------
+CAMERA (identical for every image in this batch):
+High 3/4 view, camera elevation about 35 degrees above the horizon, looking
+slightly down. Orthographic feel, no strong perspective distortion.
+A circle on the ground appears as an ellipse with height/width ratio ≈ 0.55.
+The front of every object faces the viewer (toward the bottom of the image).
+
+---------------------------------------------------------------------
+3. PALETTE
+---------------------------------------------------------------------
+SHARED PALETTE / MATERIALS (so all buildings feel like one world):
+- Cream / warm-white carved stone with soft moss at the base
+- Terracotta-red roofs; special roofs in deep blue or gold
+- Bronze and gold trims, small egg-shaped emblems as the home's motif
+- Wood: warm honey brown. Fabric: red and cream banners (no writing)
+- Architecture = a gentle blend of European storybook castle + Thai/Chinese
+  curved tiered eaves and finials. Elegant, not overly ornate.
+
+---------------------------------------------------------------------
+3b. CHARACTER
+---------------------------------------------------------------------
+THE TURTLE — "Ancient Cloud Turtle" (เต่าบรรพกาล)
+A colossal, gentle, ancient sea turtle that swims through a sea of clouds
+and carries the player's home on its shell. Kind and sleepy, cute-but-majestic.
+- Skin: mossy jade-olive green with soft golden freckles, slightly wrinkled,
+  a few tiny moss patches. Belly side lighter cream-green.
+- Shell rim + side: warm bronze-brown, thick, made of large rounded
+  marginal scutes; each scute has a faint carved cloud-spiral motif.
+- Shell TOP: a flat, gently domed MEADOW (soft green grass, a few tiny
+  flowers in cream/pink/yellow, faint hexagonal scute seams showing
+  through the grass). This top surface must be EMPTY and OPEN because the
+  game places buildings on it by code.
+- Head: big round friendly face, large shiny dark eyes with highlights,
+  small smile, rosy cheeks, a little sprout of two leaves on top of the head.
+
+---------------------------------------------------------------------
+4. IMAGES (one per turn)
+---------------------------------------------------------------------
+
+#01  home_turtle_shell.png
+THE SHELL (MASTER IMAGE)
+Canvas 1536 x 1024 (landscape).
+The turtle's SHELL ONLY — NO head, NO neck, NO flippers, NO tail.
+Where the head would come out (front-center of the shell, nearest the
+viewer) leave a smooth darker rounded notch in the rim.
+- Shell centered horizontally; it fills about 88% of the canvas width.
+- Top meadow ellipse: width ≈ 82% of canvas, height ≈ 0.55 × its width.
+- The thick bronze side band is visible on the front half (toward viewer),
+  about 6–7% of the canvas height thick.
+- Top meadow is EMPTY: no buildings, no trees, no paths, no rocks in the
+  middle. Very few small rocks only right at the rim are OK.
+- Bottom of the side band at about y = 900. Nothing below it (clouds are code).
+
+
+#02  home_turtle_head.png
+HEAD — eyes open
+Using image #01 as the EXACT same turtle (same colors, skin, freckles, scale, line style, lighting):
+Canvas 1024 x 1024. Use #01 for colors and skin (the game scales the head to fit the shell).
+Head + short neck, facing the viewer, tilted very slightly down.
+The neck rises toward the TOP of the canvas (it connects to the shell
+behind/above it): the neck's top end is cut off cleanly by the top edge
+of the canvas around x = 512, y = 0–60.
+- Head centered at about (512, 560); head width ≈ 55% of canvas.
+- Eyes open, friendly smile, sprout of two leaves on top.
+- Lowest point (chin) at about y = 900.
+
+
+#03  home_turtle_head_blink.png
+HEAD — eyes closed
+Using image #01 as the EXACT same turtle (same colors, skin, freckles, scale, line style, lighting):
+EXACT copy of #02 (same size, same position, same pose, pixel-aligned),
+only the eyes are closed in a relaxed, happy curve. Nothing else changes.
+
+
+#04  home_turtle_head_hum.png
+HEAD — humming
+Using image #01 as the EXACT same turtle (same colors, skin, freckles, scale, line style, lighting):
+EXACT copy of #02 (same size, position, pose), eyes gently closed,
+mouth a small open "o" as if humming a deep song, cheeks a bit rosier.
+Nothing else changes.
+
+
+#05  home_turtle_flipper_front.png
+FRONT-LEFT FLIPPER
+Using image #01 as the EXACT same turtle (same colors, skin, freckles, scale, line style, lighting):
+Canvas 1024 x 1024. The turtle's FRONT-LEFT flipper only (the game
+mirrors it for the right side and rotates it to paddle).
+- Long, wing-like sea-turtle flipper, same skin as the head, a few
+  scale plates along the leading edge, golden freckles.
+- Lies horizontally, pointing LEFT, seen from the same camera as #01.
+- Its ROOT (where it joins the body) is cut cleanly at the RIGHT side,
+  centered at about (900, 512). Tip at about x = 120.
+
+
+#06  home_turtle_flipper_back.png
+BACK-LEFT FLIPPER
+Using image #01 as the EXACT same turtle (same colors, skin, freckles, scale, line style, lighting):
+Same rules as #05 but a smaller, rounder rear flipper.
+Root at about (900, 512), tip at about x = 300. Same drawing scale as #05.
+
+---------------------------------------------------------------------
+QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] Background is fully transparent (no white box, no checkerboard drawn in)
+  [ ] Same camera angle as image #01 (ground ellipse ratio ≈ 0.55)
+  [ ] Pivot / size rules of each image are respected (see each item)
+  [ ] No text, no shadows on the ground, no glow halos, no particles
+  [ ] Shell top meadow is completely empty
+  [ ] Head images #02–#04 are pixel-aligned (only face changes)
+  [ ] Flipper roots are cut cleanly at the right side, centered vertically
+
+---------------------------------------------------------------------
+PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_HOME_A_TURTLE.zip
+Exact file names (lowercase, PNG):
+  home_turtle_shell.png
+  home_turtle_head.png
+  home_turtle_head_blink.png
+  home_turtle_head_hum.png
+  home_turtle_flipper_front.png
+  home_turtle_flipper_back.png
+Add notes.txt listing any image you regenerated and why.

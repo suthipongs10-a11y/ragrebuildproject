@@ -1,0 +1,195 @@
+=====================================================================
+EGGBOUND — ART BATCH 04-C : HOME BUILDINGS part 2 + RELIC ICONS
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- เปิดแชทใหม่ใน ChatGPT สำหรับไฟล์นี้ (1 ไฟล์ = 1 แชท) ทำตามลำดับ A → B → C
+- แนบ: ไฟล์นี้ + mon001_master.png + home_turtle_shell.png + bld_castle_1.png (จากไฟล์ A และ B)
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ"
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+- ต้องทำไฟล์ A และ B ให้เสร็จก่อน
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D monster RPG. Generate 11 images,
+ONE IMAGE PER TURN, in the order below. These images are placed and
+animated by code, so EXACT camera angle, scale, centering and pivot
+position matter more than creativity. Never add things that the
+instructions say code will draw.
+
+Work order:
+  1. Generate image #01 and wait for my "OK".
+  2. After "OK", generate the rest one by one, each time using the
+     approved images as reference for style, palette and camera.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Warm, cozy, storybook mood. Rich but not noisy detail.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: cast shadow on the ground, glow halos, aura, particles, sparks, smoke,
+motion lines, text, letters, numbers, watermark, frame, characters/creatures
+(unless the item IS the creature), people.
+ORIGINAL DESIGN — do not copy or resemble any existing game, film or anime
+asset (Summoners War, Clash of Clans, Pokemon, Studio Ghibli, etc.).
+The home is based on the public-domain myth of the giant sea turtles that
+carry the islands of the immortals (Chinese myth of Ao / Penglai) and the
+world-turtle Kurma (Hindu myth).
+
+---------------------------------------------------------------------
+2. CAMERA
+---------------------------------------------------------------------
+CAMERA (identical for every image in this batch):
+High 3/4 view, camera elevation about 35 degrees above the horizon, looking
+slightly down. Orthographic feel, no strong perspective distortion.
+A circle on the ground appears as an ellipse with height/width ratio ≈ 0.55.
+The front of every object faces the viewer (toward the bottom of the image).
+
+---------------------------------------------------------------------
+3. PALETTE
+---------------------------------------------------------------------
+SHARED PALETTE / MATERIALS (so all buildings feel like one world):
+- Cream / warm-white carved stone with soft moss at the base
+- Terracotta-red roofs; special roofs in deep blue or gold
+- Bronze and gold trims, small egg-shaped emblems as the home's motif
+- Wood: warm honey brown. Fabric: red and cream banners (no writing)
+- Architecture = a gentle blend of European storybook castle + Thai/Chinese
+  curved tiered eaves and finials. Elegant, not overly ornate.
+
+BUILDING PIVOT RULES (every building image):
+- Canvas 1024 x 1024, transparent.
+- Each building stands on its own small round base (stone or grass rim)
+  that is part of the drawing. The FRONT-most edge of that base is at
+  y ≈ 900 and the base is centered at x = 512.
+- No ground plane beyond the base, no cast shadow (code adds shadows).
+- Scale: the base ellipse width is given per item as % of canvas width.
+- Upgrade levels of the same building keep the SAME base size and
+  position; only what stands on it grows richer.
+(Relic icons #08–#11 use their own 512x512 rules.)
+
+---------------------------------------------------------------------
+4. IMAGES (one per turn)
+---------------------------------------------------------------------
+
+#01  bld_mine_1.png
+STARCRYSTAL MINE Lv.1 (เหมืองผลึกดาว) — MASTER for this file
+Base width ≈ 52%.
+A rocky grey outcrop with a small mine entrance framed in wood, a few
+sky-blue star-shaped crystals growing from the rock, a little wooden cart.
+
+
+#02  bld_mine_3.png
+STARCRYSTAL MINE Lv.3
+Match image #01 and the attached bld_castle_1.png in style, palette, camera and scale:
+Same base as #01, more and bigger crystals, short rails leading from
+the entrance, a hanging lantern, the cart full of small gold nuggets.
+
+
+#03  bld_mine_5.png
+STARCRYSTAL MINE Lv.5
+Match image #01 and the attached bld_castle_1.png in style, palette, camera and scale:
+Same base, a large radiant crystal cluster crowning the rock, a small
+wooden crane, two carts, bronze fittings. Still the same footprint.
+
+
+#04  bld_shrine.png
+SIX-ELEMENT SHRINE (ศาลหกธาตุ)
+Match image #01 and the attached bld_castle_1.png in style, palette, camera and scale:
+Base width ≈ 52%.
+A small open pavilion: six red lacquered pillars, a curved tiered roof
+in dark wood with gold finial (Thai/Chinese blend), a round stone
+platform with steps, a central low altar plinth.
+Do NOT draw any orbs or element symbols (the game draws 6 floating orbs).
+
+
+#05  bld_altar.png
+RELIC ALTAR (แท่นวัตถุศักดิ์สิทธิ์)
+Match image #01 and the attached bld_castle_1.png in style, palette, camera and scale:
+Base width ≈ 42%.
+A round carved stone pedestal on a two-step base, carved with a turtle
+-shell hexagon pattern and bronze inlays. The top is a flat EMPTY dish
+(the relic floats above it, drawn by the game).
+
+
+#06  bld_forge.png
+GEAR FORGE (โรงตีอุปกรณ์)
+Match image #01 and the attached bld_castle_1.png in style, palette, camera and scale:
+Base width ≈ 52%.
+A stone-and-timber smithy hut with a chimney (no smoke), a big anvil in
+front, leather bellows, racks of small charms and trinkets, the furnace
+mouth painted with warm orange light inside (no glow halo outside).
+
+
+#07  bld_arena.png
+TRIAL ARENA (ลานประลอง)
+Match image #01 and the attached bld_castle_1.png in style, palette, camera and scale:
+Base width ≈ 62%.
+A small round sand arena ringed by eight short cream stone pillars,
+each topped with a little red pennant (no writing), low stone seats on
+the back half.
+
+
+#08  relic_sun.png
+RELIC — Sun Seal (ตราสุริยัน)
+Match image #01 and the attached bld_castle_1.png in style, palette, camera and scale:
+Canvas 512 x 512, item centered, fills ~70%.
+A bronze-and-gold disc emblem with sixteen sun rays and a small egg in
+the center. Floating item, no base, no text.
+
+
+#09  relic_feather.png
+RELIC — Gale Feather (ขนนกวายุ)
+Match image #01 and the attached bld_castle_1.png in style, palette, camera and scale:
+Canvas 512 x 512, centered, ~70%.
+A large mint-green and white feather with a swirl pattern, tied with a
+thin gold cord.
+
+
+#10  relic_shell.png
+RELIC — Ancient Shell Scale (เกล็ดกระดองบรรพกาล)
+Match image #01 and the attached bld_castle_1.png in style, palette, camera and scale:
+Canvas 512 x 512, centered, ~70%.
+A thick hexagonal bronze-brown shell plate with a carved cloud spiral,
+rimmed in gold, matching the turtle's shell.
+
+
+#11  relic_gourd.png
+RELIC — Elixir Gourd (น้ำเต้าอมฤต)
+Match image #01 and the attached bld_castle_1.png in style, palette, camera and scale:
+Canvas 512 x 512, centered, ~70%.
+A calabash gourd in soft coral-pink with gold caps and a red cord with a
+small jade bead.
+
+---------------------------------------------------------------------
+QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] Background is fully transparent (no white box, no checkerboard drawn in)
+  [ ] Same camera angle as image #01 (ground ellipse ratio ≈ 0.55)
+  [ ] Pivot / size rules of each image are respected (see each item)
+  [ ] No text, no shadows on the ground, no glow halos, no particles
+  [ ] Mine levels share the same base
+  [ ] No orbs on the shrine, empty dish on the altar
+
+---------------------------------------------------------------------
+PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_HOME_C_BUILDINGS2.zip
+Exact file names (lowercase, PNG):
+  bld_mine_1.png
+  bld_mine_3.png
+  bld_mine_5.png
+  bld_shrine.png
+  bld_altar.png
+  bld_forge.png
+  bld_arena.png
+  relic_sun.png
+  relic_feather.png
+  relic_shell.png
+  relic_gourd.png
+Add notes.txt listing any image you regenerated and why.

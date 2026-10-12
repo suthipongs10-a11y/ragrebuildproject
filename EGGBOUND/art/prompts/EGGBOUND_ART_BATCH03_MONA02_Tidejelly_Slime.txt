@@ -1,0 +1,124 @@
+=====================================================================
+EGGBOUND — ART BATCH 03 : MON_A02 "Tidejelly Slime" (สไลม์ธาราคราม)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- เปิดแชทใหม่ใน ChatGPT 1 แชทต่อมอน 1 ตัว (ห้ามรวมหลายตัวในแชทเดียว ตัวจะปนกัน)
+- แนบ 2 อย่าง: ไฟล์นี้ + mon001_master.png (จิ้งจอกจากชุดแรก) ใช้เป็น "ภาพอ้างอิงสไตล์" เท่านั้น
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ"
+- ได้ zip แล้วส่งกลับมาที่แชท Claude (ส่งทีละตัวหรือรวมกันก็ได้)
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D turn-based monster RPG. Generate 12
+images, ONE IMAGE PER TURN, in the order below. The images are animated
+by code, so CONSISTENCY matters more than creativity: every image must
+show the exact same character.
+
+The attached mon001_master.png (a fire fox) is a STYLE REFERENCE ONLY:
+match its art style, shading, line quality, lighting, camera angle and
+level of detail. Do NOT copy the fox's design, colors or body.
+
+Work order:
+  1. Generate #01 (MASTER). Show it and wait for my "OK".
+  2. After "OK", generate #02–#12 one by one, each time using #01 as the
+     character reference.
+  3. Run the QUALITY CHECK, then package the ZIP (section 6).
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Cute-but-cool proportions: slightly big head, expressive eyes, strong pose.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Camera: HIGH ANGLE about 55 degrees looking down, orthographic feel.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: ground, cast shadow, glow, aura, fire/particles/sparks, motion lines,
+text, watermark, frame, second character.
+ORIGINAL DESIGN - do not copy or resemble any existing game, film, anime
+or novel character (Dota, League of Legends, Summoners War, Pokemon, etc.).
+
+Technical rules:
+- Canvas 1024 x 1024 px PNG, subject centered, at least 80 px empty margin.
+- The lowest point (feet / bottom of body) sits on an invisible ground
+  line at y ≈ 870 px in EVERY image.
+- SAME SCALE in every image of this set.
+
+---------------------------------------------------------------------
+2. CHARACTER SHEET — MON_A02 Tidejelly Slime
+---------------------------------------------------------------------
+- Species: small water slime monster, element WATER, role Healer (gentle, caring, bubbly).
+- Body: a rounded teardrop-shaped jelly blob, a little taller than wide, with a curled
+  wave-shaped tuft on top (like a small breaking wave).
+- Material: SEMI-translucent aqua-blue jelly with a clear darker blue outline so it
+  reads on any background (it must NOT be fully transparent). Lighter cyan highlights
+  on the top-left, deeper ocean blue at the bottom.
+- Inside the body: a small white-pink pearl "heart" visible in the center, plus 3-4
+  tiny suspended bubbles (painted, not glowing).
+- Face: big round dark-blue eyes with sparkling highlights, small happy mouth, soft
+  pink blush.
+- Limbs: two tiny stubby jelly arms that can stretch; no legs (it slides).
+- Size: Common class - body height about 55-60% of the canvas.
+
+---------------------------------------------------------------------
+3. VIEWS
+---------------------------------------------------------------------
+FRONT VIEW = 3/4 front view from the high 55° camera, body facing
+             BOTTOM-RIGHT. We see the face and front.
+BACK VIEW  = 3/4 back view from the same camera, body facing TOP-RIGHT.
+             We see the back and only part of the side of the face.
+
+---------------------------------------------------------------------
+4. IMAGE LIST
+---------------------------------------------------------------------
+For #02–#11 start every prompt with:
+"Using the attached reference as the EXACT same character (same design,
+colors, markings, proportions, scale, line style and lighting),
+following all MASTER STYLE rules:"
+
+#01  MASTER (FRONT VIEW) — full-body character design in the idle pose.
+     This image defines the character for all others.
+#02  FRONT VIEW — IDLE:   Relaxed, slightly squished wide resting blob, arms at sides, gentle smile, wave tuft curled.
+#03  FRONT VIEW — ATTACK: Stretched forward toward bottom-right like a lunging droplet, one jelly arm extended in a slap, cheeks puffed (spitting).
+#04  FRONT VIEW — CAST:   Stretched TALL and thin, both jelly arms raised high above the head, eyes closed peacefully, wave tuft standing up.
+#05  FRONT VIEW — HIT:    Squashed flat and wobbly, leaning back, eyes squeezed shut, a few drops flying off the body (painted drops, not particles).
+#06  FRONT VIEW — BURST:  Heroic pose: body swelled big and round, both arms spread wide, determined happy face, wave tuft splashing upward.
+#07  BACK VIEW — IDLE    (same pose idea as #02, BACK VIEW)
+#08  BACK VIEW — ATTACK  (same pose idea as #03, moving toward TOP-RIGHT)
+#09  BACK VIEW — CAST    (same pose idea as #04, BACK VIEW)
+#10  BACK VIEW — HIT     (same pose idea as #05, recoiling toward bottom-left)
+#11  BACK VIEW — BURST   (same pose idea as #06, BACK VIEW)
+#12  EGG — Aqua-blue glossy egg with white wave-crest patterns swirling around it and a small pearl set on the front.
+     Oval egg standing upright, height ~55% of canvas, bottom at y ≈ 870 px,
+     same art style and lighting, no nest, no cracks, no glow.
+
+---------------------------------------------------------------------
+5. QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] Same face, colors, markings and proportions as #01 in every image
+  [ ] Same scale; lowest point at ~y 870 px
+  [ ] Correct facing (FRONT → bottom-right, BACK → top-right)
+  [ ] No ground, shadow, glow, particles, motion lines or text
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Nothing cropped; style matches the fox reference
+  [ ] Does not resemble any existing game/anime character
+
+---------------------------------------------------------------------
+6. FILE NAMES & ZIP
+---------------------------------------------------------------------
+  #01 monA02_master.png
+  #02 monA02_front_idle.png      #07 monA02_back_idle.png
+  #03 monA02_front_attack.png    #08 monA02_back_attack.png
+  #04 monA02_front_cast.png      #09 monA02_back_cast.png
+  #05 monA02_front_hit.png       #10 monA02_back_hit.png
+  #06 monA02_front_burst.png     #11 monA02_back_burst.png
+  #12 eggA02.png
+
+ZIP name: EGGBOUND_MONA02_SET.zip (all PNGs in the root) + notes.txt listing
+each file, background type, and any image regenerated and why.
+=====================================================================
+END OF FILE
+=====================================================================

@@ -1,0 +1,31 @@
+# Eggbound P1: status
+
+## M0 — mystery eggs + hatchery incubation (code done, waiting for owner playtest)
+Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`, headless UI 1280x760 + 390x780.
+
+- Egg kinds: **named** (crafted from fragments / starter, species known) and **mystery** (stage drop, species hidden until hatch).
+  Species + rare form are rolled when the egg is created (no re-roll by reloading).
+- Mystery tiers by shell pattern — values in `src/core/data.ts` (`EGG_TIERS`, `EGG_DROP`):
+
+  | tier | drop | ★ on hatch / dup | incubation | rare form |
+  |---|---|---|---|---|
+  | ลายธรรมดา | 68% | ★1 | instant | 3% |
+  | ลายเงิน | 24% | ★1 | instant | 4% |
+  | ลายทอง | 7% | ★2 | 2 h | 5% |
+  | ลายรุ้ง | 1% | ★3 | 8 h | 8% |
+
+  Win → 30% egg (boss stage 60%), first clear always. **Pity:** the 20th mystery egg in a row without gold+ is gold/rainbow.
+  Each tier rolls monster rarity (common…legendary); a rarity with no species yet falls back to the nearest one (all 6 species are common for now).
+- Named eggs: 4% rare form. Rare form = flag `MonSave.rare` (badge in collection + prismatic reveal). Trait slot +1 comes with the trait system.
+- Duplicates gain the egg's ★ (max ★5); stars past ★5 → 500 gold each.
+- Hatchery: slots = level (1–3), speed ×1 / ×0.8 / ×0.65 (`HATCH_SPEED` in `src/game/home.ts`). End time is fixed when the egg goes in.
+  The nest on the turtle shows incubating eggs in their tier colour, pulsing when ready. Live timers on the egg screen + hatchery panel.
+- Odds + pity counter disclosed on the egg screen ("อัตราไข่ปริศนา และการันตี").
+- Mystery shells are code-drawn for now (`mysteryEggImg` in `src/render/assets.ts`); final art ordered in `art/prompts/EGGBOUND_ART_BATCH05_MYSTERY_EGGS.txt`.
+- Save stays v1: old eggs migrate to `kind: 'named'`, missing `eggPity` / `home.incub` are filled in.
+- Prototype test tools in Settings: get one egg of each tier, finish incubation now (remove before the public playtest).
+- Fix: `[hidden]{display:none!important}` — the loading overlay never hid outside the Artifact host.
+
+## Not in M0
+- Starborn eggs (premium gacha) · friends rubbing eggs to speed up · rare-form recolour in battle (comes with the M2 aura system)
+- Turtle home final art (batch 04 not received yet)
