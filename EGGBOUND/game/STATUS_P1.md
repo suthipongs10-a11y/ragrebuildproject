@@ -33,7 +33,9 @@ Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`,
 
 ## Not in M0
 - Starborn eggs (premium gacha) · friends rubbing eggs to speed up · rare-form recolour in battle (comes with the M2 aura system)
-- Turtle home final art (batch 04 in progress by the owner)
 
 ## Home tweaks
+- Turtle home art (batch 04 A/B/C) in: shell, head (blink/hum frames), flippers, 16 building sprites by level, construction site, 4 relic icons.
+  Code overlays on top: eggs in the nest (tier colour), portal swirl clipped to the gate opening, shrine orbs, floating relic on the altar.
+  Import with `tools/import_home.py`; code-drawn art remains as fallback. Build is now ~4.4 MB.
 - Monsters walking on the turtle are half size (`MON_SCALE` .27 → .135 in `homeView.ts`), up to 16 shown (was 8).

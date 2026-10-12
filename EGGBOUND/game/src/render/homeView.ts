@@ -1,8 +1,8 @@
 // @ts-nocheck
 // Turtle home scene: an ancient turtle swimming through a sea of clouds, carrying the player's buildings and monsters.
-// Everything here is code-drawn placeholder art; swap draw* functions for sprites when the ChatGPT set arrives.
+// Uses the ChatGPT art set (batch 04, imported by tools/import_home.py) when present; the code-drawn versions stay as fallback.
 import { E, run, tween, burst, ring, text, shake, flash, addP, drawParts, screenTransform, clamp, lerp, rnd, easeOut, easeBack } from './engine';
-import { spr, mk, dot, PAL, PIV, TAU, TIER_COL } from './assets';
+import { spr, mk, dot, PAL, PIV, TAU, TIER_COL, IMG } from './assets';
 import { sfx } from './audio';
 import { SPECIES } from '../core/data';
 import { BUILDINGS, BDEF, TURTLE_SCALE, home, mineStored, mineCap, unlocked, ELEMS } from '../game/home';
@@ -22,6 +22,20 @@ function puff(w, h, shade) {
   if (shade) { x.globalCompositeOperation = 'source-atop'; const g = x.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(255,240,220,0)'); g.addColorStop(1, 'rgba(150,170,215,.45)'); x.fillStyle = g; x.fillRect(0, 0, w, h); }
   return (puffCache[k] = c);
 }
+
+// ---------- art placement (original canvas px; see tools/import_home.py) ----------
+// shell 1536x1024: grass meadow centre (768,415) → turtle-local (0,-6). head/flippers/buildings 1024x1024, buildings' base at (512,900).
+const SHELL_K = .78, SHELL_C = [768, 415], HEAD_K = .41, HEAD_C = [512, 560], HEAD_Y = 407, FLIP_K = .27, BLD_K = .3;
+const NEST = [480, 590], GATE_HOLE_C = [512, 565];
+// top edge (canvas px) of each building sprite, for hit boxes and the mine coin bubble
+const ART_TOP = { bld_castle_1: 60, bld_castle_2: 178, bld_castle_3: 239, bld_castle_4: 232, bld_gate: 288, bld_hatchery_1: 468, bld_hatchery_2: 279, bld_hatchery_3: 268, bld_site: 497, bld_mine_1: 372, bld_mine_3: 365, bld_mine_5: 324, bld_shrine: 186, bld_altar: 462, bld_forge: 245, bld_arena: 395 };
+const hasHomeArt = () => !!IMG.home_shell;
+/** sprite key for a building at its level ('bld_site' when locked / coming soon), or null without art */
+function bldArt(bd, lv, ok) {
+  const k = !ok || bd.soon ? 'bld_site' : bd.id === 'castle' ? 'bld_castle_' + lv : bd.id === 'hatchery' ? 'bld_hatchery_' + lv : bd.id === 'mine' ? 'bld_mine_' + (lv >= 5 ? 5 : lv >= 3 ? 3 : 1) : 'bld_' + bd.id;
+  return IMG[k] ? k : null;
+}
+const AP = (px, py) => [(px - 512) * BLD_K, (py - 900) * BLD_K]; // building canvas px → local units
 
 // ---------- turtle shell top (pre-rendered once) ----------
 let shellC = null;
@@ -107,18 +121,7 @@ const DRAW = {
     x.fillStyle = '#7a5530'; x.beginPath(); x.ellipse(0, -8, 56, 24, 0, 0, TAU); x.fill();
     x.strokeStyle = '#a07040'; x.lineWidth = 3; for (let i = 0; i < 18; i++) { const a = i / 18 * TAU; x.beginPath(); x.moveTo(Math.cos(a) * 40, -8 + Math.sin(a) * 16); x.lineTo(Math.cos(a + .5) * 58, -10 + Math.sin(a + .5) * 25); x.stroke(); }
     x.fillStyle = '#4a3218'; x.beginPath(); x.ellipse(0, -12, 40, 15, 0, 0, TAU); x.fill();
-    // one nest per slot; incubating mystery eggs show their tier colour and pulse when ready
-    const inc = (h && h.incub) || [], now = Date.now();
-    for (let i = 0; i < lv; i++) {
-      const ex = (i - (lv - 1) / 2) * 24, e = inc[i];
-      x.fillStyle = '#2e1e0c'; x.beginPath(); x.ellipse(ex, -16, 10, 4, 0, 0, TAU); x.fill();
-      if (!e) continue;
-      const ready = now >= e.end, tier = e.tier || 'gold';
-      const col = tier === 'rainbow' ? `hsl(${(t * 90 + i * 60) % 360},90%,72%)` : TIER_COL[tier] || '#ffd27a';
-      const wob = Math.sin(t * (ready ? 9 : 3) + i * 2) * (ready ? .16 : .06);
-      x.save(); x.translate(ex, -18); x.rotate(wob); const g = x.createRadialGradient(-4, -14, 2, 0, -8, 18); g.addColorStop(0, '#ffffff'); g.addColorStop(1, col); x.fillStyle = g; x.beginPath(); x.ellipse(0, -10, 11, 15, 0, 0, TAU); x.fill(); x.restore();
-      if (ready) { x.globalCompositeOperation = 'lighter'; x.globalAlpha = .55 + .35 * Math.sin(t * 5 + i); x.drawImage(dot(col.startsWith('hsl') ? '#ff9ad8' : col), ex - 26, -54, 52, 52); x.globalAlpha = 1; x.globalCompositeOperation = 'source-over'; }
-    }
+    nestEggs(x, lv, t, h, 0, 0, 1, true);
     x.globalCompositeOperation = 'lighter'; x.globalAlpha = .35 + .15 * Math.sin(t * 2); x.drawImage(dot('#ffcf6a'), -50, -60, 100, 70); x.globalAlpha = 1; x.globalCompositeOperation = 'source-over';
   },
   mine(x, lv, t) {
@@ -172,6 +175,59 @@ const DRAW = {
     for (let i = 0; i < 8; i++) { const a = i / 8 * TAU, px = Math.cos(a) * 58, py = -4 + Math.sin(a) * 22; x.fillStyle = '#e6dcc4'; x.fillRect(px - 4, py - 34, 8, 34); x.fillStyle = '#b5443a'; x.fillRect(px - 6, py - 38, 12, 5); }
   },
 };
+/** one egg spot per hatchery slot; incubating mystery eggs show their tier colour and wobble + glow when ready */
+function nestEggs(x, lv, t, h, cx, cy, sc, holes) {
+  const inc = (h && h.incub) || [], now = Date.now();
+  x.save(); x.translate(cx, cy); x.scale(sc, sc);
+  for (let i = 0; i < lv; i++) {
+    const ex = (i - (lv - 1) / 2) * 24, e = inc[i];
+    if (holes) { x.fillStyle = '#2e1e0c'; x.beginPath(); x.ellipse(ex, -16, 10, 4, 0, 0, TAU); x.fill(); }
+    if (!e) continue;
+    const ready = now >= e.end, tier = e.tier || 'gold';
+    const col = tier === 'rainbow' ? `hsl(${(t * 90 + i * 60) % 360},90%,72%)` : TIER_COL[tier] || '#ffd27a';
+    const wob = Math.sin(t * (ready ? 9 : 3) + i * 2) * (ready ? .16 : .06);
+    x.save(); x.translate(ex, -18); x.rotate(wob); const g = x.createRadialGradient(-4, -14, 2, 0, -8, 18); g.addColorStop(0, '#ffffff'); g.addColorStop(1, col); x.fillStyle = g; x.beginPath(); x.ellipse(0, -10, 11, 15, 0, 0, TAU); x.fill(); x.strokeStyle = 'rgba(60,40,10,.35)'; x.lineWidth = 1.2; x.stroke(); x.restore();
+    if (ready) { x.globalCompositeOperation = 'lighter'; x.globalAlpha = .55 + .35 * Math.sin(t * 5 + i); x.drawImage(dot(col.startsWith('hsl') ? '#ff9ad8' : col), ex - 26, -54, 52, 52); x.globalAlpha = 1; x.globalCompositeOperation = 'source-over'; }
+  }
+  x.restore();
+}
+// ---- sprite buildings: image + code overlays (eggs, portal, orbs, floating relic) ----
+let portalC = null;
+function drawPortal(x, t) { // swirl clipped to the arch opening mask, drawn behind the gate sprite
+  const m = IMG.bld_gate_hole; if (!m) return;
+  if (!portalC) portalC = mk(256, 256);
+  const c = portalC.getContext('2d'), f = 256 / 1024, [hx, hy] = GATE_HOLE_C.map(v => v * f);
+  c.globalCompositeOperation = 'source-over'; c.clearRect(0, 0, 256, 256);
+  const g = c.createRadialGradient(hx, hy, 2, hx, hy, 40); g.addColorStop(0, '#fff8d8'); g.addColorStop(.4, '#9a7bff'); g.addColorStop(1, '#2b1d66'); c.fillStyle = g; c.fillRect(0, 0, 256, 256);
+  c.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 3; i++) { c.strokeStyle = `rgba(200,180,255,${.5 - i * .12})`; c.lineWidth = 2; c.beginPath(); for (let a = 0; a < 12; a += .2) { const rr = a * 2.4, aa = a + t * (2 + i) + i * 2; c.lineTo(hx + Math.cos(aa) * rr, hy + Math.sin(aa) * rr * 1.5); } c.stroke(); }
+  c.globalCompositeOperation = 'destination-in'; c.drawImage(m, 0, 0, 256, 256);
+  x.drawImage(portalC, -512 * BLD_K, -900 * BLD_K, 1024 * BLD_K, 1024 * BLD_K);
+}
+function shrineOrbs(x, t, h, front) { // 6 element orbs orbiting the pavilion; brightness = shrine level
+  const [cx, cy] = AP(512, 610), rx = 190 * BLD_K, ry = 62 * BLD_K;
+  for (let i = 0; i < 6; i++) {
+    const e = ELEMS[i], l = (h.shrine[e] || 0), a = t * .7 + i / 6 * TAU, isFront = Math.sin(a) > 0;
+    if (isFront !== front) continue;
+    const ox = cx + Math.cos(a) * rx, oy = cy + Math.sin(a) * ry;
+    x.globalAlpha = front ? 1 : .65; x.globalCompositeOperation = 'lighter'; const sz = 10 + l * 4; x.drawImage(dot(PAL[e].aura), ox - sz, oy - sz, sz * 2, sz * 2); x.globalCompositeOperation = 'source-over';
+    x.fillStyle = l ? PAL[e].core : 'rgba(255,255,255,.45)'; x.beginPath(); x.arc(ox, oy, 3.5 + l * .5, 0, TAU); x.fill(); x.globalAlpha = 1;
+  }
+}
+function drawArtBuilding(x, bd, key, lv, t, h, ok) {
+  const live = ok && !bd.soon;
+  if (live && bd.id === 'gate') drawPortal(x, t);
+  if (live && bd.id === 'shrine') shrineOrbs(x, t, h, false);
+  x.drawImage(IMG[key], -512 * BLD_K, -900 * BLD_K, 1024 * BLD_K, 1024 * BLD_K);
+  if (!live) return;
+  if (bd.id === 'hatchery') { const [nx, ny] = AP(...NEST); nestEggs(x, lv, t, h, nx, ny + 18 * 1.25, 1.25, false); }
+  else if (bd.id === 'shrine') shrineOrbs(x, t, h, true);
+  else if (bd.id === 'altar' && h.relic && IMG['relic_' + h.relic]) {
+    const [ax, ay] = AP(505, 470), y = ay + Math.sin(t * 2) * 5, col = { sun: '#ffb340', feather: '#7cf0a0', shell: '#c9a04a', gourd: '#ff8ab0' }[h.relic] || '#ffffff', sz = 62;
+    x.globalCompositeOperation = 'lighter'; x.globalAlpha = .8; x.drawImage(dot(col), ax - sz * .7, y - sz * .7, sz * 1.4, sz * 1.4); x.globalAlpha = 1; x.globalCompositeOperation = 'source-over';
+    x.save(); x.translate(ax, y); x.rotate(Math.sin(t) * .15); x.drawImage(IMG['relic_' + h.relic], -sz / 2, -sz / 2, sz, sz); x.restore();
+  }
+}
 function drawSite(x, b, t) { // locked / coming soon: construction site
   shadow(x, b.r * .8, b.r * .3);
   x.strokeStyle = '#8a6a3a'; x.lineWidth = 3; for (const sx of [-30, 0, 30]) { x.beginPath(); x.moveTo(sx, 2); x.lineTo(sx, -50); x.stroke(); } x.beginPath(); x.moveTo(-34, -24); x.lineTo(34, -24); x.moveTo(-34, -48); x.lineTo(34, -48); x.moveTo(-30, 0); x.lineTo(30, -48); x.stroke();
@@ -211,7 +267,8 @@ export class HomeView {
   L(x, y) { const s = this.scaleShow; return [x * s, y * s + this.bob() * s]; }
   fit() {
     const s = this.scaleShow, port = E.W < E.H;
-    const base = port ? clamp(Math.min(E.W / (840 * s), (E.H - 170) / (860 * s)), .3, 1.3) : clamp(Math.min(E.W / (1150 * s), (E.H - 140) / (880 * s)), .3, 1.3);
+    const tall = hasHomeArt() ? 1.13 : 1; // the sprite turtle is taller (shell band + head below it)
+    const base = port ? clamp(Math.min(E.W / (840 * s), (E.H - 170) / (860 * tall * s)), .3, 1.3) : clamp(Math.min(E.W / (1150 * s), (E.H - 140) / (880 * tall * s)), .3, 1.3);
     return base;
   }
   update(dt) {
@@ -222,7 +279,7 @@ export class HomeView {
     const s = this.scaleShow, port = E.W < E.H, maxPan = port ? Math.max(0, (900 * s - E.W / E.base) / 2) : 0;
     this.pan = clamp(this.pan, -maxPan, maxPan);
     const focus = this.focus ? this.L(...this.focus) : null;
-    E.camT.x = focus ? focus[0] * .6 : this.pan; E.camT.y = (focus ? lerp(70 * s, focus[1], .5) : 70 * s) + (port ? 20 / E.base : 0);
+    E.camT.x = focus ? focus[0] * .6 : this.pan; const cy = (hasHomeArt() ? 118 : 70) * s; E.camT.y = (focus ? lerp(cy, focus[1], .5) : cy) + (port ? 20 / E.base : 0);
     // blink / head
     this.nextBlink -= dt; if (this.nextBlink <= 0) { this.blink = .16; this.nextBlink = rnd(2.5, 5.5); }
     this.blink = Math.max(0, this.blink - dt); this.hum = Math.max(0, this.hum - dt); this.headUp = lerp(this.headUp, this.hum > 0 ? 1 : 0, 1 - Math.exp(-dt * 5));
@@ -257,11 +314,16 @@ export class HomeView {
     for (let i = 0; i < 3; i++) { const u = ((t * .35 + i / 3) % 1); ctx.globalAlpha = (1 - u) * .5; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(0, 110 * s + b, (470 + u * 260) * s, (280 + u * 140) * s, 0, 0, TAU); ctx.stroke(); }
     ctx.globalAlpha = 1;
     ctx.save(); ctx.translate(0, b); ctx.scale(s, s * (1 + Math.sin(t * .7 + 1) * .006));
-    this.drawLimbs(ctx, t, false);
-    this.drawHead(ctx, t, true);
-    ctx.drawImage(shellC.c, -shellC.W / 2, -shellC.oy, shellC.W, shellC.H);
-    this.drawLimbs(ctx, t, true);
-    this.drawHead(ctx, t, false);
+    if (hasHomeArt()) { // flippers + head tuck under the shell; the face shows below the rim, the neck through the front notch
+      this.drawLimbs(ctx, t, false); this.drawLimbs(ctx, t, true); this.drawHeadArt(ctx, t);
+      ctx.drawImage(IMG.home_shell, -SHELL_C[0] * SHELL_K, -6 - SHELL_C[1] * SHELL_K, 1536 * SHELL_K, 1024 * SHELL_K);
+    } else {
+      this.drawLimbs(ctx, t, false);
+      this.drawHead(ctx, t, true);
+      ctx.drawImage(shellC.c, -shellC.W / 2, -shellC.oy, shellC.W, shellC.H);
+      this.drawLimbs(ctx, t, true);
+      this.drawHead(ctx, t, false);
+    }
     ctx.restore();
     // buildings + monsters (y-sorted)
     const ents = [];
@@ -271,12 +333,22 @@ export class HomeView {
     // labels
     for (const bd of BUILDINGS) this.drawLabel(ctx, bd);
     // front cloud wisps
-    for (const c of this.clouds) if (c.layer === 2) { ctx.globalAlpha = .9; ctx.drawImage(puff(256, 110, true), c.x, 440 * s + c.y * .22, c.w * 1.3, c.w * .55); }
+    const wy = (hasHomeArt() ? 640 : 440) * s; // below the sprite turtle's face
+    for (const c of this.clouds) if (c.layer === 2) { ctx.globalAlpha = .9; ctx.drawImage(puff(256, 110, true), c.x, wy + c.y * .22, c.w * 1.3, c.w * .55); }
     ctx.globalAlpha = 1;
     drawParts();
   }
   drawLimbs(ctx, t, front) {
     const L = front ? [[-1, 1], [1, 1]] : [[-1, -1], [1, -1]];
+    const fimg = IMG[front ? 'home_flipper_front' : 'home_flipper_back'];
+    if (fimg && hasHomeArt()) { // sprite points left with its root at (900,512); mirrored for the right side
+      for (const [sx, sy] of L) {
+        const ph = (sx + 2) * 1.3 + (sy + 2), sw = Math.sin(t * 1.3 + ph) * .28;
+        ctx.save(); ctx.translate(sx * (sy > 0 ? 400 : 380), sy > 0 ? 215 : -95); ctx.rotate(sx * (sy > 0 ? .5 : -.45) + sw * sx); if (sx > 0) ctx.scale(-1, 1);
+        ctx.drawImage(fimg, -900 * FLIP_K, -512 * FLIP_K, 1024 * FLIP_K, 1024 * FLIP_K); ctx.restore();
+      }
+      return;
+    }
     for (const [sx, sy] of L) {
       const ph = (sx + 2) * 1.3 + (sy + 2), sw = Math.sin(t * 1.3 + ph) * .32;
       const px = sx * (sy > 0 ? 380 : 340), py = sy > 0 ? 150 : -150;
@@ -286,6 +358,12 @@ export class HomeView {
       ctx.fillStyle = 'rgba(60,90,40,.45)'; for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.arc(sx * (40 + i * 26), -6 + (i % 2) * 10, 6, 0, TAU); ctx.fill(); }
       ctx.restore();
     }
+  }
+  drawHeadArt(ctx, t) {
+    const up = this.headUp, sway = Math.sin(t * .9) * .04, img = IMG[this.hum > 0 ? 'home_head_hum' : this.blink > 0 ? 'home_head_blink' : 'home_head'] || IMG.home_head;
+    const top = HEAD_Y - HEAD_C[1] * HEAD_K; // neck top, the pivot
+    ctx.save(); ctx.translate(0, top - up * 22); ctx.rotate(sway);
+    ctx.drawImage(img, -HEAD_C[0] * HEAD_K, 0, 1024 * HEAD_K, 1024 * HEAD_K); ctx.restore();
   }
   drawHead(ctx, t, neckOnly) {
     const up = this.headUp, sway = Math.sin(t * .9) * .05;
@@ -314,6 +392,8 @@ export class HomeView {
     ctx.stroke();
     ctx.restore();
   }
+  /** height (local units) of a building's sprite, 0 without art */
+  artH(bd) { const h = home(this.S), lv = bd.id === 'castle' ? h.castle : (h.lv[bd.id] || 1), k = bldArt(bd, lv, unlocked(this.S, bd.id)); return k ? (900 - ART_TOP[k]) * BLD_K : 0; }
   bPos(bd) { const p = this.pops[bd.id]; return this.L(bd.pos[0], bd.pos[1]); }
   drawBuilding(ctx, bd, t) {
     const h = home(this.S), s = this.scaleShow, [x, y] = this.bPos(bd), ok = unlocked(this.S, bd.id);
@@ -321,13 +401,14 @@ export class HomeView {
     const pop = this.pops[bd.id] || 1, k = s * (bd.id === 'castle' ? 1 : .92 + .04 * lv) * pop;
     ctx.save(); ctx.translate(x, y);
     if (this.sel === bd.id) { const p = .5 + .5 * Math.sin(t * 5); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = .5 + .3 * p; ctx.strokeStyle = '#ffe9a0'; ctx.lineWidth = 4; ctx.beginPath(); ctx.ellipse(0, 2, bd.r * s * 1.05, bd.r * s * .42, 0, 0, TAU); ctx.stroke(); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; }
-    ctx.scale(k, k);
-    if (!ok || bd.soon) drawSite(ctx, bd, t); else DRAW[bd.id](ctx, lv, t, h);
+    const art = bldArt(bd, lv, ok);
+    if (art) { ctx.scale(s * pop, s * pop); drawArtBuilding(ctx, bd, art, lv, t, h, ok); }
+    else { ctx.scale(k, k); if (!ok || bd.soon) drawSite(ctx, bd, t); else DRAW[bd.id](ctx, lv, t, h); }
     ctx.restore();
     // mine coin bubble
     if (bd.id === 'mine' && ok) {
       const st = mineStored(this.S), cap = mineCap(this.S);
-      if (st >= 20) { const by = y - 100 * s + Math.sin(t * 3) * 4, full = st >= cap; ctx.fillStyle = full ? '#ffdf6a' : '#fff6dc'; ctx.strokeStyle = '#8a5a10'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(x, by, 17 * s + 4, 0, TAU); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#e0a020'; ctx.beginPath(); ctx.arc(x, by, 9 * s + 2, 0, TAU); ctx.fill(); ctx.fillStyle = '#fff3b0'; ctx.fillRect(x - 1.5, by - 5, 3, 10); }
+      if (st >= 20) { const art = bldArt(bd, h.lv.mine || 1, true), by = y - (art ? (900 - ART_TOP[art]) * BLD_K + 14 : 100) * s + Math.sin(t * 3) * 4, full = st >= cap; ctx.fillStyle = full ? '#ffdf6a' : '#fff6dc'; ctx.strokeStyle = '#8a5a10'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(x, by, 17 * s + 4, 0, TAU); ctx.fill(); ctx.stroke(); ctx.fillStyle = '#e0a020'; ctx.beginPath(); ctx.arc(x, by, 9 * s + 2, 0, TAU); ctx.fill(); ctx.fillStyle = '#fff3b0'; ctx.fillRect(x - 1.5, by - 5, 3, 10); }
     }
   }
   drawLabel(ctx, bd) {
@@ -352,9 +433,9 @@ export class HomeView {
     const s = this.scaleShow;
     for (const m of this.mons) { const [x, y] = this.L(m.x, m.y); if (Math.abs(wx - x) < 34 * MR * s + 6 && wy < y + 8 && wy > y - 80 * MR * s - 6) return { mon: m }; }
     let best = null, bd = 1e9;
-    for (const b of BUILDINGS) { const [x, y] = this.bPos(b), dx = (wx - x) / (b.r * s), dy = (wy - (y - 30 * s)) / (b.r * s * .9), d = dx * dx + dy * dy; if (d < 1.1 && d < bd) { bd = d; best = b; } }
+    for (const b of BUILDINGS) { const [x, y] = this.bPos(b), hh = this.artH(b), dx = (wx - x) / (b.r * s), dy = hh ? (wy - (y - hh * .42 * s)) / (Math.max(b.r * .9, hh * .55) * s) : (wy - (y - 30 * s)) / (b.r * s * .9), d = dx * dx + dy * dy; if (d < 1.1 && d < bd) { bd = d; best = b; } }
     if (best) return { b: best };
-    const [hx, hy] = this.L(0, 392); if (Math.hypot(wx - hx, (wy - hy) * 1.2) < 100 * s) return { head: true };
+    const [hx, hy] = this.L(0, hasHomeArt() ? HEAD_Y + 20 : 392); if (Math.hypot(wx - hx, (wy - hy) * 1.2) < (hasHomeArt() ? 115 : 100) * s) return { head: true };
     return null;
   }
   tap(wx, wy) {
