@@ -1,0 +1,120 @@
+=====================================================================
+EGGBOUND — ART BATCH 07 : MON_A08 "Lantern Wisp" (วิญญาณโคมลอย)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- เปิดแชทใหม่ใน ChatGPT 1 แชทต่อมอน 1 ตัว (ห้ามรวมหลายตัวในแชทเดียว ตัวจะปนกัน)
+- แนบ 2 อย่าง: ไฟล์นี้ + mon001_master (จิ้งจอก ไฟล์อยู่ที่ EGGBOUND/game/assets/mon001_master.webp หรือ png ต้นฉบับถ้ามี) ใช้เป็น "ภาพอ้างอิงสไตล์" เท่านั้น
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ให้ดีก่อนตอบ "OK" (เป็นต้นแบบของทุกภาพ)
+- ความหายาก: หายาก (Rare) · ธาตุ FIRE · บทบาท Support
+- ได้ zip แล้วส่งกลับมาที่แชท Claude (ส่งทีละตัวหรือรวมกันก็ได้)
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D turn-based monster RPG. Generate 12
+images, ONE IMAGE PER TURN, in the order below. The images are animated
+by code, so CONSISTENCY matters more than creativity: every image must
+show the exact same character.
+
+The attached mon001_master (a fire fox) is a STYLE REFERENCE ONLY:
+match its art style, shading, line quality, lighting, camera angle and
+level of detail. Do NOT copy the fox's design, colors or body.
+
+Work order:
+  1. Generate #01 (MASTER). Show it and wait for my "OK".
+  2. After "OK", generate #02–#12 one by one, each time using #01 as the
+     character reference.
+  3. Run the QUALITY CHECK, then package the ZIP (section 6).
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Cute-but-cool proportions: slightly big head, expressive eyes, strong pose.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Camera: HIGH ANGLE about 55 degrees looking down, orthographic feel.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: ground, cast shadow, glow, aura, fire/particles/sparks, motion lines,
+text, letters, watermark, frame, second character.
+ORIGINAL DESIGN - do not copy or resemble any existing game, film, anime
+or novel character (Dota, League of Legends, Summoners War, Pokemon, etc.).
+Myth source (public domain): original creature (a tribe of floating lantern spirits, inspired by the public-domain tradition of sky lanterns).
+
+Technical rules:
+- Canvas 1024 x 1024 px PNG, subject centered, at least 80 px empty margin.
+- The lowest point (feet / bottom of body) sits on an invisible ground
+  line at y ≈ 870 px in EVERY image.
+- SAME SCALE in every image of this set.
+
+---------------------------------------------------------------------
+2. CHARACTER SHEET — MON_A08 Lantern Wisp
+---------------------------------------------------------------------
+- Species: a small spirit living inside a floating paper sky-lantern. Element FIRE, role Support (kind, guiding, calm).
+- Body: an elongated paper lantern (warm cream/orange paper with thin bamboo ribs) that IS its body; the lantern floats a little above the ground line (the lowest point is the tassel tip at y ≈ 870).
+- Inside the lantern: a round warm-orange flame-spirit face visible through an open round "window" on the front: big round eyes, small smile (painted warm orange/yellow tones, no glow halo).
+- Details: a curling red paper flap on top like a hat, two little paper "sleeve" arms ending in flame-shaped hands, a red-and-gold tassel hanging below, small painted cloud motifs on the paper.
+- Colors: cream paper, warm orange, red trims, gold accents.
+- Size: Rare class - body height about 62-66% of the canvas. A bit more ornament and one signature feature that reads instantly.
+
+---------------------------------------------------------------------
+3. VIEWS
+---------------------------------------------------------------------
+FRONT VIEW = 3/4 front view from the high 55° camera, body facing
+             BOTTOM-RIGHT. We see the face and front.
+BACK VIEW  = 3/4 back view from the same camera, body facing TOP-RIGHT.
+             We see the back and only part of the side of the face.
+
+---------------------------------------------------------------------
+4. IMAGE LIST
+---------------------------------------------------------------------
+For #02–#11 start every prompt with:
+"Using the attached reference as the EXACT same character (same design,
+colors, markings, proportions, scale, line style and lighting),
+following all MASTER STYLE rules:"
+
+#01  MASTER (FRONT VIEW) — full-body character design in the idle pose.
+     This image defines the character for all others.
+#02  FRONT VIEW — IDLE:   Floating gently, arms folded, tassel hanging, calm smile.
+#03  FRONT VIEW — ATTACK: Leaning forward toward bottom-right, flicking a flame-hand to throw ember sparks (painted embers stuck to the hand, not particles).
+#04  FRONT VIEW — CAST:   Floating higher, both paper arms raised, eyes closed, the paper top flap open like a blooming flower.
+#05  FRONT VIEW — HIT:    Tilted backward, paper crumpled on one side, eyes squeezed shut, tassel flung up.
+#06  FRONT VIEW — BURST:  Majestic pose: arms spread wide, the lantern paper unfolded into a big round lantern shape, joyful face, tassel streaming.
+#07  BACK VIEW — IDLE   (same pose idea as #02, BACK VIEW)
+#08  BACK VIEW — ATTACK (same pose idea as #03, moving toward TOP-RIGHT)
+#09  BACK VIEW — CAST   (same pose idea as #04, BACK VIEW)
+#10  BACK VIEW — HIT    (same pose idea as #05, recoiling toward bottom-left)
+#11  BACK VIEW — BURST  (same pose idea as #06, BACK VIEW)
+#12  EGG — An egg made like a tiny paper lantern: cream paper shell with thin bamboo ribs and red top cap, painted warm orange light inside (painted, not glowing).
+     Oval egg standing upright, height ~55% of canvas, bottom at y ≈ 870 px,
+     same art style and lighting, no nest, no cracks, no glow.
+
+---------------------------------------------------------------------
+5. QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] Same face, colors, markings and proportions as #01 in every image
+  [ ] Same scale; lowest point at ~y 870 px
+  [ ] Correct facing (FRONT → bottom-right, BACK → top-right)
+  [ ] No ground, shadow, glow, particles, motion lines or text
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Nothing cropped; style matches the fox reference
+  [ ] Does not resemble any existing game/anime character
+
+---------------------------------------------------------------------
+6. FILE NAMES & ZIP
+---------------------------------------------------------------------
+  #01 monA08_master.png
+  #02 monA08_front_idle.png      #07 monA08_back_idle.png
+  #03 monA08_front_attack.png    #08 monA08_back_attack.png
+  #04 monA08_front_cast.png      #09 monA08_back_cast.png
+  #05 monA08_front_hit.png       #10 monA08_back_hit.png
+  #06 monA08_front_burst.png     #11 monA08_back_burst.png
+  #12 eggA08.png
+
+ZIP name: EGGBOUND_MONA08_SET.zip (all PNGs in the root) + notes.txt listing
+each file, background type, and any image regenerated and why.
+=====================================================================
+END OF FILE
+=====================================================================
