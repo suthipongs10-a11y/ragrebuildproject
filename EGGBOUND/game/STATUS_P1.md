@@ -72,3 +72,13 @@ Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`,
 - Uses fx_rays / fx_orb / fx_burst (batch 06) and fx_speedlines (batch 09, code-drawn lines until it arrives).
 - Next when batch 09 lands: per-element ultimate effects (flame wave/bird, tidal wave/serpent, tornado/blades, rock spikes/
   ground shatter, divine star, shadow vortex, slash).
+
+## BATCH07 ชุดแรก (11/18 ตัว) — ใส่เกมแล้ว
+- มอนใหม่ใน `SPECIES`: A07 ไข่ป่วน (หายาก), A08 วิญญาณโคมลอย (หายาก), A09 อสูรรากไม้บรรพ์ (มหากาพย์), B01 ควายธนู, B02 หุ่นพยนต์ฟาง, B04 พรายตะเคียน, B05 เสือสมิง (หายาก), B07 คชสีห์ (มหากาพย์), C01 ปี่เซียะ, C02 คางคกสามขา, C04 กระต่ายหยก
+  - สเตตัสเริ่มต้นสำหรับทดสอบ: หายาก ≈ +8%, มหากาพย์ ≈ +16% จากระดับธรรมดา · สกิลใช้กลไก/แอนิเมชันที่มีอยู่ (รอ BATCH09 สำหรับเอฟเฟ็คท่าไม้ตายเฉพาะธาตุ)
+  - ไข่ปริศนาฟักได้ตัวหายาก/มหากาพย์จริงแล้ว (ตำนานยังไม่มี → ตกไปมหากาพย์)
+- BOSS_ROOT ใช้ภาพ A09 (scale 1.3) แทนโกเลมขยาย
+- `import_art.py` ใหม่: ยึดเท้าจริงของแต่ละภาพ, `--mirror`, ข้ามไฟล์เสีย, webp alpha_quality 70 (เล็กลง ~30%)
+- `spr()` มีท่าสำรองเมื่อภาพท่าใดหาย · ทดสอบ: ตั้งค่า → "รับมอนทุกตัว", ปุ่มฟักมอนระดับใช้ตัวจริงตามระดับ
+- ไฟล์เสีย (truncated) ต้องส่งใหม่: A07 front_hit · A08 back_cast · A09 back_attack, back_cast · B01 front_attack · B02 front_cast · B04 back_attack · B05 front_idle, front_burst · C01 front_attack, eggC01 · C02 front_burst · C04 front_idle
+- B05 ท่าหน้าหันซ้าย → กลับด้านตอนนำเข้า (`--mirror front_attack,front_cast,front_hit,master`)

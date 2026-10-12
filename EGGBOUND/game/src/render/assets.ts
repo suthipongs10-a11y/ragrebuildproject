@@ -50,13 +50,18 @@ function hueShift(img, E) {
 }
 
 /** does this species have its own final art? */
-export const hasArt = sid => { const s = SPECIES[sid]; return !!(s && s.art && IMG[s.art + '_front_idle']); };
+export const hasArt = sid => { const s = SPECIES[sid]; return !!(s && s.art && (IMG[s.art + '_front_idle'] || IMG[s.art + '_master'])); };
 const SPR = {};
+/** a pose that may be missing from a set (damaged file awaiting re-export): same view's idle → master → other view's idle */
+function artPose(art, key) {
+  const view = key.split('_')[0], other = view === 'front' ? 'back' : 'front';
+  return IMG[art + '_' + key] || IMG[art + '_' + view + '_idle'] || IMG[art + '_master'] || IMG[art + '_' + other + '_idle'];
+}
 /** sprite canvas/image for a species & pose key like 'front_idle' */
 export function spr(sid, key) {
   const k = sid + key; if (SPR[k]) return SPR[k];
   const s = SPECIES[sid];
-  if (hasArt(sid)) return (SPR[k] = IMG[s.art + '_' + key]);
+  if (hasArt(sid)) return (SPR[k] = artPose(s.art, key));
   return (SPR[k] = hueShift(IMG['mon001_' + key], PAL[s.elem]));
 }
 const silC = {}, glowC = {};
