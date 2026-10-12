@@ -228,6 +228,9 @@ export function spdAt(base: number, lvl: number, stars: number): number {
   return base + (stars - 1) * 3 + Math.floor(lvl / 10);
 }
 export const expToNext = (lvl: number) => 40 + lvl * 25;
+// Gems (เพชร, premium currency — given by the adventure book for now): buy a gold mystery egg, rush an incubating egg.
+export const GEM_GOLD_EGG = 100;
+export const GEM_PER_10MIN = 1; // rushing an egg: 1 gem per started 10 minutes left
 // Power-up (เพิ่มเลเวล): feed up to FEED_MAX unwanted monsters; each gives EXP by its level and stars:
 // FEED_K × (EXP it took to reach its level) + FEED_BASE × stars². Costs FEED_GOLD per food level.
 export const FEED_MAX = 5, FEED_K = 0.8, FEED_BASE = 60, FEED_GOLD = 10;

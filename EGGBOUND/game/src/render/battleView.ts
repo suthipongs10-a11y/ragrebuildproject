@@ -87,7 +87,7 @@ export class BattleView {
     this.aim = { t: 0, dur: 1.05, hit: null, v };
     while (this.aim.hit === null && this.aim.t < this.aim.dur) { this.aim.t += (yield 0) / this.speed; }
     const ok = this.aim.hit === true;
-    if (ok) { sfx.perfect(); addP({ type: 'banner', x: v.x, y: this.headY(v) - 30, str: 'PERFECT!', color: '#ffe066', size: 30, life: 1, keep: true }); flash(.25, '#fff2c0'); }
+    if (ok) { this.onPerfect && this.onPerfect(); sfx.perfect(); addP({ type: 'banner', x: v.x, y: this.headY(v) - 30, str: 'PERFECT!', color: '#ffe066', size: 30, life: 1, keep: true }); flash(.25, '#fff2c0'); }
     this.aim = null; return ok;
   }
   tapAim() { if (this.aim && this.aim.hit === null) { const r = this.ringR(); this.aim.hit = Math.abs(r - 34) < 12; if (!this.aim.hit) text(this.aim.v.x, this.headY(this.aim.v) - 20, 'พลาดจังหวะ', '#cdbfa6', 15); } }
@@ -177,6 +177,7 @@ export class BattleView {
     const impact = (uid) => { if (applied.has(uid)) return; applied.add(uid); for (const e of res.impacts[uid] || []) this.applyEv(e); };
     const tv = res.targets.map(id => this.V.get(id)).filter(Boolean);
     this.actName(v, sk);
+    if (res.ult && v.team === 0) this.onUlt && this.onUlt();
     if (res.ult && !this.skipUlt) yield* this.ultIntro(v, sk);
     else if (res.ult) { v.glowF = .8; }
     const custom = this['sk_' + sk.id]; // signature skill choreography (per monster) when it exists

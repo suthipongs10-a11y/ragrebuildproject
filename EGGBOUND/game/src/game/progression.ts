@@ -22,7 +22,7 @@ export function grantRewards(s: SaveData, stageId: string, win: boolean, stars: 
   let rs = seed >>> 0; const rnd = () => { rs = (rs * 1664525 + 1013904223) >>> 0; return rs / 4294967296; };
   const expGain = win ? st.reward.exp : Math.round(st.reward.exp * 0.25);
   r.gold = win ? st.reward.gold + (first ? st.reward.gold : 0) : 0;
-  s.gold += r.gold;
+  s.gold += r.gold; if (win) s.stats.wins++;
   for (const uid of s.team) {
     const m = monOf(s, uid); if (!m) continue;
     const g: MonGain = { uid, sid: m.sid, fromLvl: m.lvl, toLvl: m.lvl, exp: expGain, capped: false };
@@ -90,6 +90,7 @@ export function hatchEgg(s: SaveData, eggId: number, now = Date.now()): HatchRes
   const i = s.eggs.findIndex(e => e.id === eggId); if (i < 0 || !canHatch(s, s.eggs[i], now)) return null;
   const egg = s.eggs[i], { sid } = egg, rare = !!egg.rare, copies = copiesOf(s, sid);
   s.eggs.splice(i, 1); endIncub(s, eggId);
+  s.stats.hatch++;
   const fresh = !s.dex.includes(sid), m = newMon(s.nextUid++, sid, 1, undefined, rare); s.mons.push(m); if (fresh) s.dex.push(sid);
   return { uid: m.uid, sid, egg, stars: m.stars, copies, rare, newDex: fresh };
 }
@@ -112,7 +113,7 @@ export function evolve(s: SaveData, uid: number, food: number[]): MonSave | null
   if (!evoCheck(s, uid, food).ok) return null;
   const t = monOf(s, uid)!; s.gold -= EVO_GOLD[t.stars];
   s.mons = s.mons.filter(m => !food.includes(m.uid)); s.team = s.team.filter(u => !food.includes(u));
-  t.stars++; t.lvl = 1; t.exp = 0; return t;
+  t.stars++; t.lvl = 1; t.exp = 0; s.stats.evolve++; return t;
 }
 /** EXP a food monster gives (by its level and stars) */
 export const feedValue = (m: MonSave) => Math.round(FEED_K * cumExp(m.lvl) + FEED_BASE * m.stars * m.stars);
@@ -132,7 +133,7 @@ export function feedPreview(s: SaveData, uid: number, food: number[]): FeedPrevi
 export function feed(s: SaveData, uid: number, food: number[]): FeedPreview | null {
   const p = feedPreview(s, uid, food); if (!p.ok) return null;
   const t = monOf(s, uid)!; s.gold -= p.gold; s.mons = s.mons.filter(m => !food.includes(m.uid)); s.team = s.team.filter(u => !food.includes(u));
-  t.lvl = p.toLvl; t.exp = p.toExp; return p;
+  t.lvl = p.toLvl; t.exp = p.toExp; s.stats.feed++; return p;
 }
 export const skillMaxed = (m: MonSave) => m.sk.every((l, i) => l >= SKILL_MAX[i]);
 /** feed a copy of the same species (or a soul crystal when food is null): +1 to a random non-maxed skill. Returns the skill slot. */
@@ -141,7 +142,7 @@ export function skillUp(s: SaveData, uid: number, food: number | null, rnd: () =
   if (food == null) { if (s.items.soul < 1) return -1; s.items.soul--; }
   else { const f = monOf(s, food); if (!f || f.uid === uid || f.sid !== t.sid) return -1; s.mons = s.mons.filter(m => m.uid !== food); s.team = s.team.filter(u => u !== food); }
   const open = [0, 1, 2].filter(i => t.sk[i] < SKILL_MAX[i]), slot = open[Math.floor(rnd() * open.length)];
-  t.sk[slot]++; return slot;
+  t.sk[slot]++; s.stats.skillUp++; return slot;
 }
 
 // ---- stage-end chest contents ----

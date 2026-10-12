@@ -3,6 +3,7 @@ import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
 import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
 import { startIncub, incubLeft, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
+import { QUESTS, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg } from '../src/game/quests';
 
 export function eggTests(): number {
   let fail = 0;
@@ -67,6 +68,17 @@ export function eggTests(): number {
     const r = feed(s, 1, [80, 81])!; const t = s.mons.find(m => m.uid === 1)!;
     ok(!!r && t.lvl === r.toLvl && t.lvl > 5 && !s.mons.some(m => m.uid === 80 || m.uid === 81) && s.team.join() === '1' && s.gold === 9999 - 110, 'feed levels up, eats food, pays gold');
     t.lvl = 15; ok(!feedPreview(s, 1, [2]).ok, 'max level cannot be fed'); }
+
+  // adventure book: quests unlock from progress, claim once; gems buy gold eggs and rush incubation
+  { const s = newSave(); ok(new Set(QUESTS.map(q => q.id)).size === QUESTS.length, 'quest ids unique');
+    ok(claimable(s).length === 0 && claimQuest(s, 'win1') === null, 'nothing claimable on a new save');
+    grantRewards(s, '1-1', true, 3, ['A02'], 3); ok(claimable(s).some(q => q.id === 'win1') && claimable(s).some(q => q.id === 'clear1-1'), 'winning unlocks quests');
+    const g0 = s.gems; ok(!!claimQuest(s, 'win1') && s.gems === g0 + 30 && claimQuest(s, 'win1') === null, 'claim once');
+    const tb = bookGems(); ok(tb >= 600 && tb <= 1200, 'book gem total ' + tb);
+    ok(buyGoldEgg(s) === null, 'no gems, no egg'); s.gems = 250; const e = buyGoldEgg(s)!;
+    ok(!!e && e.tier === 'gold' && e.kind === 'mystery' && s.gems === 150 && s.eggs.includes(e), 'buy gold egg');
+    const t0 = 5_000_000; ok(startIncub(s, e.id, t0), 'incubate bought egg'); const c = rushCost(s, e.id, t0);
+    ok(c >= 1 && rushEgg(s, e.id, t0) && s.gems === 150 - c && canHatch(s, e, t0), 'rush finishes incubation for gems ' + c); }
 
   // team rule: one per species; a saved team holding two copies is cleaned on load
   { const s = newSave(); s.mons.push(newMon(70, 'A01')); ok(teamHasSpecies(s, 'A01') && !teamHasSpecies(s, 'A05') && !teamHasSpecies(s, 'A01', 1), 'team species check');

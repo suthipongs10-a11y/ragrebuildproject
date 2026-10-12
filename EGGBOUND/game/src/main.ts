@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
-import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX } from './core/data';
+import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG } from './core/data';
 import { Battle } from './core/battle';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
@@ -13,6 +13,7 @@ import { home, BDEF, upgrade, upgradeCost, maxLevelNow, mineStored, mineCap, col
 import { loadSave, writeSave, resetSave, newMon } from './game/save';
 import { grantRewards, stageUnlocked, craftEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg, lootOf, monOf, copiesOf, teamHasSpecies, feedPreview, feed, feedValue, evoCheck, evolve, skillUp, skillMaxed } from './game/progression';
 import { EvolveView } from './render/evolveView';
+import { QUESTS, QUEST_CATS, questDone, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg } from './game/quests';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -49,9 +50,9 @@ function render() {
   const el = $('#screens'); renderNav(); $('#nav').hidden = false; $('#bhud').hidden = true;
   if (cur === 'home') { if (!homeV) homeV = new HomeView(S, { onSelect: id => { selB = id; renderPanel(); } }); homeV.S = S; homeV.syncMons(); if (!battle && !hatch) scene = homeV; el.innerHTML = homeHTML(); renderPanel(); return; }
   if (!battle && !hatch) scene = idleScene; selB = null; if (homeV) homeV.sel = null;
-  if (cur === 'map') el.innerHTML = mapHTML(); else if (cur === 'team') el.innerHTML = teamHTML(); else if (cur === 'mons') el.innerHTML = monsHTML(); else if (cur === 'hatch') el.innerHTML = hatchHTML(); else if (cur === 'settings') el.innerHTML = settingsHTML();
+  if (cur === 'map') el.innerHTML = mapHTML(); else if (cur === 'team') el.innerHTML = teamHTML(); else if (cur === 'mons') el.innerHTML = monsHTML(); else if (cur === 'hatch') el.innerHTML = hatchHTML(); else if (cur === 'settings') el.innerHTML = settingsHTML(); else if (cur === 'book') el.innerHTML = bookHTML();
 }
-function topbar(title, sub) { return `<div class="topbar"><div class="realm"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div><div class="row" style="flex:0 0 auto;align-items:center"><span class="proto">P0 PROTOTYPE</span><span class="gold"><i></i>${S.gold.toLocaleString()}</span></div></div>`; }
+function topbar(title, sub) { return `<div class="topbar"><div class="realm"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div><div class="row" style="flex:0 0 auto;align-items:center"><span class="proto">P0 PROTOTYPE</span>${bookBtn()}<span class="gold gem"><i></i>${S.gems.toLocaleString()}</span><span class="gold"><i></i>${S.gold.toLocaleString()}</span></div></div>`; }
 function mapHTML() {
   return `<section class="scr dim"><div class="wrap">${topbar('ทุ่งไข่ป่วน', 'ภพที่ 1 · บ้านเกิดของเผ่าไข่ป่วน')}<h2 class="sec">ด่าน</h2><div class="stages">${STAGES.map((st, i) => {
     const un = stageUnlocked(S, st.id), stars = S.stages[st.id] || 0, boss = st.waves.some(w => w.some(m => SPECIES[m.sid].boss));
@@ -153,12 +154,24 @@ function eggGain(e) {
   return `<span class="chip">${copiesOf(S, e.sid) ? 'ตัวซ้ำ · ใช้อัปสกิลได้' : 'ตัวใหม่!'}</span>`;
 }
 const timer = x => `data-start="${x.start}" data-end="${x.end}"`;
+const bookBtn = () => { const n = claimable(S).length; return `<button type="button" class="bookbtn" data-nav="book" title="สมุดผจญภัย">📖<span>สมุดผจญภัย</span>${n ? `<b class="badge">${n}</b>` : ''}</button>`; };
+const rewardChips = r => [r.gems ? `<span class="chip rw gem"><i></i>${r.gems}</span>` : '', r.gold ? `<span class="chip rw"><span class="gold sm" style="padding:0;border:0;background:none"><i></i></span>${r.gold.toLocaleString()}</span>` : '', r.soul ? `<span class="chip rw">ผลึกวิญญาณ ×${r.soul}</span>` : '', ...Object.entries(r.frags || {}).map(([sid, n]) => `<span class="chip rw"><img src="${eggURL(sid)}" alt="">เศษไข่${esc(SPECIES[sid].name)} ×${n}</span>`)].join('');
+/** adventure book: one-time quests with gems and other rewards */
+function bookHTML() {
+  const got = S.quests.length, tot = QUESTS.length, gems = QUESTS.filter(q => S.quests.includes(q.id)).reduce((a, q) => a + (q.reward.gems || 0), 0);
+  return `<section class="scr dim"><div class="wrap">${topbar('สมุดผจญภัย', 'ทำภารกิจครั้งเดียว รับเพชรและของรางวัล')}
+  <div class="booksum"><div>รับแล้ว <b>${got}/${tot}</b> ภารกิจ</div><div><span class="gold gem sm"><i></i>${gems} / ${bookGems()}</span> เพชรจากสมุด</div></div><div class="bar" style="margin:6px 0 12px"><i style="transform:scaleX(${got / tot})"></i></div>
+  ${claimable(S).length > 1 ? `<div class="row" style="margin-bottom:10px"><button class="go" type="button" data-claim="*">รับทั้งหมด (${claimable(S).length})</button></div>` : ''}
+  ${QUEST_CATS.map(cat => `<h2 class="sec">${cat}</h2><div class="quests">${QUESTS.filter(q => q.cat === cat).map(q => { const [a, b] = q.goal(S), done = a >= b, cl = S.quests.includes(q.id);
+    return `<div class="quest ${cl ? 'claimed' : done ? 'done' : ''}"><div class="qm"><b>${esc(q.name)}</b><div class="bar" style="margin:5px 0 4px"><i style="transform:scaleX(${Math.min(1, a / b)})"></i></div><span class="note">${a}/${b}</span></div><div class="qr">${rewardChips(q.reward)}</div>${cl ? '<span class="qok">รับแล้ว ✓</span>' : `<button class="${done ? 'go' : 'alt'}" type="button" data-claim="${q.id}" ${done ? '' : 'disabled'}>รับ</button>`}</div>`; }).join('')}</div>`).join('')}
+  <p class="note">เพชรใช้ซื้อไข่ปริศนาลายทอง และเร่งเวลาบ่มไข่ ที่หน้าฟักไข่</p></div></section>`;
+}
 function hatchHTML() {
   const h = home(S), slots = incubSlots(S), now = Date.now(), full = h.incub.length >= slots;
   const nest = Array.from({ length: slots }, (_, i) => {
     const x = h.incub[i], e = x && S.eggs.find(q => q.id === x.id); if (!e) return '<div class="islot empty">ช่องบ่มว่าง</div>';
     const left = Math.max(0, x.end - now), done = !left;
-    return `<div class="islot ${done ? 'ready' : ''}" style="--tc:${TIER_COL[e.tier]}"><img src="${eggURLOf(e)}" alt=""><div style="min-width:0">${esc(eggName(e))}<div class="bar fr" style="margin-top:5px"><i ${done ? '' : timer(x)} style="transform:scaleX(${done ? 1 : 1 - left / (x.end - x.start)})"></i></div><span class="note" ${done ? '' : timer(x)}>${done ? 'บ่มเสร็จแล้ว!' : 'เหลือ ' + fmtLeft(left)}</span></div>${done ? `<button class="go" type="button" data-egg="${e.id}">ฟัก</button>` : ''}</div>`;
+    return `<div class="islot ${done ? 'ready' : ''}" style="--tc:${TIER_COL[e.tier]}"><img src="${eggURLOf(e)}" alt=""><div style="min-width:0">${esc(eggName(e))}<div class="bar fr" style="margin-top:5px"><i ${done ? '' : timer(x)} style="transform:scaleX(${done ? 1 : 1 - left / (x.end - x.start)})"></i></div><span class="note" ${done ? '' : timer(x)}>${done ? 'บ่มเสร็จแล้ว!' : 'เหลือ ' + fmtLeft(left)}</span></div>${done ? `<button class="go" type="button" data-egg="${e.id}">ฟัก</button>` : `<button class="alt rush" type="button" data-rush="${e.id}" ${S.gems >= rushCost(S, e.id, now) ? '' : 'disabled'}>เร่ง <span class="gold gem sm"><i></i>${rushCost(S, e.id, now)}</span></button>`}</div>`;
   }).join('');
   const wait = S.eggs.filter(e => !incubOf(S, e.id));
   const card = e => {
@@ -169,6 +182,7 @@ function hatchHTML() {
   const crafts = Object.keys(S.frags).filter(sid => S.frags[sid] > 0);
   return `<section class="scr dim"><div class="wrap">${topbar('ฟักไข่', 'ไข่ปริศนาจะรู้ว่าเป็นตัวอะไรตอนฟัก · ลายทองขึ้นไปต้องบ่มในรังก่อน')}
   <h2 class="sec">รังบ่มไข่ · ${h.incub.length}/${slots} ช่อง</h2><div class="islots">${nest}</div>${slots < 3 ? '<p class="note">อัปรังฟักไข่ที่บ้านเต่าเพื่อเพิ่มช่องและบ่มเร็วขึ้น</p>' : ''}
+  <div class="shop"><img src="${eggURLOf({ kind: 'mystery', tier: 'gold' })}" alt=""><div style="min-width:0"><b>ไข่ปริศนาลายทอง</b><div class="note">มหากาพย์ ${EGG_TIERS.gold.rarityW.epic}% · ตำนาน ${EGG_TIERS.gold.rarityW.legendary}% · ต้องบ่ม ${fmtDur(incubMs(S, { kind: 'mystery', tier: 'gold' }))}</div></div><button class="go" type="button" data-buy="gold" ${S.gems >= GEM_GOLD_EGG ? '' : 'disabled'}>ซื้อ <span class="gold gem sm"><i></i>${GEM_GOLD_EGG}</span></button></div>
   <h2 class="sec">ไข่ที่รอฟัก</h2>${wait.length ? `<div class="eggs">${wait.map(card).join('')}</div>` : '<div class="empty">ยังไม่มีไข่ ผ่านด่านเพื่อรับไข่ปริศนาหรือสะสมเศษไข่</div>'}
   <h2 class="sec">ประกอบไข่จากเศษ</h2>${crafts.length ? crafts.map(sid => `<div class="craft"><img src="${eggURL(sid)}" alt=""><div style="min-width:0">${esc(SPECIES[sid].name)}<div class="bar fr" style="margin-top:5px"><i style="transform:scaleX(${Math.min(1, S.frags[sid] / FRAGS_TO_CRAFT)})"></i></div><span class="note">${S.frags[sid]}/${FRAGS_TO_CRAFT}</span></div><button class="go" type="button" data-craft="${sid}" ${S.frags[sid] >= FRAGS_TO_CRAFT ? '' : 'disabled'}>ประกอบ</button></div>`).join('') : '<div class="empty">ยังไม่มีเศษไข่</div>'}
   ${oddsHTML()}</div></section>`;
@@ -190,7 +204,7 @@ function settingsHTML() {
   <div class="set"><span>ข้ามฉากสกิลสุดยอด</span>${seg('skipUlt', [[false, 'ไม่ข้าม'], [true, 'ข้าม']])}</div>
   <div class="set"><span>เริ่มเกมใหม่ (ลบความคืบหน้า)</span>${confirmReset ? `<span class="confirm">ลบจริงไหม? <button class="alt" type="button" data-act="resetYes">ลบ</button><button class="alt" type="button" data-act="resetNo">ยกเลิก</button></span>` : `<button class="alt" type="button" data-act="reset">รีเซ็ต</button>`}</div>
   <div class="set"><span>ทดสอบ (prototype): ไข่ปริศนา</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="eggs">รับไข่ 4 ลาย</button><button class="alt" type="button" data-dev="incub">บ่มเสร็จทันที</button></span></div>
-  <div class="set"><span>ทดสอบ (prototype): มอนชุดใหม่</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="mons">รับมอนทุกตัว</button><button class="alt" type="button" data-dev="evo">เตรียมอัปดาว</button></span></div>
+  <div class="set"><span>ทดสอบ (prototype): มอนชุดใหม่</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="mons">รับมอนทุกตัว</button><button class="alt" type="button" data-dev="evo">เตรียมอัปดาว</button><button class="alt" type="button" data-dev="gems">+เพชร 500</button></span></div>
   <div class="set"><span>ทดสอบ (prototype): ฟักมอนระดับ</span><span class="row" style="flex:0 0 auto">${['common', 'rare', 'epic', 'legendary'].map(g => `<button class="alt" type="button" data-dev="hatch:${g}">${LOOT_GRADES[g].name}</button>`).join('')}</span></div>
   <div class="set"><span>ทดสอบ (prototype): หีบสมบัติ</span><span class="row" style="flex:0 0 auto">${['common', 'rare', 'epic', 'legendary'].map(g => `<button class="alt" type="button" data-dev="chest:${g}">${LOOT_GRADES[g].name}</button>`).join('')}</span></div>
   <p class="note">P0 เซฟในเครื่องนี้เท่านั้น · ระบบต่อสู้ทำงานแบบ deterministic (seed เดิม + คำสั่งเดิม = ผลเดิม) เพื่อให้เซิร์ฟเวอร์ตรวจผลได้ในเฟสออนไลน์</p></div></section>`;
@@ -200,7 +214,7 @@ function settingsHTML() {
 let selB = null;
 function homeHTML() {
   const h = home(S);
-  return `<div class="hhud"><div class="topbar"><div class="realm"><h1>บ้านเต่าบรรพกาล</h1><p>ป้อมพันธสัญญา Lv.${h.castle} · แตะสิ่งก่อสร้าง มอน หรือหัวเต่า</p></div><div class="row" style="flex:0 0 auto;align-items:center"><span class="gold" id="hGold"><i></i>${S.gold.toLocaleString()}</span></div></div><div id="hpanel"></div></div>`;
+  return `<div class="hhud"><div class="topbar"><div class="realm"><h1>บ้านเต่าบรรพกาล</h1><p>ป้อมพันธสัญญา Lv.${h.castle} · แตะสิ่งก่อสร้าง มอน หรือหัวเต่า</p></div><div class="row" style="flex:0 0 auto;align-items:center">${bookBtn()}<span class="gold gem"><i></i>${S.gems.toLocaleString()}</span><span class="gold" id="hGold"><i></i>${S.gold.toLocaleString()}</span></div></div><div id="hpanel"></div></div>`;
 }
 const cost = c => `<span class="gold sm"><i></i>${c.toLocaleString()}</span>`;
 function upBtn(id, label = 'อัปเกรด') {
@@ -256,6 +270,7 @@ function startBattle(stageId) {
     onCutin: (sid, name, col) => { const ci = $('#cutin'); ci.style.setProperty('--c', col); $('#cutImg').src = portrait(sid); $('#cutText').textContent = name; ci.classList.remove('go'); void ci.offsetWidth; ci.classList.add('go'); },
     onWave: (w, n, boss) => { $('#waveLbl').textContent = `${st.id} · WAVE ${w + 1}/${n}`; banner(boss ? 'BOSS' : 'WAVE ' + (w + 1), boss ? SPECIES.BOSS_ROOT.name : st.name, 1.5); },
     onEnd: (win, stars) => endBattle(win, stars, seed, b),
+    onUlt: () => { S.stats.ult++; }, onPerfect: () => { S.stats.perfect++; },
   });
   scene = battle; battle.start();
   $('#screens').innerHTML = ''; $('#nav').hidden = true; $('#bhud').hidden = false; confirmExit = false; renderBattleButtons(); hudBattle(battle);
@@ -284,6 +299,7 @@ function renderOrder() {
 }
 function endBattle(win, stars, seed, b) {
   const seen = []; for (const w of STAGES.find(x => x.id === curStageId).waves) for (const m of w) seen.push(m.sid);
+  S.stats.react += b.myReactions; S.stats.reactKinds = [...new Set([...S.stats.reactKinds, ...b.reactKinds])];
   const r = grantRewards(S, curStageId, win, stars, seen, seed); save();
   $('#skills').hidden = true;
   if (!win) { resultModal(r, win, stars); return; }
@@ -370,6 +386,7 @@ function devTool(k) {
     const pool = Object.values(SPECIES).filter(x => !x.boss);
     for (let i = 0; i < m.stars; i++) S.mons.push(newMon(S.nextUid++, pool[Math.floor(Math.random() * pool.length)].id, 1, m.stars));
     S.mons.push(newMon(S.nextUid++, m.sid, 1)); selMon = m.uid; monMode = 'evo'; food = []; save(); sfx.chime(); show('mons'); return; }
+  if (k === 'gems') { S.gems += 500; save(); sfx.coin(); render(); return; }
   if (k === 'incub') for (const x of home(S).incub) x.end = Date.now();
   if (k.startsWith('hatch:')) { // preview the hatch effect of a monster rarity (hatches a gold egg of an owned monster)
     const g = k.slice(6), pool = Object.values(SPECIES).filter(x => !x.boss && x.rarity === g), sid = pool.length ? pool[Math.floor(Math.random() * pool.length)].id : 'A03';
@@ -414,6 +431,11 @@ document.addEventListener('click', e => {
   else if (d.feed === 'go') { const m = monOf(S, selMon), from = m.lvl, r = feed(S, selMon, [...food]); if (r) { save(); food = []; sfx.starup(); toast(r.toLvl > from ? `เลเวลอัป! Lv.${from} → Lv.${r.toLvl}` : `EXP +${r.gain.toLocaleString()}`); render(); } }
   else if (d.sku) { const slot = skillUp(S, selMon, d.sku === 'soul' ? null : +d.sku); if (slot >= 0) { save(); sfx.starup(); skFlash = slot; food = []; render(); setTimeout(() => { skFlash = -1; }, 50); } }
   else if (d.egg) { sfx.click(); startHatch(+d.egg); }
+  else if (d.claim) { const ids = d.claim === '*' ? claimable(S).map(q => q.id) : [d.claim], tot = { gems: 0, gold: 0, soul: 0 };
+    for (const id of ids) { const r = claimQuest(S, id); if (r) { tot.gems += r.gems || 0; tot.gold += r.gold || 0; tot.soul += r.soul || 0; } }
+    save(); sfx.coin(); toast(['ได้รับ', tot.gems ? `เพชร ${tot.gems}` : '', tot.gold ? `ทอง ${tot.gold.toLocaleString()}` : '', tot.soul ? `ผลึกวิญญาณ ${tot.soul}` : ''].filter(Boolean).join(' ') || 'ได้รับรางวัล'); render(); }
+  else if (d.buy === 'gold') { const e = buyGoldEgg(S); if (e) { save(); sfx.chime(); toast('ได้ไข่ปริศนาลายทอง! นำไปบ่มในรังได้เลย'); render(); } }
+  else if (d.rush) { if (rushEgg(S, +d.rush)) { save(); sfx.starup(); render(); } }
   else if (d.incub) { if (startIncub(S, +d.incub)) { save(); sfx.chime(); render(); } }
   else if (d.dev) { devTool(d.dev); }
   else if (d.craft) { if (craftEgg(S, d.craft)) { save(); sfx.chime(); render(); } }

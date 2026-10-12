@@ -30,6 +30,7 @@ export class Battle {
   win = false;
   turn = 0;
   reactions = 0;
+  myReactions = 0; reactKinds = new Set<string>(); // player-caused reactions (adventure-book quests)
   allyDeaths = 0;
   private nextUid = 10;
   private actor: Unit | null = null;
@@ -229,6 +230,7 @@ export class Battle {
     ev.push({ t: 'mark', tgt: t.uid, elem: m.elem, add: false });
     const sub: Ev[] = [];
     this.reactions++;
+    if (a.team === 0) { this.myReactions++; this.reactKinds.add(id); }
     if (a.team === 0) this.rx = 1 + (this.mods.react?.[elem] || 0);
     if (id === 'wildfire') {
       this.hit(a, t, 0.3, 'fire', sub, { noCrit: true });
