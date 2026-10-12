@@ -1,0 +1,123 @@
+=====================================================================
+EGGBOUND — ART BATCH 08 : EVOLVED FORM of MON_001 "Dawnflame Fox"
+→ "Solar Dawn Fox" (จิ้งจอกสุริยันอรุณ)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ร่างวิวัฒน์ของ จิ้งจอกเพลิงอรุณ → จิ้งจอกสุริยันอรุณ (มอนตัวเดิมที่โตขึ้นและทรงพลังขึ้น)
+- เปิดแชทใหม่ 1 แชทต่อ 1 ตัว แนบ 3 อย่าง:
+  1) ไฟล์นี้
+  2) mon001_master (ภาพร่างแรกของตัวนี้ ไฟล์อยู่ที่ EGGBOUND/game/assets/mon001_master.webp) = "ตัวละครต้นแบบ"
+  3) mon001_front_burst (EGGBOUND/game/assets/mon001_front_burst.webp) = ท่าเต็มพลังของร่างแรก
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ให้ดีก่อนตอบ "OK" (ต้องดูออกทันทีว่าเป็นตัวเดิมที่โตขึ้น)
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D turn-based monster RPG. This monster
+EVOLVES: when the player raises it enough, it transforms on screen into a
+grander adult form. Generate 11 images of the EVOLVED form, ONE IMAGE PER
+TURN. The images are animated by code, so CONSISTENCY matters more than
+creativity: every image must show the exact same evolved character.
+
+The attached mon001_master is the BASE FORM of this same monster. The evolved
+form must keep its identity at a glance: same color palette, same signature
+markings, same eyes and face style, same species — but bigger, more mature,
+more ornate and more powerful. A player must instantly say "it grew up!".
+
+Work order:
+  1. Generate #01 (EVOLVED MASTER) and wait for my "OK".
+  2. After "OK", generate #02–#11 one by one, using #01 as the reference.
+  3. Run the QUALITY CHECK, then package the ZIP (section 6).
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image) — same as the base form
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Evolved forms are more detailed and majestic than base forms, but stay clean
+and readable at small size on a phone.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Camera: HIGH ANGLE about 55 degrees looking down, orthographic feel.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: ground, cast shadow, glow, aura, fire/particles/sparks, motion lines,
+text, letters, watermark, frame, second character.
+(The game adds all aura, glow and effects in code.)
+ORIGINAL DESIGN - do not copy or resemble any existing game, film, anime
+or novel character (Dota, League of Legends, Summoners War, Pokemon, Digimon, etc.).
+
+Technical rules:
+- Canvas 1024 x 1024 px PNG, subject centered, at least 80 px empty margin.
+- The lowest point (feet / bottom of body) sits on an invisible ground
+  line at y ≈ 870 px in EVERY image.
+- SAME SCALE in every image of this set.
+- Size: EVOLVED class - body height about 70-75% of the canvas (clearly bigger
+  than the base form, which was about 55-60%).
+
+---------------------------------------------------------------------
+2. CHARACTER SHEET — Solar Dawn Fox (FIRE, Attacker)
+---------------------------------------------------------------------
+- The adult form of Dawnflame Fox. Same species, same colors and markings, clearly the SAME fox grown up and powered up.
+- Proportions: no longer chibi — a sleek, athletic adult fox (head ~28% of body height), long legs, proud stance.
+- Fur: the same cream-white base with the orange-to-red gradient, now with elegant golden-orange flame-shaped markings along the legs and back.
+- Tails: THREE large fluffy tails (NOT nine), each tip shaped like stylized solid-fur flame locks (no real fire, no glow).
+- Head: the forehead ember gem has grown into a golden SUN CREST (a small sunburst shape) set in gold; ears longer with flame-shaped tufts.
+- Chest: the cream ruff has become a magnificent mane shaped like sun rays (solid fur).
+- Feel: noble, fierce, radiant — a legend of the dawn. Must NOT resemble Ninetales, Ahri, Kurama or any famous fox character.
+
+---------------------------------------------------------------------
+3. VIEWS
+---------------------------------------------------------------------
+FRONT VIEW = 3/4 front view from the high 55° camera, body facing
+             BOTTOM-RIGHT. We see the face and front.
+BACK VIEW  = 3/4 back view from the same camera, body facing TOP-RIGHT.
+             We see the back and only part of the side of the face.
+
+---------------------------------------------------------------------
+4. IMAGE LIST
+---------------------------------------------------------------------
+For #02–#11 start every prompt with:
+"Using the attached evolved reference as the EXACT same character (same design,
+colors, markings, proportions, scale, line style and lighting),
+following all MASTER STYLE rules:"
+
+#01  EVOLVED MASTER (FRONT VIEW) — full-body design in the idle pose.
+#02  FRONT VIEW — IDLE:   Proud standing pose, three tails fanned, head high, calm fierce gaze.
+#03  FRONT VIEW — ATTACK: Pouncing forward toward bottom-right, claws out, mouth open, tails streaming behind like a comet.
+#04  FRONT VIEW — CAST:   Standing tall on hind legs briefly, head thrown back, sun-ray mane flaring, tails raised in a circle behind it like a sun.
+#05  FRONT VIEW — HIT:    Recoiling back, ears flat, tails bunched, eyes squeezed shut.
+#06  FRONT VIEW — BURST:  Ultimate pose: leaping high with all three tails spread wide like a blazing sun disc behind it, mane flaring, fierce roar.
+#07  BACK VIEW — IDLE   (same pose idea as #02, BACK VIEW)
+#08  BACK VIEW — ATTACK (same pose idea as #03, moving toward TOP-RIGHT)
+#09  BACK VIEW — CAST   (same pose idea as #04, BACK VIEW)
+#10  BACK VIEW — HIT    (same pose idea as #05, recoiling toward bottom-left)
+#11  BACK VIEW — BURST  (same pose idea as #06, BACK VIEW)
+
+---------------------------------------------------------------------
+5. QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] Instantly recognisable as the evolved form of the attached base form
+  [ ] Same face, colors, markings and proportions as #01 in every image
+  [ ] Bigger than the base form (≈70-75% of the canvas); lowest point at ~y 870 px
+  [ ] Correct facing (FRONT → bottom-right, BACK → top-right)
+  [ ] No ground, shadow, glow, particles, motion lines or text
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Does not resemble any existing game/anime character
+
+---------------------------------------------------------------------
+6. FILE NAMES & ZIP
+---------------------------------------------------------------------
+  #01 mon001e_master.png
+  #02 mon001e_front_idle.png      #07 mon001e_back_idle.png
+  #03 mon001e_front_attack.png    #08 mon001e_back_attack.png
+  #04 mon001e_front_cast.png      #09 mon001e_back_cast.png
+  #05 mon001e_front_hit.png       #10 mon001e_back_hit.png
+  #06 mon001e_front_burst.png     #11 mon001e_back_burst.png
+
+ZIP name: EGGBOUND_EVO_001_SET.zip (all PNGs in the root) + notes.txt listing
+each file, background type, and any image regenerated and why.
+=====================================================================
+END OF FILE
+=====================================================================

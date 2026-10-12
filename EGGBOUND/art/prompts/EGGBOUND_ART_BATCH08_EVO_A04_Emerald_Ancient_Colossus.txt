@@ -1,0 +1,123 @@
+=====================================================================
+EGGBOUND — ART BATCH 08 : EVOLVED FORM of MON_A04 "Mossstone Golem"
+→ "Emerald Ancient Colossus" (โกเลมมรกตบรรพกาล)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ร่างวิวัฒน์ของ โกเลมศิลามรกต → โกเลมมรกตบรรพกาล (มอนตัวเดิมที่โตขึ้นและทรงพลังขึ้น)
+- เปิดแชทใหม่ 1 แชทต่อ 1 ตัว แนบ 3 อย่าง:
+  1) ไฟล์นี้
+  2) monA04_master (ภาพร่างแรกของตัวนี้ ไฟล์อยู่ที่ EGGBOUND/game/assets/monA04_master.webp) = "ตัวละครต้นแบบ"
+  3) monA04_front_burst (EGGBOUND/game/assets/monA04_front_burst.webp) = ท่าเต็มพลังของร่างแรก
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ให้ดีก่อนตอบ "OK" (ต้องดูออกทันทีว่าเป็นตัวเดิมที่โตขึ้น)
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D turn-based monster RPG. This monster
+EVOLVES: when the player raises it enough, it transforms on screen into a
+grander adult form. Generate 11 images of the EVOLVED form, ONE IMAGE PER
+TURN. The images are animated by code, so CONSISTENCY matters more than
+creativity: every image must show the exact same evolved character.
+
+The attached monA04_master is the BASE FORM of this same monster. The evolved
+form must keep its identity at a glance: same color palette, same signature
+markings, same eyes and face style, same species — but bigger, more mature,
+more ornate and more powerful. A player must instantly say "it grew up!".
+
+Work order:
+  1. Generate #01 (EVOLVED MASTER) and wait for my "OK".
+  2. After "OK", generate #02–#11 one by one, using #01 as the reference.
+  3. Run the QUALITY CHECK, then package the ZIP (section 6).
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image) — same as the base form
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Evolved forms are more detailed and majestic than base forms, but stay clean
+and readable at small size on a phone.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Camera: HIGH ANGLE about 55 degrees looking down, orthographic feel.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: ground, cast shadow, glow, aura, fire/particles/sparks, motion lines,
+text, letters, watermark, frame, second character.
+(The game adds all aura, glow and effects in code.)
+ORIGINAL DESIGN - do not copy or resemble any existing game, film, anime
+or novel character (Dota, League of Legends, Summoners War, Pokemon, Digimon, etc.).
+
+Technical rules:
+- Canvas 1024 x 1024 px PNG, subject centered, at least 80 px empty margin.
+- The lowest point (feet / bottom of body) sits on an invisible ground
+  line at y ≈ 870 px in EVERY image.
+- SAME SCALE in every image of this set.
+- Size: EVOLVED class - body height about 70-75% of the canvas (clearly bigger
+  than the base form, which was about 55-60%).
+
+---------------------------------------------------------------------
+2. CHARACTER SHEET — Emerald Ancient Colossus (EARTH, Defender)
+---------------------------------------------------------------------
+- The evolved form of Mossstone Golem. Same stones, moss and emerald, clearly the same golem grown ancient and mighty.
+- Body: a much larger, taller colossus of carved ancient stone blocks, with abstract carved line patterns (NOT letters) on the shoulders and forearms.
+- Crystals: clusters of faceted emerald crystals growing out of both shoulders; the chest emerald is now large, set in a carved stone frame.
+- Nature: thick moss mantle with flowers, and a SMALL TREE growing from its back/shoulder (the head sprout grown up).
+- Arms: enormous stone fists with emerald knuckles. Legs: solid pillar-like legs.
+- Face: the same friendly round white eyes, now set deeper under a heavy stone brow.
+- Feel: a gentle ancient giant, a walking ruin.
+
+---------------------------------------------------------------------
+3. VIEWS
+---------------------------------------------------------------------
+FRONT VIEW = 3/4 front view from the high 55° camera, body facing
+             BOTTOM-RIGHT. We see the face and front.
+BACK VIEW  = 3/4 back view from the same camera, body facing TOP-RIGHT.
+             We see the back and only part of the side of the face.
+
+---------------------------------------------------------------------
+4. IMAGE LIST
+---------------------------------------------------------------------
+For #02–#11 start every prompt with:
+"Using the attached evolved reference as the EXACT same character (same design,
+colors, markings, proportions, scale, line style and lighting),
+following all MASTER STYLE rules:"
+
+#01  EVOLVED MASTER (FRONT VIEW) — full-body design in the idle pose.
+#02  FRONT VIEW — IDLE:   Standing guard, fists resting on the ground, tree swaying, calm gaze.
+#03  FRONT VIEW — ATTACK: Swinging a giant fist forward toward bottom-right, stones shifting.
+#04  FRONT VIEW — CAST:   Both fists raised overhead, emerald crystals bright (painted), head tilted up.
+#05  FRONT VIEW — HIT:    Staggering back, a few stone chips flying (painted), one arm raised.
+#06  FRONT VIEW — BURST:  Ultimate pose: slamming both fists into the ground in a wide stance, crystals and moss flaring, tree branches spreading.
+#07  BACK VIEW — IDLE   (same pose idea as #02, BACK VIEW)
+#08  BACK VIEW — ATTACK (same pose idea as #03, moving toward TOP-RIGHT)
+#09  BACK VIEW — CAST   (same pose idea as #04, BACK VIEW)
+#10  BACK VIEW — HIT    (same pose idea as #05, recoiling toward bottom-left)
+#11  BACK VIEW — BURST  (same pose idea as #06, BACK VIEW)
+
+---------------------------------------------------------------------
+5. QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] Instantly recognisable as the evolved form of the attached base form
+  [ ] Same face, colors, markings and proportions as #01 in every image
+  [ ] Bigger than the base form (≈70-75% of the canvas); lowest point at ~y 870 px
+  [ ] Correct facing (FRONT → bottom-right, BACK → top-right)
+  [ ] No ground, shadow, glow, particles, motion lines or text
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Does not resemble any existing game/anime character
+
+---------------------------------------------------------------------
+6. FILE NAMES & ZIP
+---------------------------------------------------------------------
+  #01 monA04e_master.png
+  #02 monA04e_front_idle.png      #07 monA04e_back_idle.png
+  #03 monA04e_front_attack.png    #08 monA04e_back_attack.png
+  #04 monA04e_front_cast.png      #09 monA04e_back_cast.png
+  #05 monA04e_front_hit.png       #10 monA04e_back_hit.png
+  #06 monA04e_front_burst.png     #11 monA04e_back_burst.png
+
+ZIP name: EGGBOUND_EVO_A04_SET.zip (all PNGs in the root) + notes.txt listing
+each file, background type, and any image regenerated and why.
+=====================================================================
+END OF FILE
+=====================================================================

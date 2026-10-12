@@ -1,0 +1,143 @@
+=====================================================================
+EGGBOUND — ART BATCH 09 : ULTIMATE SKILL EFFECT SPRITES (เอฟเฟ็คท่าไม้ตาย)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- เปิดแชทใหม่ใน ChatGPT 1 แชทสำหรับไฟล์นี้
+- แนบ: ไฟล์นี้ + fx_burst.png และ fx_rays.png จากชุด 06-C (ให้ ChatGPT เห็นสไตล์แสงที่เคยผ่านแล้ว)
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ก่อนตอบ "OK"
+- เหมือนชุด 06-C: พื้นดำสนิท + แสงขาวเทาล้วน โค้ดจะย้อมเป็นสีธาตุ (ไฟส้ม น้ำฟ้า ลมเขียว ดินทอง แสงเหลือง มืดม่วง)
+  แล้วซ้อนแบบเพิ่มแสง ภาพเดียวใช้ได้หลายมอนหลายสกิล ใช้ทำท่าไม้ตายที่ซูมเข้าหาตัวมอนให้อลังการ
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the VFX artist for a 2.5D monster RPG. Generate 12 images,
+ONE IMAGE PER TURN, in the order below. They are LIGHT LAYERS for the
+monsters' ULTIMATE skills: the game adds them over the battle with additive
+blending, tints them to the element colour, and animates them (scale,
+rotate, slide, fade). They must be pure light on pure black.
+
+These ultimates are the highlight of the game: the camera zooms in on the
+monster, it strikes a pose, and the skill explodes across the screen. Make
+every effect POWERFUL, dynamic and beautiful — anime-game climax quality.
+
+Work order:
+  1. Generate image #01 and wait for my "OK".
+  2. After "OK", generate the rest one by one in the same look.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: high-quality anime game VFX, painterly but clean: hot white cores,
+soft luminous falloff, crisp sharp highlights, strong flowing shapes and
+clear motion direction. Readable at small size on a phone.
+COLOUR: GREYSCALE ONLY — white and greys. NO hue at all. Brightness = light.
+BACKGROUND: PURE BLACK #000000 everywhere outside the effect (exactly 0,0,0).
+NOT transparent, NOT dark blue, NOT a gradient.
+FORBIDDEN: characters, monsters, creatures with faces, objects, ground,
+scenery, text, letters, numbers, logos, frames, watermarks, coloured tints.
+(#02 and #04 are shapes made of light: no eyes, no faces, no realistic detail.)
+Every effect fades to black at least 40 px before every canvas edge.
+ORIGINAL DESIGN — do not copy effects from any existing game or anime.
+
+---------------------------------------------------------------------
+2. IMAGES (one per turn)
+---------------------------------------------------------------------
+#01  fx_flame_wave.png
+FIRE WAVE (sweeps across the enemy row)
+Canvas 1536 x 768. A wide horizontal wall of roaring flame tongues moving
+to the RIGHT: tall licking flames, brightest along the leading (right)
+edge, trailing wisps on the left. Base of the flames along y ≈ 640.
+
+#02  fx_flame_bird.png
+FLAME BIRD (a bird-shaped blast of fire that swoops at the enemies)
+Canvas 1024 x 1024. A majestic bird silhouette made entirely of flame,
+wings spread wide, flying toward the RIGHT, long flowing flame tail
+behind it. Pure fire shape — no eyes, no beak detail, no feathers drawn
+realistically. Centered.
+
+#03  fx_water_wave.png
+TIDAL WAVE (a great curling wave crashing on the enemies)
+Canvas 1536 x 768. A huge curling ocean wave breaking toward the RIGHT,
+foam crest, spray droplets, swirling inner water lines. Base along y ≈ 680.
+
+#04  fx_water_serpent.png
+WATER SERPENT (a long serpent shape of water that strikes)
+Canvas 1024 x 1024. A long coiling serpent-like stream of water rising
+from the bottom-left and striking toward the upper-right, with a blunt
+rounded head made of water (no face, no eyes, no horns), splashing
+droplets along its body.
+
+#05  fx_tornado.png
+TORNADO (vertical whirlwind standing on the target)
+Canvas 768 x 1024 (portrait). A tall swirling funnel of wind, narrow at
+the bottom center (384, 980) and wide at the top, spiral streaks, a few
+swirling leaf-blade shapes caught in it.
+
+#06  fx_wind_blades.png
+WIND BLADES (crescent cutting gusts)
+Canvas 1024 x 1024. Five sharp crescent-shaped blades of wind arranged in
+a fan, all flying toward the RIGHT, each with a bright cutting edge and a
+soft trailing tail.
+
+#07  fx_rock_spikes.png
+EARTH SPIKES (crystalline rock spikes erupting from the ground)
+Canvas 1536 x 768. A row of sharp jagged rock/crystal spikes bursting up
+from a ground line at y ≈ 700, tallest in the middle, with flying rock
+chunks and dust. Light on the edges and facets (greyscale).
+
+#08  fx_ground_crack.png
+GROUND SHATTER (seen from above, lies flat on the floor)
+Canvas 1024 x 1024, seen from DIRECTLY ABOVE (code squashes it into the
+floor perspective). Radial cracks spreading from a bright impact point in
+the center, glowing seams, small scattered fragments.
+
+#09  fx_holy_cross.png
+DIVINE STAR (light burst for holy skills)
+Canvas 1024 x 1024. A radiant eight-pointed star of light with a bright
+halo ring and fine rays between the points, sacred and elegant. Centered.
+
+#10  fx_dark_vortex.png
+SHADOW VORTEX (a swirling void that swallows enemies)
+Canvas 1024 x 1024. A spiral vortex of dark-energy streaks seen almost from
+the front, the CENTER is a black empty core, bright thin spiral arms and
+wispy tendrils around it. Centered.
+
+#11  fx_slash.png
+POWER SLASH (a huge crescent strike)
+Canvas 1024 x 1024. One enormous crescent slash arc from upper-left to
+lower-right, razor-bright inner edge, soft outer glow, a few sparks along
+the arc.
+
+#12  fx_speedlines.png
+ANIME SPEED LINES (frames the camera zoom on the monster before its ultimate)
+Canvas 1024 x 1024. Many thin radial lines converging toward the center,
+the CENTER circle (radius ≈ 300 px) completely EMPTY BLACK, lines brightest
+at the outer part and fading toward the center. Uneven lengths and widths.
+
+---------------------------------------------------------------------
+QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] Background is PURE BLACK #000000 (not transparent, not dark blue)
+  [ ] Greyscale only — no colour anywhere
+  [ ] Canvas sizes exactly as listed; nothing touches the canvas edges
+  [ ] Motion goes toward the RIGHT where stated (#01 #02 #03 #06)
+  [ ] No faces, no eyes, no characters, no text
+  [ ] #12 has an empty black centre
+
+---------------------------------------------------------------------
+PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_SKILL_FX.zip
+Exact file names (lowercase, PNG):
+  fx_flame_wave.png      fx_flame_bird.png
+  fx_water_wave.png      fx_water_serpent.png
+  fx_tornado.png         fx_wind_blades.png
+  fx_rock_spikes.png     fx_ground_crack.png
+  fx_holy_cross.png      fx_dark_vortex.png
+  fx_slash.png           fx_speedlines.png
+Add notes.txt listing any image you regenerated and why.
