@@ -14,6 +14,7 @@ export interface SaveData {
   team: number[];                   // monster uids, leader first
   nextUid: number;
   items: { soul: number };          // soul crystal: +1 skill level on any monster
+  dex: string[];                    // species ever obtained (monster book) — kept even after a unit is used as food
   eggs: EggSave[];
   eggPity: number;                  // mystery eggs in a row without gold+
   frags: Record<string, number>;
@@ -27,7 +28,7 @@ export const newMon = (uid: number, sid: string, lvl = 1, stars = natStars(sid),
   ({ uid, sid, lvl, exp: 0, stars, sk: [1, 1, 1], ...(rare ? { rare } : {}) });
 export function newSave(): SaveData {
   const mons = STARTERS.map((sid, i) => newMon(i + 1, sid, 5, 1));
-  return { v: 2, gold: 500, mons, team: [1, 2, 3, 4], nextUid: mons.length + 1, items: { soul: 0 }, eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, stages: {}, nextEggId: 2,
+  return { v: 2, gold: 500, mons, team: [1, 2, 3, 4], nextUid: mons.length + 1, items: { soul: 0 }, dex: [...STARTERS], eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, stages: {}, nextEggId: 2,
     settings: { sound: true, quality: 'high', skipUlt: false, speed: 1, auto: false } };
 }
 export function loadSave(): SaveData {
@@ -41,7 +42,9 @@ export function loadSave(): SaveData {
         for (const e of d.eggs) if (!e.kind) e.kind = 'named'; // P0 eggs were all species-known
         d.mons = d.mons.filter(m => SPECIES[m.sid]);
         for (const m of d.mons) { m.stars = Math.max(m.stars, natStars(m.sid)); m.sk ||= [1, 1, 1]; m.lvl = Math.min(m.lvl, levelCap(m.stars)); } // level caps per star (SW) // natural stars by rarity (2026-10-12)
-        d.team = d.team.filter(u => d.mons.some(m => m.uid === u));
+        d.dex = [...new Set([...(d.dex || []), ...d.mons.map(m => m.sid)])]; // monster book: everything owned counts as seen
+        const seen = new Set<string>(); // team rule: one per species (older saves could hold copies)
+        d.team = d.team.filter(u => { const m = d.mons.find(x => x.uid === u); if (!m || seen.has(m.sid)) return false; seen.add(m.sid); return true; });
         return d;
       }
     }

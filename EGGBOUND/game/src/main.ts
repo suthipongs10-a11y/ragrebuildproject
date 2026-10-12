@@ -2,7 +2,7 @@
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
 import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP } from './core/data';
 import { Battle } from './core/battle';
-import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc } from './render/assets';
+import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
 import { E, initCanvas, toWorld, updScripts, updParts, tickEngine, clearAll, worldTransform, drawGround, drawDecals, drawLanternPools, drawParts, drawFlies, drawLantern, drawBush, LANTERNS, BUSHES, drawOverlays, clamp } from './render/engine';
 import { BattleView } from './render/battleView';
@@ -11,7 +11,7 @@ import { HomeView } from './render/homeView';
 import { showChest } from './render/chestView';
 import { home, BDEF, upgrade, upgradeCost, maxLevelNow, mineStored, mineCap, collectMine, MINE_RATE, MINE_CAP_MIN, TURTLE_SCALE, CASTLE_COST, BUILDINGS, ELEMS, shrineCost, shrineUp, shrineMax, SHRINE_ATK, SHRINE_REACT, RELICS, buyRelic, equipRelic, homeMods, unlocked, needsIncub, incubSlots, incubOf, incubMs, startIncub, canHatch, HATCH_SPEED } from './game/home';
 import { loadSave, writeSave, resetSave, newMon } from './game/save';
-import { grantRewards, stageUnlocked, craftEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg, lootOf, monOf, copiesOf, evoCheck, evolve, skillUp, skillMaxed } from './game/progression';
+import { grantRewards, stageUnlocked, craftEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg, lootOf, monOf, copiesOf, teamHasSpecies, evoCheck, evolve, skillUp, skillMaxed } from './game/progression';
 import { EvolveView } from './render/evolveView';
 
 const $ = s => document.querySelector(s);
@@ -35,7 +35,7 @@ const NAV = [['home', 'บ้านเต่า', '<path d="M4 15c0-4 3.6-7 8-7s
   ['mons', 'มอน', '<path d="M5 18c0-6 3-11 7-11s7 5 7 11z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 7l-2-3M16 7l2-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="12" r="1" fill="currentColor"/><circle cx="14" cy="12" r="1" fill="currentColor"/>'],
   ['hatch', 'ฟักไข่', '<path d="M12 3c-4 0-7 6-7 10a7 7 0 0014 0c0-4-3-10-7-10z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 13l2 1.5 2-2 2 2 2-1.5" fill="none" stroke="currentColor" stroke-width="1.6"/>'],
   ['settings', 'ตั้งค่า', '<circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>']];
-let cur = 'home', teamCtx = null, selMon = null, confirmReset = false, monMode = null, food = [], skFlash = -1;
+let cur = 'home', teamCtx = null, selMon = null, confirmReset = false, monMode = null, food = [], skFlash = -1, monTab = 'mine', dexSel = null, dexEl = 'all';
 function renderNav() {
   $('#nav').innerHTML = NAV.map(([id, l, svg]) => `<button type="button" data-nav="${id}" ${cur === id ? 'aria-current="page"' : ''}><svg viewBox="0 0 24 24">${svg}</svg>${l}${id === 'hatch' && actionableEggs() ? `<span class="badge">${actionableEggs()}</span>` : ''}</button>`).join('');
 }
@@ -43,6 +43,8 @@ function actionableEggs() { const free = incubSlots(S) - home(S).incub.length; l
 function show(id) { cur = id; teamCtx = id === 'team' ? teamCtx : null; render(); }
 const starStr = (n, max = MAX_STARS) => Array.from({ length: max }, (_, i) => i < n ? '★' : '<span class="off">★</span>').join('');
 const elDot = el => `<span class="ed" style="background:${PAL[el].aura}" title="${ELEM_NAME[el]}"></span>`;
+/** small message at the bottom of the screen */
+function toast(msg) { document.querySelector('.toast')?.remove(); const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.classList.add('out'), 2200); setTimeout(() => t.remove(), 2700); }
 function render() {
   const el = $('#screens'); renderNav(); $('#nav').hidden = false; $('#bhud').hidden = true;
   if (cur === 'home') { if (!homeV) homeV = new HomeView(S, { onSelect: id => { selB = id; renderPanel(); } }); homeV.S = S; homeV.syncMons(); if (!battle && !hatch) scene = homeV; el.innerHTML = homeHTML(); renderPanel(); return; }
@@ -66,23 +68,50 @@ const look = m => lookOf(m.sid, m.stars);
 const units = () => [...S.mons].sort((a, b) => b.stars - a.stars || b.lvl - a.lvl || a.sid.localeCompare(b.sid) || a.uid - b.uid);
 function monCard(uid, opts = {}) {
   const m = monOf(S, uid), s = SPECIES[m.sid];
-  return `<button type="button" class="mcard ${opts.on ? 'on' : ''} ${opts.pick ? 'pick' : ''} ${s.rarity}" style="${rcVar(s)}" data-mon="${uid}">${opts.tag ? `<span class="tag">${opts.tag}</span>` : ''}${m.rare ? '<span class="rf" title="ร่างหายาก">✦</span>' : ''}<span class="pic ${m.rare ? 'rfp' : ''}"><img src="${portrait(look(m))}" alt=""></span><span class="n">${esc(s.name)}</span><span class="stars" style="font-size:.7rem">${starStr(m.stars)}</span><span class="lv">Lv.${m.lvl} ${elDot(s.elem)}</span></button>`;
+  return `<button type="button" class="mcard ${opts.on ? 'on' : ''} ${opts.pick ? 'pick' : ''} ${opts.dup ? 'dup' : ''} ${s.rarity}" style="${rcVar(s)}" data-mon="${uid}">${opts.tag ? `<span class="tag">${opts.tag}</span>` : ''}${m.rare ? '<span class="rf" title="ร่างหายาก">✦</span>' : ''}<span class="pic ${m.rare ? 'rfp' : ''}"><img src="${portrait(look(m))}" alt=""></span><span class="n">${esc(s.name)}</span><span class="stars" style="font-size:.7rem">${starStr(m.stars)}</span><span class="lv">Lv.${m.lvl} ${elDot(s.elem)}</span></button>`;
 }
 function teamHTML() {
   const owned = units(), lm = monOf(S, S.team[0]), lead = lm && SPECIES[lm.sid].leader;
   return `<section class="scr dim"><div class="wrap">${topbar('จัดทีม', teamCtx ? `ด่าน ${teamCtx} · เลือก 4 ตัว ตัวแรกเป็นผู้นำ` : 'เลือก 4 ตัว ตัวแรกเป็นผู้นำ')}
   <div class="slots">${[0, 1, 2, 3].map(i => { const m = monOf(S, S.team[i]); return m ? `<button type="button" class="slot fill" data-slot="${i}">${i === 0 ? '<b>ผู้นำ</b>' : '<b>&nbsp;</b>'}<span class="pic"><img src="${portrait(look(m))}" alt=""></span>${esc(SPECIES[m.sid].name)}<span class="stars" style="font-size:.66rem">${starStr(m.stars)}</span></button>` : `<div class="slot">${i === 0 ? '<b>ผู้นำ</b>' : ''}ว่าง</div>`; }).join('')}</div>
   <div class="lead">สกิลผู้นำ: <b>${lead ? esc(lead.text) : '—'}</b></div>
-  <h2 class="sec">มอนของคุณ (แตะเพื่อเพิ่ม/เอาออก)</h2><div class="mgrid">${owned.map(m => monCard(m.uid, { on: S.team.includes(m.uid), tag: S.team[0] === m.uid ? 'ผู้นำ' : S.team.includes(m.uid) ? S.team.indexOf(m.uid) + 1 : '' })).join('')}</div>
+  <h2 class="sec">มอนของคุณ (แตะเพื่อเพิ่ม/เอาออก · ชนิดเดียวกันลงได้ 1 ตัว)</h2><div class="mgrid">${owned.map(m => { const inT = S.team.includes(m.uid), dup = !inT && teamHasSpecies(S, m.sid); return monCard(m.uid, { on: inT, dup, tag: S.team[0] === m.uid ? 'ผู้นำ' : inT ? S.team.indexOf(m.uid) + 1 : dup ? 'ซ้ำ' : '' }); }).join('')}</div>
   <div class="row sticky">${teamCtx ? `<button class="go" type="button" data-act="fight" ${S.team.length === 4 ? '' : 'disabled'}>เริ่มต่อสู้</button><button class="alt" type="button" data-nav="map">กลับ</button>` : `<button class="alt" type="button" data-nav="map">เสร็จ</button>`}</div>
   ${S.team.length < 4 ? '<p class="note">ทีมต้องมีครบ 4 ตัว</p>' : ''}</div></section>`;
 }
 function stats(m, stars = m.stars, lvl = m.lvl) { const s = SPECIES[m.sid]; return { hp: statAt(s.base.hp, lvl, stars), atk: statAt(s.base.atk, lvl, stars), def: statAt(s.base.def, lvl, stars), spd: spdAt(s.base.spd, lvl, stars) }; }
 const skLv = (m, i) => `<span class="sklv ${m.sk[i] >= SKILL_MAX[i] ? 'max' : ''} ${skFlash === i ? 'up' : ''}">Lv.${m.sk[i]}/${SKILL_MAX[i]}</span>`;
+const monTabs = () => { const all = Object.values(SPECIES).filter(x => !x.boss).length; return `<div class="seg mtabs"><button type="button" class="${monTab === 'mine' ? 'on' : ''}" data-mt="mine">คลังของฉัน</button><button type="button" class="${monTab === 'dex' ? 'on' : ''}" data-mt="dex">สารบัญมอน ${S.dex.length}/${all}</button></div>`; };
+const REALM = { A: 'ทุ่งไข่ป่วน', B: 'สุวรรณภูมิ', C: 'สวรรค์บูรพา', S: 'ตำนานดารา' };
+/** monster book: every species in the game; ones never obtained are dark silhouettes but can still be opened */
+function dexHTML() {
+  const all = Object.values(SPECIES).filter(x => !x.boss).sort((a, b) => a.id.localeCompare(b.id)), got = new Set(S.dex);
+  const nGot = all.filter(x => got.has(x.id)).length, list = dexEl === 'all' ? all : all.filter(x => x.elem === dexEl);
+  const cnt = (arr, key) => Object.entries(arr.reduce((o, x) => { const k = x[key]; o[k] = o[k] || [0, 0]; o[k][1]++; if (got.has(x.id)) o[k][0]++; return o; }, {}));
+  const elChips = `<button type="button" class="chip ${dexEl === 'all' ? 'on' : ''}" data-dexel="all">ทั้งหมด ${nGot}/${all.length}</button>` + Object.keys(ELEM_NAME).map(el => { const a = all.filter(x => x.elem === el); return a.length ? `<button type="button" class="chip ${dexEl === el ? 'on' : ''}" data-dexel="${el}">${elDot(el)} ${ELEM_NAME[el]} ${a.filter(x => got.has(x.id)).length}/${a.length}</button>` : ''; }).join('');
+  const roles = cnt(all, 'role').map(([r, [g, t]]) => `<span class="chip">${ROLE_NAME[r]} ${g}/${t}</span>`).join('');
+  const rars = ['common', 'rare', 'epic', 'legendary'].map(r => { const a = all.filter(x => x.rarity === r); return a.length ? `<span class="chip rar" style="${rcVar({ rarity: r })}">${RARITY_NAME[r]} ${a.filter(x => got.has(x.id)).length}/${a.length}</span>` : ''; }).join('');
+  let det = '';
+  if (dexSel && SPECIES[dexSel]) {
+    const s = SPECIES[dexSel], has = got.has(s.id), nat = natStars(s.id), img = masterURL(s.id) || portrait(s.id);
+    const lo = { hp: statAt(s.base.hp, 1, nat), atk: statAt(s.base.atk, 1, nat), def: statAt(s.base.def, 1, nat) }, hi = { hp: statAt(s.base.hp, 40, 6), atk: statAt(s.base.atk, 40, 6), def: statAt(s.base.def, 40, 6) };
+    det = `<div class="detail dexd"><span class="dbig ${has ? '' : 'unk'}"><img src="${img}" alt=""></span><div style="min-width:0"><h3>${esc(s.name)} <small class="note">${esc(s.nameEn)}</small></h3>
+    <div class="row" style="gap:6px;flex:0 0 auto;margin:6px 0"><span class="chip">${elDot(s.elem)} ${ELEM_NAME[s.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}<span class="chip">${REALM[s.id[0]] || ''}</span></div>
+    <div class="stars">${starStr(nat)}</div><div class="note">${has ? '<b style="color:#8fe39a">✓ ได้มาแล้ว</b>' : '<b style="color:#e8b0a0">ยังไม่ได้</b> · หาได้จากไข่ปริศนา'}${copiesOf(S, s.id) ? ` · มีอยู่ ${copiesOf(S, s.id)} ตัว` : ''}</div>
+    <div class="stat"><div>HP<b>${lo.hp}</b><small>★6 เต็ม ${hi.hp}</small></div><div>ATK<b>${lo.atk}</b><small>★6 เต็ม ${hi.atk}</small></div><div>DEF<b>${lo.def}</b><small>★6 เต็ม ${hi.def}</small></div><div>SPD<b>${s.base.spd}</b><small>ฐาน</small></div></div></div>
+    <div class="skl">${s.skills.map((k, i) => `<div><b>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)} · ${esc(k.name)}</b>${esc(k.desc)}${k.cd ? `<em>คูลดาวน์ ${k.cd}</em>` : ''}</div>`).join('')}${s.leader ? `<div><b>ผู้นำ</b>${esc(s.leader.text)}</div>` : ''}<div class="row" style="align-items:center;gap:10px"><img src="${eggURL(s.id)}" alt="" style="width:44px;height:44px"><span class="note">ไข่ของ${esc(s.name)}</span><button class="alt" type="button" data-dex="" style="margin-left:auto">ปิด</button></div></div></div>`;
+  }
+  return `<section class="scr dim"><div class="wrap">${topbar('สารบัญมอน', `ค้นพบแล้ว ${nGot} จาก ${all.length} ตัว`)}${monTabs()}
+  <div class="bar" style="margin:4px 0 10px"><i style="transform:scaleX(${nGot / all.length})"></i></div>
+  <div class="dexsum"><div class="row">${elChips}</div><div class="row">${roles}</div><div class="row">${rars}</div></div>
+  ${det}
+  <div class="mgrid">${list.map(s => { const has = got.has(s.id); return `<button type="button" class="mcard dexc ${has ? '' : 'locked'} ${dexSel === s.id ? 'on' : ''} ${s.rarity}" style="${has ? rcVar(s) : ''}" data-dex="${s.id}"><span class="tag">${s.id}</span><span class="pic"><img src="${portrait(s.id)}" alt=""></span><span class="n">${esc(s.name)}</span><span class="lv">${elDot(s.elem)} ${ROLE_NAME[s.role]}</span></button>`; }).join('')}</div></div></section>`;
+}
 function monsHTML() {
+  if (monTab === 'dex') return dexHTML();
   const owned = units(); if (!selMon || !monOf(S, selMon)) { selMon = owned[0].uid; monMode = null; food = []; }
   const m = monOf(S, selMon), s = SPECIES[m.sid], st = stats(m), fr = S.frags[m.sid] || 0, cap = levelCap(m.stars), copies = copiesOf(S, m.sid) - 1;
-  return `<section class="scr dim"><div class="wrap">${topbar('คลังมอน', owned.length + ' ตัว')}
+  return `<section class="scr dim"><div class="wrap">${topbar('คลังมอน', owned.length + ' ตัว')}${monTabs()}
   <div class="detail"><span class="big"><img src="${portrait(look(m))}" alt=""></span><div style="min-width:0"><h3>${esc(s.name)}</h3><div class="row" style="gap:6px;flex:0 0 auto;margin:6px 0"><span class="chip">${elDot(s.elem)} ${ELEM_NAME[s.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}${m.rare ? '<span class="chip rfc">✦ ร่างหายาก</span>' : ''}</div>
   <div class="stars">${starStr(m.stars)}</div><div class="note">Lv.${m.lvl} / ${cap}${m.lvl >= cap ? ' · <b style="color:var(--gold)">เลเวลเต็ม</b>' : ` · EXP ${m.exp}/${expToNext(m.lvl)}`}</div><div class="bar" style="margin-top:4px"><i style="transform:scaleX(${m.lvl >= cap ? 1 : m.exp / expToNext(m.lvl)})"></i></div>
   <div class="stat"><div>HP<b>${st.hp}</b></div><div>ATK<b>${st.atk}</b></div><div>DEF<b>${st.def}</b></div><div>SPD<b>${st.spd}</b></div></div>
@@ -291,7 +320,7 @@ function startHatch(eggId, forceRarity = null) {
     const r = hatchEgg(S, eggId); save(); if (!r) return;
     const s = SPECIES[r.sid], more = S.eggs.filter(e => canHatch(S, e)).length;
     const title = 'ฟักสำเร็จ!';
-    const note = `${ELEM_NAME[s.elem]} · ${ROLE_NAME[s.role]} · เข้าคลังมอนแล้ว` + (r.copies ? `<br>ตัวซ้ำ (มีอยู่แล้ว ${r.copies} ตัว) · ใช้ป้อนอัปสกิล หรือเป็นอาหารอัปดาว` : '');
+    const note = (r.newDex ? '<b style="color:var(--gold)">✦ บันทึกลงสารบัญมอนครั้งแรก!</b><br>' : '') + `${ELEM_NAME[s.elem]} · ${ROLE_NAME[s.role]} · เข้าคลังมอนแล้ว` + (r.copies ? `<br>ตัวซ้ำ (มีอยู่แล้ว ${r.copies} ตัว) · ใช้ป้อนอัปสกิล หรือเป็นอาหารอัปดาว` : '');
     const modal = document.createElement('div'); modal.className = 'modal'; modal.id = 'hatchModal'; modal.style.background = 'rgba(6,8,6,.25)'; modal.style.alignItems = 'end';
     modal.innerHTML = `<div class="card" style="margin-bottom:calc(env(safe-area-inset-bottom,0px) + 12px)"><h2>${title}</h2><p style="text-align:center;margin:0;font-family:var(--f-display);font-size:1.3rem">${esc(s.name)}</p><p style="text-align:center;margin:4px 0 0">${rarChip(s)}</p>${r.rare ? '<p class="rfnote">✦ ร่างหายาก! สีและออร่าพิเศษ</p>' : ''}<div class="bigstars">${Array.from({ length: MAX_STARS }, (_, i) => `<span class="${i < r.stars ? '' : 'off'}" style="animation-delay:${.1 + i * .12}s">${starHTML(i < r.stars)}</span>`).join('')}</div><p class="note" style="text-align:center">${note}</p><div class="row"><button class="go" type="button" data-h="more">${more ? `ฟักต่อ (${more})` : 'กลับหน้าฟักไข่'}</button><button class="alt" type="button" data-h="map">แผนที่</button></div></div>`;
     document.body.appendChild(modal);
@@ -326,7 +355,7 @@ function startEvolve(uid, foodUids) {
 // prototype-only test tools (remove before the public playtest)
 function devTool(k) {
   if (k === 'eggs') { for (const t of EGG_TIER_ORDER) { let e; do { e = rollMysteryEgg({ ...S, eggPity: 0 }, Math.random); } while (e.tier !== t); e.id = S.nextEggId++; S.eggs.push(e); } }
-  if (k === 'mons') { for (const sid of Object.keys(SPECIES)) if (!SPECIES[sid].boss && !copiesOf(S, sid)) S.mons.push(newMon(S.nextUid++, sid, 5)); save(); sfx.chime(); show('mons'); return; }
+  if (k === 'mons') { for (const sid of Object.keys(SPECIES)) if (!SPECIES[sid].boss && !copiesOf(S, sid)) { S.mons.push(newMon(S.nextUid++, sid, 5)); if (!S.dex.includes(sid)) S.dex.push(sid); } save(); sfx.chime(); show('mons'); return; }
   if (k === 'evo') { // prepare the selected monster (or the first) for an evolution + a skill-up
     const m = monOf(S, selMon) || units()[0]; m.lvl = levelCap(m.stars); S.gold += 50000; S.items.soul += 2;
     const pool = Object.values(SPECIES).filter(x => !x.boss);
@@ -361,9 +390,16 @@ document.addEventListener('click', e => {
   if (d.nav) { sfx.click(); if (battle) leaveBattle(); if (hatch) leaveHatch(); confirmReset = false; show(d.nav); }
   else if (d.stage) { sfx.click(); teamCtx = d.stage; show('team'); }
   else if (d.act === 'fight') { sfx.click(); const id = teamCtx; teamCtx = null; startBattle(id); }
-  else if (d.mon && cur === 'team') { const uid = +d.mon, i = S.team.indexOf(uid); if (i >= 0) S.team.splice(i, 1); else if (S.team.length < 4) S.team.push(uid); save(); sfx.click(); render(); }
+  else if (d.mon && cur === 'team') { const uid = +d.mon, i = S.team.indexOf(uid), m = monOf(S, uid);
+    if (i >= 0) S.team.splice(i, 1);
+    else if (teamHasSpecies(S, m.sid)) { toast(`มี${SPECIES[m.sid].name}ในทีมแล้ว — มอนชนิดเดียวกันลงทีมได้ 1 ตัว`); return; }
+    else if (S.team.length < 4) S.team.push(uid);
+    save(); sfx.click(); render(); }
   else if (d.slot && cur === 'team') { const i = +d.slot; if (i > 0) { const uid = S.team.splice(i, 1)[0]; S.team.unshift(uid); } else S.team.splice(0, 1); save(); sfx.click(); render(); }
   else if (d.mon && cur === 'mons') { pickMon(+d.mon); }
+  else if (d.mt) { sfx.click(); monTab = d.mt; dexSel = null; render(); }
+  else if (d.dexel) { sfx.click(); dexEl = d.dexel; render(); }
+  else if (d.dex !== undefined && cur === 'mons') { sfx.click(); dexSel = d.dex || null; render(); if (dexSel) document.querySelector('.dexd')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); }
   else if (d.mm) { sfx.click(); monMode = d.mm === 'close' || monMode === d.mm ? null : d.mm; food = []; skFlash = -1; render(); }
   else if (d.evo === 'go') { startEvolve(selMon, [...food]); }
   else if (d.sku) { const slot = skillUp(S, selMon, d.sku === 'soul' ? null : +d.sku); if (slot >= 0) { save(); sfx.starup(); skFlash = slot; food = []; render(); setTimeout(() => { skFlash = -1; }, 50); } }

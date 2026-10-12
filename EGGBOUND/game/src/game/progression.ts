@@ -80,16 +80,18 @@ export function eggOdds() {
 
 export const monOf = (s: SaveData, uid: number) => s.mons.find(m => m.uid === uid);
 export const copiesOf = (s: SaveData, sid: string) => s.mons.filter(m => m.sid === sid).length;
+/** team rule: one monster per species (a second copy of the same species can't join) */
+export const teamHasSpecies = (s: SaveData, sid: string, except = -1) => s.team.some(u => u !== except && monOf(s, u)?.sid === sid);
 
-export interface HatchResult { uid: number; sid: string; egg: EggSave; stars: number; copies: number; rare: boolean }
+export interface HatchResult { uid: number; sid: string; egg: EggSave; stars: number; copies: number; rare: boolean; newDex?: boolean }
 /** hatch an egg: always a new monster at its natural stars (copies are separate units, used as food later).
  *  copies = how many of that species were owned before. Eggs still incubating can't hatch. */
 export function hatchEgg(s: SaveData, eggId: number, now = Date.now()): HatchResult | null {
   const i = s.eggs.findIndex(e => e.id === eggId); if (i < 0 || !canHatch(s, s.eggs[i], now)) return null;
   const egg = s.eggs[i], { sid } = egg, rare = !!egg.rare, copies = copiesOf(s, sid);
   s.eggs.splice(i, 1); endIncub(s, eggId);
-  const m = newMon(s.nextUid++, sid, 1, undefined, rare); s.mons.push(m);
-  return { uid: m.uid, sid, egg, stars: m.stars, copies, rare };
+  const fresh = !s.dex.includes(sid), m = newMon(s.nextUid++, sid, 1, undefined, rare); s.mons.push(m); if (fresh) s.dex.push(sid);
+  return { uid: m.uid, sid, egg, stars: m.stars, copies, rare, newDex: fresh };
 }
 
 // ---- evolution (อัปดาว) & skill-ups ----

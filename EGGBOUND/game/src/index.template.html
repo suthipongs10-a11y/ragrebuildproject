@@ -122,6 +122,15 @@ h2.sec{margin:0;font-family:var(--f-display);font-weight:500;font-size:.8rem;let
 .sklv.max{background:var(--gold);color:#2a1a08}
 .sklv.up{animation:skup 1.2s ease-out}
 @keyframes skup{0%{transform:scale(2.2);background:#fff6c8;color:#2a1a08;box-shadow:0 0 18px #ffd24a}100%{transform:scale(1)}}
+.mtabs{margin:-4px 0 12px}.mtabs button{flex:1;padding:9px 10px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink-dim);font:600 .86rem var(--f-body,inherit)}.mtabs button.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}
+.dexsum{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.dexsum .row{gap:6px}.dexsum .chip{white-space:nowrap;flex:0 0 auto}.dexsum button.chip{cursor:pointer}.dexsum .chip.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}
+.mcard.dexc .tag{background:rgba(255,255,255,.12);color:var(--ink-dim);font-weight:600}
+.mcard.locked .pic img{filter:brightness(0) drop-shadow(0 0 1px rgba(255,255,255,.5));opacity:.75}.mcard.locked .n{color:var(--ink-faint)}
+.dexd{margin-bottom:12px}.dexd .dbig{width:150px;height:150px;border-radius:16px;background:radial-gradient(circle,rgba(255,220,150,.18),transparent 70%);display:grid;place-items:center}.dexd .dbig img{width:100%;height:150px;object-fit:contain}
+.dexd .stat small{display:block;font-size:.6rem;color:var(--ink-faint);margin-top:2px}
+@media (max-width:520px){.dexd .dbig{width:100%;height:190px}.dexd .dbig img{height:190px}.detail.dexd{grid-template-columns:1fr}}
+.mcard.dup{opacity:.45;filter:grayscale(.6)}.mcard.dup .tag{background:#8a7a6a;color:#fff}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 92px);translate:-50% 0;z-index:80;max-width:min(92vw,440px);padding:10px 16px;border-radius:12px;background:rgba(20,16,12,.94);border:1px solid var(--gold);color:var(--ink);font-size:.85rem;text-align:center;box-shadow:0 6px 24px rgba(0,0,0,.5);animation:pop .25s both;transition:opacity .4s}.toast.out{opacity:0}
 .mcard.pick{border-color:#5fd864;box-shadow:0 0 0 2px rgba(95,216,100,.35)}
 .mcard.pick .tag{background:#5fd864}
 .bar{position:relative;height:10px;border-radius:99px;background:rgba(0,0,0,.5);overflow:hidden}

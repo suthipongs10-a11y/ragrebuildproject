@@ -54,6 +54,8 @@ function hueShift(img, E) {
 /** result / reward star: BATCH14 art when present, else a glyph styled by CSS (.bigstars) */
 export const starHTML = (on: boolean) => { const im = IMG[on ? 'ui_star' : 'ui_star_empty']; return im ? `<img src="${im.src}" alt="">` : '★'; };
 export const uiSrc = (name: string) => IMG[name] ? IMG[name].src : null;
+/** full-body master art URL for the monster book (falls back to the round portrait) */
+export const masterURL = (sid: string) => { const s = SPECIES[sid]; return s && s.art && IMG[s.art + '_master'] ? IMG[s.art + '_master'].src : null; };
 export const baseOf = (sid: string) => sid.split('~')[0];
 const SP = sid => SPECIES[baseOf(sid)];
 const lookLv = sid => +(sid.split('~')[1] || 0);

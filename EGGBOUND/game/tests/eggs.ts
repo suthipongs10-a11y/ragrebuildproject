@@ -1,7 +1,7 @@
 // Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
 import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
-import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp } from '../src/game/progression';
+import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies } from '../src/game/progression';
 import { startIncub, incubLeft, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
 
 export function eggTests(): number {
@@ -59,6 +59,11 @@ export function eggTests(): number {
     const slot = skillUp(s, 1, 60, () => 0); ok(slot === 0 && monOf(s, 1)!.sk[0] === 2 && !monOf(s, 60), 'copy eaten, +1 skill');
     ok(skillUp(s, 1, null) === -1, 'no soul crystal'); s.items.soul = 1; ok(skillUp(s, 1, null, () => .99) === 2 && s.items.soul === 0, 'soul crystal works');
     const k = SPECIES.A01.skills[2], top = skillAt(k, SKILL_MAX[2], 2); ok(top.mult > k.mult && top.cd === k.cd - 1, 'max skill: more damage, -1 cooldown'); }
+
+  // team rule: one per species; a saved team holding two copies is cleaned on load
+  { const s = newSave(); s.mons.push(newMon(70, 'A01')); ok(teamHasSpecies(s, 'A01') && !teamHasSpecies(s, 'A05') && !teamHasSpecies(s, 'A01', 1), 'team species check');
+    const store: Record<string, string> = {}; (globalThis as any).localStorage = { getItem: (k: string) => store[k] ?? null, setItem: (k: string, v: string) => { store[k] = v; }, removeItem: (k: string) => { delete store[k]; } };
+    s.team = [1, 70, 2]; writeSave(s); ok(loadSave().team.join() === '1,2', 'duplicate species removed from team on load'); delete (globalThis as any).localStorage; }
 
   // v1 save (one entry per species) → v2 units
   { const store: Record<string, string> = {}; (globalThis as any).localStorage = { getItem: (k: string) => store[k] ?? null, setItem: (k: string, v: string) => { store[k] = v; }, removeItem: (k: string) => { delete store[k]; } };
