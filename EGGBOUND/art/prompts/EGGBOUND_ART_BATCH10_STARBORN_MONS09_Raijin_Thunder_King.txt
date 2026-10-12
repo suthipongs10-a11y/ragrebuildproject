@@ -1,0 +1,124 @@
+=====================================================================
+EGGBOUND — ART BATCH 10 (STARBORN LEGENDS) : MON_S09 "Raijin Thunder King" (ราชาอัสนีไรจิน)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- เปิดแชทใหม่ใน ChatGPT 1 แชทต่อมอน 1 ตัว (ห้ามรวมหลายตัวในแชทเดียว ตัวจะปนกัน)
+- แนบ 2 อย่าง: ไฟล์นี้ + mon001_master (จิ้งจอก ไฟล์อยู่ที่ EGGBOUND/game/assets/mon001_master.webp หรือ png ต้นฉบับถ้ามี) ใช้เป็น "ภาพอ้างอิงสไตล์" เท่านั้น
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ให้ดีก่อนตอบ "OK" (เป็นต้นแบบของทุกภาพ)
+- ชุดพิเศษ "ตำนานดารา" (Starborn Legend) · ธาตุ WIND · บทบาท Controller
+- ได้ zip แล้วส่งกลับมาที่แชท Claude (ส่งทีละตัวหรือรวมกันก็ได้)
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D turn-based monster RPG. Generate 12
+images, ONE IMAGE PER TURN, in the order below. The images are animated
+by code, so CONSISTENCY matters more than creativity: every image must
+show the exact same character.
+
+The attached mon001_master (a fire fox) is a STYLE REFERENCE ONLY:
+match its art style, shading, line quality, lighting, camera angle and
+level of detail. Do NOT copy the fox's design, colors or body.
+
+Work order:
+  1. Generate #01 (MASTER). Show it and wait for my "OK".
+  2. After "OK", generate #02–#12 one by one, each time using #01 as the
+     character reference.
+  3. Run the QUALITY CHECK, then package the ZIP (section 6).
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Cute-but-cool proportions: slightly big head, expressive eyes, strong pose.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Camera: HIGH ANGLE about 55 degrees looking down, orthographic feel.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: ground, cast shadow, glow, aura, fire/particles/sparks, motion lines,
+text, letters, watermark, frame, second character.
+ORIGINAL DESIGN - do not copy or resemble any existing game, film, anime
+or novel character (Dota, League of Legends, Summoners War, Pokemon, etc.).
+Myth source (public domain): Japanese mythology (public domain): Raijin, the thunder god who beats a ring of drums.
+
+Technical rules:
+- Canvas 1024 x 1024 px PNG, subject centered, at least 80 px empty margin.
+- The lowest point (feet / bottom of body) sits on an invisible ground
+  line at y ≈ 870 px in EVERY image.
+- SAME SCALE in every image of this set.
+
+---------------------------------------------------------------------
+2. CHARACTER SHEET — MON_S09 Raijin Thunder King
+---------------------------------------------------------------------
+- Species: a young thunder oni king — a muscular oni-like spirit with a ring of taiko drums floating in an arc behind it. Element WIND (storm), role Controller (wild, loud, playful but mighty).
+- Skin: deep blue-violet, two short golden horns, a wild white mane of hair like storm clouds.
+- Drums: a large ring/arc of 8 small taiko drums connected by a golden frame behind its back, each drum with an original tomoe-like swirl emblem.
+- Clothing: a tiger-striped loincloth-style wrap with a gold belt (fully covered, game-appropriate), gold arm rings, a flowing cloud-white scarf.
+- Weapons: two drumsticks shaped like lightning bolts.
+- Face: big grin, fierce golden eyes.
+- Must NOT resemble Raiden (Mortal Kombat), Raiden Shogun (Genshin) or any existing character.
+- Size: STARBORN LEGEND class - body height about 72-77% of the canvas (top margin still at least 80 px). The most awe-inspiring designs of the game: regal, intricate, unforgettable silhouettes that still read clearly on a phone.
+- STARBORN set look (shared by all 10 of this set): each one has a few small painted star-points and thin gold constellation lines
+  worked into its armor/markings (painted, not glowing) and one deep-indigo "night sky" accent color. Majestic, ornate, legendary.
+
+---------------------------------------------------------------------
+3. VIEWS
+---------------------------------------------------------------------
+FRONT VIEW = 3/4 front view from the high 55° camera, body facing
+             BOTTOM-RIGHT. We see the face and front.
+BACK VIEW  = 3/4 back view from the same camera, body facing TOP-RIGHT.
+             We see the back and only part of the side of the face.
+
+---------------------------------------------------------------------
+4. IMAGE LIST
+---------------------------------------------------------------------
+For #02–#11 start every prompt with:
+"Using the attached reference as the EXACT same character (same design,
+colors, markings, proportions, scale, line style and lighting),
+following all MASTER STYLE rules:"
+
+#01  MASTER (FRONT VIEW) — full-body character design in the idle pose.
+     This image defines the character for all others.
+#02  FRONT VIEW — IDLE:   Standing with drumsticks on its shoulders, grinning, drum ring behind it.
+#03  FRONT VIEW — ATTACK: Leaping forward toward bottom-right, smashing a drumstick down like a lightning strike.
+#04  FRONT VIEW — CAST:   Floating up, beating the drums behind it with both sticks, hair and scarf flying upward.
+#05  FRONT VIEW — HIT:    Knocked back, drumsticks flailing, eyes squeezed shut.
+#06  FRONT VIEW — BURST:  Ultimate pose: arms spread wide with sticks raised, the whole drum ring rising behind it like a halo, roaring with laughter.
+#07  BACK VIEW — IDLE   (same pose idea as #02, BACK VIEW)
+#08  BACK VIEW — ATTACK (same pose idea as #03, moving toward TOP-RIGHT)
+#09  BACK VIEW — CAST   (same pose idea as #04, BACK VIEW)
+#10  BACK VIEW — HIT    (same pose idea as #05, recoiling toward bottom-left)
+#11  BACK VIEW — BURST  (same pose idea as #06, BACK VIEW)
+#12  EGG — A blue-violet egg with white storm-cloud swirls, a ring of tiny drum shapes around its middle and a small golden horn pair on top.
+     Oval egg standing upright, height ~55% of canvas, bottom at y ≈ 870 px,
+     same art style and lighting, no nest, no cracks, no glow.
+
+---------------------------------------------------------------------
+5. QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] Same face, colors, markings and proportions as #01 in every image
+  [ ] Same scale; lowest point at ~y 870 px
+  [ ] Correct facing (FRONT → bottom-right, BACK → top-right)
+  [ ] No ground, shadow, glow, particles, motion lines or text
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Nothing cropped; style matches the fox reference
+  [ ] Does not resemble any existing game/anime character
+
+---------------------------------------------------------------------
+6. FILE NAMES & ZIP
+---------------------------------------------------------------------
+  #01 monS09_master.png
+  #02 monS09_front_idle.png      #07 monS09_back_idle.png
+  #03 monS09_front_attack.png    #08 monS09_back_attack.png
+  #04 monS09_front_cast.png      #09 monS09_back_cast.png
+  #05 monS09_front_hit.png       #10 monS09_back_hit.png
+  #06 monS09_front_burst.png     #11 monS09_back_burst.png
+  #12 eggS09.png
+
+ZIP name: EGGBOUND_MONS09_SET.zip (all PNGs in the root) + notes.txt listing
+each file, background type, and any image regenerated and why.
+=====================================================================
+END OF FILE
+=====================================================================
