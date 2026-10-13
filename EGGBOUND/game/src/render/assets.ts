@@ -177,6 +177,7 @@ function eggPath(x, cx = 254, cy = 300, rx = 92, ry = 125) {
 const MEGG = {};
 export function mysteryEggImg(tier) {
   if (MEGG[tier]) return MEGG[tier];
+  if (IMG['eggM_' + tier]) return (MEGG[tier] = IMG['eggM_' + tier]); // BATCH11 painted shells; the code-drawn ones below are the fallback
   const c = mk(512, 512), x = c.getContext('2d'), base = {
     common: ['#fbf3e2', '#d9c5a2'], silver: ['#f4f8fc', '#9fb2c6'], gold: ['#fff1c2', '#d79a2a'], rainbow: ['#ffffff', '#c9b8ff'] }[tier];
   x.save(); eggPath(x); x.clip();
@@ -209,7 +210,7 @@ export function mysteryEggImg(tier) {
 /** image / data URL for any egg: named → species egg art, mystery → tier shell */
 export const eggOf = egg => egg.kind === 'mystery' ? mysteryEggImg(egg.tier) : eggImg(egg.sid);
 const MEGGU = {};
-export const eggURLOf = egg => egg.kind === 'mystery' ? (MEGGU[egg.tier] || (MEGGU[egg.tier] = mysteryEggImg(egg.tier).toDataURL('image/webp', .9))) : eggURL(egg.sid);
+export const eggURLOf = egg => egg.kind === 'mystery' ? (MEGGU[egg.tier] || (MEGGU[egg.tier] = (im => im.toDataURL ? im.toDataURL('image/webp', .9) : im.src)(mysteryEggImg(egg.tier)))) : eggURL(egg.sid);
 
 // ---- light sprites (batch 06): white + alpha images tinted to any colour, drawn additively ----
 const TINT = {};

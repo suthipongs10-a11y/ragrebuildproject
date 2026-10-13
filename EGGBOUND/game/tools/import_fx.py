@@ -20,6 +20,8 @@ OBJ = {  # name -> output size
     # BATCH15 adventure book (opaque textures + transparent seal/emblem/ribbon)
     'book_page': (768, 768), 'book_cover': (768, 768), 'book_emblem': (160, 160), 'book_seal': (128, 128), 'book_ribbon': (64, 256),
 }
+# BATCH11 mystery eggs: placed like monster eggs (import_art.py) — 254 px tall, bottom at y=425 on a 512 canvas
+EGGS = ['eggM_common', 'eggM_silver', 'eggM_gold', 'eggM_rainbow']
 LIGHT = {
     'hatch_altar_glow': (768, 768), 'fx_rays': (512, 512), 'fx_burst': (512, 512), 'fx_ring': (512, 512),
     'fx_rune_circle': (768, 768), 'fx_column': (256, 512), 'fx_sparkle': (128, 128), 'fx_orb': (128, 128),
@@ -53,6 +55,11 @@ def main(src):
         im = light_to_alpha(im) if name in LIGHT else im.convert('RGBA')
         im.resize(size, Image.LANCZOS).save(os.path.join(OUT, name + '.webp'), 'WEBP', quality=80 if name in LIGHT else 88, alpha_quality=72 if name in LIGHT else 100, method=6)
         done.append(name)
+    for name in EGGS:
+        if name not in files: continue
+        im = Image.open(files[name]).convert('RGBA'); b = im.getchannel('A').point(lambda a: 255 if a > 40 else 0).getbbox(); s = 254 / (b[3] - b[1])
+        im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS); c = Image.new('RGBA', (512, 512), (0, 0, 0, 0))
+        c.alpha_composite(im, (round(268 - (b[0] + b[2]) / 2 * s), round(425 - b[3] * s))); c.save(os.path.join(OUT, name + '.webp'), 'WEBP', quality=80, alpha_quality=70, method=6); done.append(name)
     kb = sum(os.path.getsize(os.path.join(OUT, n + '.webp')) for n in done) / 1024
     print(f'imported {len(done)} images ({kb:.0f} KB)')
     if missing: print('not found (code drawing stays):', ', '.join(missing))
