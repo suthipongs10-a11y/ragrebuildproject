@@ -162,6 +162,28 @@ export const SPECIES: Record<string, SpeciesDef> = {
       { id: 'gaja_divine', name: 'งาเทวะ', desc: 'โล่ทั้งทีม 22% + เพิ่ม DEF 2 เทิร์น', cd: 4, target: 'allyAll', mult: 0, effects: [{ kind: 'shield', value: 0.22, turns: 2, to: 'allies' }, { kind: 'status', status: 'def_up', turns: 2, to: 'allies' }], anim: 'ult_starlight', ult: true },
     ],
   },
+  B09: {
+    id: 'B09', art: 'monB09', name: 'พญานาคมณี', nameEn: 'Mani Naga Lord', elem: 'water', role: 'Attacker', rarity: 'legendary',
+    base: { hp: 1010, atk: 146, def: 62, spd: 112 },
+    leader: { stat: 'atk', value: 0.25, text: 'ATK ทั้งทีม +25%' },
+    rarePassive: { kind: 'killTurn', name: 'มณีนาคราช', desc: 'ล้มศัตรูได้ ได้เทิร์นต่อทันที' },
+    skills: [
+      { id: 'naga_fang', name: 'เขี้ยวนาค', desc: 'ฉก 1 ตัว 60% ติดเครื่องหมายน้ำ', cd: 0, target: 'enemy', mult: 1.15, effects: [{ kind: 'mark', elem: 'water', chance: 0.6 }], anim: 'melee' },
+      { id: 'naga_tide', name: 'กระแสมณี', desc: 'ทุกตัว 50% ลด SPD 2 เทิร์น', cd: 3, target: 'enemyAll', mult: 0.75, effects: [{ kind: 'status', status: 'spd_down', turns: 2, chance: 0.5 }], anim: 'volley' },
+      { id: 'naga_deluge', name: 'อุทกภัยนาคราช', desc: 'ทุกตัว 60% ลด DEF 2 เทิร์น + ลดเกจ 20', cd: 5, target: 'enemyAll', mult: 1.45, effects: [{ kind: 'status', status: 'def_down', turns: 2, chance: 0.6 }, { kind: 'atb', value: -20 }], anim: 'ult_rain', ult: true },
+    ],
+  },
+  C06: {
+    id: 'C06', art: 'monC06', name: 'ราชาอสูรวัว', nameEn: 'Bull Demon King', elem: 'fire', role: 'Defender', rarity: 'rare',
+    base: { hp: 1210, atk: 97, def: 88, spd: 97 },
+    leader: { stat: 'hp', value: 0.18, text: 'HP ทั้งทีม +18%' },
+    rarePassive: { kind: 'thorns', value: 0.25, name: 'ไฟโทสะ', desc: 'ถูกโจมตี สะท้อนดาเมจ 25% (สะท้อนจนศัตรูตายไม่ได้)' },
+    skills: [
+      { id: 'bull_club', name: 'กระบองเพลิง', desc: 'ทุบ 1 ตัว 40% เผาไหม้ 2 เทิร์น', cd: 0, target: 'enemy', mult: 1.0, effects: [{ kind: 'status', status: 'burn', turns: 2, chance: 0.4 }], anim: 'melee' },
+      { id: 'bull_roar', name: 'คำรามราชาอสูร', desc: 'เพิ่ม DEF ทั้งทีม 2 เทิร์น + โล่ตัวเอง 20%', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'status', status: 'def_up', turns: 2, to: 'allies' }, { kind: 'shield', value: 0.2, turns: 2, to: 'self' }], anim: 'buff' },
+      { id: 'bull_quake', name: 'ทุบภูผาเพลิง', desc: 'ทุกตัว 30% มึน 1 เทิร์น', cd: 5, target: 'enemyAll', mult: 1.1, effects: [{ kind: 'status', status: 'stun', turns: 1, chance: 0.3 }], anim: 'ult_quake', ult: true },
+    ],
+  },
   C01: {
     id: 'C01', art: 'monC01', name: 'ปี่เซียะ', nameEn: 'Pixiu', elem: 'earth', role: 'Support', rarity: 'common',
     base: { hp: 960, atk: 94, def: 66, spd: 102 },

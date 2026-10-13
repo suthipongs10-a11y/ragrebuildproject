@@ -1,6 +1,6 @@
 // @ts-nocheck
 // Sprites, recolors, silhouettes/glows and palettes. Species without final art use a recolored fox placeholder.
-import { SPECIES } from '../core/data';
+import { SPECIES, natStars } from '../core/data';
 
 export const TAU = Math.PI * 2;
 export const PIV = [256, 435]; // feet pivot inside 512px sprite
@@ -55,13 +55,17 @@ function hueShift(img, E) {
 export const starHTML = (on: boolean) => { const im = IMG[on ? 'ui_star' : 'ui_star_empty']; return im ? `<img src="${im.src}" alt="">` : '★'; };
 export const uiSrc = (name: string) => IMG[name] ? IMG[name].src : null;
 /** full-body master art URL for the monster book (falls back to the round portrait) */
-export const masterURL = (sid: string) => { const s = SPECIES[sid]; return s && s.art && IMG[s.art + '_master'] ? IMG[s.art + '_master'].src : null; };
+/** a set's master art; sets that arrived without one (BATCH07 B09/C06) use their front idle */
+const masterOf = (art: string) => IMG[art + '_master'] || IMG[art + '_front_idle'];
+export const masterURL = (sid: string) => { const s = SPECIES[sid]; return s && s.art && masterOf(s.art) ? masterOf(s.art).src : null; };
 export const baseOf = (sid: string) => sid.split('~')[0];
 const SP = sid => SPECIES[baseOf(sid)];
 const lookLv = sid => parseInt(sid.split('~')[1] || '0') || 0;
 const lookRare = sid => sid.includes('~') && sid.endsWith('r');
 /** look id: `sid~<stars>` from ★4, plus `r` for the rare form (its own colours, like a shiny) */
-export const lookOf = (sid: string, stars: number, rare = false) => stars >= 4 || rare ? sid + '~' + (stars >= 4 ? Math.min(6, stars) : 0) + (rare ? 'r' : '') : sid;
+// the ★4 recolour / ★5 evolved look only show once a monster has been starred up past the stars it hatched with
+// (a legendary hatches at ★4 and must still show its own colours)
+export const lookOf = (sid: string, stars: number, rare = false) => { const up = stars >= 4 && stars > natStars(sid); return up || rare ? sid + '~' + (up ? Math.min(6, stars) : 0) + (rare ? 'r' : '') : sid; };
 const VAR_R = { dh: .5, sat: 1.18, lit: 1.04, all: 1.04 }; // rare form: opposite hue, a little richer
 const VAR_E = { 4: { dh: .09, sat: 1.22, lit: 1, all: 1.02 }, 5: { dh: .09, sat: 1.3, lit: 1.03, all: 1.05 }, 6: { dh: .09, sat: 1.3, lit: 1.03, all: 1.05 } };
 const evoArt = sid => { const L = lookLv(sid), s = SP(sid); return L >= 5 && s.art && IMG[s.art + 'e_front_idle'] ? s.art + 'e' : null; };
@@ -144,10 +148,10 @@ const PORT = {};
 export function portrait(sid) {
   if (PORT[sid]) return PORT[sid];
   const s = SP(sid), ea = evoArt(sid), L = lookLv(sid);
-  let src = ea && IMG[ea + '_master'] ? IMG[ea + '_master'] : hasArt(sid) && IMG[s.art + '_master'] ? IMG[s.art + '_master'] : hueShift(IMG.mon001_master, PAL[s.elem]);
+  let src = ea && IMG[ea + '_master'] ? IMG[ea + '_master'] : hasArt(sid) && masterOf(s.art) ? masterOf(s.art) : hueShift(IMG.mon001_master, PAL[s.elem]);
   if (lookRare(sid)) src = hueShift(src, VAR_R); else if (L && !ea) src = hueShift(src, VAR_E[L]);
   const c = mk(256, 256), x = c.getContext('2d');
-  const f = src.width / 512, own = hasArt(sid) && (!!IMG[s.art + '_master'] || !!ea);
+  const f = src.width / 512, own = hasArt(sid) && (!!masterOf(s.art) || !!ea);
   let cr = [200, 70, 300]; // fox: head-centred crop
   if (own && (s.art !== 'mon001' || ea)) { const [x0, y0, x1, y1] = bbox(src, sid + '_master'), side = Math.min(512, Math.max(x1 - x0, (y1 - y0) * .8) * 1.04); cr = [(x0 + x1) / 2 - side / 2, y0 - side * .04, side]; }
   x.drawImage(src, cr[0] * f, cr[1] * f, cr[2] * f, cr[2] * f, 0, 0, 256, 256);
