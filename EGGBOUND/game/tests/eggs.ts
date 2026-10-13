@@ -2,8 +2,8 @@
 import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, RARE_FORM_MULT } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
 import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
-import { startIncub, incubLeft, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
-import { QUESTS, CHAPTERS, questsIn, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg, mysteryEgg } from '../src/game/quests';
+import { startIncub, incubLeft, incubOf, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
+import { QUESTS, CHAPTERS, questsIn, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg, rushPrice, rushesToday, mysteryEgg } from '../src/game/quests';
 
 export function eggTests(): number {
   let fail = 0;
@@ -94,7 +94,16 @@ export function eggTests(): number {
     ok(buyGoldEgg(s) === null, 'no gems, no egg'); s.gems = 250; const e = buyGoldEgg(s)!;
     ok(!!e && e.tier === 'gold' && e.kind === 'mystery' && s.gems === 150 && s.eggs.includes(e), 'buy gold egg');
     const t0 = 5_000_000; ok(startIncub(s, e.id, t0), 'incubate bought egg'); const c = rushCost(s, e.id, t0);
-    ok(c >= 1 && rushEgg(s, e.id, t0) && s.gems === 150 - c && canHatch(s, e, t0), 'rush finishes incubation for gems ' + c); }
+    ok(c === 10 && rushEgg(s, e.id, t0) && s.gems === 140 && canHatch(s, e, t0), 'first rush of the day: gold egg 10 gems (got ' + c + ')');
+    // the price climbs a step per rush the same day, a part-done egg pays its share of time left, and a new day starts over
+    const free = (id: number) => { home(s).incub = home(s).incub.filter(q => q.id !== id); }; // hatching frees the slot
+    free(e.id); const ladder: number[] = [];
+    for (let i = 0; i < 14; i++) { s.gems = 1000; const g = mysteryEgg(s, 'gold'); s.eggs.push(g); startIncub(s, g.id, t0); ladder.push(rushCost(s, g.id, t0)); rushEgg(s, g.id, t0); free(g.id); }
+    ok(ladder.join(',') === '12,14,16,20,24,30,36,45,55,70,85,100,100,100', 'gold rush ladder ' + ladder.join(','));
+    ok(rushPrice(s, 'rainbow', t0) === 300 && rushesToday(s, t0) === 15, 'rainbow capped at 300, 15 rushes today');
+    const t1 = t0 + 86_400_000; ok(rushesToday(s, t1) === 0 && rushPrice(s, 'gold', t1) === 10 && rushPrice(s, 'rainbow', t1) === 30, 'ladder resets the next day');
+    { const g = mysteryEgg(s, 'gold'); s.eggs.push(g); startIncub(s, g.id, t1); const x = incubOf(s, g.id)!, half = t1 + (x.end - x.start) / 2;
+      ok(rushCost(s, g.id, half) === 5 && rushCost(s, g.id, x.end - 1000) === 1, 'part-done egg pays its share of time left'); } }
 
   // team rule: one per species; a saved team holding two copies is cleaned on load
   { const s = newSave(); s.mons.push(newMon(70, 'A01')); ok(teamHasSpecies(s, 'A01') && !teamHasSpecies(s, 'A05') && !teamHasSpecies(s, 'A01', 1), 'team species check');

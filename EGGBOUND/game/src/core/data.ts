@@ -269,7 +269,11 @@ export function spdAt(base: number, lvl: number, stars: number): number {
 export const expToNext = (lvl: number) => 40 + lvl * 25;
 // Gems (เพชร, premium currency — given by the adventure book for now): buy a gold mystery egg, rush an incubating egg.
 export const GEM_GOLD_EGG = 100;
-export const GEM_PER_10MIN = 1; // rushing an egg: 1 gem per started 10 minutes left
+// Rushing an incubating egg (เร่งบ่มไข่): each rush costs the tier's base × the day's step, so rushing many eggs in one day
+// gets steadily dearer (anti-whale) — the ladder starts over at local midnight. A part-done egg pays the share of its
+// incubation still left (rounded up, at least 1). Gold: 10 · 12 · 14 · 16 · 20 · 24 · 30 · 36 · 45 · 55 · 70 · 85 · 100 (cap).
+export const RUSH_BASE: Record<string, number> = { gold: 10, rainbow: 30 };
+export const RUSH_STEP = [1, 1.2, 1.4, 1.6, 2, 2.4, 3, 3.6, 4.5, 5.5, 7, 8.5, 10]; // 1st, 2nd, ... rush of the day; then stays
 // Power-up (เพิ่มเลเวล): feed up to FEED_MAX unwanted monsters; each gives EXP by its level and stars:
 // FEED_K × (EXP it took to reach its level) + FEED_BASE × stars². Costs FEED_GOLD per food level.
 export const FEED_MAX = 5, FEED_K = 0.8, FEED_BASE = 60, FEED_GOLD = 10;

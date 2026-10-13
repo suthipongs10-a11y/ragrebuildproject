@@ -1,7 +1,7 @@
 // Adventure book (สมุดผจญภัย): one-time quests grouped in chapters (one per map region + one per game system), handing out
 // gems (600 in total for the current content), mystery eggs, egg shards, gold and soul crystals; a finished chapter opens a chest.
 // Progress is read from the save (stages, dex, monsters) and lifetime counters (save.stats); rewards are claimed by hand.
-import { SPECIES, STAGES, GEM_GOLD_EGG, GEM_PER_10MIN, EGG_TIERS, levelCap, rareFormChance } from '../core/data';
+import { SPECIES, STAGES, GEM_GOLD_EGG, RUSH_BASE, RUSH_STEP, EGG_TIERS, levelCap, rareFormChance } from '../core/data';
 import type { EggTier } from '../core/data';
 import type { SaveData, EggSave } from './save';
 import { rollRarity, rollSpecies, skillMaxed } from './progression';
@@ -136,9 +136,19 @@ export function buyGoldEgg(s: SaveData, rnd: () => number = Math.random) {
   s.gems -= GEM_GOLD_EGG; s.stats.gemEggs++;
   const e = mysteryEgg(s, 'gold', rnd); s.eggs.push(e); return e;
 }
-export const rushCost = (s: SaveData, eggId: number, now = Date.now()) => { const l = incubLeft(s, eggId, now); return l ? Math.max(1, Math.ceil(l / 600000) * GEM_PER_10MIN) : 0; };
-/** finish an incubating egg now for gems */
+/** the player's local calendar day: the rush price ladder starts over each day */
+export const dayKey = (now = Date.now()) => { const d = new Date(now); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; };
+/** rushes already bought today */
+export const rushesToday = (s: SaveData, now = Date.now()) => s.rush && s.rush.day === dayKey(now) ? s.rush.n : 0;
+/** full price of a rush for an egg tier, `k` rushes into the day (default: the next one) */
+export const rushPrice = (s: SaveData, tier: string, now = Date.now(), k = rushesToday(s, now)) => Math.round((RUSH_BASE[tier] ?? RUSH_BASE.gold) * RUSH_STEP[Math.min(k, RUSH_STEP.length - 1)]);
+/** what rushing this egg costs right now: the next rush price × the share of incubation still left */
+export const rushCost = (s: SaveData, eggId: number, now = Date.now()) => {
+  const x = incubOf(s, eggId), l = incubLeft(s, eggId, now); if (!x || !l) return 0;
+  return Math.max(1, Math.ceil(rushPrice(s, x.tier || 'gold', now) * l / Math.max(1, x.end - x.start) - 1e-9));
+};
+/** finish an incubating egg now for gems (moves today's price ladder one step up) */
 export function rushEgg(s: SaveData, eggId: number, now = Date.now()) {
   const x = incubOf(s, eggId), c = rushCost(s, eggId, now); if (!x || !c || s.gems < c) return false;
-  s.gems -= c; x.end = now; s.stats.rush++; return true;
+  s.gems -= c; x.end = now; s.stats.rush++; s.rush = { day: dayKey(now), n: rushesToday(s, now) + 1 }; return true;
 }

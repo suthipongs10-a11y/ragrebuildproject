@@ -26,6 +26,7 @@ export interface SaveData {
   frags: Record<string, number>;
   stages: Record<string, number>;   // best stars per stage
   nextEggId: number;
+  rush: { day: string; n: number }; // gem rushes bought today (price ladder, resets each local day)
   settings: { sound: boolean; quality: 'low' | 'mid' | 'high'; skipUlt: boolean; speed: number; auto: boolean };
 }
 const KEY = 'eggbound-p0-save';
@@ -34,7 +35,7 @@ export const newMon = (uid: number, sid: string, lvl = 1, stars?: number, rare =
   ({ uid, sid, lvl, exp: 0, stars: stars ?? natStars(sid, rare), sk: [1, 1, 1], ...(rare ? { rare } : {}) });
 export function newSave(): SaveData {
   const mons = STARTERS.map((sid, i) => newMon(i + 1, sid, 5, 1));
-  return { v: 2, gold: 500, mons, team: [1, 2, 3, 4], nextUid: mons.length + 1, items: { soul: 0 }, gems: 0, stats: newStats(), quests: [], dexRare: [], dex: [...STARTERS], eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, stages: {}, nextEggId: 2,
+  return { v: 2, gold: 500, mons, team: [1, 2, 3, 4], nextUid: mons.length + 1, items: { soul: 0 }, gems: 0, stats: newStats(), quests: [], dexRare: [], dex: [...STARTERS], eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, stages: {}, nextEggId: 2, rush: { day: '', n: 0 },
     settings: { sound: true, quality: 'high', skipUlt: false, speed: 1, auto: false } };
 }
 export function loadSave(): SaveData {
