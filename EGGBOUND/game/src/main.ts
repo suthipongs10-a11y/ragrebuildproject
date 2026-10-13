@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
-import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG } from './core/data';
+import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG } from './core/data';
 import { Battle } from './core/battle';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
@@ -224,6 +224,7 @@ function oddsHTML() {
   return `<details class="odds"><summary>อัตราไข่ปริศนา และการันตี</summary>
   <p class="note">ชนะด่านมีโอกาสได้ไข่ปริศนา ${pct(EGG_DROP.chance)} (ด่านบอส ${pct(EGG_DROP.bossChance)}) · ผ่านด่านครั้งแรกได้แน่นอน</p>
   <table><thead><tr><th>ลาย</th><th>โอกาส</th><th>บ่ม</th><th>ร่างหายาก</th></tr></thead><tbody>${EGG_TIER_ORDER.map(t => { const T = EGG_TIERS[t]; return `<tr><td><span class="ed" style="background:${TIER_COL[t]}"></span> ${T.name}</td><td>${pct(o[t])}</td><td>${T.incubateMin ? fmtDur(T.incubateMin * 60000) : 'ฟักทันที'}</td><td>${pct(T.rareForm)}</td></tr><tr class="sub"><td colspan="4">ความหายากของมอน: ${rw(T.rarityW)}</td></tr>`; }).join('')}</tbody></table>
+  <p class="note"><b>ร่างหายาก</b> (+1 ดาว + สกิลร่างหายาก): โอกาสในตารางคือของมอนระดับธรรมดา · หายาก ×${RARE_FORM_MULT.rare} · มหากาพย์ ×${RARE_FORM_MULT.epic} · ตำนาน ×${RARE_FORM_MULT.legendary} (ตำนานร่างหายากเกิด ★6 หายากที่สุดในเกม)</p>
   <p class="note"><b>การันตี:</b> ไข่ปริศนาฟองที่ ${EGG_DROP.pity} ที่ยังไม่เจอลายทองขึ้นไป จะเป็นลายทองหรือรุ้งแน่นอน · อีก <b>${left}</b> ฟอง<br>ไข่ระบุชื่อ (ประกอบจากเศษ) มีโอกาสเป็นร่างหายาก ${pct(NAMED_RARE_FORM)} · ฟักได้ดาวตามความหายาก (ธรรมดา ★1 · หายาก ★2 · มหากาพย์ ★3 · ตำนาน ★4) · ได้ตัวซ้ำ = มอนตัวใหม่อีกตัว ใช้ป้อนอัปสกิล หรือเป็นอาหารอัปดาว (สูงสุด ★${MAX_STARS})<br>ตอนนี้ยังไม่มีมอนระดับตำนาน ถ้าสุ่มได้ จะได้ระดับมหากาพย์แทน</p></details>`;
 }
 function settingsHTML() {

@@ -1,5 +1,5 @@
 // Rewards, levels, fragments, eggs, evolution (star-ups) and skill-ups.
-import { STAGES, SPECIES, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, MAX_STARS, EVO_GOLD, SKILL_MAX, FEED_MAX, FEED_K, FEED_BASE, FEED_GOLD, cumExp, EGG_LOOT_GRADE, LOOT_ORDER } from '../core/data';
+import { STAGES, SPECIES, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, rareFormChance, MAX_STARS, EVO_GOLD, SKILL_MAX, FEED_MAX, FEED_K, FEED_BASE, FEED_GOLD, cumExp, EGG_LOOT_GRADE, LOOT_ORDER } from '../core/data';
 import type { EggTier, LootGrade } from '../core/data';
 import type { Rarity } from '../core/types';
 import type { SaveData, EggSave, MonSave } from './save';
@@ -43,7 +43,7 @@ export function grantRewards(s: SaveData, stageId: string, win: boolean, stars: 
 
 export function craftEgg(s: SaveData, sid: string, rnd: () => number = Math.random): boolean {
   if ((s.frags[sid] || 0) < FRAGS_TO_CRAFT) return false;
-  s.frags[sid] -= FRAGS_TO_CRAFT; s.stats.craft++; s.eggs.push({ id: s.nextEggId++, sid, kind: 'named', rare: rnd() < NAMED_RARE_FORM }); return true;
+  s.frags[sid] -= FRAGS_TO_CRAFT; s.stats.craft++; s.eggs.push({ id: s.nextEggId++, sid, kind: 'named', rare: rnd() < rareFormChance(NAMED_RARE_FORM, sid) }); return true;
 }
 
 // ---- mystery eggs ----
@@ -70,7 +70,8 @@ export function rollTier(s: SaveData, rnd: () => number): EggTier {
 export const rollRarity = (tier: EggTier, rnd: () => number) => pickW(EGG_TIERS[tier].rarityW, rnd()) as Rarity;
 export function rollMysteryEgg(s: SaveData, rnd: () => number): EggSave {
   const tier = rollTier(s, rnd), T = EGG_TIERS[tier];
-  return { id: s.nextEggId++, sid: rollSpecies(rollRarity(tier, rnd), rnd), kind: 'mystery', tier, rare: rnd() < T.rareForm };
+  const sid = rollSpecies(rollRarity(tier, rnd), rnd);
+  return { id: s.nextEggId++, sid, kind: 'mystery', tier, rare: rnd() < rareFormChance(T.rareForm, sid) };
 }
 /** disclosed odds of a mystery egg drop, per tier (0..1) */
 export function eggOdds() {

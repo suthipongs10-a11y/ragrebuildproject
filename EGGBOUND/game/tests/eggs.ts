@@ -1,9 +1,9 @@
 // Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
-import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES } from '../src/core/data';
+import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, RARE_FORM_MULT } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
 import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
 import { startIncub, incubLeft, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
-import { QUESTS, CHAPTERS, questsIn, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg } from '../src/game/quests';
+import { QUESTS, CHAPTERS, questsIn, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg, mysteryEgg } from '../src/game/quests';
 
 export function eggTests(): number {
   let fail = 0;
@@ -23,6 +23,13 @@ export function eggTests(): number {
     const line = Object.keys(odds).map(k => `${k} ${(odds[k as keyof typeof odds] * 100).toFixed(1)}%→${((n[k] || 0) / N * 100).toFixed(1)}%`).join('  ');
     console.log(`mystery eggs (listed→rolled incl. pity): ${line}  rare form ${(rare / N * 100).toFixed(1)}%`);
     ok(Math.abs((n.common || 0) / N - odds.common) < 0.03, 'common rate close to listed'); }
+
+  // rare form gets rarer with species rarity: rainbow eggs, legendary rare form ≈ 6% × 8% × 0.25
+  { const s = newSave(), rnd = lcg(7), N = 400000; let leg = 0, legR = 0, com = 0, comR = 0;
+    for (let i = 0; i < N; i++) { const e = mysteryEgg(s, 'rainbow', rnd), r = SPECIES[e.sid].rarity; if (r === 'legendary') { leg++; if (e.rare) legR++; } if (r === 'rare') { com++; if (e.rare) comR++; } }
+    const pl = legR / leg, pr = comR / com;
+    console.log(`rainbow egg rare form: rare-tier ${(pr * 100).toFixed(2)}% · legendary ${(pl * 100).toFixed(2)}% (1 in ${Math.round(N / Math.max(1, legR))} rainbow eggs)`);
+    ok(Math.abs(pl - EGG_TIERS.rainbow.rareForm * RARE_FORM_MULT.legendary) < 0.008 && pl < pr, 'legendary rare form is scaled down'); }
 
   // incubation: gold egg blocks hatch until done; slots = hatchery level
   { const s = newSave(), t0 = 1_000_000; s.eggs = [];

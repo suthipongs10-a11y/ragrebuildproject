@@ -1,7 +1,7 @@
 // Adventure book (สมุดผจญภัย): one-time quests grouped in chapters (one per map region + one per game system), handing out
 // gems (600 in total for the current content), mystery eggs, egg shards, gold and soul crystals; a finished chapter opens a chest.
 // Progress is read from the save (stages, dex, monsters) and lifetime counters (save.stats); rewards are claimed by hand.
-import { SPECIES, STAGES, GEM_GOLD_EGG, GEM_PER_10MIN, EGG_TIERS, levelCap } from '../core/data';
+import { SPECIES, STAGES, GEM_GOLD_EGG, GEM_PER_10MIN, EGG_TIERS, levelCap, rareFormChance } from '../core/data';
 import type { EggTier } from '../core/data';
 import type { SaveData, EggSave } from './save';
 import { rollRarity, rollSpecies, skillMaxed } from './progression';
@@ -125,7 +125,8 @@ export function claimQuest(s: SaveData, id: string, rnd: () => number = Math.ran
 }
 /** a mystery egg of a fixed shell tier (species rolled with that tier's odds; does not touch the drop pity) */
 export function mysteryEgg(s: SaveData, tier: EggTier, rnd: () => number = Math.random): EggSave {
-  return { id: s.nextEggId++, sid: rollSpecies(rollRarity(tier, rnd), rnd), kind: 'mystery', tier, rare: rnd() < EGG_TIERS[tier].rareForm };
+  const sid = rollSpecies(rollRarity(tier, rnd), rnd);
+  return { id: s.nextEggId++, sid, kind: 'mystery', tier, rare: rnd() < rareFormChance(EGG_TIERS[tier].rareForm, sid) };
 }
 
 // ---- gem uses ----
