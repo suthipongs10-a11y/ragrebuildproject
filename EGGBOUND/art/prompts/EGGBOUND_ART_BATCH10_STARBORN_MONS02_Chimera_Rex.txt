@@ -1,17 +1,16 @@
 =====================================================================
 EGGBOUND — ART BATCH 10 (STARBORN LEGENDS) : MON_S02 "Chimera Rex" (คิเมร่าราชันย์)
-v2 REDESIGN (2026-10-13) — ONE head only · dark, mysterious, awe-inspiring
+v2 REDESIGN (2026-10-13) — ONE head only · winged sovereign beast (concept A, chosen)
 Image generation instructions for Google Flow (or ChatGPT)
 =====================================================================
 
 [หมายเหตุสำหรับผู้ใช้]
 - ฉบับใหม่แทนฉบับเดิม (เลิกใช้แบบคิเมร่าหลายหัว) · ชุดพิเศษ "ตำนานดารา" · ธาตุ FIRE · บทบาท Attacker
-- ไฟล์นี้มี 2 แนวให้เลือก ทำภาพ #01 ทั้งสองแนวก่อน (#01A, #01B) แล้วเลือกแนวที่ชอบ
-  แนะนำ A (สัตว์สี่ขามีปีก) เพราะชุดตำนานดารามีตัวคนอยู่แล้วหลายตัว (S01 วาลคีร์, S07 อสูร, S08 ซามูไร)
+- เจ้าของเลือกแล้ว: แนว A สัตว์สี่ขามีปีก อลังการ เท่ (ตัดแนว B ออกแล้ว)
 - Google Flow: แนบไฟล์นี้ + mon001_master (ภาพจิ้งจอก ใช้อ้างอิงลายเส้น/แสงเท่านั้น)
-  สั่งว่า: "สร้างภาพ #01A ตามไฟล์ที่แนบ สัดส่วน 1:1 พื้นหลังสีชมพู #FF00FF เรียบ"
-  แล้วสั่ง #01B แบบเดียวกัน → เลือกแนว → ภาพ #02–#12 แนบภาพ #01 ที่เลือกไว้ทุกครั้ง
-  สั่งว่า: "สร้างภาพ #0X ตามไฟล์ แนว A (หรือ B) ตัวละครเดียวกับภาพที่แนบเป๊ะ"
+  สั่งว่า: "สร้างภาพ #01 ตามไฟล์ที่แนบ สัดส่วน 1:1 พื้นหลังสีชมพู #FF00FF เรียบ"
+  ได้ #01 ที่ชอบแล้ว → ภาพ #02–#12 แนบภาพ #01 ทุกครั้ง
+  สั่งว่า: "สร้างภาพ #0X ตามไฟล์ ตัวละครเดียวกับภาพที่แนบเป๊ะ"
 - เช็กก่อนตอบ OK: มี "หัวเดียว" เท่านั้น หางไม่มีหัวงู ไม่ดูน่ารัก
 - ได้ครบแล้วรวม zip ส่งกลับมาที่แชท Claude (ชื่อไฟล์สุ่มจาก Flow ได้ ผมจับคู่เอง)
 
@@ -29,9 +28,9 @@ its painting style, shading, line quality, lighting and camera angle. Do
 NOT copy the fox's design, colors, body or its cute proportions.
 
 Work order:
-  1. Generate #01A and #01B (two concept masters). Wait for my choice.
-  2. After I pick A or B, generate #02–#12 one by one for that concept,
-     each time using the chosen #01 as the character reference.
+  1. Generate #01 (MASTER). Show it and wait for my "OK".
+  2. After "OK", generate #02–#12 one by one, each time using #01 as the
+     character reference.
   3. Run the QUALITY CHECK, then package the ZIP (section 6).
 
 ---------------------------------------------------------------------
@@ -63,7 +62,6 @@ Technical rules:
 ---------------------------------------------------------------------
 2. CHARACTER SHEET — MON_S02 Chimera Rex, the Ember Sovereign
 ---------------------------------------------------------------------
-SHARED BY BOTH CONCEPTS
 - ONE head only — a lion's head. NO goat head, NO snake head anywhere.
   The goat lives on as two long, swept-back obsidian-black ram/goat
   horns that rise from the brow like a crown. The serpent lives on as
@@ -83,27 +81,18 @@ SHARED BY BOTH CONCEPTS
 - Size: STARBORN LEGEND class — body height about 72–77% of the canvas.
   The most awe-inspiring design in the game, still clear on a phone.
 
-CONCEPT A — "Winged Sovereign" (four-legged, recommended)
+BODY — "Winged Sovereign"
 - A colossal lion-bodied beast standing on four legs, built like a king
   of predators: broad chest, heavy shoulders, dark claws with bronze
-  claw-caps.
+  claw-caps. Grand and majestic — the kind of monster players dream of
+  collecting.
 - Black-bronze ornate armor: shoulder plates, a chest plate engraved with
   gold constellation lines, crimson cloth tabards hanging from the belly.
 - Two large dragon-like wings: dark outer membranes, the INNER side a
   deep-indigo night sky with small painted stars; slightly tattered
-  edges.
+  edges. The wings make the silhouette huge and regal.
 - The scaled serpent tail curls behind and rises over the body, its blade
   catching the light.
-
-CONCEPT B — "Ember Knight" (two-legged beast-knight)
-- A tall lion-headed warrior king standing upright in full dark-bronze
-  plate armor with gold constellation engravings.
-- A bronze war mask covers the lower jaw (fanged design) — only the eyes
-  and the upper face show, for mystery.
-- A long, heavy cape: crimson outside, deep-indigo starry lining inside,
-  tattered hem.
-- Wields a huge crescent glaive; its edge is painted ember-orange (no
-  fire). The scaled serpent tail with its blade sweeps behind.
 
 ---------------------------------------------------------------------
 3. VIEWS
@@ -111,7 +100,7 @@ CONCEPT B — "Ember Knight" (two-legged beast-knight)
 FRONT VIEW = 3/4 front view from the high 55° camera, body facing
              BOTTOM-RIGHT. We see the face and front.
 BACK VIEW  = 3/4 back view from the same camera, body facing TOP-RIGHT.
-             We see the back (wings / cape) and only part of the face.
+             We see the back and wings, and only part of the face.
 
 ---------------------------------------------------------------------
 4. IMAGE LIST
@@ -121,25 +110,22 @@ For #02–#11 start every prompt with:
 colors, markings, proportions, scale, line style and lighting),
 following all MASTER STYLE rules:"
 
-#01A MASTER, CONCEPT A (FRONT VIEW) — full body, idle pose.
-#01B MASTER, CONCEPT B (FRONT VIEW) — full body, idle pose.
-
-                 CONCEPT A (winged beast)          CONCEPT B (beast-knight)
-#02 FRONT IDLE   head held high, wings half-        standing tall, glaive planted
-                 folded, tail blade curling,        beside him, cape hanging,
-                 calm cold stare                    calm cold stare
-#03 FRONT ATTACK pouncing toward bottom-right,      lunging toward bottom-right,
-                 claws forward, wings swept back,   glaive slashing in a wide arc,
-                 jaws open in a roar                cape flying back
-#04 FRONT CAST   rearing on hind legs, wings fully  glaive raised overhead in one
-                 spread, head lifted to the sky     hand, other hand open to the sky
-#05 FRONT HIT    recoiling, head turned aside,      staggered back, armored arm
-                 wings pulled in, one paw raised    raised to guard
-#06 FRONT BURST  ULTIMATE: lowest widest stance,    ULTIMATE: both hands on the
-                 wings spread to the maximum,       glaive drawn back for a huge
-                 roaring forward, tail blade high   strike, mane flaring, roaring
-#07–#11          BACK VIEW of #02–#06 (same pose ideas; ATTACK moves toward
-                 TOP-RIGHT, HIT recoils toward bottom-left)
+#01  MASTER (FRONT VIEW) — full body, idle pose. Defines the character.
+#02  FRONT VIEW — IDLE:   head held high, wings half-folded, tail blade
+     curling, calm cold stare.
+#03  FRONT VIEW — ATTACK: pouncing toward bottom-right, claws forward,
+     wings swept back, jaws open in a roar.
+#04  FRONT VIEW — CAST:   rearing on hind legs, wings fully spread, head
+     lifted to the sky.
+#05  FRONT VIEW — HIT:    recoiling, head turned aside, wings pulled in,
+     one paw raised.
+#06  FRONT VIEW — BURST:  ULTIMATE — lowest widest stance, wings spread to
+     the maximum, roaring forward, tail blade raised high.
+#07  BACK VIEW — IDLE   (same pose idea as #02, BACK VIEW)
+#08  BACK VIEW — ATTACK (same pose idea as #03, moving toward TOP-RIGHT)
+#09  BACK VIEW — CAST   (same pose idea as #04, BACK VIEW)
+#10  BACK VIEW — HIT    (same pose idea as #05, recoiling toward bottom-left)
+#11  BACK VIEW — BURST  (same pose idea as #06, BACK VIEW)
 #12  EGG — an obsidian-black egg standing upright with thin gold
      constellation lines and painted ember-orange cracks, a relief of one
      swept horn and a folded wing wrapping around it. Height about 55% of
@@ -151,7 +137,7 @@ following all MASTER STYLE rules:"
 ---------------------------------------------------------------------
   [ ] ONE head only; the tail ends in a blade (no snake head)
   [ ] Looks regal and intimidating — not cute, not cartoonish
-  [ ] Same face, colors, markings and proportions as the chosen #01
+  [ ] Same face, colors, markings and proportions as #01
   [ ] Same scale; lowest point on the same ground line
   [ ] Correct facing (FRONT → bottom-right, BACK → top-right)
   [ ] No ground, shadow, glow, fire, smoke, particles or text
@@ -161,7 +147,7 @@ following all MASTER STYLE rules:"
 ---------------------------------------------------------------------
 6. FILE NAMES & ZIP
 ---------------------------------------------------------------------
-  #01 monS02_master.png        (the chosen concept only)
+  #01 monS02_master.png
   #02 monS02_front_idle.png      #07 monS02_back_idle.png
   #03 monS02_front_attack.png    #08 monS02_back_attack.png
   #04 monS02_front_cast.png      #09 monS02_back_cast.png
@@ -170,7 +156,7 @@ following all MASTER STYLE rules:"
   #12 eggS02.png
 
 ZIP name: EGGBOUND_MONS02_SET.zip (Flow's random file names are fine) +
-notes.txt saying which concept (A or B) was chosen.
+notes.txt listing any image regenerated and why.
 =====================================================================
 END OF FILE
 =====================================================================
