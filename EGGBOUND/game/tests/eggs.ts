@@ -1,9 +1,9 @@
 // Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
-import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, ZONES, RARE_FORM_MULT, NAMED_RARE_FORM, ENERGY_MAX, ENERGY_REGEN_MS } from '../src/core/data';
+import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, ZONES, RARE_FORM_MULT, NAMED_RARE_FORM, ENERGY_MAX, ENERGY_REGEN_MS, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
 import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
 import { startIncub, incubLeft, incubOf, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
-import { energyNow, energyNext, payAuto, autoCost } from '../src/game/energy';
+import { energyNow, energyNext, payAuto, autoCost, buyEnergy, refillsLeft } from '../src/game/energy';
 import { QUESTS, CHAPTERS, questsIn, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg, rushPrice, rushesToday, mysteryEgg } from '../src/game/quests';
 
 export function eggTests(): number {
@@ -146,6 +146,15 @@ export function eggTests(): number {
     ok(energyNow(s, t0 + ENERGY_REGEN_MS - 1) === ENERGY_MAX - autoCost(st) && energyNow(s, t0 + ENERGY_REGEN_MS) === ENERGY_MAX - autoCost(st) + 1, 'one point per regen tick');
     s.energy = { v: 2, t: t0 }; ok(!payAuto(s, st, t0) && energyNow(s, t0) === 2, 'not enough energy: nothing spent');
     ok(energyNow(s, t0 + 3 * ENERGY_REGEN_MS + 5) === 5 && energyNext(s, t0 + 3 * ENERGY_REGEN_MS + 5) === ENERGY_REGEN_MS - 5, 'partial point keeps ticking'); }
+  // gem refill: +ENERGY_MAX for ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY per local day (owner 2026-10-13)
+  { const s = newSave(), t0 = new Date(2026, 9, 13, 9).getTime(), next = new Date(2026, 9, 14, 0, 0, 1).getTime();
+    s.energy = { v: 5, t: t0 }; s.gems = ENERGY_REFILL_GEMS * (ENERGY_REFILL_DAILY + 2);
+    ok(buyEnergy(s, t0) && energyNow(s, t0) === 5 + ENERGY_MAX && s.gems === ENERGY_REFILL_GEMS * (ENERGY_REFILL_DAILY + 1), 'refill adds a full bar for its gem price');
+    ok(buyEnergy(s, t0) && energyNow(s, t0 + 9e6) === 5 + 2 * ENERGY_MAX, 'refills stack past the cap and do not regen above it');
+    for (let i = 2; i < ENERGY_REFILL_DAILY; i++) buyEnergy(s, t0);
+    const g = s.gems; ok(refillsLeft(s, t0) === 0 && !buyEnergy(s, t0) && s.gems === g, 'daily refill limit: nothing spent past it');
+    ok(refillsLeft(s, next) === ENERGY_REFILL_DAILY && buyEnergy(s, next), 'the limit resets at local midnight');
+    s.gems = ENERGY_REFILL_GEMS - 1; ok(!buyEnergy(s, next) && s.gems === ENERGY_REFILL_GEMS - 1, 'not enough gems: nothing bought'); }
 
   console.log(fail ? `eggs: ${fail} FAILED` : 'eggs OK');
   return fail;

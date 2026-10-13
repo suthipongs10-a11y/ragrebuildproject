@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
-import { SPECIES, STAGES, ZONES, ZONE_PLAN, planOf, ENERGY_MAX, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
+import { SPECIES, STAGES, ZONES, ZONE_PLAN, planOf, ENERGY_MAX, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
 import { Battle } from './core/battle';
 import { drawShowcase, showcaseTap } from './render/showcase';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL, rareMasterURL, ensureArt, artReady, prefetchExt } from './render/assets';
@@ -15,7 +15,7 @@ import { home, BDEF, upgrade, upgradeCost, maxLevelNow, mineStored, mineCap, col
 import { loadSave, writeSave, resetSave, newMon } from './game/save';
 import { grantRewards, stageUnlocked, craftEgg, craftStarEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg, lootOf, monOf, copiesOf, teamHasSpecies, feedPreview, feed, feedValue, evoCheck, evolve, skillUp, skillMaxed } from './game/progression';
 import { EvolveView } from './render/evolveView';
-import { energyNow, energyNext, payAuto, autoCost } from './game/energy';
+import { energyNow, energyNext, payAuto, autoCost, buyEnergy, refillsLeft } from './game/energy';
 import { QUESTS, CHAPTERS, questsIn, chapterDone, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg, rushPrice, rushesToday } from './game/quests';
 
 const $ = s => document.querySelector(s);
@@ -58,7 +58,32 @@ function render() {
 }
 const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
 function enLabel() { const v = energyNow(S), n = energyNext(S); return `${v}/${ENERGY_MAX}` + (n ? ` <small>+1 ${mmss(n)}</small>` : ''); }
-function topbar(title, sub) { return `<div class="topbar"><div class="realm"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div><div class="row" style="flex:0 0 auto;align-items:center"><span class="proto">P0 PROTOTYPE</span>${bookBtn()}<span class="gold en" title="พลังงาน — ใช้เฉพาะตอนเปิด AUTO · เล่นเองไม่ใช้"><b>⚡</b><span class="enTxt">${enLabel()}</span></span><span class="gold gem"><i></i>${S.gems.toLocaleString()}</span><span class="gold"><i></i>${S.gold.toLocaleString()}</span></div></div>`; }
+const enPill = () => `<button class="gold en" type="button" data-en="open" title="พลังงาน — ใช้เฉพาะตอนเปิด AUTO · เล่นเองไม่ใช้ · แตะเพื่อเติมด้วยเพชร"><b>⚡</b><span class="enTxt">${enLabel()}</span><em class="enplus">+</em></button>`;
+/** gem energy refill sheet (owner 2026-10-13: ENERGY_REFILL_DAILY per local day); `need` = the AUTO cost that brought the player here */
+let enNeed = 0;
+function enCard() {
+  const v = energyNow(S), nx = energyNext(S), left = refillsLeft(S), poor = S.gems < ENERGY_REFILL_GEMS;
+  return `<div class="card encard"><h2>⚡ พลังงาน AUTO</h2><p class="ennow"><b>${v}</b>/${ENERGY_MAX}${nx ? ` <small>+1 ใน ${mmss(nx)}</small>` : ''}</p>` +
+    `<p class="note" style="text-align:center;margin:0">${enNeed ? `เปิด AUTO ด่านนี้ใช้ ⚡${enNeed} (มี ${v})` : 'ใช้เฉพาะตอนเปิด AUTO'} · เล่นเองไม่ใช้พลังงาน · ฟื้น 1 แต้มทุก 5 นาที</p>` +
+    `<div class="enbuy"><span>เติม <b>+${ENERGY_MAX}</b> ⚡</span><span class="gold gem sm"><i></i>${ENERGY_REFILL_GEMS}</span></div>` +
+    `<p class="note" style="text-align:center;margin:0">วันนี้เติมได้อีก <b>${left}/${ENERGY_REFILL_DAILY}</b> ครั้ง (เริ่มใหม่เที่ยงคืน) · เติมเกินหลอดได้${left && poor ? ` · <b>เพชรไม่พอ</b> (มี ${S.gems})` : ''}</p>` +
+    `<div class="row"><button class="go" type="button" data-en="buy" ${left && !poor ? '' : 'disabled'}>${left ? 'เติมด้วยเพชร' : 'ครบลิมิตวันนี้แล้ว'}</button><button class="alt" type="button" data-en="close">ปิด</button></div></div>`;
+}
+function enModal(need = 0) {
+  enNeed = need; document.querySelector('#enModal')?.remove();
+  const m = document.createElement('div'); m.className = 'modal'; m.id = 'enModal'; m.innerHTML = enCard(); document.body.appendChild(m);
+}
+function enAct(k) {
+  if (k === 'open') { sfx.click(); enModal(); return; }
+  document.querySelector('#enModal')?.remove();
+  if (k !== 'buy' || !buyEnergy(S)) return;
+  save(); sfx.coin(); toast(`เติมพลังงาน +${ENERGY_MAX} ⚡ · วันนี้เติมได้อีก ${refillsLeft(S)} ครั้ง`);
+  if (battle) { // came from the AUTO button: switch AUTO on now that it can be paid
+    if (enNeed && !battle.auto && !battle.autoPaid && payAuto(S, battle.stage)) { battle.autoPaid = true; battle.auto = S.settings.auto = true; save(); renderBattleButtons(); hudBattle(battle); }
+  } else if (!hatch && cur !== 'home') render();
+  else { const l = enLabel(); for (const e of document.querySelectorAll('.enTxt')) e.innerHTML = l; for (const e of document.querySelectorAll('.topbar .gold.gem')) e.innerHTML = `<i></i>${S.gems.toLocaleString()}`; }
+}
+function topbar(title, sub) { return `<div class="topbar"><div class="realm"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div><div class="row" style="flex:0 0 auto;align-items:center"><span class="proto">P0 PROTOTYPE</span>${bookBtn()}${enPill()}<span class="gold gem"><i></i>${S.gems.toLocaleString()}</span><span class="gold"><i></i>${S.gold.toLocaleString()}</span></div></div>`; }
 /** realms (one map each): name + tagline; a realm opens when its first stage unlocks */
 const REALMS = { '1': ['ทุ่งไข่ป่วน', 'ภพที่ 1 · บ้านเกิดของเผ่าไข่ป่วน'], '2': ['สุวรรณภูมิ', 'ภพที่ 2 · ดินแดนทองแห่งตำนานไทย นาค กินรี คชสีห์'], '3': ['สวรรค์บูรพา', 'ภพที่ 3 · สวรรค์ตะวันออก ปี่เซียะ จิ้งจอกเก้าหาง ราชาอสูรวัว'] };
 const realmOf = id => STAGES.find(st => st.id === id)?.realm || id.split('-')[0];
@@ -361,7 +386,7 @@ function settingsHTML() {
 let selB = null;
 function homeHTML() {
   const h = home(S);
-  return `<div class="hhud"><div class="topbar"><div class="realm"><h1>บ้านเต่าบรรพกาล</h1><p>ป้อมพันธสัญญา Lv.${h.castle} · แตะสิ่งก่อสร้าง มอน หรือหัวเต่า</p></div><div class="row" style="flex:0 0 auto;align-items:center">${bookBtn()}<span class="gold en" title="พลังงาน — ใช้เฉพาะตอนเปิด AUTO · เล่นเองไม่ใช้"><b>⚡</b><span class="enTxt">${enLabel()}</span></span><span class="gold gem"><i></i>${S.gems.toLocaleString()}</span><span class="gold" id="hGold"><i></i>${S.gold.toLocaleString()}</span></div></div><div id="hpanel"></div></div>`;
+  return `<div class="hhud"><div class="topbar"><div class="realm"><h1>บ้านเต่าบรรพกาล</h1><p>ป้อมพันธสัญญา Lv.${h.castle} · แตะสิ่งก่อสร้าง มอน หรือหัวเต่า</p></div><div class="row" style="flex:0 0 auto;align-items:center">${bookBtn()}${enPill()}<span class="gold gem"><i></i>${S.gems.toLocaleString()}</span><span class="gold" id="hGold"><i></i>${S.gold.toLocaleString()}</span></div></div><div id="hpanel"></div></div>`;
 }
 const cost = c => `<span class="gold sm"><i></i>${c.toLocaleString()}</span>`;
 function upBtn(id, label = 'อัปเกรด') {
@@ -417,7 +442,7 @@ function startBattle(stageId, artTried = false) {
   const b = new Battle(seed, team, st, homeMods(S));
   clearAll();
   // AUTO costs energy (manual play is free): pay up front when the player's preference is AUTO
-  const autoPaid = S.settings.auto && payAuto(S, st); if (S.settings.auto && !autoPaid) toast(`พลังงานไม่พอเปิด AUTO (ต้องใช้ ⚡${autoCost(st)}) · เล่นเองได้ไม่จำกัด`); save();
+  const autoPaid = S.settings.auto && payAuto(S, st); if (S.settings.auto && !autoPaid) toast(`พลังงานไม่พอเปิด AUTO (ต้องใช้ ⚡${autoCost(st)}) · เล่นเองได้ไม่จำกัด · แตะ AUTO เพื่อเติมด้วยเพชร`); save();
   battle = new BattleView(b, st, {
     auto: autoPaid, autoPaid, speed: S.settings.speed, skipUlt: S.settings.skipUlt,
     onHud: hudBattle, onAct: (s, team) => { const e = $('#actName'); e.textContent = s; e.classList.toggle('e', team === 1); e.classList.add('show'); actT = 1.6; },
@@ -583,9 +608,10 @@ function tickIncub() {
 
 // ---------- input ----------
 document.addEventListener('click', e => {
-  const t = e.target.closest('button'); if (!t) { if (e.target.classList?.contains('zpanel')) { mapZone = null; render(); } return; } audioInit();
+  const t = e.target.closest('button'); if (!t) { if (e.target.classList?.contains('zpanel')) { mapZone = null; render(); } if (e.target.id === 'enModal') e.target.remove(); return; } audioInit();
   const d = t.dataset;
   if ((d.hb || d.shr || d.rel || d.relbuy) && homeV) { homeAct(d); return; }
+  if (d.en) { enAct(d.en); return; }
   if (d.nav) { sfx.click(); if (battle) leaveBattle(); if (hatch) leaveHatch(); confirmReset = false; show(d.nav); }
   else if (d.stage) { sfx.click(); teamCtx = d.stage; show('team'); }
   else if (d.act === 'fight') { sfx.click(); const id = teamCtx; teamCtx = null; startBattle(id); }
@@ -627,7 +653,7 @@ document.addEventListener('click', e => {
   else if (d.act === 'resetNo') { confirmReset = false; render(); }
   else if (d.act === 'resetYes') { S = resetSave(); confirmReset = false; save(); render(); }
   else if (d.b === 'auto' && battle) {
-    if (!battle.auto && !battle.autoPaid) { if (!payAuto(S, battle.stage)) { toast(`พลังงานไม่พอเปิด AUTO (ต้องใช้ ⚡${autoCost(battle.stage)} มี ${energyNow(S)}) · เล่นเองได้ไม่จำกัด`); return; } battle.autoPaid = true; } // paid once per fight
+    if (!battle.auto && !battle.autoPaid) { if (!payAuto(S, battle.stage)) { enModal(autoCost(battle.stage)); return; } battle.autoPaid = true; } // paid once per fight
     battle.auto = !battle.auto; S.settings.auto = battle.auto; save(); renderBattleButtons(); hudBattle(battle); }
   else if (d.b === 'speed' && battle) { battle.speed = battle.speed >= 3 ? 1 : battle.speed + 1; S.settings.speed = battle.speed; save(); renderBattleButtons(); }
   else if (d.b === 'exit') { confirmExit = true; renderBattleButtons(); }

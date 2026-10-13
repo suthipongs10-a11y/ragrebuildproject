@@ -510,6 +510,8 @@ export const LEGACY_STAGE_ZONE: Record<string, string> = { '1-1': 'meadow', '1-2
 /** Energy (พลังงาน) — only AUTO battles spend it (manual play is free, owner 2026-10-13): AUTO costs the stage's
  *  `stamina`; refills 1 point every 5 minutes (full bar ≈ 5 h), offline too */
 export const ENERGY_MAX = 60, ENERGY_REGEN_MS = 5 * 60 * 1000;
+/** gem refill (owner 2026-10-13): +ENERGY_MAX per refill (may pass the cap, like SW), a few per local day */
+export const ENERGY_REFILL_GEMS = 30, ENERGY_REFILL_DAILY = 3;
 /** Starborn shards (เศษไข่ดารา): a Starborn zone boss drops one on the first clear, then STAR_SHARD_CHANCE per win;
  *  STAR_SHARDS_TO_CRAFT build the egg (owner's choice 2026-10-13: 5% · 40 — a long farm, ~800 wins on average) */
 export const STAR_SHARD_CHANCE = 0.05, STAR_SHARDS_TO_CRAFT = 40;
