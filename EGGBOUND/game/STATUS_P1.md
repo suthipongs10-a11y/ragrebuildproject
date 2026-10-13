@@ -152,3 +152,8 @@ Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`,
 - ขาด #06 back_follow (ส่งมา front_follow 2 แบบ ใช้แบบหน้ายิ้มมุมเดียวกับ idle) → เกมใช้ back_attack แทนไปก่อน
 - พื้นชมพู JPG → `fit_flow.py --key` (ลบชมพู + กันขอบ) → `import_art.py <dir> 001` (add-on mode ล็อกขนาดกับ idle เดิม) · back_windup Flow วาดใหญ่ ~25% → ย่อ 0.8 รอบจุดเท้า
 - ทดสอบบังคับทุกท่าในสนามรบจริง ขนาด/เส้นเท้าตรงกัน ไม่มี error · build 10.6MB
+
+## BATCH13-B เอฟเฟ็คสกิลจิ้งจอก + BATCH14 UI ของรางวัล — ใส่แล้ว (2026-10-13, Google Flow)
+- 13-B ครบ 6: foxfire (crop 2:3), bite, fire_trail (squash 3:1), hit_spark / hit_spark_b (ตัวที่มีรอยฟันไขว้ = b), slash_arc · ขาวเทาบนดำถูกสเปก
+- 14 ครบ 6: ดาว (เลือกแบบเหลี่ยมเพชร มีอีกแบบมันวาวสำรอง), ช่องดาวว่าง, เหรียญ (ลายกระดองเต่า), กองเหรียญ, กรอบทอง, กรอบทองแดง · พื้นชมพู → `--key` · กรอบ 3:4 → squash เป็น 4:5
+- ทดสอบหีบสมบัติทุกเกรด (มือถือ/คอม) + การต่อสู้จิ้งจอก ไม่มี error · build 11.2MB
