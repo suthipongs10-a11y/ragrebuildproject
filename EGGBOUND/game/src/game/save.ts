@@ -30,8 +30,8 @@ export interface SaveData {
 }
 const KEY = 'eggbound-p0-save';
 
-export const newMon = (uid: number, sid: string, lvl = 1, stars = natStars(sid), rare = false): MonSave =>
-  ({ uid, sid, lvl, exp: 0, stars, sk: [1, 1, 1], ...(rare ? { rare } : {}) });
+export const newMon = (uid: number, sid: string, lvl = 1, stars?: number, rare = false): MonSave =>
+  ({ uid, sid, lvl, exp: 0, stars: stars ?? natStars(sid, rare), sk: [1, 1, 1], ...(rare ? { rare } : {}) });
 export function newSave(): SaveData {
   const mons = STARTERS.map((sid, i) => newMon(i + 1, sid, 5, 1));
   return { v: 2, gold: 500, mons, team: [1, 2, 3, 4], nextUid: mons.length + 1, items: { soul: 0 }, gems: 0, stats: newStats(), quests: [], dexRare: [], dex: [...STARTERS], eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, stages: {}, nextEggId: 2,
@@ -47,7 +47,7 @@ export function loadSave(): SaveData {
         const d: SaveData = Object.assign(newSave(), s);
         for (const e of d.eggs) if (!e.kind) e.kind = 'named'; // P0 eggs were all species-known
         d.mons = d.mons.filter(m => SPECIES[m.sid]);
-        for (const m of d.mons) { m.stars = Math.max(m.stars, natStars(m.sid)); m.sk ||= [1, 1, 1]; m.lvl = Math.min(m.lvl, levelCap(m.stars)); } // level caps per star (SW) // natural stars by rarity (2026-10-12)
+        for (const m of d.mons) { m.stars = Math.max(m.stars, natStars(m.sid, !!m.rare)); m.sk ||= [1, 1, 1]; m.lvl = Math.min(m.lvl, levelCap(m.stars)); } // level caps per star (SW) // natural stars by rarity (2026-10-12)
         d.stats = { ...newStats(), ...(s.stats || {}) };
         d.dexRare = [...new Set([...(d.dexRare || []), ...d.mons.filter(m => m.rare).map(m => m.sid)])];
         d.dex = [...new Set([...(d.dex || []), ...d.mons.map(m => m.sid)])]; // monster book: everything owned counts as seen

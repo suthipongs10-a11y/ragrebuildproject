@@ -27,6 +27,10 @@ LIGHT = {
     'fx_aura_flame': (512, 768), 'fx_aura_flame_b': (512, 768), 'fx_light_shaft': (128, 512), 'fx_energy_beam': (512, 128),
     'fx_vortex_spiral': (256, 512), 'fx_arc_ring': (512, 512), 'fx_aura_burst_ground': (512, 512),
     # BATCH13 fox prototype skill FX + shared hit sparks
+    # BATCH09 elemental ultimate FX (battleView ultFx(): one per element + a shared slash)
+    'fx_flame_wave': (768, 384), 'fx_flame_bird': (512, 512), 'fx_water_wave': (768, 384), 'fx_water_serpent': (512, 512),
+    'fx_tornado': (384, 512), 'fx_wind_blades': (512, 512), 'fx_rock_spikes': (768, 384), 'fx_ground_crack': (512, 512),
+    'fx_holy_cross': (512, 512), 'fx_dark_vortex': (512, 512), 'fx_slash': (512, 512),
     'fx_foxfire': (256, 384), 'fx_bite': (512, 512), 'fx_fire_trail': (768, 256), 'fx_hit_spark': (512, 512), 'fx_hit_spark_b': (512, 512), 'fx_slash_arc': (512, 512),
 }
 
@@ -47,7 +51,7 @@ def main(src):
         if name not in files: missing.append(name); continue
         im = Image.open(files[name])
         im = light_to_alpha(im) if name in LIGHT else im.convert('RGBA')
-        im.resize(size, Image.LANCZOS).save(os.path.join(OUT, name + '.webp'), 'WEBP', quality=88, method=6)
+        im.resize(size, Image.LANCZOS).save(os.path.join(OUT, name + '.webp'), 'WEBP', quality=80 if name in LIGHT else 88, alpha_quality=72 if name in LIGHT else 100, method=6)
         done.append(name)
     kb = sum(os.path.getsize(os.path.join(OUT, n + '.webp')) for n in done) / 1024
     print(f'imported {len(done)} images ({kb:.0f} KB)')

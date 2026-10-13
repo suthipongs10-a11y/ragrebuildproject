@@ -286,9 +286,10 @@ export function skillAt(k: SkillDef, lv: number, slot: number): SkillDef {
   return { ...k, mult: k.mult * f, cd: max && k.cd > 2 ? k.cd - 1 : k.cd,
     effects: k.effects.map(e => (e.kind === 'heal' || e.kind === 'shield' || e.kind === 'drain') && e.value ? { ...e, value: e.value * f } : e) };
 }
-export const NAT_STARS: Record<Rarity, number> = { common: 1, rare: 2, epic: 3, legendary: 4 };
+export const NAT_STARS: Record<Rarity, number> = { common: 1, rare: 2, epic: 4, legendary: 5 }; // epic ★4 · legendary ★5 (decided 2026-10-13)
 export const MAX_STARS = 6;
-export const natStars = (sid: string) => NAT_STARS[SPECIES[sid]?.rarity] || 1;
+/** stars a monster hatches with: by rarity, +1 for the rare form (stronger, so it starts a grade higher), max ★6 */
+export const natStars = (sid: string, rare = false) => Math.min(6, (NAT_STARS[SPECIES[sid]?.rarity] || 1) + (rare ? 1 : 0));
 
 // ---- eggs (P1 M0) ----
 // Mystery egg: species unknown until it hatches; only the shell pattern (tier) shows the rarity.

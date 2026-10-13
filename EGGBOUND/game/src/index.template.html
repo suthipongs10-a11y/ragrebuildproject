@@ -272,6 +272,17 @@ html:not(.has-book-emblem) .bk-emblem{position:relative}html:not(.has-book-emble
 .empty{color:var(--ink-faint);font-size:.85rem;background:var(--panel);border:1px dashed var(--line);border-radius:14px;padding:16px;text-align:center}
 
 /* reveal / result */
+#newBadge{position:fixed;left:clamp(10px,calc(50% - 380px),50%);top:calc(env(safe-area-inset-top,0px) + 14px);z-index:45;transform:rotate(-9deg);transform-origin:30% 50%;display:grid;justify-items:center;gap:2px;pointer-events:none;animation:nbIn .7s cubic-bezier(.2,1.6,.4,1) both}
+#newBadge .nb-word{position:relative;font-family:var(--f-display);font-weight:600;font-size:clamp(46px,9vw,84px);line-height:1;letter-spacing:.04em;
+  background:linear-gradient(100deg,#fff6c2 0%,#ffd34d 18%,#ff7a5c 34%,#ff6bd5 50%,#7fb8ff 66%,#7dffb0 82%,#fff6c2 100%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 3px 0 #5a2a00) drop-shadow(0 0 2px #fff) drop-shadow(0 0 18px rgba(255,214,110,.9));animation:nbFlow 1.6s linear infinite,nbBob 1.4s ease-in-out .7s infinite}
+#newBadge .nb-sub{white-space:nowrap;font-family:var(--f-display);font-size:clamp(.72rem,2.6vw,.92rem);color:#fff8e0;background:linear-gradient(90deg,rgba(120,40,140,.85),rgba(200,90,30,.85));padding:4px 14px;border-radius:99px;box-shadow:0 0 0 1.5px rgba(255,220,140,.8),0 4px 14px rgba(0,0,0,.4)}
+#newBadge .nb-rays{position:absolute;left:50%;top:40%;width:220px;height:220px;margin:-110px 0 0 -110px;background:repeating-conic-gradient(rgba(255,230,140,.55) 0 7deg,transparent 7deg 22deg);border-radius:50%;
+  -webkit-mask:radial-gradient(circle,#000 18%,transparent 68%);mask:radial-gradient(circle,#000 18%,transparent 68%);animation:nbSpin 6s linear infinite;z-index:-1}
+@keyframes nbIn{0%{opacity:0;transform:scale(.2) rotate(-30deg)}60%{opacity:1;transform:scale(1.2) rotate(-4deg)}100%{transform:scale(1) rotate(-9deg)}}
+@keyframes nbFlow{to{background-position:-220% 0}}
+@keyframes nbBob{50%{transform:translateY(-5px) scale(1.04)}}
+@keyframes nbSpin{to{transform:rotate(360deg)}}
 .modal{position:fixed;inset:0;z-index:40;display:grid;place-items:center;background:rgba(6,8,6,.5);padding:16px}
 .card{background:var(--panel);border:1px solid var(--gold);border-radius:20px;padding:20px 18px 16px;width:min(460px,100%);display:flex;flex-direction:column;gap:12px;align-items:stretch;max-height:92%;overflow-y:auto}
 .card h2{margin:0;text-align:center;font-family:var(--f-display);font-weight:600;font-size:2rem;color:var(--gold);text-shadow:0 0 18px rgba(255,190,80,.6)}

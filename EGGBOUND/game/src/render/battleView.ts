@@ -187,6 +187,7 @@ export class BattleView {
     if (res.ult && v.team === 0) this.onUlt && this.onUlt();
     if (res.ult && !this.skipUlt) yield* this.ultIntro(v, sk);
     else if (res.ult) { v.glowF = .8; }
+    if (res.ult) this.ultFx(v, tv, sk);
     const custom = this['sk_' + sk.id]; // signature skill choreography (per monster) when it exists
     if (custom) yield* custom.call(this, v, tv, impact);
     else switch (sk.anim) {
@@ -225,6 +226,24 @@ export class BattleView {
     this.onCutin && this.onCutin(v.sid, sk.name, P.cut);
     yield* tween(.8, p => { v.sy = 1 + .025 * Math.sin(p * 24); v.sx = 2 - v.sy; if (Math.random() < .9) flame(2); });
     this.cine = null; this.camK = .45; this.camF = null; E.zoomT = 1.08; E.dimT = .3; v.busy = false;
+  }
+  /** BATCH09 elemental art layered over every ultimate (tinted by the caster's palette — gold for rare forms):
+   *  fire = flame wall + flame bird · water = tidal wave + water serpent · wind = tornado + wind blades ·
+   *  earth = ground crack + rock spikes · light = holy star · dark = vortex · dash ultimates add a giant slash. No art → nothing. */
+  ultFx(v, tv, sk) {
+    if (!tv.length) return;
+    const P = this.P(v), k = (tv[0].k || .4) / .4, cx = tv.reduce((a, t) => a + t.x, 0) / tv.length, cy = tv.reduce((a, t) => a + t.y, 0) / tv.length;
+    const ang = Math.atan2(cy - v.y, cx - v.x), fly = (name, size, life, o = {}) => IMG[name] && fxP(name, v.x, v.y, 70 * k, P.aura, size * .7, size, life, Object.assign({ vx: (cx - v.x) / life, vy: (cy - v.y) / life, rot: ang }, o));
+    const at = (name, x, y, z, s0, s1, life, o = {}) => IMG[name] && fxP(name, x, y, z, P.aura, s0 * k, s1 * k, life, o);
+    switch (v.elem) {
+      case 'fire': at('fx_flame_wave', cx, cy, 60 * k, 380, 560, 1.0, { ar: .5, rot: ang }); fly('fx_flame_bird', 300 * k, .7); break;
+      case 'water': at('fx_water_wave', cx, cy, 70 * k, 380, 560, 1.1, { ar: .5, rot: ang }); at('fx_water_serpent', cx, cy, 120 * k, 220, 360, 1.0); break;
+      case 'wind': at('fx_tornado', cx, cy, 130 * k, 220, 300, 1.2, { ar: 1.33, vr: .6 }); fly('fx_wind_blades', 260 * k, .55); break;
+      case 'earth': at('fx_ground_crack', cx, cy, 0, 300, 520, 1.1, { ar: .42 }); for (const t of tv) at('fx_rock_spikes', t.x, t.y, 40 * k, 160, 240, .8, { ar: .5 }); break;
+      case 'light': at('fx_holy_cross', cx, cy, 90 * k, 180, 420, 1.0, { vr: .5, alpha: .75 }); for (const t of tv) at('fx_holy_cross', t.x, t.y, 70 * k, 60, 180, .6, { vr: -.8 }); break;
+      case 'dark': at('fx_dark_vortex', cx, cy, 40 * k, 160, 480, 1.2, { ar: .6, vr: 2.2 }); break;
+    }
+    if (sk.anim === 'ult_dash') for (const t of tv) at('fx_slash', t.x, t.y, 70 * k, 160, 300, .35, { rot: ang - .5 });
   }
   ultOutro(v) { E.dimT = 0; E.zoomT = 1; this.focus = []; this.camF = null; this.camK = .45; this.cine = null; v.glowF = 0; }
   /** behind the caster during the cinematic: rotating element rays, a soft orb and the burst flash */

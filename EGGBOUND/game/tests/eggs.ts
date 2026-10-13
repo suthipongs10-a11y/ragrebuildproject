@@ -40,7 +40,7 @@ export function eggTests(): number {
 
   // natural stars by rarity + rare form
   { const s = newSave(); s.eggs = [{ id: 30, sid: 'A09', kind: 'named', rare: true }, { id: 31, sid: 'B05', kind: 'named' }];
-    const r = hatchEgg(s, 30)!; ok(r.stars === NAT_STARS.epic && monOf(s, r.uid)!.rare === true && r.copies === 0, 'epic hatches at ★3 (rare form kept)');
+    const r = hatchEgg(s, 30)!; ok(r.stars === NAT_STARS.epic + 1 && monOf(s, r.uid)!.rare === true && r.copies === 0, 'rare-form epic hatches at ★5 (epic ★4 + 1)');
     ok(hatchEgg(s, 31)!.stars === 2, 'rare hatches at ★2'); }
 
   // evolution: max level + `stars` food of the same grade + gold → ★+1, Lv1, food consumed
@@ -99,7 +99,7 @@ export function eggTests(): number {
     const v1: any = { ...newSave(), v: 1, mons: { A01: { lvl: 7, exp: 3, stars: 1 }, A09: { lvl: 2, exp: 0, stars: 1, rare: true } }, team: ['A09', 'A01'] };
     delete v1.nextUid; delete v1.items; store['eggbound-p0-save'] = JSON.stringify(v1);
     const d = loadSave(), a9 = d.mons.find(m => m.sid === 'A09')!;
-    ok(d.v === 2 && d.mons.length === 2 && a9.stars === 3 && a9.rare === true && d.team[0] === a9.uid && d.nextUid === 3 && d.items.soul === 0, 'v1 save migrates to units');
+    ok(d.v === 2 && d.mons.length === 2 && a9.stars === 5 && a9.rare === true && d.team[0] === a9.uid && d.nextUid === 3 && d.items.soul === 0, 'v1 save migrates to units');
     delete (globalThis as any).localStorage; }
 
   // first clear always drops a mystery egg

@@ -79,10 +79,10 @@ for p, im in imgs.items():
     c = place(im, s, (im.width / 2, feet), (256, FEET_Y))
     cb = bbox(c)
     if cb[0] == 0 or cb[1] == 0 or cb[2] == 512: print('WARN clipped', p, cb)
-    c.save(os.path.join(out, f'{key}_{p}.webp'), 'WEBP', quality=82, alpha_quality=70, method=6)
+    c.save(os.path.join(out, f'{key}_{p}.webp'), 'WEBP', quality=72, alpha_quality=60, method=6)
 egg = load(f'egg{ID}') if present('egg' + ID) or not idle_ref else None
 if egg is not None:
     eb = bbox(egg)
     c = place(egg, 254 / (eb[3] - eb[1]), ((eb[0] + eb[2]) / 2, eb[3]), (268, 425))
-    c.save(os.path.join(out, f'egg{ID}.webp'), 'WEBP', quality=82, alpha_quality=70, method=6)
+    c.save(os.path.join(out, f'egg{ID}.webp'), 'WEBP', quality=72, alpha_quality=60, method=6)
 print(ID, 'scale', round(s, 3), 'ok', ('BROKEN: ' + ','.join(broken)) if broken else '', ('MISSING: ' + ','.join(missing)) if missing else '')

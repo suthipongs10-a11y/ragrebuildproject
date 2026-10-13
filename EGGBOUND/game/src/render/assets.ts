@@ -65,7 +65,7 @@ const lookRare = sid => sid.includes('~') && sid.endsWith('r');
 /** look id: `sid~<stars>` from ★4, plus `r` for the rare form (its own colours, like a shiny) */
 // the ★4 recolour / ★5 evolved look only show once a monster has been starred up past the stars it hatched with
 // (a legendary hatches at ★4 and must still show its own colours)
-export const lookOf = (sid: string, stars: number, rare = false) => { const up = stars >= 4 && stars > natStars(sid); return up || rare ? sid + '~' + (up ? Math.min(6, stars) : 0) + (rare ? 'r' : '') : sid; };
+export const lookOf = (sid: string, stars: number, rare = false) => { const up = stars >= 4 && stars > natStars(sid, rare); return up || rare ? sid + '~' + (up ? Math.min(6, stars) : 0) + (rare ? 'r' : '') : sid; };
 const VAR_R = { dh: .5, sat: 1.18, lit: 1.04, all: 1.04 }; // rare form: opposite hue, a little richer
 const VAR_E = { 4: { dh: .09, sat: 1.22, lit: 1, all: 1.02 }, 5: { dh: .09, sat: 1.3, lit: 1.03, all: 1.05 }, 6: { dh: .09, sat: 1.3, lit: 1.03, all: 1.05 } };
 const evoArt = sid => { const L = lookLv(sid), s = SP(sid); return L >= 5 && s.art && IMG[s.art + 'e_front_idle'] ? s.art + 'e' : null; };

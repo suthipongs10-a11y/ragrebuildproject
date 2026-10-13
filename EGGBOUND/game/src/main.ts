@@ -368,9 +368,11 @@ function leaveBattle() { chestUI?.close(); chestUI = null; battle = null; clearA
 // ---------- hatch ----------
 function startHatch(eggId, forceRarity = null) {
   const egg = S.eggs.find(e => e.id === eggId); if (!egg || !canHatch(S, egg)) return;
-  clearAll();
-  const toStars = forceRarity ? NAT_STARS[forceRarity] : natStars(egg.sid); // every hatch is a new unit at its natural stars
+  clearAll(); $('#newBadge')?.remove();
+  const toStars = forceRarity ? NAT_STARS[forceRarity] : natStars(egg.sid, !!egg.rare); // every hatch is a new unit at its natural stars
   hatch = new HatchView(egg.rare ? lookOf(egg.sid, 0, true) : egg.sid, { fromStars: 0, toStars, eggSrc: eggOf(egg), tier: egg.kind === 'mystery' ? egg.tier : null, rare: !!egg.rare, rarityOverride: forceRarity });
+  const isNew = !S.dex.includes(egg.sid); // first time this species is obtained → big NEW badge at the reveal
+  hatch.onReveal = () => { if (isNew && hatch) newBadge(); };
   hatch.onDone = () => {
     const r = hatchEgg(S, eggId); save(); if (!r) return;
     const s = SPECIES[r.sid], more = S.eggs.filter(e => canHatch(S, e)).length;
@@ -382,7 +384,13 @@ function startHatch(eggId, forceRarity = null) {
   };
   scene = hatch; hatch.start(); $('#screens').innerHTML = ''; $('#nav').hidden = true;
 }
-function leaveHatch() { hatch = null; clearAll(); scene = idleScene; $('#hatchModal')?.remove(); }
+function leaveHatch() { hatch = null; clearAll(); scene = idleScene; $('#hatchModal')?.remove(); $('#newBadge')?.remove(); }
+/** rainbow "NEW!" stamp at the top of the screen when a hatch reveals a species never obtained before */
+function newBadge() {
+  $('#newBadge')?.remove(); const el = document.createElement('div'); el.id = 'newBadge';
+  el.innerHTML = '<span class="nb-rays"></span><b class="nb-word">NEW!</b><span class="nb-sub">มอนตัวใหม่ · บันทึกลงสารบัญแล้ว</span>';
+  document.body.appendChild(el); sfx.perfect();
+}
 
 // ---------- growth: pick food in the collection grid, evolution scene ----------
 function pickMon(uid) {
