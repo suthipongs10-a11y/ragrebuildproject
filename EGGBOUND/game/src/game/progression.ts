@@ -1,5 +1,5 @@
 // Rewards, levels, fragments, eggs, evolution (star-ups) and skill-ups.
-import { STAGES, SPECIES, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, rareFormChance, MAX_STARS, EVO_GOLD, SKILL_MAX, FEED_MAX, FEED_K, FEED_BASE, FEED_GOLD, cumExp, EGG_LOOT_GRADE, LOOT_ORDER } from '../core/data';
+import { STAGES, SPECIES, STAR_SHARD_CHANCE, STAR_SHARDS_TO_CRAFT, starbornOf, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, rareFormChance, MAX_STARS, EVO_GOLD, SKILL_MAX, FEED_MAX, FEED_K, FEED_BASE, FEED_GOLD, cumExp, EGG_LOOT_GRADE, LOOT_ORDER } from '../core/data';
 import type { EggTier, LootGrade } from '../core/data';
 import type { Rarity } from '../core/types';
 import type { SaveData, EggSave, MonSave } from './save';
@@ -7,7 +7,7 @@ import { newMon } from './save';
 import { canHatch, endIncub } from './home';
 
 export interface MonGain { uid: number; sid: string; fromLvl: number; toLvl: number; exp: number; capped: boolean }
-export interface Reward { win: boolean; stars: number; firstClear: boolean; gold: number; gains: MonGain[]; frags: Record<string, number>; eggs: EggSave[] }
+export interface Reward { win: boolean; stars: number; firstClear: boolean; gold: number; gains: MonGain[]; frags: Record<string, number>; eggs: EggSave[]; star?: string } // star: a Starborn shard dropped (species id)
 export const FRAGS_TO_CRAFT = 20;
 
 export function stageUnlocked(s: SaveData, id: string): boolean {
@@ -31,16 +31,23 @@ export function grantRewards(s: SaveData, stageId: string, win: boolean, stars: 
     g.toLvl = m.lvl; r.gains.push(g);
   }
   if (win) {
-    const uniq = [...new Set(seen.filter(sid => SPECIES[sid] && !SPECIES[sid].boss))];
+    const uniq = [...new Set(seen.filter(sid => SPECIES[sid] && !SPECIES[sid].boss && !SPECIES[sid].starborn))];
     for (const sid of uniq) { const n = 1 + (rnd() < .35 ? 1 : 0); r.frags[sid] = n; s.frags[sid] = (s.frags[sid] || 0) + n; }
     // mystery egg: one roll per win, boss stages drop more often, first clear always drops
-    const boss = st.waves.some(w => w.some(m => SPECIES[m.sid]?.boss));
+    const boss = st.waves.some(w => w.some(m => m.boss || SPECIES[m.sid]?.boss));
+    // Starborn shard: the first clear always drops one, after that it is a long farm
+    const star = starbornOf(st); if (star && (first || rnd() < STAR_SHARD_CHANCE)) { r.star = star; s.starShards[star] = (s.starShards[star] || 0) + 1; }
     if (first || rnd() < (boss ? EGG_DROP.bossChance : EGG_DROP.chance)) { const e = rollMysteryEgg(s, rnd); s.eggs.push(e); r.eggs.push(e); }
     s.stages[stageId] = Math.max(s.stages[stageId] || 0, stars);
   }
   return r;
 }
 
+/** 40 Starborn shards → that Starborn's egg (named; Starborn have no rare form) */
+export function craftStarEgg(s: SaveData, sid: string): boolean {
+  if (!SPECIES[sid]?.starborn || (s.starShards[sid] || 0) < STAR_SHARDS_TO_CRAFT) return false;
+  s.starShards[sid] -= STAR_SHARDS_TO_CRAFT; s.stats.craft++; s.eggs.push({ id: s.nextEggId++, sid, kind: 'named', rare: false }); return true;
+}
 export function craftEgg(s: SaveData, sid: string, rnd: () => number = Math.random): boolean {
   if ((s.frags[sid] || 0) < FRAGS_TO_CRAFT) return false;
   s.frags[sid] -= FRAGS_TO_CRAFT; s.stats.craft++; s.eggs.push({ id: s.nextEggId++, sid, kind: 'named', rare: rnd() < rareFormChance(NAMED_RARE_FORM, sid) }); return true;
@@ -54,7 +61,7 @@ function pickW<K extends string>(w: Partial<Record<K, number>>, r: number): K {
 }
 /** a hatchable species of that rarity; if none exists yet, the nearest lower rarity, then the nearest higher */
 export function rollSpecies(rarity: Rarity, rnd: () => number): string {
-  const pool = Object.values(SPECIES).filter(x => !x.boss), i = RARITY_ORDER.indexOf(rarity);
+  const pool = Object.values(SPECIES).filter(x => !x.boss && !x.starborn), i = RARITY_ORDER.indexOf(rarity); // Starborn only come from their shards
   const order = [i, ...[0, 1, 2, 3].filter(k => k < i).reverse(), ...[0, 1, 2, 3].filter(k => k > i)];
   for (const k of order) { const ps = pool.filter(x => x.rarity === RARITY_ORDER[k]); if (ps.length) return ps[Math.floor(rnd() * ps.length)].id; }
   return pool[0].id;
@@ -149,13 +156,15 @@ export function skillUp(s: SaveData, uid: number, food: number | null, rnd: () =
 // ---- stage-end chest contents ----
 export type LootItem = { kind: 'gold'; grade: LootGrade; qty: number; first: boolean }
   | { kind: 'frag'; grade: LootGrade; qty: number; sid: string }
-  | { kind: 'egg'; grade: LootGrade; egg: EggSave };
+  | { kind: 'egg'; grade: LootGrade; egg: EggSave }
+  | { kind: 'star'; grade: LootGrade; sid: string }; // a Starborn shard — always the chest's best item
 /** chest items, worst first so the best one pops out last; chest grade = the best item's grade */
 export function lootOf(r: Reward): { items: LootItem[]; grade: LootGrade } {
   const items: LootItem[] = [];
   if (r.gold) items.push({ kind: 'gold', grade: 'common', qty: r.gold, first: r.firstClear });
   for (const [sid, n] of Object.entries(r.frags)) items.push({ kind: 'frag', grade: 'common', qty: n, sid });
   for (const egg of r.eggs) items.push({ kind: 'egg', grade: egg.kind === 'mystery' && egg.tier ? EGG_LOOT_GRADE[egg.tier] : 'rare', egg });
+  if (r.star) items.push({ kind: 'star', grade: 'legendary', sid: r.star });
   const rank = (g: LootGrade) => LOOT_ORDER.indexOf(g);
   items.sort((a, b) => rank(a.grade) - rank(b.grade));
   return { items, grade: items.length ? items[items.length - 1].grade : 'common' };

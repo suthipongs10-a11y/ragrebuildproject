@@ -1,7 +1,7 @@
 // Adventure book (สมุดผจญภัย): one-time quests grouped in chapters (one per map region + one per game system), handing out
 // gems (600 in total for the current content), mystery eggs, egg shards, gold and soul crystals; a finished chapter opens a chest.
 // Progress is read from the save (stages, dex, monsters) and lifetime counters (save.stats); rewards are claimed by hand.
-import { SPECIES, STAGES, GEM_GOLD_EGG, RUSH_BASE, RUSH_STEP, EGG_TIERS, levelCap, rareFormChance } from '../core/data';
+import { SPECIES, STAGES, ZONES, GEM_GOLD_EGG, RUSH_BASE, RUSH_STEP, EGG_TIERS, levelCap, rareFormChance } from '../core/data';
 import type { EggTier } from '../core/data';
 import type { SaveData, EggSave } from './save';
 import { rollRarity, rollSpecies, skillMaxed } from './progression';
@@ -16,20 +16,21 @@ const dexHas = (s: SaveData, r: string) => s.dex.filter(id => SPECIES[id]?.rarit
 const stageStars = (s: SaveData, id: string) => s.stages[id] || 0;
 const maxStars = (s: SaveData) => Math.max(0, ...s.mons.map(m => m.stars));
 const starsAtLeast = (s: SaveData, k: number) => s.mons.filter(m => m.stars >= k).length;
-const allSpecies = Object.values(SPECIES).filter(x => !x.boss).length;
+const allSpecies = Object.values(SPECIES).filter(x => !x.boss && !x.starborn).length;
 /** levels gained across every building since a new home (castle 1, five buildings at 1, shrine 0) */
 const homeUps = (s: SaveData) => { const h = home(s); return h.castle - 1 + Object.values(h.lv).reduce((a, b) => a + b, 0) - 5 + Object.values(h.shrine).reduce((a, b) => a + b, 0); };
 
-// ---- maps: one chapter per region, three quests per stage (clear · 3 stars · win 5 times); new stages join automatically ----
+// ---- maps: one chapter per realm, three quests per zone (beat the boss · every stage 3 stars · beat the boss 5 times);
+// new zones join automatically. Gems stay 10 per zone + 40 per chapter (the book total is locked by tests/eggs.ts). ----
 export const REGION_NAME: Record<string, string> = { '1': 'ทุ่งไข่ป่วน', '2': 'สุวรรณภูมิ', '3': 'สวรรค์บูรพา' };
-const regions = [...new Set(STAGES.map(st => st.id.split('-')[0]))];
-const regionChapters: Chapter[] = regions.map(r => ({ id: 'map' + r, name: `แผนที่ ${r} · ${REGION_NAME[r] || 'ภพที่ ' + r}`, desc: 'ผ่านทุกด่าน เก็บครบ 3 ดาว และชนะซ้ำด่านละ 5 ครั้ง', bonus: { gems: 40, egg: 'gold' } }));
-const mapQuests: Quest[] = STAGES.flatMap((st, i) => {
-  const ch = 'map' + st.id.split('-')[0], boss = STAGES[i + 1]?.id.split('-')[0] !== st.id.split('-')[0];
+const regions = [...new Set(ZONES.map(z => z.realm))];
+const regionChapters: Chapter[] = regions.map(r => ({ id: 'map' + r, name: `แผนที่ ${r} · ${REGION_NAME[r] || 'ภพที่ ' + r}`, desc: 'ชนะบอสทุกโซน เก็บครบ 3 ดาวทุกด่าน และชนะบอสซ้ำโซนละ 5 ครั้ง', bonus: { gems: 40, egg: 'gold' } }));
+const mapQuests: Quest[] = ZONES.flatMap((z, i) => {
+  const ch = 'map' + z.realm, last = ZONES[i + 1]?.realm !== z.realm, boss = z.id + '-5', ids = STAGES.filter(st => st.zone === z.id).map(st => st.id);
   return [
-    { id: 'clear' + st.id, ch, name: `ผ่านด่าน ${st.id} ${st.name}`, goal: (s: SaveData) => n(stageStars(s, st.id) > 0 ? 1 : 0, 1), reward: boss ? { gold: 1500, soul: 1 } : { gold: 800 + i * 400 } },
-    { id: 'star' + st.id, ch, name: `ด่าน ${st.id} ครบ 3 ดาว`, goal: (s: SaveData) => n(stageStars(s, st.id), 3), reward: { gems: 10 } },
-    { id: 'farm' + st.id, ch, name: `ชนะด่าน ${st.id} 5 ครั้ง`, goal: (s: SaveData) => n(s.stats.stageWins[st.id] || 0, 5), reward: boss ? { egg: 'silver', gold: 1000 } : { gold: 600 + i * 300 } },
+    { id: 'zclear' + z.id, ch, name: `ชนะบอส ${z.name}`, goal: (s: SaveData) => n(stageStars(s, boss) > 0 ? 1 : 0, 1), reward: last ? { gold: 1500, soul: 1 } : { gold: 800 + i * 300 } },
+    { id: 'zstar' + z.id, ch, name: `${z.name} ครบ 3 ดาวทุกด่าน`, goal: (s: SaveData) => n(ids.filter(id => stageStars(s, id) >= 3).length, ids.length), reward: { gems: 10 } },
+    { id: 'zfarm' + z.id, ch, name: `ชนะบอส ${z.name} 5 ครั้ง`, goal: (s: SaveData) => n(s.stats.stageWins[boss] || 0, 5), reward: last ? { egg: 'silver', gold: 1000 } : { gold: 600 + i * 250 } },
   ];
 });
 
@@ -67,7 +68,7 @@ export const QUESTS: Quest[] = [
   { id: 'dex8', ch: 'hatch', name: 'ค้นพบมอน 8 ชนิด', goal: s => n(s.dex.length, 8), reward: { gems: 10 } },
   { id: 'dex11', ch: 'hatch', name: 'ค้นพบมอน 11 ชนิด', goal: s => n(s.dex.length, 11), reward: { gems: 10, frags: { A09: 5 } } },
   { id: 'dex14', ch: 'hatch', name: 'ค้นพบมอน 14 ชนิด', goal: s => n(s.dex.length, 14), reward: { gems: 15, frags: { A09: 10 } } },
-  { id: 'dexall', ch: 'hatch', name: `ค้นพบมอนครบ ${allSpecies} ชนิด`, goal: s => n(s.dex.length, allSpecies), reward: { gems: 20 } },
+  { id: 'dexall', ch: 'hatch', name: `ค้นพบมอนครบ ${allSpecies} ชนิด`, goal: s => n(s.dex.filter(id => !SPECIES[id]?.starborn).length, allSpecies), reward: { gems: 20 } },
   // growth & evolution (SW: power-up → evolve → 5★ → 6★)
   { id: 'feed10', ch: 'grow', name: 'ป้อนมอนเพิ่มเลเวล 10 ครั้ง', goal: s => n(s.stats.feed, 10), reward: { gems: 5, gold: 2000 } },
   { id: 'feed50', ch: 'grow', name: 'ป้อนมอนเพิ่มเลเวล 50 ครั้ง', goal: s => n(s.stats.feed, 50), reward: { gems: 10, gold: 5000 } },

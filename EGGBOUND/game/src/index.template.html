@@ -254,6 +254,46 @@ html:not(.has-book-emblem) .bk-emblem{position:relative}html:not(.has-book-emble
   .mtabs2 button{font-size:.76rem;padding:8px 3px}
   .fslots{gap:8px}.fslot{width:44px;height:44px}
 }
+/* world map: a sea-of-clouds chart per realm (painted BATCH18 map when present), zone islands on a dotted route */
+.wmap{overflow-x:auto;overflow-y:hidden;margin:4px -4px 10px;padding:4px;border-radius:20px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.wmap-in{position:relative;width:100%;aspect-ratio:16/9;margin:0 auto;border-radius:18px;overflow:hidden;border:1px solid rgba(255,230,180,.25);box-shadow:inset 0 0 80px rgba(0,0,0,.35);background-size:cover;background-position:center}
+.wmap-in:not(.art){background:
+  radial-gradient(ellipse 22% 14% at 18% 22%,rgba(255,255,255,.55),transparent 70%),radial-gradient(ellipse 30% 16% at 70% 82%,rgba(255,255,255,.5),transparent 70%),
+  radial-gradient(ellipse 26% 12% at 52% 12%,rgba(255,255,255,.4),transparent 70%),radial-gradient(ellipse 34% 18% at 88% 50%,rgba(255,255,255,.35),transparent 70%),
+  radial-gradient(ellipse 28% 15% at 8% 92%,rgba(255,255,255,.4),transparent 70%),linear-gradient(170deg,var(--sky0),var(--sky1) 55%,var(--sky2))}
+.wmap-in.realm1{--sky0:#bfe3f2;--sky1:#9cc9e6;--sky2:#7aa9d8;--isle:#7fb05a}
+.wmap-in.realm2{--sky0:#f6dfaa;--sky1:#e9c38a;--sky2:#c98e6a;--isle:#c9a24a}
+.wmap-in.realm3{--sky0:#cfe6e6;--sky1:#a9cfd8;--sky2:#8a9fd0;--isle:#5aa58a}
+.wmap-in svg{position:absolute;inset:0;width:100%;height:100%}
+.wmap-in polyline{fill:none;stroke:rgba(255,248,226,.85);stroke-width:6;stroke-dasharray:4 16;stroke-linecap:round;filter:drop-shadow(0 2px 2px rgba(40,30,10,.35))}
+.pin{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:0;color:var(--ink);cursor:pointer;z-index:1}
+.pin::before{content:'';position:absolute;top:calc(clamp(70px,11vh,104px) * .62);left:50%;width:calc(clamp(70px,11vh,104px) * 1.7);height:calc(clamp(70px,11vh,104px) * .62);transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at 50% 30%,color-mix(in srgb,var(--isle,#7fb05a) 85%,#fff) 0 38%,var(--isle,#7fb05a) 52%,#8a6a44 54%,#5a4228 70%,transparent 72%);filter:drop-shadow(0 8px 6px rgba(20,30,50,.3));z-index:-1}
+.wmap-in.art .pin::before{display:none}
+.wmap-in.art .pin .isle{width:clamp(40px,7vh,56px);border-width:2px;box-shadow:0 4px 10px rgba(0,0,0,.45)} /* painted chart: the island is in the painting, the pin is a small marker */
+.pin .isle{width:clamp(70px,11vh,104px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--isle) 70%,#fff),var(--isle) 60%,color-mix(in srgb,var(--isle) 60%,#000));background-size:cover;background-position:center;border:3px solid #f6e3b0;box-shadow:0 10px 0 -2px rgba(70,50,30,.55),0 14px 22px rgba(0,0,0,.35),inset 0 0 0 2px rgba(0,0,0,.25);transition:transform .15s}
+.pin:hover .isle,.pin:focus-visible .isle{transform:scale(1.07)}
+.pin.starborn .isle{border-color:#bfa8ff;box-shadow:0 10px 0 -2px rgba(60,40,110,.6),0 0 22px rgba(170,140,255,.75),inset 0 0 0 2px rgba(0,0,0,.25)}
+.pin.here .isle{animation:pinPulse 1.6s ease-in-out infinite}
+@keyframes pinPulse{50%{box-shadow:0 10px 0 -2px rgba(70,50,30,.55),0 0 0 8px rgba(255,210,122,.45),0 14px 22px rgba(0,0,0,.35)}}
+.pin.locked .isle{filter:grayscale(.85) brightness(.6)}
+.pin .bossb{position:absolute;top:-6px;right:-10px;width:38%;aspect-ratio:1;border-radius:50%;overflow:hidden;border:2px solid var(--gold);background:#1a1410;box-shadow:0 2px 6px rgba(0,0,0,.5)}
+.pin.starborn .bossb{border-color:#c9b4ff}.pin .bossb img{width:100%;height:100%;display:block}
+.pin .lock{position:absolute;top:28%;font-size:1.4rem}
+.pin .lbl{display:flex;flex-direction:column;align-items:center;background:rgba(14,12,10,.78);border:1px solid rgba(255,220,160,.35);border-radius:10px;padding:3px 9px;line-height:1.15;white-space:nowrap}
+.pin .lbl b{font:500 .82rem var(--f-display,inherit)}.pin .lbl small{font-size:.66rem;color:var(--ink-dim)}
+.pin.clear .lbl{border-color:var(--gold)}
+.zpanel{position:fixed;inset:0;z-index:90;background:rgba(6,6,10,.55);display:flex;justify-content:flex-end;align-items:stretch;animation:fadeIn .18s}
+.zsheet{width:min(440px,100%);height:100%;overflow-y:auto;background:var(--dark);border-left:1px solid var(--line);padding:0 14px 20px;display:flex;flex-direction:column;gap:12px;animation:slideIn .22s ease-out}
+@keyframes slideIn{from{transform:translateX(40px);opacity:0}}@keyframes fadeIn{from{opacity:0}}
+.zhead{position:relative;margin:0 -14px;min-height:170px;padding:16px;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(170deg,#5a7a4a,#2a3a2a);background-size:cover;background-position:center}
+.zhead h2{margin:0;font:500 1.4rem var(--f-display,inherit);text-shadow:0 2px 6px #000}.zhead p{margin:4px 0 0;font-size:.82rem;color:#f0e6d6;text-shadow:0 1px 4px #000}
+.zx{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:50%;border:1px solid var(--line);background:rgba(0,0,0,.55);color:var(--ink);font-size:1rem}
+.zstar{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;padding:10px 12px;border-radius:14px;border:1.5px solid #b49cff;background:linear-gradient(170deg,rgba(160,130,255,.2),var(--panel) 70%)}
+.zstar img{width:52px;height:52px;object-fit:contain}.zstar b{font:500 .9rem var(--f-display,inherit);color:#d8ccff}.zstar small{font-size:.7rem;color:var(--ink-dim)}
+.zsheet .stage .num img{width:100%;height:100%;border-radius:50%;display:block}
+.drop.star,.craft.star{border-color:#b49cff;background:linear-gradient(170deg,rgba(160,130,255,.18),var(--panel) 70%)}
+@media (max-width:640px){.wmap-in{width:auto;height:min(58vh,520px)}.zpanel{align-items:flex-end}.zsheet{width:100%;height:auto;max-height:86vh;border-left:0;border-top:1px solid var(--line);border-radius:18px 18px 0 0;animation:slideUp .22s ease-out}.zhead{border-radius:18px 18px 0 0;min-height:140px}.zsheet{padding-bottom:calc(env(safe-area-inset-bottom,0px) + 18px)}}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0}}
 .realms{margin:-4px 0 10px;flex-wrap:wrap}.realms button{flex:1 1 140px;padding:9px 10px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink-dim);font:600 .86rem var(--f-body,inherit)}.realms button small{opacity:.75;font-weight:500;margin-left:4px}.realms button.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}.realms button:disabled{opacity:.45}
 .mtabs{margin:-4px 0 12px}.mtabs button{flex:1;padding:9px 10px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink-dim);font:600 .86rem var(--f-body,inherit)}.mtabs button.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}
 .dexsum{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.dexsum .row{gap:6px}.dexsum .chip{white-space:nowrap;flex:0 0 auto}.dexsum button.chip{cursor:pointer}.dexsum .chip.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}

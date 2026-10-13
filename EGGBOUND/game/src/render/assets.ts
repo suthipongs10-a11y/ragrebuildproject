@@ -22,6 +22,28 @@ const ANCH_RAW = { front_idle: { mouth: [735, 640], body: [520, 640] }, front_at
 export const ANCH = {};
 for (const k in ANCH_RAW) { ANCH[k] = {}; for (const p in ANCH_RAW[k]) { const a = ANCH_RAW[k][p]; ANCH[k][p] = [a[0] / 2 - PIV[0], a[1] / 2 - PIV[1]]; } }
 
+// ---- separate-file art (assets_ext/ → dist/ext/<key>.webp, list in __EXT__): Starborn sprites and eggs, too big to embed
+// under the 16MB single-file limit. Loaded through fetch → blob URL so the images stay same-origin (pixel reads such as
+// bbox/recolour keep working); a failed load just leaves the placeholder art. ----
+const EXT: string[] = typeof __EXT__ !== 'undefined' ? __EXT__ : [];
+const EXTP = {};
+function loadExt(key): Promise<void> {
+  if (IMG[key] || !EXT.includes(key)) return Promise.resolve();
+  return EXTP[key] ||= fetch('ext/' + key + '.webp').then(r => r.ok ? r.blob() : Promise.reject(new Error(key)))
+    .then(b => new Promise<void>(res => { const i = new Image(); i.onload = () => { IMG[key] = i; res(); }; i.onerror = () => res(); i.src = URL.createObjectURL(b); }))
+    .catch(() => { delete EXTP[key]; });
+}
+/** drop every cached sprite / portrait / egg made for a species (placeholders drawn before its art arrived) */
+function forgetArt(sid) { for (const C of [SPR, silC, glowC, BB, ANC2, PORT, EGG, EGGU, RMU]) for (const k of Object.keys(C)) if (k === sid || k.startsWith(sid)) delete C[k]; }
+const extKeys = sid => { const a = SPECIES[baseOf(sid)]?.art; return a ? EXT.filter(k => k.startsWith(a + '_') || k === 'egg' + a.slice(3)) : []; };
+export const isExtArt = sid => extKeys(sid).length > 0;
+/** is every separate-file image of these species already loaded? */
+export const artReady = sids => sids.every(sid => extKeys(sid).every(k => IMG[k]));
+/** make sure these species' separate-file art is loaded (awaited before a battle that shows them) */
+export async function ensureArt(sids) { const need = [...new Set(sids.map(baseOf))].filter(sid => extKeys(sid).some(k => !IMG[k])); if (!need.length) return false; await Promise.all(need.flatMap(sid => extKeys(sid).map(loadExt))); need.forEach(forgetArt); return true; }
+/** background-load all separate-file art one species at a time; onDone(sid) after each (to refresh screens) */
+export function prefetchExt(onDone = sid => { }) { const sids = Object.keys(SPECIES).filter(isExtArt); let i = 0; const next = () => { if (i >= sids.length) return; const sid = sids[i++]; ensureArt([sid]).then(ch => { if (ch) onDone(sid); next(); }); }; next(); }
+
 export async function loadAssets() {
   const A = (window as any).__ASSETS || {};
   await Promise.all(Object.keys(A).map(n => new Promise<void>((res, rej) => { const i = new Image(); i.onload = () => { IMG[n] = i; res(); }; i.onerror = () => rej(new Error('asset ' + n)); i.src = A[n]; })));

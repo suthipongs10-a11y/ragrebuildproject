@@ -1,6 +1,6 @@
 // P0 game data: 6 starters + realm boss + 3 stages of "ทุ่งไข่ป่วน".
 // All numbers are starting values for playtest (see GAME_CONFIG_v2.json).
-import type { SpeciesDef, StageDef, Elem, Rarity, SkillDef } from './types';
+import type { SpeciesDef, StageDef, ZoneDef, EnemyRef, Elem, Rarity, SkillDef } from './types';
 
 export const ELEM_NAME: Record<Elem, string> = { fire: 'ไฟ', water: 'น้ำ', wind: 'ลม', earth: 'ดิน', light: 'แสง', dark: 'มืด' };
 export const ROLE_NAME: Record<string, string> = { Attacker: 'จู่โจม', Defender: 'ป้องกัน', Support: 'สนับสนุน', Healer: 'ฟื้นฟู', Controller: 'ควบคุม' };
@@ -299,6 +299,48 @@ export const SPECIES: Record<string, SpeciesDef> = {
       { id: 'root_devour', name: 'ป่ากลืนกิน', desc: 'รากโผล่ใต้ทุกตัว ดูดชีวิต 30% ของดาเมจ', cd: 4, target: 'enemyAll', mult: 1.0, effects: [{ kind: 'drain', value: 0.3, to: 'self' }], anim: 'ult_roots', ult: true },
     ],
   },
+  // ---- Starborn Legends (ตำนานดารา, BATCH10): legendary power, signature kits; zone bosses on the world map — their
+  // shards (rare boss drop) build their egg. Art ships as separate files (assets_ext/, loaded on demand). ----
+  S01: {
+    id: 'S01', art: 'monS01', name: 'วาลคีร์ปีกพายุ', nameEn: 'Valkyr Stormwing', elem: 'light', role: 'Healer', rarity: 'legendary', starborn: true,
+    base: { hp: 1060, atk: 112, def: 70, spd: 115 },
+    leader: { stat: 'hp', value: 0.22, text: 'HP ทั้งทีม +22%' },
+    skills: [
+      { id: 'valk_spear', name: 'หอกดาวพายุ', desc: 'แทง 1 ตัว 60% ติดเครื่องหมายแสง + เกจตัวเอง 10', cd: 0, target: 'enemy', mult: 1.1, effects: [{ kind: 'mark', elem: 'light', chance: 0.6 }, { kind: 'atb', value: 10, to: 'self' }], anim: 'melee' },
+      { id: 'valk_hymn', name: 'บทเพลงปีกสวรรค์', desc: 'ฮีลทั้งทีม 22% + ล้างสถานะทั้งทีม', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.22, to: 'allies' }, { kind: 'cleanse', to: 'allies' }], anim: 'heal' },
+      { id: 'valk_valhalla', name: 'วัลฮัลลาเรียกวิญญาณ', desc: 'ชุบชีวิตเพื่อน 1 ตัว 40% + ทีมอมตะ 1 เทิร์น', cd: 6, target: 'allyAll', mult: 0, effects: [{ kind: 'revive', value: 0.4, n: 1, to: 'allies' }, { kind: 'status', status: 'invincible', turns: 1, to: 'allies' }], anim: 'ult_starlight', ult: true },
+    ],
+  },
+  S02: {
+    id: 'S02', art: 'monS02', name: 'คิเมร่าราชันย์', nameEn: 'Chimera Rex', elem: 'fire', role: 'Attacker', rarity: 'legendary', starborn: true,
+    base: { hp: 980, atk: 150, def: 60, spd: 114 },
+    leader: { stat: 'atk', value: 0.25, text: 'ATK ทั้งทีม +25%' },
+    skills: [
+      { id: 'chim_claw', name: 'กรงเล็บราชันย์', desc: 'ตะปบ 1 ตัว 40% เผาไหม้ 2 เทิร์น', cd: 0, target: 'enemy', mult: 1.25, effects: [{ kind: 'status', status: 'burn', turns: 2, chance: 0.4 }], anim: 'melee' },
+      { id: 'chim_breath', name: 'ลมหายใจไฟดารา', desc: 'ทุกตัว 70% ติดเครื่องหมายไฟ + 40% ลด DEF 2 เทิร์น', cd: 3, target: 'enemyAll', mult: 0.85, effects: [{ kind: 'mark', elem: 'fire', chance: 0.7 }, { kind: 'status', status: 'def_down', turns: 2, chance: 0.4 }], anim: 'volley' },
+      { id: 'chim_rex', name: 'ราชันย์อสูรดารา', desc: 'ขย้ำ 1 ตัวแรงมาก ไม่สนใจ DEF 30% + 35% มึน 1 เทิร์น', cd: 5, target: 'enemy', mult: 2.8, ignoreDef: 0.3, effects: [{ kind: 'status', status: 'stun', turns: 1, chance: 0.35 }], anim: 'ult_dash', ult: true },
+    ],
+  },
+  S03: {
+    id: 'S03', art: 'monS03', name: 'พญานาคปัญจเศียร', nameEn: 'Panchanaga', elem: 'water', role: 'Defender', rarity: 'legendary', starborn: true,
+    base: { hp: 1320, atk: 102, def: 96, spd: 104 },
+    leader: { stat: 'def', value: 0.25, text: 'DEF ทั้งทีม +25%' },
+    skills: [
+      { id: 'panch_bite', name: 'ห้าเศียรฉก', desc: 'ฉก 1 ตัว 70% ติดเครื่องหมายน้ำ', cd: 0, target: 'enemy', mult: 1.05, effects: [{ kind: 'mark', elem: 'water', chance: 0.7 }], anim: 'melee' },
+      { id: 'panch_hood', name: 'พังพานห้าเศียร', desc: 'โล่ทั้งทีม 20% + DEF ทั้งทีมขึ้น 2 เทิร์น', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'shield', value: 0.2, to: 'allies' }, { kind: 'status', status: 'def_up', turns: 2, to: 'allies' }], anim: 'shield' },
+      { id: 'panch_flood', name: 'มหาอุทกภัยปัญจนาค', desc: 'ทุกตัว ติดเปียก + 60% ลด SPD 2 เทิร์น + ลดเกจ 20', cd: 5, target: 'enemyAll', mult: 1.2, effects: [{ kind: 'mark', elem: 'water', chance: 1 }, { kind: 'status', status: 'spd_down', turns: 2, chance: 0.6 }, { kind: 'atb', value: -20 }], anim: 'ult_rain', ult: true },
+    ],
+  },
+  S04: {
+    id: 'S04', art: 'monS04', name: 'โอโรจิแปดหุบเขา', nameEn: 'Yamata Orochi', elem: 'dark', role: 'Controller', rarity: 'legendary', starborn: true,
+    base: { hp: 1040, atk: 128, def: 66, spd: 110 },
+    leader: { stat: 'res', value: 0.25, text: 'ต้านทานทั้งทีม +25%' },
+    skills: [
+      { id: 'oro_fangs', name: 'แปดเขี้ยวพิษ', desc: 'กัด 1 ตัว 50% พิษ 2 เทิร์น + 50% ติดเครื่องหมายมืด', cd: 0, target: 'enemy', mult: 1.1, effects: [{ kind: 'status', status: 'poison', turns: 2, chance: 0.5 }, { kind: 'mark', elem: 'dark', chance: 0.5 }], anim: 'melee' },
+      { id: 'oro_sake', name: 'สุราแปดไห', desc: 'ทุกตัว 35% หลับ 1 เทิร์น + 50% ลด ATK 2 เทิร์น', cd: 3, target: 'enemyAll', mult: 0.5, effects: [{ kind: 'status', status: 'sleep', turns: 1, chance: 0.35 }, { kind: 'status', status: 'atk_down', turns: 2, chance: 0.5 }], anim: 'volley' },
+      { id: 'oro_valleys', name: 'แปดหุบเขาพิโรธ', desc: 'ทุกตัว ลบบัฟ 1 อย่าง + 45% ผนึกสกิล 2 เทิร์น', cd: 5, target: 'enemyAll', mult: 1.3, effects: [{ kind: 'strip', n: 1 }, { kind: 'status', status: 'silence', turns: 2, chance: 0.45 }], anim: 'ult_nightwave', ult: true },
+    ],
+  },
 };
 // ---- rare forms = light/dark monsters of their own (decided 2026-10-13): same name, element light or dark (a light species
 // turns dark and a dark one turns light), skill 1 kept in the new element, its own skills 2 and 3 built around the light
@@ -394,113 +436,82 @@ export function formOf(sid: string, rare = false): { elem: Elem; skills: SkillDe
 }
 export const STARTERS = ['A01', 'A02', 'A03', 'A04', 'A05', 'A06'];
 
-export const STAGES: StageDef[] = [
-  { id: '1-1', loc: 'meadow', name: 'ทุ่งหญ้าไข่ป่วน', desc: 'มอนป่ารอบทุ่ง เหมาะกับการลองจัดทีม', stamina: 3,
-    reward: { gold: 320, exp: 140 },
-    waves: [
-      [{ sid: 'A02', lvl: 3, stars: 1 }, { sid: 'A06', lvl: 3, stars: 1 }],
-      [{ sid: 'A03', lvl: 3, stars: 1 }, { sid: 'A02', lvl: 4, stars: 1 }, { sid: 'A06', lvl: 3, stars: 1 }],
-      [{ sid: 'A04', lvl: 4, stars: 1 }, { sid: 'A03', lvl: 4, stars: 1 }, { sid: 'A05', lvl: 4, stars: 1 }],
-    ] },
-  { id: '1-2', loc: 'stream', name: 'ลำธารเปียกปอน', desc: 'ศัตรูเปียกง่าย ลองใช้ลมให้เกิดพายุฟ้าคะนอง', stamina: 4,
-    reward: { gold: 480, exp: 220 },
-    waves: [
-      [{ sid: 'A02', lvl: 5, stars: 1 }, { sid: 'A02', lvl: 5, stars: 1 }, { sid: 'A06', lvl: 5, stars: 1 }],
-      [{ sid: 'A03', lvl: 5, stars: 1 }, { sid: 'A02', lvl: 6, stars: 1 }, { sid: 'A01', lvl: 5, stars: 1 }],
-      [{ sid: 'A03', lvl: 6, stars: 1 }, { sid: 'A02', lvl: 8, stars: 1 }, { sid: 'A04', lvl: 6, stars: 1 }],
-    ] },
-  { id: '1-3', loc: 'rootnest', name: 'รังรากไม้', desc: 'บอสอสูรรากไม้ยักษ์ ระวังรากรัดทำให้มึน', stamina: 6,
-    reward: { gold: 800, exp: 340 },
-    waves: [
-      [{ sid: 'A06', lvl: 8, stars: 1 }, { sid: 'A06', lvl: 8, stars: 1 }, { sid: 'A04', lvl: 8, stars: 1 }],
-      [{ sid: 'A04', lvl: 8, stars: 1 }, { sid: 'A05', lvl: 8, stars: 1 }, { sid: 'A01', lvl: 8, stars: 1 }],
-      [{ sid: 'A06', lvl: 8, stars: 1 }, { sid: 'BOSS_ROOT', lvl: 14, stars: 1, hpMult: 5, atkMult: 0.95 }, { sid: 'A06', lvl: 8, stars: 1 }],
-    ] },
-  { id: '2-1', loc: 'goldforest', name: 'ป่าตะเคียนทอง', desc: 'พรายตะเคียนกับหุ่นฟางซุ่มในป่า ระวังติดคำสาปลด ATK', stamina: 5,
-    reward: { gold: 1000, exp: 420 },
-    waves: [
-      [{ sid: 'B04', lvl: 6, stars: 2 }, { sid: 'B03', lvl: 6, stars: 2 }],
-      [{ sid: 'B02', lvl: 7, stars: 2 }, { sid: 'B04', lvl: 7, stars: 2 }, { sid: 'B03', lvl: 7, stars: 2 }],
-      [{ sid: 'B02', lvl: 8, stars: 2 }, { sid: 'B03', lvl: 8, stars: 2 }, { sid: 'B04', lvl: 9, stars: 2 }],
-    ] },
-  { id: '2-2', loc: 'ricefield', name: 'ทุ่งควายธนู', desc: 'ควายธนูหนังเหนียว ใช้ไฟเผาไหม้หรือทำปฏิกิริยาลาวา', stamina: 5,
-    reward: { gold: 1150, exp: 460 },
-    waves: [
-      [{ sid: 'B01', lvl: 11, stars: 2 }, { sid: 'B03', lvl: 11, stars: 2 }],
-      [{ sid: 'B01', lvl: 12, stars: 2 }, { sid: 'B04', lvl: 12, stars: 2 }, { sid: 'B03', lvl: 12, stars: 2 }],
-      [{ sid: 'B01', lvl: 13, stars: 2 }, { sid: 'B01', lvl: 13, stars: 2 }, { sid: 'B04', lvl: 13, stars: 2 }],
-    ] },
-  { id: '2-3', loc: 'village', name: 'หมู่บ้านหุ่นพยนต์', desc: 'เสือสมิงคุมหมู่บ้านยามค่ำ ตัวใหญ่กว่าปกติ', stamina: 6,
-    reward: { gold: 1300, exp: 500 },
-    waves: [
-      [{ sid: 'B02', lvl: 8, stars: 2 }, { sid: 'B02', lvl: 8, stars: 2 }, { sid: 'B05', lvl: 7, stars: 2 }],
-      [{ sid: 'B05', lvl: 8, stars: 2 }, { sid: 'B04', lvl: 8, stars: 2 }, { sid: 'B02', lvl: 9, stars: 2 }],
-      [{ sid: 'B02', lvl: 9, stars: 2 }, { sid: 'B05', lvl: 11, stars: 2, hpMult: 1.5 }, { sid: 'B02', lvl: 9, stars: 2 }],
-    ] },
-  { id: '2-4', loc: 'kinnari', name: 'วิมานกินรี', desc: 'ศัตรูธาตุลมฮีลเก่ง ตีให้ไวหรือใช้ไฟ', stamina: 6,
-    reward: { gold: 1450, exp: 540 },
-    waves: [
-      [{ sid: 'B06', lvl: 8, stars: 2 }, { sid: 'B03', lvl: 8, stars: 2 }],
-      [{ sid: 'B03', lvl: 9, stars: 2 }, { sid: 'B06', lvl: 9, stars: 2 }, { sid: 'B08', lvl: 8, stars: 2 }],
-      [{ sid: 'B06', lvl: 10, stars: 2 }, { sid: 'B08', lvl: 10, stars: 2 }, { sid: 'B03', lvl: 10, stars: 2 }],
-    ] },
-  { id: '2-5', loc: 'temple', name: 'ลานคชสีห์', desc: 'คชสีห์เฝ้าลานพระ ป้องกันหนา ลด DEF ก่อนค่อยตี', stamina: 7,
-    reward: { gold: 1650, exp: 590 },
-    waves: [
-      [{ sid: 'B07', lvl: 12, stars: 2 }, { sid: 'B05', lvl: 12, stars: 2 }],
-      [{ sid: 'B08', lvl: 13, stars: 2 }, { sid: 'B07', lvl: 13, stars: 2 }, { sid: 'B06', lvl: 13, stars: 2 }],
-      [{ sid: 'B05', lvl: 14, stars: 2 }, { sid: 'B07', lvl: 15, stars: 2, hpMult: 1.8 }, { sid: 'B08', lvl: 14, stars: 2 }],
-    ] },
-  { id: '2-6', loc: 'nagapool', name: 'สระมณีนาคราช', desc: 'บอสพญานาคราช คลื่นยักษ์ทำทุกตัวเปียก ใช้ลมจุดพายุฟ้าคะนองกลับ', stamina: 9,
-    reward: { gold: 2600, exp: 800 },
-    waves: [
-      [{ sid: 'B06', lvl: 15, stars: 2 }, { sid: 'B04', lvl: 15, stars: 2 }, { sid: 'B03', lvl: 15, stars: 2 }],
-      [{ sid: 'B08', lvl: 16, stars: 2 }, { sid: 'B05', lvl: 16, stars: 2 }, { sid: 'B07', lvl: 16, stars: 2 }],
-      [{ sid: 'B06', lvl: 16, stars: 2 }, { sid: 'BOSS_NAGA', lvl: 20, stars: 2, hpMult: 4, atkMult: 0.95 }, { sid: 'B04', lvl: 16, stars: 2 }],
-    ] },
-  { id: '3-1', loc: 'jade', name: 'สวนหยกจันทรา', desc: 'กระต่ายหยกกับคางคกทองเฝ้าสวน ฮีลกันเอง', stamina: 7,
-    reward: { gold: 1900, exp: 640 },
-    waves: [
-      [{ sid: 'C04', lvl: 12, stars: 3 }, { sid: 'C02', lvl: 12, stars: 3 }],
-      [{ sid: 'C01', lvl: 13, stars: 3 }, { sid: 'C04', lvl: 13, stars: 3 }, { sid: 'C02', lvl: 13, stars: 3 }],
-      [{ sid: 'C02', lvl: 14, stars: 3 }, { sid: 'C01', lvl: 14, stars: 3 }, { sid: 'C04', lvl: 15, stars: 3 }],
-    ] },
-  { id: '3-2', loc: 'palace', name: 'ตำหนักปี่เซียะ', desc: 'สิงโตผู้พิทักษ์สวนกลับ ปี่เซียะให้โล่ทั้งทีม', stamina: 7,
-    reward: { gold: 2100, exp: 690 },
-    waves: [
-      [{ sid: 'C03', lvl: 11, stars: 3 }, { sid: 'C01', lvl: 11, stars: 3 }],
-      [{ sid: 'C03', lvl: 12, stars: 3 }, { sid: 'C01', lvl: 12, stars: 3 }, { sid: 'C02', lvl: 12, stars: 3 }],
-      [{ sid: 'C03', lvl: 13, stars: 3 }, { sid: 'C03', lvl: 13, stars: 3 }, { sid: 'C01', lvl: 13, stars: 3 }],
-    ] },
-  { id: '3-3', loc: 'foxvalley', name: 'หุบเขาจิ้งจอกเก้าหาง', desc: 'จิ้งจอกเก้าหางร่างรัตติกาลซุ่มอยู่ ระวังระเบิดเงา', stamina: 8,
-    reward: { gold: 2300, exp: 740 },
-    waves: [
-      [{ sid: 'C05', lvl: 8, stars: 3 }, { sid: 'C04', lvl: 8, stars: 3 }],
-      [{ sid: 'C05', lvl: 9, stars: 3 }, { sid: 'C03', lvl: 9, stars: 3 }, { sid: 'C04', lvl: 9, stars: 3 }],
-      [{ sid: 'C03', lvl: 10, stars: 3 }, { sid: 'C05', lvl: 11, stars: 3, hpMult: 1.8, rare: true }, { sid: 'C04', lvl: 10, stars: 3 }],
-    ] },
-  { id: '3-4', loc: 'toadbridge', name: 'สะพานคางคกทอง', desc: 'คางคกพ่นเหรียญลด DEF จิ้งจอกเผาไหม้ทั้งทีม', stamina: 8,
-    reward: { gold: 2500, exp: 790 },
-    waves: [
-      [{ sid: 'C02', lvl: 9, stars: 3 }, { sid: 'C05', lvl: 9, stars: 3 }],
-      [{ sid: 'C02', lvl: 10, stars: 3 }, { sid: 'C05', lvl: 10, stars: 3 }, { sid: 'C01', lvl: 10, stars: 3 }],
-      [{ sid: 'C05', lvl: 11, stars: 3 }, { sid: 'C02', lvl: 11, stars: 3 }, { sid: 'C01', lvl: 11, stars: 3 }, { sid: 'C04', lvl: 10, stars: 3 }],
-    ] },
-  { id: '3-5', loc: 'heaven', name: 'ประตูสวรรค์', desc: 'ราชาอสูรวัวเฝ้าประตู สะท้อนดาเมจ ตีด้วยสถานะแทน', stamina: 9,
-    reward: { gold: 2800, exp: 850 },
-    waves: [
-      [{ sid: 'C06', lvl: 16, stars: 3 }, { sid: 'C04', lvl: 16, stars: 3 }],
-      [{ sid: 'C03', lvl: 17, stars: 3 }, { sid: 'C06', lvl: 17, stars: 3 }, { sid: 'C05', lvl: 17, stars: 3 }],
-      [{ sid: 'C04', lvl: 18, stars: 3, rare: true }, { sid: 'C06', lvl: 19, stars: 3, hpMult: 1.8 }, { sid: 'C03', lvl: 18, stars: 3 }],
-    ] },
-  { id: '3-6', loc: 'firecave', name: 'ถ้ำเพลิงราชาอสูร', desc: 'บอสราชาอสูรวัวเพลิงนรก ทุบมึนทั้งทีม พกล้างสถานะไปด้วย', stamina: 11,
-    reward: { gold: 4000, exp: 1100 },
-    waves: [
-      [{ sid: 'C05', lvl: 18, stars: 3 }, { sid: 'C03', lvl: 18, stars: 3 }, { sid: 'C02', lvl: 18, stars: 3 }],
-      [{ sid: 'C06', lvl: 18, stars: 3 }, { sid: 'C05', lvl: 18, stars: 3 }, { sid: 'C04', lvl: 18, stars: 3 }],
-      [{ sid: 'C03', lvl: 18, stars: 3 }, { sid: 'BOSS_BULL', lvl: 22, stars: 3, hpMult: 3, atkMult: 0.9 }, { sid: 'C05', lvl: 18, stars: 3 }],
-    ] },
+// ---- world map (decided 2026-10-13): 15 zones, one per battle location, five stages each — the fifth is the zone
+// boss (an elite of the zone's signature monster, a map boss, or a Starborn Legend). Waves are generated from each zone's
+// monster pool; the per-stage enemy levels (`lv`) are tuned with the starter-team sim (tests/sim.ts `ZONE_PLAN`). ----
+export const ZONES: ZoneDef[] = [
+  { id: 'meadow', realm: '1', loc: 'meadow', name: 'ทุ่งหญ้าไข่ป่วน', desc: 'ทุ่งบ้านเกิดของเผ่าไข่ป่วน มอนป่าซนๆ เหมาะลองจัดทีม' },
+  { id: 'stream', realm: '1', loc: 'stream', name: 'ลำธารเปียกปอน', desc: 'ศัตรูเปียกง่าย ลองใช้ลมให้เกิดพายุฟ้าคะนอง' },
+  { id: 'rootnest', realm: '1', loc: 'rootnest', name: 'รังรากไม้', desc: 'ป่าลึกใต้ต้นไม้ยักษ์ รากรัดทำให้มึน' },
+  { id: 'goldforest', realm: '2', loc: 'goldforest', name: 'ป่าตะเคียนทอง', desc: 'พรายตะเคียนกับหุ่นฟางซุ่มในป่า ระวังคำสาปลด ATK' },
+  { id: 'ricefield', realm: '2', loc: 'ricefield', name: 'ทุ่งควายธนู', desc: 'ควายธนูหนังเหนียว ใช้ไฟเผาไหม้หรือทำปฏิกิริยาลาวา' },
+  { id: 'village', realm: '2', loc: 'village', name: 'หมู่บ้านหุ่นพยนต์', desc: 'หมู่บ้านยามค่ำ เสือสมิงออกล่า ตีแรงแต่ตัวบาง' },
+  { id: 'kinnari', realm: '2', loc: 'kinnari', name: 'วิมานกินรี', desc: 'ศัตรูธาตุลมฮีลเก่ง ตีให้ไวหรือใช้ไฟ' },
+  { id: 'temple', realm: '2', loc: 'temple', name: 'ลานคชสีห์', desc: 'คชสีห์เฝ้าลานปราสาท ป้องกันหนา · บอสตำนานดารา คิเมร่าราชันย์' },
+  { id: 'nagapool', realm: '2', loc: 'nagapool', name: 'สระมณีนาคราช', desc: 'สระศักดิ์สิทธิ์ยามสนธยา · บอสตำนานดารา พญานาคปัญจเศียร' },
+  { id: 'jade', realm: '3', loc: 'jade', name: 'สวนหยกจันทรา', desc: 'กระต่ายหยกกับคางคกทองเฝ้าสวน ฮีลกันเอง' },
+  { id: 'palace', realm: '3', loc: 'palace', name: 'ตำหนักปี่เซียะ', desc: 'สิงโตผู้พิทักษ์สวนกลับ ปี่เซียะให้โล่ทั้งทีม' },
+  { id: 'foxvalley', realm: '3', loc: 'foxvalley', name: 'หุบเขาจิ้งจอกเก้าหาง', desc: 'หุบเขาหิมะ ไฟจิ้งจอกลอยวน · บอสตำนานดารา โอโรจิแปดหุบเขา' },
+  { id: 'toadbridge', realm: '3', loc: 'toadbridge', name: 'สะพานคางคกทอง', desc: 'คางคกพ่นเหรียญลด DEF จิ้งจอกเผาไหม้ทั้งทีม' },
+  { id: 'heaven', realm: '3', loc: 'heaven', name: 'ประตูสวรรค์', desc: 'ประตูเหนือทะเลเมฆ · บอสตำนานดารา วาลคีร์ปีกพายุ' },
+  { id: 'firecave', realm: '3', loc: 'firecave', name: 'ถ้ำเพลิงราชาอสูร', desc: 'ถ้ำลาวาของราชาอสูรวัวเพลิงนรก ทุบมึนทั้งทีม พกล้างสถานะไปด้วย' },
 ];
+interface ZoneGen { pool: string[]; grade: number; k: [number, number, number, number, number]; boss: EnemyRef; bossDesc: string; rare?: boolean; duel?: boolean } // duel: the boss comes with one escort, not two
+/** per-zone generator data · enemies sit at the recommended level (ZONE_PLAN); k = HP/ATK multiplier of stages 1–5
+ *  (boss stage: its escorts) tuned by the starter-team sim · the boss: its own HP/ATK multipliers, level = plan + 3 */
+export const ZONE_GEN: Record<string, ZoneGen> = {
+  meadow: { pool: ['A02', 'A06', 'A03', 'A04'], grade: 1, k: [1.15, 1, 0.9, 0.9, 0.9], boss: { sid: 'A07', lvl: 0, stars: 1, boss: true, name: 'ไข่ป่วนยักษ์', scale: 1.45, hpMult: 7.35, atkMult: 0.95 }, bossDesc: 'บอสไข่ป่วนยักษ์ หัวหน้าเผ่า ตัวใหญ่ HP หนา' },
+  stream: { pool: ['A02', 'A03', 'A06', 'A01'], grade: 1, k: [0.85, 0.85, 0.9, 0.85, 0.9], boss: { sid: 'A02', lvl: 0, stars: 1, boss: true, name: 'ราชาสไลม์ธารา', scale: 1.5, hpMult: 2.05, atkMult: 0.95 }, bossDesc: 'บอสราชาสไลม์ ฮีลตัวเองเก่ง ทำเปียกใส่ทั้งทีม' },
+  rootnest: { pool: ['A06', 'A04', 'A05', 'A08'], grade: 1, k: [1.15, 1.15, 1, 1, 1], boss: { sid: 'BOSS_ROOT', lvl: 0, stars: 1, hpMult: 4.6, atkMult: 0.95 }, bossDesc: 'บอสอสูรรากไม้ยักษ์ ระวังรากรัดทำให้มึน' },
+  goldforest: { pool: ['B04', 'B02', 'B03'], grade: 2, k: [1.3, 1.15, 1.15, 1.15, 1.15], boss: { sid: 'B04', lvl: 0, stars: 2, boss: true, name: 'แม่พรายตะเคียนทอง', scale: 1.4, hpMult: 5.25, atkMult: 0.95 }, bossDesc: 'บอสแม่พรายตะเคียน ฮีลแรง สาปลด ATK' },
+  ricefield: { pool: ['B04', 'B03', 'B01'], grade: 2, k: [1.2, 1.05, 1.25, 1.15, 1.2], boss: { sid: 'B01', lvl: 0, stars: 2, boss: true, name: 'ควายธนูเขาทอง', scale: 1.4, hpMult: 6.85, atkMult: 0.95 }, bossDesc: 'บอสควายธนูเขาทอง หนังเหนียวมาก ใช้ไฟหรือลาวา' },
+  village: { pool: ['B02', 'B04', 'B05'], grade: 2, k: [1.25, 1.1, 0.9, 1, 0.95], boss: { sid: 'B05', lvl: 0, stars: 2, boss: true, name: 'เสือสมิงเฒ่า', scale: 1.4, hpMult: 3.05, atkMult: 0.95 }, bossDesc: 'บอสเสือสมิงเฒ่า ตีแรงมาก ทำให้ติดสถานะ' },
+  kinnari: { pool: ['B03', 'B06', 'B08'], grade: 2, k: [1, 0.95, 0.75, 0.85, 0.8], boss: { sid: 'B06', lvl: 0, stars: 2, boss: true, name: 'ราชินีกินรี', scale: 1.4, hpMult: 4.85, atkMult: 0.95 }, bossDesc: 'บอสราชินีกินรี ฮีลทั้งทีม ต้องตีให้ไว' },
+  temple: { pool: ['B06', 'B05', 'B08', 'B07'], grade: 2, k: [0.8, 0.75, 0.8, 0.75, 0.8], boss: { sid: 'S02', lvl: 0, stars: 2, boss: true, scale: 1.3, hpMult: 1.3, atkMult: 0.95 }, bossDesc: 'บอสตำนานดารา คิเมร่าราชันย์ ตะปบแรงไม่สนใจ DEF · มีโอกาสดรอปเศษไข่ดารา', duel: true },
+  nagapool: { pool: ['B04', 'B06', 'B05', 'B08'], grade: 2, k: [1.35, 1.2, 1, 0.95, 1], boss: { sid: 'S03', lvl: 0, stars: 2, boss: true, scale: 1.3, hpMult: 3.05, atkMult: 0.95 }, bossDesc: 'บอสตำนานดารา พญานาคปัญจเศียร โล่หนา คลื่นยักษ์ทำทุกตัวเปียก · มีโอกาสดรอปเศษไข่ดารา', duel: true },
+  jade: { pool: ['C02', 'C01', 'C04'], grade: 3, k: [1.55, 1.5, 1.35, 1.5, 1.45], boss: { sid: 'C04', lvl: 0, stars: 3, boss: true, name: 'กระต่ายหยกจันทรา', scale: 1.4, hpMult: 1.7, atkMult: 0.95 }, bossDesc: 'บอสกระต่ายหยกจันทรา ฮีลทั้งทีม ต้องทำห้ามฮีลหรือตีให้ไว' },
+  palace: { pool: ['C01', 'C02', 'C03'], grade: 3, k: [1.6, 1.25, 1.3, 1.3, 1.3], boss: { sid: 'C01', lvl: 0, stars: 3, boss: true, name: 'ปี่เซียะทองคำ', scale: 1.4, hpMult: 6, atkMult: 0.95 }, bossDesc: 'บอสปี่เซียะทองคำ ให้โล่ทั้งทีม ลด DEF ก่อนค่อยตี' },
+  foxvalley: { pool: ['C04', 'C03', 'C05'], grade: 3, k: [1.25, 1.15, 1.05, 1.05, 1.05], boss: { sid: 'S04', lvl: 0, stars: 3, boss: true, scale: 1.3, hpMult: 5.8, atkMult: 0.95 }, bossDesc: 'บอสตำนานดารา โอโรจิแปดหุบเขา ทำหลับ ผนึกสกิล ลบบัฟ · มีโอกาสดรอปเศษไข่ดารา', rare: true, duel: true },
+  toadbridge: { pool: ['C01', 'C04', 'C02', 'C05'], grade: 3, k: [1.5, 1.5, 1.4, 1.3, 1.35], boss: { sid: 'C02', lvl: 0, stars: 3, boss: true, name: 'คางคกทองสามขายักษ์', scale: 1.5, hpMult: 2.05, atkMult: 0.95 }, bossDesc: 'บอสคางคกทองยักษ์ พ่นเหรียญลด DEF ทั้งทีม', duel: true },
+  heaven: { pool: ['C04', 'C03', 'C05', 'C06'], grade: 3, k: [1.2, 1.15, 1, 0.95, 1], boss: { sid: 'S01', lvl: 0, stars: 3, boss: true, scale: 1.3, hpMult: 2.15, atkMult: 0.95 }, bossDesc: 'บอสตำนานดารา วาลคีร์ปีกพายุ ชุบชีวิตลูกน้อง ทีมอมตะ · มีโอกาสดรอปเศษไข่ดารา', rare: true, duel: true },
+  firecave: { pool: ['C02', 'C03', 'C05', 'C06'], grade: 3, k: [1.15, 1.2, 1.05, 1.05, 1.05], boss: { sid: 'BOSS_BULL', lvl: 0, stars: 3, hpMult: 1.95, atkMult: 0.95 }, bossDesc: 'บอสราชาอสูรวัวเพลิงนรก ทุบมึนทั้งทีม พกล้างสถานะไปด้วย' },
+};
+/** wave make-up for stages 1–5: indexes into the zone pool (weakest first, the zone's strongest last; wrapped for short
+ *  pools) — later stages bring in the stronger monsters. The boss wave puts the boss between its two escorts. */
+const WAVE_PAT = [
+  [[0, 1], [0, 1, 0], [1, 0, 1]],
+  [[0, 1], [1, 0, 1], [0, 2, 1]],
+  [[0, 1, 0], [1, 2, 0], [0, 2, 1]],
+  [[1, 0, 1], [0, 2, 1], [2, 3, 0]],
+  [[0, 1, 2], [1, 3, 0], [0, 1]],
+];
+/** recommended team per zone for the stage list and the balance sim: [level at stage 1, level at stage 5, stars] —
+ *  enemy levels (`lv`) are whatever makes the starter team at this level win ~85% (stage 1) → ~62% (boss) */
+export const ZONE_PLAN: Record<string, [number, number, number]> = { meadow: [3, 5, 1], stream: [5, 8, 1], rootnest: [8, 10, 1], goldforest: [5, 7, 2], ricefield: [7, 9, 2], village: [9, 12, 2], kinnari: [12, 14, 2], temple: [14, 17, 2], nagapool: [17, 20, 2], jade: [5, 8, 3], palace: [8, 11, 3], foxvalley: [11, 14, 3], toadbridge: [14, 17, 3], heaven: [17, 21, 3], firecave: [21, 25, 3] };
+export const planOf = (st: StageDef): [number, number] => { const [a, b, s] = ZONE_PLAN[st.zone] || [5, 5, 1]; return [Math.round(a + (b - a) * (st.n - 1) / 4), s]; };
+export function zoneStages(z: ZoneDef, zi: number): StageDef[] {
+  const g = ZONE_GEN[z.id], out: StageDef[] = [], [p0, p1] = ZONE_PLAN[z.id];
+  for (let n = 1; n <= 5; n++) {
+    const waves: EnemyRef[][] = [], lv = Math.round(p0 + (p1 - p0) * (n - 1) / 4), k = g.k[n - 1], mult = k === 1 ? {} : { hpMult: k, atkMult: k };
+    WAVE_PAT[n - 1].forEach((pat, w) => {
+      const wave: EnemyRef[] = pat.map(i => ({ sid: g.pool[i % g.pool.length], lvl: lv + (w === 2 && n < 5 ? 1 : 0), stars: g.grade, ...mult }));
+      if (g.rare && n === 4 && w === 2 && RARE_FORMS[wave[1].sid]) wave[1].rare = true; // a light/dark rare form guards the last wave
+      if (n === 5 && w === 2) { if (g.duel) wave.length = 1; wave.splice(1, 0, { ...g.boss, lvl: lv + 3 }); }
+      waves.push(wave);
+    });
+    const boss = n === 5, gold = Math.round((250 + 110 * zi + 35 * n) * (boss ? 1.6 : 1) / 10) * 10, exp = Math.round((120 + 50 * zi + 18 * n) * (boss ? 1.4 : 1));
+    out.push({ id: `${z.id}-${n}`, zone: z.id, n, realm: z.realm, loc: z.loc, name: z.name, desc: boss ? g.bossDesc : z.desc, stamina: 3 + Math.floor(zi / 2) + (boss ? 2 : 0), reward: { gold, exp }, waves });
+  }
+  return out;
+}
+export const STAGES: StageDef[] = ZONES.flatMap(zoneStages);
+/** pre-zone saves (2026-10-13 and before) used one stage per place: '1-1'..'3-6' → that place's zone */
+export const LEGACY_STAGE_ZONE: Record<string, string> = { '1-1': 'meadow', '1-2': 'stream', '1-3': 'rootnest', '2-1': 'goldforest', '2-2': 'ricefield', '2-3': 'village', '2-4': 'kinnari', '2-5': 'temple', '2-6': 'nagapool', '3-1': 'jade', '3-2': 'palace', '3-3': 'foxvalley', '3-4': 'toadbridge', '3-5': 'heaven', '3-6': 'firecave' };
+/** Starborn shards (เศษไข่ดารา): a Starborn zone boss drops one on the first clear, then STAR_SHARD_CHANCE per win;
+ *  STAR_SHARDS_TO_CRAFT build the egg (owner's choice 2026-10-13: 5% · 40 — a long farm, ~800 wins on average) */
+export const STAR_SHARD_CHANCE = 0.05, STAR_SHARDS_TO_CRAFT = 40;
+/** the Starborn boss of a stage (only boss stages have one) */
+export const starbornOf = (st: StageDef) => st.waves.flat().find(m => SPECIES[m.sid]?.starborn)?.sid;
 
 // Stats, Summoners-War style: each star grade has its own level cap; evolving (★+1) resets the level to 1 at a slightly
 // lower multiplier than the previous grade's max, so a max-level evolve is always a big step up. ★6 max ≈ 8× ★1 Lv1.

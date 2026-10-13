@@ -7,7 +7,7 @@ export function passiveTests(): number {
   let fail = 0;
   const ok = (c: boolean, msg: string) => { if (!c) { fail++; console.log('PASSIVE FAIL:', msg); } };
   const st = STAGES[0], mk = (team: MonsterRef[]) => new Battle(7, team, st) as any, R = (sid: string, rare = true): MonsterRef => ({ sid, lvl: 10, stars: 2, rare });
-  ok(Object.values(SPECIES).filter(s => !s.boss).every(s => !!s.rarePassive), 'every species has a rare passive');
+  ok(Object.values(SPECIES).filter(s => !s.boss && !s.starborn).every(s => !!s.rarePassive), 'every species has a rare passive (Starborn have none)');
 
   { const b = mk([R('B01'), R('A02', false)]), u = b.units[0], ev: any[] = []; u.hp = 0;
     ok(b.endure(u, ev) && u.hp === 1 && u.statuses.some((x: any) => x.id === 'shield') && ev.some(e => e.t === 'passive'), 'endure saves once');
@@ -31,7 +31,7 @@ export function passiveTests(): number {
   // ---- light/dark rare forms (2026-10-13): own element + skills, and the 13 mechanics they use ----
   { const n = formOf('A02'), r = formOf('A02', true);
     ok(n.elem === 'water' && r.elem === 'light' && r.skills[0].effects.some(e => e.kind === 'mark' && e.elem === 'light') && r.skills[0].desc.includes('เครื่องหมายแสง') && r.skills[1].id !== n.skills[1].id && r.skills[2].id !== n.skills[2].id, 'rare form: light element, skill 1 re-elemented, own skills 2-3');
-    ok(Object.values(SPECIES).filter(s => !s.boss).every(s => s.rareForm && (s.rareForm.elem === 'light' || s.rareForm.elem === 'dark') && s.rareForm.elem !== s.elem), 'every species has a light/dark rare form of another element');
+    ok(Object.values(SPECIES).filter(s => !s.boss && !s.starborn).every(s => s.rareForm && (s.rareForm.elem === 'light' || s.rareForm.elem === 'dark') && s.rareForm.elem !== s.elem), 'every species has a light/dark rare form of another element');
     ok(mk([R('A01')]).units[0].elem === 'light' && mk([R('A01', false)]).units[0].elem === 'fire', 'rare units fight in their rare element'); }
   const foe1 = (b: any) => b.units.find((u: any) => u.team === 1);
   { const b = mk([R('A01', false)]), me = b.units[0], foe = foe1(b); me.statuses.push({ id: 'invincible', turns: 1 }); const hp0 = me.hp;
@@ -76,7 +76,7 @@ export function passiveTests(): number {
     }
   }
   // balance: the same team with and without rare forms on the boss stage
-  { const boss = STAGES.find(s => s.id === '1-3')!, N = 300; // the map-1 boss: the rare-form baseline every check above was tuned on
+  { const boss = STAGES.find(s => s.id === 'rootnest-5')!, N = 300; // the map-1 boss: the rare-form baseline every check above was tuned on
     for (const ids of [['A01', 'A02', 'A03', 'A04'], ['B05', 'B04', 'B07', 'A08'], ['A05', 'C01', 'B01', 'A06']]) {
       const wr = (rare: boolean) => { let w = 0; for (let i = 0; i < N; i++) if (simulate(2000 + i, ids.map(sid => ({ sid, lvl: 10, stars: 1, rare })), boss).win) w++; return Math.round(w / N * 100); };
       console.log(`rare-form check ${boss.id} ${ids.join(',')} Lv10: normal ${wr(false)}% → rare ${wr(true)}%`);

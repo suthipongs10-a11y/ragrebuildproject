@@ -30,7 +30,7 @@ export class BattleView {
   makeView(u, pos, drop) {
     const s = SPECIES[u.sid];
     const v = { uid: u.uid, sid: lookOf(u.sid, u.stars, !!u.rare), rare: !!u.rare, team: u.team, elem: u.elem, boss: u.boss, name: u.name, stars: u.stars, lvl: u.lvl,
-      x: pos[0], y: pos[1], hx: pos[0], hy: pos[1], hop: drop ? -620 : 0, sx: 1, sy: 1, rot: 0, k: .4 * (s.scale || 1),
+      x: pos[0], y: pos[1], hx: pos[0], hy: pos[1], hop: drop ? -620 : 0, sx: 1, sy: 1, rot: 0, k: .4 * (u.scale || s.scale || 1),
       back: u.team === 0, flip: u.team === 1, hb: u.team === 0, hf: u.team === 1, pose: 'idle', alpha: drop ? 0 : 1, flash: 0, ghosts: [], glowF: 0,
       dead: false, deathT: 0, hitT: 0, kvx: 0, kvy: 0, hp: u.hp, maxHp: u.maxHp, shown: u.hp, st: new Set(), marks: new Set(), busy: !!drop, ph: Math.random() * 9, emberT: 0, atb: 0, shieldAmt: 0,
       bend: 0, bendV: 0, bendT: 0, wave: 0, wph: 0, br: 0 }; // living-sprite springs (lean / recoil / ripple / breathing)

@@ -1,5 +1,5 @@
 // Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
-import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, RARE_FORM_MULT, NAMED_RARE_FORM } from '../src/core/data';
+import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, ZONES, RARE_FORM_MULT, NAMED_RARE_FORM } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
 import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
 import { startIncub, incubLeft, incubOf, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
@@ -79,14 +79,14 @@ export function eggTests(): number {
   // adventure book: quests unlock from progress, claim once; gems buy gold eggs and rush incubation
   { const s = newSave(); ok(new Set(QUESTS.map(q => q.id)).size === QUESTS.length, 'quest ids unique');
     ok(claimable(s).length === 0 && claimQuest(s, 'win1') === null, 'nothing claimable on a new save');
-    grantRewards(s, '1-1', true, 3, ['A02'], 3); ok(claimable(s).some(q => q.id === 'win1') && claimable(s).some(q => q.id === 'clear1-1'), 'winning unlocks quests');
+    grantRewards(s, 'meadow-5', true, 3, ['A02'], 3); ok(claimable(s).some(q => q.id === 'win1') && claimable(s).some(q => q.id === 'zclearmeadow'), 'winning unlocks quests');
     const g0 = s.gems; ok(!!claimQuest(s, 'win1') && s.gems === g0 + 10 && claimQuest(s, 'win1') === null, 'claim once');
-    ok(bookGems() === 800, 'book gem total ' + bookGems()); // 600 + maps 2-3 (2026-10-13): 6 stages × 10 + chapter 40 each
+    ok(bookGems() === 800, 'book gem total ' + bookGems()); // 600 + maps 2-3 (2026-10-13): 6 zones × 10 + chapter 40 each
     ok(CHAPTERS.every(c => questsIn(c.id).length > 0) && QUESTS.every(q => CHAPTERS.some(c => c.id === q.ch)), 'every quest in a chapter, no empty chapter');
-    ok(STAGES.every(st => ['clear', 'star', 'farm'].every(k => QUESTS.some(q => q.id === k + st.id))), 'every map stage has clear/3-star/farm quests');
-    for (let i = 0; i < 4; i++) grantRewards(s, '1-1', true, 3, [], 10 + i); ok(claimable(s).some(q => q.id === 'farm1-1'), 'winning a stage 5 times unlocks its farm quest');
+    ok(ZONES.every(z => ['zclear', 'zstar', 'zfarm'].every(k => QUESTS.some(q => q.id === k + z.id))), 'every zone has boss/3-star/farm quests');
+    for (let i = 0; i < 4; i++) grantRewards(s, 'meadow-5', true, 3, [], 10 + i); ok(claimable(s).some(q => q.id === 'zfarmmeadow'), 'beating a zone boss 5 times unlocks its farm quest');
     ok(claimQuest(s, 'ch:map1') === null, 'chapter chest locked until every quest is claimed');
-    { const e0 = s.eggs.length; for (const q of questsIn('map1')) { s.stages[q.id.replace(/^(clear|star|farm)/, '')] = 3; s.stats.stageWins[q.id.replace(/^(clear|star|farm)/, '')] = 5; }
+    { const e0 = s.eggs.length; for (const st of STAGES) if (st.realm === '1') { s.stages[st.id] = 3; s.stats.stageWins[st.id] = 5; }
       for (const q of questsIn('map1')) ok(!!claimQuest(s, q.id), 'claim ' + q.id);
       ok(chapterClaimable(s).some(c => c.id === 'map1'), 'finished chapter is claimable'); const g1 = s.gems;
       ok(!!claimQuest(s, 'ch:map1') && s.gems === g1 + 40 && claimQuest(s, 'ch:map1') === null, 'chapter chest claims once');
@@ -119,7 +119,7 @@ export function eggTests(): number {
     delete (globalThis as any).localStorage; }
 
   // first clear always drops a mystery egg
-  { const s = newSave(); const r = grantRewards(s, '1-1', true, 3, ['A02', 'A06'], 7); ok(r.eggs.length === 1 && r.eggs[0].kind === 'mystery', 'first clear drops a mystery egg'); }
+  { const s = newSave(); const r = grantRewards(s, 'meadow-1', true, 3, ['A02', 'A06'], 7); ok(r.eggs.length === 1 && r.eggs[0].kind === 'mystery', 'first clear drops a mystery egg'); }
 
   // chest: grade = best item, best item last
   { const base = { win: true, stars: 3, firstClear: false, gold: 300, gains: [], frags: { A02: 1 }, eggs: [] as any[] };

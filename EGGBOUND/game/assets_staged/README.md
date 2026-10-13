@@ -10,3 +10,4 @@ bundle size. When the monster is added to `SPECIES` (data.ts), move its files in
 - All Starborn sets imported at front_idle height 360 (`import_art.py <dir> S0x 360 --out assets_staged`); eggs at 254.
   S01–S04 together ≈ 1.5MB — too much for the 16MB single-file build, so they need separate-file loading when added.
 - BATCH11 extras: egg_starborn, starborn_shard, star_point
+- 2026-10-13: S01–S04 moved to `game/assets_ext/` (the game uses them as zone bosses; separate files loaded on demand).

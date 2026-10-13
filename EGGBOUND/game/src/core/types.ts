@@ -70,13 +70,19 @@ export interface SpeciesDef {
    *  its own skills 2 and 3 (decided 2026-10-13) */
   rareForm?: { elem: Elem; skills: [SkillDef, SkillDef] };
   boss?: boolean;
+  /** Starborn Legends (ตำนานดารา): zone bosses whose shards (rare drop) build their egg; never in mystery eggs */
+  starborn?: boolean;
   scale?: number;               // render scale multiplier
   art?: string;                 // sprite set key; absent → placeholder recolor
 }
 export interface MonsterRef { sid: string; lvl: number; stars: number; sk?: number[]; rare?: boolean }  // sk = skill levels (default 1)
-export interface EnemyRef extends MonsterRef { hpMult?: number; atkMult?: number }
+/** boss: this unit is a zone boss (bars, boss rules) even when its species is a normal monster · name/scale: elite title & size */
+export interface EnemyRef extends MonsterRef { hpMult?: number; atkMult?: number; boss?: boolean; name?: string; scale?: number }
+/** a zone (โซน) on the world map: one place with five stages, the fifth is its boss */
+export interface ZoneDef { id: string; realm: string; name: string; desc: string; loc: string }
 export interface StageDef {
   id: string; name: string; desc: string;
+  zone: string; n: number; realm: string; // zone id, stage number in the zone (1..5, 5 = boss), realm id
   loc?: string; // battle arena (render/locations.ts); none = the default meadow
   waves: EnemyRef[][];
   reward: { gold: number; exp: number };
@@ -88,7 +94,7 @@ export interface Mark { elem: Elem; turns: number; fresh?: boolean; wild?: boole
 export interface Unit {
   uid: number; team: 0 | 1; slot: number;
   sid: string; name: string; elem: Elem; role: Role;
-  lvl: number; stars: number; boss: boolean;
+  lvl: number; stars: number; boss: boolean; scale?: number; // scale: elite boss size (render only)
   maxHp: number; hp: number; atk: number; def: number; spd: number;
   crit: number; critDmg: number; res: number; acc: number;
   atb: number; cds: number[]; skills: SkillDef[];

@@ -21,7 +21,11 @@ if (process.argv.includes('--test')) {
 const bgDir = path.join(root, 'assets_bg'), bgOut = path.join(root, 'dist/bg'), bgIds = [];
 fs.rmSync(bgOut, { recursive: true, force: true });
 if (fs.existsSync(bgDir)) for (const f of fs.readdirSync(bgDir)) if (f.endsWith('.webp')) { fs.mkdirSync(bgOut, { recursive: true }); fs.copyFileSync(path.join(bgDir, f), path.join(bgOut, f)); bgIds.push(path.basename(f, '.webp')); }
-const res = await build({ entryPoints: [path.join(root, 'src/main.ts')], bundle: true, platform: 'browser', format: 'iife', target: 'es2020', minify: true, write: false, logLevel: 'warning', define: { __BG__: JSON.stringify(bgIds) } });
+// Separate-file sprites (Starborn sets, eggs): assets_ext/ → dist/ext/, loaded on demand (render/assets.ts ensureArt)
+const extDir = path.join(root, 'assets_ext'), extOut = path.join(root, 'dist/ext'), extIds = [];
+fs.rmSync(extOut, { recursive: true, force: true });
+if (fs.existsSync(extDir)) for (const f of fs.readdirSync(extDir)) if (f.endsWith('.webp')) { fs.mkdirSync(extOut, { recursive: true }); fs.copyFileSync(path.join(extDir, f), path.join(extOut, f)); extIds.push(path.basename(f, '.webp')); }
+const res = await build({ entryPoints: [path.join(root, 'src/main.ts')], bundle: true, platform: 'browser', format: 'iife', target: 'es2020', minify: true, write: false, logLevel: 'warning', define: { __BG__: JSON.stringify(bgIds), __EXT__: JSON.stringify(extIds) } });
 const js = res.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
 
 // Assets: game/assets/*.webp|png (authoritative). Legacy fallback: the old Test Lab's embedded ASSET block if present.
@@ -39,4 +43,4 @@ if (fs.existsSync(adir)) for (const f of fs.readdirSync(adir)) {
 const tpl = fs.readFileSync(path.join(root, 'src/index.template.html'), 'utf8');
 const out = tpl.replace('/*ASSETS*/', () => JSON.stringify(assets)).replace('/*BUNDLE*/', () => js);
 fs.writeFileSync(path.join(root, 'dist/index.html'), out);
-console.log('dist/index.html', (out.length / 1024).toFixed(0) + 'KB', 'bg plates:', bgIds.join(',') || '-', 'assets:', Object.keys(assets).join(','));
+console.log('dist/index.html', (out.length / 1024).toFixed(0) + 'KB', 'bg plates:', bgIds.join(',') || '-', 'ext art:', extIds.length, 'assets:', Object.keys(assets).join(','));

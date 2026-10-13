@@ -1,0 +1,120 @@
+=====================================================================
+EGGBOUND — ART BATCH 18 : WORLD MAPS (แผนที่โลก 3 ภพ)
+Image generation instructions for Google Flow (or ChatGPT)
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- หน้าแผนที่ในเกมทำเสร็จแล้ว (15 โซน โซนละ 5 ด่าน แตะเกาะเพื่อเลือกด่าน) ตอนนี้พื้นหลัง
+  แผนที่เป็นท้องฟ้าวาดด้วยโค้ด + เกาะเป็นวงกลมรูปฉาก — ภาพชุดนี้คือ "แผนที่วาดมือ" 3 ภาพ
+  (ภพละ 1 ภาพ) มาแทน ให้สวยแบบหน้าแผนที่โลกของ SW แต่เป็นสไตล์ของเรา
+- โลกของเรา: ทะเลเมฆกว้างใหญ่ มีเกาะลอยฟ้าแต่ละโซน บ้านเราคือเต่ายักษ์ที่ว่ายในทะเลเมฆ
+  ไปหาเกาะต่างๆ
+- เกมวาดเส้นทางจุดไข่ปลา ป้ายชื่อ ดาว และรูปบอสทับบนภาพเอง → ในภาพ "ห้ามมีตัวหนังสือ
+  เส้นทาง ป้าย ลูกศร หมุด หรือ UI"
+- ตำแหน่งเกาะสำคัญมาก (เกมวางป้ายตามพิกัด %) ถ้าภาพออกมาคลาดนิดหน่อยผมปรับพิกัดตามภาพได้
+- วิธีสั่ง Google Flow:
+  1) แนบไฟล์นี้ + ภาพฉากต่อสู้ BATCH17 ของโซนในภพนั้น (เป็นตัวอย่างหน้าตาสถานที่)
+     สั่งว่า: "สร้างภาพ #01 ตามไฟล์ที่แนบ สัดส่วน 16:9"
+  2) ได้ #01 ที่ชอบแล้ว → ทำ #02, #03 โดยแนบภาพ #01 ไปด้วย แล้วสั่งว่า
+     "สร้างภาพ #0X ตามไฟล์ ใช้สไตล์ มุมกล้อง และขนาดเกาะเดียวกับภาพที่แนบ เปลี่ยนแค่ภพ"
+  3) ชื่อไฟล์จาก Flow จะสุ่มมา ไม่ต้องเปลี่ยนชื่อ รวมเป็น zip ส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the environment artist for a premium 2.5D fantasy monster RPG
+(hand-painted, Summoners-War-like quality). Paint the WORLD MAP chart
+of one realm: a sea of clouds with floating islands, one island per
+zone. The game overlays the route, names, stars and boss icons, so you
+paint ONLY the landscape. Generate 3 images, ONE IMAGE PER TURN.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (every image)
+---------------------------------------------------------------------
+STYLE: painterly premium fantasy game world map, rich hand-painted
+texture, soft warm light from TOP-LEFT, clean readable shapes, cozy and
+magical. Southeast-Asian / Thai-Khmer and Chinese-heaven fantasy flavour.
+
+CAMERA: high bird's-eye view looking down at about 50–60°, like a
+tabletop diorama of floating islands. No fisheye, no tilt.
+
+WORLD: an endless SEA OF CLOUDS (soft, layered, slightly tinted by the
+realm's colour) with glimpses of sky between. Each zone is a FLOATING
+ISLAND (rocky underside with hanging roots / waterfalls into the
+clouds) whose top shows that zone's landmark in miniature. Islands are
+about 16–20% of the image width, clearly separated, with calm cloud
+space between them so the game can draw a dotted route.
+
+ISLAND POSITIONS (centre of each island top, % of the 16:9 image,
+x from the left, y from the top) — keep them exactly:
+  see each image below.
+
+FORBIDDEN: any text, letters, numbers, map labels, compass, route
+lines, arrows, pins, flags with writing, UI, frames, borders; monsters,
+people, characters; glow halos, lens flare, particles.
+ORIGINAL DESIGN — do not copy any existing game/film character, map or
+any existing game's UI.
+
+OUTPUT: 16:9, as large as possible (2048×1152 or more), no border,
+no vignette. Leave the outer 6% of the image as clouds only.
+
+---------------------------------------------------------------------
+2. IMAGES (one per turn)
+---------------------------------------------------------------------
+#01  map1.png — REALM 1 ทุ่งไข่ป่วน (green, fresh morning)
+Cloud sea tinted soft sky-blue. Three islands:
+  - (22%, 68%) MEADOW island: rolling green meadow, wild flowers,
+    a round cobblestone clearing, little lantern posts.
+  - (50%, 44%) STREAM island: a clear stream with stepping stones and
+    a willow, a small waterfall pouring off the island edge.
+  - (78%, 26%) ROOT NEST island: one gigantic ancient tree whose huge
+    roots wrap the whole island, teal glowing mushrooms under it.
+  A tiny far-away giant turtle carrying a small island on its shell,
+  swimming in the clouds near the bottom-left corner (decor, small).
+
+#02  map2.png — REALM 2 สุวรรณภูมิ (golden, warm afternoon)
+Cloud sea tinted warm gold-peach. Six islands:
+  - (13%, 70%) GOLDEN FOREST: tall pale trees with colourful cloth
+    sashes, golden leaves.
+  - (28%, 40%) RICE FIELDS: golden rice terraces, sugar palms, a small
+    thatched hut and haystacks.
+  - (44%, 70%) STILT VILLAGE: wooden Thai stilt houses with steep
+    thatched roofs, banana plants, warm lit windows.
+  - (57%, 34%) KINNARI LOTUS LAKE: a lotus lake with a floating golden
+    pavilion on a round teak deck.
+  - (71%, 66%) TEMPLE OF THE LIONS: laterite corn-cob prang towers on a
+    sandstone court.
+  - (85%, 30%) NAGA JEWEL POOL: a sapphire pool with golden multi-headed
+    naga statues and a golden stupa, dusk-blue mood on this island.
+
+#03  map3.png — REALM 3 สวรรค์บูรพา (jade & heaven, bright)
+Cloud sea tinted jade-lavender. Six islands:
+  - (13%, 64%) JADE MOON GARDEN: white wall with a round moon gate,
+    bamboo, jade-green paving.
+  - (28%, 32%) PIXIU PALACE: red palace walls with green-glazed roofs,
+    a red-and-gold gate.
+  - (43%, 68%) NINE-TAIL FOX VALLEY: snowy mountain peaks and pines
+    around a small valley.
+  - (57%, 34%) GOLDEN TOAD BRIDGE: a red arched bridge over a jade
+    river, a golden toad statue on coins.
+  - (71%, 22%) HEAVEN GATE: a grand white-and-gold gate on a marble
+    platform, the brightest island, crowned by sunlit clouds.
+  - (85%, 62%) DEMON KING'S FIRE CAVE: a dark volcanic island with lava
+    falls glowing into the clouds and a cave mouth.
+
+---------------------------------------------------------------------
+3. QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] Every island sits at its listed position, clearly separated
+  [ ] Each landmark is readable at small size (a phone shows the map
+      about 800 px wide)
+  [ ] No text, route lines, pins, labels, characters or UI
+  [ ] The three images share the same style, camera and island size
+
+---------------------------------------------------------------------
+4. PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_WORLD_MAPS.zip
+File names (Flow's random names are fine too — the developer matches them):
+  map1   map2   map3
+Add notes.txt listing any image you regenerated and why.

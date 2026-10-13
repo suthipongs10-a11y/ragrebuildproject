@@ -90,11 +90,11 @@ export class Battle {
   // ---------- setup ----------
   private makeUnit(m: EnemyRef, team: 0 | 1, slot: number, uid: number): Unit {
     const s = SPECIES[m.sid], form = formOf(s.id, !!(m as MonsterRef).rare);
-    const hp = Math.round(statAt(s.base.hp, m.lvl, m.stars) * (m.hpMult || 1));
+    const hp = Math.round(statAt(s.base.hp, m.lvl, m.stars) * (m.hpMult || 1)), boss = !!s.boss || !!m.boss; // elite / Starborn zone bosses
     return {
-      uid, team, slot, sid: s.id, name: s.name, elem: form.elem, role: s.role, lvl: m.lvl, stars: m.stars, boss: !!s.boss,
+      uid, team, slot, sid: s.id, name: m.name || s.name, elem: form.elem, role: s.role, lvl: m.lvl, stars: m.stars, boss, ...(m.scale ? { scale: m.scale } : {}),
       maxHp: hp, hp, atk: Math.round(statAt(s.base.atk, m.lvl, m.stars) * (m.atkMult || 1)), def: statAt(s.base.def, m.lvl, m.stars),
-      spd: spdAt(s.base.spd, m.lvl, m.stars), crit: 0.15, critDmg: 0.5, res: s.boss ? 0.35 : 0.15, acc: 0,
+      spd: spdAt(s.base.spd, m.lvl, m.stars), crit: 0.15, critDmg: 0.5, res: boss ? 0.35 : 0.15, acc: 0,
       atb: 0, cds: [0, 0, 0], skills: form.skills.map((k, i) => { const sk = skillAt(k, m.sk?.[i] || 1, i); return k.ult && isMythic(s.id, !!(m as MonsterRef).rare) ? mythicUlt(sk) : sk; }), statuses: [], marks: [], alive: true, leader: team === 0 && slot === 0,
       rare: !!(m as MonsterRef).rare, passive: (m as MonsterRef).rare ? s.rarePassive : undefined, pUsed: false,
     };
