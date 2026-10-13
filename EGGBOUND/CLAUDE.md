@@ -117,3 +117,4 @@ P0 เสร็จ: 3 ด่าน (1-3 บอส), มอนเริ่มต�
 - localStorage ใช้ไม่ได้บางบริบท → ทุกการอ่าน/เขียนครอบ try/catch แล้ว
 - `#loading{display:grid}` ทับ attribute `hidden` → ต้องมี `[hidden]{display:none!important}` ใน template (นอก Artifact หน้าโหลดค้าง)
 - mkUnit ต้องตั้ง max = hp จริง (เคยทำฮีลเพี้ยน)
+- ท่าใหม่ (BATCH13 windup/down/joy ...) ไม่มีในตารางจุดยึดมือทำของจิ้งจอก (`ANCH`) → `anchOf` ต้องถอยไปใช้ท่าหลัก (เคยค้างทั้งเกมตอนจิ้งจอกร่างปกติตายระหว่าง Auto) · ลูปเฟรม `frame()` ครอบ `guard()` และสคริปต์ coroutine ที่ error ถูกตัดทิ้งแยกตัว — error ใหม่จะขึ้น toast ครั้งเดียว ไม่ทำให้เกมหยุด

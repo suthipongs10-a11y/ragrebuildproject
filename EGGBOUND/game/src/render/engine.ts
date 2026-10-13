@@ -20,8 +20,10 @@ export function* tween(d, fn) { let t = 0; while (t < d) { fn(Math.min(1, t / d)
 export function* waitAll(list) { while (list.some(s => !s.done)) yield 0; }
 export function* waitUntil(cond) { while (!cond()) yield 0; }
 export function updScripts(dt) {
-  for (const s of E.scripts.slice()) { if (s.done) continue; if (s.wait > 0) { s.wait -= dt; if (s.wait > 0) continue; } const r = s.gen.next(dt); if (r.done) s.done = true; else s.wait = r.value || 0; }
+  let err = null; // a coroutine that throws is dropped (the others keep running); the error is rethrown for the caller to report
+  for (const s of E.scripts.slice()) { if (s.done) continue; if (s.wait > 0) { s.wait -= dt; if (s.wait > 0) continue; } try { const r = s.gen.next(dt); if (r.done) s.done = true; else s.wait = r.value || 0; } catch (e) { s.done = true; err = err || e; } }
   E.scripts = E.scripts.filter(s => !s.done);
+  if (err) throw err;
 }
 export function clearAll() { E.scripts = []; E.parts = []; E.projs = []; E.decals = []; E.dim = E.dimT = 0; E.zoom = E.zoomT = 1; E.hitstop = 0; E.flash = 0; E.shake = 0; }
 

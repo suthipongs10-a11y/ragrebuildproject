@@ -575,20 +575,26 @@ addEventListener('keydown', e => {
 
 // ---------- loop ----------
 let last = performance.now(), mineT = 0, incT = 0;
+/** a bug in one frame must never stop the game: log it, tell the player once, keep the loop going */
+const errSeen = new Set<string>();
+function guard(f: () => void) {
+  try { f(); } catch (e: any) { const m = String(e && e.message || e); if (!errSeen.has(m)) { errSeen.add(m); console.error(e); toast('เกิดข้อผิดพลาด (แคปจอนี้ส่งผู้พัฒนาได้): ' + m.slice(0, 80)); } }
+}
 function frame(now) {
+  requestAnimationFrame(frame);
   const rdt = Math.min(.05, (now - last) / 1000); last = now;
   const sp = scene === battle && battle ? battle.speed : 1, dt = rdt * sp;
   const frozen = E.hitstop > 0; E.hitstop = Math.max(0, E.hitstop - rdt);
-  tickEngine(rdt); updScripts(frozen ? 0 : dt); scene.update(frozen ? 0 : dt); updParts(frozen ? dt * .25 : dt);
-  E.base = baseFor(scene);
-  scene.render();
-  if (cur === 'mons' && monTab !== 'dex') drawShowcase(rdt);
+  guard(() => { tickEngine(rdt); updScripts(frozen ? 0 : dt); });
+  guard(() => scene.update(frozen ? 0 : dt));
+  guard(() => updParts(frozen ? dt * .25 : dt));
+  guard(() => { E.base = baseFor(scene); scene.render(); });
+  if (cur === 'mons' && monTab !== 'dex') guard(() => drawShowcase(rdt));
   if (actT > 0) { actT -= rdt; if (actT <= 0) $('#actName').classList.remove('show'); }
   if (bannerT > 0) { bannerT -= rdt; if (bannerT <= 0) $('#banner').classList.remove('show'); }
   if (scene === homeV && selB === 'mine') { mineT -= rdt; if (mineT <= 0) { mineT = 1; const st = mineStored(S), cap = mineCap(S), el = $('#mineSt'); if (el) { el.textContent = st.toLocaleString() + ' / ' + cap.toLocaleString(); $('#mineBar').style.transform = `scaleX(${st / cap})`; const cb = document.querySelector('[data-hb=collect]'); if (cb) cb.disabled = st < 1; } } }
   if (!battle && !hatch) { incT -= rdt; if (incT <= 0) { incT = 1; tickIncub(); } }
-  if (battle) { orderT -= rdt; if (orderT <= 0) { orderT = .2; renderOrder(); } }
-  requestAnimationFrame(frame);
+  if (battle) { orderT -= rdt; if (orderT <= 0) { orderT = .2; guard(renderOrder); } }
 }
 (async () => {
   try {

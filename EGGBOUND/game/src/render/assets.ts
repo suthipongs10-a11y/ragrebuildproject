@@ -141,7 +141,9 @@ const ANC2 = {};
 /** mouth/body anchors (relative to feet pivot) for a species & pose; fox uses hand-tuned values, other art is auto-derived */
 export function anchOf(sid, key) {
   const s = SP(sid);
-  if (!hasArt(sid) || (s.art === 'mon001' && !evoArt(sid))) return ANCH[key];
+  // the hand-tuned table only has the classic five poses: the BATCH13 extras (windup, down, joy ...) use their fallback's
+  // anchors (a missing entry here used to throw every frame once a fox died → the whole game loop stopped)
+  if (!hasArt(sid) || (s.art === 'mon001' && !evoArt(sid))) { const [view, pose] = key.split('_'); return ANCH[key] || ANCH[view + '_' + (POSE_FALLBACK[pose] || 'idle')] || ANCH.front_idle; }
   const k = sid + key; if (ANC2[k]) return ANC2[k];
   const [x0, y0, x1, y1] = bbox(spr(sid, key), k), w = x1 - x0, h = y1 - y0, cx = (x0 + x1) / 2;
   return (ANC2[k] = { mouth: [cx + w * .18 - PIV[0], y0 + h * .36 - PIV[1]], body: [cx - PIV[0], y0 + h * .58 - PIV[1]] });
