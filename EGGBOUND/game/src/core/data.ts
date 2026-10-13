@@ -319,8 +319,10 @@ export const EGG_TIERS: Record<EggTier, EggTierDef> = {
 };
 /** stage drop: one roll per win (first clear always drops). pity = the Nth mystery egg in a row without gold+ is forced gold+ */
 export const EGG_DROP = { chance: 0.3, bossChance: 0.6, tierW: { common: 68, silver: 24, gold: 7, rainbow: 1 } as Record<EggTier, number>, pity: 20 };
-/** named egg (crafted from fragments): species known, small chance of the rare form (special colour/aura, +1 trait slot later) */
-export const NAMED_RARE_FORM = 0.04;
+/** named egg (crafted from fragments): species known, and the best rare-form odds in the game — about twice the best
+ *  mystery egg (rainbow 8%) before the species multiplier, so collecting a monster's fragments is the way to hunt its
+ *  rare form (decided 2026-10-13): common 15% · rare 12% · epic 7.5% · legendary 3.75% */
+export const NAMED_RARE_FORM = 0.15;
 /** the rare form gets rarer the higher the species' rarity (a rare-form legendary hatches at ★6 — the rarest thing in the game).
  *  chance = egg's rareForm (or NAMED_RARE_FORM) × this; e.g. rainbow egg → legendary rare form = 6% × 8% × 0.25 ≈ 1 in 830 rainbow eggs */
 export const RARE_FORM_MULT: Record<Rarity, number> = { common: 1, rare: 0.8, epic: 0.5, legendary: 0.25 };

@@ -1,7 +1,7 @@
 EGGBOUND — ART BATCH 10 : ชุดพิเศษ "ตำนานดารา" (Starborn Legends) 10 ตัว · ไฟล์ละ 1 ตัว = 1 แชท ChatGPT
 
    1. MON_S01  วาลคีร์ปีกพายุ (Valkyr Stormwing)  · LIGHT Healer
-   2. MON_S02  คิเมร่าราชันย์ (Chimera Rex)  · FIRE Attacker
+   2. MON_S02  คิเมร่าราชันย์ (Chimera Rex)  · FIRE Attacker  ← v2 ออกแบบใหม่ หัวเดียว (มีแนว A/B ให้เลือก)
    3. MON_S03  พญานาคปัญจเศียร (Panchanaga)  · WATER Defender
    4. MON_S04  โอโรจิแปดหุบเขา (Yamata Orochi)  · DARK Controller
    5. MON_S05  กิเลนอัสนี (Thunder Qilin)  · WIND Support

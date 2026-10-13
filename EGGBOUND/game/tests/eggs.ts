@@ -1,5 +1,5 @@
 // Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
-import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, RARE_FORM_MULT } from '../src/core/data';
+import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, RARE_FORM_MULT, NAMED_RARE_FORM } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
 import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
 import { startIncub, incubLeft, incubOf, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
@@ -127,7 +127,8 @@ export function eggTests(): number {
     const L = lootOf({ ...base, eggs: [{ id: 1, sid: 'A01', kind: 'mystery', tier: 'rainbow' }, { id: 2, sid: 'A02', kind: 'mystery', tier: 'silver' }] });
     ok(L.grade === 'legendary' && L.items[L.items.length - 1].kind === 'egg' && L.items[0].kind === 'gold', 'chest legendary, best last'); }
 
-  // named craft
+  // named craft: the best rare-form odds — above every mystery egg tier for any species rarity
+  ok(Object.values(EGG_TIERS).every(t => NAMED_RARE_FORM > t.rareForm * 1.5), 'named egg rare-form chance beats every mystery egg');
   { const s = newSave(); s.frags.A02 = FRAGS_TO_CRAFT; ok(craftEgg(s, 'A02', () => 0) && s.eggs[s.eggs.length - 1].kind === 'named' && s.eggs[s.eggs.length - 1].rare === true, 'craft named egg (rare roll)'); }
 
   // P0 save migration: eggs without kind → named, home without incub → []
