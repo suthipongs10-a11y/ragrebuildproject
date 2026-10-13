@@ -1,9 +1,9 @@
 // Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
-import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt } from '../src/core/data';
+import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
 import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
 import { startIncub, incubLeft, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
-import { QUESTS, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg } from '../src/game/quests';
+import { QUESTS, CHAPTERS, questsIn, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg } from '../src/game/quests';
 
 export function eggTests(): number {
   let fail = 0;
@@ -73,8 +73,17 @@ export function eggTests(): number {
   { const s = newSave(); ok(new Set(QUESTS.map(q => q.id)).size === QUESTS.length, 'quest ids unique');
     ok(claimable(s).length === 0 && claimQuest(s, 'win1') === null, 'nothing claimable on a new save');
     grantRewards(s, '1-1', true, 3, ['A02'], 3); ok(claimable(s).some(q => q.id === 'win1') && claimable(s).some(q => q.id === 'clear1-1'), 'winning unlocks quests');
-    const g0 = s.gems; ok(!!claimQuest(s, 'win1') && s.gems === g0 + 30 && claimQuest(s, 'win1') === null, 'claim once');
-    const tb = bookGems(); ok(tb >= 600 && tb <= 1200, 'book gem total ' + tb);
+    const g0 = s.gems; ok(!!claimQuest(s, 'win1') && s.gems === g0 + 10 && claimQuest(s, 'win1') === null, 'claim once');
+    ok(bookGems() === 600, 'book gem total ' + bookGems());
+    ok(CHAPTERS.every(c => questsIn(c.id).length > 0) && QUESTS.every(q => CHAPTERS.some(c => c.id === q.ch)), 'every quest in a chapter, no empty chapter');
+    ok(STAGES.every(st => ['clear', 'star', 'farm'].every(k => QUESTS.some(q => q.id === k + st.id))), 'every map stage has clear/3-star/farm quests');
+    for (let i = 0; i < 4; i++) grantRewards(s, '1-1', true, 3, [], 10 + i); ok(claimable(s).some(q => q.id === 'farm1-1'), 'winning a stage 5 times unlocks its farm quest');
+    ok(claimQuest(s, 'ch:map1') === null, 'chapter chest locked until every quest is claimed');
+    { const e0 = s.eggs.length; for (const q of questsIn('map1')) { s.stages[q.id.replace(/^(clear|star|farm)/, '')] = 3; s.stats.stageWins[q.id.replace(/^(clear|star|farm)/, '')] = 5; }
+      for (const q of questsIn('map1')) ok(!!claimQuest(s, q.id), 'claim ' + q.id);
+      ok(chapterClaimable(s).some(c => c.id === 'map1'), 'finished chapter is claimable'); const g1 = s.gems;
+      ok(!!claimQuest(s, 'ch:map1') && s.gems === g1 + 40 && claimQuest(s, 'ch:map1') === null, 'chapter chest claims once');
+      const ne = s.eggs.slice(e0); ok(ne.some(e => e.kind === 'mystery' && e.tier === 'gold') && ne.some(e => e.tier === 'silver'), 'egg rewards land in the egg list'); }
     ok(buyGoldEgg(s) === null, 'no gems, no egg'); s.gems = 250; const e = buyGoldEgg(s)!;
     ok(!!e && e.tier === 'gold' && e.kind === 'mystery' && s.gems === 150 && s.eggs.includes(e), 'buy gold egg');
     const t0 = 5_000_000; ok(startIncub(s, e.id, t0), 'incubate bought egg'); const c = rushCost(s, e.id, t0);

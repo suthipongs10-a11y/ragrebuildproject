@@ -22,7 +22,7 @@ export function grantRewards(s: SaveData, stageId: string, win: boolean, stars: 
   let rs = seed >>> 0; const rnd = () => { rs = (rs * 1664525 + 1013904223) >>> 0; return rs / 4294967296; };
   const expGain = win ? st.reward.exp : Math.round(st.reward.exp * 0.25);
   r.gold = win ? st.reward.gold + (first ? st.reward.gold : 0) : 0;
-  s.gold += r.gold; if (win) s.stats.wins++;
+  s.gold += r.gold; s.stats.battles++; if (win) { s.stats.wins++; s.stats.stageWins[stageId] = (s.stats.stageWins[stageId] || 0) + 1; }
   for (const uid of s.team) {
     const m = monOf(s, uid); if (!m) continue;
     const g: MonGain = { uid, sid: m.sid, fromLvl: m.lvl, toLvl: m.lvl, exp: expGain, capped: false };
@@ -43,7 +43,7 @@ export function grantRewards(s: SaveData, stageId: string, win: boolean, stars: 
 
 export function craftEgg(s: SaveData, sid: string, rnd: () => number = Math.random): boolean {
   if ((s.frags[sid] || 0) < FRAGS_TO_CRAFT) return false;
-  s.frags[sid] -= FRAGS_TO_CRAFT; s.eggs.push({ id: s.nextEggId++, sid, kind: 'named', rare: rnd() < NAMED_RARE_FORM }); return true;
+  s.frags[sid] -= FRAGS_TO_CRAFT; s.stats.craft++; s.eggs.push({ id: s.nextEggId++, sid, kind: 'named', rare: rnd() < NAMED_RARE_FORM }); return true;
 }
 
 // ---- mystery eggs ----

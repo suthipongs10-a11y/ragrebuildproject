@@ -13,7 +13,7 @@ import { home, BDEF, upgrade, upgradeCost, maxLevelNow, mineStored, mineCap, col
 import { loadSave, writeSave, resetSave, newMon } from './game/save';
 import { grantRewards, stageUnlocked, craftEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg, lootOf, monOf, copiesOf, teamHasSpecies, feedPreview, feed, feedValue, evoCheck, evolve, skillUp, skillMaxed } from './game/progression';
 import { EvolveView } from './render/evolveView';
-import { QUESTS, QUEST_CATS, questDone, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg } from './game/quests';
+import { QUESTS, CHAPTERS, questsIn, chapterDone, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg } from './game/quests';
 
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -156,17 +156,27 @@ function eggGain(e) {
   return `<span class="chip">${copiesOf(S, e.sid) ? 'ตัวซ้ำ · ใช้อัปสกิลได้' : 'ตัวใหม่!'}</span>`;
 }
 const timer = x => `data-start="${x.start}" data-end="${x.end}"`;
-const bookBtn = () => { const n = claimable(S).length; return `<button type="button" class="bookbtn" data-nav="book" title="สมุดผจญภัย">📖<span>สมุดผจญภัย</span>${n ? `<b class="badge">${n}</b>` : ''}</button>`; };
-const rewardChips = r => [r.gems ? `<span class="chip rw gem"><i></i>${r.gems}</span>` : '', r.gold ? `<span class="chip rw"><span class="gold sm" style="padding:0;border:0;background:none"><i></i></span>${r.gold.toLocaleString()}</span>` : '', r.soul ? `<span class="chip rw">ผลึกวิญญาณ ×${r.soul}</span>` : '', ...Object.entries(r.frags || {}).map(([sid, n]) => `<span class="chip rw"><img src="${eggURL(sid)}" alt="">เศษไข่${esc(SPECIES[sid].name)} ×${n}</span>`)].join('');
-/** adventure book: one-time quests with gems and other rewards */
+const bookBtn = () => { const n = claimable(S).length + chapterClaimable(S).length; return `<button type="button" class="bookbtn" data-nav="book" title="สมุดผจญภัย">📖<span>สมุดผจญภัย</span>${n ? `<b class="badge">${n}</b>` : ''}</button>`; };
+const rewardChips = r => [r.gems ? `<span class="chip rw gem"><i></i>${r.gems}</span>` : '', r.gold ? `<span class="chip rw"><span class="gold sm" style="padding:0;border:0;background:none"><i></i></span>${r.gold.toLocaleString()}</span>` : '', r.soul ? `<span class="chip rw">ผลึกวิญญาณ ×${r.soul}</span>` : '', r.egg ? `<span class="chip rw rwegg" style="--tc:${TIER_COL[r.egg]}"><img src="${eggURLOf({ kind: 'mystery', tier: r.egg })}" alt="">ไข่ปริศนา${EGG_TIERS[r.egg].name}</span>` : '', ...Object.entries(r.frags || {}).map(([sid, n]) => `<span class="chip rw"><img src="${eggURL(sid)}" alt="">เศษไข่${esc(SPECIES[sid].name)} ×${n}</span>`)].join('');
+/** adventure book (SW style): chapters as tabs, each with its quests and a chapter chest once every quest is claimed */
+let bookCh = '';
 function bookHTML() {
-  const got = S.quests.length, tot = QUESTS.length, gems = QUESTS.filter(q => S.quests.includes(q.id)).reduce((a, q) => a + (q.reward.gems || 0), 0);
-  return `<section class="scr dim"><div class="wrap">${topbar('สมุดผจญภัย', 'ทำภารกิจครั้งเดียว รับเพชรและของรางวัล')}
-  <div class="booksum"><div>รับแล้ว <b>${got}/${tot}</b> ภารกิจ</div><div><span class="gold gem sm"><i></i>${gems} / ${bookGems()}</span> เพชรจากสมุด</div></div><div class="bar" style="margin:6px 0 12px"><i style="transform:scaleX(${got / tot})"></i></div>
-  ${claimable(S).length > 1 ? `<div class="row" style="margin-bottom:10px"><button class="go" type="button" data-claim="*">รับทั้งหมด (${claimable(S).length})</button></div>` : ''}
-  ${QUEST_CATS.map(cat => `<h2 class="sec">${cat}</h2><div class="quests">${QUESTS.filter(q => q.cat === cat).map(q => { const [a, b] = q.goal(S), done = a >= b, cl = S.quests.includes(q.id);
-    return `<div class="quest ${cl ? 'claimed' : done ? 'done' : ''}"><div class="qm"><b>${esc(q.name)}</b><div class="bar" style="margin:5px 0 4px"><i style="transform:scaleX(${Math.min(1, a / b)})"></i></div><span class="note">${a}/${b}</span></div><div class="qr">${rewardChips(q.reward)}</div>${cl ? '<span class="qok">รับแล้ว ✓</span>' : `<button class="${done ? 'go' : 'alt'}" type="button" data-claim="${q.id}" ${done ? '' : 'disabled'}>รับ</button>`}</div>`; }).join('')}</div>`).join('')}
-  <p class="note">เพชรใช้ซื้อไข่ปริศนาลายทอง และเร่งเวลาบ่มไข่ ที่หน้าฟักไข่</p></div></section>`;
+  const claimedQ = QUESTS.filter(q => S.quests.includes(q.id)), gems = claimedQ.reduce((a, q) => a + (q.reward.gems || 0), 0) + CHAPTERS.filter(c => S.quests.includes('ch:' + c.id)).reduce((a, c) => a + (c.bonus.gems || 0), 0);
+  const nReady = c => questsIn(c.id).filter(q => !S.quests.includes(q.id) && q.goal(S)[0] >= q.goal(S)[1]).length + (!S.quests.includes('ch:' + c.id) && chapterDone(S, c.id) ? 1 : 0);
+  if (!CHAPTERS.some(c => c.id === bookCh)) bookCh = (CHAPTERS.find(c => nReady(c)) || CHAPTERS.find(c => !S.quests.includes('ch:' + c.id)) || CHAPTERS[0]).id;
+  const ch = CHAPTERS.find(c => c.id === bookCh)!, qs = questsIn(ch.id), got = qs.filter(q => S.quests.includes(q.id)).length, chOpen = S.quests.includes('ch:' + ch.id), chReady = !chOpen && got === qs.length;
+  const order = q => S.quests.includes(q.id) ? 2 : q.goal(S)[0] >= q.goal(S)[1] ? 0 : 1, list = qs.map((q, i) => [q, i] as const).sort((a, b) => order(a[0]) - order(b[0]) || a[1] - b[1]).map(x => x[0]);
+  const all = claimable(S).length + chapterClaimable(S).length;
+  const tabs = CHAPTERS.map((c, i) => { const q = questsIn(c.id), g = q.filter(x => S.quests.includes(x.id)).length, n = nReady(c), fin = S.quests.includes('ch:' + c.id);
+    return `<button type="button" class="bch ${c.id === bookCh ? 'on' : ''} ${fin ? 'fin' : ''}" data-bch="${c.id}"><small>บทที่ ${i + 1}</small><b>${esc(c.name)}</b><span class="bar"><i style="transform:scaleX(${g / q.length})"></i></span><em>${fin ? 'สำเร็จ ✓' : g + '/' + q.length}</em>${n ? `<i class="badge">${n}</i>` : ''}</button>`; }).join('');
+  return `<section class="scr dim"><div class="wrap">${topbar('สมุดผจญภัย', 'ภารกิจครั้งเดียว · ทำครบบทได้หีบรางวัล')}
+  <div class="booksum"><div>รับแล้ว <b>${claimedQ.length}/${QUESTS.length}</b> ภารกิจ · <b>${CHAPTERS.filter(c => S.quests.includes('ch:' + c.id)).length}/${CHAPTERS.length}</b> บท</div><div class="bgem"><span class="gold gem sm"><i></i>${gems} / ${bookGems()}</span> เพชรจากสมุด</div>${all > 1 ? `<button class="go" type="button" data-claim="*">รับทั้งหมด (${all})</button>` : ''}</div>
+  <div class="bchs">${tabs}</div>
+  <div class="bchead"><div><h2 class="sec">บทที่ ${CHAPTERS.indexOf(ch) + 1} · ${esc(ch.name)}</h2><div class="note">${esc(ch.desc)}</div><div class="bar" style="margin-top:6px"><i style="transform:scaleX(${got / qs.length})"></i></div></div>
+    <div class="bchest ${chOpen ? 'open' : chReady ? 'ready' : ''}"><span class="ico">${chOpen ? '🎁' : '🧰'}</span><div class="qm"><b>หีบรางวัลบทนี้</b><span class="note">${chOpen ? 'รับแล้ว ✓' : chReady ? 'ทำครบทุกภารกิจแล้ว!' : `ทำครบ ${got}/${qs.length} ภารกิจเพื่อเปิด`}</span></div><div class="qr">${rewardChips(ch.bonus)}</div>${chOpen ? '' : `<button class="${chReady ? 'go' : 'alt'}" type="button" data-claim="ch:${ch.id}" ${chReady ? '' : 'disabled'}>เปิด</button>`}</div></div>
+  <div class="quests">${list.map(q => { const [a, b] = q.goal(S), done = a >= b, cl = S.quests.includes(q.id);
+    return `<div class="quest ${cl ? 'claimed' : done ? 'done' : ''}"><div class="qm"><b>${esc(q.name)}</b><div class="bar" style="margin:5px 0 4px"><i style="transform:scaleX(${Math.min(1, a / b)})"></i></div><span class="note">${a}/${b}</span></div><div class="qr">${rewardChips(q.reward)}</div>${cl ? '<span class="qok">รับแล้ว ✓</span>' : `<button class="${done ? 'go' : 'alt'}" type="button" data-claim="${q.id}" ${done ? '' : 'disabled'}>รับ</button>`}</div>`; }).join('')}</div>
+  <p class="note">เพชรใช้ซื้อไข่ปริศนาลายทอง และเร่งเวลาบ่มไข่ ที่หน้าฟักไข่ · ไข่จากสมุดไปอยู่ในหน้าฟักไข่</p></div></section>`;
 }
 function hatchHTML() {
   const h = home(S), slots = incubSlots(S), now = Date.now(), full = h.incub.length >= slots;
@@ -435,9 +445,11 @@ document.addEventListener('click', e => {
   else if (d.feed === 'go') { const m = monOf(S, selMon), from = m.lvl, r = feed(S, selMon, [...food]); if (r) { save(); food = []; sfx.starup(); toast(r.toLvl > from ? `เลเวลอัป! Lv.${from} → Lv.${r.toLvl}` : `EXP +${r.gain.toLocaleString()}`); render(); } }
   else if (d.sku) { const slot = skillUp(S, selMon, d.sku === 'soul' ? null : +d.sku); if (slot >= 0) { save(); sfx.starup(); skFlash = slot; food = []; render(); setTimeout(() => { skFlash = -1; }, 50); } }
   else if (d.egg) { sfx.click(); startHatch(+d.egg); }
-  else if (d.claim) { const ids = d.claim === '*' ? claimable(S).map(q => q.id) : [d.claim], tot = { gems: 0, gold: 0, soul: 0 };
-    for (const id of ids) { const r = claimQuest(S, id); if (r) { tot.gems += r.gems || 0; tot.gold += r.gold || 0; tot.soul += r.soul || 0; } }
-    save(); sfx.coin(); toast(['ได้รับ', tot.gems ? `เพชร ${tot.gems}` : '', tot.gold ? `ทอง ${tot.gold.toLocaleString()}` : '', tot.soul ? `ผลึกวิญญาณ ${tot.soul}` : ''].filter(Boolean).join(' ') || 'ได้รับรางวัล'); render(); }
+  else if (d.bch) { sfx.click(); bookCh = d.bch; render(); document.querySelector('.bch.on')?.scrollIntoView({ block: 'nearest', inline: 'center' }); }
+  else if (d.claim) { const tot = { gems: 0, gold: 0, soul: 0, eggs: 0, frags: 0 }, add = r => { if (!r) return; tot.gems += r.gems || 0; tot.gold += r.gold || 0; tot.soul += r.soul || 0; tot.eggs += r.egg ? 1 : 0; tot.frags += Object.values(r.frags || {}).reduce((a: number, b: any) => a + b, 0) as number; };
+    if (d.claim === '*') { for (const q of claimable(S)) add(claimQuest(S, q.id)); for (const c of chapterClaimable(S)) add(claimQuest(S, 'ch:' + c.id)); } // chapter chests after the quests that finish them
+    else add(claimQuest(S, d.claim));
+    save(); d.claim.startsWith('ch:') ? sfx.chime() : sfx.coin(); toast(['ได้รับ', tot.gems ? `เพชร ${tot.gems}` : '', tot.gold ? `ทอง ${tot.gold.toLocaleString()}` : '', tot.soul ? `ผลึกวิญญาณ ${tot.soul}` : '', tot.eggs ? `ไข่ปริศนา ${tot.eggs} ฟอง` : '', tot.frags ? `เศษไข่ ${tot.frags}` : ''].filter(Boolean).join(' ') || 'ได้รับรางวัล'); render(); }
   else if (d.buy === 'gold') { const e = buyGoldEgg(S); if (e) { save(); sfx.chime(); toast('ได้ไข่ปริศนาลายทอง! นำไปบ่มในรังได้เลย'); render(); } }
   else if (d.rush) { if (rushEgg(S, +d.rush)) { save(); sfx.starup(); render(); } }
   else if (d.incub) { if (startIncub(S, +d.incub)) { save(); sfx.chime(); render(); } }

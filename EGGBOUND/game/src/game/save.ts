@@ -7,8 +7,8 @@ export interface MonSave { uid: number; sid: string; lvl: number; exp: number; s
 /** named = species known (crafted / starter) · mystery = species hidden until hatch, tier = shell pattern.
  *  sid and rare are rolled when the egg is created, so reloading can't re-roll a hatch. */
 export interface EggSave { id: number; sid: string; kind: 'named' | 'mystery'; tier?: EggTier; rare?: boolean }
-export interface Stats { wins: number; hatch: number; ult: number; perfect: number; feed: number; skillUp: number; evolve: number; react: number; reactKinds: string[]; gemEggs: number; rush: number }
-export const newStats = (): Stats => ({ wins: 0, hatch: 0, ult: 0, perfect: 0, feed: 0, skillUp: 0, evolve: 0, react: 0, reactKinds: [], gemEggs: 0, rush: 0 });
+export interface Stats { wins: number; hatch: number; ult: number; perfect: number; feed: number; skillUp: number; evolve: number; react: number; reactKinds: string[]; gemEggs: number; rush: number; battles: number; stageWins: Record<string, number>; craft: number; mine: number }
+export const newStats = (): Stats => ({ wins: 0, hatch: 0, ult: 0, perfect: 0, feed: 0, skillUp: 0, evolve: 0, react: 0, reactKinds: [], gemEggs: 0, rush: 0, battles: 0, stageWins: {}, craft: 0, mine: 0 });
 export interface SaveData {
   v: 2;
   gold: number;

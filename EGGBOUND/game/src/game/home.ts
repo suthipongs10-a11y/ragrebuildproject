@@ -72,7 +72,7 @@ export function mineStored(s: SaveData, now = Date.now()) {
   return Math.floor(mins * MINE_RATE[lv]);
 }
 export const mineCap = (s: SaveData) => { const lv = home(s).lv.mine || 1; return MINE_RATE[lv] * MINE_CAP_MIN[lv]; };
-export function collectMine(s: SaveData, now = Date.now()) { const g = mineStored(s, now); s.gold += g; home(s).mineAt = now; return g; }
+export function collectMine(s: SaveData, now = Date.now()) { const g = mineStored(s, now); s.gold += g; home(s).mineAt = now; if (g > 0 && s.stats) s.stats.mine++; return g; }
 
 // ---- shrine ----
 export const shrineMax = (s: SaveData) => Math.min(5, home(s).castle + 1);
