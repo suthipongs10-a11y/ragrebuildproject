@@ -7,6 +7,8 @@ Usage: python3 tools/import_art.py <set_dir> <ID> [target_height_px] [--mirror n
  - damaged (truncated) or missing PNGs are skipped and reported; the game falls back to another pose (assets.ts spr()).
  - egg: scaled to egg001 height (254px), bottom at y=425.
  - --key: asset key when it differs from mon<ID> (e.g. --key monA09e for an evolved form).
+ - --out DIR: write somewhere other than assets/ (e.g. assets_staged/ for art whose monster is not in the game yet —
+   build.mjs embeds everything in assets/, so staged art does not cost bundle size until it is moved in).
  - extra motion poses (BATCH13+: windup, strike, follow, cast2, joy, down — front/back) are imported when present.
  - add-on sets without front_idle: include mon<ID>_front_idle_ref.png (a redraw of the idle); its height is matched to the
    EXISTING assets/<key>_front_idle.webp so new poses keep the in-game scale (target height is then ignored).
@@ -18,11 +20,14 @@ args = [a for a in sys.argv[1:]]
 mirror, key = set(), None
 if '--mirror' in args: i = args.index('--mirror'); mirror = set(args[i + 1].split(',')); del args[i:i + 2]
 if '--key' in args: i = args.index('--key'); key = args[i + 1]; del args[i:i + 2]
+out_dir = None
+if '--out' in args: i = args.index('--out'); out_dir = args[i + 1]; del args[i:i + 2]
 if len(args) < 2: sys.exit(__doc__)
 src, ID = args[0], args[1]
 target = float(args[2]) if len(args) > 2 else 320
 key = key or f'mon{ID}'
-out = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets')
+out = out_dir or os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'assets')
+os.makedirs(out, exist_ok=True)
 files = {os.path.basename(p): p for p in glob.glob(src + '/**/*.png', recursive=True)}
 broken, missing = [], []
 
