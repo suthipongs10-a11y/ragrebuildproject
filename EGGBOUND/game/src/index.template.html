@@ -199,6 +199,56 @@ html:not(.has-book-emblem) .bk-emblem{position:relative}html:not(.has-book-emble
 .sklv.max{background:var(--gold);color:#2a1a08}
 .sklv.up{animation:skup 1.2s ease-out}
 @keyframes skup{0%{transform:scale(2.2);background:#fff6c8;color:#2a1a08;box-shadow:0 0 18px #ffd24a}100%{transform:scale(1)}}
+/* ---- monster screen: stage + tabs on the left, the monster box on the right (stacked on phones), each scrolls on its own ---- */
+.scr.mscr{overflow:hidden}
+.mwrap{max-width:1180px;flex:1 1 auto;min-height:0}
+.mlay{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:14px}
+.mleft,.mright{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.2) transparent}
+.mleft{display:flex;flex-direction:column;gap:10px;padding-right:2px}
+.mright{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:0 10px 10px}
+.mbox-h{position:sticky;top:0;z-index:3;margin:0 -10px 8px;padding:10px 14px;background:rgba(18,22,19,.97);border-bottom:1px solid var(--line);border-radius:18px 18px 0 0;font-size:.8rem;color:var(--ink-dim)}
+.mlay.picking .mbox-h{color:#b8f5b0;background:linear-gradient(90deg,rgba(36,72,36,.98),rgba(18,22,19,.98))}
+.mbox{grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.mbox .mcard{padding:6px 4px;font-size:.7rem}.mbox .mcard .pic{width:60px;height:60px}
+.mstage{position:relative;flex:0 0 auto;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:radial-gradient(ellipse at 50% 30%,#2b3326 0%,#141912 70%,#0d100c 100%)}
+.mstage.rf{border-color:#ff9ad8;box-shadow:0 0 18px -4px #ff9ad8}
+.mshow-btn{display:block;width:100%;padding:0;margin:0;border:0;background:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+#mshow{display:block;width:100%;height:clamp(180px,40vh,330px)}
+.ms-name{position:absolute;left:14px;top:12px;right:90px;pointer-events:none}
+.ms-name h3{margin:0 0 6px;font-family:var(--f-display);font-weight:500;font-size:1.35rem;text-shadow:0 2px 6px rgba(0,0,0,.85)}
+.ms-chips{display:flex;flex-wrap:wrap;gap:5px}.ms-chips .chip{background:rgba(10,12,10,.62)}
+.ms-foot{position:absolute;left:12px;right:12px;bottom:10px;display:flex;align-items:center;gap:10px;pointer-events:none;text-shadow:0 1px 3px #000}
+.ms-foot .stars{font-size:1rem;flex:0 0 auto}.ms-foot .bar{flex:1;height:6px}
+.ms-lv{font-size:.8rem;color:var(--ink-dim);flex:0 0 auto}.ms-lv b{color:var(--ink);font-size:1rem}
+.ms-tip{position:absolute;right:12px;top:14px;font-size:.66rem;color:var(--ink-faint);pointer-events:none}
+.mtabs2{flex:0 0 auto}.mtabs2 button{flex:1;padding:9px 6px;border-radius:12px;font:600 .84rem var(--f-body);white-space:nowrap}
+.mtabs2 button.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}
+.mpane{display:flex;flex-direction:column;gap:10px}.mpane .stat{grid-template-columns:repeat(4,1fr);margin-top:0}
+.mpane .grow-p{border-color:rgba(255,210,122,.5)}
+.mlay.picking #mshow{height:clamp(150px,26vh,210px)}
+.ms-foot .bar{background:rgba(0,0,0,.45)}
+.fslots{display:flex;gap:10px;flex-wrap:wrap;padding:2px 0 6px}
+.fslot{position:relative;width:56px;height:56px;border-radius:50%;display:grid;place-items:center;border:2px dashed rgba(255,255,255,.22);color:var(--ink-faint);font-size:1.1rem;background:rgba(0,0,0,.22);padding:0;flex:0 0 auto}
+.fslot.on{border:2px solid #5fd864;cursor:pointer}.fslot.on img{width:100%;height:100%;border-radius:50%}
+.fslot.on span{position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);font-size:.58rem;background:#1c2a1c;border:1px solid #5fd864;border-radius:6px;padding:0 4px;color:#b8f5b0;white-space:nowrap}
+.fslot.on::after{content:'×';position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#c0584a;color:#fff;font-size:.8rem;line-height:1;display:grid;place-items:center}
+.sklv-list{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.78rem;color:var(--ink-dim)}
+@media (max-width:760px){
+  .mlay{grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(200px,1fr);gap:10px}
+  .mleft{gap:8px}
+  #mshow{height:clamp(140px,24vh,200px)}.mlay.picking #mshow{height:92px}
+  .mlay.picking .ms-name,.mlay.picking .ms-tip,.mlay.picking .ms-foot .bar{display:none}
+  .mlay.picking .mpane .row button{padding:9px 10px;min-height:0;font-size:.82rem}
+  .mlay.picking .mpane .grow-p{padding:10px 12px;gap:6px}.mlay.picking .mpane .grow-p h4,.mlay.picking .mpane .grow-p>.note{display:none}
+  .ms-name h3{font-size:1.15rem}
+  .mbox{grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px}
+  .mbox .mcard{padding:5px 3px 6px;gap:2px}.mbox .mcard .pic{width:46px;height:46px}
+  .mbox .mcard .n{font-size:.62rem;min-height:0;display:block;width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .mbox .mcard .stars{font-size:.5rem!important;letter-spacing:-1px}.mbox .mcard .lv{font-size:.58rem}
+  .mbox .mcard .tag{font-size:.5rem;top:3px;left:3px;padding:0 4px}
+  .mtabs2 button{font-size:.76rem;padding:8px 3px}
+  .fslots{gap:8px}.fslot{width:44px;height:44px}
+}
 .mtabs{margin:-4px 0 12px}.mtabs button{flex:1;padding:9px 10px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink-dim);font:600 .86rem var(--f-body,inherit)}.mtabs button.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}
 .dexsum{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.dexsum .row{gap:6px}.dexsum .chip{white-space:nowrap;flex:0 0 auto}.dexsum button.chip{cursor:pointer}.dexsum .chip.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}
 .mcard.dexc .tag{background:rgba(255,255,255,.12);color:var(--ink-dim);font-weight:600}
