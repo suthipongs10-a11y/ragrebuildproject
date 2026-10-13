@@ -1,0 +1,133 @@
+=====================================================================
+EGGBOUND — ART BATCH 16 : MONSTER PEDESTALS (ฐานยืนมอน 6 ธาตุ)
+Image generation instructions for Google Flow (or ChatGPT)
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ใช้กับ "ฐานยืน" ใต้ตัวมอนในหน้าคลังมอน (เวทีโชว์มอน) แยกตามธาตุ 6 แบบ
+  ตอนนี้เกมวาดฐานด้วยโค้ดไว้แล้วใช้ได้เลย ภาพชุดนี้มาแทนให้สวยขึ้น ส่งมาไม่ครบก็ได้
+  ธาตุไหนยังไม่มีภาพ เกมจะใช้แบบโค้ดไปก่อน
+- ออร่าตามความหายาก (หายาก / มหากาพย์ / ตำนาน / ร่างวิวัฒน์ / ร่างหายาก) เกมวาดเองด้วยโค้ด
+  เพราะฉะนั้นภาพฐาน "ห้ามมีแสงฟุ้ง ออร่า ประกาย หรือควัน" ไม่งั้นจะซ้อนกับออร่าของเกม
+- วิธีสั่ง Google Flow:
+  1) แนบไฟล์นี้ + ภาพแท่นฟักไข่ (hatch_altar.png จากชุด 06) เป็นตัวอย่างสไตล์
+     สั่งว่า: "สร้างภาพ #01 ตามไฟล์ที่แนบ สัดส่วน 16:9 พื้นหลังสีชมพู #FF00FF เรียบ"
+  2) ได้ #01 ที่ชอบแล้ว → ตอนทำ #02–#06 ให้แนบภาพ #01 ไปด้วยทุกครั้ง แล้วสั่งว่า:
+     "สร้างภาพ #0X ตามไฟล์ ใช้รูปทรง ขนาด ตำแหน่ง และมุมกล้องเดียวกับภาพที่แนบเป๊ะ
+      เปลี่ยนแค่วัสดุ สี และลวดลายตามธาตุ"
+  3) ชื่อไฟล์จาก Flow จะสุ่มมา ไม่ต้องเปลี่ยนชื่อ ผมดูแล้วจับคู่เอง รวมเป็น zip ส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the environment artist for a premium 2.5D fantasy monster RPG
+(hand-painted, Summoners-War-like quality). On the monster collection
+screen every monster stands full-body on a round display PEDESTAL. You
+paint 6 pedestals, one per element. The game adds all lights, auras and
+the monster itself on top, so you paint ONLY the stone object.
+Generate 6 images, ONE IMAGE PER TURN.
+
+Work order:
+  1. Generate #01 (the MASTER SHAPE) and wait for my "OK".
+  2. After "OK", generate #02–#06 one by one. Each one must reuse the
+     EXACT silhouette, proportions, size, position and camera angle of
+     #01 — only the materials, colours and engraved motifs change.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (every image)
+---------------------------------------------------------------------
+STYLE: painterly premium fantasy game art, rich hand-painted texture,
+crisp clean edges, soft light from TOP-LEFT, like the attached hatching
+altar (white marble + polished gold). Ornate but readable when small.
+
+SHAPE (identical in all 6):
+- A ROUND two-tier dais: a main round tier, and below it a slightly
+  wider, lower round step. Low and wide, perfectly symmetrical.
+  No stairs, no pillars, no spires, no arches, nothing tall.
+- Camera slightly above (about 20–25° down), front view, centred: the
+  flat top surface reads as a wide OVAL about 4 times wider than tall.
+
+COMPOSITION (fractions of the image, 16:9 landscape):
+- Centred horizontally. The top oval's width = about 60% of the image
+  width; its centre at about 42% of the image height.
+- Side of the main tier: about 12% of the image height tall, decorated
+  with a band of engravings and small gems set in metal.
+- Lower step: about 6% of the image height tall, a little wider.
+- Rim ornaments may rise at most 4% of the image height above the top
+  oval. Keep at least 8% empty margin on every side.
+
+TOP SURFACE: flat, polished, EMPTY. An inlaid ring pattern near the rim
+and a calm, plain round area in the middle (the monster stands there).
+NOTHING stands on it: no statue, egg, crystal, candle, plant or weapon.
+
+FORBIDDEN (the game draws these itself — they would double up):
+glow halo in the air, light rays, lens flare, sparkles, particles,
+mist, smoke, fire or water spilling out, magic circles floating above,
+cast shadow on the ground, reflections, floor, horizon, scenery.
+Any glow must stay INSIDE the stone (glowing veins, runes, gems).
+
+BACKGROUND: one flat pure magenta #FF00FF everywhere around the object
+(no gradient, no vignette, no floor, no shadow) so it can be cut out.
+Do not use magenta or pink anywhere on the pedestal itself.
+
+Also FORBIDDEN: text, letters, numbers, writing-like runes, logos,
+watermark, characters, monsters, UI.
+ORIGINAL DESIGN — do not copy any existing game/film character, prop
+or any existing game's UI.
+
+---------------------------------------------------------------------
+2. IMAGES (one per turn)
+---------------------------------------------------------------------
+#01  ped_light.png — LIGHT element · MASTER SHAPE
+White veined marble with polished gold filigree trim. Top: a gold
+sunburst inlay ring near the rim. Side band: engraved sun discs and
+small clear diamond / pale topaz studs in gold settings. Warm, holy,
+royal. (This image sets the shape for all the others.)
+
+#02  ped_fire.png — FIRE element
+Dark volcanic basalt with thin molten-orange lava veins glowing INSIDE
+the cracks (the glow stays in the cracks). Bronze-gold trim with
+flame-curl engravings, small ruby studs. Hot, powerful.
+
+#03  ped_water.png — WATER element
+Pearl-white marble with aquamarine / teal inlays, engraved wave scrolls
+around the side band, small seashell motifs at intervals, silver-gold
+trim, sapphire studs. Clean, cool, elegant.
+
+#04  ped_wind.png — WIND element
+Pale jade stone with carved leaf-and-swirl patterns (like a breeze),
+green-gold trim, small emerald studs. Tiny carved leaves only — no real
+plants sticking up. Fresh, light, airy.
+
+#05  ped_earth.png — EARTH element
+Warm sandstone / terracotta with bold carved block patterns, bronze
+trim, amber / topaz studs, a little soft moss in the deepest crevices.
+Solid, ancient, sturdy.
+
+#06  ped_dark.png — DARK element
+Black obsidian with amethyst inlays, silver-violet trim, engraved
+crescent moons and small stars, faint violet rune-like lines glowing
+INSIDE the stone (abstract shapes, not real letters). Mysterious, noble.
+
+---------------------------------------------------------------------
+3. QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] #02–#06 have the SAME silhouette, size, position and camera as #01
+      (laid on top of each other, the outlines match)
+  [ ] Top oval about 4× wider than tall, flat, EMPTY, calm in the middle
+  [ ] Background is one flat #FF00FF — no floor, no ground shadow, no
+      gradient, no glow or particles around the object
+  [ ] Any glow stays inside the stone; no pink/magenta on the pedestal
+  [ ] Element readable at a glance: light = white+gold, fire = black+
+      orange, water = white+teal, wind = jade green, earth = sand+amber,
+      dark = black+violet
+  [ ] No text, logos, characters or monsters anywhere
+
+---------------------------------------------------------------------
+4. PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_PEDESTALS.zip
+File names (Flow's random names are fine too — the developer matches them):
+  ped_light   ped_fire   ped_water   ped_wind   ped_earth   ped_dark
+Add notes.txt listing any image you regenerated and why.

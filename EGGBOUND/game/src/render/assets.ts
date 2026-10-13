@@ -135,6 +135,8 @@ function bbox(img, key) {
   for (let y = 0; y < 512; y += 2) for (let xx = 0; xx < 512; xx += 2) if (a[(y * 512 + xx) * 4 + 3] > 40) { if (xx < x0) x0 = xx; if (xx > x1) x1 = xx; if (y < y0) y0 = y; if (y > y1) y1 = y; }
   return (BB[key] = x1 > x0 ? [x0, y0, x1, y1] : [156, 100, 356, 435]);
 }
+/** a pose's opaque bbox [x0,y0,x1,y1] in the 512 sprite space (cached; shares the anchOf cache key) */
+export const boxOf = (sid, key) => bbox(spr(sid, key), sid + key);
 const ANC2 = {};
 /** mouth/body anchors (relative to feet pivot) for a species & pose; fox uses hand-tuned values, other art is auto-derived */
 export function anchOf(sid, key) {

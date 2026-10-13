@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Import art batch 06 (hatching altar, treasure chests, light FX), 12 (hatch power-up FX), 13-B, 14 (loot UI) and 15 (adventure book) into game/assets/.
+"""Import art batch 06 (hatching altar, treasure chests, light FX), 12 (hatch power-up FX), 13-B, 14 (loot UI), 15 (adventure book) and 16 (pedestals) into game/assets/.
 
 usage: python3 tools/import_fx.py <batch06_dir>      (the folder holding A_ALTAR/ B_CHESTS/ C_FX/, or one flat folder)
 
@@ -19,6 +19,8 @@ OBJ = {  # name -> output size
     'ui_star': (128, 128), 'ui_star_empty': (128, 128), 'ui_coin': (128, 128), 'ui_coin_pile': (192, 192), 'ui_frame_gold': (256, 320), 'ui_frame_plain': (256, 320),
     # BATCH15 adventure book (opaque textures + transparent seal/emblem/ribbon)
     'book_page': (768, 768), 'book_cover': (768, 768), 'book_emblem': (160, 160), 'book_seal': (128, 128), 'book_ribbon': (64, 256),
+    # BATCH16 showcase pedestals, already moved onto the PED anchor by `fit_flow.py ... 1024x512 anchor --key --anchor CX,CY,RX`
+    'ped_light': (1024, 512), 'ped_fire': (1024, 512), 'ped_water': (1024, 512), 'ped_wind': (1024, 512), 'ped_earth': (1024, 512), 'ped_dark': (1024, 512),
 }
 # BATCH11 mystery eggs: placed like monster eggs (import_art.py) — 254 px tall, bottom at y=425 on a 512 canvas
 EGGS = ['eggM_common', 'eggM_silver', 'eggM_gold', 'eggM_rainbow']

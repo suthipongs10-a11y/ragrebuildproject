@@ -134,8 +134,8 @@ function monsHTML() {
   <div class="mlay ${mode !== 'info' ? 'picking' : ''}">
     <div class="mleft">
       <div class="mstage ${m.rare ? 'rf' : ''}">
-        <button type="button" class="mshow-btn" data-show="1" aria-label="แตะให้${esc(s.name)}โชว์ท่า"><canvas id="mshow" data-look="${look(m)}" data-elem="${s.elem}" data-rare="${m.rare ? 1 : 0}" data-stars="${m.stars}"></canvas></button>
-        <div class="ms-name"><h3>${esc(s.name)}</h3><div class="ms-chips"><span class="chip">${elDot(s.elem)} ${ELEM_NAME[s.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}${m.rare ? '<span class="chip rfc">✦ ร่างหายาก</span>' : ''}</div>
+        <button type="button" class="mshow-btn" data-show="1" aria-label="แตะให้${esc(s.name)}โชว์ท่า"><canvas id="mshow" data-look="${look(m)}" data-elem="${s.elem}" data-rar="${s.rarity}" data-rare="${m.rare ? 1 : 0}" data-stars="${m.stars}"></canvas></button>
+        <div class="ms-name"><h3>${esc(s.name)}</h3><div class="ms-chips"><span class="chip">${elDot(s.elem)} ${ELEM_NAME[s.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}${parseInt(look(m).split('~')[1] || '0') >= 5 ? '<span class="chip evc">ร่างวิวัฒน์</span>' : ''}${m.rare ? '<span class="chip rfc">✦ ร่างหายาก</span>' : ''}</div>
           <div class="ms-foot"><span class="stars">${starStr(m.stars)}</span><span class="ms-lv">Lv.<b>${m.lvl}</b>/${cap}</span><span class="bar"><i style="transform:scaleX(${m.lvl >= cap ? 1 : m.exp / expToNext(m.lvl)})"></i></span></div></div>
         <span class="ms-tip">แตะเพื่อให้โชว์ท่า</span>
       </div>

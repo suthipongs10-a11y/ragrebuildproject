@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fit an image from Google Flow (or any generator that ignores the requested canvas) to the brief's canvas, then save PNG.
 
-usage: python3 -I tools/fit_flow.py <in> <out.png> <W>x<H> <mode> [--bottom F] [--key]
+usage: python3 -I tools/fit_flow.py <in> <out.png> <W>x<H> <mode> [--bottom F] [--key] [--anchor CX,CY,RX [--to CX,CY,RX]]
 
 Flow only makes a few aspect ratios (1:1, 9:16, 16:9 ...) and saves JPG, so the importers (import_fx.py / import_art.py)
 need the picture moved onto the canvas the brief asked for first. The content box = pixels brighter than the background
@@ -9,6 +9,8 @@ need the picture moved onto the canvas the brief asked for first. The content bo
   pad     keep the whole picture, add background around it to reach the target aspect (no distortion)
   crop    cut the target aspect out around the content box centre (content must fit; falls back to pad)
   squash  crop to the content box on the short side, then resize to the target (small distortion, e.g. beams)
+  anchor  scale + move so a measured point lands on a fixed one: --anchor CX,CY,RX is the pedestal's top-surface centre
+          and half-width in the input's pixels; --to (default 512,150,380 = PED in render/pedestal.ts, for 1024x512)
   --bottom F   (pad) put the content box bottom at F × height, e.g. .9 for an aura whose body bottom is y≈1380/1536
   --key        object art on flat magenta: magenta → transparent (soft edges de-fringed); output keeps alpha
 Light FX stay on black; import_fx.py turns brightness into alpha.
@@ -17,8 +19,10 @@ import sys
 from PIL import Image
 
 args = sys.argv[1:]
-bottom = None; key = '--key' in args
+bottom = None; key = '--key' in args; anchor = None; to = (512, 150, 380)
 if key: args.remove('--key')
+if '--anchor' in args: i = args.index('--anchor'); anchor = tuple(map(float, args[i + 1].split(','))); del args[i:i + 2]
+if '--to' in args: i = args.index('--to'); to = tuple(map(float, args[i + 1].split(','))); del args[i:i + 2]
 if '--bottom' in args: i = args.index('--bottom'); bottom = float(args[i + 1]); del args[i:i + 2]
 if len(args) != 4: sys.exit(__doc__)
 src, dst, size, mode = args
@@ -56,7 +60,12 @@ def pad(im):
     c = Image.new('RGBA', (cw, ch), bg); c.alpha_composite(im, ((cw - w) // 2, max(0, top))); return c
 
 
-if mode == 'crop':
+if mode == 'anchor':
+    if not anchor: sys.exit('anchor mode needs --anchor CX,CY,RX')
+    s = to[2] / anchor[2]; im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
+    c = Image.new('RGBA', (W, H), bg); c.paste(im, (round(to[0] - anchor[0] * s), round(to[1] - anchor[1] * s)))  # plain copy: crops at the edges, keeps soft alpha
+    (c if key else c.convert('RGB')).save(dst); print(dst, f'{W}x{H}', 'anchor', f'scale {s:.3f}'); sys.exit()
+elif mode == 'crop':
     w, h = im.size
     cw, ch = (round(h * ta), h) if w / h > ta else (w, round(w / ta))
     cx, cy = (bb[0] + bb[2]) / 2, (bb[1] + bb[3]) / 2
