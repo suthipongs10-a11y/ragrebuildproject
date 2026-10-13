@@ -146,3 +146,9 @@ Tested: `npm test` (determinism + balance + tests/eggs.ts), `npm run typecheck`,
 ## BATCH12 เอฟเฟ็คปลุกพลังตอนฟัก — ใส่แล้ว (2026-10-13)
 - เจ้าของทำภาพด้วย Google Flow: 7 ภาพครบ ขาวเทาบนพื้นดำถูกสเปก · ปรับสัดส่วนด้วย `tools/fit_flow.py` (ออร่า pad + ฐานที่ .9, ลำแสง/วังวน crop, ลำพลัง squash) → `import_fx.py`
 - ฉากฟักมหากาพย์/ตำนานใช้ภาพแทนโค้ดอัตโนมัติแล้ว ทดสอบจอคอม/มือถือ ไม่มี error · build 10.3MB
+
+## BATCH13-A ท่าจิ้งจอก — ใส่แล้ว 10/11 (2026-10-13, Google Flow)
+- ได้: idle_ref, front windup/strike/follow/cast2/joy/down, back windup/strike/cast2/down · หน้าตาตรงตัวเดิมดีมาก
+- ขาด #06 back_follow (ส่งมา front_follow 2 แบบ ใช้แบบหน้ายิ้มมุมเดียวกับ idle) → เกมใช้ back_attack แทนไปก่อน
+- พื้นชมพู JPG → `fit_flow.py --key` (ลบชมพู + กันขอบ) → `import_art.py <dir> 001` (add-on mode ล็อกขนาดกับ idle เดิม) · back_windup Flow วาดใหญ่ ~25% → ย่อ 0.8 รอบจุดเท้า
+- ทดสอบบังคับทุกท่าในสนามรบจริง ขนาด/เส้นเท้าตรงกัน ไม่มี error · build 10.6MB

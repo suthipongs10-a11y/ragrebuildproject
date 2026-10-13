@@ -28,15 +28,16 @@ im = Image.open(src).convert('RGBA')
 
 def unkey(im):
     """magenta (#FF00FF) → alpha: distance from magenta sets alpha, and the magenta spill is removed from the colour"""
-    px = im.load()
-    for y in range(im.height):
-        for x in range(im.width):
-            r, g, b, _ = px[x, y]
-            m = min(r, b) - g  # how magenta the pixel is (0 for neutral colours)
-            a = 255 if m < 40 else max(0, 255 - (m - 40) * 255 // 150)
-            if a < 255 and a > 0: r, b = max(g, r - m * (255 - a) // 255), max(g, b - m * (255 - a) // 255)
-            px[x, y] = (r, g, b, a)
-    return im
+    import numpy as np
+    p = np.asarray(im).astype(np.int32); r, g, b = p[..., 0], p[..., 1], p[..., 2]
+    m = np.clip(np.minimum(r, b) - g, 0, 255)  # how magenta the pixel is (0 for neutral and warm colours)
+    a = np.clip(255 - (m - 18) * 255 // 110, 0, 255)
+    spill = np.where(m > 8, m, 0)  # take the magenta tint back out of edge pixels (pink fringe)
+    lo = lambda c: np.where(spill > 0, np.maximum(np.minimum(c, g), c - spill), c)  # never below green, untouched when no spill
+    out = Image.fromarray(np.stack([lo(r), g, lo(b), a], -1).astype(np.uint8), 'RGBA')
+    from PIL import ImageFilter  # choke the alpha by ~1px: JPEG edges keep a ring of mixed pink pixels
+    al = out.getchannel('A'); out.putalpha(Image.fromarray(np.minimum(np.asarray(al), np.asarray(al.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(.6))))))
+    return out
 
 
 if key: im = unkey(im)
