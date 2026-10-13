@@ -402,10 +402,35 @@ export class HatchView {
     // halo: light column + tilted spinning rings around the egg
     ctx.save(); ctx.globalCompositeOperation = 'lighter';
     ctx.globalAlpha = Math.min(1, pw * .85); ctx.drawImage(column(c), x - 90, y - 440, 180, 404);
-    for (const [ry, sp, rr] of [[-110, .9, 92], [-160, -1.3, 72]]) { ctx.save(); ctx.translate(x, y + ry); ctx.rotate(Math.sin(t * .7) * .15); ctx.globalAlpha = Math.min(1, pw) * .55; ctx.strokeStyle = c; ctx.lineWidth = 2; ctx.setLineDash([14, 10]); ctx.lineDashOffset = t * 40 * sp; ctx.beginPath(); ctx.ellipse(0, 0, rr, rr * .28, 0, 0, TAU); ctx.stroke(); ctx.restore(); }
+    this.eggHalo(x, y, pw);
     ctx.restore();
     // rising motes
     if (Math.random() < .25 + pw * .4) { const a = Math.random() * TAU, r = rnd(40, 250); addP({ x: x + Math.cos(a) * r, y: y + Math.sin(a) * r * .39, z: 0, vz: rnd(40, 110), life: rnd(1, 1.8), size: rnd(5, 10), size2: 0, color: this.col() }); }
+  }
+  /** around the waiting egg: comets of light orbiting on two tilted paths (bright head, fading tail) and short
+   *  electric crackles that jump off the shell now and then — stronger as the egg's power rises */
+  eggHalo(x, y, pw) {
+    const ctx = E.ctx, t = E.time, a0 = Math.min(1, .55 + pw * .5);
+    // a soft dark under-glow keeps the light trails readable over the pale altar
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    for (const [ry, sp, rr, n] of [[-112, .9, 96, 3], [-160, -1.25, 74, 2]]) {
+      const tilt = Math.sin(t * .7 + ry) * .14, ct = Math.cos(tilt), st = Math.sin(tilt);
+      const pt = a => { const ex = Math.cos(a) * rr, ey = Math.sin(a) * rr * .3; return [x + ex * ct - ey * st, y + ry + ex * st + ey * ct, Math.sin(a)]; };
+      for (let k = 0; k < n; k++) {
+        const head = t * sp * 1.7 + k * TAU / n;
+        for (let i = 13; i >= 0; i--) { // tail first, head last
+          const [px, py, front] = pt(head - Math.sign(sp) * i * .07), f = 1 - i / 14, s = (i ? 22 : 40) * (.35 + .65 * f);
+          ctx.globalAlpha = a0 * f * (front > 0 ? 1 : .45); ctx.drawImage(dot(i < 2 ? '#ffffff' : this.col(k + i)), px - s / 2, py - s / 2, s, s);
+          if (i === 0) { ctx.globalAlpha = a0 * (front > 0 ? .9 : .4); ctx.drawImage(dot(this.col(k)), px - 30, py - 30, 60, 60); }
+        }
+      }
+    }
+    ctx.restore();
+    if (Math.random() < .06 + pw * .08) { // a short crackle off the shell
+      const ang = Math.random() * TAU, ex = x + Math.cos(ang) * 58, ey = y - 120 + Math.sin(ang) * 78, pts = [[ex, ey]];
+      let px = ex, py = ey; for (let i = 0; i < 5; i++) { px += Math.cos(ang) * rnd(8, 14) + rnd(-9, 9); py += Math.sin(ang) * rnd(8, 14) + rnd(-9, 9); pts.push([px, py]); }
+      addP({ type: 'bolt', pts, life: .16, color: this.col(), keep: true }); addP({ x: ex, y: ey, z: 0, life: .2, size: 26, size2: 0, color: '#ffffff', keep: true });
+    }
   }
   drawAltarArt() {
     const ctx = E.ctx, t = E.time, c = this.col(), pw = this.power(), K = ALT_K, ox = PED.x - DISH[0] * K, oy = PED.y - 38 - DISH[1] * K, sz = 1024 * K;
@@ -413,7 +438,7 @@ export class HatchView {
     const gl = tinted('hatch_altar_glow', c);
     if (gl) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = Math.min(1, pw); ctx.drawImage(gl, ox, oy, sz, sz); ctx.globalAlpha = Math.min(1, pw) * .45; ctx.drawImage(IMG.hatch_altar_glow, ox, oy, sz, sz); ctx.restore(); }
     fx(ctx, 'fx_column', c, PED.x, PED.y - 38 - 205, 170, 430, Math.min(1, pw * .75));
-    for (const [ry, sp, rr] of [[-110, .9, 92], [-160, -1.3, 72]]) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(PED.x, PED.y + ry); ctx.rotate(Math.sin(t * .7) * .15); ctx.globalAlpha = Math.min(1, pw) * .5; ctx.strokeStyle = c; ctx.lineWidth = 2; ctx.setLineDash([14, 10]); ctx.lineDashOffset = t * 40 * sp; ctx.beginPath(); ctx.ellipse(0, 0, rr, rr * .28, 0, 0, TAU); ctx.stroke(); ctx.restore(); }
+    this.eggHalo(PED.x, PED.y, pw);
     if (Math.random() < .25 + pw * .4) { const a = Math.random() * TAU, r = rnd(60, 300); addP({ x: PED.x + Math.cos(a) * r, y: PED.y + FLOOR_Y + Math.sin(a) * r * .38, z: 0, vz: rnd(40, 110), life: rnd(1, 1.8), size: rnd(5, 10), size2: 0, color: this.col() }); }
   }
   /** centre of a crystal (it hovers above its stand) */
