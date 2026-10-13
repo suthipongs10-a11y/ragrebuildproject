@@ -31,15 +31,23 @@ im = Image.open(src).convert('RGBA')
 
 
 def unkey(im):
-    """magenta (#FF00FF) → alpha: distance from magenta sets alpha, and the magenta spill is removed from the colour"""
+    """magenta (#FF00FF) → alpha: only the magenta region connected to the picture's border is background (so violet /
+    pink colours inside the object survive); its edge band gets soft alpha by distance from magenta and loses the pink spill"""
     import numpy as np
+    from PIL import ImageDraw, ImageFilter
     p = np.asarray(im).astype(np.int32); r, g, b = p[..., 0], p[..., 1], p[..., 2]
     m = np.clip(np.minimum(r, b) - g, 0, 255)  # how magenta the pixel is (0 for neutral and warm colours)
-    a = np.clip(255 - (m - 18) * 255 // 110, 0, 255)
-    spill = np.where(m > 8, m, 0)  # take the magenta tint back out of edge pixels (pink fringe)
+    soft = np.clip(255 - (m - 18) * 255 // 110, 0, 255)
+    fill = Image.fromarray(np.where(m > 40, 255, 0).astype(np.uint8), 'L').copy(); w, h = fill.size  # copy: floodfill can't write an array-backed image
+    for x, y in [(x, 0) for x in range(0, w, 6)] + [(x, h - 1) for x in range(0, w, 6)] + [(0, y) for y in range(0, h, 6)] + [(w - 1, y) for y in range(0, h, 6)]:
+        if fill.getpixel((x, y)) == 255: ImageDraw.floodfill(fill, (x, y), 128)
+    bg = Image.fromarray(np.where(np.asarray(fill) == 128, 255, 0).astype(np.uint8), 'L')
+    band = np.asarray(bg.filter(ImageFilter.MaxFilter(7))) > 0  # background + ~3px into the object
+    a = np.where(band, soft, 255)
+    spill = np.where(band & (m > 8), m, 0)  # take the magenta tint back out of edge pixels (pink fringe)
     lo = lambda c: np.where(spill > 0, np.maximum(np.minimum(c, g), c - spill), c)  # never below green, untouched when no spill
     out = Image.fromarray(np.stack([lo(r), g, lo(b), a], -1).astype(np.uint8), 'RGBA')
-    from PIL import ImageFilter  # choke the alpha by ~1px: JPEG edges keep a ring of mixed pink pixels
+    # choke the alpha by ~1px: JPEG edges keep a ring of mixed pink pixels
     al = out.getchannel('A'); out.putalpha(Image.fromarray(np.minimum(np.asarray(al), np.asarray(al.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(.6))))))
     return out
 

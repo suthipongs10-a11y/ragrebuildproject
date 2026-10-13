@@ -55,7 +55,8 @@ def main(src):
         if name not in files: missing.append(name); continue
         im = Image.open(files[name])
         im = light_to_alpha(im) if name in LIGHT else im.convert('RGBA')
-        im.resize(size, Image.LANCZOS).save(os.path.join(OUT, name + '.webp'), 'WEBP', quality=80 if name in LIGHT else 88, alpha_quality=72 if name in LIGHT else 100, method=6)
+        q = (80, 72) if name in LIGHT else (82, 80) if name.startswith('ped_') else (88, 100)  # pedestals are big: a lighter encode
+        im.resize(size, Image.LANCZOS).save(os.path.join(OUT, name + '.webp'), 'WEBP', quality=q[0], alpha_quality=q[1], method=6)
         done.append(name)
     for name in EGGS:
         if name not in files: continue
