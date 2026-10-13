@@ -6,12 +6,12 @@ export const SQ = .6;
 export const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 export const clamp = (v, a, b) => v < a ? a : v > b ? b : v, lerp = (a, b, t) => a + (b - a) * t, rnd = (a, b) => a + Math.random() * (b - a);
 export const easeOut = t => 1 - Math.pow(1 - t, 3), easeIn = t => t * t * t, easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2, easeBack = t => { const c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
-function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+export function mulberry(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
 
 export const E = {
   cv: null, ctx: null, W: 0, H: 0, DPR: 1, base: 1, zoom: 1, zoomT: 1, cam: { x: 0, y: 0 }, camT: { x: 0, y: 0 },
   time: 0, hitstop: 0, dim: 0, dimT: 0, flash: 0, flashC: '#fff', shake: 0, quality: 1,
-  parts: [], projs: [], decals: [], scripts: [], vign: null, ground: null,
+  parts: [], projs: [], decals: [], scripts: [], vign: null, ground: null, loc: null, // loc: location hooks (render/locations.ts)
 };
 
 // ---------- coroutines: yield <seconds> to wait, yield 0 = next frame (receives dt) ----------
@@ -103,6 +103,7 @@ export function drawProjs() {
 
 // ---------- world ----------
 const PR = 560, GW = 2800, GH = 1900, GOX = 1400, GOY = 950;
+export const GEO = { PR, GW, GH, GOX, GOY };
 /** battlefield look per realm (map): 1 ทุ่งไข่ป่วน = green meadow & cobbles · 2 สุวรรณภูมิ = golden grass, laterite
  *  sandstone, lotus & marigold, gold lamps · 3 สวรรค์บูรพา = jade grass, grey-jade stone, peach blossom, red lanterns */
 export const THEMES = {
@@ -113,8 +114,10 @@ export const THEMES = {
 let T = THEMES['1'];
 const groundC = {};
 /** switch the battlefield look (cached per realm) */
-export function setTheme(id) { const k = THEMES[id] ? id : '1'; T = THEMES[k]; if (E.ctx) E.ground = groundC[k] || (groundC[k] = buildGround()); }
-function stone(g, x, y, r, R) { const n = 7, pts = [], rot = R() * TAU; for (let i = 0; i < n; i++) { const a = rot + i / n * TAU, rr = r * (.78 + R() * .32); pts.push([x + Math.cos(a) * rr * 1.12, y + Math.sin(a) * rr * SQ]); } g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.closePath(); g.fillStyle = `hsl(${T.stone[0] + R() * T.stone[1]},${T.stone[2] + R() * T.stone[3]}%,${T.stone[4] + R() * T.stone[5]}%)`; g.fill(); const gr = g.createLinearGradient(x - r, y - r * SQ, x + r, y + r * SQ); gr.addColorStop(0, 'rgba(255,244,215,.42)'); gr.addColorStop(.5, 'rgba(255,240,210,0)'); gr.addColorStop(1, 'rgba(30,20,10,.32)'); g.fillStyle = gr; g.fill(); g.strokeStyle = 'rgba(48,38,28,.55)'; g.lineWidth = 2; g.stroke(); }
+export function setTheme(id) { const k = THEMES[id] ? id : '1'; T = THEMES[k]; E.loc = null; if (E.ctx) E.ground = groundC[k] || (groundC[k] = buildGround()); }
+/** set the active palette (a realm id or a palette object) — locations paint stones/bushes with it */
+export const useTheme = (id) => { T = typeof id === 'object' ? id : THEMES[id] || THEMES['1']; return T; };
+export function stone(g, x, y, r, R) { const n = 7, pts = [], rot = R() * TAU; for (let i = 0; i < n; i++) { const a = rot + i / n * TAU, rr = r * (.78 + R() * .32); pts.push([x + Math.cos(a) * rr * 1.12, y + Math.sin(a) * rr * SQ]); } g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(p[0], p[1]) : g.moveTo(p[0], p[1])); g.closePath(); g.fillStyle = `hsl(${T.stone[0] + R() * T.stone[1]},${T.stone[2] + R() * T.stone[3]}%,${T.stone[4] + R() * T.stone[5]}%)`; g.fill(); const gr = g.createLinearGradient(x - r, y - r * SQ, x + r, y + r * SQ); gr.addColorStop(0, 'rgba(255,244,215,.42)'); gr.addColorStop(.5, 'rgba(255,240,210,0)'); gr.addColorStop(1, 'rgba(30,20,10,.32)'); g.fillStyle = gr; g.fill(); g.strokeStyle = 'rgba(48,38,28,.55)'; g.lineWidth = 2; g.stroke(); }
 export function buildGround() {
   const c = mk(GW, GH), g = c.getContext('2d'), R = mulberry(11);
   let gr = g.createLinearGradient(0, 0, GW, GH); gr.addColorStop(0, T.base[0]); gr.addColorStop(.5, T.base[1]); gr.addColorStop(1, T.base[2]); g.fillStyle = gr; g.fillRect(0, 0, GW, GH);
@@ -131,11 +134,11 @@ export const LANTERNS = [[-500, -185], [500, -185], [-560, 250], [560, 250]].map
 export const BUSHES = [[-760, -60, 1.2], [780, 10, 1.1], [-680, 330, 1], [700, 360, 1.25], [-300, -440, .9], [330, -450, 1]].map(([x, y, s]) => ({ x, y, s, seed: (x * 7 + y * 13) | 0 }));
 const bushC = {};
 function bushImg(b) { const key = b.seed + ':' + T.bush; if (bushC[key]) return bushC[key]; const R = mulberry(b.seed), c = mk(260, 200), g = c.getContext('2d'); g.translate(130, 170); g.fillStyle = 'rgba(20,30,10,.35)'; g.beginPath(); g.ellipse(0, 6, 95, 26, 0, 0, TAU); g.fill(); for (let i = 0; i < 26; i++) { const x = (R() - .5) * 150, y = -R() * 90 - 10, r = 22 + R() * 22, l = 24 + R() * 20 + (-y / 110) * 16; const gg = g.createRadialGradient(x - r * .3, y - r * .4, 2, x, y, r); gg.addColorStop(0, `hsl(${T.bush + R() * 20},45%,${l + 14}%)`); gg.addColorStop(1, `hsl(${T.bush + 10 + R() * 20},45%,${l - 6}%)`); g.fillStyle = gg; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill(); } return (bushC[key] = c); }
-export function drawBush(b) { const im = bushImg(b); E.ctx.drawImage(im, b.x - 130 * b.s, b.y - 170 * b.s, 260 * b.s, 200 * b.s); }
-export function drawLantern(L) { const ctx = E.ctx, x = L.x, y = L.y, f = .8 + .12 * Math.sin(E.time * 7 + L.ph); ctx.fillStyle = 'rgba(18,12,6,.4)'; ctx.beginPath(); ctx.ellipse(x, y + 2, 16, 6, 0, 0, TAU); ctx.fill(); ctx.fillStyle = '#4a3424'; ctx.fillRect(x - 4, y - 118, 8, 118); ctx.fillRect(x - 4, y - 118, 26, 6); ctx.fillStyle = '#2e2219'; ctx.fillRect(x + 7, y - 104, 22, 26); ctx.fillStyle = `rgba(${T.lamp[0]},${T.lamp[1] + f * 30 | 0},${T.lamp[2]},1)`; ctx.fillRect(x + 10, y - 101, 16, 20); ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = f; ctx.drawImage(dot(T.glow), x + 18 - 60, y - 91 - 60, 120, 120); ctx.restore(); }
-export function drawLanternPools() { const ctx = E.ctx; ctx.save(); ctx.globalCompositeOperation = 'lighter'; for (const L of LANTERNS) { const f = .75 + .1 * Math.sin(E.time * 7 + L.ph); const g = ctx.createRadialGradient(L.x, L.y, 0, L.x, L.y, 150); const [pr, pg, pb] = T.pool; g.addColorStop(0, `rgba(${pr},${pg},${pb},${.22 * f})`); g.addColorStop(1, `rgba(${pr},${pg},${pb},0)`); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(L.x, L.y, 150, 62, 0, 0, TAU); ctx.fill(); } ctx.restore(); }
+export function drawBush(b) { if (b.kind && E.loc?.prop) return E.loc.prop(b); const im = bushImg(b); E.ctx.drawImage(im, b.x - 130 * b.s, b.y - 170 * b.s, 260 * b.s, 200 * b.s); }
+export function drawLantern(L) { if (L.kind && E.loc?.light) return E.loc.light(L); const ctx = E.ctx, x = L.x, y = L.y, f = .8 + .12 * Math.sin(E.time * 7 + L.ph); ctx.fillStyle = 'rgba(18,12,6,.4)'; ctx.beginPath(); ctx.ellipse(x, y + 2, 16, 6, 0, 0, TAU); ctx.fill(); ctx.fillStyle = '#4a3424'; ctx.fillRect(x - 4, y - 118, 8, 118); ctx.fillRect(x - 4, y - 118, 26, 6); ctx.fillStyle = '#2e2219'; ctx.fillRect(x + 7, y - 104, 22, 26); ctx.fillStyle = `rgba(${T.lamp[0]},${T.lamp[1] + f * 30 | 0},${T.lamp[2]},1)`; ctx.fillRect(x + 10, y - 101, 16, 20); ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = f; ctx.drawImage(dot(T.glow), x + 18 - 60, y - 91 - 60, 120, 120); ctx.restore(); }
+export function drawLanternPools() { const ctx = E.ctx; ctx.save(); ctx.globalCompositeOperation = 'lighter'; for (const L of LANTERNS) { if (L.noPool) continue; const f = .75 + .1 * Math.sin(E.time * 7 + L.ph); const g = ctx.createRadialGradient(L.x, L.y, 0, L.x, L.y, 150); const [pr, pg, pb] = L.pool || T.pool; g.addColorStop(0, `rgba(${pr},${pg},${pb},${.22 * f})`); g.addColorStop(1, `rgba(${pr},${pg},${pb},0)`); ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(L.x, L.y, 150, 62, 0, 0, TAU); ctx.fill(); } ctx.restore(); }
 const flies = Array.from({ length: 34 }, () => ({ x: rnd(-900, 900), y: rnd(-560, 560), ph: rnd(0, 9), sp: rnd(.4, 1) }));
-export function drawFlies() { const ctx = E.ctx; ctx.save(); ctx.globalCompositeOperation = 'lighter'; for (const f of flies) { const x = f.x + Math.sin(E.time * f.sp + f.ph) * 40, y = f.y + Math.cos(E.time * f.sp * .8 + f.ph) * 24 - 40; ctx.globalAlpha = .3 + .3 * Math.sin(E.time * 2 + f.ph * 3); ctx.drawImage(dot(T.fly), x - 7, y - 7, 14, 14); } ctx.restore(); }
+export function drawFlies() { if (E.loc?.ambient) return E.loc.ambient(E.ctx); const ctx = E.ctx; ctx.save(); ctx.globalCompositeOperation = 'lighter'; for (const f of flies) { const x = f.x + Math.sin(E.time * f.sp + f.ph) * 40, y = f.y + Math.cos(E.time * f.sp * .8 + f.ph) * 24 - 40; ctx.globalAlpha = .3 + .3 * Math.sin(E.time * 2 + f.ph * 3); ctx.drawImage(dot(T.fly), x - 7, y - 7, 14, 14); } ctx.restore(); }
 
 export function initCanvas(cv) {
   E.cv = cv; E.ctx = cv.getContext('2d'); E.ground = groundC['1'] = buildGround();
@@ -151,7 +154,7 @@ export const toWorld = (sx, sy) => [(sx - E.W / 2) / Z() + E.cam.x, (sy - E.H / 
 export function worldTransform() { const z = Z(), shx = E.shake ? rnd(-E.shake, E.shake) : 0, shy = E.shake ? rnd(-E.shake, E.shake) : 0; E.ctx.setTransform(E.DPR * z, 0, 0, E.DPR * z, E.DPR * (E.W / 2 - E.cam.x * z + shx), E.DPR * (E.H / 2 - E.cam.y * z + shy)); }
 export function screenTransform() { E.ctx.setTransform(E.DPR, 0, 0, E.DPR, 0, 0); }
 export function drawGround() { E.ctx.drawImage(E.ground, -GOX, -GOY); }
-export function drawOverlays() { const ctx = E.ctx; screenTransform(); ctx.drawImage(E.vign, 0, 0, E.W, E.H); if (E.flash > 0) { ctx.globalAlpha = Math.min(1, E.flash); ctx.fillStyle = E.flashC; ctx.fillRect(0, 0, E.W, E.H); ctx.globalAlpha = 1; } }
+export function drawOverlays() { const ctx = E.ctx; screenTransform(); if (E.loc?.grade) E.loc.grade(ctx, E.W, E.H); ctx.drawImage(E.vign, 0, 0, E.W, E.H); if (E.flash > 0) { ctx.globalAlpha = Math.min(1, E.flash); ctx.fillStyle = E.flashC; ctx.fillRect(0, 0, E.W, E.H); ctx.globalAlpha = 1; } }
 export function tickEngine(dt) {
   E.time += dt; E.shake = Math.max(0, E.shake - dt * 40); E.flash = Math.max(0, E.flash - dt * 2.2);
   E.dim = lerp(E.dim, E.dimT, 1 - Math.exp(-dt * 8)); E.zoom = lerp(E.zoom, E.zoomT, 1 - Math.exp(-dt * 6));

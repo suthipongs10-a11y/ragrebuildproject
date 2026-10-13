@@ -1,0 +1,220 @@
+=====================================================================
+EGGBOUND — ART BATCH 17 : BATTLE ARENA BACKGROUNDS (ฉากต่อสู้ 14 ด่าน)
+Image generation instructions for Google Flow (or ChatGPT)
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ตอนนี้ทุกด่านมีฉากของตัวเองแล้ว (เกมวาดด้วยโค้ด: พื้น ต้นไม้ ตะเกียง ละอองลอย แสงสี)
+  ภาพชุดนี้คือ "พื้นฉากแบบวาดมือ" ที่จะมาแทนพื้นโค้ด ให้สวยระดับ SW
+  ส่งมาไม่ครบก็ได้ ด่านไหนยังไม่มีภาพ เกมใช้ฉากโค้ดไปก่อน
+- ละอองลอย หิมะตก ใบไม้ร่วง กลีบดอกไม้ หมอกเคลื่อน และโทนแสงสี เกมทำเองแบบเคลื่อนไหว
+  เพราะฉะนั้นในภาพ "ห้ามมีประกาย ละออง หมอก ควัน หรือของลอยในอากาศ"
+  (ตะเกียง/โคมที่จุดไฟอยู่ในภาพ วาดแสงนวล ๆ ได้ — ด่านที่มีภาพวาด เกมจะไม่วาดตะเกียงซ้ำ)
+- ภาพนี้คือ "ทั้งจอ" ที่ผู้เล่นเห็นตอนสู้ (มุมกล้องเดียวกับเกม) ลานกลางกินพื้นที่ครึ่งภาพ
+  ของสูง ๆ (ต้นไม้ ประตู ปราสาท หน้าผา) อยู่แถบบนสุดของภาพ ส่วนบนเลยขอบภาพไปได้
+- ภาพใหญ่ (2048×1152) รวมกันหลาย MB เกินเพดานไฟล์เดียว 16MB
+  ผมจะแยกเป็นไฟล์ข้าง ๆ ให้เกมโหลดตอนเข้าด่าน (ไม่ทำให้ไฟล์เกมหลักใหญ่ขึ้น)
+- วิธีสั่ง Google Flow:
+  1) แนบไฟล์นี้ + ภาพหน้าจอฉากต่อสู้ของด่านนั้นจากเกม (ใช้เป็นตัวอย่างมุมกล้องและตำแหน่งลาน)
+     สั่งว่า: "สร้างภาพ #01 ตามไฟล์ที่แนบ สัดส่วน 16:9"
+  2) ได้ #01 ที่ชอบแล้ว → ตอนทำภาพถัดไป แนบภาพ #01 ไปด้วยทุกครั้ง แล้วสั่งว่า:
+     "สร้างภาพ #0X ตามไฟล์ ใช้มุมกล้อง ขนาดและตำแหน่งลานกลางเดียวกับภาพที่แนบเป๊ะ
+      เปลี่ยนแค่สถานที่ตามคำอธิบาย"
+  3) ชื่อไฟล์จาก Flow จะสุ่มมา ไม่ต้องเปลี่ยนชื่อ รวมเป็น zip ส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the environment artist for a premium 2.5D fantasy monster RPG
+(hand-painted, Summoners-War-like quality). Each battle stage needs one
+painted ARENA BACKGROUND: the ground the monsters fight on plus the
+scenery around it. The game draws the monsters, health bars, skill
+effects, lamps' light, falling leaves/snow and colour grading on top,
+so you paint ONLY the place itself, fully lit, in calm daylight/mood.
+Generate 14 images, ONE IMAGE PER TURN.
+
+Work order:
+  1. Generate #01 (the MASTER LAYOUT) and wait for my "OK".
+  2. After "OK", generate #02–#14 one by one, each reusing the EXACT
+     camera, arena size and arena position of #01.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER LAYOUT (every image)
+---------------------------------------------------------------------
+STYLE: painterly premium fantasy game art, rich hand-painted texture,
+soft light from TOP-LEFT, saturated but not neon, clean readable shapes.
+Southeast-Asian / Thai-Khmer and Chinese-heaven fantasy flavour.
+
+CAMERA: high three-quarter view looking DOWN at the ground at about
+35–40° (NOT straight top-down, NOT a side view): a perfect circle on
+the ground looks like an oval 1.67 times wider than tall. Orthographic
+feel, no fisheye, no strong perspective convergence. The top edge of
+the image is the back of the scene; the bottom edge is nearest.
+The image is exactly what the player sees during a battle (the game
+draws the monsters on the arena), so the arena is BIG in the frame.
+
+ARENA (identical position in all 14, fractions of the 16:9 image):
+- A flat round fighting area (plaza / dais / clearing) seen as a wide
+  OVAL: width = 51% of the image width, height = 54% of the image
+  height, centre at 50% across and 53% down (so its top edge sits at
+  about 26% down and its bottom edge at about 80% down).
+- The arena surface is FLAT, EVEN and EMPTY: no props, puddles of
+  clutter, tall grass, holes or strong patterns that fight the monsters.
+  A subtle inlay ring or a small centre emblem is fine.
+- Keep the whole arena fully inside the image with open ground around it.
+
+SCENERY ZONES (so the game can stand monsters in front of it):
+- BACK band (top 24% of the image, behind the arena): the landmark of
+  the stage — tree trunks, walls, gates, towers, cliffs — standing just
+  behind the arena's back edge. Show their LOWER parts clearly (bases,
+  doors, roots, wall faces); their tops may run off the top edge.
+- SIDES (left/right 20% of the image, beside the arena): medium props
+  (trees, rocks, lamp posts, pillars, houses, statues).
+- FRONT band (bottom 16% of the image, in front of the arena): ONLY
+  low/flat things (grass, water, flowers, low rocks, low railing).
+  Nothing taller than about 6% of the image height there — monsters
+  stand just above it and must not look hidden behind tall objects.
+
+FORBIDDEN (the game draws these itself — they would double up):
+monsters, people, animals, characters, light rays / god rays, lens
+flare, sparkles, floating particles, falling leaves/snow/petals in the
+air, drifting mist, fog banks, smoke, magic circles, UI, text, letters,
+numbers, logos, watermark. (Lit lanterns, braziers with flames, glowing
+mushrooms/crystals and glowing lava ARE fine — keep their glow soft and
+close to the object.)
+ORIGINAL DESIGN — do not copy any existing game/film character, map,
+scene or any existing game's UI.
+
+OUTPUT: 16:9, as large as possible (2048×1152 or more), no border,
+no vignette, no frame. Keep the arena floor fairly calm and evenly lit
+so the monsters stay readable on it.
+
+---------------------------------------------------------------------
+2. IMAGES (one per turn)  — file name · stage · description
+---------------------------------------------------------------------
+#01  bg_stream.png — 1-2 ลำธารเปียกปอน · MASTER LAYOUT
+A clear shallow stream flows from the top-right corner to the bottom-
+left corner, straight through the arena: the arena is a wide round
+shallow ford of clear water over pale pebbles with a few flat stepping
+stones. Grassy banks top-left and bottom-right with a willow, reeds,
+cattails and mossy rocks; small wild flowers. Fresh green, morning.
+
+#02  bg_rootnest.png — 1-3 รังรากไม้
+Deep old forest. Huge moss-covered tree trunks along the back with
+giant roots snaking across the ground toward the arena. The arena is
+trampled dark earth with a few embedded stones and leaf litter, ringed
+by moss. Ferns and clusters of teal glowing mushrooms (glow stays in
+the caps) at the sides. Shady, green, mysterious.
+
+#03  bg_goldforest.png — 2-1 ป่าตะเคียนทอง
+Tall straight pale-barked sacred trees at the back, some trunks wrapped
+with colourful cloth sashes (pink, yellow, green). Golden autumn leaves
+carpet the ground. The arena is an old path of round worn stones half
+covered by gold leaves. A small red-and-gold spirit house on a pole at
+the left side. Warm golden-green forest light.
+
+#04  bg_ricefield.png — 2-2 ทุ่งควายธนู
+Golden ripe rice paddies in a grid of green dikes all around, water
+glinting between the rows. Tall sugar palms along the back, a small
+thatched open sala hut, round haystacks at the sides. The arena is a
+packed-earth threshing ground with scattered straw, ringed by a low
+earth bank. Late-afternoon golden hour.
+
+#05  bg_village.png — 2-3 หมู่บ้านหุ่นพยนต์ (NIGHT)
+A quiet Thai village at night: wooden stilt houses with steep thatched
+roofs and warm lit windows along the back, banana plants, big brown
+clay water jars, a bamboo fence. Packed-earth lanes lead into the
+arena: a round earth yard ringed by small stones. Blue moonlit night,
+slightly eerie, still very readable (not pitch black).
+
+#06  bg_kinnari.png — 2-4 วิมานกินรี
+A round polished teak-wood dais with a gold-and-red rim, floating on a
+calm lotus lake. Pink and white lotus flowers and lily pads everywhere
+on the water, four slender red lacquer pillars with gold bands at the
+dais edge, a small golden stupa far at the back. Dreamy, celestial,
+soft pink-gold daylight.
+
+#07  bg_temple.png — 2-5 ลานคชสีห์
+An ancient Khmer-style temple courtyard: three laterite corn-cob prang
+towers along the back (the centre one biggest), stone lanterns, a big
+bodhi tree at a side, broken laterite blocks. The arena is large
+sandstone floor tiles with a carved lotus emblem, inside a raised
+laterite curb; paved laterite court around it, grass beyond. Warm sun.
+
+#08  bg_nagapool.png — 2-6 สระมณีนาคราช (DUSK)
+A sacred jewel pool at dusk: deep blue water with lily pads and pale
+lotuses all around a sandstone dais whose rim is a carved naga body
+with green-gold scales; a coiled naga emblem in the centre. Golden
+multi-headed naga statues at the back and sides, a golden stupa far
+back, blue crystal clusters on the banks. Deep blue-violet sky light.
+
+#09  bg_jade.png — 3-1 สวนหยกจันทรา (MOONLIGHT)
+A Chinese scholar's garden under moonlight: a white wall with a round
+moon gate at the back centre (dark bamboo garden visible through it),
+bamboo groves, pale holey scholar rocks, white-and-pink plum blossom
+trees, stone lanterns. Raked pale gravel around the arena; the arena
+is jade-green stone tiles with a pale moon-circle inlay and a white
+marble curb. Cool blue-green night, calm.
+
+#10  bg_palace.png — 3-2 ตำหนักปี่เซียะ
+An imperial palace courtyard: red walls with green-glazed tile roofs
+and lattice windows along the back, a red-and-gold ceremonial gate at
+the back centre, a bronze tripod incense cauldron in front of it, red
+lacquer pillars at the sides, grey stone paving everywhere. The arena
+is white marble tiles with a red ring and a gold flower emblem, inside
+a marble curb with a red band. Rich red-gold, sunny.
+
+#11  bg_foxvalley.png — 3-3 หุบเขาจิ้งจอกเก้าหาง
+A high mountain valley: grey-blue cliffs with snow on top along the
+back, snowy pine trees and snow-capped boulders at the sides, patches
+of snow on rocky ground with tough grass. The arena is a natural flat
+grey rock slab with cracks and a little snow dusting at its edge.
+Cold, crisp, quiet.
+
+#12  bg_toadbridge.png — 3-4 สะพานคางคกทอง
+A wide wooden bridge crossing the whole image left-to-right over a
+jade-green river: the deck fills the middle band (top edge of the deck
+at about 22% down, bottom edge at about 84% down). Red lacquer railings
+with gold post caps along both edges (the front railing stays LOW).
+A jade-grey stone runner down the centre of the deck with a big gold
+coin emblem in the middle; a golden toad statue sitting on coins at
+the back centre on the deck. Lily pads and gold coins under the water.
+
+#13  bg_heaven.png — 3-5 ประตูสวรรค์
+A white-and-gold marble platform floating on a sea of clouds: a grand
+heavenly gate (white pillars, golden roofs, red beams) at the back
+centre, reached by a marble walkway; puffy clouds all around and in
+front, blue-lavender sky glimpses between them. The arena is white
+marble with two gold rings and a gold sunflower emblem, gold-rimmed
+curb. Bright but NOT washed out — keep contrast.
+
+#14  bg_firecave.png — 3-6 ถ้ำเพลิงราชาอสูร
+The demon bull king's fire cave: a black rock cave wall at the back
+with glowing lava veins and three lava falls, tall obsidian spires with
+lava cracks at the sides, lava pools around the arena. The arena is a
+dais of dark hexagonal basalt slabs with glowing orange seams between
+them, ringed by a dark curb. Iron braziers with flames at the
+sides. Hot red-orange, dramatic but readable.
+
+---------------------------------------------------------------------
+3. QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] Same camera angle, arena size and arena position as #01
+      (laid on top of each other, the arena ovals match)
+  [ ] Arena flat, even, empty and clearly the brightest calm area
+  [ ] Tall scenery only in the back band and at the sides; the bottom
+      band has only low/flat things
+  [ ] No characters, animals, text, particles, mist or light rays
+  [ ] Stage readable at a glance from the description (forest = trees,
+      volcano = lava, palace = red walls, ...)
+
+---------------------------------------------------------------------
+4. PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_BATTLE_BACKGROUNDS.zip
+File names (Flow's random names are fine too — the developer matches them):
+  bg_stream  bg_rootnest  bg_goldforest  bg_ricefield  bg_village
+  bg_kinnari bg_temple    bg_nagapool    bg_jade       bg_palace
+  bg_foxvalley bg_toadbridge bg_heaven   bg_firecave
+Add notes.txt listing any image you regenerated and why.

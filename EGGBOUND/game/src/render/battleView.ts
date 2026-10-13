@@ -4,6 +4,7 @@ import { Battle, REACTION_NAME } from '../core/battle';
 import { SPECIES } from '../core/data';
 import { PAL, PIV, ANCH, anchOf, TAU, spr, silOf, glowOf, GP, dot, portrait, IMG, fx, lookOf, poseKey, warpDraw } from './assets';
 import { sfx } from './audio';
+import { drawAurasBack, drawAurasFront, tickAuras, domePop, domeHit, domeBreak } from './auras';
 import {
   E, SQ, clamp, lerp, rnd, easeOut, easeIn, easeIO, easeBack, run, tween, waitAll, waitUntil, addP, burst, ring, text, dmgText, fxP, shake, flash,
   drawParts, drawDecals, drawProjs, drawGround, drawLantern, drawBush, drawLanternPools, drawFlies, LANTERNS, BUSHES, worldTransform, screenTransform, drawOverlays,
@@ -51,7 +52,7 @@ export class BattleView {
   headY(v) { return v.y + v.hop - 385 * v.k; }
   face(v, t) { const dx = t.x - v.x, dy = t.y - v.y; if (Math.abs(dx) > 2) v.flip = dx < 0; if (Math.abs(dy) > Math.abs(dx) * .25) v.back = dy < 0; }
   ghost(v, life = .25) { v.ghosts.push({ key: this.key(v), x: v.x, y: v.y, hop: v.hop, sx: v.sx, sy: v.sy, rot: v.rot, flip: v.flip, k: v.k, life, max: life }); }
-  sync() { for (const u of this.b.units) { const v = this.V.get(u.uid); if (!v) continue; v.atb = u.atb; if (!v.dead) { v.hp = u.hp; v.maxHp = u.maxHp; v.st = new Set(u.statuses.map(s => s.id)); v.marks = new Set(u.marks.map(m => m.elem)); const sh = u.statuses.find(s => s.id === 'shield'); v.shieldAmt = sh ? sh.value : 0; } } }
+  sync() { for (const u of this.b.units) { const v = this.V.get(u.uid); if (!v) continue; v.atb = u.atb; if (!v.dead) { v.hp = u.hp; v.maxHp = u.maxHp; v.st = new Set(u.statuses.map(s => s.id)); v.marks = new Set(u.marks.map(m => m.elem)); const sh = u.statuses.find(s => s.id === 'shield'); v.shieldAmt = sh ? sh.value : 0; v.protector = u.statuses.find(s => s.id === 'protect')?.value; } } }
 
   // ---------- main loop ----------
   start() {
@@ -131,25 +132,25 @@ export class BattleView {
       case 'hit': {
         if (!v) return; const src = this.V.get(e.src);
         if (e.miss) { text(v.x, this.headY(v) + 10, 'พลาด', '#c8c8d8', 18); return; }
-        if (e.inv) { text(v.x, this.headY(v) + 10, 'อมตะ', STATUS_COL.invincible, 18); ring(v.x, v.y - 60 * v.k / .4, 20, 90, '#fff6c8', .5, 5); return; }
+        if (e.inv) { text(v.x, this.headY(v) + 10, 'อมตะ', STATUS_COL.invincible, 18); domeHit(v); return; }
         v.hp = e.hp; v.flash = 1; v.hitT = .3; if (src) { const dx = v.x - src.x, dy = v.y - src.y, l = Math.hypot(dx, dy) || 1; const k = v.boss ? .35 : 1; v.kvx += dx / l * 170 * k; v.kvy += dy / l * 110 * k; }
         v.bendV -= (e.crit ? 950 : 620) * (v.boss ? .45 : 1); v.wave = e.crit ? 22 : 13; v.wph = 0; // recoil + jelly ripple
         this.hitSpark(v, src, e.crit);
         const hy = this.headY(v) + 18;
         dmgText(v.x + rnd(-12, 12), hy, e.dmg, e.crit, { weak: e.em < 1 });
         if (e.em > 1) text(v.x + 34, hy - 12, 'ได้เปรียบธาตุ', '#9ff58a', 13, { vz: 50 }); else if (e.em < 1) text(v.x + 34, hy - 12, 'ต้านทาน', '#b9c3d6', 13, { vz: 50 });
-        if (e.shieldAbs) { ring(v.x, v.y - 60 * v.k / .4, 20, 70, '#bfe6ff', .35, 4); }
+        if (e.shieldAbs) domeHit(v);
         break;
       }
       case 'heal': if (!v) return; v.hp = e.hp; text(v.x, this.headY(v) + 18, '+' + e.amt, '#7dffb0', 21); for (let i = 0; i < 8; i++) addP({ x: v.x + rnd(-40, 40) * v.k / .4, y: v.y, z: rnd(0, 30), vz: rnd(60, 120), life: .8, size: rnd(8, 14), size2: 0, color: '#7dffb0' }); break;
-      case 'status': if (!v) return; if (e.add) { v.st.add(e.id); text(v.x - 26, this.headY(v) - 4, STATUS_TH[e.id], STATUS_COL[e.id], 14, { vz: 40 }); if (e.id === 'atk_up' || e.id === 'crit_up') for (let i = 0; i < 5; i++) addP({ type: 'arrow', x: v.x + rnd(-40, 40), y: v.y, z: rnd(10, 60), vz: rnd(80, 140), life: .9, size: 9, color: '#ff6a4a', add: false }); if (e.id === 'sleep') text(v.x + 30, this.headY(v) - 20, 'Zz', '#c9b8ff', 22, { vz: 30, life: 1.4 }); } else v.st.delete(e.id); break;
+      case 'status': if (!v) return; if (!e.add && e.id === 'shield' && v.shieldAmt > 0) { v.shieldAmt = 0; domeBreak(v); } if (e.add && e.id === 'invincible') domePop(v); if (e.add) { v.st.add(e.id); text(v.x - 26, this.headY(v) - 4, STATUS_TH[e.id], STATUS_COL[e.id], 14, { vz: 40 }); if (e.id === 'atk_up' || e.id === 'crit_up') for (let i = 0; i < 5; i++) addP({ type: 'arrow', x: v.x + rnd(-40, 40), y: v.y, z: rnd(10, 60), vz: rnd(80, 140), life: .9, size: 9, color: '#ff6a4a', add: false }); if (e.id === 'sleep') text(v.x + 30, this.headY(v) - 20, 'Zz', '#c9b8ff', 22, { vz: 30, life: 1.4 }); } else v.st.delete(e.id); break;
       case 'resist': if (!v) return; text(v.x + 26, this.headY(v) - 4, e.id === 'immunity' ? 'ภูมิคุ้มกัน' : e.id === 'unheal' ? 'ฮีลไม่ได้' : 'ต้านทาน', e.id === 'immunity' ? STATUS_COL.immunity : e.id === 'unheal' ? STATUS_COL.unheal : '#b9c3d6', 13, { vz: 40 }); break;
       case 'strip': if (!v) return; text(v.x, this.headY(v) - 18, 'ลบบัฟ', STATUS_COL.brand, 15, { vz: 40 }); for (let i = 0; i < 8; i++) addP({ type: 'smoke', add: false, x: v.x + rnd(-40, 40), y: v.y, z: rnd(40, 160), vz: rnd(30, 80), life: .7, size: rnd(14, 22), size2: rnd(30, 44), color: '#5a2a8a', alpha: .45 }); break;
       case 'cd': if (!v) return; text(v.x - 28, this.headY(v) + 4, 'คูลดาวน์ ' + e.delta, '#fff2a8', 14, { vz: 40 }); break;
       case 'revive': { if (!v) return; v.dead = false; v.deathT = 0; v.alpha = 1; v.pose = 'idle'; v.hp = e.hp; v.shown = e.hp; v.st = new Set(); v.marks = new Set(); v.bendV += 400; v.glowF = 1; setTimeout(() => { if (!v.busy) v.glowF = 0; }, 700);
         text(v.x, this.headY(v) - 24, 'ชุบชีวิต!', '#fff6c8', 20); ring(v.x, v.y, 10, 130 * v.k / .4, '#fff2b0', .6, 8); burst(v.x, v.y - 80 * v.k / .4, 60, 22, '#fff6c8', 260, 14, .7); sfx.perfect(); break; }
       case 'mark': if (!v) return; if (e.add) { v.marks.add(e.elem); const P = PAL[e.elem]; ring(v.x, v.y, 10, 70 * v.k / .4, P.aura, .45, 4); addP({ x: v.x, y: v.y, z: 390 * v.k + 30, life: .5, size: 26, size2: 0, color: P.aura }); } else v.marks.delete(e.elem); break;
-      case 'shield': if (!v) return; v.shieldAmt = e.amt; ring(v.x, v.y, 20, 90 * v.k / .4, '#bfe6ff', .5, 5); for (let i = 0; i < 10; i++) addP({ type: 'chip', add: false, x: v.x + rnd(-50, 50), y: v.y, z: rnd(0, 60), vz: rnd(40, 100), life: .7, size: rnd(5, 9), color: '#a8c88a', grav: 300, rot: rnd(0, 6), vr: rnd(-6, 6) }); break;
+      case 'shield': if (!v) return; v.shieldAmt = e.amt; domePop(v); ring(v.x, v.y, 20, 110 * v.k / .4, '#bfe6ff', .5, 5); for (let i = 0; i < 10; i++) addP({ type: 'twinkle', x: v.x + rnd(-60, 60) * v.k / .4, y: v.y, z: rnd(20, 200) * v.k / .4, life: .7, size: rnd(6, 10), color: '#dff4ff' }); break;
       case 'atb': if (!v) return; v.atb = e.atb; text(v.x + 28, this.headY(v) + 6, e.delta > 0 ? `เกจ +${e.delta}` : `เกจ ${e.delta}`, e.delta > 0 ? '#9fffcf' : '#9fd8ff', 14, { vz: 40 }); break;
       case 'cleanse': if (!v) return; text(v.x, this.headY(v) - 18, 'ล้างสถานะ', '#bff8ff', 14, { vz: 40 }); for (let i = 0; i < 6; i++) addP({ type: 'twinkle', x: v.x + rnd(-50, 50), y: v.y, z: rnd(20, 120), life: .7, size: rnd(6, 10), color: '#ffffff' }); break;
       case 'reaction': this.playReaction(e); break;
@@ -549,7 +550,7 @@ export class BattleView {
     E.camT.x = this.camF ? this.camF.x * this.camK : 0; E.camT.y = this.camF ? lerp(-25, this.camF.y, this.camK) : -25;
     if (this.cine) { this.cine.t += dt; if (this.cine.pose) this.cine.pose += dt; E.cam.x = lerp(E.cam.x, E.camT.x, 1 - Math.exp(-dt * 9)); E.cam.y = lerp(E.cam.y, E.camT.y, 1 - Math.exp(-dt * 9)); E.zoom = lerp(E.zoom, E.zoomT, 1 - Math.exp(-dt * 6)); }
     for (const v of this.V.values()) {
-      v.flash = Math.max(0, v.flash - dt * 5); for (let i = v.ghosts.length - 1; i >= 0; i--) { v.ghosts[i].life -= dt; if (v.ghosts[i].life <= 0) v.ghosts.splice(i, 1); }
+      tickAuras(v, dt); v.flash = Math.max(0, v.flash - dt * 5); for (let i = v.ghosts.length - 1; i >= 0; i--) { v.ghosts[i].life -= dt; if (v.ghosts[i].life <= 0) v.ghosts.splice(i, 1); }
       v.x += v.kvx * dt; v.y += v.kvy * dt; const dm = Math.exp(-dt * 10); v.kvx *= dm; v.kvy *= dm;
       v.shown = lerp(v.shown, v.hp, 1 - Math.exp(-dt * 4));
       if (v.dead) { v.deathT += dt; v.alpha = Math.max(0, 1 - v.deathT / .9); if (v.deathT < .9 && Math.random() < dt * 30) { const b = this.anc(v, 'body'); addP({ x: b[0] + rnd(-40, 40) * v.k / .4, y: v.y, z: v.y - b[1] + rnd(-30, 30), vz: rnd(60, 120), life: .8, size: rnd(6, 12), size2: 0, color: PAL[v.elem].aura }); } continue; }
@@ -598,6 +599,7 @@ export class BattleView {
     if (v.alpha <= .01) return; const ctx = E.ctx, key = this.key(v), P = PAL[v.elem], t = E.time;
     const sh = 1 - Math.min(.5, -v.hop / 90); ctx.globalAlpha = v.alpha; ctx.fillStyle = 'rgba(18,12,6,.36)'; ctx.beginPath(); ctx.ellipse(v.x, v.y + 2, 115 * v.k * sh * v.sx, 34 * v.k * sh, 0, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
     for (const g of v.ghosts) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (g.life / g.max) * .38; ctx.translate(g.x, g.y + g.hop); ctx.rotate(g.rot); ctx.scale(g.sx * g.k * (g.flip ? -1 : 1), g.sy * g.k); ctx.drawImage(silOf(v.sid, g.key, P.aura), -PIV[0], -PIV[1]); ctx.restore(); }
+    drawAurasBack(ctx, v, t);
     ctx.save(); ctx.translate(v.x, v.y + v.hop); ctx.rotate(v.rot); ctx.scale(v.sx * v.k * (v.flip ? -1 : 1), v.sy * v.k);
     if (v.rare && !v.dead) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (.38 + .14 * Math.sin(t * 3 + v.ph)) * v.alpha; ctx.drawImage(glowOf(v.sid, key, PRISM[Math.floor(t * 5 + v.ph) % PRISM.length]), -PIV[0] - GP, -PIV[1] - GP); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; }
     let gl = v.stars >= 4 ? .5 + .2 * Math.sin(t * 4 + v.ph) : 0; gl = Math.max(gl, v.glowF);
@@ -607,7 +609,7 @@ export class BattleView {
     if (v.dead) { ctx.globalAlpha = Math.min(1, v.deathT * 1.5) * v.alpha; warpDraw(ctx, silOf(v.sid, key, P.aura), W); }
     if (v.flash > 0) { ctx.globalAlpha = v.flash * .85; warpDraw(ctx, silOf(v.sid, key, '#ffffff'), W); }
     ctx.restore(); ctx.globalAlpha = 1;
-    if (v.shieldAmt > 0 && !v.dead) { ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = .25 + .1 * Math.sin(t * 4); ctx.strokeStyle = '#bfe6ff'; ctx.lineWidth = 3; ctx.beginPath(); ctx.ellipse(v.x, v.y - 150 * v.k, 170 * v.k, 210 * v.k, 0, 0, TAU); ctx.stroke(); ctx.restore(); }
+    drawAurasFront(ctx, v, t, this.V.values(), this.headY(v));
   }
   /** "Lv.N" plate under the feet: green rim = our team, red = enemy, dot = element */
   drawLevel(v) {

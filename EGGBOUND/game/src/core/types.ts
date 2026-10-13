@@ -77,6 +77,7 @@ export interface MonsterRef { sid: string; lvl: number; stars: number; sk?: numb
 export interface EnemyRef extends MonsterRef { hpMult?: number; atkMult?: number }
 export interface StageDef {
   id: string; name: string; desc: string;
+  loc?: string; // battle arena (render/locations.ts); none = the default meadow
   waves: EnemyRef[][];
   reward: { gold: number; exp: number };
   stamina: number;

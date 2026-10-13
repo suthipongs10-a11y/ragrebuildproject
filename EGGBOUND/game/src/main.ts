@@ -5,7 +5,8 @@ import { Battle } from './core/battle';
 import { drawShowcase, showcaseTap } from './render/showcase';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL, rareMasterURL } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
-import { E, initCanvas, toWorld, updScripts, updParts, tickEngine, clearAll, worldTransform, drawGround, drawDecals, drawLanternPools, drawParts, drawFlies, drawLantern, drawBush, LANTERNS, BUSHES, drawOverlays, clamp, setTheme } from './render/engine';
+import { E, initCanvas, toWorld, updScripts, updParts, tickEngine, clearAll, worldTransform, drawGround, drawDecals, drawLanternPools, drawParts, drawFlies, drawLantern, drawBush, LANTERNS, BUSHES, drawOverlays, clamp } from './render/engine';
+import { setLocation, clearLocation, LOC_IDS } from './render/locations';
 import { BattleView } from './render/battleView';
 import { HatchView } from './render/hatchView';
 import { HomeView } from './render/homeView';
@@ -355,7 +356,7 @@ let lastStage = null, curStageId = null, actT = 0, bannerT = 0;
 function banner(t, s = '', d = 1.8) { $('#bT').textContent = t; $('#bS').textContent = s; $('#banner').classList.add('show'); bannerT = d; }
 function startBattle(stageId) {
   if (S.team.length !== 4) { teamCtx = stageId; show('team'); return; }
-  curStageId = stageId; const st = STAGES.find(x => x.id === stageId); setTheme(stageId.split('-')[0]); // each realm has its own battlefield look
+  curStageId = stageId; const st = STAGES.find(x => x.id === stageId); setLocation(st?.loc); // each stage fights in its own arena
   const seed = (Date.now() ^ (Math.random() * 1e9)) >>> 0;
   const team = S.team.map(uid => { const m = monOf(S, uid); return { sid: m.sid, lvl: m.lvl, stars: m.stars, sk: m.sk, rare: !!m.rare }; });
   const b = new Battle(seed, team, st, homeMods(S));
@@ -428,7 +429,7 @@ function resultModal(r, win, stars) {
   document.body.appendChild(modal);
   if (win && stars) sfx.coin();
 }
-function leaveBattle() { setTheme('1'); chestUI?.close(); chestUI = null; battle = null; clearAll(); scene = cur === 'home' && homeV ? homeV : idleScene; $('#resModal')?.remove(); $('#bhud').hidden = true; }
+function leaveBattle() { clearLocation(); chestUI?.close(); chestUI = null; battle = null; clearAll(); scene = cur === 'home' && homeV ? homeV : idleScene; $('#resModal')?.remove(); $('#bhud').hidden = true; }
 
 // ---------- hatch ----------
 function startHatch(eggId, forceRarity = null) {
@@ -620,6 +621,6 @@ function frame(now) {
     initCanvas($('#game'));
     $('#loading').hidden = true; render(); requestAnimationFrame(frame);
     (window as any).__w2s = id => { const [x, y] = homeV.bPos(BDEF[id]); const z = E.base * E.zoom; return [(x - E.cam.x) * z + E.W / 2, (y - 30 * homeV.scaleShow - E.cam.y) * z + E.H / 2]; };
-    (window as any).__eb = { get S() { return S; }, get battle() { return battle; }, get hatch() { return hatch; }, startBattle, startHatch, show, devTool, get homeV() { return homeV; }, get chest() { return chestUI; }, selectB(id) { homeV.sel = id; selB = id; renderPanel(); } };
+    (window as any).__eb = { get S() { return S; }, get battle() { return battle; }, get hatch() { return hatch; }, startBattle, startHatch, show, devTool, get homeV() { return homeV; }, get chest() { return chestUI; }, selectB(id) { homeV.sel = id; selB = id; renderPanel(); }, setLocation, LOC_IDS, get E() { return E; } };
   } catch (err) { $('#loading').textContent = 'โหลดไม่สำเร็จ: ' + err.message; console.error(err); }
 })();
