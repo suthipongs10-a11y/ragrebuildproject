@@ -771,23 +771,67 @@ const LOCS = {
 };
 export const LOC_IDS = Object.keys(LOCS);
 
+// ---------- painted plates (BATCH17) ----------
+// Separate files bg/<loc>.webp published next to the page (build.mjs copies assets_bg/ → dist/bg/ and defines __BG__
+// with the ids that have one). A plate replaces the code ground, props and lamps; ambient life stays (minus the
+// systems tied to the code geometry: water ripples/sparkles and lamp smoke) and the grade becomes L.artGrade.
+// Plates are drawn on a separate image, so the main canvas may become origin-tainted — nothing reads it back.
+const ART = new Set(typeof __BG__ !== 'undefined' ? __BG__ : []);
+const PLATE = {};
+/** world height a plate covers: its painted oval (~31% of the height, centre ~50%) then matches the plaza (PR·SQ) */
+const PH = 1084;
+function plate(id) {
+  if (!ART.has(id)) return null;
+  let im = PLATE[id];
+  if (!im) { im = PLATE[id] = new Image(); im.decoding = 'async'; im.onerror = () => { ART.delete(id); delete PLATE[id]; }; im.src = 'bg/' + id + '.webp'; }
+  return im.complete && im.naturalWidth ? im : null;
+}
+/** warm the browser cache with every plate, one at a time, after the game has loaded */
+export function prefetchPlates() {
+  const ids = [...ART]; let i = 0;
+  const next = () => { if (i >= ids.length) return; const id = ids[i++]; plate(id); const im = PLATE[id]; if (!im || im.complete) return next(); im.addEventListener('load', next, { once: true }); im.addEventListener('error', next, { once: true }); };
+  next();
+}
+/** plate geometry in world units: [x, y, w, h] (per-plate fit: [centre offset as a fraction of h, scale]) */
+function plateRect(L, im) { const [dy, k] = L.fit || [0, 1], h = PH * k, w = h * im.naturalWidth / im.naturalHeight; return [-w / 2, -h * (.5 + dy), w, h]; }
+/** ground for a plate: the painting plus mirrored copies around it (covers wide screens / the wave walk-out), the
+ *  copies dimmed so the eye stays on the arena; the painting itself is redrawn sharp every frame (E.loc.plate) */
+function plateGround(L, im) {
+  const c = mk(GW, GH), g = c.getContext('2d'), [x0, y0, w, h] = plateRect(L, im);
+  g.translate(GOX, GOY);
+  for (let j = -2; j <= 2; j++) for (let i = -2; i <= 2; i++) { const x = x0 + i * w, y = y0 + j * h; if (x > GOX || y > GOY || x + w < -GOX || y + h < -GOY) continue; g.save(); g.translate(x + (i & 1 ? w : 0), y + (j & 1 ? h : 0)); g.scale(i & 1 ? -1 : 1, j & 1 ? -1 : 1); g.drawImage(im, 0, 0, w, h); g.restore(); }
+  g.fillStyle = 'rgba(10,8,14,.35)'; g.beginPath(); g.rect(-GOX, -GOY, GW, GH); g.rect(x0, y0, w, h); g.fill('evenodd');
+  return c;
+}
+
 // ---------- switching ----------
 const DEF_L = LANTERNS.slice(), DEF_B = BUSHES.slice();
-let curId = null, curGround = null;
+let curId = null, curGround = null, curArt = false, pending = null;
 /** set the battle arena for a location id ('meadow' or unknown → the default realm-1 field) */
 export function setLocation(id) {
   const L = LOCS[id];
+  pending = null;
   if (!L) return clearLocation();
   if (!E.ctx) return;
+  const im = plate(id);
+  if (!im && PLATE[id]) pending = id, PLATE[id].addEventListener('load', () => { if (pending === id && E.loc?.id === id) setLocation(id); }, { once: true }); // swap in when it arrives
   useTheme(L.pal);
-  if (curId !== id) {
+  if (curId !== id || curArt !== !!im) {
     for (const k in PC) delete PC[k]; WATER = null; curGround = null;
-    const c = mk(GW, GH), g = c.getContext('2d'); g.translate(GOX, GOY); L.ground.call(L, g, mulberry(L.seed)); curGround = c; curId = id; L.water = WATER;
+    if (im) curGround = plateGround(L, im);
+    else { const c = mk(GW, GH), g = c.getContext('2d'); g.translate(GOX, GOY); L.ground.call(L, g, mulberry(L.seed)); curGround = c; L.water = WATER; }
+    curId = id; curArt = !!im;
   }
-  WATER = L.water; useTheme(L.pal); E.ground = curGround;
-  LANTERNS.length = 0; for (const [kind, x, y, o] of L.lights) LANTERNS.push(Object.assign({ kind: kind || undefined, x, y, ph: Math.random() * 9 }, o));
-  BUSHES.length = 0; for (const [kind, x, y, s, o] of L.props) BUSHES.push({ kind, x, y, s: s || 1, o: o || {}, seed: (x * 7 + y * 13 + kind.length * 101) | 0 });
+  WATER = im ? null : L.water; useTheme(L.pal); E.ground = curGround;
+  LANTERNS.length = 0; BUSHES.length = 0;
+  if (im) {
+    const r = plateRect(L, im), amb = L.amb.filter(a => !a.where && a.k !== 'smoke' && a.k !== 'ripple');
+    E.loc = { id, art: true, prop: () => {}, light: () => {}, ambient: ambient(amb), grade: L.artGrade ? grade(L.artGrade) : null, plate: ctx => ctx.drawImage(im, r[0], r[1], r[2], r[3]) };
+    return;
+  }
+  for (const [kind, x, y, o] of L.lights) LANTERNS.push(Object.assign({ kind: kind || undefined, x, y, ph: Math.random() * 9 }, o));
+  for (const [kind, x, y, s, o] of L.props) BUSHES.push({ kind, x, y, s: s || 1, o: o || {}, seed: (x * 7 + y * 13 + kind.length * 101) | 0 });
   E.loc = { id, prop: b => put(E.ctx, PROPS[b.kind](b.o, b.seed), b.x, b.y, b.s, b.o.flip), light: Lt => LIGHTS[Lt.kind](Lt), ambient: ambient(L.amb), grade: grade(L.grade) };
 }
 /** back to the default meadow (home / hatch / idle scenes and stage 1-1) */
-export function clearLocation() { LANTERNS.splice(0, LANTERNS.length, ...DEF_L); BUSHES.splice(0, BUSHES.length, ...DEF_B); setTheme('1'); }
+export function clearLocation() { pending = null; LANTERNS.splice(0, LANTERNS.length, ...DEF_L); BUSHES.splice(0, BUSHES.length, ...DEF_B); setTheme('1'); }

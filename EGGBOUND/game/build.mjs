@@ -16,7 +16,12 @@ if (process.argv.includes('--test')) {
   process.exit(0);
 }
 
-const res = await build({ entryPoints: [path.join(root, 'src/main.ts')], bundle: true, platform: 'browser', format: 'iife', target: 'es2020', minify: true, write: false, logLevel: 'warning' });
+// Painted battle plates (BATCH17) are too big to embed under the 16MB single-file limit: they ship as separate files
+// dist/bg/<loc>.webp (published next to the page) and the bundle only gets the list of which locations have one.
+const bgDir = path.join(root, 'assets_bg'), bgOut = path.join(root, 'dist/bg'), bgIds = [];
+fs.rmSync(bgOut, { recursive: true, force: true });
+if (fs.existsSync(bgDir)) for (const f of fs.readdirSync(bgDir)) if (f.endsWith('.webp')) { fs.mkdirSync(bgOut, { recursive: true }); fs.copyFileSync(path.join(bgDir, f), path.join(bgOut, f)); bgIds.push(path.basename(f, '.webp')); }
+const res = await build({ entryPoints: [path.join(root, 'src/main.ts')], bundle: true, platform: 'browser', format: 'iife', target: 'es2020', minify: true, write: false, logLevel: 'warning', define: { __BG__: JSON.stringify(bgIds) } });
 const js = res.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
 
 // Assets: game/assets/*.webp|png (authoritative). Legacy fallback: the old Test Lab's embedded ASSET block if present.
@@ -34,4 +39,4 @@ if (fs.existsSync(adir)) for (const f of fs.readdirSync(adir)) {
 const tpl = fs.readFileSync(path.join(root, 'src/index.template.html'), 'utf8');
 const out = tpl.replace('/*ASSETS*/', () => JSON.stringify(assets)).replace('/*BUNDLE*/', () => js);
 fs.writeFileSync(path.join(root, 'dist/index.html'), out);
-console.log('dist/index.html', (out.length / 1024).toFixed(0) + 'KB', 'assets:', Object.keys(assets).join(','));
+console.log('dist/index.html', (out.length / 1024).toFixed(0) + 'KB', 'bg plates:', bgIds.join(',') || '-', 'assets:', Object.keys(assets).join(','));

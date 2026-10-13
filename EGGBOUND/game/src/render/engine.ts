@@ -153,7 +153,7 @@ export const toWorld = (sx, sy) => [(sx - E.W / 2) / Z() + E.cam.x, (sy - E.H / 
 /** apply world transform (with shake) */
 export function worldTransform() { const z = Z(), shx = E.shake ? rnd(-E.shake, E.shake) : 0, shy = E.shake ? rnd(-E.shake, E.shake) : 0; E.ctx.setTransform(E.DPR * z, 0, 0, E.DPR * z, E.DPR * (E.W / 2 - E.cam.x * z + shx), E.DPR * (E.H / 2 - E.cam.y * z + shy)); }
 export function screenTransform() { E.ctx.setTransform(E.DPR, 0, 0, E.DPR, 0, 0); }
-export function drawGround() { E.ctx.drawImage(E.ground, -GOX, -GOY); }
+export function drawGround() { E.ctx.drawImage(E.ground, -GOX, -GOY); if (E.loc?.plate) E.loc.plate(E.ctx); } // plate: a painted arena drawn at full resolution over the baked ground
 export function drawOverlays() { const ctx = E.ctx; screenTransform(); if (E.loc?.grade) E.loc.grade(ctx, E.W, E.H); ctx.drawImage(E.vign, 0, 0, E.W, E.H); if (E.flash > 0) { ctx.globalAlpha = Math.min(1, E.flash); ctx.fillStyle = E.flashC; ctx.fillRect(0, 0, E.W, E.H); ctx.globalAlpha = 1; } }
 export function tickEngine(dt) {
   E.time += dt; E.shake = Math.max(0, E.shake - dt * 40); E.flash = Math.max(0, E.flash - dt * 2.2);

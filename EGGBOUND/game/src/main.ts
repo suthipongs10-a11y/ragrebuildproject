@@ -6,7 +6,7 @@ import { drawShowcase, showcaseTap } from './render/showcase';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL, rareMasterURL } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
 import { E, initCanvas, toWorld, updScripts, updParts, tickEngine, clearAll, worldTransform, drawGround, drawDecals, drawLanternPools, drawParts, drawFlies, drawLantern, drawBush, LANTERNS, BUSHES, drawOverlays, clamp } from './render/engine';
-import { setLocation, clearLocation, LOC_IDS } from './render/locations';
+import { setLocation, clearLocation, prefetchPlates, LOC_IDS } from './render/locations';
 import { BattleView } from './render/battleView';
 import { HatchView } from './render/hatchView';
 import { HomeView } from './render/homeView';
@@ -619,7 +619,7 @@ function frame(now) {
     await loadAssets();
     try { await Promise.race([document.fonts.load('600 20px Mitr'), new Promise(r => setTimeout(r, 2000))]); } catch (e) { }
     initCanvas($('#game'));
-    $('#loading').hidden = true; render(); requestAnimationFrame(frame);
+    $('#loading').hidden = true; render(); requestAnimationFrame(frame); setTimeout(prefetchPlates, 1500); // painted battle plates are separate files
     (window as any).__w2s = id => { const [x, y] = homeV.bPos(BDEF[id]); const z = E.base * E.zoom; return [(x - E.cam.x) * z + E.W / 2, (y - 30 * homeV.scaleShow - E.cam.y) * z + E.H / 2]; };
     (window as any).__eb = { get S() { return S; }, get battle() { return battle; }, get hatch() { return hatch; }, startBattle, startHatch, show, devTool, get homeV() { return homeV; }, get chest() { return chestUI; }, selectB(id) { homeV.sel = id; selB = id; renderPanel(); }, setLocation, LOC_IDS, get E() { return E; } };
   } catch (err) { $('#loading').textContent = 'โหลดไม่สำเร็จ: ' + err.message; console.error(err); }
