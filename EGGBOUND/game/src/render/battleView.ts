@@ -15,8 +15,8 @@ const legendOf = v => SPECIES[v.sid.split('~')[0]]?.rarity === 'legendary';
 const SKY = Array.from({ length: 70 }, (_, i) => { const r = (n => () => (n = (n * 16807) % 2147483647) / 2147483647)(i * 7919 + 13); return [r() * 2 - 1, r() * 2 - 1, .4 + r() * 1.4, r() * 6]; });
 /** rare forms cast their ultimate in radiant gold (with prismatic rings on top) instead of their element colour */
 const RARE_PAL = { name: 'ร่างหายาก', aura: '#ffcf3a', core: '#fff3c0', hot: '#ffffff', rune: '#ffe27a', cut: '#b8860b', dh: 0, sat: 1, lit: 1, all: 1 };
-const STATUS_TH = { burn: 'เผาไหม้', poison: 'พิษ', stun: 'มึน', sleep: 'หลับ', blind: 'ตาบอด', def_down: 'DEF ↓', atk_down: 'ATK ↓', spd_down: 'SPD ↓', atk_up: 'ATK ↑', def_up: 'DEF ↑', spd_up: 'SPD ↑', crit_up: 'คริ ↑', shield: 'โล่', regen: 'ฟื้นฟู' };
-const STATUS_COL = { burn: '#ffae6a', poison: '#b8f06a', stun: '#ffe066', sleep: '#c9b8ff', blind: '#a8a8c8', def_down: '#ff8a7a', atk_down: '#ff8a7a', spd_down: '#9fd8ff', atk_up: '#ff7a5a', def_up: '#9fd0ff', spd_up: '#9fffcf', crit_up: '#ffd27a', shield: '#bfe6ff', regen: '#7dffb0' };
+const STATUS_TH = { burn: 'เผาไหม้', poison: 'พิษ', stun: 'มึน', sleep: 'หลับ', blind: 'ตาบอด', def_down: 'DEF ↓', atk_down: 'ATK ↓', spd_down: 'SPD ↓', atk_up: 'ATK ↑', def_up: 'DEF ↑', spd_up: 'SPD ↑', crit_up: 'คริ ↑', shield: 'โล่', regen: 'ฟื้นฟู', invincible: 'อมตะ', immunity: 'ภูมิคุ้มกัน', protect: 'ปกป้อง', provoke: 'ยั่วยุ', silence: 'ผนึกสกิล', unheal: 'ห้ามฮีล', brand: 'ตราบาป', bomb: 'ระเบิดเงา' };
+const STATUS_COL = { burn: '#ffae6a', poison: '#b8f06a', stun: '#ffe066', sleep: '#c9b8ff', blind: '#a8a8c8', def_down: '#ff8a7a', atk_down: '#ff8a7a', spd_down: '#9fd8ff', atk_up: '#ff7a5a', def_up: '#9fd0ff', spd_up: '#9fffcf', crit_up: '#ffd27a', shield: '#bfe6ff', regen: '#7dffb0', invincible: '#fff6c8', immunity: '#d8fff0', protect: '#ffe6a8', provoke: '#ff7a6a', silence: '#c8a8ff', unheal: '#ff8ac8', brand: '#e070ff', bomb: '#b48cff' };
 const ALLY_C = [-245, 165], ENEMY_C = [245, -115], PERP = [.6, .8];
 const OFFS = { 1: [0], 2: [-60, 60], 3: [-110, 0, 110], 4: [-150, -50, 50, 150] };
 
@@ -82,6 +82,8 @@ export class BattleView {
     yield* this.finish();
   }
   *waitCommand(u) {
+    const fc = this.b.forced(u);
+    if (fc) { const v = this.V.get(u.uid); text(v.x, this.headY(v) - 10, 'ถูกยั่วยุ!', STATUS_COL.provoke, 16); yield .45; return fc; }
     this.phase = 'choose'; this.sel = this.b.canUse(u, this.sel) && this.lastUid === u.uid ? this.sel : 0; this.lastUid = u.uid; this.pending = null; this.hud();
     while (!this.pending) { if (this.auto) { this.pending = this.b.autoCommand(u.uid); break; } yield 0; }
     const cmd = this.pending; this.pending = null;
@@ -117,6 +119,7 @@ export class BattleView {
     for (const e of evs) {
       if (e.t === 'wave') { yield .5; yield* this.waveIntro(false); }
       else if (e.t === 'end') { /* handled in finish */ }
+      else if (e.t === 'dot' && e.id === 'bomb') { const v = this.V.get(e.tgt); v.hp = e.hp; v.flash = 1; v.bendV -= 700; text(v.x, this.headY(v) - 30, 'ระเบิดเงา!', STATUS_COL.bomb, 20); dmgText(v.x, this.headY(v) + 18, e.dmg, false, {}); burst(v.x, v.y - 60 * v.k / .4, 70, 26, '#9a5cff', 380, 18, .6); ring(v.x, v.y, 10, 150 * v.k / .4, '#b48cff', .55, 8); shake(8); sfx.hit(true); yield .5; }
       else if (e.t === 'dot') { const v = this.V.get(e.tgt); const P = e.id === 'burn' ? PAL.fire : { aura: '#9be05a' }; for (let i = 0; i < 8; i++) addP({ type: e.id === 'burn' ? 'flame' : 'glow', x: v.x + rnd(-30, 30) * v.k / .4, y: v.y, z: rnd(10, 60) * v.k / .4, vz: rnd(60, 120), life: .6, size: rnd(12, 20), size2: 0, color: P.aura, drag: 1 }); v.hp = e.hp; v.flash = .6; text(v.x, this.headY(v) + 20, '' + e.dmg, e.id === 'burn' ? '#ffae6a' : '#b8f06a', 19); sfx.fire(); yield .4; }
       else if (e.t === 'skip') { const v = this.V.get(e.uid); text(v.x, this.headY(v), (STATUS_TH[e.reason] || '') + ' — ข้ามเทิร์น', '#ffe066', 15); yield .55; }
       else this.applyEv(e);
@@ -128,6 +131,7 @@ export class BattleView {
       case 'hit': {
         if (!v) return; const src = this.V.get(e.src);
         if (e.miss) { text(v.x, this.headY(v) + 10, 'พลาด', '#c8c8d8', 18); return; }
+        if (e.inv) { text(v.x, this.headY(v) + 10, 'อมตะ', STATUS_COL.invincible, 18); ring(v.x, v.y - 60 * v.k / .4, 20, 90, '#fff6c8', .5, 5); return; }
         v.hp = e.hp; v.flash = 1; v.hitT = .3; if (src) { const dx = v.x - src.x, dy = v.y - src.y, l = Math.hypot(dx, dy) || 1; const k = v.boss ? .35 : 1; v.kvx += dx / l * 170 * k; v.kvy += dy / l * 110 * k; }
         v.bendV -= (e.crit ? 950 : 620) * (v.boss ? .45 : 1); v.wave = e.crit ? 22 : 13; v.wph = 0; // recoil + jelly ripple
         this.hitSpark(v, src, e.crit);
@@ -139,7 +143,11 @@ export class BattleView {
       }
       case 'heal': if (!v) return; v.hp = e.hp; text(v.x, this.headY(v) + 18, '+' + e.amt, '#7dffb0', 21); for (let i = 0; i < 8; i++) addP({ x: v.x + rnd(-40, 40) * v.k / .4, y: v.y, z: rnd(0, 30), vz: rnd(60, 120), life: .8, size: rnd(8, 14), size2: 0, color: '#7dffb0' }); break;
       case 'status': if (!v) return; if (e.add) { v.st.add(e.id); text(v.x - 26, this.headY(v) - 4, STATUS_TH[e.id], STATUS_COL[e.id], 14, { vz: 40 }); if (e.id === 'atk_up' || e.id === 'crit_up') for (let i = 0; i < 5; i++) addP({ type: 'arrow', x: v.x + rnd(-40, 40), y: v.y, z: rnd(10, 60), vz: rnd(80, 140), life: .9, size: 9, color: '#ff6a4a', add: false }); if (e.id === 'sleep') text(v.x + 30, this.headY(v) - 20, 'Zz', '#c9b8ff', 22, { vz: 30, life: 1.4 }); } else v.st.delete(e.id); break;
-      case 'resist': if (!v) return; text(v.x + 26, this.headY(v) - 4, 'ต้านทาน', '#b9c3d6', 13, { vz: 40 }); break;
+      case 'resist': if (!v) return; text(v.x + 26, this.headY(v) - 4, e.id === 'immunity' ? 'ภูมิคุ้มกัน' : e.id === 'unheal' ? 'ฮีลไม่ได้' : 'ต้านทาน', e.id === 'immunity' ? STATUS_COL.immunity : e.id === 'unheal' ? STATUS_COL.unheal : '#b9c3d6', 13, { vz: 40 }); break;
+      case 'strip': if (!v) return; text(v.x, this.headY(v) - 18, 'ลบบัฟ', STATUS_COL.brand, 15, { vz: 40 }); for (let i = 0; i < 8; i++) addP({ type: 'smoke', add: false, x: v.x + rnd(-40, 40), y: v.y, z: rnd(40, 160), vz: rnd(30, 80), life: .7, size: rnd(14, 22), size2: rnd(30, 44), color: '#5a2a8a', alpha: .45 }); break;
+      case 'cd': if (!v) return; text(v.x - 28, this.headY(v) + 4, 'คูลดาวน์ ' + e.delta, '#fff2a8', 14, { vz: 40 }); break;
+      case 'revive': { if (!v) return; v.dead = false; v.deathT = 0; v.alpha = 1; v.pose = 'idle'; v.hp = e.hp; v.shown = e.hp; v.st = new Set(); v.marks = new Set(); v.bendV += 400; v.glowF = 1; setTimeout(() => { if (!v.busy) v.glowF = 0; }, 700);
+        text(v.x, this.headY(v) - 24, 'ชุบชีวิต!', '#fff6c8', 20); ring(v.x, v.y, 10, 130 * v.k / .4, '#fff2b0', .6, 8); burst(v.x, v.y - 80 * v.k / .4, 60, 22, '#fff6c8', 260, 14, .7); sfx.perfect(); break; }
       case 'mark': if (!v) return; if (e.add) { v.marks.add(e.elem); const P = PAL[e.elem]; ring(v.x, v.y, 10, 70 * v.k / .4, P.aura, .45, 4); addP({ x: v.x, y: v.y, z: 390 * v.k + 30, life: .5, size: 26, size2: 0, color: P.aura }); } else v.marks.delete(e.elem); break;
       case 'shield': if (!v) return; v.shieldAmt = e.amt; ring(v.x, v.y, 20, 90 * v.k / .4, '#bfe6ff', .5, 5); for (let i = 0; i < 10; i++) addP({ type: 'chip', add: false, x: v.x + rnd(-50, 50), y: v.y, z: rnd(0, 60), vz: rnd(40, 100), life: .7, size: rnd(5, 9), color: '#a8c88a', grav: 300, rot: rnd(0, 6), vr: rnd(-6, 6) }); break;
       case 'atb': if (!v) return; v.atb = e.atb; text(v.x + 28, this.headY(v) + 6, e.delta > 0 ? `เกจ +${e.delta}` : `เกจ ${e.delta}`, e.delta > 0 ? '#9fffcf' : '#9fd8ff', 14, { vz: 40 }); break;
@@ -618,7 +626,7 @@ export class BattleView {
     ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.fillRect(x - 1, y + 8, w + 2, 5); ctx.fillStyle = '#56cfe3'; ctx.fillRect(x, y + 9, w * Math.min(1, v.atb / 100), 3);
     let ix = x; const iy = y - 11;
     for (const m of v.marks) { ctx.fillStyle = PAL[m].aura; ctx.beginPath(); ctx.arc(ix + 5, iy, 5, 0, TAU); ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.2; ctx.stroke(); ix += 13; }
-    for (const s of v.st) { if (s === 'shield') continue; ctx.fillStyle = STATUS_COL[s] || '#fff'; ctx.fillRect(ix, iy - 4, 9, 9); ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.font = '700 8px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(({ burn: 'F', poison: 'P', stun: '!', sleep: 'z', blind: 'B', def_down: 'D', atk_down: 'A', spd_down: 'S', atk_up: 'A', def_up: 'D', spd_up: 'S', crit_up: 'C', regen: '+' })[s] || '', ix + 4.5, iy + 3); ix += 11; }
+    for (const s of v.st) { if (s === 'shield') continue; ctx.fillStyle = STATUS_COL[s] || '#fff'; ctx.fillRect(ix, iy - 4, 9, 9); ctx.fillStyle = 'rgba(0,0,0,.6)'; ctx.font = '700 8px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(({ burn: 'F', poison: 'P', stun: '!', sleep: 'z', blind: 'B', def_down: 'D', atk_down: 'A', spd_down: 'S', atk_up: 'A', def_up: 'D', spd_up: 'S', crit_up: 'C', regen: '+', invincible: 'I', immunity: 'M', protect: 'G', provoke: 'T', silence: 'X', unheal: 'H', brand: 'B', bomb: '*' })[s] || '', ix + 4.5, iy + 3); ix += 11; }
     this.drawLevel(v);
     if (v.st.has('stun')) for (let i = 0; i < 3; i++) { const a = E.time * 4 + i * TAU / 3; ctx.fillStyle = '#ffe066'; ctx.beginPath(); ctx.arc(v.x + Math.cos(a) * 22, this.headY(v) + 8 + Math.sin(a) * 7, 3.2, 0, TAU); ctx.fill(); }
   }

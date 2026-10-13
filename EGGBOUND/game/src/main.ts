@@ -1,9 +1,9 @@
 // @ts-nocheck
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
-import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG } from './core/data';
+import { SPECIES, STAGES, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
 import { Battle } from './core/battle';
 import { drawShowcase, showcaseTap } from './render/showcase';
-import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL } from './render/assets';
+import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL, rareMasterURL } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
 import { E, initCanvas, toWorld, updScripts, updParts, tickEngine, clearAll, worldTransform, drawGround, drawDecals, drawLanternPools, drawParts, drawFlies, drawLantern, drawBush, LANTERNS, BUSHES, drawOverlays, clamp } from './render/engine';
 import { BattleView } from './render/battleView';
@@ -70,7 +70,7 @@ const look = m => lookOf(m.sid, m.stars, !!m.rare);
 const units = () => [...S.mons].sort((a, b) => b.stars - a.stars || b.lvl - a.lvl || a.sid.localeCompare(b.sid) || a.uid - b.uid);
 function monCard(uid, opts = {}) {
   const m = monOf(S, uid), s = SPECIES[m.sid];
-  return `<button type="button" class="mcard ${opts.on ? 'on' : ''} ${opts.pick ? 'pick' : ''} ${opts.dup ? 'dup' : ''} ${s.rarity}" style="${rcVar(s)}" data-mon="${uid}">${opts.tag ? `<span class="tag">${opts.tag}</span>` : ''}${m.rare ? '<span class="rf" title="ร่างหายาก">✦</span>' : ''}<span class="pic ${m.rare ? 'rfp' : ''}"><img src="${portrait(look(m))}" alt=""></span><span class="n">${esc(s.name)}</span><span class="stars" style="font-size:.7rem">${starStr(m.stars)}</span><span class="lv">Lv.${m.lvl} ${elDot(s.elem)}</span></button>`;
+  return `<button type="button" class="mcard ${opts.on ? 'on' : ''} ${opts.pick ? 'pick' : ''} ${opts.dup ? 'dup' : ''} ${s.rarity}" style="${rcVar(s)}" data-mon="${uid}">${opts.tag ? `<span class="tag">${opts.tag}</span>` : ''}${m.rare ? '<span class="rf" title="ร่างหายาก">✦</span>' : ''}<span class="pic ${m.rare ? 'rfp' : ''}"><img src="${portrait(look(m))}" alt=""></span><span class="n">${esc(s.name)}</span><span class="stars" style="font-size:.7rem">${starStr(m.stars)}</span><span class="lv">Lv.${m.lvl} ${elDot(formOf(m.sid, !!m.rare).elem)}</span></button>`;
 }
 function teamHTML() {
   const owned = units(), lm = monOf(S, S.team[0]), lead = lm && SPECIES[lm.sid].leader;
@@ -83,35 +83,42 @@ function teamHTML() {
 }
 function stats(m, stars = m.stars, lvl = m.lvl) { const s = SPECIES[m.sid]; return { hp: statAt(s.base.hp, lvl, stars), atk: statAt(s.base.atk, lvl, stars), def: statAt(s.base.def, lvl, stars), spd: spdAt(s.base.spd, lvl, stars) }; }
 const skLv = (m, i) => `<span class="sklv ${m.sk[i] >= SKILL_MAX[i] ? 'max' : ''} ${skFlash === i ? 'up' : ''}">Lv.${m.sk[i]}/${SKILL_MAX[i]}</span>`;
-const monTabs = () => { const all = Object.values(SPECIES).filter(x => !x.boss).length; return `<div class="seg mtabs"><button type="button" class="${monTab === 'mine' ? 'on' : ''}" data-mt="mine">คลังของฉัน</button><button type="button" class="${monTab === 'dex' ? 'on' : ''}" data-mt="dex">สารบัญมอน ${S.dex.length}/${all}</button></div>`; };
+const monTabs = () => { const d = dexAll(), all = d.length, got = d.filter(dexHas).length; return `<div class="seg mtabs"><button type="button" class="${monTab === 'mine' ? 'on' : ''}" data-mt="mine">คลังของฉัน</button><button type="button" class="${monTab === 'dex' ? 'on' : ''}" data-mt="dex">สารบัญมอน ${got}/${all}</button></div>`; };
 const REALM = { A: 'ทุ่งไข่ป่วน', B: 'สุวรรณภูมิ', C: 'สวรรค์บูรพา', S: 'ตำนานดารา' };
 /** ★5 evolved-form preview (BATCH08 art) — shown in the book and the monster detail so the evolution can be seen before reaching it */
-const evoRow = (s, reached) => s.art && IMG[s.art + 'e_front_idle'] && natStars(s.id) < 5 ? `<div class="evorow ${reached ? 'on' : ''}"><img src="${portrait(s.id + '~5')}" alt=""><div><b>✦ ร่างวิวัฒน์ ★5</b>${reached ? 'ปลดล็อกแล้ว — ร่างนี้ใช้ในสนามรบตอน ★5 ขึ้นไป' : 'อัปดาวถึง ★5 เพื่อเปลี่ยนเป็นร่างนี้ (หน้าตาและท่าทางใหม่ทั้งหมด)'}</div></div>` : '';
+const evoRow = (s, reached, rare = false) => s.art && IMG[s.art + 'e_front_idle'] && natStars(s.id, rare) < 5 ? `<div class="evorow ${reached ? 'on' : ''}"><img src="${portrait(s.id + '~5' + (rare ? 'r' : ''))}" alt=""><div><b>✦ ร่างวิวัฒน์ ★5</b>${reached ? 'ปลดล็อกแล้ว — ร่างนี้ใช้ในสนามรบตอน ★5 ขึ้นไป' : 'อัปดาวถึง ★5 เพื่อเปลี่ยนเป็นร่างนี้ (หน้าตาและท่าทางใหม่ทั้งหมด)'}</div></div>` : '';
 /** rare-form passive row: shown in full when unlocked, otherwise a locked "???" teaser */
 const rareRow = (s, open, lockTxt) => s.rarePassive ? `<div class="rpas ${open ? '' : 'lock'}"><b>✦ สกิลร่างหายาก · ${open ? esc(s.rarePassive.name) : '???'}</b>${open ? esc(s.rarePassive.desc) : lockTxt}</div>` : '';
-/** monster book: every species in the game; ones never obtained are dark silhouettes but can still be opened */
+/** monster book: every species twice — its normal form and its light/dark rare form, which counts as a monster of its own
+ *  (SW-style: same name, other element, own skills 2-3). Ones never obtained are dark silhouettes but can still be opened. */
+const dexAll = () => Object.values(SPECIES).filter(x => !x.boss).sort((a, b) => a.id.localeCompare(b.id))
+  .flatMap(s => [false, ...(s.rareForm ? [true] : [])].map(rare => ({ s, rare, key: s.id + (rare ? 'r' : ''), elem: formOf(s.id, rare).elem })));
+const dexHas = e => (e.rare ? S.dexRare : S.dex).includes(e.s.id);
+const dexPic = e => portrait(e.rare ? lookOf(e.s.id, natStars(e.s.id, true), true) : e.s.id);
 function dexHTML() {
-  const all = Object.values(SPECIES).filter(x => !x.boss).sort((a, b) => a.id.localeCompare(b.id)), got = new Set(S.dex);
-  const nGot = all.filter(x => got.has(x.id)).length, list = dexEl === 'all' ? all : all.filter(x => x.elem === dexEl);
-  const cnt = (arr, key) => Object.entries(arr.reduce((o, x) => { const k = x[key]; o[k] = o[k] || [0, 0]; o[k][1]++; if (got.has(x.id)) o[k][0]++; return o; }, {}));
-  const elChips = `<button type="button" class="chip ${dexEl === 'all' ? 'on' : ''}" data-dexel="all">ทั้งหมด ${nGot}/${all.length}</button>` + Object.keys(ELEM_NAME).map(el => { const a = all.filter(x => x.elem === el); return a.length ? `<button type="button" class="chip ${dexEl === el ? 'on' : ''}" data-dexel="${el}">${elDot(el)} ${ELEM_NAME[el]} ${a.filter(x => got.has(x.id)).length}/${a.length}</button>` : ''; }).join('');
-  const roles = cnt(all, 'role').map(([r, [g, t]]) => `<span class="chip">${ROLE_NAME[r]} ${g}/${t}</span>`).join('');
-  const rars = ['common', 'rare', 'epic', 'legendary'].map(r => { const a = all.filter(x => x.rarity === r); return a.length ? `<span class="chip rar" style="${rcVar({ rarity: r })}">${RARITY_NAME[r]} ${a.filter(x => got.has(x.id)).length}/${a.length}</span>` : ''; }).join('');
+  const all = dexAll(), nGot = all.filter(dexHas).length, list = dexEl === 'all' ? all : all.filter(x => x.elem === dexEl);
+  const elChips = `<button type="button" class="chip ${dexEl === 'all' ? 'on' : ''}" data-dexel="all">ทั้งหมด ${nGot}/${all.length}</button>` + Object.keys(ELEM_NAME).map(el => { const a = all.filter(x => x.elem === el); return a.length ? `<button type="button" class="chip ${dexEl === el ? 'on' : ''}" data-dexel="${el}">${elDot(el)} ${ELEM_NAME[el]} ${a.filter(dexHas).length}/${a.length}</button>` : ''; }).join('');
+  const roles = Object.keys(ROLE_NAME).map(r => { const a = all.filter(x => x.s.role === r); return a.length ? `<span class="chip">${ROLE_NAME[r]} ${a.filter(dexHas).length}/${a.length}</span>` : ''; }).join('');
+  const rars = ['common', 'rare', 'epic', 'legendary'].map(r => { const a = all.filter(x => x.s.rarity === r); return a.length ? `<span class="chip rar" style="${rcVar({ rarity: r })}">${RARITY_NAME[r]} ${a.filter(dexHas).length}/${a.length}</span>` : ''; }).join('');
   let det = '';
-  if (dexSel && SPECIES[dexSel]) {
-    const s = SPECIES[dexSel], has = got.has(s.id), nat = natStars(s.id), img = masterURL(s.id) || portrait(s.id);
+  const e = dexSel && all.find(x => x.key === dexSel);
+  if (e) {
+    const { s, rare } = e, has = dexHas(e), f = formOf(s.id, rare), nat = natStars(s.id, rare), img = (rare ? rareMasterURL(s.id) : masterURL(s.id)) || dexPic(e);
+    const own = S.mons.filter(m => m.sid === s.id && !!m.rare === rare).length, rf = s.rareForm;
     const lo = { hp: statAt(s.base.hp, 1, nat), atk: statAt(s.base.atk, 1, nat), def: statAt(s.base.def, 1, nat) }, hi = { hp: statAt(s.base.hp, 40, 6), atk: statAt(s.base.atk, 40, 6), def: statAt(s.base.def, 40, 6) };
-    det = `<div class="detail dexd"><span class="dbig ${has ? '' : 'unk'}"><img src="${img}" alt=""></span><div style="min-width:0"><h3>${esc(s.name)} <small class="note">${esc(s.nameEn)}</small></h3>
-    <div class="row" style="gap:6px;flex:0 0 auto;margin:6px 0"><span class="chip">${elDot(s.elem)} ${ELEM_NAME[s.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}<span class="chip">${REALM[s.id[0]] || ''}</span></div>
-    <div class="stars">${starStr(nat)}</div><div class="note">${has ? '<b style="color:#8fe39a">✓ ได้มาแล้ว</b>' : '<b style="color:#e8b0a0">ยังไม่ได้</b> · หาได้จากไข่ปริศนา'}${copiesOf(S, s.id) ? ` · มีอยู่ ${copiesOf(S, s.id)} ตัว` : ''}</div>
+    const other = rare ? `<div class="rpas"><b>ร่างปกติ · ธาตุ${ELEM_NAME[s.elem]}</b>สกิล 2–3 คนละชุดกับร่างนี้ <button class="alt" type="button" data-dex="${s.id}">ดูร่างปกติ</button></div>`
+      : rf ? `<div class="rpas ${S.dexRare.includes(s.id) ? '' : 'lock'}"><b>✦ ร่างหายาก · ธาตุ${ELEM_NAME[rf.elem]}</b>มอนอีกตัว ชื่อเดิม สกิล 2–3 ของตัวเอง + สกิลร่างหายาก <button class="alt" type="button" data-dex="${s.id}r">ดูร่างหายาก</button></div>` : '';
+    det = `<div class="detail dexd"><span class="dbig ${has ? '' : 'unk'} ${rare ? 'rfp' : ''}"><img src="${img}" alt=""></span><div style="min-width:0"><h3>${esc(s.name)} <small class="note">${esc(s.nameEn)}</small></h3>
+    <div class="row" style="gap:6px;flex:0 0 auto;margin:6px 0"><span class="chip">${elDot(f.elem)} ${ELEM_NAME[f.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}${rare ? '<span class="chip rfc">✦ ร่างหายาก</span>' : ''}<span class="chip">${REALM[s.id[0]] || ''}</span></div>
+    <div class="stars">${starStr(nat)}</div><div class="note">${has ? '<b style="color:#8fe39a">✓ ได้มาแล้ว</b>' : '<b style="color:#e8b0a0">ยังไม่ได้</b> · ' + (rare ? 'ฟักได้จากไข่ทุกใบ (โอกาสร่างหายาก) ไข่ของตัวนี้เองโอกาสสูงสุด' : 'หาได้จากไข่ปริศนา')}${own ? ` · มีอยู่ ${own} ตัว` : ''}</div>
     <div class="stat"><div>HP<b>${lo.hp}</b><small>★6 เต็ม ${hi.hp}</small></div><div>ATK<b>${lo.atk}</b><small>★6 เต็ม ${hi.atk}</small></div><div>DEF<b>${lo.def}</b><small>★6 เต็ม ${hi.def}</small></div><div>SPD<b>${s.base.spd}</b><small>ฐาน</small></div></div></div>
-    <div class="skl">${s.skills.map((k, i) => `<div><b>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)} · ${esc(k.name)}</b>${esc(k.desc)}${k.cd ? `<em>คูลดาวน์ ${k.cd}</em>` : ''}</div>`).join('')}${s.leader ? `<div><b>ผู้นำ</b>${esc(s.leader.text)}</div>` : ''}${rareRow(s, S.dexRare.includes(s.id), 'ปลดล็อกเมื่อได้ร่างหายากของตัวนี้ (ไข่ร่างหายาก มีโอกาสออกจากไข่ทุกใบ)')}${evoRow(s, S.mons.some(m => m.sid === s.id && m.stars >= 5))}<div class="row" style="align-items:center;gap:10px"><img src="${eggURL(s.id)}" alt="" style="width:44px;height:44px;flex:0 0 auto;object-fit:contain"><span class="note">ไข่ของ${esc(s.name)}</span><button class="alt" type="button" data-dex="" style="margin-left:auto">ปิด</button></div></div></div>`;
+    <div class="skl">${f.skills.map((k, i) => `<div><b>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)} · ${esc(k.name)}</b>${esc(k.desc)}${k.cd ? `<em>คูลดาวน์ ${k.cd}</em>` : ''}</div>`).join('')}${s.leader ? `<div><b>ผู้นำ</b>${esc(s.leader.text)}</div>` : ''}${rare ? rareRow(s, has, 'ปลดล็อกเมื่อได้ร่างหายากของตัวนี้') : ''}${other}${evoRow(s, S.mons.some(m => m.sid === s.id && !!m.rare === rare && m.stars >= 5), rare)}<div class="row" style="align-items:center;gap:10px"><img src="${eggURL(s.id)}" alt="" style="width:44px;height:44px;flex:0 0 auto;object-fit:contain"><span class="note">ไข่ของ${esc(s.name)}</span><button class="alt" type="button" data-dex="" style="margin-left:auto">ปิด</button></div></div></div>`;
   }
-  return `<section class="scr dim"><div class="wrap">${topbar('สารบัญมอน', `ค้นพบแล้ว ${nGot} จาก ${all.length} ตัว`)}${monTabs()}
+  return `<section class="scr dim"><div class="wrap">${topbar('สารบัญมอน', `ค้นพบแล้ว ${nGot} จาก ${all.length} ตัว (นับร่างหายากแสง/มืดเป็นอีกตัว)`)}${monTabs()}
   <div class="bar" style="margin:4px 0 10px"><i style="transform:scaleX(${nGot / all.length})"></i></div>
   <div class="dexsum"><div class="row">${elChips}</div><div class="row">${roles}</div><div class="row">${rars}</div></div>
   ${det}
-  <div class="mgrid">${list.map(s => { const has = got.has(s.id); return `<button type="button" class="mcard dexc ${has ? '' : 'locked'} ${dexSel === s.id ? 'on' : ''} ${s.rarity}" style="${has ? rcVar(s) : ''}" data-dex="${s.id}"><span class="tag">${s.id}</span><span class="pic"><img src="${portrait(s.id)}" alt=""></span><span class="n">${esc(s.name)}</span><span class="lv">${elDot(s.elem)} ${ROLE_NAME[s.role]}</span></button>`; }).join('')}</div></div></section>`;
+  <div class="mgrid">${list.map(x => { const has = dexHas(x), s = x.s; return `<button type="button" class="mcard dexc ${has ? '' : 'locked'} ${dexSel === x.key ? 'on' : ''} ${s.rarity}" style="${has ? rcVar(s) : ''}" data-dex="${x.key}"><span class="tag">${s.id}</span>${x.rare ? '<span class="rf" title="ร่างหายาก">✦</span>' : ''}<span class="pic ${x.rare ? 'rfp' : ''}"><img src="${dexPic(x)}" alt=""></span><span class="n">${esc(s.name)}</span><span class="lv">${elDot(x.elem)} ${ROLE_NAME[s.role]}</span></button>`; }).join('')}</div></div></section>`;
 }
 /** monster screen (SW style): left = a stage with the monster standing full-body + tabs (info / level / stars / skills),
  *  right = the monster box, always on screen and scrolling on its own — in the level/star/skill tabs tapping a monster in
@@ -119,7 +126,7 @@ function dexHTML() {
 function monsHTML() {
   if (monTab === 'dex') return dexHTML();
   const owned = units(); if (!selMon || !monOf(S, selMon)) { selMon = owned[0].uid; monMode = null; food = []; }
-  const m = monOf(S, selMon), s = SPECIES[m.sid], cap = levelCap(m.stars), copies = copiesOf(S, m.sid) - 1, mode = monMode || 'info';
+  const m = monOf(S, selMon), s = SPECIES[m.sid], fe = formOf(m.sid, !!m.rare).elem, cap = levelCap(m.stars), copies = copiesOf(S, m.sid) - 1, mode = monMode || 'info';
   const tabs = [['info', 'ข้อมูล'], ['feed', '⬆ เลเวล'], ['evo', '★ อัปดาว'], ['skill', '✦ สกิล' + (copies > 0 ? ` (${copies})` : '')]];
   const hint = {
     info: `แตะมอนเพื่อดู · ${owned.length} ตัว`,
@@ -134,8 +141,8 @@ function monsHTML() {
   <div class="mlay ${mode !== 'info' ? 'picking' : ''}">
     <div class="mleft">
       <div class="mstage ${m.rare ? 'rf' : ''}">
-        <button type="button" class="mshow-btn" data-show="1" aria-label="แตะให้${esc(s.name)}โชว์ท่า"><canvas id="mshow" data-look="${look(m)}" data-elem="${s.elem}" data-rar="${s.rarity}" data-rare="${m.rare ? 1 : 0}" data-stars="${m.stars}"></canvas></button>
-        <div class="ms-name"><h3>${esc(s.name)}</h3><div class="ms-chips"><span class="chip">${elDot(s.elem)} ${ELEM_NAME[s.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}${parseInt(look(m).split('~')[1] || '0') >= 5 ? '<span class="chip evc">ร่างวิวัฒน์</span>' : ''}${m.rare ? '<span class="chip rfc">✦ ร่างหายาก</span>' : ''}</div>
+        <button type="button" class="mshow-btn" data-show="1" aria-label="แตะให้${esc(s.name)}โชว์ท่า"><canvas id="mshow" data-look="${look(m)}" data-elem="${fe}" data-rar="${s.rarity}" data-rare="${m.rare ? 1 : 0}" data-stars="${m.stars}"></canvas></button>
+        <div class="ms-name"><h3>${esc(s.name)}</h3><div class="ms-chips"><span class="chip">${elDot(fe)} ${ELEM_NAME[fe]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}${parseInt(look(m).split('~')[1] || '0') >= 5 ? '<span class="chip evc">ร่างวิวัฒน์</span>' : ''}${m.rare ? '<span class="chip rfc">✦ ร่างหายาก</span>' : ''}</div>
           <div class="ms-foot"><span class="stars">${starStr(m.stars)}</span><span class="ms-lv">Lv.<b>${m.lvl}</b>/${cap}</span><span class="bar"><i style="transform:scaleX(${m.lvl >= cap ? 1 : m.exp / expToNext(m.lvl)})"></i></span></div></div>
         <span class="ms-tip">แตะเพื่อให้โชว์ท่า</span>
       </div>
@@ -149,7 +156,7 @@ function monsHTML() {
 function infoPane(m) {
   const s = SPECIES[m.sid], st = stats(m), fr = S.frags[m.sid] || 0;
   return `<div class="stat"><div>HP<b>${st.hp}</b></div><div>ATK<b>${st.atk}</b></div><div>DEF<b>${st.def}</b></div><div>SPD<b>${st.spd}</b></div></div>
-  <div class="skl">${s.skills.map((k, i) => `<div><b>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)} · ${esc(k.name)} ${skLv(m, i)}</b>${esc(k.desc)}${k.cd ? `<em>คูลดาวน์ ${k.cd - (m.sk[i] >= SKILL_MAX[i] && k.cd > 2 ? 1 : 0)}</em>` : ''}${m.sk[i] > 1 ? `<em>พลัง +${Math.round((m.sk[i] - 1) * SKILL_STEP * 100)}%</em>` : ''}</div>`).join('')}${s.leader ? `<div><b>ผู้นำ</b>${esc(s.leader.text)}</div>` : ''}${rareRow(s, !!m.rare, 'เฉพาะร่างหายาก — ตัวนี้เป็นร่างปกติ')}${evoRow(s, m.stars >= 5)}
+  <div class="skl">${formOf(m.sid, !!m.rare).skills.map((k, i) => `<div><b>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)} · ${esc(k.name)} ${skLv(m, i)}</b>${esc(k.desc)}${k.cd ? `<em>คูลดาวน์ ${k.cd - (m.sk[i] >= SKILL_MAX[i] && k.cd > 2 ? 1 : 0)}</em>` : ''}${m.sk[i] > 1 ? `<em>พลัง +${Math.round((m.sk[i] - 1) * SKILL_STEP * 100)}%</em>` : ''}</div>`).join('')}${s.leader ? `<div><b>ผู้นำ</b>${esc(s.leader.text)}</div>` : ''}${m.rare ? rareRow(s, true, '') : s.rareForm ? `<div class="rpas lock"><b>✦ ร่างหายาก · ธาตุ${ELEM_NAME[s.rareForm.elem]}</b>มอนอีกตัว ชื่อเดิม สกิล 2–3 ของตัวเอง + สกิลร่างหายาก (ดูในสารบัญ)</div>` : ''}${evoRow(s, m.stars >= 5, !!m.rare)}
   <div><b>เศษไข่</b>${fr}/${FRAGS_TO_CRAFT} <div class="bar fr" style="margin-top:6px"><i style="transform:scaleX(${Math.min(1, fr / FRAGS_TO_CRAFT)})"></i></div></div></div>`;
 }
 /** picked food as slots (tap one to put it back) */
@@ -175,7 +182,7 @@ function growHTML(m) {
   }
   const same = S.mons.filter(x => x.sid === m.sid && x.uid !== m.uid && !S.team.includes(x.uid)), maxed = skillMaxed(m), pick = food[0] && same.some(x => x.uid === food[0]) ? food[0] : same[0]?.uid;
   return `<div class="grow-p"><h4>อัปสกิล</h4>
-  <div class="sklv-list">${SPECIES[m.sid].skills.map((k, i) => `<span>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)} ${skLv(m, i)}</span>`).join('')}</div>
+  <div class="sklv-list">${formOf(m.sid, !!m.rare).skills.map((k, i) => `<span>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)} ${skLv(m, i)}</span>`).join('')}</div>
   ${maxed ? '<p class="note"><b>สกิลเต็มทุกขั้นแล้ว</b></p>' : `${foodSlots(1)}<div class="row">${pick ? `<button class="go" type="button" data-sku="${pick}">ป้อนตัวซ้ำ (มี ${same.length})</button>` : `<span class="note">ยังไม่มี${esc(SPECIES[m.sid].name)}ตัวซ้ำ — ฟักไข่เพิ่ม</span>`}<button class="alt" type="button" data-sku="soul" ${S.items.soul ? '' : 'disabled'}>ผลึกวิญญาณ (${S.items.soul})</button></div>`}
   <p class="note">ป้อน${esc(SPECIES[m.sid].name)}ตัวซ้ำ 1 ตัว = สกิลขึ้น 1 ขั้นแน่นอน (สุ่มสกิลที่ยังไม่เต็ม) · ผลึกวิญญาณใช้แทนได้ · ขั้นละ +${SKILL_STEP * 100}% · ขั้นสุดท้ายลดคูลดาวน์ 1</p></div>`;
 }
@@ -369,7 +376,7 @@ function hudBattle(bv) {
   if (choose) {
     const u = b.get(bv.active);
     $('#whoImg').src = portrait(u.sid); $('#whoName').textContent = u.name;
-    for (let i = 0; i < 3; i++) { const btn = $('#sk' + i), k = u.skills[i]; btn.innerHTML = `<b>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)}</b>${esc(k.name)}<small>${esc(k.desc)}</small>` + (u.cds[i] > 0 ? `<span class="cdn">${u.cds[i]}</span>` : ''); btn.disabled = u.cds[i] > 0; btn.setAttribute('aria-pressed', String(bv.sel === i)); }
+    for (let i = 0; i < 3; i++) { const btn = $('#sk' + i), k = u.skills[i]; btn.innerHTML = `<b>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)}</b>${esc(k.name)}<small>${esc(k.desc)}</small>` + (u.cds[i] > 0 ? `<span class="cdn">${u.cds[i]}</span>` : i > 0 && !b.canUse(u, i) ? '<span class="cdn">ผนึก</span>' : ''); btn.disabled = !b.canUse(u, i); btn.setAttribute('aria-pressed', String(bv.sel === i)); }
     const k = u.skills[bv.sel]; $('#hint').textContent = k.target === 'allyAll' ? 'แตะพวกเดียวกัน หรือกดสกิลซ้ำเพื่อใช้' : k.target === 'enemyAll' ? 'แตะศัตรูตัวไหนก็ได้ หรือกดสกิลซ้ำ' : 'แตะศัตรูที่จะโจมตี';
   }
 }
@@ -420,15 +427,15 @@ function startHatch(eggId, forceRarity = null) {
   clearAll(); $('#newBadge')?.remove();
   const toStars = forceRarity ? NAT_STARS[forceRarity] : natStars(egg.sid, !!egg.rare); // every hatch is a new unit at its natural stars
   hatch = new HatchView(egg.rare ? lookOf(egg.sid, 0, true) : egg.sid, { fromStars: 0, toStars, eggSrc: eggOf(egg), tier: egg.kind === 'mystery' ? egg.tier : null, rare: !!egg.rare, rarityOverride: forceRarity });
-  const isNew = !S.dex.includes(egg.sid); // first time this species is obtained → big NEW badge at the reveal
+  const isNew = !S.dex.includes(egg.sid) || (!!egg.rare && !S.dexRare.includes(egg.sid)); // first time this species / rare form → big NEW badge
   hatch.onReveal = () => { if (isNew && hatch) newBadge(); };
   hatch.onDone = () => {
     const r = hatchEgg(S, eggId); save(); if (!r) return;
     const s = SPECIES[r.sid], more = S.eggs.filter(e => canHatch(S, e)).length;
     const title = 'ฟักสำเร็จ!';
-    const note = (r.newDex ? '<b style="color:var(--gold)">✦ บันทึกลงสารบัญมอนครั้งแรก!</b><br>' : '') + `${ELEM_NAME[s.elem]} · ${ROLE_NAME[s.role]} · เข้าคลังมอนแล้ว` + (r.copies ? `<br>ตัวซ้ำ (มีอยู่แล้ว ${r.copies} ตัว) · ใช้ป้อนอัปสกิล หรือเป็นอาหารอัปดาว` : '');
+    const note = (r.newDex ? '<b style="color:var(--gold)">✦ บันทึกลงสารบัญมอนครั้งแรก!</b><br>' : '') + `${ELEM_NAME[formOf(r.sid, !!r.rare).elem]} · ${ROLE_NAME[s.role]} · เข้าคลังมอนแล้ว` + (r.copies ? `<br>ตัวซ้ำ (มีอยู่แล้ว ${r.copies} ตัว) · ใช้ป้อนอัปสกิล หรือเป็นอาหารอัปดาว` : '');
     const modal = document.createElement('div'); modal.className = 'modal'; modal.id = 'hatchModal'; modal.style.background = 'rgba(6,8,6,.25)'; modal.style.alignItems = 'end';
-    modal.innerHTML = `<div class="card" style="margin-bottom:calc(env(safe-area-inset-bottom,0px) + 12px)"><h2>${title}</h2><p style="text-align:center;margin:0;font-family:var(--f-display);font-size:1.3rem">${esc(s.name)}</p><p style="text-align:center;margin:4px 0 0">${rarChip(s)}</p>${r.rare ? '<p class="rfnote">✦ ร่างหายาก! สีและออร่าพิเศษ</p>' : ''}<div class="bigstars">${Array.from({ length: MAX_STARS }, (_, i) => `<span class="${i < r.stars ? '' : 'off'}" style="animation-delay:${.1 + i * .12}s">${starHTML(i < r.stars)}</span>`).join('')}</div><p class="note" style="text-align:center">${note}</p><div class="row"><button class="go" type="button" data-h="more">${more ? `ฟักต่อ (${more})` : 'กลับหน้าฟักไข่'}</button><button class="alt" type="button" data-h="map">แผนที่</button></div></div>`;
+    modal.innerHTML = `<div class="card" style="margin-bottom:calc(env(safe-area-inset-bottom,0px) + 12px)"><h2>${title}</h2><p style="text-align:center;margin:0;font-family:var(--f-display);font-size:1.3rem">${esc(s.name)}</p><p style="text-align:center;margin:4px 0 0">${rarChip(s)}</p>${r.rare ? `<p class="rfnote">✦ ร่างหายาก! ธาตุ${ELEM_NAME[formOf(r.sid, true).elem]} · สกิลชุดใหม่ของตัวเอง</p>` : ''}<div class="bigstars">${Array.from({ length: MAX_STARS }, (_, i) => `<span class="${i < r.stars ? '' : 'off'}" style="animation-delay:${.1 + i * .12}s">${starHTML(i < r.stars)}</span>`).join('')}</div><p class="note" style="text-align:center">${note}</p><div class="row"><button class="go" type="button" data-h="more">${more ? `ฟักต่อ (${more})` : 'กลับหน้าฟักไข่'}</button><button class="alt" type="button" data-h="map">แผนที่</button></div></div>`;
     document.body.appendChild(modal);
   };
   scene = hatch; hatch.start(); $('#screens').innerHTML = ''; $('#nav').hidden = true;

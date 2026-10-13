@@ -49,6 +49,34 @@ function hueShift(img, E) {
   x.putImageData(d, 0, 0); return c;
 }
 
+/** rare forms are light or dark monsters: repaint the art by brightness through an element gradient — light = pearl white
+ *  (cool lavender shadows, warm cream highlights, a faint iridescent sheen) and dark = mysterious violet. Gold trim stays. */
+const ELEM_GRAD = {
+  light: [[0, [.30, .30, .40]], [.45, [.70, .69, .76]], [.75, [.93, .91, .92]], [1, [1, .985, .95]]],
+  dark: [[0, [.07, .03, .14]], [.35, [.30, .14, .50]], [.65, [.58, .38, .84]], [1, [.92, .85, 1]]],
+};
+function elemTint(img, mode) {
+  const c = mk(img.width, img.height), x = c.getContext('2d'); x.drawImage(img, 0, 0);
+  const d = x.getImageData(0, 0, c.width, c.height), a = d.data, st = ELEM_GRAD[mode], dark = mode === 'dark';
+  for (let i = 0; i < a.length; i += 4) {
+    if (a[i + 3] === 0) continue;
+    const r = a[i] / 255, g = a[i + 1] / 255, b = a[i + 2] / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, dd = mx - mn;
+    let h = 0, s = 0;
+    if (dd > 1e-6) { s = l > .5 ? dd / (2 - mx - mn) : dd / (mx + mn); h = (mx === r ? ((g - b) / dd + 6) % 6 : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4) / 6; }
+    if (h > 32 / 360 && h < 56 / 360 && s > (dark ? .45 : .35) && l > .22 && l < .84) { const k = dark ? .9 : 1.06; a[i] = Math.min(255, a[i] * k); a[i + 1] = Math.min(255, a[i + 1] * k); a[i + 2] = Math.min(255, a[i + 2] * k); continue; } // gold trim
+    const Y = .3 * r + .59 * g + .11 * b, t = Math.min(1, Math.max(0, dark ? Math.pow(Y, 1.05) : .18 + .9 * Math.pow(Y, .8)));
+    let j = 0; while (j < st.length - 2 && t > st[j + 1][0]) j++;
+    const [t0, c0] = st[j], [t1, c1] = st[j + 1], u = (t - t0) / (t1 - t0);
+    let o = [0, 1, 2].map(k => c0[k] + (c1[k] - c0[k]) * u);
+    if (dark) { const w = .45 * s, f = Math.min(1.1, Math.max(.35, t * 1.6)), acc = [.62, .22, .95]; o = o.map((v, k) => v * (1 - w) + acc[k] * w * f); }
+    else if (s > .2) { const p = h * TAU; o = [o[0] + .035 * Math.cos(p), o[1] + .035 * Math.cos(p - 2.1), o[2] + .035 * Math.cos(p + 2.1)]; } // pearl sheen
+    a[i] = Math.min(255, Math.max(0, o[0] * 255)); a[i + 1] = Math.min(255, Math.max(0, o[1] * 255)); a[i + 2] = Math.min(255, Math.max(0, o[2] * 255));
+  }
+  x.putImageData(d, 0, 0); return c;
+}
+/** rare-form repaint for a species: its rare form's element (light/dark), or the old hue flip if it has none */
+const rareTint = (sid, img) => { const e = SPECIES[sid.split('~')[0]]?.rareForm?.elem; return e === 'light' || e === 'dark' ? elemTint(img, e) : hueShift(img, VAR_R); };
+
 // ---- looks by star grade (evolution): ★1-3 base art · ★4 recoloured · ★5-6 evolved-form art (key + 'e', BATCH08) when it
 // exists, otherwise a stronger recolour. A "look id" is `sid~stars` (e.g. 'B05~4'); plain sid = base look. ----
 /** result / reward star: BATCH14 art when present, else a glyph styled by CSS (.bigstars) */
@@ -58,6 +86,9 @@ export const uiSrc = (name: string) => IMG[name] ? IMG[name].src : null;
 /** a set's master art; sets that arrived without one (BATCH07 B09/C06) use their front idle */
 const masterOf = (art: string) => IMG[art + '_master'] || IMG[art + '_front_idle'];
 export const masterURL = (sid: string) => { const s = SPECIES[sid]; return s && s.art && masterOf(s.art) ? masterOf(s.art).src : null; };
+const RMU = {};
+/** full-body master art of a rare form for the book: the species' master repainted light/dark (cached data URL) */
+export const rareMasterURL = (sid: string) => { if (RMU[sid]) return RMU[sid]; const s = SPECIES[sid], src = s && s.art && masterOf(s.art); return src ? (RMU[sid] = rareTint(sid, src).toDataURL('image/webp', .9)) : null; };
 export const baseOf = (sid: string) => sid.split('~')[0];
 const SP = sid => SPECIES[baseOf(sid)];
 const lookLv = sid => parseInt(sid.split('~')[1] || '0') || 0;
@@ -101,7 +132,7 @@ export function warpDraw(ctx, img, w) {
 export function spr(sid, key) {
   const k = sid + key; if (SPR[k]) return SPR[k];
   if (sid.includes('~')) { const ea = evoArt(sid), base = ea ? artPose(ea, key) : spr(baseOf(sid), key);
-    return (SPR[k] = lookRare(sid) ? hueShift(base, VAR_R) : ea ? base : hueShift(base, VAR_E[lookLv(sid)])); }
+    return (SPR[k] = lookRare(sid) ? rareTint(sid, base) : ea ? base : hueShift(base, VAR_E[lookLv(sid)])); }
   const s = SPECIES[sid];
   if (hasArt(sid)) return (SPR[k] = artPose(s.art, key));
   return (SPR[k] = hueShift(IMG['mon001_' + key], PAL[s.elem]));
@@ -153,7 +184,7 @@ export function portrait(sid) {
   if (PORT[sid]) return PORT[sid];
   const s = SP(sid), ea = evoArt(sid), L = lookLv(sid);
   let src = ea && IMG[ea + '_master'] ? IMG[ea + '_master'] : hasArt(sid) && masterOf(s.art) ? masterOf(s.art) : hueShift(IMG.mon001_master, PAL[s.elem]);
-  if (lookRare(sid)) src = hueShift(src, VAR_R); else if (L && !ea) src = hueShift(src, VAR_E[L]);
+  if (lookRare(sid)) src = rareTint(sid, src); else if (L && !ea) src = hueShift(src, VAR_E[L]);
   const c = mk(256, 256), x = c.getContext('2d');
   const f = src.width / 512, own = hasArt(sid) && (!!masterOf(s.art) || !!ea);
   let cr = [200, 70, 300]; // fox: head-centred crop
