@@ -13,6 +13,8 @@ export function passiveTests(): number {
     ok(b.endure(u, ev) && u.hp === 1 && u.statuses.some((x: any) => x.id === 'shield') && ev.some(e => e.t === 'passive'), 'endure saves once');
     u.hp = 0; ok(!b.endure(u, []), 'endure only once'); }
   { const b = mk([R('B01', false)]), u = b.units[0]; u.hp = 0; ok(!b.endure(u, []), 'normal form has no endure'); }
+  { const base = SPECIES.B09.skills[2], my = mk([R('B09')]).units[0].skills[2], nm = mk([R('B09', false)]).units[0].skills[2], ep = mk([R('A09')]).units[0].skills[2];
+    ok(Math.abs(my.mult - base.mult * 1.2) < 1e-9 && my.cd === base.cd - 1 && nm.mult === base.mult && ep.mult === SPECIES.A09.skills[2].mult, 'mythic ult only for rare-form legendaries'); }
   { const b = mk([R('A08'), R('A01', false)]), fox = b.units[1], ev: any[] = []; b.kill(fox, ev);
     ok(fox.alive && fox.hp === Math.round(fox.maxHp * 0.3) && ev.some(e => e.t === 'passive'), 'revive brings the first fallen back');
     b.kill(fox, []); ok(!fox.alive, 'revive only once'); }

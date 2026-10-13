@@ -1,7 +1,7 @@
 // Deterministic turn-based battle simulation (ATB, skills, statuses, element marks, reactions).
 // Same seed + same commands ⇒ identical results. No rendering here: callers read events.
 import { Rng } from './rng';
-import { SPECIES, statAt, spdAt, skillAt } from './data';
+import { SPECIES, statAt, spdAt, skillAt, isMythic, mythicUlt } from './data';
 import type {
   Unit, Ev, Elem, StatusId, SkillDef, SkillEffect, TurnStart, ActionResult, Command, MonsterRef, EnemyRef, StageDef, ReactionId,
 } from './types';
@@ -88,7 +88,7 @@ export class Battle {
       uid, team, slot, sid: s.id, name: s.name, elem: s.elem, role: s.role, lvl: m.lvl, stars: m.stars, boss: !!s.boss,
       maxHp: hp, hp, atk: Math.round(statAt(s.base.atk, m.lvl, m.stars) * (m.atkMult || 1)), def: statAt(s.base.def, m.lvl, m.stars),
       spd: spdAt(s.base.spd, m.lvl, m.stars), crit: 0.15, critDmg: 0.5, res: s.boss ? 0.35 : 0.15, acc: 0,
-      atb: 0, cds: [0, 0, 0], skills: s.skills.map((k, i) => skillAt(k, m.sk?.[i] || 1, i)), statuses: [], marks: [], alive: true, leader: team === 0 && slot === 0,
+      atb: 0, cds: [0, 0, 0], skills: s.skills.map((k, i) => { const sk = skillAt(k, m.sk?.[i] || 1, i); return k.ult && isMythic(s.id, !!(m as MonsterRef).rare) ? mythicUlt(sk) : sk; }), statuses: [], marks: [], alive: true, leader: team === 0 && slot === 0,
       rare: !!(m as MonsterRef).rare, passive: (m as MonsterRef).rare ? s.rarePassive : undefined, pUsed: false,
     };
   }

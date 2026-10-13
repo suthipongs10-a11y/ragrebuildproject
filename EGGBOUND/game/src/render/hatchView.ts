@@ -259,6 +259,11 @@ export class HatchView {
       sfx.perfect(); flash(.18 + rk * .05, AW_GOLD); burst(sx, m.y, h, 14 + rk * 4, AW_GOLD, 260, 10, .55); ring(sx, m.y, 4, 60, AW_PALE, .3, 3);
       if (rk >= 2) this.bolts.push({ pts: jag([sx + rnd(-60, 60), sy - 520], [sx, sy], 70), br: [], t: 0, life: .22, w: .9 });
       if (last) { sfx.starup(); shake(5 + rk * 2); burst(sx, m.y, h, 30, '#ffffff', 380, 10, .7); }
+      if (i === 5 && this.rare) { // ★6 at birth (rare-form legendary): heaven strikes the star in, rainbow
+        this.stamps[this.stamps.length - 1].mythic = true; flash(.85, '#ffffff'); shake(18); sfx.perfect();
+        for (let b = 0; b < 5; b++) this.bolts.push({ pts: jag([sx + rnd(-220, 220), sy - 700], [sx + rnd(-20, 20), sy], 90), br: [], t: -b * .05, life: .35, w: 1.3 });
+        PRISM.forEach((c, j) => { ring(sx, m.y, 6, 120 + j * 30, c, .5 + j * .06, 5); burst(sx, m.y, h, 10, c, 420, 12, .9); });
+      }
     }
     if (rk && a > T.end - .6) { E.zoomT = 1.15; E.camT.y = PED.y - 40; }
   }
@@ -274,6 +279,7 @@ export class HatchView {
     if (!this.bolts.length) return; const ctx = E.ctx; ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     const line = pts => { ctx.beginPath(); pts.forEach((p, i) => i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1])); ctx.stroke(); };
     for (const b of this.bolts) {
+      if (b.t < 0) continue; // staggered strike, not yet
       const a = (1 - b.t / b.life) * (.65 + .35 * Math.random());
       for (const [w, c, al] of [[24, AW_GOLD, .18], [9, AW_GOLD, .6], [3, '#ffffff', 1]]) { ctx.globalAlpha = a * al; ctx.strokeStyle = c; ctx.lineWidth = w * b.w; line(b.pts); for (const br of b.br) { ctx.lineWidth = w * b.w * .5; line(br); } }
     }
@@ -291,7 +297,9 @@ export class HatchView {
       const [x, y] = this.starPos(st.i), q = st.slam ? clamp(st.t / .22, 0, 1) : 1, sc = st.slam ? lerp(3.2, 1, easeOut(q)) : 1, r = 15 * sc;
       ctx.save(); ctx.globalAlpha = st.slam ? Math.min(1, st.t * 7) : 1;
       ctx.globalCompositeOperation = 'lighter'; ctx.drawImage(dot(AW_GOLD), x - r * 2.4, y - r * 2.4, r * 4.8, r * 4.8); ctx.globalCompositeOperation = 'source-over';
-      const g = ctx.createLinearGradient(x, y - r, x, y + r); g.addColorStop(0, '#fff8d6'); g.addColorStop(.5, '#ffd24a'); g.addColorStop(1, '#c47d12');
+      const g = ctx.createLinearGradient(x, y - r, x, y + r);
+      if (st.mythic) { const o = Math.floor(E.time * 6); PRISM.forEach((c, j) => g.addColorStop(j / (PRISM.length - 1), PRISM[(j + o) % PRISM.length])); ctx.globalCompositeOperation = 'lighter'; ctx.drawImage(dot(PRISM[o % PRISM.length]), x - r * 3.4, y - r * 3.4, r * 6.8, r * 6.8); ctx.globalCompositeOperation = 'source-over'; }
+      else { g.addColorStop(0, '#fff8d6'); g.addColorStop(.5, '#ffd24a'); g.addColorStop(1, '#c47d12'); }
       starPath(ctx, x, y, r); ctx.fillStyle = g; ctx.fill(); ctx.lineWidth = 2.2; ctx.strokeStyle = '#6a3a06'; ctx.stroke();
       if (st.slam && st.t < .5) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = 1 - st.t * 2; starPath(ctx, x, y, r * (1 + st.t * 2)); ctx.strokeStyle = AW_PALE; ctx.lineWidth = 3; ctx.stroke(); }
       ctx.restore();

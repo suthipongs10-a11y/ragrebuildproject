@@ -10,6 +10,9 @@ import {
 } from './engine';
 
 const PRISM = ['#ff6b6b', '#ffb84d', '#ffe66b', '#6bdc8a', '#5bb8ff', '#a98bff'];
+const legendOf = v => SPECIES[v.sid.split('~')[0]]?.rarity === 'legendary';
+/** fixed star field for the mythic (rare-form legendary) ultimate sky */
+const SKY = Array.from({ length: 70 }, (_, i) => { const r = (n => () => (n = (n * 16807) % 2147483647) / 2147483647)(i * 7919 + 13); return [r() * 2 - 1, r() * 2 - 1, .4 + r() * 1.4, r() * 6]; });
 /** rare forms cast their ultimate in radiant gold (with prismatic rings on top) instead of their element colour */
 const RARE_PAL = { name: 'ร่างหายาก', aura: '#ffcf3a', core: '#fff3c0', hot: '#ffffff', rune: '#ffe27a', cut: '#b8860b', dh: 0, sat: 1, lit: 1, all: 1 };
 const STATUS_TH = { burn: 'เผาไหม้', poison: 'พิษ', stun: 'มึน', sleep: 'หลับ', blind: 'ตาบอด', def_down: 'DEF ↓', atk_down: 'ATK ↓', spd_down: 'SPD ↓', atk_up: 'ATK ↑', def_up: 'DEF ↑', spd_up: 'SPD ↑', crit_up: 'คริ ↑', shield: 'โล่', regen: 'ฟื้นฟู' };
@@ -217,14 +220,16 @@ export class BattleView {
   *ultIntro(v, sk) {
     const P = this.P(v), flame = (n = 1) => { for (let i = 0; i < n; i++) addP({ type: 'flame', x: v.x + rnd(-60, 60) * v.k / .4, y: v.y + rnd(-8, 8), z: rnd(0, 20), vz: rnd(120, 280), life: rnd(.4, .7), size: rnd(18, 32), color: P.aura, core: P.core, drag: .5 }); };
     this.focus = [v]; v.busy = true; v.glowF = .6; this.camK = 1; this.camF = { x: v.x, y: v.y - 70 * v.k / .4 };
-    this.cine = { v, t: 0, col: P.aura, hot: P.hot, pose: 0, rare: !!v.ultOn };
+    const mythic = !!v.ultOn && legendOf(v);
+    this.cine = { v, t: 0, col: P.aura, hot: P.hot, pose: 0, rare: !!v.ultOn, mythic };
     v.pose = 'cast'; E.dimT = .86; E.zoomT = 2; sfx.charge();
     yield* tween(.42, p => { v.sx = 1 + .08 * p; v.sy = 1 - .1 * p; if (Math.random() < .8) flame(); });
     v.pose = 'burst'; v.glowF = 1; v.sx = v.sy = 1; this.cine.pose = 1e-6; flash(.55, P.hot); shake(10); sfx.whoosh(); sfx.perfect();
     ring(v.x, v.y, 10, 260, P.aura, .5, 12); ring(v.x, v.y, 10, 180, P.hot, .4, 6); burst(v.x, v.y, 60, 30, P.aura, 520, 18, .7);
     if (v.ultOn) { PRISM.forEach((c, i) => { ring(v.x, v.y, 10, 200 + i * 34, c, .45 + i * .05, 5); burst(v.x, v.y, 40, 6, c, 420 + i * 40, 14, .8); }); flash(.3, '#fff3c0'); }
-    this.onCutin && this.onCutin(v.sid, sk.name, P.cut);
-    yield* tween(.8, p => { v.sy = 1 + .025 * Math.sin(p * 24); v.sx = 2 - v.sy; if (Math.random() < .9) flame(2); });
+    if (mythic) { flash(.7, '#ffffff'); shake(16); for (let i = 0; i < 3; i++) ring(v.x, v.y, 20, 340 + i * 120, i ? PRISM[i * 2] : '#ffe27a', .7 + i * .15, 10 - i * 2); sfx.starup(); }
+    this.onCutin && this.onCutin(v.sid, (mythic ? '✦ ' : '') + sk.name + (mythic ? ' ✦' : ''), P.cut);
+    yield* tween(mythic ? 1.2 : .8, p => { v.sy = 1 + .025 * Math.sin(p * 24); v.sx = 2 - v.sy; if (Math.random() < .9) flame(2); });
     this.cine = null; this.camK = .45; this.camF = null; E.zoomT = 1.08; E.dimT = .3; v.busy = false;
   }
   /** BATCH09 elemental art layered over every ultimate (tinted by the caster's palette — gold for rare forms):
@@ -232,6 +237,7 @@ export class BattleView {
    *  earth = ground crack + rock spikes · light = holy star · dark = vortex · dash ultimates add a giant slash. No art → nothing. */
   ultFx(v, tv, sk) {
     if (!tv.length) return;
+    if (legendOf(v)) this.legendFx(v, tv);
     const P = this.P(v), k = (tv[0].k || .4) / .4, cx = tv.reduce((a, t) => a + t.x, 0) / tv.length, cy = tv.reduce((a, t) => a + t.y, 0) / tv.length;
     const ang = Math.atan2(cy - v.y, cx - v.x), fly = (name, size, life, o = {}) => IMG[name] && fxP(name, v.x, v.y, 70 * k, P.aura, size * .7, size, life, Object.assign({ vx: (cx - v.x) / life, vy: (cy - v.y) / life, rot: ang }, o));
     const at = (name, x, y, z, s0, s1, life, o = {}) => IMG[name] && fxP(name, x, y, z, P.aura, s0 * k, s1 * k, life, o);
@@ -245,6 +251,33 @@ export class BattleView {
     }
     if (sk.anim === 'ult_dash') for (const t of tv) at('fx_slash', t.x, t.y, 70 * k, 160, 300, .35, { rot: ang - .5 });
   }
+  /** legendary ultimates are a scene on their own: the element floods the whole enemy side in staggered waves
+   *  (water = three giant tidal waves crashing across the field + serpents rising out of the water) */
+  legendFx(v, tv) {
+    const P = this.P(v), k = (tv[0].k || .4) / .4, cx = tv.reduce((a, t) => a + t.x, 0) / tv.length, cy = tv.reduce((a, t) => a + t.y, 0) / tv.length;
+    const dx = cx - v.x, dy = cy - v.y, L = Math.hypot(dx, dy) || 1, ux = dx / L, uy = dy / L, ang = Math.atan2(dy, dx);
+    const later = (ms, f) => setTimeout(() => { if (this.V.has(v.uid)) f(); }, ms);
+    const splash = (t, col) => { burst(t.x, t.y, 60 * k, 22, col, 420, 14, .8); ring(t.x, t.y, 10, 170 * k, col, .5, 6); for (let i = 0; i < 10; i++) addP({ x: t.x + rnd(-50, 50) * k, y: t.y, z: rnd(20, 90) * k, vz: rnd(260, 520), vx: rnd(-90, 90), grav: 900, life: rnd(.6, .9), size: rnd(8, 16), size2: 2, color: i % 3 ? col : '#ffffff' }); };
+    const sweep = (name, ms, size, life, z, col = P.aura) => later(ms, () => {
+      if (!IMG[name]) return; const sx = v.x - ux * 260 * k, sy = v.y - uy * 120 * k, ex = cx + ux * 420 * k, ey = cy + uy * 160 * k;
+      fxP(name, sx, sy, z * k, col, size * .85 * k, size * 1.1 * k, life, { ar: .5, rot: ang, vx: (ex - sx) / life, vy: (ey - sy) / life });
+      fxP(name, sx, sy, z * k, '#ffffff', size * .6 * k, size * .8 * k, life * .9, { ar: .5, rot: ang, vx: (ex - sx) / life, vy: (ey - sy) / life, alpha: .5 });
+      shake(9); later(life * 420, () => { for (const t of tv) splash(t, col); flash(.22, P.hot); shake(14); });
+    });
+    switch (v.elem) {
+      case 'water':
+        flash(.35, '#bfe8ff'); E.dimT = Math.max(E.dimT, .55);
+        [0, 380, 760].forEach((ms, i) => sweep('fx_water_wave', ms, 980 - i * 120, 1.05, 60 + i * 30, i === 1 ? '#7fe0ff' : P.aura));
+        later(900, () => { for (const t of tv) IMG.fx_water_serpent && fxP('fx_water_serpent', t.x, t.y, 150 * k, P.aura, 120 * k, 380 * k, 1.1, { vz: 120 }); sfx.whoosh(); });
+        later(1500, () => { ring(cx, cy, 20, 620 * k, P.aura, .8, 12); ring(cx, cy, 20, 460 * k, '#ffffff', .6, 6); });
+        break;
+      case 'fire': [0, 420].forEach(ms => sweep('fx_flame_wave', ms, 900, 1.0, 70)); later(500, () => IMG.fx_flame_bird && fxP('fx_flame_bird', v.x, v.y, 120 * k, P.aura, 380 * k, 640 * k, .9, { vx: dx / .9, vy: dy / .9, rot: ang })); break;
+      case 'wind': for (const [i, t] of tv.entries()) later(i * 160, () => { IMG.fx_tornado && fxP('fx_tornado', t.x, t.y, 200 * k, P.aura, 260 * k, 420 * k, 1.4, { ar: 1.33, vr: 1.2 }); splash(t, P.aura); }); break;
+      case 'earth': [0, 300, 600].forEach(ms => later(ms, () => { for (const t of tv) IMG.fx_rock_spikes && fxP('fx_rock_spikes', t.x, t.y, 50 * k, P.aura, 200 * k, 330 * k, .8, { ar: .5 }); shake(12); })); break;
+      case 'light': for (const t of tv) { fx && IMG.fx_column && fxP('fx_column', t.x, t.y, 260 * k, P.hot, 120 * k, 200 * k, 1.2, { ar: 2.4 }); } later(300, () => { for (const t of tv) splash(t, P.aura); }); break;
+      case 'dark': IMG.fx_dark_vortex && fxP('fx_dark_vortex', cx, cy, 60 * k, P.aura, 300 * k, 900 * k, 1.6, { ar: .55, vr: 3 }); later(700, () => { for (const t of tv) splash(t, P.aura); }); break;
+    }
+  }
   ultOutro(v) { E.dimT = 0; E.zoomT = 1; this.focus = []; this.camF = null; this.camK = .45; this.cine = null; v.glowF = 0; }
   /** behind the caster during the cinematic: rotating element rays, a soft orb and the burst flash */
   drawCineBack() {
@@ -253,6 +286,12 @@ export class BattleView {
       ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(v.x, y);
       for (let i = 0; i < 16; i++) { const ang = i / 16 * TAU + E.time * .6, len = 380 * k, w = .06; ctx.globalAlpha = a * .35; ctx.fillStyle = c.col; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(Math.cos(ang - w) * len, Math.sin(ang - w) * len); ctx.lineTo(Math.cos(ang + w) * len, Math.sin(ang + w) * len); ctx.closePath(); ctx.fill(); }
       ctx.restore();
+    }
+    if (c.mythic) { // night sky full of stars + a turning golden rune circle under the caster
+      ctx.save(); ctx.globalCompositeOperation = 'lighter';
+      for (const [sx, sy, s, ph] of SKY) { const tw = .5 + .5 * Math.sin(E.time * 3 + ph); ctx.globalAlpha = a * (.35 + .65 * tw); ctx.drawImage(dot(ph > 4 ? '#ffe27a' : '#cfe4ff'), v.x + sx * 380 * k - s * 5, y + sy * 230 * k - s * 5, s * 10, s * 10); }
+      ctx.restore();
+      ctx.save(); ctx.translate(v.x, v.y); ctx.scale(1, .36); fx(ctx, 'fx_rune_circle', '#ffd24a', 0, 0, 520 * k, 520 * k, a * .95, E.time * .8); fx(ctx, 'fx_rune_circle', PRISM[Math.floor(E.time * 4) % PRISM.length], 0, 0, 380 * k, 380 * k, a * .6, -E.time * 1.3); ctx.restore();
     }
     if (c.rare) { // prismatic spokes rotating against the gold rays
       ctx.save(); ctx.globalCompositeOperation = 'lighter'; ctx.translate(v.x, y);

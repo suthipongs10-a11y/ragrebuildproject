@@ -280,6 +280,13 @@ export const EVO_GOLD = [0, 300, 1000, 3000, 8000, 20000]; // by current stars
 // Each level: +SKILL_STEP to damage multiplier and heal/shield/drain values; the max level of a cooldown skill also cuts 1 turn.
 export const SKILL_MAX = [5, 4, 3];
 export const SKILL_STEP = 0.1;
+/** a rare-form LEGENDARY (hatches ★6, the rarest unit) gets a mythic ultimate: more power, one turn less cooldown */
+export const MYTHIC_ULT = { mult: 1.2, cd: -1 };
+export const isMythic = (sid: string, rare: boolean) => rare && SPECIES[sid]?.rarity === 'legendary';
+export function mythicUlt(k: SkillDef): SkillDef {
+  return { ...k, mult: k.mult * MYTHIC_ULT.mult, cd: Math.max(2, k.cd + MYTHIC_ULT.cd),
+    effects: k.effects.map(e => (e.kind === 'heal' || e.kind === 'shield' || e.kind === 'drain') && e.value ? { ...e, value: e.value * MYTHIC_ULT.mult } : e) };
+}
 export function skillAt(k: SkillDef, lv: number, slot: number): SkillDef {
   if (!lv || lv <= 1) return k;
   const f = 1 + SKILL_STEP * (Math.min(lv, SKILL_MAX[slot]) - 1), max = lv >= SKILL_MAX[slot];
