@@ -76,7 +76,7 @@ export function passiveTests(): number {
     }
   }
   // balance: the same team with and without rare forms on the boss stage
-  { const boss = STAGES[STAGES.length - 1], N = 300;
+  { const boss = STAGES.find(s => s.id === '1-3')!, N = 300; // the map-1 boss: the rare-form baseline every check above was tuned on
     for (const ids of [['A01', 'A02', 'A03', 'A04'], ['B05', 'B04', 'B07', 'A08'], ['A05', 'C01', 'B01', 'A06']]) {
       const wr = (rare: boolean) => { let w = 0; for (let i = 0; i < N; i++) if (simulate(2000 + i, ids.map(sid => ({ sid, lvl: 10, stars: 1, rare })), boss).win) w++; return Math.round(w / N * 100); };
       console.log(`rare-form check ${boss.id} ${ids.join(',')} Lv10: normal ${wr(false)}% → rare ${wr(true)}%`);

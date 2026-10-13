@@ -21,7 +21,7 @@ const allSpecies = Object.values(SPECIES).filter(x => !x.boss).length;
 const homeUps = (s: SaveData) => { const h = home(s); return h.castle - 1 + Object.values(h.lv).reduce((a, b) => a + b, 0) - 5 + Object.values(h.shrine).reduce((a, b) => a + b, 0); };
 
 // ---- maps: one chapter per region, three quests per stage (clear · 3 stars · win 5 times); new stages join automatically ----
-export const REGION_NAME: Record<string, string> = { '1': 'ทุ่งไข่ป่วน' };
+export const REGION_NAME: Record<string, string> = { '1': 'ทุ่งไข่ป่วน', '2': 'สุวรรณภูมิ', '3': 'สวรรค์บูรพา' };
 const regions = [...new Set(STAGES.map(st => st.id.split('-')[0]))];
 const regionChapters: Chapter[] = regions.map(r => ({ id: 'map' + r, name: `แผนที่ ${r} · ${REGION_NAME[r] || 'ภพที่ ' + r}`, desc: 'ผ่านทุกด่าน เก็บครบ 3 ดาว และชนะซ้ำด่านละ 5 ครั้ง', bonus: { gems: 40, egg: 'gold' } }));
 const mapQuests: Quest[] = STAGES.flatMap((st, i) => {

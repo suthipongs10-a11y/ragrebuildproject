@@ -5,7 +5,7 @@ import { Battle } from './core/battle';
 import { drawShowcase, showcaseTap } from './render/showcase';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL, rareMasterURL } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
-import { E, initCanvas, toWorld, updScripts, updParts, tickEngine, clearAll, worldTransform, drawGround, drawDecals, drawLanternPools, drawParts, drawFlies, drawLantern, drawBush, LANTERNS, BUSHES, drawOverlays, clamp } from './render/engine';
+import { E, initCanvas, toWorld, updScripts, updParts, tickEngine, clearAll, worldTransform, drawGround, drawDecals, drawLanternPools, drawParts, drawFlies, drawLantern, drawBush, LANTERNS, BUSHES, drawOverlays, clamp, setTheme } from './render/engine';
 import { BattleView } from './render/battleView';
 import { HatchView } from './render/hatchView';
 import { HomeView } from './render/homeView';
@@ -37,7 +37,7 @@ const NAV = [['home', 'บ้านเต่า', '<path d="M4 15c0-4 3.6-7 8-7s
   ['mons', 'มอน', '<path d="M5 18c0-6 3-11 7-11s7 5 7 11z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 7l-2-3M16 7l2-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="10" cy="12" r="1" fill="currentColor"/><circle cx="14" cy="12" r="1" fill="currentColor"/>'],
   ['hatch', 'ฟักไข่', '<path d="M12 3c-4 0-7 6-7 10a7 7 0 0014 0c0-4-3-10-7-10z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 13l2 1.5 2-2 2 2 2-1.5" fill="none" stroke="currentColor" stroke-width="1.6"/>'],
   ['settings', 'ตั้งค่า', '<circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>']];
-let cur = 'home', teamCtx = null, selMon = null, confirmReset = false, monMode = null, food = [], skFlash = -1, monTab = 'mine', dexSel = null, dexEl = 'all';
+let mapRealm = null, cur = 'home', teamCtx = null, selMon = null, confirmReset = false, monMode = null, food = [], skFlash = -1, monTab = 'mine', dexSel = null, dexEl = 'all';
 function renderNav() {
   $('#nav').innerHTML = NAV.map(([id, l, svg]) => `<button type="button" data-nav="${id}" ${cur === id ? 'aria-current="page"' : ''}><svg viewBox="0 0 24 24">${svg}</svg>${l}${id === 'hatch' && actionableEggs() ? `<span class="badge">${actionableEggs()}</span>` : ''}</button>`).join('');
 }
@@ -54,12 +54,21 @@ function render() {
   if (cur === 'map') el.innerHTML = mapHTML(); else if (cur === 'team') el.innerHTML = teamHTML(); else if (cur === 'mons') el.innerHTML = monsHTML(); else if (cur === 'hatch') el.innerHTML = hatchHTML(); else if (cur === 'settings') el.innerHTML = settingsHTML(); else if (cur === 'book') el.innerHTML = bookHTML();
 }
 function topbar(title, sub) { return `<div class="topbar"><div class="realm"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div><div class="row" style="flex:0 0 auto;align-items:center"><span class="proto">P0 PROTOTYPE</span>${bookBtn()}<span class="gold gem"><i></i>${S.gems.toLocaleString()}</span><span class="gold"><i></i>${S.gold.toLocaleString()}</span></div></div>`; }
+/** realms (one map each): name + tagline; a realm opens when its first stage unlocks */
+const REALMS = { '1': ['ทุ่งไข่ป่วน', 'ภพที่ 1 · บ้านเกิดของเผ่าไข่ป่วน'], '2': ['สุวรรณภูมิ', 'ภพที่ 2 · ดินแดนทองแห่งตำนานไทย นาค กินรี คชสีห์'], '3': ['สวรรค์บูรพา', 'ภพที่ 3 · สวรรค์ตะวันออก ปี่เซียะ จิ้งจอกเก้าหาง ราชาอสูรวัว'] };
+const realmOf = id => id.split('-')[0];
+const realmOpen = r => stageUnlocked(S, STAGES.find(st => realmOf(st.id) === r).id);
 function mapHTML() {
-  return `<section class="scr dim"><div class="wrap">${topbar('ทุ่งไข่ป่วน', 'ภพที่ 1 · บ้านเกิดของเผ่าไข่ป่วน')}<h2 class="sec">ด่าน</h2><div class="stages">${STAGES.map((st, i) => {
+  const realms = [...new Set(STAGES.map(st => realmOf(st.id)))];
+  if (!mapRealm || !realmOpen(mapRealm)) mapRealm = [...realms].reverse().find(realmOpen) || '1';
+  const [title, sub] = REALMS[mapRealm] || ['ภพที่ ' + mapRealm, ''], list = STAGES.filter(st => realmOf(st.id) === mapRealm);
+  const tabs = `<div class="seg realms">${realms.map(r => { const op = realmOpen(r), done = STAGES.filter(st => realmOf(st.id) === r && (S.stages[st.id] || 0) > 0).length, all = STAGES.filter(st => realmOf(st.id) === r).length;
+    return `<button type="button" class="${r === mapRealm ? 'on' : ''}" data-realm="${r}" ${op ? '' : 'disabled'}>${op ? '' : '🔒 '}${r}. ${REALMS[r]?.[0] || ''} <small>${done}/${all}</small></button>`; }).join('')}</div>`;
+  return `<section class="scr dim"><div class="wrap">${topbar(title, sub)}${tabs}<h2 class="sec">ด่าน</h2><div class="stages">${list.map(st => {
     const un = stageUnlocked(S, st.id), stars = S.stages[st.id] || 0, boss = st.waves.some(w => w.some(m => SPECIES[m.sid].boss));
-    const els = [...new Set(st.waves.flat().map(m => SPECIES[m.sid].elem))];
-    return `<div class="stage ${un ? '' : 'locked'} ${boss ? 'boss' : ''}"><div class="num">${st.id}</div><div style="min-width:0"><div class="nm">${esc(st.name)}${boss ? ' · บอส' : ''}</div><div class="ds">${esc(st.desc)}</div><div class="meta"><span class="stars">${starStr(stars, 3)}</span><span>3 เวฟ</span><span>ธาตุศัตรู ${els.map(elDot).join(' ')}</span></div></div><button class="go" type="button" data-stage="${st.id}" ${un ? '' : 'disabled'}>${un ? 'เข้าด่าน' : 'ล็อก'}</button></div>`;
-  }).join('')}</div><p class="note">ดาวของด่าน: ★ ผ่านด่าน · ★ ไม่มีมอนตาย · ★ ทำปฏิกิริยาธาตุได้อย่างน้อย 1 ครั้ง (เช่น เครื่องหมายไฟ + ลม = ไฟลาม · เปียก + ลม = พายุฟ้าคะนอง · เปียก + ไฟ = ไอน้ำ · ดิน + ไฟ = ลาวา · แสง/มืด = สุริยคราส)</p>
+    const els = [...new Set(st.waves.flat().map(m => formOf(m.sid, !!m.rare).elem))], lv = Math.max(...st.waves.flat().filter(m => !SPECIES[m.sid].boss).map(m => m.lvl)), es = Math.max(...st.waves.flat().map(m => m.stars));
+    return `<div class="stage ${un ? '' : 'locked'} ${boss ? 'boss' : ''}"><div class="num">${st.id}</div><div style="min-width:0"><div class="nm">${esc(st.name)}${boss ? ' · บอส' : ''}</div><div class="ds">${esc(st.desc)}</div><div class="meta"><span class="stars">${starStr(stars, 3)}</span><span>3 เวฟ</span><span>ศัตรู ★${es} Lv.${lv}</span><span>ธาตุศัตรู ${els.map(elDot).join(' ')}</span></div></div><button class="go" type="button" data-stage="${st.id}" ${un ? '' : 'disabled'}>${un ? 'เข้าด่าน' : 'ล็อก'}</button></div>`;
+  }).join('')}</div>${mapRealm === '1' ? '' : `<p class="note">แนะนำ: ทีม ★${mapRealm} เลเวลสูง · บอสท้ายแผนที่ต้องใช้ทีมเลเวลเต็มของ ★${mapRealm} หรือมอนที่หายากกว่า · ชนะแล้วได้เศษไข่ของมอนในแผนที่นี้</p>`}<p class="note">ดาวของด่าน: ★ ผ่านด่าน · ★ ไม่มีมอนตาย · ★ ทำปฏิกิริยาธาตุได้อย่างน้อย 1 ครั้ง (เช่น เครื่องหมายไฟ + ลม = ไฟลาม · เปียก + ลม = พายุฟ้าคะนอง · เปียก + ไฟ = ไอน้ำ · ดิน + ไฟ = ลาวา · แสง/มืด = สุริยคราส)</p>
 </div></section>`;
 }
 /** rarity colour (shared with the chest/hatch colour language) as a CSS var; common stays neutral */
@@ -346,7 +355,7 @@ let lastStage = null, curStageId = null, actT = 0, bannerT = 0;
 function banner(t, s = '', d = 1.8) { $('#bT').textContent = t; $('#bS').textContent = s; $('#banner').classList.add('show'); bannerT = d; }
 function startBattle(stageId) {
   if (S.team.length !== 4) { teamCtx = stageId; show('team'); return; }
-  curStageId = stageId; const st = STAGES.find(x => x.id === stageId);
+  curStageId = stageId; const st = STAGES.find(x => x.id === stageId); setTheme(stageId.split('-')[0]); // each realm has its own battlefield look
   const seed = (Date.now() ^ (Math.random() * 1e9)) >>> 0;
   const team = S.team.map(uid => { const m = monOf(S, uid); return { sid: m.sid, lvl: m.lvl, stars: m.stars, sk: m.sk, rare: !!m.rare }; });
   const b = new Battle(seed, team, st, homeMods(S));
@@ -419,7 +428,7 @@ function resultModal(r, win, stars) {
   document.body.appendChild(modal);
   if (win && stars) sfx.coin();
 }
-function leaveBattle() { chestUI?.close(); chestUI = null; battle = null; clearAll(); scene = cur === 'home' && homeV ? homeV : idleScene; $('#resModal')?.remove(); $('#bhud').hidden = true; }
+function leaveBattle() { setTheme('1'); chestUI?.close(); chestUI = null; battle = null; clearAll(); scene = cur === 'home' && homeV ? homeV : idleScene; $('#resModal')?.remove(); $('#bhud').hidden = true; }
 
 // ---------- hatch ----------
 function startHatch(eggId, forceRarity = null) {
@@ -525,6 +534,7 @@ document.addEventListener('click', e => {
     save(); sfx.click(); render(); }
   else if (d.slot && cur === 'team') { const i = +d.slot; if (i > 0) { const uid = S.team.splice(i, 1)[0]; S.team.unshift(uid); } else S.team.splice(0, 1); save(); sfx.click(); render(); }
   else if (d.mon && cur === 'mons') { pickMon(+d.mon); }
+  else if (d.realm) { sfx.click(); mapRealm = d.realm; render(); }
   else if (d.mt) { sfx.click(); monTab = d.mt; dexSel = null; render(); }
   else if (d.dexel) { sfx.click(); dexEl = d.dexel; render(); }
   else if (d.dex !== undefined && cur === 'mons') { sfx.click(); dexSel = d.dex || null; render(); if (dexSel) document.querySelector('.dexd')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); }

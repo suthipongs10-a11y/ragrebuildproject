@@ -81,7 +81,7 @@ export function eggTests(): number {
     ok(claimable(s).length === 0 && claimQuest(s, 'win1') === null, 'nothing claimable on a new save');
     grantRewards(s, '1-1', true, 3, ['A02'], 3); ok(claimable(s).some(q => q.id === 'win1') && claimable(s).some(q => q.id === 'clear1-1'), 'winning unlocks quests');
     const g0 = s.gems; ok(!!claimQuest(s, 'win1') && s.gems === g0 + 10 && claimQuest(s, 'win1') === null, 'claim once');
-    ok(bookGems() === 600, 'book gem total ' + bookGems());
+    ok(bookGems() === 800, 'book gem total ' + bookGems()); // 600 + maps 2-3 (2026-10-13): 6 stages × 10 + chapter 40 each
     ok(CHAPTERS.every(c => questsIn(c.id).length > 0) && QUESTS.every(q => CHAPTERS.some(c => c.id === q.ch)), 'every quest in a chapter, no empty chapter');
     ok(STAGES.every(st => ['clear', 'star', 'farm'].every(k => QUESTS.some(q => q.id === k + st.id))), 'every map stage has clear/3-star/farm quests');
     for (let i = 0; i < 4; i++) grantRewards(s, '1-1', true, 3, [], 10 + i); ok(claimable(s).some(q => q.id === 'farm1-1'), 'winning a stage 5 times unlocks its farm quest');
