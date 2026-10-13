@@ -158,25 +158,44 @@ function eggGain(e) {
 const timer = x => `data-start="${x.start}" data-end="${x.end}"`;
 const bookBtn = () => { const n = claimable(S).length + chapterClaimable(S).length; return `<button type="button" class="bookbtn" data-nav="book" title="สมุดผจญภัย">📖<span>สมุดผจญภัย</span>${n ? `<b class="badge">${n}</b>` : ''}</button>`; };
 const rewardChips = r => [r.gems ? `<span class="chip rw gem"><i></i>${r.gems}</span>` : '', r.gold ? `<span class="chip rw"><span class="gold sm" style="padding:0;border:0;background:none"><i></i></span>${r.gold.toLocaleString()}</span>` : '', r.soul ? `<span class="chip rw">ผลึกวิญญาณ ×${r.soul}</span>` : '', r.egg ? `<span class="chip rw rwegg" style="--tc:${TIER_COL[r.egg]}"><img src="${eggURLOf({ kind: 'mystery', tier: r.egg })}" alt="">ไข่ปริศนา${EGG_TIERS[r.egg].name}</span>` : '', ...Object.entries(r.frags || {}).map(([sid, n]) => `<span class="chip rw"><img src="${eggURL(sid)}" alt="">เศษไข่${esc(SPECIES[sid].name)} ×${n}</span>`)].join('');
-/** adventure book (SW style): chapters as tabs, each with its quests and a chapter chest once every quest is claimed */
+/** adventure book (SW style) drawn as a real book: leather cover with gold corners, two parchment pages (contents + the open
+ *  chapter); one page under the other on phones. BATCH15 art (book_*) replaces the code-drawn textures when imported. */
 let bookCh = '';
+const BK_CORNER = `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M4 60V14Q4 4 14 4h46" fill="none" stroke="currentColor" stroke-width="3"/><path d="M10 60V20q0-10 10-10h40" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".7"/><path d="M14 14q10 2 14 10q-8-2-14 4q-2-8 0-14z" fill="currentColor"/><circle cx="12" cy="12" r="4.5" fill="#c43a2a" stroke="currentColor" stroke-width="1.6"/><path d="M30 8q6 6 14 2M8 30q6 6 2 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+let bookArt = false;
+function bookArtVars() { // BATCH15 textures as CSS variables (set once, not inlined into every render)
+  if (bookArt) return; bookArt = true; const st = document.documentElement.style;
+  for (const k of ['book_cover', 'book_page', 'book_seal', 'book_ribbon', 'book_emblem']) { const src = uiSrc(k); if (src) { st.setProperty('--' + k.replace('_', '-'), `url(${src})`); document.documentElement.classList.add('has-' + k.replace('_', '-')); } }
+}
 function bookHTML() {
+  bookArtVars();
   const claimedQ = QUESTS.filter(q => S.quests.includes(q.id)), gems = claimedQ.reduce((a, q) => a + (q.reward.gems || 0), 0) + CHAPTERS.filter(c => S.quests.includes('ch:' + c.id)).reduce((a, c) => a + (c.bonus.gems || 0), 0);
   const nReady = c => questsIn(c.id).filter(q => !S.quests.includes(q.id) && q.goal(S)[0] >= q.goal(S)[1]).length + (!S.quests.includes('ch:' + c.id) && chapterDone(S, c.id) ? 1 : 0);
   if (!CHAPTERS.some(c => c.id === bookCh)) bookCh = (CHAPTERS.find(c => nReady(c)) || CHAPTERS.find(c => !S.quests.includes('ch:' + c.id)) || CHAPTERS[0]).id;
-  const ch = CHAPTERS.find(c => c.id === bookCh)!, qs = questsIn(ch.id), got = qs.filter(q => S.quests.includes(q.id)).length, chOpen = S.quests.includes('ch:' + ch.id), chReady = !chOpen && got === qs.length;
+  const ch = CHAPTERS.find(c => c.id === bookCh)!, chi = CHAPTERS.indexOf(ch), qs = questsIn(ch.id), got = qs.filter(q => S.quests.includes(q.id)).length, chOpen = S.quests.includes('ch:' + ch.id), chReady = !chOpen && got === qs.length;
   const order = q => S.quests.includes(q.id) ? 2 : q.goal(S)[0] >= q.goal(S)[1] ? 0 : 1, list = qs.map((q, i) => [q, i] as const).sort((a, b) => order(a[0]) - order(b[0]) || a[1] - b[1]).map(x => x[0]);
-  const all = claimable(S).length + chapterClaimable(S).length;
-  const tabs = CHAPTERS.map((c, i) => { const q = questsIn(c.id), g = q.filter(x => S.quests.includes(x.id)).length, n = nReady(c), fin = S.quests.includes('ch:' + c.id);
-    return `<button type="button" class="bch ${c.id === bookCh ? 'on' : ''} ${fin ? 'fin' : ''}" data-bch="${c.id}"><small>บทที่ ${i + 1}</small><b>${esc(c.name)}</b><span class="bar"><i style="transform:scaleX(${g / q.length})"></i></span><em>${fin ? 'สำเร็จ ✓' : g + '/' + q.length}</em>${n ? `<i class="badge">${n}</i>` : ''}</button>`; }).join('');
-  return `<section class="scr dim"><div class="wrap">${topbar('สมุดผจญภัย', 'ภารกิจครั้งเดียว · ทำครบบทได้หีบรางวัล')}
-  <div class="booksum"><div>รับแล้ว <b>${claimedQ.length}/${QUESTS.length}</b> ภารกิจ · <b>${CHAPTERS.filter(c => S.quests.includes('ch:' + c.id)).length}/${CHAPTERS.length}</b> บท</div><div class="bgem"><span class="gold gem sm"><i></i>${gems} / ${bookGems()}</span> เพชรจากสมุด</div>${all > 1 ? `<button class="go" type="button" data-claim="*">รับทั้งหมด (${all})</button>` : ''}</div>
-  <div class="bchs">${tabs}</div>
-  <div class="bchead"><div><h2 class="sec">บทที่ ${CHAPTERS.indexOf(ch) + 1} · ${esc(ch.name)}</h2><div class="note">${esc(ch.desc)}</div><div class="bar" style="margin-top:6px"><i style="transform:scaleX(${got / qs.length})"></i></div></div>
-    <div class="bchest ${chOpen ? 'open' : chReady ? 'ready' : ''}"><span class="ico">${chOpen ? '🎁' : '🧰'}</span><div class="qm"><b>หีบรางวัลบทนี้</b><span class="note">${chOpen ? 'รับแล้ว ✓' : chReady ? 'ทำครบทุกภารกิจแล้ว!' : `ทำครบ ${got}/${qs.length} ภารกิจเพื่อเปิด`}</span></div><div class="qr">${rewardChips(ch.bonus)}</div>${chOpen ? '' : `<button class="${chReady ? 'go' : 'alt'}" type="button" data-claim="ch:${ch.id}" ${chReady ? '' : 'disabled'}>เปิด</button>`}</div></div>
-  <div class="quests">${list.map(q => { const [a, b] = q.goal(S), done = a >= b, cl = S.quests.includes(q.id);
-    return `<div class="quest ${cl ? 'claimed' : done ? 'done' : ''}"><div class="qm"><b>${esc(q.name)}</b><div class="bar" style="margin:5px 0 4px"><i style="transform:scaleX(${Math.min(1, a / b)})"></i></div><span class="note">${a}/${b}</span></div><div class="qr">${rewardChips(q.reward)}</div>${cl ? '<span class="qok">รับแล้ว ✓</span>' : `<button class="${done ? 'go' : 'alt'}" type="button" data-claim="${q.id}" ${done ? '' : 'disabled'}>รับ</button>`}</div>`; }).join('')}</div>
-  <p class="note">เพชรใช้ซื้อไข่ปริศนาลายทอง และเร่งเวลาบ่มไข่ ที่หน้าฟักไข่ · ไข่จากสมุดไปอยู่ในหน้าฟักไข่</p></div></section>`;
+  const all = claimable(S).length + chapterClaimable(S).length, nCh = CHAPTERS.filter(c => S.quests.includes('ch:' + c.id)).length;
+  const toc = CHAPTERS.map((c, i) => { const q = questsIn(c.id), g = q.filter(x => S.quests.includes(x.id)).length, n = nReady(c), fin = S.quests.includes('ch:' + c.id);
+    return `<li><button type="button" class="bk-toc-i ${c.id === bookCh ? 'on' : ''} ${fin ? 'fin' : ''}" data-bch="${c.id}"><span class="bk-num">${['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][i] || i + 1}</span><span class="bk-name">${esc(c.name)}</span><span class="bk-dots"></span><span class="bk-cnt">${fin ? '✓' : g + '/' + q.length}</span>${n ? `<i class="bk-dot">${n}</i>` : ''}</button></li>`; }).join('');
+  const chestImg = uiSrc(chOpen ? 'chest_boss_open' : chReady ? 'chest_boss_closed' : 'chest_wood_closed');
+  const quests = list.map(q => { const [a, b] = q.goal(S), done = a >= b, cl = S.quests.includes(q.id);
+    return `<li class="bkq ${cl ? 'claimed' : done ? 'done' : ''}"><div class="bkq-main"><b>${esc(q.name)}</b><div class="bkq-line"><span class="bkq-prog"><i style="transform:scaleX(${Math.min(1, a / b)})"></i></span><span class="bkq-n">${a}/${b}</span></div><div class="bkq-rw">${rewardChips(q.reward)}</div></div>${cl ? '<span class="bk-stamp">รับแล้ว</span>' : `<button class="bk-seal" type="button" data-claim="${q.id}" ${done ? '' : 'disabled'}>รับ</button>`}</li>`; }).join('');
+  return `<section class="scr bookscr"><div class="wrap bkwrap">${topbar('สมุดผจญภัย', 'ภารกิจครั้งเดียว · ทำครบบทได้หีบรางวัล')}
+  <div class="book">${['tl', 'tr', 'bl', 'br'].map(k => `<i class="bk-corner ${k}">${BK_CORNER}</i>`).join('')}<div class="bk-spread">
+    <div class="bk-page bk-left">
+      <div class="bk-title"><span class="bk-emblem"></span><h2>สมุดผจญภัย</h2><small>บันทึกการเดินทางของผู้พิทักษ์ไข่</small></div>
+      <div class="bk-sum"><div><b>${claimedQ.length}</b>/${QUESTS.length}<small>ภารกิจ</small></div><div><b>${nCh}</b>/${CHAPTERS.length}<small>บท</small></div><div><b class="bk-gem"><i></i>${gems}</b>/${bookGems()}<small>เพชร</small></div></div>
+      ${all ? `<button class="bk-all" type="button" data-claim="*">รับรางวัลทั้งหมด (${all})</button>` : ''}
+      <h3 class="bk-h"><span>สารบัญ</span></h3><ol class="bk-toc">${toc}</ol>
+      <p class="bk-note">เพชรใช้ซื้อไข่ปริศนาลายทองและเร่งเวลาบ่มไข่ · ไข่จากสมุดไปรอที่หน้าฟักไข่</p>
+      <div class="bk-folio">— ${chi * 2 + 1} —</div>
+    </div>
+    <div class="bk-page bk-right"><span class="bk-ribbon"></span>
+      <div class="bk-chhead"><small>บทที่ ${chi + 1}</small><h2>${esc(ch.name)}</h2><p>${esc(ch.desc)}</p><span class="bkq-prog big"><i style="transform:scaleX(${got / qs.length})"></i></span></div>
+      <div class="bk-chest ${chOpen ? 'open' : chReady ? 'ready' : ''}">${chestImg ? `<img src="${chestImg}" alt="">` : '<span class="ico">🧰</span>'}<div class="bk-chest-t"><b>หีบรางวัลประจำบท</b><small>${chOpen ? 'เปิดแล้ว' : chReady ? 'ทำครบทุกภารกิจแล้ว!' : `ทำภารกิจให้ครบ ${got}/${qs.length}`}</small><div class="bkq-rw">${rewardChips(ch.bonus)}</div></div>${chOpen ? '<span class="bk-stamp">เปิดแล้ว</span>' : `<button class="bk-seal gold" type="button" data-claim="ch:${ch.id}" ${chReady ? '' : 'disabled'}>เปิด</button>`}</div>
+      <ul class="bk-quests">${quests}</ul>
+      <div class="bk-folio">— ${chi * 2 + 2} —</div>
+    </div></div></div></div></section>`;
 }
 function hatchHTML() {
   const h = home(S), slots = incubSlots(S), now = Date.now(), full = h.incub.length >= slots;
@@ -445,7 +464,7 @@ document.addEventListener('click', e => {
   else if (d.feed === 'go') { const m = monOf(S, selMon), from = m.lvl, r = feed(S, selMon, [...food]); if (r) { save(); food = []; sfx.starup(); toast(r.toLvl > from ? `เลเวลอัป! Lv.${from} → Lv.${r.toLvl}` : `EXP +${r.gain.toLocaleString()}`); render(); } }
   else if (d.sku) { const slot = skillUp(S, selMon, d.sku === 'soul' ? null : +d.sku); if (slot >= 0) { save(); sfx.starup(); skFlash = slot; food = []; render(); setTimeout(() => { skFlash = -1; }, 50); } }
   else if (d.egg) { sfx.click(); startHatch(+d.egg); }
-  else if (d.bch) { sfx.click(); bookCh = d.bch; render(); document.querySelector('.bch.on')?.scrollIntoView({ block: 'nearest', inline: 'center' }); }
+  else if (d.bch) { sfx.click(); bookCh = d.bch; render(); if (innerWidth <= 820) document.querySelector('.bk-right')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); } // phones: turn to the chapter page
   else if (d.claim) { const tot = { gems: 0, gold: 0, soul: 0, eggs: 0, frags: 0 }, add = r => { if (!r) return; tot.gems += r.gems || 0; tot.gold += r.gold || 0; tot.soul += r.soul || 0; tot.eggs += r.egg ? 1 : 0; tot.frags += Object.values(r.frags || {}).reduce((a: number, b: any) => a + b, 0) as number; };
     if (d.claim === '*') { for (const q of claimable(S)) add(claimQuest(S, q.id)); for (const c of chapterClaimable(S)) add(claimQuest(S, 'ch:' + c.id)); } // chapter chests after the quests that finish them
     else add(claimQuest(S, d.claim));

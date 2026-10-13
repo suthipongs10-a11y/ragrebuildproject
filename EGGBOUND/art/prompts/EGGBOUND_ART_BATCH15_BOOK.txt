@@ -1,0 +1,94 @@
+=====================================================================
+EGGBOUND — ART BATCH 15 : ADVENTURE BOOK (สมุดผจญภัย)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ใช้กับหน้า "สมุดผจญภัย" ที่ตอนนี้เป็นสมุดวาดด้วยโค้ด (ปกหนัง ขอบทอง หน้ากระดาษ ตราครั่ง)
+  ภาพชุดนี้มาแทนลวดลายให้สวยขึ้น ใส่แล้วเกมใช้เองอัตโนมัติ ถ้าไม่มีภาพเกมก็ยังใช้แบบโค้ดได้
+- เปิดแชทใหม่ใน ChatGPT 1 แชท · แนบ: ไฟล์นี้ + chest_boss_open.png (หีบชุด 06-B) ให้เห็นสไตล์ทองที่ใช้อยู่
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ก่อนตอบ "OK"
+- ได้ zip แล้วส่งกลับมาที่แชท Claude
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the UI artist for a premium 2.5D fantasy monster RPG. The game's
+home is an ancient giant turtle carrying an island through a sea of
+clouds; players hatch monsters from eggs. You paint the textures of the
+player's ADVENTURE BOOK — an old, well-loved explorer's journal.
+Generate 5 images, ONE IMAGE PER TURN.
+
+Work order:
+  1. Generate #01 and wait for my "OK".
+  2. After "OK", generate the rest one by one in the same style.
+  3. Run the QUALITY CHECK, then package the ZIP.
+
+---------------------------------------------------------------------
+1. MASTER STYLE (every image)
+---------------------------------------------------------------------
+STYLE: painterly fantasy game art, warm and cozy, rich hand-painted
+texture, soft light from TOP-LEFT. Palette: deep oxblood / brown leather,
+warm aged parchment, polished gold leaf like the attached chest, small
+accents of ruby red.
+FORBIDDEN: text, letters, numbers, runes that look like real writing,
+logos, watermark, characters, UI buttons.
+ORIGINAL DESIGN — do not copy any existing game/film character or any
+existing game's UI.
+
+---------------------------------------------------------------------
+2. IMAGES (one per turn)
+---------------------------------------------------------------------
+#01  book_page.png — PARCHMENT PAGE (opaque, fills the whole canvas)
+Canvas 1024 x 1024, NO transparency. A single page of thick aged
+parchment seen straight on: warm cream (#f2e4c2) centre fading to a
+light toasted edge, very subtle paper fibres and a few faint water
+stains/foxing near the edges only. The CENTRE 80% must stay calm and
+light so dark-brown text stays readable on top. No drawings, no lines,
+no text on the page.
+
+#02  book_cover.png — LEATHER COVER (opaque, fills the whole canvas)
+Canvas 1024 x 1024, NO transparency. Tooled oxblood-brown leather,
+seen straight on, with soft wear on the edges, fine pebbled grain and a
+blind-embossed (no gold) border pattern of cloud swirls near the edges.
+Mostly even so it can sit behind the pages; darker vignette at the
+borders.
+
+#03  book_emblem.png — COVER EMBLEM (round medallion)
+Canvas 512 x 512, TRANSPARENT background, medallion centered filling
+about 85%. A round polished-gold medallion: an egg resting on a small
+stylised turtle shell, framed by a ring of tiny cloud swirls, one small
+ruby at the bottom. Bold shapes, readable at 56 px.
+
+#04  book_seal.png — WAX SEAL (claim button)
+Canvas 512 x 512, TRANSPARENT background, seal centered filling about
+85%. A round red wax seal (#b02a1c) with a naturally irregular melted
+edge, glossy highlights, the stamped centre slightly sunken and
+EMPTY/SMOOTH (the game writes the word "รับ" on it, so no emblem or
+letters in the middle — just a smooth plain disc with a thin raised
+ring).
+
+#05  book_ribbon.png — BOOKMARK RIBBON
+Canvas 128 x 512 (tall), TRANSPARENT background. A satin bookmark
+ribbon in deep crimson hanging straight down, filling the canvas width
+and height, soft folds and sheen, the bottom end cut in a swallowtail
+(V notch). No text, no tassel.
+
+---------------------------------------------------------------------
+3. QUALITY CHECK (fix and regenerate any image that fails)
+---------------------------------------------------------------------
+  [ ] #01 and #02 fully opaque, filling the canvas edge to edge
+  [ ] #01 centre is calm and light enough for dark text on top
+  [ ] #03 #04 #05 background fully transparent (or flat #FF00FF if
+      transparency fails)
+  [ ] #04 seal centre is EMPTY (no symbol, no letters)
+  [ ] No text, no logos, no characters anywhere
+
+---------------------------------------------------------------------
+4. PACKAGE
+---------------------------------------------------------------------
+Put all files into ONE zip named:  EGGBOUND_BOOK.zip
+Exact file names (lowercase, PNG):
+  book_page.png    book_cover.png    book_emblem.png
+  book_seal.png    book_ribbon.png
+Add notes.txt listing any image you regenerated and why.
