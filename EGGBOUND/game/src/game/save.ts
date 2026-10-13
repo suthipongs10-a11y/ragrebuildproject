@@ -1,5 +1,5 @@
 // SaveService: local only in P0 (swap for a server-backed implementation in P2).
-import { STARTERS, natStars, SPECIES, levelCap, STAGES, LEGACY_STAGE_ZONE } from '../core/data';
+import { STARTERS, natStars, SPECIES, levelCap, STAGES, LEGACY_STAGE_ZONE, ENERGY_MAX } from '../core/data';
 import type { EggTier } from '../core/data';
 
 /** one owned monster (SW style: copies are separate units — food for skill-ups and evolution). sk = skill levels */
@@ -25,6 +25,7 @@ export interface SaveData {
   eggPity: number;                  // mystery eggs in a row without gold+
   frags: Record<string, number>;
   starShards: Record<string, number>; // Starborn shards (เศษไข่ดารา) per species
+  energy: { v: number; t: number };   // AUTO energy: value at time t (game/energy.ts)
   stages: Record<string, number>;   // best stars per stage
   nextEggId: number;
   rush: { day: string; n: number }; // gem rushes bought today (price ladder, resets each local day)
@@ -36,7 +37,7 @@ export const newMon = (uid: number, sid: string, lvl = 1, stars?: number, rare =
   ({ uid, sid, lvl, exp: 0, stars: stars ?? natStars(sid, rare), sk: [1, 1, 1], ...(rare ? { rare } : {}) });
 export function newSave(): SaveData {
   const mons = STARTERS.map((sid, i) => newMon(i + 1, sid, 5, 1));
-  return { v: 2, gold: 500, mons, team: [1, 2, 3, 4], nextUid: mons.length + 1, items: { soul: 0 }, gems: 0, stats: newStats(), quests: [], dexRare: [], dex: [...STARTERS], eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, starShards: {}, stages: {}, nextEggId: 2, rush: { day: '', n: 0 },
+  return { v: 2, gold: 500, mons, team: [1, 2, 3, 4], nextUid: mons.length + 1, items: { soul: 0 }, gems: 0, stats: newStats(), quests: [], dexRare: [], dex: [...STARTERS], eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, starShards: {}, energy: { v: ENERGY_MAX, t: Date.now() }, stages: {}, nextEggId: 2, rush: { day: '', n: 0 },
     settings: { sound: true, quality: 'high', skipUlt: false, speed: 1, auto: false } };
 }
 export function loadSave(): SaveData {

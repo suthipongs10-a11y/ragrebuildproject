@@ -1,8 +1,9 @@
 // Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
-import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, ZONES, RARE_FORM_MULT, NAMED_RARE_FORM } from '../src/core/data';
+import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, ZONES, RARE_FORM_MULT, NAMED_RARE_FORM, ENERGY_MAX, ENERGY_REGEN_MS } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
 import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
 import { startIncub, incubLeft, incubOf, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
+import { energyNow, energyNext, payAuto, autoCost } from '../src/game/energy';
 import { QUESTS, CHAPTERS, questsIn, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg, rushPrice, rushesToday, mysteryEgg } from '../src/game/quests';
 
 export function eggTests(): number {
@@ -137,6 +138,14 @@ export function eggTests(): number {
     mem['eggbound-p0-save'] = JSON.stringify(old);
     const s = loadSave(); ok(s.eggs[0].kind === 'named' && s.eggPity === 0 && Array.isArray(home(s).incub), 'P0 save migrates');
     delete (globalThis as any).localStorage; }
+
+  // energy: only AUTO spends it; refills 1 per ENERGY_REGEN_MS up to the cap, offline too
+  { const s = newSave(), t0 = 1_000_000, st = STAGES.find(x => x.id === 'temple-5')!; s.energy = { v: ENERGY_MAX, t: t0 };
+    ok(energyNow(s, t0 + 9e9) === ENERGY_MAX, 'energy never passes the cap');
+    ok(payAuto(s, st, t0) && energyNow(s, t0) === ENERGY_MAX - autoCost(st), 'AUTO pays the stage cost');
+    ok(energyNow(s, t0 + ENERGY_REGEN_MS - 1) === ENERGY_MAX - autoCost(st) && energyNow(s, t0 + ENERGY_REGEN_MS) === ENERGY_MAX - autoCost(st) + 1, 'one point per regen tick');
+    s.energy = { v: 2, t: t0 }; ok(!payAuto(s, st, t0) && energyNow(s, t0) === 2, 'not enough energy: nothing spent');
+    ok(energyNow(s, t0 + 3 * ENERGY_REGEN_MS + 5) === 5 && energyNext(s, t0 + 3 * ENERGY_REGEN_MS + 5) === ENERGY_REGEN_MS - 5, 'partial point keeps ticking'); }
 
   console.log(fail ? `eggs: ${fail} FAILED` : 'eggs OK');
   return fail;

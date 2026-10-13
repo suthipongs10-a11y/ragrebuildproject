@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
-import { SPECIES, STAGES, ZONES, ZONE_PLAN, planOf, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
+import { SPECIES, STAGES, ZONES, ZONE_PLAN, planOf, ENERGY_MAX, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
 import { Battle } from './core/battle';
 import { drawShowcase, showcaseTap } from './render/showcase';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL, rareMasterURL, ensureArt, artReady, prefetchExt } from './render/assets';
@@ -15,6 +15,7 @@ import { home, BDEF, upgrade, upgradeCost, maxLevelNow, mineStored, mineCap, col
 import { loadSave, writeSave, resetSave, newMon } from './game/save';
 import { grantRewards, stageUnlocked, craftEgg, craftStarEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg, lootOf, monOf, copiesOf, teamHasSpecies, feedPreview, feed, feedValue, evoCheck, evolve, skillUp, skillMaxed } from './game/progression';
 import { EvolveView } from './render/evolveView';
+import { energyNow, energyNext, payAuto, autoCost } from './game/energy';
 import { QUESTS, CHAPTERS, questsIn, chapterDone, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg, rushPrice, rushesToday } from './game/quests';
 
 const $ = s => document.querySelector(s);
@@ -55,7 +56,9 @@ function render() {
   if (!battle && !hatch) scene = idleScene; selB = null; if (homeV) homeV.sel = null;
   if (cur === 'map') { el.innerHTML = mapHTML(); placeMap(); } else if (cur === 'team') el.innerHTML = teamHTML(); else if (cur === 'mons') el.innerHTML = monsHTML(); else if (cur === 'hatch') el.innerHTML = hatchHTML(); else if (cur === 'settings') el.innerHTML = settingsHTML(); else if (cur === 'book') el.innerHTML = bookHTML();
 }
-function topbar(title, sub) { return `<div class="topbar"><div class="realm"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div><div class="row" style="flex:0 0 auto;align-items:center"><span class="proto">P0 PROTOTYPE</span>${bookBtn()}<span class="gold gem"><i></i>${S.gems.toLocaleString()}</span><span class="gold"><i></i>${S.gold.toLocaleString()}</span></div></div>`; }
+const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
+function enLabel() { const v = energyNow(S), n = energyNext(S); return `${v}/${ENERGY_MAX}` + (n ? ` <small>+1 ${mmss(n)}</small>` : ''); }
+function topbar(title, sub) { return `<div class="topbar"><div class="realm"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div><div class="row" style="flex:0 0 auto;align-items:center"><span class="proto">P0 PROTOTYPE</span>${bookBtn()}<span class="gold en" title="พลังงาน — ใช้เฉพาะตอนเปิด AUTO · เล่นเองไม่ใช้"><b>⚡</b><span class="enTxt">${enLabel()}</span></span><span class="gold gem"><i></i>${S.gems.toLocaleString()}</span><span class="gold"><i></i>${S.gold.toLocaleString()}</span></div></div>`; }
 /** realms (one map each): name + tagline; a realm opens when its first stage unlocks */
 const REALMS = { '1': ['ทุ่งไข่ป่วน', 'ภพที่ 1 · บ้านเกิดของเผ่าไข่ป่วน'], '2': ['สุวรรณภูมิ', 'ภพที่ 2 · ดินแดนทองแห่งตำนานไทย นาค กินรี คชสีห์'], '3': ['สวรรค์บูรพา', 'ภพที่ 3 · สวรรค์ตะวันออก ปี่เซียะ จิ้งจอกเก้าหาง ราชาอสูรวัว'] };
 const realmOf = id => STAGES.find(st => st.id === id)?.realm || id.split('-')[0];
@@ -100,7 +103,7 @@ function mapHTML() {
   }).join('');
   const chart = `<div class="wmap"><div class="wmap-in realm${mapRealm} ${ART_BG.includes('map' + mapRealm) ? 'art' : ''}" ${ART_BG.includes('map' + mapRealm) ? `style="background-image:url('bg/map${mapRealm}.webp')"` : ''}>
     <svg viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true"><polyline points="${route}" /></svg>${pins}</div></div>`;
-  return `<section class="scr dim mapscr"><div class="wrap">${topbar(title, sub)}${tabs}${chart}<p class="note">แตะเกาะเพื่อดูด่าน · แต่ละโซนมี 5 ด่าน ด่านที่ 5 เป็นบอส · บอสตำนานดารา (✦) มีโอกาสดรอปเศษไข่ดารา ${STAR_SHARD_CHANCE * 100}% ต่อรอบ ครบ ${STAR_SHARDS_TO_CRAFT} ชิ้นประกอบเป็นไข่ได้ · ดาวของด่าน: ★ ผ่านด่าน · ★ ไม่มีมอนตาย · ★ ทำปฏิกิริยาธาตุได้อย่างน้อย 1 ครั้ง</p>
+  return `<section class="scr dim mapscr"><div class="wrap">${topbar(title, sub)}${tabs}${chart}<p class="note">แตะเกาะเพื่อดูด่าน · แต่ละโซนมี 5 ด่าน ด่านที่ 5 เป็นบอส · บอสตำนานดารา (✦) มีโอกาสดรอปเศษไข่ดารา ${STAR_SHARD_CHANCE * 100}% ต่อรอบ ครบ ${STAR_SHARDS_TO_CRAFT} ชิ้นประกอบเป็นไข่ได้ · เล่นเองไม่ใช้พลังงาน เปิด AUTO ใช้พลังงาน ⚡ ตามด่าน (ฟื้น 1 แต้มทุก 5 นาที เต็ม ${ENERGY_MAX}) · ดาวของด่าน: ★ ผ่านด่าน · ★ ไม่มีมอนตาย · ★ ทำปฏิกิริยาธาตุได้อย่างน้อย 1 ครั้ง</p>
   </div></section>`;
 }
 /** a zone's sheet: painted header, its boss (and Starborn shard progress) and the five stages */
@@ -110,7 +113,7 @@ function zonePanel(z) {
   const rows = zoneStagesOf(z.id).map(st => {
     const un = stageUnlocked(S, st.id), stars = S.stages[st.id] || 0, boss = st.n === 5, [pl, ps] = planOf(st);
     const els = [...new Set(st.waves.flat().map(m => formOf(m.sid, !!m.rare).elem))];
-    return `<div class="stage ${un ? '' : 'locked'} ${boss ? 'boss' : ''}"><div class="num">${boss ? `<img src="${portrait(b.sid)}" alt="">` : st.n}</div><div style="min-width:0"><div class="nm">${boss ? 'บอส · ' + esc(b.name || bs.name) : 'ด่าน ' + st.n}</div><div class="meta"><span class="stars">${starStr(stars, 3)}</span><span>แนะนำ ★${ps} Lv.${pl}</span><span>ธาตุ ${els.map(elDot).join(' ')}</span></div></div><button class="go" type="button" data-stage="${st.id}" ${un ? '' : 'disabled'}>${un ? 'สู้' : 'ล็อก'}</button></div>`;
+    return `<div class="stage ${un ? '' : 'locked'} ${boss ? 'boss' : ''}"><div class="num">${boss ? `<img src="${portrait(b.sid)}" alt="">` : st.n}</div><div style="min-width:0"><div class="nm">${boss ? 'บอส · ' + esc(b.name || bs.name) : 'ด่าน ' + st.n}</div><div class="meta"><span class="stars">${starStr(stars, 3)}</span><span>แนะนำ ★${ps} Lv.${pl}</span><span title="พลังงานที่ใช้ตอนเปิด AUTO">AUTO ⚡${autoCost(st)}</span><span>ธาตุ ${els.map(elDot).join(' ')}</span></div></div><button class="go" type="button" data-stage="${st.id}" ${un ? '' : 'disabled'}>${un ? 'สู้' : 'ล็อก'}</button></div>`;
   }).join('');
   return `<div class="zpanel" data-zclose="1"><div class="zsheet" role="dialog" aria-label="${esc(z.name)}">
     <div class="zhead loc-${z.loc}" ${art ? `style="background-image:linear-gradient(180deg,rgba(10,10,14,0) 30%,rgba(10,10,14,.9)),url('bg/${z.loc}.webp')"` : ''}><button type="button" class="zx" data-zclose="1" aria-label="ปิด">✕</button><h2>${esc(z.name)}</h2><p>${esc(z.desc)}</p></div>
@@ -349,6 +352,7 @@ function settingsHTML() {
   <div class="set"><span>ทดสอบ (prototype): ไข่ปริศนา</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="eggs">รับไข่ 4 ลาย</button><button class="alt" type="button" data-dev="incub">บ่มเสร็จทันที</button></span></div>
   <div class="set"><span>ทดสอบ (prototype): มอนชุดใหม่</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="mons">รับมอนทุกตัว</button><button class="alt" type="button" data-dev="evo">เตรียมอัปดาว</button><button class="alt" type="button" data-dev="gems">+เพชร 500</button><button class="alt" type="button" data-dev="rare">ทำให้เป็นร่างหายาก</button><button class="alt" type="button" data-dev="star5">อัปเป็น ★5 (ดูร่างวิวัฒน์)</button></span></div>
   <div class="set"><span>ทดสอบ (prototype): ฟักมอนระดับ</span><span class="row" style="flex:0 0 auto">${['common', 'rare', 'epic', 'legendary'].map(g => `<button class="alt" type="button" data-dev="hatch:${g}">${LOOT_GRADES[g].name}</button>`).join('')}</span></div>
+  <div class="set"><span>ทดสอบ (prototype): พลังงาน AUTO</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="energy">เติมพลังงานเต็ม</button></span></div>
   <div class="set"><span>ทดสอบ (prototype): หีบสมบัติ</span><span class="row" style="flex:0 0 auto">${['common', 'rare', 'epic', 'legendary'].map(g => `<button class="alt" type="button" data-dev="chest:${g}">${LOOT_GRADES[g].name}</button>`).join('')}</span></div>
   <p class="note">P0 เซฟในเครื่องนี้เท่านั้น · ระบบต่อสู้ทำงานแบบ deterministic (seed เดิม + คำสั่งเดิม = ผลเดิม) เพื่อให้เซิร์ฟเวอร์ตรวจผลได้ในเฟสออนไลน์</p></div></section>`;
 }
@@ -357,7 +361,7 @@ function settingsHTML() {
 let selB = null;
 function homeHTML() {
   const h = home(S);
-  return `<div class="hhud"><div class="topbar"><div class="realm"><h1>บ้านเต่าบรรพกาล</h1><p>ป้อมพันธสัญญา Lv.${h.castle} · แตะสิ่งก่อสร้าง มอน หรือหัวเต่า</p></div><div class="row" style="flex:0 0 auto;align-items:center">${bookBtn()}<span class="gold gem"><i></i>${S.gems.toLocaleString()}</span><span class="gold" id="hGold"><i></i>${S.gold.toLocaleString()}</span></div></div><div id="hpanel"></div></div>`;
+  return `<div class="hhud"><div class="topbar"><div class="realm"><h1>บ้านเต่าบรรพกาล</h1><p>ป้อมพันธสัญญา Lv.${h.castle} · แตะสิ่งก่อสร้าง มอน หรือหัวเต่า</p></div><div class="row" style="flex:0 0 auto;align-items:center">${bookBtn()}<span class="gold en" title="พลังงาน — ใช้เฉพาะตอนเปิด AUTO · เล่นเองไม่ใช้"><b>⚡</b><span class="enTxt">${enLabel()}</span></span><span class="gold gem"><i></i>${S.gems.toLocaleString()}</span><span class="gold" id="hGold"><i></i>${S.gold.toLocaleString()}</span></div></div><div id="hpanel"></div></div>`;
 }
 const cost = c => `<span class="gold sm"><i></i>${c.toLocaleString()}</span>`;
 function upBtn(id, label = 'อัปเกรด') {
@@ -412,8 +416,10 @@ function startBattle(stageId, artTried = false) {
   const team = S.team.map(uid => { const m = monOf(S, uid); return { sid: m.sid, lvl: m.lvl, stars: m.stars, sk: m.sk, rare: !!m.rare }; });
   const b = new Battle(seed, team, st, homeMods(S));
   clearAll();
+  // AUTO costs energy (manual play is free): pay up front when the player's preference is AUTO
+  const autoPaid = S.settings.auto && payAuto(S, st); if (S.settings.auto && !autoPaid) toast(`พลังงานไม่พอเปิด AUTO (ต้องใช้ ⚡${autoCost(st)}) · เล่นเองได้ไม่จำกัด`); save();
   battle = new BattleView(b, st, {
-    auto: S.settings.auto, speed: S.settings.speed, skipUlt: S.settings.skipUlt,
+    auto: autoPaid, autoPaid, speed: S.settings.speed, skipUlt: S.settings.skipUlt,
     onHud: hudBattle, onAct: (s, team) => { const e = $('#actName'); e.textContent = s; e.classList.toggle('e', team === 1); e.classList.add('show'); actT = 1.6; },
     onCutin: (sid, name, col) => { const ci = $('#cutin'); ci.style.setProperty('--c', col); $('#cutImg').src = portrait(sid); $('#cutText').textContent = name; ci.classList.remove('go'); void ci.offsetWidth; ci.classList.add('go'); },
     onWave: (w, n, boss) => { $('#waveLbl').textContent = `${st.name} ${st.n} · WAVE ${w + 1}/${n}`; banner(boss ? 'BOSS' : 'WAVE ' + (w + 1), boss ? (b.units.find(u => u.team === 1 && u.boss && u.alive)?.name || st.name) : `${st.name} ${st.n}`, 1.5); },
@@ -426,7 +432,7 @@ function startBattle(stageId, artTried = false) {
 let confirmExit = false;
 function renderBattleButtons() {
   const bv = battle; if (!bv) return;
-  $('#btBtns').innerHTML = `<button class="tbtn ${bv.auto ? 'on' : ''}" type="button" data-b="auto">AUTO</button><button class="tbtn ${bv.speed > 1 ? 'on' : ''}" type="button" data-b="speed">x${bv.speed}</button>` +
+  $('#btBtns').innerHTML = `<button class="tbtn ${bv.auto ? 'on' : ''}" type="button" data-b="auto">AUTO${bv.autoPaid ? '' : ` <small>⚡${autoCost(bv.stage)}</small>`}</button><button class="tbtn ${bv.speed > 1 ? 'on' : ''}" type="button" data-b="speed">x${bv.speed}</button>` +
     (confirmExit ? `<span class="confirm">ออกจากด่าน? <button class="alt" type="button" data-b="exitYes">ออก</button><button class="alt" type="button" data-b="exitNo">ต่อ</button></span>` : `<button class="tbtn" type="button" data-b="exit">ออก</button>`);
 }
 let orderT = 0;
@@ -542,6 +548,7 @@ function startEvolve(uid, foodUids) {
 
 // prototype-only test tools (remove before the public playtest)
 function devTool(k) {
+  if (k === 'energy') { S.energy = { v: ENERGY_MAX, t: Date.now() }; save(); render(); return; }
   if (k === 'eggs') { for (const t of EGG_TIER_ORDER) { let e; do { e = rollMysteryEgg({ ...S, eggPity: 0 }, Math.random); } while (e.tier !== t); e.id = S.nextEggId++; S.eggs.push(e); } }
   if (k === 'mons') { for (const sid of Object.keys(SPECIES)) if (!SPECIES[sid].boss && !copiesOf(S, sid)) { S.mons.push(newMon(S.nextUid++, sid, 5)); if (!S.dex.includes(sid)) S.dex.push(sid); } save(); sfx.chime(); show('mons'); return; }
   if (k === 'evo') { // prepare the selected monster (or the first) for an evolution + a skill-up
@@ -619,7 +626,9 @@ document.addEventListener('click', e => {
   else if (d.act === 'reset') { confirmReset = true; render(); }
   else if (d.act === 'resetNo') { confirmReset = false; render(); }
   else if (d.act === 'resetYes') { S = resetSave(); confirmReset = false; save(); render(); }
-  else if (d.b === 'auto' && battle) { battle.auto = !battle.auto; S.settings.auto = battle.auto; save(); renderBattleButtons(); hudBattle(battle); }
+  else if (d.b === 'auto' && battle) {
+    if (!battle.auto && !battle.autoPaid) { if (!payAuto(S, battle.stage)) { toast(`พลังงานไม่พอเปิด AUTO (ต้องใช้ ⚡${autoCost(battle.stage)} มี ${energyNow(S)}) · เล่นเองได้ไม่จำกัด`); return; } battle.autoPaid = true; } // paid once per fight
+    battle.auto = !battle.auto; S.settings.auto = battle.auto; save(); renderBattleButtons(); hudBattle(battle); }
   else if (d.b === 'speed' && battle) { battle.speed = battle.speed >= 3 ? 1 : battle.speed + 1; S.settings.speed = battle.speed; save(); renderBattleButtons(); }
   else if (d.b === 'exit') { confirmExit = true; renderBattleButtons(); }
   else if (d.b === 'exitNo') { confirmExit = false; renderBattleButtons(); }
@@ -668,7 +677,7 @@ function frame(now) {
   if (actT > 0) { actT -= rdt; if (actT <= 0) $('#actName').classList.remove('show'); }
   if (bannerT > 0) { bannerT -= rdt; if (bannerT <= 0) $('#banner').classList.remove('show'); }
   if (scene === homeV && selB === 'mine') { mineT -= rdt; if (mineT <= 0) { mineT = 1; const st = mineStored(S), cap = mineCap(S), el = $('#mineSt'); if (el) { el.textContent = st.toLocaleString() + ' / ' + cap.toLocaleString(); $('#mineBar').style.transform = `scaleX(${st / cap})`; const cb = document.querySelector('[data-hb=collect]'); if (cb) cb.disabled = st < 1; } } }
-  if (!battle && !hatch) { incT -= rdt; if (incT <= 0) { incT = 1; tickIncub(); } }
+  if (!battle && !hatch) { incT -= rdt; if (incT <= 0) { incT = 1; tickIncub(); const lbl = enLabel(); for (const e of document.querySelectorAll('.enTxt')) e.innerHTML = lbl; } }
   if (battle) { orderT -= rdt; if (orderT <= 0) { orderT = .2; guard(renderOrder); } }
 }
 (async () => {
