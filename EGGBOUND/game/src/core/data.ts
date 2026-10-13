@@ -129,6 +129,17 @@ export const SPECIES: Record<string, SpeciesDef> = {
       { id: 'effigy_curse', name: 'คำสาปหุ่น', desc: 'ทุกตัว ติดเครื่องหมายมืด + ลด DEF 2 เทิร์น', cd: 4, target: 'enemyAll', mult: 0.75, effects: [{ kind: 'mark', elem: 'dark', chance: 1 }, { kind: 'status', status: 'def_down', turns: 2, chance: 0.7 }], anim: 'ult_nightwave', ult: true },
     ],
   },
+  B03: {
+    id: 'B03', art: 'monB03', name: 'หัสดีลิงค์น้อย', nameEn: 'Hatsadiling Chick', elem: 'wind', role: 'Attacker', rarity: 'common',
+    base: { hp: 830, atk: 116, def: 50, spd: 114 },
+    leader: { stat: 'spd', value: 0.10, text: 'SPD ทั้งทีม +10%' },
+    rarePassive: { kind: 'hitStatusAtb', status: 'spd_down', chance: 0.35, value: 20, name: 'ลมงวงหัสดี', desc: 'ตีโดนศัตรูที่ติด SPD ลด 35% ได้เกจเทิร์น +20' },
+    skills: [
+      { id: 'hatsa_trunk', name: 'ฟาดงวง', desc: 'ฟาด 1 ตัว 50% ติดเครื่องหมายลม', cd: 0, target: 'enemy', mult: 1.05, effects: [{ kind: 'mark', elem: 'wind', chance: 0.5 }], anim: 'melee' },
+      { id: 'hatsa_gust', name: 'กระพือปีกพายุ', desc: 'ลมแรงใส่ 1 ตัว 60% ลด SPD 2 เทิร์น', cd: 3, target: 'enemy', mult: 1.5, effects: [{ kind: 'status', status: 'spd_down', turns: 2, chance: 0.6 }], anim: 'shot' },
+      { id: 'hatsa_storm', name: 'พายุหัสดี', desc: 'คลื่นลมกวาดทุกตัว ติดเครื่องหมายลม + ลดเกจ 15', cd: 5, target: 'enemyAll', mult: 1.15, effects: [{ kind: 'mark', elem: 'wind', chance: 1 }, { kind: 'atb', value: -15 }], anim: 'ult_nightwave', ult: true },
+    ],
+  },
   B04: {
     id: 'B04', art: 'monB04', name: 'พรายตะเคียน', nameEn: 'Takhian Dryad', elem: 'earth', role: 'Healer', rarity: 'common',
     base: { hp: 940, atk: 88, def: 62, spd: 103 },
@@ -151,6 +162,17 @@ export const SPECIES: Record<string, SpeciesDef> = {
       { id: 'saming_form', name: 'แปลงร่างสมิง', desc: 'พุ่งทะลุทุกตัว ดูดชีวิต 30% ของดาเมจ', cd: 5, target: 'enemyAll', mult: 1.3, effects: [{ kind: 'drain', value: 0.3, to: 'self' }], anim: 'ult_dash', ult: true },
     ],
   },
+  B06: {
+    id: 'B06', art: 'monB06', name: 'กินรี', nameEn: 'Kinnari', elem: 'wind', role: 'Healer', rarity: 'rare',
+    base: { hp: 960, atk: 92, def: 64, spd: 113 },
+    leader: { stat: 'hp', value: 0.18, text: 'HP ทั้งทีม +18%' },
+    rarePassive: { kind: 'healCleanse', chance: 0.7, name: 'ระบำชำระใจ', desc: 'ทุกครั้งที่ฮีล 70% ล้างสถานะร้าย 1 อย่างของพวกที่ถูกฮีล' },
+    skills: [
+      { id: 'kinnari_feather', name: 'ขนปีกกรีดลม', desc: 'ขนปีกคมใส่ 1 ตัว 50% ติดเครื่องหมายลม', cd: 0, target: 'enemy', mult: 0.95, effects: [{ kind: 'mark', elem: 'wind', chance: 0.5 }], anim: 'shot' },
+      { id: 'kinnari_dance', name: 'ระบำกินรี', desc: 'ฮีลทั้งทีม 15% + เพิ่ม SPD 2 เทิร์น', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.15, to: 'allies' }, { kind: 'status', status: 'spd_up', turns: 2, to: 'allies' }], anim: 'heal' },
+      { id: 'kinnari_heaven', name: 'ฟ้อนสวรรค์', desc: 'ฮีลทั้งทีม 28% + ล้างสถานะ + เกจ 15', cd: 5, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.28, to: 'allies' }, { kind: 'cleanse', to: 'allies' }, { kind: 'atb', value: 15, to: 'allies' }], anim: 'ult_starlight', ult: true },
+    ],
+  },
   B07: {
     id: 'B07', art: 'monB07', name: 'คชสีห์', nameEn: 'Gajasimha', elem: 'light', role: 'Defender', rarity: 'epic',
     base: { hp: 1260, atk: 104, def: 94, spd: 101 },
@@ -160,6 +182,17 @@ export const SPECIES: Record<string, SpeciesDef> = {
       { id: 'gaja_tusk', name: 'ตะปบงา', desc: 'ตะปบ 1 ตัว 60% ติดเครื่องหมายแสง', cd: 0, target: 'enemy', mult: 1.05, effects: [{ kind: 'mark', elem: 'light', chance: 0.6 }], anim: 'melee' },
       { id: 'gaja_roar', name: 'คำรามคชสีห์', desc: 'ทุกตัว 50% ลด ATK 2 เทิร์น', cd: 3, target: 'enemyAll', mult: 0.55, effects: [{ kind: 'status', status: 'atk_down', turns: 2, chance: 0.5 }], anim: 'volley' },
       { id: 'gaja_divine', name: 'งาเทวะ', desc: 'โล่ทั้งทีม 22% + เพิ่ม DEF 2 เทิร์น', cd: 4, target: 'allyAll', mult: 0, effects: [{ kind: 'shield', value: 0.22, turns: 2, to: 'allies' }, { kind: 'status', status: 'def_up', turns: 2, to: 'allies' }], anim: 'ult_starlight', ult: true },
+    ],
+  },
+  B08: {
+    id: 'B08', art: 'monB08', name: 'ครุฑน้อย', nameEn: 'Garuda Fledgling', elem: 'wind', role: 'Attacker', rarity: 'epic',
+    base: { hp: 960, atk: 140, def: 58, spd: 117 },
+    leader: { stat: 'atk', value: 0.22, text: 'ATK ทั้งทีม +22%' },
+    rarePassive: { kind: 'hitAtbDrain', value: 15, name: 'ปีกพญาครุฑ', desc: 'ทุกการโจมตีลดเกจเทิร์นศัตรูเพิ่มอีก 15' },
+    skills: [
+      { id: 'garuda_talon', name: 'กรงเล็บครุฑ', desc: 'ตะปบ 1 ตัว 60% ติดเครื่องหมายลม', cd: 0, target: 'enemy', mult: 1.15, effects: [{ kind: 'mark', elem: 'wind', chance: 0.6 }], anim: 'melee' },
+      { id: 'garuda_dive', name: 'โฉบล่าเหยื่อ', desc: 'โฉบใส่ 1 ตัวแรง 60% ลด DEF 2 เทิร์น', cd: 3, target: 'enemy', mult: 1.75, effects: [{ kind: 'status', status: 'def_down', turns: 2, chance: 0.6 }], anim: 'melee' },
+      { id: 'garuda_tempest', name: 'พายุปีกครุฑ', desc: 'พุ่งทะลุทุกตัว ติดเครื่องหมายลม + ลดเกจ 25', cd: 5, target: 'enemyAll', mult: 1.4, effects: [{ kind: 'mark', elem: 'wind', chance: 1 }, { kind: 'atb', value: -25 }], anim: 'ult_dash', ult: true },
     ],
   },
   B09: {
@@ -206,6 +239,17 @@ export const SPECIES: Record<string, SpeciesDef> = {
       { id: 'toad_fortune', name: 'โชคลาภ', desc: 'คริขึ้นทั้งทีม 2 เทิร์น + เกจ 20 + ศัตรูเปียก', cd: 4, target: 'allyAll', mult: 0, effects: [{ kind: 'status', status: 'crit_up', turns: 2, to: 'allies' }, { kind: 'atb', value: 20, to: 'allies' }, { kind: 'mark', elem: 'water', chance: 1, to: 'enemies' }], anim: 'ult_rain', ult: true },
     ],
   },
+  C03: {
+    id: 'C03', art: 'monC03', name: 'สิงโตผู้พิทักษ์', nameEn: 'Guardian Lion', elem: 'fire', role: 'Defender', rarity: 'common',
+    base: { hp: 1080, atk: 88, def: 82, spd: 98 },
+    leader: { stat: 'def', value: 0.15, text: 'DEF ทั้งทีม +15%' },
+    rarePassive: { kind: 'counter', chance: 0.25, value: 0.7, name: 'สิงห์เฝ้าประตู', desc: 'ถูกโจมตี 25% สวนกลับด้วยสกิล 1 (พลัง 70%)' },
+    skills: [
+      { id: 'lion_bite', name: 'งับเพลิง', desc: 'งับ 1 ตัว 50% ติดเครื่องหมายไฟ', cd: 0, target: 'enemy', mult: 1.0, effects: [{ kind: 'mark', elem: 'fire', chance: 0.5 }], anim: 'melee' },
+      { id: 'lion_ball', name: 'ลูกแก้วพิทักษ์', desc: 'โล่ทั้งทีม 15% ของ HP สูงสุด 2 เทิร์น', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'shield', value: 0.15, turns: 2, to: 'allies' }], anim: 'shield' },
+      { id: 'lion_roar', name: 'คำรามสิงห์เพลิง', desc: 'ทุกตัว 60% ลด ATK 2 เทิร์น + เพิ่ม DEF ทั้งทีม', cd: 4, target: 'enemyAll', mult: 0.8, effects: [{ kind: 'status', status: 'atk_down', turns: 2, chance: 0.6 }, { kind: 'status', status: 'def_up', turns: 2, to: 'allies' }], anim: 'ult_quake', ult: true },
+    ],
+  },
   C04: {
     id: 'C04', art: 'monC04', name: 'กระต่ายหยก', nameEn: 'Jade Rabbit', elem: 'light', role: 'Healer', rarity: 'common',
     base: { hp: 900, atk: 90, def: 60, spd: 109 },
@@ -215,6 +259,17 @@ export const SPECIES: Record<string, SpeciesDef> = {
       { id: 'rabbit_pestle', name: 'ตำยา', desc: 'ตำ 1 ตัว 40% ติดเครื่องหมายแสง', cd: 0, target: 'enemy', mult: 0.95, effects: [{ kind: 'mark', elem: 'light', chance: 0.4 }], anim: 'melee' },
       { id: 'rabbit_elixir', name: 'ยาอมฤต', desc: 'ฮีลทั้งทีม 18%', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.18, to: 'allies' }], anim: 'heal' },
       { id: 'rabbit_moon', name: 'จันทร์เพ็ญ', desc: 'ฮีลทั้งทีม 25% + ฟื้นฟูต่อเนื่อง 2 เทิร์น', cd: 5, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.25, to: 'allies' }, { kind: 'status', status: 'regen', turns: 2, to: 'allies' }], anim: 'ult_starlight', ult: true },
+    ],
+  },
+  C05: {
+    id: 'C05', art: 'monC05', name: 'จิ้งจอกเก้าหาง', nameEn: 'Nine-tail Fox', elem: 'fire', role: 'Controller', rarity: 'rare',
+    base: { hp: 880, atk: 110, def: 56, spd: 116 },
+    leader: { stat: 'res', value: 0.18, text: 'ต้านทานสถานะ ทั้งทีม +18%' },
+    rarePassive: { kind: 'curseOnHit', status: 'blind', chance: 0.3, name: 'ภาพลวงจิ้งจอก', desc: 'ถูกโจมตี 30% ผู้โจมตีติดตาบอด 2 เทิร์น' },
+    skills: [
+      { id: 'kitsune_flame', name: 'ไฟจิ้งจอก', desc: 'ไฟผีใส่ 1 ตัว 40% เผาไหม้ 2 เทิร์น', cd: 0, target: 'enemy', mult: 1.0, effects: [{ kind: 'status', status: 'burn', turns: 2, chance: 0.4 }], anim: 'shot' },
+      { id: 'kitsune_charm', name: 'เสน่ห์เก้าหาง', desc: 'ใส่ 1 ตัว 60% หลับ 2 เทิร์น', cd: 3, target: 'enemy', mult: 1.2, effects: [{ kind: 'status', status: 'sleep', turns: 2, chance: 0.6 }], anim: 'shot' },
+      { id: 'kitsune_ninefire', name: 'เพลิงเก้าหาง', desc: 'คลื่นไฟใส่ทุกตัว ติดเครื่องหมายไฟ 60% เผาไหม้ 2 เทิร์น', cd: 4, target: 'enemyAll', mult: 0.9, effects: [{ kind: 'mark', elem: 'fire', chance: 1 }, { kind: 'status', status: 'burn', turns: 2, chance: 0.6 }], anim: 'ult_nightwave', ult: true },
     ],
   },
   BOSS_ROOT: {
