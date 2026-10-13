@@ -44,7 +44,8 @@ export class HatchView {
   auraW = 66; auraH = 130; arcK = 1; bannerText = null; bannerCol = null; drawExtra = null; // hooks for EvolveView
   pt = 0; preDone = false; gatherK = 0; beamK = 0; auraK = 0; shots = []; fired = 0; nEggArc = 0; nSky = 0; nCryArc = 0;
   constructor(sid, opts) {
-    this.sid = sid; const SPc = SPECIES[baseOf(sid)]; this.P = PAL[sid.endsWith('r') && SPc.rareForm ? SPc.rareForm.elem : SPc.elem]; // a rare form hatches in its light/dark colours Object.assign(this, opts);
+    this.sid = sid; const SPc = SPECIES[baseOf(sid)]; Object.assign(this, opts);
+    this.P = PAL[sid.endsWith('r') && SPc.rareForm ? SPc.rareForm.elem : SPc.elem]; // a rare form hatches in its light/dark colours
     this.egg = { x: PED.x, y: PED.y - 38, rot: 0, hop: 0, sx: 1, sy: 1, glow: 0, white: 0, vis: true, cracks: [], cv: mk(512, 512), stage: 0, t: 0 };
     this.mon = { x: PED.x, y: PED.y - 38, hop: 0, sx: .3, sy: .3, sil: 1, vis: false, k: .4 * (SPc.scale || 1) };
     // mystery eggs glow in their tier colour so the element stays hidden until the reveal
