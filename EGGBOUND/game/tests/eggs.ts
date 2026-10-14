@@ -57,6 +57,7 @@ export function eggTests(): number {
     ok(!evoCheck(s, 1, [1]).ok, 'cannot eat itself');
     const before = statAt(SPECIES.A01.base.atk, t.lvl, t.stars), m = evolve(s, 1, [5])!;
     ok(!!m && m.stars === 2 && m.lvl === 1 && !monOf(s, 5) && s.gold === 99999 - EVO_GOLD[1], 'evolve ★1→★2 with 1 food');
+    ok(EVO_GOLD.join() === '0,600,2000,6000,16000,40000', 'evolve gold doubled (owner 2026-10-14)');
     ok(statAt(SPECIES.A01.base.atk, 1, 2) > before * .9, 'new grade Lv1 ≈ old grade max');
     m.lvl = levelCap(2); s.mons.push(newMon(50, 'A02', 1, 2), newMon(51, 'B01', 1, 1));
     ok(!evoCheck(s, 1, [50, 51]).ok, 'food must share the star grade'); s.mons.find(x => x.uid === 51)!.stars = 2;

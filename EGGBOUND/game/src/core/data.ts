@@ -546,7 +546,7 @@ export const RUSH_STEP = [1, 1.2, 1.4, 1.6, 2, 2.4, 3, 3.6, 4.5, 5.5, 7, 8.5, 10
 export const FEED_MAX = 5, FEED_K = 0.8, FEED_BASE = 60, FEED_GOLD = 10;
 export const cumExp = (lvl: number) => 40 * (lvl - 1) + 25 * (lvl - 1) * lvl / 2; // total EXP from Lv1 to lvl
 // Evolution (อัปดาว): a max-level monster + `stars` food monsters of the same star grade (any species, any level) + gold.
-export const EVO_GOLD = [0, 300, 1000, 3000, 8000, 20000]; // by current stars
+export const EVO_GOLD = [0, 600, 2000, 6000, 16000, 40000]; // by current stars · doubled 2026-10-14 (owner: evolving cost too little gold)
 // Skill levels: feeding a copy of the same species = +1 to a random skill that isn't maxed (a soul crystal works on anyone).
 // Each level: +SKILL_STEP to damage multiplier and heal/shield/drain values; the max level of a cooldown skill also cuts 1 turn.
 export const SKILL_MAX = [5, 4, 3];
