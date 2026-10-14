@@ -9,6 +9,7 @@ import { E, initCanvas, toWorld, updScripts, updParts, tickEngine, clearAll, wor
 import { setLocation, clearLocation, prefetchPlates, plateStat, LOC_IDS } from './render/locations';
 import { BattleView } from './render/battleView';
 import { HatchView } from './render/hatchView';
+import { MultiHatchView } from './render/multiHatchView';
 import { HomeView } from './render/homeView';
 import { showChest } from './render/chestView';
 import { home, BDEF, upgrade, upgradeCost, maxLevelNow, mineStored, mineCap, collectMine, MINE_RATE, MINE_CAP_MIN, TURTLE_SCALE, CASTLE_COST, BUILDINGS, ELEMS, shrineCost, shrineUp, shrineMax, SHRINE_ATK, SHRINE_REACT, RELICS, buyRelic, equipRelic, homeMods, unlocked, needsIncub, incubSlots, incubOf, incubMs, startIncub, canHatch, HATCH_SPEED } from './game/home';
@@ -372,6 +373,9 @@ function bookHTML() {
       <div class="bk-folio">— ${chi * 2 + 2} —</div>
     </div></div></div></div></section>`;
 }
+/** multi-hatch buttons (×5 / ×10): hatch that many ready eggs in one go (fewer when fewer are ready) */
+const readyEggs = () => S.eggs.filter(e => canHatch(S, e));
+const mhRow = () => { const n = readyEggs().length; return n >= 2 ? `<div class="mhrow"><span class="note">พร้อมฟัก <b>${n}</b> ฟอง · ฟักหลายฟองพร้อมกัน</span><button type="button" class="go" data-mh="5">ฟัก ×5${n < 5 ? ` <small>(${n})</small>` : ''}</button><button type="button" class="go" data-mh="10" ${n >= 6 ? '' : 'disabled'}>ฟัก ×10${n >= 6 && n < 10 ? ` <small>(${n})</small>` : ''}</button></div>` : ''; };
 function hatchHTML() {
   const h = home(S), slots = incubSlots(S), now = Date.now(), full = h.incub.length >= slots;
   const nest = Array.from({ length: slots }, (_, i) => {
@@ -389,7 +393,7 @@ function hatchHTML() {
   return `<section class="scr dim"><div class="wrap">${topbar('ฟักไข่', 'ไข่ปริศนาจะรู้ว่าเป็นตัวอะไรตอนฟัก · ลายทองขึ้นไปต้องบ่มในรังก่อน')}
   <h2 class="sec">รังบ่มไข่ · ${h.incub.length}/${slots} ช่อง</h2><div class="islots">${nest}</div>${h.incub.length ? `<p class="note rushnote">⚡ เร่งวันนี้ ${rushesToday(S, now)} ครั้ง · ครั้งถัดไป ไข่ทอง <span class="gold gem sm"><i></i>${rushPrice(S, 'gold', now)}</span> ไข่รุ้ง <span class="gold gem sm"><i></i>${rushPrice(S, 'rainbow', now)}</span><small>ยิ่งเร่งหลายครั้งยิ่งแพงขึ้น · กลับมาเริ่มใหม่ทุกเที่ยงคืน · ไข่ที่บ่มไปแล้วจ่ายตามเวลาที่เหลือ</small></p>` : ''}${slots < 3 ? '<p class="note">อัปรังฟักไข่ที่บ้านเต่าเพื่อเพิ่มช่องและบ่มเร็วขึ้น</p>' : ''}
   <div class="shop"><img src="${eggURLOf({ kind: 'mystery', tier: 'gold' })}" alt=""><div style="min-width:0"><b>ไข่ปริศนาลายทอง</b><div class="note">มหากาพย์ ${EGG_TIERS.gold.rarityW.epic}% · ตำนาน ${EGG_TIERS.gold.rarityW.legendary}% · ต้องบ่ม ${fmtDur(incubMs(S, { kind: 'mystery', tier: 'gold' }))}</div></div><button class="go" type="button" data-buy="gold" ${S.gems >= GEM_GOLD_EGG ? '' : 'disabled'}>ซื้อ <span class="gold gem sm"><i></i>${GEM_GOLD_EGG}</span></button></div>
-  <h2 class="sec">ไข่ที่รอฟัก</h2>${wait.length ? `<div class="eggs">${wait.map(card).join('')}</div>` : '<div class="empty">ยังไม่มีไข่ ผ่านด่านเพื่อรับไข่ปริศนาหรือสะสมเศษไข่</div>'}
+  <h2 class="sec">ไข่ที่รอฟัก</h2>${mhRow()}${wait.length ? `<div class="eggs">${wait.map(card).join('')}</div>` : '<div class="empty">ยังไม่มีไข่ ผ่านด่านเพื่อรับไข่ปริศนาหรือสะสมเศษไข่</div>'}
   <h2 class="sec">ประกอบไข่จากเศษ</h2>${crafts.length ? crafts.map(sid => `<div class="craft"><img src="${eggURL(sid)}" alt=""><div style="min-width:0">${esc(SPECIES[sid].name)}<div class="bar fr" style="margin-top:5px"><i style="transform:scaleX(${Math.min(1, S.frags[sid] / FRAGS_TO_CRAFT)})"></i></div><span class="note">${S.frags[sid]}/${FRAGS_TO_CRAFT}</span></div><button class="go" type="button" data-craft="${sid}" ${S.frags[sid] >= FRAGS_TO_CRAFT ? '' : 'disabled'}>ประกอบ</button></div>`).join('') : '<div class="empty">ยังไม่มีเศษไข่</div>'}
   ${stars.length ? `<h2 class="sec">ไข่ตำนานดารา</h2>${stars.map(sid => `<div class="craft star"><img src="${eggURL(sid)}" alt=""><div style="min-width:0">${esc(SPECIES[sid].name)}<div class="bar fr" style="margin-top:5px"><i style="transform:scaleX(${Math.min(1, S.starShards[sid] / STAR_SHARDS_TO_CRAFT)})"></i></div><span class="note">เศษไข่ดารา ${S.starShards[sid]}/${STAR_SHARDS_TO_CRAFT} · ดรอปจากบอสโซน ${STAR_SHARD_CHANCE * 100}% ต่อรอบ</span></div><button class="go" type="button" data-starcraft="${sid}" ${S.starShards[sid] >= STAR_SHARDS_TO_CRAFT ? '' : 'disabled'}>ประกอบ</button></div>`).join('')}` : ''}
   ${oddsHTML()}</div></section>`;
@@ -573,7 +577,32 @@ function startHatch(eggId, forceRarity = null, artTried = false) {
   };
   scene = hatch; hatch.start(); $('#screens').innerHTML = ''; $('#nav').hidden = true;
 }
-function leaveHatch() { hatch = null; clearAll(); scene = idleScene; $('#hatchModal')?.remove(); $('#newBadge')?.remove(); }
+function leaveHatch() { hatch = null; clearAll(); scene = idleScene; $('#hatchModal')?.remove(); $('#newBadge')?.remove(); $('#mhSkip')?.remove(); }
+/** hatch up to n ready eggs at once (owner 2026-10-14): results are saved first, then MultiHatchView cracks the eggs one
+ *  by one with rarity effects, then a summary card grid with aura frames for the rare-or-better ones */
+function startMultiHatch(n, artTried = false) {
+  const eggs = readyEggs().slice(0, n); if (eggs.length < 2) { if (eggs[0]) startHatch(eggs[0].id); return; }
+  if (!artTried && !artReady(eggs.map(e => e.sid))) { toast('กำลังโหลดภาพ…'); ensureArt(eggs.map(e => e.sid)).then(() => startMultiHatch(n, true)); return; }
+  clearAll(); $('#newBadge')?.remove(); $('#hatchModal')?.remove();
+  const list = eggs.map(e => { const src = eggOf(e), tier = e.kind === 'mystery' ? e.tier : null, r = hatchEgg(S, e.id);
+    return r && { sid: r.rare ? lookOf(r.sid, 0, true) : r.sid, base: r.sid, eggSrc: src, tier, rare: !!r.rare, stars: r.stars, isNew: r.newDex, uid: r.uid }; }).filter(Boolean);
+  save();
+  hatch = new MultiHatchView(list); hatch.onDone = () => multiSummary(list);
+  scene = hatch; hatch.start(); $('#screens').innerHTML = ''; $('#nav').hidden = true;
+  const sk = document.createElement('button'); sk.id = 'mhSkip'; sk.type = 'button'; sk.className = 'alt'; sk.dataset.mhskip = '1'; sk.textContent = 'ข้าม ⏭'; document.body.appendChild(sk);
+}
+function multiSummary(list) {
+  $('#mhSkip')?.remove(); $('#hatchModal')?.remove();
+  const more = readyEggs().length, cnt = r => list.filter(x => SPECIES[x.base].rarity === r).length, nNew = list.filter(x => x.isNew).length, nRare = list.filter(x => x.rare).length;
+  const cards = list.map((x, i) => { const s = SPECIES[x.base], f = formOf(x.base, x.rare);
+    return `<div class="mhc ${s.rarity} ${x.rare ? 'rf' : ''}" style="${rcVar(s)};animation-delay:${i * .07}s">${x.isNew ? '<span class="nb">NEW!</span>' : ''}<img src="${portrait(x.sid)}" alt=""><b>${esc(s.name)}</b><span class="st ${x.rare ? 'rfs' : ''}">${'★'.repeat(x.stars)}</span><small>${elDot(f.elem)} ${RARITY_NAME[s.rarity]}${x.rare ? ' · ✦ ร่างหายาก' : ''}</small></div>`; }).join('');
+  const tally = [['legendary', 'ตำนาน'], ['epic', 'มหากาพย์'], ['rare', 'หายาก']].map(([r, t]) => cnt(r) ? `${t} ${cnt(r)}` : '').filter(Boolean).concat(nRare ? [`✦ ร่างหายาก ${nRare}`] : [], nNew ? [`ตัวใหม่ ${nNew}`] : []).join(' · ');
+  const modal = document.createElement('div'); modal.className = 'modal'; modal.id = 'hatchModal'; modal.style.background = 'rgba(6,8,6,.45)';
+  modal.innerHTML = `<div class="card mhsum"><h2>ฟักสำเร็จ ${list.length} ฟอง!</h2>${tally ? `<p class="note" style="text-align:center;margin:0">${tally}</p>` : ''}<div class="mhgrid">${cards}</div>
+    <div class="row">${more >= 2 ? `<button class="go" type="button" data-mh="5">ฟักต่อ ×5</button>` : ''}${more >= 6 ? `<button class="go" type="button" data-mh="10">ฟักต่อ ×10</button>` : ''}${more === 1 ? `<button class="go" type="button" data-h="more">ฟักต่อ (1)</button>` : ''}</div>
+    <div class="row"><button class="alt" type="button" data-h="more">กลับหน้าฟักไข่</button><button class="alt" type="button" data-h="mons">คลังมอน</button></div></div>`;
+  document.body.appendChild(modal); sfx.chime();
+}
 /** rainbow "NEW!" stamp at the top of the screen when a hatch reveals a species never obtained before */
 function newBadge() {
   $('#newBadge')?.remove(); const el = document.createElement('div'); el.id = 'newBadge';
@@ -676,6 +705,8 @@ document.addEventListener('click', e => {
   else if (d.feed === 'go') { const m = monOf(S, selMon), from = m.lvl, r = feed(S, selMon, [...food]); if (r) { save(); food = []; sfx.starup(); toast(r.toLvl > from ? `เลเวลอัป! Lv.${from} → Lv.${r.toLvl}` : `EXP +${r.gain.toLocaleString()}`); render(); } }
   else if (d.sku) { const slot = skillUp(S, selMon, d.sku === 'soul' ? null : +d.sku); if (slot >= 0) { save(); sfx.starup(); skFlash = slot; food = []; render(); setTimeout(() => { skFlash = -1; }, 50); } }
   else if (d.egg) { sfx.click(); startHatch(+d.egg); }
+  else if (d.mh) { sfx.click(); if (hatch) leaveHatch(); startMultiHatch(+d.mh); }
+  else if (d.mhskip) { hatch?.skipAll?.(); }
   else if (d.bch) { sfx.click(); bookCh = d.bch; render(); if (innerWidth <= 820) document.querySelector('.bk-right')?.scrollIntoView({ block: 'start', behavior: 'smooth' }); } // phones: turn to the chapter page
   else if (d.claim) { const tot = { gems: 0, gold: 0, soul: 0, eggs: 0, frags: 0 }, add = r => { if (!r) return; tot.gems += r.gems || 0; tot.gold += r.gold || 0; tot.soul += r.soul || 0; tot.eggs += r.egg ? 1 : 0; tot.frags += Object.values(r.frags || {}).reduce((a: number, b: any) => a + b, 0) as number; };
     if (d.claim === '*') { for (const q of claimable(S)) add(claimQuest(S, q.id)); for (const c of chapterClaimable(S)) add(claimQuest(S, 'ch:' + c.id)); } // chapter chests after the quests that finish them
@@ -752,6 +783,6 @@ function frame(now) {
     initCanvas($('#game'));
     $('#loading').hidden = true; render(); requestAnimationFrame(frame); setTimeout(() => { prefetchPlates(); prefetchExt(() => { if (!battle && !hatch && cur !== 'home') render(); }); }, 1500); // painted battle plates + Starborn art are separate files
     (window as any).__w2s = id => { const [x, y] = homeV.bPos(BDEF[id]); const z = E.base * E.zoom; return [(x - E.cam.x) * z + E.W / 2, (y - 30 * homeV.scaleShow - E.cam.y) * z + E.H / 2]; };
-    (window as any).__eb = { get S() { return S; }, get battle() { return battle; }, get hatch() { return hatch; }, startBattle, startHatch, show, devTool, IMG, get homeV() { return homeV; }, get chest() { return chestUI; }, selectB(id) { homeV.sel = id; selB = id; renderPanel(); }, setLocation, LOC_IDS, get E() { return E; } };
+    (window as any).__eb = { get S() { return S; }, get battle() { return battle; }, get hatch() { return hatch; }, startBattle, startHatch, startMultiHatch, show, devTool, IMG, get homeV() { return homeV; }, get chest() { return chestUI; }, selectB(id) { homeV.sel = id; selB = id; renderPanel(); }, setLocation, LOC_IDS, get E() { return E; } };
   } catch (err) { $('#loading').textContent = 'โหลดไม่สำเร็จ: ' + err.message; console.error(err); }
 })();
