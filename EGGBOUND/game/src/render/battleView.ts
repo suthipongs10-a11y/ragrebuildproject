@@ -21,6 +21,9 @@ const STATUS_COL = { burn: '#ffae6a', poison: '#b8f06a', stun: '#ffe066', sleep:
 const ALLY_C = [-245, 165], ENEMY_C = [245, -115], PERP = [.6, .8];
 const OFFS = { 1: [0], 2: [-60, 60], 3: [-110, 0, 110], 4: [-150, -50, 50, 150] };
 
+/** real time multiplier of the AUTO speed buttons ×1/×2/×3 — owner 2026-10-14: ×2 and ×3 felt too fast → 5% / 7% slower */
+export const SPEED_MUL = [1, 1, 1.9, 2.79];
+export const speedMul = (s: number) => SPEED_MUL[s] || s;
 export class BattleView {
   b: Battle; V = new Map(); phase = 'intro'; active = null; speed = 1; auto = false; skipUlt = false;
   pending = null; sel = 0; aim = null; focus = []; camF = null; camK = .45; cine = null; env = { x: 0, y: 0 }; wipe = 0; onEnd = null; onHud = null; ended = false; stage;
@@ -94,7 +97,7 @@ export class BattleView {
   *perfectRing(u) {
     const v = this.V.get(u.uid); this.phase = 'aim'; this.hud();
     this.aim = { t: 0, dur: 1.05, hit: null, v };
-    while (this.aim.hit === null && this.aim.t < this.aim.dur) { this.aim.t += (yield 0) / this.speed; }
+    while (this.aim.hit === null && this.aim.t < this.aim.dur) { this.aim.t += (yield 0) / speedMul(this.speed); }
     const ok = this.aim.hit === true;
     if (ok) { this.onPerfect && this.onPerfect(); sfx.perfect(); addP({ type: 'banner', x: v.x, y: this.headY(v) - 30, str: 'PERFECT!', color: '#ffe066', size: 30, life: 1, keep: true }); flash(.25, '#fff2c0'); }
     this.aim = null; return ok;

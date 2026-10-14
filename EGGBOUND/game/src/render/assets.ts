@@ -41,17 +41,48 @@ const TAINT = new WeakSet<object>();
 const tainted = (src: any) => !!src && TAINT.has(src);
 /** a canvas made from `src` inherits its unreadability and its precomputed bbox / area */
 const derive = (c: any, src: any) => { if (tainted(src)) TAINT.add(c); if (src?.__bb) { c.__bb = src.__bb; c.__area = src.__area; } return c; };
-const imgOf = (src: string, cors = false) => new Promise<HTMLImageElement>((res, rej) => { const i = new Image(); if (cors) i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = () => rej(new Error(cors ? 'cors' : 'img')); i.src = src; });
+const imgOf = (src: string, cors = false, ms = 15000) => new Promise<HTMLImageElement>((res, rej) => { const i = new Image(); if (cors) i.crossOrigin = 'anonymous';
+  const t = setTimeout(() => rej(new Error('timeout')), ms); i.onload = () => { clearTimeout(t); res(i); }; i.onerror = () => { clearTimeout(t); rej(new Error(cors ? 'cors' : 'img')); }; i.src = src; });
 function readable(i: HTMLImageElement) { try { const x = mk(1, 1).getContext('2d'); x.drawImage(i, 0, 0); x.getImageData(0, 0, 1, 1); return true; } catch (e) { return false; } }
+
+// ---- published files (ext/, bg/): how this page reaches them is found ONCE by a probe and then used for every file.
+// The owner's phone app never showed a separate file (maps, Starborn, BATCH21 → foxes) although the Artifact docs say
+// files next to the page load by relative URL: so the probe tries <img> and fetch → blob, against the page's own folder
+// as resolved by the browser, the page URL taken as a folder, and the site root. Every attempt is listed in settings. ----
+type Way = { base: string; fetch: boolean };
+let WAY: Way | null | undefined, wayP: Promise<Way | null> | null = null;
+export const FILE_STAT = { tries: [] as string[], way: '' };
+const baseCands = () => { const out = [''], h = String(location.href).split(/[?#]/)[0];
+  if (/^https?:/.test(h)) { if (!h.endsWith('/')) out.push(h + '/'); out.push(location.origin + '/'); }
+  return [...new Set(out)]; };
+const viaFetch = (url: string) => Promise.race([fetch(url), new Promise<Response>((_, rej) => setTimeout(() => rej(new Error('timeout')), 15000))])
+  .then(r => r.ok ? r.blob() : Promise.reject(new Error('http ' + r.status))).then(b => imgOf(URL.createObjectURL(b)));
+const shortBase = (b: string) => b ? (b.replace(location.origin, '') || '/') : './';
+function findWay(path: string): Promise<Way | null> {
+  return wayP ||= (async () => {
+    for (const base of baseCands()) for (const f of [false, true]) {
+      const tag = `${f ? 'fetch' : 'img'} ${shortBase(base)}`;
+      try { await (f ? viaFetch(base + path) : imgOf(base + path, false, 8000)); FILE_STAT.tries.push(tag + ' ✓'); FILE_STAT.way = tag; return (WAY = { base, fetch: f }); }
+      catch (e) { FILE_STAT.tries.push(`${tag} ✗ ${e?.message || e}`); }
+    }
+    return (WAY = null);
+  })();
+}
+/** load one published file ('ext/x.webp', 'bg/y.webp') the way the probe found to work */
+export async function loadFile(path: string): Promise<HTMLImageElement> {
+  const w = await findWay(path); if (!w) throw new Error('ไฟล์แยกโหลดไม่ได้ทุกวิธี');
+  return w.fetch ? viaFetch(w.base + path) : imgOf(w.base + path);
+}
 let corsP: Promise<boolean> | null = null; // asked once (the first unreadable file): does the host answer CORS requests?
 const useTainted = (i: HTMLImageElement) => { TAINT.add(i); EXT_STAT.taint++; EXT_STAT.way ||= 'img อ่านพิกเซลไม่ได้'; return i; };
-const tryWays = (key: string) => { const url = EXTU[key] || 'ext/' + key + '.webp';
-  return imgOf(url).then(i => {
-    if (readable(i)) { EXT_STAT.way ||= 'img'; return i; }
+const tryWays = (key: string) => { const path = EXTU[key] || 'ext/' + key + '.webp';
+  return loadFile(path).then(i => {
+    if (readable(i)) { EXT_STAT.way ||= WAY?.fetch ? 'fetch' : 'img'; return i; }
+    if (WAY?.fetch) return useTainted(i);
+    const url = (WAY?.base || '') + path;
     corsP ||= imgOf(url, true).then(c => readable(c), e => { EXT_STAT.cors = String(e?.message || e); return false; });
     return corsP.then(ok => ok ? imgOf(url, true).then(c => { EXT_STAT.way ||= 'cors'; return c; }, () => useTainted(i)) : useTainted(i));
-  }, () => fetch(url).then(r => r.ok ? r.blob() : Promise.reject(new Error('http ' + r.status))).then(b => imgOf(URL.createObjectURL(b)))
-    .then(i => { EXT_STAT.way ||= 'fetch'; return readable(i) ? i : useTainted(i); }, e => { throw new Error('img โหลดไม่ได้ · fetch ' + (e?.message || e) + ' · ' + url); }));
+  });
 };
 function loadExt(key): Promise<void> {
   if (IMG[key] || !EXT.includes(key)) return Promise.resolve();
@@ -211,12 +242,17 @@ export function sizeK(look: string, stars: number, boss = false) {
   return (boss ? Math.max(1, st) : st) * artFix(look);
 }
 /** does this species have its own final art? */
-export const hasArt = sid => { const s = SP(sid); return !!(s && s.art && (IMG[s.art + '_front_idle'] || IMG[s.art + '_master'])); };
+export const hasArt = sid => { const s = SP(sid); return !!(s && s.art && (IMG[s.art + '_front_idle'] || IMG[s.art + '_master'] || IMG['thumb_' + s.art])); };
+const THS = {};
+/** a separate-file set whose files cannot be loaded (yet): its embedded master thumbnail stands in for every pose,
+ *  scaled to the 512 sprite space — the real monster, still, instead of a recoloured fox */
+const thumbSprite = (art: string) => { if (THS[art]) return THS[art]; const t = IMG['thumb_' + art]; if (!t) return undefined;
+  const c = mk(512, 512); c.getContext('2d')!.drawImage(t, 0, 0, 512, 512); return (THS[art] = c); };
 const SPR = {};
 /** a pose that may be missing from a set (damaged file awaiting re-export): same view's idle → master → other view's idle */
 function artPose(art, key) {
   const view = key.split('_')[0], other = view === 'front' ? 'back' : 'front';
-  return IMG[art + '_' + key] || IMG[art + '_' + view + '_idle'] || IMG[art + '_master'] || IMG[art + '_' + other + '_idle'];
+  return IMG[art + '_' + key] || IMG[art + '_' + view + '_idle'] || IMG[art + '_master'] || IMG[art + '_' + other + '_idle'] || thumbSprite(art);
 }
 // extra motion poses (BATCH13+) fall back to the classic five when a set doesn't have them yet
 const POSE_FALLBACK = { windup: 'idle', strike: 'attack', follow: 'attack', cast2: 'cast', joy: 'cast', down: 'hit' };

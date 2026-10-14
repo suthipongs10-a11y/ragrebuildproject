@@ -33,6 +33,10 @@ export const sfx = {
   win() { [523, 659, 784, 1047, 784, 1047, 1319].forEach((f, i) => tone('triangle', f, f, .4, .17, i * .11)); },
   lose() { [392, 330, 262, 196].forEach((f, i) => tone('triangle', f, f, .5, .15, i * .16)); },
   crack() { nz(.06, 'highpass', 3500, 2000, .6); tone('square', 900, 300, .04, .12); },
+  /** rune strike landed: one bright "ping" (owner 2026-10-14: gauge fills → ปิ๊ง) */
+  ping() { tone('sine', 2093, 2093, .38, .26); tone('sine', 3136, 3136, .28, .12, .015); tone('triangle', 4186, 4186, .16, .06, .03); },
+  /** rune strike missed: the gauge falls with a sinking "wah-wah" */
+  fail() { tone('sawtooth', 392, 300, .22, .1); tone('sawtooth', 300, 150, .42, .11, .2); nz(.3, 'lowpass', 900, 200, .12, .2); },
   chime() { [1318, 1661, 1976, 2637].forEach((f, i) => tone('sine', f, f, .7, .2, i * .09)); },
   starup() { [659, 784, 988, 1319, 1568, 1976].forEach((f, i) => tone('triangle', f, f, .5, .18, i * .08)); nz(1, 'highpass', 6000, 8000, .1, .5); },
   hum() { tone('sine', 98, 82, 1.1, .35); tone('sine', 147, 123, 1.1, .18, .05); nz(.9, 'lowpass', 300, 120, .12); },

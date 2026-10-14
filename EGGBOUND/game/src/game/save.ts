@@ -35,6 +35,7 @@ export interface SaveData {
   runes: Rune[];                    // rune bag (core/runes.ts) · rune.on = the monster wearing it
   nextRuneId: number;
   runeGift: boolean;                // starter runes given
+  presets: ({ team: number[] } | null)[]; // saved teams (owner 2026-10-14): PRESET_N slots, uids leader first
   settings: { sound: boolean; quality: 'low' | 'mid' | 'high'; skipUlt: boolean; speed: number; auto: boolean };
 }
 const KEY = 'eggbound-p0-save';
@@ -43,7 +44,7 @@ export const newMon = (uid: number, sid: string, lvl = 1, stars?: number, rare =
   ({ uid, sid, lvl, exp: 0, stars: stars ?? natStars(sid, rare), sk: [1, 1, 1], ...(rare ? { rare } : {}) });
 export function newSave(): SaveData {
   const mons = STARTERS.map((sid, i) => newMon(i + 1, sid, 5, 1));
-  return { v: 2, gold: 500, mons, team: [1, 2, 3, 4], nextUid: mons.length + 1, items: { soul: 0 }, gems: 0, stats: newStats(), quests: [], dexRare: [], dex: [...STARTERS], eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, starShards: {}, energy: { v: ENERGY_MAX, t: Date.now() }, stages: {}, nextEggId: 2, rush: { day: '', n: 0 }, enBuy: { day: '', n: 0 }, runes: [], nextRuneId: 1, runeGift: false,
+  return { v: 2, presets: [], gold: 500, mons, team: [1, 2, 3, 4], nextUid: mons.length + 1, items: { soul: 0 }, gems: 0, stats: newStats(), quests: [], dexRare: [], dex: [...STARTERS], eggs: [{ id: 1, sid: 'A01', kind: 'named' }], eggPity: 0, frags: {}, starShards: {}, energy: { v: ENERGY_MAX, t: Date.now() }, stages: {}, nextEggId: 2, rush: { day: '', n: 0 }, enBuy: { day: '', n: 0 }, runes: [], nextRuneId: 1, runeGift: false,
     settings: { sound: true, quality: 'high', skipUlt: false, speed: 1, auto: false } };
 }
 export function loadSave(): SaveData {
@@ -63,6 +64,7 @@ export function loadSave(): SaveData {
         d.dex = [...new Set([...(d.dex || []), ...d.mons.map(m => m.sid)])]; // monster book: everything owned counts as seen
         const seen = new Set<string>(); // team rule: one per species (older saves could hold copies)
         d.team = d.team.filter(u => { const m = d.mons.find(x => x.uid === u); if (!m || seen.has(m.sid)) return false; seen.add(m.sid); return true; });
+        d.presets = Array.isArray(d.presets) ? d.presets.map(p => p && Array.isArray(p.team) ? { team: p.team.filter(u => d.mons.some(m => m.uid === u)) } : null) : [];
         freeRunes(d); runeGift(d);
         return d;
       }

@@ -3,7 +3,7 @@
 // set dressing around the plaza, animated lights, ambient life and a screen colour grade.
 // Everything is code-drawn; a painted plate (art/prompts BATCH17) can replace the ground later.
 // Hooks into the engine through E.loc and by refilling the shared LANTERNS / BUSHES arrays.
-import { TAU, mk, dot, IMG, fx } from './assets';
+import { TAU, mk, dot, IMG, fx, loadFile } from './assets';
 import { E, SQ, GEO, rnd, mulberry, stone, useTheme, setTheme, LANTERNS, BUSHES, THEMES } from './engine';
 
 const { PR, GW, GH, GOX, GOY } = GEO, PRY = PR * SQ;
@@ -779,22 +779,29 @@ export const LOC_IDS = Object.keys(LOCS);
 const BGU: Record<string, string> = typeof __BGU__ !== 'undefined' ? __BGU__ : {};
 /** a painted plate's / realm chart's published path (literal, from the build) */
 export const bgURL = (id: string) => BGU[id] || 'bg/' + id + '.webp';
-const ART = new Set((typeof __BG__ !== 'undefined' ? __BG__ : []).filter(id => !/^map\d/.test(id))); // battle plates only (map<N> = realm charts)
-const PLATE = {};
+const BGALL = new Set(typeof __BG__ !== 'undefined' ? __BG__ : []);
+const ART = new Set([...BGALL].filter(id => !/^map\d/.test(id))); // battle plates only (map<N> = realm charts)
+const PLATE = {}, PLATEP = {};
 /** world height a plate covers: its painted oval (~31% of the height, centre ~50%) then matches the plaza (PR·SQ) */
 const PH = 1084;
+/** load a painted plate / realm chart through the shared file loader (assets.ts loadFile: the access way the probe found) */
+export function bgLoad(id: string): Promise<HTMLImageElement | null> {
+  if (!BGALL.has(id)) return Promise.resolve(null);
+  return PLATEP[id] ||= loadFile(bgURL(id)).then(im => (PLATE[id] = im), () => { ART.delete(id); BGALL.delete(id); return null; });
+}
 function plate(id) {
   if (!ART.has(id)) return null;
-  let im = PLATE[id];
-  if (!im) { im = PLATE[id] = new Image(); im.decoding = 'async'; im.onerror = () => { ART.delete(id); delete PLATE[id]; }; im.src = bgURL(id); }
-  return im.complete && im.naturalWidth ? im : null;
+  const im = PLATE[id]; if (!im) bgLoad(id);
+  return im && im.naturalWidth ? im : null;
 }
+/** DOM <img> source for a plate / chart: the loaded image's own URL (maybe a blob) once it is in, else its path */
+export const bgSrc = (id: string) => PLATE[id]?.src || bgURL(id);
 /** painted plates loaded / listed (settings shows it to check the live build) */
-export const plateStat = () => ({ ok: Object.values(PLATE).filter((im: any) => im.complete && im.naturalWidth).length, total: ART.size });
-/** warm the browser cache with every plate, one at a time, after the game has loaded */
-export function prefetchPlates() {
-  const ids = [...ART]; let i = 0;
-  const next = () => { if (i >= ids.length) return; const id = ids[i++]; plate(id); const im = PLATE[id]; if (!im || im.complete) return next(); im.addEventListener('load', next, { once: true }); im.addEventListener('error', next, { once: true }); };
+export const plateStat = () => ({ ok: [...ART].filter(id => PLATE[id]).length, total: ART.size });
+/** load every chart and plate, one at a time, after the game has loaded; onLoad(id) after each one that arrives */
+export function prefetchPlates(onLoad = (id: string) => { }, onAll = () => { }) {
+  const ids = [...BGALL].sort((a, b) => +/^map/.test(b) - +/^map/.test(a)); let i = 0; // realm charts first
+  const next = () => { if (i >= ids.length) return onAll(); const id = ids[i++]; bgLoad(id).then(im => { if (im) onLoad(id); next(); }); };
   next();
 }
 /** plate geometry in world units: [x, y, w, h] (per-plate fit: [centre offset as a fraction of h, scale]) */

@@ -158,6 +158,21 @@ html:not(.has-book-emblem) .bk-emblem{position:relative}html:not(.has-book-emble
 .mcard .tag{position:absolute;top:6px;left:6px;font-size:.6rem;background:var(--gold);color:#2a1a08;border-radius:6px;padding:1px 6px;font-weight:700}
 .mcard .ph{position:absolute;top:6px;right:6px;font-size:.58rem;color:var(--ink-faint)}
 .chip{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;padding:1px 8px;border-radius:99px;background:var(--panel-hi);border:1px solid var(--line);color:var(--ink-dim)}
+.presets{display:flex;flex-direction:column;gap:6px;min-width:0}
+.psrow{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.pset{flex:0 0 112px;display:flex;flex-direction:column;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px}
+.pset.on{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 0 14px rgba(255,210,122,.25)}
+.pset.empty{border-style:dashed}
+.puse{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:0;color:var(--ink);padding:2px;cursor:pointer;min-width:0}
+.puse:disabled{cursor:default;opacity:.7}
+.puse b{font:600 .82rem var(--f-display);color:var(--gold)}
+.puse small{font-size:.66rem;color:var(--ink-dim);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pmini{display:grid;grid-template-columns:repeat(2,26px);gap:3px;min-height:55px;place-content:center}
+.pmini img,.pmini i{width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.35);border:1px solid var(--line);object-fit:cover}
+.pmini em{grid-column:1/-1;font-style:normal;font-size:.72rem;color:var(--ink-faint);align-self:center}
+.psave{font-size:.68rem;padding:5px 4px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--ink-dim);cursor:pointer;line-height:1.2}
+.psave.arm{border-color:#ff9d8a;color:#ffc4b8;background:rgba(255,120,100,.12)}
+.psave:disabled{opacity:.45;cursor:default}
 .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .slot{background:var(--panel);border:1.5px dashed var(--line);border-radius:14px;min-height:118px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:.72rem;color:var(--ink-faint);padding:8px 4px}
 .slot.fill{border-style:solid;color:var(--ink)}
@@ -549,7 +564,7 @@ button.drop.rdrop{cursor:pointer;color:inherit;font:inherit;font-size:.74rem}but
 .rwho{display:flex;align-items:center;justify-content:center;gap:6px;font-size:.8rem;color:var(--ink-dim)}.rwho img{width:30px;height:30px;border-radius:50%;border:1px solid var(--gold);object-fit:cover;background:#111}
 .rbtns{justify-content:center}.alt.warn{border-color:#ff8a6a;color:#ffc2b0;background:rgba(255,90,60,.15)}
 .rmod.busy button{pointer-events:none;opacity:.55}
-.rforge{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:4px}
+.rforge{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:34px}
 .ranvil{position:relative;width:150px;height:150px}
 .rstone{position:absolute;inset:0;display:grid;place-items:center;z-index:1}
 .rstone::before{content:"";position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--sc) 45%,transparent),transparent 70%)}
@@ -566,6 +581,27 @@ button.drop.rdrop{cursor:pointer;color:inherit;font:inherit;font-size:.74rem}but
 .ranvil.fail .rbig{animation:rfail .5s linear;filter:grayscale(.75) brightness(.7) drop-shadow(0 6px 10px rgba(0,0,0,.6))}
 .rcrack{position:absolute;inset:26px;opacity:0;pointer-events:none;background:linear-gradient(115deg,transparent 46%,rgba(25,12,6,.92) 47%,transparent 49%),linear-gradient(62deg,transparent 52%,rgba(25,12,6,.85) 53%,transparent 55%),linear-gradient(165deg,transparent 40%,rgba(25,12,6,.8) 41%,transparent 43%)}
 .ranvil.fail .rcrack{animation:rcrack 1s ease-out}
+.rgauge{position:absolute;inset:-13px;width:calc(100% + 26px);height:calc(100% + 26px);overflow:visible;pointer-events:none;z-index:0}
+.rgauge .gt{fill:none;stroke:rgba(255,255,255,.14);stroke-width:9;stroke-linecap:round}
+.rgauge .gk{stroke:rgba(255,236,190,.38);stroke-width:1.6;stroke-linecap:round}
+.rgauge .gf{fill:none;stroke-width:9;stroke-linecap:round;stroke-dasharray:100 100;filter:drop-shadow(0 0 4px rgba(255,215,106,.85))}
+.rgauge .gh{fill:#fff;opacity:0;filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 9px #ffd76a)}
+.rgauge.gfall .gf{stroke:#ff6b5a;filter:drop-shadow(0 0 5px rgba(255,80,60,.85))}
+.rgauge.gfall .gh{fill:#ffc0b4;filter:drop-shadow(0 0 6px #ff6b5a)}
+.rgauge.ok .gf{animation:gflash 1s ease-out}
+.rgauge.ok .gt{stroke:rgba(255,226,122,.35)}
+.rgauge.ok .gh{animation:gping .7s ease-out}
+@keyframes gflash{0%{filter:brightness(2.2) drop-shadow(0 0 3px #fff)}35%{filter:brightness(1.6) drop-shadow(0 0 12px #ffe27a) drop-shadow(0 0 24px #ffe27a)}100%{filter:drop-shadow(0 0 4px rgba(255,215,106,.85))}}
+@keyframes gping{0%{r:6.5}30%{r:13}100%{r:6.5}}
+.rstone::after{content:"";position:absolute;inset:-34px;border-radius:50%;opacity:0;pointer-events:none;background:radial-gradient(circle,rgba(255,226,122,.6),rgba(255,200,90,.2) 45%,transparent 70%)}
+.ranvil.ok .rstone::after{animation:raura 1.2s ease-out}
+@keyframes raura{0%{opacity:0;transform:scale(.45)}22%{opacity:1}100%{opacity:0;transform:scale(1.55)}}
+.ranvil.gcharge .rbig{animation:rshake .5s linear infinite}
+.ranvil.gcharge .rring{animation:rcharge 1.4s ease-in forwards}
+.ranvil.miss .rbig{animation:rfail .45s linear}
+.rupb{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}.rupb button{flex:1 1 28%;min-width:0;white-space:normal}
+.rauto{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;font-size:.86rem;color:#ffe9b0}
+.rmod.busy button.stop{pointer-events:auto;opacity:1}
 .rres{min-height:1.4em;font:600 .98rem var(--f-display);text-align:center}.rres.ok{color:#ffe27a;text-shadow:0 0 10px rgba(255,210,80,.7);animation:rtxt .5s ease-out}.rres.fail{color:#ff9d8a;animation:rtxt .5s ease-out}
 @keyframes rshake{0%,100%{transform:none}20%{transform:translate(-2px,1px) rotate(-2deg)}40%{transform:translate(2px,-1px) rotate(2deg)}60%{transform:translate(-3px,0) rotate(-3deg) scale(1.03)}80%{transform:translate(3px,1px) rotate(3deg) scale(1.06)}}
 @keyframes rcharge{from{opacity:.3;transform:scale(1.25)}to{opacity:1;transform:scale(.72);box-shadow:0 0 30px var(--gc) inset,0 0 30px var(--gc)}}

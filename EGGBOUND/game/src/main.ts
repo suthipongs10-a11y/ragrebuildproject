@@ -3,11 +3,11 @@
 import { SPECIES, EVO_NAME, isEvolved, monName, HELL, HELL_MIN, HELL_RUNES, STAGES, ZONES, ZONE_PLAN, planOf, starbornOf, rareFormChance, DIFFS, stageKey, parseStage, stageOf, ENERGY_MAX, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, SPECIAL_SHARD_CHANCE, SPECIAL_SHARDS_TO_CRAFT, specialOf, shardOnly, shardsToCraft, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
 import { Battle } from './core/battle';
 import { drawShowcase, showcaseTap } from './render/showcase';
-import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, sizeK, lookOf, starHTML, uiSrc, masterURL, rareMasterURL, ensureArt, artReady, prefetchExt, EXT_STAT } from './render/assets';
+import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, sizeK, lookOf, starHTML, uiSrc, masterURL, rareMasterURL, ensureArt, artReady, prefetchExt, EXT_STAT, FILE_STAT } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
 import { E, initCanvas, toWorld, updScripts, updParts, tickEngine, clearAll, worldTransform, drawGround, drawDecals, drawLanternPools, drawParts, drawFlies, drawLantern, drawBush, LANTERNS, BUSHES, drawOverlays, clamp } from './render/engine';
-import { setLocation, clearLocation, prefetchPlates, plateStat, LOC_IDS, bgURL } from './render/locations';
-import { BattleView } from './render/battleView';
+import { setLocation, clearLocation, prefetchPlates, plateStat, LOC_IDS, bgSrc } from './render/locations';
+import { BattleView, speedMul } from './render/battleView';
 import { HatchView } from './render/hatchView';
 import { MultiHatchView } from './render/multiHatchView';
 import { HomeView } from './render/homeView';
@@ -63,7 +63,7 @@ function render() {
 const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
 function enLabel() { const v = energyNow(S), n = energyNext(S); return `${v}/${ENERGY_MAX}` + (n ? ` <small>+1 ${mmss(n)}</small>` : ''); }
 /** separate-file art status for the settings screen (Starborn sprites + painted battle plates) */
-const extLine = () => { const p = plateStat(), x = EXT_STAT; return `ฉากต่อสู้ ${p.ok}/${p.total} · มอนไฟล์แยก ${x.ok}/${x.total}${x.way ? ` (โหลดแบบ ${x.way})` : ''}${x.taint ? ` · อ่านพิกเซลไม่ได้ ${x.taint} ภาพ (ใช้ข้อมูลที่คำนวณไว้แทน)` : ''}${x.fail ? ` · โหลดไม่ได้ ${x.fail} ครั้ง: ${esc(x.err)}` : ''}${x.cors ? ` · cors: ${esc(x.cors)}` : ''} · หน้าเกม ${esc(location.protocol)}${esc(location.origin === 'null' ? ' origin=null' : '')}`; };
+const extLine = () => { const p = plateStat(), x = EXT_STAT; return `ฉากต่อสู้ ${p.ok}/${p.total} · มอนไฟล์แยก ${x.ok}/${x.total}${x.way ? ` (โหลดแบบ ${x.way})` : ''}${x.taint ? ` · อ่านพิกเซลไม่ได้ ${x.taint} ภาพ (ใช้ข้อมูลที่คำนวณไว้แทน)` : ''}${x.fail ? ` · โหลดไม่ได้ ${x.fail} ครั้ง: ${esc(x.err)}` : ''}${x.cors ? ` · cors: ${esc(x.cors)}` : ''} · หน้าเกม ${esc(location.protocol)}${esc(location.origin === 'null' ? ' origin=null' : '')}${FILE_STAT.tries.length ? ` · ทดลองโหลด: ${esc(FILE_STAT.tries.join(' | '))}` : ' · ยังไม่ได้ลองโหลดไฟล์'}`; };
 /** every error the player could hit (renders, taps, loads — not only the frame loop): shown once as a toast and kept for
  *  the settings screen, so the owner can send a screenshot from the real device (2026-10-14: a report we could not reproduce) */
 const errSeen = new Set<string>(); let lastErr = '';
@@ -146,11 +146,11 @@ function mapHTML() {
     const [x, y] = MAP_POS[z.id], op = zoneOpen(z), st = zoneStars(z), b = zoneBoss(z), bs = SPECIES[b.sid], star = bs?.starborn, art = ART_BG.includes(z.loc);
     const cleared = (S.stages[z.id + '-5'] || 0) > 0;
     return `<button type="button" class="pin ${op ? '' : 'locked'} ${z === here ? 'here' : ''} ${cleared ? 'clear' : ''} ${star ? 'starborn' : ''}" style="left:${x}%;top:${y}%" data-zone="${z.id}" ${op ? '' : 'disabled'}>
-      <span class="isle loc-${z.loc}">${art ? `<img class="isle-im" src="${bgURL(z.loc)}" alt="" loading="lazy" draggable="false">` : ''}</span>
+      <span class="isle loc-${z.loc}">${art ? `<img class="isle-im" src="${bgSrc(z.loc)}" alt="" loading="lazy" draggable="false">` : ''}</span>
       ${op ? `<span class="bossb"><img src="${portrait(b.sid)}" alt=""></span>` : '<span class="lock">🔒</span>'}
       <span class="lbl"><b>${esc(z.name)}</b><small>${op ? `<span class="dps">${diffPips(z)}</span> <span class="stars">★</span> ${DIFFS.reduce((a, D, d) => a + zoneDiffStars(z, d), 0)}/${DIFFS.length * 15}${star ? ' · ✦' : ''}` : 'ยังไม่ปลดล็อก'}</small></span></button>`;
   }).join('');
-  const chart = `<div class="wmap"><div class="wmap-in realm${mapRealm} ${ART_BG.includes('map' + mapRealm) ? 'art' : ''}">${ART_BG.includes('map' + mapRealm) ? `<img class="wmap-bg" src="${bgURL('map' + mapRealm)}" alt="" draggable="false">` : ''}
+  const chart = `<div class="wmap"><div class="wmap-in realm${mapRealm} ${ART_BG.includes('map' + mapRealm) ? 'art' : ''}">${ART_BG.includes('map' + mapRealm) ? `<img class="wmap-bg" src="${bgSrc('map' + mapRealm)}" alt="" draggable="false">` : ''}
     <svg viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true"><polyline points="${route}" /></svg>${pins}</div></div>`;
   return `<section class="scr dim mapscr"><div class="wrap">${topbar(title, sub)}${tabs}${chart}<p class="note">แตะเกาะเพื่อดูด่าน · แต่ละโซนมี 5 ด่าน ด่านที่ 5 เป็นบอส · บอสตำนานดารา (✦) มีโอกาสดรอปเศษไข่ดารา ${STAR_SHARD_CHANCE * 100}% ต่อรอบ ครบ ${STAR_SHARDS_TO_CRAFT} ชิ้นประกอบเป็นไข่ได้ · เล่นเองไม่ใช้พลังงาน เปิด AUTO ใช้พลังงาน ⚡ ตามด่าน (ฟื้น 1 แต้มทุก 5 นาที เต็ม ${ENERGY_MAX}) · ดาวของด่าน: ★ ผ่านด่าน · ★ ไม่มีมอนตาย · ★ ทำปฏิกิริยาธาตุได้อย่างน้อย 1 ครั้ง</p>
   </div></section>`;
@@ -169,7 +169,7 @@ function zonePanel(z) {
     return `<div class="stage ${un ? '' : 'locked'} ${boss ? 'boss' : ''}"><div class="num">${boss ? `<img src="${portrait(b.sid)}" alt="">` : st.n}</div><div style="min-width:0"><div class="nm">${boss ? 'บอส · ' + esc(b.name || bs.name) : 'ด่าน ' + st.n}</div><div class="meta"><span class="stars">${starStr(stars, 3)}</span><span>แนะนำ ★${ps} Lv.${pl}</span><span title="พลังงานที่ใช้ตอนเปิด AUTO">AUTO ⚡${autoCost(st)}</span><span>ธาตุ ${els.map(elDot).join(' ')}</span></div></div><button class="go" type="button" data-stage="${key}" ${un ? '' : 'disabled'}>${un ? 'สู้' : 'ล็อก'}</button></div>`;
   }).join('');
   return `<div class="zpanel" data-zclose="1"><div class="zsheet" role="dialog" aria-label="${esc(z.name)}">
-    <div class="zhead loc-${z.loc} ${art ? 'art' : ''}">${art ? `<img class="zhead-im" src="${bgURL(z.loc)}" alt="" draggable="false">` : ''}<button type="button" class="zx" data-zclose="1" aria-label="ปิด">✕</button><h2>${esc(z.name)}</h2><p>${esc(z.desc)}</p></div>
+    <div class="zhead loc-${z.loc} ${art ? 'art' : ''}">${art ? `<img class="zhead-im" src="${bgSrc(z.loc)}" alt="" draggable="false">` : ''}<button type="button" class="zx" data-zclose="1" aria-label="ปิด">✕</button><h2>${esc(z.name)}</h2><p>${esc(z.desc)}</p></div>
     ${spOfBoss(b) ? zspecHTML(spOfBoss(b)) : ''}${bs.starborn ? `<div class="zstar"><img src="${eggURL(b.sid)}" alt=""><div><b>ตำนานดารา · ${esc(bs.name)}</b><div class="bar fr"><i style="transform:scaleX(${Math.min(1, shards / STAR_SHARDS_TO_CRAFT)})"></i></div><small>เศษไข่ดารา ${shards}/${STAR_SHARDS_TO_CRAFT} · ชนะบอสครั้งแรกได้ 1 ชิ้น หลังจากนั้น ${STAR_SHARD_CHANCE * 100}% ต่อรอบ (ปานกลาง ${DIFFS[1].shard * 100}% · ยาก ${DIFFS[2].shard * 100}%)</small></div></div>` : ''}
     ${dtabs}<div class="stages">${rows}</div></div></div>`;
 }
@@ -184,9 +184,22 @@ function monCard(uid, opts = {}) {
   const m = monOf(S, uid), s = SPECIES[m.sid];
   return `<button type="button" class="mcard ${opts.on ? 'on' : ''} ${opts.pick ? 'pick' : ''} ${opts.dup ? 'dup' : ''} ${s.rarity}" style="${rcVar(s)}" data-mon="${uid}">${opts.tag ? `<span class="tag">${opts.tag}</span>` : ''}${m.rare ? '<span class="rf" title="ร่างหายาก">✦</span>' : ''}<span class="pic ${m.rare ? 'rfp' : ''}"><img src="${portrait(look(m))}" alt=""></span><span class="n">${esc(mName(m))}</span><span class="stars" style="font-size:.7rem">${starStr(m.stars)}</span><span class="lv">Lv.${m.lvl} ${elDot(formOf(m.sid, !!m.rare).elem)}</span></button>`;
 }
+// ---- team presets (owner 2026-10-14): with many monsters, keep several teams and switch with one tap — on the team
+// screen, which also opens before every battle. A preset keeps uids; monsters used up as food simply drop out. ----
+const PRESET_N = 5;
+let presetArm = -1, presetArmT = 0;
+/** a preset's monsters that still exist, one per species, leader first */
+function presetTeam(i) { const p = S.presets?.[i]; if (!p) return []; const seen = new Set(); return p.team.filter(u => { const m = monOf(S, u); if (!m || seen.has(m.sid)) return false; seen.add(m.sid); return true; }).slice(0, 4); }
+const sameTeam = (a, b) => a.length === b.length && a.every((u, i) => u === b[i]);
+function presetsHTML() {
+  return `<div class="presets"><h2 class="sec">ทีมที่บันทึกไว้ · แตะเพื่อใช้</h2><div class="psrow">${Array.from({ length: PRESET_N }, (_, i) => {
+    const t = presetTeam(i), has = t.length > 0, on = has && sameTeam(t, S.team), lead = has && monOf(S, t[0]);
+    return `<div class="pset ${on ? 'on' : ''} ${has ? '' : 'empty'}"><button type="button" class="puse" data-puse="${i}" ${has ? '' : 'disabled'}><b>ทีม ${i + 1}${on ? ' ✓' : ''}</b><span class="pmini">${has ? [0, 1, 2, 3].map(k => { const m = monOf(S, t[k]); return m ? `<img src="${portrait(look(m))}" alt="">` : '<i></i>'; }).join('') : '<em>ว่าง</em>'}</span><small>${has ? esc(mName(lead)) : 'ยังไม่ได้บันทึก'}</small></button><button type="button" class="psave ${presetArm === i ? 'arm' : ''}" data-psave="${i}" ${S.team.length === 4 ? '' : 'disabled'}>${presetArm === i ? 'แตะอีกครั้ง = บันทึกทับ' : has ? 'บันทึกทับ' : '＋ บันทึกทีมนี้'}</button></div>`; }).join('')}</div></div>`;
+}
 function teamHTML() {
   const owned = units(), lm = monOf(S, S.team[0]), lead = lm && SPECIES[lm.sid].leader;
   return `<section class="scr dim"><div class="wrap">${topbar('จัดทีม', teamCtx ? `${esc(stageLabel(teamCtx))} · เลือก 4 ตัว ตัวแรกเป็นผู้นำ` : 'เลือก 4 ตัว ตัวแรกเป็นผู้นำ')}
+  ${presetsHTML()}
   <div class="slots">${[0, 1, 2, 3].map(i => { const m = monOf(S, S.team[i]); return m ? `<button type="button" class="slot fill" data-slot="${i}">${i === 0 ? '<b>ผู้นำ</b>' : '<b>&nbsp;</b>'}<span class="pic"><img src="${portrait(look(m))}" alt=""></span>${esc(mName(m))}<span class="stars" style="font-size:.66rem">${starStr(m.stars)}</span></button>` : `<div class="slot">${i === 0 ? '<b>ผู้นำ</b>' : ''}ว่าง</div>`; }).join('')}</div>
   <div class="lead">สกิลผู้นำ: <b>${lead ? esc(lead.text) : '—'}</b></div>
   <h2 class="sec">มอนของคุณ (แตะเพื่อเพิ่ม/เอาออก · ชนิดเดียวกันลงได้ 1 ตัว)</h2><div class="mgrid">${owned.map(m => { const inT = S.team.includes(m.uid), dup = !inT && teamHasSpecies(S, m.sid); return monCard(m.uid, { on: inT, dup, tag: S.team[0] === m.uid ? 'ผู้นำ' : inT ? S.team.indexOf(m.uid) + 1 : dup ? 'ซ้ำ' : '' }); }).join('')}</div>
@@ -389,42 +402,81 @@ function runeModal(id, res = null) {
   const onCost = r.on === m.uid ? 0 : equipCost(S, r.id, m.uid).gold, offBtn = `<button type="button" class="alt" data-roff="${r.id}">ถอดออก · ทอง ${runeOffCost(r).toLocaleString()}</button>`;
   el.innerHTML = `<div class="card rmod g-${r.grade} ${runeBusy ? 'busy' : ''}">
     <button type="button" class="rx" data-rclose="1" aria-label="ปิด">✕</button>
-    <div class="rforge"><div class="ranvil ${forgeURL() ? 'altar' : ''}" style="--sc:${T.col}">${forgeURL() ? `<img class="raltar" src="${forgeURL()}" alt="">` : ''}<div class="rstone"><i class="rring"></i>${runeImg(r, 'rbig')}<i class="rspark"></i><i class="rcrack"></i></div></div><div class="rres ${res ? res.cls : ''}">${res ? esc(res.txt) : ''}</div></div>
+    <div class="rforge"><div class="ranvil ${forgeURL() ? 'altar' : ''}" style="--sc:${T.col}">${forgeURL() ? `<img class="raltar" src="${forgeURL()}" alt="">` : ''}<div class="rstone">${gaugeSVG(!!(res && res.full))}<i class="rring"></i>${runeImg(r, 'rbig')}<i class="rspark"></i></div></div><div class="rres ${res ? res.cls : ''}">${res ? esc(res.txt) : ''}</div></div>
     <h3>${esc(runeName(r))} <span class="rlvb">+${r.lvl}</span></h3>
     <div class="rmeta"><span class="rstars">${'★'.repeat(r.star)}</span><span class="chip" style="color:${G.col};border-color:${G.col}">${G.name}</span><span class="chip">ช่อง ${SLOT_NAME[r.slot]}</span></div>
     <div class="rmain">${fmtStat(r.main, mainValue(r))}${max ? '' : `<small>+${r.lvl + 1} → ${fmtStat(r.main, mainValue(r, r.lvl + 1))}</small>`}</div>
     <div class="rsubs">${r.subs.map(x => `<div class="${res && (res.added === x.k || res.boosted === x.k) ? 'new' : ''}">${fmtStat(x.k, x.v)}</div>`).join('')}${phs.map(l => `<div class="ph">ค่ารองใหม่ที่ +${l}</div>`).join('')}${r.subs.length >= 4 && !max ? '<div class="ph">ทุก +3 ค่ารองสุ่มเพิ่มขึ้น</div>' : ''}</div>
     <div class="rsetd" style="--sc:${T.col}">◈ เซ็ต${T.name} (${T.n} ชิ้น): ${esc(T.desc)}</div>
     <div class="rup">${max ? '<b>ตีบวกเต็ม +12 แล้ว</b>' : `<span>ตีบวก +${r.lvl} → +${r.lvl + 1} · โอกาส <b>${Math.round(rate * 100)}%</b>${fb ? `<small class="note"> (โรงตีรูน +${Math.round(fb * 100)}%)</small>` : ''} · <span class="${rich ? '' : 'bad'}">ทอง ${cost.toLocaleString()}</span> <small class="note">(มี ${S.gold.toLocaleString()})</small></span>
-      <div class="row"><button type="button" class="go" data-rup="1" ${rich ? '' : 'disabled'}>⚒ ตีบวก</button>${tgt > r.lvl + 1 ? `<button type="button" class="alt" data-rup="${tgt}" ${rich ? '' : 'disabled'}>ตีรัวถึง +${tgt}</button>` : ''}</div>${rate < 1 ? '<small class="note">ตีพลาดเสียแค่ทอง รูนไม่แตก ไม่ลดขั้น</small>' : ''}`}</div>
+      <div class="row rupb"><button type="button" class="go" data-rup="1" ${rich ? '' : 'disabled'}>⚒ ตีบวก</button><button type="button" class="alt" data-rauto="3" ${rich ? '' : 'disabled'}>⚒ อัตโนมัติ ×3</button><button type="button" class="alt" data-rauto="6" ${rich ? '' : 'disabled'}>⚒ อัตโนมัติ ×6</button></div>
+      ${runeAuto ? `<div class="rauto">⚒ ตีอัตโนมัติ · <b>สำเร็จ ${runeAuto.ok}/${runeAuto.goal} · ตีไป ${runeAuto.n} ครั้ง</b> <button type="button" class="alt stop" data-rstop="1">■ หยุด</button></div>` : '<small class="note">อัตโนมัติ: ตีให้เองจนสำเร็จครบ 3 / 6 ครั้ง (ครั้งที่พลาดไม่นับ)</small>'}${rate < 1 ? '<small class="note">ตีพลาดเสียแค่ทอง รูนไม่แตก ไม่ลดขั้น</small>' : ''}`}</div>
     <div class="rwho">${ow ? `<img src="${portrait(look(ow))}" alt="">ใส่อยู่กับ <b>${esc(mName(ow))}</b>` : 'ยังไม่ได้ใส่'}</div>
     <div class="row rbtns">${r.on === m.uid ? offBtn : `<button type="button" class="go" data-ron="${r.id}">${ow ? 'ย้ายมาใส่' : 'ใส่ให้'} ${esc(mName(m))}${onCost ? ` · ทอง ${onCost.toLocaleString()}` : ''}</button>${ow ? offBtn : ''}`}<button type="button" class="alt" data-rsellask="${r.id}">ขาย ${runeSellPrice(r).toLocaleString()} ทอง</button></div>
   </div>`;
 }
-/** one forge strike (or a rapid run to `target`): charge → success burst / crack, then the sheet refreshes */
-function runeUp(id, target = 0) {
-  const r = runeById(S, id); if (runeBusy || !r || r.lvl >= RUNE_MAX_LVL) return;
-  if (S.gold < runeUpCost(r)) { toast('ทองไม่พอ'); return; }
-  runeBusy = true; runeSellArm = 0; const fast = target > 0;
+// ---- forge gauge (owner 2026-10-14): an arc around the rune fills while you wait — success = it tops out, "ping",
+// aura burst · fail = it stalls and falls back with a fail sound (no crack on the rune). Auto: strike until 3 / 6
+// successes (misses do not count), stops at +12, without gold, or on ■ หยุด. ----
+const GA0 = 150, GA1 = 390, GR = 84; // arc from lower-left over the top to lower-right (SVG degrees, y down)
+const gPt = (p, r = GR) => { const a = (GA0 + (GA1 - GA0) * p) * Math.PI / 180; return [100 + r * Math.cos(a), 100 + r * Math.sin(a)]; };
+const gArc = (r = GR) => { const [x0, y0] = gPt(0, r), [x1, y1] = gPt(1, r); return `M${x0.toFixed(1)} ${y0.toFixed(1)}A${r} ${r} 0 1 1 ${x1.toFixed(1)} ${y1.toFixed(1)}`; };
+const gaugeSVG = (full = false) => `<svg class="rgauge ${full ? 'ok full' : ''}" viewBox="0 0 200 200" aria-hidden="true"><defs><linearGradient id="rgG" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="var(--sc)"/><stop offset=".6" stop-color="#ffd76a"/><stop offset="1" stop-color="#fff6c8"/></linearGradient></defs>
+  <path class="gt" d="${gArc()}" pathLength="100"/>${Array.from({ length: 11 }, (_, i) => { const [x0, y0] = gPt(i / 10, GR + 9), [x1, y1] = gPt(i / 10, GR + (i % 5 ? 12 : 15)); return `<line class="gk" x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}"/>`; }).join('')}
+  <path class="gf" d="${gArc()}" pathLength="100" stroke="url(#rgG)" style="stroke-dashoffset:${full ? 0 : 100};opacity:${full ? 1 : 0}"/><circle class="gh" r="6.5" cx="${gPt(full ? 1 : 0)[0].toFixed(1)}" cy="${gPt(full ? 1 : 0)[1].toFixed(1)}" style="opacity:${full ? 1 : 0}"/></svg>`;
+const gSet = (svg, p) => { if (!svg) return; const f = svg.querySelector('.gf'), h = svg.querySelector('.gh'), [x, y] = gPt(Math.max(0, Math.min(1, p)));
+  f.style.strokeDashoffset = String(100 - Math.max(0, Math.min(1, p)) * 100); f.style.opacity = p > .005 ? '1' : '0'; h.setAttribute('cx', x.toFixed(1)); h.setAttribute('cy', y.toFixed(1)); h.style.opacity = p > .01 ? '1' : '0'; };
+/** run the gauge to a known result: rise → hesitate (a little wobble) → top out, or stall and fall. Resolves when done. */
+function gaugeRun(ok, fast) {
+  const svg = $('#runeModal .rgauge'), an = $('#runeModal .ranvil'); if (!svg) return Promise.resolve();
+  const T = fast ? 760 : 1500, peak = ok ? 1 : .62 + Math.random() * .3, fall = fast ? 380 : 620, t0 = performance.now();
+  an?.classList.remove('ok', 'miss'); an?.classList.add('gcharge'); svg.classList.remove('ok', 'full', 'gfall'); gSet(svg, 0); sfx.charge(T / 1000 * .92);
+  const ease = t => 1 - Math.pow(1 - t, 3);
+  return new Promise(res => {
+    const step = now => {
+      if (!svg.isConnected) return res();
+      const t = (now - t0) / T;
+      if (t < 1) { // 0–55% quick, then a slow creep with a nervous wobble, then the decisive last stretch
+        const p = t < .4 ? ease(t / .4) * .55 : t < .82 ? .55 + (peak - .08 - .55) * ((t - .4) / .42) + Math.sin(t * 46) * .012 : (peak - .08) + .08 * ease((t - .82) / .18);
+        gSet(svg, Math.min(peak, p)); requestAnimationFrame(step); return; }
+      an?.classList.remove('gcharge');
+      if (ok) { gSet(svg, 1); svg.classList.add('ok'); return res(); }
+      const u = (now - t0 - T) / fall; // fail: stall a beat, then drop like a stone
+      if (u < .25) { gSet(svg, peak); requestAnimationFrame(step); return; }
+      if (u < 1.25) { if (!svg.classList.contains('gfall')) { svg.classList.add('gfall'); an?.classList.add('miss'); sfx.fail(); } gSet(svg, peak * (1 - Math.pow((u - .25), 2))); requestAnimationFrame(step); return; }
+      gSet(svg, 0); res();
+    };
+    requestAnimationFrame(step);
+  });
+}
+let runeAuto = null; // { goal, ok, n } while an auto run is going
+/** one forge strike: pay + roll first, play the gauge to that result, then refresh the sheet. `goal` > 0 = auto run */
+function runeUp(id, goal = 0) {
+  const r = runeById(S, id); if (runeBusy || !r) return;
+  if (r.lvl >= RUNE_MAX_LVL) { runeAuto = null; return; }
+  if (S.gold < runeUpCost(r)) { runeAuto = null; toast('ทองไม่พอ'); runeModal(id); return; }
+  const first = goal && !runeAuto; if (first) runeAuto = { goal, ok: 0, n: 0 };
+  runeBusy = true; runeSellArm = 0; const fast = !!runeAuto;
+  if (first) runeModal(id); // shows the progress line + ■ หยุด
   $('#runeModal .rmod')?.classList.add('busy');
-  const an = $('#runeModal .ranvil'); if (an) { an.classList.remove('ok', 'fail', 'charge'); void an.offsetWidth; an.classList.add('charge'); }
-  sfx.charge();
-  setTimeout(() => {
-    if (!$('#runeModal')) { runeBusy = false; return; } // left the screen mid-charge: nothing paid, nothing struck
-    const res = tryUpgrade(S, id); save();
-    const rr = runeById(S, id);
-    if (!res || !rr) { runeBusy = false; runeModal(id); return; }
-    const info = res.ok ? { cls: 'ok', txt: `+${rr.lvl} สำเร็จ!${res.added ? ' · ค่ารองใหม่ ' + RUNE_STATS[res.added].name : res.boosted ? ' · ' + RUNE_STATS[res.boosted].name + ' เพิ่มขึ้น' : ''}`, added: res.added, boosted: res.boosted }
+  const res = tryUpgrade(S, id); save(); render();
+  const rr = runeById(S, id);
+  if (!res || !rr) { runeBusy = false; runeAuto = null; runeModal(id); return; }
+  if (runeAuto) { runeAuto.n++; if (res.ok) runeAuto.ok++; }
+  gaugeRun(res.ok, fast).then(() => {
+    if (!$('#runeModal')) { runeBusy = false; runeAuto = null; return; }
+    const info = res.ok ? { cls: 'ok', txt: `+${rr.lvl} สำเร็จ!${res.added ? ' · ค่ารองใหม่ ' + RUNE_STATS[res.added].name : res.boosted ? ' · ' + RUNE_STATS[res.boosted].name + ' เพิ่มขึ้น' : ''}`, added: res.added, boosted: res.boosted, full: true }
       : { cls: 'fail', txt: `ล้มเหลว… เสียทอง ${res.cost.toLocaleString()}` };
-    runeModal(id, info); render();
-    const an2 = $('#runeModal .ranvil'); an2?.classList.add(res.ok ? 'ok' : 'fail');
-    if (res.ok) { if (rr.lvl % 3 === 0) sfx.starup(); else sfx.chime(); } else { sfx.crack(); sfx.die(); }
+    runeModal(id, info);
+    if (res.ok) { $('#runeModal .ranvil')?.classList.add('ok'); sfx.ping(); if (rr.lvl % 3 === 0) setTimeout(() => sfx.starup(), 120); }
     setTimeout(() => {
-      runeBusy = false; const r3 = runeById(S, id);
-      if (fast && r3 && r3.lvl < target && S.gold >= runeUpCost(r3) && $('#runeModal')) runeUp(id, target);
-      else $('#runeModal .rmod')?.classList.remove('busy'); // the sheet already shows the new numbers; keep the burst / crack playing
-    }, fast ? 480 : 700);
-  }, fast ? 360 : 620);
+      runeBusy = false; const r3 = runeById(S, id), a = runeAuto;
+      const more = a && a.ok < a.goal && r3 && r3.lvl < RUNE_MAX_LVL && S.gold >= runeUpCost(r3) && $('#runeModal');
+      if (more) { const pr = $('#runeModal .rauto b'); if (pr) pr.textContent = `สำเร็จ ${a.ok}/${a.goal} · ตีไป ${a.n} ครั้ง`; runeUp(id, a.goal); }
+      else if (a) { runeAuto = null; toast(`ตีอัตโนมัติจบ: สำเร็จ ${a.ok} ครั้ง จาก ${a.n} ครั้ง${a.ok < a.goal ? (r3 && r3.lvl >= RUNE_MAX_LVL ? ' · ถึง +12 แล้ว' : a.stop ? ' · หยุดแล้ว' : ' · ทองไม่พอ') : ''}`); if ($('#runeModal')) runeModal(id, { ...info, full: false }); }
+      else $('#runeModal .rmod')?.classList.remove('busy'); // single strike: the sheet already shows the result
+    }, res.ok ? (fast ? 520 : 900) : (fast ? 260 : 420));
+  });
 }
 /** picked food as slots (tap one to put it back) */
 const foodSlots = n => `<div class="fslots">${Array.from({ length: n }, (_, i) => { const f = monOf(S, food[i]); return f ? `<button type="button" class="fslot on" data-unfood="${f.uid}" title="เอาออก"><img src="${portrait(look(f))}" alt=""><span>Lv.${f.lvl}</span></button>` : '<span class="fslot">＋</span>'; }).join('')}</div>`;
@@ -841,6 +893,10 @@ document.addEventListener('click', e => {
     else if (teamHasSpecies(S, m.sid)) { toast(`มี${SPECIES[m.sid].name}ในทีมแล้ว — มอนชนิดเดียวกันลงทีมได้ 1 ตัว`); return; }
     else if (S.team.length < 4) S.team.push(uid);
     save(); sfx.click(); render(); }
+  else if (d.puse) { const t = presetTeam(+d.puse), p = S.presets?.[+d.puse]; if (!t.length) return; S.team = t; presetArm = -1; save(); sfx.buff(); if (p && t.length < p.team.length) toast('บางตัวในทีมนี้ไม่อยู่แล้ว (ถูกใช้เป็นอาหาร) — เลือกเพิ่มให้ครบ 4 ตัว'); render(); }
+  else if (d.psave) { const i = +d.psave; if (S.team.length !== 4) return; const has = presetTeam(i).length > 0;
+    if (has && !(presetArm === i && Date.now() - presetArmT < 4000)) { presetArm = i; presetArmT = Date.now(); sfx.click(); render(); return; }
+    S.presets ||= []; while (S.presets.length < PRESET_N) S.presets.push(null); S.presets[i] = { team: [...S.team] }; presetArm = -1; save(); sfx.coin(); toast(`บันทึกเป็นทีม ${i + 1} แล้ว`); render(); }
   else if (d.slot && cur === 'team') { const i = +d.slot; if (i > 0) { const uid = S.team.splice(i, 1)[0]; S.team.unshift(uid); } else S.team.splice(0, 1); save(); sfx.click(); render(); }
   else if (d.mon && cur === 'mons') { pickMon(+d.mon); }
   else if (d.realm) { sfx.click(); mapRealm = d.realm; render(); }
@@ -866,7 +922,9 @@ document.addEventListener('click', e => {
   else if (d.rpeek) { sfx.click(); runePeek(+d.rpeek); }
   else if (d.rpx) { sfx.click(); $('#runePeek')?.remove(); }
   else if (d.rbag) { sfx.click(); selB = null; if (homeV) homeV.sel = null; monTab = 'mine'; if (!selMon || !monOf(S, selMon)) selMon = units()[0].uid; monMode = 'rune'; show('mons'); }
-  else if (d.rup) { runeUp(runeSel, +d.rup > 1 ? +d.rup : 0); }
+  else if (d.rup) { runeUp(runeSel); }
+  else if (d.rauto) { if (!runeBusy) { sfx.click(); runeUp(runeSel, +d.rauto); } }
+  else if (d.rstop) { if (runeAuto) { runeAuto.goal = runeAuto.ok; runeAuto.stop = true; } }
   else if (d.rjunk) { sfx.click(); runeSellAsk(S.runes.filter(x => !x.on && x.grade === 'common' && !x.lvl).map(x => x.id)); }
   else if (d.show) { showcaseTap(); sfx.chime(); }
   else if (d.unfood) { sfx.click(); food = food.filter(u => u !== +d.unfood); render(); }
@@ -933,7 +991,7 @@ function guard(f: () => void) {
 function frame(now) {
   requestAnimationFrame(frame);
   const rdt = Math.min(.05, (now - last) / 1000); last = now;
-  const sp = scene === battle && battle ? battle.speed : 1, dt = rdt * sp;
+  const sp = scene === battle && battle ? speedMul(battle.speed) : 1, dt = rdt * sp;
   const frozen = E.hitstop > 0; E.hitstop = Math.max(0, E.hitstop - rdt);
   guard(() => { tickEngine(rdt); updScripts(frozen ? 0 : dt); });
   guard(() => scene.update(frozen ? 0 : dt));
@@ -951,7 +1009,7 @@ function frame(now) {
     await loadAssets();
     try { await Promise.race([document.fonts.load('600 20px Mitr'), new Promise(r => setTimeout(r, 2000))]); } catch (e) { }
     initCanvas($('#game'));
-    $('#loading').hidden = true; render(); requestAnimationFrame(frame); setTimeout(() => { prefetchPlates(); prefetchExt(() => { if (!battle && !hatch && cur !== 'home') render(); }); }, 1500); // painted battle plates + Starborn art are separate files
+    $('#loading').hidden = true; render(); requestAnimationFrame(frame); setTimeout(() => { const mapRe = () => { if (cur === 'map' && !battle && !hatch) render(); }; prefetchPlates(id => { if (/^map/.test(id)) mapRe(); }, mapRe); prefetchExt(() => { if (!battle && !hatch && cur !== 'home') render(); }); }, 1500); // painted battle plates + Starborn art are separate files
     (window as any).__w2s = id => { const [x, y] = homeV.bPos(BDEF[id]); const z = E.base * E.zoom; return [(x - E.cam.x) * z + E.W / 2, (y - 30 * homeV.scaleShow - E.cam.y) * z + E.H / 2]; };
     (window as any).__eb = { get S() { return S; }, get battle() { return battle; }, get hatch() { return hatch; }, startBattle, startHatch, startMultiHatch, show, devTool, IMG, sizeK, get homeV() { return homeV; }, get chest() { return chestUI; }, selectB(id) { homeV.sel = id; selB = id; renderPanel(); }, setLocation, LOC_IDS, get E() { return E; } };
   } catch (err) { $('#loading').textContent = 'โหลดไม่สำเร็จ: ' + err.message; console.error(err); }
