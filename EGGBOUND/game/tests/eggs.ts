@@ -1,5 +1,5 @@
 // Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
-import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, ZONES, DIFFS, DIFF_K, stageOf, stageKey, planOf, RARE_FORM_MULT, NAMED_RARE_FORM, ENERGY_MAX, ENERGY_REGEN_MS, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY } from '../src/core/data';
+import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, EVO_NAME, monName, SKILL_MAX, levelCap, statAt, skillAt, STAGES, ZONES, DIFFS, DIFF_K, stageOf, stageKey, planOf, RARE_FORM_MULT, NAMED_RARE_FORM, ENERGY_MAX, ENERGY_REGEN_MS, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
 import { stageUnlocked, rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
 import { startIncub, incubLeft, incubOf, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
@@ -58,6 +58,8 @@ export function eggTests(): number {
     const before = statAt(SPECIES.A01.base.atk, t.lvl, t.stars), m = evolve(s, 1, [5])!;
     ok(!!m && m.stars === 2 && m.lvl === 1 && !monOf(s, 5) && s.gold === 99999 - EVO_GOLD[1], 'evolve ★1→★2 with 1 food');
     ok(EVO_GOLD.join() === '0,600,2000,6000,16000,40000', 'evolve gold doubled (owner 2026-10-14)');
+    ok(monName('A02', 4) === SPECIES.A02.name && monName('A02', 5) === EVO_NAME.A02[0] && monName('A02', 5, true) === EVO_NAME.A02[0] && monName('A02', 2, true) === SPECIES.A02.name, 'evolved name from ★5 (rare forms share it)');
+    ok(monName('B05', 6) === SPECIES.B05.name && Object.keys(EVO_NAME).every(id => SPECIES[id] && monName(id, 6) !== SPECIES[id].name), 'evolved names only for species with evolved art');
     ok(statAt(SPECIES.A01.base.atk, 1, 2) > before * .9, 'new grade Lv1 ≈ old grade max');
     m.lvl = levelCap(2); s.mons.push(newMon(50, 'A02', 1, 2), newMon(51, 'B01', 1, 1));
     ok(!evoCheck(s, 1, [50, 51]).ok, 'food must share the star grade'); s.mons.find(x => x.uid === 51)!.stars = 2;

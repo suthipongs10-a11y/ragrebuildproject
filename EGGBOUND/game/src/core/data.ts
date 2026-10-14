@@ -177,7 +177,7 @@ export const SPECIES: Record<string, SpeciesDef> = {
     id: 'B07', art: 'monB07', name: 'คชสีห์', nameEn: 'Gajasimha', elem: 'light', role: 'Defender', rarity: 'epic',
     base: { hp: 1260, atk: 104, def: 94, spd: 101 },
     leader: { stat: 'def', value: 0.22, text: 'DEF ทั้งทีม +22%' },
-    rarePassive: { kind: 'counter', chance: 0.3, value: 0.8, name: 'งาสวนกลับ', desc: 'ถูกโจมตี 30% สวนกลับด้วยสกิล 1 (พลัง 80%)' },
+    rarePassive: { kind: 'counter', chance: 0.25, value: 0.7, name: 'งาสวนกลับ', desc: 'ถูกโจมตี 25% สวนกลับด้วยสกิล 1 (พลัง 70%)' },
     skills: [
       { id: 'gaja_tusk', name: 'ตะปบงา', desc: 'ตะปบ 1 ตัว 60% ติดเครื่องหมายแสง', cd: 0, target: 'enemy', mult: 1.05, effects: [{ kind: 'mark', elem: 'light', chance: 0.6 }], anim: 'melee' },
       { id: 'gaja_roar', name: 'คำรามคชสีห์', desc: 'ทุกตัว 50% ลด ATK 2 เทิร์น', cd: 3, target: 'enemyAll', mult: 0.55, effects: [{ kind: 'status', status: 'atk_down', turns: 2, chance: 0.5 }], anim: 'volley' },
@@ -345,80 +345,82 @@ export const SPECIES: Record<string, SpeciesDef> = {
 // ---- rare forms = light/dark monsters of their own (decided 2026-10-13): same name, element light or dark (a light species
 // turns dark and a dark one turns light), skill 1 kept in the new element, its own skills 2 and 3 built around the light
 // (protect & restore) or dark (break & curse) mechanics. Stats, leader skill and rare passive are unchanged. ----
+// Tuned 2026-10-14 (owner: an all-rare team may win at most ~15% more, down from +20%): every rare ult cd +1, and
+// the strongest forms toned down (B01 shield/stun, A09 provoke/drain, B04 unheal/heal/brand, B06 cd/revive/heal, B07 counter).
 const AL = 'allies' as const, EN = 'enemies' as const, SF = 'self' as const;
 const RARE_FORMS: Record<string, { elem: Elem; skills: [SkillDef, SkillDef] }> = {
   A01: { elem: 'light', skills: [
     { id: 'fox_l_fang', name: 'เขี้ยวแสงทะลวง', desc: 'กัด 1 ตัวแรง ไม่สนใจ DEF 50%', cd: 3, target: 'enemy', mult: 1.5, ignoreDef: 0.5, effects: [], anim: 'melee' },
-    { id: 'fox_l_judge', name: 'อรุณพิพากษา', desc: 'พุ่งทะลุทุกตัว ไม่สนใจ DEF 30% + คูลดาวน์ทีม −1', cd: 5, target: 'enemyAll', mult: 1.15, ignoreDef: 0.3, effects: [{ kind: 'cdTeam', value: 1, to: AL }], anim: 'ult_dash', ult: true }] },
+    { id: 'fox_l_judge', name: 'อรุณพิพากษา', desc: 'พุ่งทะลุทุกตัว ไม่สนใจ DEF 30% + คูลดาวน์ทีม −1', cd: 6, target: 'enemyAll', mult: 1.15, ignoreDef: 0.3, effects: [{ kind: 'cdTeam', value: 1, to: AL }], anim: 'ult_dash', ult: true }] },
   A02: { elem: 'light', skills: [
     { id: 'slime_l_ward', name: 'ฟองภูมิคุ้มกัน', desc: 'ฮีลทั้งทีม 20% + ภูมิคุ้มกัน 2 เทิร์น', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.2, to: AL }, { kind: 'status', status: 'immunity', turns: 2, to: AL }], anim: 'heal' },
-    { id: 'slime_l_pearl', name: 'ธารามุกอมตะ', desc: 'ฮีลทั้งทีม 30% + อมตะทั้งทีม 1 เทิร์น + ศัตรูทุกตัวติดเครื่องหมายแสง', cd: 6, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.3, to: AL }, { kind: 'status', status: 'invincible', turns: 1, to: AL }, { kind: 'mark', elem: 'light', chance: 1, to: EN }], anim: 'ult_starlight', ult: true }] },
+    { id: 'slime_l_pearl', name: 'ธารามุกอมตะ', desc: 'ฮีลทั้งทีม 30% + อมตะทั้งทีม 1 เทิร์น + ศัตรูทุกตัวติดเครื่องหมายแสง', cd: 7, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.3, to: AL }, { kind: 'status', status: 'invincible', turns: 1, to: AL }, { kind: 'mark', elem: 'light', chance: 1, to: EN }], anim: 'ult_starlight', ult: true }] },
   A03: { elem: 'dark', skills: [
     { id: 'owl_d_curse', name: 'ขนนกต้องสาป', desc: 'ใส่ 1 ตัว ขโมยเกจ 40 + 60% หลับ 2 เทิร์น', cd: 3, target: 'enemy', mult: 0.9, effects: [{ kind: 'steal', value: 40 }, { kind: 'status', status: 'sleep', turns: 2, chance: 0.6 }], anim: 'shot' },
-    { id: 'owl_d_silence', name: 'ราตรีไร้เสียง', desc: 'ทุกตัว 50% ผนึกสกิล 2 เทิร์น + ลดเกจ 20', cd: 4, target: 'enemyAll', mult: 0.6, effects: [{ kind: 'status', status: 'silence', turns: 2, chance: 0.5 }, { kind: 'atb', value: -20 }], anim: 'ult_nightwave', ult: true }] },
+    { id: 'owl_d_silence', name: 'ราตรีไร้เสียง', desc: 'ทุกตัว 50% ผนึกสกิล 2 เทิร์น + ลดเกจ 20', cd: 5, target: 'enemyAll', mult: 0.6, effects: [{ kind: 'status', status: 'silence', turns: 2, chance: 0.5 }, { kind: 'atb', value: -20 }], anim: 'ult_nightwave', ult: true }] },
   A04: { elem: 'dark', skills: [
     { id: 'golem_d_brand', name: 'ศิลาตราบาป', desc: 'ทุบ 1 ตัว ติดตราบาป 2 เทิร์น + โล่ทั้งทีม 12%', cd: 3, target: 'enemy', mult: 1.0, effects: [{ kind: 'status', status: 'brand', turns: 2, chance: 1 }, { kind: 'shield', value: 0.12, turns: 2, to: AL }], anim: 'melee' },
-    { id: 'golem_d_swallow', name: 'แผ่นดินกลืน', desc: 'ทุกตัว 50% ยั่วยุ 1 เทิร์น + 70% ลด DEF 2 เทิร์น', cd: 4, target: 'enemyAll', mult: 0.8, effects: [{ kind: 'status', status: 'provoke', turns: 1, chance: 0.5 }, { kind: 'status', status: 'def_down', turns: 2, chance: 0.7 }], anim: 'ult_quake', ult: true }] },
+    { id: 'golem_d_swallow', name: 'แผ่นดินกลืน', desc: 'ทุกตัว 50% ยั่วยุ 1 เทิร์น + 70% ลด DEF 2 เทิร์น', cd: 5, target: 'enemyAll', mult: 0.8, effects: [{ kind: 'status', status: 'provoke', turns: 1, chance: 0.5 }, { kind: 'status', status: 'def_down', turns: 2, chance: 0.7 }], anim: 'ult_quake', ult: true }] },
   A05: { elem: 'dark', skills: [
     { id: 'sprite_d_bless', name: 'พรเงา', desc: 'เกจทีม +20 + ศัตรูทุกตัวติดตราบาป 1 เทิร์น', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'atb', value: 20, to: AL }, { kind: 'status', status: 'brand', turns: 1, chance: 1, to: EN }], anim: 'buff' },
-    { id: 'sprite_d_steal', name: 'ราตรีขโมยดาว', desc: 'ขโมยเกจศัตรูทุกตัว 25 แบ่งให้ทีม + 40% ผนึกสกิล 1 เทิร์น', cd: 4, target: 'enemyAll', mult: 0.5, effects: [{ kind: 'steal', value: 25 }, { kind: 'status', status: 'silence', turns: 1, chance: 0.4 }], anim: 'ult_nightwave', ult: true }] },
+    { id: 'sprite_d_steal', name: 'ราตรีขโมยดาว', desc: 'ขโมยเกจศัตรูทุกตัว 25 แบ่งให้ทีม + 40% ผนึกสกิล 1 เทิร์น', cd: 5, target: 'enemyAll', mult: 0.5, effects: [{ kind: 'steal', value: 25 }, { kind: 'status', status: 'silence', turns: 1, chance: 0.4 }], anim: 'ult_nightwave', ult: true }] },
   A06: { elem: 'light', skills: [
     { id: 'shroom_l_ward', name: 'ละอองคุ้มภัย', desc: 'ทีมภูมิคุ้มกัน 1 เทิร์น + ศัตรูทุกตัว 50% ลด SPD 2 เทิร์น', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'status', status: 'immunity', turns: 1, to: AL }, { kind: 'status', status: 'spd_down', turns: 2, chance: 0.5, to: EN }], anim: 'buff' },
-    { id: 'shroom_l_moon', name: 'จันทร์ชำระ', desc: 'ทุกตัว ไม่สนใจ DEF 30% + 50% หลับ 1 เทิร์น', cd: 4, target: 'enemyAll', mult: 0.7, ignoreDef: 0.3, effects: [{ kind: 'status', status: 'sleep', turns: 1, chance: 0.5 }], anim: 'ult_starlight', ult: true }] },
+    { id: 'shroom_l_moon', name: 'จันทร์ชำระ', desc: 'ทุกตัว ไม่สนใจ DEF 30% + 50% หลับ 1 เทิร์น', cd: 5, target: 'enemyAll', mult: 0.7, ignoreDef: 0.3, effects: [{ kind: 'status', status: 'sleep', turns: 1, chance: 0.5 }], anim: 'ult_starlight', ult: true }] },
   A07: { elem: 'dark', skills: [
     { id: 'eggling_d_bomb', name: 'เปลือกระเบิด', desc: 'ติดระเบิดเงาใส่ 1 ตัว (ครบ 2 เทิร์นระเบิด + มึน) + โล่ทั้งทีม 12%', cd: 3, target: 'enemy', mult: 0.6, effects: [{ kind: 'status', status: 'bomb', turns: 2, chance: 1, value: 1.2 }, { kind: 'shield', value: 0.12, turns: 2, to: AL }], anim: 'shot' },
-    { id: 'eggling_d_hell', name: 'ฟักนรก!', desc: 'ลูกเจี๊ยบเงารุมตีทุกตัว ติดเครื่องหมายมืด + 70% ตราบาป + ห้ามฮีล 2 เทิร์น', cd: 4, target: 'enemyAll', mult: 0.85, effects: [{ kind: 'mark', elem: 'dark', chance: 1 }, { kind: 'status', status: 'brand', turns: 2, chance: 0.7 }, { kind: 'status', status: 'unheal', turns: 2, chance: 0.7 }], anim: 'ult_nightwave', ult: true }] },
+    { id: 'eggling_d_hell', name: 'ฟักนรก!', desc: 'ลูกเจี๊ยบเงารุมตีทุกตัว ติดเครื่องหมายมืด + 70% ตราบาป + ห้ามฮีล 2 เทิร์น', cd: 5, target: 'enemyAll', mult: 0.85, effects: [{ kind: 'mark', elem: 'dark', chance: 1 }, { kind: 'status', status: 'brand', turns: 2, chance: 0.7 }, { kind: 'status', status: 'unheal', turns: 2, chance: 0.7 }], anim: 'ult_nightwave', ult: true }] },
   A08: { elem: 'light', skills: [
     { id: 'wisp_l_ward', name: 'แสงโคมนำทาง', desc: 'ทีมภูมิคุ้มกัน 2 เทิร์น + เกจ 15', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'status', status: 'immunity', turns: 2, to: AL }, { kind: 'atb', value: 15, to: AL }], anim: 'buff' },
-    { id: 'wisp_l_heaven', name: 'โคมสวรรค์', desc: 'ชุบชีวิตพวกที่ล้ม 1 ตัว HP 40% + ทีมอมตะ 1 เทิร์น', cd: 5, target: 'allyAll', mult: 0, effects: [{ kind: 'revive', value: 0.4, n: 1 }, { kind: 'status', status: 'invincible', turns: 1, to: AL }], anim: 'ult_starlight', ult: true }] },
+    { id: 'wisp_l_heaven', name: 'โคมสวรรค์', desc: 'ชุบชีวิตพวกที่ล้ม 1 ตัว HP 40% + ทีมอมตะ 1 เทิร์น', cd: 6, target: 'allyAll', mult: 0, effects: [{ kind: 'revive', value: 0.4, n: 1 }, { kind: 'status', status: 'invincible', turns: 1, to: AL }], anim: 'ult_starlight', ult: true }] },
   A09: { elem: 'dark', skills: [
     { id: 'root_d_poison', name: 'รากพิษ', desc: 'ทุกตัว 60% พิษ + ห้ามฮีล 2 เทิร์น', cd: 3, target: 'enemyAll', mult: 0.6, effects: [{ kind: 'status', status: 'poison', turns: 2, chance: 0.6 }, { kind: 'status', status: 'unheal', turns: 2, chance: 0.6 }], anim: 'volley' },
-    { id: 'root_d_abyss', name: 'ป่าอเวจี', desc: 'รากเงาใต้ทุกตัว 60% ยั่วยุ 1 เทิร์น + ดูดชีวิต 30%', cd: 5, target: 'enemyAll', mult: 1.0, effects: [{ kind: 'status', status: 'provoke', turns: 1, chance: 0.6 }, { kind: 'drain', value: 0.3, to: SF }], anim: 'ult_roots', ult: true }] },
+    { id: 'root_d_abyss', name: 'ป่าอเวจี', desc: 'รากเงาใต้ทุกตัว 40% ยั่วยุ 1 เทิร์น + ดูดชีวิต 20%', cd: 6, target: 'enemyAll', mult: 1.0, effects: [{ kind: 'status', status: 'provoke', turns: 1, chance: 0.4 }, { kind: 'drain', value: 0.2, to: SF }], anim: 'ult_roots', ult: true }] },
   B01: { elem: 'light', skills: [
-    { id: 'buffalo_l_ward', name: 'ยันต์อมตะ', desc: 'ตัวเองอมตะ 1 เทิร์น + โล่ทั้งทีม 15%', cd: 4, target: 'allyAll', mult: 0, effects: [{ kind: 'status', status: 'invincible', turns: 1, to: SF }, { kind: 'shield', value: 0.15, turns: 2, to: AL }], anim: 'shield' },
-    { id: 'buffalo_l_horn', name: 'ขวิดศักดิ์สิทธิ์', desc: 'พุ่งชนทุกตัว ไม่สนใจ DEF 30% + 35% มึน 1 เทิร์น', cd: 5, target: 'enemyAll', mult: 0.9, ignoreDef: 0.3, effects: [{ kind: 'status', status: 'stun', turns: 1, chance: 0.35 }], anim: 'ult_dash', ult: true }] },
+    { id: 'buffalo_l_ward', name: 'ยันต์อมตะ', desc: 'ตัวเองอมตะ 1 เทิร์น + โล่ทั้งทีม 10%', cd: 5, target: 'allyAll', mult: 0, effects: [{ kind: 'status', status: 'invincible', turns: 1, to: SF }, { kind: 'shield', value: 0.1, turns: 2, to: AL }], anim: 'shield' },
+    { id: 'buffalo_l_horn', name: 'ขวิดศักดิ์สิทธิ์', desc: 'พุ่งชนทุกตัว ไม่สนใจ DEF 30% + 25% มึน 1 เทิร์น', cd: 6, target: 'enemyAll', mult: 0.9, ignoreDef: 0.3, effects: [{ kind: 'status', status: 'stun', turns: 1, chance: 0.25 }], anim: 'ult_dash', ult: true }] },
   B02: { elem: 'light', skills: [
     { id: 'effigy_l_thread', name: 'ด้ายผูกแสง', desc: 'ใส่ 1 ตัว ไม่สนใจ DEF 50% + 60% มึน 1 เทิร์น', cd: 3, target: 'enemy', mult: 1.0, ignoreDef: 0.5, effects: [{ kind: 'status', status: 'stun', turns: 1, chance: 0.6 }], anim: 'shot' },
-    { id: 'effigy_l_charm', name: 'หุ่นมงคลรับเคราะห์', desc: 'ทีมภูมิคุ้มกัน 2 เทิร์น + ศัตรูทุกตัว 40% หลับ 1 เทิร์น + 50% ลด DEF 2 เทิร์น', cd: 4, target: 'allyAll', mult: 0, effects: [{ kind: 'status', status: 'immunity', turns: 2, to: AL }, { kind: 'status', status: 'sleep', turns: 1, chance: 0.4, to: EN }, { kind: 'status', status: 'def_down', turns: 2, chance: 0.5, to: EN }], anim: 'ult_starlight', ult: true }] },
+    { id: 'effigy_l_charm', name: 'หุ่นมงคลรับเคราะห์', desc: 'ทีมภูมิคุ้มกัน 2 เทิร์น + ศัตรูทุกตัว 40% หลับ 1 เทิร์น + 50% ลด DEF 2 เทิร์น', cd: 5, target: 'allyAll', mult: 0, effects: [{ kind: 'status', status: 'immunity', turns: 2, to: AL }, { kind: 'status', status: 'sleep', turns: 1, chance: 0.4, to: EN }, { kind: 'status', status: 'def_down', turns: 2, chance: 0.5, to: EN }], anim: 'ult_starlight', ult: true }] },
   B03: { elem: 'light', skills: [
     { id: 'hatsa_l_rush', name: 'งวงเร่งลม', desc: 'ฟาด 1 ตัวแรง + คูลดาวน์ทีม −1', cd: 3, target: 'enemy', mult: 1.3, effects: [{ kind: 'cdTeam', value: 1, to: AL }], anim: 'melee' },
-    { id: 'hatsa_l_sun', name: 'ปีกสุริยะ', desc: 'คลื่นแสงทุกตัว ไม่สนใจ DEF 30% + 50% ตาบอด 2 เทิร์น', cd: 5, target: 'enemyAll', mult: 0.95, ignoreDef: 0.3, effects: [{ kind: 'status', status: 'blind', turns: 2, chance: 0.5 }], anim: 'ult_nightwave', ult: true }] },
+    { id: 'hatsa_l_sun', name: 'ปีกสุริยะ', desc: 'คลื่นแสงทุกตัว ไม่สนใจ DEF 30% + 50% ตาบอด 2 เทิร์น', cd: 6, target: 'enemyAll', mult: 0.95, ignoreDef: 0.3, effects: [{ kind: 'status', status: 'blind', turns: 2, chance: 0.5 }], anim: 'ult_nightwave', ult: true }] },
   B04: { elem: 'dark', skills: [
-    { id: 'dryad_d_curse', name: 'สาปตะเคียน', desc: 'ศัตรูทุกตัว 70% ห้ามฮีล 2 เทิร์น + ทีมฟื้นฟู 2 เทิร์น', cd: 3, target: 'enemyAll', mult: 0.4, effects: [{ kind: 'status', status: 'unheal', turns: 2, chance: 0.7 }, { kind: 'status', status: 'regen', turns: 2, to: AL }], anim: 'volley' },
-    { id: 'dryad_d_soul', name: 'วิญญาณคืนร่าง', desc: 'ชุบชีวิตพวกที่ล้ม 1 ตัว HP 30% + ฮีลทั้งทีม 22% + ศัตรูทุกตัว 80% ตราบาป', cd: 5, target: 'allyAll', mult: 0, effects: [{ kind: 'revive', value: 0.3, n: 1 }, { kind: 'heal', value: 0.22, to: AL }, { kind: 'status', status: 'brand', turns: 2, chance: 0.8, to: EN }], anim: 'ult_rain', ult: true }] },
+    { id: 'dryad_d_curse', name: 'สาปตะเคียน', desc: 'ศัตรูทุกตัว 50% ห้ามฮีล 2 เทิร์น + ทีมฟื้นฟู 2 เทิร์น', cd: 3, target: 'enemyAll', mult: 0.4, effects: [{ kind: 'status', status: 'unheal', turns: 2, chance: 0.5 }, { kind: 'status', status: 'regen', turns: 2, to: AL }], anim: 'volley' },
+    { id: 'dryad_d_soul', name: 'วิญญาณคืนร่าง', desc: 'ชุบชีวิตพวกที่ล้ม 1 ตัว HP 30% + ฮีลทั้งทีม 15% + ศัตรูทุกตัว 60% ตราบาป', cd: 6, target: 'allyAll', mult: 0, effects: [{ kind: 'revive', value: 0.3, n: 1 }, { kind: 'heal', value: 0.15, to: AL }, { kind: 'status', status: 'brand', turns: 2, chance: 0.6, to: EN }], anim: 'ult_rain', ult: true }] },
   B05: { elem: 'light', skills: [
     { id: 'saming_l_claw', name: 'ตะปบทะลวง', desc: 'ขย้ำ 1 ตัวแรง ไม่สนใจ DEF 50% + 50% ตาบอด 2 เทิร์น', cd: 3, target: 'enemy', mult: 1.5, ignoreDef: 0.5, effects: [{ kind: 'status', status: 'blind', turns: 2, chance: 0.5 }], anim: 'melee' },
-    { id: 'saming_l_divine', name: 'พยัคฆ์เทวะ', desc: 'พุ่งทะลุทุกตัว + ตัวเองอมตะ 1 เทิร์น', cd: 5, target: 'enemyAll', mult: 1.3, effects: [{ kind: 'status', status: 'invincible', turns: 1, to: SF }], anim: 'ult_dash', ult: true }] },
+    { id: 'saming_l_divine', name: 'พยัคฆ์เทวะ', desc: 'พุ่งทะลุทุกตัว + ตัวเองอมตะ 1 เทิร์น', cd: 6, target: 'enemyAll', mult: 1.3, effects: [{ kind: 'status', status: 'invincible', turns: 1, to: SF }], anim: 'ult_dash', ult: true }] },
   B06: { elem: 'light', skills: [
-    { id: 'kinnari_l_gold', name: 'ระบำทอง', desc: 'ฮีลทั้งทีม 18% + คูลดาวน์ทีม −1', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.18, to: AL }, { kind: 'cdTeam', value: 1, to: AL }], anim: 'heal' },
-    { id: 'kinnari_l_rebirth', name: 'ฟ้อนคืนชีวิต', desc: 'ชุบชีวิตพวกที่ล้มทุกตัว HP 30% + ฮีลทั้งทีม 22% + ล้างสถานะ', cd: 6, target: 'allyAll', mult: 0, effects: [{ kind: 'revive', value: 0.3 }, { kind: 'heal', value: 0.22, to: AL }, { kind: 'cleanse', to: AL }], anim: 'ult_starlight', ult: true }] },
+    { id: 'kinnari_l_gold', name: 'ระบำทอง', desc: 'ฮีลทั้งทีม 18% + คูลดาวน์ทีม −1', cd: 4, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.18, to: AL }, { kind: 'cdTeam', value: 1, to: AL }], anim: 'heal' },
+    { id: 'kinnari_l_rebirth', name: 'ฟ้อนคืนชีวิต', desc: 'ชุบชีวิตพวกที่ล้มทุกตัว HP 25% + ฮีลทั้งทีม 15% + ล้างสถานะ', cd: 7, target: 'allyAll', mult: 0, effects: [{ kind: 'revive', value: 0.25 }, { kind: 'heal', value: 0.15, to: AL }, { kind: 'cleanse', to: AL }], anim: 'ult_starlight', ult: true }] },
   B07: { elem: 'dark', skills: [
     { id: 'gaja_d_roar', name: 'คำรามท้าทาย', desc: 'ทุกตัว 50% ยั่วยุ 1 เทิร์น + 50% ลด ATK 2 เทิร์น', cd: 3, target: 'enemyAll', mult: 0.55, effects: [{ kind: 'status', status: 'provoke', turns: 1, chance: 0.5 }, { kind: 'status', status: 'atk_down', turns: 2, chance: 0.5 }], anim: 'volley' },
-    { id: 'gaja_d_abyss', name: 'งาอเวจี', desc: 'ทุกตัว ลบบัฟทั้งหมด + โล่ตัวเอง 30%', cd: 4, target: 'enemyAll', mult: 0.9, effects: [{ kind: 'strip' }, { kind: 'shield', value: 0.3, turns: 2, to: SF }], anim: 'ult_quake', ult: true }] },
+    { id: 'gaja_d_abyss', name: 'งาอเวจี', desc: 'ทุกตัว ลบบัฟทั้งหมด + โล่ตัวเอง 30%', cd: 5, target: 'enemyAll', mult: 0.9, effects: [{ kind: 'strip' }, { kind: 'shield', value: 0.3, turns: 2, to: SF }], anim: 'ult_quake', ult: true }] },
   B08: { elem: 'light', skills: [
     { id: 'garuda_l_dive', name: 'โฉบสุริยะ', desc: 'โฉบ 1 ตัวแรง ไม่สนใจ DEF 50% + 60% ตาบอด 2 เทิร์น', cd: 3, target: 'enemy', mult: 1.7, ignoreDef: 0.5, effects: [{ kind: 'status', status: 'blind', turns: 2, chance: 0.6 }], anim: 'melee' },
-    { id: 'garuda_l_sunfire', name: 'เพลิงสุริยครุฑ', desc: 'ทุกตัวแรง ลดเกจ 20 + คูลดาวน์ทีม −1', cd: 5, target: 'enemyAll', mult: 1.4, effects: [{ kind: 'atb', value: -20 }, { kind: 'cdTeam', value: 1, to: AL }], anim: 'ult_dash', ult: true }] },
+    { id: 'garuda_l_sunfire', name: 'เพลิงสุริยครุฑ', desc: 'ทุกตัวแรง ลดเกจ 20 + คูลดาวน์ทีม −1', cd: 6, target: 'enemyAll', mult: 1.4, effects: [{ kind: 'atb', value: -20 }, { kind: 'cdTeam', value: 1, to: AL }], anim: 'ult_dash', ult: true }] },
   B09: { elem: 'light', skills: [
     { id: 'naga_l_jewel', name: 'มณีส่องฟ้า', desc: 'ทุกตัว ไม่สนใจ DEF 30% + 50% ตาบอด 2 เทิร์น', cd: 3, target: 'enemyAll', mult: 0.8, ignoreDef: 0.3, effects: [{ kind: 'status', status: 'blind', turns: 2, chance: 0.5 }], anim: 'volley' },
-    { id: 'naga_l_avatar', name: 'นาคราชอวตาร', desc: 'ทุกตัวแรง + ทีมอมตะ 1 เทิร์น + เกจทีม 20', cd: 5, target: 'enemyAll', mult: 1.45, effects: [{ kind: 'status', status: 'invincible', turns: 1, to: AL }, { kind: 'atb', value: 20, to: AL }], anim: 'ult_starlight', ult: true }] },
+    { id: 'naga_l_avatar', name: 'นาคราชอวตาร', desc: 'ทุกตัวแรง + ทีมอมตะ 1 เทิร์น + เกจทีม 20', cd: 6, target: 'enemyAll', mult: 1.45, effects: [{ kind: 'status', status: 'invincible', turns: 1, to: AL }, { kind: 'atb', value: 20, to: AL }], anim: 'ult_starlight', ult: true }] },
   C01: { elem: 'light', skills: [
     { id: 'pixiu_l_absorb', name: 'กลืนเคราะห์', desc: 'ล้างสถานะทั้งทีม + ภูมิคุ้มกัน 2 เทิร์น', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'cleanse', to: AL }, { kind: 'status', status: 'immunity', turns: 2, to: AL }], anim: 'buff' },
-    { id: 'pixiu_l_rain', name: 'ฝนทองมงคล', desc: 'ATK และคริขึ้นทั้งทีม 2 เทิร์น + คูลดาวน์ทีม −1', cd: 5, target: 'allyAll', mult: 0, effects: [{ kind: 'status', status: 'atk_up', turns: 2, to: AL }, { kind: 'status', status: 'crit_up', turns: 2, to: AL }, { kind: 'cdTeam', value: 1, to: AL }], anim: 'ult_starlight', ult: true }] },
+    { id: 'pixiu_l_rain', name: 'ฝนทองมงคล', desc: 'ATK และคริขึ้นทั้งทีม 2 เทิร์น + คูลดาวน์ทีม −1', cd: 6, target: 'allyAll', mult: 0, effects: [{ kind: 'status', status: 'atk_up', turns: 2, to: AL }, { kind: 'status', status: 'crit_up', turns: 2, to: AL }, { kind: 'cdTeam', value: 1, to: AL }], anim: 'ult_starlight', ult: true }] },
   C02: { elem: 'dark', skills: [
     { id: 'toad_d_coin', name: 'เหรียญต้องสาป', desc: 'ทุกตัว ลบบัฟ 1 อย่าง + 50% ลด ATK 2 เทิร์น', cd: 3, target: 'enemyAll', mult: 0.5, effects: [{ kind: 'strip', n: 1 }, { kind: 'status', status: 'atk_down', turns: 2, chance: 0.5 }], anim: 'volley' },
-    { id: 'toad_d_doom', name: 'เคราะห์มาเยือน', desc: 'ทุกตัว 80% ตราบาป 2 เทิร์น + ขโมยเกจ 20', cd: 4, target: 'enemyAll', mult: 0.6, effects: [{ kind: 'status', status: 'brand', turns: 2, chance: 0.8 }, { kind: 'steal', value: 20 }], anim: 'ult_nightwave', ult: true }] },
+    { id: 'toad_d_doom', name: 'เคราะห์มาเยือน', desc: 'ทุกตัว 80% ตราบาป 2 เทิร์น + ขโมยเกจ 20', cd: 5, target: 'enemyAll', mult: 0.6, effects: [{ kind: 'status', status: 'brand', turns: 2, chance: 0.8 }, { kind: 'steal', value: 20 }], anim: 'ult_nightwave', ult: true }] },
   C03: { elem: 'light', skills: [
     { id: 'lion_l_ward', name: 'ลูกแก้วปกป้อง', desc: 'ปกป้องทั้งทีม 2 เทิร์น + DEF ตัวเองขึ้น 2 เทิร์น', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'status', status: 'protect', turns: 2, to: AL }, { kind: 'status', status: 'def_up', turns: 2, to: SF }], anim: 'shield' },
-    { id: 'lion_l_roar', name: 'คำรามสิงห์ทอง', desc: 'ทุกตัว 40% มึน 1 เทิร์น + ทีมภูมิคุ้มกัน 2 เทิร์น', cd: 5, target: 'enemyAll', mult: 0.8, effects: [{ kind: 'status', status: 'stun', turns: 1, chance: 0.4 }, { kind: 'status', status: 'immunity', turns: 2, to: AL }], anim: 'ult_quake', ult: true }] },
+    { id: 'lion_l_roar', name: 'คำรามสิงห์ทอง', desc: 'ทุกตัว 40% มึน 1 เทิร์น + ทีมภูมิคุ้มกัน 2 เทิร์น', cd: 6, target: 'enemyAll', mult: 0.8, effects: [{ kind: 'status', status: 'stun', turns: 1, chance: 0.4 }, { kind: 'status', status: 'immunity', turns: 2, to: AL }], anim: 'ult_quake', ult: true }] },
   C04: { elem: 'dark', skills: [
     { id: 'rabbit_d_potion', name: 'ยาจันทร์ดับ', desc: 'ฮีลทั้งทีม 18% + ศัตรูทุกตัว 35% ห้ามฮีล 2 เทิร์น', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.18, to: AL }, { kind: 'status', status: 'unheal', turns: 2, chance: 0.35, to: EN }], anim: 'heal' },
-    { id: 'rabbit_d_eclipse', name: 'คืนจันทร์ดับ', desc: 'ฮีลทั้งทีม 25% + ศัตรูทุกตัวลบบัฟ 1 อย่าง + ขโมยเกจ 15', cd: 5, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.25, to: AL }, { kind: 'strip', n: 1, to: EN }, { kind: 'steal', value: 15, to: EN }], anim: 'ult_starlight', ult: true }] },
+    { id: 'rabbit_d_eclipse', name: 'คืนจันทร์ดับ', desc: 'ฮีลทั้งทีม 25% + ศัตรูทุกตัวลบบัฟ 1 อย่าง + ขโมยเกจ 15', cd: 6, target: 'allyAll', mult: 0, effects: [{ kind: 'heal', value: 0.25, to: AL }, { kind: 'strip', n: 1, to: EN }, { kind: 'steal', value: 15, to: EN }], anim: 'ult_starlight', ult: true }] },
   C05: { elem: 'dark', skills: [
     { id: 'kitsune_d_illusion', name: 'มนตร์ลวงตา', desc: 'ใส่ 1 ตัว ลบบัฟทั้งหมด + 60% หลับ 2 เทิร์น', cd: 3, target: 'enemy', mult: 1.0, effects: [{ kind: 'strip' }, { kind: 'status', status: 'sleep', turns: 2, chance: 0.6 }], anim: 'shot' },
-    { id: 'kitsune_d_bomb', name: 'ระเบิดเก้าหาง', desc: 'ทุกตัว ติดเครื่องหมายมืด + 60% ติดระเบิดเงา (ครบ 2 เทิร์นระเบิด + มึน)', cd: 5, target: 'enemyAll', mult: 0.7, effects: [{ kind: 'mark', elem: 'dark', chance: 1 }, { kind: 'status', status: 'bomb', turns: 2, chance: 0.6, value: 0.9 }], anim: 'ult_nightwave', ult: true }] },
+    { id: 'kitsune_d_bomb', name: 'ระเบิดเก้าหาง', desc: 'ทุกตัว ติดเครื่องหมายมืด + 60% ติดระเบิดเงา (ครบ 2 เทิร์นระเบิด + มึน)', cd: 6, target: 'enemyAll', mult: 0.7, effects: [{ kind: 'mark', elem: 'dark', chance: 1 }, { kind: 'status', status: 'bomb', turns: 2, chance: 0.6, value: 0.9 }], anim: 'ult_nightwave', ult: true }] },
   C06: { elem: 'dark', skills: [
     { id: 'bull_d_taunt', name: 'โทสะท้าทาย', desc: 'ทุบ 1 ตัว ยั่วยุ 2 เทิร์น + โล่ตัวเอง 25%', cd: 3, target: 'enemy', mult: 1.0, effects: [{ kind: 'status', status: 'provoke', turns: 2, chance: 1 }, { kind: 'shield', value: 0.25, turns: 2, to: SF }], anim: 'melee' },
-    { id: 'bull_d_hell', name: 'ทุบนรก', desc: 'ทุกตัว 30% มึน + 60% ห้ามฮีล 2 เทิร์น + ดูดชีวิต 25%', cd: 5, target: 'enemyAll', mult: 1.1, effects: [{ kind: 'status', status: 'stun', turns: 1, chance: 0.3 }, { kind: 'status', status: 'unheal', turns: 2, chance: 0.6 }, { kind: 'drain', value: 0.25, to: SF }], anim: 'ult_quake', ult: true }] },
+    { id: 'bull_d_hell', name: 'ทุบนรก', desc: 'ทุกตัว 30% มึน + 60% ห้ามฮีล 2 เทิร์น + ดูดชีวิต 25%', cd: 6, target: 'enemyAll', mult: 1.1, effects: [{ kind: 'status', status: 'stun', turns: 1, chance: 0.3 }, { kind: 'status', status: 'unheal', turns: 2, chance: 0.6 }, { kind: 'drain', value: 0.25, to: SF }], anim: 'ult_quake', ult: true }] },
 };
 for (const [id, f] of Object.entries(RARE_FORMS)) SPECIES[id].rareForm = f;
 const MARK_TH: Partial<Record<Elem, string[]>> = { water: ['น้ำ', 'เปียก'] };
@@ -568,6 +570,15 @@ export const NAT_STARS: Record<Rarity, number> = { common: 1, rare: 2, epic: 4, 
 export const MAX_STARS = 6;
 /** stars a monster hatches with: by rarity, +1 for the rare form (stronger, so it starts a grade higher), max ★6 */
 export const natStars = (sid: string, rare = false) => Math.min(6, (NAT_STARS[SPECIES[sid]?.rarity] || 1) + (rare ? 1 : 0));
+/** evolved-form names (owner 2026-10-14: odd Thai + foreign mixes), shown with the evolved art — add one when a species'
+ *  evolved art (`mon<ID>e_*`) is imported, so a name never shows up on the old picture. Rare forms share it. */
+export const EVO_NAME: Record<string, [string, string]> = {
+  A01: ['อรุณโซลาริส', 'Arun Solaris'], A02: ['ควีนมุกธารา', 'Queen Mukthara'], A03: ['วายุเทมเปสต์', 'Vayu Tempest'],
+  A04: ['มรกตโคลอสซัส', 'Morakot Colossus'], A05: ['นภาสเตลลาร์', 'Nabha Stellar'], A06: ['ไมโครากษส', 'Myco Raksha'],
+};
+/** raised past its natural stars to ★5+ = the evolved form (the same rule as the evolved art, `lookOf` in assets.ts) */
+export const isEvolved = (sid: string, stars: number, rare = false) => stars >= 5 && stars > natStars(sid, rare);
+export const monName = (sid: string, stars = 0, rare = false) => (isEvolved(sid, stars, rare) && EVO_NAME[sid]?.[0]) || SPECIES[sid].name;
 
 // ---- eggs (P1 M0) ----
 // Mystery egg: species unknown until it hatches; only the shell pattern (tier) shows the rarity.

@@ -4,7 +4,7 @@
 import { E, run, tween, burst, ring, text, shake, flash, addP, drawParts, screenTransform, clamp, lerp, rnd, easeOut, easeBack } from './engine';
 import { spr, mk, dot, PAL, PIV, TAU, TIER_COL, IMG, lookOf } from './assets';
 import { sfx } from './audio';
-import { SPECIES } from '../core/data';
+import { SPECIES, monName } from '../core/data';
 import { BUILDINGS, BDEF, TURTLE_SCALE, home, mineStored, mineCap, unlocked, ELEMS } from '../game/home';
 
 const SKY = ['#7fb8f2', '#b9dcfb', '#ffe9cf'];
@@ -253,8 +253,8 @@ export class HomeView {
     const units = this.S.mons.filter(m => SPECIES[m.sid] && !SPECIES[m.sid].boss), inTeam = u => this.S.team.includes(u.uid);
     const ordered = [...units.filter(inTeam), ...units.filter(u => !inTeam(u)).sort((a, b) => b.stars - a.stars || b.lvl - a.lvl)].slice(0, MAX_HOME_MONS);
     const keep = this.mons.filter(m => ordered.some(u => u.uid === m.uid));
-    for (const k of keep) { const u = ordered.find(x => x.uid === k.uid); k.sid = lookOf(u.sid, u.stars, !!u.rare); }
-    for (const u of ordered) if (!keep.find(m => m.uid === u.uid)) { const p = this.freePoint(); keep.push({ uid: u.uid, sid: lookOf(u.sid, u.stars, !!u.rare), x: p[0], y: p[1], tx: p[0], ty: p[1], wait: rnd(.2, 2), flip: Math.random() < .5, back: false, walk: 0, hop: 0, vz: 0, z: 0, emo: null, emoT: rnd(3, 10), ph: Math.random() * 9 }); }
+    for (const k of keep) { const u = ordered.find(x => x.uid === k.uid); k.sid = lookOf(u.sid, u.stars, !!u.rare); k.name = monName(u.sid, u.stars, !!u.rare); }
+    for (const u of ordered) if (!keep.find(m => m.uid === u.uid)) { const p = this.freePoint(); keep.push({ uid: u.uid, sid: lookOf(u.sid, u.stars, !!u.rare), name: monName(u.sid, u.stars, !!u.rare), x: p[0], y: p[1], tx: p[0], ty: p[1], wait: rnd(.2, 2), flip: Math.random() < .5, back: false, walk: 0, hop: 0, vz: 0, z: 0, emo: null, emoT: rnd(3, 10), ph: Math.random() * 9 }); }
     this.mons = keep;
   }
   freePoint() {
@@ -442,7 +442,7 @@ export class HomeView {
   }
   tap(wx, wy) {
     const r = this.hit(wx, wy);
-    if (r?.mon) { const m = r.mon, [x, y] = this.L(m.x, m.y); m.vz = 260; m.z = .01; m.emo = { c: '♥', t: 1.6 }; burst(x, y - 60 * MR * this.scaleShow, 0, 8, '#ff7a9a', 120, 9, .7, { grav: -40 }); text(x, y - 90 * MR * this.scaleShow, SPECIES[m.sid].name, '#fff3d0', 16); sfx.chime(); this.opts.onMon?.(m.sid); return; }
+    if (r?.mon) { const m = r.mon, [x, y] = this.L(m.x, m.y); m.vz = 260; m.z = .01; m.emo = { c: '♥', t: 1.6 }; burst(x, y - 60 * MR * this.scaleShow, 0, 8, '#ff7a9a', 120, 9, .7, { grav: -40 }); text(x, y - 90 * MR * this.scaleShow, m.name, '#fff3d0', 16); sfx.chime(); this.opts.onMon?.(m.sid); return; }
     if (r?.head) { this.hum = 1.4; sfx.hum(); const [x, y] = this.L(0, 330); for (let i = 0; i < 6; i++) addP({ type: 'text', x: x + rnd(-40, 40), y: y - 40, z: 0, vz: rnd(50, 90), vx: rnd(-30, 30), life: 1.4, str: '♪', color: '#fff3d0', size: 22, add: false, keep: true }); this.opts.onHead?.(); return; }
     if (r?.b) { this.sel = r.b.id; sfx.click(); this.opts.onSelect?.(r.b.id); return; }
     this.sel = null; this.opts.onSelect?.(null);

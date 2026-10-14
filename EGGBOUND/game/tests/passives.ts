@@ -1,6 +1,6 @@
 // Rare-form passives: direct scenario checks + every rare form through every stage (no crash, deterministic).
 import { Battle, simulate } from '../src/core/battle';
-import { SPECIES, STAGES, formOf } from '../src/core/data';
+import { SPECIES, STAGES, formOf, planOf } from '../src/core/data';
 import type { MonsterRef } from '../src/core/types';
 
 export function passiveTests(): number {
@@ -75,12 +75,15 @@ export function passiveTests(): number {
       catch (e) { ok(false, `rare team crashed ${stg.id} ${team.map(t => t.sid)}: ${(e as Error).message}`); }
     }
   }
-  // balance: the same team with and without rare forms on the boss stage
-  { const boss = STAGES.find(s => s.id === 'rootnest-5')!, N = 300; // the map-1 boss: the rare-form baseline every check above was tuned on
-    for (const ids of [['A01', 'A02', 'A03', 'A04'], ['B05', 'B04', 'B07', 'A08'], ['A05', 'C01', 'B01', 'A06']]) {
-      const wr = (rare: boolean) => { let w = 0; for (let i = 0; i < N; i++) if (simulate(2000 + i, ids.map(sid => ({ sid, lvl: 10, stars: 1, rare })), boss).win) w++; return Math.round(w / N * 100); };
-      console.log(`rare-form check ${boss.id} ${ids.join(',')} Lv10: normal ${wr(false)}% → rare ${wr(true)}%`);
-    } }
+  // balance (owner 2026-10-14: an all-rare team may win at most ~15% more): every species in teams of 4, on each stage
+  // where the normal team wins 25–85% at the recommended level (saturated stages say nothing), normal vs all-rare
+  { const ids = Object.values(SPECIES).filter(s => !s.boss && !s.starborn).map(s => s.id), N = 30;
+    const wr = (t: string[], st: (typeof STAGES)[number], rare: boolean) => { const [lvl, stars] = planOf(st); let w = 0;
+      for (let i = 0; i < N; i++) if (simulate(5000 + i, t.map(sid => ({ sid, lvl, stars, rare })), st).win) w++; return w / N; };
+    let d = 0, n = 0;
+    for (let i = 0; i + 4 <= ids.length; i += 4) for (const st of STAGES) { const a = wr(ids.slice(i, i + 4), st, false); if (a < 0.25 || a > 0.85) continue; d += wr(ids.slice(i, i + 4), st, true) - a; n++; }
+    const adv = d / n * 100; console.log(`rare-form check: all-rare team +${adv.toFixed(1)}% over ${n} team-stages (cap 16)`);
+    ok(adv <= 16, `all-rare team advantage ${adv.toFixed(1)}% > 16%`); }
   console.log(fail ? `passives: ${fail} FAILED` : 'passives OK');
   return fail;
 }
