@@ -47,5 +47,5 @@ export function dropRunes(s: SaveData, st: StageDef, first: boolean, boss: boole
 export function runeGift(s: SaveData) {
   if (s.runeGift) return; s.runeGift = true;
   const mk = (slot: RuneSlot, set: Rune['set'], main: Rune['main'], sub: Rune['subs'][number]): Rune => ({ id: 0, slot, set, grade: 'rare', star: 2, lvl: 0, main, subs: [sub] });
-  for (const r of [mk(1, 'fang', 'atk', { k: 'crit', v: 1 }), mk(2, 'fang', 'hp', { k: 'atkP', v: 1 }), mk(3, 'vital', 'hpP', { k: 'spd', v: 1 }), mk(4, 'vital', 'cdmg', { k: 'hp', v: 15 })]) addRune(s, r);
+  for (const r of [mk(1, 'fang', 'atk', { k: 'crit', v: 2 }), mk(2, 'fang', 'hp', { k: 'atkP', v: 3 }), mk(3, 'vital', 'hpP', { k: 'spd', v: 2 }), mk(4, 'vital', 'cdmg', { k: 'hp', v: 40 })]) addRune(s, r);
 }

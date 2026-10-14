@@ -10,33 +10,34 @@ export type RuneSlot = 1 | 2 | 3 | 4;
 /** a rune: main stat value follows star + level (not stored), sub values are rolled and stored · on = monster uid */
 export interface Rune { id: number; slot: RuneSlot; set: RuneSet; grade: RuneGrade; star: number; lvl: number; main: RuneStat; subs: { k: RuneStat; v: number }[]; on?: number }
 
-/** values in display units (15 = 15%) · main = value at ★6 +12 · sub = one roll at ★6 */
+/** values in display units (15 = 15%) · main = value at ★6 +12 · sub = one roll at ★6 · full SW-like strength (owner 2026-10-14:
+ *  never weaken the monsters — harder content comes as new maps/stages instead) */
 export const RUNE_STATS: Record<RuneStat, { name: string; pct: boolean; main: number; sub: [number, number] }> = {
-  atk: { name: 'ATK', pct: false, main: 40, sub: [3, 5] },
-  hp: { name: 'HP', pct: false, main: 600, sub: [40, 70] },
-  def: { name: 'DEF', pct: false, main: 40, sub: [3, 5] },
-  atkP: { name: 'ATK', pct: true, main: 12, sub: [1, 3] },
-  hpP: { name: 'HP', pct: true, main: 12, sub: [1, 3] },
-  defP: { name: 'DEF', pct: true, main: 12, sub: [1, 3] },
-  spd: { name: 'SPD', pct: false, main: 8, sub: [1, 2] },
-  crit: { name: 'คริ', pct: true, main: 10, sub: [1, 2] },
-  cdmg: { name: 'คริดาเมจ', pct: true, main: 16, sub: [1, 3] },
-  res: { name: 'ต้านทาน', pct: true, main: 12, sub: [1, 3] },
-  acc: { name: 'แม่นยำ', pct: true, main: 12, sub: [1, 3] },
+  atk: { name: 'ATK', pct: false, main: 120, sub: [8, 16] },
+  hp: { name: 'HP', pct: false, main: 1800, sub: [100, 200] },
+  def: { name: 'DEF', pct: false, main: 120, sub: [8, 16] },
+  atkP: { name: 'ATK', pct: true, main: 40, sub: [4, 8] },
+  hpP: { name: 'HP', pct: true, main: 40, sub: [4, 8] },
+  defP: { name: 'DEF', pct: true, main: 40, sub: [4, 8] },
+  spd: { name: 'SPD', pct: false, main: 24, sub: [2, 5] },
+  crit: { name: 'คริ', pct: true, main: 35, sub: [3, 6] },
+  cdmg: { name: 'คริดาเมจ', pct: true, main: 50, sub: [4, 7] },
+  res: { name: 'ต้านทาน', pct: true, main: 40, sub: [4, 8] },
+  acc: { name: 'แม่นยำ', pct: true, main: 40, sub: [4, 8] },
 };
 /** slot 1 = flat ATK, slot 2 = flat HP, slots 3–4 roll their main stat */
 export const SLOT_MAIN: Record<RuneSlot, RuneStat[]> = { 1: ['atk'], 2: ['hp'], 3: ['atkP', 'hpP', 'defP', 'spd'], 4: ['atkP', 'hpP', 'defP', 'crit', 'cdmg', 'res', 'acc'] };
 export const SLOT_NAME: Record<RuneSlot, string> = { 1: 'I', 2: 'II', 3: 'III', 4: 'IV' };
 /** set bonus per completed set (n pieces; two pairs of the same 2-piece set count twice) · b in display units */
 export const RUNE_SETS: Record<RuneSet, { name: string; n: 2 | 4; desc: string; col: string; b: Partial<Record<RuneStat | 'spdP' | 'react' | 'leech' | 'mark', number>> }> = {
-  fang: { name: 'เขี้ยว', n: 2, desc: 'ATK +5%', col: '#ff6a4a', b: { atkP: 5 } },
-  shell: { name: 'กระดอง', n: 2, desc: 'DEF +8%', col: '#3fc6c0', b: { defP: 8 } },
-  vital: { name: 'ชีวา', n: 2, desc: 'HP +5%', col: '#66d17e', b: { hpP: 5 } },
-  eye: { name: 'เนตร', n: 2, desc: 'คริ +4%', col: '#ffcc3a', b: { crit: 4 } },
-  gale: { name: 'วายุ', n: 4, desc: 'SPD +8%', col: '#7fdcff', b: { spdP: 8 } },
-  storm: { name: 'อสนี', n: 4, desc: 'ปฏิกิริยาธาตุที่ตัวนี้จุด แรงขึ้น 15%', col: '#b48cff', b: { react: 15 } },
-  blood: { name: 'โลหิต', n: 4, desc: 'ดูดเลือด 8% ของดาเมจที่ทำ', col: '#e2405e', b: { leech: 8 } },
-  sigil: { name: 'ตราธาตุ', n: 4, desc: 'โอกาสติดเครื่องหมายธาตุ +15% · แม่นยำ +5%', col: '#5d8cff', b: { mark: 15, acc: 5 } },
+  fang: { name: 'เขี้ยว', n: 2, desc: 'ATK +15%', col: '#ff6a4a', b: { atkP: 15 } },
+  shell: { name: 'กระดอง', n: 2, desc: 'DEF +20%', col: '#3fc6c0', b: { defP: 20 } },
+  vital: { name: 'ชีวา', n: 2, desc: 'HP +15%', col: '#66d17e', b: { hpP: 15 } },
+  eye: { name: 'เนตร', n: 2, desc: 'คริ +12%', col: '#ffcc3a', b: { crit: 12 } },
+  gale: { name: 'วายุ', n: 4, desc: 'SPD +20%', col: '#7fdcff', b: { spdP: 20 } },
+  storm: { name: 'อสนี', n: 4, desc: 'ปฏิกิริยาธาตุที่ตัวนี้จุด แรงขึ้น 40%', col: '#b48cff', b: { react: 40 } },
+  blood: { name: 'โลหิต', n: 4, desc: 'ดูดเลือด 20% ของดาเมจที่ทำ', col: '#e2405e', b: { leech: 20 } },
+  sigil: { name: 'ตราธาตุ', n: 4, desc: 'โอกาสติดเครื่องหมายธาตุ +30% · แม่นยำ +10%', col: '#5d8cff', b: { mark: 30, acc: 10 } },
 };
 export const RUNE_SET_IDS = Object.keys(RUNE_SETS) as RuneSet[];
 export const RUNE_GRADES: Record<RuneGrade, { name: string; subs: number; col: string }> = {
