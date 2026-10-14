@@ -342,6 +342,37 @@ export const SPECIES: Record<string, SpeciesDef> = {
       { id: 'oro_valleys', name: 'แปดหุบเขาพิโรธ', desc: 'ทุกตัว ลบบัฟ 1 อย่าง + 45% ผนึกสกิล 2 เทิร์น', cd: 5, target: 'enemyAll', mult: 1.3, effects: [{ kind: 'strip', n: 1 }, { kind: 'status', status: 'silence', turns: 2, chance: 0.45 }], anim: 'ult_nightwave', ult: true },
     ],
   },
+  // S05–S07 (owner 2026-10-14): zone bosses of the jade garden, the Pixiu palace and the Asura King's fire cave
+  S05: {
+    id: 'S05', art: 'monS05', name: 'กิเลนอสนีบาต', nameEn: 'Thunder Qilin', elem: 'wind', role: 'Support', rarity: 'legendary', starborn: true,
+    base: { hp: 1010, atk: 116, def: 72, spd: 121 },
+    leader: { stat: 'spd', value: 0.15, text: 'SPD ทั้งทีม +15%' },
+    skills: [
+      { id: 'qilin_horn', name: 'เขาอสนี', desc: 'ขวิด 1 ตัว 60% ติดเครื่องหมายลม + ลดเกจ 10', cd: 0, target: 'enemy', mult: 1.05, effects: [{ kind: 'mark', elem: 'wind', chance: 0.6 }, { kind: 'atb', value: -10 }], anim: 'melee' },
+      { id: 'qilin_bless', name: 'พรกิเลนมงคล', desc: 'ทีม ATK และ SPD ขึ้น 2 เทิร์น + เกจทีม 15', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'status', status: 'atk_up', turns: 2, to: 'allies' }, { kind: 'status', status: 'spd_up', turns: 2, to: 'allies' }, { kind: 'atb', value: 15, to: 'allies' }], anim: 'heal' },
+      { id: 'qilin_storm', name: 'พายุอสนีมงคล', desc: 'ฟ้าผ่าทุกตัว 70% ติดเครื่องหมายลม + ลดเกจ 25 + คูลดาวน์ทีม −1', cd: 5, target: 'enemyAll', mult: 1.15, effects: [{ kind: 'mark', elem: 'wind', chance: 0.7 }, { kind: 'atb', value: -25 }, { kind: 'cdTeam', value: 1, to: 'allies' }], anim: 'ult_starlight', ult: true },
+    ],
+  },
+  S06: {
+    id: 'S06', art: 'monS06', name: 'มังกรทองหวงหลง', nameEn: 'Huanglong Gold Dragon', elem: 'earth', role: 'Attacker', rarity: 'legendary', starborn: true,
+    base: { hp: 1000, atk: 148, def: 66, spd: 110 },
+    leader: { stat: 'atk', value: 0.22, text: 'ATK ทั้งทีม +22%' },
+    skills: [
+      { id: 'huang_claw', name: 'กรงเล็บมังกรทอง', desc: 'ตะปบ 1 ตัว 60% ติดเครื่องหมายดิน', cd: 0, target: 'enemy', mult: 1.2, effects: [{ kind: 'mark', elem: 'earth', chance: 0.6 }], anim: 'melee' },
+      { id: 'huang_pearl', name: 'มุกมังกรบดขยี้', desc: 'ฟาด 1 ตัวแรง ไม่สนใจ DEF 25% + 50% ลด DEF 2 เทิร์น', cd: 3, target: 'enemy', mult: 1.9, ignoreDef: 0.25, effects: [{ kind: 'status', status: 'def_down', turns: 2, chance: 0.5 }], anim: 'melee' },
+      { id: 'huang_quake', name: 'มังกรทองพลิกปฐพี', desc: 'ทุกตัว 70% ติดเครื่องหมายดิน + 30% มึน 1 เทิร์น', cd: 5, target: 'enemyAll', mult: 1.5, effects: [{ kind: 'mark', elem: 'earth', chance: 0.7 }, { kind: 'status', status: 'stun', turns: 1, chance: 0.3 }], anim: 'ult_quake', ult: true },
+    ],
+  },
+  S07: {
+    id: 'S07', art: 'monS07', name: 'อสูรราชาตรีมุข', nameEn: 'Trimukha Asura King', elem: 'fire', role: 'Defender', rarity: 'legendary', starborn: true,
+    base: { hp: 1340, atk: 106, def: 94, spd: 102 },
+    leader: { stat: 'hp', value: 0.22, text: 'HP ทั้งทีม +22%' },
+    skills: [
+      { id: 'asura_strike', name: 'หกกรประหาร', desc: 'ตี 1 ตัว 50% ติดเครื่องหมายไฟ + 40% เผาไหม้ 2 เทิร์น', cd: 0, target: 'enemy', mult: 1.05, effects: [{ kind: 'mark', elem: 'fire', chance: 0.5 }, { kind: 'status', status: 'burn', turns: 2, chance: 0.4 }], anim: 'melee' },
+      { id: 'asura_guard', name: 'ตรีมุขพิทักษ์', desc: 'โล่ทั้งทีม 18% + DEF ทั้งทีมขึ้น 2 เทิร์น', cd: 3, target: 'allyAll', mult: 0, effects: [{ kind: 'shield', value: 0.18, to: 'allies' }, { kind: 'status', status: 'def_up', turns: 2, to: 'allies' }], anim: 'shield' },
+      { id: 'asura_wheel', name: 'จักรหกอาวุธ', desc: 'ทุกตัว 60% ติดเครื่องหมายไฟ + 40% ลด ATK 2 เทิร์น + โล่ทั้งทีม 12%', cd: 5, target: 'enemyAll', mult: 1.3, effects: [{ kind: 'mark', elem: 'fire', chance: 0.6 }, { kind: 'status', status: 'atk_down', turns: 2, chance: 0.4 }, { kind: 'shield', value: 0.12, to: 'allies' }], anim: 'ult_nightwave', ult: true },
+    ],
+  },
   // ---- special editions (ตัวพิเศษ, owner 2026-10-14): a few standout monsters get a new form with its own name, art and
   // story — +1 natural star, HP/ATK/DEF +10% of the base species, no rare form; only from a special egg built from shards
   // that the base species' zone boss drops (SPECIAL_SHARD_*). Art ships as separate files (assets_ext/). ----
@@ -465,12 +496,12 @@ export const ZONES: ZoneDef[] = [
   { id: 'kinnari', realm: '2', loc: 'kinnari', name: 'วิมานกินรี', desc: 'ศัตรูธาตุลมฮีลเก่ง ตีให้ไวหรือใช้ไฟ' },
   { id: 'temple', realm: '2', loc: 'temple', name: 'ลานคชสีห์', desc: 'คชสีห์เฝ้าลานปราสาท ป้องกันหนา · บอสตำนานดารา คิเมร่าราชันย์' },
   { id: 'nagapool', realm: '2', loc: 'nagapool', name: 'สระมณีนาคราช', desc: 'สระศักดิ์สิทธิ์ยามสนธยา · บอสตำนานดารา พญานาคปัญจเศียร' },
-  { id: 'jade', realm: '3', loc: 'jade', name: 'สวนหยกจันทรา', desc: 'กระต่ายหยกกับคางคกทองเฝ้าสวน ฮีลกันเอง' },
-  { id: 'palace', realm: '3', loc: 'palace', name: 'ตำหนักปี่เซียะ', desc: 'สิงโตผู้พิทักษ์สวนกลับ ปี่เซียะให้โล่ทั้งทีม' },
+  { id: 'jade', realm: '3', loc: 'jade', name: 'สวนหยกจันทรา', desc: 'กระต่ายหยกกับคางคกทองเฝ้าสวน ฮีลกันเอง · บอสตำนานดารา กิเลนอสนีบาต' },
+  { id: 'palace', realm: '3', loc: 'palace', name: 'ตำหนักปี่เซียะ', desc: 'สิงโตผู้พิทักษ์สวนกลับ ปี่เซียะให้โล่ทั้งทีม · บอสตำนานดารา มังกรทองหวงหลง' },
   { id: 'foxvalley', realm: '3', loc: 'foxvalley', name: 'หุบเขาจิ้งจอกเก้าหาง', desc: 'หุบเขาหิมะ ไฟจิ้งจอกลอยวน · บอสตำนานดารา โอโรจิแปดหุบเขา' },
   { id: 'toadbridge', realm: '3', loc: 'toadbridge', name: 'สะพานคางคกทอง', desc: 'คางคกพ่นเหรียญลด DEF จิ้งจอกเผาไหม้ทั้งทีม' },
   { id: 'heaven', realm: '3', loc: 'heaven', name: 'ประตูสวรรค์', desc: 'ประตูเหนือทะเลเมฆ · บอสตำนานดารา วาลคีร์ปีกพายุ' },
-  { id: 'firecave', realm: '3', loc: 'firecave', name: 'ถ้ำเพลิงราชาอสูร', desc: 'ถ้ำลาวาของราชาอสูรวัวเพลิงนรก ทุบมึนทั้งทีม พกล้างสถานะไปด้วย' },
+  { id: 'firecave', realm: '3', loc: 'firecave', name: 'ถ้ำเพลิงราชาอสูร', desc: 'ถ้ำลาวาใต้ภูเขาไฟ วัวอสูรเฝ้าทางเข้า · บอสตำนานดารา อสูรราชาตรีมุข' },
 ];
 interface ZoneGen { pool: string[]; grade: number; k: [number, number, number, number, number]; boss: EnemyRef; bossDesc: string; rare?: boolean; duel?: boolean } // duel: the boss comes with one escort, not two
 /** per-zone generator data · enemies sit at the recommended level (ZONE_PLAN); k = HP/ATK multiplier of stages 1–5
@@ -485,12 +516,12 @@ export const ZONE_GEN: Record<string, ZoneGen> = {
   kinnari: { pool: ['B03', 'B06', 'B08'], grade: 2, k: [1, 0.95, 0.75, 0.85, 0.8], boss: { sid: 'B06', lvl: 0, stars: 2, boss: true, name: 'ราชินีกินรี', scale: 1.4, hpMult: 4.85, atkMult: 0.95 }, bossDesc: 'บอสราชินีกินรี ฮีลทั้งทีม ต้องตีให้ไว' },
   temple: { pool: ['B06', 'B05', 'B08', 'B07'], grade: 2, k: [0.8, 0.75, 0.8, 0.75, 0.8], boss: { sid: 'S02', lvl: 0, stars: 2, boss: true, scale: 1.3, hpMult: 1.3, atkMult: 0.95 }, bossDesc: 'บอสตำนานดารา คิเมร่าราชันย์ ตะปบแรงไม่สนใจ DEF · มีโอกาสดรอปเศษไข่ดารา', duel: true },
   nagapool: { pool: ['B04', 'B06', 'B05', 'B08'], grade: 2, k: [1.35, 1.2, 1, 0.95, 1], boss: { sid: 'S03', lvl: 0, stars: 2, boss: true, scale: 1.3, hpMult: 3.05, atkMult: 0.95 }, bossDesc: 'บอสตำนานดารา พญานาคปัญจเศียร โล่หนา คลื่นยักษ์ทำทุกตัวเปียก · มีโอกาสดรอปเศษไข่ดารา', duel: true },
-  jade: { pool: ['C02', 'C01', 'C04'], grade: 3, k: [1.55, 1.5, 1.35, 1.5, 1.45], boss: { sid: 'C04', lvl: 0, stars: 3, boss: true, name: 'กระต่ายหยกจันทรา', scale: 1.4, hpMult: 1.7, atkMult: 0.95 }, bossDesc: 'บอสกระต่ายหยกจันทรา ฮีลทั้งทีม ต้องทำห้ามฮีลหรือตีให้ไว' },
-  palace: { pool: ['C01', 'C02', 'C03'], grade: 3, k: [1.6, 1.25, 1.3, 1.3, 1.3], boss: { sid: 'C01', lvl: 0, stars: 3, boss: true, name: 'ปี่เซียะทองคำ', scale: 1.4, hpMult: 6, atkMult: 0.95 }, bossDesc: 'บอสปี่เซียะทองคำ ให้โล่ทั้งทีม ลด DEF ก่อนค่อยตี' },
+  jade: { pool: ['C02', 'C01', 'C04'], grade: 3, k: [1.55, 1.5, 1.35, 1.5, 1.45], boss: { sid: 'S05', lvl: 0, stars: 3, boss: true, scale: 1.3, hpMult: 1.2, atkMult: 0.7 }, bossDesc: 'บอสตำนานดารา กิเลนอสนีบาต เร่งเกจทีม ลดเกจศัตรู · มีโอกาสดรอปเศษไข่ดารา', duel: true },
+  palace: { pool: ['C01', 'C02', 'C03'], grade: 3, k: [1.6, 1.25, 1.3, 1.3, 1.3], boss: { sid: 'S06', lvl: 0, stars: 3, boss: true, scale: 1.3, hpMult: 2.5, atkMult: 0.95 }, bossDesc: 'บอสตำนานดารา มังกรทองหวงหลง ตีแรง ลด DEF มึนทั้งทีม · มีโอกาสดรอปเศษไข่ดารา', duel: true },
   foxvalley: { pool: ['C04', 'C03', 'C05'], grade: 3, k: [1.25, 1.15, 1.05, 1.05, 1.05], boss: { sid: 'S04', lvl: 0, stars: 3, boss: true, scale: 1.3, hpMult: 5.8, atkMult: 0.95 }, bossDesc: 'บอสตำนานดารา โอโรจิแปดหุบเขา ทำหลับ ผนึกสกิล ลบบัฟ · มีโอกาสดรอปเศษไข่ดารา', rare: true, duel: true },
   toadbridge: { pool: ['C01', 'C04', 'C02', 'C05'], grade: 3, k: [1.5, 1.5, 1.4, 1.3, 1.35], boss: { sid: 'C02', lvl: 0, stars: 3, boss: true, name: 'คางคกทองสามขายักษ์', scale: 1.5, hpMult: 2.05, atkMult: 0.95 }, bossDesc: 'บอสคางคกทองยักษ์ พ่นเหรียญลด DEF ทั้งทีม', duel: true },
   heaven: { pool: ['C04', 'C03', 'C05', 'C06'], grade: 3, k: [1.2, 1.15, 1, 0.95, 1], boss: { sid: 'S01', lvl: 0, stars: 3, boss: true, scale: 1.3, hpMult: 2.15, atkMult: 0.95 }, bossDesc: 'บอสตำนานดารา วาลคีร์ปีกพายุ ชุบชีวิตลูกน้อง ทีมอมตะ · มีโอกาสดรอปเศษไข่ดารา', rare: true, duel: true },
-  firecave: { pool: ['C02', 'C03', 'C05', 'C06'], grade: 3, k: [1.15, 1.2, 1.05, 1.05, 1.05], boss: { sid: 'BOSS_BULL', lvl: 0, stars: 3, hpMult: 1.95, atkMult: 0.95 }, bossDesc: 'บอสราชาอสูรวัวเพลิงนรก ทุบมึนทั้งทีม พกล้างสถานะไปด้วย' },
+  firecave: { pool: ['C02', 'C03', 'C05', 'C06'], grade: 3, k: [1.15, 1.2, 1.05, 1.05, 1.05], boss: { sid: 'S07', lvl: 0, stars: 3, boss: true, scale: 1.3, hpMult: 2.45, atkMult: 0.95 }, bossDesc: 'บอสตำนานดารา อสูรราชาตรีมุข โล่ทั้งทีม เผาไหม้ ลด ATK · มีโอกาสดรอปเศษไข่ดารา', duel: true },
 };
 /** wave make-up for stages 1–5: indexes into the zone pool (weakest first, the zone's strongest last; wrapped for short
  *  pools) — later stages bring in the stronger monsters. The boss wave puts the boss between its two escorts. */
@@ -657,12 +688,12 @@ export const DIFF_K: Record<string, number[][]> = {
   kinnari: [[1.11, 1.08, 1.13, 1.08, 0.89], [1.2, 1.21, 1.29, 1.25, 0.76], [0.84, 0.79, 1.2, 1.06, 0.73]],
   temple: [[1.12, 1.04, 1.06, 1.1, 1.12], [1.24, 1.25, 1.11, 1.14, 1.17], [0.65, 0.77, 0.83, 0.91, 0.77]],
   nagapool: [[0.84, 0.92, 1.03, 1.1, 0.93], [0.7, 0.84, 0.95, 1.05, 0.81], [0.36, 0.38, 0.53, 0.58, 0.41]],
-  jade: [[0.99, 0.99, 0.95, 0.95, 0.94], [1.03, 0.95, 0.94, 0.85, 0.88], [0.37, 0.35, 0.36, 0.32, 0.36]],
-  palace: [[0.99, 1.11, 1.02, 0.98, 0.91], [1.05, 1.13, 0.92, 1.01, 0.74], [0.33, 0.4, 0.33, 0.29, 0.29]],
+  jade: [[0.99, 0.99, 0.95, 0.95, 1.07], [1.03, 0.95, 0.94, 0.85, 1.03], [0.37, 0.35, 0.36, 0.32, 0.31]],
+  palace: [[0.99, 1.11, 1.02, 0.98, 1.13], [1.05, 1.13, 0.92, 1.01, 1.07], [0.33, 0.4, 0.33, 0.29, 0.35]],
   foxvalley: [[0.87, 0.96, 0.96, 0.97, 0.88], [0.7, 0.81, 0.86, 0.85, 0.73], [0.18, 0.21, 0.28, 0.3, 0.24]],
   toadbridge: [[0.93, 0.9, 0.91, 0.99, 0.98], [0.78, 0.76, 0.77, 0.85, 0.92], [0.26, 0.24, 0.29, 0.35, 0.34]],
   heaven: [[0.87, 0.94, 1.01, 0.98, 0.85], [0.7, 0.76, 0.83, 0.88, 0.67], [0.16, 0.18, 0.26, 0.25, 0.18]],
-  firecave: [[0.99, 0.98, 1.02, 1.05, 0.91], [0.88, 0.92, 0.99, 0.95, 0.78], [0.21, 0.22, 0.31, 0.27, 0.26]]
+  firecave: [[0.99, 0.98, 1.02, 1.05, 0.87], [0.88, 0.92, 0.99, 0.95, 0.69], [0.21, 0.22, 0.31, 0.27, 0.21]]
 };
 const DCACHE: Record<string, StageDef> = {};
 /** the stage behind a key (any difficulty) */

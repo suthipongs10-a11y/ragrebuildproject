@@ -1,0 +1,170 @@
+=====================================================================
+EGGBOUND — ART BATCH 23 (A) : REALM 4 "NIFLHEIM" — WORLD MAP + 4 BATTLE ARENAS
+(ภพที่ 4 นิฟล์ไฮม์ แดนหมอกเหมันต์ — ดินแดนต้องห้ามที่ใครเข้าไปแทบไม่ได้กลับ)
+Image generation instructions for ChatGPT (or Google Flow)
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ภพที่ 4 = แดนลี้ลับในตำนาน หนาวเหน็บ เงียบ น่ากลัวแบบสวยงาม มีร่องรอยของคนที่เข้าไปแล้วไม่ได้กลับ
+  (ป้ายเตือนเก่า ทางเดินที่หายไปในหิมะ อาวุธหักปักอยู่ เงาร่างที่ถูกแช่แข็งในกำแพงน้ำแข็ง)
+  บอสใหญ่สุด = ราชาน้ำแข็ง ฮริมาร์ค (BATCH22) ที่โซนสุดท้าย
+- ชุดนี้มี 5 ภาพ: #01 แผนที่ภพ 4 · #02–#05 ฉากต่อสู้ 4 โซน
+- ChatGPT: แชทใหม่ 1 แชท แนบ
+  1) ไฟล์นี้
+  2) ภาพแผนที่ภพ 3 ที่ทำไว้แล้ว (EGGBOUND/game/assets_bg/map3.webp) = สไตล์/มุมกล้องแผนที่
+  3) ภาพฉากต่อสู้ "หุบเขาจิ้งจอก" (EGGBOUND/game/assets_bg/foxvalley.webp) = มุมกล้อง/ตำแหน่งลานของฉากต่อสู้
+  พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 และ #02 ให้ดีก่อนตอบ OK
+- ขอภาพแนวนอนกว้างที่สุด (16:9 ถ้าได้) · ส่งกลับเป็น "ไฟล์ภาพเดี่ยว" ไม่ต้อง zip (ภาพใหญ่ zip เคยขาดท้าย)
+- ห้ามมีตัวหนังสือ เส้นประ หมุด ป้ายชื่อ ในภาพแผนที่ (เกมวาดเอง) · ห้ามมีหิมะตก/หมอกลอย/ประกายในภาพฉากต่อสู้ (เกมทำเองแบบเคลื่อนไหว)
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the environment artist for a premium 2.5D fantasy monster RPG
+(hand-painted, top mobile-RPG quality). Paint REALM 4 of the game's
+ancient continent: NIFLHEIM, a legendary forbidden land of eternal ice
+and mist at the edge of the world. Old tales say that whoever goes in
+almost never comes back. It must feel MYSTERIOUS, COLD, SILENT and
+BEAUTIFUL-BUT-DANGEROUS — never gory, never horror.
+Generate 5 images, ONE IMAGE PER TURN: #01 the world map, then #02–#05
+the four battle arenas.
+
+Myth source (public domain): Norse mythology — Niflheim, the primordial
+realm of ice and mist, home of the rime giants. ORIGINAL DESIGN — do not
+copy any existing game/film character, map, scene or any existing game's
+UI (including Summoners War); it must not look like Game of Thrones'
+lands beyond the Wall or Warcraft's Northrend / Icecrown.
+
+Shared colour grade for all 5: cold glacier blues and silver-whites,
+deep midnight navy in the shadows, dark pine greens, old grey stone;
+faint aurora tints (pale teal and violet) only in the sky and inside
+thick ice. Light from TOP-LEFT, pale and silvery. Never dull-grey: it is
+cold but rich and luminous.
+
+=====================================================================
+#01  map4 — WORLD MAP OF REALM 4
+=====================================================================
+Follow the attached map3 EXACTLY for style, camera (high bird's-eye
+view about 60°, north at the top), painting technique, scale of the
+landmark sites and level of detail. ONE CONTINUOUS FROZEN LAND (not
+floating islands): snowfields, frozen rivers, black-green pine forests,
+glacier ridges and sharp ice mountains, an iced-over sea at the bottom.
+The land feels ANCIENT and forsaken: half-buried ruins, toppled
+standing stones, an old stone road that fades away into the snow,
+abandoned sleds and broken carts, a ruined warning arch.
+
+LANDMARK SITES (centre of each site, % of the 16:9 image, x from the
+left, y from the top). Each site is a miniature landmark about 12–16% of
+the image width, clearly separated from the next by terrain, with calm
+snow or stone around it so the game's name tag below it stays readable:
+  - (18%, 70%) SILENT MIST PINES: a deep forest of tall frosted pines
+    around a clearing with a circle of old snow-capped stone markers
+    (warning stones left by travellers).
+  - (40%, 40%) MIRROR-ICE LAKE: a perfectly round frozen lake, its ice
+    clear and dark like a mirror, ringed by tall ice-covered stone
+    pillars standing in the shallows.
+  - (62%, 68%) VALLEY OF NO RETURN: a narrow canyon between towering
+    blue glacier walls; tiny dim shapes of frozen travellers can be
+    seen deep inside the ice walls (just silhouettes, no faces);
+    broken spears and old banners stuck in the snow at its mouth.
+  - (82%, 28%) THRONE OF THE FROST SOVEREIGN: on the highest ice
+    mountain, a grand ancient palace grown from glacier ice — tiered
+    spires like a frozen temple crown, pale aurora light trapped inside
+    the ice — the most majestic and most ominous place in the image.
+  Decor (small): at the bottom-left edge, the ruined stone gate where
+  travellers enter the realm, half-buried in snow; a frozen sea with
+  ice floes at the bottom.
+
+EDGES: the outer ~6% of the image fades softly into thick frozen mist
+(no hard frame, no vignette ring).
+FORBIDDEN (map): any text, letters, numbers, labels, compass, grid,
+dotted route lines, arrows, pins, flags with writing, UI, frames;
+monsters, people, characters, animals; lens flare, floating particles,
+falling snow.
+
+=====================================================================
+#02–#05  BATTLE ARENAS (one per zone)
+=====================================================================
+Follow the attached foxvalley arena EXACTLY for camera, arena size and
+arena position (it is from the same game); only the place changes.
+
+MASTER LAYOUT (all four):
+- CAMERA: high three-quarter view looking DOWN at about 35–40°: a circle
+  on the ground looks like an oval 1.67 times wider than tall.
+  Orthographic feel, no fisheye.
+- ARENA: a flat round fighting area seen as a wide OVAL: width 51% of
+  the image width, height 54% of the image height, centre at 50% across
+  and 53% down. FLAT, EVEN and EMPTY (no props, cracks or patterns that
+  fight the monsters; a subtle inlay ring or centre emblem is fine).
+- BACK band (top 24%): the landmark of the zone standing just behind
+  the arena; show its lower parts clearly, its top may leave the image.
+- SIDES (left/right 20%): medium props (pines, ice rocks, pillars,
+  statues).
+- FRONT band (bottom 16%): ONLY low things (snow drifts, low ice, low
+  stones) — nothing taller than ~6% of the image height.
+- FORBIDDEN (arenas): monsters, people, animals, characters, falling
+  snow, floating particles, drifting mist or fog banks, light rays,
+  sparkles, magic circles, UI, text. (The game animates snow, mist and
+  glow itself.) Soft glow INSIDE thick ice is fine.
+- OUTPUT: 16:9 (or the widest landscape size), no border, no vignette.
+
+#02  mistpine — SILENT MIST PINES
+  Arena: a snow-packed clearing with a faint ring of half-buried old
+  stones. Back: very tall dark frosted pine trunks close together, an
+  ancient leaning stone marker carved with worn (unreadable, invented)
+  warning symbols. Sides: frosted pines, snow-capped boulders, a broken
+  wooden sled. Front: low snow drifts and frozen grass.
+  Mood: silent, blue-grey dusk under the pines, a little eerie.
+
+#03  mirrorlake — MIRROR-ICE LAKE
+  Arena: the frozen lake itself — smooth, clear dark ice like a mirror
+  (keep it calm and even; a faint reflection of the pillars is fine).
+  Back: tall stone pillars coated in ice standing in the lake, an old
+  half-sunken stone archway. Sides: ice-covered reeds, frozen stones.
+  Front: the lake's snowy shore edge, low.
+  Mood: still and beautiful; under the clear ice, deep down, a few vague
+  dark shapes can be guessed (no faces, nothing gory) — mysterious.
+
+#04  lostvalley — VALLEY OF NO RETURN
+  Arena: a flat snowy canyon floor with old frozen stone slabs.
+  Back: towering blue glacier walls; inside the ice, dim silhouettes of
+  frozen travellers and warriors who never returned (just shapes, no
+  faces, no blood). Sides: broken spears, a cracked shield and a torn
+  faded banner stuck in the snow, ice rocks. Front: low snow, scattered
+  small ice shards on the ground.
+  Mood: the most haunting place before the throne — cold blue light.
+
+#05  frostthrone — THRONE OF THE FROST SOVEREIGN
+  Arena: a polished floor of pale blue ice and silver-inlaid stone with
+  a subtle round crown-shaped inlay in the centre.
+  Back: the grand throne hall grown from glacier ice: tall crystal ice
+  pillars, wide ice steps leading up to an EMPTY high-backed throne of
+  ice and dark silver (its back shaped like tiered spires), frozen
+  midnight-navy royal banners; faint aurora colours glowing deep inside
+  the ice walls. Sides: crystal pillars, frozen braziers (cold, unlit),
+  ice statues of kneeling knights (helmets, no faces).
+  Front: low ice steps and frost.
+  Mood: majestic, silent, ominous — the end of the journey.
+
+---------------------------------------------------------------------
+QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] #01 one continuous frozen land, 4 sites at their positions, each
+      readable at small size; no text, pins, dotted lines, characters
+  [ ] #01 same style, camera and scale as the attached map3
+  [ ] #02–#05 camera, arena size and position match the attached
+      foxvalley arena; arena flat, even and empty
+  [ ] No falling snow, floating particles, fog banks, light rays, UI,
+      text, monsters or people in any image
+  [ ] Mysterious and cold but rich and beautiful — not gory, not horror
+  [ ] Does not resemble any existing game or film location
+
+---------------------------------------------------------------------
+DELIVERY
+---------------------------------------------------------------------
+Send each image as a separate file (not zipped). File names:
+  map4   mistpine   mirrorlake   lostvalley   frostthrone
+(Random names are fine — the developer matches them.)
+=====================================================================
+END OF FILE
+=====================================================================
