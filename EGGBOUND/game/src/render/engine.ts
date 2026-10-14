@@ -12,6 +12,7 @@ export const E = {
   cv: null, ctx: null, W: 0, H: 0, DPR: 1, base: 1, zoom: 1, zoomT: 1, cam: { x: 0, y: 0 }, camT: { x: 0, y: 0 },
   time: 0, hitstop: 0, dim: 0, dimT: 0, flash: 0, flashC: '#fff', shake: 0, quality: 1,
   parts: [], projs: [], decals: [], scripts: [], vign: null, ground: null, loc: null, // loc: location hooks (render/locations.ts)
+  hell: false, // hell difficulty: blood-red grade + hellfire glow over the arena
 };
 
 // ---------- coroutines: yield <seconds> to wait, yield 0 = next frame (receives dt) ----------
@@ -154,7 +155,16 @@ export const toWorld = (sx, sy) => [(sx - E.W / 2) / Z() + E.cam.x, (sy - E.H / 
 export function worldTransform() { const z = Z(), shx = E.shake ? rnd(-E.shake, E.shake) : 0, shy = E.shake ? rnd(-E.shake, E.shake) : 0; E.ctx.setTransform(E.DPR * z, 0, 0, E.DPR * z, E.DPR * (E.W / 2 - E.cam.x * z + shx), E.DPR * (E.H / 2 - E.cam.y * z + shy)); }
 export function screenTransform() { E.ctx.setTransform(E.DPR, 0, 0, E.DPR, 0, 0); }
 export function drawGround() { E.ctx.drawImage(E.ground, -GOX, -GOY); if (E.loc?.plate) E.loc.plate(E.ctx); } // plate: a painted arena drawn at full resolution over the baked ground
-export function drawOverlays() { const ctx = E.ctx; screenTransform(); if (E.loc?.grade) E.loc.grade(ctx, E.W, E.H); ctx.drawImage(E.vign, 0, 0, E.W, E.H); if (E.flash > 0) { ctx.globalAlpha = Math.min(1, E.flash); ctx.fillStyle = E.flashC; ctx.fillRect(0, 0, E.W, E.H); ctx.globalAlpha = 1; } }
+/** hell difficulty: a blood-red multiply grade (dark crimson sky, ember floor) + a slow hellfire glow from below */
+function hellGrade(ctx) {
+  const W = E.W, H = E.H; ctx.save(); ctx.globalCompositeOperation = 'multiply';
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, 'rgb(105,34,52)'); g.addColorStop(.45, 'rgb(232,196,200)'); g.addColorStop(1, 'rgb(160,58,44)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = .13 + .05 * Math.sin(E.time * 1.4);
+  const r = ctx.createRadialGradient(W / 2, H * 1.08, 0, W / 2, H * 1.08, H * .95); r.addColorStop(0, 'rgb(255,90,30)'); r.addColorStop(1, 'rgba(255,90,30,0)');
+  ctx.fillStyle = r; ctx.fillRect(0, 0, W, H); ctx.restore();
+}
+export function drawOverlays() { const ctx = E.ctx; screenTransform(); if (E.loc?.grade) E.loc.grade(ctx, E.W, E.H); if (E.hell) hellGrade(ctx); ctx.drawImage(E.vign, 0, 0, E.W, E.H); if (E.flash > 0) { ctx.globalAlpha = Math.min(1, E.flash); ctx.fillStyle = E.flashC; ctx.fillRect(0, 0, E.W, E.H); ctx.globalAlpha = 1; } }
 export function tickEngine(dt) {
   E.time += dt; E.shake = Math.max(0, E.shake - dt * 40); E.flash = Math.max(0, E.flash - dt * 2.2);
   E.dim = lerp(E.dim, E.dimT, 1 - Math.exp(-dt * 8)); E.zoom = lerp(E.zoom, E.zoomT, 1 - Math.exp(-dt * 6));

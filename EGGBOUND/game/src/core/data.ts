@@ -1,6 +1,7 @@
 // P0 game data: 6 starters + realm boss + 3 stages of "ทุ่งไข่ป่วน".
 // All numbers are starting values for playtest (see GAME_CONFIG_v2.json).
 import type { SpeciesDef, StageDef, ZoneDef, EnemyRef, Elem, Rarity, SkillDef } from './types';
+import { kitBonus } from './runes';
 
 export const ELEM_NAME: Record<Elem, string> = { fire: 'ไฟ', water: 'น้ำ', wind: 'ลม', earth: 'ดิน', light: 'แสง', dark: 'มืด' };
 export const ROLE_NAME: Record<string, string> = { Attacker: 'จู่โจม', Defender: 'ป้องกัน', Support: 'สนับสนุน', Healer: 'ฟื้นฟู', Controller: 'ควบคุม' };
@@ -608,6 +609,8 @@ export const DIFFS: DiffDef[] = [
   { key: '', name: 'ง่าย', short: 'ง่าย', col: '#6bdc8a', stars: 0, gold: 1, exp: 1, stamina: 0, frag: 0, shard: STAR_SHARD_CHANCE, tierW: EGG_DROP.tierW },
   { key: 'n', name: 'ปานกลาง', short: 'กลาง', col: '#ffcf5a', stars: 1, gold: 1.6, exp: 1.5, stamina: 2, frag: 1, shard: 0.075, tierW: { common: 50, silver: 34, gold: 13, rainbow: 3 } },
   { key: 'h', name: 'ยาก', short: 'ยาก', col: '#ff6b6b', stars: 2, gold: 2.4, exp: 2.2, stamina: 4, frag: 2, shard: 0.1, tierW: { common: 30, silver: 40, gold: 24, rainbow: 6 } },
+  // นรก (owner 2026-10-14: "สุดโหด", at least 4 monsters every wave): ★+3, enemies wear runes (HELL_RUNES) — needs runed teams
+  { key: 'x', name: 'นรก', short: 'นรก', col: '#c45cff', stars: 3, gold: 3.5, exp: 3, stamina: 6, frag: 3, shard: 0.15, tierW: { common: 15, silver: 40, gold: 33, rainbow: 12 } },
 ];
 /** stage key for a difficulty: easy keeps the plain id (save compatible), others `<id>@n` / `<id>@h` */
 export const stageKey = (id: string, d = 0) => d ? `${id}@${DIFFS[d].key}` : id;
@@ -615,25 +618,27 @@ export const parseStage = (key: string) => { const [id, k] = key.split('@'); con
 /** a level moved into a higher star grade, keeping its place in the grade's level range */
 const upLevel = (lvl: number, s0: number, s1: number) => Math.max(1, Math.min(levelCap(s1), Math.round(lvl * levelCap(s1) / levelCap(s0))));
 const scaleRef = (m: EnemyRef, k: number): EnemyRef => { if (!k) return m; const s0 = m.stars || 1, s1 = Math.min(6, s0 + k); return { ...m, stars: s1, lvl: upLevel(m.lvl, s0, s1) }; };
-/** extra enemy HP/ATK per stage for [normal, hard] (stages 1–5), tuned by sim so the recommended team (planOf) wins
+/** extra enemy HP/ATK per stage for [normal, hard, hell] (stages 1–5), tuned by sim so the recommended team (planOf) wins
  *  ~84% → ~74% → boss ~55% on normal and ~80% → ~70% → boss ~50% on hard. Needed because DEF reduces damage
- *  non-linearly (100/(100+DEF)): raising both sides by the same star grade does not keep a fight equally hard. */
-export const DIFF_K: Record<string, [number[], number[]]> = {
-  meadow: [[1.07, 1.01, 1.05, 1.12, 0.94], [1.08, 1.1, 1.1, 1.1, 0.93]],
-  stream: [[1.07, 1.07, 1.06, 1.05, 1.03], [1.07, 1.16, 1.06, 1.16, 1.07]],
-  rootnest: [[1.08, 1.04, 1.06, 1.02, 1.11], [1.2, 1.18, 1.16, 1.12, 1.14]],
-  goldforest: [[1.02, 1.08, 1.06, 1.1, 0.88], [1.04, 1.17, 1.12, 1.12, 0.79]],
-  ricefield: [[1.1, 1.17, 1.07, 1.1, 0.88], [1.25, 1.38, 1.06, 1.1, 0.75]],
-  village: [[1.03, 1.06, 1.07, 1.05, 1.11], [1.08, 1.17, 1.18, 1.14, 1.16]],
-  kinnari: [[1.11, 1.08, 1.13, 1.08, 0.89], [1.2, 1.21, 1.29, 1.25, 0.76]],
-  temple: [[1.12, 1.04, 1.06, 1.1, 1.12], [1.24, 1.25, 1.11, 1.14, 1.17]],
-  nagapool: [[0.84, 0.92, 1.03, 1.1, 0.93], [0.7, 0.84, 0.95, 1.05, 0.81]],
-  jade: [[0.99, 0.99, 0.95, 0.95, 0.94], [1.03, 0.95, 0.94, 0.85, 0.88]],
-  palace: [[0.99, 1.11, 1.02, 0.98, 0.91], [1.05, 1.13, 0.92, 1.01, 0.74]],
-  foxvalley: [[0.87, 0.96, 0.96, 0.97, 0.88], [0.7, 0.81, 0.86, 0.85, 0.73]],
-  toadbridge: [[0.93, 0.9, 0.91, 0.99, 0.98], [0.78, 0.76, 0.77, 0.85, 0.92]],
-  heaven: [[0.87, 0.94, 1.01, 0.98, 0.85], [0.7, 0.76, 0.83, 0.88, 0.67]],
-  firecave: [[0.99, 0.98, 1.02, 1.05, 0.91], [0.88, 0.92, 0.99, 0.95, 0.78]]
+ *  non-linearly (100/(100+DEF)): raising both sides by the same star grade does not keep a fight equally hard.
+ *  Hell: the recommended team wearing the SAME rune kit as the enemies wins ~50% → ~35% → boss ~20% (without runes ≈ 0%);
+ *  below 1 because every hell wave has 4 runed monsters (12 per stage against our 4). */
+export const DIFF_K: Record<string, number[][]> = {
+  meadow: [[1.07, 1.01, 1.05, 1.12, 0.94], [1.08, 1.1, 1.1, 1.1, 0.93], [0.64, 0.69, 0.77, 0.88, 0.66]],
+  stream: [[1.07, 1.07, 1.06, 1.05, 1.03], [1.07, 1.16, 1.06, 1.16, 1.07], [0.81, 0.86, 0.77, 0.91, 0.78]],
+  rootnest: [[1.08, 1.04, 1.06, 1.02, 1.11], [1.2, 1.18, 1.16, 1.12, 1.14], [0.57, 0.7, 0.78, 0.65, 0.66]],
+  goldforest: [[1.02, 1.08, 1.06, 1.1, 0.88], [1.04, 1.17, 1.12, 1.12, 0.79], [0.55, 0.67, 0.67, 0.71, 0.54]],
+  ricefield: [[1.1, 1.17, 1.07, 1.1, 0.88], [1.25, 1.38, 1.06, 1.1, 0.75], [0.59, 0.76, 0.49, 0.52, 0.41]],
+  village: [[1.03, 1.06, 1.07, 1.05, 1.11], [1.08, 1.17, 1.18, 1.14, 1.16], [0.55, 0.57, 0.7, 0.67, 0.72]],
+  kinnari: [[1.11, 1.08, 1.13, 1.08, 0.89], [1.2, 1.21, 1.29, 1.25, 0.76], [0.69, 0.64, 0.98, 0.86, 0.6]],
+  temple: [[1.12, 1.04, 1.06, 1.1, 1.12], [1.24, 1.25, 1.11, 1.14, 1.17], [0.53, 0.66, 0.68, 0.74, 0.63]],
+  nagapool: [[0.84, 0.92, 1.03, 1.1, 0.93], [0.7, 0.84, 0.95, 1.05, 0.81], [0.3, 0.32, 0.42, 0.49, 0.35]],
+  jade: [[0.99, 0.99, 0.95, 0.95, 0.94], [1.03, 0.95, 0.94, 0.85, 0.88], [0.37, 0.33, 0.34, 0.31, 0.34]],
+  palace: [[0.99, 1.11, 1.02, 0.98, 0.91], [1.05, 1.13, 0.92, 1.01, 0.74], [0.32, 0.38, 0.29, 0.27, 0.27]],
+  foxvalley: [[0.87, 0.96, 0.96, 0.97, 0.88], [0.7, 0.81, 0.86, 0.85, 0.73], [0.17, 0.19, 0.26, 0.28, 0.23]],
+  toadbridge: [[0.93, 0.9, 0.91, 0.99, 0.98], [0.78, 0.76, 0.77, 0.85, 0.92], [0.25, 0.24, 0.27, 0.33, 0.33]],
+  heaven: [[0.87, 0.94, 1.01, 0.98, 0.85], [0.7, 0.76, 0.83, 0.88, 0.67], [0.15, 0.16, 0.24, 0.23, 0.16]],
+  firecave: [[0.99, 0.98, 1.02, 1.05, 0.91], [0.88, 0.92, 0.99, 0.95, 0.78], [0.2, 0.2, 0.3, 0.26, 0.24]]
 };
 const DCACHE: Record<string, StageDef> = {};
 /** the stage behind a key (any difficulty) */
@@ -641,10 +646,21 @@ export function stageOf(key: string): StageDef | undefined {
   const { id, d } = parseStage(key), base = STAGES.find(x => x.id === id);
   if (!base || !d) return base;
   if (DCACHE[key]) return DCACHE[key];
-  const D = DIFFS[d];
+  const D = DIFFS[d], hell = d === HELL, realm = Math.max(1, Math.min(3, +base.realm || 1));
   return (DCACHE[key] = { ...base, id: key, diff: d, stamina: base.stamina + D.stamina,
     reward: { gold: Math.round(base.reward.gold * D.gold / 10) * 10, exp: Math.round(base.reward.exp * D.exp) },
-    waves: base.waves.map(w => w.map(m => { const r = scaleRef(m, D.stars), k = DIFF_K[base.zone]?.[d - 1]?.[base.n - 1] ?? 1; return k === 1 ? r : { ...r, hpMult: (r.hpMult || 1) * k, atkMult: (r.atkMult || 1) * k }; })) });
+    waves: (hell ? hellWaves(base) : base.waves).map(w => w.map(m => { const r = scaleRef(m, D.stars), k = DIFF_K[base.zone]?.[d - 1]?.[base.n - 1] ?? 1, out = k === 1 ? r : { ...r, hpMult: (r.hpMult || 1) * k, atkMult: (r.atkMult || 1) * k };
+      return hell ? { ...out, rb: kitBonus(SPECIES[m.sid].role, HELL_RUNES.star[realm - 1], HELL_RUNES.lvl[realm - 1], !!(m.boss || SPECIES[m.sid].boss)) } : out; })) });
+}
+/** hell: every wave has at least HELL_MIN monsters (the zone's own pool fills the gaps, at the wave's level) */
+export const HELL = 3, HELL_MIN = 4;
+/** the runes hell enemies wear, by realm: rune star and level (epic, a role kit: see kitRunes in runes.ts) */
+export const HELL_RUNES = { star: [4, 5, 6], lvl: [6, 9, 12] };
+function hellWaves(base: StageDef): EnemyRef[][] {
+  const g = ZONE_GEN[base.zone];
+  return base.waves.map((w, wi) => { const out = [...w], t = w.find(m => !m.boss && !SPECIES[m.sid]?.boss) || w[0];
+    for (let i = 0; out.length < HELL_MIN; i++) out.push({ sid: g.pool[(base.n + wi + i + 1) % g.pool.length], lvl: t.lvl, stars: g.grade, ...(t.hpMult ? { hpMult: t.hpMult, atkMult: t.atkMult } : {}) });
+    return out; });
 }
 /** named egg (crafted from fragments): species known, and the best rare-form odds in the game — about twice the best
  *  mystery egg (rainbow 8%) before the species multiplier, so collecting a monster's fragments is the way to hunt its

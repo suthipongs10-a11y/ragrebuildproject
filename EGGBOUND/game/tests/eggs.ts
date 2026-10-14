@@ -85,7 +85,7 @@ export function eggTests(): number {
     ok(claimable(s).length === 0 && claimQuest(s, 'win1') === null, 'nothing claimable on a new save');
     grantRewards(s, 'meadow-5', true, 3, ['A02'], 3); ok(claimable(s).some(q => q.id === 'win1') && claimable(s).some(q => q.id === 'zclearmeadow'), 'winning unlocks quests');
     const g0 = s.gems; ok(!!claimQuest(s, 'win1') && s.gems === g0 + 10 && claimQuest(s, 'win1') === null, 'claim once');
-    ok(bookGems() === 1725, 'book gem total ' + bookGems()); // 800 (maps 1-3) + difficulties (2026-10-14): normal 15 zones × (10+10) + 40, hard 15 × (15+20) + 60
+    ok(bookGems() === 2480, 'book gem total ' + bookGems()); // + hell (2026-10-14): 15 × (20+25) + 80 = 755 → // 800 (maps 1-3) + difficulties (2026-10-14): normal 15 zones × (10+10) + 40, hard 15 × (15+20) + 60
     ok(CHAPTERS.every(c => questsIn(c.id).length > 0) && QUESTS.every(q => CHAPTERS.some(c => c.id === q.ch)), 'every quest in a chapter, no empty chapter');
     ok(ZONES.every(z => ['zclear', 'zstar', 'zfarm'].every(k => QUESTS.some(q => q.id === k + z.id))), 'every zone has boss/3-star/farm quests');
     for (let i = 0; i < 4; i++) grantRewards(s, 'meadow-5', true, 3, [], 10 + i); ok(claimable(s).some(q => q.id === 'zfarmmeadow'), 'beating a zone boss 5 times unlocks its farm quest');
@@ -156,7 +156,7 @@ export function eggTests(): number {
     ok(nn.waves.flat().every((m, i) => m.stars === Math.min(6, (e.waves.flat()[i].stars || 1) + 1)) && hh.waves.flat().every((m, i) => m.stars === Math.min(6, (e.waves.flat()[i].stars || 1) + 2)), 'enemies +1/+2 star grades');
     ok(planOf(nn)[1] === planOf(e)[1] + 1 && planOf(hh)[1] === planOf(e)[1] + 2, 'recommended team moves up with the enemies');
     ok(nn.reward.gold > e.reward.gold && hh.reward.gold > nn.reward.gold && hh.reward.exp > nn.reward.exp && hh.stamina > nn.stamina && nn.stamina > e.stamina, 'rewards and AUTO energy grow with difficulty');
-    ok(ZONES.every(z => DIFF_K[z.id]?.every(r => r.length === 5 && r.every(k => k > 0.4 && k < 2))), 'every zone has a tuned multiplier per stage and difficulty');
+    ok(ZONES.every(z => DIFF_K[z.id]?.length === 3 && DIFF_K[z.id].every((r, i) => r.length === 5 && r.every(k => k > (i === 2 ? 0.1 : 0.4) && k < 2))), 'every zone has a tuned multiplier per stage and difficulty (hell may go low: 4 runed monsters a wave)');
     const s = newSave();
     ok(!stageUnlocked(s, 'meadow-1@n'), 'normal locked on a new save');
     for (let k = 1; k <= 5; k++) s.stages['meadow-' + k] = 3;

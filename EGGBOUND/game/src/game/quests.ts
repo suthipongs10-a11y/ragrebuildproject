@@ -38,9 +38,10 @@ const mapQuests: Quest[] = ZONES.flatMap((z, i) => {
 const DIFF_GEMS: Record<number, { boss: number; star: number; gold: number; bonus: Reward }> = {
   1: { boss: 10, star: 10, gold: 1000, bonus: { gems: 40, egg: 'gold' } },
   2: { boss: 15, star: 20, gold: 2000, bonus: { gems: 60, egg: 'rainbow' } },
+  3: { boss: 20, star: 25, gold: 4000, bonus: { gems: 80, egg: 'rainbow' } }, // นรก (2026-10-14)
 };
-const diffChapters: Chapter[] = [1, 2].map(d => ({ id: 'diff' + DIFFS[d].key, name: `ผู้กล้าระดับ${DIFFS[d].name}`, desc: `ชนะบอสทุกโซนในระดับ${DIFFS[d].name} และเก็บครบ 3 ดาวทุกด่าน (เปิดระดับนี้ได้เมื่อชนะบอสโซนนั้นในระดับ${DIFFS[d - 1].name})`, bonus: DIFF_GEMS[d].bonus }));
-const diffQuests: Quest[] = [1, 2].flatMap(d => ZONES.flatMap((z, i) => {
+const diffChapters: Chapter[] = [1, 2, 3].map(d => ({ id: 'diff' + DIFFS[d].key, name: `ผู้กล้าระดับ${DIFFS[d].name}`, desc: `ชนะบอสทุกโซนในระดับ${DIFFS[d].name} และเก็บครบ 3 ดาวทุกด่าน (เปิดระดับนี้ได้เมื่อชนะบอสโซนนั้นในระดับ${DIFFS[d - 1].name})`, bonus: DIFF_GEMS[d].bonus }));
+const diffQuests: Quest[] = [1, 2, 3].flatMap(d => ZONES.flatMap((z, i) => {
   const ch = 'diff' + DIFFS[d].key, R = DIFF_GEMS[d], boss = stageKey(z.id + '-5', d), ids = STAGES.filter(st => st.zone === z.id).map(st => stageKey(st.id, d));
   return [
     { id: `d${DIFFS[d].key}clear${z.id}`, ch, name: `ชนะบอส ${z.name} (${DIFFS[d].name})`, goal: (s: SaveData) => n(stageStars(s, boss) > 0 ? 1 : 0, 1), reward: { gems: R.boss, gold: R.gold + i * 100 * (d + 1) } },

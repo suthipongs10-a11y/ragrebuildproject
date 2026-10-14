@@ -588,6 +588,9 @@ export class BattleView {
   drawGroundFx(v) {
     if (v.alpha < .05) return; const ctx = E.ctx, P = PAL[v.elem], t = E.time, rk = v.k / .4;
     ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    if (v.team === 1 && this.stage?.diff === 3 && !v.dead) { // hell: every enemy wears runes — a slow blood-red rune ring under its feet
+      const R = 70 * rk, rot = -t * .6; ctx.globalAlpha = (.5 + .15 * Math.sin(t * 2.4 + v.ph)) * v.alpha; ctx.strokeStyle = '#ff3a4e'; ctx.lineWidth = 2.2; ctx.beginPath(); ctx.ellipse(v.x, v.y, R, R * .38, 0, 0, TAU); ctx.stroke();
+      ctx.fillStyle = '#ff7a3a'; for (let i = 0; i < 4; i++) { const a = rot + i * TAU / 4, x = v.x + Math.cos(a) * R, y = v.y + Math.sin(a) * R * .38; ctx.beginPath(); ctx.moveTo(x, y - 7); ctx.lineTo(x + 5, y); ctx.lineTo(x, y + 7); ctx.lineTo(x - 5, y); ctx.closePath(); ctx.fill(); } }
     if (v.rare && !v.dead) { for (let i = 0; i < 6; i++) { const a0 = t * 1.2 + i * TAU / 6; ctx.strokeStyle = PRISM[i]; ctx.globalAlpha = .55 * v.alpha; ctx.lineWidth = 2.4; ctx.beginPath(); ctx.ellipse(v.x, v.y, 66 * rk, 24 * rk, 0, a0, a0 + TAU / 6 - .08); ctx.stroke(); } }
     if (v.stars >= 2 && !v.dead) { const pul = .5 + .5 * Math.sin(t * 3 + v.ph); ctx.strokeStyle = P.aura; ctx.globalAlpha = (.35 + .3 * pul) * v.alpha; ctx.lineWidth = 2.2; ctx.beginPath(); ctx.ellipse(v.x, v.y, (58 + pul * 5) * rk, (21 + pul * 2) * rk, 0, 0, TAU); ctx.stroke(); }
     if (v.stars >= 5 && !v.dead) { ctx.globalAlpha = .45; ctx.strokeStyle = P.rune; ctx.lineWidth = 1.6; const R = 72 * rk, rot = t * .8; ctx.beginPath(); ctx.ellipse(v.x, v.y, R, R * .38, 0, 0, TAU); ctx.stroke(); for (let i = 0; i < 12; i++) { const a = i / 12 * TAU + rot, a2 = a + .18; ctx.beginPath(); ctx.moveTo(v.x + Math.cos(a) * R * .8, v.y + Math.sin(a) * R * .3); ctx.lineTo(v.x + Math.cos(a2) * R * .98, v.y + Math.sin(a2) * R * .375); ctx.stroke(); } }

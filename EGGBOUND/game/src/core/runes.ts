@@ -1,7 +1,7 @@
 // Runes (รูน) — chosen by the owner 2026-10-14 instead of worn equipment (gear on the sprite never looked right): no art
 // needed, every icon is drawn in code. 4 slots per monster, sets, random sub stats, +0..+12 upgrades paid in gold (the
 // game's main gold sink). Pure data + math: the save/drop/equip layer is game/runes.ts, battle reads `RuneBonus`.
-import type { Unit } from './types';
+import type { Unit, Role } from './types';
 
 export type RuneStat = 'atk' | 'hp' | 'def' | 'atkP' | 'hpP' | 'defP' | 'spd' | 'crit' | 'cdmg' | 'res' | 'acc';
 export type RuneGrade = 'common' | 'rare' | 'epic' | 'legendary';
@@ -59,8 +59,8 @@ export const RUNE_SELL = [0, 40, 80, 150, 260, 420, 650];
 const GRADE_SELL: Record<RuneGrade, number> = { common: 1, rare: 1.4, epic: 2, legendary: 3 };
 /** drops per win by difficulty (easy/normal/hard): chance, grade weights · star = realm base + 0..1 + difficulty */
 export const RUNE_DROP = {
-  chance: [0.4, 0.55, 0.7],
-  gradeW: [{ common: 55, rare: 32, epic: 11, legendary: 2 }, { common: 35, rare: 40, epic: 20, legendary: 5 }, { common: 20, rare: 40, epic: 30, legendary: 10 }] as Record<RuneGrade, number>[],
+  chance: [0.4, 0.55, 0.7, 0.9],
+  gradeW: [{ common: 55, rare: 32, epic: 11, legendary: 2 }, { common: 35, rare: 40, epic: 20, legendary: 5 }, { common: 20, rare: 40, epic: 30, legendary: 10 }, { common: 5, rare: 30, epic: 40, legendary: 25 }] as Record<RuneGrade, number>[],
   realmStar: { 1: 1, 2: 2, 3: 3 } as Record<string, number>,
 };
 
@@ -112,4 +112,17 @@ export function applyRunes(u: Unit, b: RuneBonus) {
   if (b.leech) u.leech = b.leech / 100;
   if (b.mark) u.markUp = b.mark / 100;
 }
+/** a fixed rune kit by role (no sub stats): what hell-difficulty enemies wear, and the balance sim's reference team.
+ *  Slots 1–2 carry the first set, 3–4 the second (same set twice = a 4-piece set) */
+const KIT: Record<Role | 'Boss', { sets: [RuneSet, RuneSet]; m3: RuneStat; m4: RuneStat }> = {
+  Attacker: { sets: ['fang', 'fang'], m3: 'atkP', m4: 'cdmg' },
+  Defender: { sets: ['shell', 'vital'], m3: 'defP', m4: 'hpP' },
+  Support: { sets: ['gale', 'gale'], m3: 'spd', m4: 'hpP' },
+  Healer: { sets: ['vital', 'vital'], m3: 'hpP', m4: 'res' },
+  Controller: { sets: ['sigil', 'sigil'], m3: 'spd', m4: 'acc' },
+  Boss: { sets: ['blood', 'blood'], m3: 'atkP', m4: 'hpP' },
+};
+export const kitRunes = (role: Role, star: number, lvl: number, boss = false): Rune[] => { const K = KIT[boss ? 'Boss' : role];
+  return ([1, 2, 3, 4] as RuneSlot[]).map(slot => ({ id: 0, slot, set: K.sets[slot <= 2 ? 0 : 1], grade: 'epic' as RuneGrade, star, lvl, main: slot === 1 ? 'atk' as RuneStat : slot === 2 ? 'hp' as RuneStat : slot === 3 ? K.m3 : K.m4, subs: [] })); };
+export const kitBonus = (role: Role, star: number, lvl: number, boss = false) => runeBonus(kitRunes(role, star, lvl, boss));
 export const fmtStat = (k: RuneStat, v: number) => `${RUNE_STATS[k].name} +${v}${RUNE_STATS[k].pct ? '%' : ''}`;

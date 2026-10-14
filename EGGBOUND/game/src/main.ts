@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
-import { SPECIES, EVO_NAME, isEvolved, monName, STAGES, ZONES, ZONE_PLAN, planOf, starbornOf, rareFormChance, DIFFS, stageKey, parseStage, stageOf, ENERGY_MAX, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
+import { SPECIES, EVO_NAME, isEvolved, monName, HELL, HELL_MIN, HELL_RUNES, STAGES, ZONES, ZONE_PLAN, planOf, starbornOf, rareFormChance, DIFFS, stageKey, parseStage, stageOf, ENERGY_MAX, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
 import { Battle } from './core/battle';
 import { drawShowcase, showcaseTap } from './render/showcase';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL, rareMasterURL, ensureArt, artReady, prefetchExt, EXT_STAT } from './render/assets';
@@ -153,7 +153,7 @@ function zonePanel(z) {
   while (mapDiff > 0 && !zoneDiffOpen(z, mapDiff)) mapDiff--; // the sheet opens on the last chosen difficulty this zone allows
   const dd = mapDiff, D = DIFFS[dd];
   const dtabs = `<div class="dtabs">${DIFFS.map((X, d) => { const op = zoneDiffOpen(z, d); return `<button type="button" class="dtab ${d === dd ? 'on' : ''} ${zoneDiffCleared(z, d) ? 'clear' : ''}" style="--dc:${X.col}" data-zdiff="${d}" ${op ? '' : 'disabled'}><b>${op ? '' : '🔒 '}${X.name}</b><small>${op ? `<span class="stars">★</span> ${zoneDiffStars(z, d)}/15` : `ชนะบอส${DIFFS[d - 1].name}ก่อน`}</small></button>`; }).join('')}</div>
-    <p class="dnote">${dd ? `ศัตรู ★+${D.stars} แข็งแรงขึ้น · ทอง ×${D.gold} · EXP ×${D.exp} · ไข่ปริศนาลายดีขึ้น · เศษไข่ +${D.frag}${bs.starborn ? ` · เศษไข่ดารา ${D.shard * 100}%` : ''}` : 'ระดับเริ่มต้น · ชนะบอสโซนนี้เพื่อเปิดระดับปานกลาง'}</p>`;
+    ${dd === HELL ? `<p class="dnote hell">🔥 <b>นรก</b> · ทุกเวฟมีศัตรู ${HELL_MIN} ตัว · ศัตรูทุกตัวใส่รูน ★${HELL_RUNES.star[+z.realm - 1]} +${HELL_RUNES.lvl[+z.realm - 1]} (บอสใส่เซ็ตโลหิต ดูดเลือด) · ไม่มีรูนแทบไม่มีทางชนะ · ดรอปรูน ${Math.round(RUNE_DROP.chance[HELL] * 100)}% ระดับตำนานบ่อยขึ้น</p>` : ''}<p class="dnote">${dd ? `ศัตรู ★+${D.stars} แข็งแรงขึ้น · ทอง ×${D.gold} · EXP ×${D.exp} · ไข่ปริศนาลายดีขึ้น · เศษไข่ +${D.frag}${bs.starborn ? ` · เศษไข่ดารา ${D.shard * 100}%` : ''}` : 'ระดับเริ่มต้น · ชนะบอสโซนนี้เพื่อเปิดระดับปานกลาง'}</p>`;
   const rows = zoneStagesOf(z.id).map(base => {
     const key = stageKey(base.id, dd), st = stageOf(key), un = stageUnlocked(S, key), stars = S.stages[key] || 0, boss = st.n === 5, [pl, ps] = planOf(st);
     const els = [...new Set(st.waves.flat().map(m => formOf(m.sid, !!m.rare).elem))];
@@ -567,7 +567,7 @@ function startBattle(stageId, artTried = false) {
   // Starborn art ships as separate files: load it (once) before the fight so nobody appears as a placeholder
   const sids = [...st.waves.flat().map(m => m.sid), ...S.team.map(uid => monOf(S, uid)?.sid).filter(Boolean)];
   if (!artTried && !artReady(sids)) { if (!artWait) { artWait = true; toast('กำลังโหลดภาพมอนตำนานดารา…'); ensureArt(sids).then(() => { artWait = false; startBattle(stageId, true); }); } return; }
-  curStageId = stageId; setLocation(st?.loc); // each stage fights in its own arena
+  curStageId = stageId; setLocation(st?.loc); E.hell = st?.diff === HELL; // each stage fights in its own arena (hell: red grade)
   const seed = (Date.now() ^ (Math.random() * 1e9)) >>> 0;
   const team = S.team.map(uid => { const m = monOf(S, uid); return { sid: m.sid, lvl: m.lvl, stars: m.stars, sk: m.sk, rare: !!m.rare, rb: runeBonusOf(S, uid) }; });
   const b = new Battle(seed, team, st, homeMods(S));
@@ -646,7 +646,7 @@ function resultModal(r, win, stars) {
   document.body.appendChild(modal);
   if (win && stars) sfx.coin();
 }
-function leaveBattle() { clearLocation(); chestUI?.close(); chestUI = null; battle = null; clearAll(); scene = cur === 'home' && homeV ? homeV : idleScene; $('#resModal')?.remove(); $('#bhud').hidden = true; }
+function leaveBattle() { clearLocation(); E.hell = false; chestUI?.close(); chestUI = null; battle = null; clearAll(); scene = cur === 'home' && homeV ? homeV : idleScene; $('#resModal')?.remove(); $('#bhud').hidden = true; }
 
 // ---------- hatch ----------
 function startHatch(eggId, forceRarity = null, artTried = false) {
