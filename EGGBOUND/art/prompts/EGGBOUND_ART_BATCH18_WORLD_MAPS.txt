@@ -1,120 +1,153 @@
 =====================================================================
-EGGBOUND — ART BATCH 18 : WORLD MAPS (แผนที่โลก 3 ภพ)
+EGGBOUND — ART BATCH 18 (v2) : WORLD MAPS — ANCIENT LANDS (แผนที่ดินแดนโบราณ 3 ภพ)
 Image generation instructions for Google Flow (or ChatGPT)
 =====================================================================
 
 [หมายเหตุสำหรับผู้ใช้]
-- หน้าแผนที่ในเกมทำเสร็จแล้ว (15 โซน โซนละ 5 ด่าน แตะเกาะเพื่อเลือกด่าน) ตอนนี้พื้นหลัง
-  แผนที่เป็นท้องฟ้าวาดด้วยโค้ด + เกาะเป็นวงกลมรูปฉาก — ภาพชุดนี้คือ "แผนที่วาดมือ" 3 ภาพ
-  (ภพละ 1 ภาพ) มาแทน ให้สวยแบบหน้าแผนที่โลกของ SW แต่เป็นสไตล์ของเรา
-- โลกของเรา: ทะเลเมฆกว้างใหญ่ มีเกาะลอยฟ้าแต่ละโซน บ้านเราคือเต่ายักษ์ที่ว่ายในทะเลเมฆ
-  ไปหาเกาะต่างๆ
-- เกมวาดเส้นทางจุดไข่ปลา ป้ายชื่อ ดาว และรูปบอสทับบนภาพเอง → ในภาพ "ห้ามมีตัวหนังสือ
-  เส้นทาง ป้าย ลูกศร หมุด หรือ UI"
-- ตำแหน่งเกาะสำคัญมาก (เกมวางป้ายตามพิกัด %) ถ้าภาพออกมาคลาดนิดหน่อยผมปรับพิกัดตามภาพได้
+- v2 (2026-10-14) แทนฉบับเกาะลอยฟ้าเดิม ตามที่ขอ: แผนที่เป็น "ผืนแผ่นดินโบราณ" ภาพวาดมุมสูง
+  แบบหน้าแผนที่โลกของเกม SW แต่ดีไซน์ของเราเอง — ภูเขา ป่า แม่น้ำ ชายฝั่ง ซากโบราณสถาน
+  ทางหินเก่าๆ แต่ละโซนเป็นสถานที่สำคัญย่อส่วนอยู่บนแผ่นดินเดียวกัน
+- 3 ภาพ = 3 ภพ (ภาพละภพ) ทุกภาพเป็นส่วนหนึ่งของทวีปเดียวกัน สไตล์/มุมกล้อง/ขนาดต้องเหมือนกัน
+- เกมวาดเส้นทาง ป้ายชื่อ ดาว และรูปบอสทับบนภาพเอง → ในภาพ "ห้ามมีตัวหนังสือ เส้นประ
+  ลูกศร หมุด ธง ป้าย เข็มทิศ กรอบ หรือ UI"
+- ตำแหน่งสถานที่สำคัญมาก (เกมวางป้ายตามพิกัด %) ถ้าภาพออกมาคลาดนิดหน่อยผมปรับพิกัดตามภาพได้
 - วิธีสั่ง Google Flow:
-  1) แนบไฟล์นี้ + ภาพฉากต่อสู้ BATCH17 ของโซนในภพนั้น (เป็นตัวอย่างหน้าตาสถานที่)
+  1) แนบไฟล์นี้ + ภาพฉากต่อสู้ BATCH17 ของโซนในภพ 1 (stream, rootnest) เป็นตัวอย่างหน้าตาสถานที่
      สั่งว่า: "สร้างภาพ #01 ตามไฟล์ที่แนบ สัดส่วน 16:9"
-  2) ได้ #01 ที่ชอบแล้ว → ทำ #02, #03 โดยแนบภาพ #01 ไปด้วย แล้วสั่งว่า
-     "สร้างภาพ #0X ตามไฟล์ ใช้สไตล์ มุมกล้อง และขนาดเกาะเดียวกับภาพที่แนบ เปลี่ยนแค่ภพ"
-  3) ชื่อไฟล์จาก Flow จะสุ่มมา ไม่ต้องเปลี่ยนชื่อ รวมเป็น zip ส่งกลับมาที่แชท Claude
+  2) ได้ #01 ที่ชอบแล้ว → ทำ #02 และ #03 โดยแนบภาพ #01 + ภาพฉาก BATCH17 ของภพนั้นไปด้วย แล้วสั่งว่า
+     "สร้างภาพ #0X ตามไฟล์ ใช้สไตล์ มุมกล้อง สีโทนเก่า และขนาดสถานที่เดียวกับภาพ #01 เปลี่ยนแค่ภพ"
+  3) **ส่งกลับเป็นไฟล์ภาพเดี่ยว ไม่ต้องรวม zip** (zip ใหญ่เคยขาดท้ายมาแล้ว 2 รอบ)
+     ชื่อไฟล์สุ่มจาก Flow ได้ ผมจับคู่เอง
 
 ---------------------------------------------------------------------
 0. YOUR ROLE
 ---------------------------------------------------------------------
 You are the environment artist for a premium 2.5D fantasy monster RPG
-(hand-painted, Summoners-War-like quality). Paint the WORLD MAP chart
-of one realm: a sea of clouds with floating islands, one island per
-zone. The game overlays the route, names, stars and boss icons, so you
-paint ONLY the landscape. Generate 3 images, ONE IMAGE PER TURN.
+(hand-painted, top mobile-RPG quality). Paint the WORLD MAP of one realm
+of an ANCIENT CONTINENT: a living landscape of a forgotten age, seen from
+high above, with one landmark site per zone. The game overlays the route,
+names, stars and boss icons, so you paint ONLY the land.
+Generate 3 images, ONE IMAGE PER TURN.
 
 ---------------------------------------------------------------------
 1. MASTER STYLE (every image)
 ---------------------------------------------------------------------
 STYLE: painterly premium fantasy game world map, rich hand-painted
-texture, soft warm light from TOP-LEFT, clean readable shapes, cozy and
-magical. Southeast-Asian / Thai-Khmer and Chinese-heaven fantasy flavour.
+texture (gouache / oil look), soft warm light from TOP-LEFT, clean
+readable shapes. The land feels ANCIENT and legendary: weathered stone,
+moss and vines on old ruins, cracked stone-slab roads worn by time,
+crumbling walls, half-buried giant statues, old stone bridges, giant
+ancient trees. Colour grade slightly aged and warm (a hint of old
+parchment in the highlights) but still vivid and inviting, not dark.
+Southeast-Asian / Thai-Khmer and Chinese-legend fantasy flavour.
 
-CAMERA: high bird's-eye view looking down at about 50–60°, like a
-tabletop diorama of floating islands. No fisheye, no tilt.
+CAMERA: high bird's-eye view looking down at about 60°, north at the
+top, like a beautifully painted diorama of a whole region. Terrain has
+real depth: hills and mountains cast soft shadows, rivers wind through
+valleys, coastlines meet a calm sea. No fisheye, no tilt.
 
-WORLD: an endless SEA OF CLOUDS (soft, layered, slightly tinted by the
-realm's colour) with glimpses of sky between. Each zone is a FLOATING
-ISLAND (rocky underside with hanging roots / waterfalls into the
-clouds) whose top shows that zone's landmark in miniature. Islands are
-about 16–20% of the image width, clearly separated, with calm cloud
-space between them so the game can draw a dotted route.
+LAND: ONE CONTINUOUS LANDMASS across the image (not floating islands):
+plains, forests, rivers, hills, mountains, coast. Each zone is a
+LANDMARK SITE painted in miniature on the land (about 12–16% of the
+image width), clearly separated from the next by natural terrain
+(forest, river, ridge) so each one reads on its own. Faint old dirt
+trails or worn stone roads may wind between sites, but they must stay
+subtle and must NOT look like a dotted line — the game draws its own
+route. Keep the ground right around each site calm (grass, sand, stone
+plaza) so the game's name tag below it stays readable.
 
-ISLAND POSITIONS (centre of each island top, % of the 16:9 image,
-x from the left, y from the top) — keep them exactly:
-  see each image below.
+LANDMARK POSITIONS (centre of each site, % of the 16:9 image, x from the
+left, y from the top) — keep them exactly: see each image below.
 
-FORBIDDEN: any text, letters, numbers, map labels, compass, route
-lines, arrows, pins, flags with writing, UI, frames, borders; monsters,
-people, characters; glow halos, lens flare, particles.
+EDGES: the outer ~5% of the image fades softly into sea mist / low
+cloud (no hard frame, no border, no vignette ring).
+
+FORBIDDEN: any text, letters, numbers, map labels, legend, compass rose,
+scale bar, grid, dotted route lines, arrows, pins, flags with writing,
+banners, UI, frames, borders, torn-paper edges; monsters, people,
+characters, animals; glow halos, lens flare, floating particles.
 ORIGINAL DESIGN — do not copy any existing game/film character, map or
-any existing game's UI.
+any existing game's UI (including the Summoners War world map).
 
-OUTPUT: 16:9, as large as possible (2048×1152 or more), no border,
-no vignette. Leave the outer 6% of the image as clouds only.
+OUTPUT: 16:9, as large as possible (2048×1152 or more).
 
 ---------------------------------------------------------------------
 2. IMAGES (one per turn)
 ---------------------------------------------------------------------
-#01  map1.png — REALM 1 ทุ่งไข่ป่วน (green, fresh morning)
-Cloud sea tinted soft sky-blue. Three islands:
-  - (22%, 68%) MEADOW island: rolling green meadow, wild flowers,
-    a round cobblestone clearing, little lantern posts.
-  - (50%, 44%) STREAM island: a clear stream with stepping stones and
-    a willow, a small waterfall pouring off the island edge.
-  - (78%, 26%) ROOT NEST island: one gigantic ancient tree whose huge
-    roots wrap the whole island, teal glowing mushrooms under it.
-  A tiny far-away giant turtle carrying a small island on its shell,
-  swimming in the clouds near the bottom-left corner (decor, small).
+#01  map1 — REALM 1 ทุ่งไข่ป่วน (green land, fresh morning)
+Gentle green lowlands rising to a forested highland at the top-right; a
+clear river runs from the top-right highlands down through the middle to
+a calm sea in the bottom-left corner.
+  - (22%, 68%) MEADOW: rolling green meadow with wild flowers around an
+    ancient ring of mossy standing stones and a round cobblestone
+    clearing, a few old stone lantern posts.
+  - (50%, 44%) STREAM: the river with stepping stones and a weeping
+    willow, an ancient arched stone bridge half covered in moss, a small
+    waterfall dropping over an old carved stone ledge.
+  - (78%, 26%) ROOT NEST: one gigantic ancient tree whose enormous roots
+    grip the ruins of an old shrine, teal glowing mushrooms in its shade,
+    deep old forest around it.
+  Decor (small): in the sea at the bottom-left, a giant turtle swimming
+  with a small green island and buildings on its shell, seen from far
+  above.
 
-#02  map2.png — REALM 2 สุวรรณภูมิ (golden, warm afternoon)
-Cloud sea tinted warm gold-peach. Six islands:
-  - (13%, 70%) GOLDEN FOREST: tall pale trees with colourful cloth
-    sashes, golden leaves.
-  - (28%, 40%) RICE FIELDS: golden rice terraces, sugar palms, a small
-    thatched hut and haystacks.
-  - (44%, 70%) STILT VILLAGE: wooden Thai stilt houses with steep
-    thatched roofs, banana plants, warm lit windows.
-  - (57%, 34%) KINNARI LOTUS LAKE: a lotus lake with a floating golden
-    pavilion on a round teak deck.
-  - (71%, 66%) TEMPLE OF THE LIONS: laterite corn-cob prang towers on a
-    sandstone court.
-  - (85%, 30%) NAGA JEWEL POOL: a sapphire pool with golden multi-headed
-    naga statues and a golden stupa, dusk-blue mood on this island.
+#02  map2 — REALM 2 สุวรรณภูมิ (golden land, warm afternoon)
+Warm golden lowlands of an old Southeast-Asian kingdom: jungle, rice
+plains and a wide brown-gold river that winds from left to right,
+ending at the right in dusk-blue sacred water.
+  - (13%, 70%) GOLDEN FOREST: tall pale ancient trees wrapped with
+    faded colourful cloth sashes, golden leaves, an old spirit shrine.
+  - (28%, 40%) RICE FIELDS: golden rice terraces climbing a hill, sugar
+    palms, an old thatched field hut and haystacks.
+  - (44%, 70%) STILT VILLAGE: weathered wooden Thai stilt houses with
+    steep thatched roofs along the river bank, banana plants, warm lit
+    windows, small wooden boats tied up.
+  - (57%, 34%) KINNARI LOTUS LAKE: a lotus lake with an ancient golden
+    pavilion standing on a round teak deck in the middle.
+  - (71%, 66%) TEMPLE OF THE LIONS: ruins of a Khmer-style laterite
+    temple — corn-cob prang towers, a sandstone court, guardian lion
+    statues, jungle roots creeping over the walls.
+  - (85%, 30%) NAGA JEWEL POOL: a sapphire pool framed by golden
+    multi-headed naga balustrades and an old golden stupa; this one site
+    is in a cool dusk-blue light.
 
-#03  map3.png — REALM 3 สวรรค์บูรพา (jade & heaven, bright)
-Cloud sea tinted jade-lavender. Six islands:
-  - (13%, 64%) JADE MOON GARDEN: white wall with a round moon gate,
-    bamboo, jade-green paving.
-  - (28%, 32%) PIXIU PALACE: red palace walls with green-glazed roofs,
-    a red-and-gold gate.
-  - (43%, 68%) NINE-TAIL FOX VALLEY: snowy mountain peaks and pines
-    around a small valley.
-  - (57%, 34%) GOLDEN TOAD BRIDGE: a red arched bridge over a jade
-    river, a golden toad statue on coins.
-  - (71%, 22%) HEAVEN GATE: a grand white-and-gold gate on a marble
-    platform, the brightest island, crowned by sunlit clouds.
-  - (85%, 62%) DEMON KING'S FIRE CAVE: a dark volcanic island with lava
-    falls glowing into the clouds and a cave mouth.
+#03  map3 — REALM 3 สวรรค์บูรพา (jade & heaven mountains, bright)
+A land of steep jade-green mountains and pines in the style of old
+Chinese landscape painting, a jade river in the lower middle, misty
+peaks; snow in the lower-middle valley; a dark volcano on the right.
+  - (13%, 64%) JADE MOON GARDEN: a walled garden with a white wall and a
+    round moon gate, bamboo groves, jade-green paving, an old pavilion.
+  - (28%, 32%) PIXIU PALACE: an ancient palace of red walls and
+    green-glazed roofs on a terrace, a red-and-gold gate, stone guardian
+    beasts at the steps.
+  - (43%, 68%) NINE-TAIL FOX VALLEY: a small snowy valley ringed by
+    sharp snow peaks and dark pines, an old stone shrine in the snow.
+  - (57%, 34%) GOLDEN TOAD BRIDGE: a red arched bridge over the jade
+    river, a large weathered golden toad statue sitting on a pile of old
+    coins beside it.
+  - (71%, 22%) HEAVEN GATE: the highest mountain peak pierces a sea of
+    sunlit clouds; on top, a grand white-and-gold gate on an ancient
+    marble platform — the brightest place in the image.
+  - (85%, 62%) DEMON KING'S FIRE CAVE: a dark volcanic mountain with
+    glowing lava rivers running down its side and a huge cave mouth
+    carved like an ancient ox-demon head.
 
 ---------------------------------------------------------------------
 3. QUALITY CHECK (fix and regenerate any image that fails)
 ---------------------------------------------------------------------
-  [ ] Every island sits at its listed position, clearly separated
+  [ ] One continuous landmass with real terrain (not floating islands)
+  [ ] Every landmark site sits at its listed position, clearly separated
+  [ ] It reads as ANCIENT: ruins, weathered stone, old roads, old trees
   [ ] Each landmark is readable at small size (a phone shows the map
       about 800 px wide)
-  [ ] No text, route lines, pins, labels, characters or UI
-  [ ] The three images share the same style, camera and island size
+  [ ] No text, dotted lines, pins, labels, characters, animals or UI
+  [ ] The three images share the same style, camera, scale and colour
+      grade
 
 ---------------------------------------------------------------------
-4. PACKAGE
+4. DELIVERY
 ---------------------------------------------------------------------
-Put all files into ONE zip named:  EGGBOUND_WORLD_MAPS.zip
-File names (Flow's random names are fine too — the developer matches them):
+Send the 3 images as separate files (not zipped).
+File names (Flow's random names are fine — the developer matches them):
   map1   map2   map3
-Add notes.txt listing any image you regenerated and why.
+If any image was regenerated, add one line saying which and why.
