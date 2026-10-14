@@ -776,7 +776,7 @@ export const LOC_IDS = Object.keys(LOCS);
 // with the ids that have one). A plate replaces the code ground, props and lamps; ambient life stays (minus the
 // systems tied to the code geometry: water ripples/sparkles and lamp smoke) and the grade becomes L.artGrade.
 // Plates are drawn on a separate image, so the main canvas may become origin-tainted — nothing reads it back.
-const ART = new Set(typeof __BG__ !== 'undefined' ? __BG__ : []);
+const ART = new Set((typeof __BG__ !== 'undefined' ? __BG__ : []).filter(id => !/^map\d/.test(id))); // battle plates only (map<N> = realm charts)
 const PLATE = {};
 /** world height a plate covers: its painted oval (~31% of the height, centre ~50%) then matches the plaza (PR·SQ) */
 const PH = 1084;

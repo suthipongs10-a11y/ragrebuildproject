@@ -270,7 +270,16 @@ html:not(.has-book-emblem) .bk-emblem{position:relative}html:not(.has-book-emble
 .pin{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:0;color:var(--ink);cursor:pointer;z-index:1}
 .pin::before{content:'';position:absolute;top:calc(clamp(70px,11vh,104px) * .62);left:50%;width:calc(clamp(70px,11vh,104px) * 1.7);height:calc(clamp(70px,11vh,104px) * .62);transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at 50% 30%,color-mix(in srgb,var(--isle,#7fb05a) 85%,#fff) 0 38%,var(--isle,#7fb05a) 52%,#8a6a44 54%,#5a4228 70%,transparent 72%);filter:drop-shadow(0 8px 6px rgba(20,30,50,.3));z-index:-1}
 .wmap-in.art .pin::before{display:none}
-.wmap-in.art .pin .isle{width:clamp(40px,7vh,56px);border-width:2px;box-shadow:0 4px 10px rgba(0,0,0,.45)} /* painted chart: the island is in the painting, the pin is a small marker */
+.wmap-in.art{--pr:clamp(58px,11vh,104px)} /* painted chart: the landmark is in the painting; the pin is a see-through ring centred on it + the label below */
+.wmap-in.art .pin{transform:translate(-50%,calc(var(--pr) * -.5))}
+.wmap-in.art .pin .isle{width:var(--pr);background:radial-gradient(circle,transparent 58%,rgba(255,232,170,.22) 70%,transparent 72%)!important;border:2px solid rgba(255,236,190,.55);box-shadow:0 0 10px rgba(255,214,140,.45),inset 0 0 12px rgba(255,214,140,.25)}
+.wmap-in.art .pin:hover .isle,.wmap-in.art .pin:focus-visible .isle{border-color:#ffe6a8;box-shadow:0 0 16px rgba(255,214,140,.8),inset 0 0 14px rgba(255,214,140,.45)}
+.wmap-in.art .pin.here .isle{border-color:#ffd877;border-width:3px;animation:pinGlow 1.6s ease-in-out infinite}
+@keyframes pinGlow{50%{box-shadow:0 0 0 6px rgba(255,214,120,.35),0 0 26px rgba(255,214,120,.9),inset 0 0 16px rgba(255,214,140,.5)}}
+.wmap-in.art .pin.starborn .isle{border-color:rgba(200,180,255,.8);box-shadow:0 0 14px rgba(170,140,255,.7),inset 0 0 12px rgba(170,140,255,.35)}
+.wmap-in.art .pin.locked .isle{background:radial-gradient(circle,rgba(12,10,20,.55) 0 60%,transparent 72%)!important;border-color:rgba(200,200,210,.35);box-shadow:none;filter:none}
+.wmap-in.art .pin .bossb{width:clamp(26px,4.6vh,40px);top:-4px;right:auto;left:calc(50% + var(--pr) * .26)}
+.wmap-in.art polyline{stroke:rgba(255,246,220,.7);stroke-width:5}
 .pin .isle{width:clamp(70px,11vh,104px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--isle) 70%,#fff),var(--isle) 60%,color-mix(in srgb,var(--isle) 60%,#000));background-size:cover;background-position:center;border:3px solid #f6e3b0;box-shadow:0 10px 0 -2px rgba(70,50,30,.55),0 14px 22px rgba(0,0,0,.35),inset 0 0 0 2px rgba(0,0,0,.25);transition:transform .15s}
 .pin:hover .isle,.pin:focus-visible .isle{transform:scale(1.07)}
 .pin.starborn .isle{border-color:#bfa8ff;box-shadow:0 10px 0 -2px rgba(60,40,110,.6),0 0 22px rgba(170,140,255,.75),inset 0 0 0 2px rgba(0,0,0,.25)}

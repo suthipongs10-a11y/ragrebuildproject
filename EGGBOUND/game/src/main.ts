@@ -92,10 +92,11 @@ const realmOf = id => STAGES.find(st => st.id === id)?.realm || id.split('-')[0]
 const realmOpen = r => stageUnlocked(S, STAGES.find(st => st.realm === r).id);
 /** world map (2026-10-13): each realm is a sea-of-clouds chart our turtle sails; zones are islands (their painted arena in
  *  a round frame) joined by a dotted route. Positions are % of a 16:9 chart, tuned to the BATCH18 painting when it lands. */
+/** landmark centres on the painted realm charts (BATCH18 v2, % of the 16:9 image) — the route and pins follow them */
 const MAP_POS = {
-  meadow: [22, 68], stream: [50, 44], rootnest: [78, 26],
-  goldforest: [13, 70], ricefield: [28, 40], village: [44, 70], kinnari: [57, 34], temple: [71, 66], nagapool: [85, 30],
-  jade: [13, 64], palace: [28, 32], foxvalley: [43, 68], toadbridge: [57, 34], heaven: [71, 22], firecave: [85, 62],
+  meadow: [22, 56], stream: [54.5, 45], rootnest: [79.5, 23],
+  goldforest: [13.5, 59], ricefield: [30, 35], village: [41.5, 65], kinnari: [59, 32], temple: [71, 57], nagapool: [85, 29],
+  jade: [17.5, 59], palace: [28.5, 26], foxvalley: [44.5, 71], toadbridge: [57, 37], heaven: [72.5, 12], firecave: [80, 53],
 };
 const ART_BG = typeof __BG__ !== 'undefined' ? __BG__ : [];
 const zoneStagesOf = zid => STAGES.filter(st => st.zone === zid);
