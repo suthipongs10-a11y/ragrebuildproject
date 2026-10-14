@@ -580,6 +580,8 @@ export const EVO_NAME: Record<string, [string, string]> = {
 /** raised past its natural stars to ★5+ = the evolved form (the same rule as the evolved art, `lookOf` in assets.ts) */
 export const isEvolved = (sid: string, stars: number, rare = false) => stars >= 5 && stars > natStars(sid, rare);
 export const monName = (sid: string, stars = 0, rare = false) => (isEvolved(sid, stars, rare) && EVO_NAME[sid]?.[0]) || SPECIES[sid].name;
+/** hell enemies are awakened: the evolved name when the species has evolved art, else "<name> ทมิฬ" (deep-purple form) */
+export const awakeName = (sid: string, title?: string) => EVO_NAME[sid]?.[0] || (title || SPECIES[sid].name) + ' ทมิฬ';
 
 // ---- eggs (P1 M0) ----
 // Mystery egg: species unknown until it hatches; only the shell pattern (tier) shows the rarity.
@@ -621,24 +623,25 @@ const scaleRef = (m: EnemyRef, k: number): EnemyRef => { if (!k) return m; const
 /** extra enemy HP/ATK per stage for [normal, hard, hell] (stages 1–5), tuned by sim so the recommended team (planOf) wins
  *  ~84% → ~74% → boss ~55% on normal and ~80% → ~70% → boss ~50% on hard. Needed because DEF reduces damage
  *  non-linearly (100/(100+DEF)): raising both sides by the same star grade does not keep a fight equally hard.
- *  Hell: the recommended team wearing the SAME rune kit as the enemies wins ~50% → ~35% → boss ~20% (without runes ≈ 0%);
- *  below 1 because every hell wave has 4 runed monsters (12 per stage against our 4). */
+ *  Hell (made harder 2026-10-14, owner: "not hard enough" → awakened enemies): the recommended team wearing the BEST
+ *  rune kit (★6 +12) wins only ~35% → ~20% → boss ~10% (the enemies' own kit ≈ 10–25%, no runes ≈ 0%); mostly below 1 in
+ *  realms 2–3 because every hell wave has 4 runed monsters (12 per stage against our 4). */
 export const DIFF_K: Record<string, number[][]> = {
-  meadow: [[1.07, 1.01, 1.05, 1.12, 0.94], [1.08, 1.1, 1.1, 1.1, 0.93], [0.64, 0.69, 0.77, 0.88, 0.66]],
-  stream: [[1.07, 1.07, 1.06, 1.05, 1.03], [1.07, 1.16, 1.06, 1.16, 1.07], [0.81, 0.86, 0.77, 0.91, 0.78]],
-  rootnest: [[1.08, 1.04, 1.06, 1.02, 1.11], [1.2, 1.18, 1.16, 1.12, 1.14], [0.57, 0.7, 0.78, 0.65, 0.66]],
-  goldforest: [[1.02, 1.08, 1.06, 1.1, 0.88], [1.04, 1.17, 1.12, 1.12, 0.79], [0.55, 0.67, 0.67, 0.71, 0.54]],
-  ricefield: [[1.1, 1.17, 1.07, 1.1, 0.88], [1.25, 1.38, 1.06, 1.1, 0.75], [0.59, 0.76, 0.49, 0.52, 0.41]],
-  village: [[1.03, 1.06, 1.07, 1.05, 1.11], [1.08, 1.17, 1.18, 1.14, 1.16], [0.55, 0.57, 0.7, 0.67, 0.72]],
-  kinnari: [[1.11, 1.08, 1.13, 1.08, 0.89], [1.2, 1.21, 1.29, 1.25, 0.76], [0.69, 0.64, 0.98, 0.86, 0.6]],
-  temple: [[1.12, 1.04, 1.06, 1.1, 1.12], [1.24, 1.25, 1.11, 1.14, 1.17], [0.53, 0.66, 0.68, 0.74, 0.63]],
-  nagapool: [[0.84, 0.92, 1.03, 1.1, 0.93], [0.7, 0.84, 0.95, 1.05, 0.81], [0.3, 0.32, 0.42, 0.49, 0.35]],
-  jade: [[0.99, 0.99, 0.95, 0.95, 0.94], [1.03, 0.95, 0.94, 0.85, 0.88], [0.37, 0.33, 0.34, 0.31, 0.34]],
-  palace: [[0.99, 1.11, 1.02, 0.98, 0.91], [1.05, 1.13, 0.92, 1.01, 0.74], [0.32, 0.38, 0.29, 0.27, 0.27]],
-  foxvalley: [[0.87, 0.96, 0.96, 0.97, 0.88], [0.7, 0.81, 0.86, 0.85, 0.73], [0.17, 0.19, 0.26, 0.28, 0.23]],
-  toadbridge: [[0.93, 0.9, 0.91, 0.99, 0.98], [0.78, 0.76, 0.77, 0.85, 0.92], [0.25, 0.24, 0.27, 0.33, 0.33]],
-  heaven: [[0.87, 0.94, 1.01, 0.98, 0.85], [0.7, 0.76, 0.83, 0.88, 0.67], [0.15, 0.16, 0.24, 0.23, 0.16]],
-  firecave: [[0.99, 0.98, 1.02, 1.05, 0.91], [0.88, 0.92, 0.99, 0.95, 0.78], [0.2, 0.2, 0.3, 0.26, 0.24]]
+  meadow: [[1.07, 1.01, 1.05, 1.12, 0.94], [1.08, 1.1, 1.1, 1.1, 0.93], [0.94, 1.08, 1.2, 1.33, 0.97]],
+  stream: [[1.07, 1.07, 1.06, 1.05, 1.03], [1.07, 1.16, 1.06, 1.16, 1.07], [1.23, 1.25, 1.18, 1.39, 1.17]],
+  rootnest: [[1.08, 1.04, 1.06, 1.02, 1.11], [1.2, 1.18, 1.16, 1.12, 1.14], [0.88, 0.98, 1.17, 0.92, 0.92]],
+  goldforest: [[1.02, 1.08, 1.06, 1.1, 0.88], [1.04, 1.17, 1.12, 1.12, 0.79], [0.69, 0.84, 0.83, 0.88, 0.63]],
+  ricefield: [[1.1, 1.17, 1.07, 1.1, 0.88], [1.25, 1.38, 1.06, 1.1, 0.75], [0.73, 0.89, 0.62, 0.65, 0.5]],
+  village: [[1.03, 1.06, 1.07, 1.05, 1.11], [1.08, 1.17, 1.18, 1.14, 1.16], [0.67, 0.69, 0.84, 0.81, 0.89]],
+  kinnari: [[1.11, 1.08, 1.13, 1.08, 0.89], [1.2, 1.21, 1.29, 1.25, 0.76], [0.84, 0.79, 1.2, 1.06, 0.73]],
+  temple: [[1.12, 1.04, 1.06, 1.1, 1.12], [1.24, 1.25, 1.11, 1.14, 1.17], [0.65, 0.77, 0.83, 0.91, 0.77]],
+  nagapool: [[0.84, 0.92, 1.03, 1.1, 0.93], [0.7, 0.84, 0.95, 1.05, 0.81], [0.36, 0.38, 0.53, 0.58, 0.41]],
+  jade: [[0.99, 0.99, 0.95, 0.95, 0.94], [1.03, 0.95, 0.94, 0.85, 0.88], [0.37, 0.35, 0.36, 0.32, 0.36]],
+  palace: [[0.99, 1.11, 1.02, 0.98, 0.91], [1.05, 1.13, 0.92, 1.01, 0.74], [0.33, 0.4, 0.33, 0.29, 0.29]],
+  foxvalley: [[0.87, 0.96, 0.96, 0.97, 0.88], [0.7, 0.81, 0.86, 0.85, 0.73], [0.18, 0.21, 0.28, 0.3, 0.24]],
+  toadbridge: [[0.93, 0.9, 0.91, 0.99, 0.98], [0.78, 0.76, 0.77, 0.85, 0.92], [0.26, 0.24, 0.29, 0.35, 0.34]],
+  heaven: [[0.87, 0.94, 1.01, 0.98, 0.85], [0.7, 0.76, 0.83, 0.88, 0.67], [0.16, 0.18, 0.26, 0.25, 0.18]],
+  firecave: [[0.99, 0.98, 1.02, 1.05, 0.91], [0.88, 0.92, 0.99, 0.95, 0.78], [0.21, 0.22, 0.31, 0.27, 0.26]]
 };
 const DCACHE: Record<string, StageDef> = {};
 /** the stage behind a key (any difficulty) */
@@ -650,7 +653,7 @@ export function stageOf(key: string): StageDef | undefined {
   return (DCACHE[key] = { ...base, id: key, diff: d, stamina: base.stamina + D.stamina,
     reward: { gold: Math.round(base.reward.gold * D.gold / 10) * 10, exp: Math.round(base.reward.exp * D.exp) },
     waves: (hell ? hellWaves(base) : base.waves).map(w => w.map(m => { const r = scaleRef(m, D.stars), k = DIFF_K[base.zone]?.[d - 1]?.[base.n - 1] ?? 1, out = k === 1 ? r : { ...r, hpMult: (r.hpMult || 1) * k, atkMult: (r.atkMult || 1) * k };
-      return hell ? { ...out, rb: kitBonus(SPECIES[m.sid].role, HELL_RUNES.star[realm - 1], HELL_RUNES.lvl[realm - 1], !!(m.boss || SPECIES[m.sid].boss)) } : out; })) });
+      return hell ? { ...out, awake: true, rb: kitBonus(SPECIES[m.sid].role, HELL_RUNES.star[realm - 1], HELL_RUNES.lvl[realm - 1], !!(m.boss || SPECIES[m.sid].boss)) } : out; })) });
 }
 /** hell: every wave has at least HELL_MIN monsters (the zone's own pool fills the gaps, at the wave's level) */
 export const HELL = 3, HELL_MIN = 4;

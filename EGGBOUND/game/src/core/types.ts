@@ -78,7 +78,7 @@ export interface SpeciesDef {
 }
 export interface MonsterRef { sid: string; lvl: number; stars: number; sk?: number[]; rare?: boolean; rb?: RuneBonus }  // sk = skill levels (default 1) · rb = its runes (core/runes.ts)
 /** boss: this unit is a zone boss (bars, boss rules) even when its species is a normal monster · name/scale: elite title & size */
-export interface EnemyRef extends MonsterRef { hpMult?: number; atkMult?: number; boss?: boolean; name?: string; scale?: number }
+export interface EnemyRef extends MonsterRef { hpMult?: number; atkMult?: number; boss?: boolean; name?: string; scale?: number; awake?: boolean } // awake: hell — the evolved form (or a deep-purple ทมิฬ form)
 /** a zone (โซน) on the world map: one place with five stages, the fifth is its boss */
 export interface ZoneDef { id: string; realm: string; name: string; desc: string; loc: string }
 export interface StageDef {
@@ -104,6 +104,7 @@ export interface Unit {
   alive: boolean; leader: boolean;
   rare?: boolean; passive?: PassiveDef; pUsed?: boolean;
   runeReact?: number; leech?: number; markUp?: number; // rune sets: reaction damage, lifesteal, element-mark chance
+  awake?: boolean; // hell enemy: drawn in its evolved (awakened) form, or deep purple when it has none
 }
 
 // ---- events ----

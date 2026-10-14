@@ -124,7 +124,19 @@ export const rareMasterURL = (sid: string) => { if (RMU[sid]) return RMU[sid]; c
 export const baseOf = (sid: string) => sid.split('~')[0];
 const SP = sid => SPECIES[baseOf(sid)];
 const lookLv = sid => parseInt(sid.split('~')[1] || '0') || 0;
-const lookRare = sid => sid.includes('~') && sid.endsWith('r');
+const lookRare = sid => sid.includes('~') && /rh?$/.test(sid);
+/** hell look (`…h`): a deep-purple "ทมิฬ" repaint for monsters without an evolved form */
+const lookHell = sid => sid.includes('~') && sid.endsWith('h');
+/** the look of an awakened hell enemy: its evolved form when it has the art, else the deep-purple form */
+export const awakeLook = (sid: string, rare = false) => { const s = SPECIES[sid]; return s?.art && IMG[s.art + 'e_front_idle'] ? sid + '~5' + (rare ? 'r' : '') : sid + '~0' + (rare ? 'r' : '') + 'h'; };
+/** deep purple, darker shadows — composite only (no pixel reads), so it also works on separately loaded art */
+function hellTint(src) {
+  const w = src.width, h = src.height, c = mk(w, h), x = c.getContext('2d');
+  x.drawImage(src, 0, 0); x.globalCompositeOperation = 'multiply'; x.fillStyle = '#8a55d8'; x.fillRect(0, 0, w, h);
+  x.globalCompositeOperation = 'source-atop'; x.globalAlpha = .12; x.fillStyle = '#1c0630'; x.fillRect(0, 0, w, h);
+  x.globalAlpha = .16; x.globalCompositeOperation = 'screen'; x.fillStyle = '#c070ff'; x.fillRect(0, 0, w, h);
+  x.globalAlpha = 1; x.globalCompositeOperation = 'destination-in'; x.drawImage(src, 0, 0); return c;
+}
 /** look id: `sid~<stars>` from ★4, plus `r` for the rare form (its own colours, like a shiny) */
 // the ★4 recolour / ★5 evolved look only show once a monster has been starred up past the stars it hatched with
 // (a legendary hatches at ★4 and must still show its own colours)
@@ -163,6 +175,7 @@ export function warpDraw(ctx, img, w) {
 /** sprite canvas/image for a species & pose key like 'front_idle' */
 export function spr(sid, key) {
   const k = sid + key; if (SPR[k]) return SPR[k];
+  if (lookHell(sid)) return (SPR[k] = hellTint(spr(sid.slice(0, -1).replace(/~0$/, ''), key)));
   if (sid.includes('~')) { const ea = evoArt(sid), base = ea ? artPose(ea, key) : spr(baseOf(sid), key);
     return (SPR[k] = lookRare(sid) ? rareTint(sid, base) : ea ? base : hueShift(base, VAR_E[lookLv(sid)])); }
   const s = SPECIES[sid];
@@ -217,6 +230,7 @@ export function portrait(sid) {
   const s = SP(sid), ea = evoArt(sid), L = lookLv(sid);
   let src = ea && IMG[ea + '_master'] ? IMG[ea + '_master'] : hasArt(sid) && masterOf(s.art) ? masterOf(s.art) : hueShift(IMG.mon001_master, PAL[s.elem]);
   if (lookRare(sid)) src = rareTint(sid, src); else if (L && !ea) src = hueShift(src, VAR_E[L]);
+  if (lookHell(sid)) src = hellTint(src);
   const c = mk(256, 256), x = c.getContext('2d');
   const f = src.width / 512, own = hasArt(sid) && (!!masterOf(s.art) || !!ea);
   let cr = [200, 70, 300]; // fox: head-centred crop

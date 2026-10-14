@@ -2,7 +2,7 @@
 // Battle scene: plays battle-core TurnStart/ActionResult events as animation + VFX, and collects player commands.
 import { Battle, REACTION_NAME } from '../core/battle';
 import { SPECIES } from '../core/data';
-import { PAL, PIV, ANCH, anchOf, TAU, spr, silOf, glowOf, GP, dot, portrait, IMG, fx, lookOf, poseKey, warpDraw } from './assets';
+import { PAL, PIV, ANCH, anchOf, TAU, spr, silOf, glowOf, GP, dot, portrait, IMG, fx, lookOf, awakeLook, poseKey, warpDraw } from './assets';
 import { sfx } from './audio';
 import { drawAurasBack, drawAurasFront, tickAuras, domePop, domeHit, domeBreak } from './auras';
 import {
@@ -29,7 +29,7 @@ export class BattleView {
   // ---------- views ----------
   makeView(u, pos, drop) {
     const s = SPECIES[u.sid];
-    const v = { uid: u.uid, sid: lookOf(u.sid, u.stars, !!u.rare), rare: !!u.rare, team: u.team, elem: u.elem, boss: u.boss, name: u.name, stars: u.stars, lvl: u.lvl,
+    const v = { uid: u.uid, sid: u.awake ? awakeLook(u.sid, !!u.rare) : lookOf(u.sid, u.stars, !!u.rare), awake: !!u.awake, rare: !!u.rare, team: u.team, elem: u.elem, boss: u.boss, name: u.name, stars: u.stars, lvl: u.lvl,
       x: pos[0], y: pos[1], hx: pos[0], hy: pos[1], hop: drop ? -620 : 0, sx: 1, sy: 1, rot: 0, k: .4 * (u.scale || s.scale || 1),
       back: u.team === 0, flip: u.team === 1, hb: u.team === 0, hf: u.team === 1, pose: 'idle', alpha: drop ? 0 : 1, flash: 0, ghosts: [], glowF: 0,
       dead: false, deathT: 0, hitT: 0, kvx: 0, kvy: 0, hp: u.hp, maxHp: u.maxHp, shown: u.hp, st: new Set(), marks: new Set(), busy: !!drop, ph: Math.random() * 9, emberT: 0, atb: 0, shieldAmt: 0,
@@ -606,7 +606,7 @@ export class BattleView {
     ctx.save(); ctx.translate(v.x, v.y + v.hop); ctx.rotate(v.rot); ctx.scale(v.sx * v.k * (v.flip ? -1 : 1), v.sy * v.k);
     if (v.rare && !v.dead) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = (.38 + .14 * Math.sin(t * 3 + v.ph)) * v.alpha; ctx.drawImage(glowOf(v.sid, key, PRISM[Math.floor(t * 5 + v.ph) % PRISM.length]), -PIV[0] - GP, -PIV[1] - GP); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1; }
     let gl = v.stars >= 4 ? .5 + .2 * Math.sin(t * 4 + v.ph) : 0; gl = Math.max(gl, v.glowF);
-    if (gl > 0 && !v.dead) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = gl * v.alpha; ctx.drawImage(glowOf(v.sid, key, P.aura), -PIV[0] - GP, -PIV[1] - GP); if (v.stars >= 5 || v.glowF > .5) { ctx.save(); ctx.scale(1.07, 1.16 + .05 * Math.sin(t * 9)); ctx.globalAlpha = .32 * v.alpha; ctx.drawImage(glowOf(v.sid, key, P.aura), -PIV[0] - GP, -PIV[1] - GP); ctx.restore(); } ctx.globalCompositeOperation = 'source-over'; }
+    if (gl > 0 && !v.dead) { ctx.globalCompositeOperation = 'lighter'; ctx.globalAlpha = gl * v.alpha; ctx.drawImage(glowOf(v.sid, key, v.awake ? '#b45cff' : P.aura), -PIV[0] - GP, -PIV[1] - GP); if (v.stars >= 5 || v.glowF > .5) { ctx.save(); ctx.scale(1.07, 1.16 + .05 * Math.sin(t * 9)); ctx.globalAlpha = .32 * v.alpha; ctx.drawImage(glowOf(v.sid, key, P.aura), -PIV[0] - GP, -PIV[1] - GP); ctx.restore(); } ctx.globalCompositeOperation = 'source-over'; }
     const W = { bend: v.bend, breathe: v.br, wave: v.wave, wph: v.wph };
     ctx.globalAlpha = v.alpha; warpDraw(ctx, spr(v.sid, key), W);
     if (v.dead) { ctx.globalAlpha = Math.min(1, v.deathT * 1.5) * v.alpha; warpDraw(ctx, silOf(v.sid, key, P.aura), W); }

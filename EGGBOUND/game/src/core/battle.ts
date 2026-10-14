@@ -1,7 +1,7 @@
 // Deterministic turn-based battle simulation (ATB, skills, statuses, element marks, reactions).
 // Same seed + same commands ⇒ identical results. No rendering here: callers read events.
 import { Rng } from './rng';
-import { SPECIES, statAt, spdAt, skillAt, isMythic, mythicUlt, formOf, monName } from './data';
+import { SPECIES, statAt, spdAt, skillAt, isMythic, mythicUlt, formOf, monName, awakeName } from './data';
 import { applyRunes } from './runes';
 import type {
   Unit, Ev, Elem, StatusId, SkillDef, SkillEffect, TurnStart, ActionResult, Command, MonsterRef, EnemyRef, StageDef, ReactionId,
@@ -93,7 +93,7 @@ export class Battle {
     const s = SPECIES[m.sid], form = formOf(s.id, !!(m as MonsterRef).rare);
     const hp = Math.round(statAt(s.base.hp, m.lvl, m.stars) * (m.hpMult || 1)), boss = !!s.boss || !!m.boss; // elite / Starborn zone bosses
     const u: Unit = {
-      uid, team, slot, sid: s.id, name: m.name || monName(s.id, m.stars, !!(m as MonsterRef).rare), elem: form.elem, role: s.role, lvl: m.lvl, stars: m.stars, boss, ...(m.scale ? { scale: m.scale } : {}),
+      uid, team, slot, sid: s.id, name: m.awake ? awakeName(s.id, m.name) : m.name || monName(s.id, m.stars, !!(m as MonsterRef).rare), ...(m.awake ? { awake: true } : {}), elem: form.elem, role: s.role, lvl: m.lvl, stars: m.stars, boss, ...(m.scale ? { scale: m.scale } : {}),
       maxHp: hp, hp, atk: Math.round(statAt(s.base.atk, m.lvl, m.stars) * (m.atkMult || 1)), def: statAt(s.base.def, m.lvl, m.stars),
       spd: spdAt(s.base.spd, m.lvl, m.stars), crit: 0.15, critDmg: 0.5, res: boss ? 0.35 : 0.15, acc: 0,
       atb: 0, cds: [0, 0, 0], skills: form.skills.map((k, i) => { const sk = skillAt(k, m.sk?.[i] || 1, i); return k.ult && isMythic(s.id, !!(m as MonsterRef).rare) ? mythicUlt(sk) : sk; }), statuses: [], marks: [], alive: true, leader: team === 0 && slot === 0,
