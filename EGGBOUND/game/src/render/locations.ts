@@ -3,7 +3,7 @@
 // set dressing around the plaza, animated lights, ambient life and a screen colour grade.
 // Everything is code-drawn; a painted plate (art/prompts BATCH17) can replace the ground later.
 // Hooks into the engine through E.loc and by refilling the shared LANTERNS / BUSHES arrays.
-import { TAU, mk, dot, IMG, fx, loadFile } from './assets';
+import { TAU, mk, dot, IMG, fx, loadFile, blobURL } from './assets';
 import { E, SQ, GEO, rnd, mulberry, stone, useTheme, setTheme, LANTERNS, BUSHES, THEMES } from './engine';
 
 const { PR, GW, GH, GOX, GOY } = GEO, PRY = PR * SQ;
@@ -787,15 +787,16 @@ const PH = 1084;
 /** load a painted plate / realm chart through the shared file loader (assets.ts loadFile: the access way the probe found) */
 export function bgLoad(id: string): Promise<HTMLImageElement | null> {
   if (!BGALL.has(id)) return Promise.resolve(null);
+  const em = IMG['bg_' + id]; if (em) { PLATE[id] = em; return Promise.resolve(em); } // embedded (2026-10-14: the phone app refuses separate files)
   return PLATEP[id] ||= loadFile(bgURL(id)).then(im => (PLATE[id] = im), () => { ART.delete(id); BGALL.delete(id); return null; });
 }
 function plate(id) {
   if (!ART.has(id)) return null;
-  const im = PLATE[id]; if (!im) bgLoad(id);
+  const im = PLATE[id] || IMG['bg_' + id]; if (!im) bgLoad(id);
   return im && im.naturalWidth ? im : null;
 }
 /** DOM <img> source for a plate / chart: the loaded image's own URL (maybe a blob) once it is in, else its path */
-export const bgSrc = (id: string) => PLATE[id]?.src || bgURL(id);
+export const bgSrc = (id: string) => (IMG['bg_' + id] && blobURL('bg_' + id)) || PLATE[id]?.src || bgURL(id);
 /** painted plates loaded / listed (settings shows it to check the live build) */
 export const plateStat = () => ({ ok: [...ART].filter(id => PLATE[id]).length, total: ART.size });
 /** load every chart and plate, one at a time, after the game has loaded; onLoad(id) after each one that arrives */

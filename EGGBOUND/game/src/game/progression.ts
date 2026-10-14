@@ -1,5 +1,5 @@
 // Rewards, levels, fragments, eggs, evolution (star-ups) and skill-ups.
-import { STAGES, SPECIES, DIFFS, stageKey, parseStage, stageOf, STAR_SHARD_CHANCE, STAR_SHARDS_TO_CRAFT, starbornOf, specialOf, shardOnly, shardsToCraft, SPECIAL_SHARD_CHANCE, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, rareFormChance, MAX_STARS, EVO_GOLD, SKILL_MAX, FEED_MAX, FEED_K, FEED_BASE, FEED_GOLD, cumExp, EGG_LOOT_GRADE, LOOT_ORDER } from '../core/data';
+import { STAGES, SPECIES, DIFFS, stageKey, parseStage, stageOf, STAR_SHARD_CHANCE, STAR_SHARDS_TO_CRAFT, starbornOf, specialOf, shardOnly, shardsToCraft, SPECIAL_SHARD_CHANCE, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, rareFormChance, MAX_STARS, EVO_GOLD, SKILL_MAX, FEED_MAX, FEED_K, FEED_BASE, FEED_GOLD, cumExp, EGG_LOOT_GRADE, LOOT_ORDER, isEvolved } from '../core/data';
 import type { EggTier, LootGrade } from '../core/data';
 import type { Rarity } from '../core/types';
 import type { SaveData, EggSave, MonSave } from './save';
@@ -130,7 +130,9 @@ export function evolve(s: SaveData, uid: number, food: number[]): MonSave | null
   if (!evoCheck(s, uid, food).ok) return null;
   const t = monOf(s, uid)!; s.gold -= EVO_GOLD[t.stars];
   s.mons = s.mons.filter(m => !food.includes(m.uid)); s.team = s.team.filter(u => !food.includes(u)); freeRunes(s);
-  t.stars++; t.lvl = 1; t.exp = 0; s.stats.evolve++; return t;
+  t.stars++; t.lvl = 1; t.exp = 0; s.stats.evolve++;
+  if (isEvolved(t.sid, t.stars, !!t.rare)) { const k = t.sid + (t.rare ? 'r' : ''); (s.dexEvo ||= []).includes(k) || s.dexEvo.push(k); } // monster book
+  return t;
 }
 /** EXP a food monster gives (by its level and stars) */
 export const feedValue = (m: MonSave) => Math.round(FEED_K * cumExp(m.lvl) + FEED_BASE * m.stars * m.stars);

@@ -16,40 +16,36 @@ if (process.argv.includes('--test')) {
   process.exit(0);
 }
 
-// Painted battle plates (BATCH17) are too big to embed under the 16MB single-file limit: they ship as separate files
-// dist/bg/<loc>.webp (published next to the page) and the bundle only gets the list of which locations have one.
-const bgDir = path.join(root, 'assets_bg'), bgOut = path.join(root, 'dist/bg'), bgIds = [];
-fs.rmSync(bgOut, { recursive: true, force: true });
-if (fs.existsSync(bgDir)) for (const f of fs.readdirSync(bgDir)) if (f.endsWith('.webp')) { fs.mkdirSync(bgOut, { recursive: true }); fs.copyFileSync(path.join(bgDir, f), path.join(bgOut, f)); bgIds.push(path.basename(f, '.webp')); }
-// Separate-file sprites (Starborn sets, eggs): assets_ext/ → dist/ext/, loaded on demand (render/assets.ts ensureArt)
-const extDir = path.join(root, 'assets_ext'), extOut = path.join(root, 'dist/ext'), extIds = [];
-fs.rmSync(extOut, { recursive: true, force: true });
-if (fs.existsSync(extDir)) for (const f of fs.readdirSync(extDir)) if (f.endsWith('.webp')) { fs.mkdirSync(extOut, { recursive: true }); fs.copyFileSync(path.join(extDir, f), path.join(extOut, f)); extIds.push(path.basename(f, '.webp')); }
-// Pixel data + embedded menu thumbnails of the separate-file art (tools/ext_meta.py): the live Artifact lets the canvas
-// draw those files but not read them. Regenerated here whenever meta.json misses a file.
-const metaPath = path.join(extDir, 'meta.json');
-let extMeta = fs.existsSync(metaPath) ? JSON.parse(fs.readFileSync(metaPath, 'utf8')) : {};
-if (extIds.some(k => !extMeta[k])) { const { spawnSync } = await import('node:child_process'); const r = spawnSync('python3', ['-I', path.join(root, 'tools/ext_meta.py')], { stdio: 'inherit' });
-  if (r.status === 0) extMeta = JSON.parse(fs.readFileSync(metaPath, 'utf8')); else console.warn('WARNING: tools/ext_meta.py failed — run it by hand'); }
-// file lists carry the literal published paths (a host that maps file paths can find them in the page text)
-const lit = (ids, dir) => JSON.stringify(Object.fromEntries(ids.map(k => [k, dir + '/' + k + '.webp'])));
-const res = await build({ entryPoints: [path.join(root, 'src/main.ts')], bundle: true, platform: 'browser', format: 'iife', target: 'es2020', minify: true, write: false, logLevel: 'warning',
-  define: { __BG__: JSON.stringify(bgIds), __BGU__: lit(bgIds, 'bg'), __EXT__: lit(extIds, 'ext'), __EXTMETA__: JSON.stringify(Object.fromEntries(Object.entries(extMeta).filter(([k]) => extIds.includes(k) || k === 'mon001_front_idle'))) } });
-const js = res.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
-
-// Assets: game/assets/*.webp|png (authoritative). Legacy fallback: the old Test Lab's embedded ASSET block if present.
+// Everything is embedded (2026-10-14): on the owner's phone the Artifact answers files published next to the page with
+// HTTP 403, so separate files (painted plates, realm charts, the Starborn / BATCH21 sprites) never showed. To fit the 16MB
+// page, images are embedded as AVIF (tools/avif_cache.py → .avif-cache/, ~55% of the WebP size); sources stay WebP.
+//   assets/<k>.webp → IMG[k] · assets_ext/<k>.webp → IMG[k] (same keys as before) · assets_bg/<id>.webp → IMG['bg_' + id]
+const { spawnSync } = await import('node:child_process');
+const av = spawnSync('python3', ['-I', path.join(root, 'tools/avif_cache.py')], { stdio: 'inherit' });
+if (av.status !== 0) { console.error('tools/avif_cache.py failed (needs python3 + Pillow with AVIF)'); process.exit(1); }
+const cache = path.join(root, '.avif-cache');
+const bgDir = path.join(root, 'assets_bg'), extDir = path.join(root, 'assets_ext'), bgIds = [], extIds = [];
+fs.rmSync(path.join(root, 'dist/bg'), { recursive: true, force: true }); fs.rmSync(path.join(root, 'dist/ext'), { recursive: true, force: true });
 const assets = {};
-const protoPath = path.join(root, '../proto/index.html');
-const m = fs.existsSync(protoPath) && fs.readFileSync(protoPath, 'utf8').match(/const ASSET=(\{.*?\});\n/s);
-if (m) { const all = JSON.parse(m[1]); for (const k in all) if (/^(mon\w+|egg\w+)$/.test(k)) assets[k] = all[k]; }
-const adir = path.join(root, 'assets');
-if (fs.existsSync(adir)) for (const f of fs.readdirSync(adir)) {
-  const ext = path.extname(f).slice(1).toLowerCase(); if (!['webp', 'png', 'jpg'].includes(ext)) continue;
-  const mime = ext === 'jpg' ? 'jpeg' : ext;
-  assets[path.basename(f, '.' + ext)] = `data:image/${mime};base64,` + fs.readFileSync(path.join(adir, f)).toString('base64');
+let bytes = 0;
+/** embed one image: its AVIF copy when there is one (every WebP source), else the file itself (png/jpg) */
+function embed(dir, f, key) {
+  const ext = path.extname(f).slice(1).toLowerCase(); if (!['webp', 'png', 'jpg'].includes(ext)) return;
+  if (f.startsWith('thumb_')) return; // menu thumbnails of separate files: not needed now that everything is embedded
+  const avif = path.join(cache, path.basename(dir), path.basename(f, '.' + ext) + '.avif');
+  const [file, mime] = ext === 'webp' && fs.existsSync(avif) ? [avif, 'avif'] : [path.join(dir, f), ext === 'jpg' ? 'jpeg' : ext];
+  const buf = fs.readFileSync(file); bytes += buf.length;
+  assets[key] = `data:image/${mime};base64,` + buf.toString('base64');
 }
+const adir = path.join(root, 'assets');
+if (fs.existsSync(adir)) for (const f of fs.readdirSync(adir)) embed(adir, f, path.basename(f, path.extname(f)));
+if (fs.existsSync(extDir)) for (const f of fs.readdirSync(extDir)) if (f.endsWith('.webp')) { embed(extDir, f, path.basename(f, '.webp')); extIds.push(path.basename(f, '.webp')); }
+if (fs.existsSync(bgDir)) for (const f of fs.readdirSync(bgDir)) if (f.endsWith('.webp')) { const id = path.basename(f, '.webp'); embed(bgDir, f, 'bg_' + id); bgIds.push(id); }
+const res = await build({ entryPoints: [path.join(root, 'src/main.ts')], bundle: true, platform: 'browser', format: 'iife', target: 'es2020', minify: true, write: false, logLevel: 'warning',
+  define: { __BG__: JSON.stringify(bgIds), __BGU__: '{}', __EXT__: '{}', __EXTMETA__: '{}' } });
+const js = res.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
 
 const tpl = fs.readFileSync(path.join(root, 'src/index.template.html'), 'utf8');
 const out = tpl.replace('/*ASSETS*/', () => JSON.stringify(assets)).replace('/*BUNDLE*/', () => js);
 fs.writeFileSync(path.join(root, 'dist/index.html'), out);
-console.log('dist/index.html', (out.length / 1024).toFixed(0) + 'KB', 'bg plates:', bgIds.join(',') || '-', 'ext art:', extIds.length, 'assets:', Object.keys(assets).join(','));
+console.log('dist/index.html', (out.length / 1024).toFixed(0) + 'KB', '· images', Object.keys(assets).length, '(' + (bytes / 1024).toFixed(0) + 'KB AVIF/PNG) · plates/charts', bgIds.length, '· former separate-file sprites', extIds.length);

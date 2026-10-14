@@ -100,9 +100,21 @@ export async function ensureArt(sids) { const need = [...new Set(sids.map(baseOf
 /** background-load all separate-file art one species at a time; onDone(sid) after each (to refresh screens) */
 export function prefetchExt(onDone = sid => { }) { const sids = Object.keys(SPECIES).filter(isExtArt); let i = 0; const next = () => { if (i >= sids.length) return; const sid = sids[i++]; ensureArt([sid]).then(ch => { if (ch) onDone(sid); next(); }); }; next(); }
 
+/** every image is embedded (AVIF since 2026-10-14). A browser that cannot decode AVIF gets a clear message instead of a
+ *  half-drawn game; a single bad image just stays missing (its fallback art is used). */
+export const ASSET_STAT = { total: 0, fail: 0 };
 export async function loadAssets() {
-  const A = (window as any).__ASSETS || {};
-  await Promise.all(Object.keys(A).map(n => new Promise<void>((res, rej) => { const i = new Image(); i.onload = () => { IMG[n] = i; res(); }; i.onerror = () => rej(new Error('asset ' + n)); i.src = A[n]; })));
+  const A = (window as any).__ASSETS || {}, keys = Object.keys(A); ASSET_STAT.total = keys.length;
+  await Promise.all(keys.map(n => new Promise<void>(res => { const i = new Image(); i.onload = () => { IMG[n] = i; res(); }; i.onerror = () => { ASSET_STAT.fail++; res(); }; i.src = A[n]; })));
+  if (keys.length && ASSET_STAT.fail > keys.length / 2) throw new Error('เบราว์เซอร์นี้แสดงภาพแบบ AVIF ไม่ได้ — อัปเดตเป็น iOS 16 ขึ้นไป หรือใช้ Chrome / Safari / Firefox รุ่นใหม่');
+}
+/** a blob: URL for an embedded image (DOM <img> of big pictures: avoids pasting ~100KB data URIs into every render) */
+const BLOBU = {};
+export function blobURL(key: string): string | null {
+  if (BLOBU[key]) return BLOBU[key]; const im = IMG[key]; if (!im) return null;
+  const src = im.src, m = /^data:([^;]+);base64,(.*)$/.exec(src); if (!m) return src;
+  try { const bin = atob(m[2]), u8 = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i); return (BLOBU[key] = URL.createObjectURL(new Blob([u8], { type: m[1] }))); }
+  catch (e) { return (BLOBU[key] = src); }
 }
 
 function hueShift(img, E) {
@@ -188,6 +200,10 @@ export const masterURL = (sid: string) => { const s = SPECIES[sid]; return s && 
 const RMU = {};
 /** full-body master art of a rare form for the book: the species' master repainted light/dark (cached data URL) */
 export const rareMasterURL = (sid: string) => { if (RMU[sid]) return RMU[sid]; const s = SPECIES[sid], src = s && s.art && masterOf(s.art); if (!src) return null; try { return (RMU[sid] = rareTint(sid, src).toDataURL('image/webp', .9)); } catch (e) { return src.src || null; } };
+const EMU = {};
+/** full-body art of an evolved (★5) form for the book: the evolved master, repainted light/dark for the rare form */
+export const evoMasterURL = (sid: string, rare = false) => { const k = sid + (rare ? 'r' : ''); if (EMU[k]) return EMU[k]; const a = SPECIES[sid]?.art, src = a && (IMG[a + 'e_master'] || IMG[a + 'e_front_idle']); if (!src) return null;
+  if (!rare) return (EMU[k] = src.src); try { return (EMU[k] = rareTint(sid, src).toDataURL('image/webp', .9)); } catch (e) { return src.src; } };
 export const baseOf = (sid: string) => sid.split('~')[0];
 const SP = sid => SPECIES[baseOf(sid)];
 const lookLv = sid => parseInt(sid.split('~')[1] || '0') || 0;
