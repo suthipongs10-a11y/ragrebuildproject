@@ -1,7 +1,7 @@
 // Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
-import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, ZONES, RARE_FORM_MULT, NAMED_RARE_FORM, ENERGY_MAX, ENERGY_REGEN_MS, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY } from '../src/core/data';
+import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, SKILL_MAX, levelCap, statAt, skillAt, STAGES, ZONES, DIFFS, DIFF_K, stageOf, stageKey, planOf, RARE_FORM_MULT, NAMED_RARE_FORM, ENERGY_MAX, ENERGY_REGEN_MS, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
-import { rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
+import { stageUnlocked, rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
 import { startIncub, incubLeft, incubOf, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
 import { energyNow, energyNext, payAuto, autoCost, buyEnergy, refillsLeft } from '../src/game/energy';
 import { QUESTS, CHAPTERS, questsIn, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg, rushPrice, rushesToday, mysteryEgg } from '../src/game/quests';
@@ -82,7 +82,7 @@ export function eggTests(): number {
     ok(claimable(s).length === 0 && claimQuest(s, 'win1') === null, 'nothing claimable on a new save');
     grantRewards(s, 'meadow-5', true, 3, ['A02'], 3); ok(claimable(s).some(q => q.id === 'win1') && claimable(s).some(q => q.id === 'zclearmeadow'), 'winning unlocks quests');
     const g0 = s.gems; ok(!!claimQuest(s, 'win1') && s.gems === g0 + 10 && claimQuest(s, 'win1') === null, 'claim once');
-    ok(bookGems() === 800, 'book gem total ' + bookGems()); // 600 + maps 2-3 (2026-10-13): 6 zones × 10 + chapter 40 each
+    ok(bookGems() === 1725, 'book gem total ' + bookGems()); // 800 (maps 1-3) + difficulties (2026-10-14): normal 15 zones × (10+10) + 40, hard 15 × (15+20) + 60
     ok(CHAPTERS.every(c => questsIn(c.id).length > 0) && QUESTS.every(q => CHAPTERS.some(c => c.id === q.ch)), 'every quest in a chapter, no empty chapter');
     ok(ZONES.every(z => ['zclear', 'zstar', 'zfarm'].every(k => QUESTS.some(q => q.id === k + z.id))), 'every zone has boss/3-star/farm quests');
     for (let i = 0; i < 4; i++) grantRewards(s, 'meadow-5', true, 3, [], 10 + i); ok(claimable(s).some(q => q.id === 'zfarmmeadow'), 'beating a zone boss 5 times unlocks its farm quest');
@@ -146,6 +146,23 @@ export function eggTests(): number {
     ok(energyNow(s, t0 + ENERGY_REGEN_MS - 1) === ENERGY_MAX - autoCost(st) && energyNow(s, t0 + ENERGY_REGEN_MS) === ENERGY_MAX - autoCost(st) + 1, 'one point per regen tick');
     s.energy = { v: 2, t: t0 }; ok(!payAuto(s, st, t0) && energyNow(s, t0) === 2, 'not enough energy: nothing spent');
     ok(energyNow(s, t0 + 3 * ENERGY_REGEN_MS + 5) === 5 && energyNext(s, t0 + 3 * ENERGY_REGEN_MS + 5) === ENERGY_REGEN_MS - 5, 'partial point keeps ticking'); }
+  // difficulties (owner 2026-10-14): easy = the base stage; normal/hard = same fight one/two star grades up, opened zone by
+  // zone by beating the boss one difficulty below; rewards grow; every stage has a tuned multiplier
+  { const e = stageOf('meadow-1')!, nn = stageOf('meadow-1@n')!, hh = stageOf('meadow-1@h')!;
+    ok(e === STAGES[0] && nn.diff === 1 && hh.diff === 2 && nn.id === 'meadow-1@n' && stageKey('meadow-1', 2) === 'meadow-1@h', 'stage keys per difficulty');
+    ok(nn.waves.flat().every((m, i) => m.stars === Math.min(6, (e.waves.flat()[i].stars || 1) + 1)) && hh.waves.flat().every((m, i) => m.stars === Math.min(6, (e.waves.flat()[i].stars || 1) + 2)), 'enemies +1/+2 star grades');
+    ok(planOf(nn)[1] === planOf(e)[1] + 1 && planOf(hh)[1] === planOf(e)[1] + 2, 'recommended team moves up with the enemies');
+    ok(nn.reward.gold > e.reward.gold && hh.reward.gold > nn.reward.gold && hh.reward.exp > nn.reward.exp && hh.stamina > nn.stamina && nn.stamina > e.stamina, 'rewards and AUTO energy grow with difficulty');
+    ok(ZONES.every(z => DIFF_K[z.id]?.every(r => r.length === 5 && r.every(k => k > 0.4 && k < 2))), 'every zone has a tuned multiplier per stage and difficulty');
+    const s = newSave();
+    ok(!stageUnlocked(s, 'meadow-1@n'), 'normal locked on a new save');
+    for (let k = 1; k <= 5; k++) s.stages['meadow-' + k] = 3;
+    ok(stageUnlocked(s, 'meadow-1@n') && !stageUnlocked(s, 'meadow-2@n') && !stageUnlocked(s, 'stream-1@n'), 'beating the easy boss opens normal stage 1 of that zone only');
+    s.stages['meadow-1@n'] = 1; ok(stageUnlocked(s, 'meadow-2@n') && !stageUnlocked(s, 'meadow-1@h'), 'normal opens stage by stage, hard waits for the normal boss');
+    s.stages['meadow-5@n'] = 2; ok(stageUnlocked(s, 'meadow-1@h'), 'beating the normal boss opens hard');
+    const r = grantRewards(s, 'meadow-2@n', true, 3, ['A02'], 5); ok(s.stages['meadow-2@n'] === 3 && !s.stages['meadow-2'] || s.stages['meadow-2'] === 3, 'stars are kept per difficulty');
+    ok(r.gold === stageOf('meadow-2@n')!.reward.gold * 2 && (r.frags.A02 || 0) >= 1 + DIFFS[1].frag, 'normal pays its own gold (first clear doubled) and more fragments');
+    ok(QUESTS.some(q => q.id === 'dnclearmeadow') && QUESTS.some(q => q.id === 'dhstarfirecave'), 'difficulty quests in the book'); }
   // gem refill: +ENERGY_MAX for ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY per local day (owner 2026-10-13)
   { const s = newSave(), t0 = new Date(2026, 9, 13, 9).getTime(), next = new Date(2026, 9, 14, 0, 0, 1).getTime();
     s.energy = { v: 5, t: t0 }; s.gems = ENERGY_REFILL_GEMS * (ENERGY_REFILL_DAILY + 2);

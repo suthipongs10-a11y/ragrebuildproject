@@ -1,7 +1,7 @@
 // Adventure book (สมุดผจญภัย): one-time quests grouped in chapters (one per map region + one per game system), handing out
 // gems (600 in total for the current content), mystery eggs, egg shards, gold and soul crystals; a finished chapter opens a chest.
 // Progress is read from the save (stages, dex, monsters) and lifetime counters (save.stats); rewards are claimed by hand.
-import { SPECIES, STAGES, ZONES, GEM_GOLD_EGG, RUSH_BASE, RUSH_STEP, EGG_TIERS, levelCap, rareFormChance } from '../core/data';
+import { SPECIES, STAGES, ZONES, DIFFS, stageKey, GEM_GOLD_EGG, RUSH_BASE, RUSH_STEP, EGG_TIERS, levelCap, rareFormChance } from '../core/data';
 import type { EggTier } from '../core/data';
 import type { SaveData, EggSave } from './save';
 import { rollRarity, rollSpecies, skillMaxed } from './progression';
@@ -33,10 +33,25 @@ const mapQuests: Quest[] = ZONES.flatMap((z, i) => {
     { id: 'zfarm' + z.id, ch, name: `ชนะบอส ${z.name} 5 ครั้ง`, goal: (s: SaveData) => n(s.stats.stageWins[boss] || 0, 5), reward: last ? { egg: 'silver', gold: 1000 } : { gold: 600 + i * 250 } },
   ];
 });
+// ---- difficulties (owner 2026-10-14): one chapter per harder difficulty, two quests per zone (beat the boss · every
+// stage 3 stars at that difficulty); gems grow with the difficulty (approved: "เพิ่มเพชรตามระดับเควสได้เลย") ----
+const DIFF_GEMS: Record<number, { boss: number; star: number; gold: number; bonus: Reward }> = {
+  1: { boss: 10, star: 10, gold: 1000, bonus: { gems: 40, egg: 'gold' } },
+  2: { boss: 15, star: 20, gold: 2000, bonus: { gems: 60, egg: 'rainbow' } },
+};
+const diffChapters: Chapter[] = [1, 2].map(d => ({ id: 'diff' + DIFFS[d].key, name: `ผู้กล้าระดับ${DIFFS[d].name}`, desc: `ชนะบอสทุกโซนในระดับ${DIFFS[d].name} และเก็บครบ 3 ดาวทุกด่าน (เปิดระดับนี้ได้เมื่อชนะบอสโซนนั้นในระดับ${DIFFS[d - 1].name})`, bonus: DIFF_GEMS[d].bonus }));
+const diffQuests: Quest[] = [1, 2].flatMap(d => ZONES.flatMap((z, i) => {
+  const ch = 'diff' + DIFFS[d].key, R = DIFF_GEMS[d], boss = stageKey(z.id + '-5', d), ids = STAGES.filter(st => st.zone === z.id).map(st => stageKey(st.id, d));
+  return [
+    { id: `d${DIFFS[d].key}clear${z.id}`, ch, name: `ชนะบอส ${z.name} (${DIFFS[d].name})`, goal: (s: SaveData) => n(stageStars(s, boss) > 0 ? 1 : 0, 1), reward: { gems: R.boss, gold: R.gold + i * 100 * (d + 1) } },
+    { id: `d${DIFFS[d].key}star${z.id}`, ch, name: `${z.name} (${DIFFS[d].name}) ครบ 3 ดาวทุกด่าน`, goal: (s: SaveData) => n(ids.filter(id => stageStars(s, id) >= 3).length, ids.length), reward: { gems: R.star } },
+  ];
+}));
 
 export const CHAPTERS: Chapter[] = [
   { id: 'start', name: 'นักผจญภัยมือใหม่', desc: 'เรียนรู้ทุกระบบของเกม', bonus: { gems: 30, egg: 'silver' } },
   ...regionChapters,
+  ...diffChapters,
   { id: 'hatch', name: 'ฟักไข่และสะสม', desc: 'ฟักไข่ ประกอบไข่ และเติมสารบัญมอน', bonus: { egg: 'rainbow' } },
   { id: 'grow', name: 'เติบโตและวิวัฒน์', desc: 'เพิ่มเลเวล อัปสกิล อัปดาวจนถึง ★6', bonus: { gems: 20, soul: 2 } },
   { id: 'fight', name: 'จอมยุทธ์', desc: 'ชนะ ใช้ท่าไม้ตาย กดจังหวะ และปฏิกิริยาธาตุ', bonus: { gems: 15, soul: 1 } },
@@ -54,6 +69,7 @@ export const QUESTS: Quest[] = [
   { id: 'mine1', ch: 'start', name: 'เก็บทองจากเหมืองผลึกดาว', goal: s => n(s.stats.mine, 1), reward: { gold: 500 } },
   { id: 'build1', ch: 'start', name: 'อัปเกรดอาคารในบ้านเต่า', goal: s => n(homeUps(s), 1), reward: { gems: 5, gold: 1000 } },
   ...mapQuests,
+  ...diffQuests,
   // hatching & collecting
   { id: 'hatch10', ch: 'hatch', name: 'ฟักไข่ 10 ฟอง', goal: s => n(s.stats.hatch, 10), reward: { gems: 10 } },
   { id: 'hatch30', ch: 'hatch', name: 'ฟักไข่ 30 ฟอง', goal: s => n(s.stats.hatch, 30), reward: { gems: 15, egg: 'silver' } },

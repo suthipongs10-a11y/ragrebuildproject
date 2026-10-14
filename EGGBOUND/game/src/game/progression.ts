@@ -1,5 +1,5 @@
 // Rewards, levels, fragments, eggs, evolution (star-ups) and skill-ups.
-import { STAGES, SPECIES, STAR_SHARD_CHANCE, STAR_SHARDS_TO_CRAFT, starbornOf, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, rareFormChance, MAX_STARS, EVO_GOLD, SKILL_MAX, FEED_MAX, FEED_K, FEED_BASE, FEED_GOLD, cumExp, EGG_LOOT_GRADE, LOOT_ORDER } from '../core/data';
+import { STAGES, SPECIES, DIFFS, stageKey, parseStage, stageOf, STAR_SHARD_CHANCE, STAR_SHARDS_TO_CRAFT, starbornOf, expToNext, levelCap, EGG_TIERS, EGG_DROP, NAMED_RARE_FORM, rareFormChance, MAX_STARS, EVO_GOLD, SKILL_MAX, FEED_MAX, FEED_K, FEED_BASE, FEED_GOLD, cumExp, EGG_LOOT_GRADE, LOOT_ORDER } from '../core/data';
 import type { EggTier, LootGrade } from '../core/data';
 import type { Rarity } from '../core/types';
 import type { SaveData, EggSave, MonSave } from './save';
@@ -10,13 +10,17 @@ export interface MonGain { uid: number; sid: string; fromLvl: number; toLvl: num
 export interface Reward { win: boolean; stars: number; firstClear: boolean; gold: number; gains: MonGain[]; frags: Record<string, number>; eggs: EggSave[]; star?: string } // star: a Starborn shard dropped (species id)
 export const FRAGS_TO_CRAFT = 20;
 
-export function stageUnlocked(s: SaveData, id: string): boolean {
-  const i = STAGES.findIndex(x => x.id === id);
-  return i === 0 || (s.stages[STAGES[i - 1].id] || 0) > 0;
+/** easy: the stages open one after another across the whole map. Normal/hard: a zone opens once its boss is beaten one
+ *  difficulty below, then its stages open one after another */
+export function stageUnlocked(s: SaveData, key: string): boolean {
+  const { id, d } = parseStage(key), i = STAGES.findIndex(x => x.id === id); if (i < 0) return false;
+  const st = STAGES[i];
+  if (!d) return i === 0 || (s.stages[STAGES[i - 1].id] || 0) > 0;
+  return st.n === 1 ? (s.stages[stageKey(st.zone + '-5', d - 1)] || 0) > 0 : (s.stages[stageKey(STAGES[i - 1].id, d)] || 0) > 0;
 }
 
 export function grantRewards(s: SaveData, stageId: string, win: boolean, stars: number, seen: string[], seed: number): Reward {
-  const st = STAGES.find(x => x.id === stageId)!;
+  const st = stageOf(stageId)!, D = DIFFS[st.diff || 0];
   const first = win && !(s.stages[stageId] > 0);
   const r: Reward = { win, stars, firstClear: first, gold: 0, gains: [], frags: {}, eggs: [] };
   let rs = seed >>> 0; const rnd = () => { rs = (rs * 1664525 + 1013904223) >>> 0; return rs / 4294967296; };
@@ -32,12 +36,12 @@ export function grantRewards(s: SaveData, stageId: string, win: boolean, stars: 
   }
   if (win) {
     const uniq = [...new Set(seen.filter(sid => SPECIES[sid] && !SPECIES[sid].boss && !SPECIES[sid].starborn))];
-    for (const sid of uniq) { const n = 1 + (rnd() < .35 ? 1 : 0); r.frags[sid] = n; s.frags[sid] = (s.frags[sid] || 0) + n; }
+    for (const sid of uniq) { const n = 1 + D.frag + (rnd() < .35 ? 1 : 0); r.frags[sid] = n; s.frags[sid] = (s.frags[sid] || 0) + n; }
     // mystery egg: one roll per win, boss stages drop more often, first clear always drops
     const boss = st.waves.some(w => w.some(m => m.boss || SPECIES[m.sid]?.boss));
     // Starborn shard: the first clear always drops one, after that it is a long farm
-    const star = starbornOf(st); if (star && (first || rnd() < STAR_SHARD_CHANCE)) { r.star = star; s.starShards[star] = (s.starShards[star] || 0) + 1; }
-    if (first || rnd() < (boss ? EGG_DROP.bossChance : EGG_DROP.chance)) { const e = rollMysteryEgg(s, rnd); s.eggs.push(e); r.eggs.push(e); }
+    const star = starbornOf(st); if (star && (first || rnd() < D.shard)) { r.star = star; s.starShards[star] = (s.starShards[star] || 0) + 1; }
+    if (first || rnd() < (boss ? EGG_DROP.bossChance : EGG_DROP.chance)) { const e = rollMysteryEgg(s, rnd, D.tierW); s.eggs.push(e); r.eggs.push(e); }
     s.stages[stageId] = Math.max(s.stages[stageId] || 0, stars);
   }
   return r;
@@ -67,22 +71,22 @@ export function rollSpecies(rarity: Rarity, rnd: () => number): string {
   return pool[0].id;
 }
 /** shell tier of the next mystery egg, applying (and updating) the gold+ pity counter */
-export function rollTier(s: SaveData, rnd: () => number): EggTier {
-  const w = EGG_DROP.tierW, hi = (t: EggTier) => t === 'gold' || t === 'rainbow';
+export function rollTier(s: SaveData, rnd: () => number, w: Record<EggTier, number> = EGG_DROP.tierW): EggTier {
+  const hi = (t: EggTier) => t === 'gold' || t === 'rainbow';
   let tier = pickW(w, rnd());
   if (!hi(tier) && (s.eggPity || 0) + 1 >= EGG_DROP.pity) tier = pickW({ gold: w.gold, rainbow: w.rainbow }, rnd());
   s.eggPity = hi(tier) ? 0 : (s.eggPity || 0) + 1;
   return tier;
 }
 export const rollRarity = (tier: EggTier, rnd: () => number) => pickW(EGG_TIERS[tier].rarityW, rnd()) as Rarity;
-export function rollMysteryEgg(s: SaveData, rnd: () => number): EggSave {
-  const tier = rollTier(s, rnd), T = EGG_TIERS[tier];
+export function rollMysteryEgg(s: SaveData, rnd: () => number, w?: Record<EggTier, number>): EggSave {
+  const tier = rollTier(s, rnd, w), T = EGG_TIERS[tier];
   const sid = rollSpecies(rollRarity(tier, rnd), rnd);
   return { id: s.nextEggId++, sid, kind: 'mystery', tier, rare: rnd() < rareFormChance(T.rareForm, sid) };
 }
 /** disclosed odds of a mystery egg drop, per tier (0..1) */
-export function eggOdds() {
-  const w = EGG_DROP.tierW, total = Object.values(w).reduce((a, b) => a + b, 0);
+export function eggOdds(w: Record<EggTier, number> = EGG_DROP.tierW) {
+  const total = Object.values(w).reduce((a, b) => a + b, 0);
   return Object.fromEntries(Object.entries(w).map(([k, v]) => [k, v / total])) as Record<EggTier, number>;
 }
 

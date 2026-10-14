@@ -83,6 +83,7 @@ export interface ZoneDef { id: string; realm: string; name: string; desc: string
 export interface StageDef {
   id: string; name: string; desc: string;
   zone: string; n: number; realm: string; // zone id, stage number in the zone (1..5, 5 = boss), realm id
+  diff?: number; // difficulty (data.ts DIFFS): 0 easy = the base stage, 1 normal, 2 hard; id is then `<stage>@n|@h`
   loc?: string; // battle arena (render/locations.ts); none = the default meadow
   waves: EnemyRef[][];
   reward: { gold: number; exp: number };

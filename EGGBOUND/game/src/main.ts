@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
-import { SPECIES, STAGES, ZONES, ZONE_PLAN, planOf, starbornOf, rareFormChance, ENERGY_MAX, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
+import { SPECIES, STAGES, ZONES, ZONE_PLAN, planOf, starbornOf, rareFormChance, DIFFS, stageKey, parseStage, stageOf, ENERGY_MAX, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
 import { Battle } from './core/battle';
 import { drawShowcase, showcaseTap } from './render/showcase';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL, rareMasterURL, ensureArt, artReady, prefetchExt, EXT_STAT } from './render/assets';
@@ -88,7 +88,7 @@ function enAct(k) {
 function topbar(title, sub) { return `<div class="topbar"><div class="realm"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div><div class="row" style="flex:0 0 auto;align-items:center"><span class="proto">P0 PROTOTYPE</span>${bookBtn()}${enPill()}<span class="gold gem"><i></i>${S.gems.toLocaleString()}</span><span class="gold"><i></i>${S.gold.toLocaleString()}</span></div></div>`; }
 /** realms (one map each): name + tagline; a realm opens when its first stage unlocks */
 const REALMS = { '1': ['ทุ่งไข่ป่วน', 'ภพที่ 1 · บ้านเกิดของเผ่าไข่ป่วน'], '2': ['สุวรรณภูมิ', 'ภพที่ 2 · ดินแดนทองแห่งตำนานไทย นาค กินรี คชสีห์'], '3': ['สวรรค์บูรพา', 'ภพที่ 3 · สวรรค์ตะวันออก ปี่เซียะ จิ้งจอกเก้าหาง ราชาอสูรวัว'] };
-const realmOf = id => STAGES.find(st => st.id === id)?.realm || id.split('-')[0];
+const realmOf = id => stageOf(id)?.realm || id.split('-')[0];
 const realmOpen = r => stageUnlocked(S, STAGES.find(st => st.realm === r).id);
 /** world map (2026-10-13): each realm is a sea-of-clouds chart our turtle sails; zones are islands (their painted arena in
  *  a round frame) joined by a dotted route. Positions are % of a 16:9 chart, tuned to the BATCH18 painting when it lands. */
@@ -103,7 +103,15 @@ const zoneStagesOf = zid => STAGES.filter(st => st.zone === zid);
 const zoneOpen = z => stageUnlocked(S, z.id + '-1');
 const zoneStars = z => zoneStagesOf(z.id).reduce((a, st) => a + (S.stages[st.id] || 0), 0);
 const zoneBoss = z => STAGES.find(st => st.id === z.id + '-5').waves.flat().find(m => m.boss || SPECIES[m.sid]?.boss);
-let mapZone = null, mapScroll = null; // mapScroll: [realm, scrollLeft] kept across re-renders
+// difficulties (ง่าย · ปานกลาง · ยาก): stars, unlock and clear state per zone; stage keys come from stageKey()
+const zoneDiffStars = (z, d) => zoneStagesOf(z.id).reduce((a, st) => a + (S.stages[stageKey(st.id, d)] || 0), 0);
+const zoneDiffOpen = (z, d) => stageUnlocked(S, stageKey(z.id + '-1', d));
+const zoneDiffCleared = (z, d) => (S.stages[stageKey(z.id + '-5', d)] || 0) > 0;
+/** the next stage after this one at the same difficulty, when it is open */
+const nextStageKey = key => { const { id, d } = parseStage(key), i = STAGES.findIndex(x => x.id === id), n = STAGES[i + 1]; if (!n) return null; const k = stageKey(n.id, d); return stageUnlocked(S, k) ? k : null; };
+const stageLabel = key => { const st = stageOf(key); return st ? `${st.name} ${st.n}${st.diff ? ' · ' + DIFFS[st.diff].name : ''}` : key; };
+const diffPips = z => DIFFS.map((D, d) => `<i class="dp ${zoneDiffCleared(z, d) ? 'on' : zoneDiffOpen(z, d) ? 'open' : ''}" style="--dc:${D.col}" title="${D.name}${zoneDiffCleared(z, d) ? ' · ชนะบอสแล้ว' : ''}"></i>`).join('');
+let mapZone = null, mapScroll = null, mapDiff = 0; // mapScroll: [realm, scrollLeft] kept across re-renders
 /** keep the chart where the player left it; first visit of a realm centres on the island the turtle is at */
 function placeMap() {
   if (mapZone) document.body.insertAdjacentHTML('beforeend', zonePanel(ZONES.find(z => z.id === mapZone)));
@@ -127,7 +135,7 @@ function mapHTML() {
     return `<button type="button" class="pin ${op ? '' : 'locked'} ${z === here ? 'here' : ''} ${cleared ? 'clear' : ''} ${star ? 'starborn' : ''}" style="left:${x}%;top:${y}%" data-zone="${z.id}" ${op ? '' : 'disabled'}>
       <span class="isle loc-${z.loc}" ${art ? `style="background-image:url('bg/${z.loc}.webp')"` : ''}></span>
       ${op ? `<span class="bossb"><img src="${portrait(b.sid)}" alt=""></span>` : '<span class="lock">🔒</span>'}
-      <span class="lbl"><b>${esc(z.name)}</b><small>${op ? `<span class="stars">★</span> ${st}/15${star ? ' · ✦ ดารา' : ''}` : 'ยังไม่ปลดล็อก'}</small></span></button>`;
+      <span class="lbl"><b>${esc(z.name)}</b><small>${op ? `<span class="dps">${diffPips(z)}</span> <span class="stars">★</span> ${DIFFS.reduce((a, D, d) => a + zoneDiffStars(z, d), 0)}/${DIFFS.length * 15}${star ? ' · ✦' : ''}` : 'ยังไม่ปลดล็อก'}</small></span></button>`;
   }).join('');
   const chart = `<div class="wmap"><div class="wmap-in realm${mapRealm} ${ART_BG.includes('map' + mapRealm) ? 'art' : ''}" ${ART_BG.includes('map' + mapRealm) ? `style="background-image:url('bg/map${mapRealm}.webp')"` : ''}>
     <svg viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true"><polyline points="${route}" /></svg>${pins}</div></div>`;
@@ -138,15 +146,19 @@ function mapHTML() {
 function zonePanel(z) {
   if (!z) return '';
   const b = zoneBoss(z), bs = SPECIES[b.sid], art = ART_BG.includes(z.loc), shards = S.starShards?.[b.sid] || 0;
-  const rows = zoneStagesOf(z.id).map(st => {
-    const un = stageUnlocked(S, st.id), stars = S.stages[st.id] || 0, boss = st.n === 5, [pl, ps] = planOf(st);
+  while (mapDiff > 0 && !zoneDiffOpen(z, mapDiff)) mapDiff--; // the sheet opens on the last chosen difficulty this zone allows
+  const dd = mapDiff, D = DIFFS[dd];
+  const dtabs = `<div class="dtabs">${DIFFS.map((X, d) => { const op = zoneDiffOpen(z, d); return `<button type="button" class="dtab ${d === dd ? 'on' : ''} ${zoneDiffCleared(z, d) ? 'clear' : ''}" style="--dc:${X.col}" data-zdiff="${d}" ${op ? '' : 'disabled'}><b>${op ? '' : '🔒 '}${X.name}</b><small>${op ? `<span class="stars">★</span> ${zoneDiffStars(z, d)}/15` : `ชนะบอส${DIFFS[d - 1].name}ก่อน`}</small></button>`; }).join('')}</div>
+    <p class="dnote">${dd ? `ศัตรู ★+${D.stars} แข็งแรงขึ้น · ทอง ×${D.gold} · EXP ×${D.exp} · ไข่ปริศนาลายดีขึ้น · เศษไข่ +${D.frag}${bs.starborn ? ` · เศษไข่ดารา ${D.shard * 100}%` : ''}` : 'ระดับเริ่มต้น · ชนะบอสโซนนี้เพื่อเปิดระดับปานกลาง'}</p>`;
+  const rows = zoneStagesOf(z.id).map(base => {
+    const key = stageKey(base.id, dd), st = stageOf(key), un = stageUnlocked(S, key), stars = S.stages[key] || 0, boss = st.n === 5, [pl, ps] = planOf(st);
     const els = [...new Set(st.waves.flat().map(m => formOf(m.sid, !!m.rare).elem))];
-    return `<div class="stage ${un ? '' : 'locked'} ${boss ? 'boss' : ''}"><div class="num">${boss ? `<img src="${portrait(b.sid)}" alt="">` : st.n}</div><div style="min-width:0"><div class="nm">${boss ? 'บอส · ' + esc(b.name || bs.name) : 'ด่าน ' + st.n}</div><div class="meta"><span class="stars">${starStr(stars, 3)}</span><span>แนะนำ ★${ps} Lv.${pl}</span><span title="พลังงานที่ใช้ตอนเปิด AUTO">AUTO ⚡${autoCost(st)}</span><span>ธาตุ ${els.map(elDot).join(' ')}</span></div></div><button class="go" type="button" data-stage="${st.id}" ${un ? '' : 'disabled'}>${un ? 'สู้' : 'ล็อก'}</button></div>`;
+    return `<div class="stage ${un ? '' : 'locked'} ${boss ? 'boss' : ''}"><div class="num">${boss ? `<img src="${portrait(b.sid)}" alt="">` : st.n}</div><div style="min-width:0"><div class="nm">${boss ? 'บอส · ' + esc(b.name || bs.name) : 'ด่าน ' + st.n}</div><div class="meta"><span class="stars">${starStr(stars, 3)}</span><span>แนะนำ ★${ps} Lv.${pl}</span><span title="พลังงานที่ใช้ตอนเปิด AUTO">AUTO ⚡${autoCost(st)}</span><span>ธาตุ ${els.map(elDot).join(' ')}</span></div></div><button class="go" type="button" data-stage="${key}" ${un ? '' : 'disabled'}>${un ? 'สู้' : 'ล็อก'}</button></div>`;
   }).join('');
   return `<div class="zpanel" data-zclose="1"><div class="zsheet" role="dialog" aria-label="${esc(z.name)}">
     <div class="zhead loc-${z.loc}" ${art ? `style="background-image:linear-gradient(180deg,rgba(10,10,14,0) 30%,rgba(10,10,14,.9)),url('bg/${z.loc}.webp')"` : ''}><button type="button" class="zx" data-zclose="1" aria-label="ปิด">✕</button><h2>${esc(z.name)}</h2><p>${esc(z.desc)}</p></div>
-    ${bs.starborn ? `<div class="zstar"><img src="${eggURL(b.sid)}" alt=""><div><b>ตำนานดารา · ${esc(bs.name)}</b><div class="bar fr"><i style="transform:scaleX(${Math.min(1, shards / STAR_SHARDS_TO_CRAFT)})"></i></div><small>เศษไข่ดารา ${shards}/${STAR_SHARDS_TO_CRAFT} · ชนะบอสครั้งแรกได้ 1 ชิ้น หลังจากนั้น ${STAR_SHARD_CHANCE * 100}% ต่อรอบ</small></div></div>` : ''}
-    <div class="stages">${rows}</div></div></div>`;
+    ${bs.starborn ? `<div class="zstar"><img src="${eggURL(b.sid)}" alt=""><div><b>ตำนานดารา · ${esc(bs.name)}</b><div class="bar fr"><i style="transform:scaleX(${Math.min(1, shards / STAR_SHARDS_TO_CRAFT)})"></i></div><small>เศษไข่ดารา ${shards}/${STAR_SHARDS_TO_CRAFT} · ชนะบอสครั้งแรกได้ 1 ชิ้น หลังจากนั้น ${STAR_SHARD_CHANCE * 100}% ต่อรอบ (ปานกลาง ${DIFFS[1].shard * 100}% · ยาก ${DIFFS[2].shard * 100}%)</small></div></div>` : ''}
+    ${dtabs}<div class="stages">${rows}</div></div></div>`;
 }
 /** rarity colour (shared with the chest/hatch colour language) as a CSS var; common stays neutral */
 const rcVar = s => s.rarity === 'common' ? '' : `--rc:${LOOT_GRADES[s.rarity].col}`;
@@ -160,7 +172,7 @@ function monCard(uid, opts = {}) {
 }
 function teamHTML() {
   const owned = units(), lm = monOf(S, S.team[0]), lead = lm && SPECIES[lm.sid].leader;
-  return `<section class="scr dim"><div class="wrap">${topbar('จัดทีม', teamCtx ? `ด่าน ${teamCtx} · เลือก 4 ตัว ตัวแรกเป็นผู้นำ` : 'เลือก 4 ตัว ตัวแรกเป็นผู้นำ')}
+  return `<section class="scr dim"><div class="wrap">${topbar('จัดทีม', teamCtx ? `${esc(stageLabel(teamCtx))} · เลือก 4 ตัว ตัวแรกเป็นผู้นำ` : 'เลือก 4 ตัว ตัวแรกเป็นผู้นำ')}
   <div class="slots">${[0, 1, 2, 3].map(i => { const m = monOf(S, S.team[i]); return m ? `<button type="button" class="slot fill" data-slot="${i}">${i === 0 ? '<b>ผู้นำ</b>' : '<b>&nbsp;</b>'}<span class="pic"><img src="${portrait(look(m))}" alt=""></span>${esc(SPECIES[m.sid].name)}<span class="stars" style="font-size:.66rem">${starStr(m.stars)}</span></button>` : `<div class="slot">${i === 0 ? '<b>ผู้นำ</b>' : ''}ว่าง</div>`; }).join('')}</div>
   <div class="lead">สกิลผู้นำ: <b>${lead ? esc(lead.text) : '—'}</b></div>
   <h2 class="sec">มอนของคุณ (แตะเพื่อเพิ่ม/เอาออก · ชนิดเดียวกันลงได้ 1 ตัว)</h2><div class="mgrid">${owned.map(m => { const inT = S.team.includes(m.uid), dup = !inT && teamHasSpecies(S, m.sid); return monCard(m.uid, { on: inT, dup, tag: S.team[0] === m.uid ? 'ผู้นำ' : inT ? S.team.indexOf(m.uid) + 1 : dup ? 'ซ้ำ' : '' }); }).join('')}</div>
@@ -339,7 +351,7 @@ function bookHTML() {
   const order = q => S.quests.includes(q.id) ? 2 : q.goal(S)[0] >= q.goal(S)[1] ? 0 : 1, list = qs.map((q, i) => [q, i] as const).sort((a, b) => order(a[0]) - order(b[0]) || a[1] - b[1]).map(x => x[0]);
   const all = claimable(S).length + chapterClaimable(S).length, nCh = CHAPTERS.filter(c => S.quests.includes('ch:' + c.id)).length;
   const toc = CHAPTERS.map((c, i) => { const q = questsIn(c.id), g = q.filter(x => S.quests.includes(x.id)).length, n = nReady(c), fin = S.quests.includes('ch:' + c.id);
-    return `<li><button type="button" class="bk-toc-i ${c.id === bookCh ? 'on' : ''} ${fin ? 'fin' : ''}" data-bch="${c.id}"><span class="bk-num">${['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][i] || i + 1}</span><span class="bk-name">${esc(c.name)}</span><span class="bk-dots"></span><span class="bk-cnt">${fin ? '✓' : g + '/' + q.length}</span>${n ? `<i class="bk-dot">${n}</i>` : ''}</button></li>`; }).join('');
+    return `<li><button type="button" class="bk-toc-i ${c.id === bookCh ? 'on' : ''} ${fin ? 'fin' : ''}" data-bch="${c.id}"><span class="bk-num">${['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII', 'XIII', 'XIV', 'XV'][i] || i + 1}</span><span class="bk-name">${esc(c.name)}</span><span class="bk-dots"></span><span class="bk-cnt">${fin ? '✓' : g + '/' + q.length}</span>${n ? `<i class="bk-dot">${n}</i>` : ''}</button></li>`; }).join('');
   const chestImg = uiSrc(chOpen ? 'chest_boss_open' : chReady ? 'chest_boss_closed' : 'chest_wood_closed');
   const quests = list.map(q => { const [a, b] = q.goal(S), done = a >= b, cl = S.quests.includes(q.id);
     return `<li class="bkq ${cl ? 'claimed' : done ? 'done' : ''}"><div class="bkq-main"><b>${esc(q.name)}</b><div class="bkq-line"><span class="bkq-prog"><i style="transform:scaleX(${Math.min(1, a / b)})"></i></span><span class="bkq-n">${a}/${b}</span></div><div class="bkq-rw">${rewardChips(q.reward)}</div></div>${cl ? '<span class="bk-stamp">รับแล้ว</span>' : `<button class="bk-seal" type="button" data-claim="${q.id}" ${done ? '' : 'disabled'}>รับ</button>`}</li>`; }).join('');
@@ -458,7 +470,7 @@ function banner(t, s = '', d = 1.8) { $('#bT').textContent = t; $('#bS').textCon
 let artWait = false;
 function startBattle(stageId, artTried = false) {
   if (S.team.length !== 4) { teamCtx = stageId; show('team'); return; }
-  const st = STAGES.find(x => x.id === stageId);
+  const st = stageOf(stageId);
   // Starborn art ships as separate files: load it (once) before the fight so nobody appears as a placeholder
   const sids = [...st.waves.flat().map(m => m.sid), ...S.team.map(uid => monOf(S, uid)?.sid).filter(Boolean)];
   if (!artTried && !artReady(sids)) { if (!artWait) { artWait = true; toast('กำลังโหลดภาพมอนตำนานดารา…'); ensureArt(sids).then(() => { artWait = false; startBattle(stageId, true); }); } return; }
@@ -473,7 +485,7 @@ function startBattle(stageId, artTried = false) {
     auto: autoPaid, autoPaid, speed: S.settings.speed, skipUlt: S.settings.skipUlt,
     onHud: hudBattle, onAct: (s, team) => { const e = $('#actName'); e.textContent = s; e.classList.toggle('e', team === 1); e.classList.add('show'); actT = 1.6; },
     onCutin: (sid, name, col) => { const ci = $('#cutin'); ci.style.setProperty('--c', col); $('#cutImg').src = portrait(sid); $('#cutText').textContent = name; ci.classList.remove('go'); void ci.offsetWidth; ci.classList.add('go'); },
-    onWave: (w, n, boss) => { $('#waveLbl').textContent = `${st.name} ${st.n} · WAVE ${w + 1}/${n}`; banner(boss ? 'BOSS' : 'WAVE ' + (w + 1), boss ? (b.units.find(u => u.team === 1 && u.boss && u.alive)?.name || st.name) : `${st.name} ${st.n}`, 1.5); },
+    onWave: (w, n, boss) => { $('#waveLbl').textContent = `${stageLabel(st.id)} · WAVE ${w + 1}/${n}`; banner(boss ? 'BOSS' : 'WAVE ' + (w + 1), boss ? (b.units.find(u => u.team === 1 && u.boss && u.alive)?.name || st.name) : `${st.name} ${st.n}`, 1.5); },
     onEnd: (win, stars) => endBattle(win, stars, seed, b),
     onUlt: () => { S.stats.ult++; }, onPerfect: () => { S.stats.perfect++; },
   });
@@ -503,13 +515,13 @@ function renderOrder() {
   $('#order').innerHTML = ord.slice(0, 8).map((uid, i) => { const u = b.get(uid); return `<div class="o ${u.team ? 'e' : ''} ${i === 0 ? 'first' : ''}"><img src="${portrait(u.sid)}" alt=""></div>`; }).join('');
 }
 function endBattle(win, stars, seed, b) {
-  const seen = []; for (const w of STAGES.find(x => x.id === curStageId).waves) for (const m of w) seen.push(m.sid);
+  const seen = []; for (const w of stageOf(curStageId).waves) for (const m of w) seen.push(m.sid);
   S.stats.react += b.myReactions; S.stats.reactKinds = [...new Set([...S.stats.reactKinds, ...b.reactKinds])];
   const r = grantRewards(S, curStageId, win, stars, seen, seed); save();
   $('#skills').hidden = true;
   if (!win) { resultModal(r, win, stars); return; }
   // win: treasure chest first (light colour = best drop), then the result card
-  const st = STAGES.find(x => x.id === curStageId), boss = st.waves.some(w => w.some(m => SPECIES[m.sid]?.boss));
+  const st = stageOf(curStageId), boss = st.waves.some(w => w.some(m => SPECIES[m.sid]?.boss));
   const { items, grade } = lootOf(r);
   const view = items.map(it => it.kind === 'gold' ? { icon: coinURL(it.qty >= 1000), label: `ทอง ${it.qty.toLocaleString()}`, sub: it.first ? 'โบนัสผ่านครั้งแรก' : '', grade: it.grade }
     : it.kind === 'frag' ? { icon: eggURL(it.sid), label: `เศษไข่ ×${it.qty}`, sub: SPECIES[it.sid].name, grade: it.grade }
@@ -527,7 +539,7 @@ function coinURL(big = false) {
   return (coinU = c.toDataURL());
 }
 function resultModal(r, win, stars) {
-  const idx = STAGES.findIndex(x => x.id === curStageId), next = STAGES[idx + 1];
+  const next = nextStageKey(curStageId);
   const modal = document.createElement('div'); modal.className = 'modal'; modal.id = 'resModal';
   modal.innerHTML = `<div class="card"><h2 class="${win ? '' : 'lose'}">${win ? 'ชนะ!' : 'แพ้'}</h2>${win ? `<div class="bigstars">${[0, 1, 2].map(i => `<span class="${i < stars ? '' : 'off'}" style="animation-delay:${.2 + i * .25}s">${starHTML(i < stars)}</span>`).join('')}</div>` : '<p class="note" style="text-align:center">ลองเลเวลอัปที่ด่านก่อนหน้า หรือจัดทีมให้มีธาตุที่ได้เปรียบ</p>'}
   ${r.gold ? `<div class="drop" style="align-self:center"><span class="gold" style="padding:0;border:0;background:none"><i></i></span>ทอง +${r.gold.toLocaleString()}${r.firstClear ? ' (โบนัสผ่านครั้งแรก)' : ''}</div>` : ''}
@@ -650,6 +662,7 @@ document.addEventListener('click', e => {
   else if (d.mon && cur === 'mons') { pickMon(+d.mon); }
   else if (d.realm) { sfx.click(); mapRealm = d.realm; render(); }
   else if (d.zone) { sfx.click(); mapZone = d.zone; render(); }
+  else if (d.zdiff !== undefined) { sfx.click(); mapDiff = +d.zdiff; const y = $('.zsheet')?.scrollTop || 0; render(); const zs = $('.zsheet'); if (zs) zs.scrollTop = y; }
   else if (d.zclose) { mapZone = null; render(); }
   else if (d.mt) { sfx.click(); monTab = d.mt; dexSel = null; render(); }
   else if (d.dexel) { sfx.click(); dexEl = d.dexel; render(); }
@@ -686,7 +699,7 @@ document.addEventListener('click', e => {
   else if (d.b === 'exitNo') { confirmExit = false; renderBattleButtons(); }
   else if (d.b === 'exitYes') { leaveBattle(); show('map'); }
   else if (d.r === 'again') { const id = curStageId; leaveBattle(); startBattle(id); }
-  else if (d.r === 'next') { const i = STAGES.findIndex(x => x.id === curStageId); leaveBattle(); startBattle(STAGES[i + 1].id); }
+  else if (d.r === 'next') { const k = nextStageKey(curStageId); leaveBattle(); if (k) startBattle(k); else show('map'); }
   else if (d.r === 'hatch') { leaveBattle(); show('hatch'); }
   else if (d.r === 'map') { leaveBattle(); show('map'); }
   else if (d.h === 'more') { leaveHatch(); show('hatch'); }

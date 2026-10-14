@@ -488,7 +488,9 @@ const WAVE_PAT = [
 /** recommended team per zone for the stage list and the balance sim: [level at stage 1, level at stage 5, stars] —
  *  enemy levels (`lv`) are whatever makes the starter team at this level win ~85% (stage 1) → ~62% (boss) */
 export const ZONE_PLAN: Record<string, [number, number, number]> = { meadow: [3, 5, 1], stream: [5, 8, 1], rootnest: [8, 10, 1], goldforest: [5, 7, 2], ricefield: [7, 9, 2], village: [9, 12, 2], kinnari: [12, 14, 2], temple: [14, 17, 2], nagapool: [17, 20, 2], jade: [5, 8, 3], palace: [8, 11, 3], foxvalley: [11, 14, 3], toadbridge: [14, 17, 3], heaven: [17, 21, 3], firecave: [21, 25, 3] };
-export const planOf = (st: StageDef): [number, number] => { const [a, b, s] = ZONE_PLAN[st.zone] || [5, 5, 1]; return [Math.round(a + (b - a) * (st.n - 1) / 4), s]; };
+/** recommended [level, stars] for a stage; harder difficulties move it up the same star grades as the enemies */
+export const planOf = (st: StageDef): [number, number] => { const [a, b, s] = ZONE_PLAN[st.zone] || [5, 5, 1], lv = Math.round(a + (b - a) * (st.n - 1) / 4), k = DIFFS[st.diff || 0]?.stars || 0;
+  return k ? [upLevel(lv, s, Math.min(6, s + k)), Math.min(6, s + k)] : [lv, s]; };
 export function zoneStages(z: ZoneDef, zi: number): StageDef[] {
   const g = ZONE_GEN[z.id], out: StageDef[] = [], [p0, p1] = ZONE_PLAN[z.id];
   for (let n = 1; n <= 5; n++) {
@@ -584,6 +586,55 @@ export const EGG_TIERS: Record<EggTier, EggTierDef> = {
 };
 /** stage drop: one roll per win (first clear always drops). pity = the Nth mystery egg in a row without gold+ is forced gold+ */
 export const EGG_DROP = { chance: 0.3, bossChance: 0.6, tierW: { common: 68, silver: 24, gold: 7, rainbow: 1 } as Record<EggTier, number>, pity: 20 };
+
+// ---- Difficulty (ระดับ ง่าย · ปานกลาง · ยาก — owner 2026-10-14): every stage can be played at three difficulties with no
+// new art. Easy = the base stage (old saves keep their progress). Normal/Hard are the same fight one/two star grades up:
+// every enemy +stars and its level moved to the same place in the new grade's level range — so the recommended team is
+// the easy plan +stars too and the sim win rates stay alike. A difficulty opens zone by zone: beat the zone boss one
+// difficulty below. Rewards grow with it (gold, EXP, better mystery-egg shells, more fragments, Starborn shard chance).
+export interface DiffDef { key: string; name: string; short: string; col: string; stars: number; gold: number; exp: number; stamina: number; frag: number; shard: number; tierW: Record<EggTier, number> }
+export const DIFFS: DiffDef[] = [
+  { key: '', name: 'ง่าย', short: 'ง่าย', col: '#6bdc8a', stars: 0, gold: 1, exp: 1, stamina: 0, frag: 0, shard: STAR_SHARD_CHANCE, tierW: EGG_DROP.tierW },
+  { key: 'n', name: 'ปานกลาง', short: 'กลาง', col: '#ffcf5a', stars: 1, gold: 1.6, exp: 1.5, stamina: 2, frag: 1, shard: 0.075, tierW: { common: 50, silver: 34, gold: 13, rainbow: 3 } },
+  { key: 'h', name: 'ยาก', short: 'ยาก', col: '#ff6b6b', stars: 2, gold: 2.4, exp: 2.2, stamina: 4, frag: 2, shard: 0.1, tierW: { common: 30, silver: 40, gold: 24, rainbow: 6 } },
+];
+/** stage key for a difficulty: easy keeps the plain id (save compatible), others `<id>@n` / `<id>@h` */
+export const stageKey = (id: string, d = 0) => d ? `${id}@${DIFFS[d].key}` : id;
+export const parseStage = (key: string) => { const [id, k] = key.split('@'); const d = k ? DIFFS.findIndex(x => x.key === k) : 0; return { id, d: d < 0 ? 0 : d }; };
+/** a level moved into a higher star grade, keeping its place in the grade's level range */
+const upLevel = (lvl: number, s0: number, s1: number) => Math.max(1, Math.min(levelCap(s1), Math.round(lvl * levelCap(s1) / levelCap(s0))));
+const scaleRef = (m: EnemyRef, k: number): EnemyRef => { if (!k) return m; const s0 = m.stars || 1, s1 = Math.min(6, s0 + k); return { ...m, stars: s1, lvl: upLevel(m.lvl, s0, s1) }; };
+/** extra enemy HP/ATK per stage for [normal, hard] (stages 1–5), tuned by sim so the recommended team (planOf) wins
+ *  ~84% → ~74% → boss ~55% on normal and ~80% → ~70% → boss ~50% on hard. Needed because DEF reduces damage
+ *  non-linearly (100/(100+DEF)): raising both sides by the same star grade does not keep a fight equally hard. */
+export const DIFF_K: Record<string, [number[], number[]]> = {
+  meadow: [[1.07, 1.01, 1.05, 1.12, 0.94], [1.08, 1.1, 1.1, 1.1, 0.93]],
+  stream: [[1.07, 1.07, 1.06, 1.05, 1.03], [1.07, 1.16, 1.06, 1.16, 1.07]],
+  rootnest: [[1.08, 1.04, 1.06, 1.02, 1.11], [1.2, 1.18, 1.16, 1.12, 1.14]],
+  goldforest: [[1.02, 1.08, 1.06, 1.1, 0.88], [1.04, 1.17, 1.12, 1.12, 0.79]],
+  ricefield: [[1.1, 1.17, 1.07, 1.1, 0.88], [1.25, 1.38, 1.06, 1.1, 0.75]],
+  village: [[1.03, 1.06, 1.07, 1.05, 1.11], [1.08, 1.17, 1.18, 1.14, 1.16]],
+  kinnari: [[1.11, 1.08, 1.13, 1.08, 0.89], [1.2, 1.21, 1.29, 1.25, 0.76]],
+  temple: [[1.12, 1.04, 1.06, 1.1, 1.12], [1.24, 1.25, 1.11, 1.14, 1.17]],
+  nagapool: [[0.84, 0.92, 1.03, 1.1, 0.93], [0.7, 0.84, 0.95, 1.05, 0.81]],
+  jade: [[0.99, 0.99, 0.95, 0.95, 0.94], [1.03, 0.95, 0.94, 0.85, 0.88]],
+  palace: [[0.99, 1.11, 1.02, 0.98, 0.91], [1.05, 1.13, 0.92, 1.01, 0.74]],
+  foxvalley: [[0.87, 0.96, 0.96, 0.97, 0.88], [0.7, 0.81, 0.86, 0.85, 0.73]],
+  toadbridge: [[0.93, 0.9, 0.91, 0.99, 0.98], [0.78, 0.76, 0.77, 0.85, 0.92]],
+  heaven: [[0.87, 0.94, 1.01, 0.98, 0.85], [0.7, 0.76, 0.83, 0.88, 0.67]],
+  firecave: [[0.99, 0.98, 1.02, 1.05, 0.91], [0.88, 0.92, 0.99, 0.95, 0.78]]
+};
+const DCACHE: Record<string, StageDef> = {};
+/** the stage behind a key (any difficulty) */
+export function stageOf(key: string): StageDef | undefined {
+  const { id, d } = parseStage(key), base = STAGES.find(x => x.id === id);
+  if (!base || !d) return base;
+  if (DCACHE[key]) return DCACHE[key];
+  const D = DIFFS[d];
+  return (DCACHE[key] = { ...base, id: key, diff: d, stamina: base.stamina + D.stamina,
+    reward: { gold: Math.round(base.reward.gold * D.gold / 10) * 10, exp: Math.round(base.reward.exp * D.exp) },
+    waves: base.waves.map(w => w.map(m => { const r = scaleRef(m, D.stars), k = DIFF_K[base.zone]?.[d - 1]?.[base.n - 1] ?? 1; return k === 1 ? r : { ...r, hpMult: (r.hpMult || 1) * k, atkMult: (r.atkMult || 1) * k }; })) });
+}
 /** named egg (crafted from fragments): species known, and the best rare-form odds in the game — about twice the best
  *  mystery egg (rainbow 8%) before the species multiplier, so collecting a monster's fragments is the way to hunt its
  *  rare form (decided 2026-10-13): common 15% · rare 12% · epic 7.5% · legendary 3.75% */
