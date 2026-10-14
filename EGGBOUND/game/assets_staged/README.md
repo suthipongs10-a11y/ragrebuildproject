@@ -29,3 +29,6 @@ bundle size. When the monster is added to `SPECIES` (data.ts), move its files in
   `front_cast` and `back_attack` PNGs were broken inside the zip (bottom half missing) → asked for a resend; re-import
   them with the set's original front_idle at 280. G01 / E11 / C10 zips arrived truncated (G01 7/12 salvaged, E11 1/12,
   C10 2/12) → asked for a resend of the whole sets as single files or two small zips.
+- 2026-10-14 BATCH21 (resend): G01 Bastet Kitten complete 12/12 (5 recovered PNGs merged with the 7 salvaged earlier,
+  same canvas) · H01 Kappa complete 12/12 · H04 Baku complete 12/12 — all commons, imported at front_idle height 290.
+  E11 / C10 resend zips were byte-identical to the first truncated uploads → still E11 1/12, C10 2/12.
