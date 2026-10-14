@@ -40,3 +40,4 @@ bundle size. When the monster is added to `SPECIES` (data.ts), move its files in
   back_attack, back_cast, back_hit — re-import with the set's original front_idle when they come.
 - 2026-10-14 BATCH21: E10 Dragontooth Skeleton complete 12/12 at 290 (common; transparent 1024 PNGs, one shared
   source scale, feet at y=870). E11 `_SET_1` zip was the same truncated file a third time (md5 a901398d) → still 1/12.
+- 2026-10-14: E01 E10 F01 G01 H01 H04 moved to `game/assets_ext/` — they are in the game now (separate files loaded on demand).
