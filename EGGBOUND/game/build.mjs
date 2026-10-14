@@ -25,7 +25,16 @@ if (fs.existsSync(bgDir)) for (const f of fs.readdirSync(bgDir)) if (f.endsWith(
 const extDir = path.join(root, 'assets_ext'), extOut = path.join(root, 'dist/ext'), extIds = [];
 fs.rmSync(extOut, { recursive: true, force: true });
 if (fs.existsSync(extDir)) for (const f of fs.readdirSync(extDir)) if (f.endsWith('.webp')) { fs.mkdirSync(extOut, { recursive: true }); fs.copyFileSync(path.join(extDir, f), path.join(extOut, f)); extIds.push(path.basename(f, '.webp')); }
-const res = await build({ entryPoints: [path.join(root, 'src/main.ts')], bundle: true, platform: 'browser', format: 'iife', target: 'es2020', minify: true, write: false, logLevel: 'warning', define: { __BG__: JSON.stringify(bgIds), __EXT__: JSON.stringify(extIds) } });
+// Pixel data + embedded menu thumbnails of the separate-file art (tools/ext_meta.py): the live Artifact lets the canvas
+// draw those files but not read them. Regenerated here whenever meta.json misses a file.
+const metaPath = path.join(extDir, 'meta.json');
+let extMeta = fs.existsSync(metaPath) ? JSON.parse(fs.readFileSync(metaPath, 'utf8')) : {};
+if (extIds.some(k => !extMeta[k])) { const { spawnSync } = await import('node:child_process'); const r = spawnSync('python3', ['-I', path.join(root, 'tools/ext_meta.py')], { stdio: 'inherit' });
+  if (r.status === 0) extMeta = JSON.parse(fs.readFileSync(metaPath, 'utf8')); else console.warn('WARNING: tools/ext_meta.py failed — run it by hand'); }
+// file lists carry the literal published paths (a host that maps file paths can find them in the page text)
+const lit = (ids, dir) => JSON.stringify(Object.fromEntries(ids.map(k => [k, dir + '/' + k + '.webp'])));
+const res = await build({ entryPoints: [path.join(root, 'src/main.ts')], bundle: true, platform: 'browser', format: 'iife', target: 'es2020', minify: true, write: false, logLevel: 'warning',
+  define: { __BG__: JSON.stringify(bgIds), __BGU__: lit(bgIds, 'bg'), __EXT__: lit(extIds, 'ext'), __EXTMETA__: JSON.stringify(Object.fromEntries(Object.entries(extMeta).filter(([k]) => extIds.includes(k) || k === 'mon001_front_idle'))) } });
 const js = res.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
 
 // Assets: game/assets/*.webp|png (authoritative). Legacy fallback: the old Test Lab's embedded ASSET block if present.

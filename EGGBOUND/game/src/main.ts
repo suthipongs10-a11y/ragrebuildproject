@@ -6,7 +6,7 @@ import { drawShowcase, showcaseTap } from './render/showcase';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, sizeK, lookOf, starHTML, uiSrc, masterURL, rareMasterURL, ensureArt, artReady, prefetchExt, EXT_STAT } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
 import { E, initCanvas, toWorld, updScripts, updParts, tickEngine, clearAll, worldTransform, drawGround, drawDecals, drawLanternPools, drawParts, drawFlies, drawLantern, drawBush, LANTERNS, BUSHES, drawOverlays, clamp } from './render/engine';
-import { setLocation, clearLocation, prefetchPlates, plateStat, LOC_IDS } from './render/locations';
+import { setLocation, clearLocation, prefetchPlates, plateStat, LOC_IDS, bgURL } from './render/locations';
 import { BattleView } from './render/battleView';
 import { HatchView } from './render/hatchView';
 import { MultiHatchView } from './render/multiHatchView';
@@ -63,7 +63,7 @@ function render() {
 const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
 function enLabel() { const v = energyNow(S), n = energyNext(S); return `${v}/${ENERGY_MAX}` + (n ? ` <small>+1 ${mmss(n)}</small>` : ''); }
 /** separate-file art status for the settings screen (Starborn sprites + painted battle plates) */
-const extLine = () => { const p = plateStat(), x = EXT_STAT; return `ฉากต่อสู้ ${p.ok}/${p.total} · ตำนานดารา ${x.ok}/${x.total}${x.way ? ` (โหลดแบบ ${x.way})` : ''}${x.fail ? ` · โหลดไม่ได้ ${x.fail} ครั้ง: ${esc(x.err)}` : ''}`; };
+const extLine = () => { const p = plateStat(), x = EXT_STAT; return `ฉากต่อสู้ ${p.ok}/${p.total} · มอนไฟล์แยก ${x.ok}/${x.total}${x.way ? ` (โหลดแบบ ${x.way})` : ''}${x.taint ? ` · อ่านพิกเซลไม่ได้ ${x.taint} ภาพ (ใช้ข้อมูลที่คำนวณไว้แทน)` : ''}${x.fail ? ` · โหลดไม่ได้ ${x.fail} ครั้ง: ${esc(x.err)}` : ''}${x.cors ? ` · cors: ${esc(x.cors)}` : ''} · หน้าเกม ${esc(location.protocol)}${esc(location.origin === 'null' ? ' origin=null' : '')}`; };
 /** every error the player could hit (renders, taps, loads — not only the frame loop): shown once as a toast and kept for
  *  the settings screen, so the owner can send a screenshot from the real device (2026-10-14: a report we could not reproduce) */
 const errSeen = new Set<string>(); let lastErr = '';
@@ -146,11 +146,11 @@ function mapHTML() {
     const [x, y] = MAP_POS[z.id], op = zoneOpen(z), st = zoneStars(z), b = zoneBoss(z), bs = SPECIES[b.sid], star = bs?.starborn, art = ART_BG.includes(z.loc);
     const cleared = (S.stages[z.id + '-5'] || 0) > 0;
     return `<button type="button" class="pin ${op ? '' : 'locked'} ${z === here ? 'here' : ''} ${cleared ? 'clear' : ''} ${star ? 'starborn' : ''}" style="left:${x}%;top:${y}%" data-zone="${z.id}" ${op ? '' : 'disabled'}>
-      <span class="isle loc-${z.loc}">${art ? `<img class="isle-im" src="bg/${z.loc}.webp" alt="" loading="lazy" draggable="false">` : ''}</span>
+      <span class="isle loc-${z.loc}">${art ? `<img class="isle-im" src="${bgURL(z.loc)}" alt="" loading="lazy" draggable="false">` : ''}</span>
       ${op ? `<span class="bossb"><img src="${portrait(b.sid)}" alt=""></span>` : '<span class="lock">🔒</span>'}
       <span class="lbl"><b>${esc(z.name)}</b><small>${op ? `<span class="dps">${diffPips(z)}</span> <span class="stars">★</span> ${DIFFS.reduce((a, D, d) => a + zoneDiffStars(z, d), 0)}/${DIFFS.length * 15}${star ? ' · ✦' : ''}` : 'ยังไม่ปลดล็อก'}</small></span></button>`;
   }).join('');
-  const chart = `<div class="wmap"><div class="wmap-in realm${mapRealm} ${ART_BG.includes('map' + mapRealm) ? 'art' : ''}">${ART_BG.includes('map' + mapRealm) ? `<img class="wmap-bg" src="bg/map${mapRealm}.webp" alt="" draggable="false">` : ''}
+  const chart = `<div class="wmap"><div class="wmap-in realm${mapRealm} ${ART_BG.includes('map' + mapRealm) ? 'art' : ''}">${ART_BG.includes('map' + mapRealm) ? `<img class="wmap-bg" src="${bgURL('map' + mapRealm)}" alt="" draggable="false">` : ''}
     <svg viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true"><polyline points="${route}" /></svg>${pins}</div></div>`;
   return `<section class="scr dim mapscr"><div class="wrap">${topbar(title, sub)}${tabs}${chart}<p class="note">แตะเกาะเพื่อดูด่าน · แต่ละโซนมี 5 ด่าน ด่านที่ 5 เป็นบอส · บอสตำนานดารา (✦) มีโอกาสดรอปเศษไข่ดารา ${STAR_SHARD_CHANCE * 100}% ต่อรอบ ครบ ${STAR_SHARDS_TO_CRAFT} ชิ้นประกอบเป็นไข่ได้ · เล่นเองไม่ใช้พลังงาน เปิด AUTO ใช้พลังงาน ⚡ ตามด่าน (ฟื้น 1 แต้มทุก 5 นาที เต็ม ${ENERGY_MAX}) · ดาวของด่าน: ★ ผ่านด่าน · ★ ไม่มีมอนตาย · ★ ทำปฏิกิริยาธาตุได้อย่างน้อย 1 ครั้ง</p>
   </div></section>`;
@@ -169,7 +169,7 @@ function zonePanel(z) {
     return `<div class="stage ${un ? '' : 'locked'} ${boss ? 'boss' : ''}"><div class="num">${boss ? `<img src="${portrait(b.sid)}" alt="">` : st.n}</div><div style="min-width:0"><div class="nm">${boss ? 'บอส · ' + esc(b.name || bs.name) : 'ด่าน ' + st.n}</div><div class="meta"><span class="stars">${starStr(stars, 3)}</span><span>แนะนำ ★${ps} Lv.${pl}</span><span title="พลังงานที่ใช้ตอนเปิด AUTO">AUTO ⚡${autoCost(st)}</span><span>ธาตุ ${els.map(elDot).join(' ')}</span></div></div><button class="go" type="button" data-stage="${key}" ${un ? '' : 'disabled'}>${un ? 'สู้' : 'ล็อก'}</button></div>`;
   }).join('');
   return `<div class="zpanel" data-zclose="1"><div class="zsheet" role="dialog" aria-label="${esc(z.name)}">
-    <div class="zhead loc-${z.loc} ${art ? 'art' : ''}">${art ? `<img class="zhead-im" src="bg/${z.loc}.webp" alt="" draggable="false">` : ''}<button type="button" class="zx" data-zclose="1" aria-label="ปิด">✕</button><h2>${esc(z.name)}</h2><p>${esc(z.desc)}</p></div>
+    <div class="zhead loc-${z.loc} ${art ? 'art' : ''}">${art ? `<img class="zhead-im" src="${bgURL(z.loc)}" alt="" draggable="false">` : ''}<button type="button" class="zx" data-zclose="1" aria-label="ปิด">✕</button><h2>${esc(z.name)}</h2><p>${esc(z.desc)}</p></div>
     ${spOfBoss(b) ? zspecHTML(spOfBoss(b)) : ''}${bs.starborn ? `<div class="zstar"><img src="${eggURL(b.sid)}" alt=""><div><b>ตำนานดารา · ${esc(bs.name)}</b><div class="bar fr"><i style="transform:scaleX(${Math.min(1, shards / STAR_SHARDS_TO_CRAFT)})"></i></div><small>เศษไข่ดารา ${shards}/${STAR_SHARDS_TO_CRAFT} · ชนะบอสครั้งแรกได้ 1 ชิ้น หลังจากนั้น ${STAR_SHARD_CHANCE * 100}% ต่อรอบ (ปานกลาง ${DIFFS[1].shard * 100}% · ยาก ${DIFFS[2].shard * 100}%)</small></div></div>` : ''}
     ${dtabs}<div class="stages">${rows}</div></div></div>`;
 }

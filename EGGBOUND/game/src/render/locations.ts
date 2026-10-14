@@ -776,6 +776,9 @@ export const LOC_IDS = Object.keys(LOCS);
 // with the ids that have one). A plate replaces the code ground, props and lamps; ambient life stays (minus the
 // systems tied to the code geometry: water ripples/sparkles and lamp smoke) and the grade becomes L.artGrade.
 // Plates are drawn on a separate image, so the main canvas may become origin-tainted — nothing reads it back.
+const BGU: Record<string, string> = typeof __BGU__ !== 'undefined' ? __BGU__ : {};
+/** a painted plate's / realm chart's published path (literal, from the build) */
+export const bgURL = (id: string) => BGU[id] || 'bg/' + id + '.webp';
 const ART = new Set((typeof __BG__ !== 'undefined' ? __BG__ : []).filter(id => !/^map\d/.test(id))); // battle plates only (map<N> = realm charts)
 const PLATE = {};
 /** world height a plate covers: its painted oval (~31% of the height, centre ~50%) then matches the plaza (PR·SQ) */
@@ -783,7 +786,7 @@ const PH = 1084;
 function plate(id) {
   if (!ART.has(id)) return null;
   let im = PLATE[id];
-  if (!im) { im = PLATE[id] = new Image(); im.decoding = 'async'; im.onerror = () => { ART.delete(id); delete PLATE[id]; }; im.src = 'bg/' + id + '.webp'; }
+  if (!im) { im = PLATE[id] = new Image(); im.decoding = 'async'; im.onerror = () => { ART.delete(id); delete PLATE[id]; }; im.src = bgURL(id); }
   return im.complete && im.naturalWidth ? im : null;
 }
 /** painted plates loaded / listed (settings shows it to check the live build) */

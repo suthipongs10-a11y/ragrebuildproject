@@ -26,21 +26,36 @@ for (const k in ANCH_RAW) { ANCH[k] = {}; for (const p in ANCH_RAW[k]) { const a
 // under the 16MB single-file limit. Pixel reads (bbox, recolour, portraits) need images the canvas may read, so the loader
 // tries, in order: a plain <img> (the way battle plates load; same-origin files stay readable), a CORS <img>, then
 // fetch → blob URL. The live Artifact refused fetch() for these files (2026-10-14: Starborn showed as foxes) while <img>
-// worked. An image the canvas cannot read is not used — the placeholder art stays. ----
-const EXT: string[] = typeof __EXT__ !== 'undefined' ? __EXT__ : [];
+// worked.
+// 2026-10-14 (owner's phone: every separate-file monster was still a fox): on the live Artifact those files load but stay
+// "cross-origin" — the canvas may draw them, not read them. Such an image is now USED (marked in TAINT): the pixel data
+// the game needs is precomputed (tools/ext_meta.py → __EXTMETA__: bbox + opaque area), menus use small embedded copies
+// (assets/thumb_*), and recolours fall back to canvas blend modes. ----
+const EXTU: Record<string, string> = typeof __EXT__ !== 'undefined' ? __EXT__ : {}; // key → literal published path
+const EXT = Object.keys(EXTU);
+const META: Record<string, number[]> = typeof __EXTMETA__ !== 'undefined' ? __EXTMETA__ : {};
 const EXTP = {};
-export const EXT_STAT = { total: EXT.length, ok: 0, fail: 0, way: '' as string, err: '' as string };
-const imgOf = (src: string, cors = false) => new Promise<HTMLImageElement>((res, rej) => { const i = new Image(); if (cors) i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = () => rej(new Error('img')); i.src = src; });
+export const EXT_STAT = { total: EXT.length, ok: 0, fail: 0, taint: 0, way: '' as string, err: '' as string, cors: '' as string };
+/** images (and canvases drawn from them) whose pixels cannot be read */
+const TAINT = new WeakSet<object>();
+const tainted = (src: any) => !!src && TAINT.has(src);
+/** a canvas made from `src` inherits its unreadability and its precomputed bbox / area */
+const derive = (c: any, src: any) => { if (tainted(src)) TAINT.add(c); if (src?.__bb) { c.__bb = src.__bb; c.__area = src.__area; } return c; };
+const imgOf = (src: string, cors = false) => new Promise<HTMLImageElement>((res, rej) => { const i = new Image(); if (cors) i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = () => rej(new Error(cors ? 'cors' : 'img')); i.src = src; });
 function readable(i: HTMLImageElement) { try { const x = mk(1, 1).getContext('2d'); x.drawImage(i, 0, 0); x.getImageData(0, 0, 1, 1); return true; } catch (e) { return false; } }
-const tryWays = (key: string) => { const url = 'ext/' + key + '.webp';
-  const ways: [string, () => Promise<HTMLImageElement>][] = [['img', () => imgOf(url)], ['cors', () => imgOf(url, true)],
-    ['fetch', () => fetch(url).then(r => r.ok ? r.blob() : Promise.reject(new Error('http ' + r.status))).then(b => imgOf(URL.createObjectURL(b)))]];
-  let p: Promise<HTMLImageElement> = Promise.reject(new Error('start'));
-  for (const [name, f] of ways) p = p.catch(() => f().then(i => { if (!readable(i)) throw new Error(name + ': unreadable'); EXT_STAT.way ||= name; return i; }));
-  return p; };
+let corsP: Promise<boolean> | null = null; // asked once (the first unreadable file): does the host answer CORS requests?
+const useTainted = (i: HTMLImageElement) => { TAINT.add(i); EXT_STAT.taint++; EXT_STAT.way ||= 'img อ่านพิกเซลไม่ได้'; return i; };
+const tryWays = (key: string) => { const url = EXTU[key] || 'ext/' + key + '.webp';
+  return imgOf(url).then(i => {
+    if (readable(i)) { EXT_STAT.way ||= 'img'; return i; }
+    corsP ||= imgOf(url, true).then(c => readable(c), e => { EXT_STAT.cors = String(e?.message || e); return false; });
+    return corsP.then(ok => ok ? imgOf(url, true).then(c => { EXT_STAT.way ||= 'cors'; return c; }, () => useTainted(i)) : useTainted(i));
+  }, () => fetch(url).then(r => r.ok ? r.blob() : Promise.reject(new Error('http ' + r.status))).then(b => imgOf(URL.createObjectURL(b)))
+    .then(i => { EXT_STAT.way ||= 'fetch'; return readable(i) ? i : useTainted(i); }, e => { throw new Error('img โหลดไม่ได้ · fetch ' + (e?.message || e) + ' · ' + url); }));
+};
 function loadExt(key): Promise<void> {
   if (IMG[key] || !EXT.includes(key)) return Promise.resolve();
-  return EXTP[key] ||= tryWays(key).then(i => { IMG[key] = i; EXT_STAT.ok++; })
+  return EXTP[key] ||= tryWays(key).then(i => { const m = META[key]; if (m) { (i as any).__bb = m.slice(0, 4); (i as any).__area = m[4]; } IMG[key] = i; EXT_STAT.ok++; })
     .catch(e => { delete EXTP[key]; EXT_STAT.fail++; EXT_STAT.err = String(e && e.message || e); });
 }
 /** drop every cached sprite / portrait / egg made for a species (placeholders drawn before its art arrived) */
@@ -60,7 +75,11 @@ export async function loadAssets() {
 }
 
 function hueShift(img, E) {
-  const c = mk(img.width, img.height), x = c.getContext('2d'); x.drawImage(img, 0, 0);
+  const c = derive(mk(img.width, img.height), img), x = c.getContext('2d');
+  if (tainted(img)) { // cannot read the pixels: the canvas filter (where the browser has one) comes close, else unchanged
+    if (!(E.dh === 0 && E.all === 1) && 'filter' in x) x.filter = `hue-rotate(${Math.round(E.dh * 360)}deg) saturate(${E.sat}) brightness(${(E.lit * E.all).toFixed(3)})`;
+    x.drawImage(img, 0, 0); return c; }
+  x.drawImage(img, 0, 0);
   if (E.dh === 0 && E.all === 1) return c;
   const d = x.getImageData(0, 0, c.width, c.height), a = d.data;
   for (let i = 0; i < a.length; i += 4) {
@@ -87,8 +106,23 @@ const ELEM_GRAD = {
   light: [[0, [.30, .30, .40]], [.45, [.70, .69, .76]], [.75, [.93, .91, .92]], [1, [1, .985, .95]]],
   dark: [[0, [.07, .03, .14]], [.35, [.30, .14, .50]], [.65, [.58, .38, .84]], [1, [.92, .85, 1]]],
 };
+/** elemTint for art whose pixels cannot be read: blend modes only — grey-scale then pearl (light) / violet (dark) */
+function elemTintBlend(img, mode) {
+  const w = img.width, h = img.height, c = derive(mk(w, h), img), x = c.getContext('2d');
+  x.drawImage(img, 0, 0);
+  if (mode === 'light') {
+    x.globalCompositeOperation = 'saturation'; x.fillStyle = '#808080'; x.fillRect(0, 0, w, h);
+    x.globalCompositeOperation = 'screen'; x.globalAlpha = .5; x.fillStyle = '#c9c2df'; x.fillRect(0, 0, w, h);
+    x.globalCompositeOperation = 'color'; x.globalAlpha = .35; x.fillStyle = '#d9cff0'; x.fillRect(0, 0, w, h);
+  } else {
+    x.globalCompositeOperation = 'color'; x.fillStyle = '#7a3ed6'; x.fillRect(0, 0, w, h);
+    x.globalCompositeOperation = 'multiply'; x.globalAlpha = .3; x.fillStyle = '#6a3aa8'; x.fillRect(0, 0, w, h);
+  }
+  x.globalAlpha = 1; x.globalCompositeOperation = 'destination-in'; x.drawImage(img, 0, 0); return c;
+}
 function elemTint(img, mode) {
-  const c = mk(img.width, img.height), x = c.getContext('2d'); x.drawImage(img, 0, 0);
+  if (tainted(img)) return elemTintBlend(img, mode);
+  const c = derive(mk(img.width, img.height), img), x = c.getContext('2d'); x.drawImage(img, 0, 0);
   const d = x.getImageData(0, 0, c.width, c.height), a = d.data, st = ELEM_GRAD[mode], dark = mode === 'dark';
   for (let i = 0; i < a.length; i += 4) {
     if (a[i + 3] === 0) continue;
@@ -116,11 +150,13 @@ export const starHTML = (on: boolean) => { const im = IMG[on ? 'ui_star' : 'ui_s
 export const uiSrc = (name: string) => IMG[name] ? IMG[name].src : null;
 /** full-body master art URL for the monster book (falls back to the round portrait) */
 /** a set's master art; sets that arrived without one (BATCH07 B09/C06) use their front idle */
-const masterOf = (art: string) => IMG[art + '_master'] || IMG[art + '_front_idle'];
+const masterOf = (art: string) => IMG['thumb_' + art] || IMG[art + '_master'] || IMG[art + '_front_idle'];
+/** a separate-file set has an embedded thumbnail of its master (tools/ext_meta.py): menus can show it before / without the files */
+const thumbOf = (art?: string) => art ? IMG['thumb_' + art] : undefined;
 export const masterURL = (sid: string) => { const s = SPECIES[sid]; return s && s.art && masterOf(s.art) ? masterOf(s.art).src : null; };
 const RMU = {};
 /** full-body master art of a rare form for the book: the species' master repainted light/dark (cached data URL) */
-export const rareMasterURL = (sid: string) => { if (RMU[sid]) return RMU[sid]; const s = SPECIES[sid], src = s && s.art && masterOf(s.art); return src ? (RMU[sid] = rareTint(sid, src).toDataURL('image/webp', .9)) : null; };
+export const rareMasterURL = (sid: string) => { if (RMU[sid]) return RMU[sid]; const s = SPECIES[sid], src = s && s.art && masterOf(s.art); if (!src) return null; try { return (RMU[sid] = rareTint(sid, src).toDataURL('image/webp', .9)); } catch (e) { return src.src || null; } };
 export const baseOf = (sid: string) => sid.split('~')[0];
 const SP = sid => SPECIES[baseOf(sid)];
 const lookLv = sid => parseInt(sid.split('~')[1] || '0') || 0;
@@ -131,7 +167,7 @@ const lookHell = sid => sid.includes('~') && sid.endsWith('h');
 export const awakeLook = (sid: string, rare = false) => { const s = SPECIES[sid]; return s?.art && IMG[s.art + 'e_front_idle'] ? sid + '~5' + (rare ? 'r' : '') : sid + '~0' + (rare ? 'r' : '') + 'h'; };
 /** deep purple, darker shadows — composite only (no pixel reads), so it also works on separately loaded art */
 function hellTint(src) {
-  const w = src.width, h = src.height, c = mk(w, h), x = c.getContext('2d');
+  const w = src.width, h = src.height, c = derive(mk(w, h), src), x = c.getContext('2d');
   x.drawImage(src, 0, 0); x.globalCompositeOperation = 'multiply'; x.fillStyle = '#8a55d8'; x.fillRect(0, 0, w, h);
   x.globalCompositeOperation = 'source-atop'; x.globalAlpha = .12; x.fillStyle = '#1c0630'; x.fillRect(0, 0, w, h);
   x.globalAlpha = .16; x.globalCompositeOperation = 'screen'; x.fillStyle = '#c070ff'; x.fillRect(0, 0, w, h);
@@ -147,10 +183,12 @@ const evoArt = sid => { const L = lookLv(sid), s = SP(sid); return L >= 5 && s.a
 /** battle size by stars (owner 2026-10-14: a ★5 awakened tiger looked smaller than ★1 monsters): ★1 a bit smaller, every
  *  star a bit bigger, the ★5–6 evolved forms clearly bigger. Bosses never shrink below their own size. */
 export const STAR_SIZE = [1, .92, .95, .98, 1, 1.08, 1.12];
-const opaque = (im: HTMLImageElement) => { try { const c = mk(128, 128), x = c.getContext('2d')!; x.drawImage(im, 0, 0, 128, 128); const d = x.getImageData(0, 0, 128, 128).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 40) n++; return n; } catch (e) { return 0; } };
+const opaque = (im: HTMLImageElement) => { try { const c = mk(128, 128), x = c.getContext('2d')!; x.drawImage(im, 0, 0, 128, 128); const d = x.getImageData(0, 0, 128, 128).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 40) n++; return n; } catch (e) { return (im as any).__area || 0; } };
 const AREA = {};
 /** opaque area of an art's front idle (128 px sample), relative to the starter fox — 0 when it cannot be read */
-const areaOf = (key: string) => { if (AREA[key] != null) return AREA[key]; const im = IMG[key + '_front_idle'] || IMG[key + '_master'], f = IMG.mon001_front_idle;
+const areaOf = (key: string) => { if (AREA[key] != null) return AREA[key];
+  const pm = (META[key + '_front_idle'] || META[key + '_master'])?.[4], pf = META.mon001_front_idle?.[4]; if (pm && pf) return (AREA[key] = pm / pf); // separate-file art: precomputed, ready before the files load
+  const im = IMG[key + '_front_idle'] || IMG[key + '_master'], f = IMG.mon001_front_idle;
   const a = im ? opaque(im) : 0, r = f ? opaque(f) : 0; return (AREA[key] = a && r ? a / r : 0); };
 /** the least area a rarity should cover (× the fox): rare art drawn small still reads as more than a common */
 const RARITY_AREA: Record<string, number> = { common: 0, rare: .93, epic: 1.15, legendary: 1.22 };
@@ -234,8 +272,10 @@ export function dot(color) {
 const BB = {};
 function bbox(img, key) {
   if (BB[key]) return BB[key];
+  if (tainted(img)) return (BB[key] = img.__bb || [156, 100, 356, 435]); // cannot be read: precomputed (tools/ext_meta.py)
   const c = mk(512, 512), x = c.getContext('2d'); x.drawImage(img, 0, 0, 512, 512);
-  const a = x.getImageData(0, 0, 512, 512).data; let x0 = 512, y0 = 512, x1 = 0, y1 = 0;
+  let a; try { a = x.getImageData(0, 0, 512, 512).data; } catch (e) { return (BB[key] = img.__bb || [156, 100, 356, 435]); }
+  let x0 = 512, y0 = 512, x1 = 0, y1 = 0;
   for (let y = 0; y < 512; y += 2) for (let xx = 0; xx < 512; xx += 2) if (a[(y * 512 + xx) * 4 + 3] > 40) { if (xx < x0) x0 = xx; if (xx > x1) x1 = xx; if (y < y0) y0 = y; if (y > y1) y1 = y; }
   return (BB[key] = x1 > x0 ? [x0, y0, x1, y1] : [156, 100, 356, 435]);
 }
@@ -256,15 +296,16 @@ const PORT = {};
 export function portrait(sid) {
   if (PORT[sid]) return PORT[sid];
   const s = SP(sid), ea = evoArt(sid), L = lookLv(sid);
-  let src = ea && IMG[ea + '_master'] ? IMG[ea + '_master'] : hasArt(sid) && masterOf(s.art) ? masterOf(s.art) : hueShift(IMG.mon001_master, PAL[s.elem]);
+  const own0 = hasArt(sid) || !!thumbOf(s.art);
+  let src = ea && IMG[ea + '_master'] ? IMG[ea + '_master'] : own0 && masterOf(s.art) ? masterOf(s.art) : hueShift(IMG.mon001_master, PAL[s.elem]);
   if (lookRare(sid)) src = rareTint(sid, src); else if (L && !ea) src = hueShift(src, VAR_E[L]);
   if (lookHell(sid)) src = hellTint(src);
   const c = mk(256, 256), x = c.getContext('2d');
-  const f = src.width / 512, own = hasArt(sid) && (!!masterOf(s.art) || !!ea);
+  const f = src.width / 512, own = own0 && (!!masterOf(s.art) || !!ea);
   let cr = [200, 70, 300]; // fox: head-centred crop
   if (own && (s.art !== 'mon001' || ea)) { const [x0, y0, x1, y1] = bbox(src, sid + '_master'), side = Math.min(512, Math.max(x1 - x0, (y1 - y0) * .8) * 1.04); cr = [(x0 + x1) / 2 - side / 2, y0 - side * .04, side]; }
   x.drawImage(src, cr[0] * f, cr[1] * f, cr[2] * f, cr[2] * f, 0, 0, 256, 256);
-  return (PORT[sid] = c.toDataURL('image/webp', .85));
+  try { return (PORT[sid] = c.toDataURL('image/webp', .85)); } catch (e) { return (PORT[sid] = src.src || ''); } // unreadable: the image's own URL
 }
 const EGG = {};
 export function eggImg(sid) {
@@ -274,7 +315,11 @@ export function eggImg(sid) {
   return (EGG[sid] = own || hueShift(IMG.egg001, PAL[s.elem]));
 }
 const EGGU = {};
-export function eggURL(sid) { return EGGU[sid] || (EGGU[sid] = (eggImg(sid).toDataURL ? eggImg(sid) : (() => { const c = mk(512, 512); c.getContext('2d').drawImage(eggImg(sid), 0, 0); return c; })()).toDataURL('image/webp', .85)); }
+export function eggURL(sid) {
+  if (EGGU[sid]) return EGGU[sid];
+  const s = SPECIES[baseOf(sid)], th = s?.art && IMG['thumb_egg' + s.art.replace('mon', '')], im = th || eggImg(sid);
+  return (EGGU[sid] = im.toDataURL ? im.toDataURL('image/webp', .85) : im.src);
+}
 
 // ---- mystery eggs: code-drawn shells, the pattern shows the tier (ธรรมดา/เงิน/ทอง/รุ้ง). Base at y≈425 like the art eggs. ----
 export const TIER_COL = { common: '#d8c4a0', silver: '#cfe0f0', gold: '#ffd27a', rainbow: '#ff9ad8' };
