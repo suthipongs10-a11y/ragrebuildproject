@@ -7,7 +7,8 @@ const R = ['common', 'rare', 'epic', 'legendary'] as const;
 const pct = (v: number) => (v * 100).toFixed(v < 0.001 ? 3 : 2).padStart(7) + '%';
 const sum = (w: Record<string, number>) => Object.values(w).reduce((a, b) => a + b, 0);
 const odds = eggOdds();
-console.log('== per egg tier (rarity of the monster inside) ==');
+console.log('== per egg tier (rarity of the monster inside; plus legendW % Starborn/special) ==');
+for (const t of EGG_TIER_ORDER) console.log(t.padEnd(8), 'Starborn/special legend', EGG_TIERS[t].legendW + '%');
 for (const t of EGG_TIER_ORDER) { const w = EGG_TIERS[t].rarityW as Record<string, number>, n = sum(w); console.log(t.padEnd(8), R.map(r => `${r} ${pct((w[r] || 0) / n)}`).join('  '), ` rare form ${pct(EGG_TIERS[t].rareForm)}`); }
 
 const exact: Record<string, number> = {};

@@ -84,10 +84,19 @@ export function rollTier(s: SaveData, rnd: () => number, w: Record<EggTier, numb
   return tier;
 }
 export const rollRarity = (tier: EggTier, rnd: () => number) => pickW(EGG_TIERS[tier].rarityW, rnd()) as Rarity;
+/** the shard-only legends (Starborn, special editions) a mystery egg can also hold, very rarely (EGG_TIERS.legendW) */
+export const eggLegends = () => Object.values(SPECIES).filter(x => !x.boss && shardOnly(x)).map(x => x.id);
+/** the species inside a mystery egg of this tier: a shard-only legend at legendW %, else by rarity */
+export function rollEggSpecies(tier: EggTier, rnd: () => number): string {
+  const L = eggLegends();
+  if (rnd() * 100 < EGG_TIERS[tier].legendW && L.length) return L[Math.floor(rnd() * L.length)];
+  return rollSpecies(rollRarity(tier, rnd), rnd);
+}
+/** rare form of a freshly rolled egg (species without a rare form never get one) */
+export const rollEggRare = (tier: EggTier, sid: string, rnd: () => number) => { const r = rnd() < rareFormChance(EGG_TIERS[tier].rareForm, sid); return r && !!SPECIES[sid]?.rareForm; };
 export function rollMysteryEgg(s: SaveData, rnd: () => number, w?: Record<EggTier, number>): EggSave {
-  const tier = rollTier(s, rnd, w), T = EGG_TIERS[tier];
-  const sid = rollSpecies(rollRarity(tier, rnd), rnd);
-  return { id: s.nextEggId++, sid, kind: 'mystery', tier, rare: rnd() < rareFormChance(T.rareForm, sid) };
+  const tier = rollTier(s, rnd, w), sid = rollEggSpecies(tier, rnd);
+  return { id: s.nextEggId++, sid, kind: 'mystery', tier, rare: rollEggRare(tier, sid, rnd) };
 }
 /** disclosed odds of a mystery egg drop, per tier (0..1) */
 export function eggOdds(w: Record<EggTier, number> = EGG_DROP.tierW) {

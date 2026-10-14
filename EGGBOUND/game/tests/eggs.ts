@@ -1,5 +1,5 @@
 // Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
-import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, EVO_NAME, monName, SKILL_MAX, levelCap, statAt, skillAt, STAGES, ZONES, DIFFS, DIFF_K, stageOf, stageKey, planOf, RARE_FORM_MULT, NAMED_RARE_FORM, ENERGY_MAX, ENERGY_REGEN_MS, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY } from '../src/core/data';
+import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, EVO_NAME, monName, SKILL_MAX, levelCap, statAt, skillAt, STAGES, ZONES, DIFFS, DIFF_K, stageOf, stageKey, planOf, RARE_FORM_MULT, NAMED_RARE_FORM, ENERGY_MAX, ENERGY_REGEN_MS, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY, shardOnly } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
 import { craftStarEgg, rollSpecies } from '../src/game/progression';
 import { natStars, specialOf, SPECIAL_SHARDS_TO_CRAFT } from '../src/core/data';
@@ -27,6 +27,14 @@ export function eggTests(): number {
     console.log(`mystery eggs (listed→rolled incl. pity): ${line}  rare form ${(rare / N * 100).toFixed(1)}%`);
     ok(Math.abs((n.common || 0) / N - odds.common) < 0.03, 'common rate close to listed'); }
 
+  // owner 2026-10-14: every mystery egg tier can hatch every monster — rainbow commons, Starborn / specials (no rare form)
+  { const s = newSave(), rnd = lcg(99), seen: Record<string, Set<string>> = {}, N = 60000; let legRare = 0;
+    for (const t of ['common', 'silver', 'gold', 'rainbow'] as const) { seen[t] = new Set(); for (let i = 0; i < N; i++) { const e = mysteryEgg(s, t, rnd); seen[t].add(e.sid); if (shardOnly(SPECIES[e.sid]) && e.rare) legRare++; } }
+    const all = Object.values(SPECIES).filter(x => !x.boss).map(x => x.id), miss = (t: string) => all.filter(id => !seen[t].has(id));
+    console.log('every monster from eggs: missing per tier', ['common', 'silver', 'gold', 'rainbow'].map(t => `${t} ${miss(t).length}`).join(' · '));
+    ok(miss('gold').length === 0 && miss('rainbow').length === 0, 'gold / rainbow eggs can hatch every monster: ' + miss('gold').concat(miss('rainbow')).join(','));
+    ok(['common', 'silver', 'gold', 'rainbow'].every(t => all.filter(id => shardOnly(SPECIES[id])).some(id => seen[t].has(id))), 'Starborn / specials can come from every tier');
+    ok(legRare === 0, 'shard-only legends never hatch as a rare form'); }
   // rare form gets rarer with species rarity: rainbow eggs, legendary rare form ≈ 6% × 8% × 0.25
   { const s = newSave(), rnd = lcg(7), N = 400000; let leg = 0, legR = 0, com = 0, comR = 0;
     for (let i = 0; i < N; i++) { const e = mysteryEgg(s, 'rainbow', rnd), r = SPECIES[e.sid].rarity; if (r === 'legendary') { leg++; if (e.rare) legR++; } if (r === 'rare') { com++; if (e.rare) comR++; } }

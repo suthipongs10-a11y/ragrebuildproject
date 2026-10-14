@@ -730,15 +730,17 @@ export const awakeName = (sid: string, title?: string) => EVO_NAME[sid]?.[0] || 
 // Every hatch is a new monster at its natural stars (NAT_STARS by rarity); copies are food for skill-ups / evolution.
 // incubateMin > 0 → must sit in a hatchery slot that long (scaled by hatchery speed) before it can hatch.
 export type EggTier = 'common' | 'silver' | 'gold' | 'rainbow';
-export interface EggTierDef { name: string; incubateMin: number; rareForm: number; rarityW: Partial<Record<Rarity, number>> }
+export interface EggTierDef { name: string; incubateMin: number; rareForm: number; rarityW: Partial<Record<Rarity, number>>; legendW: number } // legendW: % chance of a shard-only legend (Starborn / special)
 export const EGG_TIER_ORDER: EggTier[] = ['common', 'silver', 'gold', 'rainbow'];
 // rarityW = % chance of each monster rarity: every tier can roll every rarity — cheap shells low odds, rarer shells better odds.
 // Tuned to an epic:legendary ratio of ~18:1 per egg (SW Mystical Scroll nat4:nat5 is 16:1); see `npm run rates`.
 export const EGG_TIERS: Record<EggTier, EggTierDef> = {
-  common: { name: 'ลายธรรมดา', incubateMin: 0, rareForm: 0.03, rarityW: { common: 90, rare: 8.5, epic: 1.45, legendary: 0.05 } },
-  silver: { name: 'ลายเงิน', incubateMin: 0, rareForm: 0.04, rarityW: { common: 66, rare: 28, epic: 5.8, legendary: 0.2 } },
-  gold: { name: 'ลายทอง', incubateMin: 120, rareForm: 0.05, rarityW: { common: 25, rare: 50, epic: 23.5, legendary: 1.5 } },
-  rainbow: { name: 'ลายรุ้ง', incubateMin: 480, rareForm: 0.08, rarityW: { rare: 40, epic: 54, legendary: 6 } },
+  // owner 2026-10-14: EVERY mystery egg can hatch EVERY monster, the rarer ones very rarely — rainbow eggs now hold
+  // commons too (5%), and Starborn legends / special editions (shard-only until now) hatch at `legendW` %
+  common: { name: 'ลายธรรมดา', incubateMin: 0, rareForm: 0.03, rarityW: { common: 90, rare: 8.5, epic: 1.45, legendary: 0.05 }, legendW: 0.02 },
+  silver: { name: 'ลายเงิน', incubateMin: 0, rareForm: 0.04, rarityW: { common: 66, rare: 28, epic: 5.8, legendary: 0.2 }, legendW: 0.06 },
+  gold: { name: 'ลายทอง', incubateMin: 120, rareForm: 0.05, rarityW: { common: 25, rare: 50, epic: 23.5, legendary: 1.5 }, legendW: 0.4 },
+  rainbow: { name: 'ลายรุ้ง', incubateMin: 480, rareForm: 0.08, rarityW: { common: 5, rare: 38, epic: 51, legendary: 6 }, legendW: 1.5 },
 };
 /** stage drop: one roll per win (first clear always drops). pity = the Nth mystery egg in a row without gold+ is forced gold+ */
 export const EGG_DROP = { chance: 0.3, bossChance: 0.6, tierW: { common: 68, silver: 24, gold: 7, rainbow: 1 } as Record<EggTier, number>, pity: 20 };

@@ -4,7 +4,7 @@
 import { SPECIES, STAGES, ZONES, DIFFS, stageKey, GEM_GOLD_EGG, RUSH_BASE, RUSH_STEP, EGG_TIERS, levelCap, rareFormChance, shardOnly } from '../core/data';
 import type { EggTier } from '../core/data';
 import type { SaveData, EggSave } from './save';
-import { rollRarity, rollSpecies, skillMaxed } from './progression';
+import { rollRarity, rollSpecies, skillMaxed, rollEggSpecies, rollEggRare } from './progression';
 import { incubOf, incubLeft, home } from './home';
 
 export interface Reward { gems?: number; gold?: number; soul?: number; frags?: Record<string, number>; egg?: EggTier }
@@ -143,8 +143,8 @@ export function claimQuest(s: SaveData, id: string, rnd: () => number = Math.ran
 }
 /** a mystery egg of a fixed shell tier (species rolled with that tier's odds; does not touch the drop pity) */
 export function mysteryEgg(s: SaveData, tier: EggTier, rnd: () => number = Math.random): EggSave {
-  const sid = rollSpecies(rollRarity(tier, rnd), rnd);
-  return { id: s.nextEggId++, sid, kind: 'mystery', tier, rare: rnd() < rareFormChance(EGG_TIERS[tier].rareForm, sid) };
+  const sid = rollEggSpecies(tier, rnd);
+  return { id: s.nextEggId++, sid, kind: 'mystery', tier, rare: rollEggRare(tier, sid, rnd) };
 }
 
 // ---- gem uses ----
