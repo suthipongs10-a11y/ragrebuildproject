@@ -73,6 +73,9 @@ export interface SpeciesDef {
   boss?: boolean;
   /** Starborn Legends (ตำนานดารา): zone bosses whose shards (rare drop) build their egg; never in mystery eggs */
   starborn?: boolean;
+  /** special edition (ตัวพิเศษ, owner 2026-10-14) of this base species: own name & art, +1 natural star, +10% HP/ATK/DEF,
+   *  no rare form; only from its special egg, built from shards the base species' zone boss drops */
+  special?: string;
   scale?: number;               // render scale multiplier
   art?: string;                 // sprite set key; absent → placeholder recolor
 }

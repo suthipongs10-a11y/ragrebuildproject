@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
-import { SPECIES, EVO_NAME, isEvolved, monName, HELL, HELL_MIN, HELL_RUNES, STAGES, ZONES, ZONE_PLAN, planOf, starbornOf, rareFormChance, DIFFS, stageKey, parseStage, stageOf, ENERGY_MAX, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
+import { SPECIES, EVO_NAME, isEvolved, monName, HELL, HELL_MIN, HELL_RUNES, STAGES, ZONES, ZONE_PLAN, planOf, starbornOf, rareFormChance, DIFFS, stageKey, parseStage, stageOf, ENERGY_MAX, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, SPECIAL_SHARD_CHANCE, SPECIAL_SHARDS_TO_CRAFT, specialOf, shardOnly, shardsToCraft, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
 import { Battle } from './core/battle';
 import { drawShowcase, showcaseTap } from './render/showcase';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL, rareMasterURL, ensureArt, artReady, prefetchExt, EXT_STAT } from './render/assets';
@@ -18,7 +18,7 @@ import { grantRewards, stageUnlocked, craftEgg, craftStarEgg, hatchEgg, FRAGS_TO
 import { EvolveView } from './render/evolveView';
 import { RUNE_SETS, RUNE_SET_IDS, RUNE_GRADES, RUNE_GRADE_ORDER, RUNE_STATS, SLOT_NAME, RUNE_MAX_LVL, RUNE_DROP, mainValue, rollRune, runeUpCost, runeUpRate, runeSellPrice, runeOffCost, fmtStat } from './core/runes';
 import { runesOf, runeBonusOf, runeById, equipRune, equipCost, unequipRune, tryUpgrade, sellRune, addRune, RUNE_CAP } from './game/runes';
-import { runeURL, socketURL } from './render/runeIcon';
+import { runeURL, socketURL, forgeURL } from './render/runeIcon';
 import { energyNow, energyNext, payAuto, autoCost, buyEnergy, refillsLeft } from './game/energy';
 import { QUESTS, CHAPTERS, questsIn, chapterDone, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg, rushPrice, rushesToday } from './game/quests';
 
@@ -163,7 +163,7 @@ function zonePanel(z) {
   }).join('');
   return `<div class="zpanel" data-zclose="1"><div class="zsheet" role="dialog" aria-label="${esc(z.name)}">
     <div class="zhead loc-${z.loc} ${art ? 'art' : ''}">${art ? `<img class="zhead-im" src="bg/${z.loc}.webp" alt="" draggable="false">` : ''}<button type="button" class="zx" data-zclose="1" aria-label="ปิด">✕</button><h2>${esc(z.name)}</h2><p>${esc(z.desc)}</p></div>
-    ${bs.starborn ? `<div class="zstar"><img src="${eggURL(b.sid)}" alt=""><div><b>ตำนานดารา · ${esc(bs.name)}</b><div class="bar fr"><i style="transform:scaleX(${Math.min(1, shards / STAR_SHARDS_TO_CRAFT)})"></i></div><small>เศษไข่ดารา ${shards}/${STAR_SHARDS_TO_CRAFT} · ชนะบอสครั้งแรกได้ 1 ชิ้น หลังจากนั้น ${STAR_SHARD_CHANCE * 100}% ต่อรอบ (ปานกลาง ${DIFFS[1].shard * 100}% · ยาก ${DIFFS[2].shard * 100}%)</small></div></div>` : ''}
+    ${spOfBoss(b) ? zspecHTML(spOfBoss(b)) : ''}${bs.starborn ? `<div class="zstar"><img src="${eggURL(b.sid)}" alt=""><div><b>ตำนานดารา · ${esc(bs.name)}</b><div class="bar fr"><i style="transform:scaleX(${Math.min(1, shards / STAR_SHARDS_TO_CRAFT)})"></i></div><small>เศษไข่ดารา ${shards}/${STAR_SHARDS_TO_CRAFT} · ชนะบอสครั้งแรกได้ 1 ชิ้น หลังจากนั้น ${STAR_SHARD_CHANCE * 100}% ต่อรอบ (ปานกลาง ${DIFFS[1].shard * 100}% · ยาก ${DIFFS[2].shard * 100}%)</small></div></div>` : ''}
     ${dtabs}<div class="stages">${rows}</div></div></div>`;
 }
 /** rarity colour (shared with the chest/hatch colour language) as a CSS var; common stays neutral */
@@ -197,18 +197,29 @@ const rareRow = (s, open, lockTxt) => s.rarePassive ? `<div class="rpas ${open ?
 /** monster book (owner 2026-10-14): ONE slot per monster family — every form drawn from the same art (its normal element,
  *  the light/dark rare form, later a special edition) sits in that slot behind element buttons, each with its own data.
  *  Nothing is hidden: every form shows its art, skills and where to find it, so players know what to chase. */
-const dexForms = s => [false, ...(s.rareForm ? [true] : [])].map(rare => ({ s, rare, key: s.id + (rare ? 'r' : ''), elem: formOf(s.id, rare).elem }));
-const dexFams = () => Object.values(SPECIES).filter(x => !x.boss).sort((a, b) => a.id.localeCompare(b.id)).map(s => ({ s, forms: dexForms(s) }));
+const shardWord = sid => SPECIES[sid]?.special ? 'เศษไข่พิเศษ' : 'เศษไข่ดารา';
+/** the special edition whose shards this zone boss drops (null when none) */
+const spOfBoss = b => (b && b.boss && Object.values(SPECIES).find(x => x.special === b.sid)) || null;
+const zspecHTML = sp => { const n = S.starShards?.[sp.id] || 0;
+  return `<div class="zstar zspec"><img src="${eggURL(sp.id)}" alt=""><div><b>ตัวพิเศษ · ${esc(sp.name)}</b><div class="bar fr"><i style="transform:scaleX(${Math.min(1, n / SPECIAL_SHARDS_TO_CRAFT)})"></i></div><small>เศษไข่พิเศษ ${n}/${SPECIAL_SHARDS_TO_CRAFT} · ชนะบอสครั้งแรกของแต่ละระดับได้ 1 ชิ้น หลังจากนั้นต่อรอบ ${SPECIAL_SHARD_CHANCE.map((c, i) => DIFFS[i].name + ' ' + c * 100 + '%').join(' · ')}</small></div></div>`; };
+const specialsOf = s => Object.values(SPECIES).filter(x => x.special === s.id);
+const dexForms = s => [...[false, ...(s.rareForm ? [true] : [])].map(rare => ({ s, rare, sp: false, key: s.id + (rare ? 'r' : ''), elem: formOf(s.id, rare).elem })),
+  ...specialsOf(s).map(x => ({ s: x, rare: false, sp: true, key: x.id, elem: x.elem }))];
+const dexFams = () => Object.values(SPECIES).filter(x => !x.boss && !x.special).sort((a, b) => a.id.localeCompare(b.id)).map(s => ({ s, forms: dexForms(s) }));
 const dexAll = () => dexFams().flatMap(f => f.forms);
 const dexHas = e => (e.rare ? S.dexRare : S.dex).includes(e.s.id);
 const dexPic = e => portrait(e.rare ? lookOf(e.s.id, natStars(e.s.id, true), true) : e.s.id);
 const pct = v => (v >= .1 ? Math.round(v * 1000) / 10 : Math.round(v * 10000) / 100) + '%';
 /** chance that one mystery egg of each shell hatches this species (its rarity's share split over that rarity's species) */
-const eggChances = (s, rare) => { const pool = Object.values(SPECIES).filter(x => !x.boss && !x.starborn), n = pool.filter(x => x.rarity === s.rarity).length || 1;
+const eggChances = (s, rare) => { const pool = Object.values(SPECIES).filter(x => !x.boss && !shardOnly(x)), n = pool.filter(x => x.rarity === s.rarity).length || 1;
   return EGG_TIER_ORDER.map(t => { const T = EGG_TIERS[t], c = (T.rarityW[s.rarity] || 0) / 100 / n * (rare ? rareFormChance(T.rareForm, s.id) : 1); return c > 0 ? `${T.name.replace('ลาย', '')} ${pct(c)}` : ''; }).filter(Boolean).join(' · '); };
 /** where to find a form: eggs, fragments from the zones it fights in, or (Starborn) shards from its boss zone */
 function dexSources(e) {
   const { s, rare } = e, zoneName = id => ZONES.find(z => z.id === id)?.name || id;
+  if (s.special) { const st = STAGES.find(x => specialOf(x) === s.id);
+    return [`เศษไข่พิเศษจากบอส${st ? ' ' + esc(zoneName(st.zone)) : ''} · ชนะครั้งแรกของแต่ละระดับได้ 1 ชิ้น แล้วต่อรอบ ${SPECIAL_SHARD_CHANCE.map((c, i) => DIFFS[i].name + ' ' + c * 100 + '%').join(' · ')} · ครบ ${SPECIAL_SHARDS_TO_CRAFT} ชิ้นประกอบเป็นไข่พิเศษ`,
+      `ตัวพิเศษของ${esc(SPECIES[s.special].name)}: ดาวเกิด +1 · HP/ATK/DEF +10% · สกิลของตัวเอง`, 'ไม่ออกจากไข่ปริศนา · ไม่มีร่างหายาก'];
+  }
   if (s.starborn) { const st = STAGES.find(x => starbornOf(x) === s.id); return [`เศษไข่ดาราจากบอส${st ? ' ' + esc(zoneName(st.zone)) : ''} · ชนะครั้งแรกได้ 1 ชิ้น แล้ว ${STAR_SHARD_CHANCE * 100}% ต่อรอบ · ครบ ${STAR_SHARDS_TO_CRAFT} ชิ้นประกอบเป็นไข่`, 'ไม่ออกจากไข่ปริศนา'];
   }
   const zones = [...new Set(STAGES.filter(st => st.waves.flat().some(m => m.sid === s.id)).map(st => st.zone))].map(zoneName);
@@ -226,11 +237,11 @@ function dexHTML() {
   const e = dexSel && all.find(x => x.key === dexSel);
   if (e) {
     const { s, rare } = e, has = dexHas(e), f = formOf(s.id, rare), nat = natStars(s.id, rare), img = (rare ? rareMasterURL(s.id) : masterURL(s.id)) || dexPic(e);
-    const own = S.mons.filter(m => m.sid === s.id && !!m.rare === rare).length, forms = dexForms(s);
+    const own = S.mons.filter(m => m.sid === s.id && !!m.rare === rare).length, forms = dexForms(s.special ? SPECIES[s.special] : s);
     const lo = { hp: statAt(s.base.hp, 1, nat), atk: statAt(s.base.atk, 1, nat), def: statAt(s.base.def, 1, nat) }, hi = { hp: statAt(s.base.hp, 40, 6), atk: statAt(s.base.atk, 40, 6), def: statAt(s.base.def, 40, 6) };
-    const tabs = forms.length > 1 ? `<div class="ftabs">${forms.map(x => `<button type="button" class="ftab ${x.key === e.key ? 'on' : ''} ${x.rare ? 'rf' : ''}" data-dex="${x.key}">${elDot(x.elem)} ${ELEM_NAME[x.elem]}<small>${x.rare ? '✦ ร่างหายาก' : 'ร่างปกติ'} · ★${natStars(s.id, x.rare)}</small>${dexHas(x) ? '<i>✓</i>' : ''}</button>`).join('')}</div>` : '';
+    const tabs = forms.length > 1 ? `<div class="ftabs">${forms.map(x => `<button type="button" class="ftab ${x.key === e.key ? 'on' : ''} ${x.rare ? 'rf' : ''} ${x.sp ? 'spf' : ''}" data-dex="${x.key}">${elDot(x.elem)} ${ELEM_NAME[x.elem]}<small>${x.sp ? '✦✦ ตัวพิเศษ' : x.rare ? '✦ ร่างหายาก' : 'ร่างปกติ'} · ★${natStars(x.s.id, x.rare)}</small>${dexHas(x) ? '<i>✓</i>' : ''}</button>`).join('')}</div>` : '';
     det = `<div class="detail dexd">${tabs}<span class="dbig ${rare ? 'rfp' : ''}"><img src="${img}" alt=""></span><div style="min-width:0"><h3>${esc(s.name)} <small class="note">${esc(s.nameEn)}</small></h3>
-    <div class="row" style="gap:6px;flex:0 0 auto;margin:6px 0"><span class="chip">${elDot(f.elem)} ${ELEM_NAME[f.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}${rare ? '<span class="chip rfc">✦ ร่างหายาก</span>' : ''}<span class="chip">${REALM[s.id[0]] || ''}</span></div>
+    <div class="row" style="gap:6px;flex:0 0 auto;margin:6px 0"><span class="chip">${elDot(f.elem)} ${ELEM_NAME[f.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}${rare ? '<span class="chip rfc">✦ ร่างหายาก</span>' : ''}${s.special ? '<span class="chip spc">✦✦ ตัวพิเศษ</span>' : ''}<span class="chip">${REALM[s.id[0]] || ''}</span></div>
     <div class="stars">${starStr(nat)}</div><div class="note">${has ? '<b style="color:#8fe39a">✓ ได้มาแล้ว</b>' : '<b style="color:#e8b0a0">ยังไม่ได้</b>'}${own ? ` · มีอยู่ ${own} ตัว` : ''}</div>
     <div class="stat"><div>HP<b>${lo.hp}</b><small>★6 เต็ม ${hi.hp}</small></div><div>ATK<b>${lo.atk}</b><small>★6 เต็ม ${hi.atk}</small></div><div>DEF<b>${lo.def}</b><small>★6 เต็ม ${hi.def}</small></div><div>SPD<b>${s.base.spd}</b><small>ฐาน</small></div></div></div>
     <div class="skl">${f.skills.map((k, i) => `<div><b>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)} · ${esc(k.name)}</b>${esc(k.desc)}${k.cd ? `<em>คูลดาวน์ ${k.cd}</em>` : ''}</div>`).join('')}${s.leader ? `<div><b>ผู้นำ</b>${esc(s.leader.text)}</div>` : ''}${rare ? rareRow(s, true, '') : ''}${evoRow(s, S.mons.some(m => m.sid === s.id && !!m.rare === rare && m.stars >= 5), rare)}
@@ -346,7 +357,7 @@ function runeModal(id, res = null) {
   const onCost = r.on === m.uid ? 0 : equipCost(S, r.id, m.uid).gold, offBtn = `<button type="button" class="alt" data-roff="${r.id}">ถอดออก · ทอง ${runeOffCost(r).toLocaleString()}</button>`;
   el.innerHTML = `<div class="card rmod g-${r.grade} ${runeBusy ? 'busy' : ''}">
     <button type="button" class="rx" data-rclose="1" aria-label="ปิด">✕</button>
-    <div class="rforge"><div class="ranvil" style="--sc:${T.col}"><i class="rring"></i>${runeImg(r, 'rbig')}<i class="rspark"></i><i class="rcrack"></i></div><div class="rres ${res ? res.cls : ''}">${res ? esc(res.txt) : ''}</div></div>
+    <div class="rforge"><div class="ranvil ${forgeURL() ? 'altar' : ''}" style="--sc:${T.col}">${forgeURL() ? `<img class="raltar" src="${forgeURL()}" alt="">` : ''}<div class="rstone"><i class="rring"></i>${runeImg(r, 'rbig')}<i class="rspark"></i><i class="rcrack"></i></div></div><div class="rres ${res ? res.cls : ''}">${res ? esc(res.txt) : ''}</div></div>
     <h3>${esc(runeName(r))} <span class="rlvb">+${r.lvl}</span></h3>
     <div class="rmeta"><span class="rstars">${'★'.repeat(r.star)}</span><span class="chip" style="color:${G.col};border-color:${G.col}">${G.name}</span><span class="chip">ช่อง ${SLOT_NAME[r.slot]}</span></div>
     <div class="rmain">${fmtStat(r.main, mainValue(r))}${max ? '' : `<small>+${r.lvl + 1} → ${fmtStat(r.main, mainValue(r, r.lvl + 1))}</small>`}</div>
@@ -498,7 +509,7 @@ function hatchHTML() {
   <div class="shop"><img src="${eggURLOf({ kind: 'mystery', tier: 'gold' })}" alt=""><div style="min-width:0"><b>ไข่ปริศนาลายทอง</b><div class="note">มหากาพย์ ${EGG_TIERS.gold.rarityW.epic}% · ตำนาน ${EGG_TIERS.gold.rarityW.legendary}% · ต้องบ่ม ${fmtDur(incubMs(S, { kind: 'mystery', tier: 'gold' }))}</div></div><button class="go" type="button" data-buy="gold" ${S.gems >= GEM_GOLD_EGG ? '' : 'disabled'}>ซื้อ <span class="gold gem sm"><i></i>${GEM_GOLD_EGG}</span></button></div>
   <h2 class="sec">ไข่ที่รอฟัก</h2>${mhRow()}${wait.length ? `<div class="eggs">${wait.map(card).join('')}</div>` : '<div class="empty">ยังไม่มีไข่ ผ่านด่านเพื่อรับไข่ปริศนาหรือสะสมเศษไข่</div>'}
   <h2 class="sec">ประกอบไข่จากเศษ</h2>${crafts.length ? crafts.map(sid => `<div class="craft"><img src="${eggURL(sid)}" alt=""><div style="min-width:0">${esc(SPECIES[sid].name)}<div class="bar fr" style="margin-top:5px"><i style="transform:scaleX(${Math.min(1, S.frags[sid] / FRAGS_TO_CRAFT)})"></i></div><span class="note">${S.frags[sid]}/${FRAGS_TO_CRAFT}</span></div><button class="go" type="button" data-craft="${sid}" ${S.frags[sid] >= FRAGS_TO_CRAFT ? '' : 'disabled'}>ประกอบ</button></div>`).join('') : '<div class="empty">ยังไม่มีเศษไข่</div>'}
-  ${stars.length ? `<h2 class="sec">ไข่ตำนานดารา</h2>${stars.map(sid => `<div class="craft star"><img src="${eggURL(sid)}" alt=""><div style="min-width:0">${esc(SPECIES[sid].name)}<div class="bar fr" style="margin-top:5px"><i style="transform:scaleX(${Math.min(1, S.starShards[sid] / STAR_SHARDS_TO_CRAFT)})"></i></div><span class="note">เศษไข่ดารา ${S.starShards[sid]}/${STAR_SHARDS_TO_CRAFT} · ดรอปจากบอสโซน ${STAR_SHARD_CHANCE * 100}% ต่อรอบ</span></div><button class="go" type="button" data-starcraft="${sid}" ${S.starShards[sid] >= STAR_SHARDS_TO_CRAFT ? '' : 'disabled'}>ประกอบ</button></div>`).join('')}` : ''}
+  ${stars.length ? `<h2 class="sec">${stars.some(x => SPECIES[x]?.special) ? 'ไข่ตำนานดารา · ไข่พิเศษ' : 'ไข่ตำนานดารา'}</h2>${stars.map(sid => { const need = shardsToCraft(sid), sp = SPECIES[sid].special; return `<div class="craft star ${sp ? 'spec' : ''}"><img src="${eggURL(sid)}" alt=""><div style="min-width:0">${esc(SPECIES[sid].name)}${sp ? ' <small class="note">ตัวพิเศษ</small>' : ''}<div class="bar fr" style="margin-top:5px"><i style="transform:scaleX(${Math.min(1, S.starShards[sid] / need)})"></i></div><span class="note">${shardWord(sid)} ${S.starShards[sid]}/${need} · ${sp ? `ดรอปจากบอส${esc(SPECIES[sp].name)} ${SPECIAL_SHARD_CHANCE[0] * 100}–${SPECIAL_SHARD_CHANCE[3] * 100}% ต่อรอบตามระดับ` : `ดรอปจากบอสโซน ${STAR_SHARD_CHANCE * 100}% ต่อรอบ`}</span></div><button class="go" type="button" data-starcraft="${sid}" ${S.starShards[sid] >= need ? '' : 'disabled'}>ประกอบ</button></div>`; }).join('')}` : ''}
   ${oddsHTML()}</div></section>`;
 }
 function oddsHTML() {
@@ -519,7 +530,7 @@ function settingsHTML() {
   <div class="set"><span>ข้ามฉากสกิลสุดยอด</span>${seg('skipUlt', [[false, 'ไม่ข้าม'], [true, 'ข้าม']])}</div>
   <div class="set"><span>เริ่มเกมใหม่ (ลบความคืบหน้า)</span>${confirmReset ? `<span class="confirm">ลบจริงไหม? <button class="alt" type="button" data-act="resetYes">ลบ</button><button class="alt" type="button" data-act="resetNo">ยกเลิก</button></span>` : `<button class="alt" type="button" data-act="reset">รีเซ็ต</button>`}</div>
   <div class="set"><span>ทดสอบ (prototype): ไข่ปริศนา</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="eggs">รับไข่ 4 ลาย</button><button class="alt" type="button" data-dev="incub">บ่มเสร็จทันที</button></span></div>
-  <div class="set"><span>ทดสอบ (prototype): มอนชุดใหม่</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="mons">รับมอนทุกตัว</button><button class="alt" type="button" data-dev="evo">เตรียมอัปดาว</button><button class="alt" type="button" data-dev="gems">+เพชร 500</button><button class="alt" type="button" data-dev="rare">ทำให้เป็นร่างหายาก</button><button class="alt" type="button" data-dev="star5">อัปเป็น ★5 (ดูร่างวิวัฒน์)</button><button class="alt" type="button" data-dev="runes">รูนทดสอบ 12 ชิ้น + ทอง 100,000</button><button class="alt" type="button" data-dev="hell">เปิดระดับนรกทุกโซน</button></span></div>
+  <div class="set"><span>ทดสอบ (prototype): มอนชุดใหม่</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="mons">รับมอนทุกตัว</button><button class="alt" type="button" data-dev="evo">เตรียมอัปดาว</button><button class="alt" type="button" data-dev="gems">+เพชร 500</button><button class="alt" type="button" data-dev="rare">ทำให้เป็นร่างหายาก</button><button class="alt" type="button" data-dev="star5">อัปเป็น ★5 (ดูร่างวิวัฒน์)</button><button class="alt" type="button" data-dev="runes">รูนทดสอบ 12 ชิ้น + ทอง 100,000</button><button class="alt" type="button" data-dev="hell">เปิดระดับนรกทุกโซน</button><button class="alt" type="button" data-dev="special">เศษไข่ขุนสมิงเผือก 20</button></span></div>
   <div class="set"><span>ทดสอบ (prototype): ฟักมอนระดับ</span><span class="row" style="flex:0 0 auto">${['common', 'rare', 'epic', 'legendary'].map(g => `<button class="alt" type="button" data-dev="hatch:${g}">${LOOT_GRADES[g].name}</button>`).join('')}</span></div>
   <div class="set"><span>ภาพไฟล์แยก (ตรวจการโหลด)<small class="note" style="display:block">${extLine()}</small></span></div>
   <div class="set"><span>ทดสอบ (prototype): พลังงาน AUTO</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="energy">เติมพลังงานเต็ม</button></span></div>
@@ -632,7 +643,7 @@ function endBattle(win, stars, seed, b) {
   const { items, grade } = lootOf(r);
   const view = items.map(it => it.kind === 'gold' ? { icon: coinURL(it.qty >= 1000), label: `ทอง ${it.qty.toLocaleString()}`, sub: it.first ? 'โบนัสผ่านครั้งแรก' : '', grade: it.grade }
     : it.kind === 'frag' ? { icon: eggURL(it.sid), label: `เศษไข่ ×${it.qty}`, sub: SPECIES[it.sid].name, grade: it.grade }
-    : it.kind === 'star' ? { icon: eggURL(it.sid), label: 'เศษไข่ดารา!', sub: `${SPECIES[it.sid].name} ${S.starShards[it.sid] || 0}/${STAR_SHARDS_TO_CRAFT}`, grade: it.grade }
+    : it.kind === 'star' ? { icon: eggURL(it.sid), label: shardWord(it.sid) + '!', sub: `${SPECIES[it.sid].name} ${S.starShards[it.sid] || 0}/${shardsToCraft(it.sid)}`, grade: it.grade }
     : it.kind === 'rune' ? { icon: runeURL(it.rune), label: `${runeName(it.rune)} ${it.rune.star}★`, sub: `${RUNE_GRADES[it.rune.grade].name} · ช่อง ${SLOT_NAME[it.rune.slot]}`, grade: it.grade }
     : { icon: eggURLOf(it.egg), label: eggName(it.egg), sub: it.egg.kind === 'mystery' ? 'ไข่ปริศนา!' : '', grade: it.grade });
   chestUI = showChest({ items: view, grade, boss, stars, onDone: () => { chestUI = null; resultModal(r, win, stars); } });
@@ -653,7 +664,7 @@ function resultModal(r, win, stars) {
   ${r.gold ? `<div class="drop" style="align-self:center"><span class="gold" style="padding:0;border:0;background:none"><i></i></span>ทอง +${r.gold.toLocaleString()}${r.firstClear ? ' (โบนัสผ่านครั้งแรก)' : ''}</div>` : ''}
   <div class="gains">${r.gains.map(g => `<div class="gain"><span class="pic"><img src="${portrait(monOf(S, g.uid) ? look(monOf(S, g.uid)) : g.sid)}" alt=""></span><span>${esc(monOf(S, g.uid) ? mName(monOf(S, g.uid)) : SPECIES[g.sid].name)}<br><span class="note">EXP +${g.exp}</span></span><span>${g.toLvl > g.fromLvl ? `<span class="up">LEVEL UP</span><br>Lv.${g.fromLvl} → ${g.toLvl}` : `Lv.${g.toLvl}`}${g.capped ? '<br><span class="note">ถึงเลเวลสูงสุดของดาว</span>' : ''}</span></div>`).join('')}</div>
   ${r.runes?.length ? `<div class="drops">${r.runes.map(x => `<span class="drop" style="border-color:${RUNE_GRADES[x.grade].col}"><img src="${runeURL(x)}" alt="">${esc(runeName(x))} ${x.star}★</span>`).join('')}</div>` : ''}
-  ${r.star ? `<div class="drops"><span class="drop star"><img src="${eggURL(r.star)}" alt="">เศษไข่ดารา ${esc(SPECIES[r.star].name)} ${S.starShards[r.star] || 0}/${STAR_SHARDS_TO_CRAFT}</span></div>` : ''}
+  ${[r.star, r.special].filter(Boolean).map(sid => `<div class="drops"><span class="drop star"><img src="${eggURL(sid)}" alt="">${shardWord(sid)} ${esc(SPECIES[sid].name)} ${S.starShards[sid] || 0}/${shardsToCraft(sid)}</span></div>`).join('')}
   ${Object.keys(r.frags).length || r.eggs.length ? `<div class="drops">${Object.entries(r.frags).map(([sid, n]) => `<span class="drop"><img src="${eggURL(sid)}" alt="">เศษไข่${esc(SPECIES[sid].name)} ×${n}</span>`).join('')}${r.eggs.map(e => `<span class="drop" style="border-color:${TIER_COL[e.tier]}"><img src="${eggURLOf(e)}" alt="">${esc(eggName(e))}!</span>`).join('')}</div>` : ''}
   <div class="row"><button class="go" type="button" data-r="again">เล่นอีกครั้ง</button>${win && next ? `<button class="go" type="button" data-r="next">ด่านถัดไป</button>` : ''}</div>
   <div class="row">${S.eggs.length ? `<button class="alt" type="button" data-r="hatch">ฟักไข่ (${S.eggs.length})</button>` : ''}<button class="alt" type="button" data-r="map">แผนที่</button></div></div>`;
@@ -755,6 +766,7 @@ function devTool(k) {
     S.mons.push(newMon(S.nextUid++, m.sid, 1)); selMon = m.uid; monMode = 'evo'; food = []; save(); sfx.chime(); show('mons'); return; }
   if (k === 'runes') { for (let i = 0; i < 12; i++) addRune(S, rollRune(Math.random, 1 + Math.floor(Math.random() * 6), RUNE_DROP.gradeW[2])); S.gold += 100000; save(); sfx.chime(); toast('ได้รูนทดสอบ 12 ชิ้น + ทอง 100,000 (ดูที่ คลังมอน → ◈ รูน)'); render(); return; }
   if (k === 'hell') { for (const z of ZONES) { const b = stageKey(z.id + '-5', 2); S.stages[b] = Math.max(1, S.stages[b] || 0); } save(); sfx.chime(); toast('เปิดระดับนรกทุกโซนแล้ว (ทดสอบ: นับว่าชนะบอสระดับยากทุกโซน) — ไปที่แผนที่ → แตะโซน → แท็บ นรก'); render(); return; }
+  if (k === 'special') { S.starShards.B05S = (S.starShards.B05S || 0) + SPECIAL_SHARDS_TO_CRAFT; save(); sfx.chime(); toast('ได้เศษไข่พิเศษขุนสมิงเผือก 20 ชิ้น (ประกอบที่หน้า ฟักไข่)'); show('hatch'); return; }
   if (k === 'star5') { const m = monOf(S, selMon) || units()[0]; m.stars = Math.max(5, m.stars); m.lvl = Math.min(m.lvl, levelCap(m.stars)); selMon = m.uid; save(); sfx.starup(); show('mons'); return; }
   if (k === 'rare') { // turn the selected monster (or the first) into its rare form
     const m = monOf(S, selMon) || units()[0]; m.rare = true; if (!S.dexRare.includes(m.sid)) S.dexRare.push(m.sid); selMon = m.uid; save(); sfx.chime(); show('mons'); return; }

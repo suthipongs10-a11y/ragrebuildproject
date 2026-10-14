@@ -342,6 +342,19 @@ export const SPECIES: Record<string, SpeciesDef> = {
       { id: 'oro_valleys', name: 'แปดหุบเขาพิโรธ', desc: 'ทุกตัว ลบบัฟ 1 อย่าง + 45% ผนึกสกิล 2 เทิร์น', cd: 5, target: 'enemyAll', mult: 1.3, effects: [{ kind: 'strip', n: 1 }, { kind: 'status', status: 'silence', turns: 2, chance: 0.45 }], anim: 'ult_nightwave', ult: true },
     ],
   },
+  // ---- special editions (ตัวพิเศษ, owner 2026-10-14): a few standout monsters get a new form with its own name, art and
+  // story — +1 natural star, HP/ATK/DEF +10% of the base species, no rare form; only from a special egg built from shards
+  // that the base species' zone boss drops (SPECIAL_SHARD_*). Art ships as separate files (assets_ext/). ----
+  B05S: {
+    id: 'B05S', art: 'monB05s', name: 'ขุนสมิงเผือก', nameEn: 'Khun Saming the White', elem: 'light', role: 'Attacker', rarity: 'rare', special: 'B05',
+    base: { hp: 957, atk: 143, def: 57, spd: 114 },
+    leader: { stat: 'atk', value: 0.2, text: 'ATK ทั้งทีม +20%' },
+    skills: [
+      { id: 'khun_axe', name: 'ขวานโลหิต', desc: 'ฟาดขวาน 1 ตัว 50% ติดเครื่องหมายแสง', cd: 0, target: 'enemy', mult: 1.15, effects: [{ kind: 'mark', elem: 'light', chance: 0.5 }], anim: 'melee' },
+      { id: 'khun_roar', name: 'คำรามขุนศึก', desc: 'ผ่าขวาน 1 ตัวแรง ไม่สนใจ DEF 40% + ตัวเองภูมิคุ้มกัน 2 เทิร์น', cd: 3, target: 'enemy', mult: 1.7, ignoreDef: 0.4, effects: [{ kind: 'status', status: 'immunity', turns: 2, to: 'self' }], anim: 'melee' },
+      { id: 'khun_sunaxe', name: 'ขวานสุริยันผ่าปฐพี', desc: 'ทุ่มขวานผ่าพื้นใส่ทุกตัว ไม่สนใจ DEF 30% + 35% มึน 1 เทิร์น', cd: 5, target: 'enemyAll', mult: 1.35, ignoreDef: 0.3, effects: [{ kind: 'status', status: 'stun', turns: 1, chance: 0.35 }], anim: 'ult_quake', ult: true },
+    ],
+  },
 };
 // ---- rare forms = light/dark monsters of their own (decided 2026-10-13): same name, element light or dark (a light species
 // turns dark and a dark one turns light), skill 1 kept in the new element, its own skills 2 and 3 built around the light
@@ -522,6 +535,13 @@ export const ENERGY_REFILL_GEMS = 30, ENERGY_REFILL_DAILY = 3;
 export const STAR_SHARD_CHANCE = 0.05, STAR_SHARDS_TO_CRAFT = 40;
 /** the Starborn boss of a stage (only boss stages have one) */
 export const starbornOf = (st: StageDef) => st.waves.flat().find(m => SPECIES[m.sid]?.starborn)?.sid;
+/** special-edition shards (เศษไข่พิเศษ): the base species' zone boss drops one on the first clear of each difficulty,
+ *  then SPECIAL_SHARD_CHANCE[difficulty] per win; SPECIAL_SHARDS_TO_CRAFT build the egg (owner 2026-10-14: a rare drop) */
+export const SPECIAL_SHARD_CHANCE = [0.04, 0.06, 0.08, 0.12], SPECIAL_SHARDS_TO_CRAFT = 20;
+export const specialOf = (st: StageDef) => { const b = st.waves.flat().find(m => m.boss && !SPECIES[m.sid]?.starborn); return b ? Object.values(SPECIES).find(x => x.special === b.sid)?.id : undefined; };
+/** shard-only species (Starborn, special editions): never in mystery eggs, no fragments, no rare form */
+export const shardOnly = (s?: { starborn?: boolean; special?: string }) => !!(s && (s.starborn || s.special));
+export const shardsToCraft = (sid: string) => SPECIES[sid]?.special ? SPECIAL_SHARDS_TO_CRAFT : STAR_SHARDS_TO_CRAFT;
 
 // Stats, Summoners-War style: each star grade has its own level cap; evolving (★+1) resets the level to 1 at a slightly
 // lower multiplier than the previous grade's max, so a max-level evolve is always a big step up. ★6 max ≈ 8× ★1 Lv1.
@@ -570,12 +590,13 @@ export function skillAt(k: SkillDef, lv: number, slot: number): SkillDef {
 export const NAT_STARS: Record<Rarity, number> = { common: 1, rare: 2, epic: 4, legendary: 5 }; // epic ★4 · legendary ★5 (decided 2026-10-13)
 export const MAX_STARS = 6;
 /** stars a monster hatches with: by rarity, +1 for the rare form (stronger, so it starts a grade higher), max ★6 */
-export const natStars = (sid: string, rare = false) => Math.min(6, (NAT_STARS[SPECIES[sid]?.rarity] || 1) + (rare ? 1 : 0));
+export const natStars = (sid: string, rare = false) => Math.min(6, (NAT_STARS[SPECIES[sid]?.rarity] || 1) + (rare ? 1 : 0) + (SPECIES[sid]?.special ? 1 : 0));
 /** evolved-form names (owner 2026-10-14: odd Thai + foreign mixes), shown with the evolved art — add one when a species'
  *  evolved art (`mon<ID>e_*`) is imported, so a name never shows up on the old picture. Rare forms share it. */
 export const EVO_NAME: Record<string, [string, string]> = {
   A01: ['อรุณโซลาริส', 'Arun Solaris'], A02: ['ควีนมุกธารา', 'Queen Mukthara'], A03: ['วายุเทมเปสต์', 'Vayu Tempest'],
   A04: ['มรกตโคลอสซัส', 'Morakot Colossus'], A05: ['นภาสเตลลาร์', 'Nabha Stellar'], A06: ['ไมโครากษส', 'Myco Raksha'],
+  B05: ['พยัคฆ์เบอร์เซิร์ก', 'Phayak Berserk'],
 };
 /** raised past its natural stars to ★5+ = the evolved form (the same rule as the evolved art, `lookOf` in assets.ts) */
 export const isEvolved = (sid: string, stars: number, rare = false) => stars >= 5 && stars > natStars(sid, rare);

@@ -1,7 +1,7 @@
 // Adventure book (สมุดผจญภัย): one-time quests grouped in chapters (one per map region + one per game system), handing out
 // gems (600 in total for the current content), mystery eggs, egg shards, gold and soul crystals; a finished chapter opens a chest.
 // Progress is read from the save (stages, dex, monsters) and lifetime counters (save.stats); rewards are claimed by hand.
-import { SPECIES, STAGES, ZONES, DIFFS, stageKey, GEM_GOLD_EGG, RUSH_BASE, RUSH_STEP, EGG_TIERS, levelCap, rareFormChance } from '../core/data';
+import { SPECIES, STAGES, ZONES, DIFFS, stageKey, GEM_GOLD_EGG, RUSH_BASE, RUSH_STEP, EGG_TIERS, levelCap, rareFormChance, shardOnly } from '../core/data';
 import type { EggTier } from '../core/data';
 import type { SaveData, EggSave } from './save';
 import { rollRarity, rollSpecies, skillMaxed } from './progression';
@@ -16,7 +16,7 @@ const dexHas = (s: SaveData, r: string) => s.dex.filter(id => SPECIES[id]?.rarit
 const stageStars = (s: SaveData, id: string) => s.stages[id] || 0;
 const maxStars = (s: SaveData) => Math.max(0, ...s.mons.map(m => m.stars));
 const starsAtLeast = (s: SaveData, k: number) => s.mons.filter(m => m.stars >= k).length;
-const allSpecies = Object.values(SPECIES).filter(x => !x.boss && !x.starborn).length;
+const allSpecies = Object.values(SPECIES).filter(x => !x.boss && !shardOnly(x)).length;
 /** levels gained across every building since a new home (castle 1, five buildings at 1, shrine 0) */
 const homeUps = (s: SaveData) => { const h = home(s); return h.castle - 1 + Object.values(h.lv).reduce((a, b) => a + b, 0) - 5 + Object.values(h.shrine).reduce((a, b) => a + b, 0); };
 
@@ -85,7 +85,7 @@ export const QUESTS: Quest[] = [
   { id: 'dex8', ch: 'hatch', name: 'ค้นพบมอน 8 ชนิด', goal: s => n(s.dex.length, 8), reward: { gems: 10 } },
   { id: 'dex11', ch: 'hatch', name: 'ค้นพบมอน 11 ชนิด', goal: s => n(s.dex.length, 11), reward: { gems: 10, frags: { A09: 5 } } },
   { id: 'dex14', ch: 'hatch', name: 'ค้นพบมอน 14 ชนิด', goal: s => n(s.dex.length, 14), reward: { gems: 15, frags: { A09: 10 } } },
-  { id: 'dexall', ch: 'hatch', name: `ค้นพบมอนครบ ${allSpecies} ชนิด`, goal: s => n(s.dex.filter(id => !SPECIES[id]?.starborn).length, allSpecies), reward: { gems: 20 } },
+  { id: 'dexall', ch: 'hatch', name: `ค้นพบมอนครบ ${allSpecies} ชนิด`, goal: s => n(s.dex.filter(id => SPECIES[id] && !shardOnly(SPECIES[id])).length, allSpecies), reward: { gems: 20 } },
   // growth & evolution (SW: power-up → evolve → 5★ → 6★)
   { id: 'feed10', ch: 'grow', name: 'ป้อนมอนเพิ่มเลเวล 10 ครั้ง', goal: s => n(s.stats.feed, 10), reward: { gems: 5, gold: 2000 } },
   { id: 'feed50', ch: 'grow', name: 'ป้อนมอนเพิ่มเลเวล 50 ครั้ง', goal: s => n(s.stats.feed, 50), reward: { gems: 10, gold: 5000 } },

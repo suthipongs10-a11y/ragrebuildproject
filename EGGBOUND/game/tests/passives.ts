@@ -1,13 +1,13 @@
 // Rare-form passives: direct scenario checks + every rare form through every stage (no crash, deterministic).
 import { Battle, simulate } from '../src/core/battle';
-import { SPECIES, STAGES, formOf, planOf } from '../src/core/data';
+import { SPECIES, STAGES, formOf, planOf, shardOnly } from '../src/core/data';
 import type { MonsterRef } from '../src/core/types';
 
 export function passiveTests(): number {
   let fail = 0;
   const ok = (c: boolean, msg: string) => { if (!c) { fail++; console.log('PASSIVE FAIL:', msg); } };
   const st = STAGES[0], mk = (team: MonsterRef[]) => new Battle(7, team, st) as any, R = (sid: string, rare = true): MonsterRef => ({ sid, lvl: 10, stars: 2, rare });
-  ok(Object.values(SPECIES).filter(s => !s.boss && !s.starborn).every(s => !!s.rarePassive), 'every species has a rare passive (Starborn have none)');
+  ok(Object.values(SPECIES).filter(s => !s.boss && !shardOnly(s)).every(s => !!s.rarePassive), 'every species has a rare passive (Starborn have none)');
 
   { const b = mk([R('B01'), R('A02', false)]), u = b.units[0], ev: any[] = []; u.hp = 0;
     ok(b.endure(u, ev) && u.hp === 1 && u.statuses.some((x: any) => x.id === 'shield') && ev.some(e => e.t === 'passive'), 'endure saves once');
@@ -31,7 +31,7 @@ export function passiveTests(): number {
   // ---- light/dark rare forms (2026-10-13): own element + skills, and the 13 mechanics they use ----
   { const n = formOf('A02'), r = formOf('A02', true);
     ok(n.elem === 'water' && r.elem === 'light' && r.skills[0].effects.some(e => e.kind === 'mark' && e.elem === 'light') && r.skills[0].desc.includes('เครื่องหมายแสง') && r.skills[1].id !== n.skills[1].id && r.skills[2].id !== n.skills[2].id, 'rare form: light element, skill 1 re-elemented, own skills 2-3');
-    ok(Object.values(SPECIES).filter(s => !s.boss && !s.starborn).every(s => s.rareForm && (s.rareForm.elem === 'light' || s.rareForm.elem === 'dark') && s.rareForm.elem !== s.elem), 'every species has a light/dark rare form of another element');
+    ok(Object.values(SPECIES).filter(s => !s.boss && !shardOnly(s)).every(s => s.rareForm && (s.rareForm.elem === 'light' || s.rareForm.elem === 'dark') && s.rareForm.elem !== s.elem), 'every species has a light/dark rare form of another element');
     ok(mk([R('A01')]).units[0].elem === 'light' && mk([R('A01', false)]).units[0].elem === 'fire', 'rare units fight in their rare element'); }
   const foe1 = (b: any) => b.units.find((u: any) => u.team === 1);
   { const b = mk([R('A01', false)]), me = b.units[0], foe = foe1(b); me.statuses.push({ id: 'invincible', turns: 1 }); const hp0 = me.hp;
@@ -77,7 +77,7 @@ export function passiveTests(): number {
   }
   // balance (owner 2026-10-14: an all-rare team may win at most ~15% more): every species in teams of 4, on each stage
   // where the normal team wins 25–85% at the recommended level (saturated stages say nothing), normal vs all-rare
-  { const ids = Object.values(SPECIES).filter(s => !s.boss && !s.starborn).map(s => s.id), N = 30;
+  { const ids = Object.values(SPECIES).filter(s => !s.boss && !shardOnly(s)).map(s => s.id), N = 30;
     const wr = (t: string[], st: (typeof STAGES)[number], rare: boolean) => { const [lvl, stars] = planOf(st); let w = 0;
       for (let i = 0; i < N; i++) if (simulate(5000 + i, t.map(sid => ({ sid, lvl, stars, rare })), st).win) w++; return w / N; };
     let d = 0, n = 0;

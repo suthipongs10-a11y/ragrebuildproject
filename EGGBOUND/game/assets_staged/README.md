@@ -19,3 +19,6 @@ bundle size. When the monster is added to `SPECIES` (data.ts), move its files in
     back_burst, eggS07. Front view is near-frontal rather than 3/4 (accepted for a many-armed humanoid; no mirror)
   - Missing poses arriving later: put them in a folder with the set's `front_idle` (same canvas size as before) and
     re-run `import_art.py <dir> S0x 360 --out assets_staged` so the scale stays the same
+- 2026-10-14 (later): S06 complete 12/12 (`EGGBOUND_MONS06_COMPLETE_FIXED`, re-imported whole set at 360) ·
+  S07 complete 12/12 (the 5 missing PNGs merged with the original 7 in one folder, re-imported at 360; back views are
+  near-straight back, egg drawn taller than asked and scaled to egg height). S05–S07 are now ready to enter the game.

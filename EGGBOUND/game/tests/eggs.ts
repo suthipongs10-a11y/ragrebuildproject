@@ -1,6 +1,8 @@
 // Egg + growth checks: mystery tiers + pity, incubation slots, hatch = new unit at natural stars, rare form, evolution, skill-ups, save migration.
 import { EGG_DROP, EGG_TIERS, SPECIES, MAX_STARS, NAT_STARS, EVO_GOLD, EVO_NAME, monName, SKILL_MAX, levelCap, statAt, skillAt, STAGES, ZONES, DIFFS, DIFF_K, stageOf, stageKey, planOf, RARE_FORM_MULT, NAMED_RARE_FORM, ENERGY_MAX, ENERGY_REGEN_MS, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY } from '../src/core/data';
 import { newSave, loadSave, writeSave, newMon } from '../src/game/save';
+import { craftStarEgg, rollSpecies } from '../src/game/progression';
+import { natStars, specialOf, SPECIAL_SHARDS_TO_CRAFT } from '../src/core/data';
 import { stageUnlocked, rollMysteryEgg, hatchEgg, grantRewards, eggOdds, craftEgg, FRAGS_TO_CRAFT, lootOf, monOf, evoCheck, evolve, skillUp, teamHasSpecies, feed, feedPreview, feedValue } from '../src/game/progression';
 import { startIncub, incubLeft, incubOf, incubSlots, canHatch, home, HATCH_SPEED } from '../src/game/home';
 import { energyNow, energyNext, payAuto, autoCost, buyEnergy, refillsLeft } from '../src/game/energy';
@@ -59,7 +61,7 @@ export function eggTests(): number {
     ok(!!m && m.stars === 2 && m.lvl === 1 && !monOf(s, 5) && s.gold === 99999 - EVO_GOLD[1], 'evolve ★1→★2 with 1 food');
     ok(EVO_GOLD.join() === '0,600,2000,6000,16000,40000', 'evolve gold doubled (owner 2026-10-14)');
     ok(monName('A02', 4) === SPECIES.A02.name && monName('A02', 5) === EVO_NAME.A02[0] && monName('A02', 5, true) === EVO_NAME.A02[0] && monName('A02', 2, true) === SPECIES.A02.name, 'evolved name from ★5 (rare forms share it)');
-    ok(monName('B05', 6) === SPECIES.B05.name && Object.keys(EVO_NAME).every(id => SPECIES[id] && monName(id, 6) !== SPECIES[id].name), 'evolved names only for species with evolved art');
+    ok(monName('B07', 6) === SPECIES.B07.name && Object.keys(EVO_NAME).every(id => SPECIES[id] && monName(id, 6) !== SPECIES[id].name), 'evolved names only for species with evolved art');
     ok(statAt(SPECIES.A01.base.atk, 1, 2) > before * .9, 'new grade Lv1 ≈ old grade max');
     m.lvl = levelCap(2); s.mons.push(newMon(50, 'A02', 1, 2), newMon(51, 'B01', 1, 1));
     ok(!evoCheck(s, 1, [50, 51]).ok, 'food must share the star grade'); s.mons.find(x => x.uid === 51)!.stars = 2;
@@ -176,6 +178,19 @@ export function eggTests(): number {
     ok(refillsLeft(s, next) === ENERGY_REFILL_DAILY && buyEnergy(s, next), 'the limit resets at local midnight');
     s.gems = ENERGY_REFILL_GEMS - 1; ok(!buyEnergy(s, next) && s.gems === ENERGY_REFILL_GEMS - 1, 'not enough gems: nothing bought'); }
 
+  // special edition (ขุนสมิงเผือก): +1 natural star, +10% HP/ATK/DEF, never in mystery eggs, shards from the base species' zone boss
+  { const sp = SPECIES.B05S, base = SPECIES.B05;
+    ok(sp.special === 'B05' && natStars('B05S') === natStars('B05') + 1 && !sp.rareForm, 'special: +1 natural star, no rare form');
+    ok((['hp', 'atk', 'def'] as const).every(k => Math.abs(sp.base[k] / base.base[k] - 1.1) < 0.01), 'special: HP/ATK/DEF +10%');
+    let inPool = false; for (let i = 0; i < 4000; i++) { let x = i * 7919 % 10007; if (rollSpecies('rare', () => (x = (x * 48271) % 2147483647) / 2147483647) === 'B05S') inPool = true; }
+    ok(!inPool, 'special never hatches from mystery eggs');
+    const boss = STAGES.filter(st => specialOf(st) === 'B05S'); ok(boss.length === 1 && boss[0].zone === 'village', 'special shards come from the B05 zone boss only');
+    const s = newSave(); s.runeGift = true; const r0 = grantRewards(s, boss[0].id, true, 3, ['B05'], 5);
+    ok(r0.special === 'B05S' && s.starShards.B05S === 1, 'first clear drops a special shard');
+    ok(!craftStarEgg(s, 'B05S'), 'cannot craft before the shards are complete'); s.starShards.B05S = SPECIAL_SHARDS_TO_CRAFT;
+    ok(craftStarEgg(s, 'B05S') && s.starShards.B05S === 0, 'special egg crafted from 20 shards');
+    const egg = s.eggs[s.eggs.length - 1]; ok(egg.sid === 'B05S' && egg.kind === 'named' && !egg.rare, 'special egg is a named egg, never a rare form');
+    const m = hatchEgg(s, egg.id); ok(!!m && m.sid === 'B05S' && m.stars === 3 && !m.rare, 'special hatches at ★3'); }
   console.log(fail ? `eggs: ${fail} FAILED` : 'eggs OK');
   return fail;
 }

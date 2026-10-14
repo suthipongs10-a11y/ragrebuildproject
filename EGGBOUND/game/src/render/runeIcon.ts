@@ -1,13 +1,36 @@
-// Rune icons drawn in code (no art): stone shape by slot, colour + glyph by set, rim by grade. SVG → data URL, cached,
-// so the same icon works in DOM <img> and on a canvas.
+// Rune icons. With the BATCH20 art (runeF_<slot> amulet frames + runeG_<set> gems) the icon is assembled on a canvas:
+// grade glow + frame + the set's gem in the frame's recess. Without it: the code-drawn SVG (stone shape by slot, colour +
+// glyph by set, rim by grade). Either way a cached data URL, so the same icon works in DOM <img> and on a canvas.
 import { RUNE_SETS, RUNE_GRADES, type Rune, type RuneSet, type RuneSlot } from '../core/runes';
+import { IMG } from './assets';
 
 const SHAPE: Record<RuneSlot, string> = {
   1: 'M50 7a43 43 0 1 1 0 86a43 43 0 1 1 0-86z',                        // circle
   2: 'M50 5L95 50L50 95L5 50z',                                           // diamond
   3: 'M50 6L88 28L88 72L50 94L12 72L12 28z',                              // hexagon
-  4: 'M50 6L90 26L82 70L50 95L18 70L10 26z',                              // shield
+  4: 'M18 94V44Q18 30 31 22L50 6L69 22Q82 30 82 44V94z',                // sema leaf (ใบเสมา), like the painted frame
 };
+// painted frames: centre + radius of the dark recess in the 1024 px art (measured; the four are not identical)
+const FIT: Record<RuneSlot, [number, number, number]> = { 1: [509, 501, 256], 2: [509, 500, 208], 3: [509, 504, 234], 4: [509, 525, 213] };
+const GEM_R = 0.485;                                    // gem radius / runeG_* image width (gems cropped 800 of 1024)
+const GLOW: Record<string, number> = { common: 0, rare: 9, epic: 12, legendary: 15 }; // grade glow blur, px at 192
+const ART = 192;
+const artOK = (k: string) => { const i = IMG[k]; return !!(i && i.complete && i.naturalWidth); };
+function canvasURL(draw: (x: CanvasRenderingContext2D) => void): string | null {
+  try { const c = document.createElement('canvas'); c.width = c.height = ART; const x = c.getContext('2d'); if (!x) return null; draw(x);
+    const u = c.toDataURL('image/webp', 0.9); return u.startsWith('data:image/webp') ? u : c.toDataURL(); } catch (e) { return null; }
+}
+/** the painted rune: grade glow around the frame, the frame, the set's gem filling the recess */
+function artRune(r: Pick<Rune, 'slot' | 'set' | 'grade'>): string | null {
+  const F = 'runeF_' + r.slot, G = 'runeG_' + r.set; if (!artOK(F) || !artOK(G)) return null;
+  return canvasURL(x => {
+    const g = GLOW[r.grade] || 0;
+    if (g) { x.save(); x.shadowColor = RUNE_GRADES[r.grade].col; x.shadowBlur = g; for (let i = 0; i < (r.grade === 'legendary' ? 3 : 2); i++) x.drawImage(IMG[F], 0, 0, ART, ART); x.restore(); }
+    x.drawImage(IMG[F], 0, 0, ART, ART);
+    const [cx, cy, R] = FIT[r.slot], k = ART / 1024, w = R * 1.04 * k / GEM_R;
+    x.drawImage(IMG[G], cx * k - w / 2, cy * k - w / 2, w, w);
+  });
+}
 const GLYPH: Record<RuneSet, (dk: string) => string> = {
   fang: dk => '<path d="M33 31Q36 58 46 73Q43 51 46 31Z M67 31Q64 58 54 73Q57 51 54 31Z M30 29H70V35H30Z"/>',
   shell: dk => '<path fill="none" stroke-width="5" stroke-linejoin="round" d="M50 30L66 39V58L50 67L34 58V39Z M50 30V22 M66 39L73 35 M66 58L73 63 M50 67V76 M34 58L27 63 M34 39L27 35"/>',
@@ -36,12 +59,15 @@ export function runeSVG(r: Pick<Rune, 'slot' | 'set' | 'grade'>): string {
 }
 export function runeURL(r: Pick<Rune, 'slot' | 'set' | 'grade'>): string {
   const k = `${r.slot}|${r.set}|${r.grade}`; let u = cache.get(k);
-  if (!u) { u = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(runeSVG(r)); cache.set(k, u); }
+  if (!u) { const a = artRune(r); u = a || 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(runeSVG(r)); if (a) cache.set(k, u); }
   return u;
 }
 /** an empty socket of a slot (dashed outline) */
 export function socketURL(slot: RuneSlot): string {
   const k = 'sock' + slot; let u = cache.get(k);
+  if (!u && artOK('runeF_' + slot)) { u = canvasURL(x => { x.globalAlpha = 0.5; x.filter = 'grayscale(.7) brightness(.8)'; x.drawImage(IMG['runeF_' + slot], 0, 0, ART, ART); }) || undefined; if (u) cache.set(k, u); }
   if (!u) { u = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="${SHAPE[slot]}" fill="rgba(0,0,0,.35)" stroke="#d9c9a0" stroke-opacity=".55" stroke-width="3" stroke-dasharray="7 6" transform="translate(50 50) scale(.86) translate(-50 -50)"/></svg>`); cache.set(k, u); }
   return u;
 }
+/** the forge altar art (BATCH20) for the rune sheet, if present */
+export const forgeURL = () => artOK('rune_forge') ? IMG.rune_forge.src : null;
