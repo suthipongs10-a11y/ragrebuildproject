@@ -55,9 +55,9 @@ export function passiveTests(): number {
   { const b = mk([R('A01', false)]), me = b.units[0]; me.hp = 10; me.statuses.push({ id: 'unheal', turns: 2 }); b.applyEffect(me, me, { kind: 'heal', value: 0.5 }, [], 1); ok(me.hp === 10, 'unheal blocks healing'); }
   { const b = mk([R('A01', false)]), foe = foe1(b), ev: any[] = []; foe.statuses.push({ id: 'bomb', turns: 1, value: 300 }); const h0 = foe.hp;
     b.endTurn(foe).forEach((e: any) => ev.push(e)); ok(foe.hp < h0 && ev.some(e => e.t === 'dot' && e.id === 'bomb') && (!foe.alive || b.has(foe, 'stun')), 'bomb explodes when it runs out: damage + stun'); }
-  { const b = mk([R('A03'), R('A02', false)]), me = b.units[0], al = b.units[1], foe = foe1(b); foe.hp = foe.maxHp = 99999; foe.atb = 50; me.atb = 0; al.atb = 0; me.passive = undefined;
+  { const b = mk([R('A03'), R('A02', false)]), me = b.units[0], al = b.units[1], foe = foe1(b); foe.hp = foe.maxHp = 99999; foe.atb = 50; me.atb = 0; al.atb = 0; me.passives = [];
     b.act(me.uid, { si: 1, target: foe.uid }); ok(foe.atb === 10 && me.atb === 20 && al.atb === 20, 'steal: gauge taken and shared to the team'); }
-  { const b = mk([R('A08'), R('A01', false)]), w = b.units[0], fox = b.units[1]; w.pUsed = true; b.kill(fox, []);
+  { const b = mk([R('A08'), R('A01', false)]), w = b.units[0], fox = b.units[1]; w.used = ['revive']; b.kill(fox, []);
     const r = b.act(w.uid, { si: 2, target: w.uid }); ok(fox.alive && fox.hp === Math.round(fox.maxHp * 0.4) && Object.values(r.impacts).flat().some((e: any) => e.t === 'revive'), 'revive brings a fallen ally back'); }
 
   { const b = mk([R('A02'), R('A01', false)]), sl = b.units[0], fox = b.units[1], foe = foe1(b); foe.hp = foe.maxHp = 99999;

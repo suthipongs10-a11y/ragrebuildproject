@@ -16,8 +16,8 @@ const legendOf = v => SPECIES[v.sid.split('~')[0]]?.rarity === 'legendary';
 const SKY = Array.from({ length: 70 }, (_, i) => { const r = (n => () => (n = (n * 16807) % 2147483647) / 2147483647)(i * 7919 + 13); return [r() * 2 - 1, r() * 2 - 1, .4 + r() * 1.4, r() * 6]; });
 /** rare forms cast their ultimate in radiant gold (with prismatic rings on top) instead of their element colour */
 const RARE_PAL = { name: 'ร่างหายาก', aura: '#ffcf3a', core: '#fff3c0', hot: '#ffffff', rune: '#ffe27a', cut: '#b8860b', dh: 0, sat: 1, lit: 1, all: 1 };
-const STATUS_TH = { burn: 'เผาไหม้', poison: 'พิษ', stun: 'มึน', sleep: 'หลับ', blind: 'ตาบอด', def_down: 'DEF ↓', atk_down: 'ATK ↓', spd_down: 'SPD ↓', atk_up: 'ATK ↑', def_up: 'DEF ↑', spd_up: 'SPD ↑', crit_up: 'คริ ↑', shield: 'โล่', regen: 'ฟื้นฟู', invincible: 'อมตะ', immunity: 'ภูมิคุ้มกัน', protect: 'ปกป้อง', provoke: 'ยั่วยุ', silence: 'ผนึกสกิล', unheal: 'ห้ามฮีล', brand: 'ตราบาป', bomb: 'ระเบิดเงา' };
-const STATUS_COL = { burn: '#ffae6a', poison: '#b8f06a', stun: '#ffe066', sleep: '#c9b8ff', blind: '#a8a8c8', def_down: '#ff8a7a', atk_down: '#ff8a7a', spd_down: '#9fd8ff', atk_up: '#ff7a5a', def_up: '#9fd0ff', spd_up: '#9fffcf', crit_up: '#ffd27a', shield: '#bfe6ff', regen: '#7dffb0', invincible: '#fff6c8', immunity: '#d8fff0', protect: '#ffe6a8', provoke: '#ff7a6a', silence: '#c8a8ff', unheal: '#ff8ac8', brand: '#e070ff', bomb: '#b48cff' };
+const STATUS_TH = { burn: 'เผาไหม้', poison: 'พิษ', stun: 'มึน', sleep: 'หลับ', blind: 'ตาบอด', def_down: 'DEF ↓', atk_down: 'ATK ↓', spd_down: 'SPD ↓', atk_up: 'ATK ↑', def_up: 'DEF ↑', spd_up: 'SPD ↑', crit_up: 'คริ ↑', shield: 'โล่', regen: 'ฟื้นฟู', invincible: 'อมตะ', immunity: 'ภูมิคุ้มกัน', protect: 'ปกป้อง', provoke: 'ยั่วยุ', silence: 'ผนึกสกิล', unheal: 'ห้ามฮีล', brand: 'ตราบาป', bomb: 'ระเบิดเงา', freeze: 'แช่แข็ง', confuse: 'สับสน' };
+const STATUS_COL = { burn: '#ffae6a', poison: '#b8f06a', stun: '#ffe066', sleep: '#c9b8ff', blind: '#a8a8c8', def_down: '#ff8a7a', atk_down: '#ff8a7a', spd_down: '#9fd8ff', atk_up: '#ff7a5a', def_up: '#9fd0ff', spd_up: '#9fffcf', crit_up: '#ffd27a', shield: '#bfe6ff', regen: '#7dffb0', invincible: '#fff6c8', immunity: '#d8fff0', protect: '#ffe6a8', provoke: '#ff7a6a', silence: '#c8a8ff', unheal: '#ff8ac8', brand: '#e070ff', bomb: '#b48cff', freeze: '#9fe8ff', confuse: '#ffb3f0' };
 const ALLY_C = [-245, 165], ENEMY_C = [245, -115], PERP = [.6, .8];
 const OFFS = { 1: [0], 2: [-60, 60], 3: [-110, 0, 110], 4: [-150, -50, 50, 150] };
 
@@ -154,6 +154,7 @@ export class BattleView {
       case 'atb': if (!v) return; v.atb = e.atb; text(v.x + 28, this.headY(v) + 6, e.delta > 0 ? `เกจ +${e.delta}` : `เกจ ${e.delta}`, e.delta > 0 ? '#9fffcf' : '#9fd8ff', 14, { vz: 40 }); break;
       case 'cleanse': if (!v) return; text(v.x, this.headY(v) - 18, 'ล้างสถานะ', '#bff8ff', 14, { vz: 40 }); for (let i = 0; i < 6; i++) addP({ type: 'twinkle', x: v.x + rnd(-50, 50), y: v.y, z: rnd(20, 120), life: .7, size: rnd(6, 10), color: '#ffffff' }); break;
       case 'reaction': this.playReaction(e); break;
+      case 'confused': { const cv = this.V.get(e.uid); if (cv && !cv.dead) text(cv.x, this.headY(cv) - 30, 'สับสน! ตีพวกเดียวกัน', STATUS_COL.confuse, 16, { vz: 40 }); break; }
       case 'passive': { const pv = this.V.get(e.uid); if (!pv || pv.dead) break; // rare-form passive fired: rainbow banner + ring
         addP({ type: 'banner', x: pv.x, y: this.headY(pv) - 54, str: '✦ ' + e.name, color: PRISM[(this.pvc = ((this.pvc || 0) + 1) % PRISM.length)], size: 19, life: 1.3, keep: true });
         PRISM.forEach((c, i) => ring(pv.x, pv.y, 8, 70 + i * 14, c, .35 + i * .04, 3)); pv.glowF = Math.max(pv.glowF, .7); setTimeout(() => { if (!pv.busy) pv.glowF = 0; }, 450); sfx.perfect(); break; }

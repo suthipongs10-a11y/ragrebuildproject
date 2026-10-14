@@ -10,8 +10,11 @@ export type StatusId =
   // damage; value = protector uid) · provoke (must hit the provoker with skill 1; value = provoker uid), silence (skill 1
   // only), unheal (cannot be healed), brand (+25% damage taken), bomb (explodes when it runs out; value = raw damage)
   | 'invincible' | 'immunity' | 'protect'
-  | 'provoke' | 'silence' | 'unheal' | 'brand' | 'bomb';
-export const NEGATIVE: StatusId[] = ['burn', 'poison', 'stun', 'sleep', 'blind', 'def_down', 'atk_down', 'spd_down', 'provoke', 'silence', 'unheal', 'brand', 'bomb'];
+  | 'provoke' | 'silence' | 'unheal' | 'brand' | 'bomb'
+  // mechanics catalog 2026-10-14 (docs/SKILL_CATALOG_TH.md): freeze (แช่แข็ง: loses its turns; the next enemy hit deals +30%
+  // and shatters it) · confuse (สับสน: 50% each turn to strike an ally with skill 1 instead — never lethal)
+  | 'freeze' | 'confuse';
+export const NEGATIVE: StatusId[] = ['burn', 'poison', 'stun', 'sleep', 'blind', 'def_down', 'atk_down', 'spd_down', 'provoke', 'silence', 'unheal', 'brand', 'bomb', 'freeze', 'confuse'];
 export type TargetKind = 'enemy' | 'enemyAll' | 'allyAll' | 'self';
 export type AnimId =
   | 'melee' | 'shot' | 'volley' | 'heal' | 'buff' | 'shield'
@@ -20,7 +23,9 @@ export type AnimId =
 export interface SkillEffect {
   // revive: fallen allies come back with `value` of max HP (`n` of them, 0 = all) · strip: remove `n` beneficial statuses
   // (0 = all) · cdTeam: allies' non-ultimate cooldowns −`value` · steal: take `value` turn gauge, shared out to the caster's team
-  kind: 'mark' | 'status' | 'heal' | 'shield' | 'atb' | 'cleanse' | 'drain' | 'revive' | 'strip' | 'cdTeam' | 'steal';
+  // assist (ร่วมรบ): `n` allies strike the target with their skill 1 at `value` power · dreamEat (กินฝันร้าย): remove every
+  // harmful status and heal `value` of max HP per status removed
+  kind: 'mark' | 'status' | 'heal' | 'shield' | 'atb' | 'cleanse' | 'drain' | 'revive' | 'strip' | 'cdTeam' | 'steal' | 'assist' | 'dreamEat';
   elem?: Elem;
   status?: StatusId;
   turns?: number;
@@ -35,6 +40,10 @@ export interface SkillDef {
   mult: number;                 // 0 = no damage
   elem?: Elem;                  // defaults to caster element
   ignoreDef?: number;           // 0..1 share of the target's DEF ignored
+  hits?: number;                // ตีรัว: the damage comes in this many hits; target effects roll on every hit
+  scale?: 'hp' | 'def' | 'spd'; // พลังตามกาย: damage also grows with the caster's max HP / DEF / SPD
+  execute?: number;             // ประหาร: +this much damage against targets under half HP
+  chain?: number;               // สายฟ้ากระโดด: after the target, jumps to this many other enemies (70%, 49% ...)
   effects: SkillEffect[];
   anim: AnimId;
   ult?: boolean;
@@ -57,8 +66,16 @@ export type PassiveKind =
   | 'counter'        // when hit: `chance` to strike back with skill 1 at `value` power
   | 'startShield'    // battle start: all allies get a `value` shield for 2 turns
   | 'critDebuff'     // its critical hits inflict `status`
-  | 'overheal';      // overflow from its heals becomes a shield (up to `value` of max HP)
-export interface PassiveDef { kind: PassiveKind; name: string; desc: string; chance?: number; value?: number; status?: StatusId }
+  | 'overheal'       // overflow from its heals becomes a shield (up to `value` of max HP)
+  // signature passives (catalog 2026-10-14) — also usable as a normal-form passive (SpeciesDef.passive)
+  | 'bash'           // ทุบสะท้าน: its hits have `chance` to stun 1 turn
+  | 'evade'          // ร่างเงาลม: `chance` to dodge single-target attacks
+  | 'rebirth'        // เกิดใหม่จากเถ้า: once per battle it rises again with `value` HP when it falls
+  | 'critTurn'       // จังหวะทอง: a critical hit gives `chance` of another turn
+  | 'allyEndure'     // ไฟอุ่นใจ: once per battle the first ally hit by a lethal blow survives at 1 HP
+  | 'aura'           // ออร่า: while it stands, its team gets +`value` `stat` (atk/def % · crit chance · spd %)
+  | 'leech';         // ดูดเลือด: heals `value` of the damage it deals
+export interface PassiveDef { kind: PassiveKind; name: string; desc: string; chance?: number; value?: number; status?: StatusId; stat?: 'atk' | 'def' | 'crit' | 'spd' }
 export interface LeaderSkill { stat: 'atk' | 'hp' | 'def' | 'spd' | 'crit' | 'res'; value: number; text: string }
 export interface SpeciesDef {
   id: string; name: string; nameEn: string;
@@ -67,6 +84,8 @@ export interface SpeciesDef {
   skills: [SkillDef, SkillDef, SkillDef];
   leader?: LeaderSkill;
   rarePassive?: PassiveDef;     // unlocked only by the rare form
+  /** signature passive (owner 2026-10-14, SW style): every form has it, on top of the 3 skills and the rare-form passive */
+  passive?: PassiveDef;
   /** the rare form is a light/dark monster of its own: same name, new element, skill 1 kept (in the new element),
    *  its own skills 2 and 3 (decided 2026-10-13) */
   rareForm?: { elem: Elem; skills: [SkillDef, SkillDef] };
@@ -105,7 +124,7 @@ export interface Unit {
   atb: number; cds: number[]; skills: SkillDef[];
   statuses: Status[]; marks: Mark[];
   alive: boolean; leader: boolean;
-  rare?: boolean; passive?: PassiveDef; pUsed?: boolean;
+  rare?: boolean; passives?: PassiveDef[]; used?: string[]; // signature + rare-form passives · once-per-battle passives spent
   runeReact?: number; leech?: number; markUp?: number; // rune sets: reaction damage, lifesteal, element-mark chance
   awake?: boolean; // hell enemy: drawn in its evolved (awakened) form, or deep purple when it has none
 }
@@ -129,6 +148,7 @@ export type Ev =
   | { t: 'skip'; uid: number; reason: StatusId | 'dead' }
   | { t: 'wave'; wave: number; units: number[] }
   | { t: 'passive'; uid: number; name: string }
+  | { t: 'confused'; uid: number }
   | { t: 'end'; win: boolean };
 export type ReactionId = 'wildfire' | 'storm' | 'steam' | 'lava' | 'eclipse';
 

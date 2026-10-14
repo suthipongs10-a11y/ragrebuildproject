@@ -50,6 +50,9 @@ export function drawAurasFront(ctx, v, t, views, headY) {
   if (st.has('protect')) { const p = views && [...views].find(o => o.uid === v.protector && !o.dead); if (p) tether(ctx, p, v, t); }
   const inv = st.has('invincible'), shd = v.shieldAmt > 0;
   if (inv || shd || v.domeOut > 0) domeAt(ctx, v, B, t, inv ? INVINC : SHIELD);
+  if (st.has('freeze')) iceBlock(ctx, v, B, t);
+  if (st.has('confuse')) for (let i = 0; i < 3; i++) { const a = t * 3 + i * TAU / 3, x = v.x + Math.cos(a) * B.w * .55, y = (headY != null ? headY : v.y - B.h) - 18 + Math.sin(a) * 7;
+    ctx.save(); ctx.globalAlpha = .85; ctx.fillStyle = i === 1 ? '#fff3a8' : '#ffb3f0'; ctx.font = '700 22px sans-serif'; ctx.textAlign = 'center'; ctx.fillText(i === 1 ? '?' : '✦', x, y - 10); ctx.restore(); }
   // dark curses float above the head
   let mx = v.x - 22; const hy = (headY != null ? headY : v.y - B.h) - 46; // above the HP bar and status icons
   for (const id of ['bomb', 'brand', 'silence', 'provoke', 'unheal']) if (st.has(id)) { curse(ctx, id, mx, hy + Math.sin(t * 3 + mx) * 3, t); mx += 30; }
@@ -116,4 +119,15 @@ export function domeBreak(v) {
   if (v.dead) return; const B = body(v); v.domeOut = 1;
   for (let i = 0; i < 18; i++) addP({ type: 'chip', add: true, x: v.x + rnd(-B.w * 1.2, B.w * 1.2), y: v.y + rnd(-6, 6), z: rnd(20, B.h), vz: rnd(80, 220), vx: rnd(-120, 120), grav: 500, life: rnd(.5, .8), size: rnd(6, 11), color: '#bfe8ff', rot: rnd(0, 6), vr: rnd(-8, 8) });
   ring(v.x, v.y, 20, B.w * 2.4, '#bfe8ff', .4, 4);
+}
+
+/** แช่แข็ง: a translucent ice block around the body with a few crystal spikes and a cold rim */
+function iceBlock(ctx, v, B, t) {
+  const w = B.w * 1.25, h = B.h * .95, x = v.x, y = v.y;
+  ctx.save(); ctx.globalAlpha = .38 + .05 * Math.sin(t * 2);
+  const g = ctx.createLinearGradient(x - w, y - h, x + w, y); g.addColorStop(0, '#e8fbff'); g.addColorStop(.5, '#8fd8ff'); g.addColorStop(1, '#4a9fd8');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(x - w, y); ctx.lineTo(x - w * .9, y - h * .82); ctx.lineTo(x - w * .35, y - h); ctx.lineTo(x + w * .45, y - h * .94); ctx.lineTo(x + w, y - h * .7); ctx.lineTo(x + w * .92, y); ctx.closePath(); ctx.fill();
+  ctx.globalAlpha = .7; ctx.strokeStyle = '#e8fbff'; ctx.lineWidth = 2; ctx.stroke();
+  ctx.globalAlpha = .55; ctx.beginPath(); ctx.moveTo(x - w * .6, y - h * .2); ctx.lineTo(x - w * .1, y - h * .75); ctx.moveTo(x + w * .2, y - h * .15); ctx.lineTo(x + w * .55, y - h * .6); ctx.stroke();
+  ctx.restore();
 }

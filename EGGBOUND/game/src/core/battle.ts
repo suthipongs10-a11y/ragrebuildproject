@@ -7,7 +7,7 @@ import type {
   Unit, Ev, Elem, StatusId, SkillDef, SkillEffect, TurnStart, ActionResult, Command, MonsterRef, EnemyRef, StageDef, ReactionId,
 } from './types';
 import { NEGATIVE } from './types';
-import type { HomeMods } from './types';
+import type { HomeMods, PassiveDef } from './types';
 
 const ADV: Partial<Record<Elem, Elem>> = { fire: 'wind', wind: 'earth', earth: 'water', water: 'fire', light: 'dark', dark: 'light' };
 export function elemMult(a: Elem, d: Elem): number {
@@ -46,6 +46,7 @@ export class Battle {
   startEvents: Ev[] = [];
   private rx = 1; // reaction damage multiplier while resolving an ally reaction
   private curSi = 0; private stolen = 0; // the skill being used (team cooldown cuts skip it) · turn gauge stolen this action
+  private actorCrit = false; // the acting unit landed a critical hit this action (จังหวะทอง)
   constructor(public seed: number, public team: MonsterRef[], public stage: StageDef, public mods: HomeMods = {}) {
     this.rng = new Rng(seed);
     this.aiRng = [new Rng(seed ^ 0x9e3779b9), new Rng(seed ^ 0x85ebca6b)];
@@ -68,24 +69,36 @@ export class Battle {
     return ev;
   }
 
-  // ---------- rare-form passives ----------
-  private pk(u: Unit, kind: string) { return u.passive?.kind === kind; }
-  private pev(u: Unit, ev: Ev[]) { ev.push({ t: 'passive', uid: u.uid, name: u.passive!.name }); }
+  // ---------- passives (signature passive of every form + the rare-form passive) ----------
+  private pk(u: Unit, kind: string): PassiveDef | undefined { return u.passives?.find(p => p.kind === kind); }
+  private pev(u: Unit, p: PassiveDef, ev: Ev[]) { ev.push({ t: 'passive', uid: u.uid, name: p.name }); }
+  /** once-per-battle passives: true the first time (and marks it spent) */
+  private once(u: Unit, kind: string) { if (u.used?.includes(kind)) return false; (u.used ||= []).push(kind); return true; }
+  private spent(u: Unit, kind: string) { return !!u.used?.includes(kind); }
+  /** team aura total for a stat (every living teammate with an aura of that stat, itself included) */
+  private aura(u: Unit, stat: string) { let v = 0; for (const f of this.units) if (f.team === u.team && f.alive) for (const p of f.passives || []) if (p.kind === 'aura' && p.stat === stat) v += p.value || 0; return v; }
   /** passives that fire once when the battle starts */
   private passiveStart(): Ev[] {
     const ev: Ev[] = [];
     for (const u of this.allies()) {
-      if (this.pk(u, 'startAtb')) { this.pev(u, ev); for (const f of this.allies()) { f.atb = Math.min(100, f.atb + u.passive!.value!); ev.push({ t: 'atb', tgt: f.uid, delta: u.passive!.value!, atb: f.atb }); } }
-      if (this.pk(u, 'startShield')) { this.pev(u, ev); for (const f of this.allies()) { const amt = Math.round(f.maxHp * u.passive!.value!); f.statuses = f.statuses.filter(x => x.id !== 'shield'); f.statuses.push({ id: 'shield', turns: 2, value: amt, fresh: false }); ev.push({ t: 'shield', tgt: f.uid, amt }); } }
+      let p = this.pk(u, 'startAtb'); if (p) { this.pev(u, p, ev); for (const f of this.allies()) { f.atb = Math.min(100, f.atb + p.value!); ev.push({ t: 'atb', tgt: f.uid, delta: p.value!, atb: f.atb }); } }
+      p = this.pk(u, 'startShield'); if (p) { this.pev(u, p, ev); for (const f of this.allies()) { const amt = Math.round(f.maxHp * p.value!); f.statuses = f.statuses.filter(x => x.id !== 'shield'); f.statuses.push({ id: 'shield', turns: 2, value: amt, fresh: false }); ev.push({ t: 'shield', tgt: f.uid, amt }); } }
     }
     return ev;
   }
-  /** a lethal blow: endure saves the unit once (1 HP + shield). Returns true when saved. */
+  /** a lethal blow: endure saves the unit once (1 HP + shield), or a teammate's ไฟอุ่นใจ (allyEndure) keeps it at 1 HP.
+   *  Returns true when saved. */
   private endure(t: Unit, ev: Ev[]): boolean {
-    if (t.hp > 0 || !this.pk(t, 'endure') || t.pUsed) return false;
-    t.pUsed = true; t.hp = 1; this.pev(t, ev);
-    const amt = Math.round(t.maxHp * t.passive!.value!); t.statuses = t.statuses.filter(x => x.id !== 'shield'); t.statuses.push({ id: 'shield', turns: 2, value: amt, fresh: t === this.actor });
-    ev.push({ t: 'heal', tgt: t.uid, amt: 1, hp: 1 }); ev.push({ t: 'shield', tgt: t.uid, amt }); return true;
+    if (t.hp > 0) return false;
+    const p = this.pk(t, 'endure');
+    if (p && this.once(t, 'endure')) {
+      t.hp = 1; this.pev(t, p, ev);
+      const amt = Math.round(t.maxHp * p.value!); t.statuses = t.statuses.filter(x => x.id !== 'shield'); t.statuses.push({ id: 'shield', turns: 2, value: amt, fresh: t === this.actor });
+      ev.push({ t: 'heal', tgt: t.uid, amt: 1, hp: 1 }); ev.push({ t: 'shield', tgt: t.uid, amt }); return true;
+    }
+    const g = this.units.find(x => x.team === t.team && x.alive && this.pk(x, 'allyEndure') && !this.spent(x, 'allyEndure'));
+    if (g && this.once(g, 'allyEndure')) { t.hp = 1; this.pev(g, this.pk(g, 'allyEndure')!, ev); ev.push({ t: 'heal', tgt: t.uid, amt: 1, hp: 1 }); return true; }
+    return false;
   }
 
   // ---------- setup ----------
@@ -97,9 +110,10 @@ export class Battle {
       maxHp: hp, hp, atk: Math.round(statAt(s.base.atk, m.lvl, m.stars) * (m.atkMult || 1)), def: statAt(s.base.def, m.lvl, m.stars),
       spd: spdAt(s.base.spd, m.lvl, m.stars), crit: 0.15, critDmg: 0.5, res: boss ? 0.35 : 0.15, acc: 0,
       atb: 0, cds: [0, 0, 0], skills: form.skills.map((k, i) => { const sk = skillAt(k, m.sk?.[i] || 1, i); return k.ult && isMythic(s.id, !!(m as MonsterRef).rare) ? mythicUlt(sk) : sk; }), statuses: [], marks: [], alive: true, leader: team === 0 && slot === 0,
-      rare: !!(m as MonsterRef).rare, passive: (m as MonsterRef).rare ? s.rarePassive : undefined, pUsed: false,
+      rare: !!(m as MonsterRef).rare, passives: [s.passive, (m as MonsterRef).rare ? s.rarePassive : undefined].filter((p): p is PassiveDef => !!p),
     };
     const rb = (m as MonsterRef).rb; if (rb) applyRunes(u, rb);
+    for (const p of u.passives!) if (p.kind === 'leech') u.leech = (u.leech || 0) + (p.value || 0); // ดูดเลือด stacks with the blood runes
     return u;
   }
   private applyLeader(u: Unit, stat: string, v: number) {
@@ -125,7 +139,7 @@ export class Battle {
   foes(u: Unit) { return this.units.filter(x => x.team !== u.team && x.alive); }
   friends(u: Unit) { return this.units.filter(x => x.team === u.team && x.alive); }
   has(u: Unit, id: StatusId) { return u.statuses.some(s => s.id === id); }
-  effSpd(u: Unit) { return u.spd * (1 + (this.has(u, 'spd_up') ? 0.3 : 0) - (this.has(u, 'spd_down') ? 0.3 : 0)); }
+  effSpd(u: Unit) { return u.spd * (1 + (this.has(u, 'spd_up') ? 0.3 : 0) - (this.has(u, 'spd_down') ? 0.3 : 0) + this.aura(u, 'spd')); }
   /** units sorted by time until their next turn (for the turn-order bar) */
   order(): number[] {
     return this.units.filter(u => u.alive).map(u => ({ u, t: (100 - u.atb) / this.effSpd(u) }))
@@ -151,10 +165,11 @@ export class Battle {
       } else if (s.id === 'regen') this.healBy(a, Math.round(a.maxHp * 0.1), ev);
     }
     for (let i = 0; i < 3; i++) if (a.cds[i] > 0) a.cds[i]--;
-    if (a.hp > 0 && this.pk(a, 'turnHeal')) { const w = this.friends(a).filter(f => f.hp < f.maxHp).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp || x.uid - y.uid)[0];
-      if (w) { this.pev(a, ev); this.healBy(w, Math.round(w.maxHp * a.passive!.value!), ev); } }
+    const th = this.pk(a, 'turnHeal');
+    if (a.hp > 0 && th) { const w = this.friends(a).filter(f => f.hp < f.maxHp).sort((x, y) => x.hp / x.maxHp - y.hp / y.maxHp || x.uid - y.uid)[0];
+      if (w) { this.pev(a, th, ev); this.healBy(w, Math.round(w.maxHp * th.value!), ev); } }
     if (a.hp <= 0) { this.kill(a, ev); ev.push(...this.endTurn(a)); ev.push(...this.checkEnd()); return { uid: a.uid, events: ev, skip: true }; }
-    const cc = a.statuses.find(s => s.id === 'stun' || s.id === 'sleep');
+    const cc = a.statuses.find(s => s.id === 'stun' || s.id === 'sleep' || s.id === 'freeze');
     if (cc) { ev.push({ t: 'skip', uid: a.uid, reason: cc.id }); ev.push(...this.endTurn(a)); ev.push(...this.checkEnd()); return { uid: a.uid, events: ev, skip: true }; }
     return { uid: a.uid, events: ev, skip: false };
   }
@@ -178,8 +193,11 @@ export class Battle {
     const a = this.get(uid);
     cmd = this.forced(a) || cmd;
     let si = this.canUse(a, cmd.si) ? cmd.si : 0;
+    // สับสน: half the time it strikes one of its own team with skill 1 instead (never lethal)
+    let confusedAt: Unit | undefined;
+    if (this.has(a, 'confuse') && this.rng.chance(0.5)) { const fr = this.friends(a).filter(f => f !== a); if (fr.length) { si = 0; confusedAt = fr[Math.floor(this.rng.next() * fr.length)]; } }
     const sk = a.skills[si];
-    this.curSi = si; this.stolen = 0;
+    this.curSi = si; this.stolen = 0; this.actorCrit = false;
     const perfect = !!cmd.perfect && !!sk.ult;
     a.cds[si] = sk.cd;
     const res: ActionResult = { uid, skillIndex: si, skill: sk, ult: !!sk.ult, perfect, targets: [], impacts: {}, after: [] };
@@ -189,7 +207,8 @@ export class Battle {
 
     // targets
     let targets: Unit[];
-    if (sk.target === 'enemy') {
+    if (confusedAt) targets = [confusedAt];
+    else if (sk.target === 'enemy') {
       const t = this.foes(a).find(x => x.uid === cmd.target) || this.foes(a)[0];
       targets = t ? [t] : [];
     } else if (sk.target === 'enemyAll') targets = this.foes(a);
@@ -197,17 +216,32 @@ export class Battle {
     else targets = [a];
     res.targets = targets.map(t => t.uid);
 
+    if (confusedAt) { // the confused blow: skill 1 on a teammate, no effects, no reaction
+      const ev = imp(confusedAt.uid); ev.push({ t: 'confused', uid: a.uid });
+      if (sk.mult > 0) this.hit(a, confusedAt, sk.mult * pm, elem, ev, { single: true, noKill: true });
+      res.after.push(...this.endTurn(a)); res.after.push(...this.checkEnd()); return res;
+    }
     let dealt = 0;
-    if (sk.mult > 0) {
-      for (const t of targets) {
-        const ev = imp(t.uid);
-        const h = this.hit(a, t, sk.mult * pm, elem, ev, { single: sk.target === 'enemy', ignoreDef: sk.ignoreDef });
-        dealt += h.dmg;
+    const strike = (t: Unit, mult: number, ev: Ev[], single: boolean) => { // one target: every hit of a ตีรัว skill rolls its effects
+      const n = Math.max(1, sk.hits || 1);
+      for (let k = 0; k < n && (k === 0 || (t.alive && t.hp > 0)); k++) { // the first hit lands as it always did
+        const h = this.hit(a, t, mult / n, elem, ev, { single, ignoreDef: sk.ignoreDef, scale: sk.scale, execute: sk.execute, primary: true });
+        dealt += h.dmg; if (h.crit) this.actorCrit = true;
         if (!h.miss) {
-          this.tryReaction(a, t, elem, ev);
+          if (k === 0) this.tryReaction(a, t, elem, ev);
           for (const e of sk.effects) if (!e.to || e.to === 'target') this.applyEffect(a, t, e, ev, pm);
         }
-        if (t.hp <= 0 && t.alive && !this.endure(t, ev)) this.kill(t, ev);
+      }
+      if (t.hp <= 0 && t.alive && !this.endure(t, ev)) this.kill(t, ev);
+    };
+    if (sk.mult > 0) {
+      for (const t of targets) strike(t, sk.mult * pm, imp(t.uid), sk.target === 'enemy');
+      if (sk.chain && sk.target === 'enemy' && targets.length) { // สายฟ้ากระโดด: jumps on to other enemies, weaker each time
+        let k = 0.7;
+        for (let c = 0; c < sk.chain; c++) {
+          const nx = this.foes(a).filter(f => !targets.includes(f)).sort((x, y) => x.slot - y.slot || x.uid - y.uid)[0]; if (!nx) break;
+          targets.push(nx); res.targets.push(nx.uid); strike(nx, sk.mult * pm * k, imp(nx.uid), false); k *= 0.7;
+        }
       }
     }
     for (const e of sk.effects) {
@@ -225,10 +259,14 @@ export class Battle {
     const foesHit = targets.filter(t => t.team !== a.team);
     for (const t of foesHit) {
       if (!t.alive || !a.alive) continue;
-      if (this.pk(t, 'counter') && this.rng.chance(t.passive!.chance!)) { this.pev(t, res.after); this.hit(t, a, t.skills[0].mult * t.passive!.value!, t.elem, res.after, { single: true }); if (a.hp <= 0 && a.alive && !this.endure(a, res.after)) this.kill(a, res.after); }
-      if (a.alive && this.pk(t, 'curseOnHit') && this.rng.chance(t.passive!.chance!)) { this.pev(t, res.after); this.addStatus(t, a, t.passive!.status!, 2, 1, res.after, true); }
+      const cp = this.pk(t, 'counter');
+      if (cp && this.rng.chance(cp.chance!)) { this.pev(t, cp, res.after); this.hit(t, a, t.skills[0].mult * cp.value!, t.elem, res.after, { single: true }); if (a.hp <= 0 && a.alive && !this.endure(a, res.after)) this.kill(a, res.after); }
+      const cu = this.pk(t, 'curseOnHit');
+      if (a.alive && cu && this.rng.chance(cu.chance!)) { this.pev(t, cu, res.after); this.addStatus(t, a, cu.status!, 2, 1, res.after, true); }
     }
-    if (a.alive && this.pk(a, 'killTurn') && foesHit.some(t => !t.alive) && this.foes(a).length) { this.pev(a, res.after); a.atb = 100; res.after.push({ t: 'atb', tgt: a.uid, delta: 100, atb: 100 }); }
+    const kt = this.pk(a, 'killTurn'), ct = this.pk(a, 'critTurn');
+    if (a.alive && kt && foesHit.some(t => !t.alive) && this.foes(a).length) { this.pev(a, kt, res.after); a.atb = 100; res.after.push({ t: 'atb', tgt: a.uid, delta: 100, atb: 100 }); }
+    else if (a.alive && ct && this.actorCrit && this.foes(a).length && this.rng.chance(ct.chance ?? 1)) { this.pev(a, ct, res.after); a.atb = 100; res.after.push({ t: 'atb', tgt: a.uid, delta: 100, atb: 100 }); }
     res.after.push(...this.endTurn(a));
     res.after.push(...this.checkEnd());
     return res;
@@ -257,16 +295,25 @@ export class Battle {
   }
 
   // ---------- mechanics ----------
-  private hit(a: Unit, t: Unit, mult: number, elem: Elem, ev: Ev[], o: { single?: boolean; noCrit?: boolean; trueDmg?: boolean; ignoreDef?: number } = {}) {
+  /** o.scale: พลังตามกาย (HP / DEF / SPD adds to ATK) · o.execute: ประหาร bonus under half HP · o.primary: the action's own
+   *  hit (procs ทุบสะท้าน) · o.noKill: leaves at least 1 HP (confused blows) */
+  private hit(a: Unit, t: Unit, mult: number, elem: Elem, ev: Ev[], o: { single?: boolean; noCrit?: boolean; trueDmg?: boolean; ignoreDef?: number; scale?: 'hp' | 'def' | 'spd'; execute?: number; primary?: boolean; noKill?: boolean } = {}) {
     if (o.single && this.has(a, 'blind') && this.rng.chance(0.5)) { ev.push({ t: 'hit', src: a.uid, tgt: t.uid, dmg: 0, crit: false, em: 1, miss: true, hp: t.hp }); return { dmg: 0, miss: true }; }
+    const evp = o.single && a.team !== t.team ? this.pk(t, 'evade') : undefined; // ร่างเงาลม
+    if (evp && this.rng.chance(evp.chance!)) { this.pev(t, evp, ev); ev.push({ t: 'hit', src: a.uid, tgt: t.uid, dmg: 0, crit: false, em: 1, miss: true, hp: t.hp }); return { dmg: 0, miss: true }; }
     if (this.has(t, 'invincible')) { ev.push({ t: 'hit', src: a.uid, tgt: t.uid, dmg: 0, crit: false, em: 1, hp: t.hp, inv: true }); return { dmg: 0, miss: false }; }
-    const atk = a.atk * (1 + (this.has(a, 'atk_up') ? 0.3 : 0) - (this.has(a, 'atk_down') ? 0.3 : 0));
-    const def = o.trueDmg ? 0 : t.def * (this.has(t, 'def_up') ? 1.4 : 1) * (this.has(t, 'def_down') ? 0.5 : 1) * (1 - (o.ignoreDef || 0));
+    let atk = a.atk * (1 + (this.has(a, 'atk_up') ? 0.3 : 0) - (this.has(a, 'atk_down') ? 0.3 : 0) + this.aura(a, 'atk'));
+    if (o.scale === 'hp') atk = atk * 0.5 + a.maxHp * 0.07;
+    else if (o.scale === 'def') atk = atk * 0.5 + a.def * 1.3;
+    else if (o.scale === 'spd') atk *= 0.55 + this.effSpd(a) / 250;
+    const def = o.trueDmg ? 0 : t.def * (this.has(t, 'def_up') ? 1.4 : 1) * (this.has(t, 'def_down') ? 0.5 : 1) * (1 + this.aura(t, 'def')) * (1 - (o.ignoreDef || 0));
     const em = elemMult(elem, t.elem);
-    const crit = !o.noCrit && this.rng.chance(Math.min(0.8, a.crit + (this.has(a, 'crit_up') ? 0.2 : 0)));
+    const crit = !o.noCrit && this.rng.chance(Math.min(0.8, a.crit + (this.has(a, 'crit_up') ? 0.2 : 0) + this.aura(a, 'crit')));
     let dmg = mult * atk * 3 * (100 / (100 + def)) * em * (crit ? 1 + a.critDmg : 1) * this.rng.range(0.92, 1.08) * this.rx;
-    if (this.pk(t, 'guard') && t.hp > t.maxHp / 2) dmg *= 1 - t.passive!.value!;
+    if (o.execute && t.hp < t.maxHp / 2) dmg *= 1 + o.execute;
+    const gp = this.pk(t, 'guard'); if (gp && t.hp > t.maxHp / 2) dmg *= 1 - gp.value!;
     if (this.has(t, 'brand')) dmg *= 1.25;
+    const shatter = a.team !== t.team && this.has(t, 'freeze'); if (shatter) dmg *= 1.3; // a frozen target takes +30% and thaws
     dmg = Math.max(1, Math.round(dmg));
     const pr = a.team !== t.team ? t.statuses.find(s => s.id === 'protect') : undefined, pu = pr && this.units.find(x => x.uid === pr.value && x.alive && x !== t);
     if (pu && dmg > 1) { // a protector takes half (it cannot fall to it)
@@ -278,17 +325,19 @@ export class Battle {
     const sh = t.statuses.find(s => s.id === 'shield');
     if (sh && sh.value) { shieldAbs = Math.min(sh.value, dmg); sh.value -= shieldAbs; if (sh.value <= 0) { t.statuses = t.statuses.filter(s => s !== sh); ev.push({ t: 'status', tgt: t.uid, id: 'shield', add: false }); } }
     const real = dmg - shieldAbs;
-    t.hp = Math.max(0, t.hp - real);
+    t.hp = Math.max(o.noKill ? Math.min(1, t.hp) : 0, t.hp - real);
     ev.push({ t: 'hit', src: a.uid, tgt: t.uid, dmg, crit, em, hp: t.hp, shieldAbs: shieldAbs || undefined });
     if (a.leech && a.team !== t.team && real > 0 && a.alive && a.hp < a.maxHp && !this.has(a, 'unheal')) this.healBy(a, Math.max(1, Math.round(real * a.leech)), ev); // blood rune set
     if (real > 0 && this.has(t, 'sleep')) { t.statuses = t.statuses.filter(s => s.id !== 'sleep'); ev.push({ t: 'status', tgt: t.uid, id: 'sleep', add: false }); }
+    if (shatter) { t.statuses = t.statuses.filter(s => s.id !== 'freeze'); ev.push({ t: 'status', tgt: t.uid, id: 'freeze', add: false }); }
     if (a.team !== t.team) {
-      if (this.pk(t, 'thorns') && real > 0 && a.alive) { const th = Math.round(real * t.passive!.value!); if (th > 0) { a.hp = Math.max(1, a.hp - th); this.pev(t, ev); ev.push({ t: 'hit', src: t.uid, tgt: a.uid, dmg: th, crit: false, em: 1, hp: a.hp }); } }
-      if (this.pk(a, 'hitAtbDrain') && t.hp > 0) { const d = a.passive!.value!; t.atb = Math.max(0, t.atb - d); ev.push({ t: 'atb', tgt: t.uid, delta: -d, atb: t.atb }); }
-      if (crit && this.pk(a, 'critDebuff') && t.hp > 0) { this.pev(a, ev); this.addStatus(a, t, a.passive!.status!, 2, 1, ev, true); }
-      if (this.pk(a, 'hitStatusAtb') && this.has(t, a.passive!.status!) && this.rng.chance(a.passive!.chance!)) { this.pev(a, ev); a.atb = Math.min(100, a.atb + a.passive!.value!); ev.push({ t: 'atb', tgt: a.uid, delta: a.passive!.value!, atb: a.atb }); }
+      const tp = this.pk(t, 'thorns'); if (tp && real > 0 && a.alive) { const th = Math.round(real * tp.value!); if (th > 0) { a.hp = Math.max(1, a.hp - th); this.pev(t, tp, ev); ev.push({ t: 'hit', src: t.uid, tgt: a.uid, dmg: th, crit: false, em: 1, hp: a.hp }); } }
+      const dp = this.pk(a, 'hitAtbDrain'); if (dp && t.hp > 0) { const d = dp.value!; t.atb = Math.max(0, t.atb - d); ev.push({ t: 'atb', tgt: t.uid, delta: -d, atb: t.atb }); }
+      const cd = this.pk(a, 'critDebuff'); if (crit && cd && t.hp > 0) { this.pev(a, cd, ev); this.addStatus(a, t, cd.status!, 2, 1, ev, true); }
+      const hs = this.pk(a, 'hitStatusAtb'); if (hs && this.has(t, hs.status!) && this.rng.chance(hs.chance!)) { this.pev(a, hs, ev); a.atb = Math.min(100, a.atb + hs.value!); ev.push({ t: 'atb', tgt: a.uid, delta: hs.value!, atb: a.atb }); }
+      const bp = this.pk(a, 'bash'); if (bp && o.primary && t.hp > 0 && real > 0 && this.rng.chance(bp.chance!)) { this.pev(a, bp, ev); this.addStatus(a, t, 'stun', 1, 1, ev, true); } // ทุบสะท้าน
     }
-    return { dmg: real, miss: false };
+    return { dmg: real, miss: false, crit };
   }
 
   private tryReaction(a: Unit, t: Unit, elem: Elem, ev: Ev[]) {
@@ -334,8 +383,9 @@ export class Battle {
       case 'heal': {
         if (this.has(t, 'unheal')) { ev.push({ t: 'resist', tgt: t.uid, id: 'unheal' }); break; }
         const amt = Math.round(t.maxHp * (e.value || 0) * pm), over = t.hp + amt - t.maxHp; t.hp = Math.min(t.maxHp, t.hp + amt); ev.push({ t: 'heal', tgt: t.uid, amt, hp: t.hp });
-        if (over > 0 && this.pk(a, 'overheal')) { const cur = t.statuses.find(x => x.id === 'shield'), add = Math.min(over, Math.round(t.maxHp * a.passive!.value!)); if (cur) cur.value = (cur.value || 0) + add; else t.statuses.push({ id: 'shield', turns: 2, value: add, fresh: t === this.actor }); ev.push({ t: 'shield', tgt: t.uid, amt: cur ? cur.value! : add }); }
-        if (this.pk(a, 'healCleanse')) { const bad = t.statuses.find(x => NEGATIVE.includes(x.id)); if (bad && this.rng.chance(a.passive!.chance!)) { t.statuses = t.statuses.filter(x => x !== bad); ev.push({ t: 'status', tgt: t.uid, id: bad.id, add: false }); ev.push({ t: 'cleanse', tgt: t.uid }); } }
+        const op = this.pk(a, 'overheal'), hc = this.pk(a, 'healCleanse');
+        if (over > 0 && op) { const cur = t.statuses.find(x => x.id === 'shield'), add = Math.min(over, Math.round(t.maxHp * op.value!)); if (cur) cur.value = (cur.value || 0) + add; else t.statuses.push({ id: 'shield', turns: 2, value: add, fresh: t === this.actor }); ev.push({ t: 'shield', tgt: t.uid, amt: cur ? cur.value! : add }); }
+        if (hc) { const bad = t.statuses.find(x => NEGATIVE.includes(x.id)); if (bad && this.rng.chance(hc.chance!)) { t.statuses = t.statuses.filter(x => x !== bad); ev.push({ t: 'status', tgt: t.uid, id: bad.id, add: false }); ev.push({ t: 'cleanse', tgt: t.uid }); } }
         break;
       }
       case 'shield': {
@@ -366,6 +416,19 @@ export class Battle {
         break;
       }
       case 'steal': { const take = Math.min(t.atb, e.value || 0); if (take > 0) { t.atb -= take; this.stolen += take; ev.push({ t: 'atb', tgt: t.uid, delta: -take, atb: t.atb }); } break; }
+      case 'assist': { // ร่วมรบ: teammates strike the same target with their skill 1 (it can set off marks)
+        if (ch < 1 && !this.rng.chance(ch)) break;
+        for (const f of this.friends(a).filter(x => x !== a).sort((x, y) => x.slot - y.slot || x.uid - y.uid).slice(0, e.n || 1)) {
+          if (!t.alive || t.hp <= 0) break; const k = f.skills[0], fe = k.elem || f.elem;
+          const h = this.hit(f, t, k.mult * (e.value || 0.6), fe, ev, { single: true }); if (!h.miss) this.tryReaction(f, t, fe, ev);
+        }
+        break;
+      }
+      case 'dreamEat': { // กินฝันร้าย: every harmful status eaten heals `value` of max HP
+        const had = t.statuses.filter(s => NEGATIVE.includes(s.id));
+        if (had.length) { t.statuses = t.statuses.filter(s => !NEGATIVE.includes(s.id)); for (const s of had) ev.push({ t: 'status', tgt: t.uid, id: s.id, add: false }); ev.push({ t: 'cleanse', tgt: t.uid }); this.healBy(t, Math.round(t.maxHp * (e.value || 0) * had.length * pm), ev); }
+        break;
+      }
     }
   }
 
@@ -373,12 +436,12 @@ export class Battle {
     if (!t.alive) return;
     const neg = NEGATIVE.includes(id);
     if (neg && a.team !== t.team && this.has(t, 'immunity')) { ev.push({ t: 'resist', tgt: t.uid, id: 'immunity' }); return; }
-    if (neg && t.boss && (id === 'stun' || id === 'sleep')) { ev.push({ t: 'resist', tgt: t.uid, id }); return; }
+    if (neg && t.boss && (id === 'stun' || id === 'sleep' || id === 'freeze' || id === 'confuse')) { ev.push({ t: 'resist', tgt: t.uid, id }); return; }
     if (neg && !guaranteed) {
       const p = chance >= 1 ? 1 : Math.max(0.15, chance - t.res + a.acc);
       if (!this.rng.chance(p)) { if (chance > 0) ev.push({ t: 'resist', tgt: t.uid, id }); return; }
     }
-    if (neg && a.team !== t.team && this.pk(a, 'debuffExtend')) turns += a.passive!.value!;
+    const de = this.pk(a, 'debuffExtend'); if (neg && a.team !== t.team && de) turns += de.value!;
     const ex = t.statuses.find(s => s.id === id);
     if (ex) { ex.turns = Math.max(ex.turns, turns); if (value != null) ex.value = value; }
     else t.statuses.push({ id, turns, value, fresh: t === this.actor });
@@ -386,15 +449,20 @@ export class Battle {
   }
 
   private kill(u: Unit, ev: Ev[]) {
-    const rv = this.units.find(x => x.team === u.team && (x.alive || x === u) && this.pk(x, 'revive') && !x.pUsed);
-    if (rv) { // a lantern of souls brings the first fallen ally back
-      rv.pUsed = true; u.statuses = []; u.marks = []; u.hp = Math.round(u.maxHp * rv.passive!.value!);
-      this.pev(rv, ev); ev.push({ t: 'cleanse', tgt: u.uid }); ev.push({ t: 'heal', tgt: u.uid, amt: u.hp, hp: u.hp }); return;
+    const rv = this.units.find(x => x.team === u.team && (x.alive || x === u) && this.pk(x, 'revive') && !this.spent(x, 'revive'));
+    if (rv && this.once(rv, 'revive')) { // a lantern of souls brings the first fallen ally back
+      const p = this.pk(rv, 'revive')!; u.statuses = []; u.marks = []; u.hp = Math.round(u.maxHp * p.value!);
+      this.pev(rv, p, ev); ev.push({ t: 'cleanse', tgt: u.uid }); ev.push({ t: 'heal', tgt: u.uid, amt: u.hp, hp: u.hp }); return;
+    }
+    const rb = this.pk(u, 'rebirth');
+    if (rb && this.once(u, 'rebirth')) { // เกิดใหม่จากเถ้า: rises again by itself, once
+      u.statuses = []; u.marks = []; u.hp = Math.max(1, Math.round(u.maxHp * rb.value!));
+      this.pev(u, rb, ev); ev.push({ t: 'cleanse', tgt: u.uid }); ev.push({ t: 'heal', tgt: u.uid, amt: u.hp, hp: u.hp }); return;
     }
     u.alive = false; u.hp = 0; u.statuses = []; u.marks = [];
     if (u.team === 0) this.allyDeaths++;
     ev.push({ t: 'death', uid: u.uid });
-    if (this.pk(u, 'deathGift')) { this.pev(u, ev); for (const f of this.friends(u)) { this.healBy(f, Math.round(f.maxHp * u.passive!.value!), ev); f.atb = Math.min(100, f.atb + 30); ev.push({ t: 'atb', tgt: f.uid, delta: 30, atb: f.atb }); } }
+    const dg = this.pk(u, 'deathGift'); if (dg) { this.pev(u, dg, ev); for (const f of this.friends(u)) { this.healBy(f, Math.round(f.maxHp * dg.value!), ev); f.atb = Math.min(100, f.atb + 30); ev.push({ t: 'atb', tgt: f.uid, delta: 30, atb: f.atb }); } }
   }
 
   private endTurn(u: Unit): Ev[] {
