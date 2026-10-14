@@ -1,0 +1,170 @@
+=====================================================================
+EGGBOUND — ART BATCH 19B : SPECIAL LIGHT MONSTER
+"Khun Saming the White" (ขุนสมิงเผือก) — the special LIGHT Saming
+Image generation instructions for ChatGPT (or Google Flow)
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ตัวพิเศษธาตุแสงของเสือสมิง เป็นตัวใหม่ ภาพใหม่ทั้งชุด (ไม่ใช่ย้อมสีจากเสือสมิงเดิม):
+  เสือขาวยืนสองขาแบบคน ผ้าผูกหัวสีแดง แต่งกายแบบขุนศึกสยามโบราณเต็มยศ ถือขวานโลหิต สุดอลังการ
+- ชื่อชั่วคราว "ขุนสมิงเผือก" (เปลี่ยนได้) · ได้จากไข่พิเศษเท่านั้น · ดาวสูงกว่า เก่งกว่าตัวปกติ
+  (ตัวเลขพลัง/ไข่ที่ใช้ ตกลงกันอีกที ภาพไม่ขึ้นกับเรื่องนี้)
+- ChatGPT: เปิดแชทใหม่ แนบ 3 อย่าง
+  1) ไฟล์นี้
+  2) monB05_master (เสือสมิงร่างแรก: EGGBOUND/game/assets/monB05_master.webp) = ให้เห็นว่าเป็น "ตระกูลเดียวกัน"
+  3) mon001_master (จิ้งจอก: EGGBOUND/game/assets/mon001_master.webp) = อ้างอิงสไตล์ภาพของเกมเท่านั้น
+  พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ให้ดีก่อนตอบ "OK"
+- Google Flow: ได้ภาพ 1:1 พื้นหลังสีชมพู #FF00FF ก็ได้ ผมลบพื้นเอง
+- ส่งกลับ: zip เล็กไม่เกิน ~15MB หรือส่งเป็นไฟล์เดี่ยว ชื่อไฟล์ตามข้อ 6
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D turn-based monster RPG. Generate 12
+images of ONE special monster, ONE IMAGE PER TURN. The images are animated
+by code, so CONSISTENCY matters more than creativity: every image must show
+the exact same character.
+
+This is the rare LIGHT-element cousin of the Saming tiger (attached
+monB05_master: a lean indigo-black shadow tiger). Keep the family link —
+golden slit eyes, a pale crescent-moon mark on the forehead, one notched
+ear — but this one is a WHITE tiger who stands on two legs like a man and
+dresses as a legendary war lord (khun) of the old Siamese kingdom.
+The most collectible version of the family: grand, noble, unforgettable.
+
+Work order:
+  1. Generate #01 (MASTER) and wait for my "OK".
+  2. After "OK", generate #02–#12 one by one, using #01 as the reference.
+  3. Run the QUALITY CHECK, then deliver the files (section 6).
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Detailed and majestic, but clean and readable at small size on a phone.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Camera: HIGH ANGLE about 55 degrees looking down, orthographic feel.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: ground, cast shadow, glow, aura, halo, light rays, fire/particles,
+sparks, motion lines, dripping blood or gore, text, letters, watermark,
+frame, second character.
+(The game adds all aura, glow and effects in code.)
+ORIGINAL DESIGN - do not copy any existing game/film character, and do not
+resemble any existing game, film, anime or novel character (Dota, League of
+Legends, Summoners War, Pokemon, Digimon, Kung Fu Panda, etc.).
+
+Technical rules:
+- Canvas 1024 x 1024 px PNG, subject centered, at least 80 px empty margin
+  on every side (the axe too — nothing may touch the canvas edge).
+- The lowest point (feet) sits on an invisible ground line at y ≈ 870 px in
+  EVERY image.
+- SAME SCALE in every image of this set.
+- Size: LEGEND class - body height about 72-76% of the canvas.
+
+---------------------------------------------------------------------
+2. CHARACTER SHEET — Khun Saming the White (LIGHT, Attacker)
+---------------------------------------------------------------------
+- Species: a white tiger spirit standing UPRIGHT ON TWO LEGS like a man:
+  broad shoulders, powerful arms, tiger head, digitigrade tiger legs with big
+  clawed feet, a long tail.
+- Fur: pearl-white fur with soft pale-gold and warm grey tiger stripes; the
+  stripe tips on the forearms and tail curl like painted cloud-scrolls
+  (painted on the fur, nothing floating away).
+- Head: golden-yellow slit-pupil eyes, a pale-gold crescent-moon mark on the
+  forehead, one notched ear (the family marks), long white whiskers.
+  Expression: noble, fearless, a war lord's calm.
+- RED HEADBAND: a long crimson-red cloth band tied around the brow (above the
+  crescent mark, which stays visible), knotted at the back with two long tails
+  that stream behind the head. The signature — must read instantly.
+- Attire of an ancient Siamese war lord (khun), grand and ornate:
+  * a fitted white-and-gold war jacket with a high collar and gold-thread
+    Thai kranok (flame-scroll) trim,
+  * gold lacquered shoulder guards shaped like stylised tiger heads,
+  * a gold breastplate medallion and a diagonal crimson sash across the chest,
+  * gold arm bands on the upper arms and wide gold cuffs on the wrists,
+  * wrapped knee-length trousers in deep royal blue with a gold patterned hem
+    (Southeast-Asian wrapped-cloth style), shin guards of gold-trimmed leather,
+  * a short layered war skirt of gold-edged crimson panels at the hips.
+  Keep ornaments in SOLID shapes (white, gold, crimson, royal blue) with clear
+  edges — no thin noisy filigree everywhere.
+- BLOOD AXE (ขวานโลหิต): a huge two-handed great axe, as tall as his chest;
+  one broad crescent blade of DARK CRIMSON steel with a few blood-red painted
+  rune veins, a gold tiger-head fitting where blade meets haft, a long white
+  lacquered haft wrapped with red cord and a gold pommel. Heavy and legendary,
+  clean steel — NO dripping blood.
+- Feel: the noblest and most terrifying lord of the old kingdom — white and
+  gold with striking crimson. Majestic, grand, unforgettable.
+
+---------------------------------------------------------------------
+3. VIEWS
+---------------------------------------------------------------------
+FRONT VIEW = 3/4 front view from the high 55° camera, body facing
+             BOTTOM-RIGHT. We see the face and front.
+BACK VIEW  = 3/4 back view from the same camera, body facing TOP-RIGHT.
+             We see the back, the headband knot and tails, and only part of
+             the side of the face.
+
+---------------------------------------------------------------------
+4. IMAGE LIST
+---------------------------------------------------------------------
+For #02–#12 start every prompt with:
+"Using the attached reference as the EXACT same character (same design,
+colors, markings, outfit, axe, proportions, scale, line style and lighting),
+following all MASTER STYLE rules:"
+
+#01  MASTER (FRONT VIEW) — full-body design in the idle pose.
+#02  FRONT VIEW — IDLE:   Standing tall in a wide stance, the blood axe held
+                          diagonally across the body in both hands, headband
+                          tails flowing, calm fierce stare.
+#03  FRONT VIEW — ATTACK: A huge downward cleave toward bottom-right: axe swung
+                          down in a big arc, body lunging forward, tail whipping.
+#04  FRONT VIEW — CAST:   Axe planted head-down beside him, one clawed hand
+                          raised high with fingers spread, head thrown back in
+                          a roar, eyes narrowed.
+#05  FRONT VIEW — HIT:    Staggering back, axe haft raised to block, one ear
+                          flattened, gritted fangs.
+#06  FRONT VIEW — BURST:  Ultimate pose: axe raised high above the head in both
+                          hands, chest out, mouth open in a mighty roar, headband
+                          tails and sash flying, war skirt flaring.
+#07  BACK VIEW — IDLE   (same pose idea as #02, BACK VIEW)
+#08  BACK VIEW — ATTACK (same pose idea as #03, cleaving toward TOP-RIGHT)
+#09  BACK VIEW — CAST   (same pose idea as #04, BACK VIEW)
+#10  BACK VIEW — HIT    (same pose idea as #05, recoiling toward bottom-left)
+#11  BACK VIEW — BURST  (same pose idea as #06, BACK VIEW)
+#12  EGG — the special egg of this monster: an upright oval egg, pearl-white
+     shell with pale-gold tiger stripes, a thin crimson cloth band tied around
+     it with a knot, a small gold crescent mark. Height about 55% of the
+     canvas, bottom at y ≈ 870 px. No glow.
+
+---------------------------------------------------------------------
+5. QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] White tiger standing on TWO legs; family marks (golden slit eyes,
+      crescent mark, notched ear) visible
+  [ ] Red headband with two tails, khun war attire, crimson blood axe
+  [ ] Same outfit, axe, colors and proportions as #01 in every image
+  [ ] ≈72-76% of the canvas; feet at ~y 870 px; nothing touches the edge
+  [ ] Correct facing (FRONT → bottom-right, BACK → top-right)
+  [ ] No ground, shadow, glow, particles, motion lines, blood drips or text
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Does not resemble any existing game/anime/film character
+
+---------------------------------------------------------------------
+6. FILE NAMES & DELIVERY
+---------------------------------------------------------------------
+  #01 monB05s_master.png
+  #02 monB05s_front_idle.png      #07 monB05s_back_idle.png
+  #03 monB05s_front_attack.png    #08 monB05s_back_attack.png
+  #04 monB05s_front_cast.png      #09 monB05s_back_cast.png
+  #05 monB05s_front_hit.png       #10 monB05s_back_hit.png
+  #06 monB05s_front_burst.png     #11 monB05s_back_burst.png
+  #12 eggB05s.png
+
+ZIP name: EGGBOUND_SPECIAL_B05_SET.zip (all PNGs in the root) + notes.txt
+listing each file, background type, and any image regenerated and why.
+If the zip would be larger than about 15 MB, split it into two zips
+(PART1 = #01–#06, PART2 = #07–#12).
+=====================================================================
+END OF FILE
+=====================================================================

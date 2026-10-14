@@ -1,0 +1,176 @@
+=====================================================================
+EGGBOUND — ART BATCH 19 : EVOLVED FORM of MON_B05 "Saming Tiger"
+→ "Saming War Lord" (พญาสมิงทรงเครื่อง)
+Image generation instructions for ChatGPT (or Google Flow)
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ร่างวิวัฒน์ (★5) ของ เสือสมิง → พญาสมิงทรงเครื่อง: เสือสี่ขาตัวใหญ่ ทรงพลังแบบคิเมร่า (S02)
+  แต่งเครื่องทรงไทยเต็มยศ ผ้าผูกหัวสีแดง ปีกควันหมึกลายกนก
+- ไฟล์นี้คือร่างวิวัฒน์ของ "เสือสมิงตัวปกติ (ธาตุมืด)" เท่านั้น · ตัวพิเศษธาตุแสง "ขุนสมิงเผือก"
+  มีภาพชุดใหม่ของตัวเองอีกไฟล์ (BATCH19B)
+- ChatGPT: เปิดแชทใหม่ แนบ 4 อย่าง
+  1) ไฟล์นี้
+  2) monB05_master (ร่างแรก: EGGBOUND/game/assets/monB05_master.webp) = "ตัวละครต้นแบบ"
+  3) monB05_front_burst (EGGBOUND/game/assets/monB05_front_burst.webp) = ท่าเต็มพลังของร่างแรก
+  4) monS02_master (คิเมร่า: EGGBOUND/game/assets_ext/monS02_master.webp) = อ้างอิง "ขนาดและความอลังการ" เท่านั้น
+  พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ให้ดีก่อนตอบ "OK"
+  (ต้องดูออกทันทีว่าเป็นเสือสมิงตัวเดิมที่โตเป็นพญา และต้องไม่เหมือนคิเมร่า)
+- Google Flow: ได้ภาพ 1:1 พื้นหลังสีชมพู #FF00FF ก็ได้ ผมลบพื้นเอง
+- ส่งกลับ: zip เล็กไม่เกิน ~15MB หรือส่งเป็นไฟล์เดี่ยว (zip ใหญ่เคยขาดท้าย) ชื่อไฟล์ตามข้อ 6
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D turn-based monster RPG. This monster
+EVOLVES: when the player raises it enough, it transforms on screen into a
+grander adult form. Generate 11 images of the EVOLVED form, ONE IMAGE PER
+TURN. The images are animated by code, so CONSISTENCY matters more than
+creativity: every image must show the exact same evolved character.
+
+The attached monB05_master is the BASE FORM of this same monster (a lean
+young shadow tiger). The evolved form keeps its identity at a glance — same
+indigo-black fur, same smoky violet stripes, same golden slit eyes, same
+crescent-moon forehead mark, same notched ear — but it has grown into a
+colossal war-lord tiger dressed in grand ancient Siamese regalia.
+A player must instantly say "the Saming tiger became a king!".
+
+The attached monS02_master (a winged lion "chimera") is ONLY a reference for
+size, presence and level of grandeur. Do NOT copy its design: no horns, no
+dragon wings, no lion mane, no scorpion/blade tail, no black-bronze armor.
+
+Work order:
+  1. Generate #01 (EVOLVED MASTER) and wait for my "OK".
+  2. After "OK", generate #02–#11 one by one, using #01 as the reference.
+  3. Run the QUALITY CHECK, then deliver the files (section 6).
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image) — same as the base form
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+Evolved forms are more detailed and majestic than base forms, but stay clean
+and readable at small size on a phone.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Camera: HIGH ANGLE about 55 degrees looking down, orthographic feel.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: ground, cast shadow, glow, aura, fire/particles/sparks, motion lines,
+loose smoke clouds floating away from the body, text, letters, watermark,
+frame, rider, second character.
+(The game adds all aura, glow and effects in code.)
+ORIGINAL DESIGN - do not copy any existing game/film character, and do not
+resemble any existing game, film, anime or novel character (Dota, League of
+Legends, Summoners War, Pokemon, Digimon, etc.).
+
+Technical rules:
+- Canvas 1024 x 1024 px PNG, subject centered, at least 80 px empty margin
+  on every side (wing tips and tail too — nothing may touch the canvas edge).
+- The lowest point (paws) sits on an invisible ground line at y ≈ 870 px in
+  EVERY image.
+- SAME SCALE in every image of this set.
+- Size: EVOLVED class - body height about 72-76% of the canvas (clearly bigger
+  than the base form, which was about 62-66%).
+
+---------------------------------------------------------------------
+2. CHARACTER SHEET — Saming War Lord (DARK, Attacker)
+---------------------------------------------------------------------
+- Species: the same shape-shifting shadow tiger, now a COLOSSAL four-legged
+  war tiger: massive shoulders and chest, thick powerful legs, huge paws with
+  long violet-glass claws, a long heavy tail. Grand, fierce, regal — built
+  like a king of predators.
+- Fur: the same deep indigo-black fur with smoky violet tiger stripes; a thick
+  ruff of fur around the neck and cheeks shaped like swirling ink smoke frozen
+  in place (solid painted shapes). Stripes on the legs and tail tip dissolve
+  into PAINTED ink-smoke shapes (nothing floating away).
+- Head: the same golden-yellow slit-pupil eyes, crescent-moon pale mark on the
+  forehead (stays visible), one notched ear, long sabre-like upper fangs.
+  Expression: proud, fierce, calm power.
+- RED HEADBAND: a crimson cloth band tied around the brow just above the
+  crescent mark, knotted behind the ears, its two long tails streaming back
+  over the shoulders. This is the signature — it must read instantly.
+- Grand ancient Siamese war regalia (gold, crimson, deep indigo):
+  * a gold brow plate under the headband with a pointed Thai kranok-flame
+    crest rising between the ears (a small regal crest, not a tall crown),
+  * a jeweled gold collar and two gold chains crossing the chest like a
+    royal sash, with a round gold medallion set with a deep-indigo gem,
+  * a crimson saddle cloth draped over the back, edged in gold Thai kranok
+    (flame-scroll) patterns, with gold tassels hanging at the sides,
+  * gold shoulder guards shaped like stylised kranok flames,
+  * gold bracelets on all four legs and gold rings along the tail.
+  Keep ornaments in SOLID, clearly separated shapes with crisp edges —
+  ornate but readable, no thin noisy filigree everywhere.
+- SHADOW WINGS: two large wings growing from the shoulders, made of dark
+  ink-smoke shaped into layered Thai kranok flame scrolls (like carved
+  lacquer smoke), indigo-black with violet inner edges and thin gold edge
+  lines. Solid painted shapes — NOT feathers, NOT dragon membranes, NOT
+  glowing. Folded half-open in idle, fully spread in the burst pose.
+- Feel: a legendary night war lord of the old kingdom. Majestic, menacing,
+  unforgettable — the evolution players dream of.
+
+---------------------------------------------------------------------
+3. VIEWS
+---------------------------------------------------------------------
+FRONT VIEW = 3/4 front view from the high 55° camera, body facing
+             BOTTOM-RIGHT (head on the right, tail on the left). We see the
+             face and chest.
+BACK VIEW  = 3/4 back view from the same camera, body facing TOP-RIGHT.
+             We see the back, the saddle cloth, the headband knot and tails,
+             the wings from behind, and only part of the side of the face.
+
+---------------------------------------------------------------------
+4. IMAGE LIST
+---------------------------------------------------------------------
+For #02–#11 start every prompt with:
+"Using the attached evolved reference as the EXACT same character (same design,
+colors, markings, regalia, wings, proportions, scale, line style and lighting),
+following all MASTER STYLE rules:"
+
+#01  EVOLVED MASTER (FRONT VIEW) — full-body design in the idle pose.
+#02  FRONT VIEW — IDLE:   Standing tall and proud on four legs, head high,
+                          wings half-open, headband tails flowing, tail curled.
+#03  FRONT VIEW — ATTACK: Pouncing forward toward bottom-right, front claws
+                          slashing, jaws open, wings swept back.
+#04  FRONT VIEW — CAST:   Rearing up on the hind legs, front paws raised,
+                          head thrown back in a roar, wings lifted high.
+#05  FRONT VIEW — HIT:    Recoiling back, one ear flattened, wings jolted
+                          forward, fangs bared.
+#06  FRONT VIEW — BURST:  Ultimate pose: crouched low then lunging, wings fully
+                          spread wide, mouth open in a mighty roar, headband
+                          tails and saddle tassels flying.
+#07  BACK VIEW — IDLE   (same pose idea as #02, BACK VIEW)
+#08  BACK VIEW — ATTACK (same pose idea as #03, pouncing toward TOP-RIGHT)
+#09  BACK VIEW — CAST   (same pose idea as #04, BACK VIEW)
+#10  BACK VIEW — HIT    (same pose idea as #05, recoiling toward bottom-left)
+#11  BACK VIEW — BURST  (same pose idea as #06, BACK VIEW)
+
+---------------------------------------------------------------------
+5. QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] Instantly recognisable as the evolved Saming tiger (fur, stripes, golden
+      eyes, crescent mark, notched ear) — and clearly NOT the chimera
+  [ ] Four legs, red headband with two tails, Thai regalia, kranok smoke wings
+  [ ] Same regalia, wings, colors and proportions as #01 in every image
+  [ ] Bigger than the base form (≈72-76% of the canvas); paws at ~y 870 px
+  [ ] Nothing touches the canvas edge (wings and tail included)
+  [ ] Correct facing (FRONT → bottom-right, BACK → top-right)
+  [ ] No ground, shadow, glow, particles, motion lines or text
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Does not resemble any existing game/anime/film character
+
+---------------------------------------------------------------------
+6. FILE NAMES & DELIVERY
+---------------------------------------------------------------------
+  #01 monB05e_master.png
+  #02 monB05e_front_idle.png      #07 monB05e_back_idle.png
+  #03 monB05e_front_attack.png    #08 monB05e_back_attack.png
+  #04 monB05e_front_cast.png      #09 monB05e_back_cast.png
+  #05 monB05e_front_hit.png       #10 monB05e_back_hit.png
+  #06 monB05e_front_burst.png     #11 monB05e_back_burst.png
+
+ZIP name: EGGBOUND_EVO_B05_SET.zip (all PNGs in the root) + notes.txt listing
+each file, background type, and any image regenerated and why.
+If the zip would be larger than about 15 MB, split it into two zips
+(PART1 = #01–#06, PART2 = #07–#11).
+=====================================================================
+END OF FILE
+=====================================================================
