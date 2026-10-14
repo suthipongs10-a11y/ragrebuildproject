@@ -23,15 +23,25 @@ export const ANCH = {};
 for (const k in ANCH_RAW) { ANCH[k] = {}; for (const p in ANCH_RAW[k]) { const a = ANCH_RAW[k][p]; ANCH[k][p] = [a[0] / 2 - PIV[0], a[1] / 2 - PIV[1]]; } }
 
 // ---- separate-file art (assets_ext/ → dist/ext/<key>.webp, list in __EXT__): Starborn sprites and eggs, too big to embed
-// under the 16MB single-file limit. Loaded through fetch → blob URL so the images stay same-origin (pixel reads such as
-// bbox/recolour keep working); a failed load just leaves the placeholder art. ----
+// under the 16MB single-file limit. Pixel reads (bbox, recolour, portraits) need images the canvas may read, so the loader
+// tries, in order: a plain <img> (the way battle plates load; same-origin files stay readable), a CORS <img>, then
+// fetch → blob URL. The live Artifact refused fetch() for these files (2026-10-14: Starborn showed as foxes) while <img>
+// worked. An image the canvas cannot read is not used — the placeholder art stays. ----
 const EXT: string[] = typeof __EXT__ !== 'undefined' ? __EXT__ : [];
 const EXTP = {};
+export const EXT_STAT = { total: EXT.length, ok: 0, fail: 0, way: '' as string, err: '' as string };
+const imgOf = (src: string, cors = false) => new Promise<HTMLImageElement>((res, rej) => { const i = new Image(); if (cors) i.crossOrigin = 'anonymous'; i.onload = () => res(i); i.onerror = () => rej(new Error('img')); i.src = src; });
+function readable(i: HTMLImageElement) { try { const x = mk(1, 1).getContext('2d'); x.drawImage(i, 0, 0); x.getImageData(0, 0, 1, 1); return true; } catch (e) { return false; } }
+const tryWays = (key: string) => { const url = 'ext/' + key + '.webp';
+  const ways: [string, () => Promise<HTMLImageElement>][] = [['img', () => imgOf(url)], ['cors', () => imgOf(url, true)],
+    ['fetch', () => fetch(url).then(r => r.ok ? r.blob() : Promise.reject(new Error('http ' + r.status))).then(b => imgOf(URL.createObjectURL(b)))]];
+  let p: Promise<HTMLImageElement> = Promise.reject(new Error('start'));
+  for (const [name, f] of ways) p = p.catch(() => f().then(i => { if (!readable(i)) throw new Error(name + ': unreadable'); EXT_STAT.way ||= name; return i; }));
+  return p; };
 function loadExt(key): Promise<void> {
   if (IMG[key] || !EXT.includes(key)) return Promise.resolve();
-  return EXTP[key] ||= fetch('ext/' + key + '.webp').then(r => r.ok ? r.blob() : Promise.reject(new Error(key)))
-    .then(b => new Promise<void>(res => { const i = new Image(); i.onload = () => { IMG[key] = i; res(); }; i.onerror = () => res(); i.src = URL.createObjectURL(b); }))
-    .catch(() => { delete EXTP[key]; });
+  return EXTP[key] ||= tryWays(key).then(i => { IMG[key] = i; EXT_STAT.ok++; })
+    .catch(e => { delete EXTP[key]; EXT_STAT.fail++; EXT_STAT.err = String(e && e.message || e); });
 }
 /** drop every cached sprite / portrait / egg made for a species (placeholders drawn before its art arrived) */
 function forgetArt(sid) { for (const C of [SPR, silC, glowC, BB, ANC2, PORT, EGG, EGGU, RMU]) for (const k of Object.keys(C)) if (k === sid || k.startsWith(sid)) delete C[k]; }

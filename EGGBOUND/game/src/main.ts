@@ -3,10 +3,10 @@
 import { SPECIES, STAGES, ZONES, ZONE_PLAN, planOf, ENERGY_MAX, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
 import { Battle } from './core/battle';
 import { drawShowcase, showcaseTap } from './render/showcase';
-import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL, rareMasterURL, ensureArt, artReady, prefetchExt } from './render/assets';
+import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL, rareMasterURL, ensureArt, artReady, prefetchExt, EXT_STAT } from './render/assets';
 import { audioInit, setSound, sfx } from './render/audio';
 import { E, initCanvas, toWorld, updScripts, updParts, tickEngine, clearAll, worldTransform, drawGround, drawDecals, drawLanternPools, drawParts, drawFlies, drawLantern, drawBush, LANTERNS, BUSHES, drawOverlays, clamp } from './render/engine';
-import { setLocation, clearLocation, prefetchPlates, LOC_IDS } from './render/locations';
+import { setLocation, clearLocation, prefetchPlates, plateStat, LOC_IDS } from './render/locations';
 import { BattleView } from './render/battleView';
 import { HatchView } from './render/hatchView';
 import { HomeView } from './render/homeView';
@@ -58,6 +58,8 @@ function render() {
 }
 const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0'); };
 function enLabel() { const v = energyNow(S), n = energyNext(S); return `${v}/${ENERGY_MAX}` + (n ? ` <small>+1 ${mmss(n)}</small>` : ''); }
+/** separate-file art status for the settings screen (Starborn sprites + painted battle plates) */
+const extLine = () => { const p = plateStat(), x = EXT_STAT; return `ฉากต่อสู้ ${p.ok}/${p.total} · ตำนานดารา ${x.ok}/${x.total}${x.way ? ` (โหลดแบบ ${x.way})` : ''}${x.fail ? ` · โหลดไม่ได้ ${x.fail} ครั้ง: ${esc(x.err)}` : ''}`; };
 const enPill = () => `<button class="gold en" type="button" data-en="open" title="พลังงาน — ใช้เฉพาะตอนเปิด AUTO · เล่นเองไม่ใช้ · แตะเพื่อเติมด้วยเพชร"><b>⚡</b><span class="enTxt">${enLabel()}</span><em class="enplus">+</em></button>`;
 /** gem energy refill sheet (owner 2026-10-13: ENERGY_REFILL_DAILY per local day); `need` = the AUTO cost that brought the player here */
 let enNeed = 0;
@@ -377,6 +379,7 @@ function settingsHTML() {
   <div class="set"><span>ทดสอบ (prototype): ไข่ปริศนา</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="eggs">รับไข่ 4 ลาย</button><button class="alt" type="button" data-dev="incub">บ่มเสร็จทันที</button></span></div>
   <div class="set"><span>ทดสอบ (prototype): มอนชุดใหม่</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="mons">รับมอนทุกตัว</button><button class="alt" type="button" data-dev="evo">เตรียมอัปดาว</button><button class="alt" type="button" data-dev="gems">+เพชร 500</button><button class="alt" type="button" data-dev="rare">ทำให้เป็นร่างหายาก</button><button class="alt" type="button" data-dev="star5">อัปเป็น ★5 (ดูร่างวิวัฒน์)</button></span></div>
   <div class="set"><span>ทดสอบ (prototype): ฟักมอนระดับ</span><span class="row" style="flex:0 0 auto">${['common', 'rare', 'epic', 'legendary'].map(g => `<button class="alt" type="button" data-dev="hatch:${g}">${LOOT_GRADES[g].name}</button>`).join('')}</span></div>
+  <div class="set"><span>ภาพไฟล์แยก (ตรวจการโหลด)<small class="note" style="display:block">${extLine()}</small></span></div>
   <div class="set"><span>ทดสอบ (prototype): พลังงาน AUTO</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="energy">เติมพลังงานเต็ม</button></span></div>
   <div class="set"><span>ทดสอบ (prototype): หีบสมบัติ</span><span class="row" style="flex:0 0 auto">${['common', 'rare', 'epic', 'legendary'].map(g => `<button class="alt" type="button" data-dev="chest:${g}">${LOOT_GRADES[g].name}</button>`).join('')}</span></div>
   <p class="note">P0 เซฟในเครื่องนี้เท่านั้น · ระบบต่อสู้ทำงานแบบ deterministic (seed เดิม + คำสั่งเดิม = ผลเดิม) เพื่อให้เซิร์ฟเวอร์ตรวจผลได้ในเฟสออนไลน์</p></div></section>`;
@@ -713,6 +716,6 @@ function frame(now) {
     initCanvas($('#game'));
     $('#loading').hidden = true; render(); requestAnimationFrame(frame); setTimeout(() => { prefetchPlates(); prefetchExt(() => { if (!battle && !hatch && cur !== 'home') render(); }); }, 1500); // painted battle plates + Starborn art are separate files
     (window as any).__w2s = id => { const [x, y] = homeV.bPos(BDEF[id]); const z = E.base * E.zoom; return [(x - E.cam.x) * z + E.W / 2, (y - 30 * homeV.scaleShow - E.cam.y) * z + E.H / 2]; };
-    (window as any).__eb = { get S() { return S; }, get battle() { return battle; }, get hatch() { return hatch; }, startBattle, startHatch, show, devTool, get homeV() { return homeV; }, get chest() { return chestUI; }, selectB(id) { homeV.sel = id; selB = id; renderPanel(); }, setLocation, LOC_IDS, get E() { return E; } };
+    (window as any).__eb = { get S() { return S; }, get battle() { return battle; }, get hatch() { return hatch; }, startBattle, startHatch, show, devTool, IMG, get homeV() { return homeV; }, get chest() { return chestUI; }, selectB(id) { homeV.sel = id; selB = id; renderPanel(); }, setLocation, LOC_IDS, get E() { return E; } };
   } catch (err) { $('#loading').textContent = 'โหลดไม่สำเร็จ: ' + err.message; console.error(err); }
 })();

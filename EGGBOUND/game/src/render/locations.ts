@@ -786,6 +786,8 @@ function plate(id) {
   if (!im) { im = PLATE[id] = new Image(); im.decoding = 'async'; im.onerror = () => { ART.delete(id); delete PLATE[id]; }; im.src = 'bg/' + id + '.webp'; }
   return im.complete && im.naturalWidth ? im : null;
 }
+/** painted plates loaded / listed (settings shows it to check the live build) */
+export const plateStat = () => ({ ok: Object.values(PLATE).filter((im: any) => im.complete && im.naturalWidth).length, total: ART.size });
 /** warm the browser cache with every plate, one at a time, after the game has loaded */
 export function prefetchPlates() {
   const ids = [...ART]; let i = 0;
