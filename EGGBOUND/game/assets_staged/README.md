@@ -25,3 +25,7 @@ bundle size. When the monster is added to `SPECIES` (data.ts), move its files in
 - 2026-10-14: Z01 Hrimarch the Frost Sovereign (ice-king boss, BATCH22): complete 16/16 — 12 standard + `front_down`
   imported at front_idle height 380 (boss); ice shards `fxZ01_shard_a|b|c` cropped to 180 px tall (the game will orbit
   them around him as his aura). Placement / mechanics / obtainable: decided with the owner when it goes in.
+- 2026-10-14 BATCH21 (ChatGPT): E01 Griffin Cub complete 12/12 (front_idle height 310) · F01 Coral Crab 10/12 at 280 —
+  `front_cast` and `back_attack` PNGs were broken inside the zip (bottom half missing) → asked for a resend; re-import
+  them with the set's original front_idle at 280. G01 / E11 / C10 zips arrived truncated (G01 7/12 salvaged, E11 1/12,
+  C10 2/12) → asked for a resend of the whole sets as single files or two small zips.
