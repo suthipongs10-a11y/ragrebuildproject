@@ -1,0 +1,174 @@
+=====================================================================
+EGGBOUND — ART BATCH 20 : RUNES (รูน) — amulet frames + set gems + forge altar
+Image generation instructions for ChatGPT (or Google Flow)
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- ตอนนี้ไอคอนรูนในเกมวาดด้วยโค้ด ชุดนี้คือภาพวาดจริงมาแทน
+- **วาดแยกชิ้นแล้วเกมประกอบเอง จะได้ไม่ต้องวาด 32 แบบ** (4 ช่อง × 8 เซ็ต)
+  · กรอบ 4 แบบ (1 แบบต่อช่อง) + อัญมณี 8 เม็ด (1 เม็ดต่อเซ็ต) → เกมเอาอัญมณีใส่กลางกรอบ = ครบ 32 แบบ
+  · ขอบสีตามเกรด (ธรรมดา/หายาก/มหากาพย์/ตำนาน) ดาว และ +เลข เกมวาดเอง
+  · แท่นตีรูน 1 ภาพ ใช้เป็นฉากหลังตอนตีบวก
+  · รวม 14 ภาพ (#01 ภาพตัวอย่างไว้ตรวจสไตล์ + 13 ชิ้นที่ใช้จริง)
+- แนวภาพ: รูนเป็น "พระเครื่อง/เครื่องรางโบราณในตลับ" แบบสยาม-ขอม ของเราเอง
+  ไม่ใช่รูนเกมอื่น (ห้ามเหมือนรูนของ Summoners War)
+- ช่อง IV เปลี่ยนจากรูปโล่เป็น "ใบเสมา" ให้ไทยขึ้น (เกมจะปรับรูปให้ตรงเอง)
+- ChatGPT: เปิดแชทใหม่ แนบ 2 อย่าง
+  1) ไฟล์นี้
+  2) EGGBOUND_ART_BATCH20_RUNES_ref.png (ภาพรูนแบบโค้ดตอนนี้ — อ้างอิงแค่ "สีและสัญลักษณ์ของแต่ละเซ็ต")
+  พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ให้ดีก่อนตอบ "OK"
+- Google Flow: สั่งทีละภาพ 1:1 พื้นหลังสีชมพู #FF00FF ได้ ผมลบพื้นเอง
+  (แนบ #01 ที่ชอบไปทุกครั้ง เพื่อให้สไตล์ตรงกัน)
+- ส่งกลับ: ไฟล์เดี่ยว หรือ zip เล็กไม่เกิน ~15MB · ชื่อไฟล์ตามข้อ 6
+  (ชื่อสุ่มจาก Flow ก็ได้ ผมจับคู่เอง)
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the item artist for a premium 2.5D fantasy monster RPG (hand-painted,
+top mobile-RPG quality). The game has RUNES: small magic stones a monster
+wears in 4 slots. Each rune is drawn by the game from two separate pieces:
+  - a FRAME (the amulet case; its outline tells the slot), and
+  - a GEM (the round stone in the middle; its colour and emblem tell the set).
+The game places any gem in the centre of any frame, adds the grade glow, the
+stars and the "+level" text itself. So paint ONLY the pieces, separately.
+Generate 14 images, ONE IMAGE PER TURN.
+
+Theme: ancient Siamese-Khmer amulets (like a sacred amulet set in an antique
+gold case), mixed with a touch of mythic fantasy. Precious, old, handmade.
+
+Work order:
+  1. Generate #01 (STYLE SAMPLE, a full assembled rune) and wait for my "OK".
+  2. After "OK", generate #02–#14 one by one, matching #01 exactly.
+  3. Run the QUALITY CHECK, then deliver the files (section 6).
+
+---------------------------------------------------------------------
+1. MASTER STYLE (every image)
+---------------------------------------------------------------------
+STYLE: painterly fantasy game item icon, rich hand-painted texture, crisp
+clean edges, strong readable silhouette, soft dimensional shading. Readable
+when shown small on a phone (about 64 px) — big simple shapes, no fine noise.
+VIEW: straight-on FRONT view (no tilt, no perspective), like an icon, with a
+gentle bevel so it looks carved and solid.
+LIGHT: warm key light from TOP-LEFT, soft cool fill from the right, the same in
+every image.
+BACKGROUND: FULLY TRANSPARENT (or flat solid #FF00FF everywhere outside the
+object if transparency fails). Nothing else in the picture.
+FORBIDDEN: glow, aura, light rays, sparkles, lens flare, particles, smoke,
+magic effects, cast shadow on the background, text, letters, numbers, roman
+numerals, stars, watermark, frame around the canvas, hands, characters.
+(The game adds all glow, sparkle, grade colour, stars and numbers in code.)
+ORIGINAL DESIGN - do not copy any existing game/film character or item, and
+do not resemble the runes of Summoners War or any other game (no SW rune
+shapes, no SW set symbols).
+
+Technical rules:
+- Canvas 1024 x 1024 px PNG, object centred, at least 60 px empty margin.
+- Every FRAME (#02–#05) has the SAME outer size and the SAME centre recess
+  (see section 2), so the gems fit all of them.
+- Every GEM (#06–#13) has the SAME size, shape and cut — only colour and
+  emblem change.
+
+---------------------------------------------------------------------
+2. THE PIECES
+---------------------------------------------------------------------
+FRAMES (amulet cases) — one per slot:
+- Material: antique gold-bronze case with a pale weathered sandstone inner
+  band; Thai kranok (flame-scroll) relief along the border; small round
+  rivets; aged, slightly worn, precious. NEUTRAL colours only (gold, bronze,
+  sandstone) so every gem colour fits.
+- Outer size: the frame fills about 86% of the canvas (its widest part).
+- CENTRE RECESS: a perfectly ROUND dark cup in the exact centre, diameter
+  about 50% of the canvas (512 px), flat dark brown-black stone inside, with a
+  thin gold lip around it. Keep the recess EMPTY (no gem in it) and flat dark
+  (do NOT make it transparent or pink).
+- Keep the four frames identical in material, detail level and lighting —
+  only the outline shape changes.
+
+GEMS — one per set:
+- A polished round cabochon gem (domed, smooth), diameter about 76% of the
+  canvas, with deep colour and soft inner depth (painted, not glowing).
+- The set EMBLEM is carved into the gem's face and inlaid with pale gold —
+  bold, simple, centred, about 55% of the gem's width. Same stroke weight on
+  all eight.
+- A thin antique-gold rim around the gem.
+
+---------------------------------------------------------------------
+3. SET COLOURS & EMBLEMS (see the attached _ref.png)
+---------------------------------------------------------------------
+  fang   (เขี้ยว)  ember red-orange   #ff6a4a  — two curved fangs side by side
+  shell  (กระดอง)  turquoise teal     #3fc6c0  — a turtle-shell plate: one hexagon
+                                                with six short spokes
+  vital  (ชีวา)    jade green         #66d17e  — a heart formed by two leaves
+  eye    (เนตร)    sun gold-yellow    #ffcc3a  — an almond eye with a round pupil
+  gale   (วายุ)    sky cyan           #7fdcff  — three curling wind strokes
+  storm  (อสนี)    royal violet       #b48cff  — a zig-zag lightning bolt
+  blood  (โลหิต)   deep crimson       #e2405e  — a single falling drop
+  sigil  (ตราธาตุ) sapphire blue      #5d8cff  — a four-pointed star inside a ring
+
+---------------------------------------------------------------------
+4. IMAGE LIST
+---------------------------------------------------------------------
+For #02–#14 start every prompt with:
+"Using the attached style sample as the EXACT same art style, materials,
+lighting and level of detail, following all MASTER STYLE rules:"
+
+#01  STYLE SAMPLE — a complete rune: FRAME I (round) with the FANG gem set in
+     its centre recess. (Only for checking the style; it is not cut up.)
+
+#02  FRAME I   — ROUND: a circular amulet case.
+#03  FRAME II  — DIAMOND: a square case turned 45 degrees (points up, down,
+                 left, right), slightly rounded corners.
+#04  FRAME III — HEXAGON: a six-sided case standing on a point — a POINT at
+                 the top and at the bottom, straight vertical left and right
+                 sides, slightly rounded corners.
+#05  FRAME IV  — SEMA LEAF (ใบเสมา): the shape of an ancient Thai boundary
+                 stone — straight sides, round shoulders rising to a
+                 pointed tip at the top, flat base.
+
+#06  GEM — fang      (ember red-orange, two fangs)
+#07  GEM — shell     (turquoise teal, turtle-shell hexagon)
+#08  GEM — vital     (jade green, leaf heart)
+#09  GEM — eye       (sun gold-yellow, eye)
+#10  GEM — gale      (sky cyan, wind strokes)
+#11  GEM — storm     (royal violet, lightning bolt)
+#12  GEM — blood     (deep crimson, drop)
+#13  GEM — sigil     (sapphire blue, star in a ring)
+
+#14  RUNE FORGE ALTAR — the stone where runes are upgraded: a squat ancient
+     Khmer-style sandstone pedestal with antique bronze bands and kranok
+     relief, seen from the front and slightly above (about 20 degrees), with
+     a shallow round bronze dish on top where a rune would rest (the dish is
+     EMPTY). Altar about 70% of the canvas wide, its base at y ≈ 900 px.
+     No fire, no glow, no tools, no hammer.
+
+---------------------------------------------------------------------
+5. QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] Straight-on front view, no tilt; light from top-left in every image
+  [ ] Frames: same outer size, same round dark recess (~50%) exactly centred,
+      recess empty and dark (not transparent, not pink)
+  [ ] Frames: neutral gold/bronze/sandstone only; only the outline differs
+  [ ] Gems: same size/cut; correct colour and emblem per set; emblem bold and
+      readable at 64 px
+  [ ] No glow, sparkles, rays, particles, text, numbers or stars
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Does not resemble Summoners War runes or any other game's items
+
+---------------------------------------------------------------------
+6. FILE NAMES & DELIVERY
+---------------------------------------------------------------------
+  #01 rune_sample.png
+  #02 runeF_1_round.png      #06 runeG_fang.png     #10 runeG_gale.png
+  #03 runeF_2_diamond.png    #07 runeG_shell.png    #11 runeG_storm.png
+  #04 runeF_3_hexagon.png    #08 runeG_vital.png    #12 runeG_blood.png
+  #05 runeF_4_sema.png       #09 runeG_eye.png      #13 runeG_sigil.png
+  #14 rune_forge.png
+
+ZIP name: EGGBOUND_RUNES_SET.zip (all PNGs in the root) + notes.txt listing
+each file, background type, and any image regenerated and why.
+If the zip would be larger than about 15 MB, split it: PART1 = #01–#07,
+PART2 = #08–#14 (or send the images one by one).
+=====================================================================
+END OF FILE
+=====================================================================
