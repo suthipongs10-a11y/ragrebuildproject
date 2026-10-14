@@ -32,3 +32,9 @@ bundle size. When the monster is added to `SPECIES` (data.ts), move its files in
 - 2026-10-14 BATCH21 (resend): G01 Bastet Kitten complete 12/12 (5 recovered PNGs merged with the 7 salvaged earlier,
   same canvas) · H01 Kappa complete 12/12 · H04 Baku complete 12/12 — all commons, imported at front_idle height 290.
   E11 / C10 resend zips were byte-identical to the first truncated uploads → still E11 1/12, C10 2/12.
+- 2026-10-14 BATCH21 (resend 2): F01 Coral Crab complete 12/12 (`front_cast` + `back_attack` resent, merged with the
+  original canvas set and re-imported at 280 — the 10 earlier files came out byte-identical) · F03 Ghost Jelly 11/12
+  at 290 (its `front_hit` PNG was 0 bytes inside the zip → resend; the set's poses are pre-normalised to 600 px on a
+  1024 canvas, bottom y=870) · C10 Jade Qilin Calf 6/12 at 310 (master, front_idle, front_attack, front_cast,
+  back_burst, egg; zips REPAIRED_02 + _06 arrived, 03–05 did not). Missing C10: front_hit, front_burst, back_idle,
+  back_attack, back_cast, back_hit — re-import with the set's original front_idle when they come.
