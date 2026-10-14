@@ -1,6 +1,6 @@
 // @ts-nocheck
 // App shell: scenes (idle / battle / hatch), DOM screens, input, save.
-import { SPECIES, STAGES, ZONES, ZONE_PLAN, planOf, ENERGY_MAX, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
+import { SPECIES, STAGES, ZONES, ZONE_PLAN, planOf, starbornOf, rareFormChance, ENERGY_MAX, ENERGY_REFILL_GEMS, ENERGY_REFILL_DAILY, STAR_SHARDS_TO_CRAFT, STAR_SHARD_CHANCE, STARTERS, ELEM_NAME, ROLE_NAME, RARITY_NAME, statAt, spdAt, expToNext, levelCap, LOOT_GRADES, EGG_TIERS, EGG_TIER_ORDER, EGG_DROP, NAMED_RARE_FORM, RARE_FORM_MULT, NAT_STARS, MAX_STARS, natStars, EVO_GOLD, SKILL_MAX, SKILL_STEP, FEED_MAX, GEM_GOLD_EGG, formOf } from './core/data';
 import { Battle } from './core/battle';
 import { drawShowcase, showcaseTap } from './render/showcase';
 import { loadAssets, portrait, eggURL, eggURLOf, eggOf, TIER_COL, PAL, IMG, lookOf, starHTML, uiSrc, masterURL, rareMasterURL, ensureArt, artReady, prefetchExt, EXT_STAT } from './render/assets';
@@ -175,14 +175,31 @@ const REALM = { A: 'ทุ่งไข่ป่วน', B: 'สุวรรณ�
 const evoRow = (s, reached, rare = false) => s.art && IMG[s.art + 'e_front_idle'] && natStars(s.id, rare) < 5 ? `<div class="evorow ${reached ? 'on' : ''}"><img src="${portrait(s.id + '~5' + (rare ? 'r' : ''))}" alt=""><div><b>✦ ร่างวิวัฒน์ ★5</b>${reached ? 'ปลดล็อกแล้ว — ร่างนี้ใช้ในสนามรบตอน ★5 ขึ้นไป' : 'อัปดาวถึง ★5 เพื่อเปลี่ยนเป็นร่างนี้ (หน้าตาและท่าทางใหม่ทั้งหมด)'}</div></div>` : '';
 /** rare-form passive row: shown in full when unlocked, otherwise a locked "???" teaser */
 const rareRow = (s, open, lockTxt) => s.rarePassive ? `<div class="rpas ${open ? '' : 'lock'}"><b>✦ สกิลร่างหายาก · ${open ? esc(s.rarePassive.name) : '???'}</b>${open ? esc(s.rarePassive.desc) : lockTxt}</div>` : '';
-/** monster book: every species twice — its normal form and its light/dark rare form, which counts as a monster of its own
- *  (SW-style: same name, other element, own skills 2-3). Ones never obtained are dark silhouettes but can still be opened. */
-const dexAll = () => Object.values(SPECIES).filter(x => !x.boss).sort((a, b) => a.id.localeCompare(b.id))
-  .flatMap(s => [false, ...(s.rareForm ? [true] : [])].map(rare => ({ s, rare, key: s.id + (rare ? 'r' : ''), elem: formOf(s.id, rare).elem })));
+/** monster book (owner 2026-10-14): ONE slot per monster family — every form drawn from the same art (its normal element,
+ *  the light/dark rare form, later a special edition) sits in that slot behind element buttons, each with its own data.
+ *  Nothing is hidden: every form shows its art, skills and where to find it, so players know what to chase. */
+const dexForms = s => [false, ...(s.rareForm ? [true] : [])].map(rare => ({ s, rare, key: s.id + (rare ? 'r' : ''), elem: formOf(s.id, rare).elem }));
+const dexFams = () => Object.values(SPECIES).filter(x => !x.boss).sort((a, b) => a.id.localeCompare(b.id)).map(s => ({ s, forms: dexForms(s) }));
+const dexAll = () => dexFams().flatMap(f => f.forms);
 const dexHas = e => (e.rare ? S.dexRare : S.dex).includes(e.s.id);
 const dexPic = e => portrait(e.rare ? lookOf(e.s.id, natStars(e.s.id, true), true) : e.s.id);
+const pct = v => (v >= .1 ? Math.round(v * 1000) / 10 : Math.round(v * 10000) / 100) + '%';
+/** chance that one mystery egg of each shell hatches this species (its rarity's share split over that rarity's species) */
+const eggChances = (s, rare) => { const pool = Object.values(SPECIES).filter(x => !x.boss && !x.starborn), n = pool.filter(x => x.rarity === s.rarity).length || 1;
+  return EGG_TIER_ORDER.map(t => { const T = EGG_TIERS[t], c = (T.rarityW[s.rarity] || 0) / 100 / n * (rare ? rareFormChance(T.rareForm, s.id) : 1); return c > 0 ? `${T.name.replace('ลาย', '')} ${pct(c)}` : ''; }).filter(Boolean).join(' · '); };
+/** where to find a form: eggs, fragments from the zones it fights in, or (Starborn) shards from its boss zone */
+function dexSources(e) {
+  const { s, rare } = e, zoneName = id => ZONES.find(z => z.id === id)?.name || id;
+  if (s.starborn) { const st = STAGES.find(x => starbornOf(x) === s.id); return [`เศษไข่ดาราจากบอส${st ? ' ' + esc(zoneName(st.zone)) : ''} · ชนะครั้งแรกได้ 1 ชิ้น แล้ว ${STAR_SHARD_CHANCE * 100}% ต่อรอบ · ครบ ${STAR_SHARDS_TO_CRAFT} ชิ้นประกอบเป็นไข่`, 'ไม่ออกจากไข่ปริศนา'];
+  }
+  const zones = [...new Set(STAGES.filter(st => st.waves.flat().some(m => m.sid === s.id)).map(st => st.zone))].map(zoneName);
+  const out = [`ไข่ปริศนา${rare ? ' (ออกเป็นร่างหายาก)' : ''}: ${eggChances(s, rare)} ต่อฟอง`];
+  out.push(`ไข่ระบุชื่อ (เศษไข่ ${FRAGS_TO_CRAFT} ชิ้น)${rare ? `: โอกาสเป็นร่างหายาก ${pct(rareFormChance(NAMED_RARE_FORM, s.id))} สูงสุดในเกม` : ''} · เศษไข่ได้จากการชนะ${zones.length ? ' ' + zones.map(esc).join(', ') : 'ด่านที่มีตัวนี้ (ยังไม่มีในแผนที่)'}`);
+  return out;
+}
 function dexHTML() {
-  const all = dexAll(), nGot = all.filter(dexHas).length, list = dexEl === 'all' ? all : all.filter(x => x.elem === dexEl);
+  const fams = dexFams(), all = fams.flatMap(f => f.forms), nGot = all.filter(dexHas).length;
+  const list = dexEl === 'all' ? fams : fams.filter(f => f.forms.some(x => x.elem === dexEl));
   const elChips = `<button type="button" class="chip ${dexEl === 'all' ? 'on' : ''}" data-dexel="all">ทั้งหมด ${nGot}/${all.length}</button>` + Object.keys(ELEM_NAME).map(el => { const a = all.filter(x => x.elem === el); return a.length ? `<button type="button" class="chip ${dexEl === el ? 'on' : ''}" data-dexel="${el}">${elDot(el)} ${ELEM_NAME[el]} ${a.filter(dexHas).length}/${a.length}</button>` : ''; }).join('');
   const roles = Object.keys(ROLE_NAME).map(r => { const a = all.filter(x => x.s.role === r); return a.length ? `<span class="chip">${ROLE_NAME[r]} ${a.filter(dexHas).length}/${a.length}</span>` : ''; }).join('');
   const rars = ['common', 'rare', 'epic', 'legendary'].map(r => { const a = all.filter(x => x.s.rarity === r); return a.length ? `<span class="chip rar" style="${rcVar({ rarity: r })}">${RARITY_NAME[r]} ${a.filter(dexHas).length}/${a.length}</span>` : ''; }).join('');
@@ -190,21 +207,26 @@ function dexHTML() {
   const e = dexSel && all.find(x => x.key === dexSel);
   if (e) {
     const { s, rare } = e, has = dexHas(e), f = formOf(s.id, rare), nat = natStars(s.id, rare), img = (rare ? rareMasterURL(s.id) : masterURL(s.id)) || dexPic(e);
-    const own = S.mons.filter(m => m.sid === s.id && !!m.rare === rare).length, rf = s.rareForm;
+    const own = S.mons.filter(m => m.sid === s.id && !!m.rare === rare).length, forms = dexForms(s);
     const lo = { hp: statAt(s.base.hp, 1, nat), atk: statAt(s.base.atk, 1, nat), def: statAt(s.base.def, 1, nat) }, hi = { hp: statAt(s.base.hp, 40, 6), atk: statAt(s.base.atk, 40, 6), def: statAt(s.base.def, 40, 6) };
-    const other = rare ? `<div class="rpas"><b>ร่างปกติ · ธาตุ${ELEM_NAME[s.elem]}</b>สกิล 2–3 คนละชุดกับร่างนี้ <button class="alt" type="button" data-dex="${s.id}">ดูร่างปกติ</button></div>`
-      : rf ? `<div class="rpas ${S.dexRare.includes(s.id) ? '' : 'lock'}"><b>✦ ร่างหายาก · ธาตุ${ELEM_NAME[rf.elem]}</b>มอนอีกตัว ชื่อเดิม สกิล 2–3 ของตัวเอง + สกิลร่างหายาก <button class="alt" type="button" data-dex="${s.id}r">ดูร่างหายาก</button></div>` : '';
-    det = `<div class="detail dexd"><span class="dbig ${has ? '' : 'unk'} ${rare ? 'rfp' : ''}"><img src="${img}" alt=""></span><div style="min-width:0"><h3>${esc(s.name)} <small class="note">${esc(s.nameEn)}</small></h3>
+    const tabs = forms.length > 1 ? `<div class="ftabs">${forms.map(x => `<button type="button" class="ftab ${x.key === e.key ? 'on' : ''} ${x.rare ? 'rf' : ''}" data-dex="${x.key}">${elDot(x.elem)} ${ELEM_NAME[x.elem]}<small>${x.rare ? '✦ ร่างหายาก' : 'ร่างปกติ'} · ★${natStars(s.id, x.rare)}</small>${dexHas(x) ? '<i>✓</i>' : ''}</button>`).join('')}</div>` : '';
+    det = `<div class="detail dexd">${tabs}<span class="dbig ${rare ? 'rfp' : ''}"><img src="${img}" alt=""></span><div style="min-width:0"><h3>${esc(s.name)} <small class="note">${esc(s.nameEn)}</small></h3>
     <div class="row" style="gap:6px;flex:0 0 auto;margin:6px 0"><span class="chip">${elDot(f.elem)} ${ELEM_NAME[f.elem]}</span><span class="chip">${ROLE_NAME[s.role]}</span>${rarChip(s)}${rare ? '<span class="chip rfc">✦ ร่างหายาก</span>' : ''}<span class="chip">${REALM[s.id[0]] || ''}</span></div>
-    <div class="stars">${starStr(nat)}</div><div class="note">${has ? '<b style="color:#8fe39a">✓ ได้มาแล้ว</b>' : '<b style="color:#e8b0a0">ยังไม่ได้</b> · ' + (rare ? 'ฟักได้จากไข่ทุกใบ (โอกาสร่างหายาก) ไข่ของตัวนี้เองโอกาสสูงสุด' : 'หาได้จากไข่ปริศนา')}${own ? ` · มีอยู่ ${own} ตัว` : ''}</div>
+    <div class="stars">${starStr(nat)}</div><div class="note">${has ? '<b style="color:#8fe39a">✓ ได้มาแล้ว</b>' : '<b style="color:#e8b0a0">ยังไม่ได้</b>'}${own ? ` · มีอยู่ ${own} ตัว` : ''}</div>
     <div class="stat"><div>HP<b>${lo.hp}</b><small>★6 เต็ม ${hi.hp}</small></div><div>ATK<b>${lo.atk}</b><small>★6 เต็ม ${hi.atk}</small></div><div>DEF<b>${lo.def}</b><small>★6 เต็ม ${hi.def}</small></div><div>SPD<b>${s.base.spd}</b><small>ฐาน</small></div></div></div>
-    <div class="skl">${f.skills.map((k, i) => `<div><b>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)} · ${esc(k.name)}</b>${esc(k.desc)}${k.cd ? `<em>คูลดาวน์ ${k.cd}</em>` : ''}</div>`).join('')}${s.leader ? `<div><b>ผู้นำ</b>${esc(s.leader.text)}</div>` : ''}${rare ? rareRow(s, has, 'ปลดล็อกเมื่อได้ร่างหายากของตัวนี้') : ''}${other}${evoRow(s, S.mons.some(m => m.sid === s.id && !!m.rare === rare && m.stars >= 5), rare)}<div class="row" style="align-items:center;gap:10px"><img src="${eggURL(s.id)}" alt="" style="width:44px;height:44px;flex:0 0 auto;object-fit:contain"><span class="note">ไข่ของ${esc(s.name)}</span><button class="alt" type="button" data-dex="" style="margin-left:auto">ปิด</button></div></div></div>`;
+    <div class="skl">${f.skills.map((k, i) => `<div><b>${i === 2 ? 'สุดยอด' : 'สกิล ' + (i + 1)} · ${esc(k.name)}</b>${esc(k.desc)}${k.cd ? `<em>คูลดาวน์ ${k.cd}</em>` : ''}</div>`).join('')}${s.leader ? `<div><b>ผู้นำ</b>${esc(s.leader.text)}</div>` : ''}${rare ? rareRow(s, true, '') : ''}${evoRow(s, S.mons.some(m => m.sid === s.id && !!m.rare === rare && m.stars >= 5), rare)}
+    <div class="srcs"><b>หาได้จาก</b>${dexSources(e).map(t => `<span>${t}</span>`).join('')}</div>
+    <div class="row" style="align-items:center;gap:10px"><img src="${eggURL(s.id)}" alt="" style="width:44px;height:44px;flex:0 0 auto;object-fit:contain"><span class="note">ไข่ของ${esc(s.name)}</span><button class="alt" type="button" data-dex="" style="margin-left:auto">ปิด</button></div></div></div>`;
   }
-  return `<section class="scr dim"><div class="wrap">${topbar('สารบัญมอน', `ค้นพบแล้ว ${nGot} จาก ${all.length} ตัว (นับร่างหายากแสง/มืดเป็นอีกตัว)`)}${monTabs()}
+  const cards = list.map(({ s, forms }) => {
+    const pick = (dexEl !== 'all' && forms.find(x => x.elem === dexEl)) || forms[0], got = forms.filter(dexHas).length, on = e && e.s.id === s.id;
+    return `<button type="button" class="mcard dexc ${got ? '' : 'unseen'} ${on ? 'on' : ''} ${s.rarity}" style="${rcVar(s)}" data-dex="${pick.key}"><span class="tag">${s.id}</span><span class="fc ${got === forms.length ? 'all' : ''}">${got}/${forms.length}</span><span class="pic ${pick.rare ? 'rfp' : ''}"><img src="${dexPic(pick)}" alt=""></span><span class="n">${esc(s.name)}</span><span class="lv">${forms.map(x => `<i class="fd ${dexHas(x) ? 'got' : ''}" title="${ELEM_NAME[x.elem]}${x.rare ? ' (ร่างหายาก)' : ''}">${elDot(x.elem)}</i>`).join('')} ${ROLE_NAME[s.role]}</span></button>`;
+  }).join('');
+  return `<section class="scr dim"><div class="wrap">${topbar('สารบัญมอน', `ค้นพบแล้ว ${nGot} จาก ${all.length} ร่าง · ${fams.length} สายพันธุ์ (ทุกธาตุของตัวเดียวกันอยู่ช่องเดียว)`)}${monTabs()}
   <div class="bar" style="margin:4px 0 10px"><i style="transform:scaleX(${nGot / all.length})"></i></div>
   <div class="dexsum"><div class="row">${elChips}</div><div class="row">${roles}</div><div class="row">${rars}</div></div>
   ${det}
-  <div class="mgrid">${list.map(x => { const has = dexHas(x), s = x.s; return `<button type="button" class="mcard dexc ${has ? '' : 'locked'} ${dexSel === x.key ? 'on' : ''} ${s.rarity}" style="${has ? rcVar(s) : ''}" data-dex="${x.key}"><span class="tag">${s.id}</span>${x.rare ? '<span class="rf" title="ร่างหายาก">✦</span>' : ''}<span class="pic ${x.rare ? 'rfp' : ''}"><img src="${dexPic(x)}" alt=""></span><span class="n">${esc(s.name)}</span><span class="lv">${elDot(x.elem)} ${ROLE_NAME[s.role]}</span></button>`; }).join('')}</div></div></section>`;
+  <div class="mgrid">${cards}</div></div></section>`;
 }
 /** monster screen (SW style): left = a stage with the monster standing full-body + tabs (info / level / stars / skills),
  *  right = the monster box, always on screen and scrolling on its own — in the level/star/skill tabs tapping a monster in

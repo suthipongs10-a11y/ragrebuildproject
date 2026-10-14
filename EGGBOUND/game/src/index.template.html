@@ -309,6 +309,15 @@ html:not(.has-book-emblem) .bk-emblem{position:relative}html:not(.has-book-emble
 .dexsum{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}.dexsum .row{gap:6px}.dexsum .chip{white-space:nowrap;flex:0 0 auto}.dexsum button.chip{cursor:pointer}.dexsum .chip.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}
 .mcard.dexc .tag{background:rgba(255,255,255,.12);color:var(--ink-dim);font-weight:600}
 .mcard.locked .pic img{filter:brightness(0) drop-shadow(0 0 1px rgba(255,255,255,.5));opacity:.75}.mcard.locked .n{color:var(--ink-faint)}
+.mcard.dexc.unseen .pic img{filter:saturate(.55) brightness(.8)}.mcard.dexc.unseen .n{color:var(--ink-dim)}
+.mcard .fc{position:absolute;top:5px;right:7px;font-size:.62rem;font-weight:700;padding:1px 6px;border-radius:99px;background:rgba(0,0,0,.45);color:var(--ink-faint)}.mcard .fc.all{background:var(--gold);color:#2a1a08}
+.mcard .fd{font-style:normal;opacity:.4;margin-right:1px}.mcard .fd.got{opacity:1}
+.ftabs{grid-column:1/-1;display:flex;gap:6px;flex-wrap:wrap}
+.ftab{display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink-dim);font:600 .84rem var(--f-body,inherit)}
+.ftab small{font-weight:500;font-size:.7rem;opacity:.85}.ftab i{font-style:normal;color:#8fe39a}
+.ftab.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}.ftab.on i{color:#1d6b2a}
+.ftab.rf:not(.on){border-color:rgba(255,154,216,.55)}
+.srcs{display:flex;flex-direction:column;gap:4px;padding:10px 12px;border-radius:12px;background:rgba(255,220,150,.07);border:1px solid rgba(255,220,150,.22);font-size:.8rem;line-height:1.45}.srcs b{color:var(--gold)}.srcs span::before{content:'• ';color:var(--gold)}
 .dexd{margin-bottom:12px}.dexd .dbig{width:150px;height:150px;border-radius:16px;background:radial-gradient(circle,rgba(255,220,150,.18),transparent 70%);display:grid;place-items:center}.dexd .dbig img{width:100%;height:150px;object-fit:contain}
 .dexd .stat small{display:block;font-size:.6rem;color:var(--ink-faint);margin-top:2px}
 @media (max-width:520px){.dexd .dbig{width:100%;height:190px}.dexd .dbig img{height:190px}.detail.dexd{grid-template-columns:1fr}}
