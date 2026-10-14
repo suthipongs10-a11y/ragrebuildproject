@@ -16,8 +16,8 @@ import { home, BDEF, upgrade, upgradeCost, maxLevelNow, mineStored, mineCap, col
 import { loadSave, writeSave, resetSave, newMon } from './game/save';
 import { grantRewards, stageUnlocked, craftEgg, craftStarEgg, hatchEgg, FRAGS_TO_CRAFT, eggOdds, rollMysteryEgg, lootOf, monOf, copiesOf, teamHasSpecies, feedPreview, feed, feedValue, evoCheck, evolve, skillUp, skillMaxed } from './game/progression';
 import { EvolveView } from './render/evolveView';
-import { RUNE_SETS, RUNE_SET_IDS, RUNE_GRADES, RUNE_GRADE_ORDER, RUNE_STATS, SLOT_NAME, RUNE_MAX_LVL, RUNE_DROP, mainValue, rollRune, runeUpCost, runeUpRate, runeSellPrice, fmtStat } from './core/runes';
-import { runesOf, runeBonusOf, runeById, equipRune, unequipRune, tryUpgrade, sellRune, addRune, RUNE_CAP } from './game/runes';
+import { RUNE_SETS, RUNE_SET_IDS, RUNE_GRADES, RUNE_GRADE_ORDER, RUNE_STATS, SLOT_NAME, RUNE_MAX_LVL, RUNE_DROP, mainValue, rollRune, runeUpCost, runeUpRate, runeSellPrice, runeOffCost, fmtStat } from './core/runes';
+import { runesOf, runeBonusOf, runeById, equipRune, equipCost, unequipRune, tryUpgrade, sellRune, addRune, RUNE_CAP } from './game/runes';
 import { runeURL, socketURL } from './render/runeIcon';
 import { energyNow, energyNext, payAuto, autoCost, buyEnergy, refillsLeft } from './game/energy';
 import { QUESTS, CHAPTERS, questsIn, chapterDone, chapterClaimable, claimable, claimQuest, bookGems, buyGoldEgg, rushCost, rushEgg, rushPrice, rushesToday } from './game/quests';
@@ -120,6 +120,8 @@ let mapZone = null, mapScroll = null, mapDiff = 0; // mapScroll: [realm, scrollL
 function placeMap() {
   if (mapZone) document.body.insertAdjacentHTML('beforeend', zonePanel(ZONES.find(z => z.id === mapZone)));
   const w = $('.wmap'); if (!w) return;
+  const bg = $('.wmap-bg') as HTMLImageElement, noArt = () => { bg?.closest('.wmap-in')?.classList.remove('art'); bg?.remove(); };
+  if (bg) { if (bg.complete && !bg.naturalWidth) noArt(); else bg.addEventListener('error', noArt, { once: true }); }
   w.addEventListener('scroll', () => { mapScroll = [mapRealm, w.scrollLeft]; }, { passive: true });
   if (mapScroll && mapScroll[0] === mapRealm) { w.scrollLeft = mapScroll[1]; return; }
   const p = $('.pin.here') || [...document.querySelectorAll('.pin:not(.locked)')].pop();
@@ -137,11 +139,11 @@ function mapHTML() {
     const [x, y] = MAP_POS[z.id], op = zoneOpen(z), st = zoneStars(z), b = zoneBoss(z), bs = SPECIES[b.sid], star = bs?.starborn, art = ART_BG.includes(z.loc);
     const cleared = (S.stages[z.id + '-5'] || 0) > 0;
     return `<button type="button" class="pin ${op ? '' : 'locked'} ${z === here ? 'here' : ''} ${cleared ? 'clear' : ''} ${star ? 'starborn' : ''}" style="left:${x}%;top:${y}%" data-zone="${z.id}" ${op ? '' : 'disabled'}>
-      <span class="isle loc-${z.loc}" ${art ? `style="background-image:url('bg/${z.loc}.webp')"` : ''}></span>
+      <span class="isle loc-${z.loc}">${art ? `<img class="isle-im" src="bg/${z.loc}.webp" alt="" loading="lazy" draggable="false">` : ''}</span>
       ${op ? `<span class="bossb"><img src="${portrait(b.sid)}" alt=""></span>` : '<span class="lock">🔒</span>'}
       <span class="lbl"><b>${esc(z.name)}</b><small>${op ? `<span class="dps">${diffPips(z)}</span> <span class="stars">★</span> ${DIFFS.reduce((a, D, d) => a + zoneDiffStars(z, d), 0)}/${DIFFS.length * 15}${star ? ' · ✦' : ''}` : 'ยังไม่ปลดล็อก'}</small></span></button>`;
   }).join('');
-  const chart = `<div class="wmap"><div class="wmap-in realm${mapRealm} ${ART_BG.includes('map' + mapRealm) ? 'art' : ''}" ${ART_BG.includes('map' + mapRealm) ? `style="background-image:url('bg/map${mapRealm}.webp')"` : ''}>
+  const chart = `<div class="wmap"><div class="wmap-in realm${mapRealm} ${ART_BG.includes('map' + mapRealm) ? 'art' : ''}">${ART_BG.includes('map' + mapRealm) ? `<img class="wmap-bg" src="bg/map${mapRealm}.webp" alt="" draggable="false">` : ''}
     <svg viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true"><polyline points="${route}" /></svg>${pins}</div></div>`;
   return `<section class="scr dim mapscr"><div class="wrap">${topbar(title, sub)}${tabs}${chart}<p class="note">แตะเกาะเพื่อดูด่าน · แต่ละโซนมี 5 ด่าน ด่านที่ 5 เป็นบอส · บอสตำนานดารา (✦) มีโอกาสดรอปเศษไข่ดารา ${STAR_SHARD_CHANCE * 100}% ต่อรอบ ครบ ${STAR_SHARDS_TO_CRAFT} ชิ้นประกอบเป็นไข่ได้ · เล่นเองไม่ใช้พลังงาน เปิด AUTO ใช้พลังงาน ⚡ ตามด่าน (ฟื้น 1 แต้มทุก 5 นาที เต็ม ${ENERGY_MAX}) · ดาวของด่าน: ★ ผ่านด่าน · ★ ไม่มีมอนตาย · ★ ทำปฏิกิริยาธาตุได้อย่างน้อย 1 ครั้ง</p>
   </div></section>`;
@@ -160,7 +162,7 @@ function zonePanel(z) {
     return `<div class="stage ${un ? '' : 'locked'} ${boss ? 'boss' : ''}"><div class="num">${boss ? `<img src="${portrait(b.sid)}" alt="">` : st.n}</div><div style="min-width:0"><div class="nm">${boss ? 'บอส · ' + esc(b.name || bs.name) : 'ด่าน ' + st.n}</div><div class="meta"><span class="stars">${starStr(stars, 3)}</span><span>แนะนำ ★${ps} Lv.${pl}</span><span title="พลังงานที่ใช้ตอนเปิด AUTO">AUTO ⚡${autoCost(st)}</span><span>ธาตุ ${els.map(elDot).join(' ')}</span></div></div><button class="go" type="button" data-stage="${key}" ${un ? '' : 'disabled'}>${un ? 'สู้' : 'ล็อก'}</button></div>`;
   }).join('');
   return `<div class="zpanel" data-zclose="1"><div class="zsheet" role="dialog" aria-label="${esc(z.name)}">
-    <div class="zhead loc-${z.loc}" ${art ? `style="background-image:linear-gradient(180deg,rgba(10,10,14,0) 30%,rgba(10,10,14,.9)),url('bg/${z.loc}.webp')"` : ''}><button type="button" class="zx" data-zclose="1" aria-label="ปิด">✕</button><h2>${esc(z.name)}</h2><p>${esc(z.desc)}</p></div>
+    <div class="zhead loc-${z.loc} ${art ? 'art' : ''}">${art ? `<img class="zhead-im" src="bg/${z.loc}.webp" alt="" draggable="false">` : ''}<button type="button" class="zx" data-zclose="1" aria-label="ปิด">✕</button><h2>${esc(z.name)}</h2><p>${esc(z.desc)}</p></div>
     ${bs.starborn ? `<div class="zstar"><img src="${eggURL(b.sid)}" alt=""><div><b>ตำนานดารา · ${esc(bs.name)}</b><div class="bar fr"><i style="transform:scaleX(${Math.min(1, shards / STAR_SHARDS_TO_CRAFT)})"></i></div><small>เศษไข่ดารา ${shards}/${STAR_SHARDS_TO_CRAFT} · ชนะบอสครั้งแรกได้ 1 ชิ้น หลังจากนั้น ${STAR_SHARD_CHANCE * 100}% ต่อรอบ (ปานกลาง ${DIFFS[1].shard * 100}% · ยาก ${DIFFS[2].shard * 100}%)</small></div></div>` : ''}
     ${dtabs}<div class="stages">${rows}</div></div></div>`;
 }
@@ -320,7 +322,18 @@ function runeBoxHTML(m) {
   return `<div class="mbox-h rbox-h"><span>กระเป๋ารูน <b>${S.runes.length}</b>/${RUNE_CAP}</span><span class="rfil">${[0, 1, 2, 3, 4].map(k => `<button type="button" class="${runeF === k ? 'on' : ''}" data-rf="${k}">${k ? SLOT_NAME[k] : 'ทั้งหมด'}</button>`).join('')}</span>${junk ? `<button type="button" class="alt rjunk" data-rjunk="1">ขายรูนธรรมดา +0 (${junk})</button>` : ''}</div>
   <div class="rgrid">${cards || `<div class="empty">${runeF ? 'ไม่มีรูนช่องนี้' : 'ยังไม่มีรูน'} — ชนะด่านเพื่อรับรูน (ระดับยากดรอปบ่อยและดีกว่า)</div>`}</div>`;
 }
-function closeRuneModal() { $('#runeModal')?.remove(); runeSel = null; runeSellArm = 0; }
+function closeRuneModal() { $('#runeModal')?.remove(); $('#runeConfirm')?.remove(); runeSel = null; runeSellArm = 0; }
+/** taking a rune off costs gold (owner 2026-10-14): ask first — what comes off, from whom, how much, gold on hand */
+function runeConfirm(kind, id) {
+  const r = runeById(S, id); if (!r) return; const m = monOf(S, selMon) || units()[0];
+  const c = kind === 'off' ? { gold: runeOffCost(r), off: [r] } : equipCost(S, id, m.uid), rich = S.gold >= c.gold;
+  const rows = c.off.map(x => `<div class="rcf-row">${runeImg(x)}<span><b>${esc(runeName(x))} +${x.lvl} ${'★'.repeat(x.star)}</b><small>ถอดออกจาก ${esc(mName(monOf(S, x.on)))} · ทอง ${runeOffCost(x).toLocaleString()}</small></span></div>`).join('');
+  let el = $('#runeConfirm'); if (!el) { el = document.createElement('div'); el.className = 'modal'; el.id = 'runeConfirm'; document.body.appendChild(el); }
+  el.innerHTML = `<div class="card rcf"><h3>${kind === 'off' ? 'ถอดรูนจริงไหม?' : c.off.includes(r) ? 'ย้ายรูนจริงไหม?' : 'เปลี่ยนรูนจริงไหม?'}</h3>
+    ${kind === 'on' ? `<p class="note">ใส่${esc(runeName(r))} +${r.lvl} ให้ <b>${esc(mName(m))}</b> ต้องถอดรูนนี้ออกก่อน</p>` : ''}${rows}
+    <div class="rcf-cost">ใช้ทอง <b>${c.gold.toLocaleString()}</b> <small>(มี ${S.gold.toLocaleString()})</small></div>${rich ? '' : '<p class="bad">ทองไม่พอ</p>'}
+    <div class="row"><button class="go" type="button" data-rcf="${kind}:${id}" ${rich ? '' : 'disabled'}>${kind === 'off' ? 'ยืนยันถอด' : 'ยืนยัน'}</button><button class="alt" type="button" data-rcx="1">ยกเลิก</button></div></div>`;
+}
 /** the rune sheet: stats, set, who wears it, the forge (+1 / rapid to the next +3) and equip / sell */
 function runeModal(id, res = null) {
   const r = runeById(S, id); let el = $('#runeModal');
@@ -330,6 +343,7 @@ function runeModal(id, res = null) {
   const m = monOf(S, selMon) || units()[0], ow = r.on && monOf(S, r.on), T = RUNE_SETS[r.set], G = RUNE_GRADES[r.grade], max = r.lvl >= RUNE_MAX_LVL;
   const cost = runeUpCost(r), rate = runeUpRate(r), tgt = Math.min(RUNE_MAX_LVL, (Math.floor(r.lvl / 3) + 1) * 3), rich = S.gold >= cost;
   const phs = [3, 6, 9, 12].filter(l => l > r.lvl).slice(0, Math.max(0, 4 - r.subs.length));
+  const onCost = r.on === m.uid ? 0 : equipCost(S, r.id, m.uid).gold, offBtn = `<button type="button" class="alt" data-roff="${r.id}">ถอดออก · ทอง ${runeOffCost(r).toLocaleString()}</button>`;
   el.innerHTML = `<div class="card rmod g-${r.grade} ${runeBusy ? 'busy' : ''}">
     <button type="button" class="rx" data-rclose="1" aria-label="ปิด">✕</button>
     <div class="rforge"><div class="ranvil" style="--sc:${T.col}"><i class="rring"></i>${runeImg(r, 'rbig')}<i class="rspark"></i><i class="rcrack"></i></div><div class="rres ${res ? res.cls : ''}">${res ? esc(res.txt) : ''}</div></div>
@@ -341,7 +355,7 @@ function runeModal(id, res = null) {
     <div class="rup">${max ? '<b>ตีบวกเต็ม +12 แล้ว</b>' : `<span>ตีบวก +${r.lvl} → +${r.lvl + 1} · โอกาส <b>${Math.round(rate * 100)}%</b> · <span class="${rich ? '' : 'bad'}">ทอง ${cost.toLocaleString()}</span> <small class="note">(มี ${S.gold.toLocaleString()})</small></span>
       <div class="row"><button type="button" class="go" data-rup="1" ${rich ? '' : 'disabled'}>⚒ ตีบวก</button>${tgt > r.lvl + 1 ? `<button type="button" class="alt" data-rup="${tgt}" ${rich ? '' : 'disabled'}>ตีรัวถึง +${tgt}</button>` : ''}</div>${rate < 1 ? '<small class="note">ตีพลาดเสียแค่ทอง รูนไม่แตก ไม่ลดขั้น</small>' : ''}`}</div>
     <div class="rwho">${ow ? `<img src="${portrait(look(ow))}" alt="">ใส่อยู่กับ <b>${esc(mName(ow))}</b>` : 'ยังไม่ได้ใส่'}</div>
-    <div class="row rbtns">${r.on === m.uid ? `<button type="button" class="alt" data-roff="${r.id}">ถอดออก</button>` : `<button type="button" class="go" data-ron="${r.id}">${ow ? 'ย้ายมาใส่' : 'ใส่ให้'} ${esc(mName(m))}</button>${ow ? `<button type="button" class="alt" data-roff="${r.id}">ถอดออก</button>` : ''}`}<button type="button" class="alt ${runeSellArm === r.id ? 'warn' : ''}" data-rsell="${r.id}">${runeSellArm === r.id ? 'แตะอีกครั้งเพื่อขาย' : 'ขาย'} ${runeSellPrice(r).toLocaleString()} ทอง</button></div>
+    <div class="row rbtns">${r.on === m.uid ? offBtn : `<button type="button" class="go" data-ron="${r.id}">${ow ? 'ย้ายมาใส่' : 'ใส่ให้'} ${esc(mName(m))}${onCost ? ` · ทอง ${onCost.toLocaleString()}` : ''}</button>${ow ? offBtn : ''}`}<button type="button" class="alt ${runeSellArm === r.id ? 'warn' : ''}" data-rsell="${r.id}">${runeSellArm === r.id ? 'แตะอีกครั้งเพื่อขาย' : 'ขาย'} ${runeSellPrice(r).toLocaleString()} ทอง</button></div>
   </div>`;
 }
 /** one forge strike (or a rapid run to `target`): charge → success burst / crack, then the sheet refreshes */
@@ -768,7 +782,7 @@ function tickIncub() {
 
 // ---------- input ----------
 document.addEventListener('click', e => {
-  const t = e.target.closest('button'); if (!t) { if (e.target.classList?.contains('zpanel')) { mapZone = null; render(); } if (e.target.id === 'enModal') e.target.remove(); if (e.target.id === 'runeModal' && !runeBusy) closeRuneModal(); return; } audioInit();
+  const t = e.target.closest('button'); if (!t) { if (e.target.classList?.contains('zpanel')) { mapZone = null; render(); } if (e.target.id === 'enModal') e.target.remove(); if (e.target.id === 'runeConfirm') e.target.remove(); else if (e.target.id === 'runeModal' && !runeBusy) closeRuneModal(); return; } audioInit();
   const d = t.dataset;
   if ((d.hb || d.shr || d.rel || d.relbuy) && homeV) { homeAct(d); return; }
   if (d.en) { enAct(d.en); return; }
@@ -795,8 +809,10 @@ document.addEventListener('click', e => {
   else if (d.rslot) { sfx.click(); runeF = runeF === +d.rslot ? 0 : +d.rslot; render(); }
   else if (d.rf !== undefined) { sfx.click(); runeF = +d.rf; render(); }
   else if (d.rclose) { if (!runeBusy) closeRuneModal(); }
-  else if (d.ron) { if (!runeBusy && equipRune(S, +d.ron, selMon)) { save(); sfx.buff(); render(); runeModal(+d.ron, { cls: 'ok', txt: 'ใส่รูนแล้ว!' }); } }
-  else if (d.roff) { if (runeBusy) return; unequipRune(S, +d.roff); save(); sfx.click(); render(); runeModal(+d.roff); }
+  else if (d.ron) { if (runeBusy) return; const id = +d.ron; if (equipCost(S, id, selMon).gold > 0) { sfx.click(); runeConfirm('on', id); return; } if (equipRune(S, id, selMon)) { save(); sfx.buff(); render(); runeModal(id, { cls: 'ok', txt: 'ใส่รูนแล้ว!' }); } }
+  else if (d.roff) { if (runeBusy) return; sfx.click(); runeConfirm('off', +d.roff); }
+  else if (d.rcf) { const [k, id] = d.rcf.split(':'), ok = k === 'off' ? unequipRune(S, +id) : equipRune(S, +id, selMon); $('#runeConfirm')?.remove(); if (!ok) { toast('ทองไม่พอ'); return; } save(); sfx.coin(); render(); runeModal(+id, { cls: 'ok', txt: k === 'off' ? 'ถอดรูนแล้ว' : 'ใส่รูนแล้ว!' }); }
+  else if (d.rcx) { sfx.click(); $('#runeConfirm')?.remove(); }
   else if (d.rsell) { if (runeBusy) return; const id = +d.rsell; if (runeSellArm !== id) { runeSellArm = id; runeModal(id); return; } const g = sellRune(S, id); save(); sfx.coin(); toast(`ขายรูนได้ทอง ${g.toLocaleString()}`); closeRuneModal(); render(); }
   else if (d.rup) { runeUp(runeSel, +d.rup > 1 ? +d.rup : 0); }
   else if (d.rjunk) { let g = 0, n = 0; for (const x of S.runes.filter(x => !x.on && x.grade === 'common' && !x.lvl)) { g += sellRune(S, x.id); n++; } save(); sfx.coin(); toast(`ขายรูน ${n} ชิ้น ได้ทอง ${g.toLocaleString()}`); render(); }

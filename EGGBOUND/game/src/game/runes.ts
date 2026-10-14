@@ -2,20 +2,33 @@
 import type { SaveData } from './save';
 import type { StageDef } from '../core/types';
 import { ZONES } from '../core/data';
-import { RUNE_DROP, RUNE_MAX_LVL, rollRune, runeBonus, runeSellPrice, runeUpCost, upgradeRune, type Rune, type RuneBonus, type RuneSlot } from '../core/runes';
+import { RUNE_DROP, RUNE_MAX_LVL, rollRune, runeBonus, runeSellPrice, runeUpCost, runeOffCost, upgradeRune, type Rune, type RuneBonus, type RuneSlot } from '../core/runes';
 
 export const RUNE_CAP = 300; // inventory size (drops stop at the cap; sell to make room)
 export const runesOf = (s: SaveData, uid: number) => s.runes.filter(r => r.on === uid).sort((a, b) => a.slot - b.slot);
 export const runeBonusOf = (s: SaveData, uid: number): RuneBonus | undefined => { const rs = runesOf(s, uid); return rs.length ? runeBonus(rs) : undefined; };
 export const runeById = (s: SaveData, id: number) => s.runes.find(r => r.id === id);
 
-/** put a rune on a monster: the rune already in that slot comes off (moving a rune between monsters is free) */
+/** what putting rune `id` on monster `uid` takes off (paid): the rune itself if another monster wears it, and the rune
+ *  already in that slot. An empty slot with a rune from the bag is free. */
+export function equipCost(s: SaveData, id: number, uid: number): { gold: number; off: Rune[] } {
+  const r = runeById(s, id); if (!r) return { gold: 0, off: [] };
+  const off = [...(r.on && r.on !== uid ? [r] : []), ...s.runes.filter(x => x.on === uid && x.slot === r.slot && x !== r)];
+  return { gold: off.reduce((t, x) => t + runeOffCost(x), 0), off };
+}
+/** put a rune on a monster, paying for every rune that comes off (false = not enough gold) */
 export function equipRune(s: SaveData, id: number, uid: number): boolean {
   const r = runeById(s, id); if (!r || !s.mons.some(m => m.uid === uid)) return false;
-  for (const x of s.runes) if (x.on === uid && x.slot === r.slot && x !== r) delete x.on;
+  const c = equipCost(s, id, uid); if (s.gold < c.gold) return false;
+  s.gold -= c.gold; for (const x of c.off) if (x !== r) delete x.on;
   r.on = uid; return true;
 }
-export function unequipRune(s: SaveData, id: number) { const r = runeById(s, id); if (r) delete r.on; }
+/** take a rune off into the bag: costs runeOffCost (false = not worn / not enough gold) */
+export function unequipRune(s: SaveData, id: number): boolean {
+  const r = runeById(s, id); if (!r || !r.on) return false;
+  const g = runeOffCost(r); if (s.gold < g) return false;
+  s.gold -= g; delete r.on; return true;
+}
 /** runes on monsters that no longer exist (eaten as evolve / skill / level food) go back to the bag */
 export function freeRunes(s: SaveData) { for (const r of s.runes) if (r.on && !s.mons.some(m => m.uid === r.on)) delete r.on; }
 

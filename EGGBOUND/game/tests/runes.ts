@@ -1,9 +1,9 @@
 // Runes: rolls, main/sub values, upgrades + gold, set bonuses, battle hooks, the save layer (gift, drops, equip, food).
 import { Battle, simulate } from '../src/core/battle';
 import { STAGES, stageOf, stageKey, planOf } from '../src/core/data';
-import { RUNE_STATS, RUNE_SETS, RUNE_GRADES, SLOT_MAIN, RUNE_MAX_LVL, RUNE_DROP, rollRune, mainValue, upgradeRune, runeUpCost, runeBonus, type Rune } from '../src/core/runes';
+import { RUNE_STATS, RUNE_SETS, RUNE_GRADES, SLOT_MAIN, RUNE_MAX_LVL, RUNE_DROP, rollRune, mainValue, upgradeRune, runeUpCost, runeOffCost, runeBonus, type Rune } from '../src/core/runes';
 import { newSave, newMon } from '../src/game/save';
-import { runesOf, runeBonusOf, equipRune, unequipRune, tryUpgrade, sellRune, dropRunes, addRune } from '../src/game/runes';
+import { runesOf, runeBonusOf, equipRune, equipCost, unequipRune, tryUpgrade, sellRune, dropRunes, addRune } from '../src/game/runes';
 import { evolve, grantRewards } from '../src/game/progression';
 
 export function runeTests(): number {
@@ -56,11 +56,14 @@ export function runeTests(): number {
   // save layer: gift, equip / move / unequip, upgrade pays gold, selling, food frees runes, drops
   { const s = newSave(); ok(s.runes.length === 0 && !s.runeGift, 'a fresh save has no runes until the gift');
     const g = rollRune(seq(8), 2, W); addRune(s, g); ok(g.id === 1 && s.nextRuneId === 2, 'rune ids');
-    ok(equipRune(s, g.id, 1) && runesOf(s, 1).length === 1 && !!runeBonusOf(s, 1), 'equip');
-    const g2 = addRune(s, { ...rollRune(seq(9), 2, W), slot: g.slot }); equipRune(s, g2.id, 1);
-    ok(runesOf(s, 1).length === 1 && runesOf(s, 1)[0].id === g2.id && !g.on, 'same slot swaps');
-    equipRune(s, g2.id, 2); ok(!runesOf(s, 1).length && runesOf(s, 2)[0].id === g2.id, 'moving a rune to another monster');
-    unequipRune(s, g2.id); ok(!g2.on && runeBonusOf(s, 2) === undefined, 'unequip');
+    s.gold = 0; ok(equipRune(s, g.id, 1) && runesOf(s, 1).length === 1 && !!runeBonusOf(s, 1), 'equip into an empty slot is free');
+    const g2 = addRune(s, { ...rollRune(seq(9), 2, W), slot: g.slot });
+    ok(equipCost(s, g2.id, 1).gold === runeOffCost(g) && !equipRune(s, g2.id, 1) && g.on === 1, 'pushing a rune out costs its removal gold (refused without gold)');
+    s.gold = 5000; ok(equipRune(s, g2.id, 1) && s.gold === 5000 - runeOffCost(g) && runesOf(s, 1)[0].id === g2.id && !g.on, 'same slot swaps, paying for the rune taken off');
+    let before0 = s.gold; equipRune(s, g2.id, 2); ok(!runesOf(s, 1).length && runesOf(s, 2)[0].id === g2.id && s.gold === before0 - runeOffCost(g2), 'moving a rune to another monster pays its removal');
+    s.gold = 0; ok(!unequipRune(s, g2.id) && g2.on === 2, 'no gold, no removal');
+    s.gold = 5000; ok(unequipRune(s, g2.id) && !g2.on && runeBonusOf(s, 2) === undefined && s.gold === 5000 - runeOffCost(g2), 'unequip pays');
+    ok(runeOffCost({ ...g2, star: 6, lvl: 12 }) > runeOffCost({ ...g2, star: 6, lvl: 0 }) && runeOffCost({ ...g2, star: 6, lvl: 0 }) > runeOffCost({ ...g2, star: 1, lvl: 0 }), 'removal costs more for higher stars and levels');
     s.gold = 0; ok(tryUpgrade(s, g.id) === null && g.lvl === 0, 'no gold, no strike');
     s.gold = 1e6; const cost = runeUpCost(g), r = tryUpgrade(s, g.id, () => 0); ok(!!r && r.ok && g.lvl === 1 && s.gold === 1e6 - cost && s.stats.runeUp === 1, 'a strike pays its gold');
     const before = s.gold, price = sellRune(s, g.id); ok(price > 0 && s.gold === before + price && !s.runes.some(x => x.id === g.id), 'selling');

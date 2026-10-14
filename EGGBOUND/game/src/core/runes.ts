@@ -56,6 +56,9 @@ export const RUNE_UP_RATE = [1, 1, 1, 0.9, 0.85, 0.8, 0.7, 0.6, 0.55, 0.45, 0.35
 /** gold per attempt = base[star] × (level + 1)^1.3 — ★6 +0→+12 ≈ 120k gold before failures */
 export const RUNE_UP_BASE = [0, 100, 180, 300, 450, 620, 800];
 export const RUNE_SELL = [0, 40, 80, 150, 260, 420, 650];
+/** taking a rune off a monster costs gold (owner 2026-10-14, asks to confirm first): base[star] × (1 + 10% per level) —
+ *  also paid when a rune moves to another monster or is pushed out of its slot by another rune */
+export const RUNE_OFF_BASE = [0, 200, 400, 800, 1500, 2500, 4000];
 const GRADE_SELL: Record<RuneGrade, number> = { common: 1, rare: 1.4, epic: 2, legendary: 3 };
 /** drops per win by difficulty (easy/normal/hard): chance, grade weights · star = realm base + 0..1 + difficulty */
 export const RUNE_DROP = {
@@ -81,6 +84,7 @@ export function rollRune(rnd: () => number, star: number, gradeW: Record<RuneGra
 }
 export const runeUpCost = (r: Rune) => Math.round(RUNE_UP_BASE[r.star] * Math.pow(r.lvl + 1, 1.3) / 10) * 10;
 export const runeUpRate = (r: Rune) => RUNE_UP_RATE[r.lvl] ?? 0;
+export const runeOffCost = (r: Rune) => Math.round(RUNE_OFF_BASE[r.star] * (1 + 0.1 * r.lvl) / 10) * 10;
 export const runeSellPrice = (r: Rune) => Math.round(RUNE_SELL[r.star] * GRADE_SELL[r.grade] * (1 + r.lvl * 0.15) / 10) * 10;
 /** one upgrade attempt (gold is paid by the caller): every +3 adds a sub stat, or boosts one once there are four */
 export function upgradeRune(r: Rune, rnd: () => number): { ok: boolean; added?: RuneStat; boosted?: RuneStat } {

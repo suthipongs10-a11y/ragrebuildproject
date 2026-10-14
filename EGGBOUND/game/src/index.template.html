@@ -266,6 +266,10 @@ html:not(.has-book-emblem) .bk-emblem{position:relative}html:not(.has-book-emble
 .wmap-in.realm2{--sky0:#f6dfaa;--sky1:#e9c38a;--sky2:#c98e6a;--isle:#c9a24a}
 .wmap-in.realm3{--sky0:#cfe6e6;--sky1:#a9cfd8;--sky2:#8a9fd0;--isle:#5aa58a}
 .wmap-in svg{position:absolute;inset:0;width:100%;height:100%}
+/* separate picture files load as <img> (CSS url() did not load inside the published Artifact, 2026-10-14) */
+.wmap-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;user-select:none}
+.pin .isle{position:relative;overflow:hidden}.isle-im{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}.wmap-in.art .isle-im{display:none}
+.zhead{overflow:hidden}.zhead-im{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;pointer-events:none}.zhead.art::after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,10,14,0) 30%,rgba(10,10,14,.9));pointer-events:none}.zhead h2,.zhead p{position:relative;z-index:2}.zx{z-index:3}
 .wmap-in polyline{fill:none;stroke:rgba(255,248,226,.85);stroke-width:6;stroke-dasharray:4 16;stroke-linecap:round;filter:drop-shadow(0 2px 2px rgba(40,30,10,.35))}
 .pin{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:0;color:var(--ink);cursor:pointer;z-index:1}
 .pin::before{content:'';position:absolute;top:calc(clamp(70px,11vh,104px) * .62);left:50%;width:calc(clamp(70px,11vh,104px) * 1.7);height:calc(clamp(70px,11vh,104px) * .62);transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at 50% 30%,color-mix(in srgb,var(--isle,#7fb05a) 85%,#fff) 0 38%,var(--isle,#7fb05a) 52%,#8a6a44 54%,#5a4228 70%,transparent 72%);filter:drop-shadow(0 8px 6px rgba(20,30,50,.3));z-index:-1}
@@ -523,6 +527,9 @@ html:not(.has-book-emblem) .bk-emblem{position:relative}html:not(.has-book-emble
 .rcard.mine{box-shadow:0 0 0 2px var(--gold),0 0 12px rgba(255,210,122,.4)}.rcard.worn>img:first-child{opacity:.7}
 .rcard.g-legendary{box-shadow:0 0 12px rgba(255,180,58,.35)}.rcard.g-legendary.mine{box-shadow:0 0 0 2px var(--gold),0 0 14px rgba(255,180,58,.5)}
 #runeModal{z-index:60;align-items:end;justify-items:center}
+#runeConfirm{z-index:70;background:rgba(6,8,6,.6)}.rcf{width:min(360px,100%);display:flex;flex-direction:column;gap:10px;text-align:center}.rcf h3{margin:0;font:500 1.25rem var(--f-display)}.rcf .note{margin:0}
+.rcf-row{display:flex;align-items:center;gap:10px;text-align:left;padding:6px 10px;border-radius:12px;background:var(--panel-hi);border:1px solid var(--line)}.rcf-row img{width:46px;height:46px;flex:0 0 auto}.rcf-row b{font-size:.9rem}.rcf-row small{display:block;color:var(--ink-dim);font-size:.74rem}
+.rcf-cost{font-size:1rem}.rcf-cost b{color:#ffd84a;font-size:1.3rem;text-shadow:0 0 8px rgba(255,200,60,.5)}.rcf-cost small{color:var(--ink-dim)}.rcf .bad{color:#ffb3a8;margin:0}.rcf .row{justify-content:center}
 .rmod{position:relative;width:min(440px,100%);max-height:calc(100dvh - 24px);overflow:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:calc(env(safe-area-inset-bottom,0px) + 4px);border-color:color-mix(in srgb,var(--gc) 50%,var(--line))}
 .rmod h3{margin:0;text-align:center;font:500 1.3rem var(--f-display)}.rlvb{color:#ffd84a}
 .rx{position:absolute;top:8px;right:10px;z-index:2;width:36px;height:36px;border-radius:50%;background:var(--panel-hi);border:1px solid var(--line)}
