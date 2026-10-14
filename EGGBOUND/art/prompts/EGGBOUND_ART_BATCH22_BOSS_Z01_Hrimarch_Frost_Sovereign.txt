@@ -1,0 +1,193 @@
+=====================================================================
+EGGBOUND — ART BATCH 22 (BOSS) : MON_Z01 "Hrimarch, the Frost Sovereign" (ฮริมาร์ค ราชันเหมันต์)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- บอสราชาน้ำแข็ง ดีไซน์ของเราเอง (คู่กับ ออสซาร์ค ราชันกระดูก)
+  · ยืม "อารมณ์" จอมมารที่เป็นราชาในหนังแฟนตาซีได้: เงียบ เย็นชา น่าเกรงขาม ลึกลับ ไม่เห็นหน้า
+  · แต่ห้ามลอกของเฉพาะ ในไฟล์สั่งห้ามไว้แล้ว: ราชาในชุดคลุมไร้หน้ามีมงกุฎลอย, หมวกเกราะหนามสีดำ,
+    ราชาน้ำแข็งของ Warcraft (หมวกมีเขา บ่าหัวกะโหลก ดาบรูน), ราชาน้ำแข็งของ Game of Thrones (มงกุฎเขาน้ำแข็งบนหัวโล้น)
+  · จุดต่างของเรา: มงกุฎน้ำแข็งทรงยอดปราสาทซ้อนชั้น · หน้ากากน้ำแข็งหน้าคนนิ่งๆ ร้าวเฉียง เห็นแค่ความมืดข้างใน
+    · หัวใจดำถูกผนึกในน้ำแข็งกลางอก · อาวุธ "ง้าว" น้ำแข็ง (ไม่ใช่ดาบ) · ผ้าคลุมชายแข็งเป็นหยาดน้ำแข็ง · สีน้ำแข็งมีแสงเหนือจางๆ ข้างใน
+- ออร่าน้ำแข็งหมุนวนรอบตัว: เกมทำเองด้วยโค้ด (ภาพ #14–#16 คือก้อนผลึกน้ำแข็ง 3 ก้อนที่เกมจะเอาไปหมุนรอบตัวเขา + เพิ่มแสง/หิมะเอง)
+  → ในภาพตัวละครห้ามมีออร่า/แสง/เกล็ดหิมะลอย
+- เปิดแชทใหม่ใน ChatGPT แนบ 2 อย่าง: ไฟล์นี้ + mon001_master (จิ้งจอก ภาพอ้างอิงสไตล์เท่านั้น)
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ให้ดีก่อนตอบ "OK" (ทุกภาพยึดตามภาพนี้)
+- รวม 16 ภาพ · ขอเป็น PNG พื้นใส · ส่งกลับเป็นไฟล์เดี่ยว หรือ zip เล็กไม่เกิน ~15MB (แบ่ง 2 ก้อนได้)
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D turn-based monster RPG. Generate 16
+images, ONE IMAGE PER TURN, in the order below. The images are animated
+by code, so CONSISTENCY matters more than creativity: every character
+image must show the exact same character.
+
+The attached mon001_master (a fire fox) is a STYLE REFERENCE ONLY:
+match its art style, shading, line quality, lighting, camera angle and
+level of detail. Do NOT copy the fox's design, colors or body.
+
+Work order:
+  1. Generate #01 (MASTER). Show it and wait for my "OK".
+  2. After "OK", generate #02–#16 one by one, each time using #01 as the
+     character reference.
+  3. Run the QUALITY CHECK, then package the ZIP (section 6).
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+THIS IS A MAJOR BOSS: imposing, regal, menacing proportions — tall, broad,
+heavy and ancient. NOT cute, NOT chibi, but still exactly the same
+painterly game style as the reference.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Camera: HIGH ANGLE about 55 degrees looking down, orthographic feel.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: ground, cast shadow, glow, aura, snowflakes, frost mist,
+particles, sparks, light rays, motion lines, text, letters, watermark,
+frame, second character. (The game adds the swirling ice aura, the
+glow and the snow in code.)
+ORIGINAL DESIGN - do not copy or resemble any existing game, film, anime
+or novel character (Dota, League of Legends, Summoners War, Pokemon, etc.).
+In particular it must NOT resemble:
+  - the Lich King of Warcraft (no horned helmet-crown, no skull shoulder
+    guards, no runic greatsword, no black plate armor with blue trim),
+  - the Night King of Game of Thrones (no bald head with ice horns),
+  - the Witch-king / Ringwraiths or Sauron of The Lord of the Rings
+    (no empty hooded robe with a floating crown, no spiked black helmet),
+  - the White Witch of Narnia, Marvel's Frost Giants, or any ice queen.
+Myth source (public domain): Norse mythology — the Hrimthursar (rime
+giants) of Niflheim, the primordial realm of ice and mist, and their
+king Thrym. Our king is our own creation inspired by that realm.
+
+Technical rules:
+- Canvas 1024 x 1024 px PNG, subject centered, at least 60 px empty margin.
+- The lowest point (feet / bottom of the cape) sits on an invisible ground
+  line at y ≈ 900 px in EVERY character image.
+- SAME SCALE in every character image of this set.
+
+---------------------------------------------------------------------
+2. CHARACTER SHEET — MON_Z01 Hrimarch, the Frost Sovereign
+---------------------------------------------------------------------
+- Who: an ancient warrior-king of a lost frozen kingdom, who sat on his
+  throne under the glacier for a thousand years until the ice became part
+  of him. Silent, cold, patient, terrifying — a mysterious sovereign, never
+  a brute. Element WATER (ice). Role: BOSS.
+- Size: BOSS class — body height about 76-80% of the canvas INCLUDING the
+  crown (top of the crown still at least 60 px from the top edge). Tall,
+  broad shoulders, long legs, a heavy cape: a towering silhouette that
+  reads clearly on a phone.
+- CROWN (his signature): a tall crown of clear glacier ice that GREW out of
+  an ancient dark-silver circlet — shaped like a tiered temple spire: a
+  tall central spike with smaller stepped spikes around it (7 points in
+  all), clear ice with very faint aurora tints inside (pale teal and
+  violet, painted, NOT glowing), and one deep sapphire stone set in the
+  circlet over the brow. The crown sits ON his head; it is not a helmet.
+- FACE: hidden behind a smooth MASK of frosted white ice carved as a calm,
+  expressionless, noble human face (closed lips, straight nose, empty
+  calm brow). A thin crack runs diagonally across the mask; through the
+  crack and the eye holes there is only deep darkness with two small pale
+  ice-blue pupils (painted, not glowing). No skull, no visible skin.
+- HAIR / COLLAR: long straight frost-white hair falling behind the mask
+  onto a thick collar of pale grey-white fur.
+- ARMOR: layered plates of ancient dark-blue glacier ice framed in worn
+  frost-silver metal, etched with natural frost-fern patterns (like frost
+  on a window). Shoulder guards are big angular glacier slabs with sharp
+  broken edges — NO skulls, NO horns, NO spikes on the head.
+- FROZEN HEART: in the centre of the chest plate, a round window of clear
+  ice holds a dark heart-shaped stone sealed inside (it is his secret and
+  his weak point). Painted, not glowing.
+- CAPE: a long heavy royal cape of deep midnight-navy cloth, its hem
+  frozen solid into a fringe of hanging icicles; it reaches the ground.
+- WEAPON: a massive GLAIVE (a long polearm with a single curved blade, like
+  a Thai ngao / guandao) — a long dark-iron haft wrapped in old silver
+  bands, and a long curved blade of clear blue glacier ice with a black
+  stone frozen at its base. NOT a sword, NOT a mace, NOT a staff.
+- HANDS: armored gauntlets of frost-silver with ice-crystal knuckles.
+- COLORS: glacier cyan and clear ice, deep midnight navy, frost silver,
+  frost-white fur and hair, one sapphire accent; faint teal-violet aurora
+  tints only inside the crown and the glaive blade. Cold, elegant, eerie.
+
+---------------------------------------------------------------------
+3. VIEWS
+---------------------------------------------------------------------
+FRONT VIEW = 3/4 front view from the high 55° camera, body facing
+             BOTTOM-RIGHT. We see the mask and the front.
+BACK VIEW  = 3/4 back view from the same camera, body facing TOP-RIGHT.
+             We see the cape, the back of the crown, and only the edge
+             of the mask.
+
+---------------------------------------------------------------------
+4. IMAGE LIST
+---------------------------------------------------------------------
+For #02–#13 start every prompt with:
+"Using the attached reference as the EXACT same character (same design,
+colors, markings, proportions, scale, line style and lighting),
+following all MASTER STYLE rules:"
+
+#01  MASTER (FRONT VIEW) — full-body character design in the idle pose.
+     This image defines the character for all others.
+#02  FRONT VIEW — IDLE:   Standing tall and perfectly still, glaive held upright at his side with its butt on the ground, the other hand hanging open at his side, head slightly lowered — a silent, regal threat.
+#03  FRONT VIEW — ATTACK: A huge diagonal glaive slash toward bottom-right, weight on the front leg, cape sweeping behind him.
+#04  FRONT VIEW — CAST:   His free hand raised high with the palm open to the sky, calling the winter; the glaive held back low; the mask lifted upward.
+#05  FRONT VIEW — HIT:    Recoiling back, one shoulder turned away, the glaive pulled in to guard; the crown stays firmly on his head.
+#06  FRONT VIEW — BURST:  Ultimate pose: the glaive raised high overhead in both hands, wide powerful stance, cape flaring up and out — the moment before eternal winter falls. Keep the whole glaive inside the canvas (angle it if needed).
+#07  BACK VIEW — IDLE   (same pose idea as #02, BACK VIEW)
+#08  BACK VIEW — ATTACK (same pose idea as #03, slashing toward TOP-RIGHT)
+#09  BACK VIEW — CAST   (same pose idea as #04, BACK VIEW)
+#10  BACK VIEW — HIT    (same pose idea as #05, recoiling toward bottom-left)
+#11  BACK VIEW — BURST  (same pose idea as #06, BACK VIEW)
+#12  EGG — An egg of clear blue glacier ice with a dark curled shape sleeping deep inside, a thin dark-silver band around the middle, and a small crown of seven ice points growing from its top.
+     Oval egg standing upright, height ~55% of canvas, bottom at y ≈ 900 px,
+     same art style and lighting, no nest, no cracks, no glow.
+#13  FRONT VIEW — DEFEAT: Down on one knee, leaning on the glaive planted in front of him, head bowed; the crown tilted; one piece of the mask has broken away, showing only darkness behind it (no face). Same scale; the knee and boot touch y ≈ 900 px.
+
+ICE SHARDS (#14–#16) — three SEPARATE floating ice crystals that the game
+will spin around him as his swirling ice aura. Each on its own canvas,
+NOT the character. Clear glacier ice with the same faint teal-violet
+aurora tint, crisp facets, same lighting from TOP-LEFT, straight front
+view, centered, about 45-55% of the canvas, transparent background,
+NO glow, NO mist, NO sparkles. For #14–#16 start every prompt with:
+"In the exact same art style, ice material and lighting as the crown and
+glaive blade of the attached reference, following all MASTER STYLE rules:"
+
+#14  ICE SHARD A — a long jagged ice spike, pointed at both ends, slightly curved.
+#15  ICE SHARD B — a compact cluster of three diamond-shaped ice crystals grown together.
+#16  ICE SHARD C — a flat broken ice shard with a frost-fern pattern frozen inside.
+
+---------------------------------------------------------------------
+5. QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] Same crown, mask, armor, colors and proportions as #01 in every character image
+  [ ] Same scale; lowest point at ~y 900 px; crown never cropped
+  [ ] Correct facing (FRONT → bottom-right, BACK → top-right)
+  [ ] The mask always hides the face (no skin, no skull, no visible face)
+  [ ] The weapon is always the ice glaive (never a sword)
+  [ ] No ground, shadow, glow, aura, snow, mist, particles, motion lines or text
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Ice shards: three different shapes, same ice material, no glow
+  [ ] Does not resemble the Lich King, the Night King, the Witch-king,
+      Sauron, or any other existing character
+
+---------------------------------------------------------------------
+6. FILE NAMES & ZIP
+---------------------------------------------------------------------
+  #01 monZ01_master.png
+  #02 monZ01_front_idle.png      #07 monZ01_back_idle.png
+  #03 monZ01_front_attack.png    #08 monZ01_back_attack.png
+  #04 monZ01_front_cast.png      #09 monZ01_back_cast.png
+  #05 monZ01_front_hit.png       #10 monZ01_back_hit.png
+  #06 monZ01_front_burst.png     #11 monZ01_back_burst.png
+  #12 eggZ01.png
+  #13 monZ01_front_down.png
+  #14 fxZ01_shard_a.png   #15 fxZ01_shard_b.png   #16 fxZ01_shard_c.png
+
+ZIP name: EGGBOUND_MONZ01_SET.zip (all PNGs in the root) + notes.txt listing
+each file, background type, and any image regenerated and why.
+If the zip would be larger than about 15 MB, split it: PART1 = #01–#08,
+PART2 = #09–#16 (or send the images one by one).
+=====================================================================
+END OF FILE
+=====================================================================
