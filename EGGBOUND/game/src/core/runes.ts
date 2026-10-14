@@ -87,9 +87,10 @@ export const runeUpRate = (r: Rune) => RUNE_UP_RATE[r.lvl] ?? 0;
 export const runeOffCost = (r: Rune) => Math.round(RUNE_OFF_BASE[r.star] * (1 + 0.1 * r.lvl) / 10) * 10;
 export const runeSellPrice = (r: Rune) => Math.round(RUNE_SELL[r.star] * GRADE_SELL[r.grade] * (1 + r.lvl * 0.15) / 10) * 10;
 /** one upgrade attempt (gold is paid by the caller): every +3 adds a sub stat, or boosts one once there are four */
-export function upgradeRune(r: Rune, rnd: () => number): { ok: boolean; added?: RuneStat; boosted?: RuneStat } {
+/** one strike; `bonus` = extra success chance (the home's rune forge) */
+export function upgradeRune(r: Rune, rnd: () => number, bonus = 0): { ok: boolean; added?: RuneStat; boosted?: RuneStat } {
   if (r.lvl >= RUNE_MAX_LVL) return { ok: false };
-  if (rnd() >= runeUpRate(r)) return { ok: false };
+  if (rnd() >= Math.min(1, runeUpRate(r) + bonus)) return { ok: false };
   r.lvl++;
   if (r.lvl % 3) return { ok: true };
   if (r.subs.length < 4) return { ok: true, added: newSub(r, rnd) };

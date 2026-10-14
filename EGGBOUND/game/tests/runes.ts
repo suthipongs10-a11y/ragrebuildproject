@@ -5,6 +5,7 @@ import { RUNE_STATS, RUNE_SETS, RUNE_GRADES, SLOT_MAIN, RUNE_MAX_LVL, RUNE_DROP,
 import { newSave, newMon } from '../src/game/save';
 import { runesOf, runeBonusOf, equipRune, equipCost, unequipRune, tryUpgrade, sellRune, dropRunes, addRune } from '../src/game/runes';
 import { evolve, grantRewards } from '../src/game/progression';
+import { home, upgradeCost, FORGE_COST } from '../src/game/home';
 
 export function runeTests(): number {
   let fail = 0;
@@ -73,6 +74,13 @@ export function runeTests(): number {
     // drops: first clear always one, hard drops higher stars
     const st = stageOf(stageKey('meadow-1', 2))!, d = dropRunes(s, st, true, false, seq(12)); ok(d.length >= 1 && d.every(x => x.star >= 3), 'first clear drops a rune, hard = higher stars');
     const s2 = newSave(); s2.runeGift = true; const rw = grantRewards(s2, 'meadow-1', true, 3, ['A02'], 77); ok(rw.runes.length === 1 && s2.runes.length === 1, 'stage rewards carry runes'); }
+
+  // โรงตีรูน (home forge): built with the castle at Lv.2, its levels add success chance to strikes that are not sure
+  { const s = newSave(); s.runeGift = true; const h = home(s); h.castle = 2; h.lv.forge = 0; home(s); ok(h.lv.forge === 1, 'forge is built once the castle reaches Lv.2');
+    const r = addRune(s, { ...rollRune(seq(40), 3, W), lvl: 11 }); s.gold = 1e7;
+    ok(!tryUpgrade(s, r.id, () => 0.33)!.ok && r.lvl === 11, 'without forge levels a 30% strike fails at 0.33');
+    h.lv.forge = 3; ok(tryUpgrade(s, r.id, () => 0.33)!.ok && r.lvl === 12, 'forge Lv.3 (+6%) turns it into a success');
+    ok(upgradeCost(s, 'forge') === null && FORGE_COST[2] > 0, 'forge upgrades cost gold'); }
 
   // how much runes move the starter team (log only): realm-fitting rare runes at +6 on every member
   { let d0 = 0, d1 = 0, n = 0;

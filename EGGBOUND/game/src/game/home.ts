@@ -14,7 +14,7 @@ export const BUILDINGS: BuildingDef[] = [
   { id: 'mine', name: 'เหมืองผลึกดาว', desc: 'ผลิตทองตลอดเวลาแม้ปิดเกม แตะเพื่อเก็บ อัปเลเวลเพื่อผลิตเร็วขึ้นและเก็บได้มากขึ้น', max: 5, unlock: 1, pos: [-150, 118], r: 58 },
   { id: 'shrine', name: 'ศาลหกธาตุ', desc: 'บูชาธาตุเพื่อรับพลังถาวร: มอนธาตุนั้น ATK เพิ่ม และปฏิกิริยาที่จุดด้วยธาตุนั้นแรงขึ้น', max: 1, unlock: 1, pos: [-232, -100], r: 62 },
   { id: 'altar', name: 'แท่นวัตถุศักดิ์สิทธิ์', desc: 'สร้างวัตถุศักดิ์สิทธิ์แล้วเลือกพกเข้าต่อสู้ได้ทีมละ 1 ชิ้น ทำงานเป็นสกิลติดตัวของทั้งทีม', max: 1, unlock: 1, pos: [228, -102], r: 58 },
-  { id: 'forge', name: 'โรงตีอุปกรณ์', desc: 'สุ่มและตีบวกอุปกรณ์มอน', max: 1, unlock: 2, pos: [150, 126], r: 58, soon: 'มาใน P1 (ระบบอุปกรณ์มอน)' },
+  { id: 'forge', name: 'โรงตีรูน', desc: 'โรงตีของช่างรูน แตะเพื่อเปิดกระเป๋ารูนและตีบวก · อัปเลเวลเพื่อเพิ่มโอกาสตีบวกสำเร็จ', max: 3, unlock: 2, pos: [150, 126], r: 58 },
   { id: 'arena', name: 'ลานประลอง', desc: 'ประลองกับทีมของผู้เล่นอื่น (อารีน่า)', max: 1, unlock: 3, pos: [0, 168], r: 64, soon: 'มาใน P1 (อารีน่ากับบอท)' },
 ];
 export const BDEF = Object.fromEntries(BUILDINGS.map(b => [b.id, b])) as Record<BId, BuildingDef>;
@@ -28,6 +28,10 @@ export const HATCH_COST = [0, 0, 1200, 3500];
 export const HATCH_SPEED = [0, 1, 0.8, 0.65];                // incubation time multiplier per hatchery level (slots = level)
 export const SHRINE_COST = [0, 300, 700, 1400, 2600, 4500];    // cost to reach level n
 export const SHRINE_ATK = 0.03, SHRINE_REACT = 0.08;           // per level
+/** โรงตีรูน (the old equipment forge, 2026-10-14 runes replaced equipment): + success chance on every rune strike that is
+ *  not already sure · built with the castle at Lv.2 */
+export const FORGE_COST = [0, 0, 5000, 15000], FORGE_RATE = [0, 0, 0.03, 0.06];
+export const forgeBonus = (s: SaveData) => FORGE_RATE[home(s).lv.forge || 0] || 0;
 export const ELEMS: Elem[] = ['fire', 'water', 'wind', 'earth', 'light', 'dark'];
 
 export interface RelicDef { id: RelicId; name: string; desc: string; cost: number; unlock: number }
@@ -43,7 +47,9 @@ export interface HomeSave { castle: number; lv: Record<string, number>; shrine: 
 export function newHome(now = Date.now()): HomeSave {
   return { castle: 1, lv: { gate: 1, hatchery: 1, mine: 1, shrine: 1, altar: 1, forge: 0, arena: 0 }, shrine: Object.fromEntries(ELEMS.map(e => [e, 0])), relics: ['sun'], relic: 'sun', mineAt: now - 45 * 60000, incub: [] };
 }
-export function home(s: SaveData): HomeSave { const a = s as any; if (!a.home) a.home = newHome(); if (!a.home.incub) a.home.incub = []; return a.home; }
+export function home(s: SaveData): HomeSave { const a = s as any; if (!a.home) a.home = newHome(); if (!a.home.incub) a.home.incub = [];
+  if (a.home.castle >= BDEF.forge.unlock && !a.home.lv.forge) a.home.lv.forge = 1; // the forge was a "coming soon" site before runes
+  return a.home; }
 
 export const unlocked = (s: SaveData, id: BId) => home(s).castle >= BDEF[id].unlock;
 export function maxLevelNow(s: SaveData, id: BId) { const h = home(s); return id === 'castle' ? 4 : Math.min(BDEF[id].max, h.castle + 1); }
@@ -53,6 +59,7 @@ export function upgradeCost(s: SaveData, id: BId): number | null {
   if (id === 'castle') return CASTLE_COST[lv + 1];
   if (id === 'mine') return MINE_COST[lv + 1];
   if (id === 'hatchery') return HATCH_COST[lv + 1];
+  if (id === 'forge') return FORGE_COST[lv + 1];
   return null;
 }
 export function upgrade(s: SaveData, id: BId): boolean {

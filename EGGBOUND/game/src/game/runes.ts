@@ -2,6 +2,7 @@
 import type { SaveData } from './save';
 import type { StageDef } from '../core/types';
 import { ZONES } from '../core/data';
+import { forgeBonus } from './home';
 import { RUNE_DROP, RUNE_MAX_LVL, rollRune, runeBonus, runeSellPrice, runeUpCost, runeOffCost, upgradeRune, type Rune, type RuneBonus, type RuneSlot } from '../core/runes';
 
 export const RUNE_CAP = 300; // inventory size (drops stop at the cap; sell to make room)
@@ -37,7 +38,7 @@ export function tryUpgrade(s: SaveData, id: number, rnd: () => number = Math.ran
   const r = runeById(s, id); if (!r || r.lvl >= RUNE_MAX_LVL) return null;
   const cost = runeUpCost(r); if (s.gold < cost) return null;
   s.gold -= cost; s.stats.runeUp++;
-  return { cost, ...upgradeRune(r, rnd) };
+  return { cost, ...upgradeRune(r, rnd, forgeBonus(s)) };
 }
 export function sellRune(s: SaveData, id: number): number {
   const r = runeById(s, id); if (!r) return 0;
