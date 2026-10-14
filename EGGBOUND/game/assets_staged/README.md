@@ -22,3 +22,6 @@ bundle size. When the monster is added to `SPECIES` (data.ts), move its files in
 - 2026-10-14 (later): S06 complete 12/12 (`EGGBOUND_MONS06_COMPLETE_FIXED`, re-imported whole set at 360) ·
   S07 complete 12/12 (the 5 missing PNGs merged with the original 7 in one folder, re-imported at 360; back views are
   near-straight back, egg drawn taller than asked and scaled to egg height). S05–S07 are now ready to enter the game.
+- 2026-10-14: Z01 Hrimarch the Frost Sovereign (ice-king boss, BATCH22): complete 16/16 — 12 standard + `front_down`
+  imported at front_idle height 380 (boss); ice shards `fxZ01_shard_a|b|c` cropped to 180 px tall (the game will orbit
+  them around him as his aura). Placement / mechanics / obtainable: decided with the owner when it goes in.
