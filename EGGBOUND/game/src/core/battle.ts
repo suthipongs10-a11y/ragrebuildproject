@@ -2,6 +2,7 @@
 // Same seed + same commands ⇒ identical results. No rendering here: callers read events.
 import { Rng } from './rng';
 import { SPECIES, statAt, spdAt, skillAt, isMythic, mythicUlt, formOf, monName } from './data';
+import { applyRunes } from './runes';
 import type {
   Unit, Ev, Elem, StatusId, SkillDef, SkillEffect, TurnStart, ActionResult, Command, MonsterRef, EnemyRef, StageDef, ReactionId,
 } from './types';
@@ -91,13 +92,15 @@ export class Battle {
   private makeUnit(m: EnemyRef, team: 0 | 1, slot: number, uid: number): Unit {
     const s = SPECIES[m.sid], form = formOf(s.id, !!(m as MonsterRef).rare);
     const hp = Math.round(statAt(s.base.hp, m.lvl, m.stars) * (m.hpMult || 1)), boss = !!s.boss || !!m.boss; // elite / Starborn zone bosses
-    return {
+    const u: Unit = {
       uid, team, slot, sid: s.id, name: m.name || monName(s.id, m.stars, !!(m as MonsterRef).rare), elem: form.elem, role: s.role, lvl: m.lvl, stars: m.stars, boss, ...(m.scale ? { scale: m.scale } : {}),
       maxHp: hp, hp, atk: Math.round(statAt(s.base.atk, m.lvl, m.stars) * (m.atkMult || 1)), def: statAt(s.base.def, m.lvl, m.stars),
       spd: spdAt(s.base.spd, m.lvl, m.stars), crit: 0.15, critDmg: 0.5, res: boss ? 0.35 : 0.15, acc: 0,
       atb: 0, cds: [0, 0, 0], skills: form.skills.map((k, i) => { const sk = skillAt(k, m.sk?.[i] || 1, i); return k.ult && isMythic(s.id, !!(m as MonsterRef).rare) ? mythicUlt(sk) : sk; }), statuses: [], marks: [], alive: true, leader: team === 0 && slot === 0,
       rare: !!(m as MonsterRef).rare, passive: (m as MonsterRef).rare ? s.rarePassive : undefined, pUsed: false,
     };
+    const rb = (m as MonsterRef).rb; if (rb) applyRunes(u, rb);
+    return u;
   }
   private applyLeader(u: Unit, stat: string, v: number) {
     if (stat === 'hp') { u.maxHp = Math.round(u.maxHp * (1 + v)); u.hp = u.maxHp; }
@@ -277,6 +280,7 @@ export class Battle {
     const real = dmg - shieldAbs;
     t.hp = Math.max(0, t.hp - real);
     ev.push({ t: 'hit', src: a.uid, tgt: t.uid, dmg, crit, em, hp: t.hp, shieldAbs: shieldAbs || undefined });
+    if (a.leech && a.team !== t.team && real > 0 && a.alive && a.hp < a.maxHp && !this.has(a, 'unheal')) this.healBy(a, Math.max(1, Math.round(real * a.leech)), ev); // blood rune set
     if (real > 0 && this.has(t, 'sleep')) { t.statuses = t.statuses.filter(s => s.id !== 'sleep'); ev.push({ t: 'status', tgt: t.uid, id: 'sleep', add: false }); }
     if (a.team !== t.team) {
       if (this.pk(t, 'thorns') && real > 0 && a.alive) { const th = Math.round(real * t.passive!.value!); if (th > 0) { a.hp = Math.max(1, a.hp - th); this.pev(t, ev); ev.push({ t: 'hit', src: t.uid, tgt: a.uid, dmg: th, crit: false, em: 1, hp: a.hp }); } }
@@ -297,6 +301,7 @@ export class Battle {
     this.reactions++;
     if (a.team === 0) { this.myReactions++; this.reactKinds.add(id); }
     if (a.team === 0) this.rx = 1 + (this.mods.react?.[elem] || 0);
+    if (a.runeReact) this.rx *= 1 + a.runeReact; // storm rune set
     if (id === 'wildfire') {
       this.hit(a, t, 0.3, 'fire', sub, { noCrit: true });
       for (const f of this.foes(a)) this.addStatus(a, f, 'burn', 2, 1, sub, true);
@@ -319,7 +324,7 @@ export class Battle {
     const ch = e.chance ?? 1;
     switch (e.kind) {
       case 'mark':
-        if (this.rng.chance(ch)) { t.marks = t.marks.filter(m => m.elem !== e.elem); t.marks.push({ elem: e.elem!, turns: 2, fresh: t === this.actor, wild: (a.rare && LD(e.elem!) && e.elem === a.elem) || undefined }); ev.push({ t: 'mark', tgt: t.uid, elem: e.elem!, add: true }); }
+        if (this.rng.chance(Math.min(1, ch + (a.markUp || 0)))) { t.marks = t.marks.filter(m => m.elem !== e.elem); t.marks.push({ elem: e.elem!, turns: 2, fresh: t === this.actor, wild: (a.rare && LD(e.elem!) && e.elem === a.elem) || undefined }); ev.push({ t: 'mark', tgt: t.uid, elem: e.elem!, add: true }); }
         break;
       case 'status': {
         const id = e.status!, v = id === 'bomb' ? Math.round(a.atk * 3 * (e.value || 1) * pm) : id === 'provoke' || id === 'protect' ? a.uid : undefined;

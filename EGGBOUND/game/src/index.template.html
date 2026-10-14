@@ -497,6 +497,69 @@ html:not(.has-book-emblem) .bk-emblem{position:relative}html:not(.has-book-emble
   .proto{display:none}
 }
 @media (prefers-reduced-motion:reduce){#cutin.go{animation-duration:.01s}.bigstars span{animation:none}}
+
+/* ---- runes (รูน): monster-screen tab, bag, rune sheet + forge ---- */
+.g-common{--gc:#c9c2b0}.g-rare{--gc:#4aa8ff}.g-epic{--gc:#b76bff}.g-legendary{--gc:#ffb43a}
+.rpane{display:flex;flex-direction:column;gap:10px}
+.rnav{display:flex;align-items:center;gap:8px;font-size:.86rem}.rnav .alt{padding:6px 12px}.rnav span{flex:1;text-align:center;color:var(--ink-dim)}.rnav b{color:var(--ink);font:500 .95rem var(--f-display)}
+.rslots{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.rsock{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 7px;border-radius:14px;background:var(--panel-hi);border:1.5px solid var(--line);min-width:0}
+.rsock img{width:60px;height:60px}.rsock small{font-size:.64rem;color:var(--ink-dim);text-align:center;line-height:1.25}
+.rsock.on{border-color:color-mix(in srgb,var(--gc) 70%,transparent);background:radial-gradient(circle at 50% 35%,color-mix(in srgb,var(--gc) 16%,transparent),var(--panel-hi) 70%)}.rsock.on small{color:#fff4d6}
+.rsock.sel{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold) inset}
+.rlv{position:absolute;top:5px;right:7px;font:600 .74rem var(--f-display);color:#fff;text-shadow:0 1px 2px #000,0 0 5px #000}.rlv.dim{color:var(--ink-dim);left:8px;right:auto}
+.rst{font-size:.6rem;line-height:1;color:#ffd84a;letter-spacing:-.05em;text-shadow:0 1px 2px #000}
+.stat .rb{display:block;font-style:normal;font-size:.62rem;color:#86e892;line-height:1.1}
+.rstat{grid-template-columns:repeat(4,minmax(0,1fr))!important}.rstat div{padding:5px 4px}
+.rsets{display:flex;flex-wrap:wrap;gap:6px}.rset{font-size:.72rem;padding:3px 10px;border-radius:99px;border:1px solid color-mix(in srgb,var(--sc) 55%,transparent);color:var(--ink-dim);background:rgba(0,0,0,.25)}
+.rset.on{color:#fff;background:color-mix(in srgb,var(--sc) 28%,rgba(0,0,0,.4));box-shadow:0 0 10px color-mix(in srgb,var(--sc) 45%,transparent)}
+.rbox-h{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}.mlay.picking .rbox-h{color:var(--ink-dim);background:rgba(18,22,19,.97)}.rbox-h b{color:var(--ink)}
+.rfil{display:flex;gap:4px}.rfil button{padding:3px 10px;border-radius:99px;border:1px solid var(--line);background:var(--panel-hi);font-size:.72rem}.rfil button.on{background:var(--gold);color:#2a1a08;border-color:var(--gold)}
+.rjunk{padding:4px 10px;font-size:.72rem;margin-left:auto;border-radius:99px}
+.rgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:8px}
+.rcard{position:relative;aspect-ratio:1;border-radius:14px;padding:7px;display:grid;place-items:center;background:radial-gradient(circle at 50% 40%,color-mix(in srgb,var(--gc) 14%,transparent),rgba(0,0,0,.28) 72%);border:1.5px solid color-mix(in srgb,var(--gc) 60%,transparent)}
+.rcard>img:first-child{width:100%;height:100%;object-fit:contain}
+.rcard .rst{position:absolute;bottom:4px;left:6px}.rcard .rown{position:absolute;bottom:2px;right:2px;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--gold);background:#111;object-fit:cover}
+.rcard.mine{box-shadow:0 0 0 2px var(--gold),0 0 12px rgba(255,210,122,.4)}.rcard.worn>img:first-child{opacity:.7}
+.rcard.g-legendary{box-shadow:0 0 12px rgba(255,180,58,.35)}.rcard.g-legendary.mine{box-shadow:0 0 0 2px var(--gold),0 0 14px rgba(255,180,58,.5)}
+#runeModal{z-index:60;align-items:end;justify-items:center}
+.rmod{position:relative;width:min(440px,100%);max-height:calc(100dvh - 24px);overflow:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:calc(env(safe-area-inset-bottom,0px) + 4px);border-color:color-mix(in srgb,var(--gc) 50%,var(--line))}
+.rmod h3{margin:0;text-align:center;font:500 1.3rem var(--f-display)}.rlvb{color:#ffd84a}
+.rx{position:absolute;top:8px;right:10px;z-index:2;width:36px;height:36px;border-radius:50%;background:var(--panel-hi);border:1px solid var(--line)}
+.rmeta{display:flex;justify-content:center;gap:6px;align-items:center}.rstars{color:#ffd84a;text-shadow:0 0 6px rgba(255,200,60,.6)}
+.rmain{text-align:center;font:600 1.15rem var(--f-display);color:#fff4d6}.rmain small{display:block;font:500 .74rem var(--f-body);color:#86e892}
+.rsubs{display:grid;grid-template-columns:1fr 1fr;gap:6px}.rsubs div{padding:6px 8px;border-radius:10px;background:var(--panel-hi);font-size:.8rem;text-align:center}
+.rsubs .ph{color:var(--ink-faint);border:1px dashed var(--line);background:none;font-size:.72rem}.rsubs .new{background:rgba(127,224,138,.18);color:#c8ffce;animation:rnew 1.1s ease-out}
+.rsetd{font-size:.78rem;color:var(--ink-dim);padding:6px 10px;border-radius:10px;border-left:3px solid var(--sc);background:rgba(0,0,0,.2)}
+.rup{display:flex;flex-direction:column;gap:8px;align-items:center;text-align:center;padding:10px;border:1px solid rgba(255,210,122,.4);border-radius:14px;background:rgba(255,210,122,.05);font-size:.84rem}.rup .bad{color:#ffb3a8}.rup .row{justify-content:center}.rup .row button{white-space:nowrap;min-width:110px}
+.rwho{display:flex;align-items:center;justify-content:center;gap:6px;font-size:.8rem;color:var(--ink-dim)}.rwho img{width:30px;height:30px;border-radius:50%;border:1px solid var(--gold);object-fit:cover;background:#111}
+.rbtns{justify-content:center}.alt.warn{border-color:#ff8a6a;color:#ffc2b0;background:rgba(255,90,60,.15)}
+.rmod.busy button{pointer-events:none;opacity:.55}
+.rforge{display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:4px}
+.ranvil{position:relative;width:150px;height:150px;display:grid;place-items:center}
+.ranvil::before{content:"";position:absolute;inset:12px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--sc) 45%,transparent),transparent 70%)}
+.rbig{position:relative;width:116px;height:116px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.6))}
+.rring{position:absolute;inset:4px;border-radius:50%;border:2px solid var(--gc);opacity:.35;box-shadow:0 0 18px var(--gc) inset}
+.ranvil.charge .rbig{animation:rshake .62s linear}.ranvil.charge .rring{animation:rcharge .62s ease-in forwards}
+.ranvil.ok .rbig{animation:rpop .55s cubic-bezier(.2,1.6,.4,1)}.ranvil.ok .rring{animation:rburst .7s ease-out}
+.rspark{position:absolute;inset:-22px;border-radius:50%;pointer-events:none;opacity:0;background:repeating-conic-gradient(from 6deg,#fff3b8 0 3deg,transparent 3deg 30deg);-webkit-mask:radial-gradient(circle,transparent 34%,#000 36%,#000 58%,transparent 72%);mask:radial-gradient(circle,transparent 34%,#000 36%,#000 58%,transparent 72%)}
+.ranvil.ok .rspark{animation:rrays .8s ease-out}
+.ranvil.fail .rbig{animation:rfail .5s linear;filter:grayscale(.75) brightness(.7) drop-shadow(0 6px 10px rgba(0,0,0,.6))}
+.rcrack{position:absolute;inset:26px;opacity:0;pointer-events:none;background:linear-gradient(115deg,transparent 46%,rgba(25,12,6,.92) 47%,transparent 49%),linear-gradient(62deg,transparent 52%,rgba(25,12,6,.85) 53%,transparent 55%),linear-gradient(165deg,transparent 40%,rgba(25,12,6,.8) 41%,transparent 43%)}
+.ranvil.fail .rcrack{animation:rcrack 1s ease-out}
+.rres{min-height:1.4em;font:600 .98rem var(--f-display);text-align:center}.rres.ok{color:#ffe27a;text-shadow:0 0 10px rgba(255,210,80,.7);animation:rtxt .5s ease-out}.rres.fail{color:#ff9d8a;animation:rtxt .5s ease-out}
+@keyframes rshake{0%,100%{transform:none}20%{transform:translate(-2px,1px) rotate(-2deg)}40%{transform:translate(2px,-1px) rotate(2deg)}60%{transform:translate(-3px,0) rotate(-3deg) scale(1.03)}80%{transform:translate(3px,1px) rotate(3deg) scale(1.06)}}
+@keyframes rcharge{from{opacity:.3;transform:scale(1.25)}to{opacity:1;transform:scale(.72);box-shadow:0 0 30px var(--gc) inset,0 0 30px var(--gc)}}
+@keyframes rburst{0%{opacity:1;transform:scale(.6);box-shadow:0 0 40px #ffe27a inset,0 0 40px #ffe27a}100%{opacity:0;transform:scale(1.7)}}
+@keyframes rpop{0%{transform:scale(.8)}60%{transform:scale(1.18)}100%{transform:none}}
+@keyframes rrays{0%{opacity:0;transform:scale(.6) rotate(0)}30%{opacity:1}100%{opacity:0;transform:scale(1.35) rotate(40deg)}}
+@keyframes rfail{0%,100%{transform:none}15%{transform:translateX(-7px)}30%{transform:translateX(6px)}45%{transform:translateX(-5px)}60%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
+@keyframes rcrack{0%{opacity:0}15%{opacity:1}70%{opacity:1}100%{opacity:0}}
+@keyframes rtxt{from{transform:scale(1.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes rnew{from{box-shadow:0 0 0 2px #7fe08a,0 0 16px #7fe08a}to{box-shadow:none}}
+@media (max-width:760px){.mlay.rmode .mstage{display:none}.mlay.rmode{grid-template-rows:auto minmax(180px,1fr)}.rpane>.note{display:none}}
+@media (max-width:520px){.rsock img{width:46px;height:46px}.rsock small{font-size:.56rem}.rstat div{font-size:.6rem}.rgrid{grid-template-columns:repeat(auto-fill,minmax(60px,1fr))}.rfil button{padding:3px 8px}}
+@media (prefers-reduced-motion:reduce){.ranvil *,.rres,.rsubs .new{animation:none!important}}
 </style>
 
 <canvas id="game" aria-label="ฉากเกม Eggbound"></canvas>

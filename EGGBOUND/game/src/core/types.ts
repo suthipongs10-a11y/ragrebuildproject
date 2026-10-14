@@ -1,4 +1,5 @@
 // Battle-core types. Pure data; no DOM / rendering.
+import type { RuneBonus } from './runes';
 export type Elem = 'fire' | 'water' | 'wind' | 'earth' | 'light' | 'dark';
 export type Role = 'Attacker' | 'Defender' | 'Support' | 'Healer' | 'Controller';
 export type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
@@ -75,7 +76,7 @@ export interface SpeciesDef {
   scale?: number;               // render scale multiplier
   art?: string;                 // sprite set key; absent → placeholder recolor
 }
-export interface MonsterRef { sid: string; lvl: number; stars: number; sk?: number[]; rare?: boolean }  // sk = skill levels (default 1)
+export interface MonsterRef { sid: string; lvl: number; stars: number; sk?: number[]; rare?: boolean; rb?: RuneBonus }  // sk = skill levels (default 1) · rb = its runes (core/runes.ts)
 /** boss: this unit is a zone boss (bars, boss rules) even when its species is a normal monster · name/scale: elite title & size */
 export interface EnemyRef extends MonsterRef { hpMult?: number; atkMult?: number; boss?: boolean; name?: string; scale?: number }
 /** a zone (โซน) on the world map: one place with five stages, the fifth is its boss */
@@ -102,6 +103,7 @@ export interface Unit {
   statuses: Status[]; marks: Mark[];
   alive: boolean; leader: boolean;
   rare?: boolean; passive?: PassiveDef; pUsed?: boolean;
+  runeReact?: number; leech?: number; markUp?: number; // rune sets: reaction damage, lifesteal, element-mark chance
 }
 
 // ---- events ----

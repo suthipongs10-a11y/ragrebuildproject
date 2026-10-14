@@ -5,9 +5,11 @@ import type { Rarity } from '../core/types';
 import type { SaveData, EggSave, MonSave } from './save';
 import { newMon } from './save';
 import { canHatch, endIncub } from './home';
+import { dropRunes, freeRunes } from './runes';
+import type { Rune } from '../core/runes';
 
 export interface MonGain { uid: number; sid: string; fromLvl: number; toLvl: number; exp: number; capped: boolean }
-export interface Reward { win: boolean; stars: number; firstClear: boolean; gold: number; gains: MonGain[]; frags: Record<string, number>; eggs: EggSave[]; star?: string } // star: a Starborn shard dropped (species id)
+export interface Reward { win: boolean; stars: number; firstClear: boolean; gold: number; gains: MonGain[]; frags: Record<string, number>; eggs: EggSave[]; star?: string; runes: Rune[] } // star: a Starborn shard dropped (species id)
 export const FRAGS_TO_CRAFT = 20;
 
 /** easy: the stages open one after another across the whole map. Normal/hard: a zone opens once its boss is beaten one
@@ -22,7 +24,7 @@ export function stageUnlocked(s: SaveData, key: string): boolean {
 export function grantRewards(s: SaveData, stageId: string, win: boolean, stars: number, seen: string[], seed: number): Reward {
   const st = stageOf(stageId)!, D = DIFFS[st.diff || 0];
   const first = win && !(s.stages[stageId] > 0);
-  const r: Reward = { win, stars, firstClear: first, gold: 0, gains: [], frags: {}, eggs: [] };
+  const r: Reward = { win, stars, firstClear: first, gold: 0, gains: [], frags: {}, eggs: [], runes: [] };
   let rs = seed >>> 0; const rnd = () => { rs = (rs * 1664525 + 1013904223) >>> 0; return rs / 4294967296; };
   const expGain = win ? st.reward.exp : Math.round(st.reward.exp * 0.25);
   r.gold = win ? st.reward.gold + (first ? st.reward.gold : 0) : 0;
@@ -42,6 +44,7 @@ export function grantRewards(s: SaveData, stageId: string, win: boolean, stars: 
     // Starborn shard: the first clear always drops one, after that it is a long farm
     const star = starbornOf(st); if (star && (first || rnd() < D.shard)) { r.star = star; s.starShards[star] = (s.starShards[star] || 0) + 1; }
     if (first || rnd() < (boss ? EGG_DROP.bossChance : EGG_DROP.chance)) { const e = rollMysteryEgg(s, rnd, D.tierW); s.eggs.push(e); r.eggs.push(e); }
+    r.runes = dropRunes(s, st, first, boss, rnd); // after every older roll, so egg/shard drops stay as they were
     s.stages[stageId] = Math.max(s.stages[stageId] || 0, stars);
   }
   return r;
@@ -124,7 +127,7 @@ export function evoCheck(s: SaveData, uid: number, food: number[]): EvoCheck {
 export function evolve(s: SaveData, uid: number, food: number[]): MonSave | null {
   if (!evoCheck(s, uid, food).ok) return null;
   const t = monOf(s, uid)!; s.gold -= EVO_GOLD[t.stars];
-  s.mons = s.mons.filter(m => !food.includes(m.uid)); s.team = s.team.filter(u => !food.includes(u));
+  s.mons = s.mons.filter(m => !food.includes(m.uid)); s.team = s.team.filter(u => !food.includes(u)); freeRunes(s);
   t.stars++; t.lvl = 1; t.exp = 0; s.stats.evolve++; return t;
 }
 /** EXP a food monster gives (by its level and stars) */
@@ -144,7 +147,7 @@ export function feedPreview(s: SaveData, uid: number, food: number[]): FeedPrevi
 /** power-up: food monsters are consumed (and leave the team), the target gains their EXP */
 export function feed(s: SaveData, uid: number, food: number[]): FeedPreview | null {
   const p = feedPreview(s, uid, food); if (!p.ok) return null;
-  const t = monOf(s, uid)!; s.gold -= p.gold; s.mons = s.mons.filter(m => !food.includes(m.uid)); s.team = s.team.filter(u => !food.includes(u));
+  const t = monOf(s, uid)!; s.gold -= p.gold; s.mons = s.mons.filter(m => !food.includes(m.uid)); s.team = s.team.filter(u => !food.includes(u)); freeRunes(s);
   t.lvl = p.toLvl; t.exp = p.toExp; s.stats.feed++; return p;
 }
 export const skillMaxed = (m: MonSave) => m.sk.every((l, i) => l >= SKILL_MAX[i]);
@@ -152,7 +155,7 @@ export const skillMaxed = (m: MonSave) => m.sk.every((l, i) => l >= SKILL_MAX[i]
 export function skillUp(s: SaveData, uid: number, food: number | null, rnd: () => number = Math.random): number {
   const t = monOf(s, uid); if (!t || skillMaxed(t)) return -1;
   if (food == null) { if (s.items.soul < 1) return -1; s.items.soul--; }
-  else { const f = monOf(s, food); if (!f || f.uid === uid || f.sid !== t.sid) return -1; s.mons = s.mons.filter(m => m.uid !== food); s.team = s.team.filter(u => u !== food); }
+  else { const f = monOf(s, food); if (!f || f.uid === uid || f.sid !== t.sid) return -1; s.mons = s.mons.filter(m => m.uid !== food); s.team = s.team.filter(u => u !== food); freeRunes(s); }
   const open = [0, 1, 2].filter(i => t.sk[i] < SKILL_MAX[i]), slot = open[Math.floor(rnd() * open.length)];
   t.sk[slot]++; s.stats.skillUp++; return slot;
 }
@@ -161,7 +164,8 @@ export function skillUp(s: SaveData, uid: number, food: number | null, rnd: () =
 export type LootItem = { kind: 'gold'; grade: LootGrade; qty: number; first: boolean }
   | { kind: 'frag'; grade: LootGrade; qty: number; sid: string }
   | { kind: 'egg'; grade: LootGrade; egg: EggSave }
-  | { kind: 'star'; grade: LootGrade; sid: string }; // a Starborn shard — always the chest's best item
+  | { kind: 'star'; grade: LootGrade; sid: string } // a Starborn shard — always the chest's best item
+  | { kind: 'rune'; grade: LootGrade; rune: Rune };
 /** chest items, worst first so the best one pops out last; chest grade = the best item's grade */
 export function lootOf(r: Reward): { items: LootItem[]; grade: LootGrade } {
   const items: LootItem[] = [];
@@ -169,6 +173,7 @@ export function lootOf(r: Reward): { items: LootItem[]; grade: LootGrade } {
   for (const [sid, n] of Object.entries(r.frags)) items.push({ kind: 'frag', grade: 'common', qty: n, sid });
   for (const egg of r.eggs) items.push({ kind: 'egg', grade: egg.kind === 'mystery' && egg.tier ? EGG_LOOT_GRADE[egg.tier] : 'rare', egg });
   if (r.star) items.push({ kind: 'star', grade: 'legendary', sid: r.star });
+  for (const rune of r.runes || []) items.push({ kind: 'rune', grade: rune.grade, rune });
   const rank = (g: LootGrade) => LOOT_ORDER.indexOf(g);
   items.sort((a, b) => rank(a.grade) - rank(b.grade));
   return { items, grade: items.length ? items[items.length - 1].grade : 'common' };

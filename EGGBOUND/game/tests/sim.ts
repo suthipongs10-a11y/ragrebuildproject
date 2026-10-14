@@ -3,6 +3,7 @@ import { simulate } from '../src/core/battle';
 import { STAGES, planOf, stageOf, stageKey, DIFFS } from '../src/core/data';
 import { eggTests } from './eggs';
 import { passiveTests } from './passives';
+import { runeTests } from './runes';
 const team = (lvl: number, stars = 1) => ['A01', 'A02', 'A03', 'A04'].map(sid => ({ sid, lvl, stars }));
 let fail = 0;
 for (const st of STAGES) {
@@ -30,4 +31,5 @@ for (const d of [1, 2]) {
 }
 fail += eggTests();
 fail += passiveTests();
+fail += runeTests();
 (globalThis as any).process?.exit(fail ? 1 : 0);
