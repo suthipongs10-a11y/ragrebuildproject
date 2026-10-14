@@ -144,6 +144,34 @@ export const lookOf = (sid: string, stars: number, rare = false) => { const up =
 const VAR_R = { dh: .5, sat: 1.18, lit: 1.04, all: 1.04 }; // rare form: opposite hue, a little richer
 const VAR_E = { 4: { dh: .09, sat: 1.22, lit: 1, all: 1.02 }, 5: { dh: .09, sat: 1.3, lit: 1.03, all: 1.05 }, 6: { dh: .09, sat: 1.3, lit: 1.03, all: 1.05 } };
 const evoArt = sid => { const L = lookLv(sid), s = SP(sid); return L >= 5 && s.art && IMG[s.art + 'e_front_idle'] ? s.art + 'e' : null; };
+/** battle size by stars (owner 2026-10-14: a ★5 awakened tiger looked smaller than ★1 monsters): ★1 a bit smaller, every
+ *  star a bit bigger, the ★5–6 evolved forms clearly bigger. Bosses never shrink below their own size. */
+export const STAR_SIZE = [1, .92, .95, .98, 1, 1.08, 1.12];
+const opaque = (im: HTMLImageElement) => { try { const c = mk(128, 128), x = c.getContext('2d')!; x.drawImage(im, 0, 0, 128, 128); const d = x.getImageData(0, 0, 128, 128).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 40) n++; return n; } catch (e) { return 0; } };
+const AREA = {};
+/** opaque area of an art's front idle (128 px sample), relative to the starter fox — 0 when it cannot be read */
+const areaOf = (key: string) => { if (AREA[key] != null) return AREA[key]; const im = IMG[key + '_front_idle'] || IMG[key + '_master'], f = IMG.mon001_front_idle;
+  const a = im ? opaque(im) : 0, r = f ? opaque(f) : 0; return (AREA[key] = a && r ? a / r : 0); };
+/** the least area a rarity should cover (× the fox): rare art drawn small still reads as more than a common */
+const RARITY_AREA: Record<string, number> = { common: 0, rare: .93, epic: 1.15, legendary: 1.22 };
+const SIZEK = {};
+/** per-art size fix: a rare+ base art drawn smaller than its rarity's least area is scaled up; an evolved (★5) art covers
+ *  at least 1.3× its own base form and 1.3× the fox (evolved forms must look bigger than any ★1) */
+function artFix(look: string) {
+  const s = SP(look), ea = evoArt(look), key = ea || (s && s.art) || ''; if (!key) return 1;
+  if (SIZEK[key] != null) return SIZEK[key];
+  const clamp = (v: number) => Math.min(1.3, Math.max(1, v)), a = areaOf(key);
+  let k = 1;
+  if (a) {
+    if (ea) { const b = areaOf(s.art), bk = b ? clamp(Math.sqrt((RARITY_AREA[s.rarity] || 0) / b)) : 1; k = clamp(Math.sqrt(Math.max(1.3 * b * bk * bk, 1.3) / a)); }
+    else k = clamp(Math.sqrt((RARITY_AREA[s.rarity] || 0) / a));
+  }
+  return (SIZEK[key] = k);
+}
+export function sizeK(look: string, stars: number, boss = false) {
+  const st = STAR_SIZE[Math.max(1, Math.min(6, stars || 1))];
+  return (boss ? Math.max(1, st) : st) * artFix(look);
+}
 /** does this species have its own final art? */
 export const hasArt = sid => { const s = SP(sid); return !!(s && s.art && (IMG[s.art + '_front_idle'] || IMG[s.art + '_master'])); };
 const SPR = {};

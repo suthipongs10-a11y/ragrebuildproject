@@ -2,7 +2,7 @@
 // Battle scene: plays battle-core TurnStart/ActionResult events as animation + VFX, and collects player commands.
 import { Battle, REACTION_NAME } from '../core/battle';
 import { SPECIES } from '../core/data';
-import { PAL, PIV, ANCH, anchOf, TAU, spr, silOf, glowOf, GP, dot, portrait, IMG, fx, lookOf, awakeLook, poseKey, warpDraw } from './assets';
+import { PAL, PIV, ANCH, anchOf, TAU, spr, silOf, glowOf, GP, dot, portrait, IMG, fx, lookOf, awakeLook, poseKey, warpDraw, sizeK } from './assets';
 import { sfx } from './audio';
 import { drawAurasBack, drawAurasFront, tickAuras, domePop, domeHit, domeBreak } from './auras';
 import {
@@ -28,9 +28,9 @@ export class BattleView {
 
   // ---------- views ----------
   makeView(u, pos, drop) {
-    const s = SPECIES[u.sid];
-    const v = { uid: u.uid, sid: u.awake ? awakeLook(u.sid, !!u.rare) : lookOf(u.sid, u.stars, !!u.rare), awake: !!u.awake, rare: !!u.rare, team: u.team, elem: u.elem, boss: u.boss, name: u.name, stars: u.stars, lvl: u.lvl,
-      x: pos[0], y: pos[1], hx: pos[0], hy: pos[1], hop: drop ? -620 : 0, sx: 1, sy: 1, rot: 0, k: .4 * (u.scale || s.scale || 1),
+    const s = SPECIES[u.sid], look = u.awake ? awakeLook(u.sid, !!u.rare) : lookOf(u.sid, u.stars, !!u.rare);
+    const v = { uid: u.uid, sid: look, awake: !!u.awake, rare: !!u.rare, team: u.team, elem: u.elem, boss: u.boss, name: u.name, stars: u.stars, lvl: u.lvl,
+      x: pos[0], y: pos[1], hx: pos[0], hy: pos[1], hop: drop ? -620 : 0, sx: 1, sy: 1, rot: 0, k: .4 * (u.scale || s.scale || 1) * sizeK(look, u.stars, u.boss),
       back: u.team === 0, flip: u.team === 1, hb: u.team === 0, hf: u.team === 1, pose: 'idle', alpha: drop ? 0 : 1, flash: 0, ghosts: [], glowF: 0,
       dead: false, deathT: 0, hitT: 0, kvx: 0, kvy: 0, hp: u.hp, maxHp: u.maxHp, shown: u.hp, st: new Set(), marks: new Set(), busy: !!drop, ph: Math.random() * 9, emberT: 0, atb: 0, shieldAmt: 0,
       bend: 0, bendV: 0, bendT: 0, wave: 0, wph: 0, br: 0 }; // living-sprite springs (lean / recoil / ripple / breathing)
