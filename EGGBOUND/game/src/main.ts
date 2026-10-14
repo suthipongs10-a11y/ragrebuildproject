@@ -64,6 +64,13 @@ const mmss = ms => { const t = Math.ceil(ms / 1000); return Math.floor(t / 60) +
 function enLabel() { const v = energyNow(S), n = energyNext(S); return `${v}/${ENERGY_MAX}` + (n ? ` <small>+1 ${mmss(n)}</small>` : ''); }
 /** separate-file art status for the settings screen (Starborn sprites + painted battle plates) */
 const extLine = () => { const p = plateStat(), x = EXT_STAT; return `ฉากต่อสู้ ${p.ok}/${p.total} · ตำนานดารา ${x.ok}/${x.total}${x.way ? ` (โหลดแบบ ${x.way})` : ''}${x.fail ? ` · โหลดไม่ได้ ${x.fail} ครั้ง: ${esc(x.err)}` : ''}`; };
+/** every error the player could hit (renders, taps, loads — not only the frame loop): shown once as a toast and kept for
+ *  the settings screen, so the owner can send a screenshot from the real device (2026-10-14: a report we could not reproduce) */
+const errSeen = new Set<string>(); let lastErr = '';
+function reportErr(e: any) { const m = String(e && (e.message || e.reason) || e); lastErr = m + (e && e.stack ? ' @ ' + String(e.stack).split('\n').slice(1, 3).map(x => x.trim()).join(' ← ') : '');
+  if (errSeen.has(m)) return; errSeen.add(m); console.error(e); try { toast('เกิดข้อผิดพลาด (แคปจอนี้ส่งผู้พัฒนาได้): ' + m.slice(0, 80)); } catch (_) { /* toast itself failed */ } }
+window.addEventListener('error', ev => { const m = String(ev.message || ''); if (!ev.error && (/ResizeObserver|^Script error/.test(m) || !m)) return; reportErr(ev.error || m); }); // benign browser noise skipped
+window.addEventListener('unhandledrejection', ev => reportErr(ev.reason));
 const enPill = () => `<button class="gold en" type="button" data-en="open" title="พลังงาน — ใช้เฉพาะตอนเปิด AUTO · เล่นเองไม่ใช้ · แตะเพื่อเติมด้วยเพชร"><b>⚡</b><span class="enTxt">${enLabel()}</span><em class="enplus">+</em></button>`;
 /** gem energy refill sheet (owner 2026-10-13: ENERGY_REFILL_DAILY per local day); `need` = the AUTO cost that brought the player here */
 let enNeed = 0;
@@ -533,6 +540,7 @@ function settingsHTML() {
   <div class="set"><span>ทดสอบ (prototype): มอนชุดใหม่</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="mons">รับมอนทุกตัว</button><button class="alt" type="button" data-dev="evo">เตรียมอัปดาว</button><button class="alt" type="button" data-dev="gems">+เพชร 500</button><button class="alt" type="button" data-dev="rare">ทำให้เป็นร่างหายาก</button><button class="alt" type="button" data-dev="star5">อัปเป็น ★5 (ดูร่างวิวัฒน์)</button><button class="alt" type="button" data-dev="runes">รูนทดสอบ 12 ชิ้น + ทอง 100,000</button><button class="alt" type="button" data-dev="hell">เปิดระดับนรกทุกโซน</button><button class="alt" type="button" data-dev="special">เศษไข่ขุนสมิงเผือก 20</button></span></div>
   <div class="set"><span>ทดสอบ (prototype): ฟักมอนระดับ</span><span class="row" style="flex:0 0 auto">${['common', 'rare', 'epic', 'legendary'].map(g => `<button class="alt" type="button" data-dev="hatch:${g}">${LOOT_GRADES[g].name}</button>`).join('')}</span></div>
   <div class="set"><span>ภาพไฟล์แยก (ตรวจการโหลด)<small class="note" style="display:block">${extLine()}</small></span></div>
+  <div class="set"><span>ตรวจระบบ (แคปส่งผู้พัฒนาได้)<small class="note" style="display:block;word-break:break-all">มอน ${S.mons.length} ตัว · สารบัญ ${S.dex.length} ชนิด · ภาพในเกม ${Object.keys(IMG).length} · จอ ${innerWidth}×${innerHeight} · ${esc(navigator.userAgent.replace(/^Mozilla\/5\.0 /, '').slice(0, 90))}<br>ข้อผิดพลาดล่าสุด: ${lastErr ? esc(lastErr.slice(0, 220)) : 'ไม่มี'}</small></span></div>
   <div class="set"><span>ทดสอบ (prototype): พลังงาน AUTO</span><span class="row" style="flex:0 0 auto"><button class="alt" type="button" data-dev="energy">เติมพลังงานเต็ม</button></span></div>
   <div class="set"><span>ทดสอบ (prototype): หีบสมบัติ</span><span class="row" style="flex:0 0 auto">${['common', 'rare', 'epic', 'legendary'].map(g => `<button class="alt" type="button" data-dev="chest:${g}">${LOOT_GRADES[g].name}</button>`).join('')}</span></div>
   <p class="note">P0 เซฟในเครื่องนี้เท่านั้น · ระบบต่อสู้ทำงานแบบ deterministic (seed เดิม + คำสั่งเดิม = ผลเดิม) เพื่อให้เซิร์ฟเวอร์ตรวจผลได้ในเฟสออนไลน์</p></div></section>`;
@@ -887,9 +895,8 @@ addEventListener('keydown', e => {
 // ---------- loop ----------
 let last = performance.now(), mineT = 0, incT = 0;
 /** a bug in one frame must never stop the game: log it, tell the player once, keep the loop going */
-const errSeen = new Set<string>();
 function guard(f: () => void) {
-  try { f(); } catch (e: any) { const m = String(e && e.message || e); if (!errSeen.has(m)) { errSeen.add(m); console.error(e); toast('เกิดข้อผิดพลาด (แคปจอนี้ส่งผู้พัฒนาได้): ' + m.slice(0, 80)); } }
+  try { f(); } catch (e: any) { reportErr(e); }
 }
 function frame(now) {
   requestAnimationFrame(frame);
