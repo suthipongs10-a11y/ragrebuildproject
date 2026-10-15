@@ -24,7 +24,7 @@ github.com → repo **ragrebuildproject** → **Settings** → **Secrets and var
 ⚠️ บล็อกนี้มีกุญแจลับ — วางใน GitHub เท่านั้น ห้ามส่งในแชท
 
 ### 3. สั่งอัปโหลดรอบแรก
-repo → **Actions** → **Eggbound VPS** → **Run workflow** (หรือรอ push ครั้งถัดไป) · ใช้เวลา ~5–15 นาที (รอบแรกแปลงรูปนานสุด)
+push ครั้งถัดไป หรือ repo → **Actions** → **Eggbound VPS** → เปิดรอบล่าสุด → **Re-run all jobs** (ปุ่ม Run workflow ไม่ขึ้น เพราะ workflow อยู่บน branch งาน ไม่ใช่ default branch) · ใช้เวลา ~5–15 นาที (รอบแรกแปลงรูปนานสุด)
 แล้วเปิด `http://<IP>:8080/` บนมือถือ
 
 ## ถ้าเปิดไม่ได้
