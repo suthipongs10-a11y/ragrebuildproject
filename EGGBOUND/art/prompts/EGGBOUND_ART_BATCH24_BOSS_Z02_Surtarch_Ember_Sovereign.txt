@@ -1,0 +1,210 @@
+=====================================================================
+EGGBOUND — ART BATCH 24 (BOSS) : MON_Z02 "Surtarch, the Ember Sovereign" (เซิร์ทาร์ค ราชันเถ้าอัคคี)
+Image generation instructions for ChatGPT
+=====================================================================
+
+[หมายเหตุสำหรับผู้ใช้]
+- บอสอัศวินจอมมาร (Evil Lord Knight) ดีไซน์ของเราเอง · ธาตุไฟ ตาแดง · คู่ปรับของราชาน้ำแข็ง ฮริมาร์ค
+  (ราชาน้ำแข็ง = นิฟล์ไฮม์ แดนน้ำแข็ง · ตัวนี้ = มุสเปลไฮม์ แดนไฟ ในตำนานนอร์ส)
+  · ยืม "อารมณ์" จากภาพตัวอย่างได้: อัศวินจอมมารตัวสูงใหญ่ เกราะดำ มงกุฎโบราณ ตาแดง สนามรบเถ้าถ่าน น่าเกรงขาม
+  · แต่ห้ามลอกตัวละครในภาพตัวอย่าง (เป็นตัวละครจากหนังดัง) — ในไฟล์สั่งห้ามไว้แล้ว:
+    หมวกเกราะที่หนามแหลมตั้งขึ้นเป็นมงกุฎ · กระบองหัวใหญ่ · เกราะดำหนามเต็มตัว
+  · จุดต่างของเรา: มงกุฎทองแดงโบราณ "แยกชิ้น" สวมทับหมวกเกราะ (ยอดหัก อัญมณีแดงร้าว) ·
+    หน้ากากเหล็กดำเป็นหน้าราชาที่ตายไปแล้ว ตาแดงลุกโชนสองดวง · เกราะออบซิเดียนมีรอยแยกลาวาไหลตามขอบ ·
+    อาวุธ "ดาบใหญ่สองมือ" แก้วภูเขาไฟสีดำ แกนกลางลาวา (ดาบเพลิงของซูร์ทในตำนาน) — ไม่ใช่กระบอง
+- ⚠️ อย่าแนบรูปตัวอย่างที่เป็นตัวละครจากหนังให้ ChatGPT (มันจะลอกตาม) · แนบแค่ไฟล์นี้ + mon001_master
+- ธาตุอื่น (ตา/ขอบเกราะ/แกนดาบเปลี่ยนสี): เกมเปลี่ยนสีเองด้วยโค้ด จากชุดภาพไฟนี้ชุดเดียว
+  → ส่วนที่เป็นสีแดงส้มเพลิงต้องสดชัด ส่วนอื่นต้องเป็นสีหม่น (ดำ เทา ทองแดงหมอง) ตามที่ไฟล์สั่ง
+- ออร่าไฟ/เถ้าลอย/แสงเรือง: เกมทำเองด้วยโค้ด (ภาพ #14–#16 = หินอักขระ 3 ก้อนที่เกมจะหมุนรอบตัว)
+  → ในภาพตัวละครห้ามมีออร่า/ไฟลุก/ประกายไฟ
+- เปิดแชทใหม่ใน ChatGPT แนบ 2 อย่าง: ไฟล์นี้ + mon001_master (จิ้งจอก ภาพอ้างอิงสไตล์เท่านั้น)
+- พิมพ์ว่า "ทำตามไฟล์นี้ทีละภาพ" · ตรวจภาพ #01 ให้ดีก่อนตอบ "OK" (ทุกภาพยึดตามภาพนี้)
+- รวม 16 ภาพ · ขอเป็น PNG พื้นใส · ส่งกลับเป็นไฟล์เดี่ยว หรือ zip เล็กไม่เกิน ~15MB (แบ่ง 2 ก้อนได้)
+
+---------------------------------------------------------------------
+0. YOUR ROLE
+---------------------------------------------------------------------
+You are the art producer for a 2.5D turn-based monster RPG. Generate 16
+images, ONE IMAGE PER TURN, in the order below. The images are animated
+by code, so CONSISTENCY matters more than creativity: every character
+image must show the exact same character.
+
+The attached mon001_master (a fire fox) is a STYLE REFERENCE ONLY:
+match its art style, shading, line quality, lighting, camera angle and
+level of detail. Do NOT copy the fox's design, colors or body.
+
+Work order:
+  1. Generate #01 (MASTER). Show it and wait for my "OK".
+  2. After "OK", generate #02–#16 one by one, each time using #01 as the
+     character reference.
+  3. Run the QUALITY CHECK, then package the ZIP (section 6).
+
+---------------------------------------------------------------------
+1. MASTER STYLE (applies to every image)
+---------------------------------------------------------------------
+STYLE: painterly anime fantasy game art for a 2.5D turn-based monster RPG.
+Soft dimensional shading, clean readable silhouette, crisp edges, no blur.
+THIS IS A MAJOR BOSS: an evil lord knight — towering, broad, heavy, ancient
+and menacing. NOT cute, NOT chibi, but still exactly the same painterly
+game style as the reference.
+Lighting: warm key light from TOP-LEFT, soft cool fill from right.
+Camera: HIGH ANGLE about 55 degrees looking down, orthographic feel.
+Background: FULLY TRANSPARENT (or flat solid #FF00FF if transparency fails).
+FORBIDDEN: ground, cast shadow, glow, aura, flames, fire, smoke, embers or
+sparks in the air, particles, light rays, motion lines, text, letters,
+watermark, frame, second character. (The game adds the fire aura, the
+glow and the floating embers in code.)
+
+COLOR RULE (very important — the game recolors him for other elements):
+  - EMBER parts = bright, saturated red-orange (like lava, #FF3A1A to
+    #FF8A2A): ONLY the two eyes, the lava cracks along the armor edges and
+    trim lines, the gems of the crown, and the molten core of the sword.
+    Painted bright, but with NO glow halo around them.
+  - EVERYTHING ELSE must be LOW-saturation: blackened iron, charcoal,
+    dark obsidian grey, dull tarnished bronze. No other red, orange, pink
+    or purple anywhere (the cape is charcoal-black, not red).
+
+ORIGINAL DESIGN - do not copy or resemble any existing game, film, anime
+or novel character (Dota, League of Legends, Summoners War, Pokemon, etc.).
+In particular it must NOT resemble:
+  - Sauron of The Lord of the Rings (NO tall black helmet whose spikes
+    rise up as a crown, NO huge flanged mace, NO black armor covered in
+    spikes, NO ring),
+  - the Lich King of Warcraft (no horned helmet-crown, no skull pauldrons),
+  - Marvel's Surtur or the God of War fire giant (no horned demon head,
+    no giant molten skeleton body, no crown of horns),
+  - any Dark Souls / Elden Ring boss (not a lord of cinder, not Gwyn).
+Myth source (public domain): Norse mythology — Surtr, the lord of
+Muspelheim, the primordial realm of fire, who carries a flaming sword.
+Our knight is our own creation inspired by that realm.
+
+Technical rules:
+- Canvas 1024 x 1024 px PNG, subject centered, at least 60 px empty margin.
+- The lowest point (feet / bottom of the cape) sits on an invisible ground
+  line at y ≈ 900 px in EVERY character image.
+- SAME SCALE in every character image of this set.
+
+---------------------------------------------------------------------
+2. CHARACTER SHEET — MON_Z02 Surtarch, the Ember Sovereign
+---------------------------------------------------------------------
+- Who: the last king of a burned-out kingdom, who swore to keep fighting
+  after his own death; the fire of his oath still burns inside the armor.
+  Proud, cruel, unstoppable — a dark lord knight, never a beast.
+  Element FIRE. Role: BOSS.
+- Size: BOSS class — body height about 76-80% of the canvas INCLUDING the
+  crown (top of the crown still at least 60 px from the top edge). Very
+  tall, wide armored shoulders, long cape: a towering silhouette that
+  reads clearly on a phone.
+- HELM: a closed great-helm of blackened iron whose face plate is forged
+  as the stern, expressionless face of a dead king (straight nose, closed
+  lips, heavy brow, a short iron-forged beard). Through the two eye holes:
+  two burning EMBER-red eyes (the brightest point of the image). No visible
+  skin, no skull. The helm itself is smooth and rounded — NO spikes rising
+  from it.
+- CROWN (his signature): an ANCIENT separate crown worn ON TOP of the helm —
+  a wide circlet of dull tarnished bronze-gold, dented and scorched, with
+  seven short broad points, two of them broken off; old engraved
+  knotwork; three cracked oval gems in EMBER red set in the front. It
+  looks a thousand years old and cursed, not shiny.
+- ARMOR: heavy layered plate of black obsidian-like iron, smooth broad
+  plates (not spiky), with thin LAVA CRACKS running along the plate edges
+  and trim lines like molten seams (EMBER color). Big rounded pauldrons
+  with three stacked layers; an engraved round seal on the chest showing a
+  stylized burning sword. Armored gauntlets and sabatons in the same
+  black iron.
+- CAPE: a long, heavy, tattered cape of charcoal-black cloth, its torn hem
+  scorched to dark grey (NOT burning, NOT red). It reaches the ground.
+- WEAPON: a huge TWO-HANDED GREATSWORD of black volcanic glass: a broad,
+  slightly jagged blade with a deep central crack running down its length
+  that shows a molten EMBER core; a heavy black-iron crossguard shaped like
+  two downturned blades; a long grip wrapped in old dark leather; a round
+  pommel. NOT a mace, NOT an axe, NOT a hammer, NOT a flail.
+- COLORS: black iron and obsidian, charcoal, dull bronze-gold crown, and
+  EMBER red-orange ONLY on eyes / armor cracks / crown gems / sword core.
+
+---------------------------------------------------------------------
+3. VIEWS
+---------------------------------------------------------------------
+FRONT VIEW = 3/4 front view from the high 55° camera, body facing
+             BOTTOM-RIGHT. We see the face plate, the eyes and the front.
+BACK VIEW  = 3/4 back view from the same camera, body facing TOP-RIGHT.
+             We see the cape, the back of the crown and helm, and only the
+             edge of the face plate.
+
+---------------------------------------------------------------------
+4. IMAGE LIST
+---------------------------------------------------------------------
+For #02–#13 start every prompt with:
+"Using the attached reference as the EXACT same character (same design,
+colors, markings, proportions, scale, line style and lighting),
+following all MASTER STYLE rules:"
+
+#01  MASTER (FRONT VIEW) — full-body character design in the idle pose.
+     This image defines the character for all others.
+#02  FRONT VIEW — IDLE:   Standing tall and still, both gauntlets resting on the pommel of the greatsword planted point-down in front of him, head slightly lowered, eyes burning — a king waiting for challengers.
+#03  FRONT VIEW — ATTACK: A massive diagonal two-handed greatsword cleave toward bottom-right, weight on the front leg, cape sweeping behind him.
+#04  FRONT VIEW — CAST:   The greatsword held upright in one hand beside him, the other gauntlet thrust forward with the fingers spread, commanding the fire; head raised.
+#05  FRONT VIEW — HIT:    Recoiling back, one shoulder turned away, the greatsword pulled in front to guard; the crown stays on his head.
+#06  FRONT VIEW — BURST:  Ultimate pose: the greatsword raised high overhead in both hands, wide powerful stance, cape flaring up and out — the moment before he brings down the end of the world. Keep the whole sword inside the canvas (angle it if needed).
+#07  BACK VIEW — IDLE   (same pose idea as #02, BACK VIEW)
+#08  BACK VIEW — ATTACK (same pose idea as #03, cleaving toward TOP-RIGHT)
+#09  BACK VIEW — CAST   (same pose idea as #04, BACK VIEW)
+#10  BACK VIEW — HIT    (same pose idea as #05, recoiling toward bottom-left)
+#11  BACK VIEW — BURST  (same pose idea as #06, BACK VIEW)
+#12  EGG — An egg of black volcanic glass with thin EMBER-red lava cracks running over it like veins, a dull bronze-gold band around the middle, and a small broken crown of seven points on its top.
+     Oval egg standing upright, height ~55% of canvas, bottom at y ≈ 900 px,
+     same art style and lighting, no nest, no glow, no flames.
+#13  FRONT VIEW — DEFEAT: Down on one knee, both hands on the greatsword planted in front of him, head bowed; the crown slipped and tilted; the lava cracks on the armor dimmed to dull dark red; the eyes still faintly red. Same scale; the knee and boot touch y ≈ 900 px.
+
+RUNE STONES (#14–#16) — three SEPARATE floating stones that the game will
+spin around him as his fire aura. Each on its own canvas, NOT the
+character. Rough black obsidian with deep carved runes and cracks that show
+the same EMBER red-orange inside, crisp edges, same lighting from TOP-LEFT,
+straight front view, centered, about 40-50% of the canvas, transparent
+background, NO glow, NO flames, NO smoke, NO sparks. For #14–#16 start
+every prompt with:
+"In the exact same art style, obsidian material, ember color and lighting
+as the armor and sword of the attached reference, following all MASTER
+STYLE rules:"
+
+#14  RUNE STONE A — a long jagged obsidian shard with one carved rune glowing ember-red in its cracks (painted, no glow).
+#15  RUNE STONE B — a round broken stone disc carved with a circle of small runes, ember-red inside the carvings.
+#16  RUNE STONE C — a broken piece of a black sword blade with an ember-red crack along it.
+
+---------------------------------------------------------------------
+5. QUALITY CHECK (redo any image that fails)
+---------------------------------------------------------------------
+  [ ] Same helm, crown, armor, colors and proportions as #01 in every character image
+  [ ] Same scale; lowest point at ~y 900 px; crown never cropped
+  [ ] Correct facing (FRONT → bottom-right, BACK → top-right)
+  [ ] The face plate always hides the face (no skin, no skull); eyes ember-red
+  [ ] The crown is a separate old crown ON the helm; the helm has no rising spikes
+  [ ] The weapon is always the black greatsword with the ember core (never a mace)
+  [ ] EMBER red-orange ONLY on eyes, armor cracks, crown gems, sword core;
+      everything else black / grey / dull bronze
+  [ ] No ground, shadow, glow, aura, flames, smoke, embers, motion lines or text
+  [ ] Background fully transparent (or flat #FF00FF everywhere)
+  [ ] Rune stones: three different shapes, same obsidian + ember, no glow
+  [ ] Does not resemble Sauron, the Lich King, Marvel's Surtur, any
+      Dark Souls / Elden Ring boss, or any other existing character
+
+---------------------------------------------------------------------
+6. FILE NAMES & ZIP
+---------------------------------------------------------------------
+  #01 monZ02_master.png
+  #02 monZ02_front_idle.png      #07 monZ02_back_idle.png
+  #03 monZ02_front_attack.png    #08 monZ02_back_attack.png
+  #04 monZ02_front_cast.png      #09 monZ02_back_cast.png
+  #05 monZ02_front_hit.png       #10 monZ02_back_hit.png
+  #06 monZ02_front_burst.png     #11 monZ02_back_burst.png
+  #12 eggZ02.png
+  #13 monZ02_front_down.png
+  #14 fxZ02_rune_a.png   #15 fxZ02_rune_b.png   #16 fxZ02_rune_c.png
+
+ZIP name: EGGBOUND_MONZ02_SET.zip (all PNGs in the root) + notes.txt listing
+each file, background type, and any image regenerated and why.
+If the zip would be larger than about 15 MB, split it: PART1 = #01–#08,
+PART2 = #09–#16 (or send the images one by one).
+=====================================================================
+END OF FILE
+=====================================================================
