@@ -105,6 +105,20 @@ export function mechanicsTests(): number {
       me.statuses.push({ id: 'confuse', turns: 2 }); const r = b.act(me.uid, { si: 0, target: foe.uid }); if (evs(r).some(e => e.t === 'confused')) { hitAlly = true; lethal = !al.alive || al.hp < 1; } }
     ok(hitAlly && !lethal, 'confused unit strikes a teammate without killing it'); }
 
+  // ตีติดสถานะ (hitStatus): a sure confuse on a basic hit
+  { const id = sp('T_HITST', 'A01', { passive: { kind: 'hitStatus', name: 'ตีติดสถานะ', desc: '', status: 'confuse', chance: 1 } });
+    const b = mk([R(id)]), me = b.units[0], foe = foe1(b); foe.hp = foe.maxHp = 99999;
+    const r = b.act(me.uid, { si: 0, target: foe.uid }); ok(foe.statuses.some((s: any) => s.id === 'confuse') && evs(r).some(e => e.t === 'passive'), 'hitStatus confuses on hit'); }
+
+  // คลั่ง (enrage) as a boss-only passive (bp): ATK and SPD up the first time it drops under half HP, once
+  { const stage = { ...st, waves: [[{ sid: 'A02', lvl: 5, stars: 1, bp: [{ kind: 'enrage', name: 'คลั่ง', desc: '', value: 3 }] }]] };
+    const b = new Battle(5, [R('A01')], stage as any) as any, me = b.units[0], foe = foe1(b); me.crit = 0;
+    ok(foe.passives.some((p: any) => p.kind === 'enrage'), 'bp passives reach the enemy unit');
+    foe.maxHp = 1000; foe.hp = 501; const r = b.act(me.uid, { si: 0, target: foe.uid });
+    ok(foe.hp < 500 && ['atk_up', 'spd_up'].every(id => foe.statuses.some((s: any) => s.id === id && s.turns === 3)) && evs(r).some(e => e.t === 'passive'), 'enrage under half HP');
+    foe.statuses = []; foe.hp = 300; b.act(me.uid, { si: 0, target: foe.uid }); ok(!foe.statuses.some((s: any) => s.id === 'atk_up'), 'enrage only once'); }
+  ok(STAGES.filter(s => s.n === 5).every(s => s.waves.flat().some(m => (m as any).bp?.some((p: PassiveDef) => p.kind === 'enrage'))), 'every zone boss carries enrage');
+
   // determinism with every new mechanic in play
   { const team = ['T_BASH', 'T_MULTI', 'T_CHAIN', 'T_AURA'].map(R), a = simulate(31, team, STAGES[3]), b = simulate(31, team, STAGES[3]);
     ok(a.rng === b.rng && a.log.join() === b.log.join(), 'new mechanics stay deterministic'); }

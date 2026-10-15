@@ -74,7 +74,9 @@ export type PassiveKind =
   | 'critTurn'       // จังหวะทอง: a critical hit gives `chance` of another turn
   | 'allyEndure'     // ไฟอุ่นใจ: once per battle the first ally hit by a lethal blow survives at 1 HP
   | 'aura'           // ออร่า: while it stands, its team gets +`value` `stat` (atk/def % · crit chance · spd %)
-  | 'leech';         // ดูดเลือด: heals `value` of the damage it deals
+  | 'leech'          // ดูดเลือด: heals `value` of the damage it deals
+  | 'hitStatus'      // ตีติดสถานะ: its hits have `chance` to inflict `status` (confuse / freeze / stun last 1 turn, others 2)
+  | 'enrage';        // คลั่ง: the first time its HP drops under half, ATK & SPD up for `value` turns (default 3)
 export interface PassiveDef { kind: PassiveKind; name: string; desc: string; chance?: number; value?: number; status?: StatusId; stat?: 'atk' | 'def' | 'crit' | 'spd' }
 export interface LeaderSkill { stat: 'atk' | 'hp' | 'def' | 'spd' | 'crit' | 'res'; value: number; text: string }
 export interface SpeciesDef {
@@ -100,7 +102,7 @@ export interface SpeciesDef {
 }
 export interface MonsterRef { sid: string; lvl: number; stars: number; sk?: number[]; rare?: boolean; rb?: RuneBonus }  // sk = skill levels (default 1) · rb = its runes (core/runes.ts)
 /** boss: this unit is a zone boss (bars, boss rules) even when its species is a normal monster · name/scale: elite title & size */
-export interface EnemyRef extends MonsterRef { hpMult?: number; atkMult?: number; boss?: boolean; name?: string; scale?: number; awake?: boolean } // awake: hell — the evolved form (or a deep-purple ทมิฬ form)
+export interface EnemyRef extends MonsterRef { hpMult?: number; atkMult?: number; boss?: boolean; name?: string; scale?: number; awake?: boolean; bp?: PassiveDef[] } // bp: boss-only passives (zone bosses, 2026-10-14) // awake: hell — the evolved form (or a deep-purple ทมิฬ form)
 /** a zone (โซน) on the world map: one place with five stages, the fifth is its boss */
 export interface ZoneDef { id: string; realm: string; name: string; desc: string; loc: string }
 export interface StageDef {

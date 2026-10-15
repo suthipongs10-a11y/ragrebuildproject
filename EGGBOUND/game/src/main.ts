@@ -156,6 +156,11 @@ function mapHTML() {
   </div></section>`;
 }
 /** a zone's sheet: painted header, its boss (and Starborn shard progress) and the five stages */
+/** the zone boss's abilities (2026-10-14): its species' signature passive plus the boss-only ones (bp), so the fight can be planned */
+function bossAbilHTML(b, bs) {
+  const ps = [bs.passive, ...(b.bp || [])].filter(Boolean);
+  return ps.length ? `<div class="zbp"><b>ความสามารถบอส</b>${ps.map(p => `<span><i>${esc(p.name)}</i> ${esc(p.desc)}</span>`).join('')}</div>` : '';
+}
 function zonePanel(z) {
   if (!z) return '';
   const b = zoneBoss(z), bs = SPECIES[b.sid], art = ART_BG.includes(z.loc), shards = S.starShards?.[b.sid] || 0;
@@ -170,7 +175,7 @@ function zonePanel(z) {
   }).join('');
   return `<div class="zpanel" data-zclose="1"><div class="zsheet" role="dialog" aria-label="${esc(z.name)}">
     <div class="zhead loc-${z.loc} ${art ? 'art' : ''}">${art ? `<img class="zhead-im" src="${bgSrc(z.loc)}" alt="" draggable="false">` : ''}<button type="button" class="zx" data-zclose="1" aria-label="ปิด">✕</button><h2>${esc(z.name)}</h2><p>${esc(z.desc)}</p></div>
-    ${spOfBoss(b) ? zspecHTML(spOfBoss(b)) : ''}${bs.starborn ? `<div class="zstar"><img src="${eggURL(b.sid)}" alt=""><div><b>ตำนานดารา · ${esc(bs.name)}</b><div class="bar fr"><i style="transform:scaleX(${Math.min(1, shards / STAR_SHARDS_TO_CRAFT)})"></i></div><small>เศษไข่ดารา ${shards}/${STAR_SHARDS_TO_CRAFT} · ชนะบอสครั้งแรกได้ 1 ชิ้น หลังจากนั้น ${STAR_SHARD_CHANCE * 100}% ต่อรอบ (ปานกลาง ${DIFFS[1].shard * 100}% · ยาก ${DIFFS[2].shard * 100}%)</small></div></div>` : ''}
+    ${spOfBoss(b) ? zspecHTML(spOfBoss(b)) : ''}${bs.starborn ? `<div class="zstar"><img src="${eggURL(b.sid)}" alt=""><div><b>ตำนานดารา · ${esc(bs.name)}</b><div class="bar fr"><i style="transform:scaleX(${Math.min(1, shards / STAR_SHARDS_TO_CRAFT)})"></i></div><small>เศษไข่ดารา ${shards}/${STAR_SHARDS_TO_CRAFT} · ชนะบอสครั้งแรกได้ 1 ชิ้น หลังจากนั้น ${STAR_SHARD_CHANCE * 100}% ต่อรอบ (ปานกลาง ${DIFFS[1].shard * 100}% · ยาก ${DIFFS[2].shard * 100}%)</small></div></div>` : ''}${bossAbilHTML(b, bs)}
     ${dtabs}<div class="stages">${rows}</div></div></div>`;
 }
 /** rarity colour (shared with the chest/hatch colour language) as a CSS var; common stays neutral */

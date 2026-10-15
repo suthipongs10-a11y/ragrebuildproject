@@ -110,7 +110,7 @@ export class Battle {
       maxHp: hp, hp, atk: Math.round(statAt(s.base.atk, m.lvl, m.stars) * (m.atkMult || 1)), def: statAt(s.base.def, m.lvl, m.stars),
       spd: spdAt(s.base.spd, m.lvl, m.stars), crit: 0.15, critDmg: 0.5, res: boss ? 0.35 : 0.15, acc: 0,
       atb: 0, cds: [0, 0, 0], skills: form.skills.map((k, i) => { const sk = skillAt(k, m.sk?.[i] || 1, i); return k.ult && isMythic(s.id, !!(m as MonsterRef).rare) ? mythicUlt(sk) : sk; }), statuses: [], marks: [], alive: true, leader: team === 0 && slot === 0,
-      rare: !!(m as MonsterRef).rare, passives: [s.passive, (m as MonsterRef).rare ? s.rarePassive : undefined].filter((p): p is PassiveDef => !!p),
+      rare: !!(m as MonsterRef).rare, passives: [s.passive, (m as MonsterRef).rare ? s.rarePassive : undefined, ...((m as EnemyRef).bp || [])].filter((p): p is PassiveDef => !!p),
     };
     const rb = (m as MonsterRef).rb; if (rb) applyRunes(u, rb);
     for (const p of u.passives!) if (p.kind === 'leech') u.leech = (u.leech || 0) + (p.value || 0); // ดูดเลือด stacks with the blood runes
@@ -336,6 +336,9 @@ export class Battle {
       const cd = this.pk(a, 'critDebuff'); if (crit && cd && t.hp > 0) { this.pev(a, cd, ev); this.addStatus(a, t, cd.status!, 2, 1, ev, true); }
       const hs = this.pk(a, 'hitStatusAtb'); if (hs && this.has(t, hs.status!) && this.rng.chance(hs.chance!)) { this.pev(a, hs, ev); a.atb = Math.min(100, a.atb + hs.value!); ev.push({ t: 'atb', tgt: a.uid, delta: hs.value!, atb: a.atb }); }
       const bp = this.pk(a, 'bash'); if (bp && o.primary && t.hp > 0 && real > 0 && this.rng.chance(bp.chance!)) { this.pev(a, bp, ev); this.addStatus(a, t, 'stun', 1, 1, ev, true); } // ทุบสะท้าน
+      const hx = this.pk(a, 'hitStatus'); if (hx && o.primary && t.hp > 0 && real > 0 && this.rng.chance(hx.chance!)) { this.pev(a, hx, ev); this.addStatus(a, t, hx.status!, ['confuse', 'freeze', 'stun'].includes(hx.status!) ? 1 : 2, 1, ev, true); } // ตีติดสถานะ
+      const en = this.pk(t, 'enrage'); if (en && t.alive && t.hp > 0 && t.hp < t.maxHp / 2 && this.once(t, 'enrage')) { // คลั่ง: once, under half HP
+        this.pev(t, en, ev); const n = en.value || 3; for (const id of ['atk_up', 'spd_up'] as const) { t.statuses = t.statuses.filter(x => x.id !== id); t.statuses.push({ id, turns: n }); ev.push({ t: 'status', tgt: t.uid, id, add: true }); } }
     }
     return { dmg: real, miss: false, crit };
   }
