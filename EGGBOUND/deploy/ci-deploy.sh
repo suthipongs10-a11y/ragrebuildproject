@@ -17,10 +17,9 @@ sed -n '/-----BEGIN OPENSSH PRIVATE KEY-----/,/-----END OPENSSH PRIVATE KEY-----
   echo "EGGBOUND_VPS is missing a part (user@host:port / host key / private key) — paste the whole block from vps-setup.sh again"; exit 1; }
 
 # the build is the Artifact body (no doctype/charset/viewport — the Artifact page adds them); hosting it ourselves
-# needs that head, or phones lay it out 980px wide and may misread the Thai text
+# needs that head (page-head.html), or phones lay it out 980px wide and may misread the Thai text
 mkdir -p "$W/site"
-{ printf '%s\n' '<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#1d2619">'
-  cat "$DIST/index.html"; } > "$W/site/index.html"
+cat "$(dirname "$0")/page-head.html" "$DIST/index.html" > "$W/site/index.html"
 chmod 644 "$W/site/index.html"; chmod 755 "$W/site"
 
 HOST="${DEST%:*}"; PORT="${DEST##*:}"

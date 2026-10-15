@@ -1,5 +1,21 @@
 # Eggbound บน VPS
 
+## ทางหลัก (2026-10-15): ทำงานบน VPS โดยตรง — ไม่ต้องใช้ GitHub
+บัญชี GitHub ของเจ้าของใช้ไม่ได้ จึงย้ายงานมาไว้ที่ VPS ทั้งหมด: โค้ดอยู่ที่ `/home/eggbound/ragrebuildproject` · Claude Code ทำงานในเครื่องนั้น · `publish.sh` build แล้วขึ้นเว็บทันที
+
+1. รัน `vps-setup.sh` (nginx + ผู้ใช้ eggbound — ทำแล้ว พอร์ต 8090)
+2. รันครั้งเดียวด้วย root:
+   ```
+   curl -fsSL https://raw.githubusercontent.com/suthipongs10-a11y/ragrebuildproject/claude/ecstatic-cray-ijhpj1/EGGBOUND/deploy/vps-dev-setup.sh | sudo bash
+   ```
+   (ลง Node 22 + Pillow AVIF + โค้ด + build รอบแรก + ขึ้นเว็บ + Claude Code · ~5 นาที)
+3. ทำงาน: `su - eggbound` → `cd ragrebuildproject/EGGBOUND` → `claude`
+4. ขึ้นเว็บ: `bash deploy/publish.sh` (เทสต์ + build + ขึ้นเว็บ) หรือ `--quick` (ข้ามเทสต์)
+5. ส่งไฟล์ภาพ zip จากคอมขึ้น VPS: `scp ไฟล์.zip root@<IP>:/home/eggbound/` แล้ว `chown eggbound: /home/eggbound/ไฟล์.zip`
+6. git: commit ในเครื่อง VPS ได้ตามปกติ (push GitHub ไม่ได้) → สำรองโฟลเดอร์โปรเจกต์ไว้ที่อื่นเป็นระยะ
+
+## ทางเดิม: GitHub Actions ส่งขึ้น VPS (ต้องใช้ GitHub ได้)
+
 ทุกครั้งที่ push โค้ดเกม GitHub Actions จะทดสอบ → build → อัปโหลดขึ้น VPS เอง (`.github/workflows/eggbound-vps.yml`)
 เกมอยู่ที่ `http://<IP ของ VPS>:8080/` — แยกพอร์ตจากเซิร์ฟเวอร์ Ragnarok (`deploy/` ที่ root) ไม่ชนกัน
 
