@@ -20,7 +20,7 @@ id -u "$USR" >/dev/null 2>&1 && [ -d /var/www/eggbound ] || { echo "รัน vp
 echo "==> เครื่องมือพื้นฐาน"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -y -q >/dev/null
-apt-get install -y -q git curl ca-certificates python3-venv rsync >/dev/null
+apt-get install -y -q git curl ca-certificates python3-venv rsync tmux >/dev/null
 
 if ! node -v 2>/dev/null | grep -qE '^v(2[2-9]|[3-9][0-9])\.'; then
   echo "==> Node 22"
@@ -65,9 +65,11 @@ cat <<EOF
 
 ============================================================================
 พร้อมทำงานบน VPS แล้ว
-  เข้าทำงาน:   su - $USR
+  เข้าทำงาน:   tmux new -s egg            (ปิดหน้าต่าง SSH แล้ว Claude ยังทำงานต่อ · กลับมา: tmux attach -t egg)
+               su - $USR
                cd ragrebuildproject/EGGBOUND
-               claude          (ครั้งแรกจะให้เปิดลิงก์ล็อกอินบัญชี Claude)
+               claude                     (ครั้งแรก: เปิดลิงก์ล็อกอินบัญชี Claude แล้ว /exit)
+               claude remote-control      (แชทนี้ไปโผล่ในแอป Claude Code บนมือถือ/เว็บ)
   ขึ้นเว็บเอง:  bash deploy/publish.sh
 ============================================================================
 EOF

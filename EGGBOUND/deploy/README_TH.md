@@ -9,7 +9,7 @@
    curl -fsSL https://raw.githubusercontent.com/suthipongs10-a11y/ragrebuildproject/claude/ecstatic-cray-ijhpj1/EGGBOUND/deploy/vps-dev-setup.sh | sudo bash
    ```
    (ลง Node 22 + Pillow AVIF + โค้ด + build รอบแรก + ขึ้นเว็บ + Claude Code · ~5 นาที)
-3. ทำงาน: `su - eggbound` → `cd ragrebuildproject/EGGBOUND` → `claude`
+3. ทำงาน: `tmux new -s egg` → `su - eggbound` → `cd ragrebuildproject/EGGBOUND` → `claude` (ล็อกอินครั้งแรก แล้ว `/exit`) → `claude remote-control` = คุยผ่านแอป Claude Code เหมือนแชทเดิม · ปิด SSH ได้ (tmux ค้างไว้ · กลับมา `tmux attach -t egg`)
 4. ขึ้นเว็บ: `bash deploy/publish.sh` (เทสต์ + build + ขึ้นเว็บ) หรือ `--quick` (ข้ามเทสต์)
 5. ส่งไฟล์ภาพ zip จากคอมขึ้น VPS: `scp ไฟล์.zip root@<IP>:/home/eggbound/` แล้ว `chown eggbound: /home/eggbound/ไฟล์.zip`
 6. git: commit ในเครื่อง VPS ได้ตามปกติ (push GitHub ไม่ได้) → สำรองโฟลเดอร์โปรเจกต์ไว้ที่อื่นเป็นระยะ
