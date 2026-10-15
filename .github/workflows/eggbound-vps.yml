@@ -1,0 +1,58 @@
+name: Eggbound VPS
+
+# Every push that touches the game: test, build, and upload to the owner's VPS (EGGBOUND/deploy/README_TH.md).
+# The upload runs only once the repo secret EGGBOUND_VPS exists (printed by EGGBOUND/deploy/vps-setup.sh).
+on:
+  push:
+    branches: [claude/ecstatic-cray-ijhpj1, main]
+    paths: ['EGGBOUND/game/**', 'EGGBOUND/deploy/**', '.github/workflows/eggbound-vps.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eggbound-vps
+  cancel-in-progress: true
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    env:
+      HAS_VPS: ${{ secrets.EGGBOUND_VPS != '' }}
+    defaults:
+      run:
+        working-directory: EGGBOUND/game
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: EGGBOUND/game/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pillow with AVIF
+        run: |
+          python -m pip install --quiet pillow==12.3.0
+          python -I -c "from PIL import features; assert features.check('avif'), 'Pillow has no AVIF'"
+      # AVIF copies of every image; tools/avif_cache.py redoes only files whose source hash changed
+      - uses: actions/cache@v4
+        with:
+          path: EGGBOUND/game/.avif-cache
+          key: avif-${{ hashFiles('EGGBOUND/game/assets/**', 'EGGBOUND/game/assets_ext/**', 'EGGBOUND/game/assets_bg/**', 'EGGBOUND/game/tools/avif_cache.py') }}
+          restore-keys: avif-
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Upload to the VPS
+        if: env.HAS_VPS == 'true'
+        env:
+          EGGBOUND_VPS: ${{ secrets.EGGBOUND_VPS }}
+        run: bash ../deploy/ci-deploy.sh dist
+      - name: No VPS secret yet
+        if: env.HAS_VPS != 'true'
+        run: echo "::notice::Built and tested. Add the EGGBOUND_VPS secret (EGGBOUND/deploy/README_TH.md) to upload to the VPS."
