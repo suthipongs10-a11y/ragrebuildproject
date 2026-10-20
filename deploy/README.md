@@ -5,6 +5,7 @@
 | ไฟล์ | ใช้ที่ไหน | ทำอะไร |
 |---|---|---|
 | `publish.ps1` | เครื่อง Windows ที่ build | สร้าง `rorebuild-server.tar` (เซิร์ฟเวอร์ + ServerData + walkdata + WebClient + ไฟล์บัญชี GM) |
+| `bundler/` | เครื่อง Windows ที่ build | ตัวมัดไฟล์สำรอง (.NET) `publish.ps1` เรียกเองเมื่อ `tar.exe` ของ Windows crash ผลเป็น `.tar` แบบเดียวกัน |
 | `install-bundle.sh` | VPS ทุกครั้งที่อัปเดต | ล้างโฟลเดอร์ที่มาจาก bundle แล้วแตกไฟล์ ตั้ง owner + สิทธิ์ `.so` แล้วรีสตาร์ต service |
 | `vps-setup.sh` | VPS ครั้งแรก | ลง .NET 9, nginx, certbot สร้าง user/โฟลเดอร์ ติดตั้ง service และ nginx site |
 | `domain-setup.sh` | VPS ตอนจดโดเมนแล้ว | ชี้โดเมนมาที่เครื่องนี้ ติดตั้งหน้าแรก แล้วขอใบรับรอง SSL ให้ทั้ง 3 ชื่อ |

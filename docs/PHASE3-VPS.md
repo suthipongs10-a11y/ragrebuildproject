@@ -53,7 +53,8 @@ powershell -ExecutionPolicy Bypass -File deploy\publish.ps1
    |---|---|
    | `Browser build: ...\WebClient` | เจอตัวเกมแล้ว เล่นผ่านเบราว์เซอร์ได้ |
    | `dropping stale build Build_...` | ตัดตัวเกมรอบเก่าที่ไม่ได้ใช้ออกจาก zip (ปกติ ดีด้วย) |
-   | `Bundle ready: ...zip` | เสร็จ |
+   | `tar.exe failed with exit code ...` ตามด้วย `Packing with the .NET tar writer instead` | tar ของ Windows crash (เคยเกิดรหัส -1073741819) สคริปต์สลับไปใช้ตัวมัดไฟล์สำรองใน `deploy/bundler` เอง ปกติ รอจนขึ้นว่า `Done.` |
+| `Bundle ready: ...zip` | เสร็จ |
 
    ถ้าขึ้น `WARNING: No browser build found` **อย่าเพิ่งอัป** — build ยังไม่ได้ลงที่ที่ควรอยู่ กลับไปข้อ 3
 

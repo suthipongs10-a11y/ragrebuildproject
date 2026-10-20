@@ -101,16 +101,31 @@ foreach ($dir in @("Keys", "Cache", "Logs")) {
 $bundle = Join-Path $root "rorebuild-server.tar"
 if (Test-Path $bundle) { Remove-Item $bundle }
 
-if (-not (Get-Command tar -ErrorAction SilentlyContinue)) {
-    throw "tar is not on the path. It ships with Windows 10 1803 and later; without it the bundle cannot be built safely, because Compress-Archive corrupts the Korean sprite names."
+$tarExit = -1
+if (Get-Command tar -ErrorAction SilentlyContinue) {
+    Push-Location $out
+    try {
+        & tar.exe -cf $bundle .
+        $tarExit = $LASTEXITCODE
+    }
+    finally { Pop-Location }
+}
+else {
+    Write-Warning "tar is not on the path. It ships with Windows 10 1803 and later."
 }
 
-Push-Location $out
-try {
-    & tar.exe -cf $bundle .
-    if ($LASTEXITCODE -ne 0) { throw "tar failed with exit code $LASTEXITCODE" }
+# tar.exe has crashed outright on this bundle (exit code -1073741819, an access violation),
+# part way through the Addressables folder, printing nothing and leaving half a .tar behind.
+# deploy\bundler writes the same kind of archive with .NET's own tar writer, names as UTF-8
+# in pax headers, so that is tried next instead of stopping here. Compress-Archive is still
+# not an option, for the reason above.
+if ($tarExit -ne 0) {
+    Write-Warning "tar.exe failed with exit code $tarExit. Packing with the .NET tar writer instead (a few minutes, it prints progress)."
+    if (Test-Path $bundle) { Remove-Item $bundle }
+
+    dotnet run --project (Join-Path $root "deploy\bundler\Bundler.csproj") -c Release -- $out $bundle
+    if ($LASTEXITCODE -ne 0) { throw "The .NET tar writer failed too (exit code $LASTEXITCODE). The message above names the file it stopped on." }
 }
-finally { Pop-Location }
 
 #The old zip would otherwise sit next to the new tar and get deployed by mistake.
 $stale = Join-Path $root "rorebuild-server.zip"

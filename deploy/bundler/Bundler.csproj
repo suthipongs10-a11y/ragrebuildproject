@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Writes the server bundle as a .tar without going through Windows' own tar.exe.
+       publish.ps1 falls back to this when tar.exe crashes. See Program.cs. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>Bundler</AssemblyName>
+  </PropertyGroup>
+
+</Project>
