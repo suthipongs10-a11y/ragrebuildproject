@@ -14,6 +14,10 @@ using UnityEngine.UI;
 /// text at startup and the scroll view is still a scene object this code did not build;
 /// laying a picture over the top asks nothing of a hierarchy it cannot see, and leaves
 /// the notes one deleted line away from coming back.
+///
+/// The picture itself has been taken out of the project, so at the moment the notes are
+/// what the window shows. This class is left as it was: a sprite put back at the path
+/// below brings the poster back with no other change.
 /// </remarks>
 public class HelpWindow : WindowBase
 {

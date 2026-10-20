@@ -27,9 +27,9 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Network
             
             UiManager.OnLogIn();
 
-            //The manual - this server's welcome poster - used to open itself here whenever the
-            //patch notes had changed since the player last looked. It no longer opens on entering
-            //the game; the manual button still shows it.
+            //The manual used to open itself here whenever the patch notes had changed since the
+            //player last looked. It no longer opens on entering the game; the manual button
+            //still opens it.
             UiManager.Instance.HelpWindow.HideWindow();
             GameConfig.Data.LastViewedPatchNotes = ClientDataLoader.Instance.LatestPatchNotes;
             
