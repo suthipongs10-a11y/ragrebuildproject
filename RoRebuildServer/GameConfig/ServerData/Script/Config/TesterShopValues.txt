@@ -4,10 +4,8 @@
 //for, so the gear it stocks is made worthless to npc shopkeepers instead. That closes
 //the buy-at-1z-sell-at-full-price loop without having to weaken the check itself.
 //
-//The Card Tester that stood beside the Class Master sold every card for 100z and is gone, but the
-//thirty-five cards priced 10000 in ItemsCards.csv that it sold are still out there, and each would
-//sell back to an npc for 5000. They stay worthless to npc shopkeepers (the last block below) so
-//that none of them can be cashed in that way. Players can still trade them to each other.
+//The Card Tester beside the Class Master does the same for cards, at 100z a card. Almost every
+//card is priced 20 and sells back for 10, so only the thirty-five priced 10000 are listed.
 ServerConfig("TesterShopValues") {
 OnSetItemSaleValue:
 
@@ -39,8 +37,7 @@ OnSetItemSaleValue:
 	//ninja and gunslinger
 	if(code == "Murasame_" || code == "Gate_Keeper") return 0;
 
-	//cards priced 10000 in ItemsCards.csv, which would sell back for 5000. Kept on purpose after the
-	//Card Tester was taken away - see the top of this file.
+	//the card tester: cards priced 10000 in ItemsCards.csv, which would sell back for 5000
 	if(code == "Gloom_Under_Night_Card" || code == "Agav_Card" || code == "Echio_Card" || code == "Vanberk_Card") return 0;
 	if(code == "Isilla_Card" || code == "Hodremlin_Card" || code == "Seeker_Card" || code == "Snowier_Card") return 0;
 	if(code == "Siroma_Card" || code == "Ice_Titan_Card" || code == "Gazeti_Card" || code == "Ktullanux_Card") return 0;
