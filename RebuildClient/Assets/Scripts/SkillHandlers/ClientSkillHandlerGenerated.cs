@@ -111,14 +111,14 @@ namespace Assets.Scripts.SkillHandlers
 			handlers[91] = new Assets.Scripts.SkillHandlers.Handlers.EarthSpikeHandler();
 			handlers[92] = new Assets.Scripts.SkillHandlers.Handlers.HeavensDriveHandler();
 			handlers[93] = new Assets.Scripts.SkillHandlers.Handlers.FirePillarHandler();
-			handlers[94] = new DefaultSkillHandler();
+			handlers[94] = new Assets.Scripts.SkillHandlers.Handlers.FrostNovaHandler();
 			handlers[95] = new DefaultSkillHandler();
 			handlers[96] = new Assets.Scripts.SkillHandlers.Handlers.JupitelThunderHandler();
 			handlers[97] = new Assets.Scripts.SkillHandlers.Handlers.LordOfVermilionHandler();
 			handlers[98] = new Assets.Scripts.SkillHandlers.Handlers.MeteorStormHandler();
 			handlers[99] = new Assets.Scripts.SkillHandlers.Handlers.QuagmireHandler();
 			handlers[100] = new DefaultSkillHandler();
-			handlers[101] = new DefaultSkillHandler();
+			handlers[101] = new Assets.Scripts.SkillHandlers.Handlers.SightrasherHandler();
 			handlers[102] = new Assets.Scripts.SkillHandlers.Handlers.StormGustSkillHandler();
 			handlers[103] = new Assets.Scripts.SkillHandlers.Handlers.WaterBallHandler();
 			handlers[104] = new DefaultSkillHandler();

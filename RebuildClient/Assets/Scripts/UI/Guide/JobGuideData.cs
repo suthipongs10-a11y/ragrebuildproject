@@ -420,7 +420,9 @@ namespace Assets.Scripts.UI.Guide
                                  + "Lord of Vermilion 10 → Sightrasher 2 → Meteor Storm 10\n"
                                  + "Storm Gust ก่อนเสมอ แช่แข็งมอนทั้งวงแล้วค่อย ๆ เก็บ\n"
                                  + "Lord of Vermilion กับ Meteor Storm ไว้กับมอนที่ไม่กลัวน้ำแข็ง\n"
-                                 + "Quagmire ทำให้มอนเดินช้า ใช้คู่กับสกิลร่ายนานได้ดีมาก",
+                                 + "Quagmire ทำให้มอนเดินช้า ใช้คู่กับสกิลร่ายนานได้ดีมาก\n"
+                                 + "ตอนโดนล้อม: Frost Nova (ต้องมี Frost Diver 1 + Stone Curse 1) แช่แข็งมอนรอบตัว "
+                                 + "หรือเปิด Sight แล้วใช้ Sightrasher ระเบิดไฟผลักมอนออก (Sight หมดทุกครั้งที่ใช้)",
                         GearEarly = "Rod, Silk Robe, Shoes, Muffler",
                         GearMid = "Arc Wand, Silver Robe, Boots, Manteau, Clip, Circlet",
                         GearLate = "Wizardry Staff หรือ Arc Wand +10, Mink Coat, Boots, Manteau",
@@ -442,7 +444,8 @@ namespace Assets.Scripts.UI.Guide
                                  + "Jupitel Thunder 10 → Water Ball 5 → Frost Diver 5\n"
                                  + "Jupitel Thunder ดันบอสถอยหลังด้วย ซื้อเวลาให้ตัวเองได้\n"
                                  + "Water Ball แรงมากถ้ายืนในน้ำ ใช้คู่กับ Frost Diver หรือพื้นน้ำ\n"
-                                 + "Ice Wall กั้นทางบอสได้ ใบ้ไว้เท่านี้ ลองเล่นแล้วจะรู้ว่าโกงแค่ไหน",
+                                 + "Fire Pillar (ต้องมี Fire Wall 1) วางดักบนทางที่บอสเดินมา ดาเมจไม่สนใจ MDEF "
+                                 + "แต่ใช้ Blue Gemstone ต่อครั้ง",
                         GearEarly = "Rod, Silk Robe, Shoes, Muffler",
                         GearMid = "Arc Wand, Silver Robe, Boots, Manteau, Clip",
                         GearLate = "Wizardry Staff, Mink Coat, Boots, Manteau",
