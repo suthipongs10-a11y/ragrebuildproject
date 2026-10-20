@@ -938,6 +938,17 @@ public partial class Monster : IEntityAutoReset
         var exp = MonsterBase.Exp;
         var job = MonsterBase.JobExp;
 
+        //The server's experience rate. Taken off the table's figure before anything else is
+        //done to it, so the split between attackers and the bonuses below all see the rated
+        //number. Rounded rather than truncated, so a kill worth 3 is not stuck at 3 by a
+        //rate of 120.
+        var expRate = int.Max(0, ServerConfig.OperationConfig.ExpRate);
+        if (expRate != 100)
+        {
+            exp = (int)((exp * (long)expRate + 50) / 100);
+            job = (int)((job * (long)expRate + 50) / 100);
+        }
+
         var addExp = GetStat(CharacterStat.AddExpPercent);
 
         if (addExp > 0)

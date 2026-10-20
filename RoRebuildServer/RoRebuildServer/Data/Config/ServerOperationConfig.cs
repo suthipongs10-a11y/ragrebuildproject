@@ -12,6 +12,19 @@ public class ServerOperationConfig
     public bool AllowAdminifyCommand { get; set; }
     public string? AdminifyPasscode { get; set; }
     public bool RemapDropRates { get; set; }
+
+    /// <summary>
+    /// What a kill pays out, as a percentage of the experience written in Monsters.csv: 100
+    /// is the table as it stands, 200 is double. Base and job experience share the one rate.
+    /// </summary>
+    /// <remarks>
+    /// Applied where the monster hands experience out - see Monster.RewardExperience - so the
+    /// party split and everything a player carries (Battle Manual, the adventure rank, the
+    /// guild) works from the rated figure and stacks on top of it. It is only for kills:
+    /// quest rewards and the milestone payout are fixed amounts and are not scaled by it.
+    /// </remarks>
+    public int ExpRate { get; set; } = 100;
+
     public bool GuaranteeMvpDrops { get; set; } = true;
     //ordinary monsters swing, they do not cast. See MonsterSkillAiState for what this
     //counts as a boss and why the two are tied to the same flag.

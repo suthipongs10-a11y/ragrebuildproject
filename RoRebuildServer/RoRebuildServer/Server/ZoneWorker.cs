@@ -49,6 +49,9 @@ internal class ZoneWorker : BackgroundService
             ServerLogger.Log($"Max monster spawn time set to {spawnTime / 1000f} seconds.");
         }
 
+        //said at every start so nobody has to open appsettings.json to learn what a kill pays
+        ServerLogger.Log($"Experience rate: {ServerConfig.OperationConfig.ExpRate}% of the monster table.");
+
         world = new World();
         NetworkManager.Init(world);
 
