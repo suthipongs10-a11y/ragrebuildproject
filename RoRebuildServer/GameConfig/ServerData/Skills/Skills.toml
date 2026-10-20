@@ -757,6 +757,7 @@ Icon = "wz_sightrasher"
 Target = "Self"
 MaxLevel = 10
 SpCost = [35,37,39,41,43,45,47,49,51,53]
+AdjustableLevel = true
 
 [StormGust]
 Name = "Storm Gust"

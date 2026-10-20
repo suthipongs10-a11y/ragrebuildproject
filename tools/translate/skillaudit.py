@@ -189,11 +189,21 @@ def main():
                              path.read_text(encoding="utf-8-sig")):
             handlers.add(m.group(1))
     stranded = sorted(s for s in handlers if s not in on_a_tree and s != "None")
+
+    #A hollow handler that is off every tree was put there on purpose (Ice Wall waits for a
+    #way to block cells), so it is not "working" and is not work nobody can reach either.
+    held_back = [s for s in stranded if s in hollowed]
+    stranded = [s for s in stranded if s not in hollowed]
     if stranded:
         print()
         print("written and working, but on nobody's tree so nobody can learn it:")
         for s in stranded:
             print("      %s" % s)
+    if held_back:
+        print()
+        print("off every tree because the handler does nothing yet:")
+        for s in held_back:
+            print("      %s  (%s)" % (s, hollowed[s]))
 
     print()
     print("%d skills across the twelve trees: %d with no code, %d with no effect, "

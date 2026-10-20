@@ -125,8 +125,10 @@ JupitelThunder = [["LightningBolt",1],["NapalmBeat",1]]
 LordOfVermilion = [["ThunderStorm",1],["JupitelThunder",5]]
 WaterBall = [["LightningBolt",1],["ColdBolt",1]]
 StormGust = [["JupitelThunder",3],["FrostDiver",1]]
-IceWall = [["FrostDiver",1],["StoneCurse",1]]
-FrostNova = [["IceWall", 1]]
+# Ice Wall is not on the tree: it needs cells that can be blocked while the wall stands and a wall to draw on the client, and neither exists yet.
+# Frost Nova asks for what Ice Wall itself would have asked for (Frost Diver 1 + Stone Curse 1) until it can come back.
+FrostNova = [["FrostDiver",1],["StoneCurse",1]]
+FirePillar = [["FireWall",1]]
 EarthSpike = [["StoneCurse", 1]]
 HeavensDrive = [["EarthSpike", 3]]
 Quagmire = [["HeavensDrive",1]]
