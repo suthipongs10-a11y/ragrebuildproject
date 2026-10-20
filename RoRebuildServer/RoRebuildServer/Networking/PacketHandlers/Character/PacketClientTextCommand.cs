@@ -46,6 +46,7 @@ public class PacketClientTextCommand : IClientPacketHandler
             if (connection.Character.State == RebuildSharedData.Enum.CharacterState.Dead)
                 return;
 
+            Custom.ReturnBuffs.Give(connection.Player);
             connection.Player.ReturnToSavePoint();
             return;
         }

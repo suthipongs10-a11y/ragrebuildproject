@@ -59,7 +59,10 @@ public class PacketRespawn : IClientPacketHandler
         }
 
         if (!inPlace)
+        {
+            Custom.ReturnBuffs.Give(player);
             player.ReturnToSavePoint();
+        }
         else
         {
             player.AddInputActionDelay(InputActionCooldownType.Click);

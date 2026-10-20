@@ -52,6 +52,11 @@ internal class ZoneWorker : BackgroundService
         //said at every start so nobody has to open appsettings.json to learn what a kill pays
         ServerLogger.Log($"Experience rate: {ServerConfig.OperationConfig.ExpRate}% of the monster table.");
 
+        var returnBuffMinutes = ServerConfig.OperationConfig.ReturnBuffMinutes;
+        ServerLogger.Log(returnBuffMinutes > 0
+            ? $"Returning to the save point fills HP and gives Blessing + Increase AGI for {returnBuffMinutes} minutes."
+            : "Returning to the save point gives no free HP refill or buffs.");
+
         world = new World();
         NetworkManager.Init(world);
 

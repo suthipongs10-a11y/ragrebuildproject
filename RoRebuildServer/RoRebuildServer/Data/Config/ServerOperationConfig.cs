@@ -25,6 +25,14 @@ public class ServerOperationConfig
     /// </remarks>
     public int ExpRate { get; set; } = 100;
 
+    /// <summary>
+    /// How long, in minutes, the buffs last that a player gets for sending themselves back
+    /// to the save point - Respawn after dying, or Return to Save Point in the escape menu.
+    /// Returning also fills their HP. Zero switches all of it off, the HP included. See
+    /// Custom.ReturnBuffs for what is given and what does not count.
+    /// </summary>
+    public int ReturnBuffMinutes { get; set; }
+
     public bool GuaranteeMvpDrops { get; set; } = true;
     //ordinary monsters swing, they do not cast. See MonsterSkillAiState for what this
     //counts as a boss and why the two are tied to the same flag.
