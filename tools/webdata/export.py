@@ -127,6 +127,38 @@ def read_remap_flag():
 
 REMAP_DROPS = read_remap_flag()
 
+# Mirrors the "rate *= 2" under THE SERVER'S DROP RATE in the same script. Kept as a table
+# so a change over there is a one line change here.
+SERVER_DROP_RATE = 2
+
+# A usable's subType in the script is its use effect (DataLoader: SubCategory = UseEffect).
+# These are the ones the script lists as "what a player drinks", which skip the halving.
+DRINK_EFFECTS = {"RedPotion", "YellowPotion", "WhitePotion", "BluePotion", "GreenPotion",
+                 "FruitHp", "FruitSp", "HealLow", "HealMid", "HealHigh"}
+
+# ServerOperationConfig.ExpRate: percent of a monster's listed exp that a kill pays out.
+# appsettings.json is read with a pattern for the same reason as the flag above. Unlike
+# that flag, a missing key is not ambiguous - the server falls back to 100 - so it is not
+# an error here either.
+EXP_RATE_RE = re.compile(r'"ExpRate"\s*:\s*(\d+)')
+
+
+def read_exp_rate():
+    path = os.path.join(ROOT, "RoRebuildServer", "RoRebuildServer", "appsettings.json")
+    with io.open(path, encoding="utf-8-sig") as handle:
+        found = EXP_RATE_RE.search(handle.read())
+    return int(found.group(1)) if found else 100
+
+
+EXP_RATE = read_exp_rate()
+
+
+def rated_exp(value):
+    """Monster.RewardExperience: the table's figure scaled by ExpRate, rounded not truncated."""
+    if EXP_RATE == 100:
+        return value
+    return (value * EXP_RATE + 50) // 100
+
 
 def remap_drop_rate(item, rate):
     """Replicate Script/Config/ItemDropAndValueAdjustments.txt -> OnLoadDropData.
@@ -134,7 +166,7 @@ def remap_drop_rate(item, rate):
     When appsettings.json has RemapDropRates on, the numbers in DropData.csv are NOT what
     a player sees, and this produces the rate the server actually rolls. When it is off,
     DataLoader never calls the script at all - so neither does this, and that includes the
-    Refine doubling, which lives inside the same block.
+    Refine doubling, the halving and the server's drop rate, which live inside the same block.
     """
     if not REMAP_DROPS:
         return rate
@@ -143,10 +175,11 @@ def remap_drop_rate(item, rate):
     sub = item["subCategory"] if item else "None"
     code = item["code"] if item else ""
 
+    # these return straight from the script; the server then caps whatever comes back at 100%
     if itype == "Etc" and sub == "Quest":
-        return rate
+        return min(rate, 10000)
     if code in ("Water_Lily_Hat", "Red_Stocking", "Gift_Box"):
-        return rate
+        return min(rate, 10000)
     if itype == "Etc" and sub == "Refine":
         rate *= 2
 
@@ -162,6 +195,18 @@ def remap_drop_rate(item, rate):
         rate = remap(rate, 1200, 10000, 2400, 10000)
     else:
         rate = 10000
+
+    # the server's drop rate goes on before the halving, and cards are left out of it
+    if itype != "Card":
+        rate *= SERVER_DROP_RATE
+
+    # what a player drinks skips the halving and returns here, capped
+    if itype == "Useable" and item.get("useEffect") in DRINK_EFFECTS:
+        return min(rate, 10000)
+
+    # half of that, for everything that is not junk and not a card
+    if itype not in ("Etc", "Card"):
+        rate //= 2
 
     return min(rate, 10000)
 
@@ -396,7 +441,7 @@ def build_monsters():
             "atkMin": num(row["AtkMin"]), "atkMax": num(row["AtkMax"]),
             "range": num(row["Range"]),
             "def": num(row["Def"]), "mdef": num(row["MDef"]),
-            "exp": num(row["Exp"]), "jobExp": num(row["JExp"]),
+            "exp": rated_exp(num(row["Exp"])), "jobExp": rated_exp(num(row["JExp"])),
             "scanDist": num(row["ScanDist"]), "chaseDist": num(row["ChaseDist"]),
             "size": row["Size"], "race": row["Race"], "element": row["Element"],
             "rechargeTime": num(row["RechargeTime"]),
@@ -1492,6 +1537,9 @@ def main():
         #read from appsettings.json rather than written down, so a page can say which rates
         #it is showing instead of a sentence going stale the day somebody flips the setting
         "remapDropRates": REMAP_DROPS,
+        #the exp and drop multipliers the numbers on the site already include
+        "expRate": EXP_RATE,
+        "dropRate": SERVER_DROP_RATE if REMAP_DROPS else 1,
         "unreachableSpawnMaps": unreachable_maps,
         "monstersWithoutSpawns": sorted(m["code"] for m in monsters.values() if m.get("noSpawn")),
         "monstersSummonedOnly": sorted(m["code"] for m in monsters.values() if m.get("summonedBy")),
