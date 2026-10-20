@@ -1,15 +1,15 @@
 //A test shop beside the Class Master in the starting field. Every card in the game for a
-//flat 100z, so any card can be tried out without waiting for it to drop.
+//flat 100z, so any card can be tried out without waiting for it to drop - except thirty-five.
+//
+//Thirty-five of the cards are priced 10000 in ItemsCards.csv and sell back to an npc for 5000.
+//The server will not let an npc sell something for less than twice what it pays to buy it back
+//(Npc.SellItem throws, and the server does not start), so those are listed here at 10000 and
+//sell back at their normal price. The sign beside the shop, the second npc in this file, says so.
 //
 //Listed by the slot a card goes in, and then by id. A card added to ItemsCards.csv later is
-//not picked up by itself - give it a line here.
+//not picked up by itself - give it a line here, at 100z, or at 10000 if it is priced 10000.
 //
-//Thirty-five of the cards are priced 10000 in ItemsCards.csv and would sell back to an npc for
-//5000 each, and the server refuses to let an npc sell anything for less than twice its buy-back
-//value. Script/Config/TesterShopValues.txt makes those worthless to npc shopkeepers, the same
-//way it does for the Equipment Tester.
-//
-//To take the shop away, delete this file and the card block in TesterShopValues.txt.
+//To take the shop away, delete this file.
 Trader("prt_fild08", "Card Tester", "4_F_07", 155, 359, SE) {
 
 	//--- weapon cards (116) -----------------------------------------------
@@ -123,12 +123,12 @@ Trader("prt_fild08", "Card Tester", "4_F_07", 155, 359, SE) {
 	SellItem("Thanatos_Phantom_Card", 100);
 	SellItem("Skeggiold_Card", 100);
 	SellItem("Valkyrie_Randgris_Card", 100);
-	SellItem("Drosera_Card", 100);
-	SellItem("Atroce_Card", 100);
-	SellItem("Sword_Guardian_Card", 100);
-	SellItem("Bow_Guardian_Card", 100);
-	SellItem("Necromancer_Card", 100);
-	SellItem("Mature_Ant_Egg_Card", 100);
+	SellItem("Drosera_Card", 10000);
+	SellItem("Atroce_Card", 10000);
+	SellItem("Sword_Guardian_Card", 10000);
+	SellItem("Bow_Guardian_Card", 10000);
+	SellItem("Necromancer_Card", 10000);
+	SellItem("Mature_Ant_Egg_Card", 10000);
 
 	//--- shield cards (38) ------------------------------------------------
 	SellItem("Thief_Bug_Egg_Card", 100);
@@ -165,10 +165,10 @@ Trader("prt_fild08", "Card Tester", "4_F_07", 155, 359, SE) {
 	SellItem("High_Orc_Card", 100);
 	SellItem("Teddy_Bear_Card", 100);
 	SellItem("Thanatos_Despero_Card", 100);
-	SellItem("Hodremlin_Card", 100);
-	SellItem("Seeker_Card", 100);
-	SellItem("Muscipular_Card", 100);
-	SellItem("Flame_Skull_Card", 100);
+	SellItem("Hodremlin_Card", 10000);
+	SellItem("Seeker_Card", 10000);
+	SellItem("Muscipular_Card", 10000);
+	SellItem("Flame_Skull_Card", 10000);
 
 	//--- armor cards (83) -------------------------------------------------
 	SellItem("Poring_Card", 100);
@@ -249,11 +249,11 @@ Trader("prt_fild08", "Card Tester", "4_F_07", 155, 359, SE) {
 	SellItem("Alicel_Card", 100);
 	SellItem("Skogul_Card", 100);
 	SellItem("Frus_Card", 100);
-	SellItem("Gloom_Under_Night_Card", 100);
-	SellItem("Agav_Card", 100);
-	SellItem("Echio_Card", 100);
-	SellItem("Ktullanux_Card", 100);
-	SellItem("Byorgue_Card", 100);
+	SellItem("Gloom_Under_Night_Card", 10000);
+	SellItem("Agav_Card", 10000);
+	SellItem("Echio_Card", 10000);
+	SellItem("Ktullanux_Card", 10000);
+	SellItem("Byorgue_Card", 10000);
 
 	//--- garment cards (39) -----------------------------------------------
 	SellItem("Condor_Card", 100);
@@ -291,10 +291,10 @@ Trader("prt_fild08", "Card Tester", "4_F_07", 155, 359, SE) {
 	SellItem("Green_Maiden_Card", 100);
 	SellItem("Orc_Baby_Card", 100);
 	SellItem("Aliot_Card", 100);
-	SellItem("Roween_Card", 100);
-	SellItem("Salamander_Card", 100);
-	SellItem("Kasa_Card", 100);
-	SellItem("Magmaring_Card", 100);
+	SellItem("Roween_Card", 10000);
+	SellItem("Salamander_Card", 10000);
+	SellItem("Kasa_Card", 10000);
+	SellItem("Magmaring_Card", 10000);
 
 	//--- boots cards (38) -------------------------------------------------
 	SellItem("Chonchon_Card", 100);
@@ -332,9 +332,9 @@ Trader("prt_fild08", "Card Tester", "4_F_07", 155, 359, SE) {
 	SellItem("Gold_Acidus_Card", 100);
 	SellItem("Green_Ferus_Card", 100);
 	SellItem("Thanatos_Odium_Card", 100);
-	SellItem("Ice_Titan_Card", 100);
-	SellItem("Zombie_Slaughterer_Card", 100);
-	SellItem("Fallen_Bishop_Card", 100);
+	SellItem("Ice_Titan_Card", 10000);
+	SellItem("Zombie_Slaughterer_Card", 10000);
+	SellItem("Fallen_Bishop_Card", 10000);
 
 	//--- accessory cards (76) ---------------------------------------------
 	SellItem("Spore_Card", 100);
@@ -404,15 +404,15 @@ Trader("prt_fild08", "Card Tester", "4_F_07", 155, 359, SE) {
 	SellItem("Dragon_Egg_Card", 100);
 	SellItem("Plasma_Card", 100);
 	SellItem("Baroness_of_Retribution_Card", 100);
-	SellItem("Snowier_Card", 100);
-	SellItem("Siroma_Card", 100);
-	SellItem("Gazeti_Card", 100);
-	SellItem("Galion_Card", 100);
-	SellItem("Stapo_Card", 100);
-	SellItem("Ifrit_Card", 100);
-	SellItem("Imp_Card", 100);
-	SellItem("Ragged_Zombie_Card", 100);
-	SellItem("Hell_Poodle_Card", 100);
+	SellItem("Snowier_Card", 10000);
+	SellItem("Siroma_Card", 10000);
+	SellItem("Gazeti_Card", 10000);
+	SellItem("Galion_Card", 10000);
+	SellItem("Stapo_Card", 10000);
+	SellItem("Ifrit_Card", 10000);
+	SellItem("Imp_Card", 10000);
+	SellItem("Ragged_Zombie_Card", 10000);
+	SellItem("Hell_Poodle_Card", 10000);
 
 	//--- headgear cards (50) ----------------------------------------------
 	SellItem("Willow_Card", 100);
@@ -461,11 +461,20 @@ Trader("prt_fild08", "Card Tester", "4_F_07", 155, 359, SE) {
 	SellItem("Vesper_Card", 100);
 	SellItem("Blue_Acidus_Card", 100);
 	SellItem("Kiel_D-01_Card", 100);
-	SellItem("Vanberk_Card", 100);
-	SellItem("Isilla_Card", 100);
-	SellItem("Knocker_Card", 100);
-	SellItem("Banshee_Card", 100);
+	SellItem("Vanberk_Card", 10000);
+	SellItem("Isilla_Card", 10000);
+	SellItem("Knocker_Card", 10000);
+	SellItem("Banshee_Card", 10000);
 
 	//--- any slot cards (1) -----------------------------------------------
 	SellItem("Drake_Card", 100);
+}
+
+//The sign beside the shop. The board sprite is the one the towns already use for their notice boards.
+Npc("prt_fild08", "Cards 100z", "2_BULLETIN_BOARD", 157, 360, SE) {
+OnClick:
+	FocusNpc();
+	Dialog(Name, "<color=#CC0000>การ์ดร้อยเดียว!<color=#000000>\nพ่อค้า Card Tester ที่อยู่ข้าง ๆ ขายการ์ดให้ลองใช้ทุกใบ ใบละ <color=#CC0000>100z<color=#000000>" +
+				"\n\nมีการ์ดแพง 35 ใบ (เช่น Ktullanux, Atroce, Drosera) ที่ขายราคาปกติใบละ 10,000z" +
+				"\n\nการ์ดที่ไม่ใช้ ขายคืนร้านค้า NPC ได้ในราคาปกติของเกม (การ์ดทั่วไป 10z การ์ดแพง 5,000z)");
 }
