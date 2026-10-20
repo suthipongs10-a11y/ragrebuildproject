@@ -79,6 +79,29 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.Combat
                 case SkillValidationResult.CannotTeleportHere:
                     Camera.AppendChatText($"<color={ChatColor.Error}>วาร์ปในจุดนี้ไม่ได้</color>");
                     break;
+                //These used to fall through to the log line at the bottom, so a Fire Wall refused
+                //because three were already burning looked exactly like a skill that did nothing.
+                case SkillValidationResult.CannotCreateMore:
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: วางสกิลนี้ครบ 3 ชุดแล้ว รอให้ชุดเก่าหมดเวลาก่อน</color>");
+                    break;
+                case SkillValidationResult.OverlappingAreaOfEffect:
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ตรงนั้นมี Pneuma หรือ Safety Wall อยู่แล้ว</color>");
+                    break;
+                case SkillValidationResult.NoLineOfSight:
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: มีสิ่งกีดขวางระหว่างตัวละครกับจุดนั้น</color>");
+                    break;
+                case SkillValidationResult.TooFarAway:
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ไกลเกินไป</color>");
+                    break;
+                case SkillValidationResult.TooClose:
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ใกล้เกินไป</color>");
+                    break;
+                case SkillValidationResult.CartRequired:
+                    Camera.AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: ต้องมีรถเข็น</color>");
+                    break;
+                case SkillValidationResult.TeleportBlocked:
+                    Camera.AppendChatText($"<color={ChatColor.Error}>วาร์ปไม่ได้: ติดกับดักอยู่</color>");
+                    break;
                 case SkillValidationResult.VendFailedGenericError:
                     VendingSetupManager.Instance?.ResumeVendWindow();
                     Camera.AppendChatText("เปิดร้านไม่สำเร็จ", TextColor.Error);

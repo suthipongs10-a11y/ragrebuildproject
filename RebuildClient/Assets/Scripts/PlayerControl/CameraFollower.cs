@@ -1370,8 +1370,8 @@ namespace Assets.Scripts
                     hasSkillOnCursor = false;
                     isHolding = false;
                 }
-
-                //TODO: we should inform the user it isn't valid here
+                else
+                    AppendChatText($"<color={ChatColor.Error}>ใช้สกิลไม่สำเร็จ: วางสกิลตรงจุดนั้นไม่ได้ (เดินไม่ถึง)</color>");
 
                 hasSkillOnCursor = false;
                 UiManager.Instance.PartyPanel.EndSkillOnCursor();

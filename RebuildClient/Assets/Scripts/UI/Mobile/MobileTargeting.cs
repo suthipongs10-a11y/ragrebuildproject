@@ -106,11 +106,16 @@ namespace Assets.Scripts.UI.Mobile
             if (camera.IsCursorSkillItem)
                 network.SendUseItem(camera.CursorItemId, target.Id);
             else if (wanted == SkillTarget.Ground)
-                //a ground spell lands on the tile the target is standing on, which is where
-                //it would have been dropped by hand
+                //A ground spell lands on the tile the target is standing on, which is where
+                //it would have been dropped by hand.
+                //
+                //The tile is the floor of the position, as it is everywhere else. A body that
+                //stands on tile 11 is at 11.5, and rounding that goes to the even neighbour -
+                //12 - so on every other tile the spell was thrown one square off, and a Fire
+                //Wall one square off a monster that is against a wall lands in the wall.
                 network.SendGroundTargetSkillAction(
-                    new Vector2Int(Mathf.RoundToInt(target.transform.position.x),
-                        Mathf.RoundToInt(target.transform.position.z)),
+                    new Vector2Int(Mathf.FloorToInt(target.transform.position.x),
+                        Mathf.FloorToInt(target.transform.position.z)),
                     camera.CursorSkill, camera.CursorSkillLevel);
             else
                 network.SendSingleTargetSkillAction(target.Id, camera.CursorSkill, camera.CursorSkillLevel);
