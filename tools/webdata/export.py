@@ -131,6 +131,11 @@ REMAP_DROPS = read_remap_flag()
 # so a change over there is a one line change here.
 SERVER_DROP_RATE = 2
 
+# Mirrors the "rate *= 5" under THE GEAR RATE in the same script: weapons and everything a
+# character wears, applied last, after the halving. Same rule, a change over there is a one
+# line change here.
+GEAR_DROP_RATE = 5
+
 # A usable's subType in the script is its use effect (DataLoader: SubCategory = UseEffect).
 # These are the ones the script lists as "what a player drinks", which skip the halving.
 DRINK_EFFECTS = {"RedPotion", "YellowPotion", "WhitePotion", "BluePotion", "GreenPotion",
@@ -166,7 +171,8 @@ def remap_drop_rate(item, rate):
     When appsettings.json has RemapDropRates on, the numbers in DropData.csv are NOT what
     a player sees, and this produces the rate the server actually rolls. When it is off,
     DataLoader never calls the script at all - so neither does this, and that includes the
-    Refine doubling, the halving and the server's drop rate, which live inside the same block.
+    Refine doubling, the halving, the server's drop rate and the gear rate, which live inside
+    the same block.
     """
     if not REMAP_DROPS:
         return rate
@@ -207,6 +213,10 @@ def remap_drop_rate(item, rate):
     # half of that, for everything that is not junk and not a card
     if itype not in ("Etc", "Card"):
         rate //= 2
+
+    # the gear rate goes on last, so it multiplies the finished figure
+    if itype in ("Weapon", "Equipment"):
+        rate *= GEAR_DROP_RATE
 
     return min(rate, 10000)
 
@@ -1540,6 +1550,8 @@ def main():
         #the exp and drop multipliers the numbers on the site already include
         "expRate": EXP_RATE,
         "dropRate": SERVER_DROP_RATE if REMAP_DROPS else 1,
+        #on top of dropRate, for weapons and equipment only
+        "gearDropRate": GEAR_DROP_RATE if REMAP_DROPS else 1,
         "unreachableSpawnMaps": unreachable_maps,
         "monstersWithoutSpawns": sorted(m["code"] for m in monsters.values() if m.get("noSpawn")),
         "monstersSummonedOnly": sorted(m["code"] for m in monsters.values() if m.get("summonedBy")),

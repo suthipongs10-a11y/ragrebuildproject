@@ -9,8 +9,8 @@ OnLoadDropData:
 	//This is the rate the project shipped with. It was off for a while, with DropData.csv
 	//multiplied by ten in its place, and both halves of that have been undone - the file is
 	//back to its original numbers and the curve is back in charge of them. Note that this
-	//block also carries the Refine doubling and the server's drop rate further down; they are
-	//part of the same switch and not settings of their own.
+	//block also carries the Refine doubling, the server's drop rate and the gear rate further
+	//down; they are part of the same switch and not settings of their own.
 
 	if(type == Etc && subType == "Quest")
 		return rate;
@@ -81,6 +81,19 @@ OnLoadDropData:
 	//rates either way, since they return before they ever reach here.
 	if(type != Etc && type != Card)
 		rate /= 2;
+
+	//THE GEAR RATE: x5. Weapons and everything a character wears - armour, shields, garments,
+	//shoes, headgear, accessories - drop at five times the rate everything above leaves them
+	//at, so changing the 5 is all it takes to change it. It goes last so that it multiplies the
+	//finished figure, after the halving rather than before it.
+	//
+	//Ammo is spent rather than worn and a card is slotted rather than worn, so neither is
+	//touched. Quest items and the three Antonio items returned at the top and never get here.
+	//
+	//Anything the curve put at 20% or more is a sure thing after this. The server caps whatever
+	//the scripts hand back at 100%, so nothing here needs to.
+	if(type == Weapon || type == Equipment)
+		rate *= 5;
 
 OnSetItemPurchasePrice:
 	//all etc type items (other than those used for refining or fixed NPC sell value) have 2x value
