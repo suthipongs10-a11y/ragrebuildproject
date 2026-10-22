@@ -33,4 +33,8 @@ OnSetItemSaleValue:
 
 	//ninja and gunslinger
 	if(code == "Murasame_" || code == "Gate_Keeper") return 0;
+
+	//The Black Market Trader sells every level four weapon at 1000z. These three are priced far
+	//above that in ItemsWeapons.csv, so for them the same rule applies: worthless to npcs.
+	if(code == "Hurricane_Fury" || code == "Infiltrator_" || code == "Dagger_of_Counter") return 0;
 }

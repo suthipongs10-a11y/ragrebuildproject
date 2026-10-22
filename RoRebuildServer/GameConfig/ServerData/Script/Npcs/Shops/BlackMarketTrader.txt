@@ -1,0 +1,52 @@
+//The black market trader, back without her quest.
+//
+//She used to deal in the level four weapons, and she was revealed by an mvp milestone. Those
+//weapons moved into the mvp treasure box and she went with them. Now she is back for good:
+//standing in the open beside the enchant scribe, who took her old corner, and selling every
+//weapon the box holds for a flat 1000z, no quest and nothing to unlock. The box still drops
+//them too, so this is the cheap road and the box is the lucky one.
+//
+//Three of the weapons are priced far above that in ItemsWeapons.csv (Hurricane_Fury 10000,
+//Infiltrator_ 57000, Dagger_of_Counter 120000), and the server will not let an npc sell
+//something for less than twice what it pays to buy it back. Config/TesterShopValues.txt makes
+//those three worthless to npc shopkeepers so 1000z is allowed, which means they cannot be sold
+//back to an npc at all. The other twenty-eight sell back for 10z, and Queen's_Whip for 500z.
+//
+//Listed in the order the box lists them. A weapon added to the box later is not picked up by
+//itself - give it a line here.
+//
+//To take her away, delete this file.
+Trader("prt_fild08", "Black Market Trader", "4_F_ALCHE", 155, 377, S) {
+	SellItem("Mistilteinn", 1000);
+	SellItem("Cutlus_", 1000);
+	SellItem("Dragon_Slayer", 1000);
+	SellItem("Brionac", 1000);
+	SellItem("Crescent_Scythe_", 1000);
+	SellItem("Gelerdria", 1000);
+	SellItem("Bloody_Axe", 1000);
+	SellItem("Quadrille", 1000);
+	SellItem("Kaiser_Knuckle", 1000);
+	SellItem("Berserk", 1000);
+	SellItem("Wing_Staff", 1000);
+	SellItem("Legacy_of_Dragon", 1000);
+	SellItem("Rudra_Bow", 1000);
+	SellItem("Oriental_Lute", 1000);
+	SellItem("Queen's_Whip", 1000);
+	SellItem("Assassin_Dagger", 1000);
+	SellItem("Bloody_Roar", 1000);
+	SellItem("Infiltrator_", 1000);
+	SellItem("Sucsamad", 1000);
+	SellItem("Dagger_of_Counter", 1000);
+	SellItem("Combat_Knife", 1000);
+	SellItem("Bazerald", 1000);
+	SellItem("Staff_of_Destruction", 1000);
+	SellItem("Hurricane_Fury", 1000);
+	SellItem("Ice_Pick", 1000);
+	SellItem("Byeol-ungeom", 1000);
+	SellItem("Schweizersabel", 1000);
+	SellItem("Guillotine", 1000);
+	SellItem("Exorciser", 1000);
+	SellItem("Excalibur", 1000);
+	SellItem("Executioner", 1000);
+	SellItem("Tyrfing", 1000);
+}

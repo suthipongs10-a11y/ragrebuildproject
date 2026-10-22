@@ -85,7 +85,6 @@ export async function render() {
         <tr><td>สมุดผจญภัยแรงก์ 10 (${n(ab.ranks[9].stars)} ดาว + ครบทุกภูมิภาค)</td>
           <td>${ab.ranks[9].rewards.map((r) => `${itemLink(byId.get(r.id))}${r.count > 1 ? ` ×${r.count}` : ""}`).join(", ")}</td></tr>
         <tr><td>สมุดบอสครบทั้งเล่ม</td><td>${itemLink(byId.get(bl.clearReward))}</td></tr>
-        <tr><td>กล่อง MVP เท่านั้น</td><td>${itemLink(byId.get(bl.crownedHat))} (แบบมีรู)</td></tr>
       </tbody>
     </table></div>
 
