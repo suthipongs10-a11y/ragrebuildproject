@@ -170,6 +170,18 @@ journalctl -u rorebuild --since "1 minute ago" --no-pager | grep -E "scripts loa
 ย้อนกลับ: ขั้นตอนเดียวกับกู้ฐานข้อมูลด้านล่าง โดยใช้ไฟล์ `BeforeReset-...` สคริปต์พิมพ์คำสั่งกู้ให้ท้ายผลลัพธ์
 ธง `--wipe-bans` กับ `--wipe-addresses` ล้างรายการแบนกับประวัติไอพีด้วย (ปกติเก็บไว้ การรีเซ็ตไม่ใช่การอภัยโทษ)
 
+### F. แพตช์เฉพาะสคริปต์และข้อมูลเกม (ServerData)
+
+ใช้เมื่อแก้แค่ไฟล์ใน `RoRebuildServer/GameConfig/ServerData/` เช่น NPC เรทดรอป ไฟล์ csv ไม่ต้อง build Web ใหม่
+หน้า DB มอนกับรายชื่อ NPC ในเกมเป็นข้อมูลที่ฝังตอน build จึงโชว์ตัวเลขเก่าจนกว่าจะ build ใหม่ ส่วนเว็บไกด์ถูกต้องเสมอถ้ารัน `tools/webdata/export.py` แล้ว
+
+1. หยุด service ก่อน (`systemctl stop rorebuild`) แล้วค่อยแก้ไฟล์ และเปิดครั้งเดียวหลังไฟล์ครบ ถ้าเปิดตอนไฟล์ใหม่ปนไฟล์เก่า เซิร์ฟเวอร์อาจไม่ขึ้น (log ขึ้น `Npc ... is selling ...`) แล้ว systemd เปิดซ้ำวนไปเรื่อย ๆ
+2. ส่งไฟล์ที่แก้ด้วย `scp` ทีละไฟล์ไปที่เดียวกันใต้ `/opt/rorebuild/server/ServerData/` (PowerShell พิมพ์ทีละบรรทัด)
+3. ไฟล์ที่ถูก**ลบ**ใน repo `scp` ไม่ลบให้ ต้อง `rm` บน VPS เอง ถ้าลืม NPC เก่ายังอยู่
+4. เรท EXP ไม่ได้อยู่ใน ServerData แต่อยู่ใน `appsettings.json` แก้บน VPS ด้วย `sed -i 's/"ExpRate": 200,/"ExpRate": 250,/' /opt/rorebuild/server/appsettings.json` (ใส่เลขเดิมและเลขใหม่ให้ตรงของจริง) แล้ว `grep -n '"ExpRate"' /opt/rorebuild/server/appsettings*.json` ดูว่าไม่มีไฟล์อื่นตั้งทับ
+5. `systemctl start rorebuild` รอ 60 วินาที แล้ว `journalctl -u rorebuild --since "1 minute ago" --no-pager | grep -E "Experience rate|scripts loaded|Server started|Exception"` ต้องเห็นบรรทัด `Experience rate: ...%` กับ `Server started.`
+6. ก่อน build Web รอบถัดไป รัน `updateclient.bat` ที่ root ของ repo
+
 ## ระหว่างทดสอบ
 
 - คำสั่ง GM ในแชท: `!who`, `!kick ชื่อ`, `!ban ชื่อ เหตุผล`, `!banip`, `!bans`, `!alt ชื่อ`, `!equip ชื่อ` (ดูของที่ตัวละครที่ออนไลน์ใส่อยู่ ทั้งรีไฟน์ การ์ด ออพ หรือคลิกขวาที่ตัวละครหลัง build Web ใหม่) และ `!ench*` สำหรับทดสอบคัมภีร์
