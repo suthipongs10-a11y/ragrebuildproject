@@ -87,6 +87,11 @@ namespace Assets.Scripts.Network.IncomingPacketHandlers.System
                     else
                         Camera.AppendChatText($"<color={ChatColor.Skill}>จำจุดนี้เป็นปลายทาง Warp Portal แล้ว</color>");
                     break;
+                case ServerEvent.GmStatus:
+                    //only decides whether GM-only menu entries are drawn, the server checks
+                    //who is a GM again on every request
+                    State.IsGm = val != 0;
+                    break;
                 // case ServerEvent.PartyInviteSent:
                 //     Camera.AppendChatText($"<color=#77FF77>ส่งคำชวนเข้าปาร์ตี้แล้ว</color>");
                 //     break;

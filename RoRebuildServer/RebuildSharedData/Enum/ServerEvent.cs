@@ -19,6 +19,9 @@ public enum ServerEvent
     CardBonus,
     //ore a blacksmith turned up on a kill through Ore Discovery. Carries the item's name.
     OreDiscovery,
+    //whether the account behind this client is a GM, 1 or 0 in the value, so entries only a GM
+    //can use are left off everybody else's menus. Sent each time the character is ready.
+    GmStatus,
 }
 
 public enum ServerResult

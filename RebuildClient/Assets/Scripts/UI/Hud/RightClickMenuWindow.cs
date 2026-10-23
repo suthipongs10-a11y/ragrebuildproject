@@ -136,6 +136,14 @@ namespace Assets.Scripts.UI.Hud
                 tradeButton.onClick.AddListener(TradeWith);
             }
 
+            //GM only, and placed ahead of the party entries because those return early when
+            //something is missing, which would take this one with them.
+            if (state.IsGm)
+            {
+                var inspectButton = AddEntry($"[GM] ดูของสวมใส่ของ {target.Name}");
+                inspectButton.onClick.AddListener(InspectEquipment);
+            }
+
             if (state.IsInParty)
             {
                 if (state.PartyLeader == state.PartyMemberId)
@@ -211,6 +219,16 @@ namespace Assets.Scripts.UI.Hud
         public void TradeWith()
         {
             NetworkManager.Instance.SendTradeAction(TradeAction.Request, targetEntityId);
+            HideWindow();
+        }
+
+        /// <summary>
+        /// GM only: asks the server what the target is wearing. It answers in the chat box, and
+        /// the request is the same line a GM can type, so the server is what decides who may.
+        /// </summary>
+        public void InspectEquipment()
+        {
+            NetworkManager.Instance.SendSay("!equip " + targetName, PlayerChatType.Say);
             HideWindow();
         }
 

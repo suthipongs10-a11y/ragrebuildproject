@@ -105,9 +105,33 @@ bash /root/deploy/install-bundle.sh
 
 `RoCharacterDatabase.db`, `Keys/`, `Cache/` ไม่อยู่ใน zip จึงไม่ถูกทับ ถ้าเปลี่ยน `::ServerVersion` ใน `ServerData/Config/ServerClientConfig.txt` ทุกคนต้องรีเฟรชหน้าเว็บแบบล้างแคช (Ctrl+F5)
 
+### D. แพตช์เฉพาะโค้ดเซิร์ฟเวอร์ (ไม่ต้อง build Web ใหม่)
+
+ใช้เมื่อแก้แค่ C# ฝั่งเซิร์ฟเวอร์ เช่นเพิ่มคำสั่ง GM ไม่ต้องมัดไฟล์ 2 GB ใหม่ เพราะโค้ดเซิร์ฟเวอร์อยู่ใน DLL ไม่กี่ไฟล์
+บนเครื่อง Windows ที่ build (เปลี่ยน `IP` เป็น IP ของ VPS):
+
+```powershell
+cd RoRebuildServer\RoRebuildServer
+dotnet publish RoRebuildServer.csproj -c Release -o bin\publish
+scp bin\publish\RoRebuildServer.dll bin\publish\RebuildSharedData.dll root@IP:/opt/rorebuild/server/
+```
+
+แล้วบน VPS:
+
+```bash
+chown rorebuild:rorebuild /opt/rorebuild/server/RoRebuildServer.dll /opt/rorebuild/server/RebuildSharedData.dll
+systemctl restart rorebuild
+sleep 60
+systemctl is-active rorebuild
+journalctl -u rorebuild --since "1 minute ago" --no-pager | grep -E "scripts loaded|Server started|Exception"
+```
+
+ส่งสองไฟล์คู่กันเสมอ (โค้ดเซิร์ฟเวอร์กับไลบรารีที่ใช้ร่วมกับ client) ให้เวอร์ชันตรงกัน
+ถ้าเปลี่ยนอะไรที่ client ต้องเห็นด้วย (เมนู หน้าต่าง) ต้อง build Web ใหม่แล้วใช้วิธี C แทน
+
 ## ระหว่างทดสอบ
 
-- คำสั่ง GM ในแชท: `!who`, `!kick ชื่อ`, `!ban ชื่อ เหตุผล`, `!banip`, `!bans`, `!alt ชื่อ` และ `!ench*` สำหรับทดสอบคัมภีร์
+- คำสั่ง GM ในแชท: `!who`, `!kick ชื่อ`, `!ban ชื่อ เหตุผล`, `!banip`, `!bans`, `!alt ชื่อ`, `!equip ชื่อ` (ดูของที่ตัวละครที่ออนไลน์ใส่อยู่ ทั้งรีไฟน์ การ์ด ออพ หรือคลิกขวาที่ตัวละครหลัง build Web ใหม่) และ `!ench*` สำหรับทดสอบคัมภีร์
 - ปิดรับสมัครทันที: แก้ `AllowRegistration` เป็น `false` ใน `/opt/rorebuild/server/appsettings.Production.json` แล้ว `systemctl restart rorebuild`
 - ดู log: `journalctl -u rorebuild -n 200` หรือไฟล์ใน `/opt/rorebuild/server/Logs/`
 - สำรองข้อมูลอัตโนมัติทุก 6 ชั่วโมงที่ `/opt/rorebuild/backup/` สั่งเองได้ด้วย `/opt/rorebuild/backup.sh`

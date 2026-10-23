@@ -35,6 +35,9 @@ public class PacketClientTextCommand : IClientPacketHandler
             CommandBuilder.AddRecipient(connection.Entity);
             CommandBuilder.SendServerMessage($"You are now an admin! Have fun!");
             CommandBuilder.ClearRecipients();
+
+            //so the GM-only entries in the client's menus show up without a relog
+            CommandBuilder.SendServerEvent(connection.Player, RebuildSharedData.Enum.ServerEvent.GmStatus, 1);
         }
 
         if (type == ClientTextCommand.ReturnToSave)

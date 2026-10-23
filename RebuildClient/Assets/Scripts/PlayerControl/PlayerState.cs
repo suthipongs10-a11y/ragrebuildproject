@@ -40,6 +40,13 @@ namespace Assets.Scripts.PlayerControl
         public Dictionary<CharacterSkill, int> KnownSkills = new();
         public Dictionary<CharacterSkill, int> GrantedSkills = new();
         public bool IsAdminHidden = false;
+
+        /// <summary>
+        /// Whether the account behind this client is a GM, as the server last said. It only
+        /// decides whether GM-only menu entries are drawn; the server checks again on every
+        /// request, so a client that lies about this gets a refusal and nothing else.
+        /// </summary>
+        public bool IsGm = false;
         public ClientInventory Inventory = new();
         public ClientInventory Cart = new();
         public ClientInventory Storage = new();

@@ -59,6 +59,7 @@ public static class GmCommands
             case "!unbanip":
             case "!bans":
             case "!alt":
+            case "!equip":
             case "!gm":
             case "!ench":
             case "!enchshow":
@@ -89,6 +90,7 @@ public static class GmCommands
             case "!unbanip": UnbanIp(player, parts); break;
             case "!bans": Bans(player); break;
             case "!alt": Alt(player, parts); break;
+            case "!equip": ShowEquipment(player, parts); break;
             case "!ench": Enchant(player, parts); break;
             case "!enchshow": EnchantShow(player, parts); break;
             case "!enchclear": EnchantClear(player, parts); break;
@@ -105,6 +107,7 @@ public static class GmCommands
         Tell(player, "<color=#FFCC55>คำสั่ง GM</color>");
         Tell(player, "!who — ใครออนไลน์อยู่บ้าง อยู่แมพไหน ไอพีอะไร");
         Tell(player, "!alt <ชื่อตัวละคร> — บัญชีอื่นที่เคยใช้ไอพีเดียวกัน");
+        Tell(player, "!equip <ชื่อตัวละคร> — ดูของที่ใส่อยู่ทุกชิ้น พร้อมรีไฟน์ การ์ด และออพ (ต้องออนไลน์)");
         Tell(player, "!kick <ชื่อตัวละคร> — เตะออก ไม่ได้แบน");
         Tell(player, "!ban <ชื่อตัวละคร> <เวลา> [เหตุผล] — แบนบัญชีที่ตัวละครนั้นอยู่ แล้วเตะออก");
         Tell(player, "!banacct <ชื่อบัญชี> <เวลา> [เหตุผล] — แบนบัญชีที่ไม่ได้ออนไลน์");
@@ -439,6 +442,115 @@ public static class GmCommands
         expiresAt = DateTime.UtcNow + span;
         return true;
     }
+
+    // ---------------------------------------------------------------- what somebody has on
+
+    /// <summary>The worn slots in the order a GM reads them, and the name each is shown under.</summary>
+    private static readonly (EquipSlot Slot, string Label)[] WornSlots =
+    {
+        (EquipSlot.Weapon, "อาวุธ"),
+        (EquipSlot.Shield, "โล่"),
+        (EquipSlot.HeadTop, "หมวกบน"),
+        (EquipSlot.HeadMid, "หมวกกลาง"),
+        (EquipSlot.HeadBottom, "หมวกล่าง"),
+        (EquipSlot.Body, "เกราะ"),
+        (EquipSlot.Garment, "ผ้าคลุม"),
+        (EquipSlot.Footgear, "รองเท้า"),
+        (EquipSlot.Accessory1, "เครื่องประดับ 1"),
+        (EquipSlot.Accessory2, "เครื่องประดับ 2"),
+    };
+
+    /// <summary>
+    /// What another player has on - every slot with its refine, its cards and its enchant -
+    /// said back to the GM in the chat box.
+    /// </summary>
+    /// <remarks>
+    /// Chat text rather than a window, for the same reason as the rest of this file: it needs
+    /// no packet of its own, so it works against whatever client the GM already has open, and
+    /// the GM-only entry in the client's right-click menu only has to send this line. Only
+    /// somebody online can be looked at. What a character wears lives on the character in
+    /// memory, and an offline one is a row with a blob in it.
+    /// </remarks>
+    private static void ShowEquipment(Player player, string[] parts)
+    {
+        if (parts.Length < 2)
+        {
+            Tell(player, "ใช้: !equip <ชื่อตัวละคร>");
+            return;
+        }
+
+        var name = string.Join(" ", parts.Skip(1));
+        if (!World.Instance.TryFindPlayerByName(name, out var entity) || !entity.TryGet<Player>(out var target))
+        {
+            Tell(player, $"ไม่พบ {name} ออนไลน์อยู่");
+            return;
+        }
+
+        var job = DataManager.JobInfo.TryGetValue(target.JobId, out var jobInfo) ? jobInfo.Class : $"job {target.JobId}";
+        var map = target.Character?.Map?.Name ?? "-";
+
+        Tell(player, $"<color=#FFCC55>{target.Name}</color>  Lv.{target.GetData(PlayerStat.Level)}/{target.GetData(PlayerStat.JobLevel)}  {job}  แมพ {map}");
+
+        var shown = 0;
+        var inventory = target.Inventory;
+
+        foreach (var (slot, label) in WornSlots)
+        {
+            var bagId = target.Equipment.ItemSlots[(int)slot];
+            if (inventory == null || bagId <= 0 || !inventory.GetItem(bagId, out var item))
+                continue;
+
+            Tell(player, $"<color=#AACCFF>{label}</color>  {DescribeWornItem(item)}");
+            shown++;
+        }
+
+        //ammunition is not one of the ten slots above, it is kept beside them
+        if (target.Equipment.AmmoId > 0)
+        {
+            Tell(player, $"<color=#AACCFF>ลูกธนู/กระสุน</color>  {NameOfItem(target.Equipment.AmmoId)}");
+            shown++;
+        }
+
+        if (shown == 0)
+            Tell(player, "ไม่ได้ใส่อะไรอยู่เลย");
+
+        ServerLogger.Log($"[GM] {player.Name} looked at what {target.Name} is wearing.");
+    }
+
+    /// <summary>One worn item as a line: +refine, name, [cards], and the enchant if it has one.</summary>
+    private static string DescribeWornItem(ItemReference item)
+    {
+        var text = new System.Text.StringBuilder();
+
+        if (item.Type == ItemType.UniqueItem && item.UniqueItem.Refine > 0)
+            text.Append($"+{item.UniqueItem.Refine} ");
+
+        text.Append(NameOfItem(item.Id));
+
+        if (item.Type != ItemType.UniqueItem)
+            return text.ToString();
+
+        //four places an item can carry something: cards, and on a crafted piece the crumbs
+        //and stone the forge set into it. All of them are item ids.
+        for (var i = 0; i < 4; i++)
+        {
+            var carried = item.UniqueItem.SlotData(i);
+            if (carried > 0)
+                text.Append($" [{NameOfItem(carried)}]");
+        }
+
+        if (EnchantRegistry.TryGet(item.UniqueItem.UniqueId, out var enchant))
+        {
+            text.Append($"  <color=#AACCFF>ออพ {enchant.Tier}:</color>");
+            for (var i = 0; i < enchant.Count; i++)
+                text.Append(i == 0 ? " " : " · ").Append($"{enchant.Options[i].Stat} +{enchant.Options[i].Value}");
+        }
+
+        return text.ToString();
+    }
+
+    private static string NameOfItem(int itemId) =>
+        DataManager.ItemList.TryGetValue(itemId, out var data) ? data.Name : $"#{itemId}";
 
     private static bool TryFindOnline(string characterName, out NetworkConnection connection)
     {

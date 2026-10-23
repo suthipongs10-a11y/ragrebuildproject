@@ -51,6 +51,10 @@ public class PacketPlayerReady : IClientPacketHandler
                 new FriendNotifyPresenceRequest(connection.Player.Id, connection.Player.Name, true));
         }
 
+        //Said every time rather than only to GMs, so a client that logs out of a GM and into
+        //somebody else in the same page load does not keep the menu entries of the last one.
+        CommandBuilder.SendServerEvent(connection.Player, ServerEvent.GmStatus, connection.Player.IsAdmin ? 1 : 0);
+
         connection.Player.HasEnteredServer = true;
 
         ServerLogger.Debug($"Player {connection.Entity} finished loading, spawning him on {connection.Character.Map.Name} at position {connection.Character.Position}.");
