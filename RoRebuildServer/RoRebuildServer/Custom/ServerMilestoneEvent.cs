@@ -240,9 +240,10 @@ public class ServerMilestoneEvent : ServerConfigScriptHandlerBase
 
     private void CheckAndRevealMvpNpcs(bool isServerUp)
     {
-        //The black market trader used to be revealed here. She sold the level four weapons
-        //and those are in the mvp treasure box now, so there is no npc left to reveal and a
-        //signal with nobody listening only logs a warning nobody can act on.
+        //The black market exchange used to be revealed here. She stands in the camp from the
+        //first boot now, like the rest (Script/Npcs/Shops/BlackMarketTrader.txt), so there is
+        //nothing to reveal and a signal with nobody listening only logs a warning nobody can
+        //act on.
 
         if (!isValkyrieVisible && mvpMilestones >= ValkyrieVisibleMvpReq && highestLevelPlayer >= ValkyrieVisibleLevel)
             isValkyrieVisible = RevealNpc(ValkyrieSignalName, !isServerUp);

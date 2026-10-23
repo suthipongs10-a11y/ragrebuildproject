@@ -1,52 +1,37 @@
-//The black market trader, back without her quest.
+//The black market, back as the exchange it was.
 //
-//She used to deal in the level four weapons, and she was revealed by an mvp milestone. Those
-//weapons moved into the mvp treasure box and she went with them. Now she is back for good:
-//standing in the open beside the enchant scribe, who took her old corner, and selling every
-//weapon the box holds for a flat 1000z, no quest and nothing to unlock. The box still drops
-//them too, so this is the cheap road and the box is the lucky one.
+//Thirteen of the level four weapons are earned again instead of bought: bring the materials
+//and the zeny and she hands the weapon over. These are the original recipes, line for line,
+//with one difference - the Hat of the Sun God is not on her list. Two helms ride along with the
+//weapons, as they did in the original: the Orc Hero Helm and the Valkyrian Helm.
 //
-//Three of the weapons are priced far above that in ItemsWeapons.csv (Hurricane_Fury 10000,
-//Infiltrator_ 57000, Dagger_of_Counter 120000), and the server will not let an npc sell
-//something for less than twice what it pays to buy it back. Config/TesterShopValues.txt makes
-//those three worthless to npc shopkeepers so 1000z is allowed, which means they cannot be sold
-//back to an npc at all. The other twenty-eight sell back for 10z, and Queen's_Whip for 500z.
+//She stands in the open from the first boot, like every other camp npc on this server, rather
+//than waiting for a milestone. The Enchant Scribe has the corner she used to have, so she is
+//three steps along the same wall.
 //
-//Listed in the order the box lists them. A weapon added to the box later is not picked up by
-//itself - give it a line here.
+//The MVP treasure box still drops these weapons as well. Db/ItemBoxSummonList.csv holds
+//thirty-two level four weapons, these thirteen among them, so this is the sure road and the
+//box is the lucky one. Take the thirteen out of the box and this becomes the only way.
 //
 //To take her away, delete this file.
-Trader("prt_fild08", "Black Market Trader", "4_F_ALCHE", 155, 377, S) {
-	SellItem("Mistilteinn", 1000);
-	SellItem("Cutlus_", 1000);
-	SellItem("Dragon_Slayer", 1000);
-	SellItem("Brionac", 1000);
-	SellItem("Crescent_Scythe_", 1000);
-	SellItem("Gelerdria", 1000);
-	SellItem("Bloody_Axe", 1000);
-	SellItem("Quadrille", 1000);
-	SellItem("Kaiser_Knuckle", 1000);
-	SellItem("Berserk", 1000);
-	SellItem("Wing_Staff", 1000);
-	SellItem("Legacy_of_Dragon", 1000);
-	SellItem("Rudra_Bow", 1000);
-	SellItem("Oriental_Lute", 1000);
-	SellItem("Queen's_Whip", 1000);
-	SellItem("Assassin_Dagger", 1000);
-	SellItem("Bloody_Roar", 1000);
-	SellItem("Infiltrator_", 1000);
-	SellItem("Sucsamad", 1000);
-	SellItem("Dagger_of_Counter", 1000);
-	SellItem("Combat_Knife", 1000);
-	SellItem("Bazerald", 1000);
-	SellItem("Staff_of_Destruction", 1000);
-	SellItem("Hurricane_Fury", 1000);
-	SellItem("Ice_Pick", 1000);
-	SellItem("Byeol-ungeom", 1000);
-	SellItem("Schweizersabel", 1000);
-	SellItem("Guillotine", 1000);
-	SellItem("Exorciser", 1000);
-	SellItem("Excalibur", 1000);
-	SellItem("Executioner", 1000);
-	SellItem("Tyrfing", 1000);
+Npc("prt_fild08", "Black Market Exchange", "4_F_JOB_ASSASSIN", 155, 377, S)
+{
+	AddTradedItem(CreateTradedItem("Staff_of_Destruction").Requires("Evil_Bone_Wand").Requires("Soul_Staff").Requires("Baphomet_Doll").Requires("Osiris_Doll").Requires("Gold", 2).Costs(50000));
+	AddTradedItem(CreateTradedItem("Hurricane_Fury").Requires("War_Axe").Requires("Old_Hilt").Requires("Peridot").Requires("Emperium", 3).Requires("Gold", 2).Costs(50000));
+	AddTradedItem(CreateTradedItem("Rudra_Bow").Requires("Muscovite").Requires("Peridot").Requires("Rose_Quartz").Requires("Illusion_Flower").Requires("Gold", 2).Costs(50000));
+	AddTradedItem(CreateTradedItem("Ice_Pick").Requires("Biotite").Requires("Muscovite").Requires("Phlogopite").Requires("Chivalry_Emblem", 2).Requires("Gold", 2).Costs(50000));
+	AddTradedItem(CreateTradedItem("Combat_Knife").Requires("Agate").Requires("Citrin").Requires("Muscovite").Requires("Tongue", 15).Requires("Gold", 2).Costs(50000));
+	AddTradedItem(CreateTradedItem("Byeol-ungeom").Requires("Agate").Requires("Citrin").Requires("Muscovite").Requires("Necklace_of_Wisdom", 2).Requires("Gold", 2).Costs(50000));
+	AddTradedItem(CreateTradedItem("Schweizersabel").Requires("Citrin").Requires("Phlogopite").Requires("Pyroxene").Requires("Izidor").Requires("Gold", 2).Costs(50000));
+	AddTradedItem(CreateTradedItem("Guillotine").Requires("Agate").Requires("Peridot").Requires("Turquoise").Requires("Animal_Gore", 3).Requires("Gold", 2).Costs(50000));
+	AddTradedItem(CreateTradedItem("Exorciser").Requires("Phlogopite").Requires("Pyroxene").Requires("Turquoise").Requires("Hand_of_God").Requires("Gold", 2).Costs(50000));
+	AddTradedItem(CreateTradedItem("Excalibur").Requires("Biotite").Requires("Rose_Quartz").Requires("Turquoise").Requires("Silver_Knife_of_Chastity").Requires("Gold", 2).Costs(50000));
+	AddTradedItem(CreateTradedItem("Executioner").Requires("Amulet").Requires("Bloody_Edge").Requires("Necklace_of_Oblivion").Requires("Executioner's_Mitten").Costs(50000));
+	AddTradedItem(CreateTradedItem("Mistilteinn").Requires("Emperium").Requires("Foolishness_of_the_Blind").Requires("Loki's_Whispers").Requires("Mother's_Nightmare").Requires("Young_Twig"));
+	AddTradedItem(CreateTradedItem("Tyrfing").Requires("Emperium").Requires("Peridot").Requires("Contract_in_Shadow").Requires("Blade_Lost_in_Darkness").Costs(50000));
+	AddTradedItem(CreateTradedItem("Orc_Hero_Helm").Requires("Heroic_Emblem", 3).Requires("Jellopy", 50).Requires("Orcish_Voucher", 150).Costs(50000));
+	AddTradedItem(CreateTradedItem("Valkyrian_Helm").Requires("Valhalla's_Flower").Requires("Angel_Wing").Requires("Gemstone"));
+OnClick:
+	FocusNpc();
+	StartItemTrade();
 }

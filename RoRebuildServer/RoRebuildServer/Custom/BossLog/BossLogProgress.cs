@@ -15,11 +15,10 @@ namespace RoRebuildServer.Custom.BossLog;
 /// the Sun God is yours, no luck involved. What makes it hard is that bosses respawn once an
 /// hour, so the only way through is a lot of evenings and knowing where everything stands.
 ///
-/// The slotted one is not here. It comes out of the MVP box, which drops from MVPs at one
-/// percent and holds it among a dozen other things - a lottery inside a lottery, and nothing
-/// anybody can grind their way past. This log briefly had a lottery of its own for it, with a
-/// guarantee at five hundred MVP kills, and the two could not both exist: a guarantee makes
-/// the box pointless for the one thing that makes the box worth opening.
+/// The slotted one is not here. It used to come out of the MVP box, a lottery inside a lottery
+/// that nobody could grind their way past, and it has since been taken out of the box: nothing
+/// hands it out now. This log briefly had a lottery of its own for it, with a guarantee at five
+/// hundred MVP kills, and the two could not both exist.
 /// </remarks>
 public static class BossLogProgress
 {
@@ -32,7 +31,7 @@ public static class BossLogProgress
     /// <summary>The plain hat: finish the log, it is yours.</summary>
     public const string PlainHatCode = "Hat_of_the_Sun_God";
 
-    /// <summary>The slotted one, which comes out of the MVP box and nowhere else.</summary>
+    /// <summary>The slotted one. Nothing hands it out now; it is named here for the log's header.</summary>
     public const string CrownedHatCode = "Hat_of_the_Sun_God_";
 
     public static int GetKills(Player player, BossLogEntry entry) => player.GetNpcFlag(entry.ProgressFlag);
