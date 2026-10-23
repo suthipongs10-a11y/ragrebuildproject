@@ -131,10 +131,10 @@ REMAP_DROPS = read_remap_flag()
 # so a change over there is a one line change here.
 SERVER_DROP_RATE = 2
 
-# Mirrors the "rate *= 5" under THE GEAR RATE in the same script: weapons and everything a
+# Mirrors the "rate *= 10" under THE GEAR RATE in the same script: weapons and everything a
 # character wears, applied last, after the halving. Same rule, a change over there is a one
 # line change here.
-GEAR_DROP_RATE = 5
+GEAR_DROP_RATE = 10
 
 # A usable's subType in the script is its use effect (DataLoader: SubCategory = UseEffect).
 # These are the ones the script lists as "what a player drinks", which skip the halving.

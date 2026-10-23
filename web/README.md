@@ -119,7 +119,7 @@ web/
 - **อัตราดรอปเป็นอัตราจริง** exporter อ่าน `RemapDropRates` จาก `appsettings.json`
   ถ้าเปิดอยู่ (ค่าตอนนี้) จะคำนวณด้วยสูตรเดียวกับ `Script/Config/ItemDropAndValueAdjustments.txt`
   รวมการหาร 2 เรทดรอปของเซิร์ฟ และเรทของอาวุธกับของสวมใส่ (เลข `rate *= 2` ในสคริปต์นั้น
-  ต้องตรงกับ `SERVER_DROP_RATE` และ `rate *= 5` ต้องตรงกับ `GEAR_DROP_RATE` ใน `export.py`
+  ต้องตรงกับ `SERVER_DROP_RATE` และ `rate *= 10` ต้องตรงกับ `GEAR_DROP_RATE` ใน `export.py`
   เปลี่ยนที่หนึ่งต้องเปลี่ยนอีกที่)
   ถ้าปิดจะใช้ตัวเลขดิบใน `DropData.csv` ตรง ๆ ทั้งเว็บและหน้าที่อธิบายเรื่องนี้
   เปลี่ยนตามค่า flag เอง ไม่ต้องไล่แก้ข้อความ

@@ -82,18 +82,19 @@ OnLoadDropData:
 	if(type != Etc && type != Card)
 		rate /= 2;
 
-	//THE GEAR RATE: x5. Weapons and everything a character wears - armour, shields, garments,
-	//shoes, headgear, accessories - drop at five times the rate everything above leaves them
-	//at, so changing the 5 is all it takes to change it. It goes last so that it multiplies the
+	//THE GEAR RATE: x10. Weapons and everything a character wears - armour, shields, garments,
+	//shoes, headgear, accessories - drop at ten times the rate everything above leaves them
+	//at, so changing the 10 is all it takes to change it. It goes last so that it multiplies the
 	//finished figure, after the halving rather than before it.
 	//
 	//Ammo is spent rather than worn and a card is slotted rather than worn, so neither is
 	//touched. Quest items and the three Antonio items returned at the top and never get here.
 	//
-	//Anything the curve put at 20% or more is a sure thing after this. The server caps whatever
-	//the scripts hand back at 100%, so nothing here needs to.
+	//Anything the curve put at 10% or more is a sure thing after this, which is every piece of
+	//gear that DropData.csv writes as 3.6% or higher. The server caps whatever the scripts hand
+	//back at 100%, so nothing here needs to.
 	if(type == Weapon || type == Equipment)
-		rate *= 5;
+		rate *= 10;
 
 OnSetItemPurchasePrice:
 	//all etc type items (other than those used for refining or fixed NPC sell value) have 2x value
