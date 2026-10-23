@@ -135,7 +135,7 @@ export async function render() {
       <p><strong>ระบบที่ยังไม่เสร็จ</strong></p>
       <p>
         Bounty System มีไฟล์แล้วแต่ฟังก์ชันยังว่างและไม่ได้เปิดใน <code>ActiveEvents</code> ·
-        กิลด์และ WoE ยังไม่ได้เขียน · อาชีพ ${n(meta.counts.jobs - 13 - 3)} อาชีพยังไม่มีผังสกิล
+        WoE (สงครามกิลด์) ยังไม่ได้เขียน · อาชีพ ${n(meta.counts.jobs - 13 - 3)} อาชีพยังไม่มีผังสกิล
         (${link("#/health", "ดูรายการเต็มที่หน้าสุขภาพข้อมูล")})
       </p>
     </div>
