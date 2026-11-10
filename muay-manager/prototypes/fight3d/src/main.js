@@ -548,7 +548,10 @@ const start = async () => {
     // both fighters share one skeleton, sized halfway between the models
     const dims = {}; for (const k in MODELS[0].dims) dims[k] = MODELS.reduce((a, m) => a + m.dims[k], 0) / MODELS.length;
     MODEL = {dims, standHips: MODELS.reduce((a, m) => a + m.standHips, 0) / MODELS.length};
-  } catch (e) { MODEL = null; MODELS = []; OPT.fighter = 'code'; console.warn('3D model not loaded, using the code-built fighter:', e.message); }
+  } catch (e) {
+    MODEL = null; MODELS = []; OPT.fighter = 'code'; console.warn('3D model not loaded, using the code-built fighter:', e.message);
+    $('modelNote').textContent = 'โหลดโมเดลนักมวยไม่ได้ จึงใช้ตัวที่สร้างจากโค้ดแทน (' + e.message + ') ';
+  }
   newFight(DEFAULT_SEED); applyOpt(); requestAnimationFrame(frame);
 };
 const DEFAULT_SEED = 7537;

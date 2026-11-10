@@ -21,10 +21,28 @@ function frame(d, n, out) {
   mB.makeBasis(d, v3, v4); return out.setFromRotationMatrix(mB);
 }
 
+// Rebuilds a binary glTF in memory from the published JSON, so parsing needs no further network requests.
+function toGlb(gltf, b64) {
+  const raw = atob(b64), binLen = raw.length, binPad = (4 - (binLen % 4)) % 4;
+  const json = new TextEncoder().encode(JSON.stringify(gltf)), jsonPad = (4 - (json.length % 4)) % 4;
+  const total = 12 + 8 + json.length + jsonPad + 8 + binLen + binPad, out = new Uint8Array(total), dv = new DataView(out.buffer);
+  dv.setUint32(0, 0x46546C67, true); dv.setUint32(4, 2, true); dv.setUint32(8, total, true);
+  dv.setUint32(12, json.length + jsonPad, true); dv.setUint32(16, 0x4E4F534A, true); out.set(json, 20); out.fill(0x20, 20 + json.length, 20 + json.length + jsonPad);
+  let o = 20 + json.length + jsonPad;
+  dv.setUint32(o, binLen + binPad, true); dv.setUint32(o + 4, 0x004E4942, true); o += 8;
+  for (let i = 0; i < binLen; i++) out[o + i] = raw.charCodeAt(i);
+  return out.buffer;
+}
+const loadImage = src => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('texture ' + src + ' did not load')); im.src = src; });
+
 export async function loadModel(url) {
   const res = await fetch(url);
-  if (!res.ok) throw new Error('model ' + res.status);
-  const gltf = await new GLTFLoader().parseAsync(await res.text(), ''); // glTF JSON; its texture loads from a file beside the page
+  if (!res.ok) throw new Error(url + ' ' + res.status);
+  const file = await res.json();
+  const gltf = await new GLTFLoader().parseAsync(toGlb(file.gltf, file.bin), '');
+  const tex = new THREE.Texture(await loadImage(file.texture));
+  tex.flipY = false; tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4; tex.needsUpdate = true;
+  gltf.scene.traverse(o => { if (o.isSkinnedMesh) { o.material.map = tex; o.material.needsUpdate = true; } });
   const scene = gltf.scene; scene.updateMatrixWorld(true);
   let mesh = null; scene.traverse(o => { if (o.isSkinnedMesh) mesh = o; });
   if (!mesh) throw new Error('model has no skinned mesh');
