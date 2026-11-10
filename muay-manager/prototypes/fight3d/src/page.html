@@ -1,0 +1,168 @@
+<title>Muay Fight Lab 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,500;0,700;1,800&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+/* Layout: fight-night broadcast. Scoreboard strip, 3D arena, call line, look switcher, tale of the tape. Single dark look by choice. */
+:root{
+  color-scheme:dark;
+  --bg:#0e0f14; --panel:#181a22; --line:#2a2d39; --fg:#f1f2f5; --muted:#9a9fb0;
+  --red:#e2382f; --red-soft:#ff7a70; --blue:#2f76ea; --blue-soft:#7fb0ff; --gold:#f2b83a; --hp:#49d17d; --warn:#f2c23a; --bad:#f0624f;
+  --track:#2a2d39; --stamina:#59b5ff; --ink:#1b1300; --shade:rgba(6,7,10,.78); --stage:#07080b; --pop:#ffffff;
+  --display:"Kanit","IBM Plex Sans Thai",system-ui,sans-serif;
+  --body:"IBM Plex Sans Thai",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.5;
+  padding-block:12px 28px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.app{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
+h1{font-family:var(--display);font-style:italic;font-weight:800;font-size:22px;margin:0;letter-spacing:.02em;line-height:1.15}
+h1 span{color:var(--gold)}
+.sub{color:var(--muted);font-size:13px;margin:0}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+.board{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:8px;align-items:center}
+.side{min-width:0;display:flex;flex-direction:column;gap:3px}
+.side.b{text-align:right}
+.nm{font-family:var(--display);font-weight:700;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side.r .nm{color:var(--red-soft)} .side.b .nm{color:var(--blue-soft)}
+.bar{height:11px;background:var(--track);border-radius:3px;overflow:hidden;display:flex}
+.side.b .bar{justify-content:flex-end}
+.bar i{display:block;height:100%;background:var(--hp);transition:width .12s linear}
+.bar i.mid{background:var(--warn)} .bar i.low{background:var(--bad)}
+.bar.st{height:5px} .bar.st i{background:var(--stamina)}
+.bar.sp{height:4px} .bar.sp i{background:var(--gold)}
+.clock{font-family:var(--display);text-align:center;line-height:1.1;padding:0 4px}
+.clock .rd{font-size:11px;color:var(--gold);letter-spacing:.1em}
+.clock .tm{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+
+.stage{position:relative;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:var(--stage);max-width:100%;min-height:200px}
+.stage canvas{display:block;width:100%;height:100%}
+.stage .lb{position:absolute;left:0;right:0;height:0;background:#000;transition:height .25s ease;pointer-events:none}
+.stage .lb.t{top:0} .stage .lb.bt{bottom:0}
+.stage.slow .lb{height:8.5%}
+#flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#pops{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.pop{position:absolute;left:0;top:0;font-family:var(--display);font-style:italic;font-weight:800;font-size:19px;line-height:1.1;color:var(--pop);white-space:nowrap;
+  text-shadow:0 2px 0 rgba(0,0,0,.8),0 0 10px rgba(0,0,0,.7);will-change:transform}
+.pop.gold{color:#ffd35a} .pop.red{color:#ff6b5e} .pop.small{font-size:13px;color:#cfd6e6} .pop.small.red{color:#ff9a8f} .pop.big{font-size:27px}
+.banner{position:absolute;left:0;right:0;top:26%;text-align:center;font-family:var(--display);font-style:italic;font-weight:800;font-size:38px;line-height:1.1;color:var(--fg);
+  text-shadow:0 3px 0 rgba(0,0,0,.8),0 0 18px rgba(0,0,0,.8);pointer-events:none;animation:bannerIn 1.6s ease-out both}
+.banner.gold{color:var(--gold)} .banner.red{color:#ff6b5e} .banner.redc{color:var(--red-soft)} .banner.blue{color:var(--blue-soft)} .banner.huge{font-size:60px;animation-duration:2.2s}
+@keyframes bannerIn{0%{transform:scale(2.2);opacity:0}12%{transform:scale(1);opacity:1}78%{opacity:1}100%{opacity:0}}
+#count{position:absolute;left:0;right:0;top:12%;text-align:center;font-family:var(--display);font-weight:700;font-size:64px;line-height:1;color:#fff;
+  text-shadow:0 3px 0 rgba(0,0,0,.8);pointer-events:none;animation:countIn .55s ease-out both}
+@keyframes countIn{0%{transform:scale(1.9);opacity:0}25%{transform:scale(1);opacity:1}100%{opacity:.85}}
+.combo{position:absolute;top:18%;font-family:var(--display);font-style:italic;font-weight:800;font-size:26px;color:#ffd35a;text-shadow:0 2px 0 rgba(0,0,0,.8);pointer-events:none;animation:comboIn 1.3s ease-out both}
+.combo.r{left:5%} .combo.b{right:5%}
+@keyframes comboIn{0%{transform:scale(1.8);opacity:0}15%{transform:scale(1);opacity:1}75%{opacity:1}100%{opacity:0}}
+#replayTag{position:absolute;left:12px;top:11%;font-family:var(--display);font-style:italic;font-weight:800;font-size:15px;letter-spacing:.08em;background:var(--red);color:#fff;padding:2px 10px;border-radius:4px}
+#fps{position:absolute;right:8px;bottom:6px;font-size:11px;color:rgba(255,255,255,.45);font-variant-numeric:tabular-nums;pointer-events:none}
+.result{position:absolute;inset:0;background:var(--shade);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;line-height:1.35;text-align:center;padding:14px}
+.result .w{font-family:var(--display);font-style:italic;font-weight:800;font-size:30px}
+.result .w.r{color:var(--red-soft)} .result .w.b{color:var(--blue-soft)}
+.result .m{color:var(--gold);font-family:var(--display);font-size:16px}
+.result .d{font-size:13px;color:#c9ccd6}
+
+.call{min-height:24px;font-size:14px;color:var(--muted)}
+.call b{color:var(--fg);font-weight:600}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap}
+.btn{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-family:var(--display);font-weight:500;font-size:14px}
+.btn.go{background:var(--gold);border-color:var(--gold);color:var(--ink);font-weight:700}
+.btn[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.looks{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.looks h2{font-family:var(--display);font-size:14px;font-weight:700;margin:0;color:var(--gold)}
+.segs{display:flex;gap:6px;flex-wrap:wrap}
+.btn.seg{background:var(--bg);flex:1 1 auto;text-align:center}
+#presets{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.btn.seg.sm{padding:6px 10px;font-size:13px;flex:0 1 auto}
+.looks p{margin:0;font-size:12.5px;color:var(--muted)}
+details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:var(--muted)}
+#detail{display:flex;flex-direction:column;gap:8px;padding-top:8px}
+#detail .row{display:grid;grid-template-columns:118px minmax(0,1fr);gap:8px;align-items:center}
+#detail .lab{font-size:12.5px;color:var(--muted)}
+.tape{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:5px;min-width:0}
+.card h2{font-family:var(--display);font-size:14px;font-weight:700;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card.r h2{color:var(--red-soft)} .card.b h2{color:var(--blue-soft)}
+.card .sty{font-size:12px;color:var(--muted)}
+.stat{display:grid;grid-template-columns:54px minmax(0,1fr) 24px;gap:6px;align-items:center;font-size:12px}
+.stat .t{height:5px;background:var(--track);border-radius:3px;overflow:hidden}
+.stat .t i{display:block;height:100%}
+.card.r .t i{background:var(--red)} .card.b .t i{background:var(--blue)}
+.stat .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.card .spx{font-size:12px;color:var(--gold)}
+.note{font-size:12.5px;color:var(--muted);margin:0}
+@media (max-width:480px){ #presets{grid-template-columns:repeat(2,minmax(0,1fr))} .banner{font-size:30px} .banner.huge{font-size:44px} #count{font-size:48px} #detail .row{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:reduce){ .banner,.combo,#count{animation-duration:.01s} .banner{opacity:1} }
+</style>
+
+<div class="app">
+  <header>
+    <h1>MUAY FIGHT <span>LAB 3D</span></h1>
+    <p class="sub">ต้นแบบฉากชก 3D: ไฟต์เดียวกัน ดูได้ 4 แบบ เลือกว่าแบบไหนสนุกและสะใจที่สุด</p>
+  </header>
+
+  <div class="board">
+    <div class="side r">
+      <div class="nm" id="nmR"></div>
+      <div class="bar"><i id="hpR" style="width:100%"></i></div>
+      <div class="bar st"><i id="stR" style="width:100%"></i></div>
+      <div class="bar sp"><i id="spR" style="width:0%"></i></div>
+    </div>
+    <div class="clock"><div class="rd" id="rd">ยก 1/3</div><div class="tm" id="tm">0:35</div></div>
+    <div class="side b">
+      <div class="nm" id="nmB"></div>
+      <div class="bar"><i id="hpB" style="width:100%"></i></div>
+      <div class="bar st"><i id="stB" style="width:100%"></i></div>
+      <div class="bar sp"><i id="spB" style="width:0%"></i></div>
+    </div>
+  </div>
+
+  <div class="stage" id="stage">
+    <canvas id="cv"></canvas>
+    <div class="lb t"></div><div class="lb bt"></div>
+    <div id="pops"></div>
+    <div id="combo" class="combo" hidden></div>
+    <div id="count" hidden></div>
+    <div id="banner" class="banner" hidden></div>
+    <div id="replayTag" hidden>ภาพช้า</div>
+    <div id="flash"></div>
+    <div id="fps"></div>
+    <div class="result" id="result" hidden>
+      <div class="m" id="resM"></div>
+      <div class="w" id="resW"></div>
+      <div class="d" id="resD"></div>
+    </div>
+  </div>
+
+  <div class="call" id="call" aria-live="polite"></div>
+
+  <div class="ctrl">
+    <button class="btn go" id="btnRematch">ดูไฟต์นี้ใหม่</button>
+    <button class="btn" id="btnNext">ข้ามไปช็อตเด็ด</button>
+    <button class="btn" id="btnNew">สุ่มคู่ใหม่</button>
+    <button class="btn" id="btnSpeed" aria-pressed="false">เร็ว ×2</button>
+    <button class="btn" id="btnSound" aria-pressed="false">เปิดเสียง</button>
+  </div>
+
+  <section class="looks">
+    <h2>แบบการนำเสนอ</h2>
+    <div class="segs" id="presets"></div>
+    <p id="presetNote"></p>
+    <details>
+      <summary>ปรับทีละอย่าง</summary>
+      <div id="detail"></div>
+    </details>
+  </section>
+
+  <div class="tape">
+    <div class="card r" id="cardR"></div>
+    <div class="card b" id="cardB"></div>
+  </div>
+  <p class="note">ไฟต์หมายเลข <span id="seed"></span> เปลี่ยนแบบการนำเสนอได้ตลอดโดยผลการชกไม่เปลี่ยน ตัวนักมวยเป็นหุ่นต้นแบบ ยังไม่ใช่โมเดลจริง แถบเขียวคือพลังชีวิต แถบฟ้าคือความอึด แถบทองคือเกจท่าไม้ตาย</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+<script>
+/*__APP__*/
+</script>

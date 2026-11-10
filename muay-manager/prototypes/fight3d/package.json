@@ -1,0 +1,13 @@
+{
+  "name": "muay-fight3d-prototype",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "batch": "node tools/batch.mjs",
+    "test": "node tools/determinism.mjs"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}
