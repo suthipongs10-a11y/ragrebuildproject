@@ -65,13 +65,13 @@ export function buildArena(scene) {
       A.group.add(rope); A.ropeSides[i].push(rope);
     }
   });
-  // ropes between the lens and the fighters fade out; keepNear leaves them in for the ringside look
+  // ropes between the lens and the fighters fade out; keepNear (0..1) leaves them in, as on TV or at ringside
   A.fadeRopes = function (cam, keepNear) {
     const beyond = [cam.z - R, cam.x - R, -cam.z - R, -cam.x - R];
     for (let i = 0; i < 4; i++) {
       const d = beyond[i];
       let o = 1;
-      if (d > -.9) { const k = Math.max(0, Math.min(1, (d - .5) / .9)); o = keepNear ? k * k * (3 - 2 * k) : 0; }
+      if (d > -.9) { const k = Math.max(0, Math.min(1, (d - .5) / .9)); o = keepNear ? k * k * (3 - 2 * k) * keepNear : 0; }
       for (const r of A.ropeSides[i]) { r.visible = o > .03; r.material.opacity = o; }
     }
     // a corner post right in front of the lens would block the shot
@@ -91,8 +91,8 @@ export function buildArena(scene) {
   const bodyGeo = new THREE.CapsuleGeometry(.2, .32, 3, 6), headGeo = new THREE.SphereGeometry(.13, 8, 6);
   const crowdMat = new THREE.MeshStandardMaterial({roughness: 1}), crowdHead = new THREE.MeshStandardMaterial({roughness: 1});
   const bodies = new THREE.InstancedMesh(bodyGeo, crowdMat, seats.length), heads = new THREE.InstancedMesh(headGeo, crowdHead, seats.length);
-  const col = new THREE.Color(), shirts = [0x2a3145, 0x3a2d3f, 0x23363a, 0x40342c, 0x31343c, 0x4a2a2a, 0x2a3a52];
-  const skins = [0x6d4d36, 0x7a573d, 0x8a6446];
+  const col = new THREE.Color(), shirts = [0x1a1f2c, 0x241c28, 0x162226, 0x28211c, 0x1f2127, 0x2e1b1b, 0x1a2434];
+  const skins = [0x4a3425, 0x533b2a, 0x5e4430];
   seats.forEach((s, i) => { bodies.setColorAt(i, col.setHex(shirts[Math.floor(s.hue * shirts.length)])); heads.setColorAt(i, col.setHex(skins[i % 3])); });
   A.group.add(bodies, heads); A.seats = seats; A.bodies = bodies; A.heads = heads;
 

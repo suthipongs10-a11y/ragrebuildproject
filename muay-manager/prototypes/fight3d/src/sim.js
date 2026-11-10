@@ -3,9 +3,9 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.1';
-export const TICK_FIELDS = 8; // x, hp, st, sp, state, wearHead, wearBody, wearLeg
-export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10};
+export const SIM_VERSION = 'proto-0.2';
+export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
+export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11};
 
 function mulberry32(seed) {
   let a = seed >>> 0;
@@ -40,6 +40,7 @@ export function simulate(opts) {
 
   const events = [], poses = [], ticks = [];
   let T = 0;
+  let moveSeq = 0;
   const emit = e => { e.t = T; events.push(e); return e; };
   const say = html => emit({type: 'say', html});
 
@@ -50,7 +51,7 @@ export function simulate(opts) {
       pt: 0, pd: .001, to: 'guard', q: [], qi: 0, mv: null, mvKey: null, hold: 0, inv: 0, lunge: 0,
       combo: null, ci: 0, chain: 0, chainT: 0, lastRes: null, spi: 0,
       wearHead: 0, wearBody: 0, wearLeg: 0, stunT: 0, stunCd: 0, stunFlip: 0, tough: 0,
-      landed: 0, thrown: 0, used: {}};
+      landed: 0, thrown: 0, used: {}, seen: 0, moveId: 0, coverLvl: null, guards: 0};
   }
   const F = [mk(0, specs[0]), mk(1, specs[1])];
   const G = {phase: 'intro', t: 0, round: 1, clock: K.roundTime, count: null, restT: 0, koT: 0, over: null, lead: -1, leadChanges: 0};
@@ -67,7 +68,7 @@ export function simulate(opts) {
   function startMove(f, o, key) {
     const m = MOVES[key];
     f.mv = m; f.mvKey = key; f.q = m.fr; f.qi = 0; f.state = 'move'; f.plan = null; f.lastRes = null;
-    f.st = Math.max(0, f.st - m.st); f.thrown++;
+    f.st = Math.max(0, f.st - m.st); f.thrown++; f.moveId = ++moveSeq;
     f.used[key] = (f.used[key] || 0) + 1;
     const sp = moveSpeed(f, m), tHit = T + (m.fr[0][1] + m.fr[1][1]) / sp;
     emit({type: 'move', by: f.i, move: key, tHit, special: !!m.special});
@@ -114,6 +115,7 @@ export function simulate(opts) {
     if (o.state === 'move') { pB *= .2; pD = 0; }
     else if (o.state === 'hit') { pB *= .35; pD = 0; }
     else if (o.state === 'stun') { pB *= .3; pD = 0; }
+    else if (o.state === 'cover') { pD = 0; pB = o.coverLvl === m.lvl ? Math.min(.92, pB * K.coverMul + K.coverBonus) : pB * K.coverWrong; }
     if (o.st < 25) pB *= .7;
     if (m.special) { pB *= .45; pD *= .4; }
     if (f.chain > 0) pB *= Math.max(.5, 1 - f.chain * .15);
@@ -250,7 +252,7 @@ export function simulate(opts) {
       }
       return;
     }
-    if (f.state === 'hit' || f.state === 'block') {
+    if (f.state === 'hit' || f.state === 'block' || f.state === 'cover') {
       f.hold -= dt;
       if (f.hold <= 0) { f.state = 'idle'; setPose(f, 'guard', .16); f.cool = Math.max(f.cool, rnd(.1, .35)); }
       return;
@@ -276,6 +278,20 @@ export function simulate(opts) {
     if (done && f.to !== 'guard') setPose(f, 'guard', .14);
     if (G.phase !== 'fight') return;
     if (G.count) { const want = f.i ? LIM - 60 : -LIM + 60; f.x += clamp(want - f.x, -80 * dt, 80 * dt); return; }
+    // read the incoming attack and raise the guard
+    if (o.state === 'move' && o.qi === 0 && o.moveId !== f.seen) {
+      f.seen = o.moveId;
+      const om = o.mv;
+      if (d <= om.reach + 30 && R() < K.coverBase + f.stats.def / 100 * K.coverDef + (f.hp < 35 ? .15 : 0)) {
+        const lv = ['head', 'body', 'leg'];
+        f.coverLvl = R() < K.coverRead ? om.lvl : lv[(lv.indexOf(om.lvl) + 1 + Math.floor(R() * 2)) % 3];
+        f.state = 'cover'; f.plan = null; f.combo = null; f.guards++;
+        f.hold = (om.fr[0][1] + om.fr[1][1]) / moveSpeed(o, om) + .22;
+        setPose(f, f.coverLvl === 'leg' ? 'check' : f.coverLvl === 'body' ? 'blockBody' : 'block', .12);
+        emit({type: 'guard', by: f.i, lvl: f.coverLvl});
+        return;
+      }
+    }
     f.cool -= dt;
     if (!f.plan && f.cool <= 0) { f.combo = null; f.plan = choose(f, o); f.planT = 1.4; }
     let want = 114 + Math.sin(G.t * 1.6 + f.i * 2.1) * 9;
@@ -290,6 +306,7 @@ export function simulate(opts) {
 
   function endRound() {
     emit({type: 'bell', n: 2});
+    emit({type: 'score', round: G.round, pts: [F[0].pts, F[1].pts]});
     F.forEach(f => {
       f.q = []; f.mv = null; f.plan = null; f.combo = null;
       if (f.state === 'stun') emit({type: 'stun_end', on: f.i, bell: true});
@@ -373,7 +390,7 @@ export function simulate(opts) {
   let guard = 0, tail = -1;
   while (guard++ < 60 * 600) {
     update(DT);
-    for (const f of F) ticks.push(f.x, f.hp, f.st, f.sp, STATE[f.state], f.wearHead, f.wearBody, f.wearLeg);
+    for (const f of F) ticks.push(f.x, f.hp, f.st, f.sp, STATE[f.state], f.wearHead, f.wearBody, f.wearLeg, f.pts);
     roundAt.push(G.round, G.clock);
     T += DT;
     if (G.phase === 'over') { if (tail < 0) tail = 150; else if (--tail === 0) break; }
@@ -384,6 +401,6 @@ export function simulate(opts) {
     ticks: Float32Array.from(ticks), clock: Float32Array.from(roundAt), poses, events,
     result: {w: o.w, l: o.l, how: o.how, round: o.round, time: o.time, move: o.move,
       pts: [F[0].pts, F[1].pts], kd: [F[0].kd, F[1].kd], landed: [F[0].landed, F[1].landed], thrown: [F[0].thrown, F[1].thrown],
-      used: [F[0].used, F[1].used], leadChanges: G.leadChanges}
+      used: [F[0].used, F[1].used], guards: [F[0].guards, F[1].guards], leadChanges: G.leadChanges}
   };
 }

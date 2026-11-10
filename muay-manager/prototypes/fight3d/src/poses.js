@@ -4,11 +4,11 @@
 // side = roll to the right, twist = extra shoulder yaw, hdP/hdY = head pitch/yaw, jump = root height, spin = whole-body turn.
 // hL/hR = glove targets, fL/fR = sole targets, eL/eR = elbow pole, kL/kR = knee pole.
 const BASE = {
-  hip: [0, .86, 0], turn: .55, lean: .12, side: 0, twist: .1, hdP: .05, hdY: 0, jump: 0, spin: 0,
-  hL: [.36, 1.50, -.10], hR: [.22, 1.46, .12],
-  fL: [.24, 0, -.13], fR: [-.24, 0, .15],
+  hip: [0, .88, 0], turn: .42, lean: .07, side: 0, twist: .08, hdP: .06, hdY: 0, jump: 0, spin: 0,
+  hL: [.40, 1.56, -.11], hR: [.25, 1.51, .12],
+  fL: [.26, 0, -.12], fR: [-.22, 0, .16],
   eL: [-.2, -1, -.5], eR: [-.2, -1, .5],
-  kL: [1, 0, -.25], kR: [.8, 0, .5]
+  kL: [1, 0, -.2], kR: [.8, 0, .5]
 };
 const P = o => Object.assign({}, BASE, o);
 
@@ -45,6 +45,8 @@ export const POSES = {
   kickLow: P({turn: -1.1, twist: .4, lean: -.1, hip: [.10, .82, 0], fR: [.85, .42, -.08], kR: [.5, .3, 1], hR: [-.1, 1.1, .35], fL: [.22, .03, -.13]}),
   teepW: P({lean: -.1, hip: [-.05, .88, 0], fL: [.25, .55, -.10], kL: [1, .5, 0]}),
   teep: P({turn: .3, lean: -.35, hip: [.05, .90, 0], fL: [.95, 1.02, -.03], kL: [1, .4, 0], hL: [.2, 1.2, -.3], hR: [.18, 1.45, .12]}),
+  teepHiW: P({turn: .1, lean: -.12, hip: [-.04, .90, 0], fR: [.15, .62, .10], kR: [1, .6, .1], fL: [.22, .03, -.13]}),
+  teepHi: P({turn: -.2, lean: -.46, hip: [.08, .93, 0], fR: [.92, 1.50, 0], kR: [1, .5, .1], hR: [.1, 1.2, .3], hL: [.25, 1.5, -.1], fL: [.2, .04, -.13]}),
   crocW: P({spin: 3.0, lean: .2, hip: [0, .85, 0], fR: [-.1, .2, .2], hL: [.2, 1.4, -.15], hR: [.1, 1.4, .2]}),
   croc: P({spin: 5.6, turn: 0, lean: -.45, hip: [.05, .92, 0], fR: [.9, 1.5, 0], kR: [.3, 1, .3], hL: [.1, 1.2, -.3], hR: [-.1, 1.2, .3], fL: [.1, .04, -.1]}),
   hanuW: P({turn: .2, lean: .36, hip: [.05, .68, 0], hL: [.26, 1.0, -.13], hR: [.26, 1.0, .13], eL: [-1, -.2, -.3], eR: [-1, -.2, .3]}),

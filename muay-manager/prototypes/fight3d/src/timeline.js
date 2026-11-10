@@ -28,7 +28,7 @@ export function bake(fight) {
   for (const e of fight.events) {
     if (e.type !== 'hit' || (e.res !== 'block' && e.res !== 'dodge')) continue;
     const tA = e.t - .13, st = tick(e.on, Math.round(tA / dt), 4);
-    if (st !== STATE.idle && st !== STATE.block) continue;
+    if (st !== STATE.idle && st !== STATE.block) continue; // a fighter already covering up has the pose from the sim
     const mv = MOVES[e.move];
     const pose = e.res === 'dodge' ? 'dodge' : mv.lvl === 'leg' ? 'check' : mv.lvl === 'body' ? 'blockBody' : 'block';
     cues[e.on].push({t: tA, f: e.on, pose, d: .11, early: true});
@@ -53,7 +53,7 @@ export function bake(fight) {
     solve(ob, oo, J2);
     if (ev.res === 'hit') {
       if (mv.lvl === 'head') pt3.copy(J2.head);
-      else if (mv.lvl === 'body') { pt3.copy(J2.chest); pt3.y -= .06; }
+      else if (mv.lvl === 'body') { pt3.copy(J2.chest); pt3.y += -.06 + (mv.aimY || 0); }
       else pt3.copy(J2.hpL).add(J2.knL).multiplyScalar(.5);
     } else {
       if (mv.lvl === 'head') pt3.copy(J2.haL).add(J2.haR).multiplyScalar(.5);
@@ -136,6 +136,11 @@ export function bake(fight) {
       const x = Math.max(0, Math.min(n - 1.001, t / dt)), k = Math.floor(x), fr = x - k, B = baked[i], o = k * NP;
       for (let j = 0; j < NP; j++) out[j] = B[o + j] + (B[o + NP + j] - B[o + j]) * fr;
       const st = TK[(k * 2 + i) * TICK_FIELDS + 4];
+      if (st === STATE.idle) { // Muay Thai rhythm: the lead foot taps and the hands roll
+        const beat = t * 5.2 + i * 1.7;
+        out[IDX.fL + 1] += Math.max(0, Math.sin(beat)) * .04; out[IDX.hip] += Math.sin(beat * .5) * .012;
+        out[IDX.hL] += Math.sin(beat * .5) * .02; out[IDX.hR + 1] += Math.cos(beat * .5) * .012;
+      }
       if (st === STATE.idle || st === STATE.rest || st === STATE.intro) {
         const ph = t * 7 + i * 2.3, tired = TK[(k * 2 + i) * TICK_FIELDS + 2] < 25 && st === STATE.idle ? 1 : 0;
         out[IDX.hip + 1] += Math.sin(ph) * .012 - tired * .02;

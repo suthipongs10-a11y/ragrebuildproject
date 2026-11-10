@@ -3,7 +3,7 @@
 import { simulate } from './sim.js';
 import { MOVES, COMBOS, STYLES, STAT_TH, RULES } from './data.js';
 import { bake, EFF_NAME } from './timeline.js';
-import { Fighter, EFF_JOINT } from './rig.js';
+import { Fighter, EFF_JOINT, STYLE_BUILD } from './rig.js';
 import { NP, FLAT } from './poses.js';
 import { buildArena } from './arena.js';
 import { buildFx } from './fx.js';
@@ -15,29 +15,30 @@ const smooth = k => { k = clamp(k, 0, 1); return k * k * (3 - 2 * k); };
 
 // ---------- options ----------
 const PRESETS = {
-  broadcast: {look: 'broadcast', cam: 'side', style: 'real', slow: 1, stop: 1, shake: 1, trail: 0, labels: 0, replay: 1},
+  tv:        {look: 'broadcast', cam: 'tv', style: 'real', slow: 1, stop: 1, shake: 1, trail: 0, labels: 1, replay: 2},
   cinema:    {look: 'cinema', cam: 'director', style: 'real', slow: 2, stop: 1, shake: 1, trail: 1, labels: 1, replay: 1},
-  arcade:    {look: 'arcade', cam: 'side', style: 'toon', slow: 2, stop: 2, shake: 2, trail: 1, labels: 2, replay: 1},
-  ringside:  {look: 'ringside', cam: 'low', style: 'real', slow: 1, stop: 1, shake: 1, trail: 0, labels: 0, replay: 0}
+  ringside:  {look: 'ringside', cam: 'low', style: 'real', slow: 1, stop: 1, shake: 1, trail: 0, labels: 0, replay: 0},
+  arcade:    {look: 'arcade', cam: 'side', style: 'toon', slow: 2, stop: 2, shake: 2, trail: 1, labels: 2, replay: 1}
 };
-const PRESET_TH = {broadcast: 'ถ่ายทอดสด', cinema: 'ภาพยนตร์', arcade: 'อาร์เคด', ringside: 'ข้างเวที'};
+const PRESET_TH = {tv: 'ถ่ายทอดสด', cinema: 'ภาพยนตร์', ringside: 'ข้างเวที', arcade: 'อาร์เคด'};
 const PRESET_NOTE = {
-  broadcast: 'กล้องด้านข้างนิ่งแบบถ่ายทอดสด เอฟเฟกต์น้อย สโลว์เฉพาะตอนน็อก',
+  tv: 'ตัดสลับหลายกล้องแบบรายการมวย: กล้องหลัก กล้องแน่น กล้องมุมสูง กล้องข้างเวที และภาพหน้านักมวย มีภาพช้าช่วงพักยกและตอนน็อก',
   cinema: 'กล้องผู้กำกับตัดมุมตอนท่าไม้ตายและตอนล้ม สโลว์หมัดใหญ่ แสงจัด',
-  arcade: 'ตัวการ์ตูนตัดเส้น หยุดภาพและจอสั่นแรง มีป้ายชื่อท่าและตัวนับชุด',
-  ringside: 'มุมต่ำข้างเวที กล้องถือมือ เหมือนคลิปจากคนดูแถวหน้า'
+  ringside: 'มุมต่ำข้างเวที กล้องถือมือ เหมือนคลิปจากคนดูแถวหน้า',
+  arcade: 'ตัวการ์ตูนตัดเส้น หยุดภาพและจอสั่นแรง มีป้ายชื่อท่าและตัวนับชุด'
 };
 const DETAIL = [
-  {key: 'cam', th: 'มุมกล้อง', opts: [['side', 'ด้านข้าง'], ['director', 'ผู้กำกับ'], ['low', 'ข้างเวที'], ['orbit', 'วนรอบ']]},
-  {key: 'style', th: 'ตัวนักมวย', opts: [['real', 'สมจริง'], ['toon', 'การ์ตูน']]},
+  {key: 'cam', th: 'มุมกล้อง', opts: [['tv', 'ถ่ายทอดสด'], ['side', 'ด้านข้าง'], ['director', 'ผู้กำกับ'], ['low', 'ข้างเวที'], ['orbit', 'วนรอบ']]},
+  {key: 'build', th: 'รูปร่างนักมวย', opts: [['auto', 'ตามสายมวย'], ['heavy', 'ถึก'], ['athletic', 'สมส่วน'], ['lean', 'เพรียว']]},
+  {key: 'style', th: 'ผิวภาพ', opts: [['real', 'สมจริง'], ['toon', 'การ์ตูน']]},
   {key: 'slow', th: 'สโลว์', opts: [[0, 'ปิด'], [1, 'ตอนน็อก'], [2, 'หมัดใหญ่']]},
   {key: 'stop', th: 'หยุดภาพตอนโดน', opts: [[0, 'ปิด'], [1, 'ปกติ'], [2, 'หนัก']]},
   {key: 'shake', th: 'จอสั่น', opts: [[0, 'ปิด'], [1, 'ปกติ'], [2, 'หนัก']]},
   {key: 'trail', th: 'เส้นความเร็ว', opts: [[0, 'ปิด'], [1, 'เปิด']]},
   {key: 'labels', th: 'ป้ายชื่อท่า', opts: [[0, 'ปิด'], [1, 'ท่าใหญ่'], [2, 'ทุกจังหวะ']]},
-  {key: 'replay', th: 'ภาพช้าหมัดน็อก', opts: [[0, 'ปิด'], [1, 'เปิด']]}
+  {key: 'replay', th: 'ภาพช้า', opts: [[0, 'ปิด'], [1, 'ตอนน็อก'], [2, 'น็อกและพักยก']]}
 ];
-const OPT = Object.assign({preset: 'cinema'}, PRESETS.cinema);
+const OPT = Object.assign({preset: 'tv', build: 'auto'}, PRESETS.tv);
 const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- scene ----------
@@ -62,28 +63,35 @@ function layout() {
 
 // ---------- fight state ----------
 let fight = null, TL = null, EV = [], playT = 0, stopT = 0, mode = 'live', evi = 0, speed = 1, hype = 0, shake = 0, zoomKick = 0, realT = 0;
-let replayPlan = null, replayDone = false, slowWins = [], moments = [], marks = null, resultShown = false, galleryOn = false, frozen = false;
+let replays = [], rpi = 0, curRp = null, tvCuts = [], builtAs = '', slowWins = [], moments = [], marks = null, resultShown = false, galleryOn = false, frozen = false;
 const buf = [new Float32Array(NP), new Float32Array(NP)];
 const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3(), lastTrail = [new THREE.Vector3(), new THREE.Vector3()];
 
+function makeFighters() {
+  fighters.forEach(f => scene.remove(f.root));
+  fighters = fight.specs.map((sp, i) => new Fighter(i, {skin: sp.skin + i, build: OPT.build === 'auto' ? STYLE_BUILD[sp.style] : OPT.build, hair: sp.skin + sp.stats.spd + i, tattoo: (sp.stats.pow + i) % 2 === 0}));
+  fighters.forEach(f => { scene.add(f.root); f.setStyle(OPT.style); });
+  builtAs = OPT.build;
+}
 function newFight(seed) {
   fight = simulate({seed}); TL = bake(fight); EV = fight.events;
-  fighters.forEach(f => scene.remove(f.root));
-  fighters = [new Fighter(0, fight.specs[0].skin), new Fighter(1, fight.specs[1].skin + 1)];
-  fighters.forEach(f => { scene.add(f.root); f.setStyle(OPT.style); });
+  makeFighters();
   // landmarks the director and the slow motion need
-  marks = {specials: [], kds: [], rests: [], bigHits: [], introEnd: RULES.introTime, ko: null, dec: null, over: fight.duration};
-  let kdOpen = null, restOpen = null;
+  marks = {specials: [], kds: [], rests: [], stuns: [], bigHits: [], hits: [], rounds: [], introEnd: RULES.introTime, ko: null, dec: null, decPhase: null, over: fight.duration};
+  let kdOpen = null, restOpen = null, stunOpen = [null, null], round = null;
   for (const e of EV) {
     if (e.type === 'move' && e.special) marks.specials.push({t0: e.t, t1: (e.hit ? e.hit.t : e.tHit) + .75, by: e.by, hit: e.hit});
-    else if (e.type === 'hit' && e.res === 'hit' && e.sev >= 3) marks.bigHits.push(e);
-    else if (e.type === 'kd') { kdOpen = {t0: e.t + .5, t1: fight.duration, on: e.on, by: e.by, t: e.t}; marks.kds.push(kdOpen); }
-    else if (e.type === 'getup' && kdOpen) { kdOpen.t1 = e.t + .5; kdOpen = null; }
+    else if (e.type === 'hit') { marks.hits.push(e.t); if (e.res === 'hit' && e.sev >= 3) marks.bigHits.push(e); if (e.res === 'hit' && round && (!round.best || e.raw + (e.special ? 8 : 0) > round.best.raw + (round.best.special ? 8 : 0))) round.best = e; }
+    else if (e.type === 'stun') { stunOpen[e.on] = {t0: e.t, t1: e.t + e.dur, on: e.on}; marks.stuns.push(stunOpen[e.on]); }
+    else if (e.type === 'stun_end' && stunOpen[e.on]) { stunOpen[e.on].t1 = e.t; stunOpen[e.on] = null; }
+    else if (e.type === 'kd') { kdOpen = {t0: e.t + .5, t1: fight.duration, on: e.on, by: e.by, t: e.t, up: null}; marks.kds.push(kdOpen); if (stunOpen[e.on]) { stunOpen[e.on].t1 = e.t; stunOpen[e.on] = null; } if (round) round.kd = e; }
+    else if (e.type === 'getup' && kdOpen) { kdOpen.t1 = e.t + .5; kdOpen.up = e.t; kdOpen = null; }
     else if (e.type === 'ko') { marks.ko = e; if (kdOpen) { kdOpen.t1 = e.t; } }
     else if (e.type === 'decision') marks.dec = e;
     else if (e.type === 'phase') {
-      if (e.phase === 'rest') { restOpen = {t0: e.t + .4, t1: fight.duration}; marks.rests.push(restOpen); }
-      if (e.phase === 'fight') { if (restOpen) { restOpen.t1 = e.t - .5; restOpen = null; } if (e.round === 1) marks.introEnd = e.t; }
+      if (e.phase === 'rest') { restOpen = {t: e.t, t0: e.t + .4, t1: fight.duration, round}; marks.rests.push(restOpen); }
+      if (e.phase === 'fight') { if (restOpen) { restOpen.t1 = e.t - .5; restOpen = null; } if (e.round === 1) marks.introEnd = e.t; round = {n: e.round, t0: e.t, best: null, kd: null}; marks.rounds.push(round); }
+      if (e.phase === 'dec') marks.decPhase = e.t;
       if (e.phase === 'over') marks.over = e.t;
     }
   }
@@ -92,20 +100,58 @@ function newFight(seed) {
   marks.kds.forEach(k => moments.push(k.t));
   if (marks.ko) moments.push(marks.ko.t);
   moments = Array.from(new Set(moments.map(t => Math.round(t * 100) / 100))).sort((a, b) => a - b);
-  // the knockout replay shows the blow that ended it
-  replayPlan = null;
+  // replays: the best moment of each round during the break, and the blow that ended the fight
+  replays = [];
+  marks.rests.forEach(r => {
+    const b = r.round && (r.round.kd || r.round.best);
+    if (b && (b.type === 'kd' || b.raw >= 15)) replays.push({kind: 'round', n: r.round.n, blow: b.t, from: Math.max(0, b.t - .75), to: b.t + .65, trigger: r.t + .9, by: b.by});
+  });
   if (marks.ko) {
     const ko = marks.ko, lastKd = marks.kds.length ? marks.kds[marks.kds.length - 1] : null;
     const byBlow = EV.some(e => e.type === 'hit' && e.res === 'hit' && e.t === ko.t); // otherwise counted out
     const blow = !byBlow && lastKd && lastKd.on === ko.on ? lastKd.t : ko.t;
-    replayPlan = {blow, from: Math.max(0, blow - .8), to: blow + .8, trigger: ko.t + 1.55, by: ko.by};
+    replays.push({kind: 'ko', blow, from: Math.max(0, blow - .8), to: blow + .8, trigger: ko.t + 1.55, by: ko.by});
   }
-  buildSlow(); renderCards(); restart();
+  buildTv(); buildSlow(); renderCards(); restart();
   $('seed').textContent = String(seed);
 }
+const replayOn = r => r.kind === 'ko' ? OPT.replay >= 1 : OPT.replay >= 2;
+
+// Broadcast cut list: which camera is live at each moment. Built once per fight so the same fight always cuts the same way.
+function buildTv() {
+  let a = (fight.seed ^ 0x51ed27) >>> 0;
+  const R = () => { a = (a * 1664525 + 1013904223) >>> 0; return a / 4294967296; };
+  const forced = [], add = (t, cam, who, hold) => forced.push({t, cam, who: who == null ? -1 : who, hold: hold || 0});
+  add(0, 'high', -1, 1.2); add(1.2, 'face', 0, .8); add(2.0, 'face', 1, .8); add(marks.introEnd - .15, 'main', -1, 2.5);
+  marks.kds.forEach(k => {
+    add(k.t + .8, 'low', k.on, 1.5); add(k.t + 2.3, 'face', k.by, 1.3); add(k.t + 3.6, 'main', -1, 1);
+    if (k.up != null) { add(k.up + .1, 'face', k.on, 1.3); add(k.up + 1.4, 'main', -1, 1.5); }
+  });
+  marks.stuns.forEach(st => { if (st.t1 - st.t0 > .8) add(st.t0 + .25, 'tight', -1, st.t1 - st.t0); });
+  marks.rests.forEach(r => { add(r.t + .25, 'high', -1, .9); add(r.t + 1.2, 'face', 0, .9); add(r.t + 2.1, 'face', 1, .9); add(r.t1 + .3, 'main', -1, 2.5); });
+  if (marks.ko) { add(marks.ko.t + .85, 'low', marks.ko.on, 9); add(marks.ko.t + 1.75, 'face', marks.ko.by, 99); }
+  if (marks.decPhase != null) { add(marks.decPhase + .2, 'high', -1, 9); if (marks.dec) add(marks.dec.t + .1, 'face', marks.dec.w, 99); }
+  forced.sort((x, y) => x.t - y.t);
+  const quiet = t => !marks.hits.some(h => h > t - .3 && h < t + .7) && !marks.specials.some(sp => t > sp.t0 - .3 && t < sp.t1);
+  const cycle = ['tight', 'main', 'low', 'main', 'tight', 'main', 'high', 'main'], end = marks.ko ? marks.ko.t : marks.decPhase != null ? marks.decPhase : marks.over;
+  const cuts = forced.slice();
+  let ci = 0, next = marks.introEnd + 4 + R() * 3, fi = 0, busy = 0;
+  for (let t = marks.introEnd; t < end; t += .1) {
+    while (fi < forced.length && forced[fi].t <= t) { busy = Math.max(busy, forced[fi].t + forced[fi].hold + 1.2); fi++; }
+    if (t < next || t < busy || !quiet(t)) continue;
+    if (fi < forced.length && forced[fi].t - t < 1.6) continue;
+    if (marks.rests.some(r => t > r.t - .5 && t < r.t1 + 1)) continue;
+    const cam = cycle[ci++ % cycle.length];
+    cuts.push({t, cam, who: -1, hold: 0}); next = t + (cam === 'main' ? 5 + R() * 4 : 2.8 + R() * 1.8);
+  }
+  tvCuts = cuts.sort((x, y) => x.t - y.t);
+}
+const tvCutAt = t => { let c = tvCuts[0]; for (const x of tvCuts) { if (x.t > t) break; c = x; } return c; };
+
 function buildSlow() {
   slowWins = [];
-  if (OPT.slow >= 1 && marks.ko) { const b = replayPlan ? replayPlan.blow : marks.ko.t; slowWins.push({t0: b - .22, t1: b + 1.2, s: .22}); }
+  const koRp = replays.find(r => r.kind === 'ko');
+  if (OPT.slow >= 1 && koRp) slowWins.push({t0: koRp.blow - .22, t1: koRp.blow + 1.2, s: .22});
   if (OPT.slow >= 2) {
     marks.kds.forEach(k => slowWins.push({t0: k.t - .14, t1: k.t + .85, s: .3}));
     marks.specials.forEach(s => { slowWins.push({t0: s.t0, t1: s.t0 + .2, s: .45}); if (s.hit && s.hit.res === 'hit') slowWins.push({t0: s.hit.t - .13, t1: s.hit.t + .4, s: .28}); });
@@ -124,13 +170,13 @@ function slowAt(t) {
 const indexAt = t => { let lo = 0, hi = EV.length; while (lo < hi) { const m = (lo + hi) >> 1; if (EV[m].t <= t) lo = m + 1; else hi = m; } return lo; };
 
 function clearOverlays() {
-  $('pops').innerHTML = ''; $('result').hidden = true; $('replayTag').hidden = true; $('count').hidden = true; $('banner').hidden = true; $('combo').hidden = true;
+  $('pops').innerHTML = ''; $('result').hidden = true; $('replayTag').hidden = true; $('count').hidden = true; $('banner').hidden = true; $('combo').hidden = true; $('scorecard').hidden = true;
   fx.trailClear(); resultShown = false; stage.classList.remove('slow');
 }
 function restart() { seek(0); }
 function seek(t) {
   playT = clamp(t, 0, TL.duration); evi = indexAt(playT); mode = 'live'; stopT = 0; shake = 0; zoomKick = 0; frozen = false;
-  replayDone = !!(replayPlan && playT >= replayPlan.trigger);
+  rpi = replays.findIndex(r => r.trigger > playT); if (rpi < 0) rpi = replays.length; curRp = null;
   clearOverlays(); cam.id = null;
   let last = '';
   for (let i = 0; i < evi; i++) if (EV[i].type === 'say') last = EV[i].html;
@@ -170,10 +216,17 @@ function handle(e) {
   switch (e.type) {
     case 'say': if (!rp) $('call').innerHTML = e.html; break;
     case 'bell': if (!rp) audio.bell(e.n); break;
+    case 'score':
+      if (!rp) { $('scR').textContent = Math.round(e.pts[0]); $('scB').textContent = Math.round(e.pts[1]); $('scT').textContent = 'คะแนนหลังยก ' + e.round; $('scorecard').hidden = false; }
+      break;
+    case 'guard':
+      if (!rp && OPT.labels >= 2) { poseFighters(e.t); pop('ตั้งการ์ด', fighters[e.by].world('head', tmpV).add(tmpV2.set(0, .35, 0)), 'small'); }
+      break;
     case 'phase':
       if (rp) break;
       if (e.phase === 'fight') banner('ยก ' + e.round, 'gold');
       else if (e.phase === 'rest') banner('หมดยก ' + e.round, '');
+      if (e.phase === 'fight') $('scorecard').hidden = true;
       else if (e.phase === 'dec') banner('ครบยก', 'gold');
       else if (e.phase === 'over') showResult();
       break;
@@ -247,13 +300,17 @@ function advance(dt) {
   if (stopT > 0) { stopT -= dt; return 0; }
   const t0 = playT, ts = mode === 'replay' ? .3 : speed * slowAt(playT);
   let target = playT + dt * ts;
-  if (mode === 'live' && replayPlan && OPT.replay && !replayDone && target >= replayPlan.trigger) {
-    while (evi < EV.length && EV[evi].t <= replayPlan.trigger) handle(EV[evi++]);
-    mode = 'replay'; playT = replayPlan.from; evi = indexAt(playT); fx.trailClear(); $('replayTag').hidden = false; $('banner').hidden = true; cam.id = null; stopT = 0;
+  if (mode === 'live' && rpi < replays.length && target >= replays[rpi].trigger) {
+    const r = replays[rpi];
+    while (evi < EV.length && EV[evi].t <= r.trigger) handle(EV[evi++]);
+    if (!replayOn(r)) { rpi++; playT = Math.min(target, TL.duration); return playT - t0; }
+    mode = 'replay'; curRp = r; playT = r.from; evi = indexAt(playT); fx.trailClear(); stopT = 0; cam.id = null;
+    $('replayTag').textContent = r.kind === 'round' ? 'ภาพช้า ยก ' + r.n : 'ภาพช้า'; $('replayTag').hidden = false; $('banner').hidden = true; $('scorecard').hidden = true;
     return 0;
   }
-  if (mode === 'replay' && target >= replayPlan.to) {
-    mode = 'live'; replayDone = true; playT = replayPlan.trigger; evi = indexAt(playT); $('replayTag').hidden = true; fx.trailClear(); cam.id = null;
+  if (mode === 'replay' && target >= curRp.to) {
+    if (curRp.kind === 'round') $('scorecard').hidden = false; // back to the break: bring the round score back up
+    mode = 'live'; playT = curRp.trigger; evi = indexAt(playT); rpi++; curRp = null; $('replayTag').hidden = true; fx.trailClear(); cam.id = null;
     return 0;
   }
   while (evi < EV.length && EV[evi].t <= target) {
@@ -265,23 +322,41 @@ function advance(dt) {
 }
 
 // ---------- camera director ----------
-const cam = {id: null, az: 0, h: 1.5, fit: 5, fitH: 2.3, tx: 0, ty: 1.05};
-const shot = {id: '', az: 0, h: 1.5, fit: 5, fitH: 2.3, tx: 0, ty: 1.05, cut: false, hand: 0};
+// A shot is either an orbit around the action (az, h, fitted distance) or a fixed broadcast position with a zoom lens.
+const cam = {id: null, az: 0, h: 1.5, fit: 5, fitH: 2.3, tx: 0, ty: 1.05, px: 0, py: 2, pz: 8, fixed: false};
+const shot = {id: '', az: 0, h: 1.5, fit: 5, fitH: 2.3, tx: 0, ty: 1.05, px: 0, py: 0, pz: 0, fixed: false, cut: false, hand: 0, ropes: 0};
 function direct(t) {
   const xa = TL.val(0, t, 0) * .01, xb = TL.val(1, t, 0) * .01, mid = (xa + xb) / 2, sep = Math.abs(xb - xa);
-  const s = shot; s.cut = false; s.hand = 0; s.tx = mid; s.ty = 1.02; s.id = 'base'; s.fitH = 2.3;
+  const s = shot; s.cut = false; s.hand = 0; s.tx = mid; s.ty = 1.02; s.id = 'base'; s.fitH = 2.3; s.fixed = false; s.ropes = 0;
   const inIntro = t < marks.introEnd, rest = marks.rests.find(r => t >= r.t0 && t < r.t1);
+  let push = 0;
+  for (const e of marks.bigHits) { const d = e.t - t; if (d > -.35 && d < .5) push = Math.max(push, d > 0 ? smooth(1 - d / .5) : smooth(1 + d / .35)); }
+  if (mode === 'replay') {
+    s.id = 'replay'; s.cut = true; s.tx = mid; s.ty = 1.2; s.fit = sep + 2.0; s.fitH = 1.9; s.h = 1.0;
+    s.az = (curRp.by ? -1 : 1) * (.8 - (t - curRp.from) * .16);
+    return s;
+  }
+  if (OPT.cam === 'tv') {
+    const c = tvCutAt(t), who = c.who, wx = who === 1 ? xb : xa, flip = (Math.floor(c.t * 3) % 2) ? 1 : -1;
+    s.id = 'tv' + c.t + c.cam; s.cut = true; s.fixed = true; s.ropes = .45;
+    if (c.cam === 'main') { s.px = mid * .3; s.py = 2.55; s.pz = 8.8; s.fit = sep + 2.7; s.fitH = 2.5; s.ty = 1.0; }
+    else if (c.cam === 'tight') { s.px = mid * .3; s.py = 1.8; s.pz = 8.4; s.fit = sep + 1.5; s.fitH = 1.75; s.ty = 1.2; }
+    else if (c.cam === 'high') { s.px = flip * 6.6; s.py = 4.6; s.pz = 6.6; s.tx = mid * .6; s.ty = .8; s.fit = sep + 4.2; s.fitH = 3.5; }
+    else if (c.cam === 'low') {
+      s.px = mid + flip * 1.4; s.py = .55; s.pz = 4.75; s.hand = 1; s.fit = sep + 2.3; s.fitH = 2.5; s.ty = 1.08; s.ropes = 1;
+      if (who >= 0) { s.px = wx + (who ? -1.6 : 1.6); s.py = 1.1; s.tx = lerp(mid, wx - (who ? -.7 : .7), .6); s.ty = .5; s.fit = 3.6; s.fitH = 2.0; s.ropes = .18; }
+    } else { s.px = wx * .4; s.py = 1.85; s.pz = 8.6; s.tx = wx; s.ty = 1.42; s.fit = 1.25; s.fitH = 1.1; }
+    if (c.cam === 'main' || c.cam === 'tight') { s.fit *= 1 - push * .12; s.fitH *= 1 - push * .12; }
+    return s;
+  }
   if (OPT.cam === 'side') { s.az = 0; s.h = 1.45; s.fit = Math.max(3.3, sep + 2.5); }
-  else if (OPT.cam === 'orbit') { s.az = .62 * Math.sin(realT * .21); s.h = 2.05; s.fit = sep + 3.0; s.ty = 1.0; }
-  else if (OPT.cam === 'low') { s.az = .3 * Math.sin(realT * .15) + .12; s.h = .55; s.fit = sep + 2.3; s.fitH = 2.55; s.ty = 1.12; s.hand = 1; }
+  else if (OPT.cam === 'orbit') { s.az = .62 * Math.sin(realT * .21); s.h = 2.05; s.fit = sep + 3.0; s.ty = 1.0; s.ropes = 1; }
+  else if (OPT.cam === 'low') { s.az = .3 * Math.sin(realT * .15) + .12; s.h = .55; s.fit = sep + 2.3; s.fitH = 2.55; s.ty = 1.12; s.hand = 1; s.ropes = 1; }
   else { s.az = .26 * Math.sin(realT * .13); s.h = 1.5; s.fit = sep < 1.25 ? sep + 2.0 : sep + 2.5; }
   if (inIntro) { const k = smooth(t / marks.introEnd); s.fit = lerp(7.4, s.fit, k); s.h = lerp(2.7, s.h, k); if (OPT.cam !== 'side') s.az = lerp(-1.3, s.az, k); }
   else if (rest) { s.fit = 7; if (OPT.cam !== 'side' && OPT.cam !== 'low') { s.az = realT * .16; s.h = 3.3; s.ty = .9; s.tx = 0; } }
-  // push in just before a heavy blow lands
-  let push = 0;
-  for (const e of marks.bigHits) { const d = e.t - t; if (d > -.35 && d < .5) push = Math.max(push, d > 0 ? smooth(1 - d / .5) : smooth(1 + d / .35)); }
   s.fit *= 1 - push * (OPT.cam === 'director' ? .2 : .1); s.fitH *= 1 - push * (OPT.cam === 'director' ? .22 : .1);
-  if (OPT.cam === 'director' && mode !== 'replay') {
+  if (OPT.cam === 'director') {
     const sp = marks.specials.find(x => t >= x.t0 && t < x.t1);
     const kd = marks.kds.find(x => t >= x.t0 && t < x.t1);
     if (kd) {
@@ -291,38 +366,43 @@ function direct(t) {
       s.id = 'sp' + sp.t0; s.cut = true; s.az = sp.by ? .72 : -.72; s.h = 1.15; s.fit = sep + 2.3; s.fitH = 2.0; s.ty = 1.15;
     }
   }
-  // winner
   const winT = marks.ko ? marks.ko.t + 1.75 : marks.dec ? marks.dec.t : Infinity;
-  if (t >= winT && mode !== 'replay') {
+  if (t >= winT) {
     const w = fight.result.w, wx = w ? xb : xa;
     s.id = 'win'; s.cut = OPT.cam === 'director'; s.tx = wx; s.ty = 1.25; s.fit = 3.2; s.fitH = 2.2; s.h = OPT.cam === 'low' ? .6 : 1.05;
     if (OPT.cam !== 'side') s.az = (w ? .5 : -.5) + (t - winT) * .12 * (w ? -1 : 1);
-  } else if (marks.ko && t >= marks.ko.t + .55 && mode !== 'replay' && OPT.cam === 'director' && !(marks.kds.find(x => t >= x.t0 && t < x.t1))) {
+  } else if (marks.ko && t >= marks.ko.t + .55 && OPT.cam === 'director' && !(marks.kds.find(x => t >= x.t0 && t < x.t1))) {
     const on = marks.ko.on, vx = (on ? xb : xa) - (on ? -1 : 1) * .7;
     s.id = 'kofall'; s.cut = true; s.tx = lerp(mid, vx, .5); s.ty = .55; s.h = 1.25; s.fit = 4.4; s.fitH = 1.9; s.az = on ? -.5 : .5;
-  }
-  if (mode === 'replay') {
-    s.id = 'replay'; s.cut = true; s.tx = mid; s.ty = 1.2; s.fit = sep + 2.0; s.fitH = 1.9; s.h = 1.0; s.hand = 0;
-    s.az = (replayPlan.by ? -1 : 1) * (.8 - (t - replayPlan.from) * .16);
   }
   return s;
 }
 function applyCamera(dt) {
   const s = direct(playT);
-  if (cam.id === null || (s.cut && s.id !== cam.id) || (cam.cutId && !s.cut)) {
-    cam.az = s.az; cam.h = s.h; cam.fit = s.fit; cam.fitH = s.fitH; cam.tx = s.tx; cam.ty = s.ty;
+  if (cam.id === null || (s.cut && s.id !== cam.id) || (cam.cutId && !s.cut) || cam.fixed !== s.fixed) {
+    cam.az = s.az; cam.h = s.h; cam.fit = s.fit; cam.fitH = s.fitH; cam.tx = s.tx; cam.ty = s.ty; cam.px = s.px; cam.py = s.py; cam.pz = s.pz;
   } else {
-    const k = 1 - Math.exp(-dt * 4.5), kf = 1 - Math.exp(-dt * 7);
-    cam.az = lerp(cam.az, s.az, k); cam.h = lerp(cam.h, s.h, k); cam.fit = lerp(cam.fit, s.fit, kf); cam.fitH = lerp(cam.fitH, s.fitH, kf); cam.tx = lerp(cam.tx, s.tx, k); cam.ty = lerp(cam.ty, s.ty, k);
+    const k = 1 - Math.exp(-dt * 4.5), kf = 1 - Math.exp(-dt * (s.fixed ? 3.2 : 7));
+    cam.az = lerp(cam.az, s.az, k); cam.h = lerp(cam.h, s.h, k); cam.fit = lerp(cam.fit, s.fit, kf); cam.fitH = lerp(cam.fitH, s.fitH, kf);
+    cam.tx = lerp(cam.tx, s.tx, k); cam.ty = lerp(cam.ty, s.ty, k); cam.px = lerp(cam.px, s.px, k); cam.py = lerp(cam.py, s.py, k); cam.pz = lerp(cam.pz, s.pz, k);
   }
-  cam.id = s.id; cam.cutId = s.cut;
-  const vf = camera.fov * Math.PI / 360, hf = Math.atan(Math.tan(vf) * camera.aspect);
-  const D = Math.max(2.3, (cam.fit / 2) / Math.tan(hf), (cam.fitH / 2) / Math.tan(vf)) * (1 - zoomKick);
-  let px = cam.tx + Math.sin(cam.az) * D, py = cam.h, pz = Math.cos(cam.az) * D, lx = cam.tx, ly = cam.ty;
+  cam.id = s.id; cam.cutId = s.cut; cam.fixed = s.fixed;
+  let px, py, pz, lx = cam.tx, ly = cam.ty, fov = 30;
+  if (s.fixed) { // fixed position, the lens zooms to frame the action
+    px = cam.px; py = cam.py; pz = cam.pz;
+    const dist = Math.hypot(px - lx, py - ly, pz), half = Math.max(cam.fitH / 2, cam.fit / 2 / camera.aspect) * (1 - zoomKick);
+    fov = clamp(2 * Math.atan(half / dist) * 180 / Math.PI, 4, 50);
+  } else {
+    const vf = 15 * Math.PI / 180, hf = Math.atan(Math.tan(vf) * camera.aspect);
+    const D = Math.max(2.3, (cam.fit / 2) / Math.tan(hf), (cam.fitH / 2) / Math.tan(vf)) * (1 - zoomKick);
+    px = cam.tx + Math.sin(cam.az) * D; py = cam.h; pz = Math.cos(cam.az) * D;
+  }
+  if (Math.abs(camera.fov - fov) > .01) { camera.fov = fov; camera.updateProjectionMatrix(); }
+  const sway = s.fixed ? fov / 30 : 1; // a long lens magnifies every wobble, so scale it down
   if (s.hand && !REDUCED) { px += Math.sin(realT * 1.7) * .035 + Math.sin(realT * 4.1) * .012; py += Math.sin(realT * 2.3) * .025; ly += Math.sin(realT * 3.1) * .02; lx += Math.sin(realT * 1.3) * .03; }
-  if (shake > .0005) { px += (Math.random() - .5) * shake * 2; py += (Math.random() - .5) * shake * 2; ly += (Math.random() - .5) * shake; }
+  if (shake > .0005) { const k = s.fixed ? 2.5 : 1; lx += (Math.random() - .5) * shake * 2 * k * sway; ly += (Math.random() - .5) * shake * 2 * k * sway; if (!s.fixed) { px += (Math.random() - .5) * shake * 2; py += (Math.random() - .5) * shake * 2; } }
   camera.position.set(px, py, pz); camera.lookAt(lx, ly, 0);
-  arena.fadeRopes(camera.position, OPT.cam === 'low' || OPT.cam === 'orbit');
+  arena.fadeRopes(camera.position, s.ropes);
 }
 
 // ---------- frame ----------
@@ -336,7 +416,9 @@ function frame(ts) {
   shake *= Math.pow(.0006, dt); zoomKick *= Math.pow(.002, dt);
   hype = Math.max(0, hype - dt * .3);
   poseFighters(playT);
+  const pre = playT < marks.introEnd - .25;
   for (let i = 0; i < 2; i++) {
+    fighters[i].setMongkol(pre);
     fighters[i].setWear(TL.val(i, playT, 5), TL.val(i, playT, 6), TL.val(i, playT, 7));
     const ef = TL.effAt(i, playT);
     if (OPT.trail && ef && adv > 0) { const p = fighters[i].world(EFF_JOINT[EFF_NAME[ef]], tmpV); if (p.distanceToSquared(lastTrail[i]) > .0009) { fx.trailPush(i, p); lastTrail[i].copy(p); } }
@@ -354,12 +436,19 @@ function frame(ts) {
 function hud(dt) {
   const slow = mode === 'replay' || (speed * slowAt(playT) < .7 && OPT.slow > 0);
   stage.classList.toggle('slow', slow);
+  $('liveTag').hidden = !(OPT.cam === 'tv' && mode === 'live' && playT < marks.over);
   if (mode !== 'replay') {
     const ids = ['R', 'B'];
     for (let i = 0; i < 2; i++) {
       const hp = TL.val(i, playT, 1), el = $('hp' + ids[i]);
       el.style.width = hp + '%'; el.className = hp < 30 ? 'low' : hp < 55 ? 'mid' : '';
       $('st' + ids[i]).style.width = TL.val(i, playT, 2) + '%'; $('sp' + ids[i]).style.width = TL.val(i, playT, 3) + '%';
+    }
+    const pa = Math.round(TL.val(0, playT, 8)), pb = Math.round(TL.val(1, playT, 8));
+    for (const [id, v, lead] of [['ptR', pa, pa > pb], ['ptB', pb, pb > pa]]) {
+      const el = $(id);
+      if (el.textContent !== String(v)) { el.textContent = v; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
+      el.classList.toggle('lead', lead);
     }
     const c = TL.clock(playT); $('rd').textContent = 'ยก ' + c.round + '/' + RULES.rounds; $('tm').textContent = fmt(c.clock);
   }
@@ -385,6 +474,7 @@ function renderCards() {
 }
 function applyOpt() {
   arena.setLook(OPT.look, renderer, scene);
+  if (fight && builtAs !== OPT.build) makeFighters();
   fighters.forEach(f => f.setStyle(OPT.style));
   fx.amount = OPT.look === 'arcade' ? 1.5 : OPT.look === 'broadcast' ? .7 : 1; fx.trailWidth = OPT.look === 'arcade' ? .13 : .085;
   stage.dataset.look = OPT.look;
@@ -402,14 +492,14 @@ function buildUi() {
   $('detail').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     const d = DETAIL.find(x => x.key === b.dataset.k); OPT[d.key] = d.opts.find(o => String(o[0]) === b.dataset.v)[0];
-    OPT.preset = Object.keys(PRESETS).find(k => DETAIL.every(x => PRESETS[k][x.key] === OPT[x.key]) && PRESETS[k].look === OPT.look) || '';
+    OPT.preset = Object.keys(PRESETS).find(k => DETAIL.every(x => !(x.key in PRESETS[k]) || PRESETS[k][x.key] === OPT[x.key]) && PRESETS[k].look === OPT.look) || '';
     applyOpt();
   });
   $('btnRematch').addEventListener('click', () => restart());
   $('btnNew').addEventListener('click', () => newFight(1 + Math.floor(Math.random() * 999999)));
   $('btnNext').addEventListener('click', () => {
     if (!moments.length) return;
-    const cur = mode === 'replay' ? replayPlan.trigger : playT;
+    const cur = mode === 'replay' ? curRp.trigger : playT;
     const nx = moments.find(t => t - 1.6 > cur + .2);
     seek((nx == null ? moments[0] : nx) - 1.6);
   });
@@ -430,7 +520,7 @@ window.LAB = {
   gallery(names, az, style) {
     galleryOn = true; fighters.forEach(f => { f.root.visible = false; }); arena.group.visible = false; scene.fog = null; scene.background = new THREE.Color(0x3a4150);
     (window.LAB._g || []).forEach(f => scene.remove(f.root));
-    window.LAB._g = names.map((n, i) => { const f = new Fighter(0, 0); f.setStyle(style || 'real'); f.update(FLAT[n], 0, (i - (names.length - 1) / 2) * 1.3); scene.add(f.root); return f; });
+    window.LAB._g = names.map((n, i) => { const f = new Fighter(i % 2, typeof style === 'object' ? style : {skin: i, build: ['heavy', 'athletic', 'lean'][i % 3], hair: i, tattoo: i % 2 === 0}); f.setStyle(typeof style === 'string' ? style : 'real'); f.update(FLAT[n], 0, (i - (names.length - 1) / 2) * 1.3); scene.add(f.root); return f; });
     const D = names.length * 1.3 / 2 / Math.tan(Math.atan(Math.tan(camera.fov * Math.PI / 360) * camera.aspect)) + .4, a = az || 0;
     camera.position.set(Math.sin(a) * D, 1.3, Math.cos(a) * D); camera.lookAt(0, 1.0, 0);
   }
@@ -438,5 +528,5 @@ window.LAB = {
 
 buildUi(); layout();
 const start = () => { arena = buildArena(scene); fx = buildFx(scene); newFight(DEFAULT_SEED); applyOpt(); requestAnimationFrame(frame); };
-const DEFAULT_SEED = 4207;
+const DEFAULT_SEED = 7537;
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(start, start); else start();

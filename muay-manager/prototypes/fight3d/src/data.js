@@ -28,8 +28,10 @@ export const MOVES = {
              fr:[['kickW',.15],['kickHigh',.11],['kickW',.12],['guard',.18]]},
   low:      {th:'เตะขา', en:'Low kick', kind:'kick', sfx:'kick', lvl:'leg', reach:106, min:74, dmg:8, st:5, push:3, eff:'footR', react:'hitLeg', gb:.8, stun:0,
              fr:[['kickW',.11],['kickLow',.09],['kickW',.09],['guard',.14]]},
-  teep:     {th:'ถีบ', en:'Teep', kind:'kick', sfx:'knee', lvl:'body', reach:108, min:80, dmg:6, st:4, push:28, eff:'footL', react:'hitBody', gb:1, stun:0,
+  teep:     {th:'ถีบท้อง', en:'Body teep', kind:'kick', sfx:'knee', lvl:'body', reach:108, min:80, dmg:6, st:4, push:28, eff:'footL', react:'hitBody', gb:1, stun:0, aimY:-.14,
              fr:[['teepW',.11],['teep',.09],['guard',.2]]},
+  teepFace: {th:'ถีบหน้า', en:'Face teep', kind:'kick', sfx:'knee', lvl:'head', reach:106, min:78, dmg:10, st:6, push:24, eff:'footR', react:'hitHeadBack', gb:.9, stun:1.0,
+             fr:[['teepHiW',.14],['teepHi',.1],['teepHiW',.1],['guard',.18]]},
 
   spChop:   {th:'ศอกสับ', en:'Chopping Elbow', kind:'punch', sfx:'elbow', lvl:'head', reach:96, min:42, dmg:25, st:12, push:12, eff:'elbowR', react:'hitHeadBack', gb:1, stun:1.7, special:1, lunge:18,
              fr:[['chopW',.22],['chop',.08],['guard',.28]]},
@@ -53,22 +55,23 @@ export const COMBOS = {
   elbows:     {th:'ศอกคู่', seq:['elbow','spinElbow']},
   kneeElbow:  {th:'เข่าตามศอก', seq:['knee','knee','elbow']},
   feintKick:  {th:'แย็บเปิดเตะ', seq:['jab','high']},
-  jabLow:     {th:'แย็บตัดขา', seq:['jab','jab','low']}
+  jabLow:     {th:'แย็บตัดขา', seq:['jab','jab','low']},
+  teepTeep:   {th:'ถีบท้องถีบหน้า', seq:['teep','teepFace']}
 };
 
 // w = move weights, sp = specials used in rotation, b = stat bias, cb = combos and chance.
 export const STYLES = [
   {id:'puncher', th:'หมัดหนัก', sp:['spChop','spHanu'], cc:.34, cb:['oneTwo','threePunch','lowHigh','oneTwoKick'],
-   w:{jab:3,cross:3,hook:2.2,upper:1.6,bodyshot:1.6,elbow:1.6,spinElbow:.3,knee:.8,body:1.2,high:.5,low:1.2,teep:.7},
+   w:{jab:3,cross:3,hook:2.2,upper:1.6,bodyshot:1.6,elbow:1.6,spinElbow:.3,knee:.8,body:1.2,high:.5,low:1.2,teep:1.1,teepFace:.4},
    b:{pow:22,kick:-8,spd:0,def:-4,end:4,chin:4}},
-  {id:'kicker', th:'จอมเตะ', sp:['spKick','spCroc'], cc:.32, cb:['legHead','teepKick','feintKick','oneTwoKick'],
-   w:{jab:2,cross:1.1,hook:.5,upper:.3,bodyshot:.4,elbow:.7,spinElbow:.3,knee:1,body:3.4,high:1.7,low:2.4,teep:1.9},
+  {id:'kicker', th:'จอมเตะ', sp:['spKick','spCroc'], cc:.32, cb:['legHead','teepKick','feintKick','oneTwoKick','teepTeep'],
+   w:{jab:2,cross:1.1,hook:.5,upper:.3,bodyshot:.4,elbow:.7,spinElbow:.3,knee:1,body:3.4,high:1.7,low:2.4,teep:2.3,teepFace:1.3},
    b:{pow:-8,kick:22,spd:4,def:0,end:-2,chin:-4}},
   {id:'clinch', th:'เข่าศอก', sp:['spFly','spChop'], cc:.34, cb:['elbows','kneeElbow','oneTwo','lowHigh'],
-   w:{jab:1.8,cross:1.4,hook:1.2,upper:1.2,bodyshot:.8,elbow:2.6,spinElbow:1.1,knee:3.2,body:1.5,high:.5,low:1.1,teep:.9},
+   w:{jab:1.8,cross:1.4,hook:1.2,upper:1.2,bodyshot:.8,elbow:2.6,spinElbow:1.1,knee:3.2,body:1.5,high:.5,low:1.1,teep:1.3,teepFace:.6},
    b:{pow:8,kick:10,spd:-4,def:2,end:10,chin:10}},
-  {id:'tech', th:'ฝีมือ', sp:['spKick','spFly'], cc:.3, cb:['feintKick','jabLow','oneTwoKick','teepKick'],
-   w:{jab:3,cross:1.7,hook:1,upper:.6,bodyshot:.8,elbow:1.1,spinElbow:.6,knee:1.1,body:2.1,high:1,low:1.8,teep:2.4},
+  {id:'tech', th:'ฝีมือ', sp:['spKick','spFly'], cc:.3, cb:['feintKick','jabLow','oneTwoKick','teepKick','teepTeep'],
+   w:{jab:3,cross:1.7,hook:1,upper:.6,bodyshot:.8,elbow:1.1,spinElbow:.6,knee:1.1,body:2.1,high:1,low:1.8,teep:2.7,teepFace:1.5},
    b:{pow:-4,kick:2,spd:14,def:16,end:0,chin:-2}}
 ];
 
@@ -84,6 +87,8 @@ export const RULES = {
   dmgScale: .15,          // global damage multiplier
   blockDmg: .06,         // share of base damage that gets through a block
   blockBase: .5, dodgeBase: .12,
+  // raising the guard on reading an attack: chance, and how much it helps when the read is right or wrong
+  coverBase: .2, coverDef: .4, coverRead: .75, coverBonus: .3, coverMul: 1.7, coverWrong: .5,
   critChance: .1, critMul: 1.5, counterMul: 1.3,
   chainChance: .14,      // chance to attack again right away without a named combo
   coolMin: .4, coolMax: 1.15,
