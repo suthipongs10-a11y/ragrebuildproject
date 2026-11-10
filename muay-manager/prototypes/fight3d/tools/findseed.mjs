@@ -1,12 +1,14 @@
-// Finds seeds with a dramatic arc, for demo defaults. Usage: node tools/findseed.mjs [count]
+// Finds sample fights that end in different ways, for the demo's opening picks. Usage: node tools/findseed.mjs [count]
 import { simulate } from '../src/sim.js';
-const out = [];
-for (let seed = 1; seed <= +(process.argv[2] || 3000); seed++) {
+const want = {punch: ['cross', 'hook', 'upper'], highkick: ['high'], elbow: ['elbow', 'spinElbow'], special: ['spCroc', 'spKick', 'spFly', 'spChop', 'spHanu']}, out = {punch: [], highkick: [], elbow: [], special: [], decision: []};
+for (let seed = 1; seed <= +(process.argv[2] || 4000); seed++) {
   const f = simulate({seed}), r = f.result, ev = f.events;
-  const spHit = ev.filter(e => e.type === 'hit' && e.special && e.res === 'hit').length;
-  const stun = ev.filter(e => e.type === 'stun').length, getup = ev.filter(e => e.type === 'getup').length;
-  const ko = ev.find(e => e.type === 'ko'), koHit = ko && ev.find(e => e.type === 'hit' && e.t === ko.t);
-  if (r.how === 'น็อก' && r.round >= 2 && koHit && koHit.special && getup >= 1 && stun >= 1 && spHit >= 2 && r.leadChanges >= 1 && f.specs[0].style !== f.specs[1].style)
-    out.push(`${seed} R${r.round} ${f.specs[0].style} v ${f.specs[1].style} winner ${r.w} by ${r.move} kd ${r.kd} sp ${spHit} stun ${stun} lead ${r.leadChanges}`);
+  const clinch = ev.filter(e => e.type === 'clinch').length, catches = ev.filter(e => e.type === 'hit' && e.res === 'catch').length, kd = r.kd[0] + r.kd[1];
+  if (clinch < 1 || catches < 1 || r.leadChanges < 1 || f.specs[0].style === f.specs[1].style) continue;
+  const ko = ev.find(e => e.type === 'ko'), byBlow = ko && ev.some(e => e.type === 'hit' && e.res === 'hit' && e.t === ko.t);
+  const line = `${seed} R${r.round} ${r.move || 'pts'} ${f.specs[0].style} v ${f.specs[1].style} kd ${r.kd} clinch ${clinch} catch ${catches}`;
+  if (r.how === 'คะแนน') { if (kd >= 1 && Math.abs(r.pts[0] - r.pts[1]) < 12) out.decision.push(line); continue; }
+  if (!byBlow || r.round < 2) continue;
+  for (const k in want) if (want[k].includes(r.move)) out[k].push(line);
 }
-console.log(out.slice(0, 15).join('\n'));
+for (const k in out) console.log(k + ':\n  ' + out[k].slice(0, 4).join('\n  '));

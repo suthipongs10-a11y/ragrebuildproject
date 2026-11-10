@@ -52,6 +52,18 @@ export const POSES = {
   hanuW: P({turn: .2, lean: .36, hip: [.05, .68, 0], hL: [.26, 1.0, -.13], hR: [.26, 1.0, .13], eL: [-1, -.2, -.3], eR: [-1, -.2, .3]}),
   hanu: P({jump: .30, turn: 0, twist: 0, lean: -.05, hdP: -.2, hip: [.25, .95, 0], hL: [.5, 1.68, -.07], hR: [.5, 1.68, .07], fL: [.1, .10, -.12], fR: [-.2, .15, .14]}),
 
+  // clinch: the holder's gloves are aimed at the opponent's neck by the presenter
+  clinchHold: P({turn: .12, twist: 0, lean: .14, hip: [.02, .88, 0], hL: [.44, 1.50, -.07], hR: [.44, 1.50, .07], eL: [-.1, -1, -.7], eR: [-.1, -1, .7], fL: [.14, 0, -.17], fR: [-.2, 0, .17]}),
+  clinchHeld: P({turn: .15, twist: 0, lean: .4, hdP: .35, hip: [-.03, .84, 0], hL: [.34, 1.16, -.15], hR: [.32, 1.13, .15], fL: [.16, 0, -.2], fR: [-.22, 0, .2]}),
+  clinchKneeW: P({turn: .3, twist: 0, lean: .08, hip: [0, .9, 0], hL: [.44, 1.46, -.07], hR: [.44, 1.46, .07], eL: [-.1, -1, -.7], eR: [-.1, -1, .7], fL: [.14, .02, -.17], fR: [-.34, .22, .17], kR: [.5, -.4, .3]}),
+  clinchKnee: P({turn: -.25, twist: 0, lean: -.16, hip: [.1, .95, 0], hL: [.4, 1.36, -.07], hR: [.4, 1.36, .07], eL: [-.1, -1, -.7], eR: [-.1, -1, .7], fL: [.14, .05, -.17], fR: [.26, .6, .04], kR: [1, .6, 0]}),
+  clinchHit: P({turn: .1, twist: 0, lean: .62, hdP: .4, hip: [-.07, .8, 0], hL: [.28, 1.04, -.13], hR: [.26, 1.02, .13], fL: [.16, 0, -.2], fR: [-.24, 0, .2]}),
+  // kick caught: the kicker hops on one leg; the catcher clamps the ankle at his side and punches with the free hand
+  caught: P({turn: -1.0, twist: .35, lean: -.25, side: -.1, hip: [.02, .9, 0], fR: [.85, 1.0, -.1], kR: [.5, .3, 1], fL: [.2, .03, -.13], hL: [.25, 1.42, -.32], hR: [-.1, 1.28, .42]}),
+  catchHold: P({turn: .5, lean: .1, hip: [0, .86, 0], hL: [.22, 1.04, -.24], eL: [-.5, -.3, -1], hR: [.2, 1.46, .15]}),
+  catchPunch: P({turn: -.3, twist: -.35, lean: .22, hip: [.1, .85, 0], hL: [.22, 1.04, -.24], eL: [-.5, -.3, -1], hR: [.82, 1.5, 0], fR: [-.24, .04, .16], kR: [1, 0, .1]}),
+  catchBody: P({turn: -.3, twist: -.3, lean: .36, hdP: -.15, hip: [.1, .8, 0], hL: [.22, 1.04, -.24], eL: [-.5, -.3, -1], hR: [.78, 1.12, 0], fR: [-.24, .04, .16], kR: [1, 0, .1]}),
+
   block: P({lean: .2, hdP: .25, hip: [-.02, .84, 0], hL: [.27, 1.58, -.07], hR: [.21, 1.56, .08]}),
   blockBody: P({lean: .3, hip: [0, .82, 0], hL: [.26, 1.24, -.15], hR: [.2, 1.3, .15]}),
   check: P({lean: .05, hip: [-.04, .88, 0], fL: [.28, .42, -.12], kL: [1, .4, -.6], hL: [.3, 1.5, -.12]}),

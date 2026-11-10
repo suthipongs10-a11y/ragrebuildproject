@@ -13,7 +13,7 @@ mkdirSync('dist', {recursive: true});
 writeFileSync('dist/muay-fight-lab.html', html);
 // Models are published beside the page as a JSON file (glTF structure + base64 geometry) and a texture image:
 // the host serves .json and .jpg but not .glb, and its content policy blocks the data: and blob: fetches a stock glTF load makes.
-for (const name of ['fighter-a', 'fighter-b']) {
+for (const name of ['fighter-a', 'fighter-b', 'fighter-c', 'fighter-d', 'fighter-e', 'fighter-f']) {
   if (!existsSync(`assets/${name}.glb`)) continue;
   const glb = readFileSync(`assets/${name}.glb`), jsonLen = glb.readUInt32LE(12);
   const g = JSON.parse(glb.subarray(20, 20 + jsonLen).toString('utf8')), bin = glb.subarray(20 + jsonLen + 8);

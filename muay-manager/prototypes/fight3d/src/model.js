@@ -5,6 +5,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { IDX } from './poses.js';
 import { DIM, solve, makeJoints } from './rig.js';
+import { outfitTexture, headgear } from './outfit.js';
 const THREE = globalThis.THREE;
 
 const V = () => new THREE.Vector3(), Q = () => new THREE.Quaternion();
@@ -35,12 +36,12 @@ function toGlb(gltf, b64) {
 }
 const loadImage = src => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('texture ' + src + ' did not load')); im.src = src; });
 
-export async function loadModel(url) {
+export async function loadModel(url, id, key) {
   const res = await fetch(url);
   if (!res.ok) throw new Error(url + ' ' + res.status);
   const file = await res.json();
   const gltf = await new GLTFLoader().parseAsync(toGlb(file.gltf, file.bin), '');
-  const tex = new THREE.Texture(await loadImage(file.texture));
+  const image = await loadImage(file.texture), tex = new THREE.Texture(image);
   tex.flipY = false; tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4; tex.needsUpdate = true;
   gltf.scene.traverse(o => { if (o.isSkinnedMesh) { o.material.map = tex; o.material.needsUpdate = true; } });
   const scene = gltf.scene; scene.updateMatrixWorld(true);
@@ -58,26 +59,8 @@ export async function loadModel(url) {
     neck: pos.Head.y - pos.Spine.y, head: .11,
     ua: avg(d('LeftArm', 'LeftForeArm'), d('RightArm', 'RightForeArm')), fa: avg(d('LeftForeArm', 'LeftHand'), d('RightForeArm', 'RightHand')) + .07
   };
-  return {scene, pos, dims, standHips: pos.Hips.y, textures: {}};
-}
-
-// Second corner: the same texture with the saturated reds (shorts, gloves) turned blue.
-function blueTexture(model, src) {
-  if (model.textures.blue) return model.textures.blue;
-  const img = src.image, c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
-  const g = c.getContext('2d', {willReadFrequently: true}); g.drawImage(img, 0, 0);
-  const id = g.getImageData(0, 0, c.width, c.height), p = id.data;
-  for (let i = 0; i < p.length; i += 4) {
-    const r = p[i], gr = p[i + 1], b = p[i + 2], mx = Math.max(r, gr, b), mn = Math.min(r, gr, b);
-    if (mx < 40 || r !== mx) continue;
-    const sat = (mx - mn) / mx;
-    if (sat < .66 || gr - b > (mx - mn) * .2 || b - gr > (mx - mn) * .25) continue; // skin is less saturated and leans orange
-    const k = Math.min(1, (sat - .66) / .1);
-    p[i] = r + (mn * .9 - r) * k; p[i + 1] = gr + (mn + (mx - mn) * .32 - gr) * k; p[i + 2] = b + (Math.min(255, mx * 1.08) - b) * k;
-  }
-  g.putImageData(id, 0, 0);
-  const t = new THREE.CanvasTexture(c); t.flipY = src.flipY; t.colorSpace = src.colorSpace; t.wrapS = src.wrapS; t.wrapT = src.wrapT; t.anisotropy = 4;
-  return (model.textures.blue = t);
+  const headH = pos.head_end ? pos.head_end.distanceTo(pos.Head) : .23;
+  return {id: id || url, key: key || 'blue', scene, mesh, image, pos, dims, standHips: pos.Hips.y, headR: headH * .4, headC: headH * .74}; // headgear sits on the forehead, above the eyes
 }
 
 const LIMB = [
@@ -87,7 +70,7 @@ const LIMB = [
 ];
 
 export class ModelFighter {
-  constructor(index, model) {
+  constructor(index, model, look) {
     this.index = index; this.dir = index ? -1 : 1; this.model = model; this.isModel = true;
     this.root = new THREE.Group(); this.root.rotation.order = 'YXZ';
     this.J = makeJoints(); this.meshes = [];
@@ -95,7 +78,8 @@ export class ModelFighter {
     let mesh = null; clone.traverse(o => { if (o.isSkinnedMesh) mesh = o; });
     this.mesh = mesh; mesh.frustumCulled = false; mesh.castShadow = true; mesh.receiveShadow = false;
     const mat = mesh.material = mesh.material.clone(); mat.roughness = .62; mat.metalness = 0; mat.side = THREE.FrontSide;
-    if (mat.map) { mat.map.anisotropy = 4; if (index === 1 && model.corner !== 1) mat.map = blueTexture(model, mat.map); }
+    if (look) { try { mat.map = outfitTexture(model, look); } catch (e) { console.warn('outfit not applied:', e.message); } }
+    this.gear = headgear(look && look.head, look && look.trim, model.headR); this.root.add(this.gear);
     this.mat = mat;
     // bones leave the scene graph: their world matrices are written directly every frame
     this.bones = {}; this.bind = {};
@@ -138,6 +122,7 @@ export class ModelFighter {
     this.qNeck.copy(J.qc).slerp(J.qh, .5); this.put('neck', this.qNeck, this.a, P0.neck);
     v3.copy(P0.Head).sub(P0.neck).applyQuaternion(this.qNeck).add(this.a); this.a.copy(v3);
     for (const name of ['Head', 'head_end', 'headfront']) this.put(name, J.qh, this.a, P0.Head);
+    this.gear.position.set(0, this.model.headC, 0).applyQuaternion(J.qh).add(this.a); this.gear.quaternion.copy(J.qh);
     // limbs
     for (const L of this.limbs) {
       const l = L.l, A = J[l[3]], B = J[l[4]], C = J[l[5]];

@@ -93,6 +93,14 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
 #detail{display:flex;flex-direction:column;gap:8px;padding-top:8px}
 #detail .row{display:grid;grid-template-columns:118px minmax(0,1fr);gap:8px;align-items:center}
 #detail .lab{font-size:12.5px;color:var(--muted)}
+.lookgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
+.lk{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 8px;align-items:center;min-width:0}
+.lk h3{grid-column:1/-1;margin:0;font-family:var(--display);font-size:14px;font-weight:700}
+.lk.r h3{color:var(--red-soft)} .lk.b h3{color:var(--blue-soft)}
+.lk label{font-size:12.5px;color:var(--muted)}
+.lk select,.lk input{box-sizing:border-box;font:inherit;font-size:13px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;min-width:0;width:100%}
+.lk select:focus-visible,.lk input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+@media (max-width:480px){ .lk{grid-template-columns:1fr;gap:3px} .lk label{margin-top:4px} }
 .tape{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:5px;min-width:0}
 .card h2{font-family:var(--display);font-size:14px;font-weight:700;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -168,6 +176,12 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
       <summary>ปรับทีละอย่าง</summary>
       <div id="detail"></div>
     </details>
+  </section>
+
+  <section class="looks">
+    <h2>นักมวยและเครื่องแต่งกาย</h2>
+    <div class="lookgrid" id="lookUi"></div>
+    <p>ตัวนักมวย 6 แบบใช้เครื่องแต่งกายร่วมกันได้ทั้งหมด เปลี่ยนแล้วไฟต์เดิมเล่นต่อจากจุดเดิม</p>
   </section>
 
   <div class="tape">

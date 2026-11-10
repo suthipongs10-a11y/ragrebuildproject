@@ -86,6 +86,22 @@ export function bake(fight) {
     }
   }
 
+  // clinch and catch: place a fighter's hands or foot on the opponent's body as it will be a moment later
+  function attach(i, c, target) {
+    const o = 1 - i, k = Math.min(n - 1, Math.round((c.t + Math.max(c.d, .12)) / dt)), ob = baked[o], oo = k * NP;
+    const dist = Math.abs(tick(o, k, 0) - tick(i, k, 0)) * .01;
+    solve(ob, oo, J2);
+    const toMine = v => { v.applyAxisAngle(UP, -ob[oo + IDX.spin]); v.y += ob[oo + IDX.jump]; v.set(dist - v.x, v.y - target[IDX.jump], -v.z); return v; };
+    if (c.grab === 'neck') {
+      toMine(pt3.copy(J2.neck).lerp(J2.head, .25));
+      for (const [b, z] of [[IDX.hL, -.07], [IDX.hR, .07]]) { target[b] = pt3.x + .06; target[b + 1] = pt3.y; target[b + 2] = pt3.z + z; }
+    }
+    if (c.hold === 'leg') { // the ankle sits in the catcher's lead hand
+      toMine(pt3.copy(J2.haL));
+      target[IDX.fR] = pt3.x; target[IDX.fR + 1] = pt3.y - DIM.ankle; target[IDX.fR + 2] = pt3.z;
+    }
+  }
+
   function pass(i, aim) {
     const out = baked[i], list = cues[i];
     const cur = new Float32Array(FLAT.guard), from = new Float32Array(FLAT.guard);
@@ -102,6 +118,7 @@ export function bake(fight) {
           effId = EFF_ID[mv.eff]; effUntil = c.t + c.d + .06;
           if (aim) { target = new Float32Array(target); aimPose(i, c, target); }
         }
+        if (aim && (c.grab || c.hold)) { if (target === FLAT[c.pose]) target = new Float32Array(target); attach(i, c, target); }
         from.set(cur);
         // take the short way round for whole-body spins
         const ds = target[IDX.spin] - from[IDX.spin];

@@ -6,6 +6,7 @@ import { bake, EFF_NAME } from './timeline.js';
 import { Fighter, EFF_JOINT, STYLE_BUILD, setDims, DIM_DEFAULT } from './rig.js';
 import { NP, FLAT, scalePoses } from './poses.js';
 import { loadModel, ModelFighter } from './model.js';
+import { COLORS, PATTERNS, HEADGEAR } from './outfit.js';
 import { buildArena } from './arena.js';
 import { buildFx } from './fx.js';
 import { buildAudio } from './audio.js';
@@ -42,6 +43,38 @@ const DETAIL = [
 ];
 const OPT = Object.assign({preset: 'tv', build: 'auto', fighter: 'model'}, PRESETS.tv);
 let MODEL = null, MODELS = []; // generated characters per corner, when they loaded (MODEL = shared proportions)
+// Roster of base bodies. Outfit is separate, so any body can wear any look. [label, key colour of the model's shorts and gloves]
+const ROSTER = {
+  c: ['รุ่นเก๋า ยันต์เต็มอก', 'blue'], d: ['ช่วงยาว ผิวเข้ม', 'blue'], e: ['ฝรั่งไหล่กว้าง', 'blue'], f: ['ดาวรุ่งผมจุก', 'blue'],
+  b: ['เพรียวคมกริบ', 'blue'], a: ['ตัวถึก กางเกงลายทอง', 'red']
+};
+const LOOK = [
+  {name: '', fighter: 'c', shorts: 'red', trim: 'gold', pattern: 'zigzag', gloves: 'red', head: 'mongkol'},
+  {name: '', fighter: 'd', shorts: 'blue', trim: 'white', pattern: 'stripe', gloves: 'blue', head: 'band'}
+];
+const LOOK_FIELDS = {fighter: ROSTER, shorts: COLORS, trim: COLORS, pattern: PATTERNS, gloves: COLORS, head: HEADGEAR};
+const cleanName = v => String(v || '').replace(/[<>&"']/g, '').trim().slice(0, 24);
+try { // remembered per viewer
+  const sv = JSON.parse(localStorage.getItem('muayLabLook'));
+  if (Array.isArray(sv)) sv.forEach((l, i) => { if (!LOOK[i] || !l) return; LOOK[i].name = cleanName(l.name); for (const k in LOOK_FIELDS) if (LOOK_FIELDS[k][l[k]]) LOOK[i][k] = l[k]; });
+} catch (e) { /* storage unavailable: defaults apply */ }
+const modelCache = {};
+function ensureModel(id) { return modelCache[id] || (modelCache[id] = loadModel('fighter-' + id + '.json', id, ROSTER[id][1])); }
+async function loadPair() {
+  $('modelNote').textContent = 'กำลังโหลดนักมวย… ';
+  try {
+    MODELS = await Promise.all(LOOK.map(l => ensureModel(l.fighter)));
+    for (const id in modelCache) if (!LOOK.some(l => l.fighter === id)) delete modelCache[id]; // keep memory for the two in the ring
+    // both fighters share one skeleton, sized halfway between the two bodies
+    const dims = {}; for (const k in MODELS[0].dims) dims[k] = (MODELS[0].dims[k] + MODELS[1].dims[k]) / 2;
+    MODEL = {dims, standHips: (MODELS[0].standHips + MODELS[1].standHips) / 2};
+    $('modelNote').textContent = '';
+  } catch (e) {
+    for (const id in modelCache) delete modelCache[id];
+    MODEL = null; MODELS = []; OPT.fighter = 'code'; console.warn('3D model not loaded, using the code-built fighter:', e.message);
+    $('modelNote').textContent = 'โหลดโมเดลนักมวยไม่ได้ จึงใช้ตัวที่สร้างจากโค้ดแทน (' + e.message + ') ';
+  }
+}
 const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- scene ----------
@@ -81,17 +114,17 @@ function useDims() {
 }
 function makeFighters() {
   fighters.forEach(f => scene.remove(f.root));
-  fighters = fight.specs.map((sp, i) => OPT.fighter === 'model' && MODEL ? new ModelFighter(i, MODELS[i] || MODELS[0])
+  fighters = fight.specs.map((sp, i) => OPT.fighter === 'model' && MODEL ? new ModelFighter(i, MODELS[i], LOOK[i])
     : new Fighter(i, {skin: sp.skin + i, build: OPT.build === 'auto' ? STYLE_BUILD[sp.style] : OPT.build, hair: sp.skin + sp.stats.spd + i, tattoo: (sp.stats.pow + i) % 2 === 0}));
   fighters.forEach(f => { scene.add(f.root); f.setStyle(OPT.style); });
   builtAs = fighterKey();
 }
 function newFight(seed) {
-  useDims(); fight = simulate({seed}); TL = bake(fight); EV = fight.events;
+  useDims(); fight = simulate({seed, names: LOOK.map(l => cleanName(l.name))}); TL = bake(fight); EV = fight.events;
   makeFighters();
   // landmarks the director and the slow motion need
-  marks = {specials: [], kds: [], rests: [], stuns: [], bigHits: [], hits: [], rounds: [], introEnd: RULES.introTime, ko: null, dec: null, decPhase: null, over: fight.duration};
-  let kdOpen = null, restOpen = null, stunOpen = [null, null], round = null;
+  marks = {specials: [], kds: [], rests: [], stuns: [], clinches: [], bigHits: [], hits: [], rounds: [], introEnd: RULES.introTime, ko: null, dec: null, decPhase: null, over: fight.duration};
+  let kdOpen = null, restOpen = null, stunOpen = [null, null], round = null, clinchOpen = null;
   for (const e of EV) {
     if (e.type === 'move' && e.special) marks.specials.push({t0: e.t, t1: (e.hit ? e.hit.t : e.tHit) + .75, by: e.by, hit: e.hit});
     else if (e.type === 'hit') { marks.hits.push(e.t); if (e.res === 'hit' && e.sev >= 3) marks.bigHits.push(e); if (e.res === 'hit' && round && (!round.best || e.raw + (e.special ? 8 : 0) > round.best.raw + (round.best.special ? 8 : 0))) round.best = e; }
@@ -100,6 +133,8 @@ function newFight(seed) {
     else if (e.type === 'kd') { kdOpen = {t0: e.t + .5, t1: fight.duration, on: e.on, by: e.by, t: e.t, up: null}; marks.kds.push(kdOpen); if (stunOpen[e.on]) { stunOpen[e.on].t1 = e.t; stunOpen[e.on] = null; } if (round) round.kd = e; }
     else if (e.type === 'getup' && kdOpen) { kdOpen.t1 = e.t + .5; kdOpen.up = e.t; kdOpen = null; }
     else if (e.type === 'ko') { marks.ko = e; if (kdOpen) { kdOpen.t1 = e.t; } }
+    else if (e.type === 'clinch') { clinchOpen = {t0: e.t, t1: e.t + 4}; marks.clinches.push(clinchOpen); }
+    else if (e.type === 'break' && clinchOpen) { clinchOpen.t1 = e.t; clinchOpen = null; }
     else if (e.type === 'decision') marks.dec = e;
     else if (e.type === 'phase') {
       if (e.phase === 'rest') { restOpen = {t: e.t, t0: e.t + .4, t1: fight.duration, round}; marks.rests.push(restOpen); }
@@ -141,6 +176,7 @@ function buildTv() {
     if (k.up != null) { add(k.up + .1, 'face', k.on, 1.3); add(k.up + 1.4, 'main', -1, 1.5); }
   });
   marks.stuns.forEach(st => { if (st.t1 - st.t0 > .8) add(st.t0 + .25, 'tight', -1, st.t1 - st.t0); });
+  marks.clinches.forEach(c => { if (c.t1 - c.t0 > .9) add(c.t0 + .3, 'tight', -1, c.t1 - c.t0); });
   marks.rests.forEach(r => { add(r.t + .25, 'high', -1, .9); add(r.t + 1.2, 'face', 0, .9); add(r.t + 2.1, 'face', 1, .9); add(r.t1 + .3, 'main', -1, 2.5); });
   if (marks.ko) { add(marks.ko.t + .85, 'low', marks.ko.on, 9); add(marks.ko.t + 1.75, 'face', marks.ko.by, 99); }
   if (marks.decPhase != null) { add(marks.decPhase + .2, 'high', -1, 9); if (marks.dec) add(marks.dec.t + .1, 'face', marks.dec.w, 99); }
@@ -232,6 +268,13 @@ function handle(e) {
     case 'score':
       if (!rp) { $('scR').textContent = Math.round(e.pts[0]); $('scB').textContent = Math.round(e.pts[1]); $('scT').textContent = 'คะแนนหลังยก ' + e.round; $('scorecard').hidden = false; }
       break;
+    case 'clinch':
+      hype = Math.min(1, hype + .3);
+      if (!rp && OPT.labels >= 1) { poseFighters(e.t); pop('กอดคอตีเข่า!', fighters[e.by].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'gold'); }
+      break;
+    case 'break':
+      if (!rp && OPT.labels >= 2) { poseFighters(e.t); pop(e.reason === 'escape' ? 'สะบัดหลุด' : 'กรรมการแยก', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'small'); }
+      break;
     case 'guard':
       if (!rp && OPT.labels >= 2) { poseFighters(e.t); pop('ตั้งการ์ด', fighters[e.by].world('head', tmpV).add(tmpV2.set(0, .35, 0)), 'small'); }
       break;
@@ -286,6 +329,9 @@ function handle(e) {
         stopT = Math.max(stopT, OPT.stop * .018); shake = Math.max(shake, OPT.shake * .008 * (REDUCED ? 0 : 1));
         audio.block();
         if (!rp && OPT.labels >= 2) pop('บัง', p.clone().add(tmpV2.set(0, .3, 0)), 'small');
+      } else if (e.res === 'catch') {
+        audio.block(); hype = Math.min(1, hype + .35);
+        if (!rp && OPT.labels >= 1) pop('จับขา!', df.world('haL', tmpV2).clone().add(tmpV.set(0, .35, 0)), 'gold');
       } else {
         audio.whiff();
         if (!rp && OPT.labels >= 2 && e.res === 'dodge') pop('หลบ!', df.world('head', tmpV2).clone().add(tmpV.set(0, .3, 0)), 'small');
@@ -508,6 +554,19 @@ function buildUi() {
     OPT.preset = Object.keys(PRESETS).find(k => DETAIL.every(x => !(x.key in PRESETS[k]) || PRESETS[k][x.key] === OPT[x.key]) && PRESETS[k].look === OPT.look) || '';
     applyOpt();
   });
+  const opts = (map, cur) => Object.keys(map).map(k => '<option value="' + k + '"' + (k === cur ? ' selected' : '') + '>' + (Array.isArray(map[k]) ? map[k][0] : map[k]) + '</option>').join('');
+  const LABEL = {fighter: 'ตัวนักมวย', shorts: 'สีกางเกง', pattern: 'ลายกางเกง', trim: 'สีลายและผ้าหัว', gloves: 'สีนวม', head: 'เครื่องหัว'};
+  $('lookUi').innerHTML = LOOK.map((l, i) => '<div class="lk ' + (i ? 'b' : 'r') + '"><h3>' + (i ? 'มุมน้ำเงิน' : 'มุมแดง') + '</h3>' +
+    '<label for="lk' + i + 'name">ชื่อ</label><input id="lk' + i + 'name" data-i="' + i + '" data-k="name" maxlength="24" placeholder="ตั้งชื่อเอง" value="' + cleanName(l.name) + '">' +
+    Object.keys(LABEL).map(k => '<label for="lk' + i + k + '">' + LABEL[k] + '</label><select id="lk' + i + k + '" data-i="' + i + '" data-k="' + k + '">' + opts(LOOK_FIELDS[k], l[k]) + '</select>').join('') + '</div>').join('');
+  $('lookUi').addEventListener('change', async e => {
+    const el = e.target, i = +el.dataset.i, k = el.dataset.k; if (!k || !LOOK[i]) return;
+    LOOK[i][k] = k === 'name' ? cleanName(el.value) : el.value;
+    try { localStorage.setItem('muayLabLook', JSON.stringify(LOOK)); } catch (err) { /* not remembered, still applied */ }
+    if (OPT.fighter !== 'model' && k !== 'name') { OPT.fighter = 'model'; }
+    if (k === 'fighter' || !MODEL) await loadPair();
+    const t = playT; newFight(fight.seed); applyOpt(); seek(t);
+  });
   $('btnRematch').addEventListener('click', () => restart());
   $('btnNew').addEventListener('click', () => newFight(1 + Math.floor(Math.random() * 999999)));
   $('btnNext').addEventListener('click', () => {
@@ -533,7 +592,7 @@ window.LAB = {
   gallery(names, az, style) {
     galleryOn = true; fighters.forEach(f => { f.root.visible = false; }); arena.group.visible = false; scene.fog = null; scene.background = new THREE.Color(0x3a4150);
     (window.LAB._g || []).forEach(f => scene.remove(f.root));
-    window.LAB._g = names.map((n, i) => { const f = OPT.fighter === 'model' && MODEL ? new ModelFighter(i % 2, MODELS[i % 2] || MODELS[0]) : new Fighter(i % 2, typeof style === 'object' ? style : {skin: i, build: ['heavy', 'athletic', 'lean'][i % 3], hair: i, tattoo: i % 2 === 0}); f.setStyle(typeof style === 'string' ? style : 'real'); scene.add(f.root); f.update(FLAT[n], 0, (i - (names.length - 1) / 2) * 1.3); return f; });
+    window.LAB._g = names.map((n, i) => { const f = OPT.fighter === 'model' && MODEL ? new ModelFighter(i % 2, MODELS[i % 2], LOOK[i % 2]) : new Fighter(i % 2, typeof style === 'object' ? style : {skin: i, build: ['heavy', 'athletic', 'lean'][i % 3], hair: i, tattoo: i % 2 === 0}); f.setStyle(typeof style === 'string' ? style : 'real'); scene.add(f.root); f.update(FLAT[n], 0, (i - (names.length - 1) / 2) * 1.3); return f; });
     const D = names.length * 1.3 / 2 / Math.tan(Math.atan(Math.tan(camera.fov * Math.PI / 360) * camera.aspect)) + .4, a = az || 0;
     camera.position.set(Math.sin(a) * D, 1.3, Math.cos(a) * D); camera.lookAt(0, 1.0, 0);
   }
@@ -542,17 +601,9 @@ window.LAB = {
 buildUi(); layout();
 const start = async () => {
   arena = buildArena(scene); fx = buildFx(scene);
-  try {
-    MODELS = [await loadModel('fighter-a.json')];
-    try { const b = await loadModel('fighter-b.json'); b.corner = 1; MODELS.push(b); } catch (e) { /* no second model: the first is recoloured for the blue corner */ }
-    // both fighters share one skeleton, sized halfway between the models
-    const dims = {}; for (const k in MODELS[0].dims) dims[k] = MODELS.reduce((a, m) => a + m.dims[k], 0) / MODELS.length;
-    MODEL = {dims, standHips: MODELS.reduce((a, m) => a + m.standHips, 0) / MODELS.length};
-  } catch (e) {
-    MODEL = null; MODELS = []; OPT.fighter = 'code'; console.warn('3D model not loaded, using the code-built fighter:', e.message);
-    $('modelNote').textContent = 'โหลดโมเดลนักมวยไม่ได้ จึงใช้ตัวที่สร้างจากโค้ดแทน (' + e.message + ') ';
-  }
-  newFight(DEFAULT_SEED); applyOpt(); requestAnimationFrame(frame);
+  await loadPair();
+  newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
-const DEFAULT_SEED = 7537;
+// sample fights that end in different ways: straight punch, high kick, elbow, flying knee, and a close decision
+const SAMPLE_SEEDS = [379, 1423, 2997, 1811, 88];
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(start, start); else start();

@@ -3,9 +3,9 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.2';
+export const SIM_VERSION = 'proto-0.3';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
-export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11};
+export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14};
 
 function mulberry32(seed) {
   let a = seed >>> 0;
@@ -37,6 +37,7 @@ export function simulate(opts) {
 
   let specs = opts.specs;
   if (!specs) { const a = randomSpec(R); specs = [a, randomSpec(R, a.first)]; }
+  if (opts.names) specs.forEach((sp, i) => { if (opts.names[i]) sp.name = opts.names[i]; }); // the owner's own name for the fighter
 
   const events = [], poses = [], ticks = [];
   let T = 0;
@@ -51,14 +52,15 @@ export function simulate(opts) {
       pt: 0, pd: .001, to: 'guard', q: [], qi: 0, mv: null, mvKey: null, hold: 0, inv: 0, lunge: 0,
       combo: null, ci: 0, chain: 0, chainT: 0, lastRes: null, spi: 0,
       wearHead: 0, wearBody: 0, wearLeg: 0, stunT: 0, stunCd: 0, stunFlip: 0, tough: 0,
-      landed: 0, thrown: 0, used: {}, seen: 0, moveId: 0, coverLvl: null, guards: 0};
+      landed: 0, thrown: 0, used: {}, seen: 0, moveId: 0, coverLvl: null, guards: 0, grab: null};
   }
   const F = [mk(0, specs[0]), mk(1, specs[1])];
-  const G = {phase: 'intro', t: 0, round: 1, clock: K.roundTime, count: null, restT: 0, koT: 0, over: null, lead: -1, leadChanges: 0};
+  const G = {phase: 'intro', t: 0, round: 1, clock: K.roundTime, count: null, clinch: null, restT: 0, koT: 0, over: null, lead: -1, leadChanges: 0};
 
   function setPose(f, name, d, extra) {
     f.to = name; f.pt = 0; f.pd = Math.max(.001, d);
     const p = {t: T, f: f.i, pose: name, d: f.pd};
+    if (f.grab) p.grab = f.grab; // presenter aims the hands at the opponent's neck
     if (extra) Object.assign(p, extra);
     poses.push(p);
   }
@@ -91,7 +93,8 @@ export function simulate(opts) {
     const ws = keys.map(k => {
       const m = MOVES[k]; let v = w[k];
       if (f.st < 30 && m.st > 5) v *= .35;
-      if (stunned) v *= m.lvl === 'head' ? (m.dmg >= 10 ? 2.4 : 1) : .25;
+      if (m.grab) { if (G.clinch || f.st < 20) v = 0; else if (stunned) v *= 1.3; }
+      else if (stunned) v *= m.lvl === 'head' ? (m.dmg >= 10 ? 2.4 : 1) : .25;
       else if (o.hp < 30 && (k === 'high' || k === 'elbow' || k === 'knee' || k === 'hook')) v *= 1.6;
       if (o.wearLeg > 50 && k === 'low') v *= 1.5;
       tot += v; return v;
@@ -111,10 +114,24 @@ export function simulate(opts) {
       if (m.special) say('<b>' + f.name + '</b> ออก' + m.th + 'แต่พลาดเป้า');
       return;
     }
+    // a body kick can be caught: the kicker is stuck on one leg and eats a punch from the free hand
+    if (key === 'body' && !G.clinch && (o.state === 'idle' || o.state === 'cover' || o.state === 'block') &&
+        R() < K.catchBase + o.stats.def / 100 * K.catchDef + (o.style.id === 'tech' ? .05 : 0)) {
+      f.lastRes = 'catch'; f.chain = 0; f.combo = null; f.q = []; f.mv = null; f.lunge = 0; f.state = 'caught'; f.hold = K.catchHold;
+      setPose(f, 'caught', .1, {hold: 'leg'});
+      emit(Object.assign(base, {res: 'catch'}));
+      say('<b>' + o.name + '</b> จับขาไว้ได้ แล้วสวนด้วยหมัด');
+      o.combo = null; o.plan = null; startMove(o, f, R() < .55 ? 'catchPunch' : 'catchBody');
+      o.lunge = Math.max(0, d - 72); // step in while holding the leg, to punching range
+      return;
+    }
+    const held = o.state === 'clinched';
     let pB = o.stats.def / 100 * K.blockBase * m.gb, pD = o.stats.spd / 100 * K.dodgeBase;
     if (o.state === 'move') { pB *= .2; pD = 0; }
     else if (o.state === 'hit') { pB *= .35; pD = 0; }
     else if (o.state === 'stun') { pB *= .3; pD = 0; }
+    else if (held) { pB *= .6; pD = 0; }
+    else if (o.state === 'caught') { pB = 0; pD = 0; }
     else if (o.state === 'cover') { pD = 0; pB = o.coverLvl === m.lvl ? Math.min(.92, pB * K.coverMul + K.coverBonus) : pB * K.coverWrong; }
     if (o.st < 25) pB *= .7;
     if (m.special) { pB *= .45; pD *= .4; }
@@ -131,9 +148,11 @@ export function simulate(opts) {
       const dm = m.dmg * K.blockDmg;
       o.hp = Math.max(1, o.hp - dm); f.pts += dm * .5; o.st = Math.max(0, o.st - 2);
       if (m.lvl === 'leg') o.wearLeg += m.dmg * .25;
-      o.state = 'block'; o.hold = .2; o.q = []; o.combo = null;
-      setPose(o, m.lvl === 'leg' ? 'check' : m.lvl === 'body' ? 'blockBody' : 'block', .06);
-      o.x = clamp(o.x - o.dir * m.push * .4, -LIM, LIM);
+      if (!held) {
+        o.state = 'block'; o.hold = .2; o.q = []; o.combo = null;
+        setPose(o, m.lvl === 'leg' ? 'check' : m.lvl === 'body' ? 'blockBody' : 'block', .06);
+        o.x = clamp(o.x - o.dir * m.push * .4, -LIM, LIM);
+      }
       f.lastRes = 'block'; emit(Object.assign(base, {res: 'block', dmg: dm}));
       if (m.special) say('<b>' + o.name + '</b> บัง' + m.th + 'ไว้ได้');
       return;
@@ -150,12 +169,12 @@ export function simulate(opts) {
     o.sp = Math.min(100, o.sp + dm * K.spTake);
     o.st = Math.max(0, o.st - dm * .25);
     if (m.lvl === 'head') o.wearHead += raw; else if (m.lvl === 'body') { o.wearBody += raw; o.st = Math.max(0, o.st - raw * .25); } else o.wearLeg += raw;
-    o.x = clamp(o.x - o.dir * m.push, -LIM, LIM);
+    if (!held) o.x = clamp(o.x - o.dir * m.push, -LIM, LIM);
     f.chain = (T - f.chainT < 1.1) ? f.chain + 1 : 1; f.chainT = T;
     const big = raw >= 13 || !!m.special, sev = big ? 3 : raw >= 8 ? 2 : 1;
     o.q = []; o.mv = null; o.combo = null; o.plan = null;
-    if (!wasStun) { o.state = 'hit'; o.hold = .2 + raw / 60; }
-    setPose(o, m.react, .06, {amp: sev === 1 ? .55 : sev === 2 ? .8 : 1});
+    if (!wasStun && !held) { o.state = 'hit'; o.hold = .2 + raw / 60; }
+    setPose(o, held ? 'clinchHit' : m.react, .06, {amp: held ? 1 : sev === 1 ? .55 : sev === 2 ? .8 : 1});
     f.lastRes = 'hit';
     emit(Object.assign(base, {res: 'hit', raw, dmg: dm, sev, counter, crit, chain: f.chain}));
     const where = m.lvl === 'head' ? 'เข้าหน้า' : m.lvl === 'body' ? 'เข้าลำตัว' : 'เข้าขา';
@@ -166,14 +185,17 @@ export function simulate(opts) {
     if (lead !== G.lead) { if (G.lead >= 0) G.leadChanges++; G.lead = lead; }
 
     if (o.hp <= 0) { o.hp = 0; knockout(f, o, 'น็อก', key); return; }
-    if (m.lvl !== 'head') return;
+    if (m.lvl !== 'head' || m.noKd) return;
+    const clean = (crit || counter) && raw >= 11 && m.dmg >= 10; // flush on the button
     const chin = .65 + o.stats.chin / 100 * .7, tough = o.tough > 0 ? .5 : 1;
     let pK = 0;
     if (raw >= K.kdRaw) pK += K.kdChance;
     if (wasStun && raw >= K.kdStunRaw) pK += K.kdStunChance;
     if (o.hp < K.kdLowHp && raw >= 12) pK += K.kdLowChance;
+    if (clean) pK += K.kdClean;
+    if (m.special) pK *= K.kdSpecialMul;
     pK *= (1 + o.wearHead / K.kdWearDiv) / chin * tough;
-    if (pK > 0 && R() < pK) { knockdown(f, o, key, raw); return; }
+    if (pK > 0 && R() < pK) { knockdown(f, o, key, raw, clean); return; }
     if (!wasStun) {
       const score = o.stunCd > 0 ? 0 : raw * (m.stun || 0) * (1 + o.wearHead / K.stunWearDiv) / chin;
       if (score > K.stunMin && R() < (score - K.stunMin) / K.stunSpan) {
@@ -185,21 +207,45 @@ export function simulate(opts) {
     }
   }
 
-  function knockdown(f, o, key, raw) {
+  function knockdown(f, o, key, raw, clean) {
+    dropClinch();
     o.kd++; f.pts += K.kdPoints; o.state = 'down'; o.q = []; o.combo = null;
     setPose(o, 'fall1', .18);
     if (o.kd >= 3) { knockout(f, o, 'ทีเคโอ', key); return; }
     const ratio = o.hp / 100;
     let up = ratio > .35 ? 4 : ratio > .18 ? 6 : 8;
-    const pOut = clamp(K.outBase + (raw - 20) / K.outRawDiv - o.hp / K.outHpDiv + o.wearHead / 900, .02, .8) * (1.25 - o.stats.chin / 200);
+    const pOut = clamp(K.outBase + (raw - 20) / K.outRawDiv - o.hp / K.outHpDiv + o.wearHead / 900 + (clean ? K.outClean : 0), .02, .8) * (1.25 - o.stats.chin / 200);
     if (R() < pOut) up = 99; // will not beat the count
     G.count = {who: o, by: f, n: 0, t: -.6, up, move: key};
-    emit({type: 'kd', on: o.i, by: f.i, move: key, up: up === 99 ? 10 : up, out: up === 99});
+    emit({type: 'kd', on: o.i, by: f.i, move: key, up: up === 99 ? 10 : up, out: up === 99, clean: !!clean});
     say('<b>' + o.name + '</b> ล้มลงไป กรรมการเริ่มนับ');
     f.plan = null; f.combo = null;
   }
 
+  // ---- clinch ----
+  function dropClinch() { if (G.clinch) { G.clinch.a.grab = null; G.clinch = null; } }
+  function startClinch(f, o) {
+    G.clinch = {a: f, b: o, t: K.clinchMax, knees: K.clinchKneesMin + Math.floor(R() * K.clinchKneesSpan), next: .4};
+    if (o.state === 'stun') emit({type: 'stun_end', on: o.i});
+    f.state = 'clinch'; o.state = 'clinched'; f.plan = o.plan = null; f.combo = o.combo = null; o.q = []; o.mv = null;
+    f.st = Math.max(0, f.st - MOVES.clinch.st); f.grab = 'neck';
+    setPose(f, 'clinchHold', .2); setPose(o, 'clinchHeld', .22);
+    emit({type: 'clinch', by: f.i, on: o.i}); say('<b>' + f.name + '</b> เข้ากอดคอ');
+  }
+  function endClinch(reason) {
+    const c = G.clinch; if (!c) return;
+    dropClinch();
+    for (const x of [c.a, c.b]) {
+      if (x.state === 'ko' || x.state === 'down') continue;
+      x.state = 'idle'; x.q = []; x.mv = null; x.cool = rnd(.5, .9); setPose(x, 'guard', .28);
+      x.x = clamp(x.x - x.dir * 30, -LIM, LIM);
+    }
+    emit({type: 'break', reason, by: c.a.i, on: c.b.i});
+    say(reason === 'escape' ? '<b>' + c.b.name + '</b> สะบัดหลุดจากวงกอด' : 'กรรมการเข้าแยก');
+  }
+
   function knockout(f, o, how, key) {
+    dropClinch();
     o.state = 'ko'; o.q = []; o.combo = null;
     if (o.to !== 'down' && o.to !== 'fall1') setPose(o, 'fall1', .2);
     G.phase = 'ko'; G.koT = 0; G.count = null;
@@ -244,7 +290,9 @@ export function simulate(opts) {
             f.combo = null;
           }
         }
+        if (f.qi === 1 && G.clinch && G.clinch.a === f && R() < K.clinchEscape + o.stats.pow / 100 * .1) { endClinch('escape'); return; }
         f.qi++;
+        if (f.qi >= f.q.length && G.clinch && G.clinch.a === f) { f.state = 'clinch'; f.mv = null; return; }
         if (f.qi >= f.q.length) {
           f.state = 'idle'; f.mv = null;
           f.cool = (o.state === 'stun' || R() < K.chainChance) ? .05 : rnd(K.coolMin, K.coolMax) / (0.8 + f.stats.spd / 250);
@@ -252,6 +300,17 @@ export function simulate(opts) {
       }
       return;
     }
+    if (f.state === 'clinch') {
+      const c = G.clinch; if (!c) { f.state = 'idle'; return; }
+      const gap = clamp(d - K.clinchDist, -150 * dt, 150 * dt) / 2; // pull in to knee range
+      f.x = clamp(f.x + f.dir * gap, -LIM, LIM); o.x = clamp(o.x + o.dir * gap, -LIM, LIM);
+      c.t -= dt; c.next -= dt;
+      if (c.t <= 0 || (c.knees <= 0 && c.next <= -.15) || f.st < 6) { endClinch('ref'); return; }
+      if (c.knees > 0 && c.next <= 0) { c.knees--; c.next = .5 + R() * .25; startMove(f, o, 'clinchKnee'); }
+      return;
+    }
+    if (f.state === 'clinched') { if (done && f.to === 'clinchHit') setPose(f, 'clinchHeld', .22); return; }
+    if (f.state === 'caught') { f.hold -= dt; if (f.hold <= 0) { f.state = 'idle'; setPose(f, 'guard', .22); f.cool = .4; } return; }
     if (f.state === 'hit' || f.state === 'block' || f.state === 'cover') {
       f.hold -= dt;
       if (f.hold <= 0) { f.state = 'idle'; setPose(f, 'guard', .16); f.cool = Math.max(f.cool, rnd(.1, .35)); }
@@ -297,7 +356,11 @@ export function simulate(opts) {
     let want = 114 + Math.sin(G.t * 1.6 + f.i * 2.1) * 9;
     if (f.plan) {
       const m = MOVES[f.plan]; want = Math.max(m.min + 8, m.reach - 12); f.planT -= dt;
-      if (d <= m.reach - 4 && d >= m.min) { startMove(f, o, f.plan); return; }
+      if (d <= m.reach - 4 && d >= m.min) {
+        if (!m.grab) { startMove(f, o, f.plan); return; }
+        if (!G.clinch && ['idle', 'block', 'cover', 'hit', 'stun'].includes(o.state)) { startClinch(f, o); return; }
+        f.plan = null; f.cool = .12;
+      }
       if (f.planT <= 0) { f.plan = null; f.combo = null; f.cool = .15; }
     }
     const walk = (54 + f.stats.spd * .5) * (f.st < 25 ? .7 : 1) * (1 - Math.min(.45, f.wearLeg / 200));
@@ -305,11 +368,13 @@ export function simulate(opts) {
   }
 
   function endRound() {
+    dropClinch();
     emit({type: 'bell', n: 2});
     emit({type: 'score', round: G.round, pts: [F[0].pts, F[1].pts]});
     F.forEach(f => {
       f.q = []; f.mv = null; f.plan = null; f.combo = null;
       if (f.state === 'stun') emit({type: 'stun_end', on: f.i, bell: true});
+      f.grab = null;
       if (f.state !== 'down' && f.state !== 'getup') { f.state = 'rest'; setPose(f, 'guard', .25); }
     });
     if (G.round >= K.rounds) {
