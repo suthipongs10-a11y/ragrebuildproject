@@ -16,13 +16,13 @@ export const MOVES = {
              fr:[['upperW',.12],['upper',.09],['guard',.22]]},
   bodyshot: {th:'หมัดลำตัว', en:'Body shot', kind:'punch', sfx:'punch', lvl:'body', reach:94, min:50, dmg:9, st:5, push:5, eff:'handR', react:'hitBody', gb:.9, stun:0,
              fr:[['bodyW',.1],['bodyShot',.09],['guard',.18]]},
-  elbow:    {th:'ศอกตี', en:'Elbow', kind:'punch', sfx:'elbow', lvl:'head', reach:80, min:42, dmg:14, st:6, push:6, eff:'elbowR', react:'hitHeadSide', gb:.85, stun:1.2,
+  elbow:    {th:'ศอกตี', en:'Elbow', kind:'punch', sfx:'elbow', lvl:'head', reach:84, min:42, dmg:15, st:6, push:6, eff:'elbowR', react:'hitHeadSide', gb:.85, stun:1.2,
              fr:[['elbowW',.11],['elbow',.08],['guard',.22]]},
   spinElbow:{th:'ศอกกลับ', en:'Spinning elbow', kind:'punch', sfx:'elbow', lvl:'head', reach:84, min:44, dmg:18, st:9, push:8, eff:'elbowR', react:'hitHeadSide', gb:.8, stun:1.6,
              fr:[['spinW',.17],['spinElbow',.1],['guard',.3]]},
-  knee:     {th:'เข่าตรง', en:'Knee', kind:'kick', sfx:'knee', lvl:'body', reach:80, min:42, dmg:12, st:6, push:8, eff:'kneeR', react:'hitBody', gb:.9, stun:0,
+  knee:     {th:'เข่าตรง', en:'Knee', kind:'kick', sfx:'knee', lvl:'body', reach:86, min:42, dmg:14, st:5, push:8, eff:'kneeR', react:'hitBody', gb:.9, stun:0,
              fr:[['kneeW',.12],['knee',.1],['guard',.24]]},
-  body:     {th:'เตะลำตัว', en:'Body kick', kind:'kick', sfx:'kick', lvl:'body', reach:106, min:74, dmg:12, st:7, push:10, eff:'footR', react:'hitBodySide', gb:1, stun:0,
+  body:     {th:'เตะลำตัว', en:'Body kick', kind:'kick', sfx:'kick', lvl:'body', reach:106, min:74, dmg:11, st:7, push:10, eff:'footR', react:'hitBodySide', gb:1, stun:0,
              fr:[['kickW',.13],['kickBody',.1],['kickW',.1],['guard',.16]]},
   high:     {th:'เตะก้านคอ', en:'High kick', kind:'kick', sfx:'kick', lvl:'head', reach:102, min:76, dmg:17, st:9, push:10, eff:'footR', react:'hitHeadSide', gb:.9, stun:1.5,
              fr:[['kickW',.15],['kickHigh',.11],['kickW',.12],['guard',.18]]},
@@ -35,9 +35,9 @@ export const MOVES = {
 
   // clinch and counters
   clinch:     {th:'กอดคอ', en:'Clinch', kind:'kick', lvl:'body', reach:84, min:34, dmg:0, st:4, grab:1, fr:[]},
-  clinchKnee: {th:'กอดคอตีเข่า', en:'Clinch knee', kind:'kick', sfx:'knee', lvl:'body', reach:78, min:16, dmg:9, st:4, push:0, eff:'kneeR', react:'clinchHit', gb:.6, stun:0, inClinch:1,
+  clinchKnee: {th:'กอดคอตีเข่า', en:'Clinch knee', kind:'kick', sfx:'knee', lvl:'body', reach:78, min:16, dmg:12, st:4, push:0, eff:'kneeR', react:'clinchHit', gb:.6, stun:0, inClinch:1,
                fr:[['clinchKneeW',.17],['clinchKnee',.1],['clinchHold',.16]]},
-  clinchKneeHead: {th:'โน้มคอตีเข่า', en:'Neck-pull knee', kind:'kick', sfx:'knee', lvl:'head', reach:78, min:16, dmg:13, st:6, push:0, eff:'kneeR', react:'clinchHitHead', gb:.6, stun:1.1, inClinch:1, pull:1,
+  clinchKneeHead: {th:'โน้มคอตีเข่า', en:'Neck-pull knee', kind:'kick', sfx:'knee', lvl:'head', reach:78, min:16, dmg:16, st:6, push:0, eff:'kneeR', react:'clinchHitHead', gb:.6, stun:1.1, inClinch:1, pull:1,
                fr:[['clinchKneeW',.2],['clinchKneeHi',.1],['clinchHold',.18]]},
   clinchThrow: {th:'เหวี่ยงล้ม', en:'Clinch dump', kind:'kick', sfx:'knee', lvl:'body', reach:90, min:10, dmg:4, st:7, push:0, eff:'handR', react:'fall1', gb:1, stun:0, inClinch:1, throw:1,
                fr:[['throwW',.2],['throw',.15],['guard',.34]]},
@@ -73,14 +73,15 @@ export const COMBOS = {
 };
 
 // w = move weights, sp = specials used in rotation, b = stat bias, cb = combos and chance.
+// walk = footwork speed and tough = damage taken, for the styles that have to walk through fire to get close.
 export const STYLES = [
-  {id:'puncher', th:'หมัดหนัก', sp:['spChop','spHanu'], cc:.34, cb:['oneTwo','threePunch','lowHigh','oneTwoKick'],
+  {id:'puncher', th:'หมัดหนัก', walk:1.1, tough:.94, sp:['spChop','spHanu'], cc:.34, cb:['oneTwo','threePunch','lowHigh','oneTwoKick'],
    w:{jab:3,cross:3,hook:2.2,upper:1.6,bodyshot:1.6,elbow:1.6,spinElbow:.3,knee:.8,body:1.2,high:.5,low:1.2,teep:1.1,teepFace:.4,clinch:1.6},
    b:{pow:22,kick:-8,spd:0,def:-4,end:4,chin:4}},
   {id:'kicker', th:'จอมเตะ', sp:['spKick','spCroc'], cc:.32, cb:['legHead','teepKick','feintKick','oneTwoKick','teepTeep'],
    w:{jab:2,cross:1.1,hook:.5,upper:.3,bodyshot:.4,elbow:.7,spinElbow:.3,knee:1,body:3.4,high:1.7,low:2.4,teep:2.3,teepFace:1.3,clinch:1.3},
    b:{pow:-8,kick:22,spd:4,def:0,end:-2,chin:-4}},
-  {id:'clinch', th:'เข่าศอก', sp:['spFly','spChop'], cc:.34, cb:['elbows','kneeElbow','oneTwo','lowHigh'],
+  {id:'clinch', th:'เข่าศอก', walk:1.2, tough:.86, sp:['spFly','spChop'], cc:.34, cb:['elbows','kneeElbow','oneTwo','lowHigh'],
    w:{jab:1.8,cross:1.4,hook:1.2,upper:1.2,bodyshot:.8,elbow:2.6,spinElbow:1.1,knee:3.2,body:1.5,high:.5,low:1.1,teep:1.3,teepFace:.6,clinch:4.6},
    b:{pow:8,kick:10,spd:-4,def:2,end:10,chin:10}},
   {id:'tech', th:'ฝีมือ', sp:['spKick','spFly'], cc:.3, cb:['feintKick','jabLow','oneTwoKick','teepKick','teepTeep'],
@@ -97,7 +98,7 @@ export const RULES = {
   roundTime: 35, rounds: 3, restTime: 3.4, introTime: 3.0,
   limit: 235,            // ring half width the fighters can use
   startX: 85,
-  dmgScale: .15,          // global damage multiplier
+  dmgScale: .137,          // global damage multiplier
   blockDmg: .06,         // share of base damage that gets through a block
   blockBase: .5, dodgeBase: .12,
   // raising the guard on reading an attack: chance, and how much it helps when the read is right or wrong
@@ -105,21 +106,43 @@ export const RULES = {
   critChance: .1, critMul: 1.5, counterMul: 1.3,
   chainChance: .14,      // chance to attack again right away without a named combo
   coolMin: .4, coolMax: 1.15,
-  stRegen: 3.5, stRegenEnd: 4,
+  stRegen: 4.6, stRegenEnd: 5,
   spGain: 1.9, spTake: 1.1,
   // stun
   stunMin: 21, stunSpan: 34, stunWearDiv: 400, stunRest: 7, stunDurMin: 1.5, stunDurSpan: 1.1,
   // knockdown: only head shots put a fighter down
-  kdRaw: 21, kdChance: .05, kdStunRaw: 10, kdStunChance: .2, kdLowHp: 25, kdLowChance: .03,
+  kdRaw: 21, kdChance: .05, kdStunRaw: 10, kdStunChance: .17, kdLowHp: 25, kdLowChance: .03,
   kdWearDiv: 600, outBase: .4, outRawDiv: 50, outHpDiv: 300,
   // a clean shot (counter or flush) is what usually ends a Muay Thai fight
-  kdClean: .12, outClean: .1, kdSpecialMul: .8,
+  kdClean: .09, outClean: .1, kdSpecialMul: .8,
   // clinch: knees thrown, time before the referee breaks it, chance the held fighter shakes loose after each knee
   clinchKneesMin: 2, clinchKneesSpan: 3, clinchMax: 3.8, clinchEscape: .12, clinchDist: 48,
+  clinchStyleEscape: .45, clinchStyleKnees: 1, // a clinch specialist holds on better and gets an extra knee in
   clinchHeadKnee: .3,     // share of clinch knees that pull the head down onto the knee
   throwTry: .7, throwBase: .5, throwPoints: 5, throwDown: 1.35, // dumping the opponent out of the clinch: scores, no count
   // catching a body kick, then punching with the free hand
-  catchBase: .07, catchDef: .12, catchHold: 1.15,
+  catchBase: .09, catchDef: .12, catchHold: 1.15,
   countStep: .62, kdPoints: 15,
   restHp: 1.4, restSt: 12
+};
+
+// Fight plan: what the corner tells the fighter for a round. Each choice trades one thing for another.
+export const PLAN = {
+  ag: {attack: 'บุก', balanced: 'สมดุล', counter: 'ตั้งรับสวนกลับ'},
+  range: {out: 'วงนอก', mixed: 'ตามจังหวะ', in: 'วงใน'},
+  target: {head: 'หัว', body: 'ลำตัว', leg: 'ขา', mixed: 'ผสม'}
+};
+export const PLAN_DEFAULT = {ag: 'balanced', range: 'mixed', target: 'mixed'};
+export const PLAN_RULES = {
+  attackCool: .72, counterCool: 1.3, attackCover: .65, counterCover: 1.25, attackSt: 1.08, counterSt: .92, attackDmg: 1.05, counterBonus: .3,
+  jam: .94, keepAway: .8, outRegen: .93, inCover: .8, outVsIn: 1.12, // walking in leaves the guard open, and a fighter kept outside eats long weapons // crowding blunts kicks; staying outside blunts close weapons but costs legs
+  outDist: 12, inDist: -16,
+  outMoves: ['body', 'high', 'low', 'teep', 'teepFace', 'jab'], inMoves: ['elbow', 'spinElbow', 'knee', 'hook', 'upper', 'bodyshot'],
+  rangeUp: 1.3, rangeDown: .65, clinchOut: .5, clinchIn: 1.3, targetUp: 1.8, targetDown: .7, legUp: 3.4
+};
+
+// How a computer-run fighter of each style fights. The player's corner advice is measured against these (tools/plans.mjs).
+export const STYLE_PLAN = {
+  puncher: {ag: 'attack', range: 'mixed', target: 'head'}, kicker: {ag: 'balanced', range: 'out', target: 'mixed'},
+  clinch: {ag: 'balanced', range: 'mixed', target: 'body'}, tech: {ag: 'counter', range: 'mixed', target: 'mixed'}
 };

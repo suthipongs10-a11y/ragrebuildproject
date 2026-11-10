@@ -5,10 +5,10 @@ import { readFileSync, writeFileSync, mkdirSync, copyFileSync, existsSync } from
 import { resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const r = await build({entryPoints: ['src/main.js'], bundle: true, format: 'iife', minify: process.argv.includes('--min'), write: false, target: 'es2019', legalComments: 'none',
+const bundle = async entry => (await build({entryPoints: [entry], bundle: true, format: 'iife', minify: process.argv.includes('--min'), write: false, target: 'es2019', legalComments: 'none',
   // loaders from the three package import 'three'; point that at the page's global THREE instead of a second copy
-  plugins: [{name: 'three-global', setup(b) { b.onResolve({filter: /^three$/}, () => ({path: resolve('src/three-shim.cjs')})); }}]});
-const js = r.outputFiles[0].text.replace(/<\/script/g, '<\\/script');
+  plugins: [{name: 'three-global', setup(b) { b.onResolve({filter: /^three$/}, () => ({path: resolve('src/three-shim.cjs')})); }}]})).outputFiles[0].text.replace(/<\/script/g, '<\\/script');
+const js = await bundle('src/main.js'), jsGame = await bundle('src/entry-game.js');
 const html = readFileSync('src/page.html', 'utf8').replace('/*__APP__*/', () => js);
 mkdirSync('dist', {recursive: true});
 writeFileSync('dist/muay-fight-lab.html', html);
@@ -40,6 +40,12 @@ for (const name of ['fighter-a', 'fighter-b', 'fighter-c', 'fighter-d', 'fighter
   models.push(`<script type="application/json" id="model-${name.slice(-1)}">${text}</script>`);
   console.log(name, (text.length / 1024 / 1024).toFixed(2) + ' MB');
 }
-const page = readFileSync('dist/muay-fight-lab.html', 'utf8').replace('<!--__MODELS__-->', () => models.join('\n'));
+const withModels = readFileSync('dist/muay-fight-lab.html', 'utf8').replace('<!--__MODELS__-->', () => models.join('\n'));
+// two pages from one source: the presentation lab, and the game (same viewer plus the game screens)
+const page = withModels.replace('<!--G:top-->', '').replace('<!--G:body-->', '');
 writeFileSync('dist/muay-fight-lab.html', page);
+const game = readFileSync('src/page.html', 'utf8').replace('/*__APP__*/', () => jsGame).replace('<!--__MODELS__-->', () => models.join('\n')).replace('<title>Muay Fight Lab 3D</title>', '<title>Muay Manager</title>')
+  .replace('<!--G:top-->', '<div id="game"><div class="gbar" id="gTop"></div></div>')
+  .replace('<!--G:body-->', '<nav class="gnav" id="gNav" aria-label="เมนูเกม"></nav><div class="gbody" id="gBody"></div>');
+writeFileSync('dist/muay-manager.html', game);
 console.log('dist/muay-fight-lab.html with models', (page.length / 1024 / 1024).toFixed(2) + ' MB (limit 16)');
