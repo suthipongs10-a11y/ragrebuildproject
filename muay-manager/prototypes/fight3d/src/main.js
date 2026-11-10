@@ -59,7 +59,7 @@ try { // remembered per viewer
   if (Array.isArray(sv)) sv.forEach((l, i) => { if (!LOOK[i] || !l) return; LOOK[i].name = cleanName(l.name); for (const k in LOOK_FIELDS) if (LOOK_FIELDS[k][l[k]]) LOOK[i][k] = l[k]; });
 } catch (e) { /* storage unavailable: defaults apply */ }
 const modelCache = {};
-function ensureModel(id) { return modelCache[id] || (modelCache[id] = loadModel('fighter-' + id + '.json', id, ROSTER[id][1])); }
+function ensureModel(id) { return modelCache[id] || (modelCache[id] = loadModel(id, ROSTER[id][1])); }
 async function loadPair() {
   $('modelNote').textContent = 'กำลังโหลดนักมวย… ';
   try {
@@ -602,7 +602,7 @@ buildUi(); layout();
 const start = async () => {
   arena = buildArena(scene); fx = buildFx(scene);
   await loadPair();
-  $('ver').textContent = 'รุ่น 4.1 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 4.2 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: straight punch, high kick, elbow, flying knee, and a close decision
