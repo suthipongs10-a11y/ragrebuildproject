@@ -3,8 +3,9 @@
 import { simulate } from './sim.js';
 import { MOVES, COMBOS, STYLES, STAT_TH, RULES } from './data.js';
 import { bake, EFF_NAME } from './timeline.js';
-import { Fighter, EFF_JOINT, STYLE_BUILD } from './rig.js';
-import { NP, FLAT } from './poses.js';
+import { Fighter, EFF_JOINT, STYLE_BUILD, setDims, DIM_DEFAULT } from './rig.js';
+import { NP, FLAT, scalePoses } from './poses.js';
+import { loadModel, ModelFighter } from './model.js';
 import { buildArena } from './arena.js';
 import { buildFx } from './fx.js';
 import { buildAudio } from './audio.js';
@@ -29,7 +30,8 @@ const PRESET_NOTE = {
 };
 const DETAIL = [
   {key: 'cam', th: 'มุมกล้อง', opts: [['tv', 'ถ่ายทอดสด'], ['side', 'ด้านข้าง'], ['director', 'ผู้กำกับ'], ['low', 'ข้างเวที'], ['orbit', 'วนรอบ']]},
-  {key: 'build', th: 'รูปร่างนักมวย', opts: [['auto', 'ตามสายมวย'], ['heavy', 'ถึก'], ['athletic', 'สมส่วน'], ['lean', 'เพรียว']]},
+  {key: 'fighter', th: 'ตัวนักมวย', opts: [['model', 'โมเดล 3D'], ['code', 'สร้างจากโค้ด']]},
+  {key: 'build', th: 'รูปร่าง (แบบโค้ด)', opts: [['auto', 'ตามสายมวย'], ['heavy', 'ถึก'], ['athletic', 'สมส่วน'], ['lean', 'เพรียว']]},
   {key: 'style', th: 'ผิวภาพ', opts: [['real', 'สมจริง'], ['toon', 'การ์ตูน']]},
   {key: 'slow', th: 'สโลว์', opts: [[0, 'ปิด'], [1, 'ตอนน็อก'], [2, 'หมัดใหญ่']]},
   {key: 'stop', th: 'หยุดภาพตอนโดน', opts: [[0, 'ปิด'], [1, 'ปกติ'], [2, 'หนัก']]},
@@ -38,7 +40,8 @@ const DETAIL = [
   {key: 'labels', th: 'ป้ายชื่อท่า', opts: [[0, 'ปิด'], [1, 'ท่าใหญ่'], [2, 'ทุกจังหวะ']]},
   {key: 'replay', th: 'ภาพช้า', opts: [[0, 'ปิด'], [1, 'ตอนน็อก'], [2, 'น็อกและพักยก']]}
 ];
-const OPT = Object.assign({preset: 'tv', build: 'auto'}, PRESETS.tv);
+const OPT = Object.assign({preset: 'tv', build: 'auto', fighter: 'model'}, PRESETS.tv);
+let MODEL = null, MODELS = []; // generated characters per corner, when they loaded (MODEL = shared proportions)
 const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- scene ----------
@@ -67,14 +70,24 @@ let replays = [], rpi = 0, curRp = null, tvCuts = [], builtAs = '', slowWins = [
 const buf = [new Float32Array(NP), new Float32Array(NP)];
 const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3(), lastTrail = [new THREE.Vector3(), new THREE.Vector3()];
 
+const fighterKey = () => (OPT.fighter === 'model' && MODEL ? 'model' : 'code:' + OPT.build);
+// The skeleton takes the proportions of whichever body is in use, and the poses scale to match.
+function useDims() {
+  if (OPT.fighter === 'model' && MODEL) {
+    const D = DIM_DEFAULT, m = MODEL.dims, kHip = MODEL.standHips / (D.thigh + D.shin + D.ankle + D.hipY);
+    const g = .88, kY = (g * kHip + m.spine + m.neck + m.head) / (g + D.spine + D.neck + D.head);
+    setDims(m); scalePoses(kHip, kY);
+  } else { setDims(); scalePoses(1, 1); }
+}
 function makeFighters() {
   fighters.forEach(f => scene.remove(f.root));
-  fighters = fight.specs.map((sp, i) => new Fighter(i, {skin: sp.skin + i, build: OPT.build === 'auto' ? STYLE_BUILD[sp.style] : OPT.build, hair: sp.skin + sp.stats.spd + i, tattoo: (sp.stats.pow + i) % 2 === 0}));
+  fighters = fight.specs.map((sp, i) => OPT.fighter === 'model' && MODEL ? new ModelFighter(i, MODELS[i] || MODELS[0])
+    : new Fighter(i, {skin: sp.skin + i, build: OPT.build === 'auto' ? STYLE_BUILD[sp.style] : OPT.build, hair: sp.skin + sp.stats.spd + i, tattoo: (sp.stats.pow + i) % 2 === 0}));
   fighters.forEach(f => { scene.add(f.root); f.setStyle(OPT.style); });
-  builtAs = OPT.build;
+  builtAs = fighterKey();
 }
 function newFight(seed) {
-  fight = simulate({seed}); TL = bake(fight); EV = fight.events;
+  useDims(); fight = simulate({seed}); TL = bake(fight); EV = fight.events;
   makeFighters();
   // landmarks the director and the slow motion need
   marks = {specials: [], kds: [], rests: [], stuns: [], bigHits: [], hits: [], rounds: [], introEnd: RULES.introTime, ko: null, dec: null, decPhase: null, over: fight.duration};
@@ -343,7 +356,7 @@ function direct(t) {
     else if (c.cam === 'tight') { s.px = mid * .3; s.py = 1.8; s.pz = 8.4; s.fit = sep + 1.5; s.fitH = 1.75; s.ty = 1.2; }
     else if (c.cam === 'high') { s.px = flip * 6.6; s.py = 4.6; s.pz = 6.6; s.tx = mid * .6; s.ty = .8; s.fit = sep + 4.2; s.fitH = 3.5; }
     else if (c.cam === 'low') {
-      s.px = mid + flip * 1.4; s.py = .55; s.pz = 4.75; s.hand = 1; s.fit = sep + 2.3; s.fitH = 2.5; s.ty = 1.08; s.ropes = 1;
+      s.px = mid + flip * 1.4; s.py = .55; s.pz = 4.75; s.hand = 1; s.fit = sep + 2.3; s.fitH = 2.5; s.ty = 1.08; s.ropes = .45;
       if (who >= 0) { s.px = wx + (who ? -1.6 : 1.6); s.py = 1.1; s.tx = lerp(mid, wx - (who ? -.7 : .7), .6); s.ty = .5; s.fit = 3.6; s.fitH = 2.0; s.ropes = .18; }
     } else { s.px = wx * .4; s.py = 1.85; s.pz = 8.6; s.tx = wx; s.ty = 1.42; s.fit = 1.25; s.fitH = 1.1; }
     if (c.cam === 'main' || c.cam === 'tight') { s.fit *= 1 - push * .12; s.fitH *= 1 - push * .12; }
@@ -474,7 +487,7 @@ function renderCards() {
 }
 function applyOpt() {
   arena.setLook(OPT.look, renderer, scene);
-  if (fight && builtAs !== OPT.build) makeFighters();
+  if (fight && builtAs !== fighterKey()) { const t = playT; useDims(); TL = bake(fight); makeFighters(); seek(t); } // another body: re-aim every strike for its reach
   fighters.forEach(f => f.setStyle(OPT.style));
   fx.amount = OPT.look === 'arcade' ? 1.5 : OPT.look === 'broadcast' ? .7 : 1; fx.trailWidth = OPT.look === 'arcade' ? .13 : .085;
   stage.dataset.look = OPT.look;
@@ -520,13 +533,23 @@ window.LAB = {
   gallery(names, az, style) {
     galleryOn = true; fighters.forEach(f => { f.root.visible = false; }); arena.group.visible = false; scene.fog = null; scene.background = new THREE.Color(0x3a4150);
     (window.LAB._g || []).forEach(f => scene.remove(f.root));
-    window.LAB._g = names.map((n, i) => { const f = new Fighter(i % 2, typeof style === 'object' ? style : {skin: i, build: ['heavy', 'athletic', 'lean'][i % 3], hair: i, tattoo: i % 2 === 0}); f.setStyle(typeof style === 'string' ? style : 'real'); f.update(FLAT[n], 0, (i - (names.length - 1) / 2) * 1.3); scene.add(f.root); return f; });
+    window.LAB._g = names.map((n, i) => { const f = OPT.fighter === 'model' && MODEL ? new ModelFighter(i % 2, MODELS[i % 2] || MODELS[0]) : new Fighter(i % 2, typeof style === 'object' ? style : {skin: i, build: ['heavy', 'athletic', 'lean'][i % 3], hair: i, tattoo: i % 2 === 0}); f.setStyle(typeof style === 'string' ? style : 'real'); scene.add(f.root); f.update(FLAT[n], 0, (i - (names.length - 1) / 2) * 1.3); return f; });
     const D = names.length * 1.3 / 2 / Math.tan(Math.atan(Math.tan(camera.fov * Math.PI / 360) * camera.aspect)) + .4, a = az || 0;
     camera.position.set(Math.sin(a) * D, 1.3, Math.cos(a) * D); camera.lookAt(0, 1.0, 0);
   }
 };
 
 buildUi(); layout();
-const start = () => { arena = buildArena(scene); fx = buildFx(scene); newFight(DEFAULT_SEED); applyOpt(); requestAnimationFrame(frame); };
+const start = async () => {
+  arena = buildArena(scene); fx = buildFx(scene);
+  try {
+    MODELS = [await loadModel('fighter-a.json')];
+    try { const b = await loadModel('fighter-b.json'); b.corner = 1; MODELS.push(b); } catch (e) { /* no second model: the first is recoloured for the blue corner */ }
+    // both fighters share one skeleton, sized halfway between the models
+    const dims = {}; for (const k in MODELS[0].dims) dims[k] = MODELS.reduce((a, m) => a + m.dims[k], 0) / MODELS.length;
+    MODEL = {dims, standHips: MODELS.reduce((a, m) => a + m.standHips, 0) / MODELS.length};
+  } catch (e) { MODEL = null; MODELS = []; OPT.fighter = 'code'; console.warn('3D model not loaded, using the code-built fighter:', e.message); }
+  newFight(DEFAULT_SEED); applyOpt(); requestAnimationFrame(frame);
+};
 const DEFAULT_SEED = 7537;
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(start, start); else start();

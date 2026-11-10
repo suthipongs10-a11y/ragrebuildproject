@@ -85,3 +85,15 @@ export function flat(p) {
 }
 export const FLAT = {};
 for (const k in POSES) FLAT[k] = flat(POSES[k]);
+
+// Poses were authored for the default skeleton. A model with other proportions scales the heights:
+// pelvis height by kHip, hand and foot heights by kY. scalePoses(1, 1) restores the originals.
+const FLAT_BASE = {};
+for (const k in FLAT) FLAT_BASE[k] = new Float32Array(FLAT[k]);
+export function scalePoses(kHip, kY) {
+  for (const k in FLAT) {
+    const a = FLAT[k], b = FLAT_BASE[k]; a.set(b);
+    a[IDX.hip + 1] = b[IDX.hip + 1] * kHip;
+    for (const i of [IDX.hL, IDX.hR, IDX.fL, IDX.fR]) a[i + 1] = b[i + 1] * kY;
+  }
+}

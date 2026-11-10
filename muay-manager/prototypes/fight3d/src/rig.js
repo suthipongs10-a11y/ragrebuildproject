@@ -3,7 +3,9 @@
 import { IDX } from './poses.js';
 const THREE = globalThis.THREE;
 
-export const DIM = {thigh: .45, shin: .45, spine: .32, shY: .24, shW: .19, hipW: .10, neck: .28, head: .13, ua: .29, fa: .30, ankle: .07};
+export const DIM = {thigh: .45, shin: .45, spine: .32, shY: .24, shW: .19, hipW: .10, hipY: .02, neck: .28, head: .13, ua: .29, fa: .30, ankle: .07};
+export const DIM_DEFAULT = Object.assign({}, DIM);
+export function setDims(d) { Object.assign(DIM, DIM_DEFAULT, d || {}); } // a loaded model brings its own proportions
 const JN = ['hip', 'chest', 'neck', 'head', 'shL', 'shR', 'elL', 'elR', 'haL', 'haR', 'hpL', 'hpR', 'knL', 'knR', 'anL', 'anR'];
 export function makeJoints() {
   const J = {qp: new THREE.Quaternion(), qc: new THREE.Quaternion(), qh: new THREE.Quaternion()};
@@ -39,13 +41,23 @@ export function solve(P, o, J) {
   q1.setFromAxisAngle(AZ, -(P[o + I.lean] * .6 + P[o + I.hdP])); q2.setFromAxisAngle(AX, P[o + I.side] * .5); q3.setFromAxisAngle(AY, -P[o + I.hdY]);
   J.qh.copy(q1).multiply(q2).multiply(q3);
   J.hip.set(P[o], P[o + 1], P[o + 2]);
+  // keep planted feet on the floor: if a standing leg cannot reach its foot, the pelvis sinks until it can
+  let drop = 0;
+  for (const s of [-1, 1]) {
+    const fb = s < 0 ? I.fL : I.fR;
+    if (P[o + fb + 1] > .08) continue;
+    v1.set(0, -DIM.hipY, s * DIM.hipW).applyQuaternion(J.qp).add(J.hip);
+    const dh = Math.hypot(P[o + fb] - v1.x, P[o + fb + 2] - v1.z), L = DIM.thigh + DIM.shin - .012;
+    if (dh < L) drop = Math.max(drop, v1.y - (P[o + fb + 1] + DIM.ankle + Math.sqrt(L * L - dh * dh)));
+  }
+  if (drop > 0) J.hip.y -= drop;
   J.chest.set(0, DIM.spine, 0).applyQuaternion(J.qp).add(J.hip);
   J.neck.set(0, DIM.neck, 0).applyQuaternion(J.qc).add(J.chest);
   J.head.set(0, DIM.head, 0).applyQuaternion(J.qh).add(J.neck);
   J.shL.set(0, DIM.shY, -DIM.shW).applyQuaternion(J.qc).add(J.chest);
   J.shR.set(0, DIM.shY, DIM.shW).applyQuaternion(J.qc).add(J.chest);
-  J.hpL.set(0, -.02, -DIM.hipW).applyQuaternion(J.qp).add(J.hip);
-  J.hpR.set(0, -.02, DIM.hipW).applyQuaternion(J.qp).add(J.hip);
+  J.hpL.set(0, -DIM.hipY, -DIM.hipW).applyQuaternion(J.qp).add(J.hip);
+  J.hpR.set(0, -DIM.hipY, DIM.hipW).applyQuaternion(J.qp).add(J.hip);
   ik(J.shL, P[o + I.hL], P[o + I.hL + 1], P[o + I.hL + 2], DIM.ua, DIM.fa, P[o + I.eL], P[o + I.eL + 1], P[o + I.eL + 2], J.elL, J.haL);
   ik(J.shR, P[o + I.hR], P[o + I.hR + 1], P[o + I.hR + 2], DIM.ua, DIM.fa, P[o + I.eR], P[o + I.eR + 1], P[o + I.eR + 2], J.elR, J.haR);
   ik(J.hpL, P[o + I.fL], P[o + I.fL + 1] + DIM.ankle, P[o + I.fL + 2], DIM.thigh, DIM.shin, P[o + I.kL], P[o + I.kL + 1], P[o + I.kL + 2], J.knL, J.anL);

@@ -146,7 +146,7 @@ export function buildArena(scene) {
   // look: lighting mood per preset
   A.setLook = function (look, renderer, scene) {
     const L = {
-      broadcast: {bg: 0x12141c, fog: .018, hemi: .75, key: 1.5, rim: 10, crowd: 60, beam: .012, exp: 1.0},
+      broadcast: {bg: 0x12141c, fog: .018, hemi: 1.05, key: 1.6, rim: 10, crowd: 60, beam: .012, exp: 1.0},
       cinema: {bg: 0x06070b, fog: .034, hemi: .28, key: 1.9, rim: 55, crowd: 12, beam: .03, exp: 1.0},
       arcade: {bg: 0x15102a, fog: .02, hemi: .9, key: 1.5, rim: 40, crowd: 45, beam: .022, exp: 1.05},
       ringside: {bg: 0x0a0b10, fog: .028, hemi: .45, key: 1.7, rim: 34, crowd: 28, beam: .025, exp: 1.0}
