@@ -131,7 +131,7 @@ function newFight(seed) {
     else if (e.type === 'stun') { stunOpen[e.on] = {t0: e.t, t1: e.t + e.dur, on: e.on}; marks.stuns.push(stunOpen[e.on]); }
     else if (e.type === 'stun_end' && stunOpen[e.on]) { stunOpen[e.on].t1 = e.t; stunOpen[e.on] = null; }
     else if (e.type === 'kd') { kdOpen = {t0: e.t + .5, t1: fight.duration, on: e.on, by: e.by, t: e.t, up: null}; marks.kds.push(kdOpen); if (stunOpen[e.on]) { stunOpen[e.on].t1 = e.t; stunOpen[e.on] = null; } if (round) round.kd = e; }
-    else if (e.type === 'getup' && kdOpen) { kdOpen.t1 = e.t + .5; kdOpen.up = e.t; kdOpen = null; }
+    else if (e.type === 'getup' && kdOpen && !e.thrown) { kdOpen.t1 = e.t + .5; kdOpen.up = e.t; kdOpen = null; }
     else if (e.type === 'ko') { marks.ko = e; if (kdOpen) { kdOpen.t1 = e.t; } }
     else if (e.type === 'clinch') { clinchOpen = {t0: e.t, t1: e.t + 4}; marks.clinches.push(clinchOpen); }
     else if (e.type === 'break' && clinchOpen) { clinchOpen.t1 = e.t; clinchOpen = null; }
@@ -272,6 +272,9 @@ function handle(e) {
       hype = Math.min(1, hype + .3);
       if (!rp && OPT.labels >= 1) { poseFighters(e.t); pop('กอดคอตีเข่า!', fighters[e.by].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'gold'); }
       break;
+    case 'throw':
+      if (e.ok) { hype = 1; shake = Math.max(shake, OPT.shake * .04 * (REDUCED ? 0 : 1)); if (!rp) { audio.roar(.7); setTimeout(() => audio.thud(), 330); if (OPT.labels >= 1) { poseFighters(e.t); pop('เหวี่ยงล้ม!', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'gold big', 1.2); } } }
+      break;
     case 'break':
       if (!rp && OPT.labels >= 2) { poseFighters(e.t); pop(e.reason === 'escape' ? 'สะบัดหลุด' : 'กรรมการแยก', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'small'); }
       break;
@@ -345,7 +348,7 @@ function handle(e) {
       hype = 1; if (!rp) { audio.roar(1); flash(.3); poseFighters(e.t); pop('ล้ม!', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .5, 0)), 'red big', 1.3); setTimeout(() => audio.thud(), 380); }
       break;
     case 'count': if (!rp) { const c = $('count'); c.textContent = e.n; c.hidden = false; c.style.animation = 'none'; void c.offsetWidth; c.style.animation = ''; audio.count(); } break;
-    case 'getup': if (!rp) { $('count').hidden = true; audio.roar(.4); } break;
+    case 'getup': if (!rp && !e.thrown) { $('count').hidden = true; audio.roar(.4); } break;
     case 'ko':
       hype = 1; $('count').hidden = true;
       if (!rp) { banner(e.how === 'น็อก' ? 'น็อก!!' : 'ทีเคโอ!', 'red huge'); audio.roar(1.2); setTimeout(() => audio.thud(), 420); }

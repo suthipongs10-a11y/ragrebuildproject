@@ -37,6 +37,10 @@ export const MOVES = {
   clinch:     {th:'กอดคอ', en:'Clinch', kind:'kick', lvl:'body', reach:84, min:34, dmg:0, st:4, grab:1, fr:[]},
   clinchKnee: {th:'กอดคอตีเข่า', en:'Clinch knee', kind:'kick', sfx:'knee', lvl:'body', reach:78, min:16, dmg:9, st:4, push:0, eff:'kneeR', react:'clinchHit', gb:.6, stun:0, inClinch:1,
                fr:[['clinchKneeW',.17],['clinchKnee',.1],['clinchHold',.16]]},
+  clinchKneeHead: {th:'โน้มคอตีเข่า', en:'Neck-pull knee', kind:'kick', sfx:'knee', lvl:'head', reach:78, min:16, dmg:13, st:6, push:0, eff:'kneeR', react:'clinchHitHead', gb:.6, stun:1.1, inClinch:1, pull:1,
+               fr:[['clinchKneeW',.2],['clinchKneeHi',.1],['clinchHold',.18]]},
+  clinchThrow: {th:'เหวี่ยงล้ม', en:'Clinch dump', kind:'kick', sfx:'knee', lvl:'body', reach:90, min:10, dmg:4, st:7, push:0, eff:'handR', react:'fall1', gb:1, stun:0, inClinch:1, throw:1,
+               fr:[['throwW',.2],['throw',.15],['guard',.34]]},
   catchPunch: {th:'จับขาชกหน้า', en:'Catch and punch', kind:'punch', sfx:'punch', lvl:'head', reach:140, min:16, dmg:9, st:4, push:24, eff:'handR', react:'hitHeadBack', gb:1, stun:0, noKd:1,
                fr:[['catchHold',.2],['catchPunch',.1],['catchHold',.1],['guard',.2]]},
   catchBody:  {th:'จับขาชกลำตัว', en:'Catch and body shot', kind:'punch', sfx:'punch', lvl:'body', reach:140, min:16, dmg:9, st:4, push:24, eff:'handR', react:'hitBody', gb:1, stun:0, noKd:1,
@@ -71,16 +75,16 @@ export const COMBOS = {
 // w = move weights, sp = specials used in rotation, b = stat bias, cb = combos and chance.
 export const STYLES = [
   {id:'puncher', th:'หมัดหนัก', sp:['spChop','spHanu'], cc:.34, cb:['oneTwo','threePunch','lowHigh','oneTwoKick'],
-   w:{jab:3,cross:3,hook:2.2,upper:1.6,bodyshot:1.6,elbow:1.6,spinElbow:.3,knee:.8,body:1.2,high:.5,low:1.2,teep:1.1,teepFace:.4,clinch:1.1},
+   w:{jab:3,cross:3,hook:2.2,upper:1.6,bodyshot:1.6,elbow:1.6,spinElbow:.3,knee:.8,body:1.2,high:.5,low:1.2,teep:1.1,teepFace:.4,clinch:1.6},
    b:{pow:22,kick:-8,spd:0,def:-4,end:4,chin:4}},
   {id:'kicker', th:'จอมเตะ', sp:['spKick','spCroc'], cc:.32, cb:['legHead','teepKick','feintKick','oneTwoKick','teepTeep'],
-   w:{jab:2,cross:1.1,hook:.5,upper:.3,bodyshot:.4,elbow:.7,spinElbow:.3,knee:1,body:3.4,high:1.7,low:2.4,teep:2.3,teepFace:1.3,clinch:.9},
+   w:{jab:2,cross:1.1,hook:.5,upper:.3,bodyshot:.4,elbow:.7,spinElbow:.3,knee:1,body:3.4,high:1.7,low:2.4,teep:2.3,teepFace:1.3,clinch:1.3},
    b:{pow:-8,kick:22,spd:4,def:0,end:-2,chin:-4}},
   {id:'clinch', th:'เข่าศอก', sp:['spFly','spChop'], cc:.34, cb:['elbows','kneeElbow','oneTwo','lowHigh'],
-   w:{jab:1.8,cross:1.4,hook:1.2,upper:1.2,bodyshot:.8,elbow:2.6,spinElbow:1.1,knee:3.2,body:1.5,high:.5,low:1.1,teep:1.3,teepFace:.6,clinch:3.4},
+   w:{jab:1.8,cross:1.4,hook:1.2,upper:1.2,bodyshot:.8,elbow:2.6,spinElbow:1.1,knee:3.2,body:1.5,high:.5,low:1.1,teep:1.3,teepFace:.6,clinch:4.6},
    b:{pow:8,kick:10,spd:-4,def:2,end:10,chin:10}},
   {id:'tech', th:'ฝีมือ', sp:['spKick','spFly'], cc:.3, cb:['feintKick','jabLow','oneTwoKick','teepKick','teepTeep'],
-   w:{jab:3,cross:1.7,hook:1,upper:.6,bodyshot:.8,elbow:1.1,spinElbow:.6,knee:1.1,body:2.1,high:1,low:1.8,teep:2.7,teepFace:1.5,clinch:1.1},
+   w:{jab:3,cross:1.7,hook:1,upper:.6,bodyshot:.8,elbow:1.1,spinElbow:.6,knee:1.1,body:2.1,high:1,low:1.8,teep:2.7,teepFace:1.5,clinch:1.6},
    b:{pow:-4,kick:2,spd:14,def:16,end:0,chin:-2}}
 ];
 
@@ -111,7 +115,9 @@ export const RULES = {
   // a clean shot (counter or flush) is what usually ends a Muay Thai fight
   kdClean: .12, outClean: .1, kdSpecialMul: .8,
   // clinch: knees thrown, time before the referee breaks it, chance the held fighter shakes loose after each knee
-  clinchKneesMin: 2, clinchKneesSpan: 3, clinchMax: 3.8, clinchEscape: .16, clinchDist: 48,
+  clinchKneesMin: 2, clinchKneesSpan: 3, clinchMax: 3.8, clinchEscape: .12, clinchDist: 48,
+  clinchHeadKnee: .3,     // share of clinch knees that pull the head down onto the knee
+  throwTry: .7, throwBase: .5, throwPoints: 5, throwDown: 1.35, // dumping the opponent out of the clinch: scores, no count
   // catching a body kick, then punching with the free hand
   catchBase: .07, catchDef: .12, catchHold: 1.15,
   countStep: .62, kdPoints: 15,

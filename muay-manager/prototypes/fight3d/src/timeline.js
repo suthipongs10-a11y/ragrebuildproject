@@ -158,6 +158,10 @@ export function bake(fight) {
         out[IDX.fL + 1] += Math.max(0, Math.sin(beat)) * .04; out[IDX.hip] += Math.sin(beat * .5) * .012;
         out[IDX.hL] += Math.sin(beat * .5) * .02; out[IDX.hR + 1] += Math.cos(beat * .5) * .012;
       }
+      if (st === STATE.clinch || st === STATE.clinched) { // wrestling for position: both sway and twist against each other
+        const w = t * 6.3, sgn = i ? -1 : 1;
+        out[IDX.hip + 2] += Math.sin(w) * .035 * sgn; out[IDX.turn] += Math.sin(w * .8 + 1) * .1; out[IDX.side] += Math.sin(w) * .07 * sgn; out[IDX.hip] += Math.sin(w * .55) * .02;
+      }
       if (st === STATE.idle || st === STATE.rest || st === STATE.intro) {
         const ph = t * 7 + i * 2.3, tired = TK[(k * 2 + i) * TICK_FIELDS + 2] < 25 && st === STATE.idle ? 1 : 0;
         out[IDX.hip + 1] += Math.sin(ph) * .012 - tired * .02;

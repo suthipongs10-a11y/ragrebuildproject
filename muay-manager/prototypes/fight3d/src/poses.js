@@ -58,6 +58,11 @@ export const POSES = {
   clinchKneeW: P({turn: .3, twist: 0, lean: .08, hip: [0, .9, 0], hL: [.44, 1.46, -.07], hR: [.44, 1.46, .07], eL: [-.1, -1, -.7], eR: [-.1, -1, .7], fL: [.14, .02, -.17], fR: [-.34, .22, .17], kR: [.5, -.4, .3]}),
   clinchKnee: P({turn: -.25, twist: 0, lean: -.16, hip: [.1, .95, 0], hL: [.4, 1.36, -.07], hR: [.4, 1.36, .07], eL: [-.1, -1, -.7], eR: [-.1, -1, .7], fL: [.14, .05, -.17], fR: [.26, .6, .04], kR: [1, .6, 0]}),
   clinchHit: P({turn: .1, twist: 0, lean: .62, hdP: .4, hip: [-.07, .8, 0], hL: [.28, 1.04, -.13], hR: [.26, 1.02, .13], fL: [.16, 0, -.2], fR: [-.24, 0, .2]}),
+  clinchPulled: P({turn: .1, twist: 0, lean: .78, hdP: .3, hip: [-.02, .8, 0], hL: [.3, .95, -.16], hR: [.28, .92, .16], fL: [.16, 0, -.22], fR: [-.24, 0, .22]}),
+  clinchKneeHi: P({turn: -.25, twist: 0, lean: -.2, hip: [.12, .97, 0], hL: [.38, 1.2, -.07], hR: [.38, 1.2, .07], eL: [-.1, -1, -.7], eR: [-.1, -1, .7], fL: [.14, .06, -.17], fR: [.3, .78, .04], kR: [1, .7, 0]}),
+  clinchHitHead: P({turn: .1, twist: 0, lean: -.05, hdP: -.55, hip: [-.08, .84, 0], hL: [.26, 1.1, -.2], hR: [.22, 1.05, .2], fL: [.16, 0, -.22], fR: [-.26, 0, .22]}),
+  throwW: P({turn: .7, twist: .3, lean: .18, side: .1, hip: [.04, .84, 0], hL: [.44, 1.46, -.07], hR: [.44, 1.46, .07], eL: [-.1, -1, -.7], eR: [-.1, -1, .7], fL: [.2, 0, -.2], fR: [-.2, 0, .22]}),
+  throw: P({turn: -.9, twist: -.5, lean: .32, side: -.25, hip: [.02, .8, .06], hL: [.3, 1.0, .25], hR: [.1, .95, .4], fL: [.26, 0, -.24], fR: [-.22, 0, .1]}),
   // kick caught: the kicker hops on one leg; the catcher clamps the ankle at his side and punches with the free hand
   caught: P({turn: -1.0, twist: .35, lean: -.25, side: -.1, hip: [.02, .9, 0], fR: [.85, 1.0, -.1], kR: [.5, .3, 1], fL: [.2, .03, -.13], hL: [.25, 1.42, -.32], hR: [-.1, 1.28, .42]}),
   catchHold: P({turn: .5, lean: .1, hip: [0, .86, 0], hL: [.22, 1.04, -.24], eL: [-.5, -.3, -1], hR: [.2, 1.46, .15]}),

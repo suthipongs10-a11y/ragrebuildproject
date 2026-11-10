@@ -5,7 +5,7 @@ import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES } from './data.js';
 
 export const SIM_VERSION = 'proto-0.3';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
-export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14};
+export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
 function mulberry32(seed) {
   let a = seed >>> 0;
@@ -107,7 +107,20 @@ export function simulate(opts) {
   function resolve(f, o) {
     const m = f.mv, key = f.mvKey, d = Math.abs(o.x - f.x);
     const base = {type: 'hit', by: f.i, on: o.i, move: key, lvl: m.lvl, special: !!m.special, raw: 0, dmg: 0, sev: 0, counter: false, crit: false, chain: 0};
-    if (o.state === 'down' || o.state === 'getup' || o.state === 'ko' || o.inv > 0) { f.lastRes = 'miss'; emit(Object.assign(base, {res: 'miss'})); return; }
+    if (m.throw) { // dump out of the clinch: strength and balance decide it
+      const p = clamp(K.throwBase + (f.stats.pow + f.stats.kick - o.stats.def - o.stats.end) / 220 + (o.st < 30 ? .15 : 0), .15, .8);
+      const ok = G.clinch && G.clinch.a === f && R() < p;
+      emit({type: 'throw', by: f.i, on: o.i, ok});
+      if (!ok) { f.lastRes = 'miss'; say('<b>' + o.name + '</b> ยืนหลักแน่น เหวี่ยงไม่ล้ม'); endClinch('escape'); return; }
+      dropClinch();
+      f.pts += K.throwPoints; f.lastRes = 'hit'; f.cool = 1.3;
+      o.hp = Math.max(1, o.hp - m.dmg * K.dmgScale * 2); o.st = Math.max(0, o.st - 8);
+      o.state = 'thrown'; o.hold = K.throwDown; o.q = []; o.mv = null; o.combo = null; o.plan = null;
+      setPose(o, 'fall1', .22);
+      say('<b>' + f.name + '</b> เหวี่ยง <b>' + o.name + '</b> ลงไปนอนกับพื้น');
+      return;
+    }
+    if (o.state === 'down' || o.state === 'getup' || o.state === 'ko' || o.state === 'thrown' || o.inv > 0) { f.lastRes = 'miss'; emit(Object.assign(base, {res: 'miss'})); return; }
     const slack = m.special ? 14 : 0;
     if (d > m.reach + 6 + slack || d < m.min - 14 - slack) {
       f.lastRes = 'miss'; f.chain = 0; emit(Object.assign(base, {res: 'miss'}));
@@ -174,7 +187,7 @@ export function simulate(opts) {
     const big = raw >= 13 || !!m.special, sev = big ? 3 : raw >= 8 ? 2 : 1;
     o.q = []; o.mv = null; o.combo = null; o.plan = null;
     if (!wasStun && !held) { o.state = 'hit'; o.hold = .2 + raw / 60; }
-    setPose(o, held ? 'clinchHit' : m.react, .06, {amp: held ? 1 : sev === 1 ? .55 : sev === 2 ? .8 : 1});
+    setPose(o, held ? (m.lvl === 'head' ? 'clinchHitHead' : 'clinchHit') : m.react, .06, {amp: held ? 1 : sev === 1 ? .55 : sev === 2 ? .8 : 1});
     f.lastRes = 'hit';
     emit(Object.assign(base, {res: 'hit', raw, dmg: dm, sev, counter, crit, chain: f.chain}));
     const where = m.lvl === 'head' ? 'เข้าหน้า' : m.lvl === 'body' ? 'เข้าลำตัว' : 'เข้าขา';
@@ -305,11 +318,25 @@ export function simulate(opts) {
       const gap = clamp(d - K.clinchDist, -150 * dt, 150 * dt) / 2; // pull in to knee range
       f.x = clamp(f.x + f.dir * gap, -LIM, LIM); o.x = clamp(o.x + o.dir * gap, -LIM, LIM);
       c.t -= dt; c.next -= dt;
-      if (c.t <= 0 || (c.knees <= 0 && c.next <= -.15) || f.st < 6) { endClinch('ref'); return; }
-      if (c.knees > 0 && c.next <= 0) { c.knees--; c.next = .5 + R() * .25; startMove(f, o, 'clinchKnee'); }
+      if (c.t <= 0 || (c.knees <= 0 && c.next <= -.15) || f.st < 6) {
+        if (!c.threw && f.st >= 10 && R() < K.throwTry + (f.style.id === 'clinch' ? .15 : 0)) { c.threw = true; c.t = 1; startMove(f, o, 'clinchThrow'); return; }
+        endClinch('ref'); return;
+      }
+      if (c.knees > 0 && c.next <= 0) {
+        c.knees--; c.next = .5 + R() * .25;
+        const head = R() < K.clinchHeadKnee + (f.style.id === 'clinch' ? .12 : 0);
+        startMove(f, o, head ? 'clinchKneeHead' : 'clinchKnee');
+        if (head) setPose(o, 'clinchPulled', .18); // the head is dragged down onto the knee
+      }
       return;
     }
-    if (f.state === 'clinched') { if (done && f.to === 'clinchHit') setPose(f, 'clinchHeld', .22); return; }
+    if (f.state === 'clinched') { if (done && (f.to === 'clinchHit' || f.to === 'clinchHitHead' || f.to === 'clinchPulled') && !(o.state === 'move' && o.qi <= 1)) setPose(f, 'clinchHeld', .22); return; }
+    if (f.state === 'thrown') {
+      if (done && f.to === 'fall1') setPose(f, 'down', .22);
+      f.hold -= dt;
+      if (f.hold <= 0) { f.state = 'getup'; setPose(f, 'getup', .3); emit({type: 'getup', on: f.i, thrown: true}); }
+      return;
+    }
     if (f.state === 'caught') { f.hold -= dt; if (f.hold <= 0) { f.state = 'idle'; setPose(f, 'guard', .22); f.cool = .4; } return; }
     if (f.state === 'hit' || f.state === 'block' || f.state === 'cover') {
       f.hold -= dt;
