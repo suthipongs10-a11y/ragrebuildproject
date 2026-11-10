@@ -602,6 +602,7 @@ buildUi(); layout();
 const start = async () => {
   arena = buildArena(scene); fx = buildFx(scene);
   await loadPair();
+  $('ver').textContent = 'รุ่น 4.1 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: straight punch, high kick, elbow, flying knee, and a close decision

@@ -16,6 +16,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px
 .app{max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 h1{font-family:var(--display);font-style:italic;font-weight:800;font-size:22px;margin:0;letter-spacing:.02em;line-height:1.15}
 h1 span{color:var(--gold)}
+h1 small{font-family:var(--body);font-style:normal;font-weight:500;font-size:11px;letter-spacing:0;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:1px 6px;vertical-align:middle;white-space:nowrap}
 .sub{color:var(--muted);font-size:13px;margin:0}
 button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 button:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
@@ -119,7 +120,7 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
 
 <div class="app">
   <header>
-    <h1>MUAY FIGHT <span>LAB 3D</span></h1>
+    <h1>MUAY FIGHT <span>LAB 3D</span> <small id="ver">รุ่น 4.1</small></h1>
     <p class="sub">ต้นแบบฉากชก 3D: ไฟต์เดียวกัน ดูได้หลายแบบ เลือกว่าแบบไหนสนุกและสะใจที่สุด</p>
   </header>
 
