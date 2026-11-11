@@ -28,6 +28,19 @@ export function randomSpec(R, usedFirst) {
   return {name: first + ' ' + pick(CAMP), first, style: style.id, stats, skin: Math.floor(R() * 4)};
 }
 
+// Ten-point must, as a Muay Thai judge marks a round: the winner gets 10, the loser 9; a round is 10:8 when the loser
+// took a count or was clearly outclassed, 10:7 for two counts more than the other man, 10:10 when nothing separates them.
+// eff = work done in the round by each fighter (knockdown bonus left out), c = counts each fighter took.
+export function roundCard(eff0, eff1, c0, c1, K) {
+  const s = [10, 10];
+  if (c0 !== c1) s[c0 > c1 ? 0 : 1] = Math.max(7, 9 - Math.abs(c0 - c1));
+  else {
+    const hi = Math.max(eff0, eff1), lo = Math.min(eff0, eff1);
+    if (hi > 0 && (hi - lo) / hi >= K.scoreEven) s[eff0 < eff1 ? 0 : 1] = (lo * K.scoreClear <= hi && hi - lo >= K.scoreClearMin) ? 8 : 9;
+  }
+  return s;
+}
+
 export function simulate(opts) {
   const seed = opts.seed >>> 0;
   const R = mulberry32(seed);
@@ -430,15 +443,8 @@ export function simulate(opts) {
     f.x = clamp(f.x + f.dir * clamp(d - want, -walk * dt, fwd * dt), -LIM, LIM); sep(f, o);
   }
 
-  // Ten-point must, as a Muay Thai judge marks a round: the winner gets 10, the loser 9; a round is 10:8 when the loser
-  // took a count or was clearly outclassed, 10:7 for two counts more than the other man, 10:10 when nothing separates them.
   function scoreRound() {
-    const eff = [0, 1].map(i => F[i].pts - F[i].pts0 - K.kdPoints * F[1 - i].kdR), c0 = F[0].kdR, c1 = F[1].kdR, s = [10, 10];
-    if (c0 !== c1) s[c0 > c1 ? 0 : 1] = Math.max(7, 9 - Math.abs(c0 - c1));
-    else {
-      const hi = Math.max(eff[0], eff[1]), lo = Math.min(eff[0], eff[1]);
-      if (hi > 0 && (hi - lo) / hi >= K.scoreEven) s[eff[0] < eff[1] ? 0 : 1] = (lo * K.scoreClear <= hi && hi - lo >= K.scoreClearMin) ? 8 : 9;
-    }
+    const eff = [0, 1].map(i => F[i].pts - F[i].pts0 - K.kdPoints * F[1 - i].kdR), s = roundCard(eff[0], eff[1], F[0].kdR, F[1].kdR, K);
     F[0].card += s[0]; F[1].card += s[1]; G.cards.push(s);
     return s;
   }

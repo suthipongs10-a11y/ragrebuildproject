@@ -65,11 +65,12 @@ function hairMap(mesh) {
   const bones = mesh.skeleton.bones, names = bones.map(b => b.name), isHead = names.map(x => x === 'Head' || x === 'head_end' || x === 'headfront');
   const at = name => { const b = bones[names.indexOf(name)]; return b ? new THREE.Vector3().setFromMatrixPosition(b.matrixWorld) : null; };
   const H = at('Head'), T = at('head_end'), out = new Uint8Array(MAP * MAP); if (!H) return out;
+  const zc = mesh.userData.headZ != null ? mesh.userData.headZ : H.z; // front-to-back reference from the skull itself (set when the model loads)
   const span = T ? Math.max(.12, T.y - H.y) : .23, v = new THREE.Vector3(), hh = new Float32Array(n).fill(-9), zz = new Float32Array(n);
   for (let i = 0; i < n; i++) {
     let w = 0; for (let k = 0; k < 4; k++) if (isHead[si.getComponent(i, k)]) w += sw.getComponent(i, k);
     if (w < .5) continue;
-    mesh.getVertexPosition(i, v); v.applyMatrix4(mesh.matrixWorld); hh[i] = (v.y - H.y) / span; zz[i] = v.z - H.z; // model space: +z is the face
+    mesh.getVertexPosition(i, v); v.applyMatrix4(mesh.matrixWorld); hh[i] = (v.y - H.y) / span; zz[i] = v.z - zc; // model space: +z is the face
   }
   const line = z => z >= .07 ? .86 : z >= .02 ? .72 + (z - .02) / .05 * .14 : z >= -.03 ? .5 + (z + .03) / .05 * .22 : z >= -.07 ? .28 + (z + .07) / .04 * .22 : .28;
   const cnt = idx ? idx.count : n;

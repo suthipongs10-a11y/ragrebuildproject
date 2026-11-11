@@ -1,6 +1,6 @@
 // Presenter: plays a simulated fight in three.js. It reads the event log and never decides a result.
 // One fight can be re-watched under different presentation settings to compare what feels best.
-import { simulate } from './sim.js';
+import { simulate, roundCard } from './sim.js';
 import { MOVES, COMBOS, STYLES, STAT_TH, RULES } from './data.js';
 import { bake, EFF_NAME } from './timeline.js';
 import { Fighter, EFF_JOINT, STYLE_BUILD, setDims, DIM_DEFAULT } from './rig.js';
@@ -107,6 +107,7 @@ let replays = [], rpi = 0, curRp = null, tvCuts = [], builtAs = '', slowWins = [
 let CFG = {seed: 1, specs: null, plans: null};                      // what the current fight was simulated from
 const HOOK = {onRoundBreak: null, onOver: null}, pausedRounds = new Set(); // set by the game layer
 let previewF = null, previewPose = 'guard';                         // a single fighter shown outside a fight (create, dress, camp)
+const liveCard = {r0: -1, t: 0, since: 0, shown: [10, 10], cand: [10, 10]};
 const buf = [new Float32Array(NP), new Float32Array(NP)];
 const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3(), lastTrail = [new THREE.Vector3(), new THREE.Vector3()];
 
@@ -552,13 +553,28 @@ function hud(dt) {
       el.style.width = hp + '%'; el.className = hp < 30 ? 'low' : hp < 55 ? 'mid' : '';
       $('st' + ids[i]).style.width = TL.val(i, playT, 2) + '%'; $('sp' + ids[i]).style.width = TL.val(i, playT, 3) + '%';
     }
-    // the number is the judges' card so far; gold marks whoever is ahead on work done in the round being fought
+    // The number is the judges' card: finished rounds, plus the round being fought as it stands right now, marked by the
+    // judges' own rule (both start on 10, the one behind drops to 9, a count makes it 8). It becomes official at the bell.
+    // After a stoppage the standing of that last round stays up.
     let tot = [0, 0]; for (const sc of marks.scores) if (sc.t <= playT) tot = sc.total;
     let r0 = 0; for (const r of marks.rounds) if (r.t0 <= playT) r0 = r.t0;
-    const ga = TL.val(0, playT, 8) - TL.val(0, r0, 8), gb = TL.val(1, playT, 8) - TL.val(1, r0, 8), live = playT > marks.introEnd && !marks.rests.some(r => playT >= r.t && playT < r.t1 + .5) && playT < (marks.decPhase != null ? marks.decPhase : marks.over);
-    const pa = tot[0], pb = tot[1], edge = Math.max(ga, gb) * .08;
-    $('ld').textContent = !live ? '' : ga > gb + edge ? '◀ นำยกนี้' : gb > ga + edge ? 'นำยกนี้ ▶' : 'ยกนี้สูสี';
-    for (const [id, v, lead] of [['ptR', pa, live && ga > gb + edge], ['ptB', pb, live && gb > ga + edge]]) {
+    const stopped = marks.ko && playT >= marks.ko.t, inRest = marks.rests.some(r => playT >= r.t && playT < r.t1 + .5);
+    const live = playT > marks.introEnd && !inRest && (marks.decPhase == null || playT < marks.decPhase);
+    let prov = [0, 0];
+    if (live) {
+      const ga = TL.val(0, playT, 8) - TL.val(0, r0, 8), gb = TL.val(1, playT, 8) - TL.val(1, r0, 8);
+      const kd = [0, 0]; for (const k of marks.kds) if (k.t >= r0 && k.t <= playT) kd[k.on]++;
+      const e0 = ga - RULES.kdPoints * kd[1], e1 = gb - RULES.kdPoints * kd[0];
+      const now = kd[0] !== kd[1] || Math.max(e0, e1) >= 3 ? roundCard(e0, e1, kd[0], kd[1], RULES) : [10, 10];
+      // a lead that changes hands for a moment does not flip the number: a new mark has to hold for half a second
+      if (liveCard.r0 !== r0 || playT < liveCard.t || playT - liveCard.t > 1) { liveCard.r0 = r0; liveCard.shown = now; liveCard.cand = now; liveCard.since = playT; } // new round, or the viewer jumped in time
+      if (now[0] !== liveCard.cand[0] || now[1] !== liveCard.cand[1]) { liveCard.cand = now; liveCard.since = playT; }
+      if (playT - liveCard.since > .5 || now[0] < 9 || now[1] < 9) liveCard.shown = liveCard.cand;
+      liveCard.t = playT; prov = liveCard.shown;
+    }
+    const pa = tot[0] + prov[0], pb = tot[1] + prov[1];
+    $('ld').textContent = !live || stopped ? '' : prov[0] > prov[1] ? '◀ นำยกนี้' : prov[1] > prov[0] ? 'นำยกนี้ ▶' : 'ยกนี้สูสี';
+    for (const [id, v, lead] of [['ptR', pa, !stopped && (live ? prov[0] > prov[1] : pa > pb)], ['ptB', pb, !stopped && (live ? prov[1] > prov[0] : pb > pa)]]) {
       const el = $(id);
       if (el.textContent !== String(v)) { el.textContent = v; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
       el.classList.toggle('lead', lead);
@@ -647,6 +663,25 @@ window.LAB = {
   freeze(t) { seek(t); frozen = true; },
   // play t0..t1 in fixed steps so effects and overlays are in the state a viewer would see, then hold
   runTo(t0, t1) { seek(t0); let g = 0; while (playT < t1 && g++ < 60000) { const a = advance(1 / 60); fx.update(Math.max(a, .004), camera); } frozen = true; },
+  // Check for a generated body: how much skin stretches into flaps in each pose. Per pose: [triangles, cm2] on the upper body
+  // whose longest edge more than doubled against the rest pose. A clean body scores near zero in 'guard'.
+  stretch(names) {
+    this.gallery(names, 0); const v = new THREE.Vector3(), out = {};
+    window.LAB._g.forEach((f, pi) => {
+      const bm = f.model.mesh, pm = f.mesh, idx = bm.geometry.index, n = bm.geometry.attributes.position.count, B = new Float32Array(n * 3), P = new Float32Array(n * 3);
+      for (let i = 0; i < n; i++) { bm.getVertexPosition(i, v); v.applyMatrix4(bm.matrixWorld); v.toArray(B, i * 3); pm.getVertexPosition(i, v); v.applyMatrix4(pm.matrixWorld); v.toArray(P, i * 3); }
+      const len = (A, a, b) => Math.hypot(A[a * 3] - A[b * 3], A[a * 3 + 1] - A[b * 3 + 1], A[a * 3 + 2] - A[b * 3 + 2]);
+      let cnt = 0, area = 0;
+      for (let t = 0; t < idx.count; t += 3) {
+        const a = idx.getX(t), b = idx.getX(t + 1), c = idx.getX(t + 2); if (B[a * 3 + 1] < 1) continue;
+        const ab = len(P, a, b), bc = len(P, b, c), ca = len(P, a, c);
+        if (Math.max(ab, bc, ca) < .06 || Math.max(ab / (len(B, a, b) + 1e-6), bc / (len(B, b, c) + 1e-6), ca / (len(B, a, c) + 1e-6)) < 2.2) continue;
+        const s = (ab + bc + ca) / 2; cnt++; area += Math.sqrt(Math.max(0, s * (s - ab) * (s - bc) * (s - ca))) * 1e4;
+      }
+      out[names[pi]] = [cnt, Math.round(area)];
+    });
+    return out;
+  },
   gallery(names, az, style) {
     galleryOn = true; fighters.forEach(f => { f.root.visible = false; }); arena.group.visible = false; scene.fog = null; scene.background = new THREE.Color(0x3a4150);
     (window.LAB._g || []).forEach(f => scene.remove(f.root));
@@ -724,7 +759,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 13 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 14 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

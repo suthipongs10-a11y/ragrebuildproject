@@ -41,6 +41,8 @@ async function gunzip(b64) {
 }
 const loadImage = src => new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = () => rej(new Error('texture ' + src + ' did not load')); im.src = src; });
 
+// On a well-placed rig the middle of the skull is this far behind the head bone (measured on the bodies that looked right).
+const SKULL_BEHIND_BONE = .037;
 // Models are embedded in the page as <script type="application/json" id="model-x"> blocks.
 export async function loadModel(id, key) {
   const el = document.getElementById('model-' + id);
@@ -66,12 +68,24 @@ export async function loadModel(id, key) {
     ua: avg(d('LeftArm', 'LeftForeArm'), d('RightArm', 'RightForeArm')), fa: avg(d('LeftForeArm', 'LeftHand'), d('RightForeArm', 'RightHand')) + .07
   };
   const headH = pos.head_end ? pos.head_end.distanceTo(pos.Head) : .23;
-  return {id, key: key || 'blue', scene, mesh, image, pos, dims, standHips: pos.Hips.y, headR: headH * .4, headC: headH * .74}; // headgear sits on the forehead, above the eyes
+  // Where the skull really is. The auto-rig does not always put the head bone in the middle of the head, so headgear
+  // and the hair mask take their centre from the geometry: the middle of the skull, front to back, in model space.
+  const names = mesh.skeleton.bones.map(b => b.name), isHead = names.map(x => x === 'Head' || x === 'head_end' || x === 'headfront');
+  const SI = mesh.geometry.attributes.skinIndex, SW = mesh.geometry.attributes.skinWeight, hb = mesh.skeleton.bones[names.indexOf('Head')], hy = V().setFromMatrixPosition(hb.matrixWorld), p = V();
+  let z0 = Infinity, z1 = -Infinity;
+  for (let i = 0; i < SI.count; i++) {
+    let w = 0; for (let k = 0; k < 4; k++) if (isHead[SI.getComponent(i, k)]) w += SW.getComponent(i, k);
+    if (w < .5) continue;
+    mesh.getVertexPosition(i, p); p.applyMatrix4(mesh.matrixWorld);
+    if (p.y < hy.y + headH * .6 || p.y > hy.y + headH) continue;
+    if (p.z < z0) z0 = p.z; if (p.z > z1) z1 = p.z;
+  }
+  const skullZ = isFinite(z0) ? (z0 + z1) / 2 : hy.z - SKULL_BEHIND_BONE;
+  const headZ = mesh.userData.headZ = skullZ + SKULL_BEHIND_BONE; // where a well-placed head bone would be, front to back (the hair mask uses it too)
+  const headF = headZ - hy.z;                                    // how far forward of the actual head bone the headgear's centre sits
+  return {id, key: key || 'blue', scene, mesh, image, pos, dims, standHips: pos.Hips.y, headR: headH * .4, headC: headH * .74, headF}; // headgear sits on the forehead, above the eyes
 }
 
-// How far the collar bone turns with the upper arm (0 = stays with the chest). The generated rigs weight the skin over the
-// shoulder and down the back of the arm to the collar bone; left fixed to the chest, that skin stays behind as a flap.
-const SHOULDER_FOLLOW = .42;
 const LIMB = [
   // [upper bone, lower bone, end bone, root joint, mid joint, end joint, pole index, kind]
   ['LeftArm', 'LeftForeArm', 'LeftHand', 'shL', 'elL', 'haL', 'eL', 'arm'], ['RightArm', 'RightForeArm', 'RightHand', 'shR', 'elR', 'haR', 'eR', 'arm'],
@@ -103,7 +117,7 @@ export class ModelFighter {
       const n0 = V().crossVectors(d0, flex).normalize();
       return {l, upInv: frame(d0, n0, Q()).invert(), loInv: frame(e0, n0, Q()).invert(), n: n0.clone(), up0: P0[l[0]].distanceTo(P0[l[1]]), lo0: P0[l[1]].distanceTo(P0[l[2]])};
     });
-    this.qUp = Q(); this.qLo = Q(); this.qFoot = Q(); this.qNeck = Q(); this.qChest = Q(); this.qSh = Q(); this.d = V(); this.e = V(); this.n = V(); this.a = V();
+    this.qUp = Q(); this.qLo = Q(); this.qFoot = Q(); this.qNeck = Q(); this.d = V(); this.e = V(); this.n = V(); this.a = V();
   }
   setStyle() {}
   setMongkol(on) { this.gear.visible = !!on; } // the headpiece comes off before the fight
@@ -126,14 +140,13 @@ export class ModelFighter {
     this.put('Hips', J.qp, J.hip, P0.Hips);
     for (const [name, w] of [['Spine02', .3], ['Spine01', .65], ['Spine', 1], ['LeftShoulder', 1], ['RightShoulder', 1]]) {
       q1.setFromAxisAngle(UP, -tw * w); q2.copy(J.qp).multiply(q1); this.put(name, q2, J.hip, P0.Hips);
-      if (name === 'Spine') this.qChest.copy(q2);
     }
     // neck and head hang off the chest
     v3.copy(P0.neck).sub(P0.Hips).applyQuaternion(J.qc).add(J.hip); this.a.copy(v3);
     this.qNeck.copy(J.qc).slerp(J.qh, .5); this.put('neck', this.qNeck, this.a, P0.neck);
     v3.copy(P0.Head).sub(P0.neck).applyQuaternion(this.qNeck).add(this.a); this.a.copy(v3);
     for (const name of ['Head', 'head_end', 'headfront']) this.put(name, J.qh, this.a, P0.Head);
-    this.gear.position.set(0, this.model.headC, 0).applyQuaternion(J.qh).add(this.a); this.gear.quaternion.copy(J.qh);
+    this.gear.position.set(this.model.headF, this.model.headC, 0).applyQuaternion(J.qh).add(this.a); this.gear.quaternion.copy(J.qh);
     // limbs
     for (const L of this.limbs) {
       const l = L.l, A = J[l[3]], B = J[l[4]], C = J[l[5]];
@@ -146,8 +159,6 @@ export class ModelFighter {
       this.n.normalize();
       const arm = l[7] === 'arm', kUp = (arm ? DIM.ua : DIM.thigh) / L.up0, kLo = (arm ? DIM.fa - .07 : DIM.shin) / L.lo0;
       frame(this.d, this.n, this.qUp).multiply(L.upInv); this.put(l[0], this.qUp, A, P0[l[0]], kUp);
-      // the skin over the shoulder and under the arm is tied to the collar bone: turn it part of the way with the arm, or it stays behind as a flap
-      if (arm) { this.qSh.copy(this.qChest).slerp(this.qUp, SHOULDER_FOLLOW); this.put(l[0] === 'LeftArm' ? 'LeftShoulder' : 'RightShoulder', this.qSh, A, P0[l[0]]); }
       frame(this.e, this.n, this.qLo).multiply(L.loInv); this.put(l[1], this.qLo, B, P0[l[1]], kLo);
       if (arm) { this.a.copy(P0[l[2]]).sub(P0[l[1]]).multiplyScalar(kLo).applyQuaternion(this.qLo).add(B); this.put(l[2], this.qLo, this.a, P0[l[2]], this.handK); }
       else {
