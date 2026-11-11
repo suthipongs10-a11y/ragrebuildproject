@@ -72,6 +72,10 @@ export const POSES = {
   block: P({lean: .2, hdP: .25, hip: [-.02, .84, 0], hL: [.27, 1.58, -.07], hR: [.21, 1.56, .08]}),
   blockBody: P({lean: .3, hip: [0, .82, 0], hL: [.26, 1.24, -.15], hR: [.2, 1.3, .15]}),
   check: P({lean: .05, hip: [-.04, .88, 0], fL: [.28, .42, -.12], kL: [1, .4, -.6], hL: [.3, 1.5, -.12]}),
+  // head movement: duck under a swing, slip a straight punch to either side
+  duck: P({turn: .3, lean: .56, hdP: .12, hip: [.03, .67, 0], hL: [.34, 1.22, -.1], hR: [.26, 1.2, .1], fL: [.28, 0, -.14], fR: [-.24, 0, .18]}),
+  slipL: P({lean: .24, side: -.4, twist: .22, hdP: .1, hip: [.01, .81, -.08], hL: [.32, 1.42, -.17], hR: [.22, 1.44, .05]}),
+  slipR: P({lean: .24, side: .4, twist: -.22, hdP: .1, hip: [.01, .81, .08], hL: [.34, 1.44, -.05], hR: [.2, 1.4, .17]}),
   dodge: P({lean: -.42, hdP: -.1, hip: [-.12, .86, 0], hL: [.2, 1.38, -.12], hR: [.1, 1.36, .13]}),
 
   hitHeadBack: P({lean: -.35, hdP: -.5, hip: [-.10, .86, 0], hL: [.2, 1.3, -.2], hR: [.1, 1.25, .2]}),

@@ -101,6 +101,7 @@ export const RULES = {
   dmgScale: .137,          // global damage multiplier
   blockDmg: .06,         // share of base damage that gets through a block
   blockBase: .5, dodgeBase: .12,
+  evadeShare: .6,        // share of head-level blocks that become a slip or a duck (scaled by speed / 55)
   // raising the guard on reading an attack: chance, and how much it helps when the read is right or wrong
   coverBase: .2, coverDef: .4, coverRead: .75, coverBonus: .3, coverMul: 1.7, coverWrong: .5,
   critChance: .1, critMul: 1.5, counterMul: 1.3,

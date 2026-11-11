@@ -47,15 +47,20 @@ export function bake(fight) {
     if (e.type === 'move') pend[e.by] = e;
     else if (e.type === 'hit') { hitsBy[e.by].push(e); const m = pend[e.by]; if (m && m.move === e.move) { m.hit = e; e.moveEv = m; pend[e.by] = null; } }
   }
+  // How a fighter gets out of the way depends on what is coming: duck under a swing, slip a straight punch, lean back from the rest.
+  const DUCK = new Set(['hook', 'elbow', 'spinElbow', 'high', 'spKick', 'spCroc', 'spChop']), SLIP = new Set(['jab', 'cross']);
+  const evade = e => { const mv = MOVES[e.move]; if (mv.lvl !== 'head') return 'dodge'; const h = Math.round(e.t / dt); if (DUCK.has(e.move) || (e.move === 'cross' && h % 4 < 2)) return 'duck'; if (SLIP.has(e.move)) return h % 2 ? 'slipL' : 'slipR'; return 'dodge'; };
+  const evadeAt = new Map();
+  for (const e of fight.events) if (e.type === 'hit' && e.res === 'dodge') evadeAt.set(e.on + ':' + Math.round(e.t / dt), evade(e));
   // cues per fighter, plus early defence
   const cues = [[], []];
-  for (const c of fight.poses) cues[c.f].push(c);
+  for (const c of fight.poses) { const v = c.pose === 'dodge' && evadeAt.get(c.f + ':' + Math.round(c.t / dt)); cues[c.f].push(v ? Object.assign({}, c, {pose: v}) : c); }
   for (const e of fight.events) {
     if (e.type !== 'hit' || (e.res !== 'block' && e.res !== 'dodge')) continue;
     const tA = e.t - .13, st = tick(e.on, Math.round(tA / dt), 4);
     if (st !== STATE.idle && st !== STATE.block) continue; // a fighter already covering up has the pose from the sim
     const mv = MOVES[e.move];
-    const pose = e.res === 'dodge' ? 'dodge' : mv.lvl === 'leg' ? 'check' : mv.lvl === 'body' ? 'blockBody' : 'block';
+    const pose = e.res === 'dodge' ? evade(e) : mv.lvl === 'leg' ? 'check' : mv.lvl === 'body' ? 'blockBody' : 'block';
     cues[e.on].push({t: tA, f: e.on, pose, d: .11, early: true});
   }
   cues.forEach(c => c.sort((a, b) => a.t - b.t));
@@ -180,6 +185,11 @@ export function bake(fight) {
   }
   footwork(0); footwork(1);
 
+  // how much a fighter is free to move on his own (bounce, weave): 1 while idle, eased in and out around everything else
+  const idleW = [new Float32Array(n), new Float32Array(n)];
+  for (let i = 0; i < 2; i++) { let w = 0; for (let k = 0; k < n; k++) { w = tick(i, k, 4) === STATE.idle ? Math.min(1, w + dt / .16) : Math.max(0, w - dt / .07); idleW[i][k] = w; } }
+  const hash = x => { const s = Math.sin(x * 127.1 + 31.7) * 43758.5453; return s - Math.floor(s); };
+
   const TL = {
     fight, n, dt, duration: (n - 1) * dt, baked, eff,
     val(i, t, f) {
@@ -194,10 +204,23 @@ export function bake(fight) {
       const x = Math.max(0, Math.min(n - 1.001, t / dt)), k = Math.floor(x), fr = x - k, B = baked[i], o = k * NP;
       for (let j = 0; j < NP; j++) out[j] = B[o + j] + (B[o + NP + j] - B[o + j]) * fr;
       const st = TK[(k * 2 + i) * TICK_FIELDS + 4];
-      if (st === STATE.idle) { // Muay Thai rhythm: the lead foot taps and the hands roll
-        const beat = t * 5.2 + i * 1.7;
-        out[IDX.fL + 1] += Math.max(0, Math.sin(beat)) * .04; out[IDX.hip] += Math.sin(beat * .5) * .012;
-        out[IDX.hL] += Math.sin(beat * .5) * .02; out[IDX.hR + 1] += Math.cos(beat * .5) * .012;
+      const iw = idleW[i][k] + (idleW[i][k + 1] - idleW[i][k]) * fr;
+      if (iw > 0) {
+        const amp = iw * (TK[(k * 2 + i) * TICK_FIELDS + 2] < 25 ? .45 : 1); // a tired fighter barely lifts his feet
+        // light bounce on the balls of the feet, weight rocking front to back, lead foot tapping, hands rolling
+        const beat = t * 9.4 + i * 1.7, up = Math.max(0, Math.sin(beat)), rock = Math.sin(beat * .5);
+        out[IDX.jump] += up * .026 * amp; out[IDX.hip + 1] -= (1 - up) * .016 * amp;
+        out[IDX.hip] += rock * .022 * amp; out[IDX.lean] += rock * .025 * amp;
+        out[IDX.fL + 1] += Math.max(0, rock) * .03 * amp;
+        out[IDX.hL] += rock * .02 * amp; out[IDX.hR + 1] += Math.cos(beat * .5) * .012 * amp;
+        // bob and weave: every few seconds the head dips and rolls from one side to the other
+        const cyc = t * .42 + i * .37, c0 = Math.floor(cyc), p = (cyc - c0) / .3, h = hash(c0 * 2 + i);
+        if (p < 1 && h < .72) {
+          const dip = Math.sin(p * Math.PI) * amp, roll = Math.sin(p * Math.PI * 2) * amp * (h < .36 ? 1 : -1);
+          out[IDX.hip + 1] -= .1 * dip; out[IDX.lean] += .26 * dip; out[IDX.hdP] += .12 * dip;
+          out[IDX.side] += .22 * roll; out[IDX.hip + 2] += .05 * roll; out[IDX.twist] -= .12 * roll;
+          out[IDX.hL + 1] -= .06 * dip; out[IDX.hR + 1] -= .06 * dip;
+        }
       }
       if (st === STATE.clinch || st === STATE.clinched) { // wrestling for position: both sway and twist against each other
         const w = t * 6.3, sgn = i ? -1 : 1;

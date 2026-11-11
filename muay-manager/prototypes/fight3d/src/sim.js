@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.4';
+export const SIM_VERSION = 'proto-0.5';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -159,6 +159,8 @@ export function simulate(opts) {
     if (m.special) { pB *= .45; pD *= .4; }
     if (f.chain > 0) pB *= Math.max(.5, 1 - f.chain * .15);
     pD *= 1 - Math.min(.5, o.wearLeg / 160);
+    // upstairs, part of what would have been blocked is slipped or ducked instead, more so for a quick fighter
+    if (m.lvl === 'head' && (o.state === 'idle' || o.state === 'block' || o.state === 'cover')) { const sh = Math.min(.8, K.evadeShare * o.stats.spd / 55) * pB; pD += sh; pB -= sh; }
     const r = R();
     if (r < pD && m.lvl !== 'leg') {
       o.state = 'block'; o.hold = .24; o.q = []; o.combo = null;
