@@ -100,6 +100,8 @@ export const RULES = {
   startX: 85,
   dmgScale: .137,          // global damage multiplier
   blockDmg: .06,         // share of base damage that gets through a block
+  // how much more often than a style's own weights say each fist punch is chosen: fights are meant to have plenty of hands
+  fistBias: {jab: 1.2, cross: 1.6, hook: 1.9, upper: 1.9, bodyshot: 1.6},
   blockBase: .5, dodgeBase: .12,
   evadeShare: .6,        // share of head-level blocks that become a slip or a duck (scaled by speed / 55)
   // raising the guard on reading an attack: chance, and how much it helps when the read is right or wrong
