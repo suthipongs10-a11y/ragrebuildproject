@@ -42,6 +42,17 @@ function apronTex(c) {
     for (let i = 0; i < 3; i++) g.fillText(c.text, w / 6 + i * w / 3, h / 2 + (c.bunting ? 22 : 4));
   });
 }
+// Corner pad cover. A plain pale pad behind a fighter reads as part of his body under warm light,
+// so every pad carries dark straps and an emblem that make it plainly ring furniture.
+function padTex(color, neutral) {
+  return canvasTex(64, 256, (g, w, h) => {
+    g.fillStyle = css(color); g.fillRect(0, 0, w, h);
+    g.fillStyle = '#16171c'; g.fillRect(0, 18, w, 20); g.fillRect(0, h - 38, w, 20);                  // straps
+    g.fillStyle = neutral ? '#1f55c4' : 'rgba(255,255,255,.92)'; g.beginPath(); g.moveTo(w / 2, 78); g.lineTo(w - 9, 128); g.lineTo(w / 2, 178); g.lineTo(9, 128); g.fill();
+    g.fillStyle = neutral ? '#c9281f' : css(color); g.beginPath(); g.moveTo(w / 2, 100); g.lineTo(w - 22, 128); g.lineTo(w / 2, 156); g.lineTo(22, 128); g.fill();
+    g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = 2; g.strokeRect(1, 1, w - 2, h - 2);
+  });
+}
 // floor, apron, posts and ropes. c: {mat, apron, ground, posts: {col, r, h, metal}, pads, ropeY, ropeCols, ropeR}
 function ringParts(V, c) {
   const g = V.group;
@@ -51,7 +62,7 @@ function ringParts(V, c) {
   corners.forEach((p, i) => {
     const post = put(g, new THREE.CylinderGeometry(P.r, P.r * (P.taper || 1), P.h, 12), std({color: P.col, roughness: P.metal ? .5 : .95, metalness: P.metal ? .4 : 0}), p[0] * 1.03, P.h / 2, p[1] * 1.03); post.castShadow = true;
     let pad = post;
-    if (c.pads) { pad = put(g, new THREE.BoxGeometry(.24, 1.05, .24), std({color: c.pads[i], roughness: .6}), p[0] * .985, .85, p[1] * .985, 0, Math.PI / 4); pad.castShadow = true; }
+    if (c.pads) { pad = put(g, new THREE.BoxGeometry(.24, 1.05, .24), std({map: padTex(c.pads[i], i % 2 === 1), roughness: .6}), p[0] * .985, .85, p[1] * .985, 0, Math.PI / 4); pad.castShadow = true; }
     V.corners.push({x: p[0], z: p[1], post, pad});
   });
   c.ropeY.forEach((y, k) => {
@@ -168,7 +179,7 @@ function gable(g, w, hgt, depth, mat, x, y, z) {
 // ---------- indoor stadiums ----------
 function indoor(c) {
   const V = newVenue(); const g = V.group;
-  ringParts(V, {mat: matTex(c.mat), apron: apronTex(c.apron), ground: -.95, posts: {col: 0x30323c, r: .07, h: 1.5, metal: 1}, pads: [0xd9342b, 0xe9e9ee, 0x2f6fe0, 0xe9e9ee], ropeY: [.42, .72, 1.02, 1.32], ropeCols: c.ropes, ropeR: .022});
+  ringParts(V, {mat: matTex(c.mat), apron: apronTex(c.apron), ground: -.95, posts: {col: 0x30323c, r: .07, h: 1.5, metal: 1}, pads: [0xd9342b, 0xcdd6e4, 0x2f6fe0, 0xcdd6e4], ropeY: [.42, .72, 1.02, 1.32], ropeCols: c.ropes, ropeR: .022});
   put(g, new THREE.PlaneGeometry(80, 80), std({color: c.floor || 0x0b0c12, roughness: 1}), 0, -.95, 0, -Math.PI / 2);
   crowd(V, tierSeats(c.rows), c.shirts || [0x1a1f2c, 0x241c28, 0x162226, 0x28211c, 0x1f2127, 0x2e1b1b, 0x1a2434], [0x4a3425, 0x533b2a, 0x5e4430]);
   // light rig: truss with lamps, visible beams
@@ -233,7 +244,7 @@ function temple() {
   const ground = put(g, new THREE.PlaneGeometry(90, 90), std({map: groundTex('#4a3826', '120,95,60', '30,22,14')}), 0, GY, 0, -Math.PI / 2); ground.receiveShadow = true;
   ringParts(V, {mat: matTex({base: '#93aab8', noise: .09, ring: 'rgba(150,30,25,.55)', ink: 'rgba(150,30,25,.8)', t1: 'มวยไทย', t2: 'งานวัด', size: 84, border: 'rgba(30,60,120,.5)'}),
     apron: apronTex({bg: '#5d3f27', planks: 1, bunting: ['#c9281f', '#f0f0f2', '#1f55c4', '#e0a52a'], fg: 'rgba(255,236,190,.95)', text: 'งานประจำปี', size: 44}), ground: GY,
-    posts: {col: 0x6a5a48, r: .075, h: 1.5}, pads: [0xd9342b, 0xe9e9ee, 0x2f6fe0, 0xe9e9ee], ropeY: [.42, .72, 1.02, 1.32], ropeCols: [0xd8d2c2, 0xc9463c, 0xd8d2c2, 0x4a78c8], ropeR: .024});
+    posts: {col: 0x6a5a48, r: .075, h: 1.5}, pads: [0xd9342b, 0xcdd6e4, 0x2f6fe0, 0xcdd6e4], ropeY: [.42, .72, 1.02, 1.32], ropeCols: [0xd8d2c2, 0xc9463c, 0xd8d2c2, 0x4a78c8], ropeR: .024});
   // bamboo poles with strings of coloured bulbs and paper flags
   const bamboo = std({color: 0x8a7a45, roughness: .8}), PX = 5.4, top = 4.3, poles = [[-PX, PX], [PX, PX], [PX, -PX], [-PX, -PX]];
   poles.forEach(p => put(g, new THREE.CylinderGeometry(.05, .07, top - GY, 7), bamboo, p[0], (top + GY) / 2, p[1]));
