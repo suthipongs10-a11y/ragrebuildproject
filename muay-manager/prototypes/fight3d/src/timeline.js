@@ -12,6 +12,31 @@ export const EFF_NAME = Object.keys(EFF_ID).reduce((o, k) => { o[EFF_ID[k]] = k;
 const TWO_PI = Math.PI * 2;
 const ease = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
 
+// Moves a strike pose so its striking part lands on pt (fighter-local metres). Shifts the hips when the limb alone cannot reach.
+const d3 = new THREE.Vector3();
+export function aimEffector(target, en, pt3, J) {
+  const side = en.endsWith('L') ? 'L' : 'R';
+  solve(target, 0, J);
+  if (en.startsWith('hand') || en.startsWith('foot')) {
+    const isHand = en.startsWith('hand'), base = isHand ? IDX['h' + side] : IDX['f' + side];
+    const root = isHand ? J['sh' + side] : J['hp' + side], max = (isHand ? DIM.ua + DIM.fa : DIM.thigh + DIM.shin) - .03;
+    // the contact point is the glove centre or the shin just above the ankle
+    const ty = isHand ? pt3.y : pt3.y - DIM.ankle;
+    d3.set(pt3.x - root.x, pt3.y - root.y, pt3.z - root.z);
+    const over = d3.length() - max;
+    if (over > 0) { const h = Math.hypot(d3.x, d3.z) || 1, s = Math.min(.38, over * 1.1); target[IDX.hip] += d3.x / h * s; target[IDX.hip + 2] += d3.z / h * s; }
+    target[base] = pt3.x; target[base + 1] = ty; target[base + 2] = pt3.z;
+  } else {
+    const jn = J[EFF_JOINT[en]];
+    d3.copy(pt3).sub(jn);
+    const h = Math.hypot(d3.x, d3.z), s = h > .42 ? .42 / h : 1;
+    d3.x *= s; d3.z *= s; d3.y = Math.max(-.14, Math.min(.16, d3.y));
+    target[IDX.hip] += d3.x; target[IDX.hip + 1] += d3.y * .6; target[IDX.hip + 2] += d3.z;
+    const lb = en.startsWith('elbow') ? IDX['h' + side] : IDX['f' + side];
+    target[lb] += d3.x; target[lb + 1] += d3.y; target[lb + 2] += d3.z;
+  }
+}
+
 export function bake(fight) {
   const n = fight.nTicks, dt = fight.dt, TK = fight.ticks;
   const tick = (i, k, f) => TK[(Math.max(0, Math.min(n - 1, k)) * 2 + i) * TICK_FIELDS + f];
@@ -37,7 +62,7 @@ export function bake(fight) {
 
   const baked = [new Float32Array(n * NP), new Float32Array(n * NP)];
   const eff = [new Uint8Array(n), new Uint8Array(n)];
-  const J = makeJoints(), J2 = makeJoints(), tmp = new Float32Array(NP), pt3 = new THREE.Vector3(), d3 = new THREE.Vector3();
+  const J = makeJoints(), J2 = makeJoints(), pt3 = new THREE.Vector3();
   const UP = new THREE.Vector3(0, 1, 0);
 
   function aimPose(i, cue, target) {
@@ -64,26 +89,7 @@ export function bake(fight) {
     pt3.applyAxisAngle(UP, -ob[oo + IDX.spin]); pt3.y += ob[oo + IDX.jump];
     pt3.set(dist - pt3.x, pt3.y - target[IDX.jump], -pt3.z);
     pt3.applyAxisAngle(UP, target[IDX.spin]);
-    const en = mv.eff, side = en.endsWith('L') ? 'L' : 'R';
-    solve(target, 0, J);
-    if (en.startsWith('hand') || en.startsWith('foot')) {
-      const isHand = en.startsWith('hand'), base = isHand ? IDX['h' + side] : IDX['f' + side];
-      const root = isHand ? J['sh' + side] : J['hp' + side], max = (isHand ? DIM.ua + DIM.fa : DIM.thigh + DIM.shin) - .03;
-      // the contact point is the glove centre or the shin just above the ankle
-      const ty = isHand ? pt3.y : pt3.y - DIM.ankle;
-      d3.set(pt3.x - root.x, (isHand ? pt3.y : pt3.y) - root.y, pt3.z - root.z);
-      const over = d3.length() - max;
-      if (over > 0) { const h = Math.hypot(d3.x, d3.z) || 1, s = Math.min(.38, over * 1.1); target[IDX.hip] += d3.x / h * s; target[IDX.hip + 2] += d3.z / h * s; }
-      target[base] = pt3.x; target[base + 1] = ty; target[base + 2] = pt3.z;
-    } else {
-      const jn = J[EFF_JOINT[en]];
-      d3.copy(pt3).sub(jn);
-      const h = Math.hypot(d3.x, d3.z), s = h > .42 ? .42 / h : 1;
-      d3.x *= s; d3.z *= s; d3.y = Math.max(-.14, Math.min(.16, d3.y));
-      target[IDX.hip] += d3.x; target[IDX.hip + 1] += d3.y * .6; target[IDX.hip + 2] += d3.z;
-      const lb = en.startsWith('elbow') ? IDX['h' + side] : IDX['f' + side];
-      target[lb] += d3.x; target[lb + 1] += d3.y; target[lb + 2] += d3.z;
-    }
+    aimEffector(target, mv.eff, pt3, J);
   }
 
   // clinch and catch: place a fighter's hands or foot on the opponent's body as it will be a moment later

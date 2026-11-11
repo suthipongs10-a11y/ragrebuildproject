@@ -87,6 +87,7 @@ export class ModelFighter {
     if (look) { try { mat.map = outfitTexture(model, look); } catch (e) { console.warn('outfit not applied:', e.message); } }
     this.gear = headgear(look && look.head, look && look.trim, model.headR); this.root.add(this.gear);
     this.mat = mat;
+    this.handK = look && look.gloves === 'rope' ? .8 : 1; // a wrapped fist is smaller than a glove
     // bones leave the scene graph: their world matrices are written directly every frame
     this.bones = {}; this.bind = {};
     mesh.skeleton.bones.forEach(b => { this.bones[b.name] = b; this.bind[b.name] = new THREE.Matrix4().multiplyMatrices(TO_LOCAL, b.matrixWorld); b.matrixAutoUpdate = false; b.matrixWorldAutoUpdate = false; });
@@ -142,7 +143,7 @@ export class ModelFighter {
       const arm = l[7] === 'arm', kUp = (arm ? DIM.ua : DIM.thigh) / L.up0, kLo = (arm ? DIM.fa - .07 : DIM.shin) / L.lo0;
       frame(this.d, this.n, this.qUp).multiply(L.upInv); this.put(l[0], this.qUp, A, P0[l[0]], kUp);
       frame(this.e, this.n, this.qLo).multiply(L.loInv); this.put(l[1], this.qLo, B, P0[l[1]], kLo);
-      if (arm) { this.a.copy(P0[l[2]]).sub(P0[l[1]]).multiplyScalar(kLo).applyQuaternion(this.qLo).add(B); this.put(l[2], this.qLo, this.a, P0[l[2]]); }
+      if (arm) { this.a.copy(P0[l[2]]).sub(P0[l[1]]).multiplyScalar(kLo).applyQuaternion(this.qLo).add(B); this.put(l[2], this.qLo, this.a, P0[l[2]], this.handK); }
       else {
         // planted foot stays flat and points where the knee points; a foot in the air follows the shin
         v4.crossVectors(this.n, UP); v4.y = 0;

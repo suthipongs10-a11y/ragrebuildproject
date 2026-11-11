@@ -146,3 +146,8 @@ export const STYLE_PLAN = {
   puncher: {ag: 'attack', range: 'mixed', target: 'head'}, kicker: {ag: 'balanced', range: 'out', target: 'mixed'},
   clinch: {ag: 'balanced', range: 'mixed', target: 'body'}, tech: {ag: 'counter', range: 'mixed', target: 'mixed'}
 };
+
+// Rules that differ by venue. Rope-bound fists instead of gloves: every blow does more, and a guard stops less of it.
+export const VENUE_RULES = {
+  chuek: {dmgScale: RULES.dmgScale * 1.12, blockDmg: .1}
+};

@@ -1,7 +1,7 @@
 // Game layer: profile, training, outfits, matchmaking, corner plans, rewards and ranking.
 // It never touches fight rules: it builds two fighter specs and plans, hands them to the simulation through the viewer,
 // and turns the result into progress. Save lives in the browser and, when the page has it, in the artifact database.
-import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN } from './data.js';
+import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VENUE_RULES } from './data.js';
 import { PLAN_TIPS } from './plantips.js';
 
 const $ = id => document.getElementById(id);
@@ -30,13 +30,20 @@ function matchupTip(opp) {
   return 'เขาเป็นสาย' + STYLES.find(x => x.id === opp).th + ' ' + (good.length ? 'แผนที่ได้ผลกับสายนี้: ' + good.join(' · ') : 'ไม่มีแผนไหนได้เปรียบชัด ใช้แผนสมดุลแล้วดูเชิงก่อน') + (bad.length ? ' หลีกเลี่ยง: ' + bad.join(' · ') : '');
 }
 const ACTS = [
-  {id: 'bag', th: 'ชกกระสอบ', stat: ['pow'], fat: 12, note: 'เพิ่มหมัดศอก'},
-  {id: 'pads', th: 'เตะเป้า', stat: ['kick'], fat: 12, note: 'เพิ่มเตะเข่า'},
+  {id: 'bag', th: 'กระสอบทราย', drill: 'bag', focus: 'punch', stat: ['pow'], fat: 12, note: 'เน้นต่อย เพิ่มหมัดศอก มีเตะและถีบสลับ'},
+  {id: 'banana', th: 'เตะต้นกล้วย', drill: 'banana', focus: 'kick', stat: ['kick'], fat: 12, note: 'เน้นเตะ เพิ่มเตะเข่า แข้งแกร่ง'},
+  {id: 'dummy', th: 'ถีบหุ่น', drill: 'dummy', focus: 'teep', stat: ['spd', 'def'], fat: 10, note: 'เน้นถีบ คุมระยะ เพิ่มความเร็วและป้องกัน'},
   {id: 'rope', th: 'กระโดดเชือก ชกลม', stat: ['spd'], fat: 8, note: 'เพิ่มความเร็ว'},
   {id: 'spar', th: 'ลงนวมซ้อมคู่', stat: ['def', 'chin'], fat: 16, note: 'เพิ่มป้องกันและคาง เสี่ยงเจ็บ'},
   {id: 'run', th: 'วิ่ง', stat: ['end'], fat: 10, note: 'เพิ่มความอึด'},
   {id: 'rest', th: 'พัก นวด', stat: [], fat: -32, note: 'ลดความล้า'}
 ];
+// Drill: the trainer calls strikes, the player presses them in time. What each strike trains, and how often each target calls for it.
+const KINDS = {punch: {th: 'ต่อย', stat: {pow: 1}, key: ['a', 'j', 'arrowleft']}, kick: {th: 'เตะ', stat: {kick: 1}, key: ['s', 'k', 'arrowdown']}, teep: {th: 'ถีบ', stat: {spd: .5, def: .5}, key: ['d', 'l', 'arrowright']}};
+const DRILL_MIX = {bag: {punch: .6, kick: .25, teep: .15}, banana: {punch: .15, kick: .7, teep: .15}, dummy: {punch: .25, kick: .2, teep: .55}};
+const DRILL = {lead: 2.4, beat: .5, gap: .95, notes: 24, perfect: .085, good: .17, late: .25, focusBonus: 1.3, ahead: 1.7};
+// where a fight is held: local challenges at the temple fair, ranked fights by league, the rope-fist bout at the old ground
+const LEAGUE_VENUE = ['temple', 'temple', 'province', 'stadium', 'champ'];
 const LEAGUES = [[0, 'เวทีงานวัด'], [1100, 'เวทีอำเภอ'], [1250, 'เวทีจังหวัด'], [1400, 'เวทีมาตรฐาน'], [1600, 'ศึกชิงแชมป์']];
 const GYM_COST = [0, 1200, 2800, 5500, 9000];
 const PRICE = {colors: {gold: 250, green: 250, purple: 250, pink: 250, orange: 250}, patterns: {stripe: 300, hem: 300, split: 400, zigzag: 500}, head: {band: 350, mongkol: 600}};
@@ -46,13 +53,13 @@ const SP_FAME = [30, 80, 160];      // fame needed for each extra signature move
 const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', need: 3, money: 100, fame: 0}, {id: 'win', th: 'ชนะ 1 ไฟต์', need: 1, money: 150, fame: 1}, {id: 'ranked', th: 'ขึ้นชกจัดอันดับ 1 ไฟต์', need: 1, money: 120, fame: 2}];
 const SAVE_KEY = 'muayManagerSave1';
 
-let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null;
+let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
 // ---------- save ----------
 function newSave(name, body, style) {
   return {v: 1, name, body, style, stats: Object.assign({}, START[style]), look: {shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'},
     own: {colors: ['red', 'blue', 'black', 'white'], patterns: ['plain'], head: ['none']}, day: 1, slots: 3, ranked: 2, fatigue: 0, money: 500, fame: 0, rp: 1000, best: 1000,
-    rec: {w: 0, l: 0, ko: 0}, gym: 1, seed: Math.floor(Math.random() * 1e9), plan: Object.assign({}, PLAN_DEFAULT), log: [],
+    rec: {w: 0, l: 0, ko: 0}, gym: 1, chuek: 1, seed: Math.floor(Math.random() * 1e9), plan: Object.assign({}, PLAN_DEFAULT), log: [],
     sp: STYLES.find(x => x.id === style).sp.slice(), spOwn: STYLES.find(x => x.id === style).sp.slice(), mis: {day: 1, n: {}}, updatedAt: Date.now()};
 }
 function loadLocal() { try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); return valid(s) ? fix(s) : null; } catch (e) { return null; } }
@@ -61,6 +68,7 @@ function fix(s) { // fields added after a save was made
   if (!Array.isArray(s.spOwn)) s.spOwn = sp.slice();
   if (!Array.isArray(s.sp) || !s.sp.length) s.sp = sp.slice();
   if (!s.mis || typeof s.mis !== 'object' || !s.mis.n) s.mis = {day: s.day, n: {}};
+  if (typeof s.chuek !== 'number') s.chuek = 1;
   return s;
 }
 // daily missions: progress counts up, the reward pays out the moment the target is reached
@@ -145,9 +153,11 @@ function rankRows() {
 function localOpps() {
   const T = total(S.stats), lg = league(S.rp);
   return [[.86, 'ง่าย', 120, 2], [.97, 'สูสี', 220, 4], [1.08, 'ยาก', 380, 7]].map((d, i) => {
-    const o = makeOpp(S.seed + S.day * 31 + i, T * d[0]); o.kind = 'local'; o.diff = d[1]; o.money = d[2] + lg * 60; o.fame = d[3] + lg; o.id = 'l' + i; return o;
+    const o = makeOpp(S.seed + S.day * 31 + i, T * d[0]); o.kind = 'local'; o.venue = 'temple'; o.diff = d[1]; o.money = d[2] + lg * 60; o.fame = d[3] + lg; o.id = 'l' + i; return o;
   });
 }
+// one rope-fist bout a day at the old ground: no gloves, harder blows, good for fame
+function chuekOpp() { const lg = league(S.rp), o = makeOpp(S.seed + S.day * 53 + 9, total(S.stats) * 1.02); o.kind = 'chuek'; o.venue = 'chuek'; o.diff = 'คาดเชือก'; o.money = 260 + lg * 80; o.fame = 9 + lg * 2; o.id = 'c'; return o; }
 function rankedOpp() {
   const R = rng(S.seed + S.day * 977 + S.ranked * 13 + S.rec.w + S.rec.l), near = rankRows().filter(r => !r.me && Math.abs(r.rp - S.rp) <= 130);
   const pool = near.length ? near : rankRows().filter(r => !r.me).sort((a, b) => Math.abs(a.rp - S.rp) - Math.abs(b.rp - S.rp)).slice(0, 4);
@@ -155,7 +165,7 @@ function rankedOpp() {
   let o;
   if (r.real) o = {name: r.real.name, style: r.real.style, body: r.real.body, look: r.real.look, stats: r.real.stats, real: true};
   else o = makeOpp(r.ghost.seed, ghostTotal(r.rp), r.name);
-  const lg = league(S.rp); o.kind = 'ranked'; o.rp = r.rp; o.money = 300 + lg * 150; o.fame = 8 + lg * 4; o.id = 'r'; o.diff = r.rp > S.rp + 40 ? 'อันดับสูงกว่า' : r.rp < S.rp - 40 ? 'อันดับต่ำกว่า' : 'อันดับใกล้กัน';
+  const lg = league(S.rp); o.kind = 'ranked'; o.venue = LEAGUE_VENUE[lg]; o.rp = r.rp; o.money = 300 + lg * 150; o.fame = 8 + lg * 4; o.id = 'r'; o.diff = r.rp > S.rp + 40 ? 'อันดับสูงกว่า' : r.rp < S.rp - 40 ? 'อันดับต่ำกว่า' : 'อันดับใกล้กัน';
   return o;
 }
 
@@ -176,7 +186,7 @@ function nav() {
   const tabs = [['home', 'ค่าย'], ['train', 'ซ้อม'], ['dress', 'แต่งตัว'], ['fight', 'หาคู่ชก'], ['rank', 'อันดับ']];
   $('gNav').innerHTML = tabs.map(t => '<button class="btn seg" data-act="tab" data-v="' + t[0] + '" aria-pressed="' + (tab === t[0]) + '">' + t[1] + '</button>').join('');
 }
-function setMode(fight) { const app = document.querySelector('.app'); app.classList.add('game'); app.classList.toggle('g-fight', !!fight); app.classList.toggle('g-menu', !fight); }
+function setMode(fight) { const app = document.querySelector('.app'); app.classList.add('game'); app.classList.toggle('g-fight', !!fight); app.classList.toggle('g-menu', !fight); app.classList.toggle('g-drill', !!DR); }
 function showMe(pose) { if (S) API.preview(Object.assign({fighter: S.body}, pending ? pending.look : S.look), pose || 'guard'); }
 
 // ---------- screens ----------
@@ -192,7 +202,7 @@ function render() {
   else if (tab === 'fight') b.innerHTML = fightHtml();
   else b.innerHTML = rankHtml();
 }
-function go(t) { tab = t; view = null; pending = null; mini = null; setMode(false); render(); showMe(t === 'dress' ? 'guard' : t === 'home' ? 'guard' : 'guard'); }
+function go(t) { if (DR) drillEnd(true); tab = t; view = null; pending = null; mini = null; setMode(false); render(); showMe(t === 'dress' ? 'guard' : t === 'home' ? 'guard' : 'guard'); }
 
 let draft = {body: 'c', style: 'puncher', name: ''};
 function renderCreate() {
@@ -223,12 +233,13 @@ function homeHtml() {
     '<p class="hint">' + cloudNote + ' · <button class="link" data-act="reset">เริ่มใหม่ทั้งหมด</button></p>';
 }
 function trainHtml() {
+  if (DR) return drillHtml();
   if (mini) return miniHtml();
   const c = cap();
   return '<section class="gcard"><h2>ตารางซ้อมวันนี้ <small>เหลือ ' + S.slots + ' ครั้ง</small></h2>' +
     (S.fatigue >= 70 ? '<p class="warn">ล้ามากแล้ว ซ้อมได้ผลน้อยลงและเสี่ยงเจ็บ ควรพัก</p>' : '') +
-    '<div class="acts">' + ACTS.map(a => { const st = a.stat.map(k => STAT_TH[k] + ' ' + Math.floor(S.stats[k]) + '/' + c).join(' · '); return '<button class="act" data-act="train" data-v="' + a.id + '"' + (S.slots < 1 ? ' disabled' : '') + '><b>' + a.th + '</b><span>' + a.note + '</span><span class="sm">' + (st || 'ไม่ได้ค่าพลัง') + ' · ล้า ' + (a.fat > 0 ? '+' : '') + a.fat + '</span></button>'; }).join('') + '</div>' +
-    (S.slots < 1 ? '<p class="hint">แรงซ้อมหมดแล้ว ไปหาคู่ชก หรือจบวันที่หน้าค่าย</p>' : '<p class="hint">กดเลือกการซ้อม แล้วกดปุ่มออกแรงให้ตรงช่วงสีทอง ยิ่งตรงยิ่งได้ผลมาก</p>') +
+    '<div class="acts">' + ACTS.map(a => { const st = a.stat.map(k => STAT_TH[k] + ' ' + Math.floor(S.stats[k]) + '/' + c).join(' · '); return '<button class="act' + (a.drill ? ' drill' : '') + '" data-act="train" data-v="' + a.id + '"' + (S.slots < 1 ? ' disabled' : '') + '><b>' + a.th + (a.drill ? ' <i>กดเอง</i>' : '') + '</b><span>' + a.note + '</span><span class="sm">' + (st || 'ไม่ได้ค่าพลัง') + ' · ล้า ' + (a.fat > 0 ? '+' : '') + a.fat + '</span></button>'; }).join('') + '</div>' +
+    (S.slots < 1 ? '<p class="hint">แรงซ้อมหมดแล้ว ไปหาคู่ชก หรือจบวันที่หน้าค่าย</p>' : '<p class="hint">กระสอบทราย ต้นกล้วย และหุ่น เป็นการซ้อมแบบกดเอง: ครูเรียกท่า ต่อย เตะ ถีบ ให้กดตามจังหวะ ยิ่งตรงยิ่งได้ผลมาก การซ้อมอื่นกดปุ่มออกแรงให้ตรงช่วงสีทอง</p>') +
     (view && view.msg ? '<p class="gain">' + view.msg + '</p>' : '') + '</section>';
 }
 function miniHtml() {
@@ -249,7 +260,7 @@ function dressHtml() {
 }
 function oppCard(o, btn) {
   return '<div class="opp"><div class="oh"><b>' + esc(o.name) + '</b><span class="tag">' + o.diff + '</span></div><div class="sty">สาย' + styleTh(o.style) + ' · ค่าพลังเฉลี่ย ' + overall(o.stats) + (o.real ? ' · นักมวยของผู้เล่นจริง' : '') + (o.rp ? ' · RP ' + o.rp : '') + '</div>' +
-    '<div class="rw">รางวัลชนะ ฿ ' + baht(o.money) + ' · ★ ' + o.fame + '</div>' + btn + '</div>';
+    '<div class="rw">รางวัลชนะ ฿ ' + baht(o.money) + ' · ★ ' + o.fame + ' · สถานที่: ' + API.VENUES[o.venue] + '</div>' + btn + '</div>';
 }
 function fightHtml() {
   const tired = S.fatigue >= 90, dis = tired ? ' disabled' : '';
@@ -258,6 +269,7 @@ function fightHtml() {
   const rk = S.ranked > 0 ? oppCard(ro, '<button class="btn go" data-act="pick" data-v="r"' + dis + '>ชกจัดอันดับ</button>') : '<p class="hint">ชกจัดอันดับครบ 2 ไฟต์ของวันนี้แล้ว จบวันเพื่อชกต่อ</p>';
   return (tired ? '<p class="warn">ล้าเกิน 90% ขึ้นชกไม่ได้ ไปพักหรือจบวันก่อน</p>' : '') +
     '<section class="gcard"><h2>ศึกจัดอันดับ <small>เหลือ ' + S.ranked + ' ไฟต์วันนี้</small></h2><p class="hint">ชนะได้คะแนนอันดับ แพ้เสียคะแนน คู่ชกคือนักมวยที่อันดับใกล้กัน</p>' + rk + '</section>' +
+    '<section class="gcard"><h2>ศึกมวยคาดเชือก <small>งานประเพณี วันละ 1 ไฟต์</small></h2><p class="hint">ถอดนวม พันหมัดด้วยเชือก ชกบนลานดิน หมัดเท้าเข่าศอกหนักขึ้น การ์ดกันได้น้อยลง น็อกง่ายกว่าเวทีปกติ ไม่มีผลกับอันดับ ได้ชื่อเสียงมาก</p>' + (S.chuek > 0 ? oppCard(chuekOpp(), '<button class="btn" data-act="pick" data-v="c"' + dis + '>ขึ้นชกคาดเชือก</button>') : '<p class="hint">ชกคาดเชือกของวันนี้ไปแล้ว</p>') + '</section>' +
     '<section class="gcard"><h2>เวทีงานวัดใกล้ค่าย <small>ท้าชกฝึกฝีมือ</small></h2><p class="hint">ไม่มีผลกับอันดับ ได้เงิน ชื่อเสียง และประสบการณ์เวที ทุกไฟต์เพิ่มความล้า 22</p>' + loc + '</section>';
 }
 function rankHtml() {
@@ -273,7 +285,7 @@ function rankHtml() {
 // ---------- fight flow ----------
 function planHtml() {
   const o = F.opp, me = playerSpec();
-  return '<section class="gcard"><h2>ก่อนขึ้นเวที</h2><div class="vs"><div class="statbox r"><b>' + esc(S.name) + '</b><span class="sty">สาย' + styleTh(S.style) + (fatigueMul() < 1 ? ' · ล้า ค่าพลังลด ' + Math.round((1 - fatigueMul()) * 100) + '%' : '') + '</span>' + statBars(me.stats) + '</div>' +
+  return '<section class="gcard"><h2>ก่อนขึ้นเวที <small>' + API.VENUES[o.venue] + '</small></h2><div class="vs"><div class="statbox r"><b>' + esc(S.name) + '</b><span class="sty">สาย' + styleTh(S.style) + (fatigueMul() < 1 ? ' · ล้า ค่าพลังลด ' + Math.round((1 - fatigueMul()) * 100) + '%' : '') + '</span>' + statBars(me.stats) + '</div>' +
     '<div class="statbox b"><b>' + esc(o.name) + '</b><span class="sty">สาย' + styleTh(o.style) + '</span>' + statBars(o.stats) + '</div></div>' +
     '<p class="advice"><b>พี่เลี้ยง:</b> ' + matchupTip(o.style) + '</p>' + planPicker(F.plan) +
     '<div class="rowbtn"><button class="btn go wide" data-act="startfight">ขึ้นเวที</button><button class="btn" data-act="backout">ถอนตัว</button></div></section>';
@@ -321,7 +333,7 @@ async function startFight() {
   F.plans = [F.plan, F.plan, F.plan].map(p => Object.assign({}, p)); F.phase = 'live'; S.plan = Object.assign({}, F.plan);
   setMode(true); render();
   const o = F.opp;
-  await API.startFight({seed: F.seed, specs: [playerSpec(), {name: o.name, first: o.name, style: o.style, stats: o.stats, skin: 1}], plans: plansFor(),
+  await API.startFight({venue: o.venue, rules: VENUE_RULES[o.venue] || null, seed: F.seed, specs: [playerSpec(), {name: o.name, first: o.name, style: o.style, stats: o.stats, skin: 1}], plans: plansFor(),
     looks: [Object.assign({name: S.name, fighter: S.body}, S.look), Object.assign({name: o.name, fighter: o.body}, o.look)]});
 }
 function onRoundBreak(n, st) { F.phase = 'break'; F.round = n; F.stats = st; render(); $('gBody').scrollIntoView({block: 'nearest', behavior: 'smooth'}); }
@@ -331,6 +343,7 @@ function onOver(res) {
   r.money = win ? o.money + (ko ? 80 : 0) : Math.round(o.money * .25); r.fame = win ? o.fame + (ko ? 2 : 0) : 1;
   r.fat = 22 + (!win && ko ? 12 : 0);
   if (o.kind === 'ranked') { const ex = 1 / (1 + Math.pow(10, (o.rp - S.rp) / 400)); r.drp = Math.round(32 * ((win ? 1 : 0) - ex)); S.rp = Math.max(600, S.rp + r.drp); S.ranked = Math.max(0, S.ranked - 1); }
+  if (o.kind === 'chuek') S.chuek = 0;
   // ring experience: a little growth in what the style leans on, more for a win
   const grow = win ? .7 : .35, ks = KEYS.slice().sort((a, b) => START[S.style][b] - START[S.style][a]).slice(0, 2);
   ks.forEach(k => { S.stats[k] = Math.min(cap(), S.stats[k] + grow); }); r.xp = ks.map(k => STAT_TH[k] + ' +' + grow).join(' · ');
@@ -341,6 +354,85 @@ function onOver(res) {
   r.extra = [win ? mission('win') : '', o.kind === 'ranked' ? mission('ranked') : '', unlockSpecials()].filter(Boolean);
   save(); F.res = r; F.phase = 'result'; topBar(); render(); $('gBody').scrollIntoView({block: 'nearest', behavior: 'smooth'});
   void lgBefore;
+}
+
+// ---------- drill: trainer calls, player presses ----------
+function drillChart(mix, seed) {
+  const R = rng(seed), kinds = Object.keys(mix), notes = []; let t = DRILL.lead;
+  const pick = () => { let x = R(); for (const k of kinds) { if ((x -= mix[k]) < 0) return k; } return kinds[0]; };
+  while (notes.length < DRILL.notes) {
+    const n = Math.min(DRILL.notes - notes.length, 2 + Math.floor(R() * 3));
+    for (let i = 0; i < n; i++) { notes.push({t, kind: pick(), res: null, el: null}); t += DRILL.beat; }
+    t += DRILL.gap - DRILL.beat;
+  }
+  return notes;
+}
+async function drillStart(act) {
+  const notes = drillChart(DRILL_MIX[act.drill], S.seed + S.day * 17 + S.slots * 5 + Math.floor(S.fatigue));
+  DR = {act, notes, t0: 0, combo: 0, best: 0, n: {perfect: 0, good: 0, late: 0, miss: 0}, score: 0, w: {}, seq: {punch: 0, kick: 0, teep: 0}, ready: false, raf: 0};
+  mini = null; setMode(false); render();
+  const ui = document.createElement('div'); ui.id = 'drillUi';
+  ui.innerHTML = '<div class="dtop"><span id="dCombo"></span><span id="dLeft"></span></div><div class="dmsg" id="dMsg">เตรียมตัว</div><div class="dtrack"><div class="dring"></div><div id="dNotes"></div></div>';
+  $('stage').appendChild(ui);
+  notes.forEach(n => { n.el = document.createElement('div'); n.el.className = 'dnote k-' + n.kind; n.el.textContent = KINDS[n.kind].th; $('dNotes').appendChild(n.el); });
+  $('stage').scrollIntoView({block: 'start', behavior: 'smooth'});
+  await API.drillStart(Object.assign({fighter: S.body}, S.look), act.drill);
+  if (!DR) return;
+  DR.t0 = performance.now(); DR.ready = true; DR.raf = requestAnimationFrame(drillTick);
+}
+function drillMsg(text, cls) { const m = $('dMsg'); if (!m) return; m.textContent = text; m.className = 'dmsg ' + (cls || ''); m.style.animation = 'none'; void m.offsetWidth; m.style.animation = ''; }
+function drillJudge(n, res) {
+  n.res = res; DR.n[res]++; n.el.classList.add(res === 'miss' ? 'gone' : 'hit');
+  const pts = {perfect: 1, good: .7, late: .35, miss: 0}[res]; DR.score += pts;
+  if (res === 'miss') DR.combo = 0; else { DR.combo++; DR.best = Math.max(DR.best, DR.combo); const st = KINDS[n.kind].stat, b = n.kind === DR.act.focus ? DRILL.focusBonus : 1; for (const k in st) DR.w[k] = (DR.w[k] || 0) + st[k] * pts * b; }
+  $('dCombo').textContent = DR.combo >= 2 ? 'ต่อเนื่อง ' + DR.combo : '';
+}
+function drillPress(kind) {
+  if (!DR || !DR.ready) return;
+  const now = (performance.now() - DR.t0) / 1000, list = API.TARGETS[DR.act.drill].moves[kind];
+  const n = DR.notes.find(x => !x.res && Math.abs(x.t - now) <= DRILL.late);
+  API.drillStrike(list[DR.seq[kind]++ % list.length]);
+  const b = document.querySelector('[data-drill="' + kind + '"]'); if (b) { b.classList.remove('tap'); void b.offsetWidth; b.classList.add('tap'); }
+  if (!n) return;                                       // a free strike between calls: no score either way
+  if (n.kind !== kind) { drillJudge(n, 'miss'); drillMsg('ผิดท่า', 'bad'); return; }
+  const d = Math.abs(n.t - now), res = d <= DRILL.perfect ? 'perfect' : d <= DRILL.good ? 'good' : 'late';
+  drillJudge(n, res); drillMsg(res === 'perfect' ? 'เป๊ะ!' : res === 'good' ? 'ดี' : n.t > now ? 'เร็วไป' : 'ช้าไป', res);
+}
+function drillTick() {
+  if (!DR) return;
+  const now = (performance.now() - DR.t0) / 1000, track = $('dNotes'); if (!track) return;
+  const W = track.clientWidth, x0 = W * .2, speed = W * .8 / DRILL.ahead;
+  let left = 0;
+  for (const n of DR.notes) {
+    if (!n.res && now > n.t + DRILL.late) { drillJudge(n, 'miss'); drillMsg('พลาด', 'bad'); }
+    if (!n.res) left++;
+    const x = x0 + (n.t - now) * speed;
+    n.el.style.display = x > W + 40 || x < -60 ? 'none' : ''; n.el.style.transform = 'translate(' + x.toFixed(1) + 'px,-50%) translateX(-50%)';
+  }
+  if (now < DRILL.lead - .6) { const c = Math.ceil(DRILL.lead - .6 - now); if ($('dMsg').textContent !== String(c)) drillMsg(String(c), ''); } else if ($('dMsg').textContent === '1') drillMsg('เริ่ม!', 'perfect');
+  $('dLeft').textContent = 'เหลือ ' + left + ' ท่า';
+  if (now > DR.notes[DR.notes.length - 1].t + .9) { drillEnd(false); return; }
+  DR.raf = requestAnimationFrame(drillTick);
+}
+// abort = left the screen: nothing is spent
+function drillEnd(abort) {
+  const d = DR; if (!d) return;
+  cancelAnimationFrame(d.raf); DR = null; const ui = $('drillUi'); if (ui) ui.remove(); API.drillStop();
+  if (abort) return;
+  const a = d.act, c = cap(), q = d.score / d.notes.length;
+  const mul = q >= .85 ? 1.5 : q >= .6 ? 1.15 : q >= .3 ? .8 : .5, label = q >= .85 ? 'ยอดเยี่ยม' : q >= .6 ? 'ดี' : q >= .3 ? 'พอใช้' : 'ยังไม่เข้าจังหวะ';
+  let sum = 0; for (const k in d.w) sum += d.w[k];
+  if (!sum) { d.w = {}; a.stat.forEach(k => { d.w[k] = 1; }); sum = a.stat.length; }
+  const parts = Object.keys(d.w).map(k => { const room = Math.max(.12, 1 - Math.pow(S.stats[k] / c, 2)), g = 2.4 * mul * (d.w[k] / sum) * room * (1 - S.fatigue / 160) * (1 + .1 * (S.gym - 1)), before = S.stats[k]; S.stats[k] = Math.min(c, S.stats[k] + Math.max(.02, g)); return [k, S.stats[k] - before]; })
+    .filter(p => p[1] >= .05).sort((x, y) => y[1] - x[1]).map(p => STAT_TH[p[0]] + ' +' + p[1].toFixed(1));
+  S.fatigue = clamp(S.fatigue + a.fat, 0, 100); S.slots--;
+  const done = mission('train');
+  view = {msg: a.th + ': ' + label + ' · เป๊ะ ' + d.n.perfect + ' ดี ' + d.n.good + ' คลาด ' + d.n.late + ' พลาด ' + d.n.miss + ' · ต่อเนื่องสูงสุด ' + d.best + ' · ' + parts.join(' · ') + (done ? ' · ' + done : '')};
+  save(); setMode(false); render(); showMe();
+}
+function drillHtml() {
+  return '<section class="gcard drillpad"><div class="dbtns">' + Object.keys(KINDS).map(k => '<button class="dbtn k-' + k + '" data-drill="' + k + '"><b>' + KINDS[k].th + '</b></button>').join('') + '</div>' +
+    '<p class="hint">' + DR.act.th + ': กดปุ่มให้ตรงกับท่าที่ครูเรียก ตอนป้ายท่าเลื่อนมาถึงวงกลม · คีย์บอร์ด A S D</p><button class="link" data-act="drillquit">เลิกซ้อมรอบนี้ (ไม่เสียแรงซ้อม)</button></section>';
 }
 
 // ---------- actions ----------
@@ -363,20 +455,21 @@ function onClick(e) {
   else if (act === 'create') { const name = API.cleanName($('gName').value); if (name.length < 2) { $('gCreateMsg').textContent = 'ตั้งชื่อนักมวยก่อน อย่างน้อย 2 ตัวอักษร'; return; } S = newSave(name, draft.body, draft.style); save(); go('home'); }
   else if (act === 'tab') go(v);
   else if (act === 'home') { F = null; API.stop(); go('home'); if (CLOUD) loadBoard(); }
-  else if (act === 'sleep') { S.day++; S.slots = 3; S.ranked = 2; S.fatigue = clamp(S.fatigue - 35, 0, 100); S.money += 40 + S.fame * 3; save(); view = null; render(); }
+  else if (act === 'sleep') { S.day++; S.slots = 3; S.ranked = 2; S.chuek = 1; S.fatigue = clamp(S.fatigue - 35, 0, 100); S.money += 40 + S.fame * 3; save(); view = null; render(); }
   else if (act === 'gym') { const c = GYM_COST[S.gym]; if (S.money < c) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(c); return; } S.money -= c; S.gym++; save(); render(); }
   else if (act === 'reset') { if (el.dataset.sure) { try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* fine */ } S = null; view = 'create'; setMode(false); render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); } else { el.dataset.sure = '1'; el.textContent = 'กดอีกครั้งเพื่อยืนยันการลบนักมวยคนนี้'; } }
-  else if (act === 'train') { if (S.slots < 1) return; const a = ACTS.find(x => x.id === v); mini = {act: a, t0: performance.now()}; if (a.id === 'rest') trainResult(1); else render(); }
+  else if (act === 'train') { if (S.slots < 1) return; const a = ACTS.find(x => x.id === v); mini = {act: a, t0: performance.now()}; if (a.id === 'rest') trainResult(1); else if (a.drill) drillStart(a); else render(); }
   else if (act === 'hit') { const ph = ((performance.now() - mini.t0) / 1100) % 2, x = ph < 1 ? ph : 2 - ph; trainResult(1 - Math.abs(x - .5) * 2); }
   else if (act === 'buy') { const cost = pending.items.reduce((a, i) => a + i.price, 0); if (S.money < cost) return; S.money -= cost; pending.items.forEach(i => { if (!S.own[i.kind].includes(i.k)) S.own[i.kind].push(i.k); }); S.look = pending.look; pending = null; save(); render(); showMe(); }
   else if (act === 'cancelbuy') { pending = null; render(); showMe(); }
-  else if (act === 'pick') { const o = v === 'r' ? rankedOpp() : localOpps().find(x => x.id === v); F = {opp: o, seed: (S.seed + S.day * 101 + S.rec.w * 7 + S.rec.l * 13 + (v === 'r' ? 5 : +v.slice(1))) >>> 0, plan: Object.assign({}, S.plan || PLAN_DEFAULT), phase: 'plan'}; setMode(false); render(); API.preview(Object.assign({fighter: o.body}, o.look), 'guard'); $('gBody').scrollIntoView({block: 'nearest'}); }
+  else if (act === 'pick') { const o = v === 'r' ? rankedOpp() : v === 'c' ? chuekOpp() : localOpps().find(x => x.id === v); F = {opp: o, seed: (S.seed + S.day * 101 + S.rec.w * 7 + S.rec.l * 13 + (v === 'r' ? 5 : v === 'c' ? 9 : +v.slice(1))) >>> 0, plan: Object.assign({}, S.plan || PLAN_DEFAULT), phase: 'plan'}; setMode(false); render(); API.preview(Object.assign({fighter: o.body}, o.look), 'guard', o.venue); $('gBody').scrollIntoView({block: 'nearest'}); }
   else if (act === 'backout') { F = null; go('fight'); }
   else if (act === 'sp') { if (!S.spOwn.includes(v)) return; if (S.sp.includes(v)) { if (S.sp.length > 1) S.sp = S.sp.filter(k => k !== v); } else { S.sp.push(v); if (S.sp.length > 2) S.sp.shift(); } save(); render(); }
   else if (act === 'plan') { F.plan[el.dataset.g] = v; render(); }
   else if (act === 'startfight') startFight();
   else if (act === 'resume') { for (let i = F.round; i < 3; i++) F.plans[i] = Object.assign({}, F.plan); API.replan(plansFor()); F.phase = 'live'; render(); API.resume(); $('stage').scrollIntoView({block: 'nearest', behavior: 'smooth'}); }
   else if (act === 'skip') API.skip();
+  else if (act === 'drillquit') { drillEnd(true); setMode(false); render(); showMe(); }
 }
 function onChange(e) {
   const el = e.target;
@@ -391,8 +484,11 @@ function onChange(e) {
 
 export function bootGame(api) {
   API = api; API.HOOK.onRoundBreak = onRoundBreak; API.HOOK.onOver = onOver;
+  window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
+  $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; $('ver').textContent = 'ต้นแบบ 0.1'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; $('ver').textContent = 'ต้นแบบ 0.2'; }
+  window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }
   cloudInit();

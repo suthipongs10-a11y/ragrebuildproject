@@ -22,7 +22,7 @@ function bodyMap(mesh) {
     for (let k = 0; k < 4; k++) w[kind[si.getComponent(i, k)]] += sw.getComponent(i, k);
     vr[i] = w[1] > .5 ? 1 : w[2] > .5 ? 2 : 0;
   }
-  const region = new Uint8Array(MAP * MAP), hq = new Uint8Array(MAP * MAP), sq = new Int8Array(MAP * MAP);
+  const region = new Uint8Array(MAP * MAP), hq = new Uint8Array(MAP * MAP), sq = new Int8Array(MAP * MAP), aq = new Uint8Array(MAP * MAP);
   const n = idx ? idx.count : pos.count;
   for (let t = 0; t < n; t += 3) {
     const a = idx ? idx.getX(t) : t, b = idx ? idx.getX(t + 1) : t + 1, c = idx ? idx.getX(t + 2) : t + 2;
@@ -40,9 +40,10 @@ function bodyMap(mesh) {
       const o = y * MAP + x; if (region[o] && (l1 < 0 || l2 < 0 || l3 < 0)) continue;
       region[o] = r; hq[o] = Math.max(0, Math.min(255, (l1 * ya + l2 * yb + l3 * yc) / 1.8 * 255));
       sq[o] = Math.max(-127, Math.min(127, (l1 * xa + l2 * xb + l3 * xc) * 300));
+      if (r === 1) aq[o] = Math.max(0, Math.min(255, (Math.abs(l1 * xa + l2 * xb + l3 * xc) - .3) * 400)); // distance out along the arm
     }
   }
-  return {region, hq, sq};
+  return {region, hq, sq, aq};
 }
 // Is this texel the garment's key colour? Returns 0..1.
 function keyed(rule, r, g, b) {
@@ -75,13 +76,16 @@ export function outfitTexture(model, look) {
   const src = model.pixels.data, out = new ImageData(new Uint8ClampedArray(src), W, H), d = out.data, B = model.body;
   const col = k => { const c = COLORS[k] ? COLORS[k][1] : COLORS.red[1]; return [(c >> 16) & 255, (c >> 8) & 255, c & 255]; };
   const cS = col(look.shorts), cT = col(look.trim), cG = col(look.gloves), [lo, hi] = model.shortsY, span = Math.max(1, hi - lo);
-  const fx = MAP / W, fy = MAP / H, pat = look.pattern;
+  const fx = MAP / W, fy = MAP / H, pat = look.pattern, rope = look.gloves === 'rope';
   for (let y = 0; y < H; y++) {
     const my = Math.floor(y * fy) * MAP;
     for (let x = 0; x < W; x++) {
       const o = my + Math.floor(x * fx), reg = B.region[o]; if (!reg) continue;
       const p = (y * W + x) * 4, r = src[p], g = src[p + 1], b = src[p + 2], k = keyed(model.key, r, g, b); if (k <= 0) continue;
-      let c = cG;
+      let c = cG, matte = false;
+      if (reg === 1 && rope) { // hemp cord wound round the fist: light turns with dark grooves between them
+        const ph = (B.aq[o] / 400 * 46) % 1, gv = ph < .22 ? .58 : ph > .82 ? .82 : 1; c = [212 * gv, 192 * gv, 150 * gv]; matte = true;
+      }
       if (reg === 2) {
         c = cS;
         const h = (B.hq[o] - lo) / span, s = B.sq[o] / 300; // 0 at the hem, 1 at the waist; metres to the fighter's left
@@ -92,7 +96,7 @@ export function outfitTexture(model, look) {
       }
       // keep the cloth's shading and sheen: brightness from the original, highlights stay light
       const mx = Math.max(r, g, b), mn = Math.min(r, g, b), sat = (mx - mn) / mx, v = mx / 255;
-      const shade = Math.min(1.25, .25 + v * 1.25), gloss = Math.max(0, 1 - sat * 1.6) * v;
+      const shade = matte ? .55 + v * .6 : Math.min(1.25, .25 + v * 1.25), gloss = matte ? 0 : Math.max(0, 1 - sat * 1.6) * v;
       const nr = c[0] * shade * (1 - gloss) + 255 * gloss, ng = c[1] * shade * (1 - gloss) + 255 * gloss, nb = c[2] * shade * (1 - gloss) + 255 * gloss;
       d[p] = r + (nr - r) * k; d[p + 1] = g + (ng - g) * k; d[p + 2] = b + (nb - b) * k;
     }

@@ -7,7 +7,8 @@ import { Fighter, EFF_JOINT, STYLE_BUILD, setDims, DIM_DEFAULT } from './rig.js'
 import { NP, FLAT, IDX, scalePoses } from './poses.js';
 import { loadModel, ModelFighter } from './model.js';
 import { COLORS, PATTERNS, HEADGEAR } from './outfit.js';
-import { buildArena } from './arena.js';
+import { buildArena, VENUES } from './arena.js';
+import { buildDrill, TARGETS } from './drill.js';
 import { buildFx } from './fx.js';
 import { buildAudio } from './audio.js';
 const THREE = globalThis.THREE;
@@ -30,6 +31,7 @@ const PRESET_NOTE = {
   arcade: 'ตัวการ์ตูนตัดเส้น หยุดภาพและจอสั่นแรง มีป้ายชื่อท่าและตัวนับชุด'
 };
 const DETAIL = [
+  {key: 'venue', th: 'เวที', opts: Object.keys(VENUES).filter(k => k !== 'camp').map(k => [k, VENUES[k]])},
   {key: 'cam', th: 'มุมกล้อง', opts: [['tv', 'ถ่ายทอดสด'], ['side', 'ด้านข้าง'], ['director', 'ผู้กำกับ'], ['low', 'ข้างเวที'], ['orbit', 'วนรอบ']]},
   {key: 'fighter', th: 'ตัวนักมวย', opts: [['model', 'โมเดล 3D'], ['code', 'สร้างจากโค้ด']]},
   {key: 'build', th: 'รูปร่าง (แบบโค้ด)', opts: [['auto', 'ตามสายมวย'], ['heavy', 'ถึก'], ['athletic', 'สมส่วน'], ['lean', 'เพรียว']]},
@@ -41,7 +43,7 @@ const DETAIL = [
   {key: 'labels', th: 'ป้ายชื่อท่า', opts: [[0, 'ปิด'], [1, 'ท่าใหญ่'], [2, 'ทุกจังหวะ']]},
   {key: 'replay', th: 'ภาพช้า', opts: [[0, 'ปิด'], [1, 'ตอนน็อก'], [2, 'น็อกและพักยก']]}
 ];
-const OPT = Object.assign({preset: 'tv', build: 'auto', fighter: 'model'}, PRESETS.tv);
+const OPT = Object.assign({preset: 'tv', build: 'auto', fighter: 'model', venue: 'stadium'}, PRESETS.tv);
 let MODEL = null, MODELS = []; // generated characters per corner, when they loaded (MODEL = shared proportions)
 // Roster of base bodies. Outfit is separate, so any body can wear any look. [label, key colour of the model's shorts and gloves]
 const ROSTER = {
@@ -85,7 +87,7 @@ renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadow
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(30, 1.5, .1, 120);
 const audio = buildAudio();
-let arena = null, fx = null; // built once fonts are ready, the mat texture draws text
+let arena = null, fx = null, drill = null, drillF = null; // built once fonts are ready, the mat texture draws text
 let fighters = [], W = 0, H = 0;
 
 function layout() {
@@ -106,7 +108,9 @@ let previewF = null, previewPose = 'guard';                         // a single 
 const buf = [new Float32Array(NP), new Float32Array(NP)];
 const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3(), lastTrail = [new THREE.Vector3(), new THREE.Vector3()];
 
-const fighterKey = () => (OPT.fighter === 'model' && MODEL ? 'model' : 'code:' + OPT.build);
+const fighterKey = () => (OPT.fighter === 'model' && MODEL ? 'model' : 'code:' + OPT.build) + (OPT.venue === 'chuek' ? ':rope' : '');
+// at the rope-fist ground the gloves come off
+const venueLook = (look, venue) => venue === 'chuek' ? Object.assign({}, look, {gloves: 'rope'}) : look;
 // The skeleton takes the proportions of whichever body is in use, and the poses scale to match.
 function useDims() {
   if (OPT.fighter === 'model' && MODEL) {
@@ -117,20 +121,20 @@ function useDims() {
 }
 function makeFighters() {
   fighters.forEach(f => scene.remove(f.root));
-  fighters = fight.specs.map((sp, i) => OPT.fighter === 'model' && MODEL ? new ModelFighter(i, MODELS[i], LOOK[i])
+  fighters = fight.specs.map((sp, i) => OPT.fighter === 'model' && MODEL ? new ModelFighter(i, MODELS[i], venueLook(LOOK[i], OPT.venue))
     : new Fighter(i, {skin: sp.skin + i, build: OPT.build === 'auto' ? STYLE_BUILD[sp.style] : OPT.build, hair: sp.skin + sp.stats.spd + i, tattoo: (sp.stats.pow + i) % 2 === 0}));
   fighters.forEach(f => { scene.add(f.root); f.setStyle(OPT.style); });
   builtAs = fighterKey();
 }
 function newFight(seed, cfg) {
-  CFG = Object.assign({seed, specs: null, plans: null}, cfg || {}); pausedRounds.clear();
+  CFG = Object.assign({seed, specs: null, plans: null, rules: null}, cfg || {}); pausedRounds.clear();
   useDims(); buildFight(); makeFighters(); renderCards(); restart();
   $('seed').textContent = String(seed);
 }
 // Simulates CFG and prepares everything playback needs. Same seed and same plans for the rounds already seen give the same events,
 // so a plan changed at a round break only alters what comes after.
 function buildFight() {
-  fight = simulate({seed: CFG.seed, specs: CFG.specs ? JSON.parse(JSON.stringify(CFG.specs)) : null, plans: CFG.plans, names: CFG.specs ? null : LOOK.map(l => cleanName(l.name))});
+  fight = simulate({seed: CFG.seed, specs: CFG.specs ? JSON.parse(JSON.stringify(CFG.specs)) : null, plans: CFG.plans, rules: CFG.rules, names: CFG.specs ? null : LOOK.map(l => cleanName(l.name))});
   TL = bake(fight); EV = fight.events;
   // landmarks the director and the slow motion need
   marks = {specials: [], kds: [], rests: [], stuns: [], clinches: [], bigHits: [], hits: [], rounds: [], introEnd: RULES.introTime, ko: null, dec: null, decPhase: null, over: fight.duration};
@@ -493,6 +497,14 @@ function frame(ts) {
   if (!last) last = ts;
   const dt = Math.min(.05, (ts - last) / 1000); last = ts; realT += dt;
   layout();
+  if (drill && drill.on && W) { // training: the fighter works a target, the game layer calls the strikes
+    drill.update(dt, realT, buf[0]); drillF.setWear(0, 0, 0);
+    if (camera.fov !== 30) { camera.fov = 30; camera.updateProjectionMatrix(); }
+    const sh = REDUCED ? 0 : drill.shake, far = camera.aspect < 1.5 ? 4.5 : 4.1;
+    camera.position.set(.3 + (Math.random() - .5) * sh, 1.3 + (Math.random() - .5) * sh, far * (1 - drill.kick)); camera.lookAt(.1, 1.02, 0);
+    arena.keyAt(0); arena.fadeRopes(camera.position, 0);
+    arena.update(realT, 0, dt); fx.update(dt, camera); renderer.render(scene, camera); movePops(dt); return;
+  }
   if (previewF && W) { // one fighter, slow orbit
     const P = buf[0]; P.set(FLAT[previewPose] || FLAT.guard);
     if (previewPose === 'guard') { const b = realT * 5.2; P[IDX.fL + 1] += Math.max(0, Math.sin(b)) * .04; P[IDX.hip + 1] += Math.sin(b) * .012; P[IDX.hL + 1] += Math.sin(b + 1) * .01; }
@@ -500,7 +512,7 @@ function frame(ts) {
     if (camera.fov !== 30) { camera.fov = 30; camera.updateProjectionMatrix(); }
     const az = .55 * Math.sin(realT * .35) + .5, D = 3.5;
     camera.position.set(Math.sin(az) * D, 1.25, Math.cos(az) * D); camera.lookAt(0, .92, 0);
-    arena.key.position.set(1.5, 7, 4.5); arena.key.target.position.set(0, 0, 0); arena.fadeRopes(camera.position, .25);
+    arena.keyAt(0); arena.fadeRopes(camera.position, .25);
     arena.update(realT, .05, dt); fx.update(dt, camera); renderer.render(scene, camera); return;
   }
   if (!W || !TL || galleryOn) { if (galleryOn) renderer.render(scene, camera); return; }
@@ -516,8 +528,9 @@ function frame(ts) {
     if (OPT.trail && ef && adv > 0) { const p = fighters[i].world(EFF_JOINT[EFF_NAME[ef]], tmpV); if (p.distanceToSquared(lastTrail[i]) > .0009) { fx.trailPush(i, p); lastTrail[i].copy(p); } }
   }
   const mid = (fighters[0].root.position.x + fighters[1].root.position.x) / 2;
-  arena.key.position.set(mid + 1.5, 7, 4.5); arena.key.target.position.set(mid, 0, 0);
+  arena.keyAt(mid);
   applyCamera(dt);
+  if (window.LAB.eye) { const e = window.LAB.eye; camera.position.set(e[0], e[1], e[2]); camera.lookAt(e[3], e[4], e[5]); camera.fov = e[6] || 40; camera.updateProjectionMatrix(); arena.fadeRopes(camera.position, 1); } // fixed viewpoint for checks
   fx.update(Math.max(adv, dt * .2), camera);
   const fighting = mode === 'live' && playT > marks.introEnd && playT < marks.over;
   arena.update(realT, hype, dt); audio.update(dt, hype, fighting && !frozen, TL.clock(playT).round);
@@ -544,6 +557,9 @@ function hud(dt) {
     }
     const c = TL.clock(playT); $('rd').textContent = 'ยก ' + c.round + '/' + RULES.rounds; $('tm').textContent = fmt(c.clock);
   }
+  movePops(dt);
+}
+function movePops(dt) {
   for (let i = popList.length - 1; i >= 0; i--) {
     const p = popList[i]; p.t += dt;
     if (p.t >= p.life) { p.el.remove(); popList.splice(i, 1); continue; }
@@ -565,7 +581,7 @@ function renderCards() {
   });
 }
 function applyOpt() {
-  arena.setLook(OPT.look, renderer, scene);
+  arena.setVenue(OPT.venue); arena.setLook(OPT.look, renderer, scene);
   if (fight && builtAs !== fighterKey()) { const t = playT; useDims(); TL = bake(fight); makeFighters(); seek(t); } // another body: re-aim every strike for its reach
   fighters.forEach(f => f.setStyle(OPT.style));
   fx.amount = OPT.look === 'arcade' ? 1.5 : OPT.look === 'broadcast' ? .7 : 1; fx.trailWidth = OPT.look === 'arcade' ? .13 : .085;
@@ -646,28 +662,43 @@ function roundStats(n) {
 }
 // ---------- hooks for the game layer ----------
 const API = {
-  LOOK, ROSTER, COLORS, PATTERNS, HEADGEAR, HOOK, cleanName,
+  LOOK, ROSTER, COLORS, PATTERNS, HEADGEAR, HOOK, VENUES, TARGETS, cleanName,
   hasModels: () => !!document.getElementById('model-c'),
-  async startFight(cfg) { // cfg: {seed, specs: [player, opponent], plans, looks: [look, look]}
-    API.endPreview();
+  async startFight(cfg) { // cfg: {seed, specs: [player, opponent], plans, looks: [look, look], venue, rules}
+    API.endPreview(); API.drillStop(); OPT.venue = VENUES[cfg.venue] ? cfg.venue : 'stadium';
     cfg.looks.forEach((l, i) => Object.assign(LOOK[i], l));
     OPT.fighter = 'model'; await loadPair();
-    newFight(cfg.seed, {specs: cfg.specs, plans: cfg.plans}); applyOpt(); frozen = false;
+    newFight(cfg.seed, {specs: cfg.specs, plans: cfg.plans, rules: cfg.rules || null}); applyOpt(); frozen = false;
   },
   replan(plans) { CFG.plans = plans; const t = playT; buildFight(); evi = indexAt(t); rpi = replays.findIndex(r => r.trigger > t); if (rpi < 0) rpi = replays.length; },
   resume() { frozen = false; },
   skip() { seek(marks.over); },
   stop() { TL = null; fighters.forEach(f => scene.remove(f.root)); fighters = []; clearOverlays(); },
   result: () => fight && fight.result, fight: () => fight,
-  async preview(look, pose) { // show one fighter in the given look
-    let model = null;
-    try { model = await ensureModel(look.fighter); } catch (e) { $('modelNote').textContent = 'โหลดโมเดลนักมวยไม่ได้ (' + e.message + ') '; return false; }
-    const m = model.dims, D = DIM_DEFAULT, kHip = model.standHips / (D.thigh + D.shin + D.ankle + D.hipY);
-    setDims(m); scalePoses(kHip, (.88 * kHip + m.spine + m.neck + m.head) / (.88 + D.spine + D.neck + D.head));
-    API.endPreview(); fighters.forEach(f => { f.root.visible = false; });
-    previewF = new ModelFighter(0, model, look); previewPose = pose || 'guard'; scene.add(previewF.root); clearOverlays();
+  async preview(look, pose, venue) { // show one fighter in the given look, standing in a venue
+    const model = await API.single(look); if (!model) return false;
+    venue = VENUES[venue] ? venue : 'camp'; arena.setVenue(venue);
+    previewF = new ModelFighter(0, model, venueLook(look, venue)); previewPose = pose || 'guard'; scene.add(previewF.root); clearOverlays();
     return true;
   },
+  // load one body, size the skeleton to it and clear the stage for it
+  async single(look) {
+    let model = null;
+    try { model = await ensureModel(look.fighter); } catch (e) { $('modelNote').textContent = 'โหลดโมเดลนักมวยไม่ได้ (' + e.message + ') '; return null; }
+    const m = model.dims, D = DIM_DEFAULT, kHip = model.standHips / (D.thigh + D.shin + D.ankle + D.hipY);
+    setDims(m); scalePoses(kHip, (.88 * kHip + m.spine + m.neck + m.head) / (.88 + D.spine + D.neck + D.head));
+    API.endPreview(); API.drillStop(); fighters.forEach(f => { f.root.visible = false; });
+    return model;
+  },
+  // training drill: the fighter in the camp with a target in front; the caller throws the strikes
+  async drillStart(look, target) {
+    const model = await API.single(look); if (!model) return false;
+    arena.setVenue('camp'); drillF = new ModelFighter(0, model, look); scene.add(drillF.root); clearOverlays();
+    drill.start(drillF, target, arena.V.beamY); return true;
+  },
+  drillStrike: move => drill.strike(move),
+  drillStop() { if (drill) drill.stop(); if (drillF) { scene.remove(drillF.root); drillF = null; } },
+  pop(text, cls) { if (drillF) pop(text, drillF.world('head', tmpV).add(tmpV2.set(.3, .42, 0)), cls, .7); },
   endPreview() { if (previewF) { scene.remove(previewF.root); previewF = null; } fighters.forEach(f => { f.root.visible = true; }); },
   setSpeed(v) { speed = v; }, applyOpt
 };
@@ -676,11 +707,11 @@ window.MUAY = API;
 buildUi(); layout();
 const GAME_MODE = !!document.getElementById('game');
 const start = async () => {
-  arena = buildArena(scene); fx = buildFx(scene);
+  arena = buildArena(scene); fx = buildFx(scene); drill = buildDrill(scene, fx, audio);
   await Promise.resolve(); // the game entry registers its boot function after this module has run
-  if (GAME_MODE && window.MUAY_BOOT) { arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
+  if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 5 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 6 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

@@ -33,7 +33,7 @@ export function simulate(opts) {
   const R = mulberry32(seed);
   const rnd = (a, b) => a + R() * (b - a);
   const pick = a => a[Math.floor(R() * a.length)];
-  const K = RULES, DT = K.dt, LIM = K.limit;
+  const K = opts.rules ? Object.assign({}, RULES, opts.rules) : RULES, DT = K.dt, LIM = K.limit; // a venue may change a few rules
 
   let specs = opts.specs;
   if (!specs) { const a = randomSpec(R); specs = [a, randomSpec(R, a.first)]; }

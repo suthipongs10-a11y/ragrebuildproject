@@ -177,6 +177,27 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
 .rk .lg{font-size:11.5px;color:var(--muted)} .rk .rp{text-align:right;color:var(--gold)} .rk.me{color:var(--gold);font-weight:600} .rk.gap{color:var(--muted);display:block;text-align:center}
 .gcard.slim{padding:9px 12px}
 .mis{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;font-size:13.5px} .mis span:nth-child(2){color:var(--muted);font-variant-numeric:tabular-nums} .mis span:last-child{color:var(--gold)} .mis.done span:first-child{color:var(--hp)}
+/* training drill: call track over the stage, three big buttons under it */
+.app.game.g-drill header,.app.game.g-drill .gnav,.app.game.g-drill #noteLine{display:none}
+.act.drill{border-color:var(--gold)} .act b i{font-style:normal;font-family:var(--body);font-size:10.5px;font-weight:600;color:var(--ink);background:var(--gold);border-radius:3px;padding:0 5px;margin-left:4px;vertical-align:middle}
+#drillUi{position:absolute;inset:0;pointer-events:none;font-family:var(--display)}
+#drillUi .dtop{position:absolute;left:10px;right:10px;top:8px;display:flex;justify-content:space-between;font-size:14px;font-weight:700;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.8),0 0 8px rgba(0,0,0,.7)}
+#dCombo{color:#ffd35a}
+#drillUi .dmsg{position:absolute;left:0;right:0;top:15%;text-align:center;font-style:italic;font-weight:800;font-size:34px;line-height:1.1;color:#fff;text-shadow:0 3px 0 rgba(0,0,0,.8),0 0 14px rgba(0,0,0,.8);animation:dmsg .5s ease-out both}
+#drillUi .dmsg.perfect{color:#ffd35a} #drillUi .dmsg.good{color:#8fe3a8} #drillUi .dmsg.late{color:#cfd6e6} #drillUi .dmsg.bad{color:#ff6b5e}
+@keyframes dmsg{0%{transform:scale(1.7);opacity:0}25%{transform:scale(1);opacity:1}100%{opacity:.9}}
+#drillUi .dtrack{position:absolute;left:0;right:0;bottom:0;height:54px;background:linear-gradient(rgba(6,7,10,0),rgba(6,7,10,.82) 45%)}
+#drillUi .dring{position:absolute;left:20%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.5),inset 0 0 0 2px rgba(0,0,0,.5)}
+#dNotes{position:absolute;inset:0;overflow:hidden}
+.dnote{position:absolute;left:0;top:50%;min-width:42px;height:34px;line-height:34px;padding:0 9px;box-sizing:border-box;border-radius:17px;text-align:center;font-size:15px;font-weight:700;color:var(--ink);will-change:transform;box-shadow:0 0 0 2px rgba(0,0,0,.55)}
+.dnote.k-punch,.dbtn.k-punch{background:#ff7a70} .dnote.k-kick,.dbtn.k-kick{background:#7fb0ff} .dnote.k-teep,.dbtn.k-teep{background:#f2b83a}
+.dnote.hit{opacity:0;transition:opacity .12s} .dnote.gone{opacity:.28;filter:grayscale(1)}
+.drillpad{gap:8px}
+.dbtns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.dbtn{height:78px;border:0;border-radius:12px;color:var(--ink);font-family:var(--display);font-size:24px;user-select:none;-webkit-user-select:none;touch-action:none;box-shadow:0 4px 0 rgba(0,0,0,.45)}
+.dbtn b{font-weight:700;pointer-events:none}
+.dbtn.tap{animation:dtap .14s ease-out}
+@keyframes dtap{0%{transform:translateY(4px) scale(.96);box-shadow:0 0 0 rgba(0,0,0,.45)}100%{transform:none}}
 @media (max-width:480px){ .acts,.styles{grid-template-columns:1fr} .rkh,.rk{grid-template-columns:24px minmax(0,1fr) 44px 40px} .rk .lg,.rkh span:nth-child(3){display:none} }
 @media (max-width:480px){ #presets{grid-template-columns:repeat(2,minmax(0,1fr))} .banner{font-size:30px} .banner.huge{font-size:44px} #count{font-size:48px} #detail .row{grid-template-columns:1fr} }
 @media (prefers-reduced-motion:reduce){ .banner,.combo,#count{animation-duration:.01s} .banner{opacity:1} }
