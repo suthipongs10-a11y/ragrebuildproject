@@ -145,6 +145,41 @@ export function bake(fight) {
   baked[0] = first[0]; baked[1] = b1; pass(1, true);
   baked[0] = aimed0;
 
+  // Footwork. The simulation slides a fighter along the ring; here the feet are pinned to the canvas and
+  // step to keep up: lead foot first going forward, rear foot first going back, one foot at a time.
+  const GROUNDED = new Set([STATE.intro, STATE.idle, STATE.move, STATE.hit, STATE.block, STATE.stun, STATE.rest, STATE.cover, STATE.win]);
+  function footwork(i) {
+    const B = baked[i], dir = i ? -1 : 1, TH = .08, LIFT = .05;
+    const root = k => tick(i, k, 0) * .01 * dir;                 // position along the fighter's own forward axis
+    const feet = [IDX.fL, IDX.fR].map(base => ({base, w: 0, at: root(0) + B[base], step: null}));
+    for (let k = 0; k < n; k++) {
+      const o = k * NP, t = k * dt, a = root(k), st = tick(i, k, 4);
+      const ok = GROUNDED.has(st) && Math.abs(B[o + IDX.spin]) < .05 && B[o + IDX.jump] < .02;
+      for (const f of feet) {
+        f.lx = B[o + f.base]; f.ly = B[o + f.base + 1]; f.can = ok && f.ly < .035; f.des = a + f.lx;
+        if (!f.can) { f.w = Math.max(0, f.w - dt / .07); f.step = null; f.at = f.des; continue; }
+        f.w = Math.min(1, f.w + dt / .1);
+        if (f.step && t >= f.step.t0 + f.step.dur) { f.at = f.step.to; f.step = null; }
+        if (!f.step) f.at = Math.max(f.des - .4, Math.min(f.des + .4, f.at)); // shoved a long way: the foot drags rather than stretches
+      }
+      if (!feet[0].step && !feet[1].step) {
+        const late = feet.filter(f => f.can && Math.abs(f.des - f.at) > TH);
+        if (late.length) {
+          const fwd = late[0].des - late[0].at > 0, f = late.length > 1 ? feet[fwd ? 0 : 1] : late[0];
+          const speed = Math.abs(root(Math.min(n - 1, k + 4)) - a) / (4 * dt), dur = Math.max(.1, Math.min(.16, .16 - speed * .06));
+          const k2 = Math.min(n - 1, k + Math.round(dur / dt)), ahead = Math.min(.07, speed * .06) * (fwd ? 1 : -1);
+          f.step = {t0: t, dur, from: f.at, to: root(k2) + B[k2 * NP + f.base] + ahead};
+        }
+      }
+      for (const f of feet) {
+        let at = f.at, lift = 0;
+        if (f.step) { const p = Math.min(1, (t - f.step.t0) / f.step.dur); at = f.step.from + (f.step.to - f.step.from) * ease(p); lift = Math.sin(p * Math.PI) * LIFT; }
+        B[o + f.base] = f.lx + (at - a - f.lx) * f.w; B[o + f.base + 1] = f.ly + lift * f.w;
+      }
+    }
+  }
+  footwork(0); footwork(1);
+
   const TL = {
     fight, n, dt, duration: (n - 1) * dt, baked, eff,
     val(i, t, f) {

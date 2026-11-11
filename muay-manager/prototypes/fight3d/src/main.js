@@ -632,7 +632,7 @@ function buildUi() {
 
 // hooks for tuning and automated checks
 window.LAB = {
-  OPT, seek, applyOpt, newFight, get fight() { return fight; }, get t() { return playT; }, get mode() { return mode; },
+  OPT, seek, applyOpt, newFight, get fight() { return fight; }, get models() { return MODELS; }, get tl() { return TL; }, three: {scene, camera, renderer}, get t() { return playT; }, get mode() { return mode; },
   set(o) { Object.assign(OPT, o); OPT.preset = o.preset || ''; applyOpt(); },
   preset(k) { OPT.preset = k; Object.assign(OPT, PRESETS[k]); applyOpt(); },
   freeze(t) { seek(t); frozen = true; },
@@ -677,6 +677,8 @@ const API = {
   result: () => fight && fight.result, fight: () => fight,
   async preview(look, pose, venue) { // show one fighter in the given look, standing in a venue
     const model = await API.single(look); if (!model) return false;
+    API.endPreview(); API.drillStop(); // a second call may have finished while this one was loading
+    fighters.forEach(f => { f.root.visible = false; });
     venue = VENUES[venue] ? venue : 'camp'; arena.setVenue(venue);
     previewF = new ModelFighter(0, model, venueLook(look, venue)); previewPose = pose || 'guard'; scene.add(previewF.root); clearOverlays();
     return true;
@@ -693,6 +695,7 @@ const API = {
   // training drill: the fighter in the camp with a target in front; the caller throws the strikes
   async drillStart(look, target) {
     const model = await API.single(look); if (!model) return false;
+    API.endPreview(); API.drillStop(); fighters.forEach(f => { f.root.visible = false; });
     arena.setVenue('camp'); drillF = new ModelFighter(0, model, look); scene.add(drillF.root); clearOverlays();
     drill.start(drillF, target, arena.V.beamY); return true;
   },
@@ -711,7 +714,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 6 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 7 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

@@ -75,8 +75,12 @@ function crowd(V, seats, shirts, skins, bare) {
   const bodies = new THREE.InstancedMesh(afoot ? figureGeo() : new THREE.CapsuleGeometry(.2, .32, 3, 6), std({roughness: 1, vertexColors: afoot}), seats.length), heads = new THREE.InstancedMesh(new THREE.SphereGeometry(.13, 8, 6), std({roughness: 1}), seats.length);
   const col = new THREE.Color();
   seats.forEach((s, i) => { const skin = skins[i % skins.length]; bodies.setColorAt(i, col.setHex(bare && s.hue < bare ? skin : shirts[Math.floor(s.hue * shirts.length) % shirts.length])); heads.setColorAt(i, col.setHex(skin)); });
-  bodies.frustumCulled = heads.frustumCulled = false;
-  V.group.add(bodies, heads); V.seats = seats; V.bodies = bodies; V.heads = heads; V.afoot = afoot;
+  // two arms each, shown only while that person is cheering
+  const armGeo = new THREE.CylinderGeometry(.035, .045, .46, 5); armGeo.translate(0, .23, 0);
+  const arms = new THREE.InstancedMesh(armGeo, std({roughness: 1}), seats.length * 2), zero = new THREE.Matrix4().makeScale(0, 0, 0);
+  seats.forEach((s, i) => { s.th = .4 + rng() * .85; s.e = 0; col.setHex(skins[i % skins.length]); arms.setColorAt(i * 2, col); arms.setColorAt(i * 2 + 1, col); arms.setMatrixAt(i * 2, zero); arms.setMatrixAt(i * 2 + 1, zero); });
+  bodies.frustumCulled = heads.frustumCulled = arms.frustumCulled = false;
+  V.group.add(bodies, heads, arms); V.seats = seats; V.bodies = bodies; V.heads = heads; V.arms = arms; V.afoot = afoot; V.placed = false;
 }
 // raked seating on all four sides
 function tierSeats(rows) {
@@ -86,7 +90,7 @@ function tierSeats(rows) {
     for (let i = 0; i < n; i++) {
       const u = -dist + i * .62 + (row % 2) * .3 + (rng() - .5) * .12;
       const p = side === 0 ? [u, y, dist] : side === 1 ? [dist, y, u] : side === 2 ? [u, y, -dist] : [-dist, y, u];
-      seats.push({x: p[0], y: p[1], z: p[2], ph: rng() * 6.28, s: .85 + rng() * .3, hue: rng()});
+      seats.push({x: p[0], y: p[1], z: p[2], ph: rng() * 6.28, s: .85 + rng() * .3, hue: rng(), ax: side % 2 ? 0 : 1});
     }
   }
   return seats;
@@ -101,7 +105,7 @@ function groundSeats(o) {
       if (side !== 2 && u > o.zMax) continue;
       const d = dist + (rng() - .5) * .3, p = side === 1 ? [d, u] : side === 2 ? [u, -d] : [-d, u];
       if (o.skip && o.skip(p[0], p[1])) continue;
-      seats.push({x: p[0], y: o.y, z: p[1], ph: rng() * 6.28, s: (rng() < .12 ? .7 : .94) + rng() * .14, hue: rng(), stand: row >= o.sit, ry: (side === 2 ? 0 : Math.PI / 2) + (rng() - .5) * .5});
+      seats.push({x: p[0], y: o.y, z: p[1], ph: rng() * 6.28, s: (rng() < .12 ? .7 : .94) + rng() * .14, hue: rng(), stand: row >= o.sit, ry: (side === 2 ? 0 : Math.PI / 2) + (rng() - .5) * .5, ax: side === 2 ? 1 : 0});
     }
   }
   return seats;
@@ -459,19 +463,35 @@ export function buildArena(scene) {
     if (V.flicker !== 1) A.rimR.intensity = A.rimB.intensity = rimBase * V.flicker;
     const seats = V.seats;
     if (seats) {
-      const amp = .03 + hype * .16;
+      // The crowd stays still. When the fight heats up the keener people get to their feet and throw their arms up,
+      // more of them the hotter it gets, and they settle again as it cools.
+      let moved = false;
       for (let i = 0; i < seats.length; i++) {
-        const s = seats[i], bob = Math.abs(Math.sin(time * (2.2 + hype * 5) + s.ph)) * amp * (hype > .55 && s.hue > .5 ? 2.2 : 1);
-        if (V.afoot) { // on their feet, or squatting in the front rows
-          const k = s.stand ? 1 : .6;
-          dummy.position.set(s.x, s.y + bob * k, s.z); dummy.rotation.y = s.ry; dummy.scale.set(s.s, s.s * k, s.s); dummy.updateMatrix(); V.bodies.setMatrixAt(i, dummy.matrix);
-          dummy.position.y = s.y + 1.6 * s.s * k + bob * k; dummy.rotation.y = 0; dummy.scale.setScalar(s.s * .92); dummy.updateMatrix(); V.heads.setMatrixAt(i, dummy.matrix);
-        } else {
-          dummy.position.set(s.x, s.y + .3 + bob, s.z); dummy.scale.setScalar(s.s); dummy.updateMatrix(); V.bodies.setMatrixAt(i, dummy.matrix);
-          dummy.position.y += .42 * s.s; dummy.updateMatrix(); V.heads.setMatrixAt(i, dummy.matrix);
+        const s = seats[i], want = hype > s.th ? 1 : 0;
+        if (V.placed && s.e === want && !want) continue;
+        s.e += (want - s.e) * Math.min(1, dt * (want ? 6 : 1.8)); if (Math.abs(want - s.e) < .01) s.e = want;
+        const e = s.e, hop = e * Math.abs(Math.sin(time * 5.5 + s.ph)) * .05;
+        let sh; // shoulder height
+        if (V.afoot) { // on their feet, or squatting in the front rows and rising
+          const k = s.stand ? 1 : .6 + .4 * e;
+          dummy.position.set(s.x, s.y + hop, s.z); dummy.rotation.set(0, s.ry, 0); dummy.scale.set(s.s, s.s * k, s.s); dummy.updateMatrix(); V.bodies.setMatrixAt(i, dummy.matrix);
+          dummy.position.y = s.y + 1.6 * s.s * k + hop; dummy.rotation.set(0, 0, 0); dummy.scale.setScalar(s.s * .92); dummy.updateMatrix(); V.heads.setMatrixAt(i, dummy.matrix);
+          sh = s.y + 1.3 * s.s * k + hop;
+        } else { // seated: gets up off the bench
+          const up = e * .24;
+          dummy.position.set(s.x, s.y + .3 + up + hop, s.z); dummy.rotation.set(0, 0, 0); dummy.scale.set(s.s, s.s * (1 + e * .4), s.s); dummy.updateMatrix(); V.bodies.setMatrixAt(i, dummy.matrix);
+          dummy.position.y += (.42 + e * .12) * s.s; dummy.scale.setScalar(s.s); dummy.updateMatrix(); V.heads.setMatrixAt(i, dummy.matrix);
+          sh = s.y + .44 + up + hop + e * .1;
         }
+        for (let a = 0; a < 2; a++) {
+          const sg = a ? 1 : -1, tilt = sg * (.42 + Math.sin(time * 7 + s.ph + a) * .16);
+          dummy.position.set(s.x + s.ax * sg * .17 * s.s, sh, s.z + (1 - s.ax) * sg * .17 * s.s); dummy.rotation.set(s.ax ? 0 : tilt, 0, s.ax ? -tilt : 0); dummy.scale.set(e, e * s.s, e); dummy.updateMatrix(); V.arms.setMatrixAt(i * 2 + a, dummy.matrix);
+        }
+        moved = true;
       }
-      V.bodies.instanceMatrix.needsUpdate = true; V.heads.instanceMatrix.needsUpdate = true;
+      dummy.rotation.set(0, 0, 0);
+      if (moved) { V.bodies.instanceMatrix.needsUpdate = true; V.heads.instanceMatrix.needsUpdate = true; V.arms.instanceMatrix.needsUpdate = true; }
+      V.placed = true;
     }
     for (const f of A.flashes) {
       f.t -= dt;
