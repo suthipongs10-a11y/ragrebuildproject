@@ -155,14 +155,24 @@ export function bake(fight) {
   // how much a fighter is free to move on his own (bounce, weave): 1 while idle, eased in and out around everything else
   const idleW = [new Float32Array(n), new Float32Array(n)];
   for (let i = 0; i < 2; i++) { let w = 0; for (let k = 0; k < n; k++) { w = tick(i, k, 4) === STATE.idle ? Math.min(1, w + dt / .16) : Math.max(0, w - dt / .07); idleW[i][k] = w; } }
+  // A blow is aimed at where the defender's baked pose puts him. His own bobbing and swaying therefore eases out
+  // over the quarter second before anything lands on him or on his guard, or the glove would meet thin air.
+  for (const e of fight.events) {
+    if (e.type !== 'hit' || (e.res !== 'hit' && e.res !== 'block' && e.res !== 'catch')) continue;
+    const k1 = Math.min(n - 1, Math.round(e.t / dt)), span = Math.round(.26 / dt), W = idleW[e.on];
+    for (let k = Math.max(0, k1 - span); k <= k1; k++) { const r = (k1 - k) / span; W[k] = Math.min(W[k], r * r * (3 - 2 * r)); }
+  }
   const hash = x => { const s = Math.sin(x * 127.1 + 31.7) * 43758.5453; return s - Math.floor(s); };
   // How a fighter carries himself between exchanges follows what his corner asked for this round:
   // 0 feeling out (on his toes, with pauses), 1 walking forward (no bounce), 2 waiting (planted, guard up, slow sway).
   const MODE = {balanced: 0, attack: 1, counter: 2}, mode = [new Uint8Array(n), new Uint8Array(n)];
   for (const e of fight.events) if (e.type === 'plan') mode[e.by].fill(MODE[e.ag] || 0, Math.min(n, Math.round(e.t / dt)));
   const smooth = (a, b, x) => { const k = Math.max(0, Math.min(1, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
-  // feeling out: bounce for a couple of seconds, then stand and sway, then bounce again
-  const hopGate = (i, t) => { const g = t * .3 + i * .43, p = g - Math.floor(g); return smooth(0, .05, p) * (1 - smooth(.64, .7, p)); };
+  // feeling out: bounce for about three seconds, then stand and sway for one, then bounce again
+  const GATE = .25, gateP = (i, t) => { const g = t * GATE + i * .43; return g - Math.floor(g); }; // a four-second cycle
+  // share of each cycle spent on the toes: most of it when feeling out, a short burst for the man walking forward or waiting
+  const HOP_ON = [.8, .36, .26];
+  const hopGate = (i, t, md) => { const p = gateP(i, t), on = HOP_ON[md]; return smooth(0, .04, p) * (1 - smooth(on, on + .05, p)); };
   // waiting: now and then the feet change over, slowly, one step at a time
   const slowSwitch = (i, t) => { const g = t * .19 + i * .47, c = Math.floor(g); return g - c < .26 && hash(c * 5 + i) < .6; };
   // the bounce: a little over two light hops a second, in the air slightly longer than on the canvas
@@ -189,8 +199,8 @@ export function bake(fight) {
         if (f.step && t >= f.step.t0 + f.step.dur) { f.at = f.step.to; f.step = null; }
         if (!f.step) f.at = Math.max(f.des - .4, Math.min(f.des + .4, f.at)); // shoved a long way: the foot drags rather than stretches
       }
-      const md = mode[i][k], ph = hopPh[i][k], up = hopUp(ph) > 0, bouncing = IW[k] > .5 && md === 0 && hopGate(i, t) > .5;
-      if (md === 2 && IW[k] === 1 && slowSwitch(i, t)) { feet[0].des -= .26; feet[1].des += .26; }
+      const md = mode[i][k], ph = hopPh[i][k], up = hopUp(ph) > 0, bouncing = IW[k] > .5 && hopGate(i, t, md) > .5;
+      if (md === 2 && !bouncing && IW[k] === 1 && slowSwitch(i, t)) { feet[0].des -= .26; feet[1].des += .26; }
       if (bouncing && up && !wasUp) { // leaving the canvas: both feet go to where they will be wanted on landing
         let k2 = k + 1; while (k2 < n - 1 && hopUp(hopPh[i][k2]) > 0) k2++;
         const sw = IW[k] === 1 && IW[k2] === 1 && hash(Math.floor(ph / (Math.PI * 2)) * 7 + i * 3) < .15; // a quick switch of the feet
@@ -234,36 +244,59 @@ export function bake(fight) {
       const st = TK[(k * 2 + i) * TICK_FIELDS + 4];
       const iw = idleW[i][k] + (idleW[i][k + 1] - idleW[i][k]) * fr;
       if (iw > 0) {
-        const amp = iw * (TK[(k * 2 + i) * TICK_FIELDS + 2] < 25 ? .45 : 1); // a tired fighter barely lifts his feet
+        const amp = iw * (TK[(k * 2 + i) * TICK_FIELDS + 2] < 25 ? .7 : 1); // a tired fighter moves less
         const md = mode[i][k], ph = hopPh[i][k] + (hopPh[i][k + 1] - hopPh[i][k]) * fr;
+        // slow drift every fighter has while he waits: side to side, front to back, sinking and rising
+        const lr = Math.sin(t * 1.7 + i * 2.1) * amp, fb = Math.sin(t * 1.15 + i * .7) * amp, sink = Math.sin(t * 2.4 + i * 1.3);
+        // Bounce on the toes, guard up: every attitude has it, for as long as its gate is open.
+        const g = hopGate(i, t, md), up = hopUp(ph) * g, rock = Math.sin(ph * .5), still = 1 - g;
+        out[IDX.jump] += up * .042 * amp; out[IDX.hip + 1] -= (g - up) * .026 * amp;
+        out[IDX.hip] += rock * .022 * amp * g; out[IDX.lean] += rock * .03 * amp * g;
+        out[IDX.hL] += rock * .02 * amp * g; out[IDX.hL + 1] += up * .014 * amp; out[IDX.hR + 1] += up * .014 * amp;
         if (md === 0) {
-          // feeling out: light bounce on the toes with the guard up; every few seconds he stops and sways to read the other man
-          const g = hopGate(i, t), up = hopUp(ph) * g, rock = Math.sin(ph * .5), gc = t * .3 + i * .43, gp = gc - Math.floor(gc);
-          const sway = Math.sin(Math.max(0, gp - .67) / .33 * Math.PI * 2) * (1 - g) * amp;
-          out[IDX.jump] += up * .032 * amp; out[IDX.hip + 1] -= ((g - up) * .02 + (1 - g) * .035) * amp;
-          out[IDX.hip] += rock * .02 * amp * g; out[IDX.lean] += rock * .025 * amp * g;
-          out[IDX.hL] += rock * .02 * amp; out[IDX.hL + 1] += up * .012 * amp; out[IDX.hR + 1] += (Math.cos(ph * .5) * .012 + up * .012) * amp;
-          out[IDX.side] += sway * .17; out[IDX.hip + 2] += sway * .055; out[IDX.twist] -= sway * .1; out[IDX.hdY] += sway * .15;
+          // feeling out: between bursts of bouncing he stops and sways to read the other man
+          const sway = Math.sin(Math.max(0, gateP(i, t) - .82) / .18 * Math.PI * 2) * still * amp;
+          out[IDX.hip + 1] -= still * .04 * amp; out[IDX.hip] += fb * .025; out[IDX.lean] += fb * .06; out[IDX.hR + 1] += Math.cos(ph * .5) * .012 * amp;
+          out[IDX.side] += sway * .2 + lr * .11; out[IDX.hip + 2] += sway * .06 + lr * .035; out[IDX.twist] -= sway * .1 + lr * .06; out[IDX.hdY] += sway * .15;
         } else if (md === 1) {
-          // walking forward: no bounce, chin down behind a tight high guard, shoulders rolling with each step
-          const roll = Math.sin(ph * .5) * amp;
-          out[IDX.hip + 1] -= (.03 + Math.abs(roll) * .012) * amp; out[IDX.lean] += .08 * amp; out[IDX.hdP] += .08 * amp;
-          out[IDX.twist] += roll * .1; out[IDX.side] += roll * .04; out[IDX.hip + 2] += roll * .015;
-          out[IDX.hL] -= .07 * amp; out[IDX.hL + 1] += .04 * amp; out[IDX.hR + 1] += .035 * amp; out[IDX.hR] += .03 * amp;
+          // walking forward: when he is not bouncing the lead foot taps the canvas in time and the weight rolls from leg to leg;
+          // the head keeps moving behind a tight high guard.
+          const beat = Math.sin(ph * .5), tap = Math.max(0, beat) * amp * still;
+          out[IDX.fL + 1] += tap * .075; out[IDX.hip] -= tap * .02; out[IDX.hip + 1] -= (.032 * amp - tap * .02) * still;
+          out[IDX.lean] += .07 * amp + fb * .05; out[IDX.hdP] += .06 * amp;
+          out[IDX.side] += lr * .12; out[IDX.hip + 2] += lr * .035; out[IDX.twist] += beat * .1 * amp * still - lr * .05; out[IDX.hdY] += lr * .08;
+          out[IDX.hL] -= .06 * amp; out[IDX.hL + 1] += .04 * amp + tap * .012; out[IDX.hR + 1] += .035 * amp; out[IDX.hR] += .03 * amp;
         } else {
-          // waiting: feet planted, guard up and long, the body sinking and rising slowly, swaying side to side and rocking front to back
-          const sink = Math.sin(t * 2.3 + i * 1.3), lr = Math.sin(t * 1.55 + i * 2.1) * amp, fb = Math.sin(t * 1.1 + i * .7) * amp;
-          out[IDX.hip + 1] -= (.045 + .04 * sink) * amp; out[IDX.lean] += (.03 + .03 * sink) * amp + fb * .075; out[IDX.hip] += fb * .035;
-          out[IDX.side] += lr * .12; out[IDX.hip + 2] += lr * .04; out[IDX.twist] -= lr * .07; out[IDX.hdY] += lr * .1;
-          out[IDX.hL] += (.07 + fb * .03) * amp; out[IDX.hL + 1] += .03 * amp; out[IDX.hR + 1] += .03 * amp;
+          // waiting: guard up and long; when he is not bouncing the feet stay planted and the body sinks and rises,
+          // swaying side to side and rocking front to back
+          out[IDX.hip + 1] -= (.05 + .055 * sink) * amp * (1 - .6 * g); out[IDX.lean] += (.03 + .035 * sink) * amp + fb * .1; out[IDX.hip] += fb * .04;
+          out[IDX.side] += lr * .15; out[IDX.hip + 2] += lr * .045; out[IDX.twist] -= lr * .08; out[IDX.hdY] += lr * .1;
+          out[IDX.hL] += .07 * amp + fb * .03; out[IDX.hL + 1] += .03 * amp; out[IDX.hR + 1] += .03 * amp;
         }
-        // bob and weave: every few seconds the head dips and rolls from one side to the other (a man walking forward just walks)
-        const cyc = t * .5 + i * .37, c0 = Math.floor(cyc), p = (cyc - c0) / .34, h = hash(c0 * 2 + i);
-        if (md !== 1 && p < 1 && h < (md === 2 ? .55 : .8)) {
-          const dip = Math.sin(p * Math.PI) * amp, roll = Math.sin(p * Math.PI * 2) * amp * (h < .36 ? 1 : -1);
-          out[IDX.hip + 1] -= .1 * dip; out[IDX.lean] += .26 * dip; out[IDX.hdP] += .12 * dip;
-          out[IDX.side] += .22 * roll; out[IDX.hip + 2] += .05 * roll; out[IDX.twist] -= .12 * roll;
-          out[IDX.hL + 1] -= .06 * dip; out[IDX.hR + 1] -= .06 * dip;
+        // Head movement: every second and a quarter, more often than not, one of four moves.
+        const cyc = t / 1.25 + i * .37, c0 = Math.floor(cyc), p = (cyc - c0) * 1.25 / .62, h = hash(c0 * 2 + i);
+        if (p < 1 && h < (md === 0 ? .8 : md === 1 ? .7 : .85)) {
+          let kind = Math.floor(hash(c0 * 7 + i * 3 + .5) * 4); if (md === 1 && kind === 1) kind = 0; // the man coming forward does not lean away
+          const dir = h * 31 % 1 < .5 ? 1 : -1, e = Math.sin(p * Math.PI) * amp, s2 = Math.sin(p * Math.PI * 2) * amp * dir;
+          if (kind === 0) { // weave: dip and roll under, from one side to the other
+            out[IDX.hip + 1] -= .1 * e; out[IDX.lean] += .26 * e; out[IDX.hdP] += .12 * e; out[IDX.side] += .22 * s2; out[IDX.hip + 2] += .05 * s2; out[IDX.twist] -= .12 * s2;
+            out[IDX.hL + 1] -= .06 * e; out[IDX.hR + 1] -= .06 * e;
+          } else if (kind === 1) { // pull back out of range, standing tall, then return
+            out[IDX.lean] -= .24 * e; out[IDX.hip] -= .07 * e; out[IDX.hip + 1] += .015 * e; out[IDX.hdP] -= .08 * e; out[IDX.hL] -= .04 * e; out[IDX.hR] -= .04 * e;
+          } else if (kind === 2) { // duck low, then come up taller than before
+            const dn = Math.sin(Math.min(1, p / .6) * Math.PI) * amp, upk = Math.sin(Math.max(0, (p - .6) / .4) * Math.PI) * amp;
+            out[IDX.hip + 1] += -.15 * dn + .03 * upk; out[IDX.lean] += .22 * dn - .05 * upk; out[IDX.hdP] += .1 * dn; out[IDX.hL + 1] -= .08 * dn; out[IDX.hR + 1] -= .08 * dn;
+          } else { // slip one way, then the other, without dropping
+            out[IDX.side] += .26 * s2; out[IDX.hip + 2] += .06 * s2; out[IDX.twist] -= .15 * s2; out[IDX.hip + 1] -= .04 * Math.abs(s2); out[IDX.hdY] += .12 * s2;
+          }
+        }
+        // Feints: now and then the lead hand paws, the lead knee comes up as if to check or teep, or a shoulder twitches.
+        const fc = t / 2.6 + i * .61 + .33, f0 = Math.floor(fc), q = (fc - f0) * 2.6 / .38, hf = hash(f0 * 11 + i * 5 + .25);
+        if (q < 1 && hf < (md === 2 ? .45 : .58)) {
+          const kind = Math.floor(hf * 97 % 3), e = Math.sin(q * Math.PI) * amp;
+          if (kind === 0) { const pw = Math.abs(Math.sin(q * Math.PI * 2)) * amp; out[IDX.hL] += .13 * pw; out[IDX.hL + 1] -= .03 * pw; out[IDX.twist] += .06 * pw; }
+          else if (kind === 1) { out[IDX.fL + 1] += .28 * e; out[IDX.fL] += .03 * e; out[IDX.kL + 1] += .5 * e; out[IDX.hip] -= .03 * e; out[IDX.lean] -= .05 * e; }
+          else { const tw = Math.sin(q * Math.PI * 2) * amp; out[IDX.twist] += .22 * tw; out[IDX.hR] += .05 * Math.max(0, tw); out[IDX.hip] += .02 * Math.max(0, tw); }
         }
       }
       if (st === STATE.clinch || st === STATE.clinched) { // wrestling for position: both sway and twist against each other
