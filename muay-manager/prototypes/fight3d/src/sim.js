@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.5';
+export const SIM_VERSION = 'proto-0.6';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -105,6 +105,8 @@ export function simulate(opts) {
       if (o.wearLeg > 50 && k === 'low') v *= 1.5;
       if (pl.range === 'out') v *= m.grab ? PR.clinchOut : PR.outMoves.includes(k) ? PR.rangeUp : PR.inMoves.includes(k) ? PR.rangeDown : 1;
       else if (pl.range === 'in') v *= m.grab ? PR.clinchIn : PR.inMoves.includes(k) ? PR.rangeUp : PR.outMoves.includes(k) ? PR.rangeDown : 1;
+      if (pl.ag === 'counter' && (k === 'teep' || k === 'teepFace')) v *= PR.counterTeep; // the man waiting keeps the other off with the push kick
+      if (pl.ag === 'attack' && m.grab) v *= PR.attackClinch;
       if (!m.grab && pl.target !== 'mixed') v *= pl.target === 'leg' ? (k === 'low' ? PR.legUp : .85) : m.lvl === pl.target ? PR.targetUp : PR.targetDown;
       tot += v; return v;
     });
@@ -198,7 +200,8 @@ export function simulate(opts) {
     o.sp = Math.min(100, o.sp + dm * K.spTake);
     o.st = Math.max(0, o.st - dm * .25);
     if (m.lvl === 'head') o.wearHead += raw; else if (m.lvl === 'body') { o.wearBody += raw; o.st = Math.max(0, o.st - raw * .25); } else o.wearLeg += raw;
-    if (!held) o.x = clamp(o.x - o.dir * m.push, -LIM, LIM);
+    const isTeep = key === 'teep' || key === 'teepFace';
+    if (!held) o.x = clamp(o.x - o.dir * m.push * (isTeep && planOf(f).ag === 'counter' ? PR.counterPush : 1), -LIM, LIM);
     f.chain = (T - f.chainT < 1.1) ? f.chain + 1 : 1; f.chainT = T;
     const big = raw >= 13 || !!m.special, sev = big ? 3 : raw >= 8 ? 2 : 1;
     o.q = []; o.mv = null; o.combo = null; o.plan = null;
@@ -214,6 +217,17 @@ export function simulate(opts) {
     if (lead !== G.lead) { if (G.lead >= 0) G.leadChanges++; G.lead = lead; }
 
     if (o.hp <= 0) { o.hp = 0; knockout(f, o, 'น็อก', key); return; }
+    // a push kick that catches a man coming forward can sit him down: no count, but it scores and everyone sees it
+    if (isTeep && !held && !wasStun) {
+      const pT = PR.teepDump + (planOf(f).ag === 'counter' ? PR.teepDumpCounter : 0) + (planOf(o).ag === 'attack' ? PR.teepDumpVsAttack : 0) + (counter ? PR.teepDumpCaught : 0) + (o.st < 30 ? PR.teepDumpTired : 0);
+      if (R() < pT) {
+        f.pts += K.throwPoints; o.st = Math.max(0, o.st - 6);
+        o.state = 'thrown'; o.hold = K.throwDown; setPose(o, 'fall1', .22);
+        emit({type: 'throw', by: f.i, on: o.i, ok: true, teep: true});
+        say('<b>' + f.name + '</b> ถีบ <b>' + o.name + '</b> กระเด็นล้มก้นจ้ำเบ้า');
+        return;
+      }
+    }
     if (m.lvl !== 'head' || m.noKd) return;
     const clean = (crit || counter) && raw >= 11 && m.dmg >= 10; // flush on the button
     const chin = .65 + o.stats.chin / 100 * .7, tough = o.tough > 0 ? .5 : 1;
@@ -411,7 +425,9 @@ export function simulate(opts) {
       if (f.planT <= 0) { f.plan = null; f.combo = null; f.cool = .15; }
     }
     const walk = (54 + f.stats.spd * .5) * (f.st < 25 ? .7 : 1) * (1 - Math.min(.45, f.wearLeg / 200)) * (f.style.walk || 1);
-    f.x = clamp(f.x + f.dir * clamp(d - want, -walk * dt, walk * dt), -LIM, LIM); sep(f, o);
+    // the man told to wait holds his ground and lets the other come; the man told to go forward walks him down
+    const ag2 = planOf(f).ag, fwd = walk * (ag2 === 'counter' ? (f.plan ? PR.counterStepIn : PR.counterAdvance) : ag2 === 'attack' ? PR.attackAdvance : 1);
+    f.x = clamp(f.x + f.dir * clamp(d - want, -walk * dt, fwd * dt), -LIM, LIM); sep(f, o);
   }
 
   function endRound() {
@@ -444,7 +460,7 @@ export function simulate(opts) {
       if (G.t > K.introTime - 1 && a.to === 'wai') { setPose(a, 'guard', .4); setPose(b, 'guard', .4); }
       if (G.t > K.introTime) {
         G.phase = 'fight'; F.forEach(f => { f.state = 'idle'; f.cool = rnd(.7, 1.4); });
-        emit({type: 'phase', phase: 'fight', round: 1}); emit({type: 'bell', n: 1}); say('ระฆังยกแรกดังขึ้น');
+        emit({type: 'phase', phase: 'fight', round: 1}); F.forEach(x => emit({type: 'plan', by: x.i, round: 1, ag: planOf(x).ag})); emit({type: 'bell', n: 1}); say('ระฆังยกแรกดังขึ้น');
       }
     } else if (G.phase === 'fight') {
       if (G.count) {
@@ -475,7 +491,7 @@ export function simulate(opts) {
       if (G.restT <= 0) {
         G.round++; G.clock = K.roundTime; G.phase = 'fight';
         F.forEach(f => { f.state = 'idle'; f.cool = rnd(.6, 1.2); f.plan = null; });
-        emit({type: 'phase', phase: 'fight', round: G.round}); emit({type: 'bell', n: 1}); say('เริ่มยกที่ ' + G.round);
+        emit({type: 'phase', phase: 'fight', round: G.round}); F.forEach(x => emit({type: 'plan', by: x.i, round: G.round, ag: planOf(x).ag})); emit({type: 'bell', n: 1}); say('เริ่มยกที่ ' + G.round);
       }
     } else if (G.phase === 'ko') {
       G.koT += dt;

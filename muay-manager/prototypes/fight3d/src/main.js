@@ -32,6 +32,8 @@ const PRESET_NOTE = {
 };
 const DETAIL = [
   {key: 'venue', th: 'เวที', opts: Object.keys(VENUES).filter(k => k !== 'camp').map(k => [k, VENUES[k]])},
+  {key: 'agR', th: 'ท่าทีมุมแดง', opts: [['attack', 'เดินตี'], ['balanced', 'ดูเชิง'], ['counter', 'ตั้งรับ']]},
+  {key: 'agB', th: 'ท่าทีมุมน้ำเงิน', opts: [['attack', 'เดินตี'], ['balanced', 'ดูเชิง'], ['counter', 'ตั้งรับ']]},
   {key: 'cam', th: 'มุมกล้อง', opts: [['tv', 'ถ่ายทอดสด'], ['side', 'ด้านข้าง'], ['director', 'ผู้กำกับ'], ['low', 'ข้างเวที'], ['orbit', 'วนรอบ']]},
   {key: 'fighter', th: 'ตัวนักมวย', opts: [['model', 'โมเดล 3D'], ['code', 'สร้างจากโค้ด']]},
   {key: 'build', th: 'รูปร่าง (แบบโค้ด)', opts: [['auto', 'ตามสายมวย'], ['heavy', 'ถึก'], ['athletic', 'สมส่วน'], ['lean', 'เพรียว']]},
@@ -43,7 +45,7 @@ const DETAIL = [
   {key: 'labels', th: 'ป้ายชื่อท่า', opts: [[0, 'ปิด'], [1, 'ท่าใหญ่'], [2, 'ทุกจังหวะ']]},
   {key: 'replay', th: 'ภาพช้า', opts: [[0, 'ปิด'], [1, 'ตอนน็อก'], [2, 'น็อกและพักยก']]}
 ];
-const OPT = Object.assign({preset: 'tv', build: 'auto', fighter: 'model', venue: 'stadium'}, PRESETS.tv);
+const OPT = Object.assign({preset: 'tv', build: 'auto', fighter: 'model', venue: 'stadium', agR: 'attack', agB: 'counter'}, PRESETS.tv);
 let MODEL = null, MODELS = []; // generated characters per corner, when they loaded (MODEL = shared proportions)
 // Roster of base bodies. Outfit is separate, so any body can wear any look. [label, key colour of the model's shorts and gloves]
 const ROSTER = {
@@ -127,7 +129,7 @@ function makeFighters() {
   builtAs = fighterKey();
 }
 function newFight(seed, cfg) {
-  CFG = Object.assign({seed, specs: null, plans: null, rules: null}, cfg || {}); pausedRounds.clear();
+  CFG = Object.assign({seed, specs: null, plans: null, rules: null}, cfg || {plans: [OPT.agR, OPT.agB].map(ag => [{ag, range: 'mixed', target: 'mixed'}])}); pausedRounds.clear(); // the lab sets each corner's attitude itself
   useDims(); buildFight(); makeFighters(); renderCards(); restart();
   $('seed').textContent = String(seed);
 }
@@ -288,7 +290,7 @@ function handle(e) {
       if (!rp && OPT.labels >= 1) { poseFighters(e.t); pop('กอดคอตีเข่า!', fighters[e.by].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'gold'); }
       break;
     case 'throw':
-      if (e.ok) { hype = 1; shake = Math.max(shake, OPT.shake * .04 * (REDUCED ? 0 : 1)); if (!rp) { audio.roar(.7); setTimeout(() => audio.thud(), 330); if (OPT.labels >= 1) { poseFighters(e.t); pop('เหวี่ยงล้ม!', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'gold big', 1.2); } } }
+      if (e.ok) { hype = 1; shake = Math.max(shake, OPT.shake * .04 * (REDUCED ? 0 : 1)); if (!rp) { audio.roar(.7); setTimeout(() => audio.thud(), 330); if (OPT.labels >= 1) { poseFighters(e.t); pop(e.teep ? 'ถีบล้ม!' : 'เหวี่ยงล้ม!', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'gold big', 1.2); } } }
       break;
     case 'break':
       if (!rp && OPT.labels >= 2) { poseFighters(e.t); pop(e.reason === 'escape' ? 'สะบัดหลุด' : 'กรรมการแยก', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'small'); }
@@ -600,6 +602,7 @@ function buildUi() {
   $('detail').addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     const d = DETAIL.find(x => x.key === b.dataset.k); OPT[d.key] = d.opts.find(o => String(o[0]) === b.dataset.v)[0];
+    if (d.key === 'agR' || d.key === 'agB') { newFight(fight.seed); applyOpt(); return; } // another attitude is another fight
     OPT.preset = Object.keys(PRESETS).find(k => DETAIL.every(x => !(x.key in PRESETS[k]) || PRESETS[k][x.key] === OPT[x.key]) && PRESETS[k].look === OPT.look) || '';
     applyOpt();
   });
@@ -714,7 +717,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 9 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 10 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

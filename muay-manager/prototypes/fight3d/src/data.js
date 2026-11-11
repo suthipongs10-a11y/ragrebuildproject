@@ -129,7 +129,7 @@ export const RULES = {
 
 // Fight plan: what the corner tells the fighter for a round. Each choice trades one thing for another.
 export const PLAN = {
-  ag: {attack: 'บุก', balanced: 'สมดุล', counter: 'ตั้งรับสวนกลับ'},
+  ag: {attack: 'เดินตี', balanced: 'ดูเชิง', counter: 'ตั้งรับ'},
   range: {out: 'วงนอก', mixed: 'ตามจังหวะ', in: 'วงใน'},
   target: {head: 'หัว', body: 'ลำตัว', leg: 'ขา', mixed: 'ผสม'}
 };
@@ -138,6 +138,10 @@ export const PLAN_RULES = {
   attackCool: .72, counterCool: 1.3, attackCover: .65, counterCover: 1.25, attackSt: 1.08, counterSt: .92, attackDmg: 1.05, counterBonus: .3,
   jam: .94, keepAway: .8, outRegen: .93, inCover: .8, outVsIn: 1.12, // walking in leaves the guard open, and a fighter kept outside eats long weapons // crowding blunts kicks; staying outside blunts close weapons but costs legs
   outDist: 12, inDist: -16,
+  // how each attitude moves: the counter fighter barely advances and keeps the push kick going, the attacker walks forward and ties up more
+  counterAdvance: .22, counterStepIn: .75, attackAdvance: 1.12, counterTeep: 1.9, counterPush: 1.3, attackClinch: 1.25,
+  // chance that a landed push kick sits the opponent down (scores like a dump, no count)
+  teepDump: .03, teepDumpCounter: .05, teepDumpVsAttack: .04, teepDumpCaught: .08, teepDumpTired: .06,
   outMoves: ['body', 'high', 'low', 'teep', 'teepFace', 'jab'], inMoves: ['elbow', 'spinElbow', 'knee', 'hook', 'upper', 'bodyshot'],
   rangeUp: 1.3, rangeDown: .65, clinchOut: .5, clinchIn: 1.3, targetUp: 1.8, targetDown: .7, legUp: 3.4
 };

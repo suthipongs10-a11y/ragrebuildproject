@@ -71,6 +71,8 @@ export const POSES = {
 
   block: P({lean: .2, hdP: .25, hip: [-.02, .84, 0], hL: [.27, 1.58, -.07], hR: [.21, 1.56, .08]}),
   blockBody: P({lean: .3, hip: [0, .82, 0], hL: [.26, 1.24, -.15], hR: [.2, 1.3, .15]}),
+  // knee lifted to meet a body kick, elbow dropped onto it
+  checkBody: P({lean: .12, hip: [-.04, .9, 0], fL: [.24, .6, -.08], kL: [1, .7, -.55], hL: [.3, 1.28, -.17], eL: [.3, -1, -.5], hR: [.22, 1.52, .1]}),
   check: P({lean: .05, hip: [-.04, .88, 0], fL: [.28, .42, -.12], kL: [1, .4, -.6], hL: [.3, 1.5, -.12]}),
   // head movement: duck under a swing, slip a straight punch to either side
   duck: P({turn: .3, lean: .56, hdP: .12, hip: [.03, .67, 0], hL: [.34, 1.22, -.1], hR: [.26, 1.2, .1], fL: [.28, 0, -.14], fR: [-.24, 0, .18]}),

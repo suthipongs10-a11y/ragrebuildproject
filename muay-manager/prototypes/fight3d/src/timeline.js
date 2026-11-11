@@ -52,15 +52,17 @@ export function bake(fight) {
   const evade = e => { const mv = MOVES[e.move]; if (mv.lvl !== 'head') return 'dodge'; const h = Math.round(e.t / dt); if (DUCK.has(e.move) || (e.move === 'cross' && h % 4 < 2)) return 'duck'; if (SLIP.has(e.move)) return h % 2 ? 'slipL' : 'slipR'; return 'dodge'; };
   const evadeAt = new Map();
   for (const e of fight.events) if (e.type === 'hit' && e.res === 'dodge') evadeAt.set(e.on + ':' + Math.round(e.t / dt), evade(e));
+  const kneeUp = new Set(); // a body kick that is blocked is met with the lifted knee
+  for (const e of fight.events) if (e.type === 'hit' && e.res === 'block' && e.move === 'body') kneeUp.add(e.on + ':' + Math.round(e.t / dt));
   // cues per fighter, plus early defence
   const cues = [[], []];
-  for (const c of fight.poses) { const v = c.pose === 'dodge' && evadeAt.get(c.f + ':' + Math.round(c.t / dt)); cues[c.f].push(v ? Object.assign({}, c, {pose: v}) : c); }
+  for (const c of fight.poses) { const key = c.f + ':' + Math.round(c.t / dt), v = c.pose === 'dodge' ? evadeAt.get(key) : c.pose === 'blockBody' && kneeUp.has(key) ? 'checkBody' : null; cues[c.f].push(v ? Object.assign({}, c, {pose: v}) : c); }
   for (const e of fight.events) {
     if (e.type !== 'hit' || (e.res !== 'block' && e.res !== 'dodge')) continue;
     const tA = e.t - .13, st = tick(e.on, Math.round(tA / dt), 4);
     if (st !== STATE.idle && st !== STATE.block) continue; // a fighter already covering up has the pose from the sim
     const mv = MOVES[e.move];
-    const pose = e.res === 'dodge' ? evade(e) : mv.lvl === 'leg' ? 'check' : mv.lvl === 'body' ? 'blockBody' : 'block';
+    const pose = e.res === 'dodge' ? evade(e) : mv.lvl === 'leg' ? 'check' : e.move === 'body' ? 'checkBody' : mv.lvl === 'body' ? 'blockBody' : 'block';
     cues[e.on].push({t: tA, f: e.on, pose, d: .11, early: true});
   }
   cues.forEach(c => c.sort((a, b) => a.t - b.t));
@@ -154,6 +156,15 @@ export function bake(fight) {
   const idleW = [new Float32Array(n), new Float32Array(n)];
   for (let i = 0; i < 2; i++) { let w = 0; for (let k = 0; k < n; k++) { w = tick(i, k, 4) === STATE.idle ? Math.min(1, w + dt / .16) : Math.max(0, w - dt / .07); idleW[i][k] = w; } }
   const hash = x => { const s = Math.sin(x * 127.1 + 31.7) * 43758.5453; return s - Math.floor(s); };
+  // How a fighter carries himself between exchanges follows what his corner asked for this round:
+  // 0 feeling out (on his toes, with pauses), 1 walking forward (no bounce), 2 waiting (planted, guard up, slow sway).
+  const MODE = {balanced: 0, attack: 1, counter: 2}, mode = [new Uint8Array(n), new Uint8Array(n)];
+  for (const e of fight.events) if (e.type === 'plan') mode[e.by].fill(MODE[e.ag] || 0, Math.min(n, Math.round(e.t / dt)));
+  const smooth = (a, b, x) => { const k = Math.max(0, Math.min(1, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
+  // feeling out: bounce for a couple of seconds, then stand and sway, then bounce again
+  const hopGate = (i, t) => { const g = t * .3 + i * .43, p = g - Math.floor(g); return smooth(0, .05, p) * (1 - smooth(.64, .7, p)); };
+  // waiting: now and then the feet change over, slowly, one step at a time
+  const slowSwitch = (i, t) => { const g = t * .19 + i * .47, c = Math.floor(g); return g - c < .26 && hash(c * 5 + i) < .6; };
   // the bounce: a little over two light hops a second, in the air slightly longer than on the canvas
   // and quicker while he is travelling, so each hop stays short
   const HOP = 13.2, hopUp = ph => Math.max(0, Math.sin(ph) + .25) / 1.25, hopPh = [new Float32Array(n), new Float32Array(n)];
@@ -178,7 +189,8 @@ export function bake(fight) {
         if (f.step && t >= f.step.t0 + f.step.dur) { f.at = f.step.to; f.step = null; }
         if (!f.step) f.at = Math.max(f.des - .4, Math.min(f.des + .4, f.at)); // shoved a long way: the foot drags rather than stretches
       }
-      const ph = hopPh[i][k], up = hopUp(ph) > 0, bouncing = IW[k] > .5;
+      const md = mode[i][k], ph = hopPh[i][k], up = hopUp(ph) > 0, bouncing = IW[k] > .5 && md === 0 && hopGate(i, t) > .5;
+      if (md === 2 && IW[k] === 1 && slowSwitch(i, t)) { feet[0].des -= .26; feet[1].des += .26; }
       if (bouncing && up && !wasUp) { // leaving the canvas: both feet go to where they will be wanted on landing
         let k2 = k + 1; while (k2 < n - 1 && hopUp(hopPh[i][k2]) > 0) k2++;
         const sw = IW[k] === 1 && IW[k2] === 1 && hash(Math.floor(ph / (Math.PI * 2)) * 7 + i * 3) < .15; // a quick switch of the feet
@@ -191,9 +203,9 @@ export function bake(fight) {
         const late = feet.filter(f => f.can && Math.abs(f.des - f.at) > (bouncing ? .24 : TH));
         if (late.length) {
           const fwd = late[0].des - late[0].at > 0, f = late.length > 1 ? feet[fwd ? 0 : 1] : late[0];
-          const speed = Math.abs(root(Math.min(n - 1, k + 4)) - a) / (4 * dt), dur = Math.max(.1, Math.min(.16, .16 - speed * .06));
+          const speed = Math.abs(root(Math.min(n - 1, k + 4)) - a) / (4 * dt), dur = Math.max(.1, Math.min(.16, .16 - speed * .06)) * (md === 2 ? 1.6 : md === 1 ? 1.25 : 1);
           const k2 = Math.min(n - 1, k + Math.round(dur / dt)), ahead = Math.min(.07, speed * .06) * (fwd ? 1 : -1);
-          f.step = {t0: t, dur, from: f.at, to: root(k2) + B[k2 * NP + f.base] + ahead, lift: LIFT};
+          f.step = {t0: t, dur, from: f.at, to: root(k2) + B[k2 * NP + f.base] + (f.des - a - f.lx) + ahead, lift: LIFT};
         }
       }
       wasUp = up;
@@ -223,14 +235,31 @@ export function bake(fight) {
       const iw = idleW[i][k] + (idleW[i][k + 1] - idleW[i][k]) * fr;
       if (iw > 0) {
         const amp = iw * (TK[(k * 2 + i) * TICK_FIELDS + 2] < 25 ? .45 : 1); // a tired fighter barely lifts his feet
-        // light bounce on the toes with the guard up, weight rocking front to back, hands rolling
-        const ph = hopPh[i][k] + (hopPh[i][k + 1] - hopPh[i][k]) * fr, up = hopUp(ph), rock = Math.sin(ph * .5);
-        out[IDX.jump] += up * .032 * amp; out[IDX.hip + 1] -= (1 - up) * .02 * amp;
-        out[IDX.hip] += rock * .02 * amp; out[IDX.lean] += rock * .025 * amp;
-        out[IDX.hL] += rock * .02 * amp; out[IDX.hL + 1] += up * .012 * amp; out[IDX.hR + 1] += (Math.cos(ph * .5) * .012 + up * .012) * amp;
-        // bob and weave: every few seconds the head dips and rolls from one side to the other
+        const md = mode[i][k], ph = hopPh[i][k] + (hopPh[i][k + 1] - hopPh[i][k]) * fr;
+        if (md === 0) {
+          // feeling out: light bounce on the toes with the guard up; every few seconds he stops and sways to read the other man
+          const g = hopGate(i, t), up = hopUp(ph) * g, rock = Math.sin(ph * .5), gc = t * .3 + i * .43, gp = gc - Math.floor(gc);
+          const sway = Math.sin(Math.max(0, gp - .67) / .33 * Math.PI * 2) * (1 - g) * amp;
+          out[IDX.jump] += up * .032 * amp; out[IDX.hip + 1] -= ((g - up) * .02 + (1 - g) * .035) * amp;
+          out[IDX.hip] += rock * .02 * amp * g; out[IDX.lean] += rock * .025 * amp * g;
+          out[IDX.hL] += rock * .02 * amp; out[IDX.hL + 1] += up * .012 * amp; out[IDX.hR + 1] += (Math.cos(ph * .5) * .012 + up * .012) * amp;
+          out[IDX.side] += sway * .17; out[IDX.hip + 2] += sway * .055; out[IDX.twist] -= sway * .1; out[IDX.hdY] += sway * .15;
+        } else if (md === 1) {
+          // walking forward: no bounce, chin down behind a tight high guard, shoulders rolling with each step
+          const roll = Math.sin(ph * .5) * amp;
+          out[IDX.hip + 1] -= (.03 + Math.abs(roll) * .012) * amp; out[IDX.lean] += .08 * amp; out[IDX.hdP] += .08 * amp;
+          out[IDX.twist] += roll * .1; out[IDX.side] += roll * .04; out[IDX.hip + 2] += roll * .015;
+          out[IDX.hL] -= .07 * amp; out[IDX.hL + 1] += .04 * amp; out[IDX.hR + 1] += .035 * amp; out[IDX.hR] += .03 * amp;
+        } else {
+          // waiting: feet planted, guard up and long, the body sinking and rising slowly, swaying side to side and rocking front to back
+          const sink = Math.sin(t * 2.3 + i * 1.3), lr = Math.sin(t * 1.55 + i * 2.1) * amp, fb = Math.sin(t * 1.1 + i * .7) * amp;
+          out[IDX.hip + 1] -= (.045 + .04 * sink) * amp; out[IDX.lean] += (.03 + .03 * sink) * amp + fb * .075; out[IDX.hip] += fb * .035;
+          out[IDX.side] += lr * .12; out[IDX.hip + 2] += lr * .04; out[IDX.twist] -= lr * .07; out[IDX.hdY] += lr * .1;
+          out[IDX.hL] += (.07 + fb * .03) * amp; out[IDX.hL + 1] += .03 * amp; out[IDX.hR + 1] += .03 * amp;
+        }
+        // bob and weave: every few seconds the head dips and rolls from one side to the other (a man walking forward just walks)
         const cyc = t * .5 + i * .37, c0 = Math.floor(cyc), p = (cyc - c0) / .34, h = hash(c0 * 2 + i);
-        if (p < 1 && h < .8) {
+        if (md !== 1 && p < 1 && h < (md === 2 ? .55 : .8)) {
           const dip = Math.sin(p * Math.PI) * amp, roll = Math.sin(p * Math.PI * 2) * amp * (h < .36 ? 1 : -1);
           out[IDX.hip + 1] -= .1 * dip; out[IDX.lean] += .26 * dip; out[IDX.hdP] += .12 * dip;
           out[IDX.side] += .22 * roll; out[IDX.hip + 2] += .05 * roll; out[IDX.twist] -= .12 * roll;
