@@ -150,13 +150,24 @@ export function bake(fight) {
   baked[0] = first[0]; baked[1] = b1; pass(1, true);
   baked[0] = aimed0;
 
-  // Footwork. The simulation slides a fighter along the ring; here the feet are pinned to the canvas and
-  // step to keep up: lead foot first going forward, rear foot first going back, one foot at a time.
+  // how much a fighter is free to move on his own (bounce, weave): 1 while idle, eased in and out around everything else
+  const idleW = [new Float32Array(n), new Float32Array(n)];
+  for (let i = 0; i < 2; i++) { let w = 0; for (let k = 0; k < n; k++) { w = tick(i, k, 4) === STATE.idle ? Math.min(1, w + dt / .16) : Math.max(0, w - dt / .07); idleW[i][k] = w; } }
+  const hash = x => { const s = Math.sin(x * 127.1 + 31.7) * 43758.5453; return s - Math.floor(s); };
+  // the bounce: a little over two light hops a second, in the air slightly longer than on the canvas
+  // and quicker while he is travelling, so each hop stays short
+  const HOP = 13.2, hopUp = ph => Math.max(0, Math.sin(ph) + .25) / 1.25, hopPh = [new Float32Array(n), new Float32Array(n)];
+  for (let i = 0; i < 2; i++) { let ph = i * 1.7, v = 0; for (let k = 0; k < n; k++) { v += (Math.abs(tick(i, k + 1, 0) - tick(i, k, 0)) * .01 / dt - v) * .15; ph += HOP * (1 + Math.min(.9, v * .8)) * dt; hopPh[i][k] = ph; } }
+
+  // Footwork. The simulation slides a fighter along the ring; here the feet are pinned to the canvas.
+  // A fighter on his toes moves by bouncing: both feet shift together while he is in the air, and now and then
+  // he switches his feet for one bounce. Out of the bounce (mid-strike, hurt) a late foot steps across on its own.
   const GROUNDED = new Set([STATE.intro, STATE.idle, STATE.move, STATE.hit, STATE.block, STATE.stun, STATE.rest, STATE.cover, STATE.win]);
   function footwork(i) {
-    const B = baked[i], dir = i ? -1 : 1, TH = .08, LIFT = .05;
+    const B = baked[i], dir = i ? -1 : 1, TH = .08, LIFT = .05, IW = idleW[i];
     const root = k => tick(i, k, 0) * .01 * dir;                 // position along the fighter's own forward axis
-    const feet = [IDX.fL, IDX.fR].map(base => ({base, w: 0, at: root(0) + B[base], step: null}));
+    const feet = [IDX.fL, IDX.fR].map((base, j) => ({base, j, w: 0, at: root(0) + B[base], step: null}));
+    let wasUp = false;
     for (let k = 0; k < n; k++) {
       const o = k * NP, t = k * dt, a = root(k), st = tick(i, k, 4);
       const ok = GROUNDED.has(st) && Math.abs(B[o + IDX.spin]) < .05 && B[o + IDX.jump] < .02;
@@ -167,28 +178,33 @@ export function bake(fight) {
         if (f.step && t >= f.step.t0 + f.step.dur) { f.at = f.step.to; f.step = null; }
         if (!f.step) f.at = Math.max(f.des - .4, Math.min(f.des + .4, f.at)); // shoved a long way: the foot drags rather than stretches
       }
-      if (!feet[0].step && !feet[1].step) {
-        const late = feet.filter(f => f.can && Math.abs(f.des - f.at) > TH);
+      const ph = hopPh[i][k], up = hopUp(ph) > 0, bouncing = IW[k] > .5;
+      if (bouncing && up && !wasUp) { // leaving the canvas: both feet go to where they will be wanted on landing
+        let k2 = k + 1; while (k2 < n - 1 && hopUp(hopPh[i][k2]) > 0) k2++;
+        const sw = IW[k] === 1 && IW[k2] === 1 && hash(Math.floor(ph / (Math.PI * 2)) * 7 + i * 3) < .15; // a quick switch of the feet
+        for (const f of feet) {
+          if (!f.can) continue;
+          const to = root(k2) + B[k2 * NP + f.base] + (sw ? (f.j ? .3 : -.3) : 0);
+          if (Math.abs(to - f.at) > .012) f.step = {t0: t, dur: (k2 - k) * dt, from: f.at, to, lift: 0};
+        }
+      } else if (!feet[0].step && !feet[1].step) { // off the bounce, or left too far behind to wait for the next hop
+        const late = feet.filter(f => f.can && Math.abs(f.des - f.at) > (bouncing ? .24 : TH));
         if (late.length) {
           const fwd = late[0].des - late[0].at > 0, f = late.length > 1 ? feet[fwd ? 0 : 1] : late[0];
           const speed = Math.abs(root(Math.min(n - 1, k + 4)) - a) / (4 * dt), dur = Math.max(.1, Math.min(.16, .16 - speed * .06));
           const k2 = Math.min(n - 1, k + Math.round(dur / dt)), ahead = Math.min(.07, speed * .06) * (fwd ? 1 : -1);
-          f.step = {t0: t, dur, from: f.at, to: root(k2) + B[k2 * NP + f.base] + ahead};
+          f.step = {t0: t, dur, from: f.at, to: root(k2) + B[k2 * NP + f.base] + ahead, lift: LIFT};
         }
       }
+      wasUp = up;
       for (const f of feet) {
         let at = f.at, lift = 0;
-        if (f.step) { const p = Math.min(1, (t - f.step.t0) / f.step.dur); at = f.step.from + (f.step.to - f.step.from) * ease(p); lift = Math.sin(p * Math.PI) * LIFT; }
+        if (f.step) { const p = Math.min(1, (t - f.step.t0) / f.step.dur); at = f.step.from + (f.step.to - f.step.from) * ease(p); lift = Math.sin(p * Math.PI) * f.step.lift; }
         B[o + f.base] = f.lx + (at - a - f.lx) * f.w; B[o + f.base + 1] = f.ly + lift * f.w;
       }
     }
   }
   footwork(0); footwork(1);
-
-  // how much a fighter is free to move on his own (bounce, weave): 1 while idle, eased in and out around everything else
-  const idleW = [new Float32Array(n), new Float32Array(n)];
-  for (let i = 0; i < 2; i++) { let w = 0; for (let k = 0; k < n; k++) { w = tick(i, k, 4) === STATE.idle ? Math.min(1, w + dt / .16) : Math.max(0, w - dt / .07); idleW[i][k] = w; } }
-  const hash = x => { const s = Math.sin(x * 127.1 + 31.7) * 43758.5453; return s - Math.floor(s); };
 
   const TL = {
     fight, n, dt, duration: (n - 1) * dt, baked, eff,
@@ -207,15 +223,14 @@ export function bake(fight) {
       const iw = idleW[i][k] + (idleW[i][k + 1] - idleW[i][k]) * fr;
       if (iw > 0) {
         const amp = iw * (TK[(k * 2 + i) * TICK_FIELDS + 2] < 25 ? .45 : 1); // a tired fighter barely lifts his feet
-        // light bounce on the balls of the feet, weight rocking front to back, lead foot tapping, hands rolling
-        const beat = t * 9.4 + i * 1.7, up = Math.max(0, Math.sin(beat)), rock = Math.sin(beat * .5);
-        out[IDX.jump] += up * .026 * amp; out[IDX.hip + 1] -= (1 - up) * .016 * amp;
-        out[IDX.hip] += rock * .022 * amp; out[IDX.lean] += rock * .025 * amp;
-        out[IDX.fL + 1] += Math.max(0, rock) * .03 * amp;
-        out[IDX.hL] += rock * .02 * amp; out[IDX.hR + 1] += Math.cos(beat * .5) * .012 * amp;
+        // light bounce on the toes with the guard up, weight rocking front to back, hands rolling
+        const ph = hopPh[i][k] + (hopPh[i][k + 1] - hopPh[i][k]) * fr, up = hopUp(ph), rock = Math.sin(ph * .5);
+        out[IDX.jump] += up * .032 * amp; out[IDX.hip + 1] -= (1 - up) * .02 * amp;
+        out[IDX.hip] += rock * .02 * amp; out[IDX.lean] += rock * .025 * amp;
+        out[IDX.hL] += rock * .02 * amp; out[IDX.hL + 1] += up * .012 * amp; out[IDX.hR + 1] += (Math.cos(ph * .5) * .012 + up * .012) * amp;
         // bob and weave: every few seconds the head dips and rolls from one side to the other
-        const cyc = t * .42 + i * .37, c0 = Math.floor(cyc), p = (cyc - c0) / .3, h = hash(c0 * 2 + i);
-        if (p < 1 && h < .72) {
+        const cyc = t * .5 + i * .37, c0 = Math.floor(cyc), p = (cyc - c0) / .34, h = hash(c0 * 2 + i);
+        if (p < 1 && h < .8) {
           const dip = Math.sin(p * Math.PI) * amp, roll = Math.sin(p * Math.PI * 2) * amp * (h < .36 ? 1 : -1);
           out[IDX.hip + 1] -= .1 * dip; out[IDX.lean] += .26 * dip; out[IDX.hdP] += .12 * dip;
           out[IDX.side] += .22 * roll; out[IDX.hip + 2] += .05 * roll; out[IDX.twist] -= .12 * roll;
