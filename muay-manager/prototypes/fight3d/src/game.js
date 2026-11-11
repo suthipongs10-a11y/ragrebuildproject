@@ -339,16 +339,17 @@ function advice(st) {
   if (op.st < 38) tips.push('เขาหอบแล้ว บุกเลย');
   if (op.head >= me.head + 3) tips.push('เราโดนเข้าหน้าบ่อย ถอยวงนอก หรือตั้งรับ');
   if (op.wearBody > 34) tips.push('ลำตัวเขาช้ำ เน้นลำตัวต่อ แรงเขาจะฟื้นช้า');
-  const diff = me.total - op.total, left = 3 - F.round;
-  if (diff < 0) tips.unshift(-diff > left ? 'คะแนนตาม ' + (-diff) + ' แต้ม ชนะยกธรรมดาไม่พอแล้ว ต้องทำให้เขาถูกนับหรือน็อก' : 'คะแนนตาม ' + (-diff) + ' แต้ม ต้องชนะยกที่เหลือ');
-  else if (diff > 0) tips.push('คะแนนนำ ' + diff + ' แต้ม คุมเกม อย่าเสี่ยงโดนนับ');
+  const diff = Math.round(me.pts - op.pts);
+  if (diff <= -10) tips.unshift('แต้มตาม ' + (-diff) + ' ต้องบุกหนัก หรือทำให้เขาถูกนับ (ได้ +10)');
+  else if (diff < -2) tips.unshift('แต้มตาม ' + (-diff) + ' ออกอาวุธให้เข้าเป้ามากขึ้น');
+  else if (diff >= 8) tips.push('แต้มนำ ' + diff + ' คุมเกม อย่าเสี่ยงโดนนับ (เสีย 10 แต้ม)');
   if (!tips.length) tips.push('ยกนี้สูสี ' + matchupTip(F.opp.style));
   return tips.slice(0, 2);
 }
 function breakHtml() {
   const st = F.stats, n = F.round;
   const line = (label, a, b) => '<span>' + a + '</span><b>' + label + '</b><span>' + b + '</span>';
-  return '<section class="gcard"><h2>พักยก ' + n + '</h2><div class="cmp">' + line('ยกนี้กรรมการให้', st[0].card, st[1].card) + line('คะแนนรวม', st[0].total, st[1].total) + line('เข้าเป้า', st[0].landed, st[1].landed) + line('เข้าหน้า', st[0].head, st[1].head) + line('เข้าลำตัว', st[0].body, st[1].body) + line('เข้าขา', st[0].leg, st[1].leg) + line('แรงเหลือ', Math.round(st[0].st) + '%', Math.round(st[1].st) + '%') + line('พลังชีวิต', Math.round(st[0].hp) + '%', Math.round(st[1].hp) + '%') + '</div>' +
+  return '<section class="gcard"><h2>พักยก ' + n + '</h2><div class="cmp">' + line('แต้มยกนี้', st[0].rp, st[1].rp) + line('แต้มรวม', Math.round(st[0].pts), Math.round(st[1].pts)) + line('เข้าเป้า', st[0].landed, st[1].landed) + line('เข้าหน้า', st[0].head, st[1].head) + line('เข้าลำตัว', st[0].body, st[1].body) + line('เข้าขา', st[0].leg, st[1].leg) + line('แรงเหลือ', Math.round(st[0].st) + '%', Math.round(st[1].st) + '%') + line('พลังชีวิต', Math.round(st[0].hp) + '%', Math.round(st[1].hp) + '%') + '</div>' +
     advice(st).map(t => '<p class="advice"><b>พี่เลี้ยง:</b> ' + t + '</p>').join('') + '<div class="fld">แผนยกต่อไป</div>' + planPicker(F.plan) +
     '<button class="btn go wide" data-act="resume">ชกต่อ</button></section>';
 }
@@ -382,7 +383,7 @@ async function startFight() {
 function onRoundBreak(n, st) { F.phase = 'break'; F.round = n; F.stats = st; render(); $('gBody').scrollIntoView({block: 'nearest', behavior: 'smooth'}); }
 function onOver(res) {
   const win = res.w === 0, o = F.opp, ko = res.how !== 'คะแนน', lgBefore = league(S.rp);
-  const r = {win, how: res.how === 'คะแนน' ? 'คะแนน' : res.how + ' ยก ' + res.round, detail: (res.move ? 'ปิดเกมด้วย' + MOVES[res.move].th + ' · ' : '') + (res.how === 'คะแนน' ? 'กรรมการให้ ' + res.cards[0] + ' ต่อ ' + res.cards[1] + (res.cards[0] === res.cards[1] ? ' (เท่ากัน ตัดสินจากความเสียหายที่ทำได้)' : '') + ' · ' : '') + 'เข้าเป้า ' + res.landed[0] + ' ต่อ ' + res.landed[1]};
+  const r = {win, how: res.how === 'คะแนน' ? 'คะแนน' : res.how + ' ยก ' + res.round, detail: (res.move ? 'ปิดเกมด้วย' + MOVES[res.move].th + ' · ' : '') + 'แต้ม ' + res.pts[0] + ' ต่อ ' + res.pts[1] + (res.how === 'คะแนน' && res.pts[0] === res.pts[1] ? ' (เท่ากัน ตัดสินจากความเสียหายที่ทำได้)' : '') + ' · ' + 'เข้าเป้า ' + res.landed[0] + ' ต่อ ' + res.landed[1]};
   r.money = win ? o.money + (ko ? 80 : 0) : Math.round(o.money * .25); r.fame = win ? o.fame + (ko ? 2 : 0) : 1;
   r.fat = 22 + (!win && ko ? 12 : 0);
   if (o.kind === 'ranked') { const ex = 1 / (1 + Math.pow(10, (o.rp - S.rp) / 400)); r.drp = Math.round(32 * ((win ? 1 : 0) - ex)); S.rp = Math.max(600, S.rp + r.drp); S.ranked = Math.max(0, S.ranked - 1); }
@@ -548,7 +549,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; $('ver').textContent = 'ต้นแบบ 1.0'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; $('ver').textContent = 'ต้นแบบ 1.1'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

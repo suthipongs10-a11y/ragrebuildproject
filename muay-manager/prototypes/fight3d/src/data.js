@@ -120,12 +120,14 @@ export const RULES = {
   clinchKneesMin: 2, clinchKneesSpan: 3, clinchMax: 3.8, clinchEscape: .12, clinchDist: 48,
   clinchStyleEscape: .45, clinchStyleKnees: 1, // a clinch specialist holds on better and gets an extra knee in
   clinchHeadKnee: .3,     // share of clinch knees that pull the head down onto the knee
-  throwTry: .7, throwBase: .5, throwPoints: 5, throwDown: 1.35, // dumping the opponent out of the clinch: scores, no count
+  throwTry: .7, throwBase: .5, throwPoints: 3, throwDown: 1.35, // dumping the opponent out of the clinch: scores, no count
   // catching a body kick, then punching with the free hand
   catchBase: .09, catchDef: .12, catchHold: 1.15,
-  countStep: .62, kdPoints: 15,
-  // round scoring: within this share of each other is an even round; this many times the other man's work (and this much more) is a clear 10:8
-  scoreEven: .08, scoreClear: 3.5, scoreClearMin: 30,
+  countStep: .62,
+  // Scoring, live: a clean strike scores by how hard it lands (index = severity: light, solid, heavy or signature move);
+  // a strike is solid from sevSolid raw damage and heavy from sevBig. A blocked strike scores nothing.
+  // A knockdown that draws a count is worth ten clean strikes: about one round's usual winning margin.
+  hitPoints: [0, 1, 1, 2], sevSolid: 8, sevBig: 13, kdPoints: 10,
   restHp: 1.4, restSt: 12
 };
 

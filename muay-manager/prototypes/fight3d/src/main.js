@@ -1,6 +1,6 @@
 // Presenter: plays a simulated fight in three.js. It reads the event log and never decides a result.
 // One fight can be re-watched under different presentation settings to compare what feels best.
-import { simulate, roundCard } from './sim.js';
+import { simulate } from './sim.js';
 import { MOVES, COMBOS, STYLES, STAT_TH, RULES } from './data.js';
 import { bake, EFF_NAME } from './timeline.js';
 import { Fighter, EFF_JOINT, STYLE_BUILD, setDims, DIM_DEFAULT } from './rig.js';
@@ -107,7 +107,6 @@ let replays = [], rpi = 0, curRp = null, tvCuts = [], builtAs = '', slowWins = [
 let CFG = {seed: 1, specs: null, plans: null};                      // what the current fight was simulated from
 const HOOK = {onRoundBreak: null, onOver: null}, pausedRounds = new Set(); // set by the game layer
 let previewF = null, previewPose = 'guard';                         // a single fighter shown outside a fight (create, dress, camp)
-const liveCard = {r0: -1, t: 0, since: 0, shown: [10, 10], cand: [10, 10]};
 const buf = [new Float32Array(NP), new Float32Array(NP)];
 const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3(), lastTrail = [new THREE.Vector3(), new THREE.Vector3()];
 
@@ -270,8 +269,8 @@ function showResult() {
   const r = fight.result, w = fight.specs[r.w];
   $('resM').textContent = r.how === 'คะแนน' ? 'ชนะคะแนน ครบ ' + RULES.rounds + ' ยก' : 'ชนะ' + r.how + ' ยก ' + r.round + ' นาทีที่ ' + fmt(r.time);
   $('resW').textContent = w.name; $('resW').className = 'w ' + (r.w ? 'b' : 'r');
-  $('resD').textContent = (r.move ? 'ปิดเกมด้วย' + MOVES[r.move].th + ' · ' : '') + (r.how === 'คะแนน' ? 'กรรมการให้ ' + r.cards[0] + ' ต่อ ' + r.cards[1] + (r.cards[0] === r.cards[1] ? ' (คะแนนเท่ากัน ตัดสินจากความเสียหายที่ทำได้)' : '') + ' · ' : '') +
-    'เข้าเป้า ' + r.landed[0] + ' ต่อ ' + r.landed[1];
+  $('resD').textContent = (r.move ? 'ปิดเกมด้วย' + MOVES[r.move].th + ' · ' : '') + 'แต้ม ' + r.pts[0] + ' ต่อ ' + r.pts[1] + (r.how === 'คะแนน' && r.pts[0] === r.pts[1] ? ' (แต้มเท่ากัน ตัดสินจากความเสียหายที่ทำได้)' : '') +
+    ' · เข้าเป้า ' + r.landed[0] + ' ต่อ ' + r.landed[1];
   $('result').hidden = false;
 }
 
@@ -285,14 +284,14 @@ function handle(e) {
     case 'say': if (!rp) $('call').innerHTML = e.html; break;
     case 'bell': if (!rp) audio.bell(e.n); break;
     case 'score':
-      if (!rp) { $('scR').textContent = e.total[0]; $('scB').textContent = e.total[1]; $('scT').textContent = 'ยก ' + e.round + ' กรรมการให้ ' + e.card[0] + ' : ' + e.card[1] + ' · คะแนนรวม'; $('scorecard').hidden = false; }
+      if (!rp) { $('scR').textContent = e.pts[0]; $('scB').textContent = e.pts[1]; $('scT').textContent = 'หมดยก ' + e.round + ' · ยกนี้ ' + e.rpts[0] + ' : ' + e.rpts[1] + ' · แต้มรวม'; $('scorecard').hidden = false; }
       break;
     case 'clinch':
       hype = Math.min(1, hype + .3);
       if (!rp && OPT.labels >= 1) { poseFighters(e.t); pop('กอดคอตีเข่า!', fighters[e.by].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'gold'); }
       break;
     case 'throw':
-      if (e.ok) { hype = 1; shake = Math.max(shake, OPT.shake * .04 * (REDUCED ? 0 : 1)); if (!rp) { audio.roar(.7); setTimeout(() => audio.thud(), 330); if (OPT.labels >= 1) { poseFighters(e.t); pop(e.teep ? 'ถีบล้ม!' : 'เหวี่ยงล้ม!', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'gold big', 1.2); } } }
+      if (e.ok) { hype = 1; shake = Math.max(shake, OPT.shake * .04 * (REDUCED ? 0 : 1)); if (!rp) { audio.roar(.7); setTimeout(() => audio.thud(), 330); if (OPT.labels >= 1) { poseFighters(e.t); pop('+' + RULES.throwPoints + ' แต้ม', fighters[e.by].world('head', tmpV).add(tmpV2.set(0, .45, 0)), 'gold', 1.3); pop(e.teep ? 'ถีบล้ม!' : 'เหวี่ยงล้ม!', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'gold big', 1.2); } } }
       break;
     case 'break':
       if (!rp && OPT.labels >= 2) { poseFighters(e.t); pop(e.reason === 'escape' ? 'สะบัดหลุด' : 'กรรมการแยก', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'small'); }
@@ -364,7 +363,7 @@ function handle(e) {
       hype = 1; if (!rp) { audio.roar(.5); if (OPT.labels >= 1) { poseFighters(e.t); pop('เมาหมัด!', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'red'); } }
       break;
     case 'kd':
-      hype = 1; if (!rp) { audio.roar(1); flash(.3); poseFighters(e.t); pop('ล้ม!', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .5, 0)), 'red big', 1.3); setTimeout(() => audio.thud(), 380); }
+      hype = 1; if (!rp) { audio.roar(1); flash(.3); poseFighters(e.t); pop('ล้ม!', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .5, 0)), 'red big', 1.3); pop('+' + RULES.kdPoints + ' แต้ม', fighters[e.by].world('head', tmpV).add(tmpV2.set(0, .5, 0)), 'gold big', 1.6); setTimeout(() => audio.thud(), 380); }
       break;
     case 'count': if (!rp) { const c = $('count'); c.textContent = e.n; c.hidden = false; c.style.animation = 'none'; void c.offsetWidth; c.style.animation = ''; audio.count(); } break;
     case 'getup': if (!rp && !e.thrown) { $('count').hidden = true; audio.roar(.4); } break;
@@ -553,28 +552,13 @@ function hud(dt) {
       el.style.width = hp + '%'; el.className = hp < 30 ? 'low' : hp < 55 ? 'mid' : '';
       $('st' + ids[i]).style.width = TL.val(i, playT, 2) + '%'; $('sp' + ids[i]).style.width = TL.val(i, playT, 3) + '%';
     }
-    // The number is the judges' card: finished rounds, plus the round being fought as it stands right now, marked by the
-    // judges' own rule (both start on 10, the one behind drops to 9, a count makes it 8). It becomes official at the bell.
-    // After a stoppage the standing of that last round stays up.
-    let tot = [0, 0]; for (const sc of marks.scores) if (sc.t <= playT) tot = sc.total;
-    let r0 = 0; for (const r of marks.rounds) if (r.t0 <= playT) r0 = r.t0;
-    const stopped = marks.ko && playT >= marks.ko.t, inRest = marks.rests.some(r => playT >= r.t && playT < r.t1 + .5);
-    const live = playT > marks.introEnd && !inRest && (marks.decPhase == null || playT < marks.decPhase);
-    let prov = [0, 0];
-    if (live) {
-      const ga = TL.val(0, playT, 8) - TL.val(0, r0, 8), gb = TL.val(1, playT, 8) - TL.val(1, r0, 8);
-      const kd = [0, 0]; for (const k of marks.kds) if (k.t >= r0 && k.t <= playT) kd[k.on]++;
-      const e0 = ga - RULES.kdPoints * kd[1], e1 = gb - RULES.kdPoints * kd[0];
-      const now = kd[0] !== kd[1] || Math.max(e0, e1) >= 3 ? roundCard(e0, e1, kd[0], kd[1], RULES) : [10, 10];
-      // a lead that changes hands for a moment does not flip the number: a new mark has to hold for half a second
-      if (liveCard.r0 !== r0 || playT < liveCard.t || playT - liveCard.t > 1) { liveCard.r0 = r0; liveCard.shown = now; liveCard.cand = now; liveCard.since = playT; } // new round, or the viewer jumped in time
-      if (now[0] !== liveCard.cand[0] || now[1] !== liveCard.cand[1]) { liveCard.cand = now; liveCard.since = playT; }
-      if (playT - liveCard.since > .5 || now[0] < 9 || now[1] < 9) liveCard.shown = liveCard.cand;
-      liveCard.t = playT; prov = liveCard.shown;
-    }
-    const pa = tot[0] + prov[0], pb = tot[1] + prov[1];
-    $('ld').textContent = !live || stopped ? '' : prov[0] > prov[1] ? '◀ นำยกนี้' : prov[1] > prov[0] ? 'นำยกนี้ ▶' : 'ยกนี้สูสี';
-    for (const [id, v, lead] of [['ptR', pa, !stopped && (live ? prov[0] > prov[1] : pa > pb)], ['ptB', pb, !stopped && (live ? prov[1] > prov[0] : pb > pa)]]) {
+    // The number by each name is the fighter's points, live: it goes up the moment a strike lands clean or the other man goes down.
+    // Under the clock: the points scored in the round being fought.
+    const pa = Math.round(TL.val(0, playT, 8)), pb = Math.round(TL.val(1, playT, 8));
+    let r0 = -1; for (const r of marks.rounds) if (r.t0 <= playT) r0 = r.t0;
+    const inRest = marks.rests.some(r => playT >= r.t && playT < r.t1 + .5), live = r0 >= 0 && !inRest && (marks.decPhase == null || playT < marks.decPhase);
+    $('ld').textContent = live ? 'ยกนี้ ' + (pa - Math.round(TL.val(0, r0, 8))) + ' : ' + (pb - Math.round(TL.val(1, r0, 8))) : '';
+    for (const [id, v, lead] of [['ptR', pa, pa > pb], ['ptB', pb, pb > pa]]) {
       const el = $(id);
       if (el.textContent !== String(v)) { el.textContent = v; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
       el.classList.toggle('lead', lead);
@@ -694,8 +678,8 @@ window.LAB = {
 // What happened in a round, for the corner's advice. Index 0 is the red corner.
 function roundStats(n) {
   const r = marks.rounds.find(x => x.n === n), rest = marks.rests.find(x => x.round && x.round.n === n), t1 = rest ? rest.t : fight.duration, t0 = r ? r.t0 : 0;
-  const sc = marks.scores.find(x => x.round === n) || {card: [0, 0], total: [0, 0]};
-  const out = [0, 1].map(i => ({card: sc.card[i], total: sc.total[i], head: 0, body: 0, leg: 0, landed: 0, blocked: 0, thrown: 0, kd: 0, hp: TL.val(i, t1, 1), st: TL.val(i, t1, 2), wearHead: TL.val(i, t1, 5), wearBody: TL.val(i, t1, 6), wearLeg: TL.val(i, t1, 7), pts: TL.val(i, t1, 8)}));
+  const sc = marks.scores.find(x => x.round === n) || {rpts: [0, 0], pts: [0, 0]};
+  const out = [0, 1].map(i => ({rp: sc.rpts[i], head: 0, body: 0, leg: 0, landed: 0, blocked: 0, thrown: 0, kd: 0, hp: TL.val(i, t1, 1), st: TL.val(i, t1, 2), wearHead: TL.val(i, t1, 5), wearBody: TL.val(i, t1, 6), wearLeg: TL.val(i, t1, 7), pts: TL.val(i, t1, 8)}));
   for (const e of EV) {
     if (e.t < t0 || e.t > t1) continue;
     if (e.type === 'move') out[e.by].thrown++;
@@ -759,7 +743,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 14 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 15 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

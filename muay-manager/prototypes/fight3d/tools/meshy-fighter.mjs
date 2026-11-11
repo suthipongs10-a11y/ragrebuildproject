@@ -1,5 +1,6 @@
 // Generates one rigged fighter with the Meshy API: reference image -> textured 3D model -> auto-rig.
-// Usage: node tools/meshy-fighter.mjs <name> "<prompt>" [--from-image]     writes assets/<name>.glb and assets/<name>-reference.png
+// Usage: node tools/meshy-fighter.mjs <name> "<prompt>" [--from-image] [--resume <task id>]     writes assets/<name>.glb and assets/<name>-reference.png
+// The reference picture must show the arms straight out to the sides (see tools/meshy-tpose.mjs).
 // The API key comes from MESHY_API_KEY (in a Claude cloud session the network proxy injects it, so any placeholder works).
 // Cost seen on 10 Nov 2026: image 9 + model 30 + rig 5 = 44 credits per fighter.
 import { execFileSync } from 'node:child_process';
@@ -17,27 +18,35 @@ const postJson = (url, body) => { // body goes through a file: an image sent as 
 const [name, prompt] = process.argv.slice(2);
 if (!name || !prompt) { console.error('usage: node tools/meshy-fighter.mjs <name> "<prompt>"'); process.exit(1); }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-async function run(path, body) {
-  const j = postJson(API + path, body); if (!j.result) throw new Error(path + ' ' + JSON.stringify(j));
-  for (let i = 0; i < 120; i++) {
+// Waits for a task. Meshy's queue can hold a job for half an hour; the task id is printed so a run that gave up
+// can be picked up again with --resume <image-to-3d task id> instead of paying for the model twice.
+async function wait(path, id) {
+  console.log(path, 'task', id);
+  for (let i = 0; i < 300; i++) {
     await sleep(8000);
-    const t = getJson(API + path + '/' + j.result);
+    const t = getJson(API + path + '/' + id);
     if (t.status === 'SUCCEEDED') { console.log(path, 'done, credits', t.consumed_credits); return t; }
     if (t.status === 'FAILED' || t.status === 'CANCELED') throw new Error(path + ' ' + t.status + ' ' + JSON.stringify(t.task_error));
   }
-  throw new Error(path + ' timed out');
+  throw new Error(path + ' timed out, task ' + id);
+}
+async function run(path, body) {
+  const j = postJson(API + path, body); if (!j.result) throw new Error(path + ' ' + JSON.stringify(j));
+  return wait(path, j.result);
 }
 const save = async (url, file) => { curl(['-L', '-o', file, url]); };
 // With --from-image the saved reference picture is reused (30 + 5 credits) instead of drawing a new one (9 more).
 // No pose_mode on the model step: re-posing has been seen to drop the gloves, and the reference is already arms-out.
 const ref = `assets/${name}-reference.png`, reuse = process.argv.includes('--from-image') && existsSync(ref);
 let source;
-if (reuse) source = {image_url: 'data:image/png;base64,' + readFileSync(ref).toString('base64')};
+if (process.argv.includes('--resume')) source = null;
+else if (reuse) source = {image_url: 'data:image/png;base64,' + readFileSync(ref).toString('base64')};
 else {
   const img = await run('/text-to-image', {ai_model: 'nano-banana-pro', pose_mode: 't-pose', prompt});
   await save(img.image_urls[0], ref); source = {input_task_id: img.id};
 }
-const mesh = await run('/image-to-3d', Object.assign({should_texture: true, should_remesh: true, target_polycount: 30000, topology: 'triangle', texture_resolution: '2k', enable_pbr: false, target_formats: ['glb']}, source));
+const resume = process.argv.indexOf('--resume') > 0 ? process.argv[process.argv.indexOf('--resume') + 1] : null;
+const mesh = resume ? await wait('/image-to-3d', resume) : await run('/image-to-3d', Object.assign({should_texture: true, should_remesh: true, target_polycount: 30000, topology: 'triangle', texture_resolution: '2k', enable_pbr: false, target_formats: ['glb']}, source));
 const rig = await run('/rigging', {input_task_id: mesh.id, height_meters: 1.72});
 await save(rig.result.rigged_character_glb_url, `assets/${name}.glb`);
 console.log('saved assets/' + name + '.glb');
