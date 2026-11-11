@@ -69,6 +69,9 @@ export async function loadModel(id, key) {
   return {id, key: key || 'blue', scene, mesh, image, pos, dims, standHips: pos.Hips.y, headR: headH * .4, headC: headH * .74}; // headgear sits on the forehead, above the eyes
 }
 
+// How far the collar bone turns with the upper arm (0 = stays with the chest). The generated rigs weight the skin over the
+// shoulder and down the back of the arm to the collar bone; left fixed to the chest, that skin stays behind as a flap.
+const SHOULDER_FOLLOW = .42;
 const LIMB = [
   // [upper bone, lower bone, end bone, root joint, mid joint, end joint, pole index, kind]
   ['LeftArm', 'LeftForeArm', 'LeftHand', 'shL', 'elL', 'haL', 'eL', 'arm'], ['RightArm', 'RightForeArm', 'RightHand', 'shR', 'elR', 'haR', 'eR', 'arm'],
@@ -100,7 +103,7 @@ export class ModelFighter {
       const n0 = V().crossVectors(d0, flex).normalize();
       return {l, upInv: frame(d0, n0, Q()).invert(), loInv: frame(e0, n0, Q()).invert(), n: n0.clone(), up0: P0[l[0]].distanceTo(P0[l[1]]), lo0: P0[l[1]].distanceTo(P0[l[2]])};
     });
-    this.qUp = Q(); this.qLo = Q(); this.qFoot = Q(); this.qNeck = Q(); this.d = V(); this.e = V(); this.n = V(); this.a = V();
+    this.qUp = Q(); this.qLo = Q(); this.qFoot = Q(); this.qNeck = Q(); this.qChest = Q(); this.qSh = Q(); this.d = V(); this.e = V(); this.n = V(); this.a = V();
   }
   setStyle() {}
   setMongkol(on) { this.gear.visible = !!on; } // the headpiece comes off before the fight
@@ -123,6 +126,7 @@ export class ModelFighter {
     this.put('Hips', J.qp, J.hip, P0.Hips);
     for (const [name, w] of [['Spine02', .3], ['Spine01', .65], ['Spine', 1], ['LeftShoulder', 1], ['RightShoulder', 1]]) {
       q1.setFromAxisAngle(UP, -tw * w); q2.copy(J.qp).multiply(q1); this.put(name, q2, J.hip, P0.Hips);
+      if (name === 'Spine') this.qChest.copy(q2);
     }
     // neck and head hang off the chest
     v3.copy(P0.neck).sub(P0.Hips).applyQuaternion(J.qc).add(J.hip); this.a.copy(v3);
@@ -142,6 +146,8 @@ export class ModelFighter {
       this.n.normalize();
       const arm = l[7] === 'arm', kUp = (arm ? DIM.ua : DIM.thigh) / L.up0, kLo = (arm ? DIM.fa - .07 : DIM.shin) / L.lo0;
       frame(this.d, this.n, this.qUp).multiply(L.upInv); this.put(l[0], this.qUp, A, P0[l[0]], kUp);
+      // the skin over the shoulder and under the arm is tied to the collar bone: turn it part of the way with the arm, or it stays behind as a flap
+      if (arm) { this.qSh.copy(this.qChest).slerp(this.qUp, SHOULDER_FOLLOW); this.put(l[0] === 'LeftArm' ? 'LeftShoulder' : 'RightShoulder', this.qSh, A, P0[l[0]]); }
       frame(this.e, this.n, this.qLo).multiply(L.loInv); this.put(l[1], this.qLo, B, P0[l[1]], kLo);
       if (arm) { this.a.copy(P0[l[2]]).sub(P0[l[1]]).multiplyScalar(kLo).applyQuaternion(this.qLo).add(B); this.put(l[2], this.qLo, this.a, P0[l[2]], this.handK); }
       else {
