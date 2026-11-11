@@ -8,7 +8,11 @@ export const COLORS = {
   green: ['เขียว', 0x1f8a4c], purple: ['ม่วง', 0x6b2fb5], pink: ['ชมพู', 0xe0559a], orange: ['ส้ม', 0xe8742a]
 };
 export const PATTERNS = {plain: 'สีพื้น', stripe: 'แถบข้าง', hem: 'ขอบล่าง', zigzag: 'ลายฟันปลา', split: 'สองสี'};
-export const HEADGEAR = {none: 'ไม่มี', mongkol: 'มงคล', band: 'ผ้าคาดหัว'};
+export const HEADGEAR = {none: 'ไม่มี', mongkol: 'มงคล'}; // worn for the wai kru, taken off before the bell
+export const HAIR = {
+  natural: ['สีเดิม', 0], brown: ['น้ำตาล', 0x8a5a2c], blond: ['ทอง', 0xe0bf5a], red: ['แดง', 0xc2301f], silver: ['เงิน', 0xd6d9de],
+  blue: ['น้ำเงิน', 0x3f6fe0], green: ['เขียว', 0x35a35a], pink: ['ชมพู', 0xe86aa6], purple: ['ม่วง', 0x8a4fd0]
+};
 
 const MAP = 1024;
 // Which body part each texel belongs to, and where it sits in the bind pose (height, sideways offset).
@@ -54,10 +58,44 @@ function keyed(rule, r, g, b) {
   return Math.min(1, (sat - .32) / .14);
 }
 
+// Which texels are hair: on the head, above a hairline that sits high on the forehead and drops behind the ears to the nape.
+// Positions come from the skinned bind pose, so this works whatever space the raw geometry is in.
+function hairMap(mesh) {
+  const g = mesh.geometry, uv = g.attributes.uv, si = g.attributes.skinIndex, sw = g.attributes.skinWeight, idx = g.index, n = g.attributes.position.count;
+  const bones = mesh.skeleton.bones, names = bones.map(b => b.name), isHead = names.map(x => x === 'Head' || x === 'head_end' || x === 'headfront');
+  const at = name => { const b = bones[names.indexOf(name)]; return b ? new THREE.Vector3().setFromMatrixPosition(b.matrixWorld) : null; };
+  const H = at('Head'), T = at('head_end'), out = new Uint8Array(MAP * MAP); if (!H) return out;
+  const span = T ? Math.max(.12, T.y - H.y) : .23, v = new THREE.Vector3(), hh = new Float32Array(n).fill(-9), zz = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    let w = 0; for (let k = 0; k < 4; k++) if (isHead[si.getComponent(i, k)]) w += sw.getComponent(i, k);
+    if (w < .5) continue;
+    mesh.getVertexPosition(i, v); v.applyMatrix4(mesh.matrixWorld); hh[i] = (v.y - H.y) / span; zz[i] = v.z - H.z; // model space: +z is the face
+  }
+  const line = z => z >= .07 ? .86 : z >= .02 ? .72 + (z - .02) / .05 * .14 : z >= -.03 ? .5 + (z + .03) / .05 * .22 : z >= -.07 ? .28 + (z + .07) / .04 * .22 : .28;
+  const cnt = idx ? idx.count : n;
+  for (let t = 0; t < cnt; t += 3) {
+    const a = idx ? idx.getX(t) : t, b = idx ? idx.getX(t + 1) : t + 1, c = idx ? idx.getX(t + 2) : t + 2;
+    if (hh[a] < -8 || hh[b] < -8 || hh[c] < -8) continue;
+    const ax = uv.getX(a) * MAP, ay = uv.getY(a) * MAP, bx = uv.getX(b) * MAP, by = uv.getY(b) * MAP, cx = uv.getX(c) * MAP, cy = uv.getY(c) * MAP;
+    const den = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy); if (Math.abs(den) < 1e-9) continue;
+    const x0 = Math.max(0, Math.floor(Math.min(ax, bx, cx)) - 1), x1 = Math.min(MAP - 1, Math.ceil(Math.max(ax, bx, cx)) + 1);
+    const y0 = Math.max(0, Math.floor(Math.min(ay, by, cy)) - 1), y1 = Math.min(MAP - 1, Math.ceil(Math.max(ay, by, cy)) + 1);
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+      const px = x + .5, py = y + .5;
+      const l1 = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / den, l2 = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / den, l3 = 1 - l1 - l2;
+      if (l1 < -.3 || l2 < -.3 || l3 < -.3) continue;
+      const h = l1 * hh[a] + l2 * hh[b] + l3 * hh[c], z = l1 * zz[a] + l2 * zz[b] + l3 * zz[c];
+      out[y * MAP + x] = h > line(z) ? (h > .93 ? 2 : 1) : out[y * MAP + x] === 0 ? 3 : out[y * MAP + x]; // 2 = crown, 1 = hair zone, 3 = face and neck
+    }
+  }
+  return out;
+}
+const lum = (r, g, b) => (r * .3 + g * .59 + b * .11) / 255;
+
 const cache = new Map();
 // A texture for this model in this outfit. look: {shorts, trim, gloves, pattern}
 export function outfitTexture(model, look) {
-  const key = model.id + '|' + look.shorts + look.trim + look.gloves + look.pattern;
+  const key = model.id + '|' + look.shorts + look.trim + look.gloves + look.pattern + (look.hair || '');
   if (cache.has(key)) return cache.get(key);
   const img = model.image, W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;
   if (!model.pixels) {
@@ -72,15 +110,30 @@ export function outfitTexture(model, look) {
       if (keyed(model.key, d[p], d[p + 1], d[p + 2]) > .5) { if (B.hq[o] < lo) lo = B.hq[o]; if (B.hq[o] > hi) hi = B.hq[o]; }
     }
     model.shortsY = [lo, hi];
+    // hair: typical brightness of the crown against the face tells hair from skin; a shaved head has nothing to dye
+    const HM = model.hair = hairMap(model.mesh), crown = [], face = [];
+    for (let y = 0; y < MAP; y += 2) for (let x = 0; x < MAP; x += 2) {
+      const z = HM[y * MAP + x]; if (z !== 2 && z !== 3) continue;
+      const p = (Math.floor(y * sy) * W + Math.floor(x * sx)) * 4; (z === 2 ? crown : face).push(lum(d[p], d[p + 1], d[p + 2]));
+    }
+    const med = a => { a.sort((p, q) => p - q); return a.length ? a[a.length >> 1] : 0; };
+    model.hairV = med(crown); model.skinV = med(face); model.hasHair = crown.length > 20 && Math.abs(model.hairV - model.skinV) > .07;
   }
   const src = model.pixels.data, out = new ImageData(new Uint8ClampedArray(src), W, H), d = out.data, B = model.body;
   const col = k => { const c = COLORS[k] ? COLORS[k][1] : COLORS.red[1]; return [(c >> 16) & 255, (c >> 8) & 255, c & 255]; };
   const cS = col(look.shorts), cT = col(look.trim), cG = col(look.gloves), [lo, hi] = model.shortsY, span = Math.max(1, hi - lo);
   const fx = MAP / W, fy = MAP / H, pat = look.pattern, rope = look.gloves === 'rope';
+  const dye = model.hasHair && HAIR[look.hair] && HAIR[look.hair][1] ? HAIR[look.hair][1] : 0, cH = [(dye >> 16) & 255, (dye >> 8) & 255, dye & 255], HM = model.hair, hv = Math.max(.04, model.hairV), sv = model.skinV;
   for (let y = 0; y < H; y++) {
     const my = Math.floor(y * fy) * MAP;
     for (let x = 0; x < W; x++) {
-      const o = my + Math.floor(x * fx), reg = B.region[o]; if (!reg) continue;
+      const o = my + Math.floor(x * fx), reg = B.region[o];
+      if (dye && (HM[o] === 1 || HM[o] === 2)) { // closer in brightness to the hair than to the skin: dye it, keeping the strands' own light and dark
+        const p = (y * W + x) * 4, v = lum(src[p], src[p + 1], src[p + 2]);
+        if (Math.abs(v - hv) < Math.abs(v - sv)) { const sh = Math.max(.45, Math.min(1.5, .55 + v / hv * .45)); d[p] = Math.min(255, cH[0] * sh); d[p + 1] = Math.min(255, cH[1] * sh); d[p + 2] = Math.min(255, cH[2] * sh); }
+        continue;
+      }
+      if (!reg) continue;
       const p = (y * W + x) * 4, r = src[p], g = src[p + 1], b = src[p + 2], k = keyed(model.key, r, g, b); if (k <= 0) continue;
       let c = cG, matte = false;
       if (reg === 1 && rope) { // hemp cord wound round the fist: light turns with dark grooves between them
@@ -117,10 +170,6 @@ export function headgear(kind, colorKey, radius) {
   if (kind === 'mongkol') {
     add(new THREE.TorusGeometry(radius * 1.04, .011, 8, 28), 0, .012, 0, Math.PI / 2);
     add(new THREE.CapsuleGeometry(.01, .11, 3, 6), -radius * 1.2, .0, 0, 0, -.7);
-  } else {
-    const band = add(new THREE.TorusGeometry(radius * 1.01, .008, 6, 28), 0, 0, 0, Math.PI / 2); band.scale.z = 3.2; // flattened into a cloth strip
-    add(new THREE.BoxGeometry(.012, .13, .03), -radius * 1.08, -.07, .018, 0, -.25);
-    add(new THREE.BoxGeometry(.012, .11, .03), -radius * 1.1, -.06, -.02, 0, -.45);
   }
   return g;
 }

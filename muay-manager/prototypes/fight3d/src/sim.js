@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.6';
+export const SIM_VERSION = 'proto-0.7';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -49,14 +49,14 @@ export function simulate(opts) {
     return {i, dir: i ? -1 : 1, x: i ? K.startX : -K.startX, name: spec.name, stats: spec.stats,
       style: STYLES.find(s => s.id === spec.style),
       spList: (spec.sp || []).filter(k => MOVES[k] && MOVES[k].special).slice(0, 3), // the owner's chosen signature moves, else the style's
-      hp: 100, st: 100, sp: 0, kd: 0, pts: 0, state: 'intro', cool: 0, plan: null, planT: 0,
+      hp: 100, st: 100, sp: 0, kd: 0, pts: 0, pts0: 0, kdR: 0, card: 0, state: 'intro', cool: 0, plan: null, planT: 0,
       pt: 0, pd: .001, to: 'guard', q: [], qi: 0, mv: null, mvKey: null, hold: 0, inv: 0, lunge: 0,
       combo: null, ci: 0, chain: 0, chainT: 0, lastRes: null, spi: 0,
       wearHead: 0, wearBody: 0, wearLeg: 0, stunT: 0, stunCd: 0, stunFlip: 0, tough: 0,
       landed: 0, thrown: 0, used: {}, seen: 0, moveId: 0, coverLvl: null, guards: 0, grab: null};
   }
   const F = [mk(0, specs[0]), mk(1, specs[1])];
-  const G = {phase: 'intro', t: 0, round: 1, clock: K.roundTime, count: null, clinch: null, restT: 0, koT: 0, over: null, lead: -1, leadChanges: 0};
+  const G = {cards: [], phase: 'intro', t: 0, round: 1, clock: K.roundTime, count: null, clinch: null, restT: 0, koT: 0, over: null, lead: -1, leadChanges: 0};
 
   // the corner's plan for the current round; opts.plans[fighter] is a list with one plan per round
   const PR = PLAN_RULES;
@@ -252,7 +252,7 @@ export function simulate(opts) {
 
   function knockdown(f, o, key, raw, clean) {
     dropClinch();
-    o.kd++; f.pts += K.kdPoints; o.state = 'down'; o.q = []; o.combo = null;
+    o.kd++; o.kdR++; f.pts += K.kdPoints; o.state = 'down'; o.q = []; o.combo = null;
     setPose(o, 'fall1', .18);
     if (o.kd >= 3) { knockout(f, o, 'ทีเคโอ', key); return; }
     const ratio = o.hp / 100;
@@ -430,10 +430,23 @@ export function simulate(opts) {
     f.x = clamp(f.x + f.dir * clamp(d - want, -walk * dt, fwd * dt), -LIM, LIM); sep(f, o);
   }
 
+  // Ten-point must, as a Muay Thai judge marks a round: the winner gets 10, the loser 9; a round is 10:8 when the loser
+  // took a count or was clearly outclassed, 10:7 for two counts more than the other man, 10:10 when nothing separates them.
+  function scoreRound() {
+    const eff = [0, 1].map(i => F[i].pts - F[i].pts0 - K.kdPoints * F[1 - i].kdR), c0 = F[0].kdR, c1 = F[1].kdR, s = [10, 10];
+    if (c0 !== c1) s[c0 > c1 ? 0 : 1] = Math.max(7, 9 - Math.abs(c0 - c1));
+    else {
+      const hi = Math.max(eff[0], eff[1]), lo = Math.min(eff[0], eff[1]);
+      if (hi > 0 && (hi - lo) / hi >= K.scoreEven) s[eff[0] < eff[1] ? 0 : 1] = (lo * K.scoreClear <= hi && hi - lo >= K.scoreClearMin) ? 8 : 9;
+    }
+    F[0].card += s[0]; F[1].card += s[1]; G.cards.push(s);
+    return s;
+  }
   function endRound() {
     dropClinch();
     emit({type: 'bell', n: 2});
-    emit({type: 'score', round: G.round, pts: [F[0].pts, F[1].pts]});
+    const card = scoreRound();
+    emit({type: 'score', round: G.round, card, total: [F[0].card, F[1].card], pts: [F[0].pts, F[1].pts]});
     F.forEach(f => {
       f.q = []; f.mv = null; f.plan = null; f.combo = null;
       if (f.state === 'stun') emit({type: 'stun_end', on: f.i, bell: true});
@@ -441,7 +454,7 @@ export function simulate(opts) {
       if (f.state !== 'down' && f.state !== 'getup') { f.state = 'rest'; setPose(f, 'guard', .25); }
     });
     if (G.round >= K.rounds) {
-      const w = F[0].pts >= F[1].pts ? 0 : 1;
+      const w = F[0].card !== F[1].card ? (F[0].card > F[1].card ? 0 : 1) : F[0].pts >= F[1].pts ? 0 : 1; // level on the card: the one who did more damage gets the nod
       G.over = {w, l: 1 - w, how: 'คะแนน', round: G.round, time: K.roundTime, move: null};
       G.phase = 'dec'; G.koT = 0;
       emit({type: 'phase', phase: 'dec', round: G.round});
@@ -460,7 +473,7 @@ export function simulate(opts) {
       if (G.t > K.introTime - 1 && a.to === 'wai') { setPose(a, 'guard', .4); setPose(b, 'guard', .4); }
       if (G.t > K.introTime) {
         G.phase = 'fight'; F.forEach(f => { f.state = 'idle'; f.cool = rnd(.7, 1.4); });
-        emit({type: 'phase', phase: 'fight', round: 1}); F.forEach(x => emit({type: 'plan', by: x.i, round: 1, ag: planOf(x).ag})); emit({type: 'bell', n: 1}); say('ระฆังยกแรกดังขึ้น');
+        emit({type: 'phase', phase: 'fight', round: 1}); F.forEach(x => { x.pts0 = x.pts; x.kdR = 0; emit({type: 'plan', by: x.i, round: 1, ag: planOf(x).ag}); }); emit({type: 'bell', n: 1}); say('ระฆังยกแรกดังขึ้น');
       }
     } else if (G.phase === 'fight') {
       if (G.count) {
@@ -491,7 +504,7 @@ export function simulate(opts) {
       if (G.restT <= 0) {
         G.round++; G.clock = K.roundTime; G.phase = 'fight';
         F.forEach(f => { f.state = 'idle'; f.cool = rnd(.6, 1.2); f.plan = null; });
-        emit({type: 'phase', phase: 'fight', round: G.round}); F.forEach(x => emit({type: 'plan', by: x.i, round: G.round, ag: planOf(x).ag})); emit({type: 'bell', n: 1}); say('เริ่มยกที่ ' + G.round);
+        emit({type: 'phase', phase: 'fight', round: G.round}); F.forEach(x => { x.pts0 = x.pts; x.kdR = 0; emit({type: 'plan', by: x.i, round: G.round, ag: planOf(x).ag}); }); emit({type: 'bell', n: 1}); say('เริ่มยกที่ ' + G.round);
       }
     } else if (G.phase === 'ko') {
       G.koT += dt;
@@ -528,7 +541,7 @@ export function simulate(opts) {
     version: SIM_VERSION, seed, specs, dt: DT, nTicks: roundAt.length / 2, duration: T,
     ticks: Float32Array.from(ticks), clock: Float32Array.from(roundAt), poses, events,
     result: {w: o.w, l: o.l, how: o.how, round: o.round, time: o.time, move: o.move,
-      pts: [F[0].pts, F[1].pts], kd: [F[0].kd, F[1].kd], landed: [F[0].landed, F[1].landed], thrown: [F[0].thrown, F[1].thrown],
+      pts: [F[0].pts, F[1].pts], cards: [F[0].card, F[1].card], rounds: G.cards, kd: [F[0].kd, F[1].kd], landed: [F[0].landed, F[1].landed], thrown: [F[0].thrown, F[1].thrown],
       used: [F[0].used, F[1].used], guards: [F[0].guards, F[1].guards], leadChanges: G.leadChanges}
   };
 }

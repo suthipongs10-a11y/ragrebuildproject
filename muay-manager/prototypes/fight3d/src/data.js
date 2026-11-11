@@ -124,6 +124,8 @@ export const RULES = {
   // catching a body kick, then punching with the free hand
   catchBase: .09, catchDef: .12, catchHold: 1.15,
   countStep: .62, kdPoints: 15,
+  // round scoring: within this share of each other is an even round; this many times the other man's work (and this much more) is a clear 10:8
+  scoreEven: .08, scoreClear: 3.5, scoreClearMin: 30,
   restHp: 1.4, restSt: 12
 };
 

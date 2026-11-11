@@ -6,7 +6,7 @@ import { bake, EFF_NAME } from './timeline.js';
 import { Fighter, EFF_JOINT, STYLE_BUILD, setDims, DIM_DEFAULT } from './rig.js';
 import { NP, FLAT, IDX, scalePoses } from './poses.js';
 import { loadModel, ModelFighter } from './model.js';
-import { COLORS, PATTERNS, HEADGEAR } from './outfit.js';
+import { COLORS, PATTERNS, HEADGEAR, HAIR } from './outfit.js';
 import { buildArena, VENUES } from './arena.js';
 import { buildDrill, TARGETS } from './drill.js';
 import { buildFx } from './fx.js';
@@ -53,10 +53,10 @@ const ROSTER = {
   b: ['เพรียวคมกริบ', 'blue'], a: ['ตัวถึก กางเกงลายทอง', 'red']
 };
 const LOOK = [
-  {name: '', fighter: 'c', shorts: 'red', trim: 'gold', pattern: 'zigzag', gloves: 'red', head: 'mongkol'},
-  {name: '', fighter: 'd', shorts: 'blue', trim: 'white', pattern: 'stripe', gloves: 'blue', head: 'band'}
+  {name: '', fighter: 'c', shorts: 'red', trim: 'gold', pattern: 'zigzag', gloves: 'red', head: 'mongkol', hair: 'natural'},
+  {name: '', fighter: 'd', shorts: 'blue', trim: 'white', pattern: 'stripe', gloves: 'blue', head: 'mongkol', hair: 'natural'}
 ];
-const LOOK_FIELDS = {fighter: ROSTER, shorts: COLORS, trim: COLORS, pattern: PATTERNS, gloves: COLORS, head: HEADGEAR};
+const LOOK_FIELDS = {fighter: ROSTER, shorts: COLORS, trim: COLORS, pattern: PATTERNS, gloves: COLORS, head: HEADGEAR, hair: HAIR};
 const cleanName = v => String(v || '').replace(/[<>&"']/g, '').trim().slice(0, 24);
 try { // remembered per viewer
   const sv = JSON.parse(localStorage.getItem('muayLabLook'));
@@ -139,7 +139,7 @@ function buildFight() {
   fight = simulate({seed: CFG.seed, specs: CFG.specs ? JSON.parse(JSON.stringify(CFG.specs)) : null, plans: CFG.plans, rules: CFG.rules, names: CFG.specs ? null : LOOK.map(l => cleanName(l.name))});
   TL = bake(fight); EV = fight.events;
   // landmarks the director and the slow motion need
-  marks = {specials: [], kds: [], rests: [], stuns: [], clinches: [], bigHits: [], hits: [], rounds: [], introEnd: RULES.introTime, ko: null, dec: null, decPhase: null, over: fight.duration};
+  marks = {scores: [], specials: [], kds: [], rests: [], stuns: [], clinches: [], bigHits: [], hits: [], rounds: [], introEnd: RULES.introTime, ko: null, dec: null, decPhase: null, over: fight.duration};
   let kdOpen = null, restOpen = null, stunOpen = [null, null], round = null, clinchOpen = null;
   for (const e of EV) {
     if (e.type === 'move' && e.special) marks.specials.push({t0: e.t, t1: (e.hit ? e.hit.t : e.tHit) + .75, by: e.by, hit: e.hit});
@@ -152,6 +152,7 @@ function buildFight() {
     else if (e.type === 'clinch') { clinchOpen = {t0: e.t, t1: e.t + 4}; marks.clinches.push(clinchOpen); }
     else if (e.type === 'break' && clinchOpen) { clinchOpen.t1 = e.t; clinchOpen = null; }
     else if (e.type === 'decision') marks.dec = e;
+    else if (e.type === 'score') marks.scores.push(e);
     else if (e.type === 'phase') {
       if (e.phase === 'rest') { restOpen = {t: e.t, t0: e.t + .4, t1: fight.duration, round}; marks.rests.push(restOpen); }
       if (e.phase === 'fight') { if (restOpen) { restOpen.t1 = e.t - .5; restOpen = null; } if (e.round === 1) marks.introEnd = e.t; round = {n: e.round, t0: e.t, best: null, kd: null}; marks.rounds.push(round); }
@@ -268,8 +269,8 @@ function showResult() {
   const r = fight.result, w = fight.specs[r.w];
   $('resM').textContent = r.how === 'คะแนน' ? 'ชนะคะแนน ครบ ' + RULES.rounds + ' ยก' : 'ชนะ' + r.how + ' ยก ' + r.round + ' นาทีที่ ' + fmt(r.time);
   $('resW').textContent = w.name; $('resW').className = 'w ' + (r.w ? 'b' : 'r');
-  $('resD').textContent = (r.move ? 'ปิดเกมด้วย' + MOVES[r.move].th + ' · ' : '') + 'คะแนน ' + Math.round(r.pts[0]) + ' ต่อ ' + Math.round(r.pts[1]) +
-    ' · เข้าเป้า ' + r.landed[0] + ' ต่อ ' + r.landed[1];
+  $('resD').textContent = (r.move ? 'ปิดเกมด้วย' + MOVES[r.move].th + ' · ' : '') + (r.how === 'คะแนน' ? 'กรรมการให้ ' + r.cards[0] + ' ต่อ ' + r.cards[1] + (r.cards[0] === r.cards[1] ? ' (คะแนนเท่ากัน ตัดสินจากความเสียหายที่ทำได้)' : '') + ' · ' : '') +
+    'เข้าเป้า ' + r.landed[0] + ' ต่อ ' + r.landed[1];
   $('result').hidden = false;
 }
 
@@ -283,7 +284,7 @@ function handle(e) {
     case 'say': if (!rp) $('call').innerHTML = e.html; break;
     case 'bell': if (!rp) audio.bell(e.n); break;
     case 'score':
-      if (!rp) { $('scR').textContent = Math.round(e.pts[0]); $('scB').textContent = Math.round(e.pts[1]); $('scT').textContent = 'คะแนนหลังยก ' + e.round; $('scorecard').hidden = false; }
+      if (!rp) { $('scR').textContent = e.total[0]; $('scB').textContent = e.total[1]; $('scT').textContent = 'ยก ' + e.round + ' กรรมการให้ ' + e.card[0] + ' : ' + e.card[1] + ' · คะแนนรวม'; $('scorecard').hidden = false; }
       break;
     case 'clinch':
       hype = Math.min(1, hype + .3);
@@ -551,8 +552,13 @@ function hud(dt) {
       el.style.width = hp + '%'; el.className = hp < 30 ? 'low' : hp < 55 ? 'mid' : '';
       $('st' + ids[i]).style.width = TL.val(i, playT, 2) + '%'; $('sp' + ids[i]).style.width = TL.val(i, playT, 3) + '%';
     }
-    const pa = Math.round(TL.val(0, playT, 8)), pb = Math.round(TL.val(1, playT, 8));
-    for (const [id, v, lead] of [['ptR', pa, pa > pb], ['ptB', pb, pb > pa]]) {
+    // the number is the judges' card so far; gold marks whoever is ahead on work done in the round being fought
+    let tot = [0, 0]; for (const sc of marks.scores) if (sc.t <= playT) tot = sc.total;
+    let r0 = 0; for (const r of marks.rounds) if (r.t0 <= playT) r0 = r.t0;
+    const ga = TL.val(0, playT, 8) - TL.val(0, r0, 8), gb = TL.val(1, playT, 8) - TL.val(1, r0, 8), live = playT > marks.introEnd && !marks.rests.some(r => playT >= r.t && playT < r.t1 + .5) && playT < (marks.decPhase != null ? marks.decPhase : marks.over);
+    const pa = tot[0], pb = tot[1], edge = Math.max(ga, gb) * .08;
+    $('ld').textContent = !live ? '' : ga > gb + edge ? '◀ นำยกนี้' : gb > ga + edge ? 'นำยกนี้ ▶' : 'ยกนี้สูสี';
+    for (const [id, v, lead] of [['ptR', pa, live && ga > gb + edge], ['ptB', pb, live && gb > ga + edge]]) {
       const el = $(id);
       if (el.textContent !== String(v)) { el.textContent = v; el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
       el.classList.toggle('lead', lead);
@@ -607,7 +613,7 @@ function buildUi() {
     applyOpt();
   });
   const opts = (map, cur) => Object.keys(map).map(k => '<option value="' + k + '"' + (k === cur ? ' selected' : '') + '>' + (Array.isArray(map[k]) ? map[k][0] : map[k]) + '</option>').join('');
-  const LABEL = {fighter: 'ตัวนักมวย', shorts: 'สีกางเกง', pattern: 'ลายกางเกง', trim: 'สีลายและผ้าหัว', gloves: 'สีนวม', head: 'เครื่องหัว'};
+  const LABEL = {fighter: 'ตัวนักมวย', shorts: 'สีกางเกง', pattern: 'ลายกางเกง', trim: 'สีลายและมงคล', gloves: 'สีนวม', head: 'มงคล', hair: 'สีผม'};
   $('lookUi').innerHTML = LOOK.map((l, i) => '<div class="lk ' + (i ? 'b' : 'r') + '"><h3>' + (i ? 'มุมน้ำเงิน' : 'มุมแดง') + '</h3>' +
     '<label for="lk' + i + 'name">ชื่อ</label><input id="lk' + i + 'name" data-i="' + i + '" data-k="name" maxlength="24" placeholder="ตั้งชื่อเอง" value="' + cleanName(l.name) + '">' +
     Object.keys(LABEL).map(k => '<label for="lk' + i + k + '">' + LABEL[k] + '</label><select id="lk' + i + k + '" data-i="' + i + '" data-k="' + k + '">' + opts(LOOK_FIELDS[k], l[k]) + '</select>').join('') + '</div>').join('');
@@ -653,7 +659,8 @@ window.LAB = {
 // What happened in a round, for the corner's advice. Index 0 is the red corner.
 function roundStats(n) {
   const r = marks.rounds.find(x => x.n === n), rest = marks.rests.find(x => x.round && x.round.n === n), t1 = rest ? rest.t : fight.duration, t0 = r ? r.t0 : 0;
-  const out = [0, 1].map(i => ({head: 0, body: 0, leg: 0, landed: 0, blocked: 0, thrown: 0, kd: 0, hp: TL.val(i, t1, 1), st: TL.val(i, t1, 2), wearHead: TL.val(i, t1, 5), wearBody: TL.val(i, t1, 6), wearLeg: TL.val(i, t1, 7), pts: TL.val(i, t1, 8)}));
+  const sc = marks.scores.find(x => x.round === n) || {card: [0, 0], total: [0, 0]};
+  const out = [0, 1].map(i => ({card: sc.card[i], total: sc.total[i], head: 0, body: 0, leg: 0, landed: 0, blocked: 0, thrown: 0, kd: 0, hp: TL.val(i, t1, 1), st: TL.val(i, t1, 2), wearHead: TL.val(i, t1, 5), wearBody: TL.val(i, t1, 6), wearLeg: TL.val(i, t1, 7), pts: TL.val(i, t1, 8)}));
   for (const e of EV) {
     if (e.t < t0 || e.t > t1) continue;
     if (e.type === 'move') out[e.by].thrown++;
@@ -665,7 +672,7 @@ function roundStats(n) {
 }
 // ---------- hooks for the game layer ----------
 const API = {
-  LOOK, ROSTER, COLORS, PATTERNS, HEADGEAR, HOOK, VENUES, TARGETS, cleanName,
+  LOOK, ROSTER, COLORS, PATTERNS, HEADGEAR, HAIR, HOOK, VENUES, TARGETS, cleanName,
   hasModels: () => !!document.getElementById('model-c'),
   async startFight(cfg) { // cfg: {seed, specs: [player, opponent], plans, looks: [look, look], venue, rules}
     API.endPreview(); API.drillStop(); OPT.venue = VENUES[cfg.venue] ? cfg.venue : 'stadium';
@@ -700,7 +707,7 @@ const API = {
     const model = await API.single(look); if (!model) return false;
     API.endPreview(); API.drillStop(); fighters.forEach(f => { f.root.visible = false; });
     arena.setVenue('camp'); drillF = new ModelFighter(0, model, look); scene.add(drillF.root); clearOverlays();
-    drill.start(drillF, target, arena.V.beamY); return true;
+    drillF.setMongkol(false); drill.start(drillF, target, arena.V.beamY); return true;
   },
   drillStrike: move => drill.strike(move),
   drillStop() { if (drill) drill.stop(); if (drillF) { scene.remove(drillF.root); drillF = null; } },
@@ -717,7 +724,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 10 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 11 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

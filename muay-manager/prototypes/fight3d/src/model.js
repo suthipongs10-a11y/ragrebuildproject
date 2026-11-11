@@ -103,7 +103,7 @@ export class ModelFighter {
     this.qUp = Q(); this.qLo = Q(); this.qFoot = Q(); this.qNeck = Q(); this.d = V(); this.e = V(); this.n = V(); this.a = V();
   }
   setStyle() {}
-  setMongkol() {}
+  setMongkol(on) { this.gear.visible = !!on; } // the headpiece comes off before the fight
   setWear(h, b) { const k = Math.min(.28, (h + b) / 900); this.mat.color.setRGB(1, 1 - k * .75, 1 - k * .85); }
   // world matrix for a bone: rotate by q about its bind point a0 and move that point to a
   put(name, q, a, a0, k) {
