@@ -61,6 +61,12 @@ export const POSES = {
   clinchPulled: P({turn: .1, twist: 0, lean: .78, hdP: .3, hip: [-.02, .8, 0], hL: [.3, .95, -.16], hR: [.28, .92, .16], fL: [.16, 0, -.22], fR: [-.24, 0, .22]}),
   clinchKneeHi: P({turn: -.25, twist: 0, lean: -.2, hip: [.12, .97, 0], hL: [.38, 1.2, -.07], hR: [.38, 1.2, .07], eL: [-.1, -1, -.7], eR: [-.1, -1, .7], fL: [.14, .06, -.17], fR: [.3, .78, .04], kR: [1, .7, 0]}),
   clinchHitHead: P({turn: .1, twist: 0, lean: -.05, hdP: -.55, hip: [-.08, .84, 0], hL: [.26, 1.1, -.2], hR: [.22, 1.05, .2], fL: [.16, 0, -.22], fR: [-.26, 0, .22]}),
+  // elbows in the clinch: the holder keeps one glove on the neck and slashes with the other arm; the held man drives one up
+  clinchElbowW: P({turn: .55, twist: .25, lean: .1, hip: [.02, .88, 0], hL: [.44, 1.5, -.07], hR: [.12, 1.6, .26], eL: [-.1, -1, -.7], eR: [-.3, .6, 1], fL: [.14, 0, -.17], fR: [-.2, 0, .17]}),
+  clinchElbow: P({turn: -.35, twist: -.45, lean: .22, hip: [.08, .87, 0], hL: [.44, 1.48, -.07], hR: [.3, 1.5, -.1], eL: [-.1, -1, -.7], eR: [1, .35, .1], fL: [.14, 0, -.17], fR: [-.16, .03, .17]}),
+  clinchCover: P({turn: .15, twist: 0, lean: .32, hdP: .3, hip: [-.02, .85, 0], hL: [.3, 1.5, -.1], hR: [.24, 1.56, .1], eL: [.4, -.6, -.6], eR: [.4, -.6, .6], fL: [.16, 0, -.2], fR: [-.22, 0, .2]}),
+  clinchElbowUpW: P({turn: .4, twist: .2, lean: .36, hdP: .25, hip: [-.02, .82, 0], hL: [.32, 1.2, -.14], hR: [.14, 1.2, .2], eR: [-.6, -.4, .8], fL: [.16, 0, -.2], fR: [-.22, 0, .2]}),
+  clinchElbowUp: P({turn: -.3, twist: -.35, lean: .12, hdP: 0, hip: [.06, .9, 0], hL: [.3, 1.3, -.14], hR: [.26, 1.62, 0], eR: [1, .7, .15], fL: [.16, 0, -.2], fR: [-.2, .03, .2]}),
   throwW: P({turn: .7, twist: .3, lean: .18, side: .1, hip: [.04, .84, 0], hL: [.44, 1.46, -.07], hR: [.44, 1.46, .07], eL: [-.1, -1, -.7], eR: [-.1, -1, .7], fL: [.2, 0, -.2], fR: [-.2, 0, .22]}),
   throw: P({turn: -.9, twist: -.5, lean: .32, side: -.25, hip: [.02, .8, .06], hL: [.3, 1.0, .25], hR: [.1, .95, .4], fL: [.26, 0, -.24], fR: [-.22, 0, .1]}),
   // kick caught: the kicker hops on one leg; the catcher clamps the ankle at his side and punches with the free hand

@@ -39,6 +39,12 @@ export const MOVES = {
                fr:[['clinchKneeW',.17],['clinchKnee',.1],['clinchHold',.16]]},
   clinchKneeHead: {th:'โน้มคอตีเข่า', en:'Neck-pull knee', kind:'kick', sfx:'knee', lvl:'head', reach:78, min:16, dmg:16, st:6, push:0, eff:'kneeR', react:'clinchHitHead', gb:.6, stun:1.1, inClinch:1, pull:1,
                fr:[['clinchKneeW',.2],['clinchKneeHi',.1],['clinchHold',.18]]},
+  // elbows inside the clinch: the holder slashes down with the free arm; the held man can drive one up through the middle.
+  // Both are thrown at arm's length from a raised guard, so they are stopped far more often than a knee (high gb).
+  clinchElbow: {th:'ศอกตัดในวงกอด', en:'Clinch elbow', kind:'punch', sfx:'elbow', lvl:'head', reach:78, min:16, dmg:13, st:5, push:0, eff:'elbowR', react:'clinchHitHead', gb:2.5, stun:1.0, inClinch:1,
+               fr:[['clinchElbowW',.15],['clinchElbow',.08],['clinchHold',.16]]},
+  clinchElbowUp: {th:'ศอกงัดสวน', en:'Counter elbow', kind:'punch', sfx:'elbow', lvl:'head', reach:78, min:10, dmg:12, st:5, push:14, eff:'elbowR', react:'hitHeadUp', gb:1.6, stun:1.0, inClinch:1,
+               fr:[['clinchElbowUpW',.13],['clinchElbowUp',.08],['clinchHeld',.16]]},
   clinchThrow: {th:'เหวี่ยงล้ม', en:'Clinch dump', kind:'kick', sfx:'knee', lvl:'body', reach:90, min:10, dmg:4, st:7, push:0, eff:'handR', react:'fall1', gb:1, stun:0, inClinch:1, throw:1,
                fr:[['throwW',.2],['throw',.15],['guard',.34]]},
   catchPunch: {th:'จับขาชกหน้า', en:'Catch and punch', kind:'punch', sfx:'punch', lvl:'head', reach:140, min:16, dmg:9, st:4, push:24, eff:'handR', react:'hitHeadBack', gb:1, stun:0, noKd:1,
@@ -122,6 +128,9 @@ export const RULES = {
   clinchKneesMin: 2, clinchKneesSpan: 3, clinchMax: 3.8, clinchEscape: .12, clinchDist: 48,
   clinchStyleEscape: .45, clinchStyleKnees: 1, // a clinch specialist holds on better and gets an extra knee in
   clinchHeadKnee: .3,     // share of clinch knees that pull the head down onto the knee
+  clinchElbow: .28, clinchElbowStyle: .1,   // share of the holder's clinch strikes that are elbows (more for a clinch specialist)
+  // chance the held man answers one of those strikes with an elbow of his own: base, plus his power / 100 times the second number
+  clinchCounter: .14, clinchCounterPow: .12, clinchCounterStyle: 1.4,
   throwTry: .7, throwBase: .5, throwPoints: 3, throwDown: 1.35, // dumping the opponent out of the clinch: scores, no count
   // catching a body kick, then punching with the free hand
   catchBase: .09, catchDef: .12, catchHold: 1.15,

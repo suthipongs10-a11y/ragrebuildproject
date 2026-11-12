@@ -99,6 +99,7 @@ export function bake(fight) {
     aimEffector(target, mv.eff, pt3, J);
   }
 
+  const ONE_HAND = new Set(['clinchElbowW', 'clinchElbow', 'clinchCover']);
   // clinch and catch: place a fighter's hands or foot on the opponent's body as it will be a moment later
   function attach(i, c, target) {
     const o = 1 - i, k = Math.min(n - 1, Math.round((c.t + Math.max(c.d, .12)) / dt)), ob = baked[o], oo = k * NP;
@@ -107,7 +108,9 @@ export function bake(fight) {
     const toMine = v => { v.applyAxisAngle(UP, -ob[oo + IDX.spin]); v.y += ob[oo + IDX.jump]; v.set(dist - v.x, v.y - target[IDX.jump], -v.z); return v; };
     if (c.grab === 'neck') {
       toMine(pt3.copy(J2.neck).lerp(J2.head, .25));
-      for (const [b, z] of [[IDX.hL, -.07], [IDX.hR, .07]]) { target[b] = pt3.x + .06; target[b + 1] = pt3.y; target[b + 2] = pt3.z + z; }
+      // both gloves behind the neck, or only the lead one while the other arm throws or stops an elbow
+      const hands = ONE_HAND.has(c.pose) ? [[IDX.hL, -.04]] : [[IDX.hL, -.07], [IDX.hR, .07]];
+      for (const [b, z] of hands) { target[b] = pt3.x + .06; target[b + 1] = pt3.y; target[b + 2] = pt3.z + z; }
     }
     if (c.hold === 'leg') { // the ankle sits in the catcher's lead hand
       toMine(pt3.copy(J2.haL));

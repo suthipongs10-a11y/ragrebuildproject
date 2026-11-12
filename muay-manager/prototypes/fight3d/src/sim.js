@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.9';
+export const SIM_VERSION = 'proto-0.10';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -149,12 +149,13 @@ export function simulate(opts) {
       o.lunge = Math.max(0, d - 72); // step in while holding the leg, to punching range
       return;
     }
-    const held = o.state === 'clinched';
+    const held = o.state === 'clinched', onHolder = !!(G.clinch && G.clinch.a === o); // onHolder: the held man hitting back
     let pB = o.stats.def / 100 * K.blockBase * m.gb, pD = o.stats.spd / 100 * K.dodgeBase;
     if (o.state === 'move') { pB *= .2; pD = 0; }
     else if (o.state === 'hit') { pB *= .35; pD = 0; }
     else if (o.state === 'stun') { pB *= .3; pD = 0; }
     else if (held) { pB *= .6; pD = 0; }
+    else if (o.state === 'clinch') { pD = 0; }
     else if (o.state === 'caught') { pB = 0; pD = 0; }
     else if (o.state === 'cover') { pD = 0; pB = o.coverLvl === m.lvl ? Math.min(.92, pB * K.coverMul + K.coverBonus) : pB * K.coverWrong; }
     if (o.st < 25) pB *= .7;
@@ -174,10 +175,13 @@ export function simulate(opts) {
       const dm = m.dmg * K.blockDmg;
       o.hp = Math.max(1, o.hp - dm); o.st = Math.max(0, o.st - 2); // a blocked strike does not score
       if (m.lvl === 'leg') o.wearLeg += m.dmg * .25;
-      if (!held) {
+      if (!held && !onHolder) {
         o.state = 'block'; o.hold = .2; o.q = []; o.combo = null;
         setPose(o, m.lvl === 'leg' ? 'check' : m.lvl === 'body' ? 'blockBody' : 'block', .06);
         o.x = clamp(o.x - o.dir * m.push * .4, -LIM, LIM);
+      } else if (m.sfx === 'elbow' && (held || o.state === 'clinch')) {
+        setPose(o, 'clinchCover', .06); // a forearm comes up inside the clinch
+        say('<b>' + o.name + '</b> ยกแขนกันศอกไว้ได้');
       }
       f.lastRes = 'block'; emit(Object.assign(base, {res: 'block', dmg: dm}));
       if (m.special) say('<b>' + o.name + '</b> บัง' + m.th + 'ไว้ได้');
@@ -205,6 +209,10 @@ export function simulate(opts) {
     const isTeep = key === 'teep' || key === 'teepFace';
     if (!held) o.x = clamp(o.x - o.dir * m.push * (isTeep && planOf(f).ag === 'counter' ? PR.counterPush : 1), -LIM, LIM);
     f.chain = (T - f.chainT < 1.1) ? f.chain + 1 : 1; f.chainT = T;
+    if (onHolder) { // the elbow lands on the man holding: the clinch is broken
+      const c = G.clinch; dropClinch(); f.q = f.q.slice(0, 2).concat([['guard', .22]]);
+      emit({type: 'break', reason: 'elbow', by: c.a.i, on: c.b.i});
+    }
     o.q = []; o.mv = null; o.combo = null; o.plan = null;
     if (!wasStun && !held) { o.state = 'hit'; o.hold = .2 + raw / 60; }
     setPose(o, held ? (m.lvl === 'head' ? 'clinchHitHead' : 'clinchHit') : m.react, .06, {amp: held ? 1 : sev === 1 ? .55 : sev === 2 ? .8 : 1});
@@ -337,7 +345,16 @@ export function simulate(opts) {
         }
         if (f.qi === 1 && G.clinch && G.clinch.a === f && R() < (K.clinchEscape + o.stats.pow / 100 * .1) * (f.style.id === 'clinch' ? K.clinchStyleEscape : 1)) { endClinch('escape'); return; }
         f.qi++;
-        if (f.qi >= f.q.length && G.clinch && G.clinch.a === f) { f.state = 'clinch'; f.mv = null; return; }
+        if (f.qi >= f.q.length && G.clinch && G.clinch.a === f) {
+          f.state = 'clinch'; f.mv = null;
+          // the held man may answer with an elbow of his own
+          if (o.state === 'clinched' && o.st >= 8 && R() < (K.clinchCounter + o.stats.pow / 100 * K.clinchCounterPow) * (o.style.id === 'clinch' ? K.clinchCounterStyle : 1)) {
+            const c = G.clinch; c.next = Math.max(c.next, .55); c.t = Math.max(c.t, .7);
+            startMove(o, f, 'clinchElbowUp');
+          }
+          return;
+        }
+        if (f.qi >= f.q.length && G.clinch && G.clinch.b === f) { f.state = 'clinched'; f.mv = null; return; }
         if (f.qi >= f.q.length) {
           f.state = 'idle'; f.mv = null;
           const ag = planOf(f).ag;
@@ -348,6 +365,7 @@ export function simulate(opts) {
     }
     if (f.state === 'clinch') {
       const c = G.clinch; if (!c) { f.state = 'idle'; return; }
+      if (done && f.to === 'clinchCover') setPose(f, 'clinchHold', .18);
       const gap = clamp(d - K.clinchDist, -150 * dt, 150 * dt) / 2; // pull in to knee range
       f.x = clamp(f.x + f.dir * gap, -LIM, LIM); o.x = clamp(o.x + o.dir * gap, -LIM, LIM);
       c.t -= dt; c.next -= dt;
@@ -357,13 +375,16 @@ export function simulate(opts) {
       }
       if (c.knees > 0 && c.next <= 0) {
         c.knees--; c.next = .5 + R() * .25;
-        const head = R() < K.clinchHeadKnee + (f.style.id === 'clinch' ? .12 : 0);
-        startMove(f, o, head ? 'clinchKneeHead' : 'clinchKnee');
-        if (head) setPose(o, 'clinchPulled', .18); // the head is dragged down onto the knee
+        if (R() < K.clinchElbow + (f.style.id === 'clinch' ? K.clinchElbowStyle : 0)) startMove(f, o, 'clinchElbow');
+        else {
+          const head = R() < K.clinchHeadKnee + (f.style.id === 'clinch' ? .12 : 0);
+          startMove(f, o, head ? 'clinchKneeHead' : 'clinchKnee');
+          if (head) setPose(o, 'clinchPulled', .18); // the head is dragged down onto the knee
+        }
       }
       return;
     }
-    if (f.state === 'clinched') { if (done && (f.to === 'clinchHit' || f.to === 'clinchHitHead' || f.to === 'clinchPulled') && !(o.state === 'move' && o.qi <= 1)) setPose(f, 'clinchHeld', .22); return; }
+    if (f.state === 'clinched') { if (done && (f.to === 'clinchHit' || f.to === 'clinchHitHead' || f.to === 'clinchPulled' || f.to === 'clinchCover') && !(o.state === 'move' && o.qi <= 1)) setPose(f, 'clinchHeld', .22); return; }
     if (f.state === 'thrown') {
       if (done && f.to === 'fall1') setPose(f, 'down', .22);
       f.hold -= dt;

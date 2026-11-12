@@ -292,7 +292,7 @@ function dressHtml() {
   let buy = '';
   if (pending) { const cost = pending.items.reduce((a, i) => a + i.price, 0); buy = '<div class="buy"><span>กำลังลองของที่ยังไม่มี: ' + pending.items.map(i => i.th + ' ฿' + i.price).join(', ') + '</span><div class="rowbtn"><button class="btn go" data-act="buy"' + (S.money < cost ? ' disabled' : '') + '>ซื้อ ฿ ' + baht(cost) + '</button><button class="btn" data-act="cancelbuy">ยกเลิก</button></div>' + (S.money < cost ? '<span class="warn">เงินไม่พอ ชกหาเงินก่อน</span>' : '') + '</div>'; }
   return '<section class="gcard"><h2>แต่งตัวนักมวย</h2>' + buy + '<label class="fld" for="gdname">ชื่อ</label><input id="gdname" class="inp" maxlength="24" value="' + esc(S.name) + '">' +
-    row('shorts', 'สีกางเกง', API.COLORS, 1) + row('pattern', 'ลายกางเกง', API.PATTERNS) + row('trim', 'สีลายกางเกงและมงคล', API.COLORS, 1) + row('gloves', 'สีนวม', API.COLORS, 1) + row('hair', 'สีผม', API.HAIR, 1) + row('head', 'มงคล (สวมตอนไหว้ครู ถอดก่อนชก)', API.HEADGEAR) +
+    row('shorts', 'สีกางเกง', API.COLORS, 1) + row('pattern', 'ลายกางเกง', API.PATTERNS) + row('trim', 'สีลายกางเกงและมงคล', API.COLORS, 1) + row('gloves', 'สีนวม', API.COLORS, 1) + (API.ROSTER[S.body][2] && API.ROSTER[S.body][2].bald ? '' : row('hair', 'สีผม', API.HAIR, 1)) + row('head', 'มงคล (สวมตอนไหว้ครู ถอดก่อนชก)', API.HEADGEAR) +
     '<p class="hint">กดเลือกแล้วเห็นบนตัวนักมวยทันที ของที่มีราคาลองใส่ได้ก่อน ซื้อครั้งเดียวใช้ได้ตลอด สีที่ซื้อแล้วใช้ได้ทั้งกางเกง ลาย และนวม</p></section>';
 }
 function oppCard(o, btn) {
@@ -549,7 +549,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; $('ver').textContent = 'ต้นแบบ 1.5'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; $('ver').textContent = 'ต้นแบบ 1.6'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

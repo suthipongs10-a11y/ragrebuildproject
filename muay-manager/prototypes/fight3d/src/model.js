@@ -43,6 +43,7 @@ const loadImage = src => new Promise((res, rej) => { const im = new Image(); im.
 
 // On a well-placed rig the middle of the skull is this far behind the head bone (measured on the bodies that looked right).
 const SKULL_BEHIND_BONE = .037;
+const BAND_GAP = .004; // metres between the head and the middle of the headband's cord
 // Models are embedded in the page as <script type="application/json" id="model-x"> blocks.
 export async function loadModel(id, key) {
   const el = document.getElementById('model-' + id);
@@ -67,23 +68,32 @@ export async function loadModel(id, key) {
     neck: pos.Head.y - pos.Spine.y, head: .11,
     ua: avg(d('LeftArm', 'LeftForeArm'), d('RightArm', 'RightForeArm')), fa: avg(d('LeftForeArm', 'LeftHand'), d('RightForeArm', 'RightHand')) + .07
   };
-  const headH = pos.head_end ? pos.head_end.distanceTo(pos.Head) : .23;
   // Where the skull really is. The auto-rig does not always put the head bone in the middle of the head, so headgear
   // and the hair mask take their centre from the geometry: the middle of the skull, front to back, in model space.
   const names = mesh.skeleton.bones.map(b => b.name), isHead = names.map(x => x === 'Head' || x === 'head_end' || x === 'headfront');
   const SI = mesh.geometry.attributes.skinIndex, SW = mesh.geometry.attributes.skinWeight, hb = mesh.skeleton.bones[names.indexOf('Head')], hy = V().setFromMatrixPosition(hb.matrixWorld), p = V();
-  let z0 = Infinity, z1 = -Infinity;
+  const headW = i => { let w = 0; for (let k = 0; k < 4; k++) if (isHead[SI.getComponent(i, k)]) w += SW.getComponent(i, k); return w; };
+  // Height of the head above its bone. The rig's own end-of-head bone is usually right, but now and then it lands next to the
+  // head bone; then the top of the head itself is used (hair included, hence the small reduction).
+  let headH = pos.head_end ? pos.head_end.distanceTo(pos.Head) : 0;
+  if (headH < .16 || headH > .3) { let top = -Infinity; for (let i = 0; i < SI.count; i++) { if (headW(i) < .5) continue; mesh.getVertexPosition(i, p); p.applyMatrix4(mesh.matrixWorld); if (p.y > top) top = p.y; } headH = isFinite(top) ? Math.max(.18, Math.min(.27, (top - hy.y) * .93)) : .23; }
+  mesh.userData.headH = headH;
+  let z0 = Infinity, z1 = -Infinity, bz0 = Infinity, bz1 = -Infinity, bx0 = Infinity, bx1 = -Infinity;
+  const bandY = hy.y + headH * .74; // the headband's height: on the forehead, above the eyes and ears
   for (let i = 0; i < SI.count; i++) {
-    let w = 0; for (let k = 0; k < 4; k++) if (isHead[SI.getComponent(i, k)]) w += SW.getComponent(i, k);
-    if (w < .5) continue;
+    if (headW(i) < .5) continue;
     mesh.getVertexPosition(i, p); p.applyMatrix4(mesh.matrixWorld);
+    if (Math.abs(p.y - bandY) < .018) { if (p.z < bz0) bz0 = p.z; if (p.z > bz1) bz1 = p.z; if (p.x < bx0) bx0 = p.x; if (p.x > bx1) bx1 = p.x; }
     if (p.y < hy.y + headH * .6 || p.y > hy.y + headH) continue;
     if (p.z < z0) z0 = p.z; if (p.z > z1) z1 = p.z;
   }
+  // The head and hair as the headband meets them: its centre and its two half-widths, so the ring sits on a big
+  // haircut instead of inside it. Front-to-back first, then side-to-side.
+  const band = isFinite(bz0) && bz1 - bz0 > .1 && bx1 - bx0 > .1 ? {f: (bz0 + bz1) / 2 - hy.z, a: (bz1 - bz0) / 2, b: (bx1 - bx0) / 2} : null;
   const skullZ = isFinite(z0) ? (z0 + z1) / 2 : hy.z - SKULL_BEHIND_BONE;
   const headZ = mesh.userData.headZ = skullZ + SKULL_BEHIND_BONE; // where a well-placed head bone would be, front to back (the hair mask uses it too)
   const headF = headZ - hy.z;                                    // how far forward of the actual head bone the headgear's centre sits
-  return {id, key: key || 'blue', scene, mesh, image, pos, dims, standHips: pos.Hips.y, headR: headH * .4, headC: headH * .74, headF}; // headgear sits on the forehead, above the eyes
+  return {id, key: key || 'blue', scene, mesh, image, pos, dims, standHips: pos.Hips.y, headR: headH * .4, headC: headH * .74, headF, band}; // headgear sits on the forehead, above the eyes
 }
 
 const LIMB = [
@@ -103,6 +113,7 @@ export class ModelFighter {
     const mat = mesh.material = mesh.material.clone(); mat.roughness = .62; mat.metalness = 0; mat.side = THREE.FrontSide;
     if (look) { try { mat.map = outfitTexture(model, look); } catch (e) { console.warn('outfit not applied:', e.message); } }
     this.gear = headgear(look && look.head, look && look.trim, model.headR); this.root.add(this.gear);
+    if (model.band) this.gear.scale.set((model.band.a + BAND_GAP) / (model.headR * 1.04), 1, (model.band.b + BAND_GAP) / (model.headR * 1.04)); // fitted to this head
     this.mat = mat;
     this.handK = look && look.gloves === 'rope' ? .8 : 1; // a wrapped fist is smaller than a glove
     // bones leave the scene graph: their world matrices are written directly every frame
@@ -146,7 +157,7 @@ export class ModelFighter {
     this.qNeck.copy(J.qc).slerp(J.qh, .5); this.put('neck', this.qNeck, this.a, P0.neck);
     v3.copy(P0.Head).sub(P0.neck).applyQuaternion(this.qNeck).add(this.a); this.a.copy(v3);
     for (const name of ['Head', 'head_end', 'headfront']) this.put(name, J.qh, this.a, P0.Head);
-    this.gear.position.set(this.model.headF, this.model.headC, 0).applyQuaternion(J.qh).add(this.a); this.gear.quaternion.copy(J.qh);
+    this.gear.position.set(this.model.band ? this.model.band.f : this.model.headF, this.model.headC, 0).applyQuaternion(J.qh).add(this.a); this.gear.quaternion.copy(J.qh);
     // limbs
     for (const L of this.limbs) {
       const l = L.l, A = J[l[3]], B = J[l[4]], C = J[l[5]];

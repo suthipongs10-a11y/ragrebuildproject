@@ -47,10 +47,13 @@ const DETAIL = [
 ];
 const OPT = Object.assign({preset: 'tv', build: 'auto', fighter: 'model', venue: 'stadium', agR: 'attack', agB: 'counter'}, PRESETS.tv);
 let MODEL = null, MODELS = []; // generated characters per corner, when they loaded (MODEL = shared proportions)
-// Roster of base bodies. Outfit is separate, so any body can wear any look. [label, key colour of the model's shorts and gloves]
+// Roster of base bodies. Outfit is separate, so any body can wear any look. [label, key colour of the model's shorts and gloves, flags]
+// bald: no hair to dye, so the shop does not offer hair colours.
 const ROSTER = {
   c: ['รุ่นเก๋า ยันต์เต็มอก', 'blue'], d: ['ช่วงยาว ผิวเข้ม', 'blue'], e: ['ฝรั่งไหล่กว้าง', 'blue'], f: ['ดาวรุ่งผมจุก', 'blue'],
-  b: ['เพรียวคมกริบ', 'blue'], a: ['ตัวถึก กางเกงลายทอง', 'red']
+  b: ['เพรียวคมกริบ', 'blue'], a: ['ตัวถึก กางเกงลายทอง', 'red'],
+  i: ['มวยยุคทอง หนวดเข้ม', 'blue'], j: ['โย่งช่วงยาว ผมม้า', 'blue'], k: ['ตัวบาง ผมเสยเรียบ', 'blue'],
+  g: ['เชื้อสายจีน สูงเพรียว', 'blue'], h: ['นักสู้ญี่ปุ่น ผมตั้ง', 'blue'], l: ['ฝรั่งหัวโล้น เคราแดง', 'blue', {bald: true}]
 };
 const LOOK = [
   {name: '', fighter: 'c', shorts: 'red', trim: 'gold', pattern: 'zigzag', gloves: 'red', head: 'mongkol', hair: 'natural'},
@@ -294,7 +297,8 @@ function handle(e) {
       if (e.ok) { hype = 1; shake = Math.max(shake, OPT.shake * .04 * (REDUCED ? 0 : 1)); if (!rp) { audio.roar(.7); setTimeout(() => audio.thud(), 330); if (OPT.labels >= 1) { poseFighters(e.t); pop('+' + RULES.throwPoints + ' แต้ม', fighters[e.by].world('head', tmpV).add(tmpV2.set(0, .45, 0)), 'gold', 1.3); pop(e.teep ? 'ถีบล้ม!' : 'เหวี่ยงล้ม!', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'gold big', 1.2); } } }
       break;
     case 'break':
-      if (!rp && OPT.labels >= 2) { poseFighters(e.t); pop(e.reason === 'escape' ? 'สะบัดหลุด' : 'กรรมการแยก', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'small'); }
+      if (!rp && e.reason === 'elbow' && OPT.labels >= 1) { poseFighters(e.t); pop('ศอกสวนหลุด!', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .45, 0)), 'gold', 1.2); }
+      else if (!rp && OPT.labels >= 2) { poseFighters(e.t); pop(e.reason === 'escape' ? 'สะบัดหลุด' : 'กรรมการแยก', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .4, 0)), 'small'); }
       break;
     case 'guard':
       if (!rp && OPT.labels >= 2) { poseFighters(e.t); pop('ตั้งการ์ด', fighters[e.by].world('head', tmpV).add(tmpV2.set(0, .35, 0)), 'small'); }
@@ -340,7 +344,7 @@ function handle(e) {
         if ((e.special || ko) && !rp) flash(.45);
         if (!rp) {
           const nx = EV[evi], covered = nx && nx.t === e.t && (nx.type === 'kd' || nx.type === 'ko' || nx.type === 'stun'); // that label takes the spot
-          if (OPT.labels >= 1 && s >= 3 && !e.special && !covered) pop(m.th + '!', p.clone().add(tmpV2.set(0, .32, 0)), 'gold');
+          if (OPT.labels >= 1 && (s >= 3 || m.inClinch && m.sfx === 'elbow') && !e.special && !covered) pop((m.inClinch && m.sfx === 'elbow' ? 'ศอก' : m.th) + '!', p.clone().add(tmpV2.set(0, .32, 0)), 'gold');
           if (OPT.labels >= 2 && e.counter) pop('สวน!', p.clone().add(tmpV2.set(0, .55, 0)), 'small red');
           else if (OPT.labels >= 2 && e.crit) pop('จังๆ!', p.clone().add(tmpV2.set(0, .55, 0)), 'small red');
           if (OPT.labels >= 1 && e.chain >= 3) { const c = $('combo'); c.textContent = e.chain + ' HIT'; c.className = 'combo ' + (e.by ? 'b' : 'r'); c.hidden = false; c.style.animation = 'none'; void c.offsetWidth; c.style.animation = ''; }
@@ -349,7 +353,8 @@ function handle(e) {
         fx.sparks(p, 5, 0xcfd6e6, .7, -away); fx.flash(p, .35, 0xcfe0ff, .12);
         stopT = Math.max(stopT, OPT.stop * .018); shake = Math.max(shake, OPT.shake * .008 * (REDUCED ? 0 : 1));
         audio.block();
-        if (!rp && OPT.labels >= 2) pop('บัง', p.clone().add(tmpV2.set(0, .3, 0)), 'small');
+        if (!rp && m.inClinch && m.sfx === 'elbow' && OPT.labels >= 1) pop('กันศอกได้', p.clone().add(tmpV2.set(0, .32, 0)), 'small', 1.1);
+        else if (!rp && OPT.labels >= 2) pop('บัง', p.clone().add(tmpV2.set(0, .3, 0)), 'small');
       } else if (e.res === 'catch') {
         audio.block(); hype = Math.min(1, hype + .35);
         if (!rp && OPT.labels >= 1) pop('จับขา!', df.world('haL', tmpV2).clone().add(tmpV.set(0, .35, 0)), 'gold');
@@ -743,7 +748,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 19 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 20 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

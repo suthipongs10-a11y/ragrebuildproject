@@ -60,19 +60,22 @@ function keyed(rule, r, g, b) {
 
 // Which texels are hair: on the head, above a hairline that sits high on the forehead and drops behind the ears to the nape.
 // Positions come from the skinned bind pose, so this works whatever space the raw geometry is in.
+const BACK = -.085; // metres behind the skull centre: further back than this there is no neck skin, only hair hanging down
 function hairMap(mesh) {
   const g = mesh.geometry, uv = g.attributes.uv, si = g.attributes.skinIndex, sw = g.attributes.skinWeight, idx = g.index, n = g.attributes.position.count;
-  const bones = mesh.skeleton.bones, names = bones.map(b => b.name), isHead = names.map(x => x === 'Head' || x === 'head_end' || x === 'headfront');
+  const bones = mesh.skeleton.bones, names = bones.map(b => b.name), isHead = names.map(x => x === 'Head' || x === 'head_end' || x === 'headfront'), isNeck = names.map(x => x === 'neck');
   const at = name => { const b = bones[names.indexOf(name)]; return b ? new THREE.Vector3().setFromMatrixPosition(b.matrixWorld) : null; };
-  const H = at('Head'), T = at('head_end'), out = new Uint8Array(MAP * MAP); if (!H) return out;
+  const H = at('Head'), out = new Uint8Array(MAP * MAP); if (!H) return out;
   const zc = mesh.userData.headZ != null ? mesh.userData.headZ : H.z; // front-to-back reference from the skull itself (set when the model loads)
-  const span = T ? Math.max(.12, T.y - H.y) : .23, v = new THREE.Vector3(), hh = new Float32Array(n).fill(-9), zz = new Float32Array(n);
+  const span = mesh.userData.headH || .23, v = new THREE.Vector3() /* head height as measured when the model loaded */, hh = new Float32Array(n).fill(-9), zz = new Float32Array(n);
   for (let i = 0; i < n; i++) {
-    let w = 0; for (let k = 0; k < 4; k++) if (isHead[si.getComponent(i, k)]) w += sw.getComponent(i, k);
-    if (w < .5) continue;
-    mesh.getVertexPosition(i, v); v.applyMatrix4(mesh.matrixWorld); hh[i] = (v.y - H.y) / span; zz[i] = v.z - zc; // model space: +z is the face
+    let w = 0, wn = 0; for (let k = 0; k < 4; k++) { const j = si.getComponent(i, k); if (isHead[j]) w += sw.getComponent(i, k); else if (isNeck[j]) wn += sw.getComponent(i, k); }
+    if (w + wn < .5) continue;
+    mesh.getVertexPosition(i, v); v.applyMatrix4(mesh.matrixWorld); const z = v.z - zc; // model space: +z is the face
+    if (w < .5 && z > BACK) continue; // the neck counts only behind the skull, where long hair hangs
+    hh[i] = (v.y - H.y) / span; zz[i] = z;
   }
-  const line = z => z >= .07 ? .86 : z >= .02 ? .72 + (z - .02) / .05 * .14 : z >= -.03 ? .5 + (z + .03) / .05 * .22 : z >= -.07 ? .28 + (z + .07) / .04 * .22 : .28;
+  const line = z => z >= .07 ? .86 : z >= .02 ? .72 + (z - .02) / .05 * .14 : z >= -.03 ? .5 + (z + .03) / .05 * .22 : z >= -.07 ? .28 + (z + .07) / .04 * .22 : z >= BACK ? .28 : -1;
   const cnt = idx ? idx.count : n;
   for (let t = 0; t < cnt; t += 3) {
     const a = idx ? idx.getX(t) : t, b = idx ? idx.getX(t + 1) : t + 1, c = idx ? idx.getX(t + 2) : t + 2;
@@ -118,7 +121,7 @@ export function outfitTexture(model, look) {
       const p = (Math.floor(y * sy) * W + Math.floor(x * sx)) * 4; (z === 2 ? crown : face).push(lum(d[p], d[p + 1], d[p + 2]));
     }
     const med = a => { a.sort((p, q) => p - q); return a.length ? a[a.length >> 1] : 0; };
-    model.hairV = med(crown); model.skinV = med(face); model.hasHair = crown.length > 20 && Math.abs(model.hairV - model.skinV) > .07;
+    model.hairV = med(crown); model.skinV = med(face); model.hasHair = crown.length > 20 && model.skinV - model.hairV > .07; // every body here has dark natural hair; a brighter crown is a bare scalp over a beard
   }
   const src = model.pixels.data, out = new ImageData(new Uint8ClampedArray(src), W, H), d = out.data, B = model.body;
   const col = k => { const c = COLORS[k] ? COLORS[k][1] : COLORS.red[1]; return [(c >> 16) & 255, (c >> 8) & 255, c & 255]; };
