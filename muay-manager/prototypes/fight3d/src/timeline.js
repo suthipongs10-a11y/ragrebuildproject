@@ -2,7 +2,7 @@
 // per-tick baked poses for both fighters. Because the whole fight is known up front, strikes are aimed
 // at where the opponent will be and defenders start blocking before the blow lands.
 import { FLAT, NP, IDX } from './poses.js';
-import { MOVES } from './data.js';
+import { MOVES, RULES } from './data.js';
 import { solve, makeJoints, EFF_JOINT, DIM } from './rig.js';
 import { TICK_FIELDS, STATE } from './sim.js';
 const THREE = globalThis.THREE;
@@ -47,9 +47,15 @@ export function bake(fight) {
     if (e.type === 'move') pend[e.by] = e;
     else if (e.type === 'hit') { hitsBy[e.by].push(e); const m = pend[e.by]; if (m && m.move === e.move) { m.hit = e; e.moveEv = m; pend[e.by] = null; } }
   }
-  // How a fighter gets out of the way depends on what is coming: duck under a swing, slip a straight punch, lean back from the rest.
-  const DUCK = new Set(['hook', 'elbow', 'spinElbow', 'high', 'spKick', 'spCroc', 'spChop']), SLIP = new Set(['jab', 'cross']);
-  const evade = e => { const mv = MOVES[e.move]; if (mv.lvl !== 'head') return 'dodge'; const h = Math.round(e.t / dt); if (DUCK.has(e.move) || (e.move === 'cross' && h % 4 < 2)) return 'duck'; if (SLIP.has(e.move)) return h % 2 ? 'slipL' : 'slipR'; return 'dodge'; };
+  // How a fighter gets out of the way depends on what is coming: duck under a swing, slip a straight punch, bend right
+  // back from a kick (now and then he ducks a high kick instead), lean back from the rest.
+  const DUCK = new Set(['hook', 'elbow', 'spinElbow', 'spCroc', 'spChop']), SLIP = new Set(['jab', 'cross']), LEAN = new Set(['high', 'spKick', 'body', 'teepFace']);
+  const evade = e => {
+    const h = Math.round(e.t / dt);
+    if (LEAN.has(e.move)) return (e.move === 'high' || e.move === 'spKick') && h % 3 === 0 ? 'duck' : 'leanBack';
+    if (MOVES[e.move].lvl !== 'head') return 'dodge';
+    if (DUCK.has(e.move) || (e.move === 'cross' && h % 4 < 2)) return 'duck'; if (SLIP.has(e.move)) return h % 2 ? 'slipL' : 'slipR'; return 'dodge';
+  };
   const evadeAt = new Map();
   for (const e of fight.events) if (e.type === 'hit' && e.res === 'dodge') evadeAt.set(e.on + ':' + Math.round(e.t / dt), evade(e));
   const kneeUp = new Set(); // a body kick that is blocked is met with the lifted knee
@@ -59,11 +65,12 @@ export function bake(fight) {
   for (const c of fight.poses) { const key = c.f + ':' + Math.round(c.t / dt), v = c.pose === 'dodge' ? evadeAt.get(key) : c.pose === 'blockBody' && kneeUp.has(key) ? 'checkBody' : null; cues[c.f].push(v ? Object.assign({}, c, {pose: v}) : c); }
   for (const e of fight.events) {
     if (e.type !== 'hit' || (e.res !== 'block' && e.res !== 'dodge')) continue;
-    const tA = e.t - .13, st = tick(e.on, Math.round(tA / dt), 4);
-    if (st !== STATE.idle && st !== STATE.block) continue; // a fighter already covering up has the pose from the sim
+    const pose = e.res === 'dodge' ? evade(e) : null, lb = pose === 'leanBack'; // bending back from a kick starts earlier and takes longer
+    const tA = e.t - (lb ? .2 : .13), st = tick(e.on, Math.round(tA / dt), 4);
+    // a fighter already covering up has the pose from the sim, unless he is about to get out of the way instead
+    if (st !== STATE.idle && st !== STATE.block && !(pose && st === STATE.cover)) continue;
     const mv = MOVES[e.move];
-    const pose = e.res === 'dodge' ? evade(e) : mv.lvl === 'leg' ? 'check' : e.move === 'body' ? 'checkBody' : mv.lvl === 'body' ? 'blockBody' : 'block';
-    cues[e.on].push({t: tA, f: e.on, pose, d: .11, early: true});
+    cues[e.on].push({t: tA, f: e.on, pose: pose || (mv.lvl === 'leg' ? 'check' : e.move === 'body' ? 'checkBody' : mv.lvl === 'body' ? 'blockBody' : 'block'), d: lb ? .17 : .11, early: true});
   }
   cues.forEach(c => c.sort((a, b) => a.t - b.t));
 
@@ -171,13 +178,19 @@ export function bake(fight) {
   const MODE = {balanced: 0, attack: 1, counter: 2}, mode = [new Uint8Array(n), new Uint8Array(n)];
   for (const e of fight.events) if (e.type === 'plan') mode[e.by].fill(MODE[e.ag] || 0, Math.min(n, Math.round(e.t / dt)));
   const smooth = (a, b, x) => { const k = Math.max(0, Math.min(1, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
+  // The pace of the fight (as in the simulation): low while the two are still reading each other in the first round.
+  // A low pace means more of the planted Muay Thai rhythm, rocking with the lead knee coming up, and less bouncing.
+  const PC = RULES.pace, pace = new Float32Array(n);
+  for (let k = 0; k < n; k++) { const r = Math.min(Math.max(1, fight.clock[k * 2]), PC.start.length) - 1, e = Math.max(0, Math.min(1, 1 - fight.clock[k * 2 + 1] / RULES.roundTime)); pace[k] = PC.start[r] + (PC.end[r] - PC.start[r]) * Math.pow(e, PC.ramp); }
+  const paceAt = t => pace[Math.max(0, Math.min(n - 1, Math.round(t / dt)))];
+  const HOP_PACE = .5; // share of the usual bouncing left at pace 0
   // feeling out: bounce for about three seconds, then stand and sway for one, then bounce again
   const GATE = .25, gateP = (i, t) => { const g = t * GATE + i * .43; return g - Math.floor(g); }; // a four-second cycle
   // share of each cycle spent on the toes: most of it when feeling out, a short burst for the man walking forward or waiting
   const HOP_ON = [.84, .46, .34];
   // Rhythm guard: how high the lead foot comes up on the beat while standing (per attitude), and while bouncing
-  const KNEE_STILL = [.15, .1, .17], KNEE_HOP = [.1, .05, .06];
-  const hopGate = (i, t, md) => { const p = gateP(i, t), on = HOP_ON[md]; return smooth(0, .04, p) * (1 - smooth(on, on + .05, p)); };
+  const KNEE_STILL = [.2, .13, .21], KNEE_HOP = [.1, .05, .06];
+  const hopGate = (i, t, md) => { const p = gateP(i, t), on = HOP_ON[md] * (HOP_PACE + (1 - HOP_PACE) * paceAt(t)); return smooth(0, .04, p) * (1 - smooth(on, on + .05, p)); };
   // waiting: now and then the feet change over, slowly, one step at a time
   const slowSwitch = (i, t) => { const g = t * .19 + i * .47, c = Math.floor(g); return g - c < .26 && hash(c * 5 + i) < .6; };
   // the bounce: a little over two light hops a second, in the air slightly longer than on the canvas
@@ -261,11 +274,11 @@ export function bake(fight) {
         // The Muay Thai rhythm guard, on a beat of about one a second. The weight rocks back onto the rear leg and the
         // lead knee comes up; at the same time the lead glove reaches out and the rear glove draws in, then they change
         // over. The elbows swing forward and back with the hands.
-        const s = rock * amp, c = Math.cos(ph * .5) * amp, kn = Math.max(0, rock) * amp;
+        const lo = 1 - paceAt(t), s = rock * amp * (1 + .35 * lo), c = Math.cos(ph * .5) * amp, kn = Math.max(0, rock) * amp * (1 + .3 * lo); // bigger while reading him
         out[IDX.hip] -= .026 * s; out[IDX.lean] -= .03 * s;
         out[IDX.hL] += .05 * s; out[IDX.hL + 1] += .022 * c; out[IDX.hR] -= .045 * s; out[IDX.hR + 1] -= .02 * c;
         out[IDX.eL] += .32 * s; out[IDX.eR] -= .32 * s;
-        out[IDX.fL + 1] += (KNEE_STILL[md] * still + KNEE_HOP[md] * g) * kn; out[IDX.fL] -= .03 * kn * still; out[IDX.kL + 1] += .45 * kn * still;
+        out[IDX.fL + 1] += (KNEE_STILL[md] * still + KNEE_HOP[md] * g) * kn; out[IDX.fL] -= .03 * kn * still; out[IDX.kL + 1] += .55 * kn * still;
         if (md === 0) {
           // feeling out: between bursts of bouncing he stops and sways to read the other man
           const sway = Math.sin(Math.max(0, gateP(i, t) - .82) / .18 * Math.PI * 2) * still * amp;

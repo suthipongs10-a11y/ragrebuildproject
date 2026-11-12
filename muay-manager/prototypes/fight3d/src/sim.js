@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.10';
+export const SIM_VERSION = 'proto-0.11';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -53,13 +53,16 @@ export function simulate(opts) {
       pt: 0, pd: .001, to: 'guard', q: [], qi: 0, mv: null, mvKey: null, hold: 0, inv: 0, lunge: 0,
       combo: null, ci: 0, chain: 0, chainT: 0, lastRes: null, spi: 0,
       wearHead: 0, wearBody: 0, wearLeg: 0, stunT: 0, stunCd: 0, stunFlip: 0, tough: 0,
-      landed: 0, thrown: 0, used: {}, seen: 0, moveId: 0, coverLvl: null, guards: 0, grab: null};
+      landed: 0, thrown: 0, used: {}, seen: 0, moveId: 0, coverLvl: null, guards: 0, grab: null, light: false, backT: 0};
   }
   const F = [mk(0, specs[0]), mk(1, specs[1])];
   const G = {phase: 'intro', t: 0, round: 1, clock: K.roundTime, count: null, clinch: null, restT: 0, koT: 0, over: null, lead: -1, leadChanges: 0};
 
   // the corner's plan for the current round; opts.plans[fighter] is a list with one plan per round
   const PR = PLAN_RULES;
+  // how hard both men are going right now, 0..1 (see RULES.pace)
+  const paceNow = () => { const P = K.pace, r = Math.min(G.round, P.start.length) - 1, k = clamp(1 - G.clock / K.roundTime, 0, 1); return P.start[r] + (P.end[r] - P.start[r]) * Math.pow(k, P.ramp); };
+  const byPace = (low, I) => low + (1 - low) * I; // a rate that is 'low' at pace 0 and normal at full pace
   function planOf(f) { const p = opts.plans && opts.plans[f.i]; return (p && (p[G.round - 1] || p[p.length - 1])) || PLAN_DEFAULT; }
 
   function setPose(f, name, d, extra) {
@@ -78,8 +81,9 @@ export function simulate(opts) {
     const pl = planOf(f);
     f.st = Math.max(0, f.st - m.st * (pl.ag === 'attack' ? PR.attackSt : pl.ag === 'counter' ? PR.counterSt : 1)); f.thrown++; f.moveId = ++moveSeq;
     f.used[key] = (f.used[key] || 0) + 1;
+    f.light = !m.special && !m.inClinch && K.lightMoves.includes(key) && R() < (1 - paceNow()) * K.lightShare; // a touch to read him, not to hurt
     const sp = moveSpeed(f, m), tHit = T + (m.fr[0][1] + m.fr[1][1]) / sp;
-    emit({type: 'move', by: f.i, move: key, tHit, special: !!m.special});
+    emit({type: 'move', by: f.i, move: key, tHit, special: !!m.special, light: f.light});
     if (m.special) { f.sp = 0; say('ท่าไม้ตาย! <b>' + f.name + '</b> ออก<b>' + m.th + '</b>'); }
     f.lunge = m.lunge || 0;
     setPose(f, m.fr[0][0], m.fr[0][1] / sp);
@@ -87,17 +91,22 @@ export function simulate(opts) {
 
   function choose(f, o) {
     if (f.sp >= 100 && f.st > 14) { const list = f.spList.length ? f.spList : f.style.sp, k = list[f.spi % list.length]; f.spi++; return k; }
-    const stunned = o.state === 'stun';
-    if (!stunned && R() < f.style.cc && f.st > 30) {
-      const id = pick(f.style.cb);
-      f.combo = {id, seq: COMBOS[id].seq}; f.ci = 0;
-      emit({type: 'combo', by: f.i, id, n: f.combo.seq.length});
-      return f.combo.seq[0];
+    const stunned = o.state === 'stun', I = paceNow();
+    // the style's named combos come with the pace; early on a fighter mostly reads the other man with a short feeler
+    if (!stunned && f.st > 30) {
+      const id = R() < f.style.cc * byPace(K.paceCombo, I) ? pick(f.style.cb) : R() < (1 - I) * K.paceFeel ? pick(K.feelCombos) : null;
+      if (id) {
+        f.combo = {id, seq: COMBOS[id].seq}; f.ci = 0;
+        emit({type: 'combo', by: f.i, id, n: f.combo.seq.length});
+        return f.combo.seq[0];
+      }
     }
+    const heavyMul = byPace(K.paceHeavy, I), probeMul = 1 + (K.probeUp - 1) * (1 - I);
     const w = f.style.w, keys = Object.keys(w), pl = planOf(f);
     let tot = 0;
     const ws = keys.map(k => {
       const m = MOVES[k]; let v = w[k] * (K.fistBias[k] || 1);
+      if (K.probeMoves.includes(k)) v *= probeMul; else if (K.heavyMoves.includes(k)) v *= heavyMul;
       if (f.st < 30 && m.st > 5) v *= .35;
       if (m.grab) { if (G.clinch || f.st < 20) v = 0; else if (stunned) v *= 1.3; }
       else if (stunned) v *= m.lvl === 'head' ? (m.dmg >= 10 ? 2.4 : 1) : .25;
@@ -166,7 +175,9 @@ export function simulate(opts) {
     if (m.lvl === 'head' && (o.state === 'idle' || o.state === 'block' || o.state === 'cover')) { const sh = Math.min(.8, K.evadeShare * o.stats.spd / 55) * pB; pD += sh; pB -= sh; }
     const r = R();
     if (r < pD && m.lvl !== 'leg') {
-      o.state = 'block'; o.hold = .24; o.q = []; o.combo = null;
+      const lb = m.kind === 'kick' && key !== 'teep'; // a kick is leaned away from: weight on the back leg, upper body bent back
+      o.state = 'block'; o.hold = lb ? K.leanBackHold : .24; o.q = []; o.combo = null;
+      if (lb) o.x = clamp(o.x - o.dir * 5, -LIM, LIM);
       setPose(o, 'dodge', .07);
       f.lastRes = 'dodge'; f.chain = 0; emit(Object.assign(base, {res: 'dodge'}));
       return;
@@ -188,7 +199,7 @@ export function simulate(opts) {
       return;
     }
     const stat = (m.kind === 'punch' ? f.stats.pow : f.stats.kick) / 100;
-    let raw = m.dmg * (.6 + .8 * stat) * rnd(.85, 1.15) * (f.st < 25 ? .8 : 1);
+    let raw = m.dmg * (.6 + .8 * stat) * rnd(.85, 1.15) * (f.st < 25 ? .8 : 1) * (f.light ? K.paceLight : 1) * (K.paceDmg[0] + (K.paceDmg[1] - K.paceDmg[0]) * paceNow()); // they sit down on their shots as the pace rises
     const counter = o.state === 'move', crit = R() < K.critChance, wasStun = o.state === 'stun';
     if (counter) raw *= K.counterMul + (planOf(f).ag === 'counter' ? PR.counterBonus : 0);
     if (planOf(f).ag === 'attack') raw *= PR.attackDmg;
@@ -207,7 +218,7 @@ export function simulate(opts) {
     o.st = Math.max(0, o.st - dm * .25);
     if (m.lvl === 'head') o.wearHead += raw; else if (m.lvl === 'body') { o.wearBody += raw; o.st = Math.max(0, o.st - raw * .25); } else o.wearLeg += raw;
     const isTeep = key === 'teep' || key === 'teepFace';
-    if (!held) o.x = clamp(o.x - o.dir * m.push * (isTeep && planOf(f).ag === 'counter' ? PR.counterPush : 1), -LIM, LIM);
+    if (!held) o.x = clamp(o.x - o.dir * m.push * (isTeep && planOf(f).ag === 'counter' ? PR.counterPush : 1) * (f.light ? K.paceLight : 1), -LIM, LIM);
     f.chain = (T - f.chainT < 1.1) ? f.chain + 1 : 1; f.chainT = T;
     if (onHolder) { // the elbow lands on the man holding: the clinch is broken
       const c = G.clinch; dropClinch(); f.q = f.q.slice(0, 2).concat([['guard', .22]]);
@@ -217,7 +228,7 @@ export function simulate(opts) {
     if (!wasStun && !held) { o.state = 'hit'; o.hold = .2 + raw / 60; }
     setPose(o, held ? (m.lvl === 'head' ? 'clinchHitHead' : 'clinchHit') : m.react, .06, {amp: held ? 1 : sev === 1 ? .55 : sev === 2 ? .8 : 1});
     f.lastRes = 'hit';
-    emit(Object.assign(base, {res: 'hit', raw, dmg: dm, sev, counter, crit, chain: f.chain}));
+    emit(Object.assign(base, {res: 'hit', raw, dmg: dm, sev, counter, crit, chain: f.chain, light: f.light}));
     const where = m.lvl === 'head' ? 'เข้าหน้า' : m.lvl === 'body' ? 'เข้าลำตัว' : 'เข้าขา';
     if (big || counter) say('<b>' + f.name + '</b> ' + m.th + where + (counter ? ' สวนเต็มๆ' : '') + (crit ? ' โดนจังๆ' : ''));
     else if (f.chain === 3) say('<b>' + f.name + '</b> เข้าเป็นชุด');
@@ -357,8 +368,9 @@ export function simulate(opts) {
         if (f.qi >= f.q.length && G.clinch && G.clinch.b === f) { f.state = 'clinched'; f.mv = null; return; }
         if (f.qi >= f.q.length) {
           f.state = 'idle'; f.mv = null;
-          const ag = planOf(f).ag;
-          f.cool = (o.state === 'stun' || R() < K.chainChance) ? .05 : rnd(K.coolMin, K.coolMax) / (0.8 + f.stats.spd / 250) * (ag === 'attack' ? PR.attackCool : ag === 'counter' ? PR.counterCool : 1);
+          const ag = planOf(f).ag, I = paceNow();
+          f.cool = (o.state === 'stun' || R() < K.chainChance * byPace(K.paceCombo, I)) ? .05 : rnd(K.coolMin, K.coolMax) / (0.8 + f.stats.spd / 250) * (ag === 'attack' ? PR.attackCool : ag === 'counter' ? PR.counterCool : 1) * (K.paceCool[0] + (K.paceCool[1] - K.paceCool[0]) * I);
+          if (f.cool > .05 && o.state !== 'stun' && R() < (1 - I) * K.paceBack) f.backT = rnd(.4, .75); // one shot, then straight back out
         } else setPose(f, f.q[f.qi][0], f.q[f.qi][1] / moveSpeed(f, f.mv), f.qi === 1 ? {strike: f.mvKey} : null);
       }
       return;
@@ -436,7 +448,8 @@ export function simulate(opts) {
     f.cool -= dt;
     if (!f.plan && f.cool <= 0) { f.combo = null; f.plan = choose(f, o); f.planT = 1.4; }
     const rg = planOf(f).range;
-    let want = 114 + (rg === 'out' ? PR.outDist : rg === 'in' ? PR.inDist : 0) + Math.sin(G.t * 1.6 + f.i * 2.1) * 9;
+    let want = 114 + (rg === 'out' ? PR.outDist : rg === 'in' ? PR.inDist : 0) + Math.sin(G.t * 1.6 + f.i * 2.1) * 9 + (1 - paceNow()) * K.paceRange;
+    if (f.backT > 0) { f.backT -= dt; if (!f.plan) want = Math.max(want, K.backDist); }
     if (f.plan) {
       const m = MOVES[f.plan]; want = Math.max(m.min + 8, m.reach - 12); f.planT -= dt;
       if (d <= m.reach - 4 && d >= m.min) {

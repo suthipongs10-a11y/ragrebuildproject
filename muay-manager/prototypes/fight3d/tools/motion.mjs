@@ -28,3 +28,21 @@ for (const ag of AG) {
   out[TH[ag]] = {'ว่าง (ยืนคุมเชิง)': (idleT / fightT * 100).toFixed(0) + '%', 'ลอยจากการเด้ง': (airT / fightT * 100).toFixed(0) + '%', 'เด้งต่อนาที': (hops / (fightT * 2 / 60) * 60).toFixed(0), 'หัวขึ้นลง ซม.': span(hy), 'หัวซ้ายขวา ซม.': span(hz), 'หัวหน้าหลัง ซม.': span(hx), 'ความเร็วหัวเฉลี่ย ซม./วิ': Math.round(sp / spN * 100)};
 }
 console.table(out);
+// By round (default attitude both sides): share of time free to move, hops and lead-knee lifts per minute of that free time,
+// and strikes thrown per minute. A knee lift: the lead foot rising 8 cm or more while he is on the floor (not bouncing).
+const byR = {};
+for (let s = 1; s <= N; s++) {
+  const f = simulate({seed: s}), TL = bake(f); let prevUp = false, prevK = false, rnd = 1;
+  for (const e of f.events) if (e.type === 'move') { const r = f.clock[Math.min(f.nTicks - 1, Math.round(e.t / f.dt)) * 2]; (byR[r] = byR[r] || {t: 0, idle: 0, hops: 0, knees: 0, moves: 0}).moves++; }
+  for (let k = 0; k < f.nTicks; k += 2) {
+    const st = f.ticks[(k * 2) * 9 + 4]; rnd = f.clock[k * 2];
+    if (st === STATE.intro || st === STATE.rest || st === STATE.win || st === STATE.ko || st === STATE.down || st === STATE.getup) { prevUp = prevK = false; continue; }
+    const R = byR[rnd] = byR[rnd] || {t: 0, idle: 0, hops: 0, knees: 0, moves: 0}; R.t++;
+    if (st !== STATE.idle) { prevUp = prevK = false; continue; }
+    R.idle++; TL.sample(0, k * f.dt, P);
+    const up = P[IDX.jump] > .004, kn = !up && P[IDX.fL + 1] > .08;
+    if (up && !prevUp) R.hops++; if (kn && !prevK) R.knees++; prevUp = up; prevK = kn;
+  }
+}
+const perMin = (v, t) => (v / Math.max(1, t * 2 * (1 / 60)) * 60).toFixed(0);
+console.table(Object.fromEntries(Object.keys(byR).filter(r => r >= 1 && r <= 3).map(r => { const R = byR[r]; return ['ยก ' + r, {'ว่าง': (R.idle / R.t * 100).toFixed(0) + '%', 'เด้งต่อนาทีที่ว่าง': perMin(R.hops, R.idle), 'ยกเข่าต่อนาทีที่ว่าง': perMin(R.knees, R.idle), 'ท่าต่อนาที (สองคน)': perMin(R.moves, R.t)}]; })));

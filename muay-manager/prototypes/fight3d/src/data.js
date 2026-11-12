@@ -75,6 +75,7 @@ export const COMBOS = {
   kneeElbow:  {th:'เข่าตามศอก', seq:['knee','knee','elbow']},
   feintKick:  {th:'แย็บเปิดเตะ', seq:['jab','high']},
   jabLow:     {th:'แย็บตัดขา', seq:['jab','jab','low']},
+  oneTwoLow:  {th:'หนึ่งสองตัดขา', seq:['jab','cross','low']},
   teepTeep:   {th:'ถีบท้องถีบหน้า', seq:['teep','teepFace']}
 };
 
@@ -120,10 +121,10 @@ export const RULES = {
   // stun
   stunMin: 21, stunSpan: 34, stunWearDiv: 400, stunRest: 7, stunDurMin: 1.5, stunDurSpan: 1.1,
   // knockdown: only head shots put a fighter down
-  kdRaw: 21, kdChance: .05, kdStunRaw: 10, kdStunChance: .17, kdLowHp: 25, kdLowChance: .03,
+  kdRaw: 21, kdChance: .02, kdStunRaw: 10, kdStunChance: .1, kdLowHp: 25, kdLowChance: .02,
   kdWearDiv: 600, outBase: .4, outRawDiv: 50, outHpDiv: 300,
   // a clean shot (counter or flush) is what usually ends a Muay Thai fight
-  kdClean: .09, outClean: .1, kdSpecialMul: .8,
+  kdClean: .045, outClean: .1, kdSpecialMul: .8,
   // clinch: knees thrown, time before the referee breaks it, chance the held fighter shakes loose after each knee
   clinchKneesMin: 2, clinchKneesSpan: 3, clinchMax: 3.8, clinchEscape: .12, clinchDist: 48,
   clinchStyleEscape: .45, clinchStyleKnees: 1, // a clinch specialist holds on better and gets an extra knee in
@@ -139,6 +140,23 @@ export const RULES = {
   // a strike is solid from sevSolid raw damage and heavy from sevBig. A blocked strike scores nothing.
   // A knockdown that draws a count is worth ten clean strikes: about one round's usual winning margin.
   hitPoints: [0, 1, 1, 2], sevSolid: 8, sevBig: 13, kdPoints: 10,
+  // Pace: how hard both men are going, 0..1, from the start to the end of each round (index = round - 1). The first round
+  // is for reading the other man: single shots, light touches, a kick and straight back out. It builds toward each bell
+  // and from the second round on. ramp > 1 keeps the build late in the round.
+  pace: {start: [.12, .62, .85], end: [.6, 1, 1], ramp: 1.5},
+  paceCool: [3.2, .85],   // gap between attacks, times the usual, at pace 0 and at full pace
+  paceCombo: .12,         // named combos and quick follow-ups at pace 0: this share of their usual rate
+  paceFeel: .4,           // at pace 0, chance a fighter opens with a short feeler instead of a single shot
+  feelCombos: ['oneTwo', 'oneTwoLow', 'jabLow'],
+  paceHeavy: .28,         // heavy close weapons and the clinch at pace 0: this share of their usual weight
+  heavyMoves: ['hook', 'upper', 'elbow', 'spinElbow', 'knee', 'high', 'clinch'],
+  probeUp: 1.7, probeMoves: ['jab', 'low', 'teep', 'body'], // the reading weapons, this much more likely at pace 0
+  // a light touch (jab, push kick, low kick thrown at a low pace) lands with this share of the power and push
+  paceLight: .5, lightShare: .85, lightMoves: ['jab', 'cross', 'low', 'teep'],
+  paceBack: .75, backDist: 162, // at pace 0, chance to step straight back out of range after a single shot, and to how far
+  paceRange: 16,          // extra distance kept at pace 0
+  paceDmg: [.9, 1.35],    // power of a full shot at pace 0 and at full pace
+  leanBackHold: .34,      // leaning back from a kick: how long the defender stays back
   restHp: 1.4, restSt: 12
 };
 

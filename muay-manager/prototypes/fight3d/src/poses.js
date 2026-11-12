@@ -85,6 +85,8 @@ export const POSES = {
   slipL: P({lean: .24, side: -.4, twist: .22, hdP: .1, hip: [.01, .81, -.08], hL: [.32, 1.42, -.17], hR: [.22, 1.44, .05]}),
   slipR: P({lean: .24, side: .4, twist: -.22, hdP: .1, hip: [.01, .81, .08], hL: [.34, 1.44, -.05], hR: [.2, 1.4, .17]}),
   dodge: P({lean: -.42, hdP: -.1, hip: [-.12, .86, 0], hL: [.2, 1.38, -.12], hR: [.1, 1.36, .13]}),
+  // bending right back from a kick: weight sunk on the rear leg, lead foot light, chin tucked, rear glove by the face
+  leanBack: P({turn: .55, lean: -.62, hdP: .12, hip: [-.2, .82, .02], hL: [-.14, 1.43, -.14], hR: [-.28, 1.35, .12], fL: [.3, .03, -.12], fR: [-.24, 0, .17], kR: [.8, 0, .6]}),
 
   hitHeadBack: P({lean: -.35, hdP: -.5, hip: [-.10, .86, 0], hL: [.2, 1.3, -.2], hR: [.1, 1.25, .2]}),
   hitHeadSide: P({lean: -.1, side: .35, hdP: -.1, hdY: .9, hip: [-.08, .84, .05], hL: [.22, 1.25, -.2], hR: [.1, 1.2, .25]}),

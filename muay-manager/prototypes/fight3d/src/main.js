@@ -360,7 +360,7 @@ function handle(e) {
         if (!rp && OPT.labels >= 1) pop('จับขา!', df.world('haL', tmpV2).clone().add(tmpV.set(0, .35, 0)), 'gold');
       } else {
         audio.whiff();
-        if (!rp && OPT.labels >= 2 && e.res === 'dodge') pop('หลบ!', df.world('head', tmpV2).clone().add(tmpV.set(0, .3, 0)), 'small');
+        if (!rp && OPT.labels >= 2 && e.res === 'dodge') pop(/^(high|spKick|body|teepFace)$/.test(e.move) ? 'เอนหลบ!' : 'หลบ!', df.world('head', tmpV2).clone().add(tmpV.set(0, .3, 0)), 'small');
       }
       break;
     }
@@ -748,7 +748,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 20 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 21 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision
