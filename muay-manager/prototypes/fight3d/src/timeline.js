@@ -183,13 +183,18 @@ export function bake(fight) {
   const PC = RULES.pace, pace = new Float32Array(n);
   for (let k = 0; k < n; k++) { const r = Math.min(Math.max(1, fight.clock[k * 2]), PC.start.length) - 1, e = Math.max(0, Math.min(1, 1 - fight.clock[k * 2 + 1] / RULES.roundTime)); pace[k] = PC.start[r] + (PC.end[r] - PC.start[r]) * Math.pow(e, PC.ramp); }
   const paceAt = t => pace[Math.max(0, Math.min(n - 1, Math.round(t / dt)))];
-  const HOP_PACE = .5; // share of the usual bouncing left at pace 0
+  const HOP_PACE = .1; // share of the usual bouncing left at pace 0
+  // Muay Thai rhythm between exchanges, as in the stadium clip the owner sent: no bounce, gloves high by the brow and
+  // close to the face, elbows in, standing tall with the weight on the rear leg and the lead foot light. The body rocks
+  // slowly and the lead knee comes up on the beat while he looks for an opening.
+  const RHYTHM = 2 * Math.PI * .75; // rocking beat, rad/s: a little under one a second
+  const GUARD_L = [.21, -.025], GUARD_R = [.12, -.045]; // planted guard: each glove forward of and above the head centre, metres
   // feeling out: bounce for about three seconds, then stand and sway for one, then bounce again
   const GATE = .25, gateP = (i, t) => { const g = t * GATE + i * .43; return g - Math.floor(g); }; // a four-second cycle
   // share of each cycle spent on the toes: most of it when feeling out, a short burst for the man walking forward or waiting
-  const HOP_ON = [.84, .46, .34];
+  const HOP_ON = [.5, .28, .18];
   // Rhythm guard: how high the lead foot comes up on the beat while standing (per attitude), and while bouncing
-  const KNEE_STILL = [.2, .13, .21], KNEE_HOP = [.1, .05, .06];
+  const KNEE_STILL = [.14, .1, .15], KNEE_HOP = [.1, .05, .06];
   const hopGate = (i, t, md) => { const p = gateP(i, t), on = HOP_ON[md] * (HOP_PACE + (1 - HOP_PACE) * paceAt(t)); return smooth(0, .04, p) * (1 - smooth(on, on + .05, p)); };
   // waiting: now and then the feet change over, slowly, one step at a time
   const slowSwitch = (i, t) => { const g = t * .19 + i * .47, c = Math.floor(g); return g - c < .26 && hash(c * 5 + i) < .6; };
@@ -263,18 +268,23 @@ export function bake(fight) {
       const iw = idleW[i][k] + (idleW[i][k + 1] - idleW[i][k]) * fr;
       if (iw > 0) {
         const amp = iw * (TK[(k * 2 + i) * TICK_FIELDS + 2] < 25 ? .7 : 1); // a tired fighter moves less
-        solve(out, 0, J); const sx = (J.shL.x + J.shR.x) / 2, sy = (J.shL.y + J.shR.y) / 2, sz = (J.shL.z + J.shR.z) / 2; // shoulders before he moves on his own
+        solve(out, 0, J); let sx = (J.shL.x + J.shR.x) / 2, sy = (J.shL.y + J.shR.y) / 2, sz = (J.shL.z + J.shR.z) / 2; // shoulders before he moves on his own
         const md = mode[i][k], ph = hopPh[i][k] + (hopPh[i][k + 1] - hopPh[i][k]) * fr;
         // slow drift every fighter has while he waits: side to side, front to back, sinking and rising
         const lr = Math.sin(t * 1.7 + i * 2.1) * amp, fb = Math.sin(t * 1.15 + i * .7) * amp, sink = Math.sin(t * 2.4 + i * 1.3);
         // Bounce on the toes, guard up: every attitude has it, for as long as its gate is open.
-        const g = hopGate(i, t, md), up = hopUp(ph) * g, rock = Math.sin(ph * .5), still = 1 - g;
+        const g = hopGate(i, t, md), up = hopUp(ph) * g, still = 1 - g, rph = t * RHYTHM + i * 1.9;
+        const rock = g * Math.sin(ph * .5) + still * Math.sin(rph), rockC = g * Math.cos(ph * .5) + still * Math.cos(rph); // on the bounce, or on the slower beat
         out[IDX.jump] += up * .05 * amp; out[IDX.hip + 1] -= (g - up) * .028 * amp;
         out[IDX.hL + 1] += up * .014 * amp; out[IDX.hR + 1] += up * .014 * amp;
         // The Muay Thai rhythm guard, on a beat of about one a second. The weight rocks back onto the rear leg and the
         // lead knee comes up; at the same time the lead glove reaches out and the rear glove draws in, then they change
         // over. The elbows swing forward and back with the hands.
-        const lo = 1 - paceAt(t), s = rock * amp * (1 + .35 * lo), c = Math.cos(ph * .5) * amp, kn = Math.max(0, rock) * amp * (1 + .3 * lo); // bigger while reading him
+        const lo = 1 - paceAt(t), s = rock * amp * (1 + .35 * lo), c = rockC * amp, kn = Math.max(0, rock) * amp * (1 + .3 * lo); // bigger while reading him
+        // planted: the tight high guard, standing tall, chin down, weight back and the lead foot light
+        const hg = still * amp;
+        out[IDX.eL + 2] += .25 * hg; out[IDX.eR + 2] -= .25 * hg;
+        out[IDX.lean] += .03 * hg; out[IDX.hip + 1] += .04 * hg; out[IDX.hip] -= .025 * hg; out[IDX.hdP] += .16 * hg; // shoulders round, chin down behind the gloves out[IDX.fL + 1] += .015 * hg;
         out[IDX.hip] -= .026 * s; out[IDX.lean] -= .03 * s;
         out[IDX.hL] += .05 * s; out[IDX.hL + 1] += .022 * c; out[IDX.hR] -= .045 * s; out[IDX.hR + 1] -= .02 * c;
         out[IDX.eL] += .32 * s; out[IDX.eR] -= .32 * s;
@@ -299,9 +309,17 @@ export function bake(fight) {
           out[IDX.side] += lr * .15; out[IDX.hip + 2] += lr * .045; out[IDX.twist] -= lr * .08; out[IDX.hdY] += lr * .1;
           out[IDX.hL] += .07 * amp + fb * .03; out[IDX.hL + 1] += .03 * amp; out[IDX.hR + 1] += .03 * amp;
         }
+        if (hg > .01) {
+          // Planted, the guard settles where the stadium fighters keep it, whatever the attitude: gloves by the brow and in
+          // close (lead about a forearm in front of the face, rear by the temple), still reaching and drawing on the beat.
+          solve(out, 0, J); const k = hg * .8, hx = J.head.x, hy = J.head.y;
+          out[IDX.hL] += (hx + GUARD_L[0] + .035 * s - out[IDX.hL]) * k; out[IDX.hL + 1] += (hy + GUARD_L[1] + .012 * c - out[IDX.hL + 1]) * k;
+          out[IDX.hR] += (hx + GUARD_R[0] - .025 * s - out[IDX.hR]) * k; out[IDX.hR + 1] += (hy + GUARD_R[1] - .012 * c - out[IDX.hR + 1]) * k;
+          solve(out, 0, J); sx = (J.shL.x + J.shR.x) / 2; sy = (J.shL.y + J.shR.y) / 2; sz = (J.shL.z + J.shR.z) / 2; // the gloves follow the shoulders from here
+        }
         // Head movement: every second and a quarter, more often than not, one of four moves.
         const cyc = t / 1.25 + i * .37, c0 = Math.floor(cyc), p = (cyc - c0) * 1.25 / .62, h = hash(c0 * 2 + i);
-        if (p < 1 && h < (md === 0 ? .8 : md === 1 ? .7 : .85)) {
+        if (p < 1 && h < (md === 0 ? .8 : md === 1 ? .7 : .85) * (.55 + .45 * paceAt(t))) { // fewer while the two are still reading each other
           let kind = Math.floor(hash(c0 * 7 + i * 3 + .5) * 4); if (md === 1 && kind === 1) kind = 0; // the man coming forward does not lean away
           const dir = h * 31 % 1 < .5 ? 1 : -1, e = Math.sin(p * Math.PI) * amp, s2 = Math.sin(p * Math.PI * 2) * amp * dir;
           if (kind === 0) { // weave: dip and roll under, from one side to the other
