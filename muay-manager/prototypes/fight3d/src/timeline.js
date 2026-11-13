@@ -260,6 +260,7 @@ export function bake(fight) {
     },
     clock(t) { const k = Math.max(0, Math.min(n - 1, Math.floor(t / dt))); return {round: fight.clock[k * 2], clock: fight.clock[k * 2 + 1]}; },
     effAt(i, t) { return eff[i][Math.max(0, Math.min(n - 1, Math.round(t / dt)))]; },
+    pace: paceAt, // how hard the fight is going at time t (0..1), for the music
     // pose at time t into out, with small living-body motion layered on top
     sample(i, t, out) {
       const x = Math.max(0, Math.min(n - 1.001, t / dt)), k = Math.floor(x), fr = x - k, B = baked[i], o = k * NP;

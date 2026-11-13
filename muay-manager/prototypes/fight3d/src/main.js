@@ -11,6 +11,7 @@ import { buildArena, VENUES } from './arena.js';
 import { buildDrill, TARGETS } from './drill.js';
 import { buildFx } from './fx.js';
 import { buildAudio } from './audio.js';
+import { buildCommentary } from './commentary.js';
 const THREE = globalThis.THREE;
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
@@ -91,7 +92,8 @@ renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.A
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(30, 1.5, .1, 120);
-const audio = buildAudio();
+const audio = buildAudio(), voice = buildCommentary(audio, MOVES);
+let introSaid = false;
 let arena = null, fx = null, drill = null, drillF = null; // built once fonts are ready, the mat texture draws text
 let fighters = [], W = 0, H = 0;
 
@@ -132,6 +134,7 @@ function makeFighters() {
   builtAs = fighterKey();
 }
 function newFight(seed, cfg) {
+  introSaid = false;
   CFG = Object.assign({seed, specs: null, plans: null, rules: null}, cfg || {plans: [OPT.agR, OPT.agB].map(ag => [{ag, range: 'mixed', target: 'mixed'}])}); pausedRounds.clear(); // the lab sets each corner's attitude itself
   useDims(); buildFight(); makeFighters(); renderCards(); restart();
   $('seed').textContent = String(seed);
@@ -283,6 +286,7 @@ function poseFighters(t) {
 }
 function handle(e) {
   const rp = mode === 'replay';
+  if (!rp && !frozen) voice.event(e, audio.time());
   switch (e.type) {
     case 'say': if (!rp) $('call').innerHTML = e.html; break;
     case 'bell': if (!rp) audio.bell(e.n); break;
@@ -341,6 +345,7 @@ function handle(e) {
         hype = Math.min(1, hype + e.raw / 22);
         audio.hit(m.sfx, e.raw, rp);
         if (s >= 3 && !rp) audio.roar(e.special ? .8 : .35);
+        if (!rp && (s >= 2 || m.kind === 'kick') && !e.light) audio.shout(Math.min(1, (s - 1) * .35 + hype * .4)); // the stand shouts with the blow
         if ((e.special || ko) && !rp) flash(.45);
         if (!rp) {
           const nx = EV[evi], covered = nx && nx.t === e.t && (nx.type === 'kd' || nx.type === 'ko' || nx.type === 'stun'); // that label takes the spot
@@ -370,7 +375,7 @@ function handle(e) {
     case 'kd':
       hype = 1; if (!rp) { audio.roar(1); flash(.3); poseFighters(e.t); pop('ล้ม!', fighters[e.on].world('head', tmpV).add(tmpV2.set(0, .5, 0)), 'red big', 1.3); pop('+' + RULES.kdPoints + ' แต้ม', fighters[e.by].world('head', tmpV).add(tmpV2.set(0, .5, 0)), 'gold big', 1.6); setTimeout(() => audio.thud(), 380); }
       break;
-    case 'count': if (!rp) { const c = $('count'); c.textContent = e.n; c.hidden = false; c.style.animation = 'none'; void c.offsetWidth; c.style.animation = ''; audio.count(); } break;
+    case 'count': if (!rp) { const c = $('count'); c.textContent = e.n; c.hidden = false; c.style.animation = 'none'; void c.offsetWidth; c.style.animation = ''; } break; // the count is called by the commentary
     case 'getup': if (!rp && !e.thrown) { $('count').hidden = true; audio.roar(.4); } break;
     case 'ko':
       hype = 1; $('count').hidden = true;
@@ -540,8 +545,11 @@ function frame(ts) {
   applyCamera(dt);
   if (window.LAB.eye) { const e = window.LAB.eye; camera.position.set(e[0], e[1], e[2]); camera.lookAt(e[3], e[4], e[5]); camera.fov = e[6] || 40; camera.updateProjectionMatrix(); arena.fadeRopes(camera.position, 1); } // fixed viewpoint for checks
   fx.update(Math.max(adv, dt * .2), camera);
-  const fighting = mode === 'live' && playT > marks.introEnd && playT < marks.over;
-  arena.update(realT, hype, dt); audio.update(dt, hype, fighting && !frozen, TL.clock(playT).round);
+  const fighting = mode === 'live' && playT > marks.introEnd && playT < marks.over, ck = TL.clock(playT);
+  const phase = mode !== 'live' || frozen || playT >= marks.over ? 'off' : playT <= marks.introEnd ? 'intro' : ck.clock <= 0 ? 'rest' : 'fight';
+  arena.update(realT, hype, dt); audio.update(dt, hype, fighting && !frozen, ck.round, TL.pace(playT), phase);
+  if (phase === 'intro' && !introSaid && playT > .6) { introSaid = true; voice.intro(audio.time()); }
+  if (phase === 'fight') { const a = TL.val(0, playT, 8), b = TL.val(1, playT, 8); voice.update(audio.time(), {fighting: true, pace: TL.pace(playT), lead: a === b ? -1 : a > b ? 0 : 1, margin: Math.abs(a - b)}); }
   renderer.render(scene, camera);
   hud(dt);
   fpsAcc += dt; fpsN++; if (fpsAcc > 1) { $('fps').textContent = Math.round(fpsN / fpsAcc) + ' fps'; fpsAcc = 0; fpsN = 0; }
@@ -646,7 +654,7 @@ function buildUi() {
 
 // hooks for tuning and automated checks
 window.LAB = {
-  OPT, seek, applyOpt, newFight, get fight() { return fight; }, get models() { return MODELS; }, get tl() { return TL; }, three: {scene, camera, renderer}, get t() { return playT; }, get mode() { return mode; },
+  OPT, seek, applyOpt, newFight, audio, voice, get fight() { return fight; }, get models() { return MODELS; }, get tl() { return TL; }, three: {scene, camera, renderer}, get t() { return playT; }, get mode() { return mode; },
   set(o) { Object.assign(OPT, o); OPT.preset = o.preset || ''; applyOpt(); },
   preset(k) { OPT.preset = k; Object.assign(OPT, PRESETS[k]); applyOpt(); },
   freeze(t) { seek(t); frozen = true; },
@@ -748,7 +756,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 22 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 23 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

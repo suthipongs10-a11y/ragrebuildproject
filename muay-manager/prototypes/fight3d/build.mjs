@@ -66,6 +66,16 @@ for (const name of readdirSync('assets').filter(f => /^fighter-[a-z]\.glb$/.test
   models.push(`<script type="application/json" id="model-${name.slice(-1)}">${text}</script>`);
   console.log(name, (text.length / 1024 / 1024).toFixed(2) + ' MB');
 }
+// Commentary, referee's count and crowd shouts (tools/tts-commentary.mjs): base64 MP3, grouped by line, in order
+if (existsSync('assets/voice')) {
+  const pack = {};
+  for (const f of readdirSync('assets/voice').filter(f => f.endsWith('.mp3')).sort((a, b) => a.localeCompare(b, 'en', {numeric: true}))) {
+    const [key] = f.slice(0, -4).split('-'); (pack[key] = pack[key] || []).push(readFileSync('assets/voice/' + f).toString('base64'));
+  }
+  const text = JSON.stringify(pack);
+  models.push(`<script type="application/json" id="voice-pack">${text}</script>`);
+  console.log('voice', Object.keys(pack).length, 'lines', (text.length / 1024 / 1024).toFixed(2) + ' MB');
+}
 const withModels = readFileSync('dist/muay-fight-lab.html', 'utf8').replace('<!--__MODELS__-->', () => models.join('\n'));
 // two pages from one source: the presentation lab, and the game (same viewer plus the game screens)
 const page = withModels.replace('<!--G:top-->', '').replace('<!--G:body-->', '');
