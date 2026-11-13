@@ -207,6 +207,8 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
 .swb[aria-pressed="true"]{border-color:var(--gold);box-shadow:inset 0 0 0 1px var(--gold)}
 .staff{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;font-size:13.5px}
 .staff span{color:var(--muted);font-size:12.5px;grid-column:1} .staff b{font-family:var(--display);grid-column:1} .staff .btn{grid-column:2;grid-row:span 2;padding:6px 10px;font-size:13px}
+/* drawn UI art: hidden unless the page carries it (build.mjs adds the images and the rules that show them) */
+.ui{display:none}
 .belts{display:flex;flex-wrap:wrap;gap:6px} .belt{font-size:12px;font-family:var(--display);color:var(--ink);background:var(--gold);border-radius:4px;padding:1px 8px}
 .gbar .who i{font-style:normal;color:var(--fg)} .gbar .who i.hi{color:var(--hp)} .gbar .who i.lo{color:var(--bad)}
 @media (max-width:480px){ .acts,.styles{grid-template-columns:1fr} .rkh,.rk{grid-template-columns:24px minmax(0,1fr) 44px 40px} .rk .lg,.rkh span:nth-child(3){display:none} }

@@ -1,0 +1,42 @@
+/* Layout for the drawn UI art (assets/ui, from tools/ui-art-import.py). Only in the game page, and only when the images
+   are there: build.mjs adds this file together with the images. Without it the game keeps its plain look. */
+.ui{display:inline-block;background-position:center;background-size:contain;background-repeat:no-repeat;flex:none;vertical-align:middle} /* longhands: the image itself comes from the [data-ui] rule */
+.sym{display:none}
+/* header */
+h1.glogo{display:flex;align-items:center;gap:8px;font-size:0}
+h1.glogo .ui.logo{width:190px;height:36px;background-position:left center}
+h1.glogo > span{display:none}
+/* top bar */
+.gbar .res span{display:inline-flex;align-items:center;gap:3px}
+.gbar .ui.ic{width:18px;height:18px}
+.gbar .fat > span{display:inline-flex;align-items:center;gap:4px}
+.gbar .fat .ui.ic{display:inline-block;width:18px;height:18px;background:var(--ui-icon-fatigue) center/contain no-repeat} /* not the bar's own <i> */
+.gbar .ui.mood{width:17px;height:17px;margin-right:3px}
+/* menu */
+.gnav .btn{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 2px 7px}
+.gnav .ui.tab{width:30px;height:30px}
+.gnav .btn[aria-pressed="false"] .ui.tab{filter:saturate(.6) brightness(.82)}
+/* cards with a picture on the left: training and fighting styles */
+.act,.stylecard{display:grid;grid-template-columns:48px minmax(0,1fr);column-gap:9px;align-content:start}
+.act .ui.pic,.stylecard .ui.pic{grid-row:1 / span 4;width:48px;height:48px;align-self:start}
+.act > :not(.ui),.stylecard > :not(.ui){grid-column:2}
+.stylecard .ui.pic{border-radius:8px}
+/* staff */
+.staff{grid-template-columns:52px minmax(0,1fr) auto}
+.staff .ui.face{grid-column:1;grid-row:span 2;width:52px;height:52px;border-radius:50%;background-color:var(--bg);background-size:cover;border:1px solid var(--line)}
+.staff b,.staff span{grid-column:2} .staff .btn{grid-column:3}
+/* belts */
+.belt{display:inline-flex;flex-direction:column;align-items:center;background:none;color:var(--gold);padding:0}
+.belt .ui.beltimg{width:96px;height:30px}
+.ui.beltbig{width:200px;height:62px;align-self:center}
+/* a strip of the venue across the top of a card */
+.gcard > .ui.venue:first-child{display:block;margin:-12px -12px 2px;height:92px;background-size:cover;border-radius:6px 6px 0 0;-webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
+/* result ribbon */
+.gcard h2.ribbon{background-position:center;background-size:100% 100%;background-repeat:no-repeat;padding:22px 34px 26px;text-align:center;font-size:22px}
+.gcard h2.ribbon.win{color:#3a1d00;text-shadow:0 1px 0 rgba(255,240,190,.6)} .gcard h2.ribbon.lose{color:#ececf0}
+/* panels and buttons: the drawn frame and pills, stretched by their middles only */
+.app.game .gcard{border:9px solid transparent;border-image:var(--ui-panel) 30 fill / 18px stretch;background:none;border-radius:0}
+.app.game .btn.go{border:0 solid transparent;border-image:var(--ui-button-gold) 0 40 fill / 0 22px stretch;background:none;padding:11px 18px}
+.app.game .btn:not(.seg):not(.go):not(.link){border:0 solid transparent;border-image:var(--ui-button-dark) 0 40 fill / 0 22px stretch;background:none;padding:10px 16px}
+/* the stadium behind the game's menus */
+.app.game.g-menu::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(rgba(14,15,20,.7),rgba(14,15,20,.93) 55%),var(--ui-title-portrait) center top/cover}

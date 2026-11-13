@@ -76,12 +76,22 @@ if (existsSync('assets/voice')) {
   models.push(`<script type="application/json" id="voice-pack">${text}</script>`);
   console.log('voice', Object.keys(pack).length, 'lines', (text.length / 1024 / 1024).toFixed(2) + ' MB');
 }
+// Drawn UI art for the game page (tools/ui-art-import.py): each image as a CSS variable and a [data-ui] rule, plus the
+// layout that shows them (src/ui-art.css). The app icon is kept for the stores, not the page.
+let uiStyle = '';
+if (existsSync('assets/ui')) {
+  const files = readdirSync('assets/ui').filter(f => f.endsWith('.webp') && f !== 'app-icon.webp').sort();
+  const vars = files.map(f => `--ui-${f.slice(0, -5)}:url(data:image/webp;base64,${readFileSync('assets/ui/' + f).toString('base64')})`).join(';');
+  const rules = files.map(f => `[data-ui="${f.slice(0, -5)}"]{background-image:var(--ui-${f.slice(0, -5)})}`).join('');
+  uiStyle = `<style id="ui-art">:root{${vars}}${rules}\n${readFileSync('src/ui-art.css', 'utf8')}</style>`;
+  console.log('ui art', files.length, 'images', (uiStyle.length / 1024 / 1024).toFixed(2) + ' MB');
+}
 const withModels = readFileSync('dist/muay-fight-lab.html', 'utf8').replace('<!--__MODELS__-->', () => models.join('\n'));
 // two pages from one source: the presentation lab, and the game (same viewer plus the game screens)
 const page = withModels.replace('<!--G:top-->', '').replace('<!--G:body-->', '');
 writeFileSync('dist/muay-fight-lab.html', page);
-const game = readFileSync('src/page.html', 'utf8').replace('/*__APP__*/', () => jsGame).replace('<!--__MODELS__-->', () => models.join('\n')).replace('<title>Muay Fight Lab 3D</title>', '<title>Muay Manager</title>')
+const game = readFileSync('src/page.html', 'utf8').replace('/*__APP__*/', () => jsGame).replace('<!--__MODELS__-->', () => models.join('\n') + uiStyle).replace('<title>Muay Fight Lab 3D</title>', '<title>Muay Manager</title>')
   .replace('<!--G:top-->', '<div id="game"><div class="gbar" id="gTop"></div></div>')
   .replace('<!--G:body-->', '<nav class="gnav" id="gNav" aria-label="เมนูเกม"></nav><div class="gbody" id="gBody"></div>');
 writeFileSync('dist/muay-manager.html', game);
-console.log('dist/muay-fight-lab.html with models', (page.length / 1024 / 1024).toFixed(2) + ' MB (limit 16)');
+console.log('dist/muay-fight-lab.html with models', (page.length / 1024 / 1024).toFixed(2) + ' MB, dist/muay-manager.html', (game.length / 1024 / 1024).toFixed(2) + ' MB (limit 16)');

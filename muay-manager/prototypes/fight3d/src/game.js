@@ -210,16 +210,19 @@ const styleTh = id => STYLES.find(s => s.id === id).th;
 const seg = (group, map, cur) => '<div class="segs">' + Object.keys(map).map(k => '<button class="btn seg sm" data-act="plan" data-g="' + group + '" data-v="' + k + '" aria-pressed="' + (k === cur) + '">' + map[k] + '</button>').join('') + '</div>';
 function planPicker(p) { return '<div class="plan"><div class="row"><span class="lab">ท่าที</span>' + seg('ag', PLAN.ag, p.ag) + '</div><div class="row"><span class="lab">ระยะ</span>' + seg('range', PLAN.range, p.range) + '</div><div class="row"><span class="lab">เป้าเน้น</span>' + seg('target', PLAN.target, p.target) + '</div></div>'; }
 const planText = p => PLAN.ag[p.ag] + ' · ' + PLAN.range[p.range] + ' · เน้น' + PLAN.target[p.target];
+// a drawn image from assets/ui (embedded in the game page as CSS); without the art it takes no space
+const art = (name, cls) => '<i class="ui ' + (cls || '') + '" data-ui="' + name + '" aria-hidden="true"></i>';
 function topBar() {
   if (!S) { $('gTop').innerHTML = ''; return; }
   const f = Math.round(S.fatigue);
-  $('gTop').innerHTML = '<div class="who"><b>' + esc(S.name) + '</b><span>' + LEAGUES[league(S.rp)][1] + ' · วันที่ ' + S.day + ' · อารมณ์ <i class="' + (S.mood > 2 ? 'hi' : S.mood < 2 ? 'lo' : '') + '">' + MOODS[S.mood] + '</i></span></div>' +
-    '<div class="res"><span title="เงิน">฿ ' + baht(S.money) + '</span><span title="ชื่อเสียง">★ ' + S.fame + '</span><span title="คะแนนอันดับ">RP ' + S.rp + '</span></div>' +
-    '<div class="fat" title="ความล้า"><span>ล้า ' + f + '%</span><span class="t"><i class="' + (f >= 70 ? 'hi' : f >= 40 ? 'mid' : '') + '" style="width:' + f + '%"></i></span></div>';
+  $('gTop').innerHTML = '<div class="who"><b>' + esc(S.name) + '</b><span>' + LEAGUES[league(S.rp)][1] + ' · วันที่ ' + S.day + ' · อารมณ์ ' + art('mood-' + (S.mood + 1), 'mood') + '<i class="' + (S.mood > 2 ? 'hi' : S.mood < 2 ? 'lo' : '') + '">' + MOODS[S.mood] + '</i></span></div>' +
+    '<div class="res"><span title="เงิน">' + art('icon-baht', 'ic') + '<b class="sym">฿</b> ' + baht(S.money) + '</span><span title="ชื่อเสียง">' + art('icon-fame', 'ic') + '<b class="sym">★</b> ' + S.fame + '</span><span title="คะแนนอันดับ">' + art('icon-rp', 'ic') + '<b class="sym">RP</b> ' + S.rp + '</span></div>' +
+    '<div class="fat" title="ความล้า"><span>' + art('icon-fatigue', 'ic') + 'ล้า ' + f + '%</span><span class="t"><i class="' + (f >= 70 ? 'hi' : f >= 40 ? 'mid' : '') + '" style="width:' + f + '%"></i></span></div>';
 }
 function nav() {
   const tabs = [['home', 'ค่าย'], ['train', 'ซ้อม'], ['dress', 'แต่งตัว'], ['fight', 'หาคู่ชก'], ['rank', 'อันดับ']];
-  $('gNav').innerHTML = tabs.map(t => '<button class="btn seg" data-act="tab" data-v="' + t[0] + '" aria-pressed="' + (tab === t[0]) + '">' + t[1] + '</button>').join('');
+  const icon = {home: 'tab-camp', train: 'tab-train', dress: 'tab-dress', fight: 'tab-fight', rank: 'tab-rank'};
+  $('gNav').innerHTML = tabs.map(t => '<button class="btn seg" data-act="tab" data-v="' + t[0] + '" aria-pressed="' + (tab === t[0]) + '">' + art(icon[t[0]], 'tab') + '<span>' + t[1] + '</span></button>').join('');
 }
 function setMode(fight) { const app = document.querySelector('.app'); app.classList.add('game'); app.classList.toggle('g-fight', !!fight); app.classList.toggle('g-menu', !fight); app.classList.toggle('g-drill', !!DR); }
 function showMe(pose) { if (S) API.preview(Object.assign({fighter: S.body}, pending ? pending.look : S.look), pose || 'guard'); }
@@ -245,7 +248,7 @@ function renderCreate() {
   $('gBody').innerHTML = '<section class="gcard"><h2>สร้างนักมวยของคุณ</h2>' +
     '<label class="fld" for="gName">ชื่อนักมวย</label><input id="gName" class="inp" maxlength="24" placeholder="เช่น เพชรน้ำหนึ่ง ศ.ของคุณ" value="' + esc(draft.name) + '">' +
     '<div class="fld">ตัวนักมวย</div><div class="pick">' + Object.keys(API.ROSTER).map(k => '<button class="btn seg sm" data-act="body" data-v="' + k + '" aria-pressed="' + (draft.body === k) + '">' + API.ROSTER[k][0] + '</button>').join('') + '</div>' +
-    '<div class="fld">สายมวย</div><div class="styles">' + STYLES.map(s => '<button class="stylecard" data-act="style" data-v="' + s.id + '" aria-pressed="' + (draft.style === s.id) + '"><b>' + s.th + '</b><span>' + STYLE_NOTE[s.id] + '</span><span class="sp">ท่าไม้ตาย: ' + s.sp.map(k => MOVES[k].th).join(' · ') + '</span></button>').join('') + '</div>' +
+    '<div class="fld">สายมวย</div><div class="styles">' + STYLES.map(s => '<button class="stylecard" data-act="style" data-v="' + s.id + '" aria-pressed="' + (draft.style === s.id) + '">' + art('style-' + s.id, 'pic') + '<b>' + s.th + '</b><span>' + STYLE_NOTE[s.id] + '</span><span class="sp">ท่าไม้ตาย: ' + s.sp.map(k => MOVES[k].th).join(' · ') + '</span></button>').join('') + '</div>' +
     '<div class="statbox r">' + statBars(START[draft.style]) + '</div>' +
     '<p class="hint" id="gCreateMsg"></p><button class="btn go wide" data-act="create">เริ่มอาชีพ</button></section>';
 }
@@ -255,13 +258,13 @@ function homeHtml() {
   const gymNext = S.gym < 5 ? '<button class="btn" data-act="gym">อัปเกรดค่าย ระดับ ' + (S.gym + 1) + ' · ฿ ' + baht(GYM_COST[S.gym]) + '</button>' : '<span class="hint">ค่ายระดับสูงสุดแล้ว</span>';
   const guide = S.rec.w + S.rec.l === 0 ? '<section class="gcard"><h2>เริ่มต้นยังไง</h2><p class="hint">1. ไปที่ "ซ้อม" ใช้แรงซ้อมวันละ 3 ครั้งเพิ่มค่าพลัง<br>2. ไปที่ "หาคู่ชก" ท้าชกเวทีงานวัดเพื่อหาเงินและประสบการณ์ แล้วลองศึกจัดอันดับ<br>3. ก่อนชกเลือกแผน และแก้แผนได้ทุกพักยกตามที่พี่เลี้ยงแนะนำ<br>4. กลับมา "จบวัน นอนพัก" เพื่อลดความล้าและเริ่มวันใหม่</p></section>' : '';
   return (view && view.note ? '<p class="gain">' + view.note + '</p>' : '') + guide + '<section class="gcard"><h2>' + esc(S.name) + ' <small>สาย' + styleTh(S.style) + '</small></h2>' +
-    '<div class="kv"><span>สถิติ</span><b>ชนะ ' + S.rec.w + ' (น็อก ' + S.rec.ko + ') แพ้ ' + S.rec.l + '</b><span>อันดับ</span><b>ที่ ' + pos + ' จาก ' + rows.length + ' · ' + LEAGUES[lg][1] + '</b><span>เข็มขัด</span><b>' + (S.belts.length ? '<span class="belts">' + S.belts.map(i => '<span class="belt">' + BELTS[i] + '</span>').join('') + '</span>' : 'ยังไม่มี') + '</b><span>เป้าหมาย</span><b>' + goal + '</b></div>' +
+    '<div class="kv"><span>สถิติ</span><b>ชนะ ' + S.rec.w + ' (น็อก ' + S.rec.ko + ') แพ้ ' + S.rec.l + '</b><span>อันดับ</span><b>ที่ ' + pos + ' จาก ' + rows.length + ' · ' + LEAGUES[lg][1] + '</b><span>เข็มขัด</span><b>' + (S.belts.length ? '<span class="belts">' + S.belts.map(i => '<span class="belt">' + art('belt-' + (i + 1), 'beltimg') + BELTS[i] + '</span>').join('') + '</span>' : 'ยังไม่มี') + '</b><span>เป้าหมาย</span><b>' + goal + '</b></div>' +
     '<div class="statbox r">' + statBars(S.stats) + '</div><p class="hint">ค่าพลังเฉลี่ย ' + overall(S.stats) + ' · เพดานค่าพลังของค่ายระดับ ' + S.gym + ' คือ ' + cap() + '</p>' +
     '<div class="rowbtn">' + gymNext + '</div></section>' +
     '<section class="gcard"><h2>วันนี้</h2><div class="kv"><span>แรงซ้อม</span><b>เหลือ ' + S.slots + ' จาก 3 ครั้ง</b><span>ศึกจัดอันดับ</span><b>เหลือ ' + S.ranked + ' จาก 2 ไฟต์</b></div>' +
     '<div class="rowbtn"><button class="btn" data-act="tab" data-v="train">ไปซ้อม</button><button class="btn" data-act="tab" data-v="fight">หาคู่ชก</button><button class="btn go" data-act="sleep">จบวัน นอนพัก</button></div>' +
     '<p class="hint">นอนพักแล้วความล้าลด ' + (35 + (S.staff.includes('massage') ? 12 : 0)) + ' ได้แรงซ้อมและคู่ชกชุดใหม่ ได้ค่าสปอนเซอร์ ฿ ' + baht(40 + S.fame * 3) + (S.staff.length ? ' จ่ายค่าจ้างทีมงาน ฿ ' + baht(S.staff.reduce((a, id) => a + STAFF.find(x => x.id === id).wage, 0)) : '') + '</p></section>' +
-    '<section class="gcard"><h2>ทีมงาน <small>จ่ายค่าจ้างทุกเช้า</small></h2>' + STAFF.map(st => { const on = S.staff.includes(st.id); return '<div class="staff"><b>' + st.th + (on ? ' ✓' : '') + '</b><span>' + st.note + ' · ค่าจ้างวันละ ฿ ' + st.wage + '</span><button class="btn" data-act="staff" data-v="' + st.id + '">' + (on ? 'เลิกจ้าง' : 'จ้าง ฿ ' + baht(st.hire)) + '</button></div>'; }).join('') + '</section>' +
+    '<section class="gcard"><h2>ทีมงาน <small>จ่ายค่าจ้างทุกเช้า</small></h2>' + STAFF.map(st => { const on = S.staff.includes(st.id); return '<div class="staff">' + art('staff-' + st.id, 'face') + '<b>' + st.th + (on ? ' ✓' : '') + '</b><span>' + st.note + ' · ค่าจ้างวันละ ฿ ' + st.wage + '</span><button class="btn" data-act="staff" data-v="' + st.id + '">' + (on ? 'เลิกจ้าง' : 'จ้าง ฿ ' + baht(st.hire)) + '</button></div>'; }).join('') + '</section>' +
     '<section class="gcard"><h2>ภารกิจวันนี้</h2>' + MISSIONS.map(m => { const n = Math.min(m.need, (S.mis.day === S.day ? S.mis.n[m.id] : 0) || 0), done = n >= m.need; return '<div class="mis' + (done ? ' done' : '') + '"><span>' + (done ? '✓ ' : '') + m.th + '</span><span>' + n + '/' + m.need + '</span><span>฿ ' + m.money + (m.fame ? ' ★ ' + m.fame : '') + '</span></div>'; }).join('') + '</section>' +
     '<section class="gcard"><h2>ท่าไม้ตาย <small>เลือกใช้ได้ 2 ท่า</small></h2><div class="pick">' + SPECIALS.map(k => { const own = S.spOwn.includes(k), on = S.sp.includes(k); return '<button class="btn seg sm" data-act="sp" data-v="' + k + '" aria-pressed="' + on + '"' + (own ? '' : ' disabled') + '>' + MOVES[k].th + (own ? '' : ' (ล็อก)') + '</button>'; }).join('') + '</div>' +
     '<p class="hint">' + (S.spOwn.length - 2 < SP_FAME.length && S.spOwn.length < SPECIALS.length ? 'ท่าถัดไปปลดเมื่อชื่อเสียงถึง ★ ' + SP_FAME[S.spOwn.length - 2] + ' ' : 'ปลดครบทุกท่าแล้ว ') + 'ท่าที่เลือกจะออกสลับกันเมื่อเกจท่าไม้ตายเต็ม</p></section>' +
@@ -274,7 +277,7 @@ function trainHtml() {
   const c = cap();
   return '<section class="gcard"><h2>ตารางซ้อมวันนี้ <small>เหลือ ' + S.slots + ' ครั้ง</small></h2>' +
     (S.fatigue >= 70 ? '<p class="warn">ล้ามากแล้ว ซ้อมได้ผลน้อยลงและเสี่ยงเจ็บ ควรพัก</p>' : '') +
-    '<div class="acts">' + ACTS.map(a => { const st = a.stat.map(k => STAT_TH[k] + ' ' + Math.floor(S.stats[k]) + '/' + c).join(' · '); return '<button class="act' + (a.drill ? ' drill' : '') + '" data-act="train" data-v="' + a.id + '"' + (S.slots < 1 ? ' disabled' : '') + '><b>' + a.th + (a.drill ? ' <i>กดเอง</i>' : '') + '</b><span>' + a.note + '</span><span class="sm">' + (st || 'ไม่ได้ค่าพลัง') + ' · ล้า ' + (a.fat > 0 ? '+' : '') + a.fat + (failPct(a) ? ' · เสี่ยงซ้อมพลาด ' + failPct(a) + '%' : '') + (coachOf(a) ? ' · ครูช่วย +25%' : '') + '</span></button>'; }).join('') + '</div>' +
+    '<div class="acts">' + ACTS.map(a => { const st = a.stat.map(k => STAT_TH[k] + ' ' + Math.floor(S.stats[k]) + '/' + c).join(' · '); return '<button class="act' + (a.drill ? ' drill' : '') + '" data-act="train" data-v="' + a.id + '"' + (S.slots < 1 ? ' disabled' : '') + '>' + art('act-' + a.id, 'pic') + '<b>' + a.th + (a.drill ? ' <i>กดเอง</i>' : '') + '</b><span>' + a.note + '</span><span class="sm">' + (st || 'ไม่ได้ค่าพลัง') + ' · ล้า ' + (a.fat > 0 ? '+' : '') + a.fat + (failPct(a) ? ' · เสี่ยงซ้อมพลาด ' + failPct(a) + '%' : '') + (coachOf(a) ? ' · ครูช่วย +25%' : '') + '</span></button>'; }).join('') + '</div>' +
     (S.slots < 1 ? '<p class="hint">แรงซ้อมหมดแล้ว ไปหาคู่ชก หรือจบวันที่หน้าค่าย</p>' : '<p class="hint">กระสอบทราย ต้นกล้วย และหุ่น เป็นการซ้อมแบบกดเอง: ครูเรียกท่า ต่อย เตะ ถีบ ให้กดตามจังหวะ ยิ่งตรงยิ่งได้ผลมาก การซ้อมอื่นกดปุ่มออกแรงให้ตรงช่วงสีทอง อารมณ์ตอนนี้ "' + MOODS[S.mood] + '" ผลซ้อม ×' + MOOD_TRAIN[S.mood] + ' ล้าเกิน 50% เริ่มเสี่ยงซ้อมพลาด</p>') +
     (view && view.msg ? '<p class="' + (view.bad ? 'warn' : 'gain') + '">' + view.msg + '</p>' : '') + '</section>';
 }
@@ -309,10 +312,10 @@ function fightHtml() {
     : !to ? '<p class="hint">ได้สิทธิ์ชิง' + BELTS[lgNow] + 'เมื่อคะแนนอันดับถึง RP ' + titleNeed() + ' (ตอนนี้ ' + S.rp + ')</p>'
     : S.title > 0 ? oppCard(to, '<button class="btn go" data-act="pick" data-v="t"' + dis + '>ชิง' + BELTS[lgNow] + '</button>') : '<p class="hint">ชิงเข็มขัดของวันนี้ไปแล้ว พรุ่งนี้ชิงใหม่ได้</p>';
   return (tired ? '<p class="warn">ล้าเกิน 90% ขึ้นชกไม่ได้ ไปพักหรือจบวันก่อน</p>' : '') +
-    '<section class="gcard"><h2>ศึกชิงเข็มขัด <small>' + BELTS[lgNow] + '</small></h2><p class="hint">แชมป์เก่าแกร่งกว่าคู่ชกทั่วไป ชนะได้เข็มขัด เงินก้อนใหญ่ และ RP +25 ชิงได้วันละครั้ง</p>' + title + '</section>' +
-    '<section class="gcard"><h2>ศึกจัดอันดับ <small>เหลือ ' + S.ranked + ' ไฟต์วันนี้</small></h2><p class="hint">ชนะได้คะแนนอันดับ แพ้เสียคะแนน คู่ชกคือนักมวยที่อันดับใกล้กัน</p>' + rk + '</section>' +
-    '<section class="gcard"><h2>ศึกมวยคาดเชือก <small>งานประเพณี วันละ 1 ไฟต์</small></h2><p class="hint">ถอดนวม พันหมัดด้วยเชือก ชกบนลานดิน หมัดเท้าเข่าศอกหนักขึ้น การ์ดกันได้น้อยลง น็อกง่ายกว่าเวทีปกติ ไม่มีผลกับอันดับ ได้ชื่อเสียงมาก</p>' + (S.chuek > 0 ? oppCard(chuekOpp(), '<button class="btn" data-act="pick" data-v="c"' + dis + '>ขึ้นชกคาดเชือก</button>') : '<p class="hint">ชกคาดเชือกของวันนี้ไปแล้ว</p>') + '</section>' +
-    '<section class="gcard"><h2>เวทีงานวัดใกล้ค่าย <small>ท้าชกฝึกฝีมือ</small></h2><p class="hint">ไม่มีผลกับอันดับ ได้เงิน ชื่อเสียง และประสบการณ์เวที ทุกไฟต์เพิ่มความล้า 22</p>' + loc + '</section>';
+    '<section class="gcard">' + art('venue-' + LEAGUE_VENUE[lgNow], 'venue') + '<h2>ศึกชิงเข็มขัด <small>' + BELTS[lgNow] + '</small></h2>' + art('belt-' + (lgNow + 1), 'beltbig') + '<p class="hint">แชมป์เก่าแกร่งกว่าคู่ชกทั่วไป ชนะได้เข็มขัด เงินก้อนใหญ่ และ RP +25 ชิงได้วันละครั้ง</p>' + title + '</section>' +
+    '<section class="gcard">' + art('venue-' + LEAGUE_VENUE[league(S.rp)], 'venue') + '<h2>ศึกจัดอันดับ <small>เหลือ ' + S.ranked + ' ไฟต์วันนี้</small></h2><p class="hint">ชนะได้คะแนนอันดับ แพ้เสียคะแนน คู่ชกคือนักมวยที่อันดับใกล้กัน</p>' + rk + '</section>' +
+    '<section class="gcard">' + art('venue-chuek', 'venue') + '<h2>ศึกมวยคาดเชือก <small>งานประเพณี วันละ 1 ไฟต์</small></h2><p class="hint">ถอดนวม พันหมัดด้วยเชือก ชกบนลานดิน หมัดเท้าเข่าศอกหนักขึ้น การ์ดกันได้น้อยลง น็อกง่ายกว่าเวทีปกติ ไม่มีผลกับอันดับ ได้ชื่อเสียงมาก</p>' + (S.chuek > 0 ? oppCard(chuekOpp(), '<button class="btn" data-act="pick" data-v="c"' + dis + '>ขึ้นชกคาดเชือก</button>') : '<p class="hint">ชกคาดเชือกของวันนี้ไปแล้ว</p>') + '</section>' +
+    '<section class="gcard">' + art('venue-temple', 'venue') + '<h2>เวทีงานวัดใกล้ค่าย <small>ท้าชกฝึกฝีมือ</small></h2><p class="hint">ไม่มีผลกับอันดับ ได้เงิน ชื่อเสียง และประสบการณ์เวที ทุกไฟต์เพิ่มความล้า 22</p>' + loc + '</section>';
 }
 function rankHtml() {
   const rows = rankRows(), me = rows.findIndex(r => r.me), show = new Set();
@@ -359,7 +362,7 @@ function liveHtml() {
 }
 function resultHtml() {
   const r = F.res;
-  return '<section class="gcard"><h2 class="' + (r.win ? 'win' : 'lose') + '">' + (r.win ? 'ชนะ' : 'แพ้') + ' ' + esc(r.how) + '</h2><p class="hint">' + esc(r.detail) + '</p>' +
+  return '<section class="gcard"><h2 class="' + (r.win ? 'win' : 'lose') + ' ribbon" data-ui="ribbon-' + (r.win ? 'win' : 'lose') + '">' + (r.win ? 'ชนะ' : 'แพ้') + ' ' + esc(r.how) + '</h2><p class="hint">' + esc(r.detail) + '</p>' +
     '<div class="kv"><span>เงินรางวัล</span><b>+ ฿ ' + baht(r.money) + '</b><span>ชื่อเสียง</span><b>+ ' + r.fame + '</b>' + (r.drp != null ? '<span>คะแนนอันดับ</span><b>' + (r.drp >= 0 ? '+' : '') + r.drp + ' (เป็น ' + S.rp + ')</b>' : '') + '<span>ประสบการณ์เวที</span><b>' + r.xp + '</b><span>ความล้า</span><b>+' + r.fat + '</b></div>' +
     (r.promo ? '<p class="gain">เลื่อนขึ้น' + r.promo + '! โบนัส ฿ ' + baht(r.promoMoney) + '</p>' : '') + r.extra.map(x => '<p class="gain">' + x + '</p>').join('') +
     '<button class="btn go wide" data-act="home">กลับค่าย</button></section>';
@@ -549,7 +552,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; $('ver').textContent = 'ต้นแบบ 2.0'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.1'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }
