@@ -118,7 +118,7 @@ export function buildCommentary(audio, MOVES) {
       case 'kd': say('kd', now, true); break;
       case 'count': audio.count(e.n); break;
       case 'getup': if (!e.thrown) say('getup', now); break;
-      case 'ko': say('ko', now, true); setTimeout(() => say(e.by ? 'winBlue' : 'winRed', audio.time(), true), 1900); break;
+      case 'ko': say('ko', now, true); break; // the winner is named when the referee raises his hand
       case 'decision': say(e.w ? 'decBlue' : 'decRed', now, true); break;
     }
   };
@@ -129,5 +129,6 @@ export function buildCommentary(audio, MOVES) {
     else say(ctx.pace < .5 ? 'feel' : 'busy', now);
   };
   C.intro = now => say('intro', now, true);
+  C.win = (w, now) => say(w ? 'winBlue' : 'winRed', now, true);
   return C;
 }

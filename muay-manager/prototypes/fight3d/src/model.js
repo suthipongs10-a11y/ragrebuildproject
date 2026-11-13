@@ -141,10 +141,10 @@ export class ModelFighter {
     m1.compose(v2, q, v3.set(k, k, k));
     b.matrixWorld.multiplyMatrices(this.root.matrixWorld, m1).multiply(this.bind[name]);
   }
-  update(P, o, x) {
+  update(P, o, x, z, yaw) { // z, yaw: optional, to stand somewhere off the fight line facing any way (the ceremony)
     const J = solve(P, o, this.J), P0 = this.model.pos;
-    this.root.position.set(x, P[o + IDX.jump], 0);
-    this.root.rotation.y = (this.dir > 0 ? 0 : Math.PI) - P[o + IDX.spin];
+    this.root.position.set(x, P[o + IDX.jump], z || 0);
+    this.root.rotation.y = yaw != null ? yaw : (this.dir > 0 ? 0 : Math.PI) - P[o + IDX.spin];
     this.root.updateMatrixWorld(true);
     // torso: the pelvis leads, the spine takes up the shoulder twist step by step
     const tw = P[o + IDX.twist];

@@ -98,7 +98,53 @@ const lum = (r, g, b) => (r * .3 + g * .59 + b * .11) / 255;
 
 const cache = new Map();
 // A texture for this model in this outfit. look: {shorts, trim, gloves, pattern}
+// The referee: one of the bodies dressed in a dark short-sleeved shirt, black trousers and shoes, and white gloves.
+// Each texel takes its part from the bone that moves it most; the cloth keeps a little of the light and shade under it.
+const REF = {shirt: [0x1c, 0x24, 0x3a, .55], trousers: [0x17, 0x17, 0x1b, .12], shoes: [0x0e, 0x0e, 0x10, .2], gloves: [0xe6, 0xe8, 0xec, .25]};
+function refereeTexture(model) {
+  const key = model.id + '|referee'; if (cache.has(key)) return cache.get(key);
+  const mesh = model.mesh, g = mesh.geometry, pos = g.attributes.position, uv = g.attributes.uv, si = g.attributes.skinIndex, sw = g.attributes.skinWeight, idx = g.index;
+  const names = mesh.skeleton.bones.map(b => b.name), P0 = model.pos, v = new THREE.Vector3();
+  const sleeve = (side, p) => { const a = P0[side + 'Arm'], b = P0[side + 'ForeArm']; if (!a || !b) return true; const d = b.clone().sub(a); return p.clone().sub(a).dot(d) / d.lengthSq() < .55; };
+  const part = new Uint8Array(pos.count); // 0 skin, 1 shirt, 2 trousers, 3 shoes, 4 gloves
+  for (let i = 0; i < pos.count; i++) {
+    let best = 0, bw = -1; for (let k = 0; k < 4; k++) { const w = sw.getComponent(i, k); if (w > bw) { bw = w; best = si.getComponent(i, k); } }
+    const n = names[best] || '';
+    mesh.getVertexPosition(i, v); v.applyMatrix4(mesh.matrixWorld);
+    part[i] = /Hand/.test(n) ? 4 : /ForeArm/.test(n) ? 0 : /^(Left|Right)Arm$/.test(n) ? (sleeve(n.startsWith('Left') ? 'Left' : 'Right', v) ? 1 : 0)
+      : /Shoulder|Spine/.test(n) ? 1 : /Foot|Toe/.test(n) ? 3 : /Hips|UpLeg|Leg/.test(n) ? 2 : 0;
+  }
+  const map = new Uint8Array(MAP * MAP), n = idx ? idx.count : pos.count;
+  for (let t = 0; t < n; t += 3) {
+    const a = idx ? idx.getX(t) : t, b = idx ? idx.getX(t + 1) : t + 1, c = idx ? idx.getX(t + 2) : t + 2;
+    const r = part[a] === part[b] || part[a] === part[c] ? part[a] : part[b] === part[c] ? part[b] : part[a]; if (!r) continue;
+    const ax = uv.getX(a) * MAP, ay = uv.getY(a) * MAP, bx = uv.getX(b) * MAP, by = uv.getY(b) * MAP, cx = uv.getX(c) * MAP, cy = uv.getY(c) * MAP;
+    const den = (by - cy) * (ax - cx) + (cx - bx) * (ay - cy); if (Math.abs(den) < 1e-9) continue;
+    const x0 = Math.max(0, Math.floor(Math.min(ax, bx, cx)) - 1), x1 = Math.min(MAP - 1, Math.ceil(Math.max(ax, bx, cx)) + 1);
+    const y0 = Math.max(0, Math.floor(Math.min(ay, by, cy)) - 1), y1 = Math.min(MAP - 1, Math.ceil(Math.max(ay, by, cy)) + 1);
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+      const px = x + .5, py = y + .5, l1 = ((by - cy) * (px - cx) + (cx - bx) * (py - cy)) / den, l2 = ((cy - ay) * (px - cx) + (ax - cx) * (py - cy)) / den;
+      if (l1 < -.05 || l2 < -.05 || 1 - l1 - l2 < -.05) continue;
+      map[y * MAP + x] = r;
+    }
+  }
+  for (let pass = 0; pass < 2; pass++) { const m2 = map.slice(); for (let y = 1; y < MAP - 1; y++) for (let x = 1; x < MAP - 1; x++) { const o = y * MAP + x; if (map[o]) continue; const nb = map[o - 1] || map[o + 1] || map[o - MAP] || map[o + MAP]; if (nb) m2[o] = nb; } map.set(m2); } // cover the seams
+  const img = model.image, W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;
+  const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const cx2 = cv.getContext('2d', {willReadFrequently: true}); cx2.drawImage(img, 0, 0);
+  const id = cx2.getImageData(0, 0, W, H), d = id.data, fx = MAP / W, fy = MAP / H, cols = [null, REF.shirt, REF.trousers, REF.shoes, REF.gloves];
+  const med = [0, 0, 0, 0, 0].map((_, r) => { if (!r) return 0; const a = []; for (let y = 0; y < H; y += 4) for (let x = 0; x < W; x += 4) if (map[Math.floor(y * fy) * MAP + Math.floor(x * fx)] === r) { const p = (y * W + x) * 4; a.push(lum(d[p], d[p + 1], d[p + 2])); } a.sort((p, q) => p - q); return a.length ? a[a.length >> 1] : .5; });
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const r = map[Math.floor(y * fy) * MAP + Math.floor(x * fx)]; if (!r) continue;
+    const p = (y * W + x) * 4, c = cols[r], k = Math.max(.7, Math.min(1.3, 1 + (lum(d[p], d[p + 1], d[p + 2]) - med[r]) * c[3]));
+    d[p] = Math.min(255, c[0] * k); d[p + 1] = Math.min(255, c[1] * k); d[p + 2] = Math.min(255, c[2] * k);
+  }
+  cx2.putImageData(id, 0, 0);
+  const tex = new THREE.CanvasTexture(cv); tex.flipY = false; tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4; // glTF texture layout, as the outfits
+  cache.set(key, tex); return tex;
+}
+
 export function outfitTexture(model, look) {
+  if (look.referee) return refereeTexture(model);
   const key = model.id + '|' + look.shorts + look.trim + look.gloves + look.pattern + (look.hair || '');
   if (cache.has(key)) return cache.get(key);
   const img = model.image, W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;

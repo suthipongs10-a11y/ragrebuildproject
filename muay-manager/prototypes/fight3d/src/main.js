@@ -12,6 +12,7 @@ import { buildDrill, TARGETS } from './drill.js';
 import { buildFx } from './fx.js';
 import { buildAudio } from './audio.js';
 import { buildCommentary } from './commentary.js';
+import { buildCeremony, CER_LEN } from './ceremony.js';
 const THREE = globalThis.THREE;
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
@@ -77,12 +78,31 @@ async function loadPair() {
     const dims = {}; for (const k in MODELS[0].dims) dims[k] = (MODELS[0].dims[k] + MODELS[1].dims[k]) / 2;
     MODEL = {dims, standHips: (MODELS[0].standHips + MODELS[1].standHips) / 2};
     $('modelNote').textContent = '';
+    loadRef();
   } catch (e) {
     for (const id in modelCache) delete modelCache[id];
     MODEL = null; MODELS = []; OPT.fighter = 'code'; console.warn('3D model not loaded, using the code-built fighter:', e.message);
     $('modelNote').textContent = 'โหลดโมเดลนักมวยไม่ได้ จึงใช้ตัวที่สร้างจากโค้ดแทน (' + e.message + ') ';
   }
 }
+// The referee for the ceremony after the fight: a body that is not in the ring tonight, dressed as an official.
+const REF_PREF = ['c', 'g', 'k', 'i', 'b', 'j', 'f', 'h', 'a', 'd', 'e', 'l'];
+let REFM = null, refF = null;
+function loadRef() {
+  const id = REF_PREF.find(k => ROSTER[k] && !LOOK.some(l => l.fighter === k) && document.getElementById('model-' + k));
+  if (!id || (REFM && REFM.id === id)) return;
+  loadModel(id, ROSTER[id][1]).then(m => { REFM = m; if (refF) { scene.remove(refF.root); refF = null; } }).catch(e => console.warn('referee not loaded:', e.message));
+}
+function startCeremony() {
+  if (!REFM || !fighters[0] || !fighters[0].isModel || !fight.result) return false;
+  if (!refF) { refF = new ModelFighter(0, REFM, {referee: true, head: 'none'}); refF.handK = .55; scene.add(refF.root); } // the moulded glove shrinks to a gloved hand
+  const w = fight.result.w; cerDone = false;
+  fighters.forEach(f => f.setMongkol(false));
+  ['banner', 'count', 'scorecard', 'replayTag'].forEach(id => { $(id).hidden = true; }); $('pops').innerHTML = '';
+  cer.start(fighters[w], fighters[1 - w], refF, {onRaise: p => { hype = 1; audio.roar(1.1); audio.shout(1); voice.win(w, audio.time()); fx.sparks(p, 40, 0xffd35a, 1.8, 0); fx.ring(p, 1, 0xffd35a); }});
+  return true;
+}
+function stopCeremony() { cer.stop(); cerDone = false; cerAt = null; }
 const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- scene ----------
@@ -92,7 +112,8 @@ renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.A
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(30, 1.5, .1, 120);
-const audio = buildAudio(), voice = buildCommentary(audio, MOVES);
+const audio = buildAudio(), voice = buildCommentary(audio, MOVES), cer = buildCeremony(camera);
+let cerDone = false, cerAt = null; // cerAt: hold the ceremony at this time (checks)
 let introSaid = false;
 let arena = null, fx = null, drill = null, drillF = null; // built once fonts are ready, the mat texture draws text
 let fighters = [], W = 0, H = 0;
@@ -247,6 +268,7 @@ function clearOverlays() {
 }
 function restart() { seek(0); }
 function seek(t) {
+  stopCeremony();
   playT = clamp(t, 0, TL.duration); evi = indexAt(playT); mode = 'live'; stopT = 0; shake = 0; zoomKick = 0; frozen = false;
   rpi = replays.findIndex(r => r.trigger > playT); if (rpi < 0) rpi = replays.length; curRp = null;
   clearOverlays(); cam.id = null;
@@ -313,7 +335,7 @@ function handle(e) {
       else if (e.phase === 'rest') banner('หมดยก ' + e.round, '');
       if (e.phase === 'fight') $('scorecard').hidden = true;
       else if (e.phase === 'dec') banner('ครบยก', 'gold');
-      else if (e.phase === 'over') finish();
+      else if (e.phase === 'over') { if (rp || !startCeremony()) finish(); } // the referee raises the winner's hand first
       break;
     case 'move': {
       const m = MOVES[e.move];
@@ -529,6 +551,14 @@ function frame(ts) {
     arena.update(realT, .05, dt); fx.update(dt, camera); renderer.render(scene, camera); return;
   }
   if (!W || !TL || galleryOn) { if (galleryOn) renderer.render(scene, camera); return; }
+  if (cer.on) { // the ceremony runs on its own clock; the fight stays at its last moment
+    const going = cer.update(dt, cerAt);
+    if (!going && !cerDone) { cerDone = true; finish(); } // the result comes up; the three stay in the ring behind it
+    hype = Math.max(.3, hype - dt * .15);
+    arena.keyAt(0); arena.fadeRopes(camera.position, 1); arena.update(realT, hype, dt); fx.update(dt, camera);
+    audio.update(dt, hype, true, TL.clock(playT).round, 1, 'cer');
+    renderer.render(scene, camera); hud(dt); return;
+  }
   const adv = advance(dt);
   shake *= Math.pow(.0006, dt); zoomKick *= Math.pow(.002, dt);
   hype = Math.max(0, hype - dt * .3);
@@ -654,7 +684,8 @@ function buildUi() {
 
 // hooks for tuning and automated checks
 window.LAB = {
-  OPT, seek, applyOpt, newFight, audio, voice, get fight() { return fight; }, get models() { return MODELS; }, get tl() { return TL; }, three: {scene, camera, renderer}, get t() { return playT; }, get mode() { return mode; },
+  OPT, seek, applyOpt, newFight, audio, voice, get ref() { return refF; },
+  cer(t) { if (!cer.on) { seek(marks.over - .02); evi = indexAt(marks.over); if (!startCeremony()) return false; } cerAt = t; return true; }, get fight() { return fight; }, get models() { return MODELS; }, get tl() { return TL; }, three: {scene, camera, renderer}, get t() { return playT; }, get mode() { return mode; },
   set(o) { Object.assign(OPT, o); OPT.preset = o.preset || ''; applyOpt(); },
   preset(k) { OPT.preset = k; Object.assign(OPT, PRESETS[k]); applyOpt(); },
   freeze(t) { seek(t); frozen = true; },
@@ -756,7 +787,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 23 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 24 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

@@ -276,10 +276,10 @@ export class Fighter {
     L.g.attributes.position.needsUpdate = true; L.g.computeVertexNormals();
   }
   // P = pose array at offset o, x in metres along the ring axis.
-  update(P, o, x) {
+  update(P, o, x, z, yaw) { // z, yaw: optional, to stand somewhere off the fight line facing any way (the ceremony)
     const J = solve(P, o, this.J), p = this.p, toon = this.style === 'toon';
-    this.root.position.set(x, P[o + IDX.jump], 0);
-    this.root.rotation.y = (this.dir > 0 ? 0 : Math.PI) - P[o + IDX.spin];
+    this.root.position.set(x, P[o + IDX.jump], z || 0);
+    this.root.rotation.y = yaw != null ? yaw : (this.dir > 0 ? 0 : Math.PI) - P[o + IDX.spin];
     this.skin(this.torso, J); this.skin(this.shell, J);
     v1.set(0, .0, 0).applyQuaternion(J.qc).add(J.neck); v2.set(0, -.07, 0).applyQuaternion(J.qh).add(J.head); limb(p.neck, v1, v2);
     const hs = toon ? 1.15 : 1;

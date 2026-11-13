@@ -76,10 +76,11 @@ export function buildAudio() {
       const talking = speaking && speaking._end > AC.currentTime;
       duck += ((talking ? .55 : 1) - duck) * Math.min(1, dt * 6);
       crowdGain.gain.setTargetAtTime((playing ? .035 + hype * .16 : .02) * duck, AC.currentTime, .25);
-      music.gain.setTargetAtTime((phase === 'fight' || phase === 'intro' ? .55 : 0) * duck, AC.currentTime, phase === 'fight' || phase === 'intro' ? .3 : .8);
+      const playOn = phase === 'fight' || phase === 'intro' || phase === 'cer';
+      music.gain.setTargetAtTime((playOn ? .55 : 0) * duck, AC.currentTime, playOn ? .3 : .8);
       // Ringside music speeds up with the fight: slow and stately for the wai kru, then about 100 to 180 beats a minute.
-      M.bpm = phase === 'intro' ? 84 : 100 + (pace || 0) * 66 + hype * 14 + (round - 1) * 4;
-      if (phase === 'fight' || phase === 'intro') { if (!M.on) startMusic(); schedule(); }
+      M.bpm = phase === 'intro' ? 84 : phase === 'cer' ? 126 : 100 + (pace || 0) * 66 + hype * 14 + (round - 1) * 4;
+      if (playOn) { if (!M.on) startMusic(); schedule(); }
       else if (M.on) { M.on = false; stopPi(); }
     }
   };
