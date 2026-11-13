@@ -67,14 +67,16 @@ for (const name of readdirSync('assets').filter(f => /^fighter-[a-z]\.glb$/.test
   console.log(name, (text.length / 1024 / 1024).toFixed(2) + ' MB');
 }
 // Commentary, referee's count and crowd shouts (tools/tts-commentary.mjs): base64 MP3, grouped by line, in order
-if (existsSync('assets/voice')) {
+// and the fight sounds from free CC0 packs (tools/sfx-import.py), grouped by use
+for (const [dir, id] of [['assets/voice', 'voice-pack'], ['assets/sfx', 'sfx-pack']]) {
+  if (!existsSync(dir)) continue;
   const pack = {};
-  for (const f of readdirSync('assets/voice').filter(f => f.endsWith('.mp3')).sort((a, b) => a.localeCompare(b, 'en', {numeric: true}))) {
-    const [key] = f.slice(0, -4).split('-'); (pack[key] = pack[key] || []).push(readFileSync('assets/voice/' + f).toString('base64'));
+  for (const f of readdirSync(dir).filter(f => f.endsWith('.mp3')).sort((a, b) => a.localeCompare(b, 'en', {numeric: true}))) {
+    const [key] = f.slice(0, -4).split('-'); (pack[key] = pack[key] || []).push(readFileSync(dir + '/' + f).toString('base64'));
   }
   const text = JSON.stringify(pack);
-  models.push(`<script type="application/json" id="voice-pack">${text}</script>`);
-  console.log('voice', Object.keys(pack).length, 'lines', (text.length / 1024 / 1024).toFixed(2) + ' MB');
+  models.push(`<script type="application/json" id="${id}">${text}</script>`);
+  console.log(id, Object.keys(pack).length, 'groups', (text.length / 1024 / 1024).toFixed(2) + ' MB');
 }
 // Drawn UI art for the game page (tools/ui-art-import.py): each image as a CSS variable and a [data-ui] rule, plus the
 // layout that shows them (src/ui-art.css). The app icon is kept for the stores, not the page.

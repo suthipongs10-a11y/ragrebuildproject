@@ -99,7 +99,7 @@ function startCeremony() {
   const w = fight.result.w; cerDone = false;
   fighters.forEach(f => f.setMongkol(false));
   ['banner', 'count', 'scorecard', 'replayTag'].forEach(id => { $(id).hidden = true; }); $('pops').innerHTML = '';
-  cer.start(fighters[w], fighters[1 - w], refF, {onRaise: p => { hype = 1; audio.roar(1.1); audio.shout(1); voice.win(w, audio.time()); fx.sparks(p, 40, 0xffd35a, 1.8, 0); fx.ring(p, 1, 0xffd35a); }});
+  cer.start(fighters[w], fighters[1 - w], refF, {onRaise: p => { hype = 1; audio.roar(1.1); audio.applause(); audio.shout(1); voice.win(w, audio.time()); fx.sparks(p, 40, 0xffd35a, 1.8, 0); fx.ring(p, 1, 0xffd35a); }});
   return true;
 }
 function stopCeremony() { cer.stop(); cerDone = false; cerAt = null; }
@@ -403,7 +403,7 @@ function handle(e) {
       hype = 1; $('count').hidden = true;
       if (!rp) { banner(e.how === 'น็อก' ? 'น็อก!!' : 'ทีเคโอ!', 'red huge'); audio.roar(1.2); setTimeout(() => audio.thud(), 420); }
       break;
-    case 'decision': if (!rp) { banner('ชนะคะแนน', fight.result.w ? 'blue' : 'redc'); audio.roar(.8); } break;
+    case 'decision': if (!rp) { banner('ชนะคะแนน', fight.result.w ? 'blue' : 'redc'); audio.roar(.8); audio.applause(); } break;
   }
 }
 
@@ -787,7 +787,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 24 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 25 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

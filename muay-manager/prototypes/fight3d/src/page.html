@@ -209,6 +209,7 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
 .staff span{color:var(--muted);font-size:12.5px;grid-column:1} .staff b{font-family:var(--display);grid-column:1} .staff .btn{grid-column:2;grid-row:span 2;padding:6px 10px;font-size:13px}
 /* drawn UI art: hidden unless the page carries it (build.mjs adds the images and the rules that show them) */
 .ui{display:none}
+.credits{font-size:12px;color:var(--muted)} .credits summary{cursor:pointer;font-family:var(--display);color:var(--fg)} .credits a{color:var(--blue-soft)} .credits ul{margin:6px 0;padding-left:18px}
 .belts{display:flex;flex-wrap:wrap;gap:6px} .belt{font-size:12px;font-family:var(--display);color:var(--ink);background:var(--gold);border-radius:4px;padding:1px 8px}
 .gbar .who i{font-style:normal;color:var(--fg)} .gbar .who i.hi{color:var(--hp)} .gbar .who i.lo{color:var(--bad)}
 @media (max-width:480px){ .acts,.styles{grid-template-columns:1fr} .rkh,.rk{grid-template-columns:24px minmax(0,1fr) 44px 40px} .rk .lg,.rkh span:nth-child(3){display:none} }
@@ -289,6 +290,11 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
     <div class="card r" id="cardR"></div>
     <div class="card b" id="cardB"></div>
   </div>
+  <details class="credits"><summary>เครดิต</summary>
+    <p>เสียงประกอบการชกจาก <a href="https://opengameart.org" target="_blank" rel="noopener">OpenGameArt.org</a> เป็นสาธารณสมบัติ (CC0) ขอบคุณผู้สร้างทุกคน</p>
+    <ul><li>หมัด: <a href="https://opengameart.org/content/punch" target="_blank" rel="noopener">Punch</a> โดย Iwan "qubodup" Gabovitch (CC0)</li><li>หมัด ลูกหนัก ศอก ล้ม: <a href="https://opengameart.org/content/37-hitspunches" target="_blank" rel="noopener">37 hits/punches</a> โดย qubodup (Independent.nu ljudbank) (CC0)</li><li>เตะโดนเนื้อ ล้ม: <a href="https://opengameart.org/content/12-wet-towel-hittingfallingpunching-floor-sounds" target="_blank" rel="noopener">12 wet towel hitting/falling/punching floor sounds</a> โดย Iwan "qubodup" Gabovitch (CC0)</li><li>ลมลูกเตะ: <a href="https://opengameart.org/content/swish-bamboo-stick-weapon-swhoshes" target="_blank" rel="noopener">Swish - bamboo stick weapon swhoshes</a> โดย Iwan "qubodup" Gabovitch (CC0)</li><li>ลมหมัด: <a href="https://opengameart.org/content/swishes-sound-pack" target="_blank" rel="noopener">Swishes Sound Pack</a> โดย artisticdude (CC0)</li><li>บัง ศอก: <a href="https://opengameart.org/content/10-impactshield-blocks" target="_blank" rel="noopener">10 Impact/Shield Blocks</a> โดย StarNinjas (CC0)</li><li>คนดูลุกฮือ: <a href="https://opengameart.org/content/crowd-shoutingspeaking-ambience" target="_blank" rel="noopener">Crowd Shouting/Speaking Ambience</a> โดย StarNinjas (CC0)</li><li>ปรบมือ: <a href="https://opengameart.org/content/applause-in-a-large-hall-or-church" target="_blank" rel="noopener">Applause in a large hall or church</a> โดย eXpl0it3r (CC0)</li></ul>
+    <p>เสียงพากย์: Cartesia TTS • ตัวนักมวย 3D: Meshy • ภาพ UI: ChatGPT • ดนตรีปี่กลอง ระฆัง: สร้างจากโค้ด • ฟอนต์ Kanit, IBM Plex Sans Thai (OFL) • <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> (MIT)</p>
+  </details>
   <p class="note" id="noteLine"><span id="modelNote"></span>ไฟต์หมายเลข <span id="seed"></span> เปลี่ยนแบบการนำเสนอได้ตลอดโดยผลการชกไม่เปลี่ยน ตัวเลขข้างชื่อคือแต้มสด ขึ้นทันทีเมื่ออาวุธเข้าเป้า: เข้าเป้า +1 เข้าหนักหรือท่าไม้ตาย +2 เหวี่ยงล้มหรือถีบล้ม +3 ทำล้มจนถูกนับ +10 โดนบังไม่ได้แต้ม ครบยกแล้วแต้มมากกว่าชนะ สีทองคือฝ่ายที่นำ ใต้นาฬิกาคือแต้มของยกที่กำลังชก แถบเขียวคือพลังชีวิต แถบฟ้าคือความอึด แถบทองคือเกจท่าไม้ตาย ตัวนักมวยเป็นโมเดล 3D ที่สร้างด้วย Meshy</p>
 </div>
 

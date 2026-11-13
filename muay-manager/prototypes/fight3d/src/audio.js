@@ -1,12 +1,14 @@
-// Sound. Strikes, bell and crowd are synthesised; the ringside music (pi, klong khaek and ching) is played live from
+// Sound. Strikes, blocks, swishes and falls are recorded sounds from free CC0 packs (assets/sfx, CREDITS.md), with a
+// synthesised low thump underneath and the old synthesised sounds as the fallback; bell and crowd bed are synthesised; the ringside music (pi, klong khaek and ching) is played live from
 // code so its tempo can follow the fight; the commentary and the crowd's shouts are short recorded clips
 // (assets/voice, embedded in the page). Starts only after the viewer taps the sound button.
 export function buildAudio() {
-  let AC = null, on = false, master = null, sfx = null, music = null, crowd = null, voiceBus = null, crowdGain = null, noiseBuf = null;
-  let clips = null, decoding = null, speaking = null, duck = 1;
+  let AC = null, on = false, master = null, sfxBus = null, music = null, crowd = null, voiceBus = null, crowdGain = null, noiseBuf = null;
+  let clips = null, decoding = null, speaking = null, duck = 1, sfx = null, sfxLast = {}, bedEnd = 0;
   const M = {next: 0, step: 0, bpm: 100, on: false, pi: null, piGain: null, piFilter: null, phrase: [], pi7: 0, seed: 7};
   const A = {
     get on() { return on; },
+    get sfxReady() { return !!sfx; }, // the recorded fight sounds are decoded
     time: () => (AC ? AC.currentTime : 0),
     toggle() {
       on = !on;
@@ -15,7 +17,7 @@ export function buildAudio() {
           AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume();
           if (!master) build();
           master.gain.value = .9;
-          loadVoice();
+          loadVoice(); loadSfx();
         } catch (e) { on = false; }
       } else if (master) { master.gain.value = 0; stopPi(); }
       return on;
@@ -24,38 +26,51 @@ export function buildAudio() {
       if (!on) return; const t = at || AC.currentTime, s = AC.createBufferSource(); s.buffer = noiseBuf;
       const f = AC.createBiquadFilter(); f.type = type; f.frequency.setValueAtTime(freq, t); if (sweepTo) f.frequency.exponentialRampToValueAtTime(sweepTo, t + len); f.Q.value = q || .7;
       const g = AC.createGain(); g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(.001, t + len);
-      s.connect(f); f.connect(g); g.connect(bus || sfx); s.start(t, Math.random() * 1.5, len + .02);
+      s.connect(f); f.connect(g); g.connect(bus || sfxBus); s.start(t, Math.random() * 1.5, len + .02);
     },
     tone(type, f0, f1, len, gain, delay, bus, attack) {
       if (!on) return; const t = AC.currentTime + (delay || 0), o = AC.createOscillator(), g = AC.createGain(); o.type = type;
       o.frequency.setValueAtTime(f0, t); if (f1) o.frequency.exponentialRampToValueAtTime(f1, t + len);
       if (attack) { g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(gain, t + attack); } else g.gain.setValueAtTime(gain, t);
-      g.gain.exponentialRampToValueAtTime(.0001, t + len); o.connect(g); g.connect(bus || sfx); o.start(t); o.stop(t + len + .02);
+      g.gain.exponentialRampToValueAtTime(.0001, t + len); o.connect(g); g.connect(bus || sfxBus); o.start(t); o.stop(t + len + .02);
     },
     hit(kind, raw, quiet) {
       if (!on) return; const p = Math.min(1, raw / 26), v = quiet ? .5 : 1;
+      if (sfx) { // recorded blows, layered: the skin, the weight behind it, and a low thump to feel it
+        const g = (.38 + p * .62) * v;
+        if (kind === 'punch') { sample('punch', g); if (p > .45) sample('thud', g * .55); }
+        else if (kind === 'kick') { sample('slap', g); sample('thud', g * .75); }
+        else if (kind === 'elbow') { sample('crack', g); sample('punch', g * .45); }
+        else { sample('thud', g); sample('slap', g * .45); }
+        A.tone('sine', kind === 'kick' ? 105 : 140, 42, .16, (.12 + p * .3) * v);
+        return;
+      }
       if (kind === 'punch') { A.noise(.09 + p * .05, 'lowpass', 1100, (.3 + p * .5) * v); A.tone('sine', 150, 48, .15, (.25 + p * .5) * v); }
       else if (kind === 'kick') { A.noise(.12 + p * .06, 'bandpass', 1500, (.35 + p * .5) * v, .6); A.tone('sine', 110, 38, .2, (.3 + p * .55) * v); }
       else if (kind === 'elbow') { A.noise(.05, 'highpass', 2400, (.3 + p * .4) * v); A.tone('triangle', 420, 90, .1, (.25 + p * .4) * v); A.tone('sine', 130, 50, .14, .3 * v); }
       else { A.noise(.1, 'lowpass', 600, (.3 + p * .4) * v); A.tone('sine', 95, 34, .24, (.4 + p * .5) * v); }
     },
-    block() { A.noise(.06, 'bandpass', 2600, .22, 1.2); A.tone('sine', 220, 120, .06, .12); },
-    whiff() { A.noise(.16, 'bandpass', 500, .1, 1.5, 1700); },
-    swish(big) { A.noise(big ? .32 : .18, 'bandpass', 380, big ? .16 : .07, 1.4, big ? 2200 : 1300); },
+    block() { if (sfx) { sample('block', .55); return; } A.noise(.06, 'bandpass', 2600, .22, 1.2); A.tone('sine', 220, 120, .06, .12); },
+    whiff() { if (sfx) { sample('whoosh', .3, 4); return; } A.noise(.16, 'bandpass', 500, .1, 1.5, 1700); },
+    swish(big) { if (sfx) { sample('whoosh', big ? .7 : .45, 0, 4); return; } A.noise(big ? .32 : .18, 'bandpass', 380, big ? .16 : .07, 1.4, big ? 2200 : 1300); },
     // The ring bell: a bronze bell struck with a hammer. Inharmonic partials with their own decays, a knock at the strike.
     bell(n) {
       if (!on) return;
       for (let i = 0; i < n; i++) {
         const d = i * .42;
-        [[1, .22, 2.6], [2.32, .12, 1.8], [3.95, .08, 1.2], [5.4, .05, .8], [6.8, .03, .5]].forEach(([r, g, len]) => A.tone('sine', 640 * r, 0, len, g, d, sfx, .004));
-        A.tone('sine', 640 * 1.003, 0, 2.4, .12, d, sfx, .004); // a second, slightly sharp hum makes it beat as real bells do
-        A.noise(.04, 'bandpass', 3200, .25, 1, 0, sfx, AC.currentTime + d);
+        [[1, .22, 2.6], [2.32, .12, 1.8], [3.95, .08, 1.2], [5.4, .05, .8], [6.8, .03, .5]].forEach(([r, g, len]) => A.tone('sine', 640 * r, 0, len, g, d, sfxBus, .004));
+        A.tone('sine', 640 * 1.003, 0, 2.4, .12, d, sfxBus, .004); // a second, slightly sharp hum makes it beat as real bells do
+        A.noise(.04, 'bandpass', 3200, .25, 1, 0, sfxBus, AC.currentTime + d);
       }
     },
     // the referee's count: the recorded number when there is one, else a click
     count(n) { if (!on) return; if (clips && clips.count && clips.count[n - 1]) playClip(clips.count[n - 1], {bus: voiceBus, gain: .8}); else A.tone('square', 520, 0, .12, .06); },
-    roar(v) { if (!on) return; A.noise(.9 + v * .6, 'bandpass', 800, .12 + v * .2, .4, 1300, crowd); },
-    thud() { A.noise(.2, 'lowpass', 300, .5); A.tone('sine', 70, 30, .3, .6); },
+    roar(v) {
+      if (!on) return; A.noise(.9 + v * .6, 'bandpass', 800, .12 + v * .2, .4, 1300, crowd);
+      if (sfx && sfx.roar && v >= .7 && AC.currentTime > bedEnd) bedEnd = playClip(sfx.roar[0], {bus: crowd, gain: .35 + v * .25, lowpass: 2600})._end - 1; // the whole stand on its feet
+    },
+    applause() { if (on && sfx && sfx.applause && AC.currentTime > bedEnd) bedEnd = playClip(sfx.applause[0], {bus: crowd, gain: .8})._end - 1; },
+    thud() { if (sfx) sample('fall', .9); else A.noise(.2, 'lowpass', 300, .5); A.tone('sine', 70, 30, .3, .6); },
     // The stand shouts as one ('เฮ้!') when a strike lands: the recorded shouts, stacked with small differences in pitch and timing.
     shout(v) {
       if (!on || !clips || !clips.shout0) return;
@@ -90,7 +105,7 @@ export function buildAudio() {
     const comp = AC.createDynamicsCompressor(); comp.threshold.value = -10; comp.knee.value = 8; comp.ratio.value = 6; comp.attack.value = .003; comp.release.value = .2; // a stacked crowd shout or a pile-up of sounds never clips
     master.connect(comp); comp.connect(AC.destination);
     const bus = g => { const n = AC.createGain(); n.gain.value = g; n.connect(master); return n; };
-    sfx = bus(1); music = bus(0); crowd = bus(.9); voiceBus = bus(1.1);
+    sfxBus = bus(1); music = bus(0); crowd = bus(.9); voiceBus = bus(1.1);
     noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
     const d = noiseBuf.getChannelData(0); let last = 0;
     for (let i = 0; i < d.length; i++) { const w = Math.random() * 2 - 1; last = (last + .04 * w) / 1.04; d[i] = last * 3 + w * .25; }
@@ -106,7 +121,20 @@ export function buildAudio() {
     const dec = b64 => new Promise(res => { const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); AC.decodeAudioData(u.buffer, res, () => res(null)); });
     decoding = Promise.all(Object.entries(pack).map(async ([k, list]) => { out[k] = (await Promise.all(list.map(dec))).filter(Boolean); })).then(() => { clips = out; });
   }
-  function playClip(buf, o) {
+  function loadSfx() {
+    if (sfx) return; const el = document.getElementById('sfx-pack'); if (!el) return;
+    const pack = JSON.parse(el.textContent), out = {};
+    const dec = b64 => new Promise(res => { const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); AC.decodeAudioData(u.buffer, res, () => res(null)); });
+    Promise.all(Object.entries(pack).map(async ([k, list]) => { out[k] = (await Promise.all(list.map(dec))).filter(Boolean); })).then(() => { if (out.punch && out.punch.length) sfx = out; });
+  }
+  // one recording from a set (from index a up to b), never the same one twice running, a little higher or lower each time
+  function sample(set, gain, a, b) {
+    const list = sfx && sfx[set]; if (!list || !list.length) return;
+    const lo = a || 0, hi = Math.min(list.length, b || list.length); if (hi <= lo) return;
+    let i = lo + Math.floor(Math.random() * (hi - lo)); if (i === sfxLast[set] && hi - lo > 1) i = lo + ((i - lo + 1) % (hi - lo)); sfxLast[set] = i;
+    playClip(list[i], {bus: sfxBus, gain, rate: .93 + Math.random() * .14});
+  }
+    function playClip(buf, o) {
     const t = AC.currentTime + (o.delay || 0), s = AC.createBufferSource(); s.buffer = buf; s.playbackRate.value = o.rate || 1;
     let node = s;
     if (o.lowpass) { const f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = o.lowpass; node.connect(f); node = f; }
