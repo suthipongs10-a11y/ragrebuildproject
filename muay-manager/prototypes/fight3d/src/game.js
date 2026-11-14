@@ -1,7 +1,7 @@
 // Game layer: profile, training, outfits, matchmaking, corner plans, rewards and ranking.
 // It never touches fight rules: it builds two fighter specs and plans, hands them to the simulation through the viewer,
 // and turns the result into progress. Save lives in the browser and, when the page has it, in the artifact database.
-import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VENUE_RULES } from './data.js';
+import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VENUE_RULES, RULES } from './data.js';
 import { PLAN_TIPS } from './plantips.js';
 
 const $ = id => document.getElementById(id);
@@ -65,6 +65,9 @@ const PRICE = {colors: {gold: 250, green: 250, purple: 250, pink: 250, orange: 2
 const LOOK_KIND = {shorts: 'colors', trim: 'colors', gloves: 'colors', pattern: 'patterns', head: 'head', hair: 'hair'};
 const SPECIALS = ['spChop', 'spHanu', 'spKick', 'spCroc', 'spFly'];
 const SP_FAME = [30, 80, 160];      // fame needed for each extra signature move beyond the style's two
+// Or learn one sooner from a visiting master, for money. Each move then trains up to level 3: a day's training slot,
+// money and fatigue per level; the fight engine makes a higher level harder to stop and heavier (RULES.spLvAcc / spLvDmg).
+const SP_LEARN = [1500, 2500, 4000], SP_UP = [0, 800, 1800], SP_MAX = 3, SP_UP_FAT = 12;
 const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', need: 3, money: 100, fame: 0}, {id: 'win', th: 'ชนะ 1 ไฟต์', need: 1, money: 150, fame: 1}, {id: 'ranked', th: 'ขึ้นชกจัดอันดับ 1 ไฟต์', need: 1, money: 120, fame: 2}];
 const SAVE_KEY = 'muayManagerSave1';
 
@@ -75,13 +78,14 @@ function newSave(name, body, style) {
   return {v: 1, name, body, style, stats: Object.assign({}, START[style]), look: {shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none', hair: 'natural'},
     own: {colors: ['red', 'blue', 'black', 'white'], patterns: ['plain'], head: ['none'], hair: ['natural']}, mood: 2, staff: [], belts: [], title: 1, day: 1, slots: 3, ranked: 2, fatigue: 0, money: 500, fame: 0, rp: 1000, best: 1000,
     rec: {w: 0, l: 0, ko: 0}, gym: 1, chuek: 1, seed: Math.floor(Math.random() * 1e9), plan: Object.assign({}, PLAN_DEFAULT), log: [],
-    sp: STYLES.find(x => x.id === style).sp.slice(), spOwn: STYLES.find(x => x.id === style).sp.slice(), mis: {day: 1, n: {}}, updatedAt: Date.now()};
+    sp: STYLES.find(x => x.id === style).sp.slice(), spOwn: STYLES.find(x => x.id === style).sp.slice(), mis: {day: 1, n: {}}, spLv: {}, updatedAt: Date.now()};
 }
 function loadLocal() { try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); return valid(s) ? fix(s) : null; } catch (e) { return null; } }
 function fix(s) { // fields added after a save was made
   const sp = STYLES.find(x => x.id === s.style).sp;
   if (!Array.isArray(s.spOwn)) s.spOwn = sp.slice();
   if (!Array.isArray(s.sp) || !s.sp.length) s.sp = sp.slice();
+  if (!s.spLv || typeof s.spLv !== 'object') s.spLv = {};
   if (!s.mis || typeof s.mis !== 'object' || !s.mis.n) s.mis = {day: s.day, n: {}};
   if (typeof s.chuek !== 'number') s.chuek = 1;
   if (!s.look.hair) s.look.hair = 'natural';
@@ -161,7 +165,10 @@ const coachOf = a => S.staff.includes(STAFF_ACT[a.id]);
 const boost = a => MOOD_TRAIN[S.mood] * (coachOf(a) ? 1.25 : 1);
 const failPct = a => a.stat.length ? Math.round(Math.max(0, S.fatigue - FAIL.from) * FAIL.perPoint * (S.mood <= 1 ? FAIL.lowMood : 1)) : 0;
 function moodUp(n) { const b = S.mood; S.mood = clamp(S.mood + n, 0, 4); return S.mood === b ? '' : ' อารมณ์' + (n > 0 ? 'ดีขึ้น' : 'แย่ลง') + 'เป็น "' + MOODS[S.mood] + '"'; }
-function playerSpec() { const st = {}, m = fatigueMul() * MOOD_FIGHT[S.mood]; KEYS.forEach(k => { st[k] = clamp(Math.round(S.stats[k] * m), 20, 100); }); return {name: S.name, first: S.name, style: S.style, stats: st, skin: 0, sp: S.sp.slice()}; }
+function playerSpec() { const st = {}, m = fatigueMul() * MOOD_FIGHT[S.mood]; KEYS.forEach(k => { st[k] = clamp(Math.round(S.stats[k] * m), 20, 100); }); return {name: S.name, first: S.name, style: S.style, stats: st, skin: 0, sp: S.sp.slice(), spLv: Object.assign({}, S.spLv || {})}; }
+const spLv = k => (S.spLv && S.spLv[k]) || 1;
+// opponents train their signature moves too: one level per two leagues, champions one more
+function oppSpLv(style, lg, champ) { const lv = Math.min(SP_MAX, 1 + Math.floor(lg / 2) + (champ ? 1 : 0)), o = {}; STYLES.find(x => x.id === style).sp.forEach(k => { o[k] = lv; }); return o; }
 function makeStats(style, T, R) { const b = START[style], sum = total(b), st = {}; KEYS.forEach(k => { st[k] = clamp(Math.round(b[k] * T / sum + (R() - .5) * 8), 22, 99); }); return st; }
 function randomLook(R) { const cs = Object.keys(API.COLORS), ps = Object.keys(API.PATTERNS), hs = Object.keys(API.HEADGEAR); return {shorts: cs[Math.floor(R() * cs.length)], trim: cs[Math.floor(R() * cs.length)], gloves: cs[Math.floor(R() * cs.length)], pattern: ps[Math.floor(R() * ps.length)], head: hs[Math.floor(R() * hs.length)], hair: R() < .7 ? 'natural' : Object.keys(API.HAIR)[1 + Math.floor(R() * (Object.keys(API.HAIR).length - 1))]}; }
 function makeOpp(seed, T, fixedName) {
@@ -266,10 +273,24 @@ function homeHtml() {
     '<p class="hint">นอนพักแล้วความล้าลด ' + (35 + (S.staff.includes('massage') ? 12 : 0)) + ' ได้แรงซ้อมและคู่ชกชุดใหม่ ได้ค่าสปอนเซอร์ ฿ ' + baht(40 + S.fame * 3) + (S.staff.length ? ' จ่ายค่าจ้างทีมงาน ฿ ' + baht(S.staff.reduce((a, id) => a + STAFF.find(x => x.id === id).wage, 0)) : '') + '</p></section>' +
     '<section class="gcard"><h2>ทีมงาน <small>จ่ายค่าจ้างทุกเช้า</small></h2>' + STAFF.map(st => { const on = S.staff.includes(st.id); return '<div class="staff">' + art('staff-' + st.id, 'face') + '<b>' + st.th + (on ? ' ✓' : '') + '</b><span>' + st.note + ' · ค่าจ้างวันละ ฿ ' + st.wage + '</span><button class="btn" data-act="staff" data-v="' + st.id + '">' + (on ? 'เลิกจ้าง' : 'จ้าง ฿ ' + baht(st.hire)) + '</button></div>'; }).join('') + '</section>' +
     '<section class="gcard"><h2>ภารกิจวันนี้</h2>' + MISSIONS.map(m => { const n = Math.min(m.need, (S.mis.day === S.day ? S.mis.n[m.id] : 0) || 0), done = n >= m.need; return '<div class="mis' + (done ? ' done' : '') + '"><span>' + (done ? '✓ ' : '') + m.th + '</span><span>' + n + '/' + m.need + '</span><span>฿ ' + m.money + (m.fame ? ' ★ ' + m.fame : '') + '</span></div>'; }).join('') + '</section>' +
-    '<section class="gcard"><h2>ท่าไม้ตาย <small>เลือกใช้ได้ 2 ท่า</small></h2><div class="pick">' + SPECIALS.map(k => { const own = S.spOwn.includes(k), on = S.sp.includes(k); return '<button class="btn seg sm" data-act="sp" data-v="' + k + '" aria-pressed="' + on + '"' + (own ? '' : ' disabled') + '>' + MOVES[k].th + (own ? '' : ' (ล็อก)') + '</button>'; }).join('') + '</div>' +
-    '<p class="hint">' + (S.spOwn.length - 2 < SP_FAME.length && S.spOwn.length < SPECIALS.length ? 'ท่าถัดไปปลดเมื่อชื่อเสียงถึง ★ ' + SP_FAME[S.spOwn.length - 2] + ' ' : 'ปลดครบทุกท่าแล้ว ') + 'ท่าที่เลือกจะออกสลับกันเมื่อเกจท่าไม้ตายเต็ม</p></section>' +
+    spHtml() +
     (S.log.length ? '<section class="gcard"><h2>ไฟต์ล่าสุด</h2>' + S.log.slice(0, 5).map(l => '<div class="logrow ' + (l.w ? 'w' : 'l') + '"><b>' + (l.w ? 'ชนะ' : 'แพ้') + '</b><span>' + esc(l.o) + '</span><span>' + esc(l.h) + '</span></div>').join('') + '</section>' : '') +
     '<p class="hint">' + cloudNote + ' · <button class="link" data-act="reset">เริ่มใหม่ทั้งหมด</button></p>';
+}
+// Signature moves: choose two to use, learn more from a master, train each up to level 3
+function spHtml() {
+  const nextFame = S.spOwn.length - 2 < SP_FAME.length && S.spOwn.length < SPECIALS.length ? SP_FAME[S.spOwn.length - 2] : null;
+  const learnCost = SP_LEARN[Math.min(SP_LEARN.length - 1, Math.max(0, S.spOwn.length - 2))];
+  const rows = SPECIALS.map(k => {
+    const own = S.spOwn.includes(k), on = S.sp.includes(k), lv = spLv(k), stars = '★'.repeat(lv) + '☆'.repeat(SP_MAX - lv);
+    const act = !own ? '<button class="btn" data-act="splearn" data-v="' + k + '"' + (S.money < learnCost ? ' disabled' : '') + '>เรียน ฿ ' + baht(learnCost) + '</button>'
+      : lv < SP_MAX ? '<button class="btn" data-act="spup" data-v="' + k + '"' + (S.money < SP_UP[lv] || S.slots < 1 ? ' disabled' : '') + '>ฝึกขั้น ' + (lv + 1) + ' ฿ ' + baht(SP_UP[lv]) + '</button>' : '<span class="hint">ขั้นสูงสุด</span>';
+    return '<div class="sprow' + (own ? '' : ' locked') + '"><button class="btn seg sm" data-act="sp" data-v="' + k + '" aria-pressed="' + on + '"' + (own ? '' : ' disabled') + '>' + MOVES[k].th + '</button>' +
+      '<span class="lv" title="ขั้นที่ ' + lv + '">' + (own ? stars : 'ยังไม่ได้เรียน') + '</span>' + act + '</div>';
+  }).join('');
+  return '<section class="gcard"><h2>ท่าไม้ตาย <small>เลือกใช้ได้ 2 ท่า</small></h2>' + rows +
+    '<p class="hint">ฝึกท่าขั้นถัดไปใช้แรงซ้อม 1 ครั้ง ความล้า +' + SP_UP_FAT + ' ทุกขั้นที่สูงขึ้น ท่าบังและหลบยากขึ้น ' + Math.round(RULES.spLvAcc * 100) + '% และแรงขึ้น ' + Math.round(RULES.spLvDmg * 100) + '% ' +
+    (nextFame ? '· ท่าถัดไปปลดฟรีเมื่อชื่อเสียงถึง ★ ' + nextFame + ' หรือจ่ายครูเรียนก่อนได้ ' : '') + '· ท่าที่เลือกออกสลับกันเมื่อเกจท่าไม้ตายเต็ม</p></section>';
 }
 function trainHtml() {
   if (DR) return drillHtml();
@@ -380,7 +401,7 @@ async function startFight() {
   F.plans = [F.plan, F.plan, F.plan].map(p => Object.assign({}, p)); F.phase = 'live'; S.plan = Object.assign({}, F.plan);
   setMode(true); render();
   const o = F.opp;
-  await API.startFight({venue: o.venue, rules: VENUE_RULES[o.venue] || null, seed: F.seed, specs: [playerSpec(), {name: o.name, first: o.name, style: o.style, stats: o.stats, skin: 1}], plans: plansFor(),
+  await API.startFight({venue: o.venue, rules: VENUE_RULES[o.venue] || null, seed: F.seed, specs: [playerSpec(), {name: o.name, first: o.name, style: o.style, stats: o.stats, skin: 1, spLv: oppSpLv(o.style, league(S.rp), o.kind === 'title')}], plans: plansFor(),
     looks: [Object.assign({name: S.name, fighter: S.body}, S.look), Object.assign({name: o.name, fighter: o.body}, o.look)]});
 }
 function onRoundBreak(n, st) { F.phase = 'break'; F.round = n; F.stats = st; render(); $('gBody').scrollIntoView({block: 'nearest', behavior: 'smooth'}); }
@@ -535,6 +556,8 @@ function onClick(e) {
   else if (act === 'cancelbuy') { pending = null; render(); showMe(); }
   else if (act === 'pick') { const o = v === 'r' ? rankedOpp() : v === 'c' ? chuekOpp() : v === 't' ? titleOpp() : localOpps().find(x => x.id === v); if (!o) return; F = {opp: o, seed: (S.seed + S.day * 101 + S.rec.w * 7 + S.rec.l * 13 + (v === 'r' ? 5 : v === 'c' ? 9 : v === 't' ? 11 : +v.slice(1))) >>> 0, plan: Object.assign({}, S.plan || PLAN_DEFAULT), phase: 'plan'}; setMode(false); render(); API.preview(Object.assign({fighter: o.body}, o.look), 'guard', o.venue); $('gBody').scrollIntoView({block: 'nearest'}); }
   else if (act === 'backout') { F = null; go('fight'); }
+  else if (act === 'splearn') { const cost = SP_LEARN[Math.min(SP_LEARN.length - 1, Math.max(0, S.spOwn.length - 2))]; if (S.spOwn.includes(v) || !SPECIALS.includes(v) || S.money < cost) return; S.money -= cost; S.spOwn.push(v); view = {note: 'เรียนท่าไม้ตาย ' + MOVES[v].th + ' จากครูแล้ว'}; save(); topBar(); render(); }
+  else if (act === 'spup') { const lv = spLv(v); if (!S.spOwn.includes(v) || lv >= SP_MAX || S.money < SP_UP[lv] || S.slots < 1) return; S.money -= SP_UP[lv]; S.slots--; S.spLv[v] = lv + 1; S.fatigue = clamp(S.fatigue + SP_UP_FAT, 0, 100); view = {note: 'ฝึก' + MOVES[v].th + 'ได้ขั้น ' + (lv + 1) + ' แล้ว'}; save(); topBar(); render(); }
   else if (act === 'sp') { if (!S.spOwn.includes(v)) return; if (S.sp.includes(v)) { if (S.sp.length > 1) S.sp = S.sp.filter(k => k !== v); } else { S.sp.push(v); if (S.sp.length > 2) S.sp.shift(); } save(); render(); }
   else if (act === 'plan') { F.plan[el.dataset.g] = v; render(); }
   else if (act === 'startfight') startFight();

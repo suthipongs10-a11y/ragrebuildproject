@@ -220,6 +220,7 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
 /* drawn UI art: hidden unless the page carries it (build.mjs adds the images and the rules that show them) */
 .ui{display:none}
 .credits{font-size:12px;color:var(--muted)} .credits summary{cursor:pointer;font-family:var(--display);color:var(--fg)} .credits a{color:var(--blue-soft)} .credits ul{margin:6px 0;padding-left:18px}
+.sprow{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px;align-items:center} .sprow .btn.seg{flex:none;text-align:left} .sprow .lv{color:var(--gold);letter-spacing:1px;font-size:13px;white-space:nowrap} .sprow.locked .lv{color:var(--muted);font-size:12px;letter-spacing:0} .sprow .btn:not(.seg){padding:6px 10px;font-size:13px}
 .belts{display:flex;flex-wrap:wrap;gap:6px} .belt{font-size:12px;font-family:var(--display);color:var(--ink);background:var(--gold);border-radius:4px;padding:1px 8px}
 .gbar .who i{font-style:normal;color:var(--fg)} .gbar .who i.hi{color:var(--hp)} .gbar .who i.lo{color:var(--bad)}
 @media (max-width:480px){ .acts,.styles{grid-template-columns:1fr} .rkh,.rk{grid-template-columns:24px minmax(0,1fr) 44px 40px} .rk .lg,.rkh span:nth-child(3){display:none} }

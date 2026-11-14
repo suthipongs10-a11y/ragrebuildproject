@@ -114,6 +114,8 @@ export const RULES = {
   // On top of that, a man standing his ground gets out of the way: he slips punches to the head left and right, and bends
   // back or sucks his body back from kicks to the body and head (scaled by speed / 55)
   slipBase: .12, kickDodge: .3,
+  // a signature move trained up a level (spec.spLv, 1-3): harder to block or slip, and heavier, per level above the first
+  spLvAcc: .15, spLvDmg: .1,
   // raising the guard on reading an attack: chance, and how much it helps when the read is right or wrong
   coverBase: .2, coverDef: .4, coverRead: .75, coverBonus: .3, coverMul: 1.7, coverWrong: .5,
   critChance: .1, critMul: 1.5, counterMul: 1.3,

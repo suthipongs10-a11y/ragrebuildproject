@@ -49,6 +49,7 @@ export function simulate(opts) {
     return {i, dir: i ? -1 : 1, x: i ? K.startX : -K.startX, name: spec.name, stats: spec.stats,
       style: STYLES.find(s => s.id === spec.style),
       spList: (spec.sp || []).filter(k => MOVES[k] && MOVES[k].special).slice(0, 3), // the owner's chosen signature moves, else the style's
+      spLv: spec.spLv || {}, // how far each signature move has been trained (1-3)
       hp: 100, st: 100, sp: 0, kd: 0, pts: 0, pts0: 0, dmg: 0, state: 'intro', cool: 0, plan: null, planT: 0,
       pt: 0, pd: .001, to: 'guard', q: [], qi: 0, mv: null, mvKey: null, hold: 0, inv: 0, lunge: 0,
       combo: null, ci: 0, chain: 0, chainT: 0, lastRes: null, spi: 0,
@@ -169,7 +170,8 @@ export function simulate(opts) {
     else if (o.state === 'cover') { pD = 0; pB = o.coverLvl === m.lvl ? 1 : pB * K.coverWrong; } // the guard up at the right height stops it: no points
     const guarded = o.state === 'cover' && o.coverLvl === m.lvl;
     if (o.st < 25 && !guarded) pB *= .7;
-    if (m.special && !guarded) { pB *= .45; pD *= .4; }
+    const spUp = m.special ? Math.max(0, Math.min(2, (f.spLv[key] || 1) - 1)) : 0;
+    if (m.special && !guarded) { pB *= .45 * (1 - K.spLvAcc * spUp); pD *= .4 * (1 - K.spLvAcc * spUp); }
     if (f.chain > 0 && !guarded) pB *= Math.max(.5, 1 - f.chain * .15);
     if (o.state === 'idle' || o.state === 'block') { // getting out of the way, on top of the guard
       const q = o.stats.spd / 55;
@@ -214,6 +216,7 @@ export function simulate(opts) {
     if (planOf(o).range === 'out' && PR.inMoves.includes(key)) raw *= PR.keepAway;
     if (planOf(f).range === 'out' && planOf(o).range === 'in' && PR.outMoves.includes(key)) raw *= PR.outVsIn;
     if (crit) raw *= K.critMul;
+    raw *= 1 + K.spLvDmg * spUp;
     if (f.combo && f.ci === f.combo.seq.length - 1 && f.chain >= 1) raw *= 1.15; // combo finisher
     const dm = raw * K.dmgScale;
     // points go up the moment a strike lands clean: 1 for a light one, 2 for a solid one, 3 for a heavy one or a signature move
