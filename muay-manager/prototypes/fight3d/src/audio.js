@@ -12,7 +12,8 @@ export function buildAudio() {
     get on() { return on; },
     get sfxReady() { return !!sfx; }, // the recorded fight sounds are decoded
     get vols() { return Object.assign({}, vol); },
-    get musicOn() { return M.on; }, // for checks
+    get musicOn() { return M.on || !!T.buf; }, // for checks
+    get musicTrack() { return T.buf ? T.i : -1; },
     setVol(k, v) { if (!(k in vol)) return; vol[k] = Math.max(0, Math.min(1, +v || 0)); if (userGain[k]) userGain[k].gain.setTargetAtTime(vol[k], AC.currentTime, .05); },
     time: () => (AC ? AC.currentTime : 0),
     toggle() {
@@ -22,7 +23,7 @@ export function buildAudio() {
           AC = AC || new (window.AudioContext || window.webkitAudioContext)(); AC.resume();
           if (!master) build();
           master.gain.value = .9;
-          loadVoice(); loadSfx();
+          loadVoice(); loadSfx(); loadMusic();
         } catch (e) { on = false; }
       } else if (master) { master.gain.value = 0; stopPi(); }
       return on;
@@ -97,11 +98,14 @@ export function buildAudio() {
       duck += ((talking ? .55 : 1) - duck) * Math.min(1, dt * 6);
       crowdGain.gain.setTargetAtTime((playing ? .035 + hype * .16 : .02) * duck, AC.currentTime, .25);
       const playOn = phase === 'fight' || phase === 'intro' || phase === 'cer';
-      music.gain.setTargetAtTime((playOn ? .55 : 0) * duck, AC.currentTime, playOn ? .3 : .8);
+      // the recorded music is a soft bed under the commentary; the made-up pipe and drums stand in until it is decoded
+      const lvl = T.tracks ? (phase === 'fight' ? .16 + (pace || 0) * .08 : .26) : .55;
+      music.gain.setTargetAtTime((playOn ? lvl : 0) * duck, AC.currentTime, playOn ? .3 : .8);
       // Ringside music speeds up with the fight: slow and stately for the wai kru, then about 100 to 180 beats a minute.
       M.bpm = phase === 'intro' ? 84 : phase === 'cer' ? 126 : 100 + (pace || 0) * 66 + hype * 14 + (round - 1) * 4;
-      if (playOn) { if (!M.on) startMusic(); schedule(); }
-      else if (M.on) { M.on = false; stopPi(); }
+      if (playOn && T.tracks) { if (M.on) { M.on = false; stopPi(); } if (!T.buf) trackStart(); trackTick(); }
+      else if (playOn) { if (!M.on) startMusic(); schedule(); }
+      else { if (M.on) { M.on = false; stopPi(); } if (T.buf) trackStop(); }
     }
   };
 
@@ -125,6 +129,30 @@ export function buildAudio() {
     const pack = JSON.parse(el.textContent), out = {};
     const dec = b64 => new Promise(res => { const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); AC.decodeAudioData(u.buffer, res, () => res(null)); });
     decoding = Promise.all(Object.entries(pack).map(async ([k, list]) => { out[k] = (await Promise.all(list.map(dec))).filter(Boolean); })).then(() => { clips = out; });
+  }
+  // recorded background music (assets/music, embedded as music-pack): each round takes the next track and loops it
+  // with a crossfade, so a one-minute recording plays on without a seam
+  const T = {tracks: null, buf: null, i: -1, next: 0, src: []}, XF = 2;
+  function loadMusic() {
+    if (T.tracks || T.loading) return; const el = document.getElementById('music-pack'); if (!el) return; T.loading = true;
+    const list = (JSON.parse(el.textContent).track || []);
+    Promise.all(list.map(b64 => new Promise(res => { const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); AC.decodeAudioData(u.buffer, res, () => res(null)); })))
+      .then(bufs => { bufs = bufs.filter(Boolean); if (bufs.length) T.tracks = bufs; });
+  }
+  function trackStart() { T.i = (T.i + 1) % T.tracks.length; T.buf = T.tracks[T.i]; T.next = AC.currentTime + .05; }
+  function trackTick() {
+    while (T.buf && T.next < AC.currentTime + .6) {
+      const s = AC.createBufferSource(), g = AC.createGain(), t0 = T.next, dur = T.buf.duration;
+      s.buffer = T.buf; s.connect(g); g.connect(music);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(1, t0 + XF); g.gain.setValueAtTime(1, t0 + dur - XF); g.gain.linearRampToValueAtTime(0, t0 + dur);
+      s.start(t0); s.stop(t0 + dur + .05); const x = {s, g}; T.src.push(x); s.onended = () => { T.src = T.src.filter(y => y !== x); };
+      T.next = t0 + dur - XF;
+    }
+  }
+  function trackStop() {
+    const t = AC.currentTime;
+    T.src.forEach(x => { x.g.gain.cancelScheduledValues(t); x.g.gain.setValueAtTime(x.g.gain.value, t); x.g.gain.linearRampToValueAtTime(0, t + 1.2); try { x.s.stop(t + 1.3); } catch (e) { /* already stopped */ } });
+    T.src = []; T.buf = null;
   }
   function loadSfx() {
     if (sfx) return; const el = document.getElementById('sfx-pack'); if (!el) return;

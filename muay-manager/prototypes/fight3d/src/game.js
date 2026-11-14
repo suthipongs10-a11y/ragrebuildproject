@@ -269,7 +269,7 @@ function nav() {
   $('gNav').innerHTML = tabs.map(t => '<button class="btn seg" data-act="tab" data-v="' + t[0] + '" aria-pressed="' + (tab === t[0]) + '">' + art(icon[t[0]], 'tab') + '<span>' + t[1] + '</span></button>').join('');
 }
 function setMode(fight) { const app = document.querySelector('.app'); app.classList.add('game'); app.classList.toggle('g-fight', !!fight); app.classList.toggle('g-menu', !fight); app.classList.toggle('g-drill', !!DR); }
-function showMe(pose) { if (S) API.preview(Object.assign({fighter: S.body}, pending ? pending.look : S.look), pose || 'guard'); }
+function showMe(pose) { if (S) API.camp(S.gym); if (S) API.preview(Object.assign({fighter: S.body}, pending ? pending.look : S.look), pose || 'guard'); }
 
 // ---------- screens ----------
 function render() {
@@ -787,7 +787,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.11'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.12'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

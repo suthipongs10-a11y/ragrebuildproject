@@ -69,7 +69,8 @@ for (const name of readdirSync('assets').filter(f => /^fighter-[a-z]\.glb$/.test
 }
 // Commentary, referee's count and crowd shouts (tools/tts-commentary.mjs): base64 MP3, grouped by line, in order
 // and the fight sounds from free CC0 packs (tools/sfx-import.py), grouped by use
-for (const [dir, id] of [['assets/voice', 'voice-pack'], ['assets/sfx', 'sfx-pack']]) {
+// and the background music (tools/music-import.sh)
+for (const [dir, id] of [['assets/voice', 'voice-pack'], ['assets/sfx', 'sfx-pack'], ['assets/music', 'music-pack']]) {
   if (!existsSync(dir)) continue;
   const pack = {};
   for (const f of readdirSync(dir).filter(f => f.endsWith('.mp3')).sort((a, b) => a.localeCompare(b, 'en', {numeric: true}))) {
@@ -109,7 +110,13 @@ const head = '<!doctype html>\n<html lang="th">\n<head>\n<meta charset="utf-8">\
 // only what changed.
 rmSync('dist/site', {recursive: true, force: true}); mkdirSync('dist/site/a', {recursive: true});
 const hash = t => createHash('sha256').update(t).digest('hex').slice(0, 16);
-const assetsHtml = models.join('\n') + uiImages, assetsName = 'a/' + hash(assetsHtml) + '.html', appName = 'a/' + hash(jsGame) + '.js';
+// painted camps (tools/camp-art-import.py) only on the website: the claude.ai page has no room left under its size limit
+let campArt = '';
+if (existsSync('assets/camp')) {
+  const pack = {}; for (const f of readdirSync('assets/camp').filter(f => /^camp-\d\.webp$/.test(f))) pack[f[5]] = 'data:image/webp;base64,' + readFileSync('assets/camp/' + f).toString('base64');
+  if (Object.keys(pack).length) { campArt = `<script type="application/json" id="camp-art">${JSON.stringify(pack)}</script>`; console.log('camp art', Object.keys(pack).join(','), (campArt.length / 1048576).toFixed(2) + ' MB (website only)'); }
+}
+const assetsHtml = models.join('\n') + uiImages + campArt, assetsName = 'a/' + hash(assetsHtml) + '.html', appName = 'a/' + hash(jsGame) + '.js';
 writeFileSync('dist/site/' + assetsName, assetsHtml); writeFileSync('dist/site/' + appName, jsGame);
 const THREE_TAG = '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>';
 const siteAssets = {assets: '/' + assetsName, app: '/' + appName, three: THREE_TAG.match(/src="([^"]+)"/)[1],

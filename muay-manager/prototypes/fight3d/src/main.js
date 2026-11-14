@@ -571,7 +571,7 @@ function frame(ts) {
     if (previewPose === 'guard') { const b = realT * 5.2; P[IDX.fL + 1] += Math.max(0, Math.sin(b)) * .04; P[IDX.hip + 1] += Math.sin(b) * .012; P[IDX.hL + 1] += Math.sin(b + 1) * .01; }
     previewF.update(P, 0, 0); previewF.setWear(0, 0, 0);
     if (camera.fov !== 30) { camera.fov = 30; camera.updateProjectionMatrix(); }
-    const az = .55 * Math.sin(realT * .35) + .5, D = 3.5;
+    const az = arena.painted() ? .16 * Math.sin(realT * .35) + .2 : .55 * Math.sin(realT * .35) + .5, D = 3.5; // a painted camp only covers the middle
     camera.position.set(Math.sin(az) * D, 1.25, Math.cos(az) * D); camera.lookAt(0, .92, 0);
     arena.keyAt(0); arena.fadeRopes(camera.position, .25);
     arena.update(realT, .05, dt); fx.update(dt, camera); renderer.render(scene, camera); return;
@@ -724,7 +724,7 @@ function buildUi() {
 
 // hooks for tuning and automated checks
 window.LAB = {
-  OPT, seek, applyOpt, newFight, audio, voice, get ref() { return refF; },
+  OPT, seek, applyOpt, newFight, audio, voice, get ref() { return refF; }, camp(level, time) { arena.setCamp(level, time); }, // camp(level 1-5, 'morning'|'day'|'evening'|'night'|null)
   cer(t) { if (!cer.on) { seek(marks.over - .02); evi = indexAt(marks.over); if (!startCeremony()) return false; } cerAt = t; return true; }, get fight() { return fight; }, get models() { return MODELS; }, get tl() { return TL; }, three: {scene, camera, renderer}, get t() { return playT; }, get mode() { return mode; },
   set(o) { Object.assign(OPT, o); OPT.preset = o.preset || ''; applyOpt(); },
   preset(k) { OPT.preset = k; Object.assign(OPT, PRESETS[k]); applyOpt(); },
@@ -820,6 +820,7 @@ const API = {
   pop(text, cls) { if (drillF) pop(text, drillF.world('head', tmpV).add(tmpV2.set(.3, .42, 0)), cls, .7); },
   endPreview() { if (previewF) { scene.remove(previewF.root); previewF = null; } fighters.forEach(f => { f.root.visible = true; }); },
   setSpeed(v) { speed = v; }, applyOpt,
+  camp(level) { if (arena) arena.setCamp(level); }, // the camp scene grows with the camp level
   sound: {get on() { return audio.on; }, set: setSound, get vols() { return audio.vols; }, vol(k, v) { audio.setVol(k, v); soundSave(); }, test() { if (audio.on) audio.bell(1); }},
   bright: {get v() { return arena.bright; }, set(v) { arena.setBrightness(v); soundSave(); }}
 };
@@ -832,7 +833,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 32 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 33 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

@@ -28,3 +28,7 @@
 | ฟอนต์ | Kanit, IBM Plex Sans Thai — Google Fonts (SIL Open Font License) |
 | three.js | MIT License — https://threejs.org |
 | ดนตรีประกอบ | รอเจ้าของเกมส่งมา |
+
+## ดนตรีประกอบ
+
+- เพลงประกอบ 2 เพลง (`prototypes/fight3d/assets/music/`) ไฟล์จากเจ้าของเกม 14 พ.ย. 2026 — ที่มาและสัญญาอนุญาต: รอระบุ ต้องตรวจก่อนเปิดสาธารณะหรือลงสโตร์

@@ -361,46 +361,190 @@ function chuek() {
 }
 
 // ---------- training camp ----------
-function camp() {
+// The player's camp. It grows with the camp level (1 a dirt yard under a mango tree ... 5 a proper gym with a ring),
+// and the sky and light follow the time of day (A.campTime): morning, midday, evening and night, all bright enough
+// to watch. Most props sit behind the fighter (negative z), where the preview and training cameras look.
+const CAMP_TIME = {
+  morning: {tint: 0xfff4e6, sky: [0x78acd8, 0xc4dbec, 0xffdcae], light: {bg: 0xffdcae, fog: .008, hemi: [0xe2eeff, 0xa08a62, 1.25], key: [0xffe2b4, 2.3, 5, 4.5, 4.5], rim: [0xfff0d0, 0xfff0d0, 0, [-5, 2.6, -4], [5, 2.6, -4]], crowd: [0xffe8c8, 14, 0, 2.6, 1, 14], beam: 0}, bulbs: false},
+  day: {sky: [0x3f7fc8, 0x9cc4e8, 0xf4dfb4], light: {bg: 0xf4dfb4, fog: .007, hemi: [0xdcecff, 0x9a8460, 1.25], key: [0xfff0d2, 2.3, 3.2, 7, 4.2], rim: [0xfff0d0, 0xfff0d0, 0, [-5, 2.6, -4], [5, 2.6, -4]], crowd: [0xfff0d0, 14, 0, 2.6, 1, 14], beam: 0}, bulbs: false},
+  evening: {tint: 0xffd2b0, sky: [0x48558f, 0xe0906a, 0xffb878], light: {bg: 0xf0a878, fog: .009, hemi: [0xffd8c0, 0x8a6a50, 1.15], key: [0xffbe80, 2.4, -5, 4, 4.5], rim: [0xffa060, 0x8aa0ff, 6, [-5, 2.6, -4], [5, 2.6, -4]], crowd: [0xffd8a0, 30, 0, 2.9, 0, 16], beam: 0}, bulbs: true},
+  night: {tint: 0x8a96c8, sky: [0x0e1630, 0x223163, 0x4a5486], light: {bg: 0x3a4170, fog: .012, hemi: [0xb8c4ff, 0x5a4a3a, 1.05], key: [0xffe4b8, 2.6, .8, 5.5, 3.2], rim: [0xffc080, 0x7a9cff, 8, [-5, 2.6, -4], [5, 2.6, -4]], crowd: [0xffe0b0, 60, 0, 2.9, 0, 16], beam: 0}, bulbs: true, stars: 260}
+};
+function campTimeNow() { const h = new Date().getHours(); return h >= 5 && h < 10 ? 'morning' : h >= 10 && h < 16 ? 'day' : h >= 16 && h < 19 ? 'evening' : 'night'; }
+function camp(level) {
+  const L = Math.max(1, Math.min(5, level | 0 || 1));
   const V = newVenue(), g = V.group;
+  V.skyTex = {}; V.campLevel = L;
   sky(V, 0x3f7fc8, 0x9cc4e8, 0xf4dfb4);
   const ground = put(g, new THREE.PlaneGeometry(90, 90), std({map: groundTex('#8f7a52', '120,140,70', '90,70,40')}), 0, 0, 0, -Math.PI / 2); ground.receiveShadow = true;
-  const slab = canvasTex(1024, 1024, (c, w, h) => { c.fillStyle = '#3d6f8a'; c.fillRect(0, 0, w, h); speckle(c, w, h, 4200, '255,255,255', '15,35,50', .1, 8); c.strokeStyle = 'rgba(255,255,255,.55)'; c.lineWidth = 10; c.strokeRect(60, 60, w - 120, h - 120); c.fillStyle = 'rgba(255,255,255,.75)'; c.font = 'italic 800 76px Kanit, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('ค่ายมวย', w / 2, h / 2 + 250); });
-  const floor = put(g, new THREE.PlaneGeometry(S, S), std({map: slab, roughness: .95}), 0, .004, 0, -Math.PI / 2); floor.receiveShadow = true;
-  const wood = std({color: 0x5a4028}), woodL = std({color: 0x7a5a3a});
-  // open shed: posts, beams, tin roof
+  // the training floor: packed earth, then concrete, then a mat that gets smarter
+  const floorTex = canvasTex(1024, 1024, (c, w, h) => {
+    if (L === 1) { c.fillStyle = '#7d6644'; c.fillRect(0, 0, w, h); speckle(c, w, h, 5200, '60,45,25', '170,150,110', .22, 10); return; }
+    if (L === 2) { c.fillStyle = '#9a9a94'; c.fillRect(0, 0, w, h); speckle(c, w, h, 4800, '70,70,70', '200,200,195', .14, 7); c.strokeStyle = 'rgba(60,60,60,.35)'; c.lineWidth = 4; for (let x = 256; x < w; x += 256) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); c.beginPath(); c.moveTo(0, x); c.lineTo(w, x); c.stroke(); } return; }
+    c.fillStyle = L === 5 ? '#b0362c' : '#3d6f8a'; c.fillRect(0, 0, w, h); speckle(c, w, h, 4200, '255,255,255', '15,35,50', .1, 8);
+    c.strokeStyle = L === 5 ? 'rgba(242,184,58,.85)' : 'rgba(255,255,255,.55)'; c.lineWidth = 10; c.strokeRect(60, 60, w - 120, h - 120);
+    c.fillStyle = L === 5 ? 'rgba(242,184,58,.9)' : 'rgba(255,255,255,.75)'; c.font = 'italic 800 76px Kanit, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('ค่ายมวย', w / 2, h / 2 + 250);
+    if (L >= 4) { c.font = '800 54px Kanit, sans-serif'; c.fillText('★'.repeat(L - 2), w / 2, h / 2 + 330); }
+  });
+  const floor = put(g, new THREE.PlaneGeometry(S + (L >= 4 ? 1.2 : 0), S + (L >= 4 ? 1.2 : 0)), std({map: floorTex, roughness: .95}), 0, .004, 0, -Math.PI / 2); floor.receiveShadow = true;
+  const wood = std({color: 0x5a4028}), woodL = std({color: 0x7a5a3a}), white = std({color: 0xf0ece2}), gold = std({color: 0xd9a531, metalness: .5, roughness: .4}), red = std({color: 0xb5281f});
   const H = 3.25, X = 3.9;
-  for (const x of [-X, 0, X]) for (const z of [-3.6, 3.6]) if (!(x === 0 && z > 0)) { const p = put(g, new THREE.BoxGeometry(.16, H, .16), wood, x, H / 2, z); p.castShadow = true; }
-  for (const z of [-3.6, 0, 3.6]) put(g, new THREE.BoxGeometry(X * 2 + .3, .14, .14), wood, 0, H, z);
-  for (const x of [-X, X]) put(g, new THREE.BoxGeometry(.14, .14, 7.4), wood, x, H, 0);
-  const tin = canvasTex(256, 64, (c, w, h) => { for (let x = 0; x < w; x += 8) { c.fillStyle = x % 16 ? '#8a8f94' : '#62676c'; c.fillRect(x, 0, 8, h); } c.fillStyle = 'rgba(120,70,30,.25)'; for (let i = 0; i < 30; i++) c.fillRect(rng() * w, rng() * h, 10 + rng() * 30, 3 + rng() * 8); }); tin.wrapS = tin.wrapT = THREE.RepeatWrapping; tin.repeat.set(8, 2);
-  const tinM = std({map: tin, roughness: .6, metalness: .3, side: THREE.DoubleSide});
-  for (const s of [-1, 1]) put(g, new THREE.PlaneGeometry(X * 2 + 1.2, 4.5), tinM, 0, H + .75, s * 2.05, -s * (Math.PI / 2 - .36));
-  // heavy bags hanging at the back, tyres, water jar, bench
-  const bagM = [std({color: 0x7c1f1a, roughness: .55}), std({color: 0x1d2f6a, roughness: .55}), std({color: 0x24242a, roughness: .55})], chain = std({color: 0x50545c, metalness: .6, roughness: .5});
-  [-2.5, -.6, 2.4].forEach((x, i) => { put(g, new THREE.CylinderGeometry(.012, .012, .9, 4), chain, x, H - .45, -3.55); const b = put(g, new THREE.CapsuleGeometry(.2, .85, 4, 12), bagM[i], x, H - 1.55, -3.55); b.castShadow = true; });
+  const hangBag = (x, z, top, mat, len) => { put(g, new THREE.CylinderGeometry(.012, .012, .9, 4), chain, x, top - .45, z); const b = put(g, new THREE.CapsuleGeometry(.2, len || .85, 4, 12), mat, x, top - .9 - (len || .85) / 2 - .2, z); b.castShadow = true; return b; };
+  const bagM = [std({color: 0x7c1f1a, roughness: .55}), std({color: 0x1d2f6a, roughness: .55}), std({color: 0x24242a, roughness: .55}), std({color: 0x8a5a2a, roughness: .6}), std({color: 0x2f5a2f, roughness: .55}), std({color: 0xb08a2a, roughness: .5})];
+  const chain = std({color: 0x50545c, metalness: .6, roughness: .5});
+  const lightLines = [];
+  if (L === 1) {
+    // a big mango tree gives the shade; one bag hangs from its branch, a bulb on a wire for the evenings
+    const bark = std({color: 0x5a4632, roughness: 1}), leaves = [std({color: 0x2f6a2a}), std({color: 0x3b7d33}), std({color: 0x285a25})];
+    put(g, new THREE.CylinderGeometry(.2, .32, 3.2, 8), bark, -2.6, 1.6, -3.6).castShadow = true;
+    const br = put(g, new THREE.CylinderGeometry(.07, .11, 2.6, 6), bark, -1.5, 3.05, -3.4, 0, 0, Math.PI / 2 - .25); br.castShadow = true;
+    [[-2.6, 4.3, -3.8, 1.7], [-1.3, 3.9, -3.2, 1.3], [-3.7, 3.8, -3.3, 1.3], [-2.2, 4.0, -2.4, 1.2], [-2.9, 4.9, -3.1, 1.2], [-0.6, 3.6, -3.7, 1]].forEach(([x, y, z, r], i) => { const s = put(g, new THREE.SphereGeometry(r, 10, 8), leaves[i % 3], x, y, z); s.scale.y = .72; s.castShadow = true; });
+    hangBag(-.6, -3.4, 3.35, bagM[0]);
+    lightLines.push(sag([-2.4, 3.1, -3.1], [2.6, 2.6, -2.2], 14, .35));
+    put(g, new THREE.CylinderGeometry(.05, .06, 2.7, 6), wood, 2.6, 1.35, -2.2);
+  } else {
+    // open shed: posts, beams, tin roof (deeper and with a back wall from level 3)
+    const D = L >= 4 ? 4.4 : 3.6;
+    for (const x of [-X, 0, X]) for (const z of [-D, D]) if (!(x === 0 && z > 0)) { const p = put(g, new THREE.BoxGeometry(.16, H, .16), wood, x, H / 2, z); p.castShadow = true; }
+    for (const z of [-D, 0, D]) put(g, new THREE.BoxGeometry(X * 2 + .3, .14, .14), wood, 0, H, z);
+    for (const x of [-X, X]) put(g, new THREE.BoxGeometry(.14, .14, D * 2 + .2), wood, x, H, 0);
+    const tin = canvasTex(256, 64, (c, w, h) => { for (let x = 0; x < w; x += 8) { c.fillStyle = x % 16 ? (L === 5 ? '#b0423a' : '#8a8f94') : (L === 5 ? '#8a2e28' : '#62676c'); c.fillRect(x, 0, 8, h); } c.fillStyle = 'rgba(120,70,30,.25)'; for (let i = 0; i < (L >= 4 ? 8 : 30); i++) c.fillRect(rng() * w, rng() * h, 10 + rng() * 30, 3 + rng() * 8); }); tin.wrapS = tin.wrapT = THREE.RepeatWrapping; tin.repeat.set(8, 2);
+    const tinM = std({map: tin, roughness: .6, metalness: .3, side: THREE.DoubleSide});
+    for (const s of [-1, 1]) put(g, new THREE.PlaneGeometry(X * 2 + 1.2, D * 1.25), tinM, 0, H + .75, s * D * .57, -s * (Math.PI / 2 - .36));
+    // bags along the back beam
+    const xs = [[-2.5, 2.4], [-2.5, -.6, 2.4], [-3.1, -1.6, 1.3, 2.9], [-3.2, -2, -.8, 1.2, 2.4, 3.4]][Math.min(L, 5) - 2];
+    xs.forEach((x, i) => hangBag(x, -D + .05, H, bagM[i % bagM.length], L >= 4 && i === 1 ? 1.15 : .85));
+    if (L >= 4) { const banana = std({color: 0xd8c050, roughness: .6}); const b = put(g, new THREE.CapsuleGeometry(.17, 1.2, 4, 12), banana, -X + .4, H - 1.55, -1.4); b.rotation.z = .08; put(g, new THREE.CylinderGeometry(.012, .012, .7, 4), chain, -X + .4, H - .35, -1.4); }
+    // bulbs along the beams
+    lightLines.push(sag([-X, H - .05, -D], [X, H - .05, -D], 18, .25), sag([-X, H - .05, 0], [X, H - .05, 0], 18, .25));
+    if (L >= 3) {
+      // a plank wall behind the bags with fight posters, a banner and flags across the front
+      const plank = canvasTex(512, 256, (c, w, h) => { for (let y = 0; y < h; y += 32) { c.fillStyle = ['#9a7350', '#8a6644', '#a67c56'][(y / 32) % 3]; c.fillRect(0, y, w, 31); } speckle(c, w, h, 900, '40,25,10', '150,110,70', .2, 6); });
+      put(g, new THREE.PlaneGeometry(X * 2 + .2, 2.6), std({map: plank, roughness: .95}), 0, 1.3, -D - .12);
+      const nP = L === 3 ? 2 : L === 4 ? 4 : 6;
+      for (let i = 0; i < nP; i++) { const x = -X + .6 + (i + .5) * ((X * 2 - 1.2) / nP); put(g, new THREE.PlaneGeometry(.62, .86), basic({map: posterTex(i + L * 3)}), x, 2.05 + (i % 2 ? .06 : -.04), -D - .1); }
+      const ban = canvasTex(1024, 160, (c, w, h) => { c.fillStyle = L === 5 ? '#7a1712' : '#1f3f8a'; c.fillRect(0, 0, w, h); c.fillStyle = '#f2b83a'; c.fillRect(0, 10, w, 8); c.fillRect(0, h - 18, w, 8); c.font = '800 92px Kanit, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = '#fff4d8'; c.fillText(L === 5 ? 'ค่ายมวยระดับแชมป์' : 'ค่ายมวยไทย', w / 2, h / 2 + 4); });
+      put(g, new THREE.PlaneGeometry(4.6, .72), basic({map: ban, side: THREE.DoubleSide}), 0, H - .52, D + .02, 0, Math.PI, 0);
+      put(g, new THREE.PlaneGeometry(4.6, .72), basic({map: ban, side: THREE.DoubleSide}), 0, H + .25, -D - .14);
+      const flagCols = [0xc9281f, 0xf0f0f2, 0x1f55c4, 0xe0a52a, 0x2f8a3a];
+      for (const z of [-D + .3, 0]) { const pts = sag([-X, H - .2, z], [X, H - .2, z], 16, .3); pts.slice(1, -1).forEach((p, i) => { const f = put(g, new THREE.ConeGeometry(.11, .26, 3), basic({color: flagCols[i % flagCols.length]}), p.x, p.y - .15, p.z, Math.PI, 0, 0); f.scale.z = .2; }); }
+    }
+    if (L >= 4) {
+      // weights corner: a rack, a barbell and dumbbells
+      const iron = std({color: 0x2a2c30, metalness: .6, roughness: .45});
+      put(g, new THREE.BoxGeometry(.08, 1.1, .08), iron, -X + .45, .55, -2.4); put(g, new THREE.BoxGeometry(.08, 1.1, .08), iron, -X + .45, .55, -3.4);
+      const bar = put(g, new THREE.CylinderGeometry(.025, .025, 1.6, 8), std({color: 0xb8bcc4, metalness: .8, roughness: .3}), -X + .5, 1.05, -2.9, Math.PI / 2, 0, 0);
+      for (const z of [-2.25, -3.55]) put(g, new THREE.CylinderGeometry(.22, .22, .07, 18), iron, -X + .5, 1.05, z, Math.PI / 2, 0, 0);
+      for (let i = 0; i < 4; i++) { const db = new THREE.Group(); db.position.set(-X + 1.3 + i * .32, .08, -3.6); g.add(db); put(db, new THREE.CylinderGeometry(.015, .015, .3, 6), iron, 0, 0, 0, 0, 0, Math.PI / 2); for (const s of [-1, 1]) put(db, new THREE.CylinderGeometry(.07, .07, .06, 10), iron, s * .13, 0, 0, 0, 0, Math.PI / 2); }
+      bar.castShadow = true;
+    }
+    if (L === 5) {
+      // trophies on a shelf over the posters
+      put(g, new THREE.BoxGeometry(3.6, .05, .25), woodL, 0, 2.72, -D - .02);
+      const cup = [[.0, 0], [.07, .01], [.05, .05], [.03, .08], [.03, .14], [.09, .2], [.11, .32], [.1, .36]].map(p => new THREE.Vector2(p[0], p[1]));
+      [-1.4, -.7, 0, .7, 1.4].forEach((x, i) => { const c = put(g, new THREE.LatheGeometry(cup, 14), gold, x, 2.745, -D + .02); c.scale.setScalar(i === 2 ? 1.5 : 1.1); });
+    }
+  }
+  // everyone's camp: tyres, the water jar, a bench with pads and gloves, shorts drying on a line, the spirit house
   const tyre = std({color: 0x18181b, roughness: .85});
   for (let k = 0; k < 3; k++) put(g, new THREE.TorusGeometry(.34, .13, 8, 18), tyre, -3.1 + (k === 2 ? .12 : 0), .13 + k * .26, 2.2, Math.PI / 2);
   put(g, new THREE.TorusGeometry(.34, .13, 8, 18), tyre, 3.3, .46, -2.6, 0, .5);
   const jar = [[.05, 0], [.3, .05], [.42, .4], [.36, .75], [.24, .86], [.27, .92]].map(p => new THREE.Vector2(p[0], p[1]));
   put(g, new THREE.LatheGeometry(jar, 14), std({color: 0x7a4a34, roughness: .7}), 3.15, 0, 1.6);
   put(g, new THREE.BoxGeometry(1.8, .07, .36), woodL, -2.9, .45, -2.9); for (const x of [-3.6, -2.2]) put(g, new THREE.BoxGeometry(.07, .45, .3), wood, x, .22, -2.9);
-  // old practice ring further back, fence, plants
-  const ringG = new THREE.Group(); ringG.position.set(-9, 0, -12); g.add(ringG);
-  put(ringG, new THREE.BoxGeometry(5.6, .7, 5.6), std({color: 0x5a6f7a}), 0, .35, 0);
-  for (const [x, z] of [[-2.6, -2.6], [2.6, -2.6], [-2.6, 2.6], [2.6, 2.6]]) put(ringG, new THREE.CylinderGeometry(.07, .07, 1.5, 6), wood, x, 1.45, z);
-  for (const y of [1.1, 1.5, 1.9]) for (let i = 0; i < 4; i++) put(ringG, new THREE.CylinderGeometry(.02, .02, 5.2, 5), std({color: i % 2 ? 0xc9463c : 0x4a78c8}), Math.sin(i * Math.PI / 2) * 2.6, y, Math.cos(i * Math.PI / 2) * 2.6, 0, 0, 0).rotation.set(i % 2 ? Math.PI / 2 : 0, 0, i % 2 ? 0 : Math.PI / 2);
+  const pad = std({color: 0xc23a2e, roughness: .6}), padB = std({color: 0x1f3f8a, roughness: .6});
+  put(g, new THREE.BoxGeometry(.42, .1, .26), pad, -3.35, .54, -2.9, 0, .2, 0); put(g, new THREE.BoxGeometry(.42, .1, .26), padB, -2.85, .54, -2.88, 0, -.15, 0);
+  for (const [x, m] of [[-2.4, pad], [-2.2, pad]]) put(g, new THREE.SphereGeometry(.09, 10, 8), m, x, .55, -2.95).scale.set(1, .8, 1.3);
+  // shorts on a line between two bamboo poles, back left
+  const bamboo = std({color: 0x9a8650, roughness: .8});
+  for (const x of [-6.4, -3.6]) put(g, new THREE.CylinderGeometry(.035, .045, 2.1, 6), bamboo, x, 1.05, -5.6);
+  put(g, new THREE.CylinderGeometry(.006, .006, 2.8, 4), std({color: 0x222222}), -5, 1.98, -5.6, 0, 0, Math.PI / 2);
+  [[-5.9, 0xc9281f], [-5.3, 0x1f55c4], [-4.7, 0xe0a52a], [-4.15, 0xf0f0f2]].forEach(([x, col], i) => put(g, new THREE.PlaneGeometry(.42, .44), basic({map: shortsTex(col, i), transparent: true, alphaTest: .4, side: THREE.DoubleSide}), x, 1.74, -5.6 + i * .01));
+  // spirit house on its pillar, back right, with garlands
+  if (L >= 2) {
+    const sh = new THREE.Group(); sh.position.set(4.9, 0, -4.4); sh.rotation.y = -.5; g.add(sh);
+    put(sh, new THREE.CylinderGeometry(.09, .11, 1.25, 10), white, 0, .62, 0);
+    put(sh, new THREE.BoxGeometry(.78, .07, .78), white, 0, 1.28, 0);
+    put(sh, new THREE.BoxGeometry(.44, .4, .44), L >= 4 ? gold : white, 0, 1.52, 0);
+    const roof = put(sh, new THREE.ConeGeometry(.42, .42, 4), red, 0, 1.93, 0, 0, Math.PI / 4, 0); roof.castShadow = true;
+    put(sh, new THREE.ConeGeometry(.05, .26, 6), gold, 0, 2.25, 0);
+    put(sh, new THREE.BoxGeometry(.16, .22, .02), std({color: 0x2a1a10}), 0, 1.48, .23);
+    for (let i = 0; i < 3; i++) put(sh, new THREE.TorusGeometry(.06, .02, 6, 12), std({color: i % 2 ? 0xffd040 : 0xff8a20, roughness: .7}), -.22 + i * .22, 1.36, .33, Math.PI / 2.3, 0, 0);
+  }
+  // a practice ring in the yard from level 3, closer and dressed from level 5
+  if (L >= 3) {
+    const ringG = new THREE.Group(); ringG.position.set(L >= 4 ? 8.2 : -9, 0, L >= 4 ? -8.2 : -12); ringG.rotation.y = L >= 4 ? -.35 : 0; g.add(ringG);
+    put(ringG, new THREE.BoxGeometry(5.6, .7, 5.6), std({color: L === 5 ? 0x1f3f8a : 0x5a6f7a}), 0, .35, 0);
+    for (const [x, z] of [[-2.6, -2.6], [2.6, -2.6], [-2.6, 2.6], [2.6, 2.6]]) put(ringG, new THREE.CylinderGeometry(.07, .07, 1.5, 6), L === 5 ? red : wood, x, 1.45, z);
+    for (const y of [1.1, 1.5, 1.9]) for (let i = 0; i < 4; i++) put(ringG, new THREE.CylinderGeometry(.02, .02, 5.2, 5), std({color: i % 2 ? 0xc9463c : 0x4a78c8}), Math.sin(i * Math.PI / 2) * 2.6, y, Math.cos(i * Math.PI / 2) * 2.6, 0, 0, 0).rotation.set(i % 2 ? Math.PI / 2 : 0, 0, i % 2 ? 0 : Math.PI / 2);
+  }
+  // fence, palms, banana trees, hills
   const fence = new THREE.InstancedMesh(new THREE.CylinderGeometry(.035, .035, 1.5, 5), std({color: 0x9a8650}), 120), d = new THREE.Object3D();
-  for (let i = 0; i < 120; i++) { d.position.set(-21 + i * .35, .72 + (i % 3) * .05, -8.2); d.rotation.z = (rng() - .5) * .08; d.updateMatrix(); fence.setMatrixAt(i, d.matrix); } g.add(fence);
-  put(g, new THREE.BoxGeometry(42, .06, .06), woodL, 0, 1.1, -8.15); put(g, new THREE.BoxGeometry(42, .06, .06), woodL, 0, .5, -8.15);
+  for (let i = 0; i < 120; i++) { d.position.set(-21 + i * .35, .72 + (i % 3) * .05, -8.2 - (L >= 4 ? 4 : 0)); d.rotation.z = (rng() - .5) * .08; d.updateMatrix(); fence.setMatrixAt(i, d.matrix); } g.add(fence);
+  put(g, new THREE.BoxGeometry(42, .06, .06), woodL, 0, 1.1, -8.15 - (L >= 4 ? 4 : 0)); put(g, new THREE.BoxGeometry(42, .06, .06), woodL, 0, .5, -8.15 - (L >= 4 ? 4 : 0));
   const leafM = std({color: 0x3f7a33}), trunkM = std({color: 0x6a5a48});
-  for (const [x, z, h] of [[-13, -11, 8.5], [-3.5, -13, 10], [6, -11.5, 9], [14, -13, 10.5], [20, -6, 8], [-21, -5, 9.5]]) palm(g, x, 0, z, h, leafM, trunkM);
-  for (const [x, z, h] of [[5.6, -5.4, 1.9], [6.5, -6.2, 2.3], [-6.2, -6, 2.1], [8.6, -9.5, 2.2], [1.5, -9.6, 1.8]]) { const b = bananaTree(h); b.position.set(x, 0, z); b.rotation.y = rng() * 6; g.add(b); }
+  for (const [x, z, h] of [[-13, -11, 8.5], [-3.5, -13, 10], [6, -11.5, 9], [14, -13, 10.5], [20, -6, 8], [-21, -5, 9.5]]) palm(g, x, 0, z - (L >= 4 ? 3 : 0), h, leafM, trunkM);
+  for (const [x, z, h] of [[5.6, -5.4, 1.9], [6.5, -6.2, 2.3], [-6.2, -6.8, 2.1], [8.6, -9.5, 2.2], [1.5, -9.6, 1.8]]) { if (L >= 4 && x > 4 && z < -5) continue; const b = bananaTree(h); b.position.set(x, 0, z); b.rotation.y = rng() * 6; g.add(b); }
   const hill = std({color: 0x5a8a52, roughness: 1});
   for (const [x, z, r] of [[-30, -48, 16], [5, -55, 22], [38, -50, 15]]) { const m = put(g, new THREE.SphereGeometry(r, 12, 8), hill, x, -r * .55, z); m.scale.y = .6; }
-  V.light = {bg: 0xf4dfb4, fog: .007, hemi: [0xdcecff, 0x9a8460, 1.25], key: [0xfff0d2, 2.3, 3.2, 7, 4.2], rim: [0xfff0d0, 0xfff0d0, 0, [-5, 2.6, -4], [5, 2.6, -4]], crowd: [0xfff0d0, 14, 0, 2.6, 1, 14], beam: 0};
-  V.flashRate = 0; V.beamY = H;
+  // the lights come on in the evening
+  V.lights = new THREE.Group(); g.add(V.lights);
+  bulbs({group: V.lights}, lightLines, [0xffe2a0, 0xffd27a, 0xfff0c8]);
+  // everything but the ground, the floor and the sky, so a painted backdrop can stand in for it
+  V.props = new THREE.Group(); [...g.children].forEach(c => { if (c !== ground && c !== floor && c !== V.dome) V.props.add(c); }); g.add(V.props);
+  V.ground = ground; V.floor = floor;
+  campArt(V, L);
+  V.light = CAMP_TIME.day.light; V.flashRate = 0; V.beamY = H;
   return V;
+}
+// A painted camp (assets/camp/camp-<level>.webp, made with ChatGPT, see docs/CAMP_ART_BRIEF.md) on a curved backdrop
+// behind the fighter, centred where the camp cameras look. The fighter's shadow falls on a see-through floor.
+// Without a picture for the level the 3D camp stays.
+const BACKDROP = {r: 7.5, arc: 1.75, center: Math.PI + .2, bottom: -3.6, top: 5.4};
+let campPack;
+function campArt(V, L) {
+  if (campPack === undefined) { const el = document.getElementById('camp-art'); campPack = el ? JSON.parse(el.textContent) : null; }
+  const src = campPack && (campPack[L] || campPack[Math.min(L, Object.keys(campPack).length)]);
+  if (!src) return;
+  const img = new Image(), tex = new THREE.Texture(img); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+  img.onload = () => { tex.needsUpdate = true; }; img.src = src;
+  const B = BACKDROP, h = B.top - B.bottom;
+  const geo = new THREE.CylinderGeometry(B.r, B.r, h, 48, 1, true, B.center - B.arc / 2, B.arc);
+  V.backdrop = put(V.group, geo, basic({map: tex, side: THREE.BackSide, fog: false, toneMapped: false}), 0, B.bottom + h / 2, 0);
+  V.shadow = put(V.group, new THREE.PlaneGeometry(14, 14), new THREE.ShadowMaterial({opacity: .32}), 0, .003, 0, -Math.PI / 2); V.shadow.receiveShadow = true;
+  V.props.visible = V.ground.visible = V.floor.visible = V.dome.visible = false;
+  V.painted = true;
+}
+// set the camp's sky, light and bulbs for a time of day
+function campTimeOf(V, t) {
+  const T = CAMP_TIME[t] || CAMP_TIME.day;
+  if (!V.skyTex[t]) { const tmp = {group: new THREE.Group()}; sky(tmp, T.sky[0], T.sky[1], T.sky[2], T.stars); V.skyTex[t] = tmp.dome.material.map; tmp.dome.geometry.dispose(); }
+  V.dome.material.map = V.skyTex[t]; V.dome.material.needsUpdate = true;
+  V.light = T.light; V.lights.visible = T.bulbs; V.campTime = t;
+  if (V.backdrop) V.backdrop.material.color.setHex(T.tint || 0xffffff); // a painted day, shaded for the time
+}
+// a generic fight poster for the camp wall
+function posterTex(seed) {
+  const pal = [['#c9281f', '#f2b83a'], ['#1f3f8a', '#f0f0f2'], ['#e0a52a', '#1b1300'], ['#2f6a2a', '#f2e6b8'], ['#5a1f6a', '#f2b83a'], ['#1b1b1f', '#e2382f']][seed % 6];
+  return canvasTex(256, 360, (c, w, h) => {
+    c.fillStyle = pal[0]; c.fillRect(0, 0, w, h); c.fillStyle = 'rgba(0,0,0,.18)'; c.fillRect(0, h * .62, w, h * .38);
+    c.fillStyle = pal[1]; c.font = '800 46px Kanit, sans-serif'; c.textAlign = 'center'; c.fillText('ศึกมวยไทย', w / 2, 58);
+    // two fighters' silhouettes facing each other
+    c.fillStyle = 'rgba(0,0,0,.55)';
+    for (const s of [-1, 1]) { const x = w / 2 + s * 58; c.beginPath(); c.arc(x, 128, 22, 0, 7); c.fill(); c.fillRect(x - 24, 152, 48, 70); c.beginPath(); c.arc(x - s * 30, 150, 15, 0, 7); c.fill(); c.fillRect(x - 20, 222, 16, 60); c.fillRect(x + 4, 222, 16, 60); }
+    c.fillStyle = pal[1]; c.font = '800 40px Kanit, sans-serif'; c.fillText('VS', w / 2, 200);
+    c.font = '700 26px Kanit, sans-serif'; c.fillText(['คืนวันเสาร์', 'ชิงเข็มขัด', 'คู่เอก 5 ยก', 'มันส์ทุกคู่', 'ศึกวันพระ', 'ศึกใหญ่ประจำปี'][(seed * 7) % 6], w / 2, h - 70);
+    c.font = '600 20px Kanit, sans-serif'; c.fillText('เวทีมวยประจำจังหวัด', w / 2, h - 36);
+  });
+}
+// a pair of boxing shorts, for the washing line
+function shortsTex(col, i) {
+  return canvasTex(128, 128, (c, w, h) => {
+    c.fillStyle = '#' + col.toString(16).padStart(6, '0');
+    c.beginPath(); c.moveTo(14, 18); c.lineTo(114, 18); c.lineTo(122, 116); c.lineTo(72, 116); c.lineTo(64, 78); c.lineTo(56, 116); c.lineTo(6, 116); c.closePath(); c.fill();
+    c.fillStyle = col === 0xf0f0f2 ? '#c9281f' : '#ffffff'; c.fillRect(14, 18, 100, 16);
+    c.fillStyle = 'rgba(255,255,255,.55)'; c.font = '700 22px Kanit, sans-serif'; c.textAlign = 'center'; c.fillText(['มวย', 'ไทย', 'สู้', 'ชนะ'][i % 4], 36, 80);
+  });
 }
 
 function newVenue() { return {group: new THREE.Group(), ropeSides: [[], [], [], []], corners: [], beams: [], seats: null, anim: null, dome: null, flicker: 1}; }
@@ -444,14 +588,20 @@ export function buildArena(scene) {
   }
   A.setBrightness = function (v) { A.bright = Math.max(.6, Math.min(1.8, +v || 1)); light(); };
   A.keyAt = function (x) { const o = A.keyOff || [1.5, 7, 4.5]; A.key.position.set(x + o[0], o[1], o[2]); A.key.target.position.set(x, 0, 0); };
+  // the camp is built once per camp level (A.campLevel) and lit for the time of day (A.campTime, or the clock)
+  A.campLevel = 1; A.campTime = null;
   A.setVenue = function (key) {
     if (!BUILD[key]) key = 'stadium';
-    if (A.venue === key) return;
-    if (!built[key]) { built[key] = BUILD[key](); A.group.add(built[key].group); }
-    for (const k in built) built[k].group.visible = k === key;
-    A.venue = key; A.V = built[key]; A.flashes.forEach(f => { f.t = 0; f.sp.material.opacity = 0; });
+    const bkey = key === 'camp' ? 'camp' + A.campLevel : key, time = key === 'camp' ? (A.campTime || campTimeNow()) : '';
+    if (A.venue === bkey && (!time || A.V.campTime === time)) return;
+    if (!built[bkey]) { built[bkey] = key === 'camp' ? camp(A.campLevel) : BUILD[key](); A.group.add(built[bkey].group); }
+    for (const k in built) built[k].group.visible = k === bkey;
+    A.venue = bkey; A.V = built[bkey]; A.flashes.forEach(f => { f.t = 0; f.sp.material.opacity = 0; });
+    if (time) campTimeOf(A.V, time);
     light();
   };
+  A.painted = () => !!(A.V && A.V.painted); // a painted camp: the cameras keep to the painted part
+  A.setCamp = function (level, time) { A.campLevel = Math.max(1, Math.min(5, level | 0 || 1)); if (time !== undefined) A.campTime = time; if (A.venue.startsWith('camp')) A.setVenue('camp'); };
   // look: lighting mood per preset
   A.setLook = function (look, renderer) { A.look = look; ren = renderer; if (!A.V) A.setVenue('stadium'); light(); };
   // ropes between the lens and the fighters fade out; keepNear (0..1) leaves them in, as on TV or at ringside

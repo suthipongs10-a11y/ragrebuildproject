@@ -24,6 +24,7 @@
 | `docs/UI_ART_BRIEF.md` | รายการภาพ UI และคำสั่งสำหรับให้ ChatGPT วาด |
 | `docs/ONLINE_STORE_PLAN.md` | แผนเซิร์ฟเวอร์บน VPS และการลงสโตร์ |
 | `docs/DEPLOY_CLOUDFLARE.md` | เอาเกมขึ้นเว็บ (Cloudflare Pages + D1) เล่นกับเพื่อน |
+| `docs/CAMP_ART_BRIEF.md` | คำสั่งภาพค่าย 5 ระดับให้ ChatGPT วาด (ฉากหลังค่ายบนเว็บ) |
 | `docs/muay_auto_fight.html` | เดโม 2D ที่เจ้าของเกมอนุมัติแล้ว เป็นมาตรฐานของจังหวะและความรู้สึก **ห้ามแก้ไฟล์นี้** |
 | `prototypes/fight3d/README.md` | ต้นแบบฉากชก 3D ที่ใช้ตัดสินว่าจะทำเกมต่อหรือไม่ |
 | `STATUS.md` | สถานะปัจจุบันและงานถัดไป อัปเดตทุกครั้งที่จบงาน |
