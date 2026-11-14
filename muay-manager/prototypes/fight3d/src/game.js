@@ -47,12 +47,46 @@ const MOODS = ['แย่มาก', 'แย่', 'ปกติ', 'ดี', 'ด
 const FAIL = {from: 50, perPoint: .9, lowMood: 1.2, fatigue: 8, hurt: .35};
 // Staff: hired once, paid every morning. A coach lifts one kind of training; the masseur helps recovery.
 const STAFF = [
-  {id: 'punch', th: 'ครูหมัด', hire: 900, wage: 30, note: 'ซ้อมกระสอบทรายได้ผล +25%'},
-  {id: 'kick', th: 'ครูเตะ', hire: 900, wage: 30, note: 'ซ้อมเตะต้นกล้วยได้ผล +25%'},
-  {id: 'tech', th: 'ครูเชิง', hire: 900, wage: 30, note: 'ซ้อมถีบหุ่นและลงนวมได้ผล +25%'},
+  {id: 'punch', th: 'ครูหมัด', hire: 900, wage: 30, note: 'ซ้อมกระสอบทรายได้ผล +25% และคุมซ้อมกระสอบแทนให้ฟรีวันละครั้ง'},
+  {id: 'kick', th: 'ครูเตะ', hire: 900, wage: 30, note: 'ซ้อมเตะต้นกล้วยได้ผล +25% และคุมซ้อมเตะแทนให้ฟรีวันละครั้ง'},
+  {id: 'tech', th: 'ครูเชิง', hire: 900, wage: 30, note: 'ซ้อมถีบหุ่นและลงนวมได้ผล +25% และคุมซ้อมแทนให้ฟรีวันละครั้ง (หุ่นหรือลงนวม)'},
   {id: 'massage', th: 'หมอนวด', hire: 600, wage: 25, note: 'นอนพักลดล้าเพิ่มอีก 12 พักนวดลดเพิ่มอีก 10'}
 ];
 const STAFF_ACT = {bag: 'punch', banana: 'kick', dummy: 'tech', spar: 'tech'};
+// Training without pressing: a hired coach runs his own training once a day for free; otherwise a session can be
+// paid for. The result is a solid "good" session (what a fair player gets by hand), never better than playing it well.
+const AUTO = {q: .7, base: 80, perGym: 30};
+const autoCost = () => AUTO.base + AUTO.perGym * S.gym;
+const coachFree = a => { const c = STAFF_ACT[a.drill]; return !!c && S.staff.includes(c) && !(S.coachUsed && S.coachUsed.day === S.day && S.coachUsed.ids.includes(c)); };
+function autoTrain(a, how) {
+  if (S.slots < 1) return '';
+  const cost = how === 'paid' ? autoCost() : 0;
+  if (S.money < cost) return 'เงินไม่พอจ้างครูคุมซ้อม ต้องมี ฿ ' + baht(cost);
+  S.money -= cost;
+  if (how === 'coach') { const c = STAFF_ACT[a.drill], used = S.coachUsed && S.coachUsed.day === S.day ? S.coachUsed.ids : []; S.coachUsed = {day: S.day, ids: used.concat(c)}; }
+  if (Math.random() * 100 < failPct(a)) { S.slots--; S.fatigue = clamp(S.fatigue + FAIL.fatigue, 0, 100); return a.th + ': ซ้อมพลาด ร่างกายล้าเกินไป' + moodUp(-1); }
+  const w = {}, c = cap();
+  if (a.drill) { const mix = a.drill === 'spar' ? {punch: .28, kick: .17, teep: .1, guard: .45} : DRILL_MIX[a.drill]; for (const k in mix) for (const s in KINDS[k].stat) w[s] = (w[s] || 0) + mix[k] * KINDS[k].stat[s]; }
+  else a.stat.forEach(k => { w[k] = 1; });
+  let sum = 0; for (const k in w) sum += w[k];
+  const parts = sum ? Object.keys(w).map(k => { const room = Math.max(.12, 1 - Math.pow(S.stats[k] / c, 2)), g = 2.4 * 1.15 * (w[k] / sum) * room * (1 - S.fatigue / 160) * (1 + .1 * (S.gym - 1)) * boost(a), before = S.stats[k]; S.stats[k] = Math.min(c, S.stats[k] + Math.max(.02, g)); return [k, S.stats[k] - before]; })
+    .filter(p => p[1] >= .05).sort((x, y) => y[1] - x[1]).map(p => STAT_TH[p[0]] + ' +' + p[1].toFixed(1)) : [];
+  S.fatigue = clamp(S.fatigue + a.fat - (a.id === 'rest' && S.staff.includes('massage') ? 10 : 0), 0, 100); S.slots--;
+  mission('train');
+  return a.th + (how === 'coach' ? ' (' + STAFF.find(x => x.id === STAFF_ACT[a.drill]).th + 'คุมให้)' : ' (จ้างครูคุม ฿ ' + baht(cost) + ')') + ': ดี · ' + (parts.join(' · ') || 'ค่าพลังเต็มเพดานค่าย');
+}
+// every session left today, each on the weakest of the trainable stats, coaches first
+function autoDay() {
+  const out = []; let guard = 0;
+  while (S.slots > 0 && guard++ < 6) {
+    const score = a => Math.min(...a.stat.map(k => S.stats[k])) - (coachFree(a) ? 6 : 0); // a free coach session wins a near tie
+    const a = ACTS.filter(x => x.stat.length).sort((x, y) => score(x) - score(y))[0];
+    const how = coachFree(a) ? 'coach' : 'paid';
+    if (how === 'paid' && S.money < autoCost()) { out.push('เงินไม่พอจ้างครูคุมซ้อมครั้งต่อไป (฿ ' + baht(autoCost()) + ')'); break; }
+    out.push(autoTrain(a, how));
+  }
+  return out.join(' • ');
+}
 // One belt per league, fought for against its champion once the fighter is near the top of that league.
 const BELTS = ['เข็มขัดงานวัด', 'เข็มขัดอำเภอ', 'เข็มขัดจังหวัด', 'เข็มขัดเวทีมาตรฐาน', 'เข็มขัดแชมป์ประเทศ'];
 // Drill: the trainer calls strikes, the player presses them in time. What each strike trains, and how often each target calls for it.
@@ -364,6 +398,8 @@ function trainHtml() {
   return '<section class="gcard"><h2>ตารางซ้อมวันนี้ <small>เหลือ ' + S.slots + ' ครั้ง</small></h2>' +
     (S.fatigue >= 70 ? '<p class="warn">ล้ามากแล้ว ซ้อมได้ผลน้อยลงและเสี่ยงเจ็บ ควรพัก</p>' : '') +
     '<div class="acts">' + ACTS.map(a => { const st = a.stat.map(k => STAT_TH[k] + ' ' + Math.floor(S.stats[k]) + '/' + c).join(' · '); return '<button class="act' + (a.drill ? ' drill' : '') + '" data-act="train" data-v="' + a.id + '"' + (S.slots < 1 ? ' disabled' : '') + '>' + art('act-' + a.id, 'pic') + '<b>' + a.th + (a.drill ? ' <i>กดเอง</i>' : '') + '</b><span>' + a.note + '</span><span class="sm">' + (st || 'ไม่ได้ค่าพลัง') + ' · ล้า ' + (a.fat > 0 ? '+' : '') + a.fat + (failPct(a) ? ' · เสี่ยงซ้อมพลาด ' + failPct(a) + '%' : '') + (coachOf(a) ? ' · ครูช่วย +25%' : '') + '</span></button>'; }).join('') + '</div>' +
+    (S.slots > 0 ? '<div class="fld">ไม่อยากกดเอง: ให้ครูคุมซ้อมแทน ได้ผลระดับดี</div><div class="autos">' + ACTS.filter(a => a.drill).map(a => { const free = coachFree(a); return '<button class="btn' + (free ? ' go' : '') + '" data-act="autotrain" data-v="' + a.id + '">' + a.th + ' · ' + (free ? 'ครูคุมฟรี' : '฿ ' + baht(autoCost())) + '</button>'; }).join('') +
+      '<button class="btn" data-act="autoday">ซ้อมแทนให้ครบ ' + S.slots + ' ครั้ง · ไม่เกิน ฿ ' + baht(autoCost() * S.slots) + '</button></div>' : '') +
     (S.slots < 1 ? '<p class="hint">แรงซ้อมหมดแล้ว ไปหาคู่ชก หรือจบวันที่หน้าค่าย</p>' : '<p class="hint">กระสอบทราย ต้นกล้วย หุ่น และลงนวมซ้อมคู่ เป็นการซ้อมแบบกดเอง: ครูเรียกท่า ต่อย เตะ ถีบ ให้กดตามจังหวะ ยิ่งตรงยิ่งได้ผลมาก ซ้อมคู่มีปุ่มบัง กดตอนเพื่อนออกอาวุธ การซ้อมอื่นกดปุ่มออกแรงให้ตรงช่วงสีทอง อารมณ์ตอนนี้ "' + MOODS[S.mood] + '" ผลซ้อม ×' + MOOD_TRAIN[S.mood] + ' ล้าเกิน 50% เริ่มเสี่ยงซ้อมพลาด</p>') +
     (view && view.msg ? '<p class="' + (view.bad ? 'warn' : 'gain') + '">' + view.msg + '</p>' : '') + '</section>';
 }
@@ -775,6 +811,8 @@ function trainResult(q) {
 function onClick(e) {
   const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
   const act = el.dataset.act, v = el.dataset.v;
+  if (act === 'autotrain') { const a = ACTS.find(x => x.id === v); if (!a || S.slots < 1) return; const r = autoTrain(a, coachFree(a) ? 'coach' : 'paid'); view = {msg: r, bad: /ไม่พอ|พลาด/.test(r)}; save(); render(); return; }
+  if (act === 'autoday') { if (S.slots < 1) return; const r = autoDay(); view = {msg: r, bad: /ไม่พอ/.test(r) && !/: ดี/.test(r)}; save(); render(); return; }
   if (act === 'watch') { if (view && view.watch) view = null; else { if (DR) drillEnd(true); view = {watch: true}; } render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   if (act === 'exh') { watchMatch(null, exhibition()); return; }
   if (act === 'watchmore') { F = null; API.stop(); view = {watch: true}; setMode(false); render(); showMe(); if (CLOUD) loadBoard(); return; }
@@ -833,7 +871,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.16'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.17'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }
