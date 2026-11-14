@@ -248,10 +248,36 @@ function topBar() {
   $('gTop').innerHTML = '<div class="who"><b>' + esc(S.name) + '</b><span>' + LEAGUES[league(S.rp)][1] + ' · วันที่ ' + S.day + ' · อารมณ์ ' + art('mood-' + (S.mood + 1), 'mood') + '<i class="' + (S.mood > 2 ? 'hi' : S.mood < 2 ? 'lo' : '') + '">' + MOODS[S.mood] + '</i></span></div>' +
     '<div class="res"><span title="เงิน">' + art('icon-baht', 'ic') + '<b class="sym">฿</b> ' + baht(S.money) + '</span><span title="ชื่อเสียง">' + art('icon-fame', 'ic') + '<b class="sym">★</b> ' + S.fame + '</span><span title="คะแนนอันดับ">' + art('icon-rp', 'ic') + '<b class="sym">RP</b> ' + S.rp + '</span></div>' +
     '<div class="fat" title="ความล้า"><span>' + art('icon-fatigue', 'ic') + 'ล้า ' + f + '%</span><span class="t"><i class="' + (f >= 70 ? 'hi' : f >= 40 ? 'mid' : '') + '" style="width:' + f + '%"></i></span>' +
-    (F ? '' : '<button class="btn link gset" data-act="settings" aria-pressed="' + !!(view && view.settings) + '">' + SPEAKER + 'ตั้งค่า</button>') + '</div>';
+    (F ? '' : '<span class="gtools"><button class="btn link gset" data-act="watch" aria-pressed="' + !!(view && view.watch) + '">' + SCREEN + 'ดูมวย</button><button class="btn link gset" data-act="settings" aria-pressed="' + !!(view && view.settings) + '">' + SPEAKER + 'ตั้งค่า</button></span>') + '</div>';
 }
 const SPEAKER = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M16 8.5a5 5 0 0 1 0 7M18.8 5.8a9 9 0 0 1 0 12.4"/></svg>';
 // sound settings (the viewer keeps them in this browser)
+const SCREEN = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="12.5" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path fill="currentColor" d="M10 8.2v5.6l4.6-2.8z"/><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M8 20.5h8"/></svg>';
+// Watching for its own sake: online challenge matches live, coming up and from the last three days, and an exhibition
+// between two fighters from the ranking. Nothing here changes the player's fighter.
+function watchHtml() {
+  const now = Date.now(), all = CLOUD ? matches().filter(m => m.a && m.a.accept) : [];
+  const live = all.filter(m => now >= m.start && now < m.start + MATCH_LEN), soon = all.filter(m => now < m.start);
+  const past = all.filter(m => now >= m.start + MATCH_LEN).sort((a, b) => b.start - a.start).slice(0, 20);
+  const part = (title, list, empty) => '<div class="fld">' + title + '</div>' + (list.length ? list.map(m => matchRow(m, false)).join('') : '<p class="hint">' + empty + '</p>');
+  return '<section class="gcard"><h2>ดูมวย <small>ดูอย่างเดียว ไม่มีผลกับนักมวยของเรา</small></h2>' +
+    '<div class="fld">ไฟต์อุ่นเครื่อง</div><p class="hint">สุ่มนักมวยสองคนจากตารางอันดับขึ้นชกให้ดูเต็มไฟต์</p><div class="rowbtn"><button class="btn go" data-act="exh">สุ่มคู่ชกให้ดู</button></div>' +
+    (CLOUD ? part('สดตอนนี้', live, 'ไม่มีคู่ท้าชกที่กำลังชกอยู่') + part('กำลังจะขึ้นเวที', soon, 'ยังไม่มีนัด') + part('ดูย้อนหลัง · 3 วันล่าสุด', past, 'ยังไม่มีคู่ท้าชกที่ชกจบ')
+      : '<p class="hint">คู่ท้าชกของผู้เล่นคนอื่นดูได้เมื่อเกมออนไลน์</p>') +
+    '<div class="rowbtn"><button class="btn" data-act="setback">กลับ</button></div></section>';
+}
+// an exhibition: two fighters from the ranking (other players and the built-in rivals), the player's own excluded
+function exhibition() {
+  const pool = GHOSTS.slice(0, 30).map(g => Object.assign(makeOpp(g.seed, ghostTotal(g.rp), g.name), {rp: g.rp}))
+    .concat(board.map(b => ({name: b.name, style: b.style, body: b.body, look: b.look, stats: b.stats, rp: b.rp})));
+  const a = pool[Math.floor(Math.random() * pool.length)]; let b = a;
+  for (let k = 0; k < 20 && (b === a || Math.abs(b.rp - a.rp) > 260); k++) b = pool[Math.floor(Math.random() * pool.length)];
+  if (b === a) b = pool[(pool.indexOf(a) + 1) % pool.length];
+  const venues = ['temple', 'chuek', 'province', 'stadium', 'champ'], venue = venues[Math.min(4, Math.max(0, league((a.rp + b.rp) / 2)))];
+  const side = x => ({spec: {style: x.style, stats: x.stats, sp: (STYLES.find(s => s.id === x.style) || STYLES[0]).sp}, plan: OPP_PLAN[x.style] || PLAN_DEFAULT, look: x.look, body: x.body});
+  const seed = 1 + Math.floor(Math.random() * 999999);
+  return {key: 'exh:' + seed, from: 'x', to: 'y', exh: true, e: Object.assign(side(a), {seed, venue}), a: Object.assign(side(b), {accept: true}), start: 0, fromName: a.name, toName: b.name, venue};
+}
 // settings: sound and picture
 const VOL_TH = [['music', 'ดนตรีปี่กลอง'], ['voice', 'เสียงพากย์และกรรมการ'], ['crowd', 'เสียงคนดู'], ['sfx', 'เสียงชก ระฆัง']];
 function settingsHtml() {
@@ -279,6 +305,7 @@ function render() {
   nav();
   const b = $('gBody');
   if (view && view.settings) b.innerHTML = settingsHtml();
+  else if (view && view.watch) b.innerHTML = watchHtml();
   else if (tab === 'home') b.innerHTML = homeHtml();
   else if (tab === 'train') b.innerHTML = trainHtml();
   else if (tab === 'dress') b.innerHTML = dressHtml();
@@ -436,13 +463,13 @@ function breakHtml() {
     '<button class="btn go wide" data-act="resume">ชกต่อ</button></section>';
 }
 function liveHtml() {
-  if (F.live) return '<section class="gcard slim"><div class="kv"><span>ท้าชก</span><b>' + esc(F.live.fromName) + ' vs ' + esc(F.live.toName) + '</b><span>เวที</span><b>' + API.VENUES[F.live.venue] + '</b></div><p class="hint">ชกสด พักยกแก้แผนไม่ได้</p><div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button></div></section>';
+  if (F.live) return '<section class="gcard slim"><div class="kv"><span>' + (F.live.exh ? 'อุ่นเครื่อง' : 'ท้าชก') + '</span><b>' + esc(F.live.fromName) + ' vs ' + esc(F.live.toName) + '</b><span>เวที</span><b>' + API.VENUES[F.live.venue] + '</b></div><p class="hint">ชกสด พักยกแก้แผนไม่ได้</p><div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button></div></section>';
   return '<section class="gcard slim"><div class="kv"><span>แผนตอนนี้</span><b>' + planText(F.plan) + '</b><span>คู่ชก</span><b>' + esc(F.opp.name) + ' · สาย' + styleTh(F.opp.style) + '</b></div>' +
     '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button></div></section>';
 }
 function resultHtml() {
   const r = F.res;
-  if (F.live) return '<section class="gcard"><h2' + (r.win == null ? '>ผลการท้าชก' : ' class="' + (r.win ? 'win' : 'lose') + ' ribbon" data-ui="ribbon-' + (r.win ? 'win' : 'lose') + '">' + (r.win ? 'ชนะ' : 'แพ้') + ' ' + esc(r.how)) + '</h2><p class="hint">' + esc(r.detail) + '</p>' + r.extra.map(x => '<p class="gain">' + x + '</p>').join('') + '<button class="btn go wide" data-act="home">กลับค่าย</button></section>';
+  if (F.live) return '<section class="gcard"><h2' + (r.win == null ? '>' + (F.live.exh ? 'ผลไฟต์อุ่นเครื่อง' : 'ผลการท้าชก') : ' class="' + (r.win ? 'win' : 'lose') + ' ribbon" data-ui="ribbon-' + (r.win ? 'win' : 'lose') + '">' + (r.win ? 'ชนะ' : 'แพ้') + ' ' + esc(r.how)) + '</h2><p class="hint">' + esc(r.detail) + '</p>' + r.extra.map(x => '<p class="gain">' + x + '</p>').join('') + (F.me < 0 ? '<div class="rowbtn"><button class="btn go" data-act="watchmore">ดูคู่อื่นต่อ</button><button class="btn" data-act="home">กลับค่าย</button></div>' : '<button class="btn go wide" data-act="home">กลับค่าย</button>') + '</section>';
   return '<section class="gcard"><h2 class="' + (r.win ? 'win' : 'lose') + ' ribbon" data-ui="ribbon-' + (r.win ? 'win' : 'lose') + '">' + (r.win ? 'ชนะ' : 'แพ้') + ' ' + esc(r.how) + '</h2><p class="hint">' + esc(r.detail) + '</p>' +
     '<div class="kv"><span>เงินรางวัล</span><b>+ ฿ ' + baht(r.money) + '</b><span>ชื่อเสียง</span><b>+ ' + r.fame + '</b>' + (r.drp != null ? '<span>คะแนนอันดับ</span><b>' + (r.drp >= 0 ? '+' : '') + r.drp + ' (เป็น ' + S.rp + ')</b>' : '') + '<span>ประสบการณ์เวที</span><b>' + r.xp + '</b><span>ความล้า</span><b>+' + r.fat + '</b></div>' +
     (r.promo ? '<p class="gain">เลื่อนขึ้น' + r.promo + '! โบนัส ฿ ' + baht(r.promoMoney) + '</p>' : '') + r.extra.map(x => '<p class="gain">' + x + '</p>').join('') +
@@ -499,7 +526,8 @@ function onOver(res) {
 // from the same seed, the two fighters as they were when challenged and accepted, and the plans they chose then.
 // Shared documents (rules in the artifact's db declaration): challenges/<challenger id> {name, list: {<opponent id>: …}}
 // and answers/<responder id> {list: {<challenger id>: …}}; each player writes only his own document.
-const MATCH_LEN = 5 * 60e3, MATCH_KEEP = 6 * 3600e3, CH_REWARD = {win: [400, 10], lose: [100, 2]};
+const MATCH_LEN = 5 * 60e3, MATCH_KEEP = 72 * 3600e3, // replays stay three days
+   CH_REWARD = {win: [400, 10], lose: [100, 2]};
 const CH = {cdocs: {}, adocs: {}, on: false, live: new Set()};
 const WHEN = [['n5', 'อีก 5 นาที'], ['n30', 'อีก 30 นาที'], ['n60', 'อีก 1 ชั่วโมง'], ['t18', '18:00 น.'], ['t20', '20:00 น.'], ['t21', '21:00 น.']];
 function whenTime(k) {
@@ -605,8 +633,8 @@ function challengeHtml() {
 }
 const upcomingHtml = () => { const list = matches().filter(m => m.a && m.a.accept && Date.now() < m.start + MATCH_LEN).slice(0, 8); return list.length ? '<section class="gcard"><h2>แมตช์ท้าชกที่กำลังจะมา <small>ใครก็ดูได้</small></h2>' + list.map(m => matchRow(m, false)).join('') + '</section>' : ''; };
 const nextMineHtml = () => { const m = mine().find(x => x.a && x.a.accept && Date.now() < x.start + MATCH_LEN && x.start - Date.now() < 30 * 60e3); return m ? '<section class="gcard hot"><h2>แมตช์ท้าชกของเรา</h2>' + matchRow(m, true) + '</section>' : ''; };
-async function watchMatch(key) {
-  const m = matches().find(x => x.key === key); if (!m || !m.a || !m.a.accept) return;
+async function watchMatch(key, given) {
+  const m = given || matches().find(x => x.key === key); if (!m || !m.a || !m.a.accept) return;
   const cfg = matchCfg(m), me = CLOUD && m.from === CLOUD.uid ? 0 : CLOUD && m.to === CLOUD.uid ? 1 : -1;
   F = {opp: {name: me === 1 ? m.fromName : m.toName, style: cfg.specs[me === 1 ? 0 : 1].style}, seed: cfg.seed, live: m, me, phase: 'live', plan: cfg.plans[Math.max(0, me)][0]};
   setMode(true); render();
@@ -732,6 +760,9 @@ function trainResult(q) {
 function onClick(e) {
   const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
   const act = el.dataset.act, v = el.dataset.v;
+  if (act === 'watch') { if (view && view.watch) view = null; else { if (DR) drillEnd(true); view = {watch: true}; } render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
+  if (act === 'exh') { watchMatch(null, exhibition()); return; }
+  if (act === 'watchmore') { F = null; API.stop(); view = {watch: true}; setMode(false); render(); showMe(); if (CLOUD) loadBoard(); return; }
   if (act === 'settings') { if (view && view.settings) view = null; else { if (DR) drillEnd(true); view = {settings: true}; } render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   if (act === 'soundon') { API.sound.set(!API.sound.on); API.sound.test(); render(); return; }
   if (act === 'soundtest') { API.sound.test(); return; }
@@ -787,7 +818,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.12'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.13'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

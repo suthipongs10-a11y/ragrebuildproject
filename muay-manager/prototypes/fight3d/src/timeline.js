@@ -177,6 +177,18 @@ export function bake(fight) {
   const hash = x => { const s = Math.sin(x * 127.1 + 31.7) * 43758.5453; return s - Math.floor(s); };
   // How a fighter carries himself between exchanges follows what his corner asked for this round:
   // 0 feeling out (on his toes, with pauses), 1 walking forward (no bounce), 2 waiting (planted, guard up, slow sway).
+  // While the other man is down and being counted, the one on his feet lowers his hands and stands easy (there is
+  // nobody to guard against), and brings the guard back up as the count ends and the man rises.
+  const relaxW = [new Float32Array(n + 1), new Float32Array(n + 1)];
+  for (const e of fight.events) {
+    if (e.type !== 'kd') continue;
+    const up = fight.events.find(x => x.t > e.t && ((x.type === 'getup' && x.on === e.on) || x.type === 'ko' || (x.type === 'phase' && x.phase !== 'fight')));
+    const t0 = e.t + .7, t1 = up ? up.t - (up.type === 'getup' ? .5 : 0) : n * dt, R = relaxW[e.by];
+    for (let k = Math.max(0, Math.floor(t0 / dt)); k <= Math.min(n, Math.ceil((t1 + .5) / dt)); k++) {
+      const t = k * dt, w = Math.min(1, (t - t0) / .6, up && up.type === 'getup' ? (t1 + .5 - t) / .5 : 1);
+      R[k] = Math.max(R[k], Math.max(0, w));
+    }
+  }
   const MODE = {balanced: 0, attack: 1, counter: 2}, mode = [new Uint8Array(n), new Uint8Array(n)];
   for (const e of fight.events) if (e.type === 'plan') mode[e.by].fill(MODE[e.ag] || 0, Math.min(n, Math.round(e.t / dt)));
   const smooth = (a, b, x) => { const k = Math.max(0, Math.min(1, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
@@ -268,7 +280,8 @@ export function bake(fight) {
       const x = Math.max(0, Math.min(n - 1.001, t / dt)), k = Math.floor(x), fr = x - k, B = baked[i], o = k * NP;
       for (let j = 0; j < NP; j++) out[j] = B[o + j] + (B[o + NP + j] - B[o + j]) * fr;
       const st = TK[(k * 2 + i) * TICK_FIELDS + 4];
-      const iw = idleW[i][k] + (idleW[i][k + 1] - idleW[i][k]) * fr;
+      const rw = relaxW[i][k] + (relaxW[i][k + 1] - relaxW[i][k]) * fr, rs = rw * rw * (3 - 2 * rw);
+      const iw = (idleW[i][k] + (idleW[i][k + 1] - idleW[i][k]) * fr) * (1 - rs);
       if (iw > 0) {
         const amp = iw * (TK[(k * 2 + i) * TICK_FIELDS + 2] < 25 ? .7 : 1); // a tired fighter moves less
         solve(out, 0, J); let sx = (J.shL.x + J.shR.x) / 2, sy = (J.shL.y + J.shR.y) / 2, sz = (J.shL.z + J.shR.z) / 2; // shoulders before he moves on his own
@@ -357,6 +370,12 @@ export function bake(fight) {
         out[IDX.hip + 1] += Math.sin(ph) * .012 - tired * .02;
         out[IDX.hL + 1] += Math.sin(ph + 1) * .008 - tired * .09; out[IDX.hR + 1] += Math.sin(ph + 1.4) * .008 - tired * .11;
         out[IDX.lean] += tired * .1;
+      }
+      if (rs > 0) { // hands down, standing easy: only the upper body, the legs keep walking where the fight takes them
+        const E = FLAT.cerStand, br = Math.sin(t * 1.9 + i) * .012;
+        for (const v of [IDX.hL, IDX.hR, IDX.eL, IDX.eR]) for (let j = 0; j < 3; j++) out[v + j] += (E[v + j] - out[v + j]) * rs;
+        for (const v of [IDX.lean, IDX.hdP, IDX.twist]) out[v] += (E[v] - out[v]) * rs;
+        out[IDX.hip + 1] += (E[IDX.hip + 1] - out[IDX.hip + 1]) * rs * .6 + br * rs; // straightens up, breathing
       }
       return out;
     }
