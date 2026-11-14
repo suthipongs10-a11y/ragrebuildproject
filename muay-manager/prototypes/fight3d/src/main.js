@@ -328,29 +328,53 @@ function showResult() {
 // The engine keeps the fighters 2.35 m either side of the centre at most; the ropes are at 3.05 m. When the fight drifts
 // to the edge both slide over together (the gap between them, and so every blow, unchanged) until the back man leans
 // on the ropes. Presentation only.
-const ROPE_FROM = 170, ROPE_GAIN = .62, BACK = .3; // cm where the slide starts; metres at the limit; body behind the hips
+// The fight line also turns around the ring centre (TL.theta: circling, presentation only), so a man backed up toward
+// a side meets the ropes there, and one backed up toward a corner slides all the way into it (a square ring reaches
+// farther along its diagonals).
+const ROPE_FROM = 170, BACK = .3, R_ROPE = 3.05; // cm where the slide starts; body behind the hips; ropes from the centre
+const ROPE_N = [[0, 1], [1, 0], [0, -1], [-1, 0]]; // each side's outward direction (x, z): side 0 z+, 1 x+, 2 z-, 3 x-
+const turn = t => (TL && TL.theta ? TL.theta(t) : 0);
+const toRopes = (c, s) => R_ROPE / Math.max(Math.abs(c), Math.abs(s), 1e-3);
 function pairShift(t) {
   const xa = TL.val(0, t, 0), xb = TL.val(1, t, 0), back = Math.abs(xa) > Math.abs(xb) ? xa : xb, lim = (CFG.rules && CFG.rules.limit) || RULES.limit;
-  const k = Math.max(0, Math.min(1, (Math.abs(back) - ROPE_FROM) / (lim - ROPE_FROM)));
-  return Math.sign(back) * k * k * (3 - 2 * k) * ROPE_GAIN;
+  const k = Math.max(0, Math.min(1, (Math.abs(back) - ROPE_FROM) / (lim - ROPE_FROM))), sg = Math.sign(back) || 1, th = turn(t);
+  const gain = Math.max(0, toRopes(Math.cos(th), Math.sin(th)) + .22 - BACK - lim / 100); // to the ropes along this line
+  return sg * k * k * (3 - 2 * k) * gain;
 }
 let ropeBounce = [0, 0]; // the rope throwing a man back off it: extra metres toward the centre
-const fx0 = (i, t) => TL.val(i, t, 0) * .01 + pairShift(t);
-function poseFighters(t) {
-  for (let i = 0; i < 2; i++) { TL.sample(i, t, buf[i]); const x = fx0(i, t); fighters[i].update(buf[i], 0, x - Math.sign(x) * ropeBounce[i]); }
+const fx0 = (i, t) => TL.val(i, t, 0) * .01 + pairShift(t); // along the fight line
+const place = {x: 0, z: 0, th: 0};
+function placeOf(i, t, extra) { // world position on the turned line
+  const a = fx0(i, t), x = a - Math.sign(a) * (ropeBounce[i] + (extra || 0)), th = turn(t);
+  place.x = x * Math.cos(th); place.z = -x * Math.sin(th); place.th = th; return place;
 }
-// each frame: who is leaning on which rope, and the rope pushing back
+function poseFighters(t) {
+  for (let i = 0; i < 2; i++) {
+    TL.sample(i, t, buf[i]); const p = placeOf(i, t), f = fighters[i];
+    f.update(buf[i], 0, p.x, p.z, (f.dir > 0 ? 0 : Math.PI) - buf[i][IDX.spin] + p.th);
+  }
+}
+// how far a fighter's back is past each rope (negative: short of it) at time t
+function ropeDepths(i, t, out) {
+  const a = fx0(i, t) + (i ? 1 : -1) * BACK, th = turn(t), qx = a * Math.cos(th), qz = -a * Math.sin(th); // red's back is toward -x, blue's toward +x
+  for (let s = 0; s < 4; s++) out[s] = qx * ROPE_N[s][0] + qz * ROPE_N[s][1] - (R_ROPE - .03);
+  out.x = qx; out.z = qz; return out;
+}
+const depthBuf = [0, 0, 0, 0];
+// each frame: who is leaning on which rope (two in a corner), and the ropes pushing back
 function ropes(t, dt) {
   if (!arena || !arena.V || !arena.V.ropeSides[1].length || !TL) return;
   for (let i = 0; i < 2; i++) {
-    const x = fx0(i, t), side = x > 0 ? 1 : 3, depth = Math.abs(x) + BACK - (R_ROPE - .03);
-    if (depth > 0) arena.ropePush(side, Math.min(.18, depth * .85), 0); // a body leaning back sinks into the ropes
+    const d = ropeDepths(i, t, depthBuf); let give = 0, near = false;
+    for (let s = 0; s < 4; s++) {
+      if (d[s] > 0) arena.ropePush(s, Math.min(.18, d[s] * .85), s % 2 ? d.z : d.x); // a body leaning back sinks into the ropes
+      if (d[s] > -.05) { near = true; give = Math.max(give, arena.ropeGive(s)); }
+    }
     ropeBounce[i] = Math.max(0, ropeBounce[i] - dt * .5);
-    if (depth > -.05) ropeBounce[i] = Math.max(ropeBounce[i], Math.min(.12, arena.ropeGive(side) * .8));
+    if (near) ropeBounce[i] = Math.max(ropeBounce[i], Math.min(.12, give * .8));
   }
   arena.ropeUpdate(dt);
 }
-const R_ROPE = 3.05;
 function handle(e) {
   const rp = mode === 'replay';
   if (!rp && !frozen) voice.event(e, audio.time());
@@ -398,7 +422,7 @@ function handle(e) {
       const m = MOVES[e.move];
       poseFighters(e.t);
       const at = fighters[e.by], df = fighters[e.on], p = at.world(EFF_JOINT[m.eff], tmpV).clone();
-      if (e.res === 'hit' && arena) { const x = fx0(e.on, e.t); if (Math.abs(x) + BACK > R_ROPE - .12) arena.ropeKick(x > 0 ? 1 : 3, .7 + (m.push || 0) * .035 + (e.sev || 0) * .25); } // driven into the ropes
+      if (e.res === 'hit' && arena) { const d = ropeDepths(e.on, e.t, depthBuf); for (let s2 = 0; s2 < 4; s2++) if (d[s2] > -.12) arena.ropeKick(s2, .7 + (m.push || 0) * .035 + (e.sev || 0) * .25); } // driven into the ropes
       const away = df.root.position.x > at.root.position.x ? 1 : -1;
       if (e.res === 'hit') {
         const s = e.sev, ko = marks.ko && marks.ko.t === e.t;
@@ -491,10 +515,17 @@ function advance(dt) {
 // ---------- camera director ----------
 // A shot is either an orbit around the action (az, h, fitted distance) or a fixed broadcast position with a zoom lens.
 const cam = {id: null, az: 0, h: 1.5, fit: 5, fitH: 2.3, tx: 0, ty: 1.05, px: 0, py: 2, pz: 8, fixed: false};
-const shot = {id: '', az: 0, h: 1.5, fit: 5, fitH: 2.3, tx: 0, ty: 1.05, px: 0, py: 0, pz: 0, fixed: false, cut: false, hand: 0, ropes: 0};
+const shot = {id: '', az: 0, h: 1.5, fit: 5, fitH: 2.3, tx: 0, ty: 1.05, px: 0, py: 0, pz: 0, fixed: false, cut: false, hand: 0, ropes: 0, alpha: 0, cz: 0};
+// Shots are worked out in the fight's own frame (the fight line along x) and turned into the ring at the end
+// (applyCamera): the moving cameras turn with the fighters as they circle; the ringside TV cameras stay put and the
+// director cuts to the side that sees the two side-on (the frame snaps by quarter turns at each cut).
+const QUARTER = Math.PI / 2, snapTurn = a => Math.round(a / QUARTER) * QUARTER;
 function direct(t) {
-  const xa = fx0(0, t), xb = fx0(1, t), mid = (xa + xb) / 2, sep = Math.abs(xb - xa);
+  const th = turn(t), tv = OPT.cam === 'tv' && mode !== 'replay', alpha = tv ? snapTurn(turn(tvCutAt(t).t)) : th, dl = th - alpha;
+  const cd = Math.cos(dl), sd = Math.sin(dl), a0 = fx0(0, t), b0 = fx0(1, t);
+  const xa = a0 * cd, xb = b0 * cd, mid = (xa + xb) / 2, sep = Math.abs(b0 - a0);
   const s = shot; s.cut = false; s.hand = 0; s.tx = mid; s.ty = 1.02; s.id = 'base'; s.fitH = 2.3; s.fixed = false; s.ropes = 0;
+  s.alpha = alpha; s.cz = -(a0 + b0) / 2 * sd; // the pair's centre off the frame's line (TV only)
   const inIntro = t < marks.introEnd, rest = marks.rests.find(r => t >= r.t0 && t < r.t1);
   let push = 0;
   for (const e of marks.bigHits) { const d = e.t - t; if (d > -.35 && d < .5) push = Math.max(push, d > 0 ? smooth(1 - d / .5) : smooth(1 + d / .35)); }
@@ -548,28 +579,29 @@ function direct(t) {
 function applyCamera(dt) {
   const s = direct(playT);
   if (cam.id === null || (s.cut && s.id !== cam.id) || (cam.cutId && !s.cut) || cam.fixed !== s.fixed) {
-    cam.az = s.az; cam.h = s.h; cam.fit = s.fit; cam.fitH = s.fitH; cam.tx = s.tx; cam.ty = s.ty; cam.px = s.px; cam.py = s.py; cam.pz = s.pz;
+    cam.az = s.az; cam.h = s.h; cam.fit = s.fit; cam.fitH = s.fitH; cam.tx = s.tx; cam.ty = s.ty; cam.px = s.px; cam.py = s.py; cam.pz = s.pz; cam.cz = s.cz;
   } else {
     const k = 1 - Math.exp(-dt * 4.5), kf = 1 - Math.exp(-dt * (s.fixed ? 3.2 : 7));
     cam.az = lerp(cam.az, s.az, k); cam.h = lerp(cam.h, s.h, k); cam.fit = lerp(cam.fit, s.fit, kf); cam.fitH = lerp(cam.fitH, s.fitH, kf);
-    cam.tx = lerp(cam.tx, s.tx, k); cam.ty = lerp(cam.ty, s.ty, k); cam.px = lerp(cam.px, s.px, k); cam.py = lerp(cam.py, s.py, k); cam.pz = lerp(cam.pz, s.pz, k);
+    cam.tx = lerp(cam.tx, s.tx, k); cam.ty = lerp(cam.ty, s.ty, k); cam.px = lerp(cam.px, s.px, k); cam.py = lerp(cam.py, s.py, k); cam.pz = lerp(cam.pz, s.pz, k); cam.cz = lerp(cam.cz || 0, s.cz, k);
   }
   cam.id = s.id; cam.cutId = s.cut; cam.fixed = s.fixed;
-  let px, py, pz, lx = cam.tx, ly = cam.ty, fov = 30;
+  let px, py, pz, lx = cam.tx, ly = cam.ty, lz = cam.cz || 0, fov = 30;
   if (s.fixed) { // fixed position, the lens zooms to frame the action
     px = cam.px; py = cam.py; pz = cam.pz;
-    const dist = Math.hypot(px - lx, py - ly, pz), half = Math.max(cam.fitH / 2, cam.fit / 2 / camera.aspect) * (1 - zoomKick);
+    const dist = Math.hypot(px - lx, py - ly, pz - lz), half = Math.max(cam.fitH / 2, cam.fit / 2 / camera.aspect) * (1 - zoomKick);
     fov = clamp(2 * Math.atan(half / dist) * 180 / Math.PI, 4, 50);
   } else {
     const vf = 15 * Math.PI / 180, hf = Math.atan(Math.tan(vf) * camera.aspect);
     const D = Math.max(2.3, (cam.fit / 2) / Math.tan(hf), (cam.fitH / 2) / Math.tan(vf)) * (1 - zoomKick);
-    px = cam.tx + Math.sin(cam.az) * D; py = cam.h; pz = Math.cos(cam.az) * D;
+    px = cam.tx + Math.sin(cam.az) * D; py = cam.h; pz = lz + Math.cos(cam.az) * D;
   }
   if (Math.abs(camera.fov - fov) > .01) { camera.fov = fov; camera.updateProjectionMatrix(); }
   const sway = s.fixed ? fov / 30 : 1; // a long lens magnifies every wobble, so scale it down
   if (s.hand && !REDUCED) { px += Math.sin(realT * 1.7) * .035 + Math.sin(realT * 4.1) * .012; py += Math.sin(realT * 2.3) * .025; ly += Math.sin(realT * 3.1) * .02; lx += Math.sin(realT * 1.3) * .03; }
   if (shake > .0005) { const k = s.fixed ? 2.5 : 1; lx += (Math.random() - .5) * shake * 2 * k * sway; ly += (Math.random() - .5) * shake * 2 * k * sway; if (!s.fixed) { px += (Math.random() - .5) * shake * 2; py += (Math.random() - .5) * shake * 2; } }
-  camera.position.set(px, py, pz); camera.lookAt(lx, ly, 0);
+  const ca = Math.cos(s.alpha), sa = Math.sin(s.alpha); // from the fight's frame into the ring
+  camera.position.set(px * ca + pz * sa, py, -px * sa + pz * ca); camera.lookAt(lx * ca + lz * sa, ly, -lx * sa + lz * ca);
   arena.fadeRopes(camera.position, s.ropes);
 }
 
@@ -620,8 +652,7 @@ function frame(ts) {
     const ef = TL.effAt(i, playT);
     if (OPT.trail && ef && adv > 0) { const p = fighters[i].world(EFF_JOINT[EFF_NAME[ef]], tmpV); if (p.distanceToSquared(lastTrail[i]) > .0009) { fx.trailPush(i, p); lastTrail[i].copy(p); } }
   }
-  const mid = (fighters[0].root.position.x + fighters[1].root.position.x) / 2;
-  arena.keyAt(mid);
+  arena.keyAt((fighters[0].root.position.x + fighters[1].root.position.x) / 2, (fighters[0].root.position.z + fighters[1].root.position.z) / 2);
   applyCamera(dt);
   if (window.LAB.eye) { const e = window.LAB.eye; camera.position.set(e[0], e[1], e[2]); camera.lookAt(e[3], e[4], e[5]); camera.fov = e[6] || 40; camera.updateProjectionMatrix(); arena.fadeRopes(camera.position, 1); } // fixed viewpoint for checks
   fx.update(Math.max(adv, dt * .2), camera);
@@ -863,7 +894,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 37 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 38 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

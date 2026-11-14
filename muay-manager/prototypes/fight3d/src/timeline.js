@@ -265,7 +265,42 @@ export function bake(fight) {
   }
   footwork(0); footwork(1);
 
+  // Circling (presentation only): the line between the two fighters turns around the ring centre while neither is
+  // throwing, one way for a few seconds then maybe the other, faster while feeling each other out, faster still when
+  // the man backing up is at the ropes (he slides along them to get out). Still during exchanges and counts, back
+  // to the starting line at the bell and between rounds. Read from the ticks, so every viewer sees the same.
+  const theta = new Float32Array(n + 1);
+  {
+    const busy = new Uint8Array(n + 1), SPIN = .45, H = x => { const v = Math.sin(x * 91.7 + 13.1) * 43758.5453; return v - Math.floor(v); };
+    for (let k = 0; k < n; k++) for (let i = 0; i < 2; i++) {
+      const st = TK[(k * 2 + i) * TICK_FIELDS + 4];
+      if (st !== STATE.idle && st !== STATE.rest && st !== STATE.intro && st !== STATE.clinch && st !== STATE.clinched) busy[k] = 1;
+    }
+    const wide = Math.round(.35 / dt), act = new Uint8Array(n + 1); // an exchange holds the line a moment either side
+    for (let k = 0; k < n; k++) if (busy[k]) for (let j = Math.max(0, k - wide); j <= Math.min(n, k + wide); j++) act[j] = 1;
+    let th = 0, w = 0, trapDir = 0;
+    for (let k = 0; k < n; k++) {
+      const t = k * dt, s0 = TK[(k * 2) * TICK_FIELDS + 4], s1 = TK[(k * 2 + 1) * TICK_FIELDS + 4];
+      const resting = s0 === STATE.rest || s1 === STATE.rest || s0 === STATE.intro || s1 === STATE.intro;
+      const down = s0 === STATE.down || s1 === STATE.down || s0 === STATE.getup || s1 === STATE.getup || s0 === STATE.ko || s1 === STATE.ko || s0 === STATE.win || s1 === STATE.win;
+      const clinch = s0 === STATE.clinch || s0 === STATE.clinched;
+      let want = 0;
+      if (resting) { const home = Math.round(th / (Math.PI * 2)) * Math.PI * 2; want = (home - th) * 1.2; }
+      else if (down) want = 0;
+      else if (clinch) want = (H(Math.floor(t / 2.5)) < .5 ? -1 : 1) * SPIN; // wrestling round and round
+      else if (!act[k]) {
+        const xa = TK[(k * 2) * TICK_FIELDS], xb = TK[(k * 2 + 1) * TICK_FIELDS], back = Math.max(Math.abs(xa), Math.abs(xb));
+        const seg = Math.floor((t + H(Math.floor(t / 3)) * 2) / 3.4), dir = H(seg * 3 + 1) < .5 ? -1 : 1, sp = .2 + .22 * H(seg * 7 + 2);
+        if (back > 205) { if (!trapDir) trapDir = H(k * .37) < .5 ? -1 : 1; want = trapDir * .6; } // off the ropes, sideways
+        else { trapDir = 0; want = dir * sp * (1.25 - .55 * paceAt(t)) * (H(seg * 11 + 5) < .18 ? 0 : 1); } // now and then a pause
+      }
+      w += (want - w) * Math.min(1, dt * 3.2); th += w * dt; theta[k] = th;
+    }
+    theta[n] = th;
+  }
+
   const TL = {
+    theta(t) { const x = Math.max(0, Math.min(n - 1.001, t / dt)), k = Math.floor(x); return theta[k] + (theta[k + 1] - theta[k]) * (x - k); }, // the fight line's turn (radians)
     fight, n, dt, duration: (n - 1) * dt, baked, eff,
     val(i, t, f) {
       const x = Math.max(0, Math.min(n - 1.001, t / dt)), k = Math.floor(x), fr = x - k;

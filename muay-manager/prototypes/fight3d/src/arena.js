@@ -605,7 +605,7 @@ export function buildArena(scene) {
     ren.toneMappingExposure = M.exp * A.bright;
   }
   A.setBrightness = function (v) { A.bright = Math.max(.6, Math.min(1.8, +v || 1)); light(); };
-  A.keyAt = function (x) { const o = A.keyOff || [1.5, 7, 4.5]; A.key.position.set(x + o[0], o[1], o[2]); A.key.target.position.set(x, 0, 0); };
+  A.keyAt = function (x, z) { const o = A.keyOff || [1.5, 7, 4.5]; z = z || 0; A.key.position.set(x + o[0], o[1], z + o[2]); A.key.target.position.set(x, 0, z); };
   // the camp is built once per camp level (A.campLevel) and lit for the time of day (A.campTime, or the clock)
   A.campLevel = 1; A.campTime = null;
   A.setVenue = function (key) {
