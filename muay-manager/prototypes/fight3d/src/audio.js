@@ -74,11 +74,12 @@ export function buildAudio() {
     count(n) { if (!on) return; if (clips && clips.count && clips.count[n - 1]) playClip(clips.count[n - 1], {bus: voiceBus, gain: .8}); else A.tone('square', 520, 0, .12, .06); },
     roar(v) {
       if (!on) return;
-      if (sfx && sfx.cheer && v >= .45) { // a swell of the real crowd: a slice of a cheer recording, faded in and out
-        const b = sfx.cheer[Math.floor(Math.random() * sfx.cheer.length)], len = Math.min(b.duration - .2, 1.8 + v * 1.2), off = Math.random() * Math.max(0, b.duration - len);
+      if (sfx && sfx.swell && v >= .45) { // the crowd rising: a soft or a strong cheer, cut short for a smaller moment
+        if (AC.currentTime < swellEnd - 1.5) return; // one swell at a time
+        const b = sfx.swell[Math.min(sfx.swell.length - 1, v >= .75 ? 1 : 0)], len = Math.min(b.duration, 2.6 + v * 3.2), lvl = .3 + v * .45;
         const s = AC.createBufferSource(), g = AC.createGain(), t = AC.currentTime; s.buffer = b; s.connect(g); g.connect(crowd);
-        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.35 + v * .4, t + .12); g.gain.setValueAtTime(.35 + v * .4, t + len - .5); g.gain.linearRampToValueAtTime(0, t + len);
-        s.start(t, off, len + .05); return;
+        g.gain.setValueAtTime(lvl, t); g.gain.setValueAtTime(lvl, t + len - .8); g.gain.linearRampToValueAtTime(0, t + len);
+        s.start(t, 0, len + .05); swellEnd = t + len; return;
       }
       A.noise(.9 + v * .6, 'bandpass', 800, .12 + v * .2, .4, 1300, crowd);
       if (sfx && sfx.roar && v >= .7 && AC.currentTime > bedEnd) bedEnd = playClip(sfx.roar[0], {bus: crowd, gain: .35 + v * .25, lowpass: 2600})._end - 1; // the whole stand on its feet
@@ -106,7 +107,7 @@ export function buildAudio() {
       duck += ((talking ? .55 : 1) - duck) * Math.min(1, dt * 6);
       if (sfx && sfx.cheer && !bed.on) bedStart();
       if (bed.on) bedTick();
-      // the recorded crowd under everything, rising with the action; the made-up noise until it is decoded
+      // the recorded crowd (CC-BY, see CREDITS.md) under everything, rising with the action; the made-up noise until it is decoded
       crowdGain.gain.setTargetAtTime(phase === 'off' ? 0 : (bed.on ? (playing ? .16 + hype * .42 : .07) : (playing ? .035 + hype * .16 : .02)) * duck, AC.currentTime, .25); // no crowd in the camp
       const playOn = phase === 'fight' || phase === 'intro' || phase === 'cer';
       // the recorded music is a soft bed under the commentary; the made-up pipe and drums stand in until it is decoded
@@ -142,7 +143,7 @@ export function buildAudio() {
     decoding = Promise.all(Object.entries(pack).map(async ([k, list]) => { out[k] = (await Promise.all(list.map(dec))).filter(Boolean); })).then(() => { clips = out; });
   }
   // the crowd bed: the cheer recordings one after another, crossfaded, into crowdGain (which follows the fight)
-  const bed = {on: false, next: 0, i: 0};
+  const bed = {on: false, next: 0, i: 0}; let swellEnd = 0;
   function bedStart() { bed.on = true; bed.next = AC.currentTime + .05; noiseGain.gain.setTargetAtTime(0, AC.currentTime, .5); }
   function bedTick() {
     const XB = 1.5;

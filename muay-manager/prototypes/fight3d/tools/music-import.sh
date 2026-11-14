@@ -8,7 +8,7 @@ ffmpeg -v error -y -ss "$2" -t "$3" -i "$1" -ac 1 -ar 44100 \
   -af "loudnorm=I=-18:TP=-2:LRA=11,afade=t=in:d=0.03,areverse,afade=t=in:d=0.03,areverse" \
   -c:a libmp3lame -b:a 40k "$4"
 
-# Crowd cheering (assets/sfx/cheer-N.mp3, group "cheer" in sfx-pack): stretches with no commentary, found by how
-# voice-like each half second is, levelled to -20 LUFS, mono 48 kbit/s, looped with a crossfade in src/audio.js.
-#   ffmpeg -ss <start> -t <len> -i <clip> -ac 1 -ar 44100 -af "loudnorm=I=-20:TP=-3:LRA=11,afade=t=in:d=0.04,areverse,afade=t=in:d=0.04,areverse" -c:a libmp3lame -b:a 48k assets/sfx/cheer-N.mp3
-# 14 Nov 2026: the owner's fight clip, 0.5-8.4 s and 11.0-17.9 s.
+# Crowd (assets/sfx, CC-BY 4.0 "Free Crowd Cheering Sounds" by Gregor Quendel, see CREDITS.md), mono 40 kbit/s:
+#   cheer-1: "10 - Ambience" 16-26 s at -20 LUFS, the bed under the fight (looped with a crossfade in src/audio.js)
+#   swell-1: "06 - Soft cheering - II" 2.5-9.5 s, swell-2: "04 - Strong cheering - II - Short" 4-11 s, the crowd rising
+#   ffmpeg -ss <start> -t <len> -i <track> -ac 1 -ar 44100 -af "loudnorm=I=<-20|-18|-17>:TP=-3:LRA=11,afade=t=in:d=<fade>,areverse,afade=t=in:d=0.6,areverse" -c:a libmp3lame -b:a 40k <out>

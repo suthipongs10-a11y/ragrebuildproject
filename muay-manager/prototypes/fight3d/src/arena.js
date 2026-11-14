@@ -53,6 +53,24 @@ function padTex(color, neutral) {
     g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = 2; g.strokeRect(1, 1, w - 2, h - 2);
   });
 }
+// A rope that gives: pushed out at one point (uC along the rope) by uDef metres, in a straight line to each post, as a
+// tight rope does. How far each rope gives depends on its height against the back pushing it (hips to shoulders).
+// side: 0 z+, 1 x+, 2 z-, 3 x- (sides 0 and 2 are rotated about z, 1 and 3 about x: the outward direction in the
+// rope's own frame is then +z, +x, -z, -x).
+const ROPE_OUT = [[0, 0, 1], [1, 0, 0], [0, 0, -1], [-1, 0, 0]];
+function ropeMat(col, r, side, y) {
+  const m = std({color: col, roughness: r > .025 ? 1 : .6, transparent: true});
+  const u = {uDef: {value: 0}, uC: {value: 0}, uOut: {value: new THREE.Vector3(...ROPE_OUT[side])}};
+  m.userData.rope = {u, side, w: Math.max(0, 1 - Math.abs(y - 1.05) / .7)};
+  m.onBeforeCompile = sh => {
+    Object.assign(sh.uniforms, u);
+    sh.vertexShader = 'uniform float uDef; uniform float uC; uniform vec3 uOut;\n' + sh.vertexShader.replace('#include <begin_vertex>',
+      '#include <begin_vertex>\n float rl = ' + R.toFixed(3) + '; float s = transformed.y; float c = clamp(uC, -rl + .3, rl - .3);\n' +
+      ' float tri = s < c ? (s + rl) / (c + rl) : (rl - s) / (rl - c);\n transformed += uOut * uDef * clamp(tri, 0., 1.);');
+  };
+  m.customProgramCacheKey = () => 'rope';
+  return m;
+}
 // floor, apron, posts and ropes. c: {mat, apron, ground, posts: {col, r, h, metal}, pads, ropeY, ropeCols, ropeR}
 function ringParts(V, c) {
   const g = V.group;
@@ -67,7 +85,7 @@ function ringParts(V, c) {
   });
   c.ropeY.forEach((y, k) => {
     for (let i = 0; i < 4; i++) {
-      const rope = put(g, new THREE.CylinderGeometry(c.ropeR, c.ropeR, R * 2, 8), std({color: c.ropeCols[k % c.ropeCols.length], roughness: c.ropeR > .025 ? 1 : .6, transparent: true}), Math.sin(i * Math.PI / 2) * R, y, Math.cos(i * Math.PI / 2) * R);
+      const rope = put(g, new THREE.CylinderGeometry(c.ropeR, c.ropeR, R * 2, 8, 48), ropeMat(c.ropeCols[k % c.ropeCols.length], c.ropeR, i, y), Math.sin(i * Math.PI / 2) * R, y, Math.cos(i * Math.PI / 2) * R);
       if (i % 2 === 0) rope.rotation.z = Math.PI / 2; else rope.rotation.x = Math.PI / 2; // sides 0,2 run along x
       V.ropeSides[i].push(rope);
     }
@@ -601,6 +619,19 @@ export function buildArena(scene) {
     light();
   };
   A.painted = () => !!(A.V && A.V.painted); // a painted camp: the cameras keep to the painted part
+  // ropes: a spring per side; push(side, depth, along) leans a body on it, kick(side, speed) drives it out
+  const ropeS = [0, 1, 2, 3].map(() => ({d: 0, v: 0, want: 0, c: 0}));
+  A.ropePush = function (side, depth, along) { const r = ropeS[side]; r.want = Math.max(r.want, depth); r.c = along || 0; };
+  A.ropeKick = function (side, speed) { ropeS[side].v += speed; };
+  A.ropeGive = side => ropeS[side].d - ropeS[side].want; // > 0 while the rope springs back harder than the body leans
+  A.ropeUpdate = function (dt) {
+    const V = A.V; if (!V) return;
+    for (let i = 0; i < 4; i++) {
+      const r = ropeS[i], h = Math.min(dt, .05);
+      r.v += (-70 * (r.d - r.want) - 5 * r.v) * h; r.d = Math.max(-.06, Math.min(.32, r.d + r.v * h)); r.want = 0; // slack enough to see it give and swing back
+      for (const rope of V.ropeSides[i]) { const R0 = rope.material.userData.rope; if (R0) { R0.u.uDef.value = r.d * R0.w; R0.u.uC.value = (i % 2 ? 1 : -1) * r.c; } }
+    }
+  };
   A.setCamp = function (level, time) { A.campLevel = Math.max(1, Math.min(5, level | 0 || 1)); if (time !== undefined) A.campTime = time; if (A.venue.startsWith('camp')) A.setVenue('camp'); };
   // look: lighting mood per preset
   A.setLook = function (look, renderer) { A.look = look; ren = renderer; if (!A.V) A.setVenue('stadium'); light(); };

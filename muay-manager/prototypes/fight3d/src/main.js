@@ -325,9 +325,32 @@ function showResult() {
 }
 
 // ---------- events -> picture and sound ----------
-function poseFighters(t) {
-  for (let i = 0; i < 2; i++) { TL.sample(i, t, buf[i]); fighters[i].update(buf[i], 0, TL.val(i, t, 0) * .01); }
+// The engine keeps the fighters 2.35 m either side of the centre at most; the ropes are at 3.05 m. When the fight drifts
+// to the edge both slide over together (the gap between them, and so every blow, unchanged) until the back man leans
+// on the ropes. Presentation only.
+const ROPE_FROM = 170, ROPE_GAIN = .62, BACK = .3; // cm where the slide starts; metres at the limit; body behind the hips
+function pairShift(t) {
+  const xa = TL.val(0, t, 0), xb = TL.val(1, t, 0), back = Math.abs(xa) > Math.abs(xb) ? xa : xb, lim = (CFG.rules && CFG.rules.limit) || RULES.limit;
+  const k = Math.max(0, Math.min(1, (Math.abs(back) - ROPE_FROM) / (lim - ROPE_FROM)));
+  return Math.sign(back) * k * k * (3 - 2 * k) * ROPE_GAIN;
 }
+let ropeBounce = [0, 0]; // the rope throwing a man back off it: extra metres toward the centre
+const fx0 = (i, t) => TL.val(i, t, 0) * .01 + pairShift(t);
+function poseFighters(t) {
+  for (let i = 0; i < 2; i++) { TL.sample(i, t, buf[i]); const x = fx0(i, t); fighters[i].update(buf[i], 0, x - Math.sign(x) * ropeBounce[i]); }
+}
+// each frame: who is leaning on which rope, and the rope pushing back
+function ropes(t, dt) {
+  if (!arena || !arena.V || !arena.V.ropeSides[1].length || !TL) return;
+  for (let i = 0; i < 2; i++) {
+    const x = fx0(i, t), side = x > 0 ? 1 : 3, depth = Math.abs(x) + BACK - (R_ROPE - .03);
+    if (depth > 0) arena.ropePush(side, Math.min(.18, depth * .85), 0); // a body leaning back sinks into the ropes
+    ropeBounce[i] = Math.max(0, ropeBounce[i] - dt * .5);
+    if (depth > -.05) ropeBounce[i] = Math.max(ropeBounce[i], Math.min(.12, arena.ropeGive(side) * .8));
+  }
+  arena.ropeUpdate(dt);
+}
+const R_ROPE = 3.05;
 function handle(e) {
   const rp = mode === 'replay';
   if (!rp && !frozen) voice.event(e, audio.time());
@@ -375,6 +398,7 @@ function handle(e) {
       const m = MOVES[e.move];
       poseFighters(e.t);
       const at = fighters[e.by], df = fighters[e.on], p = at.world(EFF_JOINT[m.eff], tmpV).clone();
+      if (e.res === 'hit' && arena) { const x = fx0(e.on, e.t); if (Math.abs(x) + BACK > R_ROPE - .12) arena.ropeKick(x > 0 ? 1 : 3, .7 + (m.push || 0) * .035 + (e.sev || 0) * .25); } // driven into the ropes
       const away = df.root.position.x > at.root.position.x ? 1 : -1;
       if (e.res === 'hit') {
         const s = e.sev, ko = marks.ko && marks.ko.t === e.t;
@@ -469,7 +493,7 @@ function advance(dt) {
 const cam = {id: null, az: 0, h: 1.5, fit: 5, fitH: 2.3, tx: 0, ty: 1.05, px: 0, py: 2, pz: 8, fixed: false};
 const shot = {id: '', az: 0, h: 1.5, fit: 5, fitH: 2.3, tx: 0, ty: 1.05, px: 0, py: 0, pz: 0, fixed: false, cut: false, hand: 0, ropes: 0};
 function direct(t) {
-  const xa = TL.val(0, t, 0) * .01, xb = TL.val(1, t, 0) * .01, mid = (xa + xb) / 2, sep = Math.abs(xb - xa);
+  const xa = fx0(0, t), xb = fx0(1, t), mid = (xa + xb) / 2, sep = Math.abs(xb - xa);
   const s = shot; s.cut = false; s.hand = 0; s.tx = mid; s.ty = 1.02; s.id = 'base'; s.fitH = 2.3; s.fixed = false; s.ropes = 0;
   const inIntro = t < marks.introEnd, rest = marks.rests.find(r => t >= r.t0 && t < r.t1);
   let push = 0;
@@ -578,7 +602,7 @@ function frame(ts) {
   }
   if (!W || !TL || galleryOn) { if (galleryOn) renderer.render(scene, camera); return; }
   if (cer.on) { // the ceremony runs on its own clock; the fight stays at its last moment
-    const going = cer.update(dt, cerAt);
+    const going = cer.update(dt, cerAt); if (arena) arena.ropeUpdate(dt); // the ropes settle
     if (!going && !cerDone) { cerDone = true; finish(); } // the result comes up; the three stay in the ring behind it
     hype = Math.max(.3, hype - dt * .15);
     arena.keyAt(0); arena.fadeRopes(camera.position, 1); arena.update(realT, hype, dt); fx.update(dt, camera);
@@ -588,7 +612,7 @@ function frame(ts) {
   const adv = advance(dt);
   shake *= Math.pow(.0006, dt); zoomKick *= Math.pow(.002, dt);
   hype = Math.max(0, hype - dt * .3);
-  poseFighters(playT);
+  poseFighters(playT); ropes(playT, dt);
   const pre = playT < marks.introEnd - .25;
   for (let i = 0; i < 2; i++) {
     fighters[i].setMongkol(pre);
@@ -839,7 +863,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 35 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 37 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision
