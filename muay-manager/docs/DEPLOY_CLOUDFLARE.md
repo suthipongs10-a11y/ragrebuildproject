@@ -1,6 +1,7 @@
 # เอาเกมขึ้นเว็บ (Cloudflare) — Muay Manager
 
-สถานะ: 14 พ.ย. 2026 โค้ดพร้อม ทดสอบในเครื่องแล้ว รอเจ้าของเกมสมัคร Cloudflare และให้ token
+สถานะ: 14 พ.ย. 2026 บัญชีและ token พร้อม ฐานข้อมูล D1 `muay-manager` (APAC) และโปรเจกต์ Pages `muay-manager` สร้างแล้ว
+เซิร์ฟเวอร์ `/api` ขึ้นจริงที่ https://muay-manager.pages.dev แล้ว หน้าเกมรอสิทธิ์ Workers KV ใน token
 
 ## ทำไมเลือก Cloudflare ก่อน VPS
 
@@ -19,8 +20,8 @@ VPS ยังใช้ต่อได้ในขั้นลงสโตร์ 
 ```
 เบราว์เซอร์ / มือถือ                  Cloudflare
 ┌─────────────────────┐   HTTPS   ┌───────────────────────────────────────────┐
-│ index.html (เกมทั้งเกม) │ ────────▶ │ Pages: ไฟล์ใน dist/site                      │
-│ src/netdb.js         │ ◀──────── │ Functions: functions/api/[[route]].js       │
+│ index.html (เกมทั้งเกม) │ ────────▶ │ functions/[[path]].js → KV `SITE` (ไฟล์เกม)   │
+│ src/netdb.js         │ ◀──────── │ functions/api/[[route]].js → D1            │
 │ id + รหัสลับใน          │  /api/... │ D1 (SQLite): players, docs                 │
 │ localStorage         │           └───────────────────────────────────────────┘
 └─────────────────────┘
@@ -35,22 +36,30 @@ VPS ยังใช้ต่อได้ในขั้นลงสโตร์ 
 
 1. สมัคร https://dash.cloudflare.com/sign-up (ฟรี ไม่ต้องใส่บัตร)
 2. ไปที่ My Profile → API Tokens → Create Token → Custom token
-   - Permissions: `Account · Cloudflare Pages · Edit` • `Account · D1 · Edit` • `Account · Account Settings · Read`
-   - Account Resources: บัญชีของตัวเอง
+   - Permissions: `Cloudflare Pages · Edit` • `D1 · Edit` • `Workers KV Storage · Edit` • `Account Settings · Read`
+   - หน้าจอปัจจุบันไม่มีช่อง Account Resources แยก ใช้ `Include · All accounts` ได้ • ช่อง Client IP address filtering เว้นว่าง
 3. กด Create แล้ว **ใส่ token ในหน้าต่างที่ Claude เปิดให้ (ช่องเก็บความลับของ environment) ห้ามวางในแชต**
 4. บอก Claude ว่าใส่แล้ว
+
+## ทำไมไฟล์เกมอยู่ใน KV ไม่ใช่ไฟล์ของ Pages
+
+การอัปโหลดไฟล์ของ Pages (`/pages/assets/*`) ใช้กุญแจชั่วคราวคนละตัวกับ token แต่ระบบเครือข่ายของเซสชัน Claude ใส่ token แทนกุญแจนั้นทุกครั้ง จึงขึ้น `Authorization failed` (ลองแล้ว 14 พ.ย. 2026)
+ทางออก: `tools/deploy-site.mjs` เขียนไฟล์ใน `dist/site` ลง KV namespace `SITE` (ใช้ token ปกติได้ ค่าละไม่เกิน 25 MB) แล้ว deploy เฉพาะ Functions (`--skip-caching` ไม่มีไฟล์ให้อัป) `functions/[[path]].js` ส่งไฟล์จาก KV พร้อม ETag เปิดซ้ำโดยหน้าไม่เปลี่ยนได้ 304 ไม่ต้องโหลด 15 MB ใหม่
+ในเครื่อง (`npm run site`) ไม่มี KV ก็ส่งไฟล์จาก `dist/site` ตามปกติ
 
 ## Claude ทำ
 
 ครั้งแรก
 ```bash
 cd muay-manager/prototypes/fight3d
-npx --yes wrangler@4 d1 create muay-manager        # ได้ database_id ใส่ใน wrangler.toml แล้ว commit
-npx --yes wrangler@4 pages project create muay-manager --production-branch main
-npm run deploy                                      # build + อัปโหลด ได้ https://muay-manager.pages.dev
+export CLOUDFLARE_API_TOKEN=proxy-injected-dummy CLOUDFLARE_ACCOUNT_ID=<จาก /client/v4/accounts>   # proxy ใส่ token จริงให้
+npx --yes wrangler@4 d1 create muay-manager --location apac                 # ทำแล้ว id อยู่ใน wrangler.toml
+npx --yes wrangler@4 pages project create muay-manager --production-branch main   # ทำแล้ว
+npx --yes wrangler@4 kv namespace create muay-manager-site                  # รอสิทธิ์ KV แล้วใส่ id ใน wrangler.toml เป็น binding SITE
+npm run deploy                                      # build + ไฟล์ลง KV + deploy Functions ได้ https://muay-manager.pages.dev
 ```
 
-ทุกครั้งที่แก้บั๊ก: แก้โค้ด → ทดสอบ → `npm run deploy` → commit + push เพื่อนกดรีเฟรชก็ได้ของใหม่ (`_headers` สั่งไม่ให้แคชหน้าเกม)
+ทุกครั้งที่แก้บั๊ก: แก้โค้ด → ทดสอบ → `npm run deploy` → commit + push เพื่อนกดรีเฟรชก็ได้ของใหม่ (หน้าเกมตั้ง `no-cache` + ETag และ KV เก็บแคชที่ขอบเครือข่าย 60 วินาที)
 
 ทดสอบในเครื่องก่อนขึ้นจริง: `npm run site` เปิด http://localhost:8788 ใช้ฐานข้อมูลจำลองใน `.wrangler/` (ไม่ commit)
 
@@ -61,9 +70,9 @@ npx --yes wrangler@4 d1 execute muay-manager --remote --command "SELECT coll, id
 
 ## ขีดจำกัดแผนฟรี (ตรวจเมื่อจะเปิดให้คนเยอะ)
 
-- Functions 100,000 ครั้งต่อวัน: เกมถามคำท้าใหม่ทุก 8 วินาทีตอนเปิดหน้า (30 วินาทีตอนสลับไปแอปอื่น) ผู้เล่นหนึ่งคนเปิดหนึ่งชั่วโมงราว 900 ครั้ง เพื่อน 10 คนเล่นวันละ 2 ชั่วโมงราว 18,000 ครั้ง สบาย
+- Functions 100,000 ครั้งต่อวัน (นับการเปิดหน้าเกมด้วย): เกมถามคำท้าใหม่ทุก 8 วินาทีตอนเปิดหน้า (30 วินาทีตอนสลับไปแอปอื่น) ผู้เล่นหนึ่งคนเปิดหนึ่งชั่วโมงราว 900 ครั้ง เพื่อน 10 คนเล่นวันละ 2 ชั่วโมงราว 18,000 ครั้ง สบาย
 - D1 อ่าน 5 ล้านแถวต่อวัน ที่เก็บ 5 GB
-- ไฟล์ละไม่เกิน 25 MB (หน้าเกมตอนนี้ 15 MB)
+- KV อ่าน 100,000 ครั้งต่อวัน เขียน 1,000 ครั้งต่อวัน ค่าละไม่เกิน 25 MB (หน้าเกมตอนนี้ 15 MB deploy หนึ่งครั้งเขียน 4 ค่า)
 
 ## ยังไม่มี (ทำเมื่อต้องการ)
 

@@ -7,7 +7,7 @@
     "batch": "node tools/batch.mjs",
     "test": "node tools/determinism.mjs",
     "site": "node build.mjs && npx --yes wrangler@4 pages dev dist/site",
-    "deploy": "node build.mjs && npx --yes wrangler@4 pages deploy dist/site --project-name muay-manager --branch main --commit-dirty=true"
+    "deploy": "node tools/deploy-site.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.24.0",
