@@ -240,6 +240,7 @@
 - [x] ขั้นตอนขึ้นเว็บ `docs/DEPLOY_CLOUDFLARE.md` และคำสั่ง `npm run site` / `npm run deploy`
 
 รอเจ้าของเกม
+- [ ] เลือกเวลาเริ่มทำระบบกันโกง (`docs/ONLINE_STORE_PLAN.md` ข้อ 8): ตอนนี้โกงได้ทุกจุดเพราะเครื่องผู้เล่นคำนวณเอง
 - [ ] สมัคร Cloudflare สร้าง API token (สิทธิ์ตาม `docs/DEPLOY_CLOUDFLARE.md`) แล้วใส่ในหน้าต่างเก็บความลับ จากนั้น Claude สร้างฐานข้อมูลและขึ้นเว็บให้
 
 ยังไม่ได้ตรวจ
