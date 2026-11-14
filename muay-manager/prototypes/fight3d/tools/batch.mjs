@@ -26,7 +26,7 @@ for (let i = 0; i < N; i++) {
     if (e.type === 'hit' && e.special && e.res === 'hit') out.specialHits++;
     if (e.type === 'hit' && e.res === 'hit' && e.chain === 3) out.combos3++;
     if (e.type === 'phase') { inFight = e.phase === 'fight'; lastHit = e.t; if (inFight) { rnd = e.round || rnd; rt0 = e.t; for (let h = 0; h < 2; h++) if (rnd <= 3) halfN[(rnd - 1) * 2 + h]++; } }
-    if (e.type === 'move' && inFight && rnd <= 3) { half[(rnd - 1) * 2 + (e.t - rt0 > 17.5 ? 1 : 0)]++; if (e.light) lightN[rnd - 1]++; }
+    if (e.type === 'move' && inFight && rnd <= 3) { half[(rnd - 1) * 2 + (e.t - rt0 > RULES.roundTime / 2 ? 1 : 0)]++; if (e.light) lightN[rnd - 1]++; }
     if (e.type === 'kd' && rnd <= 3) kdR[rnd - 1]++;
     if (e.type === 'phase') { inFight = e.phase === 'fight'; lastHit = e.t; }
     if (e.type === 'count') lastHit = e.t;

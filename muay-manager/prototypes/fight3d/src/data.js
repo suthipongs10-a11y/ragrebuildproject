@@ -102,7 +102,7 @@ export const STAT_TH = {pow:'หมัดศอก', kick:'เตะเข่า
 
 export const RULES = {
   dt: 1/60,
-  roundTime: 35, rounds: 3, restTime: 3.4, introTime: 3.0,
+  roundTime: 60, rounds: 3, restTime: 3.4, introTime: 3.0,
   limit: 235,            // ring half width the fighters can use
   startX: 85,
   dmgScale: .137,          // global damage multiplier
@@ -124,10 +124,10 @@ export const RULES = {
   // stun
   stunMin: 21, stunSpan: 34, stunWearDiv: 400, stunRest: 7, stunDurMin: 1.5, stunDurSpan: 1.1,
   // knockdown: only head shots put a fighter down
-  kdRaw: 21, kdChance: .02, kdStunRaw: 10, kdStunChance: .1, kdLowHp: 25, kdLowChance: .02,
+  kdRaw: 21, kdChance: .015, kdStunRaw: 10, kdStunChance: .1, kdLowHp: 25, kdLowChance: .02,
   kdWearDiv: 600, outBase: .4, outRawDiv: 50, outHpDiv: 300,
   // a clean shot (counter or flush) is what usually ends a Muay Thai fight
-  kdClean: .045, outClean: .1, kdSpecialMul: .8,
+  kdClean: .035, outClean: .1, kdSpecialMul: .8,
   // clinch: knees thrown, time before the referee breaks it, chance the held fighter shakes loose after each knee
   clinchKneesMin: 2, clinchKneesSpan: 3, clinchMax: 3.8, clinchEscape: .12, clinchDist: 48,
   clinchStyleEscape: .45, clinchStyleKnees: 1, // a clinch specialist holds on better and gets an extra knee in
@@ -158,7 +158,7 @@ export const RULES = {
   paceLight: .5, lightShare: .85, lightMoves: ['jab', 'cross', 'low', 'teep'],
   paceBack: .75, backDist: 162, // at pace 0, chance to step straight back out of range after a single shot, and to how far
   paceRange: 16,          // extra distance kept at pace 0
-  paceDmg: [.95, 1.5],    // power of a full shot at pace 0 and at full pace
+  paceDmg: [.85, 1.2],    // power of a full shot at pace 0 and at full pace
   leanBackHold: .34,      // leaning back from a kick: how long the defender stays back
   restHp: 1.4, restSt: 12
 };
