@@ -134,6 +134,7 @@ let fight = null, TL = null, EV = [], playT = 0, stopT = 0, mode = 'live', evi =
 let replays = [], rpi = 0, curRp = null, tvCuts = [], builtAs = '', slowWins = [], moments = [], marks = null, resultShown = false, galleryOn = false, frozen = false;
 let CFG = {seed: 1, specs: null, plans: null};                      // what the current fight was simulated from
 const HOOK = {onRoundBreak: null, onOver: null}, pausedRounds = new Set(); // set by the game layer
+let noBreaks = false;
 let previewF = null, previewPose = 'guard';                         // a single fighter shown outside a fight (create, dress, camp)
 const buf = [new Float32Array(NP), new Float32Array(NP)];
 const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3(), lastTrail = [new THREE.Vector3(), new THREE.Vector3()];
@@ -415,7 +416,7 @@ function advance(dt) {
   if (stopT > 0) { stopT -= dt; return 0; }
   const t0 = playT, ts = mode === 'replay' ? .3 : speed * slowAt(playT);
   let target = playT + dt * ts;
-  if (mode === 'live' && HOOK.onRoundBreak) { // the corner gets a moment to change the plan
+  if (mode === 'live' && HOOK.onRoundBreak && !noBreaks) { // the corner gets a moment to change the plan
     const rb = marks.rests.find(r => r.round && !pausedRounds.has(r.round.n) && playT < r.pauseAt && target >= r.pauseAt && !(rpi < replays.length && replays[rpi].trigger <= r.pauseAt && replayOn(replays[rpi])));
     if (rb) {
       while (evi < EV.length && EV[evi].t <= rb.pauseAt) handle(EV[evi++]);
@@ -757,11 +758,13 @@ const API = {
     API.endPreview(); API.drillStop(); OPT.venue = VENUES[cfg.venue] ? cfg.venue : 'stadium';
     cfg.looks.forEach((l, i) => Object.assign(LOOK[i], l));
     OPT.fighter = 'model'; await loadPair();
+    noBreaks = !!cfg.noBreaks; // a live challenge: nobody gets to stop it at the break
     newFight(cfg.seed, {specs: cfg.specs, plans: cfg.plans, rules: cfg.rules || null}); applyOpt(); frozen = false;
   },
   replan(plans) { CFG.plans = plans; const t = playT; buildFight(); evi = indexAt(t); rpi = replays.findIndex(r => r.trigger > t); if (rpi < 0) rpi = replays.length; },
   resume() { frozen = false; },
   skip() { seek(marks.over); },
+  seekTo(t) { if (TL) seek(Math.min(t, marks.over - .05)); }, // join a live fight late
   stop() { TL = null; fighters.forEach(f => scene.remove(f.root)); fighters = []; clearOverlays(); },
   result: () => fight && fight.result, fight: () => fight,
   async preview(look, pose, venue) { // show one fighter in the given look, standing in a venue
@@ -803,7 +806,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 26 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 27 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision
