@@ -1,0 +1,10 @@
+# Cloudflare Pages project for Muay Manager: the game page (dist/site, made by build.mjs) and its small store
+# (functions/api, a D1 database bound as DB). See docs/DEPLOY_CLOUDFLARE.md.
+name = "muay-manager"
+pages_build_output_dir = "dist/site"
+compatibility_date = "2026-11-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "muay-manager"
+database_id = "00000000-0000-0000-0000-000000000000" # replaced with the real id when the database is created

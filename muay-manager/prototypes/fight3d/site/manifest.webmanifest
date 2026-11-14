@@ -1,0 +1,15 @@
+{
+  "name": "Muay Manager",
+  "short_name": "Muay Manager",
+  "description": "เกมผู้จัดการค่ายมวยไทย ซ้อม แต่งตัว วางแผน แล้วดูนักมวยชกเองแบบ 3D",
+  "lang": "th",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0E0F14",
+  "theme_color": "#0E0F14",
+  "icons": [
+    {"src": "/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "/icon-512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}

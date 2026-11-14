@@ -1,0 +1,7 @@
+# Cloudflare Pages: the page always fresh (fixes show up on the next open), icons cached
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+/icon-*.png
+  Cache-Control: public, max-age=604800

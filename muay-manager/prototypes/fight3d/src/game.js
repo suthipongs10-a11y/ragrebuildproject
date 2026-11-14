@@ -4,6 +4,7 @@
 import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VENUE_RULES, RULES } from './data.js';
 import { PLAN_TIPS } from './plantips.js';
 import { simulate } from './sim.js';
+import { siteRuntime } from './netdb.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
@@ -135,8 +136,10 @@ async function pushCloud() {
 }
 async function cloudInit() {
   try {
-    if (!window.claude || !window.claude.use) { cloudNote = 'ออฟไลน์ บันทึกในเครื่องนี้'; return; }
-    const [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]);
+    // inside claude.ai the artifact runtime holds the store; on the game's own website, the site's /api does
+    const rt = window.claude && window.claude.use ? window.claude : await siteRuntime();
+    if (!rt) { cloudNote = 'ออฟไลน์ บันทึกในเครื่องนี้'; return; }
+    const [db, user] = await Promise.all([rt.use('db'), rt.use('user')]);
     const uid = db && user ? await user.id() : null;
     if (!uid) { cloudNote = 'ออฟไลน์ บันทึกในเครื่องนี้'; if (tab === 'rank' || tab === 'home') render(); return; }
     CLOUD = {db, uid}; cloudNote = 'ออนไลน์';
@@ -761,7 +764,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.4'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.5'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

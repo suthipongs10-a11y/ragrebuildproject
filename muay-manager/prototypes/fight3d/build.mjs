@@ -96,4 +96,12 @@ const game = readFileSync('src/page.html', 'utf8').replace('/*__APP__*/', () => 
   .replace('<!--G:top-->', '<div id="game"><div class="gbar" id="gTop"></div></div>')
   .replace('<!--G:body-->', '<nav class="gnav" id="gNav" aria-label="เมนูเกม"></nav><div class="gbody" id="gBody"></div>');
 writeFileSync('dist/muay-manager.html', game);
+// the game as its own website (Cloudflare Pages, see docs/DEPLOY_CLOUDFLARE.md): a full document around the same page,
+// plus the phone home-screen files from site/. The store behind it is functions/api.
+const head = '<!doctype html>\n<html lang="th">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
+  + '<meta name="theme-color" content="#0E0F14">\n<meta name="description" content="Muay Manager เกมผู้จัดการค่ายมวยไทย ซ้อม แต่งตัว วางแผน แล้วดูนักมวยชกเองแบบ 3D ท้าชกเพื่อนได้">\n'
+  + '<link rel="manifest" href="/manifest.webmanifest">\n<link rel="icon" href="/icon-192.png">\n<link rel="apple-touch-icon" href="/icon-192.png">\n<style>html,body{margin:0;background:#0e0f14}</style>\n';
+mkdirSync('dist/site', {recursive: true});
+writeFileSync('dist/site/index.html', head + game + '\n</html>\n');
+for (const f of readdirSync('site')) writeFileSync('dist/site/' + f, readFileSync('site/' + f));
 console.log('dist/muay-fight-lab.html with models', (page.length / 1024 / 1024).toFixed(2) + ' MB, dist/muay-manager.html', (game.length / 1024 / 1024).toFixed(2) + ' MB (limit 16)');
