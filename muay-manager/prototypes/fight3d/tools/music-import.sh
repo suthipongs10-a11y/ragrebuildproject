@@ -7,3 +7,8 @@ set -e
 ffmpeg -v error -y -ss "$2" -t "$3" -i "$1" -ac 1 -ar 44100 \
   -af "loudnorm=I=-18:TP=-2:LRA=11,afade=t=in:d=0.03,areverse,afade=t=in:d=0.03,areverse" \
   -c:a libmp3lame -b:a 40k "$4"
+
+# Crowd cheering (assets/sfx/cheer-N.mp3, group "cheer" in sfx-pack): stretches with no commentary, found by how
+# voice-like each half second is, levelled to -20 LUFS, mono 48 kbit/s, looped with a crossfade in src/audio.js.
+#   ffmpeg -ss <start> -t <len> -i <clip> -ac 1 -ar 44100 -af "loudnorm=I=-20:TP=-3:LRA=11,afade=t=in:d=0.04,areverse,afade=t=in:d=0.04,areverse" -c:a libmp3lame -b:a 48k assets/sfx/cheer-N.mp3
+# 14 Nov 2026: the owner's fight clip, 0.5-8.4 s and 11.0-17.9 s.

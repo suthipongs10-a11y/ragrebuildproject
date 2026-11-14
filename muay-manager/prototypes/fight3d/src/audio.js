@@ -3,7 +3,7 @@
 // code so its tempo can follow the fight; the commentary and the crowd's shouts are short recorded clips
 // (assets/voice, embedded in the page). Starts only after the viewer taps the sound button.
 export function buildAudio() {
-  let AC = null, on = false, master = null, sfxBus = null, music = null, crowd = null, voiceBus = null, crowdGain = null, noiseBuf = null;
+  let AC = null, on = false, master = null, sfxBus = null, music = null, crowd = null, voiceBus = null, crowdGain = null, noiseGain = null, noiseBuf = null;
   let clips = null, decoding = null, speaking = null, duck = 1, sfx = null, sfxLast = {}, bedEnd = 0;
   // the player's own level for each group of sounds (settings screen), 0..1, applied after the mix below
   const vol = {music: 1, voice: 1, crowd: 1, sfx: 1}, userGain = {};
@@ -14,6 +14,7 @@ export function buildAudio() {
     get vols() { return Object.assign({}, vol); },
     get musicOn() { return M.on || !!T.buf; }, // for checks
     get musicTrack() { return T.buf ? T.i : -1; },
+    get crowdBed() { return bed.on; },
     setVol(k, v) { if (!(k in vol)) return; vol[k] = Math.max(0, Math.min(1, +v || 0)); if (userGain[k]) userGain[k].gain.setTargetAtTime(vol[k], AC.currentTime, .05); },
     time: () => (AC ? AC.currentTime : 0),
     toggle() {
@@ -72,7 +73,14 @@ export function buildAudio() {
     // the referee's count: the recorded number when there is one, else a click
     count(n) { if (!on) return; if (clips && clips.count && clips.count[n - 1]) playClip(clips.count[n - 1], {bus: voiceBus, gain: .8}); else A.tone('square', 520, 0, .12, .06); },
     roar(v) {
-      if (!on) return; A.noise(.9 + v * .6, 'bandpass', 800, .12 + v * .2, .4, 1300, crowd);
+      if (!on) return;
+      if (sfx && sfx.cheer && v >= .45) { // a swell of the real crowd: a slice of a cheer recording, faded in and out
+        const b = sfx.cheer[Math.floor(Math.random() * sfx.cheer.length)], len = Math.min(b.duration - .2, 1.8 + v * 1.2), off = Math.random() * Math.max(0, b.duration - len);
+        const s = AC.createBufferSource(), g = AC.createGain(), t = AC.currentTime; s.buffer = b; s.connect(g); g.connect(crowd);
+        g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.35 + v * .4, t + .12); g.gain.setValueAtTime(.35 + v * .4, t + len - .5); g.gain.linearRampToValueAtTime(0, t + len);
+        s.start(t, off, len + .05); return;
+      }
+      A.noise(.9 + v * .6, 'bandpass', 800, .12 + v * .2, .4, 1300, crowd);
       if (sfx && sfx.roar && v >= .7 && AC.currentTime > bedEnd) bedEnd = playClip(sfx.roar[0], {bus: crowd, gain: .35 + v * .25, lowpass: 2600})._end - 1; // the whole stand on its feet
     },
     applause() { if (on && sfx && sfx.applause && AC.currentTime > bedEnd) bedEnd = playClip(sfx.applause[0], {bus: crowd, gain: .8})._end - 1; },
@@ -96,7 +104,10 @@ export function buildAudio() {
       if (!on || !AC) return;
       const talking = speaking && speaking._end > AC.currentTime;
       duck += ((talking ? .55 : 1) - duck) * Math.min(1, dt * 6);
-      crowdGain.gain.setTargetAtTime((playing ? .035 + hype * .16 : .02) * duck, AC.currentTime, .25);
+      if (sfx && sfx.cheer && !bed.on) bedStart();
+      if (bed.on) bedTick();
+      // the recorded crowd under everything, rising with the action; the made-up noise until it is decoded
+      crowdGain.gain.setTargetAtTime(phase === 'off' ? 0 : (bed.on ? (playing ? .16 + hype * .42 : .07) : (playing ? .035 + hype * .16 : .02)) * duck, AC.currentTime, .25); // no crowd in the camp
       const playOn = phase === 'fight' || phase === 'intro' || phase === 'cer';
       // the recorded music is a soft bed under the commentary; the made-up pipe and drums stand in until it is decoded
       const lvl = T.tracks ? (phase === 'fight' ? .16 + (pace || 0) * .08 : .26) : .55;
@@ -120,7 +131,7 @@ export function buildAudio() {
     for (let i = 0; i < d.length; i++) { const w = Math.random() * 2 - 1; last = (last + .04 * w) / 1.04; d[i] = last * 3 + w * .25; }
     const src = AC.createBufferSource(); src.buffer = noiseBuf; src.loop = true;
     const bp = AC.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 650; bp.Q.value = .5;
-    crowdGain = AC.createGain(); crowdGain.gain.value = 0; src.connect(bp); bp.connect(crowdGain); crowdGain.connect(crowd); src.start();
+    crowdGain = AC.createGain(); crowdGain.gain.value = 0; noiseGain = AC.createGain(); src.connect(bp); bp.connect(noiseGain); noiseGain.connect(crowdGain); crowdGain.connect(crowd); src.start();
   }
   // the recorded clips come in the page as base64 MP3, one list per line
   function loadVoice() {
@@ -129,6 +140,18 @@ export function buildAudio() {
     const pack = JSON.parse(el.textContent), out = {};
     const dec = b64 => new Promise(res => { const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); AC.decodeAudioData(u.buffer, res, () => res(null)); });
     decoding = Promise.all(Object.entries(pack).map(async ([k, list]) => { out[k] = (await Promise.all(list.map(dec))).filter(Boolean); })).then(() => { clips = out; });
+  }
+  // the crowd bed: the cheer recordings one after another, crossfaded, into crowdGain (which follows the fight)
+  const bed = {on: false, next: 0, i: 0};
+  function bedStart() { bed.on = true; bed.next = AC.currentTime + .05; noiseGain.gain.setTargetAtTime(0, AC.currentTime, .5); }
+  function bedTick() {
+    const XB = 1.5;
+    while (bed.next < AC.currentTime + .6) {
+      const b = sfx.cheer[bed.i++ % sfx.cheer.length], s = AC.createBufferSource(), g = AC.createGain(), t0 = bed.next, d = b.duration;
+      s.buffer = b; s.connect(g); g.connect(crowdGain);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(1, t0 + XB); g.gain.setValueAtTime(1, t0 + d - XB); g.gain.linearRampToValueAtTime(0, t0 + d);
+      s.start(t0); s.stop(t0 + d + .05); bed.next = t0 + d - XB;
+    }
   }
   // recorded background music (assets/music, embedded as music-pack): each round takes the next track and loops it
   // with a crossfade, so a one-minute recording plays on without a seam

@@ -36,7 +36,7 @@ const ACTS = [
   {id: 'banana', th: 'เตะต้นกล้วย', drill: 'banana', focus: 'kick', stat: ['kick'], fat: 12, note: 'เน้นเตะ เพิ่มเตะเข่า แข้งแกร่ง'},
   {id: 'dummy', th: 'ถีบหุ่น', drill: 'dummy', focus: 'teep', stat: ['spd', 'def'], fat: 10, note: 'เน้นถีบ คุมระยะ เพิ่มความเร็วและป้องกัน'},
   {id: 'rope', th: 'กระโดดเชือก ชกลม', stat: ['spd'], fat: 8, note: 'เพิ่มความเร็ว'},
-  {id: 'spar', th: 'ลงนวมซ้อมคู่', stat: ['def', 'chin'], fat: 16, note: 'เพิ่มป้องกันและคาง เสี่ยงเจ็บ'},
+  {id: 'spar', th: 'ลงนวมซ้อมคู่', drill: 'spar', focus: 'guard', stat: ['def', 'chin'], fat: 16, note: 'ซ้อมกับเพื่อนร่วมค่าย ออกอาวุธและกดบังตอนเขาออกอาวุธ เพิ่มป้องกันและคาง เสี่ยงเจ็บ'},
   {id: 'run', th: 'วิ่ง', stat: ['end'], fat: 10, note: 'เพิ่มความอึด'},
   {id: 'fun', th: 'พักผ่อนหย่อนใจ', stat: [], fat: -14, note: 'ดูหนัง ตกปลา กินข้าวกับที่บ้าน อารมณ์ดีขึ้น'},
   {id: 'rest', th: 'พัก นวด', stat: [], fat: -32, note: 'ลดความล้า'}
@@ -56,8 +56,8 @@ const STAFF_ACT = {bag: 'punch', banana: 'kick', dummy: 'tech', spar: 'tech'};
 // One belt per league, fought for against its champion once the fighter is near the top of that league.
 const BELTS = ['เข็มขัดงานวัด', 'เข็มขัดอำเภอ', 'เข็มขัดจังหวัด', 'เข็มขัดเวทีมาตรฐาน', 'เข็มขัดแชมป์ประเทศ'];
 // Drill: the trainer calls strikes, the player presses them in time. What each strike trains, and how often each target calls for it.
-const KINDS = {punch: {th: 'ต่อย', stat: {pow: 1}, key: ['a', 'j', 'arrowleft']}, kick: {th: 'เตะ', stat: {kick: 1}, key: ['s', 'k', 'arrowdown']}, teep: {th: 'ถีบ', stat: {spd: .5, def: .5}, key: ['d', 'l', 'arrowright']}};
-const DRILL_MIX = {bag: {punch: .6, kick: .25, teep: .15}, banana: {punch: .15, kick: .7, teep: .15}, dummy: {punch: .25, kick: .2, teep: .55}};
+const KINDS = {punch: {th: 'ต่อย', stat: {pow: 1}, key: ['a', 'j', 'arrowleft']}, kick: {th: 'เตะ', stat: {kick: 1}, key: ['s', 'k', 'arrowdown']}, teep: {th: 'ถีบ', stat: {spd: .5, def: .5}, key: ['d', 'l', 'arrowright']}, guard: {th: 'บัง', stat: {def: 1, chin: .5}, key: ['f', ';', 'arrowup']}};
+const DRILL_MIX = {spar: {punch: .5, kick: .32, teep: .18}, bag: {punch: .6, kick: .25, teep: .15}, banana: {punch: .15, kick: .7, teep: .15}, dummy: {punch: .25, kick: .2, teep: .55}};
 const DRILL = {lead: 2.4, beat: .5, gap: .95, notes: 24, perfect: .085, good: .17, late: .25, focusBonus: 1.3, ahead: 1.7};
 // where a fight is held: local challenges at the temple fair, ranked fights by league, the rope-fist bout at the old ground
 const LEAGUE_VENUE = ['temple', 'temple', 'province', 'stadium', 'champ'];
@@ -364,7 +364,7 @@ function trainHtml() {
   return '<section class="gcard"><h2>ตารางซ้อมวันนี้ <small>เหลือ ' + S.slots + ' ครั้ง</small></h2>' +
     (S.fatigue >= 70 ? '<p class="warn">ล้ามากแล้ว ซ้อมได้ผลน้อยลงและเสี่ยงเจ็บ ควรพัก</p>' : '') +
     '<div class="acts">' + ACTS.map(a => { const st = a.stat.map(k => STAT_TH[k] + ' ' + Math.floor(S.stats[k]) + '/' + c).join(' · '); return '<button class="act' + (a.drill ? ' drill' : '') + '" data-act="train" data-v="' + a.id + '"' + (S.slots < 1 ? ' disabled' : '') + '>' + art('act-' + a.id, 'pic') + '<b>' + a.th + (a.drill ? ' <i>กดเอง</i>' : '') + '</b><span>' + a.note + '</span><span class="sm">' + (st || 'ไม่ได้ค่าพลัง') + ' · ล้า ' + (a.fat > 0 ? '+' : '') + a.fat + (failPct(a) ? ' · เสี่ยงซ้อมพลาด ' + failPct(a) + '%' : '') + (coachOf(a) ? ' · ครูช่วย +25%' : '') + '</span></button>'; }).join('') + '</div>' +
-    (S.slots < 1 ? '<p class="hint">แรงซ้อมหมดแล้ว ไปหาคู่ชก หรือจบวันที่หน้าค่าย</p>' : '<p class="hint">กระสอบทราย ต้นกล้วย และหุ่น เป็นการซ้อมแบบกดเอง: ครูเรียกท่า ต่อย เตะ ถีบ ให้กดตามจังหวะ ยิ่งตรงยิ่งได้ผลมาก การซ้อมอื่นกดปุ่มออกแรงให้ตรงช่วงสีทอง อารมณ์ตอนนี้ "' + MOODS[S.mood] + '" ผลซ้อม ×' + MOOD_TRAIN[S.mood] + ' ล้าเกิน 50% เริ่มเสี่ยงซ้อมพลาด</p>') +
+    (S.slots < 1 ? '<p class="hint">แรงซ้อมหมดแล้ว ไปหาคู่ชก หรือจบวันที่หน้าค่าย</p>' : '<p class="hint">กระสอบทราย ต้นกล้วย หุ่น และลงนวมซ้อมคู่ เป็นการซ้อมแบบกดเอง: ครูเรียกท่า ต่อย เตะ ถีบ ให้กดตามจังหวะ ยิ่งตรงยิ่งได้ผลมาก ซ้อมคู่มีปุ่มบัง กดตอนเพื่อนออกอาวุธ การซ้อมอื่นกดปุ่มออกแรงให้ตรงช่วงสีทอง อารมณ์ตอนนี้ "' + MOODS[S.mood] + '" ผลซ้อม ×' + MOOD_TRAIN[S.mood] + ' ล้าเกิน 50% เริ่มเสี่ยงซ้อมพลาด</p>') +
     (view && view.msg ? '<p class="' + (view.bad ? 'warn' : 'gain') + '">' + view.msg + '</p>' : '') + '</section>';
 }
 function miniHtml() {
@@ -662,8 +662,19 @@ function drillChart(mix, seed) {
   }
   return notes;
 }
+// sparring: a few strikes of ours, then the partner answers and we cover up, then again; his strikes are known ahead
+function sparChart(seed) {
+  const R = rng(seed), mix = DRILL_MIX.spar, kinds = Object.keys(mix), moves = API.TARGETS.spar.partner, notes = []; let t = DRILL.lead;
+  const pick = () => { let x = R(); for (const k of kinds) { if ((x -= mix[k]) < 0) return k; } return kinds[0]; };
+  while (notes.length < DRILL.notes) {
+    const n = 1 + Math.floor(R() * 3);
+    for (let i = 0; i < n && notes.length < DRILL.notes - 1; i++) { notes.push({t, kind: pick(), res: null, el: null}); t += DRILL.beat; }
+    t += .45; notes.push({t, kind: 'guard', move: moves[Math.floor(R() * moves.length)], res: null, el: null}); t += 1.15;
+  }
+  return notes;
+}
 async function drillStart(act) {
-  const notes = drillChart(DRILL_MIX[act.drill], S.seed + S.day * 17 + S.slots * 5 + Math.floor(S.fatigue));
+  const seed = S.seed + S.day * 17 + S.slots * 5 + Math.floor(S.fatigue), notes = act.drill === 'spar' ? sparChart(seed) : drillChart(DRILL_MIX[act.drill], seed);
   DR = {act, notes, t0: 0, combo: 0, best: 0, n: {perfect: 0, good: 0, late: 0, miss: 0}, score: 0, w: {}, seq: {punch: 0, kick: 0, teep: 0}, ready: false, raf: 0};
   mini = null; setMode(false); render();
   const ui = document.createElement('div'); ui.id = 'drillUi';
@@ -684,9 +695,9 @@ function drillJudge(n, res) {
 }
 function drillPress(kind) {
   if (!DR || !DR.ready) return;
-  const now = (performance.now() - DR.t0) / 1000, list = API.TARGETS[DR.act.drill].moves[kind];
+  const now = (performance.now() - DR.t0) / 1000, list = API.TARGETS[DR.act.drill].moves[kind]; if (!list) return; // a key for a button this drill has not got
   const n = DR.notes.find(x => !x.res && Math.abs(x.t - now) <= DRILL.late);
-  API.drillStrike(list[DR.seq[kind]++ % list.length]);
+  if (kind === 'guard') API.drillGuard(); else API.drillStrike(list[DR.seq[kind]++ % list.length]);
   const b = document.querySelector('[data-drill="' + kind + '"]'); if (b) { b.classList.remove('tap'); void b.offsetWidth; b.classList.add('tap'); }
   if (!n) return;                                       // a free strike between calls: no score either way
   if (n.kind !== kind) { drillJudge(n, 'miss'); drillMsg('ผิดท่า', 'bad'); return; }
@@ -699,7 +710,9 @@ function drillTick() {
   const W = track.clientWidth, x0 = W * .2, speed = W * .8 / DRILL.ahead;
   let left = 0;
   for (const n of DR.notes) {
-    if (!n.res && now > n.t + DRILL.late) { drillJudge(n, 'miss'); drillMsg('พลาด', 'bad'); }
+    // the partner's strike leaves so that it arrives on the beat; whether it lands depends on the cover-up by then
+    if (n.move && !n.sent) { const m = MOVES[n.move], go = n.t - (m.fr[0][1] + m.fr[1][1]) * .8; if (now >= go) { n.sent = true; API.drillIncoming(n.move, () => !!n.res && n.res !== 'miss'); } }
+    if (!n.res && now > n.t + DRILL.late) { drillJudge(n, 'miss'); drillMsg(n.move ? 'โดนเข้าไป' : 'พลาด', 'bad'); if (n.move) DR.hits = (DR.hits || 0) + 1; }
     if (!n.res) left++;
     const x = x0 + (n.t - now) * speed;
     n.el.style.display = x > W + 40 || x < -60 ? 'none' : ''; n.el.style.transform = 'translate(' + x.toFixed(1) + 'px,-50%) translateX(-50%)';
@@ -721,12 +734,14 @@ function drillEnd(abort) {
   const parts = Object.keys(d.w).map(k => { const room = Math.max(.12, 1 - Math.pow(S.stats[k] / c, 2)), g = 2.4 * mul * (d.w[k] / sum) * room * (1 - S.fatigue / 160) * (1 + .1 * (S.gym - 1)) * boost(a), before = S.stats[k]; S.stats[k] = Math.min(c, S.stats[k] + Math.max(.02, g)); return [k, S.stats[k] - before]; })
     .filter(p => p[1] >= .05).sort((x, y) => y[1] - x[1]).map(p => STAT_TH[p[0]] + ' +' + p[1].toFixed(1));
   S.fatigue = clamp(S.fatigue + a.fat, 0, 100); S.slots--;
+  let hurt = ''; if (a.id === 'spar' && Math.random() < .03 + (d.hits || 0) * .012 + S.fatigue / 500) { S.fatigue = clamp(S.fatigue + 18, 0, 100); hurt = ' · เจ็บเล็กน้อยจากการซ้อมคู่ ล้าเพิ่ม 18'; }
   const done = mission('train'), sour = S.fatigue >= 85 ? ' · ฝืนซ้อมตอนล้ามาก' + moodUp(-1) : '';
-  view = {msg: a.th + ': ' + label + ' · เป๊ะ ' + d.n.perfect + ' ดี ' + d.n.good + ' คลาด ' + d.n.late + ' พลาด ' + d.n.miss + ' · ต่อเนื่องสูงสุด ' + d.best + ' · ' + parts.join(' · ') + sour + (done ? ' · ' + done : '')};
+  view = {msg: a.th + ': ' + label + ' · เป๊ะ ' + d.n.perfect + ' ดี ' + d.n.good + ' คลาด ' + d.n.late + ' พลาด ' + d.n.miss + ' · ต่อเนื่องสูงสุด ' + d.best + ' · ' + parts.join(' · ') + (d.act.id === 'spar' ? ' · โดนเต็ม ๆ ' + (d.hits || 0) + ' ครั้ง' : '') + sour + hurt + (done ? ' · ' + done : '')};
   save(); setMode(false); render(); showMe();
 }
 function drillHtml() {
-  return '<section class="gcard drillpad"><div class="dbtns">' + Object.keys(KINDS).map(k => '<button class="dbtn k-' + k + '" data-drill="' + k + '"><b>' + KINDS[k].th + '</b></button>').join('') + '</div>' +
+  const keys = Object.keys(KINDS).filter(k => API.TARGETS[DR.act.drill].moves[k]);
+  return '<section class="gcard drillpad"><div class="dbtns' + (keys.length > 3 ? ' four' : '') + '">' + keys.map(k => '<button class="dbtn k-' + k + '" data-drill="' + k + '"><b>' + KINDS[k].th + '</b></button>').join('') + '</div>' +
     '<p class="hint">' + DR.act.th + ': กดปุ่มให้ตรงกับท่าที่ครูเรียก ตอนป้ายท่าเลื่อนมาถึงวงกลม · คีย์บอร์ด A S D</p><button class="link" data-act="drillquit">เลิกซ้อมรอบนี้ (ไม่เสียแรงซ้อม)</button></section>';
 }
 
@@ -818,7 +833,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.13'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.15'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

@@ -1,9 +1,10 @@
-// Training drill: one fighter working a target (heavy bag, banana tree or standing dummy).
+// Training drill: one fighter working a target (heavy bag, banana tree or standing dummy), or sparring with a camp
+// partner who covers up from his strikes and throws his own for him to block.
 // Presentation only. The game layer decides which strike is thrown and scores the timing;
 // this plays the strike, lands it on the target and makes the target react.
 import { FLAT, NP, IDX } from './poses.js';
 import { MOVES } from './data.js';
-import { makeJoints, EFF_JOINT, DIM } from './rig.js';
+import { makeJoints, EFF_JOINT, DIM, solve } from './rig.js';
 import { aimEffector } from './timeline.js';
 import { bananaTree } from './arena.js';
 const THREE = globalThis.THREE;
@@ -12,9 +13,13 @@ const THREE = globalThis.THREE;
 export const TARGETS = {
   bag: {th: 'กระสอบทราย', moves: {punch: ['jab', 'cross', 'hook', 'bodyshot'], kick: ['body', 'high', 'body'], teep: ['teep', 'teepFace']}},
   banana: {th: 'ต้นกล้วย', moves: {punch: ['jab', 'cross'], kick: ['low', 'body', 'low', 'high'], teep: ['teep']}},
-  dummy: {th: 'หุ่นซ้อม', moves: {punch: ['jab', 'cross', 'hook', 'bodyshot'], kick: ['body', 'high', 'low'], teep: ['teep', 'teepFace']}}
+  dummy: {th: 'หุ่นซ้อม', moves: {punch: ['jab', 'cross', 'hook', 'bodyshot'], kick: ['body', 'high', 'low'], teep: ['teep', 'teepFace']}},
+  spar: {th: 'คู่ซ้อม', moves: {punch: ['jab', 'cross', 'hook', 'bodyshot'], kick: ['body', 'low', 'body'], teep: ['teep'], guard: []}, partner: ['jab', 'cross', 'body', 'jab', 'teep', 'hook', 'low']}
 };
 const FIGHTER_X = -.5, TARGET_X = .5, DIST = TARGET_X - FIGHTER_X, SPEED = .8;
+const SPAR_X = .62, SDIST = SPAR_X - FIGHTER_X; // the sparring partner stands a little further off, at punching range
+// how each side covers a strike: by where it lands
+const COVER = mv => mv.kind === 'kick' && mv.lvl === 'leg' ? 'check' : mv.kind === 'kick' && mv.lvl === 'body' && mv.push < 20 ? 'checkBody' : mv.lvl === 'body' ? 'blockBody' : 'block';
 const ease = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
 const std = o => new THREE.MeshStandardMaterial(Object.assign({roughness: .8}, o));
 function tex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; }
@@ -65,14 +70,18 @@ export function buildDrill(scene, fx, audio) {
   const cur = new Float32Array(NP), from = new Float32Array(NP), J = makeJoints(), pt = new THREE.Vector3(), wp = new THREE.Vector3();
   let fighter = null, T = null, built = {}, queue = [], to = null, pt0 = 0, pd = .001, live = null, ax = 0, az = 0, vx = 0, vz = 0, shakeT = 0, lastKey = '';
 
-  D.start = function (f, key, beamY) {
+  // sparring partner: his own pose, a strike queue of his own, and who is covering up
+  let partner = null, pq = [], pto = null, ppt = 0, ppd = .001, plive = null;
+  const pcur = new Float32Array(NP), pfrom = new Float32Array(NP), PP = new Float32Array(NP), J2 = makeJoints();
+  D.start = function (f, key, beamY, mate) {
     D.stop(); fighter = f; D.on = true;
+    if (key === 'spar') { partner = mate; lastKey = key; T = null; cur.set(FLAT.guard); pcur.set(FLAT.guard); queue = []; to = null; live = null; pq = []; pto = null; plive = null; return; }
     const id = key + (key === 'bag' ? beamY : '');
     if (!built[id]) { built[id] = MAKE[key](beamY || 3.25); built[id].group.position.set(TARGET_X, 0, 0); scene.add(built[id].group); }
     T = built[id]; T.group.visible = true; lastKey = key;
     cur.set(FLAT.guard); queue = []; to = null; live = null; ax = az = vx = vz = 0; shakeT = 0;
   };
-  D.stop = function () { D.on = false; fighter = null; if (T) T.group.visible = false; T = null; };
+  D.stop = function () { D.on = false; fighter = null; partner = null; if (T) T.group.visible = false; T = null; };
   D.key = () => lastKey;
 
   // throw a strike; returns seconds until it lands
@@ -80,7 +89,8 @@ export function buildDrill(scene, fx, audio) {
     const mv = MOVES[moveKey]; if (!mv || !D.on) return 0;
     queue = mv.fr.map((f, i) => {
       let target = FLAT[f[0]] || FLAT.guard;
-      if (i === 1) { // land the striking part on the target's surface
+      if (i === 1 && partner) { target = new Float32Array(target); aimEffector(target, mv.eff, sparPoint(pcur, mv), J); }
+      else if (i === 1) { // land the striking part on the target's surface
         target = new Float32Array(target);
         const hand = mv.eff.startsWith('hand'), base = IDX[(hand ? 'h' : 'f') + mv.eff.slice(-1)], y = target[base + 1] + (hand ? 0 : DIM.ankle), r = T.radius(y);
         if (moveKey === 'hook') pt.set(DIST - r * .45, y, -r * .9);
@@ -91,11 +101,49 @@ export function buildDrill(scene, fx, audio) {
       return {target, d: f[1] * SPEED, hit: i === 1};
     });
     live = {mv, key: moveKey}; next();
+    if (partner) cover(true, mv, mv.fr[0][1] * SPEED);
     if (mv.kind === 'kick') audio.swish(false);
     return (mv.fr[0][1] + mv.fr[1][1]) * SPEED;
   };
+  // where a strike lands on the other man, in the striker's own frame (the other faces him)
+  function sparPoint(other, mv) {
+    solve(other, 0, J2);
+    const j = mv.lvl === 'leg' ? J2.knL : mv.lvl === 'body' || /teep|body/.test(mv.kind) ? J2.chest : J2.head;
+    return pt.set(SDIST - j.x - .1, j.y - (mv.lvl === 'body' ? .12 : 0), -j.z);
+  }
+  // one side covers up (partner: from our strike, us: from his) for a moment, then back to the guard
+  function cover(isPartner, mv, lead) {
+    const pose = FLAT[COVER(mv)] || FLAT.block, q = [{target: pose, d: Math.max(.08, lead * .6)}, {target: pose, d: .3}];
+    if (isPartner) { pq = q; pnext(); } else { queue = q; live = null; next(); }
+  }
+  function pnext() { const q = pq.shift(); if (!q) { pto = null; return; } pfrom.set(pcur); pto = q; ppt = 0; ppd = q.d; }
+  // the partner throws: returns seconds until it lands; guarded() says at that moment whether we covered in time
+  D.incoming = function (moveKey, guarded) {
+    const mv = MOVES[moveKey]; if (!mv || !partner) return 0;
+    pq = mv.fr.map((f, i) => {
+      let target = FLAT[f[0]] || FLAT.guard;
+      if (i === 1) { target = new Float32Array(target); aimEffector(target, mv.eff, sparPoint(cur, mv), J); }
+      return {target, d: f[1] * SPEED, hit: i === 1};
+    });
+    plive = {mv, key: moveKey, guarded}; pnext();
+    if (mv.kind === 'kick') audio.swish(false);
+    return (mv.fr[0][1] + mv.fr[1][1]) * SPEED;
+  };
+  // we cover up from whatever he is throwing (or a plain high guard)
+  D.guard = function () { if (!partner) return; cover(false, plive ? plive.mv : MOVES.jab, .12); };
+  function pimpact() {
+    const mv = plive.mv, ok = plive.guarded ? plive.guarded() : false, j = mv.kind === 'kick' ? 'anR' : EFF_JOINT[mv.eff] || 'haR';
+    partner.world(j, wp);
+    if (ok) { audio.block(); fx.sparks(wp, 4, 0xffffff, .6, 1); }
+    else { // caught clean: a light one in sparring, but it shows
+      queue = [{target: FLAT[mv.lvl === 'body' ? 'hitBody' : 'hitHeadBack'] || FLAT.guard, d: .1}, {target: FLAT.guard, d: .35}]; live = null; next();
+      audio.hit(mv.sfx, mv.dmg * .7, false); fx.flash(wp, .4, 0xffffff, .12); D.shake = Math.max(D.shake, .01); D.kick = Math.max(D.kick, .015);
+    }
+    plive = null;
+  }
   function next() { const q = queue.shift(); if (!q) { to = null; return; } from.set(cur); to = q; pt0 = 0; pd = q.d; }
   function impact() {
+    if (partner) { const mv = live.mv; fighter.world(EFF_JOINT[mv.eff], wp); audio.block(); audio.hit(mv.sfx, mv.dmg * .5, false); fx.sparks(wp, 5, 0xffffff, .7, 1); D.kick = Math.max(D.kick, .01); if (D.onImpact) D.onImpact(live.key, wp); return; }
     const mv = live.mv, side = /teep|jab|cross|bodyshot/.test(live.key) ? 0 : live.key === 'hook' ? 1 : -1;
     fighter.world(EFF_JOINT[mv.eff], wp);
     const pow = mv.dmg / 12;
@@ -122,6 +170,18 @@ export function buildDrill(scene, fx, audio) {
     P.set(cur);
     if (!to) { const b = time * 5.2; P[IDX.fL + 1] += Math.max(0, Math.sin(b)) * .04; P[IDX.hip + 1] += Math.sin(b) * .012; P[IDX.hL] += Math.sin(b * .5) * .02; }
     fighter.update(P, 0, FIGHTER_X);
+    if (partner) {
+      if (pto) {
+        ppt += dt; const e = ease(Math.min(1, ppt / ppd));
+        for (let j = 0; j < NP; j++) pcur[j] = pfrom[j] + (pto.target[j] - pfrom[j]) * e;
+        if (ppt >= ppd) { const hit = pto.hit; if (hit && plive) pimpact(); pnext(); }
+      } else { const k = 1 - Math.exp(-dt * 10), G = FLAT.guard; for (let j = 0; j < NP; j++) pcur[j] += (G[j] - pcur[j]) * k; }
+      PP.set(pcur);
+      if (!pto) { const b = time * 5.2 + 1.3; PP[IDX.fL + 1] += Math.max(0, Math.sin(b)) * .04; PP[IDX.hip + 1] += Math.sin(b) * .012; }
+      partner.update(PP, 0, SPAR_X);
+      D.kick *= Math.pow(.002, dt); D.shake *= Math.pow(.0006, dt);
+      return;
+    }
     // target spring
     const w2 = T.w * T.w;
     vx += (-w2 * ax - T.damp * vx) * dt; vz += (-w2 * az - T.damp * vz) * dt; ax += vx * dt; az += vz * dt;

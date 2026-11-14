@@ -134,7 +134,7 @@ const camera = new THREE.PerspectiveCamera(30, 1.5, .1, 120);
 const audio = buildAudio(), voice = buildCommentary(audio, MOVES), cer = buildCeremony(camera);
 let cerDone = false, cerAt = null; // cerAt: hold the ceremony at this time (checks)
 let introSaid = false;
-let arena = null, fx = null, drill = null, drillF = null; // built once fonts are ready, the mat texture draws text
+let arena = null, fx = null, drill = null, drillF = null, mateF = null; // built once fonts are ready, the mat texture draws text
 let fighters = [], W = 0, H = 0;
 
 function layout() {
@@ -813,10 +813,16 @@ const API = {
     const model = await API.single(look); if (!model) return false;
     API.endPreview(); API.drillStop(); fighters.forEach(f => { f.root.visible = false; });
     arena.setVenue('camp'); drillF = new ModelFighter(0, model, look); scene.add(drillF.root); clearOverlays();
-    drillF.setMongkol(false); drill.start(drillF, target, arena.V.beamY); return true;
+    drillF.setMongkol(false);
+    if (target === 'spar') { // a camp mate of the same build, in the other corner's colours
+      const mate = Object.assign({}, look, {shorts: look.shorts === 'blue' ? 'red' : 'blue', gloves: look.gloves === 'blue' ? 'red' : 'blue', pattern: 'plain', head: 'none', hair: 'natural'});
+      mateF = new ModelFighter(1, model, mate); mateF.setMongkol(false); scene.add(mateF.root);
+    }
+    drill.start(drillF, target, arena.V.beamY, mateF); return true;
   },
   drillStrike: move => drill.strike(move),
-  drillStop() { if (drill) drill.stop(); if (drillF) { scene.remove(drillF.root); drillF = null; } },
+  drillIncoming: (move, guarded) => drill.incoming(move, guarded), drillGuard: () => drill.guard(),
+  drillStop() { if (drill) drill.stop(); if (drillF) { scene.remove(drillF.root); drillF = null; } if (mateF) { scene.remove(mateF.root); mateF = null; } },
   pop(text, cls) { if (drillF) pop(text, drillF.world('head', tmpV).add(tmpV2.set(.3, .42, 0)), cls, .7); },
   endPreview() { if (previewF) { scene.remove(previewF.root); previewF = null; } fighters.forEach(f => { f.root.visible = true; }); },
   setSpeed(v) { speed = v; }, applyOpt,
@@ -833,7 +839,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 33 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 35 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

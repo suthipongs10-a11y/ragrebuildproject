@@ -28,3 +28,4 @@
 | ฟอนต์ | Kanit, IBM Plex Sans Thai — Google Fonts (SIL Open Font License) |
 | three.js | MIT License — https://threejs.org |
 | ดนตรีประกอบ 2 เพลง (`prototypes/fight3d/assets/music/`) | ไฟล์จากเจ้าของเกม 14 พ.ย. 2026 — ที่มาและสัญญาอนุญาต: รอระบุ ต้องตรวจก่อนเปิดสาธารณะหรือลงสโตร์ |
+| เสียงเชียร์คนดู (`prototypes/fight3d/assets/sfx/cheer-*.mp3`) | ตัดจากคลิปถ่ายทอดสดที่เจ้าของเกมส่งมา 14 พ.ย. 2026 — สิทธิ์เป็นของผู้ถ่ายทอด ใช้ทดสอบเท่านั้น ต้องเปลี่ยนก่อนเปิดสาธารณะหรือลงสโตร์ |
