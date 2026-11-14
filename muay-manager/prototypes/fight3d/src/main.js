@@ -120,9 +120,11 @@ let fighters = [], W = 0, H = 0;
 
 function layout() {
   const w = stage.clientWidth; if (!w) return;
-  const h = Math.round(w / (w < 560 ? 4 / 3 : 16 / 9));
+  const full = $('arena').classList.contains('full'); // full screen: the ring takes whatever height is left
+  if (full) stage.style.height = '';
+  const h = full ? stage.clientHeight : Math.round(w / (w < 560 ? 4 / 3 : 16 / 9));
   if (w === W && h === H) return;
-  W = w; H = h; stage.style.height = h + 'px';
+  W = w; H = h; if (!full) stage.style.height = h + 'px';
   renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1)); renderer.setSize(w, h, false);
   camera.aspect = w / h; camera.updateProjectionMatrix();
 }
@@ -679,6 +681,19 @@ function buildUi() {
   });
   $('btnSpeed').addEventListener('click', e => { speed = speed === 1 ? 2 : 1; e.currentTarget.setAttribute('aria-pressed', String(speed === 2)); });
   $('btnSound').addEventListener('click', e => { const on = audio.toggle(); e.currentTarget.setAttribute('aria-pressed', String(on)); e.currentTarget.textContent = on ? 'ปิดเสียง' : 'เปิดเสียง'; if (on) audio.bell(1); });
+  // the fight alone, full screen: the browser's own full screen where it is allowed, else the page fills the window
+  const setFull = on => { $('arena').classList.toggle('full', on); $('btnFull').setAttribute('aria-pressed', String(on)); document.body.style.overflow = on ? 'hidden' : ''; W = 0; layout(); };
+  $('btnFull').addEventListener('click', () => {
+    const on = !$('arena').classList.contains('full'), el = $('arena');
+    setFull(on);
+    try {
+      if (on && el.requestFullscreen) el.requestFullscreen().catch(() => {});
+      else if (on && el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      else if (!on && document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    } catch (e) { /* the window-filling view still works */ }
+  });
+  document.addEventListener('fullscreenchange', () => { if (!document.fullscreenElement && $('arena').classList.contains('full')) setFull(false); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('arena').classList.contains('full') && !document.fullscreenElement) setFull(false); });
   window.addEventListener('resize', layout);
   if (window.ResizeObserver) new ResizeObserver(layout).observe(stage);
 }

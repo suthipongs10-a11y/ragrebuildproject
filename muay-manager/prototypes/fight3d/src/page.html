@@ -71,6 +71,16 @@ button:focus-visible,summary:focus-visible{outline:2px solid var(--gold);outline
 #scorecard .row{display:flex;justify-content:space-between;gap:22px;font-size:15px}
 #scorecard .r{color:var(--red-soft)} #scorecard .b{color:var(--blue-soft)}
 #scorecard b{font-size:24px;color:#fff;font-variant-numeric:tabular-nums}
+/* the fight alone, full screen: scoreboard on top, the ring filling the rest, the caption over the bottom */
+.arena{display:flex;flex-direction:column;gap:10px;min-width:0}
+.arena.full{position:fixed;inset:0;z-index:60;background:#000;gap:0;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.arena.full .board{padding:6px 10px;background:rgba(14,15,20,.92)}
+.arena.full .stage{flex:1 1 auto;min-height:0;border:0;border-radius:0}
+.arena.full .call{position:absolute;left:0;right:0;bottom:env(safe-area-inset-bottom);padding:6px 12px;background:linear-gradient(transparent,rgba(0,0,0,.7));pointer-events:none}
+.fullbtn{position:absolute;right:8px;top:8px;width:36px;height:36px;border-radius:8px;border:1px solid rgba(255,255,255,.25);background:rgba(10,11,15,.55);display:grid;place-items:center;padding:0;z-index:3}
+.fullbtn svg{width:20px;height:20px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.fullbtn[aria-pressed="true"] svg{transform:rotate(180deg)}
+.app.game.g-menu .fullbtn,.app.game.g-drill .fullbtn{display:none}
 #fps{position:absolute;right:8px;bottom:6px;font-size:11px;color:rgba(255,255,255,.45);font-variant-numeric:tabular-nums;pointer-events:none}
 .result{position:absolute;inset:0;background:var(--shade);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;line-height:1.35;text-align:center;padding:14px}
 .result .w{font-family:var(--display);font-style:italic;font-weight:800;font-size:30px}
@@ -224,6 +234,7 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
   </header>
   <!--G:top-->
 
+  <div class="arena" id="arena">
   <div class="board">
     <div class="side r">
       <div class="nmrow"><div class="nm" id="nmR"></div><div class="pts" id="ptR" title="คะแนน">0</div></div>
@@ -252,6 +263,7 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
     <div id="scorecard" hidden><div class="t" id="scT"></div><div class="row"><span class="r">แดง <b id="scR">0</b></span><span class="b"><b id="scB">0</b> น้ำเงิน</span></div></div>
     <div id="flash"></div>
     <div id="fps"></div>
+    <button class="fullbtn" id="btnFull" type="button" aria-label="ดูไฟต์เต็มจอ" aria-pressed="false" title="ดูไฟต์เต็มจอ"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button>
     <div class="result" id="result" hidden>
       <div class="m" id="resM"></div>
       <div class="w" id="resW"></div>
@@ -260,6 +272,7 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
   </div>
 
   <div class="call" id="call" aria-live="polite"></div>
+  </div>
 
   <div class="ctrl">
     <button class="btn go" id="btnRematch">ดูไฟต์นี้ใหม่</button>
