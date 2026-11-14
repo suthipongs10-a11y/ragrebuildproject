@@ -560,9 +560,11 @@ function frame(ts) {
     const sh = REDUCED ? 0 : drill.shake, far = camera.aspect < 1.5 ? 4.5 : 4.1;
     camera.position.set(.3 + (Math.random() - .5) * sh, 1.3 + (Math.random() - .5) * sh, far * (1 - drill.kick)); camera.lookAt(.1, 1.02, 0);
     arena.keyAt(0); arena.fadeRopes(camera.position, 0);
+    audio.update(dt, 0, false, 1, 0, 'off'); // the ring music and the pipe drone stop away from the fight
     arena.update(realT, 0, dt); fx.update(dt, camera); renderer.render(scene, camera); movePops(dt); return;
   }
   if (previewF && W) { // one fighter, slow orbit
+    audio.update(dt, 0, false, 1, 0, 'off');
     const P = buf[0]; P.set(FLAT[previewPose] || FLAT.guard);
     if (previewPose === 'guard') { const b = realT * 5.2; P[IDX.fL + 1] += Math.max(0, Math.sin(b)) * .04; P[IDX.hip + 1] += Math.sin(b) * .012; P[IDX.hL + 1] += Math.sin(b + 1) * .01; }
     previewF.update(P, 0, 0); previewF.setWear(0, 0, 0);
@@ -828,7 +830,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 30 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 31 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

@@ -12,6 +12,7 @@ export function buildAudio() {
     get on() { return on; },
     get sfxReady() { return !!sfx; }, // the recorded fight sounds are decoded
     get vols() { return Object.assign({}, vol); },
+    get musicOn() { return M.on; }, // for checks
     setVol(k, v) { if (!(k in vol)) return; vol[k] = Math.max(0, Math.min(1, +v || 0)); if (userGain[k]) userGain[k].gain.setTargetAtTime(vol[k], AC.currentTime, .05); },
     time: () => (AC ? AC.currentTime : 0),
     toggle() {
