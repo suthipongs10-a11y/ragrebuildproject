@@ -1,7 +1,8 @@
 // Bundles src/ into one self-contained page: dist/muay-fight-lab.html
 // three.js itself is loaded from the CDN by the page and used as a global.
 import { build } from 'esbuild';
-import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
@@ -92,16 +93,31 @@ const withModels = readFileSync('dist/muay-fight-lab.html', 'utf8').replace('<!-
 // two pages from one source: the presentation lab, and the game (same viewer plus the game screens)
 const page = withModels.replace('<!--G:top-->', '').replace('<!--G:body-->', '');
 writeFileSync('dist/muay-fight-lab.html', page);
-const game = readFileSync('src/page.html', 'utf8').replace('/*__APP__*/', () => jsGame).replace('<!--__MODELS__-->', () => models.join('\n') + uiStyle).replace('<title>Muay Fight Lab 3D</title>', '<title>Muay Manager</title>')
+const gameBase = readFileSync('src/page.html', 'utf8').replace('<title>Muay Fight Lab 3D</title>', '<title>Muay Manager</title>')
   .replace('<!--G:top-->', '<div id="game"><div class="gbar" id="gTop"></div></div>')
   .replace('<!--G:body-->', '<nav class="gnav" id="gNav" aria-label="เมนูเกม"></nav><div class="gbody" id="gBody"></div>');
+const game = gameBase.replace('/*__APP__*/', () => jsGame).replace('<!--__MODELS__-->', () => models.join('\n') + uiStyle);
 writeFileSync('dist/muay-manager.html', game);
 // the game as its own website (Cloudflare Pages, see docs/DEPLOY_CLOUDFLARE.md): a full document around the same page,
 // plus the phone home-screen files from site/. The store behind it is functions/api.
 const head = '<!doctype html>\n<html lang="th">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
   + '<meta name="theme-color" content="#0E0F14">\n<meta name="description" content="Muay Manager เกมผู้จัดการค่ายมวยไทย ซ้อม แต่งตัว วางแผน แล้วดูนักมวยชกเองแบบ 3D ท้าชกเพื่อนได้">\n'
   + '<link rel="manifest" href="/manifest.webmanifest">\n<link rel="icon" href="/icon-192.png">\n<link rel="apple-touch-icon" href="/icon-192.png">\n<style>html,body{margin:0;background:#0e0f14}</style>\n';
-mkdirSync('dist/site', {recursive: true});
-writeFileSync('dist/site/index.html', head + game + '\n</html>\n');
-for (const f of readdirSync('site')) writeFileSync('dist/site/' + f, readFileSync('site/' + f));
+// The site's page is small: the models, sounds and art (a/<hash>.html) and the game code (a/<hash>.js) are files of their
+// own named by content, which the loading screen (site/loader.html) fetches and browsers keep, so an update costs
+// only what changed.
+rmSync('dist/site', {recursive: true, force: true}); mkdirSync('dist/site/a', {recursive: true});
+const hash = t => createHash('sha256').update(t).digest('hex').slice(0, 16);
+const assetsHtml = models.join('\n') + uiStyle, assetsName = 'a/' + hash(assetsHtml) + '.html', appName = 'a/' + hash(jsGame) + '.js';
+writeFileSync('dist/site/' + assetsName, assetsHtml); writeFileSync('dist/site/' + appName, jsGame);
+const THREE_TAG = '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>';
+const siteAssets = {assets: '/' + assetsName, app: '/' + appName, three: THREE_TAG.match(/src="([^"]+)"/)[1],
+  assetsSize: Buffer.byteLength(assetsHtml), appSize: Buffer.byteLength(jsGame), assetsGz: gzipSync(assetsHtml + jsGame).length};
+const appBlock = THREE_TAG + '\n<script>\n/*__APP__*/\n</script>';
+if (!gameBase.includes(appBlock)) throw new Error('page.html: three.js tag and app script block not found');
+const loader = readFileSync('site/loader.html', 'utf8').replace('/*__SITE_ASSETS__*/null', () => JSON.stringify(siteAssets));
+const shell = gameBase.replace('<!--__MODELS__-->', '').replace(appBlock, () => loader);
+writeFileSync('dist/site/index.html', head + shell + '\n</html>\n');
+for (const f of readdirSync('site')) if (f !== 'loader.html') writeFileSync('dist/site/' + f, readFileSync('site/' + f));
+console.log('site: index.html', (shell.length / 1024).toFixed(0) + ' KB,', assetsName, (siteAssets.assetsSize / 1048576).toFixed(2) + ' MB,', appName, (siteAssets.appSize / 1024).toFixed(0) + ' KB, download ~' + (siteAssets.assetsGz / 1048576).toFixed(1) + ' MB gzip');
 console.log('dist/muay-fight-lab.html with models', (page.length / 1024 / 1024).toFixed(2) + ' MB, dist/muay-manager.html', (game.length / 1024 / 1024).toFixed(2) + ' MB (limit 16)');

@@ -1,0 +1,54 @@
+<!-- The website's loading screen (build.mjs puts it in place of the page's scripts). The models, sounds and drawn art
+     (a/<hash>.html) and the game code (a/<hash>.js) are separate files named by their content, kept by the browser
+     for a year: after an update only the changed file is downloaded again, not the whole 11 MB. -->
+<div id="siteLoad" role="status" aria-live="polite">
+  <div class="sl-box">
+    <b class="sl-logo">MUAY <span>MANAGER</span></b>
+    <span id="slMsg">กำลังโหลดเกม…</span>
+    <div class="sl-bar"><i id="slBar"></i></div>
+    <small id="slNote"></small>
+  </div>
+</div>
+<style>
+#siteLoad{position:fixed;inset:0;z-index:100;background:#0e0f14;display:flex;align-items:center;justify-content:center;padding:16px;color:#f1f2f5;font-family:"IBM Plex Sans Thai",system-ui,sans-serif}
+#siteLoad .sl-box{display:flex;flex-direction:column;align-items:center;gap:12px;width:min(320px,100%);text-align:center}
+#siteLoad .sl-logo{font-family:"Kanit",system-ui,sans-serif;font-style:italic;font-weight:800;font-size:28px;letter-spacing:.02em}
+#siteLoad .sl-logo span{color:#f2b83a}
+#siteLoad #slMsg{font-size:15px}
+#siteLoad .sl-bar{width:100%;height:8px;border-radius:4px;background:#2a2d39;overflow:hidden}
+#siteLoad .sl-bar i{display:block;height:100%;width:2%;background:#f2b83a;transition:width .2s}
+#siteLoad small{font-size:12.5px;color:#9a9fb0;min-height:1.4em}
+#siteLoad button{font:inherit;font-size:15px;padding:10px 18px;border-radius:8px;border:0;background:#f2b83a;color:#1b1300;font-weight:700}
+</style>
+<script>
+(async function () {
+  var A = /*__SITE_ASSETS__*/null;
+  var bar = document.getElementById('slBar'), msg = document.getElementById('slMsg'), note = document.getElementById('slNote');
+  var total = A.assetsSize + A.appSize, got = 0, mb = function (n) { return (n / 1048576).toFixed(1); };
+  note.textContent = 'ครั้งแรกราว ' + mb(A.assetsGz) + ' MB ครั้งต่อไปโหลดเฉพาะส่วนที่เปลี่ยน';
+  // read a file and move the bar as it arrives (sizes are the unpacked sizes, which is what the reader counts)
+  async function pull(url) {
+    var r = await fetch(url); if (!r.ok) throw new Error(url + ' ' + r.status);
+    if (!r.body || !r.body.getReader) { var t = await r.text(); got += t.length; return t; }
+    var rd = r.body.getReader(), dec = new TextDecoder(), out = '';
+    for (;;) {
+      var c = await rd.read(); if (c.done) break;
+      got += c.value.length; out += dec.decode(c.value, {stream: true});
+      bar.style.width = Math.min(98, 2 + got / total * 96) + '%';
+    }
+    return out + dec.decode();
+  }
+  function script(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { no(new Error(src)); }; document.head.appendChild(s); }); }
+  try {
+    var both = await Promise.all([pull(A.assets), pull(A.app), script(A.three)]);
+    msg.textContent = 'กำลังเตรียมเวที…'; bar.style.width = '99%';
+    await new Promise(function (ok) { setTimeout(ok, 30); });
+    var box = document.createElement('div'); box.id = 'siteAssets'; box.hidden = true; box.innerHTML = both[0]; document.body.appendChild(box);
+    var s = document.createElement('script'); s.textContent = both[1]; document.body.appendChild(s);
+    document.getElementById('siteLoad').remove();
+  } catch (e) {
+    msg.textContent = 'โหลดไม่สำเร็จ (เน็ตหลุดหรือช้า)'; note.textContent = String(e && e.message || e).slice(0, 120);
+    var b = document.createElement('button'); b.textContent = 'ลองใหม่'; b.onclick = function () { location.reload(); }; msg.parentNode.appendChild(b);
+  }
+})();
+</script>
