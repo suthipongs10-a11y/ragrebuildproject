@@ -103,6 +103,22 @@ function startCeremony() {
   return true;
 }
 function stopCeremony() { cer.stop(); cerDone = false; cerAt = null; }
+
+// ---------- sound settings: on/off and a level per group, kept in this browser ----------
+const SOUND_KEY = 'muaySound';
+function soundSave() { try { localStorage.setItem(SOUND_KEY, JSON.stringify(Object.assign({on: audio.on}, audio.vols))); } catch (e) { /* kept for this visit */ } }
+function setSound(on) {
+  if (audio.on !== !!on) audio.toggle();
+  const b = $('btnSound'); b.setAttribute('aria-pressed', String(audio.on)); b.textContent = audio.on ? 'ปิดเสียง' : 'เปิดเสียง';
+  soundSave(); return audio.on;
+}
+function soundLoad() {
+  let s = null; try { s = JSON.parse(localStorage.getItem(SOUND_KEY)); } catch (e) { /* defaults */ }
+  if (!s) return;
+  Object.keys(audio.vols).forEach(k => { if (typeof s[k] === 'number') audio.setVol(k, s[k]); });
+  // a browser starts sound only from a tap, so sound left on comes back with the first tap anywhere
+  if (s.on) { const wake = () => { document.removeEventListener('pointerdown', wake, true); if (!audio.on) setSound(true); }; document.addEventListener('pointerdown', wake, true); }
+}
 const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // ---------- scene ----------
@@ -681,7 +697,8 @@ function buildUi() {
     seek((nx == null ? moments[0] : nx) - 1.6);
   });
   $('btnSpeed').addEventListener('click', e => { speed = speed === 1 ? 2 : 1; e.currentTarget.setAttribute('aria-pressed', String(speed === 2)); });
-  $('btnSound').addEventListener('click', e => { const on = audio.toggle(); e.currentTarget.setAttribute('aria-pressed', String(on)); e.currentTarget.textContent = on ? 'ปิดเสียง' : 'เปิดเสียง'; if (on) audio.bell(1); });
+  $('btnSound').addEventListener('click', () => { if (setSound(!audio.on)) audio.bell(1); });
+  soundLoad();
   // the fight alone, full screen: the browser's own full screen where it is allowed, else the page fills the window
   const setFull = on => { $('arena').classList.toggle('full', on); $('btnFull').setAttribute('aria-pressed', String(on)); document.body.style.overflow = on ? 'hidden' : ''; W = 0; layout(); };
   $('btnFull').addEventListener('click', () => {
@@ -765,7 +782,7 @@ const API = {
   resume() { frozen = false; },
   skip() { seek(marks.over); },
   seekTo(t) { if (TL) seek(Math.min(t, marks.over - .05)); }, // join a live fight late
-  stop() { TL = null; fighters.forEach(f => scene.remove(f.root)); fighters = []; clearOverlays(); },
+  stop() { stopCeremony(); TL = null; fighters.forEach(f => scene.remove(f.root)); fighters = []; clearOverlays(); },
   result: () => fight && fight.result, fight: () => fight,
   async preview(look, pose, venue) { // show one fighter in the given look, standing in a venue
     const model = await API.single(look); if (!model) return false;
@@ -779,6 +796,7 @@ const API = {
   async single(look) {
     let model = null;
     try { model = await ensureModel(look.fighter); } catch (e) { $('modelNote').textContent = 'โหลดโมเดลนักมวยไม่ได้ (' + e.message + ') '; return null; }
+    stopCeremony(); // the referee leaves with the fight (he stood behind the camp screens before)
     const m = model.dims, D = DIM_DEFAULT, kHip = model.standHips / (D.thigh + D.shin + D.ankle + D.hipY);
     setDims(m); scalePoses(kHip, (.88 * kHip + m.spine + m.neck + m.head) / (.88 + D.spine + D.neck + D.head));
     API.endPreview(); API.drillStop(); fighters.forEach(f => { f.root.visible = false; });
@@ -795,7 +813,8 @@ const API = {
   drillStop() { if (drill) drill.stop(); if (drillF) { scene.remove(drillF.root); drillF = null; } },
   pop(text, cls) { if (drillF) pop(text, drillF.world('head', tmpV).add(tmpV2.set(.3, .42, 0)), cls, .7); },
   endPreview() { if (previewF) { scene.remove(previewF.root); previewF = null; } fighters.forEach(f => { f.root.visible = true; }); },
-  setSpeed(v) { speed = v; }, applyOpt
+  setSpeed(v) { speed = v; }, applyOpt,
+  sound: {get on() { return audio.on; }, set: setSound, get vols() { return audio.vols; }, vol(k, v) { audio.setVol(k, v); soundSave(); }, test() { if (audio.on) audio.bell(1); }}
 };
 window.MUAY = API;
 
@@ -806,7 +825,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 28 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 29 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

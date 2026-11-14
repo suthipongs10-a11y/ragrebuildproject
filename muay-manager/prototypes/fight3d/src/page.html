@@ -135,7 +135,13 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
 .gbar .who b{font-family:var(--display);font-size:16px;color:var(--red-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gbar .who span{font-size:12px;color:var(--muted)}
 .gbar .res{display:flex;gap:10px;font-family:var(--display);font-size:13px;font-variant-numeric:tabular-nums;color:var(--gold);white-space:nowrap}
-.gbar .fat{grid-column:1/-1;display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.gbar .fat{grid-column:1/-1;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+.gbar .fat .gset{display:inline-flex;align-items:center;gap:5px;min-height:32px;padding:4px 10px;border:1px solid var(--line);border-radius:16px;color:var(--fg);text-decoration:none;font-family:var(--display);font-size:13px}
+.gbar .fat .gset[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.setrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;font-size:14px}
+.setrow.vol{grid-template-columns:minmax(0,9em) minmax(0,1fr) 3.2em}
+.setrow input[type=range]{width:100%;accent-color:var(--gold);min-height:32px}
+.setrow output{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
 .gbar .fat .t,.kv .t{height:6px;background:var(--track);border-radius:3px;overflow:hidden}
 .gbar .fat i{display:block;height:100%;background:var(--hp)} .gbar .fat i.mid{background:var(--warn)} .gbar .fat i.hi{background:var(--bad)}
 .gnav{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}

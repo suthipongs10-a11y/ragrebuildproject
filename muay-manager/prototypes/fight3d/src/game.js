@@ -247,7 +247,19 @@ function topBar() {
   const f = Math.round(S.fatigue);
   $('gTop').innerHTML = '<div class="who"><b>' + esc(S.name) + '</b><span>' + LEAGUES[league(S.rp)][1] + ' · วันที่ ' + S.day + ' · อารมณ์ ' + art('mood-' + (S.mood + 1), 'mood') + '<i class="' + (S.mood > 2 ? 'hi' : S.mood < 2 ? 'lo' : '') + '">' + MOODS[S.mood] + '</i></span></div>' +
     '<div class="res"><span title="เงิน">' + art('icon-baht', 'ic') + '<b class="sym">฿</b> ' + baht(S.money) + '</span><span title="ชื่อเสียง">' + art('icon-fame', 'ic') + '<b class="sym">★</b> ' + S.fame + '</span><span title="คะแนนอันดับ">' + art('icon-rp', 'ic') + '<b class="sym">RP</b> ' + S.rp + '</span></div>' +
-    '<div class="fat" title="ความล้า"><span>' + art('icon-fatigue', 'ic') + 'ล้า ' + f + '%</span><span class="t"><i class="' + (f >= 70 ? 'hi' : f >= 40 ? 'mid' : '') + '" style="width:' + f + '%"></i></span></div>';
+    '<div class="fat" title="ความล้า"><span>' + art('icon-fatigue', 'ic') + 'ล้า ' + f + '%</span><span class="t"><i class="' + (f >= 70 ? 'hi' : f >= 40 ? 'mid' : '') + '" style="width:' + f + '%"></i></span>' +
+    (F ? '' : '<button class="btn link gset" data-act="settings" aria-pressed="' + !!(view && view.settings) + '">' + SPEAKER + 'ตั้งค่า</button>') + '</div>';
+}
+const SPEAKER = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M16 8.5a5 5 0 0 1 0 7M18.8 5.8a9 9 0 0 1 0 12.4"/></svg>';
+// sound settings (the viewer keeps them in this browser)
+const VOL_TH = [['music', 'ดนตรีปี่กลอง'], ['voice', 'เสียงพากย์และกรรมการ'], ['crowd', 'เสียงคนดู'], ['sfx', 'เสียงชก ระฆัง']];
+function settingsHtml() {
+  const snd = API.sound, v = snd.vols;
+  return '<section class="gcard gset-card"><h2>ตั้งค่าเสียง</h2>' +
+    '<div class="setrow"><span>เสียงทั้งหมด</span><button class="btn ' + (snd.on ? 'go' : '') + '" data-act="soundon" role="switch" aria-checked="' + snd.on + '">' + (snd.on ? 'เปิดอยู่' : 'ปิดอยู่ แตะเพื่อเปิด') + '</button></div>' +
+    VOL_TH.map(([k, th]) => '<label class="setrow vol"><span>' + th + '</span><input type="range" min="0" max="100" step="5" data-vol="' + k + '" value="' + Math.round(v[k] * 100) + '" aria-label="' + th + '"><output>' + Math.round(v[k] * 100) + '%</output></label>').join('') +
+    '<p class="hint">ระดับเสียงจำไว้ในเครื่องนี้ เปิดเสียงไว้แล้วครั้งหน้าเสียงจะกลับมาเมื่อแตะหน้าจอครั้งแรก</p>' +
+    '<div class="rowbtn"><button class="btn" data-act="soundtest"' + (snd.on ? '' : ' disabled') + '>ลองฟัง (ระฆัง)</button><button class="btn" data-act="setback">กลับ</button></div></section>';
 }
 function nav() {
   const tabs = [['home', 'ค่าย'], ['train', 'ซ้อม'], ['dress', 'แต่งตัว'], ['fight', 'หาคู่ชก'], ['rank', 'อันดับ']];
@@ -264,7 +276,8 @@ function render() {
   if (F) return renderFight();
   nav();
   const b = $('gBody');
-  if (tab === 'home') b.innerHTML = homeHtml();
+  if (view && view.settings) b.innerHTML = settingsHtml();
+  else if (tab === 'home') b.innerHTML = homeHtml();
   else if (tab === 'train') b.innerHTML = trainHtml();
   else if (tab === 'dress') b.innerHTML = dressHtml();
   else if (tab === 'fight') b.innerHTML = fightHtml();
@@ -717,6 +730,10 @@ function trainResult(q) {
 function onClick(e) {
   const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
   const act = el.dataset.act, v = el.dataset.v;
+  if (act === 'settings') { if (view && view.settings) view = null; else { if (DR) drillEnd(true); view = {settings: true}; } render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
+  if (act === 'soundon') { API.sound.set(!API.sound.on); API.sound.test(); render(); return; }
+  if (act === 'soundtest') { API.sound.test(); return; }
+  if (act === 'setback') { view = null; render(); return; }
   if (act === 'body') { draft.body = v; draft.name = $('gName').value; renderCreate(); API.preview({fighter: v, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}, 'guard'); }
   else if (act === 'style') { draft.style = v; draft.name = $('gName').value; renderCreate(); }
   else if (act === 'create') { const name = API.cleanName($('gName').value); if (name.length < 2) { $('gCreateMsg').textContent = 'ตั้งชื่อนักมวยก่อน อย่างน้อย 2 ตัวอักษร'; return; } S = newSave(name, draft.body, draft.style); save(); go('home'); }
@@ -754,6 +771,10 @@ function onClick(e) {
   else if (act === 'skip') API.skip();
   else if (act === 'drillquit') { drillEnd(true); setMode(false); render(); showMe(); }
 }
+function onInput(e) {
+  const el = e.target; if (!el.dataset || !el.dataset.vol) return;
+  API.sound.vol(el.dataset.vol, el.value / 100); const o = el.parentNode.querySelector('output'); if (o) o.textContent = el.value + '%';
+}
 function onChange(e) {
   const el = e.target;
   if (el.id === 'gdname') { const n = API.cleanName(el.value); if (n.length >= 2) { S.name = n; save(); topBar(); } el.value = S.name; }
@@ -763,8 +784,8 @@ export function bootGame(api) {
   API = api; API.HOOK.onRoundBreak = onRoundBreak; API.HOOK.onOver = onOver;
   window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
-  const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.5'; }
+  const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.6'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

@@ -5,10 +5,14 @@
 export function buildAudio() {
   let AC = null, on = false, master = null, sfxBus = null, music = null, crowd = null, voiceBus = null, crowdGain = null, noiseBuf = null;
   let clips = null, decoding = null, speaking = null, duck = 1, sfx = null, sfxLast = {}, bedEnd = 0;
+  // the player's own level for each group of sounds (settings screen), 0..1, applied after the mix below
+  const vol = {music: 1, voice: 1, crowd: 1, sfx: 1}, userGain = {};
   const M = {next: 0, step: 0, bpm: 100, on: false, pi: null, piGain: null, piFilter: null, phrase: [], pi7: 0, seed: 7};
   const A = {
     get on() { return on; },
     get sfxReady() { return !!sfx; }, // the recorded fight sounds are decoded
+    get vols() { return Object.assign({}, vol); },
+    setVol(k, v) { if (!(k in vol)) return; vol[k] = Math.max(0, Math.min(1, +v || 0)); if (userGain[k]) userGain[k].gain.setTargetAtTime(vol[k], AC.currentTime, .05); },
     time: () => (AC ? AC.currentTime : 0),
     toggle() {
       on = !on;
@@ -104,8 +108,8 @@ export function buildAudio() {
     master = AC.createGain(); master.gain.value = .9;
     const comp = AC.createDynamicsCompressor(); comp.threshold.value = -10; comp.knee.value = 8; comp.ratio.value = 6; comp.attack.value = .003; comp.release.value = .2; // a stacked crowd shout or a pile-up of sounds never clips
     master.connect(comp); comp.connect(AC.destination);
-    const bus = g => { const n = AC.createGain(); n.gain.value = g; n.connect(master); return n; };
-    sfxBus = bus(1); music = bus(0); crowd = bus(.9); voiceBus = bus(1.1);
+    const bus = (g, k) => { const n = AC.createGain(), u = AC.createGain(); n.gain.value = g; u.gain.value = vol[k]; userGain[k] = u; n.connect(u); u.connect(master); return n; };
+    sfxBus = bus(1, 'sfx'); music = bus(0, 'music'); crowd = bus(.9, 'crowd'); voiceBus = bus(1.1, 'voice');
     noiseBuf = AC.createBuffer(1, AC.sampleRate * 2, AC.sampleRate);
     const d = noiseBuf.getChannelData(0); let last = 0;
     for (let i = 0; i < d.length; i++) { const w = Math.random() * 2 - 1; last = (last + .04 * w) / 1.04; d[i] = last * 3 + w * .25; }
