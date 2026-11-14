@@ -111,6 +111,9 @@ export const RULES = {
   fistBias: {jab: 1.2, cross: 1.6, hook: 1.9, upper: 1.9, bodyshot: 1.6},
   blockBase: .5, dodgeBase: .12,
   evadeShare: .6,        // share of head-level blocks that become a slip or a duck (scaled by speed / 55)
+  // On top of that, a man standing his ground gets out of the way: he slips punches to the head left and right, and bends
+  // back or sucks his body back from kicks to the body and head (scaled by speed / 55)
+  slipBase: .12, kickDodge: .3,
   // raising the guard on reading an attack: chance, and how much it helps when the read is right or wrong
   coverBase: .2, coverDef: .4, coverRead: .75, coverBonus: .3, coverMul: 1.7, coverWrong: .5,
   critChance: .1, critMul: 1.5, counterMul: 1.3,
@@ -155,7 +158,7 @@ export const RULES = {
   paceLight: .5, lightShare: .85, lightMoves: ['jab', 'cross', 'low', 'teep'],
   paceBack: .75, backDist: 162, // at pace 0, chance to step straight back out of range after a single shot, and to how far
   paceRange: 16,          // extra distance kept at pace 0
-  paceDmg: [.9, 1.35],    // power of a full shot at pace 0 and at full pace
+  paceDmg: [.95, 1.5],    // power of a full shot at pace 0 and at full pace
   leanBackHold: .34,      // leaning back from a kick: how long the defender stays back
   restHp: 1.4, restSt: 12
 };

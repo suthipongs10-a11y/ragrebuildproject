@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.11';
+export const SIM_VERSION = 'proto-0.12';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -166,10 +166,16 @@ export function simulate(opts) {
     else if (held) { pB *= .6; pD = 0; }
     else if (o.state === 'clinch') { pD = 0; }
     else if (o.state === 'caught') { pB = 0; pD = 0; }
-    else if (o.state === 'cover') { pD = 0; pB = o.coverLvl === m.lvl ? Math.min(.92, pB * K.coverMul + K.coverBonus) : pB * K.coverWrong; }
-    if (o.st < 25) pB *= .7;
-    if (m.special) { pB *= .45; pD *= .4; }
-    if (f.chain > 0) pB *= Math.max(.5, 1 - f.chain * .15);
+    else if (o.state === 'cover') { pD = 0; pB = o.coverLvl === m.lvl ? 1 : pB * K.coverWrong; } // the guard up at the right height stops it: no points
+    const guarded = o.state === 'cover' && o.coverLvl === m.lvl;
+    if (o.st < 25 && !guarded) pB *= .7;
+    if (m.special && !guarded) { pB *= .45; pD *= .4; }
+    if (f.chain > 0 && !guarded) pB *= Math.max(.5, 1 - f.chain * .15);
+    if (o.state === 'idle' || o.state === 'block') { // getting out of the way, on top of the guard
+      const q = o.stats.spd / 55;
+      if (m.kind === 'punch' && m.lvl === 'head' && !m.inClinch && !m.special) pD += K.slipBase * q;
+      else if (key === 'body' || key === 'high' || key === 'teepFace') pD += K.kickDodge * q;
+    }
     pD *= 1 - Math.min(.5, o.wearLeg / 160);
     // upstairs, part of what would have been blocked is slipped or ducked instead, more so for a quick fighter
     if (m.lvl === 'head' && (o.state === 'idle' || o.state === 'block' || o.state === 'cover')) { const sh = Math.min(.8, K.evadeShare * o.stats.spd / 55) * pB; pD += sh; pB -= sh; }

@@ -381,13 +381,14 @@ function handle(e) {
         stopT = Math.max(stopT, OPT.stop * .018); shake = Math.max(shake, OPT.shake * .008 * (REDUCED ? 0 : 1));
         audio.block();
         if (!rp && m.inClinch && m.sfx === 'elbow' && OPT.labels >= 1) pop('กันศอกได้', p.clone().add(tmpV2.set(0, .32, 0)), 'small', 1.1);
+        else if (!rp && m.kind === 'kick' && m.lvl !== 'head' && !m.inClinch && OPT.labels >= 1) pop('ยกเข่าบัง', p.clone().add(tmpV2.set(0, .3, 0)), 'small'); // checked: no points
         else if (!rp && OPT.labels >= 2) pop('บัง', p.clone().add(tmpV2.set(0, .3, 0)), 'small');
       } else if (e.res === 'catch') {
         audio.block(); hype = Math.min(1, hype + .35);
         if (!rp && OPT.labels >= 1) pop('จับขา!', df.world('haL', tmpV2).clone().add(tmpV.set(0, .35, 0)), 'gold');
       } else {
         audio.whiff();
-        if (!rp && OPT.labels >= 2 && e.res === 'dodge') pop(/^(high|spKick|body|teepFace)$/.test(e.move) ? 'เอนหลบ!' : 'หลบ!', df.world('head', tmpV2).clone().add(tmpV.set(0, .3, 0)), 'small');
+        if (!rp && OPT.labels >= 2 && e.res === 'dodge') pop(/^(high|spKick|teepFace)$/.test(e.move) ? 'เอนหลบ!' : /^(body|teep|knee)$/.test(e.move) ? 'โก่งตัวหลบ!' : 'หลบ!', df.world('head', tmpV2).clone().add(tmpV.set(0, .3, 0)), 'small');
       }
       break;
     }
@@ -787,7 +788,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 25 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 26 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

@@ -82,9 +82,12 @@ export const POSES = {
   check: P({lean: .05, hip: [-.04, .88, 0], fL: [.28, .42, -.12], kL: [1, .4, -.6], hL: [.3, 1.5, -.12]}),
   // head movement: duck under a swing, slip a straight punch to either side
   duck: P({turn: .3, lean: .56, hdP: .12, hip: [.03, .67, 0], hL: [.34, 1.22, -.1], hR: [.26, 1.2, .1], fL: [.28, 0, -.14], fR: [-.24, 0, .18]}),
-  slipL: P({lean: .24, side: -.4, twist: .22, hdP: .1, hip: [.01, .81, -.08], hL: [.32, 1.42, -.17], hR: [.22, 1.44, .05]}),
-  slipR: P({lean: .24, side: .4, twist: -.22, hdP: .1, hip: [.01, .81, .08], hL: [.34, 1.44, -.05], hR: [.2, 1.4, .17]}),
+  slipL: P({lean: .28, side: -.52, twist: .28, hdP: .1, hip: [.01, .8, -.12], hL: [.3, 1.4, -.2], hR: [.22, 1.44, .04]}),
+  slipR: P({lean: .28, side: .52, twist: -.28, hdP: .1, hip: [.01, .8, .12], hL: [.34, 1.44, -.04], hR: [.2, 1.38, .2]}),
   dodge: P({lean: -.42, hdP: -.1, hip: [-.12, .86, 0], hL: [.2, 1.38, -.12], hR: [.1, 1.36, .13]}),
+  // sucking the body back from a kick to the stomach: hips thrown back over the rear foot, the body bowed so the belly
+  // goes away while the guard stays up
+  hipBack: P({turn: .3, lean: .34, hdP: .18, hip: [-.25, .83, .01], hL: [.12, 1.32, -.14], hR: [-.02, 1.24, .12], fL: [.26, 0, -.12], fR: [-.3, 0, .17], kR: [.8, 0, .6]}),
   // bending right back from a kick: weight sunk on the rear leg, lead foot light, chin tucked, rear glove by the face
   leanBack: P({turn: .55, lean: -.62, hdP: .12, hip: [-.2, .82, .02], hL: [-.14, 1.43, -.14], hR: [-.28, 1.35, .12], fL: [.3, .03, -.12], fR: [-.24, 0, .17], kR: [.8, 0, .6]}),
 

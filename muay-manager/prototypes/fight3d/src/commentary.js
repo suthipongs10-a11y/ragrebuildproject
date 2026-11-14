@@ -30,6 +30,9 @@ export const LINES = {
   special:   {hot: 1, t: ['ท่าไม้ตาย!']},
   block:     {hot: 0, t: ['ป้องกันไว้ได้', 'บังไว้ได้ครับ']},
   leanBack:  {hot: 1, t: ['เอนหลบสวยมาก!', 'หลบลูกเตะได้!']},
+  bellyBack: {hot: 1, t: ['โก่งตัวหลบลูกเตะ!']},
+  slip:      {hot: 1, t: ['โยกหลบสวย!', 'หลบหมัดได้!']},
+  check:     {hot: 0, t: ['ยกเข่าบังไว้ได้']},
   catch:     {hot: 1, t: ['จับขาไว้ได้!']},
   clinch:    {hot: 0, t: ['เข้ากอดคอแล้วครับ', 'กอดคอปล้ำกันแล้ว']},
   clinchHit: {hot: 1, t: ['ตีเข่าในวงกอด!', 'ศอกในวงกอด!']},
@@ -101,7 +104,8 @@ export function buildCommentary(audio, MOVES) {
         else if (e.phase === 'dec') say('decWait', now, true);
         break;
       case 'hit': {
-        if (e.res === 'dodge' && /^(high|spKick|body|teepFace)$/.test(e.move) && Math.random() < .5) { say('leanBack', now); break; }
+        if (e.res === 'dodge') { const r = Math.random(); if (/^(high|spKick|teepFace)$/.test(e.move) && r < .5) say('leanBack', now); else if (/^(body|teep|knee)$/.test(e.move) && r < .5) say('bellyBack', now); else if (r < .3) say('slip', now); break; }
+        if (e.res === 'block' && (e.move === 'body' || e.move === 'low') && Math.random() < .25) { say('check', now); break; }
         if (e.res === 'block' && e.special) { say('block', now); break; }
         if (e.res === 'catch') { say('catch', now); break; }
         if (e.res !== 'hit') break;

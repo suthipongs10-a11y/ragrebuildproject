@@ -49,9 +49,10 @@ export function bake(fight) {
   }
   // How a fighter gets out of the way depends on what is coming: duck under a swing, slip a straight punch, bend right
   // back from a kick (now and then he ducks a high kick instead), lean back from the rest.
-  const DUCK = new Set(['hook', 'elbow', 'spinElbow', 'spCroc', 'spChop']), SLIP = new Set(['jab', 'cross']), LEAN = new Set(['high', 'spKick', 'body', 'teepFace']);
+  const DUCK = new Set(['hook', 'elbow', 'spinElbow', 'spCroc', 'spChop']), SLIP = new Set(['jab', 'cross']), LEAN = new Set(['high', 'spKick', 'teepFace']), BELLY = new Set(['body', 'teep', 'knee']);
   const evade = e => {
     const h = Math.round(e.t / dt);
+    if (BELLY.has(e.move)) return 'hipBack'; // a kick at the stomach: the body bows back out of it
     if (LEAN.has(e.move)) return (e.move === 'high' || e.move === 'spKick') && h % 3 === 0 ? 'duck' : 'leanBack';
     if (MOVES[e.move].lvl !== 'head') return 'dodge';
     if (DUCK.has(e.move) || (e.move === 'cross' && h % 4 < 2)) return 'duck'; if (SLIP.has(e.move)) return h % 2 ? 'slipL' : 'slipR'; return 'dodge';
@@ -65,7 +66,7 @@ export function bake(fight) {
   for (const c of fight.poses) { const key = c.f + ':' + Math.round(c.t / dt), v = c.pose === 'dodge' ? evadeAt.get(key) : c.pose === 'blockBody' && kneeUp.has(key) ? 'checkBody' : null; cues[c.f].push(v ? Object.assign({}, c, {pose: v}) : c); }
   for (const e of fight.events) {
     if (e.type !== 'hit' || (e.res !== 'block' && e.res !== 'dodge')) continue;
-    const pose = e.res === 'dodge' ? evade(e) : null, lb = pose === 'leanBack'; // bending back from a kick starts earlier and takes longer
+    const pose = e.res === 'dodge' ? evade(e) : null, lb = pose === 'leanBack' || pose === 'hipBack'; // getting the body out of a kick starts earlier and takes longer
     const tA = e.t - (lb ? .2 : .13), st = tick(e.on, Math.round(tA / dt), 4);
     // a fighter already covering up has the pose from the sim, unless he is about to get out of the way instead
     if (st !== STATE.idle && st !== STATE.block && !(pose && st === STATE.cover)) continue;
@@ -85,12 +86,13 @@ export function bake(fight) {
     let ev = null;
     for (const e of list) if (Math.abs(e.t - tH) < .05) { ev = e; break; }
     cue.ev = ev;
-    if (!ev || (ev.res !== 'hit' && ev.res !== 'block')) return;
+    if (!ev || (ev.res !== 'hit' && ev.res !== 'block' && ev.res !== 'dodge')) return;
     const mv = MOVES[cue.strike], kh = Math.round(tH / dt), o = 1 - i;
     const dist = Math.abs(tick(o, kh, 0) - tick(i, kh, 0)) * .01;
-    const ob = baked[o], oo = Math.min(n - 1, kh + (ev.res === 'block' ? 1 : 0)) * NP;
+    // a dodged blow is thrown at where the target was before he moved, so it goes on past him into the air
+    const ob = baked[o], oo = Math.max(0, Math.min(n - 1, kh + (ev.res === 'block' ? 1 : ev.res === 'dodge' ? -Math.round(.3 / dt) : 0))) * NP;
     solve(ob, oo, J2);
-    if (ev.res === 'hit') {
+    if (ev.res === 'hit' || ev.res === 'dodge') {
       if (mv.lvl === 'head') pt3.copy(J2.head);
       else if (mv.lvl === 'body') { pt3.copy(J2.chest); pt3.y += -.06 + (mv.aimY || 0); }
       else pt3.copy(J2.hpL).add(J2.knL).multiplyScalar(.5);
@@ -101,7 +103,7 @@ export function bake(fight) {
     }
     // defender-local -> attacker-local (they face each other), then into the attacker's spun frame
     pt3.applyAxisAngle(UP, -ob[oo + IDX.spin]); pt3.y += ob[oo + IDX.jump];
-    pt3.set(dist - pt3.x, pt3.y - target[IDX.jump], -pt3.z);
+    pt3.set(dist - pt3.x + (ev.res === 'dodge' ? .06 : 0), pt3.y - target[IDX.jump], -pt3.z);
     pt3.applyAxisAngle(UP, target[IDX.spin]);
     aimEffector(target, mv.eff, pt3, J);
   }
