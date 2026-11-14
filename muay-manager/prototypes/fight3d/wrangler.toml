@@ -8,3 +8,8 @@ compatibility_date = "2026-11-01"
 binding = "DB"
 database_name = "muay-manager"
 database_id = "2282b1ce-4325-43b0-af85-988867502ed7"
+
+# the game files (index.html, icons, manifest), written by tools/deploy-site.mjs and served by functions/[[path]].js
+[[kv_namespaces]]
+binding = "SITE"
+id = "5d66b60a77884b6eac1f730f9d365bfb"

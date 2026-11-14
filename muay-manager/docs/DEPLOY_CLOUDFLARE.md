@@ -1,7 +1,7 @@
 # เอาเกมขึ้นเว็บ (Cloudflare) — Muay Manager
 
-สถานะ: 14 พ.ย. 2026 บัญชีและ token พร้อม ฐานข้อมูล D1 `muay-manager` (APAC) และโปรเจกต์ Pages `muay-manager` สร้างแล้ว
-เซิร์ฟเวอร์ `/api` ขึ้นจริงที่ https://muay-manager.pages.dev แล้ว หน้าเกมรอสิทธิ์ Workers KV ใน token
+สถานะ: 14 พ.ย. 2026 **ขึ้นจริงแล้วที่ https://muay-manager.pages.dev** ฐานข้อมูล D1 `muay-manager` (APAC) • KV `muay-manager-site` (binding `SITE`) • โปรเจกต์ Pages `muay-manager`
+ขึ้นใหม่หลังแก้: `npm run deploy` (ต้องตั้ง `CLOUDFLARE_ACCOUNT_ID` และ token ดูหัวข้อ Claude ทำ)
 
 ## ทำไมเลือก Cloudflare ก่อน VPS
 
@@ -55,7 +55,7 @@ cd muay-manager/prototypes/fight3d
 export CLOUDFLARE_API_TOKEN=proxy-injected-dummy CLOUDFLARE_ACCOUNT_ID=<จาก /client/v4/accounts>   # proxy ใส่ token จริงให้
 npx --yes wrangler@4 d1 create muay-manager --location apac                 # ทำแล้ว id อยู่ใน wrangler.toml
 npx --yes wrangler@4 pages project create muay-manager --production-branch main   # ทำแล้ว
-npx --yes wrangler@4 kv namespace create muay-manager-site                  # รอสิทธิ์ KV แล้วใส่ id ใน wrangler.toml เป็น binding SITE
+npx --yes wrangler@4 kv namespace create muay-manager-site                  # ทำแล้ว id อยู่ใน wrangler.toml เป็น binding SITE
 npm run deploy                                      # build + ไฟล์ลง KV + deploy Functions ได้ https://muay-manager.pages.dev
 ```
 
