@@ -78,6 +78,11 @@ npm run deploy                                      # build + ไฟล์ลง
 npx --yes wrangler@4 d1 execute muay-manager --remote --command "SELECT coll, id, updated FROM docs ORDER BY updated DESC LIMIT 20"
 ```
 
+อ่าน error จากเครื่องผู้เล่น (หน้าเว็บส่งเข้า `/api/log` เองเมื่อเกมพัง):
+```bash
+npx --yes wrangler@4 d1 execute muay-manager --remote --command "SELECT id, datetime(t/1000,'unixepoch') AS at, ver, ua, msg FROM logs ORDER BY id DESC LIMIT 20"
+```
+
 ## ขีดจำกัดแผนฟรี (ตรวจเมื่อจะเปิดให้คนเยอะ)
 
 - Functions 100,000 ครั้งต่อวัน (นับการเปิดหน้าเกมด้วย): เกมถามคำท้าใหม่ทุก 8 วินาทีตอนเปิดหน้า (30 วินาทีตอนสลับไปแอปอื่น) ผู้เล่นหนึ่งคนเปิดหนึ่งชั่วโมงราว 900 ครั้ง เพื่อน 10 คนเล่นวันละ 2 ชั่วโมงราว 18,000 ครั้ง สบาย

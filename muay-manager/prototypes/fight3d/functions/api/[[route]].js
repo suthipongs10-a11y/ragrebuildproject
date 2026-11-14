@@ -8,6 +8,7 @@
 //   GET  /api/db/<collection>/<doc>       -> {id, data} (data null when there is no such document)
 //   PUT  /api/db/<collection>/<doc>       body: JSON object -> {ok}
 //   DELETE /api/db/<collection>/<doc>     -> {ok}
+//   POST /api/log                         body: {msg, ver, page} -> {ok}   errors from players' browsers, the last 1000 kept
 const SHARED = new Set(['board', 'challenges', 'answers']);
 const SEG = /^[A-Za-z0-9_\-.~:@+]{1,200}$/, FIELD = /^[A-Za-z0-9_]{1,40}$/, MAX_BODY = 256 * 1024;
 const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers: {'Content-Type': 'application/json', 'Cache-Control': 'no-store'}});
@@ -16,7 +17,8 @@ async function schema(db) {
   if (ready) return;
   await db.batch([
     db.prepare('CREATE TABLE IF NOT EXISTS players (id TEXT PRIMARY KEY, secret_hash TEXT NOT NULL, created INTEGER NOT NULL)'),
-    db.prepare('CREATE TABLE IF NOT EXISTS docs (coll TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, updated INTEGER NOT NULL, PRIMARY KEY (coll, id))')
+    db.prepare('CREATE TABLE IF NOT EXISTS docs (coll TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, updated INTEGER NOT NULL, PRIMARY KEY (coll, id))'),
+    db.prepare('CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER NOT NULL, ua TEXT, ver TEXT, msg TEXT)')
   ]);
   ready = true;
 }
@@ -36,6 +38,15 @@ export async function onRequest({request, env, params}) {
   await schema(db);
   const dec = x => { try { return decodeURIComponent(x); } catch (e) { return ''; } }, route = [].concat(params.route || []).map(dec), method = request.method;
   if (route[0] === 'health') return json({ok: true});
+  if (route[0] === 'log' && method === 'POST') {
+    const text = (await request.text()).slice(0, 4000); let d = {}; try { d = JSON.parse(text) || {}; } catch (e) { d = {msg: text}; }
+    const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
+    await db.batch([
+      db.prepare('INSERT INTO logs (t, ua, ver, msg) VALUES (?, ?, ?, ?)').bind(Date.now(), cut(request.headers.get('User-Agent'), 200), cut(d.ver, 40), cut(d.msg, 3000)),
+      db.prepare('DELETE FROM logs WHERE id <= (SELECT MAX(id) - 1000 FROM logs)')
+    ]);
+    return json({ok: true});
+  }
   if (route[0] === 'register' && method === 'POST') {
     const id = 'p_' + rand(10), secret = rand(32);
     await db.prepare('INSERT INTO players (id, secret_hash, created) VALUES (?, ?, ?)').bind(id, await sha256(secret), Date.now()).run();

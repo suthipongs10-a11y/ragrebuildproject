@@ -38,6 +38,24 @@
     }
     return out + dec.decode();
   }
+  // errors on players' phones go to the server (/api/log) so they can be read while fixing; a few per visit at most
+  var sent = 0, failed = null, booted = function () { var h = document.querySelector('h1'); return !!(h && h.classList.contains('glogo')); };
+  function report(m) {
+    if (!failed && !booted()) failed = m;
+    if (sent++ >= 5) return;
+    var ver = (document.getElementById('ver') || {}).textContent || '';
+    try { navigator.sendBeacon('/api/log', JSON.stringify({msg: String(m).slice(0, 3000), ver: ver})); } catch (e) { /* no beacon */ }
+  }
+  window.addEventListener('error', function (e) { report((e.message || 'error') + ' @' + (e.filename || '').split('/').pop() + ':' + e.lineno + (e.error && e.error.stack ? '\n' + e.error.stack : '')); });
+  window.addEventListener('unhandledrejection', function (e) { var r = e.reason; report('promise: ' + (r && (r.stack || r.message) || r)); });
+  function fail(text, detail) {
+    msg.textContent = text; note.textContent = String(detail || '').slice(0, 160); bar.parentNode.style.display = 'none';
+    var row = document.createElement('div'); row.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;justify-content:center';
+    var b = document.createElement('button'); b.textContent = 'ลองใหม่'; b.onclick = function () { location.reload(); }; row.appendChild(b);
+    var c = document.createElement('button'); c.textContent = 'ล้างการตั้งค่าเสียงและภาพ แล้วลองใหม่'; c.style.background = '#2a2d39'; c.style.color = '#f1f2f5';
+    c.onclick = function () { try { localStorage.removeItem('muaySound'); } catch (e) {} location.reload(); }; row.appendChild(c);
+    msg.parentNode.appendChild(row);
+  }
   function script(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { no(new Error(src)); }; document.head.appendChild(s); }); }
   try {
     var both = await Promise.all([pull(A.assets), pull(A.app), script(A.three)]);
@@ -45,10 +63,13 @@
     await new Promise(function (ok) { setTimeout(ok, 30); });
     var box = document.createElement('div'); box.id = 'siteAssets'; box.hidden = true; box.innerHTML = both[0]; document.body.appendChild(box);
     var s = document.createElement('script'); s.textContent = both[1]; document.body.appendChild(s);
-    document.getElementById('siteLoad').remove();
-  } catch (e) {
-    msg.textContent = 'โหลดไม่สำเร็จ (เน็ตหลุดหรือช้า)'; note.textContent = String(e && e.message || e).slice(0, 120);
-    var b = document.createElement('button'); b.textContent = 'ลองใหม่'; b.onclick = function () { location.reload(); }; msg.parentNode.appendChild(b);
+  } catch (e) { report('load: ' + (e && e.message || e)); fail('โหลดไม่สำเร็จ (เน็ตหลุดหรือช้า)', e && e.message || e); return; }
+  // the game is up when its menu has replaced the page title; an error before that shows here instead of a frozen page
+  for (var i = 0; i < 150; i++) {
+    if (booted()) { document.getElementById('siteLoad').remove(); return; }
+    if (failed) { fail('เกมเริ่มไม่ได้ ส่งรายงานให้ผู้พัฒนาแล้ว', failed); return; }
+    await new Promise(function (ok) { setTimeout(ok, 200); });
   }
+  report('boot: no game menu after 30 s'); fail('เกมเริ่มช้าผิดปกติ', 'ลองใหม่อีกครั้ง หรือล้างการตั้งค่า');
 })();
 </script>

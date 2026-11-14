@@ -106,17 +106,19 @@ function stopCeremony() { cer.stop(); cerDone = false; cerAt = null; }
 
 // ---------- sound settings: on/off and a level per group, kept in this browser ----------
 const SOUND_KEY = 'muaySound';
-function soundSave() { try { localStorage.setItem(SOUND_KEY, JSON.stringify(Object.assign({on: audio.on, bright: arena.bright}, audio.vols))); } catch (e) { /* kept for this visit */ } }
+let savedBright = 1; // the brightness setting, applied to the arena once it is built
+function soundSave() { try { localStorage.setItem(SOUND_KEY, JSON.stringify(Object.assign({on: audio.on, bright: arena ? arena.bright : savedBright}, audio.vols))); } catch (e) { /* kept for this visit */ } }
 function setSound(on) {
   if (audio.on !== !!on) audio.toggle();
   const b = $('btnSound'); b.setAttribute('aria-pressed', String(audio.on)); b.textContent = audio.on ? 'ปิดเสียง' : 'เปิดเสียง';
   soundSave(); return audio.on;
 }
+// Runs before the arena exists. A bad or old saved value must never stop the game from starting.
 function soundLoad() {
   let s = null; try { s = JSON.parse(localStorage.getItem(SOUND_KEY)); } catch (e) { /* defaults */ }
-  if (!s) return;
-  Object.keys(audio.vols).forEach(k => { if (typeof s[k] === 'number') audio.setVol(k, s[k]); });
-  if (typeof s.bright === 'number') arena.setBrightness(s.bright);
+  if (!s || typeof s !== 'object') return;
+  try { Object.keys(audio.vols).forEach(k => { if (typeof s[k] === 'number') audio.setVol(k, s[k]); }); } catch (e) { console.warn('sound settings ignored', e); }
+  if (typeof s.bright === 'number' && s.bright > 0) savedBright = s.bright;
   // a browser starts sound only from a tap, so sound left on comes back with the first tap anywhere
   if (s.on) { const wake = () => { document.removeEventListener('pointerdown', wake, true); if (!audio.on) setSound(true); }; document.addEventListener('pointerdown', wake, true); }
 }
@@ -826,11 +828,11 @@ window.MUAY = API;
 buildUi(); layout();
 const GAME_MODE = !!document.getElementById('game');
 const start = async () => {
-  arena = buildArena(scene); fx = buildFx(scene); drill = buildDrill(scene, fx, audio);
+  arena = buildArena(scene); arena.setBrightness(savedBright); fx = buildFx(scene); drill = buildDrill(scene, fx, audio);
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 31 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 32 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision
