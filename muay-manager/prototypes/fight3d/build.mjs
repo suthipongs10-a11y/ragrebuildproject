@@ -81,12 +81,13 @@ for (const [dir, id] of [['assets/voice', 'voice-pack'], ['assets/sfx', 'sfx-pac
 }
 // Drawn UI art for the game page (tools/ui-art-import.py): each image as a CSS variable and a [data-ui] rule, plus the
 // layout that shows them (src/ui-art.css). The app icon is kept for the stores, not the page.
-let uiStyle = '';
+let uiStyle = '', uiImages = '', uiCss = ''; // images (big, rarely change) and their layout (small, often tweaked)
 if (existsSync('assets/ui')) {
   const files = readdirSync('assets/ui').filter(f => f.endsWith('.webp') && f !== 'app-icon.webp').sort();
   const vars = files.map(f => `--ui-${f.slice(0, -5)}:url(data:image/webp;base64,${readFileSync('assets/ui/' + f).toString('base64')})`).join(';');
   const rules = files.map(f => `[data-ui="${f.slice(0, -5)}"]{background-image:var(--ui-${f.slice(0, -5)})}`).join('');
-  uiStyle = `<style id="ui-art">:root{${vars}}${rules}\n${readFileSync('src/ui-art.css', 'utf8')}</style>`;
+  uiImages = `<style id="ui-art">:root{${vars}}${rules}</style>`; uiCss = `<style id="ui-art-layout">${readFileSync('src/ui-art.css', 'utf8')}</style>`;
+  uiStyle = uiImages + uiCss;
   console.log('ui art', files.length, 'images', (uiStyle.length / 1024 / 1024).toFixed(2) + ' MB');
 }
 const withModels = readFileSync('dist/muay-fight-lab.html', 'utf8').replace('<!--__MODELS__-->', () => models.join('\n'));
@@ -108,7 +109,7 @@ const head = '<!doctype html>\n<html lang="th">\n<head>\n<meta charset="utf-8">\
 // only what changed.
 rmSync('dist/site', {recursive: true, force: true}); mkdirSync('dist/site/a', {recursive: true});
 const hash = t => createHash('sha256').update(t).digest('hex').slice(0, 16);
-const assetsHtml = models.join('\n') + uiStyle, assetsName = 'a/' + hash(assetsHtml) + '.html', appName = 'a/' + hash(jsGame) + '.js';
+const assetsHtml = models.join('\n') + uiImages, assetsName = 'a/' + hash(assetsHtml) + '.html', appName = 'a/' + hash(jsGame) + '.js';
 writeFileSync('dist/site/' + assetsName, assetsHtml); writeFileSync('dist/site/' + appName, jsGame);
 const THREE_TAG = '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>';
 const siteAssets = {assets: '/' + assetsName, app: '/' + appName, three: THREE_TAG.match(/src="([^"]+)"/)[1],
@@ -116,7 +117,7 @@ const siteAssets = {assets: '/' + assetsName, app: '/' + appName, three: THREE_T
 const appBlock = THREE_TAG + '\n<script>\n/*__APP__*/\n</script>';
 if (!gameBase.includes(appBlock)) throw new Error('page.html: three.js tag and app script block not found');
 const loader = readFileSync('site/loader.html', 'utf8').replace('/*__SITE_ASSETS__*/null', () => JSON.stringify(siteAssets));
-const shell = gameBase.replace('<!--__MODELS__-->', '').replace(appBlock, () => loader);
+const shell = gameBase.replace('<!--__MODELS__-->', () => uiCss).replace(appBlock, () => loader);
 writeFileSync('dist/site/index.html', head + shell + '\n</html>\n');
 for (const f of readdirSync('site')) if (f !== 'loader.html') writeFileSync('dist/site/' + f, readFileSync('site/' + f));
 console.log('site: index.html', (shell.length / 1024).toFixed(0) + ' KB,', assetsName, (siteAssets.assetsSize / 1048576).toFixed(2) + ' MB,', appName, (siteAssets.appSize / 1024).toFixed(0) + ' KB, download ~' + (siteAssets.assetsGz / 1048576).toFixed(1) + ' MB gzip');

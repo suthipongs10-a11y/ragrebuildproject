@@ -38,5 +38,7 @@ h1.glogo > span{display:none}
 .app.game .gcard{border:9px solid transparent;border-image:var(--ui-panel) 30 fill / 18px stretch;background:none;border-radius:0}
 .app.game .btn.go{border:0 solid transparent;border-image:var(--ui-button-gold) 0 40 fill / 0 22px stretch;background:none;padding:11px 18px}
 .app.game .btn:not(.seg):not(.go):not(.link){border:0 solid transparent;border-image:var(--ui-button-dark) 0 40 fill / 0 22px stretch;background:none;padding:10px 16px}
-/* the stadium behind the game's menus */
+/* the stadium behind the game's menus. .app is its own stacking context, so the picture stays behind the page's
+   content in every browser (on its own a fixed layer at z-index -1 can be drawn over the 3D canvas in Safari) */
+.app.game{position:relative;z-index:0;isolation:isolate}
 .app.game.g-menu::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(rgba(14,15,20,.7),rgba(14,15,20,.93) 55%),var(--ui-title-portrait) center top/cover}

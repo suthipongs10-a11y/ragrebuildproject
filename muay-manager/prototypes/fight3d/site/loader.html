@@ -56,6 +56,27 @@
     c.onclick = function () { try { localStorage.removeItem('muaySound'); } catch (e) {} location.reload(); }; row.appendChild(c);
     msg.parentNode.appendChild(row);
   }
+  // Once a day per browser: how bright the drawn picture is and what lies over the 3D view, sent to /api/log, so a
+  // look that differs between browsers can be checked without the device.
+  function diag() {
+    try {
+      var day = new Date().toISOString().slice(0, 10); if (localStorage.getItem('muayDiag') === day) return; localStorage.setItem('muayDiag', day);
+      var L = window.LAB, r = L && L.three && L.three.renderer, gl = r && r.getContext(), cv = document.getElementById('cv');
+      var lum = -1;
+      if (gl) {
+        r.render(L.three.scene, L.three.camera); // read the frame just drawn, before the page shows it
+        var w = gl.drawingBufferWidth, h = gl.drawingBufferHeight, px = new Uint8Array(w * h * 4), sum = 0, n = 0;
+        gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
+        for (var i = 0; i < px.length; i += 4 * 97) { sum += .2126 * px[i] + .7152 * px[i + 1] + .0722 * px[i + 2]; n++; }
+        lum = Math.round(sum / n);
+      }
+      var b = cv.getBoundingClientRect(), over = document.elementsFromPoint(b.left + b.width / 2, b.top + b.height / 2).slice(0, 5).map(function (e) { return e.id || e.className || e.tagName; });
+      var dbg = gl && gl.getExtension('WEBGL_debug_renderer_info'), gpu = dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : '';
+      var st = function (id) { var e = document.getElementById(id); return e ? getComputedStyle(e).display + '/' + getComputedStyle(e).opacity : '-'; };
+      report('diag lum=' + lum + ' exp=' + (r && r.toneMappingExposure.toFixed(2)) + ' over=' + over.join('>') + ' result=' + st('result') + ' flash=' + st('flash') +
+        ' before=' + getComputedStyle(document.querySelector('.app'), '::before').zIndex + ' gpu=' + gpu + ' dpr=' + devicePixelRatio + ' buf=' + (gl && gl.drawingBufferWidth + 'x' + gl.drawingBufferHeight) + ' css=' + Math.round(b.width) + 'x' + Math.round(b.height) + ' settings=' + localStorage.getItem('muaySound'));
+    } catch (e) { report('diag failed: ' + e.message); }
+  }
   function script(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { no(new Error(src)); }; document.head.appendChild(s); }); }
   try {
     var both = await Promise.all([pull(A.assets), pull(A.app), script(A.three)]);
@@ -66,7 +87,7 @@
   } catch (e) { report('load: ' + (e && e.message || e)); fail('โหลดไม่สำเร็จ (เน็ตหลุดหรือช้า)', e && e.message || e); return; }
   // the game is up when its menu has replaced the page title; an error before that shows here instead of a frozen page
   for (var i = 0; i < 150; i++) {
-    if (booted()) { document.getElementById('siteLoad').remove(); return; }
+    if (booted()) { document.getElementById('siteLoad').remove(); setTimeout(diag, 5000); return; }
     if (failed) { fail('เกมเริ่มไม่ได้ ส่งรายงานให้ผู้พัฒนาแล้ว', failed); return; }
     await new Promise(function (ok) { setTimeout(ok, 200); });
   }
