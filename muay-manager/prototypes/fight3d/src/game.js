@@ -252,13 +252,15 @@ function topBar() {
 }
 const SPEAKER = '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M3 9v6h4l5 5V4L7 9H3z"/><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M16 8.5a5 5 0 0 1 0 7M18.8 5.8a9 9 0 0 1 0 12.4"/></svg>';
 // sound settings (the viewer keeps them in this browser)
+// settings: sound and picture
 const VOL_TH = [['music', 'ดนตรีปี่กลอง'], ['voice', 'เสียงพากย์และกรรมการ'], ['crowd', 'เสียงคนดู'], ['sfx', 'เสียงชก ระฆัง']];
 function settingsHtml() {
   const snd = API.sound, v = snd.vols;
-  return '<section class="gcard gset-card"><h2>ตั้งค่าเสียง</h2>' +
+  return '<section class="gcard gset-card"><h2>ตั้งค่า · เสียง</h2>' +
     '<div class="setrow"><span>เสียงทั้งหมด</span><button class="btn ' + (snd.on ? 'go' : '') + '" data-act="soundon" role="switch" aria-checked="' + snd.on + '">' + (snd.on ? 'เปิดอยู่' : 'ปิดอยู่ แตะเพื่อเปิด') + '</button></div>' +
     VOL_TH.map(([k, th]) => '<label class="setrow vol"><span>' + th + '</span><input type="range" min="0" max="100" step="5" data-vol="' + k + '" value="' + Math.round(v[k] * 100) + '" aria-label="' + th + '"><output>' + Math.round(v[k] * 100) + '%</output></label>').join('') +
-    '<p class="hint">ระดับเสียงจำไว้ในเครื่องนี้ เปิดเสียงไว้แล้วครั้งหน้าเสียงจะกลับมาเมื่อแตะหน้าจอครั้งแรก</p>' +
+    '<h2>ภาพ</h2><label class="setrow vol"><span>ความสว่าง</span><input type="range" min="70" max="160" step="5" data-bright="1" value="' + Math.round(API.bright.v * 100) + '" aria-label="ความสว่าง"><output>' + Math.round(API.bright.v * 100) + '%</output></label>' +
+    '<p class="hint">ค่าทั้งหมดจำไว้ในเครื่องนี้ เปิดเสียงไว้แล้วครั้งหน้าเสียงจะกลับมาเมื่อแตะหน้าจอครั้งแรก</p>' +
     '<div class="rowbtn"><button class="btn" data-act="soundtest"' + (snd.on ? '' : ' disabled') + '>ลองฟัง (ระฆัง)</button><button class="btn" data-act="setback">กลับ</button></div></section>';
 }
 function nav() {
@@ -772,8 +774,8 @@ function onClick(e) {
   else if (act === 'drillquit') { drillEnd(true); setMode(false); render(); showMe(); }
 }
 function onInput(e) {
-  const el = e.target; if (!el.dataset || !el.dataset.vol) return;
-  API.sound.vol(el.dataset.vol, el.value / 100); const o = el.parentNode.querySelector('output'); if (o) o.textContent = el.value + '%';
+  const el = e.target; if (!el.dataset || !(el.dataset.vol || el.dataset.bright)) return;
+  if (el.dataset.bright) API.bright.set(el.value / 100); else API.sound.vol(el.dataset.vol, el.value / 100); const o = el.parentNode.querySelector('output'); if (o) o.textContent = el.value + '%';
 }
 function onChange(e) {
   const el = e.target;
@@ -785,7 +787,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.7'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.8'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

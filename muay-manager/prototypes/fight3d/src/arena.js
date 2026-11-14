@@ -296,7 +296,7 @@ function temple() {
   for (let i = 0; i < 12; i++) { const a = -2.6 + i * .47, d2 = 21 + rng() * 6, x = Math.sin(a) * d2, z = -Math.abs(Math.cos(a)) * d2 - 4; put(g, new THREE.CylinderGeometry(.2, .28, 3.4, 6), trunkM, x, GY + 1.7, z); const s = put(g, new THREE.SphereGeometry(2.6 + rng() * 1.2, 7, 5), leafM, x, GY + 5 + rng(), z); s.scale.y = .75; }
   crowd(V, groundSeats({d0: 4.9, rows: 8, step: .7, y: GY, sit: 0, zMax: 2.6}), [0x7a2c26, 0x254668, 0x857a62, 0x25553a, 0x8a6a22, 0x433058, 0x858072, 0x1c1c24, 0x7a4256], [0x5e4430, 0x6a4c36, 0x533b2a]);
   V.anim = time => { wheel.rotation.z = time * .12; V.halo.material.opacity = .5 + Math.sin(time * 3.1) * .06; };
-  V.light = {bg: 0x1a2244, fog: .017, hemi: [0x8a9ad0, 0x4a3826, .62], key: [0xffd9a0, 1.9, .8, 7, 3.6], rim: [0xff7a3a, 0x4ac0ff, 9, [-5, 2.4, -3.5], [5, 2.4, -3.5]], crowd: [0xffc070, 34, 0, 4.6, -3, 30], beam: 0};
+  V.light = {bg: 0x223060, fog: .014, hemi: [0xa8b6e6, 0x5a4630, 1.0], key: [0xffdcaa, 2.4, .8, 7, 3.6], rim: [0xff7a3a, 0x4ac0ff, 12, [-5, 2.4, -3.5], [5, 2.4, -3.5]], crowd: [0xffc878, 55, 0, 4.6, -3, 30], beam: 0}; // a fair at night, but lit well enough to watch
   V.flashRate = .3; V.crowdBright = 1;
   return V;
 }
@@ -407,14 +407,14 @@ function newVenue() { return {group: new THREE.Group(), ropeSides: [[], [], [], 
 const BUILD = {stadium, champ, province, temple, chuek, camp};
 // lighting mood per presentation preset, as multipliers on the venue's own light
 const MOOD = {
-  broadcast: {bg: 1, fog: 1, hemi: 1, key: 1, rim: 1, crowd: 1, beam: 1, exp: 1},
+  broadcast: {bg: 1, fog: 1, hemi: 1, key: 1, rim: 1, crowd: 1, beam: 1, exp: 1.12},
   cinema: {bg: .42, fog: 1.9, hemi: .3, key: 1.19, rim: 5.5, crowd: .22, beam: 2.5, exp: 1},
   arcade: {bg: 1, fog: 1.1, hemi: .86, key: .94, rim: 4, crowd: .75, beam: 1.8, exp: 1.05},
   ringside: {bg: .6, fog: 1.55, hemi: .45, key: 1.06, rim: 3.4, crowd: .47, beam: 2.1, exp: 1}
 };
 
 export function buildArena(scene) {
-  const A = {group: new THREE.Group(), flashes: [], hype: 0, venue: '', V: null, look: 'broadcast', dotTex: glow()};
+  const A = {group: new THREE.Group(), flashes: [], hype: 0, venue: '', V: null, look: 'broadcast', dotTex: glow(), bright: 1}; // bright: the viewer's own brightness setting
   scene.add(A.group);
   const built = {};
   for (let i = 0; i < 10; i++) { // camera flashes in the crowd
@@ -440,8 +440,9 @@ export function buildArena(scene) {
     A.rimR.position.fromArray(L.rim[3]); A.rimB.position.fromArray(L.rim[4]);
     A.crowdLight.color.setHex(L.crowd[0]); A.crowdLight.intensity = L.crowd[1] * M.crowd; A.crowdLight.position.set(L.crowd[2], L.crowd[3], L.crowd[4]); A.crowdLight.distance = L.crowd[5];
     V.beams.forEach(b => { b.material.opacity = L.beam * M.beam; });
-    ren.toneMappingExposure = M.exp;
+    ren.toneMappingExposure = M.exp * A.bright;
   }
+  A.setBrightness = function (v) { A.bright = Math.max(.6, Math.min(1.8, +v || 1)); light(); };
   A.keyAt = function (x) { const o = A.keyOff || [1.5, 7, 4.5]; A.key.position.set(x + o[0], o[1], o[2]); A.key.target.position.set(x, 0, 0); };
   A.setVenue = function (key) {
     if (!BUILD[key]) key = 'stadium';

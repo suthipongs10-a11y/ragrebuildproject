@@ -106,7 +106,7 @@ function stopCeremony() { cer.stop(); cerDone = false; cerAt = null; }
 
 // ---------- sound settings: on/off and a level per group, kept in this browser ----------
 const SOUND_KEY = 'muaySound';
-function soundSave() { try { localStorage.setItem(SOUND_KEY, JSON.stringify(Object.assign({on: audio.on}, audio.vols))); } catch (e) { /* kept for this visit */ } }
+function soundSave() { try { localStorage.setItem(SOUND_KEY, JSON.stringify(Object.assign({on: audio.on, bright: arena.bright}, audio.vols))); } catch (e) { /* kept for this visit */ } }
 function setSound(on) {
   if (audio.on !== !!on) audio.toggle();
   const b = $('btnSound'); b.setAttribute('aria-pressed', String(audio.on)); b.textContent = audio.on ? 'ปิดเสียง' : 'เปิดเสียง';
@@ -116,6 +116,7 @@ function soundLoad() {
   let s = null; try { s = JSON.parse(localStorage.getItem(SOUND_KEY)); } catch (e) { /* defaults */ }
   if (!s) return;
   Object.keys(audio.vols).forEach(k => { if (typeof s[k] === 'number') audio.setVol(k, s[k]); });
+  if (typeof s.bright === 'number') arena.setBrightness(s.bright);
   // a browser starts sound only from a tap, so sound left on comes back with the first tap anywhere
   if (s.on) { const wake = () => { document.removeEventListener('pointerdown', wake, true); if (!audio.on) setSound(true); }; document.addEventListener('pointerdown', wake, true); }
 }
@@ -479,13 +480,14 @@ function direct(t) {
   if (OPT.cam === 'tv') {
     const c = tvCutAt(t), who = c.who, wx = who === 1 ? xb : xa, flip = (Math.floor(c.t * 3) % 2) ? 1 : -1;
     s.id = 'tv' + c.t + c.cam; s.cut = true; s.fixed = true; s.ropes = .45;
-    if (c.cam === 'main') { s.px = mid * .3; s.py = 2.55; s.pz = 8.8; s.fit = sep + 2.7; s.fitH = 2.5; s.ty = 1.0; }
-    else if (c.cam === 'tight') { s.px = mid * .3; s.py = 1.8; s.pz = 8.4; s.fit = sep + 1.5; s.fitH = 1.75; s.ty = 1.2; }
+    // near ropes through a long lens cross the whole frame like a grey film, so the close shots keep only a trace of them
+    if (c.cam === 'main') { s.px = mid * .3; s.py = 2.55; s.pz = 8.8; s.fit = sep + 2.7; s.fitH = 2.5; s.ty = 1.0; s.ropes = .2; }
+    else if (c.cam === 'tight') { s.px = mid * .3; s.py = 1.8; s.pz = 8.4; s.fit = sep + 1.5; s.fitH = 1.75; s.ty = 1.2; s.ropes = .08; }
     else if (c.cam === 'high') { s.px = flip * 6.6; s.py = 4.6; s.pz = 6.6; s.tx = mid * .6; s.ty = .8; s.fit = sep + 4.2; s.fitH = 3.5; }
     else if (c.cam === 'low') {
       s.px = mid + flip * 1.4; s.py = .55; s.pz = 4.75; s.hand = 1; s.fit = sep + 2.3; s.fitH = 2.5; s.ty = 1.08; s.ropes = .45;
       if (who >= 0) { s.px = wx + (who ? -1.6 : 1.6); s.py = 1.1; s.tx = lerp(mid, wx - (who ? -.7 : .7), .6); s.ty = .5; s.fit = 3.6; s.fitH = 2.0; s.ropes = .18; }
-    } else { s.px = wx * .4; s.py = 1.85; s.pz = 8.6; s.tx = wx; s.ty = 1.42; s.fit = 1.25; s.fitH = 1.1; }
+    } else { s.px = wx * .4; s.py = 1.85; s.pz = 8.6; s.tx = wx; s.ty = 1.42; s.fit = 1.25; s.fitH = 1.1; s.ropes = .08; }
     if (c.cam === 'main' || c.cam === 'tight') { s.fit *= 1 - push * .12; s.fitH *= 1 - push * .12; }
     return s;
   }
@@ -814,7 +816,8 @@ const API = {
   pop(text, cls) { if (drillF) pop(text, drillF.world('head', tmpV).add(tmpV2.set(.3, .42, 0)), cls, .7); },
   endPreview() { if (previewF) { scene.remove(previewF.root); previewF = null; } fighters.forEach(f => { f.root.visible = true; }); },
   setSpeed(v) { speed = v; }, applyOpt,
-  sound: {get on() { return audio.on; }, set: setSound, get vols() { return audio.vols; }, vol(k, v) { audio.setVol(k, v); soundSave(); }, test() { if (audio.on) audio.bell(1); }}
+  sound: {get on() { return audio.on; }, set: setSound, get vols() { return audio.vols; }, vol(k, v) { audio.setVol(k, v); soundSave(); }, test() { if (audio.on) audio.bell(1); }},
+  bright: {get v() { return arena.bright; }, set(v) { arena.setBrightness(v); soundSave(); }}
 };
 window.MUAY = API;
 
@@ -825,7 +828,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 29 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 30 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision
