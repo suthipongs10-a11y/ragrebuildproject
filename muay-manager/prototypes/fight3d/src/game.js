@@ -88,7 +88,7 @@ function autoDay() {
   return out.join(' • ');
 }
 // One belt per league, fought for against its champion once the fighter is near the top of that league.
-const BELTS = ['เข็มขัดงานวัด', 'เข็มขัดอำเภอ', 'เข็มขัดจังหวัด', 'เข็มขัดเวทีมาตรฐาน', 'เข็มขัดแชมป์ประเทศ'];
+const BELTS = ['เข็มขัดงานวัด', 'เข็มขัดอำเภอ', 'เข็มขัดจังหวัด', 'เข็มขัดเวทีมาตรฐาน', 'เข็มขัดแชมป์ประเทศไทย', 'เข็มขัดแชมป์โลก'];
 // Drill: the trainer calls strikes, the player presses them in time. What each strike trains, and how often each target calls for it.
 const KINDS = {punch: {th: 'ต่อย', stat: {pow: 1}, key: ['a', 'j', 'arrowleft']}, kick: {th: 'เตะ', stat: {kick: 1}, key: ['s', 'k', 'arrowdown']}, teep: {th: 'ถีบ', stat: {spd: .5, def: .5}, key: ['d', 'l', 'arrowright']}, guard: {th: 'บัง', stat: {def: 1, chin: .5}, key: ['f', ';', 'arrowup']}};
 const DRILL_MIX = {spar: {punch: .5, kick: .32, teep: .18}, bag: {punch: .6, kick: .25, teep: .15}, banana: {punch: .15, kick: .7, teep: .15}, dummy: {punch: .25, kick: .2, teep: .55}};
@@ -114,7 +114,7 @@ function newSave(name, body, style) {
   return {v: 1, name, body, style, stats: Object.assign({}, START[style]), look: {shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none', hair: 'natural'},
     own: {colors: ['red', 'blue', 'black', 'white'], patterns: ['plain'], head: ['none'], hair: ['natural']}, mood: 2, staff: [], belts: [], title: 1, day: 1, slots: 3, ranked: 2, fatigue: 0, money: 500, fame: 0, rp: 1000, best: 1000,
     rec: {w: 0, l: 0, ko: 0}, gym: 1, chuek: 1, seed: Math.floor(Math.random() * 1e9), plan: Object.assign({}, PLAN_DEFAULT), log: [],
-    sp: STYLES.find(x => x.id === style).sp.slice(), spOwn: STYLES.find(x => x.id === style).sp.slice(), mis: {day: 1, n: {}}, spLv: {}, rivals: [], rematch: 1, defendDue: 0, defends: 0, chDone: [], updatedAt: Date.now()};
+    sp: STYLES.find(x => x.id === style).sp.slice(), spOwn: STYLES.find(x => x.id === style).sp.slice(), mis: {day: 1, n: {}}, spLv: {}, rivals: [], rematch: 1, defendDue: 0, defends: 0, chDone: [], tour: null, tours: {}, updatedAt: Date.now()};
 }
 function loadLocal() { try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); return valid(s) ? fix(s) : null; } catch (e) { return null; } }
 function fix(s) { // fields added after a save was made
@@ -127,6 +127,8 @@ function fix(s) { // fields added after a save was made
   if (typeof s.rematch !== 'number') s.rematch = 1;
   if (typeof s.defendDue !== 'number') s.defendDue = 0;
   if (typeof s.defends !== 'number') s.defends = 0;
+  if (!s.tours || typeof s.tours !== 'object') s.tours = {};
+  if (s.tour === undefined) s.tour = null;
   if (!s.mis || typeof s.mis !== 'object' || !s.mis.n) s.mis = {day: s.day, n: {}};
   if (typeof s.chuek !== 'number') s.chuek = 1;
   if (!s.look.hair) s.look.hair = 'natural';
@@ -257,6 +259,119 @@ function defenseOpp() {
   const b = Math.max(...S.belts), o = makeOpp(9400 + b * 37 + S.defends * 11, total(S.stats) * 1.04);
   o.kind = 'defense'; o.belt = b; o.venue = b >= 3 ? 'champ' : LEAGUE_VENUE[b]; o.diff = 'ผู้ท้าชิง' + BELTS[b]; o.money = 700 + b * 500; o.fame = 18 + b * 10; o.id = 'd'; return o;
 }
+// ---------- tournaments: the career ladder ----------
+// Knockout tournaments, one per level from the temple fair to the world title. The draw is made when the player
+// enters, one round a day, lose once and he is out. The other bouts in the bracket are fought by the same fight engine
+// (deterministic, so any of them can be watched). The winner takes the level's belt, a purse that grows a lot with
+// each level, fame and ranking points. A tournament comes round again some days after the last one ended.
+// T: [name, entrants, min RP, entry fee, purses per round won (last = champion), fame per round, venue, stat total of
+// the field from weakest to strongest, the belt (index in BELTS)]
+const TOURS = [
+  {th: 'ศึกงานวัด', n: 8, rp: 0, fee: 0, purse: [150, 250, 700], fame: [3, 5, 12], venue: 'temple', field: [245, 290]},
+  {th: 'ศึกเวทีอำเภอ', n: 8, rp: 1100, fee: 200, purse: [300, 500, 1400], fame: [5, 8, 18], venue: 'temple', field: [282, 326]},
+  {th: 'ศึกเวทีจังหวัด', n: 8, rp: 1250, fee: 400, purse: [500, 900, 2600], fame: [7, 11, 26], venue: 'province', field: [318, 362]},
+  {th: 'ศึกเวทีมาตรฐาน', n: 16, rp: 1400, fee: 800, purse: [700, 1000, 1700, 4500], fame: [8, 12, 18, 40], venue: 'stadium', field: [352, 410]},
+  {th: 'ศึกชิงแชมป์ประเทศไทย', n: 16, rp: 1600, fee: 1500, purse: [1200, 2000, 3500, 10000], fame: [12, 18, 28, 70], venue: 'champ', field: [400, 460]},
+  {th: 'ศึกชิงแชมป์โลก', n: 16, rp: 1750, fee: 3000, purse: [2500, 4000, 7000, 25000], fame: [20, 30, 45, 150], venue: 'champ', field: [452, 525], needBelt: 4}
+];
+const TOUR_REST = 4; // days before the same tournament is held again
+const TOUR_RP = [960, 1110, 1260, 1410, 1610, 1760]; // the field's ranking points, weakest entrant
+const ROUND_TH = n => n === 2 ? 'รอบชิงชนะเลิศ' : n === 4 ? 'รอบรองชนะเลิศ' : n === 8 ? 'รอบ 8 คนสุดท้าย' : 'รอบ 16 คน';
+const tourOpen = t => { const T = TOURS[t], h = S.tours[t] || {}; return S.rp >= T.rp && (T.needBelt == null || S.belts.includes(T.needBelt)) && S.day >= (h.next || 0); };
+function tourMake(t) {
+  const T = TOURS[t], ed = ((S.tours[t] || {}).ed || 0) + 1, R = rng(S.seed + t * 7919 + ed * 104729), ents = [];
+  for (let i = 0; i < T.n - 1; i++) { const tot = T.field[0] + (T.field[1] - T.field[0]) * (i / (T.n - 2)), o = makeOpp(Math.floor(R() * 1e9), tot); ents.push({name: o.name, style: o.style, body: o.body, look: o.look, stats: o.stats, rp: Math.round(TOUR_RP[t] + i * 14)}); }
+  ents.push({me: true});
+  for (let i = ents.length - 1; i > 0; i--) { const j = Math.floor(R() * (i + 1)); [ents[i], ents[j]] = [ents[j], ents[i]]; } // the draw
+  return {t, ed, start: S.day, ents, rounds: [ents.map((e, i) => i)], res: [], seed: Math.floor(R() * 1e9), out: false, champ: null};
+}
+const meIdx = tr => tr.ents.findIndex(e => e.me);
+const tourSpec = (e, t) => ({name: e.name, first: e.name, style: e.style, stats: e.stats, skin: 1, spLv: oppSpLv(e.style, Math.min(4, t), false)});
+// fight out one bout between two entrants who are not the player
+function tourBout(tr, r, a, b) {
+  const A = tr.ents[a], B = tr.ents[b], seed = (tr.seed + r * 1009 + a * 37 + b * 101) >>> 0, rules = VENUE_RULES[TOURS[tr.t].venue] || null;
+  const f = simulate({seed, specs: [tourSpec(A, tr.t), tourSpec(B, tr.t)], plans: [[OPP_PLAN[A.style]], [OPP_PLAN[B.style]]], rules}).result;
+  return {a, b, w: f.w ? b : a, how: f.how === 'คะแนน' ? 'คะแนน' : f.how + ' ยก ' + f.round, seed};
+}
+// the rest of a round once the player's bout (if any) is settled; then the next round's pairs
+function tourCloseRound(tr, mine) {
+  const r = tr.res.length, list = tr.rounds[r], out = [];
+  for (let i = 0; i < list.length; i += 2) {
+    const a = list[i], b = list[i + 1];
+    out.push(mine && (tr.ents[a].me || tr.ents[b].me) ? mine : tourBout(tr, r, a, b));
+  }
+  tr.res.push(out);
+  const next = out.map(x => x.w);
+  if (next.length === 1) tr.champ = next[0]; else tr.rounds.push(next);
+}
+function tourFinishWithoutMe(tr) { while (tr.champ == null) tourCloseRound(tr, null); }
+// the player's opponent in the round now open, or null
+function tourOpp() {
+  const tr = S.tour; if (!tr || tr.out || tr.champ != null) return null;
+  const r = tr.res.length, list = tr.rounds[r], me = meIdx(tr), k = list.indexOf(me); if (k < 0) return null;
+  const oi = list[k ^ 1], e = tr.ents[oi], T = TOURS[tr.t];
+  return {name: e.name, style: e.style, body: e.body, look: e.look, stats: e.stats, rp: e.rp, kind: 'tour', venue: T.venue, money: T.purse[r], fame: T.fame[r],
+    diff: ROUND_TH(list.length), id: 'u', tourIdx: oi, round: r};
+}
+const tourDay = tr => tr.start + tr.res.length; // one round a day
+// the bracket drawn as columns, round by round; the player's line in gold, a finished bout can be watched
+function bracketHtml(tr) {
+  const T = TOURS[tr.t], me = meIdx(tr), cols = [];
+  for (let r = 0; r < tr.rounds.length; r++) {
+    const list = tr.rounds[r], res = tr.res[r] || [];
+    const boxes = [];
+    for (let i = 0; i < list.length; i += 2) {
+      const x = res[i / 2], nm = j => { const e = tr.ents[j]; return '<span class="' + (j === me ? 'me ' : '') + (x ? (x.w === j ? 'won' : 'lost') : '') + '">' + esc(e.me ? S.name : e.name) + '</span>'; };
+      const watch = x && x.seed && !tr.ents[list[i]].me && !tr.ents[list[i + 1]].me ? '<button class="btn link" data-act="tourwatch" data-v="' + r + ':' + (i / 2) + '" aria-label="ดูคู่นี้">▶ ดู</button>' : '';
+      boxes.push('<div class="bx' + (list[i] === me || list[i + 1] === me ? ' mine' : '') + '">' + nm(list[i]) + nm(list[i + 1]) + (x ? '<small>' + esc(x.how) + '</small>' : '') + watch + '</div>');
+    }
+    cols.push('<div class="bcol"><div class="bh">' + ROUND_TH(list.length) + '</div>' + boxes.join('') + '</div>');
+  }
+  if (tr.champ != null) { const e = tr.ents[tr.champ]; cols.push('<div class="bcol champ"><div class="bh">แชมป์</div><div class="bx win' + (e.me ? ' mine' : '') + '">' + art('belt-' + Math.min(5, tr.t + 1), 'beltimg') + '<b>' + esc(e.me ? S.name : e.name) + '</b></div></div>'); }
+  return '<div class="bracket">' + cols.join('') + '</div>';
+}
+function tourHtml() {
+  const tr = S.tour, list = TOURS.map((T, t) => {
+    const h = S.tours[t] || {}, open = tourOpen(t), lock = S.rp < T.rp ? 'ต้องมี RP ' + T.rp + ' (ตอนนี้ ' + S.rp + ')' : T.needBelt != null && !S.belts.includes(T.needBelt) ? 'ต้องเป็นแชมป์ประเทศไทยก่อน' : S.day < (h.next || 0) ? 'จัดครั้งต่อไปวันที่ ' + h.next : '';
+    const busy = tr && tr.champ == null && !tr.out;
+    return '<div class="trow' + (open ? '' : ' off') + '">' + art('belt-' + Math.min(5, t + 1), 'beltimg') + '<div><b>' + T.th + '</b><span class="hint">' + T.n + ' คน · แชมป์ได้ ฿ ' + baht(T.purse[T.purse.length - 1]) + ' + ' + BELTS[t] + (h.wins ? ' · เคยเป็นแชมป์ ' + h.wins + ' สมัย' : '') + '</span>' +
+      (lock ? '<span class="hint">' + lock + '</span>' : '') + '</div>' +
+      (open && !busy ? '<button class="btn go" data-act="tourjoin" data-v="' + t + '">สมัคร' + (T.fee ? ' ฿ ' + baht(T.fee) : ' ฟรี') + '</button>' : '') + '</div>';
+  }).join('');
+  let cur = '';
+  if (tr) {
+    const T = TOURS[tr.t], o = tourOpp(), day = tourDay(tr);
+    const state = tr.champ != null ? (tr.ents[tr.champ].me ? '<p class="gain">เป็นแชมป์' + T.th + '!</p>' : '<p class="hint">จบแล้ว แชมป์คือ ' + esc(tr.ents[tr.champ].name) + '</p>')
+      : tr.out ? '<p class="warn">ตกรอบแล้ว รอดูว่าใครได้แชมป์</p>'
+      : o ? (S.day >= day ? oppCard(o, '<button class="btn go" data-act="pick" data-v="u"' + (S.fatigue >= 90 ? ' disabled' : '') + '>ขึ้นชก' + ROUND_TH(tr.rounds[tr.res.length].length) + '</button>') + (S.fatigue >= 90 ? '<p class="warn">ล้าเกินไป ต้องพักก่อน ถ้าไม่ได้ชกวันนี้ถือว่าแพ้ผ่าน</p>' : '<p class="hint">ต้องขึ้นชกวันนี้ ถ้านอนข้ามวันไปถือว่าแพ้ผ่าน</p>')
+        : '<p class="hint">รอบต่อไปวันที่ ' + day + ' · พักและซ้อมได้</p>' + oppCard(o, '')) : '';
+    cur = '<section class="gcard hot">' + art('venue-' + T.venue, 'venue') + '<h2>' + T.th + ' <small>ครั้งที่ ' + tr.ed + '</small></h2>' + state + bracketHtml(tr) +
+      (tr.champ != null || tr.out ? '<div class="rowbtn"><button class="btn" data-act="tourclose">ปิดสายการชกนี้</button></div>' : '') + '</section>';
+  }
+  return cur + '<section class="gcard"><h2>ทัวร์นาเมนต์ <small>เส้นทางสู่แชมป์โลก</small></h2><p class="hint">ชกทีละคน วันละรอบ แพ้คือตกรอบ แชมป์ได้เข็มขัดและเงินก้อนใหญ่ ทุกรายการจัดซ้ำทุก ' + TOUR_REST + ' วัน</p>' + list + '</section>';
+}
+// the player's bout is over: the rest of the round, then next round, or the end
+function tourAfter(o, win, how) {
+  const tr = S.tour, lines = []; if (!tr) return lines;
+  const T = TOURS[tr.t], me = meIdx(tr);
+  tourCloseRound(tr, {a: me, b: o.tourIdx, w: win ? me : o.tourIdx, how});
+  if (!win) { tr.out = true; tourFinishWithoutMe(tr); lines.push('ตกรอบ' + T.th + ' · แชมป์คือ ' + tr.ents[tr.champ].name); }
+  else if (tr.champ === me) {
+    const h = S.tours[tr.t] = Object.assign(S.tours[tr.t] || {}, {wins: ((S.tours[tr.t] || {}).wins || 0) + 1});
+    if (!S.belts.includes(tr.t)) { S.belts.push(tr.t); S.defendDue = S.day + DEFEND.every; }
+    lines.push('แชมป์' + T.th + '! ได้' + BELTS[tr.t] + (h.wins > 1 ? ' (สมัยที่ ' + h.wins + ')' : '') + moodUp(2));
+  } else lines.push('ผ่านเข้า' + ROUND_TH(tr.rounds[tr.res.length].length) + ' ชกวันที่ ' + tourDay(tr));
+  if (tr.champ != null || tr.out) S.tours[tr.t] = Object.assign(S.tours[tr.t] || {}, {ed: tr.ed, next: S.day + TOUR_REST});
+  return lines;
+}
+// a new day: a missed bout is lost by walkover
+function tourNewDay() {
+  const tr = S.tour; if (!tr || tr.out || tr.champ != null) return '';
+  const o = tourOpp(); if (!o || S.day <= tourDay(tr)) return '';
+  const me = meIdx(tr); tourCloseRound(tr, {a: me, b: o.tourIdx, w: o.tourIdx, how: 'ไม่ขึ้นชก'}); tr.out = true; tourFinishWithoutMe(tr);
+  S.tours[tr.t] = Object.assign(S.tours[tr.t] || {}, {ed: tr.ed, next: S.day + TOUR_REST});
+  return ' ไม่ได้ขึ้นชก' + TOURS[tr.t].th + ' ถูกปรับแพ้ ตกรอบ';
+}
 function rankedOpp() {
   const R = rng(S.seed + S.day * 977 + S.ranked * 13 + S.rec.w + S.rec.l), near = rankRows().filter(r => !r.me && Math.abs(r.rp - S.rp) <= 130);
   const pool = near.length ? near : rankRows().filter(r => !r.me).sort((a, b) => Math.abs(a.rp - S.rp) - Math.abs(b.rp - S.rp)).slice(0, 4);
@@ -363,7 +478,8 @@ function homeHtml() {
   const goal = next ? 'อีก ' + (next[0] - S.rp) + ' RP จะได้ขึ้น' + next[1] : 'อยู่ระดับสูงสุดแล้ว รักษาอันดับไว้';
   const gymNext = S.gym < 5 ? '<button class="btn" data-act="gym">อัปเกรดค่าย ระดับ ' + (S.gym + 1) + ' · ฿ ' + baht(GYM_COST[S.gym]) + '</button>' : '<span class="hint">ค่ายระดับสูงสุดแล้ว</span>';
   const guide = S.rec.w + S.rec.l === 0 ? '<section class="gcard"><h2>เริ่มต้นยังไง</h2><p class="hint">1. ไปที่ "ซ้อม" ใช้แรงซ้อมวันละ 3 ครั้งเพิ่มค่าพลัง<br>2. ไปที่ "หาคู่ชก" ท้าชกเวทีงานวัดเพื่อหาเงินและประสบการณ์ แล้วลองศึกจัดอันดับ<br>3. ก่อนชกเลือกแผน และแก้แผนได้ทุกพักยกตามที่พี่เลี้ยงแนะนำ<br>4. กลับมา "จบวัน นอนพัก" เพื่อลดความล้าและเริ่มวันใหม่</p></section>' : '';
-  return (view && view.note ? '<p class="gain">' + view.note + '</p>' : '') + nextMineHtml() + guide + '<section class="gcard"><h2>' + esc(S.name) + ' <small>สาย' + styleTh(S.style) + '</small></h2>' +
+  const to = tourOpp(), tourToday = to && S.day >= tourDay(S.tour) ? '<section class="gcard hot"><h2>วันนี้มีชก <small>' + TOURS[S.tour.t].th + '</small></h2><p class="hint">' + to.diff + ' พบ ' + esc(to.name) + ' ต้องขึ้นชกวันนี้ ไม่งั้นแพ้ผ่าน</p><div class="rowbtn"><button class="btn go" data-act="tab" data-v="fight">ไปที่สายการชก</button></div></section>' : '';
+  return (view && view.note ? '<p class="gain">' + view.note + '</p>' : '') + nextMineHtml() + tourToday + guide + '<section class="gcard"><h2>' + esc(S.name) + ' <small>สาย' + styleTh(S.style) + '</small></h2>' +
     '<div class="kv"><span>สถิติ</span><b>ชนะ ' + S.rec.w + ' (น็อก ' + S.rec.ko + ') แพ้ ' + S.rec.l + '</b><span>อันดับ</span><b>ที่ ' + pos + ' จาก ' + rows.length + ' · ' + LEAGUES[lg][1] + '</b><span>เข็มขัด</span><b>' + (S.belts.length ? '<span class="belts">' + S.belts.map(i => '<span class="belt">' + art('belt-' + (i + 1), 'beltimg') + BELTS[i] + '</span>').join('') + '</span>' : 'ยังไม่มี') + '</b><span>เป้าหมาย</span><b>' + goal + '</b></div>' +
     '<div class="statbox r">' + statBars(S.stats) + '</div><p class="hint">ค่าพลังเฉลี่ย ' + overall(S.stats) + ' · เพดานค่าพลังของค่ายระดับ ' + S.gym + ' คือ ' + cap() + '</p>' +
     '<div class="rowbtn">' + gymNext + '</div></section>' +
@@ -426,6 +542,7 @@ function oppCard(o, btn) {
 }
 function fightHtml() {
   const tired = S.fatigue >= 90, dis = tired ? ' disabled' : '';
+  const tourSec = tourHtml();
   const loc = localOpps().map(o => oppCard(o, '<button class="btn" data-act="pick" data-v="' + o.id + '"' + dis + '>ท้าชก</button>')).join('');
   const ro = rankedOpp();
   const rk = S.ranked > 0 ? oppCard(ro, '<button class="btn go" data-act="pick" data-v="r"' + dis + '>ชกจัดอันดับ</button>') : '<p class="hint">ชกจัดอันดับครบ 2 ไฟต์ของวันนี้แล้ว จบวันเพื่อชกต่อ</p>';
@@ -439,7 +556,7 @@ function fightHtml() {
     oppCard(df, '<button class="btn go" data-act="pick" data-v="d"' + dis + '>ขึ้นป้องกันแชมป์</button>') + '</section>' : '';
   const rvSec = rv ? '<section class="gcard"><h2>ไฟต์ล้างตา <small>วันละ 1 ไฟต์</small></h2><p class="hint">คู่ปรับที่เคยชนะเรา เขาซ้อมมาเพิ่ม ค่าตัวสูงกว่าปกติ ชนะแล้วหายแค้น</p>' +
     oppCard(rv, '<button class="btn go" data-act="pick" data-v="v"' + dis + '>ท้าล้างตา</button>') + '</section>' : '';
-  return (tired ? '<p class="warn">ล้าเกิน 90% ขึ้นชกไม่ได้ ไปพักหรือจบวันก่อน</p>' : '') + defSec + rvSec + challengeHtml() +
+  return (tired ? '<p class="warn">ล้าเกิน 90% ขึ้นชกไม่ได้ ไปพักหรือจบวันก่อน</p>' : '') + tourSec + defSec + rvSec + challengeHtml() +
     '<section class="gcard">' + art('venue-' + LEAGUE_VENUE[lgNow], 'venue') + '<h2>ศึกชิงเข็มขัด <small>' + BELTS[lgNow] + '</small></h2>' + art('belt-' + (lgNow + 1), 'beltbig') + '<p class="hint">แชมป์เก่าแกร่งกว่าคู่ชกทั่วไป ชนะได้เข็มขัด เงินก้อนใหญ่ และ RP +25 ชิงได้วันละครั้ง</p>' + title + '</section>' +
     '<section class="gcard">' + art('venue-' + LEAGUE_VENUE[league(S.rp)], 'venue') + '<h2>ศึกจัดอันดับ <small>เหลือ ' + S.ranked + ' ไฟต์วันนี้</small></h2><p class="hint">ชนะได้คะแนนอันดับ แพ้เสียคะแนน คู่ชกคือนักมวยที่อันดับใกล้กัน</p>' + rk + '</section>' +
     '<section class="gcard">' + art('venue-chuek', 'venue') + '<h2>ศึกมวยคาดเชือก <small>งานประเพณี วันละ 1 ไฟต์</small></h2><p class="hint">ถอดนวม พันหมัดด้วยเชือก ชกบนลานดิน หมัดเท้าเข่าศอกหนักขึ้น การ์ดกันได้น้อยลง น็อกง่ายกว่าเวทีปกติ ไม่มีผลกับอันดับ ได้ชื่อเสียงมาก</p>' + (S.chuek > 0 ? oppCard(chuekOpp(), '<button class="btn" data-act="pick" data-v="c"' + dis + '>ขึ้นชกคาดเชือก</button>') : '<p class="hint">ชกคาดเชือกของวันนี้ไปแล้ว</p>') + '</section>' +
@@ -534,13 +651,15 @@ function onOver(res) {
   const r = {win, how: res.how === 'คะแนน' ? 'คะแนน' : res.how + ' ยก ' + res.round, detail: (res.move ? 'ปิดเกมด้วย' + MOVES[res.move].th + ' · ' : '') + 'แต้ม ' + res.pts[0] + ' ต่อ ' + res.pts[1] + (res.how === 'คะแนน' && res.pts[0] === res.pts[1] ? ' (เท่ากัน ตัดสินจากความเสียหายที่ทำได้)' : '') + ' · ' + 'เข้าเป้า ' + res.landed[0] + ' ต่อ ' + res.landed[1]};
   r.money = win ? o.money + (ko ? 80 : 0) : Math.round(o.money * .25); r.fame = win ? o.fame + (ko ? 2 : 0) : 1;
   r.fat = 22 + (!win && ko ? 12 : 0);
-  if (o.kind === 'ranked') { const ex = 1 / (1 + Math.pow(10, (o.rp - S.rp) / 400)); r.drp = Math.round(32 * ((win ? 1 : 0) - ex)); S.rp = Math.max(600, S.rp + r.drp); S.ranked = Math.max(0, S.ranked - 1); }
+  if (o.kind === 'ranked' || o.kind === 'tour') { const ex = 1 / (1 + Math.pow(10, (o.rp - S.rp) / 400)); r.drp = Math.round(32 * ((win ? 1 : 0) - ex)); S.rp = Math.max(600, S.rp + r.drp); if (o.kind === 'ranked') S.ranked = Math.max(0, S.ranked - 1); }
+  if (o.kind === 'tour' && !win) r.money = Math.round(o.money * .3); // the purse of the round for a win; a loser's fee otherwise
   if (o.kind === 'chuek') S.chuek = 0;
   if (o.kind === 'title') { S.title = 0; if (win) { S.belts.push(o.belt); r.drp = 25; S.rp += 25; S.defendDue = S.day + DEFEND.every; } }
   const rivalLine = [];
   if (o.kind === 'rival') { S.rematch = 0; if (win) { S.rivals = S.rivals.filter(x => x.name !== o.name); rivalLine.push('ล้างตา ' + o.name + ' สำเร็จ!' + moodUp(1)); } }
   if (o.kind === 'defense') { S.defendDue = S.day + DEFEND.every; if (win) { S.defends++; rivalLine.push('ป้องกัน' + BELTS[o.belt] + 'สำเร็จ ครั้งที่ ' + S.defends); } else { S.belts = S.belts.filter(b => b !== o.belt); rivalLine.push('เสีย' + BELTS[o.belt] + 'ให้ ' + o.name); } }
-  if (!win && o.kind !== 'title' && o.kind !== 'defense') { // he goes on the rivals list (or stays at the top of it)
+  if (o.kind === 'tour') rivalLine.push(...tourAfter(o, win, r.how));
+  if (!win && o.kind !== 'title' && o.kind !== 'defense' && o.kind !== 'tour') { // he goes on the rivals list (or stays at the top of it)
     const prev = S.rivals.find(x => x.name === o.name), entry = {name: o.name, style: o.style, body: o.body, look: o.look, stats: roundStats(o.stats), losses: (prev ? prev.losses : 0) + 1};
     S.rivals = [entry].concat(S.rivals.filter(x => x.name !== o.name)).slice(0, RIVAL.keep);
   }
@@ -811,6 +930,11 @@ function trainResult(q) {
 function onClick(e) {
   const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
   const act = el.dataset.act, v = el.dataset.v;
+  if (act === 'tourjoin') { const t = +v, T = TOURS[t]; if (!tourOpen(t) || (S.tour && S.tour.champ == null && !S.tour.out)) return; if (S.money < T.fee) { view = {msg: 'ค่าสมัครไม่พอ ต้องมี ฿ ' + baht(T.fee)}; render(); return; } S.money -= T.fee; S.tour = tourMake(t); save(); render(); return; }
+  if (act === 'tourclose') { S.tour = null; save(); render(); return; }
+  if (act === 'tourwatch') { const [r, k] = v.split(':').map(Number), tr = S.tour, x = tr && tr.res[r] && tr.res[r][k]; if (!x) return; const A = tr.ents[x.a], B = tr.ents[x.b], T = TOURS[tr.t];
+    const side = e => ({spec: {style: e.style, stats: e.stats, sp: (STYLES.find(s => s.id === e.style) || STYLES[0]).sp, spLv: oppSpLv(e.style, Math.min(4, tr.t), false)}, plan: OPP_PLAN[e.style] || PLAN_DEFAULT, look: e.look, body: e.body});
+    watchMatch(null, {key: 'tour:' + x.seed, from: 'x', to: 'y', exh: true, e: Object.assign(side(A), {seed: x.seed, venue: T.venue}), a: Object.assign(side(B), {accept: true}), start: 0, fromName: A.name, toName: B.name, venue: T.venue}); return; }
   if (act === 'autotrain') { const a = ACTS.find(x => x.id === v); if (!a || S.slots < 1) return; const r = autoTrain(a, coachFree(a) ? 'coach' : 'paid'); view = {msg: r, bad: /ไม่พอ|พลาด/.test(r)}; save(); render(); return; }
   if (act === 'autoday') { if (S.slots < 1) return; const r = autoDay(); view = {msg: r, bad: /ไม่พอ/.test(r) && !/: ดี/.test(r)}; save(); render(); return; }
   if (act === 'watch') { if (view && view.watch) view = null; else { if (DR) drillEnd(true); view = {watch: true}; } render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
@@ -828,9 +952,11 @@ function onClick(e) {
   else if (act === 'sleep') {
     const wage = S.staff.reduce((a, id) => a + STAFF.find(x => x.id === id).wage, 0), income = 40 + S.fame * 3; let note = 'เช้าวันใหม่ ได้ค่าสปอนเซอร์ ฿ ' + baht(income);
     S.day++; S.slots = 3; S.ranked = 2; S.chuek = 1; S.title = 1; S.rematch = 1;
+    const walk = tourNewDay();
     if (S.belts.length && S.day > S.defendDue + DEFEND.grace) { const b = Math.max(...S.belts); S.belts = S.belts.filter(x => x !== b); S.defendDue = S.day + DEFEND.every; note = 'ไม่ได้ป้องกันแชมป์ตามกำหนด ถูกปลดจาก' + BELTS[b] + ' · ' + note; } S.fatigue = clamp(S.fatigue - 35 - (S.staff.includes('massage') ? 12 : 0), 0, 100); S.money += income;
     if (wage) { if (S.money >= wage) { S.money -= wage; note += ' จ่ายค่าจ้างทีมงาน ฿ ' + baht(wage); } else { S.staff = []; note += ' เงินไม่พอจ่ายค่าจ้าง ทีมงานลาออกทั้งหมด'; } }
     if (S.fatigue < 30 && S.mood < 2) note += ' พักเต็มที่' + moodUp(1);
+    if (walk) note += walk;
     save(); view = {note}; render(); topBar();
   }
   else if (act === 'staff') { const st = STAFF.find(x => x.id === v); if (S.staff.includes(v)) S.staff = S.staff.filter(k => k !== v); else { if (S.money < st.hire) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(st.hire); return; } S.money -= st.hire; S.staff.push(v); } save(); render(); }
@@ -841,7 +967,7 @@ function onClick(e) {
   else if (act === 'hit') { const ph = ((performance.now() - mini.t0) / 1100) % 2, x = ph < 1 ? ph : 2 - ph; trainResult(1 - Math.abs(x - .5) * 2); }
   else if (act === 'buy') { const cost = pending.items.reduce((a, i) => a + i.price, 0); if (S.money < cost) return; S.money -= cost; pending.items.forEach(i => { if (!S.own[i.kind].includes(i.k)) S.own[i.kind].push(i.k); }); S.look = pending.look; pending = null; save(); render(); showMe(); }
   else if (act === 'cancelbuy') { pending = null; render(); showMe(); }
-  else if (act === 'pick') { const o = v === 'r' ? rankedOpp() : v === 'c' ? chuekOpp() : v === 't' ? titleOpp() : v === 'v' ? rivalOpp() : v === 'd' ? defenseOpp() : localOpps().find(x => x.id === v); if (!o) return; F = {opp: o, seed: (S.seed + S.day * 101 + S.rec.w * 7 + S.rec.l * 13 + (v === 'r' ? 5 : v === 'c' ? 9 : v === 't' ? 11 : v === 'v' ? 15 : v === 'd' ? 17 : +v.slice(1))) >>> 0, plan: Object.assign({}, S.plan || PLAN_DEFAULT), phase: 'plan'}; setMode(false); render(); API.preview(Object.assign({fighter: o.body}, o.look), 'guard', o.venue); $('gBody').scrollIntoView({block: 'nearest'}); }
+  else if (act === 'pick') { const o = v === 'r' ? rankedOpp() : v === 'c' ? chuekOpp() : v === 't' ? titleOpp() : v === 'v' ? rivalOpp() : v === 'd' ? defenseOpp() : v === 'u' ? tourOpp() : localOpps().find(x => x.id === v); if (!o) return; F = {opp: o, seed: (S.seed + S.day * 101 + S.rec.w * 7 + S.rec.l * 13 + (v === 'r' ? 5 : v === 'c' ? 9 : v === 't' ? 11 : v === 'v' ? 15 : v === 'd' ? 17 : v === 'u' ? 19 + (S.tour ? S.tour.res.length * 3 : 0) : +v.slice(1))) >>> 0, plan: Object.assign({}, S.plan || PLAN_DEFAULT), phase: 'plan'}; setMode(false); render(); API.preview(Object.assign({fighter: o.body}, o.look), 'guard', o.venue); $('gBody').scrollIntoView({block: 'nearest'}); }
   else if (act === 'backout') { F = null; go('fight'); }
   else if (act === 'chsend') { const b = board.find(x => x.id === v), w = ($('chWhen') || {}).value || 'n30'; if (!b || !CLOUD) return; el.disabled = true; el.textContent = 'กำลังส่ง…'; sendChallenge(v, b.name, w).then(() => { view = {note: 'ส่งคำท้าถึง ' + b.name + ' แล้ว นัดขึ้นเวที ' + hm(whenTime(w))}; render(); }).catch(() => { el.textContent = 'ส่งไม่ได้ ลองใหม่'; el.disabled = false; }); }
   else if (act === 'chyes' || act === 'chno') { if (!CLOUD) return; el.disabled = true; answerChallenge(v, act === 'chyes').then(() => { view = {note: act === 'chyes' ? 'รับคำท้าแล้ว' : 'ปฏิเสธคำท้าแล้ว'}; render(); }).catch(() => { el.disabled = false; }); }
@@ -871,7 +997,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.17'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.18'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

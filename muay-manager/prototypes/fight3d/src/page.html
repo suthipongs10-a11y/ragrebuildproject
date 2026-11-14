@@ -214,6 +214,16 @@ p.bad{margin:0;font-size:14px;font-weight:600;color:var(--bad)}
 .dnote.k-punch,.dbtn.k-punch{background:#ff7a70} .dnote.k-kick,.dbtn.k-kick{background:#7fb0ff} .dnote.k-teep,.dbtn.k-teep{background:#f2b83a} .dnote.k-guard,.dbtn.k-guard{background:#49d17d}
 .dnote.hit{opacity:0;transition:opacity .12s} .dnote.gone{opacity:.28;filter:grayscale(1)}
 .drillpad{gap:8px}
+.bracket{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 8px;align-items:stretch;-webkit-overflow-scrolling:touch}
+.bcol{display:flex;flex-direction:column;justify-content:space-around;gap:8px;min-width:122px;flex:0 0 122px}
+.bcol .bh{font-family:var(--display);font-size:12px;color:var(--gold);text-align:center}
+.bx{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 7px;display:flex;flex-direction:column;gap:2px;font-size:12.5px;line-height:1.3}
+.bx span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--fg)} .bx span.lost{color:var(--muted);text-decoration:line-through} .bx span.won{font-weight:700}
+.bx span.me{color:var(--gold)} .bx.mine{border-color:var(--gold)} .bx small{color:var(--muted);font-size:11px} .bx .btn.link{align-self:flex-start;font-size:11.5px}
+.bcol.champ .bx{align-items:center;text-align:center;gap:4px} .bcol.champ .bx b{font-family:var(--display);color:var(--gold)}
+.trow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line)} .trow.off{opacity:.62}
+.trow > div{display:flex;flex-direction:column;gap:1px} .trow b{font-family:var(--display)}
+.trow .ui.beltimg,.bx .ui.beltimg{display:inline-block;width:72px;height:24px;background-size:contain;background-repeat:no-repeat;background-position:center}
 .autos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px} .autos .btn:last-child{grid-column:1/-1}
 .dbtns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px} .dbtns.four{grid-template-columns:repeat(4,minmax(0,1fr))}
 .dbtn{height:78px;border:0;border-radius:12px;color:var(--ink);font-family:var(--display);font-size:24px;user-select:none;-webkit-user-select:none;touch-action:none;box-shadow:0 4px 0 rgba(0,0,0,.45)}
