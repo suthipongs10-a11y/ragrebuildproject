@@ -74,6 +74,30 @@ export function bake(fight) {
     cues[e.on].push({t: tA, f: e.on, pose: pose || (mv.lvl === 'leg' ? 'check' : e.move === 'body' ? 'checkBody' : mv.lvl === 'body' ? 'blockBody' : 'block'), d: lb ? .17 : .11, early: true});
   }
   cues.forEach(c => c.sort((a, b) => a.t - b.t));
+  // How a man goes down (presentation only): onto his back, face down, or onto his side, picked per knockdown from
+  // the blow (body shots fold him forward, head shots more often put him on his back). On the ropes, or backed into a
+  // corner, he always folds forward face down toward the middle, so no fall ever ends outside the ring. Thrown
+  // fighters keep the fall on the back.
+  {
+    const FH = x => { const v = Math.sin(x * 78.233 + 4.7) * 43758.5453; return v - Math.floor(v); };
+    for (let f = 0; f < 2; f++) {
+      let variant = '';
+      for (let ci = 0; ci < cues[f].length; ci++) {
+        let c = cues[f][ci];
+        const swap = pose => { c = cues[f][ci] = Object.assign({}, c, {pose}); }; // a copy: the fight's own cue list stays as it was
+        if (c.pose === 'fall1') {
+          const e = fight.events.find(x => (x.type === 'kd' || x.type === 'ko') && x.on === f && Math.abs(x.t - c.t) < .35);
+          const k = Math.max(0, Math.min(n - 1, Math.round(c.t / dt))), xs = TK[(k * 2 + f) * TICK_FIELDS], xo = TK[(k * 2 + 1 - f) * TICK_FIELDS];
+          const onRopes = Math.abs(xs) >= 170 && Math.abs(xs) >= Math.abs(xo);
+          if (!e) { variant = onRopes ? 'Side' : ''; if (variant) swap('fall1' + variant); continue; } // a throw or a sweep: on his back, or along the ropes
+          const mv = MOVES[e.move] || {}, body = mv.lvl === 'body' || /knee|teep/.test(e.move || ''), r = FH(e.t);
+          variant = onRopes ? 'Face' : body ? (r < .6 ? 'Face' : 'Side') : (r < .5 ? '' : r < .8 ? 'Side' : 'Face');
+          if (variant) swap('fall1' + variant);
+        } else if (c.pose === 'down' && variant) swap('down' + variant);
+        else if (c.pose === 'guard') variant = '';
+      }
+    }
+  }
 
   const baked = [new Float32Array(n * NP), new Float32Array(n * NP)];
   const eff = [new Uint8Array(n), new Uint8Array(n)];

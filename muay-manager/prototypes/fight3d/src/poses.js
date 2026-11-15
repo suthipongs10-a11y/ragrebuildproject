@@ -102,6 +102,12 @@ export const POSES = {
 
   fall1: P({turn: 0, twist: 0, lean: -1.0, hdP: -.4, hip: [-.35, .55, 0], hL: [-.3, 1.0, -.45], hR: [-.35, .95, .45], fL: [.15, .12, -.12], fR: [-.1, 0, .15]}),
   down: P({turn: 0, twist: 0, lean: -1.5, hdP: 0, hip: [-.75, .13, 0], hL: [-1.3, .04, -.6], hR: [-1.2, .04, .62], eL: [0, -.2, -1], eR: [0, -.2, 1], fL: [0, .02, -.16], fR: [.1, .02, .2], kL: [0, 1, -.2], kR: [0, 1, .2]}),
+  // other ways down (the presenter picks one per knockdown, timeline.js): folding forward face down onto the canvas,
+  // which keeps a man on the ropes inside the ring, and onto the side
+  fall1Face: P({turn: 0, twist: 0, lean: .75, hdP: .35, hip: [.04, .6, 0], hL: [.5, .42, -.26], hR: [.42, .5, .28], eL: [-.2, -.5, -.8], eR: [-.2, -.5, .8], fL: [.12, 0, -.13], fR: [-.24, 0, .15], kL: [1, -.2, -.2], kR: [1, -.2, .2]}),
+  downFace: P({turn: 0, twist: 0, lean: 1.72, hdP: .45, side: .06, hip: [-.02, .42, 0], hL: [.66, .04, -.32], hR: [.5, .05, .34], eL: [-.3, 1, -.6], eR: [-.3, 1, .6], fL: [-.46, .03, -.13], fR: [-.5, .03, .14], kL: [1, -.6, -.15], kR: [1, -.6, .15]}),
+  fall1Side: P({turn: .3, twist: -.2, lean: .25, side: .75, hdP: .25, hip: [0, .55, .12], hL: [.25, .45, .45], hR: [.2, .7, .55], eL: [-.3, -.6, -.6], eR: [-.3, -.6, .6], fL: [.15, 0, -.18], fR: [-.15, 0, .05], kL: [1, 0, -.3], kR: [1, 0, .3]}),
+  downSide: P({turn: .1, twist: 0, lean: .15, side: 1.45, hdP: .1, hip: [-.05, .17, .05], hL: [.32, .06, .8], hR: [.2, .32, .58], eL: [.2, .3, 1], eR: [.3, 1, .3], fL: [.28, .04, -.62], fR: [.05, .16, -.6], kL: [1, .2, -.2], kR: [1, .5, -.1]}),
   getup: P({turn: .2, lean: .55, hip: [-.45, .50, 0], hL: [-.15, .2, -.25], hR: [-.2, .5, .2], fL: [-.15, 0, -.15], fR: [-.75, 0, .15], kR: [.5, -1, 0]}),
   // after the fight: standing square and tall, arms down; gloves reaching out to touch the other man's and a small bow
   // skipping rope: upright, feet together, hands low and out at the hips holding the handles
