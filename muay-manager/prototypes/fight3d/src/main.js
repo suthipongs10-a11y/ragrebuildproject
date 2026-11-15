@@ -7,12 +7,13 @@ import { Fighter, EFF_JOINT, STYLE_BUILD, setDims, DIM_DEFAULT } from './rig.js'
 import { NP, FLAT, IDX, scalePoses } from './poses.js';
 import { loadModel, ModelFighter } from './model.js';
 import { COLORS, PATTERNS, HEADGEAR, HAIR } from './outfit.js';
-import { buildArena, VENUES } from './arena.js';
+import { buildArena, VENUES, RING_R } from './arena.js';
 import { buildDrill, TARGETS } from './drill.js';
 import { buildFx } from './fx.js';
 import { buildAudio } from './audio.js';
 import { buildCommentary } from './commentary.js';
 import { buildCeremony, CER_LEN } from './ceremony.js';
+import { buildCorner, CORNER_LEN } from './corner.js';
 const THREE = globalThis.THREE;
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
@@ -91,8 +92,19 @@ let REFM = null, refF = null;
 function loadRef() {
   const id = REF_PREF.find(k => ROSTER[k] && !LOOK.some(l => l.fighter === k) && document.getElementById('model-' + k));
   if (!id || (REFM && REFM.id === id)) return;
-  loadModel(id, ROSTER[id][1]).then(m => { REFM = m; if (refF) { scene.remove(refF.root); refF = null; } }).catch(e => console.warn('referee not loaded:', e.message));
+  loadModel(id, ROSTER[id][1]).then(m => { REFM = m; if (refF) { scene.remove(refF.root); refF = null; } if (menF) { stopCorner(); menF.forEach(f => scene.remove(f.root)); menF = null; } }).catch(e => console.warn('referee not loaded:', e.message));
 }
+// Between rounds (corner.js): the fighters sit in their corners and a cornerman each, the referee's body in a corner shirt,
+// gives them water. Without the models the fight simply waits at the break as before.
+let menF = null;
+function startCorner() {
+  if (!fighters[0] || !fighters[0].isModel || !fighters[1].isModel) return false;
+  fighters.forEach(f => f.setMongkol(false));
+  if (!menF && REFM) menF = [0, 1].map(i => { const m = new ModelFighter(0, REFM, {corner: i, head: 'none'}); m.handK = .55; m.root.visible = false; scene.add(m.root); return m; });
+  cor.start(fighters, menF, RING_R, (i, P) => { TL.sample(i, playT, P); sideSteps(i, playT, P); const p = placeOf(i, playT); return {x: p.x, z: p.z, yaw: (fighters[i].dir > 0 ? 0 : Math.PI) - P[IDX.spin] + p.th}; });
+  return true;
+}
+function stopCorner() { if (cor.on) { cor.stop(); cam.id = null; } }
 function startCeremony() {
   if (!REFM || !fighters[0] || !fighters[0].isModel || !fight.result) return false;
   if (!refF) { refF = new ModelFighter(0, REFM, {referee: true, head: 'none'}); refF.handK = .55; scene.add(refF.root); } // the moulded glove shrinks to a gloved hand
@@ -102,7 +114,7 @@ function startCeremony() {
   cer.start(fighters[w], fighters[1 - w], refF, {onRaise: p => { hype = 1; audio.roar(1.1); audio.applause(); audio.shout(1); voice.win(w, audio.time()); fx.sparks(p, 40, 0xffd35a, 1.8, 0); fx.ring(p, 1, 0xffd35a); }});
   return true;
 }
-function stopCeremony() { cer.stop(); cerDone = false; cerAt = null; }
+function stopCeremony() { cer.stop(); cerDone = false; cerAt = null; stopCorner(); }
 
 // ---------- sound settings: on/off and a level per group, kept in this browser ----------
 const SOUND_KEY = 'muaySound';
@@ -131,7 +143,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.A
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(30, 1.5, .1, 120);
-const audio = buildAudio(), voice = buildCommentary(audio, MOVES), cer = buildCeremony(camera);
+const audio = buildAudio(), voice = buildCommentary(audio, MOVES), cer = buildCeremony(camera), cor = buildCorner(scene, camera, () => fx);
 let cerDone = false, cerAt = null; // cerAt: hold the ceremony at this time (checks)
 let introSaid = false;
 let arena = null, fx = null, drill = null, drillF = null, mateF = null; // built once fonts are ready, the mat texture draws text
@@ -243,7 +255,7 @@ function buildTv() {
   });
   marks.stuns.forEach(st => { if (st.t1 - st.t0 > .8) add(st.t0 + .25, 'tight', -1, st.t1 - st.t0); });
   marks.clinches.forEach(c => { if (c.t1 - c.t0 > .9) add(c.t0 + .3, 'tight', -1, c.t1 - c.t0); });
-  marks.rests.forEach(r => { add(r.t + .25, 'high', -1, .9); add(r.t + 1.2, 'face', 0, .9); add(r.t + 2.1, 'face', 1, .9); add(r.t1 + .3, 'main', -1, 2.5); });
+  marks.rests.forEach(r => { add(r.t + .25, 'high', -1, .9); add(r.t + 1.0, 'face', 0, .6); add(r.t + 1.65, 'face', 1, .6); add(r.t + 2.3, 'main', -1, 3); });
   if (marks.ko) { add(marks.ko.t + .85, 'low', marks.ko.on, 9); add(marks.ko.t + 1.75, 'face', marks.ko.by, 99); }
   if (marks.decPhase != null) { add(marks.decPhase + .2, 'high', -1, 9); if (marks.dec) add(marks.dec.t + .1, 'face', marks.dec.w, 99); }
   forced.sort((x, y) => x.t - y.t);
@@ -293,6 +305,7 @@ function seek(t) {
   stopCeremony();
   playT = clamp(t, 0, TL.duration); evi = indexAt(playT); mode = 'live'; stopT = 0; shake = 0; zoomKick = 0; frozen = false;
   rpi = replays.findIndex(r => r.trigger > playT); if (rpi < 0) rpi = replays.length; curRp = null;
+  marks.rests.forEach(r => { if (r.round && r.pauseAt > playT) pausedRounds.delete(r.round.n); }); // watched again: the corners again
   clearOverlays(); cam.id = null;
   let last = '';
   for (let i = 0; i < evi; i++) if (EV[i].type === 'say') last = EV[i].html;
@@ -501,11 +514,14 @@ function advance(dt) {
   if (stopT > 0) { stopT -= dt; return 0; }
   const t0 = playT, ts = mode === 'replay' ? .3 : speed * slowAt(playT);
   let target = playT + dt * ts;
-  if (mode === 'live' && HOOK.onRoundBreak && !noBreaks) { // the corner gets a moment to change the plan
+  const hold = HOOK.onRoundBreak && !noBreaks, models = fighters[0] && fighters[0].isModel;
+  if (mode === 'live' && (hold || models)) { // the rest between rounds: the corners, and a moment to change the plan
     const rb = marks.rests.find(r => r.round && !pausedRounds.has(r.round.n) && playT < r.pauseAt && target >= r.pauseAt && !(rpi < replays.length && replays[rpi].trigger <= r.pauseAt && replayOn(replays[rpi])));
     if (rb) {
       while (evi < EV.length && EV[evi].t <= rb.pauseAt) handle(EV[evi++]);
-      playT = rb.pauseAt; pausedRounds.add(rb.round.n); frozen = true; HOOK.onRoundBreak(rb.round.n, roundStats(rb.round.n));
+      playT = rb.pauseAt; pausedRounds.add(rb.round.n); frozen = true; startCorner();
+      if (hold) HOOK.onRoundBreak(rb.round.n, roundStats(rb.round.n)); // the game lets it go on with API.resume()
+      else API.resume();
       return 0;
     }
   }
@@ -659,6 +675,15 @@ function frame(ts) {
     audio.update(dt, hype, true, TL.clock(playT).round, 1, 'cer');
     renderer.render(scene, camera); hud(dt); return;
   }
+  if (cor.on) { // between rounds in the corners; the fight waits at the pause
+    const going = cor.update(dt * speed); arena.ropeUpdate(dt);
+    if (window.LAB.eye) { const e = window.LAB.eye; camera.position.set(e[0], e[1], e[2]); camera.lookAt(e[3], e[4], e[5]); camera.fov = e[6] || 40; camera.updateProjectionMatrix(); }
+    if (!going) { stopCorner(); frozen = false; }
+    hype = Math.max(0, hype - dt * .3);
+    arena.keyAt(0); arena.fadeRopes(camera.position, 1); arena.update(realT, hype, dt); fx.update(dt, camera);
+    audio.update(dt, hype, false, TL.clock(playT).round, 1, 'rest');
+    renderer.render(scene, camera); hud(dt); return;
+  }
   const adv = advance(dt);
   shake *= Math.pow(.0006, dt); zoomKick *= Math.pow(.002, dt);
   hype = Math.max(0, hype - dt * .3);
@@ -802,6 +827,7 @@ window.LAB = {
   set(o) { Object.assign(OPT, o); OPT.preset = o.preset || ''; applyOpt(); },
   preset(k) { OPT.preset = k; Object.assign(OPT, PRESETS[k]); applyOpt(); },
   freeze(t) { seek(t); frozen = true; },
+  corner(n, t, pin) { const r = marks.rests[n - 1]; if (!r) return false; if (!cor.on) { seek(r.pauseAt); pausedRounds.add(r.round.n); frozen = true; if (!startCorner()) return false; cor.release(); } cor.update(0, t); cor.pin = !!pin; return true; }, get cor() { return cor; }, get fx() { return fx; },
   // play t0..t1 in fixed steps so effects and overlays are in the state a viewer would see, then hold
   runTo(t0, t1) { seek(t0); let g = 0; while (playT < t1 && g++ < 60000) { const a = advance(1 / 60); fx.update(Math.max(a, .004), camera); } frozen = true; },
   // Check for a generated body: how much skin stretches into flaps in each pose. Per pose: [triangles, cm2] on the upper body
@@ -858,9 +884,18 @@ const API = {
     newFight(cfg.seed, {specs: cfg.specs, plans: cfg.plans, rules: cfg.rules || null}); applyOpt(); frozen = false;
   },
   replan(plans) { CFG.plans = plans; const t = playT; buildFight(); evi = indexAt(t); rpi = replays.findIndex(r => r.trigger > t); if (rpi < 0) rpi = replays.length; },
-  resume() { frozen = false; },
+  resume() { if (cor.on) cor.release(); else frozen = false; }, // in the corners: the round starts once they are back out
   skip() { seek(marks.over); },
-  seekTo(t) { if (TL) seek(Math.min(t, marks.over - .05)); }, // join a live fight late
+  seekTo(t) { // join a live fight late: t is the time since it started, the rests in the corners included
+    if (!TL) return;
+    const corners = fighters[0] && fighters[0].isModel;
+    for (const r of marks.rests) {
+      if (!corners || !r.round || t <= r.pauseAt) break;
+      if (t < r.pauseAt + CORNER_LEN) { seek(r.pauseAt); pausedRounds.add(r.round.n); frozen = true; if (startCorner()) { cor.release(); cor.update(0, t - r.pauseAt); return; } frozen = false; break; }
+      t -= CORNER_LEN;
+    }
+    seek(Math.min(t, marks.over - .05));
+  },
   stop() { stopCeremony(); TL = null; fighters.forEach(f => scene.remove(f.root)); fighters = []; clearOverlays(); },
   result: () => fight && fight.result, fight: () => fight,
   async preview(look, pose, venue) { // show one fighter in the given look, standing in a venue
@@ -913,7 +948,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 40 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 41 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

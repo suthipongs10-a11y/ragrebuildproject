@@ -60,6 +60,15 @@ export function buildFx(scene) {
         pos[j] = p.x; pos[j + 1] = p.y; pos[j + 2] = p.z;
       }
     },
+    // water poured between rounds: drops leaving p at (vx, vy, vz), spread by `spread` (m/s) each way
+    water(p, n, vx, vy, vz, spread) {
+      for (let i = 0; i < n; i++) {
+        const q = P[next], j = next * 3; next = (next + 1) % N;
+        q.vx = vx + (Math.random() - .5) * spread; q.vy = vy + (Math.random() - .5) * spread; q.vz = vz + (Math.random() - .5) * spread;
+        q.life = .45 + Math.random() * .35; q.t = 0; q.r = .62; q.g = .8; q.b = 1; q.grav = 9;
+        pos[j] = p.x; pos[j + 1] = p.y; pos[j + 2] = p.z;
+      }
+    },
     sweat(p, n, dirX) {
       n = Math.round(n * FX.amount);
       for (let i = 0; i < n; i++) {

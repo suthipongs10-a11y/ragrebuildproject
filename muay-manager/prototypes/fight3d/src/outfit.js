@@ -101,8 +101,10 @@ const cache = new Map();
 // The referee: one of the bodies dressed in a dark short-sleeved shirt, black trousers and shoes, and white gloves.
 // Each texel takes its part from the bone that moves it most; the cloth keeps a little of the light and shade under it.
 const REF = {shirt: [0x1c, 0x24, 0x3a, .55], trousers: [0x17, 0x17, 0x1b, .12], shoes: [0x0e, 0x0e, 0x10, .2], gloves: [0xe6, 0xe8, 0xec, .25]};
-function refereeTexture(model) {
-  const key = model.id + '|referee'; if (cache.has(key)) return cache.get(key);
+// the cornermen between rounds: the same cut in each corner's colour, bare hands
+const KITS = {ref: REF, c0: Object.assign({}, REF, {shirt: [0xb4, 0x24, 0x22, .5], gloves: [0x9c, 0x6c, 0x4c, .3]}), c1: Object.assign({}, REF, {shirt: [0x23, 0x4f, 0xb0, .5], gloves: [0x9c, 0x6c, 0x4c, .3]})};
+function refereeTexture(model, kit) {
+  const K = KITS[kit] || REF, key = model.id + '|' + kit; if (cache.has(key)) return cache.get(key);
   const mesh = model.mesh, g = mesh.geometry, pos = g.attributes.position, uv = g.attributes.uv, si = g.attributes.skinIndex, sw = g.attributes.skinWeight, idx = g.index;
   const names = mesh.skeleton.bones.map(b => b.name), P0 = model.pos, v = new THREE.Vector3();
   const sleeve = (side, p) => { const a = P0[side + 'Arm'], b = P0[side + 'ForeArm']; if (!a || !b) return true; const d = b.clone().sub(a); return p.clone().sub(a).dot(d) / d.lengthSq() < .55; };
@@ -131,7 +133,7 @@ function refereeTexture(model) {
   for (let pass = 0; pass < 2; pass++) { const m2 = map.slice(); for (let y = 1; y < MAP - 1; y++) for (let x = 1; x < MAP - 1; x++) { const o = y * MAP + x; if (map[o]) continue; const nb = map[o - 1] || map[o + 1] || map[o - MAP] || map[o + MAP]; if (nb) m2[o] = nb; } map.set(m2); } // cover the seams
   const img = model.image, W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;
   const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const cx2 = cv.getContext('2d', {willReadFrequently: true}); cx2.drawImage(img, 0, 0);
-  const id = cx2.getImageData(0, 0, W, H), d = id.data, fx = MAP / W, fy = MAP / H, cols = [null, REF.shirt, REF.trousers, REF.shoes, REF.gloves];
+  const id = cx2.getImageData(0, 0, W, H), d = id.data, fx = MAP / W, fy = MAP / H, cols = [null, K.shirt, K.trousers, K.shoes, K.gloves];
   const med = [0, 0, 0, 0, 0].map((_, r) => { if (!r) return 0; const a = []; for (let y = 0; y < H; y += 4) for (let x = 0; x < W; x += 4) if (map[Math.floor(y * fy) * MAP + Math.floor(x * fx)] === r) { const p = (y * W + x) * 4; a.push(lum(d[p], d[p + 1], d[p + 2])); } a.sort((p, q) => p - q); return a.length ? a[a.length >> 1] : .5; });
   for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
     const r = map[Math.floor(y * fy) * MAP + Math.floor(x * fx)]; if (!r) continue;
@@ -144,7 +146,8 @@ function refereeTexture(model) {
 }
 
 export function outfitTexture(model, look) {
-  if (look.referee) return refereeTexture(model);
+  if (look.referee) return refereeTexture(model, 'ref');
+  if (look.corner != null) return refereeTexture(model, 'c' + look.corner);
   const key = model.id + '|' + look.shorts + look.trim + look.gloves + look.pattern + (look.hair || '');
   if (cache.has(key)) return cache.get(key);
   const img = model.image, W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;

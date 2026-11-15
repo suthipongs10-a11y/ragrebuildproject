@@ -3,6 +3,7 @@
 const THREE = globalThis.THREE;
 
 const R = 3.05, S = R * 2 + .9;   // ring half size at the ropes, platform width
+export const RING_R = R;
 const rng = (() => { let a = 12345; return () => { a = (a * 1664525 + 1013904223) >>> 0; return a / 4294967296; }; })();
 export const VENUES = {stadium: 'เวทีมาตรฐาน', champ: 'เวทีใหญ่ชิงแชมป์', province: 'เวทีจังหวัด', temple: 'เวทีมวยวัด', chuek: 'ลานมวยคาดเชือก', camp: 'ค่ายมวย'};
 
