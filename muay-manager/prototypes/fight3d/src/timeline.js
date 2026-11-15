@@ -128,6 +128,13 @@ export function bake(fight) {
     // defender-local -> attacker-local (they face each other), then into the attacker's spun frame
     pt3.applyAxisAngle(UP, -ob[oo + IDX.spin]); pt3.y += ob[oo + IDX.jump];
     pt3.set(dist - pt3.x + (ev.res === 'dodge' ? .06 : 0), pt3.y - target[IDX.jump], -pt3.z);
+    // A round kick lands with the shin, not the foot: the ankle carries on past the near side of the target so the shin
+    // meets it, as on the banana tree in training (aimed at the middle, it looked like a slap with the inside of the
+    // foot). Push kicks and the spinning heel still land with the foot.
+    if (mv.kind === 'kick' && mv.eff.startsWith('foot') && !/teep|spCroc/.test(cue.strike)) {
+      const side = mv.eff.endsWith('L') ? -1 : 1;
+      pt3.x += mv.lvl === 'body' ? .1 : .08; pt3.z += side * (ev.res === 'block' ? .05 : mv.lvl === 'head' ? .1 : mv.lvl === 'body' ? .17 : .06);
+    }
     pt3.applyAxisAngle(UP, target[IDX.spin]);
     aimEffector(target, mv.eff, pt3, J);
   }

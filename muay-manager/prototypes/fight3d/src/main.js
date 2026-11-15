@@ -481,6 +481,7 @@ function handle(e) {
       const m = MOVES[e.move];
       poseFighters(e.t);
       const at = fighters[e.by], df = fighters[e.on], p = at.world(EFF_JOINT[m.eff], tmpV).clone();
+      if (m.kind === 'kick' && /^foot/.test(m.eff) && !/teep|spCroc/.test(e.move)) p.lerp(at.world(m.eff.endsWith('L') ? 'knL' : 'knR', tmpV2), .3); // a round kick lands on the shin: the flash goes there
       if (e.res === 'hit' && arena) { const d = ropeDepths(e.on, e.t, depthBuf); for (let s2 = 0; s2 < 4; s2++) if (d[s2] > -.12) arena.ropeKick(s2, .7 + (m.push || 0) * .035 + (e.sev || 0) * .25); } // driven into the ropes
       const away = df.root.position.x > at.root.position.x ? 1 : -1;
       if (e.res === 'hit') {
@@ -602,7 +603,9 @@ function direct(t) {
     // near ropes through a long lens cross the whole frame like a grey film, so the close shots keep only a trace of them
     if (c.cam === 'main') { s.px = mid * .3; s.py = 2.55; s.pz = 8.8; s.fit = sep + 2.7; s.fitH = 2.5; s.ty = 1.0; s.ropes = .2; }
     else if (c.cam === 'tight') { s.px = mid * .3; s.py = 1.8; s.pz = 8.4; s.fit = sep + 1.5; s.fitH = 1.75; s.ty = 1.2; s.ropes = .08; }
-    else if (c.cam === 'high') { s.px = flip * 6.6; s.py = 4.6; s.pz = 6.6; s.tx = mid * .6; s.ty = .8; s.fit = sep + 4.2; s.fitH = 3.5; }
+    // high and close, off the ring's diagonal: out on the diagonal the temple fair's bamboo light pole (5.4 m out, 4.3 m
+    // tall) stood right in front of the lens, and further back its strings of bulbs hung across the fighters
+    else if (c.cam === 'high') { s.px = flip * 2.8; s.py = 4.6; s.pz = 5; s.tx = mid * .6; s.ty = .8; s.fit = sep + 4.2; s.fitH = 3.5; }
     else if (c.cam === 'low') {
       s.px = mid + flip * 1.4; s.py = .55; s.pz = 4.75; s.hand = 1; s.fit = sep + 2.3; s.fitH = 2.5; s.ty = 1.08; s.ropes = .45;
       if (who >= 0) { s.px = wx + (who ? -1.6 : 1.6); s.py = 1.1; s.tx = lerp(mid, wx - (who ? -.7 : .7), .6); s.ty = .5; s.fit = 3.6; s.fitH = 2.0; s.ropes = .18; }
@@ -976,7 +979,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 48 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 49 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision
