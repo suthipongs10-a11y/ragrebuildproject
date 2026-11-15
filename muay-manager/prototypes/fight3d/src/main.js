@@ -877,6 +877,7 @@ const API = {
   },
   drillStrike: move => drill.strike(move),
   drillIncoming: (move, guarded) => drill.incoming(move, guarded), drillGuard: () => drill.guard(),
+  drillSkip: (t0, cross) => drill.skipPlan(t0, cross), drillTrip: () => drill.trip(),
   drillStop() { if (drill) drill.stop(); if (drillF) { scene.remove(drillF.root); drillF = null; } if (mateF) { scene.remove(mateF.root); mateF = null; } },
   pop(text, cls) { if (drillF) pop(text, drillF.world('head', tmpV).add(tmpV2.set(.3, .42, 0)), cls, .7); },
   endPreview() { if (previewF) { scene.remove(previewF.root); previewF = null; } fighters.forEach(f => { f.root.visible = true; }); },

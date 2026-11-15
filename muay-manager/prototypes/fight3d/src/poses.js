@@ -104,6 +104,8 @@ export const POSES = {
   down: P({turn: 0, twist: 0, lean: -1.5, hdP: 0, hip: [-.75, .13, 0], hL: [-1.3, .04, -.6], hR: [-1.2, .04, .62], eL: [0, -.2, -1], eR: [0, -.2, 1], fL: [0, .02, -.16], fR: [.1, .02, .2], kL: [0, 1, -.2], kR: [0, 1, .2]}),
   getup: P({turn: .2, lean: .55, hip: [-.45, .50, 0], hL: [-.15, .2, -.25], hR: [-.2, .5, .2], fL: [-.15, 0, -.15], fR: [-.75, 0, .15], kR: [.5, -1, 0]}),
   // after the fight: standing square and tall, arms down; gloves reaching out to touch the other man's and a small bow
+  // skipping rope: upright, feet together, hands low and out at the hips holding the handles
+  skip: P({turn: 0, twist: 0, lean: .03, hdP: .02, hip: [0, .94, 0], hL: [.16, .9, -.3], hR: [.16, .9, .3], eL: [-.6, -.8, -.3], eR: [-.6, -.8, .3], fL: [.02, 0, -.08], fR: [.02, 0, .08], kL: [1, 0, -.05], kR: [1, 0, .05]}),
   cerStand: P({turn: 0, twist: 0, lean: .02, hdP: .04, hip: [0, .93, 0], hL: [.1, .93, -.27], hR: [.1, .93, .27], eL: [-.3, -1, -.4], eR: [-.3, -1, .4], fL: [.03, 0, -.13], fR: [-.03, 0, .13], kL: [1, 0, -.1], kR: [1, 0, .1]}),
   cerTouch: P({turn: 0, twist: 0, lean: .2, hdP: .3, hip: [-.02, .91, 0], hL: [.36, 1.17, -.07], hR: [.36, 1.15, .07], eL: [-.2, -1, -.5], eR: [-.2, -1, .5], fL: [.08, 0, -.13], fR: [-.1, 0, .13], kL: [1, 0, -.1], kR: [1, 0, .1]}),
   win: P({turn: 0, twist: 0, lean: -.05, hdP: -.2, hip: [0, .90, 0], hL: [.05, 2.0, -.35], hR: [.05, 2.0, .35], eL: [0, -.3, -1], eR: [0, -.3, 1], fL: [.05, 0, -.18], fR: [-.05, 0, .18], kL: [1, 0, -.2], kR: [1, 0, .2]})

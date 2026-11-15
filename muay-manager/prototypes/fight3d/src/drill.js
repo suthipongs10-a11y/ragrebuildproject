@@ -14,6 +14,7 @@ export const TARGETS = {
   bag: {th: 'กระสอบทราย', moves: {punch: ['jab', 'cross', 'hook', 'bodyshot'], kick: ['body', 'high', 'body'], teep: ['teep', 'teepFace']}},
   banana: {th: 'ต้นกล้วย', moves: {punch: ['jab', 'cross'], kick: ['low', 'body', 'low', 'high'], teep: ['teep']}},
   dummy: {th: 'หุ่นซ้อม', moves: {punch: ['jab', 'cross', 'hook', 'bodyshot'], kick: ['body', 'high', 'low'], teep: ['teep', 'teepFace']}},
+  skip: {th: 'กระโดดเชือก', moves: {jump: ['jump'], punch: ['jab', 'cross', 'hook', 'upper'], kick: ['high', 'body', 'teepFace']}},
   spar: {th: 'คู่ซ้อม', moves: {punch: ['jab', 'cross', 'hook', 'bodyshot'], kick: ['body', 'low', 'body'], teep: ['teep'], guard: []}, partner: ['jab', 'cross', 'body', 'jab', 'teep', 'hook', 'low']}
 };
 const FIGHTER_X = -.5, TARGET_X = .5, DIST = TARGET_X - FIGHTER_X, SPEED = .8;
@@ -75,18 +76,50 @@ export function buildDrill(scene, fx, audio) {
   const pcur = new Float32Array(NP), pfrom = new Float32Array(NP), PP = new Float32Array(NP), J2 = makeJoints();
   D.start = function (f, key, beamY, mate) {
     D.stop(); fighter = f; D.on = true;
+    if (key === 'skip') { skip = {t0: 0, cross: [], hopT: -9, tripT: -9, rope: null}; lastKey = key; T = null; cur.set(FLAT.skip); queue = []; to = null; live = null; return; }
+    skip = null;
     if (key === 'spar') { partner = mate; lastKey = key; T = null; cur.set(FLAT.guard); pcur.set(FLAT.guard); queue = []; to = null; live = null; pq = []; pto = null; plive = null; return; }
     const id = key + (key === 'bag' ? beamY : '');
     if (!built[id]) { built[id] = MAKE[key](beamY || 3.25); built[id].group.position.set(TARGET_X, 0, 0); scene.add(built[id].group); }
     T = built[id]; T.group.visible = true; lastKey = key;
     cur.set(FLAT.guard); queue = []; to = null; live = null; ax = az = vx = vz = 0; shakeT = 0;
   };
-  D.stop = function () { D.on = false; fighter = null; partner = null; if (T) T.group.visible = false; T = null; };
+  D.stop = function () { D.on = false; fighter = null; partner = null; if (skip && skip.rope) { scene.remove(skip.rope); skip.rope.geometry.dispose(); } skip = null; if (T) T.group.visible = false; T = null; };
+  // Skipping rope. The game gives the times (seconds from the start) the rope passes under the feet; a jump pressed
+  // near one clears it, a pass with no jump catches the feet.
+  let skip = null;
+  const ropeMat = new THREE.MeshStandardMaterial({color: 0xd23a2a, roughness: .6}), ropeCurve = new THREE.CatmullRomCurve3(Array.from({length: 17}, () => new THREE.Vector3()));
+  D.skipPlan = function (t0, cross) { if (skip) { skip.t0 = t0; skip.cross = cross; } };
+  D.trip = function () { if (skip) skip.tripT = performance.now() / 1000; };
+  function ropePhase(now) { // angle of the rope: 0 over the head, pi under the feet
+    const c = skip.cross, el = now - skip.t0, LAG = .08;
+    if (!c.length || el > c[c.length - 1] + LAG + .3) return null; // the rope is put down for the shadowboxing
+    let k = 0; while (k < c.length - 1 && c[k + 1] + LAG <= el) k++;
+    const a = c[k] + LAG, b = k < c.length - 1 ? c[k + 1] + LAG : a + (k ? c[k] - c[k - 1] : .6);
+    if (el < c[0] + LAG) { const p = c.length > 1 ? c[1] - c[0] : .6; return Math.PI - 2 * Math.PI * (a - el) / p; }
+    return Math.PI + 2 * Math.PI * (el - a) / (b - a);
+  }
+  function drawRope(now) {
+    const ph = ropePhase(now);
+    if (ph == null) { if (skip.rope) skip.rope.visible = false; return; }
+    const tripped = now - skip.tripT < .7, phi = tripped ? Math.PI * .97 : ph; // caught on the feet for a moment
+    fighter.world('haL', pt); fighter.world('haR', wp);
+    const pts = ropeCurve.points, R = .98;
+    for (let i = 0; i <= 16; i++) {
+      const s = i / 16, b = Math.sin(Math.PI * s), x = pt.x + (wp.x - pt.x) * s, y = pt.y + (wp.y - pt.y) * s, z = pt.z + (wp.z - pt.z) * s;
+      pts[i].set(x + Math.sin(phi) * R * b * .55, Math.max(.01, y + Math.cos(phi) * R * b), z);
+    }
+    const geo = new THREE.TubeGeometry(ropeCurve, 40, .013, 6, false);
+    if (!skip.rope) { skip.rope = new THREE.Mesh(geo, ropeMat); skip.rope.castShadow = true; scene.add(skip.rope); } else { skip.rope.geometry.dispose(); skip.rope.geometry = geo; }
+    skip.rope.visible = true;
+  }
   D.key = () => lastKey;
 
   // throw a strike; returns seconds until it lands
   D.strike = function (moveKey) {
+    if (skip && moveKey === 'jump') { skip.hopT = performance.now() / 1000; audio.swish(false); return .1; }
     const mv = MOVES[moveKey]; if (!mv || !D.on) return 0;
+    if (skip) { queue = mv.fr.map(f => ({target: FLAT[f[0]] || FLAT.guard, d: f[1] * SPEED, hit: false})).concat([{target: FLAT.guard, d: .3}]); live = {mv, key: moveKey}; next(); audio.swish(mv.kind === 'kick'); return (mv.fr[0][1] + mv.fr[1][1]) * SPEED; } // shadowboxing: into the air
     queue = mv.fr.map((f, i) => {
       let target = FLAT[f[0]] || FLAT.guard;
       if (i === 1 && partner) { target = new Float32Array(target); aimEffector(target, mv.eff, sparPoint(pcur, mv), J); }
@@ -163,11 +196,20 @@ export function buildDrill(scene, fx, audio) {
       pt0 += dt; const e = ease(Math.min(1, pt0 / pd));
       for (let j = 0; j < NP; j++) cur[j] = from[j] + (to.target[j] - from[j]) * e;
       if (pt0 >= pd) { const hit = to.hit; if (hit) impact(); next(); }
-    } else { // back to the guard, bouncing on the lead foot
-      const k = 1 - Math.exp(-dt * 12), G = FLAT.guard;
+    } else { // back to the guard (or the skipping stance), bouncing on the lead foot
+      const now = performance.now() / 1000, roping = skip && ropePhase(now) != null, k = 1 - Math.exp(-dt * 12), G = roping ? FLAT.skip : FLAT.guard;
       for (let j = 0; j < NP; j++) cur[j] += (G[j] - cur[j]) * k;
     }
     P.set(cur);
+    if (skip) {
+      const now = performance.now() / 1000, h = now - skip.hopT, tr = now - skip.tripT;
+      if (h >= 0 && h < .3) { const u = h / .3; P[IDX.jump] += Math.sin(Math.PI * u) * .12; P[IDX.hip + 1] -= Math.max(0, .02 - u * .08); }
+      if (tr >= 0 && tr < .7) { const u = Math.sin(Math.PI * tr / .7); P[IDX.lean] += .22 * u; P[IDX.hip + 1] -= .06 * u; P[IDX.fR] += .08 * u; } // stumbles over the rope
+      fighter.update(P, 0, FIGHTER_X + .45);
+      drawRope(now);
+      D.kick *= Math.pow(.002, dt); D.shake *= Math.pow(.0006, dt);
+      return;
+    }
     if (!to) { const b = time * 5.2; P[IDX.fL + 1] += Math.max(0, Math.sin(b)) * .04; P[IDX.hip + 1] += Math.sin(b) * .012; P[IDX.hL] += Math.sin(b * .5) * .02; }
     fighter.update(P, 0, FIGHTER_X);
     if (partner) {
