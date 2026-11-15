@@ -203,7 +203,7 @@ export function buildDrill(scene, fx, audio) {
     P.set(cur);
     if (skip) {
       const now = performance.now() / 1000, h = now - skip.hopT, tr = now - skip.tripT;
-      if (h >= 0 && h < .3) { const u = h / .3; P[IDX.jump] += Math.sin(Math.PI * u) * .12; P[IDX.hip + 1] -= Math.max(0, .02 - u * .08); }
+      if (h >= 0 && h < .32) { const u = h / .32, up = Math.sin(Math.PI * u); P[IDX.jump] += up * .13; P[IDX.fL + 1] += up * .05; P[IDX.fR + 1] += up * .05; P[IDX.hip + 1] -= Math.max(0, .02 - u * .08); } // off the ground, knees tucked a little
       if (tr >= 0 && tr < .7) { const u = Math.sin(Math.PI * tr / .7); P[IDX.lean] += .22 * u; P[IDX.hip + 1] -= .06 * u; P[IDX.fR] += .08 * u; } // stumbles over the rope
       fighter.update(P, 0, FIGHTER_X + .45);
       drawRope(now);

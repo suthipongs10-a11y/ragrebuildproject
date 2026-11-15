@@ -939,7 +939,8 @@ function drillPress(kind) {
   if (!DR || !DR.ready) return;
   const now = (performance.now() - DR.t0) / 1000, list = API.TARGETS[DR.act.drill].moves[kind]; if (!list) return; // a key for a button this drill has not got
   const n = DR.notes.find(x => !x.res && Math.abs(x.t - now) <= DRILL.late);
-  if (kind === 'guard') API.drillGuard(); else API.drillStrike(list[DR.seq[kind]++ % list.length]);
+  const i = DR.seq[kind] || 0; DR.seq[kind] = i + 1; // jump had no counter: the strike went out empty and he never left the ground
+  if (kind === 'guard') API.drillGuard(); else API.drillStrike(list[i % list.length]);
   const b = document.querySelector('[data-drill="' + kind + '"]'); if (b) { b.classList.remove('tap'); void b.offsetWidth; b.classList.add('tap'); }
   if (!n) return;                                       // a free strike between calls: no score either way
   if (n.kind !== kind) { drillJudge(n, 'miss'); drillMsg('ผิดท่า', 'bad'); return; }
@@ -1087,7 +1088,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (SC && !e.repeat) { const k = e.key === 'ArrowLeft' ? 'L' : e.key === 'ArrowRight' ? 'R' : e.key === ' ' ? 'pull' : ''; if (k) { e.preventDefault(); scenePress(k); } return; } if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const sc = e.target.closest('[data-scene]'); if (sc && SC) { e.preventDefault(); scenePress(sc.dataset.scene); return; } const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.25'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.26'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }
