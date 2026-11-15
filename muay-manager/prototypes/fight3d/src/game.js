@@ -685,14 +685,14 @@ function advice(st) {
 function breakHtml() {
   const st = F.stats, n = F.round;
   const line = (label, a, b) => '<span>' + a + '</span><b>' + label + '</b><span>' + b + '</span>';
-  return '<section class="gcard"><h2>พักยก ' + n + '</h2><div class="cmp">' + line('แต้มยกนี้', st[0].rp, st[1].rp) + line('แต้มรวม', Math.round(st[0].pts), Math.round(st[1].pts)) + line('เข้าเป้า', st[0].landed, st[1].landed) + line('เข้าหน้า', st[0].head, st[1].head) + line('เข้าลำตัว', st[0].body, st[1].body) + line('เข้าขา', st[0].leg, st[1].leg) + line('แรงเหลือ', Math.round(st[0].st) + '%', Math.round(st[1].st) + '%') + line('พลังชีวิต', Math.round(st[0].hp) + '%', Math.round(st[1].hp) + '%') + '</div>' +
+  return '<section class="gcard"><h2>พักยก ' + n + '</h2><div class="rowbtn"><button class="btn go" data-act="resume">เริ่มยก ' + (n + 1) + ' เลย · แผนเดิม</button><button class="btn link" data-act="nobreak" aria-pressed="' + !!S.noBreak + '">' + (S.noBreak ? '✓ ' : '') + 'ไม่ต้องหยุดพักยกอีก</button></div><div class="cmp">' + line('แต้มยกนี้', st[0].rp, st[1].rp) + line('แต้มรวม', Math.round(st[0].pts), Math.round(st[1].pts)) + line('เข้าเป้า', st[0].landed, st[1].landed) + line('เข้าหน้า', st[0].head, st[1].head) + line('เข้าลำตัว', st[0].body, st[1].body) + line('เข้าขา', st[0].leg, st[1].leg) + line('แรงเหลือ', Math.round(st[0].st) + '%', Math.round(st[1].st) + '%') + line('พลังชีวิต', Math.round(st[0].hp) + '%', Math.round(st[1].hp) + '%') + '</div>' +
     advice(st).map(t => '<p class="advice"><b>พี่เลี้ยง:</b> ' + t + '</p>').join('') + quickHtml() + '<div class="fld">แผนยกต่อไป</div>' + planPicker(F.plan) +
     '<button class="btn go wide" data-act="resume">ชกต่อ</button></section>';
 }
 function liveHtml() {
   if (F.live) return '<section class="gcard slim"><div class="kv"><span>' + (F.live.exh ? 'อุ่นเครื่อง' : 'ท้าชก') + '</span><b>' + esc(F.live.fromName) + ' vs ' + esc(F.live.toName) + '</b><span>เวที</span><b>' + API.VENUES[F.live.venue] + '</b></div><p class="hint">ชกสด พักยกแก้แผนไม่ได้</p><div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button></div></section>';
   return '<section class="gcard slim"><div class="kv"><span>แผนตอนนี้</span><b>' + planText(F.plan) + '</b><span>คู่ชก</span><b>' + esc(F.opp.name) + ' · สาย' + styleTh(F.opp.style) + '</b></div>' +
-    '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button></div></section>';
+    '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button><button class="btn link" data-act="nobreak" aria-pressed="' + !!S.noBreak + '">' + (S.noBreak ? 'ชกต่อเนื่อง ไม่หยุดพักยก · แตะเพื่อหยุดพักยกแก้แผน' : 'หยุดทุกพักยกให้แก้แผน · แตะเพื่อชกต่อเนื่อง') + '</button></div></section>';
 }
 function resultHtml() {
   const r = F.res;
@@ -718,7 +718,11 @@ async function startFight() {
   await API.startFight({venue: o.venue, rules: VENUE_RULES[o.venue] || null, seed: F.seed, specs: [playerSpec(), {name: o.name, first: o.name, style: o.style, stats: o.stats, skin: 1, spLv: oppSpLv(o.style, league(S.rp), o.kind === 'title')}], plans: plansFor(),
     looks: [Object.assign({name: S.name, fighter: S.body}, S.look), Object.assign({name: o.name, fighter: o.body}, o.look)]});
 }
-function onRoundBreak(n, st) { F.phase = 'break'; F.round = n; F.stats = st; render(); $('gBody').scrollIntoView({block: 'nearest', behavior: 'smooth'}); }
+function onRoundBreak(n, st) {
+  F.phase = 'break'; F.round = n; F.stats = st;
+  if (S.noBreak) { F.phase = 'live'; render(); API.resume(); return; } // the player chose not to stop between rounds: same plan, straight on
+  render(); $('gBody').scrollIntoView({block: 'nearest', behavior: 'smooth'});
+}
 function onOver(res) {
   if (F && F.live) { liveMatchOver(res); return; }
   const win = res.w === 0, o = F.opp, ko = res.how !== 'คะแนน', lgBefore = league(S.rp);
@@ -1063,6 +1067,7 @@ function onClick(e) {
   else if (act === 'sp') { if (!S.spOwn.includes(v)) return; if (S.sp.includes(v)) { if (S.sp.length > 1) S.sp = S.sp.filter(k => k !== v); } else { S.sp.push(v); if (S.sp.length > 2) S.sp.shift(); } save(); render(); }
   else if (act === 'plan') { F.plan[el.dataset.g] = v; render(); }
   else if (act === 'startfight') startFight();
+  else if (act === 'nobreak') { S.noBreak = !S.noBreak; save(); render(); }
   else if (act === 'resume') { for (let i = F.round; i < 3; i++) F.plans[i] = Object.assign({}, F.plan); API.replan(plansFor()); F.phase = 'live'; render(); API.resume(); $('stage').scrollIntoView({block: 'nearest', behavior: 'smooth'}); }
   else if (act === 'skip') API.skip();
   else if (act === 'sceneskip') { if (!SC) return; if (SC.a.id === 'run') { SC.ticks = Math.max(1, SC.ticks); SC.inZone = SC.ticks * .5; } sceneEnd(false); }
@@ -1082,7 +1087,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (SC && !e.repeat) { const k = e.key === 'ArrowLeft' ? 'L' : e.key === 'ArrowRight' ? 'R' : e.key === ' ' ? 'pull' : ''; if (k) { e.preventDefault(); scenePress(k); } return; } if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const sc = e.target.closest('[data-scene]'); if (sc && SC) { e.preventDefault(); scenePress(sc.dataset.scene); return; } const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.23'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.24'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

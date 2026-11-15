@@ -348,9 +348,27 @@ function placeOf(i, t, extra) { // world position on the turned line
   const a = fx0(i, t), x = a - Math.sign(a) * (ropeBounce[i] + (extra || 0)), th = turn(t);
   place.x = x * Math.cos(th); place.z = -x * Math.sin(th); place.th = th; return place;
 }
+// Side steps while circling: each man moves sideways to where he faces, so his feet step that way. The step phase
+// is the distance he has gone along the circle (the turn times his distance from the centre), so steps keep pace
+// with the movement and run backwards when he circles back. A planted foot stays put while the body passes over it
+// (sliding back under the body), then lifts and is set down ahead again; a light bounce on each step.
+const STEP = .3, STEP_A = STEP * .35;
+function sideSteps(i, t, P) {
+  const ph = tt => turn(tt) * fx0(i, tt) * (i ? 1 : -1) / STEP; // strides gone sideways (signed)
+  const p = ph(t), v = (ph(t + .05) - ph(t - .05)) / .1 * STEP, w = Math.min(1, Math.abs(v) / .15);
+  if (w < .02) return;
+  for (const [j, base] of [[0, IDX.fL], [1, IDX.fR]]) {
+    const q = ((p + j * .5) % 1 + 1) % 1;
+    let z, lift = 0;
+    if (q < .7) z = STEP_A * (1 - 2 * q / .7); // planted
+    else { const u = (q - .7) / .3; z = -STEP_A + 2 * STEP_A * u; lift = Math.sin(Math.PI * u) * .06; } // swinging across
+    P[base + 2] += z * w; P[base + 1] += lift * w;
+  }
+  P[IDX.jump] += Math.abs(Math.sin(2 * Math.PI * p)) * .018 * w;
+}
 function poseFighters(t) {
   for (let i = 0; i < 2; i++) {
-    TL.sample(i, t, buf[i]); const p = placeOf(i, t), f = fighters[i];
+    TL.sample(i, t, buf[i]); sideSteps(i, t, buf[i]); const p = placeOf(i, t), f = fighters[i];
     f.update(buf[i], 0, p.x, p.z, (f.dir > 0 ? 0 : Math.PI) - buf[i][IDX.spin] + p.th);
   }
 }
@@ -895,7 +913,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 39 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 40 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision
