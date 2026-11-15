@@ -5,6 +5,7 @@ import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VE
 import { PLAN_TIPS } from './plantips.js';
 import { simulate } from './sim.js';
 import { siteRuntime } from './netdb.js';
+import { sceneArt, playScene, SCENE_KEYS } from './scenes.js';
 
 const $ = id => document.getElementById(id);
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
@@ -462,7 +463,7 @@ function render() {
   else if (tab === 'fight') b.innerHTML = fightHtml();
   else b.innerHTML = rankHtml();
 }
-function go(t) { if (DR) drillEnd(true); tab = t; view = null; pending = null; mini = null; setMode(false); render(); showMe(t === 'dress' ? 'guard' : t === 'home' ? 'guard' : 'guard'); }
+function go(t) { if (DR) drillEnd(true); if (SC) sceneEnd(true); tab = t; view = null; pending = null; mini = null; setMode(false); render(); showMe(t === 'dress' ? 'guard' : t === 'home' ? 'guard' : 'guard'); }
 
 let draft = {body: 'c', style: 'puncher', name: ''};
 function renderCreate() {
@@ -508,7 +509,68 @@ function spHtml() {
     '<p class="hint">ฝึกท่าขั้นถัดไปใช้แรงซ้อม 1 ครั้ง ความล้า +' + SP_UP_FAT + ' ทุกขั้นที่สูงขึ้น ท่าบังและหลบยากขึ้น ' + Math.round(RULES.spLvAcc * 100) + '% และแรงขึ้น ' + Math.round(RULES.spLvDmg * 100) + '% ' +
     (nextFame ? '· ท่าถัดไปปลดฟรีเมื่อชื่อเสียงถึง ★ ' + nextFame + ' หรือจ่ายครูเรียนก่อนได้ ' : '') + '· ท่าที่เลือกออกสลับกันเมื่อเกจท่าไม้ตายเต็ม</p></section>';
 }
+// ---------- activity scenes: run, leisure, rest (website pictures; without them the plain versions stay) ----------
+let SC = null;
+const SCENE_LEN = {run: 11, fun: 10, rest: 11}, PACE = {lo: .45, hi: .85, decay: .3, step: .09};
+function sceneStart(a) {
+  const art = sceneArt(), keys = (SCENE_KEYS[a.id] || []).filter(k => art && art[k]); if (!keys.length) return false;
+  const key = keys[Math.floor(Math.random() * keys.length)];
+  SC = {a, key, len: SCENE_LEN[a.id], pace: .55, inZone: 0, ticks: 0, last: '', caught: 0, spots: 0, nSpots: a.id === 'rest' ? 5 : 0,
+    bites: key === 'fun_1' ? [2.2, 5 + Math.random(), 7.6 + Math.random()].map(t => ({t, shown: false, done: null})) : []};
+  mini = null; render();
+  SC.ctl = playScene($('stage'), key, art[key], SC.len, {tick: sceneTick, spot: () => { SC.spots++; SC.ctl.big(SC.spots >= SC.nSpots ? 'คลายแล้ว!' : 'ดีขึ้น', 'perfect'); }});
+  $('stage').scrollIntoView({block: 'start', behavior: 'smooth'});
+  return true;
+}
+function sceneTick(t) {
+  const sc = SC; if (!sc) return;
+  if (sc.a.id === 'run') {
+    const dt = Math.min(.1, t - (sc.lastT || t)); sc.lastT = t; // real time, whatever the frame rate
+    sc.pace = Math.max(0, sc.pace - PACE.decay * dt); sc.ticks += dt; const ok = sc.pace >= PACE.lo && sc.pace <= PACE.hi; if (ok) sc.inZone += dt;
+    const el = $('scPace'); if (el) { el.style.width = Math.min(100, sc.pace / 1.1 * 100) + '%'; el.className = ok ? 'ok' : sc.pace > PACE.hi ? 'hi' : ''; }
+  }
+  for (const b of sc.bites) {
+    if (!b.shown && t >= b.t) { b.shown = true; sc.ctl.bite(); sc.ctl.big('ปลากินเบ็ด!', 'good'); }
+    if (b.shown && !b.done && t > b.t + .9) { b.done = 'miss'; sc.ctl.big('ปลาหลุด', 'bad'); }
+  }
+  if (sc.nSpots) for (let i = 0; i < sc.nSpots; i++) if (t >= 1 + i * 1.7 && !(sc['s' + i])) { sc['s' + i] = 1; sc.ctl.showSpot(i); }
+  if (t >= sc.len) sceneEnd(false);
+}
+function scenePress(kind) {
+  const sc = SC; if (!sc) return;
+  if (kind === 'L' || kind === 'R') { // strides: left and right in turn keep the pace, the same foot twice loses it
+    if (kind !== sc.last) sc.pace = Math.min(1.1, sc.pace + PACE.step); else { sc.pace = Math.max(0, sc.pace - .06); sc.ctl.big('ก้าวผิดจังหวะ', 'bad'); }
+    sc.last = kind; sc.ctl.step();
+    const b = document.querySelector('[data-scene="' + kind + '"]'); if (b) { b.classList.remove('tap'); void b.offsetWidth; b.classList.add('tap'); }
+  } else if (kind === 'pull') {
+    const t = (performance.now() / 1000), b = sc.bites.find(x => x.shown && !x.done);
+    if (b) { b.done = 'hit'; sc.caught++; sc.ctl.big('ได้ปลา!', 'perfect'); } else sc.ctl.big('ยังไม่กิน', 'bad');
+    void t;
+  }
+}
+// abort = left the screen: nothing spent
+function sceneEnd(abort) {
+  const sc = SC; if (!sc) return; SC = null; sc.ctl.end();
+  if (abort) return;
+  mini = {act: sc.a};
+  let extra = '';
+  if (sc.a.id === 'run') { const r = sc.inZone / Math.max(.5, sc.ticks); trainResult(r >= .75 ? .95 : r >= .45 ? .75 : .4); extra = 'วิ่งเข้าจังหวะ ' + Math.round(r * 100) + '%'; }
+  else { trainResult(1); }
+  if (sc.key === 'fun_1') extra = 'ได้ปลา ' + sc.caught + ' ตัว' + (sc.caught >= 2 ? moodUp(1) : '');
+  if (sc.a.id === 'rest' && sc.spots >= sc.nSpots) { S.fatigue = clamp(S.fatigue - 4, 0, 100); extra = 'นวดครบทุกจุด ลดล้าเพิ่มอีก 4'; }
+  if (extra && view) { view.msg += ' · ' + extra; save(); render(); }
+}
+function sceneHtml() {
+  const id = SC.a.id, fish = SC.key === 'fun_1';
+  return '<section class="gcard drillpad"><h2>' + SC.a.th + '</h2>' +
+    (id === 'run' ? '<div class="pace" aria-label="ความเร็วในการวิ่ง"><i id="scPace"></i></div><div class="dbtns"><button class="dbtn k-run" data-scene="L"><b>ซ้าย</b></button><button class="dbtn k-run" data-scene="R"><b>ขวา</b></button></div><p class="hint">แตะซ้าย ขวา สลับกัน ให้แถบความเร็วอยู่ในช่วงสีเขียว ยิ่งอยู่นานยิ่งได้ผล · คีย์บอร์ด ← →</p>'
+      : fish ? '<div class="dbtns"><button class="dbtn k-fish" data-scene="pull"><b>ดึง!</b></button></div><p class="hint">รอทุ่นกระตุก แล้วกดดึงให้ทัน · คีย์บอร์ด space</p>'
+      : id === 'rest' ? '<p class="hint">แตะจุดที่เรืองแสงบนภาพ ช่วยหมอนวดคลายกล้ามเนื้อ ครบทุกจุดลดล้าเพิ่ม</p>'
+      : '<p class="hint">พักใจสบาย ๆ อารมณ์ดีขึ้น</p>') +
+    '<button class="btn" data-act="sceneskip">ข้าม</button></section>';
+}
 function trainHtml() {
+  if (SC) return sceneHtml();
   if (DR) return drillHtml();
   if (mini) return miniHtml();
   const c = cap();
@@ -726,7 +788,7 @@ const mine = () => CLOUD ? matches().filter(m => m.from === CLOUD.uid || m.to ==
 function chChanged() {
   settleMatches();
   const typing = document.activeElement && document.activeElement.matches && document.activeElement.matches('input,select');
-  if (!F && !DR && !typing && view !== 'create' && (tab === 'fight' || tab === 'rank' || tab === 'home')) render();
+  if (!F && !DR && !SC && !typing && view !== 'create' && (tab === 'fight' || tab === 'rank' || tab === 'home')) render();
 }
 // once a match is over, its result counts for the two players whether or not they watched it
 function settleMatches() {
@@ -978,7 +1040,7 @@ function onClick(e) {
   else if (act === 'look') setLook(el.dataset.f, v);
   else if (act === 'gym') { const c = GYM_COST[S.gym]; if (S.money < c) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(c); return; } S.money -= c; S.gym++; save(); render(); }
   else if (act === 'reset') { if (el.dataset.sure) { try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* fine */ } S = null; view = 'create'; setMode(false); render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); } else { el.dataset.sure = '1'; el.textContent = 'กดอีกครั้งเพื่อยืนยันการลบนักมวยคนนี้'; } }
-  else if (act === 'train') { if (S.slots < 1) return; const a = ACTS.find(x => x.id === v); if (Math.random() * 100 < failPct(a)) { trainFail(a); return; } mini = {act: a, t0: performance.now()}; if (a.id === 'rest' || a.id === 'fun') trainResult(1); else if (a.drill) drillStart(a); else render(); }
+  else if (act === 'train') { if (S.slots < 1) return; const a = ACTS.find(x => x.id === v); if (Math.random() * 100 < failPct(a)) { trainFail(a); return; } mini = {act: a, t0: performance.now()}; if ((a.id === 'run' || a.id === 'rest' || a.id === 'fun') && sceneStart(a)) return; if (a.id === 'rest' || a.id === 'fun') trainResult(1); else if (a.drill) drillStart(a); else render(); }
   else if (act === 'hit') { const ph = ((performance.now() - mini.t0) / 1100) % 2, x = ph < 1 ? ph : 2 - ph; trainResult(1 - Math.abs(x - .5) * 2); }
   else if (act === 'buy') { const cost = pending.items.reduce((a, i) => a + i.price, 0); if (S.money < cost) return; S.money -= cost; pending.items.forEach(i => { if (!S.own[i.kind].includes(i.k)) S.own[i.kind].push(i.k); }); S.look = pending.look; pending = null; save(); render(); showMe(); }
   else if (act === 'cancelbuy') { pending = null; render(); showMe(); }
@@ -996,6 +1058,7 @@ function onClick(e) {
   else if (act === 'startfight') startFight();
   else if (act === 'resume') { for (let i = F.round; i < 3; i++) F.plans[i] = Object.assign({}, F.plan); API.replan(plansFor()); F.phase = 'live'; render(); API.resume(); $('stage').scrollIntoView({block: 'nearest', behavior: 'smooth'}); }
   else if (act === 'skip') API.skip();
+  else if (act === 'sceneskip') { if (!SC) return; if (SC.a.id === 'run') { SC.ticks = Math.max(1, SC.ticks); SC.inZone = SC.ticks * .5; } sceneEnd(false); }
   else if (act === 'drillquit') { drillEnd(true); setMode(false); render(); showMe(); }
 }
 function onInput(e) {
@@ -1009,11 +1072,11 @@ function onChange(e) {
 
 export function bootGame(api) {
   API = api; API.HOOK.onRoundBreak = onRoundBreak; API.HOOK.onOver = onOver;
-  window.addEventListener('keydown', e => { if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
-  $('gBody').addEventListener('pointerdown', e => { const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
+  window.addEventListener('keydown', e => { if (SC && !e.repeat) { const k = e.key === 'ArrowLeft' ? 'L' : e.key === 'ArrowRight' ? 'R' : e.key === ' ' ? 'pull' : ''; if (k) { e.preventDefault(); scenePress(k); } return; } if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
+  $('gBody').addEventListener('pointerdown', e => { const sc = e.target.closest('[data-scene]'); if (sc && SC) { e.preventDefault(); scenePress(sc.dataset.scene); return; } const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.20'; }
-  window.GAME = {drill: () => DR, press: drillPress, save: () => S}; // for automated checks
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.21'; }
+  window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }
   cloudInit();

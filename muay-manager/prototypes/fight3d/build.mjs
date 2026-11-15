@@ -116,7 +116,13 @@ if (existsSync('assets/camp')) {
   const pack = {}; for (const f of readdirSync('assets/camp').filter(f => /^camp-\d\.webp$/.test(f))) pack[f[5]] = 'data:image/webp;base64,' + readFileSync('assets/camp/' + f).toString('base64');
   if (Object.keys(pack).length) { campArt = `<script type="application/json" id="camp-art">${JSON.stringify(pack)}</script>`; console.log('camp art', Object.keys(pack).join(','), (campArt.length / 1048576).toFixed(2) + ' MB (website only)'); }
 }
-const assetsHtml = models.join('\n') + uiImages + campArt, assetsName = 'a/' + hash(assetsHtml) + '.html', appName = 'a/' + hash(jsGame) + '.js';
+// activity scenes (run, leisure, rest; docs/ACTIVITY_ART_BRIEF.md), website only as well
+let actArt = '';
+if (existsSync('assets/acts')) {
+  const pack = {}; for (const f of readdirSync('assets/acts').filter(f => f.endsWith('.webp'))) pack[f.slice(0, -5)] = 'data:image/webp;base64,' + readFileSync('assets/acts/' + f).toString('base64');
+  if (Object.keys(pack).length) { actArt = `<script type="application/json" id="act-art">${JSON.stringify(pack)}</script>`; console.log('activity art', Object.keys(pack).length, (actArt.length / 1048576).toFixed(2) + ' MB (website only)'); }
+}
+const assetsHtml = models.join('\n') + uiImages + campArt + actArt, assetsName = 'a/' + hash(assetsHtml) + '.html', appName = 'a/' + hash(jsGame) + '.js';
 writeFileSync('dist/site/' + assetsName, assetsHtml); writeFileSync('dist/site/' + appName, jsGame);
 const THREE_TAG = '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>';
 const siteAssets = {assets: '/' + assetsName, app: '/' + appName, three: THREE_TAG.match(/src="([^"]+)"/)[1],
