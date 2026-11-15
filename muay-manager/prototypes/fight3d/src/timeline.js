@@ -236,10 +236,10 @@ export function bake(fight) {
   const hopGate = (i, t, md) => { const p = gateP(i, t), on = HOP_ON[md] * (HOP_PACE + (1 - HOP_PACE) * paceAt(t)); return smooth(0, .04, p) * (1 - smooth(on, on + .05, p)); };
   // waiting: now and then the feet change over, slowly, one step at a time
   const slowSwitch = (i, t) => { const g = t * .19 + i * .47, c = Math.floor(g); return g - c < .26 && hash(c * 5 + i) < .6; };
-  // the bounce: a little over two light hops a second, in the air slightly longer than on the canvas
-  // and quicker while he is travelling, so each hop stays short
-  const HOP = 14, hopUp = ph => Math.max(0, Math.sin(ph) + .25) / 1.25, hopPh = [new Float32Array(n), new Float32Array(n)];
-  for (let i = 0; i < 2; i++) { let ph = i * 1.7, v = 0; for (let k = 0; k < n; k++) { v += (Math.abs(tick(i, k + 1, 0) - tick(i, k, 0)) * .01 / dt - v) * .15; ph += HOP * (1 + Math.min(.9, v * .8)) * dt; hopPh[i][k] = ph; } }
+  // the bounce: light hops a little under one and a half a second (halved from two after the owner found the feet
+  // far too quick), in the air slightly longer than on the canvas, a little quicker while he is travelling
+  const HOP = 8.5, hopUp = ph => Math.max(0, Math.sin(ph) + .25) / 1.25, hopPh = [new Float32Array(n), new Float32Array(n)];
+  for (let i = 0; i < 2; i++) { let ph = i * 1.7, v = 0; for (let k = 0; k < n; k++) { v += (Math.abs(tick(i, k + 1, 0) - tick(i, k, 0)) * .01 / dt - v) * .15; ph += HOP * (1 + Math.min(.4, v * .4)) * dt; hopPh[i][k] = ph; } }
 
   // Footwork. The simulation slides a fighter along the ring; here the feet are pinned to the canvas.
   // A fighter on his toes moves by bouncing: both feet shift together while he is in the air, and now and then
@@ -274,7 +274,7 @@ export function bake(fight) {
         const late = feet.filter(f => f.can && Math.abs(f.des - f.at) > (bouncing ? .24 : TH));
         if (late.length) {
           const fwd = late[0].des - late[0].at > 0, f = late.length > 1 ? feet[fwd ? 0 : 1] : late[0];
-          const speed = Math.abs(root(Math.min(n - 1, k + 4)) - a) / (4 * dt), dur = Math.max(.1, Math.min(.16, .16 - speed * .06)) * (md === 2 ? 1.6 : md === 1 ? 1.25 : 1);
+          const speed = Math.abs(root(Math.min(n - 1, k + 4)) - a) / (4 * dt), dur = Math.max(.2, Math.min(.32, .32 - speed * .12)) * (md === 2 ? 1.5 : md === 1 ? 1.2 : 1); // unhurried steps, the foot lifted
           const k2 = Math.min(n - 1, k + Math.round(dur / dt)), ahead = Math.min(.07, speed * .06) * (fwd ? 1 : -1);
           f.step = {t0: t, dur, from: f.at, to: root(k2) + B[k2 * NP + f.base] + (f.des - a - f.lx) + ahead, lift: LIFT};
         }

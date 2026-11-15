@@ -1,13 +1,14 @@
 // Between rounds: each fighter walks to his own corner (red at -x +z, blue at +x -z, where the pads are) and sits on
-// a stool. His cornerman climbs in, pours water over his head, gives him a drink and fans him with a towel; then he
-// gets up and walks back out for the bell. Presentation only: main.js holds the fight at the pause and picks it up
-// from there when this is over. Runs on its own clock, like the ceremony.
+// a stool. Two cornermen look after him: one gives him a drink of water (once), then wipes the sweat off his face and
+// chest with a towel; the other kneels in front and rubs boxing oil into his thighs. The camera goes up high and turns
+// slowly over the ring and the crowd, then comes back down to a corner. Then he gets up and walks back out for the
+// bell. Presentation only: main.js holds the fight at the pause and picks it up from there when this is over. Runs on
+// its own clock, like the ceremony.
 import { FLAT, NP, IDX } from './poses.js';
 const THREE = globalThis.THREE;
 
-const WALK = 2.1, SIT = .6, STAY = 5.2, UP = .6, BACK = 1.9; // seconds
+const WALK = 2.1, SIT = .6, STAY = 6.5, UP = .6, BACK = 1.9; // seconds
 const A = WALK + SIT, B = A + STAY; // seated from A; up at B unless the corner is held
-const CYC = 4.8; // seated loop: splash .2-1.0, drink 1.2-2.6, fan 2.8-4.8 (blue runs half a loop behind red)
 const sm = (a, b, x) => { const k = Math.max(0, Math.min(1, (x - a) / (b - a))); return k * k * (3 - 2 * k); };
 const yawOf = (dx, dz) => Math.atan2(-dz, dx); // the yaw that faces along (dx, dz)
 const turnTo = (a, b, k) => { let d = b - a; d -= Math.round(d / (Math.PI * 2)) * Math.PI * 2; return a + d * k; };
@@ -20,7 +21,7 @@ export const CORNER_LEN = B + UP + BACK;
 export function buildCorner(scene, camera, getFx) {
   const C = {on: false, t: 0, pin: false};
   const UPV = new THREE.Vector3(0, 1, 0), YV = new THREE.Vector3(0, 1, 0);
-  const v = new THREE.Vector3(), w = new THREE.Vector3(), head = new THREE.Vector3(), tip = new THREE.Vector3(), dir = new THREE.Vector3();
+  const v = new THREE.Vector3(), w = new THREE.Vector3(), head = new THREE.Vector3(), tip = new THREE.Vector3(), dir = new THREE.Vector3(), a3 = new THREE.Vector3(), b3 = new THREE.Vector3();
   const Q = [0, 1, 2, 3].map(() => new Float32Array(NP));
   // props: a stool per corner, and the cornerman's water bottle and towel
   const prop = (geo, color, extra) => { const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial(Object.assign({color, roughness: .55}, extra))); m.visible = false; m.castShadow = true; scene.add(m); return m; };
@@ -36,10 +37,10 @@ export function buildCorner(scene, camera, getFx) {
   function spots(i, from) {
     const sx = i ? 1 : -1, sz = i ? -1 : 1, dx = -sx * Math.SQRT1_2, dz = -sz * Math.SQRT1_2; // d: out of the corner
     const rx = -dz, rz = dx; // the seated fighter's right
-    const stool = {x: sx * (R - .43), z: sz * (R - .43)};
-    const wait = {x: stool.x + rx * .4 + dx * .3, z: stool.z + rz * .4 + dz * .3}; // out of his way while he comes in
-    return {sx, sz, dx, dz, rx, rz, stool, wait, out: {x: wait.x, z: sz * (R + .32)},
-      front: {x: stool.x + dx * .5 + rx * .3, z: stool.z + dz * .5 + rz * .3}, // in front, on the side away from the close-up
+    const stool = {x: sx * (R - .43), z: sz * (R - .43)}, at = (f, r) => ({x: stool.x + dx * f + rx * r, z: stool.z + dz * f + rz * r});
+    const wait = at(.3, .4), kneel = at(.85, -.12); // the first waits out of his way while he comes in
+    return {sx, sz, dx, dz, rx, rz, stool, wait, kneel, front: at(.5, .3),
+      out: {x: wait.x, z: sz * (R + .32)}, out2: {x: sx * (R + .32), z: kneel.z}, // on the apron, behind the ropes either side
       sit: yawOf(dx, dz), face: yawOf(-dx, -dz), from, P0: new Float32Array(from.P)};
   }
   // feet stepping along the local direction (mx, mz) after d metres walked; k: how much
@@ -56,14 +57,21 @@ export function buildCorner(scene, camera, getFx) {
   // walk from a to b over [t0, t0 + len]: position, the distance gone, and the direction in the world
   function walk(a, b, t0, len, s) {
     const k = sm(t0, t0 + len, s), dxw = b.x - a.x, dzw = b.z - a.z, L = Math.hypot(dxw, dzw) || 1;
-    return {x: a.x + dxw * k, z: a.z + dzw * k, d: L * k, ux: dxw / L, uz: dzw / L, yaw: yawOf(dxw, dzw), moving: k > 0 && k < 1};
+    return {x: a.x + dxw * k, z: a.z + dzw * k, d: L * k, ux: dxw / L, uz: dzw / L, yaw: yawOf(dxw, dzw)};
   }
   const toLocal = (p, x, z, yaw, out) => out.set(p.x - x, p.y, p.z - z).applyAxisAngle(UPV, -yaw);
-  // the activity weights at time c of the seated loop
-  const acts = c => ({splash: sm(0, .25, c) * (1 - sm(.95, 1.15, c)), drink: sm(1.0, 1.3, c) * (1 - sm(2.5, 2.75, c)), fan: sm(2.7, 2.95, c) * (1 - sm(4.55, 4.8, c))});
+  // one man climbing in through the ropes from `out` to `to` over [t0, t0 + .9] and back out over [t1, t1 + .9]
+  function climber(Pm, from, to, t0, t1, s, face) {
+    const k = sm(t0, t0 + .9, s) * (1 - sm(t1, t1 + .9, s)), x = from.x + (to.x - from.x) * k, z = from.z + (to.z - from.z) * k;
+    const going = s < t1 ? yawOf(to.x - from.x, to.z - from.z) : yawOf(from.x - to.x, from.z - to.z);
+    const yaw = k > .98 ? face : s < t1 ? turnTo(going, face, sm(t0 + .6, t0 + .9, s)) : going;
+    Pm.set(FLAT.cerStand);
+    if (k > .02 && k < .98) { gait(Pm, s * 1.1, 1, 0, .8); Pm[IDX.jump] = Math.sin(Math.PI * k) * .12; } // stepping through the ropes
+    return {x, z, yaw, k};
+  }
 
-  // F: the two fighters; men: two cornermen or null; ring: half size at the ropes; place(i, P) fills P with fighter
-  // i's pose at the pause and returns {x, z, yaw}
+  // F: the two fighters; men: four cornermen (the water and towel man for red and blue, then the masseur for each) or
+  // null; ring: half size at the ropes; place(i, P) fills P with fighter i's pose at the pause and returns {x, z, yaw}
   C.start = function (fighters, cornermen, ring, placeAt) {
     F = fighters; men = cornermen; R = ring; place = placeAt; C.on = true; C.t = 0; C.upAfter = null; C.upT = null; C.pin = false;
     S = [0, 1].map(i => { const P = Q[i]; const at = place(i, P); return spots(i, {x: at.x, z: at.z, yaw: at.yaw, P}); });
@@ -85,7 +93,8 @@ export function buildCorner(scene, camera, getFx) {
     if (tJump != null) { C.t = tJump; C.upT = C.upAfter != null && C.t >= C.upAfter ? C.upAfter : null; } else if (!C.pin) C.t += dt;
     const s = C.t;
     if (C.upT == null && C.upAfter != null && s >= C.upAfter) C.upT = C.upAfter;
-    const U = C.upT != null ? C.upT : 1e6, wSeat = s - A, fx = getFx();
+    const U = C.upT != null ? C.upT : 1e6, ws = s - A; // ws: seconds seated
+    const seated = s >= A && s < U, drink = seated ? sm(.1, .4, ws) * (1 - sm(1.6, 1.9, ws)) : 0, wipe = seated ? sm(1.9, 2.3, ws) : 0;
     for (let i = 0; i < 2; i++) {
       const sp = S[i], P = Q[2 + i], stool = sp.stool;
       let x = stool.x, z = stool.z, yaw = sp.sit;
@@ -97,11 +106,11 @@ export function buildCorner(scene, camera, getFx) {
         const ca = Math.cos(yaw), sa = Math.sin(yaw); // the walk in his own frame
         gait(P, m.d, m.ux * ca - m.uz * sa, m.ux * sa + m.uz * ca, sm(0, .2, s) * (1 - sm(WALK - .2, WALK, s)));
       } else if (s < A) blend(P, FLAT.cerStand, FLAT.sit, sm(WALK, A, s)); // sits down
-      else if (s < U) { // seated: breathing hard, head back to drink, down for the water
+      else if (s < U) { // seated: breathing hard, head back to drink, eyes down while he is wiped
         P.set(FLAT.sit);
-        const a = acts(((wSeat - i * 2.4) % CYC + CYC) % CYC), br = Math.sin(s * 3.6 + i * 1.3);
-        P[IDX.hip + 1] += br * .006; P[IDX.lean] += br * .025 - .05 * a.fan;
-        P[IDX.hdP] += -.55 * a.drink + .35 * a.splash + Math.sin(s * 9) * .06 * a.splash - .12 * a.fan;
+        const br = Math.sin(s * 3.6 + i * 1.3);
+        P[IDX.hip + 1] += br * .006; P[IDX.lean] += br * .025;
+        P[IDX.hdP] += -.55 * drink + .12 * wipe + Math.sin(s * 2.1 + i) * .04 * wipe;
       } else if (s < U + UP) blend(P, FLAT.sit, FLAT.cerStand, sm(U, U + UP, s)); // up
       else { // back out to where the round starts
         const to = place(i, Q[i]), m = walk(stool, to, U + UP, BACK, s), k = sm(U + UP + BACK - .45, U + UP + BACK, s);
@@ -116,61 +125,65 @@ export function buildCorner(scene, camera, getFx) {
       const st = stools[i], gone = U + UP + 1.2, inK = sm(.3, 1.1, s) * (1 - sm(gone, gone + .7, s));
       st.position.set(sp.sx * (R + .35) + (stool.x - sp.sx * (R + .35)) * inK, Math.sin(Math.PI * inK) * .5, sp.sz * (R + .35) + (stool.z - sp.sz * (R + .35)) * inK);
       if (!men) continue;
-      // the cornerman: climbs in, waits by the stool, steps in front once he is seated, and back and out at the end
-      const M = men[i], Pm = Q[i]; // Q[i] is free here: the walk back has used it already this frame
-      let mx, mz, myaw = sp.face, k1 = sm(A - .3, A + .3, s) * (1 - sm(U, U + .5, s));
-      const climb = sm(0, .9, s) * (1 - sm(U + UP + .6, U + UP + 1.5, s));
-      mx = sp.out.x + (sp.wait.x - sp.out.x) * climb; mz = sp.out.z + (sp.wait.z - sp.out.z) * climb;
-      const bulge = Math.sin(Math.PI * k1) * .25;
-      mx += (sp.front.x - sp.wait.x) * k1 + sp.dx * bulge; mz += (sp.front.z - sp.wait.z) * k1 + sp.dz * bulge;
-      if (climb < 1) myaw = s < 1 ? turnTo(yawOf(sp.wait.x - sp.out.x, sp.wait.z - sp.out.z), sp.face, sm(.6, .95, s)) : yawOf(sp.out.x - sp.wait.x, sp.out.z - sp.wait.z); // facing the way he goes
-      Pm.set(FLAT.cerStand); Pm[IDX.lean] += .1 * k1;
-      const moving = (s < .9) || (k1 > .02 && k1 < .98) || (s > U + UP + .6 && s < U + UP + 1.5);
-      if (moving) gait(Pm, s * 1.1, 1, 0, .8);
-      Pm[IDX.jump] = Math.sin(Math.PI * climb) * (climb < 1 ? .12 : 0); // stepping through the ropes
-      // what his hands do while the fighter is seated: water over the head, a drink, the towel
-      const a = s >= A && s < U ? acts(((wSeat - i * 2.4) % CYC + CYC) % CYC) : {splash: 0, drink: 0, fan: 0}, c = ((wSeat - i * 2.4) % CYC + CYC) % CYC;
-      const near = k1 * (1 - sm(U, U + .3, s));
       F[i].world('head', head);
-      const fdx = Math.cos(sp.sit), fdz = -Math.sin(sp.sit); // the fighter's forward
-      Pm[IDX.lean] += .22 * (a.splash + a.drink) * near; Pm[IDX.hdP] += .25 * near;
-      // drink: the bottle comes down into his mouth
-      v.set(head.x + fdx * .09, head.y - .06, head.z + fdz * .09); // mouth
+      const fdx = Math.cos(sp.sit), fdz = -Math.sin(sp.sit), Pm = Q[i]; // the fighter's forward; Q[i] is free again
+      // The water and towel man: climbs in, waits by the stool, steps in front once he is seated, gives him one drink,
+      // then wipes his face and chest. Bottle in the right hand, towel in the left.
+      const M = men[i], cl = climber(Pm, sp.out, sp.wait, 0, U + UP + .6, s, sp.face);
+      const k1 = sm(A - .3, A + .3, s) * (1 - sm(U, U + .5, s)), bulge = Math.sin(Math.PI * k1) * .25;
+      const mx = cl.x + (sp.front.x - sp.wait.x) * k1 + sp.dx * bulge, mz = cl.z + (sp.front.z - sp.wait.z) * k1 + sp.dz * bulge, myaw = cl.yaw;
+      if (k1 > .02 && k1 < .98) gait(Pm, s * 1.1, 1, 0, .8);
+      const near = k1 * (1 - sm(U, U + .3, s)), d1 = drink * near, w1 = wipe * near;
+      Pm[IDX.lean] += .1 * k1 + .22 * d1 + .16 * w1; Pm[IDX.hdP] += .25 * near;
+      v.set(head.x + fdx * .09, head.y - .06, head.z + fdz * .09); // his mouth
       dir.set(v.x - mx, -.55, v.z - mz).normalize();
-      w.copy(v).addScaledVector(dir, -.2); toLocal(w, mx, mz, myaw, w); mix3(Pm, IDX.hR, w, a.drink * near);
-      // splash: held up over his head, pouring
-      w.set(head.x, head.y + .32, head.z).addScaledVector(dir.set(mx - head.x, 0, mz - head.z).normalize(), .06); toLocal(w, mx, mz, myaw, w); mix3(Pm, IDX.hR, w, a.splash * near);
-      // fan: the towel waves in front of his face
-      w.set(head.x + fdx * .36 - sp.rx * Math.sin(s * 8) * .16, head.y - .05 + Math.cos(s * 16) * .03, head.z + fdz * .36 - sp.rz * Math.sin(s * 8) * .16); toLocal(w, mx, mz, myaw, w); mix3(Pm, IDX.hL, w, a.fan * near);
+      w.copy(v).addScaledVector(dir, -.2); toLocal(w, mx, mz, myaw, w); mix3(Pm, IDX.hR, w, d1); // the bottle comes down to it
+      // the towel goes round over his face, then down over his chest and shoulders, and back
+      const onFace = .5 + .5 * Math.cos((ws - 2) * Math.PI * 2 / 3.2), ang = s * 6.5;
+      F[i].world('shL', a3); F[i].world('shR', b3); a3.add(b3).multiplyScalar(.5);
+      w.set(head.x + fdx * .17, head.y + .07, head.z + fdz * .17).lerp(a3.set(a3.x + fdx * .2, a3.y + .06, a3.z + fdz * .2), 1 - onFace);
+      w.x += sp.rx * Math.cos(ang) * .07; w.y += Math.sin(ang) * .05; w.z += sp.rz * Math.cos(ang) * .07;
+      toLocal(w, mx, mz, myaw, w); mix3(Pm, IDX.hL, w, w1);
       M.update(Pm, 0, mx, mz, myaw);
-      // bottle in his right hand: upright, pointing at the mouth, or tipped over the head
       const bt = bottles[i]; M.world('haR', w); bt.position.copy(w);
       dir.set(0, 1, 0);
-      if (a.drink * near > 0) { tip.set(head.x + fdx * .09, head.y - .06, head.z + fdz * .09).sub(w).normalize(); dir.lerp(tip, a.drink * near); }
-      if (a.splash * near > 0) { tip.set(head.x - w.x, -.6, head.z - w.z).normalize(); dir.lerp(tip, a.splash * near); }
+      if (d1 > 0) { tip.copy(v).sub(w).normalize(); dir.lerp(tip, d1); }
       bt.quaternion.setFromUnitVectors(YV, dir.normalize());
-      if (a.splash * near > .6 && c > .3 && c < .95 && fx && !C.pin) { // the water: a stream from the bottle and drops off his head
-        tip.copy(w).addScaledVector(dir, .17);
-        fx.water(tip, Math.max(2, Math.round(130 * dt)), dir.x * 1.4, dir.y * 1.4, dir.z * 1.4, .3);
-        fx.water(head, Math.max(1, Math.round(70 * dt)), 0, .8, 0, 1.8);
-      }
-      // towel in his left hand, flapping while he fans
       const tw = towels[i]; M.world('haL', w); tw.position.copy(w);
-      tw.rotation.set(0, myaw + Math.PI / 2, 0); tw.rotateX(Math.sin(s * 8) * .9 * a.fan * near); tw.rotateZ(.25 + .5 * a.fan * near);
+      tw.rotation.set(0, myaw + Math.PI / 2, 0); tw.rotateX(-.5 * w1 + Math.sin(ang) * .15 * w1); tw.rotateZ(.25 * (1 - w1));
+      // The masseur: waits on the apron, climbs in once the fighter is down on the stool, kneels in front and rubs
+      // the oil into both thighs, hand over hand, until it is time to go.
+      const M2 = men[2 + i], c2 = climber(Pm, sp.out2, sp.kneel, A - .4, U + .1, s, sp.face);
+      const kn = sm(A + .5, A + 1.0, s) * (1 - sm(U - .2, U + .2, s)), rub = sm(A + .9, A + 1.2, s) * (1 - sm(U - .3, U, s));
+      if (kn > 0) blend(Pm, Pm, FLAT.kneel, kn);
+      for (const [hand, hip, knee, ph] of [[IDX.hL, 'hpR', 'knR', 0], [IDX.hR, 'hpL', 'knL', Math.PI]]) {
+        if (rub <= 0) continue;
+        F[i].world(hip, a3); F[i].world(knee, b3);
+        const u = .45 + .25 * Math.sin(s * 4.2 + ph); // up and down the thigh
+        w.copy(a3).lerp(b3, u); w.y += .07 + Math.max(0, Math.sin(s * 4.2 + ph + 1.2)) * .025;
+        toLocal(w, c2.x, c2.z, c2.yaw, w); mix3(Pm, hand, w, rub);
+      }
+      Pm[IDX.hdP] += .2 * kn;
+      M2.update(Pm, 0, c2.x, c2.z, c2.yaw);
     }
-    shoot(s, U, wSeat);
+    shoot(s, U, ws);
     return s < U + UP + BACK;
   };
 
-  // camera: a high wide shot as they walk to the corners, close-ups taking turns on each corner while they sit, and a
-  // wide shot from the main side as they come back out
-  function shoot(s, U, wSeat) {
-    let px, py, pz, lx, ly, lz, fov;
+  // camera: high and wide as they walk to the corners; a close-up of the red corner for the drink; then up high over
+  // the ring, turning slowly to take in the crowd and the hall; back down to the blue corner for the rub and the
+  // towel (held longer: turns between the corners and the high shot); wide from the main side as they come back out
+  function shoot(s, U, ws) {
+    let px, py, pz, lx, ly, lz, fov, close = -1, into = 0;
     if (s < WALK + .3) { px = 6.2; py = 4.4; pz = 6.6; lx = -.2; ly = .6; lz = 0; fov = 27; }
     else if (s < U) {
-      const k = Math.max(0, Math.floor((wSeat + .3) / 2.4)), i = k % 2, sp = S[i], into = (wSeat + .3) / 2.4 - k;
-      const a = -.85, cx = sp.dx * Math.cos(a) - sp.dz * Math.sin(a), cz = sp.dx * Math.sin(a) + sp.dz * Math.cos(a), D = 2.3 - .3 * into; // on his left, the cornerman on his right
-      px = sp.stool.x + cx * D; py = 1.2; pz = sp.stool.z + cz * D; lx = sp.stool.x + sp.dx * .25 + sp.rx * .14; ly = .95; lz = sp.stool.z + sp.dz * .25 + sp.rz * .14; fov = 36;
+      if (ws < 1.9) { close = 0; into = (ws + .3) / 2.2; }
+      else if (ws >= 4.3) { const q = (ws - 4.3) / 2.4, k = Math.floor(q) % 4; into = q - Math.floor(q); close = k === 0 ? 1 : k === 2 ? 0 : -1; }
+      if (close < 0) { const a = .35 + s * .09, r = 8.4; px = Math.sin(a) * r; py = 5.4; pz = Math.cos(a) * r; lx = 0; ly = .2; lz = 0; fov = 44; }
+      else {
+        const sp = S[close], a = -.85, cx = sp.dx * Math.cos(a) - sp.dz * Math.sin(a), cz = sp.dx * Math.sin(a) + sp.dz * Math.cos(a), D = 2.3 - .25 * sm(0, 1, into); // on his left, the cornermen on his right and in front
+        px = sp.stool.x + cx * D; py = 1.45; pz = sp.stool.z + cz * D; lx = sp.stool.x + sp.dx * .3 + sp.rx * .1; ly = .82; lz = sp.stool.z + sp.dz * .3 + sp.rz * .1; fov = 38;
+      }
     } else { px = -1.4; py = 2.5; pz = 7.2; lx = 0; ly = .8; lz = 0; fov = 33; }
     camera.position.set(px, py, pz); camera.lookAt(lx, ly, lz);
     if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }

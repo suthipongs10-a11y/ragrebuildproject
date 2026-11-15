@@ -94,13 +94,13 @@ function loadRef() {
   if (!id || (REFM && REFM.id === id)) return;
   loadModel(id, ROSTER[id][1]).then(m => { REFM = m; if (refF) { scene.remove(refF.root); refF = null; } if (menF) { stopCorner(); menF.forEach(f => scene.remove(f.root)); menF = null; } }).catch(e => console.warn('referee not loaded:', e.message));
 }
-// Between rounds (corner.js): the fighters sit in their corners and a cornerman each, the referee's body in a corner shirt,
-// gives them water. Without the models the fight simply waits at the break as before.
+// Between rounds (corner.js): the fighters sit in their corners and two cornermen each, the referee's body in a corner
+// shirt, give them water, wipe them down and rub oil into their legs. Without the models the fight simply waits at the break as before.
 let menF = null;
 function startCorner() {
   if (!fighters[0] || !fighters[0].isModel || !fighters[1].isModel) return false;
   fighters.forEach(f => f.setMongkol(false));
-  if (!menF && REFM) menF = [0, 1].map(i => { const m = new ModelFighter(0, REFM, {corner: i, head: 'none'}); m.handK = .55; m.root.visible = false; scene.add(m.root); return m; });
+  if (!menF && REFM) menF = [0, 1, 0, 1].map(i => { const m = new ModelFighter(0, REFM, {corner: i, head: 'none'}); m.handK = .55; m.root.visible = false; scene.add(m.root); return m; }); // water and towel, then oil, per corner
   cor.start(fighters, menF, RING_R, (i, P) => { TL.sample(i, playT, P); sideSteps(i, playT, P); const p = placeOf(i, playT); return {x: p.x, z: p.z, yaw: (fighters[i].dir > 0 ? 0 : Math.PI) - P[IDX.spin] + p.th}; });
   return true;
 }
@@ -364,8 +364,9 @@ function placeOf(i, t, extra) { // world position on the turned line
 // Side steps while circling: each man moves sideways to where he faces, so his feet step that way. The step phase
 // is the distance he has gone along the circle (the turn times his distance from the centre), so steps keep pace
 // with the movement and run backwards when he circles back. A planted foot stays put while the body passes over it
-// (sliding back under the body), then lifts and is set down ahead again; a light bounce on each step.
-const STEP = .3, STEP_A = STEP * .35;
+// (sliding back under the body, gliding a little), then lifts and is set down ahead again; a light bounce on each
+// step. Half the cadence it had at first (the owner: far too quick), so each step is longer and unhurried.
+const STEP = .6, STEP_A = STEP * .25;
 function sideSteps(i, t, P) {
   const ph = tt => turn(tt) * fx0(i, tt) * (i ? 1 : -1) / STEP; // strides gone sideways (signed)
   const p = ph(t), v = (ph(t + .05) - ph(t - .05)) / .1 * STEP, w = Math.min(1, Math.abs(v) / .15);
@@ -374,7 +375,7 @@ function sideSteps(i, t, P) {
     const q = ((p + j * .5) % 1 + 1) % 1;
     let z, lift = 0;
     if (q < .7) z = STEP_A * (1 - 2 * q / .7); // planted
-    else { const u = (q - .7) / .3; z = -STEP_A + 2 * STEP_A * u; lift = Math.sin(Math.PI * u) * .06; } // swinging across
+    else { const u = (q - .7) / .3; z = -STEP_A + 2 * STEP_A * u; lift = Math.sin(Math.PI * u) * .07; } // swinging across
     P[base + 2] += z * w; P[base + 1] += lift * w;
   }
   P[IDX.jump] += Math.abs(Math.sin(2 * Math.PI * p)) * .018 * w;
@@ -948,7 +949,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 42 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 43 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision
