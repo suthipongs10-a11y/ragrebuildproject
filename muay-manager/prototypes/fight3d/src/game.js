@@ -91,8 +91,8 @@ function autoDay() {
 // One belt per league, fought for against its champion once the fighter is near the top of that league.
 const BELTS = ['เข็มขัดงานวัด', 'เข็มขัดอำเภอ', 'เข็มขัดจังหวัด', 'เข็มขัดเวทีมาตรฐาน', 'เข็มขัดแชมป์ประเทศไทย', 'เข็มขัดแชมป์โลก'];
 // Drill: the trainer calls strikes, the player presses them in time. What each strike trains, and how often each target calls for it.
-const KINDS = {punch: {th: 'ต่อย', stat: {pow: 1}, key: ['a', 'j', 'arrowleft']}, kick: {th: 'เตะ', stat: {kick: 1}, key: ['s', 'k', 'arrowdown']}, teep: {th: 'ถีบ', stat: {spd: .5, def: .5}, key: ['d', 'l', 'arrowright']}, guard: {th: 'บัง', stat: {def: 1, chin: .5}, key: ['f', ';', 'arrowup']}, jump: {th: 'กระโดด', stat: {spd: 1, end: .35}, key: [' ', 'w', 'g']}};
-const DRILL_MIX = {skip: {jump: .7, punch: .2, kick: .1}, spar: {punch: .5, kick: .32, teep: .18}, bag: {punch: .6, kick: .25, teep: .15}, banana: {punch: .15, kick: .7, teep: .15}, dummy: {punch: .25, kick: .2, teep: .55}};
+const KINDS = {punch: {th: 'ต่อย', stat: {pow: 1}, key: ['a', 'j', 'arrowleft']}, elbow: {th: 'ศอก', stat: {pow: 1}, key: ['q', 'u']}, kick: {th: 'เตะ', stat: {kick: 1}, key: ['s', 'k', 'arrowdown']}, knee: {th: 'เข่า', stat: {kick: 1}, key: ['e', 'i']}, teep: {th: 'ถีบ', stat: {spd: .5, def: .5}, key: ['d', 'l', 'arrowright']}, guard: {th: 'บัง', stat: {def: 1, chin: .5}, key: ['f', ';', 'arrowup']}, jump: {th: 'กระโดด', stat: {spd: 1, end: .35}, key: [' ', 'w', 'g']}};
+const DRILL_MIX = {skip: {jump: .7, punch: .2, kick: .1}, spar: {punch: .5, kick: .32, teep: .18}, bag: {punch: .45, elbow: .2, knee: .15, kick: .2}, banana: {punch: .15, kick: .6, knee: .25}, dummy: {punch: .25, kick: .2, teep: .55}};
 const DRILL = {lead: 2.4, beat: .5, gap: .95, notes: 24, perfect: .085, good: .17, late: .25, focusBonus: 1.3, ahead: 1.7};
 // where a fight is held: local challenges at the temple fair, ranked fights by league, the rope-fist bout at the old ground
 const LEAGUE_VENUE = ['temple', 'temple', 'province', 'stadium', 'champ'];
@@ -520,13 +520,33 @@ function spHtml() {
 let SC = null;
 const SCENE_LEN = {run: 11, fun: 10, rest: 11}, PACE = {lo: .45, hi: .85, decay: .3, step: .09};
 function sceneStart(a) {
-  const art = sceneArt(), keys = (SCENE_KEYS[a.id] || []).filter(k => art && art[k]); if (!keys.length) return false;
+  const art = sceneArt(), keys = (SCENE_KEYS[a.id] || []).filter(k => art && art[k]); if (!keys.length) return a.id === 'run' && API.hasModels() && run3d(a);
   const key = keys[Math.floor(Math.random() * keys.length)];
   SC = {a, key, len: SCENE_LEN[a.id], pace: .55, inZone: 0, ticks: 0, last: '', caught: 0, spots: 0, nSpots: a.id === 'rest' ? 5 : 0,
     bites: key === 'fun_1' ? [2.2, 5 + Math.random(), 7.6 + Math.random()].map(t => ({t, shown: false, done: null})) : []};
   mini = null; render();
   SC.ctl = playScene($('stage'), key, art[key], SC.len, {tick: sceneTick, spot: () => { SC.spots++; SC.ctl.big(SC.spots >= SC.nSpots ? 'คลายแล้ว!' : 'ดีขึ้น', 'perfect'); }});
   $('stage').scrollIntoView({block: 'start', behavior: 'smooth'});
+  return true;
+}
+// the run without the pictures (the claude.ai page has no room for them): the fighter runs on the spot in the camp,
+// a stride for each tap, with the same pace bar and the same result as the pictured run
+function run3d(a) {
+  SC = {a, key: 'run3d', len: SCENE_LEN.run, pace: .55, inZone: 0, ticks: 0, last: '', caught: 0, spots: 0, nSpots: 0, bites: [], ctl: {step() {}, big() {}, end() {}}};
+  mini = null; render();
+  const ui = document.createElement('div'); ui.className = 'scene s3d'; ui.innerHTML = '<div class="scap">วิ่งรอบค่าย</div><div class="sbig"></div>';
+  $('stage').appendChild(ui); $('stage').scrollIntoView({block: 'start', behavior: 'smooth'});
+  const sc = SC;
+  API.drillStart(Object.assign({fighter: S.body}, S.look), 'run').then(ok => {
+    if (SC !== sc) { ui.remove(); API.drillStop(); return; } // left before the body was ready
+    let live = true; const t0 = performance.now();
+    sc.ctl = {step() { API.drillStrike('stride'); },
+      big(text, cls) { const el = ui.querySelector('.sbig'); el.textContent = text; el.className = 'sbig ' + (cls || ''); el.style.animation = 'none'; void el.offsetWidth; el.style.animation = ''; },
+      end() { live = false; ui.remove(); API.drillStop(); }};
+    if (!ok) { sceneEnd(true); return; }
+    const loop = () => { if (live) { sceneTick((performance.now() - t0) / 1000); requestAnimationFrame(loop); } };
+    requestAnimationFrame(loop);
+  });
   return true;
 }
 function sceneTick(t) {
@@ -583,8 +603,8 @@ function trainHtml() {
   const c = cap();
   return '<section class="gcard"><h2>ตารางซ้อมวันนี้ <small>เหลือ ' + S.slots + ' ครั้ง</small></h2>' +
     (S.fatigue >= 70 ? '<p class="warn">ล้ามากแล้ว ซ้อมได้ผลน้อยลงและเสี่ยงเจ็บ ควรพัก</p>' : '') +
-    '<div class="acts">' + ACTS.map(a => { const st = a.stat.map(k => STAT_TH[k] + ' ' + Math.floor(S.stats[k]) + '/' + c).join(' · '); return '<button class="act' + (a.drill ? ' drill' : '') + '" data-act="train" data-v="' + a.id + '"' + (S.slots < 1 ? ' disabled' : '') + '>' + art('act-' + a.id, 'pic') + '<b>' + a.th + (a.drill ? ' <i>กดเอง</i>' : '') + '</b><span>' + a.note + '</span><span class="sm">' + (st || 'ไม่ได้ค่าพลัง') + ' · ล้า ' + (a.fat > 0 ? '+' : '') + a.fat + (failPct(a) ? ' · เสี่ยงซ้อมพลาด ' + failPct(a) + '%' : '') + (coachOf(a) ? ' · ครูช่วย +25%' : '') + '</span></button>'; }).join('') + '</div>' +
-    (S.slots > 0 ? '<div class="fld">ไม่อยากกดเอง: ให้ครูคุมซ้อมแทน ได้ผลระดับดี</div><div class="autos">' + ACTS.filter(a => a.drill).map(a => { const free = coachFree(a); return '<button class="btn' + (free ? ' go' : '') + '" data-act="autotrain" data-v="' + a.id + '">' + a.th + ' · ' + (free ? 'ครูคุมฟรี' : '฿ ' + baht(autoCost())) + '</button>'; }).join('') +
+    '<div class="acts">' + ACTS.map(a => { const st = a.stat.map(k => STAT_TH[k] + ' ' + Math.floor(S.stats[k]) + '/' + c).join(' · '); return '<button class="act' + (a.drill ? ' drill' : '') + '" data-act="train" data-v="' + a.id + '"' + (S.slots < 1 ? ' disabled' : '') + '>' + art('act-' + a.id, 'pic') + '<b>' + a.th + (a.drill || a.id === 'run' ? ' <i>กดเอง</i>' : '') + '</b><span>' + a.note + '</span><span class="sm">' + (st || 'ไม่ได้ค่าพลัง') + ' · ล้า ' + (a.fat > 0 ? '+' : '') + a.fat + (failPct(a) ? ' · เสี่ยงซ้อมพลาด ' + failPct(a) + '%' : '') + (coachOf(a) ? ' · ครูช่วย +25%' : '') + '</span></button>'; }).join('') + '</div>' +
+    (S.slots > 0 ? '<div class="fld">ไม่อยากกดเอง: ให้ครูคุมซ้อมแทน ได้ผลระดับดี</div><div class="autos">' + ACTS.filter(a => a.stat.length).map(a => { const free = coachFree(a); return '<button class="btn' + (free ? ' go' : '') + '" data-act="autotrain" data-v="' + a.id + '">' + a.th + ' · ' + (free ? 'ครูคุมฟรี' : '฿ ' + baht(autoCost())) + '</button>'; }).join('') +
       '<button class="btn" data-act="autoday">ซ้อมแทนให้ครบ ' + S.slots + ' ครั้ง · ไม่เกิน ฿ ' + baht(autoCost() * S.slots) + '</button></div>' : '') +
     (S.slots < 1 ? '<p class="hint">แรงซ้อมหมดแล้ว ไปหาคู่ชก หรือจบวันที่หน้าค่าย</p>' : '<p class="hint">กระสอบทราย ต้นกล้วย หุ่น และลงนวมซ้อมคู่ เป็นการซ้อมแบบกดเอง: ครูเรียกท่า ต่อย เตะ ถีบ ให้กดตามจังหวะ ยิ่งตรงยิ่งได้ผลมาก ซ้อมคู่มีปุ่มบัง กดตอนเพื่อนออกอาวุธ การซ้อมอื่นกดปุ่มออกแรงให้ตรงช่วงสีทอง อารมณ์ตอนนี้ "' + MOODS[S.mood] + '" ผลซ้อม ×' + MOOD_TRAIN[S.mood] + ' ล้าเกิน 50% เริ่มเสี่ยงซ้อมพลาด</p>') +
     (view && view.msg ? '<p class="' + (view.bad ? 'warn' : 'gain') + '">' + view.msg + '</p>' : '') + '</section>';
@@ -916,6 +936,8 @@ function skipChart(seed) {
 }
 async function drillStart(act) {
   const seed = S.seed + S.day * 17 + S.slots * 5 + Math.floor(S.fatigue), notes = act.drill === 'spar' ? sparChart(seed) : act.drill === 'skip' ? skipChart(seed) : drillChart(DRILL_MIX[act.drill], seed);
+  const tempo = 1 - .05 * (S.gym - 1); // a bigger camp drills at a quicker beat: up to a fifth faster at level 5
+  notes.forEach(n => { n.t = DRILL.lead + (n.t - DRILL.lead) * tempo; });
   DR = {act, notes, t0: 0, combo: 0, best: 0, n: {perfect: 0, good: 0, late: 0, miss: 0}, score: 0, w: {}, seq: {punch: 0, kick: 0, teep: 0}, ready: false, raf: 0};
   mini = null; setMode(false); render();
   const ui = document.createElement('div'); ui.id = 'drillUi';
@@ -985,7 +1007,7 @@ function drillEnd(abort) {
 function drillHtml() {
   const keys = Object.keys(KINDS).filter(k => API.TARGETS[DR.act.drill].moves[k]).sort((a, b) => (b === DR.act.focus && DR.act.drill === 'skip') - (a === DR.act.focus && DR.act.drill === 'skip')); // the jump button first
   return '<section class="gcard drillpad"><div class="dbtns' + (keys.length > 3 ? ' four' : '') + '">' + keys.map(k => '<button class="dbtn k-' + k + '" data-drill="' + k + '"><b>' + KINDS[k].th + '</b></button>').join('') + '</div>' +
-    '<p class="hint">' + DR.act.th + ': กดปุ่มให้ตรงกับท่าที่ครูเรียก ตอนป้ายท่าเลื่อนมาถึงวงกลม · คีย์บอร์ด A S D</p><button class="link" data-act="drillquit">เลิกซ้อมรอบนี้ (ไม่เสียแรงซ้อม)</button></section>';
+    '<p class="hint">' + DR.act.th + ': กดปุ่มให้ตรงกับท่าที่ครูเรียก ตอนป้ายท่าเลื่อนมาถึงวงกลม · คีย์บอร์ด ' + keys.map(k => KINDS[k].key[0] === ' ' ? 'Space' : KINDS[k].key[0].toUpperCase()).join(' ') + (S.gym > 1 ? ' · ค่ายระดับ ' + S.gym + ' ครูเรียกเร็วขึ้น' : '') + '</p><button class="link" data-act="drillquit">เลิกซ้อมรอบนี้ (ไม่เสียแรงซ้อม)</button></section>';
 }
 
 function trainFail(a) {
@@ -1088,7 +1110,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (SC && !e.repeat) { const k = e.key === 'ArrowLeft' ? 'L' : e.key === 'ArrowRight' ? 'R' : e.key === ' ' ? 'pull' : ''; if (k) { e.preventDefault(); scenePress(k); } return; } if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const sc = e.target.closest('[data-scene]'); if (sc && SC) { e.preventDefault(); scenePress(sc.dataset.scene); return; } const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.29'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.31'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

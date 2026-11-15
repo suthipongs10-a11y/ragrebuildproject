@@ -11,8 +11,8 @@ const THREE = globalThis.THREE;
 
 // what can be thrown at each target: the bag hangs too high for a low kick, a tree trunk has no chin for a hook
 export const TARGETS = {
-  bag: {th: 'กระสอบทราย', moves: {punch: ['jab', 'cross', 'hook', 'bodyshot'], kick: ['body', 'high', 'body'], teep: ['teep', 'teepFace']}},
-  banana: {th: 'ต้นกล้วย', moves: {punch: ['jab', 'cross'], kick: ['low', 'body', 'low', 'high'], teep: ['teep']}},
+  bag: {th: 'กระสอบทราย', moves: {punch: ['jab', 'cross', 'hook', 'bodyshot'], elbow: ['elbow'], knee: ['knee'], kick: ['body', 'high', 'body']}},
+  banana: {th: 'ต้นกล้วย', moves: {punch: ['jab', 'cross'], kick: ['low', 'body', 'low', 'high'], knee: ['knee']}},
   dummy: {th: 'หุ่นซ้อม', moves: {punch: ['jab', 'cross', 'hook', 'bodyshot'], kick: ['body', 'high', 'low'], teep: ['teep', 'teepFace']}},
   skip: {th: 'กระโดดเชือก', moves: {jump: ['jump'], punch: ['jab', 'cross', 'hook', 'upper'], kick: ['high', 'body', 'teepFace']}},
   spar: {th: 'คู่ซ้อม', moves: {punch: ['jab', 'cross', 'hook', 'bodyshot'], kick: ['body', 'low', 'body'], teep: ['teep'], guard: []}, partner: ['jab', 'cross', 'body', 'jab', 'teep', 'hook', 'low']}
@@ -76,6 +76,8 @@ export function buildDrill(scene, fx, audio) {
   const pcur = new Float32Array(NP), pfrom = new Float32Array(NP), PP = new Float32Array(NP), J2 = makeJoints();
   D.start = function (f, key, beamY, mate) {
     D.stop(); fighter = f; D.on = true;
+    run = key === 'run' ? {ph: 0, goal: 0} : null; // running on the spot: a stride for each tap
+    if (run) { skip = null; lastKey = key; T = null; queue = []; to = null; live = null; return; }
     if (key === 'skip') { skip = {t0: 0, cross: [], hopT: -9, tripT: -9, rope: null}; lastKey = key; T = null; cur.set(FLAT.skip); queue = []; to = null; live = null; return; }
     skip = null;
     if (key === 'spar') { partner = mate; lastKey = key; T = null; cur.set(FLAT.guard); pcur.set(FLAT.guard); queue = []; to = null; live = null; pq = []; pto = null; plive = null; return; }
@@ -84,10 +86,10 @@ export function buildDrill(scene, fx, audio) {
     T = built[id]; T.group.visible = true; lastKey = key;
     cur.set(FLAT.guard); queue = []; to = null; live = null; ax = az = vx = vz = 0; shakeT = 0;
   };
-  D.stop = function () { D.on = false; fighter = null; partner = null; if (skip && skip.rope) { scene.remove(skip.rope); skip.rope.geometry.dispose(); } skip = null; if (T) T.group.visible = false; T = null; };
+  D.stop = function () { D.on = false; fighter = null; partner = null; run = null; if (skip && skip.rope) { scene.remove(skip.rope); skip.rope.geometry.dispose(); } skip = null; if (T) T.group.visible = false; T = null; };
   // Skipping rope. The game gives the times (seconds from the start) the rope passes under the feet; a jump pressed
   // near one clears it, a pass with no jump catches the feet.
-  let skip = null;
+  let skip = null, run = null;
   const ropeMat = new THREE.MeshStandardMaterial({color: 0xd23a2a, roughness: .6}), ropeCurve = new THREE.CatmullRomCurve3(Array.from({length: 17}, () => new THREE.Vector3()));
   D.skipPlan = function (t0, cross) { if (skip) { skip.t0 = t0; skip.cross = cross; } };
   D.trip = function () { if (skip) skip.tripT = performance.now() / 1000; };
@@ -117,6 +119,7 @@ export function buildDrill(scene, fx, audio) {
 
   // throw a strike; returns seconds until it lands
   D.strike = function (moveKey) {
+    if (run) { if (moveKey === 'stride') run.goal = Math.floor(run.goal) + 1; return 0; }
     if (skip && moveKey === 'jump') { skip.hopT = performance.now() / 1000; audio.swish(false); return .1; }
     const mv = MOVES[moveKey]; if (!mv || !D.on) return 0;
     if (skip) { queue = mv.fr.map(f => ({target: FLAT[f[0]] || FLAT.guard, d: f[1] * SPEED, hit: false})).concat([{target: FLAT.guard, d: .3}]); live = {mv, key: moveKey}; next(); audio.swish(mv.kind === 'kick'); return (mv.fr[0][1] + mv.fr[1][1]) * SPEED; } // shadowboxing: into the air
@@ -125,11 +128,15 @@ export function buildDrill(scene, fx, audio) {
       if (i === 1 && partner) { target = new Float32Array(target); aimEffector(target, mv.eff, sparPoint(pcur, mv), J); }
       else if (i === 1) { // land the striking part on the target's surface
         target = new Float32Array(target);
-        const hand = mv.eff.startsWith('hand'), base = IDX[(hand ? 'h' : 'f') + mv.eff.slice(-1)], y = target[base + 1] + (hand ? 0 : DIM.ankle), r = T.radius(y);
+        const hand = mv.eff.startsWith('hand'), joint = /^(elbow|knee)/.test(mv.eff), base = IDX[(hand ? 'h' : 'f') + mv.eff.slice(-1)];
+        if (joint) solve(target, 0, J);
+        const y = joint ? J[EFF_JOINT[mv.eff]].y : target[base + 1] + (hand ? 0 : DIM.ankle), r = T.radius(y);
         if (moveKey === 'hook') pt.set(DIST - r * .45, y, -r * .9);
         else if (mv.kind === 'kick' && mv.eff === 'footR' && !/teep/.test(moveKey)) pt.set(DIST - r * .5, y, r * .85);
         else pt.set(DIST - r, y, 0);
+        const hip0 = target[IDX.hip];
         aimEffector(target, mv.eff, pt, J);
+        if (joint) { const go = target[IDX.hip] - hip0; target[IDX.fL] += go * .7; target[IDX.fR] += go * .45; } // steps in for an elbow or a knee rather than stretching into a split
       }
       return {target, d: f[1] * SPEED, hit: i === 1};
     });
@@ -177,7 +184,7 @@ export function buildDrill(scene, fx, audio) {
   function next() { const q = queue.shift(); if (!q) { to = null; return; } from.set(cur); to = q; pt0 = 0; pd = q.d; }
   function impact() {
     if (partner) { const mv = live.mv; fighter.world(EFF_JOINT[mv.eff], wp); audio.block(); audio.hit(mv.sfx, mv.dmg * .5, false); fx.sparks(wp, 5, 0xffffff, .7, 1); D.kick = Math.max(D.kick, .01); if (D.onImpact) D.onImpact(live.key, wp); return; }
-    const mv = live.mv, side = /teep|jab|cross|bodyshot/.test(live.key) ? 0 : live.key === 'hook' ? 1 : -1;
+    const mv = live.mv, side = /teep|jab|cross|bodyshot|knee/.test(live.key) ? 0 : live.key === 'hook' ? 1 : -1;
     fighter.world(EFF_JOINT[mv.eff], wp);
     const pow = mv.dmg / 12;
     vx += T.gain * pow * (side ? .55 : 1) * 9; vz += T.gain * pow * side * 6;
@@ -192,6 +199,18 @@ export function buildDrill(scene, fx, audio) {
   // advances the fighter's pose into P and animates the target
   D.update = function (dt, time, P) {
     if (!D.on) return;
+    if (run) { // each stride: one knee drives up while the other foot pushes back, the opposite arm swings through
+      run.ph += Math.min(run.goal - run.ph, dt * 4.2);
+      const q = run.ph % 2, j = Math.floor(q), u = q - j, up = Math.sin(Math.PI * u), go = Math.min(1, (run.goal - run.ph) * 3 + up);
+      P.set(FLAT.cerStand); P[IDX.lean] += .14; P[IDX.hdP] -= .05;
+      const fa = j ? IDX.fR : IDX.fL, fb = j ? IDX.fL : IDX.fR, ka = j ? IDX.kR : IDX.kL, ha = j ? IDX.hL : IDX.hR, hb = j ? IDX.hR : IDX.hL;
+      P[fa + 1] += .2 * up; P[fa] += .1 * up; P[ka] = 1; P[ka + 1] = .4; P[fb] -= .06 * up;
+      for (const [h, s] of [[IDX.hL, -1], [IDX.hR, 1]]) { P[h] = .12; P[h + 1] = 1.12; P[h + 2] = s * .22; P[h === IDX.hL ? IDX.eL : IDX.eR] = -1; }
+      P[ha] += .14 * up; P[hb] -= .12 * up; P[IDX.jump] += .035 * up * go; P[IDX.hip + 1] -= .03 * (1 - up) * go;
+      fighter.update(P, 0, FIGHTER_X + .45);
+      D.kick *= Math.pow(.002, dt); D.shake *= Math.pow(.0006, dt);
+      return;
+    }
     if (to) {
       pt0 += dt; const e = ease(Math.min(1, pt0 / pd));
       for (let j = 0; j < NP; j++) cur[j] = from[j] + (to.target[j] - from[j]) * e;

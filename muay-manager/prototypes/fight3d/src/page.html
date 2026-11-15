@@ -211,11 +211,11 @@ p.bad{margin:0;font-size:14px;font-weight:600;color:var(--bad)}
 #drillUi .dring{position:absolute;left:20%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border:3px solid #fff;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.5),inset 0 0 0 2px rgba(0,0,0,.5)}
 #dNotes{position:absolute;inset:0;overflow:hidden}
 .dnote{position:absolute;left:0;top:50%;min-width:42px;height:34px;line-height:34px;padding:0 9px;box-sizing:border-box;border-radius:17px;text-align:center;font-size:15px;font-weight:700;color:var(--ink);will-change:transform;box-shadow:0 0 0 2px rgba(0,0,0,.55)}
-.dnote.k-punch,.dbtn.k-punch{background:#ff7a70} .dnote.k-kick,.dbtn.k-kick{background:#7fb0ff} .dnote.k-teep,.dbtn.k-teep{background:#f2b83a} .dnote.k-guard,.dbtn.k-guard{background:#49d17d} .dnote.k-jump,.dbtn.k-jump{background:#c8a2ff}
+.dnote.k-punch,.dbtn.k-punch{background:#ff7a70} .dnote.k-kick,.dbtn.k-kick{background:#7fb0ff} .dnote.k-teep,.dbtn.k-teep{background:#f2b83a} .dnote.k-guard,.dbtn.k-guard{background:#49d17d} .dnote.k-jump,.dbtn.k-jump{background:#c8a2ff} .dnote.k-elbow,.dbtn.k-elbow{background:#ff9e5e} .dnote.k-knee,.dbtn.k-knee{background:#5fd0d8}
 .dnote.hit{opacity:0;transition:opacity .12s} .dnote.gone{opacity:.28;filter:grayscale(1)}
 .drillpad{gap:8px}
 /* activity scenes over the stage (src/scenes.js) */
-.scene{position:absolute;inset:0;overflow:hidden;z-index:3;background:#000}
+.scene{position:absolute;inset:0;overflow:hidden;z-index:3;background:#000} .scene.s3d{background:none;pointer-events:none}
 .scene .scv{position:absolute;inset:0;transform-origin:50% 55%;will-change:transform}
 .scene img{display:block;width:100%;height:100%;object-fit:cover}
 .scene canvas{position:absolute;inset:0;pointer-events:none}
