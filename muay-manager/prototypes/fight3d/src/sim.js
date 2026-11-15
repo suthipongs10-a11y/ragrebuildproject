@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.13';
+export const SIM_VERSION = 'proto-0.14';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -455,7 +455,7 @@ export function simulate(opts) {
       }
     }
     f.cool -= dt;
-    if (!f.plan && f.cool <= 0) { f.combo = null; f.plan = choose(f, o); f.planT = 1.4; }
+    if (!f.plan && f.cool <= 0) { f.combo = null; f.plan = choose(f, o); f.planT = K.planTime; }
     const rg = planOf(f).range;
     let want = 114 + (rg === 'out' ? PR.outDist : rg === 'in' ? PR.inDist : 0) + Math.sin(G.t * 1.6 + f.i * 2.1) * 9 + (1 - paceNow()) * K.paceRange;
     if (f.backT > 0) { f.backT -= dt; if (!f.plan) want = Math.max(want, K.backDist); }
@@ -471,7 +471,9 @@ export function simulate(opts) {
     const walk = (54 + f.stats.spd * .5) * (f.st < 25 ? .7 : 1) * (1 - Math.min(.45, f.wearLeg / 200)) * (f.style.walk || 1);
     // the man told to wait holds his ground and lets the other come; the man told to go forward walks him down
     const ag2 = planOf(f).ag, fwd = walk * (ag2 === 'counter' ? (f.plan ? PR.counterStepIn : PR.counterAdvance) : ag2 === 'attack' ? PR.attackAdvance : 1);
-    f.x = clamp(f.x + f.dir * clamp(d - want, -walk * dt, fwd * dt), -LIM, LIM); sep(f, o);
+    const wk = f.plan ? K.walkPlanK : K.walkK; // eases toward the distance he wants rather than darting to it
+    const e = d - want, ee = Math.sign(e) * Math.max(0, Math.abs(e) - (f.plan ? 0 : K.walkDead));
+    f.x = clamp(f.x + f.dir * clamp(ee * Math.min(1, K.walkGain * dt), -walk * wk * dt, fwd * wk * dt), -LIM, LIM); sep(f, o);
   }
 
   function endRound() {

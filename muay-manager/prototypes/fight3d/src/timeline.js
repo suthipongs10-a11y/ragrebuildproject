@@ -271,12 +271,16 @@ export function bake(fight) {
           if (Math.abs(to - f.at) > .012) f.step = {t0: t, dur: (k2 - k) * dt, from: f.at, to, lift: 0};
         }
       } else if (!feet[0].step && !feet[1].step) { // off the bounce, or left too far behind to wait for the next hop
-        const late = feet.filter(f => f.can && Math.abs(f.des - f.at) > (bouncing ? .24 : TH));
+        // the faster he goes, the further a foot may trail before it steps, and the further ahead it lands: a few long
+        // steps when he darts in or backs off, not a patter of little ones
+        const speed = Math.abs(root(Math.min(n - 1, k + 4)) - a) / (4 * dt);
+        const late = feet.filter(f => f.can && Math.abs(f.des - f.at) > (bouncing ? .24 : TH + Math.min(.12, speed * .08)));
         if (late.length) {
           const fwd = late[0].des - late[0].at > 0, f = late.length > 1 ? feet[fwd ? 0 : 1] : late[0];
-          const speed = Math.abs(root(Math.min(n - 1, k + 4)) - a) / (4 * dt), dur = Math.max(.2, Math.min(.32, .32 - speed * .12)) * (md === 2 ? 1.5 : md === 1 ? 1.2 : 1); // unhurried steps, the foot lifted
-          const k2 = Math.min(n - 1, k + Math.round(dur / dt)), ahead = Math.min(.07, speed * .06) * (fwd ? 1 : -1);
-          f.step = {t0: t, dur, from: f.at, to: root(k2) + B[k2 * NP + f.base] + (f.des - a - f.lx) + ahead, lift: LIFT};
+          const dur = Math.max(.2, Math.min(.32, .32 - speed * .12)) * (md === 2 ? 1.5 : md === 1 ? 1.2 : 1); // unhurried steps, the foot lifted
+          const k2 = Math.min(n - 1, k + Math.round(dur / dt)), k3 = Math.min(n - 1, k2 + Math.round(.2 / dt)), ahead = Math.min(.12, speed * .09) * (fwd ? 1 : -1);
+          const to = root(k3) + B[k2 * NP + f.base] + (f.des - a - f.lx) + ahead;
+          f.step = {t0: t, dur, from: f.at, to: f.at + Math.max(-.5, Math.min(.5, to - f.at)), lift: LIFT};
         }
       }
       wasUp = up;

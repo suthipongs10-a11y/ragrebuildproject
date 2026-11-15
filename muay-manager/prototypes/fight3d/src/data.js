@@ -103,6 +103,11 @@ export const STAT_TH = {pow:'หมัดศอก', kick:'เตะเข่า
 export const RULES = {
   dt: 1/60,
   roundTime: 60, rounds: 3, restTime: 3.4, introTime: 3.0,
+  // footwork between exchanges: the walk eases in and out (gain, per second) and tops out at this share of a man's
+  // walking speed, a little more when he is closing in to throw (the owner: moving and stepping far too quick)
+  // and without a strike in mind he is content anywhere within walkDead (cm) of the distance he wants, so the two can stand
+  walkGain: 5, walkK: .62, walkPlanK: .82, walkDead: 14,
+  planTime: 1.8,         // how long a man keeps closing in for the strike he has picked before he gives it up
   limit: 235,            // ring half width the fighters can use
   startX: 85,
   dmgScale: .137,          // global damage multiplier
