@@ -42,7 +42,7 @@ console.table(Object.fromEntries([1, 2, 3].map(r => ['ยก ' + r, {'ท่า�
 console.table({
   'จบยก 1 (เป้า ~15%)': pc(out.r1), 'จบยก 2 (เป้า ~25%)': pc(out.r2), 'จบยก 3 (เป้า ~25%)': pc(out.r3), 'ตัดสินคะแนน (เป้า ~35%)': pc(out.dec),
   'น็อก / ทีเคโอ': out.ko + ' / ' + out.tko, 'ล้มต่อไฟต์ (เป้า ≤1)': av(out.kd),
-  'ฝั่งค่าพลังสูงกว่า 10% ชนะ (เป้า 65-70%)': out.favN ? (out.favWins / out.favN * 100).toFixed(1) + '% จาก ' + out.favN : '-',
+  'ฝั่งค่าพลังสูงกว่า 10% ชนะ (เป้า 60-65%)': out.favN ? (out.favWins / out.favN * 100).toFixed(1) + '% จาก ' + out.favN : '-',
   'ไฟต์ที่มีเมาหมัด (เป้า ≥60%)': pc(out.fightsWithStun), 'เมาหมัดต่อไฟต์': av(out.stun), 'เมาหมัดแล้วรอด (เป้า ~50%)': out.stun ? (out.stunSurvived / out.stun * 100).toFixed(1) + '%' : '-',
   'ท่าต่างชนิดต่อนักมวย': av(out.kinds), 'ตั้งการ์ดรับต่อไฟต์': av(out.guards), 'ถีบต่อไฟต์': av(out.teeps), 'ชุด 3 จังหวะต่อไฟต์ (เป้า 3-6)': av(out.combos3),
   'ท่าไม้ตายต่อไฟต์ (เป้า 2-4)': av(out.specials), 'ท่าไม้ตายเข้าเป้า (เป้า ~50%)': out.specials ? (out.specialHits / out.specials * 100).toFixed(1) + '%' : '-',

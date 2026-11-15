@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.15';
+export const SIM_VERSION = 'proto-0.16';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -45,8 +45,16 @@ export function simulate(opts) {
   const emit = e => { e.t = T; events.push(e); return e; };
   const say = html => emit({type: 'say', html});
 
+  // What a man's numbers are worth in the ring: each is pulled toward the average of the two men's (statSpread 1 = as
+  // on paper), so the gap between them counts for less than their level. The owner: a man 10% better on paper should
+  // win about 6 fights in 10, not 8; real fights are not that one-sided.
+  function ringStats(i) {
+    const out = {}, a = specs[0].stats, b = specs[1].stats;
+    for (const k in specs[i].stats) { const m = (a[k] + b[k]) / 2; out[k] = m + (specs[i].stats[k] - m) * K.statSpread; }
+    return out;
+  }
   function mk(i, spec) {
-    return {i, dir: i ? -1 : 1, x: i ? K.startX : -K.startX, name: spec.name, stats: spec.stats,
+    return {i, dir: i ? -1 : 1, x: i ? K.startX : -K.startX, name: spec.name, stats: ringStats(i),
       style: STYLES.find(s => s.id === spec.style),
       spList: (spec.sp || []).filter(k => MOVES[k] && MOVES[k].special).slice(0, 3), // the owner's chosen signature moves, else the style's
       spLv: spec.spLv || {}, // how far each signature move has been trained (1-3)
@@ -463,7 +471,12 @@ export function simulate(opts) {
       const m = MOVES[f.plan]; want = Math.max(m.min + 8, m.reach - 12); f.planT -= dt;
       if (d <= m.reach - 4 && d >= m.min) {
         if (!m.grab) { startMove(f, o, f.plan); return; }
-        if (!G.clinch && ['idle', 'block', 'cover', 'hit', 'stun'].includes(o.state)) { startClinch(f, o); return; }
+        if (!G.clinch && ['idle', 'block', 'cover', 'hit', 'stun'].includes(o.state)) {
+          // a man standing his ground does not let himself be tied up every time: unless he is hurt he may shove the
+          // other off as he reaches for the neck
+          if (o.state === 'stun' || R() < K.clinchEnter) { startClinch(f, o); return; }
+          f.x = clamp(f.x - f.dir * K.clinchShove, -LIM, LIM); f.plan = null; f.combo = null; f.cool = rnd(.5, .9); return;
+        }
         f.plan = null; f.cool = .12;
       }
       if (f.planT <= 0) { f.plan = null; f.combo = null; f.cool = .15; }
@@ -472,7 +485,7 @@ export function simulate(opts) {
     // the man told to wait holds his ground and lets the other come; the man told to go forward walks him down
     const ag2 = planOf(f).ag, fwd = walk * (ag2 === 'counter' ? (f.plan ? PR.counterStepIn : PR.counterAdvance) : ag2 === 'attack' ? PR.attackAdvance : 1);
     const wk = f.plan ? K.walkPlanK : K.walkK; // eases toward the distance he wants rather than darting to it
-    const e = d - want, out = f.backT > 0, ee = Math.sign(e) * Math.max(0, Math.abs(e) - (f.plan ? 0 : e < 0 && !out ? K.walkDeadIn : K.walkDead));
+    const e = d - want, out = f.backT > 0 || rg === 'out', ee = Math.sign(e) * Math.max(0, Math.abs(e) - (f.plan ? 0 : e < 0 && !out ? K.walkDeadIn : K.walkDead));
     f.x = clamp(f.x + f.dir * clamp(ee * Math.min(1, K.walkGain * dt), -walk * wk * (out ? 1 : K.walkBack) * dt, fwd * wk * dt), -LIM, LIM); sep(f, o);
   }
 

@@ -80,18 +80,19 @@ export const COMBOS = {
 };
 
 // w = move weights, sp = specials used in rotation, b = stat bias, cb = combos and chance.
-// walk = footwork speed and tough = damage taken, for the styles that have to walk through fire to get close.
+// walk = footwork speed and tough = damage taken. Rebalanced when the defender stopped backing away (proto-0.16): with the
+// men standing their ground the in-fighter no longer needs a thick skin to get close, and the kicker needs a little help.
 export const STYLES = [
   {id:'puncher', th:'หมัดหนัก', walk:1.1, tough:.94, sp:['spChop','spHanu'], cc:.34, cb:['oneTwo','threePunch','lowHigh','oneTwoKick'],
    w:{jab:3,cross:3,hook:2.2,upper:1.6,bodyshot:1.6,elbow:1.6,spinElbow:.3,knee:.8,body:1.2,high:.5,low:1.2,teep:1.1,teepFace:.4,clinch:1.6},
    b:{pow:22,kick:-8,spd:0,def:-4,end:4,chin:4}},
-  {id:'kicker', th:'จอมเตะ', sp:['spKick','spCroc'], cc:.32, cb:['legHead','teepKick','feintKick','oneTwoKick','teepTeep'],
+  {id:'kicker', th:'จอมเตะ', tough:.94, sp:['spKick','spCroc'], cc:.32, cb:['legHead','teepKick','feintKick','oneTwoKick','teepTeep'],
    w:{jab:2,cross:1.1,hook:.5,upper:.3,bodyshot:.4,elbow:.7,spinElbow:.3,knee:1,body:3.4,high:1.7,low:2.4,teep:2.3,teepFace:1.3,clinch:1.3},
-   b:{pow:-8,kick:22,spd:4,def:0,end:-2,chin:-4}},
-  {id:'clinch', th:'เข่าศอก', walk:1.2, tough:.86, sp:['spFly','spChop'], cc:.34, cb:['elbows','kneeElbow','oneTwo','lowHigh'],
+   b:{pow:-8,kick:22,spd:4,def:4,end:2,chin:0}},
+  {id:'clinch', th:'เข่าศอก', walk:1.2, tough:1.09, sp:['spFly','spChop'], cc:.34, cb:['elbows','kneeElbow','oneTwo','lowHigh'],
    w:{jab:1.8,cross:1.4,hook:1.2,upper:1.2,bodyshot:.8,elbow:2.6,spinElbow:1.1,knee:3.2,body:1.5,high:.5,low:1.1,teep:1.3,teepFace:.6,clinch:4.6},
-   b:{pow:8,kick:10,spd:-4,def:2,end:10,chin:10}},
-  {id:'tech', th:'ฝีมือ', sp:['spKick','spFly'], cc:.3, cb:['feintKick','jabLow','oneTwoKick','teepKick','teepTeep'],
+   b:{pow:6,kick:8,spd:-4,def:2,end:6,chin:6}},
+  {id:'tech', th:'ฝีมือ', tough:.92, sp:['spKick','spFly'], cc:.3, cb:['feintKick','jabLow','oneTwoKick','teepKick','teepTeep'],
    w:{jab:3,cross:1.7,hook:1,upper:.6,bodyshot:.8,elbow:1.1,spinElbow:.6,knee:1.1,body:2.1,high:1,low:1.8,teep:2.7,teepFace:1.5,clinch:1.6},
    b:{pow:-4,kick:2,spd:14,def:16,end:0,chin:-2}}
 ];
@@ -116,6 +117,7 @@ export const RULES = {
   startX: 85,
   dmgScale: .137,          // global damage multiplier
   dmgStat: [.6, .8],       // a blow's power: this much whatever the stat, plus this much times the stat (0-1)
+  statSpread: .5,          // how much of the gap between the two men's stats counts in the ring (sim.js ringStats)
   blockDmg: .06,         // share of base damage that gets through a block
   // how much more often than a style's own weights say each fist punch is chosen: fights are meant to have plenty of hands
   fistBias: {jab: 1.2, cross: 1.6, hook: 1.9, upper: 1.9, bodyshot: 1.6},
@@ -142,6 +144,7 @@ export const RULES = {
   kdClean: .035, outClean: .1, kdSpecialMul: .8,
   // clinch: knees thrown, time before the referee breaks it, chance the held fighter shakes loose after each knee
   clinchKneesMin: 2, clinchKneesSpan: 3, clinchMax: 3.8, clinchEscape: .12, clinchDist: 48,
+  clinchEnter: .7, clinchShove: 22, // chance a reach for the neck ties the other man up; otherwise he is shoved back this far (cm)
   clinchStyleEscape: .45, clinchStyleKnees: 1, // a clinch specialist holds on better and gets an extra knee in
   clinchHeadKnee: .3,     // share of clinch knees that pull the head down onto the knee
   clinchElbow: .28, clinchElbowStyle: .1,   // share of the holder's clinch strikes that are elbows (more for a clinch specialist)
