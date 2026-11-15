@@ -17,20 +17,20 @@ export const POSES = {
   wai: P({turn: 0, twist: 0, lean: .42, hdP: .3, hip: [0, .86, 0], hL: [.30, 1.24, -.03], hR: [.30, 1.24, .03], fL: [0, 0, -.11], fR: [0, 0, .11], kL: [1, 0, -.1], kR: [1, 0, .1]}),
 
   jabW: P({turn: .5, hip: [-.01, .86, 0], hL: [.34, 1.50, -.11]}),
-  jab: P({turn: .9, twist: .25, lean: .18, hip: [.07, .86, 0], hL: [.82, 1.52, -.02], hR: [.2, 1.48, .12], fL: [.31, 0, -.13]}),
+  jab: P({turn: .9, twist: .25, lean: .1, hip: [.07, .86, 0], hL: [.82, 1.52, -.02], hR: [.2, 1.48, .12], fL: [.31, 0, -.13]}),
   crossW: P({turn: .72, twist: .2, hip: [-.02, .85, 0], hR: [.12, 1.44, .17]}),
-  cross: P({turn: -.35, twist: -.35, lean: .26, hip: [.13, .84, 0], hR: [.86, 1.52, -.02], hL: [.22, 1.47, -.13], fR: [-.26, .04, .15], kR: [1, 0, .1]}),
+  cross: P({turn: -.35, twist: -.35, lean: .15, hip: [.13, .84, 0], hR: [.86, 1.52, -.02], hL: [.22, 1.47, -.13], fR: [-.26, .04, .15], kR: [1, 0, .1]}),
   hookW: P({turn: .8, twist: .3, hip: [.02, .85, 0], hL: [.24, 1.45, -.32], eL: [-.3, -.2, -1]}),
-  hook: P({turn: -.15, twist: -.35, lean: .16, hip: [.09, .85, 0], hL: [.50, 1.52, .06], eL: [-.7, .1, -1], hR: [.2, 1.48, .13], fL: [.26, .03, -.13]}),
-  upperW: P({turn: .6, lean: .32, hip: [.05, .77, 0], hR: [.22, 1.06, .15], eR: [-1, -.3, .3]}),
+  hook: P({turn: -.15, twist: -.35, lean: .1, hip: [.09, .85, 0], hL: [.50, 1.52, .06], eL: [-.7, .1, -1], hR: [.2, 1.48, .13], fL: [.26, .03, -.13]}),
+  upperW: P({turn: .6, lean: .22, hip: [.05, .77, 0], hR: [.22, 1.06, .15], eR: [-1, -.3, .3]}),
   upper: P({turn: -.2, twist: -.2, lean: 0, hip: [.13, .91, 0], hR: [.50, 1.64, 0], eR: [-.3, -1, .3], hL: [.24, 1.46, -.13], fR: [-.22, .05, .15]}),
-  bodyW: P({turn: .65, lean: .25, hip: [.02, .80, 0], hR: [.14, 1.28, .17]}),
-  bodyShot: P({turn: -.3, twist: -.3, lean: .44, hdP: -.2, hip: [.13, .76, 0], hR: [.82, 1.12, -.02], hL: [.28, 1.42, -.1], fR: [-.26, .04, .15]}),
+  bodyW: P({turn: .65, lean: .18, hip: [.02, .80, 0], hR: [.14, 1.28, .17]}),
+  bodyShot: P({turn: -.3, twist: -.3, lean: .3, hdP: -.2, hip: [.13, .76, 0], hR: [.82, 1.12, -.02], hL: [.28, 1.42, -.1], fR: [-.26, .04, .15]}),
 
   elbowW: P({turn: .7, hip: [.08, .86, 0], hR: [.10, 1.50, .24], eR: [-.3, .4, 1], fL: [.32, 0, -.13]}),
-  elbow: P({turn: -.45, twist: -.45, lean: .3, hip: [.22, .85, 0], hR: [.22, 1.50, -.12], eR: [1, .25, .1], hL: [.24, 1.45, -.14], fL: [.34, 0, -.13], fR: [-.2, .04, .15]}),
+  elbow: P({turn: -.45, twist: -.45, lean: .18, hip: [.22, .85, 0], hR: [.22, 1.50, -.12], eR: [1, .25, .1], hL: [.24, 1.45, -.14], fL: [.34, 0, -.13], fR: [-.2, .04, .15]}),
   chopW: P({turn: .5, lean: -.05, hip: [.10, .92, 0], hR: [.15, 1.98, .16], eR: [.3, 1, .3], fL: [.32, 0, -.13], fR: [-.2, .05, .15]}),
-  chop: P({turn: -.4, twist: -.4, lean: .42, hip: [.26, .80, 0], hR: [.26, 1.34, -.06], eR: [1, .55, 0], hL: [.24, 1.4, -.15], fL: [.36, 0, -.13], fR: [-.16, .04, .15]}),
+  chop: P({turn: -.4, twist: -.4, lean: .28, hip: [.26, .80, 0], hR: [.26, 1.34, -.06], eR: [1, .55, 0], hL: [.24, 1.4, -.15], fL: [.36, 0, -.13], fR: [-.16, .04, .15]}),
   spinW: P({spin: 3.3, turn: .3, lean: .1, hip: [.10, .85, 0], hR: [0, 1.45, .26], eR: [-.2, .3, 1], hL: [.2, 1.45, -.12]}),
   spinElbow: P({spin: 6.0, turn: -.3, twist: -.4, lean: .25, hip: [.20, .85, 0], hR: [.2, 1.5, -.1], eR: [1, .3, .2], hL: [.22, 1.45, -.14]}),
 
@@ -42,9 +42,12 @@ export const POSES = {
   kickW: P({turn: -.2, lean: -.05, hip: [.05, .88, 0], fR: [-.05, .35, .30], kR: [.6, .3, 1], hR: [.10, 1.30, .30], fL: [.22, .03, -.13]}),
   // round kicks (the owner's reference pictures): the body leans away over a standing leg turned out and up on the
   // ball of the foot, the hip rolled over, the kicking leg out level, the arm on the kicking side thrown down behind
-  kickBody: P({turn: -1.35, twist: .5, lean: -.38, side: -.3, hip: [.10, .92, 0], fR: [.92, 1.12, -.05], kR: [.5, .3, 1], hR: [-.3, .95, .4], hL: [.27, 1.5, -.03], fL: [.22, .06, -.13], kL: [.35, 0, -1]}),
-  kickHigh: P({turn: -1.35, twist: .5, lean: -.56, side: -.36, hip: [.08, .97, 0], fR: [.80, 1.58, -.03], kR: [.5, .3, 1], hR: [-.32, .92, .4], hL: [.24, 1.45, -.03], fL: [.22, .07, -.13], kL: [.35, 0, -1]}),
-  kickLow: P({turn: -1.15, twist: .4, lean: -.14, side: -.12, hip: [.10, .82, 0], fR: [.85, .42, -.08], kR: [.5, .3, 1], hR: [-.15, 1.05, .38], fL: [.22, .05, -.13], kL: [.35, 0, -1]}),
+  // The kicking knee faces the target (kR toward -z), so the shin and the top of the foot lead, not the heel; a knee
+  // pole longer than 1.4 also tells the model to point the toes (model.js). Punches above stand tall: bending the
+  // body in is for getting out of the way of a blow, not for throwing one (owner, round 55).
+  kickBody: P({turn: -1.35, twist: .5, lean: -.38, side: -.3, hip: [.10, .92, 0], fR: [.92, 1.12, -.05], kR: [.3, -.15, -2], hR: [-.3, .95, .4], hL: [.27, 1.5, -.03], fL: [.22, .06, -.13], kL: [.35, 0, -1]}),
+  kickHigh: P({turn: -1.35, twist: .5, lean: -.56, side: -.36, hip: [.08, .97, 0], fR: [.80, 1.58, -.03], kR: [.3, -.2, -2], hR: [-.32, .92, .4], hL: [.24, 1.45, -.03], fL: [.22, .07, -.13], kL: [.35, 0, -1]}),
+  kickLow: P({turn: -1.15, twist: .4, lean: -.14, side: -.12, hip: [.10, .82, 0], fR: [.85, .42, -.08], kR: [.3, -.1, -2], hR: [-.15, 1.05, .38], fL: [.22, .05, -.13], kL: [.35, 0, -1]}),
   teepW: P({lean: -.1, hip: [-.05, .88, 0], fL: [.25, .55, -.10], kL: [1, .5, 0]}),
   teep: P({turn: .3, lean: -.35, hip: [.05, .90, 0], fL: [.95, 1.02, -.03], kL: [1, .4, 0], hL: [.2, 1.2, -.3], hR: [.18, 1.45, .12]}),
   teepHiW: P({turn: .1, lean: -.12, hip: [-.04, .90, 0], fR: [.15, .62, .10], kR: [1, .6, .1], fL: [.22, .03, -.13]}),
@@ -72,10 +75,10 @@ export const POSES = {
   throwW: P({turn: .7, twist: .3, lean: .18, side: .1, hip: [.04, .84, 0], hL: [.44, 1.46, -.07], hR: [.44, 1.46, .07], eL: [-.1, -1, -.7], eR: [-.1, -1, .7], fL: [.2, 0, -.2], fR: [-.2, 0, .22]}),
   throw: P({turn: -.9, twist: -.5, lean: .32, side: -.25, hip: [.02, .8, .06], hL: [.3, 1.0, .25], hR: [.1, .95, .4], fL: [.26, 0, -.24], fR: [-.22, 0, .1]}),
   // kick caught: the kicker hops on one leg; the catcher clamps the ankle at his side and punches with the free hand
-  caught: P({turn: -1.0, twist: .35, lean: -.25, side: -.1, hip: [.02, .9, 0], fR: [.85, 1.0, -.1], kR: [.5, .3, 1], fL: [.2, .03, -.13], hL: [.25, 1.42, -.32], hR: [-.1, 1.28, .42]}),
+  caught: P({turn: -1.0, twist: .35, lean: -.25, side: -.1, hip: [.02, .9, 0], fR: [.85, 1.0, -.1], kR: [.3, -.15, -2], fL: [.2, .03, -.13], hL: [.25, 1.42, -.32], hR: [-.1, 1.28, .42]}),
   catchHold: P({turn: .5, lean: .1, hip: [0, .86, 0], hL: [.22, 1.04, -.24], eL: [-.5, -.3, -1], hR: [.2, 1.46, .15]}),
-  catchPunch: P({turn: -.3, twist: -.35, lean: .22, hip: [.1, .85, 0], hL: [.22, 1.04, -.24], eL: [-.5, -.3, -1], hR: [.82, 1.5, 0], fR: [-.24, .04, .16], kR: [1, 0, .1]}),
-  catchBody: P({turn: -.3, twist: -.3, lean: .36, hdP: -.15, hip: [.1, .8, 0], hL: [.22, 1.04, -.24], eL: [-.5, -.3, -1], hR: [.78, 1.12, 0], fR: [-.24, .04, .16], kR: [1, 0, .1]}),
+  catchPunch: P({turn: -.3, twist: -.35, lean: .14, hip: [.1, .85, 0], hL: [.22, 1.04, -.24], eL: [-.5, -.3, -1], hR: [.82, 1.5, 0], fR: [-.24, .04, .16], kR: [1, 0, .1]}),
+  catchBody: P({turn: -.3, twist: -.3, lean: .26, hdP: -.15, hip: [.1, .8, 0], hL: [.22, 1.04, -.24], eL: [-.5, -.3, -1], hR: [.78, 1.12, 0], fR: [-.24, .04, .16], kR: [1, 0, .1]}),
 
   block: P({lean: .2, hdP: .25, hip: [-.02, .84, 0], hL: [.27, 1.58, -.07], hR: [.21, 1.56, .08]}),
   blockBody: P({lean: .3, hip: [0, .82, 0], hL: [.26, 1.24, -.15], hR: [.2, 1.3, .15]}),

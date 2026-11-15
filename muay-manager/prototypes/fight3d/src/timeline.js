@@ -24,7 +24,12 @@ export function aimEffector(target, en, pt3, J) {
     const ty = isHand ? pt3.y : pt3.y - DIM.ankle;
     d3.set(pt3.x - root.x, pt3.y - root.y, pt3.z - root.z);
     const over = d3.length() - max;
-    if (over > 0) { const h = Math.hypot(d3.x, d3.z) || 1, s = Math.min(.38, over * 1.1); target[IDX.hip] += d3.x / h * s; target[IDX.hip + 2] += d3.z / h * s; }
+    if (over > 0) {
+      const h = Math.hypot(d3.x, d3.z) || 1, s = Math.min(isHand ? .32 : .38, over * 1.1); target[IDX.hip] += d3.x / h * s; target[IDX.hip + 2] += d3.z / h * s;
+      // a punch that has to reach steps in: both feet slide forward under him with the hips, so he is not left bowing
+      // forward over planted feet (the owner: bending the body is for getting out of the way, not for punching)
+      if (isHand) { const f = d3.x / h * s * .55; target[IDX.fL] += f; target[IDX.fR] += f; }
+    }
     target[base] = pt3.x; target[base + 1] = ty; target[base + 2] = pt3.z;
   } else {
     const jn = J[EFF_JOINT[en]];
@@ -262,7 +267,8 @@ export function bake(fight) {
       const o = k * NP, t = k * dt, a = root(k), st = tick(i, k, 4);
       const ok = GROUNDED.has(st) && Math.abs(B[o + IDX.spin]) < .05 && B[o + IDX.jump] < .02;
       for (const f of feet) {
-        f.lx = B[o + f.base]; f.ly = B[o + f.base + 1]; f.can = ok && f.ly < .035; f.des = a + f.lx;
+        const lx0 = f.lx; f.lx = B[o + f.base]; f.ly = B[o + f.base + 1]; f.can = ok && f.ly < .035; f.des = a + f.lx;
+        if (f.can && k && !f.step) f.at += f.lx - lx0; // the pose moves the foot (stepping in with a punch): it slides there
         if (!f.can) { f.w = Math.max(0, f.w - dt / .07); f.step = null; f.at = f.des; continue; }
         f.w = Math.min(1, f.w + dt / .1);
         if (f.step && t >= f.step.t0 + f.step.dur) { f.at = f.step.to; f.step = null; if (f.lift) stepEnd = t; }

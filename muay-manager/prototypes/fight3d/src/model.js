@@ -179,6 +179,9 @@ export class ModelFighter {
         v4.normalize(); this.qFoot.setFromUnitVectors(FWD, v4);
         const k = Math.max(0, Math.min(1, (C.y - DIM.ankle - .05) / .28));
         this.qFoot.slerp(this.qLo, k);
+        // a round kick points the toes, so the top of the foot lies in line with the shin (asked for by a knee pole longer than 1.4)
+        const pi = IDX[l[6]], point = Math.max(0, Math.min(1, (Math.hypot(P[o + pi], P[o + pi + 1], P[o + pi + 2]) - 1.4) / .6)) * k;
+        if (point > 0) { q1.setFromAxisAngle(this.n, point); this.qFoot.premultiply(q1); }
         this.put(l[2], this.qFoot, C, P0[l[2]]);
         this.put(l[2] === 'LeftFoot' ? 'LeftToeBase' : 'RightToeBase', this.qFoot, C, P0[l[2]]);
       }
