@@ -233,7 +233,7 @@ export function bake(fight) {
   // close to the face, elbows in, standing tall with the weight on the rear leg and the lead foot light. The body rocks
   // slowly and the lead knee comes up on the beat while he looks for an opening.
   const RHYTHM = 2 * Math.PI * .75; // rocking beat, rad/s: a little under one a second
-  const GUARD_L = [.21, -.025], GUARD_R = [.12, -.045]; // planted guard: each glove forward of and above the head centre, metres
+  const GUARD_L = [.25, 0], GUARD_R = [.12, -.045]; // planted guard: each glove forward of and above the head centre, metres
   // feeling out: bounce for about three seconds, then stand and sway for one, then bounce again
   const GATE = .25, gateP = (i, t) => { const g = t * GATE + i * .43; return g - Math.floor(g); }; // a four-second cycle
   // share of each cycle spent on the toes: most of it when feeling out, a short burst for the man walking forward or waiting
@@ -370,17 +370,17 @@ export function bake(fight) {
         out[IDX.jump] += up * .022 * amp + Math.max(0, -Math.sin(rph)) * (Math.sin(rph * .5) > 0 ? .012 : 0) * still * amp;
         out[(Math.floor((ph + .26) / (Math.PI * 2)) & 1 ? IDX.fR : IDX.fL) + 1] += up * .035 * amp; // footwork: a light hop from one foot to the other out[IDX.hip + 1] -= (g - up) * .028 * amp; // light hops; standing, a little lift as he rocks back, every other beat
         out[IDX.hL + 1] += up * .014 * amp; out[IDX.hR + 1] += up * .014 * amp;
-        // The Muay Thai rhythm guard, on a beat of about one a second. The weight rocks back onto the rear leg and the
-        // lead knee comes up; at the same time the lead glove reaches out and the rear glove draws in, then they change
-        // over. The elbows swing forward and back with the hands.
+        // The Muay Thai rhythm guard, on a beat of about one a second (the owner's reference picture): the back a little
+        // rounded, the arms up in the guard, the weight rocking back onto the rear leg as the lead knee comes up, and both
+        // gloves rising and sinking a little with it. The elbows stay where they are: they used to swing forward and
+        // back with the hands, which read as the arms twisting.
         const lo = 1 - paceAt(t), s = rock * amp * (1 + .35 * lo), c = rockC * amp, kn = Math.max(0, rock) * amp * (1 + .3 * lo); // bigger while reading him
         // planted: the tight high guard, standing tall, chin down, weight back and the lead foot light
         const hg = still * amp;
         out[IDX.eL + 2] += .25 * hg; out[IDX.eR + 2] -= .25 * hg;
-        out[IDX.lean] += .03 * hg; out[IDX.hip + 1] += .04 * hg; out[IDX.hip] -= .025 * hg; out[IDX.hdP] += .16 * hg; // shoulders round, chin down behind the gloves out[IDX.fL + 1] += .015 * hg;
+        out[IDX.lean] += .08 * hg; out[IDX.hip + 1] += .015 * hg; out[IDX.hip] -= .025 * hg; out[IDX.hdP] += .16 * hg; // shoulders round, chin down behind the gloves out[IDX.fL + 1] += .015 * hg;
         out[IDX.hip] -= .026 * s; out[IDX.lean] -= .03 * s;
-        out[IDX.hL] += .05 * s; out[IDX.hL + 1] += .022 * c; out[IDX.hR] -= .045 * s; out[IDX.hR + 1] -= .02 * c;
-        out[IDX.eL] += .32 * s; out[IDX.eR] -= .32 * s;
+        out[IDX.hL + 1] += .03 * s; out[IDX.hR + 1] += .024 * s;
         out[IDX.fL + 1] += (KNEE_STILL[md] * still + KNEE_HOP[md] * g) * kn; out[IDX.fL] -= .03 * kn * still; out[IDX.kL + 1] += .55 * kn * still; out[IDX.kL + 2] -= .25 * kn * still;
         if (md === 0) {
           // feeling out: between bursts of bouncing he stops and sways to read the other man
@@ -393,7 +393,7 @@ export function bake(fight) {
           const beat = Math.sin(ph * .5), tap = Math.max(0, beat) * amp * still;
           out[IDX.hip + 1] -= (.032 * amp - tap * .02) * still;
           out[IDX.lean] += .07 * amp + fb * .05; out[IDX.hdP] += .06 * amp;
-          out[IDX.side] += lr * .12; out[IDX.hip + 2] += lr * .035; out[IDX.twist] += beat * .1 * amp * still - lr * .05; out[IDX.hdY] += lr * .08;
+          out[IDX.side] += lr * .12; out[IDX.hip + 2] += lr * .035; out[IDX.twist] -= lr * .05; out[IDX.hdY] += lr * .08;
           out[IDX.hL] -= .06 * amp; out[IDX.hL + 1] += .04 * amp + tap * .012; out[IDX.hR + 1] += .035 * amp; out[IDX.hR] += .03 * amp;
         } else {
           // waiting: guard up and long; when he is not bouncing the feet stay planted and the body sinks and rises,
@@ -404,10 +404,10 @@ export function bake(fight) {
         }
         if (hg > .01) {
           // Planted, the guard settles where the stadium fighters keep it, whatever the attitude: gloves by the brow and in
-          // close (lead about a forearm in front of the face, rear by the temple), still reaching and drawing on the beat.
+          // close (lead about a forearm in front of the face, rear by the temple), rising and sinking on the beat.
           solve(out, 0, J); const k = hg * .8, hx = J.head.x, hy = J.head.y;
-          out[IDX.hL] += (hx + GUARD_L[0] + .035 * s - out[IDX.hL]) * k; out[IDX.hL + 1] += (hy + GUARD_L[1] + .012 * c - out[IDX.hL + 1]) * k;
-          out[IDX.hR] += (hx + GUARD_R[0] - .025 * s - out[IDX.hR]) * k; out[IDX.hR + 1] += (hy + GUARD_R[1] - .012 * c - out[IDX.hR + 1]) * k;
+          out[IDX.hL] += (hx + GUARD_L[0] - out[IDX.hL]) * k; out[IDX.hL + 1] += (hy + GUARD_L[1] + .03 * s - out[IDX.hL + 1]) * k;
+          out[IDX.hR] += (hx + GUARD_R[0] - out[IDX.hR]) * k; out[IDX.hR + 1] += (hy + GUARD_R[1] + .024 * s - out[IDX.hR + 1]) * k;
           solve(out, 0, J); sx = (J.shL.x + J.shR.x) / 2; sy = (J.shL.y + J.shR.y) / 2; sz = (J.shL.z + J.shR.z) / 2; // the gloves follow the shoulders from here
         }
         // Head movement: every second and a quarter, more often than not, one of four moves.

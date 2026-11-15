@@ -40,9 +40,11 @@ export const POSES = {
   fly: P({jump: .38, turn: -.1, lean: -.1, hip: [.30, .95, 0], hL: [.42, 1.42, -.1], hR: [.4, 1.38, .1], fR: [.5, .72, .05], kR: [1, .6, 0], fL: [-.1, .25, -.1], kL: [1, -.2, -.2]}),
 
   kickW: P({turn: -.2, lean: -.05, hip: [.05, .88, 0], fR: [-.05, .35, .30], kR: [.6, .3, 1], hR: [.10, 1.30, .30], fL: [.22, .03, -.13]}),
-  kickBody: P({turn: -1.3, twist: .5, lean: -.30, side: -.25, hip: [.10, .90, 0], fR: [.92, 1.12, -.05], kR: [.5, .3, 1], hR: [-.25, 1.0, .35], hL: [.25, 1.5, -.05], fL: [.22, .04, -.13]}),
-  kickHigh: P({turn: -1.3, twist: .5, lean: -.5, side: -.3, hip: [.08, .95, 0], fR: [.80, 1.58, -.03], kR: [.5, .3, 1], hR: [-.3, .95, .35], hL: [.22, 1.45, -.05], fL: [.22, .06, -.13]}),
-  kickLow: P({turn: -1.1, twist: .4, lean: -.1, hip: [.10, .82, 0], fR: [.85, .42, -.08], kR: [.5, .3, 1], hR: [-.1, 1.1, .35], fL: [.22, .03, -.13]}),
+  // round kicks (the owner's reference pictures): the body leans away over a standing leg turned out and up on the
+  // ball of the foot, the hip rolled over, the kicking leg out level, the arm on the kicking side thrown down behind
+  kickBody: P({turn: -1.35, twist: .5, lean: -.38, side: -.3, hip: [.10, .92, 0], fR: [.92, 1.12, -.05], kR: [.5, .3, 1], hR: [-.3, .95, .4], hL: [.27, 1.5, -.03], fL: [.22, .06, -.13], kL: [.35, 0, -1]}),
+  kickHigh: P({turn: -1.35, twist: .5, lean: -.56, side: -.36, hip: [.08, .97, 0], fR: [.80, 1.58, -.03], kR: [.5, .3, 1], hR: [-.32, .92, .4], hL: [.24, 1.45, -.03], fL: [.22, .07, -.13], kL: [.35, 0, -1]}),
+  kickLow: P({turn: -1.15, twist: .4, lean: -.14, side: -.12, hip: [.10, .82, 0], fR: [.85, .42, -.08], kR: [.5, .3, 1], hR: [-.15, 1.05, .38], fL: [.22, .05, -.13], kL: [.35, 0, -1]}),
   teepW: P({lean: -.1, hip: [-.05, .88, 0], fL: [.25, .55, -.10], kL: [1, .5, 0]}),
   teep: P({turn: .3, lean: -.35, hip: [.05, .90, 0], fL: [.95, 1.02, -.03], kL: [1, .4, 0], hL: [.2, 1.2, -.3], hR: [.18, 1.45, .12]}),
   teepHiW: P({turn: .1, lean: -.12, hip: [-.04, .90, 0], fR: [.15, .62, .10], kR: [1, .6, .1], fL: [.22, .03, -.13]}),
