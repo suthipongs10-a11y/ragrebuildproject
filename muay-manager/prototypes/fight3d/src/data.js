@@ -107,10 +107,15 @@ export const RULES = {
   // walking speed, a little more when he is closing in to throw (the owner: moving and stepping far too quick)
   // and without a strike in mind he is content anywhere within walkDead (cm) of the distance he wants, so the two can stand
   walkGain: 5, walkK: .62, walkPlanK: .82, walkDead: 14,
+  // standing his ground: a man lets the other come walkDeadIn (cm) inside the distance he likes before he gives way, and
+  // then backs up at only walkBack of his walking speed (stepping out after a shot of his own is still quick). The owner:
+  // the man defending sets his guard, pushes kicks and lifts the knee; he does not run, and nobody need chase.
+  walkDeadIn: 30, walkBack: .45,
   planTime: 1.8,         // how long a man keeps closing in for the strike he has picked before he gives it up
   limit: 235,            // ring half width the fighters can use
   startX: 85,
   dmgScale: .137,          // global damage multiplier
+  dmgStat: [.6, .8],       // a blow's power: this much whatever the stat, plus this much times the stat (0-1)
   blockDmg: .06,         // share of base damage that gets through a block
   // how much more often than a style's own weights say each fist punch is chosen: fights are meant to have plenty of hands
   fistBias: {jab: 1.2, cross: 1.6, hook: 1.9, upper: 1.9, bodyshot: 1.6},
@@ -181,8 +186,9 @@ export const PLAN_RULES = {
   attackCool: .72, counterCool: 1.3, attackCover: .65, counterCover: 1.25, attackSt: 1.08, counterSt: .92, attackDmg: 1.05, counterBonus: .3,
   jam: .94, keepAway: .8, outRegen: .93, inCover: .8, outVsIn: 1.12, // walking in leaves the guard open, and a fighter kept outside eats long weapons // crowding blunts kicks; staying outside blunts close weapons but costs legs
   outDist: 12, inDist: -16,
-  // how each attitude moves: the counter fighter barely advances and keeps the push kick going, the attacker walks forward and ties up more
-  counterAdvance: .22, counterStepIn: .75, attackAdvance: 1.12, counterTeep: 1.9, counterPush: 1.3, attackClinch: 1.25,
+  // how each attitude moves: the counter fighter barely advances and keeps the push kick going; the attacker ties up more
+  // and throws more (attackCool), but walks no faster than anyone else (owner: going forward means more weapons, not quicker feet)
+  counterAdvance: .22, counterStepIn: .75, attackAdvance: 1, counterTeep: 1.9, counterPush: 1.3, attackClinch: 1.25,
   // chance that a landed push kick sits the opponent down (scores like a dump, no count)
   teepDump: .03, teepDumpCounter: .05, teepDumpVsAttack: .04, teepDumpCaught: .08, teepDumpTired: .06,
   outMoves: ['body', 'high', 'low', 'teep', 'teepFace', 'jab'], inMoves: ['elbow', 'spinElbow', 'knee', 'hook', 'upper', 'bodyshot'],

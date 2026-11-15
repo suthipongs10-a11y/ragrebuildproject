@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.14';
+export const SIM_VERSION = 'proto-0.15';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -207,7 +207,7 @@ export function simulate(opts) {
       return;
     }
     const stat = (m.kind === 'punch' ? f.stats.pow : f.stats.kick) / 100;
-    let raw = m.dmg * (.6 + .8 * stat) * rnd(.85, 1.15) * (f.st < 25 ? .8 : 1) * (f.light ? K.paceLight : 1) * (K.paceDmg[0] + (K.paceDmg[1] - K.paceDmg[0]) * paceNow()); // they sit down on their shots as the pace rises
+    let raw = m.dmg * (K.dmgStat[0] + K.dmgStat[1] * stat) * rnd(.85, 1.15) * (f.st < 25 ? .8 : 1) * (f.light ? K.paceLight : 1) * (K.paceDmg[0] + (K.paceDmg[1] - K.paceDmg[0]) * paceNow()); // they sit down on their shots as the pace rises
     const counter = o.state === 'move', crit = R() < K.critChance, wasStun = o.state === 'stun';
     if (counter) raw *= K.counterMul + (planOf(f).ag === 'counter' ? PR.counterBonus : 0);
     if (planOf(f).ag === 'attack') raw *= PR.attackDmg;
@@ -472,8 +472,8 @@ export function simulate(opts) {
     // the man told to wait holds his ground and lets the other come; the man told to go forward walks him down
     const ag2 = planOf(f).ag, fwd = walk * (ag2 === 'counter' ? (f.plan ? PR.counterStepIn : PR.counterAdvance) : ag2 === 'attack' ? PR.attackAdvance : 1);
     const wk = f.plan ? K.walkPlanK : K.walkK; // eases toward the distance he wants rather than darting to it
-    const e = d - want, ee = Math.sign(e) * Math.max(0, Math.abs(e) - (f.plan ? 0 : K.walkDead));
-    f.x = clamp(f.x + f.dir * clamp(ee * Math.min(1, K.walkGain * dt), -walk * wk * dt, fwd * wk * dt), -LIM, LIM); sep(f, o);
+    const e = d - want, out = f.backT > 0, ee = Math.sign(e) * Math.max(0, Math.abs(e) - (f.plan ? 0 : e < 0 && !out ? K.walkDeadIn : K.walkDead));
+    f.x = clamp(f.x + f.dir * clamp(ee * Math.min(1, K.walkGain * dt), -walk * wk * (out ? 1 : K.walkBack) * dt, fwd * wk * dt), -LIM, LIM); sep(f, o);
   }
 
   function endRound() {

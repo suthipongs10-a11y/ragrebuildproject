@@ -232,24 +232,25 @@ export function bake(fight) {
   // share of each cycle spent on the toes: most of it when feeling out, a short burst for the man walking forward or waiting
   const HOP_ON = [.6, .38, .28]; // a little more light bouncing between the planted spells (owner, round 50)
   // Rhythm guard: how high the lead foot comes up on the beat while standing (per attitude), and while bouncing
-  const KNEE_STILL = [.14, .1, .15], KNEE_HOP = [.1, .05, .06];
+  const KNEE_STILL = [.2, .1, .26], KNEE_HOP = [.1, .05, .06]; // the man reading or waiting brings the lead knee well up, ready to check a kick
   const hopGate = (i, t, md) => { const p = gateP(i, t), on = HOP_ON[md] * (HOP_PACE + (1 - HOP_PACE) * paceAt(t)); return smooth(0, .04, p) * (1 - smooth(on, on + .05, p)); };
   // waiting: now and then the feet change over, slowly, one step at a time
   const slowSwitch = (i, t) => { const g = t * .19 + i * .47, c = Math.floor(g); return g - c < .26 && hash(c * 5 + i) < .6; };
-  // the bounce: light hops about one and a half a second (halved from two after the owner found the feet
-  // far too quick), in the air slightly longer than on the canvas, a little quicker while he is travelling
-  const HOP = 9.5, hopUp = ph => Math.max(0, Math.sin(ph) + .25) / 1.25, hopPh = [new Float32Array(n), new Float32Array(n)];
-  for (let i = 0; i < 2; i++) { let ph = i * 1.7, v = 0; for (let k = 0; k < n; k++) { v += (Math.abs(tick(i, k + 1, 0) - tick(i, k, 0)) * .01 / dt - v) * .15; ph += HOP * (1 + Math.min(.4, v * .4)) * dt; hopPh[i][k] = ph; } }
+  // the bounce (footwork): light hops from one foot to the other, a little over one a second, in the air slightly
+  // longer than on the canvas. The owner asked for this in place of quick feet: slow, light, the same beat however
+  // hard the round is being fought.
+  const HOP = 7.5, hopUp = ph => Math.max(0, Math.sin(ph) + .25) / 1.25, hopPh = [new Float32Array(n), new Float32Array(n)];
+  for (let i = 0; i < 2; i++) for (let k = 0; k < n; k++) hopPh[i][k] = i * 1.7 + HOP * k * dt; // a steady beat: pressing forward does not hurry the feet
 
   // Footwork. The simulation slides a fighter along the ring; here the feet are pinned to the canvas.
   // A fighter on his toes moves by bouncing: both feet shift together while he is in the air, and now and then
   // he switches his feet for one bounce. Out of the bounce (mid-strike, hurt) a late foot steps across on its own.
   const GROUNDED = new Set([STATE.intro, STATE.idle, STATE.move, STATE.hit, STATE.block, STATE.stun, STATE.rest, STATE.cover, STATE.win]);
   function footwork(i) {
-    const B = baked[i], dir = i ? -1 : 1, TH = .08, LIFT = .05, IW = idleW[i];
+    const B = baked[i], dir = i ? -1 : 1, TH = .08, LIFT = .05, STEP_GAP = .3, IW = idleW[i]; // STEP_GAP: both feet down this long between steps
     const root = k => tick(i, k, 0) * .01 * dir;                 // position along the fighter's own forward axis
     const feet = [IDX.fL, IDX.fR].map((base, j) => ({base, j, w: 0, at: root(0) + B[base], step: null}));
-    let wasUp = false;
+    let wasUp = false, stepEnd = -9;
     for (let k = 0; k < n; k++) {
       const o = k * NP, t = k * dt, a = root(k), st = tick(i, k, 4);
       const ok = GROUNDED.has(st) && Math.abs(B[o + IDX.spin]) < .05 && B[o + IDX.jump] < .02;
@@ -257,7 +258,7 @@ export function bake(fight) {
         f.lx = B[o + f.base]; f.ly = B[o + f.base + 1]; f.can = ok && f.ly < .035; f.des = a + f.lx;
         if (!f.can) { f.w = Math.max(0, f.w - dt / .07); f.step = null; f.at = f.des; continue; }
         f.w = Math.min(1, f.w + dt / .1);
-        if (f.step && t >= f.step.t0 + f.step.dur) { f.at = f.step.to; f.step = null; }
+        if (f.step && t >= f.step.t0 + f.step.dur) { f.at = f.step.to; f.step = null; if (f.lift) stepEnd = t; }
         if (!f.step) f.at = Math.max(f.des - .25, Math.min(f.des + .25, f.at)); // shoved a long way: the foot drags rather than stretches into a split
       }
       const md = mode[i][k], ph = hopPh[i][k], up = hopUp(ph) > 0, bouncing = IW[k] > .5 && hopGate(i, t, md) > .5;
@@ -268,18 +269,19 @@ export function bake(fight) {
         for (const f of feet) {
           if (!f.can) continue;
           const to = root(k2) + B[k2 * NP + f.base] + (sw ? (f.j ? .3 : -.3) : 0);
-          if (Math.abs(to - f.at) > .012) f.step = {t0: t, dur: (k2 - k) * dt, from: f.at, to, lift: 0};
+          if (Math.abs(to - f.at) > .012) { f.step = {t0: t, dur: (k2 - k) * dt, from: f.at, to, lift: 0}; f.lift = false; }
         }
       } else if (!feet[0].step && !feet[1].step) { // off the bounce, or left too far behind to wait for the next hop
         // the faster he goes, the further a foot may trail before it steps, so a dart in or back is a few
         // steps, not a patter; but no further, or the stance opens into a split
         const speed = Math.abs(root(Math.min(n - 1, k + 4)) - a) / (4 * dt);
-        const late = feet.filter(f => f.can && Math.abs(f.des - f.at) > (bouncing ? .24 : TH + Math.min(.05, speed * .04)));
-        if (late.length) {
+        const hurt = st === STATE.hit || st === STATE.block || st === STATE.cover || st === STATE.stun;
+        const late = feet.filter(f => f.can && Math.abs(f.des - f.at) > (bouncing || hurt ? .24 : TH + Math.min(.05, speed * .04)));
+        if (late.length && t - stepEnd >= STEP_GAP) {
           const fwd = late[0].des - late[0].at > 0, f = late.length > 1 ? feet[fwd ? 0 : 1] : late[0];
           const dur = Math.max(.2, Math.min(.32, .32 - speed * .12)) * (md === 2 ? 1.5 : md === 1 ? 1.2 : 1); // unhurried steps, the foot lifted
           const k2 = Math.min(n - 1, k + Math.round(dur / dt)), ahead = Math.min(.07, speed * .06) * (fwd ? 1 : -1);
-          f.step = {t0: t, dur, from: f.at, to: root(k2) + B[k2 * NP + f.base] + (f.des - a - f.lx) + ahead, lift: LIFT};
+          f.step = {t0: t, dur, from: f.at, to: root(k2) + B[k2 * NP + f.base] + (f.des - a - f.lx) + ahead, lift: LIFT}; f.lift = true;
         }
       }
       wasUp = up;
@@ -298,7 +300,7 @@ export function bake(fight) {
   // to the starting line at the bell and between rounds. Read from the ticks, so every viewer sees the same.
   const theta = new Float32Array(n + 1);
   {
-    const busy = new Uint8Array(n + 1), SPIN = .45, H = x => { const v = Math.sin(x * 91.7 + 13.1) * 43758.5453; return v - Math.floor(v); };
+    const busy = new Uint8Array(n + 1), SPIN = .45, CIRCLE = .4, H = x => { const v = Math.sin(x * 91.7 + 13.1) * 43758.5453; return v - Math.floor(v); };
     for (let k = 0; k < n; k++) for (let i = 0; i < 2; i++) {
       const st = TK[(k * 2 + i) * TICK_FIELDS + 4];
       if (st !== STATE.idle && st !== STATE.rest && st !== STATE.intro && st !== STATE.clinch && st !== STATE.clinched) busy[k] = 1;
@@ -320,6 +322,11 @@ export function bake(fight) {
         const seg = Math.floor((t + H(Math.floor(t / 3)) * 2) / 3.4), dir = H(seg * 3 + 1) < .5 ? -1 : 1, sp = .2 + .22 * H(seg * 7 + 2);
         if (back > 205) { if (!trapDir) trapDir = H(k * .37) < .5 ? -1 : 1; want = trapDir * .6; } // off the ropes, sideways
         else { trapDir = 0; want = dir * sp * (1.25 - .55 * paceAt(t)) * (H(seg * 11 + 5) < .18 ? 0 : 1); } // now and then a pause
+      }
+      if (!resting) { // the line turns about the ring's centre: out by the ropes the same turn is a long way round, so the
+        // turn is held to what moves the outer man CIRCLE metres a second (he slid along the ropes at 1.6 m/s before)
+        const far = Math.max(Math.abs(TK[(k * 2) * TICK_FIELDS]), Math.abs(TK[(k * 2 + 1) * TICK_FIELDS])), r = Math.max(.7, far * .01 + Math.max(0, far - 130) * .01);
+        want = Math.max(-CIRCLE / r, Math.min(CIRCLE / r, want));
       }
       w += (want - w) * Math.min(1, dt * 3.2); th += w * dt; theta[k] = th;
     }
@@ -353,7 +360,8 @@ export function bake(fight) {
         // Bounce on the toes, guard up: every attitude has it, for as long as its gate is open.
         const g = hopGate(i, t, md), up = hopUp(ph) * g, still = 1 - g, rph = t * RHYTHM + i * 1.9;
         const rock = g * Math.sin(ph * .5) + still * Math.sin(rph), rockC = g * Math.cos(ph * .5) + still * Math.cos(rph); // on the bounce, or on the slower beat
-        out[IDX.jump] += up * .04 * amp + Math.max(0, -Math.sin(rph)) * (Math.sin(rph * .5) > 0 ? .012 : 0) * still * amp; out[IDX.hip + 1] -= (g - up) * .028 * amp; // light hops; standing, a little lift as he rocks back, every other beat
+        out[IDX.jump] += up * .022 * amp + Math.max(0, -Math.sin(rph)) * (Math.sin(rph * .5) > 0 ? .012 : 0) * still * amp;
+        out[(Math.floor((ph + .26) / (Math.PI * 2)) & 1 ? IDX.fR : IDX.fL) + 1] += up * .035 * amp; // footwork: a light hop from one foot to the other out[IDX.hip + 1] -= (g - up) * .028 * amp; // light hops; standing, a little lift as he rocks back, every other beat
         out[IDX.hL + 1] += up * .014 * amp; out[IDX.hR + 1] += up * .014 * amp;
         // The Muay Thai rhythm guard, on a beat of about one a second. The weight rocks back onto the rear leg and the
         // lead knee comes up; at the same time the lead glove reaches out and the rear glove draws in, then they change
@@ -366,7 +374,7 @@ export function bake(fight) {
         out[IDX.hip] -= .026 * s; out[IDX.lean] -= .03 * s;
         out[IDX.hL] += .05 * s; out[IDX.hL + 1] += .022 * c; out[IDX.hR] -= .045 * s; out[IDX.hR + 1] -= .02 * c;
         out[IDX.eL] += .32 * s; out[IDX.eR] -= .32 * s;
-        out[IDX.fL + 1] += (KNEE_STILL[md] * still + KNEE_HOP[md] * g) * kn; out[IDX.fL] -= .03 * kn * still; out[IDX.kL + 1] += .55 * kn * still;
+        out[IDX.fL + 1] += (KNEE_STILL[md] * still + KNEE_HOP[md] * g) * kn; out[IDX.fL] -= .03 * kn * still; out[IDX.kL + 1] += .55 * kn * still; out[IDX.kL + 2] -= .25 * kn * still;
         if (md === 0) {
           // feeling out: between bursts of bouncing he stops and sways to read the other man
           const sway = Math.sin(Math.max(0, gateP(i, t) - .82) / .18 * Math.PI * 2) * still * amp;

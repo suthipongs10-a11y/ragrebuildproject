@@ -344,15 +344,30 @@ function showResult() {
 // The fight line also turns around the ring centre (TL.theta: circling, presentation only), so a man backed up toward
 // a side meets the ropes there, and one backed up toward a corner slides all the way into it (a square ring reaches
 // farther along its diagonals).
-const ROPE_FROM = 170, BACK = .3, R_ROPE = 3.05; // cm where the slide starts; body behind the hips; ropes from the centre
+const ROPE_FROM = 130, BACK = .3, R_ROPE = 3.05; // cm where the slide starts; body behind the hips; ropes from the centre
 const ROPE_N = [[0, 1], [1, 0], [0, -1], [-1, 0]]; // each side's outward direction (x, z): side 0 z+, 1 x+, 2 z-, 3 x-
 const turn = t => (TL && TL.theta ? TL.theta(t) : 0);
 const toRopes = (c, s) => R_ROPE / Math.max(Math.abs(c), Math.abs(s), 1e-3);
-function pairShift(t) {
+// The slide the pair wants at time t, and the most the ring allows along the line as it lies then.
+function shiftWanted(t, out) {
   const xa = TL.val(0, t, 0), xb = TL.val(1, t, 0), back = Math.abs(xa) > Math.abs(xb) ? xa : xb, lim = (CFG.rules && CFG.rules.limit) || RULES.limit;
   const k = Math.max(0, Math.min(1, (Math.abs(back) - ROPE_FROM) / (lim - ROPE_FROM))), sg = Math.sign(back) || 1, th = turn(t);
   const gain = Math.max(0, toRopes(Math.cos(th), Math.sin(th)) + .22 - BACK - lim / 100); // to the ropes along this line
-  return sg * k * k * (3 - 2 * k) * gain;
+  out[0] = sg * k * k * (3 - 2 * k) * gain; out[1] = gain;
+}
+// The slide itself follows what is wanted at SLIDE metres a second at most. Toward a corner the ring is nearly two
+// metres deeper than the engine's limit, and taking that up as fast as the back man retreats made the pair shoot
+// across the canvas (2.5 m/s) with their feet pattering. Built once per fight, so any moment can be looked up.
+const SLIDE = .6;
+let shiftOf = null, shiftArr = null;
+function pairShift(t) {
+  if (shiftOf !== TL) {
+    const n = TL.n, dt = TL.dt, w = [0, 0]; shiftArr = new Float32Array(n + 1); let cur = 0;
+    for (let k = 0; k <= n; k++) { shiftWanted(k * dt, w); cur += Math.max(-SLIDE * dt, Math.min(SLIDE * dt, w[0] - cur)); cur = Math.max(-w[1], Math.min(w[1], cur)); shiftArr[k] = cur; }
+    shiftOf = TL;
+  }
+  const x = Math.max(0, Math.min(TL.n - 1.001, t / TL.dt)), k = Math.floor(x);
+  return shiftArr[k] + (shiftArr[k + 1] - shiftArr[k]) * (x - k);
 }
 let ropeBounce = [0, 0]; // the rope throwing a man back off it: extra metres toward the centre
 const fx0 = (i, t) => TL.val(i, t, 0) * .01 + pairShift(t); // along the fight line
@@ -367,9 +382,21 @@ function placeOf(i, t, extra) { // world position on the turned line
 // (sliding back under the body, gliding a little), then lifts and is set down ahead again; a light bounce on each
 // step. Half the cadence it had at first (the owner: far too quick), so each step is longer and unhurried.
 const STEP = .6, STEP_A = STEP * .25;
+// Strides gone sideways (signed), per fighter and tick: each small turn of the line times his distance from the middle
+// at that moment, added up. (Not the whole turn so far times his distance: late in a fight that made every step
+// forward or back count as many strides sideways, and the feet pattered.) Built once per fight.
+let sideOf = null, sidePh = null;
+function sidePhase(i, t) {
+  if (sideOf !== TL) {
+    const n = TL.n, dt = TL.dt; sidePh = [new Float32Array(n + 1), new Float32Array(n + 1)];
+    for (let j = 0; j < 2; j++) { let p = 0; for (let k = 0; k < n; k++) { sidePh[j][k] = p; p += (TL.theta((k + 1) * dt) - TL.theta(k * dt)) * fx0(j, (k + .5) * dt) * (j ? 1 : -1) / STEP; } sidePh[j][n] = p; }
+    sideOf = TL;
+  }
+  const x = Math.max(0, Math.min(TL.n - 1.001, t / TL.dt)), k = Math.floor(x);
+  return sidePh[i][k] + (sidePh[i][k + 1] - sidePh[i][k]) * (x - k);
+}
 function sideSteps(i, t, P) {
-  const ph = tt => turn(tt) * fx0(i, tt) * (i ? 1 : -1) / STEP; // strides gone sideways (signed)
-  const p = ph(t), v = (ph(t + .05) - ph(t - .05)) / .1 * STEP, w = Math.min(1, Math.abs(v) / .15);
+  const p = sidePhase(i, t), v = (sidePhase(i, t + .05) - sidePhase(i, t - .05)) / .1 * STEP, w = Math.min(1, Math.abs(v) / .15);
   if (w < .02) return;
   for (const [j, base] of [[0, IDX.fL], [1, IDX.fR]]) {
     const q = ((p + j * .5) % 1 + 1) % 1;
@@ -828,7 +855,7 @@ window.LAB = {
   set(o) { Object.assign(OPT, o); OPT.preset = o.preset || ''; applyOpt(); },
   preset(k) { OPT.preset = k; Object.assign(OPT, PRESETS[k]); applyOpt(); },
   freeze(t) { seek(t); frozen = true; },
-  corner(n, t, pin) { const r = marks.rests[n - 1]; if (!r) return false; if (!cor.on) { seek(r.pauseAt); pausedRounds.add(r.round.n); frozen = true; if (!startCorner()) return false; cor.release(); } cor.update(0, t); cor.pin = !!pin; return true; }, get cor() { return cor; }, get fx() { return fx; },
+  corner(n, t, pin) { const r = marks.rests[n - 1]; if (!r) return false; if (!cor.on) { seek(r.pauseAt); pausedRounds.add(r.round.n); frozen = true; if (!startCorner()) return false; cor.release(); } cor.update(0, t); cor.pin = !!pin; return true; }, get cor() { return cor; }, get fx() { return fx; }, get fighters() { return fighters; }, pose: t => poseFighters(t),
   // play t0..t1 in fixed steps so effects and overlays are in the state a viewer would see, then hold
   runTo(t0, t1) { seek(t0); let g = 0; while (playT < t1 && g++ < 60000) { const a = advance(1 / 60); fx.update(Math.max(a, .004), camera); } frozen = true; },
   // Check for a generated body: how much skin stretches into flaps in each pose. Per pose: [triangles, cm2] on the upper body
@@ -949,7 +976,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 47 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 48 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision

@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
 
-const bundle = async entry => (await build({entryPoints: [entry], bundle: true, format: 'iife', minify: process.argv.includes('--min'), write: false, target: 'es2019', legalComments: 'none',
+const bundle = async entry => (await build({entryPoints: [entry], bundle: true, format: 'iife', minify: process.argv.includes('--min'), minifyWhitespace: true, minifySyntax: true, write: false, // spaces out, names kept: the claude.ai page has a 16 MB limit, and error reports still name the function target: 'es2019', legalComments: 'none',
   // loaders from the three package import 'three'; point that at the page's global THREE instead of a second copy
   plugins: [{name: 'three-global', setup(b) { b.onResolve({filter: /^three$/}, () => ({path: resolve('src/three-shim.cjs')})); }}]})).outputFiles[0].text.replace(/<\/script/g, '<\\/script');
 const js = await bundle('src/main.js'), jsGame = await bundle('src/entry-game.js');
