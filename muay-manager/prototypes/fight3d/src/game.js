@@ -182,7 +182,7 @@ async function cloudInit() {
     CLOUD = {db, uid}; cloudNote = 'ออนไลน์';
     const snap = await db.collection('data/users/' + uid).doc('save').get();
     const c = snap.exists ? snap.data() : null;
-    if (valid(c) && (!S || (c.updatedAt || 0) > (S.updatedAt || 0))) { S = fix(c); try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* fine */ } if (!F) go('home'); }
+    if (valid(c) && (!S || (c.updatedAt || 0) > (S.updatedAt || 0))) { S = fix(JSON.parse(JSON.stringify(c))); /* a copy: stored data can come back locked, and the save grows new fields */ try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* fine */ } if (!F) go('home'); }
     else if (S) save();
     await loadBoard(); chSubscribe();
   } catch (e) { cloudNote = 'ออฟไลน์ บันทึกในเครื่องนี้'; }
@@ -450,18 +450,25 @@ function showMe(pose) { if (S) API.camp(S.gym); if (S) API.preview(Object.assign
 
 // ---------- screens ----------
 function render() {
+  if (S) { if (!Object.isExtensible(S)) S = JSON.parse(JSON.stringify(S)); fix(S); } // whatever path the save came in by, newer fields exist
   topBar();
   if (view === 'create') return renderCreate();
   if (F) return renderFight();
   nav();
   const b = $('gBody');
-  if (view && view.settings) b.innerHTML = settingsHtml();
-  else if (view && view.watch) b.innerHTML = watchHtml();
-  else if (tab === 'home') b.innerHTML = homeHtml();
-  else if (tab === 'train') b.innerHTML = trainHtml();
-  else if (tab === 'dress') b.innerHTML = dressHtml();
-  else if (tab === 'fight') b.innerHTML = fightHtml();
-  else b.innerHTML = rankHtml();
+  try {
+    if (view && view.settings) b.innerHTML = settingsHtml();
+    else if (view && view.watch) b.innerHTML = watchHtml();
+    else if (tab === 'home') b.innerHTML = homeHtml();
+    else if (tab === 'train') b.innerHTML = trainHtml();
+    else if (tab === 'dress') b.innerHTML = dressHtml();
+    else if (tab === 'fight') b.innerHTML = fightHtml();
+    else b.innerHTML = rankHtml();
+  } catch (e) { // a screen that cannot be drawn says so instead of leaving the last one up; the website reports it
+    console.error(e);
+    try { navigator.sendBeacon && location.protocol.startsWith('http') && !window.claude && navigator.sendBeacon('/api/log', JSON.stringify({msg: 'render ' + tab + ': ' + (e && e.stack || e), ver: (document.getElementById('ver') || {}).textContent})); } catch (e2) { /* no report */ }
+    b.innerHTML = '<section class="gcard"><h2>หน้านี้แสดงไม่ได้</h2><p class="warn">' + esc(String(e && e.message || e)).slice(0, 160) + '</p><p class="hint">ลองกดเมนูอื่นแล้วกลับมา ถ้ายังเป็นอยู่ให้แจ้งผู้พัฒนา</p></section>';
+  }
 }
 function go(t) { if (DR) drillEnd(true); if (SC) sceneEnd(true); tab = t; view = null; pending = null; mini = null; setMode(false); render(); showMe(t === 'dress' ? 'guard' : t === 'home' ? 'guard' : 'guard'); }
 
@@ -1075,7 +1082,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (SC && !e.repeat) { const k = e.key === 'ArrowLeft' ? 'L' : e.key === 'ArrowRight' ? 'R' : e.key === ' ' ? 'pull' : ''; if (k) { e.preventDefault(); scenePress(k); } return; } if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const sc = e.target.closest('[data-scene]'); if (sc && SC) { e.preventDefault(); scenePress(sc.dataset.scene); return; } const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.22'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.23'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }
