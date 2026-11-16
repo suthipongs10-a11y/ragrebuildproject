@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.17';
+export const SIM_VERSION = 'proto-0.18';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -61,11 +61,11 @@ export function simulate(opts) {
       hp: 100, st: 100, sp: 0, kd: 0, pts: 0, pts0: 0, dmg: 0, state: 'intro', cool: 0, plan: null, planT: 0,
       pt: 0, pd: .001, to: 'guard', q: [], qi: 0, mv: null, mvKey: null, hold: 0, inv: 0, lunge: 0,
       combo: null, ci: 0, chain: 0, chainT: 0, lastRes: null, spi: 0,
-      wearHead: 0, wearBody: 0, wearLeg: 0, stunT: 0, stunCd: 0, stunFlip: 0, tough: 0,
+      wearHead: 0, wearBody: 0, wearLeg: 0, stunT: 0, stunCd: 0, stunFlip: 0, tough: 0, groggy: 0,
       landed: 0, thrown: 0, used: {}, seen: 0, moveId: 0, coverLvl: null, guards: 0, grab: null, light: false, backT: 0};
   }
   const F = [mk(0, specs[0]), mk(1, specs[1])];
-  const G = {phase: 'intro', t: 0, round: 1, clock: K.roundTime, count: null, clinch: null, restT: 0, koT: 0, over: null, lead: -1, leadChanges: 0};
+  const G = {phase: 'intro', t: 0, round: 1, clock: K.roundTime, count: null, clinch: null, pivot: null, restT: 0, koT: 0, over: null, lead: -1, leadChanges: 0};
 
   // the corner's plan for the current round; opts.plans[fighter] is a list with one plan per round
   const PR = PLAN_RULES;
@@ -180,6 +180,7 @@ export function simulate(opts) {
     else if (o.state === 'cover') { pD = 0; pB = o.coverLvl === m.lvl ? 1 : pB * K.coverWrong; } // the guard up at the right height stops it: no points
     const guarded = o.state === 'cover' && o.coverLvl === m.lvl;
     if (o.st < 25 && !guarded) pB *= .7;
+    if (o.groggy > 0 && !guarded) { pB *= K.groggyDef; pD *= K.groggyDef; } // just out of a daze: the hands and the head are slow
     const spUp = m.special ? Math.max(0, Math.min(2, (f.spLv[key] || 1) - 1)) : 0;
     if (m.special && !guarded) { pB *= .45 * (1 - K.spLvAcc * spUp); pD *= .4 * (1 - K.spLvAcc * spUp); }
     if (f.chain > 0 && !guarded) pB *= Math.max(.5, 1 - f.chain * .15);
@@ -244,7 +245,7 @@ export function simulate(opts) {
       emit({type: 'break', reason: 'elbow', by: c.a.i, on: c.b.i});
     }
     o.q = []; o.mv = null; o.combo = null; o.plan = null;
-    if (!wasStun && !held) { o.state = 'hit'; o.hold = .2 + raw / 60; }
+    if (!wasStun && !held) { o.state = 'hit'; o.hold = .2 + raw / 60 + (m.lvl === 'head' && sev === 3 ? K.rockHold : 0); } // a heavy one to the head: rocked a moment longer
     setPose(o, held ? (m.lvl === 'head' ? 'clinchHitHead' : 'clinchHit') : m.react, .06, {amp: held ? 1 : sev === 1 ? .55 : sev === 2 ? .8 : 1});
     f.lastRes = 'hit';
     emit(Object.assign(base, {res: 'hit', raw, dmg: dm, sev, counter, crit, chain: f.chain, light: f.light}));
@@ -275,11 +276,13 @@ export function simulate(opts) {
     if (wasStun && raw >= K.kdStunRaw) pK += K.kdStunChance;
     if (o.hp < K.kdLowHp && raw >= 12) pK += K.kdLowChance;
     if (clean) pK += K.kdClean;
+    if (m.kd && raw >= K.kdMoveRaw) pK += m.kd * (clean ? K.kdMoveClean : 1); // the blows that put men down: the shin on the neck above all
     if (m.special) pK *= K.kdSpecialMul;
+    if (o.groggy > 0) pK *= K.groggyKd;
     pK *= (1 + o.wearHead / K.kdWearDiv) / chin * tough;
     if (pK > 0 && R() < pK) { knockdown(f, o, key, raw, clean); return; }
     if (!wasStun) {
-      const score = o.stunCd > 0 ? 0 : raw * (m.stun || 0) * (1 + o.wearHead / K.stunWearDiv) / chin;
+      const score = o.stunCd > 0 ? 0 : raw * (m.stun || 0) * (clean ? K.stunClean : 1) * (1 + o.wearHead / K.stunWearDiv) / chin;
       if (score > K.stunMin && R() < (score - K.stunMin) / K.stunSpan) {
         o.state = 'stun'; o.stunT = K.stunDurMin + R() * K.stunDurSpan; o.stunFlip = 0; o.stunCd = o.stunT + K.stunRest;
         emit({type: 'stun', on: o.i, by: f.i, dur: o.stunT});
@@ -347,6 +350,7 @@ export function simulate(opts) {
     if (f.inv > 0) f.inv -= dt;
     if (f.tough > 0) f.tough -= dt;
     if (f.stunCd > 0) f.stunCd -= dt;
+    if (f.groggy > 0) f.groggy -= dt;
     f.pt += dt;
     const done = f.pt >= f.pd, d = Math.abs(o.x - f.x);
     if (f.state === 'move') {
@@ -432,7 +436,7 @@ export function simulate(opts) {
       f.stunT -= dt; f.stunFlip -= dt;
       f.x = clamp(f.x - f.dir * 26 * dt, -LIM, LIM);
       if (f.stunT <= 0) {
-        f.state = 'idle'; setPose(f, 'guard', .3); f.cool = rnd(.3, .6);
+        f.state = 'idle'; setPose(f, 'guard', .3); f.cool = rnd(.3, .6); f.groggy = K.groggyTime;
         emit({type: 'stun_end', on: f.i}); say('<b>' + f.name + '</b> ตั้งหลักได้');
       } else if (f.stunFlip <= 0 && done) { f.stunFlip = .42; setPose(f, f.to === 'stunA' ? 'stunB' : 'stunA', .38); }
       return;
@@ -464,6 +468,16 @@ export function simulate(opts) {
         return;
       }
     }
+    // Backed up to the ropes he will not stay there: he shuffles out to one side and the other man has to turn with him,
+    // so the two end up back toward the middle (the picture shows a side step off the ropes or out of the corner).
+    // Nobody throws while it happens. A dazed man cannot do it, and that is when the ropes cost him.
+    if (!G.pivot && !G.clinch && f.x * f.dir < 0 && Math.abs(f.x) > LIM - K.pivotNear && o.state !== 'move' && o.state !== 'stun' && R() < K.pivotRate * (.6 + f.stats.spd / 150) * dt) {
+      G.pivot = {t: 0, by: f.i, shift: -Math.sign(f.x) * K.pivotShift};
+      f.plan = null; f.combo = null; o.plan = null; o.combo = null;
+      f.cool = Math.max(f.cool, K.pivotTime + rnd(.05, .25)); o.cool = Math.max(o.cool, K.pivotTime * .85);
+      emit({type: 'pivot', by: f.i, dur: K.pivotTime, dir: R() < .5 ? -1 : 1});
+      say('<b>' + f.name + '</b> ฉากออกด้านข้าง หลุดจากเชือก');
+    }
     f.cool -= dt;
     if (!f.plan && f.cool <= 0) { f.combo = null; f.plan = choose(f, o); f.planT = K.planTime; }
     const rg = planOf(f).range;
@@ -483,7 +497,7 @@ export function simulate(opts) {
       }
       if (f.planT <= 0) { f.plan = null; f.combo = null; f.cool = .15; }
     }
-    const walk = (54 + f.stats.spd * .5) * (f.st < 25 ? .7 : 1) * (1 - Math.min(.45, f.wearLeg / 200)) * (f.style.walk || 1);
+    const walk = (54 + f.stats.spd * .5) * (f.st < 25 ? .7 : 1) * (1 - Math.min(.45, f.wearLeg / 200)) * (f.style.walk || 1) * (f.groggy > 0 ? K.groggyWalk : 1);
     // the man told to wait holds his ground and lets the other come; the man told to go forward walks him down
     const ag2 = planOf(f).ag, fwd = walk * (ag2 === 'counter' ? (f.plan ? PR.counterStepIn : PR.counterAdvance) : ag2 === 'attack' ? PR.attackAdvance : 1);
     const wk = f.plan ? K.walkPlanK : K.walkK; // eases toward the distance he wants rather than darting to it
@@ -570,6 +584,11 @@ export function simulate(opts) {
       }
       if (G.koT > 2.8) { G.phase = 'over'; emit({type: 'phase', phase: 'over'}); }
     }
+    if (G.pivot) { // the side step off the ropes carries both men toward the middle, the gap between them unchanged
+      const p = G.pivot, ez = x => x * x * (3 - 2 * x), dx = (ez(Math.min(1, (p.t + dt) / K.pivotTime)) - ez(Math.min(1, p.t / K.pivotTime))) * p.shift;
+      if (G.phase !== 'fight' || G.count || G.clinch) G.pivot = null;
+      else { a.x = clamp(a.x + dx, -LIM, LIM); b.x = clamp(b.x + dx, -LIM, LIM); p.t += dt; if (p.t >= K.pivotTime) G.pivot = null; }
+    }
     stepFighter(a, b, dt); stepFighter(b, a, dt);
   }
 
@@ -588,7 +607,7 @@ export function simulate(opts) {
   }
   const o = G.over || {w: 0, l: 1, how: 'คะแนน', round: K.rounds, time: K.roundTime, move: null};
   return {
-    version: SIM_VERSION, seed, specs, dt: DT, nTicks: roundAt.length / 2, duration: T,
+    version: SIM_VERSION, seed, specs, dt: DT, nTicks: roundAt.length / 2, duration: T, limit: LIM,
     ticks: Float32Array.from(ticks), clock: Float32Array.from(roundAt), poses, events,
     result: {w: o.w, l: o.l, how: o.how, round: o.round, time: o.time, move: o.move,
       pts: [F[0].pts, F[1].pts], dmg: [F[0].dmg, F[1].dmg], kd: [F[0].kd, F[1].kd], landed: [F[0].landed, F[1].landed], thrown: [F[0].thrown, F[1].thrown],

@@ -53,6 +53,9 @@ export function evadePose(e, dt) {
   if (MOVES[e.move].lvl !== 'head') return 'dodge';
   if (DUCK.has(e.move) || (e.move === 'cross' && h % 4 < 2)) return 'duck'; if (SLIP.has(e.move)) return h % 2 ? 'slipL' : 'slipR'; return 'dodge';
 }
+// The ring as the picture has it: where the slide toward the ropes starts (cm from the centre, engine units), how far the
+// body is behind the hips (m), the ropes from the centre (m), and how fast the pair slides over (m/s)
+export const ROPE = {from: 130, back: .3, r: 3.05, slide: .6};
 export function bake(fight) {
   const n = fight.nTicks, dt = fight.dt, TK = fight.ticks;
   const tick = (i, k, f) => TK[(Math.max(0, Math.min(n - 1, k)) * 2 + i) * TICK_FIELDS + f];
@@ -256,64 +259,11 @@ export function bake(fight) {
   const HOP = 7.5, hopUp = ph => Math.max(0, Math.sin(ph) + .25) / 1.25, hopPh = [new Float32Array(n), new Float32Array(n)];
   for (let i = 0; i < 2; i++) for (let k = 0; k < n; k++) hopPh[i][k] = i * 1.7 + HOP * k * dt; // a steady beat: pressing forward does not hurry the feet
 
-  // Footwork. The simulation slides a fighter along the ring; here the feet are pinned to the canvas.
-  // A fighter on his toes moves by bouncing: both feet shift together while he is in the air, and now and then
-  // he switches his feet for one bounce. Out of the bounce (mid-strike, hurt) a late foot steps across on its own.
-  const GROUNDED = new Set([STATE.intro, STATE.idle, STATE.move, STATE.hit, STATE.block, STATE.stun, STATE.rest, STATE.cover, STATE.win]);
-  function footwork(i) {
-    const B = baked[i], dir = i ? -1 : 1, TH = .08, LIFT = .05, STEP_GAP = .3, IW = idleW[i]; // STEP_GAP: both feet down this long between steps
-    const root = k => tick(i, k, 0) * .01 * dir;                 // position along the fighter's own forward axis
-    const feet = [IDX.fL, IDX.fR].map((base, j) => ({base, j, w: 0, at: root(0) + B[base], step: null}));
-    let wasUp = false, stepEnd = -9;
-    for (let k = 0; k < n; k++) {
-      const o = k * NP, t = k * dt, a = root(k), st = tick(i, k, 4);
-      const ok = GROUNDED.has(st) && Math.abs(B[o + IDX.spin]) < .05 && B[o + IDX.jump] < .02;
-      for (const f of feet) {
-        const lx0 = f.lx; f.lx = B[o + f.base]; f.ly = B[o + f.base + 1]; f.can = ok && f.ly < .035; f.des = a + f.lx;
-        if (f.can && k && !f.step) f.at += f.lx - lx0; // the pose moves the foot (stepping in with a punch): it slides there
-        if (!f.can) { f.w = Math.max(0, f.w - dt / .07); f.step = null; f.at = f.des; continue; }
-        f.w = Math.min(1, f.w + dt / .1);
-        if (f.step && t >= f.step.t0 + f.step.dur) { f.at = f.step.to; f.step = null; if (f.lift) stepEnd = t; }
-        if (!f.step) f.at = Math.max(f.des - .25, Math.min(f.des + .25, f.at)); // shoved a long way: the foot drags rather than stretches into a split
-      }
-      const md = mode[i][k], ph = hopPh[i][k], up = hopUp(ph) > 0, bouncing = IW[k] > .5 && hopGate(i, t, md) > .5;
-      if (md === 2 && !bouncing && IW[k] === 1 && slowSwitch(i, t)) { feet[0].des -= .26; feet[1].des += .26; }
-      if (bouncing && up && !wasUp) { // leaving the canvas: both feet go to where they will be wanted on landing
-        let k2 = k + 1; while (k2 < n - 1 && hopUp(hopPh[i][k2]) > 0) k2++;
-        const sw = IW[k] === 1 && IW[k2] === 1 && hash(Math.floor(ph / (Math.PI * 2)) * 7 + i * 3) < .15; // a quick switch of the feet
-        for (const f of feet) {
-          if (!f.can) continue;
-          const to = root(k2) + B[k2 * NP + f.base] + (sw ? (f.j ? .3 : -.3) : 0);
-          if (Math.abs(to - f.at) > .012) { f.step = {t0: t, dur: (k2 - k) * dt, from: f.at, to, lift: 0}; f.lift = false; }
-        }
-      } else if (!feet[0].step && !feet[1].step) { // off the bounce, or left too far behind to wait for the next hop
-        // the faster he goes, the further a foot may trail before it steps, so a dart in or back is a few
-        // steps, not a patter; but no further, or the stance opens into a split
-        const speed = Math.abs(root(Math.min(n - 1, k + 4)) - a) / (4 * dt);
-        const hurt = st === STATE.hit || st === STATE.block || st === STATE.cover || st === STATE.stun;
-        const late = feet.filter(f => f.can && Math.abs(f.des - f.at) > (bouncing || hurt ? .24 : TH + Math.min(.05, speed * .04)));
-        if (late.length && t - stepEnd >= STEP_GAP) {
-          const fwd = late[0].des - late[0].at > 0, f = late.length > 1 ? feet[fwd ? 0 : 1] : late[0];
-          const dur = Math.max(.2, Math.min(.32, .32 - speed * .12)) * (md === 2 ? 1.5 : md === 1 ? 1.2 : 1); // unhurried steps, the foot lifted
-          const k2 = Math.min(n - 1, k + Math.round(dur / dt)), ahead = Math.min(.07, speed * .06) * (fwd ? 1 : -1);
-          f.step = {t0: t, dur, from: f.at, to: root(k2) + B[k2 * NP + f.base] + (f.des - a - f.lx) + ahead, lift: LIFT}; f.lift = true;
-        }
-      }
-      wasUp = up;
-      for (const f of feet) {
-        let at = f.at, lift = 0;
-        if (f.step) { const p = Math.min(1, (t - f.step.t0) / f.step.dur); at = f.step.from + (f.step.to - f.step.from) * ease(p); lift = Math.sin(p * Math.PI) * f.step.lift; }
-        B[o + f.base] = f.lx + (at - a - f.lx) * f.w; B[o + f.base + 1] = f.ly + lift * f.w;
-      }
-    }
-  }
-  footwork(0); footwork(1);
-
   // Circling (presentation only): the line between the two fighters turns around the ring centre while neither is
   // throwing, one way for a few seconds then maybe the other, faster while feeling each other out, faster still when
   // the man backing up is at the ropes (he slides along them to get out). Still during exchanges and counts, back
   // to the starting line at the bell and between rounds. Read from the ticks, so every viewer sees the same.
-  const theta = new Float32Array(n + 1);
+  const theta = new Float32Array(n + 1), pivoting = new Uint8Array(n + 1); // pivoting: a man is stepping off the ropes at this tick
   {
     const busy = new Uint8Array(n + 1), SPIN = .45, CIRCLE = .4, H = x => { const v = Math.sin(x * 91.7 + 13.1) * 43758.5453; return v - Math.floor(v); };
     for (let k = 0; k < n; k++) for (let i = 0; i < 2; i++) {
@@ -322,6 +272,9 @@ export function bake(fight) {
     }
     const wide = Math.round(.35 / dt), act = new Uint8Array(n + 1); // an exchange holds the line a moment either side
     for (let k = 0; k < n; k++) if (busy[k]) for (let j = Math.max(0, k - wide); j <= Math.min(n, k + wide); j++) act[j] = 1;
+    // The side step off the ropes (the engine's 'pivot'): the line swings PIVOT radians while the pair comes back toward
+    // the middle, to the side that leaves the man who was trapped more room. Not held to the circling speed.
+    const PIVOT = .8, pivotRate = new Float32Array(n + 1), pivots = fight.events.filter(e => e.type === 'pivot'), begun = new Set();
     let th = 0, w = 0, trapDir = 0;
     for (let k = 0; k < n; k++) {
       const t = k * dt, s0 = TK[(k * 2) * TICK_FIELDS + 4], s1 = TK[(k * 2 + 1) * TICK_FIELDS + 4];
@@ -343,13 +296,111 @@ export function bake(fight) {
         const far = Math.max(Math.abs(TK[(k * 2) * TICK_FIELDS]), Math.abs(TK[(k * 2 + 1) * TICK_FIELDS])), r = Math.max(.7, far * .01 + Math.max(0, far - 130) * .01);
         want = Math.max(-CIRCLE / r, Math.min(CIRCLE / r, want));
       }
-      w += (want - w) * Math.min(1, dt * 3.2); th += w * dt; theta[k] = th;
+      for (const e of pivots) if (!begun.has(e) && k >= Math.round(e.t / dt)) { // starting now: choose the side from where they stand
+        begun.add(e); const kn = Math.min(n, k + Math.round(e.dur / dt)), xb = TK[(k * 2 + e.by) * TICK_FIELDS] * .01, r = Math.max(.8, Math.abs(xb) - RULES.pivotShift * .01 + .3), sg = Math.sign(xb) || 1; // about where he will stand afterwards
+        const room = a => { const px = sg * r * Math.cos(a), pz = -sg * r * Math.sin(a); return ROPE.r - Math.max(Math.abs(px), Math.abs(pz)); }; // how far inside the ropes he would be on that line
+        const d = Math.abs(room(th + PIVOT) - room(th - PIVOT)) > .15 ? (room(th + PIVOT) > room(th - PIVOT) ? 1 : -1) : e.dir;
+        for (let j = k; j < kn; j++) { const u = (j - k + .5) / (kn - k); pivotRate[j] = d * PIVOT * 6 * u * (1 - u) / e.dur; pivoting[j] = 1; }
+      }
+      if (pivoting[k]) { w = pivotRate[k]; trapDir = 0; } else w += (want - w) * Math.min(1, dt * 3.2);
+      th += w * dt; theta[k] = th;
     }
     theta[n] = th;
   }
+  // Near the ropes the pair moves over together along the fight line (the gap between them, and so every blow,
+  // unchanged) until the back man leans on the ropes: the engine keeps them 2.35 m either side of the centre at most,
+  // the ropes are at 3.05 m, and a square ring reaches farther along its diagonals. It follows what is wanted at
+  // ROPE.slide metres a second at most. The footwork below counts it as ground covered, so the feet step it
+  // (it used to be added on screen only, and both men slid over with their feet still).
+  const LIMIT = fight.limit || RULES.limit, shift = new Float32Array(n + 1);
+  {
+    let cur = 0;
+    for (let k = 0; k <= n; k++) {
+      const kk = Math.min(n - 1, k), xa = TK[(kk * 2) * TICK_FIELDS], xb = TK[(kk * 2 + 1) * TICK_FIELDS], back = Math.abs(xa) > Math.abs(xb) ? xa : xb;
+      const u = Math.max(0, Math.min(1, (Math.abs(back) - ROPE.from) / (LIMIT - ROPE.from))), c = Math.cos(theta[k]), sn = Math.sin(theta[k]);
+      const gain = Math.max(0, ROPE.r / Math.max(Math.abs(c), Math.abs(sn), 1e-3) + .22 - ROPE.back - LIMIT / 100), want = (Math.sign(back) || 1) * u * u * (3 - 2 * u) * gain;
+      const sl = ROPE.slide * (pivoting[Math.min(n, k)] ? 2.5 : 1); // stepping off the ropes, they come away from them with him
+      cur += Math.max(-sl * dt, Math.min(sl * dt, want - cur)); cur = Math.max(-gain, Math.min(gain, cur)); shift[k] = cur;
+    }
+  }
+  // Footwork. The simulation slides a fighter along the ring; here the feet are pinned to the canvas.
+  // A fighter on his toes moves by bouncing: both feet shift together while he is in the air, and now and then
+  // he switches his feet for one bounce. Out of the bounce (mid-strike, hurt) a late foot steps across on its own.
+  const GROUNDED = new Set([STATE.intro, STATE.idle, STATE.move, STATE.hit, STATE.block, STATE.stun, STATE.rest, STATE.cover, STATE.win]);
+  function footwork(i) {
+    const B = baked[i], dir = i ? -1 : 1, TH = .08, LIFT = .06, STEP_GAP = .3, IW = idleW[i]; // STEP_GAP: both feet down this long between steps
+    // walking: from this speed (m/s); seconds for a cycle of two steps and its floor; the longest stride (m); a foot's time in the air; both feet down between steps; how high the foot comes
+    const WALK = {from: .2, cycle: .96, quick: .7, stride: .55, swing: .34, gap: .08, lift: .09};
+    const root = k => (tick(i, k, 0) * .01 + shift[Math.max(0, Math.min(n, k))]) * dir; // position along the fighter's own forward axis, the slide to the ropes included
+    const feet = [IDX.fL, IDX.fR].map((base, j) => ({base, j, w: 0, at: root(0) + B[base], step: null}));
+    let wasUp = false, stepEnd = -9;
+    for (let k = 0; k < n; k++) {
+      const o = k * NP, t = k * dt, a = root(k), st = tick(i, k, 4);
+      const ok = GROUNDED.has(st) && Math.abs(B[o + IDX.spin]) < .05 && B[o + IDX.jump] < .02;
+      for (const f of feet) {
+        const lx0 = f.lx; f.lx = B[o + f.base]; f.ly = B[o + f.base + 1]; f.can = ok && f.ly < .035; f.des = a + f.lx;
+        if (f.can && k && !f.step) f.at += f.lx - lx0; // the pose moves the foot (stepping in with a punch): it slides there
+        if (!f.can) { f.w = Math.max(0, f.w - dt / .07); f.step = null; f.at = f.des; continue; }
+        f.w = Math.min(1, f.w + dt / .1);
+        if (f.step && t >= f.step.t0 + f.step.dur) { f.at = f.step.to; f.step = null; if (f.lift) stepEnd = t; }
+        if (!f.step) f.at = Math.max(f.des - .25, Math.min(f.des + .25, f.at)); // shoved a long way: the foot drags rather than stretches into a split
+      }
+      // Going somewhere (more than a shuffle a second): he walks, one foot lifted at a time, lead foot first then the
+      // other up to it. The bounce only carries small shifts; it used to carry the whole walk with the feet barely
+      // off the canvas, which read as dragging them.
+      const vs = (root(Math.min(n - 1, k + 6)) - root(Math.max(0, k - 2))) / (Math.min(n - 1, k + 6) - Math.max(0, k - 2)) / dt, going = Math.abs(vs) > WALK.from;
+      const md = mode[i][k], ph = hopPh[i][k], up = hopUp(ph) > 0, bouncing = IW[k] > .5 && hopGate(i, t, md) > .5 && !going;
+      if (md === 2 && !bouncing && IW[k] === 1 && slowSwitch(i, t)) { feet[0].des -= .26; feet[1].des += .26; }
+      if (bouncing && up && !wasUp) { // leaving the canvas: both feet go to where they will be wanted on landing
+        let k2 = k + 1; while (k2 < n - 1 && hopUp(hopPh[i][k2]) > 0) k2++;
+        const sw = IW[k] === 1 && IW[k2] === 1 && hash(Math.floor(ph / (Math.PI * 2)) * 7 + i * 3) < .15; // a quick switch of the feet
+        for (const f of feet) {
+          if (!f.can) continue;
+          const to = root(k2) + B[k2 * NP + f.base] + (sw ? (f.j ? .3 : -.3) : 0);
+          if (Math.abs(to - f.at) > .012) { f.step = {t0: t, dur: (k2 - k) * dt, from: f.at, to, lift: 0}; f.lift = false; }
+        }
+      } else if (!feet[0].step && !feet[1].step) { // off the bounce, or left too far behind to wait for the next hop
+        // the faster he goes, the further a foot may trail before it steps, so a dart in or back is a few
+        // steps, not a patter; but no further, or the stance opens into a split
+        const speed = Math.abs(root(Math.min(n - 1, k + 4)) - a) / (4 * dt);
+        const hurt = st === STATE.hit || st === STATE.block || st === STATE.cover || st === STATE.stun;
+        if (going && !hurt) {
+          // the walk: a cycle of two steps takes WALK.cycle seconds, shorter only when he would otherwise stride more
+          // than WALK.stride metres; a foot lands ahead of its place by half of what the body covers while it is planted,
+          // and steps again when it is that far behind
+          const sg = Math.sign(vs), v = Math.abs(vs), T = Math.max(WALK.quick, Math.min(WALK.cycle, WALK.stride / v)), dur = WALK.swing, reach = v * (T - dur) / 2;
+          const late = feet.filter(f => f.can && (f.des - f.at) * sg > Math.max(.04, reach * .9));
+          if (late.length && t - stepEnd >= WALK.gap) {
+            const f = late.length > 1 ? feet[sg > 0 ? 0 : 1] : late[0], k2 = Math.min(n - 1, k + Math.round(dur / dt));
+            f.step = {t0: t, dur, from: f.at, to: root(k2) + B[k2 * NP + f.base] + sg * reach, lift: WALK.lift}; f.lift = true;
+          }
+        } else {
+        const late = feet.filter(f => f.can && Math.abs(f.des - f.at) > (bouncing ? .24 : hurt ? .16 : TH + Math.min(.05, speed * .04)));
+        if (late.length && t - stepEnd >= (hurt ? .12 : STEP_GAP)) {
+          const fwd = late[0].des - late[0].at > 0, f = late.length > 1 ? feet[fwd ? 0 : 1] : late[0];
+          const dur = Math.max(.2, Math.min(.32, .32 - speed * .12)) * (md === 2 ? 1.5 : md === 1 ? 1.2 : 1); // unhurried steps, the foot lifted
+          const k2 = Math.min(n - 1, k + Math.round(dur / dt)), ahead = Math.min(.07, speed * .06) * (fwd ? 1 : -1);
+          f.step = {t0: t, dur, from: f.at, to: root(k2) + B[k2 * NP + f.base] + (f.des - a - f.lx) + ahead, lift: LIFT}; f.lift = true;
+        }
+        }
+      }
+      wasUp = up;
+      for (const f of feet) {
+        let at = f.at, lift = 0;
+        if (f.step) { const p = Math.min(1, (t - f.step.t0) / f.step.dur); at = f.step.from + (f.step.to - f.step.from) * ease(p); lift = Math.sin(p * Math.PI) * f.step.lift; }
+        // a foot carried along the canvas without a step (a lunge with a punch, a shove) comes off it a little: a skip, not a slide
+        const moved = f.was == null || f.step ? 0 : Math.abs(at - f.was) / dt; f.was = at;
+        f.skip = (f.skip || 0) + (Math.min(.028, Math.max(0, moved - .25) * .08) - (f.skip || 0)) * Math.min(1, dt / .06);
+        B[o + f.base] = f.lx + (at - a - f.lx) * f.w; B[o + f.base + 1] = f.ly + Math.max(lift, f.skip) * f.w;
+      }
+    }
+  }
+  footwork(0); footwork(1);
+
 
   const TL = {
     theta(t) { const x = Math.max(0, Math.min(n - 1.001, t / dt)), k = Math.floor(x); return theta[k] + (theta[k + 1] - theta[k]) * (x - k); }, // the fight line's turn (radians)
+    shift(t) { const x = Math.max(0, Math.min(n - 1.001, t / dt)), k = Math.floor(x); return shift[k] + (shift[k + 1] - shift[k]) * (x - k); }, // the pair's slide toward the ropes along the line (m)
     fight, n, dt, duration: (n - 1) * dt, baked, eff,
     val(i, t, f) {
       const x = Math.max(0, Math.min(n - 1.001, t / dt)), k = Math.floor(x), fr = x - k;

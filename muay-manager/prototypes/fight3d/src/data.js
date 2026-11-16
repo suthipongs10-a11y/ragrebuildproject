@@ -24,7 +24,7 @@ export const MOVES = {
              fr:[['kneeW',.12],['knee',.1],['guard',.24]]},
   body:     {th:'เตะลำตัว', en:'Body kick', kind:'kick', sfx:'kick', lvl:'body', reach:106, min:74, dmg:11, st:7, push:10, eff:'footR', react:'hitBodySide', gb:1, stun:0,
              fr:[['kickW',.13],['kickBody',.1],['kickW',.1],['guard',.16]]},
-  high:     {th:'เตะก้านคอ', en:'High kick', kind:'kick', sfx:'kick', lvl:'head', reach:102, min:76, dmg:17, st:9, push:10, eff:'footR', react:'hitHeadSide', gb:.9, stun:1.5,
+  high:     {th:'เตะก้านคอ', en:'High kick', kind:'kick', sfx:'kick', lvl:'head', reach:102, min:76, dmg:17, st:9, push:10, eff:'footR', react:'hitHeadSide', gb:.9, stun:2, kd:.05,
              fr:[['kickW',.15],['kickHigh',.11],['kickW',.12],['guard',.18]]},
   low:      {th:'เตะขา', en:'Low kick', kind:'kick', sfx:'kick', lvl:'leg', reach:106, min:74, dmg:8, st:5, push:3, eff:'footR', react:'hitLeg', gb:.8, stun:0,
              fr:[['kickW',.11],['kickLow',.09],['kickW',.09],['guard',.14]]},
@@ -118,6 +118,9 @@ export const RULES = {
   urgePts: 12, urgeCool: .16, urgeCover: .2, urgeDist: 6,
   planTime: 1.8,         // how long a man keeps closing in for the strike he has picked before he gives it up
   limit: 235,            // ring half width the fighters can use
+  // off the ropes: within pivotNear (cm) of the limit a man looks to step out sideways, pivotRate times a second (quicker
+  // men sooner); it takes pivotTime seconds and brings the pair pivotShift (cm) back toward the middle
+  pivotNear: 30, pivotRate: 1.3, pivotTime: 1.9, pivotShift: 95,
   startX: 85,
   dmgScale: .137,          // global damage multiplier
   dmgStat: [.6, .8],       // a blow's power: this much whatever the stat, plus this much times the stat (0-1)
@@ -125,27 +128,33 @@ export const RULES = {
   blockDmg: .06,         // share of base damage that gets through a block
   // how much more often than a style's own weights say each fist punch is chosen: fights are meant to have plenty of hands
   fistBias: {jab: 1.2, cross: 1.6, hook: 1.9, upper: 1.9, bodyshot: 1.6},
-  blockBase: .5, dodgeBase: .12,
+  blockBase: .7, dodgeBase: .15, // more guard and more head movement (owner, round 62: blows were landing too easily; 56% landed, now about 45%)
   evadeShare: .6,        // share of head-level blocks that become a slip or a duck (scaled by speed / 55)
   // On top of that, a man standing his ground gets out of the way: he slips punches to the head left and right, and bends
   // back or sucks his body back from kicks to the body and head (scaled by speed / 55)
-  slipBase: .12, kickDodge: .3,
+  slipBase: .17, kickDodge: .36,
   // a signature move trained up a level (spec.spLv, 1-3): harder to block or slip, and heavier, per level above the first
   spLvAcc: .15, spLvDmg: .1,
   // raising the guard on reading an attack: chance, and how much it helps when the read is right or wrong
-  coverBase: .2, coverDef: .4, coverRead: .75, coverBonus: .3, coverMul: 1.7, coverWrong: .5,
+  coverBase: .3, coverDef: .4, coverRead: .75, coverBonus: .3, coverMul: 1.7, coverWrong: .5,
   critChance: .1, critMul: 1.5, counterMul: 1.3,
   chainChance: .14,      // chance to attack again right away without a named combo
   coolMin: .4, coolMax: 1.15,
   stRegen: 4.6, stRegenEnd: 5,
-  spGain: 1.9, spTake: 1.1,
+  spGain: 2.3, spTake: 1.1, // fewer blows land since round 62, so each fills the gauge a little more
   // stun
-  stunMin: 21, stunSpan: 34, stunWearDiv: 400, stunRest: 7, stunDurMin: 1.5, stunDurSpan: 1.1,
+  // (owner, round 62: men shook off clean shots too easily. A flush shot dazes more surely, the daze lasts longer, and for
+  // a few seconds after it he is still groggy: slower hands and feet, easier to put down.)
+  stunMin: 19, stunSpan: 30, stunWearDiv: 400, stunRest: 3.5, stunDurMin: 2.1, stunDurSpan: 1.5,
+  stunClean: 1.35,       // a flush shot (a counter or right on the button) dazes this much more surely
+  groggyTime: 4.5, groggyDef: .7, groggyKd: 1.25, groggyWalk: .75,
+  rockHold: .25,         // a heavy shot to the head that does not daze still rocks him: this much longer before he is himself again
+  kdMoveRaw: 13, kdMoveClean: 2, // a move's own knockdown chance (MOVES kd) needs this much behind it, and counts double when flush
   // knockdown: only head shots put a fighter down
-  kdRaw: 21, kdChance: .015, kdStunRaw: 10, kdStunChance: .1, kdLowHp: 25, kdLowChance: .02,
-  kdWearDiv: 600, outBase: .4, outRawDiv: 50, outHpDiv: 300,
+  kdRaw: 21, kdChance: .015, kdStunRaw: 10, kdStunChance: .08, kdLowHp: 25, kdLowChance: .02,
+  kdWearDiv: 600, outBase: .46, outRawDiv: 50, outHpDiv: 300,
   // a clean shot (counter or flush) is what usually ends a Muay Thai fight
-  kdClean: .035, outClean: .1, kdSpecialMul: .8,
+  kdClean: .04, outClean: .1, kdSpecialMul: .8,
   // clinch: knees thrown, time before the referee breaks it, chance the held fighter shakes loose after each knee
   clinchKneesMin: 2, clinchKneesSpan: 3, clinchMax: 3.8, clinchEscape: .12, clinchDist: 48,
   clinchEnter: .7, clinchShove: 22, // chance a reach for the neck ties the other man up; otherwise he is shoved back this far (cm)
