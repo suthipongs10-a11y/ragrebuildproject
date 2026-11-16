@@ -109,9 +109,9 @@ export function buildAudio() {
       if (bed.on) bedTick();
       // the recorded crowd (CC-BY, see CREDITS.md) under everything, rising with the action; the made-up noise until it is decoded
       crowdGain.gain.setTargetAtTime(phase === 'off' ? 0 : (bed.on ? (playing ? .16 + hype * .42 : .07) : (playing ? .035 + hype * .16 : .02)) * duck, AC.currentTime, .25); // no crowd in the camp
-      const playOn = phase === 'fight' || phase === 'intro' || phase === 'cer';
+      const playOn = phase === 'fight' || phase === 'intro'; // the ring music ends with the fight: the raised hand has the crowd alone (its own music is to come)
       // the recorded music is a soft bed under the commentary; the made-up pipe and drums stand in until it is decoded
-      const lvl = T.tracks ? (phase === 'fight' ? .16 + (pace || 0) * .08 : .26) : .55;
+      const lvl = T.tracks ? (phase === 'fight' ? .144 + (pace || 0) * .072 : .234) : .55; // a tenth quieter again (owner, round 58); the crowd is unchanged
       music.gain.setTargetAtTime((playOn ? lvl : 0) * duck, AC.currentTime, playOn ? .3 : .8);
       // Ringside music speeds up with the fight: slow and stately for the wai kru, then about 100 to 180 beats a minute.
       M.bpm = phase === 'intro' ? 84 : phase === 'cer' ? 126 : 100 + (pace || 0) * 66 + hype * 14 + (round - 1) * 4;

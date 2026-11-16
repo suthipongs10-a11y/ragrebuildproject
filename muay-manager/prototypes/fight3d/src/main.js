@@ -734,7 +734,7 @@ function frame(ts) {
   const phase = mode !== 'live' || frozen || playT >= marks.over ? 'off' : playT <= marks.introEnd ? 'intro' : ck.clock <= 0 ? 'rest' : 'fight';
   arena.update(realT, hype, dt); audio.update(dt, hype, fighting && !frozen, ck.round, TL.pace(playT), phase);
   if (phase === 'intro' && !introSaid && playT > .6) { introSaid = true; voice.intro(audio.time()); }
-  if (phase === 'fight') { const a = TL.val(0, playT, 8), b = TL.val(1, playT, 8); voice.update(audio.time(), {fighting: true, pace: TL.pace(playT), lead: a === b ? -1 : a > b ? 0 : 1, margin: Math.abs(a - b)}); }
+  if (phase === 'fight') { const a = TL.val(0, playT, 8), b = TL.val(1, playT, 8); voice.update(audio.time(), {fighting: true, pace: TL.pace(playT), lead: a === b ? -1 : a > b ? 0 : 1, margin: Math.abs(a - b), clock: ck.clock}); }
   renderer.render(scene, camera);
   hud(dt);
   fpsAcc += dt; fpsN++; if (fpsAcc > 1) { $('fps').textContent = Math.round(fpsN / fpsAcc) + ' fps'; fpsAcc = 0; fpsN = 0; }
@@ -979,7 +979,7 @@ const start = async () => {
   await Promise.resolve(); // the game entry registers its boot function after this module has run
   if (GAME_MODE && window.MUAY_BOOT) { arena.setVenue('camp'); arena.setLook(OPT.look, renderer, scene); requestAnimationFrame(frame); window.MUAY_BOOT(API); return; }
   await loadPair();
-  $('ver').textContent = 'รุ่น 53 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
+  $('ver').textContent = 'รุ่น 55 · ' + (MODEL ? 'โมเดล 3D' : 'ตัวจากโค้ด'); // lets a viewer tell a stale cached page from a failed model load
   newFight(SAMPLE_SEEDS[Math.floor(Math.random() * SAMPLE_SEEDS.length)]); applyOpt(); requestAnimationFrame(frame);
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision
