@@ -1,342 +1,2027 @@
 {
  "intro-0": {
-  "h": "1f1db9620b61",
-  "text": "ไหว้ครูร่ายรำกันก่อนชกครับ"
+  "h": "207a584350ff",
+  "text": "ไหว้ครูกันก่อนชกครับ",
+  "s": 1.44,
+  "heard": "ไหว้ครูกันก่อนชกครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "intro-1": {
-  "h": "63608ad9f332",
-  "text": "คู่นี้น่าสนใจมากครับ ไหว้ครูกันก่อน"
+  "h": "a474d310505d",
+  "text": "สวัสดีครับแฟนมวย",
+  "s": 1.44,
+  "heard": "สวัสดีครับแฟนมวย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "intro-2": {
+  "h": "85d25ac61084",
+  "text": "คู่นี้น่าดูมากครับ",
+  "s": 1.54,
+  "heard": "คู่นี้น่าดูมากครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "intro-3": {
+  "h": "c3c796b575ac",
+  "text": "ขึ้นเวทีไหว้ครูแล้วครับ",
+  "s": 1.52,
+  "heard": "ขึ้นเวทีไหว้ครูแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "bell1-0": {
-  "h": "da8c66bf81d8",
-  "text": "ระฆังยกแรกดังขึ้นแล้วครับ!"
+  "h": "22df49a1218b",
+  "text": "ระฆังยกแรกดังขึ้นแล้วครับ!",
+  "s": 1.7,
+  "heard": "ระฆังยกแรกดังขึ้นแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bell1-1": {
+  "h": "b8a937c3a5be",
+  "text": "เริ่มแล้วครับ ยกที่หนึ่ง!",
+  "s": 1.25,
+  "heard": "เริ่มแล้วครับ ยกที่หนึ่ง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bell1-2": {
+  "h": "c558b5f1ce51",
+  "text": "ระฆังดัง! เปิดฉากกันแล้วครับ!",
+  "s": 1.88,
+  "heard": "ระฆังดัง เปิดฉากกันแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "round2-0": {
-  "h": "24f3556bac93",
-  "text": "ยกที่สองครับ เริ่มเร่งกันแล้ว"
+  "h": "3808974ad4ba",
+  "text": "ยกที่สองครับ เริ่มเร่งกันแล้ว!",
+  "s": 2.09,
+  "heard": "ยกที่สองครับ เริ่มเร่งกันแล้ว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "round2-1": {
-  "h": "f7fbee0ad225",
-  "text": "เข้าสู่ยกที่สองครับ"
+  "h": "1efddd784a58",
+  "text": "เข้าสู่ยกที่สองครับ!",
+  "s": 1.23,
+  "heard": "เข้าสู่ยกที่สองครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round2-2": {
+  "h": "6e2d45cb4e29",
+  "text": "ยกสองมาแล้ว! เกมเริ่มเดือดครับ!",
+  "s": 2.09,
+  "heard": "ยกสองมาแล้ว เกมเริ่มเดือดครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round2-3": {
+  "h": "e1099a8e84fa",
+  "text": "ระฆังยกสอง! ต้องเก็บแต้มกันแล้วครับ!",
+  "s": 2.4,
+  "heard": "ระฆังยกสอง ต้องเก็บแต้มกันแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "round3-0": {
-  "h": "60f52f0d141b",
-  "text": "ยกสุดท้ายแล้วครับ! ใครจะเอาชนะ"
+  "h": "eea8460fbd61",
+  "text": "ยกสุดท้ายแล้วครับ! ใครจะเอาชนะ!",
+  "s": 2.48,
+  "heard": "ยกสุดท้ายแล้วครับ ใครจะเอาชนะ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "round3-1": {
-  "h": "f3815c676dd2",
-  "text": "ยกที่สาม ยกตัดสินครับ!"
+  "h": "4ecd811c9e84",
+  "text": "ยกที่สาม ยกตัดสินครับ!",
+  "s": 2.14,
+  "heard": "ยกที่สาม ยกตัดสินครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round3-2": {
+  "h": "ea7bcf346740",
+  "text": "ยกสุดท้าย! ใส่กันให้หมดครับ!",
+  "s": 1.96,
+  "heard": "ยกสุดท้าย ใส่กันให้หมดครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round3-3": {
+  "h": "bdb59ad4eb6f",
+  "text": "ยกสุดท้าย! ชี้เป็นชี้ตายกันยกนี้ครับ!",
+  "s": 2.64,
+  "heard": "ยกสุดท้าย ชี้เป็นชี้ตายกันยกนี้ครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "rest-0": {
-  "h": "297a3a5f8b57",
-  "text": "หมดยกครับ พักให้น้ำ"
+  "h": "e0290447dc5e",
+  "text": "หมดยกครับ พักให้น้ำ",
+  "s": 1.49,
+  "heard": "หมดยกครับ พักให้น้ำ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "rest-1": {
-  "h": "2024cd5eabca",
-  "text": "หมดยกครับ"
+  "h": "3934757699f2",
+  "text": "หมดยกครับ",
+  "s": 0.63,
+  "heard": "หมดยกครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "rest-2": {
+  "h": "fdb0072558c6",
+  "text": "ระฆังหมดยก พี่เลี้ยงเข้าให้น้ำครับ",
+  "s": 2.06,
+  "heard": "ระฆังหมดยก พี่เลี้ยงเข้าให้น้ำครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "rest-3": {
+  "h": "87769153c4d8",
+  "text": "หมดยกแล้วครับ กลับเข้ามุมไปฟังแผนจากพี่เลี้ยง",
+  "s": 3.16,
+  "heard": "หมดยกแล้วครับ กลับเข้ามุมไปฟังแผนจากพี่เลี้ยง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "decWait-0": {
-  "h": "1797daed9d77",
-  "text": "ครบสามยก รอฟังผลการตัดสินครับ"
+  "h": "198d46b24f31",
+  "text": "ครบสามยก รอฟังผลการตัดสินครับ",
+  "s": 2.4,
+  "heard": "ครบสามยก รอฟังผลการตัดสินครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decWait-1": {
+  "h": "93bf6868bd9d",
+  "text": "ครบยกแล้วครับ ลุ้นคะแนนจากกรรมการ",
+  "s": 2.32,
+  "heard": "ครบยกแล้วครับ ลุ้นคะแนนจากกรรมการ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decWait-2": {
+  "h": "cffa80789141",
+  "text": "ชกกันครบสามยก มาฟังคำตัดสินกันครับ",
+  "s": 2.46,
+  "heard": "ชกกันครบสามยก มาฟังคำตัดสินกันครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "feel-0": {
-  "h": "acaaffb681b8",
-  "text": "ยกแรกยังดูเชิงกันอยู่ครับ"
+  "h": "45b22d2ef054",
+  "text": "ต่างฝ่ายต่างยังไม่เปิดเกม",
+  "s": 1.85,
+  "heard": "ต่างฝ่ายต่างยังไม่เปิดเกม",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "feel-1": {
-  "h": "2be4eec48c3a",
-  "text": "ต่างฝ่ายต่างยังไม่เปิดเกม"
+  "h": "8ebc7ff279eb",
+  "text": "ขยับหาระยะกันอยู่ครับ",
+  "s": 1.23,
+  "heard": "ขยับหาระยะกันอยู่ครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "feel-2": {
-  "h": "3ba90295af43",
-  "text": "ตอดแย็บหาระยะกันอยู่ครับ"
+  "h": "287a927b1f1f",
+  "text": "ยังวัดเชิงกันอยู่",
+  "s": 1.31,
+  "heard": "ยังวัดเชิงกันอยู่",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "feel-3": {
-  "h": "7d4f85a8b5b8",
-  "text": "ยังวัดเชิงกันอยู่"
+  "h": "f28443f52eff",
+  "text": "ยังคุมเชิงกันอยู่ครับ รอจังหวะ",
+  "s": 1.96,
+  "heard": "ยังคุมเชิงกันอยู่ รอจังหวะ",
+  "ok": 0.86,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
- "busy-0": {
-  "h": "1007c94d63a3",
-  "text": "แลกกันไม่มีใครยอมใคร!"
+ "feel-4": {
+  "h": "d10d42588224",
+  "text": "โยกหาจังหวะกันอยู่ครับ",
+  "s": 1.33,
+  "heard": "โยกหาจังหวะกันอยู่ครับ หนึ่ง",
+  "ok": 0.84,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
- "busy-1": {
-  "h": "db1abc0e0d0f",
-  "text": "เกมเริ่มดุเดือดแล้วครับ!"
- },
- "busy-2": {
-  "h": "463addc5ba9b",
-  "text": "ยังสูสีกันมากครับ"
- },
- "leadRed-0": {
-  "h": "cf607cc94437",
-  "text": "มุมแดงเก็บแต้มนำอยู่ครับ"
- },
- "leadBlue-0": {
-  "h": "f4a70860684e",
-  "text": "มุมน้ำเงินเก็บแต้มนำอยู่ครับ"
- },
- "punch-0": {
-  "h": "2bd9e6502a8a",
-  "text": "หมัดเข้าเต็มๆ!"
- },
- "punch-1": {
-  "h": "02fd2f6af434",
-  "text": "หมัดตรงเข้าหน้า!"
- },
- "hook-0": {
-  "h": "7eaab230a962",
-  "text": "ฮุกเข้าไปแล้ว!"
- },
- "upper-0": {
-  "h": "f6ecc47719fc",
-  "text": "หมัดเสยเข้าคาง!"
- },
- "bodyPunch-0": {
-  "h": "67beb33936e3",
-  "text": "หมัดเข้าลำตัว!"
- },
- "elbow-0": {
-  "h": "48198795c92a",
-  "text": "ศอก! เข้าไปแล้ว!"
- },
- "elbow-1": {
-  "h": "01cb0d8d7700",
-  "text": "ศอกเข้าเต็มๆ!"
- },
- "knee-0": {
-  "h": "30a636eaf401",
-  "text": "เข่าเข้าลำตัว!"
- },
- "knee-1": {
-  "h": "80d4045ee7c6",
-  "text": "ตีเข่าหนักมาก!"
- },
- "bodyKick-0": {
-  "h": "96a4be3b3086",
-  "text": "เตะลำตัวเข้าเต็มๆ!"
- },
- "bodyKick-1": {
-  "h": "52f93415d699",
-  "text": "เตะเข้าชายโครง!"
- },
- "highKick-0": {
-  "h": "51ccb37c9fc7",
-  "text": "เตะก้านคอ! เข้าไปแล้ว!"
- },
- "lowKick-0": {
-  "h": "71c3398c3848",
-  "text": "เตะขาหนักมาก!"
- },
- "teep-0": {
-  "h": "79cda1ebba0d",
-  "text": "ถีบเข้าไปเต็มๆ!"
- },
- "counter-0": {
-  "h": "8fb205fda5c2",
-  "text": "สวนกลับทันที!"
- },
- "counter-1": {
-  "h": "bf4621ed3359",
-  "text": "สวนจังหวะสวยมาก!"
- },
- "combo-0": {
-  "h": "4794b14c8e06",
-  "text": "เข้าเป็นชุด!"
- },
- "combo-1": {
-  "h": "3e361d307fbb",
-  "text": "ต่อเนื่องเป็นชุดเลยครับ!"
- },
- "special-0": {
-  "h": "c799f5b8d337",
-  "text": "ท่าไม้ตาย!"
- },
- "block-0": {
-  "h": "0bf64b5f1b17",
-  "text": "ป้องกันไว้ได้"
- },
- "block-1": {
-  "h": "9749119e4bda",
-  "text": "บังไว้ได้ครับ"
- },
- "leanBack-0": {
-  "h": "48aca3ad2822",
-  "text": "เอนหลบสวยมาก!"
- },
- "leanBack-1": {
-  "h": "2f2cb930b432",
-  "text": "หลบลูกเตะได้!"
- },
- "catch-0": {
-  "h": "78b668ff2eda",
-  "text": "จับขาไว้ได้!"
- },
- "clinch-0": {
-  "h": "84cd63ae3ea8",
-  "text": "เข้ากอดคอแล้วครับ"
- },
- "clinch-1": {
-  "h": "9b72d72fd660",
-  "text": "กอดคอปล้ำกันแล้ว"
- },
- "clinchHit-0": {
-  "h": "2cbbc6cea605",
-  "text": "ตีเข่าในวงกอด!"
- },
- "clinchHit-1": {
-  "h": "30af6667c559",
-  "text": "ศอกในวงกอด!"
- },
- "separate-0": {
-  "h": "0e9e6632b6bc",
-  "text": "กรรมการเข้าแยกครับ"
- },
- "elbowOut-0": {
-  "h": "f45266754095",
-  "text": "ศอกสวนหลุดวงกอด!"
- },
- "throw-0": {
-  "h": "dc3f25d87cd4",
-  "text": "เหวี่ยงล้มลงไปเลย!"
- },
- "teepDump-0": {
-  "h": "77fb3353957c",
-  "text": "ถีบล้มก้นจ้ำเบ้า!"
- },
- "stun-0": {
-  "h": "1fda2d6c0736",
-  "text": "เมาหมัดแล้วครับ! ตามถล่ม!"
- },
- "stun-1": {
-  "h": "b82925811823",
-  "text": "ขาเริ่มไม่อยู่แล้ว!"
- },
- "stunEnd-0": {
-  "h": "f6b972c60116",
-  "text": "ตั้งหลักได้แล้วครับ"
- },
- "kd-0": {
-  "h": "ebbde43adfd7",
-  "text": "ล้มลงไปแล้วครับ! กรรมการเริ่มนับ!"
- },
- "kd-1": {
-  "h": "3dc53be51039",
-  "text": "ลงไปนอนแล้ว!"
- },
- "getup-0": {
-  "h": "2faafdcafcbf",
-  "text": "ลุกขึ้นมาได้ครับ สู้ต่อ!"
- },
- "ko-0": {
-  "h": "85e28e1db95a",
-  "text": "น็อกเอาต์! จบแล้วครับ!"
- },
- "ko-1": {
-  "h": "79325238be71",
-  "text": "ลุกไม่ขึ้นแล้วครับ! จบแล้ว!"
- },
- "winRed-0": {
-  "h": "b8cc1f97a678",
-  "text": "มุมแดงชนะครับ!"
- },
- "winBlue-0": {
-  "h": "ea8efc9cae6f",
-  "text": "มุมน้ำเงินชนะครับ!"
- },
- "decRed-0": {
-  "h": "27db1002c674",
-  "text": "มุมแดงชนะคะแนนครับ!"
- },
- "decBlue-0": {
-  "h": "8cce58bd9aea",
-  "text": "มุมน้ำเงินชนะคะแนนครับ!"
+ "feel-5": {
+  "h": "af7021cc041f",
+  "text": "ยังไม่มีใครเสี่ยงเปิดก่อนครับ",
+  "s": 1.85,
+  "heard": "ยังไม่มีใครเสี่ยงเปิดก่อนครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "count-0": {
-  "h": "423fb44555ec",
-  "text": "หนึ่ง"
+  "h": "d35d65f38582",
+  "text": "หนึ่ง",
+  "s": 0.34,
+  "heard": "หนึ่ง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "count-1": {
-  "h": "58b8fde472c5",
-  "text": "สอง"
+  "h": "eedb9193ad2b",
+  "text": "สอง",
+  "s": 0.71,
+  "heard": "สอง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "count-2": {
-  "h": "5502b9035738",
-  "text": "สาม"
+  "h": "91325476b5ab",
+  "text": "สาม",
+  "s": 0.6,
+  "heard": "สาม",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "count-3": {
-  "h": "1b5a8b2139e7",
-  "text": "สี่"
+  "h": "6db0fb4b7775",
+  "text": "สี่",
+  "s": 0.63,
+  "heard": "สี่",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "count-4": {
-  "h": "d2fda292a94d",
-  "text": "ห้า"
+  "h": "61c6df7f2c28",
+  "text": "ห้า",
+  "s": 0.55,
+  "heard": "ห้า",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "count-5": {
-  "h": "80619449c9dd",
-  "text": "หก"
+  "h": "576953882d42",
+  "text": "หก",
+  "s": 0.55,
+  "heard": "หก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "count-6": {
-  "h": "7655925e39e8",
-  "text": "เจ็ด"
+  "h": "acb80977d397",
+  "text": "เจ็ด",
+  "s": 0.42,
+  "heard": "เจ็ด",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "count-7": {
-  "h": "0f061ffd508e",
-  "text": "แปด"
+  "h": "6c3669475a46",
+  "text": "แปด",
+  "s": 0.55,
+  "heard": "แปด",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "count-8": {
-  "h": "373bc4834400",
-  "text": "เก้า"
+  "h": "b451f21f0ceb",
+  "text": "เก้า",
+  "s": 0.57,
+  "heard": "เก้า",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "count-9": {
-  "h": "b57fafadff09",
-  "text": "สิบ"
+  "h": "94048361478f",
+  "text": "สิบ",
+  "s": 0.63,
+  "heard": "สิบ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-0": {
+  "h": "79d7cfdc3393",
+  "text": "แลกกันไม่มีใครยอมใคร!",
+  "s": 1.7,
+  "heard": "แลกกันไม่มีใครยอมใคร",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-1": {
+  "h": "825de51ec7c7",
+  "text": "เกมเริ่มดุเดือดแล้วครับ!",
+  "s": 1.23,
+  "heard": "เกมเริ่มดุเดือดแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-2": {
+  "h": "87af76b239ca",
+  "text": "ยังสูสีกันมากครับ!",
+  "s": 1.23,
+  "heard": "ยังสูสีกันมากครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-3": {
+  "h": "7ce9025f63b4",
+  "text": "ใส่กันไม่ยั้งเลยครับ!",
+  "s": 1.38,
+  "heard": "ใส่กันไม่ยั้งเลยครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-4": {
+  "h": "4bac6a09e19b",
+  "text": "เดินแลกกันสนุกมากครับ!",
+  "s": 1.75,
+  "heard": "เดินแลกกันสนุกมากครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-5": {
+  "h": "dc95d49dce87",
+  "text": "คนดูลุกขึ้นเชียร์กันทั้งสนามแล้วครับ!",
+  "s": 2.3,
+  "heard": "คนดูลุกขึ้นเชียร์กันทั้งสนามแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "close-0": {
+  "h": "b57bb4f44983",
+  "text": "แต้มสูสีมากครับ ยังชี้ขาดไม่ได้",
+  "s": 2.53,
+  "heard": "แต้มสูสีมากครับ ยังชี้ขาดไม่ได้",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "close-1": {
+  "h": "d8fd48ccdf85",
+  "text": "คะแนนเบียดกันมากครับ",
+  "s": 1.49,
+  "heard": "คะแนนเบียดกันมากครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "close-2": {
+  "h": "5234e575d07e",
+  "text": "ยังกินกันไม่ขาดครับ ต้องลุ้นกันต่อ",
+  "s": 2.12,
+  "heard": "ยังกินกันไม่ลงครับ ต้องลุ้นกันต่อ",
+  "ok": 0.9,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadRed-0": {
+  "h": "a0ad6250917c",
+  "text": "มุมแดงเก็บแต้มนำอยู่ครับ",
+  "s": 1.49,
+  "heard": "มุมแดงเก็บแต้มนำอยู่ครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadRed-1": {
+  "h": "f29d11bb35a1",
+  "text": "ตอนนี้มุมแดงทำแต้มได้ดีกว่าครับ",
+  "s": 1.78,
+  "heard": "ตอนนี้มุมแดงทำแต้มได้ดีกว่าครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadRed-2": {
+  "h": "c25f5b9ec6de",
+  "text": "มุมแดงออกอาวุธเข้าเป้าชัดกว่าครับ",
+  "s": 2.09,
+  "heard": "มุมแดงออกอาวุธเข้าเป้าชัดกว่าครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadBlue-0": {
+  "h": "5ab675ae45ff",
+  "text": "มุมน้ำเงินเก็บแต้มนำอยู่ครับ",
+  "s": 1.91,
+  "heard": "มุมน้ำเงินเก็บแต้มนำอยู่ครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadBlue-1": {
+  "h": "a2e01ab9e870",
+  "text": "ตอนนี้มุมน้ำเงินทำแต้มได้ดีกว่าครับ",
+  "s": 2.14,
+  "heard": "ตอนนี้มุมน้ำเงินทำแต้มได้ดีกว่าครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadBlue-2": {
+  "h": "a0e6ff39d388",
+  "text": "มุมน้ำเงินออกอาวุธเข้าเป้าชัดกว่าครับ",
+  "s": 2.25,
+  "heard": "มุมน้ำเงินออกอาวุธเข้าเป้าชัดกว่าครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "behindRed-0": {
+  "h": "48042a30f354",
+  "text": "มุมแดงแต้มตามอยู่ ต้องเร่งเครื่องแล้วครับ!",
+  "s": 2.32,
+  "heard": "มุมแดงแต้มตามอยู่ ต้องเร่งเครื่องแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "behindRed-1": {
+  "h": "3a40708050de",
+  "text": "มุมแดงต้องเดินแล้วครับ แต้มยังตาม!",
+  "s": 2.32,
+  "heard": "มุมแดงต้องเดินแล้วครับ แต้มยังตาม",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "behindBlue-0": {
+  "h": "f99a115095cd",
+  "text": "มุมน้ำเงินแต้มตามอยู่ ต้องเร่งเครื่องแล้วครับ!",
+  "s": 2.56,
+  "heard": "มุมน้ำเงินแต้มตามอยู่ ต้องเร่งเครื่องแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "behindBlue-1": {
+  "h": "920c4a3b6a39",
+  "text": "มุมน้ำเงินต้องเดินแล้วครับ แต้มยังตาม!",
+  "s": 2.48,
+  "heard": "มุมน้ำเงินต้องเดินแล้วครับ แต้มยังตาม",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadChange-0": {
+  "h": "eda8d9dc27a3",
+  "text": "พลิกกลับมานำแล้วครับ!",
+  "s": 1.23,
+  "heard": "พลิกกลับมานำแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadChange-1": {
+  "h": "52b1b9d298c9",
+  "text": "แต้มพลิกแล้วครับ! เกมเปลี่ยน!",
+  "s": 2.25,
+  "heard": "แต้มพลิกแล้วครับ เกมเปลี่ยน",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "timeLow-0": {
+  "h": "1fa9f1f0143b",
+  "text": "ใกล้หมดยกแล้ว! เร่งกันหน่อยครับ!",
+  "s": 1.93,
+  "heard": "ใกล้หมดยกแล้ว เร่งกันหน่อยครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "timeLow-1": {
+  "h": "66074d241054",
+  "text": "เวลาเหลือน้อยแล้วครับ! ใครจะเก็บแต้มได้อีก!",
+  "s": 2.14,
+  "heard": "เวลาเหลือน้อยแล้วครับ ใครจะเก็บแต้มได้อีก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "punch-0": {
+  "h": "7d5d8d56f084",
+  "text": "หมัดเข้าเต็มๆ!",
+  "s": 1.36,
+  "heard": "หมัดเข้าเต็มๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "punch-1": {
+  "h": "4e91fb7ed5bc",
+  "text": "หมัดตรงเข้าหน้า!",
+  "s": 1.02,
+  "heard": "หมัดตรงเข้าหน้า",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "punch-2": {
+  "h": "6c2cc016c49d",
+  "text": "หมัดเข้าปลายคาง!",
+  "s": 1.25,
+  "heard": "หมัดเข้าปลายคาง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "punch-3": {
+  "h": "76ea09109a4f",
+  "text": "ต่อยเข้าไปจังๆ!",
+  "s": 1.02,
+  "heard": "ต่อยเข้าไปจังๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "shout0-0": {
-  "h": "f7e2f0f46082",
-  "text": "เฮ้!"
- },
- "shout0-1": {
-  "h": "9a7cd8974bc5",
-  "text": "เฮ้!"
- },
- "shout0-2": {
-  "h": "77e734e4324f",
-  "text": "เฮ้!"
- },
- "shout0-3": {
-  "h": "cda5dfece199",
-  "text": "เฮ้!"
+  "h": "5224e5780f30",
+  "text": "เฮ้!",
+  "s": 0.97,
+  "heard": "เฮ้ย",
+  "ok": 0.72,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "shout1-0": {
-  "h": "3f112ce41ea0",
-  "text": "โอ้!"
+  "h": "cd634de0b1f9",
+  "text": "โอ้!",
+  "s": 0.34,
+  "heard": "โอ้",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "hook-0": {
+  "h": "e1f302238da0",
+  "text": "ฮุกเข้าไปแล้ว!",
+  "s": 0.73,
+  "heard": "ฮุคเข้าไปแล้ว",
+  "ok": 0.91,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "hook-1": {
+  "h": "1132ce082907",
+  "text": "ฮุกเข้ากกหู!",
+  "s": 1.1,
+  "heard": "ฮุคเข้ากกหู",
+  "ok": 0.9,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "hook-2": {
+  "h": "2276d14076b6",
+  "text": "เหวี่ยงฮุกเข้าเต็มหน้า!",
+  "s": 1.41,
+  "heard": "เหวี่ยงฮุกเข้าเต็มหน้า",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "upper-0": {
+  "h": "2a1651c2aa9b",
+  "text": "หมัดเสยเข้าคาง!",
+  "s": 1.49,
+  "heard": "หมัดเสยเข้าคาง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "upper-1": {
+  "h": "24ecaebf1ee5",
+  "text": "เสยปลายคางเข้าไป!",
+  "s": 1.44,
+  "heard": "เสยปลายคางเข้าไป",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "upper-2": {
+  "h": "ff28283a51df",
+  "text": "อัปเปอร์คัตเข้าเต็มๆ!",
+  "s": 1.36,
+  "heard": "อัปเปอร์คัตเข้าเต็มๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyPunch-0": {
+  "h": "d6c4a1718d6f",
+  "text": "หมัดเข้าลำตัว!",
+  "s": 1.12,
+  "heard": "หมัดเข้าลำตัว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyPunch-1": {
+  "h": "a11c34986cea",
+  "text": "ต่อยท้องเข้าไปจุกเลย!",
+  "s": 1.57,
+  "heard": "ต่อยท้องเข้าไปจุกเลย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyPunch-2": {
+  "h": "c163bdd6522f",
+  "text": "หมัดเข้าชายโครง!",
+  "s": 1.25,
+  "heard": "หมัดเข้าชายโครง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbow-0": {
+  "h": "32483a337886",
+  "text": "ศอก! เข้าไปแล้ว!",
+  "s": 1.83,
+  "heard": "ศอก เข้าไปแล้ว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbow-1": {
+  "h": "a7c59905ee59",
+  "text": "ศอกเข้าเต็มๆ!",
+  "s": 1.33,
+  "heard": "ศอกเข้าเต็มๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbow-2": {
+  "h": "65b24d08cd7a",
+  "text": "ตีศอกเข้าหน้า!",
+  "s": 1.12,
+  "heard": "ตีศอกเข้าหน้า",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbow-3": {
+  "h": "74a3ca902fbf",
+  "text": "ศอกตัดเข้าไป! อันตรายมาก!",
+  "s": 2.12,
+  "heard": "ศอกตัดเข้าไป อันตรายมาก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "knee-0": {
+  "h": "718d3db335b6",
+  "text": "เข่าเข้าลำตัว!",
+  "s": 1.2,
+  "heard": "เข่าเข้าลำตัว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "knee-1": {
+  "h": "081fac3bab1f",
+  "text": "ตีเข่าหนักมาก!",
+  "s": 1.65,
+  "heard": "ตีเข่าหนักมาก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "knee-2": {
+  "h": "b01982e4dcb1",
+  "text": "เข่าตรงเข้าท้อง!",
+  "s": 1.46,
+  "heard": "เข่าตรงเข้าท้อง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "knee-3": {
+  "h": "21eefccea9ba",
+  "text": "แทงเข่าเข้าไปจุกๆ!",
+  "s": 1.44,
+  "heard": "แทงเข่าเข้าไปจุกๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyKick-0": {
+  "h": "d0b8867ecbed",
+  "text": "เตะลำตัวเข้าเต็มๆ!",
+  "s": 1.44,
+  "heard": "เตะลำตัวเข้าเต็มๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyKick-1": {
+  "h": "c76195ab5d29",
+  "text": "เตะเข้าชายโครง!",
+  "s": 1.15,
+  "heard": "เตะเข้าชายโครง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyKick-2": {
+  "h": "042b4c7cabe0",
+  "text": "เตะตัดลำตัว เสียงดังสนั่น!",
+  "s": 1.99,
+  "heard": "เตะตัดลำตัวเสียงดังสนั่น",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyKick-3": {
+  "h": "ce025d6070e0",
+  "text": "หน้าแข้งฟาดเข้าลำตัว!",
+  "s": 1.78,
+  "heard": "หน้าแข้งฟาดเข้าลำตัว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "highKick-0": {
+  "h": "02b028940e7a",
+  "text": "เตะก้านคอ! เข้าไปแล้ว!",
+  "s": 1.75,
+  "heard": "เตะก้านคอเข้าไปแล้ว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "highKick-1": {
+  "h": "e2061683c634",
+  "text": "ก้านคอ! เต็มๆ เลยครับ!",
+  "s": 1.41,
+  "heard": "เตะก้านคอเต็มๆ เลยครับ",
+  "ok": 0.85,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "highKick-2": {
+  "h": "d3f961d557a8",
+  "text": "เตะสูงเข้าขากรรไกร!",
+  "s": 1.31,
+  "heard": "เตะสูงเข้าขากรรไกร",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKick-0": {
+  "h": "264818876948",
+  "text": "เตะขาหนักมาก!",
+  "s": 1.33,
+  "heard": "เตะขาหนักมาก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKick-1": {
+  "h": "ffb4741c36f0",
+  "text": "เตะตัดขาเข้าไป!",
+  "s": 1.25,
+  "heard": "เตะตัดขาเข้าไป",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKick-2": {
+  "h": "b349da350243",
+  "text": "เตะขาเข้าเต็มแข้ง!",
+  "s": 1.33,
+  "heard": "เตะขาเข้าเต็มแข้ง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teep-0": {
+  "h": "4aedb6265841",
+  "text": "ถีบเข้าไปเต็มๆ!",
+  "s": 1.31,
+  "heard": "ถีบเข้าไปเต็มๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "shout0-1": {
+  "h": "9fd33826672a",
+  "text": "เฮ้!",
+  "s": 0.5,
+  "heard": "เฮ้",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "shout1-1": {
-  "h": "b14d0b74ccc7",
-  "text": "โอ้!"
+  "h": "c58a34bda021",
+  "text": "โอ้!",
+  "s": 0.26,
+  "heard": "โอ้",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
- "shout1-2": {
-  "h": "6cd46b85f75d",
-  "text": "โอ้!"
+ "teep-1": {
+  "h": "f74b797271cc",
+  "text": "ถีบเข้าท้อง! ผงะเลย!",
+  "s": 1.72,
+  "heard": "ถีบเข้าท้อง ผงะเลย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
- "shout1-3": {
-  "h": "5c234aefc3ec",
-  "text": "โอ้!"
+ "teep-2": {
+  "h": "1a7400d39f85",
+  "text": "ถีบสกัดไว้ได้สวย!",
+  "s": 1.31,
+  "heard": "ถีบสกัดไว้ได้สวย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "counter-0": {
+  "h": "9844b4ab0e2a",
+  "text": "สวนกลับทันที!",
+  "s": 1.31,
+  "heard": "สวนกลับทันที",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "counter-1": {
+  "h": "d9e3cab14ec6",
+  "text": "สวนจังหวะสวยมาก!",
+  "s": 1.62,
+  "heard": "สวนจังหวะสวยมาก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "counter-2": {
+  "h": "85ad632ca30b",
+  "text": "โดนสวนเข้าเต็มๆ!",
+  "s": 1.46,
+  "heard": "โดนสวนเข้าเต็มๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "counter-3": {
+  "h": "eda9f6fc7402",
+  "text": "ชิงจังหวะสวนได้ก่อน!",
+  "s": 1.49,
+  "heard": "ชิงจังหวะสวนได้ก่อน",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "combo-0": {
+  "h": "f2b9b733865f",
+  "text": "เข้าเป็นชุด!",
+  "s": 0.78,
+  "heard": "เข้าเป็นชุด",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "combo-1": {
+  "h": "8486f5c543e5",
+  "text": "ต่อเนื่องเป็นชุดเลยครับ!",
+  "s": 1.31,
+  "heard": "ต่อเนื่องเป็นชุดเลยครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "combo-2": {
+  "h": "ff4d70995c33",
+  "text": "ออกอาวุธเป็นชุด เข้าหมดเลย!",
+  "s": 2.12,
+  "heard": "ออกอาวุธเป็นชุด เข้าหมดเลย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "special-0": {
+  "h": "a50b544e5049",
+  "text": "ท่าไม้ตาย!",
+  "s": 1.88,
+  "heard": "ท่าไม้ตาย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "special-1": {
+  "h": "946b92cab050",
+  "text": "ปล่อยไม้ตายออกมาแล้ว!",
+  "s": 1.96,
+  "heard": "ปล่อยไม้ตายออกมาแล้ว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "special-2": {
+  "h": "9f0f5bd57f0e",
+  "text": "โอ้โห! ลูกไม้มวยไทย!",
+  "s": 2.04,
+  "heard": "โอ้โห ลูกไม้มวยไทย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bigHit-0": {
+  "h": "e8c4d6ffb393",
+  "text": "โอ้โห! หนักมาก!",
+  "s": 2.25,
+  "heard": "โอ้โห หนักมาก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bigHit-1": {
+  "h": "344918d1771c",
+  "text": "เต็มๆ เลยครับ!",
+  "s": 0.99,
+  "heard": "เต็มๆ เลยครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bigHit-2": {
+  "h": "e50594078207",
+  "text": "เข้าไปจังๆ! สะเทือนเลย!",
+  "s": 2.25,
+  "heard": "เข้าไปจังๆ สะเทือนเลย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bigHit-3": {
+  "h": "89fe39a0220e",
+  "text": "โอ้โห! ลูกนี้หนักจริงๆ!",
+  "s": 1.72,
+  "heard": "โอ้โห ลูกนี้หนักจริงๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "block-0": {
+  "h": "edbec7ac88a2",
+  "text": "ป้องกันไว้ได้",
+  "s": 1.2,
+  "heard": "ป้องกันไว้ได้",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "block-1": {
+  "h": "0b6f7a4fdb59",
+  "text": "บังไว้ได้ครับ",
+  "s": 1.2,
+  "heard": "บังไว้ได้ครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "block-2": {
+  "h": "fca02dd7be8b",
+  "text": "การ์ดแน่นมากครับ",
+  "s": 1.12,
+  "heard": "การ์ดแน่นมากครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leanBack-0": {
+  "h": "f9e28cfd22e7",
+  "text": "เอนหลบสวยมาก!",
+  "s": 1.12,
+  "heard": "เอี้ยวหลบสวยมาก",
+  "ok": 0.79,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leanBack-1": {
+  "h": "1e32e027d0ec",
+  "text": "เอนตัวหลบ เฉียดไปนิดเดียว!",
+  "s": 1.78,
+  "heard": "เอนตัวหลบ เฉียดไปนิดเดียว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leanBack-2": {
+  "h": "d480aca46474",
+  "text": "เอนหลบได้ทัน! หวุดหวิดมาก!",
+  "s": 1.93,
+  "heard": "เอนหลบได้ทัน วุดวิดมาก",
+  "ok": 0.91,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "bellyBack-0": {
-  "h": "5d71b92bf818",
-  "text": "โก่งตัวหลบลูกเตะ!"
+  "h": "5fa074788500",
+  "text": "หดท้องหลบได้ทัน!",
+  "s": 1.2,
+  "heard": "หดท้องหลบได้ทัน",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bellyBack-1": {
+  "h": "04cb7b8c4c72",
+  "text": "โก่งตัวหลบได้สวย!",
+  "s": 1.1,
+  "heard": "โก่งตัวหลบได้สวย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "slip-0": {
-  "h": "d58421d12ace",
-  "text": "โยกหลบสวย!"
+  "h": "c49bf7492ed3",
+  "text": "โยกหลบสวย!",
+  "s": 1.23,
+  "heard": "โยกหลบสวย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "slip-1": {
-  "h": "64e9c3267c1e",
-  "text": "หลบหมัดได้!"
+  "h": "cfd5cc594f0e",
+  "text": "หลบหมัดได้!",
+  "s": 0.91,
+  "heard": "หลบหมัดได้",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "shout0-2": {
+  "h": "ddf03c129bdd",
+  "text": "เฮ้!",
+  "s": 0.55,
+  "heard": "เฮ้",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "shout1-2": {
+  "h": "9585b9fedf9e",
+  "text": "โอ้!",
+  "s": 0.44,
+  "heard": "โอ้",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "slip-2": {
+  "h": "30a327b2bf80",
+  "text": "โยกหัวหลบ! หมัดวืดไป!",
+  "s": 1.75,
+  "heard": "โยกหัวหลบ หมัดวืดไป",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  },
  "check-0": {
-  "h": "7150986d75ff",
-  "text": "ยกเข่าบังไว้ได้"
+  "h": "249bcdd8186b",
+  "text": "ยกเข่าบังไว้ได้",
+  "s": 1.44,
+  "heard": "ยกเข่าบังไว้ได้",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "check-1": {
+  "h": "a6826359c4f6",
+  "text": "ยกขาบังลูกเตะไว้ครับ",
+  "s": 1.72,
+  "heard": "ยกขาบังลูกเตะไว้ครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "check-2": {
+  "h": "31828fc0bf70",
+  "text": "บังแข้งไว้ได้ทัน",
+  "s": 1.38,
+  "heard": "บังแข้งไว้ได้ทัน",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "catch-0": {
+  "h": "ff7cb4140e42",
+  "text": "จับขาไว้ได้!",
+  "s": 1.1,
+  "heard": "จับขาไว้ได้",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "catch-1": {
+  "h": "8fd4eb496e43",
+  "text": "จับขาได้แล้ว! อันตราย!",
+  "s": 1.88,
+  "heard": "จับขาได้แล้ว อันตราย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "separate-1": {
+  "h": "51645447aed0",
+  "text": "กรรมการสั่งแยก",
+  "s": 0.81,
+  "heard": "กรรมการสั่งแยก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "legHurt-0": {
+  "h": "4a94fa1453fc",
+  "text": "ขาเริ่มไม่ไหวแล้วครับ โดนเตะสะสมมาเยอะ!",
+  "s": 2.27,
+  "heard": "ขาเริ่มไม่ไหวแล้วครับโดนเตะสะสมมาเยอะ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "legHurt-1": {
+  "h": "5a48b52c64b7",
+  "text": "ขาโดนเก็บไปหลายดอกแล้วครับ เริ่มออกอาการ!",
+  "s": 2.56,
+  "heard": "ขาโดนเก็บไปหลายดอกแล้วครับเริ่มออกอาการ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyHurt-0": {
+  "h": "ef11318e7f87",
+  "text": "ลำตัวโดนสะสมมาเยอะแล้วครับ เริ่มหมดแรง!",
+  "s": 3.03,
+  "heard": "ลำตัวโดนสะสมมาเยอะแล้วครับ เริ่มหมดแรง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyHurt-1": {
+  "h": "29519976f0a1",
+  "text": "โดนเข้าท้องบ่อยมาก เริ่มแผ่วแล้วครับ!",
+  "s": 2.51,
+  "heard": "โดนเข้าท้องบ่อยมาก เริ่มแผ่วแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "shout0-3": {
+  "h": "1ffee5d08c2a",
+  "text": "เฮ้!",
+  "s": 0.57,
+  "heard": "เฮ้",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "shout1-3": {
+  "h": "4c50231345eb",
+  "text": "โอ้!",
+  "s": 0.81,
+  "heard": "โอ้โห",
+  "ok": 0.72,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stun-0": {
+  "h": "19fc0ce7ed01",
+  "text": "ขาเริ่มไม่อยู่แล้ว!",
+  "s": 1.23,
+  "heard": "ขาเริ่มไม่อยู่แล้ว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stun-1": {
+  "h": "61a605e3be2f",
+  "text": "ออกอาการแล้ว! เซเลยครับ!",
+  "s": 2.06,
+  "heard": "ออกอาการแล้วเซเลยครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stun-2": {
+  "h": "cc82930e1d7d",
+  "text": "ตาลอยแล้วครับ! ต้องรีบตามซ้ำ!",
+  "s": 1.85,
+  "heard": "ตาลอยแล้วครับต้องรีบตามซ้ำ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stunEnd-0": {
+  "h": "2371c74effa7",
+  "text": "ตั้งหลักได้แล้วครับ",
+  "s": 1.1,
+  "heard": "ตั้งหลักได้แล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stunEnd-1": {
+  "h": "18b84e58f7be",
+  "text": "ประคองตัวรอดมาได้ครับ",
+  "s": 1.46,
+  "heard": "ประคองตัวรอดมาได้ครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stunEnd-2": {
+  "h": "0ae4ac396d67",
+  "text": "ฟื้นตัวกลับมาได้แล้ว",
+  "s": 1.44,
+  "heard": "ฟื้นตัวกลับมาได้แล้ว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "kd-0": {
+  "h": "a08cb79ea978",
+  "text": "ล้มลงไปแล้วครับ! กรรมการเริ่มนับ!",
+  "s": 2.01,
+  "heard": "ล้มลงไปแล้วครับ กรรมการเริ่มนับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "kd-1": {
+  "h": "d487ad1b15dc",
+  "text": "ลงไปนอนแล้ว!",
+  "s": 1.15,
+  "heard": "ลงไปนอนแล้ว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "kd-2": {
+  "h": "7614af1850c9",
+  "text": "ร่วงลงไปกองกับพื้นเวที!",
+  "s": 2.43,
+  "heard": "ร่วงลงไปกองกับพื้นเวที",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winRed-2": {
+  "h": "f15f2f27475a",
+  "text": "มุมแดงชูมือเป็นผู้ชนะครับ!",
+  "s": 2.25,
+  "heard": "มุมแดงชูมือเป็นผู้ชนะครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winBlue-0": {
+  "h": "6823e14c554d",
+  "text": "มุมน้ำเงินชนะครับ!",
+  "s": 2.32,
+  "heard": "มุมน้ำเงินชนะครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winBlue-1": {
+  "h": "966fa4c3ee00",
+  "text": "ชัยชนะเป็นของมุมน้ำเงิน!",
+  "s": 2.66,
+  "heard": "ชัยชนะเป็นของมุมน้ำเงิน",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winBlue-2": {
+  "h": "60e8d662ea05",
+  "text": "มุมน้ำเงินชูมือเป็นผู้ชนะครับ!",
+  "s": 2.74,
+  "heard": "มุมน้ำเงินชูมือเป็นผู้ชนะครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decRed-0": {
+  "h": "bd16941d3db5",
+  "text": "มุมแดงชนะคะแนนครับ!",
+  "s": 1.83,
+  "heard": "มุมแดงชนะคะแนนครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decRed-1": {
+  "h": "02b2bb5fe66b",
+  "text": "กรรมการให้มุมแดงชนะคะแนน!",
+  "s": 2.22,
+  "heard": "กรรมการให้มุมแดงชนะคะแนน",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decBlue-0": {
+  "h": "da28865fc665",
+  "text": "มุมน้ำเงินชนะคะแนนครับ!",
+  "s": 1.78,
+  "heard": "มุมน้ำเงินชนะคะแนนครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "combo-3": {
+  "h": "149e180972d5",
+  "text": "หนึ่ง สอง สาม! เข้าครบชุด!",
+  "s": 2.38,
+  "heard": "นับ หนึ่ง สอง สาม เข้าครบชุด",
+  "ok": 0.86,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "block-3": {
+  "h": "b27e40f857b4",
+  "text": "ยกแขนบังไว้ทัน",
+  "s": 1.31,
+  "heard": "ยกแขนบังไว้ทัน",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinch-0": {
+  "h": "834bbbc164e4",
+  "text": "เข้ากอดคอแล้วครับ",
+  "s": 1.33,
+  "heard": "เข้ากอดคอแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinch-1": {
+  "h": "64dd465783ce",
+  "text": "กอดคอปล้ำกันแล้ว",
+  "s": 1.23,
+  "heard": "กอดคอปล้ำกันแล้ว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinch-2": {
+  "h": "1184f074a6ec",
+  "text": "เข้าวงในแล้วครับ ปล้ำกันนัว",
+  "s": 2.06,
+  "heard": "เข้าวงในแล้วครับ ปล้ำกันนัว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinch-3": {
+  "h": "07035eb03b39",
+  "text": "ล็อกคอได้แล้วครับ",
+  "s": 1.15,
+  "heard": "ล็อคคอได้แล้วครับ",
+  "ok": 0.93,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "separate-0": {
+  "h": "596910802f3c",
+  "text": "กรรมการเข้าแยกครับ",
+  "s": 0.91,
+  "heard": "กรรมการเข้าแยกครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "separate-2": {
+  "h": "28e8c2bc6ac1",
+  "text": "แยกออกมาตั้งหลักใหม่ครับ",
+  "s": 1.44,
+  "heard": "แยกออกมาตั้งหลักใหม่ครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbowOut-0": {
+  "h": "6d717524f211",
+  "text": "ศอกสวนหลุดวงกอด!",
+  "s": 1.59,
+  "heard": "ศอกสวนหลุดวงกอด",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbowOut-1": {
+  "h": "88ee3e6ecb13",
+  "text": "งัดศอกสวนออกมา!",
+  "s": 1.38,
+  "heard": "งัดศอกสวนออกมา",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throw-0": {
+  "h": "43b96d83f94b",
+  "text": "เหวี่ยงล้มลงไปเลย!",
+  "s": 1.36,
+  "heard": "เหวี่ยงล้มลงไปเลย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throw-1": {
+  "h": "42d618fc66ec",
+  "text": "ปล้ำเหวี่ยงลงไปกองกับพื้น!",
+  "s": 1.44,
+  "heard": "ปล้ำเหวี่ยงลงไปกองกับพื้น",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throw-2": {
+  "h": "b6f9157fef56",
+  "text": "เหวี่ยงทิ้ง! ได้แต้มไปเต็มๆ!",
+  "s": 2.53,
+  "heard": "เหวี่ยงทิ้ง ได้แต้มไปเต็มๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teepDump-0": {
+  "h": "aa72c819030b",
+  "text": "ถีบล้มก้นจ้ำเบ้า!",
+  "s": 1.52,
+  "heard": "ถีบล้มก้นจ้ำเบ้า",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teepDump-1": {
+  "h": "c690c1186846",
+  "text": "ถีบกระเด็นลงไปนั่งเลย!",
+  "s": 1.46,
+  "heard": "ถีบกระเด็นลงไปนั่งเลย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "kd-3": {
+  "h": "ad24caa70a7b",
+  "text": "ล้ม! ล้มแล้วครับ! กรรมการนับ!",
+  "s": 2.53,
+  "heard": "ล้ม ล้มแล้วครับ กรรมการนับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "getup-0": {
+  "h": "51a74e0aa051",
+  "text": "ลุกขึ้นมาได้ครับ สู้ต่อ!",
+  "s": 1.54,
+  "heard": "ลุกขึ้นมาได้ครับ สู้ต่อ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "getup-1": {
+  "h": "f9eff7c9fdd3",
+  "text": "ลุกขึ้นมาแล้ว! ใจสู้มากครับ!",
+  "s": 2.09,
+  "heard": "ลุกขึ้นมาแล้ว ใจสู้มากครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "getup-2": {
+  "h": "9974538b4b21",
+  "text": "ยังไหวครับ! ลุกขึ้นมาสู้ต่อ!",
+  "s": 1.72,
+  "heard": "ยังไหวครับ ลุกขึ้นมาสู้ต่อ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "ko-0": {
+  "h": "27571b0b1c23",
+  "text": "น็อกเอาต์! จบแล้วครับ!",
+  "s": 1.57,
+  "heard": "น็อกเอาต์ จบแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "ko-1": {
+  "h": "361f8eff0c68",
+  "text": "ลุกไม่ขึ้นแล้วครับ! จบแล้ว!",
+  "s": 1.88,
+  "heard": "ลุกไม่ขึ้นแล้วครับ จบแล้ว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "ko-2": {
+  "h": "760bcc29a19f",
+  "text": "น็อก! น็อกไปแล้วครับพี่น้อง!",
+  "s": 1.96,
+  "heard": "น็อก น็อกไปแล้วครับพี่น้อง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winRed-0": {
+  "h": "b3ec3c1281eb",
+  "text": "มุมแดงชนะครับ!",
+  "s": 1.59,
+  "heard": "มุมแดงชนะครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winRed-1": {
+  "h": "ff4f6dba6fdd",
+  "text": "ชัยชนะเป็นของมุมแดง!",
+  "s": 2.85,
+  "heard": "ชัยชนะเป็นของมุมแดง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decBlue-1": {
+  "h": "b06cd5ed6b2c",
+  "text": "กรรมการให้มุมน้ำเงินชนะคะแนน!",
+  "s": 3.37,
+  "heard": "กรรมการให้มุมน้ำเงินชนะคะแนน",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel1-0": {
+  "h": "83984cf36b2f",
+  "text": "ยกแรกยังดูเชิงกันอยู่ครับ",
+  "s": 1.78,
+  "heard": "ยกแรกยังดูเชิงกันอยู่ครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "timeLow10-0": {
+  "h": "7e42ffb7c2b9",
+  "text": "สิบวินาทีสุดท้ายของยกแล้วครับ!",
+  "s": 1.72,
+  "heard": "10 วินาทีสุดท้ายของยกแล้วครับ",
+  "ok": 0.89,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKickMore-0": {
+  "h": "f72458721673",
+  "text": "เตะขาอีกแล้ว! เก็บขาไปเรื่อยๆ!",
+  "s": 2.22,
+  "heard": "เตะขาอีกแล้ว เก็บขาไปเรื่อยๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bellyKick-0": {
+  "h": "d7101788cccd",
+  "text": "โก่งตัวหลบลูกเตะ!",
+  "s": 1.02,
+  "heard": "โก่งตัวหลบลูกเตะ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stunPunch-0": {
+  "h": "c7a6f4f2f25a",
+  "text": "เมาหมัดแล้วครับ! ตามถล่ม!",
+  "s": 2.04,
+  "heard": "เมาหมัดแล้วครับตามถล่ม",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "corner-0": {
+  "h": "c4095df8bf61",
+  "text": "พี่เลี้ยงให้น้ำ เช็ดเหงื่อ นวดน้ำมันกันเต็มที่ครับ",
+  "s": 3.37,
+  "heard": "พี่เลี้ยงให้น้ำ เช็ดเหงื่อ นวดน้ำมันกันเต็มที่ครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "corner-1": {
+  "h": "e5a96e39ab39",
+  "text": "ให้น้ำกันก่อนครับ แล้วนวดน้ำมันคลายกล้ามเนื้อ",
+  "s": 3.24,
+  "heard": "ให้น้ำกันก่อนครับ แล้วนวดน้ำมันคลายกล้ามเนื้อ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "corner-2": {
+  "h": "3aa17e0a83ab",
+  "text": "พี่เลี้ยงเร่งมือกันใหญ่เลยครับ ทั้งให้น้ำ ทั้งนวด",
+  "s": 3.11,
+  "heard": "พี่เลี้ยงเร่งมือกันใหญ่เลยครับ ทั้งให้น้ำ ทั้งนวด",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "cornerOut-0": {
+  "h": "c1c7c43cf19b",
+  "text": "หมดเวลาพักแล้วครับ ออกมาสู้กันต่อ!",
+  "s": 2.3,
+  "heard": "หมดเวลาพักแล้วครับ ออกมาสู้กันต่อ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "cornerOut-1": {
+  "h": "28c052add58b",
+  "text": "พร้อมแล้วครับ! ลุกออกจากมุมแล้ว!",
+  "s": 1.67,
+  "heard": "พร้อมแล้วครับ ลุกจากมุมแล้ว",
+  "ok": 0.88,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel1-1": {
+  "h": "cd2399ba004b",
+  "text": "ยกแรก ต่างคนต่างหยั่งเชิงกันก่อนครับ",
+  "s": 2.27,
+  "heard": "ยกแรก ต่างคนต่างหยั่งเชิงกันก่อนครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "catchHit-0": {
+  "h": "68608caf20e5",
+  "text": "จับขาแล้วชกสวนเข้าไป!",
+  "s": 1.49,
+  "heard": "จับขาแล้วชกสวนเข้าไป",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "catchHit-1": {
+  "h": "113037b5b867",
+  "text": "จับขาไว้ได้ ซัดหมัดสวนทันที!",
+  "s": 2.25,
+  "heard": "จับขาไว้ได้ ซัดมาสวนทันที",
+  "ok": 0.88,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKickMore-1": {
+  "h": "d13b71183fb5",
+  "text": "เตะขาซ้ำเข้าไปอีกดอก!",
+  "s": 1.31,
+  "heard": "เตะขาซ้ำเข้าไปอีกดอก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teepFace-0": {
+  "h": "72891708da99",
+  "text": "ถีบหน้า! เข้าเต็มๆ!",
+  "s": 2.06,
+  "heard": "ถีบหน้า เข้าเต็มๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teepFace-1": {
+  "h": "a53a32b62417",
+  "text": "ถีบเข้าหน้าเลยครับ!",
+  "s": 1.72,
+  "heard": "ถีบเข้าหน้าเลยครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spChop-0": {
+  "h": "f7fb14e7bc09",
+  "text": "ศอกสับ! ลงมาเต็มๆ!",
+  "s": 2.06,
+  "heard": "ศอกสับ ลงมาเต็มๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spChop-1": {
+  "h": "dc970bca91f3",
+  "text": "ศอกสับ! ไม้ตายเข้าเป้า!",
+  "s": 2.19,
+  "heard": "ศอกสับ ไม้ตายเข้าเป้า",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spKick-0": {
+  "h": "fb1022ad9ba7",
+  "text": "เตะก้านคอสายฟ้า! เร็วมาก!",
+  "s": 2.64,
+  "heard": "เตะก้านคอสายฟ้า เร็วมาก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spKick-1": {
+  "h": "a5c35f647c89",
+  "text": "ก้านคอสายฟ้า! เข้าเต็มๆ!",
+  "s": 2.19,
+  "heard": "ก้านคอสายฟ้า เข้าเต็มๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spFly-0": {
+  "h": "ab70979af1fa",
+  "text": "เข่าลอย! เข้าเต็มๆ!",
+  "s": 2.14,
+  "heard": "เข่าลอย เข้าเต็มๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spFly-1": {
+  "h": "72532e659978",
+  "text": "กระโดดเข่าลอย! สวยงามมาก!",
+  "s": 2.56,
+  "heard": "กระโดดเข่าลอย สวยงามมาก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spCroc-0": {
+  "h": "0442b6747358",
+  "text": "จระเข้ฟาดหาง! เข้าเต็มๆ!",
+  "s": 2.12,
+  "heard": "จระเข้ฟาดหาง เข้าเต็มๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spCroc-1": {
+  "h": "43472da9edc4",
+  "text": "หมุนตัวจระเข้ฟาดหาง! โอ้โห!",
+  "s": 2.82,
+  "heard": "หมุนตัวจระเข้ฟาดหาง โอ้โห",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spHanu-0": {
+  "h": "eade70a02bb5",
+  "text": "หนุมานถวายแหวน! เสยเข้าปลายคาง!",
+  "s": 2.56,
+  "heard": "หนุมานถวายแหวน เสยเข้าปลายคาง",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spHanu-1": {
+  "h": "39533003de84",
+  "text": "หนุมานถวายแหวน! แม่ไม้มวยไทยแท้ๆ!",
+  "s": 2.66,
+  "heard": "หนุมานถวายแหวน แม่ไม้มวยไทยแท้ๆ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "duck-0": {
+  "h": "c372a23e6a15",
+  "text": "มุดหลบได้สวย!",
+  "s": 1.02,
+  "heard": "มุดหลบได้สวย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "duck-1": {
+  "h": "5d02bca4d1f1",
+  "text": "ก้มหลบ! วืดไปเลยครับ!",
+  "s": 1.28,
+  "heard": "ก้มหลบ วืดไปเลยครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bellyKick-1": {
+  "h": "14ccb34e2de8",
+  "text": "โก่งหลบ! ลูกเตะเฉียดท้องไปนิดเดียว!",
+  "s": 1.93,
+  "heard": "โก้งหลบ ลูกเตะเฉียดท้องไปนิดเดียว",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "dodge-0": {
+  "h": "6b16a18af1f5",
+  "text": "หลบได้ทัน!",
+  "s": 1.1,
+  "heard": "หลบได้ทัน",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "dodge-1": {
+  "h": "1c37af8a4dc9",
+  "text": "วืด! ไม่โดนครับ!",
+  "s": 1.18,
+  "heard": "วืดไม่โดนครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKnee-0": {
+  "h": "8218c354f844",
+  "text": "ตีเข่าในวงกอด!",
+  "s": 1.12,
+  "heard": "ตีเข่าในวงกอด",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKnee-1": {
+  "h": "496751047133",
+  "text": "ตีเข่าไม่ยั้งเลย!",
+  "s": 1.18,
+  "heard": "ตีเข่าไม่ยั้งเลย",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKnee-2": {
+  "h": "d2adc9391057",
+  "text": "เข่าเข้าลำตัวในวงกอด!",
+  "s": 1.54,
+  "heard": "เข่าเข้าลำตัวในวงกอด",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKneeHead-0": {
+  "h": "dceda4b01973",
+  "text": "โน้มคอตีเข่า!",
+  "s": 1.23,
+  "heard": "โน้มคอมาตีเข่า",
+  "ok": 0.83,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKneeHead-1": {
+  "h": "7588dcb6a7a5",
+  "text": "กดคอลงมาตีเข่า!",
+  "s": 1.18,
+  "heard": "กดคอลงมาตีเข่า",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchElbow-0": {
+  "h": "060b61bade65",
+  "text": "ศอกในวงกอด!",
+  "s": 1.04,
+  "heard": "ศอกในวงกอด",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchElbow-1": {
+  "h": "c54ae58ceda7",
+  "text": "ศอกสั้นในวงใน! เข้าเต็มๆ!",
+  "s": 2.4,
+  "heard": "ศอกสั้นในวงใน เข้าเต็ม เต็ม",
+  "ok": 0.83,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "escape-0": {
+  "h": "ddc73427d7ab",
+  "text": "สะบัดหลุดออกมาได้!",
+  "s": 1.38,
+  "heard": "สะบัดหลุดออกมาได้",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "escape-1": {
+  "h": "7f6de65ba17d",
+  "text": "ดิ้นหลุดจากวงกอดแล้วครับ!",
+  "s": 1.36,
+  "heard": "ดิ้นหลุดจากวงกอดแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throwFail-0": {
+  "h": "d9e36bd7115a",
+  "text": "ยืนหลักแน่นครับ เหวี่ยงไม่ล้ม",
+  "s": 1.99,
+  "heard": "ยืนหลักแน่นครับ เหวี่ยงไม่ลง",
+  "ok": 0.96,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throwFail-1": {
+  "h": "6e43ee80e61b",
+  "text": "เหวี่ยงไม่ลงครับ หลักดีมาก",
+  "s": 1.67,
+  "heard": "เหวี่ยงไม่ลงครับ หลักดีมาก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "koFlash-0": {
+  "h": "ebb7fac50dbd",
+  "text": "หลับกลางอากาศ! จบการชก!",
+  "s": 2.12,
+  "heard": "หลับกลางอากาศ จบการชก",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "koFlash-1": {
+  "h": "56f13523fce5",
+  "text": "น็อกคาที่! ไม่ต้องนับเลยครับ!",
+  "s": 2.27,
+  "heard": "น็อกคาที่ ไม่ต้องนับเลยครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "tko-0": {
+  "h": "c813bea3f54b",
+  "text": "กรรมการยุติการชก! ทีเคโอครับ!",
+  "s": 3.19,
+  "heard": "กรรมการยุติการชก ทีเคโอครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "tko-1": {
+  "h": "08307861f81c",
+  "text": "ล้มสามครั้ง! กรรมการไม่ให้ชกต่อแล้วครับ!",
+  "s": 2.82,
+  "heard": "ล้มสามครั้ง กรรมการไม่ให้ชกต่อแล้วครับ",
+  "ok": 1,
+  "m": "gemini-3.8-flash-lite-tts",
+  "ear": "gemini-3-flash-preview"
  }
 }

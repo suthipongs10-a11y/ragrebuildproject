@@ -51,7 +51,7 @@ export const LINES = {
   spFly:     {hot: 2, t: ['เข่าลอย! เข้าเต็มๆ!', 'กระโดดเข่าลอย! สวยงามมาก!']},
   spCroc:    {hot: 2, t: ['จระเข้ฟาดหาง! เข้าเต็มๆ!', 'หมุนตัวจระเข้ฟาดหาง! โอ้โห!']},
   spHanu:    {hot: 2, t: ['หนุมานถวายแหวน! เสยเข้าปลายคาง!', 'หนุมานถวายแหวน! แม่ไม้มวยไทยแท้ๆ!']},
-  bigHit:    {hot: 2, t: ['โอ้โห! หนักมาก!', 'เต็มๆ เลยครับ!', 'เข้าไปจังๆ! สะเทือนเลย!', 'อู้ฮู! ลูกนี้หนัก!']},
+  bigHit:    {hot: 2, t: ['โอ้โห! หนักมาก!', 'เต็มๆ เลยครับ!', 'เข้าไปจังๆ! สะเทือนเลย!', 'โอ้โห! ลูกนี้หนักจริงๆ!']},
   // a blow that does not land, by how he got out of it (the pose on screen)
   block:     {hot: 0, t: ['ป้องกันไว้ได้', 'บังไว้ได้ครับ', 'การ์ดแน่นมากครับ', 'ยกแขนบังไว้ทัน']},                                                          // arms up against a trick at the head
   check:     {hot: 0, t: ['ยกเข่าบังไว้ได้', 'ยกขาบังลูกเตะไว้ครับ', 'บังแข้งไว้ได้ทัน']},                                                                   // the lifted knee against a body or leg kick
@@ -147,7 +147,7 @@ const SEAT_CARE = .8, ROOM = {corner: 3.3, score: 2.3}; // seconds seated before
 // voice: the audio module. Call event(e) for each event as playback reaches it, update(t) every frame of the fight, tick(t) every frame.
 export function buildCommentary(audio, MOVES) {
   const C = {on: true, log: null}, turn = {};
-  let busyTo = 0, lastHitCall = -9, lastLine = -9, curPri = 0, round = 1, later = null, queued = null, last = {lead: -1, margin: 0}, counted = 0, cs = {}, bell = null; // bell: seconds left in the round
+  let busyTo = 0, lastHitCall = -9, lastLine = -9, curPri = 0, round = 1, later = null, queued = null, last = {lead: -1, margin: 0}, counted = 0, cs = {}, bell = null, floor = false; // bell: seconds left in the round; floor: a man is down or the fight is decided
   const worn = [{leg: 0, body: 0}, {leg: 0, body: 0}], said = {}, lastBlow = [null, null]; // blows taken to the legs and the body, one-off calls already made, the last blow each man took
   const has = k => audio.hasVoice(k);
   const next = key => { const n = audio.voiceCount(key); return ((turn[key] ?? Math.floor(Math.random() * n) - 1) + 1) % n; };
@@ -181,7 +181,7 @@ export function buildCommentary(audio, MOVES) {
     switch (e.type) {
       case 'phase':
         if (e.phase === 'fight') {
-          round = e.round; bell = 99; said.timeLow = false; if (round === 1) { worn[0].leg = worn[0].body = worn[1].leg = worn[1].body = 0; said.leg0 = said.leg1 = said.body0 = said.body1 = false; }
+          round = e.round; bell = 99; floor = false; said.timeLow = false; if (round === 1) { worn[0].leg = worn[0].body = worn[1].leg = worn[1].body = 0; said.leg0 = said.leg1 = said.body0 = said.body1 = false; }
           say(e.round === 1 ? 'bell1' : e.round === 2 ? 'round2' : 'round3', now, true);
           if (e.round === 3 && last.lead >= 0 && last.margin >= 5) later = {key: last.lead ? 'behindRed' : 'behindBlue', at: now + 3.2}; // who has to chase in the last round
         }
@@ -208,17 +208,17 @@ export function buildCommentary(audio, MOVES) {
       case 'throw': say(e.ok ? (e.teep ? 'teepDump' : 'throw') : 'throwFail', now); break;
       case 'stun': { const m = MOVES[lastBlow[e.on]]; said['stun' + e.on] = say(m && m.sfx === 'punch' && Math.random() < .5 ? 'stunPunch' : 'stun', now); break; }
       case 'stun_end': if (!e.bell && said['stun' + e.on]) say('stunEnd', now); said['stun' + e.on] = false; break; // "he has recovered" only if we said he was dazed
-      case 'kd': counted = 0; later = null; bell = null; say('kd', now, true); break; // the count stops the clock
+      case 'kd': counted = 0; later = null; bell = null; floor = true; say('kd', now, true); break; // the count stops the clock, and the small talk
       case 'count': counted = e.n; audio.count(e.n); break;
-      case 'getup': if (!e.thrown) say('getup', now); break;
-      case 'ko': later = null; say(e.how === 'ทีเคโอ' ? 'tko' : counted >= 10 ? 'ko' : 'koFlash', now, true); counted = 0; break; // the winner is named when the referee raises his hand
-      case 'decision': say(e.w ? 'decBlue' : 'decRed', now, true); break;
+      case 'getup': if (!e.thrown) { floor = false; say('getup', now); } break;
+      case 'ko': later = null; floor = true; say(e.how === 'ทีเคโอ' ? 'tko' : counted >= 10 ? 'ko' : 'koFlash', now, true); counted = 0; break; // the winner is named when the referee raises his hand
+      case 'decision': floor = true; say(e.w ? 'decBlue' : 'decRed', now, true); break;
     }
   };
   // between exchanges: a line now and then so the quiet stretches are not silent
   C.update = function (now, ctx) {
     C.tick(now);
-    if (!ctx.fighting) return;
+    if (!ctx.fighting || floor) return; // a man on the floor, or the fight decided: nothing but the count and the call
     if (ctx.clock != null) bell = ctx.clock;
     // the points swinging over, the last seconds of a round, and a call that was waiting its turn
     const swung = last.lead >= 0 && ctx.lead >= 0 && ctx.lead !== last.lead && ctx.margin >= 2; last = {lead: ctx.lead, margin: ctx.margin};

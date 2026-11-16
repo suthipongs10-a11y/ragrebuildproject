@@ -33,7 +33,7 @@ function play(seed, print) {
   let rs = seed * 2654435761 >>> 0; Math.random = () => { rs = rs + 0x6D2B79F5 >>> 0; let t = Math.imul(rs ^ rs >>> 15, 1 | rs); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; // the commentary's own dice, the same every run
   const fight = simulate({seed}), TL = bake(fight), EV = fight.events, dtF = 1 / FPS;
   let now = 0, playT = 0, evi = 0, cur = null, speaking = null, scene = 'intro', round = 1, counted = 0, introSaid = false, lastEnd = 0, sceneAt = {};
-  let seated = -9, leaving = false, restAt = -9, roundAt = -9;
+  let seated = -9, leaving = false, restAt = -9, roundAt = -9, floor = null; // floor: a man is down, or the fight is decided
   const cornerEnd = st => now + (CORNER_LEN - CORNER_SEAT - st); // when the bell goes, from the seat clock
   const legs = [0, 0], lastBlow = [null, null], rests = EV.filter(e => e.type === 'phase' && e.phase === 'rest').map(e => e.t + 2.3);
   const introEnd = (EV.find(e => e.type === 'phase' && e.phase === 'fight') || {t: RULES.introTime}).t, over = (EV.find(e => e.type === 'phase' && e.phase === 'over') || {t: fight.duration}).t;
@@ -52,6 +52,7 @@ function play(seed, print) {
     speaking = {text, at: now, end: now + dur}; lastEnd = now + dur;
     if (print) console.log(`${now.toFixed(1).padStart(6)}s ${scene.padEnd(6)} R${ck.round} ${String(Math.ceil(ck.clock)).padStart(2)}  ${key.padEnd(14)} ${text}   ${e ? '<- ' + e.type + (e.move ? ' ' + e.move : '') + (e.res ? ' ' + e.res : '') + (pose ? ' (' + pose + ')' : '') + (e.reason ? ' ' + e.reason : '') : ''}`);
     // ---- is it true of the picture? ----
+    if (floor && /^(feel|feel1|busy|close|lead|behind|timeLow)/.test(key)) no(floor === 'down' ? 'a man is down and being counted' : 'the fight is over');
     switch (key) {
       case 'intro': if (scene !== 'intro') no('not the wai kru'); break;
       case 'bell1': case 'round2': case 'round3': if (scene !== 'fight' || ck.round !== {bell1: 1, round2: 2, round3: 3}[key] || now - roundAt > 3.5) no('not the start of that round'); break;
@@ -112,7 +113,8 @@ function play(seed, print) {
   const handle = e => {
     if (e.type === 'phase') { if (e.phase === 'fight') { scene = 'fight'; round = e.round; roundAt = now; sceneAt[['bell1', 'round2', 'round3'][e.round - 1]] = now; } else if (e.phase === 'rest') { scene = 'rest'; restAt = now; sceneAt.rest = now; } else if (e.phase === 'dec') { scene = 'dec'; sceneAt.decWait = now; } }
     if (e.type === 'decision') sceneAt[e.w ? 'decBlue' : 'decRed'] = now;
-    if (e.type === 'kd') counted = 0; if (e.type === 'count') counted = e.n;
+    if (e.type === 'kd') { counted = 0; floor = 'down'; } if (e.type === 'count') counted = e.n;
+    if (e.type === 'getup' || (e.type === 'phase' && e.phase === 'fight')) floor = null; if (e.type === 'ko' || e.type === 'decision') floor = 'over';
     if (e.type === 'hit' && e.res === 'hit') { if (e.move === 'low') legs[e.on]++; }
     cur = {e, pose: e.type === 'hit' && e.res === 'dodge' ? evadePose(e, fight.dt) : null};
     C.event(e, now, cur.pose); cur = null;
