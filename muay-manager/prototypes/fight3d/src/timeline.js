@@ -42,6 +42,17 @@ export function aimEffector(target, en, pt3, J) {
   }
 }
 
+// How a fighter gets out of the way depends on what is coming: duck under a swing, slip a straight punch, bend right
+// back from a kick (now and then he ducks a high kick instead), lean back from the rest. The commentary asks too
+// (main.js hands it the answer), so the words fit the pose.
+const DUCK = new Set(['hook', 'elbow', 'spinElbow', 'spCroc', 'spChop']), SLIP = new Set(['jab', 'cross']), LEAN = new Set(['high', 'spKick', 'teepFace']), BELLY = new Set(['body', 'teep', 'knee']);
+export function evadePose(e, dt) {
+  const h = Math.round(e.t / dt);
+  if (BELLY.has(e.move)) return 'hipBack'; // a kick at the stomach: the body bows back out of it
+  if (LEAN.has(e.move)) return (e.move === 'high' || e.move === 'spKick') && h % 3 === 0 ? 'duck' : 'leanBack';
+  if (MOVES[e.move].lvl !== 'head') return 'dodge';
+  if (DUCK.has(e.move) || (e.move === 'cross' && h % 4 < 2)) return 'duck'; if (SLIP.has(e.move)) return h % 2 ? 'slipL' : 'slipR'; return 'dodge';
+}
 export function bake(fight) {
   const n = fight.nTicks, dt = fight.dt, TK = fight.ticks;
   const tick = (i, k, f) => TK[(Math.max(0, Math.min(n - 1, k)) * 2 + i) * TICK_FIELDS + f];
@@ -52,16 +63,7 @@ export function bake(fight) {
     if (e.type === 'move') pend[e.by] = e;
     else if (e.type === 'hit') { hitsBy[e.by].push(e); const m = pend[e.by]; if (m && m.move === e.move) { m.hit = e; e.moveEv = m; pend[e.by] = null; } }
   }
-  // How a fighter gets out of the way depends on what is coming: duck under a swing, slip a straight punch, bend right
-  // back from a kick (now and then he ducks a high kick instead), lean back from the rest.
-  const DUCK = new Set(['hook', 'elbow', 'spinElbow', 'spCroc', 'spChop']), SLIP = new Set(['jab', 'cross']), LEAN = new Set(['high', 'spKick', 'teepFace']), BELLY = new Set(['body', 'teep', 'knee']);
-  const evade = e => {
-    const h = Math.round(e.t / dt);
-    if (BELLY.has(e.move)) return 'hipBack'; // a kick at the stomach: the body bows back out of it
-    if (LEAN.has(e.move)) return (e.move === 'high' || e.move === 'spKick') && h % 3 === 0 ? 'duck' : 'leanBack';
-    if (MOVES[e.move].lvl !== 'head') return 'dodge';
-    if (DUCK.has(e.move) || (e.move === 'cross' && h % 4 < 2)) return 'duck'; if (SLIP.has(e.move)) return h % 2 ? 'slipL' : 'slipR'; return 'dodge';
-  };
+  const evade = e => evadePose(e, dt);
   const evadeAt = new Map();
   for (const e of fight.events) if (e.type === 'hit' && e.res === 'dodge') evadeAt.set(e.on + ':' + Math.round(e.t / dt), evade(e));
   const kneeUp = new Set(); // a body kick that is blocked is met with the lifted knee

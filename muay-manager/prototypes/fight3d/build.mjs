@@ -5,6 +5,7 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync, rmSync
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 import { gzipSync } from 'node:zlib';
+import { FALLBACK } from './src/commentary.js';
 
 const bundle = async entry => (await build({entryPoints: [entry], bundle: true, format: 'iife', minify: process.argv.includes('--min'), minifyWhitespace: true, minifySyntax: true, write: false, // spaces out, names kept: the claude.ai page has a 16 MB limit, and error reports still name the function target: 'es2019', legalComments: 'none',
   // loaders from the three package import 'three'; point that at the page's global THREE instead of a second copy
@@ -85,9 +86,11 @@ for (const [dir, id] of [['assets/voice', 'voice-pack'], ['assets/sfx', 'sfx-pac
   if (id !== 'voice-pack') { models.push(text); continue; }
   const lite = {}, whole = k => k === 'count' || k.startsWith('shout'); let used = 0, lines = 0, all = 0;
   for (const k of Object.keys(pack)) { all += pack[k].length; if (whole(k)) { lite[k] = pack[k]; used += pack[k].join('').length; } }
+  // first the lines the game cannot do without (a key with nothing to borrow from), then the keys that could borrow, then second lines, ...
+  const order = Object.keys(pack).filter(k => !whole(k)), plain = order.filter(k => !FALLBACK[k]), borrow = order.filter(k => FALLBACK[k]);
   for (let i = 0, any = true; any; i++) {
     any = false;
-    for (const k of Object.keys(pack)) if (!whole(k) && pack[k][i]) { any = true; if (used + pack[k][i].length <= VOICE_LITE) { (lite[k] = lite[k] || []).push(pack[k][i]); used += pack[k][i].length; lines++; } }
+    for (const k of plain.concat(borrow)) if (pack[k][i]) { any = true; if (used + pack[k][i].length <= VOICE_LITE) { (lite[k] = lite[k] || []).push(pack[k][i]); used += pack[k][i].length; lines++; } else if (i === 0 && !FALLBACK[k]) throw new Error('VOICE_LITE is too small for the first line of ' + k); }
   }
   voiceFull = text; voiceLite = tag(id, lite);
   console.log('voice-pack for the claude.ai page:', lines, 'of', all - Object.keys(pack).filter(whole).reduce((n, k) => n + pack[k].length, 0), 'commentary lines,', (voiceLite.length / 1024 / 1024).toFixed(2) + ' MB');

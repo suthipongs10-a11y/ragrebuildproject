@@ -16,7 +16,7 @@ const blend = (out, P, Q, k) => { for (let j = 0; j < NP; j++) out[j] = P[j] + (
 const add3 = (P, i, x, y, z, k) => { P[i] += x * k; P[i + 1] += y * k; P[i + 2] += z * k; };
 const mix3 = (P, i, v, k) => { P[i] += (v.x - P[i]) * k; P[i + 1] += (v.y - P[i + 1]) * k; P[i + 2] += (v.z - P[i + 2]) * k; };
 
-export const CORNER_LEN = B + UP + BACK;
+export const CORNER_LEN = B + UP + BACK, CORNER_SEAT = A; // CORNER_SEAT: seconds in when they are on the stools
 
 export function buildCorner(scene, camera, getFx) {
   const C = {on: false, t: 0, pin: false};

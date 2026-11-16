@@ -11,11 +11,12 @@
 // and gemini-2.5-flash drop words, and lines matched on a bad transcript come out shifted. So there is no fallback:
 // when the listener's daily quota (20 requests on the free tier) is gone the run stops and waits.
 // Usage: node tools/tts-commentary.mjs [--model gemini-3.8-flash-tts] [--ear model,model] [--dir assets/voice]
-//          [--only key,key] [--redo name,name|all] [--limit clips] [--batch 28] [--gap 13] [--keep-doubt]
+//          [--only key,key] [--redo name,name|all] [--limit clips] [--batch 28] [--gap 13] [--keep-doubt] [--recheck]
+//   --recheck: first listen again to every clip that a listener not on the --ear list passed (or that nobody heard)
 // Needs ffmpeg and GEMINI_API_KEY (a Google AI Studio key; never put it in the repo).
 // Thai is on the language list of gemini-3.8-flash-tts only; the lite model speaks it but is not listed for it.
 import { execFileSync, spawnSync } from 'node:child_process';
-import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, rmSync, readdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, renameSync, rmSync, readdirSync, unlinkSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { LINES, COUNT, SHOUT, VOICES, STYLE } from '../src/commentary.js';
 
@@ -39,6 +40,19 @@ for (const J of jobs) J.h = createHash('sha1').update(JSON.stringify([J.text, J.
 const KEEP = process.argv.includes('--keep-doubt');
 const done = J => man[J.name] && man[J.name].h === J.h && existsSync(`${DIR}/${J.name}.mp3`) && (KEEP || man[J.name].ok == null || man[J.name].ok >= PASS);
 const redo = J => REDO.includes(J.name) || REDO[0] === 'all';
+// The script moves: a line may change key or place while its words, voice and style stay the same. Such a clip is
+// carried over under its new name rather than recorded again, and clips whose line is gone are removed.
+if (!ONLY) {
+  const file = nm => `${DIR}/${nm}.mp3`, pool = {};
+  for (const [nm, v] of Object.entries(man)) if (v.h && (v.ok == null || v.ok >= PASS) && existsSync(file(nm))) pool[v.h] = {buf: readFileSync(file(nm)), v};
+  let moved = 0, gone = 0;
+  for (const J of jobs) if (!(man[J.name] && man[J.name].h === J.h && existsSync(file(J.name)) && (man[J.name].ok == null || man[J.name].ok >= PASS)) && pool[J.h]) { J.adopt = pool[J.h]; moved++; }
+  for (const J of jobs) if (J.adopt) { writeFileSync(file(J.name), J.adopt.buf); man[J.name] = Object.assign({}, J.adopt.v, {text: J.text}); }
+  const names = new Set(jobs.map(J => J.name));
+  for (const f of readdirSync(DIR).filter(f => f.endsWith('.mp3'))) if (!names.has(f.slice(0, -4))) { unlinkSync(`${DIR}/${f}`); gone++; }
+  for (const nm of Object.keys(man)) if (!names.has(nm)) delete man[nm];
+  if (moved || gone) { writeFileSync(MAN, JSON.stringify(man, null, 1)); console.log(`  ${moved} clips carried over to a new name, ${gone} clips of lines no longer in the script removed`); }
+}
 // Requests: the busiest voice in runs of BATCH lines, and each of the other voices rides along as a request's second voice
 function pack(js) {
   const by = {}; for (const J of js) (by[J.voice] = by[J.voice] || []).push(J);
@@ -151,7 +165,7 @@ function alike(a, b) {
 let made = 0, secs = 0; const doubt = [];
 function keep(J) { // the best take becomes the clip
   renameSync(J.best.file, `${DIR}/${J.name}.mp3`);
-  man[J.name] = {h: J.h, text: J.text, s: +J.best.s.toFixed(2), heard: J.best.heard, ok: J.best.score == null ? null : +J.best.score.toFixed(2), m: MODEL};
+  man[J.name] = {h: J.h, text: J.text, s: +J.best.s.toFixed(2), heard: J.best.heard, ok: J.best.score == null ? null : +J.best.score.toFixed(2), m: MODEL, ear: EARS[0]};
   writeFileSync(MAN, JSON.stringify(man, null, 1)); made++; secs += J.best.s;
   if (J.best.score != null && J.best.score < PASS) doubt.push(J);
   console.log(`${J.best.score == null ? '?' : J.best.score >= PASS ? 'ok' : '!!'} ${J.name}  ${J.best.s.toFixed(1)}s  ${J.text}${J.best.score != null && J.best.score < .85 ? '   <- heard: ' + J.best.heard : ''}`);
@@ -182,6 +196,18 @@ async function cutUp(id, B) {
 }
 let todo = [];
 try {
+  if (process.argv.includes('--recheck')) { // clips a weaker listener passed are heard again by the one we trust
+    const R = jobs.filter(J => man[J.name] && man[J.name].h === J.h && existsSync(`${DIR}/${J.name}.mp3`) && !EARS.includes(man[J.name].ear));
+    if (R.length) {
+      const heard = await listen(R.map(J => `${DIR}/${J.name}.mp3`)); let failed = 0;
+      R.forEach((J, i) => {
+        const short = J.style === 'count' || J.style === 'shout', sc = alike(heard[i], J.text), extra = !short && bare(heard[i]).length > bare(J.text).length * 1.15 + 1;
+        const ok = extra ? Math.min(sc, .5) : Math.max(sc, short ? PASS : 0);
+        Object.assign(man[J.name], {heard: heard[i], ok: +ok.toFixed(2), ear: EARS[0]}); if (ok < PASS) { failed++; console.log(`!! ${J.name}  ${J.text}   <- heard: ${heard[i]}`); }
+      });
+      writeFileSync(MAN, JSON.stringify(man, null, 1)); console.log(`  heard ${R.length} clips again: ${failed} do not say their line and will be recorded again`);
+    }
+  }
   // recordings left over from a run that stopped
   for (const f of readdirSync(TAKE).filter(f => /^\d+\.json$/.test(f)).sort()) {
     const id = TAKE + '/' + f.slice(0, -5), B = JSON.parse(readFileSync(id + '.json', 'utf8')).map(nm => jobs.find(J => J.name === nm));

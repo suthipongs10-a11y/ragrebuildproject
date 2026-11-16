@@ -2,7 +2,7 @@
 // One fight can be re-watched under different presentation settings to compare what feels best.
 import { simulate } from './sim.js';
 import { MOVES, COMBOS, STYLES, STAT_TH, RULES } from './data.js';
-import { bake, EFF_NAME } from './timeline.js';
+import { bake, EFF_NAME, evadePose } from './timeline.js';
 import { Fighter, EFF_JOINT, STYLE_BUILD, setDims, DIM_DEFAULT } from './rig.js';
 import { NP, FLAT, IDX, scalePoses } from './poses.js';
 import { loadModel, ModelFighter } from './model.js';
@@ -13,7 +13,7 @@ import { buildFx } from './fx.js';
 import { buildAudio } from './audio.js';
 import { buildCommentary } from './commentary.js';
 import { buildCeremony, CER_LEN } from './ceremony.js';
-import { buildCorner, CORNER_LEN } from './corner.js';
+import { buildCorner, CORNER_LEN, CORNER_SEAT } from './corner.js';
 const THREE = globalThis.THREE;
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
@@ -436,7 +436,7 @@ function ropes(t, dt) {
 }
 function handle(e) {
   const rp = mode === 'replay';
-  if (!rp && !frozen) voice.event(e, audio.time());
+  if (!rp && !frozen) voice.event(e, audio.time(), e.type === 'hit' && e.res === 'dodge' ? evadePose(e, fight.dt) : null);
   switch (e.type) {
     case 'say': if (!rp) $('call').innerHTML = e.html; break;
     case 'bell': if (!rp) audio.bell(e.n); break;
@@ -703,7 +703,7 @@ function frame(ts) {
     if (!going && !cerDone) { cerDone = true; finish(); } // the result comes up; the three stay in the ring behind it
     hype = Math.max(.3, hype - dt * .15);
     arena.keyAt(0); arena.fadeRopes(camera.position, 1); arena.update(realT, hype, dt); fx.update(dt, camera);
-    audio.update(dt, hype, true, TL.clock(playT).round, 1, 'cer');
+    audio.update(dt, hype, true, TL.clock(playT).round, 1, 'cer'); voice.tick(audio.time());
     renderer.render(scene, camera); hud(dt); return;
   }
   if (cor.on) { // between rounds in the corners; the fight waits at the pause
@@ -713,6 +713,7 @@ function frame(ts) {
     hype = Math.max(0, hype - dt * .3);
     arena.keyAt(0); arena.fadeRopes(camera.position, 1); arena.update(realT, hype, dt); fx.update(dt, camera);
     audio.update(dt, hype, false, TL.clock(playT).round, 1, 'rest');
+    { const a = TL.val(0, playT, 8), b = TL.val(1, playT, 8); voice.corner(cor.t - CORNER_SEAT, cor.upAfter != null ? cor.upAfter - cor.t : null, audio.time(), {lead: a === b ? -1 : a > b ? 0 : 1, margin: Math.abs(a - b)}); } // the commentary follows the corner scene
     renderer.render(scene, camera); hud(dt); return;
   }
   const adv = advance(dt);
@@ -733,8 +734,9 @@ function frame(ts) {
   const fighting = mode === 'live' && playT > marks.introEnd && playT < marks.over, ck = TL.clock(playT);
   const phase = mode !== 'live' || frozen || playT >= marks.over ? 'off' : playT <= marks.introEnd ? 'intro' : ck.clock <= 0 ? 'rest' : 'fight';
   arena.update(realT, hype, dt); audio.update(dt, hype, fighting && !frozen, ck.round, TL.pace(playT), phase);
-  if (phase === 'intro' && !introSaid && playT > .6) { introSaid = true; voice.intro(audio.time()); }
+  if (phase === 'intro' && !introSaid && playT > .15) { introSaid = true; voice.intro(audio.time()); }
   if (phase === 'fight') { const a = TL.val(0, playT, 8), b = TL.val(1, playT, 8); voice.update(audio.time(), {fighting: true, pace: TL.pace(playT), lead: a === b ? -1 : a > b ? 0 : 1, margin: Math.abs(a - b), clock: ck.clock}); }
+  else voice.tick(audio.time());
   renderer.render(scene, camera);
   hud(dt);
   fpsAcc += dt; fpsN++; if (fpsAcc > 1) { $('fps').textContent = Math.round(fpsN / fpsAcc) + ' fps'; fpsAcc = 0; fpsN = 0; }

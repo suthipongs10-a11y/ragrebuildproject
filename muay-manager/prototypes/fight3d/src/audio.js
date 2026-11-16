@@ -95,8 +95,9 @@ export function buildAudio() {
     // commentary
     hasVoice: k => !!(clips && clips[k] && clips[k].length),
     voiceCount: k => (clips && clips[k] ? clips[k].length : 0),
+    voiceLen: (k, i) => (clips && clips[k] && clips[k][i] ? clips[k][i].duration : 0),
     voice(k, i, cut) {
-      if (cut && speaking) { try { speaking.stop(); } catch (e) { /* already ended */ } }
+      if (cut && speaking) { try { const t = AC.currentTime, g = speaking._gain.gain; g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(0, t + .07); speaking.stop(t + .08); } catch (e) { /* already ended */ } } // a quick fade, not a click
       const buf = clips[k][i]; speaking = playClip(buf, {bus: voiceBus, gain: 1});
       return buf.duration;
     },
@@ -201,7 +202,7 @@ export function buildAudio() {
     node.connect(g); node = g;
     if (o.pan && AC.createStereoPanner) { const p = AC.createStereoPanner(); p.pan.value = o.pan; node.connect(p); node = p; }
     node.connect(o.bus); s.start(t); if (o.len) s.stop(t + len + .02);
-    s._end = t + len; return s;
+    s._end = t + len; s._gain = g; return s;
   }
 
   // ---- ringside music ----
