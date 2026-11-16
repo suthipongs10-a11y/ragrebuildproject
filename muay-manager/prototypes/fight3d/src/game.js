@@ -109,7 +109,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.44', BUILD = 244;
+const VER = '2.45', BUILD = 245;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -173,11 +173,14 @@ async function pushCloud() {
   cloudBusy = true; cloudDirty = false;
   try {
     await CLOUD.db.collection('data/users/' + CLOUD.uid).doc('save').set(JSON.parse(JSON.stringify(S)));
-    await CLOUD.db.doc('board/' + CLOUD.uid).set({name: S.name, rp: S.rp, w: S.rec.w, l: S.rec.l, ko: S.rec.ko, body: S.body, style: S.style, look: S.look, stats: roundStats(S.stats), t: Date.now()});
+    await CLOUD.db.doc('board/' + CLOUD.uid).set(boardDoc());
     cloudNote = 'ออนไลน์ บันทึกแล้ว';
   } catch (e) { cloudNote = 'บันทึกออนไลน์ไม่ได้ ใช้การบันทึกในเครื่อง'; }
   cloudBusy = false; if (cloudDirty) cloudTimer = setTimeout(pushCloud, 2500);
 }
+// This player's line in the leaderboard. seen: when he was last here on the server's clock (others show him as online
+// while it is fresh); in: the live match he is in or watching.
+const boardDoc = () => ({name: S.name, rp: S.rp, w: S.rec.w, l: S.rec.l, ko: S.rec.ko, body: S.body, style: S.style, look: S.look, stats: roundStats(S.stats), t: Date.now(), seen: now(), in: F && F.live && F.clock ? F.live.key : ''});
 async function cloudInit() {
   try {
     // inside claude.ai the artifact runtime holds the store; on the game's own website, the site's /api does
@@ -193,6 +196,7 @@ async function cloudInit() {
     if (valid(c) && (!S || (c.updatedAt || 0) > (S.updatedAt || 0))) { S = fix(JSON.parse(JSON.stringify(c))); /* a copy: stored data can come back locked, and the save grows new fields */ try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* fine */ } if (!F) go('home'); }
     else if (S) save();
     await loadBoard(); chSubscribe();
+    try { const w = new URLSearchParams(location.search).get('watch'); if (w) { CH.follow = w.slice(0, 200); history.replaceState(null, '', location.pathname); } } catch (e) { /* no link */ }
   } catch (e) { cloudNote = 'ออฟไลน์ บันทึกในเครื่องนี้'; }
   if (!F && view !== 'create') render();
 }
@@ -202,7 +206,8 @@ async function loadBoard() {
     const q = await CLOUD.db.collection('board').orderBy('rp', 'desc').limit(60).get();
     board = q.docs.map(d => ({id: d.id, d: d.data() || {}})).filter(x => x.id !== CLOUD.uid && typeof x.d.rp === 'number' && typeof x.d.name === 'string')
       .map(x => ({id: x.id, real: true, name: API.cleanName(x.d.name) || 'นักมวย', rp: clamp(Math.round(x.d.rp), 0, 4000), w: x.d.w | 0, l: x.d.l | 0, ko: x.d.ko | 0,
-        body: API.ROSTER[x.d.body] ? x.d.body : 'c', style: START[x.d.style] ? x.d.style : 'tech', look: cleanLook(x.d.look), stats: cleanStats(x.d.stats)}));
+        body: API.ROSTER[x.d.body] ? x.d.body : 'c', style: START[x.d.style] ? x.d.style : 'tech', look: cleanLook(x.d.look), stats: cleanStats(x.d.stats), seen: +x.d.seen || 0, in: typeof x.d.in === 'string' ? x.d.in.slice(0, 120) : ''}));
+    CH.boardAt = Date.now();
   } catch (e) { /* the built-in rivals still fill the table */ }
 }
 const roundStats = st => { const o = {}; KEYS.forEach(k => { o[k] = Math.round(st[k]); }); return o; };
@@ -403,7 +408,7 @@ const planText = p => PLAN.ag[p.ag] + ' · ' + PLAN.range[p.range] + ' · เน
 // a drawn image from assets/ui (embedded in the game page as CSS); without the art it takes no space
 const art = (name, cls) => '<i class="ui ' + (cls || '') + '" data-ui="' + name + '" aria-hidden="true"></i>';
 function topBar() {
-  const bar = $('gMatch'); if (bar) bar.innerHTML = S ? matchBarHtml() : '';
+  const bar = $('gMatch'); if (bar) { CH.barHtml = bannersHtml(); bar.innerHTML = CH.barHtml; fillCountdowns(); }
   if (!S) { $('gTop').innerHTML = ''; return; }
   const f = Math.round(S.fatigue);
   $('gTop').innerHTML = '<div class="who"><b>' + esc(S.name) + '</b><span>' + LEAGUES[league(S.rp)][1] + ' · วันที่ ' + S.day + ' · อารมณ์ ' + art('mood-' + (S.mood + 1), 'mood') + '<i class="' + (S.mood > 2 ? 'hi' : S.mood < 2 ? 'lo' : '') + '">' + MOODS[S.mood] + '</i></span></div>' +
@@ -526,7 +531,7 @@ function homeHtml() {
   const gymNext = S.gym < 5 ? '<button class="btn" data-act="gym">อัปเกรดค่าย ระดับ ' + (S.gym + 1) + ' · ฿ ' + baht(GYM_COST[S.gym]) + '</button>' : '<span class="hint">ค่ายระดับสูงสุดแล้ว</span>';
   const guide = S.rec.w + S.rec.l === 0 ? '<section class="gcard"><h2>เริ่มต้นยังไง</h2><p class="hint">1. ไปที่ "ซ้อม" ใช้แรงซ้อมวันละ 3 ครั้งเพิ่มค่าพลัง<br>2. ไปที่ "หาคู่ชก" ท้าชกเวทีงานวัดเพื่อหาเงินและประสบการณ์ แล้วลองศึกจัดอันดับ<br>3. ก่อนชกเลือกแผน และแก้แผนได้ทุกพักยกตามที่พี่เลี้ยงแนะนำ<br>4. กลับมา "จบวัน นอนพัก" เพื่อลดความล้าและเริ่มวันใหม่</p></section>' : '';
   const to = tourOpp(), tourToday = to && S.day >= tourDay(S.tour) ? '<section class="gcard hot"><h2>วันนี้มีชก <small>' + TOURS[S.tour.t].th + '</small></h2><p class="hint">' + to.diff + ' พบ ' + esc(to.name) + ' ต้องขึ้นชกวันนี้ ไม่งั้นแพ้ผ่าน</p><div class="rowbtn"><button class="btn go" data-act="tab" data-v="fight">ไปที่สายการชก</button></div></section>' : '';
-  return (view && view.note ? '<p class="gain">' + view.note + '</p>' : '') + nextMineHtml() + tourToday + guide + '<section class="gcard"><h2>' + esc(S.name) + ' <small>สาย' + styleTh(S.style) + '</small></h2>' +
+  return (view && view.note ? '<p class="gain">' + view.note + '</p>' : '') + tourToday + guide + '<section class="gcard"><h2>' + esc(S.name) + ' <small>สาย' + styleTh(S.style) + '</small></h2>' +
     '<div class="kv"><span>สถิติ</span><b>ชนะ ' + S.rec.w + ' (น็อก ' + S.rec.ko + ') แพ้ ' + S.rec.l + '</b><span>อันดับ</span><b>ที่ ' + pos + ' จาก ' + rows.length + ' · ' + LEAGUES[lg][1] + '</b><span>เข็มขัด</span><b>' + (S.belts.length ? '<span class="belts">' + S.belts.map(i => '<span class="belt">' + art('belt-' + (i + 1), 'beltimg') + BELTS[i] + '</span>').join('') + '</span>' : 'ยังไม่มี') + '</b><span>เป้าหมาย</span><b>' + goal + '</b></div>' +
     '<div class="statbox r">' + statBars(S.stats) + '</div><p class="hint">ค่าพลังเฉลี่ย ' + overall(S.stats) + ' · เพดานค่าพลังของค่ายระดับ ' + S.gym + ' คือ ' + cap() + '</p>' +
     '<div class="rowbtn">' + gymNext + '<button class="btn" data-act="hall">ทำเนียบแชมป์ · เข็มขัด ' + S.belts.length + ' ถ้วย ' + S.honors.filter(h => h.k === 'cup').length + '</button></div></section>' +
@@ -748,7 +753,7 @@ function breakHtml() {
     '<button class="btn go wide" data-act="resume">ชกต่อ</button></section>';
 }
 function liveHtml() {
-  if (F.live) return '<section class="gcard slim"><div class="kv"><span>' + (F.live.exh ? 'อุ่นเครื่อง' : F.clock ? 'ท้าชก · สด' : 'ท้าชก') + '</span><b>' + esc(F.live.fromName) + ' vs ' + esc(F.live.toName) + '</b><span>เวที</span><b>' + API.VENUES[F.live.venue] + '</b>' + (F.clock && F.me >= 0 ? '<span>แผนตอนนี้</span><b>' + planText(F.plan) + '</b>' : '') + '</div>' +
+  if (F.live) return '<section class="gcard slim"><div class="kv"><span>' + (F.live.exh ? 'อุ่นเครื่อง' : F.clock ? 'ท้าชก · สด' : 'ท้าชก') + '</span><b>' + esc(F.live.fromName) + ' vs ' + esc(F.live.toName) + '</b><span>เวที</span><b>' + API.VENUES[F.live.venue] + '</b>' + (F.clock && F.me >= 0 ? '<span>แผนตอนนี้</span><b>' + planText(F.plan) + '</b>' : '') + (F.clock ? '<span>ผู้ชม</span><b data-viewers>' + viewers(F.live) + '</b>' : '') + '</div>' +
     (F.loading ? '<p class="hint">กำลังขึ้นเวที…</p>' : F.clock ? '<p class="hint">ชกสดพร้อมกันทั้งสองฝั่ง ภาพและแต้มเดียวกัน · พักยก ' + LIVE_REST + ' วินาที ' + (F.me >= 0 ? 'เลือกแผนยกถัดไปได้ ' : '') + 'แล้วชกต่อเอง</p>' : '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button></div>') + '</section>';
   return '<section class="gcard slim"><div class="kv"><span>แผนตอนนี้</span><b>' + planText(F.plan) + '</b><span>คู่ชก</span><b>' + esc(F.opp.name) + ' · สาย' + styleTh(F.opp.style) + '</b></div>' +
     '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button><button class="btn link" data-act="nobreak" aria-pressed="' + !!S.noBreak + '">' + (S.noBreak ? 'พักยกแล้วชกต่อเอง · แตะเพื่อหยุดแก้แผนทุกพักยก' : 'หยุดแก้แผนทุกพักยก · แตะเพื่อให้พักแล้วชกต่อเอง') + '</button></div></section>';
@@ -834,8 +839,17 @@ const now = () => Date.now() + CH.skew;
 // The rest between rounds of a live match: LIVE_REST seconds in all, the first LIVE_PICK to choose the plan for the next
 // round, both sides' choices read at LIVE_READ, and the bell goes by itself.
 const LIVE_REST = 20, LIVE_PICK = 13, LIVE_READ = 16;
+// READY: a match starts no sooner than this after the challenge is accepted, so both get the countdown. QUICK_WAIT: how long
+// a "fight now" challenge waits for its answer. ONLINE: a player whose record was touched this recently is shown as online.
+const READY = 30e3, QUICK_WAIT = 90e3, ONLINE = 100e3, PRESENCE = 45e3, COUNT_FROM = 10e3;
+const isOnline = b => !!(b && b.seen && now() - b.seen < ONLINE);
+const agoTh = ms => { const m = Math.max(1, Math.round(ms / 60e3)); return m < 60 ? m + ' นาทีที่แล้ว' : m < 1440 ? Math.round(m / 60) + ' ชม. ที่แล้ว' : Math.round(m / 1440) + ' วันที่แล้ว'; };
+function presence() { if (!CLOUD || !S || document.hidden) return; CH.seenAt = Date.now(); CLOUD.db.doc('board/' + CLOUD.uid).set(boardDoc()).catch(() => {}); }
+// people watching a live match who are not in it (from the leaderboard records, ours included)
+const viewers = m => board.filter(b => b.in === m.key && isOnline(b) && b.id !== m.from && b.id !== m.to).length + (sideOf(m) < 0 && F && F.live && F.clock && F.live.key === m.key ? 1 : 0);
 const WHEN = [['n5', 'อีก 5 นาที'], ['n30', 'อีก 30 นาที'], ['n60', 'อีก 1 ชั่วโมง'], ['t18', '18:00 น.'], ['t20', '20:00 น.'], ['t21', '21:00 น.']];
 function whenTime(k) {
+  if (k === 'now') return now();
   if (k[0] === 'n') return now() + (+k.slice(1)) * 60e3;
   const d = new Date(); d.setHours(+k.slice(1), 0, 0, 0); if (d.getTime() < Date.now() + 60e3) d.setDate(d.getDate() + 1); return d.getTime() + CH.skew;
 }
@@ -864,16 +878,23 @@ function matches() {
       // newer than the challenge). Without this, a new challenge between the same two was "accepted" at once by the answer
       // to an old one, with the fighter as he was back then.
       const a0 = ((CH.adocs[to] || {}).list || {})[from] || null, a = a0 && (a0.seed != null ? a0.seed === e.seed : +a0.at >= +e.created) ? a0 : null;
-      const start = a && a.accept ? Math.max(e.time, +a.at || 0) : e.time;
-      if (t > start + MATCH_KEEP) continue;
+      const start = a && a.accept ? Math.max(e.time, (+a.at || 0) + READY) : e.time;
+      if (t > start + MATCH_KEEP || (e.quick && !a && t > (+e.until || 0))) continue;
       out.push({key: from + '>' + to + '>' + e.seed, from, to, e, a, start, fromName: API.cleanName(c.name) || 'นักมวย', toName: API.cleanName(e.toName) || 'นักมวย', venue: API.VENUES[e.venue] ? e.venue : 'stadium'});
     }
   }
   return out.sort((x, y) => x.start - y.start);
 }
 const mine = () => CLOUD ? matches().filter(m => m.from === CLOUD.uid || m.to === CLOUD.uid) : [];
+// an agreed match of ours that is gone before its bell: the other side withdrew (unless we did)
+function trackMine() {
+  if (!CLOUD || !S) return; const t = now(), cur = {};
+  for (const m of mine()) if (m.a && m.a.accept && t < m.start) cur[m.key] = {name: sideOf(m) ? m.fromName : m.toName, start: m.start};
+  for (const k in (CH.known || {})) if (!cur[k] && t < CH.known[k].start && CH.quit !== k) CH.notice = {text: CH.known[k].name + ' ถอนตัวจากนัดชก', until: Date.now() + 20000};
+  CH.known = cur;
+}
 function chChanged() {
-  settleMatches();
+  settleMatches(); trackMine();
   const typing = document.activeElement && document.activeElement.matches && document.activeElement.matches('input,select');
   if (!F && !DR && !SC && !typing && view !== 'create' && (tab === 'fight' || tab === 'rank' || tab === 'home')) render();
 }
@@ -934,38 +955,95 @@ async function checkBuild() { // the website says which build it serves now (ver
   try { const r = await fetch('/version.json', {cache: 'no-store'}), j = r.ok ? await r.json() : null; if (j && j.build > BUILD) CH.stale = true; } catch (e) { /* offline */ }
   if (CH.stale) selfUpdate();
 }
-function chTick() {
+const idle = () => !F && !DR && !SC && view !== 'create';
+const fillCountdowns = () => {
   const t = now();
   document.querySelectorAll('[data-cd]').forEach(el => { const left = +el.dataset.cd - t; el.textContent = left > 0 ? countdown(left) : 'เริ่มแล้ว'; });
   document.querySelectorAll('[data-restcd]').forEach(el => { el.textContent = String(Math.max(0, Math.ceil((+el.dataset.restcd - t) / 1000))); });
+};
+// into the ring of a match whose bell has gone, without anybody pressing (not out of another fight or a drill)
+function enterDue(m) { const t = now(); if (!m || t < m.start || t >= m.start + MATCH_LEN || CH.entered.has(m.key) || !idle()) return false; CH.entered.add(m.key); countOff(); watchMatch(m.key); return true; }
+function chTick() {
+  const t = now();
   for (const m of matches()) { const live = t >= m.start && t < m.start + MATCH_LEN && m.a && m.a.accept; if (live && !CH.live.has(m.key)) { CH.live.add(m.key); chChanged(); } }
   if (CH.stale) selfUpdate();
-  const m = S && CLOUD ? nextMine() : null; if (!m) { if (CH.barSig) { CH.barSig = ''; topBar(); } return; }
-  if (Date.now() - CH.beatAt > 15000) beat(m);
-  const o = theirBeat(m), mineNow = F && F.live && F.live.key === m.key;
-  if (o && o.b > BUILD) { CH.stale = true; selfUpdate(); }                    // he runs a newer build: get it before the bell
-  if (o && o.b === BUILD && o.fp && t < m.start && o.fp !== fightPrint(m) && CH.warned !== m.key && t - o.t < 20000) { CH.warned = m.key; siteLog('live match differs between the two devices: ' + m.key + ' mine ' + fightPrint(m) + ' his ' + o.fp); }
-  const sig = mineNow ? '' : [m.key, t >= m.start, !!(o && t - o.t < 45e3), !!(o && o.b < BUILD), m.start - t < 10000, !!F, !!DR, !!SC].join('|');
-  if (sig !== CH.barSig) { CH.barSig = sig; topBar(); }                       // the banner follows: he came online, the bell is near
-  // the bell: both corners are taken into the ring without pressing anything (unless busy in another fight or a drill)
-  if (t >= m.start && t < m.start + MATCH_LEN && !CH.entered.has(m.key) && !F && !DR && !SC && view !== 'create' && !(o && o.b > BUILD)) { CH.entered.add(m.key); watchMatch(m.key); }
+  if (!S || !CLOUD) return;
+  if (Date.now() - (CH.seenAt || 0) > PRESENCE) presence();
+  // who is online, and who is watching: the leaderboard is read again while it matters
+  const watching = F && F.clock, pageUp = tab === 'fight' && idle();
+  if ((watching || pageUp || CH.barHtml) && Date.now() - (CH.boardAt || 0) > (pageUp ? 20000 : 30000) && !CH.boardBusy) {
+    CH.boardBusy = true; CH.boardAt = Date.now();
+    loadBoard().then(() => { CH.boardBusy = false; const typing = document.activeElement && document.activeElement.matches && document.activeElement.matches('input,select'); if (tab === 'fight' && idle() && !typing) render(); const v = document.querySelector('[data-viewers]'); if (v && F && F.live) v.textContent = String(viewers(F.live)); }, () => { CH.boardBusy = false; });
+  }
+  const m = nextMine();
+  if (m) {
+    if (Date.now() - CH.beatAt > 15000) beat(m);
+    const o = theirBeat(m);
+    if (o && o.b > BUILD) { CH.stale = true; selfUpdate(); }                  // he runs a newer build: get it before the bell
+    if (o && o.b === BUILD && o.fp && t < m.start && o.fp !== fightPrint(m) && CH.warned !== m.key && t - o.t < 20000) { CH.warned = m.key; siteLog('live match differs between the two devices: ' + m.key + ' mine ' + fightPrint(m) + ' his ' + o.fp); }
+    if (!(o && o.b > BUILD)) enterDue(m);
+    if (m.start - t > 0 && m.start - t <= COUNT_FROM + 500 && idle()) countOn(m);
+  }
+  // a match somebody's link brought us to: taken to it when its bell goes
+  if (CH.follow) { const x = matches().find(k => k.key === CH.follow && k.a && k.a.accept); if (x && sideOf(x) < 0 && !enterDue(x) && t >= x.start + MATCH_LEN && !CH.entered.has(x.key) && idle()) { CH.entered.add(x.key); watchMatch(x.key); } }
+  // a challenge to fight now has just come in: the bell, once
+  const ask = mine().find(x => x.to === CLOUD.uid && !x.a && x.e.quick && t < x.e.until);
+  if (ask && CH.rang !== ask.key) { CH.rang = ask.key; try { API.sound.test(); } catch (e) { /* no sound */ } }
+  const html = bannersHtml(); if (html !== CH.barHtml) topBar();
+  fillCountdowns();
 }
-// The banner across the top while a match of ours is near: who against whom, who is here, and the time left in big figures
-function matchBarHtml() {
-  const m = S && CLOUD ? nextMine() : null; if (!m || (F && F.live && F.live.key === m.key)) return '';
-  const t = now(), me = sideOf(m), o = theirBeat(m), on = !!(o && t - o.t < 45e3), live = t >= m.start, oppName = me ? m.fromName : m.toName;
-  const who = (name, here) => '<span class="p' + (here ? ' on' : '') + '">' + esc(name) + '</span>';
-  return '<div class="matchbar' + (live ? ' live' : m.start - t < 10000 ? ' soon' : '') + '" role="status">' +
-    '<div class="mb-h">' + (live ? 'ระฆังดังแล้ว!' : on ? 'จับคู่แล้ว · ทั้งสองฝ่ายออนไลน์ · เตรียมตัวขึ้นชก' : 'จับคู่แล้ว · รอ ' + esc(oppName) + ' เข้าเกม') + '</div>' +
-    '<div class="mb-vs">' + who(m.fromName, me === 0 || on) + '<i>VS</i>' + who(m.toName, me === 1 || on) + '</div>' +
-    (!live ? '<div class="mb-cd" data-cd="' + m.start + '">' + countdown(m.start - t) + '</div>' : F || DR || SC ? '<div class="mb-w">' + (F ? 'จบไฟต์นี้แล้วกลับค่าย' : 'จบการซ้อมนี้') + ' ระบบพาขึ้นเวทีให้เอง</div>' : '<button class="btn go" data-act="chwatch" data-v="' + m.key + '">ขึ้นเวทีเลย</button>') +
-    '<div class="mb-s">' + API.VENUES[m.venue] + ' · ขึ้นเวที ' + hm(m.start - CH.skew) + (live ? '' : ' · ถึงเวลาแล้วเข้าเวทีให้เอง') + '</div>' +
-    (o && o.b < BUILD ? '<div class="mb-w">เครื่องของ ' + esc(oppName) + ' ยังเป็นเกมรุ่นเก่า กำลังรอให้โหลดรุ่นใหม่</div>' : !on && !live ? '<div class="mb-w">ถ้าอีกฝั่งเปิดเกมค้างไว้แล้วยังไม่ขึ้นว่าออนไลน์ ให้รีเฟรชหน้าเกมหนึ่งครั้ง</div>' : '') + '</div>';
+// The last seconds before our own match: the count in figures that fill the screen
+function countOn(m) {
+  if (CH.cnt) return;
+  const el = document.createElement('div'); el.id = 'gCount'; el.setAttribute('role', 'timer');
+  el.innerHTML = '<div class="cn-h">เตรียมขึ้นเวที</div><div class="cn-vs"><b class="r">' + esc(m.fromName) + '</b><i>VS</i><b class="b">' + esc(m.toName) + '</b></div><div class="cn-n" id="gCountN"></div><div class="cn-s">' + API.VENUES[m.venue] + ' · เข้าเวทีให้เองเมื่อครบเวลา</div>';
+  document.body.appendChild(el);
+  const step = () => {
+    const left = m.start - now(), n = $('gCountN'); if (!CH.cnt || !n) return;
+    if (!idle() || left > COUNT_FROM + 1500 || !matches().some(x => x.key === m.key && x.a && x.a.accept)) { countOff(); return; } // called off, or busy now
+    if (left <= 0) { if (!enterDue(m)) countOff(); return; }
+    const v = String(Math.ceil(left / 1000)); if (n.textContent !== v) { n.textContent = v; n.classList.remove('tick'); void n.offsetWidth; n.classList.add('tick'); }
+  };
+  CH.cnt = {el, timer: setInterval(step, 100)}; step();
+}
+function countOff() { if (!CH.cnt) return; clearInterval(CH.cnt.timer); CH.cnt.el.remove(); CH.cnt = null; }
+// The banners across the top of every screen: our own match that is near (who is here, the time left in big figures, the
+// way in once the bell has gone), a challenge waiting for our answer, our own "fight now" challenge waiting for his, and a
+// match of others to watch. No time-dependent text in here (the countdowns are filled in by the tick), so the same state
+// gives the same markup and the page is only touched when something changed.
+function bannersHtml() {
+  if (!S || !CLOUD || (F && F.clock)) return '';
+  const t = now(), out = [], busy = !!(F || DR || SC), all = mine(), vs = (x, on) => '<div class="mb-vs">' + ['from', 'to'].map((k, i) => '<span class="p' + (on && on[i] ? ' on' : '') + (on ? '' : ' plain') + '">' + esc(x[k + 'Name']) + '</span>').join('<i>VS</i>') + '</div>';
+  const m = nextMine();
+  if (m && !(F && F.live && F.live.key === m.key)) {
+    const me = sideOf(m), o = theirBeat(m), on = !!(o && t - o.t < 45e3), live = t >= m.start, soon = !live && m.start - t <= COUNT_FROM, oppName = me ? m.fromName : m.toName, ask = CH.quitAsk && CH.quitAsk.key === m.key && Date.now() < CH.quitAsk.until;
+    out.push('<div class="matchbar' + (live ? ' live' : soon ? ' soon' : '') + '" role="status">' +
+      '<div class="mb-h">' + (live ? 'ระฆังดังแล้ว! ไฟต์ของเรากำลังชก' : on ? 'จับคู่แล้ว · ทั้งสองฝ่ายออนไลน์ · เตรียมตัวขึ้นชก' : 'จับคู่แล้ว · รอ ' + esc(oppName) + ' เข้าเกม') + '</div>' + vs(m, [me === 0 || on, me === 1 || on]) +
+      (!live ? '<div class="mb-cd" data-cd="' + m.start + '"></div>' : busy ? '<div class="mb-w">' + (F ? 'จบไฟต์นี้แล้วกลับค่าย' : 'จบการซ้อมนี้') + ' ระบบพาขึ้นเวทีให้เอง</div>' : '<button class="btn go mb-go" data-act="chwatch" data-v="' + m.key + '">▶ ขึ้นเวทีเลย</button>') +
+      '<div class="mb-s">' + API.VENUES[m.venue] + ' · ขึ้นเวที ' + hm(m.start - CH.skew) + (live ? '' : ' · ถึงเวลาแล้วเข้าเวทีให้เอง') + '</div>' +
+      (!live && !soon ? '<div class="mb-row"><button class="btn sm" data-act="chquit" data-v="' + m.key + '">' + (ask ? 'แตะอีกครั้งเพื่อยืนยันถอนตัว' : 'ถอนตัว') + '</button>' + (CLOUD.site ? '<button class="btn sm" data-act="chshare" data-v="' + m.key + '">' + (CH.shared === m.key ? 'คัดลอกลิงก์แล้ว ✓' : 'ชวนเพื่อนมาดู') + '</button>' : '') + '</div>' : '') +
+      (o && o.b < BUILD ? '<div class="mb-w">เครื่องของ ' + esc(oppName) + ' ยังเป็นเกมรุ่นเก่า กำลังรอให้โหลดรุ่นใหม่</div>' : !on && !live ? '<div class="mb-w">ไม่เข้ามาก็ชกตามแผนที่ตั้งไว้ · ถ้าอีกฝั่งเปิดเกมอยู่แล้วยังไม่ขึ้นว่าออนไลน์ ให้รีเฟรชหนึ่งครั้ง</div>' : '') + '</div>');
+  }
+  all.filter(x => x.to === CLOUD.uid && !x.a && t < (x.e.quick ? x.e.until : x.e.time)).slice(0, 2).forEach(x => out.push('<div class="matchbar ask" role="alert">' +
+    '<div class="mb-h">' + esc(x.fromName) + ' ท้าชกคุณ' + (x.e.quick ? ' · ชกเดี๋ยวนี้' : ' · นัด ' + hm(x.e.time - CH.skew)) + '</div>' +
+    '<div class="mb-s">' + API.VENUES[x.venue] + (x.e.quick ? ' · รับแล้วขึ้นเวทีใน ' + READY / 1000 + ' วินาที · ตอบได้อีก <b class="cd" data-cd="' + x.e.until + '"></b>' : '') + '</div>' +
+    '<div class="mb-row"><button class="btn go mb-go" data-act="chyes" data-v="' + x.from + '">รับคำท้า</button><button class="btn" data-act="chno" data-v="' + x.from + '">ปฏิเสธ</button></div></div>'));
+  all.filter(x => x.from === CLOUD.uid && !x.a && x.e.quick && t < x.e.until).slice(0, 1).forEach(x => out.push('<div class="matchbar slim" role="status"><div class="mb-h">ส่งคำท้าถึง ' + esc(x.toName) + ' แล้ว · รอคำตอบอีก <b class="cd" data-cd="' + x.e.until + '"></b></div><div class="mb-row"><button class="btn sm" data-act="chcancel" data-v="' + x.to + '">ยกเลิกคำท้า</button></div></div>'));
+  // a match of others: under way, about to start, or the one a link brought us to
+  const others = matches().filter(x => x.a && x.a.accept && sideOf(x) < 0 && t < x.start + MATCH_LEN && (t >= x.start - 120e3 || x.key === CH.follow));
+  if (others.length) {
+    const x = others.find(k => k.key === CH.follow) || others[0], live = t >= x.start, n = viewers(x);
+    out.push('<div class="matchbar slim watch' + (live ? ' live' : '') + '" role="status"><div class="mb-h">' + (live ? '<span class="livetag">สด</span> กำลังชก' : 'กำลังจะชก · อีก <b class="cd" data-cd="' + x.start + '"></b>') + (others.length > 1 ? ' · อีก ' + (others.length - 1) + ' คู่' : '') + '</div>' + vs(x) +
+      '<div class="mb-row">' + (live ? busy ? '<span class="mb-s">จบที่ทำอยู่แล้วกดดูได้</span>' : '<button class="btn go mb-go" data-act="chwatch" data-v="' + x.key + '">▶ ดูสด</button>' : '<span class="mb-s">' + API.VENUES[x.venue] + (x.key === CH.follow ? ' · ถึงเวลาแล้วพาเข้าไปดูเอง' : ' · ถึงเวลาแล้วกดดูสดได้') + '</span>') + (n ? '<span class="mb-s">ผู้ชม ' + n + '</span>' : '') + '</div></div>');
+  }
+  if (CH.notice && Date.now() < CH.notice.until) out.push('<div class="matchbar slim note" role="status"><div class="mb-h">' + esc(CH.notice.text) + '</div></div>');
+  return out.join('');
 }
 async function sendChallenge(oppId, oppName, when) {
   return myDoc('challenges', cur => {
     const list = {}, t = now(); for (const k in (cur.list || {})) if (cur.list[k] && cur.list[k].time > t - MATCH_KEEP) list[k] = cur.list[k]; // forget old ones
-    list[oppId] = {toName: oppName, time: whenTime(when), seed: 1 + Math.floor(Math.random() * 999999), venue: LEAGUE_VENUE[league(S.rp)], spec: playerSpec(), look: S.look, body: S.body, plan: cleanPlan(S.plan), created: t, hb: {t, b: BUILD}};
+    list[oppId] = Object.assign({toName: oppName, time: whenTime(when), seed: 1 + Math.floor(Math.random() * 999999), venue: LEAGUE_VENUE[league(S.rp)], spec: playerSpec(), look: S.look, body: S.body, plan: cleanPlan(S.plan), created: t, hb: {t, b: BUILD}},
+      when === 'now' ? {quick: true, until: t + QUICK_WAIT} : {});
     return {name: S.name, list};
   });
 }
@@ -985,23 +1063,34 @@ function matchRow(m, mineView) {
   else if (!m.a) { state = 'รอคำตอบ · นัด ' + hm(m.e.time - CH.skew); if (me === 1) btn = '<button class="btn go" data-act="chyes" data-v="' + m.from + '">รับคำท้า</button><button class="btn" data-act="chno" data-v="' + m.from + '">ปฏิเสธ</button>'; else if (me === 0) btn = '<button class="btn" data-act="chcancel" data-v="' + m.to + '">ยกเลิก</button>'; }
   else if (live) { state = '<span class="livetag">สด</span> กำลังชก'; btn = '<button class="btn go" data-act="chwatch" data-v="' + m.key + '">' + (me >= 0 ? 'ขึ้นเวที' : 'ดูสด') + '</button>'; }
   else if (over) { state = 'จบแล้ว'; btn = '<button class="btn" data-act="chwatch" data-v="' + m.key + '">ดูย้อนหลัง</button>'; }
-  else { state = 'ขึ้นเวที ' + hm(m.start - CH.skew) + ' · อีก <b class="cd" data-cd="' + m.start + '">' + countdown(m.start - t) + '</b>'; }
+  else {
+    state = 'ขึ้นเวที ' + hm(m.start - CH.skew) + ' · อีก <b class="cd" data-cd="' + m.start + '">' + countdown(m.start - t) + '</b>';
+    const ask = CH.quitAsk && CH.quitAsk.key === m.key && Date.now() < CH.quitAsk.until;
+    if (me >= 0 && m.start - t > COUNT_FROM) btn = '<button class="btn" data-act="chquit" data-v="' + m.key + '">' + (ask ? 'แตะอีกครั้งเพื่อยืนยันถอนตัว' : 'ถอนตัว') + '</button>';
+    if (CLOUD && CLOUD.site) btn += '<button class="btn" data-act="chshare" data-v="' + m.key + '">' + (CH.shared === m.key ? 'คัดลอกลิงก์แล้ว ✓' : 'ชวนเพื่อนมาดู') + '</button>';
+  }
   return '<div class="match' + (live ? ' live' : '') + '"><div>' + vs + '</div><div class="hint">' + API.VENUES[m.venue] + ' · ' + state + '</div>' + (btn ? '<div class="rowbtn">' + btn + '</div>' : '') + '</div>';
 }
 function challengeHtml() {
   if (!CLOUD) return '<section class="gcard"><h2>ท้าชกออนไลน์</h2><p class="hint">ต้องเปิดเกมแบบออนไลน์ (ลงชื่อเข้า claude.ai) จึงท้าชกกับผู้เล่นคนอื่นได้</p></section>';
-  const my = mine(), others = board.filter(b => b.id).sort((a, b) => Math.abs(a.rp - S.rp) - Math.abs(b.rp - S.rp)).slice(0, 8);
-  const sent = new Set(my.filter(m => m.from === CLOUD.uid && !(m.a && m.a.accept && now() > m.start + MATCH_LEN)).map(m => m.to));
-  return '<section class="gcard"><h2>ท้าชกออนไลน์ <small>นัดเวลา ดูสดได้ทั้งสองฝ่าย</small></h2>' +
+  const cur = $('chWhen'); if (cur) CH.when = cur.value; // the page is drawn again as people come and go: keep the chosen time
+  const my = mine(), others = board.filter(b => b.id).sort((a, b) => (isOnline(b) - isOnline(a)) || Math.abs(a.rp - S.rp) - Math.abs(b.rp - S.rp)).slice(0, 12);
+  const sent = new Set(my.filter(m => m.from === CLOUD.uid && !(m.a && (!m.a.accept || now() > m.start + MATCH_LEN))).map(m => m.to));
+  const row = b => {
+    const on = isOnline(b), busy = on && !!b.in;
+    return '<div class="opp"><div class="oh"><b>' + esc(b.name) + '</b><span class="tag">RP ' + b.rp + '</span></div>' +
+      '<div class="sty"><span class="pres' + (on ? ' on' : '') + '">' + (busy ? 'ออนไลน์ · อยู่ในไฟต์สด' : on ? 'ออนไลน์' : b.seen ? 'ออฟไลน์ · ' + agoTh(now() - b.seen) : 'ออฟไลน์') + '</span> · สาย' + styleTh(b.style) + ' · ชนะ ' + b.w + ' แพ้ ' + b.l + '</div>' +
+      (sent.has(b.id) ? '<span class="hint">ส่งคำท้าแล้ว</span>' : '<div class="rowbtn">' + (on && !busy ? '<button class="btn go" data-act="chsend" data-w="now" data-v="' + b.id + '">ท้าชกเดี๋ยวนี้</button>' : '') + '<button class="btn" data-act="chsend" data-v="' + b.id + '">นัดเวลา</button></div>') + '</div>';
+  };
+  return '<section class="gcard"><h2>ท้าชกออนไลน์ <small>ชกเดี๋ยวนี้กับคนที่ออนไลน์ หรือนัดเวลา · ใครก็เข้ามาดูสดได้</small></h2>' +
     (my.length ? '<div class="fld">แมตช์ของเรา</div>' + my.map(m => matchRow(m, true)).join('') : '<p class="hint">ยังไม่มีแมตช์ท้าชก</p>') +
-    '<div class="fld">ท้าผู้เล่นคนอื่น</div>' + (others.length ? '<label class="fld" for="chWhen">เวลาขึ้นเวที</label><select id="chWhen" class="inp">' + WHEN.map(w => '<option value="' + w[0] + '">' + w[1] + '</option>').join('') + '</select>' +
-      others.map(b => '<div class="opp"><div class="oh"><b>' + esc(b.name) + '</b><span class="tag">RP ' + b.rp + '</span></div><div class="sty">สาย' + styleTh(b.style) + ' · ชนะ ' + b.w + ' แพ้ ' + b.l + '</div>' +
-        (sent.has(b.id) ? '<span class="hint">ส่งคำท้าแล้ว</span>' : '<button class="btn" data-act="chsend" data-v="' + b.id + '">ท้าชก</button>') + '</div>').join('') : '<p class="hint">ยังไม่มีผู้เล่นคนอื่นออนไลน์ในตารางอันดับ ชวนเพื่อนมาเล่น (แชร์หน้านี้ให้เพื่อน)</p>') +
+    '<div class="fld">ท้าผู้เล่นคนอื่น</div>' + (others.length ? '<label class="fld" for="chWhen">เวลานัด (ใช้กับปุ่ม "นัดเวลา")</label><select id="chWhen" class="inp">' + WHEN.map(w => '<option value="' + w[0] + '"' + (w[0] === (CH.when || 'n5') ? ' selected' : '') + '>' + w[1] + '</option>').join('') + '</select>' +
+      others.map(row).join('') : '<p class="hint">ยังไม่มีผู้เล่นคนอื่นในตารางอันดับ ชวนเพื่อนมาเล่น (แชร์หน้านี้ให้เพื่อน)</p>') +
+    '<p class="hint"><b>ท้าชกเดี๋ยวนี้:</b> อีกฝ่ายมีเวลา ' + QUICK_WAIT / 1000 + ' วินาทีกดรับ รับแล้วขึ้นเวทีใน ' + READY / 1000 + ' วินาที · <b>นัดเวลา:</b> ถึงเวลาแล้วชกเองตามแผนที่ตั้งไว้แม้ไม่ได้เข้ามา ถอนตัวได้ก่อนเวลา</p>' +
     '<p class="hint">ทั้งสองฝ่ายชกด้วยค่าพลัง ท่าไม้ตาย และแผนตอนส่งหรือรับคำท้า พักยก ' + LIVE_REST + ' วินาที เลือกแผนยกถัดไปได้แล้วชกต่อเอง ชนะได้ ฿ ' + CH_REWARD.win[0] + ' ★ ' + CH_REWARD.win[1] + ' แพ้ได้ ฿ ' + CH_REWARD.lose[0] + ' ไม่มีผลกับอันดับ</p>' +
     (CH.err ? '<p class="warn">' + CH.err + '</p>' : '') + '</section>';
 }
 const upcomingHtml = () => { const list = matches().filter(m => m.a && m.a.accept && now() < m.start + MATCH_LEN).slice(0, 8); return list.length ? '<section class="gcard"><h2>แมตช์ท้าชกที่กำลังจะมา <small>ใครก็ดูได้</small></h2>' + list.map(m => matchRow(m, false)).join('') + '</section>' : ''; };
-const nextMineHtml = () => ''; // the banner across the top (matchBarHtml) says it now, on every screen
 // the two records of a match read again from the server, not from the last poll
 async function freshMatch(m) {
   try {
@@ -1020,7 +1109,7 @@ async function watchMatch(key, given) {
   if (real) { setMode(true); render(); m = (await freshMatch(m)) || m; if (F !== hold) return; }
   const cfg = matchCfg(m), me = real ? sideOf(m) : -1, start = m.start, clock = real && now() < start + MATCH_LEN;
   F = {opp: {name: me === 1 ? m.fromName : m.toName, style: cfg.specs[me === 1 ? 0 : 1].style}, seed: cfg.seed, live: m, me, phase: 'live', plans: cfg.plans, plan: Object.assign({}, cfg.plans[Math.max(0, me)][0]), clock, planSig: JSON.stringify(cfg.plans)};
-  const f = F; setMode(true); topBar(); render();
+  const f = F; setMode(true); topBar(); render(); CH.seenAt = 0; CH.boardAt = 0; // the record says at once that we are in this match
   const body = (b, d) => (API.ROSTER[b] ? b : d);
   await API.startFight(Object.assign({venue: m.venue, rules: cfg.rules, seed: cfg.seed, specs: cfg.specs, plans: cfg.plans,
     looks: [Object.assign({name: m.fromName, fighter: body(m.e.body, 'c')}, cleanLook(m.e.look)), Object.assign({name: m.toName, fighter: body(m.a.body, 'd')}, cleanLook(m.a.look))]},
@@ -1238,7 +1327,7 @@ function onClick(e) {
   else if (act === 'style') { draft.style = v; draft.name = $('gName').value; renderCreate(); }
   else if (act === 'create') { const name = API.cleanName($('gName').value); if (name.length < 2) { const m = $('gCreateMsg'), n = $('gName'); m.textContent = 'ใส่ชื่อนักมวยก่อน (อย่างน้อย 2 ตัวอักษร) ที่ช่องด้านบน'; m.className = 'bad'; n.classList.add('bad'); n.scrollIntoView({block: 'center', behavior: 'smooth'}); n.focus({preventScroll: true}); n.addEventListener('input', () => { n.classList.remove('bad'); m.textContent = ''; }, {once: true}); return; } S = newSave(name, draft.body, draft.style); save(); go('home'); }
   else if (act === 'tab') go(v);
-  else if (act === 'home') { F = null; API.stop(); go('home'); if (CLOUD) loadBoard(); }
+  else if (act === 'home') { F = null; API.stop(); CH.seenAt = 0; go('home'); if (CLOUD) loadBoard(); }
   else if (act === 'sleep') {
     const wage = S.staff.reduce((a, id) => a + STAFF.find(x => x.id === id).wage, 0), income = 40 + S.fame * 3; let note = 'เช้าวันใหม่ ได้ค่าสปอนเซอร์ ฿ ' + baht(income);
     S.day++; S.slots = 3; S.ranked = 2; S.chuek = 1; S.title = 1; S.rematch = 1;
@@ -1260,9 +1349,19 @@ function onClick(e) {
   else if (act === 'cancelbuy') { pending = null; render(); showMe(); }
   else if (act === 'pick') { const o = v === 'r' ? rankedOpp() : v === 'c' ? chuekOpp() : v === 't' ? titleOpp() : v === 'v' ? rivalOpp() : v === 'd' ? defenseOpp() : v === 'u' ? tourOpp() : localOpps().find(x => x.id === v); if (!o) return; F = {opp: o, seed: (S.seed + S.day * 101 + S.rec.w * 7 + S.rec.l * 13 + (v === 'r' ? 5 : v === 'c' ? 9 : v === 't' ? 11 : v === 'v' ? 15 : v === 'd' ? 17 : v === 'u' ? 19 + (S.tour ? S.tour.res.length * 3 : 0) : +v.slice(1))) >>> 0, plan: Object.assign({}, S.plan || PLAN_DEFAULT), phase: 'plan'}; setMode(false); render(); API.preview(Object.assign({fighter: o.body}, o.look), 'guard', o.venue); $('gBody').scrollIntoView({block: 'nearest'}); }
   else if (act === 'backout') { F = null; go('fight'); }
-  else if (act === 'chsend') { const b = board.find(x => x.id === v), w = ($('chWhen') || {}).value || 'n30'; if (!b || !CLOUD) return; el.disabled = true; el.textContent = 'กำลังส่ง…'; sendChallenge(v, b.name, w).then(() => { view = {note: 'ส่งคำท้าถึง ' + b.name + ' แล้ว นัดขึ้นเวที ' + hm(whenTime(w))}; render(); }).catch(() => { el.textContent = 'ส่งไม่ได้ ลองใหม่'; el.disabled = false; }); }
-  else if (act === 'chyes' || act === 'chno') { if (!CLOUD) return; el.disabled = true; answerChallenge(v, act === 'chyes').then(() => { view = {note: act === 'chyes' ? 'รับคำท้าแล้ว' : 'ปฏิเสธคำท้าแล้ว'}; render(); }).catch(() => { el.disabled = false; }); }
-  else if (act === 'chcancel') { if (!CLOUD) return; el.disabled = true; cancelChallenge(v).then(() => render()).catch(() => { el.disabled = false; }); }
+  else if (act === 'chsend') { const b = board.find(x => x.id === v), w = el.dataset.w || ($('chWhen') || {}).value || 'n30'; if (!b || !CLOUD) return; el.disabled = true; el.textContent = 'กำลังส่ง…'; sendChallenge(v, b.name, w).then(() => { view = {note: 'ส่งคำท้าถึง ' + b.name + ' แล้ว ' + (w === 'now' ? 'รอคำตอบ ' + QUICK_WAIT / 1000 + ' วินาที รับแล้วขึ้นเวทีใน ' + READY / 1000 + ' วินาที' : 'นัดขึ้นเวที ' + hm(whenTime(w) - CH.skew))}; topBar(); render(); }).catch(() => { el.textContent = 'ส่งไม่ได้ ลองใหม่'; el.disabled = false; }); }
+  else if (act === 'chyes' || act === 'chno') { if (!CLOUD) return; el.disabled = true; answerChallenge(v, act === 'chyes').then(() => { topBar(); if (idle()) { view = {note: act === 'chyes' ? 'รับคำท้าแล้ว' : 'ปฏิเสธคำท้าแล้ว'}; render(); } }).catch(() => { el.disabled = false; }); }
+  else if (act === 'chcancel') { if (!CLOUD) return; el.disabled = true; cancelChallenge(v).then(() => { topBar(); if (idle()) render(); }).catch(() => { el.disabled = false; }); }
+  else if (act === 'chquit') { // out of an agreed match before its bell: asked twice, then the challenge is taken back or the answer turned to no
+    const m = mine().find(x => x.key === v); if (!m || !CLOUD || !m.a || !m.a.accept || now() >= m.start - COUNT_FROM) return;
+    if (!(CH.quitAsk && CH.quitAsk.key === v && Date.now() < CH.quitAsk.until)) { CH.quitAsk = {key: v, until: Date.now() + 5000}; topBar(); if (idle()) render(); return; }
+    CH.quitAsk = null; CH.quit = v; el.disabled = true;
+    (m.from === CLOUD.uid ? cancelChallenge(m.to) : answerChallenge(m.from, false)).then(() => { topBar(); if (idle()) { view = {note: 'ถอนตัวจากนัดชกกับ ' + (sideOf(m) ? m.fromName : m.toName) + ' แล้ว'}; render(); } }).catch(() => { el.disabled = false; });
+  }
+  else if (act === 'chshare') { // a link that takes whoever opens it to this match (live when it is on, the replay after)
+    const url = location.origin + '/?watch=' + encodeURIComponent(v), done = () => { CH.shared = v; topBar(); if (idle()) render(); };
+    if (navigator.share) navigator.share({title: 'Muay Manager', text: 'มาดูมวยคู่นี้สดด้วยกัน', url}).then(done, () => {}); else if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, () => {});
+  }
   else if (act === 'chwatch') watchMatch(v);
   else if (act === 'quick') { if (!F || !QUICK[v] || (F.live && !(F.rest && !F.rest.locked))) return; F.plan = Object.assign({}, QUICK[v][1]); if (F.live) sendRoundPlan(); render(); }
   else if (act === 'splearn') { const cost = SP_LEARN[Math.min(SP_LEARN.length - 1, Math.max(0, S.spOwn.length - 2))]; if (S.spOwn.includes(v) || !SPECIALS.includes(v) || S.money < cost) return; S.money -= cost; S.spOwn.push(v); view = {note: 'เรียนท่าไม้ตาย ' + MOVES[v].th + ' จากครูแล้ว'}; save(); topBar(); render(); }
@@ -1290,7 +1389,7 @@ export function bootGame(api) {
   API.HOOK.onCeremony = w => { if (!F) return; const me = F.live ? F.me : 0; F.cer = me >= 0 && w !== me ? 'lose' : 'win'; tune(); }; // the hand goes up: the winner's fanfare, or the long walk back
   window.addEventListener('keydown', e => { if (SC && !e.repeat) { const k = e.key === 'ArrowLeft' ? 'L' : e.key === 'ArrowRight' ? 'R' : e.key === ' ' ? 'pull' : ''; if (k) { e.preventDefault(); scenePress(k); } return; } if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const sc = e.target.closest('[data-scene]'); if (sc && SC) { e.preventDefault(); scenePress(sc.dataset.scene); return; } const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
-  const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
+  const g = $('game'); g.addEventListener('click', onClick); $('gMatch').addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
   const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ ' + VER; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress}; // for automated checks
   S = loadLocal(); setMode(false);
