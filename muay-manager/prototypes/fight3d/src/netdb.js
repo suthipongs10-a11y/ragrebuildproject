@@ -20,7 +20,8 @@ export async function siteRuntime(base = '/api') {
   const snap = (id, data) => ({id, exists: data != null, data: () => (data == null ? undefined : data)});
   const docRef = path => ({
     async get() { const r = await fetch(url(path), {headers: auth, cache: 'no-store'}); if (r.status === 404) return snap(path.split('/').pop(), null); if (!r.ok) fail(r); const j = await r.json(); return snap(j.id, j.data); },
-    async set(data) { const r = await fetch(url(path), {method: 'PUT', headers: Object.assign({'Content-Type': 'application/json'}, auth), body: JSON.stringify(data)}); if (!r.ok) fail(r); kick(); },
+    // opt.keepalive: the write is allowed to finish after the page has gone (the "I am leaving" note; small bodies only)
+    async set(data, opt) { const r = await fetch(url(path), {method: 'PUT', headers: Object.assign({'Content-Type': 'application/json'}, auth), body: JSON.stringify(data), keepalive: !!(opt && opt.keepalive)}); if (!r.ok) fail(r); kick(); },
     async delete() { const r = await fetch(url(path), {method: 'DELETE', headers: auth}); if (!r.ok && r.status !== 404) fail(r); kick(); }
   });
   // a query is read with get(); onSnapshot polls it (more slowly while the tab is hidden)
