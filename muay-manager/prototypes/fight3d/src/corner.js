@@ -16,7 +16,7 @@ const blend = (out, P, Q, k) => { for (let j = 0; j < NP; j++) out[j] = P[j] + (
 const add3 = (P, i, x, y, z, k) => { P[i] += x * k; P[i + 1] += y * k; P[i + 2] += z * k; };
 const mix3 = (P, i, v, k) => { P[i] += (v.x - P[i]) * k; P[i + 1] += (v.y - P[i + 1]) * k; P[i + 2] += (v.z - P[i + 2]) * k; };
 
-export const CORNER_LEN = B + UP + BACK, CORNER_SEAT = A; // CORNER_SEAT: seconds in when they are on the stools
+export const CORNER_LEN = B + UP + BACK, CORNER_SEAT = A, CORNER_OUT = UP + BACK; // CORNER_OUT: seconds from being told to stand to the bell // CORNER_SEAT: seconds in when they are on the stools
 
 export function buildCorner(scene, camera, getFx) {
   const C = {on: false, t: 0, pin: false};
@@ -83,6 +83,7 @@ export function buildCorner(scene, camera, getFx) {
   };
   // let the round start: right away if asked at the start, else once the fighters have sat for a moment
   C.release = function () { if (C.upAfter == null) C.upAfter = C.t < .05 ? B : Math.max(A + .8, C.t); };
+  C.releaseAt = function (t) { C.upAfter = Math.max(A + .8, t); }; // a rest of a set length (a live match): up at this time on the scene's clock
   C.stop = function () {
     C.on = false; stools.forEach(m => { m.visible = false; }); bottles.forEach(m => { m.visible = false; }); towels.forEach(m => { m.visible = false; });
     if (men) men.forEach(m => { m.root.visible = false; });

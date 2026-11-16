@@ -2,7 +2,7 @@
 // The browser side is src/netdb.js. Each player gets an id and a secret on first visit (POST /api/register).
 // Anyone may read the shared collections; a player writes only his own document in them (document id = his id)
 // and only his own private folder data/users/<his id>/.
-//   GET  /api/health                      -> {ok}
+//   GET  /api/health                      -> {ok, now}   (now: server time in ms)
 //   POST /api/register                    -> {id, secret}
 //   GET  /api/db/<collection>?order=&dir=&limit=   -> {docs: [{id, data}]}
 //   GET  /api/db/<collection>/<doc>       -> {id, data} (data null when there is no such document)
@@ -37,7 +37,7 @@ export async function onRequest({request, env, params}) {
   const db = env.DB; if (!db) return json({error: 'no database bound as DB'}, 500);
   await schema(db);
   const dec = x => { try { return decodeURIComponent(x); } catch (e) { return ''; } }, route = [].concat(params.route || []).map(dec), method = request.method;
-  if (route[0] === 'health') return json({ok: true});
+  if (route[0] === 'health') return json({ok: true, now: Date.now()}); // now: the server's clock, so two players' screens can keep the same time
   if (route[0] === 'log' && method === 'POST') {
     const text = (await request.text()).slice(0, 4000); let d = {}; try { d = JSON.parse(text) || {}; } catch (e) { d = {msg: text}; }
     const cut = (v, n) => String(v == null ? '' : v).slice(0, n);

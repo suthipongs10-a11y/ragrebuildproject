@@ -111,7 +111,7 @@ const withModels = readFileSync('dist/muay-fight-lab.html', 'utf8').replace('<!-
 const page = withModels.replace('<!--G:top-->', '').replace('<!--G:body-->', '');
 writeFileSync('dist/muay-fight-lab.html', page);
 const gameBase = readFileSync('src/page.html', 'utf8').replace('<title>Muay Fight Lab 3D</title>', '<title>Muay Manager</title>')
-  .replace('<!--G:top-->', '<div id="game"><div class="gbar" id="gTop"></div></div>')
+  .replace('<!--G:top-->', '<div id="gMatch"></div><div id="game"><div class="gbar" id="gTop"></div></div>')
   .replace('<!--G:body-->', '<nav class="gnav" id="gNav" aria-label="เมนูเกม"></nav><div class="gbody" id="gBody"></div>');
 const game = gameBase.replace('/*__APP__*/', () => jsGame).replace('<!--__MODELS__-->', () => models.join('\n') + voiceLite + uiStyle);
 writeFileSync('dist/muay-manager.html', game);
@@ -159,6 +159,8 @@ if (existsSync('assets/scene-music/tracks.json')) {
 }
 const shell = gameBase.replace('<!--__MODELS__-->', () => uiCss + sceneTag).replace(appBlock, () => loader);
 writeFileSync('dist/site/index.html', head + shell + '\n</html>\n');
+// the build now on the server: an open game asks for this and loads the new page when its own number is lower
+{ const v = /const VER = '([^']+)', BUILD = (\d+);/.exec(readFileSync('src/game.js', 'utf8')); if (!v) throw new Error('src/game.js has no VER / BUILD line'); writeFileSync('dist/site/version.json', JSON.stringify({build: +v[2], ver: v[1]}) + '\n'); }
 for (const f of readdirSync('site')) if (f !== 'loader.html') writeFileSync('dist/site/' + f, readFileSync('site/' + f));
 console.log('site: index.html', (shell.length / 1024).toFixed(0) + ' KB,', assetsName, (siteAssets.assetsSize / 1048576).toFixed(2) + ' MB,', appName, (siteAssets.appSize / 1024).toFixed(0) + ' KB, download ~' + (siteAssets.assetsGz / 1048576).toFixed(1) + ' MB gzip');
 console.log('dist/muay-fight-lab.html with models', (page.length / 1024 / 1024).toFixed(2) + ' MB, dist/muay-manager.html', (game.length / 1024 / 1024).toFixed(2) + ' MB (limit 16)');

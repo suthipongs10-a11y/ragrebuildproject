@@ -14,7 +14,7 @@ import { buildAudio } from './audio.js';
 import { buildCommentary } from './commentary.js';
 import { buildCeremony, CER_LEN } from './ceremony.js';
 import { buildPrize } from './prize.js';
-import { buildCorner, CORNER_LEN, CORNER_SEAT } from './corner.js';
+import { buildCorner, CORNER_LEN, CORNER_SEAT, CORNER_OUT } from './corner.js';
 const THREE = globalThis.THREE;
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
@@ -171,7 +171,38 @@ let fight = null, TL = null, EV = [], playT = 0, stopT = 0, mode = 'live', evi =
 let replays = [], rpi = 0, curRp = null, tvCuts = [], builtAs = '', slowWins = [], moments = [], marks = null, resultShown = false, galleryOn = false, frozen = false;
 let CFG = {seed: 1, specs: null, plans: null};                      // what the current fight was simulated from
 const HOOK = {onRoundBreak: null, onOver: null, onCeremony: null}, pausedRounds = new Set(); // set by the game layer
-let noBreaks = false;
+let sceneGen = 0; // each request to change what is on stage (a fight, the camp preview, a drill) takes the next number
+let noBreaks = false, restLen = 0; // restLen: a rest of this many seconds whatever anyone presses (a live match: both sides pick a plan, then it goes on)
+// A live match is shown by the clock its two players share: liveClock() gives the seconds since its bell. A hit-stop
+// or a slow frame puts the picture behind; it then runs a little faster until it is back in step, and jumps only when
+// it is far out (the tab was in the background). So both screens show the same second of the same fight.
+let liveClock = null, clockRate = 1;
+function clockAt(w) { // where the fight should be w seconds after the bell: fight time t, and the rest it is in (into: seconds into it)
+  let t = Math.max(0, w);
+  for (const r of marks.rests) {
+    if (!r.round || t <= r.pauseAt) break;
+    if (t < r.pauseAt + restLen) return {t: r.pauseAt, rest: r, into: t - r.pauseAt};
+    t -= restLen;
+  }
+  return {t, rest: null, into: 0};
+}
+// the finish (its slow motion, the replay, the raised hand) is shown in full on each screen: the clock is followed up to it
+function syncEnd() { const ko = replays.find(r => r.kind === 'ko'); return Math.min(marks.over - .05, ko ? ko.blow - .35 : Infinity); }
+function followClock() {
+  clockRate = 1;
+  if (!liveClock || !TL || mode !== 'live' || cer.on || playT >= syncEnd()) return;
+  const w = liveClock(), c = clockAt(w);
+  if (cor.on) { // in the corners: the scene's own clock is the rest's
+    const here = marks.rests.find(r => r.round && Math.abs(r.pauseAt - playT) < 1e-6);
+    if (c.rest ? c.rest !== here : c.t > playT + .5) API.seekTo(w); // the clock has left this rest
+    else if (c.rest && Math.abs(cor.t - c.into) > .7) cor.update(0, c.into);
+    return;
+  }
+  if (frozen) return;
+  const d = c.t - playT; // above 0: the picture is behind the clock
+  if (d > 1.6 || d < -1.2) { API.seekTo(w); return; } // far out (a tab that slept, a late start): straight to the clock's moment
+  clockRate = clamp(1 + d * .6, .75, 1.3);          // a hit-stop or a slow frame: made up within a second or so
+}
 let previewF = null, previewPose = 'guard';                         // a single fighter shown outside a fight (create, dress, camp)
 const buf = [new Float32Array(NP), new Float32Array(NP)];
 const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3(), lastTrail = [new THREE.Vector3(), new THREE.Vector3()];
@@ -247,7 +278,7 @@ function buildFight() {
   marks.rests.forEach(r => { r.pauseAt = r.t + 2.3; });
   buildTv(); buildSlow();
 }
-const replayOn = r => r.kind === 'ko' ? OPT.replay >= 1 : OPT.replay >= 2;
+const replayOn = r => r.kind === 'ko' ? OPT.replay >= 1 : OPT.replay >= 2 && !liveClock; // a live match has no time for the replay of the round: its rest runs by the clock
 
 // Broadcast cut list: which camera is live at each moment. Built once per fight so the same fight always cuts the same way.
 function buildTv() {
@@ -285,7 +316,7 @@ function buildSlow() {
   slowWins = [];
   const koRp = replays.find(r => r.kind === 'ko');
   if (OPT.slow >= 1 && koRp) slowWins.push({t0: koRp.blow - .22, t1: koRp.blow + 1.2, s: .22});
-  if (OPT.slow >= 2) {
+  if (OPT.slow >= 2 && !liveClock) { // a live match keeps to the clock: only its finish is slowed
     marks.kds.forEach(k => slowWins.push({t0: k.t - .14, t1: k.t + .85, s: .3}));
     marks.specials.forEach(s => { slowWins.push({t0: s.t0, t1: s.t0 + .2, s: .45}); if (s.hit && s.hit.res === 'hit') slowWins.push({t0: s.hit.t - .13, t1: s.hit.t + .4, s: .28}); });
     marks.bigHits.forEach(e => { if (e.raw >= 19 && !e.special) slowWins.push({t0: e.t - .07, t1: e.t + .24, s: .42}); });
@@ -527,7 +558,7 @@ function handle(e) {
 function advance(dt) {
   if (frozen) return 0;
   if (stopT > 0) { stopT -= dt; return 0; }
-  const t0 = playT, ts = mode === 'replay' ? .3 : speed * slowAt(playT);
+  const t0 = playT, ts = mode === 'replay' ? .3 : (liveClock ? clockRate : speed) * slowAt(playT);
   let target = playT + dt * ts;
   const hold = HOOK.onRoundBreak && !noBreaks, models = fighters[0] && fighters[0].isModel;
   if (mode === 'live' && (hold || models)) { // the rest between rounds: the corners, and a moment to change the plan
@@ -535,7 +566,12 @@ function advance(dt) {
     if (rb) {
       while (evi < EV.length && EV[evi].t <= rb.pauseAt) handle(EV[evi++]);
       playT = rb.pauseAt; pausedRounds.add(rb.round.n); frozen = true; startCorner();
-      if (hold) HOOK.onRoundBreak(rb.round.n, roundStats(rb.round.n)); // the game lets it go on with API.resume()
+      if (restLen && cor.on) { // a timed rest: the game shows the plan picker, the bell goes by itself
+        const into = liveClock ? clamp(clockAt(liveClock()).into, 0, restLen - 1) : 0;
+        cor.releaseAt(restLen - CORNER_OUT); if (into > .05) cor.update(0, into);
+        if (HOOK.onRoundBreak) HOOK.onRoundBreak(rb.round.n, roundStats(rb.round.n), restLen - into);
+      }
+      else if (hold) HOOK.onRoundBreak(rb.round.n, roundStats(rb.round.n)); // the game lets it go on with API.resume()
       else API.resume();
       return 0;
     }
@@ -661,7 +697,7 @@ let last = 0, fpsAcc = 0, fpsN = 0;
 function frame(ts) {
   requestAnimationFrame(frame);
   if (!last) last = ts;
-  const dt = Math.min(.05, (ts - last) / 1000); last = ts; realT += dt;
+  const dt = Math.min(liveClock ? .5 : .05, (ts - last) / 1000); last = ts; realT += dt; // a live match keeps to the clock on a slow screen too: longer steps, not a slower fight
   layout();
   if (drill && drill.on && W) { // training: the fighter works a target, the game layer calls the strikes
     drill.update(dt, realT, buf[0]); drillF.setWear(0, 0, 0);
@@ -692,8 +728,9 @@ function frame(ts) {
     audio.update(dt, hype, true, TL.clock(playT).round, 1, 'cer'); voice.tick(audio.time());
     renderer.render(scene, camera); hud(dt); return;
   }
+  followClock();
   if (cor.on) { // between rounds in the corners; the fight waits at the pause
-    const going = cor.update(dt * speed); arena.ropeUpdate(dt);
+    const going = cor.update(dt * (liveClock ? 1 : speed)); arena.ropeUpdate(dt);
     if (window.LAB.eye) { const e = window.LAB.eye; camera.position.set(e[0], e[1], e[2]); camera.lookAt(e[3], e[4], e[5]); camera.fov = e[6] || 40; camera.updateProjectionMatrix(); }
     if (!going) { stopCorner(); frozen = false; }
     hype = Math.max(0, hype - dt * .3);
@@ -843,7 +880,7 @@ function buildUi() {
 window.LAB = {
   OPT, seek, applyOpt, newFight, audio, voice, get ref() { return refF; }, camp(level, time) { arena.setCamp(level, time); }, // camp(level 1-5, 'morning'|'day'|'evening'|'night'|null)
   prize(kind, tier, name) { CFG.prize = kind ? {kind, tier, name} : null; }, // for checks: put a belt or a cup at stake in the fight on screen
-  cer(t) { if (!cer.on) { seek(marks.over - .02); evi = indexAt(marks.over); if (!startCeremony()) return false; } cerAt = t; return true; }, get fight() { return fight; }, get models() { return MODELS; }, get tl() { return TL; }, three: {scene, camera, renderer}, get t() { return playT; }, get mode() { return mode; },
+  cer(t) { if (!cer.on) { seek(marks.over - .02); evi = indexAt(marks.over); if (!startCeremony()) return false; } cerAt = t; return true; }, get fight() { return fight; }, get cfg() { return CFG; }, get clock() { return liveClock ? liveClock() : null; }, get rate() { return clockRate; }, get models() { return MODELS; }, get tl() { return TL; }, three: {scene, camera, renderer}, get t() { return playT; }, get mode() { return mode; },
   set(o) { Object.assign(OPT, o); OPT.preset = o.preset || ''; applyOpt(); },
   preset(k) { OPT.preset = k; Object.assign(OPT, PRESETS[k]); applyOpt(); },
   freeze(t) { seek(t); frozen = true; },
@@ -897,29 +934,50 @@ const API = {
   LOOK, ROSTER, COLORS, PATTERNS, HEADGEAR, HAIR, HOOK, VENUES, TARGETS, cleanName,
   hasModels: () => !!document.getElementById('model-c'),
   async startFight(cfg) { // cfg: {seed, specs: [player, opponent], plans, looks: [look, look], venue, rules}
+    const g = ++sceneGen;
     API.endPreview(); API.drillStop(); OPT.venue = VENUES[cfg.venue] ? cfg.venue : 'stadium';
     cfg.looks.forEach((l, i) => Object.assign(LOOK[i], l));
     OPT.fighter = 'model'; await loadPair();
-    noBreaks = !!cfg.noBreaks; // a live challenge: nobody gets to stop it at the break
-    newFight(cfg.seed, {specs: cfg.specs, plans: cfg.plans, rules: cfg.rules || null, prize: cfg.prize || null}); // prize: {kind: 'belt' | 'cup', tier, name} when a title or a tournament is at stake for the player's man applyOpt(); frozen = false;
+    if (g !== sceneGen) return false; // something newer was asked for while the bodies loaded
+    API.endPreview(); API.drillStop();
+    noBreaks = !!cfg.noBreaks; restLen = +cfg.restLen || 0; // a live challenge: nobody gets to stop it at the break; its rests last restLen seconds
+    liveClock = restLen && typeof cfg.clock === 'function' ? cfg.clock : null; clockRate = 1; // clock(): seconds since the bell of a live match
+    // prize: {kind: 'belt' | 'cup', tier, name} when a title or a tournament is at stake for the player's man
+    newFight(cfg.seed, {specs: cfg.specs, plans: cfg.plans, rules: cfg.rules || null, prize: cfg.prize || null});
+    applyOpt(); frozen = false; // applyOpt puts up the venue of this fight (without it the ring stays whatever was on stage: the camp)
+    if (liveClock && liveClock() > 1) API.seekTo(liveClock()); // joined after the bell: straight to where the fight is now
+    return true;
   },
   replan(plans) { CFG.plans = plans; const t = playT; buildFight(); evi = indexAt(t); rpi = replays.findIndex(r => r.trigger > t); if (rpi < 0) rpi = replays.length; },
   resume() { if (cor.on) cor.release(); else frozen = false; }, // in the corners: the round starts once they are back out
   skip() { seek(marks.over); },
+  // seconds since the fight began as this screen shows it, the rests in the corners included; null once it is over
+  // (a live match is kept in step with the clock by comparing this with the time since its start)
+  liveAt() {
+    if (!TL || cer.on || playT >= marks.over - .05) return null;
+    let t = playT; const len = restLen || CORNER_LEN;
+    for (const r of marks.rests) { if (!r.round) continue; if (playT > r.pauseAt + 1e-6) t += len; else if (cor.on && Math.abs(playT - r.pauseAt) < 1e-6) t += cor.t; }
+    return t;
+  },
   seekTo(t) { // join a live fight late: t is the time since it started, the rests in the corners included
     if (!TL) return;
     const corners = fighters[0] && fighters[0].isModel;
     for (const r of marks.rests) {
       if (!corners || !r.round || t <= r.pauseAt) break;
-      if (t < r.pauseAt + CORNER_LEN) { seek(r.pauseAt); pausedRounds.add(r.round.n); frozen = true; if (startCorner()) { cor.release(); cor.update(0, t - r.pauseAt); return; } frozen = false; break; }
-      t -= CORNER_LEN;
+      const len = restLen || CORNER_LEN;
+      if (t < r.pauseAt + len) {
+        seek(r.pauseAt); pausedRounds.add(r.round.n); frozen = true;
+        if (startCorner()) { if (restLen) { cor.releaseAt(restLen - CORNER_OUT); if (HOOK.onRoundBreak) HOOK.onRoundBreak(r.round.n, roundStats(r.round.n), len - (t - r.pauseAt)); } else cor.release(); cor.update(0, t - r.pauseAt); return; }
+        frozen = false; break;
+      }
+      t -= len;
     }
     seek(Math.min(t, marks.over - .05));
   },
-  stop() { stopCeremony(); TL = null; fighters.forEach(f => scene.remove(f.root)); fighters = []; clearOverlays(); },
+  stop() { stopCeremony(); TL = null; liveClock = null; restLen = 0; fighters.forEach(f => scene.remove(f.root)); fighters = []; clearOverlays(); },
   result: () => fight && fight.result, fight: () => fight,
   async preview(look, pose, venue) { // show one fighter in the given look, standing in a venue
-    const model = await API.single(look); if (!model) return false;
+    const model = await API.single(look, ++sceneGen); if (!model) return false;
     API.endPreview(); API.drillStop(); // a second call may have finished while this one was loading
     fighters.forEach(f => { f.root.visible = false; });
     venue = VENUES[venue] ? venue : 'camp'; arena.setVenue(venue);
@@ -927,9 +985,13 @@ const API = {
     return true;
   },
   // load one body, size the skeleton to it and clear the stage for it
-  async single(look) {
+  // gen: the caller's scene number. A fight (or anything else) asked for while this body was loading wins: the camp must
+  // not come back over a fight that has started (it did: a live match opened right after the page loaded was fought in the camp).
+  async single(look, gen) {
+    const g = gen || ++sceneGen;
     let model = null;
     try { model = await ensureModel(look.fighter); } catch (e) { $('modelNote').textContent = 'โหลดโมเดลนักมวยไม่ได้ (' + e.message + ') '; return null; }
+    if (g !== sceneGen) return null;
     stopCeremony(); // the referee leaves with the fight (he stood behind the camp screens before)
     const m = model.dims, D = DIM_DEFAULT, kHip = model.standHips / (D.thigh + D.shin + D.ankle + D.hipY);
     setDims(m); scalePoses(kHip, (.88 * kHip + m.spine + m.neck + m.head) / (.88 + D.spine + D.neck + D.head));
@@ -938,7 +1000,7 @@ const API = {
   },
   // training drill: the fighter in the camp with a target in front; the caller throws the strikes
   async drillStart(look, target) {
-    const model = await API.single(look); if (!model) return false;
+    const model = await API.single(look, ++sceneGen); if (!model) return false;
     API.endPreview(); API.drillStop(); fighters.forEach(f => { f.root.visible = false; });
     arena.setVenue('camp'); drillF = new ModelFighter(0, model, look); scene.add(drillF.root); clearOverlays();
     drillF.setMongkol(false);
@@ -956,6 +1018,7 @@ const API = {
   endPreview() { if (previewF) { scene.remove(previewF.root); previewF = null; } fighters.forEach(f => { f.root.visible = true; }); },
   setSpeed(v) { speed = v; }, applyOpt,
   camp(level) { if (arena) arena.setCamp(level); }, // the camp scene grows with the camp level
+  venueNow: () => (arena ? arena.venue : null), // for checks
   music(k) { audio.scene(k); }, // scene music away from the ring (camp, train, calm, night, title, win, lose; null for none)
   sound: {get on() { return audio.on; }, set: setSound, get vols() { return audio.vols; }, vol(k, v) { audio.setVol(k, v); soundSave(); }, test() { if (audio.on) audio.bell(1); }},
   bright: {get v() { return arena.bright; }, set(v) { arena.setBrightness(v); soundSave(); }}

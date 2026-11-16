@@ -17,8 +17,10 @@ const NS = ['--namespace-id', ns[1], '--remote'];
 if (!process.argv.includes('--no-build')) execFileSync('node', ['build.mjs'], {stdio: 'inherit'});
 
 const walk = d => readdirSync('dist/site/' + d).flatMap(f => { const p = d ? d + '/' + f : f; return statSync('dist/site/' + p).isDirectory() ? walk(p) : [p]; });
-// index.html last, so a visitor never gets a page whose files are not there yet
-const files = walk('').filter(f => !f.startsWith('_')).sort((a, b) => (a === 'index.html') - (b === 'index.html'));
+// index.html after the files it needs, so a visitor never gets a page whose files are not there yet; version.json
+// (the build number open games compare theirs with) last of all, so they reload only once the new page is there
+const rank = f => (f === 'version.json' ? 2 : f === 'index.html' ? 1 : 0);
+const files = walk('').filter(f => !f.startsWith('_')).sort((a, b) => rank(a) - rank(b));
 const have = new Set(JSON.parse(out(['kv', 'key', 'list', ...NS, '--prefix', 'site:'])).map(k => k.name));
 for (const f of files) {
   if (f.startsWith('a/') && have.has('site:' + f)) { console.log('KV site:' + f, 'already there'); continue; }

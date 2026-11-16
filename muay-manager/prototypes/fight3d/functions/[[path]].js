@@ -12,7 +12,7 @@ export async function onRequest({request, env, next}) {
     if (value) {
       const etag = metadata && metadata.etag ? '"' + metadata.etag + '"' : null;
       // the page is checked on every visit (a fix shows up on the next open); a/ files are named by content and never change
-      const headers = {'Content-Type': TYPES[path.split('.').pop()] || 'application/octet-stream', 'Cache-Control': path === 'index.html' ? 'no-cache' : path.startsWith('a/') ? 'public, max-age=31536000, immutable' : 'public, max-age=86400'};
+      const headers = {'Content-Type': TYPES[path.split('.').pop()] || 'application/octet-stream', 'Cache-Control': path === 'index.html' || path === 'version.json' ? 'no-cache' : path.startsWith('a/') ? 'public, max-age=31536000, immutable' : 'public, max-age=86400'};
       if (etag) headers.ETag = etag;
       if ((etag && request.headers.get('If-None-Match') === etag) || request.method === 'HEAD') {
         await value.cancel();
