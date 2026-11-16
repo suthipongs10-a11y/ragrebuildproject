@@ -124,7 +124,8 @@ export const RULES = {
   startX: 85,
   dmgScale: .137,          // global damage multiplier
   dmgStat: [.6, .8],       // a blow's power: this much whatever the stat, plus this much times the stat (0-1)
-  statSpread: .5,          // how much of the gap between the two men's stats counts in the ring (sim.js ringStats)
+  statSpread: .56,         // how much of the gap between the two men's stats counts in the ring (sim.js ringStats)
+  statGap: [.12, .4], statSpreadFar: 1, // ... for men within 12% of each other on paper; from there more of it counts, all of it from 40% apart
   blockDmg: .06,         // share of base damage that gets through a block
   // how much more often than a style's own weights say each fist punch is chosen: fights are meant to have plenty of hands
   fistBias: {jab: 1.2, cross: 1.6, hook: 1.9, upper: 1.9, bodyshot: 1.6},

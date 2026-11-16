@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.19';
+export const SIM_VERSION = 'proto-0.20';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -50,7 +50,13 @@ export function simulate(opts) {
   // win about 6 fights in 10, not 8; real fights are not that one-sided.
   function ringStats(i) {
     const out = {}, a = specs[0].stats, b = specs[1].stats;
-    for (const k in specs[i].stats) { const m = (a[k] + b[k]) / 2; out[k] = m + (specs[i].stats[k] - m) * K.statSpread; }
+    // That holds for men near each other. A real mismatch is a mismatch: how far apart the two are on paper (their totals,
+    // as a share of the weaker man's) decides how much of the gap counts, statSpread up to statGap[0], rising to
+    // statSpreadFar at statGap[1]. The weaker man can still land the one shot that ends it, but seldom (owner, round 63).
+    let ta = 0, tb = 0; for (const k in a) { ta += a[k]; tb += b[k] || 0; }
+    const g = Math.abs(ta - tb) / Math.max(1, Math.min(ta, tb)), u = Math.max(0, Math.min(1, (g - K.statGap[0]) / (K.statGap[1] - K.statGap[0])));
+    const spread = K.statSpread + (K.statSpreadFar - K.statSpread) * u * u * (3 - 2 * u);
+    for (const k in specs[i].stats) { const m = (a[k] + b[k]) / 2; out[k] = m + (specs[i].stats[k] - m) * spread; }
     return out;
   }
   function mk(i, spec) {
