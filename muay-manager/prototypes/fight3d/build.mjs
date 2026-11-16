@@ -148,7 +148,16 @@ const siteAssets = {assets: '/' + assetsName, app: '/' + appName, three: THREE_T
 const appBlock = THREE_TAG + '\n<script>\n/*__APP__*/\n</script>';
 if (!gameBase.includes(appBlock)) throw new Error('page.html: three.js tag and app script block not found');
 const loader = readFileSync('site/loader.html', 'utf8').replace('/*__SITE_ASSETS__*/null', () => JSON.stringify(siteAssets));
-const shell = gameBase.replace('<!--__MODELS__-->', () => uiCss).replace(appBlock, () => loader);
+// scene music (tools/scene-music-import.mjs), website only: each piece is a file of its own named by content, listed in
+// the page and fetched the first time its scene comes up, so the game opens no slower for it
+let sceneTag = '';
+if (existsSync('assets/scene-music/tracks.json')) {
+  const list = JSON.parse(readFileSync('assets/scene-music/tracks.json', 'utf8')); let bytes = 0;
+  for (const k of Object.keys(list)) { const b = readFileSync(`assets/scene-music/${k}.mp3`), name = 'a/' + createHash('sha256').update(b).digest('hex').slice(0, 16) + '.mp3'; writeFileSync('dist/site/' + name, b); list[k].url = '/' + name; bytes += b.length; }
+  sceneTag = `<script type="application/json" id="scene-music">${JSON.stringify(list)}</script>`;
+  console.log('scene music', Object.keys(list).join(','), (bytes / 1048576).toFixed(2) + ' MB (website only, fetched when needed)');
+}
+const shell = gameBase.replace('<!--__MODELS__-->', () => uiCss + sceneTag).replace(appBlock, () => loader);
 writeFileSync('dist/site/index.html', head + shell + '\n</html>\n');
 for (const f of readdirSync('site')) if (f !== 'loader.html') writeFileSync('dist/site/' + f, readFileSync('site/' + f));
 console.log('site: index.html', (shell.length / 1024).toFixed(0) + ' KB,', assetsName, (siteAssets.assetsSize / 1048576).toFixed(2) + ' MB,', appName, (siteAssets.appSize / 1024).toFixed(0) + ' KB, download ~' + (siteAssets.assetsGz / 1048576).toFixed(1) + ' MB gzip');

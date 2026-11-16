@@ -14,6 +14,10 @@ export function buildAudio() {
     get vols() { return Object.assign({}, vol); },
     get musicOn() { return M.on || !!T.buf; }, // for checks
     get musicTrack() { return T.buf ? T.i : -1; },
+    get sceneNow() { return SM.playing; },        // the scene piece that is playing (checks)
+    get sceneReady() { return Object.keys(SM.buf); },
+    get sceneVoices() { return SM.src.length; }, // two while one pass of the loop fades into the next
+    scene(k) { SM.want = k || null; },            // which scene piece is wanted away from the ring (null: none)
     get crowdBed() { return bed.on; },
     setVol(k, v) { if (!(k in vol)) return; vol[k] = Math.max(0, Math.min(1, +v || 0)); if (userGain[k]) userGain[k].gain.setTargetAtTime(vol[k], AC.currentTime, .05); },
     time: () => (AC ? AC.currentTime : 0),
@@ -119,6 +123,7 @@ export function buildAudio() {
       if (playOn && T.tracks) { if (M.on) { M.on = false; stopPi(); } if (!T.buf) trackStart(); trackTick(); }
       else if (playOn) { if (!M.on) startMusic(); schedule(); }
       else { if (M.on) { M.on = false; stopPi(); } if (T.buf) trackStop(); }
+      sceneTick(phase === 'off' || phase === 'cer' ? SM.want : null); // the camp, training, the raised hand: never over a round
     }
   };
 
@@ -178,6 +183,39 @@ export function buildAudio() {
     const t = AC.currentTime;
     T.src.forEach(x => { x.g.gain.cancelScheduledValues(t); x.g.gain.setValueAtTime(x.g.gain.value, t); x.g.gain.linearRampToValueAtTime(0, t + 1.2); try { x.s.stop(t + 1.3); } catch (e) { /* already stopped */ } });
     T.src = []; T.buf = null;
+  }
+  // ---- scene music away from the ring (website only: tools/scene-music-import.mjs, docs/MUSIC_BRIEF.md) ----
+  // One piece per scene: the camp, training, a quiet evening, fight night, the opening, a win, a loss. The page lists
+  // them (scene-music: url, where the loop starts, its length, the crossfade, the level). A piece is fetched the first
+  // time its scene comes up, plays from the top of its file, then loops from its loop point with a crossfade, so a win
+  // starts on its fanfare and still goes on for as long as the result is on screen. It shares the music volume.
+  const SM = {list: null, buf: {}, loading: {}, want: null, playing: null, src: [], next: 0, first: true, out: null};
+  function sceneLoad(k) {
+    if (SM.buf[k] || SM.loading[k]) return; SM.loading[k] = true;
+    fetch(SM.list[k].url).then(r => r.ok ? r.arrayBuffer() : Promise.reject(new Error('HTTP ' + r.status))).then(b => new Promise((ok, no) => AC.decodeAudioData(b, ok, no)))
+      .then(b => { SM.buf[k] = b; }, () => { setTimeout(() => { SM.loading[k] = false; }, 20000); }); // offline: try again later
+  }
+  function sceneStop(fade) {
+    const t = AC.currentTime;
+    SM.src.forEach(x => { x.g.gain.cancelScheduledValues(t); x.g.gain.setValueAtTime(x.g.gain.value, t); x.g.gain.linearRampToValueAtTime(0, t + fade); try { x.s.stop(t + fade + .1); } catch (e) { /* already stopped */ } });
+    SM.src = []; SM.playing = null;
+  }
+  function sceneTick(want) {
+    if (!SM.list) { const el = document.getElementById('scene-music'); SM.list = el ? JSON.parse(el.textContent) : {}; SM.out = AC.createGain(); SM.out.connect(userGain.music); }
+    const k = want && SM.list[want] ? want : null;
+    if (SM.playing && SM.playing !== k) sceneStop(.9);
+    if (!k) return;
+    if (!SM.buf[k]) { sceneLoad(k); return; }
+    const d = SM.list[k], buf = SM.buf[k], now = AC.currentTime;
+    if (SM.playing !== k || SM.next < now - 1) { if (SM.playing) sceneStop(.2); SM.playing = k; SM.first = true; SM.next = now + .12; } // new piece, or the sound was off for a while
+    while (SM.next < now + .6) {
+      // each pass ends xf seconds past the loop's end; the next one starts at the loop point as that tail fades
+      const off = SM.first ? 0 : d.from, t0 = SM.next, len = Math.min(buf.duration, d.from + d.len + d.xf) - off, up = SM.first ? (d.from > 0 ? .05 : .8) : d.xf;
+      const s = AC.createBufferSource(), g = AC.createGain(); s.buffer = buf; s.connect(g); g.connect(SM.out);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(d.gain, t0 + up); g.gain.setValueAtTime(d.gain, t0 + len - d.xf); g.gain.linearRampToValueAtTime(0, t0 + len);
+      s.start(t0, off, len + .05); const x = {s, g}; SM.src.push(x); s.onended = () => { SM.src = SM.src.filter(y => y !== x); };
+      SM.next = t0 + len - d.xf; SM.first = false;
+    }
   }
   function loadSfx() {
     if (sfx) return; const el = document.getElementById('sfx-pack'); if (!el) return;

@@ -449,9 +449,18 @@ function setMode(fight) { const app = document.querySelector('.app'); app.classL
 function showMe(pose) { if (S) API.camp(S.gym); if (S) API.preview(Object.assign({fighter: S.body}, pending ? pending.look : S.look), pose || 'guard'); }
 
 // ---------- screens ----------
+// Scene music (website only, docs/MUSIC_BRIEF.md): the piece that fits what is on screen. During a fight the ring has its
+// own music, so nothing is asked for until the referee raises a hand (onCeremony) or the result is up.
+function tune() {
+  if (!API || !API.music) return;
+  API.music(view === 'create' ? 'title'
+    : F ? (F.phase === 'result' ? (F.res && F.res.win === false ? 'lose' : 'win') : F.phase === 'plan' ? 'night' : F.cer || null)
+    : DR ? 'train' : SC ? (SC.a.id === 'run' ? 'train' : 'calm')
+    : (view && view.watch) || tab === 'fight' ? 'night' : 'camp');
+}
 function render() {
   if (S) { if (!Object.isExtensible(S)) S = JSON.parse(JSON.stringify(S)); fix(S); } // whatever path the save came in by, newer fields exist
-  topBar();
+  tune(); topBar();
   if (view === 'create') return renderCreate();
   if (F) return renderFight();
   nav();
@@ -577,7 +586,7 @@ function scenePress(kind) {
 }
 // abort = left the screen: nothing spent
 function sceneEnd(abort) {
-  const sc = SC; if (!sc) return; SC = null; sc.ctl.end();
+  const sc = SC; if (!sc) return; SC = null; sc.ctl.end(); tune();
   if (abort) return;
   mini = {act: sc.a};
   let extra = '';
@@ -945,7 +954,7 @@ async function drillStart(act) {
   $('stage').appendChild(ui);
   notes.forEach(n => { n.el = document.createElement('div'); n.el.className = 'dnote k-' + n.kind; n.el.textContent = KINDS[n.kind].th; $('dNotes').appendChild(n.el); });
   $('stage').scrollIntoView({block: 'start', behavior: 'smooth'});
-  await API.drillStart(Object.assign({fighter: S.body}, S.look), act.drill);
+  tune(); await API.drillStart(Object.assign({fighter: S.body}, S.look), act.drill);
   if (!DR) return;
   DR.t0 = performance.now(); DR.ready = true; DR.raf = requestAnimationFrame(drillTick);
   if (act.drill === 'skip') API.drillSkip(DR.t0 / 1000, notes.filter(n => n.kind === 'jump').map(n => n.t)); // the rope keeps time with the calls
@@ -990,7 +999,7 @@ function drillTick() {
 // abort = left the screen: nothing is spent
 function drillEnd(abort) {
   const d = DR; if (!d) return;
-  cancelAnimationFrame(d.raf); DR = null; const ui = $('drillUi'); if (ui) ui.remove(); API.drillStop();
+  cancelAnimationFrame(d.raf); DR = null; const ui = $('drillUi'); if (ui) ui.remove(); API.drillStop(); tune();
   if (abort) return;
   const a = d.act, c = cap(), q = d.score / d.notes.length;
   const mul = q >= .85 ? 1.5 : q >= .6 ? 1.15 : q >= .3 ? .8 : .5, label = q >= .85 ? 'ยอดเยี่ยม' : q >= .6 ? 'ดี' : q >= .3 ? 'พอใช้' : 'ยังไม่เข้าจังหวะ';
@@ -1107,10 +1116,11 @@ function onChange(e) {
 
 export function bootGame(api) {
   API = api; API.HOOK.onRoundBreak = onRoundBreak; API.HOOK.onOver = onOver;
+  API.HOOK.onCeremony = w => { if (!F) return; const me = F.live ? F.me : 0; F.cer = me >= 0 && w !== me ? 'lose' : 'win'; tune(); }; // the hand goes up: the winner's fanfare, or the long walk back
   window.addEventListener('keydown', e => { if (SC && !e.repeat) { const k = e.key === 'ArrowLeft' ? 'L' : e.key === 'ArrowRight' ? 'R' : e.key === ' ' ? 'pull' : ''; if (k) { e.preventDefault(); scenePress(k); } return; } if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const sc = e.target.closest('[data-scene]'); if (sc && SC) { e.preventDefault(); scenePress(sc.dataset.scene); return; } const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.39'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.40'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

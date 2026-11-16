@@ -21,7 +21,8 @@
 
 | ส่วน | ที่มา |
 |---|---|
-| เสียงพากย์ กรรมการนับ เสียงตะโกน | สร้างด้วย Cartesia TTS (บัญชีของเจ้าของเกม) |
+| เสียงพากย์ กรรมการนับ เสียงตะโกน (`prototypes/fight3d/assets/voice/`) | สร้างด้วย Gemini TTS ของ Google (`gemini-3.8-flash-lite-tts` คีย์ของเจ้าของเกม 16 พ.ย. 2026) เสียงสำเร็จรูป Fenrir (ผู้พากย์) Charon (กรรมการ) Puck Orus Kore Zephyr (คนดู) — ใช้ตามเงื่อนไขของ Gemini API ต้องตรวจเงื่อนไขการใช้เชิงพาณิชย์ก่อนลงสโตร์ |
+| ดนตรีประกอบฉากนอกเวที 7 เพลง (`prototypes/fight3d/assets/scene-music/`: win lose camp train calm night title) | เจ้าของเกมสร้างด้วย Gemini ตามคำสั่งใน `docs/MUSIC_BRIEF.md` ส่งมา 16 พ.ย. 2026 (ชื่อไฟล์ต้นฉบับ: Victory at the Ring, The Long Walk Back, Hands Wrapped in Linen, Leather And Bone, Stillness by the Canal, Before the First Bell, Eight Limbs of Honor) ตัดช่วงและปรับระดับด้วย `tools/scene-music-import.mjs` — ใช้ตามเงื่อนไขของบัญชี Gemini ของเจ้าของเกม ต้องตรวจเงื่อนไขการใช้เชิงพาณิชย์ก่อนลงสโตร์ |
 | ดนตรีปี่กลอง ระฆัง เสียงคนดูพื้นหลัง | สร้างจากโค้ดในเกม |
 | ตัวนักมวย 3D | สร้างด้วย Meshy (บัญชีของเจ้าของเกม) |
 | ภาพ UI | สร้างด้วย ChatGPT (บัญชีของเจ้าของเกม) |

@@ -109,6 +109,7 @@ function startCeremony() {
   if (!REFM || !fighters[0] || !fighters[0].isModel || !fight.result) return false;
   if (!refF) { refF = new ModelFighter(0, REFM, {referee: true, head: 'none'}); refF.handK = .55; scene.add(refF.root); } // the moulded glove shrinks to a gloved hand
   const w = fight.result.w; cerDone = false;
+  if (HOOK.onCeremony) HOOK.onCeremony(w); // the game picks the music for a win or a loss
   fighters.forEach(f => f.setMongkol(false));
   ['banner', 'count', 'scorecard', 'replayTag'].forEach(id => { $(id).hidden = true; }); $('pops').innerHTML = '';
   cer.start(fighters[w], fighters[1 - w], refF, {onRaise: p => { hype = 1; audio.roar(1.1); audio.applause(); audio.shout(1); voice.win(w, audio.time()); fx.sparks(p, 40, 0xffd35a, 1.8, 0); fx.ring(p, 1, 0xffd35a); }});
@@ -164,7 +165,7 @@ function layout() {
 let fight = null, TL = null, EV = [], playT = 0, stopT = 0, mode = 'live', evi = 0, speed = 1, hype = 0, shake = 0, zoomKick = 0, realT = 0;
 let replays = [], rpi = 0, curRp = null, tvCuts = [], builtAs = '', slowWins = [], moments = [], marks = null, resultShown = false, galleryOn = false, frozen = false;
 let CFG = {seed: 1, specs: null, plans: null};                      // what the current fight was simulated from
-const HOOK = {onRoundBreak: null, onOver: null}, pausedRounds = new Set(); // set by the game layer
+const HOOK = {onRoundBreak: null, onOver: null, onCeremony: null}, pausedRounds = new Set(); // set by the game layer
 let noBreaks = false;
 let previewF = null, previewPose = 'guard';                         // a single fighter shown outside a fight (create, dress, camp)
 const buf = [new Float32Array(NP), new Float32Array(NP)];
@@ -969,6 +970,7 @@ const API = {
   endPreview() { if (previewF) { scene.remove(previewF.root); previewF = null; } fighters.forEach(f => { f.root.visible = true; }); },
   setSpeed(v) { speed = v; }, applyOpt,
   camp(level) { if (arena) arena.setCamp(level); }, // the camp scene grows with the camp level
+  music(k) { audio.scene(k); }, // scene music away from the ring (camp, train, calm, night, title, win, lose; null for none)
   sound: {get on() { return audio.on; }, set: setSound, get vols() { return audio.vols; }, vol(k, v) { audio.setVol(k, v); soundSave(); }, test() { if (audio.on) audio.bell(1); }},
   bright: {get v() { return arena.bright; }, set(v) { arena.setBrightness(v); soundSave(); }}
 };

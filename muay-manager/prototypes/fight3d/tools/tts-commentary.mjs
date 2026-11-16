@@ -26,7 +26,7 @@ const MODEL = arg('model', 'gemini-3.8-flash-tts'), EARS = list('ear') || ['gemi
 const LIMIT = +arg('limit', 1e9), BATCH = +arg('batch', 28), GAP = +arg('gap', 13), DIR = arg('dir', 'assets/voice'), MAN = DIR + '/manifest.json', TMP = DIR + '/_tmp', TAKE = DIR + '/_takes';
 const KEY = process.env.GEMINI_API_KEY;
 if (!KEY) { console.log('set GEMINI_API_KEY'); process.exit(1); }
-const TAKES = 3, PASS = .72, HEAR = 32, API = 'https://generativelanguage.googleapis.com/v1beta/';
+const TAKES = 3, PASS = .72, HEAR = 20, API = 'https://generativelanguage.googleapis.com/v1beta/';
 const LOUD = {0: -18, 1: -16, 2: -14.5, count: -16, shout: -16}; // shouting plays louder than a calm read
 mkdirSync(TMP, {recursive: true}); mkdirSync(TAKE, {recursive: true});
 const man = existsSync(MAN) ? JSON.parse(readFileSync(MAN, 'utf8')) : {};
@@ -137,20 +137,37 @@ function clip(wav, a, b, J, out) {
     '-af', `silenceremove=start_periods=1:start_threshold=-45dB,areverse,silenceremove=start_periods=1:start_threshold=-45dB,areverse,loudnorm=I=${LOUD[J.style]}:TP=-1.5`, '-ac', '1', '-ar', '22050', '-b:a', '32k', out]);
   try { return +execFileSync('ffprobe', ['-v', 'error', '-show_entries', 'format=duration', '-of', 'csv=p=0', out], {stdio: ['ignore', 'pipe', 'ignore']}).toString() || 0; } catch { return 0; }
 }
-// a second model writes down what each clip says, HEAR clips to a request
+// A second model writes down what each clip says, HEAR clips to a request.
+// A listener that misses one clip numbers every clip after it wrong, and lines matched on such a list come out shifted
+// while looking right. So every request ends with a clip whose words are known (one this listener passed before):
+// if that one comes back wrong the list is not trusted, and it is asked again in two halves.
+async function hear(F) {
+  // every clip has its number in front of it, or the listener runs two pieces of one sentence together and loses count
+  const parts = F.flatMap((f, i) => [{text: `Clip ${i + 1}:`}, {inlineData: {mimeType: 'audio/mp3', data: readFileSync(f).toString('base64')}}]);
+  parts.push({text: `Those are ${F.length} separate short audio clips cut from a Thai Muay Thai TV broadcast. Some are a whole sentence, some only a word or a fragment. For each clip write down only the words audible in that clip itself, in Thai script; never complete a sentence from a neighbouring clip. If a clip has no speech write (none). Reply with exactly ${F.length} lines in the form "1: words", nothing else.`});
+  let out = null, err;
+  for (const model of EARS) { try { const d = await ask(model, `models/${model}:generateContent`, {contents: [{parts}], generationConfig: {temperature: 0}}); out = ((((d.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join(''); break; } catch (e) { err = e; } }
+  if (out == null) throw err;
+  const got = F.map(() => '');
+  for (const l of out.split('\n')) { const m = /^\s*(\d+)\s*[:.)]\s*(.*)$/.exec(l); if (m && got[+m[1] - 1] != null) got[+m[1] - 1] = /^\(?none\)?$/i.test(m[2].trim()) ? '' : m[2].trim(); }
+  return got;
+}
+let guard; // the known clip: {file, text}, or null in a folder with nothing passed yet
+async function heardRight(F) {
+  if (!guard) return hear(F);
+  const got = await hear(F.concat([guard.file]));
+  if (alike(got[F.length], guard.text) >= .7) return got.slice(0, F.length);
+  if (F.length <= 3) { console.log('  the listener lost count on a list of ' + F.length + '; taken as heard'); return got.slice(0, F.length); }
+  console.log(`  the listener lost count on a list of ${F.length}; asking again in two halves`);
+  return (await heardRight(F.slice(0, F.length >> 1))).concat(await heardRight(F.slice(F.length >> 1)));
+}
 async function listen(files) {
-  const heard = [];
-  for (let at = 0; at < files.length; at += HEAR) {
-    // every clip has its number in front of it, or the listener runs two pieces of one sentence together and loses count
-    const F = files.slice(at, at + HEAR), parts = F.flatMap((f, i) => [{text: `Clip ${i + 1}:`}, {inlineData: {mimeType: 'audio/mp3', data: readFileSync(f).toString('base64')}}]);
-    parts.push({text: `Those are ${F.length} separate short audio clips cut from a Thai Muay Thai TV broadcast. Some are a whole sentence, some only a word or a fragment. For each clip write down only the words audible in that clip itself, in Thai script; never complete a sentence from a neighbouring clip. If a clip has no speech write (none). Reply with exactly ${F.length} lines in the form "1: words", nothing else.`});
-    let out = null, err;
-    for (const model of EARS) { try { const d = await ask(model, `models/${model}:generateContent`, {contents: [{parts}], generationConfig: {temperature: 0}}); out = ((((d.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join(''); break; } catch (e) { err = e; } }
-    if (out == null) throw err;
-    const got = F.map(() => '');
-    for (const l of out.split('\n')) { const m = /^\s*(\d+)\s*[:.)]\s*(.*)$/.exec(l); if (m && got[+m[1] - 1] != null) got[+m[1] - 1] = /^\(?none\)?$/i.test(m[2].trim()) ? '' : m[2].trim(); }
-    heard.push(...got);
+  if (guard === undefined) { // a long, sure clip this listener passed, kept apart so a retake cannot change it under us
+    const e = Object.entries(man).find(([nm, v]) => EARS.includes(v.ear) && v.ok >= .95 && bare(v.text).length >= 14 && existsSync(`${DIR}/${nm}.mp3`));
+    guard = e ? {file: TMP + '/guard.mp3', text: e[1].text} : null; if (e) writeFileSync(guard.file, readFileSync(`${DIR}/${e[0]}.mp3`));
   }
+  const heard = [], size = guard ? HEAR - 1 : Math.min(HEAR, 10);
+  for (let at = 0; at < files.length; at += size) heard.push(...await heardRight(files.slice(at, at + size)));
   return heard;
 }
 // how close what was heard is to the line: letters only, tone marks dropped (the ear is least sure of those)
