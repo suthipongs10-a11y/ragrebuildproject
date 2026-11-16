@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.16';
+export const SIM_VERSION = 'proto-0.17';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -73,6 +73,8 @@ export function simulate(opts) {
   const paceNow = () => { const P = K.pace, r = Math.min(G.round, P.start.length) - 1, k = clamp(1 - G.clock / K.roundTime, 0, 1); return P.start[r] + (P.end[r] - P.start[r]) * Math.pow(k, P.ramp); };
   const byPace = (low, I) => low + (1 - low) * I; // a rate that is 'low' at pace 0 and normal at full pace
   function planOf(f) { const p = opts.plans && opts.plans[f.i]; return (p && (p[G.round - 1] || p[p.length - 1])) || PLAN_DEFAULT; }
+  // last-round instinct, from -1 (well ahead: sits back) to +1 (well behind: presses); 0 before the last round or under an order
+  const urge = f => (G.round < K.rounds || planOf(f).ag !== 'balanced') ? 0 : clamp((F[1 - f.i].pts - f.pts) / K.urgePts, -1, 1);
 
   function setPose(f, name, d, extra) {
     f.to = name; f.pt = 0; f.pd = Math.max(.001, d);
@@ -386,7 +388,7 @@ export function simulate(opts) {
         if (f.qi >= f.q.length) {
           f.state = 'idle'; f.mv = null;
           const ag = planOf(f).ag, I = paceNow();
-          f.cool = (o.state === 'stun' || R() < K.chainChance * byPace(K.paceCombo, I)) ? .05 : rnd(K.coolMin, K.coolMax) / (0.8 + f.stats.spd / 250) * (ag === 'attack' ? PR.attackCool : ag === 'counter' ? PR.counterCool : 1) * (K.paceCool[0] + (K.paceCool[1] - K.paceCool[0]) * I);
+          f.cool = (o.state === 'stun' || R() < K.chainChance * byPace(K.paceCombo, I)) ? .05 : rnd(K.coolMin, K.coolMax) / (0.8 + f.stats.spd / 250) * (ag === 'attack' ? PR.attackCool : ag === 'counter' ? PR.counterCool : 1) * (K.paceCool[0] + (K.paceCool[1] - K.paceCool[0]) * I) * (1 - K.urgeCool * urge(f));
           if (f.cool > .05 && o.state !== 'stun' && R() < (1 - I) * K.paceBack) f.backT = rnd(.4, .75); // one shot, then straight back out
         } else setPose(f, f.q[f.qi][0], f.q[f.qi][1] / moveSpeed(f, f.mv), f.qi === 1 ? {strike: f.mvKey} : null);
       }
@@ -452,7 +454,7 @@ export function simulate(opts) {
       f.seen = o.moveId;
       const om = o.mv;
       const ag = planOf(f).ag;
-      if (d <= om.reach + 30 && R() < (K.coverBase + f.stats.def / 100 * K.coverDef + (f.hp < 35 ? .15 : 0)) * (ag === 'attack' ? PR.attackCover : ag === 'counter' ? PR.counterCover : 1) * (planOf(f).range === 'in' ? PR.inCover : 1)) {
+      if (d <= om.reach + 30 && R() < (K.coverBase + f.stats.def / 100 * K.coverDef + (f.hp < 35 ? .15 : 0)) * (ag === 'attack' ? PR.attackCover : ag === 'counter' ? PR.counterCover : 1) * (planOf(f).range === 'in' ? PR.inCover : 1) * (1 - K.urgeCover * urge(f))) {
         const lv = ['head', 'body', 'leg'];
         f.coverLvl = R() < K.coverRead ? om.lvl : lv[(lv.indexOf(om.lvl) + 1 + Math.floor(R() * 2)) % 3];
         f.state = 'cover'; f.plan = null; f.combo = null; f.guards++;
@@ -465,7 +467,7 @@ export function simulate(opts) {
     f.cool -= dt;
     if (!f.plan && f.cool <= 0) { f.combo = null; f.plan = choose(f, o); f.planT = K.planTime; }
     const rg = planOf(f).range;
-    let want = 114 + (rg === 'out' ? PR.outDist : rg === 'in' ? PR.inDist : 0) + Math.sin(G.t * 1.6 + f.i * 2.1) * 9 + (1 - paceNow()) * K.paceRange;
+    let want = 114 + (rg === 'out' ? PR.outDist : rg === 'in' ? PR.inDist : 0) + Math.sin(G.t * 1.6 + f.i * 2.1) * 9 + (1 - paceNow()) * K.paceRange - K.urgeDist * urge(f);
     if (f.backT > 0) { f.backT -= dt; if (!f.plan) want = Math.max(want, K.backDist); }
     if (f.plan) {
       const m = MOVES[f.plan]; want = Math.max(m.min + 8, m.reach - 12); f.planT -= dt;
@@ -550,7 +552,9 @@ export function simulate(opts) {
       if (G.restT <= 0) {
         G.round++; G.clock = K.roundTime; G.phase = 'fight';
         F.forEach(f => { f.state = 'idle'; f.cool = rnd(.6, 1.2); f.plan = null; });
-        emit({type: 'phase', phase: 'fight', round: G.round}); F.forEach(x => { x.pts0 = x.pts; emit({type: 'plan', by: x.i, round: G.round, ag: planOf(x).ag}); }); emit({type: 'bell', n: 1}); say('เริ่มยกที่ ' + G.round);
+        emit({type: 'phase', phase: 'fight', round: G.round}); let note = ''; // the picture follows the instinct too: the man pressing walks forward, the man sitting back waits
+        F.forEach(x => { x.pts0 = x.pts; const u = urge(x); emit({type: 'plan', by: x.i, round: G.round, ag: u > .4 ? 'attack' : u < -.4 ? 'counter' : planOf(x).ag}); if (u > .4) note += ' · <b>' + x.name + '</b> แต้มตาม เร่งออกอาวุธ'; else if (u < -.4) note += ' · <b>' + x.name + '</b> แต้มนำ เน้นตั้งรับ'; });
+        emit({type: 'bell', n: 1}); say('เริ่มยกที่ ' + G.round + note);
       }
     } else if (G.phase === 'ko') {
       G.koT += dt;

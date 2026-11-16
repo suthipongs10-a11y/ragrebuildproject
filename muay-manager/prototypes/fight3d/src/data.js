@@ -112,6 +112,10 @@ export const RULES = {
   // then backs up at only walkBack of his walking speed (stepping out after a shot of his own is still quick). The owner:
   // the man defending sets his guard, pushes kicks and lifts the knee; he does not run, and nobody need chase.
   walkDeadIn: 30, walkBack: .45,
+  // Instinct in the last round, when the corner has given no order to press or to wait (attitude 'balanced'): the man
+  // behind on points throws a little sooner, covers a little less and stands a touch closer; the man ahead does the
+  // opposite. Full effect when urgePts points apart. (The owner: what any fighter does unless told otherwise.)
+  urgePts: 12, urgeCool: .16, urgeCover: .2, urgeDist: 6,
   planTime: 1.8,         // how long a man keeps closing in for the strike he has picked before he gives it up
   limit: 235,            // ring half width the fighters can use
   startX: 85,
