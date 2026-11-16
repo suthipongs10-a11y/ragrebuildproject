@@ -13,6 +13,7 @@ import { buildFx } from './fx.js';
 import { buildAudio } from './audio.js';
 import { buildCommentary } from './commentary.js';
 import { buildCeremony, CER_LEN } from './ceremony.js';
+import { buildPrize } from './prize.js';
 import { buildCorner, CORNER_LEN, CORNER_SEAT } from './corner.js';
 const THREE = globalThis.THREE;
 const $ = id => document.getElementById(id);
@@ -112,10 +113,14 @@ function startCeremony() {
   if (HOOK.onCeremony) HOOK.onCeremony(w); // the game picks the music for a win or a loss
   fighters.forEach(f => f.setMongkol(false));
   ['banner', 'count', 'scorecard', 'replayTag'].forEach(id => { $(id).hidden = true; }); $('pops').innerHTML = '';
-  cer.start(fighters[w], fighters[1 - w], refF, {onRaise: p => { hype = 1; audio.roar(1.1); audio.applause(); audio.shout(1); voice.win(w, audio.time()); fx.sparks(p, 40, 0xffd35a, 1.8, 0); fx.ring(p, 1, 0xffd35a); }});
+  // a title or a tournament won by the player's man (corner 0): the belt or the cup is presented after the raised hand
+  const pz = CFG.prize && w === 0 ? CFG.prize : null; if (!prizes) prizes = buildPrize(scene);
+  cer.start(fighters[w], fighters[1 - w], refF, {onRaise: p => { hype = 1; audio.roar(1.1); audio.applause(); audio.shout(1); voice.win(w, audio.time()); fx.sparks(p, 40, 0xffd35a, 1.8, 0); fx.ring(p, 1, 0xffd35a); },
+    prize: pz ? {kind: pz.kind, obj: prizes.get(pz.kind, pz.tier), r: prizes.R} : null,
+    onPrize: p => { hype = 1; audio.roar(1.2); audio.applause(); audio.shout(1); fx.sparks(p, 70, 0xffd35a, 2.2, 0); fx.ring(p, 1.3, 0xffd35a); if (pz.name) banner(pz.name, 'gold'); }});
   return true;
 }
-function stopCeremony() { cer.stop(); cerDone = false; cerAt = null; stopCorner(); }
+function stopCeremony() { cer.stop(); if (prizes) prizes.hide(); cerDone = false; cerAt = null; stopCorner(); }
 
 // ---------- sound settings: on/off and a level per group, kept in this browser ----------
 const SOUND_KEY = 'muaySound';
@@ -145,7 +150,7 @@ renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadow
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(30, 1.5, .1, 120);
 const audio = buildAudio(), voice = buildCommentary(audio, MOVES), cer = buildCeremony(camera), cor = buildCorner(scene, camera, () => fx);
-let cerDone = false, cerAt = null; // cerAt: hold the ceremony at this time (checks)
+let cerDone = false, cerAt = null, prizes = null; // cerAt: hold the ceremony at this time (checks); prizes: the belt and the cup (prize.js)
 let introSaid = false;
 let arena = null, fx = null, drill = null, drillF = null, mateF = null; // built once fonts are ready, the mat texture draws text
 let fighters = [], W = 0, H = 0;
@@ -837,6 +842,7 @@ function buildUi() {
 // hooks for tuning and automated checks
 window.LAB = {
   OPT, seek, applyOpt, newFight, audio, voice, get ref() { return refF; }, camp(level, time) { arena.setCamp(level, time); }, // camp(level 1-5, 'morning'|'day'|'evening'|'night'|null)
+  prize(kind, tier, name) { CFG.prize = kind ? {kind, tier, name} : null; }, // for checks: put a belt or a cup at stake in the fight on screen
   cer(t) { if (!cer.on) { seek(marks.over - .02); evi = indexAt(marks.over); if (!startCeremony()) return false; } cerAt = t; return true; }, get fight() { return fight; }, get models() { return MODELS; }, get tl() { return TL; }, three: {scene, camera, renderer}, get t() { return playT; }, get mode() { return mode; },
   set(o) { Object.assign(OPT, o); OPT.preset = o.preset || ''; applyOpt(); },
   preset(k) { OPT.preset = k; Object.assign(OPT, PRESETS[k]); applyOpt(); },
@@ -895,7 +901,7 @@ const API = {
     cfg.looks.forEach((l, i) => Object.assign(LOOK[i], l));
     OPT.fighter = 'model'; await loadPair();
     noBreaks = !!cfg.noBreaks; // a live challenge: nobody gets to stop it at the break
-    newFight(cfg.seed, {specs: cfg.specs, plans: cfg.plans, rules: cfg.rules || null}); applyOpt(); frozen = false;
+    newFight(cfg.seed, {specs: cfg.specs, plans: cfg.plans, rules: cfg.rules || null, prize: cfg.prize || null}); // prize: {kind: 'belt' | 'cup', tier, name} when a title or a tournament is at stake for the player's man applyOpt(); frozen = false;
   },
   replan(plans) { CFG.plans = plans; const t = playT; buildFight(); evi = indexAt(t); rpi = replays.findIndex(r => r.trigger > t); if (rpi < 0) rpi = replays.length; },
   resume() { if (cor.on) cor.release(); else frozen = false; }, // in the corners: the round starts once they are back out

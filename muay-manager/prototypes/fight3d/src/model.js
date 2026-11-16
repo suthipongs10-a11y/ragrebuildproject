@@ -78,6 +78,11 @@ export async function loadModel(id, key) {
   let headH = pos.head_end ? pos.head_end.distanceTo(pos.Head) : 0;
   if (headH < .16 || headH > .3) { let top = -Infinity; for (let i = 0; i < SI.count; i++) { if (headW(i) < .5) continue; mesh.getVertexPosition(i, p); p.applyMatrix4(mesh.matrixWorld); if (p.y > top) top = p.y; } headH = isFinite(top) ? Math.max(.18, Math.min(.27, (top - hy.y) * .93)) : .23; }
   mesh.userData.headH = headH;
+  // The waist where a title belt sits (a band just above the hip joint), in fighter space: how far the body reaches
+  // ahead of the hips, behind them and to each side. Bodies differ a lot here; a belt cut to one size sinks into a big man.
+  { const W = [.1, .1, .12], y0 = pos.Hips.y + .03, y1 = pos.Hips.y + .12;
+    for (let i = 0; i < SI.count; i++) { mesh.getVertexPosition(i, p); p.applyMatrix4(mesh.matrixWorld).applyMatrix4(TO_LOCAL); if (p.y > y0 && p.y < y1 && Math.abs(p.z) < .3) { W[0] = Math.max(W[0], p.x - pos.Hips.x); W[1] = Math.max(W[1], pos.Hips.x - p.x); W[2] = Math.max(W[2], Math.abs(p.z)); } }
+    dims.waist = W; }
   let z0 = Infinity, z1 = -Infinity, bz0 = Infinity, bz1 = -Infinity, bx0 = Infinity, bx1 = -Infinity;
   const bandY = hy.y + headH * .74; // the headband's height: on the forehead, above the eyes and ears
   for (let i = 0; i < SI.count; i++) {

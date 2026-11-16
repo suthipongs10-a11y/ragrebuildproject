@@ -237,6 +237,11 @@ p.bad{margin:0;font-size:14px;font-weight:600;color:var(--bad)}
 .bcol.champ .bx{align-items:center;text-align:center;gap:4px} .bcol.champ .bx b{font-family:var(--display);color:var(--gold)}
 .trow{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--line)} .trow.off{opacity:.62}
 .trow > div{display:flex;flex-direction:column;gap:1px} .trow b{font-family:var(--display)}
+.hshelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px}
+.hitem{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border:1px solid var(--line);border-radius:8px;text-align:center;min-width:0}
+.hitem.on{border-color:var(--gold)} .hitem.none{opacity:.4;filter:grayscale(1)} .hitem.lost{opacity:.75;filter:grayscale(.6)}
+.hitem .ui.beltimg{display:block;width:116px;height:38px;background-size:contain;background-repeat:no-repeat;background-position:center}
+.cupimg{width:46px;height:46px} .hh{margin:4px 0 0;font-size:14px;color:var(--muted,#9aa)}
 .trow .ui.beltimg,.bx .ui.beltimg{display:inline-block;width:72px;height:24px;background-size:contain;background-repeat:no-repeat;background-position:center}
 .autos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px} .autos .btn:last-child{grid-column:1/-1}
 .dbtns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px} .dbtns.four{grid-template-columns:repeat(4,minmax(0,1fr))}

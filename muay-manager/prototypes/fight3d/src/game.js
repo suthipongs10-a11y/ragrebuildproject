@@ -139,6 +139,10 @@ function fix(s) { // fields added after a save was made
   if (typeof s.mood !== 'number') s.mood = 2;
   if (!Array.isArray(s.staff)) s.staff = [];
   if (!Array.isArray(s.belts)) s.belts = [];
+  if (!Array.isArray(s.honors)) { // the roll of honour (the trophy room): an older save has only what it holds now, without dates
+    s.honors = s.belts.map(i => ({k: 'belt', i}));
+    for (const t of Object.keys(s.tours || {})) for (let n = 1; n <= ((s.tours[t] || {}).wins || 0); n++) s.honors.push({k: 'cup', i: +t, n});
+  }
   if (typeof s.title !== 'number') s.title = 1;
   return s;
 }
@@ -360,7 +364,8 @@ function tourAfter(o, win, how) {
   if (!win) { tr.out = true; tourFinishWithoutMe(tr); lines.push('ตกรอบ' + T.th + ' · แชมป์คือ ' + tr.ents[tr.champ].name); }
   else if (tr.champ === me) {
     const h = S.tours[tr.t] = Object.assign(S.tours[tr.t] || {}, {wins: ((S.tours[tr.t] || {}).wins || 0) + 1});
-    if (!S.belts.includes(tr.t)) { S.belts.push(tr.t); S.defendDue = S.day + DEFEND.every; }
+    S.honors.push({k: 'cup', i: tr.t, d: S.day, n: h.wins});
+    if (!S.belts.includes(tr.t)) { S.belts.push(tr.t); S.honors.push({k: 'belt', i: tr.t, d: S.day, vs: T.th}); S.defendDue = S.day + DEFEND.every; }
     lines.push('แชมป์' + T.th + '! ได้' + BELTS[tr.t] + (h.wins > 1 ? ' (สมัยที่ ' + h.wins + ')' : '') + moodUp(2));
   } else lines.push('ผ่านเข้า' + ROUND_TH(tr.rounds[tr.res.length].length) + ' ชกวันที่ ' + tourDay(tr));
   if (tr.champ != null || tr.out) S.tours[tr.t] = Object.assign(S.tours[tr.t] || {}, {ed: tr.ed, next: S.day + TOUR_REST});
@@ -468,6 +473,7 @@ function render() {
   try {
     if (view && view.settings) b.innerHTML = settingsHtml();
     else if (view && view.watch) b.innerHTML = watchHtml();
+    else if (view && view.hall) b.innerHTML = hallHtml();
     else if (tab === 'home') b.innerHTML = homeHtml();
     else if (tab === 'train') b.innerHTML = trainHtml();
     else if (tab === 'dress') b.innerHTML = dressHtml();
@@ -491,6 +497,24 @@ function renderCreate() {
     '<div class="statbox r">' + statBars(START[draft.style]) + '</div>' +
     '<p class="hint" id="gCreateMsg"></p><button class="btn go wide" data-act="create">เริ่มอาชีพ</button></section>';
 }
+// The trophy room: every belt there is (the ones won lit up, with the day and the man beaten for it) and a cup for each
+// tournament won. A belt that was taken away for not defending it stays on the wall, greyed.
+const CUP_COL = ['#c98a4b', '#b9c2cc', '#e8c24a', '#ecc955', '#f2d66b', '#ffe38a'];
+const cupSvg = t => { const c = CUP_COL[t] || CUP_COL[2]; return '<svg class="cupimg" viewBox="0 0 48 48" aria-hidden="true"><path d="M14 6h20v10a10 10 0 0 1-20 0z" fill="' + c + '"/><path d="M14 9H7a7 7 0 0 0 8 9M34 9h7a7 7 0 0 1-8 9" fill="none" stroke="' + c + '" stroke-width="3"/><rect x="22" y="25" width="4" height="9" fill="' + c + '"/><rect x="15" y="34" width="18" height="5" rx="1.5" fill="' + c + '"/><rect x="12" y="39" width="24" height="4" rx="1.5" fill="#6b4a1f"/></svg>'; };
+function hallHtml() {
+  const cups = S.honors.filter(h => h.k === 'cup'), byT = {}; cups.forEach(h => { (byT[h.i] = byT[h.i] || []).push(h); });
+  const belts = BELTS.map((nm, i) => {
+    const h = S.honors.filter(x => x.k === 'belt' && x.i === i).pop(), on = S.belts.includes(i);
+    return '<div class="hitem' + (h ? on ? ' on' : ' lost' : ' none') + '">' + art('belt-' + Math.min(5, i + 1), 'beltimg') + '<b>' + nm + '</b><span class="hint">' +
+      (h ? (on ? 'ครองอยู่' : 'เคยครอง (เสียแชมป์)') + (h.d ? ' · ได้วันที่ ' + h.d : '') + (h.vs ? ' · ชนะ ' + esc(h.vs) : '') : 'ยังไม่ได้') + '</span></div>';
+  }).join('');
+  const cupHtml = TOURS.map((T, t) => { const w = byT[t] || [], last = w[w.length - 1];
+    return '<div class="hitem' + (w.length ? ' on' : ' none') + '">' + cupSvg(t) + '<b>' + T.th + '</b><span class="hint">' + (w.length ? 'แชมป์ ' + w.length + ' สมัย' + (last.d ? ' · ล่าสุดวันที่ ' + last.d : '') : 'ยังไม่ได้') + '</span></div>'; }).join('');
+  return '<section class="gcard hall"><h2>ทำเนียบแชมป์ <small>' + esc(S.name) + '</small></h2>' +
+    '<p class="hint">เข็มขัด ' + S.belts.length + ' จาก ' + BELTS.length + ' เส้น · ถ้วยทัวร์นาเมนต์ ' + cups.length + ' ใบ · ป้องกันแชมป์สำเร็จ ' + S.defends + ' ครั้ง · ชนะ ' + S.rec.w + ' (น็อก ' + S.rec.ko + ') แพ้ ' + S.rec.l + '</p>' +
+    '<h3 class="hh">เข็มขัด</h3><div class="hshelf">' + belts + '</div><h3 class="hh">ถ้วยทัวร์นาเมนต์</h3><div class="hshelf">' + cupHtml + '</div>' +
+    '<div class="rowbtn"><button class="btn" data-act="hall">กลับ</button></div></section>';
+}
 function homeHtml() {
   const rows = rankRows(), pos = rows.findIndex(r => r.me) + 1, lg = league(S.rp), next = LEAGUES[lg + 1];
   const goal = next ? 'อีก ' + (next[0] - S.rp) + ' RP จะได้ขึ้น' + next[1] : 'อยู่ระดับสูงสุดแล้ว รักษาอันดับไว้';
@@ -500,7 +524,7 @@ function homeHtml() {
   return (view && view.note ? '<p class="gain">' + view.note + '</p>' : '') + nextMineHtml() + tourToday + guide + '<section class="gcard"><h2>' + esc(S.name) + ' <small>สาย' + styleTh(S.style) + '</small></h2>' +
     '<div class="kv"><span>สถิติ</span><b>ชนะ ' + S.rec.w + ' (น็อก ' + S.rec.ko + ') แพ้ ' + S.rec.l + '</b><span>อันดับ</span><b>ที่ ' + pos + ' จาก ' + rows.length + ' · ' + LEAGUES[lg][1] + '</b><span>เข็มขัด</span><b>' + (S.belts.length ? '<span class="belts">' + S.belts.map(i => '<span class="belt">' + art('belt-' + (i + 1), 'beltimg') + BELTS[i] + '</span>').join('') + '</span>' : 'ยังไม่มี') + '</b><span>เป้าหมาย</span><b>' + goal + '</b></div>' +
     '<div class="statbox r">' + statBars(S.stats) + '</div><p class="hint">ค่าพลังเฉลี่ย ' + overall(S.stats) + ' · เพดานค่าพลังของค่ายระดับ ' + S.gym + ' คือ ' + cap() + '</p>' +
-    '<div class="rowbtn">' + gymNext + '</div></section>' +
+    '<div class="rowbtn">' + gymNext + '<button class="btn" data-act="hall">ทำเนียบแชมป์ · เข็มขัด ' + S.belts.length + ' ถ้วย ' + S.honors.filter(h => h.k === 'cup').length + '</button></div></section>' +
     '<section class="gcard"><h2>วันนี้</h2><div class="kv"><span>แรงซ้อม</span><b>เหลือ ' + S.slots + ' จาก 3 ครั้ง</b><span>ศึกจัดอันดับ</span><b>เหลือ ' + S.ranked + ' จาก 2 ไฟต์</b></div>' +
     '<div class="rowbtn"><button class="btn" data-act="tab" data-v="train">ไปซ้อม</button><button class="btn" data-act="tab" data-v="fight">หาคู่ชก</button><button class="btn go" data-act="sleep">จบวัน นอนพัก</button></div>' +
     '<p class="hint">นอนพักแล้วความล้าลด ' + (NIGHT + (S.staff.includes('massage') ? 12 : 0)) + ' ได้แรงซ้อมและคู่ชกชุดใหม่ ได้ค่าสปอนเซอร์ ฿ ' + baht(40 + S.fame * 3) + (S.staff.length ? ' จ่ายค่าจ้างทีมงาน ฿ ' + baht(S.staff.reduce((a, id) => a + STAFF.find(x => x.id === id).wage, 0)) : '') + '</p></section>' +
@@ -740,11 +764,18 @@ function renderFight() {
   else b.innerHTML = liveHtml();
 }
 function plansFor() { return [F.plans, [OPP_PLAN[F.opp.style], OPP_PLAN[F.opp.style], OPP_PLAN[F.opp.style]]]; }
+// What is at stake in the ring, for the presentation after the raised hand: a belt (a title fight or a defence) or the
+// tournament's cup (its final)
+function prizeFor(o) {
+  if (o.kind === 'title' || o.kind === 'defense') return {kind: 'belt', tier: o.belt, name: (o.kind === 'title' ? 'แชมป์คนใหม่ ' : 'ป้องกันแชมป์ ') + BELTS[o.belt]};
+  const tr = S.tour, now = o.kind === 'tour' && tr && tr.rounds[tr.res.length];
+  return now && now.length === 2 ? {kind: 'cup', tier: tr.t, name: 'แชมป์' + TOURS[tr.t].th} : null;
+}
 async function startFight() {
   F.plans = [F.plan, F.plan, F.plan].map(p => Object.assign({}, p)); F.phase = 'live'; S.plan = Object.assign({}, F.plan);
   setMode(true); render();
   const o = F.opp;
-  await API.startFight({venue: o.venue, rules: VENUE_RULES[o.venue] || null, seed: F.seed, specs: [playerSpec(), {name: o.name, first: o.name, style: o.style, stats: o.stats, skin: 1, spLv: oppSpLv(o.style, league(S.rp), o.kind === 'title')}], plans: plansFor(),
+  await API.startFight({venue: o.venue, rules: VENUE_RULES[o.venue] || null, seed: F.seed, specs: [playerSpec(), {name: o.name, first: o.name, style: o.style, stats: o.stats, skin: 1, spLv: oppSpLv(o.style, league(S.rp), o.kind === 'title')}], plans: plansFor(), prize: prizeFor(o),
     looks: [Object.assign({name: S.name, fighter: S.body}, S.look), Object.assign({name: o.name, fighter: o.body}, o.look)]});
 }
 function onRoundBreak(n, st) {
@@ -761,7 +792,7 @@ function onOver(res) {
   if (o.kind === 'ranked' || o.kind === 'tour') { const ex = 1 / (1 + Math.pow(10, (o.rp - S.rp) / 400)); r.drp = Math.round(32 * ((win ? 1 : 0) - ex)); S.rp = Math.max(600, S.rp + r.drp); if (o.kind === 'ranked') S.ranked = Math.max(0, S.ranked - 1); }
   if (o.kind === 'tour' && !win) r.money = Math.round(o.money * .3); // the purse of the round for a win; a loser's fee otherwise
   if (o.kind === 'chuek') S.chuek = 0;
-  if (o.kind === 'title') { S.title = 0; if (win) { S.belts.push(o.belt); r.drp = 25; S.rp += 25; S.defendDue = S.day + DEFEND.every; } }
+  if (o.kind === 'title') { S.title = 0; if (win) { S.belts.push(o.belt); S.honors.push({k: 'belt', i: o.belt, d: S.day, vs: o.name}); r.drp = 25; S.rp += 25; S.defendDue = S.day + DEFEND.every; } }
   const rivalLine = [];
   if (o.kind === 'rival') { S.rematch = 0; if (win) { S.rivals = S.rivals.filter(x => x.name !== o.name); rivalLine.push('ล้างตา ' + o.name + ' สำเร็จ!' + moodUp(1)); } }
   if (o.kind === 'defense') { S.defendDue = S.day + DEFEND.every; if (win) { S.defends++; rivalLine.push('ป้องกัน' + BELTS[o.belt] + 'สำเร็จ ครั้งที่ ' + S.defends); } else { S.belts = S.belts.filter(b => b !== o.belt); rivalLine.push('เสีย' + BELTS[o.belt] + 'ให้ ' + o.name); } }
@@ -1059,6 +1090,7 @@ function onClick(e) {
   if (act === 'watch') { if (view && view.watch) view = null; else { if (DR) drillEnd(true); view = {watch: true}; } render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   if (act === 'exh') { watchMatch(null, exhibition()); return; }
   if (act === 'watchmore') { F = null; API.stop(); view = {watch: true}; setMode(false); render(); showMe(); if (CLOUD) loadBoard(); return; }
+  if (act === 'hall') { view = view && view.hall ? null : {hall: true}; render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   if (act === 'settings') { if (view && view.settings) view = null; else { if (DR) drillEnd(true); view = {settings: true}; } render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   if (act === 'soundon') { API.sound.set(!API.sound.on); API.sound.test(); render(); return; }
   if (act === 'soundtest') { API.sound.test(); return; }
@@ -1120,7 +1152,7 @@ export function bootGame(api) {
   window.addEventListener('keydown', e => { if (SC && !e.repeat) { const k = e.key === 'ArrowLeft' ? 'L' : e.key === 'ArrowRight' ? 'R' : e.key === ' ' ? 'pull' : ''; if (k) { e.preventDefault(); scenePress(k); } return; } if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const sc = e.target.closest('[data-scene]'); if (sc && SC) { e.preventDefault(); scenePress(sc.dataset.scene); return; } const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
-  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.41'; }
+  const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ 2.42'; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress}; // for automated checks
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }

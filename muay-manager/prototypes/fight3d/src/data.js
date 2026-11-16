@@ -200,8 +200,8 @@ export const PLAN = {
 export const PLAN_DEFAULT = {ag: 'balanced', range: 'mixed', target: 'mixed'};
 export const PLAN_RULES = {
   attackCool: .72, counterCool: 1.3, attackCover: .65, counterCover: 1.25, attackSt: 1.08, counterSt: .92, attackDmg: 1.05, counterBonus: .3,
-  jam: .94, keepAway: .8, outRegen: .93, inCover: .8, outVsIn: 1.12, // walking in leaves the guard open, and a fighter kept outside eats long weapons // crowding blunts kicks; staying outside blunts close weapons but costs legs
-  outDist: 12, inDist: -16,
+  jam: .94, keepAway: .9, outRegen: .93, inCover: .8, outVsIn: 1.05, // walking in leaves the guard open, and a fighter kept outside eats long weapons // crowding blunts kicks; staying outside blunts close weapons but costs legs
+  outDist: 8, outBack: .55, inDist: -16,
   // how each attitude moves: the counter fighter barely advances and keeps the push kick going; the attacker ties up more
   // and throws more (attackCool), but walks no faster than anyone else (owner: going forward means more weapons, not quicker feet)
   counterAdvance: .22, counterStepIn: .75, attackAdvance: 1, counterTeep: 1.9, counterPush: 1.3, attackClinch: 1.25,
