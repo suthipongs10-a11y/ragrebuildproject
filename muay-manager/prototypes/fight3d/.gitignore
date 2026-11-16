@@ -1,3 +1,7 @@
 node_modules/
 dist/
 .wrangler/
+
+# raw recordings kept by tools/tts-commentary.mjs until their lines are cut out
+assets/voice/_takes/
+assets/voice/_tmp/

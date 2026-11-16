@@ -70,15 +70,27 @@ for (const name of readdirSync('assets').filter(f => /^fighter-[a-z]\.glb$/.test
 // Commentary, referee's count and crowd shouts (tools/tts-commentary.mjs): base64 MP3, grouped by line, in order
 // and the fight sounds from free CC0 packs (tools/sfx-import.py), grouped by use
 // and the background music (tools/music-import.sh)
+// The commentary comes in two sizes: all of it for the website, and for the claude.ai page (which has a size limit) the
+// count and the shouts whole plus the first lines of every call, round and round, until VOICE_LITE characters are spent.
+const VOICE_LITE = 690000, tag = (id, pack) => `<script type="application/json" id="${id}">${JSON.stringify(pack)}</script>`;
+let voiceFull = '', voiceLite = '';
 for (const [dir, id] of [['assets/voice', 'voice-pack'], ['assets/sfx', 'sfx-pack'], ['assets/music', 'music-pack']]) {
   if (!existsSync(dir)) continue;
   const pack = {};
   for (const f of readdirSync(dir).filter(f => f.endsWith('.mp3')).sort((a, b) => a.localeCompare(b, 'en', {numeric: true}))) {
     const [key] = f.slice(0, -4).split('-'); (pack[key] = pack[key] || []).push(readFileSync(dir + '/' + f).toString('base64'));
   }
-  const text = JSON.stringify(pack);
-  models.push(`<script type="application/json" id="${id}">${text}</script>`);
+  const text = tag(id, pack);
   console.log(id, Object.keys(pack).length, 'groups', (text.length / 1024 / 1024).toFixed(2) + ' MB');
+  if (id !== 'voice-pack') { models.push(text); continue; }
+  const lite = {}, whole = k => k === 'count' || k.startsWith('shout'); let used = 0, lines = 0, all = 0;
+  for (const k of Object.keys(pack)) { all += pack[k].length; if (whole(k)) { lite[k] = pack[k]; used += pack[k].join('').length; } }
+  for (let i = 0, any = true; any; i++) {
+    any = false;
+    for (const k of Object.keys(pack)) if (!whole(k) && pack[k][i]) { any = true; if (used + pack[k][i].length <= VOICE_LITE) { (lite[k] = lite[k] || []).push(pack[k][i]); used += pack[k][i].length; lines++; } }
+  }
+  voiceFull = text; voiceLite = tag(id, lite);
+  console.log('voice-pack for the claude.ai page:', lines, 'of', all - Object.keys(pack).filter(whole).reduce((n, k) => n + pack[k].length, 0), 'commentary lines,', (voiceLite.length / 1024 / 1024).toFixed(2) + ' MB');
 }
 // Drawn UI art for the game page (tools/ui-art-import.py): each image as a CSS variable and a [data-ui] rule, plus the
 // layout that shows them (src/ui-art.css). The app icon is kept for the stores, not the page.
@@ -91,15 +103,18 @@ if (existsSync('assets/ui')) {
   uiStyle = uiImages + uiCss;
   console.log('ui art', files.length, 'images', (uiStyle.length / 1024 / 1024).toFixed(2) + ' MB');
 }
-const withModels = readFileSync('dist/muay-fight-lab.html', 'utf8').replace('<!--__MODELS__-->', () => models.join('\n'));
+const withModels = readFileSync('dist/muay-fight-lab.html', 'utf8').replace('<!--__MODELS__-->', () => models.join('\n') + voiceLite);
 // two pages from one source: the presentation lab, and the game (same viewer plus the game screens)
 const page = withModels.replace('<!--G:top-->', '').replace('<!--G:body-->', '');
 writeFileSync('dist/muay-fight-lab.html', page);
 const gameBase = readFileSync('src/page.html', 'utf8').replace('<title>Muay Fight Lab 3D</title>', '<title>Muay Manager</title>')
   .replace('<!--G:top-->', '<div id="game"><div class="gbar" id="gTop"></div></div>')
   .replace('<!--G:body-->', '<nav class="gnav" id="gNav" aria-label="เมนูเกม"></nav><div class="gbody" id="gBody"></div>');
-const game = gameBase.replace('/*__APP__*/', () => jsGame).replace('<!--__MODELS__-->', () => models.join('\n') + uiStyle);
+const game = gameBase.replace('/*__APP__*/', () => jsGame).replace('<!--__MODELS__-->', () => models.join('\n') + voiceLite + uiStyle);
 writeFileSync('dist/muay-manager.html', game);
+// claude.ai refuses a page over 16 MiB
+console.log('claude.ai page', (Buffer.byteLength(game) / 1048576).toFixed(2) + ' MB,', ((16 * 1048576 - Buffer.byteLength(game)) / 1024).toFixed(0) + ' KB under the limit');
+if (Buffer.byteLength(game) > 16 * 1048576 - 20000) throw new Error('dist/muay-manager.html is over the 16 MiB limit of a claude.ai page: lower VOICE_LITE');
 // the game as its own website (Cloudflare Pages, see docs/DEPLOY_CLOUDFLARE.md): a full document around the same page,
 // plus the phone home-screen files from site/. The store behind it is functions/api.
 const head = '<!doctype html>\n<html lang="th">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
@@ -122,7 +137,7 @@ if (existsSync('assets/acts')) {
   const pack = {}; for (const f of readdirSync('assets/acts').filter(f => f.endsWith('.webp'))) pack[f.slice(0, -5)] = 'data:image/webp;base64,' + readFileSync('assets/acts/' + f).toString('base64');
   if (Object.keys(pack).length) { actArt = `<script type="application/json" id="act-art">${JSON.stringify(pack)}</script>`; console.log('activity art', Object.keys(pack).length, (actArt.length / 1048576).toFixed(2) + ' MB (website only)'); }
 }
-const assetsHtml = models.join('\n') + uiImages + campArt + actArt, assetsName = 'a/' + hash(assetsHtml) + '.html', appName = 'a/' + hash(jsGame) + '.js';
+const assetsHtml = models.join('\n') + voiceFull + uiImages + campArt + actArt, assetsName = 'a/' + hash(assetsHtml) + '.html', appName = 'a/' + hash(jsGame) + '.js';
 writeFileSync('dist/site/' + assetsName, assetsHtml); writeFileSync('dist/site/' + appName, jsGame);
 const THREE_TAG = '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>';
 const siteAssets = {assets: '/' + assetsName, app: '/' + appName, three: THREE_TAG.match(/src="([^"]+)"/)[1],

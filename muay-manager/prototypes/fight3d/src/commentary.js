@@ -63,14 +63,15 @@ export const COUNT = ['หนึ่ง', 'สอง', 'สาม', 'สี่', 
 // one shout from the crowd, recorded by several voices and stacked to sound like a stand full of people
 export const SHOUT = ['เฮ้!', 'โอ้!'];
 // Voices (Gemini TTS prebuilt voices, tools/tts-commentary.mjs): the commentator, the referee, and the people whose
-// shouts make the crowd. STYLE is how each kind of line is asked for: Gemini reads the direction and speaks only the line.
+// shouts make the crowd. STYLE is how each kind of line is delivered: Gemini 3.8 TTS takes it beside the words, never reads it.
 export const VOICES = {caller: 'Fenrir', referee: 'Charon', crowd: ['Puck', 'Orus', 'Kore', 'Zephyr']};
-export const STYLE = [
-  'Say in Thai as a calm, confident Muay Thai ringside TV commentator reading the fight for the viewers, clear and brisk',
-  'Say in Thai as a Muay Thai ringside TV commentator who is very excited: loud, fast and punchy, as a clean shot lands right in front of him',
-  'Shout in Thai as a Muay Thai ringside TV commentator at the absolute peak of excitement: voice high and cracking, stretching the key word, breathless, like a knockout in a title fight'
-];
-export const STYLE_COUNT = 'Say in Thai as a boxing referee counting over a fallen fighter: loud, firm, one short word', STYLE_SHOUT = 'Shout in Thai, one short burst at the top of the voice, like a fan at ringside';
+export const STYLE = {
+  0: 'Thai boxing TV commentator reading the fight for the viewers: lively and warm, confident, brisk, never flat',
+  1: 'Thai boxing TV commentator, very excited, loud, fast and punchy, the call bursts out',
+  2: 'Thai boxing TV commentator screaming at the absolute peak of excitement, voice high and cracking, stretching the key word, breathless',
+  count: 'boxing referee counting over a fallen fighter: loud, firm, clipped, barked',
+  shout: 'fight fan at ringside: one short burst shouted at the top of the voice'
+};
 
 // Which line a hit calls for, if it is worth a call at all
 function hitLine(e, M, big) {
