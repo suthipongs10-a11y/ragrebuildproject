@@ -1,0 +1,9 @@
+# Checks GitHub for a newer version of the game; when there is one: pulls, rebuilds the site, restarts the server.
+# Copy with muay-update.timer to /etc/systemd/system/, then:  sudo systemctl enable --now muay-update.timer
+[Unit]
+Description=Muay Manager: update from GitHub
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/srv/muay/repo/muay-manager/prototypes/fight3d/server/update.sh

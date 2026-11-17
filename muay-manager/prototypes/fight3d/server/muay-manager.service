@@ -1,0 +1,28 @@
+# systemd unit for the game's server. Copy to /etc/systemd/system/muay-manager.service, then:
+#   sudo systemctl daemon-reload && sudo systemctl enable --now muay-manager
+# Paths assume the repository was cloned to /srv/muay/repo by the user "muay" (docs/DEPLOY_VPS.md).
+[Unit]
+Description=Muay Manager game server
+After=network.target
+
+[Service]
+User=muay
+Group=muay
+WorkingDirectory=/srv/muay/repo/muay-manager/prototypes/fight3d
+Environment=NODE_ENV=production
+Environment=PORT=8787
+Environment=HOST=127.0.0.1
+# the players' data lives outside the checkout, so an update of the code can never touch it
+Environment=MUAY_DB=/srv/muay/data/muay.db
+ExecStart=/usr/bin/node --disable-warning=ExperimentalWarning server/server.mjs
+Restart=always
+RestartSec=2
+# a small game: keep it from ever crowding the other sites on the machine
+MemoryMax=400M
+CPUQuota=80%
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

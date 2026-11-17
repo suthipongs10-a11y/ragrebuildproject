@@ -111,7 +111,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.50', BUILD = 250;
+const VER = '2.51', BUILD = 251;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -171,16 +171,24 @@ let cloudTimer = 0, cloudBusy = false, cloudDirty = false;
 function save() {
   S.updatedAt = Date.now();
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage blocked: progress lasts for this visit only */ }
-  if (CLOUD) { cloudDirty = true; clearTimeout(cloudTimer); cloudTimer = setTimeout(pushCloud, 2500); }
+  if (CLOUD && !CLOUD.dead) { cloudDirty = true; clearTimeout(cloudTimer); cloudTimer = setTimeout(pushCloud, 2500); }
+}
+// This device's key no longer opens the player: he was moved to another device with a code. Nothing more is written
+// from here, and the screen says so (the fight on screen, if any, is left to finish first).
+function keyDead(e) {
+  if (!CLOUD || !CLOUD.acct) return false; if (CLOUD.dead) return true;
+  if (!e || e.code !== 'permission_denied') return false;
+  if (!S) { CLOUD.acct.forget(); location.reload(); return true; } // no fighter here either: this device simply starts as a new player
+  CLOUD.dead = true; clearTimeout(cloudTimer); cloudNote = 'ย้ายไปเครื่องอื่นแล้ว'; if (!F) render(); return true;
 }
 async function pushCloud() {
-  if (!CLOUD || cloudBusy || !cloudDirty || !S) return;
+  if (!CLOUD || CLOUD.dead || cloudBusy || !cloudDirty || !S) return;
   cloudBusy = true; cloudDirty = false;
   try {
     await CLOUD.db.collection('data/users/' + CLOUD.uid).doc('save').set(JSON.parse(JSON.stringify(S)));
     await CLOUD.db.doc('board/' + CLOUD.uid).set(boardDoc());
     cloudNote = 'ออนไลน์ บันทึกแล้ว';
-  } catch (e) { cloudNote = 'บันทึกออนไลน์ไม่ได้ ใช้การบันทึกในเครื่อง'; }
+  } catch (e) { if (keyDead(e)) { cloudBusy = false; return; } cloudNote = 'บันทึกออนไลน์ไม่ได้ ใช้การบันทึกในเครื่อง'; }
   cloudBusy = false; if (cloudDirty) cloudTimer = setTimeout(pushCloud, 2500);
 }
 // This player's line in the leaderboard. seen: when he was last here on the server's clock (others show him as online
@@ -194,17 +202,18 @@ async function cloudInit() {
     const [db, user] = await Promise.all([rt.use('db'), rt.use('user')]);
     const uid = db && user ? await user.id() : null;
     if (!uid) { cloudNote = 'ออฟไลน์ บันทึกในเครื่องนี้'; if (tab === 'rank' || tab === 'home') render(); return; }
-    CLOUD = {db, uid, site: !!rt.site}; CH.skew = rt.skew || 0; cloudNote = 'ออนไลน์';
+    CLOUD = {db, uid, site: !!rt.site, acct: rt.account || null}; CH.skew = rt.skew || 0; cloudNote = 'ออนไลน์'; // acct: moving to another device and being forgotten (the game's own website only)
     if (rt.site) { setInterval(checkBuild, 120000); document.addEventListener('visibilitychange', () => { if (!document.hidden) checkBuild(); }); checkBuild(); }
     document.addEventListener('visibilitychange', () => presence(document.hidden)); window.addEventListener('pagehide', () => presence(true));
-    const snap = await db.collection('data/users/' + uid).doc('save').get();
+    let snap; try { snap = await db.collection('data/users/' + uid).doc('save').get(); } catch (e) { if (keyDead(e)) return; throw e; }
     const c = snap.exists ? snap.data() : null;
     if (valid(c) && (!S || (c.updatedAt || 0) > (S.updatedAt || 0))) { S = fix(JSON.parse(JSON.stringify(c))); /* a copy: stored data can come back locked, and the save grows new fields */ try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* fine */ } if (!F) go('home'); }
     else if (S) save();
     await loadBoard(); chSubscribe();
     try { const w = new URLSearchParams(location.search).get('watch'); if (w) { CH.follow = w.slice(0, 200); history.replaceState(null, '', location.pathname); } } catch (e) { /* no link */ }
   } catch (e) { cloudNote = 'ออฟไลน์ บันทึกในเครื่องนี้'; }
-  if (!F && view !== 'create') render();
+  if (view === 'create') { const box = $('gClaimBox'); if (box && !box.innerHTML) box.innerHTML = claimBoxHtml(); }
+  else if (!F) render();
 }
 async function loadBoard() {
   if (!CLOUD) return;
@@ -451,6 +460,24 @@ function exhibition() {
 }
 // settings: sound and picture
 const VOL_TH = [['music', 'ดนตรีปี่กลอง'], ['voice', 'เสียงพากย์และกรรมการ'], ['crowd', 'เสียงคนดู'], ['sfx', 'เสียงชก ระฆัง']];
+// The player's account on the game's website: a code to carry him to another device, taking one in, the documents, and
+// being forgotten. (Inside claude.ai the page has no account of its own.)
+function acctHtml() {
+  if (!CLOUD || !CLOUD.acct) return '';
+  const v = view || {}, c = v.code && v.code.expires > Date.now() ? v.code : null;
+  return '<h2>บัญชีและข้อมูล</h2>' +
+    '<div class="setrow"><span>ย้ายไปเล่นเครื่องอื่น</span><button class="btn" data-act="xfer">ขอรหัสย้ายเครื่อง</button></div>' +
+    (c ? '<p class="xcode">' + c.code + '</p><p class="hint">ใส่รหัสนี้ที่เครื่องใหม่ภายใน 10 นาที (หน้าสร้างนักมวย หรือหน้าตั้งค่า) ใช้แล้วเครื่องนี้จะเล่นนักมวยคนนี้ต่อไม่ได้</p>' : '') +
+    claimHtml() +
+    '<div class="setrow"><span>ลบบัญชีและข้อมูลทั้งหมด</span><button class="btn" data-act="delacct">' + (v.delSure ? 'กดอีกครั้งเพื่อยืนยัน ลบแล้วกู้คืนไม่ได้' : 'ลบบัญชี') + '</button></div>' +
+    (v.acctNote ? '<p class="warn">' + v.acctNote + '</p>' : '') +
+    '<p class="hint"><a class="link" href="' + WEB + '/privacy.html" target="_blank" rel="noopener">นโยบายความเป็นส่วนตัว</a> · <a class="link" href="' + WEB + '/terms.html" target="_blank" rel="noopener">ข้อตกลงการใช้งาน</a></p>';
+}
+const claimHtml = () => (CLOUD && CLOUD.acct ? '<div class="setrow"><label for="gCode">มีรหัสจากเครื่องเดิม</label><span class="codein"><input id="gCode" class="inp" maxlength="12" placeholder="รหัส 8 ตัว" autocomplete="off" autocapitalize="characters"><button class="btn" data-act="claim">ใช้รหัส</button></span></div>' : '');
+// a note to the developer from inside the game (the game's own website and the app): it goes to the site's log with the
+// build, the fighter and the screen size, so a tester's report says where it came from
+const feedbackHtml = () => (CLOUD && CLOUD.site ? '<h2>แจ้งปัญหา · เสนอแนะ</h2><textarea id="gFb" class="inp fb" maxlength="500" rows="3" placeholder="เจออะไรแปลก ๆ หรืออยากให้มีอะไรเพิ่ม เขียนบอกได้เลย"></textarea>' +
+  '<div class="rowbtn"><button class="btn" data-act="feedback">ส่งถึงผู้พัฒนา</button></div><p class="hint" id="gFbNote">ส่งพร้อมชื่อนักมวย รุ่นของเกม และขนาดหน้าจอ เพื่อให้ตามแก้ได้ถูกจุด</p>' : '');
 function settingsHtml() {
   const snd = API.sound, v = snd.vols;
   return '<section class="gcard gset-card"><h2>ตั้งค่า · เสียง</h2>' +
@@ -459,6 +486,7 @@ function settingsHtml() {
     '<h2>ภาพ</h2><label class="setrow vol"><span>ความสว่าง</span><input type="range" min="70" max="160" step="5" data-bright="1" value="' + Math.round(API.bright.v * 100) + '" aria-label="ความสว่าง"><output>' + Math.round(API.bright.v * 100) + '%</output></label>' +
     '<p class="hint">ค่าทั้งหมดจำไว้ในเครื่องนี้ เปิดเสียงไว้แล้วครั้งหน้าเสียงจะกลับมาเมื่อแตะหน้าจอครั้งแรก</p>' +
     '<div class="rowbtn"><button class="btn" data-act="soundtest"' + (snd.on ? '' : ' disabled') + '>ลองฟัง (ระฆัง)</button><button class="btn" data-act="setback">กลับ</button></div>' +
+    acctHtml() + feedbackHtml() +
     (MON.mode() === 'none' ? '' : '<h2>การซื้อ</h2><div class="rowbtn"><button class="btn" data-act="viprestore">กู้คืนการซื้อ</button></div>' + (view && view.vipNote ? '<p class="hint">' + view.vipNote + '</p>' : '')) + '</section>';
 }
 function nav() {
@@ -484,6 +512,7 @@ function render() {
   tune(); topBar();
   if (view === 'create') return renderCreate();
   if (F) return renderFight();
+  if (CLOUD && CLOUD.dead) return renderMoved();
   nav();
   const b = $('gBody');
   try {
@@ -501,6 +530,14 @@ function render() {
     b.innerHTML = '<section class="gcard"><h2>หน้านี้แสดงไม่ได้</h2><p class="warn">' + esc(String(e && e.message || e)).slice(0, 160) + '</p><p class="hint">ลองกดเมนูอื่นแล้วกลับมา ถ้ายังเป็นอยู่ให้แจ้งผู้พัฒนา</p></section>';
   }
 }
+// the fighter was moved to another device: this one can take him back with a new code, or start a fighter of its own
+function renderMoved() {
+  $('gNav').innerHTML = '';
+  $('gBody').innerHTML = '<section class="gcard hot"><h2>นักมวยคนนี้ย้ายไปเล่นเครื่องอื่นแล้ว</h2>' +
+    '<p class="hint">เครื่องนี้เล่น <b>' + esc(S ? S.name : 'นักมวยคนนี้') + '</b> ต่อไม่ได้ ความคืบหน้าทั้งหมดอยู่ที่เครื่องใหม่ ถ้าจะย้ายกลับมาเล่นเครื่องนี้ ให้ขอรหัสย้ายเครื่องจากเครื่องที่เล่นอยู่ แล้วใส่ที่นี่</p>' +
+    claimHtml() + '<p class="hint" id="gClaimMsg"></p>' +
+    '<div class="rowbtn"><button class="btn" data-act="fresh">เริ่มนักมวยใหม่ในเครื่องนี้</button></div></section>';
+}
 function go(t) { if (DR) drillEnd(true); if (SC) sceneEnd(true); tab = t; view = null; pending = null; mini = null; setMode(false); render(); showMe(t === 'dress' ? 'guard' : t === 'home' ? 'guard' : 'guard'); }
 
 let draft = {body: 'c', style: 'puncher', name: '', look: Object.assign({}, LOOK0)};
@@ -511,6 +548,8 @@ function drow(field, label, map, swatch) {
   return '<div class="fld">' + label + '</div><div class="sw">' + Object.keys(map).map(k => { const th = Array.isArray(map[k]) ? map[k][0] : map[k];
     return '<button class="swb" data-act="dlook" data-f="' + field + '" data-v="' + k + '" aria-pressed="' + (draft.look[field] === k) + '"' + (swatch ? ' style="--c:' + (map[k][1] ? hexCss(map[k][1]) : SW0) + '"' : '') + '>' + (swatch ? '<i></i>' : '') + th + '</button>'; }).join('') + '</div>';
 }
+// on the creation screen: a player who already has a fighter on another device brings him over instead of making a new one
+const claimBoxHtml = () => (CLOUD && CLOUD.acct && !CLOUD.dead ? '<section class="gcard slim"><h2>มีนักมวยอยู่แล้วในเครื่องอื่น</h2>' + claimHtml() + '<p class="hint" id="gClaimMsg">ขอรหัสได้ที่เครื่องเดิม: ตั้งค่า → ย้ายไปเล่นเครื่องอื่น</p></section>' : '');
 function renderCreate() {
   $('gNav').innerHTML = '';
   $('gBody').innerHTML = '<section class="gcard"><h2>สร้างนักมวยของคุณ</h2>' +
@@ -522,7 +561,8 @@ function renderCreate() {
     '<p class="hint">ที่เลือกตอนนี้ได้ฟรีทั้งหมด เปลี่ยนทีหลังได้ที่เมนูแต่งตัว (สีและลายอื่นต้องซื้อ)</p>' +
     '<div class="fld">สายมวย</div><div class="styles">' + STYLES.map(s => '<button class="stylecard" data-act="style" data-v="' + s.id + '" aria-pressed="' + (draft.style === s.id) + '">' + art('style-' + s.id, 'pic') + '<b>' + s.th + '</b><span>' + STYLE_NOTE[s.id] + '</span><span class="sp">ท่าไม้ตาย: ' + s.sp.map(k => MOVES[k].th).join(' · ') + '</span></button>').join('') + '</div>' +
     '<div class="statbox r">' + statBars(START[draft.style]) + '</div>' +
-    '<p class="hint" id="gCreateMsg"></p><button class="btn go wide" data-act="create">เริ่มอาชีพ</button></section>';
+    '<p class="hint" id="gCreateMsg"></p><button class="btn go wide" data-act="create">เริ่มอาชีพ</button></section>' +
+    '<div id="gClaimBox">' + claimBoxHtml() + '</div>';
 }
 // The trophy room: every belt there is (the ones won lit up, with the day and the man beaten for it) and a cup for each
 // tournament won. A belt that was taken away for not defending it stays on the wall, greyed.
@@ -897,6 +937,7 @@ function onOver(res) {
 // from the same seed, the two fighters as they were when challenged and accepted, and the plans they chose then.
 // Shared documents (rules in the artifact's db declaration): challenges/<challenger id> {name, list: {<opponent id>: …}}
 // and answers/<responder id> {list: {<challenger id>: …}}; each player writes only his own document.
+const CH_PAID = 3; // challenge matches a day that pay (one per opponent)
 const MATCH_LEN = LIVE.matchLen * 1e3, MATCH_KEEP = LIVE.keepDays * 24 * 3600e3, CH_REWARD = LIVE.reward; // the rules of a match live in data.js (LIVE): the server reads the same ones
 const CH = {cdocs: {}, adocs: {}, on: false, live: new Set(), entered: new Set(), skew: 0, q: Promise.resolve(), beatAt: 0, fp: {}};
 // A live match is fought on the server's clock (now()), not each device's own, so both screens show the same second.
@@ -911,7 +952,7 @@ const isOnline = b => !!(b && b.seen && now() - b.seen < ONLINE);
 const agoTh = ms => { const m = Math.max(1, Math.round(ms / 60e3)); return m < 60 ? m + ' นาทีที่แล้ว' : m < 1440 ? Math.round(m / 60) + ' ชม. ที่แล้ว' : Math.round(m / 1440) + ' วันที่แล้ว'; };
 // Every PRESENCE ms while the game is on screen; and once with off when it is closed or hidden, so the others see
 // "offline" at their next look instead of after the ONLINE window runs out (that window is for a lost connection).
-function presence(off) { if (!CLOUD || !S || (document.hidden && !off)) return; CH.seenAt = Date.now(); try { const ref = CLOUD.db.doc('board/' + CLOUD.uid); (CLOUD.site ? ref.set(boardDoc(off), {keepalive: !!off}) : ref.set(boardDoc(off))).catch(() => {}); } catch (e) { /* leaving anyway */ } }
+function presence(off) { if (!CLOUD || CLOUD.dead || !S || (document.hidden && !off)) return; CH.seenAt = Date.now(); try { const ref = CLOUD.db.doc('board/' + CLOUD.uid); (CLOUD.site ? ref.set(boardDoc(off), {keepalive: !!off}) : ref.set(boardDoc(off))).catch(keyDead); } catch (e) { /* leaving anyway */ } }
 // people watching a live match who are not in it (from the leaderboard records, ours included)
 const viewers = m => board.filter(b => b.in === m.key && isOnline(b) && b.id !== m.from && b.id !== m.to).length + (sideOf(m) < 0 && F && F.live && F.clock && F.live.key === m.key ? 1 : 0);
 const WHEN = [['n5', 'อีก 5 นาที'], ['n30', 'อีก 30 นาที'], ['n60', 'อีก 1 ชั่วโมง'], ['t18', '18:00 น.'], ['t20', '20:00 น.'], ['t21', '21:00 น.']];
@@ -985,17 +1026,21 @@ function matchCfg(m) {
   const side = (x, name) => ({name, spec: x.spec, plans: [x.plan, x.rp && x.rp[2], x.rp && x.rp[3]]});
   return matchInput(m.e.seed, [side(m.e, m.fromName), side(m.a, m.toName)], m.venue);
 }
+const chPaidLeft = () => (S.chDay && S.chDay.d === adDay() ? Math.max(0, CH_PAID - S.chDay.n) : CH_PAID);
 function applyMatch(m, res) {
-  const me = m.from === CLOUD.uid ? 0 : 1, win = res.w === me, [money, fame] = CH_REWARD[win ? 'win' : 'lose'], other = me ? m.fromName : m.toName;
+  const me = m.from === CLOUD.uid ? 0 : 1, win = res.w === me, other = me ? m.fromName : m.toName, oid = me ? m.from : m.to, day = adDay();
+  if (!S.chDay || S.chDay.d !== day) S.chDay = {d: day, n: 0, opp: []};
+  const paid = S.chDay.n < CH_PAID && !S.chDay.opp.includes(oid), [money, fame] = paid ? CH_REWARD[win ? 'win' : 'lose'] : [0, 0]; // the record always counts; the purse has its limits
+  if (paid) { S.chDay.n++; S.chDay.opp.push(oid); }
   S.chDone = S.chDone.concat(m.key).slice(-60); S.money += money; S.fame += fame;
   if (win) S.rec.w++; else S.rec.l++;
   S.log.unshift({w: win, o: other, h: 'ท้าชก · ' + (res.how === 'คะแนน' ? 'คะแนน' : res.how + ' ยก ' + res.round)}); S.log = S.log.slice(0, 12);
-  save(); return 'ผลท้าชกกับ ' + other + ': ' + (win ? 'ชนะ' : 'แพ้') + ' ได้ ฿ ' + baht(money) + ' ★ ' + fame;
+  save(); return 'ผลท้าชกกับ ' + other + ': ' + (win ? 'ชนะ' : 'แพ้') + (paid ? ' ได้ ฿ ' + baht(money) + ' ★ ' + fame : ' (ไม่มีรางวัล: วันนี้รับรางวัลท้าชกครบ ' + CH_PAID + ' แมตช์ หรือชกกับคนนี้ไปแล้ว)');
 }
 // Every change to this player's own challenge or answer document goes through one queue: each is read, changed and
 // written back, and two at once would lose one of them (the heartbeat and the plan for the next round, say).
 function myDoc(coll, change) {
-  const run = async () => { const ref = CLOUD.db.doc(coll + '/' + CLOUD.uid), snap = await ref.get(), next = change(snap.exists ? snap.data() : {}); if (next) { await ref.set(next); (coll === 'challenges' ? CH.cdocs : CH.adocs)[CLOUD.uid] = next; } };
+  const run = async () => { if (CLOUD.dead) return; const ref = CLOUD.db.doc(coll + '/' + CLOUD.uid), snap = await ref.get(), next = change(snap.exists ? snap.data() : {}); if (next) { try { await ref.set(next); } catch (e) { keyDead(e); throw e; } (coll === 'challenges' ? CH.cdocs : CH.adocs)[CLOUD.uid] = next; } };
   return (CH.q = CH.q.then(run, run));
 }
 const sideOf = m => (!CLOUD ? -1 : m.from === CLOUD.uid ? 0 : m.to === CLOUD.uid ? 1 : -1);
@@ -1164,7 +1209,7 @@ function challengeHtml() {
     '<div class="fld">ท้าผู้เล่นคนอื่น</div>' + (others.length ? '<label class="fld" for="chWhen">เวลานัด (ใช้กับปุ่ม "นัดเวลา")</label><select id="chWhen" class="inp">' + WHEN.map(w => '<option value="' + w[0] + '"' + (w[0] === (CH.when || 'n5') ? ' selected' : '') + '>' + w[1] + '</option>').join('') + '</select>' +
       others.map(row).join('') : '<p class="hint">ยังไม่มีผู้เล่นคนอื่นในตารางอันดับ ชวนเพื่อนมาเล่น (แชร์หน้านี้ให้เพื่อน)</p>') +
     '<p class="hint"><b>ท้าชกเดี๋ยวนี้:</b> อีกฝ่ายมีเวลา ' + QUICK_WAIT / 1000 + ' วินาทีกดรับ รับแล้วขึ้นเวทีใน ' + READY / 1000 + ' วินาที · <b>นัดเวลา:</b> ถึงเวลาแล้วชกเองตามแผนที่ตั้งไว้แม้ไม่ได้เข้ามา ถอนตัวได้ก่อนเวลา</p>' +
-    '<p class="hint">ทั้งสองฝ่ายชกด้วยค่าพลัง ท่าไม้ตาย และแผนตอนส่งหรือรับคำท้า พักยก ' + LIVE_REST + ' วินาที เลือกแผนยกถัดไปได้แล้วชกต่อเอง ชนะได้ ฿ ' + CH_REWARD.win[0] + ' ★ ' + CH_REWARD.win[1] + ' แพ้ได้ ฿ ' + CH_REWARD.lose[0] + ' ไม่มีผลกับอันดับ</p>' +
+    '<p class="hint">ทั้งสองฝ่ายชกด้วยค่าพลัง ท่าไม้ตาย และแผนตอนส่งหรือรับคำท้า พักยก ' + LIVE_REST + ' วินาที เลือกแผนยกถัดไปได้แล้วชกต่อเอง ชนะได้ ฿ ' + CH_REWARD.win[0] + ' ★ ' + CH_REWARD.win[1] + ' แพ้ได้ ฿ ' + CH_REWARD.lose[0] + ' ไม่มีผลกับอันดับ · รางวัลท้าชกรับได้วันละ ' + CH_PAID + ' แมตช์ คู่ชกคนเดิมนับวันละครั้ง (วันนี้เหลือ ' + chPaidLeft() + ') แมตช์ที่เกินยังบันทึกผลแพ้ชนะตามปกติ</p>' +
     (CH.err ? '<p class="warn">' + CH.err + '</p>' : '') + '</section>';
 }
 const upcomingHtml = () => { const list = matches().filter(m => m.a && m.a.accept && now() < m.start + MATCH_LEN).slice(0, 8); return list.length ? '<section class="gcard"><h2>แมตช์ท้าชกที่กำลังจะมา <small>ใครก็ดูได้</small></h2>' + list.map(m => matchRow(m, false)).join('') + '</section>' : ''; };
@@ -1410,6 +1455,24 @@ function onClick(e) {
   else if (act === 'tab') go(v);
   else if (act === 'home') { const live = F && F.live; F = null; API.stop(); CH.seenAt = 0; go('home'); if (CLOUD) loadBoard(); if (!live && !S.vip && ++S.adFights % 3 === 0) MON.interstitial(); } // an advert between screens every third fight of his own, back at the camp (never around a match between players)
   else if (act === 'adr') adReward(v, el);
+  else if (act === 'xfer') { if (!CLOUD || !CLOUD.acct) return; el.disabled = true; save(); pushCloud().then(() => CLOUD.acct.transferCode()).then(c => { view = Object.assign({settings: true}, c && c.code ? {code: c} : {acctNote: 'ขอรหัสไม่ได้ ลองใหม่อีกครั้ง'}); render(); }, () => { view = {settings: true, acctNote: 'ขอรหัสไม่ได้ ลองใหม่อีกครั้ง'}; render(); }); }
+  else if (act === 'claim') { // a code from the old device: this browser becomes that player, and the page starts again with his fighter
+    const inp = $('gCode'), code = inp ? inp.value.trim() : '', say = t => { const m = $('gClaimMsg'); if (m) { m.textContent = t; m.className = 'warn'; } else { view = Object.assign(view || {}, {acctNote: t}); render(); } };
+    if (!CLOUD || !CLOUD.acct || code.length < 6) { say('ใส่รหัส 8 ตัวจากเครื่องเดิมก่อน'); return; }
+    el.disabled = true; CLOUD.acct.claim(code).then(okc => { if (!okc) { el.disabled = false; say('รหัสไม่ถูกต้องหรือหมดอายุ ขอรหัสใหม่ที่เครื่องเดิม'); return; } try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* fine */ } location.reload(); }, () => { el.disabled = false; say('เชื่อมต่อไม่ได้ ลองใหม่อีกครั้ง'); });
+  }
+  else if (act === 'feedback') {
+    const box = $('gFb'), note = $('gFbNote'), text = box ? box.value.trim() : '', say = (t, bad) => { if (note) { note.textContent = t; note.className = bad ? 'warn' : 'hint'; } };
+    if (text.length < 3) { say('เขียนสักหน่อยก่อนส่ง', 1); return; }
+    el.disabled = true; say('กำลังส่ง…');
+    fetch(API_BASE + '/log', {method: 'POST', body: JSON.stringify({ver: VER, msg: 'FEEDBACK ' + JSON.stringify({from: S ? S.name : '', day: S ? S.day : 0, rp: S ? S.rp : 0, id: CLOUD ? CLOUD.uid : '', scr: innerWidth + 'x' + innerHeight}) + ' ' + text.slice(0, 500)})})
+      .then(r => { el.disabled = false; if (r.ok) { box.value = ''; say('ส่งแล้ว ขอบคุณครับ'); } else say('ส่งไม่ได้ ลองใหม่อีกครั้ง', 1); }, () => { el.disabled = false; say('ส่งไม่ได้ ลองใหม่อีกครั้ง', 1); });
+  }
+  else if (act === 'fresh') { try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* fine */ } if (CLOUD && CLOUD.acct) CLOUD.acct.forget(); location.reload(); }
+  else if (act === 'delacct') {
+    if (!CLOUD || !CLOUD.acct) return; if (!(view && view.delSure)) { view = Object.assign(view || {}, {settings: true, delSure: true}); render(); return; }
+    el.disabled = true; CLOUD.acct.remove().then(okd => { if (!okd) { view = {settings: true, acctNote: 'ลบไม่ได้ ลองใหม่อีกครั้ง'}; render(); return; } try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* fine */ } location.reload(); }, () => { view = {settings: true, acctNote: 'ลบไม่ได้ ลองใหม่อีกครั้ง'}; render(); });
+  }
   else if (act === 'vipbuy') { if (monBusy) return; monBusy = true; el.disabled = true; MON.purchase().then(ok => { monBusy = false; if (ok) vipOn(); view = Object.assign(view || {}, {vipNote: ok ? 'ซื้อแล้ว ขอบคุณที่สนับสนุนเกม' : 'ยังไม่ได้ซื้อ'}); render(); }); }
   else if (act === 'viprestore') vipSync(true);
   else if (act === 'vipsoon') { if (!S.vipAsk) { S.vipAsk = true; save(); siteLog('offer: camp owner pack pressed'); } render(); }
@@ -1427,7 +1490,7 @@ function onClick(e) {
   else if (act === 'staff') { const st = STAFF.find(x => x.id === v); if (S.staff.includes(v)) S.staff = S.staff.filter(k => k !== v); else { if (S.money < st.hire) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(st.hire); return; } S.money -= st.hire; S.staff.push(v); } save(); render(); }
   else if (act === 'look') setLook(el.dataset.f, v);
   else if (act === 'gym') { const c = GYM_COST[S.gym]; if (S.money < c) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(c); return; } S.money -= c; S.gym++; save(); render(); }
-  else if (act === 'reset') { if (el.dataset.sure) { try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* fine */ } S = null; view = 'create'; setMode(false); render(); previewDraft(); } else { el.dataset.sure = '1'; el.textContent = 'กดอีกครั้งเพื่อยืนยันการลบนักมวยคนนี้'; } }
+  else if (act === 'reset') { if (el.dataset.sure) { try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* fine */ } if (CLOUD) { try { CLOUD.db.collection('data/users/' + CLOUD.uid).doc('save').delete().catch(() => {}); CLOUD.db.doc('board/' + CLOUD.uid).delete().catch(() => {}); } catch (err) { /* the next save overwrites it */ } } S = null; view = 'create'; setMode(false); render(); previewDraft(); } /* (the stored copy goes too, or the old fighter would come back on the next visit) */ else { el.dataset.sure = '1'; el.textContent = 'กดอีกครั้งเพื่อยืนยันการลบนักมวยคนนี้'; } }
   else if (act === 'train') { if (S.slots < 1) return; const a = ACTS.find(x => x.id === v); if (Math.random() * 100 < failPct(a)) { trainFail(a); return; } mini = {act: a, t0: performance.now()}; if ((a.id === 'run' || a.id === 'rest' || a.id === 'fun') && sceneStart(a)) return; if (a.id === 'rest' || a.id === 'fun') trainResult(1); else if (a.drill) drillStart(a); else render(); }
   else if (act === 'hit') { const ph = ((performance.now() - mini.t0) / 1100) % 2, x = ph < 1 ? ph : 2 - ph; trainResult(1 - Math.abs(x - .5) * 2); }
   else if (act === 'buy') { const cost = pending.items.reduce((a, i) => a + i.price, 0); if (S.money < cost) return; S.money -= cost; pending.items.forEach(i => { if (!S.own[i.kind].includes(i.k)) S.own[i.kind].push(i.k); }); S.look = pending.look; pending = null; save(); render(); showMe(); }
@@ -1472,7 +1535,7 @@ export function bootGame(api) {
   $('gBody').addEventListener('pointerdown', e => { const sc = e.target.closest('[data-scene]'); if (sc && SC) { e.preventDefault(); scenePress(sc.dataset.scene); return; } const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gMatch').addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
   const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ ' + VER; }
-  window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress}; // for automated checks
+  window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress, uid: () => (CLOUD ? CLOUD.uid : null), match: applyMatch}; // for automated checks
   MON.price().then(pr => { monPrice = pr; if (pr && S && !F && !DR && !SC && tab === 'home' && view !== 'create') render(); }); if (S) vipSync(); // the store's price, and what it says is owned
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); previewDraft(); }

@@ -50,5 +50,13 @@ export async function siteRuntime(base = (typeof window !== 'undefined' && windo
   };
   const db = {collection: p => query(p), doc: p => docRef(p)};
   const user = {id: async () => me.id, isOwner: () => false, canEdit: () => false};
-  return {skew, site: true, use: async name => (name === 'db' ? db : name === 'user' ? user : null)};
+  // the player himself: a code to move to another device, taking one in, and being forgotten
+  const post = async (p, body, withKey) => { const r = await fetch(base + p, {method: 'POST', headers: Object.assign({'Content-Type': 'application/json'}, withKey ? auth : {}), body: JSON.stringify(body || {})}); return r.ok ? r.json() : null; };
+  const account = {
+    transferCode: () => post('/transfer', null, true),
+    async claim(code) { const j = await post('/transfer/claim', {code}); if (!j || !j.id || !j.secret) return false; try { localStorage.setItem('muaySitePlayer', JSON.stringify({id: j.id, secret: j.secret})); } catch (e) { return false; } return true; },
+    forget() { try { localStorage.removeItem('muaySitePlayer'); } catch (e) { /* a new id next visit anyway */ } }, // this device lets go of a player it can no longer open
+    async remove() { const r = await fetch(base + '/me', {method: 'DELETE', headers: auth}); if (!r.ok) return false; try { localStorage.removeItem('muaySitePlayer'); } catch (e) { /* gone with the page */ } return true; }
+  };
+  return {skew, site: true, account, use: async name => (name === 'db' ? db : name === 'user' ? user : null)};
 }

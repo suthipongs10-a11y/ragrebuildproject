@@ -5,3 +5,6 @@ dist/
 # raw recordings kept by tools/tts-commentary.mjs until their lines are cut out
 assets/voice/_takes/
 assets/voice/_tmp/
+
+# the players' database when the game runs with server/server.mjs on this machine
+data/

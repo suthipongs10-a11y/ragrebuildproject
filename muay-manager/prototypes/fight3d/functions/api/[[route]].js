@@ -8,8 +8,13 @@
 //   GET  /api/db/<collection>/<doc>       -> {id, data} (data null when there is no such document)
 //   PUT  /api/db/<collection>/<doc>       body: JSON object -> {ok}
 //   DELETE /api/db/<collection>/<doc>     -> {ok}
-//   POST /api/log                         body: {msg, ver, page} -> {ok}   errors from players' browsers, the last 1000 kept
+//   POST /api/log                         body: {msg, ver, page} -> {ok}   errors from players' browsers, the last 1000 kept;
+//                                         a msg that starts with "FEEDBACK " is a player's note to the developer (the last 2000 kept)
+//   POST /api/transfer                    -> {code, expires}   a code that moves this player to another device (10 minutes)
+//   POST /api/transfer/claim              body: {code} -> {id, secret}   the new device takes the player over; the old key stops working
+//   DELETE /api/me                        -> {ok}   the player and everything stored for him are removed
 const SHARED = new Set(['board', 'challenges', 'answers']);
+const CODE_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', CODE_LEN = 8; // transfer codes: no letters that read like digits
 const SEG = /^[A-Za-z0-9_\-.~:@+]{1,200}$/, FIELD = /^[A-Za-z0-9_]{1,40}$/, MAX_BODY = 256 * 1024;
 // Any origin may call the API: the game inside the iOS / Android app is a local page (capacitor://localhost, https://localhost).
 // A player is known by the key he sends in Authorization, never by a cookie, so this opens nothing.
@@ -21,7 +26,8 @@ async function schema(db) {
   await db.batch([
     db.prepare('CREATE TABLE IF NOT EXISTS players (id TEXT PRIMARY KEY, secret_hash TEXT NOT NULL, created INTEGER NOT NULL)'),
     db.prepare('CREATE TABLE IF NOT EXISTS docs (coll TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, updated INTEGER NOT NULL, PRIMARY KEY (coll, id))'),
-    db.prepare('CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER NOT NULL, ua TEXT, ver TEXT, msg TEXT)')
+    db.prepare('CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER NOT NULL, ua TEXT, ver TEXT, msg TEXT)'),
+    db.prepare('CREATE TABLE IF NOT EXISTS transfers (code TEXT PRIMARY KEY, id TEXT NOT NULL, expires INTEGER NOT NULL)')
   ]);
   ready = true;
 }
@@ -47,7 +53,9 @@ export async function onRequest({request, env, params}) {
     const cut = (v, n) => String(v == null ? '' : v).slice(0, n);
     await db.batch([
       db.prepare('INSERT INTO logs (t, ua, ver, msg) VALUES (?, ?, ?, ?)').bind(Date.now(), cut(request.headers.get('User-Agent'), 200), cut(d.ver, 40), cut(d.msg, 3000)),
-      db.prepare('DELETE FROM logs WHERE id <= (SELECT MAX(id) - 1000 FROM logs)')
+      // the last 1000 kept; players' own notes (FEEDBACK ...) are not pushed out by errors, and are capped on their own
+      db.prepare("DELETE FROM logs WHERE id <= (SELECT MAX(id) - 1000 FROM logs) AND msg NOT LIKE 'FEEDBACK %'"),
+      db.prepare("DELETE FROM logs WHERE msg LIKE 'FEEDBACK %' AND id NOT IN (SELECT id FROM logs WHERE msg LIKE 'FEEDBACK %' ORDER BY id DESC LIMIT 2000)")
     ]);
     return json({ok: true});
   }
@@ -55,6 +63,32 @@ export async function onRequest({request, env, params}) {
     const id = 'p_' + rand(10), secret = rand(32);
     await db.prepare('INSERT INTO players (id, secret_hash, created) VALUES (?, ?, ?)').bind(id, await sha256(secret), Date.now()).run();
     return json({id, secret});
+  }
+  // moving to another device: the old one asks for a code, the new one hands it in and gets a fresh key for the same player
+  if (route[0] === 'transfer' && method === 'POST') {
+    const now = Date.now();
+    if (route[1] === 'claim') {
+      let d = {}; try { d = JSON.parse((await request.text()).slice(0, 200)) || {}; } catch (e) { /* no code */ }
+      const code = String(d.code || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      const row = code.length === CODE_LEN ? await db.prepare('SELECT id, expires FROM transfers WHERE code = ?').bind(code).first() : null;
+      if (!row || row.expires < now) return json({error: 'bad code'}, 404);
+      const secret = rand(32);
+      await db.batch([db.prepare('UPDATE players SET secret_hash = ? WHERE id = ?').bind(await sha256(secret), row.id), db.prepare('DELETE FROM transfers WHERE id = ?').bind(row.id)]);
+      return json({id: row.id, secret});
+    }
+    const who = await caller(request, db); if (!who) return json({error: 'forbidden'}, 403);
+    const pick = crypto.getRandomValues(new Uint8Array(CODE_LEN)), code = [...pick].map(x => CODE_ABC[x % CODE_ABC.length]).join(''), expires = now + 10 * 60e3;
+    await db.batch([db.prepare('DELETE FROM transfers WHERE id = ? OR expires < ?').bind(who, now), db.prepare('INSERT INTO transfers (code, id, expires) VALUES (?, ?, ?)').bind(code, who, expires)]);
+    return json({code, expires});
+  }
+  // the player asks to be forgotten: his records in the shared collections, his private folder, his codes and his key
+  if (route[0] === 'me' && method === 'DELETE') {
+    const who = await caller(request, db); if (!who) return json({error: 'forbidden'}, 403);
+    await db.batch([
+      db.prepare("DELETE FROM docs WHERE (id = ? AND coll IN ('board', 'challenges', 'answers')) OR coll = ? OR coll LIKE ?").bind(who, 'data/users/' + who, 'data/users/' + who + '/%'),
+      db.prepare('DELETE FROM transfers WHERE id = ?').bind(who), db.prepare('DELETE FROM players WHERE id = ?').bind(who)
+    ]);
+    return json({ok: true});
   }
   if (route[0] !== 'db' || route.length < 2 || !route.slice(1).every(s => SEG.test(s))) return json({error: 'not found'}, 404);
   const path = route.slice(1), who = await caller(request, db);

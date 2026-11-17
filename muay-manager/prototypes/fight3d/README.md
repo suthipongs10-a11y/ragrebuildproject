@@ -5,6 +5,16 @@
 
 ตัวนักมวยเป็นโมเดล 3D ที่สร้างด้วย Meshy (ภาพอ้างอิง → โมเดลมีผิว → ใส่กระดูกอัตโนมัติ) แล้วขยับด้วยท่าชุดเดียวกับตัวที่สร้างจากโค้ด ซึ่งยังเลือกกลับไปใช้ได้ เสียงเป็นเสียงสังเคราะห์ชั่วคราว
 
+## รอบที่ 73: เตรียมทดสอบกับคนจริงและขึ้นสโตร์ — บัญชี หน้านโยบาย เซิร์ฟเวอร์ VPS บอททดสอบ (17 พ.ย. 2026)
+
+- บัญชี (เฉพาะเว็บเกมและแอป): `functions/api/[[route]].js` เพิ่ม `POST /api/transfer` `POST /api/transfer/claim` `DELETE /api/me` • `netdb.js` `account = {transferCode, claim, forget, remove}`
+- `game.js`: `acctHtml()` `claimHtml()` `claimBoxHtml()` (หน้าสร้างนักมวย) • `keyDead(e)` + `renderMoved()` เครื่องเก่าหลังย้าย: บอกว่าย้ายแล้ว เลิกเขียนข้อมูล • `feedbackHtml()` ช่องแจ้งปัญหา (ลง `/api/log` ขึ้นต้น `FEEDBACK `)
+- `game.js`: `CH_PAID` + `S.chDay` รางวัลท้าชกวันละ 3 แมตช์ คู่เดิมวันละครั้ง (`chPaidLeft()`) • "เริ่มใหม่" ลบเซฟและบรรทัดอันดับบนเซิร์ฟเวอร์ด้วย
+- `site/privacy.html` `site/terms.html`: หน้านโยบายและข้อตกลง (ช่องอีเมลติดต่อรอเจ้าของเกมใส่)
+- `server/`: `server.mjs` (Node 22.13+ เสิร์ฟ `dist/site` และ `/api` ตัวเดิมบน SQLite ผ่าน `d1-sqlite.mjs`) ไฟล์ systemd nginx และ `update.sh` • คู่มือ `docs/DEPLOY_VPS.md`
+- ทดสอบ: `npm run e2e:full` (บอทเล่นครบทุกฟีเจอร์ 100+ ข้อ ไม่ต้องมีเซิร์ฟเวอร์) • `npm run e2e:account` (ย้ายเครื่อง ลบบัญชี เริ่มใหม่ ต้องมีเซิร์ฟเวอร์ที่ 8788: `PORT=8788 npm run serve` หรือ `npm run site`)
+- รายการตรวจขึ้นสโตร์: `docs/STORE_CHECKLIST.md`
+
 ## รอบที่ 72: โฆษณาแบบกดดูแลกของ แพ็กซื้อครั้งเดียว และช่องต่อกับแอป (17 พ.ย. 2026)
 
 - `src/mon.js`: `mode()` `rewarded(placement)` `interstitial()` `price()` `purchase()` `owned()` • ในแอปเรียก `window.MuayNative` • `?mon=test` ใช้ตัวจำลอง
@@ -527,6 +537,8 @@ npm test             # ยืนยันว่าค่าตั้งต้น
 npm run batch        # จำลอง 2,000 ไฟต์ รายงานเทียบเป้าสมดุล
 npm run site         # เกมแบบเว็บ + ที่เก็บข้อมูลจำลอง ที่ http://localhost:8788
 npm run deploy       # ขึ้นเว็บจริงบน Cloudflare (ดู docs/DEPLOY_CLOUDFLARE.md)
+npm run serve        # เกมแบบเว็บบนเครื่องตัวเองหรือ VPS: Node + SQLite ที่ http://127.0.0.1:8787 (ดู docs/DEPLOY_VPS.md)
+npm run e2e:full     # บอทเล่นครบทุกฟีเจอร์บนจอขนาดมือถือ (ราว 5 นาที)
 ```
 
 หน้าเว็บโหลด three.js 0.160.0 จาก cdnjs ต้องต่ออินเทอร์เน็ตตอนเปิด โมเดลทั้ง 12 ตัวฝังอยู่ในไฟล์หน้าเว็บ (ราว 13.2 MB) เพราะแอปมือถือของ Claude ปฏิเสธการขอไฟล์ที่วางข้างหน้า artifact (403) ถ้าแก้ผิวโมเดล ให้รัน `python3 tools/shrink-textures.py` ก่อน build ต้องใช้เบราว์เซอร์ที่มี DecompressionStream (iOS 16.4 ขึ้นไป)
