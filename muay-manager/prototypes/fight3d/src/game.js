@@ -1,7 +1,8 @@
 // Game layer: profile, training, outfits, matchmaking, corner plans, rewards and ranking.
 // It never touches fight rules: it builds two fighter specs and plans, hands them to the simulation through the viewer,
 // and turns the result into progress. Save lives in the browser and, when the page has it, in the artifact database.
-import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VENUE_RULES, RULES } from './data.js';
+import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VENUE_RULES, RULES, LIVE, SPECIALS, SP_MAX } from './data.js';
+import { cleanPlan, cleanSpec, cleanStats, own, matchCfg as matchInput } from './match.js';
 import { PLAN_TIPS } from './plantips.js';
 import { simulate, SIM_VERSION } from './sim.js';
 import { siteRuntime } from './netdb.js';
@@ -100,16 +101,15 @@ const LEAGUES = [[0, 'เวทีงานวัด'], [1100, 'เวทีอ�
 const GYM_COST = [0, 1200, 2800, 5500, 9000];
 const PRICE = {colors: {gold: 250, green: 250, purple: 250, pink: 250, orange: 250}, patterns: {stripe: 300, hem: 300, split: 400, zigzag: 500}, head: {mongkol: 600}, hair: {brown: 200, blond: 300, red: 300, silver: 300, blue: 350, green: 350, pink: 350, purple: 350}};
 const LOOK_KIND = {shorts: 'colors', trim: 'colors', gloves: 'colors', pattern: 'patterns', head: 'head', hair: 'hair'};
-const SPECIALS = ['spChop', 'spHanu', 'spKick', 'spCroc', 'spFly'];
 const SP_FAME = [30, 80, 160];      // fame needed for each extra signature move beyond the style's two
 // Or learn one sooner from a visiting master, for money. Each move then trains up to level 3: a day's training slot,
 // money and fatigue per level; the fight engine makes a higher level harder to stop and heavier (RULES.spLvAcc / spLvDmg).
-const SP_LEARN = [1500, 2500, 4000], SP_UP = [0, 800, 1800], SP_MAX = 3, SP_UP_FAT = 12;
+const SP_LEARN = [1500, 2500, 4000], SP_UP = [0, 800, 1800], SP_UP_FAT = 12;
 const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', need: 3, money: 100, fame: 0}, {id: 'win', th: 'ชนะ 1 ไฟต์', need: 1, money: 150, fame: 1}, {id: 'ranked', th: 'ขึ้นชกจัดอันดับ 1 ไฟต์', need: 1, money: 120, fame: 2}];
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.46', BUILD = 246;
+const VER = '2.47', BUILD = 247;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -207,13 +207,12 @@ async function loadBoard() {
     const q = await CLOUD.db.collection('board').orderBy('rp', 'desc').limit(60).get();
     board = q.docs.map(d => ({id: d.id, d: d.data() || {}})).filter(x => x.id !== CLOUD.uid && typeof x.d.rp === 'number' && typeof x.d.name === 'string')
       .map(x => ({id: x.id, real: true, name: API.cleanName(x.d.name) || 'นักมวย', rp: clamp(Math.round(x.d.rp), 0, 4000), w: x.d.w | 0, l: x.d.l | 0, ko: x.d.ko | 0,
-        body: API.ROSTER[x.d.body] ? x.d.body : 'c', style: START[x.d.style] ? x.d.style : 'tech', look: cleanLook(x.d.look), stats: cleanStats(x.d.stats), seen: +x.d.seen || 0, in: typeof x.d.in === 'string' ? x.d.in.slice(0, 120) : ''}));
+        body: own(API.ROSTER, x.d.body) ? x.d.body : 'c', style: own(START, x.d.style) ? x.d.style : 'tech', look: cleanLook(x.d.look), stats: cleanStats(x.d.stats), seen: +x.d.seen || 0, in: typeof x.d.in === 'string' ? x.d.in.slice(0, 120) : ''}));
     CH.boardAt = Date.now();
   } catch (e) { /* the built-in rivals still fill the table */ }
 }
 const roundStats = st => { const o = {}; KEYS.forEach(k => { o[k] = Math.round(st[k]); }); return o; };
-function cleanStats(st) { const o = {}; KEYS.forEach(k => { o[k] = clamp(Math.round(+(st && st[k]) || 40), 20, 100); }); return o; }
-function cleanLook(l) { l = l || {}; const pick = (map, v, d) => (map[v] ? v : d); return {shorts: pick(API.COLORS, l.shorts, 'blue'), trim: pick(API.COLORS, l.trim, 'white'), gloves: pick(API.COLORS, l.gloves, 'blue'), pattern: pick(API.PATTERNS, l.pattern, 'plain'), head: pick(API.HEADGEAR, l.head, 'none'), hair: pick(API.HAIR, l.hair, 'natural')}; }
+function cleanLook(l) { l = l || {}; const pick = (map, v, d) => (own(map, v) ? v : d); return {shorts: pick(API.COLORS, l.shorts, 'blue'), trim: pick(API.COLORS, l.trim, 'white'), gloves: pick(API.COLORS, l.gloves, 'blue'), pattern: pick(API.PATTERNS, l.pattern, 'plain'), head: pick(API.HEADGEAR, l.head, 'none'), hair: pick(API.HAIR, l.hair, 'natural')}; }
 
 // ---------- derived values ----------
 const total = st => KEYS.reduce((a, k) => a + st[k], 0);
@@ -832,17 +831,16 @@ function onOver(res) {
 // from the same seed, the two fighters as they were when challenged and accepted, and the plans they chose then.
 // Shared documents (rules in the artifact's db declaration): challenges/<challenger id> {name, list: {<opponent id>: …}}
 // and answers/<responder id> {list: {<challenger id>: …}}; each player writes only his own document.
-const MATCH_LEN = 5 * 60e3, MATCH_KEEP = 72 * 3600e3, // replays stay three days
-   CH_REWARD = {win: [400, 10], lose: [100, 2]};
+const MATCH_LEN = LIVE.matchLen * 1e3, MATCH_KEEP = LIVE.keepDays * 24 * 3600e3, CH_REWARD = LIVE.reward; // the rules of a match live in data.js (LIVE): the server reads the same ones
 const CH = {cdocs: {}, adocs: {}, on: false, live: new Set(), entered: new Set(), skew: 0, q: Promise.resolve(), beatAt: 0, fp: {}};
 // A live match is fought on the server's clock (now()), not each device's own, so both screens show the same second.
 const now = () => Date.now() + CH.skew;
 // The rest between rounds of a live match: LIVE_REST seconds in all, the first LIVE_PICK to choose the plan for the next
 // round, both sides' choices read at LIVE_READ, and the bell goes by itself.
-const LIVE_REST = 20, LIVE_PICK = 13, LIVE_READ = 16;
+const LIVE_REST = LIVE.rest, LIVE_PICK = LIVE.pick, LIVE_READ = LIVE.read;
 // READY: a match starts no sooner than this after the challenge is accepted, so both get the countdown. QUICK_WAIT: how long
 // a "fight now" challenge waits for its answer. ONLINE: a player whose record was touched this recently is shown as online.
-const READY = 30e3, QUICK_WAIT = 90e3, ONLINE = 60e3, PRESENCE = 25e3, COUNT_FROM = 10e3, QUIT_UNTIL = 3e3; // QUIT_UNTIL: no withdrawing this close to the bell
+const READY = LIVE.ready * 1e3, QUICK_WAIT = LIVE.quickWait * 1e3, QUIT_UNTIL = LIVE.quitUntil * 1e3, ONLINE = 60e3, PRESENCE = 25e3, COUNT_FROM = 10e3;
 const isOnline = b => !!(b && b.seen && now() - b.seen < ONLINE);
 const agoTh = ms => { const m = Math.max(1, Math.round(ms / 60e3)); return m < 60 ? m + ' นาทีที่แล้ว' : m < 1440 ? Math.round(m / 60) + ' ชม. ที่แล้ว' : Math.round(m / 1440) + ' วันที่แล้ว'; };
 // Every PRESENCE ms while the game is on screen; and once with off when it is closed or hidden, so the others see
@@ -859,11 +857,6 @@ function whenTime(k) {
 const hm = t => { const d = new Date(t); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ' น.' + (new Date(t).toDateString() !== new Date().toDateString() ? ' พรุ่งนี้' : ''); };
 const countdown = ms => { ms = Math.max(0, ms); const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s % 60).padStart(2, '0'); };
 // everything from the shared store is someone else's input: cleaned the same way on every viewer, so all run the same fight
-const cleanPlan = p => { p = p || {}; return {ag: PLAN.ag[p.ag] ? p.ag : 'balanced', range: PLAN.range[p.range] ? p.range : 'mixed', target: PLAN.target[p.target] ? p.target : 'mixed'}; };
-function cleanSpec(sp, name) {
-  sp = sp || {}; const lv = {}; for (const k of SPECIALS) if (sp.spLv && sp.spLv[k]) lv[k] = clamp(Math.round(+sp.spLv[k]) || 1, 1, SP_MAX);
-  return {name, first: name, style: START[sp.style] ? sp.style : 'tech', stats: cleanStats(sp.stats), skin: 0, sp: (Array.isArray(sp.sp) ? sp.sp : []).filter(k => SPECIALS.includes(k)).slice(0, 3), spLv: lv};
-}
 function chSubscribe() {
   if (!CLOUD || CH.on) return; CH.on = true;
   const fail = () => { CH.err = 'ดึงข้อมูลท้าชกไม่ได้ในตอนนี้'; };
@@ -883,7 +876,7 @@ function matches() {
       const a0 = ((CH.adocs[to] || {}).list || {})[from] || null, a = a0 && (a0.seed != null ? a0.seed === e.seed : +a0.at >= +e.created) ? a0 : null;
       const start = a && a.accept ? Math.max(e.time, (+a.at || 0) + READY) : e.time;
       if (t > start + MATCH_KEEP || (e.quick && !a && t > (+e.until || 0))) continue;
-      out.push({key: from + '>' + to + '>' + e.seed, from, to, e, a, start, fromName: API.cleanName(c.name) || 'นักมวย', toName: API.cleanName(e.toName) || 'นักมวย', venue: API.VENUES[e.venue] ? e.venue : 'stadium'});
+      out.push({key: from + '>' + to + '>' + e.seed, from, to, e, a, start, fromName: API.cleanName(c.name) || 'นักมวย', toName: API.cleanName(e.toName) || 'นักมวย', venue: own(API.VENUES, e.venue) ? e.venue : 'stadium'});
     }
   }
   return out.sort((x, y) => x.start - y.start);
@@ -923,8 +916,8 @@ function settleMatches() {
 // What everyone runs the fight from: the two fighters as they were when the challenge was sent and accepted, and each
 // side's plan round by round (the plan given then, and whatever it chose at each rest of the live match: rp[2], rp[3]).
 function matchCfg(m) {
-  const rounds = x => { const p0 = cleanPlan(x.plan), r = x.rp && typeof x.rp === 'object' ? x.rp : {}, p2 = r[2] ? cleanPlan(r[2]) : p0, p3 = r[3] ? cleanPlan(r[3]) : p2; return [p0, p2, p3]; };
-  return {seed: (m.e.seed >>> 0) || 1, specs: [cleanSpec(m.e.spec, m.fromName), cleanSpec(m.a.spec, m.toName)], plans: [rounds(m.e), rounds(m.a)], rules: VENUE_RULES[m.venue] || null};
+  const side = (x, name) => ({name, spec: x.spec, plans: [x.plan, x.rp && x.rp[2], x.rp && x.rp[3]]});
+  return matchInput(m.e.seed, [side(m.e, m.fromName), side(m.a, m.toName)], m.venue);
 }
 function applyMatch(m, res) {
   const me = m.from === CLOUD.uid ? 0 : 1, win = res.w === me, [money, fame] = CH_REWARD[win ? 'win' : 'lose'], other = me ? m.fromName : m.toName;
@@ -1127,7 +1120,7 @@ async function watchMatch(key, given) {
   const cfg = matchCfg(m), me = real ? sideOf(m) : -1, start = m.start, clock = real && now() < start + MATCH_LEN;
   F = {opp: {name: me === 1 ? m.fromName : m.toName, style: cfg.specs[me === 1 ? 0 : 1].style}, seed: cfg.seed, live: m, me, phase: 'live', plans: cfg.plans, plan: Object.assign({}, cfg.plans[Math.max(0, me)][0]), clock, planSig: JSON.stringify(cfg.plans)};
   const f = F; setMode(true); topBar(); render(); CH.seenAt = 0; CH.boardAt = 0; // the record says at once that we are in this match
-  const body = (b, d) => (API.ROSTER[b] ? b : d);
+  const body = (b, d) => (own(API.ROSTER, b) ? b : d);
   await API.startFight(Object.assign({venue: m.venue, rules: cfg.rules, seed: cfg.seed, specs: cfg.specs, plans: cfg.plans,
     looks: [Object.assign({name: m.fromName, fighter: body(m.e.body, 'c')}, cleanLook(m.e.look)), Object.assign({name: m.toName, fighter: body(m.a.body, 'd')}, cleanLook(m.a.look))]},
     clock ? {restLen: LIVE_REST, clock: () => (now() - start) / 1000} : {noBreaks: true}));

@@ -199,6 +199,19 @@ export const PLAN = {
   target: {head: 'หัว', body: 'ลำตัว', leg: 'ขา', mixed: 'ผสม'}
 };
 export const PLAN_DEFAULT = {ag: 'balanced', range: 'mixed', target: 'mixed'};
+// signature moves a fighter can carry, and the highest level of one
+export const SPECIALS = ['spChop', 'spHanu', 'spKick', 'spCroc', 'spFly'], SP_MAX = 3;
+// A match between two players: the game and the server both read these. Seconds unless said otherwise.
+export const LIVE = {
+  ready: 30,        // the bell no sooner than this after the challenge is accepted
+  quickWait: 90,    // how long a "fight now" challenge waits for its answer
+  quitUntil: 3,     // no withdrawing this close to the bell
+  rest: 20, pick: 13, read: 16, // the rest between rounds; the next round's plan can be changed for the first `pick` of it; every screen reads both plans at `read`
+  cornerIn: 2.3,    // from the bell that ends a round to the fighters being in their corners (where the rest starts on the clock)
+  matchLen: 300,    // a match counts as under way for this long after its bell
+  keepDays: 3,      // finished matches stay on the list this long
+  reward: {win: [400, 10], lose: [100, 2]} // money, fame
+};
 export const PLAN_RULES = {
   attackCool: .72, counterCool: 1.3, attackCover: .65, counterCover: 1.25, attackSt: 1.08, counterSt: .92, attackDmg: 1.05, counterBonus: .3,
   jam: .94, keepAway: .9, outRegen: .93, inCover: .8, outVsIn: 1.05, // walking in leaves the guard open, and a fighter kept outside eats long weapons // crowding blunts kicks; staying outside blunts close weapons but costs legs

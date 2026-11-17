@@ -1,7 +1,7 @@
 // Presenter: plays a simulated fight in three.js. It reads the event log and never decides a result.
 // One fight can be re-watched under different presentation settings to compare what feels best.
 import { simulate } from './sim.js';
-import { MOVES, COMBOS, STYLES, STAT_TH, RULES } from './data.js';
+import { MOVES, COMBOS, STYLES, STAT_TH, RULES, LIVE } from './data.js';
 import { bake, EFF_NAME, evadePose, ROPE } from './timeline.js';
 import { Fighter, EFF_JOINT, STYLE_BUILD, setDims, DIM_DEFAULT } from './rig.js';
 import { NP, FLAT, IDX, scalePoses } from './poses.js';
@@ -115,7 +115,13 @@ function startCeremony() {
   ['banner', 'count', 'scorecard', 'replayTag'].forEach(id => { $(id).hidden = true; }); $('pops').innerHTML = '';
   // a title or a tournament won by the player's man (corner 0): the belt or the cup is presented after the raised hand
   const pz = CFG.prize && w === 0 ? CFG.prize : null; if (!prizes) prizes = buildPrize(scene);
-  cer.start(fighters[w], fighters[1 - w], refF, {onRaise: p => { hype = 1; audio.roar(1.1); audio.applause(); audio.shout(1); voice.win(w, audio.time()); fx.sparks(p, 40, 0xffd35a, 1.8, 0); fx.ring(p, 1, 0xffd35a); },
+  // how the winner celebrates: from the fight's own number, so every screen showing this fight shows the same one
+  const ko = fight.result.how !== 'คะแนน', pool = pz ? ['ropes'] : ko ? ['ropes', 'roar', 'slide', 'ropes'] : ['bow', 'ropes', 'roar', 'bow'];
+  const style = window.LAB.celebrate || pool[(CFG.seed >>> 0) % pool.length];
+  cer.start(fighters[w], fighters[1 - w], refF, {style, ko, ring: {R: RING_R, ropeY: arena.ropeY()},
+    onRespect: () => { audio.applause(); },
+    onCheer: p => { hype = 1; audio.roar(1.2); audio.shout(1); fx.sparks(p, 46, 0xffd35a, 2.0, 0); },
+    onRaise: p => { hype = 1; audio.roar(1.1); audio.applause(); audio.shout(1); voice.win(w, audio.time()); fx.sparks(p, 40, 0xffd35a, 1.8, 0); fx.ring(p, 1, 0xffd35a); },
     prize: pz ? {kind: pz.kind, obj: prizes.get(pz.kind, pz.tier), r: prizes.R} : null,
     onPrize: p => { hype = 1; audio.roar(1.2); audio.applause(); audio.shout(1); fx.sparks(p, 70, 0xffd35a, 2.2, 0); fx.ring(p, 1.3, 0xffd35a); if (pz.name) banner(pz.name, 'gold'); }});
   return true;
@@ -275,7 +281,7 @@ function buildFight() {
     const blow = !byBlow && lastKd && lastKd.on === ko.on ? lastKd.t : ko.t;
     replays.push({kind: 'ko', blow, from: Math.max(0, blow - .8), to: blow + .8, trigger: ko.t + 1.55, by: ko.by});
   }
-  marks.rests.forEach(r => { r.pauseAt = r.t + 2.3; });
+  marks.rests.forEach(r => { r.pauseAt = r.t + LIVE.cornerIn; });
   buildTv(); buildSlow();
 }
 const replayOn = r => r.kind === 'ko' ? OPT.replay >= 1 : OPT.replay >= 2 && !liveClock; // a live match has no time for the replay of the round: its rest runs by the clock
@@ -292,7 +298,7 @@ function buildTv() {
   });
   marks.stuns.forEach(st => { if (st.t1 - st.t0 > .8) add(st.t0 + .25, 'tight', -1, st.t1 - st.t0); });
   marks.clinches.forEach(c => { if (c.t1 - c.t0 > .9) add(c.t0 + .3, 'tight', -1, c.t1 - c.t0); });
-  marks.rests.forEach(r => { add(r.t + .25, 'high', -1, .9); add(r.t + 1.0, 'face', 0, .6); add(r.t + 1.65, 'face', 1, .6); add(r.t + 2.3, 'main', -1, 3); });
+  marks.rests.forEach(r => { add(r.t + .25, 'high', -1, .9); add(r.t + 1.0, 'face', 0, .6); add(r.t + 1.65, 'face', 1, .6); add(r.t + LIVE.cornerIn, 'main', -1, 3); });
   if (marks.ko) { add(marks.ko.t + .85, 'low', marks.ko.on, 9); add(marks.ko.t + 1.75, 'face', marks.ko.by, 99); }
   if (marks.decPhase != null) { add(marks.decPhase + .2, 'high', -1, 9); if (marks.dec) add(marks.dec.t + .1, 'face', marks.dec.w, 99); }
   forced.sort((x, y) => x.t - y.t);
@@ -724,7 +730,7 @@ function frame(ts) {
     const going = cer.update(dt, cerAt); if (arena) arena.ropeUpdate(dt); // the ropes settle
     if (!going && !cerDone) { cerDone = true; finish(); } // the result comes up; the three stay in the ring behind it
     hype = Math.max(.3, hype - dt * .15);
-    arena.keyAt(0); arena.fadeRopes(camera.position, 1); arena.update(realT, hype, dt); fx.update(dt, camera);
+    arena.keyAt(0); arena.fadeRopes(camera.position, cer.keepRopes ? 'all' : 1); arena.update(realT, hype, dt); fx.update(dt, camera);
     audio.update(dt, hype, true, TL.clock(playT).round, 1, 'cer'); voice.tick(audio.time());
     renderer.render(scene, camera); hud(dt); return;
   }

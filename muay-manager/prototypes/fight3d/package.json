@@ -5,7 +5,7 @@
   "scripts": {
     "build": "node build.mjs",
     "batch": "node tools/batch.mjs",
-    "test": "node tools/determinism.mjs",
+    "test": "node tools/determinism.mjs && node tools/match-test.mjs",
     "site": "node build.mjs && npx --yes wrangler@4 pages dev dist/site",
     "deploy": "node tools/deploy-site.mjs",
     "e2e:single": "node tools/e2e/single-fight.mjs",

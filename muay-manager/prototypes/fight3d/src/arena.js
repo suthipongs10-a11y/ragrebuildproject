@@ -74,7 +74,7 @@ function ropeMat(col, r, side, y) {
 }
 // floor, apron, posts and ropes. c: {mat, apron, ground, posts: {col, r, h, metal}, pads, ropeY, ropeCols, ropeR}
 function ringParts(V, c) {
-  const g = V.group;
+  const g = V.group; V.ropeY = c.ropeY;
   const floor = put(g, new THREE.PlaneGeometry(S, S), std({map: c.mat, roughness: .92}), 0, c.ground < 0 ? 0 : .004, 0, -Math.PI / 2); floor.receiveShadow = true;
   if (c.apron) for (let i = 0; i < 4; i++) put(g, new THREE.PlaneGeometry(S, -c.ground), std({map: c.apron, roughness: .8}), Math.sin(i * Math.PI / 2) * S / 2, c.ground / 2, Math.cos(i * Math.PI / 2) * S / 2, 0, i * Math.PI / 2);
   const corners = [[-R, R], [R, R], [R, -R], [-R, -R]], P = c.posts;
@@ -619,6 +619,7 @@ export function buildArena(scene) {
     if (time) campTimeOf(A.V, time);
     light();
   };
+  A.ropeY = () => (A.V && A.V.ropeY) || [.42, .72, 1.02, 1.32]; // heights of the ropes of the venue on stage
   A.painted = () => !!(A.V && A.V.painted); // a painted camp: the cameras keep to the painted part
   // ropes: a spring per side; push(side, depth, along) leans a body on it, kick(side, speed) drives it out
   const ropeS = [0, 1, 2, 3].map(() => ({d: 0, v: 0, want: 0, c: 0}));
@@ -643,7 +644,7 @@ export function buildArena(scene) {
     for (let i = 0; i < 4; i++) {
       const d = beyond[i];
       let o = 1;
-      if (d > -.9) { const k = Math.max(0, Math.min(1, (d - .5) / .9)); o = keepNear ? k * k * (3 - 2 * k) * keepNear : 0; }
+      if (d > -.9 && keepNear !== 'all') { const k = Math.max(0, Math.min(1, (d - .5) / .9)); o = keepNear ? k * k * (3 - 2 * k) * keepNear : 0; } // 'all': a shot from outside of somebody standing on the ropes
       for (const r of V.ropeSides[i]) { r.visible = o > .03; r.material.opacity = o; }
     }
     // a corner post right in front of the lens would block the shot

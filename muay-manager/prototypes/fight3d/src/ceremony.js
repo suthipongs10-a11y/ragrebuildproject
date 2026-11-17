@@ -2,11 +2,17 @@
 // of him while he holds a wrist of each, then he raises the winner's arm. The camera circles the three of them.
 // When a title or a tournament was at stake and the player's man won it, the scene goes on: the referee brings the belt
 // and puts it round his waist, or hands him the cup and he lifts it over his head (h.prize, an object from prize.js).
+// Once the scene proper is over (the result is on screen by then) the ring goes on behind it: the two show each other
+// respect (a wai and a bow after a decision; down on their knees, forehead to the canvas, after a knockout), then the
+// winner celebrates in one of several ways (h.style) and stays in it: 'ropes' he runs to the corner, jumps up on the ropes
+// and throws his arms up to the crowd; 'roar' fists down and a roar, then both arms flexed; 'slide' a run and a slide on
+// the knees with the arms wide; 'bow' he kneels to the crowd and bows three times.
 // Presentation only: the winner comes from the fight result.
 import { FLAT, NP, IDX } from './poses.js';
 const THREE = globalThis.THREE;
 
 export const CER_LEN = 9.6, PRIZE_LEN = 6.6; // seconds; the prize adds PRIZE_LEN
+export const CELEBRATIONS = ['ropes', 'roar', 'slide', 'bow'];
 // the prize: it appears in the referee's hands, he turns to the winner, hands it over, steps back, and the winner shows it off
 const TP = {show: [8.7, 9.2], turn: [8.9, 9.8], give: [10.0, 11.1], back: [11.4, 12.3], take: [9.9, 10.7], lift: [10.9, 11.8], cheer: [11.9, 15.6], done: 11.25};
 const T = {touch: [.3, 1.0], untouch: [1.7, 2.3], walk: [2.1, 3.0], grab: [2.9, 3.4], raise: [4.9, 5.35], release: [5.0, 5.5], both: [6.3, 6.8], hop: [6.8, 8.6]};
@@ -14,7 +20,7 @@ const sm = (r, x) => { const k = Math.max(0, Math.min(1, (x - r[0]) / (r[1] - r[
 const FRONT = -Math.PI / 2; // facing the main camera side of the ring (+z)
 
 export function buildCeremony(camera) {
-  const C = {on: false, t: 0, raised: false, len: CER_LEN, prized: false};
+  const C = {on: false, t: 0, raised: false, len: CER_LEN, prized: false, respected: false, cheered: false};
   const P = [new Float32Array(NP), new Float32Array(NP), new Float32Array(NP)], UP = new THREE.Vector3(0, 1, 0);
   const a = new THREE.Vector3(), b = new THREE.Vector3(), tmp = new THREE.Vector3(), c = new THREE.Vector3(), camA = new THREE.Vector3(), lookA = new THREE.Vector3();
   let W = null, L = null, R = null, hooks = {};
@@ -26,11 +32,104 @@ export function buildCeremony(camera) {
 
   // win, lose: the fighters (winner first); ref: the referee. h: {onRaise()}
   C.start = function (win, lose, ref, h) {
-    W = win; L = lose; R = ref; hooks = h || {}; C.on = true; C.t = 0; C.raised = false; C.prized = false;
+    W = win; L = lose; R = ref; hooks = h || {}; C.on = true; C.t = 0; C.raised = false; C.prized = false; C.respected = false; C.cheered = false;
     C.len = CER_LEN + (hooks.prize ? PRIZE_LEN : 0);
     R.root.visible = true;
   };
   C.stop = function () { C.on = false; if (R) R.root.visible = false; if (hooks.prize) hooks.prize.obj.visible = false; };
+
+  // ---- after the scene proper: respect, then the winner's celebration (see the top of the file)
+  const Q0 = new Float32Array(NP), Q1 = new Float32Array(NP), Qc = new Float32Array(NP), camB = new THREE.Vector3(), lookB = new THREE.Vector3();
+  const yawTo = (dx, dz) => Math.atan2(-dz, dx), near = (a, b, k) => a + Math.atan2(Math.sin(b - a), Math.cos(b - a)) * k; // turning the short way round
+  const lerp = (a, b, k) => a + (b - a) * k, pulse = (r0, r1, x) => sm(r0, x) * (1 - sm(r1, x));
+  // a running body after d metres: the feet reach and lift in turn, the arms pump against them
+  function runPose(Q, d) {
+    const ph = d / 1.3 * Math.PI * 2, sn = Math.sin(ph), cs = Math.cos(ph);
+    Q.set(FLAT.cerStand); Q[IDX.lean] = .3; Q[IDX.hdP] = -.12; Q[IDX.hip + 1] += -.03 + Math.abs(cs) * .035;
+    set3(Q, IDX.fL, .34 * sn, Math.max(0, cs) * .2, -.11); set3(Q, IDX.fR, -.34 * sn, Math.max(0, -cs) * .2, .11);
+    set3(Q, IDX.hL, .16 - .24 * sn, 1.2 + .06 * cs, -.27); set3(Q, IDX.hR, .16 + .24 * sn, 1.2 - .06 * cs, .27);
+    set3(Q, IDX.eL, -1, -.4, -.3); set3(Q, IDX.eR, -1, -.4, .3);
+  }
+  // both arms up and pumping in turn, the head back, looking round at the crowd: what a celebration settles into
+  function cheerPose(Q, t, bob) {
+    Q.set(FLAT.win); const w = Math.sin(t * 5.2);
+    Q[IDX.hL + 1] += .1 * w; Q[IDX.hR + 1] -= .1 * w; Q[IDX.hdY] = Math.sin(t * 1.1) * .4; Q[IDX.hdP] = -.28 + .06 * Math.sin(t * 2.3);
+    Q[IDX.jump] = Math.abs(Math.sin(t * 5.2)) * bob;
+  }
+  const EP = {cam: 0}; // the camera the celebration asks for (camB, lookB) and how much of it
+  function after(e, pw, pl, pr) {
+    const H = hooks, kneel = !!H.ko && !H.prize, style = H.style || 'ropes', ring = H.ring || {R: 3.05, ropeY: [.42, .72, 1.02, 1.32]}, cup = H.prize && H.prize.kind !== 'belt';
+    const T2 = kneel ? {down: [.9, 1.8], bow: [2.2, 2.9], up: [3.6, 4.3], rise: [4.4, 5.3], go: 5.5} : {down: [.9, 1.6], bow: [.9, 1.6], up: [2.9, 3.6], rise: [2.9, 3.6], go: 4.0};
+    const gap = kneel ? .84 : .47, face = sm([.15, .95], e), c = e - T2.go, z0 = .3;
+    pr.z -= 1.45 * sm([0, 1.0], e);                                    // the referee stands back out of it
+    pw.x = lerp(pw.x, -gap, face); pw.z = lerp(pw.z, z0, face); pw.yaw = near(pw.yaw, 0, face);            // the two turn to each other
+    pl.x = lerp(pl.x, gap, face); pl.z = lerp(pl.z, z0, face); pl.yaw = near(pl.yaw, Math.PI, face);
+    const resp = (Q, t) => {
+      if (kneel) { blend(Q, FLAT.cerStand, FLAT.kneelUp, pulse(T2.down, T2.rise, t)); const kb = pulse(T2.bow, T2.up, t); if (kb > 0) blend(Q, Q, FLAT.krab, kb); }
+      else blend(Q, FLAT.cerStand, FLAT.wai, pulse(T2.down, T2.up, t));
+    };
+    resp(Q0, e); resp(Q1, e - .14); // the loser a beat behind
+    const kin = sm([0, .7], e); blend(P[0], P[0], Q0, kin); blend(P[1], P[1], Q1, kin);
+    if (cup) { const dn = pulse(T2.down, T2.up, e); for (const [i, zz] of [[IDX.hL, -.13], [IDX.hR, .13]]) { mix3(P[0], i, .12, 2.0, zz, kin); mix3(P[0], i, .34, 1.22, zz, dn); } } // the cup comes down to his chest for the bow, then goes up again
+    if (!C.respected && e >= T2.bow[0] + .25) { C.respected = true; if (H.onRespect) H.onRespect(); }
+    // the camera for the respect: from the front and a little to one side, low when they kneel
+    camB.set(.9, kneel ? 1.0 : 1.3, 3.5); lookB.set(0, kneel ? .68 : 1.12, z0); EP.cam = sm([0, 1.1], e);
+    if (c <= 0) return;
+    // ---- the celebration
+    const sx0 = -gap, kc = sm([0, .4], c); let x = sx0, z = z0, yaw = 0, cheerAt = 9e9, cx2 = 0, cy2 = 1.2, cz2 = 3, lx = 0, ly = 1.2, lz = 0;
+    if (style === 'ropes') {
+      const sx = W.index ? 1 : -1, cx = sx * ring.R, cz = ring.R, ox = sx * Math.SQRT1_2, oz = Math.SQRT1_2; // the corner on the camera's side of the ring nearest his own, and the way out of it
+      const ry = ring.ropeY.length > 2 ? ring.ropeY[1] : ring.ropeY[0];                                       // the rope he stands on
+      const gx = cx - ox * 1.0, gz = cz - oz * 1.0, tx = cx - ox * .212, tz = cz - oz * .212, D = Math.hypot(gx - sx0, gz - z0);
+      const kr = sm([.1, 1.5], c), j = Math.max(0, Math.min(1, (c - 1.5) / .45)), up = sm([0, 1], j);
+      x = lerp(lerp(sx0, gx, kr), tx, up); z = lerp(lerp(z0, gz, kr), tz, up); yaw = near(0, yawTo(ox, oz), sm([0, .5], c));
+      if (j <= 0) { runPose(Q0, kr * D); Q0[IDX.hip + 1] -= .15 * sm([1.3, 1.5], c); Q0[IDX.lean] += .1 * sm([1.3, 1.5], c); } // the run, and the dip before the jump
+      else {
+        cheerPose(Q0, Math.max(0, c - 1.95), .028); const bob = Q0[IDX.jump];
+        if (j < 1) { blend(Q0, FLAT.cerStand, Q0, up); Q0[IDX.fL + 1] += .2 * Math.sin(Math.PI * j); Q0[IDX.fR + 1] += .2 * Math.sin(Math.PI * j); } // in the air: knees tucked, arms on their way up
+        mix3(Q0, IDX.fL, 0, Q0[IDX.fL + 1], -.212, up); mix3(Q0, IDX.fR, 0, Q0[IDX.fR + 1], .212, up);            // a foot on the rope either side of the post
+        set3(Q0, IDX.kL, 1, 0, -.25); set3(Q0, IDX.kR, 1, 0, .25); Q0[IDX.hip] -= .1 * up; Q0[IDX.hip + 1] -= .03 * up; Q0[IDX.lean] = .2 * up; // hips back and the body over the top rope, so the shins rest on the ropes above his feet
+        Q0[IDX.jump] = ry * up + .34 * Math.sin(Math.PI * j) + (j >= 1 ? bob : 0);
+      }
+      cheerAt = 1.95;
+      // from outside the corner, a little round to the front so the post is not in the way, looking up at him
+      const ca = Math.atan2(oz, ox) + sx * .6; cx2 = cx + Math.cos(ca) * 2.8; cy2 = 1.15; cz2 = cz + Math.sin(ca) * 2.8; lx = x; ly = 1.22 + Q0[IDX.jump] * .9 + (cup ? .12 : 0); lz = z;
+    } else if (style === 'roar') {
+      z = lerp(z0, z0 + .75, sm([.1, .7], c)); yaw = near(0, FRONT, sm([0, .5], c));
+      const a = sm([.55, .95], c), b = sm([2.5, 3.0], c), d = sm([4.3, 4.8], c);
+      blend(Q0, FLAT.cerStand, FLAT.roar, a); if (b > 0) blend(Q0, Q0, FLAT.flex, b);
+      if (a > .9 && b < .1) { const sh = Math.sin(c * 34) * .012; Q0[IDX.hL + 1] += sh; Q0[IDX.hR + 1] += sh; Q0[IDX.hdP] += Math.sin(c * 29) * .03; } // shaking with it
+      if (b > .9 && d < .1) { const fl = Math.sin(c * 7) * .03; Q0[IDX.hL + 1] += fl; Q0[IDX.hR + 1] += fl; }
+      if (d > 0) { cheerPose(Qc, c - 4.8, .045 * (1 - sm([7.5, 8.5], c))); blend(Q0, Q0, Qc, d); }
+      cheerAt = .8; cx2 = x + .55; cy2 = 1.15; cz2 = Math.min(z + 2.75, 3.5); lx = x; ly = 1.3; lz = z;
+    } else if (style === 'slide') {
+      const ax = sx0 - .1, az = .7, bz = az + .65, D = Math.hypot(ax - sx0, az - z0), kr = sm([.1, 1.05], c), q = Math.max(0, Math.min(1, (c - 1.05) / 1.25)), ks = 1 - (1 - q) * (1 - q);
+      x = lerp(sx0, ax, kr); z = lerp(z0, az, kr) + (bz - az) * ks; yaw = near(0, FRONT, sm([0, .4], c));
+      const dn = sm([1.0, 1.3], c), upk = sm([3.8, 4.6], c);
+      runPose(Q0, kr * D); if (dn > 0) blend(Q0, Q0, FLAT.slide, dn);
+      if (upk > 0) { cheerPose(Qc, c - 4.6, .04 * (1 - sm([7.5, 8.5], c))); blend(Q0, Q0, Qc, upk); }
+      cheerAt = 1.15; cx2 = x + .9; cy2 = .8 + .5 * upk; cz2 = Math.min(z + 2.5 + .3 * upk, 3.5); lx = x; ly = .85 + .65 * upk; lz = z; // no further out than the ropes fade for (arena.fadeRopes) // the camera stays close outside the ropes (they fade there)
+    } else { // 'bow': to the crowd, three times
+      z = lerp(z0, z0 + .6, sm([.1, .7], c)); yaw = near(0, FRONT, sm([0, .5], c));
+      const kd = pulse([.7, 1.5], [5.7, 6.5], c); let kb = 0;
+      for (let n = 0; n < 3; n++) { const t0 = 2.0 + n * 1.2; kb = Math.max(kb, pulse([t0, t0 + .42], [t0 + .62, t0 + 1.1], c)); }
+      blend(Q0, FLAT.cerStand, FLAT.kneelUp, kd);
+      const hi = kd * (1 - kb) * sm([1.5, 1.9], c); mix3(Q0, IDX.hL, .2, 1.5, -.035, hi); mix3(Q0, IDX.hR, .2, 1.5, .035, hi); Q0[IDX.hdP] -= .2 * hi; // between bows the gloves go up over the head
+      if (kb > 0) blend(Q0, Q0, FLAT.krab, kb);
+      const w2 = pulse([6.6, 7.2], [8.4, 9.1], c), arm = sm([9.1, 9.8], c);
+      if (w2 > 0) blend(Q0, Q0, FLAT.wai, w2 * .8);                       // on his feet again: a wai to the crowd
+      mix3(Q0, IDX.hR, .06, 1.96, .3, arm); mix3(Q0, IDX.eR, 0, -.3, 1, arm); Q0[IDX.hdP] -= .18 * arm; Q0[IDX.hdY] = Math.sin(c * 1.1) * .35 * arm; // then one arm up to them
+      cheerAt = 2.2; cx2 = x + 1.0; cy2 = .85 + .35 * (1 - kd); cz2 = z + 2.6; lx = x; ly = .7 + .45 * (1 - kd); lz = z;
+    }
+    blend(P[0], P[0], Q0, kc); pw.x = lerp(pw.x, x, kc); pw.z = lerp(pw.z, z, kc); pw.yaw = yaw;
+    if (cup) { mix3(P[0], IDX.hL, .12, 2.0, -.13, 1); mix3(P[0], IDX.hR, .12, 2.0, .13, 1); } // the cup stays over his head through all of it
+    // the loser turns to watch, and claps
+    Q1.set(FLAT.cerStand); const clap = sm([1.6, 2.4], c), cl = .04 + .09 * Math.abs(Math.sin(c * 6.2));
+    mix3(Q1, IDX.hL, .3, 1.22, -cl, clap); mix3(Q1, IDX.hR, .3, 1.22, cl, clap);
+    blend(P[1], P[1], Q1, kc); pl.yaw = near(Math.PI, yawTo(pw.x - pl.x, pw.z - pl.z), .85 * sm([.3, 1.5], c));
+    if (!C.cheered && c >= cheerAt) { C.cheered = true; if (H.onCheer) H.onCheer(new THREE.Vector3(pw.x, 1.4 + P[0][IDX.jump], pw.z), style); }
+    const k2 = sm([.1, 1.15], c); C.keepRopes = style === 'ropes' && k2 > .85; camB.lerp(tmp.set(cx2, cy2, cz2), k2); lookB.lerp(tmp.set(lx, ly, lz), k2);
+  }
 
   // advance by dt (or jump to time t) and pose everyone; returns false once the scene is over
   C.update = function (dt, t) {
@@ -64,14 +163,16 @@ export function buildCeremony(camera) {
       } else { Q[IDX.hdP] += .35 * rel; Q[IDX.lean] += .05 * rel; } // the loser takes it with his head down
       breathe(Q, k * 1.7);
     }
+    const e = s - C.len; EP.cam = 0; C.keepRopes = false;
+    if (e > 0) after(e, pw, pl, pr); else { C.respected = false; C.cheered = false; } // (a jump back in time, for checks, starts it over)
     W.update(P[0], 0, pw.x, pw.z, pw.yaw); L.update(P[1], 0, pl.x, pl.z, pl.yaw);
     // the referee holds the near wrist of each, looks from one to the other, and lifts the winner's
     const Q = P[2]; Q.set(FLAT.cerStand); breathe(Q, 3.1);
     const wrist = (F, n, out) => { F.world('ha' + n, a); F.world('el' + n, b); return out.copy(a).lerp(b, .22); };
-    const hold = grab * refIn;
+    const free = e > 0 ? 1 - sm([0, .5], e) : 1, hold = grab * refIn * free; // he lets go once the scene proper is over
     wrist(W, 'L', a); toLocal(a, pr, b); mix3(Q, IDX.hR, b.x, b.y, b.z, hold);
     wrist(L, 'R', a); toLocal(a, pr, b); mix3(Q, IDX.hL, b.x, b.y, b.z, hold * (1 - rel));
-    mix3(Q, IDX.eR, 0, -.4, 1, raise);
+    mix3(Q, IDX.eR, 0, -.4, 1, raise * free);
     if (s > 3.4 && s < 4.9) Q[IDX.hdY] = Math.sin((s - 3.4) / 1.5 * Math.PI * 2) * .45 * sm([3.4, 3.7], s); // a look at each of them
     if (Z) { // both hands carry the prize in front of him, then reach to the winner with it, then let go
       const hold = show * (1 - sm([TP.give[1] - .1, TP.give[1] + .5], s)), hy = belt ? 1.0 : 1.12, reach = give * hold;
@@ -100,6 +201,7 @@ export function buildCeremony(camera) {
       const k = sm([8.5, 9.6], s), out = sm([11.3, 12.6], s), az2 = -.42 + .5 * out + Math.max(0, s - 12.6) * .12, D2 = 2.15 + .9 * out;
       camA.lerp(tmp.set(pw.x + Math.sin(az2) * D2, 1.02 + .2 * out, Math.cos(az2) * D2), k); lookA.lerp(tmp.set(pw.x + .14 * (1 - out), (belt ? 1.02 : 1.25) + (belt ? .2 : .25) * out, 0), k);
     }
+    if (EP.cam > 0) { camA.lerp(camB, EP.cam); lookA.lerp(lookB, EP.cam); } // the respect and the celebration have their own
     camera.position.copy(camA); camera.lookAt(lookA);
     if (camera.fov !== 34) { camera.fov = 34; camera.updateProjectionMatrix(); }
     return C.t < C.len;

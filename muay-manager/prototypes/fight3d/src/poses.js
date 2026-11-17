@@ -123,7 +123,15 @@ export const POSES = {
   kneel: P({turn: 0, twist: 0, lean: .45, hdP: .3, hip: [-.05, .52, 0], hL: [.38, .72, -.15], hR: [.38, .72, .15], eL: [-.3, -1, -.6], eR: [-.3, -1, .6], fL: [.3, 0, -.16], fR: [-.42, .02, .16], kL: [1, .5, -.1], kR: [1, -1, .1]}),
   cerStand: P({turn: 0, twist: 0, lean: .02, hdP: .04, hip: [0, .93, 0], hL: [.1, .93, -.27], hR: [.1, .93, .27], eL: [-.3, -1, -.4], eR: [-.3, -1, .4], fL: [.03, 0, -.13], fR: [-.03, 0, .13], kL: [1, 0, -.1], kR: [1, 0, .1]}),
   cerTouch: P({turn: 0, twist: 0, lean: .2, hdP: .3, hip: [-.02, .91, 0], hL: [.36, 1.17, -.07], hR: [.36, 1.15, .07], eL: [-.2, -1, -.5], eR: [-.2, -1, .5], fL: [.08, 0, -.13], fR: [-.1, 0, .13], kL: [1, 0, -.1], kR: [1, 0, .1]}),
-  win: P({turn: 0, twist: 0, lean: -.05, hdP: -.2, hip: [0, .90, 0], hL: [.05, 2.0, -.35], hR: [.05, 2.0, .35], eL: [0, -.3, -1], eR: [0, -.3, 1], fL: [.05, 0, -.18], fR: [-.05, 0, .18], kL: [1, 0, -.2], kR: [1, 0, .2]})
+  win: P({turn: 0, twist: 0, lean: -.05, hdP: -.2, hip: [0, .90, 0], hL: [.05, 2.0, -.35], hR: [.05, 2.0, .35], eL: [0, -.3, -1], eR: [0, -.3, 1], fL: [.05, 0, -.18], fR: [-.05, 0, .18], kL: [1, 0, -.2], kR: [1, 0, .2]}),
+  // the winner's celebrations (ceremony.js): a roar with the fists driven down and the head thrown back; both arms flexed,
+  // fists by the ears; down on both knees sitting tall with the gloves together; the bow from there, forehead to the canvas
+  // between the gloves; and the slide on the knees, leaning back with the arms thrown wide
+  roar: P({turn: 0, twist: 0, lean: -.2, hdP: -.5, hip: [0, .80, 0], hL: [.2, 1.0, -.48], hR: [.2, 1.0, .48], eL: [-.6, -.2, -1], eR: [-.6, -.2, 1], fL: [.06, 0, -.3], fR: [-.06, 0, .3], kL: [1, 0, -.5], kR: [1, 0, .5]}),
+  flex: P({turn: 0, twist: 0, lean: -.06, hdP: -.15, hip: [0, .90, 0], hL: [.02, 1.74, -.4], hR: [.02, 1.74, .4], eL: [0, .15, -1], eR: [0, .15, 1], fL: [.04, 0, -.24], fR: [-.04, 0, .24], kL: [1, 0, -.3], kR: [1, 0, .3]}),
+  kneelUp: P({turn: 0, twist: 0, lean: .04, hdP: .05, hip: [0, .52, 0], hL: [.27, 1.02, -.035], hR: [.27, 1.02, .035], eL: [-.2, -1, -.6], eR: [-.2, -1, .6], fL: [-.46, .04, -.13], fR: [-.46, .04, .13], kL: [1, -.8, -.12], kR: [1, -.8, .12]}),
+  krab: P({turn: 0, twist: 0, lean: 1.62, hdP: .3, hip: [-.2, .34, 0], hL: [.5, .05, -.09], hR: [.5, .05, .09], eL: [-.1, .2, -1], eR: [-.1, .2, 1], fL: [-.52, .04, -.13], fR: [-.52, .04, .13], kL: [1, -.8, -.12], kR: [1, -.8, .12]}),
+  slide: P({turn: 0, twist: 0, lean: -.5, hdP: -.45, hip: [0, .46, 0], hL: [-.08, 1.12, -.8], hR: [-.08, 1.12, .8], eL: [-.4, -.6, -1], eR: [-.4, -.6, 1], fL: [-.5, .04, -.17], fR: [-.5, .04, .17], kL: [1, -.8, -.16], kR: [1, -.8, .16]})
 };
 
 // Flat layout used for blending and baking.
