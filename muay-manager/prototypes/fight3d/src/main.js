@@ -6,7 +6,7 @@ import { bake, EFF_NAME, evadePose, ROPE } from './timeline.js';
 import { Fighter, EFF_JOINT, STYLE_BUILD, setDims, DIM_DEFAULT } from './rig.js';
 import { NP, FLAT, IDX, scalePoses } from './poses.js';
 import { loadModel, ModelFighter } from './model.js';
-import { COLORS, PATTERNS, HEADGEAR, HAIR } from './outfit.js';
+import { COLORS, PATTERNS, HEADGEAR, HAIR, SKINS, BANDS } from './outfit.js';
 import { buildArena, VENUES, RING_R } from './arena.js';
 import { buildDrill, TARGETS } from './drill.js';
 import { buildFx } from './fx.js';
@@ -60,10 +60,10 @@ const ROSTER = {
   g: ['เชื้อสายจีน สูงเพรียว', 'blue'], h: ['นักสู้ญี่ปุ่น ผมตั้ง', 'blue'], l: ['ฝรั่งหัวโล้น เคราแดง', 'blue', {bald: true}]
 };
 const LOOK = [
-  {name: '', fighter: 'c', shorts: 'red', trim: 'gold', pattern: 'zigzag', gloves: 'red', head: 'mongkol', hair: 'natural'},
-  {name: '', fighter: 'd', shorts: 'blue', trim: 'white', pattern: 'stripe', gloves: 'blue', head: 'mongkol', hair: 'natural'}
+  {name: '', fighter: 'c', shorts: 'red', trim: 'gold', pattern: 'zigzag', gloves: 'red', head: 'mongkol', hair: 'natural', skin: 'natural', band: 'none'},
+  {name: '', fighter: 'd', shorts: 'blue', trim: 'white', pattern: 'stripe', gloves: 'blue', head: 'mongkol', hair: 'natural', skin: 'natural', band: 'none'}
 ];
-const LOOK_FIELDS = {fighter: ROSTER, shorts: COLORS, trim: COLORS, pattern: PATTERNS, gloves: COLORS, head: HEADGEAR, hair: HAIR};
+const LOOK_FIELDS = {fighter: ROSTER, shorts: COLORS, trim: COLORS, pattern: PATTERNS, gloves: COLORS, head: HEADGEAR, hair: HAIR, skin: SKINS, band: BANDS};
 const cleanName = v => String(v || '').replace(/[<>&"']/g, '').trim().slice(0, 24);
 try { // remembered per viewer
   const sv = JSON.parse(localStorage.getItem('muayLabLook'));
@@ -842,7 +842,7 @@ function buildUi() {
     applyOpt();
   });
   const opts = (map, cur) => Object.keys(map).map(k => '<option value="' + k + '"' + (k === cur ? ' selected' : '') + '>' + (Array.isArray(map[k]) ? map[k][0] : map[k]) + '</option>').join('');
-  const LABEL = {fighter: 'ตัวนักมวย', shorts: 'สีกางเกง', pattern: 'ลายกางเกง', trim: 'สีลายและมงคล', gloves: 'สีนวม', head: 'มงคล', hair: 'สีผม'};
+  const LABEL = {fighter: 'ตัวนักมวย', shorts: 'สีกางเกง', pattern: 'ลายกางเกง', trim: 'สีลายและมงคล', gloves: 'สีนวม', head: 'มงคล', hair: 'สีผม', skin: 'สีผิว', band: 'ประเจียด'};
   $('lookUi').innerHTML = LOOK.map((l, i) => '<div class="lk ' + (i ? 'b' : 'r') + '"><h3>' + (i ? 'มุมน้ำเงิน' : 'มุมแดง') + '</h3>' +
     '<label for="lk' + i + 'name">ชื่อ</label><input id="lk' + i + 'name" data-i="' + i + '" data-k="name" maxlength="24" placeholder="ตั้งชื่อเอง" value="' + cleanName(l.name) + '">' +
     Object.keys(LABEL).map(k => '<label for="lk' + i + k + '">' + LABEL[k] + '</label><select id="lk' + i + k + '" data-i="' + i + '" data-k="' + k + '">' + opts(LOOK_FIELDS[k], l[k]) + '</select>').join('') + '</div>').join('');
@@ -937,12 +937,12 @@ function roundStats(n) {
 }
 // ---------- hooks for the game layer ----------
 const API = {
-  LOOK, ROSTER, COLORS, PATTERNS, HEADGEAR, HAIR, HOOK, VENUES, TARGETS, cleanName,
+  LOOK, ROSTER, COLORS, PATTERNS, HEADGEAR, HAIR, SKINS, BANDS, HOOK, VENUES, TARGETS, cleanName,
   hasModels: () => !!document.getElementById('model-c'),
   async startFight(cfg) { // cfg: {seed, specs: [player, opponent], plans, looks: [look, look], venue, rules}
     const g = ++sceneGen;
     API.endPreview(); API.drillStop(); OPT.venue = VENUES[cfg.venue] ? cfg.venue : 'stadium';
-    cfg.looks.forEach((l, i) => Object.assign(LOOK[i], l));
+    cfg.looks.forEach((l, i) => Object.assign(LOOK[i], {skin: 'natural', band: 'none'}, l)); // a look that names no skin tone or arm band has none (not the last fighter's)
     OPT.fighter = 'model'; await loadPair();
     if (g !== sceneGen) return false; // something newer was asked for while the bodies loaded
     API.endPreview(); API.drillStop();

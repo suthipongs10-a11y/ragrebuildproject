@@ -5,7 +5,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 import { IDX } from './poses.js';
 import { DIM, solve, makeJoints } from './rig.js';
-import { outfitTexture, headgear } from './outfit.js';
+import { outfitTexture, headgear, armband } from './outfit.js';
 const THREE = globalThis.THREE;
 
 const V = () => new THREE.Vector3(), Q = () => new THREE.Quaternion();
@@ -83,6 +83,17 @@ export async function loadModel(id, key) {
   { const W = [.1, .1, .12], y0 = pos.Hips.y + .03, y1 = pos.Hips.y + .12;
     for (let i = 0; i < SI.count; i++) { mesh.getVertexPosition(i, p); p.applyMatrix4(mesh.matrixWorld).applyMatrix4(TO_LOCAL); if (p.y > y0 && p.y < y1 && Math.abs(p.z) < .3) { W[0] = Math.max(W[0], p.x - pos.Hips.x); W[1] = Math.max(W[1], pos.Hips.x - p.x); W[2] = Math.max(W[2], Math.abs(p.z)); } }
     dims.waist = W; }
+  // The upper arm where a prajioud is tied (a little above its middle): how thick each arm is there
+  { dims.armR = {}; const rel = V(), ax = V();
+    for (const side of ['Left', 'Right']) {
+      const A = pos[side + 'Arm'], bi = names.indexOf(side + 'Arm'); ax.subVectors(pos[side + 'ForeArm'], A); const len = ax.length(); ax.normalize(); let sum = 0, n = 0, mx = 0;
+      for (let i = 0; i < SI.count; i++) {
+        let w = 0; for (let k = 0; k < 4; k++) if (SI.getComponent(i, k) === bi) w += SW.getComponent(i, k); if (w < .5) continue;
+        mesh.getVertexPosition(i, p); p.applyMatrix4(mesh.matrixWorld).applyMatrix4(TO_LOCAL); rel.subVectors(p, A); const t = rel.dot(ax); if (t < len * .34 || t > len * .54) continue;
+        const dd = rel.addScaledVector(ax, -t).length(); sum += dd; n++; if (dd > mx) mx = dd;
+      }
+      dims.armR[side] = n > 5 ? Math.max(.035, Math.min(.085, (sum / n + mx) / 2)) : .052;
+    } }
   let z0 = Infinity, z1 = -Infinity, bz0 = Infinity, bz1 = -Infinity, bx0 = Infinity, bx1 = -Infinity;
   const bandY = hy.y + headH * .74; // the headband's height: on the forehead, above the eyes and ears
   for (let i = 0; i < SI.count; i++) {
@@ -119,6 +130,18 @@ export class ModelFighter {
     if (look) { try { mat.map = outfitTexture(model, look); } catch (e) { console.warn('outfit not applied:', e.message); } }
     this.gear = headgear(look && look.head, look && look.trim, model.headR); this.root.add(this.gear);
     if (model.band) this.gear.scale.set((model.band.a + BAND_GAP) / (model.headR * 1.04), 1, (model.band.b + BAND_GAP) / (model.headR * 1.04)); // fitted to this head
+    // prajioud: a band on each upper arm, carried by that bone (put() below moves it with the arm)
+    this.bandOf = null;
+    if (look && look.band && look.band !== 'none' && model.dims.armR) {
+      this.bandOf = {};
+      for (const side of ['Left', 'Right']) {
+        const g = armband(look.band, model.dims.armR[side]); if (!g.children.length) continue;
+        const A = model.pos[side + 'Arm'], y = V().subVectors(model.pos[side + 'ForeArm'], A), at = V().copy(A).addScaledVector(y, .44); y.normalize();
+        const z = V().copy(UP).addScaledVector(y, -UP.dot(y)); if (z.lengthSq() < 1e-4) z.copy(FWD); z.normalize(); // the knot on the side that is up when the arm is held out
+        g.matrixAutoUpdate = false; this.root.add(g);
+        this.bandOf[side + 'Arm'] = {g, B0: new THREE.Matrix4().makeBasis(V().crossVectors(y, z), y, z).setPosition(at)};
+      }
+    }
     this.mat = mat;
     this.handK = look && look.gloves === 'rope' ? .8 : 1; // a wrapped fist is smaller than a glove
     // bones leave the scene graph: their world matrices are written directly every frame
@@ -145,6 +168,7 @@ export class ModelFighter {
     v1.copy(a0).multiplyScalar(k).applyQuaternion(q); v2.copy(a).sub(v1);
     m1.compose(v2, q, v3.set(k, k, k));
     b.matrixWorld.multiplyMatrices(this.root.matrixWorld, m1).multiply(this.bind[name]);
+    const bd = this.bandOf && this.bandOf[name]; if (bd) { bd.g.matrix.multiplyMatrices(m1, bd.B0); bd.g.matrixWorldNeedsUpdate = true; }
   }
   update(P, o, x, z, yaw) { // z, yaw: optional, to stand somewhere off the fight line facing any way (the ceremony)
     const J = solve(P, o, this.J), P0 = this.model.pos;

@@ -100,7 +100,8 @@ const LEAGUE_VENUE = ['temple', 'temple', 'province', 'stadium', 'champ'];
 const LEAGUES = [[0, 'เวทีงานวัด'], [1100, 'เวทีอำเภอ'], [1250, 'เวทีจังหวัด'], [1400, 'เวทีมาตรฐาน'], [1600, 'ศึกชิงแชมป์']];
 const GYM_COST = [0, 1200, 2800, 5500, 9000];
 const PRICE = {colors: {gold: 250, green: 250, purple: 250, pink: 250, orange: 250}, patterns: {stripe: 300, hem: 300, split: 400, zigzag: 500}, head: {mongkol: 600}, hair: {brown: 200, blond: 300, red: 300, silver: 300, blue: 350, green: 350, pink: 350, purple: 350}};
-const LOOK_KIND = {shorts: 'colors', trim: 'colors', gloves: 'colors', pattern: 'patterns', head: 'head', hair: 'hair'};
+const LOOK_KIND = {shorts: 'colors', trim: 'colors', gloves: 'colors', pattern: 'patterns', head: 'head', hair: 'hair', band: 'colors'}; // what each part of the look is bought as (the skin tone is free; no arm band is free)
+const LOOK0 = {shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none', hair: 'natural', skin: 'natural', band: 'none'};
 const SP_FAME = [30, 80, 160];      // fame needed for each extra signature move beyond the style's two
 // Or learn one sooner from a visiting master, for money. Each move then trains up to level 3: a day's training slot,
 // money and fatigue per level; the fight engine makes a higher level harder to stop and heavier (RULES.spLvAcc / spLvDmg).
@@ -109,19 +110,21 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.47', BUILD = 247;
+const VER = '2.48', BUILD = 248;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
 // ---------- save ----------
-function newSave(name, body, style) {
-  return {v: 1, name, body, style, stats: Object.assign({}, START[style]), look: {shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none', hair: 'natural'},
-    own: {colors: ['red', 'blue', 'black', 'white'], patterns: ['plain'], head: ['none'], hair: ['natural']}, mood: 2, staff: [], belts: [], title: 1, day: 1, slots: 3, ranked: 2, fatigue: 0, money: 500, fame: 0, rp: 1000, best: 1000,
+function newSave(name, body, style, look0) {
+  const look = Object.assign({}, LOOK0, look0 ? cleanLook(look0) : null, {head: 'none'}), uniq = a => Array.from(new Set(a));
+  return {v: 1, name, body, style, stats: Object.assign({}, START[style]), look,
+    own: {colors: uniq(['red', 'blue', 'black', 'white', look.shorts, look.trim, look.gloves].concat(look.band === 'none' ? [] : [look.band])), patterns: uniq(['plain', look.pattern]), head: ['none'], hair: uniq(['natural', look.hair])}, mood: 2, staff: [], belts: [], title: 1, day: 1, slots: 3, ranked: 2, fatigue: 0, money: 500, fame: 0, rp: 1000, best: 1000,
     rec: {w: 0, l: 0, ko: 0}, gym: 1, chuek: 1, seed: Math.floor(Math.random() * 1e9), plan: Object.assign({}, PLAN_DEFAULT), log: [],
     sp: STYLES.find(x => x.id === style).sp.slice(), spOwn: STYLES.find(x => x.id === style).sp.slice(), mis: {day: 1, n: {}}, spLv: {}, rivals: [], rematch: 1, defendDue: 0, defends: 0, chDone: [], tour: null, tours: {}, updatedAt: Date.now()};
 }
 function loadLocal() { try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); return valid(s) ? fix(s) : null; } catch (e) { return null; } }
 function fix(s) { // fields added after a save was made
+  if (s.look && !s.look.skin) s.look.skin = 'natural'; if (s.look && !s.look.band) s.look.band = 'none';
   const sp = STYLES.find(x => x.id === s.style).sp;
   if (!Array.isArray(s.spOwn)) s.spOwn = sp.slice();
   if (!Array.isArray(s.sp) || !s.sp.length) s.sp = sp.slice();
@@ -212,7 +215,7 @@ async function loadBoard() {
   } catch (e) { /* the built-in rivals still fill the table */ }
 }
 const roundStats = st => { const o = {}; KEYS.forEach(k => { o[k] = Math.round(st[k]); }); return o; };
-function cleanLook(l) { l = l || {}; const pick = (map, v, d) => (own(map, v) ? v : d); return {shorts: pick(API.COLORS, l.shorts, 'blue'), trim: pick(API.COLORS, l.trim, 'white'), gloves: pick(API.COLORS, l.gloves, 'blue'), pattern: pick(API.PATTERNS, l.pattern, 'plain'), head: pick(API.HEADGEAR, l.head, 'none'), hair: pick(API.HAIR, l.hair, 'natural')}; }
+function cleanLook(l) { l = l || {}; const pick = (map, v, d) => (own(map, v) ? v : d); return {shorts: pick(API.COLORS, l.shorts, 'blue'), trim: pick(API.COLORS, l.trim, 'white'), gloves: pick(API.COLORS, l.gloves, 'blue'), pattern: pick(API.PATTERNS, l.pattern, 'plain'), head: pick(API.HEADGEAR, l.head, 'none'), hair: pick(API.HAIR, l.hair, 'natural'), skin: pick(API.SKINS, l.skin, 'natural'), band: pick(API.BANDS, l.band, 'none')}; }
 
 // ---------- derived values ----------
 const total = st => KEYS.reduce((a, k) => a + st[k], 0);
@@ -230,7 +233,7 @@ const spLv = k => (S.spLv && S.spLv[k]) || 1;
 // opponents train their signature moves too: one level per two leagues, champions one more
 function oppSpLv(style, lg, champ) { const lv = Math.min(SP_MAX, 1 + Math.floor(lg / 2) + (champ ? 1 : 0)), o = {}; STYLES.find(x => x.id === style).sp.forEach(k => { o[k] = lv; }); return o; }
 function makeStats(style, T, R) { const b = START[style], sum = total(b), st = {}; KEYS.forEach(k => { st[k] = clamp(Math.round(b[k] * T / sum + (R() - .5) * 8), 22, 99); }); return st; }
-function randomLook(R) { const cs = Object.keys(API.COLORS), ps = Object.keys(API.PATTERNS), hs = Object.keys(API.HEADGEAR); return {shorts: cs[Math.floor(R() * cs.length)], trim: cs[Math.floor(R() * cs.length)], gloves: cs[Math.floor(R() * cs.length)], pattern: ps[Math.floor(R() * ps.length)], head: hs[Math.floor(R() * hs.length)], hair: R() < .7 ? 'natural' : Object.keys(API.HAIR)[1 + Math.floor(R() * (Object.keys(API.HAIR).length - 1))]}; }
+function randomLook(R) { const cs = Object.keys(API.COLORS), ps = Object.keys(API.PATTERNS), hs = Object.keys(API.HEADGEAR); const L = {shorts: cs[Math.floor(R() * cs.length)], trim: cs[Math.floor(R() * cs.length)], gloves: cs[Math.floor(R() * cs.length)], pattern: ps[Math.floor(R() * ps.length)], head: hs[Math.floor(R() * hs.length)], hair: R() < .7 ? 'natural' : Object.keys(API.HAIR)[1 + Math.floor(R() * (Object.keys(API.HAIR).length - 1))]}; L.skin = 'natural'; L.band = (cs.indexOf(L.shorts) + ps.indexOf(L.pattern)) % 3 === 0 ? L.trim : 'none'; return L; }
 function makeOpp(seed, T, fixedName) {
   const R = rng(seed), style = STYLES[Math.floor(R() * STYLES.length)].id, bodies = Object.keys(API.ROSTER).filter(b => b !== S.body);
   const name = fixedName || FIRST[Math.floor(R() * FIRST.length)] + ' ' + CAMP[Math.floor(R() * CAMP.length)];
@@ -497,12 +500,23 @@ function render() {
 }
 function go(t) { if (DR) drillEnd(true); if (SC) sceneEnd(true); tab = t; view = null; pending = null; mini = null; setMode(false); render(); showMe(t === 'dress' ? 'guard' : t === 'home' ? 'guard' : 'guard'); }
 
-let draft = {body: 'c', style: 'puncher', name: ''};
+let draft = {body: 'c', style: 'puncher', name: '', look: Object.assign({}, LOOK0)};
+const previewDraft = pose => API.preview(Object.assign({fighter: draft.body}, draft.look), pose || 'guard');
+const SW0 = 'linear-gradient(135deg,#1c1c22 50%,#6a4a2a 50%)', hexCss = c => '#' + c.toString(16).padStart(6, '0'); // the swatch of "as it is" / "none"
+// one row of choices on the creation screen (all free there)
+function drow(field, label, map, swatch) {
+  return '<div class="fld">' + label + '</div><div class="sw">' + Object.keys(map).map(k => { const th = Array.isArray(map[k]) ? map[k][0] : map[k];
+    return '<button class="swb" data-act="dlook" data-f="' + field + '" data-v="' + k + '" aria-pressed="' + (draft.look[field] === k) + '"' + (swatch ? ' style="--c:' + (map[k][1] ? hexCss(map[k][1]) : SW0) + '"' : '') + '>' + (swatch ? '<i></i>' : '') + th + '</button>'; }).join('') + '</div>';
+}
 function renderCreate() {
   $('gNav').innerHTML = '';
   $('gBody').innerHTML = '<section class="gcard"><h2>สร้างนักมวยของคุณ</h2>' +
     '<label class="fld" for="gName">ชื่อนักมวย</label><input id="gName" class="inp" maxlength="24" placeholder="เช่น เพชรน้ำหนึ่ง ศ.ของคุณ" value="' + esc(draft.name) + '">' +
     '<div class="fld">ตัวนักมวย</div><div class="pick">' + Object.keys(API.ROSTER).map(k => '<button class="btn seg sm" data-act="body" data-v="' + k + '" aria-pressed="' + (draft.body === k) + '">' + API.ROSTER[k][0] + '</button>').join('') + '</div>' +
+    '<p class="hint">หน้าตาและทรงผมมากับตัวนักมวยแต่ละคน ส่วนสีผิว สีผม ชุด และประเจียด เลือกเองได้ข้างล่าง ดูบนตัวจริงได้ทันที ไม่มีผลกับฝีมือบนเวที</p>' +
+    drow('skin', 'สีผิว', API.SKINS, 1) + (API.ROSTER[draft.body][2] && API.ROSTER[draft.body][2].bald ? '' : drow('hair', 'สีผม', API.HAIR, 1)) +
+    drow('shorts', 'สีกางเกง', API.COLORS, 1) + drow('pattern', 'ลายกางเกง', API.PATTERNS) + (draft.look.pattern === 'plain' ? '' : drow('trim', 'สีลายกางเกง', API.COLORS, 1)) + drow('gloves', 'สีนวม', API.COLORS, 1) + drow('band', 'ประเจียด (ผ้าผูกต้นแขน)', API.BANDS, 1) +
+    '<p class="hint">ที่เลือกตอนนี้ได้ฟรีทั้งหมด เปลี่ยนทีหลังได้ที่เมนูแต่งตัว (สีและลายอื่นต้องซื้อ)</p>' +
     '<div class="fld">สายมวย</div><div class="styles">' + STYLES.map(s => '<button class="stylecard" data-act="style" data-v="' + s.id + '" aria-pressed="' + (draft.style === s.id) + '">' + art('style-' + s.id, 'pic') + '<b>' + s.th + '</b><span>' + STYLE_NOTE[s.id] + '</span><span class="sp">ท่าไม้ตาย: ' + s.sp.map(k => MOVES[k].th).join(' · ') + '</span></button>').join('') + '</div>' +
     '<div class="statbox r">' + statBars(START[draft.style]) + '</div>' +
     '<p class="hint" id="gCreateMsg"></p><button class="btn go wide" data-act="create">เริ่มอาชีพ</button></section>';
@@ -660,14 +674,14 @@ function miniHtml() {
 function dressHtml() {
   const L = pending ? pending.look : S.look, hex = c => '#' + c.toString(16).padStart(6, '0');
   const row = (field, label, map, swatch) => '<div class="fld">' + label + '</div><div class="sw">' + Object.keys(map).map(k => {
-    const kind = LOOK_KIND[field], owned = S.own[kind].includes(k), th = Array.isArray(map[k]) ? map[k][0] : map[k];
+    const kind = LOOK_KIND[field], owned = !kind || k === 'none' || S.own[kind].includes(k), th = Array.isArray(map[k]) ? map[k][0] : map[k];
     return '<button class="swb" data-act="look" data-f="' + field + '" data-v="' + k + '" aria-pressed="' + (L[field] === k) + '"' + (swatch ? ' style="--c:' + (map[k][1] ? hex(map[k][1]) : 'linear-gradient(135deg,#1c1c22 50%,#6a4a2a 50%)') + '"' : '') + '>' + (swatch ? '<i></i>' : '') + th + (owned ? '' : ' <em>฿' + PRICE[kind][k] + '</em>') + '</button>';
   }).join('') + '</div>';
   let buy = '';
   if (pending) { const cost = pending.items.reduce((a, i) => a + i.price, 0); buy = '<div class="buy"><span>กำลังลองของที่ยังไม่มี: ' + pending.items.map(i => i.th + ' ฿' + i.price).join(', ') + '</span><div class="rowbtn"><button class="btn go" data-act="buy"' + (S.money < cost ? ' disabled' : '') + '>ซื้อ ฿ ' + baht(cost) + '</button><button class="btn" data-act="cancelbuy">ยกเลิก</button></div>' + (S.money < cost ? '<span class="warn">เงินไม่พอ ชกหาเงินก่อน</span>' : '') + '</div>'; }
   return '<section class="gcard"><h2>แต่งตัวนักมวย</h2>' + buy + '<label class="fld" for="gdname">ชื่อ</label><input id="gdname" class="inp" maxlength="24" value="' + esc(S.name) + '">' +
-    row('shorts', 'สีกางเกง', API.COLORS, 1) + row('pattern', 'ลายกางเกง', API.PATTERNS) + row('trim', 'สีลายกางเกงและมงคล', API.COLORS, 1) + row('gloves', 'สีนวม', API.COLORS, 1) + (API.ROSTER[S.body][2] && API.ROSTER[S.body][2].bald ? '' : row('hair', 'สีผม', API.HAIR, 1)) + row('head', 'มงคล (สวมตอนไหว้ครู ถอดก่อนชก)', API.HEADGEAR) +
-    '<p class="hint">กดเลือกแล้วเห็นบนตัวนักมวยทันที ของที่มีราคาลองใส่ได้ก่อน ซื้อครั้งเดียวใช้ได้ตลอด สีที่ซื้อแล้วใช้ได้ทั้งกางเกง ลาย และนวม</p></section>';
+    row('shorts', 'สีกางเกง', API.COLORS, 1) + row('pattern', 'ลายกางเกง', API.PATTERNS) + row('trim', 'สีลายกางเกงและมงคล', API.COLORS, 1) + row('gloves', 'สีนวม', API.COLORS, 1) + row('band', 'ประเจียด (ผ้าผูกต้นแขน)', API.BANDS, 1) + row('skin', 'สีผิว', API.SKINS, 1) + (API.ROSTER[S.body][2] && API.ROSTER[S.body][2].bald ? '' : row('hair', 'สีผม', API.HAIR, 1)) + row('head', 'มงคล (สวมตอนไหว้ครู ถอดก่อนชก)', API.HEADGEAR) +
+    '<p class="hint">กดเลือกแล้วเห็นบนตัวนักมวยทันที ของที่มีราคาลองใส่ได้ก่อน ซื้อครั้งเดียวใช้ได้ตลอด สีที่ซื้อแล้วใช้ได้ทั้งกางเกง ลาย นวม และประเจียด สีผิวเปลี่ยนได้ฟรี</p></section>';
 }
 function oppCard(o, btn) {
   return '<div class="opp"><div class="oh"><b>' + esc(o.name) + '</b><span class="tag">' + o.diff + '</span></div><div class="sty">สาย' + styleTh(o.style) + ' · ค่าพลังเฉลี่ย ' + overall(o.stats) + (o.real ? ' · นักมวยของผู้เล่นจริง' : '') + (o.rp ? ' · RP ' + o.rp : '') + '</div>' +
@@ -1300,7 +1314,7 @@ function trainFail(a) {
 function setLook(field, value) {
   const look = Object.assign({}, pending ? pending.look : S.look); look[field] = value;
   const items = [], MAPS = {pattern: API.PATTERNS, head: API.HEADGEAR, hair: API.HAIR};
-  Object.keys(LOOK_KIND).forEach(f => { const kind = LOOK_KIND[f], k = look[f]; if (!S.own[kind].includes(k) && !items.some(i => i.kind === kind && i.k === k)) { const map = MAPS[f] || API.COLORS; items.push({kind, k, price: PRICE[kind][k] || 0, th: Array.isArray(map[k]) ? map[k][0] : map[k]}); } });
+  Object.keys(LOOK_KIND).forEach(f => { const kind = LOOK_KIND[f], k = look[f]; if (k === 'none') return; if (!S.own[kind].includes(k) && !items.some(i => i.kind === kind && i.k === k)) { const map = MAPS[f] || API.COLORS; items.push({kind, k, price: PRICE[kind][k] || 0, th: Array.isArray(map[k]) ? map[k][0] : map[k]}); } });
   if (items.length) pending = {look, items}; else { pending = null; S.look = look; save(); }
   render(); showMe();
 }
@@ -1335,9 +1349,10 @@ function onClick(e) {
   if (act === 'soundon') { API.sound.set(!API.sound.on); API.sound.test(); render(); return; }
   if (act === 'soundtest') { API.sound.test(); return; }
   if (act === 'setback') { view = null; render(); return; }
-  if (act === 'body') { draft.body = v; draft.name = $('gName').value; renderCreate(); API.preview({fighter: v, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}, 'guard'); }
+  if (act === 'body') { draft.body = v; draft.name = $('gName').value; renderCreate(); previewDraft(); }
+  else if (act === 'dlook') { if (!own(LOOK0, el.dataset.f)) return; draft.look[el.dataset.f] = v; draft.name = $('gName').value; renderCreate(); previewDraft(); }
   else if (act === 'style') { draft.style = v; draft.name = $('gName').value; renderCreate(); }
-  else if (act === 'create') { const name = API.cleanName($('gName').value); if (name.length < 2) { const m = $('gCreateMsg'), n = $('gName'); m.textContent = 'ใส่ชื่อนักมวยก่อน (อย่างน้อย 2 ตัวอักษร) ที่ช่องด้านบน'; m.className = 'bad'; n.classList.add('bad'); n.scrollIntoView({block: 'center', behavior: 'smooth'}); n.focus({preventScroll: true}); n.addEventListener('input', () => { n.classList.remove('bad'); m.textContent = ''; }, {once: true}); return; } S = newSave(name, draft.body, draft.style); save(); go('home'); }
+  else if (act === 'create') { const name = API.cleanName($('gName').value); if (name.length < 2) { const m = $('gCreateMsg'), n = $('gName'); m.textContent = 'ใส่ชื่อนักมวยก่อน (อย่างน้อย 2 ตัวอักษร) ที่ช่องด้านบน'; m.className = 'bad'; n.classList.add('bad'); n.scrollIntoView({block: 'center', behavior: 'smooth'}); n.focus({preventScroll: true}); n.addEventListener('input', () => { n.classList.remove('bad'); m.textContent = ''; }, {once: true}); return; } S = newSave(name, draft.body, draft.style, draft.look); save(); go('home'); }
   else if (act === 'tab') go(v);
   else if (act === 'home') { F = null; API.stop(); CH.seenAt = 0; go('home'); if (CLOUD) loadBoard(); }
   else if (act === 'sleep') {
@@ -1354,7 +1369,7 @@ function onClick(e) {
   else if (act === 'staff') { const st = STAFF.find(x => x.id === v); if (S.staff.includes(v)) S.staff = S.staff.filter(k => k !== v); else { if (S.money < st.hire) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(st.hire); return; } S.money -= st.hire; S.staff.push(v); } save(); render(); }
   else if (act === 'look') setLook(el.dataset.f, v);
   else if (act === 'gym') { const c = GYM_COST[S.gym]; if (S.money < c) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(c); return; } S.money -= c; S.gym++; save(); render(); }
-  else if (act === 'reset') { if (el.dataset.sure) { try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* fine */ } S = null; view = 'create'; setMode(false); render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); } else { el.dataset.sure = '1'; el.textContent = 'กดอีกครั้งเพื่อยืนยันการลบนักมวยคนนี้'; } }
+  else if (act === 'reset') { if (el.dataset.sure) { try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* fine */ } S = null; view = 'create'; setMode(false); render(); previewDraft(); } else { el.dataset.sure = '1'; el.textContent = 'กดอีกครั้งเพื่อยืนยันการลบนักมวยคนนี้'; } }
   else if (act === 'train') { if (S.slots < 1) return; const a = ACTS.find(x => x.id === v); if (Math.random() * 100 < failPct(a)) { trainFail(a); return; } mini = {act: a, t0: performance.now()}; if ((a.id === 'run' || a.id === 'rest' || a.id === 'fun') && sceneStart(a)) return; if (a.id === 'rest' || a.id === 'fun') trainResult(1); else if (a.drill) drillStart(a); else render(); }
   else if (act === 'hit') { const ph = ((performance.now() - mini.t0) / 1100) % 2, x = ph < 1 ? ph : 2 - ph; trainResult(1 - Math.abs(x - .5) * 2); }
   else if (act === 'buy') { const cost = pending.items.reduce((a, i) => a + i.price, 0); if (S.money < cost) return; S.money -= cost; pending.items.forEach(i => { if (!S.own[i.kind].includes(i.k)) S.own[i.kind].push(i.k); }); S.look = pending.look; pending = null; save(); render(); showMe(); }
@@ -1401,6 +1416,6 @@ export function bootGame(api) {
   const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ ' + VER; }
   window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress}; // for automated checks
   S = loadLocal(); setMode(false);
-  if (S) go('home'); else { view = 'create'; render(); API.preview({fighter: draft.body, shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none'}); }
+  if (S) go('home'); else { view = 'create'; render(); previewDraft(); }
   cloudInit();
 }

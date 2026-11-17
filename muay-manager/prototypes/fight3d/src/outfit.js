@@ -14,6 +14,12 @@ export const HAIR = {
   blue: ['น้ำเงิน', 0x3f6fe0], green: ['เขียว', 0x35a35a], pink: ['ชมพู', 0xe86aa6], purple: ['ม่วง', 0x8a4fd0]
 };
 
+// Skin tones: the body's own, or its skin brought to one of these (outfitTexture). Bodies start from different tones, so
+// each is moved by the ratio between this colour and its own typical skin colour.
+export const SKINS = {natural: ['ผิวเดิม', 0], fair: ['ขาว', 0xecc7ac], light: ['ขาวเหลือง', 0xd9a987], tan: ['แทน', 0xbb875f], brown: ['คล้ำ', 0x93643f], dark: ['เข้ม', 0x664330]};
+// Prajioud, the cloth band tied round each upper arm: none, or one of the colours
+export const BANDS = Object.assign({none: ['ไม่ใส่', 0]}, COLORS);
+
 const MAP = 1024;
 // Which body part each texel belongs to, and where it sits in the bind pose (height, sideways offset).
 function bodyMap(mesh) {
@@ -56,6 +62,14 @@ function keyed(rule, r, g, b) {
   if (rule === 'red') { if (r !== mx || sat < .66 || g - b > (mx - mn) * .2 || b - g > (mx - mn) * .25) return 0; return Math.min(1, (sat - .66) / .1); }
   if (b !== mx || sat < .32 || r > g + (mx - mn) * .45) return 0;
   return Math.min(1, (sat - .32) / .14);
+}
+
+// Does this texel look like skin? Red highest, then green, then blue; neither grey (wraps, teeth, the whites of the eyes)
+// nor a strong colour (cloth). Returns 0..1.
+function skinLike(r, g, b) {
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b); if (mx < 40 || r !== mx || b > g * 1.06) return 0;
+  const sat = (mx - mn) / mx; if (sat < .12 || sat > .72) return 0;
+  return Math.min(1, (sat - .12) / .08, (.72 - sat) / .08);
 }
 
 // Which texels are hair: on the head, above a hairline that sits high on the forehead and drops behind the ears to the nape.
@@ -148,7 +162,7 @@ function refereeTexture(model, kit) {
 export function outfitTexture(model, look) {
   if (look.referee) return refereeTexture(model, 'ref');
   if (look.corner != null) return refereeTexture(model, 'c' + look.corner);
-  const key = model.id + '|' + look.shorts + look.trim + look.gloves + look.pattern + (look.hair || '');
+  const key = model.id + '|' + look.shorts + look.trim + look.gloves + look.pattern + (look.hair || '') + '|' + (look.skin || '');
   if (cache.has(key)) return cache.get(key);
   const img = model.image, W = img.naturalWidth || img.width, H = img.naturalHeight || img.height;
   if (!model.pixels) {
@@ -164,12 +178,14 @@ export function outfitTexture(model, look) {
     }
     model.shortsY = [lo, hi];
     // hair: typical brightness of the crown against the face tells hair from skin; a shaved head has nothing to dye
-    const HM = model.hair = hairMap(model.mesh), crown = [], face = [];
+    const HM = model.hair = hairMap(model.mesh), crown = [], face = [], fr = [], fg = [], fb = [];
     for (let y = 0; y < MAP; y += 2) for (let x = 0; x < MAP; x += 2) {
       const z = HM[y * MAP + x]; if (z !== 2 && z !== 3) continue;
       const p = (Math.floor(y * sy) * W + Math.floor(x * sx)) * 4; (z === 2 ? crown : face).push(lum(d[p], d[p + 1], d[p + 2]));
+      if (z === 3 && skinLike(d[p], d[p + 1], d[p + 2]) > .5) { fr.push(d[p]); fg.push(d[p + 1]); fb.push(d[p + 2]); }
     }
     const med = a => { a.sort((p, q) => p - q); return a.length ? a[a.length >> 1] : 0; };
+    model.skinRGB = fr.length > 20 ? [med(fr), med(fg), med(fb)] : null; // the face's typical skin colour: what a chosen tone is measured against
     model.hairV = med(crown); model.skinV = med(face); model.hasHair = crown.length > 20 && model.skinV - model.hairV > .07; // every body here has dark natural hair; a brighter crown is a bare scalp over a beard
   }
   const src = model.pixels.data, out = new ImageData(new Uint8ClampedArray(src), W, H), d = out.data, B = model.body;
@@ -177,10 +193,23 @@ export function outfitTexture(model, look) {
   const cS = col(look.shorts), cT = col(look.trim), cG = col(look.gloves), [lo, hi] = model.shortsY, span = Math.max(1, hi - lo);
   const fx = MAP / W, fy = MAP / H, pat = look.pattern, rope = look.gloves === 'rope';
   const dye = model.hasHair && HAIR[look.hair] && HAIR[look.hair][1] ? HAIR[look.hair][1] : 0, cH = [(dye >> 16) & 255, (dye >> 8) & 255, dye & 255], HM = model.hair, hv = Math.max(.04, model.hairV), sv = model.skinV;
+  const tc = SKINS[look.skin] && SKINS[look.skin][1], S0 = model.skinRGB, lim = (v, a, b2) => Math.max(a, Math.min(b2, v));
+  // one channel moved by gain k: darker is a plain multiply; lighter multiplies the dark end and eases the bright end toward
+  // white, so lit skin does not burn out
+  const shift = (c, k, w) => { const t = c / 255, n = k <= 1 ? c * k : c * k * (1 - t) + (255 - (255 - c) / k) * t; return c + (n - c) * w; };
+  const tone = tc && S0 ? [lim(((tc >> 16) & 255) / S0[0], .42, 1.7), lim(((tc >> 8) & 255) / S0[1], .42, 1.7), lim((tc & 255) / S0[2], .42, 1.7)] : null;
   for (let y = 0; y < H; y++) {
     const my = Math.floor(y * fy) * MAP;
     for (let x = 0; x < W; x++) {
       const o = my + Math.floor(x * fx), reg = B.region[o];
+      if (tone) { // skin anywhere on the body goes to the chosen tone, its own light and shade kept; cloth, hair, brows, beard and ink stay
+        const p = (y * W + x) * 4, r = src[p], g = src[p + 1], b = src[p + 2]; let s = skinLike(r, g, b);
+        if (s > 0 && keyed(model.key, r, g, b) <= 0) {
+          const v = lum(r, g, b), hz = HM[o]; s *= lim((v / sv - .2) / .18, 0, 1); // the very dark (brows, beard, the deepest shade) is left alone
+          if ((hz === 1 || hz === 2) && Math.abs(v - hv) < Math.abs(v - sv)) s = 0;
+          if (s > 0) { d[p] = shift(r, tone[0], s); d[p + 1] = shift(g, tone[1], s); d[p + 2] = shift(b, tone[2], s); }
+        }
+      }
       if (dye && (HM[o] === 1 || HM[o] === 2)) { // closer in brightness to the hair than to the skin: dye it, keeping the strands' own light and dark
         const p = (y * W + x) * 4, v = lum(src[p], src[p + 1], src[p + 2]);
         if (Math.abs(v - hv) < Math.abs(v - sv)) { const sh = Math.max(.45, Math.min(1.5, .55 + v / hv * .45)); d[p] = Math.min(255, cH[0] * sh); d[p + 1] = Math.min(255, cH[1] * sh); d[p + 2] = Math.min(255, cH[2] * sh); }
@@ -211,6 +240,17 @@ export function outfitTexture(model, look) {
   const t = new THREE.CanvasTexture(cv); t.flipY = false; t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
   if (cache.size >= 6) { const first = cache.keys().next().value; cache.get(first).dispose(); cache.delete(first); }
   cache.set(key, t); return t;
+}
+
+// Prajioud for one arm, built round the y axis with its knot and tails on +z. r: how thick the arm is where it is tied.
+export function armband(colorKey, r) {
+  const g = new THREE.Group(); if (!COLORS[colorKey]) return g;
+  const mat = new THREE.MeshStandardMaterial({color: COLORS[colorKey][1], roughness: .85, side: THREE.DoubleSide}), R = r * 1.04;
+  const put = (geo, x, y, z) => { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); m.castShadow = true; g.add(m); return m; };
+  put(new THREE.CylinderGeometry(R, R, .036, 20, 1, true), 0, 0, 0);
+  put(new THREE.SphereGeometry(.015, 8, 6), 0, 0, R).scale.set(1.25, .9, .8);
+  for (const s of [-1, 1]) put(new THREE.BoxGeometry(.012, .075, .004), s * .011, -.04, R + .005).rotation.z = s * .28; // the two ends hanging from the knot
+  return g;
 }
 
 // Mongkol or cloth headband, sized to the head. Sits in a group the fighter moves with the head each frame.
