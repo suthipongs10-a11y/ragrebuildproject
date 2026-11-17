@@ -102,7 +102,8 @@ const LEAGUES = [[0, 'เวทีงานวัด'], [1100, 'เวทีอ�
 const GYM_COST = [0, 1200, 2800, 5500, 9000];
 const PRICE = {colors: {gold: 250, green: 250, purple: 250, pink: 250, orange: 250}, patterns: {stripe: 300, hem: 300, split: 400, zigzag: 500}, head: {mongkol: 600}, hair: {brown: 200, blond: 300, red: 300, silver: 300, blue: 350, green: 350, pink: 350, purple: 350}};
 const LOOK_KIND = {shorts: 'colors', trim: 'colors', gloves: 'colors', pattern: 'patterns', head: 'head', hair: 'hair', band: 'colors'}; // what each part of the look is bought as (the skin tone is free; no arm band is free)
-const LOOK0 = {shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none', hair: 'natural', skin: 'natural', band: 'none'};
+const LOOK0 = {shorts: 'red', trim: 'white', pattern: 'plain', gloves: 'red', head: 'none', hair: 'natural', skin: 'natural', band: 'none', beard: 'none'};
+const noBeard = body => !!(API.ROSTER[body] && API.ROSTER[body][2] && API.ROSTER[body][2].beard); // a body that comes with a beard of its own
 const SP_FAME = [30, 80, 160];      // fame needed for each extra signature move beyond the style's two
 // Or learn one sooner from a visiting master, for money. Each move then trains up to level 3: a day's training slot,
 // money and fatigue per level; the fight engine makes a higher level harder to stop and heavier (RULES.spLvAcc / spLvDmg).
@@ -111,7 +112,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.51', BUILD = 251;
+const VER = '2.52', BUILD = 252;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -126,7 +127,7 @@ function newSave(name, body, style, look0) {
 function loadLocal() { try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); return valid(s) ? fix(s) : null; } catch (e) { return null; } }
 function fix(s) { // fields added after a save was made
   if (!s.ad || typeof s.ad !== 'object' || !s.ad.n) s.ad = {d: '', n: {}}; if (typeof s.vip !== 'boolean') s.vip = false; if (typeof s.adFights !== 'number') s.adFights = 0;
-  if (s.look && !s.look.skin) s.look.skin = 'natural'; if (s.look && !s.look.band) s.look.band = 'none';
+  if (s.look && !s.look.skin) s.look.skin = 'natural'; if (s.look && !s.look.band) s.look.band = 'none'; if (s.look && !s.look.beard) s.look.beard = 'none';
   const sp = STYLES.find(x => x.id === s.style).sp;
   if (!Array.isArray(s.spOwn)) s.spOwn = sp.slice();
   if (!Array.isArray(s.sp) || !s.sp.length) s.sp = sp.slice();
@@ -226,7 +227,7 @@ async function loadBoard() {
   } catch (e) { /* the built-in rivals still fill the table */ }
 }
 const roundStats = st => { const o = {}; KEYS.forEach(k => { o[k] = Math.round(st[k]); }); return o; };
-function cleanLook(l) { l = l || {}; const pick = (map, v, d) => (own(map, v) ? v : d); return {shorts: pick(API.COLORS, l.shorts, 'blue'), trim: pick(API.COLORS, l.trim, 'white'), gloves: pick(API.COLORS, l.gloves, 'blue'), pattern: pick(API.PATTERNS, l.pattern, 'plain'), head: pick(API.HEADGEAR, l.head, 'none'), hair: pick(API.HAIR, l.hair, 'natural'), skin: pick(API.SKINS, l.skin, 'natural'), band: pick(API.BANDS, l.band, 'none')}; }
+function cleanLook(l) { l = l || {}; const pick = (map, v, d) => (own(map, v) ? v : d); return {shorts: pick(API.COLORS, l.shorts, 'blue'), trim: pick(API.COLORS, l.trim, 'white'), gloves: pick(API.COLORS, l.gloves, 'blue'), pattern: pick(API.PATTERNS, l.pattern, 'plain'), head: pick(API.HEADGEAR, l.head, 'none'), hair: pick(API.HAIR, l.hair, 'natural'), skin: pick(API.SKINS, l.skin, 'natural'), band: pick(API.BANDS, l.band, 'none'), beard: pick(API.BEARDS, l.beard, 'none')}; }
 
 // ---------- derived values ----------
 const total = st => KEYS.reduce((a, k) => a + st[k], 0);
@@ -244,7 +245,9 @@ const spLv = k => (S.spLv && S.spLv[k]) || 1;
 // opponents train their signature moves too: one level per two leagues, champions one more
 function oppSpLv(style, lg, champ) { const lv = Math.min(SP_MAX, 1 + Math.floor(lg / 2) + (champ ? 1 : 0)), o = {}; STYLES.find(x => x.id === style).sp.forEach(k => { o[k] = lv; }); return o; }
 function makeStats(style, T, R) { const b = START[style], sum = total(b), st = {}; KEYS.forEach(k => { st[k] = clamp(Math.round(b[k] * T / sum + (R() - .5) * 8), 22, 99); }); return st; }
-function randomLook(R) { const cs = Object.keys(API.COLORS), ps = Object.keys(API.PATTERNS), hs = Object.keys(API.HEADGEAR); const L = {shorts: cs[Math.floor(R() * cs.length)], trim: cs[Math.floor(R() * cs.length)], gloves: cs[Math.floor(R() * cs.length)], pattern: ps[Math.floor(R() * ps.length)], head: hs[Math.floor(R() * hs.length)], hair: R() < .7 ? 'natural' : Object.keys(API.HAIR)[1 + Math.floor(R() * (Object.keys(API.HAIR).length - 1))]}; L.skin = 'natural'; L.band = (cs.indexOf(L.shorts) + ps.indexOf(L.pattern)) % 3 === 0 ? L.trim : 'none'; return L; }
+function randomLook(R) { const cs = Object.keys(API.COLORS), ps = Object.keys(API.PATTERNS), hs = Object.keys(API.HEADGEAR); const L = {shorts: cs[Math.floor(R() * cs.length)], trim: cs[Math.floor(R() * cs.length)], gloves: cs[Math.floor(R() * cs.length)], pattern: ps[Math.floor(R() * ps.length)], head: hs[Math.floor(R() * hs.length)], hair: R() < .7 ? 'natural' : Object.keys(API.HAIR)[1 + Math.floor(R() * (Object.keys(API.HAIR).length - 1))]}; L.skin = 'natural'; L.band = (cs.indexOf(L.shorts) + ps.indexOf(L.pattern)) % 3 === 0 ? L.trim : 'none';
+  // about one opponent in three wears facial hair; worked out from the look already drawn, so nobody else's draw moves
+  const bi = (cs.indexOf(L.gloves) * 5 + cs.indexOf(L.trim) * 3 + ps.indexOf(L.pattern)) % 14; L.beard = ['stubble', 'mustache', 'goatee', 'full', 'chin'][bi] || 'none'; return L; }
 function makeOpp(seed, T, fixedName) {
   const R = rng(seed), style = STYLES[Math.floor(R() * STYLES.length)].id, bodies = Object.keys(API.ROSTER).filter(b => b !== S.body);
   const name = fixedName || FIRST[Math.floor(R() * FIRST.length)] + ' ' + CAMP[Math.floor(R() * CAMP.length)];
@@ -495,7 +498,9 @@ function nav() {
   $('gNav').innerHTML = tabs.map(t => '<button class="btn seg" data-act="tab" data-v="' + t[0] + '" aria-pressed="' + (tab === t[0]) + '">' + art(icon[t[0]], 'tab') + '<span>' + t[1] + '</span></button>').join('');
 }
 function setMode(fight) { const app = document.querySelector('.app'); app.classList.add('game'); app.classList.toggle('g-fight', !!fight); app.classList.toggle('g-menu', !fight); app.classList.toggle('g-drill', !!DR); app.classList.toggle('g-clock', !!(fight && F && F.clock)); }
-function showMe(pose) { if (S) API.camp(S.gym); if (S) API.preview(Object.assign({fighter: S.body}, pending ? pending.look : S.look), pose || 'guard'); }
+function showMe(pose, view) { if (S) API.camp(S.gym); if (S) API.preview(Object.assign({fighter: S.body}, pending ? pending.look : S.look), pose || 'guard', undefined, view); }
+// a change to the face is shown on the face: hands down, the camera close on the head
+const FACE_FIELDS = {skin: 1, hair: 1, beard: 1}, faceView = f => (FACE_FIELDS[f] ? ['cerStand', 'face'] : ['guard', '']);
 
 // ---------- screens ----------
 // Scene music (website only, docs/MUSIC_BRIEF.md): the piece that fits what is on screen. During a fight the ring has its
@@ -541,7 +546,7 @@ function renderMoved() {
 function go(t) { if (DR) drillEnd(true); if (SC) sceneEnd(true); tab = t; view = null; pending = null; mini = null; setMode(false); render(); showMe(t === 'dress' ? 'guard' : t === 'home' ? 'guard' : 'guard'); }
 
 let draft = {body: 'c', style: 'puncher', name: '', look: Object.assign({}, LOOK0)};
-const previewDraft = pose => API.preview(Object.assign({fighter: draft.body}, draft.look), pose || 'guard');
+const previewDraft = (pose, view) => API.preview(Object.assign({fighter: draft.body}, draft.look), pose || 'guard', undefined, view);
 const SW0 = 'linear-gradient(135deg,#1c1c22 50%,#6a4a2a 50%)', hexCss = c => '#' + c.toString(16).padStart(6, '0'); // the swatch of "as it is" / "none"
 // one row of choices on the creation screen (all free there)
 function drow(field, label, map, swatch) {
@@ -555,8 +560,8 @@ function renderCreate() {
   $('gBody').innerHTML = '<section class="gcard"><h2>สร้างนักมวยของคุณ</h2>' +
     '<label class="fld" for="gName">ชื่อนักมวย</label><input id="gName" class="inp" maxlength="24" placeholder="เช่น เพชรน้ำหนึ่ง ศ.ของคุณ" value="' + esc(draft.name) + '">' +
     '<div class="fld">ตัวนักมวย</div><div class="pick">' + Object.keys(API.ROSTER).map(k => '<button class="btn seg sm" data-act="body" data-v="' + k + '" aria-pressed="' + (draft.body === k) + '">' + API.ROSTER[k][0] + '</button>').join('') + '</div>' +
-    '<p class="hint">หน้าตาและทรงผมมากับตัวนักมวยแต่ละคน ส่วนสีผิว สีผม ชุด และประเจียด เลือกเองได้ข้างล่าง ดูบนตัวจริงได้ทันที ไม่มีผลกับฝีมือบนเวที</p>' +
-    drow('skin', 'สีผิว', API.SKINS, 1) + (API.ROSTER[draft.body][2] && API.ROSTER[draft.body][2].bald ? '' : drow('hair', 'สีผม', API.HAIR, 1)) +
+    '<p class="hint">หน้าตาและทรงผมมากับตัวนักมวยแต่ละคน ส่วนสีผิว สีผม หนวดเครา ชุด และประเจียด เลือกเองได้ข้างล่าง ดูบนตัวจริงได้ทันที ไม่มีผลกับฝีมือบนเวที</p>' +
+    drow('skin', 'สีผิว', API.SKINS, 1) + (API.ROSTER[draft.body][2] && API.ROSTER[draft.body][2].bald ? '' : drow('hair', 'สีผม', API.HAIR, 1)) + (noBeard(draft.body) ? '' : drow('beard', 'หนวดเครา', API.BEARDS)) +
     drow('shorts', 'สีกางเกง', API.COLORS, 1) + drow('pattern', 'ลายกางเกง', API.PATTERNS) + (draft.look.pattern === 'plain' ? '' : drow('trim', 'สีลายกางเกง', API.COLORS, 1)) + drow('gloves', 'สีนวม', API.COLORS, 1) + drow('band', 'ประเจียด (ผ้าผูกต้นแขน)', API.BANDS, 1) +
     '<p class="hint">ที่เลือกตอนนี้ได้ฟรีทั้งหมด เปลี่ยนทีหลังได้ที่เมนูแต่งตัว (สีและลายอื่นต้องซื้อ)</p>' +
     '<div class="fld">สายมวย</div><div class="styles">' + STYLES.map(s => '<button class="stylecard" data-act="style" data-v="' + s.id + '" aria-pressed="' + (draft.style === s.id) + '">' + art('style-' + s.id, 'pic') + '<b>' + s.th + '</b><span>' + STYLE_NOTE[s.id] + '</span><span class="sp">ท่าไม้ตาย: ' + s.sp.map(k => MOVES[k].th).join(' · ') + '</span></button>').join('') + '</div>' +
@@ -724,7 +729,7 @@ function dressHtml() {
   let buy = '';
   if (pending) { const cost = pending.items.reduce((a, i) => a + i.price, 0); buy = '<div class="buy"><span>กำลังลองของที่ยังไม่มี: ' + pending.items.map(i => i.th + ' ฿' + i.price).join(', ') + '</span><div class="rowbtn"><button class="btn go" data-act="buy"' + (S.money < cost ? ' disabled' : '') + '>ซื้อ ฿ ' + baht(cost) + '</button><button class="btn" data-act="cancelbuy">ยกเลิก</button></div>' + (S.money < cost ? '<span class="warn">เงินไม่พอ ชกหาเงินก่อน</span>' : '') + '</div>'; }
   return '<section class="gcard"><h2>แต่งตัวนักมวย</h2>' + buy + '<label class="fld" for="gdname">ชื่อ</label><input id="gdname" class="inp" maxlength="24" value="' + esc(S.name) + '">' +
-    row('shorts', 'สีกางเกง', API.COLORS, 1) + row('pattern', 'ลายกางเกง', API.PATTERNS) + row('trim', 'สีลายกางเกงและมงคล', API.COLORS, 1) + row('gloves', 'สีนวม', API.COLORS, 1) + row('band', 'ประเจียด (ผ้าผูกต้นแขน)', API.BANDS, 1) + row('skin', 'สีผิว', API.SKINS, 1) + (API.ROSTER[S.body][2] && API.ROSTER[S.body][2].bald ? '' : row('hair', 'สีผม', API.HAIR, 1)) + row('head', 'มงคล (สวมตอนไหว้ครู ถอดก่อนชก)', API.HEADGEAR) +
+    row('shorts', 'สีกางเกง', API.COLORS, 1) + row('pattern', 'ลายกางเกง', API.PATTERNS) + row('trim', 'สีลายกางเกงและมงคล', API.COLORS, 1) + row('gloves', 'สีนวม', API.COLORS, 1) + row('band', 'ประเจียด (ผ้าผูกต้นแขน)', API.BANDS, 1) + row('skin', 'สีผิว', API.SKINS, 1) + (API.ROSTER[S.body][2] && API.ROSTER[S.body][2].bald ? '' : row('hair', 'สีผม', API.HAIR, 1)) + (noBeard(S.body) ? '' : row('beard', 'หนวดเครา (เปลี่ยนได้ฟรี)', API.BEARDS)) + row('head', 'มงคล (สวมตอนไหว้ครู ถอดก่อนชก)', API.HEADGEAR) +
     '<p class="hint">กดเลือกแล้วเห็นบนตัวนักมวยทันที ของที่มีราคาลองใส่ได้ก่อน ซื้อครั้งเดียวใช้ได้ตลอด สีที่ซื้อแล้วใช้ได้ทั้งกางเกง ลาย นวม และประเจียด สีผิวเปลี่ยนได้ฟรี</p></section>';
 }
 function oppCard(o, btn) {
@@ -1415,7 +1420,7 @@ function setLook(field, value) {
   const items = [], MAPS = {pattern: API.PATTERNS, head: API.HEADGEAR, hair: API.HAIR};
   Object.keys(LOOK_KIND).forEach(f => { const kind = LOOK_KIND[f], k = look[f]; if (k === 'none') return; if (!S.own[kind].includes(k) && !items.some(i => i.kind === kind && i.k === k)) { const map = MAPS[f] || API.COLORS; items.push({kind, k, price: PRICE[kind][k] || 0, th: Array.isArray(map[k]) ? map[k][0] : map[k]}); } });
   if (items.length) pending = {look, items}; else { pending = null; S.look = look; save(); }
-  render(); showMe();
+  render(); showMe(...faceView(field));
 }
 // ---------- actions ----------
 function trainResult(q) {
@@ -1448,8 +1453,8 @@ function onClick(e) {
   if (act === 'soundon') { API.sound.set(!API.sound.on); API.sound.test(); render(); return; }
   if (act === 'soundtest') { API.sound.test(); return; }
   if (act === 'setback') { view = null; render(); return; }
-  if (act === 'body') { draft.body = v; draft.name = $('gName').value; renderCreate(); previewDraft(); }
-  else if (act === 'dlook') { if (!own(LOOK0, el.dataset.f)) return; draft.look[el.dataset.f] = v; draft.name = $('gName').value; renderCreate(); previewDraft(); }
+  if (act === 'body') { draft.body = v; if (noBeard(v)) draft.look.beard = 'none'; draft.name = $('gName').value; renderCreate(); previewDraft(); }
+  else if (act === 'dlook') { if (!own(LOOK0, el.dataset.f)) return; draft.look[el.dataset.f] = v; draft.name = $('gName').value; renderCreate(); previewDraft(...faceView(el.dataset.f)); }
   else if (act === 'style') { draft.style = v; draft.name = $('gName').value; renderCreate(); }
   else if (act === 'create') { const name = API.cleanName($('gName').value); if (name.length < 2) { const m = $('gCreateMsg'), n = $('gName'); m.textContent = 'ใส่ชื่อนักมวยก่อน (อย่างน้อย 2 ตัวอักษร) ที่ช่องด้านบน'; m.className = 'bad'; n.classList.add('bad'); n.scrollIntoView({block: 'center', behavior: 'smooth'}); n.focus({preventScroll: true}); n.addEventListener('input', () => { n.classList.remove('bad'); m.textContent = ''; }, {once: true}); return; } S = newSave(name, draft.body, draft.style, draft.look); save(); go('home'); vipSync(); }
   else if (act === 'tab') go(v);

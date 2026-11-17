@@ -5,6 +5,16 @@
 
 ตัวนักมวยเป็นโมเดล 3D ที่สร้างด้วย Meshy (ภาพอ้างอิง → โมเดลมีผิว → ใส่กระดูกอัตโนมัติ) แล้วขยับด้วยท่าชุดเดียวกับตัวที่สร้างจากโค้ด ซึ่งยังเลือกกลับไปใช้ได้ เสียงเป็นเสียงสังเคราะห์ชั่วคราว
 
+## รอบที่ 74: หนวดเครา และมุมกล้องดูหน้า (17 พ.ย. 2026)
+
+ความเห็นเจ้าของเกม: อยากได้ทรงผม หนวดเครา ให้แต่ละคนต่างกัน
+
+- `outfit.js`: `BEARDS` (none, stubble, mustache, chin, goatee, full) • `faceTexels(mesh)` ตำแหน่งบนกะโหลกของ texel ทุกจุดบนหน้า (สูง ข้าง ลึก) • `mouthAt()` หาปากจากรูปทรงหน้า • `BEARD_AT[style](dh, ax, dz)` ความหนาของแต่ละแบบ ณ จุดหนึ่ง (อ้างจากปาก) • `beardPaint()` วาดเฉพาะบนผิว คงแสงเงาเดิม ขอบแตกเป็นเส้น
+- วัดหน้าเฉพาะเมื่อมีการเลือกหนวดเคราครั้งแรกของตัวนั้น (`model.face` `model.mouth`) • หน้าที่วัดไม่ได้สัดส่วน (`mouth.ok` เป็นเท็จ) ไม่วาด
+- `main.js`: `LOOK_FIELDS.beard` • `ROSTER` ธง `beard` (ตัวที่มีเคราอยู่แล้ว) • `API.preview(look, pose, venue, view)` `view = 'face'` กล้องอยู่ที่เดิม เลนส์ 9° เล็งหัว นักมวยหันเข้ากล้องด้วย `update(P, 0, 0, 0, yaw)`
+- `game.js`: `LOOK0.beard` `cleanLook` `noBeard(body)` `FACE_FIELDS` `faceView(field)` • `randomLook` ให้คู่ชกบางคนมีหนวดเครา
+- ตรวจด้วยหน้าทดลอง: `MUAY.preview({fighter: 'c', …, beard: 'full'}, 'cerStand', 'camp', 'face')` • `LAB.face` (ค่าที่วัดได้) `LAB.zoom = {az, d, x, y, z}` (ตรึงกล้อง)
+
 ## รอบที่ 73: เตรียมทดสอบกับคนจริงและขึ้นสโตร์ — บัญชี หน้านโยบาย เซิร์ฟเวอร์ VPS บอททดสอบ (17 พ.ย. 2026)
 
 - บัญชี (เฉพาะเว็บเกมและแอป): `functions/api/[[route]].js` เพิ่ม `POST /api/transfer` `POST /api/transfer/claim` `DELETE /api/me` • `netdb.js` `account = {transferCode, claim, forget, remove}`

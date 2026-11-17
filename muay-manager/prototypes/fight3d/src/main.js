@@ -6,7 +6,7 @@ import { bake, EFF_NAME, evadePose, ROPE } from './timeline.js';
 import { Fighter, EFF_JOINT, STYLE_BUILD, setDims, DIM_DEFAULT } from './rig.js';
 import { NP, FLAT, IDX, scalePoses } from './poses.js';
 import { loadModel, ModelFighter } from './model.js';
-import { COLORS, PATTERNS, HEADGEAR, HAIR, SKINS, BANDS } from './outfit.js';
+import { COLORS, PATTERNS, HEADGEAR, HAIR, SKINS, BANDS, BEARDS } from './outfit.js';
 import { buildArena, VENUES, RING_R } from './arena.js';
 import { buildDrill, TARGETS } from './drill.js';
 import { buildFx } from './fx.js';
@@ -52,18 +52,18 @@ const DETAIL = [
 const OPT = Object.assign({preset: 'tv', build: 'auto', fighter: 'model', venue: 'stadium', agR: 'attack', agB: 'counter'}, PRESETS.tv);
 let MODEL = null, MODELS = []; // generated characters per corner, when they loaded (MODEL = shared proportions)
 // Roster of base bodies. Outfit is separate, so any body can wear any look. [label, key colour of the model's shorts and gloves, flags]
-// bald: no hair to dye, so the shop does not offer hair colours.
+// bald: no hair to dye, so the shop does not offer hair colours. beard: comes with one, so no facial hair is offered.
 const ROSTER = {
   c: ['รุ่นเก๋า ยันต์เต็มอก', 'blue'], d: ['ช่วงยาว ผิวเข้ม', 'blue'], e: ['ฝรั่งไหล่กว้าง', 'blue'], f: ['ดาวรุ่งผมจุก', 'blue'],
   b: ['เพรียวคมกริบ', 'blue'], a: ['ตัวถึก กางเกงลายทอง', 'red'],
   i: ['มวยยุคทอง หนวดเข้ม', 'blue'], j: ['โย่งช่วงยาว ผมม้า', 'blue'], k: ['ตัวบาง ผมเสยเรียบ', 'blue'],
-  g: ['เชื้อสายจีน สูงเพรียว', 'blue'], h: ['นักสู้ญี่ปุ่น ผมตั้ง', 'blue'], l: ['ฝรั่งหัวโล้น เคราแดง', 'blue', {bald: true}]
+  g: ['เชื้อสายจีน สูงเพรียว', 'blue'], h: ['นักสู้ญี่ปุ่น ผมตั้ง', 'blue'], l: ['ฝรั่งหัวโล้น เคราแดง', 'blue', {bald: true, beard: true}]
 };
 const LOOK = [
-  {name: '', fighter: 'c', shorts: 'red', trim: 'gold', pattern: 'zigzag', gloves: 'red', head: 'mongkol', hair: 'natural', skin: 'natural', band: 'none'},
-  {name: '', fighter: 'd', shorts: 'blue', trim: 'white', pattern: 'stripe', gloves: 'blue', head: 'mongkol', hair: 'natural', skin: 'natural', band: 'none'}
+  {name: '', fighter: 'c', shorts: 'red', trim: 'gold', pattern: 'zigzag', gloves: 'red', head: 'mongkol', hair: 'natural', skin: 'natural', band: 'none', beard: 'none'},
+  {name: '', fighter: 'd', shorts: 'blue', trim: 'white', pattern: 'stripe', gloves: 'blue', head: 'mongkol', hair: 'natural', skin: 'natural', band: 'none', beard: 'none'}
 ];
-const LOOK_FIELDS = {fighter: ROSTER, shorts: COLORS, trim: COLORS, pattern: PATTERNS, gloves: COLORS, head: HEADGEAR, hair: HAIR, skin: SKINS, band: BANDS};
+const LOOK_FIELDS = {fighter: ROSTER, shorts: COLORS, trim: COLORS, pattern: PATTERNS, gloves: COLORS, head: HEADGEAR, hair: HAIR, skin: SKINS, band: BANDS, beard: BEARDS};
 const cleanName = v => String(v || '').replace(/[<>&"']/g, '').trim().slice(0, 24);
 try { // remembered per viewer
   const sv = JSON.parse(localStorage.getItem('muayLabLook'));
@@ -209,7 +209,7 @@ function followClock() {
   if (d > 1.6 || d < -1.2) { API.seekTo(w); return; } // far out (a tab that slept, a late start): straight to the clock's moment
   clockRate = clamp(1 + d * .6, .75, 1.3);          // a hit-stop or a slow frame: made up within a second or so
 }
-let previewF = null, previewPose = 'guard';                         // a single fighter shown outside a fight (create, dress, camp)
+let previewF = null, previewPose = 'guard', previewView = '';       // a single fighter shown outside a fight (create, dress, camp); view 'face': a long lens on the head
 const buf = [new Float32Array(NP), new Float32Array(NP)];
 const tmpV = new THREE.Vector3(), tmpV2 = new THREE.Vector3(), lastTrail = [new THREE.Vector3(), new THREE.Vector3()];
 
@@ -718,10 +718,18 @@ function frame(ts) {
     audio.update(dt, 0, false, 1, 0, 'off');
     const P = buf[0]; P.set(FLAT[previewPose] || FLAT.guard);
     if (previewPose === 'guard') { const b = realT * 5.2; P[IDX.fL + 1] += Math.max(0, Math.sin(b)) * .04; P[IDX.hip + 1] += Math.sin(b) * .012; P[IDX.hL + 1] += Math.sin(b + 1) * .01; }
-    previewF.update(P, 0, 0); previewF.setWear(0, 0, 0);
-    if (camera.fov !== 30) { camera.fov = 30; camera.updateProjectionMatrix(); }
+    const face = previewView === 'face', fov = face ? 9 : 30;
     const az = arena.painted() ? .16 * Math.sin(realT * .35) + .2 : .55 * Math.sin(realT * .35) + .5, D = 3.5; // a painted camp only covers the middle
+    // the face view: the camera stays where it is (the painted camp behind is made for that spot); the fighter turns
+    // toward it, a little to either side in turn, and the lens closes in on his head
+    previewF.update(P, 0, 0, 0, face ? az - Math.PI / 2 + .42 * Math.sin(realT * .55) : undefined); previewF.setWear(0, 0, 0);
+    if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }
     camera.position.set(Math.sin(az) * D, 1.25, Math.cos(az) * D); camera.lookAt(0, .92, 0);
+    if (face) {
+      const hb = previewF.mesh.skeleton.bones.find(b => b.name === 'Head');
+      if (hb) { const v = tmpV.setFromMatrixPosition(hb.matrixWorld); camera.lookAt(v.x, v.y + (previewF.model.mesh.userData.headH || .23) * .3, v.z); }
+    }
+    const Z = window.LAB.zoom; if (Z) { camera.position.set((Z.x || 0) + Math.sin(Z.az) * Z.d, Z.y, (Z.z || 0) + Math.cos(Z.az) * Z.d); camera.lookAt(Z.x || 0, Z.y, Z.z || 0); } // for checks: LAB.zoom = {az, d, y} holds the camera on the face
     arena.keyAt(0); arena.fadeRopes(camera.position, .25);
     arena.update(realT, .05, dt); fx.update(dt, camera); renderer.render(scene, camera); return;
   }
@@ -887,6 +895,9 @@ window.LAB = {
   OPT, seek, applyOpt, newFight, audio, voice, get ref() { return refF; }, camp(level, time) { arena.setCamp(level, time); }, // camp(level 1-5, 'morning'|'day'|'evening'|'night'|null)
   prize(kind, tier, name) { CFG.prize = kind ? {kind, tier, name} : null; }, // for checks: put a belt or a cup at stake in the fight on screen
   cer(t) { if (!cer.on) { seek(marks.over - .02); evi = indexAt(marks.over); if (!startCeremony()) return false; } cerAt = t; return true; }, get fight() { return fight; }, get cfg() { return CFG; }, get clock() { return liveClock ? liveClock() : null; }, get rate() { return clockRate; }, get models() { return MODELS; }, get tl() { return TL; }, three: {scene, camera, renderer}, get t() { return playT; }, get mode() { return mode; },
+  // for checks of faces: where the previewed fighter's head is, and what was measured on his face (outfit.js)
+  get head() { if (!previewF) return null; const b = previewF.mesh.skeleton.bones.find(x => x.name === 'Head'); if (!b) return null; const v = new THREE.Vector3().setFromMatrixPosition(b.matrixWorld); return {x: v.x, y: v.y, z: v.z, h: previewF.model.mesh.userData.headH}; },
+  get face() { const m = previewF && previewF.model; return m ? {mouth: m.mouth, n: m.face ? m.face.n : 0, hair: m.hairRGB, hasHair: m.hasHair, hairV: m.hairV, skinV: m.skinV} : null; },
   set(o) { Object.assign(OPT, o); OPT.preset = o.preset || ''; applyOpt(); },
   preset(k) { OPT.preset = k; Object.assign(OPT, PRESETS[k]); applyOpt(); },
   freeze(t) { seek(t); frozen = true; },
@@ -937,12 +948,12 @@ function roundStats(n) {
 }
 // ---------- hooks for the game layer ----------
 const API = {
-  LOOK, ROSTER, COLORS, PATTERNS, HEADGEAR, HAIR, SKINS, BANDS, HOOK, VENUES, TARGETS, cleanName,
+  LOOK, ROSTER, COLORS, PATTERNS, HEADGEAR, HAIR, SKINS, BANDS, BEARDS, HOOK, VENUES, TARGETS, cleanName,
   hasModels: () => !!document.getElementById('model-c'),
   async startFight(cfg) { // cfg: {seed, specs: [player, opponent], plans, looks: [look, look], venue, rules}
     const g = ++sceneGen;
     API.endPreview(); API.drillStop(); OPT.venue = VENUES[cfg.venue] ? cfg.venue : 'stadium';
-    cfg.looks.forEach((l, i) => Object.assign(LOOK[i], {skin: 'natural', band: 'none'}, l)); // a look that names no skin tone or arm band has none (not the last fighter's)
+    cfg.looks.forEach((l, i) => Object.assign(LOOK[i], {skin: 'natural', band: 'none', beard: 'none'}, l)); // a look that names no skin tone, arm band or facial hair has none (not the last fighter's)
     OPT.fighter = 'model'; await loadPair();
     if (g !== sceneGen) return false; // something newer was asked for while the bodies loaded
     API.endPreview(); API.drillStop();
@@ -982,12 +993,12 @@ const API = {
   },
   stop() { stopCeremony(); TL = null; liveClock = null; restLen = 0; fighters.forEach(f => scene.remove(f.root)); fighters = []; clearOverlays(); },
   result: () => fight && fight.result, fight: () => fight,
-  async preview(look, pose, venue) { // show one fighter in the given look, standing in a venue
+  async preview(look, pose, venue, view) { // show one fighter in the given look, standing in a venue; view 'face': close on his head
     const model = await API.single(look, ++sceneGen); if (!model) return false;
     API.endPreview(); API.drillStop(); // a second call may have finished while this one was loading
     fighters.forEach(f => { f.root.visible = false; });
     venue = VENUES[venue] ? venue : 'camp'; arena.setVenue(venue);
-    previewF = new ModelFighter(0, model, venueLook(look, venue)); previewPose = pose || 'guard'; scene.add(previewF.root); clearOverlays();
+    previewF = new ModelFighter(0, model, venueLook(look, venue)); previewPose = pose || 'guard'; previewView = view || ''; scene.add(previewF.root); clearOverlays();
     return true;
   },
   // load one body, size the skeleton to it and clear the stage for it
