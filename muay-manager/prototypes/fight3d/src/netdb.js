@@ -2,7 +2,7 @@
 // artifact db/user API that game.js uses, talking to the site's /api (functions/api/[[route]].js on Cloudflare Pages).
 // Each browser gets a player id and a secret on its first visit, kept in localStorage.
 // Returns a stand-in for window.claude ({use(name)}), or null when the site has no API (opened as a plain file).
-export async function siteRuntime(base = '/api') {
+export async function siteRuntime(base = (typeof window !== 'undefined' && window.MUAY_API) || '/api') { // inside the app the shell sets MUAY_API to the game's website
   let skew = 0; // the server's clock minus this device's (ms): players' devices are seldom set to the same second
   try { const t0 = Date.now(), r = await fetch(base + '/health', {cache: 'no-store'}); if (!r.ok) return null; const j = await r.json().catch(() => null); if (j && j.now) skew = Math.round(j.now - (t0 + Date.now()) / 2); } catch (e) { return null; }
   let me = null;

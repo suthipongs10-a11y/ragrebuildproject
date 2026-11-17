@@ -73,7 +73,7 @@ for (const name of readdirSync('assets').filter(f => /^fighter-[a-z]\.glb$/.test
 // and the background music (tools/music-import.sh)
 // The commentary comes in two sizes: all of it for the website, and for the claude.ai page (which has a size limit) the
 // count and the shouts whole plus the first lines of every call, round and round, until VOICE_LITE characters are spent.
-const VOICE_LITE = 630000, tag = (id, pack) => `<script type="application/json" id="${id}">${JSON.stringify(pack)}</script>`;
+const VOICE_LITE = 600000, tag = (id, pack) => `<script type="application/json" id="${id}">${JSON.stringify(pack)}</script>`;
 let voiceFull = '', voiceLite = '';
 for (const [dir, id] of [['assets/voice', 'voice-pack'], ['assets/sfx', 'sfx-pack'], ['assets/music', 'music-pack']]) {
   if (!existsSync(dir)) continue;

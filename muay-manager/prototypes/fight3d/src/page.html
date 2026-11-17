@@ -300,6 +300,13 @@ p.bad{margin:0;font-size:14px;font-weight:600;color:var(--bad)}
 @keyframes cnTick{0%{transform:scale(1.5);opacity:.2}18%{transform:scale(1);opacity:1}100%{transform:scale(.94);opacity:.9}}
 @media (prefers-reduced-motion:reduce){#gCount .cn-n.tick{animation:none}}
 .pres::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#6b6f7a;margin-right:5px;vertical-align:1px} .pres.on{color:var(--hp)} .pres.on::before{background:var(--hp);box-shadow:0 0 6px var(--hp)}
+/* adverts and the one-time pack */
+.btn.adb{display:block;width:100%;margin-top:8px;border-color:var(--gold);color:var(--gold);text-align:center} .btn.adb small{display:block;font-size:11px;color:var(--muted);font-weight:400}
+.gcard.vip{border-color:var(--gold)} .gcard.vip h2{color:var(--gold)} .perks{margin:4px 0 10px;padding-left:20px;font-size:13.5px;line-height:1.7}
+.rk .star{color:var(--gold)}
+#monCard{position:fixed;inset:0;z-index:300;display:grid;place-items:center;background:rgba(4,4,8,.94);padding:20px}
+#monCard .mc{display:grid;gap:10px;justify-items:center;text-align:center;max-width:340px;color:#fff;font-family:var(--body)} #monCard .mc b{font-family:var(--display);font-size:22px;color:var(--gold)} #monCard .mc p{margin:0;color:var(--muted);font-size:13.5px}
+#monCard .mc-n{font-family:var(--display);font-weight:800;font-size:96px;line-height:1}
 .gcard h2 .cd.big{font-size:1.5em;color:var(--gold);font-variant-numeric:tabular-nums} .fld .cd{color:var(--gold);font-variant-numeric:tabular-nums}
 .match{display:flex;flex-direction:column;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px} .match.live{border-color:var(--red)} .match b{font-family:var(--display)} .match .cd{color:var(--gold);font-variant-numeric:tabular-nums} .livetag{background:var(--red);color:#fff;border-radius:3px;padding:0 5px;font-size:11px;font-weight:700} .gcard.hot{border-color:var(--gold)}
 .belts{display:flex;flex-wrap:wrap;gap:6px} .belt{font-size:12px;font-family:var(--display);color:var(--ink);background:var(--gold);border-radius:4px;padding:1px 8px}

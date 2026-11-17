@@ -11,7 +11,10 @@
 //   POST /api/log                         body: {msg, ver, page} -> {ok}   errors from players' browsers, the last 1000 kept
 const SHARED = new Set(['board', 'challenges', 'answers']);
 const SEG = /^[A-Za-z0-9_\-.~:@+]{1,200}$/, FIELD = /^[A-Za-z0-9_]{1,40}$/, MAX_BODY = 256 * 1024;
-const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers: {'Content-Type': 'application/json', 'Cache-Control': 'no-store'}});
+// Any origin may call the API: the game inside the iOS / Android app is a local page (capacitor://localhost, https://localhost).
+// A player is known by the key he sends in Authorization, never by a cookie, so this opens nothing.
+const CORS = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS', 'Access-Control-Max-Age': '86400'};
+const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers: Object.assign({'Content-Type': 'application/json', 'Cache-Control': 'no-store'}, CORS)});
 let ready = false;
 async function schema(db) {
   if (ready) return;
@@ -34,6 +37,7 @@ const canWrite = (who, coll, id) => !!who && ((SHARED.has(coll) && id === who) |
 const canRead = (who, coll) => SHARED.has(coll) || (!!who && coll === 'data/users/' + who);
 
 export async function onRequest({request, env, params}) {
+  if (request.method === 'OPTIONS') return new Response(null, {status: 204, headers: CORS});
   const db = env.DB; if (!db) return json({error: 'no database bound as DB'}, 500);
   await schema(db);
   const dec = x => { try { return decodeURIComponent(x); } catch (e) { return ''; } }, route = [].concat(params.route || []).map(dec), method = request.method;
