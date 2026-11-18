@@ -1,7 +1,7 @@
 // Game layer: profile, training, outfits, matchmaking, corner plans, rewards and ranking.
 // It never touches fight rules: it builds two fighter specs and plans, hands them to the simulation through the viewer,
 // and turns the result into progress. Save lives in the browser and, when the page has it, in the artifact database.
-import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VENUE_RULES, RULES, LIVE, SPECIALS, SP_MAX } from './data.js';
+import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VENUE_RULES, RULES, LIVE, SPECIALS, SP_MAX, REST_AUTO } from './data.js';
 import { cleanPlan, cleanSpec, cleanStats, own, matchCfg as matchInput } from './match.js';
 import { PLAN_TIPS } from './plantips.js';
 import { simulate, SIM_VERSION } from './sim.js';
@@ -112,7 +112,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.52', BUILD = 252;
+const VER = '2.53', BUILD = 253;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -857,7 +857,9 @@ function advice(st) {
 function breakHtml() {
   const st = F.stats, n = F.round;
   const line = (label, a, b) => '<span>' + a + '</span><b>' + label + '</b><span>' + b + '</span>';
-  return '<section class="gcard"><h2>พักยก ' + n + '</h2><div class="rowbtn"><button class="btn go" data-act="resume">เริ่มยก ' + (n + 1) + ' เลย · แผนเดิม</button><button class="btn link" data-act="nobreak" aria-pressed="' + !!S.noBreak + '">' + (S.noBreak ? '✓ ' : '') + 'พักยกแล้วชกต่อเอง</button></div><div class="cmp">' + line('แต้มยกนี้', st[0].rp, st[1].rp) + line('แต้มรวม', Math.round(st[0].pts), Math.round(st[1].pts)) + line('เข้าเป้า', st[0].landed, st[1].landed) + line('เข้าหน้า', st[0].head, st[1].head) + line('เข้าลำตัว', st[0].body, st[1].body) + line('เข้าขา', st[0].leg, st[1].leg) + line('แรงเหลือ', Math.round(st[0].st) + '%', Math.round(st[1].st) + '%') + line('พลังชีวิต', Math.round(st[0].hp) + '%', Math.round(st[1].hp) + '%') + '</div>' +
+  const count = F.restHold ? '<p class="hint">หยุดเวลาไว้แล้ว เลือกแผนได้ตามสบาย กด "ชกต่อ" เมื่อพร้อม</p>'
+    : '<div class="restline"><span>ยก ' + (n + 1) + ' เริ่มเองใน <b class="cd big" data-restcd="' + F.restEnd + '">' + Math.max(0, Math.ceil((F.restEnd - now()) / 1000)) + '</b> วินาที</span><button class="btn" data-act="resthold">รอก่อน</button></div>';
+  return '<section class="gcard"><h2>พักยก ' + n + '</h2>' + count + '<div class="rowbtn"><button class="btn go" data-act="resume">เริ่มยก ' + (n + 1) + ' เลย · แผนเดิม</button><button class="btn link" data-act="nobreak" aria-pressed="' + !!S.noBreak + '">' + (S.noBreak ? '✓ ' : '') + 'ไม่ต้องหยุดพักยก</button></div><div class="cmp">' + line('แต้มยกนี้', st[0].rp, st[1].rp) + line('แต้มรวม', Math.round(st[0].pts), Math.round(st[1].pts)) + line('เข้าเป้า', st[0].landed, st[1].landed) + line('เข้าหน้า', st[0].head, st[1].head) + line('เข้าลำตัว', st[0].body, st[1].body) + line('เข้าขา', st[0].leg, st[1].leg) + line('แรงเหลือ', Math.round(st[0].st) + '%', Math.round(st[1].st) + '%') + line('พลังชีวิต', Math.round(st[0].hp) + '%', Math.round(st[1].hp) + '%') + '</div>' +
     advice(st).map(t => '<p class="advice"><b>พี่เลี้ยง:</b> ' + t + '</p>').join('') + quickHtml() + '<div class="fld">แผนยกต่อไป</div>' + planPicker(F.plan) +
     '<button class="btn go wide" data-act="resume">ชกต่อ</button></section>';
 }
@@ -865,7 +867,7 @@ function liveHtml() {
   if (F.live) return '<section class="gcard slim"><div class="kv"><span>' + (F.live.exh ? 'อุ่นเครื่อง' : F.clock ? 'ท้าชก · สด' : 'ท้าชก') + '</span><b>' + esc(F.live.fromName) + ' vs ' + esc(F.live.toName) + '</b><span>เวที</span><b>' + API.VENUES[F.live.venue] + '</b>' + (F.clock && F.me >= 0 ? '<span>แผนตอนนี้</span><b>' + planText(F.plan) + '</b>' : '') + (F.clock ? '<span>ผู้ชม</span><b data-viewers>' + viewers(F.live) + '</b>' : '') + '</div>' +
     (F.loading ? '<p class="hint">กำลังขึ้นเวที…</p>' : F.clock ? '<p class="hint">ชกสดพร้อมกันทั้งสองฝั่ง ภาพและแต้มเดียวกัน · พักยก ' + LIVE_REST + ' วินาที ' + (F.me >= 0 ? 'เลือกแผนยกถัดไปได้ ' : '') + 'แล้วชกต่อเอง</p>' : '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button></div>') + '</section>';
   return '<section class="gcard slim"><div class="kv"><span>แผนตอนนี้</span><b>' + planText(F.plan) + '</b><span>คู่ชก</span><b>' + esc(F.opp.name) + ' · สาย' + styleTh(F.opp.style) + '</b></div>' +
-    '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button><button class="btn link" data-act="nobreak" aria-pressed="' + !!S.noBreak + '">' + (S.noBreak ? 'พักยกแล้วชกต่อเอง · แตะเพื่อหยุดแก้แผนทุกพักยก' : 'หยุดแก้แผนทุกพักยก · แตะเพื่อให้พักแล้วชกต่อเอง') + '</button></div></section>';
+    '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button><button class="btn link" data-act="nobreak" aria-pressed="' + !!S.noBreak + '">' + (S.noBreak ? 'ไม่ต้องหยุดพักยก · แตะเพื่อหยุดแก้แผนทุกพักยก' : 'หยุดแก้แผนทุกพักยก · แตะเพื่อให้พักแล้วชกต่อเอง') + '</button></div></section>';
 }
 function resultHtml() {
   const r = F.res;
@@ -904,7 +906,22 @@ function onRoundBreak(n, st, left) {
   if (F && F.live) { if (left != null) liveBreak(n, st, left); return; } // a live match: a rest by the clock
   F.phase = 'break'; F.round = n; F.stats = st;
   if (S.noBreak) { F.phase = 'live'; render(); API.resume(); return; } // the player chose not to stop between rounds: same plan, straight on
+  F.restEnd = now() + REST_AUTO * 1000; F.restHold = false; restStop(); restTimer = setInterval(restTick, 250);
   render(); $('gBody').scrollIntoView({block: 'nearest', behavior: 'smooth'});
+}
+// The rest of the player's own fight is timed: REST_AUTO seconds, then the next round starts by itself with the plan
+// that is on screen. "Wait" stops the count, and the rest then lasts until he presses on, as it always did.
+let restTimer = 0;
+function restStop() { clearInterval(restTimer); restTimer = 0; }
+function restTick() {
+  if (!F || F.live || F.phase !== 'break' || F.restHold) { restStop(); return; }
+  if (F.restEnd - now() <= 0) { restGo(); return; }
+  fillCountdowns();
+}
+function restGo() { // on with the fight: the plan on screen is the plan for the rounds left
+  restStop(); if (!F || F.live || F.phase !== 'break') return;
+  for (let i = F.round; i < 3; i++) F.plans[i] = Object.assign({}, F.plan);
+  API.replan(plansFor()); F.phase = 'live'; render(); API.resume(); $('stage').scrollIntoView({block: 'nearest', behavior: 'smooth'});
 }
 function onOver(res) {
   if (F && F.live) { liveMatchOver(res); return; }
@@ -1519,7 +1536,8 @@ function onClick(e) {
   else if (act === 'plan') { if (F.live && !(F.rest && !F.rest.locked)) return; F.plan[el.dataset.g] = v; if (F.live) sendRoundPlan(); render(); }
   else if (act === 'startfight') startFight();
   else if (act === 'nobreak') { S.noBreak = !S.noBreak; save(); render(); }
-  else if (act === 'resume') { for (let i = F.round; i < 3; i++) F.plans[i] = Object.assign({}, F.plan); API.replan(plansFor()); F.phase = 'live'; render(); API.resume(); $('stage').scrollIntoView({block: 'nearest', behavior: 'smooth'}); }
+  else if (act === 'resume') restGo();
+  else if (act === 'resthold') { if (F && F.phase === 'break' && !F.live) { F.restHold = true; restStop(); render(); } }
   else if (act === 'skip') API.skip();
   else if (act === 'sceneskip') { if (!SC) return; if (SC.a.id === 'run') { SC.ticks = Math.max(1, SC.ticks); SC.inZone = SC.ticks * .5; } sceneEnd(false); }
   else if (act === 'drillquit') { drillEnd(true); setMode(false); render(); showMe(); }
@@ -1540,7 +1558,7 @@ export function bootGame(api) {
   $('gBody').addEventListener('pointerdown', e => { const sc = e.target.closest('[data-scene]'); if (sc && SC) { e.preventDefault(); scenePress(sc.dataset.scene); return; } const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
   const g = $('game'); g.addEventListener('click', onClick); $('gMatch').addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
   const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ ' + VER; }
-  window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress, uid: () => (CLOUD ? CLOUD.uid : null), match: applyMatch}; // for automated checks
+  window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress, uid: () => (CLOUD ? CLOUD.uid : null), match: applyMatch, fight: () => F, rest: sec => { if (F && F.phase === 'break') F.restEnd = now() + sec * 1000; }}; // for automated checks
   MON.price().then(pr => { monPrice = pr; if (pr && S && !F && !DR && !SC && tab === 'home' && view !== 'create') render(); }); if (S) vipSync(); // the store's price, and what it says is owned
   S = loadLocal(); setMode(false);
   if (S) go('home'); else { view = 'create'; render(); previewDraft(); }

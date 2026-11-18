@@ -57,11 +57,33 @@ async function fight(pick, opt = {}) {
     const pa = await ev("LAB.fight.events.filter(e => e.phase === 'rest').map(e => e.t + 2.3)");
     if (pa.length) { await ev(`LAB.seek(${pa[0]} - .4)`); if (await until("!!document.querySelector('#gBody [data-act=resume]')", 40000)) { await click('[data-act=quick][data-v=press]', 300); await click('#gBody .btn.go.wide[data-act=resume]', 300); } }
   }
+  let rest = null;
+  if (opt.rest) { // the timed rest: the count on the card, then either the bell by itself or "wait"
+    const pa = await ev("LAB.fight.events.filter(e => e.phase === 'rest').map(e => e.t + 2.3)");
+    if (pa.length) {
+      await ev(`LAB.seek(${pa[0]} - .4)`);
+      if (await until("!!document.querySelector('#gBody [data-act=resume]') && !!document.querySelector('#gBody [data-restcd]')", 40000)) {
+        const count = +(await ev("document.querySelector('#gBody [data-restcd]').textContent"));
+        if (opt.rest === 'auto') {
+          await click('[data-act=quick][data-v=press]', 300); const plan = await ev('JSON.stringify(GAME.fight().plan)');
+          await ev('GAME.rest(1.5)'); // the bell in a second and a half instead of thirty
+          const went = await until("!document.querySelector('#gBody [data-act=resume]') && GAME.fight() && GAME.fight().phase === 'live'", 15000);
+          rest = {count, went, plan, used: await ev('JSON.stringify(GAME.fight().plans[1])')};
+        } else {
+          await click('[data-act=resthold]', 400); const gone = !await has('#gBody [data-restcd]') && !await has('[data-act=resthold]');
+          await ev('GAME.rest(1)'); await wait(3500); // the count would be long over by now
+          rest = {count, gone, still: await has('#gBody [data-act=resume]') && await ev("GAME.fight().phase === 'break'")};
+          await click('#gBody .btn.go.wide[data-act=resume]', 300); rest.on = await ev("GAME.fight().phase === 'live'");
+        }
+      }
+    }
+  }
   await click('[data-act=skip]', 0);
   if (!await until("!!document.querySelector('#gBody [data-act=home]')", 90000)) return null;
   const r = await ev("({win: /ชนะ/.test(document.querySelector('#gBody h2').textContent), head: document.querySelector('#gBody h2').textContent, venue: '" + venue + "', specs: '" + specs + "'})");
   if (opt.ceremony) { await wait(opt.ceremony); await page.locator('#stage').screenshot({path: S + 'full-' + opt.shot + '.png'}); }
   await click('#gBody [data-act=home]', 1500);
+  r.rest = rest;
   return r;
 }
 const strong = () => save("for (const k in S.stats) S.stats[k] = 96; S.fatigue = 0; S.mood = 4;");
@@ -145,6 +167,14 @@ r = await fight('l1'); ok(!!r, 'local fight (even)', r && r.head); await sane('a
 await save('S.noBreak = true;'); r = await fight('l2', {plan: ['range', 'out']}); ok(!!r, 'local fight (hard), no stopping between rounds', r && r.head); await save('S.noBreak = false;'); await sane('after local fight 3');
 await save('S.fatigue = 0;'); r = await fight('c'); ok(!!r && r.venue === 'chuek', 'rope-fist bout at the old ground', r && r.head + ' @' + r.venue); if (r) venues.add(r.venue); await sane('after the rope-fist bout');
 await save('S.fatigue = 0;'); const rp0 = await ev('GAME.save().rp'); r = await fight('r'); ok(!!r && await ev('GAME.save().rp') !== rp0, 'ranked fight moves the ranking points', rp0 + ' → ' + await ev('GAME.save().rp')); if (r) venues.add(r.venue); await sane('after a ranked fight');
+// the rest between rounds is timed: thirty seconds, then the next round by itself; "wait" stops the count.
+// (a fight that ends in round one has no rest: the next opponent is tried)
+const restOf = async kind => { for (let i = 0; i < 4; i++) { await save('S.fatigue = 0;'); const x = await fight('l' + (i % 3), {rest: kind}); if (x && x.rest) return x.rest; } return null; };
+let rs = await restOf('auto');
+ok(!!rs && rs.count > 20 && rs.count <= 30, 'a round break shows the count to the next round', rs && rs.count + ' s');
+ok(!!rs && rs.went && rs.used === rs.plan, 'when the count runs out the next round starts by itself, with the plan on screen', rs && rs.used);
+rs = await restOf('hold');
+ok(!!rs && rs.gone && rs.still && rs.on, '"wait" stops the count: the rest lasts until "fight on" is pressed', JSON.stringify(rs)); await sane('after the timed rests');
 // a loss makes a rival; the rematch is on the menu and winning it clears him
 await save('S.rivals = [];'); await strong(); r = await fight('l2', {before: weak});
 const foe = await ev("(GAME.save().rivals[0] || {}).name || ''");

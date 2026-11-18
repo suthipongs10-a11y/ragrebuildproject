@@ -201,6 +201,8 @@ export const PLAN = {
 export const PLAN_DEFAULT = {ag: 'balanced', range: 'mixed', target: 'mixed'};
 // signature moves a fighter can carry, and the highest level of one
 export const SPECIALS = ['spChop', 'spHanu', 'spKick', 'spCroc', 'spFly'], SP_MAX = 3;
+// The rest between rounds of the player's own fight: the next round starts by itself after this many seconds, unless he asks it to wait
+export const REST_AUTO = 30;
 // A match between two players: the game and the server both read these. Seconds unless said otherwise.
 export const LIVE = {
   ready: 30,        // the bell no sooner than this after the challenge is accepted
