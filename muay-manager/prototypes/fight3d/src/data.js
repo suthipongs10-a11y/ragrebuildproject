@@ -203,6 +203,8 @@ export const PLAN_DEFAULT = {ag: 'balanced', range: 'mixed', target: 'mixed'};
 export const SPECIALS = ['spChop', 'spHanu', 'spKick', 'spCroc', 'spFly'], SP_MAX = 3;
 // The rest between rounds of the player's own fight: the next round starts by itself after this many seconds, unless he asks it to wait
 export const REST_AUTO = 30;
+// The players' cup (cup.js): what each place wins [money, fame]: champion, runner-up, semi-finalist, the rest of the field
+export const CUP_PRIZE = [[3000, 30], [1200, 12], [500, 5], [150, 2]];
 // A match between two players: the game and the server both read these. Seconds unless said otherwise.
 export const LIVE = {
   ready: 30,        // the bell no sooner than this after the challenge is accepted

@@ -13,6 +13,9 @@
 //   POST /api/transfer                    -> {code, expires}   a code that moves this player to another device (10 minutes)
 //   POST /api/transfer/claim              body: {code} -> {id, secret}   the new device takes the player over; the old key stops working
 //   DELETE /api/me                        -> {ok}   the player and everything stored for him are removed
+//   GET  /api/cup                         -> {now, gap, lead, next: {k, start, close, entries}, prev: {k, start, entries}}   the players' cup (below)
+//   POST /api/cup                         body: the fighter entered (JSON object) -> {ok, k}   until the list closes; a second POST replaces the first
+//   DELETE /api/cup                       -> {ok}   withdraw, until the list closes
 const SHARED = new Set(['board', 'challenges', 'answers']);
 const CODE_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', CODE_LEN = 8; // transfer codes: no letters that read like digits
 const SEG = /^[A-Za-z0-9_\-.~:@+]{1,200}$/, FIELD = /^[A-Za-z0-9_]{1,40}$/, MAX_BODY = 256 * 1024;
@@ -20,6 +23,17 @@ const SEG = /^[A-Za-z0-9_\-.~:@+]{1,200}$/, FIELD = /^[A-Za-z0-9_]{1,40}$/, MAX_
 // A player is known by the key he sends in Authorization, never by a cookie, so this opens nothing.
 const CORS = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Headers': 'Authorization, Content-Type', 'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS', 'Access-Control-Max-Age': '86400'};
 const json = (data, status = 200) => new Response(JSON.stringify(data), {status, headers: Object.assign({'Content-Type': 'application/json', 'Cache-Control': 'no-store'}, CORS)});
+// The players' cup: a knockout tournament between players' fighters at a fixed time every week. The server keeps the
+// clock and the list: it takes no entry and no change once the list has closed, so every screen builds the same bracket
+// from the same list and works the bouts out by itself (the fights are deterministic). Times in ms.
+// Cup number k starts at anchor + k * every; its list closes `lead` before that; its rounds follow each other `gap` apart.
+// (CUP_* in the environment replace these, for tests.)
+const CUP = {every: 7 * 864e5, anchor: Date.UTC(2026, 10, 21, 13, 0, 0), lead: 5 * 60e3, gap: 6 * 60e3, rounds: 4, max: 64}; // Saturdays, 20:00 in Thailand
+function cupClock(env, now) {
+  const num = (v, d) => (Number.isFinite(+v) && +v > 0 ? +v : d), every = num(env.CUP_EVERY, CUP.every), anchor = num(env.CUP_ANCHOR, CUP.anchor), lead = num(env.CUP_LEAD, CUP.lead), gap = num(env.CUP_GAP, CUP.gap);
+  const k = Math.ceil((now - CUP.rounds * gap - anchor) / every), at = n => anchor + n * every; // the cup that is next, or on right now
+  return {k, start: at(k), close: at(k) - lead, prevStart: at(k - 1), gap, lead};
+}
 let ready = false;
 async function schema(db) {
   if (ready) return;
@@ -27,7 +41,8 @@ async function schema(db) {
     db.prepare('CREATE TABLE IF NOT EXISTS players (id TEXT PRIMARY KEY, secret_hash TEXT NOT NULL, created INTEGER NOT NULL)'),
     db.prepare('CREATE TABLE IF NOT EXISTS docs (coll TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, updated INTEGER NOT NULL, PRIMARY KEY (coll, id))'),
     db.prepare('CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER NOT NULL, ua TEXT, ver TEXT, msg TEXT)'),
-    db.prepare('CREATE TABLE IF NOT EXISTS transfers (code TEXT PRIMARY KEY, id TEXT NOT NULL, expires INTEGER NOT NULL)')
+    db.prepare('CREATE TABLE IF NOT EXISTS transfers (code TEXT PRIMARY KEY, id TEXT NOT NULL, expires INTEGER NOT NULL)'),
+    db.prepare('CREATE TABLE IF NOT EXISTS cups (k INTEGER NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, at INTEGER NOT NULL, PRIMARY KEY (k, id))')
   ]);
   ready = true;
 }
@@ -86,9 +101,28 @@ export async function onRequest({request, env, params}) {
     const who = await caller(request, db); if (!who) return json({error: 'forbidden'}, 403);
     await db.batch([
       db.prepare("DELETE FROM docs WHERE (id = ? AND coll IN ('board', 'challenges', 'answers')) OR coll = ? OR coll LIKE ?").bind(who, 'data/users/' + who, 'data/users/' + who + '/%'),
-      db.prepare('DELETE FROM transfers WHERE id = ?').bind(who), db.prepare('DELETE FROM players WHERE id = ?').bind(who)
+      db.prepare('DELETE FROM transfers WHERE id = ?').bind(who), db.prepare('DELETE FROM cups WHERE id = ?').bind(who), db.prepare('DELETE FROM players WHERE id = ?').bind(who)
     ]);
     return json({ok: true});
+  }
+  if (route[0] === 'cup' && route.length === 1) {
+    const now = Date.now(), c = cupClock(env, now);
+    if (method === 'GET') {
+      const list = async k => (await db.prepare('SELECT id, data, at FROM cups WHERE k = ? ORDER BY at, id LIMIT ?').bind(k, CUP.max).all()).results.map(r => ({id: r.id, at: r.at, data: JSON.parse(r.data)}));
+      return json({now, gap: c.gap, lead: c.lead, next: {k: c.k, start: c.start, close: c.close, entries: await list(c.k)}, prev: {k: c.k - 1, start: c.prevStart, entries: await list(c.k - 1)}});
+    }
+    const who = await caller(request, db); if (!who) return json({error: 'forbidden'}, 403);
+    if (now >= c.close) return json({error: 'closed', k: c.k}, 409); // the list is closed: what is in it is what fights
+    if (method === 'DELETE') { await db.prepare('DELETE FROM cups WHERE k = ? AND id = ?').bind(c.k, who).run(); return json({ok: true, k: c.k}); }
+    if (method !== 'POST') return json({error: 'method'}, 405);
+    const text = await request.text(); if (text.length > 6000) return json({error: 'too large'}, 413);
+    let data; try { data = JSON.parse(text); } catch (e) { return json({error: 'not json'}, 400); }
+    if (!data || typeof data !== 'object' || Array.isArray(data)) return json({error: 'not an object'}, 400);
+    await db.batch([
+      db.prepare('INSERT INTO cups (k, id, data, at) VALUES (?, ?, ?, ?) ON CONFLICT (k, id) DO UPDATE SET data = excluded.data').bind(c.k, who, JSON.stringify(data), now), // a change keeps the first entry's place in the list
+      db.prepare('DELETE FROM cups WHERE k < ?').bind(c.k - 3)
+    ]);
+    return json({ok: true, k: c.k});
   }
   if (route[0] !== 'db' || route.length < 2 || !route.slice(1).every(s => SEG.test(s))) return json({error: 'not found'}, 404);
   const path = route.slice(1), who = await caller(request, db);

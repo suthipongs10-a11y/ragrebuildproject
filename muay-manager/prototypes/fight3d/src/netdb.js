@@ -58,5 +58,7 @@ export async function siteRuntime(base = (typeof window !== 'undefined' && windo
     forget() { try { localStorage.removeItem('muaySitePlayer'); } catch (e) { /* a new id next visit anyway */ } }, // this device lets go of a player it can no longer open
     async remove() { const r = await fetch(base + '/me', {method: 'DELETE', headers: auth}); if (!r.ok) return false; try { localStorage.removeItem('muaySitePlayer'); } catch (e) { /* gone with the page */ } return true; }
   };
-  return {skew, site: true, account, use: async name => (name === 'db' ? db : name === 'user' ? user : null)};
+  // any other call to the site's API as this player (the players' cup): the answer as JSON with its status, or null when the site cannot be reached
+  const call = async (p, method, body) => { try { const r = await fetch(base + p, {method: method || 'GET', cache: 'no-store', headers: Object.assign(body ? {'Content-Type': 'application/json'} : {}, auth), body: body ? JSON.stringify(body) : undefined}); const j = await r.json().catch(() => null); return j ? Object.assign(j, {status: r.status}) : null; } catch (e) { return null; } };
+  return {skew, site: true, account, call, use: async name => (name === 'db' ? db : name === 'user' ? user : null)};
 }

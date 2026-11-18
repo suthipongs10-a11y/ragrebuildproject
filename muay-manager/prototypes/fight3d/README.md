@@ -5,6 +5,13 @@
 
 ตัวนักมวยเป็นโมเดล 3D ที่สร้างด้วย Meshy (ภาพอ้างอิง → โมเดลมีผิว → ใส่กระดูกอัตโนมัติ) แล้วขยับด้วยท่าชุดเดียวกับตัวที่สร้างจากโค้ด ซึ่งยังเลือกกลับไปใช้ได้ เสียงเป็นเสียงสังเคราะห์ชั่วคราว
 
+## รอบที่ 79: ศึกชิงถ้วยผู้เล่น (18 พ.ย. 2026)
+
+- เซิร์ฟเวอร์ (`functions/api/[[route]].js`): `CUP` กำหนดการ (ทุก 7 วัน เริ่มนับจากเสาร์ 21 พ.ย. 2026 20:00 เวลาไทย ปิดรับก่อน 5 นาที รอบห่างกัน 6 นาที) `cupClock(env, now)` • `GET /api/cup` → `{now, gap, lead, next: {k, start, close, entries}, prev}` • `POST` / `DELETE /api/cup` ได้ถึง `close` • ตาราง `cups (k, id, data, at)` • ตัวแปร `CUP_EVERY` `CUP_ANCHOR` `CUP_LEAD` `CUP_GAP` (บน VPS ขึ้นต้น `MUAY_`) ใช้ย่อกำหนดการตอนทดสอบ
+- `src/cup.js` (ไม่มี DOM): `buildCup(k, entries, filler, rng, name)` จับสายและชกทุกคู่ • `cupPlace` • `cupTimes(cup, start, gap)` • `cupMatch(cup, r, i, start)` คู่ชกในรูปเดียวกับแมตช์ท้าชก (`cup: true`)
+- `game.js`: `PC` `cupLoad()` `cupPhase()` `pcupHtml()` `cupBracket()` `cupWatch()` `cupClaim()` • `watchMatch` รองรับ `m.cup` (เดินตามนาฬิกา ไม่อ่านแผนจากเอกสารผู้เล่น) • `netdb.js` `call(path, method, body)` • `data.js` `CUP_PRIZE`
+- ทดสอบ: `npm run e2e:cup`
+
 ## รอบที่ 78: ข่าวจากเวที และปุ่มเชียร์ (18 พ.ย. 2026)
 
 - ข่าวจากเวที (`game.js`): `rankedOpp` ใส่ `pid` ของเจ้าของนักมวย • `vsNote(o, r)` หลังไฟต์จัดอันดับเขียน `vs` ลง `challenges/<ฉัน>` • `vsNews()` รวมบรรทัดที่ `to` เป็นเราจาก `CH.cdocs` • `vsHtml()` การ์ดหน้าค่าย • `chDoc(cur, list)` ให้การเขียนคำท้าไม่ทับ `vs` • ปุ่ม `chsend` รับชื่อจาก `data-n` เมื่อผู้เล่นคนนั้นยังไม่อยู่ใน `board`

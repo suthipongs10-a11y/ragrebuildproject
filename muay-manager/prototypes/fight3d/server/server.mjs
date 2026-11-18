@@ -17,7 +17,7 @@ const SITE = resolve(ROOT, process.env.MUAY_SITE || 'dist/site'), DB_FILE = reso
 const RATE = +(process.env.MUAY_RATE || 1800), MAX_BODY = 300 * 1024, KEEP_BACKUPS = 7;
 if (!existsSync(join(SITE, 'index.html'))) { console.error('no site at ' + SITE + ' — run "node build.mjs" first'); process.exit(1); }
 mkdirSync(dirname(DB_FILE), {recursive: true});
-const db = openDb(DB_FILE), env = {DB: db};
+const db = openDb(DB_FILE), env = {DB: db, CUP_EVERY: process.env.MUAY_CUP_EVERY, CUP_ANCHOR: process.env.MUAY_CUP_ANCHOR, CUP_LEAD: process.env.MUAY_CUP_LEAD, CUP_GAP: process.env.MUAY_CUP_GAP}; // MUAY_CUP_*: another schedule for the players' cup (tests)
 
 // ---- the game's files
 const TYPES = {html: 'text/html; charset=utf-8', js: 'text/javascript; charset=utf-8', css: 'text/css; charset=utf-8', json: 'application/json', webmanifest: 'application/manifest+json',
