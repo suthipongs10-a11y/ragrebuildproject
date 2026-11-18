@@ -120,7 +120,9 @@ const game = gameBase.replace('/*__APP__*/', () => jsGame).replace('<!--__MODELS
 writeFileSync('dist/muay-manager.html', game);
 // claude.ai refuses a page over 16 MiB
 console.log('claude.ai page', (Buffer.byteLength(game) / 1048576).toFixed(2) + ' MB,', ((16 * 1048576 - Buffer.byteLength(game)) / 1024).toFixed(0) + ' KB under the limit');
-if (Buffer.byteLength(game) > 16 * 1048576 - 20000) throw new Error('dist/muay-manager.html is over the 16 MiB limit of a claude.ai page: lower VOICE_LITE');
+// The single-file page is no longer published on claude.ai (the owner plays on the game's website, 18 Nov 2026): it is
+// kept as the page the automated checks run on, so its size is only reported.
+if (Buffer.byteLength(game) > 16 * 1048576 - 20000) console.log('note: dist/muay-manager.html is over the 16 MiB a claude.ai page may be (it is not published there any more)');
 // the game as its own website (Cloudflare Pages, see docs/DEPLOY_CLOUDFLARE.md): a full document around the same page,
 // plus the phone home-screen files from site/. The store behind it is functions/api.
 const head = '<!doctype html>\n<html lang="th">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
