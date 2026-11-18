@@ -7,6 +7,7 @@
 // winner celebrates in one of several ways (h.style) and stays in it: 'ropes' he runs to the corner, jumps up on the ropes
 // and throws his arms up to the crowd; 'roar' fists down and a roar, then both arms flexed; 'slide' a run and a slide on
 // the knees with the arms wide; 'bow' he kneels to the crowd and bows three times.
+// A draw (h.draw): the referee lifts an arm of each, then the two embrace and wai each other; nobody celebrates.
 // Presentation only: the winner comes from the fight result.
 import { FLAT, NP, IDX } from './poses.js';
 const THREE = globalThis.THREE;
@@ -57,7 +58,26 @@ export function buildCeremony(camera) {
     Q[IDX.jump] = Math.abs(Math.sin(t * 5.2)) * bob;
   }
   const EP = {cam: 0}; // the camera the celebration asks for (camB, lookB) and how much of it
+  // A draw ends with the two of them: they step in and embrace, a pat on the back, then step apart and wai each other.
+  function afterDraw(e, pw, pl, pr) {
+    const TD = {in: [.2, 1.1], hug: [.95, 1.5], out: [3.1, 3.7], wai: [4.0, 4.6], up: [5.7, 6.4]}, z0 = .3, face = sm([.15, .95], e);
+    const hug = sm(TD.hug, e) * (1 - sm(TD.out, e)), g = lerp(.5, .21, sm(TD.in, e) * (1 - sm(TD.out, e)));
+    pr.z -= 1.45 * sm([0, 1.0], e);                                    // the referee stands back out of it
+    pw.x = lerp(pw.x, -g, face); pw.z = lerp(pw.z, z0, face); pw.yaw = near(pw.yaw, 0, face);
+    pl.x = lerp(pl.x, g, face); pl.z = lerp(pl.z, z0, face); pl.yaw = near(pl.yaw, Math.PI, face);
+    for (const [k, Q] of [[0, Q0], [1, Q1]]) {
+      blend(Q, FLAT.cerStand, FLAT.wai, pulse(TD.wai, TD.up, e - k * .12));
+      // one arm over the other man's shoulder, one round his ribs, the head past his: the same for both, so they fit
+      mix3(Q, IDX.hL, .46, 1.47, -.1, hug); mix3(Q, IDX.hR, .44, 1.2, .15, hug); mix3(Q, IDX.eL, 0, .1, -1, hug); mix3(Q, IDX.eR, 0, -.3, 1, hug);
+      Q[IDX.lean] += .12 * hug; Q[IDX.hdY] += .45 * hug; Q[IDX.hdP] += .1 * hug;
+      if (e > 1.7 && e < 2.8) Q[IDX.hR] -= Math.max(0, Math.sin((e - 1.7) * 11)) * .05 * hug; // a pat or two on the back
+    }
+    const kin = sm([0, .7], e); blend(P[0], P[0], Q0, kin); blend(P[1], P[1], Q1, kin);
+    if (!C.respected && e >= TD.wai[0] + .25) { C.respected = true; if (hooks.onRespect) hooks.onRespect(); }
+    camB.set(.8, 1.3, 3.4); lookB.set(0, 1.15, z0); EP.cam = sm([0, 1.1], e);
+  }
   function after(e, pw, pl, pr) {
+    if (hooks.draw) return afterDraw(e, pw, pl, pr);
     const H = hooks, kneel = !!H.ko && !H.prize, style = H.style || 'ropes', ring = H.ring || {R: 3.05, ropeY: [.42, .72, 1.02, 1.32]}, cup = H.prize && H.prize.kind !== 'belt';
     const T2 = kneel ? {down: [.9, 1.8], bow: [2.2, 2.9], up: [3.6, 4.3], rise: [4.4, 5.3], go: 5.5} : {down: [.9, 1.6], bow: [.9, 1.6], up: [2.9, 3.6], rise: [2.9, 3.6], go: 4.0};
     const gap = kneel ? .84 : .47, face = sm([.15, .95], e), c = e - T2.go, z0 = .3;
@@ -148,8 +168,11 @@ export function buildCeremony(camera) {
     for (const [k, A, near] of [[0, W, 'L'], [1, L, 'R']]) {
       const Q = P[k]; blend(Q, FLAT.cerStand, FLAT.cerTouch, touch);
       const side = near === 'L' ? -1 : 1, hi = IDX['h' + near];
-      mix3(Q, hi, .14, Q[IDX.hip + 1] + .16, side * .3, grab * (k === 1 ? 1 - rel : 1)); // the near arm offered to the referee, wrist at belly height
-      if (k === 0) { // the winner: his arm goes up with the referee's, then the other one too, then a couple of little jumps
+      mix3(Q, hi, .14, Q[IDX.hip + 1] + .16, side * .3, grab * (k === 1 && !hooks.draw ? 1 - rel : 1)); // the near arm offered to the referee, wrist at belly height
+      if (hooks.draw) { // a draw: each has his near arm lifted, and looks across at the other
+        mix3(Q, hi, .08, 1.92, side * .36, raise); mix3(Q, IDX['e' + near], 0, -.3, side, raise); Q[IDX.hdP] += -.1 * raise; Q[IDX.hdY] += -side * .3 * sm([5.6, 6.4], s);
+      }
+      else if (k === 0) { // the winner: his arm goes up with the referee's, then the other one too, then a couple of little jumps
         mix3(Q, hi, .08, 1.92, side * .36, raise); mix3(Q, IDX.eL, 0, -.3, -1, raise); // up, and in over the referee
         mix3(Q, IDX.hR, .04, 1.93, .3, both); mix3(Q, IDX.eR, 0, -.3, 1, both);
         Q[IDX.hdP] += -.2 * raise; Q[IDX.lean] -= .04 * raise;
@@ -171,8 +194,8 @@ export function buildCeremony(camera) {
     const wrist = (F, n, out) => { F.world('ha' + n, a); F.world('el' + n, b); return out.copy(a).lerp(b, .22); };
     const free = e > 0 ? 1 - sm([0, .5], e) : 1, hold = grab * refIn * free; // he lets go once the scene proper is over
     wrist(W, 'L', a); toLocal(a, pr, b); mix3(Q, IDX.hR, b.x, b.y, b.z, hold);
-    wrist(L, 'R', a); toLocal(a, pr, b); mix3(Q, IDX.hL, b.x, b.y, b.z, hold * (1 - rel));
-    mix3(Q, IDX.eR, 0, -.4, 1, raise * free);
+    wrist(L, 'R', a); toLocal(a, pr, b); mix3(Q, IDX.hL, b.x, b.y, b.z, hold * (hooks.draw ? 1 : 1 - rel));
+    mix3(Q, IDX.eR, 0, -.4, 1, raise * free); if (hooks.draw) mix3(Q, IDX.eL, 0, -.4, -1, raise * free);
     if (s > 3.4 && s < 4.9) Q[IDX.hdY] = Math.sin((s - 3.4) / 1.5 * Math.PI * 2) * .45 * sm([3.4, 3.7], s); // a look at each of them
     if (Z) { // both hands carry the prize in front of him, then reach to the winner with it, then let go
       const hold = show * (1 - sm([TP.give[1] - .1, TP.give[1] + .5], s)), hy = belt ? 1.0 : 1.12, reach = give * hold;

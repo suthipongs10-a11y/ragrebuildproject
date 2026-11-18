@@ -87,12 +87,16 @@ export const LINES = {
   winRed:    {hot: 2, t: ['มุมแดงชนะครับ!', 'ชัยชนะเป็นของมุมแดง!', 'มุมแดงชูมือเป็นผู้ชนะครับ!']},
   winBlue:   {hot: 2, t: ['มุมน้ำเงินชนะครับ!', 'ชัยชนะเป็นของมุมน้ำเงิน!', 'มุมน้ำเงินชูมือเป็นผู้ชนะครับ!']},
   decRed:    {hot: 2, t: ['มุมแดงชนะคะแนนครับ!', 'กรรมการให้มุมแดงชนะคะแนน!']},
-  decBlue:   {hot: 2, t: ['มุมน้ำเงินชนะคะแนนครับ!', 'กรรมการให้มุมน้ำเงินชนะคะแนน!']}
+  decBlue:   {hot: 2, t: ['มุมน้ำเงินชนะคะแนนครับ!', 'กรรมการให้มุมน้ำเงินชนะคะแนน!']},
+  // a draw: the announcement when the cards are read, then the longer word as the referee lifts both arms
+  decDraw:   {hot: 1, t: ['เสมอกันครับ! แต้มเท่ากันพอดี', 'กรรมการให้เสมอกันครับ!']},
+  draw:      {hot: 1, t: ['เสมอกันครับ ไม่มีใครยอมใครเลยจริง ๆ คู่นี้ สูสีมากจนสุดท้ายเสมอกัน แบบนี้ต้องมีไฟต์ล้างตากันใหม่ครับท่านผู้ชม', 'สูสีกันทั้งสามยกครับ สุดท้ายเสมอกัน ไม่มีใครยอมใครเลย คู่นี้ต้องเจอกันใหม่แน่นอนครับ']}
 };
 // A key whose clips are missing (the short voice pack of the claude.ai page) borrows the FIRST line of the plainer key
 // beside it, so that first line has to be true of both: "the push kick lands" for a push kick to the face as well.
 export const FALLBACK = {feel1: 'feel', timeLow10: 'timeLow', lowKickMore: 'lowKick', teepFace: 'teep', spChop: 'special', spKick: 'special', spFly: 'special', spCroc: 'special', spHanu: 'special',
-  bellyKick: 'bellyBack', duck: 'dodge', clinchKneeHead: 'clinchKnee', stunPunch: 'stun', koFlash: 'ko', tko: 'ko', catchHit: 'counter'};
+  bellyKick: 'bellyBack', duck: 'dodge', clinchKneeHead: 'clinchKnee', stunPunch: 'stun', koFlash: 'ko', tko: 'ko', catchHit: 'counter',
+  decDraw: 'close', draw: 'close'}; // until the draw lines are recorded, a draw is called with a "too close to call" line
 // the referee's count, in a second, plainer voice
 export const COUNT = ['หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า', 'สิบ'];
 // one shout from the crowd, recorded by several voices and stacked to sound like a stand full of people
@@ -139,7 +143,7 @@ function evadeLine(e, pose) {
   if (pose === 'slipL' || pose === 'slipR') return 'slip';
   return 'dodge';
 }
-const PRI = {ko: 3, koFlash: 3, tko: 3, kd: 3, winRed: 3, winBlue: 3, decRed: 3, decBlue: 3, special: 2, spChop: 2, spKick: 2, spFly: 2, spCroc: 2, spHanu: 2, stun: 2, stunPunch: 2, throw: 2, teepDump: 2, elbowOut: 2,
+export const PRI = {ko: 3, koFlash: 3, tko: 3, kd: 3, winRed: 3, winBlue: 3, decRed: 3, decBlue: 3, decDraw: 3, draw: 3, special: 2, spChop: 2, spKick: 2, spFly: 2, spCroc: 2, spHanu: 2, stun: 2, stunPunch: 2, throw: 2, teepDump: 2, elbowOut: 2,
   getup: 2, bell1: 2, round2: 2, round3: 2, decWait: 2};
 const CUTS = {ko: 1, koFlash: 1, tko: 1, kd: 1}; // these break into whatever is being said; every other forced line waits for the sentence to end
 const SEAT_CARE = .8, ROOM = {corner: 3.3, score: 2.3}; // seconds seated before the corner work is described; the time a line needs before they stand up
@@ -212,7 +216,7 @@ export function buildCommentary(audio, MOVES) {
       case 'count': counted = e.n; audio.count(e.n); break;
       case 'getup': if (!e.thrown) { floor = false; say('getup', now); } break;
       case 'ko': later = null; floor = true; say(e.how === 'ทีเคโอ' ? 'tko' : counted >= 10 ? 'ko' : 'koFlash', now, true); counted = 0; break; // the winner is named when the referee raises his hand
-      case 'decision': floor = true; say(e.w ? 'decBlue' : 'decRed', now, true); break;
+      case 'decision': floor = true; say(e.w < 0 ? 'decDraw' : e.w ? 'decBlue' : 'decRed', now, true); break;
     }
   };
   // between exchanges: a line now and then so the quiet stretches are not silent
@@ -244,5 +248,6 @@ export function buildCommentary(audio, MOVES) {
   };
   C.intro = now => say('intro', now, true);
   C.win = (w, now) => say(w ? 'winBlue' : 'winRed', now, true);
+  C.draw = now => say('draw', now, true);
   return C;
 }

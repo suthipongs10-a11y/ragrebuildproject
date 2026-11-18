@@ -5,6 +5,15 @@
 
 ตัวนักมวยเป็นโมเดล 3D ที่สร้างด้วย Meshy (ภาพอ้างอิง → โมเดลมีผิว → ใส่กระดูกอัตโนมัติ) แล้วขยับด้วยท่าชุดเดียวกับตัวที่สร้างจากโค้ด ซึ่งยังเลือกกลับไปใช้ได้ เสียงเป็นเสียงสังเคราะห์ชั่วคราว
 
+## รอบที่ 77: ผลเสมอ (18 พ.ย. 2026, กติกา proto-0.21)
+
+- `sim.js`: แต้มเท่ากันครบยก → `G.over = {w: -1, l: -1, how: 'เสมอ'}` เหตุการณ์ `{type: 'decision', w: -1}` • `rules.noDraw` ให้ชี้ขาดด้วยความเสียหาย (ทัวร์นาเมนต์)
+- `match.js` `matchCfg(seed, sides, venue, more)` กติกาเพิ่มทับของสนาม • `game.js` `NO_DRAW` ใช้กับ `tourBout` ไฟต์ทัวร์นาเมนต์ของผู้เล่น และการดูคู่อื่น (`m.noDraw`)
+- `ceremony.js`: `h.draw` ทั้งสองแขนขึ้นพร้อมกรรมการ • `afterDraw()` กอดแล้วไหว้ • `main.js` `startCeremony` แยกกรณี `w < 0` กล้องหลังประกาศจับทั้งคู่ • `commentary.js` `decDraw` `draw` (`C.draw()`), `FALLBACK` ยืม `close` จนกว่าจะอัดเสียง
+- `game.js` `onOver`: `draw` → เงินครึ่ง RP ครึ่งแต้ม `S.rec.d` คู่ปรับ `draws` • `applyMatch` / `liveMatchOver` รองรับเสมอ (`LIVE.reward.draw`)
+- `build.mjs`: ชุดเสียงย่อเรียงตาม `PRI` และข้ามกลุ่มที่ไม่มีที่ (`VOICE_LITE` 480000)
+- เครื่องมือ: `tools/batch.mjs` นับเสมอ • ตัวตรวจ: `full-play.mjs` ส่งผลเสมอเข้า `MUAY.HOOK.onOver`
+
 ## รอบที่ 76: ตัวนับการใช้งานและรายงานผู้ทดสอบ (18 พ.ย. 2026)
 
 - `game.js`: `S.use = {first, days[], sess, secs, a{}, f{}, end{}, rest{}}` • `useCount(group, key)` (ไม่เกิน 160 คีย์ต่อกลุ่ม) • นับที่ต้นทางของ `onClick` ทุกปุ่ม (`USE_BY_V`: นับแยกตามค่าที่เลือก) `startFight` `watchMatch` `onOver` `restGo(how)` • เวลาเล่นสะสมทุก 5 วินาทีขณะหน้าเกมอยู่ข้างหน้า แล้วเขียนลงเซฟตอน `save()`

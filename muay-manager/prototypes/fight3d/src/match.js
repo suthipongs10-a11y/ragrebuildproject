@@ -19,9 +19,10 @@ export function cleanSpec(sp, name) {
 }
 // The input of simulate() for a match. sides: [{name, spec, plans: [round 1, round 2?, round 3?]}, ...] (challenger
 // first). A round with no plan of its own keeps the plan of the round before.
-export function matchCfg(seed, sides, venue) {
+// more: rules on top of the venue's (noDraw for a knockout tournament, where every bout needs a winner)
+export function matchCfg(seed, sides, venue, more) {
   const rounds = x => { const p = Array.isArray(x.plans) ? x.plans : [], p1 = cleanPlan(p[0]), p2 = p[1] ? cleanPlan(p[1]) : p1, p3 = p[2] ? cleanPlan(p[2]) : p2; return [p1, p2, p3]; };
-  return {seed: (seed >>> 0) || 1, specs: sides.map(x => cleanSpec(x.spec, x.name)), plans: sides.map(rounds), rules: own(VENUE_RULES, venue) ? VENUE_RULES[venue] : null};
+  return {seed: (seed >>> 0) || 1, specs: sides.map(x => cleanSpec(x.spec, x.name)), plans: sides.map(rounds), rules: more ? Object.assign({}, own(VENUE_RULES, venue) ? VENUE_RULES[venue] : null, more) : own(VENUE_RULES, venue) ? VENUE_RULES[venue] : null};
 }
 // When each rest of a live match starts, in seconds after its bell on the shared clock (the rests before it included).
 // The rest after round n is restWalls(fight)[n - 1]; it lasts LIVE.rest seconds.

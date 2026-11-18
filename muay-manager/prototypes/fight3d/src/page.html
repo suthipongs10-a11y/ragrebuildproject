@@ -152,7 +152,7 @@ details summary{cursor:pointer;font-family:var(--display);font-size:13px;color:v
 .gcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:9px;min-width:0}
 .gcard h2{font-family:var(--display);font-size:16px;font-weight:700;margin:0;color:var(--gold);text-wrap:balance}
 .gcard h2 small{font-family:var(--body);font-weight:500;font-size:12px;color:var(--muted);margin-left:6px}
-.gcard h2.win{color:var(--hp);font-size:24px} .gcard h2.lose{color:var(--bad);font-size:24px}
+.gcard h2.win{color:var(--hp);font-size:24px} .gcard h2.lose{color:var(--bad);font-size:24px} .gcard h2.draw{color:var(--gold);font-size:24px}
 .kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;font-size:13.5px}
 .kv span{color:var(--muted)} .kv b{font-weight:600}
 .statbox{display:flex;flex-direction:column;gap:5px;min-width:0}
@@ -192,7 +192,7 @@ p.bad{margin:0;font-size:14px;font-weight:600;color:var(--bad)}
 .plan{display:flex;flex-direction:column;gap:7px} .plan .row{display:grid;grid-template-columns:62px minmax(0,1fr);gap:8px;align-items:center} .plan .lab{font-size:12.5px;color:var(--muted)}
 .cmp{display:grid;grid-template-columns:1fr auto 1fr;gap:3px 12px;font-size:13.5px;font-variant-numeric:tabular-nums}
 .cmp span:nth-child(3n+1){text-align:right;color:var(--red-soft)} .cmp span:nth-child(3n){color:var(--blue-soft)} .cmp b{font-weight:500;color:var(--muted);text-align:center}
-.logrow{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:8px;font-size:13px} .logrow.w b{color:var(--hp)} .logrow.l b{color:var(--bad)} .logrow span:last-child{color:var(--muted)}
+.logrow{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:8px;font-size:13px} .logrow.w b{color:var(--hp)} .logrow.l b{color:var(--bad)} .logrow.d b{color:var(--gold)} .logrow span:last-child{color:var(--muted)}
 .rkh,.rk{display:grid;grid-template-columns:28px minmax(0,1fr) 86px 50px 44px;gap:6px;font-size:13px;align-items:baseline;font-variant-numeric:tabular-nums}
 .rkh{color:var(--muted);font-size:11.5px} .rk .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .rk .nm i{font-style:normal;font-size:10.5px;color:var(--ink);background:var(--blue-soft);border-radius:3px;padding:0 4px}
 .rk .lg{font-size:11.5px;color:var(--muted)} .rk .rp{text-align:right;color:var(--gold)} .rk.me{color:var(--gold);font-weight:600} .rk.gap{color:var(--muted);display:block;text-align:center}

@@ -60,7 +60,7 @@ say('# รายงานผู้ทดสอบ Muay Manager'); say();
 say('ออกรายงาน ' + new Date(now).toLocaleString('th-TH', {timeZone: 'Asia/Bangkok'}) + ' • ไม่นับนักมวยที่ชื่อขึ้นต้นด้วย: ' + (SKIP.join(', ') || '–')); say();
 
 say('## 1. ภาพรวม'); say();
-const fights = P.map(p => (p.s.rec ? p.s.rec.w + p.s.rec.l : 0)), secs = U.map(p => use(p).secs || 0);
+const nf = r => (r ? r.w + r.l + (r.d || 0) : 0), fights = P.map(p => nf(p.s.rec)), secs = U.map(p => use(p).secs || 0);
 table(['รายการ', 'ค่า'], [
   ['เครื่องที่เคยเปิดเกม (ลงทะเบียน)', players.length], ['สร้างนักมวยแล้ว', P.length + (all.length - P.length ? ' (ไม่นับชื่อทดสอบอีก ' + (all.length - P.length) + ')' : '')],
   ['มีสถิติการใช้งาน (เล่นรุ่น 2.54 ขึ้นไป)', U.length], ['เล่นใน 24 ชม. ที่ผ่านมา', P.filter(p => now - (p.s.updatedAt || p.updated) < DAY).length],
@@ -97,13 +97,13 @@ else {
 }
 
 say('## 4. ผู้เล่นแต่ละคน'); say();
-table(['นักมวย', 'วันในเกม', 'ชนะ-แพ้', 'RP', 'ค่าย', 'เข็มขัด', 'เวลาเล่น', 'เปิดเกม', 'วันจริง', 'เล่นล่าสุด'], P.slice().sort((x, y) => (y.s.updatedAt || 0) - (x.s.updatedAt || 0)).map(p => { const u = use(p), s = p.s;
-  return [s.name, s.day || 1, (s.rec ? s.rec.w + '-' + s.rec.l : '–'), s.rp || '–', s.gym || 1, (s.belts || []).length, u ? hm(u.secs || 0) : '–', u ? (u.sess || 0) + ' ครั้ง' : '–', u ? (u.days || []).length : '–', ago(s.updatedAt || p.updated)]; }));
+table(['นักมวย', 'วันในเกม', 'ชนะ-แพ้(-เสมอ)', 'RP', 'ค่าย', 'เข็มขัด', 'เวลาเล่น', 'เปิดเกม', 'วันจริง', 'เล่นล่าสุด'], P.slice().sort((x, y) => (y.s.updatedAt || 0) - (x.s.updatedAt || 0)).map(p => { const u = use(p), s = p.s;
+  return [s.name, s.day || 1, (s.rec ? s.rec.w + '-' + s.rec.l + (s.rec.d ? '-' + s.rec.d : '') : '–'), s.rp || '–', s.gym || 1, (s.belts || []).length, u ? hm(u.secs || 0) : '–', u ? (u.sess || 0) + ' ครั้ง' : '–', u ? (u.days || []).length : '–', ago(s.updatedAt || p.updated)]; }));
 
 say('## 5. คนที่หยุดเล่น (ไม่ได้เปิดเกมเกิน 2 วัน)'); say();
 const gone = P.filter(p => now - (p.s.updatedAt || p.updated) > 2 * DAY);
 if (!gone.length) { say('ยังไม่มี'); say(); }
-else table(['นักมวย', 'หยุดที่วันในเกม', 'ไฟต์ที่ชก', 'ไฟต์สุดท้าย', 'เล่นล่าสุด'], gone.map(p => [p.s.name, p.s.day || 1, p.s.rec ? p.s.rec.w + p.s.rec.l : 0, p.s.log && p.s.log[0] ? (p.s.log[0].w ? 'ชนะ ' : 'แพ้ ') + (p.s.log[0].h || '') : '–', ago(p.s.updatedAt || p.updated)]));
+else table(['นักมวย', 'หยุดที่วันในเกม', 'ไฟต์ที่ชก', 'ไฟต์สุดท้าย', 'เล่นล่าสุด'], gone.map(p => [p.s.name, p.s.day || 1, nf(p.s.rec), p.s.log && p.s.log[0] ? (p.s.log[0].d ? 'เสมอ ' : p.s.log[0].w ? 'ชนะ ' : 'แพ้ ') + (p.s.log[0].h || '') : '–', ago(p.s.updatedAt || p.updated)]));
 
 say('## 6. ข้อความจากผู้เล่น'); say();
 const notes = logs.filter(l => String(l.msg).startsWith('FEEDBACK '));

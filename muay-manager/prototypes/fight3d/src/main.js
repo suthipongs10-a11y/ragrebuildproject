@@ -114,6 +114,12 @@ function startCeremony() {
   fighters.forEach(f => f.setMongkol(false));
   ['banner', 'count', 'scorecard', 'replayTag'].forEach(id => { $(id).hidden = true; }); $('pops').innerHTML = '';
   // a title or a tournament won by the player's man (corner 0): the belt or the cup is presented after the raised hand
+  if (w < 0) { // a draw: the referee lifts both arms, then the two embrace and bow to each other
+    cer.start(fighters[0], fighters[1], refF, {draw: true, ring: {R: RING_R, ropeY: arena.ropeY()},
+      onRespect: () => { audio.applause(); },
+      onRaise: p => { hype = .7; audio.roar(.8); audio.applause(); voice.draw(audio.time()); fx.ring(p, 1, 0xffd35a); }});
+    return true;
+  }
   const pz = CFG.prize && w === 0 ? CFG.prize : null; if (!prizes) prizes = buildPrize(scene);
   // how the winner celebrates: from the fight's own number, so every screen showing this fight shows the same one
   const ko = fight.result.how !== 'คะแนน', pool = pz ? ['ropes'] : ko ? ['ropes', 'roar', 'slide', 'ropes'] : ['bow', 'ropes', 'roar', 'bow'];
@@ -373,8 +379,8 @@ function fmt(t) { t = Math.max(0, Math.ceil(t)); return Math.floor(t / 60) + ':'
 function showResult() {
   if (resultShown) return; resultShown = true;
   const r = fight.result, w = fight.specs[r.w];
-  $('resM').textContent = r.how === 'คะแนน' ? 'ชนะคะแนน ครบ ' + RULES.rounds + ' ยก' : 'ชนะ' + r.how + ' ยก ' + r.round + ' นาทีที่ ' + fmt(r.time);
-  $('resW').textContent = w.name; $('resW').className = 'w ' + (r.w ? 'b' : 'r');
+  $('resM').textContent = r.w < 0 ? 'แต้มเท่ากัน ครบ ' + RULES.rounds + ' ยก' : r.how === 'คะแนน' ? 'ชนะคะแนน ครบ ' + RULES.rounds + ' ยก' : 'ชนะ' + r.how + ' ยก ' + r.round + ' นาทีที่ ' + fmt(r.time);
+  $('resW').textContent = w ? w.name : 'เสมอ'; $('resW').className = 'w ' + (r.w < 0 ? '' : r.w ? 'b' : 'r');
   $('resD').textContent = (r.move ? 'ปิดเกมด้วย' + MOVES[r.move].th + ' · ' : '') + 'แต้ม ' + r.pts[0] + ' ต่อ ' + r.pts[1] + (r.how === 'คะแนน' && r.pts[0] === r.pts[1] ? ' (แต้มเท่ากัน ตัดสินจากความเสียหายที่ทำได้)' : '') +
     ' · เข้าเป้า ' + r.landed[0] + ' ต่อ ' + r.landed[1];
   $('result').hidden = false;
@@ -557,7 +563,7 @@ function handle(e) {
       hype = 1; $('count').hidden = true;
       if (!rp) { banner(e.how === 'น็อก' ? 'น็อก!!' : 'ทีเคโอ!', 'red huge'); audio.roar(1.2); setTimeout(() => audio.thud(), 420); }
       break;
-    case 'decision': if (!rp) { banner('ชนะคะแนน', fight.result.w ? 'blue' : 'redc'); audio.roar(.8); audio.applause(); } break;
+    case 'decision': if (!rp) { if (e.w < 0) { banner('เสมอ', 'gold'); audio.applause(); } else { banner('ชนะคะแนน', fight.result.w ? 'blue' : 'redc'); audio.roar(.8); audio.applause(); } } break;
   }
 }
 
@@ -660,9 +666,9 @@ function direct(t) {
   }
   const winT = marks.ko ? marks.ko.t + 1.75 : marks.dec ? marks.dec.t : Infinity;
   if (t >= winT) {
-    const w = fight.result.w, wx = w ? xb : xa;
-    s.id = 'win'; s.cut = OPT.cam === 'director'; s.tx = wx; s.ty = 1.25; s.fit = 3.2; s.fitH = 2.2; s.h = OPT.cam === 'low' ? .6 : 1.05;
-    if (OPT.cam !== 'side') s.az = (w ? .5 : -.5) + (t - winT) * .12 * (w ? -1 : 1);
+    const w = fight.result.w, wx = w < 0 ? mid : w ? xb : xa;
+    s.id = 'win'; s.cut = OPT.cam === 'director'; s.tx = wx; s.ty = 1.25; s.fit = w < 0 ? sep + 2.6 : 3.2; s.fitH = 2.2; s.h = OPT.cam === 'low' ? .6 : 1.05;
+    if (OPT.cam !== 'side') s.az = w < 0 ? (t - winT) * .08 : (w ? .5 : -.5) + (t - winT) * .12 * (w ? -1 : 1);
   } else if (marks.ko && t >= marks.ko.t + .55 && OPT.cam === 'director' && !(marks.kds.find(x => t >= x.t0 && t < x.t1))) {
     const on = marks.ko.on, vx = (on ? xb : xa) - (on ? -1 : 1) * .7;
     s.id = 'kofall'; s.cut = true; s.tx = lerp(mid, vx, .5); s.ty = .55; s.h = 1.25; s.fit = 4.4; s.fitH = 1.9; s.az = on ? -.5 : .5;

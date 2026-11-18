@@ -175,6 +175,20 @@ ok(!!rs && rs.count > 20 && rs.count <= 30, 'a round break shows the count to th
 ok(!!rs && rs.went && rs.used === rs.plan, 'when the count runs out the next round starts by itself, with the plan on screen', rs && rs.used);
 rs = await restOf('hold');
 ok(!!rs && rs.gone && rs.still && rs.on, '"wait" stops the count: the rest lasts until "fight on" is pressed', JSON.stringify(rs)); await sane('after the timed rests');
+// a draw (level on points): nobody wins, the purse is split, the record shows it, and the opponent is kept for a rematch.
+// The fight on screen is handed a level result (a real one comes about once in 250 fights).
+{ await save('S.fatigue = 0; S.rivals = [];'); await tab('fight'); await click('[data-act=pick][data-v=l1]', 800); await click('[data-act=startfight]', 0);
+  await until("!!(window.LAB && LAB.fight && document.querySelector('.app.g-fight') && LAB.t > .2 && GAME.fight() && GAME.fight().phase === 'live')", 60000);
+  const b4 = await ev("(S => ({m: S.money, w: S.rec.w, l: S.rec.l, d: S.rec.d || 0, purse: GAME.fight().opp.money, name: GAME.fight().opp.name}))(GAME.save())");
+  await ev("MUAY.HOOK.onOver(Object.assign({}, LAB.fight.result, {w: -1, l: -1, how: 'เสมอ', pts: [48, 48], move: null}))");
+  await until("!!document.querySelector('#gBody [data-act=home]')", 20000);
+  const af = await ev("(S => ({m: S.money, w: S.rec.w, l: S.rec.l, d: S.rec.d || 0, riv: S.rivals[0] || {}, head: document.querySelector('#gBody h2').textContent, log: S.log[0]}))(GAME.save())");
+  ok(/เสมอ/.test(af.head) && af.d === b4.d + 1 && af.w === b4.w && af.l === b4.l, 'a draw is a draw: one more on the record, no win and no loss', af.head + ' · ' + af.w + '-' + af.l + '-' + af.d);
+  ok(af.m - b4.m === Math.round(b4.purse * .5) && af.log.d === true && !await has('[data-act=adr]'), 'a draw splits the purse', '+' + (af.m - b4.m) + ' of ' + b4.purse);
+  ok(af.riv.name === b4.name && af.riv.draws === 1 && af.riv.losses === 0, 'the man he drew with is kept for a rematch', JSON.stringify({n: af.riv.name, d: af.riv.draws, l: af.riv.losses}));
+  await click('#gBody [data-act=home]', 1500); await save('S.rematch = 1; S.fatigue = 0;'); await tab('fight');
+  ok(await ev(`document.getElementById('gBody').innerText.includes('เสมอกัน 1 ครั้ง')`) && await has('[data-act=pick][data-v=v]'), 'the rematch after a draw is offered on the fight menu'); await sane('after a draw');
+  await tab('rank'); ok(await ev(`[...document.querySelectorAll('#gBody .rk.me .wl')].some(e => /^\\d+-\\d+-1$/.test(e.textContent))`), 'the ranking shows wins, losses and the draw'); }
 // a loss makes a rival; the rematch is on the menu and winning it clears him
 await save('S.rivals = [];'); await strong(); r = await fight('l2', {before: weak});
 const foe = await ev("(GAME.save().rivals[0] || {}).name || ''");
@@ -238,6 +252,8 @@ if (await ev('!!GAME.uid()')) {
   ok(pay.every(p => p[1] === 1), 'five challenge results are all recorded', JSON.stringify(pay));
   ok(pay[0][0] > 0 && pay[1][0] === 0 && pay[1][2] && pay[2][0] > 0 && pay[2][0] < pay[0][0] && pay[3][0] > 0 && pay[4][0] === 0 && pay[4][2], 'paid: first opponent once, a loss less than a win, three a day at most');
   await tab('fight'); ok(await ev(`document.getElementById('gBody').innerText.includes('วันนี้เหลือ 0')`), 'the challenge card says none are left today'); await sane('after the challenge results');
+  const dr = await ev(`(() => { const S = GAME.save(), me = GAME.uid(); S.chDay = null; const m0 = S.money, d0 = S.rec.d || 0, w0 = S.rec.w, l0 = S.rec.l; const note = GAME.match({from: 'x7', to: me, fromName: 'คู่ x7', toName: S.name, key: 'bot-draw'}, {w: -1, how: 'เสมอ', round: 3}); return {money: S.money - m0, d: (S.rec.d || 0) - d0, wl: S.rec.w - w0 + S.rec.l - l0, note, log: S.log[0]}; })()`);
+  ok(dr.money === 250 && dr.d === 1 && dr.wl === 0 && /เสมอ/.test(dr.note) && dr.log.d === true, 'a drawn challenge match: a draw on the record and the draw purse', JSON.stringify(dr).slice(0, 160));
 } else ok(false, 'the online store is connected (needed for the challenge reward check)');
 
 // ---- 7c. what the player used is counted in his save (tools/tester-report.mjs reads it)

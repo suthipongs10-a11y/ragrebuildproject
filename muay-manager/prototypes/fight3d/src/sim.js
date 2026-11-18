@@ -3,7 +3,7 @@
 // The presenter only plays this back; it never decides an outcome.
 import { MOVES, COMBOS, STYLES, FIRST, CAMP, STAT_TH, RULES, PLAN_DEFAULT, PLAN_RULES } from './data.js';
 
-export const SIM_VERSION = 'proto-0.20';
+export const SIM_VERSION = 'proto-0.21';
 export const TICK_FIELDS = 9; // x, hp, st, sp, state, wearHead, wearBody, wearLeg, points
 export const STATE = {intro:0, idle:1, move:2, hit:3, block:4, stun:5, down:6, getup:7, ko:8, win:9, rest:10, cover:11, clinch:12, clinched:13, caught:14, thrown:15};
 
@@ -524,8 +524,9 @@ export function simulate(opts) {
       if (f.state !== 'down' && f.state !== 'getup') { f.state = 'rest'; setPose(f, 'guard', .25); }
     });
     if (G.round >= K.rounds) {
-      const w = F[0].pts !== F[1].pts ? (F[0].pts > F[1].pts ? 0 : 1) : F[0].dmg >= F[1].dmg ? 0 : 1; // level on points: the one who did more damage gets the nod
-      G.over = {w, l: 1 - w, how: 'คะแนน', round: G.round, time: K.roundTime, move: null};
+      // level on points: a draw (w -1). Where there has to be a winner (rule noDraw: a knockout tournament) the one who did more damage gets the nod
+      const w = F[0].pts !== F[1].pts ? (F[0].pts > F[1].pts ? 0 : 1) : K.noDraw ? (F[0].dmg >= F[1].dmg ? 0 : 1) : -1;
+      G.over = w < 0 ? {w: -1, l: -1, how: 'เสมอ', round: G.round, time: K.roundTime, move: null} : {w, l: 1 - w, how: 'คะแนน', round: G.round, time: K.roundTime, move: null};
       G.phase = 'dec'; G.koT = 0;
       emit({type: 'phase', phase: 'dec', round: G.round});
       say('ครบ ' + K.rounds + ' ยก รอฟังคำตัดสิน');
@@ -586,7 +587,8 @@ export function simulate(opts) {
     } else if (G.phase === 'dec') {
       G.koT += dt;
       const w = F[G.over.w];
-      if (G.koT > 1.6 && w.state !== 'win') {
+      if (!w) { if (G.koT > 1.6 && !G.decSaid) { G.decSaid = true; emit({type: 'decision', w: -1}); say('<b>เสมอกัน</b> แต้มเท่ากัน'); } } // a draw: nobody's arm goes up
+      else if (G.koT > 1.6 && w.state !== 'win') {
         w.state = 'win'; setPose(w, 'win', .45);
         emit({type: 'decision', w: w.i}); say('<b>' + w.name + '</b> ชนะคะแนน');
       }

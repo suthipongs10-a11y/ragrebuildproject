@@ -7,7 +7,7 @@ let ko = 0, clinch = 0, catches = 0, ckHits = 0, throws = 0, headKnees = 0;
 for (let i = 1; i <= N; i++) {
   const f = simulate({seed: i}), r = f.result;
   for (const e of f.events) { if (e.type === 'clinch') clinch++; if (e.type === 'throw' && e.ok) throws++; if (e.type === 'hit' && e.move === 'clinchKneeHead' && e.res === 'hit') headKnees++; if (e.type === 'hit' && e.res === 'catch') catches++; if (e.type === 'hit' && e.move === 'clinchKnee' && e.res === 'hit') ckHits++; }
-  if (r.how === 'คะแนน') continue;
+  if (r.how === 'คะแนน' || r.how === 'เสมอ') continue;
   ko++; by[r.move] = (by[r.move] || 0) + 1;
   const m = MOVES[r.move];
   grp[m.special ? 'special' : ['jab', 'cross', 'hook', 'upper', 'bodyshot', 'catchPunch', 'catchBody'].includes(r.move) ? 'punch' : ['elbow', 'spinElbow'].includes(r.move) ? 'elbow' : r.move === 'high' ? 'highkick' : ['knee', 'clinchKnee', 'clinchKneeHead'].includes(r.move) ? 'knee' : 'other']++;

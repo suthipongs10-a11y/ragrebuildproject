@@ -212,7 +212,7 @@ export const LIVE = {
   cornerIn: 2.3,    // from the bell that ends a round to the fighters being in their corners (where the rest starts on the clock)
   matchLen: 300,    // a match counts as under way for this long after its bell
   keepDays: 3,      // finished matches stay on the list this long
-  reward: {win: [400, 10], lose: [100, 2]} // money, fame
+  reward: {win: [400, 10], lose: [100, 2], draw: [250, 6]} // money, fame
 };
 export const PLAN_RULES = {
   attackCool: .72, counterCool: 1.3, attackCover: .65, counterCover: 1.25, attackSt: 1.08, counterSt: .92, attackDmg: 1.05, counterBonus: .3,

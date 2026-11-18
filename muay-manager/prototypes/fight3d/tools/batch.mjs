@@ -11,7 +11,8 @@ const half = [0, 0, 0, 0, 0, 0], lightN = [0, 0, 0], kdR = [0, 0, 0], halfN = [0
 const t0 = Date.now();
 for (let i = 0; i < N; i++) {
   const f = simulate({seed: S0 + i}), r = f.result;
-  if (r.how === 'คะแนน') { out.dec++; if (Math.abs(r.pts[0] - r.pts[1]) / Math.max(r.pts[0], r.pts[1]) < .1) out.close++; }
+  if (r.how === 'เสมอ') { out.dec++; out.draw = (out.draw || 0) + 1; out.close++; } // a draw goes to the cards too
+  else if (r.how === 'คะแนน') { out.dec++; if (Math.abs(r.pts[0] - r.pts[1]) / Math.max(r.pts[0], r.pts[1]) < .1) out.close++; }
   else { out['r' + r.round]++; out[r.how === 'น็อก' ? 'ko' : 'tko']++; }
   out.guards += r.guards[0] + r.guards[1]; out.teeps += (r.used[0].teep || 0) + (r.used[1].teep || 0) + (r.used[0].teepFace || 0) + (r.used[1].teepFace || 0);
   out.kd += r.kd[0] + r.kd[1]; out.dur += f.duration; out.leadChanges += r.leadChanges;
@@ -47,5 +48,6 @@ console.table({
   'ท่าต่างชนิดต่อนักมวย': av(out.kinds), 'ตั้งการ์ดรับต่อไฟต์': av(out.guards), 'ถีบต่อไฟต์': av(out.teeps), 'ชุด 3 จังหวะต่อไฟต์ (เป้า 3-6)': av(out.combos3),
   'ท่าไม้ตายต่อไฟต์ (เป้า 2-4)': av(out.specials), 'ท่าไม้ตายเข้าเป้า (เป้า ~50%)': out.specials ? (out.specialHits / out.specials * 100).toFixed(1) + '%' : '-',
   'ผู้นำคะแนนเปลี่ยนต่อไฟต์ (เป้า ≥1)': av(out.leadChanges), 'ช่วงเงียบยาวสุดเฉลี่ย วินาที (เป้า ≤5)': av(out.maxGap),
+  'เสมอ (แต้มเท่ากัน)': pc(out.draw || 0),
   'ไฟต์คะแนนที่ห่างไม่เกิน 10%': out.dec ? (out.close / out.dec * 100).toFixed(1) + '%' : '-', 'ความยาวไฟต์เฉลี่ย วินาที': av(out.dur)
 });
