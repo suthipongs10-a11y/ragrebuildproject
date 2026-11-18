@@ -974,6 +974,7 @@ const API = {
   replan(plans) { CFG.plans = plans; const t = playT; buildFight(); evi = indexAt(t); rpi = replays.findIndex(r => r.trigger > t); if (rpi < 0) rpi = replays.length; },
   resume() { if (cor.on) cor.release(); else frozen = false; }, // in the corners: the round starts once they are back out
   skip() { seek(marks.over); },
+  cheer(k) { hype = Math.max(hype, .6); audio.roar(k === 'fire' || k === 'wow' ? .7 : .5); if (k === 'red' || k === 'blue') audio.applause(); }, // somebody watching pressed a cheer: the crowd lifts
   // seconds since the fight began as this screen shows it, the rests in the corners included; null once it is over
   // (a live match is kept in step with the clock by comparing this with the time since its start)
   liveAt() {

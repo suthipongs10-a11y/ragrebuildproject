@@ -112,7 +112,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.55', BUILD = 255;
+const VER = '2.56', BUILD = 256;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -269,7 +269,7 @@ function makeOpp(seed, T, fixedName) {
 const GHOSTS = (() => { const out = [], R = rng(20261110); for (let i = 0; i < 48; i++) { const rp = Math.round(1960 - i * 24 + (R() - .5) * 14); out.push({rp, seed: 7000 + i, name: FIRST[(i * 5 + 3) % FIRST.length] + ' ' + CAMP[(i * 3 + 1) % CAMP.length], w: Math.round((rp - 700) / 22 + R() * 6), l: Math.round(8 + R() * 14)}); } return out; })();
 const ghostTotal = rp => clamp(262 + (rp - 1000) * .24, 215, 560);
 function rankRows() {
-  const rows = GHOSTS.map(g => ({name: g.name, rp: g.rp, w: g.w, l: g.l, ghost: g})).concat(board.map(b => ({name: b.name, rp: b.rp, w: b.w, l: b.l, real: b, vip: b.vip})));
+  const rows = GHOSTS.map(g => ({name: g.name, rp: g.rp, w: g.w, l: g.l, ghost: g})).concat(board.map(b => ({name: b.name, rp: b.rp, w: b.w, l: b.l, d: b.d, real: b, vip: b.vip})));
   if (S) rows.push({name: S.name, rp: S.rp, w: S.rec.w, l: S.rec.l, d: S.rec.d || 0, me: true, vip: S.vip});
   return rows.sort((a, b) => b.rp - a.rp);
 }
@@ -423,7 +423,7 @@ function rankedOpp() {
   const pool = near.length ? near : rankRows().filter(r => !r.me).sort((a, b) => Math.abs(a.rp - S.rp) - Math.abs(b.rp - S.rp)).slice(0, 4);
   const r = pool[Math.floor(R() * pool.length)];
   let o;
-  if (r.real) o = {name: r.real.name, style: r.real.style, body: r.real.body, look: r.real.look, stats: r.real.stats, real: true};
+  if (r.real) o = {name: r.real.name, style: r.real.style, body: r.real.body, look: r.real.look, stats: r.real.stats, real: true, pid: r.real.id};
   else o = makeOpp(r.ghost.seed, ghostTotal(r.rp), r.name);
   const lg = league(S.rp); o.kind = 'ranked'; o.venue = LEAGUE_VENUE[lg]; o.rp = r.rp; o.money = 300 + lg * 150; o.fame = 8 + lg * 4; o.id = 'r'; o.diff = r.rp > S.rp + 40 ? 'อันดับสูงกว่า' : r.rp < S.rp - 40 ? 'อันดับต่ำกว่า' : 'อันดับใกล้กัน';
   return o;
@@ -606,7 +606,7 @@ function homeHtml() {
   const gymNext = S.gym < 5 ? '<button class="btn" data-act="gym">อัปเกรดค่าย ระดับ ' + (S.gym + 1) + ' · ฿ ' + baht(GYM_COST[S.gym]) + '</button>' : '<span class="hint">ค่ายระดับสูงสุดแล้ว</span>';
   const guide = S.rec.w + S.rec.l === 0 ? '<section class="gcard"><h2>เริ่มต้นยังไง</h2><p class="hint">1. ไปที่ "ซ้อม" ใช้แรงซ้อมวันละ 3 ครั้งเพิ่มค่าพลัง<br>2. ไปที่ "หาคู่ชก" ท้าชกเวทีงานวัดเพื่อหาเงินและประสบการณ์ แล้วลองศึกจัดอันดับ<br>3. ก่อนชกเลือกแผน และแก้แผนได้ทุกพักยกตามที่พี่เลี้ยงแนะนำ<br>4. กลับมา "จบวัน นอนพัก" เพื่อลดความล้าและเริ่มวันใหม่</p></section>' : '';
   const to = tourOpp(), tourToday = to && S.day >= tourDay(S.tour) ? '<section class="gcard hot"><h2>วันนี้มีชก <small>' + TOURS[S.tour.t].th + '</small></h2><p class="hint">' + to.diff + ' พบ ' + esc(to.name) + ' ต้องขึ้นชกวันนี้ ไม่งั้นแพ้ผ่าน</p><div class="rowbtn"><button class="btn go" data-act="tab" data-v="fight">ไปที่สายการชก</button></div></section>' : '';
-  return (view && view.note ? '<p class="gain">' + view.note + '</p>' : '') + tourToday + guide + '<section class="gcard"><h2>' + esc(S.name) + ' <small>สาย' + styleTh(S.style) + '</small></h2>' +
+  return (view && view.note ? '<p class="gain">' + view.note + '</p>' : '') + tourToday + vsHtml() + guide + '<section class="gcard"><h2>' + esc(S.name) + ' <small>สาย' + styleTh(S.style) + '</small></h2>' +
     '<div class="kv"><span>สถิติ</span><b>ชนะ ' + S.rec.w + ' (น็อก ' + S.rec.ko + ') แพ้ ' + S.rec.l + (S.rec.d ? ' เสมอ ' + S.rec.d : '') + '</b><span>อันดับ</span><b>ที่ ' + pos + ' จาก ' + rows.length + ' · ' + LEAGUES[lg][1] + '</b><span>เข็มขัด</span><b>' + (S.belts.length ? '<span class="belts">' + S.belts.map(i => '<span class="belt">' + art('belt-' + (i + 1), 'beltimg') + BELTS[i] + '</span>').join('') + '</span>' : 'ยังไม่มี') + '</b><span>เป้าหมาย</span><b>' + goal + '</b></div>' +
     '<div class="statbox r">' + statBars(S.stats) + '</div><p class="hint">ค่าพลังเฉลี่ย ' + overall(S.stats) + ' · เพดานค่าพลังของค่ายระดับ ' + S.gym + ' คือ ' + cap() + '</p>' +
     '<div class="rowbtn">' + gymNext + '<button class="btn" data-act="hall">ทำเนียบแชมป์ · เข็มขัด ' + S.belts.length + ' ถ้วย ' + S.honors.filter(h => h.k === 'cup').length + '</button></div></section>' +
@@ -878,7 +878,7 @@ function breakHtml() {
 }
 function liveHtml() {
   if (F.live) return '<section class="gcard slim"><div class="kv"><span>' + (F.live.exh ? 'อุ่นเครื่อง' : F.clock ? 'ท้าชก · สด' : 'ท้าชก') + '</span><b>' + esc(F.live.fromName) + ' vs ' + esc(F.live.toName) + '</b><span>เวที</span><b>' + API.VENUES[F.live.venue] + '</b>' + (F.clock && F.me >= 0 ? '<span>แผนตอนนี้</span><b>' + planText(F.plan) + '</b>' : '') + (F.clock ? '<span>ผู้ชม</span><b data-viewers>' + viewers(F.live) + '</b>' : '') + '</div>' +
-    (F.loading ? '<p class="hint">กำลังขึ้นเวที…</p>' : F.clock ? '<p class="hint">ชกสดพร้อมกันทั้งสองฝั่ง ภาพและแต้มเดียวกัน · พักยก ' + LIVE_REST + ' วินาที ' + (F.me >= 0 ? 'เลือกแผนยกถัดไปได้ ' : '') + 'แล้วชกต่อเอง</p>' : '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button></div>') + '</section>';
+    (F.loading ? '<p class="hint">กำลังขึ้นเวที…</p>' : F.clock ? cheerHtml() + '<p class="hint">ชกสดพร้อมกันทั้งสองฝั่ง ภาพและแต้มเดียวกัน · พักยก ' + LIVE_REST + ' วินาที ' + (F.me >= 0 ? 'เลือกแผนยกถัดไปได้ ' : '') + 'แล้วชกต่อเอง</p>' : '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button></div>') + '</section>';
   return '<section class="gcard slim"><div class="kv"><span>แผนตอนนี้</span><b>' + planText(F.plan) + '</b><span>คู่ชก</span><b>' + esc(F.opp.name) + ' · สาย' + styleTh(F.opp.style) + '</b></div>' +
     '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button><button class="btn link" data-act="nobreak" aria-pressed="' + !!S.noBreak + '">' + (S.noBreak ? 'ไม่ต้องหยุดพักยก · แตะเพื่อหยุดแก้แผนทุกพักยก' : 'หยุดพักยกทุกยก · แตะเพื่อไม่ต้องหยุดพักยก') + '</button></div></section>';
 }
@@ -947,6 +947,7 @@ function onOver(res) {
   if (o.kind === 'ranked' || o.kind === 'tour') { const ex = 1 / (1 + Math.pow(10, (o.rp - S.rp) / 400)); r.drp = Math.round(32 * ((win ? 1 : draw ? .5 : 0) - ex)); S.rp = Math.max(600, S.rp + r.drp); if (o.kind === 'ranked') S.ranked = Math.max(0, S.ranked - 1); }
   if (o.kind === 'tour' && !win) r.money = Math.round(o.money * .3); // the purse of the round for a win; a loser's fee otherwise
   if (o.kind === 'chuek') S.chuek = 0;
+  if (o.kind === 'ranked') vsNote(o, r);
   if (o.kind === 'title') { S.title = 0; if (win) { S.belts.push(o.belt); S.honors.push({k: 'belt', i: o.belt, d: S.day, vs: o.name}); r.drp = 25; S.rp += 25; S.defendDue = S.day + DEFEND.every; } }
   const rivalLine = [];
   if (o.kind === 'rival') { S.rematch = 0; if (win) { S.rivals = S.rivals.filter(x => x.name !== o.name); rivalLine.push('ล้างตา ' + o.name + ' สำเร็จ!' + moodUp(1)); } }
@@ -978,7 +979,7 @@ function onOver(res) {
 // and answers/<responder id> {list: {<challenger id>: …}}; each player writes only his own document.
 const CH_PAID = 3; // challenge matches a day that pay (one per opponent)
 const MATCH_LEN = LIVE.matchLen * 1e3, MATCH_KEEP = LIVE.keepDays * 24 * 3600e3, CH_REWARD = LIVE.reward; // the rules of a match live in data.js (LIVE): the server reads the same ones
-const CH = {cdocs: {}, adocs: {}, on: false, live: new Set(), entered: new Set(), skew: 0, q: Promise.resolve(), beatAt: 0, fp: {}};
+const CH = {cdocs: {}, adocs: {}, on: false, live: new Set(), entered: new Set(), skew: 0, q: Promise.resolve(), beatAt: 0, fp: {}, cheered: {}, cheerAt: 0};
 // A live match is fought on the server's clock (now()), not each device's own, so both screens show the same second.
 const now = () => Date.now() + CH.skew;
 // The rest between rounds of a live match: LIVE_REST seconds in all, the first LIVE_PICK to choose the plan for the next
@@ -1046,7 +1047,9 @@ function trackMine() {
   CH.known = cur;
 }
 function chChanged() {
-  settleMatches(); trackMine();
+  settleMatches(); trackMine(); cheersIn();
+  const nw = S ? vsNews()[0] : null; // somebody has just fought my fighter: said once, at the top of the screen
+  if (nw && nw.t > (S.vsNote || 0)) { S.vsNote = nw.t; if (!F) CH.notice = {text: nw.name + ' ' + VS_RES[nw.r] + 'ในศึกจัดอันดับ · ดูที่หน้าค่าย', until: Date.now() + 15000}; loadBoard().then(() => { if (!F && !DR && !SC && tab === 'home' && !view) render(); }); }
   const typing = document.activeElement && document.activeElement.matches && document.activeElement.matches('input,select');
   if (!F && !DR && !SC && !typing && view !== 'create' && (tab === 'fight' || tab === 'rank' || tab === 'home')) render();
 }
@@ -1200,12 +1203,69 @@ function bannersHtml() {
   if (CH.notice && Date.now() < CH.notice.until) out.push('<div class="matchbar slim note" role="status"><div class="mb-h">' + esc(CH.notice.text) + '</div></div>');
   return out.join('');
 }
+// ---------- cheers during a live match ----------
+// Anyone in a live match, the two players and the people watching, can press a cheer: no typing, four of them. It goes
+// into the presser's own answers document (cheer: {key, k, t, n}) and shows on every screen that has that match on, with
+// his name, as a line floating up the side of the ring and a rise from the crowd. One every few seconds at most.
+const CHEERS = {red: ['👏', 'เชียร์มุมแดง'], blue: ['👏', 'เชียร์มุมน้ำเงิน'], fire: ['🔥', 'สุดยอด!'], wow: ['😮', 'โอ้โห!']}, CHEER_GAP = 4000, CHEER_SHOW = 25000;
+function showCheer(c, from) {
+  CH.cheered[from] = c.t;
+  const box = $('gCheers'); if (!box) return;
+  const el = document.createElement('div'); el.className = 'cheer ' + c.k; el.textContent = CHEERS[c.k][0] + ' ' + (API.cleanName(c.n) || 'ผู้ชม').slice(0, 18) + ' · ' + CHEERS[c.k][1];
+  box.appendChild(el); setTimeout(() => el.remove(), 4200); while (box.children.length > 5) box.firstChild.remove();
+  if (API.cheer) API.cheer(c.k);
+}
+function sendCheer(k) {
+  if (!F || !F.live || !F.clock || F.phase === 'result' || !CLOUD || CLOUD.dead || !own(CHEERS, k) || Date.now() - CH.cheerAt < CHEER_GAP) return false;
+  CH.cheerAt = Date.now(); const c = {key: F.live.key, k, t: now(), n: S.name};
+  showCheer(c, CLOUD.uid); // on my own screen at once
+  myDoc('answers', cur => Object.assign({}, cur, {cheer: c})).catch(() => {});
+  return true;
+}
+function cheersIn() { // the other people's cheers for the match on this screen
+  if (!F || !F.live || !F.clock || !CLOUD) return;
+  const key = F.live.key, t = now();
+  for (const from in CH.adocs) {
+    const c = from === CLOUD.uid ? null : (CH.adocs[from] || {}).cheer;
+    if (c && c.key === key && own(CHEERS, c.k) && typeof c.t === 'number' && t - c.t < CHEER_SHOW && c.t > (CH.cheered[from] || 0)) showCheer({k: c.k, t: c.t, n: String(c.n || '')}, from);
+  }
+}
+const cheerHtml = () => '<div class="cheers">' + Object.keys(CHEERS).map(k => '<button class="btn cheerb ' + k + '" data-act="cheer" data-v="' + k + '">' + CHEERS[k][0] + ' ' + CHEERS[k][1] + '</button>').join('') + '</div>';
+const chDoc = (cur, list) => Object.assign(Array.isArray(cur.vs) ? {vs: cur.vs} : {}, {name: S.name, list}); // my challenges document: the challenges, and the lines about my ranked fights (vsNote)
+// ---------- news from the ranking: somebody fought my fighter ----------
+// A ranked fight can be against another player's fighter, run by the game. The one who fought writes a line about it in
+// his own challenges document (vs: [{to, t, r, how}]), which everybody reads anyway. The owner of that fighter finds the
+// lines addressed to him: who came, how it went, and a button to challenge him back. Nothing else changes for the owner.
+const VS_KEEP = 3 * 24 * 3600e3, VS_MAX = 12, VS_RES = {w: 'ชนะนักมวยของคุณ', l: 'แพ้นักมวยของคุณ', d: 'เสมอกับนักมวยของคุณ'};
+function vsNote(o, r) {
+  if (!CLOUD || CLOUD.dead || !o.real || !o.pid) return;
+  const e = {to: o.pid, t: now(), r: r.draw ? 'd' : r.win ? 'w' : 'l', how: r.how};
+  myDoc('challenges', cur => { const t = now(), vs = (Array.isArray(cur.vs) ? cur.vs : []).filter(x => x && x.t > t - VS_KEEP).concat(e).slice(-VS_MAX); return Object.assign({}, cur, {name: S.name, vs}); }).catch(() => {});
+}
+function vsNews() { // the lines about my fighter, newest first
+  if (!CLOUD) return [];
+  const out = [], t = now();
+  for (const from in CH.cdocs) {
+    const c = CH.cdocs[from] || {}; if (from === CLOUD.uid || !Array.isArray(c.vs)) continue;
+    for (const x of c.vs) if (x && x.to === CLOUD.uid && typeof x.t === 'number' && x.t > t - VS_KEEP && x.t < t + 60e3 && own(VS_RES, x.r)) out.push({from, name: API.cleanName(c.name) || 'นักมวย', t: x.t, r: x.r, how: String(x.how || '').slice(0, 24)});
+  }
+  return out.sort((a, b) => b.t - a.t).slice(0, 6);
+}
+function vsHtml() {
+  const list = vsNews(); if (!list.length) return '';
+  const seen = S.vsSeen || 0; S.vsSeen = list[0].t; // kept with the next save
+  return '<section class="gcard"><h2>ข่าวจากเวที <small>มีคนขึ้นชกกับนักมวยของคุณ</small></h2>' + list.map(x => {
+    const b = board.find(p => p.id === x.from), on = isOnline(b);
+    return '<div class="vsrow' + (x.t > seen ? ' new' : '') + '"><div><b>' + esc(x.name) + '</b> ' + VS_RES[x.r] + ' <small>' + esc(x.how) + ' · ' + agoTh(now() - x.t) + '</small></div>' +
+      '<button class="btn" data-act="chsend" data-v="' + x.from + '" data-n="' + esc(x.name) + '" data-w="' + (on ? 'now' : 'n30') + '">' + (x.r === 'w' ? 'ท้าแก้มือ' : 'ท้าชก') + (on ? 'เดี๋ยวนี้' : '') + '</button></div>'; }).join('') +
+    '<p class="hint">ศึกจัดอันดับอาจจับคู่กับนักมวยของผู้เล่นคนอื่น โดยเกมคุมแทนเจ้าของ ผลมีผลกับคะแนนของคนที่ขึ้นชกเท่านั้น นักมวยของคุณไม่เสียอะไร ปุ่มท้าชกส่งคำท้าถึงเจ้าของตัวจริง</p></section>';
+}
 async function sendChallenge(oppId, oppName, when) {
   return myDoc('challenges', cur => {
     const list = {}, t = now(); for (const k in (cur.list || {})) if (cur.list[k] && cur.list[k].time > t - MATCH_KEEP) list[k] = cur.list[k]; // forget old ones
     list[oppId] = Object.assign({toName: oppName, time: whenTime(when), seed: 1 + Math.floor(Math.random() * 999999), venue: LEAGUE_VENUE[league(S.rp)], spec: playerSpec(), look: S.look, body: S.body, plan: cleanPlan(S.plan), created: t, hb: {t, b: BUILD}},
       when === 'now' ? {quick: true, until: t + QUICK_WAIT} : {});
-    return {name: S.name, list};
+    return chDoc(cur, list);
   });
 }
 async function answerChallenge(fromId, accept) {
@@ -1213,7 +1273,7 @@ async function answerChallenge(fromId, accept) {
   return myDoc('answers', cur => { const list = Object.assign({}, cur.list || {}); list[fromId] = {accept, at: now(), seed: e.seed, name: S.name, spec: playerSpec(), look: S.look, body: S.body, plan: cleanPlan(S.plan), hb: {t: now(), b: BUILD}}; return {list}; });
 }
 async function cancelChallenge(toId) {
-  return myDoc('challenges', cur => { if (!cur.list) return null; const list = Object.assign({}, cur.list); delete list[toId]; return {name: S.name, list}; });
+  return myDoc('challenges', cur => { if (!cur.list) return null; const list = Object.assign({}, cur.list); delete list[toId]; return chDoc(cur, list); });
 }
 function matchRow(m, mineView) {
   const t = now(), live = m.a && m.a.accept && t >= m.start && t < m.start + MATCH_LEN, over = m.a && m.a.accept && t >= m.start + MATCH_LEN;
@@ -1320,7 +1380,7 @@ function liveBreakHtml() {
   const pick = f.me < 0 ? '' : rest && !rest.locked
     ? '<div class="fld">แผนยก ' + (n + 1) + ' · เลือกได้อีก <b class="cd" data-restcd="' + (rest.end - (LIVE_REST - LIVE_PICK) * 1000) + '">' + Math.max(0, left - (LIVE_REST - LIVE_PICK)) + '</b> วินาที</div>' + quickHtml() + planPicker(f.plan) + '<p class="hint">แตะเลือกแล้วส่งให้เอง ไม่ต้องกดชกต่อ หมดเวลาแล้วระฆังดังเอง</p>'
     : '<div class="kv"><span>แผนยก ' + (n + 1) + '</span><b>' + planText(f.plan) + '</b></div><p class="hint">ปิดรับแผนแล้ว รอระฆัง</p>';
-  return '<section class="gcard"><h2>พักยก ' + n + ' · ยก ' + (n + 1) + ' เริ่มใน <b class="cd big" data-restcd="' + (rest ? rest.end : 0) + '">' + left + '</b> วินาที</h2>' + pick +
+  return '<section class="gcard"><h2>พักยก ' + n + ' · ยก ' + (n + 1) + ' เริ่มใน <b class="cd big" data-restcd="' + (rest ? rest.end : 0) + '">' + left + '</b> วินาที</h2>' + pick + (f.clock ? cheerHtml() : '') +
     '<div class="cmp"><span><b>' + esc(m.fromName) + '</b></span><b></b><span><b>' + esc(m.toName) + '</b></span>' + line('แต้มยกนี้', st[0].rp, st[1].rp) + line('แต้มรวม', Math.round(st[0].pts), Math.round(st[1].pts)) + line('เข้าเป้า', st[0].landed, st[1].landed) + line('แรงเหลือ', Math.round(st[0].st) + '%', Math.round(st[1].st) + '%') + line('พลังชีวิต', Math.round(st[0].hp) + '%', Math.round(st[1].hp) + '%') + '</div></section>';
 }
 async function liveMatchOver(res) {
@@ -1539,7 +1599,7 @@ function onClick(e) {
   else if (act === 'cancelbuy') { pending = null; render(); showMe(); }
   else if (act === 'pick') { const o = v === 'r' ? rankedOpp() : v === 'c' ? chuekOpp() : v === 't' ? titleOpp() : v === 'v' ? rivalOpp() : v === 'd' ? defenseOpp() : v === 'u' ? tourOpp() : localOpps().find(x => x.id === v); if (!o) return; F = {opp: o, seed: (S.seed + S.day * 101 + S.rec.w * 7 + S.rec.l * 13 + (v === 'r' ? 5 : v === 'c' ? 9 : v === 't' ? 11 : v === 'v' ? 15 : v === 'd' ? 17 : v === 'u' ? 19 + (S.tour ? S.tour.res.length * 3 : 0) : +v.slice(1))) >>> 0, plan: Object.assign({}, S.plan || PLAN_DEFAULT), phase: 'plan'}; setMode(false); render(); API.preview(Object.assign({fighter: o.body}, o.look), 'guard', o.venue); $('gBody').scrollIntoView({block: 'nearest'}); }
   else if (act === 'backout') { F = null; go('fight'); }
-  else if (act === 'chsend') { const b = board.find(x => x.id === v), w = el.dataset.w || ($('chWhen') || {}).value || 'n30'; if (!b || !CLOUD) return; el.disabled = true; el.textContent = 'กำลังส่ง…'; sendChallenge(v, b.name, w).then(() => { view = {note: 'ส่งคำท้าถึง ' + b.name + ' แล้ว ' + (w === 'now' ? 'รอคำตอบ ' + QUICK_WAIT / 1000 + ' วินาที รับแล้วขึ้นเวทีใน ' + READY / 1000 + ' วินาที' : 'นัดขึ้นเวที ' + hm(whenTime(w) - CH.skew))}; topBar(); render(); }).catch(() => { el.textContent = 'ส่งไม่ได้ ลองใหม่'; el.disabled = false; }); }
+  else if (act === 'chsend') { const b = board.find(x => x.id === v) || (el.dataset.n ? {name: API.cleanName(el.dataset.n)} : null), w = el.dataset.w || ($('chWhen') || {}).value || 'n30'; if (!b || !CLOUD) return; el.disabled = true; el.textContent = 'กำลังส่ง…'; sendChallenge(v, b.name, w).then(() => { view = {note: 'ส่งคำท้าถึง ' + b.name + ' แล้ว ' + (w === 'now' ? 'รอคำตอบ ' + QUICK_WAIT / 1000 + ' วินาที รับแล้วขึ้นเวทีใน ' + READY / 1000 + ' วินาที' : 'นัดขึ้นเวที ' + hm(whenTime(w) - CH.skew))}; topBar(); render(); }).catch(() => { el.textContent = 'ส่งไม่ได้ ลองใหม่'; el.disabled = false; }); }
   else if (act === 'chyes' || act === 'chno') { if (!CLOUD) return; el.disabled = true; answerChallenge(v, act === 'chyes').then(() => { topBar(); if (idle()) { view = {note: act === 'chyes' ? 'รับคำท้าแล้ว' : 'ปฏิเสธคำท้าแล้ว'}; render(); } }).catch(() => { el.disabled = false; }); }
   else if (act === 'chcancel') { if (!CLOUD) return; el.disabled = true; cancelChallenge(v).then(() => { topBar(); if (idle()) render(); }).catch(() => { el.disabled = false; }); }
   else if (act === 'chquit') quitMatch(v, el);
@@ -1559,6 +1619,7 @@ function onClick(e) {
   else if (act === 'resume') restGo();
   else if (act === 'resthold') { if (F && F.phase === 'break' && !F.live) { F.restHold = true; restStop(); render(); } }
   else if (act === 'skip') { if (F) F.skipped = true; API.skip(); }
+  else if (act === 'cheer') { if (sendCheer(v)) { document.querySelectorAll('.cheerb').forEach(b => { b.disabled = true; }); setTimeout(() => document.querySelectorAll('.cheerb').forEach(b => { b.disabled = false; }), CHEER_GAP); } }
   else if (act === 'sceneskip') { if (!SC) return; if (SC.a.id === 'run') { SC.ticks = Math.max(1, SC.ticks); SC.inZone = SC.ticks * .5; } sceneEnd(false); }
   else if (act === 'drillquit') { drillEnd(true); setMode(false); render(); showMe(); }
 }

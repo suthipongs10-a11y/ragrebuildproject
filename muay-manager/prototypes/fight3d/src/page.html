@@ -311,6 +311,12 @@ p.bad{margin:0;font-size:14px;font-weight:600;color:var(--bad)}
 #monCard .mc{display:grid;gap:10px;justify-items:center;text-align:center;max-width:340px;color:#fff;font-family:var(--body)} #monCard .mc b{font-family:var(--display);font-size:22px;color:var(--gold)} #monCard .mc p{margin:0;color:var(--muted);font-size:13.5px}
 #monCard .mc-n{font-family:var(--display);font-weight:800;font-size:96px;line-height:1}
 .gcard h2 .cd.big,.restline .cd.big{font-size:1.5em;color:var(--gold);font-variant-numeric:tabular-nums}
+#gCheers{position:absolute;left:8px;bottom:10px;z-index:6;display:flex;flex-direction:column;gap:4px;align-items:flex-start;pointer-events:none;max-width:72%}
+.cheer{font:600 13px/1.3 var(--body);color:#fff;background:rgba(10,12,18,.72);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;animation:cheerUp 4.2s ease-out forwards}
+.cheer.red{border-color:var(--red)} .cheer.blue{border-color:var(--blue)} .cheer.fire,.cheer.wow{border-color:var(--gold)}
+@keyframes cheerUp{0%{opacity:0;transform:translateY(10px)}8%{opacity:1;transform:none}80%{opacity:1}100%{opacity:0;transform:translateY(-14px)}}
+.cheers{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0} .cheers .btn{padding:8px 6px;font-size:14px} .cheerb.red{border-color:var(--red)} .cheerb.blue{border-color:var(--blue)} .cheerb:disabled{opacity:.45}
+.vsrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)} .vsrow:last-of-type{border-bottom:0} .vsrow small{display:block;color:var(--muted)} .vsrow.new b{color:var(--gold)} .vsrow .btn{flex:none}
 .restline{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 10px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg)} .restline .btn{flex:none} .fld .cd{color:var(--gold);font-variant-numeric:tabular-nums}
 .match{display:flex;flex-direction:column;gap:4px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px} .match.live{border-color:var(--red)} .match b{font-family:var(--display)} .match .cd{color:var(--gold);font-variant-numeric:tabular-nums} .livetag{background:var(--red);color:#fff;border-radius:3px;padding:0 5px;font-size:11px;font-weight:700} .gcard.hot{border-color:var(--gold)}
 .belts{display:flex;flex-wrap:wrap;gap:6px} .belt{font-size:12px;font-family:var(--display);color:var(--ink);background:var(--gold);border-radius:4px;padding:1px 8px}
@@ -348,6 +354,7 @@ p.bad{margin:0;font-size:14px;font-weight:600;color:var(--bad)}
     <canvas id="cv"></canvas>
     <div class="lb t"></div><div class="lb bt"></div>
     <div id="pops"></div>
+    <div id="gCheers" aria-live="polite"></div>
     <div id="combo" class="combo" hidden></div>
     <div id="count" hidden></div>
     <div id="banner" class="banner" hidden></div>

@@ -16,7 +16,8 @@
     "serve": "node --disable-warning=ExperimentalWarning server/server.mjs",
     "e2e:full": "node tools/e2e/full-play.mjs",
     "e2e:account": "node tools/e2e/account.mjs",
-    "report": "node --disable-warning=ExperimentalWarning tools/tester-report.mjs"
+    "report": "node --disable-warning=ExperimentalWarning tools/tester-report.mjs",
+    "e2e:social": "node tools/e2e/social.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.24.0",
