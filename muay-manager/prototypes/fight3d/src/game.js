@@ -112,7 +112,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.53', BUILD = 253;
+const VER = '2.54', BUILD = 254;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -126,6 +126,9 @@ function newSave(name, body, style, look0) {
 }
 function loadLocal() { try { const s = JSON.parse(localStorage.getItem(SAVE_KEY)); return valid(s) ? fix(s) : null; } catch (e) { return null; } }
 function fix(s) { // fields added after a save was made
+  const u = s.use && typeof s.use === 'object' ? s.use : (s.use = {}); // what the player uses (useCount below)
+  if (!Array.isArray(u.days)) u.days = []; for (const k of ['a', 'f', 'end', 'rest']) if (!u[k] || typeof u[k] !== 'object') u[k] = {};
+  if (typeof u.sess !== 'number') u.sess = 0; if (typeof u.secs !== 'number') u.secs = 0;
   if (!s.ad || typeof s.ad !== 'object' || !s.ad.n) s.ad = {d: '', n: {}}; if (typeof s.vip !== 'boolean') s.vip = false; if (typeof s.adFights !== 'number') s.adFights = 0;
   if (s.look && !s.look.skin) s.look.skin = 'natural'; if (s.look && !s.look.band) s.look.band = 'none'; if (s.look && !s.look.beard) s.look.beard = 'none';
   const sp = STYLES.find(x => x.id === s.style).sp;
@@ -168,8 +171,17 @@ function unlockSpecials() { // more fame opens more signature moves to choose fr
   return '';
 }
 function valid(s) { return s && s.v === 1 && typeof s.name === 'string' && START[s.style] && API.ROSTER[s.body] && s.stats && KEYS.every(k => typeof s.stats[k] === 'number'); }
+// What the player uses, counted in his save: which buttons, which kinds of training and fight, whether fights are watched
+// to the end, how round breaks end, how long the game is open and on which days. Read by tools/tester-report.mjs.
+// No names, nothing typed, nothing about the device: counts only.
+let useSecs = 0;
+const realDay = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
+function useCount(group, key) { if (!S || !S.use) return; const g = S.use[group]; if (!g || (!own(g, key) && Object.keys(g).length >= 160)) return; g[key] = (g[key] || 0) + 1; }
+function useOpen() { if (!S || !S.use) return; const u = S.use, d = realDay(); u.sess++; if (!u.first) u.first = d; if (u.days[u.days.length - 1] !== d) u.days = u.days.concat(d).slice(-60); }
+setInterval(() => { if (S && !document.hidden) useSecs += 5; }, 5000);
 let cloudTimer = 0, cloudBusy = false, cloudDirty = false;
 function save() {
+  if (S.use) { S.use.secs += useSecs; useSecs = 0; const d = realDay(); if (S.use.days[S.use.days.length - 1] !== d) S.use.days = S.use.days.concat(d).slice(-60); }
   S.updatedAt = Date.now();
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage blocked: progress lasts for this visit only */ }
   if (CLOUD && !CLOUD.dead) { cloudDirty = true; clearTimeout(cloudTimer); cloudTimer = setTimeout(pushCloud, 2500); }
@@ -207,8 +219,8 @@ async function cloudInit() {
     if (rt.site) { setInterval(checkBuild, 120000); document.addEventListener('visibilitychange', () => { if (!document.hidden) checkBuild(); }); checkBuild(); }
     document.addEventListener('visibilitychange', () => presence(document.hidden)); window.addEventListener('pagehide', () => presence(true));
     let snap; try { snap = await db.collection('data/users/' + uid).doc('save').get(); } catch (e) { if (keyDead(e)) return; throw e; }
-    const c = snap.exists ? snap.data() : null;
-    if (valid(c) && (!S || (c.updatedAt || 0) > (S.updatedAt || 0))) { S = fix(JSON.parse(JSON.stringify(c))); /* a copy: stored data can come back locked, and the save grows new fields */ try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* fine */ } if (!F) go('home'); }
+    const c = snap.exists ? snap.data() : null, had = !!S;
+    if (valid(c) && (!S || (c.updatedAt || 0) > (S.updatedAt || 0))) { S = fix(JSON.parse(JSON.stringify(c))); /* a copy: stored data can come back locked, and the save grows new fields */ try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* fine */ } if (!had) useOpen(); if (!F) go('home'); }
     else if (S) save();
     await loadBoard(); chSubscribe();
     try { const w = new URLSearchParams(location.search).get('watch'); if (w) { CH.follow = w.slice(0, 200); history.replaceState(null, '', location.pathname); } } catch (e) { /* no link */ }
@@ -898,7 +910,7 @@ function prizeFor(o) {
 async function startFight() {
   F.plans = [F.plan, F.plan, F.plan].map(p => Object.assign({}, p)); F.phase = 'live'; S.plan = Object.assign({}, F.plan);
   setMode(true); render();
-  const o = F.opp;
+  const o = F.opp; useCount('f', o.kind || 'local');
   await API.startFight({venue: o.venue, rules: VENUE_RULES[o.venue] || null, seed: F.seed, specs: [playerSpec(), {name: o.name, first: o.name, style: o.style, stats: o.stats, skin: 1, spLv: oppSpLv(o.style, league(S.rp), o.kind === 'title')}], plans: plansFor(), prize: prizeFor(o),
     looks: [Object.assign({name: S.name, fighter: S.body}, S.look), Object.assign({name: o.name, fighter: o.body}, o.look)]});
 }
@@ -915,16 +927,18 @@ let restTimer = 0;
 function restStop() { clearInterval(restTimer); restTimer = 0; }
 function restTick() {
   if (!F || F.live || F.phase !== 'break' || F.restHold) { restStop(); return; }
-  if (F.restEnd - now() <= 0) { restGo(); return; }
+  if (F.restEnd - now() <= 0) { restGo('auto'); return; }
   fillCountdowns();
 }
-function restGo() { // on with the fight: the plan on screen is the plan for the rounds left
+function restGo(how) { // on with the fight: the plan on screen is the plan for the rounds left
   restStop(); if (!F || F.live || F.phase !== 'break') return;
+  useCount('rest', how || (F.restHold ? 'held' : 'go')); // pressed on, pressed on after "wait", or the count ran out
   for (let i = F.round; i < 3; i++) F.plans[i] = Object.assign({}, F.plan);
   API.replan(plansFor()); F.phase = 'live'; render(); API.resume(); $('stage').scrollIntoView({block: 'nearest', behavior: 'smooth'});
 }
 function onOver(res) {
   if (F && F.live) { liveMatchOver(res); return; }
+  useCount('end', F.skipped ? 'skip' : 'full');
   const win = res.w === 0, o = F.opp, ko = res.how !== 'คะแนน', lgBefore = league(S.rp);
   const r = {win, how: res.how === 'คะแนน' ? 'คะแนน' : res.how + ' ยก ' + res.round, detail: (res.move ? 'ปิดเกมด้วย' + MOVES[res.move].th + ' · ' : '') + 'แต้ม ' + res.pts[0] + ' ต่อ ' + res.pts[1] + (res.how === 'คะแนน' && res.pts[0] === res.pts[1] ? ' (เท่ากัน ตัดสินจากความเสียหายที่ทำได้)' : '') + ' · ' + 'เข้าเป้า ' + res.landed[0] + ' ต่อ ' + res.landed[1]};
   r.money = win ? o.money + (ko ? 80 : 0) : Math.round(o.money * .25); r.fame = win ? o.fame + (ko ? 2 : 0) : 1;
@@ -1250,6 +1264,7 @@ const stillOn = fr => !fr.ok || !!(fr.m && fr.m.a && fr.m.a.accept); // unknown 
 async function watchMatch(key, given) {
   let m = given || matches().find(x => x.key === key); if (!m || !m.a || !m.a.accept) return;
   if (!given) CH.entered.add(m.key);
+  useCount('f', m.exh ? 'exhibition' : sideOf(m) >= 0 ? 'challenge' : 'spectator');
   const real = !given && !!CLOUD, hold = F = {opp: {name: '', style: 'tech'}, live: m, me: -1, phase: 'live', plan: cleanPlan(m.e.plan), loading: true};
   if (real) { setMode(true); render(); const fr = await freshMatch(m); if (F !== hold) return; if (!stillOn(fr)) { callOff('นัดชกนี้ถูกยกเลิกแล้ว (มีฝ่ายถอนตัว)'); return; } m = fr.m || m; }
   const cfg = matchCfg(m), me = real ? sideOf(m) : -1, start = m.start, clock = real && now() < start + MATCH_LEN;
@@ -1452,9 +1467,11 @@ function trainResult(q) {
   }
   S.slots--; mini = null; const done = mission('train'); view = {msg: msg + (done ? ' · ' + done : '')}; save(); render();
 }
+const USE_BY_V = {tab: 1, train: 1, pick: 1, quick: 1, body: 1, style: 1}; // counted per choice, not just per press
 function onClick(e) {
   const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
   const act = el.dataset.act, v = el.dataset.v;
+  useCount('a', USE_BY_V[act] ? act + ':' + v : act === 'plan' ? 'plan:' + el.dataset.g + '=' + v : act === 'look' || act === 'dlook' ? act + ':' + el.dataset.f : act);
   if (act === 'tourjoin') { const t = +v, T = TOURS[t]; if (!tourOpen(t) || (S.tour && S.tour.champ == null && !S.tour.out)) return; if (S.money < T.fee) { view = {msg: 'ค่าสมัครไม่พอ ต้องมี ฿ ' + baht(T.fee)}; render(); return; } S.money -= T.fee; S.tour = tourMake(t); save(); render(); return; }
   if (act === 'tourclose') { S.tour = null; save(); render(); return; }
   if (act === 'tourwatch') { const [r, k] = v.split(':').map(Number), tr = S.tour, x = tr && tr.res[r] && tr.res[r][k]; if (!x) return; const A = tr.ents[x.a], B = tr.ents[x.b], T = TOURS[tr.t];
@@ -1473,7 +1490,7 @@ function onClick(e) {
   if (act === 'body') { draft.body = v; if (noBeard(v)) draft.look.beard = 'none'; draft.name = $('gName').value; renderCreate(); previewDraft(); }
   else if (act === 'dlook') { if (!own(LOOK0, el.dataset.f)) return; draft.look[el.dataset.f] = v; draft.name = $('gName').value; renderCreate(); previewDraft(...faceView(el.dataset.f)); }
   else if (act === 'style') { draft.style = v; draft.name = $('gName').value; renderCreate(); }
-  else if (act === 'create') { const name = API.cleanName($('gName').value); if (name.length < 2) { const m = $('gCreateMsg'), n = $('gName'); m.textContent = 'ใส่ชื่อนักมวยก่อน (อย่างน้อย 2 ตัวอักษร) ที่ช่องด้านบน'; m.className = 'bad'; n.classList.add('bad'); n.scrollIntoView({block: 'center', behavior: 'smooth'}); n.focus({preventScroll: true}); n.addEventListener('input', () => { n.classList.remove('bad'); m.textContent = ''; }, {once: true}); return; } S = newSave(name, draft.body, draft.style, draft.look); save(); go('home'); vipSync(); }
+  else if (act === 'create') { const name = API.cleanName($('gName').value); if (name.length < 2) { const m = $('gCreateMsg'), n = $('gName'); m.textContent = 'ใส่ชื่อนักมวยก่อน (อย่างน้อย 2 ตัวอักษร) ที่ช่องด้านบน'; m.className = 'bad'; n.classList.add('bad'); n.scrollIntoView({block: 'center', behavior: 'smooth'}); n.focus({preventScroll: true}); n.addEventListener('input', () => { n.classList.remove('bad'); m.textContent = ''; }, {once: true}); return; } S = fix(newSave(name, draft.body, draft.style, draft.look)); useOpen(); save(); go('home'); vipSync(); }
   else if (act === 'tab') go(v);
   else if (act === 'home') { const live = F && F.live; F = null; API.stop(); CH.seenAt = 0; go('home'); if (CLOUD) loadBoard(); if (!live && !S.vip && ++S.adFights % 3 === 0) MON.interstitial(); } // an advert between screens every third fight of his own, back at the camp (never around a match between players)
   else if (act === 'adr') adReward(v, el);
@@ -1538,7 +1555,7 @@ function onClick(e) {
   else if (act === 'nobreak') { S.noBreak = !S.noBreak; save(); render(); }
   else if (act === 'resume') restGo();
   else if (act === 'resthold') { if (F && F.phase === 'break' && !F.live) { F.restHold = true; restStop(); render(); } }
-  else if (act === 'skip') API.skip();
+  else if (act === 'skip') { if (F) F.skipped = true; API.skip(); }
   else if (act === 'sceneskip') { if (!SC) return; if (SC.a.id === 'run') { SC.ticks = Math.max(1, SC.ticks); SC.inZone = SC.ticks * .5; } sceneEnd(false); }
   else if (act === 'drillquit') { drillEnd(true); setMode(false); render(); showMe(); }
 }
@@ -1561,6 +1578,6 @@ export function bootGame(api) {
   window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress, uid: () => (CLOUD ? CLOUD.uid : null), match: applyMatch, fight: () => F, rest: sec => { if (F && F.phase === 'break') F.restEnd = now() + sec * 1000; }}; // for automated checks
   MON.price().then(pr => { monPrice = pr; if (pr && S && !F && !DR && !SC && tab === 'home' && view !== 'create') render(); }); if (S) vipSync(); // the store's price, and what it says is owned
   S = loadLocal(); setMode(false);
-  if (S) go('home'); else { view = 'create'; render(); previewDraft(); }
+  if (S) { useOpen(); go('home'); } else { view = 'create'; render(); previewDraft(); }
   cloudInit();
 }

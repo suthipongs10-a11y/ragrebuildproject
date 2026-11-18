@@ -240,6 +240,16 @@ if (await ev('!!GAME.uid()')) {
   await tab('fight'); ok(await ev(`document.getElementById('gBody').innerText.includes('วันนี้เหลือ 0')`), 'the challenge card says none are left today'); await sane('after the challenge results');
 } else ok(false, 'the online store is connected (needed for the challenge reward check)');
 
+// ---- 7c. what the player used is counted in his save (tools/tester-report.mjs reads it)
+await tab('home'); await click('[data-act=sleep]', 900); // a save, so the seconds played are written
+{ const u = await ev('JSON.parse(JSON.stringify(GAME.save().use))');
+  ok(u.sess === 1 && u.days.length === 1 && /^\d{4}-\d\d-\d\d$/.test(u.days[0]) && u.first === u.days[0], 'usage: one visit, one day', JSON.stringify({sess: u.sess, days: u.days}));
+  ok(u.secs > 60 && u.secs < 3600, 'usage: the time played is counted', u.secs + ' s');
+  ok(['bag', 'banana', 'dummy', 'rope', 'spar', 'run', 'fun', 'rest'].every(k => u.a['train:' + k] >= 1) && u.a['tab:fight'] > 5 && u.a['plan:ag=attack'] >= 1 && u.a['look:beard'] >= 1, 'usage: presses are counted by action and choice', Object.keys(u.a).length + ' kinds');
+  ok(u.f.local >= 3 && u.f.ranked >= 1 && u.f.chuek === 1 && u.f.rival === 1 && u.f.title === 1 && u.f.defense === 2 && u.f.tour === 3 && u.f.exhibition >= 1, 'usage: fights are counted by kind', JSON.stringify(u.f));
+  ok(u.end.skip >= 10 && u.rest.go >= 1 && u.rest.auto === 1 && u.rest.held === 1, 'usage: skipped fights and the three ways a rest ends', JSON.stringify(u.end) + ' ' + JSON.stringify(u.rest));
+  ok(Object.values(u.a).concat(Object.values(u.f), Object.values(u.end), Object.values(u.rest)).every(n => Number.isInteger(n) && n > 0), 'usage: every count is a whole number'); }
+
 // ---- 8. starting over
 await tab('home'); await click('[data-act=reset]', 400); await click('[data-act=reset]', 1200);
 ok(await has('#gName') && await ev('GAME.save() === null'), 'starting over returns to the creation screen');

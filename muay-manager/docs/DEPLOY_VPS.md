@@ -194,6 +194,17 @@ SITE=https://muay.example.com/ node tools/e2e/account.mjs
 
 (`sqlite3` ลงด้วย `sudo apt-get install -y sqlite3` ใช้ดูข้อมูลเท่านั้น เกมไม่ต้องใช้)
 
+### รายงานผู้ทดสอบ
+
+สรุปว่าใครเล่นบ้าง เล่นนานแค่ไหน กลับมาเล่นกี่วัน ใช้การซ้อมและการชกแบบไหนมากที่สุด ฟีเจอร์ไหนยังไม่มีใครกด
+คนหยุดเล่นที่วันไหน ข้อความแจ้งปัญหา และ error จากเครื่องผู้เล่น (ตัวเลขการใช้งานมีตั้งแต่รุ่น 2.54)
+
+```bash
+cd /srv/muay/repo/muay-manager/prototypes/fight3d && sudo -u muay node --disable-warning=ExperimentalWarning tools/tester-report.mjs --db /srv/muay/data/muay.db
+```
+
+เติม `--out /tmp/report.md` เพื่อเก็บเป็นไฟล์ • ถ้าเกมอยู่บน Cloudflare ให้บอกผู้ช่วยว่า "ขอรายงานผู้ทดสอบ" (รันด้วย `--remote` จากเซสชันคลาวด์)
+
 ## 6. ข้อมูลและการสำรอง
 
 - ข้อมูลทั้งหมดอยู่ในไฟล์ `/srv/muay/data/muay.db` (มีไฟล์คู่ `-wal` `-shm` ขณะรัน)
