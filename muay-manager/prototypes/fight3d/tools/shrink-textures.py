@@ -2,7 +2,7 @@
 # Usage: python3 tools/shrink-textures.py     (needs Pillow)
 import glob, io, json, struct
 from PIL import Image
-for path in sorted(glob.glob('assets/fighter-?.glb')):
+for path in sorted(glob.glob('assets/fighter-?.glb')) + sorted(glob.glob('assets/cardgirl.glb')):  # the fighters, and the ring-card girl
     b = open(path, 'rb').read(); jl = struct.unpack('<I', b[12:16])[0]
     g = json.loads(b[20:20 + jl]); bin_ = b[20 + jl + 8:]
     v = g['bufferViews'][g['images'][0]['bufferView']]; off = v.get('byteOffset', 0)

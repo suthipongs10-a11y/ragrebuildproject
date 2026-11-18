@@ -18,7 +18,9 @@ writeFileSync('dist/muay-fight-lab.html', html);
 // Per model: glTF structure, gzip-compressed geometry (tangents dropped, weights, normals and texture coordinates
 // quantised) and a 1280px texture: about 1.1 MB each, so twelve bodies fit under the page limit.
 const models = [];
-for (const name of readdirSync('assets').filter(f => /^fighter-[a-z]\.glb$/.test(f)).map(f => f.slice(0, -4)).sort()) {
+// the fighters (model-a … model-l), and the ring-card girl (model-girl)
+const modelId = name => (name === 'cardgirl' ? 'girl' : name.slice(-1));
+for (const name of readdirSync('assets').filter(f => /^(fighter-[a-z]|cardgirl)\.glb$/.test(f)).map(f => f.slice(0, -4)).sort()) {
   if (!existsSync(`assets/${name}-1k.jpg`)) continue;
   const glb = readFileSync(`assets/${name}.glb`), jsonLen = glb.readUInt32LE(12);
   const g = JSON.parse(glb.subarray(20, 20 + jsonLen).toString('utf8')), bin = glb.subarray(20 + jsonLen + 8);
@@ -65,7 +67,7 @@ for (const name of readdirSync('assets').filter(f => /^fighter-[a-z]\.glb$/.test
   g.buffers = [{byteLength: packed.length}];
   const data = {gltf: g, gz: gzipSync(packed, {level: 9}).toString('base64'), texture: 'data:image/jpeg;base64,' + readFileSync(`assets/${name}-1k.jpg`).toString('base64')};
   const text = JSON.stringify(data).replace(/<\//g, '<\\/');
-  models.push(`<script type="application/json" id="model-${name.slice(-1)}">${text}</script>`);
+  models.push(`<script type="application/json" id="model-${modelId(name)}">${text}</script>`);
   console.log(name, (text.length / 1024 / 1024).toFixed(2) + ' MB');
 }
 // Commentary, referee's count and crowd shouts (tools/tts-commentary.mjs): base64 MP3, grouped by line, in order

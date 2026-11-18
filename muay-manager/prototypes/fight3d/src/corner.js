@@ -4,6 +4,8 @@
 // slowly over the ring and the crowd, then comes back down to a corner. Then he gets up and walks back out for the
 // bell. Presentation only: main.js holds the fight at the pause and picks it up from there when this is over. Runs on
 // its own clock, like the ceremony.
+// In the bigger halls a ring-card girl (C.girl) walks a lap of the ring while they sit, holding the number of the round
+// to come over her head, and leaves by the corner she came in from; when the fighters get up early she leaves at once.
 import { FLAT, NP, IDX } from './poses.js';
 const THREE = globalThis.THREE;
 
@@ -72,8 +74,41 @@ export function buildCorner(scene, camera, getFx) {
 
   // F: the two fighters; men: four cornermen (the water and towel man for red and blue, then the masseur for each) or
   // null; ring: half size at the ropes; place(i, P) fills P with fighter i's pose at the pause and returns {x, z, yaw}
+  // ---- the ring-card girl: main.js hands over her body and her card (or null where there is none)
+  let girl = null, card = null, girlSaid = false; const GQ = new Float32Array(NP), gp = {x: 0, z: 0, on: false}, g0 = {x: 0, z: 0}, g1 = {x: 0, z: 0};
+  const G = {in: 3.9, lap0: 5.2, lap1: 14.2, out: 15.6, rx: 1.55, rz: 1.25, flee: 1.5, pace: .98}; // seconds on the scene's clock; the lap's half-widths (m); metres a second
+  const set3 = (P, i, x, y, z) => { P[i] = x; P[i + 1] = y; P[i + 2] = z; };
+  C.girl = function (actor, cardObj) { if (girl && girl !== actor) girl.root.visible = false; if (card && card !== cardObj) card.visible = false; girl = actor || null; card = cardObj || null; girlSaid = false; if (girl) girl.root.visible = false; if (card) card.visible = false; };
+  // where she is s seconds in, on the whole walk: in from the neutral corner on the camera's side, once round, back to it
+  function girlAt(s, out) {
+    const cx = R - .8, cz = R - .8, a0 = Math.PI / 4, ex = Math.cos(a0) * G.rx, ez = Math.sin(a0) * G.rz;
+    if (s < G.lap0) { const k = sm(G.in, G.lap0, s); out.x = cx + (ex - cx) * k; out.z = cz + (ez - cz) * k; }
+    else if (s < G.lap1) { const a = a0 + (s - G.lap0) / (G.lap1 - G.lap0) * Math.PI * 2; out.x = Math.cos(a) * G.rx; out.z = Math.sin(a) * G.rz; }
+    else { const k = sm(G.lap1, G.out, s); out.x = ex + (cx - ex) * k; out.z = ez + (cz - ez) * k; }
+    return out;
+  }
+  function girlMove(s, U) {
+    if (!girl) return;
+    const on = s >= G.in && s < Math.min(G.out, U + G.flee); girl.root.visible = on; card.visible = on; gp.on = on;
+    if (!on) { if (s < G.in) girlSaid = false; return; }
+    const cx = R - .8, cz = R - .8, path = (t, out) => { // the walk, cut short when the fighters are told to stand: straight back to her corner
+      if (t <= U) return girlAt(t, out); girlAt(U, out); const k = sm(0, G.flee, t - U); out.x += (cx - out.x) * k; out.z += (cz - out.z) * k; return out; };
+    path(s, gp); path(s - .22, g0); path(s + .22, g1); // she faces the way she is going, turning through the bends
+    const dx = g1.x - g0.x, dz = g1.z - g0.z, yaw = dx * dx + dz * dz > 1e-7 ? yawOf(dx, dz) : yawOf(-1, -1), d = (s - G.in) * G.pace;
+    // the walk: one foot in front of the other, the hips swinging a little, both hands up with the card
+    const ph = d / .62 * Math.PI, sn = Math.sin(ph), cs = Math.cos(ph);
+    GQ.set(FLAT.cerStand);
+    set3(GQ, IDX.fL, .2 * sn, Math.max(0, cs) * .07, -.06); set3(GQ, IDX.fR, -.2 * sn, Math.max(0, -cs) * .07, .06);
+    GQ[IDX.hip + 1] += -.012 + Math.abs(cs) * .014; GQ[IDX.side] = .05 * sn; GQ[IDX.twist] = -.06 * sn;
+    set3(GQ, IDX.hL, .05, 1.97, -.2); set3(GQ, IDX.hR, .05, 1.97, .2); set3(GQ, IDX.eL, .35, -.2, -1); set3(GQ, IDX.eR, .35, -.2, 1);
+    GQ[IDX.hdP] = -.04; GQ[IDX.hdY] = .32 * Math.sin(s * .9); // a look round at the crowd
+    girl.update(GQ, 0, gp.x, gp.z, yaw);
+    girl.world('haL', a3).add(girl.world('haR', b3)).multiplyScalar(.5);
+    card.position.set(a3.x, a3.y + .17, a3.z); card.rotation.y = yaw + Math.PI / 2; // the card faces the way she does
+    if (!girlSaid && s >= G.lap0) { girlSaid = true; if (C.onGirl) C.onGirl(); }
+  }
   C.start = function (fighters, cornermen, ring, placeAt) {
-    F = fighters; men = cornermen; R = ring; place = placeAt; C.on = true; C.t = 0; C.upAfter = null; C.upT = null; C.pin = false;
+    F = fighters; men = cornermen; R = ring; place = placeAt; C.on = true; C.t = 0; C.upAfter = null; C.upT = null; C.pin = false; girlSaid = false;
     S = [0, 1].map(i => { const P = Q[i]; const at = place(i, P); return spots(i, {x: at.x, z: at.z, yaw: at.yaw, P}); });
     // the stool's top sits under the seated pelvis
     const h = Math.max(.3, FLAT.sit[IDX.hip + 1] - .11);
@@ -87,6 +122,7 @@ export function buildCorner(scene, camera, getFx) {
   C.stop = function () {
     C.on = false; stools.forEach(m => { m.visible = false; }); bottles.forEach(m => { m.visible = false; }); towels.forEach(m => { m.visible = false; });
     if (men) men.forEach(m => { m.root.visible = false; });
+    if (girl) girl.root.visible = false; if (card) card.visible = false; gp.on = false;
   };
 
   C.update = function (dt, tJump) {
@@ -167,6 +203,7 @@ export function buildCorner(scene, camera, getFx) {
       Pm[IDX.hdP] += .2 * kn;
       M2.update(Pm, 0, c2.x, c2.z, c2.yaw);
     }
+    girlMove(s, U);
     shoot(s, U, ws);
     return s < U + UP + BACK;
   };
@@ -180,7 +217,8 @@ export function buildCorner(scene, camera, getFx) {
     else if (s < U) {
       if (ws < 1.9) { close = 0; into = (ws + .3) / 2.2; }
       else if (ws >= 4.3) { const q = (ws - 4.3) / 2.4, k = Math.floor(q) % 4; into = q - Math.floor(q); close = k === 0 ? 1 : k === 2 ? 0 : -1; }
-      if (close < 0) { const a = .35 + s * .09, r = 8.4; px = Math.sin(a) * r; py = 5.4; pz = Math.cos(a) * r; lx = 0; ly = .2; lz = 0; fov = 44; }
+      if (close < 0 && gp.on && ws >= 1.9 && ws < 4.3) { px = -1.75; py = 1.5; pz = R + .42; lx = gp.x; ly = 1.4; lz = gp.z; fov = 35; } // the ring-card girl coming along the camera's side of the ring, seen from ahead of her
+      else if (close < 0) { const a = .35 + s * .09, r = 8.4; px = Math.sin(a) * r; py = 5.4; pz = Math.cos(a) * r; lx = 0; ly = .2; lz = 0; fov = 44; }
       else {
         const sp = S[close], a = -.85, cx = sp.dx * Math.cos(a) - sp.dz * Math.sin(a), cz = sp.dx * Math.sin(a) + sp.dz * Math.cos(a), D = 2.3 - .25 * sm(0, 1, into); // on his left, the cornermen on his right and in front
         px = sp.stool.x + cx * D; py = 1.45; pz = sp.stool.z + cz * D; lx = sp.stool.x + sp.dx * .3 + sp.rx * .1; ly = .82; lz = sp.stool.z + sp.dz * .3 + sp.rz * .1; fov = 38;

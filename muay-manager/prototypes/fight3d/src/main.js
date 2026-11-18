@@ -98,11 +98,36 @@ function loadRef() {
 // Between rounds (corner.js): the fighters sit in their corners and two cornermen each, the referee's body in a corner
 // shirt, give them water, wipe them down and rub oil into their legs. Without the models the fight simply waits at the break as before.
 let menF = null;
+// The ring-card girl of the bigger halls (corner.js walks her): her own body, loaded when a fight is to be held in one of
+// them, and the card with the number of the round to come.
+const GIRL_VENUES = {stadium: 1, champ: 1};
+let GIRLM = null, girlF = null, girlCard = null, girlBusy = false;
+function loadGirl() {
+  if (GIRLM || girlBusy || !document.getElementById('model-girl')) return; girlBusy = true;
+  loadModel('girl', 'blue').then(m => { GIRLM = m; }).catch(e => console.warn('ring-card girl not loaded:', e.message)).then(() => { girlBusy = false; });
+}
+function buildRoundCard() { // readable from both sides
+  const g = new THREE.Group(), cv = document.createElement('canvas'); cv.width = 256; cv.height = 192;
+  const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+  const mat = new THREE.MeshBasicMaterial({map: tex}), geo = new THREE.PlaneGeometry(.5, .375), f = new THREE.Mesh(geo, mat), b = new THREE.Mesh(geo, mat);
+  f.position.z = .005; b.position.z = -.005; b.rotation.y = Math.PI; g.add(f, b, new THREE.Mesh(new THREE.BoxGeometry(.52, .395, .008), new THREE.MeshStandardMaterial({color: 0x15151a, roughness: .6})));
+  g.visible = false;
+  return {obj: g, set(n) {
+    const c = cv.getContext('2d'); c.fillStyle = '#101116'; c.fillRect(0, 0, 256, 192); c.strokeStyle = '#f2b83a'; c.lineWidth = 8; c.strokeRect(7, 7, 242, 178);
+    c.textAlign = 'center'; c.fillStyle = '#f2b83a'; c.font = "700 40px 'Kanit', 'IBM Plex Sans Thai', sans-serif"; c.fillText('ยก', 128, 54);
+    c.fillStyle = '#ffffff'; c.font = "800 118px 'Kanit', 'IBM Plex Sans Thai', sans-serif"; c.fillText(String(n), 128, 164); tex.needsUpdate = true; }};
+}
 function startCorner() {
   if (!fighters[0] || !fighters[0].isModel || !fighters[1].isModel) return false;
   fighters.forEach(f => f.setMongkol(false));
   if (!menF && REFM) menF = [0, 1, 0, 1].map(i => { const m = new ModelFighter(0, REFM, {corner: i, head: 'none'}); m.handK = .55; m.root.visible = false; scene.add(m.root); return m; }); // water and towel, then oil, per corner
   cor.start(fighters, menF, RING_R, (i, P) => { TL.sample(i, playT, P); sideSteps(i, playT, P); const p = placeOf(i, playT); return {x: p.x, z: p.z, yaw: (fighters[i].dir > 0 ? 0 : Math.PI) - P[IDX.spin] + p.th}; });
+  if (GIRLM && GIRL_VENUES[OPT.venue]) { // the round to come: the one after the rest the fight is held at
+    if (!girlF) { girlF = new ModelFighter(0, GIRLM, null); girlF.root.scale.setScalar(.95); girlF.root.visible = false; scene.add(girlF.root); girlCard = buildRoundCard(); scene.add(girlCard.obj); }
+    const rb = marks.rests.filter(r => r.round).sort((a, b) => Math.abs(a.pauseAt - playT) - Math.abs(b.pauseAt - playT))[0];
+    girlCard.set(rb ? rb.round.n + 1 : 2); cor.girl(girlF, girlCard.obj);
+    cor.onGirl = () => { hype = Math.max(hype, .55); audio.roar(.55); audio.shout(.5); };
+  } else cor.girl(null);
   return true;
 }
 function stopCorner() { if (cor.on) { cor.stop(); cam.id = null; } }
@@ -160,6 +185,12 @@ const renderer = new THREE.WebGLRenderer({canvas, antialias: true, powerPreferen
 renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
+// The stage is drawn only while some of it is on the screen. With the page scrolled down to the plan card (a round break)
+// nobody sees it, and a slow graphics chip that is still sent a picture every frame falls further and further behind: when
+// the stage comes back, the pictures it still owes are drawn first and the fight stands still for that long.
+let stageSeen = true;
+if (window.IntersectionObserver) new IntersectionObserver(es => { stageSeen = es[es.length - 1].isIntersecting; }).observe(canvas);
+function draw() { if (stageSeen) renderer.render(scene, camera); }
 const camera = new THREE.PerspectiveCamera(30, 1.5, .1, 120);
 const audio = buildAudio(), voice = buildCommentary(audio, MOVES), cer = buildCeremony(camera), cor = buildCorner(scene, camera, () => fx);
 let cerDone = false, cerAt = null, prizes = null; // cerAt: hold the ceremony at this time (checks); prizes: the belt and the cup (prize.js)
@@ -718,7 +749,7 @@ function frame(ts) {
     camera.position.set(.3 + (Math.random() - .5) * sh, 1.3 + (Math.random() - .5) * sh, far * (1 - drill.kick)); camera.lookAt(.1, 1.02, 0);
     arena.keyAt(0); arena.fadeRopes(camera.position, 0);
     audio.update(dt, 0, false, 1, 0, 'off'); // the ring music and the pipe drone stop away from the fight
-    arena.update(realT, 0, dt); fx.update(dt, camera); renderer.render(scene, camera); movePops(dt); return;
+    arena.update(realT, 0, dt); fx.update(dt, camera); draw(); movePops(dt); return;
   }
   if (previewF && W) { // one fighter, slow orbit
     audio.update(dt, 0, false, 1, 0, 'off');
@@ -737,16 +768,16 @@ function frame(ts) {
     }
     const Z = window.LAB.zoom; if (Z) { camera.position.set((Z.x || 0) + Math.sin(Z.az) * Z.d, Z.y, (Z.z || 0) + Math.cos(Z.az) * Z.d); camera.lookAt(Z.x || 0, Z.y, Z.z || 0); } // for checks: LAB.zoom = {az, d, y} holds the camera on the face
     arena.keyAt(0); arena.fadeRopes(camera.position, .25);
-    arena.update(realT, .05, dt); fx.update(dt, camera); renderer.render(scene, camera); return;
+    arena.update(realT, .05, dt); fx.update(dt, camera); draw(); return;
   }
-  if (!W || !TL || galleryOn) { if (galleryOn) renderer.render(scene, camera); return; }
+  if (!W || !TL || galleryOn) { if (galleryOn) draw(); return; }
   if (cer.on) { // the ceremony runs on its own clock; the fight stays at its last moment
     const going = cer.update(dt, cerAt); if (arena) arena.ropeUpdate(dt); // the ropes settle
     if (!going && !cerDone) { cerDone = true; finish(); } // the result comes up; the three stay in the ring behind it
     hype = Math.max(.3, hype - dt * .15);
     arena.keyAt(0); arena.fadeRopes(camera.position, cer.keepRopes ? 'all' : 1); arena.update(realT, hype, dt); fx.update(dt, camera);
     audio.update(dt, hype, true, TL.clock(playT).round, 1, 'cer'); voice.tick(audio.time());
-    renderer.render(scene, camera); hud(dt); return;
+    draw(); hud(dt); return;
   }
   followClock();
   if (cor.on) { // between rounds in the corners; the fight waits at the pause
@@ -757,7 +788,7 @@ function frame(ts) {
     arena.keyAt(0); arena.fadeRopes(camera.position, 1); arena.update(realT, hype, dt); fx.update(dt, camera);
     audio.update(dt, hype, false, TL.clock(playT).round, 1, 'rest');
     { const a = TL.val(0, playT, 8), b = TL.val(1, playT, 8); voice.corner(cor.t - CORNER_SEAT, cor.upAfter != null ? cor.upAfter - cor.t : null, audio.time(), {lead: a === b ? -1 : a > b ? 0 : 1, margin: Math.abs(a - b)}); } // the commentary follows the corner scene
-    renderer.render(scene, camera); hud(dt); return;
+    draw(); hud(dt); return;
   }
   const adv = advance(dt);
   shake *= Math.pow(.0006, dt); zoomKick *= Math.pow(.002, dt);
@@ -780,7 +811,7 @@ function frame(ts) {
   if (phase === 'intro' && !introSaid && playT > .15) { introSaid = true; voice.intro(audio.time()); }
   if (phase === 'fight') { const a = TL.val(0, playT, 8), b = TL.val(1, playT, 8); voice.update(audio.time(), {fighting: true, pace: TL.pace(playT), lead: a === b ? -1 : a > b ? 0 : 1, margin: Math.abs(a - b), clock: ck.clock}); }
   else voice.tick(audio.time());
-  renderer.render(scene, camera);
+  draw();
   hud(dt);
   fpsAcc += dt; fpsN++; if (fpsAcc > 1) { $('fps').textContent = Math.round(fpsN / fpsAcc) + ' fps'; fpsAcc = 0; fpsN = 0; }
 }
@@ -832,6 +863,7 @@ function renderCards() {
   });
 }
 function applyOpt() {
+  if (GIRL_VENUES[OPT.venue]) loadGirl(); // the hall has a ring-card girl: her body is fetched while the first round is fought
   arena.setVenue(OPT.venue); arena.setLook(OPT.look, renderer, scene);
   if (fight && builtAs !== fighterKey()) { const t = playT; useDims(); TL = bake(fight); makeFighters(); seek(t); } // another body: re-aim every strike for its reach
   fighters.forEach(f => f.setStyle(OPT.style));
@@ -901,6 +933,9 @@ window.LAB = {
   OPT, seek, applyOpt, newFight, audio, voice, get ref() { return refF; }, camp(level, time) { arena.setCamp(level, time); }, // camp(level 1-5, 'morning'|'day'|'evening'|'night'|null)
   prize(kind, tier, name) { CFG.prize = kind ? {kind, tier, name} : null; }, // for checks: put a belt or a cup at stake in the fight on screen
   cer(t) { if (!cer.on) { seek(marks.over - .02); evi = indexAt(marks.over); if (!startCeremony()) return false; } cerAt = t; return true; }, get fight() { return fight; }, get cfg() { return CFG; }, get clock() { return liveClock ? liveClock() : null; }, get rate() { return clockRate; }, get models() { return MODELS; }, get tl() { return TL; }, three: {scene, camera, renderer}, get t() { return playT; }, get mode() { return mode; },
+  get girl() { return girlF; }, loadGirl, get girlReady() { return !!GIRLM; },
+  get renderer() { return renderer; }, get scene() { return scene; }, get seen() { return stageSeen; },
+  get state() { return {frozen, cor: cor.on, corT: +cor.t.toFixed(2), cer: cer.on, mode, playT: +playT.toFixed(2), paused: [...pausedRounds], resultShown}; }, // for checks: what the stage is doing
   // for checks of faces: where the previewed fighter's head is, and what was measured on his face (outfit.js)
   get head() { if (!previewF) return null; const b = previewF.mesh.skeleton.bones.find(x => x.name === 'Head'); if (!b) return null; const v = new THREE.Vector3().setFromMatrixPosition(b.matrixWorld); return {x: v.x, y: v.y, z: v.z, h: previewF.model.mesh.userData.headH}; },
   get face() { const m = previewF && previewF.model; return m ? {mouth: m.mouth, n: m.face ? m.face.n : 0, hair: m.hairRGB, hasHair: m.hasHair, hairV: m.hairV, skinV: m.skinV} : null; },

@@ -5,6 +5,15 @@
 
 ตัวนักมวยเป็นโมเดล 3D ที่สร้างด้วย Meshy (ภาพอ้างอิง → โมเดลมีผิว → ใส่กระดูกอัตโนมัติ) แล้วขยับด้วยท่าชุดเดียวกับตัวที่สร้างจากโค้ด ซึ่งยังเลือกกลับไปใช้ได้ เสียงเป็นเสียงสังเคราะห์ชั่วคราว
 
+## รอบที่ 81: สาวชูป้ายบอกยก (18 พ.ย. 2026)
+
+- โมเดล: `node tools/meshy-fighter.mjs cardgirl "<คำสั่งภาพ>" --image-only` แล้ว `--from-image --height 1.66` • `python3 tools/shrink-textures.py` ทำ `cardgirl-1k.jpg` • `build.mjs` ฝังเป็น `model-girl`
+- `main.js`: `GIRL_VENUES` `loadGirl()` (เรียกจาก `applyOpt`) `buildRoundCard()` (ป้ายสองหน้า วาดเลขด้วย canvas) • `startCorner` ส่งตัวและป้ายให้ `cor.girl(actor, card)` พร้อมเลขยกถัดไป • `cor.onGirl` เสียงคนดู
+- `corner.js`: `G` (เวลาเข้า เริ่มรอบ จบรอบ ออก ครึ่งกว้างของวงเดิน เวลาหนี) `girlAt(s)` เส้นทางเต็ม `girlMove(s, U)` ท่าเดินชูป้ายและตำแหน่งป้าย • `shoot` ช็อตของเธอช่วง ws 1.9–4.3
+- ตรวจด้วยหน้าทดลอง: `LAB.set({venue: 'stadium'}); LAB.corner(1, 5.9, true)` • `LAB.girl` `LAB.girlReady`
+- `main.js` `stageSeen` + `draw()`: ทุกจุดที่เคยเรียก `renderer.render` ในลูปเฟรมเรียก `draw()` แทน ซึ่งวาดเฉพาะเมื่อ canvas อยู่บนจอ (IntersectionObserver) • `LAB.seen` ดูค่าได้ • เหตุผล: เวทีที่เลื่อนหลุดจอยังถูกสั่งวาดทุกเฟรม ชิปภาพช้าจะมีงานค้างเป็นนาที
+- `game.js` `resetAt` `resetArmed()`: การยืนยัน "เริ่มใหม่ทั้งหมด" ไม่ผูกกับปุ่มแล้ว
+
 ## รอบที่ 79: ศึกชิงถ้วยผู้เล่น (18 พ.ย. 2026)
 
 - เซิร์ฟเวอร์ (`functions/api/[[route]].js`): `CUP` กำหนดการ (ทุก 7 วัน เริ่มนับจากเสาร์ 21 พ.ย. 2026 20:00 เวลาไทย ปิดรับก่อน 5 นาที รอบห่างกัน 6 นาที) `cupClock(env, now)` • `GET /api/cup` → `{now, gap, lead, next: {k, start, close, entries}, prev}` • `POST` / `DELETE /api/cup` ได้ถึง `close` • ตาราง `cups (k, id, data, at)` • ตัวแปร `CUP_EVERY` `CUP_ANCHOR` `CUP_LEAD` `CUP_GAP` (บน VPS ขึ้นต้น `MUAY_`) ใช้ย่อกำหนดการตอนทดสอบ

@@ -53,11 +53,24 @@ async function fight(pick, opt = {}) {
   await click('[data-act=startfight]', 0);
   if (!await until(`!!(window.LAB && LAB.fight && LAB.cfg.seed !== ${seen} && document.querySelector('.app.g-fight') && LAB.t > .2)`, 60000)) return null;
   const venue = await ev('MUAY.venueNow()'), specs = await ev("LAB.cfg.specs.map(s => Object.values(s.stats).join('/')).join(' v ')");
+  let rest = null, girl = null, noGirl = null;
   if (opt.round) { // to the first round break: a quick order, then on
     const pa = await ev("LAB.fight.events.filter(e => e.phase === 'rest').map(e => e.t + 2.3)");
-    if (pa.length) { await ev(`LAB.seek(${pa[0]} - .4)`); if (await until("!!document.querySelector('#gBody [data-act=resume]')", 40000)) { await click('[data-act=quick][data-v=press]', 300); await click('#gBody .btn.go.wide[data-act=resume]', 300); } }
+    if (pa.length) { await ev(`LAB.seek(${pa[0]} - .4)`); if (await until("!!document.querySelector('#gBody [data-act=resume]')", 40000)) { noGirl = await ev("!LAB.girlReady && !(LAB.girl && LAB.girl.root.visible)"); await click('[data-act=quick][data-v=press]', 300); await click('#gBody .btn.go.wide[data-act=resume]', 300); } }
   }
-  let rest = null;
+  if (opt.girl) { // a big hall: between rounds the ring-card girl walks her lap with the number of the round to come
+    const pa = await ev("LAB.fight.events.filter(e => e.phase === 'rest').map(e => e.t + 2.3)");
+    if (pa.length) {
+      await ev(`LAB.seek(${pa[0]} - .4)`);
+      if (await until("!!document.querySelector('#gBody [data-act=resthold]')", 40000)) {
+        await click('[data-act=resthold]', 200); // the rest waits for us
+        girl = {seen: await until("!!(LAB.girl && LAB.girl.root.visible)", 60000), at: await ev("LAB.girl ? [LAB.girl.root.position.x, LAB.girl.root.position.z].map(v => +v.toFixed(2)).join(',') : ''")};
+        if (girl.seen) await page.locator('#stage').screenshot({path: S + 'full-girl.png'}).catch(() => {});
+        await click('#gBody .btn.go.wide[data-act=resume]', 300);
+        girl.gone = await until("!LAB.girl || !LAB.girl.root.visible", 30000);
+      }
+    }
+  }
   if (opt.rest) { // the timed rest: the count on the card, then either the bell by itself or "wait"
     const pa = await ev("LAB.fight.events.filter(e => e.phase === 'rest').map(e => e.t + 2.3)");
     if (pa.length) {
@@ -83,7 +96,7 @@ async function fight(pick, opt = {}) {
   const r = await ev("({win: /ชนะ/.test(document.querySelector('#gBody h2').textContent), head: document.querySelector('#gBody h2').textContent, venue: '" + venue + "', specs: '" + specs + "'})");
   if (opt.ceremony) { await wait(opt.ceremony); await page.locator('#stage').screenshot({path: S + 'full-' + opt.shot + '.png'}); }
   await click('#gBody [data-act=home]', 1500);
-  r.rest = rest;
+  r.rest = rest; r.girl = girl; r.noGirl = noGirl;
   return r;
 }
 const strong = () => save("for (const k in S.stats) S.stats[k] = 96; S.fatigue = 0; S.mood = 4;");
@@ -162,7 +175,7 @@ await click('[data-act=sp]', 500); await sane('signature moves');
 await strong();
 const venues = new Set();
 let r = await fight('l0', {backout: true}); ok(r === 'backed out' && await ev('!document.querySelector(".app.g-fight")'), 'stepping back from the plan screen returns to the menu');
-r = await fight('l0', {plan: ['ag', 'attack'], round: true}); ok(!!r, 'local fight (easy) with a round break and a quick order', r && r.head); // an easy opponent still wins now and then: the result is not part of the check if (r) venues.add(r.venue); await sane('after a local fight');
+r = await fight('l0', {plan: ['ag', 'attack'], round: true}); ok(!!r, 'local fight (easy) with a round break and a quick order', r && r.head); if (r && r.noGirl != null) ok(r.noGirl, 'the temple fair has no ring-card girl (her body is not even loaded)'); // an easy opponent still wins now and then: the result is not part of the check if (r) venues.add(r.venue); await sane('after a local fight');
 r = await fight('l1'); ok(!!r, 'local fight (even)', r && r.head); await sane('after local fight 2');
 await save('S.noBreak = true;'); r = await fight('l2', {plan: ['range', 'out']}); ok(!!r, 'local fight (hard), no stopping between rounds', r && r.head); await save('S.noBreak = false;'); await sane('after local fight 3');
 await save('S.fatigue = 0;'); r = await fight('c'); ok(!!r && r.venue === 'chuek', 'rope-fist bout at the old ground', r && r.head + ' @' + r.venue); if (r) venues.add(r.venue); await sane('after the rope-fist bout');
@@ -188,7 +201,7 @@ ok(!!rs && rs.gone && rs.still && rs.on, '"wait" stops the count: the rest lasts
   ok(af.riv.name === b4.name && af.riv.draws === 1 && af.riv.losses === 0, 'the man he drew with is kept for a rematch', JSON.stringify({n: af.riv.name, d: af.riv.draws, l: af.riv.losses}));
   await click('#gBody [data-act=home]', 1500); await save('S.rematch = 1; S.fatigue = 0;'); await tab('fight');
   ok(await ev(`document.getElementById('gBody').innerText.includes('เสมอกัน 1 ครั้ง')`) && await has('[data-act=pick][data-v=v]'), 'the rematch after a draw is offered on the fight menu'); await sane('after a draw');
-  await tab('rank'); ok(await ev(`[...document.querySelectorAll('#gBody .rk.me .wl')].some(e => /^\\d+-\\d+-1$/.test(e.textContent))`), 'the ranking shows wins, losses and the draw'); }
+  await tab('rank'); ok(await ev(`[...document.querySelectorAll('#gBody .rk.me .wl')].some(e => /^\\d+-\\d+-[1-9]\\d*$/.test(e.textContent))`), 'the ranking shows wins, losses and the draw'); }
 // a loss makes a rival; the rematch is on the menu and winning it clears him
 await save('S.rivals = [];'); await strong(); r = await fight('l2', {before: weak});
 const foe = await ev("(GAME.save().rivals[0] || {}).name || ''");
@@ -265,6 +278,11 @@ await tab('home'); await click('[data-act=sleep]', 900); // a save, so the secon
   ok(u.f.local >= 3 && u.f.ranked >= 1 && u.f.chuek === 1 && u.f.rival === 1 && u.f.title === 1 && u.f.defense === 2 && u.f.tour === 3 && u.f.exhibition >= 1, 'usage: fights are counted by kind', JSON.stringify(u.f));
   ok(u.end.skip >= 10 && u.rest.go >= 1 && u.rest.auto === 1 && u.rest.held === 1, 'usage: skipped fights and the three ways a rest ends', JSON.stringify(u.end) + ' ' + JSON.stringify(u.rest));
   ok(Object.values(u.a).concat(Object.values(u.f), Object.values(u.end), Object.values(u.rest)).every(n => Number.isInteger(n) && n > 0), 'usage: every count is a whole number'); }
+
+// ---- 7d. a big hall: the ring-card girl between rounds. The last fight of the run.
+await save('S.rp = 1450; S.ranked = 2; S.fatigue = 0;'); await strong();
+r = await fight('r', {girl: true});
+ok(!!r && r.venue === 'stadium' && !!r.girl && r.girl.seen && r.girl.gone, 'at the stadium the ring-card girl walks her lap between rounds and is gone when the round starts', r && JSON.stringify(r.girl));
 
 // ---- 8. starting over
 await tab('home'); await click('[data-act=reset]', 400); await click('[data-act=reset]', 1200);

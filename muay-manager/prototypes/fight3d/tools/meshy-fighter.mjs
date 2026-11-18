@@ -1,5 +1,5 @@
 // Generates one rigged fighter with the Meshy API: reference image -> textured 3D model -> auto-rig.
-// Usage: node tools/meshy-fighter.mjs <name> "<prompt>" [--image-only] [--from-image] [--resume <task id>]     writes assets/<name>.glb and assets/<name>-reference.png
+// Usage: node tools/meshy-fighter.mjs <name> "<prompt>" [--image-only] [--from-image] [--resume <task id>] [--height <metres>]     writes assets/<name>.glb and assets/<name>-reference.png
 // The reference picture must show the arms straight out to the sides (see tools/meshy-tpose.mjs).
 // The API key comes from MESHY_API_KEY (in a Claude cloud session the network proxy injects it, so any placeholder works).
 // Cost seen on 10 Nov 2026: image 9 + model 30 + rig 5 = 44 credits per fighter.
@@ -48,6 +48,7 @@ else {
 if (process.argv.includes('--image-only')) { console.log('saved ' + ref + ' (look at it, then run again with --from-image)'); process.exit(0); }
 const resume = process.argv.indexOf('--resume') > 0 ? process.argv[process.argv.indexOf('--resume') + 1] : null;
 const mesh = resume ? await wait('/image-to-3d', resume) : await run('/image-to-3d', Object.assign({should_texture: true, should_remesh: true, target_polycount: 30000, topology: 'triangle', texture_resolution: '2k', enable_pbr: false, target_formats: ['glb']}, source));
-const rig = await run('/rigging', {input_task_id: mesh.id, height_meters: 1.72});
+const hAt = process.argv.indexOf('--height'), height = hAt > 0 ? +process.argv[hAt + 1] || 1.72 : 1.72; // --height 1.66 for a shorter body (the ring-card girl)
+const rig = await run('/rigging', {input_task_id: mesh.id, height_meters: height});
 await save(rig.result.rigged_character_glb_url, `assets/${name}.glb`);
 console.log('saved assets/' + name + '.glb');

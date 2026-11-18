@@ -113,7 +113,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.57', BUILD = 257;
+const VER = '2.58', BUILD = 258;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -620,7 +620,7 @@ function homeHtml() {
     '<section class="gcard"><h2>ภารกิจวันนี้</h2>' + MISSIONS.map(m => { const n = Math.min(m.need, (S.mis.day === S.day ? S.mis.n[m.id] : 0) || 0), done = n >= m.need; return '<div class="mis' + (done ? ' done' : '') + '"><span>' + (done ? '✓ ' : '') + m.th + '</span><span>' + n + '/' + m.need + '</span><span>฿ ' + m.money + (m.fame ? ' ★ ' + m.fame : '') + '</span></div>'; }).join('') + '</section>' +
     spHtml() + vipHtml() +
     (S.log.length ? '<section class="gcard"><h2>ไฟต์ล่าสุด</h2>' + S.log.slice(0, 5).map(l => '<div class="logrow ' + (l.d ? 'd' : l.w ? 'w' : 'l') + '"><b>' + (l.d ? 'เสมอ' : l.w ? 'ชนะ' : 'แพ้') + '</b><span>' + esc(l.o) + '</span><span>' + esc(l.h) + '</span></div>').join('') + '</section>' : '') +
-    '<p class="hint">' + cloudNote + ' · <button class="link" data-act="reset">เริ่มใหม่ทั้งหมด</button></p>';
+    '<p class="hint">' + cloudNote + ' · <button class="link" data-act="reset">' + (resetArmed() ? RESET_SURE : 'เริ่มใหม่ทั้งหมด') + '</button></p>';
 }
 // Signature moves: choose two to use, learn more from a master, train each up to level 3
 function spHtml() {
@@ -994,6 +994,8 @@ const isOnline = b => !!(b && b.seen && now() - b.seen < ONLINE);
 const agoTh = ms => { const m = Math.max(1, Math.round(ms / 60e3)); return m < 60 ? m + ' นาทีที่แล้ว' : m < 1440 ? Math.round(m / 60) + ' ชม. ที่แล้ว' : Math.round(m / 1440) + ' วันที่แล้ว'; };
 // Every PRESENCE ms while the game is on screen; and once with off when it is closed or hidden, so the others see
 // "offline" at their next look instead of after the ONLINE window runs out (that window is for a lost connection).
+// "Start over" asks twice. The first press is remembered here, not on the button: the menu may be redrawn between the two.
+let resetAt = 0; const RESET_SURE = 'กดอีกครั้งเพื่อยืนยันการลบนักมวยคนนี้', resetArmed = () => Date.now() - resetAt < 10000;
 function presence(off) { if (!CLOUD || CLOUD.dead || !S || (document.hidden && !off)) return; CH.seenAt = Date.now(); try { const ref = CLOUD.db.doc('board/' + CLOUD.uid); (CLOUD.site ? ref.set(boardDoc(off), {keepalive: !!off}) : ref.set(boardDoc(off))).catch(keyDead); } catch (e) { /* leaving anyway */ } }
 // people watching a live match who are not in it (from the leaderboard records, ours included)
 const viewers = m => board.filter(b => b.in === m.key && isOnline(b) && b.id !== m.from && b.id !== m.to).length + (sideOf(m) < 0 && F && F.live && F.clock && F.live.key === m.key ? 1 : 0);
@@ -1685,7 +1687,7 @@ function onClick(e) {
   else if (act === 'staff') { const st = STAFF.find(x => x.id === v); if (S.staff.includes(v)) S.staff = S.staff.filter(k => k !== v); else { if (S.money < st.hire) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(st.hire); return; } S.money -= st.hire; S.staff.push(v); } save(); render(); }
   else if (act === 'look') setLook(el.dataset.f, v);
   else if (act === 'gym') { const c = GYM_COST[S.gym]; if (S.money < c) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(c); return; } S.money -= c; S.gym++; save(); render(); }
-  else if (act === 'reset') { if (el.dataset.sure) { try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* fine */ } if (CLOUD) { try { CLOUD.db.collection('data/users/' + CLOUD.uid).doc('save').delete().catch(() => {}); CLOUD.db.doc('board/' + CLOUD.uid).delete().catch(() => {}); } catch (err) { /* the next save overwrites it */ } } S = null; view = 'create'; setMode(false); render(); previewDraft(); } /* (the stored copy goes too, or the old fighter would come back on the next visit) */ else { el.dataset.sure = '1'; el.textContent = 'กดอีกครั้งเพื่อยืนยันการลบนักมวยคนนี้'; } }
+  else if (act === 'reset') { if (resetArmed()) { resetAt = 0; try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* fine */ } if (CLOUD) { try { CLOUD.db.collection('data/users/' + CLOUD.uid).doc('save').delete().catch(() => {}); CLOUD.db.doc('board/' + CLOUD.uid).delete().catch(() => {}); } catch (err) { /* the next save overwrites it */ } } S = null; view = 'create'; setMode(false); render(); previewDraft(); } /* (the stored copy goes too, or the old fighter would come back on the next visit) */ else { resetAt = Date.now(); el.textContent = RESET_SURE; } }
   else if (act === 'train') { if (S.slots < 1) return; const a = ACTS.find(x => x.id === v); if (Math.random() * 100 < failPct(a)) { trainFail(a); return; } mini = {act: a, t0: performance.now()}; if ((a.id === 'run' || a.id === 'rest' || a.id === 'fun') && sceneStart(a)) return; if (a.id === 'rest' || a.id === 'fun') trainResult(1); else if (a.drill) drillStart(a); else render(); }
   else if (act === 'hit') { const ph = ((performance.now() - mini.t0) / 1100) % 2, x = ph < 1 ? ph : 2 - ph; trainResult(1 - Math.abs(x - .5) * 2); }
   else if (act === 'buy') { const cost = pending.items.reduce((a, i) => a + i.price, 0); if (S.money < cost) return; S.money -= cost; pending.items.forEach(i => { if (!S.own[i.kind].includes(i.k)) S.own[i.kind].push(i.k); }); S.look = pending.look; pending = null; save(); render(); showMe(); }
