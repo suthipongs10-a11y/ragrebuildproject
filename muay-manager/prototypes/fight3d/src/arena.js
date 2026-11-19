@@ -28,7 +28,7 @@ function matTex(c) {
     speckle(g, w, h, 2600, '255,255,255', c.dark || '40,60,80', c.noise || .05, 5);
     if (c.ring) { g.strokeStyle = c.ring; g.lineWidth = 10; g.beginPath(); g.arc(w / 2, h / 2, 210, 0, 7); g.stroke(); }
     if (c.fill) { g.fillStyle = c.fill; g.beginPath(); g.arc(w / 2, h / 2, 205, 0, 7); g.fill(); }
-    g.fillStyle = c.ink; g.font = 'italic 800 ' + (c.size || 78) + 'px Kanit, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = c.ink; g.font = 'italic 800 ' + (c.size || 78) + 'px "Chakra Petch", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillText(c.t1, w / 2, h / 2 - 42); g.fillText(c.t2, w / 2, h / 2 + 46);
     if (c.border) { g.strokeStyle = c.border; g.lineWidth = 14; g.strokeRect(70, 70, w - 140, h - 140); }
   });
@@ -39,7 +39,7 @@ function apronTex(c) {
     if (c.planks) { for (let x = 0; x < w; x += 46) { g.fillStyle = 'rgba(0,0,0,' + (.08 + rng() * .22) + ')'; g.fillRect(x, 0, 3, h); g.fillStyle = 'rgba(255,220,170,' + rng() * .06 + ')'; g.fillRect(x + 3, 0, 43, h); } }
     if (c.bunting) { const cols = c.bunting; for (let x = 0, i = 0; x < w; x += 64, i++) { g.fillStyle = cols[i % cols.length]; g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 64, 0); g.lineTo(x + 32, 44); g.fill(); } }
     g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(0, 0, w, 10);
-    g.fillStyle = c.fg; g.font = 'italic 800 ' + (c.size || 46) + 'px Kanit, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = c.fg; g.font = 'italic 800 ' + (c.size || 46) + 'px "Chakra Petch", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
     for (let i = 0; i < 3; i++) g.fillText(c.text, w / 6 + i * w / 3, h / 2 + (c.bunting ? 22 : 4));
   });
 }
@@ -227,7 +227,7 @@ const champ = () => indoor({rows: 12, ropes: [0xe2b33c, 0x18181c, 0xe2b33c, 0x18
   apron: {bg: '#101013', fg: 'rgba(238,196,84,.95)', text: 'ศึกชิงแชมป์', size: 50},
   shirts: [0x1a1f2c, 0x2a2030, 0x162226, 0x30261c, 0x1f2127, 0x3a1e1e, 0x1a2434, 0x3a3320],
   extra(V) {
-    const screen = canvasTex(1024, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, '#2a1a05'); gr.addColorStop(.5, '#7a5512'); gr.addColorStop(1, '#2a1a05'); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.fillStyle = '#ffe9a8'; g.font = 'italic 800 120px Kanit, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('ศึกชิงแชมป์มวยไทย', w / 2, h / 2 + 6); g.strokeStyle = '#ffd35a'; g.lineWidth = 8; g.strokeRect(8, 8, w - 16, h - 16); });
+    const screen = canvasTex(1024, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, '#2a1a05'); gr.addColorStop(.5, '#7a5512'); gr.addColorStop(1, '#2a1a05'); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.fillStyle = '#ffe9a8'; g.font = 'italic 800 120px "Chakra Petch", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('ศึกชิงแชมป์มวยไทย', w / 2, h / 2 + 6); g.strokeStyle = '#ffd35a'; g.lineWidth = 8; g.strokeRect(8, 8, w - 16, h - 16); });
     const sm = basic({map: screen, fog: false});
     put(V.group, new THREE.PlaneGeometry(15, 3.75), sm, 0, 9.4, -19.5);
     put(V.group, new THREE.PlaneGeometry(11, 2.75), sm, -19.5, 8.6, -4, 0, Math.PI / 2); put(V.group, new THREE.PlaneGeometry(11, 2.75), sm, 19.5, 8.6, -4, 0, -Math.PI / 2);
@@ -244,7 +244,7 @@ const province = () => indoor({rows: 4, ropes: [0xe9e9ee, 0xd9342b, 0xe9e9ee, 0x
   shirts: [0x2a3040, 0x3a2a2a, 0x24382e, 0x40382a, 0x2c2c34, 0x4a2626, 0x26364a, 0x4a4030],
   extra(V) {
     const g = V.group, D = 12.6;
-    const board = canvasTex(1024, 256, (c, w, h) => { c.fillStyle = '#17383c'; c.fillRect(0, 0, w, h); const cols = ['#c9a23a', '#b23a2e', '#e6dcc2', '#2d6f8f'], words = ['มวยไทย', 'ศึกวันศุกร์', 'ค่ายมวย', 'ชกทุกนัด']; for (let i = 0; i < 4; i++) { c.fillStyle = cols[i]; c.fillRect(20 + i * 252, 40, 228, 150); c.fillStyle = i === 2 ? '#7c1f1a' : '#fff'; c.font = '700 44px Kanit, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(words[i], 134 + i * 252, 116); } });
+    const board = canvasTex(1024, 256, (c, w, h) => { c.fillStyle = '#17383c'; c.fillRect(0, 0, w, h); const cols = ['#c9a23a', '#b23a2e', '#e6dcc2', '#2d6f8f'], words = ['มวยไทย', 'ศึกวันศุกร์', 'ค่ายมวย', 'ชกทุกนัด']; for (let i = 0; i < 4; i++) { c.fillStyle = cols[i]; c.fillRect(20 + i * 252, 40, 228, 150); c.fillStyle = i === 2 ? '#7c1f1a' : '#fff'; c.font = '700 44px "Chakra Petch", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(words[i], 134 + i * 252, 116); } });
     board.wrapS = THREE.RepeatWrapping; board.repeat.set(3, 1);
     const wall = std({map: board, roughness: 1});
     for (let i = 0; i < 4; i++) put(g, new THREE.PlaneGeometry(D * 2, 6.4), wall, -Math.sin(i * Math.PI / 2) * D, 2.2, -Math.cos(i * Math.PI / 2) * D, 0, i * Math.PI / 2);
@@ -402,8 +402,8 @@ function camp(level) {
     if (L === 2) { c.fillStyle = '#9a9a94'; c.fillRect(0, 0, w, h); speckle(c, w, h, 4800, '70,70,70', '200,200,195', .14, 7); c.strokeStyle = 'rgba(60,60,60,.35)'; c.lineWidth = 4; for (let x = 256; x < w; x += 256) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, h); c.stroke(); c.beginPath(); c.moveTo(0, x); c.lineTo(w, x); c.stroke(); } return; }
     c.fillStyle = L === 5 ? '#b0362c' : '#3d6f8a'; c.fillRect(0, 0, w, h); speckle(c, w, h, 4200, '255,255,255', '15,35,50', .1, 8);
     c.strokeStyle = L === 5 ? 'rgba(242,184,58,.85)' : 'rgba(255,255,255,.55)'; c.lineWidth = 10; c.strokeRect(60, 60, w - 120, h - 120);
-    c.fillStyle = L === 5 ? 'rgba(242,184,58,.9)' : 'rgba(255,255,255,.75)'; c.font = 'italic 800 76px Kanit, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('ค่ายมวย', w / 2, h / 2 + 250);
-    if (L >= 4) { c.font = '800 54px Kanit, sans-serif'; c.fillText('★'.repeat(L - 2), w / 2, h / 2 + 330); }
+    c.fillStyle = L === 5 ? 'rgba(242,184,58,.9)' : 'rgba(255,255,255,.75)'; c.font = 'italic 800 76px "Chakra Petch", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('ค่ายมวย', w / 2, h / 2 + 250);
+    if (L >= 4) { c.font = '800 54px "Chakra Petch", sans-serif'; c.fillText('★'.repeat(L - 2), w / 2, h / 2 + 330); }
   });
   const floor = put(g, new THREE.PlaneGeometry(S + (L >= 4 ? 1.2 : 0), S + (L >= 4 ? 1.2 : 0)), std({map: floorTex, roughness: .95}), 0, .004, 0, -Math.PI / 2); floor.receiveShadow = true;
   const wood = std({color: 0x5a4028}), woodL = std({color: 0x7a5a3a}), white = std({color: 0xf0ece2}), gold = std({color: 0xd9a531, metalness: .5, roughness: .4}), red = std({color: 0xb5281f});
@@ -442,7 +442,7 @@ function camp(level) {
       put(g, new THREE.PlaneGeometry(X * 2 + .2, 2.6), std({map: plank, roughness: .95}), 0, 1.3, -D - .12);
       const nP = L === 3 ? 2 : L === 4 ? 4 : 6;
       for (let i = 0; i < nP; i++) { const x = -X + .6 + (i + .5) * ((X * 2 - 1.2) / nP); put(g, new THREE.PlaneGeometry(.62, .86), basic({map: posterTex(i + L * 3)}), x, 2.05 + (i % 2 ? .06 : -.04), -D - .1); }
-      const ban = canvasTex(1024, 160, (c, w, h) => { c.fillStyle = L === 5 ? '#7a1712' : '#1f3f8a'; c.fillRect(0, 0, w, h); c.fillStyle = '#f2b83a'; c.fillRect(0, 10, w, 8); c.fillRect(0, h - 18, w, 8); c.font = '800 92px Kanit, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = '#fff4d8'; c.fillText(L === 5 ? 'ค่ายมวยระดับแชมป์' : 'ค่ายมวยไทย', w / 2, h / 2 + 4); });
+      const ban = canvasTex(1024, 160, (c, w, h) => { c.fillStyle = L === 5 ? '#7a1712' : '#1f3f8a'; c.fillRect(0, 0, w, h); c.fillStyle = '#f2b83a'; c.fillRect(0, 10, w, 8); c.fillRect(0, h - 18, w, 8); c.font = '800 92px "Chakra Petch", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = '#fff4d8'; c.fillText(L === 5 ? 'ค่ายมวยระดับแชมป์' : 'ค่ายมวยไทย', w / 2, h / 2 + 4); });
       put(g, new THREE.PlaneGeometry(4.6, .72), basic({map: ban, side: THREE.DoubleSide}), 0, H - .52, D + .02, 0, Math.PI, 0);
       put(g, new THREE.PlaneGeometry(4.6, .72), basic({map: ban, side: THREE.DoubleSide}), 0, H + .25, -D - .14);
       const flagCols = [0xc9281f, 0xf0f0f2, 0x1f55c4, 0xe0a52a, 0x2f8a3a];
@@ -547,13 +547,13 @@ function posterTex(seed) {
   const pal = [['#c9281f', '#f2b83a'], ['#1f3f8a', '#f0f0f2'], ['#e0a52a', '#1b1300'], ['#2f6a2a', '#f2e6b8'], ['#5a1f6a', '#f2b83a'], ['#1b1b1f', '#e2382f']][seed % 6];
   return canvasTex(256, 360, (c, w, h) => {
     c.fillStyle = pal[0]; c.fillRect(0, 0, w, h); c.fillStyle = 'rgba(0,0,0,.18)'; c.fillRect(0, h * .62, w, h * .38);
-    c.fillStyle = pal[1]; c.font = '800 46px Kanit, sans-serif'; c.textAlign = 'center'; c.fillText('ศึกมวยไทย', w / 2, 58);
+    c.fillStyle = pal[1]; c.font = '800 46px "Chakra Petch", sans-serif'; c.textAlign = 'center'; c.fillText('ศึกมวยไทย', w / 2, 58);
     // two fighters' silhouettes facing each other
     c.fillStyle = 'rgba(0,0,0,.55)';
     for (const s of [-1, 1]) { const x = w / 2 + s * 58; c.beginPath(); c.arc(x, 128, 22, 0, 7); c.fill(); c.fillRect(x - 24, 152, 48, 70); c.beginPath(); c.arc(x - s * 30, 150, 15, 0, 7); c.fill(); c.fillRect(x - 20, 222, 16, 60); c.fillRect(x + 4, 222, 16, 60); }
-    c.fillStyle = pal[1]; c.font = '800 40px Kanit, sans-serif'; c.fillText('VS', w / 2, 200);
-    c.font = '700 26px Kanit, sans-serif'; c.fillText(['คืนวันเสาร์', 'ชิงเข็มขัด', 'คู่เอก 5 ยก', 'มันส์ทุกคู่', 'ศึกวันพระ', 'ศึกใหญ่ประจำปี'][(seed * 7) % 6], w / 2, h - 70);
-    c.font = '600 20px Kanit, sans-serif'; c.fillText('เวทีมวยประจำจังหวัด', w / 2, h - 36);
+    c.fillStyle = pal[1]; c.font = '800 40px "Chakra Petch", sans-serif'; c.fillText('VS', w / 2, 200);
+    c.font = '700 26px "Chakra Petch", sans-serif'; c.fillText(['คืนวันเสาร์', 'ชิงเข็มขัด', 'คู่เอก 5 ยก', 'มันส์ทุกคู่', 'ศึกวันพระ', 'ศึกใหญ่ประจำปี'][(seed * 7) % 6], w / 2, h - 70);
+    c.font = '600 20px "Chakra Petch", sans-serif'; c.fillText('เวทีมวยประจำจังหวัด', w / 2, h - 36);
   });
 }
 // a pair of boxing shorts, for the washing line
@@ -562,7 +562,7 @@ function shortsTex(col, i) {
     c.fillStyle = '#' + col.toString(16).padStart(6, '0');
     c.beginPath(); c.moveTo(14, 18); c.lineTo(114, 18); c.lineTo(122, 116); c.lineTo(72, 116); c.lineTo(64, 78); c.lineTo(56, 116); c.lineTo(6, 116); c.closePath(); c.fill();
     c.fillStyle = col === 0xf0f0f2 ? '#c9281f' : '#ffffff'; c.fillRect(14, 18, 100, 16);
-    c.fillStyle = 'rgba(255,255,255,.55)'; c.font = '700 22px Kanit, sans-serif'; c.textAlign = 'center'; c.fillText(['มวย', 'ไทย', 'สู้', 'ชนะ'][i % 4], 36, 80);
+    c.fillStyle = 'rgba(255,255,255,.55)'; c.font = '700 22px "Chakra Petch", sans-serif'; c.textAlign = 'center'; c.fillText(['มวย', 'ไทย', 'สู้', 'ชนะ'][i % 4], 36, 80);
   });
 }
 

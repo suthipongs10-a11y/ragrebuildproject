@@ -33,7 +33,7 @@ function makeBag(beamY) {
   const skin = tex(512, 512, (c, w, h) => {
     c.fillStyle = '#8a221b'; c.fillRect(0, 0, w, h); c.fillStyle = '#1b1b20'; c.fillRect(0, 0, w, 70); c.fillRect(0, h - 70, w, 70);
     for (let i = 0; i < 60; i++) { c.fillStyle = 'rgba(' + (i % 2 ? '255,200,180' : '30,5,5') + ',' + (.03 + (i * 37 % 10) / 120) + ')'; c.fillRect((i * 97) % w, 70 + (i * 53) % (h - 180), 20 + (i * 13) % 60, 10 + (i * 7) % 40); }
-    c.fillStyle = 'rgba(255,224,150,.9)'; c.font = 'italic 800 64px Kanit, sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('มวยไทย', w / 4, h / 2); c.fillText('มวยไทย', w * 3 / 4, h / 2);
+    c.fillStyle = 'rgba(255,224,150,.9)'; c.font = 'italic 800 64px "Chakra Petch", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('มวยไทย', w / 4, h / 2); c.fillText('มวยไทย', w * 3 / 4, h / 2);
   });
   mesh(piv, new THREE.CylinderGeometry(r, r, len, 20), std({map: skin, roughness: .55}), 0, top - len / 2 - beamY, 0);
   mesh(piv, new THREE.SphereGeometry(r, 20, 8, 0, 7, Math.PI / 2, Math.PI / 2), std({color: 0x1b1b20, roughness: .55}), 0, top - len - beamY, 0);

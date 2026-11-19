@@ -19,15 +19,15 @@ console.log('over the stage:', await page.evaluate("[...document.querySelectorAl
 await page.evaluate(t => LAB.seek(t - .12), +t); await page.waitForTimeout(1500);
 const frame = await page.locator('#cv').screenshot({type: 'png'}); writeFileSync(S + 'frame.png', frame);
 const card = await browser.newPage({viewport: {width: 1200, height: 630}, deviceScaleFactor: 1});
-await card.setContent(`<!doctype html><meta charset="utf-8"><style>
+await card.setContent(`<!doctype html><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@1,700&family=Bai+Jamjuree:wght@600&display=swap"><style>
 html,body{margin:0;width:1200px;height:630px;overflow:hidden;background:#0e0f14}
 .bg{position:absolute;inset:0;background:url(data:image/png;base64,${frame.toString('base64')}) center 38%/cover}
 .sh{position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,15,20,0) 42%,rgba(14,15,20,.72) 70%,rgba(14,15,20,.96) 100%)}
-.tx{position:absolute;left:56px;right:56px;bottom:44px;color:#fff;font-family:'DejaVu Sans','Loma',sans-serif}
-h1{margin:0;font-size:92px;line-height:1;font-weight:800;letter-spacing:2px;color:#ffd35a;text-shadow:0 4px 18px rgba(0,0,0,.7)}
-p{margin:14px 0 0;font:600 40px/1.25 'Loma',sans-serif;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.tx{position:absolute;left:56px;right:56px;bottom:44px;color:#fff;font-family:'Chakra Petch','DejaVu Sans',sans-serif}
+h1{margin:0;font-size:96px;line-height:1;font-style:italic;font-weight:700;letter-spacing:2px;color:#ffd35a;text-shadow:0 4px 18px rgba(0,0,0,.7)}
+p{margin:14px 0 0;font:600 40px/1.25 'Bai Jamjuree','Loma',sans-serif;text-shadow:0 2px 10px rgba(0,0,0,.8)}
 </style><div class="bg"></div><div class="sh"></div><div class="tx"><h1>MUAY MANAGER</h1><p>เกมผู้จัดการค่ายมวยไทย · ดูนักมวยของคุณชกแบบ 3D</p></div>`);
-await card.waitForTimeout(600);
+await card.evaluate(() => Promise.all([document.fonts.load('italic 700 96px "Chakra Petch"', 'MUAY MANAGER'), document.fonts.load('600 40px "Bai Jamjuree"', 'เกมผู้จัดการค่ายมวยไทย 3D')]).then(() => document.fonts.ready)).catch(() => {}); await card.waitForTimeout(600); // the game's own typefaces
 writeFileSync(out, await card.screenshot({type: 'jpeg', quality: 86}));
 console.log('written', out);
 await browser.close();

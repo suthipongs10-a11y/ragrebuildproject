@@ -114,8 +114,8 @@ function buildRoundCard() { // readable from both sides
   g.visible = false;
   return {obj: g, set(n) {
     const c = cv.getContext('2d'); c.fillStyle = '#101116'; c.fillRect(0, 0, 256, 192); c.strokeStyle = '#f2b83a'; c.lineWidth = 8; c.strokeRect(7, 7, 242, 178);
-    c.textAlign = 'center'; c.fillStyle = '#f2b83a'; c.font = "700 40px 'Kanit', 'IBM Plex Sans Thai', sans-serif"; c.fillText('ยก', 128, 54);
-    c.fillStyle = '#ffffff'; c.font = "800 118px 'Kanit', 'IBM Plex Sans Thai', sans-serif"; c.fillText(String(n), 128, 164); tex.needsUpdate = true; }};
+    c.textAlign = 'center'; c.fillStyle = '#f2b83a'; c.font = "700 40px 'Chakra Petch', 'Bai Jamjuree', sans-serif"; c.fillText('ยก', 128, 54);
+    c.fillStyle = '#ffffff'; c.font = "800 118px 'Chakra Petch', 'Bai Jamjuree', sans-serif"; c.fillText(String(n), 128, 164); tex.needsUpdate = true; }};
 }
 function startCorner() {
   if (!fighters[0] || !fighters[0].isModel || !fighters[1].isModel) return false;
@@ -1096,4 +1096,7 @@ const start = async () => {
 };
 // sample fights that end in different ways: hook, high kick, elbow, flying knee, and a decision
 const SAMPLE_SEEDS = [300, 512, 84, 1607, 5];
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(start, start); else start();
+if (document.fonts && document.fonts.load) {
+  const want = ['italic 700', '700', '600', '500'].map(w => document.fonts.load(w + ' 20px "Chakra Petch"', 'มวยไทย ศึก ยก MUAY 123').catch(() => {}));
+  Promise.race([Promise.all(want).then(() => document.fonts.ready), new Promise(res => setTimeout(res, 3000))]).then(start, start);
+} else start();

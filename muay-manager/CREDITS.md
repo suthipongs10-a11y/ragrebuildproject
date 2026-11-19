@@ -26,7 +26,7 @@
 | ดนตรีปี่กลอง ระฆัง เสียงคนดูพื้นหลัง | สร้างจากโค้ดในเกม |
 | ตัวนักมวย 3D และสาวชูป้ายบอกยก (`assets/cardgirl.glb` 18 พ.ย. 2026) | สร้างด้วย Meshy (บัญชีแบบจ่ายเงินของเจ้าของเกม: ไม่ต้องให้เครดิต) **ไม่แสดงในเกม** ตามที่เจ้าของเกมสั่ง 17 พ.ย. 2026 • ถ้ามีตัวไหนสร้างตอนใช้แผนฟรี ตัวนั้นเป็น CC BY 4.0 ต้องให้เครดิต |
 | ภาพ UI | สร้างด้วย ChatGPT (บัญชีของเจ้าของเกม) **ไม่แสดงในเกม** ตามที่เจ้าของเกมสั่ง 17 พ.ย. 2026 |
-| ฟอนต์ | Kanit, IBM Plex Sans Thai — Google Fonts (SIL Open Font License) |
+| ฟอนต์ | Chakra Petch, Bai Jamjuree (Cadson Demak) — Google Fonts (SIL Open Font License) |
 | three.js | MIT License — https://threejs.org |
 | ดนตรีประกอบ 2 เพลง (`prototypes/fight3d/assets/music/`) | ไฟล์จากเจ้าของเกม 14 พ.ย. 2026 — ที่มาและสัญญาอนุญาต: รอระบุ ต้องตรวจก่อนเปิดสาธารณะหรือลงสโตร์ |
 | เสียงคนดูและเสียงเชียร์ (`prototypes/fight3d/assets/sfx/cheer-1.mp3`, `swell-1.mp3`, `swell-2.mp3`) | [Free Crowd Cheering Sounds](https://opengameart.org/content/free-crowd-cheering-sounds) โดย Gregor Quendel ([gregorquendel.com](https://www.gregorquendel.com)) — [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/) ตัดบางช่วงและปรับความดัง |

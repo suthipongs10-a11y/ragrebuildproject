@@ -160,8 +160,8 @@ function shortsTexture(c) {
     g.fillStyle = 'rgba(0,0,0,.28)'; for (const y of [.05, .1, .15]) g.fillRect(0, H * y, W, 2.5);
     for (const x of [0, 256, 512]) { g.fillStyle = c.trimCss; g.fillRect(x - 9, H * .2, 18, H); g.fillStyle = 'rgba(0,0,0,.22)'; g.fillRect(x - 3, H * .2, 6, H); }
     g.textAlign = 'center'; g.textBaseline = 'middle'; g.lineJoin = 'round';
-    g.font = '700 58px Kanit, "IBM Plex Sans Thai", sans-serif'; g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,.45)'; g.strokeText('มวยไทย', 128, H * .43); g.fillStyle = c.textCss; g.fillText('มวยไทย', 128, H * .43);
-    g.font = 'italic 800 38px Kanit, sans-serif'; g.lineWidth = 5; g.strokeText('MUAY THAI', 384, H * .43); g.fillText('MUAY THAI', 384, H * .43);
+    g.font = '700 58px "Chakra Petch", "Bai Jamjuree", sans-serif'; g.lineWidth = 6; g.strokeStyle = 'rgba(0,0,0,.45)'; g.strokeText('มวยไทย', 128, H * .43); g.fillStyle = c.textCss; g.fillText('มวยไทย', 128, H * .43);
+    g.font = 'italic 800 38px "Chakra Petch", sans-serif'; g.lineWidth = 5; g.strokeText('MUAY THAI', 384, H * .43); g.fillText('MUAY THAI', 384, H * .43);
   });
 }
 let GRAD = null, OUTLINE = null, GEO = null;
