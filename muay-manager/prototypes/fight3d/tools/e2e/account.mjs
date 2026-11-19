@@ -89,12 +89,15 @@ try {
 
   // ---- 4. delete account on the new device
   ok(await (async () => { for (let i = 0; i < 20; i++) { if (((await api('news')).body.items || []).some(x => x.pid === keyB.id)) return true; await B.waitForTimeout(500); } return false; })(), 'the news list has a line about his fighter');
+  { const r = await fetch(new URL('api/chat', URL0), {method: 'POST', headers: {'Content-Type': 'application/json', Authorization: 'Bearer ' + keyB.id + '.' + keyB.secret}, body: JSON.stringify({text: 'ข้อความก่อนลบบัญชี'})});
+    ok(r.status === 200 && (((await api('chat?after=0')).body.chat || {}).items || []).some(x => x.pid === keyB.id), 'and the world chat has a line of his'); }
   await click(B, '[data-act=tab][data-v=home]', 400); await click(B, '[data-act=settings]', 700);
   await click(B, '[data-act=delacct]', 600); ok(await ev(B, "/ยืนยัน/.test(document.querySelector('[data-act=delacct]').textContent) && !!GAME.save()"), 'delete account asks a second time');
   await shot(B, 'account-delete');
   await click(B, '[data-act=delacct]', 0); ok(await until(B, "!!document.getElementById('gName') && !GAME.save()", 60000), 'after the second press: back at the creation screen');
   ok((await board()).length === 0, 'he is off the leaderboard');
   ok(!((await api('news')).body.items || []).some(x => x.pid === keyB.id), 'and off the news list');
+  ok(!(((await api('chat?after=0')).body.chat || {}).items || []).some(x => x.pid === keyB.id), 'and his chat lines are gone');
   ok((await api('db/data/users/' + keyB.id + '/save', keyB)).status === 403 && (await api('db/board/' + keyB.id)).body.data === null && (await api('db/challenges/' + keyB.id)).body.data === null, 'his key, save and records are gone from the server');
   await until(B, "!!localStorage.getItem('muaySitePlayer')", 15000); const keyB2 = await me(B); made.push(keyB2); ok(keyB2 && keyB2.id !== keyB.id, 'the device is a new player now');
 

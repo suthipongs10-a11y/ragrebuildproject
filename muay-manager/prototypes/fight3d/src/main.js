@@ -181,7 +181,23 @@ const REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion:
 
 // ---------- scene ----------
 const stage = $('stage'), canvas = $('cv');
-const renderer = new THREE.WebGLRenderer({canvas, antialias: true, powerPreference: 'high-performance'});
+// Some phones refuse the first kind of 3D context asked for (seen on an iPhone: "Error creating WebGL context"). It is
+// asked for again without smoothing and without the fast chip; if none opens, the page says so instead of staying empty.
+function openRenderer() {
+  const tries = [{antialias: true, powerPreference: 'high-performance'}, {antialias: false, powerPreference: 'default'}, {antialias: false, powerPreference: 'low-power', failIfMajorPerformanceCaveat: false}];
+  let err = null;
+  for (let i = 0; i < tries.length; i++) {
+    try { const r = new THREE.WebGLRenderer(Object.assign({canvas}, tries[i])); if (i) window.MUAY_GL_TRY = i + 1; return r; } catch (e) { err = e; }
+  }
+  const box = document.createElement('div'); box.id = 'noGl'; box.setAttribute('role', 'alert');
+  box.style.cssText = 'position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;background:#0e0f14;color:#f1f2f5;font:16px/1.6 "Bai Jamjuree",system-ui,sans-serif';
+  box.innerHTML = '<div style="max-width:420px"><h2 style="margin:0 0 8px;color:#f2b83a;font-size:20px">เครื่องนี้เปิดภาพ 3D ของเกมไม่ได้ในตอนนี้</h2><p style="margin:0 0 10px">ลองตามนี้ทีละข้อ แล้วเปิดเกมใหม่</p>'
+    + '<ol style="margin:0 0 14px;padding-left:22px"><li>ถ้าเปิดจากในแอป Facebook หรือ LINE ให้กดเมนูแล้วเลือก "เปิดในเบราว์เซอร์" (Safari หรือ Chrome)</li><li>ปิดแท็บและแอปอื่นที่ไม่ได้ใช้ แล้วโหลดหน้านี้ใหม่</li><li>ปิดแล้วเปิดเครื่องใหม่</li></ol>'
+    + '<button type="button" onclick="location.reload()" style="font:inherit;font-weight:700;padding:10px 18px;border-radius:999px;border:0;background:#f2b83a;color:#1b1300">โหลดใหม่</button></div>';
+  document.body.appendChild(box);
+  throw err || new Error('no WebGL context');
+}
+const renderer = openRenderer();
 renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();

@@ -118,6 +118,7 @@ await sane('home screen');
 ok(await ev("GAME.news().some(x => /^หน้าใหม่: นักมวยหน้าใหม่ บอทเล่นครบ/.test(x))") && await until("!document.getElementById('gNews').hidden && document.querySelector('.app').classList.contains('has-news') && document.getElementById('gNewsRun').textContent.includes('บอทเล่นครบ')", 30000) /* a new line waits for the run on screen to end */, 'the news strip runs at the top with the new fighter\'s line', await ev('GAME.news().join(" | ")'));
 await click('#gNews', 600); ok(await ev("document.querySelector('#gBody h2').textContent.startsWith('ข่าวจากทุกเวที') && document.querySelectorAll('#gBody .newsrow').length >= 1"), 'a tap on the strip opens the news as a list');
 await click('[data-act=setback]', 400); ok(!await has('#gBody .newsrow'), 'and "back" closes it');
+ok(await ev("document.getElementById('gChatBtn').hidden && document.getElementById('gOnline').hidden && document.getElementById('gChat').hidden"), 'no chat and no online count where the game has no server of its own');
 for (const t of ['train', 'dress', 'fight', 'rank', 'home']) { await tab(t); ok(await ev("document.getElementById('gBody').innerText.length > 80"), 'tab ' + t + ' shows its screen'); await sane('tab ' + t); }
 
 // ---- 2. training: every activity once

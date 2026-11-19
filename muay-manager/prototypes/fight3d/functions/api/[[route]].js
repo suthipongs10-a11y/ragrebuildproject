@@ -44,7 +44,12 @@ async function schema(db) {
     db.prepare('CREATE TABLE IF NOT EXISTS transfers (code TEXT PRIMARY KEY, id TEXT NOT NULL, expires INTEGER NOT NULL)'),
     db.prepare('CREATE TABLE IF NOT EXISTS cups (k INTEGER NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, at INTEGER NOT NULL, PRIMARY KEY (k, id))'),
     db.prepare('CREATE TABLE IF NOT EXISTS news (id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER NOT NULL, pid TEXT NOT NULL, data TEXT NOT NULL)'),
-    db.prepare('CREATE INDEX IF NOT EXISTS news_pid ON news (pid, id)')
+    db.prepare('CREATE INDEX IF NOT EXISTS news_pid ON news (pid, id)'),
+    db.prepare('CREATE TABLE IF NOT EXISTS chat (id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER NOT NULL, pid TEXT NOT NULL, name TEXT NOT NULL, msg TEXT NOT NULL)'),
+    db.prepare('CREATE INDEX IF NOT EXISTS chat_pid ON chat (pid, id)'),
+    db.prepare('CREATE TABLE IF NOT EXISTS chat_bans (pid TEXT PRIMARY KEY, t INTEGER NOT NULL)'),
+    // who is online is asked often: an index on the time each fighter was last seen, so the count reads only those rows
+    db.prepare("CREATE INDEX IF NOT EXISTS board_seen ON docs (json_extract(data, '$.seen')) WHERE coll = 'board'")
   ]);
   ready = true;
 }
@@ -59,6 +64,37 @@ function newsItem(x) {
   if (Number.isInteger(x.rd) && x.rd >= 1 && x.rd <= 5) out.rd = x.rd; if (Number.isInteger(x.n) && x.n >= 0 && x.n <= 999) out.n = x.n;
   return out;
 }
+// The world chat: short lines from players to everyone. Read along with the challenges list every game already polls (no
+// request of its own); a line costs its sender one request. Kept: the last CHAT.keep lines. A line is cleaned here, not
+// trusted from the page: length, links out, the coarsest words masked. The name is the fighter's, read from the ranking.
+const CHAT = {keep: 200, page: 40, max: 120, gap: 2500, perMin: 8, online: 60e3, cache: 10e3};
+const CHAT_BAD = ['ควย', 'เย็ด', 'เหี้ย', 'หีแม่', 'อีดอก', 'ไอ้สัตว์', 'ไอ้สัส', 'อีสัส', 'พ่อมึงตาย', 'แม่มึงตาย', 'fuck', 'shit', 'bitch', 'cunt', 'nigger', 'nigga'];
+const CHAT_LINK = /(https?:\/\/|www\.)\S+|\b[\w-]+\.(com|net|org|io|co|me|xyz|info|th|ly|gg|tv|cc|app|dev|site|online|shop|club|vip|bet)\b(\/\S*)?/gi;
+function chatClean(v) {
+  // control and invisible characters (zero-width, direction marks, line separators) become spaces
+  let t = typeof v === 'string' ? v.replace(/[\p{Cc}\p{Cf}\p{Zl}\p{Zp}]/gu, ' ').replace(/\s+/g, ' ').trim() : '';
+  t = t.replace(CHAT_LINK, '[ลิงก์]');
+  for (const w of CHAT_BAD) t = t.split(new RegExp(w, 'gi')).join('***');
+  return [...t].slice(0, CHAT.max).join(''); // by characters, not halves of them
+}
+async function chatSince(db, after) { // the lines after one already had, oldest first; with none had, the last page
+  const row = r => ({id: r.id, t: r.t, pid: r.pid, name: r.name, msg: r.msg});
+  if (after > 0) return (await db.prepare('SELECT id, t, pid, name, msg FROM chat WHERE id > ? ORDER BY id LIMIT ?').bind(after, CHAT.page).all()).results.map(row);
+  return (await db.prepare('SELECT id, t, pid, name, msg FROM chat ORDER BY id DESC LIMIT ?').bind(CHAT.page).all()).results.map(row).reverse();
+}
+// who has the game open now (seen in the last minute): the count and the first names. Worked out afresh every few seconds.
+let onlineMemo = {at: 0, v: {n: 0, list: []}};
+async function onlineNow(db) {
+  const now = Date.now(); if (now - onlineMemo.at < CHAT.cache) return onlineMemo.v;
+  const since = now - CHAT.online;
+  const [c, l] = await db.batch([
+    db.prepare("SELECT COUNT(*) n FROM docs WHERE coll = 'board' AND json_extract(data, '$.seen') > ?").bind(since),
+    db.prepare("SELECT id, json_extract(data, '$.name') name FROM docs WHERE coll = 'board' AND json_extract(data, '$.seen') > ? LIMIT 30").bind(since)
+  ]);
+  onlineMemo = {at: now, v: {n: (c.results[0] || {}).n | 0, list: l.results.map(r => ({id: r.id, name: newsName(r.name).slice(0, 24)}))}};
+  return onlineMemo.v;
+}
+const reportMemo = new Map(); // one report every few seconds from a player (kept in this worker's memory: enough to stop a flood)
 async function sha256(s) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
 const rand = n => [...crypto.getRandomValues(new Uint8Array(n))].map(x => x.toString(16).padStart(2, '0')).join('');
 async function caller(request, db) {
@@ -82,7 +118,7 @@ export async function onRequest({request, env, params}) {
     await db.batch([
       db.prepare('INSERT INTO logs (t, ua, ver, msg) VALUES (?, ?, ?, ?)').bind(Date.now(), cut(request.headers.get('User-Agent'), 200), cut(d.ver, 40), cut(d.msg, 3000)),
       // the last 1000 kept; players' own notes (FEEDBACK ...) are not pushed out by errors, and are capped on their own
-      db.prepare("DELETE FROM logs WHERE id <= (SELECT MAX(id) - 1000 FROM logs) AND msg NOT LIKE 'FEEDBACK %'"),
+      db.prepare("DELETE FROM logs WHERE id <= (SELECT MAX(id) - 1000 FROM logs) AND msg NOT LIKE 'FEEDBACK %' AND msg NOT LIKE 'REPORT %'"),
       db.prepare("DELETE FROM logs WHERE msg LIKE 'FEEDBACK %' AND id NOT IN (SELECT id FROM logs WHERE msg LIKE 'FEEDBACK %' ORDER BY id DESC LIMIT 2000)")
     ]);
     return json({ok: true});
@@ -114,7 +150,7 @@ export async function onRequest({request, env, params}) {
     const who = await caller(request, db); if (!who) return json({error: 'forbidden'}, 403);
     await db.batch([
       db.prepare("DELETE FROM docs WHERE (id = ? AND coll IN ('board', 'challenges', 'answers')) OR coll = ? OR coll LIKE ?").bind(who, 'data/users/' + who, 'data/users/' + who + '/%'),
-      db.prepare('DELETE FROM transfers WHERE id = ?').bind(who), db.prepare('DELETE FROM cups WHERE id = ?').bind(who), db.prepare('DELETE FROM news WHERE pid = ?').bind(who), db.prepare('DELETE FROM players WHERE id = ?').bind(who)
+      db.prepare('DELETE FROM transfers WHERE id = ?').bind(who), db.prepare('DELETE FROM cups WHERE id = ?').bind(who), db.prepare('DELETE FROM news WHERE pid = ?').bind(who), db.prepare('DELETE FROM chat WHERE pid = ?').bind(who), db.prepare('DELETE FROM players WHERE id = ?').bind(who)
     ]);
     return json({ok: true});
   }
@@ -135,6 +171,34 @@ export async function onRequest({request, env, params}) {
     await db.batch(items.map(x => db.prepare('INSERT INTO news (t, pid, data) VALUES (?, ?, ?)').bind(now, who, JSON.stringify(x)))
       .concat(db.prepare('DELETE FROM news WHERE id <= (SELECT MAX(id) - ? FROM news)').bind(NEWS.keep)));
     return json({ok: true, n: items.length});
+  }
+  if (route[0] === 'chat') {
+    const now = Date.now();
+    if (route.length === 1 && method === 'GET') return json({now, chat: {items: await chatSince(db, +new URL(request.url).searchParams.get('after') || 0)}, on: await onlineNow(db)});
+    if (method !== 'POST' || route.length > 2 || (route.length === 2 && route[1] !== 'report')) return json({error: 'not found'}, 404);
+    const who = await caller(request, db); if (!who) return json({error: 'forbidden'}, 403);
+    const text = await request.text(); if (text.length > 2000) return json({error: 'too large'}, 413);
+    let body; try { body = JSON.parse(text); } catch (e) { return json({error: 'not json'}, 400); }
+    if (route.length === 2) { // a line somebody finds out of order: written down for the owner to look at
+      const id = body && Number.isInteger(body.id) ? body.id : 0, last = reportMemo.get(who) || 0; if (!id) return json({error: 'which line'}, 400);
+      if (now - last < 5000) return json({error: 'too soon'}, 429); reportMemo.set(who, now); if (reportMemo.size > 500) reportMemo.clear();
+      const m = await db.prepare('SELECT pid, name, msg FROM chat WHERE id = ?').bind(id).first(); if (!m) return json({ok: true, gone: true});
+      await db.prepare('INSERT INTO logs (t, ua, ver, msg) VALUES (?, ?, ?, ?)').bind(now, '', '', ('REPORT chat #' + id + ' by ' + who + ': ' + m.pid + ' ' + m.name + ': ' + m.msg).slice(0, 600)).run();
+      return json({ok: true});
+    }
+    const msg = chatClean(body && body.text); if (!msg) return json({error: 'nothing to say'}, 400);
+    const [ban, me, rate] = await db.batch([
+      db.prepare('SELECT 1 x FROM chat_bans WHERE pid = ?').bind(who),
+      db.prepare("SELECT data FROM docs WHERE coll = 'board' AND id = ?").bind(who),
+      db.prepare('SELECT COUNT(*) c, MAX(t) last FROM chat WHERE pid = ? AND t > ?').bind(who, now - 60e3)
+    ]);
+    if (ban.results.length) return json({error: 'banned'}, 403);
+    let name = ''; try { name = newsName(JSON.parse(me.results[0].data).name).slice(0, 24); } catch (e) { /* no fighter yet */ }
+    if (name.length < 2) return json({error: 'no fighter'}, 409); // the chat is for players with a fighter on the ranking
+    const r = rate.results[0] || {}; if ((r.c | 0) >= CHAT.perMin || (r.last && now - r.last < CHAT.gap)) return json({error: 'too soon'}, 429);
+    const ins = await db.prepare('INSERT INTO chat (t, pid, name, msg) VALUES (?, ?, ?, ?) RETURNING id').bind(now, who, name, msg).first();
+    await db.prepare('DELETE FROM chat WHERE id <= (SELECT MAX(id) - ? FROM chat)').bind(CHAT.keep).run();
+    return json({ok: true, item: {id: ins.id, t: now, pid: who, name, msg}});
   }
   if (route[0] === 'cup' && route.length === 1) {
     const now = Date.now(), c = cupClock(env, now);
@@ -163,8 +227,10 @@ export async function onRequest({request, env, params}) {
     const u = new URL(request.url), order = u.searchParams.get('order'), dir = u.searchParams.get('dir') === 'desc' ? 'DESC' : 'ASC';
     const limit = Math.max(1, Math.min(1000, +u.searchParams.get('limit') || 300));
     const sql = order && FIELD.test(order) ? `SELECT id, data FROM docs WHERE coll = ? ORDER BY json_extract(data, '$.${order}') ${dir} LIMIT ?` : 'SELECT id, data FROM docs WHERE coll = ? ORDER BY id LIMIT ?';
-    const {results} = await db.prepare(sql).bind(coll, limit).all();
-    return json({docs: results.map(r => ({id: r.id, data: JSON.parse(r.data)}))});
+    const {results} = await db.prepare(sql).bind(coll, limit).all(), out = {docs: results.map(r => ({id: r.id, data: JSON.parse(r.data)}))};
+    // the world chat and who is online ride along with the list every game asks for anyway (chat=<the last line it has>)
+    if (coll === 'challenges' && u.searchParams.has('chat')) { out.chat = {items: await chatSince(db, +u.searchParams.get('chat') || 0)}; out.on = await onlineNow(db); }
+    return json(out);
   }
   const coll = path.slice(0, -1).join('/'), id = path[path.length - 1];
   if (method === 'GET') {

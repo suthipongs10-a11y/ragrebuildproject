@@ -5,6 +5,14 @@
 
 ตัวนักมวยเป็นโมเดล 3D ที่สร้างด้วย Meshy (ภาพอ้างอิง → โมเดลมีผิว → ใส่กระดูกอัตโนมัติ) แล้วขยับด้วยท่าชุดเดียวกับตัวที่สร้างจากโค้ด ซึ่งยังเลือกกลับไปใช้ได้ เสียงเป็นเสียงสังเคราะห์ชั่วคราว
 
+## รอบที่ 86: แชทโลก จำนวนคนออนไลน์ และเครื่องที่เปิดภาพ 3D ไม่ได้ (19 พ.ย. 2026)
+
+- เซิร์ฟเวอร์ (`functions/api/[[route]].js`): `CHAT` (เก็บ 200 หน้า 40 ยาว 120 ห่าง 2.5 วิ 8 ต่อนาที) `CHAT_BAD` `CHAT_LINK` `chatClean(v)` `chatSince(db, after)` `onlineNow(db)` (จำไว้ 10 วินาทีต่อ worker) • ตาราง `chat (id, t, pid, name, msg)` `chat_bans (pid, t)` ดัชนี `chat_pid` และ `board_seen` (บน `json_extract(data, '$.seen')` เฉพาะ `coll = 'board'`: คำถามต้องเขียน `coll = 'board'` เป็นค่าตรง ๆ ดัชนีจึงถูกใช้) • `GET /api/chat?after=` • `POST /api/chat` • `POST /api/chat/report` • รายการ `challenges` ที่ขอพร้อม `chat=` ตอบ `chat` และ `on` เพิ่ม
+- `netdb.js`: `ride(path, ask, got)` ฝากคำถามและรับคำตอบไปกับรายการที่ poll อยู่แล้ว
+- `game.js`: `CT` (สถานะ: `polled` = ข้อความล่าสุดที่ poll นำมา แยกจากข้อความของตัวเองที่เพิ่มตอนส่ง) `chatGot(j)` `chatAdd(list)` `chatUi(fresh)` `chatFit()` `chatSend()` `chatAct(act, v)` `chatBuild()` สร้าง `#gOnline` (ในหัวหน้า) `#gChatBtn` `#gChat` • `GAME.chat()` สำหรับทดสอบ
+- `main.js` `openRenderer()`: ลองสร้างตัววาดภาพ 3 แบบ แล้วจึงขึ้น `#noGl` • `window.MUAY_GL_TRY`
+- `tools/chat-admin.mjs` (`npm run chat -- list --remote`) • `tools/e2e/no-webgl.mjs` (`npm run e2e:nogl`)
+
 ## รอบที่ 84: ฟอนต์ใหม่ (19 พ.ย. 2026)
 
 - `src/page.html`: ลิงก์ Google Fonts (Chakra Petch 500/600/700 + เอียง 700, Bai Jamjuree 400–700) และ `--display` / `--body` • น้ำหนัก 800 ที่ CSS ขอ จะได้ 700 ซึ่งหนาสุดของฟอนต์นี้

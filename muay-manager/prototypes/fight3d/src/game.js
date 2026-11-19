@@ -113,7 +113,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.60', BUILD = 260;
+const VER = '2.61', BUILD = 261;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -216,7 +216,7 @@ async function cloudInit() {
     const [db, user] = await Promise.all([rt.use('db'), rt.use('user')]);
     const uid = db && user ? await user.id() : null;
     if (!uid) { cloudNote = 'ออฟไลน์ บันทึกในเครื่องนี้'; if (tab === 'rank' || tab === 'home') render(); return; }
-    CLOUD = {db, uid, site: !!rt.site, acct: rt.account || null, call: rt.call || null}; CH.skew = rt.skew || 0; cloudNote = 'ออนไลน์'; // acct: moving to another device and being forgotten (the game's own website only)
+    CLOUD = {db, uid, site: !!rt.site, acct: rt.account || null, call: rt.call || null, ride: rt.ride || null}; CH.skew = rt.skew || 0; cloudNote = 'ออนไลน์'; if (CLOUD.ride) CLOUD.ride('challenges', () => ({chat: CT.polled}), chatGot); if (window.MUAY_GL_TRY) siteLog('gl: the 3D context opened on try ' + window.MUAY_GL_TRY); // acct: moving to another device and being forgotten (the game's own website only)
     if (rt.site) { setInterval(checkBuild, 120000); document.addEventListener('visibilitychange', () => { if (!document.hidden) checkBuild(); }); checkBuild(); }
     document.addEventListener('visibilitychange', () => presence(document.hidden)); window.addEventListener('pagehide', () => presence(true));
     let snap; try { snap = await db.collection('data/users/' + uid).doc('save').get(); } catch (e) { if (keyDead(e)) return; throw e; }
@@ -440,7 +440,7 @@ const planText = p => PLAN.ag[p.ag] + ' · ' + PLAN.range[p.range] + ' · เน
 const art = (name, cls) => '<i class="ui ' + (cls || '') + '" data-ui="' + name + '" aria-hidden="true"></i>';
 function topBar() {
   const bar = $('gMatch'); if (bar) { CH.barHtml = bannersHtml(); bar.innerHTML = CH.barHtml; fillCountdowns(); }
-  newsDraw();
+  newsDraw(); chatUi();
   if (!S) { $('gTop').innerHTML = ''; return; }
   const f = Math.round(S.fatigue);
   $('gTop').innerHTML = '<div class="who"><b>' + esc(S.name) + '</b><span>' + LEAGUES[league(S.rp)][1] + ' · วันที่ ' + S.day + ' · อารมณ์ ' + art('mood-' + (S.mood + 1), 'mood') + '<i class="' + (S.mood > 2 ? 'hi' : S.mood < 2 ? 'lo' : '') + '">' + MOODS[S.mood] + '</i></span></div>' +
@@ -1138,6 +1138,7 @@ function chTick() {
   if (!S || !CLOUD) return;
   if (Date.now() - (CH.seenAt || 0) > PRESENCE) presence();
   if (NW.queue.length) newsSend();
+  chatUi();
   if (CLOUD.call && !F && !document.hidden && Date.now() - NW.at > NEWS_EVERY) newsLoad(); // the news: read while a menu is up
   newsDraw();
   // who is online, and who is watching: the leaderboard is read again while it matters
@@ -1189,6 +1190,95 @@ function countOff() { if (!CH.cnt) return; clearInterval(CH.cnt.timer); CH.cnt.e
 // way in once the bell has gone), a challenge waiting for our answer, our own "fight now" challenge waiting for his, and a
 // match of others to watch. No time-dependent text in here (the countdowns are filled in by the tick), so the same state
 // gives the same markup and the page is only touched when something changed.
+// ---------- the world chat, and who is online ----------
+// Short lines from any player to everyone, in a panel over the lower half of the screen (menus and fights alike: a fight
+// plays itself, so there is time to talk). The lines and the number of people online come with the challenges list the
+// game polls anyway (netdb's rider); a line sent is one request. The server cleans every line and names its sender.
+const CT = {items: [], ids: new Set(), polled: 0, seen: -1, open: false, mute: {}, hid: {}, more: 0, note: '', noteAt: 0, on: null, sending: false, sig: ''};
+try { const v = localStorage.getItem('muayChatSeen'); if (v != null) CT.seen = +v || 0; CT.mute = JSON.parse(localStorage.getItem('muayChatMute') || '{}') || {}; } catch (e) { /* this visit only */ }
+const chatOn = () => !!(S && CLOUD && CLOUD.call && CLOUD.ride && !CLOUD.dead && view !== 'create' && !DR && !SC);
+const chatKeep = () => { try { localStorage.setItem('muayChatSeen', String(CT.seen)); localStorage.setItem('muayChatMute', JSON.stringify(CT.mute)); } catch (e) { /* this visit only */ } };
+function chatAdd(list) {
+  let got = false;
+  for (const x of list) {
+    if (!x || !Number.isInteger(x.id) || CT.ids.has(x.id) || typeof x.msg !== 'string') continue;
+    CT.ids.add(x.id); CT.items.push({id: x.id, t: +x.t || 0, pid: String(x.pid || ''), name: API.cleanName(x.name) || 'นักมวย', msg: x.msg.slice(0, 200)}); got = true;
+  }
+  if (got) { CT.items.sort((a, b) => a.id - b.id); if (CT.items.length > 120) { CT.items.splice(0, CT.items.length - 120); CT.ids = new Set(CT.items.map(x => x.id)); } }
+  return got;
+}
+// what came with the poll: who is online, and the lines after the last one a poll brought (a line of my own, added when
+// it was sent, does not move that mark: somebody else's earlier line may still be on its way)
+function chatGot(j) {
+  if (j && j.on && typeof j.on.n === 'number') CT.on = {n: j.on.n, list: (Array.isArray(j.on.list) ? j.on.list : []).slice(0, 30).map(x => ({id: String(x && x.id || ''), name: API.cleanName(x && x.name) || 'นักมวย'}))};
+  const list = j && j.chat && Array.isArray(j.chat.items) ? j.chat.items : [], got = chatAdd(list);
+  list.forEach(x => { if (x && Number.isInteger(x.id) && x.id > CT.polled) CT.polled = x.id; });
+  if (CT.seen < 0) { CT.seen = CT.polled; chatKeep(); } // a first visit: what was said before he came is not "unread"
+  chatUi(got);
+}
+const chatShown = () => CT.items.filter(x => !CT.mute[x.pid] && !CT.hid[x.id]);
+const chatUnread = () => (CLOUD ? chatShown().filter(x => x.id > CT.seen && x.pid !== CLOUD.uid).length : 0);
+const chatTime = t => { const d = new Date(t - CH.skew), p = n => String(n).padStart(2, '0'), hm = p(d.getHours()) + ':' + p(d.getMinutes()); return d.toDateString() === new Date().toDateString() ? hm : d.getDate() + '/' + (d.getMonth() + 1) + ' ' + hm; };
+const chatSay = text => { CT.note = text; CT.noteAt = Date.now(); };
+function chatListHtml() {
+  const list = chatShown();
+  if (!list.length) return '<p class="chat-empty">ยังไม่มีใครพูดอะไร เริ่มทักทายคนแรกได้เลย</p>';
+  return list.map(x => { const me = x.pid === CLOUD.uid;
+    return '<div class="cm' + (me ? ' me' : '') + '"><button type="button" class="cm-b" data-act="chatmore" data-v="' + x.id + '"' + (me ? ' disabled' : '') + '><b>' + esc(x.name) + '</b><span>' + esc(x.msg) + '</span><small>' + chatTime(x.t) + '</small></button>' +
+      (CT.more === x.id && !me ? '<span class="cm-acts"><button type="button" class="btn sm" data-act="chatmute" data-v="' + esc(x.pid) + '">ซ่อนข้อความจากคนนี้</button><button type="button" class="btn sm" data-act="chatreport" data-v="' + x.id + '">รายงานข้อความนี้</button></span>' : '') + '</div>'; }).join('');
+}
+// the panel stands on the part of the screen that can be seen (above a phone's keyboard, when that is up)
+function chatFit() {
+  const el = $('gChat'); if (!el || el.hidden) return;
+  const vv = window.visualViewport, h = vv ? vv.height : window.innerHeight, top = vv ? vv.offsetTop : 0, ph = Math.round(Math.max(200, Math.min(h * .55, 460)));
+  el.style.top = Math.round(top + h - ph) + 'px'; el.style.height = ph + 'px';
+}
+// everything of the chat on the screen: the number online at the top, the button with its count, and the open panel
+function chatUi(fresh) {
+  const pill = $('gOnline'), fab = $('gChatBtn'), el = $('gChat'); if (!pill || !fab || !el) return;
+  const on = chatOn(); if (!on && CT.open) CT.open = false;
+  const n = CT.on ? Math.max(1, CT.on.n) : 0, unread = on && !CT.open ? chatUnread() : 0;
+  pill.hidden = !(on && CT.on); if (!pill.hidden) { const t = 'ออนไลน์ ' + n; if ($('gOnlineN').textContent !== t) $('gOnlineN').textContent = t; }
+  fab.hidden = !on || CT.open; const bd = $('gChatBadge'); bd.hidden = !unread; if (unread) bd.textContent = unread > 99 ? '99+' : String(unread);
+  if (el.hidden === CT.open) { el.hidden = !CT.open; if (CT.open) { chatFit(); fresh = true; CT.sig = ''; } }
+  if (!CT.open) return;
+  if (CT.items.length) { const last = CT.items[CT.items.length - 1].id; if (last > CT.seen) { CT.seen = last; chatKeep(); } }
+  const names = CT.on ? CT.on.list.map(x => x.name) : [], muted = Object.keys(CT.mute).length;
+  $('gChatOn').textContent = CT.on ? 'ออนไลน์ ' + n + ' คน' + (names.length ? ': ' + names.join(', ') + (n > names.length ? ' …' : '') : '') : '';
+  const note = CT.note && Date.now() - CT.noteAt < 6000 ? CT.note : '';
+  $('gChatNote').innerHTML = note ? esc(note) : 'คุยกันสุภาพ ไม่ใส่ข้อมูลส่วนตัว · แตะข้อความของคนอื่นเพื่อซ่อนหรือรายงาน' + (muted ? ' · <button type="button" class="link" data-act="chatunmute">เลิกซ่อน ' + muted + ' คน</button>' : '');
+  const sig = CT.items.length + ':' + (CT.items.length ? CT.items[CT.items.length - 1].id : 0) + ':' + CT.more + ':' + muted + ':' + Object.keys(CT.hid).length;
+  if (sig === CT.sig) return; CT.sig = sig;
+  const box = $('gChatList'), atEnd = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
+  box.innerHTML = chatListHtml(); if (fresh || atEnd) box.scrollTop = box.scrollHeight;
+}
+async function chatSend() {
+  const inp = $('gChatText'), text = inp.value.replace(/\s+/g, ' ').trim(); if (!text || CT.sending || !chatOn()) return;
+  CT.sending = true; const j = await CLOUD.call('/chat', 'POST', {text}); CT.sending = false;
+  if (j && j.status === 200 && j.item) { inp.value = ''; chatAdd([j.item]); CT.note = ''; CT.sig = ''; chatUi(true); return; }
+  chatSay(!j ? 'ส่งไม่ได้ เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ลองอีกครั้ง' : j.status === 429 ? 'ส่งถี่เกินไป รอสักครู่แล้วส่งใหม่' : j.status === 409 ? 'ยังส่งไม่ได้ รอเกมบันทึกนักมวยขึ้นเซิร์ฟเวอร์สักครู่' : j.error === 'banned' ? 'บัญชีนี้ถูกระงับการใช้แชท' : j.status === 400 ? 'ข้อความว่าง' : 'ส่งไม่ได้ในตอนนี้'); chatUi();
+}
+function chatAct(act, v) {
+  if (act === 'chat') { CT.open = !CT.open && chatOn(); CT.more = 0; chatUi(true); if (CT.open && !('ontouchstart' in window)) $('gChatText').focus({preventScroll: true}); return true; }
+  if (act === 'chatmore') { CT.more = CT.more === +v ? 0 : +v; chatUi(); return true; }
+  if (act === 'chatmute') { CT.mute[v] = 1; const k = Object.keys(CT.mute); if (k.length > 100) delete CT.mute[k[0]]; CT.more = 0; chatKeep(); chatSay('ซ่อนข้อความจากคนนี้แล้ว (เฉพาะในเครื่องนี้)'); chatUi(); return true; }
+  if (act === 'chatunmute') { CT.mute = {}; chatKeep(); chatUi(); return true; }
+  if (act === 'chatreport') { CT.hid[+v] = 1; CT.more = 0; chatSay('รายงานแล้ว ขอบคุณ ข้อความนี้ถูกซ่อนในเครื่องคุณ'); chatUi(); CLOUD.call('/chat/report', 'POST', {id: +v}); return true; }
+  return false;
+}
+// the chat's own pieces of the page: the number online beside the logo, the round button, the panel
+function chatBuild() {
+  const app = document.querySelector('.app'), head = app.querySelector('header'); if (!head || $('gChat')) return;
+  head.insertAdjacentHTML('beforeend', '<button type="button" id="gOnline" class="onpill" data-act="chat" hidden aria-label="จำนวนผู้เล่นออนไลน์ แตะเพื่อเปิดแชทโลก"><i></i><span id="gOnlineN"></span></button>');
+  app.insertAdjacentHTML('beforeend', '<button type="button" id="gChatBtn" class="chatfab" data-act="chat" hidden aria-label="แชทโลก"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H9.5L5 21v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg><b id="gChatBadge" hidden></b></button>' +
+    '<section id="gChat" class="chat" hidden aria-label="แชทโลก"><div class="chat-h"><b>แชทโลก</b><span id="gChatOn"></span><button type="button" class="btn sm" data-act="chat">ปิด</button></div>' +
+    '<div class="chat-list" id="gChatList" aria-live="polite"></div><div class="chat-note" id="gChatNote"></div>' +
+    '<form class="chat-in" id="gChatForm"><input class="inp" id="gChatText" maxlength="120" placeholder="พิมพ์คุยกับทุกคน" autocomplete="off" enterkeyhint="send" aria-label="ข้อความ"><button class="btn go" type="submit">ส่ง</button></form></section>');
+  [$('gOnline'), $('gChatBtn'), $('gChat')].forEach(el => el.addEventListener('click', onClick));
+  $('gChatForm').addEventListener('submit', e => { e.preventDefault(); useCount('a', 'chatsend'); chatSend(); });
+  if (window.visualViewport) { window.visualViewport.addEventListener('resize', chatFit); window.visualViewport.addEventListener('scroll', chatFit); }
+  window.addEventListener('resize', chatFit);
+}
 // ---------- the news ticker ----------
 // One line across the top of the menu screens, running right to left: what players' fighters have just done (the
 // server's list, read once a minute while a menu is up; each game posts its own notable results), the matches and the
@@ -1271,7 +1361,7 @@ function newsAll() {
       const [tag, html] = newsLine(x); out.push({tag, html, t: x.t});
     });
     all.filter(m => t >= m.start + MATCH_LEN && t < m.start + MATCH_LEN + 6 * 3600e3).slice(-2).forEach(m => out.push({tag: 'ดูย้อนหลัง', go: 'watch', html: pair(m) + ' ชกจบแล้ว · ดูย้อนหลังได้ที่ปุ่ม ดูมวย'}));
-    const real = board.filter(b => b.real), top = real.concat(S ? [{name: S.name, rp: S.rp}] : []).sort((x, y) => y.rp - x.rp)[0], on = real.filter(isOnline).length + 1;
+    const real = board.filter(b => b.real), top = real.concat(S ? [{name: S.name, rp: S.rp}] : []).sort((x, y) => y.rp - x.rp)[0], on = CT.on ? CT.on.n : real.filter(isOnline).length + 1;
     if (real.length && top) out.push({tag: 'อันดับ', go: 'rank', html: 'ผู้เล่นคะแนนสูงสุดตอนนี้ <b>' + esc(top.name) + '</b> · RP ' + top.rp});
     if (on >= 2) out.push({tag: 'ออนไลน์', html: 'ตอนนี้มีผู้เล่นออนไลน์ ' + on + ' คน · ท้าชกกันได้ที่เมนู หาคู่ชก'});
   } else NW.own.filter(x => t - x.t < NEWS_OWN).forEach(x => { const [tag, html] = newsLine(x); out.push({tag, html, t: x.t}); });
@@ -1759,6 +1849,7 @@ function onClick(e) {
   if (act === 'watch') { if (view && view.watch) view = null; else { if (DR) drillEnd(true); view = {watch: true}; } render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   if (act === 'exh') { watchMatch(null, exhibition()); return; }
   if (act === 'watchmore') { F = null; API.stop(); view = {watch: true}; setMode(false); render(); showMe(); if (CLOUD) loadBoard(); return; }
+  if (act.startsWith('chat') && chatAct(act, v)) return;
   if (act === 'news') { if (view && view.news) view = null; else { if (DR) drillEnd(true); view = {news: true}; } render(); $('gBody').scrollIntoView({block: 'start', behavior: 'smooth'}); return; }
   if (act === 'hall') { view = view && view.hall ? null : {hall: true}; render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   if (act === 'settings') { if (view && view.settings) view = null; else { if (DR) drillEnd(true); view = {settings: true}; } render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
@@ -1862,8 +1953,9 @@ export function bootGame(api) {
   const g = $('game'); g.addEventListener('click', onClick); $('gMatch').addEventListener('click', onClick); $('gBody').addEventListener('click', onClick);
   { const nw = $('gNews'); if (nw) { nw.addEventListener('click', onClick); $('gNewsRun').addEventListener('animationiteration', () => { if (NW.next != null) newsSet(NW.next); }); } } // a changed line waits for the run on screen to end
   $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
+  chatBuild();
   const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ ' + VER; }
-  window.GAME = {news: () => newsAll().map(x => x.tag + ': ' + x.html.replace(/<[^>]+>/g, '')), newsLoad, drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress, uid: () => (CLOUD ? CLOUD.uid : null), match: applyMatch, fight: () => F, cup: () => { const d = PC.data, c = d && d.next; return !c ? null : {k: c.k, phase: cupPhase(now()), age: Date.now() - PC.at, busy: PC.busy, entries: c.entries.length, cup: now() >= c.close ? cupOf(c) : null, prev: d.prev && d.prev.entries.length >= CUP_MIN ? cupOf(d.prev) : null}; }, rest: sec => { if (F && F.phase === 'break') F.restEnd = now() + sec * 1000; }}; // for automated checks
+  window.GAME = {chat: () => ({open: CT.open, on: CT.on, unread: chatUnread(), polled: CT.polled, items: chatShown().map(x => x.name + ': ' + x.msg)}), news: () => newsAll().map(x => x.tag + ': ' + x.html.replace(/<[^>]+>/g, '')), newsLoad, drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress, uid: () => (CLOUD ? CLOUD.uid : null), match: applyMatch, fight: () => F, cup: () => { const d = PC.data, c = d && d.next; return !c ? null : {k: c.k, phase: cupPhase(now()), age: Date.now() - PC.at, busy: PC.busy, entries: c.entries.length, cup: now() >= c.close ? cupOf(c) : null, prev: d.prev && d.prev.entries.length >= CUP_MIN ? cupOf(d.prev) : null}; }, rest: sec => { if (F && F.phase === 'break') F.restEnd = now() + sec * 1000; }}; // for automated checks
   MON.price().then(pr => { monPrice = pr; if (pr && S && !F && !DR && !SC && tab === 'home' && view !== 'create') render(); }); if (S) vipSync(); // the store's price, and what it says is owned
   S = loadLocal(); setMode(false);
   if (S) { useOpen(); go('home'); } else { view = 'create'; render(); previewDraft(); }

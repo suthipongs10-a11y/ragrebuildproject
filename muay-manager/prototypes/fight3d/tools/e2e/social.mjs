@@ -37,6 +37,21 @@ try {
   const newsOf = async (p, re) => { for (let i = 0; i < 20; i++) { await ev(p, 'GAME.newsLoad()'); await p.waitForTimeout(1500); const l = await ev(p, 'GAME.news()'); if (l.some(x => re.test(x))) return l.find(x => re.test(x)); } return ''; };
   ok(await newsOf(B, new RegExp('^หน้าใหม่: นักมวยหน้าใหม่ ' + NAMES[0])), 'B’s news strip tells of A’s new fighter');
   ok(await ev(B, `!document.getElementById('gNews').hidden`), 'and the strip is up on B’s screen');
+  // ---- 0b. the world chat, and how many are online (both come with a list the game polls anyway)
+  const say = (p, text) => ev(p, `document.getElementById('gChatText').value = ${JSON.stringify(text)}; document.getElementById('gChatForm').requestSubmit()`);
+  ok(await until(A, "!document.getElementById('gOnline').hidden && /^ออนไลน์ [2-9]/.test(document.getElementById('gOnlineN').textContent)", 70000), 'the top of A’s screen says how many are online', await ev(A, "document.getElementById('gOnlineN').textContent"));
+  ok(await click(A, '#gChatBtn', 400) && await ev(A, "!document.getElementById('gChat').hidden && document.getElementById('gChatBtn').hidden"), 'the round button opens the chat panel');
+  await say(A, 'สวัสดีจากเอ <i>นะ</i>'); ok(await until(A, "GAME.chat().items.some(x => x.endsWith(': สวัสดีจากเอ <i>นะ</i>'))", 10000) && await ev(A, "!document.querySelector('#gChatList i')"), 'A’s line is on his own screen at once, as plain text');
+  ok(await until(B, "GAME.chat().unread === 1 && !document.getElementById('gChatBadge').hidden", 25000), 'B’s chat button shows one unread line');
+  await click(B, '#gChatBtn', 500); ok(await ev(B, `(t => t.includes(${JSON.stringify(NAMES[0])}) && t.includes('สวัสดีจากเอ'))(document.getElementById('gChatList').innerText) && GAME.chat().unread === 0`), 'B opens the panel and reads it; nothing is unread any more');
+  ok(await ev(B, `(t => t.includes(${JSON.stringify(NAMES[0])}) && t.includes(${JSON.stringify(NAMES[1])}))(document.getElementById('gChatOn').textContent)`), 'the panel names who is online', await ev(B, "document.getElementById('gChatOn').textContent"));
+  await say(B, 'ตอบจากบี'); await until(B, "GAME.chat().items.some(x => x.endsWith(': ตอบจากบี'))", 10000); await say(B, 'เร็วไป');
+  ok(await until(B, "/ส่งถี่เกินไป/.test(document.getElementById('gChatNote').textContent)", 8000), 'a second line straight after the first is refused, with a note');
+  ok(await until(A, "GAME.chat().items.some(x => x.endsWith(': ตอบจากบี'))", 25000), 'A gets B’s answer');
+  await ev(A, "[...document.querySelectorAll('.cm:not(.me) .cm-b')].pop().click()"); await A.waitForTimeout(300); await click(A, '[data-act=chatmute]', 300);
+  ok(await ev(A, "!GAME.chat().items.some(x => x.endsWith(': ตอบจากบี')) && GAME.chat().items.length === 1"), 'A hides B’s lines on his own screen');
+  await click(A, '#gChat [data-act=chat]', 300); await click(B, '#gChat [data-act=chat]', 300);
+  ok(await ev(A, "document.getElementById('gChat').hidden && !document.getElementById('gChatBtn').hidden"), '"close" puts the panel away');
   // ---- 1. a ranked fight against another player’s fighter, and the news of it
   let found = false; // the ranked draw moves with the number of ranked fights left: turn it until B’s fighter comes up
   for (let k = 2; k < 80 && !found; k++) { await ev(A, `GAME.save().ranked = ${k}; GAME.save().fatigue = 0`); await click(A, '[data-act=tab][data-v=fight]', 250); found = await ev(A, `(() => { const b = document.querySelector('[data-act=pick][data-v=r]'), c = b && b.closest('.opp'); return !!c && c.innerText.includes(${JSON.stringify(NAMES[1])}); })()`); }

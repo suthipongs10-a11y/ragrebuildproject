@@ -277,6 +277,23 @@ p.bad{margin:0;font-size:14px;font-weight:600;color:var(--bad)}
 @keyframes nwrun{to{transform:translateX(-50%)}} /* the lines are there twice (newsSet): half way along, the picture is the one it started with */
 #gNews.still #gNewsRun{display:block;animation:none;overflow:hidden;text-overflow:ellipsis} #gNews.still #gNewsRun .nw{margin-right:0}
 .app.has-news #gMatch{top:36px} .app.has-news #gBody{scroll-margin-top:44px}
+/* who is online (beside the logo), and the world chat: a round button, and a panel over the lower half of the screen */
+.app.game header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.onpill{flex:none;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12.5px;font-weight:600;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer;white-space:nowrap}
+.onpill[hidden],.chatfab[hidden],.chat[hidden]{display:none}
+.onpill i{width:8px;height:8px;border-radius:50%;background:var(--hp);box-shadow:0 0 0 3px color-mix(in srgb,var(--hp) 25%,transparent)}
+.chatfab{position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:70;width:50px;height:50px;border-radius:50%;border:1px solid #6b5a2a;background:#1b1810;color:var(--gold);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.55);cursor:pointer}
+.chatfab b{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:10px;background:var(--red);color:#fff;font:700 11.5px/20px var(--body);text-align:center;padding:0 5px;box-sizing:border-box}
+.chat{position:fixed;left:0;right:0;bottom:0;height:55vh;z-index:80;max-width:860px;margin:0 auto;display:flex;flex-direction:column;background:rgba(15,16,22,.97);border:1px solid #4a3d18;border-bottom:0;border-radius:14px 14px 0 0;box-shadow:0 -10px 34px rgba(0,0,0,.6)}
+.chat-h{display:flex;align-items:center;gap:8px;padding:8px 10px 6px 14px;border-bottom:1px solid var(--line)} .chat-h b{font-family:var(--display);font-size:16px;color:var(--gold);white-space:nowrap}
+.chat-h span{flex:1;min-width:0;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .chat-h .btn{min-height:32px;padding:3px 12px;font-size:13px}
+.chat-list{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:6px 10px;-webkit-overflow-scrolling:touch}
+.chat-empty{color:var(--muted);font-size:13.5px;text-align:center;margin:18px 0}
+.cm{margin:2px 0} .cm-b{display:block;width:100%;text-align:left;font:inherit;color:var(--fg);background:none;border:0;border-radius:8px;padding:4px 6px;line-height:1.45;cursor:pointer;overflow-wrap:anywhere}
+.cm-b:disabled{cursor:default;color:var(--fg)} .cm-b b{color:var(--blue-soft);font-weight:700;margin-right:7px} .cm.me .cm-b b{color:var(--gold)} .cm-b small{color:var(--muted);font-size:11px;margin-left:7px;white-space:nowrap}
+.cm-acts{display:flex;flex-wrap:wrap;gap:6px;padding:2px 6px 6px} .cm-acts .btn{min-height:30px;padding:3px 10px;font-size:12.5px}
+.chat-note{padding:3px 14px;font-size:11.5px;color:var(--muted);min-height:17px} .chat-note .link{font:inherit;color:var(--blue-soft);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}
+.chat-in{display:flex;gap:8px;padding:6px 10px calc(8px + env(safe-area-inset-bottom,0px))} .chat-in .inp{flex:1;min-width:0;font-size:16px} .chat-in .btn{flex:none;min-height:40px;padding:4px 18px}
 .newsrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.5} .newsrow:first-of-type{border-top:0}
 .newsrow b{color:#fff} .newsrow small{color:var(--muted);white-space:nowrap} .newsrow .btn{flex:none}
 .app.g-clock #btnSpeed{display:none} /* a live match runs by the clock */

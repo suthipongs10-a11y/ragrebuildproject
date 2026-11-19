@@ -17,6 +17,8 @@ export async function siteRuntime(base = (typeof window !== 'undefined' && windo
   const fail = r => { throw {code: r.status === 403 ? 'permission_denied' : r.status === 413 ? 'invalid_argument' : 'unavailable'}; };
   // live queries, refreshed at once after this player writes so his own change shows without waiting for the next poll
   const live = new Set(), kick = () => setTimeout(() => live.forEach(f => f()), 150);
+  // a rider: more asked for, and more given back, with a list that is polled anyway (the world chat with the challenges)
+  const riders = {}, ride = (path, ask, got) => { riders[path] = {ask, got}; };
   const snap = (id, data) => ({id, exists: data != null, data: () => (data == null ? undefined : data)});
   const docRef = path => ({
     async get() { const r = await fetch(url(path), {headers: auth, cache: 'no-store'}); if (r.status === 404) return snap(path.split('/').pop(), null); if (!r.ok) fail(r); const j = await r.json(); return snap(j.id, j.data); },
@@ -30,9 +32,11 @@ export async function siteRuntime(base = (typeof window !== 'undefined' && windo
       orderBy: (f, dir) => query(path, [f, dir || 'asc'], lim), limit: n => query(path, ord, n), where: () => q,
       doc: id => docRef(path + '/' + id),
       async get() {
-        const p = new URLSearchParams(); if (ord) { p.set('order', ord[0]); p.set('dir', ord[1]); } if (lim) p.set('limit', String(lim));
+        const p = new URLSearchParams(), rd = riders[path]; if (ord) { p.set('order', ord[0]); p.set('dir', ord[1]); } if (lim) p.set('limit', String(lim));
+        if (rd) { const more = rd.ask() || {}; for (const k in more) p.set(k, String(more[k])); }
         const r = await fetch(url(path) + '?' + p, {headers: auth, cache: 'no-store'}); if (!r.ok) fail(r);
-        const j = await r.json(); return {docs: j.docs.map(d => snap(d.id, d.data)), docChanges: () => []};
+        const j = await r.json(); if (rd) { try { rd.got(j); } catch (e) { /* the list itself still counts */ } }
+        return {docs: j.docs.map(d => snap(d.id, d.data)), docChanges: () => []};
       },
       onSnapshot(next, error) {
         let stop = false, timer = 0, busy = false, again = false; // one read at a time; a refresh asked for mid-read runs right after it
@@ -60,5 +64,5 @@ export async function siteRuntime(base = (typeof window !== 'undefined' && windo
   };
   // any other call to the site's API as this player (the players' cup): the answer as JSON with its status, or null when the site cannot be reached
   const call = async (p, method, body) => { try { const r = await fetch(base + p, {method: method || 'GET', cache: 'no-store', headers: Object.assign(body ? {'Content-Type': 'application/json'} : {}, auth), body: body ? JSON.stringify(body) : undefined}); const j = await r.json().catch(() => null); return j ? Object.assign(j, {status: r.status}) : null; } catch (e) { return null; } };
-  return {skew, site: true, account, call, use: async name => (name === 'db' ? db : name === 'user' ? user : null)};
+  return {skew, site: true, account, call, ride, use: async name => (name === 'db' ? db : name === 'user' ? user : null)};
 }
