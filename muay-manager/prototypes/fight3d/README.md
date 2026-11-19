@@ -5,6 +5,11 @@
 
 ตัวนักมวยเป็นโมเดล 3D ที่สร้างด้วย Meshy (ภาพอ้างอิง → โมเดลมีผิว → ใส่กระดูกอัตโนมัติ) แล้วขยับด้วยท่าชุดเดียวกับตัวที่สร้างจากโค้ด ซึ่งยังเลือกกลับไปใช้ได้ เสียงเป็นเสียงสังเคราะห์ชั่วคราว
 
+## รอบที่ 82: การ์ดตัวอย่างลิงก์ (19 พ.ย. 2026)
+
+- `node tools/og-image.mjs [venue] [seed] [วินาทีของไฟต์] [out]` (build ก่อน) ถ่ายเฟรมจากหน้าทดลองแล้ววางชื่อเกมทับ ได้ `site/og.jpg`
+- `build.mjs`: แท็ก `og:*` และ `twitter:card` ในหัวของ `dist/site/index.html` • `OG_IMAGE` ต้องเป็นที่อยู่เต็ม ตอนนี้ชี้ `muay-manager.pages.dev/og.jpg`
+
 ## รอบที่ 81: สาวชูป้ายบอกยก (18 พ.ย. 2026)
 
 - โมเดล: `node tools/meshy-fighter.mjs cardgirl "<คำสั่งภาพ>" --image-only` แล้ว `--from-image --height 1.66` • `python3 tools/shrink-textures.py` ทำ `cardgirl-1k.jpg` • `build.mjs` ฝังเป็น `model-girl`

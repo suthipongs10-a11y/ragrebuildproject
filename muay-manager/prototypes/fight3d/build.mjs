@@ -127,8 +127,13 @@ console.log('claude.ai page', (Buffer.byteLength(game) / 1048576).toFixed(2) + '
 if (Buffer.byteLength(game) > 16 * 1048576 - 20000) console.log('note: dist/muay-manager.html is over the 16 MiB a claude.ai page may be (it is not published there any more)');
 // the game as its own website (Cloudflare Pages, see docs/DEPLOY_CLOUDFLARE.md): a full document around the same page,
 // plus the phone home-screen files from site/. The store behind it is functions/api.
+const OG_IMAGE = 'https://muay-manager.pages.dev/og.jpg'; // an address that always answers (the project's own); a custom domain serves the same file
 const head = '<!doctype html>\n<html lang="th">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">\n'
   + '<meta name="theme-color" content="#0E0F14">\n<meta name="description" content="Muay Manager เกมผู้จัดการค่ายมวยไทย ซ้อม แต่งตัว วางแผน แล้วดูนักมวยชกเองแบบ 3D ท้าชกเพื่อนได้">\n'
+  // the card a chat or a feed shows for the link (site/og.jpg, made by tools/og-image.mjs); the picture's address must be a full one
+  + '<meta property="og:type" content="website">\n<meta property="og:site_name" content="Muay Manager">\n<meta property="og:title" content="Muay Manager เกมผู้จัดการค่ายมวยไทย">\n'
+  + '<meta property="og:description" content="ซ้อม แต่งตัว วางแผน แล้วดูนักมวยชกเองแบบ 3D ท้าชกเพื่อนได้ เล่นบนเบราว์เซอร์ได้เลย">\n'
+  + '<meta property="og:image" content="' + OG_IMAGE + '">\n<meta property="og:image:width" content="1200">\n<meta property="og:image:height" content="630">\n<meta name="twitter:card" content="summary_large_image">\n'
   + '<link rel="manifest" href="/manifest.webmanifest">\n<link rel="icon" href="/icon-192.png">\n<link rel="apple-touch-icon" href="/icon-192.png">\n<style>html,body{margin:0;background:#0e0f14}</style>\n';
 // The site's page is small: the models, sounds and art (a/<hash>.html) and the game code (a/<hash>.js) are files of their
 // own named by content, which the loading screen (site/loader.html) fetches and browsers keep, so an update costs
