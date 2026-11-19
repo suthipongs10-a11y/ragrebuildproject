@@ -94,3 +94,12 @@ npx --yes wrangler@4 d1 execute muay-manager --remote --command "SELECT id, date
 - ล็อกอินหรือรหัสย้ายเครื่อง (ตอนนี้ตัวละครผูกกับเบราว์เซอร์)
 - กันคนสมัครรัว ๆ และกันแก้ค่าพลังในเครื่อง (เล่นกับเพื่อนพอได้ ก่อนเปิดสาธารณะต้องย้ายไฟต์จัดอันดับไปจำลองที่เซิร์ฟเวอร์)
 - deploy อัตโนมัติจาก GitHub (ต่อ repo ใน Cloudflare dashboard: root `muay-manager/prototypes/fight3d`, build `npm ci && node build.mjs`, output `dist/site`)
+
+## โดเมนของตัวเอง (19 พ.ย. 2026)
+
+เจ้าของเกมขอ `muay.eggpact.com` สองขั้น:
+
+1. ผูกโดเมนกับโปรเจกต์ Pages (ทำแล้วทาง API): `POST /accounts/<account>/pages/projects/muay-manager/domains` ตัวข้อมูล `{"name": "muay.eggpact.com"}` • ดูสถานะ: `GET …/domains/muay.eggpact.com` (`pending` จนกว่าจะมี CNAME แล้วเป็น `active`)
+2. ระเบียน DNS ในโซน `eggpact.com` (ต้องทำในบัญชีที่ถือโซน โทเคนของเซสชันมองไม่เห็นโซนนี้): ชนิด CNAME ชื่อ `muay` เป้าหมาย `muay-manager.pages.dev` สถานะ DNS only
+
+เกมไม่ต้อง build ใหม่ ที่อยู่ `muay-manager.pages.dev` ยังใช้ได้ • ที่เก็บในเบราว์เซอร์แยกตามที่อยู่เว็บ นักมวยที่สร้างไว้ที่ที่อยู่เดิมต้องย้ายด้วยรหัสย้ายเครื่อง
