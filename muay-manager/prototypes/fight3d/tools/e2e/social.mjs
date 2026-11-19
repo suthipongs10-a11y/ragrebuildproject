@@ -33,6 +33,10 @@ try {
   for (const [p, n] of [[A, NAMES[0]], [B, NAMES[1]]]) { await ev(p, `document.getElementById('gName').value = ${JSON.stringify(n)}`); await click(p, '[data-act=create]', 2500); await until(p, "!!GAME.save() && !!document.querySelector('[data-act=tab][data-v=fight]')", 30000); made.push(await me(p)); }
   await A.waitForTimeout(5000); await A.reload({timeout: 120000}).catch(() => {}); await until(A, "!!window.GAME && !!GAME.save() && !!document.querySelector('[data-act=tab][data-v=fight]')", 90000); await A.waitForTimeout(3000);
 
+  // ---- 0. the news strip: what one player's game tells, the other's reads from the server
+  const newsOf = async (p, re) => { for (let i = 0; i < 20; i++) { await ev(p, 'GAME.newsLoad()'); await p.waitForTimeout(1500); const l = await ev(p, 'GAME.news()'); if (l.some(x => re.test(x))) return l.find(x => re.test(x)); } return ''; };
+  ok(await newsOf(B, new RegExp('^หน้าใหม่: นักมวยหน้าใหม่ ' + NAMES[0])), 'B’s news strip tells of A’s new fighter');
+  ok(await ev(B, `!document.getElementById('gNews').hidden`), 'and the strip is up on B’s screen');
   // ---- 1. a ranked fight against another player’s fighter, and the news of it
   let found = false; // the ranked draw moves with the number of ranked fights left: turn it until B’s fighter comes up
   for (let k = 2; k < 80 && !found; k++) { await ev(A, `GAME.save().ranked = ${k}; GAME.save().fatigue = 0`); await click(A, '[data-act=tab][data-v=fight]', 250); found = await ev(A, `(() => { const b = document.querySelector('[data-act=pick][data-v=r]'), c = b && b.closest('.opp'); return !!c && c.innerText.includes(${JSON.stringify(NAMES[1])}); })()`); }
@@ -43,6 +47,8 @@ try {
   await click(A, '[data-act=skip]', 0); await until(A, "!!document.querySelector('#gBody [data-act=home]')", 120000);
   const resA = await ev(A, "(r => r.draw ? 'd' : r.win ? 'w' : 'l')(GAME.fight().res)"), want = {w: 'ชนะนักมวยของคุณ', l: 'แพ้นักมวยของคุณ', d: 'เสมอกับนักมวยของคุณ'}[resA];
   await click(A, '#gBody [data-act=home]', 1500);
+  if (resA === 'l') ok(!(await ev(A, 'GAME.news()')).some(x => x.startsWith('ผลชก: ' + NAMES[0])), 'a loss is not put on the news');
+  else ok(await newsOf(B, new RegExp('^ผลชก: ' + NAMES[0] + ' (ชนะ|เสมอกับ).*' + NAMES[1])), 'B’s news strip tells how A’s fight with his fighter went', resA);
   const docA = async () => (await api('db/challenges/' + made[0].id)).body.data || {};
   ok(await (async () => { for (let i = 0; i < 30; i++) { const d = await docA(); if (Array.isArray(d.vs) && d.vs.length === 1 && d.vs[0].to === made[1].id && d.vs[0].r === resA) return true; await A.waitForTimeout(400); } return false; })(), 'A’s record says whom he fought and how it went', resA);
   ok(await until(B, `[...document.querySelectorAll('#gMatch .matchbar')].some(b => b.innerText.includes(${JSON.stringify(NAMES[0])}) && b.innerText.includes('ศึกจัดอันดับ'))`, 30000), 'B is told at the top of the screen', await ev(B, "[...document.querySelectorAll('#gMatch .matchbar')].map(b => b.innerText.replace(/\\s+/g, ' ')).join(' | ')"));

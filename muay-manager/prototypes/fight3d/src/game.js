@@ -113,7 +113,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.58', BUILD = 258;
+const VER = '2.59', BUILD = 259;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -404,7 +404,7 @@ function tourAfter(o, win, how) {
   if (!win) { tr.out = true; tourFinishWithoutMe(tr); lines.push('ตกรอบ' + T.th + ' · แชมป์คือ ' + tr.ents[tr.champ].name); }
   else if (tr.champ === me) {
     const h = S.tours[tr.t] = Object.assign(S.tours[tr.t] || {}, {wins: ((S.tours[tr.t] || {}).wins || 0) + 1});
-    S.honors.push({k: 'cup', i: tr.t, d: S.day, n: h.wins});
+    S.honors.push({k: 'cup', i: tr.t, d: S.day, n: h.wins}); if (F) F.tourWon = tr.t; // for the news (fightNews)
     if (!S.belts.includes(tr.t)) { S.belts.push(tr.t); S.honors.push({k: 'belt', i: tr.t, d: S.day, vs: T.th}); S.defendDue = S.day + DEFEND.every; }
     lines.push('แชมป์' + T.th + '! ได้' + BELTS[tr.t] + (h.wins > 1 ? ' (สมัยที่ ' + h.wins + ')' : '') + moodUp(2));
   } else lines.push('ผ่านเข้า' + ROUND_TH(tr.rounds[tr.res.length].length) + ' ชกวันที่ ' + tourDay(tr));
@@ -440,6 +440,7 @@ const planText = p => PLAN.ag[p.ag] + ' · ' + PLAN.range[p.range] + ' · เน
 const art = (name, cls) => '<i class="ui ' + (cls || '') + '" data-ui="' + name + '" aria-hidden="true"></i>';
 function topBar() {
   const bar = $('gMatch'); if (bar) { CH.barHtml = bannersHtml(); bar.innerHTML = CH.barHtml; fillCountdowns(); }
+  newsDraw();
   if (!S) { $('gTop').innerHTML = ''; return; }
   const f = Math.round(S.fatigue);
   $('gTop').innerHTML = '<div class="who"><b>' + esc(S.name) + '</b><span>' + LEAGUES[league(S.rp)][1] + ' · วันที่ ' + S.day + ' · อารมณ์ ' + art('mood-' + (S.mood + 1), 'mood') + '<i class="' + (S.mood > 2 ? 'hi' : S.mood < 2 ? 'lo' : '') + '">' + MOODS[S.mood] + '</i></span></div>' +
@@ -538,6 +539,7 @@ function render() {
     if (view && view.settings) b.innerHTML = settingsHtml();
     else if (view && view.watch) b.innerHTML = watchHtml();
     else if (view && view.hall) b.innerHTML = hallHtml();
+    else if (view && view.news) b.innerHTML = newsHtml();
     else if (tab === 'home') b.innerHTML = homeHtml();
     else if (tab === 'train') b.innerHTML = trainHtml();
     else if (tab === 'dress') b.innerHTML = dressHtml();
@@ -969,7 +971,7 @@ function onOver(res) {
   if (S.rp > S.best) { const lgNow = league(S.rp); if (lgNow > league(S.best)) { r.promo = LEAGUES[lgNow][1]; r.promoMoney = 1000 * lgNow; S.money += r.promoMoney; } S.best = S.rp; }
   S.log.unshift({w: win, d: draw, o: o.name, h: r.how}); S.log = S.log.slice(0, 12);
   r.extra = [o.kind === 'title' && win ? 'ได้' + BELTS[o.belt] + 'มาครอง!' : '', (win ? moodUp(ko ? 2 : 1) : draw ? '' : moodUp(ko ? -2 : -1)).trim(), win ? mission('win') : '', o.kind === 'ranked' ? mission('ranked') : '', unlockSpecials()].concat(rivalLine).filter(Boolean);
-  save(); F.res = r; F.phase = 'result'; topBar(); render(); $('gBody').scrollIntoView({block: 'nearest', behavior: 'smooth'});
+  save(); F.res = r; F.phase = 'result'; newsPost(fightNews(o, res, r, win, draw, ko)); topBar(); render(); $('gBody').scrollIntoView({block: 'nearest', behavior: 'smooth'});
   void lgBefore;
 }
 
@@ -1081,6 +1083,7 @@ function applyMatch(m, res) {
   S.chDone = S.chDone.concat(m.key).slice(-60); S.money += money; S.fame += fame;
   if (win) S.rec.w++; else if (draw) S.rec.d = (S.rec.d || 0) + 1; else S.rec.l++;
   S.log.unshift({w: win, d: draw, o: other, h: 'ท้าชก · ' + (draw ? 'เสมอ' : res.how === 'คะแนน' ? 'คะแนน' : res.how + ' ยก ' + res.round)}); S.log = S.log.slice(0, 12);
+  if (win) { const ko = res.how !== 'คะแนน'; newsPost([Object.assign({k: ko ? 'ko' : 'win', o: other, hw: !ko ? 'pts' : res.how === 'ทีเคโอ' ? 'tko' : 'ko', ch: 1}, ko ? {rd: res.round | 0} : {})]); } // the winner's game tells it
   save(); return 'ผลท้าชกกับ ' + other + ': ' + (win ? 'ชนะ' : draw ? 'เสมอ' : 'แพ้') + (paid ? ' ได้ ฿ ' + baht(money) + ' ★ ' + fame : ' (ไม่มีรางวัล: วันนี้รับรางวัลท้าชกครบ ' + CH_PAID + ' แมตช์ หรือชกกับคนนี้ไปแล้ว)');
 }
 // Every change to this player's own challenge or answer document goes through one queue: each is read, changed and
@@ -1134,6 +1137,9 @@ function chTick() {
   if (CH.stale) selfUpdate();
   if (!S || !CLOUD) return;
   if (Date.now() - (CH.seenAt || 0) > PRESENCE) presence();
+  if (NW.queue.length) newsSend();
+  if (CLOUD.call && !F && !document.hidden && Date.now() - NW.at > NEWS_EVERY) newsLoad(); // the news: read while a menu is up
+  newsDraw();
   // who is online, and who is watching: the leaderboard is read again while it matters
   if (CLOUD.call) { // the players' cup: read at the start and now and then, more often while its page is up; the page is redrawn when the cup moves on
     const ph = cupPhase(t), up = tab === 'fight' && idle();
@@ -1183,6 +1189,119 @@ function countOff() { if (!CH.cnt) return; clearInterval(CH.cnt.timer); CH.cnt.e
 // way in once the bell has gone), a challenge waiting for our answer, our own "fight now" challenge waiting for his, and a
 // match of others to watch. No time-dependent text in here (the countdowns are filled in by the tick), so the same state
 // gives the same markup and the page is only touched when something changed.
+// ---------- the news ticker ----------
+// One line across the top of the menu screens, running right to left: what players' fighters have just done (the
+// server's list, read once a minute while a menu is up; each game posts its own notable results), the matches and the
+// cup to come, who leads. A tap opens the same lines as a list.
+const NW = {items: [], own: [], queue: [], hold: 0, sending: false, at: 0, busy: false, html: '', next: null, shown: false};
+const NEWS_EVERY = 90e3, NEWS_OWN = 180e3, NEWS_MAX = 14, NEWS_SPEED = 62 /* px a second */, NEWS_AGE = 24 * 3600e3, NEWS_STILL = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+const NEWS_KINDS = {ko: 1, win: 1, draw: 1, belt: 1, def: 1, rev: 1, cup: 1, pcup: 1, up: 1, new: 1}, NEWS_HOW = {ko: 'ชนะน็อก', tko: 'ชนะทีเคโอ', pts: 'ชนะคะแนน', draw: 'เสมอกับ'};
+// my fighter's own news: on this screen at once, and sent to the list everyone reads
+function newsPost(list) {
+  if (!S || !list || !list.length) return;
+  const t = now(), items = list.slice(0, 2).map(x => Object.assign({name: S.name}, x));
+  NW.own = NW.own.concat(items.map(x => Object.assign({t, pid: CLOUD ? CLOUD.uid : 'me', own: true}, x))).slice(-6);
+  NW.queue = NW.queue.concat(items.map(x => ({t: Date.now(), x}))).slice(-6); newsSend(); newsDraw();
+}
+// The lines wait here until the server has them: the connection may not be up yet (a fighter just made), and the server
+// takes one post per fight (two lines at most), a few seconds apart.
+async function newsSend() {
+  NW.queue = NW.queue.filter(q => Date.now() - q.t < NEWS_OWN);
+  if (!NW.queue.length || NW.sending || !CLOUD || !CLOUD.call || CLOUD.dead || Date.now() < NW.hold) return;
+  const batch = NW.queue.slice(0, 2); NW.sending = true;
+  const j = await CLOUD.call('/news', 'POST', {items: batch.map(q => q.x)}); NW.sending = false;
+  if (j && (j.status === 200 || j.status === 400)) NW.queue = NW.queue.filter(q => !batch.includes(q)); // said, or not worth saying
+  NW.hold = Date.now() + (j && j.status === 200 ? 8500 : j && j.status === 429 ? 9000 : 30000);
+}
+// what a fight of mine is worth telling everyone (nothing for a loss, or for a win on points in a small local fight)
+function fightNews(o, res, r, win, draw, ko) {
+  const out = [], base = {o: o.name, hw: draw ? 'draw' : res.how === 'คะแนน' ? 'pts' : res.how === 'ทีเคโอ' ? 'tko' : 'ko'}; if (ko) base.rd = res.round | 0;
+  if (o.kind === 'title' && win) out.push(Object.assign({k: 'belt', n: o.belt}, base));
+  else if (o.kind === 'defense' && (win || draw)) out.push(Object.assign({k: 'def', n: o.belt}, base));
+  else if (o.kind === 'tour' && win && F && F.tourWon != null) out.push({k: 'cup', n: F.tourWon});
+  else if (o.kind === 'rival' && win) out.push(Object.assign({k: 'rev'}, base));
+  else if (win && (ko || o.kind !== 'local')) out.push(Object.assign({k: ko ? 'ko' : 'win'}, base));
+  else if (draw) out.push(Object.assign({k: 'draw'}, base));
+  if (r.promo) out.push({k: 'up', n: league(S.rp)});
+  return out;
+}
+async function newsLoad() {
+  if (!CLOUD || !CLOUD.call || NW.busy) return; NW.busy = true; NW.at = Date.now();
+  const j = await CLOUD.call('/news'); NW.busy = false;
+  if (!j || j.status !== 200 || !Array.isArray(j.items)) return;
+  NW.items = j.items.filter(x => x && own(NEWS_KINDS, x.k) && typeof x.t === 'number' && typeof x.name === 'string').slice(0, 40);
+  // my own lines the list now has are shown from the list
+  NW.own = NW.own.filter(x => !NW.items.some(y => y.pid === x.pid && y.k === x.k && (y.o || '') === (x.o || '') && Math.abs(y.t - x.t) < NEWS_OWN));
+  newsDraw();
+}
+// one line about a fighter, as safe HTML: set words around cleaned names
+function newsLine(x) {
+  const nm = v => '<b>' + esc(API.cleanName(v) || 'นักมวย') + '</b>', a = nm(x.name), o = x.o ? ' ' + nm(x.o) : '', how = own(NEWS_HOW, x.hw) ? x.hw : 'pts';
+  const rd = (how === 'ko' || how === 'tko') && x.rd >= 1 && x.rd <= 5 ? (x.rd === 1 ? ' ในยกแรก' : ' ในยก ' + x.rd) : '', beat = NEWS_HOW[how] + o + rd, belt = BELTS[x.n] || 'เข็มขัด';
+  switch (x.k) {
+    case 'ko': case 'win': return ['ผลชก', a + ' ' + beat + (x.ch ? ' ในแมตช์ท้าชก' : '')];
+    case 'draw': return ['ผลชก', a + ' เสมอกับ' + o + ' สูสีจนครบยก'];
+    case 'rev': return ['ล้างตา', a + ' ล้างตาสำเร็จ ' + beat];
+    case 'belt': return ['เข็มขัด', a + ' คว้า' + belt + ' ' + beat];
+    case 'def': return ['เข็มขัด', a + ' ป้องกัน' + belt + 'สำเร็จ ' + beat];
+    case 'cup': return ['แชมป์', a + ' คว้าแชมป์' + ((TOURS[x.n] || {}).th || 'ทัวร์นาเมนต์')];
+    case 'pcup': return ['แชมป์', a + ' คว้าถ้วยศึกชิงถ้วยผู้เล่น' + (x.n ? ' ครั้งที่ ' + x.n : '')];
+    case 'up': return ['ขึ้นชั้น', a + ' ขึ้นชั้นสู่' + ((LEAGUES[x.n] || LEAGUES[1])[1])];
+    default: return ['หน้าใหม่', 'นักมวยหน้าใหม่ ' + a + ' เปิดตัวที่เวทีงานวัด'];
+  }
+}
+// every line for the strip, the most pressing first: {tag, html, t (when it happened, if it did), go (where a button leads), live}
+function newsAll() {
+  const out = [], t = now();
+  if (CLOUD) {
+    const all = matches().filter(m => m.a && m.a.accept && !m.exh), met = m => all.some(x => x !== m && x.start < m.start && ((x.from === m.from && x.to === m.to) || (x.from === m.to && x.to === m.from)));
+    const pair = m => '<b>' + esc(m.fromName) + '</b> กับ <b>' + esc(m.toName) + '</b>';
+    all.filter(m => t >= m.start && t < m.start + MATCH_LEN).slice(0, 2).forEach(m => out.push({tag: 'สด', live: true, go: 'watch', html: pair(m) + ' กำลังชกกันอยู่ · กดปุ่ม ดูมวย เพื่อดูสด'}));
+    all.filter(m => t < m.start).slice(0, 3).forEach(m => out.push({tag: 'นัดชก', go: 'watch', html: 'เชิญชม' + (met(m) ? 'นัดล้างตา' : 'แมตช์ท้าชก') + 'ระหว่าง ' + pair(m) + ' เวลา ' + hm(m.start - CH.skew) + ' · ดูได้ที่ปุ่ม ดูมวย'}));
+    const d = PC.data, c = d && d.next;
+    if (c) {
+      const ph = cupPhase(t), n = c.entries.length;
+      if (ph === 'open') out.push({tag: 'ชิงถ้วย', go: 'fight', html: 'ศึกชิงถ้วยผู้เล่น ระฆังแรก ' + whenTh(c.start) + ' · ลงชื่อได้ที่เมนู หาคู่ชก' + (n ? ' · ลงชื่อแล้ว ' + n + ' คน' : ' · ยังไม่มีใครลงชื่อ เป็นคนแรกได้เลย')});
+      else if (ph === 'closed') out.push({tag: 'ชิงถ้วย', go: 'fight', html: 'ศึกชิงถ้วยผู้เล่นปิดรับสมัครแล้ว · ระฆังแรก ' + hm(c.start - CH.skew) + ' · ดูสายการแข่งขันที่เมนู หาคู่ชก'});
+      else if (/^on/.test(ph) && !/x$/.test(ph)) out.push({tag: 'ชิงถ้วย', live: true, go: 'fight', html: 'ศึกชิงถ้วยผู้เล่นกำลังแข่ง · ดูสายการแข่งขันและดูสดได้ที่เมนู หาคู่ชก'});
+    }
+    const seen = {}; // the server's list and my own lines, newest first, one of each
+    NW.own.filter(x => t - x.t < NEWS_OWN).concat(NW.items).filter(x => t - x.t < NEWS_AGE).sort((x, y) => y.t - x.t).forEach(x => {
+      const key = x.pid + x.k + (x.o || '') + Math.round(x.t / NEWS_OWN); if (seen[key] || out.length >= NEWS_MAX) return; seen[key] = 1;
+      const [tag, html] = newsLine(x); out.push({tag, html, t: x.t});
+    });
+    all.filter(m => t >= m.start + MATCH_LEN && t < m.start + MATCH_LEN + 6 * 3600e3).slice(-2).forEach(m => out.push({tag: 'ดูย้อนหลัง', go: 'watch', html: pair(m) + ' ชกจบแล้ว · ดูย้อนหลังได้ที่ปุ่ม ดูมวย'}));
+    const real = board.filter(b => b.real), top = real.concat(S ? [{name: S.name, rp: S.rp}] : []).sort((x, y) => y.rp - x.rp)[0], on = real.filter(isOnline).length + 1;
+    if (real.length && top) out.push({tag: 'อันดับ', go: 'rank', html: 'ผู้เล่นคะแนนสูงสุดตอนนี้ <b>' + esc(top.name) + '</b> · RP ' + top.rp});
+    if (on >= 2) out.push({tag: 'ออนไลน์', html: 'ตอนนี้มีผู้เล่นออนไลน์ ' + on + ' คน · ท้าชกกันได้ที่เมนู หาคู่ชก'});
+  } else NW.own.filter(x => t - x.t < NEWS_OWN).forEach(x => { const [tag, html] = newsLine(x); out.push({tag, html, t: x.t}); });
+  return out;
+}
+const newsItemHtml = x => '<span class="nw"><i' + (x.live ? ' class="live"' : '') + '>' + x.tag + '</i>' + x.html + '</span>';
+function newsSet(html) { // the lines, as many times over as fill the strip, and then the same again: the run has no seam and no empty stretch
+  const run = $('gNewsRun'); NW.html = html; NW.next = null; run.innerHTML = html;
+  if (NEWS_STILL) return;
+  const w = run.scrollWidth || 1, k = Math.max(1, Math.ceil(run.parentNode.clientWidth / w)), unit = html.repeat(k);
+  run.innerHTML = unit + unit; run.style.animation = 'none'; void run.offsetWidth; run.style.animation = ''; run.style.setProperty('--news-s', Math.max(8, k * w / NEWS_SPEED).toFixed(1) + 's');
+}
+function newsDraw() {
+  const el = $('gNews'); if (!el) return;
+  const list = S && !F && !DR && !SC && view !== 'create' && !(CLOUD && CLOUD.dead) ? newsAll() : [], show = list.length > 0;
+  if (show !== NW.shown) { NW.shown = show; el.hidden = !show; el.classList.toggle('still', NEWS_STILL); document.querySelector('.app').classList.toggle('has-news', show); NW.html = ''; }
+  if (!show) return;
+  // moving: every line in one run. Still (the viewer asked for less motion): one line at a time, changed every few seconds
+  const html = NEWS_STILL ? newsItemHtml(list[Math.floor(Date.now() / 6000) % list.length]) : list.map(newsItemHtml).join('');
+  if (html === NW.html) { NW.next = null; return; }
+  if (NW.html && !NEWS_STILL) NW.next = html; else newsSet(html); // the run on screen finishes first (see the listener in bootGame)
+}
+// the same lines as a list, for reading at rest
+function newsHtml() {
+  const list = newsAll(), goTh = {watch: 'ดูมวย', fight: 'หาคู่ชก', rank: 'อันดับ'};
+  return '<section class="gcard"><h2>ข่าวจากทุกเวที <small>เหตุการณ์ล่าสุดของผู้เล่นทุกคน</small></h2>' +
+    (list.length ? list.map(x => '<div class="newsrow"><div><i class="nwtag' + (x.live ? ' live' : '') + '">' + x.tag + '</i>' + x.html + (x.t ? ' <small>' + agoTh(now() - x.t) + '</small>' : '') + '</div>' +
+      (x.go ? '<button class="btn sm" data-act="' + (x.go === 'watch' ? 'watch' : 'tab') + '"' + (x.go === 'watch' ? '' : ' data-v="' + x.go + '"') + '>' + goTh[x.go] + '</button>' : '') + '</div>').join('') : '<p class="hint">ยังไม่มีข่าว ขึ้นชกแล้วชนะน็อกสักไฟต์ ชื่อของคุณจะขึ้นที่นี่</p>') +
+    '<div class="rowbtn"><button class="btn" data-act="setback">กลับ</button></div></section>';
+}
 function bannersHtml() {
   if (!S || !CLOUD || (F && F.clock)) return '';
   const t = now(), out = [], busy = !!(F || DR || SC), all = mine(), vs = (x, on) => '<div class="mb-vs">' + ['from', 'to'].map((k, i) => '<span class="p' + (on && on[i] ? ' on' : '') + (on ? '' : ' plain') + '">' + esc(x[k + 'Name']) + '</span>').join('<i>VS</i>') + '</div>';
@@ -1295,7 +1414,7 @@ function cupClaim(k) {
   const d = PC.data, p = d && [d.next, d.prev].find(x => x && x.k === +k); if (!p || p.entries.length < CUP_MIN || (S.cupDone || []).includes(p.k)) return;
   const cup = cupOf(p), place = cupPlace(cup, CLOUD.uid); if (place < 0 || !cupOver(cup, p, d, now())) return; // only once its final is over
   const [money, fame] = CUP_PRIZE[place]; S.cupDone = (S.cupDone || []).concat(p.k).slice(-12); S.money += money; S.fame += fame;
-  if (place === 0) S.honors.push({k: 'pcup', i: p.k, d: S.day});
+  if (place === 0) { S.honors.push({k: 'pcup', i: p.k, d: S.day}); newsPost([{k: 'pcup', n: p.k + 1}]); }
   view = {note: 'ศึกชิงถ้วยผู้เล่น: ' + CUP_PLACE[place] + ' ได้ ฿ ' + baht(money) + ' ★ ' + fame + (place === 0 ? ' และถ้วยเข้าทำเนียบ' : '')}; save(); topBar(); render();
 }
 // ---------- cheers during a live match ----------
@@ -1640,6 +1759,7 @@ function onClick(e) {
   if (act === 'watch') { if (view && view.watch) view = null; else { if (DR) drillEnd(true); view = {watch: true}; } render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   if (act === 'exh') { watchMatch(null, exhibition()); return; }
   if (act === 'watchmore') { F = null; API.stop(); view = {watch: true}; setMode(false); render(); showMe(); if (CLOUD) loadBoard(); return; }
+  if (act === 'news') { if (view && view.news) view = null; else { if (DR) drillEnd(true); view = {news: true}; } render(); $('gBody').scrollIntoView({block: 'start', behavior: 'smooth'}); return; }
   if (act === 'hall') { view = view && view.hall ? null : {hall: true}; render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   if (act === 'settings') { if (view && view.settings) view = null; else { if (DR) drillEnd(true); view = {settings: true}; } render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   if (act === 'soundon') { API.sound.set(!API.sound.on); API.sound.test(); render(); return; }
@@ -1648,7 +1768,7 @@ function onClick(e) {
   if (act === 'body') { draft.body = v; if (noBeard(v)) draft.look.beard = 'none'; draft.name = $('gName').value; renderCreate(); previewDraft(); }
   else if (act === 'dlook') { if (!own(LOOK0, el.dataset.f)) return; draft.look[el.dataset.f] = v; draft.name = $('gName').value; renderCreate(); previewDraft(...faceView(el.dataset.f)); }
   else if (act === 'style') { draft.style = v; draft.name = $('gName').value; renderCreate(); }
-  else if (act === 'create') { const name = API.cleanName($('gName').value); if (name.length < 2) { const m = $('gCreateMsg'), n = $('gName'); m.textContent = 'ใส่ชื่อนักมวยก่อน (อย่างน้อย 2 ตัวอักษร) ที่ช่องด้านบน'; m.className = 'bad'; n.classList.add('bad'); n.scrollIntoView({block: 'center', behavior: 'smooth'}); n.focus({preventScroll: true}); n.addEventListener('input', () => { n.classList.remove('bad'); m.textContent = ''; }, {once: true}); return; } S = fix(newSave(name, draft.body, draft.style, draft.look)); useOpen(); save(); go('home'); vipSync(); }
+  else if (act === 'create') { const name = API.cleanName($('gName').value); if (name.length < 2) { const m = $('gCreateMsg'), n = $('gName'); m.textContent = 'ใส่ชื่อนักมวยก่อน (อย่างน้อย 2 ตัวอักษร) ที่ช่องด้านบน'; m.className = 'bad'; n.classList.add('bad'); n.scrollIntoView({block: 'center', behavior: 'smooth'}); n.focus({preventScroll: true}); n.addEventListener('input', () => { n.classList.remove('bad'); m.textContent = ''; }, {once: true}); return; } S = fix(newSave(name, draft.body, draft.style, draft.look)); useOpen(); save(); go('home'); vipSync(); newsPost([{k: 'new'}]); }
   else if (act === 'tab') go(v);
   else if (act === 'home') { const live = F && F.live; F = null; API.stop(); CH.seenAt = 0; go('home'); if (CLOUD) loadBoard(); if (!live && !S.vip && ++S.adFights % 3 === 0) MON.interstitial(); } // an advert between screens every third fight of his own, back at the camp (never around a match between players)
   else if (act === 'adr') adReward(v, el);
@@ -1739,9 +1859,11 @@ export function bootGame(api) {
   API.HOOK.onCeremony = w => { if (!F) return; const me = F.live ? F.me : 0; F.cer = w < 0 ? 'calm' : me >= 0 && w !== me ? 'lose' : 'win'; tune(); }; // the hand goes up: the winner's fanfare, or the long walk back
   window.addEventListener('keydown', e => { if (SC && !e.repeat) { const k = e.key === 'ArrowLeft' ? 'L' : e.key === 'ArrowRight' ? 'R' : e.key === ' ' ? 'pull' : ''; if (k) { e.preventDefault(); scenePress(k); } return; } if (!DR || e.repeat) return; const k = Object.keys(KINDS).find(x => KINDS[x].key.includes(e.key.toLowerCase())); if (k) { e.preventDefault(); drillPress(k); } });
   $('gBody').addEventListener('pointerdown', e => { const sc = e.target.closest('[data-scene]'); if (sc && SC) { e.preventDefault(); scenePress(sc.dataset.scene); return; } const el = e.target.closest('[data-drill]'); if (el && DR) { e.preventDefault(); drillPress(el.dataset.drill); } });
-  const g = $('game'); g.addEventListener('click', onClick); $('gMatch').addEventListener('click', onClick); $('gBody').addEventListener('click', onClick); $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
+  const g = $('game'); g.addEventListener('click', onClick); $('gMatch').addEventListener('click', onClick); $('gBody').addEventListener('click', onClick);
+  { const nw = $('gNews'); if (nw) { nw.addEventListener('click', onClick); $('gNewsRun').addEventListener('animationiteration', () => { if (NW.next != null) newsSet(NW.next); }); } } // a changed line waits for the run on screen to end
+  $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
   const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ ' + VER; }
-  window.GAME = {drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress, uid: () => (CLOUD ? CLOUD.uid : null), match: applyMatch, fight: () => F, cup: () => { const d = PC.data, c = d && d.next; return !c ? null : {k: c.k, phase: cupPhase(now()), age: Date.now() - PC.at, busy: PC.busy, entries: c.entries.length, cup: now() >= c.close ? cupOf(c) : null, prev: d.prev && d.prev.entries.length >= CUP_MIN ? cupOf(d.prev) : null}; }, rest: sec => { if (F && F.phase === 'break') F.restEnd = now() + sec * 1000; }}; // for automated checks
+  window.GAME = {news: () => newsAll().map(x => x.tag + ': ' + x.html.replace(/<[^>]+>/g, '')), newsLoad, drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress, uid: () => (CLOUD ? CLOUD.uid : null), match: applyMatch, fight: () => F, cup: () => { const d = PC.data, c = d && d.next; return !c ? null : {k: c.k, phase: cupPhase(now()), age: Date.now() - PC.at, busy: PC.busy, entries: c.entries.length, cup: now() >= c.close ? cupOf(c) : null, prev: d.prev && d.prev.entries.length >= CUP_MIN ? cupOf(d.prev) : null}; }, rest: sec => { if (F && F.phase === 'break') F.restEnd = now() + sec * 1000; }}; // for automated checks
   MON.price().then(pr => { monPrice = pr; if (pr && S && !F && !DR && !SC && tab === 'home' && view !== 'create') render(); }); if (S) vipSync(); // the store's price, and what it says is owned
   S = loadLocal(); setMode(false);
   if (S) { useOpen(); go('home'); } else { view = 'create'; render(); previewDraft(); }

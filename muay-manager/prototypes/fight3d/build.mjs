@@ -116,6 +116,8 @@ const withModels = readFileSync('dist/muay-fight-lab.html', 'utf8').replace('<!-
 const page = withModels.replace('<!--G:top-->', '').replace('<!--G:body-->', '');
 writeFileSync('dist/muay-fight-lab.html', page);
 const gameBase = readFileSync('src/page.html', 'utf8').replace('<title>Muay Fight Lab 3D</title>', '<title>Muay Manager</title>')
+  // the news ticker sits above everything else on the menu screens (game.js fills it and shows it)
+  .replace('<div class="app">', '<div class="app"><button type="button" id="gNews" data-act="news" hidden aria-label="ข่าวจากทุกเวที เปิดอ่านเป็นรายการ"><span class="nw-h">ข่าว</span><span class="nw-win"><span id="gNewsRun"></span></span></button>')
   .replace('<!--G:top-->', '<div id="gMatch"></div><div id="game"><div class="gbar" id="gTop"></div></div>')
   .replace('<!--G:body-->', '<nav class="gnav" id="gNav" aria-label="เมนูเกม"></nav><div class="gbody" id="gBody"></div>');
 const game = gameBase.replace('/*__APP__*/', () => jsGame).replace('<!--__MODELS__-->', () => models.join('\n') + voiceLite + uiStyle);

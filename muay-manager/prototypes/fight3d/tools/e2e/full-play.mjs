@@ -52,7 +52,7 @@ async function fight(pick, opt = {}) {
   const seen = await ev('window.LAB && LAB.fight ? LAB.cfg.seed : null'); // the fight before this one is still in LAB until the new one starts
   await click('[data-act=startfight]', 0);
   if (!await until(`!!(window.LAB && LAB.fight && LAB.cfg.seed !== ${seen} && document.querySelector('.app.g-fight') && LAB.t > .2)`, 60000)) return null;
-  const venue = await ev('MUAY.venueNow()'), specs = await ev("LAB.cfg.specs.map(s => Object.values(s.stats).join('/')).join(' v ')");
+  const venue = await ev('MUAY.venueNow()'), specs = await ev("LAB.cfg.specs.map(s => Object.values(s.stats).join('/')).join(' v ')"), newsOff = await ev("document.getElementById('gNews').hidden");
   let rest = null, girl = null, noGirl = null;
   if (opt.round) { // to the first round break: a quick order, then on
     const pa = await ev("LAB.fight.events.filter(e => e.phase === 'rest').map(e => e.t + 2.3)");
@@ -96,13 +96,14 @@ async function fight(pick, opt = {}) {
   const r = await ev("({win: /ชนะ/.test(document.querySelector('#gBody h2').textContent), head: document.querySelector('#gBody h2').textContent, venue: '" + venue + "', specs: '" + specs + "'})");
   if (opt.ceremony) { await wait(opt.ceremony); await page.locator('#stage').screenshot({path: S + 'full-' + opt.shot + '.png'}); }
   await click('#gBody [data-act=home]', 1500);
-  r.rest = rest; r.girl = girl; r.noGirl = noGirl;
+  r.rest = rest; r.girl = girl; r.noGirl = noGirl; r.newsOff = newsOff;
   return r;
 }
 const strong = () => save("for (const k in S.stats) S.stats[k] = 96; S.fatigue = 0; S.mood = 4;");
 const weak = () => save("for (const k in S.stats) S.stats[k] = 22; S.fatigue = 0;");
 
 // ---- 1. creation
+ok(await ev("document.getElementById('gNews').hidden"), 'the news strip is not shown on the creation screen');
 await ev("document.getElementById('gName').value = 'บอทเล่นครบ'");
 await click('[data-act=body][data-v=f]'); await click('[data-act=style][data-v=kicker]');
 for (const [f, v] of [['skin', 'tan'], ['hair', 'red'], ['shorts', 'purple'], ['pattern', 'split'], ['trim', 'gold'], ['gloves', 'black'], ['band', 'gold'], ['beard', 'goatee']]) await click(`[data-act=dlook][data-f=${f}][data-v=${v}]`, 400);
@@ -113,6 +114,10 @@ await click('[data-act=body][data-v=f]', 500); await click('[data-act=dlook][dat
 await click('[data-act=create]', 2500);
 ok(await ev("GAME.save().name === 'บอทเล่นครบ' && GAME.save().style === 'kicker' && GAME.save().look.skin === 'tan' && GAME.save().look.beard === 'goatee'"), 'a fighter is created with the chosen body, style and look');
 await sane('home screen');
+// the news strip: up as soon as there is something to tell (his own first line), and the same lines as a list on a tap
+ok(await ev("GAME.news().some(x => /^หน้าใหม่: นักมวยหน้าใหม่ บอทเล่นครบ/.test(x))") && await until("!document.getElementById('gNews').hidden && document.querySelector('.app').classList.contains('has-news') && document.getElementById('gNewsRun').textContent.includes('บอทเล่นครบ')", 30000) /* a new line waits for the run on screen to end */, 'the news strip runs at the top with the new fighter\'s line', await ev('GAME.news().join(" | ")'));
+await click('#gNews', 600); ok(await ev("document.querySelector('#gBody h2').textContent.startsWith('ข่าวจากทุกเวที') && document.querySelectorAll('#gBody .newsrow').length >= 1"), 'a tap on the strip opens the news as a list');
+await click('[data-act=setback]', 400); ok(!await has('#gBody .newsrow'), 'and "back" closes it');
 for (const t of ['train', 'dress', 'fight', 'rank', 'home']) { await tab(t); ok(await ev("document.getElementById('gBody').innerText.length > 80"), 'tab ' + t + ' shows its screen'); await sane('tab ' + t); }
 
 // ---- 2. training: every activity once
@@ -175,7 +180,7 @@ await click('[data-act=sp]', 500); await sane('signature moves');
 await strong();
 const venues = new Set();
 let r = await fight('l0', {backout: true}); ok(r === 'backed out' && await ev('!document.querySelector(".app.g-fight")'), 'stepping back from the plan screen returns to the menu');
-r = await fight('l0', {plan: ['ag', 'attack'], round: true}); ok(!!r, 'local fight (easy) with a round break and a quick order', r && r.head); if (r && r.noGirl != null) ok(r.noGirl, 'the temple fair has no ring-card girl (her body is not even loaded)'); // an easy opponent still wins now and then: the result is not part of the check if (r) venues.add(r.venue); await sane('after a local fight');
+r = await fight('l0', {plan: ['ag', 'attack'], round: true}); ok(!!r, 'local fight (easy) with a round break and a quick order', r && r.head); const restGo = !!r && r.noGirl != null; // it may end inside round 1: then no rest was had if (r && r.noGirl != null) ok(r.noGirl, 'the temple fair has no ring-card girl (her body is not even loaded)'); // an easy opponent still wins now and then: the result is not part of the check if (r) venues.add(r.venue); await sane('after a local fight');
 r = await fight('l1'); ok(!!r, 'local fight (even)', r && r.head); await sane('after local fight 2');
 await save('S.noBreak = true;'); r = await fight('l2', {plan: ['range', 'out']}); ok(!!r, 'local fight (hard), no stopping between rounds', r && r.head); await save('S.noBreak = false;'); await sane('after local fight 3');
 await save('S.fatigue = 0;'); r = await fight('c'); ok(!!r && r.venue === 'chuek', 'rope-fist bout at the old ground', r && r.head + ' @' + r.venue); if (r) venues.add(r.venue); await sane('after the rope-fist bout');
@@ -207,10 +212,12 @@ await save('S.rivals = [];'); await strong(); r = await fight('l2', {before: wea
 const foe = await ev("(GAME.save().rivals[0] || {}).name || ''");
 ok(r && !r.win && !!foe && await ev('GAME.save().rivals.length') === 1, 'a loss puts the opponent on the rivals list', r && r.head + ' · ' + r.specs + ' · rival: ' + foe); await sane('after a loss');
 await strong(); await save('S.rematch = 1; for (const k in S.rivals[0].stats) S.rivals[0].stats[k] = 40;'); await tab('fight'); ok(await ev(`document.querySelector('#gBody').innerText.includes(${JSON.stringify('ไฟต์ล้างตา')})`) && await has('[data-act=pick][data-v=v]'), 'the rematch is offered on the fight menu');
-r = await fight('v'); ok(r && r.win && await ev('GAME.save().rivals.length') === 0 && await ev('GAME.save().rematch') === 0, 'the rematch is won and the rival is cleared', r && r.head + ' · ' + r.specs); await sane('after the rematch');
+r = await fight('v'); ok(r && r.newsOff && await ev("GAME.news().some(x => /^ล้างตา: \\S+ ล้างตาสำเร็จ ชนะ/.test(x))"), 'the strip is away during a fight, and the won rematch is on the news afterwards', await ev('GAME.news().slice(0, 2).join(" | ")'));
+ok(r && r.win && await ev('GAME.save().rivals.length') === 0 && await ev('GAME.save().rematch') === 0, 'the rematch is won and the rival is cleared', r && r.head + ' · ' + r.specs); await sane('after the rematch');
 // the title of his league, then its defence
 await save("S.rp = 1045; S.title = 1; S.fatigue = 0; S.ranked = 2;"); await strong();
-r = await fight('t', {ceremony: 24000, shot: 'belt'}); ok(r && r.win && await ev('GAME.save().belts.length') === 1, 'a title fight is won: the belt is his', r && r.head); if (r) venues.add(r.venue); await sane('after the title fight');
+r = await fight('t', {ceremony: 24000, shot: 'belt'}); ok(r && r.win && await ev('GAME.save().belts.length') === 1, 'a title fight is won: the belt is his', r && r.head);
+ok(await ev("GAME.news().some(x => /^เข็มขัด: \\S+ คว้าเข็มขัด/.test(x))"), 'the belt is on the news', await ev('GAME.news()[0]')); if (r) venues.add(r.venue); await sane('after the title fight');
 await tab('home'); await click('[data-act=hall]', 700); ok(await ev("document.querySelectorAll('#gBody .hitem, #gBody .hshelf *').length > 0"), 'the trophy room shows the belt'); await page.screenshot({path: S + 'full-hall.png'}); await sane('trophy room'); await click('[data-act=hall]', 500);
 await save('S.day = S.defendDue; S.fatigue = 0;'); await strong(); await tab('home');
 await weak(); r = await fight('d', {before: strong}); ok(r && r.win && await ev('GAME.save().belts.length') === 1 && await ev('GAME.save().defends') === 1, 'the title is defended: the belt stays', r && r.head + ' · ' + r.specs); await sane('after the defence');
@@ -276,7 +283,7 @@ await tab('home'); await click('[data-act=sleep]', 900); // a save, so the secon
   ok(u.secs > 60 && u.secs < 3600, 'usage: the time played is counted', u.secs + ' s');
   ok(['bag', 'banana', 'dummy', 'rope', 'spar', 'run', 'fun', 'rest'].every(k => u.a['train:' + k] >= 1) && u.a['tab:fight'] > 5 && u.a['plan:ag=attack'] >= 1 && u.a['look:beard'] >= 1, 'usage: presses are counted by action and choice', Object.keys(u.a).length + ' kinds');
   ok(u.f.local >= 3 && u.f.ranked >= 1 && u.f.chuek === 1 && u.f.rival === 1 && u.f.title === 1 && u.f.defense === 2 && u.f.tour === 3 && u.f.exhibition >= 1, 'usage: fights are counted by kind', JSON.stringify(u.f));
-  ok(u.end.skip >= 10 && u.rest.go >= 1 && u.rest.auto === 1 && u.rest.held === 1, 'usage: skipped fights and the three ways a rest ends', JSON.stringify(u.end) + ' ' + JSON.stringify(u.rest));
+  ok(u.end.skip >= 10 && (!restGo || u.rest.go >= 1) && u.rest.auto === 1 && u.rest.held === 1, 'usage: skipped fights and the three ways a rest ends', JSON.stringify(u.end) + ' ' + JSON.stringify(u.rest));
   ok(Object.values(u.a).concat(Object.values(u.f), Object.values(u.end), Object.values(u.rest)).every(n => Number.isInteger(n) && n > 0), 'usage: every count is a whole number'); }
 
 // ---- 7d. a big hall: the ring-card girl between rounds. The last fight of the run.

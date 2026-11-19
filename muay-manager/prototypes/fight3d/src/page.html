@@ -265,6 +265,20 @@ p.bad{margin:0;font-size:14px;font-weight:600;color:var(--bad)}
 .quick{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px} .quick .btn{font-size:13px;padding:8px 4px}
 /* the banner of a match of ours that is near: stays at the top of the screen on every page of the game */
 #gMatch{position:sticky;top:0;z-index:60} #gMatch:empty{display:none}
+/* the news ticker: one line across the top of the menu screens, running right to left; a tap opens the list */
+#gNews{position:sticky;top:0;z-index:61;display:flex;align-items:center;gap:8px;width:100%;height:32px;margin:0;padding:0 0 0 8px;border:1px solid #4a3d18;border-radius:9px;background:#16130b;color:#efe6cd;font:inherit;font-size:13.5px;text-align:left;overflow:hidden;cursor:pointer}
+#gNews[hidden]{display:none}
+#gNews .nw-h{flex:none;font-size:11px;font-weight:800;letter-spacing:.06em;color:var(--ink);background:var(--gold);border-radius:5px;padding:2px 7px}
+#gNews .nw-win{flex:1;min-width:0;overflow:hidden;white-space:nowrap;-webkit-mask-image:linear-gradient(90deg,transparent,#000 16px,#000 calc(100% - 16px),transparent);mask-image:linear-gradient(90deg,transparent,#000 16px,#000 calc(100% - 16px),transparent)}
+#gNewsRun{display:inline-block;white-space:nowrap;animation:nwrun var(--news-s,40s) linear infinite;will-change:transform}
+#gNewsRun .nw{margin-right:38px} #gNewsRun .nw b{color:#fff;font-weight:700}
+#gNewsRun .nw i,.nwtag{font-style:normal;font-size:10.5px;font-weight:800;color:var(--gold);border:1px solid #6b5a2a;border-radius:4px;padding:1px 5px;margin-right:7px;white-space:nowrap}
+#gNewsRun .nw i.live,.nwtag.live{color:#fff;background:var(--red);border-color:var(--red)}
+@keyframes nwrun{to{transform:translateX(-50%)}} /* the lines are there twice (newsSet): half way along, the picture is the one it started with */
+#gNews.still #gNewsRun{display:block;animation:none;overflow:hidden;text-overflow:ellipsis} #gNews.still #gNewsRun .nw{margin-right:0}
+.app.has-news #gMatch{top:36px} .app.has-news #gBody{scroll-margin-top:44px}
+.newsrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.5} .newsrow:first-of-type{border-top:0}
+.newsrow b{color:#fff} .newsrow small{color:var(--muted);white-space:nowrap} .newsrow .btn{flex:none}
 .app.g-clock #btnSpeed{display:none} /* a live match runs by the clock */
 .matchbar{display:grid;justify-items:center;gap:3px;text-align:center;background:linear-gradient(180deg,#3b2b08,#1c1505);border:2px solid var(--gold);border-radius:12px;padding:9px 12px 11px;box-shadow:0 8px 26px rgba(0,0,0,.6)}
 .matchbar .mb-h{font-family:var(--display);font-weight:700;font-size:14px;letter-spacing:.02em;color:var(--gold)}

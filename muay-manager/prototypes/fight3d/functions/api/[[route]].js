@@ -42,9 +42,22 @@ async function schema(db) {
     db.prepare('CREATE TABLE IF NOT EXISTS docs (coll TEXT NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, updated INTEGER NOT NULL, PRIMARY KEY (coll, id))'),
     db.prepare('CREATE TABLE IF NOT EXISTS logs (id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER NOT NULL, ua TEXT, ver TEXT, msg TEXT)'),
     db.prepare('CREATE TABLE IF NOT EXISTS transfers (code TEXT PRIMARY KEY, id TEXT NOT NULL, expires INTEGER NOT NULL)'),
-    db.prepare('CREATE TABLE IF NOT EXISTS cups (k INTEGER NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, at INTEGER NOT NULL, PRIMARY KEY (k, id))')
+    db.prepare('CREATE TABLE IF NOT EXISTS cups (k INTEGER NOT NULL, id TEXT NOT NULL, data TEXT NOT NULL, at INTEGER NOT NULL, PRIMARY KEY (k, id))'),
+    db.prepare('CREATE TABLE IF NOT EXISTS news (id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER NOT NULL, pid TEXT NOT NULL, data TEXT NOT NULL)'),
+    db.prepare('CREATE INDEX IF NOT EXISTS news_pid ON news (pid, id)')
   ]);
   ready = true;
+}
+// The news ticker: what players' fighters have just done (a knockout, a belt, a step up). Each game posts its own notable
+// results and everyone reads the last ones. Only set words, small numbers and names are kept: never free text.
+const NEWS = {keep: 200, list: 30, gap: 8000, kinds: new Set(['ko', 'win', 'draw', 'belt', 'def', 'rev', 'cup', 'pcup', 'up', 'new']), how: new Set(['ko', 'tko', 'pts', 'draw'])};
+const newsName = v => (typeof v === 'string' ? v.replace(/[\u0000-\u001f<>&"']/g, '').trim().slice(0, 40) : '');
+function newsItem(x) {
+  if (!x || typeof x !== 'object' || !NEWS.kinds.has(x.k)) return null;
+  const name = newsName(x.name), o = newsName(x.o), out = {k: x.k, name}; if (name.length < 2) return null;
+  if (o) out.o = o; if (NEWS.how.has(x.hw)) out.hw = x.hw; if (x.ch === 1) out.ch = 1;
+  if (Number.isInteger(x.rd) && x.rd >= 1 && x.rd <= 5) out.rd = x.rd; if (Number.isInteger(x.n) && x.n >= 0 && x.n <= 999) out.n = x.n;
+  return out;
 }
 async function sha256(s) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
 const rand = n => [...crypto.getRandomValues(new Uint8Array(n))].map(x => x.toString(16).padStart(2, '0')).join('');
@@ -101,9 +114,27 @@ export async function onRequest({request, env, params}) {
     const who = await caller(request, db); if (!who) return json({error: 'forbidden'}, 403);
     await db.batch([
       db.prepare("DELETE FROM docs WHERE (id = ? AND coll IN ('board', 'challenges', 'answers')) OR coll = ? OR coll LIKE ?").bind(who, 'data/users/' + who, 'data/users/' + who + '/%'),
-      db.prepare('DELETE FROM transfers WHERE id = ?').bind(who), db.prepare('DELETE FROM cups WHERE id = ?').bind(who), db.prepare('DELETE FROM players WHERE id = ?').bind(who)
+      db.prepare('DELETE FROM transfers WHERE id = ?').bind(who), db.prepare('DELETE FROM cups WHERE id = ?').bind(who), db.prepare('DELETE FROM news WHERE pid = ?').bind(who), db.prepare('DELETE FROM players WHERE id = ?').bind(who)
     ]);
     return json({ok: true});
+  }
+  if (route[0] === 'news' && route.length === 1) {
+    const now = Date.now();
+    if (method === 'GET') { // the last lines, newest first (the game leaves out the ones too old to tell)
+      const {results} = await db.prepare('SELECT id, t, pid, data FROM news ORDER BY id DESC LIMIT ?').bind(NEWS.list).all();
+      return json({now, items: results.map(r => Object.assign(JSON.parse(r.data), {id: r.id, t: r.t, pid: r.pid}))});
+    }
+    if (method !== 'POST') return json({error: 'method'}, 405);
+    const who = await caller(request, db); if (!who) return json({error: 'forbidden'}, 403);
+    const text = await request.text(); if (text.length > 2000) return json({error: 'too large'}, 413);
+    let body; try { body = JSON.parse(text); } catch (e) { return json({error: 'not json'}, 400); }
+    const items = (body && Array.isArray(body.items) ? body.items : []).slice(0, 2).map(newsItem).filter(Boolean);
+    if (!items.length) return json({error: 'nothing to say'}, 400);
+    const last = await db.prepare('SELECT t FROM news WHERE pid = ? ORDER BY id DESC LIMIT 1').bind(who).first();
+    if (last && now - last.t < NEWS.gap) return json({error: 'too soon'}, 429); // one fight, one post
+    await db.batch(items.map(x => db.prepare('INSERT INTO news (t, pid, data) VALUES (?, ?, ?)').bind(now, who, JSON.stringify(x)))
+      .concat(db.prepare('DELETE FROM news WHERE id <= (SELECT MAX(id) - ? FROM news)').bind(NEWS.keep)));
+    return json({ok: true, n: items.length});
   }
   if (route[0] === 'cup' && route.length === 1) {
     const now = Date.now(), c = cupClock(env, now);
