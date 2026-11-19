@@ -816,7 +816,7 @@
 
 ทำแล้วในรอบที่ 82 (19 พ.ย. 2026) ไม่มีการแก้เกม (ยังเป็น 2.58)
 - [x] ผูก `muay.eggpact.com` เข้ากับโปรเจกต์ Pages `muay-manager` ทาง API แล้ว สถานะ **pending: CNAME record not set**
-- [ ] **รอเจ้าของเกม:** เพิ่มระเบียน DNS ในโซน `eggpact.com` (โทเคนของเซสชันมองไม่เห็นโซนนี้): CNAME ชื่อ `muay` ชี้ `muay-manager.pages.dev` แบบ DNS only • เสร็จแล้วตรวจ `https://muay.eggpact.com/version.json` แล้วค่อยแก้ที่อยู่ในเอกสาร (`CLAUDE.md` ข้อ 5, `docs/APP_BUILD_GUIDE.md` `MUAY_API` / `MUAY_WEB`)
+- [x] ระเบียน DNS: เจ้าของเกมเพิ่ม CNAME `muay` → `muay-manager.pages.dev` แบบ DNS only แล้ว (19 พ.ย.) • Pages ยังตอบ error 1014 จนสั่งตรวจโดเมนใหม่ทาง API (`PATCH …/domains/muay.eggpact.com`) จากนั้น **`https://muay.eggpact.com` เปิดเกมได้**: `version.json` 2.60 หน้าเกมตรงกับ build ทุกไบต์ API และไฟล์ตอบปกติ • แก้ที่อยู่ใน `CLAUDE.md` ข้อ 5 และ `docs/APP_BUILD_GUIDE.md` แล้ว • ภาพตัวอย่างลิงก์ยังชี้ `muay-manager.pages.dev/og.jpg` โดยตั้งใจ (ที่อยู่ที่ตอบเสมอ)
 - เกมไม่ผูกกับชื่อโดเมน (`WEB = location.origin`, API เป็น `/api`, CORS เปิดทุก origin) ใช้โดเมนใหม่ได้โดยไม่ต้อง build ใหม่ • ที่อยู่ `muay-manager.pages.dev` ยังใช้ได้ต่อ
 - **นักมวยไม่ตามข้ามโดเมนเอง** (ที่เก็บในเบราว์เซอร์แยกตามที่อยู่เว็บ): ย้ายด้วย ตั้งค่า → บัญชีและข้อมูล → ขอรหัสย้ายเครื่อง ที่ที่อยู่เดิม แล้วใส่รหัสที่ที่อยู่ใหม่ภายใน 10 นาที
 - ภาพก่อนปล่อยลงกลุ่ม (รายงาน `tools/tester-report.mjs --remote` 19 พ.ย. 09:03): เครื่องที่เคยเปิดเกม 70 • สร้างนักมวยแล้ว 4 • ไฟต์รวม 31

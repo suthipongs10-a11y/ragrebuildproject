@@ -102,4 +102,8 @@ npx --yes wrangler@4 d1 execute muay-manager --remote --command "SELECT id, date
 1. ผูกโดเมนกับโปรเจกต์ Pages (ทำแล้วทาง API): `POST /accounts/<account>/pages/projects/muay-manager/domains` ตัวข้อมูล `{"name": "muay.eggpact.com"}` • ดูสถานะ: `GET …/domains/muay.eggpact.com` (`pending` จนกว่าจะมี CNAME แล้วเป็น `active`)
 2. ระเบียน DNS ในโซน `eggpact.com` (ต้องทำในบัญชีที่ถือโซน โทเคนของเซสชันมองไม่เห็นโซนนี้): ชนิด CNAME ชื่อ `muay` เป้าหมาย `muay-manager.pages.dev` สถานะ DNS only
 
+3. หลังเพิ่มระเบียนแล้ว Pages ยังไม่ตรวจซ้ำเอง (โดเมนตอบ error 1014 อยู่): สั่งตรวจใหม่ด้วย `PATCH …/domains/muay.eggpact.com` (ไม่มีตัวข้อมูล) ภายใน 15 วินาทีสถานะ verification เป็น `active` และโดเมนเปิดเกมได้
+
+**ใช้ได้แล้วตั้งแต่ 19 พ.ย. 2026** ตรวจ: `https://muay.eggpact.com/version.json` ตรงกับ build หน้าเกมตรงทุกไบต์ `/api/health` `/api/news` `/og.jpg` ตอบปกติ `http://` พาไป `https://`
+
 เกมไม่ต้อง build ใหม่ ที่อยู่ `muay-manager.pages.dev` ยังใช้ได้ • ที่เก็บในเบราว์เซอร์แยกตามที่อยู่เว็บ นักมวยที่สร้างไว้ที่ที่อยู่เดิมต้องย้ายด้วยรหัสย้ายเครื่อง

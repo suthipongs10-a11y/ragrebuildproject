@@ -14,15 +14,15 @@
 
 สามโหมด (`MON.mode()`): `native` เมื่อมี `window.MuayNative` • `test` เมื่อเปิดหน้าด้วย `?mon=test` (โฆษณาและการซื้อจำลอง ไม่ตัดเงิน ใช้ลองบนเว็บ) • `none` หน้าเว็บปกติ (ไม่แสดงปุ่มโฆษณา การ์ดแพ็กขึ้นว่าเร็ว ๆ นี้ และนับคนกดลง `/api/log`)
 
-ลองได้เลย: `https://muay-manager.pages.dev/?mon=test`
+ลองได้เลย: `https://muay.eggpact.com/?mon=test`
 
 ## 2. สิ่งที่ตัวห่อแอปต้องให้: `window.MuayNative`
 
 ต้องมีก่อนสคริปต์ของเกมเริ่มทำงาน ทุกฟังก์ชันคืน Promise เกมไม่เรียกไลบรารีโฆษณาหรือการซื้อเอง
 
 ```js
-window.MUAY_API = 'https://muay-manager.pages.dev/api';   // ที่อยู่เซิร์ฟเวอร์เกม (หน้าในแอปเป็นไฟล์ในเครื่อง)
-window.MUAY_WEB = 'https://muay-manager.pages.dev';       // ใช้ทำลิงก์ชวนเพื่อนมาดู
+window.MUAY_API = 'https://muay.eggpact.com/api';   // ที่อยู่เซิร์ฟเวอร์เกม (หน้าในแอปเป็นไฟล์ในเครื่อง)
+window.MUAY_WEB = 'https://muay.eggpact.com';       // ใช้ทำลิงก์ชวนเพื่อนมาดู
 window.MuayNative = {
   rewarded(placement),   // 'purse' | 'massage' | 'revenge' → {rewarded: true} เมื่อดูจนจบ, {rewarded: false} เมื่อปิดก่อนหรือไม่มีโฆษณา
   interstitial(),        // แสดงโฆษณาคั่นถ้ามีพร้อม แล้ว resolve (ไม่มีก็ resolve เลย)
