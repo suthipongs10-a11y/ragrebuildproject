@@ -15,6 +15,7 @@ import { buildCommentary } from './commentary.js';
 import { buildCeremony, CER_LEN } from './ceremony.js';
 import { buildPrize } from './prize.js';
 import { buildCorner, CORNER_LEN, CORNER_SEAT, CORNER_OUT } from './corner.js';
+import { hasBad } from './badwords.js';
 const THREE = globalThis.THREE;
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
@@ -64,7 +65,7 @@ const LOOK = [
   {name: '', fighter: 'd', shorts: 'blue', trim: 'white', pattern: 'stripe', gloves: 'blue', head: 'mongkol', hair: 'natural', skin: 'natural', band: 'none', beard: 'none'}
 ];
 const LOOK_FIELDS = {fighter: ROSTER, shorts: COLORS, trim: COLORS, pattern: PATTERNS, gloves: COLORS, head: HEADGEAR, hair: HAIR, skin: SKINS, band: BANDS, beard: BEARDS};
-const cleanName = v => String(v || '').replace(/[<>&"']/g, '').trim().slice(0, 24);
+const cleanName = v => { const n = String(v || '').replace(/[<>&"']/g, '').trim().slice(0, 24); return hasBad(n) ? '' : n; }; // a name with a bad word (badwords.js) comes out empty: callers show a stand-in
 try { // remembered per viewer
   const sv = JSON.parse(localStorage.getItem('muayLabLook'));
   if (Array.isArray(sv)) sv.forEach((l, i) => { if (!LOOK[i] || !l) return; LOOK[i].name = cleanName(l.name); for (const k in LOOK_FIELDS) if (LOOK_FIELDS[k][l[k]]) LOOK[i][k] = l[k]; });

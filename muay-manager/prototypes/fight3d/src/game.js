@@ -1,11 +1,12 @@
 // Game layer: profile, training, outfits, matchmaking, corner plans, rewards and ranking.
 // It never touches fight rules: it builds two fighter specs and plans, hands them to the simulation through the viewer,
 // and turns the result into progress. Save lives in the browser and, when the page has it, in the artifact database.
-import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VENUE_RULES, RULES, LIVE, SPECIALS, SP_MAX, REST_AUTO, CUP_PRIZE } from './data.js';
+import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VENUE_RULES, RULES, LIVE, SPECIALS, SP_MAX, REST_AUTO, CUP_PRIZE, SKIP, SHOP } from './data.js';
 import { buildCup, cupPlace, cupTimes, cupMatch, CUP_MIN } from './cup.js';
 import { cleanPlan, cleanSpec, cleanStats, own, matchCfg as matchInput } from './match.js';
 import { PLAN_TIPS } from './plantips.js';
 import { simulate, SIM_VERSION } from './sim.js';
+import { hasBad, NAME_STANDIN } from './badwords.js';
 import { siteRuntime } from './netdb.js';
 import * as MON from './mon.js';
 import { sceneArt, playScene, SCENE_KEYS } from './scenes.js';
@@ -113,7 +114,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.61', BUILD = 261;
+const VER = '2.62', BUILD = 262;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -157,6 +158,8 @@ function fix(s) { // fields added after a save was made
     for (const t of Object.keys(s.tours || {})) for (let n = 1; n <= ((s.tours[t] || {}).wins || 0); n++) s.honors.push({k: 'cup', i: +t, n});
   }
   if (typeof s.title !== 'number') s.title = 1;
+  if (hasBad(s.name)) s.name = NAME_STANDIN; // badwords.js: the name everyone sees
+  if (!Array.isArray(s.build)) s.build = []; if (typeof s.merit !== 'number') s.merit = 0; // the shop (SHOP)
   return s;
 }
 // daily missions: progress counts up, the reward pays out the moment the target is reached
@@ -250,7 +253,12 @@ const cap = () => 62 + S.gym * 7;
 const fatigueMul = () => 1 - Math.max(0, S.fatigue - 40) / 200;
 const NIGHT = 45; // fatigue a night's sleep takes away
 const coachOf = a => S.staff.includes(STAFF_ACT[a.id]);
-const boost = a => MOOD_TRAIN[S.mood] * (coachOf(a) ? 1.25 : 1);
+// the shop (SHOP in data.js): what is built, and what that gives
+const built = id => (S.build || []).includes(id), shopOf = id => SHOP.build.find(x => x.id === id);
+const slotsMax = () => 3 + (built('ring') ? shopOf('ring').slots : 0);
+const dailyPrice = d => d.base + d.perLeague * league(S.rp), meritPrice = () => Math.round(SHOP.merit.base * Math.pow(SHOP.merit.grow, S.merit || 0) / 50) * 50;
+const boughtToday = id => !!(S.shopDay && S.shopDay.day === S.day && S.shopDay.ids.includes(id));
+const boost = a => MOOD_TRAIN[S.mood] * (coachOf(a) ? 1.25 : 1) * (built('weights') ? 1 + shopOf('weights').train : 1);
 const failPct = a => a.stat.length ? Math.round(Math.max(0, S.fatigue - FAIL.from) * FAIL.perPoint * (S.mood <= 1 ? FAIL.lowMood : 1)) : 0;
 function moodUp(n) { const b = S.mood; S.mood = clamp(S.mood + n, 0, 4); return S.mood === b ? '' : ' อารมณ์' + (n > 0 ? 'ดีขึ้น' : 'แย่ลง') + 'เป็น "' + MOODS[S.mood] + '"'; }
 function playerSpec() { const st = {}, m = fatigueMul() * MOOD_FIGHT[S.mood]; KEYS.forEach(k => { st[k] = clamp(Math.round(S.stats[k] * m), 20, 100); }); return {name: S.name, first: S.name, style: S.style, stats: st, skin: 0, sp: S.sp.slice(), spLv: Object.assign({}, S.spLv || {})}; }
@@ -614,11 +622,12 @@ function homeHtml() {
     '<div class="kv"><span>สถิติ</span><b>ชนะ ' + S.rec.w + ' (น็อก ' + S.rec.ko + ') แพ้ ' + S.rec.l + (S.rec.d ? ' เสมอ ' + S.rec.d : '') + '</b><span>อันดับ</span><b>ที่ ' + pos + ' จาก ' + rows.length + ' · ' + LEAGUES[lg][1] + '</b><span>เข็มขัด</span><b>' + (S.belts.length ? '<span class="belts">' + S.belts.map(i => '<span class="belt">' + art('belt-' + (i + 1), 'beltimg') + BELTS[i] + '</span>').join('') + '</span>' : 'ยังไม่มี') + '</b><span>เป้าหมาย</span><b>' + goal + '</b></div>' +
     '<div class="statbox r">' + statBars(S.stats) + '</div><p class="hint">ค่าพลังเฉลี่ย ' + overall(S.stats) + ' · เพดานค่าพลังของค่ายระดับ ' + S.gym + ' คือ ' + cap() + '</p>' +
     '<div class="rowbtn">' + gymNext + '<button class="btn" data-act="hall">ทำเนียบแชมป์ · เข็มขัด ' + S.belts.length + ' ถ้วย ' + S.honors.filter(h => h.k === 'cup').length + '</button></div></section>' +
-    '<section class="gcard"><h2>วันนี้</h2><div class="kv"><span>แรงซ้อม</span><b>เหลือ ' + S.slots + ' จาก 3 ครั้ง</b><span>ศึกจัดอันดับ</span><b>เหลือ ' + S.ranked + ' จาก 2 ไฟต์</b></div>' +
+    '<section class="gcard"><h2>วันนี้</h2><div class="kv"><span>แรงซ้อม</span><b>เหลือ ' + S.slots + ' จาก ' + slotsMax() + ' ครั้ง</b><span>ศึกจัดอันดับ</span><b>เหลือ ' + S.ranked + ' จาก 2 ไฟต์</b></div>' +
     '<div class="rowbtn"><button class="btn" data-act="tab" data-v="train">ไปซ้อม</button><button class="btn" data-act="tab" data-v="fight">หาคู่ชก</button><button class="btn go" data-act="sleep">จบวัน นอนพัก</button></div>' +
     (S.fatigue >= 30 ? adBtn('massage', 'นวดคลายล้า −' + AD.massage.off + ' (ตอนนี้ล้า ' + Math.round(S.fatigue) + '%)') : '') +
-    '<p class="hint">นอนพักแล้วความล้าลด ' + (NIGHT + (S.staff.includes('massage') ? 12 : 0)) + ' ได้แรงซ้อมและคู่ชกชุดใหม่ ได้ค่าสปอนเซอร์ ฿ ' + baht(40 + S.fame * 3) + (S.staff.length ? ' จ่ายค่าจ้างทีมงาน ฿ ' + baht(S.staff.reduce((a, id) => a + STAFF.find(x => x.id === id).wage, 0)) : '') + '</p></section>' +
+    '<p class="hint">นอนพักแล้วความล้าลด ' + (NIGHT + (S.staff.includes('massage') ? 12 : 0) + (built('sauna') ? shopOf('sauna').night : 0)) + ' ได้แรงซ้อมและคู่ชกชุดใหม่ ได้ค่าสปอนเซอร์ ฿ ' + baht(40 + S.fame * 3) + (S.staff.length ? ' จ่ายค่าจ้างทีมงาน ฿ ' + baht(S.staff.reduce((a, id) => a + STAFF.find(x => x.id === id).wage, 0)) : '') + '</p></section>' +
     '<section class="gcard"><h2>ทีมงาน <small>จ่ายค่าจ้างทุกเช้า</small></h2>' + STAFF.map(st => { const on = S.staff.includes(st.id); return '<div class="staff">' + art('staff-' + st.id, 'face') + '<b>' + st.th + (on ? ' ✓' : '') + '</b><span>' + st.note + ' · ค่าจ้างวันละ ฿ ' + st.wage + '</span><button class="btn" data-act="staff" data-v="' + st.id + '">' + (on ? 'เลิกจ้าง' : 'จ้าง ฿ ' + baht(st.hire)) + '</button></div>'; }).join('') + '</section>' +
+    shopHtml() +
     '<section class="gcard"><h2>ภารกิจวันนี้</h2>' + MISSIONS.map(m => { const n = Math.min(m.need, (S.mis.day === S.day ? S.mis.n[m.id] : 0) || 0), done = n >= m.need; return '<div class="mis' + (done ? ' done' : '') + '"><span>' + (done ? '✓ ' : '') + m.th + '</span><span>' + n + '/' + m.need + '</span><span>฿ ' + m.money + (m.fame ? ' ★ ' + m.fame : '') + '</span></div>'; }).join('') + '</section>' +
     spHtml() + vipHtml() +
     (S.log.length ? '<section class="gcard"><h2>ไฟต์ล่าสุด</h2>' + S.log.slice(0, 5).map(l => '<div class="logrow ' + (l.d ? 'd' : l.w ? 'w' : 'l') + '"><b>' + (l.d ? 'เสมอ' : l.w ? 'ชนะ' : 'แพ้') + '</b><span>' + esc(l.o) + '</span><span>' + esc(l.h) + '</span></div>').join('') + '</section>' : '') +
@@ -796,11 +805,50 @@ let monBusy = false, monPrice = ''; // an advert or a purchase is on screen; the
 const AD = {
   purse:   {cap: 3, th: 'เงินรางวัลไฟต์นี้อีกเท่าตัว'},        // after a win: the purse again
   massage: {cap: 2, th: 'นวดคลายล้า −25', off: 25},            // at the camp: fatigue down
-  revenge: {cap: 1, th: 'ลุกขึ้นแก้มือทันที'}                   // after a loss: this fight's fatigue is taken off, and the rematch is his today
+  revenge: {cap: 1, th: 'ลุกขึ้นแก้มือทันที'},                  // after a loss: this fight's fatigue is taken off, and the rematch is his today
+  skip:    {cap: SKIP.adCap, th: 'ข้ามไปดูผลได้อีก ' + SKIP.ad + ' ครั้ง'} // out of skips for the day: a few more
 };
+// how many more of his own fights he may skip today (the real day: game days pass with a tap)
+const skipLeft = () => { if (!S.skip || S.skip.d !== adDay()) S.skip = {d: adDay(), n: 0, add: 0}; return Math.max(0, SKIP.free + S.skip.add - S.skip.n); };
 const adDay = () => { const d = new Date(now()); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
 const adLeft = k => { if (S.ad.d !== adDay()) S.ad = {d: adDay(), n: {}}; return Math.max(0, AD[k].cap - (S.ad.n[k] || 0)); };
 const adOn = () => MON.mode() !== 'none' || S.vip; // nothing to watch on the plain web page
+// ---------- the shop: what money buys besides the camp's levels (SHOP in data.js) ----------
+function shopHtml() {
+  const row = (title, note, btn) => '<div class="shoprow"><div><b>' + title + '</b><span>' + note + '</span></div>' + btn + '</div>';
+  const b = SHOP.build.map(x => row(x.th + (built(x.id) ? ' ✓' : ''), x.note, built(x.id) ? '<span class="hint">มีแล้ว</span>'
+    : S.gym < x.gym ? '<span class="hint">ต้องเป็นค่ายระดับ ' + x.gym + '</span>'
+    : '<button class="btn" data-act="shop" data-v="build:' + x.id + '"' + (S.money < x.price ? ' disabled' : '') + '>สร้าง ฿ ' + baht(x.price) + '</button>')).join('');
+  const d = SHOP.daily.map(x => { const p = dailyPrice(x), done = boughtToday(x.id), idle = x.fat ? S.fatigue < 1 : S.mood >= 4;
+    return row(x.th, x.note, done ? '<span class="hint">วันนี้แล้ว</span>' : '<button class="btn" data-act="shop" data-v="daily:' + x.id + '"' + (S.money < p || idle ? ' disabled' : '') + '>฿ ' + baht(p) + '</button>'); }).join('');
+  const mp = meritPrice(), m = SHOP.merit;
+  return '<section class="gcard" id="gShop"><h2>ใช้เงินในค่าย <small>สร้างค่าย ดูแลนักมวย ทำบุญ</small></h2>' + (view && view.shop ? '<p class="' + (view.bad ? 'warn' : 'gain') + '">' + esc(view.shop) + '</p>' : '') + '<div class="fld">สิ่งปลูกสร้าง · สร้างครั้งเดียวใช้ได้ตลอด</div>' + b +
+    '<div class="fld">ดูแลนักมวย · วันละครั้ง ราคาตามระดับเวที</div>' + d +
+    '<div class="fld">ทำบุญ · ครั้งต่อไปทำบุญมากขึ้น</div>' + row(m.th + (S.merit ? ' <small>ทำแล้ว ' + S.merit + ' ครั้ง</small>' : ''), 'ชื่อเสียง +' + m.fame + ' อารมณ์ดีขึ้น · คนในวงการนับถือ', '<button class="btn" data-act="shop" data-v="merit"' + (S.money < mp ? ' disabled' : '') + '>ถวาย ฿ ' + baht(mp) + '</button>') + '</section>';
+}
+// -> {ok, text}, or null when there is nothing to do
+function shopBuy(v) {
+  const [kind, id] = String(v).split(':'), no = text => ({ok: false, text});
+  if (kind === 'build') {
+    const x = shopOf(id); if (!x || built(id)) return null; if (S.gym < x.gym) return no('ต้องเป็นค่ายระดับ ' + x.gym + ' ก่อน');
+    if (S.money < x.price) return no('เงินไม่พอ ต้องมี ฿ ' + baht(x.price));
+    S.money -= x.price; S.build = S.build.concat(id); if (x.slots) S.slots += x.slots; // the new ring is used today already
+    return {ok: true, text: 'สร้าง' + x.th + 'เสร็จแล้ว: ' + x.note};
+  }
+  if (kind === 'daily') {
+    const x = SHOP.daily.find(d => d.id === id); if (!x || boughtToday(id)) return null; const p = dailyPrice(x);
+    if (S.money < p) return no('เงินไม่พอ ต้องมี ฿ ' + baht(p));
+    S.money -= p; S.shopDay = {day: S.day, ids: (S.shopDay && S.shopDay.day === S.day ? S.shopDay.ids : []).concat(id)};
+    if (x.fat) { S.fatigue = clamp(S.fatigue - x.fat, 0, 100); return {ok: true, text: x.th + ' ความล้าเหลือ ' + Math.round(S.fatigue) + '%'}; }
+    return {ok: true, text: x.th + moodUp(x.mood)};
+  }
+  if (kind === 'merit') {
+    const p = meritPrice(); if (S.money < p) return no('เงินไม่พอ ต้องมี ฿ ' + baht(p));
+    S.money -= p; S.merit = (S.merit || 0) + 1; S.fame += SHOP.merit.fame;
+    return {ok: true, text: SHOP.merit.th + ' ฿ ' + baht(p) + ' (ครั้งที่ ' + S.merit + ') ชื่อเสียง +' + SHOP.merit.fame + moodUp(SHOP.merit.mood) + (u => (u ? ' · ' + u : ''))(unlockSpecials())};
+  }
+  return null;
+}
 // the button for one bonus (label: what he gets here, e.g. the sum); '' where there is nothing to offer
 function adBtn(k, label, extra) {
   if (!adOn()) return ''; const left = adLeft(k);
@@ -815,6 +863,7 @@ async function adReward(k, el) {
   if (!adLeft(k)) return; S.ad.n[k] = (S.ad.n[k] || 0) + 1; if (view) delete view.note;
   if (k === 'purse') { S.money += F.res.money; F.res.ad = 'ได้เงินรางวัลเพิ่ม ฿ ' + baht(F.res.money); }
   else if (k === 'massage') { S.fatigue = clamp(S.fatigue - AD.massage.off, 0, 100); view = {note: 'นวดคลายล้าแล้ว ความล้าเหลือ ' + Math.round(S.fatigue) + '%'}; }
+  else if (k === 'skip') { skipLeft(); S.skip.add += SKIP.ad; }
   else if (k === 'revenge') { S.fatigue = clamp(S.fatigue - F.res.fat, 0, 100); S.rematch = 1; F.res.ad = 'พร้อมแก้มือ: ความล้าของไฟต์นี้หายไป และมีสิทธิ์ล้างตา ' + esc(F.opp.name) + ' วันนี้ (ที่เมนูหาคู่ชก)'; }
   save(); topBar(); render();
 }
@@ -883,8 +932,11 @@ function breakHtml() {
 function liveHtml() {
   if (F.live) return '<section class="gcard slim"><div class="kv"><span>' + (F.live.cup ? 'ศึกชิงถ้วยผู้เล่น' + (F.clock ? ' · สด' : '') : F.live.exh ? 'อุ่นเครื่อง' : F.clock ? 'ท้าชก · สด' : 'ท้าชก') + '</span><b>' + esc(F.live.fromName) + ' vs ' + esc(F.live.toName) + '</b><span>เวที</span><b>' + API.VENUES[F.live.venue] + '</b>' + (F.clock && F.me >= 0 ? '<span>แผนตอนนี้</span><b>' + planText(F.plan) + '</b>' : '') + (F.clock ? '<span>ผู้ชม</span><b data-viewers>' + viewers(F.live) + '</b>' : '') + '</div>' +
     (F.loading ? '<p class="hint">กำลังขึ้นเวที…</p>' : F.clock ? cheerHtml() + (F.me < 0 ? '<div class="rowbtn"><button class="btn" data-act="home">ออกจากการชม</button></div>' : '') + '<p class="hint">ชกสดพร้อมกันทั้งสองฝั่ง ภาพและแต้มเดียวกัน · พักยก ' + LIVE_REST + ' วินาที ' + (F.me >= 0 ? 'เลือกแผนยกถัดไปได้ ' : '') + 'แล้วชกต่อเอง</p>' : '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button></div>') + '</section>';
+  const sl = skipLeft();
   return '<section class="gcard slim"><div class="kv"><span>แผนตอนนี้</span><b>' + planText(F.plan) + '</b><span>คู่ชก</span><b>' + esc(F.opp.name) + ' · สาย' + styleTh(F.opp.style) + '</b></div>' +
-    '<div class="rowbtn"><button class="btn" data-act="skip">ข้ามไปดูผล</button><button class="btn link" data-act="nobreak" aria-pressed="' + !!S.noBreak + '">' + (S.noBreak ? 'ไม่ต้องหยุดพักยก · แตะเพื่อหยุดแก้แผนทุกพักยก' : 'หยุดพักยกทุกยก · แตะเพื่อไม่ต้องหยุดพักยก') + '</button></div></section>';
+    '<div class="rowbtn">' + (sl ? '<button class="btn" data-act="skip">ข้ามไปดูผล <small>เหลือ ' + sl + ' ครั้งวันนี้</small></button>' : '<button class="btn" data-act="skip" disabled>ข้ามไปดูผล · วันนี้ใช้ครบแล้ว</button>') +
+    '<button class="btn link" data-act="nobreak" aria-pressed="' + !!S.noBreak + '">' + (S.noBreak ? 'ไม่ต้องหยุดพักยก · แตะเพื่อหยุดแก้แผนทุกพักยก' : 'หยุดพักยกทุกยก · แตะเพื่อไม่ต้องหยุดพักยก') + '</button></div>' +
+    (sl ? '' : adBtn('skip', 'ข้ามได้อีก ' + SKIP.ad + ' ครั้ง') + '<p class="hint">ข้ามไปดูผลได้วันละ ' + SKIP.free + ' ไฟต์ ได้สิทธิ์ใหม่ตอนเที่ยงคืน · กด "เร็ว ×2" ใต้ภาพเพื่อดูเร็วขึ้น</p>') + '</section>';
 }
 function resultHtml() {
   const r = F.res;
@@ -1834,7 +1886,7 @@ function trainResult(q) {
   }
   S.slots--; mini = null; const done = mission('train'); view = {msg: msg + (done ? ' · ' + done : '')}; save(); render();
 }
-const USE_BY_V = {tab: 1, train: 1, pick: 1, quick: 1, body: 1, style: 1}; // counted per choice, not just per press
+const USE_BY_V = {tab: 1, train: 1, pick: 1, quick: 1, body: 1, style: 1, shop: 1}; // counted per choice, not just per press
 function onClick(e) {
   const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
   const act = el.dataset.act, v = el.dataset.v;
@@ -1859,7 +1911,7 @@ function onClick(e) {
   if (act === 'body') { draft.body = v; if (noBeard(v)) draft.look.beard = 'none'; draft.name = $('gName').value; renderCreate(); previewDraft(); }
   else if (act === 'dlook') { if (!own(LOOK0, el.dataset.f)) return; draft.look[el.dataset.f] = v; draft.name = $('gName').value; renderCreate(); previewDraft(...faceView(el.dataset.f)); }
   else if (act === 'style') { draft.style = v; draft.name = $('gName').value; renderCreate(); }
-  else if (act === 'create') { const name = API.cleanName($('gName').value); if (name.length < 2) { const m = $('gCreateMsg'), n = $('gName'); m.textContent = 'ใส่ชื่อนักมวยก่อน (อย่างน้อย 2 ตัวอักษร) ที่ช่องด้านบน'; m.className = 'bad'; n.classList.add('bad'); n.scrollIntoView({block: 'center', behavior: 'smooth'}); n.focus({preventScroll: true}); n.addEventListener('input', () => { n.classList.remove('bad'); m.textContent = ''; }, {once: true}); return; } S = fix(newSave(name, draft.body, draft.style, draft.look)); useOpen(); save(); go('home'); vipSync(); newsPost([{k: 'new'}]); }
+  else if (act === 'create') { const raw = $('gName').value, name = API.cleanName(raw); if (name.length < 2) { const m = $('gCreateMsg'), n = $('gName'); m.textContent = hasBad(raw) ? 'ชื่อนี้มีคำไม่สุภาพ ตั้งชื่ออื่นนะครับ' : 'ใส่ชื่อนักมวยก่อน (อย่างน้อย 2 ตัวอักษร) ที่ช่องด้านบน'; m.className = 'bad'; n.classList.add('bad'); n.scrollIntoView({block: 'center', behavior: 'smooth'}); n.focus({preventScroll: true}); n.addEventListener('input', () => { n.classList.remove('bad'); m.textContent = ''; }, {once: true}); return; } S = fix(newSave(name, draft.body, draft.style, draft.look)); useOpen(); save(); go('home'); vipSync(); newsPost([{k: 'new'}]); }
   else if (act === 'tab') go(v);
   else if (act === 'home') { const live = F && F.live; F = null; API.stop(); CH.seenAt = 0; go('home'); if (CLOUD) loadBoard(); if (!live && !S.vip && ++S.adFights % 3 === 0) MON.interstitial(); } // an advert between screens every third fight of his own, back at the camp (never around a match between players)
   else if (act === 'adr') adReward(v, el);
@@ -1886,17 +1938,19 @@ function onClick(e) {
   else if (act === 'vipsoon') { if (!S.vipAsk) { S.vipAsk = true; save(); siteLog('offer: camp owner pack pressed'); } render(); }
   else if (act === 'sleep') {
     const wage = S.staff.reduce((a, id) => a + STAFF.find(x => x.id === id).wage, 0), income = 40 + S.fame * 3; let note = 'เช้าวันใหม่ ได้ค่าสปอนเซอร์ ฿ ' + baht(income);
-    S.day++; S.slots = 3; S.ranked = 2; S.chuek = 1; S.title = 1; S.rematch = 1;
+    S.day++; S.slots = slotsMax(); S.ranked = 2; S.chuek = 1; S.title = 1; S.rematch = 1;
     const walk = tourNewDay();
     if (S.belts.length && S.day > S.defendDue + DEFEND.grace) { const b = Math.max(...S.belts); S.belts = S.belts.filter(x => x !== b); S.defendDue = S.day + DEFEND.every; note = 'ไม่ได้ป้องกันแชมป์ตามกำหนด ถูกปลดจาก' + BELTS[b] + ' · ' + note; }
-    S.fatigue = clamp(S.fatigue - NIGHT - (S.staff.includes('massage') ? 12 : 0), 0, 100); S.money += income; // a night's sleep and the day's sponsor money
+    S.fatigue = clamp(S.fatigue - NIGHT - (S.staff.includes('massage') ? 12 : 0) - (built('sauna') ? shopOf('sauna').night : 0), 0, 100); S.money += income; // a night's sleep and the day's sponsor money
     if (wage) { if (S.money >= wage) { S.money -= wage; note += ' จ่ายค่าจ้างทีมงาน ฿ ' + baht(wage); } else { S.staff = []; note += ' เงินไม่พอจ่ายค่าจ้าง ทีมงานลาออกทั้งหมด'; } }
     if (S.fatigue < 30 && S.mood < 2) note += ' พักเต็มที่' + moodUp(1);
+    if (built('shrine') && S.mood < 3) note += ' ไหว้ศาลพ่อครู' + moodUp(1);
     if (walk) note += walk;
     save(); view = {note}; render(); topBar();
   }
   else if (act === 'staff') { const st = STAFF.find(x => x.id === v); if (S.staff.includes(v)) S.staff = S.staff.filter(k => k !== v); else { if (S.money < st.hire) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(st.hire); return; } S.money -= st.hire; S.staff.push(v); } save(); render(); }
   else if (act === 'look') setLook(el.dataset.f, v);
+  else if (act === 'shop') { const r = shopBuy(v); if (r) { view = {shop: r.text, bad: !r.ok}; if (r.ok) save(); render(); topBar(); } } // the note shows in the shop card, by the button pressed
   else if (act === 'gym') { const c = GYM_COST[S.gym]; if (S.money < c) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(c); return; } S.money -= c; S.gym++; save(); render(); }
   else if (act === 'reset') { if (resetArmed()) { resetAt = 0; try { localStorage.removeItem(SAVE_KEY); } catch (err) { /* fine */ } if (CLOUD) { try { CLOUD.db.collection('data/users/' + CLOUD.uid).doc('save').delete().catch(() => {}); CLOUD.db.doc('board/' + CLOUD.uid).delete().catch(() => {}); } catch (err) { /* the next save overwrites it */ } } S = null; view = 'create'; setMode(false); render(); previewDraft(); } /* (the stored copy goes too, or the old fighter would come back on the next visit) */ else { resetAt = Date.now(); el.textContent = RESET_SURE; } }
   else if (act === 'train') { if (S.slots < 1) return; const a = ACTS.find(x => x.id === v); if (Math.random() * 100 < failPct(a)) { trainFail(a); return; } mini = {act: a, t0: performance.now()}; if ((a.id === 'run' || a.id === 'rest' || a.id === 'fun') && sceneStart(a)) return; if (a.id === 'rest' || a.id === 'fun') trainResult(1); else if (a.drill) drillStart(a); else render(); }
@@ -1924,7 +1978,7 @@ function onClick(e) {
   else if (act === 'nobreak') { S.noBreak = !S.noBreak; save(); render(); }
   else if (act === 'resume') restGo();
   else if (act === 'resthold') { if (F && F.phase === 'break' && !F.live) { F.restHold = true; restStop(); render(); } }
-  else if (act === 'skip') { if (F) F.skipped = true; API.skip(); }
+  else if (act === 'skip') { if (F && !F.live) { if (!skipLeft()) return; S.skip.n++; save(); } if (F) F.skipped = true; API.skip(); } // his own fights count against the day's skips (SKIP)
   else if (act === 'cupin' || act === 'cupout') {
     if (!CLOUD || !CLOUD.call) return; el.disabled = true;
     (act === 'cupin' ? CLOUD.call('/cup', 'POST', {name: S.name, body: S.body, look: S.look, spec: cupSpec(), plan: cleanPlan(S.plan), rp: S.rp}) : CLOUD.call('/cup', 'DELETE'))
@@ -1942,7 +1996,7 @@ function onInput(e) {
 }
 function onChange(e) {
   const el = e.target;
-  if (el.id === 'gdname') { const n = API.cleanName(el.value); if (n.length >= 2) { S.name = n; save(); topBar(); } el.value = S.name; }
+  if (el.id === 'gdname') { const n = API.cleanName(el.value); if (n.length >= 2) { S.name = n; save(); topBar(); } else if (hasBad(el.value)) { el.classList.add('bad'); el.title = 'ชื่อนี้มีคำไม่สุภาพ'; el.addEventListener('input', () => { el.classList.remove('bad'); el.title = ''; }, {once: true}); } el.value = S.name; }
 }
 
 export function bootGame(api) {
@@ -1955,7 +2009,7 @@ export function bootGame(api) {
   $('gNav').addEventListener('click', onClick); $('gBody').addEventListener('change', onChange); $('gBody').addEventListener('input', onInput);
   chatBuild();
   const h = document.querySelector('.app h1'); if (h) { h.firstChild.textContent = 'MUAY '; h.querySelector('span').textContent = 'MANAGER'; h.insertAdjacentHTML('afterbegin', '<i class="ui logo" data-ui="logo" role="img" aria-label="MUAY MANAGER"></i>'); h.classList.add('glogo'); $('ver').textContent = 'ต้นแบบ ' + VER; }
-  window.GAME = {chat: () => ({open: CT.open, on: CT.on, unread: chatUnread(), polled: CT.polled, items: chatShown().map(x => x.name + ': ' + x.msg)}), news: () => newsAll().map(x => x.tag + ': ' + x.html.replace(/<[^>]+>/g, '')), newsLoad, drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress, uid: () => (CLOUD ? CLOUD.uid : null), match: applyMatch, fight: () => F, cup: () => { const d = PC.data, c = d && d.next; return !c ? null : {k: c.k, phase: cupPhase(now()), age: Date.now() - PC.at, busy: PC.busy, entries: c.entries.length, cup: now() >= c.close ? cupOf(c) : null, prev: d.prev && d.prev.entries.length >= CUP_MIN ? cupOf(d.prev) : null}; }, rest: sec => { if (F && F.phase === 'break') F.restEnd = now() + sec * 1000; }}; // for automated checks
+  window.GAME = {skipLeft: () => (S ? skipLeft() : 0), chat: () => ({open: CT.open, on: CT.on, unread: chatUnread(), polled: CT.polled, items: chatShown().map(x => x.name + ': ' + x.msg)}), news: () => newsAll().map(x => x.tag + ': ' + x.html.replace(/<[^>]+>/g, '')), newsLoad, drill: () => DR, press: drillPress, save: () => S, scene: () => SC, scenePress, uid: () => (CLOUD ? CLOUD.uid : null), match: applyMatch, fight: () => F, cup: () => { const d = PC.data, c = d && d.next; return !c ? null : {k: c.k, phase: cupPhase(now()), age: Date.now() - PC.at, busy: PC.busy, entries: c.entries.length, cup: now() >= c.close ? cupOf(c) : null, prev: d.prev && d.prev.entries.length >= CUP_MIN ? cupOf(d.prev) : null}; }, rest: sec => { if (F && F.phase === 'break') F.restEnd = now() + sec * 1000; }}; // for automated checks
   MON.price().then(pr => { monPrice = pr; if (pr && S && !F && !DR && !SC && tab === 'home' && view !== 'create') render(); }); if (S) vipSync(); // the store's price, and what it says is owned
   S = loadLocal(); setMode(false);
   if (S) { useOpen(); go('home'); } else { view = 'create'; render(); previewDraft(); }

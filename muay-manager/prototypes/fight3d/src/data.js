@@ -239,3 +239,27 @@ export const STYLE_PLAN = {
 export const VENUE_RULES = {
   chuek: {dmgScale: RULES.dmgScale * 1.12, blockDmg: .1}
 };
+
+// "Skip to the result" on the player's own fights: so many a day (the real day, at midnight), more for an advert in the
+// app (adCap adverts, `ad` skips each). Watching other people's fights is never counted. Owner, 20 Nov 2026: one player
+// skipped 109 of 117 fights and made half a million baht in 88 minutes.
+export const SKIP = {free: 10, ad: 5, adCap: 3};
+
+// What money buys besides the camp's five levels (owner, 20 Nov 2026: players had far more money than things to buy).
+// build: bought once, a lasting help, open from a camp level (gym). daily: once per game day, priced by the league
+// (base + perLeague x league index). merit: as often as he likes, each gift dearer than the last (base x grow^n,
+// rounded to 50).
+export const SHOP = {
+  build: [
+    {id: 'sauna', th: 'ห้องซาวน่า', price: 15000, gym: 2, night: 10, note: 'นอนพักแล้วความล้าลดเพิ่มอีก 10'},
+    {id: 'weights', th: 'ห้องยกน้ำหนัก', price: 30000, gym: 3, train: .1, note: 'ซ้อมได้ผลเพิ่มอีก 10%'},
+    {id: 'ring', th: 'เวทีซ้อมในค่าย', price: 60000, gym: 4, slots: 1, note: 'แรงซ้อมวันละ 4 ครั้ง (จาก 3)'},
+    {id: 'shrine', th: 'ศาลพ่อครู', price: 100000, gym: 5, note: 'ทุกเช้าอารมณ์ดีขึ้นหนึ่งขั้น จนถึง "ดี"'}
+  ],
+  daily: [
+    {id: 'massage', th: 'นวดแผนไทยเต็มชั่วโมง', base: 200, perLeague: 150, fat: 30, note: 'ความล้า −30 ไม่เสียแรงซ้อม'},
+    {id: 'meal', th: 'เลี้ยงข้าวทั้งค่าย', base: 150, perLeague: 120, mood: 1, note: 'อารมณ์ดีขึ้นหนึ่งขั้น'}
+  ],
+  merit: {th: 'ทำบุญถวายวัดประจำหมู่บ้าน', base: 500, grow: 1.6, fame: 5, mood: 1}
+};
+

@@ -91,6 +91,7 @@ async function fight(pick, opt = {}) {
       }
     }
   }
+  await ev('GAME.save().skip = null'); // a fresh day's skips: the bot skips far more than a player may (section 7e checks the limit)
   await click('[data-act=skip]', 0);
   if (!await until("!!document.querySelector('#gBody [data-act=home]')", 90000)) return null;
   const r = await ev("({win: /ชนะ/.test(document.querySelector('#gBody h2').textContent), head: document.querySelector('#gBody h2').textContent, venue: '" + venue + "', specs: '" + specs + "'})");
@@ -104,6 +105,8 @@ const weak = () => save("for (const k in S.stats) S.stats[k] = 22; S.fatigue = 0
 
 // ---- 1. creation
 ok(await ev("document.getElementById('gNews').hidden"), 'the news strip is not shown on the creation screen');
+await ev("document.getElementById('gName').value = 'ค ว ย จริง'"); await click('[data-act=create]', 600);
+ok(await ev("!GAME.save() && /คำไม่สุภาพ/.test(document.getElementById('gCreateMsg').textContent)"), 'a name with a bad word (even spelled out) is refused, and the screen says why');
 await ev("document.getElementById('gName').value = 'บอทเล่นครบ'");
 await click('[data-act=body][data-v=f]'); await click('[data-act=style][data-v=kicker]');
 for (const [f, v] of [['skin', 'tan'], ['hair', 'red'], ['shorts', 'purple'], ['pattern', 'split'], ['trim', 'gold'], ['gloves', 'black'], ['band', 'gold'], ['beard', 'goatee']]) await click(`[data-act=dlook][data-f=${f}][data-v=${v}]`, 400);
@@ -286,6 +289,33 @@ await tab('home'); await click('[data-act=sleep]', 900); // a save, so the secon
   ok(u.f.local >= 3 && u.f.ranked >= 1 && u.f.chuek === 1 && u.f.rival === 1 && u.f.title === 1 && u.f.defense === 2 && u.f.tour === 3 && u.f.exhibition >= 1, 'usage: fights are counted by kind', JSON.stringify(u.f));
   ok(u.end.skip >= 10 && (!restGo || u.rest.go >= 1) && u.rest.auto === 1 && u.rest.held === 1, 'usage: skipped fights and the three ways a rest ends', JSON.stringify(u.end) + ' ' + JSON.stringify(u.rest));
   ok(Object.values(u.a).concat(Object.values(u.f), Object.values(u.end), Object.values(u.rest)).every(n => Number.isInteger(n) && n > 0), 'usage: every count is a whole number'); }
+
+// ---- 7e. the shop, and the day's skips
+await save('S.money = 400000; S.gym = 5; S.build = []; S.merit = 0; S.fatigue = 60; S.mood = 1; S.slots = 3; S.shopDay = null; S.staff = [];'); await tab('home');
+ok(await ev("document.querySelectorAll('#gBody .shoprow').length") === 7, 'the camp screen has the shop: four buildings, two daily buys, merit', await ev("document.querySelectorAll('#gBody .shoprow').length"));
+{ const f0 = await ev('GAME.save().fame');
+  for (const id of ['sauna', 'weights', 'ring', 'shrine']) await click(`[data-act=shop][data-v="build:${id}"]`, 300);
+  ok(await ev("GAME.save().build.length === 4 && GAME.save().money === 400000 - 205000 && GAME.save().slots === 4"), 'the four buildings are built and paid for; the training ring gives a fourth session today', await ev("JSON.stringify([GAME.save().build, GAME.save().money, GAME.save().slots])"));
+  ok(await ev("/จาก 4 ครั้ง/.test(document.getElementById('gBody').innerText) && !document.querySelector('[data-act=shop][data-v^=build]')"), 'the camp says four sessions a day; nothing is left to build');
+  await click('[data-act=shop][data-v="daily:massage"]', 300); const fat = await ev('GAME.save().fatigue');
+  await click('[data-act=shop][data-v="daily:massage"]', 300);
+  ok(fat === 30 && await ev('GAME.save().fatigue') === 30 && !await has('[data-act=shop][data-v="daily:massage"]'), 'the paid massage takes 30 off, once a day', fat);
+  await click('[data-act=shop][data-v="daily:meal"]', 300); ok(await ev('GAME.save().mood') === 2, 'the meal lifts his mood');
+  const m0 = await ev('GAME.save().money'); await click('[data-act=shop][data-v=merit]', 300); const m1 = await ev('GAME.save().money'); await click('[data-act=shop][data-v=merit]', 300); const m2 = await ev('GAME.save().money');
+  ok(m0 - m1 === 500 && m1 - m2 === 800 && await ev('GAME.save().merit') === 2 && await ev('GAME.save().fame') === f0 + 10, 'merit: 500, then 800; fame +5 each time', [m0 - m1, m1 - m2].join(' '));
+  ok(await ev('GAME.save().mood') === 4, 'merit lifts his mood too (meal and two gifts: to the top)');
+  await save('S.mood = 2;'); await click('[data-act=sleep]', 800); // a mood the shrine can lift
+  ok(await ev("GAME.save().slots === 4 && GAME.save().fatigue === 0 && GAME.save().mood === 3"), 'the next morning: four sessions, the sauna\'s rest, the shrine\'s mood', await ev("JSON.stringify([GAME.save().slots, GAME.save().fatigue, GAME.save().mood])")); }
+// the day's skips: none left, the button is shut and says so; another day's allowance opens it
+await ev('GAME.skipLeft()'); await save('S.skip.n = 10; S.fatigue = 0;'); await tab('fight'); await click('[data-act=pick][data-v=l0]', 800);
+{ const seen = await ev('window.LAB && LAB.fight ? LAB.cfg.seed : null'); await click('[data-act=startfight]', 0);
+  if (await until(`!!(window.LAB && LAB.fight && LAB.cfg.seed !== ${seen} && document.querySelector('.app.g-fight') && LAB.t > .2)`, 60000)) {
+    ok(await ev("(b => !!b && b.disabled)(document.querySelector('#gBody [data-act=skip]')) && /ข้ามไปดูผลได้วันละ 10 ไฟต์/.test(document.getElementById('gBody').innerText) && !document.querySelector('#gBody [data-act=adr]')"), 'out of skips: the button is shut, the screen says why (no advert on the web)');
+    await ev("document.querySelector('#gBody [data-act=skip]').click()"); await wait(800); ok(await ev("GAME.fight() && GAME.fight().phase === 'live' && !GAME.fight().skipped"), 'and pressing it does nothing');
+    await save('S.skip = null;'); await click('#gBody [data-act=nobreak]', 300); await click('#gBody [data-act=nobreak]', 300);
+    ok(await ev("/เหลือ 10 ครั้งวันนี้/.test(document.querySelector('#gBody [data-act=skip]').innerText)"), 'a new day: ten skips, and the button says so');
+    await click('#gBody [data-act=skip]', 0); ok(await until("!!document.querySelector('#gBody [data-act=home]')", 90000) && await ev('GAME.skipLeft()') === 9, 'a skip counts: nine left'); await click('#gBody [data-act=home]', 1200);
+  } else ok(false, 'the fight for the skip check started'); }
 
 // ---- 7d. a big hall: the ring-card girl between rounds. The last fight of the run.
 await save('S.rp = 1450; S.ranked = 2; S.fatigue = 0;'); await strong();

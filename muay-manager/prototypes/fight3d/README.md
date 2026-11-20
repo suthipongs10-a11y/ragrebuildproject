@@ -5,6 +5,14 @@
 
 ตัวนักมวยเป็นโมเดล 3D ที่สร้างด้วย Meshy (ภาพอ้างอิง → โมเดลมีผิว → ใส่กระดูกอัตโนมัติ) แล้วขยับด้วยท่าชุดเดียวกับตัวที่สร้างจากโค้ด ซึ่งยังเลือกกลับไปใช้ได้ เสียงเป็นเสียงสังเคราะห์ชั่วคราว
 
+## รอบที่ 87: ตัวกรองคำหยาบ ลิมิตข้ามไปดูผล และที่ใช้เงินในค่าย (20 พ.ย. 2026)
+
+- `src/badwords.js` (ไม่มี DOM ใช้ทั้งเกมและเซิร์ฟเวอร์): `BAD_WORDS` `NAME_STANDIN` `normWord(s)` `hasBad(s)` `maskBad(s)` `scrubNames(o)` • เซิร์ฟเวอร์ import ด้วย `../../src/badwords.js` (Pages Functions และ `server/server.mjs` รวมไฟล์นี้เอง)
+- `main.js` `cleanName`: ชื่อที่หยาบออกมาเป็นค่าว่าง (ที่เรียกใช้แสดง "นักมวย" แทน) • `game.js` `fix()` เปลี่ยนชื่อเซฟที่หยาบ • สร้าง/เปลี่ยนชื่อไม่รับ
+- `data.js` `SKIP {free, ad, adCap}` • `game.js` `skipLeft()` (`S.skip = {d, n, add}` วันจริงตาม `adDay()`) • จุดโฆษณา `AD.skip` • `GAME.skipLeft()` สำหรับทดสอบ
+- `data.js` `SHOP {build, daily, merit}` • `game.js` `built(id)` `slotsMax()` `dailyPrice()` `meritPrice()` `boughtToday()` `shopHtml()` `shopBuy(v)` (`data-act="shop" data-v="build:sauna" | "daily:massage" | "merit"`) • เซฟ: `S.build` `S.merit` `S.shopDay`
+- บอท: ส่วน 7e (ร้านค้าและลิมิตข้าม) • ฟังก์ชัน `fight()` ของบอทล้าง `S.skip` ก่อนกดข้ามทุกครั้ง
+
 ## รอบที่ 86: แชทโลก จำนวนคนออนไลน์ และเครื่องที่เปิดภาพ 3D ไม่ได้ (19 พ.ย. 2026)
 
 - เซิร์ฟเวอร์ (`functions/api/[[route]].js`): `CHAT` (เก็บ 200 หน้า 40 ยาว 120 ห่าง 2.5 วิ 8 ต่อนาที) `CHAT_BAD` `CHAT_LINK` `chatClean(v)` `chatSince(db, after)` `onlineNow(db)` (จำไว้ 10 วินาทีต่อ worker) • ตาราง `chat (id, t, pid, name, msg)` `chat_bans (pid, t)` ดัชนี `chat_pid` และ `board_seen` (บน `json_extract(data, '$.seen')` เฉพาะ `coll = 'board'`: คำถามต้องเขียน `coll = 'board'` เป็นค่าตรง ๆ ดัชนีจึงถูกใช้) • `GET /api/chat?after=` • `POST /api/chat` • `POST /api/chat/report` • รายการ `challenges` ที่ขอพร้อม `chat=` ตอบ `chat` และ `on` เพิ่ม

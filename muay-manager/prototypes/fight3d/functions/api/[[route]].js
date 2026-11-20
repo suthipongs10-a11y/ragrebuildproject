@@ -16,6 +16,7 @@
 //   GET  /api/cup                         -> {now, gap, lead, next: {k, start, close, entries}, prev: {k, start, entries}}   the players' cup (below)
 //   POST /api/cup                         body: the fighter entered (JSON object) -> {ok, k}   until the list closes; a second POST replaces the first
 //   DELETE /api/cup                       -> {ok}   withdraw, until the list closes
+import { hasBad, maskBad, scrubNames, NAME_STANDIN } from '../../src/badwords.js'; // the same word list as the game
 const SHARED = new Set(['board', 'challenges', 'answers']);
 const CODE_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', CODE_LEN = 8; // transfer codes: no letters that read like digits
 const SEG = /^[A-Za-z0-9_\-.~:@+]{1,200}$/, FIELD = /^[A-Za-z0-9_]{1,40}$/, MAX_BODY = 256 * 1024;
@@ -59,7 +60,7 @@ const NEWS = {keep: 200, list: 30, gap: 8000, kinds: new Set(['ko', 'win', 'draw
 const newsName = v => (typeof v === 'string' ? v.replace(/[\u0000-\u001f<>&"']/g, '').trim().slice(0, 40) : '');
 function newsItem(x) {
   if (!x || typeof x !== 'object' || !NEWS.kinds.has(x.k)) return null;
-  const name = newsName(x.name), o = newsName(x.o), out = {k: x.k, name}; if (name.length < 2) return null;
+  const clean = v => { const n = newsName(v); return hasBad(n) ? NAME_STANDIN : n; }, name = clean(x.name), o = clean(x.o), out = {k: x.k, name}; if (name.length < 2) return null;
   if (o) out.o = o; if (NEWS.how.has(x.hw)) out.hw = x.hw; if (x.ch === 1) out.ch = 1;
   if (Number.isInteger(x.rd) && x.rd >= 1 && x.rd <= 5) out.rd = x.rd; if (Number.isInteger(x.n) && x.n >= 0 && x.n <= 999) out.n = x.n;
   return out;
@@ -68,13 +69,12 @@ function newsItem(x) {
 // request of its own); a line costs its sender one request. Kept: the last CHAT.keep lines. A line is cleaned here, not
 // trusted from the page: length, links out, the coarsest words masked. The name is the fighter's, read from the ranking.
 const CHAT = {keep: 200, page: 40, max: 120, gap: 2500, perMin: 8, online: 60e3, cache: 10e3};
-const CHAT_BAD = ['ควย', 'เย็ด', 'เหี้ย', 'หีแม่', 'อีดอก', 'ไอ้สัตว์', 'ไอ้สัส', 'อีสัส', 'พ่อมึงตาย', 'แม่มึงตาย', 'fuck', 'shit', 'bitch', 'cunt', 'nigger', 'nigga'];
 const CHAT_LINK = /(https?:\/\/|www\.)\S+|\b[\w-]+\.(com|net|org|io|co|me|xyz|info|th|ly|gg|tv|cc|app|dev|site|online|shop|club|vip|bet)\b(\/\S*)?/gi;
 function chatClean(v) {
   // control and invisible characters (zero-width, direction marks, line separators) become spaces
   let t = typeof v === 'string' ? v.replace(/[\p{Cc}\p{Cf}\p{Zl}\p{Zp}]/gu, ' ').replace(/\s+/g, ' ').trim() : '';
   t = t.replace(CHAT_LINK, '[ลิงก์]');
-  for (const w of CHAT_BAD) t = t.split(new RegExp(w, 'gi')).join('***');
+  t = maskBad(t); // src/badwords.js
   return [...t].slice(0, CHAT.max).join(''); // by characters, not halves of them
 }
 async function chatSince(db, after) { // the lines after one already had, oldest first; with none had, the last page
@@ -91,7 +91,7 @@ async function onlineNow(db) {
     db.prepare("SELECT COUNT(*) n FROM docs WHERE coll = 'board' AND json_extract(data, '$.seen') > ?").bind(since),
     db.prepare("SELECT id, json_extract(data, '$.name') name FROM docs WHERE coll = 'board' AND json_extract(data, '$.seen') > ? LIMIT 30").bind(since)
   ]);
-  onlineMemo = {at: now, v: {n: (c.results[0] || {}).n | 0, list: l.results.map(r => ({id: r.id, name: newsName(r.name).slice(0, 24)}))}};
+  onlineMemo = {at: now, v: {n: (c.results[0] || {}).n | 0, list: l.results.map(r => ({id: r.id, name: hasBad(r.name) ? NAME_STANDIN : newsName(r.name).slice(0, 24)}))}};
   return onlineMemo.v;
 }
 const reportMemo = new Map(); // one report every few seconds from a player (kept in this worker's memory: enough to stop a flood)
@@ -193,7 +193,7 @@ export async function onRequest({request, env, params}) {
       db.prepare('SELECT COUNT(*) c, MAX(t) last FROM chat WHERE pid = ? AND t > ?').bind(who, now - 60e3)
     ]);
     if (ban.results.length) return json({error: 'banned'}, 403);
-    let name = ''; try { name = newsName(JSON.parse(me.results[0].data).name).slice(0, 24); } catch (e) { /* no fighter yet */ }
+    let name = ''; try { name = newsName(JSON.parse(me.results[0].data).name).slice(0, 24); if (hasBad(name)) name = NAME_STANDIN; } catch (e) { /* no fighter yet */ }
     if (name.length < 2) return json({error: 'no fighter'}, 409); // the chat is for players with a fighter on the ranking
     const r = rate.results[0] || {}; if ((r.c | 0) >= CHAT.perMin || (r.last && now - r.last < CHAT.gap)) return json({error: 'too soon'}, 429);
     const ins = await db.prepare('INSERT INTO chat (t, pid, name, msg) VALUES (?, ?, ?, ?) RETURNING id').bind(now, who, name, msg).first();
@@ -213,6 +213,7 @@ export async function onRequest({request, env, params}) {
     const text = await request.text(); if (text.length > 6000) return json({error: 'too large'}, 413);
     let data; try { data = JSON.parse(text); } catch (e) { return json({error: 'not json'}, 400); }
     if (!data || typeof data !== 'object' || Array.isArray(data)) return json({error: 'not an object'}, 400);
+    scrubNames(data); // a name everyone sees in the bracket
     await db.batch([
       db.prepare('INSERT INTO cups (k, id, data, at) VALUES (?, ?, ?, ?) ON CONFLICT (k, id) DO UPDATE SET data = excluded.data').bind(c.k, who, JSON.stringify(data), now), // a change keeps the first entry's place in the list
       db.prepare('DELETE FROM cups WHERE k < ?').bind(c.k - 3)
@@ -244,6 +245,7 @@ export async function onRequest({request, env, params}) {
   const text = await request.text(); if (text.length > MAX_BODY) return json({error: 'too large'}, 413);
   let data; try { data = JSON.parse(text); } catch (e) { return json({error: 'not json'}, 400); }
   if (!data || typeof data !== 'object' || Array.isArray(data)) return json({error: 'not an object'}, 400);
+  if (SHARED.has(coll)) scrubNames(data); // what everyone reads carries no bad word in a name (src/badwords.js)
   await db.prepare('INSERT INTO docs (coll, id, data, updated) VALUES (?, ?, ?, ?) ON CONFLICT (coll, id) DO UPDATE SET data = excluded.data, updated = excluded.updated')
     .bind(coll, id, JSON.stringify(data), Date.now()).run();
   return json({ok: true});
