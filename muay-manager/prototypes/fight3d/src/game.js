@@ -2014,7 +2014,7 @@ function onClick(e) {
   else if (act === 'chquitno') { CH.quitAsk = null; topBar(); if (idle()) render(); }
   else if (act === 'chshare') { // a link that takes whoever opens it to this match (live when it is on, the replay after)
     const url = WEB + '/?watch=' + encodeURIComponent(v), done = () => { CH.shared = v; topBar(); if (idle()) render(); };
-    if (navigator.share) navigator.share({title: 'Muay Manager', text: 'มาดูมวยคู่นี้สดด้วยกัน', url}).then(done, () => {}); else if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, () => {});
+    if (navigator.share && !window.MuayDesktop) navigator.share({title: 'Muay Manager', text: 'มาดูมวยคู่นี้สดด้วยกัน', url}).then(done, () => {}); else if (navigator.clipboard) navigator.clipboard.writeText(url).then(done, () => {});
   }
   else if (act === 'chwatch') watchMatch(v);
   else if (act === 'quick') { if (!F || !QUICK[v] || (F.live && !(F.rest && !F.rest.locked))) return; F.plan = Object.assign({}, QUICK[v][1]); if (F.live) sendRoundPlan(); render(); }

@@ -1,0 +1,8 @@
+{
+  "name": "muay-manager",
+  "productName": "Muay Manager",
+  "version": "0.0.0",
+  "description": "Muay Manager: manage a Muay Thai fighter",
+  "main": "main.cjs",
+  "private": true
+}

@@ -20,10 +20,13 @@
     "e2e:social": "node tools/e2e/social.mjs",
     "e2e:cup": "node tools/e2e/cup.mjs",
     "e2e:nogl": "node tools/e2e/no-webgl.mjs",
-    "chat": "node tools/chat-admin.mjs"
+    "chat": "node tools/chat-admin.mjs",
+    "desktop": "node tools/desktop-build.mjs",
+    "e2e:desktop": "node tools/e2e/desktop.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.24.0",
+    "resedit": "3.1.0",
     "three": "^0.160.0"
   },
   "engines": {
