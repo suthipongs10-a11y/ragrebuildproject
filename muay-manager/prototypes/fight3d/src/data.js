@@ -281,3 +281,11 @@ export const TITLES = [
   {id: 'lord', th: 'จ้าวสังเวียน', price: 200000, need: 3}
 ];
 
+// A cheering section taken to the player's own fights (owner, 20 Nov 2026): paid at the bell of each fight it goes to,
+// priced by the league (base + perLeague x league index). banners / flags: what is held up in the stands behind the ring;
+// hype: how loud the crowd stays at the least (0-1); fame: added for a win, the crowd tells the town.
+export const FANS = [
+  {id: 'small', th: 'กองเชียร์ชุดเล็ก', base: 200, perLeague: 150, banners: 1, flags: 0, hype: .12, fame: 1, note: 'ป้ายชื่อนักมวยของคุณ 1 ผืนในอัฒจันทร์'},
+  {id: 'big', th: 'กองเชียร์ชุดใหญ่', base: 600, perLeague: 450, banners: 3, flags: 8, hype: .25, fame: 3, note: 'ป้าย 3 ผืน ธงโบก เสียงเชียร์ดังทั้งไฟต์'}
+];
+

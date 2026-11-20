@@ -1,7 +1,7 @@
 // Game layer: profile, training, outfits, matchmaking, corner plans, rewards and ranking.
 // It never touches fight rules: it builds two fighter specs and plans, hands them to the simulation through the viewer,
 // and turns the result into progress. Save lives in the browser and, when the page has it, in the artifact database.
-import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VENUE_RULES, RULES, LIVE, SPECIALS, SP_MAX, REST_AUTO, CUP_PRIZE, SKIP, SHOP, TITLES } from './data.js';
+import { STYLES, STAT_TH, FIRST, CAMP, PLAN, PLAN_DEFAULT, MOVES, STYLE_PLAN, VENUE_RULES, RULES, LIVE, SPECIALS, SP_MAX, REST_AUTO, CUP_PRIZE, SKIP, SHOP, TITLES, FANS } from './data.js';
 import { buildCup, cupPlace, cupTimes, cupMatch, CUP_MIN } from './cup.js';
 import { cleanPlan, cleanSpec, cleanStats, own, matchCfg as matchInput } from './match.js';
 import { PLAN_TIPS } from './plantips.js';
@@ -114,7 +114,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.64', BUILD = 264;
+const VER = '2.65', BUILD = 265;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -160,6 +160,7 @@ function fix(s) { // fields added after a save was made
   if (typeof s.title !== 'number') s.title = 1;
   if (hasBad(s.name)) s.name = NAME_STANDIN; // badwords.js: the name everyone sees
   if (!Array.isArray(s.build)) s.build = []; if (typeof s.merit !== 'number') s.merit = 0; // the shop (SHOP)
+  if (typeof s.fans !== 'string' || (s.fans && !FANS.some(f => f.id === s.fans))) s.fans = ''; // the cheering section he takes to his fights (FANS)
   if (!Array.isArray(s.titles)) s.titles = []; if (typeof s.tag !== 'string' || !s.titles.includes(s.tag)) s.tag = ''; // titles (TITLES): owned, and the one worn
   return s;
 }
@@ -265,6 +266,14 @@ const FREE_PATTERNS = () => { const o = {}; for (const k in API.PATTERNS) if (!(
 // more ranked fights today (SHOP.extra)
 const extraToday = () => (S.rkBuy && S.rkBuy.day === S.day ? S.rkBuy.n : 0), extraPrice = () => (SHOP.extra.base + SHOP.extra.perLeague * league(S.rp)) * (extraToday() + 1);
 const extraBtn = () => extraToday() >= SHOP.extra.max ? '<span class="hint">วันนี้ซื้อไฟต์เพิ่มครบ ' + SHOP.extra.max + ' ไฟต์แล้ว</span>' : '<button class="btn" data-act="shop" data-v="extra"' + (S.money < extraPrice() ? ' disabled' : '') + '>ซื้อเพิ่ม 1 ไฟต์ ฿ ' + baht(extraPrice()) + '</button>';
+// the cheering section: its price for a fight, and the choice on the screen before the bell
+const fansOf = id => FANS.find(f => f.id === id), fansPrice = f => f.base + f.perLeague * league(S.rp);
+function fansHtml() {
+  const b = (id, label) => '<button class="btn seg" data-act="fans" data-v="' + id + '" aria-pressed="' + (S.fans === id) + '">' + label + '</button>';
+  const f = fansOf(S.fans), short = f && S.money < fansPrice(f);
+  return '<div class="fld">กองเชียร์ <small>จ่ายตอนขึ้นเวทีทุกไฟต์ที่พาไป</small></div><div class="seg3">' + b('', 'ไม่พา') + FANS.map(x => b(x.id, x.th.replace('กองเชียร์', '') + ' ฿ ' + baht(fansPrice(x)))).join('') + '</div>' +
+    '<p class="hint">' + (f ? f.note + ' · ชนะได้ชื่อเสียงเพิ่ม ' + f.fame + (short ? ' · <b>เงินไม่พอ ไฟต์นี้จะไม่ได้พาไป</b>' : '') : 'พากองเชียร์ไปด้วย: ป้ายชื่อนักมวยของคุณในอัฒจันทร์ คนดูเชียร์ดังขึ้น') + '</p>';
+}
 const boughtToday = id => !!(S.shopDay && S.shopDay.day === S.day && S.shopDay.ids.includes(id));
 const boost = a => MOOD_TRAIN[S.mood] * (coachOf(a) ? 1.25 : 1) * (built('weights') ? 1 + shopOf('weights').train : 1);
 const failPct = a => a.stat.length ? Math.round(Math.max(0, S.fatigue - FAIL.from) * FAIL.perPoint * (S.mood <= 1 ? FAIL.lowMood : 1)) : 0;
@@ -930,7 +939,7 @@ function planHtml() {
   const o = F.opp, me = playerSpec();
   return '<section class="gcard"><h2>ก่อนขึ้นเวที <small>' + API.VENUES[o.venue] + '</small></h2><div class="vs"><div class="statbox r"><b>' + esc(S.name) + '</b><span class="sty">สาย' + styleTh(S.style) + (fatigueMul() < 1 ? ' · ล้า ค่าพลังลด ' + Math.round((1 - fatigueMul()) * 100) + '%' : '') + '</span>' + statBars(me.stats) + '</div>' +
     '<div class="statbox b"><b>' + esc(o.name) + '</b><span class="sty">สาย' + styleTh(o.style) + '</span>' + statBars(o.stats) + '</div></div>' +
-    scoutHtml(o) + '<p class="advice"><b>พี่เลี้ยง:</b> ' + matchupTip(o.style) + '</p>' + quickHtml() + planPicker(F.plan) +
+    scoutHtml(o) + '<p class="advice"><b>พี่เลี้ยง:</b> ' + matchupTip(o.style) + '</p>' + quickHtml() + planPicker(F.plan) + fansHtml() +
     '<div class="rowbtn"><button class="btn go wide" data-act="startfight">ขึ้นเวที</button><button class="btn" data-act="backout">ถอนตัว</button></div></section>';
 }
 function advice(st) {
@@ -995,7 +1004,9 @@ async function startFight() {
   F.plans = [F.plan, F.plan, F.plan].map(p => Object.assign({}, p)); F.phase = 'live'; S.plan = Object.assign({}, F.plan);
   setMode(true); render();
   const o = F.opp; useCount('f', o.kind || 'local');
-  await API.startFight({venue: o.venue, rules: o.kind === 'tour' ? Object.assign({}, VENUE_RULES[o.venue], NO_DRAW) : VENUE_RULES[o.venue] || null, seed: F.seed, specs: [playerSpec(), {name: o.name, first: o.name, style: o.style, stats: o.stats, skin: 1, spLv: oppSpLv(o.style, league(S.rp), o.kind === 'title')}], plans: plansFor(), prize: prizeFor(o),
+  const fan = fansOf(S.fans), fp = fan ? fansPrice(fan) : 0; F.fans = null; // the cheering section is paid now, if he has the money
+  if (fan && S.money >= fp) { S.money -= fp; F.fans = {id: fan.id, paid: fp}; save(); topBar(); } else if (fan) F.fansShort = true;
+  await API.startFight({fans: F.fans ? {name: S.name, tag: S.tag && titleOf(S.tag) ? titleOf(S.tag).th : '', banners: fan.banners, flags: fan.flags, hype: fan.hype} : null,venue: o.venue, rules: o.kind === 'tour' ? Object.assign({}, VENUE_RULES[o.venue], NO_DRAW) : VENUE_RULES[o.venue] || null, seed: F.seed, specs: [playerSpec(), {name: o.name, first: o.name, style: o.style, stats: o.stats, skin: 1, spLv: oppSpLv(o.style, league(S.rp), o.kind === 'title')}], plans: plansFor(), prize: prizeFor(o),
     looks: [Object.assign({name: S.name, fighter: S.body}, S.look), Object.assign({name: o.name, fighter: o.body}, o.look)]});
 }
 function onRoundBreak(n, st, left) {
@@ -1037,6 +1048,8 @@ function onOver(res) {
   if (o.kind === 'title' && draw) rivalLine.push('เสมอกัน แชมป์ยังครอง' + BELTS[o.belt] + ' พรุ่งนี้ชิงใหม่ได้');
   if (o.kind === 'defense') { S.defendDue = S.day + DEFEND.every; if (win || draw) { S.defends++; rivalLine.push(draw ? 'เสมอกัน ยังครอง' + BELTS[o.belt] + 'ไว้ได้ (ป้องกันครั้งที่ ' + S.defends + ')' : 'ป้องกัน' + BELTS[o.belt] + 'สำเร็จ ครั้งที่ ' + S.defends); } else { S.belts = S.belts.filter(b => b !== o.belt); rivalLine.push('เสีย' + BELTS[o.belt] + 'ให้ ' + o.name); } }
   if (o.kind === 'tour') rivalLine.push(...tourAfter(o, win, r.how));
+  if (F.fans) { const fan = fansOf(F.fans.id), ff = win ? fan.fame : 0; r.fame += ff; rivalLine.push(fan.th + ' ฿ ' + baht(F.fans.paid) + (ff ? ' · กองเชียร์ช่วยให้คนรู้จักมากขึ้น ชื่อเสียง +' + ff : '')); }
+  else if (F.fansShort) rivalLine.push('เงินไม่พอพากองเชียร์ไปไฟต์นี้');
   if (!win && o.kind !== 'title' && o.kind !== 'defense' && o.kind !== 'tour') { // he goes on the rivals list (or stays at the top of it): a loss to avenge, or a draw to settle
     const prev = S.rivals.find(x => x.name === o.name), entry = {name: o.name, style: o.style, body: o.body, look: o.look, stats: roundStats(o.stats), losses: (prev ? prev.losses : 0) + (draw ? 0 : 1), draws: (prev && prev.draws || 0) + (draw ? 1 : 0)};
     S.rivals = [entry].concat(S.rivals.filter(x => x.name !== o.name)).slice(0, RIVAL.keep); r.rev = !draw;
@@ -1914,7 +1927,7 @@ function trainResult(q) {
   }
   S.slots--; mini = null; const done = mission('train'); view = {msg: msg + (done ? ' · ' + done : '')}; save(); render();
 }
-const USE_BY_V = {tab: 1, train: 1, pick: 1, quick: 1, body: 1, style: 1, shop: 1, title: 1}; // counted per choice, not just per press
+const USE_BY_V = {tab: 1, train: 1, pick: 1, quick: 1, body: 1, style: 1, shop: 1, title: 1, fans: 1}; // counted per choice, not just per press
 function onClick(e) {
   const el = e.target.closest('[data-act]'); if (!el || el.disabled) return;
   const act = el.dataset.act, v = el.dataset.v;
@@ -1978,6 +1991,7 @@ function onClick(e) {
   }
   else if (act === 'staff') { const st = STAFF.find(x => x.id === v); if (S.staff.includes(v)) S.staff = S.staff.filter(k => k !== v); else { if (S.money < st.hire) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(st.hire); return; } S.money -= st.hire; S.staff.push(v); } save(); render(); }
   else if (act === 'look') setLook(el.dataset.f, v);
+  else if (act === 'fans') { if (v === '' || fansOf(v)) { S.fans = v; save(); render(); } }
   else if (act === 'title') { const r = titlePick(v); if (r) { view = {shop: r.text, bad: !r.ok}; if (r.ok) { save(); if (CLOUD) presence(); } render(); topBar(); } }
   else if (act === 'shop') { const r = shopBuy(v); if (r) { view = {shop: r.text, bad: !r.ok}; if (r.ok) save(); render(); topBar(); } } // the note shows in the shop card, by the button pressed
   else if (act === 'gym') { const c = GYM_COST[S.gym]; if (S.money < c) { el.textContent = 'เงินไม่พอ ต้องมี ฿ ' + baht(c); return; } S.money -= c; S.gym++; save(); render(); }

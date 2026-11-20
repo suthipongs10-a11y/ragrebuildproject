@@ -227,6 +227,7 @@ function layout() {
 }
 
 // ---------- fight state ----------
+let fansHype = 0; // the crowd's floor while the player's cheering section is in (startFight)
 let fight = null, TL = null, EV = [], playT = 0, stopT = 0, mode = 'live', evi = 0, speed = 1, hype = 0, shake = 0, zoomKick = 0, realT = 0;
 let replays = [], rpi = 0, curRp = null, tvCuts = [], builtAs = '', slowWins = [], moments = [], marks = null, resultShown = false, galleryOn = false, frozen = false;
 let CFG = {seed: 1, specs: null, plans: null};                      // what the current fight was simulated from
@@ -801,7 +802,7 @@ function frame(ts) {
     const going = cor.update(dt * (liveClock ? 1 : speed)); arena.ropeUpdate(dt);
     if (window.LAB.eye) { const e = window.LAB.eye; camera.position.set(e[0], e[1], e[2]); camera.lookAt(e[3], e[4], e[5]); camera.fov = e[6] || 40; camera.updateProjectionMatrix(); }
     if (!going) { stopCorner(); frozen = false; }
-    hype = Math.max(0, hype - dt * .3);
+    hype = Math.max(fansHype, hype - dt * .3);
     arena.keyAt(0); arena.fadeRopes(camera.position, 1); arena.update(realT, hype, dt); fx.update(dt, camera);
     audio.update(dt, hype, false, TL.clock(playT).round, 1, 'rest');
     { const a = TL.val(0, playT, 8), b = TL.val(1, playT, 8); voice.corner(cor.t - CORNER_SEAT, cor.upAfter != null ? cor.upAfter - cor.t : null, audio.time(), {lead: a === b ? -1 : a > b ? 0 : 1, margin: Math.abs(a - b)}); } // the commentary follows the corner scene
@@ -809,7 +810,7 @@ function frame(ts) {
   }
   const adv = advance(dt);
   shake *= Math.pow(.0006, dt); zoomKick *= Math.pow(.002, dt);
-  hype = Math.max(0, hype - dt * .3);
+  hype = Math.max(fansHype, hype - dt * .3);
   poseFighters(playT); ropes(playT, dt);
   const pre = playT < marks.introEnd - .25;
   for (let i = 0; i < 2; i++) {
@@ -950,6 +951,7 @@ window.LAB = {
   OPT, seek, applyOpt, newFight, audio, voice, get ref() { return refF; }, camp(level, time) { arena.setCamp(level, time); }, // camp(level 1-5, 'morning'|'day'|'evening'|'night'|null)
   prize(kind, tier, name) { CFG.prize = kind ? {kind, tier, name} : null; }, // for checks: put a belt or a cup at stake in the fight on screen
   cer(t) { if (!cer.on) { seek(marks.over - .02); evi = indexAt(marks.over); if (!startCeremony()) return false; } cerAt = t; return true; }, get fight() { return fight; }, get cfg() { return CFG; }, get clock() { return liveClock ? liveClock() : null; }, get rate() { return clockRate; }, get models() { return MODELS; }, get tl() { return TL; }, three: {scene, camera, renderer}, get t() { return playT; }, get mode() { return mode; },
+  get fans() { return arena.fansInfo(); }, setFans: c => { fansHype = c ? +c.hype || 0 : 0; arena.setFans(c); }, // for checks and pictures
   get girl() { return girlF; }, loadGirl, get girlReady() { return !!GIRLM; },
   get renderer() { return renderer; }, get scene() { return scene; }, get seen() { return stageSeen; },
   get state() { return {frozen, cor: cor.on, corT: +cor.t.toFixed(2), cer: cer.on, mode, playT: +playT.toFixed(2), paused: [...pausedRounds], resultShown}; }, // for checks: what the stage is doing
@@ -1020,6 +1022,7 @@ const API = {
     // prize: {kind: 'belt' | 'cup', tier, name} when a title or a tournament is at stake for the player's man
     newFight(cfg.seed, {specs: cfg.specs, plans: cfg.plans, rules: cfg.rules || null, prize: cfg.prize || null});
     applyOpt(); frozen = false; // applyOpt puts up the venue of this fight (without it the ring stays whatever was on stage: the camp)
+    fansHype = cfg.fans ? +cfg.fans.hype || 0 : 0; arena.setFans(cfg.fans || null); if (fansHype) audio.roar(.5); // the player's cheering section: banners in the stands, a crowd that never quite goes quiet
     if (liveClock && liveClock() > 1) API.seekTo(liveClock()); // joined after the bell: straight to where the fight is now
     return true;
   },
@@ -1050,7 +1053,7 @@ const API = {
     }
     seek(Math.min(t, marks.over - .05));
   },
-  stop() { stopCeremony(); TL = null; liveClock = null; restLen = 0; fighters.forEach(f => scene.remove(f.root)); fighters = []; clearOverlays(); },
+  stop() { fansHype = 0; arena.setFans(null); stopCeremony(); TL = null; liveClock = null; restLen = 0; fighters.forEach(f => scene.remove(f.root)); fighters = []; clearOverlays(); },
   result: () => fight && fight.result, fight: () => fight,
   async preview(look, pose, venue, view) { // show one fighter in the given look, standing in a venue; view 'face': close on his head
     const model = await API.single(look, ++sceneGen); if (!model) return false;

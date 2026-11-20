@@ -344,6 +344,24 @@ ok(await has('#gBody [data-act=shop][data-v=extra]') && !await has('#gBody [data
   ok(!await has('#gShop [data-act=shop][data-v=extra]') && /ครบ 3 ไฟต์/.test(await ev("document.getElementById('gShop').innerText")), 'no fourth: the shop says the day\'s three are bought'); }
 await save('S.ranked = 2;');
 
+// ---- 7h. the cheering section: chosen before the bell, paid at the bell, banners in the stands, gone after
+const bell = async () => { const seen = await ev('window.LAB && LAB.fight ? LAB.cfg.seed : null'); await click('#gBody [data-act=startfight]', 0); return until(`!!(window.LAB && LAB.fight && LAB.cfg.seed !== ${seen} && document.querySelector('.app.g-fight') && LAB.t > .2)`, 60000); };
+const toResult = async () => { await ev('GAME.save().skip = null'); await click('#gBody [data-act=skip]', 0); return until("!!document.querySelector('#gBody [data-act=home]')", 90000); };
+await save('S.money = 50000; S.fans = ""; S.fatigue = 0;'); await tab('fight'); await click('[data-act=pick][data-v=l0]', 800);
+ok(await ev("document.querySelectorAll('#gBody [data-act=fans]').length") === 3, 'the screen before the bell offers a cheering section: none, small, big');
+await click('#gBody [data-act=fans][data-v=big]', 400);
+{ const price = +(await ev("document.querySelector('#gBody [data-act=fans][data-v=big]').textContent.replace(/[^0-9]/g, '')")), m0 = await ev('GAME.save().money');
+  ok(await ev("GAME.save().fans === 'big'") && price > 0, 'the big section is chosen', '฿ ' + price);
+  if (await bell()) {
+    ok(await ev('GAME.save().money') === m0 - price && await ev("JSON.stringify(LAB.fans)") === '{"banners":3,"flags":8,"visible":true}', 'paid at the bell; three banners and eight flags are up in the stands', await ev("JSON.stringify(LAB.fans)"));
+    if (await toResult()) { ok(await ev("/กองเชียร์ชุดใหญ่ ฿/.test(document.getElementById('gBody').innerText)"), 'the result says what the section cost');
+      await click('#gBody [data-act=home]', 1200); ok(await ev('LAB.fans === null'), 'back at the camp: the banners are gone'); }
+  } else ok(false, 'the fight with the cheering section started'); }
+await save('S.money = 100;'); await tab('fight'); await click('[data-act=pick][data-v=l0]', 800);
+if (await bell()) { ok(await ev('GAME.save().money') === 100 && await ev('LAB.fans === null'), 'without the money the section stays home, and nothing is taken');
+  if (await toResult()) { ok(await ev("/เงินไม่พอพากองเชียร์/.test(document.getElementById('gBody').innerText)"), 'and the result says why'); await click('#gBody [data-act=home]', 1200); } }
+await save('S.fans = "";');
+
 // ---- 7d. a big hall: the ring-card girl between rounds. The last fight of the run.
 await save('S.rp = 1450; S.ranked = 2; S.fatigue = 0;'); await strong();
 r = await fight('r', {girl: true});

@@ -5,6 +5,14 @@
 
 ตัวนักมวยเป็นโมเดล 3D ที่สร้างด้วย Meshy (ภาพอ้างอิง → โมเดลมีผิว → ใส่กระดูกอัตโนมัติ) แล้วขยับด้วยท่าชุดเดียวกับตัวที่สร้างจากโค้ด ซึ่งยังเลือกกลับไปใช้ได้ เสียงเป็นเสียงสังเคราะห์ชั่วคราว
 
+## รอบที่ 90: กองเชียร์ (20 พ.ย. 2026)
+
+- `data.js` `FANS [{id, th, base, perLeague, banners, flags, hype, fame, note}]`
+- `game.js` `fansOf()` `fansPrice()` `fansHtml()` (หน้าก่อนขึ้นเวที `data-act="fans"`) • `startFight` จ่ายแล้วส่ง `fans: {name, tag, banners, flags, hype}` ให้ `API.startFight` • `onOver` เพิ่มชื่อเสียงเมื่อชนะและบรรทัดในหน้าผล • เซฟ `S.fans`
+- `arena.js` `fanBannerTex(big, small, hue)` • ใน `buildArena`: `placeFans()` (หาที่นั่งฝั่งไกล `ax === 1 && z < -3` วางหน้าแถวที่สอง) `A.setFans(cfg)` `A.fansInfo()` `swayFans()` เรียกจาก `A.update` • `setVenue` วางใหม่ทุกครั้งที่เปลี่ยนเวที (ในค่ายไม่วาง)
+- `main.js` `fansHype` (พื้นของ `hype` ระหว่างไฟต์และพักยก) • `stop()` ล้างกองเชียร์ • ทดสอบ: `LAB.fans` `LAB.setFans(cfg)`
+- บอท: ส่วน 7h
+
 ## รอบที่ 89: เอากฎลดเงินออก ลายกางเกงราคาสูง และซื้อไฟต์จัดอันดับเพิ่ม (20 พ.ย. 2026)
 
 - เอา `EASY` และ `easyMul` ออก (เจ้าของเกม: ไม่ลดรายได้)

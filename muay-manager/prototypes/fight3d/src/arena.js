@@ -100,6 +100,25 @@ function figureGeo() {
   for (let i = 0; i < p.count; i++) { const k = p.getY(i) < .84 ? .42 : 1; c[i * 3] = c[i * 3 + 1] = c[i * 3 + 2] = k; }
   geo.setAttribute('color', new THREE.BufferAttribute(c, 3)); return geo;
 }
+// A cheering section's banner: dark red cloth, a gold frame with teeth along the edges, a small line on top and the big
+// line (the fighter's name, or a slogan) in the display face, fitted to the width.
+function fanBannerTex(big, small, hue) {
+  return canvasTex(1024, 320, (c, w, h) => {
+    const bg = [['#3a0806', '#a3170f'], ['#05070d', '#1d2a55'], ['#2a1a02', '#8a5a08']][hue % 3];
+    const gr = c.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, bg[0]); gr.addColorStop(.5, bg[1]); gr.addColorStop(1, bg[0]);
+    c.fillStyle = gr; c.fillRect(0, 0, w, h);
+    c.fillStyle = '#f2b83a'; c.fillRect(0, 0, w, 12); c.fillRect(0, h - 12, w, 12); c.fillRect(0, 0, 12, h); c.fillRect(w - 12, 0, 12, h);
+    c.fillStyle = '#ffd979'; for (let x = 12; x < w - 12; x += 32) { c.beginPath(); c.moveTo(x, 12); c.lineTo(x + 16, 34); c.lineTo(x + 32, 12); c.fill(); c.beginPath(); c.moveTo(x, h - 12); c.lineTo(x + 16, h - 34); c.lineTo(x + 32, h - 12); c.fill(); }
+    c.strokeStyle = 'rgba(255,217,121,.55)'; c.lineWidth = 3; c.strokeRect(26, 44, w - 52, h - 88);
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    if (small) { c.font = '600 40px "Chakra Petch", sans-serif'; c.fillStyle = '#ffd979'; c.fillText(small, w / 2, 76); }
+    let size = 150; do { c.font = 'italic 700 ' + size + 'px "Chakra Petch", sans-serif'; size -= 6; } while (c.measureText(big).width > w * .84 && size > 50);
+    const y = small ? h / 2 + 30 : h / 2 + 6;
+    c.lineJoin = 'round'; c.lineWidth = 14; c.strokeStyle = 'rgba(0,0,0,.6)'; c.strokeText(big, w / 2, y + 4);
+    c.lineWidth = 6; c.strokeStyle = '#f2b83a'; c.strokeText(big, w / 2, y);
+    c.fillStyle = '#fff8e6'; c.fillText(big, w / 2, y);
+  });
+}
 function crowd(V, seats, shirts, skins, bare) {
   const afoot = seats.some(s => s.stand != null);
   const bodies = new THREE.InstancedMesh(afoot ? figureGeo() : new THREE.CapsuleGeometry(.2, .32, 3, 6), std({roughness: 1, vertexColors: afoot}), seats.length), heads = new THREE.InstancedMesh(new THREE.SphereGeometry(.13, 8, 6), std({roughness: 1}), seats.length);
@@ -617,7 +636,7 @@ export function buildArena(scene) {
     for (const k in built) built[k].group.visible = k === bkey;
     A.venue = bkey; A.V = built[bkey]; A.flashes.forEach(f => { f.t = 0; f.sp.material.opacity = 0; });
     if (time) campTimeOf(A.V, time);
-    light();
+    light(); placeFans(); // the cheering section moves to the new venue's stands (or goes, in the camp)
   };
   A.ropeY = () => (A.V && A.V.ropeY) || [.42, .72, 1.02, 1.32]; // heights of the ropes of the venue on stage
   A.painted = () => !!(A.V && A.V.painted); // a painted camp: the cameras keep to the painted part
@@ -651,9 +670,50 @@ export function buildArena(scene) {
     for (const c of V.corners) { const near = Math.hypot(cam.x - c.x, cam.z - c.z) < 2.7; c.post.visible = c.pad.visible = !near; }
   };
   const dummy = new THREE.Object3D();
+  // ---- the player's cheering section (bought per fight in the game): banners with his name held up in the stands on the
+  // far side of the ring (where the cameras mostly look), flags among them, all swaying with the crowd.
+  // cfg: {name, tag, banners: 1 | 3, flags} or null. Rebuilt for each venue; none in the camp.
+  let fans = null, fansCfg = null;
+  const SLOGANS = ['สู้ตาย!', 'เอาให้จอด!', 'ใจเกินร้อย!', 'หมัดเดียวจอด!', 'ไม่มีถอย!'];
+  function dropFans() { if (!fans) return; fans.parent.remove(fans); fans.traverse(o => { if (o.material) { if (o.material.map) o.material.map.dispose(); o.material.dispose(); } if (o.geometry) o.geometry.dispose(); }); fans = null; }
+  function placeFans() {
+    dropFans(); const V = A.V, cfg = fansCfg;
+    if (!cfg || !V || !V.seats || A.venue.startsWith('camp')) return;
+    const far = V.seats.filter(s => s.ax === 1 && s.z < -3); if (!far.length) return;
+    const front = Math.min(...far.map(s => -s.z)), want = front + 1.1, row = far.filter(s => Math.abs(-s.z - want) < .5);
+    const pick = row.length ? row : far, ys = pick.map(s => s.y).sort((a, b) => a - b), y0 = ys[ys.length >> 1], afoot = pick.some(s => s.stand);
+    const scale = front > 7 ? 1.35 : 1, z = -want + .35, yc = y0 + (afoot ? 1.95 : 1.55) * (front > 7 ? 1.1 : 1);
+    fans = new THREE.Group(); fans.name = 'fans';
+    const n = cfg.banners >= 3 ? 3 : 1, xs = n === 3 ? [-3.1, 0, 3.1] : [1.4], seed = (cfg.name || '').length;
+    xs.forEach((x, i) => {
+      const main = n === 1 || i === 1, big = main ? cfg.name : SLOGANS[(seed + i) % SLOGANS.length], small = main ? (cfg.tag ? '« ' + cfg.tag + ' »' : 'กองเชียร์') : cfg.name;
+      const w = (main ? 2.9 : 2.3) * scale, hgt = w * 320 / 1024, b = new THREE.Group(); b.position.set(x * scale, yc, z); b.userData = {y: yc, i, kind: 'banner'};
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(w, hgt), basic({map: fanBannerTex(big, small, main ? 0 : i), side: THREE.DoubleSide})); b.add(m);
+      for (const px of [-w * .42, w * .42]) { const pole = new THREE.Mesh(new THREE.CylinderGeometry(.025, .025, hgt + .7, 5), std({color: 0x5a3a1c})); pole.position.set(px, -.32, -.02); b.add(pole); } // two people hold it up
+      fans.add(b);
+    });
+    const cols = [0xc9281f, 0xf2b83a, 0xc9281f, 0xfff4d8];
+    for (let i = 0; i < (cfg.flags || 0); i++) { // small flags on sticks, waved among them
+      const x = (-4.6 + i * (9.2 / Math.max(1, cfg.flags - 1))) * scale, f = new THREE.Group(); f.position.set(x, yc - .52 * scale - .42 + (i % 2) * .12, z + .3); f.userData = {y: f.position.y, i, kind: 'flag'}; // below the banners: the names stay clear
+      const stick = new THREE.Mesh(new THREE.CylinderGeometry(.015, .015, .9, 4), std({color: 0x3a2a1a})); stick.position.y = -.2; f.add(stick);
+      const cloth = new THREE.Mesh(new THREE.PlaneGeometry(.5, .32), basic({color: cols[i % cols.length], side: THREE.DoubleSide})); cloth.position.set(.26, .1, 0); f.add(cloth);
+      fans.add(f);
+    }
+    A.group.add(fans);
+  }
+  A.setFans = function (cfg) { fansCfg = cfg || null; placeFans(); };
+  A.fansInfo = () => (fans ? {banners: fans.children.filter(c => c.userData.kind === 'banner').length, flags: fans.children.filter(c => c.userData.kind === 'flag').length, visible: fans.visible && !!fans.parent} : null);
+  function swayFans(time, hype) {
+    if (!fans) return;
+    for (const c of fans.children) {
+      const u = c.userData, a = u.kind === 'flag' ? 1 : .35;
+      c.position.y = u.y + Math.abs(Math.sin(time * (2 + hype * 3) + u.i * 1.7)) * (.03 + hype * .12) * a * 2;
+      c.rotation.z = Math.sin(time * (1.6 + hype * 2.5) + u.i * 1.3) * (.025 + hype * .06) * (u.kind === 'flag' ? 6 : 1);
+    }
+  }
   A.update = function (time, hype, dt) {
     const V = A.V; if (!V) return;
-    A.hype = hype;
+    A.hype = hype; swayFans(time, hype);
     if (V.anim) V.anim(time, hype, dt);
     if (V.flicker !== 1) A.rimR.intensity = A.rimB.intensity = rimBase * V.flicker;
     const seats = V.seats;
