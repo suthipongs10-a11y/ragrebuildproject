@@ -317,6 +317,23 @@ await ev('GAME.skipLeft()'); await save('S.skip.n = 10; S.fatigue = 0;'); await 
     await click('#gBody [data-act=skip]', 0); ok(await until("!!document.querySelector('#gBody [data-act=home]')", 90000) && await ev('GAME.skipLeft()') === 9, 'a skip counts: nine left'); await click('#gBody [data-act=home]', 1200);
   } else ok(false, 'the fight for the skip check started'); }
 
+// ---- 7f. titles, and the smaller purse for beating much weaker entrants
+await save('S.money = 300000; S.belts = [0]; S.titles = []; S.tag = "";'); await tab('home');
+ok(await ev("document.querySelectorAll('#gShop .ttlb').length") === 11, 'the shop lists eleven titles');
+ok(await ev("(b => b.disabled && /เข็มขัด 2 เส้น/.test(b.innerText))(document.querySelector('[data-act=title][data-v=general]'))"), 'a title that needs two belts is shut while he holds one');
+await click('[data-act=title][data-v=kick]', 400);
+ok(await ev("GAME.save().tag === 'kick' && GAME.save().money === 295000 && /จอมเตะ/.test(document.getElementById('gTop').innerText)"), 'a title is bought, worn at once, and shown at the top', await ev("JSON.stringify([GAME.save().tag, GAME.save().money])"));
+ok(await ev("GAME.news().some(x => /ได้รับฉายา \"จอมเตะ\"/.test(x))"), 'the news strip tells of it');
+await tab('rank'); ok(await ev("/จอมเตะ/.test(document.querySelector('#gBody .rk.me').innerText)"), 'and it stands before his name in the ranking'); await tab('home');
+await click('[data-act=title][data-v=mo]', 400); ok(await ev("GAME.save().tag === 'mo' && GAME.save().titles.length === 2 && GAME.save().money === 293000"), 'a second title is bought and worn in its place');
+await click('[data-act=title][data-v=kick]', 400); ok(await ev("GAME.save().tag === 'kick' && GAME.save().money === 293000"), 'one he owns is worn again for nothing');
+await click('[data-act=title][data-v=kick]', 400); ok(await ev("GAME.save().tag === ''"), 'and a tap on the one he wears takes it off');
+await save('S.tour = null; S.tours = {}; S.rp = 1000; S.fatigue = 0; S.mis = {day: S.day, n: {win: 9, ranked: 9, train: 9}}; for (const k in S.stats) S.stats[k] = 95;'); await tab('fight');
+ok(await ev("/อ่อนกว่าคุณมาก เงินรางวัลราว 20%/.test(document.getElementById('gBody').innerText)"), 'the tournament list tells a far stronger fighter the temple fair pays a fifth');
+await click('[data-act=tourjoin][data-v="0"]', 600);
+{ const m0 = await ev('GAME.save().money'); const rr = await fight('u'); const got = await ev('GAME.save().money') - m0;
+  ok(rr && rr.win && got > 0 && got <= Math.round((150 + 80) * .2), 'a win over a much weaker entrant pays a fifth of the purse (full: 150, 230 by knockout)', got + ' · ' + (rr && rr.head)); }
+
 // ---- 7d. a big hall: the ring-card girl between rounds. The last fight of the run.
 await save('S.rp = 1450; S.ranked = 2; S.fatigue = 0;'); await strong();
 r = await fight('r', {girl: true});

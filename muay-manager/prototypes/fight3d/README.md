@@ -5,6 +5,13 @@
 
 ตัวนักมวยเป็นโมเดล 3D ที่สร้างด้วย Meshy (ภาพอ้างอิง → โมเดลมีผิว → ใส่กระดูกอัตโนมัติ) แล้วขยับด้วยท่าชุดเดียวกับตัวที่สร้างจากโค้ด ซึ่งยังเลือกกลับไปใช้ได้ เสียงเป็นเสียงสังเคราะห์ชั่วคราว
 
+## รอบที่ 88: ฉายา และเงินรางวัลเมื่อชนะคู่ที่อ่อนกว่ามาก (20 พ.ย. 2026)
+
+- `data.js` `TITLES [{id, th, price, need}]` `EASY {from, slope, min, kinds}`
+- `game.js` `titleOf(id)` `tagHtml(id)` `titlePick(id)` (`data-act="title"`) • เซฟ `S.titles` `S.tag` • `boardDoc` ส่ง `tag` • `loadBoard` รับเฉพาะ id ที่อยู่ใน `TITLES` • `easyMul(ofTotal)` ใช้ใน `onOver` (`r.easy`) และใน `tourHtml` • ข่าวชนิด `tag` (`n` = ลำดับใน `TITLES`)
+- เซิร์ฟเวอร์: `chatSince` อ่านฉายาของผู้ส่งจากแถวอันดับ (`LEFT JOIN docs ... json_extract(d.data, '$.tag')`) • ข่าวรับชนิด `tag`
+- บอท: ส่วน 7f
+
 ## รอบที่ 87: ตัวกรองคำหยาบ ลิมิตข้ามไปดูผล และที่ใช้เงินในค่าย (20 พ.ย. 2026)
 
 - `src/badwords.js` (ไม่มี DOM ใช้ทั้งเกมและเซิร์ฟเวอร์): `BAD_WORDS` `NAME_STANDIN` `normWord(s)` `hasBad(s)` `maskBad(s)` `scrubNames(o)` • เซิร์ฟเวอร์ import ด้วย `../../src/badwords.js` (Pages Functions และ `server/server.mjs` รวมไฟล์นี้เอง)

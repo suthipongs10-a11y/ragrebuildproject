@@ -263,3 +263,25 @@ export const SHOP = {
   merit: {th: 'ทำบุญถวายวัดประจำหมู่บ้าน', base: 500, grow: 1.6, fame: 5, mood: 1}
 };
 
+// Beating a much weaker opponent pays less (owner, 20 Nov 2026: a fighter trained far past a tournament's entrants won
+// 106 tournament fights for half a million baht). Only fights against opponents of fixed strength (tournaments, title
+// fights); the others are already matched to the fighter. ratio = his stat total / the opponent's; at or below `from`
+// the full purse and fame, then `slope` less per 1.0 of ratio, never below `min`.
+export const EASY = {from: 1.15, slope: 2, min: .2, kinds: ['tour', 'title']};
+
+// Titles (ฉายา): bought in the camp, shown before the fighter's name in the ranking and the chat. A fixed list: nobody
+// types one, so there is nothing to moderate. need: belts he must hold to buy it. Made-up words, no real fighter's nickname.
+export const TITLES = [
+  {id: 'mo', th: 'ลูกหม้อค่าย', price: 2000},
+  {id: 'teep', th: 'จอมถีบ', price: 5000},
+  {id: 'kick', th: 'จอมเตะ', price: 5000},
+  {id: 'punch', th: 'หมัดหนัก', price: 5000},
+  {id: 'knee', th: 'เข่าเหล็ก', price: 8000},
+  {id: 'elbow', th: 'ศอกกลับ', price: 8000},
+  {id: 'tiger', th: 'พยัคฆ์หนุ่ม', price: 15000},
+  {id: 'dragon', th: 'มังกรไฟ', price: 25000},
+  {id: 'lion', th: 'ราชสีห์สังเวียน', price: 50000, need: 1},
+  {id: 'general', th: 'ขุนพลสังเวียน', price: 100000, need: 2},
+  {id: 'lord', th: 'จ้าวสังเวียน', price: 200000, need: 3}
+];
+

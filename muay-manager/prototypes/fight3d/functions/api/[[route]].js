@@ -56,7 +56,7 @@ async function schema(db) {
 }
 // The news ticker: what players' fighters have just done (a knockout, a belt, a step up). Each game posts its own notable
 // results and everyone reads the last ones. Only set words, small numbers and names are kept: never free text.
-const NEWS = {keep: 200, list: 30, gap: 8000, kinds: new Set(['ko', 'win', 'draw', 'belt', 'def', 'rev', 'cup', 'pcup', 'up', 'new']), how: new Set(['ko', 'tko', 'pts', 'draw'])};
+const NEWS = {keep: 200, list: 30, gap: 8000, kinds: new Set(['ko', 'win', 'draw', 'belt', 'def', 'rev', 'cup', 'pcup', 'up', 'new', 'tag']), how: new Set(['ko', 'tko', 'pts', 'draw'])};
 const newsName = v => (typeof v === 'string' ? v.replace(/[\u0000-\u001f<>&"']/g, '').trim().slice(0, 40) : '');
 function newsItem(x) {
   if (!x || typeof x !== 'object' || !NEWS.kinds.has(x.k)) return null;
@@ -78,9 +78,11 @@ function chatClean(v) {
   return [...t].slice(0, CHAT.max).join(''); // by characters, not halves of them
 }
 async function chatSince(db, after) { // the lines after one already had, oldest first; with none had, the last page
-  const row = r => ({id: r.id, t: r.t, pid: r.pid, name: r.name, msg: r.msg});
-  if (after > 0) return (await db.prepare('SELECT id, t, pid, name, msg FROM chat WHERE id > ? ORDER BY id LIMIT ?').bind(after, CHAT.page).all()).results.map(row);
-  return (await db.prepare('SELECT id, t, pid, name, msg FROM chat ORDER BY id DESC LIMIT ?').bind(CHAT.page).all()).results.map(row).reverse();
+  // with each line, the title the sender wears now (an id from the game's list, read from his ranking record)
+  const row = r => ({id: r.id, t: r.t, pid: r.pid, name: r.name, msg: r.msg, tag: typeof r.tag === 'string' && /^[a-z]{1,16}$/.test(r.tag) ? r.tag : ''});
+  const cols = "SELECT c.id, c.t, c.pid, c.name, c.msg, json_extract(d.data, '$.tag') tag FROM chat c LEFT JOIN docs d ON d.coll = 'board' AND d.id = c.pid";
+  if (after > 0) return (await db.prepare(cols + ' WHERE c.id > ? ORDER BY c.id LIMIT ?').bind(after, CHAT.page).all()).results.map(row);
+  return (await db.prepare(cols + ' ORDER BY c.id DESC LIMIT ?').bind(CHAT.page).all()).results.map(row).reverse();
 }
 // who has the game open now (seen in the last minute): the count and the first names. Worked out afresh every few seconds.
 let onlineMemo = {at: 0, v: {n: 0, list: []}};
