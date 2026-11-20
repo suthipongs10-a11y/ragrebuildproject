@@ -271,7 +271,7 @@ const fansOf = id => FANS.find(f => f.id === id), fansPrice = f => f.base + f.pe
 function fansHtml() {
   const b = (id, label) => '<button class="btn seg" data-act="fans" data-v="' + id + '" aria-pressed="' + (S.fans === id) + '">' + label + '</button>';
   const f = fansOf(S.fans), short = f && S.money < fansPrice(f);
-  return '<div class="fld">กองเชียร์ <small>จ่ายตอนขึ้นเวทีทุกไฟต์ที่พาไป</small></div><div class="seg3">' + b('', 'ไม่พา') + FANS.map(x => b(x.id, x.th.replace('กองเชียร์', '') + ' ฿ ' + baht(fansPrice(x)))).join('') + '</div>' +
+  return art('fans-crowd', 'fansimg opt') + '<div class="fld">กองเชียร์ <small>จ่ายตอนขึ้นเวทีทุกไฟต์ที่พาไป</small></div><div class="seg3">' + b('', 'ไม่พา') + FANS.map(x => b(x.id, x.th.replace('กองเชียร์', '') + ' ฿ ' + baht(fansPrice(x)))).join('') + '</div>' +
     '<p class="hint">' + (f ? f.note + ' · ชนะได้ชื่อเสียงเพิ่ม ' + f.fame + (short ? ' · <b>เงินไม่พอ ไฟต์นี้จะไม่ได้พาไป</b>' : '') : 'พากองเชียร์ไปด้วย: ป้ายชื่อนักมวยของคุณในอัฒจันทร์ คนดูเชียร์ดังขึ้น') + '</p>';
 }
 const boughtToday = id => !!(S.shopDay && S.shopDay.day === S.day && S.shopDay.ids.includes(id));
@@ -832,19 +832,19 @@ const adLeft = k => { if (S.ad.d !== adDay()) S.ad = {d: adDay(), n: {}}; return
 const adOn = () => MON.mode() !== 'none' || S.vip; // nothing to watch on the plain web page
 // ---------- the shop: what money buys besides the camp's levels (SHOP in data.js) ----------
 function shopHtml() {
-  const row = (title, note, btn) => '<div class="shoprow"><div><b>' + title + '</b><span>' + note + '</span></div>' + btn + '</div>';
+  const row = (title, note, btn, pic) => '<div class="shoprow">' + (pic ? art('shop-' + pic, 'shopimg opt') : '') + '<div><b>' + title + '</b><span>' + note + '</span></div>' + btn + '</div>';
   const b = SHOP.build.map(x => row(x.th + (built(x.id) ? ' ✓' : ''), x.note, built(x.id) ? '<span class="hint">มีแล้ว</span>'
     : S.gym < x.gym ? '<span class="hint">ต้องเป็นค่ายระดับ ' + x.gym + '</span>'
-    : '<button class="btn" data-act="shop" data-v="build:' + x.id + '"' + (S.money < x.price ? ' disabled' : '') + '>สร้าง ฿ ' + baht(x.price) + '</button>')).join('');
+    : '<button class="btn" data-act="shop" data-v="build:' + x.id + '"' + (S.money < x.price ? ' disabled' : '') + '>สร้าง ฿ ' + baht(x.price) + '</button>', x.id)).join('');
   const d = SHOP.daily.map(x => { const p = dailyPrice(x), done = boughtToday(x.id), idle = x.fat ? S.fatigue < 1 : S.mood >= 4;
-    return row(x.th, x.note, done ? '<span class="hint">วันนี้แล้ว</span>' : '<button class="btn" data-act="shop" data-v="daily:' + x.id + '"' + (S.money < p || idle ? ' disabled' : '') + '>฿ ' + baht(p) + '</button>'); }).join('');
+    return row(x.th, x.note, done ? '<span class="hint">วันนี้แล้ว</span>' : '<button class="btn" data-act="shop" data-v="daily:' + x.id + '"' + (S.money < p || idle ? ' disabled' : '') + '>฿ ' + baht(p) + '</button>', x.id); }).join('');
   const tt = TITLES.map(t => { const own = S.titles.includes(t.id), on = S.tag === t.id, lock = !own && t.need && S.belts.length < t.need;
     return '<button class="btn sm ttlb' + (on ? ' on' : '') + '" data-act="title" data-v="' + t.id + '" aria-pressed="' + on + '"' + (!own && (lock || S.money < t.price) ? ' disabled' : '') + '>' + t.th + '<small>' + (on ? 'ใช้อยู่ ✓' : own ? 'แตะเพื่อใช้' : lock ? 'ต้องมีเข็มขัด ' + t.need + ' เส้น' : '฿ ' + baht(t.price)) + '</small></button>'; }).join('');
   const mp = meritPrice(), m = SHOP.merit;
   return '<section class="gcard" id="gShop"><h2>ใช้เงินในค่าย <small>สร้างค่าย ดูแลนักมวย ทำบุญ</small></h2>' + (view && view.shop ? '<p class="' + (view.bad ? 'warn' : 'gain') + '">' + esc(view.shop) + '</p>' : '') + '<div class="fld">สิ่งปลูกสร้าง · สร้างครั้งเดียวใช้ได้ตลอด</div>' + b +
     '<div class="fld">ดูแลนักมวย · วันละครั้ง ราคาตามระดับเวที</div>' + d +
-    row(SHOP.extra.th + (extraToday() ? ' <small>วันนี้ซื้อแล้ว ' + extraToday() + '</small>' : ''), 'ชกจัดอันดับวันนี้ได้อีก 1 ไฟต์ ซื้อได้วันละ ' + SHOP.extra.max + ' ไฟต์ ไฟต์ต่อไปแพงขึ้น', extraBtn()) +
-    '<div class="fld">ทำบุญ · ครั้งต่อไปทำบุญมากขึ้น</div>' + row(m.th + (S.merit ? ' <small>ทำแล้ว ' + S.merit + ' ครั้ง</small>' : ''), 'ชื่อเสียง +' + m.fame + ' อารมณ์ดีขึ้น · คนในวงการนับถือ', '<button class="btn" data-act="shop" data-v="merit"' + (S.money < mp ? ' disabled' : '') + '>ถวาย ฿ ' + baht(mp) + '</button>') +
+    row(SHOP.extra.th + (extraToday() ? ' <small>วันนี้ซื้อแล้ว ' + extraToday() + '</small>' : ''), 'ชกจัดอันดับวันนี้ได้อีก 1 ไฟต์ ซื้อได้วันละ ' + SHOP.extra.max + ' ไฟต์ ไฟต์ต่อไปแพงขึ้น', extraBtn(), 'extra') +
+    '<div class="fld">ทำบุญ · ครั้งต่อไปทำบุญมากขึ้น</div>' + row(m.th + (S.merit ? ' <small>ทำแล้ว ' + S.merit + ' ครั้ง</small>' : ''), 'ชื่อเสียง +' + m.fame + ' อารมณ์ดีขึ้น · คนในวงการนับถือ', '<button class="btn" data-act="shop" data-v="merit"' + (S.money < mp ? ' disabled' : '') + '>ถวาย ฿ ' + baht(mp) + '</button>', 'merit') +
     '<div class="fld">ฉายา · ขึ้นหน้าชื่อในตารางอันดับและแชทโลก ซื้อแล้วสลับใช้ได้ตลอด</div><div class="ttls">' + tt + '</div></section>';
 }
 // -> {ok, text}, or null when there is nothing to do
@@ -1563,7 +1563,7 @@ function cupPrizeHtml(cup, k) { // my fighter's place in a finished cup, and the
 }
 function pcupHtml() {
   if (!CLOUD || !CLOUD.call) return '';
-  const d = PC.data, head = k => '<section class="gcard hot">' + art('venue-stadium', 'venue') + '<h2>ศึกชิงถ้วยผู้เล่น <small>ผู้เล่นพบผู้เล่น' + (k != null && k >= 0 ? ' · ครั้งที่ ' + (k + 1) : '') + '</small></h2>';
+  const d = PC.data, head = k => '<section class="gcard hot">' + art('venue-stadium', 'venue') + '<h2>' + art('trophy-cup', 'trophyimg opt') + 'ศึกชิงถ้วยผู้เล่น <small>ผู้เล่นพบผู้เล่น' + (k != null && k >= 0 ? ' · ครั้งที่ ' + (k + 1) : '') + '</small></h2>';
   if (!d) return head() + '<p class="hint">กำลังโหลดกำหนดการ…</p></section>';
   const t = now(), c = d.next, mine = c.entries.some(e => e.id === CLOUD.uid), P = CUP_PRIZE; let body;
   if (t < c.close) {

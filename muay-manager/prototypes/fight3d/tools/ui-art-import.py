@@ -16,6 +16,7 @@ SPEC = [
     ('staff-', (192, 192, False, 78, False)), ('belt-', (360, 120, True, 82, False)), ('venue-', (640, 427, False, 66, False)),
     ('panel', (256, 256, False, 88, False)), ('button-', (360, 90, True, 88, False)), ('corner-', (96, 96, True, 84, True)),
     ('mood-', (64, 64, True, 86, True)), ('ribbon-', (600, 200, True, 82, False)), ('style-', (192, 192, True, 78, True)),
+    ('shop-', (192, 192, False, 80, False)), ('fans-', (640, 427, False, 66, False)), ('trophy-', (192, 192, True, 82, True)),  # set 2 (20 Nov 2026)
 ]
 HAZE = 40  # alpha below this is a painted glow plane, not part of the drawing
 

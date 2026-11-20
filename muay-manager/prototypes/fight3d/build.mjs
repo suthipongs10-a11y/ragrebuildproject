@@ -106,7 +106,9 @@ let uiStyle = '', uiImages = '', uiCss = ''; // images (big, rarely change) and 
 if (existsSync('assets/ui')) {
   const files = readdirSync('assets/ui').filter(f => f.endsWith('.webp') && f !== 'app-icon.webp').sort();
   const vars = files.map(f => `--ui-${f.slice(0, -5)}:url(data:image/webp;base64,${readFileSync('assets/ui/' + f).toString('base64')})`).join(';');
-  const rules = files.map(f => `[data-ui="${f.slice(0, -5)}"]{background-image:var(--ui-${f.slice(0, -5)})}`).join('');
+  const rules = files.map(f => `[data-ui="${f.slice(0, -5)}"]{background-image:var(--ui-${f.slice(0, -5)})}`).join('')
+    // art marked .opt (drawn later than the rest) takes no room until its image is here
+    + '.ui.opt{display:none}' + files.map(f => `.ui.opt[data-ui="${f.slice(0, -5)}"]{display:inline-block}`).join('');
   uiImages = `<style id="ui-art">:root{${vars}}${rules}</style>`; uiCss = `<style id="ui-art-layout">${readFileSync('src/ui-art.css', 'utf8')}</style>`;
   uiStyle = uiImages + uiCss;
   console.log('ui art', files.length, 'images', (uiStyle.length / 1024 / 1024).toFixed(2) + ' MB');

@@ -42,3 +42,9 @@ h1.glogo > span{display:none}
    content in every browser (on its own a fixed layer at z-index -1 can be drawn over the 3D canvas in Safari) */
 .app.game{position:relative;z-index:0;isolation:isolate}
 .app.game.g-menu::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(rgba(14,15,20,.7),rgba(14,15,20,.93) 55%),var(--ui-title-portrait) center top/cover}
+/* set 2 (20 Nov 2026): the camp shop's pictures, the cheering section, the players' cup (shown once imported: .opt) */
+.shoprow .ui.shopimg{width:52px;height:52px;border-radius:10px;background-size:cover;border:1px solid var(--line);margin-right:2px}
+.shoprow > div{flex:1;min-width:0}
+.ui.fansimg{width:100%;height:96px;margin:10px 0 2px;background-size:cover;border-radius:8px;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+h2 .ui.trophyimg{width:34px;height:34px;margin:-6px 6px -6px 0}
+

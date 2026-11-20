@@ -210,12 +210,57 @@ def palette_png():
         d.text((x + 140, y + 22), name, fill='#F1F2F5'); d.text((x + 140, y + 46), hx, fill='#9A9FB0')
     b = io.BytesIO(); im.save(b, 'PNG'); return b.getvalue()
 
+# ---- set 2 (20 Nov 2026): art for what came after the first players' test (the camp shop, the cheering section, the
+# players' cup). `--set2` packs only these.
+SHOPCARD = ('Shop item card art, square, opaque, filling the whole frame: a small painted scene in a Thai boxing camp in warm '
+            'evening light, the subject centred and large so it still reads when shown at 52 pixels: {}. Same painting style, light '
+            'and colour grading for all eight cards in this set. No close-up faces, no text, no labels, no signs with writing.')
+SET2 = []
+for f, what, use in [
+        ('shop-sauna.png', 'a small wooden steam-sauna hut with steam drifting out of the half-open door, a folded towel and a wooden bucket '
+         'on the step, bundles of lemongrass and herbs hanging to dry', 'Camp shop: sauna (sleep takes more fatigue away)'),
+        ('shop-weights.png', 'a weights corner under a corrugated tin roof: a squat rack with a loaded barbell, a row of iron dumbbells, a '
+         'worn rubber floor mat and a hanging towel', 'Camp shop: weights room (training works better)'),
+        ('shop-ring.png', 'a second training ring under a tin roof inside the camp: red and blue corner pads, worn white canvas, ropes '
+         'slightly slack, two heavy bags hanging beside it, one lamp shining down', 'Camp shop: training ring (a fourth session a day)'),
+        ('shop-shrine.png', 'a small Thai spirit-house shrine for the camp\'s teachers on a pedestal, marigold garlands, a few incense '
+         'sticks smoking, a white-and-red mongkol headband resting on a gold tray in front, soft candlelight', 'Camp shop: shrine to the teachers (a better mood each morning)'),
+        ('shop-massage.png', 'a Thai massage corner: a woven mat, herbal compress balls tied in cloth, a bottle of liniment oil, a rolled '
+         'towel and a small lamp', 'Camp shop: an hour of Thai massage'),
+        ('shop-meal.png', 'a big shared meal on a low wooden table for the whole camp: rice in a large bowl, grilled chicken, papaya salad, '
+         'sticky-rice baskets and glasses of water, steam rising', 'Camp shop: a meal for the whole camp'),
+        ('shop-merit.png', 'an offering tray at a Thai temple: lotus buds, marigold flowers, incense and candles on a gold tray, a temple '
+         'roof with gold finials softly blurred behind', 'Camp shop: making merit at the temple'),
+        ('shop-extra.png', 'a pair of red boxing gloves resting on a corner stool in an empty ring at night under a single spotlight, the '
+         'seats around dark and waiting', 'Camp shop: one more ranked fight today')]:
+    SET2.append((f, 'B', SQ, '192x192', False, use, SHOPCARD.format(what)))
+SET2 += [
+ ('fans-crowd.png', 'B', WIDE, '640x427', False, 'Cheering section, on the screen before the bell (trimmed to a wide strip)',
+  'A cheering section in the stands of a Muay Thai stadium at night: fans in red and gold shirts on their feet, holding up a long '
+  'red banner with a gold border and nothing written on it, waving small red and gold flags, one fan beating a long Thai drum, '
+  'stage lights and haze above. Faces small and not detailed. Keep all the action in the middle band: the game trims the top and '
+  'the bottom to a wide strip. The banner must be completely blank: no letters, no symbols.'),
+ ('trophy-cup.png', 'B', SQ, '192x192', True, 'Players\' cup: beside the title of its card',
+  'Trophy icon, transparent background: a grand gold cup with two handles on a dark wooden base, a red-and-blue enamel band around '
+  'the cup, a small kanok flame crest on the lid, soft gold glow, front view, centred, filling about 75% of the square. The plate on '
+  'the base is blank: no text.'),
+]
+A += SET2
+
+SET2_NOTE = """# ชุดที่ 2 (20 พ.ย. 2026): ภาพของใหม่หลังเปิดให้คนเล่น
+
+10 ภาพ: ร้านค้าในค่าย 8 ภาพ (ซาวน่า ห้องยกน้ำหนัก เวทีซ้อม ศาลพ่อครู นวดแผนไทย เลี้ยงข้าว ทำบุญ ไฟต์จัดอันดับเพิ่ม) กองเชียร์ 1 ภาพ ถ้วยศึกชิงถ้วยผู้เล่น 1 ภาพ
+ร้านค้าทั้ง 8 ภาพสั่งในแชตเดียวกัน ให้เข้าชุดกัน • ภาพเข้าเกมทันทีที่ส่งมา ภาพที่ยังไม่มี เกมไม่เว้นที่ไว้
+
+"""
+
 def main():
-    out, refs = sys.argv[1], (sys.argv[2] if len(sys.argv) > 2 else None)
-    order = sorted(A, key=lambda r: 'ABC'.index(r[1]))  # stable: keeps the listed order inside each priority
+    args = [a for a in sys.argv[1:] if a != '--set2']; only2 = '--set2' in sys.argv  # --set2: only the second set
+    out, refs = args[0], (args[1] if len(args) > 1 else None)
+    order = SET2 if only2 else sorted(A, key=lambda r: 'ABC'.index(r[1]))  # stable: keeps the listed order inside each priority
     with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
         z.writestr('START_HERE.md', START)
-        z.writestr('README_TH.md', GUIDE.format(n=len(A), a=sum(r[1] == 'A' for r in A), b=sum(r[1] == 'B' for r in A), c=sum(r[1] == 'C' for r in A)))
+        z.writestr('README_TH.md', (SET2_NOTE if only2 else '') + GUIDE.format(n=len(order), a=sum(r[1] == 'A' for r in order), b=sum(r[1] == 'B' for r in order), c=sum(r[1] == 'C' for r in order)))
         z.writestr('STYLE.txt', STYLE + '\n')
         rows = io.StringIO(); w = csv.writer(rows)
         w.writerow(['order', 'file', 'priority', 'draw_at', 'final_size', 'background', 'used_for', 'prompt_file'])
@@ -231,6 +276,6 @@ def main():
                 if not (n.startswith('ref-') and n.endswith('.png') and n[4:6].isdigit()): continue
                 im = Image.open(os.path.join(refs, n)).convert('RGB'); b = io.BytesIO(); im.save(b, 'JPEG', quality=84)
                 z.writestr('reference/' + n[4:-4] + '.jpg', b.getvalue())
-    print(out, len(A), 'images,', os.path.getsize(out) // 1024, 'KB')
+    print(out, len(order), 'images,', os.path.getsize(out) // 1024, 'KB')
 
 main()
