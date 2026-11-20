@@ -16,6 +16,7 @@ import { buildCeremony, CER_LEN } from './ceremony.js';
 import { buildPrize } from './prize.js';
 import { buildCorner, CORNER_LEN, CORNER_SEAT, CORNER_OUT } from './corner.js';
 import { hasBad } from './badwords.js';
+import { T } from './i18n.js';
 const THREE = globalThis.THREE;
 const $ = id => document.getElementById(id);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v)), lerp = (a, b, t) => a + (b - a) * t;
@@ -115,7 +116,7 @@ function buildRoundCard() { // readable from both sides
   g.visible = false;
   return {obj: g, set(n) {
     const c = cv.getContext('2d'); c.fillStyle = '#101116'; c.fillRect(0, 0, 256, 192); c.strokeStyle = '#f2b83a'; c.lineWidth = 8; c.strokeRect(7, 7, 242, 178);
-    c.textAlign = 'center'; c.fillStyle = '#f2b83a'; c.font = "700 40px 'Chakra Petch', 'Bai Jamjuree', sans-serif"; c.fillText('ยก', 128, 54);
+    c.textAlign = 'center'; c.fillStyle = '#f2b83a'; c.font = "700 40px 'Chakra Petch', 'Bai Jamjuree', sans-serif"; c.fillText(T('ยก'), 128, 54);
     c.fillStyle = '#ffffff'; c.font = "800 118px 'Chakra Petch', 'Bai Jamjuree', sans-serif"; c.fillText(String(n), 128, 164); tex.needsUpdate = true; }};
 }
 function startCorner() {

@@ -21,11 +21,18 @@
 #siteLoad button{font:inherit;font-size:15px;padding:10px 18px;border-radius:8px;border:0;background:#f2b83a;color:#1b1300;font-weight:700}
 </style>
 <script>
+  // the loading screen speaks the device's language before the game (and src/i18n.js) arrives
+  var LANG = (function () { try { var q = new URLSearchParams(location.search).get('lang'); if (q) return q; return localStorage.getItem('muayLang') || 'th'; } catch (e) { return 'th'; } })();
+  var EN = {'กำลังโหลดเกม…': 'Loading the game…', 'กำลังเตรียมเวที…': 'Setting up the ring…', 'ลองใหม่': 'Try again', 'ล้างการตั้งค่าเสียงและภาพ แล้วลองใหม่': 'Reset sound and picture settings, then try again',
+    'โหลดไม่สำเร็จ (เน็ตหลุดหรือช้า)': 'Could not load (connection lost or slow)', 'เกมเริ่มไม่ได้ ส่งรายงานให้ผู้พัฒนาแล้ว': "The game could not start; a report went to the developer", 'เกมเริ่มช้าผิดปกติ': 'The game is unusually slow to start', 'ลองใหม่อีกครั้ง หรือล้างการตั้งค่า': 'Try again, or reset the settings'};
+  var L = function (th) { return LANG === 'en' && EN[th] ? EN[th] : th; };
+  if (LANG === 'en') { document.documentElement.lang = 'en'; var m0 = document.getElementById('slMsg'); if (m0) m0.textContent = L(m0.textContent); }
+
 (async function () {
   var A = /*__SITE_ASSETS__*/null;
   var bar = document.getElementById('slBar'), msg = document.getElementById('slMsg'), note = document.getElementById('slNote');
   var total = A.assetsSize + A.appSize, got = 0, mb = function (n) { return (n / 1048576).toFixed(1); };
-  note.textContent = 'ครั้งแรกราว ' + mb(A.assetsGz) + ' MB ครั้งต่อไปโหลดเฉพาะส่วนที่เปลี่ยน';
+  note.textContent = LANG === 'en' ? 'About ' + mb(A.assetsGz) + ' MB the first time, then only what changed' : 'ครั้งแรกราว ' + mb(A.assetsGz) + ' MB ครั้งต่อไปโหลดเฉพาะส่วนที่เปลี่ยน';
   // read a file and move the bar as it arrives (sizes are the unpacked sizes, which is what the reader counts)
   async function pull(url) {
     var r = await fetch(url); if (!r.ok) throw new Error(url + ' ' + r.status);
@@ -51,8 +58,8 @@
   function fail(text, detail) {
     msg.textContent = text; note.textContent = String(detail || '').slice(0, 160); bar.parentNode.style.display = 'none';
     var row = document.createElement('div'); row.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;justify-content:center';
-    var b = document.createElement('button'); b.textContent = 'ลองใหม่'; b.onclick = function () { location.reload(); }; row.appendChild(b);
-    var c = document.createElement('button'); c.textContent = 'ล้างการตั้งค่าเสียงและภาพ แล้วลองใหม่'; c.style.background = '#2a2d39'; c.style.color = '#f1f2f5';
+    var b = document.createElement('button'); b.textContent = L('ลองใหม่'); b.onclick = function () { location.reload(); }; row.appendChild(b);
+    var c = document.createElement('button'); c.textContent = L('ล้างการตั้งค่าเสียงและภาพ แล้วลองใหม่'); c.style.background = '#2a2d39'; c.style.color = '#f1f2f5';
     c.onclick = function () { try { localStorage.removeItem('muaySound'); } catch (e) {} location.reload(); }; row.appendChild(c);
     msg.parentNode.appendChild(row);
   }
@@ -80,17 +87,17 @@
   function script(src) { return new Promise(function (ok, no) { var s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = function () { no(new Error(src)); }; document.head.appendChild(s); }); }
   try {
     var both = await Promise.all([pull(A.assets), pull(A.app), script(A.three)]);
-    msg.textContent = 'กำลังเตรียมเวที…'; bar.style.width = '99%';
+    msg.textContent = L('กำลังเตรียมเวที…'); bar.style.width = '99%';
     await new Promise(function (ok) { setTimeout(ok, 30); });
     var box = document.createElement('div'); box.id = 'siteAssets'; box.hidden = true; box.innerHTML = both[0]; document.body.appendChild(box);
     var s = document.createElement('script'); s.textContent = both[1]; document.body.appendChild(s);
-  } catch (e) { report('load: ' + (e && e.message || e)); fail('โหลดไม่สำเร็จ (เน็ตหลุดหรือช้า)', e && e.message || e); return; }
+  } catch (e) { report('load: ' + (e && e.message || e)); fail(L('โหลดไม่สำเร็จ (เน็ตหลุดหรือช้า)'), e && e.message || e); return; }
   // the game is up when its menu has replaced the page title; an error before that shows here instead of a frozen page
   for (var i = 0; i < 150; i++) {
     if (booted()) { document.getElementById('siteLoad').remove(); setTimeout(diag, 5000); return; }
-    if (failed) { fail('เกมเริ่มไม่ได้ ส่งรายงานให้ผู้พัฒนาแล้ว', failed); return; }
+    if (failed) { fail(L('เกมเริ่มไม่ได้ ส่งรายงานให้ผู้พัฒนาแล้ว'), failed); return; }
     await new Promise(function (ok) { setTimeout(ok, 200); });
   }
-  report('boot: no game menu after 30 s'); fail('เกมเริ่มช้าผิดปกติ', 'ลองใหม่อีกครั้ง หรือล้างการตั้งค่า');
+  report('boot: no game menu after 30 s'); fail(L('เกมเริ่มช้าผิดปกติ'), L('ลองใหม่อีกครั้ง หรือล้างการตั้งค่า'));
 })();
 </script>

@@ -1,5 +1,6 @@
 // Venues: the ring and everything around it. All generated in code; no asset files.
 // One venue is visible at a time. Each is built the first time it is asked for and kept.
+import { T } from './i18n.js'; // words drawn in the hall (the cheering section's banners) in the page's language
 const THREE = globalThis.THREE;
 
 const R = 3.05, S = R * 2 + .9;   // ring half size at the ropes, platform width
@@ -686,7 +687,7 @@ export function buildArena(scene) {
     fans = new THREE.Group(); fans.name = 'fans';
     const n = cfg.banners >= 3 ? 3 : 1, xs = n === 3 ? [-3.1, 0, 3.1] : [1.4], seed = (cfg.name || '').length;
     xs.forEach((x, i) => {
-      const main = n === 1 || i === 1, big = main ? cfg.name : SLOGANS[(seed + i) % SLOGANS.length], small = main ? (cfg.tag ? '« ' + cfg.tag + ' »' : 'กองเชียร์') : cfg.name;
+      const main = n === 1 || i === 1, big = main ? cfg.name : T(SLOGANS[(seed + i) % SLOGANS.length]), small = main ? (cfg.tag ? '« ' + T(cfg.tag) + ' »' : T('กองเชียร์')) : cfg.name; // drawn on canvas: in the page's language (i18n.js T)
       const w = (main ? 2.9 : 2.3) * scale, hgt = w * 320 / 1024, b = new THREE.Group(); b.position.set(x * scale, yc, z); b.userData = {y: yc, i, kind: 'banner'};
       const m = new THREE.Mesh(new THREE.PlaneGeometry(w, hgt), basic({map: fanBannerTex(big, small, main ? 0 : i), side: THREE.DoubleSide})); b.add(m);
       for (const px of [-w * .42, w * .42]) { const pole = new THREE.Mesh(new THREE.CylinderGeometry(.025, .025, hgt + .7, 5), std({color: 0x5a3a1c})); pole.position.set(px, -.32, -.02); b.add(pole); } // two people hold it up

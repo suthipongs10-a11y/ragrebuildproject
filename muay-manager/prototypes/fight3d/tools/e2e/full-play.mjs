@@ -18,7 +18,8 @@ await page.addInitScript(() => { const st = window.__mock.store; delete st['chal
 await page.route('**/three.min.js', r => r.fulfill({path: THREE, contentType: 'application/javascript'}));
 await page.route('**/fonts.googleapis.com/**', r => r.abort());
 await page.route('http://lab.test/**', r => r.fulfill({path: S + 'page.html', contentType: 'text/html'}));
-await page.goto('http://lab.test/'); await page.waitForFunction("!!window.MUAY && !!document.getElementById('gName')", null, {timeout: 60000}); await page.waitForTimeout(2000);
+const UI_LANG = process.env.UI_LANG || ''; // UI_LANG=en: the run in that language, and the Thai still on screen is listed (dist/e2e/lang-miss-full-en.json)
+await page.goto('http://lab.test/' + (UI_LANG ? '?lang=' + UI_LANG : '')); await page.waitForFunction("!!window.MUAY && !!document.getElementById('gName')", null, {timeout: 60000}); await page.waitForTimeout(2000);
 const ev = js => page.evaluate(js), wait = ms => page.waitForTimeout(ms);
 const until = (js, ms) => page.waitForFunction(js, null, {timeout: ms || 30000, polling: 200}).then(() => true, () => false);
 const t0 = Date.now(), T = () => ((Date.now() - t0) / 1000).toFixed(0).padStart(4) + 's';
@@ -371,5 +372,6 @@ ok(!!r && r.venue === 'stadium' && !!r.girl && r.girl.seen && r.girl.gone, 'at t
 await tab('home'); await click('[data-act=reset]', 400); await click('[data-act=reset]', 1200);
 ok(await has('#gName') && await ev('GAME.save() === null'), 'starting over returns to the creation screen');
 const e = errs.splice(0); ok(!e.length, 'no script errors at the end', e.join(' | '));
+if (UI_LANG) { const m = JSON.parse(await ev('JSON.stringify([...window.__i18n.miss.entries()])')).sort((a, b) => b[1] - a[1]); writeFileSync(S + 'lang-miss-full-' + UI_LANG + '.json', JSON.stringify(m.map(([text, n]) => ({text, n})), null, 1)); console.log(UI_LANG + ': ' + m.length + ' texts on screen without a line (the checks above read Thai, so many fail in another language)'); }
 console.log(bad ? `${bad} of ${steps} checks FAILED` : `PASS: ${steps} checks`);
 await browser.close(); process.exit(bad ? 1 : 0);

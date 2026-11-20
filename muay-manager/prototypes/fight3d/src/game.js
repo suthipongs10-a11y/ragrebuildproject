@@ -7,6 +7,7 @@ import { cleanPlan, cleanSpec, cleanStats, own, matchCfg as matchInput } from '.
 import { PLAN_TIPS } from './plantips.js';
 import { simulate, SIM_VERSION } from './sim.js';
 import { hasBad, NAME_STANDIN } from './badwords.js';
+import { getLang, chooseLang, LANGS } from './i18n.js';
 import { siteRuntime } from './netdb.js';
 import * as MON from './mon.js';
 import { sceneArt, playScene, SCENE_KEYS } from './scenes.js';
@@ -114,7 +115,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.65', BUILD = 265;
+const VER = '2.66', BUILD = 266;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -514,7 +515,7 @@ function acctHtml() {
     claimHtml() +
     '<div class="setrow"><span>ลบบัญชีและข้อมูลทั้งหมด</span><button class="btn" data-act="delacct">' + (v.delSure ? 'กดอีกครั้งเพื่อยืนยัน ลบแล้วกู้คืนไม่ได้' : 'ลบบัญชี') + '</button></div>' +
     (v.acctNote ? '<p class="warn">' + v.acctNote + '</p>' : '') +
-    '<p class="hint"><a class="link" href="' + WEB + '/privacy.html" target="_blank" rel="noopener">นโยบายความเป็นส่วนตัว</a> · <a class="link" href="' + WEB + '/terms.html" target="_blank" rel="noopener">ข้อตกลงการใช้งาน</a></p>';
+    '<p class="hint"><a class="link" href="' + WEB + '/privacy' + (getLang() === 'th' ? '' : '-' + getLang()) + '.html" target="_blank" rel="noopener">นโยบายความเป็นส่วนตัว</a> · <a class="link" href="' + WEB + '/terms' + (getLang() === 'th' ? '' : '-' + getLang()) + '.html" target="_blank" rel="noopener">ข้อตกลงการใช้งาน</a></p>';
 }
 const claimHtml = () => (CLOUD && CLOUD.acct ? '<div class="setrow"><label for="gCode">มีรหัสจากเครื่องเดิม</label><span class="codein"><input id="gCode" class="inp" maxlength="12" placeholder="รหัส 8 ตัว" autocomplete="off" autocapitalize="characters"><button class="btn" data-act="claim">ใช้รหัส</button></span></div>' : '');
 // a note to the developer from inside the game (the game's own website and the app): it goes to the site's log with the
@@ -523,7 +524,7 @@ const feedbackHtml = () => (CLOUD && CLOUD.site ? '<h2>แจ้งปัญห�
   '<div class="rowbtn"><button class="btn" data-act="feedback">ส่งถึงผู้พัฒนา</button></div><p class="hint" id="gFbNote">ส่งพร้อมชื่อนักมวย รุ่นของเกม และขนาดหน้าจอ เพื่อให้ตามแก้ได้ถูกจุด</p>' : '');
 function settingsHtml() {
   const snd = API.sound, v = snd.vols;
-  return '<section class="gcard gset-card"><h2>ตั้งค่า · เสียง</h2>' +
+  return langHtml() + '<section class="gcard gset-card"><h2>ตั้งค่า · เสียง</h2>' +
     '<div class="setrow"><span>เสียงทั้งหมด</span><button class="btn ' + (snd.on ? 'go' : '') + '" data-act="soundon" role="switch" aria-checked="' + snd.on + '">' + (snd.on ? 'เปิดอยู่' : 'ปิดอยู่ แตะเพื่อเปิด') + '</button></div>' +
     VOL_TH.map(([k, th]) => '<label class="setrow vol"><span>' + th + '</span><input type="range" min="0" max="100" step="5" data-vol="' + k + '" value="' + Math.round(v[k] * 100) + '" aria-label="' + th + '"><output>' + Math.round(v[k] * 100) + '%</output></label>').join('') +
     '<h2>ภาพ</h2><label class="setrow vol"><span>ความสว่าง</span><input type="range" min="70" max="160" step="5" data-bright="1" value="' + Math.round(API.bright.v * 100) + '" aria-label="ความสว่าง"><output>' + Math.round(API.bright.v * 100) + '%</output></label>' +
@@ -596,9 +597,11 @@ function drow(field, label, map, swatch) {
 }
 // on the creation screen: a player who already has a fighter on another device brings him over instead of making a new one
 const claimBoxHtml = () => (CLOUD && CLOUD.acct && !CLOUD.dead ? '<section class="gcard slim"><h2>มีนักมวยอยู่แล้วในเครื่องอื่น</h2>' + claimHtml() + '<p class="hint" id="gClaimMsg">ขอรหัสได้ที่เครื่องเดิม: ตั้งค่า → ย้ายไปเล่นเครื่องอื่น</p></section>' : '');
+// the language of the page (i18n.js): the device's choice; changing it loads the page again
+const langHtml = () => '<section class="gcard slim"><div class="setrow"><span>ภาษา · Language</span><span class="seg2">' + Object.keys(LANGS).map(k => '<button class="btn sm" data-act="lang" data-v="' + k + '" aria-pressed="' + (getLang() === k) + '" lang="' + k + '">' + LANGS[k] + '</button>').join('') + '</span></div></section>';
 function renderCreate() {
   $('gNav').innerHTML = '';
-  $('gBody').innerHTML = '<section class="gcard"><h2>สร้างนักมวยของคุณ</h2>' +
+  $('gBody').innerHTML = langHtml() + '<section class="gcard"><h2>สร้างนักมวยของคุณ</h2>' +
     '<label class="fld" for="gName">ชื่อนักมวย</label><input id="gName" class="inp" maxlength="24" placeholder="เช่น เพชรน้ำหนึ่ง ศ.ของคุณ" value="' + esc(draft.name) + '">' +
     '<div class="fld">ตัวนักมวย</div><div class="pick">' + Object.keys(API.ROSTER).map(k => '<button class="btn seg sm" data-act="body" data-v="' + k + '" aria-pressed="' + (draft.body === k) + '">' + API.ROSTER[k][0] + '</button>').join('') + '</div>' +
     '<p class="hint">หน้าตาและทรงผมมากับตัวนักมวยแต่ละคน ส่วนสีผิว สีผม หนวดเครา ชุด และประเจียด เลือกเองได้ข้างล่าง ดูบนตัวจริงได้ทันที ไม่มีผลกับฝีมือบนเวที</p>' +
@@ -1085,7 +1088,7 @@ const LIVE_REST = LIVE.rest, LIVE_PICK = LIVE.pick, LIVE_READ = LIVE.read;
 // a "fight now" challenge waits for its answer. ONLINE: a player whose record was touched this recently is shown as online.
 const READY = LIVE.ready * 1e3, QUICK_WAIT = LIVE.quickWait * 1e3, QUIT_UNTIL = LIVE.quitUntil * 1e3, ONLINE = 60e3, PRESENCE = 25e3, COUNT_FROM = 10e3;
 const isOnline = b => !!(b && b.seen && now() - b.seen < ONLINE);
-const agoTh = ms => { const m = Math.max(1, Math.round(ms / 60e3)); return m < 60 ? m + ' นาทีที่แล้ว' : m < 1440 ? Math.round(m / 60) + ' ชม. ที่แล้ว' : Math.round(m / 1440) + ' วันที่แล้ว'; };
+const agoTh = ms => { const m = Math.max(1, Math.round(ms / 60e3)), th = getLang() === 'th'; return m < 60 ? m + (th ? ' นาทีที่แล้ว' : ' min ago') : m < 1440 ? Math.round(m / 60) + (th ? ' ชม. ที่แล้ว' : ' h ago') : Math.round(m / 1440) + (th ? ' วันที่แล้ว' : (Math.round(m / 1440) > 1 ? ' days ago' : ' day ago')); };
 // Every PRESENCE ms while the game is on screen; and once with off when it is closed or hidden, so the others see
 // "offline" at their next look instead of after the ONLINE window runs out (that window is for a lost connection).
 // "Start over" asks twice. The first press is remembered here, not on the button: the menu may be redrawn between the two.
@@ -1099,7 +1102,7 @@ function whenTime(k) {
   if (k[0] === 'n') return now() + (+k.slice(1)) * 60e3;
   const d = new Date(); d.setHours(+k.slice(1), 0, 0, 0); if (d.getTime() < Date.now() + 60e3) d.setDate(d.getDate() + 1); return d.getTime() + CH.skew;
 }
-const hm = t => { const d = new Date(t); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + ' น.' + (new Date(t).toDateString() !== new Date().toDateString() ? ' พรุ่งนี้' : ''); };
+const hm = t => { const d = new Date(t), th = getLang() === 'th'; return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0') + (th ? ' น.' : '') + (new Date(t).toDateString() !== new Date().toDateString() ? (th ? ' พรุ่งนี้' : ' tomorrow') : ''); };
 const countdown = ms => { ms = Math.max(0, ms); const s = Math.floor(ms / 1000), h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s % 60).padStart(2, '0'); };
 // everything from the shared store is someone else's input: cleaned the same way on every viewer, so all run the same fight
 function chSubscribe() {
@@ -1377,7 +1380,7 @@ function chatBuild() {
 // cup to come, who leads. A tap opens the same lines as a list.
 const NW = {items: [], own: [], queue: [], hold: 0, sending: false, at: 0, busy: false, html: '', next: null, shown: false};
 const NEWS_EVERY = 90e3, NEWS_OWN = 180e3, NEWS_MAX = 14, NEWS_SPEED = 62 /* px a second */, NEWS_AGE = 24 * 3600e3, NEWS_STILL = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-const NEWS_KINDS = {ko: 1, win: 1, draw: 1, belt: 1, def: 1, rev: 1, cup: 1, pcup: 1, up: 1, new: 1, tag: 1}, NEWS_HOW = {ko: 'ชนะน็อก', tko: 'ชนะทีเคโอ', pts: 'ชนะคะแนน', draw: 'เสมอกับ'};
+const NEWS_KINDS = {ko: 1, win: 1, draw: 1, belt: 1, def: 1, rev: 1, cup: 1, pcup: 1, up: 1, new: 1, tag: 1}, NEWS_HOW = {ko: 'ชนะน็อก', tko: 'ชนะทีเคโอ', pts: 'ชนะคะแนนเหนือ', draw: 'เสมอกับ'}; // a verb with the opponent after it ("ชนะคะแนน" alone ends a fight call: i18n keys differ)
 // my fighter's own news: on this screen at once, and sent to the list everyone reads
 function newsPost(list) {
   if (!S || !list || !list.length) return;
@@ -1542,7 +1545,8 @@ function cupPhase(t) {
   const cup = cupOf(c); if (!cup.held) return 'none';
   const T = cupTimes(cup, c.start, d.gap); return 'on' + T.filter(x => t >= x.start).length + '.' + T.filter(x => t >= x.end).length + (t >= c.start + 4 * d.gap + 2000 ? 'x' : ''); // x: the server now lists it as the cup before
 }
-const whenTh = t => new Date(t - CH.skew).toLocaleString('th-TH', {weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}) + ' น.';
+const whenTh = t => getLang() === 'th' ? new Date(t - CH.skew).toLocaleString('th-TH', {weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}) + ' น.'
+  : new Date(t - CH.skew).toLocaleString('en-GB', {weekday: 'long', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'}); // the date in the language on screen
 function cupBracket(cup, start, gap, t) {
   const T = cupTimes(cup, start, gap);
   return cup.res.map((list, r) => {
@@ -1943,6 +1947,7 @@ function onClick(e) {
   if (act === 'exh') { watchMatch(null, exhibition()); return; }
   if (act === 'watchmore') { F = null; API.stop(); view = {watch: true}; setMode(false); render(); showMe(); if (CLOUD) loadBoard(); return; }
   if (act.startsWith('chat') && chatAct(act, v)) return;
+  if (act === 'lang') { if (v !== getLang()) chooseLang(v); return; }
   if (act === 'news') { if (view && view.news) view = null; else { if (DR) drillEnd(true); view = {news: true}; } render(); $('gBody').scrollIntoView({block: 'start', behavior: 'smooth'}); return; }
   if (act === 'hall') { view = view && view.hall ? null : {hall: true}; render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
   if (act === 'settings') { if (view && view.settings) view = null; else { if (DR) drillEnd(true); view = {settings: true}; } render(); window.scrollTo({top: 0, behavior: 'smooth'}); return; }
@@ -1983,9 +1988,9 @@ function onClick(e) {
     const walk = tourNewDay();
     if (S.belts.length && S.day > S.defendDue + DEFEND.grace) { const b = Math.max(...S.belts); S.belts = S.belts.filter(x => x !== b); S.defendDue = S.day + DEFEND.every; note = 'ไม่ได้ป้องกันแชมป์ตามกำหนด ถูกปลดจาก' + BELTS[b] + ' · ' + note; }
     S.fatigue = clamp(S.fatigue - NIGHT - (S.staff.includes('massage') ? 12 : 0) - (built('sauna') ? shopOf('sauna').night : 0), 0, 100); S.money += income; // a night's sleep and the day's sponsor money
-    if (wage) { if (S.money >= wage) { S.money -= wage; note += ' จ่ายค่าจ้างทีมงาน ฿ ' + baht(wage); } else { S.staff = []; note += ' เงินไม่พอจ่ายค่าจ้าง ทีมงานลาออกทั้งหมด'; } }
-    if (S.fatigue < 30 && S.mood < 2) note += ' พักเต็มที่' + moodUp(1);
-    if (built('shrine') && S.mood < 3) note += ' ไหว้ศาลพ่อครู' + moodUp(1);
+    if (wage) { if (S.money >= wage) { S.money -= wage; note += ' · จ่ายค่าจ้างทีมงาน ฿ ' + baht(wage); } else { S.staff = []; note += ' · เงินไม่พอจ่ายค่าจ้าง ทีมงานลาออกทั้งหมด'; } } // sentences joined by ' · ': each is translated on its own (i18n.js)
+    if (S.fatigue < 30 && S.mood < 2) note += ' · พักเต็มที่' + moodUp(1);
+    if (built('shrine') && S.mood < 3) note += ' · ไหว้ศาลพ่อครู' + moodUp(1);
     if (walk) note += walk;
     save(); view = {note}; render(); topBar();
   }

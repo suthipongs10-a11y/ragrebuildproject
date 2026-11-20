@@ -244,6 +244,7 @@ p.bad{margin:0;font-size:14px;font-weight:600;color:var(--bad)}
 .cupimg{width:46px;height:46px} .hh{margin:4px 0 0;font-size:14px;color:var(--muted,#9aa)}
 .trow .ui.beltimg,.bx .ui.beltimg{display:inline-block;width:72px;height:24px;background-size:contain;background-repeat:no-repeat;background-position:center}
 .autos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px} .autos .btn:last-child{grid-column:1/-1}
+html:not([lang="th"]) .dbtn{font-size:clamp(15px,4.6vw,22px);padding:0 4px;overflow-wrap:anywhere} /* English words run wider than หมัด ศอก เตะ เข่า */
 .dbtns{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px} .dbtns.four{grid-template-columns:repeat(4,minmax(0,1fr))}
 .dbtn{height:78px;border:0;border-radius:12px;color:var(--ink);font-family:var(--display);font-size:24px;user-select:none;-webkit-user-select:none;touch-action:none;box-shadow:0 4px 0 rgba(0,0,0,.45)}
 .dbtn b{font-weight:700;pointer-events:none}
@@ -297,6 +298,7 @@ p.bad{margin:0;font-size:14px;font-weight:600;color:var(--bad)}
 .ttl{font-style:normal;font-size:.82em;font-weight:700;color:var(--ink);background:var(--gold);border-radius:4px;padding:0 5px;margin-right:2px;white-space:nowrap;vertical-align:1px}
 .ttls{display:flex;flex-wrap:wrap;gap:6px;padding:4px 0 2px} .ttlb{display:flex;flex-direction:column;align-items:flex-start;min-height:44px;padding:5px 11px;line-height:1.25;text-align:left} .ttlb small{font-size:11px;color:var(--muted);font-weight:500} .ttlb.on{border-color:var(--gold);color:var(--gold)}
 .seg3{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0} .seg3 .btn{flex:1 1 0;min-width:0;white-space:normal;line-height:1.25;padding-left:6px;padding-right:6px}
+.seg2{display:inline-flex;gap:6px}
 .shoprow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--line)} .shoprow b{display:block} .shoprow span{display:block;font-size:13px;color:var(--muted)} .shoprow .btn{flex:none} .shoprow .hint{flex:none;margin:0}
 .newsrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:14px;line-height:1.5} .newsrow:first-of-type{border-top:0}
 .newsrow b{color:#fff} .newsrow small{color:var(--muted);white-space:nowrap} .newsrow .btn{flex:none}

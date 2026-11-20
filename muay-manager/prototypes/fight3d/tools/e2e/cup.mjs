@@ -24,7 +24,7 @@ async function player(tag, name) {
   page.on('pageerror', e => errs.push(tag + ' PAGEERROR: ' + e.message));
   await page.route('**/three.min.js', r => r.fulfill({path: THREE, contentType: 'application/javascript'}));
   await page.route('**/fonts.googleapis.com/**', r => r.abort());
-  await page.goto(URL0, {timeout: 120000}).catch(() => {}); await page.waitForFunction("!!window.MUAY && !!document.getElementById('gName')", null, {timeout: 90000});
+  await page.goto(URL0 + (process.env.UI_LANG ? '?lang=' + process.env.UI_LANG : ''), {timeout: 120000}).catch(() => {}); await page.waitForFunction("!!window.MUAY && !!document.getElementById('gName')", null, {timeout: 90000});
   await page.evaluate(n => { document.getElementById('gName').value = n; document.querySelector('[data-act=create]').click(); }, name);
   await page.waitForFunction("!!window.GAME && !!GAME.save() && !!document.querySelector('[data-act=tab][data-v=fight]')", null, {timeout: 30000});
   await page.waitForFunction("!!localStorage.getItem('muaySitePlayer') && !!GAME.uid()", null, {timeout: 30000}); // the player is registered a moment after the page is up
@@ -98,6 +98,10 @@ try {
   await click(B, 'details.pbr summary', 400); ok(await ev(B, "[...document.querySelectorAll('details.pbr [data-act=cupwatch]')].length === 7 && [...document.querySelectorAll('details.pbr [data-act=cupwatch]')].every(b => b.textContent === 'ดูย้อนหลัง')"), 'every bout of the finished cup can be watched again');
   ok(!errs.length, 'no script errors', [...new Set(errs)].slice(0, 5).join(' | '));
 } catch (e) { bad++; console.log('FAILED: ' + String(e && e.stack || e).split('\n').slice(0, 3).join(' ')); }
+if (process.env.UI_LANG) { // the run in another language: the Thai each screen still showed (tools/e2e/lang.mjs explains)
+  const all = new Map(); for (const b of browsers) for (const c of b.contexts()) for (const pg of c.pages()) { const m = await pg.evaluate('JSON.stringify(window.__i18n ? [...window.__i18n.miss.entries()] : [])').catch(() => '[]'); for (const [t, n] of JSON.parse(m)) all.set(t, (all.get(t) || 0) + n); }
+  (await import('node:fs')).writeFileSync(new URL('../../dist/e2e/lang-miss-cup-' + process.env.UI_LANG + '.json', import.meta.url), JSON.stringify([...all.keys()], null, 1)); console.log(process.env.UI_LANG + ': ' + all.size + ' texts on screen without a line');
+}
 for (const b of browsers) await b.close();
 server.kill();
 console.log(bad ? bad + ' of ' + steps + ' checks FAILED' : 'all ' + steps + ' checks passed');
