@@ -7,7 +7,8 @@ export const COLORS = {
   red: ['แดง', 0xc9281f], blue: ['น้ำเงิน', 0x1f55c4], black: ['ดำ', 0x1c1c22], white: ['ขาว', 0xf0f0f2], gold: ['ทอง', 0xe0a52a],
   green: ['เขียว', 0x1f8a4c], purple: ['ม่วง', 0x6b2fb5], pink: ['ชมพู', 0xe0559a], orange: ['ส้ม', 0xe8742a]
 };
-export const PATTERNS = {plain: 'สีพื้น', stripe: 'แถบข้าง', hem: 'ขอบล่าง', zigzag: 'ลายฟันปลา', split: 'สองสี'};
+// the last four are the dear ones (prices in game.js PRICE): not offered when a fighter is made
+export const PATTERNS = {plain: 'สีพื้น', stripe: 'แถบข้าง', hem: 'ขอบล่าง', zigzag: 'ลายฟันปลา', split: 'สองสี', check: 'ตาหมากรุก', tiger: 'ลายเสือ', flame: 'เปลวไฟ', spark: 'ประกายทอง'};
 export const HEADGEAR = {none: 'ไม่มี', mongkol: 'มงคล'}; // worn for the wai kru, taken off before the bell
 export const HAIR = {
   natural: ['สีเดิม', 0], brown: ['น้ำตาล', 0x8a5a2c], blond: ['ทอง', 0xe0bf5a], red: ['แดง', 0xc2301f], silver: ['เงิน', 0xd6d9de],
@@ -305,7 +306,7 @@ export function outfitTexture(model, look) {
   }
   const src = model.pixels.data, out = new ImageData(new Uint8ClampedArray(src), W, H), d = out.data, B = model.body;
   const col = k => { const c = COLORS[k] ? COLORS[k][1] : COLORS.red[1]; return [(c >> 16) & 255, (c >> 8) & 255, c & 255]; };
-  const cS = col(look.shorts), cT = col(look.trim), cG = col(look.gloves), [lo, hi] = model.shortsY, span = Math.max(1, hi - lo);
+  const cS = col(look.shorts), cT = col(look.trim), cG = col(look.gloves), cGold = col('gold'), [lo, hi] = model.shortsY, span = Math.max(1, hi - lo);
   const fx = MAP / W, fy = MAP / H, pat = look.pattern, rope = look.gloves === 'rope';
   const dye = model.hasHair && HAIR[look.hair] && HAIR[look.hair][1] ? HAIR[look.hair][1] : 0, cH = [(dye >> 16) & 255, (dye >> 8) & 255, dye & 255], HM = model.hair, hv = Math.max(.04, model.hairV), sv = model.skinV;
   const tc = SKINS[look.skin] && SKINS[look.skin][1], S0 = model.skinRGB, lim = (v, a, b2) => Math.max(a, Math.min(b2, v));
@@ -343,6 +344,10 @@ export function outfitTexture(model, look) {
         else if (pat === 'hem' && h < .2) c = cT;
         else if (pat === 'zigzag' && h < .2 + .16 * Math.abs(((s * 9) % 1 + 1) % 1 - .5) * 2) c = cT;
         else if (pat === 'split' && s < 0) c = cT;
+        else if (pat === 'check' && (Math.floor(s * 12 + 100) + Math.floor(h * 6)) % 2 === 0) c = cT;
+        else if (pat === 'tiger') { const t = s * 9 + h * 2.2 + .35 * Math.sin(h * 11 + s * 4); if (((t % 1) + 1) % 1 < .26) c = cT; } // wavy slanting stripes
+        else if (pat === 'flame') { const f = (.12 + .5 * Math.pow(Math.abs(Math.sin(s * 26 + h * 5)), 1.4)) * (1 - h * .3); if (h < f * .55) c = cGold; else if (h < f) c = cT; } // tongues of the trim colour up from the hem, gold at the heart
+        else if (pat === 'spark') { const q = Math.sin(o * 12.9898) * 43758.5453; if (h < .12 || q - Math.floor(q) < .07) c = cGold; } // a gold hem and gold flecks all over
       }
       // keep the cloth's shading and sheen: brightness from the original, highlights stay light
       const mx = Math.max(r, g, b), mn = Math.min(r, g, b), sat = (mx - mn) / mx, v = mx / 255;

@@ -105,6 +105,7 @@ const weak = () => save("for (const k in S.stats) S.stats[k] = 22; S.fatigue = 0
 
 // ---- 1. creation
 ok(await ev("document.getElementById('gNews').hidden"), 'the news strip is not shown on the creation screen');
+ok(await has('[data-act=dlook][data-f=pattern][data-v=zigzag]') && !await has('[data-act=dlook][data-f=pattern][data-v=tiger]') && !await has('[data-act=dlook][data-f=pattern][data-v=spark]'), 'the creation screen offers the cheap patterns, not the dear ones');
 await ev("document.getElementById('gName').value = 'ค ว ย จริง'"); await click('[data-act=create]', 600);
 ok(await ev("!GAME.save() && /คำไม่สุภาพ/.test(document.getElementById('gCreateMsg').textContent)"), 'a name with a bad word (even spelled out) is refused, and the screen says why');
 await ev("document.getElementById('gName').value = 'บอทเล่นครบ'");
@@ -292,7 +293,7 @@ await tab('home'); await click('[data-act=sleep]', 900); // a save, so the secon
 
 // ---- 7e. the shop, and the day's skips
 await save('S.money = 400000; S.gym = 5; S.build = []; S.merit = 0; S.fatigue = 60; S.mood = 1; S.slots = 3; S.shopDay = null; S.staff = [];'); await tab('home');
-ok(await ev("document.querySelectorAll('#gBody .shoprow').length") === 7, 'the camp screen has the shop: four buildings, two daily buys, merit', await ev("document.querySelectorAll('#gBody .shoprow').length"));
+ok(await ev("document.querySelectorAll('#gBody .shoprow').length") === 8, 'the camp screen has the shop: four buildings, two daily buys, an extra ranked fight, merit', await ev("document.querySelectorAll('#gBody .shoprow').length"));
 { const f0 = await ev('GAME.save().fame');
   for (const id of ['sauna', 'weights', 'ring', 'shrine']) await click(`[data-act=shop][data-v="build:${id}"]`, 300);
   ok(await ev("GAME.save().build.length === 4 && GAME.save().money === 400000 - 205000 && GAME.save().slots === 4"), 'the four buildings are built and paid for; the training ring gives a fourth session today', await ev("JSON.stringify([GAME.save().build, GAME.save().money, GAME.save().slots])"));
@@ -317,7 +318,7 @@ await ev('GAME.skipLeft()'); await save('S.skip.n = 10; S.fatigue = 0;'); await 
     await click('#gBody [data-act=skip]', 0); ok(await until("!!document.querySelector('#gBody [data-act=home]')", 90000) && await ev('GAME.skipLeft()') === 9, 'a skip counts: nine left'); await click('#gBody [data-act=home]', 1200);
   } else ok(false, 'the fight for the skip check started'); }
 
-// ---- 7f. titles, and the smaller purse for beating much weaker entrants
+// ---- 7f. titles
 await save('S.money = 300000; S.belts = [0]; S.titles = []; S.tag = "";'); await tab('home');
 ok(await ev("document.querySelectorAll('#gShop .ttlb').length") === 11, 'the shop lists eleven titles');
 ok(await ev("(b => b.disabled && /เข็มขัด 2 เส้น/.test(b.innerText))(document.querySelector('[data-act=title][data-v=general]'))"), 'a title that needs two belts is shut while he holds one');
@@ -328,11 +329,20 @@ await tab('rank'); ok(await ev("/จอมเตะ/.test(document.querySelector
 await click('[data-act=title][data-v=mo]', 400); ok(await ev("GAME.save().tag === 'mo' && GAME.save().titles.length === 2 && GAME.save().money === 293000"), 'a second title is bought and worn in its place');
 await click('[data-act=title][data-v=kick]', 400); ok(await ev("GAME.save().tag === 'kick' && GAME.save().money === 293000"), 'one he owns is worn again for nothing');
 await click('[data-act=title][data-v=kick]', 400); ok(await ev("GAME.save().tag === ''"), 'and a tap on the one he wears takes it off');
-await save('S.tour = null; S.tours = {}; S.rp = 1000; S.fatigue = 0; S.mis = {day: S.day, n: {win: 9, ranked: 9, train: 9}}; for (const k in S.stats) S.stats[k] = 95;'); await tab('fight');
-ok(await ev("/อ่อนกว่าคุณมาก เงินรางวัลราว 20%/.test(document.getElementById('gBody').innerText)"), 'the tournament list tells a far stronger fighter the temple fair pays a fifth');
-await click('[data-act=tourjoin][data-v="0"]', 600);
-{ const m0 = await ev('GAME.save().money'); const rr = await fight('u'); const got = await ev('GAME.save().money') - m0;
-  ok(rr && rr.win && got > 0 && got <= Math.round((150 + 80) * .2), 'a win over a much weaker entrant pays a fifth of the purse (full: 150, 230 by knockout)', got + ' · ' + (rr && rr.head)); }
+
+// ---- 7g. dear shorts patterns, and more ranked fights bought for the day
+await save('S.money = 100000; S.own.patterns = S.own.patterns.filter(k => k !== "tiger");'); await tab('dress');
+await click('[data-act=look][data-f=pattern][data-v=tiger]', 800); ok(await has('[data-act=buy]') && await ev("/8,000/.test(document.querySelector('.buy').innerText)"), 'the tiger pattern is tried on, priced ฿ 8,000');
+await click('[data-act=buy]', 800); ok(await ev("GAME.save().own.patterns.includes('tiger') && GAME.save().look.pattern === 'tiger' && GAME.save().money === 92000"), 'and bought: worn and paid for', await ev('GAME.save().money'));
+await save('S.ranked = 0; S.rkBuy = null; S.money = 100000;'); await tab('fight');
+ok(await has('#gBody [data-act=shop][data-v=extra]') && !await has('#gBody [data-act=pick][data-v=r]'), 'no ranked fights left today: the fight menu offers to buy one');
+{ const m = [await ev('GAME.save().money')]; await click('#gBody [data-act=shop][data-v=extra]', 500); m.push(await ev('GAME.save().money'));
+  ok(await ev('GAME.save().ranked') === 1 && await has('#gBody [data-act=pick][data-v=r]'), 'one bought from the fight menu: the ranked fight is there to fight');
+  await tab('home'); for (let i = 0; i < 2; i++) { await click('#gShop [data-act=shop][data-v=extra]', 500); m.push(await ev('GAME.save().money')); }
+  const d = [m[0] - m[1], m[1] - m[2], m[2] - m[3]];
+  ok(d[0] > 0 && d[1] === 2 * d[0] && d[2] === 3 * d[0] && await ev('GAME.save().ranked') === 3, 'two more from the camp shop, each dearer (×1, ×2, ×3): three to fight', d.join(' '));
+  ok(!await has('#gShop [data-act=shop][data-v=extra]') && /ครบ 3 ไฟต์/.test(await ev("document.getElementById('gShop').innerText")), 'no fourth: the shop says the day\'s three are bought'); }
+await save('S.ranked = 2;');
 
 // ---- 7d. a big hall: the ring-card girl between rounds. The last fight of the run.
 await save('S.rp = 1450; S.ranked = 2; S.fatigue = 0;'); await strong();

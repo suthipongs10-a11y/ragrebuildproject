@@ -260,14 +260,10 @@ export const SHOP = {
     {id: 'massage', th: 'นวดแผนไทยเต็มชั่วโมง', base: 200, perLeague: 150, fat: 30, note: 'ความล้า −30 ไม่เสียแรงซ้อม'},
     {id: 'meal', th: 'เลี้ยงข้าวทั้งค่าย', base: 150, perLeague: 120, mood: 1, note: 'อารมณ์ดีขึ้นหนึ่งขั้น'}
   ],
-  merit: {th: 'ทำบุญถวายวัดประจำหมู่บ้าน', base: 500, grow: 1.6, fame: 5, mood: 1}
+  merit: {th: 'ทำบุญถวายวัดประจำหมู่บ้าน', base: 500, grow: 1.6, fame: 5, mood: 1},
+  // more ranked fights today: each one dearer, at most `max` a day (base + perLeague x league) x (bought today + 1)
+  extra: {th: 'ไฟต์จัดอันดับเพิ่ม', base: 400, perLeague: 300, max: 3}
 };
-
-// Beating a much weaker opponent pays less (owner, 20 Nov 2026: a fighter trained far past a tournament's entrants won
-// 106 tournament fights for half a million baht). Only fights against opponents of fixed strength (tournaments, title
-// fights); the others are already matched to the fighter. ratio = his stat total / the opponent's; at or below `from`
-// the full purse and fame, then `slope` less per 1.0 of ratio, never below `min`.
-export const EASY = {from: 1.15, slope: 2, min: .2, kinds: ['tour', 'title']};
 
 // Titles (ฉายา): bought in the camp, shown before the fighter's name in the ranking and the chat. A fixed list: nobody
 // types one, so there is nothing to moderate. need: belts he must hold to buy it. Made-up words, no real fighter's nickname.
