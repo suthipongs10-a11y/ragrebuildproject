@@ -156,10 +156,25 @@ if (existsSync('assets/acts')) {
   const pack = {}; for (const f of readdirSync('assets/acts').filter(f => f.endsWith('.webp'))) pack[f.slice(0, -5)] = 'data:image/webp;base64,' + readFileSync('assets/acts/' + f).toString('base64');
   if (Object.keys(pack).length) { actArt = `<script type="application/json" id="act-art">${JSON.stringify(pack)}</script>`; console.log('activity art', Object.keys(pack).length, (actArt.length / 1048576).toFixed(2) + ' MB (website only)'); }
 }
+// The typefaces (tools/fonts-local.mjs, SIL Open Font License: the licences go along) and three.js are the site's own
+// files: the website asks nothing of Google or a CDN, and the computer app (desktop/) works with no network.
+let fontCss = '';
+if (existsSync('assets/fonts/fonts.json')) {
+  for (const f of JSON.parse(readFileSync('assets/fonts/fonts.json', 'utf8'))) {
+    const b = readFileSync('assets/fonts/' + f.file), name = 'a/' + hash(b) + '.woff2'; writeFileSync('dist/site/' + name, b);
+    fontCss += `@font-face{font-family:'${f.family}';font-style:${f.style};font-weight:${f.weight};font-display:swap;src:url(/${name}) format('woff2');unicode-range:${f.range}}\n`;
+  }
+  for (const f of readdirSync('assets/fonts').filter(f => f.endsWith('.txt'))) writeFileSync('dist/site/' + f, readFileSync('assets/fonts/' + f));
+}
+const FONT_LINK = /<link rel="stylesheet" href="https:\/\/fonts\.googleapis\.com\/[^"]*">\n?/;
+const fontTag = fontCss ? '<style>\n' + fontCss + '</style>\n' : null;
 const assetsHtml = models.join('\n') + voiceFull + uiImages + campArt + actArt, assetsName = 'a/' + hash(assetsHtml) + '.html', appName = 'a/' + hash(jsGame) + '.js';
 writeFileSync('dist/site/' + assetsName, assetsHtml); writeFileSync('dist/site/' + appName, jsGame);
 const THREE_TAG = '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>';
-const siteAssets = {assets: '/' + assetsName, app: '/' + appName, three: THREE_TAG.match(/src="([^"]+)"/)[1],
+const threeVer = THREE_TAG.match(/three\.js\/([\d.]+)\//)[1], threeJs = readFileSync('node_modules/three/build/three.min.js'), threeName = 'a/' + hash(threeJs) + '.js';
+if (JSON.parse(readFileSync('node_modules/three/package.json', 'utf8')).version !== threeVer) throw new Error('node_modules/three is not ' + threeVer + ' (the version the game is written for): npm ci');
+writeFileSync('dist/site/' + threeName, threeJs);
+const siteAssets = {assets: '/' + assetsName, app: '/' + appName, three: '/' + threeName,
   assetsSize: Buffer.byteLength(assetsHtml), appSize: Buffer.byteLength(jsGame), assetsGz: gzipSync(assetsHtml + jsGame).length};
 const appBlock = THREE_TAG + '\n<script>\n/*__APP__*/\n</script>';
 if (!gameBase.includes(appBlock)) throw new Error('page.html: three.js tag and app script block not found');
@@ -173,10 +188,14 @@ if (existsSync('assets/scene-music/tracks.json')) {
   sceneTag = `<script type="application/json" id="scene-music">${JSON.stringify(list)}</script>`;
   console.log('scene music', Object.keys(list).join(','), (bytes / 1048576).toFixed(2) + ' MB (website only, fetched when needed)');
 }
-const shell = gameBase.replace('<!--__MODELS__-->', () => uiCss + sceneTag).replace(appBlock, () => loader);
+const shell = gameBase.replace('<!--__MODELS__-->', () => uiCss + sceneTag).replace(appBlock, () => loader).replace(FONT_LINK, m => fontTag || m);
+if (fontTag && FONT_LINK.test(shell)) throw new Error('the site page still asks Google Fonts');
 writeFileSync('dist/site/index.html', head + shell + '\n</html>\n');
 // the build now on the server: an open game asks for this and loads the new page when its own number is lower
 { const v = /const VER = '([^']+)', BUILD = (\d+);/.exec(readFileSync('src/game.js', 'utf8')); if (!v) throw new Error('src/game.js has no VER / BUILD line'); writeFileSync('dist/site/version.json', JSON.stringify({build: +v[2], ver: v[1]}) + '\n'); }
-for (const f of readdirSync('site')) if (f !== 'loader.html') writeFileSync('dist/site/' + f, readFileSync('site/' + f));
+for (const f of readdirSync('site')) if (f !== 'loader.html') {
+  const b = readFileSync('site/' + f); // the policy pages in the game's typefaces too
+  writeFileSync('dist/site/' + f, fontTag && f.endsWith('.html') ? b.toString('utf8').replace('</head>', () => fontTag + '</head>') : b);
+}
 console.log('site: index.html', (shell.length / 1024).toFixed(0) + ' KB,', assetsName, (siteAssets.assetsSize / 1048576).toFixed(2) + ' MB,', appName, (siteAssets.appSize / 1024).toFixed(0) + ' KB, download ~' + (siteAssets.assetsGz / 1048576).toFixed(1) + ' MB gzip');
 console.log('dist/muay-fight-lab.html with models', (page.length / 1024 / 1024).toFixed(2) + ' MB, dist/muay-manager.html', (game.length / 1024 / 1024).toFixed(2) + ' MB (limit 16)');

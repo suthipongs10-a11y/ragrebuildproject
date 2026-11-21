@@ -2,7 +2,7 @@
 // by tools/deploy-site.mjs: Pages' own file upload signs each request with a short-lived key that the cloud session's
 // network proxy replaces, so the site is deployed with Functions only. Locally (wrangler pages dev) they are plain
 // static files and next() serves them. /api/* is handled by functions/api/[[route]].js.
-const TYPES = {html: 'text/html; charset=utf-8', png: 'image/png', webmanifest: 'application/manifest+json', json: 'application/json', js: 'text/javascript', css: 'text/css', webp: 'image/webp', jpg: 'image/jpeg', mp3: 'audio/mpeg', svg: 'image/svg+xml', txt: 'text/plain; charset=utf-8'};
+const TYPES = {woff2: 'font/woff2', html: 'text/html; charset=utf-8', png: 'image/png', webmanifest: 'application/manifest+json', json: 'application/json', js: 'text/javascript', css: 'text/css', webp: 'image/webp', jpg: 'image/jpeg', mp3: 'audio/mpeg', svg: 'image/svg+xml', txt: 'text/plain; charset=utf-8'};
 
 export async function onRequest({request, env, next}) {
   if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('method not allowed', {status: 405});

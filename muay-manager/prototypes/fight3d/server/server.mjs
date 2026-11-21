@@ -20,7 +20,7 @@ mkdirSync(dirname(DB_FILE), {recursive: true});
 const db = openDb(DB_FILE), env = {DB: db, CUP_EVERY: process.env.MUAY_CUP_EVERY, CUP_ANCHOR: process.env.MUAY_CUP_ANCHOR, CUP_LEAD: process.env.MUAY_CUP_LEAD, CUP_GAP: process.env.MUAY_CUP_GAP}; // MUAY_CUP_*: another schedule for the players' cup (tests)
 
 // ---- the game's files
-const TYPES = {html: 'text/html; charset=utf-8', js: 'text/javascript; charset=utf-8', css: 'text/css; charset=utf-8', json: 'application/json', webmanifest: 'application/manifest+json',
+const TYPES = {woff2: 'font/woff2', html: 'text/html; charset=utf-8', js: 'text/javascript; charset=utf-8', css: 'text/css; charset=utf-8', json: 'application/json', webmanifest: 'application/manifest+json',
   png: 'image/png', jpg: 'image/jpeg', webp: 'image/webp', svg: 'image/svg+xml', mp3: 'audio/mpeg', ico: 'image/x-icon', txt: 'text/plain; charset=utf-8', glb: 'model/gltf-binary'};
 const SQUEEZE = new Set(['html', 'js', 'css', 'json', 'webmanifest', 'svg', 'txt']), SQUEEZE_MAX = 4e6; // the big page in a/ is packed data already: gzip gains little there
 const packed = new Map(); // path -> {tag, body}: small text files, gzipped once

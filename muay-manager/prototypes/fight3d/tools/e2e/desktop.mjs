@@ -26,9 +26,11 @@ const ok = (c, what, got) => { steps++; if (!c) bad++; console.log(T(), (c ? 'ok
 const errs = [];
 // a Linux container runs as root and has no graphics card: Chromium's sandbox off, WebGL in software
 const ARGS = ['--no-sandbox', '--use-gl=angle', '--use-angle=swiftshader', '--server=' + SERVER, '--user-data=' + S + 'profile'];
-async function open(tag) {
-  const app = await _electron.launch({executablePath: EXE, args: ARGS, env: {...process.env, DISPLAY: display}, timeout: 60000});
+const asked = new Set(); // every host the app's page asked for something
+async function open(tag, extra) {
+  const app = await _electron.launch({executablePath: EXE, args: extra ? ARGS.filter(a => !a.startsWith('--server=')).concat(extra) : ARGS, env: {...process.env, DISPLAY: display}, timeout: 60000});
   const page = await app.firstWindow();
+  page.on('request', r => { try { const u = new URL(r.url()); asked.add(u.protocol === 'muay:' ? 'muay://' + u.host : u.host); } catch (e) { /* data: and the like */ } });
   page.on('pageerror', e => errs.push(tag + ': ' + e.message));
   page.on('console', m => { if (m.type() === 'error' && !/fonts\.g|Failed to load resource/.test(m.text())) errs.push(tag + ' console: ' + m.text()); });
   await page.waitForFunction("!!window.MUAY && !!document.querySelector('#gBody h2')", null, {timeout: 90000});
@@ -48,6 +50,8 @@ try {
   ok(JSON.stringify(files) === '[200,200,404,404]', 'the game\'s files are served, and nothing outside them', files.join(' '));
   const music = await page.evaluate("(() => { const u = [...document.scripts].map(s => s.textContent).join(' ').match(/\\/a\\/[0-9a-f]{16}\\.mp3/); return u ? fetch(u[0]).then(r => r.status + ' ' + r.headers.get('content-type')) : 'no music in this build'; })()");
   ok(/^200 audio\//.test(music) || music === 'no music in this build', 'the music files play from inside the app', music);
+  const fonts = await page.evaluate("document.fonts.ready.then(() => [...document.fonts].filter(f => f.status === 'loaded').map(f => f.family.replace(/[\\x22']/g, '') + ' ' + f.weight))");
+  ok(fonts.some(f => /Chakra Petch/.test(f)) && fonts.some(f => /Bai Jamjuree/.test(f)), 'the game\'s typefaces load from inside the app', [...new Set(fonts)].join(', '));
   // a fighter, then online
   await page.evaluate(`document.getElementById('gName').value = ${JSON.stringify(NAME)}; document.querySelector('[data-act=create]').click()`);
   ok(await page.waitForFunction("!!document.querySelector('[data-act=tab]')", null, {timeout: 30000}).then(() => true, () => false), 'a fighter is made and the camp opens');
@@ -80,6 +84,13 @@ try {
   ok(quit && (await app.windows()).length === 1, 'starting it again does not open a second game');
   ok(errs.length === 0, 'no script errors on the second run', errs.slice(0, 3).join(' | '));
   await page.screenshot({path: S + 'desktop.png'}).catch(() => {});
+  await app.close();
+  const outside = [...asked].filter(h => h !== 'muay://game' && h !== new URL(SERVER).host);
+  ok(outside.length === 0, 'everything the game loads comes with the app (no Google Fonts, no CDN)', outside.join(' ') || [...asked].join(' '));
+  // ---- 4. no network at all: the game still opens, from the save, in its own typefaces
+  ({app, page} = await open('offline', ['--server=http://127.0.0.1:9', '--proxy-server=http://127.0.0.1:9']));
+  const off = await page.evaluate("document.fonts.ready.then(() => [!!window.THREE, !!document.querySelector('[data-act=tab]'), (GAME.save() || {}).name, [...document.fonts].some(f => /Chakra/.test(f.family) && f.status === 'loaded')])");
+  ok(off[0] && off[1] && off[2] === NAME && off[3], 'with no network the game opens from the save, 3D and fonts included', JSON.stringify(off));
   await app.close();
 } catch (e) { ok(false, 'the run stopped: ' + e.message.split('\n')[0]); }
 finally { for (const k of kids) k.kill(); }
