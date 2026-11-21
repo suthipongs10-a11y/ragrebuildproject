@@ -107,7 +107,14 @@ await page.addInitScript(CLOCK);
 await page.route('**/three.min.js', r => r.fulfill({path: ROOT + 'node_modules/three/build/three.min.js', contentType: 'application/javascript'}));
 await page.route('https://fonts.googleapis.com/**', r => r.fulfill({body: fontCss, contentType: 'text/css'}));
 await page.route('http://lab.test/fonts/*', r => r.fulfill({path: ROOT + 'assets/fonts/' + r.request().url().split('/').pop(), contentType: 'font/woff2'}));
-await page.route('http://lab.test/', r => r.fulfill({path: ROOT + 'dist/muay-fight-lab.html', contentType: 'text/html; charset=utf-8'}));
+// The two recorded ring tracks (assets/music) have no known source or licence yet (STATUS.md round 34): never in a clip.
+// Without them the game plays its own pipe and drums, made in code. A check below makes sure no recording longer than
+// the longest sound effect ever starts.
+const MUSIC_PACK = /<script type="application\/json" id="music-pack">[\s\S]*?<\/script>/;
+const labHtml = readFileSync(ROOT + 'dist/muay-fight-lab.html', 'utf8');
+if (!MUSIC_PACK.test(labHtml)) console.log('(the page has no recorded music to take out)');
+await page.route('http://lab.test/', r => r.fulfill({body: labHtml.replace(MUSIC_PACK, ''), contentType: 'text/html; charset=utf-8'}));
+await page.addInitScript(() => { window.__long = []; const go = AudioBufferSourceNode.prototype.start; AudioBufferSourceNode.prototype.start = function (...a) { if (this.buffer && this.buffer.duration > 20) window.__long.push(+this.buffer.duration.toFixed(1)); return go.apply(this, a); }; });
 const ev = js => page.evaluate(js), step = ms => ev(`__clip.step(${ms})`);
 // Chromium's own capture: Playwright's screenshot waits for an animation frame, which the page's clock holds back
 const cdp = await page.context().newCDPSession(page);
@@ -149,8 +156,9 @@ while (n < MAX * FPS) {
 console.log('');
 if (endAt == null) await ev('__overlay.end()');
 const tEnd = t0 + n * dt;
-const wav = await ev(`__clip.wav(${t0}, ${tEnd})`);
+const wav = await ev(`__clip.wav(${t0}, ${tEnd})`), long = await ev('window.__long');
 await browser.close();
+if (long.length) throw new Error('a long recording played (music with unknown rights?): ' + long.join(', ') + ' s');
 if (errs.length) console.log('page errors:', errs.slice(0, 3).join(' | '));
 if (!wav) throw new Error('no sound: the game did not open its AudioContext');
 writeFileSync(OUT + NAME + '.wav', Buffer.from(wav, 'base64'));
