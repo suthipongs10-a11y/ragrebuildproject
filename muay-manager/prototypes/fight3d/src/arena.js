@@ -120,17 +120,137 @@ function fanBannerTex(big, small, hue) {
     c.fillStyle = '#fff8e6'; c.fillText(big, w / 2, y);
   });
 }
+// ---------- the crowd ----------
+// People as a handful of instanced parts, one draw call each however big the crowd: a torso in a shirt (a whole figure
+// where they stand), head and neck, hair or a cap, now and then a pha khao ma over the shoulders, and two arms that always
+// show: hands on the knees, arms folded or clasped, or a phone held up to film the fight (its light shows from the ring).
+// Everyone faces the ring. The rows farther back sit in less light, the way a broadcast shows a crowd.
+const CROWD_SKIN = [0x6e4a32, 0x7a5236, 0x86603f, 0x936a48, 0x5e3e2a, 0x9c7454];
+const CROWD_HAIR = [0x0e0c0b, 0x12100e, 0x18130f, 0x1e1712, 0x0e0c0b, 0x4e4a46];
+const CROWD_HAT = [0xb02a22, 0xe2e0da, 0x18191f, 0x284a92, 0xd09a26];
+const CROWD_CLOTH = [0x3a6ab8, 0xc03a30, 0x3a8a52, 0x8a4a9a, 0xd09a26];
+// a few geometries as one (positions, normals, uvs, colours; a part without colours counts as white)
+function mergeGeo(list) {
+  const parts = list.map(g => (g.index ? g.toNonIndexed() : g)), n = parts.reduce((a, g) => a + g.attributes.position.count, 0);
+  const pos = new Float32Array(n * 3), nor = new Float32Array(n * 3), uv = new Float32Array(n * 2), col = new Float32Array(n * 3).fill(1);
+  let o = 0;
+  for (const g of parts) {
+    const c = g.attributes.position.count; pos.set(g.attributes.position.array, o * 3); nor.set(g.attributes.normal.array, o * 3);
+    if (g.attributes.uv) uv.set(g.attributes.uv.array, o * 2); if (g.attributes.color) col.set(g.attributes.color.array, o * 3); o += c;
+  }
+  const out = new THREE.BufferGeometry();
+  out.setAttribute('position', new THREE.BufferAttribute(pos, 3)); out.setAttribute('normal', new THREE.BufferAttribute(nor, 3));
+  out.setAttribute('uv', new THREE.BufferAttribute(uv, 2)); out.setAttribute('color', new THREE.BufferAttribute(col, 3)); return out;
+}
+const tint = (g, k) => { const c = new Float32Array(g.attributes.position.count * 3).fill(k); g.setAttribute('color', new THREE.BufferAttribute(c, 3)); return g; };
+let crowdGeos = null;
+function crowdParts() {
+  if (crowdGeos) return crowdGeos;
+  // seated, from the bench up (origin on the bench, facing +z): torso with shoulders, the thighs in darker trousers
+  const prof = [[.14, 0], [.16, .08], [.155, .24], [.19, .4], [.205, .49], [.17, .55], [.08, .6], [.06, .62]].map(p => new THREE.Vector2(p[0], p[1]));
+  const torso = new THREE.LatheGeometry(prof, 7); torso.scale(1, 1, .62);
+  const lap = new THREE.BoxGeometry(.3, .13, .4); lap.translate(0, .04, .2);
+  const neck = new THREE.CylinderGeometry(.05, .058, .12, 5, 1, true); neck.translate(0, .66, 0); neck.deleteAttribute('uv'); // plain skin: the face is drawn on the head only
+  const head = new THREE.SphereGeometry(.112, 8, 6); head.scale(1, 1.12, 1.04); head.translate(0, .79, .01);
+  const hair = new THREE.SphereGeometry(.12, 8, 4, 0, Math.PI * 2, 0, Math.PI * .6); hair.rotateX(-.68); hair.scale(1, 1.1, 1.06); hair.translate(0, .8, -.008); // the hairline high on the forehead, down to the nape behind
+  const dome = new THREE.SphereGeometry(.123, 8, 3, 0, Math.PI * 2, 0, Math.PI * .5); dome.translate(0, .82, 0);
+  const brim = new THREE.CylinderGeometry(.1, .1, .012, 6, 1, false, -Math.PI / 2, Math.PI); brim.scale(1, 1, 1.25); brim.translate(0, .825, .07);
+  const drape = new THREE.BoxGeometry(.4, .03, .13); drape.translate(0, .565, 0);
+  const endL = new THREE.BoxGeometry(.075, .28, .02); endL.translate(-.1, .43, .085); const endR = endL.clone(); endR.translate(.2, 0, 0);
+  const arm = new THREE.CylinderGeometry(.058, .055, .44, 5, 2, false); arm.translate(0, .22, 0); // ends in a fist
+  const phone = new THREE.BoxGeometry(.065, .12, .014);
+  crowdGeos = {seated: mergeGeo([torso, tint(lap, .32)]), standing: figureGeo(), head: mergeGeo([neck, head]), hair, hat: mergeGeo([dome, brim]),
+    towel: mergeGeo([drape, endL, endR]), arm, phone, lamp: new THREE.SphereGeometry(.014, 5, 3)};
+  return crowdGeos;
+}
+// a face every head shares, tinted by its skin: brows, eyes and a mouth on the front of the sphere (u .25 faces +z)
+let faceMap = null;
+const faceTex = () => faceMap || (faceMap = canvasTex(64, 32, (c, w, h) => {
+  c.fillStyle = '#fff'; c.fillRect(0, 0, w, h); c.fillStyle = 'rgba(20,12,8,.85)';
+  for (const sx of [-1, 1]) { const x = 16 + sx * 3.4; c.fillRect(x - 1.6, 11.2, 3.2, 1); c.beginPath(); c.ellipse(x, 14.2, 1.05, .8, 0, 0, Math.PI * 2); c.fill(); }
+  c.fillStyle = 'rgba(70,30,24,.6)'; c.fillRect(14.2, 19.4, 3.6, .9);
+}));
+// a small check (pha khao ma) every towel shares; each is tinted its own colour
+let checkTex = null;
+const towelTex = () => checkTex || (checkTex = canvasTex(32, 32, (c, w, h) => {
+  c.fillStyle = '#fff'; c.fillRect(0, 0, w, h); c.fillStyle = 'rgba(0,0,0,.38)';
+  for (let i = 0; i < 4; i++) { c.fillRect(i * 8, 0, 4, h); c.fillRect(0, i * 8, w, 4); }
+}));
 function crowd(V, seats, shirts, skins, bare) {
-  const afoot = seats.some(s => s.stand != null);
-  const bodies = new THREE.InstancedMesh(afoot ? figureGeo() : new THREE.CapsuleGeometry(.2, .32, 3, 6), std({roughness: 1, vertexColors: afoot}), seats.length), heads = new THREE.InstancedMesh(new THREE.SphereGeometry(.13, 8, 6), std({roughness: 1}), seats.length);
-  const col = new THREE.Color();
-  seats.forEach((s, i) => { const skin = skins[i % skins.length]; bodies.setColorAt(i, col.setHex(bare && s.hue < bare ? skin : shirts[Math.floor(s.hue * shirts.length) % shirts.length])); heads.setColorAt(i, col.setHex(skin)); });
-  // two arms each, shown only while that person is cheering
-  const armGeo = new THREE.CylinderGeometry(.035, .045, .46, 5); armGeo.translate(0, .23, 0);
-  const arms = new THREE.InstancedMesh(armGeo, std({roughness: 1}), seats.length * 2), zero = new THREE.Matrix4().makeScale(0, 0, 0);
-  seats.forEach((s, i) => { s.th = .4 + rng() * .85; s.e = 0; col.setHex(skins[i % skins.length]); arms.setColorAt(i * 2, col); arms.setColorAt(i * 2 + 1, col); arms.setMatrixAt(i * 2, zero); arms.setMatrixAt(i * 2 + 1, zero); });
-  bodies.frustumCulled = heads.frustumCulled = arms.frustumCulled = false;
-  V.group.add(bodies, heads, arms); V.seats = seats; V.bodies = bodies; V.heads = heads; V.arms = arms; V.afoot = afoot; V.placed = false;
+  const afoot = seats.some(s => s.stand != null), G = crowdParts(), n = seats.length, col = new THREE.Color();
+  const dIn = afoot ? 4.7 : 7.6, fall = afoot ? .05 : .042, near = afoot ? .9 : .8;
+  seats.forEach(s => { // who wears what, and how he sits
+    const r = rng(), r2 = rng();
+    s.fy = Math.atan2(-s.x, -s.z) + (rng() - .5) * .3; // facing the ring, give or take
+    s.lit = Math.max(afoot ? .55 : .4, Math.min(near, near - (Math.hypot(s.x, s.z) - dIn) * fall)); // under the ring's light, the farther the darker
+    s.pose = r < .5 ? 'rest' : r < .72 ? 'fold' : r < .86 ? 'clasp' : r < .95 ? 'phone' : 'rest';
+    s.hat = r2 < .13; s.towel = r2 > .84; s.bald = !s.hat && r2 > .8 && r2 < .84; s.wide = .92 + rng() * .2;
+    s.skin = CROWD_SKIN[Math.floor(rng() * CROWD_SKIN.length)]; s.hairC = CROWD_HAIR[Math.floor(rng() * CROWD_HAIR.length)];
+    s.th = .4 + rng() * .85; s.e = 0;
+  });
+  // a part only some people have gets as many instances as there are such people (s.hatI and so on: whose is which)
+  const some = (k, f) => { let c = 0; seats.forEach(s => { s[k] = f(s) ? c++ : -1; }); return c; };
+  const nHat = some('hatI', s => s.hat), nHair = some('hairI', s => !s.hat && !s.bald), nTowel = some('towelI', s => s.towel), nPhone = some('phoneI', s => s.pose === 'phone');
+  const inst = (geo, mat, count) => { const m = new THREE.InstancedMesh(geo, mat, Math.max(1, count)); m.count = count; m.frustumCulled = false; V.group.add(m); return m; };
+  const P = {
+    body: inst(afoot ? G.standing : G.seated, std({roughness: 1, vertexColors: true}), n), head: inst(G.head, std({roughness: .95, map: faceTex()}), n),
+    hair: inst(G.hair, std({roughness: 1}), nHair), hat: inst(G.hat, std({roughness: .9}), nHat), towel: inst(G.towel, std({roughness: 1, map: towelTex()}), nTowel),
+    arms: inst(G.arm, std({roughness: .95}), n * 2), phone: inst(G.phone, std({color: 0x141418, roughness: .5}), nPhone), lamp: inst(G.lamp, basic({color: 0xfff6e0, fog: false}), nPhone)
+  };
+  seats.forEach((s, i) => {
+    const tone = c => col.setHex(c).multiplyScalar(s.lit), bareChest = bare && s.hue < bare;
+    P.body.setColorAt(i, tone(bareChest ? s.skin : shirts[Math.floor(s.hue * shirts.length) % shirts.length]));
+    P.head.setColorAt(i, tone(s.skin)); P.arms.setColorAt(i * 2, tone(s.skin)); P.arms.setColorAt(i * 2 + 1, tone(s.skin));
+    if (s.hairI >= 0) P.hair.setColorAt(s.hairI, tone(s.hairC)); if (s.hatI >= 0) P.hat.setColorAt(s.hatI, tone(CROWD_HAT[i % CROWD_HAT.length]));
+    if (s.towelI >= 0) P.towel.setColorAt(s.towelI, tone(CROWD_CLOTH[i % CROWD_CLOTH.length]));
+  });
+  V.seats = seats; V.crowd = P; V.afoot = afoot; V.placed = false;
+}
+// where each arm points (in the person's own frame: x to his left hand side, y up, z toward the ring)
+const ARM_POSE = {
+  rest: [[.1, -.82, .56], [-.1, -.82, .56]], fold: [[.72, -.22, .62], [-.7, -.16, .66]], clasp: [[.45, -.5, .72], [-.45, -.5, .72]],
+  phone: [[.1, -.82, .56], [-.12, .5, .86]]
+};
+const _q = new THREE.Quaternion(), _v = new THREE.Vector3(), _u = new THREE.Vector3(), _up = new THREE.Vector3(0, 1, 0), _m = new THREE.Matrix4(), _s = new THREE.Vector3();
+// The crowd sits still. When the fight heats up the keener people get to their feet and throw their arms up, more of them
+// the hotter it gets, and they settle again as it cools. Only those moving are worked out again each frame.
+function crowdUpdate(V, time, hype, dt) {
+  const seats = V.seats, P = V.crowd; let moved = false;
+  for (let i = 0; i < seats.length; i++) {
+    const s = seats[i], want = hype > s.th ? 1 : 0;
+    if (V.placed && s.e === want && !want) continue;
+    s.e += (want - s.e) * Math.min(1, dt * (want ? 6 : 1.8)); if (Math.abs(want - s.e) < .01) s.e = want;
+    const e = s.e, hop = e * Math.abs(Math.sin(time * 5.5 + s.ph)) * .05, sc = s.s, cy = Math.cos(s.fy), sy = Math.sin(s.fy);
+    _q.setFromAxisAngle(_up, s.fy);
+    let base; // where the seated parts' origin is (on the bench; for those on their feet, so that the head sits on the figure)
+    if (V.afoot) {
+      const k = s.stand ? 1 : .6 + .4 * e;
+      _m.compose(_v.set(s.x, s.y + hop, s.z), _q, _s.set(sc * s.wide, sc * k, sc)); P.body.setMatrixAt(i, _m);
+      base = s.y + (1.6 * k - .79) * sc + hop;
+    } else {
+      base = s.y + .05 + e * .22 * sc + hop;
+      _m.compose(_v.set(s.x, base, s.z), _q, _s.set(sc * s.wide, sc, sc)); P.body.setMatrixAt(i, _m);
+    }
+    _m.compose(_v.set(s.x, base, s.z), _q, _s.setScalar(sc));
+    P.head.setMatrixAt(i, _m); if (s.hatI >= 0) P.hat.setMatrixAt(s.hatI, _m); if (s.hairI >= 0) P.hair.setMatrixAt(s.hairI, _m); if (s.towelI >= 0) P.towel.setMatrixAt(s.towelI, _m);
+    const pose = ARM_POSE[s.pose];
+    for (let a = 0; a < 2; a++) {
+      const sg = a ? -1 : 1, lx = sg * .19 * s.wide, ly = .53; // the shoulder
+      const b = pose[a], sway = Math.sin(time * 7 + s.ph + a) * .3;
+      _u.set(b[0] + (sg * .25 + sway - b[0]) * e, b[1] + (1 - b[1]) * e, b[2] + (.12 - b[2]) * e).normalize(); // toward arms up as he cheers
+      _u.set(_u.x * cy + _u.z * sy, _u.y, -_u.x * sy + _u.z * cy);
+      const wx = s.x + (lx * cy) * sc, wz = s.z + (-lx * sy) * sc, wy = base + ly * sc;
+      _m.compose(_v.set(wx, wy, wz), new THREE.Quaternion().setFromUnitVectors(_up, _u), _s.setScalar(sc)); P.arms.setMatrixAt(i * 2 + a, _m);
+      if (a === 1 && s.phoneI >= 0) { // the phone at the raised hand, its back (and its light) toward the ring
+        const hx = wx + _u.x * .43 * sc, hy = wy + _u.y * .43 * sc, hz = wz + _u.z * .43 * sc;
+        _m.compose(_v.set(hx + sy * .02, hy + .05 * sc, hz + cy * .02), _q, _s.setScalar(sc)); P.phone.setMatrixAt(s.phoneI, _m);
+        _m.compose(_v.set(hx + sy * .03, hy + .09 * sc, hz + cy * .03), _q, _s.setScalar(sc)); P.lamp.setMatrixAt(s.phoneI, _m);
+      }
+    }
+    moved = true;
+  }
+  if (moved) for (const k in P) P[k].instanceMatrix.needsUpdate = true;
+  V.placed = true;
 }
 // raked seating on all four sides
 function tierSeats(rows) {
@@ -220,7 +340,7 @@ function indoor(c) {
   const V = newVenue(); const g = V.group;
   ringParts(V, {mat: matTex(c.mat), apron: apronTex(c.apron), ground: -.95, posts: {col: 0x30323c, r: .07, h: 1.5, metal: 1}, pads: [0xd9342b, 0xcdd6e4, 0x2f6fe0, 0xcdd6e4], ropeY: [.42, .72, 1.02, 1.32], ropeCols: c.ropes, ropeR: .022});
   put(g, new THREE.PlaneGeometry(80, 80), std({color: c.floor || 0x0b0c12, roughness: 1}), 0, -.95, 0, -Math.PI / 2);
-  crowd(V, tierSeats(c.rows), c.shirts || [0x1a1f2c, 0x241c28, 0x162226, 0x28211c, 0x1f2127, 0x2e1b1b, 0x1a2434], [0x4a3425, 0x533b2a, 0x5e4430]);
+  crowd(V, tierSeats(c.rows), c.shirts || [0xd8d6d0, 0xe6e4de, 0x1c1c22, 0x2a2c34, 0xa8261e, 0xc99a22, 0x2a4c9e, 0x6a96c8, 0x2f7244, 0xc0642a, 0x80858f, 0x3a3f68, 0xb85a74, 0x5a3e2a], [0x4a3425, 0x533b2a, 0x5e4430]);
   // light rig: truss with lamps, visible beams
   const truss = new THREE.Group(); truss.position.y = 6.2; g.add(truss);
   const lampMat = basic({color: 0xfff2d0});
@@ -245,7 +365,7 @@ const champ = () => indoor({rows: 12, ropes: [0xe2b33c, 0x18181c, 0xe2b33c, 0x18
   lamps: [[-2.2, -2.2], [2.2, -2.2], [-2.2, 2.2], [2.2, 2.2], [0, 0], [-4.4, -3.4], [4.4, -3.4], [0, -4.4]],
   mat: {base: '#17181d', dark: '0,0,0', ring: 'rgba(226,179,60,.9)', fill: 'rgba(226,179,60,.1)', ink: 'rgba(238,196,84,.95)', t1: 'ศึกชิงแชมป์', t2: 'มวยไทย', size: 70, border: 'rgba(226,179,60,.75)'},
   apron: {bg: '#101013', fg: 'rgba(238,196,84,.95)', text: 'ศึกชิงแชมป์', size: 50},
-  shirts: [0x1a1f2c, 0x2a2030, 0x162226, 0x30261c, 0x1f2127, 0x3a1e1e, 0x1a2434, 0x3a3320],
+  shirts: [0x1c1c22, 0xd8d6d0, 0x24262e, 0xb8942e, 0xa8261e, 0x2a4c9e, 0xe6e4de, 0x3a3320, 0x7e1c1c, 0x46484f],
   extra(V) {
     const screen = canvasTex(1024, 256, (g, w, h) => { const gr = g.createLinearGradient(0, 0, w, 0); gr.addColorStop(0, '#2a1a05'); gr.addColorStop(.5, '#7a5512'); gr.addColorStop(1, '#2a1a05'); g.fillStyle = gr; g.fillRect(0, 0, w, h); g.fillStyle = '#ffe9a8'; g.font = 'italic 800 120px "Chakra Petch", sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('ศึกชิงแชมป์มวยไทย', w / 2, h / 2 + 6); g.strokeStyle = '#ffd35a'; g.lineWidth = 8; g.strokeRect(8, 8, w - 16, h - 16); });
     const sm = basic({map: screen, fog: false});
@@ -261,7 +381,7 @@ const champ = () => indoor({rows: 12, ropes: [0xe2b33c, 0x18181c, 0xe2b33c, 0x18
 const province = () => indoor({rows: 4, ropes: [0xe9e9ee, 0xd9342b, 0xe9e9ee, 0x2f6fe0], beamCols: [0xfff0c8], lamps: [[-1.6, 0], [1.6, 0]], floor: 0x23201c,
   mat: {base: '#3f7f96', dark: '10,40,50', ring: 'rgba(255,255,255,.7)', ink: 'rgba(255,255,255,.85)', t1: 'ศึกมวยไทย', t2: 'เวทีจังหวัด', size: 70, border: 'rgba(200,40,30,.6)'},
   apron: {bg: '#e6dcc2', fg: 'rgba(170,30,25,.95)', text: 'ศึกมวยไทย', size: 50},
-  shirts: [0x2a3040, 0x3a2a2a, 0x24382e, 0x40382a, 0x2c2c34, 0x4a2626, 0x26364a, 0x4a4030],
+  shirts: [0x6a96c8, 0xd8d6d0, 0xa8261e, 0x2f7244, 0xc99a22, 0x7a5a3a, 0x80858f, 0xc0642a, 0x2a4c9e, 0x5a6a3a],
   extra(V) {
     const g = V.group, D = 12.6;
     const board = canvasTex(1024, 256, (c, w, h) => { c.fillStyle = '#17383c'; c.fillRect(0, 0, w, h); const cols = ['#c9a23a', '#b23a2e', '#e6dcc2', '#2d6f8f'], words = ['มวยไทย', 'ศึกวันศุกร์', 'ค่ายมวย', 'ชกทุกนัด']; for (let i = 0; i < 4; i++) { c.fillStyle = cols[i]; c.fillRect(20 + i * 252, 40, 228, 150); c.fillStyle = i === 2 ? '#7c1f1a' : '#fff'; c.font = '700 44px "Chakra Petch", sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(words[i], 134 + i * 252, 116); } });
@@ -718,37 +838,7 @@ export function buildArena(scene) {
     if (V.anim) V.anim(time, hype, dt);
     if (V.flicker !== 1) A.rimR.intensity = A.rimB.intensity = rimBase * V.flicker;
     const seats = V.seats;
-    if (seats) {
-      // The crowd stays still. When the fight heats up the keener people get to their feet and throw their arms up,
-      // more of them the hotter it gets, and they settle again as it cools.
-      let moved = false;
-      for (let i = 0; i < seats.length; i++) {
-        const s = seats[i], want = hype > s.th ? 1 : 0;
-        if (V.placed && s.e === want && !want) continue;
-        s.e += (want - s.e) * Math.min(1, dt * (want ? 6 : 1.8)); if (Math.abs(want - s.e) < .01) s.e = want;
-        const e = s.e, hop = e * Math.abs(Math.sin(time * 5.5 + s.ph)) * .05;
-        let sh; // shoulder height
-        if (V.afoot) { // on their feet, or squatting in the front rows and rising
-          const k = s.stand ? 1 : .6 + .4 * e;
-          dummy.position.set(s.x, s.y + hop, s.z); dummy.rotation.set(0, s.ry, 0); dummy.scale.set(s.s, s.s * k, s.s); dummy.updateMatrix(); V.bodies.setMatrixAt(i, dummy.matrix);
-          dummy.position.y = s.y + 1.6 * s.s * k + hop; dummy.rotation.set(0, 0, 0); dummy.scale.setScalar(s.s * .92); dummy.updateMatrix(); V.heads.setMatrixAt(i, dummy.matrix);
-          sh = s.y + 1.3 * s.s * k + hop;
-        } else { // seated: gets up off the bench
-          const up = e * .24;
-          dummy.position.set(s.x, s.y + .3 + up + hop, s.z); dummy.rotation.set(0, 0, 0); dummy.scale.set(s.s, s.s * (1 + e * .4), s.s); dummy.updateMatrix(); V.bodies.setMatrixAt(i, dummy.matrix);
-          dummy.position.y += (.42 + e * .12) * s.s; dummy.scale.setScalar(s.s); dummy.updateMatrix(); V.heads.setMatrixAt(i, dummy.matrix);
-          sh = s.y + .44 + up + hop + e * .1;
-        }
-        for (let a = 0; a < 2; a++) {
-          const sg = a ? 1 : -1, tilt = sg * (.42 + Math.sin(time * 7 + s.ph + a) * .16);
-          dummy.position.set(s.x + s.ax * sg * .17 * s.s, sh, s.z + (1 - s.ax) * sg * .17 * s.s); dummy.rotation.set(s.ax ? 0 : tilt, 0, s.ax ? -tilt : 0); dummy.scale.set(e, e * s.s, e); dummy.updateMatrix(); V.arms.setMatrixAt(i * 2 + a, dummy.matrix);
-        }
-        moved = true;
-      }
-      dummy.rotation.set(0, 0, 0);
-      if (moved) { V.bodies.instanceMatrix.needsUpdate = true; V.heads.instanceMatrix.needsUpdate = true; V.arms.instanceMatrix.needsUpdate = true; }
-      V.placed = true;
-    }
+    if (seats) crowdUpdate(V, time, hype, dt);
     for (const f of A.flashes) {
       f.t -= dt;
       if (seats && V.flashRate && f.t <= 0 && Math.random() < dt * (0.15 + hype * 5) * V.flashRate) { const s = seats[Math.floor(Math.random() * seats.length)]; f.sp.position.set(s.x, s.y + (V.afoot ? 1.5 : .8), s.z); f.t = .12; }
