@@ -55,7 +55,7 @@ const logo = 'data:image/webp;base64,' + readFileSync(ROOT + 'assets/ui/logo.web
 const OVERLAY = `(() => {
   const st = document.createElement('style'); st.textContent = \`
     #btnFull,#fps,#replayTag{opacity:0!important;pointer-events:none}
-    #clipCap{position:fixed;left:50%;top:112px;transform:translateX(-50%);z-index:2147483000;width:max-content;max-width:88%;padding:9px 18px 10px;border-radius:16px;background:rgba(10,10,14,.8);
+    #clipCap{position:fixed;left:50%;top:64px;transform:translateX(-50%);z-index:2147483000;width:max-content;max-width:88%;padding:9px 18px 10px;border-radius:16px;background:rgba(10,10,14,.8);
       border:2px solid #f2b83a;box-shadow:0 6px 18px rgba(0,0,0,.55);text-align:center;pointer-events:none;animation:capIn .32s cubic-bezier(.2,1.5,.4,1) both}
     #arena.full #clipCap{position:absolute}
     #clipCap b{display:block;font:italic 700 29px/1.05 'Chakra Petch',sans-serif;color:#fff;letter-spacing:.01em}
@@ -155,12 +155,12 @@ await cap('CREATE YOUR FIGHTER', 'สร้างนักมวยของค�
 for (const [f, v] of [['shorts', 'blue'], ['gloves', 'white'], ['band', 'red']]) await tap(`[data-act=dlook][data-f=${f}][data-v=${v}]`, .55);
 await ev("document.getElementById('gName').scrollIntoView({block: 'center', behavior: 'instant'})"); await rec(.3);
 for (const ch of FIGHTER) { await ev(`(() => { const i = document.getElementById('gName'); i.value += ${JSON.stringify(ch)}; i.dispatchEvent(new Event('input', {bubbles: true})); })()`); await rec(2 / FPS); }
-await rec(.5); await tap('[data-act=create]', 1.6);
+await rec(.5); await tap('[data-act=create]', 0); await ev("scrollTo({top: 0, behavior: 'instant'})"); await rec(1.2); // the new camp from the top
 if (!await ev('!!GAME.save()')) throw new Error('the fighter was not created: ' + await ev("document.getElementById('gCreateMsg') && document.getElementById('gCreateMsg').textContent"));
 say('created', await ev('GAME.save().name'));
 
 // ---- 2. the camp
-await ev('scrollTo(0, 0)'); await cap('RUN YOUR OWN CAMP', 'ดูแลค่ายมวยของคุณ'); await rec(2.2);
+await cap('RUN YOUR OWN CAMP', 'ดูแลค่ายมวยของคุณ'); await rec(1.4);
 const deep = await ev('Math.min(1500, document.documentElement.scrollHeight - innerHeight)');
 await rec(2.2, i => ev(`scrollTo(0, ${Math.round(deep * Math.min(1, (i + 1) / (2.2 * FPS * .85)))})`)); await rec(.6);
 await ev('scrollTo(0, 0)');
