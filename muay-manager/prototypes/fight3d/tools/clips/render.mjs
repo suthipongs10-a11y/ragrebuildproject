@@ -3,7 +3,8 @@
 // virtual clock, so the video is smooth on a machine with no graphics card and the sound is exact. The page's
 // timers, animation frames, CSS animations and its audio clock all follow that clock; the sound is rendered offline
 // (OfflineAudioContext) and laid under the frames. A line of text opens the clip and an end card closes it.
-// usage: node tools/clips/render.mjs --seed 80 --from 80 [--name ko-80] [--hook "EN line|ไทย line"] [--fps 30] [--tail 6] [--max 50]
+// usage: node tools/clips/render.mjs --seed 80 --from 80 [--name ko-80] [--hook "EN line|ไทย line"] [--fps 30] [--tail 14] [--max 50]
+//        the end card comes a second after the knockout's slow-motion replay (--tail: the most seconds after the knockout)
 //        --from: the fight's second to start at (tools/clips/find-fights.mjs gives the knockout's)
 // out:   dist/clips/<name>.mp4 (and <name>.jpg, a frame for a preview)
 import { createRequire } from 'node:module';
@@ -12,7 +13,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync
 const require = createRequire(import.meta.url); const { chromium } = require('playwright');
 const ROOT = new URL('../../', import.meta.url).pathname;
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
-const SEED = +arg('seed', 80), FROM = +arg('from', 0), FPS = +arg('fps', 30), TAIL = +arg('tail', 6), MAX = +arg('max', 50), END = +arg('end', 2.8);
+const SEED = +arg('seed', 80), FROM = +arg('from', 0), FPS = +arg('fps', 30), TAIL = +arg('tail', 14), MAX = +arg('max', 50), END = +arg('end', 2.8);
 const NAME = arg('name', 'clip-' + SEED), HOOK = arg('hook', 'WAIT FOR IT…|รอดูตอนจบ…').split('|');
 const OUT = ROOT + 'dist/clips/', FR = OUT + NAME + '-frames/';
 mkdirSync(OUT, {recursive: true}); rmSync(FR, {recursive: true, force: true}); mkdirSync(FR, {recursive: true});
@@ -127,13 +128,19 @@ for (let i = 0; i < 3; i++) await step(1000 / FPS); // the stage settles at the 
 const info = await ev('({koT: (LAB.fight.events.find(e => e.type === "ko") || {}).t, names: LAB.fight.specs ? LAB.fight.specs.map(s => s.name) : []})');
 console.log('seed', SEED, 'from', FROM, 'knockout at', info.koT, info.names.join(' vs '));
 const t0 = await ev('__clip.t'), dt = 1000 / FPS;
-let n = 0, endAt = null, overAt = null, hookOff = Math.round(3.2 * FPS);
+let n = 0, endAt = null, overAt = null, rpOn = false, rpDone = null, hookOff = Math.round(3.2 * FPS);
 const t1 = Date.now();
 while (n < MAX * FPS) {
   await step(dt);
   if (n === hookOff) await ev('__overlay.hookOut()');
   if (overAt == null) { const s = await ev('LAB.state'); if (s.playT >= (info.koT || 1e9) || s.cer) overAt = n; }
-  if (overAt != null && endAt == null && n - overAt >= TAIL * FPS) { endAt = n; await ev('__overlay.end()'); }
+  // After the knockout the broadcast shows it again in slow motion: the end card waits for that replay to finish (a second
+  // after it), for no replay within 9 s, or for --tail seconds at most.
+  if (overAt != null && endAt == null) {
+    const m = (await ev('LAB.state')).mode, since = n - overAt;
+    if (m === 'replay') rpOn = true; else if (rpOn && rpDone == null) rpDone = n;
+    if ((rpDone != null && n - rpDone >= FPS) || since >= TAIL * FPS || (!rpOn && since >= 9 * FPS)) { endAt = n; await ev('__overlay.end()'); }
+  }
   if (endAt != null && n - endAt >= END * FPS) break;
   writeFileSync(FR + String(n).padStart(5, '0') + '.jpg', await grab());
   n++;
