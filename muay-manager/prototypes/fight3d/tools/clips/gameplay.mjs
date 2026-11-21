@@ -174,6 +174,7 @@ await rec(7.5, pressNote);
 const lastNote = await ev('GAME.drill() ? GAME.drill().notes.at(-1).t - (performance.now() - GAME.drill().t0) / 1000 : 0');
 await idle(Math.max(0, lastNote - 2), pressNote, dt);
 await rec(3.2, pressNote); await until('!GAME.drill()', 10, dt);
+await ev("(() => { const g = document.querySelector('#gBody .gain'); if (g) g.scrollIntoView({block: 'center', behavior: 'instant'}); })()"); // the session's result sits under the list
 await cap('EVERY SESSION BUILDS HIM UP', 'ซ้อมแล้วค่าพลังขึ้นทุกครั้ง'); await rec(2.6);
 say('drill 1:', await ev("((document.querySelector('#gBody .gain') || {}).textContent || '').slice(0, 90)"));
 await ev('scrollTo(0, 0)'); await tap('[data-act=tab][data-v=train]', .3); await cap('KICKS, KNEES, SKIPPING, SPARRING…', 'เตะ ถีบ กระโดดเชือก ซ้อมคู่…'); await tap('[data-act=train][data-v=banana]', 0);
