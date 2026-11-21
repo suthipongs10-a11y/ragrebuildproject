@@ -182,8 +182,9 @@ if (await until('GAME.drill() && GAME.drill().ready', 60)) { await idle(2.1, pre
 await until('!GAME.drill()', 10, dt);
 
 // ---- 4. an opponent and a plan
-await ev('scrollTo(0, 0)'); await cap('PICK YOUR OPPONENT', 'เลือกคู่ชก'); await tap('[data-act=tab][data-v=fight]', 1.3);
-await tap('[data-act=pick][data-v=l1]', 2.2);
+await ev('scrollTo(0, 0)'); await cap('PICK YOUR OPPONENT', 'เลือกคู่ชก'); await tap('[data-act=tab][data-v=fight]', .8);
+await ev("(() => { const b = document.querySelector('[data-act=pick][data-v=l0]'); if (b) b.scrollIntoView({block: 'center', behavior: 'instant'}); })()"); await rec(1.4); // the list of opponents
+await tap('[data-act=pick][data-v=l1]', 1.6);
 await cap('SET THE GAME PLAN', 'วางแผนการชก'); await tap('.plan [data-act=plan][data-g=ag][data-v=counter]', .7); await tap('.plan [data-act=plan][data-g=range][data-v=out]', .7);
 await tap('[data-act=fans][data-v=small]', 1.0);
 await cap(''); await tap('[data-act=startfight]', 0);
