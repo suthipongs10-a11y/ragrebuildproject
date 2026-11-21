@@ -39,13 +39,15 @@ function pickFight(cfg) {
   if (!best) throw new Error(`no knockout win for the new fighter in ${TRIES} fights: try another opponent or more --tries`);
   const f = best.f, ev = f.events, rests = ev.filter(e => e.phase === 'rest').map(e => e.t), ko = ev.find(e => e.type === 'ko');
   const r2 = ev.find(e => e.type === 'phase' && e.phase === 'fight' && e.round === 2).t, r2end = rests[1] || ko.t;
+  // the blow that finished it: a knockdown he did not beat the count from comes some seconds before the knockout itself
+  const kd = ev.filter(e => e.type === 'kd' && e.on !== ko.by && e.t <= ko.t && e.t >= ko.t - 15).pop(), blowT = kd ? kd.t : ko.t;
   // the busiest eight seconds of round two that end well before the finish is shown
   let w = r2 + 4, wBest = -1;
-  for (let a = r2 + 1; a + 8 <= Math.min(r2end, ko.t - 9); a += .5) {
+  for (let a = r2 + 1; a + 8 <= Math.min(r2end, blowT - 9); a += .5) {
     const k = ev.filter(e => e.type === 'hit' && e.res === 'hit' && e.t >= a && e.t < a + 8).reduce((s, e) => s + 1 + (e.sev || 0), 0);
     if (k > wBest) { wBest = k; w = a; }
   }
-  FIGHT = {seed: f.seed, koT: ko.t, round: f.result.round, how: f.result.how, move: best.r.moveTh, rests, r2win: wBest >= 0 ? w : null, score: best.r.score, wins: n, kds: best.r.kds};
+  FIGHT = {seed: f.seed, koT: ko.t, blowT, round: f.result.round, how: f.result.how, move: best.r.moveTh, rests, r2win: wBest >= 0 ? w : null, score: best.r.score, wins: n, kds: best.r.kds};
   say(`fight: seed ${f.seed} of ${n} knockout wins in ${TRIES}: ${f.result.how} round ${f.result.round} at ${ko.t.toFixed(1)} s by ${best.r.moveTh}, knockdowns ${best.r.kds}, score ${best.r.score}`);
   return f.seed;
 }
@@ -208,12 +210,14 @@ await full(true);
 // ---- 7. round two
 if (FIGHT.r2win != null) { await ev(`LAB.seek(${FIGHT.r2win})`); await idle(.15); await cap('ROUND 2: GO FORWARD!', 'ยก 2 เดินหน้าบี้'); await rec(8); }
 // ---- 8. the finish, its replay; the teaser is taken from here
-await ev(`LAB.seek(${FIGHT.koT - 7})`); await idle(.15);
+await ev(`LAB.seek(${FIGHT.blowT - 6})`); await idle(.15);
 await cap(FIGHT.round === 3 ? 'ROUND 3: FINISH HIM' : 'THE FINISH', FIGHT.round === 3 ? 'ยก 3 ปิดฉาก' : 'ปิดฉาก');
-let k = 0, overAt = null, rpOn = false, rpDone = null;
+let k = 0, overAt = null, rpOn = false, rpDone = null, cut = false;
 for (;;) {
   const s = await ev('({p: LAB.state.playT, m: LAB.state.mode, c: LAB.state.cer})');
-  const teaser = s.m === 'live' && s.p >= FIGHT.koT - 2.2 && s.p <= FIGHT.koT + .5;
+  const teaser = s.m === 'live' && s.p >= FIGHT.blowT - 1.8 && s.p <= FIGHT.blowT + .8;
+  // the count is cut: from two seconds after the blow to two seconds before he is counted out
+  if (!cut && FIGHT.koT - FIGHT.blowT > 5 && s.p >= FIGHT.blowT + 2.5) { cut = true; await ev(`LAB.seek(${FIGHT.koT - 2})`); await idle(.1); continue; }
   await frame(teaser); k++;
   if (k === Math.round(4.5 * FPS)) await cap('');
   if (overAt == null && (s.p >= FIGHT.koT || s.c)) overAt = k;
