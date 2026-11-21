@@ -283,6 +283,20 @@ html:not([lang="th"]) .dbtn{font-size:clamp(15px,4.6vw,22px);padding:0 4px;overf
 .onpill{flex:none;display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:12.5px;font-weight:600;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer;white-space:nowrap}
 .onpill[hidden],.chatfab[hidden],.chat[hidden]{display:none}
 .onpill i{width:8px;height:8px;border-radius:50%;background:var(--hp);box-shadow:0 0 0 3px color-mix(in srgb,var(--hp) 25%,transparent)}
+/* The game's two columns. On a phone one column, as the page is written (the wrappers step aside and the order puts
+   the top bar above the ring). On a wide screen (a computer, a tablet held sideways) the ring on the left, kept in view
+   while the menus on the right scroll; its column is never wider than lets a 16:9 ring and its score bar fit the height. */
+.gcols,.gleft,.gright{display:contents}
+.app.game>#gNews,.app.game>header{order:-2} .app.game #gMatch,.app.game #game{order:-1}
+@media (min-width:1000px) and (min-aspect-ratio:5/4){
+  .app.game{max-width:1680px}
+  .app.game .gcols{display:grid;grid-template-columns:min(62%,calc(100% - 396px),calc((100vh - 230px) * 16 / 9)) minmax(380px,1fr);gap:16px;align-items:start}
+  .app.game .gleft{display:flex;flex-direction:column;gap:10px;position:sticky;top:8px;min-width:0}
+  .app.game.has-news .gleft{top:44px}
+  .app.game .gleft:has(.arena.full){z-index:100} /* the full-screen ring above the sticky bars of the other column */
+  .app.game .gright{display:flex;flex-direction:column;gap:10px;min-width:0}
+  .app.game .chat{left:auto;right:16px;width:min(440px,36vw);margin:0}
+}
 .chatfab{position:fixed;right:12px;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:70;width:50px;height:50px;border-radius:50%;border:1px solid #6b5a2a;background:#1b1810;color:var(--gold);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.55);cursor:pointer}
 .chatfab b{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:10px;background:var(--red);color:#fff;font:700 11.5px/20px var(--body);text-align:center;padding:0 5px;box-sizing:border-box}
 .chat{position:fixed;left:0;right:0;bottom:0;height:55vh;z-index:80;max-width:860px;margin:0 auto;display:flex;flex-direction:column;background:rgba(15,16,22,.97);border:1px solid #4a3d18;border-bottom:0;border-radius:14px 14px 0 0;box-shadow:0 -10px 34px rgba(0,0,0,.6)}
@@ -449,6 +463,7 @@ html:not([lang="th"]) .dbtn{font-size:clamp(15px,4.6vw,22px);padding:0 4px;overf
     <p>ฟอนต์ Chakra Petch, Bai Jamjuree (OFL) • <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> (MIT)</p>
   </details>
   <p class="note" id="noteLine"><span id="modelNote"></span>ไฟต์หมายเลข <span id="seed"></span> เปลี่ยนแบบการนำเสนอได้ตลอดโดยผลการชกไม่เปลี่ยน ตัวเลขข้างชื่อคือแต้มสด ขึ้นทันทีเมื่ออาวุธเข้าเป้า: เข้าเป้า +1 เข้าหนักหรือท่าไม้ตาย +2 เหวี่ยงล้มหรือถีบล้ม +3 ทำล้มจนถูกนับ +10 โดนบังไม่ได้แต้ม ครบยกแล้วแต้มมากกว่าชนะ สีทองคือฝ่ายที่นำ ใต้นาฬิกาคือแต้มของยกที่กำลังชก แถบเขียวคือพลังชีวิต แถบฟ้าคือความอึด แถบทองคือเกจท่าไม้ตาย</p>
+  <!--G:end-->
 </div>
 
 <!--__MODELS__-->

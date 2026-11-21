@@ -3,7 +3,7 @@
 .ui{display:inline-block;background-position:center;background-size:contain;background-repeat:no-repeat;flex:none;vertical-align:middle} /* longhands: the image itself comes from the [data-ui] rule */
 .sym{display:none}
 /* header */
-h1.glogo{display:flex;align-items:center;gap:8px;font-size:0}
+h1.glogo{display:flex;flex-wrap:wrap;align-items:center;gap:2px 8px;font-size:0} /* on a narrow phone the version tag goes under the logo, leaving room for the online count */
 h1.glogo .ui.logo{width:190px;height:36px;background-position:left center}
 h1.glogo > span{display:none}
 /* top bar */

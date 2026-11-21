@@ -115,13 +115,15 @@ if (existsSync('assets/ui')) {
 }
 const withModels = readFileSync('dist/muay-fight-lab.html', 'utf8').replace('<!--__MODELS__-->', () => models.join('\n') + voiceLite);
 // two pages from one source: the presentation lab, and the game (same viewer plus the game screens)
-const page = withModels.replace('<!--G:top-->', '').replace('<!--G:body-->', '');
+const page = withModels.replace('<!--G:top-->', '').replace('<!--G:body-->', '').replace('<!--G:end-->', '');
 writeFileSync('dist/muay-fight-lab.html', page);
 const gameBase = readFileSync('src/page.html', 'utf8').replace('<title>Muay Fight Lab 3D</title>', '<title>Muay Manager</title>')
   // the news ticker sits above everything else on the menu screens (game.js fills it and shows it)
   .replace('<div class="app">', '<div class="app"><button type="button" id="gNews" data-act="news" hidden aria-label="ข่าวจากทุกเวที เปิดอ่านเป็นรายการ"><span class="nw-h">ข่าว</span><span class="nw-win"><span id="gNewsRun"></span></span></button>')
-  .replace('<!--G:top-->', '<div id="gMatch"></div><div id="game"><div class="gbar" id="gTop"></div></div>')
-  .replace('<!--G:body-->', '<nav class="gnav" id="gNav" aria-label="เมนูเกม"></nav><div class="gbody" id="gBody"></div>');
+  // two columns on a wide screen (page.html: .gcols): the ring and its buttons on the left, the rest on the right
+  .replace('<!--G:top-->', '<div class="gcols"><div class="gleft">')
+  .replace('<!--G:body-->', '</div><div class="gright"><div id="gMatch"></div><div id="game"><div class="gbar" id="gTop"></div></div><nav class="gnav" id="gNav" aria-label="เมนูเกม"></nav><div class="gbody" id="gBody"></div>')
+  .replace('<!--G:end-->', '</div></div>');
 const game = gameBase.replace('/*__APP__*/', () => jsGame).replace('<!--__MODELS__-->', () => models.join('\n') + voiceLite + uiStyle);
 writeFileSync('dist/muay-manager.html', game);
 // claude.ai refuses a page over 16 MiB
