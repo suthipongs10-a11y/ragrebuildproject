@@ -211,15 +211,19 @@ const ARM_POSE = {
   rest: [[.1, -.82, .56], [-.1, -.82, .56]], fold: [[.72, -.22, .62], [-.7, -.16, .66]], clasp: [[.45, -.5, .72], [-.45, -.5, .72]],
   phone: [[.1, -.82, .56], [-.12, .5, .86]]
 };
-const _q = new THREE.Quaternion(), _v = new THREE.Vector3(), _u = new THREE.Vector3(), _up = new THREE.Vector3(0, 1, 0), _m = new THREE.Matrix4(), _s = new THREE.Vector3();
+const ZERO = new THREE.Matrix4().makeScale(0, 0, 0), _q = new THREE.Quaternion(), _v = new THREE.Vector3(), _u = new THREE.Vector3(), _up = new THREE.Vector3(0, 1, 0), _m = new THREE.Matrix4(), _s = new THREE.Vector3();
 // The crowd sits still. When the fight heats up the keener people get to their feet and throw their arms up, more of them
 // the hotter it gets, and they settle again as it cools. Only those moving are worked out again each frame.
 function crowdUpdate(V, time, hype, dt) {
   const seats = V.seats, P = V.crowd; let moved = false;
   for (let i = 0; i < seats.length; i++) {
     const s = seats[i], want = hype > s.th ? 1 : 0;
-    if (V.placed && s.e === want && !want) continue;
-    s.e += (want - s.e) * Math.min(1, dt * (want ? 6 : 1.8)); if (Math.abs(want - s.e) < .01) s.e = want;
+    if (V.placed && s.e === want && !want && !s.dirty) continue;
+    s.e += (want - s.e) * Math.min(1, dt * (want ? 6 : 1.8)); if (Math.abs(want - s.e) < .01) s.e = want; s.dirty = false;
+    if (s.hid) { // out of the shot: every part of him folded away
+      for (const [m, k] of [[P.body, i], [P.head, i], [P.arms, i * 2], [P.arms, i * 2 + 1], [P.hat, s.hatI], [P.hair, s.hairI], [P.towel, s.towelI], [P.phone, s.phoneI], [P.lamp, s.phoneI]]) if (k >= 0) m.setMatrixAt(k, ZERO);
+      moved = true; continue;
+    }
     const e = s.e, hop = e * Math.abs(Math.sin(time * 5.5 + s.ph)) * .05, sc = s.s, cy = Math.cos(s.fy), sy = Math.sin(s.fy);
     _q.setFromAxisAngle(_up, s.fy);
     let base; // where the seated parts' origin is (on the bench; for those on their feet, so that the head sits on the figure)
@@ -789,6 +793,8 @@ export function buildArena(scene) {
     }
     // a corner post right in front of the lens would block the shot
     for (const c of V.corners) { const near = Math.hypot(cam.x - c.x, cam.z - c.z) < 2.7; c.post.visible = c.pad.visible = !near; }
+    // nor anybody in the stands right in front of it (a camera among the crowd for a replay): he steps out of the shot
+    if (V.seats && V.crowd) for (const t of V.seats) { const h = Math.hypot(cam.x - t.x, cam.z - t.z) < 1.5 && cam.y < t.y + 2.2; if (h !== !!t.hid) { t.hid = h; t.dirty = true; } }
   };
   const dummy = new THREE.Object3D();
   // ---- the player's cheering section (bought per fight in the game): banners with his name held up in the stands on the
