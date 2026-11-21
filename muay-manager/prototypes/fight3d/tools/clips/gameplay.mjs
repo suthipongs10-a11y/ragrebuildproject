@@ -92,9 +92,11 @@ const OVERLAY = `(() => {
     tap(sel) {
       const el = document.querySelector(sel); if (!el || el.disabled) return false;
       let r = el.getBoundingClientRect(); if (r.top < 150 || r.bottom > innerHeight - 40) { el.scrollIntoView({block: 'center', behavior: 'instant'}); r = el.getBoundingClientRect(); }
-      const d = document.createElement('div'); d.className = 'clipTap'; d.style.left = (r.left + r.width / 2) + 'px'; d.style.top = (r.top + r.height / 2) + 'px';
+      this.ring(el); el.click(); return true;
+    },
+    ring(el) {
+      const r = el.getBoundingClientRect(), d = document.createElement('div'); d.className = 'clipTap'; d.style.left = (r.left + r.width / 2) + 'px'; d.style.top = (r.top + r.height / 2) + 'px';
       (document.querySelector('#arena.full') || document.body).appendChild(d); setTimeout(() => d.remove(), 600);
-      el.click(); return true;
     },
     hook(on) { place(); hook.classList.toggle('on', !!on); },
     end() { cap.hidden = true; end.classList.add('on'); }
@@ -135,7 +137,7 @@ const cap = (en, th) => ev(`__overlay.cap(${JSON.stringify(en || '')}, ${JSON.st
 const tap = async (sel, after = .6) => { const ok = await ev(`__overlay.tap(${JSON.stringify(sel)})`); if (!ok) say('could not tap', sel); await rec(after); return ok; };
 // a drill note pressed on its beat (half a frame either side is well inside "perfect")
 const PRESS_NOTE = `(() => { const d = GAME.drill(); if (!d || !d.ready) return; const now = (performance.now() - d.t0) / 1000;
-  const n = d.notes.find(x => !x.res && x.t - now <= ${dt / 2000 + .004} && x.t - now > -.08); if (n) GAME.press(n.kind); })()`;
+  const n = d.notes.find(x => !x.res && x.t - now <= ${dt / 2000 + .004} && x.t - now > -.08); if (n) { const b = document.querySelector('[data-drill="' + n.kind + '"]'); if (b) __overlay.ring(b); GAME.press(n.kind); } })()`;
 const pressNote = () => ev(PRESS_NOTE);
 // the ring full screen, or back in the page (the game may have left full screen by itself)
 const full = async on => { if (await ev("document.getElementById('arena').classList.contains('full')") !== on) await ev("document.getElementById('btnFull').click()"); await step(dt); await ev('__overlay.place()'); };
