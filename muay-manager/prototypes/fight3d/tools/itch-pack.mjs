@@ -49,6 +49,6 @@ cover.convert('RGB').save(out + 'cover-630x500.png')
 `;
 execFileSync('python3', ['-I', '-c', py, ROOT, PAGE]);
 // screenshots: frames the clip tools recorded (tools/clips), when they are there
-const shots = [['round-1-frames/00090.jpg', '1-plan'], ['round-1-frames/01500.jpg', '2-fight'], ['round-1-frames/02150.jpg', '3-fight'], ['gameplay-draft-frames/00168.jpg', '4-training'], ['gameplay-draft-frames/00090.jpg', '5-camp']];
+const shots = [['round-1-frames/00090.jpg', '1-plan'], ['round-1-frames/01500.jpg', '2-fight'], ['round-1-frames/02150.jpg', '3-fight']];
 for (const [f, name] of shots) if (existsSync(ROOT + 'dist/clips/' + f)) execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', ROOT + 'dist/clips/' + f, '-vf', 'scale=540:-1', '-q:v', '3', PAGE + 'shot-' + name + '.jpg']);
 console.log('page pictures →', PAGE);
