@@ -21,7 +21,7 @@
 | ภาพ | `src/main.js` `src/timeline.js` และอื่น ๆ | เล่นภาพจากเหตุการณ์ ไม่ตัดสินผล ไฟต์สดเดินตามนาฬิกา (`followClock`) |
 | เกม | `src/game.js` | หน้าจอ เซฟ กติกาเกม (ซ้อม ซื้อ ชก) **ปนกับ UI ในไฟล์เดียว** ส่วนท้าชกอยู่ราวบรรทัด 840–1195 |
 | ที่เก็บข้อมูลฝั่งเบราว์เซอร์ | `src/netdb.js` | เลียน API ของ artifact db เรียก `/api` ถามซ้ำทุก 8 วินาที วัดส่วนต่างนาฬิกาเซิร์ฟเวอร์ (`skew`) |
-| เซิร์ฟเวอร์ | `functions/api/[[route]].js` (81 บรรทัด) | Cloudflare Pages Functions + D1: สมัคร (`players`) เก็บเอกสาร (`docs`) เก็บ error (`logs`) **ไม่มีกติกาเกมเลย** |
+| เซิร์ฟเวอร์ | `functions/api/[[route]].js` (81 บรรทัด) | Cloudflare Pages Functions + D1: สมัคร (`players`) เก็บเอกสาร (`docs`) เก็บ error (`logs`) **ไม่มีกติกาเกม** ยกเว้นตัวกันค่าที่เป็นไปไม่ได้ (2.71: ตารางอันดับ คำท้า ศึกชิงถ้วย ดู `docs/ONLINE_STORE_PLAN.md` ข้อ 8) |
 | ไฟล์เกม | `functions/[[path]].js` | ส่งไฟล์จาก KV (`SITE`) |
 
 ข้อมูลที่เก็บตอนนี้ (ตาราง `docs`): `board/<id>` (ชื่อ RP สถิติ ค่าพลัง `seen` `in`) • `challenges/<ผู้ท้า>` และ `answers/<ผู้รับ>` (คำท้า คำตอบ แผน heartbeat) • `data/users/<id>/save` (เซฟทั้งก้อน)

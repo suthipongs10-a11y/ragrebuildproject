@@ -24,6 +24,9 @@
     "desktop": "node tools/desktop-build.mjs",
     "e2e:desktop": "node tools/e2e/desktop.mjs",
     "e2e:wide": "node tools/e2e/wide.mjs",
+    "e2e:itch": "node tools/e2e/itch.mjs",
+    "test:plausible": "node tools/plausible-test.mjs",
+    "itch": "node tools/itch-pack.mjs",
     "clips:find": "node tools/clips/find-fights.mjs",
     "clips:render": "node tools/clips/render.mjs"
   },

@@ -49,6 +49,12 @@ async function schema(db) {
     db.prepare('CREATE TABLE IF NOT EXISTS chat (id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER NOT NULL, pid TEXT NOT NULL, name TEXT NOT NULL, msg TEXT NOT NULL)'),
     db.prepare('CREATE INDEX IF NOT EXISTS chat_pid ON chat (pid, id)'),
     db.prepare('CREATE TABLE IF NOT EXISTS chat_bans (pid TEXT PRIMARY KEY, t INTEGER NOT NULL)'),
+    // players the owner took off the ranking (tools/rank-admin.mjs): nothing of theirs is shown or taken in the shared lists
+    db.prepare('CREATE TABLE IF NOT EXISTS bans (pid TEXT PRIMARY KEY, t INTEGER NOT NULL, why TEXT)'),
+    // writes the plausibility check refused (below): for the owner to look at, the last 500 kept
+    // the highest record and rating each player's ranking line has been allowed: kept apart from the line, which he may delete
+    db.prepare('CREATE TABLE IF NOT EXISTS marks (pid TEXT PRIMARY KEY, w INTEGER NOT NULL, l INTEGER NOT NULL, d INTEGER NOT NULL, rp REAL NOT NULL, t INTEGER NOT NULL)'),
+    db.prepare('CREATE TABLE IF NOT EXISTS refused (id INTEGER PRIMARY KEY AUTOINCREMENT, t INTEGER NOT NULL, pid TEXT NOT NULL, coll TEXT NOT NULL, why TEXT NOT NULL)'),
     // who is online is asked often: an index on the time each fighter was last seen, so the count reads only those rows
     db.prepare("CREATE INDEX IF NOT EXISTS board_seen ON docs (json_extract(data, '$.seen')) WHERE coll = 'board'")
   ]);
@@ -96,6 +102,54 @@ async function onlineNow(db) {
   onlineMemo = {at: now, v: {n: (c.results[0] || {}).n | 0, list: l.results.map(r => ({id: r.id, name: hasBad(r.name) ? NAME_STANDIN : newsName(r.name).slice(0, 24)}))}};
   return onlineMemo.v;
 }
+// ---- what a fighter can be by the game's own rules: a quick guard until the server judges the fights itself
+// (docs/SERVER_WORK_PLAN.md P1–P2). Every rule below is one the game keeps (src/game.js): a stat is 20–97 (the camp's
+// cap, 62 + 7 a level, five levels); the rating starts at 1000, never goes under 600, and moves at most 32 in a fight
+// (Elo, K = 32; a belt is +25); the record only grows, and only so fast. A fighter's challenge or cup entry carries the
+// stats on his ranking line (on the day of a fight a good mood adds up to 4%, a few points of slack cover a session
+// trained since the line was last sent). What fails is refused and written down; the player keeps what was there.
+const LIM = {statMin: 20, statMax: 97, specMax: 100, rpStart: 1000, rpFloor: 600, rpMax: 4000, perFight: 32, perMin: 3, slack: 6, mood: 1.04, over: 3};
+const isInt = v => Number.isInteger(v) && v >= 0, isNum = v => typeof v === 'number' && Number.isFinite(v);
+function statsWrong(st, max) {
+  if (!st || typeof st !== 'object' || Array.isArray(st)) return 'stats';
+  const ks = Object.keys(st); if (!ks.length || ks.length > 12) return 'stats';
+  for (const k of ks) { const v = st[k]; if (!isNum(v) || v < LIM.statMin - .5 || v > (typeof max === 'object' ? max[k] : max) + .5) return 'stats ' + k + ' ' + v; }
+  return null;
+}
+const fightsOf = d => (d.w | 0) + (d.l | 0) + (d.d | 0);
+function boardWrong(d, prev, minutes) {
+  if (!isNum(d.rp) || d.rp < LIM.rpFloor || d.rp > LIM.rpMax) return 'rating ' + d.rp;
+  if (!isInt(d.w) || !isInt(d.l) || !isInt(d.ko) || (d.d != null && !isInt(d.d)) || d.ko > d.w) return 'record';
+  const s = statsWrong(d.stats, LIM.statMax); if (s) return s;
+  if (d.rp > LIM.rpStart + LIM.perFight * (d.w + (d.d | 0))) return 'rating ' + d.rp + ' for ' + d.w + ' wins';
+  if (prev && !(fightsOf(d) === 0 && d.rp === LIM.rpStart)) { // (a record back to nothing at 1000: he started over with a new fighter)
+    if (d.w < (prev.w | 0) || d.l < (prev.l | 0) || (d.d | 0) < (prev.d | 0)) return 'record went back';
+    const more = fightsOf(d) - fightsOf(prev); if (more > LIM.slack + LIM.perMin * minutes) return more + ' fights in ' + Math.round(minutes) + ' min';
+    const won = (d.w - (prev.w | 0)) + ((d.d | 0) - (prev.d | 0)); if (isNum(prev.rp) && d.rp - prev.rp > LIM.perFight * won + 1) return 'rating +' + (d.rp - prev.rp) + ' for ' + won + ' wins';
+  }
+  return null;
+}
+// the stats a fighter may carry into a fight: his ranking line's, times the best mood, and a little slack
+function specMax(board) {
+  const out = {}; for (const k of Object.keys((board && board.stats) || {})) out[k] = Math.min(LIM.specMax, Math.ceil(board.stats[k] * LIM.mood) + LIM.over);
+  return board && board.stats ? out : LIM.specMax;
+}
+// a challenge or an answer: each entry that is new or changed in this write
+function entriesWrong(d, prev, board) {
+  const list = d && d.list && typeof d.list === 'object' ? d.list : {}, old = (prev && prev.list) || {}, max = specMax(board);
+  for (const k of Object.keys(list)) {
+    const e = list[k]; if (!e || typeof e !== 'object' || !e.spec) continue;
+    if (old[k] && JSON.stringify(old[k]) === JSON.stringify(e)) continue;
+    const s = statsWrong(e.spec.stats, typeof max === 'object' && Object.keys(max).length ? max : LIM.specMax); if (s) return k + ': ' + s;
+  }
+  return null;
+}
+async function refuse(db, who, coll, why) {
+  await db.batch([db.prepare('INSERT INTO refused (t, pid, coll, why) VALUES (?, ?, ?, ?)').bind(Date.now(), who, coll, String(why).slice(0, 200)),
+    db.prepare('DELETE FROM refused WHERE id <= (SELECT MAX(id) - 500 FROM refused)')]);
+  return json({error: 'not plausible', why}, 422);
+}
+const banned = async (db, who) => !!(await db.prepare('SELECT 1 x FROM bans WHERE pid = ?').bind(who).first());
 const reportMemo = new Map(); // one report every few seconds from a player (kept in this worker's memory: enough to stop a flood)
 async function sha256(s) { const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
 const rand = n => [...crypto.getRandomValues(new Uint8Array(n))].map(x => x.toString(16).padStart(2, '0')).join('');
@@ -152,7 +206,7 @@ export async function onRequest({request, env, params}) {
     const who = await caller(request, db); if (!who) return json({error: 'forbidden'}, 403);
     await db.batch([
       db.prepare("DELETE FROM docs WHERE (id = ? AND coll IN ('board', 'challenges', 'answers')) OR coll = ? OR coll LIKE ?").bind(who, 'data/users/' + who, 'data/users/' + who + '/%'),
-      db.prepare('DELETE FROM transfers WHERE id = ?').bind(who), db.prepare('DELETE FROM cups WHERE id = ?').bind(who), db.prepare('DELETE FROM news WHERE pid = ?').bind(who), db.prepare('DELETE FROM chat WHERE pid = ?').bind(who), db.prepare('DELETE FROM players WHERE id = ?').bind(who)
+      db.prepare('DELETE FROM transfers WHERE id = ?').bind(who), db.prepare('DELETE FROM cups WHERE id = ?').bind(who), db.prepare('DELETE FROM news WHERE pid = ?').bind(who), db.prepare('DELETE FROM chat WHERE pid = ?').bind(who), db.prepare('DELETE FROM marks WHERE pid = ?').bind(who), db.prepare('DELETE FROM players WHERE id = ?').bind(who)
     ]);
     return json({ok: true});
   }
@@ -215,6 +269,13 @@ export async function onRequest({request, env, params}) {
     const text = await request.text(); if (text.length > 6000) return json({error: 'too large'}, 413);
     let data; try { data = JSON.parse(text); } catch (e) { return json({error: 'not json'}, 400); }
     if (!data || typeof data !== 'object' || Array.isArray(data)) return json({error: 'not an object'}, 400);
+    if (await banned(db, who)) return json({error: 'banned'}, 403);
+    { // the fighter entered is the one on his ranking line, as trained (no mood on the day of a cup)
+      const row = await db.prepare("SELECT data FROM docs WHERE coll = 'board' AND id = ?").bind(who).first(), b = row ? JSON.parse(row.data) : null;
+      const max = b && b.stats ? Object.fromEntries(Object.keys(b.stats).map(k => [k, Math.min(LIM.statMax, Math.ceil(b.stats[k]) + LIM.over)])) : LIM.statMax;
+      const why = statsWrong(data.spec && data.spec.stats, max) || (isNum(data.rp) && b && isNum(b.rp) && data.rp > b.rp + LIM.perFight ? 'rating ' + data.rp : null);
+      if (why) return refuse(db, who, 'cup', why);
+    }
     scrubNames(data); // a name everyone sees in the bracket
     await db.batch([
       db.prepare('INSERT INTO cups (k, id, data, at) VALUES (?, ?, ?, ?) ON CONFLICT (k, id) DO UPDATE SET data = excluded.data').bind(c.k, who, JSON.stringify(data), now), // a change keeps the first entry's place in the list
@@ -229,7 +290,8 @@ export async function onRequest({request, env, params}) {
     if (!canRead(who, coll)) return json({error: 'forbidden'}, 403);
     const u = new URL(request.url), order = u.searchParams.get('order'), dir = u.searchParams.get('dir') === 'desc' ? 'DESC' : 'ASC';
     const limit = Math.max(1, Math.min(1000, +u.searchParams.get('limit') || 300));
-    const sql = order && FIELD.test(order) ? `SELECT id, data FROM docs WHERE coll = ? ORDER BY json_extract(data, '$.${order}') ${dir} LIMIT ?` : 'SELECT id, data FROM docs WHERE coll = ? ORDER BY id LIMIT ?';
+    const out_ = SHARED.has(coll) ? ' AND id NOT IN (SELECT pid FROM bans)' : ''; // a banned player is in no shared list
+    const sql = order && FIELD.test(order) ? `SELECT id, data FROM docs WHERE coll = ?${out_} ORDER BY json_extract(data, '$.${order}') ${dir} LIMIT ?` : `SELECT id, data FROM docs WHERE coll = ?${out_} ORDER BY id LIMIT ?`;
     const {results} = await db.prepare(sql).bind(coll, limit).all(), out = {docs: results.map(r => ({id: r.id, data: JSON.parse(r.data)}))};
     // the world chat and who is online ride along with the list every game asks for anyway (chat=<the last line it has>)
     if (coll === 'challenges' && u.searchParams.has('chat')) { out.chat = {items: await chatSince(db, +u.searchParams.get('chat') || 0)}; out.on = await onlineNow(db); }
@@ -247,7 +309,19 @@ export async function onRequest({request, env, params}) {
   const text = await request.text(); if (text.length > MAX_BODY) return json({error: 'too large'}, 413);
   let data; try { data = JSON.parse(text); } catch (e) { return json({error: 'not json'}, 400); }
   if (!data || typeof data !== 'object' || Array.isArray(data)) return json({error: 'not an object'}, 400);
-  if (SHARED.has(coll)) scrubNames(data); // what everyone reads carries no bad word in a name (src/badwords.js)
+  if (SHARED.has(coll)) {
+    if (await banned(db, who)) return json({error: 'banned'}, 403);
+    const [prevRow, boardRow, markRow] = await db.batch([db.prepare('SELECT data FROM docs WHERE coll = ? AND id = ?').bind(coll, id), db.prepare("SELECT data FROM docs WHERE coll = 'board' AND id = ?").bind(who),
+      db.prepare('SELECT m.w, m.l, m.d, m.rp, m.t, p.created FROM players p LEFT JOIN marks m ON m.pid = p.id WHERE p.id = ?').bind(who)]);
+    const p = prevRow.results[0], prev = p ? JSON.parse(p.data) : null, board = boardRow.results[0] ? JSON.parse(boardRow.results[0].data) : null, m = markRow.results[0] || {};
+    // the ranking line is measured against the marks (or, before any, against nothing since he signed up)
+    const since = m.t != null ? {w: m.w, l: m.l, d: m.d, rp: m.rp} : {w: 0, l: 0, d: 0, rp: LIM.rpStart}, minutes = (Date.now() - (m.t != null ? m.t : m.created || Date.now())) / 60e3;
+    const why = coll === 'board' ? boardWrong(data, since, minutes) : entriesWrong(data, prev, board);
+    if (why) return refuse(db, who, coll, why);
+    if (coll === 'board') await db.prepare('INSERT INTO marks (pid, w, l, d, rp, t) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT (pid) DO UPDATE SET w = excluded.w, l = excluded.l, d = excluded.d, rp = excluded.rp, t = excluded.t')
+      .bind(who, data.w, data.l, data.d | 0, data.rp, Date.now()).run();
+    scrubNames(data); // what everyone reads carries no bad word in a name (src/badwords.js)
+  }
   await db.prepare('INSERT INTO docs (coll, id, data, updated) VALUES (?, ?, ?, ?) ON CONFLICT (coll, id) DO UPDATE SET data = excluded.data, updated = excluded.updated')
     .bind(coll, id, JSON.stringify(data), Date.now()).run();
   return json({ok: true});
