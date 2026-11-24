@@ -8,9 +8,10 @@
 // inside a sentence: the line fits only when that phrase has a line of its own), {x} text kept as it is (a fighter's name).
 // The value puts them back as {1}, {2}… in its own order. Thai left on the
 // screen is counted (window.__i18n.miss) for tools/e2e/lang.mjs, which lists what still needs a line.
-// The language is the device's choice (localStorage muayLang, or ?lang=en); the default is Thai.
+// The language is the device's choice (localStorage muayLang, or ?lang=en); with none chosen, Chinese for a device set to
+// Chinese, otherwise Thai.
 const KEY = 'muayLang', TH = /[\u0e01-\u0e3a\u0e40-\u0e5b]/, /* Thai letters and marks, not the baht sign (English keeps it) */ ATTRS = ['placeholder', 'title', 'aria-label'];
-export const LANGS = {th: 'ไทย', en: 'English'};
+export const LANGS = {th: 'ไทย', en: 'English', zh: '中文'};
 let lang = 'th', exact = new Map(), tpls = [], loose = [], names = {};
 const miss = new Map();
 const norm = s => s.replace(/\s+/g, ' ').trim();
@@ -20,6 +21,8 @@ export function pickLang() {
   let l = null;
   try { const q = new URLSearchParams(location.search).get('lang'); if (q && LANGS[q]) { l = q; localStorage.setItem(KEY, q); } } catch (e) { /* no URL */ }
   if (!l) try { l = localStorage.getItem(KEY); } catch (e) { /* blocked storage: Thai */ }
+  // nothing chosen yet: a device set to Chinese starts in Chinese (Simplified; the only Chinese there is)
+  if (!l) try { if ((navigator.languages || [navigator.language]).some(x => /^zh/i.test(x || ''))) l = 'zh'; } catch (e) { /* no navigator */ }
   return LANGS[l] ? l : 'th';
 }
 export const getLang = () => lang;

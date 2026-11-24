@@ -22,17 +22,19 @@
 </style>
 <script>
   // the loading screen speaks the device's language before the game (and src/i18n.js) arrives
-  var LANG = (function () { try { var q = new URLSearchParams(location.search).get('lang'); if (q) return q; return localStorage.getItem('muayLang') || 'th'; } catch (e) { return 'th'; } })();
+  var LANG = (function () { try { var q = new URLSearchParams(location.search).get('lang'); if (q) return q; var s = localStorage.getItem('muayLang'); if (s) return s; return (navigator.languages || [navigator.language]).some(function (x) { return /^zh/i.test(x || ''); }) ? 'zh' : 'th'; } catch (e) { return 'th'; } })();
   var EN = {'กำลังโหลดเกม…': 'Loading the game…', 'กำลังเตรียมเวที…': 'Setting up the ring…', 'ลองใหม่': 'Try again', 'ล้างการตั้งค่าเสียงและภาพ แล้วลองใหม่': 'Reset sound and picture settings, then try again',
     'โหลดไม่สำเร็จ (เน็ตหลุดหรือช้า)': 'Could not load (connection lost or slow)', 'เกมเริ่มไม่ได้ ส่งรายงานให้ผู้พัฒนาแล้ว': "The game could not start; a report went to the developer", 'เกมเริ่มช้าผิดปกติ': 'The game is unusually slow to start', 'ลองใหม่อีกครั้ง หรือล้างการตั้งค่า': 'Try again, or reset the settings'};
-  var L = function (th) { return LANG === 'en' && EN[th] ? EN[th] : th; };
-  if (LANG === 'en') { document.documentElement.lang = 'en'; var m0 = document.getElementById('slMsg'); if (m0) m0.textContent = L(m0.textContent); }
+  var ZH = {'กำลังโหลดเกม…': '正在载入游戏…', 'กำลังเตรียมเวที…': '正在准备拳台…', 'ลองใหม่': '重试', 'ล้างการตั้งค่าเสียงและภาพ แล้วลองใหม่': '重置声音和画面设置，然后重试',
+    'โหลดไม่สำเร็จ (เน็ตหลุดหรือช้า)': '载入失败（网络断开或太慢）', 'เกมเริ่มไม่ได้ ส่งรายงานให้ผู้พัฒนาแล้ว': '游戏无法启动，已向开发者发送报告', 'เกมเริ่มช้าผิดปกติ': '游戏启动异常缓慢', 'ลองใหม่อีกครั้ง หรือล้างการตั้งค่า': '再试一次，或重置设置'};
+  var L = function (th) { var t = {en: EN, zh: ZH}[LANG]; return t && t[th] ? t[th] : th; };
+  if (LANG === 'en' || LANG === 'zh') { document.documentElement.lang = LANG; var m0 = document.getElementById('slMsg'); if (m0) m0.textContent = L(m0.textContent); }
 
 (async function () {
   var A = /*__SITE_ASSETS__*/null;
   var bar = document.getElementById('slBar'), msg = document.getElementById('slMsg'), note = document.getElementById('slNote');
   var total = A.assetsSize + A.appSize, got = 0, mb = function (n) { return (n / 1048576).toFixed(1); };
-  note.textContent = LANG === 'en' ? 'About ' + mb(A.assetsGz) + ' MB the first time, then only what changed' : 'ครั้งแรกราว ' + mb(A.assetsGz) + ' MB ครั้งต่อไปโหลดเฉพาะส่วนที่เปลี่ยน';
+  note.textContent = LANG === 'en' ? 'About ' + mb(A.assetsGz) + ' MB the first time, then only what changed' : LANG === 'zh' ? '第一次约 ' + mb(A.assetsGz) + ' MB，之后只下载有变动的部分' : 'ครั้งแรกราว ' + mb(A.assetsGz) + ' MB ครั้งต่อไปโหลดเฉพาะส่วนที่เปลี่ยน';
   // read a file and move the bar as it arrives (sizes are the unpacked sizes, which is what the reader counts)
   async function pull(url) {
     var r = await fetch(url); if (!r.ok) throw new Error(url + ' ' + r.status);
