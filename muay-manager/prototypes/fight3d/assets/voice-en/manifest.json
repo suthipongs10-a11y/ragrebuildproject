@@ -277,5 +277,1625 @@
   "ok": 1,
   "m": "gemini-3.8-flash-tts",
   "ear": "gemini-3-flash-preview"
+ },
+ "feel-2": {
+  "h": "7f36ea5f00e7",
+  "text": "Still measuring each other.",
+  "s": 1.49,
+  "heard": "Still measuring each other",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel-3": {
+  "h": "885815157d76",
+  "text": "Patient, waiting for an opening.",
+  "s": 1.88,
+  "heard": "Patient waiting for an opening",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel-4": {
+  "h": "937e836fb251",
+  "text": "Rocking, looking for the timing.",
+  "s": 1.78,
+  "heard": "Rocking looking for the timing",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel-5": {
+  "h": "9aa377dd0152",
+  "text": "Nobody wants to take the first risk.",
+  "s": 1.62,
+  "heard": "Nobody wants to take the first risk",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-0": {
+  "h": "7838ba04bb4c",
+  "text": "Toe to toe, nobody backing down!",
+  "s": 2.22,
+  "heard": "Toe-to-toe nobody backing down",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-1": {
+  "h": "00a2560c8276",
+  "text": "Now it's getting heated!",
+  "s": 1.23,
+  "heard": "Now it's getting heated",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-2": {
+  "h": "d4e7d396f5e8",
+  "text": "So close, this one!",
+  "s": 1.36,
+  "heard": "So close this one",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-3": {
+  "h": "7fb3f10b1065",
+  "text": "They're letting it all go!",
+  "s": 1.2,
+  "heard": "They're letting it all go",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-4": {
+  "h": "879cf3af4f71",
+  "text": "What an exchange!",
+  "s": 1.18,
+  "heard": "What an exchange",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-5": {
+  "h": "0f51e089718a",
+  "text": "The whole crowd is on its feet!",
+  "s": 1.65,
+  "heard": "The whole crowd is on its feet",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "close-0": {
+  "h": "be3da531fca5",
+  "text": "Very close on points, too close to call.",
+  "s": 2.48,
+  "heard": "Very close on points too close to call",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "close-1": {
+  "h": "63e3fec8e59e",
+  "text": "The scores are neck and neck.",
+  "s": 1.46,
+  "heard": "The scores are neck and neck",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "close-2": {
+  "h": "bd0d941a35b8",
+  "text": "Nothing in it yet, it could go either way.",
+  "s": 1.99,
+  "heard": "Nothing in it yet it could go either way",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadRed-0": {
+  "h": "6fa3fdc82e61",
+  "text": "Red corner ahead on points.",
+  "s": 1.65,
+  "heard": "Red corner ahead on points",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadRed-1": {
+  "h": "0599434c7184",
+  "text": "Red corner doing the better work right now.",
+  "s": 2.17,
+  "heard": "Red corner doing the better work right now",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadRed-2": {
+  "h": "9f1a7dc9b071",
+  "text": "Red corner landing the cleaner shots.",
+  "s": 2.22,
+  "heard": "Red corner landing the cleaner shots",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadBlue-0": {
+  "h": "f72c191e31c5",
+  "text": "Blue corner ahead on points.",
+  "s": 1.72,
+  "heard": "Blue corner ahead on points",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadBlue-1": {
+  "h": "7c796e503cc9",
+  "text": "Blue corner doing the better work right now.",
+  "s": 1.83,
+  "heard": "Blue corner doing the better work right now",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadBlue-2": {
+  "h": "9762b1560911",
+  "text": "Blue corner landing the cleaner shots.",
+  "s": 2.19,
+  "heard": "Blue corner landing the cleaner shots",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "behindRed-0": {
+  "h": "327201dc1861",
+  "text": "Red corner behind, time to step it up!",
+  "s": 2.22,
+  "heard": "Red corner behind, time to step it up.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "behindRed-1": {
+  "h": "4c9615a1b23b",
+  "text": "Red corner has to come forward now, still behind!",
+  "s": 3.03,
+  "heard": "Red corner has to come forward now, still behind.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "behindBlue-0": {
+  "h": "a12ee9b8ee35",
+  "text": "Blue corner behind, time to step it up!",
+  "s": 2.3,
+  "heard": "Blue corner behind, time to step it up.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "behindBlue-1": {
+  "h": "f3e53ee0c915",
+  "text": "Blue corner has to come forward now, still behind!",
+  "s": 2.9,
+  "heard": "Blue corner has to come forward now, still behind.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadChange-0": {
+  "h": "fcb4b389cf1b",
+  "text": "And now he's in front!",
+  "s": 1.38,
+  "heard": "And now he's in front.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadChange-1": {
+  "h": "9772a23b615a",
+  "text": "The lead has changed! Game on!",
+  "s": 1.67,
+  "heard": "The lead has changed, game on.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "timeLow10-0": {
+  "h": "3874f4b8f0d2",
+  "text": "Ten seconds left in the round!",
+  "s": 1.46,
+  "heard": "10 seconds left in the round.",
+  "ok": 0.88,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "timeLow-0": {
+  "h": "067b75bde94e",
+  "text": "Not long left! Pick it up!",
+  "s": 1.36,
+  "heard": "Not long left, pick it up.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "timeLow-1": {
+  "h": "c5731939e1b3",
+  "text": "Time running out! Who can steal the round?",
+  "s": 2.32,
+  "heard": "Time running out, who can steal the round?",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "punch-0": {
+  "h": "08edcc4672a0",
+  "text": "Right on the button!",
+  "s": 1.12,
+  "heard": "Right on the button.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "punch-1": {
+  "h": "25682cf8fdaf",
+  "text": "Straight to the face!",
+  "s": 1.31,
+  "heard": "Straight to the face.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "punch-2": {
+  "h": "5bf10a1474cf",
+  "text": "On the chin!",
+  "s": 0.84,
+  "heard": "On the chin.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "punch-3": {
+  "h": "0e4dfdc50e9b",
+  "text": "Clean punch!",
+  "s": 0.94,
+  "heard": "Clean punch.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "hook-0": {
+  "h": "de6b33186813",
+  "text": "Hook lands!",
+  "s": 0.94,
+  "heard": "Hook lands.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "hook-1": {
+  "h": "f4150b9feeea",
+  "text": "Hook behind the ear!",
+  "s": 1.18,
+  "heard": "Hook behind the ear.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "hook-2": {
+  "h": "59ce0cf73180",
+  "text": "Swinging hook, full in the face!",
+  "s": 1.91,
+  "heard": "Swinging hook full in the face.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "upper-0": {
+  "h": "db24ffa9bbd0",
+  "text": "Uppercut on the chin!",
+  "s": 1.59,
+  "heard": "Uppercut on the chin.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "upper-1": {
+  "h": "d2efecb7dc62",
+  "text": "Up the middle, on the chin!",
+  "s": 1.75,
+  "heard": "Up the middle on the chin.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "upper-2": {
+  "h": "ac568e632c69",
+  "text": "Huge uppercut!",
+  "s": 0.99,
+  "heard": "Huge uppercut.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyPunch-0": {
+  "h": "0da9ed76b4d2",
+  "text": "Punch to the body!",
+  "s": 0.89,
+  "heard": "Punch to the body.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyPunch-1": {
+  "h": "15e649a678e3",
+  "text": "Dug in to the stomach!",
+  "s": 1.28,
+  "heard": "Dug in to the stomach.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyPunch-2": {
+  "h": "4ddb26d8e5c9",
+  "text": "Into the ribs!",
+  "s": 0.97,
+  "heard": "Into the ribs.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "catchHit-0": {
+  "h": "99a61691b55b",
+  "text": "Catches the leg and punches back!",
+  "s": 1.57,
+  "heard": "Catches the leg and punches back.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "catchHit-1": {
+  "h": "5d35f7a6e269",
+  "text": "Leg caught, and he fires straight back!",
+  "s": 2.06,
+  "heard": "Leg caught and he fires straight back.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbow-0": {
+  "h": "15e40a2a00f2",
+  "text": "Elbow! It lands!",
+  "s": 1.25,
+  "heard": "Elbow it lands.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbow-1": {
+  "h": "4dab0f2dc9b5",
+  "text": "Big elbow!",
+  "s": 0.78,
+  "heard": "Big elbow.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbow-2": {
+  "h": "89914a6263ac",
+  "text": "Elbow to the face!",
+  "s": 1.15,
+  "heard": "Elbow to the face.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbow-3": {
+  "h": "98594d0b78f0",
+  "text": "Slicing elbow! Dangerous!",
+  "s": 1.91,
+  "heard": "Slicing elbow dangerous.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "knee-0": {
+  "h": "5be8de87577b",
+  "text": "Knee to the body!",
+  "s": 1.04,
+  "heard": "Knee to the body!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "knee-1": {
+  "h": "f67b843151c2",
+  "text": "Heavy knee!",
+  "s": 0.94,
+  "heard": "Heavy knee!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "knee-2": {
+  "h": "79bcdcf207b1",
+  "text": "Straight knee to the gut!",
+  "s": 1.31,
+  "heard": "Straight knee to the gut!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "knee-3": {
+  "h": "d8373340fb6c",
+  "text": "Drives the knee in!",
+  "s": 1.12,
+  "heard": "Drives the knee in!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyKick-0": {
+  "h": "9c07c8550a2e",
+  "text": "Body kick, flush!",
+  "s": 1.2,
+  "heard": "Body kick flush!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyKick-1": {
+  "h": "0b03ee9b2dcd",
+  "text": "Kick to the ribs!",
+  "s": 0.91,
+  "heard": "Kick to the ribs!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyKick-2": {
+  "h": "b6922d861bdf",
+  "text": "Body kick, what a crack!",
+  "s": 1.44,
+  "heard": "Body kick, what a crack!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyKick-3": {
+  "h": "e137b7c6d939",
+  "text": "Shin across the body!",
+  "s": 1.31,
+  "heard": "Shin across the body!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "highKick-0": {
+  "h": "af50b9e6637d",
+  "text": "Head kick! It's in!",
+  "s": 1.31,
+  "heard": "Head kick, it's in!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "highKick-1": {
+  "h": "a1571b1269e2",
+  "text": "Head kick! Flush!",
+  "s": 1.44,
+  "heard": "Head kick flush!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "highKick-2": {
+  "h": "68f5167d21d8",
+  "text": "High kick to the jaw!",
+  "s": 1.25,
+  "heard": "High kick to the jaw!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKick-0": {
+  "h": "5b92c463c636",
+  "text": "Heavy leg kick!",
+  "s": 0.89,
+  "heard": "Heavy leg kick!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKick-1": {
+  "h": "52034a6220d9",
+  "text": "Chops the leg!",
+  "s": 0.84,
+  "heard": "Chops the leg!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKick-2": {
+  "h": "f28f24b95126",
+  "text": "Shin to the thigh!",
+  "s": 1.07,
+  "heard": "Shin to the thigh!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKickMore-0": {
+  "h": "a1ae96077912",
+  "text": "Another leg kick! Taking the leg away!",
+  "s": 2.17,
+  "heard": "Another leg kick, taking the leg away!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKickMore-1": {
+  "h": "6efb24d4de26",
+  "text": "Back to the leg again!",
+  "s": 1.04,
+  "heard": "Back to the leg again!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teep-0": {
+  "h": "0a397bff5aa3",
+  "text": "Teep, full in the stomach!",
+  "s": 1.75,
+  "heard": "Teep full in the stomach!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teep-1": {
+  "h": "509175a19b0d",
+  "text": "Teep to the belly! He's knocked back!",
+  "s": 2.12,
+  "heard": "Teep to the belly, he's knocked back!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teep-2": {
+  "h": "fb093c35965a",
+  "text": "Lovely teep to stop him!",
+  "s": 1.62,
+  "heard": "Lovely teep to stop him!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teepFace-0": {
+  "h": "edcbc339ee43",
+  "text": "Teep to the face! Flush!",
+  "s": 1.88,
+  "heard": "Teep to the face, flush!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teepFace-1": {
+  "h": "9131eeeab731",
+  "text": "Right in the face with the foot!",
+  "s": 1.62,
+  "heard": "Right in the face with the foot!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "counter-0": {
+  "h": "9e25a2c08a2b",
+  "text": "Countered straight away!",
+  "s": 1.33,
+  "heard": "Countered straight away!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "counter-1": {
+  "h": "c2ae7f366b6f",
+  "text": "Beautiful counter!",
+  "s": 1.15,
+  "heard": "Beautiful counter!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "counter-2": {
+  "h": "e1874b6df55d",
+  "text": "Caught on the counter!",
+  "s": 1.23,
+  "heard": "Caught on the counter!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "counter-3": {
+  "h": "b2822b116700",
+  "text": "Beats him to the punch!",
+  "s": 1.23,
+  "heard": "Beat him to the punch!",
+  "ok": 0.94,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "combo-0": {
+  "h": "d88e18a3d9be",
+  "text": "A full combination!",
+  "s": 1.25,
+  "heard": "A full combination!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "combo-1": {
+  "h": "17f56c3d0072",
+  "text": "Shot after shot!",
+  "s": 1.25,
+  "heard": "Shot after shot!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "combo-2": {
+  "h": "d0274d1e5077",
+  "text": "Combination, every one lands!",
+  "s": 1.91,
+  "heard": "Combination, every one lands!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "combo-3": {
+  "h": "02343232d8a1",
+  "text": "One, two, three! The whole set!",
+  "s": 2.14,
+  "heard": "One, two, three, the whole set!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "special-0": {
+  "h": "2bb186520a7a",
+  "text": "Signature move!",
+  "s": 1.33,
+  "heard": "Signature move!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "special-1": {
+  "h": "8fbb4520490f",
+  "text": "He lets the special go!",
+  "s": 1.54,
+  "heard": "He lets the special go!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "special-2": {
+  "h": "b4ab70956c1c",
+  "text": "Wow! Pure Muay Thai!",
+  "s": 2.64,
+  "heard": "Wow! Pure Muay Thai!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spChop-0": {
+  "h": "0cf78ab14d1a",
+  "text": "Chopping elbow! Right down on top!",
+  "s": 2.06,
+  "heard": "Chopping elbow, right down on top!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spChop-1": {
+  "h": "15f6f29d4c42",
+  "text": "Chopping elbow! On target!",
+  "s": 1.75,
+  "heard": "Chopping elbow, on target!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spKick-0": {
+  "h": "b508ea09c618",
+  "text": "Lightning head kick! So fast!",
+  "s": 1.96,
+  "heard": "Lightning head kick, so fast!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spKick-1": {
+  "h": "5183efe99ccd",
+  "text": "Lightning head kick! Flush!",
+  "s": 1.83,
+  "heard": "Lightning head kick, flush!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spFly-0": {
+  "h": "7ac3d7db9e40",
+  "text": "Flying knee! It lands!",
+  "s": 2.3,
+  "heard": "Flying knee, it lands!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spFly-1": {
+  "h": "69ad65bf28be",
+  "text": "Leaping knee! Beautiful!",
+  "s": 2.04,
+  "heard": "Leaping knee, beautiful!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spCroc-0": {
+  "h": "93242b1a3c51",
+  "text": "Crocodile tail spin! Flush!",
+  "s": 2.27,
+  "heard": "Crocodile tail spin, flush!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spCroc-1": {
+  "h": "9dd6461d2dd6",
+  "text": "Spinning crocodile tail! Wow!",
+  "s": 2.3,
+  "heard": "Spinning crocodile tail, wow!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spHanu-0": {
+  "h": "b13970d8b735",
+  "text": "Hanuman's offering! Up on the chin!",
+  "s": 2.27,
+  "heard": "Hanuman's offering, up on the chin!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spHanu-1": {
+  "h": "ff532a4ae012",
+  "text": "Hanuman's offering! Classic Muay Thai!",
+  "s": 2.48,
+  "heard": "Hanuman's offering, classic Muay Thai!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bigHit-0": {
+  "h": "e267349b2638",
+  "text": "Wow! What a shot!",
+  "s": 1.59,
+  "heard": "Wow, what a shot!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bigHit-1": {
+  "h": "fd5934b38e32",
+  "text": "Flush!",
+  "s": 0.73,
+  "heard": "Flush!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bigHit-2": {
+  "h": "54f2d6ec5aad",
+  "text": "Clean as you like! That shook him!",
+  "s": 2.17,
+  "heard": "Clean as you like, that shook him!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bigHit-3": {
+  "h": "7d3ecc564b74",
+  "text": "Wow! That one was heavy!",
+  "s": 1.75,
+  "heard": "Wow, that one was heavy!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "block-0": {
+  "h": "b26446d9894c",
+  "text": "Blocked.",
+  "s": 0.42,
+  "heard": "Blocked.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "block-1": {
+  "h": "a05aa6ccd17f",
+  "text": "Covered up.",
+  "s": 0.57,
+  "heard": "Covered up.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "block-2": {
+  "h": "e9f585ae19d5",
+  "text": "Tight guard.",
+  "s": 0.63,
+  "heard": "Tight guard.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "block-3": {
+  "h": "e0b01068854a",
+  "text": "Arms up just in time.",
+  "s": 1.12,
+  "heard": "Arms up just in time!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "check-0": {
+  "h": "17e7c3db149e",
+  "text": "Knee up to check it.",
+  "s": 0.97,
+  "heard": "Knee up to check it.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "check-1": {
+  "h": "0959bb0dce0e",
+  "text": "Checks the kick.",
+  "s": 0.63,
+  "heard": "Checks the kick.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "check-2": {
+  "h": "b25d3ba42cb2",
+  "text": "Shin check, just in time.",
+  "s": 1.54,
+  "heard": "Shin check just in time!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leanBack-0": {
+  "h": "87365165ad47",
+  "text": "Beautiful lean back!",
+  "s": 1.33,
+  "heard": "Beautiful lean back!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leanBack-1": {
+  "h": "5b70fd44b91e",
+  "text": "Leans away, just misses!",
+  "s": 1.88,
+  "heard": "Leans away, just misses.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leanBack-2": {
+  "h": "d7a6d6906ba4",
+  "text": "Leans back in time! So close!",
+  "s": 1.85,
+  "heard": "Leans back in time, so close.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "duck-0": {
+  "h": "a4b24a4989dd",
+  "text": "Ducks under it!",
+  "s": 0.6,
+  "heard": "Ducks under it.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "duck-1": {
+  "h": "9bdecd4ac834",
+  "text": "Ducks! Whiff!",
+  "s": 1.15,
+  "heard": "Ducks, whiff!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "slip-0": {
+  "h": "d387fe26bea6",
+  "text": "Nice slip!",
+  "s": 1.07,
+  "heard": "Nice slip.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "slip-1": {
+  "h": "5a9a6ebbe3a4",
+  "text": "Slips the punch!",
+  "s": 1.28,
+  "heard": "Slips the punch.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "slip-2": {
+  "h": "78d6fd1af8aa",
+  "text": "Moves the head! Punch misses!",
+  "s": 1.59,
+  "heard": "Moves the head, punch misses.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bellyKick-0": {
+  "h": "34b2719276d3",
+  "text": "Arches away from the kick!",
+  "s": 1.07,
+  "heard": "Arches away from the kick.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bellyKick-1": {
+  "h": "06de9b3fd13c",
+  "text": "Bends away! The kick just grazes him!",
+  "s": 1.91,
+  "heard": "Bends away, the kick just grazes him.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bellyBack-0": {
+  "h": "e695ccda5d13",
+  "text": "Sucks the stomach in, just in time!",
+  "s": 1.65,
+  "heard": "Sucks the stomach in just in time.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bellyBack-1": {
+  "h": "1ecd85c9925f",
+  "text": "Beautiful bend away!",
+  "s": 1.59,
+  "heard": "Beautiful bend away.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "dodge-0": {
+  "h": "402b58759389",
+  "text": "Gets out of the way!",
+  "s": 0.97,
+  "heard": "Gets out of the way!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "dodge-1": {
+  "h": "6b9188ffa851",
+  "text": "Misses! Nothing there!",
+  "s": 1.33,
+  "heard": "Misses, nothing there!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "catch-0": {
+  "h": "8a4a0408eca6",
+  "text": "Catches the leg!",
+  "s": 0.78,
+  "heard": "Catches the leg!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "catch-1": {
+  "h": "9b94eb731835",
+  "text": "Leg caught! Danger!",
+  "s": 1.12,
+  "heard": "Leg caught, danger!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinch-0": {
+  "h": "f4edcce73daf",
+  "text": "They're in the clinch.",
+  "s": 0.71,
+  "heard": "They're in the clinch!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinch-1": {
+  "h": "a221fb244ec3",
+  "text": "Locked up in the clinch.",
+  "s": 0.99,
+  "heard": "Locked up in the clinch!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinch-2": {
+  "h": "968f140e6bc0",
+  "text": "Inside now, wrestling for position.",
+  "s": 1.72,
+  "heard": "Inside now, wrestling for position!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinch-3": {
+  "h": "b1bcd92458df",
+  "text": "He's got the neck tie.",
+  "s": 0.99,
+  "heard": "He's got the neck tie!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKnee-0": {
+  "h": "7bff5429c0ee",
+  "text": "Knee in the clinch!",
+  "s": 1.02,
+  "heard": "Knee in the clinch!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKnee-1": {
+  "h": "1e045745709d",
+  "text": "Knees, knees, knees!",
+  "s": 1.33,
+  "heard": "Knees, knees, knees!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKnee-2": {
+  "h": "a0c1a6efcfec",
+  "text": "Knee to the body in the clinch!",
+  "s": 1.36,
+  "heard": "Knee to the body in the clinch!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKneeHead-0": {
+  "h": "bc88872c0bd7",
+  "text": "Pulls the head down for the knee!",
+  "s": 1.41,
+  "heard": "Pulls the head down for the knee!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKneeHead-1": {
+  "h": "997467164d32",
+  "text": "Head down, knee up!",
+  "s": 1.12,
+  "heard": "Head down, knee up!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchElbow-0": {
+  "h": "64452e06c2cb",
+  "text": "Elbow in the clinch!",
+  "s": 0.91,
+  "heard": "Elbow in the clinch!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchElbow-1": {
+  "h": "57fea98a126f",
+  "text": "Short elbow inside! Flush!",
+  "s": 1.83,
+  "heard": "Short elbow inside, flush!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "separate-0": {
+  "h": "f9e6d987b8ac",
+  "text": "The referee breaks them.",
+  "s": 0.89,
+  "heard": "The referee breaks them!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "separate-1": {
+  "h": "7f27cb245961",
+  "text": "Referee says break.",
+  "s": 0.81,
+  "heard": "Referee says break!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "separate-2": {
+  "h": "10d70b7f02b6",
+  "text": "They part and reset.",
+  "s": 0.89,
+  "heard": "They part and reset!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "escape-0": {
+  "h": "6e030dee3298",
+  "text": "Shakes free!",
+  "s": 0.76,
+  "heard": "Shakes free!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "escape-1": {
+  "h": "68d9f86fba75",
+  "text": "Wriggles out of the clinch!",
+  "s": 1.02,
+  "heard": "Wriggles out of the clinch.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbowOut-0": {
+  "h": "132eb0e6929e",
+  "text": "Elbow breaks the clinch!",
+  "s": 1.12,
+  "heard": "Elbow breaks the clinch.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbowOut-1": {
+  "h": "4fe17e487789",
+  "text": "Levers an elbow out!",
+  "s": 1.04,
+  "heard": "Levers an elbow out.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throw-0": {
+  "h": "aee5b508a8de",
+  "text": "Throws him down!",
+  "s": 1.15,
+  "heard": "Throws him down.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throw-1": {
+  "h": "96c2ea99534f",
+  "text": "Dumped on the canvas!",
+  "s": 1.15,
+  "heard": "Dumped on the canvas.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throw-2": {
+  "h": "9818954b9e88",
+  "text": "Thrown down! Points for that!",
+  "s": 1.72,
+  "heard": "Thrown down, points for that.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throwFail-0": {
+  "h": "74df1c9bce6d",
+  "text": "He stands firm, won't go down.",
+  "s": 1.85,
+  "heard": "He stands firm, won't go down.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throwFail-1": {
+  "h": "0c5a414f0152",
+  "text": "Can't throw him, great balance.",
+  "s": 1.8,
+  "heard": "Can't throw him, great balance.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teepDump-0": {
+  "h": "43a179fdaaa7",
+  "text": "Teeped onto the seat of his shorts!",
+  "s": 1.52,
+  "heard": "Tipped onto the seat of his shorts.",
+  "ok": 0.93,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teepDump-1": {
+  "h": "94a3cc1a012c",
+  "text": "Teep sends him flying!",
+  "s": 1.67,
+  "heard": "Teep sends him flying!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "legHurt-0": {
+  "h": "050cfc4aa927",
+  "text": "The leg is going, too many kicks!",
+  "s": 2.43,
+  "heard": "The leg is going! Too many kicks!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "legHurt-1": {
+  "h": "adbfb862cf8b",
+  "text": "He's taken a lot on that leg, it's showing!",
+  "s": 2.25,
+  "heard": "He's taken a lot on that leg, it's showing!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyHurt-0": {
+  "h": "86577ba4c4ba",
+  "text": "The body shots are adding up, he's fading!",
+  "s": 2.27,
+  "heard": "The body shots are adding up, he's fading!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyHurt-1": {
+  "h": "8bf3df2feed3",
+  "text": "Hit to the body so often, he's slowing!",
+  "s": 2.32,
+  "heard": "Hit to the body so often, he's slowing!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stunPunch-0": {
+  "h": "c609f58a933d",
+  "text": "He's rocked! Go get him!",
+  "s": 1.54,
+  "heard": "He's rocked! Go get him!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stun-0": {
+  "h": "04eadb0d8ccb",
+  "text": "His legs are going!",
+  "s": 1.31,
+  "heard": "His legs are going!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stun-1": {
+  "h": "7017c1817aa2",
+  "text": "He's hurt! He's wobbling!",
+  "s": 1.62,
+  "heard": "He's hurt! He's wobbling!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stun-2": {
+  "h": "c0d2b328c32e",
+  "text": "Glassy eyes! Finish it!",
+  "s": 1.65,
+  "heard": "Glassy eyes! Finish it!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stunEnd-0": {
+  "h": "816ddd5c4496",
+  "text": "He's back on balance.",
+  "s": 1.04,
+  "heard": "He's back on balance!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stunEnd-1": {
+  "h": "b5ba7c7b8de2",
+  "text": "He survives the moment.",
+  "s": 1.18,
+  "heard": "He survives the moment!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stunEnd-2": {
+  "h": "b5323eed403c",
+  "text": "He's recovered.",
+  "s": 0.81,
+  "heard": "He's recovered!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "kd-0": {
+  "h": "c79425f1ea9f",
+  "text": "He's down! The referee starts the count!",
+  "s": 2.4,
+  "heard": "He's down! The referee starts the count!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "kd-1": {
+  "h": "99327a9aaae1",
+  "text": "He's down!",
+  "s": 0.89,
+  "heard": "He's down!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "kd-2": {
+  "h": "5ae5d3ea7b5a",
+  "text": "Down on the canvas!",
+  "s": 1.52,
+  "heard": "Down on the canvas!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "kd-3": {
+  "h": "8c994718966c",
+  "text": "Down! He's down! The count is on!",
+  "s": 2.3,
+  "heard": "Down, he's down! The count is on!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "getup-0": {
+  "h": "0edd3282c828",
+  "text": "He's up, and he fights on!",
+  "s": 1.65,
+  "heard": "He's up! And he fights on!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "getup-1": {
+  "h": "08fa98f5b3ec",
+  "text": "Back on his feet! What heart!",
+  "s": 1.49,
+  "heard": "Back on his feet! What heart!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "getup-2": {
+  "h": "efc8962e3709",
+  "text": "He's alright! Up and fighting!",
+  "s": 1.36,
+  "heard": "He's alright, up and fighting!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "ko-0": {
+  "h": "a32d49fcffc0",
+  "text": "Knockout! It's over!",
+  "s": 1.96,
+  "heard": "Knockout! It's over!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "ko-1": {
+  "h": "af3d9c2bf270",
+  "text": "He can't get up! It's all over!",
+  "s": 2.3,
+  "heard": "He can't get up! It's all over!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "ko-2": {
+  "h": "56413a2b3570",
+  "text": "Knockout! What a finish!",
+  "s": 1.78,
+  "heard": "Knockout! What a finish!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "koFlash-0": {
+  "h": "081ecdbeba31",
+  "text": "Out cold before he hits the floor!",
+  "s": 2.35,
+  "heard": "Out cold before he hits the floor!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "koFlash-1": {
+  "h": "1a51602fee80",
+  "text": "Knocked out on the spot! No count needed!",
+  "s": 2.53,
+  "heard": "Knocked out on the spot! No count needed!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "tko-0": {
+  "h": "9a1800309696",
+  "text": "The referee stops it! TKO!",
+  "s": 2.32,
+  "heard": "The referee stops it! TKO!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "tko-1": {
+  "h": "54d95ddf485f",
+  "text": "Three knockdowns! The referee has seen enough!",
+  "s": 3.47,
+  "heard": "Three knockdowns! The referee has seen enough!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winRed-0": {
+  "h": "5da2f1c39387",
+  "text": "Red corner wins!",
+  "s": 1.57,
+  "heard": "Red corner wins!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winRed-1": {
+  "h": "70284d6356ad",
+  "text": "Victory for the red corner!",
+  "s": 2.27,
+  "heard": "Victory for the red corner!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winRed-2": {
+  "h": "599c095bd51c",
+  "text": "The red corner's hand is raised!",
+  "s": 2.22,
+  "heard": "The red corner's hand is raised.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winBlue-0": {
+  "h": "7ade86660432",
+  "text": "Blue corner wins!",
+  "s": 1.38,
+  "heard": "Blue corner wins!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winBlue-1": {
+  "h": "10c6f1c753e3",
+  "text": "Victory for the blue corner!",
+  "s": 1.78,
+  "heard": "Victory for the blue corner!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winBlue-2": {
+  "h": "73723ef6cfc6",
+  "text": "The blue corner's hand is raised!",
+  "s": 1.88,
+  "heard": "The blue corner's hand is raised.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decRed-0": {
+  "h": "84c1e0ab03a9",
+  "text": "Red corner wins on points!",
+  "s": 2.12,
+  "heard": "Red corner wins on points.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decRed-1": {
+  "h": "be2fbcc27a90",
+  "text": "The judges give it to the red corner!",
+  "s": 2.22,
+  "heard": "The judges give it to the red corner.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decBlue-0": {
+  "h": "acdc20344e52",
+  "text": "Blue corner wins on points!",
+  "s": 2.22,
+  "heard": "Blue corner wins on points!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decBlue-1": {
+  "h": "13538bd61530",
+  "text": "The judges give it to the blue corner!",
+  "s": 2.38,
+  "heard": "The judges give it to the blue corner.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decDraw-0": {
+  "h": "a66be2521bb3",
+  "text": "It's a draw! Dead level on points.",
+  "s": 2.8,
+  "heard": "It's a draw! Dead level on points!",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decDraw-1": {
+  "h": "ae4927acc4e5",
+  "text": "The judges call it a draw!",
+  "s": 1.54,
+  "heard": "The judges call it a draw.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "draw-0": {
+  "h": "cb2cf86df08b",
+  "text": "A draw! Neither man would give an inch, so close all the way that it ends level. These two need a rematch, folks!",
+  "s": 6.77,
+  "heard": "A draw! Neither man would give an inch, so close all the way that it ends level. These two need a rematch, folks.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "draw-1": {
+  "h": "29899406b245",
+  "text": "Level after three rounds, and it ends in a draw. Nobody gave anything away. We'll surely see these two again!",
+  "s": 5.9,
+  "heard": "Level after three rounds and it ends in a draw. Nobody gave anything away. We'll surely see these two again.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
  }
 }

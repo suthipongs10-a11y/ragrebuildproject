@@ -25,5 +25,500 @@
   "ok": 1,
   "m": "gemini-3.8-flash-tts",
   "ear": "gemini-3-flash-preview"
+ },
+ "intro-0": {
+  "h": "6124bbaa9103",
+  "text": "赛前拜师舞开始了。",
+  "s": 1.28,
+  "heard": "赛前拜师舞开始了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "intro-1": {
+  "h": "653f2c855320",
+  "text": "各位拳迷大家好！",
+  "s": 1.04,
+  "heard": "各位拳迷大家好",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "intro-2": {
+  "h": "92ef4fedb486",
+  "text": "这场对决非常值得期待。",
+  "s": 1.65,
+  "heard": "这场对决非常值得期待",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "intro-3": {
+  "h": "7d63fab9ddf7",
+  "text": "上台跳拜师舞了。",
+  "s": 1.25,
+  "heard": "上台跳拜师舞了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round2-0": {
+  "h": "0bae8df4ca2d",
+  "text": "第二回合，节奏加快了！",
+  "s": 1.49,
+  "heard": "第二回合节奏加快了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round2-1": {
+  "h": "d3b9868440e4",
+  "text": "进入第二回合！",
+  "s": 1.1,
+  "heard": "进入第二回合",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round2-2": {
+  "h": "d6a375d2d532",
+  "text": "第二回合来了！越打越激烈！",
+  "s": 2.06,
+  "heard": "第二回合来了 越打越激烈",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round2-3": {
+  "h": "83832e3039b0",
+  "text": "第二回合铃响！要开始抢分了！",
+  "s": 1.78,
+  "heard": "第二回合铃响，要开始抢分了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round3-0": {
+  "h": "3af0616d7172",
+  "text": "最后一回合！谁能拿下胜利！",
+  "s": 1.93,
+  "heard": "最后一回合，谁能拿下胜利",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round3-1": {
+  "h": "37c662081cf8",
+  "text": "第三回合，决胜回合！",
+  "s": 1.7,
+  "heard": "第三回合 决胜回合",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round3-2": {
+  "h": "d40c16c93c78",
+  "text": "最后一回合！全力以赴！",
+  "s": 1.8,
+  "heard": "最后一回合，全力以赴",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round3-3": {
+  "h": "dfd50a3fdcaf",
+  "text": "最后一回合！胜负就看这一回合！",
+  "s": 2.4,
+  "heard": "最后一回合，胜负就看这一回合",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "rest-0": {
+  "h": "b963c77d02c9",
+  "text": "回合结束，休息补水。",
+  "s": 1.31,
+  "heard": "回合结束 休息补水",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "rest-1": {
+  "h": "ab0e00f2a91e",
+  "text": "回合结束。",
+  "s": 0.57,
+  "heard": "回合结束",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "rest-2": {
+  "h": "c8ac122cf1fa",
+  "text": "铃声响，回合结束，角落教练上来补水。",
+  "s": 4.55,
+  "heard": "铃声响，回合结束，角落教练上来补水",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "corner-0": {
+  "h": "657f970399bc",
+  "text": "教练忙着补水、擦汗、抹油按摩。",
+  "s": 2.51,
+  "heard": "教练忙着补水擦汗，抹油按摩",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "corner-1": {
+  "h": "de187628d475",
+  "text": "先补水，再抹油放松肌肉。",
+  "s": 2.38,
+  "heard": "先补水 再抹油，放松肌肉",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "corner-2": {
+  "h": "2a8113faecd4",
+  "text": "角落教练手脚不停，又补水又按摩。",
+  "s": 3.5,
+  "heard": "擦汗 角落教练手脚不停 又补水，又按摩",
+  "ok": 0.88,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "cornerOut-0": {
+  "h": "2fa9f116f91c",
+  "text": "休息结束，继续开打！",
+  "s": 1.49,
+  "heard": "休息结束，继续开打",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "cornerOut-1": {
+  "h": "042062715336",
+  "text": "准备好了！离开角落了！",
+  "s": 1.46,
+  "heard": "准备好了，离开角落了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decWait-0": {
+  "h": "0c9b4cb10412",
+  "text": "三个回合打完，等待裁判判定。",
+  "s": 2.22,
+  "heard": "三个回合打完，等待裁判判定",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decWait-1": {
+  "h": "533add43f176",
+  "text": "打满全场，等裁判打分。",
+  "s": 1.99,
+  "heard": "打满全场，等裁判打分",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decWait-2": {
+  "h": "c77228316adb",
+  "text": "三回合结束，一起听判决。",
+  "s": 2.01,
+  "heard": "三回合结束，一起听判决",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel1-0": {
+  "h": "8c4f752fe98d",
+  "text": "第一回合双方还在试探。",
+  "s": 1.99,
+  "heard": "第一回合 双方还在试探",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel1-1": {
+  "h": "ee62757c5d7f",
+  "text": "第一回合，双方都在观察对手。",
+  "s": 2.32,
+  "heard": "第一回合 双方都在观察对手",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel-0": {
+  "h": "fcd19602bb93",
+  "text": "双方都还没打开局面。",
+  "s": 1.1,
+  "heard": "双方都还没打开局面",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel-1": {
+  "h": "08f73a05aa0d",
+  "text": "在找距离。",
+  "s": 0.6,
+  "heard": "在找距离",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "rest-3": {
+  "h": "611c5f02349e",
+  "text": "回合结束，回角落听教练布置。",
+  "s": 2.17,
+  "heard": "回合结束 回角落，听教练布置",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel-2": {
+  "h": "1018f9268763",
+  "text": "还在互相试探。",
+  "s": 0.97,
+  "heard": "还在互相试探",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel-3": {
+  "h": "435149c59e3e",
+  "text": "都很耐心，等待机会。",
+  "s": 1.41,
+  "heard": "都很耐心 等待机会",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel-4": {
+  "h": "066e757c1494",
+  "text": "摇晃身体，寻找时机。",
+  "s": 1.33,
+  "heard": "摇晃身体，寻找时机",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel-5": {
+  "h": "b5ff0c2d48a4",
+  "text": "谁都不想先冒险。",
+  "s": 1.1,
+  "heard": "谁都不想先冒险",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-0": {
+  "h": "c63106de46e9",
+  "text": "正面对攻，谁也不让谁！",
+  "s": 1.28,
+  "heard": "正面对攻，谁也不让谁",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-1": {
+  "h": "21880a169861",
+  "text": "比赛越来越激烈了！",
+  "s": 1.36,
+  "heard": "比赛越来越激烈了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-2": {
+  "h": "0ec22cc1e2e3",
+  "text": "非常胶着！",
+  "s": 0.86,
+  "heard": "非常胶着",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-3": {
+  "h": "fd4d8f3c9ee0",
+  "text": "双方全力出手！",
+  "s": 1.18,
+  "heard": "双方全力出手",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-4": {
+  "h": "46b3410dacb6",
+  "text": "精彩的对攻！",
+  "s": 0.81,
+  "heard": "精彩的对攻",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "busy-5": {
+  "h": "5533b5b95e20",
+  "text": "全场观众都站起来了！",
+  "s": 1.33,
+  "heard": "全场观众都站起来了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "close-0": {
+  "h": "48d171a69cc5",
+  "text": "比分非常接近，还分不出高下。",
+  "s": 2.09,
+  "heard": "比分非常接近，还分不出高下",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "close-1": {
+  "h": "6bab6f7b9961",
+  "text": "比分咬得很紧。",
+  "s": 0.86,
+  "heard": "比分咬得很紧",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "close-2": {
+  "h": "f0a00add2682",
+  "text": "还难分胜负，继续看下去。",
+  "s": 2.06,
+  "heard": "还难分胜负 继续看下去",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadRed-0": {
+  "h": "cb7551d8f29a",
+  "text": "红角在分数上领先。",
+  "s": 1.28,
+  "heard": "红角在分数上领先",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadRed-1": {
+  "h": "b8f0c8e7b58b",
+  "text": "现在红角打得更好。",
+  "s": 1.7,
+  "heard": "现在红角打得更好",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadRed-2": {
+  "h": "e8788effdd1a",
+  "text": "红角的攻击更清楚有效。",
+  "s": 1.88,
+  "heard": "红角的攻击更清楚有效",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadBlue-0": {
+  "h": "01febae0dd02",
+  "text": "蓝角在分数上领先。",
+  "s": 1.25,
+  "heard": "蓝角在分数上领先",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadBlue-1": {
+  "h": "962fcc881e28",
+  "text": "现在蓝角打得更好。",
+  "s": 1.38,
+  "heard": "现在蓝角打得更好",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadBlue-2": {
+  "h": "9610a1acfd8f",
+  "text": "蓝角的攻击更清楚有效。",
+  "s": 1.88,
+  "heard": "蓝角的攻击更清楚有效",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "behindRed-0": {
+  "h": "fcc3ee6e7107",
+  "text": "红角落后，要加把劲了！",
+  "s": 1.57,
+  "heard": "红角落后要加把劲啦",
+  "ok": 0.89,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "behindRed-1": {
+  "h": "4b41d2c7c56a",
+  "text": "红角必须压上了，分数还落后！",
+  "s": 2.01,
+  "heard": "红角必须压上了，分数还落后",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "behindBlue-0": {
+  "h": "d7ce7a6ca60d",
+  "text": "蓝角落后，要加把劲了！",
+  "s": 1.52,
+  "heard": "蓝角落后要加把劲啦",
+  "ok": 0.89,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "behindBlue-1": {
+  "h": "ca9e6f4f0ea3",
+  "text": "蓝角必须压上了，分数还落后！",
+  "s": 1.85,
+  "heard": "蓝角必须压上了，分数还落后",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadChange-0": {
+  "h": "7946a45f4f62",
+  "text": "反超领先了！",
+  "s": 0.91,
+  "heard": "反超领先啦",
+  "ok": 0.8,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leadChange-1": {
+  "h": "ca00b3b38e82",
+  "text": "比分逆转了！局势变了！",
+  "s": 1.62,
+  "heard": "比分逆转啦，局势变啦",
+  "ok": 0.78,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "timeLow10-0": {
+  "h": "d50581f19030",
+  "text": "本回合最后十秒！",
+  "s": 1.36,
+  "heard": "本回合最后十秒",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "timeLow-0": {
+  "h": "8f505db86616",
+  "text": "回合快结束了！加油！",
+  "s": 1.31,
+  "heard": "回合快结束了 加油",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
  }
 }
