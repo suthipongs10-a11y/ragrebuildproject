@@ -10,7 +10,9 @@
 // The listener matters as much as the voice: gemini-3-flash-preview hears short shouted Thai right, gemini-3.5-flash
 // and gemini-2.5-flash drop words, and lines matched on a bad transcript come out shifted. So there is no fallback:
 // when the listener's daily quota (20 requests on the free tier) is gone the run stops and waits.
-// Usage: node tools/tts-commentary.mjs [--model gemini-3.8-flash-tts] [--ear model,model] [--dir assets/voice]
+// --lang en|zh: the commentator in English or Mandarin (src/lang/voice-<lang>.json, the same keys and number of lines as
+// LINES) into assets/voice-<lang>/; the referee's count and the crowd's shouts stay in Thai (the Thai clips are used).
+// Usage: node tools/tts-commentary.mjs [--lang th|en|zh] [--model gemini-3.8-flash-tts] [--ear model,model] [--dir assets/voice]
 //          [--only key,key] [--redo name,name|all] [--limit clips] [--batch 28] [--gap 13] [--keep-doubt] [--recheck]
 //   --recheck: first listen again to every clip that a listener not on the --ear list passed (or that nobody heard)
 // Needs ffmpeg and GEMINI_API_KEY (a Google AI Studio key; never put it in the repo).
@@ -21,9 +23,12 @@ import { createHash } from 'node:crypto';
 import { LINES, COUNT, SHOUT, VOICES, STYLE } from '../src/commentary.js';
 
 const arg = (k, d) => { const i = process.argv.indexOf('--' + k); return i > 0 ? process.argv[i + 1] : d; };
+const LANG = arg('lang', 'th'), LNAME = {th: 'Thai', en: 'English', zh: 'Mandarin Chinese'}[LANG];
+if (!LNAME) { console.log('--lang th, en or zh'); process.exit(1); }
+const SAY = LANG === 'th' ? null : JSON.parse(readFileSync(new URL('../src/lang/voice-' + LANG + '.json', import.meta.url), 'utf8'));
 const list = k => arg(k, '') ? arg(k).split(',') : null;
 const MODEL = arg('model', 'gemini-3.8-flash-tts'), EARS = list('ear') || ['gemini-3-flash-preview'], ONLY = list('only'), REDO = list('redo') || [];
-const LIMIT = +arg('limit', 1e9), BATCH = +arg('batch', 28), GAP = +arg('gap', 13), DIR = arg('dir', 'assets/voice'), MAN = DIR + '/manifest.json', TMP = DIR + '/_tmp', TAKE = DIR + '/_takes';
+const LIMIT = +arg('limit', 1e9), BATCH = +arg('batch', 28), GAP = +arg('gap', 13), DIR = arg('dir', LANG === 'th' ? 'assets/voice' : 'assets/voice-' + LANG), MAN = DIR + '/manifest.json', TMP = DIR + '/_tmp', TAKE = DIR + '/_takes';
 const KEY = process.env.GEMINI_API_KEY;
 if (!KEY) { console.log('set GEMINI_API_KEY'); process.exit(1); }
 const TAKES = 3, PASS = .72, HEAR = 20, API = 'https://generativelanguage.googleapis.com/v1beta/';
@@ -32,11 +37,12 @@ mkdirSync(TMP, {recursive: true}); mkdirSync(TAKE, {recursive: true});
 const man = existsSync(MAN) ? JSON.parse(readFileSync(MAN, 'utf8')) : {};
 
 let jobs = [];
-for (const [key, L] of Object.entries(LINES)) L.t.forEach((t, i) => jobs.push({name: key + '-' + i, key, text: t, voice: VOICES.caller, style: L.hot}));
-COUNT.forEach((t, i) => jobs.push({name: 'count-' + i, key: 'count', text: t, voice: VOICES.referee, style: 'count'}));
-SHOUT.forEach((t, i) => VOICES.crowd.forEach((v, j) => jobs.push({name: 'shout' + i + '-' + j, key: 'shout' + i, text: t, voice: v, style: 'shout'})));
+for (const [key, L] of Object.entries(LINES)) (SAY ? SAY[key] || [] : L.t).forEach((t, i) => jobs.push({name: key + '-' + i, key, text: t, voice: VOICES.caller, style: L.hot}));
+if (!SAY) COUNT.forEach((t, i) => jobs.push({name: 'count-' + i, key: 'count', text: t, voice: VOICES.referee, style: 'count'}));
+if (!SAY) SHOUT.forEach((t, i) => VOICES.crowd.forEach((v, j) => jobs.push({name: 'shout' + i + '-' + j, key: 'shout' + i, text: t, voice: v, style: 'shout'})));
 if (ONLY) jobs = jobs.filter(j => ONLY.includes(j.key));
-for (const J of jobs) J.h = createHash('sha1').update(JSON.stringify([J.text, J.voice, STYLE[J.style]])).digest('hex').slice(0, 12);
+const styleOf = k => (SAY ? STYLE[k].replace('Thai boxing TV commentator', `Muay Thai TV commentator speaking ${LNAME}`) : STYLE[k]);
+for (const J of jobs) J.h = createHash('sha1').update(JSON.stringify([J.text, J.voice, styleOf(J.style)])).digest('hex').slice(0, 12);
 const KEEP = process.argv.includes('--keep-doubt');
 const done = J => man[J.name] && man[J.name].h === J.h && existsSync(`${DIR}/${J.name}.mp3`) && (KEEP || man[J.name].ok == null || man[J.name].ok >= PASS);
 const redo = J => REDO.includes(J.name) || REDO[0] === 'all';
@@ -86,7 +92,7 @@ async function ask(model, path, body) {
 // Every line is a turn of its own: the words only, its style beside it, and a long pause after it to cut on
 async function speak(B) {
   const voices = [...new Set(B.map(J => J.voice))], two = voices.length > 1;
-  const content = B.map(J => ({type: 'text', text: J.text + ' <long pause> <long pause>', annotations: [{type: 'speech_metadata', ...(two ? {speaker: J.voice} : {}), style: STYLE[J.style]}]}));
+  const content = B.map(J => ({type: 'text', text: J.text + ' <long pause> <long pause>', annotations: [{type: 'speech_metadata', ...(two ? {speaker: J.voice} : {}), style: styleOf(J.style)}]}));
   const d = await ask(MODEL, 'interactions', {model: MODEL, input: [{type: 'user_input', content}], response_format: {type: 'audio'},
     generation_config: {speech_config: two ? {speakers: voices.map(v => ({speaker: v, voice: v}))} : [{voice: voices[0]}]}});
   const au = (d.steps || []).filter(s => s.type === 'model_output').flatMap(s => s.content || []).filter(c => c.type === 'audio').pop(); if (!au) return null;
@@ -144,7 +150,7 @@ function clip(wav, a, b, J, out) {
 async function hear(F) {
   // every clip has its number in front of it, or the listener runs two pieces of one sentence together and loses count
   const parts = F.flatMap((f, i) => [{text: `Clip ${i + 1}:`}, {inlineData: {mimeType: 'audio/mp3', data: readFileSync(f).toString('base64')}}]);
-  parts.push({text: `Those are ${F.length} separate short audio clips cut from a Thai Muay Thai TV broadcast. Some are a whole sentence, some only a word or a fragment. For each clip write down only the words audible in that clip itself, in Thai script; never complete a sentence from a neighbouring clip. If a clip has no speech write (none). Reply with exactly ${F.length} lines in the form "1: words", nothing else.`});
+  parts.push({text: `Those are ${F.length} separate short audio clips cut from a ${SAY ? LNAME + '-language ' : 'Thai '}Muay Thai TV broadcast. Some are a whole sentence, some only a word or a fragment. For each clip write down only the words audible in that clip itself, in ${LANG === "zh" ? "simplified Chinese characters" : LANG === "en" ? "English" : "Thai script"}; never complete a sentence from a neighbouring clip. If a clip has no speech write (none). Reply with exactly ${F.length} lines in the form "1: words", nothing else.`});
   let out = null, err;
   for (const model of EARS) { try { const d = await ask(model, `models/${model}:generateContent`, {contents: [{parts}], generationConfig: {temperature: 0}}); out = ((((d.candidates || [])[0] || {}).content || {}).parts || []).map(p => p.text || '').join(''); break; } catch (e) { err = e; } }
   if (out == null) throw err;
@@ -171,7 +177,7 @@ async function listen(files) {
   return heard;
 }
 // how close what was heard is to the line: letters only, tone marks dropped (the ear is least sure of those)
-const bare = s => s.replace(/[^ก-ฺเ-็]/g, '');
+const bare = LANG === 'en' ? s => s.toLowerCase().replace(/[^a-z]/g, '') : LANG === 'zh' ? s => s.replace(/[^\u4e00-\u9fff]/g, '') : s => s.replace(/[^ก-ฺเ-็]/g, '');
 function alike(a, b) {
   a = bare(a); b = bare(b); if (!a.length || !b.length) return 0;
   let row = Array.from({length: b.length + 1}, (_, i) => i);

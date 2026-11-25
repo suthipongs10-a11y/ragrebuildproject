@@ -190,6 +190,18 @@ if (existsSync('assets/scene-music/tracks.json')) {
   sceneTag = `<script type="application/json" id="scene-music">${JSON.stringify(list)}</script>`;
   console.log('scene music', Object.keys(list).join(','), (bytes / 1048576).toFixed(2) + ' MB (website only, fetched when needed)');
 }
+// the commentator in another language (tools/tts-commentary.mjs --lang en|zh), website only: one file per language, named
+// by content and fetched only by a game shown in that language (src/audio.js loadVoice); the referee's count and the
+// crowd stay the Thai ones in the page
+{ const langs = {};
+  for (const l of ['en', 'zh']) {
+    const dir = 'assets/voice-' + l; if (!existsSync(dir)) continue; const pack = {};
+    for (const f of readdirSync(dir).filter(f => f.endsWith('.mp3')).sort((a, b) => a.localeCompare(b, 'en', {numeric: true}))) { const [key] = f.slice(0, -4).split('-'); (pack[key] = pack[key] || []).push(readFileSync(dir + '/' + f).toString('base64')); }
+    const b = Buffer.from(JSON.stringify(pack)), name = 'a/' + createHash('sha256').update(b).digest('hex').slice(0, 16) + '.json'; writeFileSync('dist/site/' + name, b); langs[l] = '/' + name;
+    console.log('voice', l, Object.keys(pack).length, 'keys', (b.length / 1048576).toFixed(2) + ' MB (website only, fetched in that language)');
+  }
+  if (Object.keys(langs).length) sceneTag += `<script type="application/json" id="voice-langs">${JSON.stringify(langs)}</script>`;
+}
 const shell = gameBase.replace('<!--__MODELS__-->', () => uiCss + sceneTag).replace(appBlock, () => loader).replace(FONT_LINK, m => fontTag || m);
 if (fontTag && FONT_LINK.test(shell)) throw new Error('the site page still asks Google Fonts');
 writeFileSync('dist/site/index.html', head + shell + '\n</html>\n');

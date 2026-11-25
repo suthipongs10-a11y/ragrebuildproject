@@ -146,7 +146,13 @@ export function buildAudio() {
     const el = document.getElementById('voice-pack'); if (!el) return;
     const pack = JSON.parse(el.textContent), out = {};
     const dec = b64 => new Promise(res => { const bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); AC.decodeAudioData(u.buffer, res, () => res(null)); });
-    decoding = Promise.all(Object.entries(pack).map(async ([k, list]) => { out[k] = (await Promise.all(list.map(dec))).filter(Boolean); })).then(() => { clips = out; });
+    // the commentator in the page's language when the website has him (voice-langs, build.mjs): his lines replace the Thai
+    // ones key by key; the referee's count and the crowd stay Thai, as at a real Muay Thai ring. Thai when it cannot load.
+    let langs = {}; try { const t = document.getElementById('voice-langs'); if (t) langs = JSON.parse(t.textContent); } catch (e) { /* none */ }
+    const url = langs[document.documentElement.lang];
+    const own = url ? fetch(url).then(r => (r.ok ? r.json() : {})).catch(() => ({})) : Promise.resolve({});
+    decoding = own.then(o => { for (const k in o) if (Array.isArray(o[k]) && o[k].length) pack[k] = o[k]; })
+      .then(() => Promise.all(Object.entries(pack).map(async ([k, list]) => { out[k] = (await Promise.all(list.map(dec))).filter(Boolean); }))).then(() => { clips = out; });
   }
   // the crowd bed: the cheer recordings one after another, crossfaded, into crowdGain (which follows the fight)
   const bed = {on: false, next: 0, i: 0}; let swellEnd = 0;
