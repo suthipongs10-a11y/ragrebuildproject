@@ -520,5 +520,1382 @@
   "ok": 1,
   "m": "gemini-3.8-flash-tts",
   "ear": "gemini-3-flash-preview"
+ },
+ "timeLow-1": {
+  "h": "a8af493449c2",
+  "text": "时间不多了！谁还能抢分！",
+  "s": 1.96,
+  "heard": "时间不多了，谁还能抢分？",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "punch-0": {
+  "h": "8880a2801587",
+  "text": "重拳命中！",
+  "s": 0.76,
+  "heard": "重拳命中！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "punch-1": {
+  "h": "6f3ba430051f",
+  "text": "直拳打脸！",
+  "s": 1.02,
+  "heard": "直拳打脸！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "punch-2": {
+  "h": "14992943eb83",
+  "text": "打中下巴！",
+  "s": 0.73,
+  "heard": "打中下巴！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "punch-3": {
+  "h": "129514815f9a",
+  "text": "一拳结结实实！",
+  "s": 1.31,
+  "heard": "一拳结结实实！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "hook-0": {
+  "h": "22b0a59c7532",
+  "text": "勾拳打中了！",
+  "s": 0.91,
+  "heard": "勾拳打中了！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "hook-1": {
+  "h": "73ac0435b3e6",
+  "text": "勾拳打在耳后！",
+  "s": 1.2,
+  "heard": "勾拳打在耳后！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "hook-2": {
+  "h": "3320eae8b7ff",
+  "text": "大勾拳打满脸！",
+  "s": 1.2,
+  "heard": "大勾拳打满脸！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "upper-0": {
+  "h": "7bfcc90d0e6d",
+  "text": "上勾拳打中下巴！",
+  "s": 1.31,
+  "heard": "上勾拳打中下巴！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "upper-1": {
+  "h": "a162c89b474a",
+  "text": "从中路挑上下巴！",
+  "s": 1.44,
+  "heard": "从中路挑上下巴！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "upper-2": {
+  "h": "87faa48dcba6",
+  "text": "漂亮的上勾拳！",
+  "s": 0.99,
+  "heard": "漂亮的上勾拳！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyPunch-0": {
+  "h": "b46c64748f81",
+  "text": "拳打身体！",
+  "s": 0.91,
+  "heard": "一拳打身体！",
+  "ok": 0.8,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyPunch-1": {
+  "h": "34bc6d7c06bb",
+  "text": "一拳打进肚子！",
+  "s": 1.15,
+  "heard": "一拳打中肚子！",
+  "ok": 0.83,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyPunch-2": {
+  "h": "6704875d5243",
+  "text": "打中肋部！",
+  "s": 0.63,
+  "heard": "打中肋部！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "catchHit-0": {
+  "h": "65001e2a3bdd",
+  "text": "接腿反击一拳！",
+  "s": 1.04,
+  "heard": "接腿反击一拳！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "catchHit-1": {
+  "h": "9aa7bf4fc76d",
+  "text": "接住了腿，马上回击！",
+  "s": 1.33,
+  "heard": "接住了腿马上回击！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbow-0": {
+  "h": "994dea4711bb",
+  "text": "肘击！打中了！",
+  "s": 0.89,
+  "heard": "肘击！ 打中了！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbow-1": {
+  "h": "5800364d94b4",
+  "text": "重肘命中！",
+  "s": 0.65,
+  "heard": "重肘命中！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbow-2": {
+  "h": "2c6f94a1b305",
+  "text": "肘击打脸！",
+  "s": 0.65,
+  "heard": "肘击打脸",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbow-3": {
+  "h": "a49aef08516c",
+  "text": "切肘！非常危险！",
+  "s": 1.28,
+  "heard": "切肘，非常危险",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "knee-0": {
+  "h": "d3f3abd8d7cd",
+  "text": "膝撞身体！",
+  "s": 0.65,
+  "heard": "膝撞身体",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "knee-2": {
+  "h": "47c7eb125f8a",
+  "text": "直膝撞腹！",
+  "s": 0.97,
+  "heard": "直膝撞腹",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "knee-3": {
+  "h": "4e76775f4647",
+  "text": "膝盖顶进去了！",
+  "s": 1.31,
+  "heard": "膝盖顶进去了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyKick-0": {
+  "h": "f7242be9970f",
+  "text": "踢中身体！",
+  "s": 0.71,
+  "heard": "踢中身体",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyKick-1": {
+  "h": "2dab4f769ec3",
+  "text": "踢中肋部！",
+  "s": 0.76,
+  "heard": "踢中肋部",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyKick-2": {
+  "h": "9788402e676f",
+  "text": "中段踢，响声震天！",
+  "s": 1.65,
+  "heard": "中段踢，响声震天",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyKick-3": {
+  "h": "2b7175d32594",
+  "text": "小腿抽中身体！",
+  "s": 1.31,
+  "heard": "小腿抽中身体",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "highKick-0": {
+  "h": "a89804c8d78e",
+  "text": "高踢！踢中了！",
+  "s": 1.59,
+  "heard": "高踢 踢中了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "highKick-1": {
+  "h": "4b5bbaaebd7d",
+  "text": "高踢！结结实实！",
+  "s": 1.83,
+  "heard": "高踢，结结实实",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "highKick-2": {
+  "h": "cbc7980d0cc8",
+  "text": "高踢打中下颚！",
+  "s": 1.57,
+  "heard": "高踢 打中下颚",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKick-0": {
+  "h": "7095d6c46eb3",
+  "text": "重重的低踢！",
+  "s": 0.94,
+  "heard": "重重的低踢",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKick-1": {
+  "h": "c2b1498b7805",
+  "text": "踢腿砍下去！",
+  "s": 1.12,
+  "heard": "踢腿砍下去",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKick-2": {
+  "h": "00bc4baf3b61",
+  "text": "小腿踢中大腿！",
+  "s": 1.57,
+  "heard": "小腿 踢中大腿",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKickMore-0": {
+  "h": "1f0040971629",
+  "text": "又是低踢！慢慢废掉他的腿！",
+  "s": 2.4,
+  "heard": "又是低踢，慢慢废掉他的腿",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "lowKickMore-1": {
+  "h": "3ca92c26bb51",
+  "text": "再踢腿！",
+  "s": 0.68,
+  "heard": "再踢腿",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teep-0": {
+  "h": "4e73a4dfba95",
+  "text": "蹬腿正中！",
+  "s": 0.65,
+  "heard": "蹬腿正中",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teep-1": {
+  "h": "efc28a98e51a",
+  "text": "蹬中肚子！被蹬退了！",
+  "s": 1.25,
+  "heard": "蹬中肚子，被蹬退了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teepFace-0": {
+  "h": "80c373ca7b61",
+  "text": "蹬脸！正中！",
+  "s": 0.86,
+  "heard": "蹬脸 正中",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teepFace-1": {
+  "h": "b6ee7890d825",
+  "text": "一脚蹬在脸上！",
+  "s": 0.99,
+  "heard": "一脚蹬在脸上",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "counter-0": {
+  "h": "d5f37b03b5cb",
+  "text": "立刻反击！",
+  "s": 0.63,
+  "heard": "立刻反击",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "counter-1": {
+  "h": "d6d2f052f964",
+  "text": "漂亮的反击！",
+  "s": 0.81,
+  "heard": "漂亮的反击",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "counter-2": {
+  "h": "04dea87649d4",
+  "text": "被反击打中！",
+  "s": 0.73,
+  "heard": "反击打中",
+  "ok": 0.8,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "counter-3": {
+  "h": "992727efdb64",
+  "text": "抢先一步反击！",
+  "s": 0.94,
+  "heard": "抢先一步反击",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "combo-0": {
+  "h": "23680e2aebc3",
+  "text": "一套组合拳！",
+  "s": 0.78,
+  "heard": "一套组合拳",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "combo-1": {
+  "h": "81b8761b82fc",
+  "text": "连续出击！",
+  "s": 0.78,
+  "heard": "连续出击",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "combo-2": {
+  "h": "12b9a71b639a",
+  "text": "组合攻击，全部命中！",
+  "s": 1.46,
+  "heard": "组合攻击，全部命中",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "combo-3": {
+  "h": "4bdad597e2e4",
+  "text": "一、二、三！整套打完！",
+  "s": 1.85,
+  "heard": "一 二三，整套打完",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "special-0": {
+  "h": "8c1cf18d078c",
+  "text": "绝招！",
+  "s": 0.57,
+  "heard": "绝招",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "special-1": {
+  "h": "88a65681fc76",
+  "text": "使出绝招了！",
+  "s": 1.07,
+  "heard": "使出绝招了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "special-2": {
+  "h": "908c279e3457",
+  "text": "哇！正宗泰拳技法！",
+  "s": 1.78,
+  "heard": "哇，正宗泰拳技法",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spChop-0": {
+  "h": "18647dae6a2b",
+  "text": "劈肘！从上砸下来！",
+  "s": 1.7,
+  "heard": "劈肘，从上砸下来",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spChop-1": {
+  "h": "c83e211bcac2",
+  "text": "劈肘！绝招命中！",
+  "s": 1.36,
+  "heard": "劈肘，绝招命中",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spKick-0": {
+  "h": "02c549fe3ca7",
+  "text": "闪电高踢！太快了！",
+  "s": 1.85,
+  "heard": "闪电高踢，太快了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spKick-1": {
+  "h": "1f9292a0668c",
+  "text": "闪电高踢！正中！",
+  "s": 1.72,
+  "heard": "闪电高踢 正中",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spFly-0": {
+  "h": "7d4ad5d48c2f",
+  "text": "飞膝！命中！",
+  "s": 1.65,
+  "heard": "飞膝 命中",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spFly-1": {
+  "h": "b1c1a893b9c9",
+  "text": "腾空飞膝！太漂亮了！",
+  "s": 2.38,
+  "heard": "腾空飞膝，太漂亮了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spCroc-0": {
+  "h": "7258fc5e4ad8",
+  "text": "鳄鱼摆尾！正中！",
+  "s": 1.7,
+  "heard": "鳄鱼摆尾，正中",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spCroc-1": {
+  "h": "2a9334d8bab7",
+  "text": "转身鳄鱼摆尾！哇！",
+  "s": 1.59,
+  "heard": "转身鳄鱼摆尾，哇",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spHanu-0": {
+  "h": "268fe289e1ef",
+  "text": "哈努曼献戒！挑中下巴！",
+  "s": 2.17,
+  "heard": "哈努曼献戒，挑中下巴",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "spHanu-1": {
+  "h": "a98e7c697bd1",
+  "text": "哈努曼献戒！正宗泰拳绝技！",
+  "s": 2.56,
+  "heard": "哈努曼献戒，正宗泰拳绝技",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bigHit-0": {
+  "h": "a400cfbcab25",
+  "text": "哇！太重了！",
+  "s": 1.72,
+  "heard": "哇，太重了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bigHit-1": {
+  "h": "1ddadd2da571",
+  "text": "结结实实！",
+  "s": 1.38,
+  "heard": "结结实实",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bigHit-2": {
+  "h": "b4dcdcd17c54",
+  "text": "正中！打得他一震！",
+  "s": 1.72,
+  "heard": "正中，打得他一颤",
+  "ok": 0.86,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bigHit-3": {
+  "h": "96f2dbf73c0b",
+  "text": "哇！这一下真重！",
+  "s": 2.06,
+  "heard": "哇 这下真重",
+  "ok": 0.83,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "block-0": {
+  "h": "0287ab7354c0",
+  "text": "挡住了。",
+  "s": 0.44,
+  "heard": "挡住了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "block-1": {
+  "h": "c4a4fc9c026a",
+  "text": "防住了。",
+  "s": 0.57,
+  "heard": "防住了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "block-2": {
+  "h": "33bdc4da6ffa",
+  "text": "防守很严密。",
+  "s": 1.2,
+  "heard": "防守很严密",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "block-3": {
+  "h": "0ef542e35700",
+  "text": "及时举手挡住。",
+  "s": 1.12,
+  "heard": "及时举手挡住",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "check-0": {
+  "h": "335f4c2beb53",
+  "text": "提膝挡住。",
+  "s": 0.6,
+  "heard": "提膝挡住",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "check-1": {
+  "h": "781100f7a13f",
+  "text": "抬腿挡住踢击。",
+  "s": 1.2,
+  "heard": "抬腿挡住踢击",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "check-2": {
+  "h": "3911354b8227",
+  "text": "及时用小腿挡住。",
+  "s": 1.23,
+  "heard": "及时用小腿挡住",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leanBack-0": {
+  "h": "0a9acb5cf518",
+  "text": "漂亮的后仰闪避！",
+  "s": 1.12,
+  "heard": "漂亮的后仰闪避",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leanBack-1": {
+  "h": "b2cb20a66040",
+  "text": "后仰躲开，差一点点！",
+  "s": 1.59,
+  "heard": "后仰躲开 差一点点",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "leanBack-2": {
+  "h": "07438ed67db8",
+  "text": "及时后仰！好险！",
+  "s": 1.49,
+  "heard": "及时后仰，好险",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "duck-0": {
+  "h": "61494b80cebe",
+  "text": "下潜躲过！",
+  "s": 0.91,
+  "heard": "下潜躲过",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "duck-1": {
+  "h": "9d4df5e12397",
+  "text": "低头闪开！打空了！",
+  "s": 1.44,
+  "heard": "低头散开 打空了",
+  "ok": 0.86,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "slip-0": {
+  "h": "84366fb71225",
+  "text": "漂亮的摇闪！",
+  "s": 0.99,
+  "heard": "漂亮的摇闪",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "slip-1": {
+  "h": "f835a146c9b7",
+  "text": "躲过了拳头！",
+  "s": 0.71,
+  "heard": "躲过了拳头",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "slip-2": {
+  "h": "7c7cf10c8f70",
+  "text": "摆头闪开！拳头落空！",
+  "s": 1.96,
+  "heard": "摆头散开 拳头落空",
+  "ok": 0.88,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bellyKick-0": {
+  "h": "02b5f5890d29",
+  "text": "收腹躲开踢击！",
+  "s": 1.46,
+  "heard": "收腹躲开踢击",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bellyKick-1": {
+  "h": "fd7a44d26a01",
+  "text": "弓身闪开！踢击擦过肚子！",
+  "s": 1.78,
+  "heard": "弓身闪开，踢击擦过肚子",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bellyBack-0": {
+  "h": "a7fa2741c994",
+  "text": "及时收腹躲开！",
+  "s": 1.02,
+  "heard": "及时收腹躲开",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bellyBack-1": {
+  "h": "0e5df5642b16",
+  "text": "漂亮的弓身闪避！",
+  "s": 1.33,
+  "heard": "漂亮的弓身闪避",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "dodge-0": {
+  "h": "0da798dd17c5",
+  "text": "及时躲开！",
+  "s": 0.6,
+  "heard": "及时躲开",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "dodge-1": {
+  "h": "6105e6c4be72",
+  "text": "落空！没打中！",
+  "s": 0.91,
+  "heard": "落空 没打中",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "catch-0": {
+  "h": "f774143102fd",
+  "text": "接住腿了！",
+  "s": 0.65,
+  "heard": "接触腿了",
+  "ok": 0.75,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "catch-1": {
+  "h": "25ecfe01b6fe",
+  "text": "接住腿了！危险！",
+  "s": 1.44,
+  "heard": "接触腿了，危险",
+  "ok": 0.83,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinch-0": {
+  "h": "bd5530d7d200",
+  "text": "双方进入缠抱。",
+  "s": 1.02,
+  "heard": "双方进入缠抱",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinch-1": {
+  "h": "6ef93413fef9",
+  "text": "缠抱在一起了。",
+  "s": 0.81,
+  "heard": "缠抱在一起了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinch-2": {
+  "h": "cf05f225cdc9",
+  "text": "进入近身，扭打成一团。",
+  "s": 1.93,
+  "heard": "进入近战 扭打成一团",
+  "ok": 0.89,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinch-3": {
+  "h": "c66844d39665",
+  "text": "锁住脖子了。",
+  "s": 0.73,
+  "heard": "锁住脖子了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKnee-0": {
+  "h": "f874198886fa",
+  "text": "缠抱中膝撞！",
+  "s": 0.89,
+  "heard": "缠斗中膝撞",
+  "ok": 0.8,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKnee-1": {
+  "h": "0ec431aff704",
+  "text": "膝撞连连！",
+  "s": 1.02,
+  "heard": "膝撞连连",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKnee-2": {
+  "h": "4da445b9e925",
+  "text": "缠抱中膝撞身体！",
+  "s": 1.38,
+  "heard": "缠抱中膝撞身体",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKneeHead-0": {
+  "h": "42fb6adbef42",
+  "text": "拉头膝撞！",
+  "s": 0.68,
+  "heard": "拉头膝撞",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchKneeHead-1": {
+  "h": "7c6e577405ea",
+  "text": "压下头来膝撞！",
+  "s": 0.99,
+  "heard": "压下头来膝撞",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchElbow-0": {
+  "h": "a805d1ac1d91",
+  "text": "缠抱中肘击！",
+  "s": 1.41,
+  "heard": "缠抱中肘击",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "clinchElbow-1": {
+  "h": "0415a4c19509",
+  "text": "近身短肘！正中！",
+  "s": 1.36,
+  "heard": "近身短肘，正中",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "separate-0": {
+  "h": "256be0ee82a5",
+  "text": "裁判上前分开。",
+  "s": 0.86,
+  "heard": "裁判上前分开",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "separate-2": {
+  "h": "7d5aa465487a",
+  "text": "分开，重新站好。",
+  "s": 1.28,
+  "heard": "分开 重新站好",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "escape-0": {
+  "h": "ba14ab2efd0b",
+  "text": "挣脱出来了！",
+  "s": 0.65,
+  "heard": "挣脱出来了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "escape-1": {
+  "h": "9076ad9a451f",
+  "text": "从缠抱中挣脱了！",
+  "s": 1.44,
+  "heard": "从缠抱中挣脱了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbowOut-0": {
+  "h": "e9248e203e63",
+  "text": "反肘破开缠抱！",
+  "s": 1.2,
+  "heard": "反手破开缠抱",
+  "ok": 0.83,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "elbowOut-1": {
+  "h": "d3484b7cc15c",
+  "text": "挑肘挣脱出来！",
+  "s": 1.31,
+  "heard": "跳肘挣脱出来",
+  "ok": 0.83,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throw-0": {
+  "h": "bf947d15dd8a",
+  "text": "摔倒了！",
+  "s": 0.71,
+  "heard": "摔倒了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throw-1": {
+  "h": "cc9704a5f3a2",
+  "text": "摔在台上！",
+  "s": 0.76,
+  "heard": "摔在台上",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throw-2": {
+  "h": "1ee7a39da6e7",
+  "text": "摔倒！拿到分数！",
+  "s": 1.15,
+  "heard": "摔倒 拿到分数",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throwFail-0": {
+  "h": "86bca89210bc",
+  "text": "站得很稳，摔不倒。",
+  "s": 1.23,
+  "heard": "站得很稳，摔不倒",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "throwFail-1": {
+  "h": "e955081240d8",
+  "text": "摔不动，重心太稳了。",
+  "s": 1.52,
+  "heard": "摔不动，重心太稳了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teepDump-0": {
+  "h": "58062a92ce25",
+  "text": "一脚蹬得一屁股坐倒！",
+  "s": 1.49,
+  "heard": "一脚蹬的一屁股坐倒",
+  "ok": 0.89,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teepDump-1": {
+  "h": "4c810a9bc74d",
+  "text": "一脚蹬飞了！",
+  "s": 0.84,
+  "heard": "一脚蹬飞了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "legHurt-0": {
+  "h": "b0dc06cb9b53",
+  "text": "腿撑不住了，挨了太多低踢！",
+  "s": 1.62,
+  "heard": "腿撑不住了，挨了太多的低踢",
+  "ok": 0.92,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "legHurt-1": {
+  "h": "0edbe2f9f8a2",
+  "text": "腿已经挨了好多脚，开始出状况了！",
+  "s": 1.96,
+  "heard": "腿已经挨了好几脚，开始出状况了",
+  "ok": 0.93,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyHurt-0": {
+  "h": "749eae230684",
+  "text": "身体挨打太多，体力快没了！",
+  "s": 1.67,
+  "heard": "身体挨得太多，体力快没了",
+  "ok": 0.91,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bodyHurt-1": {
+  "h": "68eae73a748f",
+  "text": "肚子挨了好多下，开始慢下来了！",
+  "s": 1.65,
+  "heard": "肚子挨了好几下，开始慢下来了",
+  "ok": 0.92,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stunPunch-0": {
+  "h": "c33b0620d702",
+  "text": "被打晃了！追击！",
+  "s": 1.12,
+  "heard": "被打晃了，追击",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stun-0": {
+  "h": "17136d941fc0",
+  "text": "腿软了！",
+  "s": 0.78,
+  "heard": "腿软了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stun-1": {
+  "h": "d2b65dfa78db",
+  "text": "受伤了！站不稳了！",
+  "s": 1.72,
+  "heard": "受伤了，站不稳了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stun-2": {
+  "h": "e1f0a822e959",
+  "text": "眼神涣散了！赶快追击！",
+  "s": 2.06,
+  "heard": "眼神涣散了，赶快追击",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stunEnd-0": {
+  "h": "5cb17f0e0e77",
+  "text": "站稳了。",
+  "s": 0.5,
+  "heard": "站稳了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stunEnd-1": {
+  "h": "dfbe9b1291b6",
+  "text": "撑过来了。",
+  "s": 0.68,
+  "heard": "撑过来了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "stunEnd-2": {
+  "h": "bf44a5a7a58b",
+  "text": "恢复过来了。",
+  "s": 0.65,
+  "heard": "恢复过来了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "kd-0": {
+  "h": "86ffccb1299a",
+  "text": "倒地了！裁判开始读秒！",
+  "s": 1.7,
+  "heard": "倒地了，裁判开始读秒",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "kd-1": {
+  "h": "22a1894006c4",
+  "text": "倒下了！",
+  "s": 0.89,
+  "heard": "倒下了",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "kd-2": {
+  "h": "0c5c12e763e5",
+  "text": "重重倒在拳台上！",
+  "s": 1.23,
+  "heard": "重重倒在拳台上",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "kd-3": {
+  "h": "30c86d7cae32",
+  "text": "倒地！倒地了！裁判读秒！",
+  "s": 1.78,
+  "heard": "倒地，倒地了，裁判读秒",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "getup-0": {
+  "h": "be47a7651ca5",
+  "text": "站起来了，继续打！",
+  "s": 1.25,
+  "heard": "站起来了，继续打",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "getup-1": {
+  "h": "98f8eb2907d3",
+  "text": "重新站起来了！斗志惊人！",
+  "s": 1.85,
+  "heard": "重新站起来了，斗志惊人",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "getup-2": {
+  "h": "b2c25930957c",
+  "text": "还能打！站起来继续！",
+  "s": 1.46,
+  "heard": "还能打，站起来继续！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "ko-0": {
+  "h": "4b5a81b6364d",
+  "text": "击倒！比赛结束！",
+  "s": 1.38,
+  "heard": "击倒！ 比赛结束！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "ko-1": {
+  "h": "bbcef14b5af7",
+  "text": "站不起来了！结束了！",
+  "s": 1.41,
+  "heard": "站不起来了，结束了！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "ko-2": {
+  "h": "c04a0153e543",
+  "text": "KO！击倒获胜！",
+  "s": 1.44,
+  "heard": "KO，击倒获胜！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "koFlash-0": {
+  "h": "1c3bc10fb4e8",
+  "text": "还没落地就已经昏过去了！",
+  "s": 1.72,
+  "heard": "还没落地，就已经昏过去了！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "koFlash-1": {
+  "h": "b457fb49e7ee",
+  "text": "当场击倒！不用读秒了！",
+  "s": 1.67,
+  "heard": "当场击倒！ 不用读秒了！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "tko-0": {
+  "h": "2ed8500dd4b8",
+  "text": "裁判终止比赛！TKO！",
+  "s": 2.09,
+  "heard": "裁判终止比赛，TKO！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "tko-1": {
+  "h": "a6bc3beb5027",
+  "text": "三次倒地！裁判不让打了！",
+  "s": 2.09,
+  "heard": "三次倒地，裁判不让打了！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winRed-0": {
+  "h": "7985697b85fc",
+  "text": "红角获胜！",
+  "s": 1.07,
+  "heard": "红角获胜！",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winRed-1": {
+  "h": "82779a9012e0",
+  "text": "胜利属于红角！",
+  "s": 2.17,
+  "heard": "胜利属于红角",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winRed-2": {
+  "h": "651c7fffde1e",
+  "text": "红角举手获胜！",
+  "s": 1.57,
+  "heard": "红角举手获胜",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winBlue-0": {
+  "h": "684973d761b0",
+  "text": "蓝角获胜！",
+  "s": 1.04,
+  "heard": "蓝角获胜",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winBlue-1": {
+  "h": "5970d9342a69",
+  "text": "胜利属于蓝角！",
+  "s": 1.65,
+  "heard": "胜利属于蓝角",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "winBlue-2": {
+  "h": "029924719a82",
+  "text": "蓝角举手获胜！",
+  "s": 1.44,
+  "heard": "蓝角举手获胜",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decRed-0": {
+  "h": "f0d5948e124e",
+  "text": "红角点数获胜！",
+  "s": 1.67,
+  "heard": "红角点数获胜",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decRed-1": {
+  "h": "b0f5dfe262cf",
+  "text": "裁判判红角点数获胜！",
+  "s": 2.14,
+  "heard": "裁判判红角点数获胜",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decBlue-0": {
+  "h": "f1c6c3348ad8",
+  "text": "蓝角点数获胜！",
+  "s": 1.62,
+  "heard": "蓝角点数获胜",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decBlue-1": {
+  "h": "23b88479207b",
+  "text": "裁判判蓝角点数获胜！",
+  "s": 2.06,
+  "heard": "裁判判蓝角点数获胜",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decDraw-0": {
+  "h": "30de0153a9d6",
+  "text": "平局！分数完全相同。",
+  "s": 2.14,
+  "heard": "平局 分数完全相同",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decDraw-1": {
+  "h": "ece2a8effc80",
+  "text": "裁判判为平局！",
+  "s": 1.1,
+  "heard": "裁判判为平局",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "draw-0": {
+  "h": "04e99458c689",
+  "text": "平局！双方谁也不让谁，从头到尾都很接近，最后打成平手。这两位一定要再打一场，各位观众！",
+  "s": 6.58,
+  "heard": "平局，双方谁也不让谁，从头到尾都很接近，最后打成平手，这两位一定要再打一场各位观众",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "draw-1": {
+  "h": "5f1dbba34fe9",
+  "text": "三个回合不分上下，最后平局。谁也没有退让，这两位肯定还会再碰面！",
+  "s": 5.96,
+  "heard": "三个回合不分上下，最后平局 谁也没有退让 这两位肯定还会再碰面",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "teep-2": {
+  "h": "4ed8829a8bd4",
+  "text": "漂亮的蹬腿阻截！",
+  "s": 1.38,
+  "heard": "漂亮的蹬腿阻截",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "separate-1": {
+  "h": "846f9debe8c5",
+  "text": "裁判喊分开。",
+  "s": 0.73,
+  "heard": "裁判喊分开",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "knee-1": {
+  "h": "d738e642b0d0",
+  "text": "重膝！",
+  "s": 0.6,
+  "heard": "中膝",
+  "ok": 0.5,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
  }
 }
