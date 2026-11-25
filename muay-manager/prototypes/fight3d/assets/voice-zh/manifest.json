@@ -1,0 +1,29 @@
+{
+ "bell1-0": {
+  "h": "0e3685f666ce",
+  "text": "第一回合铃声响起！",
+  "s": 1.2,
+  "heard": "第一回合，铃声响起",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bell1-1": {
+  "h": "a9472a2ef9e9",
+  "text": "开始了，第一回合！",
+  "s": 1.1,
+  "heard": "开始了 第一回合",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bell1-2": {
+  "h": "d785b85a33c6",
+  "text": "铃声响了！比赛开打！",
+  "s": 1.36,
+  "heard": "铃声响了，比赛开打",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ }
+}

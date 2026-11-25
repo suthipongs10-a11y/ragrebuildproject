@@ -8,3 +8,7 @@ assets/voice/_tmp/
 
 # the players' database when the game runs with server/server.mjs on this machine
 data/
+
+# TTS work files (tools/tts-commentary.mjs): every take and the pieces being cut
+assets/voice*/_takes/
+assets/voice*/_tmp/

@@ -1,0 +1,281 @@
+{
+ "bell1-0": {
+  "h": "f8ac09be79f5",
+  "text": "There's the bell for round one!",
+  "s": 1.59,
+  "heard": "There's the bell for round one",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bell1-1": {
+  "h": "3699bb3ed70a",
+  "text": "Here we go, round one!",
+  "s": 1.18,
+  "heard": "Here we go round one",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "bell1-2": {
+  "h": "e9793f2f6981",
+  "text": "The bell goes! We're under way!",
+  "s": 1.33,
+  "heard": "The bell goes we're underway",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "intro-0": {
+  "h": "f6b43c2dedc1",
+  "text": "The wai kru before the fight.",
+  "s": 1.62,
+  "heard": "The Y crew before the fight",
+  "ok": 0.74,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "intro-1": {
+  "h": "30d7c2512c4d",
+  "text": "Welcome, fight fans!",
+  "s": 1.25,
+  "heard": "Welcome fight fans",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "intro-2": {
+  "h": "2de01ae1a3eb",
+  "text": "What a matchup this is.",
+  "s": 1.91,
+  "heard": "What a match up this is",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "intro-3": {
+  "h": "cbdf4ea45eb5",
+  "text": "Into the ring for the wai kru.",
+  "s": 1.85,
+  "heard": "Into the ring for the Y crew",
+  "ok": 0.74,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round2-0": {
+  "h": "72b29e669a32",
+  "text": "Round two, and they pick up the pace!",
+  "s": 1.96,
+  "heard": "Round two and they pick up the pace",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round2-1": {
+  "h": "f1af06225c82",
+  "text": "Into round two!",
+  "s": 1.07,
+  "heard": "Into round two",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round2-2": {
+  "h": "102005161034",
+  "text": "Round two, and it's heating up!",
+  "s": 1.83,
+  "heard": "Round two and it's heating up",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round2-3": {
+  "h": "7b7e2d5161e4",
+  "text": "The bell for round two! Time to score!",
+  "s": 2.32,
+  "heard": "The bell for round two, time to score",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round3-0": {
+  "h": "a80b1590159c",
+  "text": "The final round! Who wants it more?",
+  "s": 2.04,
+  "heard": "The final round, who wants it more?",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round3-1": {
+  "h": "b8ab6bb1a509",
+  "text": "Round three, the deciding round!",
+  "s": 2.06,
+  "heard": "Round three, the deciding round",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round3-2": {
+  "h": "0064894ba0a7",
+  "text": "Last round! Leave it all in there!",
+  "s": 1.67,
+  "heard": "Last round, leave it all in there",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "round3-3": {
+  "h": "eb813aab77d8",
+  "text": "Final round! It all comes down to this!",
+  "s": 1.91,
+  "heard": "Final round, it all comes down to this",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "rest-0": {
+  "h": "8f9592a658b4",
+  "text": "End of the round, water in the corners.",
+  "s": 1.8,
+  "heard": "End of the round, water in the corners",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "rest-1": {
+  "h": "1c1d97fa673c",
+  "text": "That's the round.",
+  "s": 0.76,
+  "heard": "That's the round",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "rest-2": {
+  "h": "12d1116ab59d",
+  "text": "The bell ends the round, the cornermen are in.",
+  "s": 2.27,
+  "heard": "The bell ends the round, the corner men are in",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "rest-3": {
+  "h": "32022d70324a",
+  "text": "End of the round, back to the corner for new orders.",
+  "s": 2.25,
+  "heard": "End of the round, back to the corner for new orders",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "corner-0": {
+  "h": "218b2dffa3e4",
+  "text": "Water, a towel, oil on the legs, the cornermen are busy.",
+  "s": 3.21,
+  "heard": "Water, a towel, oil on the legs, the corner men are busy",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "corner-1": {
+  "h": "08f50854b54a",
+  "text": "Water first, then the oil massage to loosen up.",
+  "s": 2.35,
+  "heard": "Water first, then the oil massage to loosen up",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "corner-2": {
+  "h": "7a3a6b465c51",
+  "text": "The cornermen working fast, water and massage.",
+  "s": 2.25,
+  "heard": "The corner men working fast, water and massage",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "cornerOut-0": {
+  "h": "8a9522def9ae",
+  "text": "The break is over, back to work!",
+  "s": 1.8,
+  "heard": "The break is over. Back to work.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "cornerOut-1": {
+  "h": "6fcc446ea225",
+  "text": "Ready to go! Out of the corner!",
+  "s": 1.49,
+  "heard": "Ready to go, out of the corner.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decWait-0": {
+  "h": "3fa753d8ab8e",
+  "text": "Three rounds done, we wait for the decision.",
+  "s": 2.06,
+  "heard": "Three rounds done, we wait for the decision.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decWait-1": {
+  "h": "84338654ed68",
+  "text": "That's the distance, over to the judges.",
+  "s": 1.99,
+  "heard": "That's the distance, over to the judges.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "decWait-2": {
+  "h": "98ba63b1fbe8",
+  "text": "All three rounds, let's hear the decision.",
+  "s": 2.06,
+  "heard": "All three rounds, let's hear the decision.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel1-0": {
+  "h": "c04a45f962bd",
+  "text": "Still feeling each other out in round one.",
+  "s": 1.88,
+  "heard": "Still feeling each other out in round one.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel1-1": {
+  "h": "118ef18f08d0",
+  "text": "Round one, both men taking a look.",
+  "s": 2.17,
+  "heard": "Round one, both men taking a look.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel-0": {
+  "h": "e144be1e146a",
+  "text": "Neither man has opened up yet.",
+  "s": 1.52,
+  "heard": "Neither man has opened up yet.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ },
+ "feel-1": {
+  "h": "aa96c018be6a",
+  "text": "Working for the range.",
+  "s": 0.97,
+  "heard": "Working for the range.",
+  "ok": 1,
+  "m": "gemini-3.8-flash-tts",
+  "ear": "gemini-3-flash-preview"
+ }
+}
