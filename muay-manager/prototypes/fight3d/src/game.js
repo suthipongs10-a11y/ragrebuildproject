@@ -115,7 +115,7 @@ const MISSIONS = [{id: 'train', th: 'ซ้อมครบ 3 ครั้ง', n
 const SAVE_KEY = 'muayManagerSave1';
 // The version shown on the page, and the same as a number: two players in a live match must run the same build (they each
 // work the fight out themselves), so the older one reloads when it sees a newer one. Raise both with every release.
-const VER = '2.74', BUILD = 274;
+const VER = '2.75', BUILD = 275;
 
 let API = null, S = null, tab = 'home', view = null, CLOUD = null, board = [], cloudNote = 'กำลังเชื่อมต่อ…', pending = null, mini = null, F = null, DR = null;
 
@@ -184,12 +184,27 @@ function valid(s) { return s && s.v === 1 && typeof s.name === 'string' && START
 let useSecs = 0;
 const realDay = () => { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); };
 function useCount(group, key) { if (!S || !S.use) return; const g = S.use[group]; if (!g || (!own(g, key) && Object.keys(g).length >= 160)) return; g[key] = (g[key] || 0) + 1; }
-function useOpen() { if (!S || !S.use) return; const u = S.use, d = realDay(); u.sess++; if (!u.first) u.first = d; if (u.days[u.days.length - 1] !== d) u.days = u.days.concat(d).slice(-60); }
+// Where this device first came from (kept from its first visit): ?from= (the itch.io page adds from=itch), utm_source or
+// ref, else the site it was linked from, else the shell it runs in, else direct. With the device's language and time
+// zone, in the player's private save (never on the ranking), for the owner's counts (tools/rank-admin.mjs sources).
+function srcNow() {
+  try {
+    const q = new URLSearchParams(location.search), p = q.get('from') || q.get('utm_source') || q.get('ref');
+    if (p) return p.toLowerCase().replace(/[^a-z0-9_.-]/g, '').slice(0, 24);
+    const r = document.referrer ? new URL(document.referrer).hostname : '';
+    if (r && r !== location.hostname) return /itch\.(io|zone)$/.test(r) ? 'itch' : /tiktok\./.test(r) ? 'tiktok' : /(^|\.)(facebook|fb)\./.test(r) ? 'facebook' : /google\./.test(r) ? 'google' : r.replace(/^www\./, '').slice(0, 40);
+  } catch (e) { /* no URL */ }
+  return window.MuayDesktop ? 'desktop' : window.MuayNative ? 'app' : 'direct';
+}
+const FIRST_SRC = (() => { let f = null; try { f = JSON.parse(localStorage.getItem('muaySrc')); } catch (e) { /* none */ } if (!f || !f.s) { f = {s: srcNow(), t: Date.now()}; try { localStorage.setItem('muaySrc', JSON.stringify(f)); } catch (e) { /* this visit */ } } return f; })();
+function useOpen() { if (!S || !S.use) return; const u = S.use, d = realDay(); u.sess++;
+  if (!u.src) u.src = FIRST_SRC.s; try { u.lang = String(navigator.language || '').slice(0, 16); u.tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; u.ui = getLang(); } catch (e) { /* no Intl */ } if (!u.first) u.first = d; if (u.days[u.days.length - 1] !== d) u.days = u.days.concat(d).slice(-60); }
 setInterval(() => { if (S && !document.hidden) useSecs += 5; }, 5000);
 let cloudTimer = 0, cloudBusy = false, cloudDirty = false;
 function save() {
   if (S.use) { S.use.secs += useSecs; useSecs = 0; const d = realDay(); if (S.use.days[S.use.days.length - 1] !== d) S.use.days = S.use.days.concat(d).slice(-60); }
   S.updatedAt = Date.now();
+  if (CLOUD && CLOUD.key && !CLOUD.dead && (!S._k || S._k.id !== CLOUD.key.id)) S._k = CLOUD.key; // a spare of the player's key, on this device only (never sent: pushCloud)
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) { /* storage blocked: progress lasts for this visit only */ }
   if (CLOUD && !CLOUD.dead) { cloudDirty = true; clearTimeout(cloudTimer); cloudTimer = setTimeout(pushCloud, 2500); }
 }
@@ -205,7 +220,8 @@ async function pushCloud() {
   if (!CLOUD || CLOUD.dead || cloudBusy || !cloudDirty || !S) return;
   cloudBusy = true; cloudDirty = false;
   try {
-    await CLOUD.db.collection('data/users/' + CLOUD.uid).doc('save').set(JSON.parse(JSON.stringify(S)));
+    const copy = JSON.parse(JSON.stringify(S)); delete copy._k; // the key stays on the device
+    await CLOUD.db.collection('data/users/' + CLOUD.uid).doc('save').set(copy);
     await CLOUD.db.doc('board/' + CLOUD.uid).set(boardDoc());
     cloudNote = 'ออนไลน์ บันทึกแล้ว';
   } catch (e) { if (keyDead(e)) { cloudBusy = false; return; } cloudNote = 'บันทึกออนไลน์ไม่ได้ ใช้การบันทึกในเครื่อง'; }
@@ -217,12 +233,12 @@ const boardDoc = off => ({name: S.name, rp: S.rp, w: S.rec.w, l: S.rec.l, d: S.r
 async function cloudInit() {
   try {
     // inside claude.ai the artifact runtime holds the store; on the game's own website, the site's /api does
-    const rt = window.claude && window.claude.use ? window.claude : await siteRuntime();
+    const rt = window.claude && window.claude.use ? window.claude : await siteRuntime(undefined, S && S._k);
     if (!rt) { cloudNote = 'ออฟไลน์ บันทึกในเครื่องนี้'; return; }
     const [db, user] = await Promise.all([rt.use('db'), rt.use('user')]);
     const uid = db && user ? await user.id() : null;
     if (!uid) { cloudNote = 'ออฟไลน์ บันทึกในเครื่องนี้'; if (tab === 'rank' || tab === 'home') render(); return; }
-    CLOUD = {db, uid, site: !!rt.site, acct: rt.account || null, call: rt.call || null, ride: rt.ride || null}; CH.skew = rt.skew || 0; cloudNote = 'ออนไลน์'; if (CLOUD.ride) CLOUD.ride('challenges', () => ({chat: CT.polled}), chatGot); if (window.MUAY_GL_TRY) siteLog('gl: the 3D context opened on try ' + window.MUAY_GL_TRY); // acct: moving to another device and being forgotten (the game's own website only)
+    CLOUD = {db, uid, key: rt.key || null, site: !!rt.site, acct: rt.account || null, call: rt.call || null, ride: rt.ride || null}; CH.skew = rt.skew || 0; cloudNote = 'ออนไลน์'; if (CLOUD.ride) CLOUD.ride('challenges', () => ({chat: CT.polled}), chatGot); if (window.MUAY_GL_TRY) siteLog('gl: the 3D context opened on try ' + window.MUAY_GL_TRY); // acct: moving to another device and being forgotten (the game's own website only)
     if (rt.site) { setInterval(checkBuild, 120000); document.addEventListener('visibilitychange', () => { if (!document.hidden) checkBuild(); }); checkBuild(); }
     document.addEventListener('visibilitychange', () => presence(document.hidden)); window.addEventListener('pagehide', () => presence(true));
     let snap; try { snap = await db.collection('data/users/' + uid).doc('save').get(); } catch (e) { if (keyDead(e)) return; throw e; }

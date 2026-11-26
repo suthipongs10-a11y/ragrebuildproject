@@ -6,6 +6,10 @@
 //   node tools/rank-admin.mjs ban <player id> [why]   off the ranking and out of every shared list
 //   node tools/rank-admin.mjs unban <player id>       he may write again (his fighter comes back the next time his game saves)
 //   node tools/rank-admin.mjs bans                    who is banned
+//   node tools/rank-admin.mjs remove <player id>      take a line off the ranking that is nobody's any more (a player whose
+//                                                     device signed up again: his old lines), without a ban
+//   node tools/rank-admin.mjs sources                 where players came from, their device language and time zone
+//                                                     (game.js useOpen, in the private saves; filled from 2.75 on)
 // Where: --remote (the Cloudflare site; needs CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID), --local, or --db <file> (the VPS).
 import { execFileSync } from 'node:child_process';
 const args = process.argv.slice(2), has = f => args.includes(f), arg = f => { const i = args.indexOf(f); return i >= 0 ? args[i + 1] : null; };
@@ -36,5 +40,11 @@ if (cmd === 'top') {
   query(`DELETE FROM docs WHERE id = ${q(p)} AND coll IN ('board', 'challenges', 'answers')`); query(`DELETE FROM cups WHERE id = ${q(p)}`);
   console.log(p, 'is off the ranking, his challenges and cup entries are gone, and nothing more of his is taken (screens drop him within a minute)');
 } else if (cmd === 'unban') { ensure(); query(`DELETE FROM bans WHERE pid = ${q(pid(what))}`); console.log(what, 'may write again'); }
+else if (cmd === 'remove') { const p = pid(what); query(`DELETE FROM docs WHERE id = ${q(p)} AND coll IN ('board', 'challenges', 'answers')`); query(`DELETE FROM cups WHERE id = ${q(p)}`); console.log(p, 'is off the ranking (his save is kept; if his device writes again he comes back)'); }
+else if (cmd === 'sources') {
+  const rows = query("SELECT d.coll, json_extract(d.data, '$.use.src') src, json_extract(d.data, '$.use.lang') lang, json_extract(d.data, '$.use.tz') tz, json_extract(d.data, '$.use.ui') ui, json_extract(d.data, '$.rec.w') + json_extract(d.data, '$.rec.l') fights FROM docs d WHERE d.coll LIKE 'data/users/%' AND d.id = 'save'");
+  const count = k => { const m = {}; for (const r of rows) { const v = r[k] || '(not yet)'; m[v] = (m[v] || 0) + 1; } return Object.entries(m).sort((a, b) => b[1] - a[1]).map(([v, n]) => v + ' ' + n).join(' · '); };
+  console.log(rows.length, 'saves'); for (const k of ['src', 'ui', 'lang', 'tz']) console.log(k.padEnd(5), count(k));
+}
 else if (cmd === 'bans') { ensure(); for (const r of query('SELECT pid, t, why FROM bans ORDER BY t')) console.log(r.pid, when(r.t), r.why); }
-else console.log('top [n] | refused [n] | ban <player id> [why] | unban <player id> | bans');
+else console.log('top [n] | refused [n] | ban <player id> [why] | unban <player id> | bans | remove <player id> | sources');
