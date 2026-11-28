@@ -7,7 +7,7 @@ export const CONFIG = {
   outDir: 'assets',
   reportPath: 'docs/ASSET_REPORT.md',
 
-  /** Chosen by the project owner after looking at docs/asset-samples (CLAUDE.md §4.5). */
+  /** Decided 2026-11-28 (owner delegated the choice): the art is not on a true pixel grid, so nearest drops outline pixels. */
   resizeKernel: 'lanczos' as ResizeKernel,
   sharpenSigma: 0.5,
 
