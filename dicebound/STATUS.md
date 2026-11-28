@@ -25,7 +25,8 @@
 - ✅ `npm run build:win` บน Linux ได้ไฟล์ .exe
 - ❌ **ยังไม่ได้เปิด .exe บน Windows จริง** (เครื่อง build เป็น Linux ไม่มี wine) — เจ้าของโปรเจกต์ต้องเปิดเอง = เกณฑ์ผ่าน M0
 - ❌ `npm run dev:electron` ยังไม่ได้รันทั้งคำสั่ง (ทดสอบแยกส่วน: vite dev และ electron โหลด build)
-- ❌ CI ยังไม่เคยรันบน GitHub
+- ✅ CI รันแรกผ่านทั้ง 2 job (check บน Linux, build-win บน Windows) ได้ artifact `dicebound-win-portable`
+- ❌ tag `dicebound-m0` สร้างในเครื่อง build แล้วแต่ push ไม่ขึ้น (remote ตัดการเชื่อมต่อ) — M0 อยู่ที่ commit `67d5fa2`
 
 ## ค้างอยู่ (รอเจ้าของโปรเจกต์)
 - [ ] เปิด .exe บน Windows ยืนยัน M0
