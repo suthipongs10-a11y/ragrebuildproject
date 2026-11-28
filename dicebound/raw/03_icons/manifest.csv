@@ -1,0 +1,19 @@
+﻿pack,prompt_id,title_th,save_as,gen_size,background,slice,final_size,prompt_file
+03_icons,I-tiles-1,ช่องกระดาน ชุด 1/8 (4 ช่อง),tiles_sheet_01.png,1024x1024,tile,slice 2x2 → tile_<name>.png,256x256 per tile,prompts/01_I-tiles-1.md
+03_icons,I-tiles-2,ช่องกระดาน ชุด 2/8 (4 ช่อง),tiles_sheet_02.png,1024x1024,tile,slice 2x2 → tile_<name>.png,256x256 per tile,prompts/02_I-tiles-2.md
+03_icons,I-tiles-3,ช่องกระดาน ชุด 3/8 (4 ช่อง),tiles_sheet_03.png,1024x1024,tile,slice 2x2 → tile_<name>.png,256x256 per tile,prompts/03_I-tiles-3.md
+03_icons,I-tiles-4,ช่องกระดาน ชุด 4/8 (4 ช่อง),tiles_sheet_04.png,1024x1024,tile,slice 2x2 → tile_<name>.png,256x256 per tile,prompts/04_I-tiles-4.md
+03_icons,I-tiles-5,ช่องกระดาน ชุด 5/8 (4 ช่อง),tiles_sheet_05.png,1024x1024,tile,slice 2x2 → tile_<name>.png,256x256 per tile,prompts/05_I-tiles-5.md
+03_icons,I-tiles-6,ช่องกระดาน ชุด 6/8 (4 ช่อง),tiles_sheet_06.png,1024x1024,tile,slice 2x2 → tile_<name>.png,256x256 per tile,prompts/06_I-tiles-6.md
+03_icons,I-tiles-7,ช่องกระดาน ชุด 7/8 (4 ช่อง),tiles_sheet_07.png,1024x1024,tile,slice 2x2 → tile_<name>.png,256x256 per tile,prompts/07_I-tiles-7.md
+03_icons,I-tiles-8,ช่องกระดาน ชุด 8/8 (4 ช่อง),tiles_sheet_08.png,1024x1024,tile,slice 2x2 → tile_<name>.png,256x256 per tile,prompts/08_I-tiles-8.md
+03_icons,I-items,ไอคอน: ไอเทมใช้งาน + ค่าเงิน (9 ชิ้น),icons_items.png,1024x1024,alpha,slice 3x3 → icon_<name>.png,128x128 per icon,prompts/09_I-items.md
+03_icons,I-relics1,ไอคอน: เรลิก (รางวัลบอส) ชุด 1 (9 ชิ้น),icons_relics1.png,1024x1024,alpha,slice 3x3 → icon_<name>.png,128x128 per icon,prompts/10_I-relics1.md
+03_icons,I-relics2,ไอคอน: เรลิก (รางวัลบอส) ชุด 2 (9 ชิ้น),icons_relics2.png,1024x1024,alpha,slice 3x3 → icon_<name>.png,128x128 per icon,prompts/11_I-relics2.md
+03_icons,I-status1,ไอคอน: สถานะ/ดีบัฟ (9 ชิ้น),icons_status1.png,1024x1024,alpha,slice 3x3 → icon_<name>.png,128x128 per icon,prompts/12_I-status1.md
+03_icons,I-status2,ไอคอน: สถานะ/บัฟ (9 ชิ้น),icons_status2.png,1024x1024,alpha,slice 3x3 → icon_<name>.png,128x128 per icon,prompts/13_I-status2.md
+03_icons,I-synergy,ไอคอน: สัญลักษณ์ซินเนอร์จี (9 ชิ้น),icons_synergy.png,1024x1024,alpha,slice 3x3 → icon_<name>.png,128x128 per icon,prompts/14_I-synergy.md
+03_icons,I-dice-faces,หน้าลูกเต๋าปกติ 1–6,dice_faces_normal.png,1024x1024,alpha,slice 3x2 → die_1..die_6,128x128 each,prompts/15_I-dice-faces.md
+03_icons,I-dice-special,หน้าลูกเต๋าพิเศษ (อัปหน้าเต๋า),dice_faces_special.png,1024x1024,alpha,slice 3x2,128x128 each,prompts/16_I-dice-special.md
+03_icons,I-dice-3d,ลูกเต๋า 3 มิติ (ปุ่มทอย / แอนิเมชันกลิ้ง),dice_3d.png,1024x1024,alpha,slice 3x2,192x192 each,prompts/17_I-dice-3d.md
+03_icons,I-leader-skills,สกิลผู้นำทีม + ไอคอนเมนู,icons_leader_menu.png,1024x1024,alpha,slice 3x2,128x128 each,prompts/18_I-leader-skills.md
