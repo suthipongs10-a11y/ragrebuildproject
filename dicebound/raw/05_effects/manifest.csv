@@ -1,0 +1,27 @@
+﻿pack,prompt_id,title_th,save_as,gen_size,background,slice,final_size,prompt_file
+05_effects,F-slash,เอฟเฟกต์: ฟันดาบโดน (6 เฟรม),fx_slash.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/01_F-slash.md
+05_effects,F-arrow_hit,เอฟเฟกต์: ลูกธนูปัก (6 เฟรม),fx_arrow_hit.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/02_F-arrow_hit.md
+05_effects,F-fire_arrow_hit,เอฟเฟกต์: ธนูไฟระเบิด (6 เฟรม),fx_fire_arrow_hit.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/03_F-fire_arrow_hit.md
+05_effects,F-magic_burst,เอฟเฟกต์: ระเบิดเวท (6 เฟรม),fx_magic_burst.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/04_F-magic_burst.md
+05_effects,F-holy_heal,เอฟเฟกต์: ฮีลแสงศักดิ์สิทธิ์ (6 เฟรม),fx_holy_heal.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/05_F-holy_heal.md
+05_effects,F-revive,เอฟเฟกต์: ชุบชีวิต (6 เฟรม),fx_revive.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/06_F-revive.md
+05_effects,F-explosion,เอฟเฟกต์: ระเบิด (ปีศาจระเบิด) (8 เฟรม),fx_explosion.png,1536x1024,black,slice 8 frames → additive blend,256x256 per frame,prompts/07_F-explosion.md
+05_effects,F-poison_cloud,เอฟเฟกต์: เมฆพิษ (6 เฟรม),fx_poison_cloud.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/08_F-poison_cloud.md
+05_effects,F-lightning,เอฟเฟกต์: สายฟ้าฟาด (6 เฟรม),fx_lightning.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/09_F-lightning.md
+05_effects,F-fire_breath,เอฟเฟกต์: ไฟพ่นมังกร (กว้าง) (6 เฟรม),fx_fire_breath.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/10_F-fire_breath.md
+05_effects,F-ground_slam,เอฟเฟกต์: กระแทกพื้น (โกเลม) (6 เฟรม),fx_ground_slam.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/11_F-ground_slam.md
+05_effects,F-summon_circle,เอฟเฟกต์: วงเวทอัญเชิญ (6 เฟรม),fx_summon_circle.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/12_F-summon_circle.md
+05_effects,F-death_poof,เอฟเฟกต์: ศัตรูตาย (6 เฟรม),fx_death_poof.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/13_F-death_poof.md
+05_effects,F-coin_burst,เอฟเฟกต์: เหรียญกระจาย (6 เฟรม),fx_coin_burst.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/14_F-coin_burst.md
+05_effects,F-level_up_beam,เอฟเฟกต์: อัปช่อง (เลเวลอัป) (6 เฟรม),fx_level_up_beam.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/15_F-level_up_beam.md
+05_effects,F-dice_land,เอฟเฟกต์: ลูกเต๋าตกพื้น (6 เฟรม),fx_dice_land.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/16_F-dice_land.md
+05_effects,F-six_burst,เอฟเฟกต์: ทอยได้ 6 (6 เฟรม),fx_six_burst.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/17_F-six_burst.md
+05_effects,F-crit_flash,เอฟเฟกต์: คริติคอล (4 เฟรม),fx_crit_flash.png,1536x1024,black,slice 4 frames → additive blend,256x256 per frame,prompts/18_F-crit_flash.md
+05_effects,F-warp_portal,เอฟเฟกต์: วาร์ป (วนลูป) (6 เฟรม),fx_warp_portal.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/19_F-warp_portal.md
+05_effects,F-curse_chains,เอฟเฟกต์: ช่องโดนสาป (6 เฟรม),fx_curse_chains.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/20_F-curse_chains.md
+05_effects,F-boss_aura,เอฟเฟกต์: ออร่าบอส (วนลูป) (6 เฟรม),fx_boss_aura.png,1536x1024,black,slice 6 frames → additive blend,256x256 per frame,prompts/21_F-boss_aura.md
+05_effects,F-status_loops,เอฟเฟกต์: สถานะวนลูปบนตัวละคร (9 ช่อง),fx_status_loops.png,1024x1024,black,slice 3x3,128x128 each,prompts/22_F-status_loops.md
+05_effects,F-buff_auras,เอฟเฟกต์: ออร่าบัฟ / โล่ (9 ช่อง),fx_buff_auras.png,1024x1024,black,slice 3x3,128x128 each,prompts/23_F-buff_auras.md
+05_effects,F-projectiles,เอฟเฟกต์: กระสุน / วัตถุพุ่ง (9 ช่อง),fx_projectiles.png,1024x1024,black,slice 3x3,128x128 each,prompts/24_F-projectiles.md
+05_effects,F-particles,เอฟเฟกต์: อนุภาคพื้นฐาน (ให้โค้ดทำ particle) (9 ช่อง),fx_particles.png,1024x1024,black,slice 3x3,128x128 each,prompts/25_F-particles.md
+05_effects,F-synergy-line,เส้นพลังซินเนอร์จี (ต่อกันได้),fx_synergy_lines.png,1536x1024,black,"slice 5 rows, tile horizontally",1024x64 each,prompts/26_F-synergy-line.md

@@ -9,7 +9,7 @@
 - สร้าง `dicebound/` ใน repo พร้อม `CLAUDE.md`, `STATUS.md`, `docs/`, `raw/` (5 ชุด ยังว่าง)
 
 ## ค้างอยู่
-- [ ] เจ้าของโปรเจกต์ส่งภาพ 5 ชุด + `manifest.csv` ของแต่ละชุด ลง `raw/`
+- [ ] เจ้าของโปรเจกต์ส่งภาพที่เหลือ 4 ชุด: `01_characters`, `02_monsters`, `03_icons`, `04_ui` (ได้ `05_effects` แล้ว 26/26 ไฟล์ตรง manifest)
 - [ ] ตรวจจำนวนไฟล์ใน `raw/` เทียบ manifest (งานแรกข้อ 10.1)
 - [ ] M0: โครงโปรเจกต์ Vite + TS + PixiJS + Electron
 
