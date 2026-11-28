@@ -58,7 +58,7 @@ export function gainUnitXp(content: Content, state: RunState, unitId: string, xp
     unit = { uid: state.nextUid++, unitId, xp: 0, tier: 1, hp: 0, shield: 0 };
     state.team.push(unit);
     unit.hp = maxHp(content, state, unit);
-    events.push({ type: 'UnitRecruited', uid: unit.uid, unitId });
+    events.push({ type: 'UnitRecruited', uid: unit.uid, unitId, hp: unit.hp });
     // The recruit itself is the first point of the tile's value.
     xp -= 1;
   }

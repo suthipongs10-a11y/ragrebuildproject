@@ -3,7 +3,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CONFIG } from './config';
-import { writePng } from './compose';
+import { writeAtlas } from './compose';
 import { readPack } from './manifest';
 import { packAtlas } from './pack';
 import { processEntries } from './process';
@@ -45,10 +45,11 @@ async function main(): Promise<void> {
       seen.add(frame.id);
     }
     const packed = packAtlas(packFrames.map((frame) => ({ id: frame.id, raster: frame.raster })));
-    const files = packed.pages.map((_, i) => `atlases/${category}-${i}.png`);
+    const files = packed.pages.map((_, i) => `atlases/${category}-${i}.webp`);
     atlasFiles[category] = files;
     atlasPages += files.length;
-    await Promise.all(packed.pages.map((page, i) => writePng(page, path.join(outDir, files[i] as string))));
+    const lossless = CONFIG.losslessAtlases.includes(category);
+    await Promise.all(packed.pages.map((page, i) => writeAtlas(page, path.join(outDir, files[i] as string), lossless)));
     // Keep manifest order = sheet order (idle, attack, hurt...), not packing order.
     for (const frame of packFrames) {
       const placement = packed.placements.find((p) => p.id === frame.id);

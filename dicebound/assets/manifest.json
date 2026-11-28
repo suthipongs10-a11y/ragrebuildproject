@@ -3,32 +3,32 @@
  "resize": "lanczos",
  "atlases": {
   "characters": [
-   "atlases/characters-0.png",
-   "atlases/characters-1.png"
+   "atlases/characters-0.webp",
+   "atlases/characters-1.webp"
   ],
   "monsters": [
-   "atlases/monsters-0.png",
-   "atlases/monsters-1.png",
-   "atlases/monsters-2.png",
-   "atlases/monsters-3.png",
-   "atlases/monsters-4.png"
+   "atlases/monsters-0.webp",
+   "atlases/monsters-1.webp",
+   "atlases/monsters-2.webp",
+   "atlases/monsters-3.webp",
+   "atlases/monsters-4.webp"
   ],
   "icons": [
-   "atlases/icons-0.png"
+   "atlases/icons-0.webp"
   ],
   "ui": [
-   "atlases/ui-0.png",
-   "atlases/ui-1.png"
+   "atlases/ui-0.webp",
+   "atlases/ui-1.webp"
   ],
   "effects": [
-   "atlases/effects-0.png",
-   "atlases/effects-1.png",
-   "atlases/effects-2.png"
+   "atlases/effects-0.webp",
+   "atlases/effects-1.webp",
+   "atlases/effects-2.webp"
   ]
  },
  "frames": {
   "portrait_warrior": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 770,
    "y": 776,
    "w": 251,
@@ -37,7 +37,7 @@
    "blend": "normal"
   },
   "portrait_knight": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1281,
    "y": 776,
    "w": 256,
@@ -46,7 +46,7 @@
    "blend": "normal"
   },
   "portrait_archer": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 518,
    "y": 776,
    "w": 250,
@@ -55,7 +55,7 @@
    "blend": "normal"
   },
   "portrait_mage": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1023,
    "y": 776,
    "w": 256,
@@ -64,7 +64,7 @@
    "blend": "normal"
   },
   "portrait_cleric": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1539,
    "y": 776,
    "w": 256,
@@ -73,7 +73,7 @@
    "blend": "normal"
   },
   "leader_captain_portrait": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 980,
    "y": 2,
    "w": 512,
@@ -82,7 +82,7 @@
    "blend": "normal"
   },
   "leader_gambler_portrait": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 2,
    "y": 2,
    "w": 462,
@@ -91,7 +91,7 @@
    "blend": "normal"
   },
   "leader_merchant_portrait": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 466,
    "y": 2,
    "w": 512,
@@ -100,7 +100,7 @@
    "blend": "normal"
   },
   "char_warrior_t1_idle": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1550,
    "y": 260,
    "w": 256,
@@ -109,7 +109,7 @@
    "blend": "normal"
   },
   "char_warrior_t1_attack": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1034,
    "y": 260,
    "w": 256,
@@ -118,7 +118,7 @@
    "blend": "normal"
   },
   "char_warrior_t1_hurt": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1292,
    "y": 260,
    "w": 256,
@@ -127,7 +127,7 @@
    "blend": "normal"
   },
   "char_warrior_t1_victory": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 2,
    "y": 518,
    "w": 256,
@@ -136,7 +136,7 @@
    "blend": "normal"
   },
   "char_warrior_t2_idle": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 776,
    "y": 518,
    "w": 256,
@@ -145,7 +145,7 @@
    "blend": "normal"
   },
   "char_warrior_t2_attack": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 260,
    "y": 518,
    "w": 256,
@@ -154,7 +154,7 @@
    "blend": "normal"
   },
   "char_warrior_t2_hurt": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 518,
    "y": 518,
    "w": 256,
@@ -163,7 +163,7 @@
    "blend": "normal"
   },
   "char_warrior_t2_victory": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1034,
    "y": 518,
    "w": 256,
@@ -172,7 +172,7 @@
    "blend": "normal"
   },
   "char_warrior_t3_idle": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 2,
    "y": 776,
    "w": 256,
@@ -181,7 +181,7 @@
    "blend": "normal"
   },
   "char_warrior_t3_attack": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1292,
    "y": 518,
    "w": 256,
@@ -190,7 +190,7 @@
    "blend": "normal"
   },
   "char_warrior_t3_hurt": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1550,
    "y": 518,
    "w": 256,
@@ -199,7 +199,7 @@
    "blend": "normal"
   },
   "char_warrior_t3_victory": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 260,
    "y": 776,
    "w": 256,
@@ -208,7 +208,7 @@
    "blend": "normal"
   },
   "char_knight_t1_idle": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 776,
    "y": 1290,
    "w": 256,
@@ -217,7 +217,7 @@
    "blend": "normal"
   },
   "char_knight_t1_attack": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 260,
    "y": 1290,
    "w": 256,
@@ -226,7 +226,7 @@
    "blend": "normal"
   },
   "char_knight_t1_hurt": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 518,
    "y": 1290,
    "w": 256,
@@ -235,7 +235,7 @@
    "blend": "normal"
   },
   "char_knight_t1_victory": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1034,
    "y": 1290,
    "w": 256,
@@ -244,7 +244,7 @@
    "blend": "normal"
   },
   "char_knight_t2_idle": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 2,
    "y": 1548,
    "w": 256,
@@ -253,7 +253,7 @@
    "blend": "normal"
   },
   "char_knight_t2_attack": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1292,
    "y": 1290,
    "w": 256,
@@ -262,7 +262,7 @@
    "blend": "normal"
   },
   "char_knight_t2_hurt": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1550,
    "y": 1290,
    "w": 256,
@@ -271,7 +271,7 @@
    "blend": "normal"
   },
   "char_knight_t2_victory": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 260,
    "y": 1548,
    "w": 256,
@@ -280,7 +280,7 @@
    "blend": "normal"
   },
   "char_knight_t3_idle": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1034,
    "y": 1548,
    "w": 256,
@@ -289,7 +289,7 @@
    "blend": "normal"
   },
   "char_knight_t3_attack": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 518,
    "y": 1548,
    "w": 256,
@@ -298,7 +298,7 @@
    "blend": "normal"
   },
   "char_knight_t3_hurt": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 776,
    "y": 1548,
    "w": 256,
@@ -307,7 +307,7 @@
    "blend": "normal"
   },
   "char_knight_t3_victory": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1292,
    "y": 1548,
    "w": 256,
@@ -316,7 +316,7 @@
    "blend": "normal"
   },
   "char_archer_t1_idle": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 2,
    "y": 516,
    "w": 256,
@@ -325,7 +325,7 @@
    "blend": "normal"
   },
   "char_archer_t1_attack": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1494,
    "y": 2,
    "w": 256,
@@ -334,7 +334,7 @@
    "blend": "normal"
   },
   "char_archer_t1_hurt": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1752,
    "y": 2,
    "w": 256,
@@ -343,7 +343,7 @@
    "blend": "normal"
   },
   "char_archer_t1_victory": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 260,
    "y": 516,
    "w": 256,
@@ -352,7 +352,7 @@
    "blend": "normal"
   },
   "char_archer_t2_idle": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1034,
    "y": 516,
    "w": 256,
@@ -361,7 +361,7 @@
    "blend": "normal"
   },
   "char_archer_t2_attack": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 518,
    "y": 516,
    "w": 256,
@@ -370,7 +370,7 @@
    "blend": "normal"
   },
   "char_archer_t2_hurt": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 776,
    "y": 516,
    "w": 256,
@@ -379,7 +379,7 @@
    "blend": "normal"
   },
   "char_archer_t2_victory": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1292,
    "y": 516,
    "w": 256,
@@ -388,7 +388,7 @@
    "blend": "normal"
   },
   "char_archer_t3_idle": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 260,
    "y": 774,
    "w": 256,
@@ -397,7 +397,7 @@
    "blend": "normal"
   },
   "char_archer_t3_attack": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1550,
    "y": 516,
    "w": 256,
@@ -406,7 +406,7 @@
    "blend": "normal"
   },
   "char_archer_t3_hurt": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 2,
    "y": 774,
    "w": 256,
@@ -415,7 +415,7 @@
    "blend": "normal"
   },
   "char_archer_t3_victory": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 518,
    "y": 774,
    "w": 256,
@@ -424,7 +424,7 @@
    "blend": "normal"
   },
   "char_mage_t1_idle": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 260,
    "y": 2,
    "w": 256,
@@ -433,7 +433,7 @@
    "blend": "normal"
   },
   "char_mage_t1_attack": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1550,
    "y": 1548,
    "w": 256,
@@ -442,7 +442,7 @@
    "blend": "normal"
   },
   "char_mage_t1_hurt": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 2,
    "y": 2,
    "w": 256,
@@ -451,7 +451,7 @@
    "blend": "normal"
   },
   "char_mage_t1_victory": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 518,
    "y": 2,
    "w": 256,
@@ -460,7 +460,7 @@
    "blend": "normal"
   },
   "char_mage_t2_idle": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1292,
    "y": 2,
    "w": 256,
@@ -469,7 +469,7 @@
    "blend": "normal"
   },
   "char_mage_t2_attack": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 776,
    "y": 2,
    "w": 256,
@@ -478,7 +478,7 @@
    "blend": "normal"
   },
   "char_mage_t2_hurt": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1034,
    "y": 2,
    "w": 256,
@@ -487,7 +487,7 @@
    "blend": "normal"
   },
   "char_mage_t2_victory": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1550,
    "y": 2,
    "w": 256,
@@ -496,7 +496,7 @@
    "blend": "normal"
   },
   "char_mage_t3_idle": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 518,
    "y": 260,
    "w": 256,
@@ -505,7 +505,7 @@
    "blend": "normal"
   },
   "char_mage_t3_attack": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 2,
    "y": 260,
    "w": 256,
@@ -514,7 +514,7 @@
    "blend": "normal"
   },
   "char_mage_t3_hurt": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 260,
    "y": 260,
    "w": 256,
@@ -523,7 +523,7 @@
    "blend": "normal"
   },
   "char_mage_t3_victory": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 776,
    "y": 260,
    "w": 256,
@@ -532,7 +532,7 @@
    "blend": "normal"
   },
   "char_cleric_t1_idle": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1292,
    "y": 774,
    "w": 256,
@@ -541,7 +541,7 @@
    "blend": "normal"
   },
   "char_cleric_t1_attack": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 776,
    "y": 774,
    "w": 256,
@@ -550,7 +550,7 @@
    "blend": "normal"
   },
   "char_cleric_t1_hurt": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1034,
    "y": 774,
    "w": 256,
@@ -559,7 +559,7 @@
    "blend": "normal"
   },
   "char_cleric_t1_victory": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1550,
    "y": 774,
    "w": 256,
@@ -568,7 +568,7 @@
    "blend": "normal"
   },
   "char_cleric_t2_idle": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 518,
    "y": 1032,
    "w": 256,
@@ -577,7 +577,7 @@
    "blend": "normal"
   },
   "char_cleric_t2_attack": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 2,
    "y": 1032,
    "w": 256,
@@ -586,7 +586,7 @@
    "blend": "normal"
   },
   "char_cleric_t2_hurt": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 260,
    "y": 1032,
    "w": 256,
@@ -595,7 +595,7 @@
    "blend": "normal"
   },
   "char_cleric_t2_victory": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 776,
    "y": 1032,
    "w": 256,
@@ -604,7 +604,7 @@
    "blend": "normal"
   },
   "char_cleric_t3_idle": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1550,
    "y": 1032,
    "w": 256,
@@ -613,7 +613,7 @@
    "blend": "normal"
   },
   "char_cleric_t3_attack": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1034,
    "y": 1032,
    "w": 256,
@@ -622,7 +622,7 @@
    "blend": "normal"
   },
   "char_cleric_t3_hurt": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 1292,
    "y": 1032,
    "w": 256,
@@ -631,7 +631,7 @@
    "blend": "normal"
   },
   "char_cleric_t3_victory": {
-   "atlas": "atlases/characters-0.png",
+   "atlas": "atlases/characters-0.webp",
    "x": 2,
    "y": 1290,
    "w": 256,
@@ -640,7 +640,7 @@
    "blend": "normal"
   },
   "pawn_captain_idle": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 2,
    "y": 1034,
    "w": 128,
@@ -649,7 +649,7 @@
    "blend": "normal"
   },
   "pawn_captain_hop": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 1797,
    "y": 776,
    "w": 128,
@@ -658,7 +658,7 @@
    "blend": "normal"
   },
   "pawn_gambler_idle": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 262,
    "y": 1034,
    "w": 128,
@@ -667,7 +667,7 @@
    "blend": "normal"
   },
   "pawn_gambler_hop": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 132,
    "y": 1034,
    "w": 128,
@@ -676,7 +676,7 @@
    "blend": "normal"
   },
   "pawn_merchant_idle": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 522,
    "y": 1034,
    "w": 128,
@@ -685,7 +685,7 @@
    "blend": "normal"
   },
   "pawn_merchant_hop": {
-   "atlas": "atlases/characters-1.png",
+   "atlas": "atlases/characters-1.webp",
    "x": 392,
    "y": 1034,
    "w": 128,
@@ -694,7 +694,7 @@
    "blend": "normal"
   },
   "mon_sand_wolf_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 2,
    "y": 1356,
    "w": 256,
@@ -703,7 +703,7 @@
    "blend": "normal"
   },
   "mon_sand_wolf_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1292,
    "y": 1098,
    "w": 256,
@@ -712,7 +712,7 @@
    "blend": "normal"
   },
   "mon_sand_wolf_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1550,
    "y": 1098,
    "w": 256,
@@ -721,7 +721,7 @@
    "blend": "normal"
   },
   "mon_scorpion_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 776,
    "y": 1356,
    "w": 256,
@@ -730,7 +730,7 @@
    "blend": "normal"
   },
   "mon_scorpion_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 260,
    "y": 1356,
    "w": 256,
@@ -739,7 +739,7 @@
    "blend": "normal"
   },
   "mon_scorpion_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 518,
    "y": 1356,
    "w": 256,
@@ -748,7 +748,7 @@
    "blend": "normal"
   },
   "mon_cactus_brute_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 2,
    "y": 582,
    "w": 256,
@@ -757,7 +757,7 @@
    "blend": "normal"
   },
   "mon_cactus_brute_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1292,
    "y": 324,
    "w": 256,
@@ -766,7 +766,7 @@
    "blend": "normal"
   },
   "mon_cactus_brute_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1550,
    "y": 324,
    "w": 256,
@@ -775,7 +775,7 @@
    "blend": "normal"
   },
   "mon_vulture_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1292,
    "y": 1614,
    "w": 256,
@@ -784,7 +784,7 @@
    "blend": "normal"
   },
   "mon_vulture_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 776,
    "y": 1614,
    "w": 256,
@@ -793,7 +793,7 @@
    "blend": "normal"
   },
   "mon_vulture_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1034,
    "y": 1614,
    "w": 256,
@@ -802,7 +802,7 @@
    "blend": "normal"
   },
   "mon_goblin_thief_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1550,
    "y": 582,
    "w": 256,
@@ -811,7 +811,7 @@
    "blend": "normal"
   },
   "mon_goblin_thief_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1034,
    "y": 582,
    "w": 256,
@@ -820,7 +820,7 @@
    "blend": "normal"
   },
   "mon_goblin_thief_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1292,
    "y": 582,
    "w": 256,
@@ -829,7 +829,7 @@
    "blend": "normal"
   },
   "mon_bat_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1484,
    "y": 2,
    "w": 256,
@@ -838,7 +838,7 @@
    "blend": "normal"
   },
   "mon_bat_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 968,
    "y": 2,
    "w": 256,
@@ -847,7 +847,7 @@
    "blend": "normal"
   },
   "mon_bat_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1226,
    "y": 2,
    "w": 256,
@@ -856,7 +856,7 @@
    "blend": "normal"
   },
   "mon_poison_toad_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1034,
    "y": 1098,
    "w": 256,
@@ -865,7 +865,7 @@
    "blend": "normal"
   },
   "mon_poison_toad_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 518,
    "y": 1098,
    "w": 256,
@@ -874,7 +874,7 @@
    "blend": "normal"
   },
   "mon_poison_toad_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 776,
    "y": 1098,
    "w": 256,
@@ -883,7 +883,7 @@
    "blend": "normal"
   },
   "mon_slime_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 518,
    "y": 1614,
    "w": 256,
@@ -892,7 +892,7 @@
    "blend": "normal"
   },
   "mon_slime_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 2,
    "y": 1614,
    "w": 256,
@@ -901,7 +901,7 @@
    "blend": "normal"
   },
   "mon_slime_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 260,
    "y": 1614,
    "w": 256,
@@ -910,7 +910,7 @@
    "blend": "normal"
   },
   "mon_mushroom_shaman_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1292,
    "y": 840,
    "w": 256,
@@ -919,7 +919,7 @@
    "blend": "normal"
   },
   "mon_mushroom_shaman_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 776,
    "y": 840,
    "w": 256,
@@ -928,7 +928,7 @@
    "blend": "normal"
   },
   "mon_mushroom_shaman_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1034,
    "y": 840,
    "w": 256,
@@ -937,7 +937,7 @@
    "blend": "normal"
   },
   "mon_bog_zombie_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 260,
    "y": 324,
    "w": 256,
@@ -946,7 +946,7 @@
    "blend": "normal"
   },
   "mon_bog_zombie_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1742,
    "y": 2,
    "w": 256,
@@ -955,7 +955,7 @@
    "blend": "normal"
   },
   "mon_bog_zombie_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 2,
    "y": 324,
    "w": 256,
@@ -964,7 +964,7 @@
    "blend": "normal"
   },
   "mon_skeleton_knight_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1550,
    "y": 1356,
    "w": 256,
@@ -973,7 +973,7 @@
    "blend": "normal"
   },
   "mon_skeleton_knight_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1034,
    "y": 1356,
    "w": 256,
@@ -982,7 +982,7 @@
    "blend": "normal"
   },
   "mon_skeleton_knight_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1292,
    "y": 1356,
    "w": 256,
@@ -991,7 +991,7 @@
    "blend": "normal"
   },
   "mon_necromancer_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 260,
    "y": 1098,
    "w": 256,
@@ -1000,7 +1000,7 @@
    "blend": "normal"
   },
   "mon_necromancer_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1550,
    "y": 840,
    "w": 256,
@@ -1009,7 +1009,7 @@
    "blend": "normal"
   },
   "mon_necromancer_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 2,
    "y": 1098,
    "w": 256,
@@ -1018,7 +1018,7 @@
    "blend": "normal"
   },
   "mon_imp_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 518,
    "y": 840,
    "w": 256,
@@ -1027,7 +1027,7 @@
    "blend": "normal"
   },
   "mon_imp_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 2,
    "y": 840,
    "w": 256,
@@ -1036,7 +1036,7 @@
    "blend": "normal"
   },
   "mon_imp_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 260,
    "y": 840,
    "w": 256,
@@ -1045,7 +1045,7 @@
    "blend": "normal"
   },
   "mon_gargoyle_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 776,
    "y": 582,
    "w": 256,
@@ -1054,7 +1054,7 @@
    "blend": "normal"
   },
   "mon_gargoyle_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 260,
    "y": 582,
    "w": 256,
@@ -1063,7 +1063,7 @@
    "blend": "normal"
   },
   "mon_gargoyle_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 518,
    "y": 582,
    "w": 256,
@@ -1072,7 +1072,7 @@
    "blend": "normal"
   },
   "mon_bomb_demon_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1034,
    "y": 324,
    "w": 256,
@@ -1081,7 +1081,7 @@
    "blend": "normal"
   },
   "mon_bomb_demon_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 518,
    "y": 324,
    "w": 256,
@@ -1090,7 +1090,7 @@
    "blend": "normal"
   },
   "mon_bomb_demon_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 776,
    "y": 324,
    "w": 256,
@@ -1099,7 +1099,7 @@
    "blend": "normal"
   },
   "mon_skeleton_minion_idle": {
-   "atlas": "atlases/monsters-4.png",
+   "atlas": "atlases/monsters-4.webp",
    "x": 2,
    "y": 2,
    "w": 192,
@@ -1108,7 +1108,7 @@
    "blend": "normal"
   },
   "mon_skeleton_minion_attack": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1550,
    "y": 1614,
    "w": 192,
@@ -1117,7 +1117,7 @@
    "blend": "normal"
   },
   "mon_skeleton_minion_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 1744,
    "y": 1614,
    "w": 192,
@@ -1126,7 +1126,7 @@
    "blend": "normal"
   },
   "mon_slime_small_idle": {
-   "atlas": "atlases/monsters-4.png",
+   "atlas": "atlases/monsters-4.webp",
    "x": 584,
    "y": 2,
    "w": 192,
@@ -1135,7 +1135,7 @@
    "blend": "normal"
   },
   "mon_slime_small_attack": {
-   "atlas": "atlases/monsters-4.png",
+   "atlas": "atlases/monsters-4.webp",
    "x": 196,
    "y": 2,
    "w": 192,
@@ -1144,7 +1144,7 @@
    "blend": "normal"
   },
   "mon_slime_small_hurt": {
-   "atlas": "atlases/monsters-4.png",
+   "atlas": "atlases/monsters-4.webp",
    "x": 390,
    "y": 2,
    "w": 192,
@@ -1153,7 +1153,7 @@
    "blend": "normal"
   },
   "elite_alpha_wolf_idle": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 2,
    "y": 1544,
    "w": 320,
@@ -1162,7 +1162,7 @@
    "blend": "normal"
   },
   "elite_alpha_wolf_attack": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 1030,
    "y": 1030,
    "w": 320,
@@ -1171,7 +1171,7 @@
    "blend": "normal"
   },
   "elite_alpha_wolf_hurt": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 1674,
    "y": 1030,
    "w": 320,
@@ -1180,7 +1180,7 @@
    "blend": "normal"
   },
   "elite_alpha_wolf_enraged": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 1352,
    "y": 1030,
    "w": 320,
@@ -1189,7 +1189,7 @@
    "blend": "normal"
   },
   "elite_giant_spider_idle": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 646,
    "y": 2,
    "w": 320,
@@ -1198,7 +1198,7 @@
    "blend": "normal"
   },
   "elite_giant_spider_attack": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 1612,
    "y": 1544,
    "w": 320,
@@ -1207,7 +1207,7 @@
    "blend": "normal"
   },
   "elite_giant_spider_hurt": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 324,
    "y": 2,
    "w": 320,
@@ -1216,7 +1216,7 @@
    "blend": "normal"
   },
   "elite_giant_spider_enraged": {
-   "atlas": "atlases/monsters-3.png",
+   "atlas": "atlases/monsters-3.webp",
    "x": 2,
    "y": 2,
    "w": 320,
@@ -1225,7 +1225,7 @@
    "blend": "normal"
   },
   "elite_dark_captain_idle": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 1290,
    "y": 1544,
    "w": 320,
@@ -1234,7 +1234,7 @@
    "blend": "normal"
   },
   "elite_dark_captain_attack": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 324,
    "y": 1544,
    "w": 320,
@@ -1243,7 +1243,7 @@
    "blend": "normal"
   },
   "elite_dark_captain_hurt": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 968,
    "y": 1544,
    "w": 320,
@@ -1252,7 +1252,7 @@
    "blend": "normal"
   },
   "elite_dark_captain_enraged": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 646,
    "y": 1544,
    "w": 320,
@@ -1261,7 +1261,7 @@
    "blend": "normal"
   },
   "boss_stone_golem_idle": {
-   "atlas": "atlases/monsters-1.png",
+   "atlas": "atlases/monsters-1.webp",
    "x": 1030,
    "y": 1030,
    "w": 512,
@@ -1270,7 +1270,7 @@
    "blend": "normal"
   },
   "boss_stone_golem_attack": {
-   "atlas": "atlases/monsters-1.png",
+   "atlas": "atlases/monsters-1.webp",
    "x": 1030,
    "y": 516,
    "w": 512,
@@ -1279,7 +1279,7 @@
    "blend": "normal"
   },
   "boss_stone_golem_hurt": {
-   "atlas": "atlases/monsters-1.png",
+   "atlas": "atlases/monsters-1.webp",
    "x": 516,
    "y": 1030,
    "w": 512,
@@ -1288,7 +1288,7 @@
    "blend": "normal"
   },
   "boss_stone_golem_windup": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 516,
    "y": 2,
    "w": 512,
@@ -1297,7 +1297,7 @@
    "blend": "normal"
   },
   "boss_stone_golem_special": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 2,
    "y": 2,
    "w": 512,
@@ -1306,7 +1306,7 @@
    "blend": "normal"
   },
   "boss_stone_golem_defeated": {
-   "atlas": "atlases/monsters-1.png",
+   "atlas": "atlases/monsters-1.webp",
    "x": 2,
    "y": 1030,
    "w": 512,
@@ -1315,7 +1315,7 @@
    "blend": "normal"
   },
   "boss_swamp_witch_idle": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 1030,
    "y": 516,
    "w": 512,
@@ -1324,7 +1324,7 @@
    "blend": "normal"
   },
   "boss_swamp_witch_attack": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 1030,
    "y": 2,
    "w": 512,
@@ -1333,7 +1333,7 @@
    "blend": "normal"
   },
   "boss_swamp_witch_hurt": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 516,
    "y": 516,
    "w": 512,
@@ -1342,7 +1342,7 @@
    "blend": "normal"
   },
   "boss_swamp_witch_windup": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 516,
    "y": 1030,
    "w": 512,
@@ -1351,7 +1351,7 @@
    "blend": "normal"
   },
   "boss_swamp_witch_special": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 2,
    "y": 1030,
    "w": 512,
@@ -1360,7 +1360,7 @@
    "blend": "normal"
   },
   "boss_swamp_witch_defeated": {
-   "atlas": "atlases/monsters-2.png",
+   "atlas": "atlases/monsters-2.webp",
    "x": 2,
    "y": 516,
    "w": 512,
@@ -1369,7 +1369,7 @@
    "blend": "normal"
   },
   "boss_fire_dragon_idle": {
-   "atlas": "atlases/monsters-1.png",
+   "atlas": "atlases/monsters-1.webp",
    "x": 1030,
    "y": 2,
    "w": 512,
@@ -1378,7 +1378,7 @@
    "blend": "normal"
   },
   "boss_fire_dragon_attack": {
-   "atlas": "atlases/monsters-0.png",
+   "atlas": "atlases/monsters-0.webp",
    "x": 1030,
    "y": 1030,
    "w": 512,
@@ -1387,7 +1387,7 @@
    "blend": "normal"
   },
   "boss_fire_dragon_hurt": {
-   "atlas": "atlases/monsters-1.png",
+   "atlas": "atlases/monsters-1.webp",
    "x": 516,
    "y": 2,
    "w": 512,
@@ -1396,7 +1396,7 @@
    "blend": "normal"
   },
   "boss_fire_dragon_windup": {
-   "atlas": "atlases/monsters-1.png",
+   "atlas": "atlases/monsters-1.webp",
    "x": 516,
    "y": 516,
    "w": 512,
@@ -1405,7 +1405,7 @@
    "blend": "normal"
   },
   "boss_fire_dragon_special": {
-   "atlas": "atlases/monsters-1.png",
+   "atlas": "atlases/monsters-1.webp",
    "x": 2,
    "y": 516,
    "w": 512,
@@ -1414,7 +1414,7 @@
    "blend": "normal"
   },
   "boss_fire_dragon_defeated": {
-   "atlas": "atlases/monsters-1.png",
+   "atlas": "atlases/monsters-1.webp",
    "x": 2,
    "y": 2,
    "w": 512,
@@ -1423,7 +1423,7 @@
    "blend": "normal"
   },
   "boss_dice_demon_p1_idle": {
-   "atlas": "atlases/monsters-0.png",
+   "atlas": "atlases/monsters-0.webp",
    "x": 1030,
    "y": 2,
    "w": 512,
@@ -1432,7 +1432,7 @@
    "blend": "normal"
   },
   "boss_dice_demon_p1_attack": {
-   "atlas": "atlases/monsters-0.png",
+   "atlas": "atlases/monsters-0.webp",
    "x": 2,
    "y": 2,
    "w": 512,
@@ -1441,7 +1441,7 @@
    "blend": "normal"
   },
   "boss_dice_demon_p1_windup": {
-   "atlas": "atlases/monsters-0.png",
+   "atlas": "atlases/monsters-0.webp",
    "x": 2,
    "y": 516,
    "w": 512,
@@ -1450,7 +1450,7 @@
    "blend": "normal"
   },
   "boss_dice_demon_p1_hurt": {
-   "atlas": "atlases/monsters-0.png",
+   "atlas": "atlases/monsters-0.webp",
    "x": 516,
    "y": 2,
    "w": 512,
@@ -1459,7 +1459,7 @@
    "blend": "normal"
   },
   "boss_dice_demon_p2_idle": {
-   "atlas": "atlases/monsters-0.png",
+   "atlas": "atlases/monsters-0.webp",
    "x": 516,
    "y": 1030,
    "w": 512,
@@ -1468,7 +1468,7 @@
    "blend": "normal"
   },
   "boss_dice_demon_p2_attack": {
-   "atlas": "atlases/monsters-0.png",
+   "atlas": "atlases/monsters-0.webp",
    "x": 516,
    "y": 516,
    "w": 512,
@@ -1477,7 +1477,7 @@
    "blend": "normal"
   },
   "boss_dice_demon_p2_curse": {
-   "atlas": "atlases/monsters-0.png",
+   "atlas": "atlases/monsters-0.webp",
    "x": 1030,
    "y": 516,
    "w": 512,
@@ -1486,7 +1486,7 @@
    "blend": "normal"
   },
   "boss_dice_demon_p2_defeated": {
-   "atlas": "atlases/monsters-0.png",
+   "atlas": "atlases/monsters-0.webp",
    "x": 2,
    "y": 1030,
    "w": 512,
@@ -1495,7 +1495,7 @@
    "blend": "normal"
   },
   "tile_boss_gate": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 260,
    "y": 2,
    "w": 256,
@@ -1504,7 +1504,7 @@
    "blend": "normal"
   },
   "tile_sword": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 260,
    "y": 1034,
    "w": 256,
@@ -1513,7 +1513,7 @@
    "blend": "normal"
   },
   "tile_bow": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 518,
    "y": 2,
    "w": 256,
@@ -1522,7 +1522,7 @@
    "blend": "normal"
   },
   "tile_campfire": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 776,
    "y": 2,
    "w": 256,
@@ -1531,7 +1531,7 @@
    "blend": "normal"
   },
   "tile_supply": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1550,
    "y": 776,
    "w": 256,
@@ -1540,7 +1540,7 @@
    "blend": "normal"
   },
   "tile_staff": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1034,
    "y": 776,
    "w": 256,
@@ -1549,7 +1549,7 @@
    "blend": "normal"
   },
   "tile_prison": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 2,
    "y": 776,
    "w": 256,
@@ -1558,7 +1558,7 @@
    "blend": "normal"
   },
   "tile_gold": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 776,
    "y": 260,
    "w": 256,
@@ -1567,7 +1567,7 @@
    "blend": "normal"
   },
   "tile_rune_stone": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 260,
    "y": 776,
    "w": 256,
@@ -1576,7 +1576,7 @@
    "blend": "normal"
   },
   "tile_knight": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 2,
    "y": 518,
    "w": 256,
@@ -1585,7 +1585,7 @@
    "blend": "normal"
   },
   "tile_crystal": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1034,
    "y": 2,
    "w": 256,
@@ -1594,7 +1594,7 @@
    "blend": "normal"
   },
   "tile_great_tree": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1034,
    "y": 260,
    "w": 256,
@@ -1603,7 +1603,7 @@
    "blend": "normal"
   },
   "tile_treasure": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 518,
    "y": 1034,
    "w": 256,
@@ -1612,7 +1612,7 @@
    "blend": "normal"
   },
   "tile_fate_card": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 2,
    "y": 260,
    "w": 256,
@@ -1621,7 +1621,7 @@
    "blend": "normal"
   },
   "tile_market": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1034,
    "y": 518,
    "w": 256,
@@ -1630,7 +1630,7 @@
    "blend": "normal"
   },
   "tile_aegis": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 2,
    "y": 2,
    "w": 256,
@@ -1639,7 +1639,7 @@
    "blend": "normal"
   },
   "tile_scepter": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 518,
    "y": 776,
    "w": 256,
@@ -1648,7 +1648,7 @@
    "blend": "normal"
   },
   "tile_storm": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1292,
    "y": 776,
    "w": 256,
@@ -1657,7 +1657,7 @@
    "blend": "normal"
   },
   "tile_shadow_blade": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 776,
    "y": 776,
    "w": 256,
@@ -1666,7 +1666,7 @@
    "blend": "normal"
   },
   "tile_lucky_dice": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 518,
    "y": 518,
    "w": 256,
@@ -1675,7 +1675,7 @@
    "blend": "normal"
   },
   "tile_mine": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1292,
    "y": 518,
    "w": 256,
@@ -1684,7 +1684,7 @@
    "blend": "normal"
   },
   "tile_harvest": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1550,
    "y": 260,
    "w": 256,
@@ -1693,7 +1693,7 @@
    "blend": "normal"
   },
   "tile_fountain": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 518,
    "y": 260,
    "w": 256,
@@ -1702,7 +1702,7 @@
    "blend": "normal"
   },
   "tile_volcano": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 776,
    "y": 1034,
    "w": 256,
@@ -1711,7 +1711,7 @@
    "blend": "normal"
   },
   "tile_magnet": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 776,
    "y": 518,
    "w": 256,
@@ -1720,7 +1720,7 @@
    "blend": "normal"
   },
   "tile_forge": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 260,
    "y": 260,
    "w": 256,
@@ -1729,7 +1729,7 @@
    "blend": "normal"
   },
   "tile_grimoire": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1292,
    "y": 260,
    "w": 256,
@@ -1738,7 +1738,7 @@
    "blend": "normal"
   },
   "tile_swamp": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 2,
    "y": 1034,
    "w": 256,
@@ -1747,7 +1747,7 @@
    "blend": "normal"
   },
   "tile_curse": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1292,
    "y": 2,
    "w": 256,
@@ -1756,7 +1756,7 @@
    "blend": "normal"
   },
   "tile_empty": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1550,
    "y": 2,
    "w": 256,
@@ -1765,7 +1765,7 @@
    "blend": "normal"
   },
   "tile_locked": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 260,
    "y": 518,
    "w": 256,
@@ -1774,7 +1774,7 @@
    "blend": "normal"
   },
   "tile_mystery": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1550,
    "y": 518,
    "w": 256,
@@ -1783,7 +1783,7 @@
    "blend": "normal"
   },
   "icon_potion": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 522,
    "y": 1486,
    "w": 128,
@@ -1792,7 +1792,7 @@
    "blend": "normal"
   },
   "icon_reroll": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 652,
    "y": 1486,
    "w": 128,
@@ -1801,7 +1801,7 @@
    "blend": "normal"
   },
   "icon_force_die": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 2,
    "y": 1486,
    "w": 128,
@@ -1810,7 +1810,7 @@
    "blend": "normal"
   },
   "icon_double_dice": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1886,
    "y": 1292,
    "w": 128,
@@ -1819,7 +1819,7 @@
    "blend": "normal"
   },
   "icon_gold": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 132,
    "y": 1486,
    "w": 128,
@@ -1828,7 +1828,7 @@
    "blend": "normal"
   },
   "icon_heart": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 262,
    "y": 1486,
    "w": 128,
@@ -1837,7 +1837,7 @@
    "blend": "normal"
   },
   "icon_heart_empty": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 392,
    "y": 1486,
    "w": 128,
@@ -1846,7 +1846,7 @@
    "blend": "normal"
   },
   "icon_star": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 782,
    "y": 1486,
    "w": 128,
@@ -1855,7 +1855,7 @@
    "blend": "normal"
   },
   "icon_attack": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1756,
    "y": 1292,
    "w": 128,
@@ -1864,7 +1864,7 @@
    "blend": "normal"
   },
   "relic_lucky_clover": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 522,
    "y": 1616,
    "w": 128,
@@ -1873,7 +1873,7 @@
    "blend": "normal"
   },
   "relic_loaded_die": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 392,
    "y": 1616,
    "w": 128,
@@ -1882,7 +1882,7 @@
    "blend": "normal"
   },
   "relic_golden_horseshoe": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1822,
    "y": 1486,
    "w": 128,
@@ -1891,7 +1891,7 @@
    "blend": "normal"
   },
   "relic_merchant_scale": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 652,
    "y": 1616,
    "w": 128,
@@ -1900,7 +1900,7 @@
    "blend": "normal"
   },
   "relic_war_drum": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1432,
    "y": 1616,
    "w": 128,
@@ -1909,7 +1909,7 @@
    "blend": "normal"
   },
   "relic_phoenix_feather": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 782,
    "y": 1616,
    "w": 128,
@@ -1918,7 +1918,7 @@
    "blend": "normal"
   },
   "relic_hourglass": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 132,
    "y": 1616,
    "w": 128,
@@ -1927,7 +1927,7 @@
    "blend": "normal"
   },
   "relic_compass": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1432,
    "y": 1486,
    "w": 128,
@@ -1936,7 +1936,7 @@
    "blend": "normal"
   },
   "relic_kings_crown": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 262,
    "y": 1616,
    "w": 128,
@@ -1945,7 +1945,7 @@
    "blend": "normal"
   },
   "relic_dragon_scale": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1692,
    "y": 1486,
    "w": 128,
@@ -1954,7 +1954,7 @@
    "blend": "normal"
   },
   "relic_demon_eye": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1562,
    "y": 1486,
    "w": 128,
@@ -1963,7 +1963,7 @@
    "blend": "normal"
   },
   "relic_greedy_pig": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 2,
    "y": 1616,
    "w": 128,
@@ -1972,7 +1972,7 @@
    "blend": "normal"
   },
   "relic_treasure_map": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1172,
    "y": 1616,
    "w": 128,
@@ -1981,7 +1981,7 @@
    "blend": "normal"
   },
   "relic_ancient_coin": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1302,
    "y": 1486,
    "w": 128,
@@ -1990,7 +1990,7 @@
    "blend": "normal"
   },
   "relic_thorn_crown": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1042,
    "y": 1616,
    "w": 128,
@@ -1999,7 +1999,7 @@
    "blend": "normal"
   },
   "relic_wise_owl": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1562,
    "y": 1616,
    "w": 128,
@@ -2008,7 +2008,7 @@
    "blend": "normal"
   },
   "relic_spirit_lantern": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 912,
    "y": 1616,
    "w": 128,
@@ -2017,7 +2017,7 @@
    "blend": "normal"
   },
   "relic_war_banner": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1302,
    "y": 1616,
    "w": 128,
@@ -2026,7 +2026,7 @@
    "blend": "normal"
   },
   "status_burn": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 522,
    "y": 1746,
    "w": 128,
@@ -2035,7 +2035,7 @@
    "blend": "normal"
   },
   "status_poison": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1692,
    "y": 1746,
    "w": 128,
@@ -2044,7 +2044,7 @@
    "blend": "normal"
   },
   "status_armor": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 132,
    "y": 1746,
    "w": 128,
@@ -2053,7 +2053,7 @@
    "blend": "normal"
   },
   "status_stun": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 2,
    "y": 1876,
    "w": 128,
@@ -2062,7 +2062,7 @@
    "blend": "normal"
   },
   "status_regen": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1822,
    "y": 1746,
    "w": 128,
@@ -2071,7 +2071,7 @@
    "blend": "normal"
   },
   "status_flying": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1042,
    "y": 1746,
    "w": 128,
@@ -2080,7 +2080,7 @@
    "blend": "normal"
   },
   "status_summon": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 132,
    "y": 1876,
    "w": 128,
@@ -2089,7 +2089,7 @@
    "blend": "normal"
   },
   "status_bomb": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 392,
    "y": 1746,
    "w": 128,
@@ -2098,7 +2098,7 @@
    "blend": "normal"
   },
   "status_thief": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 392,
    "y": 1876,
    "w": 128,
@@ -2107,7 +2107,7 @@
    "blend": "normal"
   },
   "status_atk_up": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 262,
    "y": 1746,
    "w": 128,
@@ -2116,7 +2116,7 @@
    "blend": "normal"
   },
   "status_def_up": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 912,
    "y": 1746,
    "w": 128,
@@ -2125,7 +2125,7 @@
    "blend": "normal"
   },
   "status_haste": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1302,
    "y": 1746,
    "w": 128,
@@ -2134,7 +2134,7 @@
    "blend": "normal"
   },
   "status_crit": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 652,
    "y": 1746,
    "w": 128,
@@ -2143,7 +2143,7 @@
    "blend": "normal"
   },
   "status_lifesteal": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1432,
    "y": 1746,
    "w": 128,
@@ -2152,7 +2152,7 @@
    "blend": "normal"
   },
   "status_taunt": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 262,
    "y": 1876,
    "w": 128,
@@ -2161,7 +2161,7 @@
    "blend": "normal"
   },
   "status_curse": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 782,
    "y": 1746,
    "w": 128,
@@ -2170,7 +2170,7 @@
    "blend": "normal"
   },
   "status_locked": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1562,
    "y": 1746,
    "w": 128,
@@ -2179,7 +2179,7 @@
    "blend": "normal"
   },
   "status_fury": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1172,
    "y": 1746,
    "w": 128,
@@ -2188,7 +2188,7 @@
    "blend": "normal"
   },
   "synergy_ember_volley": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 652,
    "y": 1876,
    "w": 128,
@@ -2197,7 +2197,7 @@
    "blend": "normal"
   },
   "synergy_vanguard": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1432,
    "y": 1876,
    "w": 128,
@@ -2206,7 +2206,7 @@
    "blend": "normal"
   },
   "synergy_arcane": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 522,
    "y": 1876,
    "w": 128,
@@ -2215,7 +2215,7 @@
    "blend": "normal"
   },
   "synergy_verdant": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1562,
    "y": 1876,
    "w": 128,
@@ -2224,7 +2224,7 @@
    "blend": "normal"
   },
   "synergy_prosperity": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1042,
    "y": 1876,
    "w": 128,
@@ -2233,7 +2233,7 @@
    "blend": "normal"
   },
   "synergy_stormblade": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1302,
    "y": 1876,
    "w": 128,
@@ -2242,7 +2242,7 @@
    "blend": "normal"
   },
   "synergy_shadow": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1172,
    "y": 1876,
    "w": 128,
@@ -2251,7 +2251,7 @@
    "blend": "normal"
   },
   "synergy_holy": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 912,
    "y": 1876,
    "w": 128,
@@ -2260,7 +2260,7 @@
    "blend": "normal"
   },
   "synergy_harvest": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 782,
    "y": 1876,
    "w": 128,
@@ -2269,7 +2269,7 @@
    "blend": "normal"
   },
   "die_1": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 196,
    "y": 1292,
    "w": 128,
@@ -2278,7 +2278,7 @@
    "blend": "normal"
   },
   "die_2": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 326,
    "y": 1292,
    "w": 128,
@@ -2287,7 +2287,7 @@
    "blend": "normal"
   },
   "die_3": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 456,
    "y": 1292,
    "w": 128,
@@ -2296,7 +2296,7 @@
    "blend": "normal"
   },
   "die_4": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 586,
    "y": 1292,
    "w": 128,
@@ -2305,7 +2305,7 @@
    "blend": "normal"
   },
   "die_5": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 716,
    "y": 1292,
    "w": 128,
@@ -2314,7 +2314,7 @@
    "blend": "normal"
   },
   "die_6": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 846,
    "y": 1292,
    "w": 128,
@@ -2323,7 +2323,7 @@
    "blend": "normal"
   },
   "face_star": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1496,
    "y": 1292,
    "w": 128,
@@ -2332,7 +2332,7 @@
    "blend": "normal"
   },
   "face_warp": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1626,
    "y": 1292,
    "w": 128,
@@ -2341,7 +2341,7 @@
    "blend": "normal"
   },
   "face_gold": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1236,
    "y": 1292,
    "w": 128,
@@ -2350,7 +2350,7 @@
    "blend": "normal"
   },
   "face_double": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1106,
    "y": 1292,
    "w": 128,
@@ -2359,7 +2359,7 @@
    "blend": "normal"
   },
   "face_skull": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1366,
    "y": 1292,
    "w": 128,
@@ -2368,7 +2368,7 @@
    "blend": "normal"
   },
   "face_crown": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 976,
    "y": 1292,
    "w": 128,
@@ -2377,7 +2377,7 @@
    "blend": "normal"
   },
   "dice3d_normal": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1616,
    "y": 1034,
    "w": 192,
@@ -2386,7 +2386,7 @@
    "blend": "normal"
   },
   "dice3d_gold": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1228,
    "y": 1034,
    "w": 192,
@@ -2395,7 +2395,7 @@
    "blend": "normal"
   },
   "dice3d_demon": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1034,
    "y": 1034,
    "w": 192,
@@ -2404,7 +2404,7 @@
    "blend": "normal"
   },
   "dice3d_tilt": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 2,
    "y": 1292,
    "w": 192,
@@ -2413,7 +2413,7 @@
    "blend": "normal"
   },
   "dice3d_spin": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1810,
    "y": 1034,
    "w": 192,
@@ -2422,7 +2422,7 @@
    "blend": "normal"
   },
   "dice3d_land": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1422,
    "y": 1034,
    "w": 192,
@@ -2431,7 +2431,7 @@
    "blend": "normal"
   },
   "skill_captain": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1692,
    "y": 1616,
    "w": 128,
@@ -2440,7 +2440,7 @@
    "blend": "normal"
   },
   "skill_gambler": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1822,
    "y": 1616,
    "w": 128,
@@ -2449,7 +2449,7 @@
    "blend": "normal"
   },
   "skill_merchant": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 2,
    "y": 1746,
    "w": 128,
@@ -2458,7 +2458,7 @@
    "blend": "normal"
   },
   "menu_settings": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1172,
    "y": 1486,
    "w": 128,
@@ -2467,7 +2467,7 @@
    "blend": "normal"
   },
   "menu_codex": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 912,
    "y": 1486,
    "w": 128,
@@ -2476,7 +2476,7 @@
    "blend": "normal"
   },
   "menu_pause": {
-   "atlas": "atlases/icons-0.png",
+   "atlas": "atlases/icons-0.webp",
    "x": 1042,
    "y": 1486,
    "w": 128,
@@ -2485,7 +2485,7 @@
    "blend": "normal"
   },
   "frame_star1": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 1760,
    "y": 468,
    "w": 256,
@@ -2494,7 +2494,7 @@
    "blend": "normal"
   },
   "frame_star2": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 2,
    "y": 766,
    "w": 256,
@@ -2503,7 +2503,7 @@
    "blend": "normal"
   },
   "frame_star3": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 260,
    "y": 766,
    "w": 256,
@@ -2512,7 +2512,7 @@
    "blend": "normal"
   },
   "frame_danger": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 986,
    "y": 468,
    "w": 256,
@@ -2521,7 +2521,7 @@
    "blend": "normal"
   },
   "frame_selected": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 1502,
    "y": 468,
    "w": 256,
@@ -2530,7 +2530,7 @@
    "blend": "normal"
   },
   "frame_locked": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 1244,
    "y": 468,
    "w": 256,
@@ -2539,7 +2539,7 @@
    "blend": "normal"
   },
   "btn_gold": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 1182,
    "y": 1520,
    "w": 420,
@@ -2548,7 +2548,7 @@
    "blend": "normal"
   },
   "btn_gold_pressed": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 2,
    "y": 1738,
    "w": 420,
@@ -2557,7 +2557,7 @@
    "blend": "normal"
   },
   "btn_gold_disabled": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 1604,
    "y": 1520,
    "w": 420,
@@ -2566,7 +2566,7 @@
    "blend": "normal"
   },
   "btn_purple": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 2,
    "y": 1852,
    "w": 420,
@@ -2575,7 +2575,7 @@
    "blend": "normal"
   },
   "btn_purple_pressed": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 846,
    "y": 1852,
    "w": 420,
@@ -2584,7 +2584,7 @@
    "blend": "normal"
   },
   "btn_purple_disabled": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 424,
    "y": 1852,
    "w": 420,
@@ -2593,7 +2593,7 @@
    "blend": "normal"
   },
   "btn_green": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 424,
    "y": 1738,
    "w": 420,
@@ -2602,7 +2602,7 @@
    "blend": "normal"
   },
   "btn_green_pressed": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 1268,
    "y": 1738,
    "w": 420,
@@ -2611,7 +2611,7 @@
    "blend": "normal"
   },
   "btn_green_disabled": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 846,
    "y": 1738,
    "w": 420,
@@ -2620,7 +2620,7 @@
    "blend": "normal"
   },
   "btn_red": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 1268,
    "y": 1852,
    "w": 420,
@@ -2629,7 +2629,7 @@
    "blend": "normal"
   },
   "btn_red_pressed": {
-   "atlas": "atlases/ui-1.png",
+   "atlas": "atlases/ui-1.webp",
    "x": 2,
    "y": 2,
    "w": 420,
@@ -2638,7 +2638,7 @@
    "blend": "normal"
   },
   "btn_round": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 1060,
    "y": 1520,
    "w": 120,
@@ -2647,7 +2647,7 @@
    "blend": "normal"
   },
   "panel_square": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 1242,
    "y": 2,
    "w": 432,
@@ -2656,7 +2656,7 @@
    "blend": "normal"
   },
   "panel_wide": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 372,
    "y": 1520,
    "w": 312,
@@ -2665,7 +2665,7 @@
    "blend": "normal"
   },
   "panel_tooltip": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 2,
    "y": 1520,
    "w": 368,
@@ -2674,7 +2674,7 @@
    "blend": "normal"
   },
   "panel_tall": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 1302,
    "y": 1024,
    "w": 248,
@@ -2683,7 +2683,7 @@
    "blend": "normal"
   },
   "panel_strip": {
-   "atlas": "atlases/ui-1.png",
+   "atlas": "atlases/ui-1.webp",
    "x": 1078,
    "y": 2,
    "w": 464,
@@ -2692,7 +2692,7 @@
    "blend": "normal"
   },
   "panel_titled": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 2,
    "y": 468,
    "w": 408,
@@ -2701,7 +2701,7 @@
    "blend": "normal"
   },
   "card_common": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 630,
    "y": 2,
    "w": 304,
@@ -2710,7 +2710,7 @@
    "blend": "normal"
   },
   "card_rare": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 936,
    "y": 2,
    "w": 304,
@@ -2719,7 +2719,7 @@
    "blend": "normal"
   },
   "card_epic": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 2,
    "y": 2,
    "w": 312,
@@ -2728,7 +2728,7 @@
    "blend": "normal"
   },
   "card_legendary": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 316,
    "y": 2,
    "w": 312,
@@ -2737,7 +2737,7 @@
    "blend": "normal"
   },
   "bar_frame": {
-   "atlas": "atlases/ui-1.png",
+   "atlas": "atlases/ui-1.webp",
    "x": 576,
    "y": 116,
    "w": 412,
@@ -2746,7 +2746,7 @@
    "blend": "normal"
   },
   "bar_fills": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 686,
    "y": 1520,
    "w": 372,
@@ -2755,7 +2755,7 @@
    "blend": "normal"
   },
   "bar_boss_frame": {
-   "atlas": "atlases/ui-1.png",
+   "atlas": "atlases/ui-1.webp",
    "x": 424,
    "y": 2,
    "w": 652,
@@ -2764,7 +2764,7 @@
    "blend": "normal"
   },
   "bar_boss_fill": {
-   "atlas": "atlases/ui-1.png",
+   "atlas": "atlases/ui-1.webp",
    "x": 990,
    "y": 116,
    "w": 612,
@@ -2773,7 +2773,7 @@
    "blend": "normal"
   },
   "bar_progress_frame": {
-   "atlas": "atlases/ui-1.png",
+   "atlas": "atlases/ui-1.webp",
    "x": 2,
    "y": 116,
    "w": 572,
@@ -2782,7 +2782,7 @@
    "blend": "normal"
   },
   "bar_progress_fill": {
-   "atlas": "atlases/ui-1.png",
+   "atlas": "atlases/ui-1.webp",
    "x": 2,
    "y": 178,
    "w": 532,
@@ -2791,7 +2791,7 @@
    "blend": "normal"
   },
   "banner_boss": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 412,
    "y": 468,
    "w": 572,
@@ -2800,7 +2800,7 @@
    "blend": "normal"
   },
   "banner_six": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 1144,
    "y": 766,
    "w": 660,
@@ -2809,7 +2809,7 @@
    "blend": "normal"
   },
   "banner_critical": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 2,
    "y": 1274,
    "w": 668,
@@ -2818,7 +2818,7 @@
    "blend": "normal"
   },
   "banner_level_up": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 1302,
    "y": 1274,
    "w": 644,
@@ -2827,7 +2827,7 @@
    "blend": "normal"
   },
   "banner_synergy": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 2,
    "y": 1024,
    "w": 628,
@@ -2836,7 +2836,7 @@
    "blend": "normal"
   },
   "banner_victory": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 632,
    "y": 1024,
    "w": 668,
@@ -2845,7 +2845,7 @@
    "blend": "normal"
   },
   "banner_defeat": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 518,
    "y": 766,
    "w": 624,
@@ -2854,7 +2854,7 @@
    "blend": "normal"
   },
   "banner_lap_clear": {
-   "atlas": "atlases/ui-0.png",
+   "atlas": "atlases/ui-0.webp",
    "x": 672,
    "y": 1274,
    "w": 628,
@@ -2863,7 +2863,7 @@
    "blend": "normal"
   },
   "fx_slash_0": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 776,
    "y": 260,
    "w": 256,
@@ -2872,7 +2872,7 @@
    "blend": "add"
   },
   "fx_slash_1": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1034,
    "y": 260,
    "w": 256,
@@ -2881,7 +2881,7 @@
    "blend": "add"
   },
   "fx_slash_2": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1292,
    "y": 260,
    "w": 256,
@@ -2890,7 +2890,7 @@
    "blend": "add"
   },
   "fx_slash_3": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1550,
    "y": 260,
    "w": 256,
@@ -2899,7 +2899,7 @@
    "blend": "add"
   },
   "fx_slash_4": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 2,
    "y": 518,
    "w": 256,
@@ -2908,7 +2908,7 @@
    "blend": "add"
   },
   "fx_slash_5": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 260,
    "y": 518,
    "w": 256,
@@ -2917,7 +2917,7 @@
    "blend": "add"
   },
   "fx_arrow_hit_0": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 2,
    "y": 2,
    "w": 256,
@@ -2926,7 +2926,7 @@
    "blend": "add"
   },
   "fx_arrow_hit_1": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 260,
    "y": 2,
    "w": 256,
@@ -2935,7 +2935,7 @@
    "blend": "add"
   },
   "fx_arrow_hit_2": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 518,
    "y": 2,
    "w": 256,
@@ -2944,7 +2944,7 @@
    "blend": "add"
   },
   "fx_arrow_hit_3": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 776,
    "y": 2,
    "w": 256,
@@ -2953,7 +2953,7 @@
    "blend": "add"
   },
   "fx_arrow_hit_4": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1034,
    "y": 2,
    "w": 256,
@@ -2962,7 +2962,7 @@
    "blend": "add"
   },
   "fx_arrow_hit_5": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1292,
    "y": 2,
    "w": 256,
@@ -2971,7 +2971,7 @@
    "blend": "add"
   },
   "fx_fire_arrow_hit_0": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1550,
    "y": 1550,
    "w": 256,
@@ -2980,7 +2980,7 @@
    "blend": "add"
   },
   "fx_fire_arrow_hit_1": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 2,
    "y": 2,
    "w": 256,
@@ -2989,7 +2989,7 @@
    "blend": "add"
   },
   "fx_fire_arrow_hit_2": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 260,
    "y": 2,
    "w": 256,
@@ -2998,7 +2998,7 @@
    "blend": "add"
   },
   "fx_fire_arrow_hit_3": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 518,
    "y": 2,
    "w": 256,
@@ -3007,7 +3007,7 @@
    "blend": "add"
   },
   "fx_fire_arrow_hit_4": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 776,
    "y": 2,
    "w": 256,
@@ -3016,7 +3016,7 @@
    "blend": "add"
   },
   "fx_fire_arrow_hit_5": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1034,
    "y": 2,
    "w": 256,
@@ -3025,7 +3025,7 @@
    "blend": "add"
   },
   "fx_magic_burst_0": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 2,
    "y": 1292,
    "w": 256,
@@ -3034,7 +3034,7 @@
    "blend": "add"
   },
   "fx_magic_burst_1": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 260,
    "y": 1292,
    "w": 256,
@@ -3043,7 +3043,7 @@
    "blend": "add"
   },
   "fx_magic_burst_2": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 518,
    "y": 1292,
    "w": 256,
@@ -3052,7 +3052,7 @@
    "blend": "add"
   },
   "fx_magic_burst_3": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 776,
    "y": 1292,
    "w": 256,
@@ -3061,7 +3061,7 @@
    "blend": "add"
   },
   "fx_magic_burst_4": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1034,
    "y": 1292,
    "w": 256,
@@ -3070,7 +3070,7 @@
    "blend": "add"
   },
   "fx_magic_burst_5": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1292,
    "y": 1292,
    "w": 256,
@@ -3079,7 +3079,7 @@
    "blend": "add"
   },
   "fx_holy_heal_0": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 776,
    "y": 518,
    "w": 256,
@@ -3088,7 +3088,7 @@
    "blend": "add"
   },
   "fx_holy_heal_1": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1034,
    "y": 518,
    "w": 256,
@@ -3097,7 +3097,7 @@
    "blend": "add"
   },
   "fx_holy_heal_2": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1292,
    "y": 518,
    "w": 256,
@@ -3106,7 +3106,7 @@
    "blend": "add"
   },
   "fx_holy_heal_3": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1550,
    "y": 518,
    "w": 256,
@@ -3115,7 +3115,7 @@
    "blend": "add"
   },
   "fx_holy_heal_4": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 2,
    "y": 776,
    "w": 256,
@@ -3124,7 +3124,7 @@
    "blend": "add"
   },
   "fx_holy_heal_5": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 260,
    "y": 776,
    "w": 256,
@@ -3133,7 +3133,7 @@
    "blend": "add"
   },
   "fx_revive_0": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1292,
    "y": 1550,
    "w": 256,
@@ -3142,7 +3142,7 @@
    "blend": "add"
   },
   "fx_revive_1": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1550,
    "y": 1550,
    "w": 256,
@@ -3151,7 +3151,7 @@
    "blend": "add"
   },
   "fx_revive_2": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 2,
    "y": 2,
    "w": 256,
@@ -3160,7 +3160,7 @@
    "blend": "add"
   },
   "fx_revive_3": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 260,
    "y": 2,
    "w": 256,
@@ -3169,7 +3169,7 @@
    "blend": "add"
   },
   "fx_revive_4": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 518,
    "y": 2,
    "w": 256,
@@ -3178,7 +3178,7 @@
    "blend": "add"
   },
   "fx_revive_5": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 776,
    "y": 2,
    "w": 256,
@@ -3187,7 +3187,7 @@
    "blend": "add"
   },
   "fx_explosion_0": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1292,
    "y": 1292,
    "w": 256,
@@ -3196,7 +3196,7 @@
    "blend": "add"
   },
   "fx_explosion_1": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1550,
    "y": 1292,
    "w": 256,
@@ -3205,7 +3205,7 @@
    "blend": "add"
   },
   "fx_explosion_2": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 2,
    "y": 1550,
    "w": 256,
@@ -3214,7 +3214,7 @@
    "blend": "add"
   },
   "fx_explosion_3": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 260,
    "y": 1550,
    "w": 256,
@@ -3223,7 +3223,7 @@
    "blend": "add"
   },
   "fx_explosion_4": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 518,
    "y": 1550,
    "w": 256,
@@ -3232,7 +3232,7 @@
    "blend": "add"
   },
   "fx_explosion_5": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 776,
    "y": 1550,
    "w": 256,
@@ -3241,7 +3241,7 @@
    "blend": "add"
   },
   "fx_explosion_6": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1034,
    "y": 1550,
    "w": 256,
@@ -3250,7 +3250,7 @@
    "blend": "add"
   },
   "fx_explosion_7": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1292,
    "y": 1550,
    "w": 256,
@@ -3259,7 +3259,7 @@
    "blend": "add"
   },
   "fx_poison_cloud_0": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1550,
    "y": 1292,
    "w": 256,
@@ -3268,7 +3268,7 @@
    "blend": "add"
   },
   "fx_poison_cloud_1": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 2,
    "y": 1550,
    "w": 256,
@@ -3277,7 +3277,7 @@
    "blend": "add"
   },
   "fx_poison_cloud_2": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 260,
    "y": 1550,
    "w": 256,
@@ -3286,7 +3286,7 @@
    "blend": "add"
   },
   "fx_poison_cloud_3": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 518,
    "y": 1550,
    "w": 256,
@@ -3295,7 +3295,7 @@
    "blend": "add"
   },
   "fx_poison_cloud_4": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 776,
    "y": 1550,
    "w": 256,
@@ -3304,7 +3304,7 @@
    "blend": "add"
   },
   "fx_poison_cloud_5": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1034,
    "y": 1550,
    "w": 256,
@@ -3313,7 +3313,7 @@
    "blend": "add"
   },
   "fx_lightning_0": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 260,
    "y": 1034,
    "w": 256,
@@ -3322,7 +3322,7 @@
    "blend": "add"
   },
   "fx_lightning_1": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 518,
    "y": 1034,
    "w": 256,
@@ -3331,7 +3331,7 @@
    "blend": "add"
   },
   "fx_lightning_2": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 776,
    "y": 1034,
    "w": 256,
@@ -3340,7 +3340,7 @@
    "blend": "add"
   },
   "fx_lightning_3": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1034,
    "y": 1034,
    "w": 256,
@@ -3349,7 +3349,7 @@
    "blend": "add"
   },
   "fx_lightning_4": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1292,
    "y": 1034,
    "w": 256,
@@ -3358,7 +3358,7 @@
    "blend": "add"
   },
   "fx_lightning_5": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1550,
    "y": 1034,
    "w": 256,
@@ -3367,7 +3367,7 @@
    "blend": "add"
   },
   "fx_fire_breath_0": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1292,
    "y": 2,
    "w": 256,
@@ -3376,7 +3376,7 @@
    "blend": "add"
   },
   "fx_fire_breath_1": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1550,
    "y": 2,
    "w": 256,
@@ -3385,7 +3385,7 @@
    "blend": "add"
   },
   "fx_fire_breath_2": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 2,
    "y": 260,
    "w": 256,
@@ -3394,7 +3394,7 @@
    "blend": "add"
   },
   "fx_fire_breath_3": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 260,
    "y": 260,
    "w": 256,
@@ -3403,7 +3403,7 @@
    "blend": "add"
   },
   "fx_fire_breath_4": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 518,
    "y": 260,
    "w": 256,
@@ -3412,7 +3412,7 @@
    "blend": "add"
   },
   "fx_fire_breath_5": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 776,
    "y": 260,
    "w": 256,
@@ -3421,7 +3421,7 @@
    "blend": "add"
   },
   "fx_ground_slam_0": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1034,
    "y": 260,
    "w": 256,
@@ -3430,7 +3430,7 @@
    "blend": "add"
   },
   "fx_ground_slam_1": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1292,
    "y": 260,
    "w": 256,
@@ -3439,7 +3439,7 @@
    "blend": "add"
   },
   "fx_ground_slam_2": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1550,
    "y": 260,
    "w": 256,
@@ -3448,7 +3448,7 @@
    "blend": "add"
   },
   "fx_ground_slam_3": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 2,
    "y": 518,
    "w": 256,
@@ -3457,7 +3457,7 @@
    "blend": "add"
   },
   "fx_ground_slam_4": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 260,
    "y": 518,
    "w": 256,
@@ -3466,7 +3466,7 @@
    "blend": "add"
   },
   "fx_ground_slam_5": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 518,
    "y": 518,
    "w": 256,
@@ -3475,7 +3475,7 @@
    "blend": "add"
   },
   "fx_summon_circle_0": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 518,
    "y": 518,
    "w": 256,
@@ -3484,7 +3484,7 @@
    "blend": "add"
   },
   "fx_summon_circle_1": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 776,
    "y": 518,
    "w": 256,
@@ -3493,7 +3493,7 @@
    "blend": "add"
   },
   "fx_summon_circle_2": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1034,
    "y": 518,
    "w": 256,
@@ -3502,7 +3502,7 @@
    "blend": "add"
   },
   "fx_summon_circle_3": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1292,
    "y": 518,
    "w": 256,
@@ -3511,7 +3511,7 @@
    "blend": "add"
   },
   "fx_summon_circle_4": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1550,
    "y": 518,
    "w": 256,
@@ -3520,7 +3520,7 @@
    "blend": "add"
   },
   "fx_summon_circle_5": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 2,
    "y": 776,
    "w": 256,
@@ -3529,7 +3529,7 @@
    "blend": "add"
   },
   "fx_death_poof_0": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 2,
    "y": 1034,
    "w": 256,
@@ -3538,7 +3538,7 @@
    "blend": "add"
   },
   "fx_death_poof_1": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 260,
    "y": 1034,
    "w": 256,
@@ -3547,7 +3547,7 @@
    "blend": "add"
   },
   "fx_death_poof_2": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 518,
    "y": 1034,
    "w": 256,
@@ -3556,7 +3556,7 @@
    "blend": "add"
   },
   "fx_death_poof_3": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 776,
    "y": 1034,
    "w": 256,
@@ -3565,7 +3565,7 @@
    "blend": "add"
   },
   "fx_death_poof_4": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1034,
    "y": 1034,
    "w": 256,
@@ -3574,7 +3574,7 @@
    "blend": "add"
   },
   "fx_death_poof_5": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1292,
    "y": 1034,
    "w": 256,
@@ -3583,7 +3583,7 @@
    "blend": "add"
   },
   "fx_coin_burst_0": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1292,
    "y": 260,
    "w": 256,
@@ -3592,7 +3592,7 @@
    "blend": "add"
   },
   "fx_coin_burst_1": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1550,
    "y": 260,
    "w": 256,
@@ -3601,7 +3601,7 @@
    "blend": "add"
   },
   "fx_coin_burst_2": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 2,
    "y": 518,
    "w": 256,
@@ -3610,7 +3610,7 @@
    "blend": "add"
   },
   "fx_coin_burst_3": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 260,
    "y": 518,
    "w": 256,
@@ -3619,7 +3619,7 @@
    "blend": "add"
   },
   "fx_coin_burst_4": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 518,
    "y": 518,
    "w": 256,
@@ -3628,7 +3628,7 @@
    "blend": "add"
   },
   "fx_coin_burst_5": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 776,
    "y": 518,
    "w": 256,
@@ -3637,7 +3637,7 @@
    "blend": "add"
   },
   "fx_level_up_beam_0": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 518,
    "y": 776,
    "w": 256,
@@ -3646,7 +3646,7 @@
    "blend": "add"
   },
   "fx_level_up_beam_1": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 776,
    "y": 776,
    "w": 256,
@@ -3655,7 +3655,7 @@
    "blend": "add"
   },
   "fx_level_up_beam_2": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1034,
    "y": 776,
    "w": 256,
@@ -3664,7 +3664,7 @@
    "blend": "add"
   },
   "fx_level_up_beam_3": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1292,
    "y": 776,
    "w": 256,
@@ -3673,7 +3673,7 @@
    "blend": "add"
   },
   "fx_level_up_beam_4": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 1550,
    "y": 776,
    "w": 256,
@@ -3682,7 +3682,7 @@
    "blend": "add"
   },
   "fx_level_up_beam_5": {
-   "atlas": "atlases/effects-1.png",
+   "atlas": "atlases/effects-1.webp",
    "x": 2,
    "y": 1034,
    "w": 256,
@@ -3691,7 +3691,7 @@
    "blend": "add"
   },
   "fx_dice_land_0": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1550,
    "y": 1034,
    "w": 256,
@@ -3700,7 +3700,7 @@
    "blend": "add"
   },
   "fx_dice_land_1": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 2,
    "y": 1292,
    "w": 256,
@@ -3709,7 +3709,7 @@
    "blend": "add"
   },
   "fx_dice_land_2": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 260,
    "y": 1292,
    "w": 256,
@@ -3718,7 +3718,7 @@
    "blend": "add"
   },
   "fx_dice_land_3": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 518,
    "y": 1292,
    "w": 256,
@@ -3727,7 +3727,7 @@
    "blend": "add"
   },
   "fx_dice_land_4": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 776,
    "y": 1292,
    "w": 256,
@@ -3736,7 +3736,7 @@
    "blend": "add"
   },
   "fx_dice_land_5": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1034,
    "y": 1292,
    "w": 256,
@@ -3745,7 +3745,7 @@
    "blend": "add"
   },
   "fx_six_burst_0": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1034,
    "y": 2,
    "w": 256,
@@ -3754,7 +3754,7 @@
    "blend": "add"
   },
   "fx_six_burst_1": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1292,
    "y": 2,
    "w": 256,
@@ -3763,7 +3763,7 @@
    "blend": "add"
   },
   "fx_six_burst_2": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1550,
    "y": 2,
    "w": 256,
@@ -3772,7 +3772,7 @@
    "blend": "add"
   },
   "fx_six_burst_3": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 2,
    "y": 260,
    "w": 256,
@@ -3781,7 +3781,7 @@
    "blend": "add"
   },
   "fx_six_burst_4": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 260,
    "y": 260,
    "w": 256,
@@ -3790,7 +3790,7 @@
    "blend": "add"
   },
   "fx_six_burst_5": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 518,
    "y": 260,
    "w": 256,
@@ -3799,7 +3799,7 @@
    "blend": "add"
   },
   "fx_crit_flash_0": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1034,
    "y": 518,
    "w": 256,
@@ -3808,7 +3808,7 @@
    "blend": "add"
   },
   "fx_crit_flash_1": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1292,
    "y": 518,
    "w": 256,
@@ -3817,7 +3817,7 @@
    "blend": "add"
   },
   "fx_crit_flash_2": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1550,
    "y": 518,
    "w": 256,
@@ -3826,7 +3826,7 @@
    "blend": "add"
   },
   "fx_crit_flash_3": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 2,
    "y": 776,
    "w": 256,
@@ -3835,7 +3835,7 @@
    "blend": "add"
   },
   "fx_warp_portal_0": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 260,
    "y": 776,
    "w": 256,
@@ -3844,7 +3844,7 @@
    "blend": "add"
   },
   "fx_warp_portal_1": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 518,
    "y": 776,
    "w": 256,
@@ -3853,7 +3853,7 @@
    "blend": "add"
   },
   "fx_warp_portal_2": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 776,
    "y": 776,
    "w": 256,
@@ -3862,7 +3862,7 @@
    "blend": "add"
   },
   "fx_warp_portal_3": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1034,
    "y": 776,
    "w": 256,
@@ -3871,7 +3871,7 @@
    "blend": "add"
   },
   "fx_warp_portal_4": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1292,
    "y": 776,
    "w": 256,
@@ -3880,7 +3880,7 @@
    "blend": "add"
   },
   "fx_warp_portal_5": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1550,
    "y": 776,
    "w": 256,
@@ -3889,7 +3889,7 @@
    "blend": "add"
   },
   "fx_curse_chains_0": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 260,
    "y": 776,
    "w": 256,
@@ -3898,7 +3898,7 @@
    "blend": "add"
   },
   "fx_curse_chains_1": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 518,
    "y": 776,
    "w": 256,
@@ -3907,7 +3907,7 @@
    "blend": "add"
   },
   "fx_curse_chains_2": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 776,
    "y": 776,
    "w": 256,
@@ -3916,7 +3916,7 @@
    "blend": "add"
   },
   "fx_curse_chains_3": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1034,
    "y": 776,
    "w": 256,
@@ -3925,7 +3925,7 @@
    "blend": "add"
   },
   "fx_curse_chains_4": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1292,
    "y": 776,
    "w": 256,
@@ -3934,7 +3934,7 @@
    "blend": "add"
   },
   "fx_curse_chains_5": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1550,
    "y": 776,
    "w": 256,
@@ -3943,7 +3943,7 @@
    "blend": "add"
   },
   "fx_boss_aura_0": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1550,
    "y": 2,
    "w": 256,
@@ -3952,7 +3952,7 @@
    "blend": "add"
   },
   "fx_boss_aura_1": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 2,
    "y": 260,
    "w": 256,
@@ -3961,7 +3961,7 @@
    "blend": "add"
   },
   "fx_boss_aura_2": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 260,
    "y": 260,
    "w": 256,
@@ -3970,7 +3970,7 @@
    "blend": "add"
   },
   "fx_boss_aura_3": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 518,
    "y": 260,
    "w": 256,
@@ -3979,7 +3979,7 @@
    "blend": "add"
   },
   "fx_boss_aura_4": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 776,
    "y": 260,
    "w": 256,
@@ -3988,7 +3988,7 @@
    "blend": "add"
   },
   "fx_boss_aura_5": {
-   "atlas": "atlases/effects-0.png",
+   "atlas": "atlases/effects-0.webp",
    "x": 1034,
    "y": 260,
    "w": 256,
@@ -3997,7 +3997,7 @@
    "blend": "add"
   },
   "fx_loop_burn_0": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 652,
    "y": 1034,
    "w": 128,
@@ -4006,7 +4006,7 @@
    "blend": "add"
   },
   "fx_loop_burn_1": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 782,
    "y": 1034,
    "w": 128,
@@ -4015,7 +4015,7 @@
    "blend": "add"
   },
   "fx_loop_burn_2": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 912,
    "y": 1034,
    "w": 128,
@@ -4024,7 +4024,7 @@
    "blend": "add"
   },
   "fx_loop_poison_0": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1042,
    "y": 1034,
    "w": 128,
@@ -4033,7 +4033,7 @@
    "blend": "add"
   },
   "fx_loop_poison_1": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1172,
    "y": 1034,
    "w": 128,
@@ -4042,7 +4042,7 @@
    "blend": "add"
   },
   "fx_loop_stun_0": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1562,
    "y": 1034,
    "w": 128,
@@ -4051,7 +4051,7 @@
    "blend": "add"
   },
   "fx_loop_stun_1": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1692,
    "y": 1034,
    "w": 128,
@@ -4060,7 +4060,7 @@
    "blend": "add"
   },
   "fx_loop_regen_0": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1302,
    "y": 1034,
    "w": 128,
@@ -4069,7 +4069,7 @@
    "blend": "add"
   },
   "fx_loop_regen_1": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1432,
    "y": 1034,
    "w": 128,
@@ -4078,7 +4078,7 @@
    "blend": "add"
   },
   "fx_aura_atk": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1808,
    "y": 776,
    "w": 128,
@@ -4087,7 +4087,7 @@
    "blend": "add"
   },
   "fx_aura_def": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 262,
    "y": 1034,
    "w": 128,
@@ -4096,7 +4096,7 @@
    "blend": "add"
   },
   "fx_aura_haste": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 392,
    "y": 1034,
    "w": 128,
@@ -4105,7 +4105,7 @@
    "blend": "add"
   },
   "fx_shield_bubble": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1822,
    "y": 1034,
    "w": 128,
@@ -4114,7 +4114,7 @@
    "blend": "add"
   },
   "fx_shield_crack": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 2,
    "y": 1164,
    "w": 128,
@@ -4123,7 +4123,7 @@
    "blend": "add"
   },
   "fx_shield_shatter": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 132,
    "y": 1164,
    "w": 128,
@@ -4132,7 +4132,7 @@
    "blend": "add"
   },
   "fx_aura_curse": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 132,
    "y": 1034,
    "w": 128,
@@ -4141,7 +4141,7 @@
    "blend": "add"
   },
   "fx_aura_bleed": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 2,
    "y": 1034,
    "w": 128,
@@ -4150,7 +4150,7 @@
    "blend": "add"
   },
   "fx_aura_summon": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 522,
    "y": 1034,
    "w": 128,
@@ -4159,7 +4159,7 @@
    "blend": "add"
   },
   "proj_arrow": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1562,
    "y": 1164,
    "w": 128,
@@ -4168,7 +4168,7 @@
    "blend": "add"
   },
   "proj_fire_arrow": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 2,
    "y": 1294,
    "w": 128,
@@ -4177,7 +4177,7 @@
    "blend": "add"
   },
   "proj_arcane_orb": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1432,
    "y": 1164,
    "w": 128,
@@ -4186,7 +4186,7 @@
    "blend": "add"
   },
   "proj_poison_spit": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 522,
    "y": 1294,
    "w": 128,
@@ -4195,7 +4195,7 @@
    "blend": "add"
   },
   "proj_fireball": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 132,
    "y": 1294,
    "w": 128,
@@ -4204,7 +4204,7 @@
    "blend": "add"
   },
   "proj_hex_die": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 392,
    "y": 1294,
    "w": 128,
@@ -4213,7 +4213,7 @@
    "blend": "add"
   },
   "proj_coin": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1822,
    "y": 1164,
    "w": 128,
@@ -4222,7 +4222,7 @@
    "blend": "add"
   },
   "proj_bone": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1692,
    "y": 1164,
    "w": 128,
@@ -4231,7 +4231,7 @@
    "blend": "add"
   },
   "proj_gold_spark": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 262,
    "y": 1294,
    "w": 128,
@@ -4240,7 +4240,7 @@
    "blend": "add"
   },
   "particle_spark_white": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1302,
    "y": 1164,
    "w": 128,
@@ -4249,7 +4249,7 @@
    "blend": "add"
   },
   "particle_spark_gold": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1172,
    "y": 1164,
    "w": 128,
@@ -4258,7 +4258,7 @@
    "blend": "add"
   },
   "particle_flame": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 522,
    "y": 1164,
    "w": 128,
@@ -4267,7 +4267,7 @@
    "blend": "add"
   },
   "particle_leaf": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 912,
    "y": 1164,
    "w": 128,
@@ -4276,7 +4276,7 @@
    "blend": "add"
   },
   "particle_bubble": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 262,
    "y": 1164,
    "w": 128,
@@ -4285,7 +4285,7 @@
    "blend": "add"
   },
   "particle_rock": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 1042,
    "y": 1164,
    "w": 128,
@@ -4294,7 +4294,7 @@
    "blend": "add"
   },
   "particle_coin": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 392,
    "y": 1164,
    "w": 128,
@@ -4303,7 +4303,7 @@
    "blend": "add"
   },
   "particle_gem": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 652,
    "y": 1164,
    "w": 128,
@@ -4312,7 +4312,7 @@
    "blend": "add"
   },
   "particle_heart": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 782,
    "y": 1164,
    "w": 128,
@@ -4321,7 +4321,7 @@
    "blend": "add"
   },
   "fx_synergy_lines_0": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 652,
    "y": 1294,
    "w": 1024,
@@ -4330,7 +4330,7 @@
    "blend": "add"
   },
   "fx_synergy_lines_1": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 2,
    "y": 1424,
    "w": 1024,
@@ -4339,7 +4339,7 @@
    "blend": "add"
   },
   "fx_synergy_lines_2": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 2,
    "y": 1490,
    "w": 1024,
@@ -4348,7 +4348,7 @@
    "blend": "add"
   },
   "fx_synergy_lines_3": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 2,
    "y": 1556,
    "w": 1024,
@@ -4357,7 +4357,7 @@
    "blend": "add"
   },
   "fx_synergy_lines_4": {
-   "atlas": "atlases/effects-2.png",
+   "atlas": "atlases/effects-2.webp",
    "x": 2,
    "y": 1622,
    "w": 1024,

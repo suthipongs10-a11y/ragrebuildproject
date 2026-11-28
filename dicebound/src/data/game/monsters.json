@@ -1,10 +1,9 @@
 [
-  { "id": "sand_wolf", "act": 1, "hp": 22, "atk": 6, "armor": 0, "gold": 4, "traits": [] },
-  { "id": "scorpion", "act": 1, "hp": 40, "atk": 7, "armor": 4, "gold": 7, "traits": [] },
-  { "id": "cactus_brute", "act": 1, "hp": 90, "atk": 10, "armor": 1, "gold": 10, "traits": [] },
-  { "id": "vulture", "act": 1, "hp": 28, "atk": 8, "armor": 0, "gold": 6, "traits": ["flying"] },
-  { "id": "goblin_thief", "act": 1, "hp": 30, "atk": 5, "armor": 0, "gold": 12, "traits": ["thief"], "stealGold": 5 },
-  { "id": "alpha_wolf", "act": 1, "hp": 150, "atk": 13, "armor": 1, "gold": 30, "traits": ["elite"] },
-  { "id": "stone_golem", "act": 1, "hp": 420, "atk": 14, "armor": 3, "gold": 60, "traits": ["boss"],
-    "special": { "period": 4, "damageMultiplier": 2.2 } }
+  {"id": "sand_wolf", "sprite": "mon_sand_wolf", "act": 1, "hp": 22, "atk": 6, "armor": 0, "gold": 4, "traits": []},
+  {"id": "scorpion", "sprite": "mon_scorpion", "act": 1, "hp": 40, "atk": 7, "armor": 4, "gold": 7, "traits": []},
+  {"id": "cactus_brute", "sprite": "mon_cactus_brute", "act": 1, "hp": 90, "atk": 10, "armor": 1, "gold": 10, "traits": []},
+  {"id": "vulture", "sprite": "mon_vulture", "act": 1, "hp": 28, "atk": 8, "armor": 0, "gold": 6, "traits": ["flying"]},
+  {"id": "goblin_thief", "sprite": "mon_goblin_thief", "act": 1, "hp": 30, "atk": 5, "armor": 0, "gold": 12, "traits": ["thief"], "stealGold": 5},
+  {"id": "alpha_wolf", "sprite": "elite_alpha_wolf", "act": 1, "hp": 150, "atk": 13, "armor": 1, "gold": 30, "traits": ["elite"]},
+  {"id": "stone_golem", "sprite": "boss_stone_golem", "act": 1, "hp": 420, "atk": 14, "armor": 3, "gold": 60, "traits": ["boss"], "special": {"period": 4, "damageMultiplier": 2.2}}
 ]

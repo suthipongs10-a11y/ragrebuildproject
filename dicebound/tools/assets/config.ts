@@ -30,6 +30,10 @@ export const CONFIG = {
   atlasSize: 2048,
   atlasPadding: 2,
   sceneWebpQuality: 92,
+  /** Atlases of resized art ship as lossy WebP (lossless alpha): ~5x smaller, no visible change. */
+  atlasWebpQuality: 92,
+  /** Never-resized pixel art stays lossless so its hard edges survive. */
+  losslessAtlases: ['ui', 'effects'] as readonly string[],
 
   sampleFiles: [
     ['01_characters', 'char_warrior_t1_sheet.png'],

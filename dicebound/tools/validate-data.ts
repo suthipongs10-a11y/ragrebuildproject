@@ -47,6 +47,19 @@ try {
   for (const item of [...Object.values(content.tiles), ...content.synergies]) {
     if (!assetIds.has(item.icon)) errors.push(`${item.id}: icon "${item.icon}" is not in assets/manifest.json`);
   }
+  const tierCount = content.rules.unitXpForTier.length;
+  for (const unit of Object.values(content.units)) {
+    for (let tier = 1; tier <= tierCount; tier++) {
+      for (const pose of ['idle', 'attack', 'hurt', 'victory']) {
+        if (!assetIds.has(`${unit.sprite}_t${tier}_${pose}`)) errors.push(`${unit.id}: missing frame ${unit.sprite}_t${tier}_${pose}`);
+      }
+    }
+  }
+  for (const monster of Object.values(content.monsters)) {
+    for (const pose of ['idle', 'attack', 'hurt']) {
+      if (!assetIds.has(`${monster.sprite}_${pose}`)) errors.push(`${monster.id}: missing frame ${monster.sprite}_${pose}`);
+    }
+  }
   gameSummary = `, ${Object.keys(content.units).length} units, ${Object.keys(content.monsters).length} monsters, ${Object.keys(content.tiles).length} tiles, ${content.laps.length} laps`;
 } catch (error) {
   if (error instanceof ContentError) errors.push(...error.problems);

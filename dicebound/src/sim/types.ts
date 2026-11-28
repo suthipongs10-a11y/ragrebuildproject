@@ -75,13 +75,20 @@ export type Action =
 
 export type Side = 'team' | 'enemy';
 
+/** Enough for a view to put the enemy on screen without reading the state. */
+export interface SpawnedEnemy {
+  uid: number;
+  monsterId: string;
+  hp: number;
+}
+
 export type GameEvent =
   | { type: 'RunStarted'; seed: number }
   | { type: 'DiceRolled'; value: number; crit: boolean; source: 'roll' | 'reroll' | 'forced' }
   | { type: 'PawnMoved'; from: number; to: number; steps: number; passedGate: boolean }
   | { type: 'TileLanded'; index: number; tileId: string; stars: number }
   | { type: 'GoldChanged'; delta: number; total: number; reason: 'tile' | 'gamble' | 'kill' | 'stolen' | 'upgrade' }
-  | { type: 'UnitRecruited'; uid: number; unitId: string }
+  | { type: 'UnitRecruited'; uid: number; unitId: string; hp: number }
   | { type: 'UnitXpGained'; uid: number; xp: number }
   | { type: 'UnitTierUp'; uid: number; tier: number }
   | { type: 'TeamHealed'; amounts: Array<{ uid: number; amount: number }> }
@@ -90,8 +97,8 @@ export type GameEvent =
   | { type: 'GambleResolved'; won: boolean }
   | { type: 'TileUpgraded'; index: number; stars: number }
   | { type: 'SynergyActivated'; id: string; tier: number }
-  | { type: 'WaveSpawned'; enemies: Array<{ uid: number; monsterId: string }>; nextWave: string[] }
-  | { type: 'GateFightStarted'; kind: 'elite' | 'boss'; enemies: Array<{ uid: number; monsterId: string }> }
+  | { type: 'WaveSpawned'; enemies: SpawnedEnemy[]; nextWave: string[] }
+  | { type: 'GateFightStarted'; kind: 'elite' | 'boss'; enemies: SpawnedEnemy[] }
   | { type: 'RoundStarted'; round: number }
   | { type: 'UnitAttacked'; side: Side; source: number; target: number; damage: number; absorbed: number; area: boolean }
   | { type: 'UnitHealed'; source: number; target: number; amount: number }

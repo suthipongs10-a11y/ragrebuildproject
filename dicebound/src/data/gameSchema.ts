@@ -32,6 +32,8 @@ export const rulesSchema = z.object({
 const unitTier = z.object({ hp: z.number().positive(), atk: z.number().nonnegative(), armor: z.number().nonnegative(), heal: z.number().positive().optional() });
 export const unitSchema = z.object({
   id,
+  /** Asset id prefix: frames are `<sprite>_t<tier>_<pose>`. */
+  sprite: id,
   /** Formation slot: lower rows stand in front and get hit first. */
   row: z.number().int().nonnegative(),
   role: z.enum(['melee', 'backline', 'aoe', 'healer']),
@@ -41,6 +43,8 @@ export const unitSchema = z.object({
 
 export const monsterSchema = z.object({
   id,
+  /** Asset id prefix: frames are `<sprite>_<pose>`. */
+  sprite: id,
   act: z.number().int().positive(),
   hp: z.number().positive(),
   atk: z.number().nonnegative(),

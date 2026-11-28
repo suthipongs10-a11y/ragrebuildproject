@@ -62,3 +62,9 @@ export async function writePng(raster: Raster, file: string): Promise<void> {
     .png({ compressionLevel: 9 })
     .toFile(file);
 }
+
+export async function writeAtlas(raster: Raster, file: string, lossless: boolean): Promise<void> {
+  await sharp(raster.data, { raw: { width: raster.width, height: raster.height, channels: 4 } })
+    .webp(lossless ? { lossless: true, effort: 6 } : { quality: CONFIG.atlasWebpQuality, alphaQuality: 100, effort: 6 })
+    .toFile(file);
+}
