@@ -59,7 +59,8 @@ export class EventPlayer {
       case 'DiceRolled':
         board.setTarget(null);
         await hud.rollDie(event.value);
-        hud.log(t(event.source === 'forced' ? 'log.forced' : 'log.rolled', { value: event.value }));
+        hud.log(t(event.source === 'forced' || event.source === 'warp' ? 'log.forced' : 'log.rolled', { value: event.value }));
+        if (event.face) hud.log(t('log.face', { name: t(`face.${event.face}.name`) }));
         if (event.crit) {
           hud.log(t('log.crit'));
           void board.fx.play('fx_six_burst', board.center(0).x + 300, board.center(0).y + 300, 2);
@@ -81,6 +82,7 @@ export class EventPlayer {
       case 'GoldChanged':
         hud.changeGold(event.total);
         if (event.reason === 'stolen') hud.log(t('log.stolen', { n: -event.delta }));
+        else if (event.reason === 'interest') hud.log(t('log.interest', { n: event.delta }));
         else if (event.reason !== 'kill') hud.log(t(event.delta >= 0 ? 'log.gold_gain' : 'log.gold_loss', { n: Math.abs(event.delta) }));
         if (event.reason === 'tile' || event.reason === 'gamble') void board.playAt(after.position, 'fx_coin_burst');
         return;
@@ -242,6 +244,45 @@ export class EventPlayer {
       case 'LapStarted':
         hud.log(t('log.lap', { lap: event.lap }));
         return;
+      case 'ForceDiceChanged':
+        if (event.delta > 0) hud.log(t('log.force_dice', { n: event.total }));
+        return;
+      case 'RerollsChanged':
+        hud.log(t('log.rerolls', { n: event.total }));
+        return;
+      case 'FateDrawn':
+        hud.log(t(event.good ? 'log.fate_good' : 'log.fate_bad', { name: t(`fate.${event.fateId}.name`) }));
+        void board.playAt(after.position, event.good ? 'fx_six_burst' : 'fx_curse_chains');
+        await tweener.wait(TUNING.fx.frame * 5);
+        return;
+      case 'ItemBought':
+        hud.log(t('log.bought', { name: t(`shop.${event.itemId}.name`) }));
+        return;
+      case 'RelicGained':
+        hud.log(t('log.relic', { name: t(`relic.${event.relicId}.name`) }));
+        return;
+      case 'TilePlaced': {
+        const tile = after.board[event.index];
+        board.sync(after);
+        void board.playAt(event.index, 'fx_level_up_beam');
+        if (tile) hud.log(t('log.tile_placed', { tile: tileName(tile) }));
+        await board.pulse(event.index);
+        return;
+      }
+      case 'FacePlaced':
+        hud.log(t('log.face_placed', { name: t(`face.${event.faceId}.name`), face: event.face }));
+        return;
+      case 'WipePrevented':
+        hud.log(t('log.wipe_prevented'));
+        return;
+      case 'ThornsDamage': {
+        const head = this.headOf(event.target);
+        battle.actor(event.target)?.changeHp(-event.damage);
+        battle.fx.float(String(event.damage), head.x + 30, head.y + 20, UI_COLOR.heal, TEXT.small);
+        return;
+      }
+      case 'ShopOpened':
+      case 'RewardOffered':
       case 'RunEnded':
         return;
     }

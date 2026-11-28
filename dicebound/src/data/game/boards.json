@@ -1,7 +1,23 @@
 [
-  { "id": "classic", "tiles": [
-    "gate", "recruit_warrior", "gold_mine", "risk_trap",
-    "recruit_knight", "buff_attack", "heal_campfire", "recruit_archer",
-    "risk_ambush", "gold_mine", "recruit_mage", "buff_shield",
-    "risk_gamble", "recruit_cleric", "heal_campfire", "risk_trap" ] }
+ {
+  "id": "classic",
+  "tiles": [
+   "gate",
+   "recruit_warrior",
+   "gold_mine",
+   "risk_trap",
+   "recruit_knight",
+   "buff_attack",
+   "heal_campfire",
+   "recruit_archer",
+   "risk_ambush",
+   "fate_deck",
+   "recruit_mage",
+   "buff_shield",
+   "risk_gamble",
+   "recruit_cleric",
+   "bazaar",
+   "risk_trap"
+  ]
+ }
 ]

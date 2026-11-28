@@ -1,0 +1,8 @@
+[
+  {"id": "star", "icon": "face_star", "effect": {"kind": "crit"}},
+  {"id": "warp", "icon": "face_warp", "effect": {"kind": "warp"}},
+  {"id": "gold", "icon": "face_gold", "effect": {"kind": "instants", "instants": [{"kind": "gold", "value": 15}]}},
+  {"id": "double", "icon": "face_double", "effect": {"kind": "double_tile"}},
+  {"id": "crown", "icon": "face_crown", "effect": {"kind": "instants", "instants": [{"kind": "xp_all", "value": 1}]}},
+  {"id": "skull", "icon": "face_skull", "effect": {"kind": "instants", "instants": [{"kind": "team_atk_pct", "value": 50}, {"kind": "damage_pct", "value": 10}]}}
+]

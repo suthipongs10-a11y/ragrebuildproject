@@ -28,24 +28,32 @@ export class BoardView extends Container {
     private readonly assets: GameAssets,
     private readonly tweener: Tweener,
     boardImageId: string,
-    pawnPrefix: string,
+    /** Hover (index or null) and click callbacks for the tiles. */
+    private readonly onHover: (index: number | null) => void,
+    private readonly onPick: (index: number) => void,
   ) {
     super();
     const backdrop = new Sprite(assets.image(boardImageId));
     backdrop.width = this.size;
     backdrop.height = this.size;
     this.addChild(backdrop, this.links);
-    this.pawnPrefix = pawnPrefix;
     this.fx = new FxLayer(assets, tweener);
     this.pawn.anchor.set(0.5, 0.92);
-    this.pawn.texture = assets.frame(`${pawnPrefix}_idle`);
-    this.pawn.width = LAYOUT.board.pawnSize;
-    this.pawn.height = LAYOUT.board.pawnSize;
-    this.pawnScale = this.pawn.scale.x;
   }
 
-  private readonly pawnPrefix: string;
-  private readonly pawnScale: number;
+  private pawnPrefix = '';
+
+  /** The pawn is the run's leader. */
+  setPawn(prefix: string): void {
+    this.pawnPrefix = prefix;
+    this.showPawn('idle');
+  }
+
+  private showPawn(pose: string): void {
+    this.pawn.texture = this.assets.frame(`${this.pawnPrefix}_${pose}`);
+    this.pawn.width = LAYOUT.board.pawnSize;
+    this.pawn.height = LAYOUT.board.pawnSize;
+  }
 
   center(index: number): { x: number; y: number } {
     return tileCenter(index, this.size);
@@ -60,6 +68,11 @@ export class BoardView extends Container {
         const icon = new Sprite();
         icon.anchor.set(0.5);
         icon.position.set(x, y);
+        icon.eventMode = 'static';
+        icon.cursor = 'pointer';
+        icon.on('pointerover', () => this.onHover(index));
+        icon.on('pointerout', () => this.onHover(null));
+        icon.on('pointertap', () => this.onPick(index));
         const frame = new Sprite();
         frame.anchor.set(0.5);
         frame.position.set(x, y);
@@ -83,7 +96,7 @@ export class BoardView extends Container {
       frame.visible = def.type !== 'gate';
     });
     this.drawLinks(state);
-    this.setPawn(state.position);
+    this.placePawn(state.position);
   }
 
   private drawLinks(state: RunState): void {
@@ -99,7 +112,7 @@ export class BoardView extends Container {
     }
   }
 
-  setPawn(index: number): void {
+  placePawn(index: number): void {
     const { x, y } = this.center(index);
     this.pawn.position.set(x, y + LAYOUT.board.pawnSize * 0.36);
   }
@@ -115,7 +128,7 @@ export class BoardView extends Container {
 
   /** Hops the pawn tile by tile so the player can count the steps. */
   async movePawn(from: number, steps: number, boardLength: number): Promise<void> {
-    this.pawn.texture = this.assets.frame(`${this.pawnPrefix}_hop`);
+    this.showPawn('hop');
     for (let step = 1; step <= steps; step++) {
       const a = this.center((from + step - 1) % boardLength);
       const b = this.center((from + step) % boardLength);
@@ -124,8 +137,7 @@ export class BoardView extends Container {
         this.pawn.position.set(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t + lift - TUNING.pawn.hopHeight * arc(t));
       });
     }
-    this.pawn.texture = this.assets.frame(`${this.pawnPrefix}_idle`);
-    this.pawn.scale.set(this.pawnScale);
+    this.showPawn('idle');
   }
 
   async pulse(index: number): Promise<void> {

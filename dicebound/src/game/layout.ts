@@ -5,7 +5,7 @@ export const LAYOUT = {
   controls: { x: 44, y: 786, width: 680, buttonY: 198, buttonHeight: 80, buttonGap: 16, faceSize: 64, faceY: 122 },
   battle: { x: 800, y: 24, width: 1096, height: 660, ground: 590, centerX: 600, teamGap: 92, enemyGap: 128, frontOffset: 96, depthStep: 30, bossOffset: 250 },
   nextWave: { x: 800, y: 704, width: 540, height: 150, iconSize: 96, iconGap: 104 },
-  status: { x: 1356, y: 704, width: 540, height: 150, iconSize: 64, iconGap: 76 },
+  status: { x: 1356, y: 704, width: 540, height: 150, faceSize: 40, faceGap: 46, iconSize: 44, iconGap: 48, rowGap: 50 },
   log: { x: 800, y: 870, width: 1096, height: 186, lines: 5, lineHeight: 32 },
   hpBar: { width: 84, height: 9, offsetY: 14, bossWidth: 260 },
   die: { size: 190 },

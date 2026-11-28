@@ -1,5 +1,10 @@
 import { z } from 'zod';
 import boardsJson from './game/boards.json';
+import facesJson from './game/faces.json';
+import fatesJson from './game/fates.json';
+import leadersJson from './game/leaders.json';
+import relicsJson from './game/relics.json';
+import shopJson from './game/shop.json';
 import lapsJson from './game/laps.json';
 import monstersJson from './game/monsters.json';
 import rulesJson from './game/rules.json';
@@ -8,8 +13,8 @@ import tilesJson from './game/tiles.json';
 import unitsJson from './game/units.json';
 import wavesJson from './game/waves.json';
 import {
-  boardSchema, lapSchema, monsterSchema, rulesSchema, synergySchema, tileSchema, unitSchema, wavePoolSchema,
-  type BoardDef, type LapDef, type MonsterDef, type Rules, type SynergyDef, type TileDef, type UnitDef, type WavePoolDef,
+  boardSchema, faceSchema, fateSchema, lapSchema, leaderSchema, relicSchema, shopItemSchema, monsterSchema, rulesSchema, synergySchema, tileSchema, unitSchema, wavePoolSchema,
+  type BoardDef, type FaceDef, type FateDef, type LapDef, type LeaderDef, type RelicDef, type ShopItemDef, type MonsterDef, type Rules, type SynergyDef, type TileDef, type UnitDef, type WavePoolDef,
 } from './gameSchema';
 
 /** Everything the sim needs to know about the game, validated and indexed by id. */
@@ -23,11 +28,17 @@ export interface Content {
   wavePools: Record<string, WavePoolDef>;
   /** In play order; laps[0] is lap 1. */
   laps: LapDef[];
+  leaders: Record<string, LeaderDef>;
+  relics: Record<string, RelicDef>;
+  faces: Record<string, FaceDef>;
+  shopItems: Record<string, ShopItemDef>;
+  fates: FateDef[];
 }
 
 export interface RawContent {
   rules: unknown; units: unknown; monsters: unknown; tiles: unknown;
   boards: unknown; synergies: unknown; waves: unknown; laps: unknown;
+  leaders: unknown; relics: unknown; faces: unknown; shop: unknown; fates: unknown;
 }
 
 export class ContentError extends Error {
@@ -62,6 +73,11 @@ export function parseContent(raw: RawContent): Content {
   const synergies = parse('synergies.json', z.array(synergySchema), raw.synergies, []);
   const wavePools = index('waves.json', parse('waves.json', z.array(wavePoolSchema), raw.waves, []));
   const laps = parse('laps.json', z.array(lapSchema), raw.laps, []);
+  const leaders = index('leaders.json', parse('leaders.json', z.array(leaderSchema), raw.leaders, []));
+  const relics = index('relics.json', parse('relics.json', z.array(relicSchema), raw.relics, []));
+  const faces = index('faces.json', parse('faces.json', z.array(faceSchema), raw.faces, []));
+  const shopItems = index('shop.json', parse('shop.json', z.array(shopItemSchema), raw.shop, []));
+  const fates = parse('fates.json', z.array(fateSchema), raw.fates, []);
   if (problems.length > 0 || !rules) throw new ContentError(problems);
 
   const need = (file: string, what: string, table: Record<string, unknown>, ref: string): void => {
@@ -72,6 +88,12 @@ export function parseContent(raw: RawContent): Content {
   if (rules.upgradeCosts.length !== rules.maxStars - 1) problems.push('rules.json: upgradeCosts needs maxStars - 1 entries');
   if (rules.die.critFace < rules.die.min || rules.die.critFace > rules.die.max) problems.push('rules.json: die.critFace is not a face of the die');
   need('rules.json', 'board', boards, rules.startingBoard);
+  need('rules.json', 'leader', leaders, rules.startingLeader);
+  index('fates.json', fates);
+  for (const leader of Object.values(leaders)) for (const unit of leader.startingUnits) need('leaders.json', 'unit', units, unit);
+  if (rules.shopDiscountByStars.length !== rules.maxStars || rules.fateGoodChanceByStars.length !== rules.maxStars) problems.push('rules.json: per-star arrays need maxStars entries');
+  if (!fates.some((f) => f.good) || !fates.some((f) => !f.good)) problems.push('fates.json: needs at least one good and one bad card');
+  if (Object.keys(faces).length === 0 || Object.keys(relics).length === 0) problems.push('faces.json / relics.json: must not be empty');
   for (const unit of rules.startingUnits) need('rules.json', 'unit', units, unit);
   for (const unit of Object.values(units)) {
     if (unit.tiers.length !== tierCount) problems.push(`units.json: ${unit.id} needs ${tierCount} tiers`);
@@ -104,12 +126,13 @@ export function parseContent(raw: RawContent): Content {
   });
   if (laps.length === 0) problems.push('laps.json: at least one lap is required');
   if (problems.length > 0) throw new ContentError(problems);
-  return { rules, units, monsters, tiles, boards, synergies, wavePools, laps };
+  return { rules, units, monsters, tiles, boards, synergies, wavePools, laps, leaders, relics, faces, shopItems, fates };
 }
 
 export const RAW_CONTENT: RawContent = {
   rules: rulesJson, units: unitsJson, monsters: monstersJson, tiles: tilesJson,
   boards: boardsJson, synergies: synergiesJson, waves: wavesJson, laps: lapsJson,
+  leaders: leadersJson, relics: relicsJson, faces: facesJson, shop: shopJson, fates: fatesJson,
 };
 
 export function loadContent(): Content {

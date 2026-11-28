@@ -56,7 +56,7 @@ async function boot(): Promise<void> {
     if (event.key === ' ') event.preventDefault();
     scene.handleKey(event.key);
   });
-  await scene.startRun();
+  scene.chooseLeader();
 }
 
 boot().catch((error: unknown) => {

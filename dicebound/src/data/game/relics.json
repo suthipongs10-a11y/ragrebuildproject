@@ -1,0 +1,20 @@
+[
+  {"id": "lucky_clover", "icon": "relic_lucky_clover", "mods": {"luckPct": 20}},
+  {"id": "loaded_die", "icon": "relic_loaded_die", "mods": {"rerollsPerLap": 1}},
+  {"id": "golden_horseshoe", "icon": "relic_golden_horseshoe", "mods": {"goldPct": 20}},
+  {"id": "merchant_scale", "icon": "relic_merchant_scale", "mods": {"shopDiscountPct": 25}},
+  {"id": "war_drum", "icon": "relic_war_drum", "mods": {"teamAtkPct": 15}},
+  {"id": "phoenix_feather", "icon": "relic_phoenix_feather", "mods": {}, "wipeShields": 1},
+  {"id": "hourglass", "icon": "relic_hourglass", "mods": {"forceDicePerGate": 1}},
+  {"id": "compass", "icon": "relic_compass", "mods": {"upgradeDiscountPct": 20}},
+  {"id": "kings_crown", "icon": "relic_kings_crown", "mods": {"critMultiplierBonus": 1}},
+  {"id": "dragon_scale", "icon": "relic_dragon_scale", "mods": {"teamArmor": 2}},
+  {"id": "demon_eye", "icon": "relic_demon_eye", "mods": {"enemyHpPct": -10}},
+  {"id": "greedy_pig", "icon": "relic_greedy_pig", "mods": {"lapInterestPct": 10}},
+  {"id": "treasure_map", "icon": "relic_treasure_map", "mods": {"tileGoldFlat": 8}},
+  {"id": "ancient_coin", "icon": "relic_ancient_coin", "mods": {}, "onPickup": [{"kind": "gold", "value": 60}]},
+  {"id": "thorn_crown", "icon": "relic_thorn_crown", "mods": {"thorns": 3}},
+  {"id": "wise_owl", "icon": "relic_wise_owl", "mods": {"xpBonus": 1}},
+  {"id": "spirit_lantern", "icon": "relic_spirit_lantern", "mods": {"healPct": 30}},
+  {"id": "war_banner", "icon": "relic_war_banner", "mods": {"teamHpPct": 15}}
+]

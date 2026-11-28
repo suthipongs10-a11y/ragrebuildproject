@@ -1,9 +1,36 @@
 import { z } from 'zod';
 
 const id = z.string().regex(/^[a-z][a-z0-9_]*$/, 'ids are snake_case');
-const pct = z.number().nonnegative();
+
+/** Passive bonuses. Synergy tiers, relics and leaders all speak this one vocabulary. */
+export const modsSchema = z
+  .object({
+    teamAtkPct: z.number(), teamHpPct: z.number(), healPct: z.number(), goldPct: z.number(), teamArmor: z.number(), thorns: z.number(),
+    rerollsPerLap: z.number(), forceDicePerGate: z.number(), upgradeDiscountPct: z.number(), shopDiscountPct: z.number(),
+    critMultiplierBonus: z.number(), luckPct: z.number(), enemyHpPct: z.number(), xpBonus: z.number(), tileGoldFlat: z.number(), lapInterestPct: z.number(),
+  })
+  .partial()
+  .strict();
+export type Mods = z.infer<typeof modsSchema>;
+export type ModKey = keyof Mods;
+
+/** Something that happens once, right now. Tiles, fate cards, shop items, relic pickups and die faces all use these. */
+export const instantSchema = z.object({
+  kind: z.enum(['gold', 'heal_pct', 'damage_pct', 'team_atk_pct', 'team_shield', 'enemy_atk_pct', 'force_die', 'reroll', 'xp_all']),
+  value: z.number(),
+});
+export type Instant = z.infer<typeof instantSchema>;
 
 export const rulesSchema = z.object({
+  startingLeader: id,
+  rewardOptions: z.number().int().positive(),
+  shopOffers: z.number().int().positive(),
+  /** Price cut at a 1/2/3-star bazaar. */
+  shopDiscountByStars: z.array(z.number().nonnegative()),
+  /** Chance (percent) that a fate card is a good one, by the Fate Deck's stars. */
+  fateGoodChanceByStars: z.array(z.number().min(0).max(100)),
+  lapInterestCap: z.number().int().nonnegative(),
+  maxDiscountPct: z.number().min(0).max(100),
   hearts: z.number().int().positive(),
   teamMax: z.number().int().positive(),
   die: z.object({
@@ -66,6 +93,10 @@ export const tileEffectSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('heal_pct'), values }),
   z.object({ kind: z.literal('damage_pct'), values }),
   z.object({ kind: z.literal('enemy_atk_pct'), values }),
+  z.object({ kind: z.literal('xp_all'), values }),
+  z.object({ kind: z.literal('force_die'), values }),
+  z.object({ kind: z.literal('shop'), values }),
+  z.object({ kind: z.literal('fate'), values }),
   z.object({ kind: z.literal('gamble'), winChance: z.number().min(0).max(1), values, loseGold: z.number().int().nonnegative() }),
 ]);
 export const tileSchema = z.object({
@@ -74,6 +105,8 @@ export const tileSchema = z.object({
   icon: id,
   type: z.enum(['gate', 'recruit', 'buff', 'economy', 'heal', 'risk']),
   upgradable: z.boolean(),
+  /** Can be offered as a gate reward. */
+  reward: z.boolean(),
   effect: tileEffectSchema,
 });
 
@@ -84,7 +117,7 @@ export const synergySchema = z.object({
   icon: id,
   tiles: z.tuple([id, id]),
   /** tiers[0] needs both tiles at 2 stars, tiers[1] at 3 stars, and so on. */
-  tiers: z.array(z.object({ teamAtkPct: pct.optional(), teamHpPct: pct.optional(), healPct: pct.optional(), goldPct: pct.optional() })).min(1),
+  tiers: z.array(modsSchema).min(1),
 });
 
 export const wavePoolSchema = z.object({ id, waves: z.array(z.array(id).min(1)).min(1) });
@@ -98,6 +131,42 @@ export const lapSchema = z.object({
   gate: z.object({ kind: z.enum(['elite', 'boss']), monsters: z.array(id).min(1) }),
 });
 
+export const leaderSchema = z.object({ id, icon: id, pawn: id, portrait: id, startingUnits: z.array(id), mods: modsSchema });
+
+export const relicSchema = z.object({
+  id,
+  icon: id,
+  mods: modsSchema,
+  onPickup: z.array(instantSchema).optional(),
+  /** Each one cancels a heart loss from a team wipe. */
+  wipeShields: z.number().int().positive().optional(),
+});
+
+export const faceSchema = z.object({
+  id,
+  icon: id,
+  effect: z.discriminatedUnion('kind', [
+    z.object({ kind: z.literal('crit') }),
+    z.object({ kind: z.literal('warp') }),
+    z.object({ kind: z.literal('double_tile') }),
+    z.object({ kind: z.literal('instants'), instants: z.array(instantSchema).min(1) }),
+  ]),
+});
+
+export const shopItemSchema = z.object({
+  id,
+  icon: id,
+  cost: z.number().int().positive(),
+  effect: z.discriminatedUnion('kind', [z.object({ kind: z.literal('instant'), instant: instantSchema }), z.object({ kind: z.literal('relic') })]),
+});
+
+export const fateSchema = z.object({ id, good: z.boolean(), instant: instantSchema });
+
+export type LeaderDef = z.infer<typeof leaderSchema>;
+export type RelicDef = z.infer<typeof relicSchema>;
+export type FaceDef = z.infer<typeof faceSchema>;
+export type ShopItemDef = z.infer<typeof shopItemSchema>;
+export type FateDef = z.infer<typeof fateSchema>;
 export type Rules = z.infer<typeof rulesSchema>;
 export type UnitDef = z.infer<typeof unitSchema>;
 export type MonsterDef = z.infer<typeof monsterSchema>;

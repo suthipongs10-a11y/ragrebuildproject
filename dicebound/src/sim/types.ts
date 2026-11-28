@@ -33,17 +33,44 @@ export interface TileState {
 export interface TurnState {
   roll: number | null;
   crit: boolean;
+  /** Special die face that came up, if any. */
+  face: string | null;
+  /** Multiplies what the landed tile gives (a crit and the Twin Face both raise it). */
+  tileBoost: number;
+  /** The Warp Face lets this roll be replaced by any face for free. */
+  warp: boolean;
   teamAtkPct: number;
   enemyAtkPct: number;
   passedGate: boolean;
 }
 
-export type Phase = 'roll' | 'decide' | 'upgrade' | 'ended';
+export type Phase = 'roll' | 'decide' | 'shop' | 'upgrade' | 'reward' | 'placeTile' | 'placeFace' | 'ended';
+
+export type RewardOption = { kind: 'tile'; tileId: string } | { kind: 'relic'; relicId: string } | { kind: 'face'; faceId: string };
+
+export interface ShopOffer {
+  itemId: string;
+  /** Set when the item is a relic crate: the relic inside is shown before buying. */
+  relicId: string | null;
+  cost: number;
+  sold: boolean;
+}
 
 /** The whole run. Plain JSON: `JSON.parse(JSON.stringify(state))` is a valid save. */
 export interface RunState {
   seed: number;
   rng: RngState;
+  leaderId: string;
+  relics: string[];
+  /** Special face installed on each side of the die (index = pips - 1), or null. */
+  dieFaces: Array<string | null>;
+  /** Wipes that will not cost a heart (Phoenix Feather). */
+  wipeShields: number;
+  /** What the current reward / shop / placement phase is offering. */
+  rewardOptions: RewardOption[];
+  shop: ShopOffer[];
+  pendingTile: string | null;
+  pendingFace: string | null;
   phase: Phase;
   result: 'won' | 'lost' | null;
   /** 1-based lap being played. */
@@ -70,6 +97,12 @@ export type Action =
   | { type: 'move' }
   | { type: 'reroll' }
   | { type: 'forceDie'; face: number }
+  | { type: 'warp'; face: number }
+  | { type: 'buy'; index: number }
+  | { type: 'leaveShop' }
+  | { type: 'chooseReward'; index: number }
+  | { type: 'placeTile'; index: number }
+  | { type: 'placeFace'; face: number }
   | { type: 'upgrade' }
   | { type: 'skipUpgrade' };
 
@@ -84,10 +117,21 @@ export interface SpawnedEnemy {
 
 export type GameEvent =
   | { type: 'RunStarted'; seed: number }
-  | { type: 'DiceRolled'; value: number; crit: boolean; source: 'roll' | 'reroll' | 'forced' }
+  | { type: 'DiceRolled'; value: number; crit: boolean; source: 'roll' | 'reroll' | 'forced' | 'warp'; face: string | null }
+  | { type: 'ForceDiceChanged'; delta: number; total: number }
+  | { type: 'RerollsChanged'; delta: number; total: number }
+  | { type: 'FateDrawn'; fateId: string; good: boolean }
+  | { type: 'ShopOpened'; offers: ShopOffer[] }
+  | { type: 'ItemBought'; index: number; itemId: string }
+  | { type: 'RelicGained'; relicId: string }
+  | { type: 'RewardOffered'; options: RewardOption[] }
+  | { type: 'TilePlaced'; index: number; tileId: string }
+  | { type: 'FacePlaced'; face: number; faceId: string }
+  | { type: 'WipePrevented'; shieldsLeft: number }
+  | { type: 'ThornsDamage'; source: number; target: number; damage: number }
   | { type: 'PawnMoved'; from: number; to: number; steps: number; passedGate: boolean }
   | { type: 'TileLanded'; index: number; tileId: string; stars: number }
-  | { type: 'GoldChanged'; delta: number; total: number; reason: 'tile' | 'gamble' | 'kill' | 'stolen' | 'upgrade' }
+  | { type: 'GoldChanged'; delta: number; total: number; reason: 'tile' | 'gamble' | 'kill' | 'stolen' | 'upgrade' | 'shop' | 'interest' | 'effect' }
   | { type: 'UnitRecruited'; uid: number; unitId: string; hp: number }
   | { type: 'UnitXpGained'; uid: number; xp: number }
   | { type: 'UnitTierUp'; uid: number; tier: number }

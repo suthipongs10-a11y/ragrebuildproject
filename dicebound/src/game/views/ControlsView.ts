@@ -50,10 +50,17 @@ export class ControlsView extends Container {
       sprite.position.set(width - (7 - face) * (faceSize + FACE_GAP) + FACE_GAP, faceY);
       sprite.eventMode = 'static';
       sprite.cursor = 'pointer';
-      sprite.on('pointertap', () => this.fire({ type: 'forceDie', face }));
+      sprite.on('pointertap', () => this.fire(this.faceAction(face)));
       this.faces.addChild(sprite);
     }
     this.addChild(this.info, this.faces, this.primary, this.secondary);
+  }
+
+  private faceMode: 'forceDie' | 'warp' | 'placeFace' = 'forceDie';
+
+  /** What clicking (or pressing the number of) a die face does right now, if anything. */
+  faceAction(face: number): Action | null {
+    return this.faces.visible ? { type: this.faceMode, face } : null;
   }
 
   private fire(action: Action | null): void {
@@ -95,7 +102,8 @@ export class ControlsView extends Container {
     this.primary.setEnabled(this.primaryAction !== null && can(this.primaryAction.type));
     this.secondary.visible = this.secondaryAction !== null;
     this.secondary.setEnabled(this.secondaryAction !== null && can(this.secondaryAction.type));
-    this.faces.visible = can('forceDie');
-    this.faceLabel.text = t('ui.force_die', { n: model.forceDice });
+    this.faceMode = can('placeFace') ? 'placeFace' : can('warp') ? 'warp' : 'forceDie';
+    this.faces.visible = can(this.faceMode);
+    this.faceLabel.text = this.faceMode === 'forceDie' ? t('ui.force_die', { n: model.forceDice }) : t(this.faceMode === 'warp' ? 'ui.warp' : 'ui.place_face');
   }
 }

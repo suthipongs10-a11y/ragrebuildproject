@@ -1,0 +1,7 @@
+[
+  {"id": "potion", "icon": "icon_potion", "cost": 25, "effect": {"kind": "instant", "instant": {"kind": "heal_pct", "value": 50}}},
+  {"id": "force_die", "icon": "icon_force_die", "cost": 30, "effect": {"kind": "instant", "instant": {"kind": "force_die", "value": 1}}},
+  {"id": "reroll_charm", "icon": "icon_reroll", "cost": 15, "effect": {"kind": "instant", "instant": {"kind": "reroll", "value": 1}}},
+  {"id": "war_tome", "icon": "icon_star", "cost": 45, "effect": {"kind": "instant", "instant": {"kind": "xp_all", "value": 1}}},
+  {"id": "relic_crate", "icon": "tile_treasure", "cost": 80, "effect": {"kind": "relic"}}
+]

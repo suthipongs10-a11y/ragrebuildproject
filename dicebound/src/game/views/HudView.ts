@@ -8,6 +8,7 @@ import type { GameAssets } from '../assets';
 import { DESIGN_HEIGHT, DESIGN_WIDTH } from '../../app/viewport';
 import { LAYOUT, TEXT } from '../layout';
 import { UI_COLOR } from '../theme';
+import { modsText, relicText } from '../describe';
 import { label, panel } from '../ui/widgets';
 
 const BANNER_SCALE = 1.4;
@@ -32,6 +33,8 @@ export class HudView extends Container {
     private readonly content: Content,
     private readonly assets: GameAssets,
     private readonly tweener: Tweener,
+    /** Shows a hint for whatever is under the pointer (null clears it). */
+    private readonly onHint: (text: string | null) => void,
   ) {
     super();
     const top = LAYOUT.topBar;
@@ -65,7 +68,7 @@ export class HudView extends Container {
     statusPanel.position.set(status.x, status.y);
     this.counts = label('', TEXT.small, UI_COLOR.text);
     this.counts.position.set(status.x + LAYOUT.panelPad, status.y + 10);
-    this.statusIcons.position.set(status.x + LAYOUT.panelPad, status.y + 60);
+    this.statusIcons.position.set(status.x + LAYOUT.panelPad, status.y + 46);
 
     const log = LAYOUT.log;
     const logPanel = panel(log.width, log.height);
@@ -96,17 +99,41 @@ export class HudView extends Container {
     this.counts.text = `${t('ui.rerolls', { n: state.rerollsLeft })}    ${t('ui.force_dice', { n: state.forceDice })}`;
     this.setNextWave(state.nextWave);
     this.statusIcons.removeChildren();
-    Object.entries(state.synergies).forEach(([id, tier], i) => {
-      const def = this.content.synergies.find((s) => s.id === id);
-      if (!def) return;
-      const icon = new Sprite(this.assets.frame(def.icon));
-      icon.width = LAYOUT.status.iconSize;
-      icon.height = LAYOUT.status.iconSize;
-      icon.x = i * LAYOUT.status.iconGap;
-      const badge = label('★'.repeat(tier), TEXT.small, UI_COLOR.gold, true);
-      badge.position.set(icon.x, LAYOUT.status.iconSize - 6);
-      this.statusIcons.addChild(icon, badge);
+    const { faceSize, faceGap, iconSize, iconGap, rowGap } = LAYOUT.status;
+    // Row 1: the six sides of the die, special faces shown in place of their pips.
+    state.dieFaces.forEach((faceId, i) => {
+      const face = faceId ? this.content.faces[faceId] : undefined;
+      const pips = i + this.content.rules.die.min;
+      this.addStatusIcon(face ? face.icon : `die_${pips}`, i * faceGap, 0, faceSize, face ? `${t(`face.${face.id}.name`)} (${pips})\n${t(`face.${face.id}.desc`)}` : null);
     });
+    // Row 2: relics, then active synergies.
+    let x = 0;
+    for (const relicId of state.relics) {
+      const relic = this.content.relics[relicId];
+      if (!relic) continue;
+      this.addStatusIcon(relic.icon, x, rowGap, iconSize, `${t(`relic.${relicId}.name`)}\n${relicText(this.content, relicId)}`);
+      x += iconGap;
+    }
+    for (const [id, tier] of Object.entries(state.synergies)) {
+      const def = this.content.synergies.find((s) => s.id === id);
+      const mods = def?.tiers[tier - 1];
+      if (!def || !mods) continue;
+      this.addStatusIcon(def.icon, x, rowGap, iconSize, `${t(`synergy.${id}.name`)} ${'★'.repeat(tier)}\n${modsText(mods).join('\n')}`);
+      x += iconGap;
+    }
+  }
+
+  private addStatusIcon(frameId: string, x: number, y: number, size: number, hint: string | null): void {
+    const icon = new Sprite(this.assets.frame(frameId));
+    icon.width = size;
+    icon.height = size;
+    icon.position.set(x, y);
+    if (hint) {
+      icon.eventMode = 'static';
+      icon.on('pointerover', () => this.onHint(hint));
+      icon.on('pointerout', () => this.onHint(null));
+    }
+    this.statusIcons.addChild(icon);
   }
 
   setNextWave(monsterIds: string[]): void {

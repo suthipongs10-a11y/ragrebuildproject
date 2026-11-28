@@ -1,5 +1,6 @@
 import type { Content } from '../data/content';
 import type { LapDef } from '../data/gameSchema';
+import { mod, scaled } from './mods';
 import type { Rng } from './rng';
 import type { EnemyState, GameEvent, RunState } from './types';
 
@@ -14,7 +15,7 @@ function spawn(content: Content, state: RunState, monsterIds: string[]): EnemySt
   return monsterIds.map((monsterId) => {
     const def = content.monsters[monsterId];
     if (!def) throw new Error(`unknown monster "${monsterId}"`);
-    const hp = Math.max(1, Math.round(def.hp * scale));
+    const hp = Math.max(1, Math.round(scaled(def.hp * scale, mod(content, state, 'enemyHpPct'))));
     return { uid: state.nextUid++, monsterId, hp, maxHp: hp, atk: Math.max(1, Math.round(def.atk * scale)), armor: def.armor, age: 0, windingUp: false };
   });
 }

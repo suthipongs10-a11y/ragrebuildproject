@@ -1,0 +1,10 @@
+[
+  {"id": "windfall", "good": true, "instant": {"kind": "gold", "value": 25}},
+  {"id": "blessing", "good": true, "instant": {"kind": "heal_pct", "value": 30}},
+  {"id": "training", "good": true, "instant": {"kind": "xp_all", "value": 1}},
+  {"id": "smuggler", "good": true, "instant": {"kind": "force_die", "value": 1}},
+  {"id": "battle_hymn", "good": true, "instant": {"kind": "team_atk_pct", "value": 40}},
+  {"id": "pickpocket", "good": false, "instant": {"kind": "gold", "value": -15}},
+  {"id": "night_raid", "good": false, "instant": {"kind": "enemy_atk_pct", "value": 40}},
+  {"id": "hex", "good": false, "instant": {"kind": "damage_pct", "value": 15}}
+]

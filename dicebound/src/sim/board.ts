@@ -1,7 +1,10 @@
 import type { Content } from '../data/content';
 import type { TileDef } from '../data/gameSchema';
+import { drawFate, openShop } from './extras';
+import { applyInstant, changeGold } from './instant';
+import { discounted, mod } from './mods';
 import type { Rng } from './rng';
-import { gainUnitXp, healTeam, maxHp, synergyBonus } from './team';
+import { gainUnitXp, keepHpShare } from './team';
 import type { GameEvent, RunState, TileState } from './types';
 
 const PERCENT = 100;
@@ -22,13 +25,8 @@ export function currentTile(state: RunState): TileState {
 export function upgradeCost(content: Content, state: RunState): number | null {
   const tile = currentTile(state);
   if (!tileDef(content, tile).upgradable || tile.stars >= content.rules.maxStars) return null;
-  return content.rules.upgradeCosts[tile.stars - 1] ?? null;
-}
-
-function addGold(content: Content, state: RunState, base: number, reason: 'tile' | 'gamble', events: GameEvent[]): void {
-  const delta = Math.round(base * (1 + synergyBonus(content, state, 'goldPct') / PERCENT));
-  state.gold += delta;
-  events.push({ type: 'GoldChanged', delta, total: state.gold, reason });
+  const base = content.rules.upgradeCosts[tile.stars - 1];
+  return base === undefined ? null : discounted(content, base, mod(content, state, 'upgradeDiscountPct'));
 }
 
 /** Applies the tile under the pawn. A crit roll doubles what the tile gives, never what it takes. */
@@ -37,54 +35,37 @@ export function applyTile(content: Content, state: RunState, rng: Rng, events: G
   const effect = tileDef(content, tile).effect;
   events.push({ type: 'TileLanded', index: state.position, tileId: tile.tileId, stars: tile.stars });
   if (effect.kind === 'none') return;
-  const boost = state.turnState.crit ? content.rules.die.critMultiplier : 1;
+  const boost = state.turnState.tileBoost;
   const value = effect.values[tile.stars - 1] ?? 0;
 
   switch (effect.kind) {
     case 'recruit':
-      gainUnitXp(content, state, effect.unit, Math.round(value * boost), events);
+      gainUnitXp(content, state, effect.unit, Math.round(value * boost) + mod(content, state, 'xpBonus'), events);
       break;
     case 'gold':
-      addGold(content, state, value * boost, 'tile', events);
+      changeGold(content, state, value * boost + mod(content, state, 'tileGoldFlat'), 'tile', events);
+      break;
+    case 'damage_pct':
+    case 'enemy_atk_pct':
+      applyInstant(content, state, { kind: effect.kind, value }, 'tile', events);
       break;
     case 'heal_pct':
-      healTeam(content, state, ((value * boost) / PERCENT) * (1 + synergyBonus(content, state, 'healPct') / PERCENT), events);
-      break;
     case 'team_atk_pct':
-      state.turnState.teamAtkPct += value * boost;
-      events.push({ type: 'BuffApplied', kind: effect.kind, value: value * boost });
-      break;
     case 'team_shield':
-      for (const unit of state.team) if (unit.hp > 0) unit.shield += Math.round(value * boost);
-      events.push({ type: 'BuffApplied', kind: effect.kind, value: Math.round(value * boost) });
+    case 'xp_all':
+    case 'force_die':
+      applyInstant(content, state, { kind: effect.kind, value: value * boost }, 'tile', events);
       break;
-    case 'enemy_atk_pct':
-      state.turnState.enemyAtkPct += value;
-      events.push({ type: 'BuffApplied', kind: effect.kind, value });
+    case 'shop':
+      openShop(content, state, rng, tile.stars, events);
       break;
-    case 'damage_pct': {
-      const amounts: Array<{ uid: number; amount: number }> = [];
-      for (const unit of state.team) {
-        if (unit.hp <= 0) continue;
-        // Traps hurt but never kill: only fights can wipe the team.
-        const amount = Math.min(unit.hp - 1, Math.round((maxHp(content, state, unit) * value) / PERCENT));
-        if (amount > 0) {
-          unit.hp -= amount;
-          amounts.push({ uid: unit.uid, amount });
-        }
-      }
-      events.push({ type: 'TeamDamaged', amounts });
+    case 'fate':
+      drawFate(content, state, rng, tile.stars, events);
       break;
-    }
     case 'gamble': {
-      const won = rng.next() < effect.winChance;
+      const won = rng.next() < effect.winChance + mod(content, state, 'luckPct') / PERCENT;
       events.push({ type: 'GambleResolved', won });
-      if (won) addGold(content, state, value * boost, 'gamble', events);
-      else {
-        const lost = Math.min(state.gold, effect.loseGold);
-        state.gold -= lost;
-        events.push({ type: 'GoldChanged', delta: -lost, total: state.gold, reason: 'gamble' });
-      }
+      changeGold(content, state, won ? value * boost : -effect.loseGold, 'gamble', events);
       break;
     }
   }
@@ -95,32 +76,28 @@ function starsOf(state: RunState, tileId: string): number {
   return Math.max(0, ...state.board.filter((t) => t.tileId === tileId).map((t) => t.stars));
 }
 
-/** Re-derives active synergies; announces the ones that just switched on or grew. */
+/** Re-derives active synergies after the board changed; announces the ones that switched on or grew. */
 export function refreshSynergies(content: Content, state: RunState, events: GameEvent[]): void {
-  for (const synergy of content.synergies) {
-    // Both tiles at 2 stars = tier 1, both at 3 stars = tier 2.
-    const tier = Math.min(synergy.tiers.length, Math.min(...synergy.tiles.map((id) => starsOf(state, id))) - 1);
-    const before = state.synergies[synergy.id] ?? 0;
-    if (tier <= 0) continue;
-    if (tier > before) {
-      const hpBefore = state.team.map((unit) => maxHp(content, state, unit));
-      state.synergies[synergy.id] = tier;
-      // Extra max HP from a synergy is granted, not left as missing health.
-      state.team.forEach((unit, i) => {
-        if (unit.hp > 0) unit.hp += maxHp(content, state, unit) - (hpBefore[i] ?? 0);
-      });
-      events.push({ type: 'SynergyActivated', id: synergy.id, tier });
+  keepHpShare(content, state, () => {
+    for (const synergy of content.synergies) {
+      // Both tiles at 2 stars = tier 1, both at 3 stars = tier 2.
+      const tier = Math.max(0, Math.min(synergy.tiers.length, Math.min(...synergy.tiles.map((id) => starsOf(state, id))) - 1));
+      const before = state.synergies[synergy.id] ?? 0;
+      if (tier === before) continue;
+      // Replacing a tile can also switch a synergy off again.
+      if (tier === 0) delete state.synergies[synergy.id];
+      else state.synergies[synergy.id] = tier;
+      if (tier > before) events.push({ type: 'SynergyActivated', id: synergy.id, tier });
     }
-  }
+  });
 }
 
 export function upgradeTile(content: Content, state: RunState, events: GameEvent[]): void {
   const cost = upgradeCost(content, state);
   if (cost === null || state.gold < cost) throw new Error('upgrade is not available');
   const tile = currentTile(state);
-  state.gold -= cost;
+  changeGold(content, state, -cost, 'upgrade', events);
   tile.stars++;
-  events.push({ type: 'GoldChanged', delta: -cost, total: state.gold, reason: 'upgrade' });
   events.push({ type: 'TileUpgraded', index: state.position, stars: tile.stars });
   refreshSynergies(content, state, events);
 }

@@ -1,122 +1,55 @@
 import type { Content } from '../data/content';
-import { playRound } from './battle';
-import { applyTile, upgradeCost, upgradeTile } from './board';
-import { createRng, type Rng } from './rng';
-import { freshTurn } from './run';
-import { reviveTeam } from './team';
+import { refreshSynergies, tileDef, upgradeTile } from './board';
+import { buy, canBuy, gainRelic } from './extras';
+import { createRng } from './rng';
 import type { Action, GameEvent, RunState, StepResult } from './types';
-import { drawWave, spawnGate, spawnNextWave } from './waves';
+import { afterTile, finishTurn, movePawn, rollDie, setRoll } from './turn';
 
 export class IllegalActionError extends Error {}
 
 /** Actions the player may take right now. Empty once the run has ended. */
 export function legalActions(content: Content, state: RunState): Action[] {
   const { die } = content.rules;
+  const faces = Array.from({ length: die.max - die.min + 1 }, (_, i) => die.min + i);
   switch (state.phase) {
     case 'roll':
       return [{ type: 'roll' }];
     case 'decide': {
       const actions: Action[] = [{ type: 'move' }];
       if (state.rerollsLeft > 0) actions.push({ type: 'reroll' });
-      if (state.forceDice > 0) for (let face = die.min; face <= die.max; face++) actions.push({ type: 'forceDie', face });
+      if (state.turnState.warp) for (const face of faces) actions.push({ type: 'warp', face });
+      else if (state.forceDice > 0) for (const face of faces) actions.push({ type: 'forceDie', face });
       return actions;
     }
+    case 'shop':
+      return [...state.shop.flatMap((_, index): Action[] => (canBuy(state, index) ? [{ type: 'buy', index }] : [])), { type: 'leaveShop' }];
     case 'upgrade':
       return [{ type: 'upgrade' }, { type: 'skipUpgrade' }];
+    case 'reward':
+      return state.rewardOptions.map((_, index): Action => ({ type: 'chooseReward', index }));
+    case 'placeTile':
+      // Any slot but a gate can be rebuilt.
+      return state.board.flatMap((tile, index): Action[] => (tileDef(content, tile).type === 'gate' ? [] : [{ type: 'placeTile', index }]));
+    case 'placeFace':
+      return faces.map((face): Action => ({ type: 'placeFace', face }));
     case 'ended':
       return [];
   }
 }
 
-function rollDie(content: Content, state: RunState, rng: Rng, source: 'roll' | 'reroll', events: GameEvent[]): void {
-  const { die } = content.rules;
-  const value = rng.int(die.min, die.max);
-  state.turnState.roll = value;
-  state.turnState.crit = value === die.critFace;
-  events.push({ type: 'DiceRolled', value, crit: state.turnState.crit, source });
-}
-
-function endRun(state: RunState, result: 'won' | 'lost', events: GameEvent[]): void {
-  state.phase = 'ended';
-  state.result = result;
-  events.push({ type: 'RunEnded', result });
-}
-
-/** Team wiped: lose a heart, and either end the run or stand everyone back up. */
-function loseHeart(content: Content, state: RunState, events: GameEvent[]): void {
-  events.push({ type: 'TeamWiped' });
-  state.hearts--;
-  events.push({ type: 'HeartLost', hearts: state.hearts });
-  if (state.hearts <= 0) endRun(state, 'lost', events);
-  else reviveTeam(content, state, events);
-}
-
-/** The fight at the gate runs to a result: this is the lap's exam. */
-function fightGate(content: Content, state: RunState, rng: Rng, events: GameEvent[]): void {
-  spawnGate(content, state, events);
-  let won = false;
-  for (let round = 1; round <= content.rules.gateMaxRounds; round++) {
-    const outcome = playRound(content, state, round, events);
-    if (outcome === 'ongoing') continue;
-    won = outcome === 'enemiesDead';
-    break;
-  }
-  events.push({ type: 'GateFightEnded', won });
-  if (won) state.forceDice += content.rules.forceDicePerGateWon;
-  else {
-    loseHeart(content, state, events);
-    if (state.phase === 'ended') return;
-  }
-  if (state.lap >= content.laps.length) {
-    // A lost final gate still ends the run: there is no lap left to recover in.
-    endRun(state, won ? 'won' : 'lost', events);
-    return;
-  }
-  state.lap++;
-  state.rerollsLeft = content.rules.rerollsPerLap;
-  events.push({ type: 'LapStarted', lap: state.lap });
-  state.nextWave = drawWave(content, state, rng);
-  spawnNextWave(content, state, rng, events);
-}
-
-/** The auto-battle that closes every turn. */
-function fightWave(content: Content, state: RunState, rng: Rng, events: GameEvent[]): void {
-  for (let round = 1; round <= content.rules.battleRoundsPerTurn; round++) {
-    const outcome = playRound(content, state, round, events);
-    if (outcome === 'enemiesDead') {
-      events.push({ type: 'WaveCleared' });
-      spawnNextWave(content, state, rng, events);
-      return;
-    }
-    if (outcome === 'teamDead') {
-      loseHeart(content, state, events);
-      return;
-    }
-  }
-}
-
-function finishTurn(content: Content, state: RunState, rng: Rng, events: GameEvent[]): void {
-  if (state.turnState.passedGate) fightGate(content, state, rng, events);
-  else fightWave(content, state, rng, events);
-  for (const unit of state.team) unit.shield = 0;
-  if (state.phase === 'ended') return;
-  state.turnState = freshTurn();
-  state.turn++;
+function chooseReward(content: Content, state: RunState, index: number, events: GameEvent[]): void {
+  const option = state.rewardOptions[index];
+  if (!option) throw new IllegalActionError('no such reward');
+  state.rewardOptions = [];
   state.phase = 'roll';
-}
-
-function movePawn(content: Content, state: RunState, rng: Rng, events: GameEvent[]): void {
-  const steps = state.turnState.roll;
-  if (steps === null) throw new IllegalActionError('no roll to move with');
-  const from = state.position;
-  const size = state.board.length;
-  state.turnState.passedGate = from + steps >= size;
-  state.position = (from + steps) % size;
-  events.push({ type: 'PawnMoved', from, to: state.position, steps, passedGate: state.turnState.passedGate });
-  applyTile(content, state, rng, events);
-  const cost = upgradeCost(content, state);
-  if (cost !== null && state.gold >= cost) state.phase = 'upgrade';
-  else finishTurn(content, state, rng, events);
+  if (option.kind === 'relic') gainRelic(content, state, option.relicId, events);
+  else if (option.kind === 'tile') {
+    state.pendingTile = option.tileId;
+    state.phase = 'placeTile';
+  } else {
+    state.pendingFace = option.faceId;
+    state.phase = 'placeFace';
+  }
 }
 
 /**
@@ -141,13 +74,23 @@ export function applyAction(content: Content, state: RunState, action: Action): 
       break;
     case 'forceDie':
       next.forceDice--;
-      next.turnState.roll = action.face;
-      next.turnState.crit = content.rules.die.forcedDieCanCrit && action.face === content.rules.die.critFace;
-      events.push({ type: 'DiceRolled', value: action.face, crit: next.turnState.crit, source: 'forced' });
+      events.push({ type: 'ForceDiceChanged', delta: -1, total: next.forceDice });
+      setRoll(content, next, action.face, 'forced', events);
+      movePawn(content, next, rng, events);
+      break;
+    case 'warp':
+      setRoll(content, next, action.face, 'warp', events);
       movePawn(content, next, rng, events);
       break;
     case 'move':
       movePawn(content, next, rng, events);
+      break;
+    case 'buy':
+      buy(content, next, action.index, events);
+      break;
+    case 'leaveShop':
+      next.shop = [];
+      afterTile(content, next, rng, events);
       break;
     case 'upgrade':
       upgradeTile(content, next, events);
@@ -156,8 +99,29 @@ export function applyAction(content: Content, state: RunState, action: Action): 
     case 'skipUpgrade':
       finishTurn(content, next, rng, events);
       break;
+    case 'chooseReward':
+      chooseReward(content, next, action.index, events);
+      break;
+    case 'placeTile': {
+      const tileId = next.pendingTile;
+      if (!tileId) throw new IllegalActionError('no tile to place');
+      next.board[action.index] = { tileId, stars: 1 };
+      next.pendingTile = null;
+      next.phase = 'roll';
+      events.push({ type: 'TilePlaced', index: action.index, tileId });
+      refreshSynergies(content, next, events);
+      break;
+    }
+    case 'placeFace': {
+      const faceId = next.pendingFace;
+      if (!faceId) throw new IllegalActionError('no face to place');
+      next.dieFaces[action.face - content.rules.die.min] = faceId;
+      next.pendingFace = null;
+      next.phase = 'roll';
+      events.push({ type: 'FacePlaced', face: action.face, faceId });
+      break;
+    }
   }
   next.rng = rng.getState();
   return { state: next, events };
 }
-

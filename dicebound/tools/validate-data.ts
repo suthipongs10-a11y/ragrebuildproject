@@ -40,11 +40,16 @@ try {
     ['monster', Object.keys(content.monsters)],
     ['tile', Object.keys(content.tiles)],
     ['synergy', content.synergies.map((s) => s.id)],
+    ['leader', Object.keys(content.leaders)],
+    ['relic', Object.keys(content.relics)],
+    ['face', Object.keys(content.faces)],
+    ['shop', Object.keys(content.shopItems)],
+    ['fate', content.fates.map((f) => f.id)],
   ];
   for (const [kind, ids] of named) {
     for (const id of ids) if (reference && !(`${kind}.${id}.name` in reference)) errors.push(`locales: missing "${kind}.${id}.name"`);
   }
-  for (const item of [...Object.values(content.tiles), ...content.synergies]) {
+  for (const item of [...Object.values(content.tiles), ...content.synergies, ...Object.values(content.relics), ...Object.values(content.faces), ...Object.values(content.shopItems)]) {
     if (!assetIds.has(item.icon)) errors.push(`${item.id}: icon "${item.icon}" is not in assets/manifest.json`);
   }
   const tierCount = content.rules.unitXpForTier.length;

@@ -17,7 +17,7 @@ function withDummyWave(state: RunState): RunState {
 describe('turn flow', () => {
   it('starts with the starting unit, a wave on the field and the next wave announced', () => {
     const state = start();
-    expect(state.team.map((u) => u.unitId)).toEqual(content.rules.startingUnits);
+    expect(state.team.map((u) => u.unitId)).toEqual(['warrior', 'knight']);
     expect(state.enemies.length).toBeGreaterThan(0);
     expect(state.nextWave.length).toBeGreaterThan(0);
     expect(legalActions(content, state)).toEqual([{ type: 'roll' }]);
@@ -58,7 +58,7 @@ describe('tiles', () => {
 
   it('doubles what a tile gives on a crit roll, and a forced six is not a crit', () => {
     const rolled = play(withDummyWave(start()), [{ type: 'roll' }]).state;
-    const crit: RunState = { ...rolled, turnState: { ...rolled.turnState, roll: GOLD_TILE, crit: true } };
+    const crit: RunState = { ...rolled, turnState: { ...rolled.turnState, roll: GOLD_TILE, crit: true, tileBoost: content.rules.die.critMultiplier } };
     const { events } = play(crit, [{ type: 'move' }]);
     expect(eventsOf(events, 'GoldChanged').find((e) => e.reason === 'tile')?.delta).toBe(24);
     const forced = forceMove(start(), content.rules.die.critFace);

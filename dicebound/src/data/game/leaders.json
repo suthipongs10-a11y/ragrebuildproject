@@ -1,0 +1,5 @@
+[
+  {"id": "captain", "icon": "skill_captain", "pawn": "pawn_captain", "portrait": "leader_captain_portrait", "startingUnits": ["knight"], "mods": {}},
+  {"id": "gambler", "icon": "skill_gambler", "pawn": "pawn_gambler", "portrait": "leader_gambler_portrait", "startingUnits": [], "mods": {"rerollsPerLap": 1}},
+  {"id": "merchant", "icon": "skill_merchant", "pawn": "pawn_merchant", "portrait": "leader_merchant_portrait", "startingUnits": [], "mods": {"upgradeDiscountPct": 30}}
+]

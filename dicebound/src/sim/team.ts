@@ -1,8 +1,7 @@
 import type { Content } from '../data/content';
 import type { UnitDef } from '../data/gameSchema';
+import { mod, scaled } from './mods';
 import type { GameEvent, RunState, UnitState } from './types';
-
-const PERCENT = 100;
 
 export function unitDef(content: Content, unit: UnitState): UnitDef {
   const def = content.units[unit.unitId];
@@ -16,18 +15,8 @@ export function tierStats(content: Content, unit: UnitState): UnitDef['tiers'][n
   return stats;
 }
 
-/** Sum of one bonus across every active synergy. */
-export function synergyBonus(content: Content, state: RunState, key: 'teamAtkPct' | 'teamHpPct' | 'healPct' | 'goldPct'): number {
-  let total = 0;
-  for (const synergy of content.synergies) {
-    const tier = state.synergies[synergy.id];
-    if (tier) total += synergy.tiers[tier - 1]?.[key] ?? 0;
-  }
-  return total;
-}
-
 export function maxHp(content: Content, state: RunState, unit: UnitState): number {
-  return Math.round(tierStats(content, unit).hp * (1 + synergyBonus(content, state, 'teamHpPct') / PERCENT));
+  return Math.round(scaled(tierStats(content, unit).hp, mod(content, state, 'teamHpPct')));
 }
 
 export function tierForXp(content: Content, xp: number): number {
@@ -45,24 +34,10 @@ export function formation(content: Content, state: RunState): UnitState[] {
     .sort((a, b) => unitDef(content, a).row - unitDef(content, b).row || a.uid - b.uid);
 }
 
-/**
- * Recruit tiles feed XP into one unit of their class: the weakest one that can still
- * grow, otherwise a new recruit if there is room. Mutates the draft state.
- */
-export function gainUnitXp(content: Content, state: RunState, unitId: string, xp: number, events: GameEvent[]): void {
+/** Adds XP to one unit and promotes it when it crosses a tier threshold. */
+export function addXp(content: Content, state: RunState, unit: UnitState, xp: number, events: GameEvent[]): void {
   const maxTier = content.rules.unitXpForTier.length;
-  const growable = state.team.filter((u) => u.unitId === unitId && u.tier < maxTier).sort((a, b) => a.xp - b.xp || a.uid - b.uid);
-  let unit = growable[0];
-  if (!unit) {
-    if (state.team.length >= content.rules.teamMax) return;
-    unit = { uid: state.nextUid++, unitId, xp: 0, tier: 1, hp: 0, shield: 0 };
-    state.team.push(unit);
-    unit.hp = maxHp(content, state, unit);
-    events.push({ type: 'UnitRecruited', uid: unit.uid, unitId, hp: unit.hp });
-    // The recruit itself is the first point of the tile's value.
-    xp -= 1;
-  }
-  if (xp <= 0) return;
+  if (xp <= 0 || unit.tier >= maxTier) return;
   const before = maxHp(content, state, unit);
   unit.xp += xp;
   events.push({ type: 'UnitXpGained', uid: unit.uid, xp });
@@ -73,6 +48,33 @@ export function gainUnitXp(content: Content, state: RunState, unitId: string, xp
     if (unit.hp > 0) unit.hp += maxHp(content, state, unit) - before;
     events.push({ type: 'UnitTierUp', uid: unit.uid, tier });
   }
+}
+
+export function recruit(content: Content, state: RunState, unitId: string, events: GameEvent[]): UnitState | null {
+  if (state.team.length >= content.rules.teamMax) return null;
+  const unit: UnitState = { uid: state.nextUid++, unitId, xp: 0, tier: 1, hp: 0, shield: 0 };
+  state.team.push(unit);
+  unit.hp = maxHp(content, state, unit);
+  events.push({ type: 'UnitRecruited', uid: unit.uid, unitId, hp: unit.hp });
+  return unit;
+}
+
+/**
+ * Recruit tiles feed XP into one unit of their class: the weakest one that can still
+ * grow, otherwise a new recruit if there is room. Mutates the draft state.
+ */
+export function gainUnitXp(content: Content, state: RunState, unitId: string, xp: number, events: GameEvent[]): void {
+  const maxTier = content.rules.unitXpForTier.length;
+  const growable = state.team.filter((u) => u.unitId === unitId && u.tier < maxTier).sort((a, b) => a.xp - b.xp || a.uid - b.uid);
+  let unit = growable[0];
+  if (!unit) {
+    const fresh = recruit(content, state, unitId, events);
+    if (!fresh) return;
+    unit = fresh;
+    // The recruit itself is the first point of the tile's value.
+    xp -= 1;
+  }
+  addXp(content, state, unit, xp, events);
 }
 
 export function healTeam(content: Content, state: RunState, share: number, events: GameEvent[]): void {
@@ -92,4 +94,14 @@ export function healTeam(content: Content, state: RunState, share: number, event
 export function reviveTeam(content: Content, state: RunState, events: GameEvent[]): void {
   for (const unit of state.team) unit.hp = maxHp(content, state, unit);
   events.push({ type: 'TeamRevived' });
+}
+
+/** Runs `change` and then grants (never removes) any max HP it added to living units. */
+export function keepHpShare(content: Content, state: RunState, change: () => void): void {
+  const before = state.team.map((unit) => maxHp(content, state, unit));
+  change();
+  state.team.forEach((unit, i) => {
+    const gain = maxHp(content, state, unit) - (before[i] ?? 0);
+    if (unit.hp > 0 && gain > 0) unit.hp += gain;
+  });
 }
