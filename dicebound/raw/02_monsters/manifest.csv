@@ -1,0 +1,33 @@
+﻿pack,prompt_id,title_th,save_as,gen_size,background,slice,final_size,prompt_file
+02_monsters,M-sand_wolf,[ACT1] หมาป่าทราย — หน้าที่: ฝูง / เร็ว,mon_sand_wolf_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/01_M-sand_wolf.md
+02_monsters,M-scorpion,[ACT1] แมงป่องยักษ์ — หน้าที่: เกราะ,mon_scorpion_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/02_M-scorpion.md
+02_monsters,M-cactus_brute,[ACT1] เจ้ากระบองเพชร — หน้าที่: ตัวตึง,mon_cactus_brute_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/03_M-cactus_brute.md
+02_monsters,M-vulture,[ACT1] แร้งทะเลทราย — หน้าที่: บิน (ข้ามแท็งก์),mon_vulture_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/04_M-vulture.md
+02_monsters,M-goblin_thief,[ACT1] ก็อบลินขโมยทอง — หน้าที่: ขโมยทอง,mon_goblin_thief_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/05_M-goblin_thief.md
+02_monsters,M-bat,[ACT2] ค้างคาวปีศาจ — หน้าที่: บิน,mon_bat_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/06_M-bat.md
+02_monsters,M-poison_toad,[ACT2] คางคกพิษ — หน้าที่: พิษ,mon_poison_toad_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/07_M-poison_toad.md
+02_monsters,M-slime,[ACT2] สไลม์หนองน้ำ — หน้าที่: ฝูง (แตกตัว),mon_slime_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/08_M-slime.md
+02_monsters,M-mushroom_shaman,[ACT2] เห็ดหมอผี — หน้าที่: ฮีลเลอร์ศัตรู,mon_mushroom_shaman_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/09_M-mushroom_shaman.md
+02_monsters,M-bog_zombie,[ACT2] ซอมบี้หนองน้ำ — หน้าที่: ตัวตึง,mon_bog_zombie_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/10_M-bog_zombie.md
+02_monsters,M-skeleton_knight,[ACT3] อัศวินกระดูก — หน้าที่: เกราะหนา,mon_skeleton_knight_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/11_M-skeleton_knight.md
+02_monsters,M-necromancer,[ACT3] เนโครแมนเซอร์ — หน้าที่: อัญเชิญ,mon_necromancer_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/12_M-necromancer.md
+02_monsters,M-imp,[ACT3] อิมพ์ — หน้าที่: ฝูง,mon_imp_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/13_M-imp.md
+02_monsters,M-gargoyle,[ACT3] การ์กอยล์ — หน้าที่: บิน + เกราะ,mon_gargoyle_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/14_M-gargoyle.md
+02_monsters,M-bomb_demon,[ACT3] ปีศาจระเบิด — หน้าที่: ระเบิดตอนตาย,mon_bomb_demon_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",256x256 per cell,prompts/15_M-bomb_demon.md
+02_monsters,M-skeleton_minion,[ลูกน้อง] โครงกระดูกลูกน้อง (ถูกอัญเชิญ),mon_skeleton_minion_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",192x192 per cell,prompts/16_M-skeleton_minion.md
+02_monsters,M-slime_small,[ลูกน้อง] สไลม์จิ๋ว (แตกตัว),mon_slime_small_sheet.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",192x192 per cell,prompts/17_M-slime_small.md
+02_monsters,E-alpha_wolf,[ACT1 อีลิท] จ่าฝูงหมาป่า,elite_alpha_wolf_sheet.png,1536x1024,alpha,"slice 4 cells: idle, attack, hurt, enraged",320x320 per cell,prompts/18_E-alpha_wolf.md
+02_monsters,E-giant_spider,[ACT2 อีลิท] แมงมุมยักษ์,elite_giant_spider_sheet.png,1536x1024,alpha,"slice 4 cells: idle, attack, hurt, enraged",320x320 per cell,prompts/19_E-giant_spider.md
+02_monsters,E-dark_captain,[ACT3 อีลิท] กัปตันอัศวินมืด,elite_dark_captain_sheet.png,1536x1024,alpha,"slice 4 cells: idle, attack, hurt, enraged",320x320 per cell,prompts/20_E-dark_captain.md
+02_monsters,B-stone_golem-a,[ACT1 บอส] โกเลมหิน — ชีต A (ท่าปกติ),boss_stone_golem_a.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",512x512 per cell,prompts/21_B-stone_golem-a.md
+02_monsters,B-stone_golem-b,[ACT1 บอส] โกเลมหิน — ชีต B (ท่าไม้ตาย + แพ้),boss_stone_golem_b.png,1536x1024,alpha,"slice 3 cells: windup, special, defeated",512x512 per cell,prompts/22_B-stone_golem-b.md
+02_monsters,B-stone_golem-intro,[ACT1 บอส] โกเลมหิน — ภาพเปิดตัวบอส,boss_stone_golem_intro.png,1536x1024,scene,single image,1536x1024,prompts/23_B-stone_golem-intro.md
+02_monsters,B-swamp_witch-a,[ACT2 บอส] แม่มดหนองน้ำ — ชีต A (ท่าปกติ),boss_swamp_witch_a.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",512x512 per cell,prompts/24_B-swamp_witch-a.md
+02_monsters,B-swamp_witch-b,[ACT2 บอส] แม่มดหนองน้ำ — ชีต B (ท่าไม้ตาย + แพ้),boss_swamp_witch_b.png,1536x1024,alpha,"slice 3 cells: windup, special, defeated",512x512 per cell,prompts/25_B-swamp_witch-b.md
+02_monsters,B-swamp_witch-intro,[ACT2 บอส] แม่มดหนองน้ำ — ภาพเปิดตัวบอส,boss_swamp_witch_intro.png,1536x1024,scene,single image,1536x1024,prompts/26_B-swamp_witch-intro.md
+02_monsters,B-fire_dragon-a,[ACT3 บอส] มังกรไฟ — ชีต A (ท่าปกติ),boss_fire_dragon_a.png,1536x1024,alpha,"slice 3 cells: idle, attack, hurt",512x512 per cell,prompts/27_B-fire_dragon-a.md
+02_monsters,B-fire_dragon-b,[ACT3 บอส] มังกรไฟ — ชีต B (ท่าไม้ตาย + แพ้),boss_fire_dragon_b.png,1536x1024,alpha,"slice 3 cells: windup, special, defeated",512x512 per cell,prompts/28_B-fire_dragon-b.md
+02_monsters,B-fire_dragon-intro,[ACT3 บอส] มังกรไฟ — ภาพเปิดตัวบอส,boss_fire_dragon_intro.png,1536x1024,scene,single image,1536x1024,prompts/29_B-fire_dragon-intro.md
+02_monsters,B-dice_demon-a,[FINAL บอส] ปีศาจลูกเต๋า — ร่าง 1,boss_dice_demon_p1.png,1536x1024,alpha,"slice 4 cells: idle, attack, windup, hurt",512x512 per cell,prompts/30_B-dice_demon-a.md
+02_monsters,B-dice_demon-b,[FINAL บอส] ปีศาจลูกเต๋า — ร่าง 2 (ตื่นเต็มพลัง),boss_dice_demon_p2.png,1536x1024,alpha,"slice 4 cells: idle, attack, curse, defeated",512x512 per cell,prompts/31_B-dice_demon-b.md
+02_monsters,B-dice_demon-intro,[FINAL บอส] ปีศาจลูกเต๋า — ภาพเปิดตัว,boss_dice_demon_intro.png,1536x1024,scene,single image,1536x1024,prompts/32_B-dice_demon-intro.md
