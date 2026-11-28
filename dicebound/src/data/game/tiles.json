@@ -1,15 +1,15 @@
 [
-  { "id": "gate", "type": "gate", "upgradable": false, "effect": { "kind": "none" } },
-  { "id": "recruit_warrior", "type": "recruit", "upgradable": true, "effect": { "kind": "recruit", "unit": "warrior", "values": [1, 2, 3] } },
-  { "id": "recruit_knight", "type": "recruit", "upgradable": true, "effect": { "kind": "recruit", "unit": "knight", "values": [1, 2, 3] } },
-  { "id": "recruit_archer", "type": "recruit", "upgradable": true, "effect": { "kind": "recruit", "unit": "archer", "values": [1, 2, 3] } },
-  { "id": "recruit_mage", "type": "recruit", "upgradable": true, "effect": { "kind": "recruit", "unit": "mage", "values": [1, 2, 3] } },
-  { "id": "recruit_cleric", "type": "recruit", "upgradable": true, "effect": { "kind": "recruit", "unit": "cleric", "values": [1, 2, 3] } },
-  { "id": "buff_attack", "type": "buff", "upgradable": true, "effect": { "kind": "team_atk_pct", "values": [20, 35, 55] } },
-  { "id": "buff_shield", "type": "buff", "upgradable": true, "effect": { "kind": "team_shield", "values": [8, 14, 24] } },
-  { "id": "gold_mine", "type": "economy", "upgradable": true, "effect": { "kind": "gold", "values": [12, 20, 32] } },
-  { "id": "heal_campfire", "type": "heal", "upgradable": true, "effect": { "kind": "heal_pct", "values": [25, 40, 60] } },
-  { "id": "risk_trap", "type": "risk", "upgradable": false, "effect": { "kind": "damage_pct", "values": [20, 20, 20] } },
-  { "id": "risk_ambush", "type": "risk", "upgradable": false, "effect": { "kind": "enemy_atk_pct", "values": [40, 40, 40] } },
-  { "id": "risk_gamble", "type": "risk", "upgradable": true, "effect": { "kind": "gamble", "winChance": 0.5, "values": [30, 50, 80], "loseGold": 15 } }
+  {"id": "gate", "icon": "tile_boss_gate", "type": "gate", "upgradable": false, "effect": {"kind": "none"}},
+  {"id": "recruit_warrior", "icon": "tile_sword", "type": "recruit", "upgradable": true, "effect": {"kind": "recruit", "unit": "warrior", "values": [1, 2, 3]}},
+  {"id": "recruit_knight", "icon": "tile_knight", "type": "recruit", "upgradable": true, "effect": {"kind": "recruit", "unit": "knight", "values": [1, 2, 3]}},
+  {"id": "recruit_archer", "icon": "tile_bow", "type": "recruit", "upgradable": true, "effect": {"kind": "recruit", "unit": "archer", "values": [1, 2, 3]}},
+  {"id": "recruit_mage", "icon": "tile_staff", "type": "recruit", "upgradable": true, "effect": {"kind": "recruit", "unit": "mage", "values": [1, 2, 3]}},
+  {"id": "recruit_cleric", "icon": "tile_scepter", "type": "recruit", "upgradable": true, "effect": {"kind": "recruit", "unit": "cleric", "values": [1, 2, 3]}},
+  {"id": "buff_attack", "icon": "tile_forge", "type": "buff", "upgradable": true, "effect": {"kind": "team_atk_pct", "values": [20, 35, 55]}},
+  {"id": "buff_shield", "icon": "tile_aegis", "type": "buff", "upgradable": true, "effect": {"kind": "team_shield", "values": [8, 14, 24]}},
+  {"id": "gold_mine", "icon": "tile_mine", "type": "economy", "upgradable": true, "effect": {"kind": "gold", "values": [12, 20, 32]}},
+  {"id": "heal_campfire", "icon": "tile_campfire", "type": "heal", "upgradable": true, "effect": {"kind": "heal_pct", "values": [25, 40, 60]}},
+  {"id": "risk_trap", "icon": "tile_curse", "type": "risk", "upgradable": false, "effect": {"kind": "damage_pct", "values": [20, 20, 20]}},
+  {"id": "risk_ambush", "icon": "tile_shadow_blade", "type": "risk", "upgradable": false, "effect": {"kind": "enemy_atk_pct", "values": [40, 40, 40]}},
+  {"id": "risk_gamble", "icon": "tile_lucky_dice", "type": "risk", "upgradable": true, "effect": {"kind": "gamble", "winChance": 0.5, "values": [30, 50, 80], "loseGold": 15}}
 ]

@@ -1,5 +1,6 @@
 import sharp from 'sharp';
 import { CONFIG } from './config';
+import namesJson from './names.json';
 import { placeOnCanvas, resizeRaster, sharedScale, solidRaster, type Anchor } from './compose';
 import type { ManifestEntry } from './manifest';
 import { alphaStats, loadRaster, type Raster } from './pixels';
@@ -40,6 +41,9 @@ interface Sliced {
   result: EntryResult;
 }
 
+/** Asset ids for sheets whose manifest row does not name its pieces (chosen 2026-11-28). */
+const PIECE_NAMES: Record<string, string[]> = namesJson;
+
 const PLACEHOLDER_RGBA: [number, number, number, number] = [255, 0, 255, 255];
 const MAX_ATLAS_SINGLE = 512;
 
@@ -58,6 +62,11 @@ function expectedCount(entry: ManifestEntry): number {
 function frameIds(entry: ManifestEntry, count: number): string[] {
   const s = entry.slice;
   if (s.kind === 'single') return [entry.baseId];
+  const chosen = PIECE_NAMES[entry.baseId];
+  if (chosen) {
+    if (chosen.length !== count) throw new Error(`names.json: ${entry.baseId} lists ${chosen.length} names for ${count} pieces`);
+    return chosen;
+  }
   const names = s.kind === 'row' || s.kind === 'grid' ? s.names : null;
   // Boss sheets A and B hold different poses of one boss, so both use the boss id.
   const prefix = s.kind === 'row' && names ? entry.baseId.replace(/_[ab]$/, '') : entry.baseId;

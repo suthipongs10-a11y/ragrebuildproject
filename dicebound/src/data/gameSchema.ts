@@ -66,6 +66,8 @@ export const tileEffectSchema = z.discriminatedUnion('kind', [
 ]);
 export const tileSchema = z.object({
   id,
+  /** Asset id of the tile picture (assets/manifest.json). */
+  icon: id,
   type: z.enum(['gate', 'recruit', 'buff', 'economy', 'heal', 'risk']),
   upgradable: z.boolean(),
   effect: tileEffectSchema,
@@ -75,6 +77,7 @@ export const boardSchema = z.object({ id, tiles: z.array(id).min(2) });
 
 export const synergySchema = z.object({
   id,
+  icon: id,
   tiles: z.tuple([id, id]),
   /** tiers[0] needs both tiles at 2 stars, tiers[1] at 3 stars, and so on. */
   tiers: z.array(z.object({ teamAtkPct: pct.optional(), teamHpPct: pct.optional(), healPct: pct.optional(), goldPct: pct.optional() })).min(1),

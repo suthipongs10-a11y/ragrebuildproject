@@ -34,6 +34,19 @@ if (reference) {
 let gameSummary = '';
 try {
   const content = loadContent();
+  const assetIds = new Set(Object.keys((JSON.parse(readFileSync(fileURLToPath(new URL('../assets/manifest.json', import.meta.url)), 'utf8')) as { frames: object }).frames));
+  const named: Array<[string, string[]]> = [
+    ['unit', Object.keys(content.units)],
+    ['monster', Object.keys(content.monsters)],
+    ['tile', Object.keys(content.tiles)],
+    ['synergy', content.synergies.map((s) => s.id)],
+  ];
+  for (const [kind, ids] of named) {
+    for (const id of ids) if (reference && !(`${kind}.${id}.name` in reference)) errors.push(`locales: missing "${kind}.${id}.name"`);
+  }
+  for (const item of [...Object.values(content.tiles), ...content.synergies]) {
+    if (!assetIds.has(item.icon)) errors.push(`${item.id}: icon "${item.icon}" is not in assets/manifest.json`);
+  }
   gameSummary = `, ${Object.keys(content.units).length} units, ${Object.keys(content.monsters).length} monsters, ${Object.keys(content.tiles).length} tiles, ${content.laps.length} laps`;
 } catch (error) {
   if (error instanceof ContentError) errors.push(...error.problems);

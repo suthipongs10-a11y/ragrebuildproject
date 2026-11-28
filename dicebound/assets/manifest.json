@@ -1494,16 +1494,7 @@
    "anchor": "bottom",
    "blend": "normal"
   },
-  "tiles_sheet_01_0": {
-   "atlas": "atlases/icons-0.png",
-   "x": 2,
-   "y": 2,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_01_1": {
+  "tile_boss_gate": {
    "atlas": "atlases/icons-0.png",
    "x": 260,
    "y": 2,
@@ -1512,250 +1503,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "tiles_sheet_01_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 518,
-   "y": 2,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_01_3": {
-   "atlas": "atlases/icons-0.png",
-   "x": 776,
-   "y": 2,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_02_0": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1034,
-   "y": 2,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_02_1": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1292,
-   "y": 2,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_02_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1550,
-   "y": 2,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_02_3": {
-   "atlas": "atlases/icons-0.png",
-   "x": 2,
-   "y": 260,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_03_0": {
-   "atlas": "atlases/icons-0.png",
-   "x": 260,
-   "y": 260,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_03_1": {
-   "atlas": "atlases/icons-0.png",
-   "x": 518,
-   "y": 260,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_03_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 776,
-   "y": 260,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_03_3": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1034,
-   "y": 260,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_04_0": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1292,
-   "y": 260,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_04_1": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1550,
-   "y": 260,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_04_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 2,
-   "y": 518,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_04_3": {
-   "atlas": "atlases/icons-0.png",
-   "x": 260,
-   "y": 518,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_05_0": {
-   "atlas": "atlases/icons-0.png",
-   "x": 518,
-   "y": 518,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_05_1": {
-   "atlas": "atlases/icons-0.png",
-   "x": 776,
-   "y": 518,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_05_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1034,
-   "y": 518,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_05_3": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1292,
-   "y": 518,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_06_0": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1550,
-   "y": 518,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_06_1": {
-   "atlas": "atlases/icons-0.png",
-   "x": 2,
-   "y": 776,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_06_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 260,
-   "y": 776,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_06_3": {
-   "atlas": "atlases/icons-0.png",
-   "x": 518,
-   "y": 776,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_07_0": {
-   "atlas": "atlases/icons-0.png",
-   "x": 776,
-   "y": 776,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_07_1": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1034,
-   "y": 776,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_07_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1292,
-   "y": 776,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_07_3": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1550,
-   "y": 776,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_08_0": {
-   "atlas": "atlases/icons-0.png",
-   "x": 2,
-   "y": 1034,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "tiles_sheet_08_1": {
+  "tile_sword": {
    "atlas": "atlases/icons-0.png",
    "x": 260,
    "y": 1034,
@@ -1764,7 +1512,97 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "tiles_sheet_08_2": {
+  "tile_bow": {
+   "atlas": "atlases/icons-0.png",
+   "x": 518,
+   "y": 2,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_campfire": {
+   "atlas": "atlases/icons-0.png",
+   "x": 776,
+   "y": 2,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_supply": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1550,
+   "y": 776,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_staff": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1034,
+   "y": 776,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_prison": {
+   "atlas": "atlases/icons-0.png",
+   "x": 2,
+   "y": 776,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_gold": {
+   "atlas": "atlases/icons-0.png",
+   "x": 776,
+   "y": 260,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_rune_stone": {
+   "atlas": "atlases/icons-0.png",
+   "x": 260,
+   "y": 776,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_knight": {
+   "atlas": "atlases/icons-0.png",
+   "x": 2,
+   "y": 518,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_crystal": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1034,
+   "y": 2,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_great_tree": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1034,
+   "y": 260,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_treasure": {
    "atlas": "atlases/icons-0.png",
    "x": 518,
    "y": 1034,
@@ -1773,7 +1611,97 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "tiles_sheet_08_3": {
+  "tile_fate_card": {
+   "atlas": "atlases/icons-0.png",
+   "x": 2,
+   "y": 260,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_market": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1034,
+   "y": 518,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_aegis": {
+   "atlas": "atlases/icons-0.png",
+   "x": 2,
+   "y": 2,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_scepter": {
+   "atlas": "atlases/icons-0.png",
+   "x": 518,
+   "y": 776,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_storm": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1292,
+   "y": 776,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_shadow_blade": {
+   "atlas": "atlases/icons-0.png",
+   "x": 776,
+   "y": 776,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_lucky_dice": {
+   "atlas": "atlases/icons-0.png",
+   "x": 518,
+   "y": 518,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_mine": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1292,
+   "y": 518,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_harvest": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1550,
+   "y": 260,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_fountain": {
+   "atlas": "atlases/icons-0.png",
+   "x": 518,
+   "y": 260,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_volcano": {
    "atlas": "atlases/icons-0.png",
    "x": 776,
    "y": 1034,
@@ -1782,16 +1710,106 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_items_0": {
+  "tile_magnet": {
    "atlas": "atlases/icons-0.png",
-   "x": 1756,
-   "y": 1292,
+   "x": 776,
+   "y": 518,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_forge": {
+   "atlas": "atlases/icons-0.png",
+   "x": 260,
+   "y": 260,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_grimoire": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1292,
+   "y": 260,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_swamp": {
+   "atlas": "atlases/icons-0.png",
+   "x": 2,
+   "y": 1034,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_curse": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1292,
+   "y": 2,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_empty": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1550,
+   "y": 2,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_locked": {
+   "atlas": "atlases/icons-0.png",
+   "x": 260,
+   "y": 518,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "tile_mystery": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1550,
+   "y": 518,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "icon_potion": {
+   "atlas": "atlases/icons-0.png",
+   "x": 522,
+   "y": 1486,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_items_1": {
+  "icon_reroll": {
+   "atlas": "atlases/icons-0.png",
+   "x": 652,
+   "y": 1486,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "icon_force_die": {
+   "atlas": "atlases/icons-0.png",
+   "x": 2,
+   "y": 1486,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "icon_double_dice": {
    "atlas": "atlases/icons-0.png",
    "x": 1886,
    "y": 1292,
@@ -1800,16 +1818,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_items_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 2,
-   "y": 1486,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_items_3": {
+  "icon_gold": {
    "atlas": "atlases/icons-0.png",
    "x": 132,
    "y": 1486,
@@ -1818,7 +1827,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_items_4": {
+  "icon_heart": {
    "atlas": "atlases/icons-0.png",
    "x": 262,
    "y": 1486,
@@ -1827,7 +1836,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_items_5": {
+  "icon_heart_empty": {
    "atlas": "atlases/icons-0.png",
    "x": 392,
    "y": 1486,
@@ -1836,25 +1845,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_items_6": {
-   "atlas": "atlases/icons-0.png",
-   "x": 522,
-   "y": 1486,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_items_7": {
-   "atlas": "atlases/icons-0.png",
-   "x": 652,
-   "y": 1486,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_items_8": {
+  "icon_star": {
    "atlas": "atlases/icons-0.png",
    "x": 782,
    "y": 1486,
@@ -1863,16 +1854,34 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_relics1_0": {
+  "icon_attack": {
    "atlas": "atlases/icons-0.png",
-   "x": 1692,
-   "y": 1486,
+   "x": 1756,
+   "y": 1292,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_relics1_1": {
+  "relic_lucky_clover": {
+   "atlas": "atlases/icons-0.png",
+   "x": 522,
+   "y": 1616,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "relic_loaded_die": {
+   "atlas": "atlases/icons-0.png",
+   "x": 392,
+   "y": 1616,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "relic_golden_horseshoe": {
    "atlas": "atlases/icons-0.png",
    "x": 1822,
    "y": 1486,
@@ -1881,52 +1890,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_relics1_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 2,
-   "y": 1616,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_relics1_3": {
-   "atlas": "atlases/icons-0.png",
-   "x": 132,
-   "y": 1616,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_relics1_4": {
-   "atlas": "atlases/icons-0.png",
-   "x": 262,
-   "y": 1616,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_relics1_5": {
-   "atlas": "atlases/icons-0.png",
-   "x": 392,
-   "y": 1616,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_relics1_6": {
-   "atlas": "atlases/icons-0.png",
-   "x": 522,
-   "y": 1616,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_relics1_7": {
+  "relic_merchant_scale": {
    "atlas": "atlases/icons-0.png",
    "x": 652,
    "y": 1616,
@@ -1935,52 +1899,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_relics1_8": {
-   "atlas": "atlases/icons-0.png",
-   "x": 782,
-   "y": 1616,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_relics2_0": {
-   "atlas": "atlases/icons-0.png",
-   "x": 912,
-   "y": 1616,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_relics2_1": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1042,
-   "y": 1616,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_relics2_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1172,
-   "y": 1616,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_relics2_3": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1302,
-   "y": 1616,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_relics2_4": {
+  "relic_war_drum": {
    "atlas": "atlases/icons-0.png",
    "x": 1432,
    "y": 1616,
@@ -1989,70 +1908,124 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_relics2_5": {
+  "relic_phoenix_feather": {
    "atlas": "atlases/icons-0.png",
-   "x": 1562,
+   "x": 782,
    "y": 1616,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_relics2_6": {
+  "relic_hourglass": {
+   "atlas": "atlases/icons-0.png",
+   "x": 132,
+   "y": 1616,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "relic_compass": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1432,
+   "y": 1486,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "relic_kings_crown": {
+   "atlas": "atlases/icons-0.png",
+   "x": 262,
+   "y": 1616,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "relic_dragon_scale": {
    "atlas": "atlases/icons-0.png",
    "x": 1692,
-   "y": 1616,
+   "y": 1486,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_relics2_7": {
+  "relic_demon_eye": {
    "atlas": "atlases/icons-0.png",
-   "x": 1822,
-   "y": 1616,
+   "x": 1562,
+   "y": 1486,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_relics2_8": {
+  "relic_greedy_pig": {
    "atlas": "atlases/icons-0.png",
    "x": 2,
-   "y": 1746,
+   "y": 1616,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_status1_0": {
+  "relic_treasure_map": {
    "atlas": "atlases/icons-0.png",
-   "x": 132,
-   "y": 1746,
+   "x": 1172,
+   "y": 1616,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_status1_1": {
+  "relic_ancient_coin": {
    "atlas": "atlases/icons-0.png",
-   "x": 262,
-   "y": 1746,
+   "x": 1302,
+   "y": 1486,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_status1_2": {
+  "relic_thorn_crown": {
    "atlas": "atlases/icons-0.png",
-   "x": 392,
-   "y": 1746,
+   "x": 1042,
+   "y": 1616,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_status1_3": {
+  "relic_wise_owl": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1562,
+   "y": 1616,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "relic_spirit_lantern": {
+   "atlas": "atlases/icons-0.png",
+   "x": 912,
+   "y": 1616,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "relic_war_banner": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1302,
+   "y": 1616,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "status_burn": {
    "atlas": "atlases/icons-0.png",
    "x": 522,
    "y": 1746,
@@ -2061,79 +2034,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_status1_4": {
-   "atlas": "atlases/icons-0.png",
-   "x": 652,
-   "y": 1746,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_status1_5": {
-   "atlas": "atlases/icons-0.png",
-   "x": 782,
-   "y": 1746,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_status1_6": {
-   "atlas": "atlases/icons-0.png",
-   "x": 912,
-   "y": 1746,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_status1_7": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1042,
-   "y": 1746,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_status1_8": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1172,
-   "y": 1746,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_status2_0": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1302,
-   "y": 1746,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_status2_1": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1432,
-   "y": 1746,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_status2_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1562,
-   "y": 1746,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_status2_3": {
+  "status_poison": {
    "atlas": "atlases/icons-0.png",
    "x": 1692,
    "y": 1746,
@@ -2142,16 +2043,16 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_status2_4": {
+  "status_armor": {
    "atlas": "atlases/icons-0.png",
-   "x": 1822,
+   "x": 132,
    "y": 1746,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_status2_5": {
+  "status_stun": {
    "atlas": "atlases/icons-0.png",
    "x": 2,
    "y": 1876,
@@ -2160,7 +2061,25 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_status2_6": {
+  "status_regen": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1822,
+   "y": 1746,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "status_flying": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1042,
+   "y": 1746,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "status_summon": {
    "atlas": "atlases/icons-0.png",
    "x": 132,
    "y": 1876,
@@ -2169,16 +2088,16 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_status2_7": {
+  "status_bomb": {
    "atlas": "atlases/icons-0.png",
-   "x": 262,
-   "y": 1876,
+   "x": 392,
+   "y": 1746,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_status2_8": {
+  "status_thief": {
    "atlas": "atlases/icons-0.png",
    "x": 392,
    "y": 1876,
@@ -2187,16 +2106,88 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_synergy_0": {
+  "status_atk_up": {
    "atlas": "atlases/icons-0.png",
-   "x": 522,
+   "x": 262,
+   "y": 1746,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "status_def_up": {
+   "atlas": "atlases/icons-0.png",
+   "x": 912,
+   "y": 1746,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "status_haste": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1302,
+   "y": 1746,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "status_crit": {
+   "atlas": "atlases/icons-0.png",
+   "x": 652,
+   "y": 1746,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "status_lifesteal": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1432,
+   "y": 1746,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "status_taunt": {
+   "atlas": "atlases/icons-0.png",
+   "x": 262,
    "y": 1876,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_synergy_1": {
+  "status_curse": {
+   "atlas": "atlases/icons-0.png",
+   "x": 782,
+   "y": 1746,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "status_locked": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1562,
+   "y": 1746,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "status_fury": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1172,
+   "y": 1746,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "synergy_ember_volley": {
    "atlas": "atlases/icons-0.png",
    "x": 652,
    "y": 1876,
@@ -2205,52 +2196,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_synergy_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 782,
-   "y": 1876,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_synergy_3": {
-   "atlas": "atlases/icons-0.png",
-   "x": 912,
-   "y": 1876,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_synergy_4": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1042,
-   "y": 1876,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_synergy_5": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1172,
-   "y": 1876,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_synergy_6": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1302,
-   "y": 1876,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "icons_synergy_7": {
+  "synergy_vanguard": {
    "atlas": "atlases/icons-0.png",
    "x": 1432,
    "y": 1876,
@@ -2259,9 +2205,63 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_synergy_8": {
+  "synergy_arcane": {
+   "atlas": "atlases/icons-0.png",
+   "x": 522,
+   "y": 1876,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "synergy_verdant": {
    "atlas": "atlases/icons-0.png",
    "x": 1562,
+   "y": 1876,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "synergy_prosperity": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1042,
+   "y": 1876,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "synergy_stormblade": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1302,
+   "y": 1876,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "synergy_shadow": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1172,
+   "y": 1876,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "synergy_holy": {
+   "atlas": "atlases/icons-0.png",
+   "x": 912,
+   "y": 1876,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "synergy_harvest": {
+   "atlas": "atlases/icons-0.png",
+   "x": 782,
    "y": 1876,
    "w": 128,
    "h": 128,
@@ -2270,7 +2270,7 @@
   },
   "die_1": {
    "atlas": "atlases/icons-0.png",
-   "x": 976,
+   "x": 196,
    "y": 1292,
    "w": 128,
    "h": 128,
@@ -2279,7 +2279,7 @@
   },
   "die_2": {
    "atlas": "atlases/icons-0.png",
-   "x": 1106,
+   "x": 326,
    "y": 1292,
    "w": 128,
    "h": 128,
@@ -2288,7 +2288,7 @@
   },
   "die_3": {
    "atlas": "atlases/icons-0.png",
-   "x": 1236,
+   "x": 456,
    "y": 1292,
    "w": 128,
    "h": 128,
@@ -2297,7 +2297,7 @@
   },
   "die_4": {
    "atlas": "atlases/icons-0.png",
-   "x": 1366,
+   "x": 586,
    "y": 1292,
    "w": 128,
    "h": 128,
@@ -2306,7 +2306,7 @@
   },
   "die_5": {
    "atlas": "atlases/icons-0.png",
-   "x": 1496,
+   "x": 716,
    "y": 1292,
    "w": 128,
    "h": 128,
@@ -2315,60 +2315,6 @@
   },
   "die_6": {
    "atlas": "atlases/icons-0.png",
-   "x": 1626,
-   "y": 1292,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "dice_faces_special_0": {
-   "atlas": "atlases/icons-0.png",
-   "x": 196,
-   "y": 1292,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "dice_faces_special_1": {
-   "atlas": "atlases/icons-0.png",
-   "x": 326,
-   "y": 1292,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "dice_faces_special_2": {
-   "atlas": "atlases/icons-0.png",
-   "x": 456,
-   "y": 1292,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "dice_faces_special_3": {
-   "atlas": "atlases/icons-0.png",
-   "x": 586,
-   "y": 1292,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "dice_faces_special_4": {
-   "atlas": "atlases/icons-0.png",
-   "x": 716,
-   "y": 1292,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "dice_faces_special_5": {
-   "atlas": "atlases/icons-0.png",
    "x": 846,
    "y": 1292,
    "w": 128,
@@ -2376,34 +2322,61 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "dice_3d_0": {
+  "face_star": {
    "atlas": "atlases/icons-0.png",
-   "x": 1034,
-   "y": 1034,
-   "w": 192,
-   "h": 192,
+   "x": 1496,
+   "y": 1292,
+   "w": 128,
+   "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "dice_3d_1": {
+  "face_warp": {
    "atlas": "atlases/icons-0.png",
-   "x": 1228,
-   "y": 1034,
-   "w": 192,
-   "h": 192,
+   "x": 1626,
+   "y": 1292,
+   "w": 128,
+   "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "dice_3d_2": {
+  "face_gold": {
    "atlas": "atlases/icons-0.png",
-   "x": 1422,
-   "y": 1034,
-   "w": 192,
-   "h": 192,
+   "x": 1236,
+   "y": 1292,
+   "w": 128,
+   "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "dice_3d_3": {
+  "face_double": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1106,
+   "y": 1292,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "face_skull": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1366,
+   "y": 1292,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "face_crown": {
+   "atlas": "atlases/icons-0.png",
+   "x": 976,
+   "y": 1292,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "dice3d_normal": {
    "atlas": "atlases/icons-0.png",
    "x": 1616,
    "y": 1034,
@@ -2412,16 +2385,25 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "dice_3d_4": {
+  "dice3d_gold": {
    "atlas": "atlases/icons-0.png",
-   "x": 1810,
+   "x": 1228,
    "y": 1034,
    "w": 192,
    "h": 192,
    "anchor": "center",
    "blend": "normal"
   },
-  "dice_3d_5": {
+  "dice3d_demon": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1034,
+   "y": 1034,
+   "w": 192,
+   "h": 192,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "dice3d_tilt": {
    "atlas": "atlases/icons-0.png",
    "x": 2,
    "y": 1292,
@@ -2430,25 +2412,52 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_leader_menu_0": {
+  "dice3d_spin": {
    "atlas": "atlases/icons-0.png",
-   "x": 912,
-   "y": 1486,
+   "x": 1810,
+   "y": 1034,
+   "w": 192,
+   "h": 192,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "dice3d_land": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1422,
+   "y": 1034,
+   "w": 192,
+   "h": 192,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "skill_captain": {
+   "atlas": "atlases/icons-0.png",
+   "x": 1692,
+   "y": 1616,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_leader_menu_1": {
+  "skill_gambler": {
    "atlas": "atlases/icons-0.png",
-   "x": 1042,
-   "y": 1486,
+   "x": 1822,
+   "y": 1616,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_leader_menu_2": {
+  "skill_merchant": {
+   "atlas": "atlases/icons-0.png",
+   "x": 2,
+   "y": 1746,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "menu_settings": {
    "atlas": "atlases/icons-0.png",
    "x": 1172,
    "y": 1486,
@@ -2457,61 +2466,25 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_leader_menu_3": {
+  "menu_codex": {
    "atlas": "atlases/icons-0.png",
-   "x": 1302,
+   "x": 912,
    "y": 1486,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_leader_menu_4": {
+  "menu_pause": {
    "atlas": "atlases/icons-0.png",
-   "x": 1432,
+   "x": 1042,
    "y": 1486,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "normal"
   },
-  "icons_leader_menu_5": {
-   "atlas": "atlases/icons-0.png",
-   "x": 1562,
-   "y": 1486,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "ui_tile_frames_0": {
-   "atlas": "atlases/ui-0.png",
-   "x": 986,
-   "y": 468,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "ui_tile_frames_1": {
-   "atlas": "atlases/ui-0.png",
-   "x": 1244,
-   "y": 468,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "ui_tile_frames_2": {
-   "atlas": "atlases/ui-0.png",
-   "x": 1502,
-   "y": 468,
-   "w": 256,
-   "h": 256,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "ui_tile_frames_3": {
+  "frame_star1": {
    "atlas": "atlases/ui-0.png",
    "x": 1760,
    "y": 468,
@@ -2520,7 +2493,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_tile_frames_4": {
+  "frame_star2": {
    "atlas": "atlases/ui-0.png",
    "x": 2,
    "y": 766,
@@ -2529,7 +2502,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_tile_frames_5": {
+  "frame_star3": {
    "atlas": "atlases/ui-0.png",
    "x": 260,
    "y": 766,
@@ -2538,7 +2511,34 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_buttons_0": {
+  "frame_danger": {
+   "atlas": "atlases/ui-0.png",
+   "x": 986,
+   "y": 468,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "frame_selected": {
+   "atlas": "atlases/ui-0.png",
+   "x": 1502,
+   "y": 468,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "frame_locked": {
+   "atlas": "atlases/ui-0.png",
+   "x": 1244,
+   "y": 468,
+   "w": 256,
+   "h": 256,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "btn_gold": {
    "atlas": "atlases/ui-0.png",
    "x": 1182,
    "y": 1520,
@@ -2547,7 +2547,16 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_buttons_1": {
+  "btn_gold_pressed": {
+   "atlas": "atlases/ui-0.png",
+   "x": 2,
+   "y": 1738,
+   "w": 420,
+   "h": 112,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "btn_gold_disabled": {
    "atlas": "atlases/ui-0.png",
    "x": 1604,
    "y": 1520,
@@ -2556,34 +2565,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_buttons_2": {
-   "atlas": "atlases/ui-0.png",
-   "x": 424,
-   "y": 1738,
-   "w": 420,
-   "h": 112,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "ui_buttons_3": {
-   "atlas": "atlases/ui-0.png",
-   "x": 846,
-   "y": 1738,
-   "w": 420,
-   "h": 112,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "ui_buttons_4": {
-   "atlas": "atlases/ui-0.png",
-   "x": 1268,
-   "y": 1738,
-   "w": 420,
-   "h": 112,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "ui_buttons_5": {
+  "btn_purple": {
    "atlas": "atlases/ui-0.png",
    "x": 2,
    "y": 1852,
@@ -2592,16 +2574,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_buttons_6": {
-   "atlas": "atlases/ui-0.png",
-   "x": 424,
-   "y": 1852,
-   "w": 420,
-   "h": 112,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "ui_buttons_7": {
+  "btn_purple_pressed": {
    "atlas": "atlases/ui-0.png",
    "x": 846,
    "y": 1852,
@@ -2610,7 +2583,43 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_buttons_8": {
+  "btn_purple_disabled": {
+   "atlas": "atlases/ui-0.png",
+   "x": 424,
+   "y": 1852,
+   "w": 420,
+   "h": 112,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "btn_green": {
+   "atlas": "atlases/ui-0.png",
+   "x": 424,
+   "y": 1738,
+   "w": 420,
+   "h": 112,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "btn_green_pressed": {
+   "atlas": "atlases/ui-0.png",
+   "x": 1268,
+   "y": 1738,
+   "w": 420,
+   "h": 112,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "btn_green_disabled": {
+   "atlas": "atlases/ui-0.png",
+   "x": 846,
+   "y": 1738,
+   "w": 420,
+   "h": 112,
+   "anchor": "center",
+   "blend": "normal"
+  },
+  "btn_red": {
    "atlas": "atlases/ui-0.png",
    "x": 1268,
    "y": 1852,
@@ -2619,7 +2628,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_buttons_9": {
+  "btn_red_pressed": {
    "atlas": "atlases/ui-1.png",
    "x": 2,
    "y": 2,
@@ -2628,16 +2637,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_buttons_10": {
-   "atlas": "atlases/ui-0.png",
-   "x": 2,
-   "y": 1738,
-   "w": 420,
-   "h": 112,
-   "anchor": "center",
-   "blend": "normal"
-  },
-  "ui_buttons_11": {
+  "btn_round": {
    "atlas": "atlases/ui-0.png",
    "x": 1060,
    "y": 1520,
@@ -2646,7 +2646,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_panels_0": {
+  "panel_square": {
    "atlas": "atlases/ui-0.png",
    "x": 1242,
    "y": 2,
@@ -2655,7 +2655,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_panels_1": {
+  "panel_wide": {
    "atlas": "atlases/ui-0.png",
    "x": 372,
    "y": 1520,
@@ -2664,7 +2664,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_panels_2": {
+  "panel_tooltip": {
    "atlas": "atlases/ui-0.png",
    "x": 2,
    "y": 1520,
@@ -2673,7 +2673,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_panels_3": {
+  "panel_tall": {
    "atlas": "atlases/ui-0.png",
    "x": 1302,
    "y": 1024,
@@ -2682,7 +2682,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_panels_4": {
+  "panel_strip": {
    "atlas": "atlases/ui-1.png",
    "x": 1078,
    "y": 2,
@@ -2691,7 +2691,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_panels_5": {
+  "panel_titled": {
    "atlas": "atlases/ui-0.png",
    "x": 2,
    "y": 468,
@@ -2700,7 +2700,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_reward_cards_0": {
+  "card_common": {
    "atlas": "atlases/ui-0.png",
    "x": 630,
    "y": 2,
@@ -2709,7 +2709,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_reward_cards_1": {
+  "card_rare": {
    "atlas": "atlases/ui-0.png",
    "x": 936,
    "y": 2,
@@ -2718,7 +2718,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_reward_cards_2": {
+  "card_epic": {
    "atlas": "atlases/ui-0.png",
    "x": 2,
    "y": 2,
@@ -2727,7 +2727,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_reward_cards_3": {
+  "card_legendary": {
    "atlas": "atlases/ui-0.png",
    "x": 316,
    "y": 2,
@@ -2736,7 +2736,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_bars_0": {
+  "bar_frame": {
    "atlas": "atlases/ui-1.png",
    "x": 576,
    "y": 116,
@@ -2745,7 +2745,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_bars_1": {
+  "bar_fills": {
    "atlas": "atlases/ui-0.png",
    "x": 686,
    "y": 1520,
@@ -2754,7 +2754,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_bars_2": {
+  "bar_boss_frame": {
    "atlas": "atlases/ui-1.png",
    "x": 424,
    "y": 2,
@@ -2763,7 +2763,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_bars_3": {
+  "bar_boss_fill": {
    "atlas": "atlases/ui-1.png",
    "x": 990,
    "y": 116,
@@ -2772,7 +2772,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_bars_4": {
+  "bar_progress_frame": {
    "atlas": "atlases/ui-1.png",
    "x": 2,
    "y": 116,
@@ -2781,7 +2781,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_bars_5": {
+  "bar_progress_fill": {
    "atlas": "atlases/ui-1.png",
    "x": 2,
    "y": 178,
@@ -2790,7 +2790,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_banners_1_0": {
+  "banner_boss": {
    "atlas": "atlases/ui-0.png",
    "x": 412,
    "y": 468,
@@ -2799,7 +2799,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_banners_1_1": {
+  "banner_six": {
    "atlas": "atlases/ui-0.png",
    "x": 1144,
    "y": 766,
@@ -2808,7 +2808,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_banners_1_2": {
+  "banner_critical": {
    "atlas": "atlases/ui-0.png",
    "x": 2,
    "y": 1274,
@@ -2817,7 +2817,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_banners_1_3": {
+  "banner_level_up": {
    "atlas": "atlases/ui-0.png",
    "x": 1302,
    "y": 1274,
@@ -2826,7 +2826,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_banners_2_0": {
+  "banner_synergy": {
    "atlas": "atlases/ui-0.png",
    "x": 2,
    "y": 1024,
@@ -2835,7 +2835,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_banners_2_1": {
+  "banner_victory": {
    "atlas": "atlases/ui-0.png",
    "x": 632,
    "y": 1024,
@@ -2844,7 +2844,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_banners_2_2": {
+  "banner_defeat": {
    "atlas": "atlases/ui-0.png",
    "x": 518,
    "y": 766,
@@ -2853,7 +2853,7 @@
    "anchor": "center",
    "blend": "normal"
   },
-  "ui_banners_2_3": {
+  "banner_lap_clear": {
    "atlas": "atlases/ui-0.png",
    "x": 672,
    "y": 1274,
@@ -3996,88 +3996,88 @@
    "anchor": "center",
    "blend": "add"
   },
-  "fx_status_loops_0": {
+  "fx_loop_burn_0": {
    "atlas": "atlases/effects-2.png",
-   "x": 1432,
-   "y": 1164,
+   "x": 652,
+   "y": 1034,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "add"
   },
-  "fx_status_loops_1": {
+  "fx_loop_burn_1": {
+   "atlas": "atlases/effects-2.png",
+   "x": 782,
+   "y": 1034,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "fx_loop_burn_2": {
+   "atlas": "atlases/effects-2.png",
+   "x": 912,
+   "y": 1034,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "fx_loop_poison_0": {
+   "atlas": "atlases/effects-2.png",
+   "x": 1042,
+   "y": 1034,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "fx_loop_poison_1": {
+   "atlas": "atlases/effects-2.png",
+   "x": 1172,
+   "y": 1034,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "fx_loop_stun_0": {
    "atlas": "atlases/effects-2.png",
    "x": 1562,
-   "y": 1164,
+   "y": 1034,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "add"
   },
-  "fx_status_loops_2": {
+  "fx_loop_stun_1": {
    "atlas": "atlases/effects-2.png",
    "x": 1692,
-   "y": 1164,
+   "y": 1034,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "add"
   },
-  "fx_status_loops_3": {
+  "fx_loop_regen_0": {
    "atlas": "atlases/effects-2.png",
-   "x": 1822,
-   "y": 1164,
+   "x": 1302,
+   "y": 1034,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "add"
   },
-  "fx_status_loops_4": {
+  "fx_loop_regen_1": {
    "atlas": "atlases/effects-2.png",
-   "x": 2,
-   "y": 1294,
+   "x": 1432,
+   "y": 1034,
    "w": 128,
    "h": 128,
    "anchor": "center",
    "blend": "add"
   },
-  "fx_status_loops_5": {
-   "atlas": "atlases/effects-2.png",
-   "x": 132,
-   "y": 1294,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_status_loops_6": {
-   "atlas": "atlases/effects-2.png",
-   "x": 262,
-   "y": 1294,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_status_loops_7": {
-   "atlas": "atlases/effects-2.png",
-   "x": 392,
-   "y": 1294,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_status_loops_8": {
-   "atlas": "atlases/effects-2.png",
-   "x": 522,
-   "y": 1294,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_buff_auras_0": {
+  "fx_aura_atk": {
    "atlas": "atlases/effects-2.png",
    "x": 1808,
    "y": 776,
@@ -4086,25 +4086,7 @@
    "anchor": "center",
    "blend": "add"
   },
-  "fx_buff_auras_1": {
-   "atlas": "atlases/effects-2.png",
-   "x": 2,
-   "y": 1034,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_buff_auras_2": {
-   "atlas": "atlases/effects-2.png",
-   "x": 132,
-   "y": 1034,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_buff_auras_3": {
+  "fx_aura_def": {
    "atlas": "atlases/effects-2.png",
    "x": 262,
    "y": 1034,
@@ -4113,7 +4095,7 @@
    "anchor": "center",
    "blend": "add"
   },
-  "fx_buff_auras_4": {
+  "fx_aura_haste": {
    "atlas": "atlases/effects-2.png",
    "x": 392,
    "y": 1034,
@@ -4122,178 +4104,7 @@
    "anchor": "center",
    "blend": "add"
   },
-  "fx_buff_auras_5": {
-   "atlas": "atlases/effects-2.png",
-   "x": 522,
-   "y": 1034,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_buff_auras_6": {
-   "atlas": "atlases/effects-2.png",
-   "x": 652,
-   "y": 1034,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_buff_auras_7": {
-   "atlas": "atlases/effects-2.png",
-   "x": 782,
-   "y": 1034,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_buff_auras_8": {
-   "atlas": "atlases/effects-2.png",
-   "x": 912,
-   "y": 1034,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_projectiles_0": {
-   "atlas": "atlases/effects-2.png",
-   "x": 262,
-   "y": 1164,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_projectiles_1": {
-   "atlas": "atlases/effects-2.png",
-   "x": 392,
-   "y": 1164,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_projectiles_2": {
-   "atlas": "atlases/effects-2.png",
-   "x": 522,
-   "y": 1164,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_projectiles_3": {
-   "atlas": "atlases/effects-2.png",
-   "x": 652,
-   "y": 1164,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_projectiles_4": {
-   "atlas": "atlases/effects-2.png",
-   "x": 782,
-   "y": 1164,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_projectiles_5": {
-   "atlas": "atlases/effects-2.png",
-   "x": 912,
-   "y": 1164,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_projectiles_6": {
-   "atlas": "atlases/effects-2.png",
-   "x": 1042,
-   "y": 1164,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_projectiles_7": {
-   "atlas": "atlases/effects-2.png",
-   "x": 1172,
-   "y": 1164,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_projectiles_8": {
-   "atlas": "atlases/effects-2.png",
-   "x": 1302,
-   "y": 1164,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_particles_0": {
-   "atlas": "atlases/effects-2.png",
-   "x": 1042,
-   "y": 1034,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_particles_1": {
-   "atlas": "atlases/effects-2.png",
-   "x": 1172,
-   "y": 1034,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_particles_2": {
-   "atlas": "atlases/effects-2.png",
-   "x": 1302,
-   "y": 1034,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_particles_3": {
-   "atlas": "atlases/effects-2.png",
-   "x": 1432,
-   "y": 1034,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_particles_4": {
-   "atlas": "atlases/effects-2.png",
-   "x": 1562,
-   "y": 1034,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_particles_5": {
-   "atlas": "atlases/effects-2.png",
-   "x": 1692,
-   "y": 1034,
-   "w": 128,
-   "h": 128,
-   "anchor": "center",
-   "blend": "add"
-  },
-  "fx_particles_6": {
+  "fx_shield_bubble": {
    "atlas": "atlases/effects-2.png",
    "x": 1822,
    "y": 1034,
@@ -4302,7 +4113,7 @@
    "anchor": "center",
    "blend": "add"
   },
-  "fx_particles_7": {
+  "fx_shield_crack": {
    "atlas": "atlases/effects-2.png",
    "x": 2,
    "y": 1164,
@@ -4311,9 +4122,198 @@
    "anchor": "center",
    "blend": "add"
   },
-  "fx_particles_8": {
+  "fx_shield_shatter": {
    "atlas": "atlases/effects-2.png",
    "x": 132,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "fx_aura_curse": {
+   "atlas": "atlases/effects-2.png",
+   "x": 132,
+   "y": 1034,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "fx_aura_bleed": {
+   "atlas": "atlases/effects-2.png",
+   "x": 2,
+   "y": 1034,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "fx_aura_summon": {
+   "atlas": "atlases/effects-2.png",
+   "x": 522,
+   "y": 1034,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "proj_arrow": {
+   "atlas": "atlases/effects-2.png",
+   "x": 1562,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "proj_fire_arrow": {
+   "atlas": "atlases/effects-2.png",
+   "x": 2,
+   "y": 1294,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "proj_arcane_orb": {
+   "atlas": "atlases/effects-2.png",
+   "x": 1432,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "proj_poison_spit": {
+   "atlas": "atlases/effects-2.png",
+   "x": 522,
+   "y": 1294,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "proj_fireball": {
+   "atlas": "atlases/effects-2.png",
+   "x": 132,
+   "y": 1294,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "proj_hex_die": {
+   "atlas": "atlases/effects-2.png",
+   "x": 392,
+   "y": 1294,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "proj_coin": {
+   "atlas": "atlases/effects-2.png",
+   "x": 1822,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "proj_bone": {
+   "atlas": "atlases/effects-2.png",
+   "x": 1692,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "proj_gold_spark": {
+   "atlas": "atlases/effects-2.png",
+   "x": 262,
+   "y": 1294,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "particle_spark_white": {
+   "atlas": "atlases/effects-2.png",
+   "x": 1302,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "particle_spark_gold": {
+   "atlas": "atlases/effects-2.png",
+   "x": 1172,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "particle_flame": {
+   "atlas": "atlases/effects-2.png",
+   "x": 522,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "particle_leaf": {
+   "atlas": "atlases/effects-2.png",
+   "x": 912,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "particle_bubble": {
+   "atlas": "atlases/effects-2.png",
+   "x": 262,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "particle_rock": {
+   "atlas": "atlases/effects-2.png",
+   "x": 1042,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "particle_coin": {
+   "atlas": "atlases/effects-2.png",
+   "x": 392,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "particle_gem": {
+   "atlas": "atlases/effects-2.png",
+   "x": 652,
+   "y": 1164,
+   "w": 128,
+   "h": 128,
+   "anchor": "center",
+   "blend": "add"
+  },
+  "particle_heart": {
+   "atlas": "atlases/effects-2.png",
+   "x": 782,
    "y": 1164,
    "w": 128,
    "h": 128,

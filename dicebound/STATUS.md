@@ -64,7 +64,7 @@ Gallery: https://claude.ai/artifact/SLAa4PiLNfbGRkDptKUrca · ในเครื
 
 ## ขั้นต่อไป
 **M3 — Vertical slice Act 1** (เริ่มเมื่อ M2 ได้รับการยืนยัน): เล่นได้จริงด้วยภาพจริง + แอนิเมชัน + ลิงก์เล่นบนเบราว์เซอร์ให้เจ้าของโปรเจกต์ลอง
-ก่อนเริ่มต้องได้: ชื่อ id ของช่องกระดาน/ไอคอน (ดู `docs/ASSET_REPORT.md` หัวข้อ 5) เพื่อจับคู่ภาพช่องกับ `tiles.json`
+ชื่อ id ของภาพและชื่อแสดงผลภาษาอังกฤษตั้งแล้ว (2026-11-28 เจ้าของโปรเจกต์ให้ตั้งเอง): `tools/assets/names.json`, `src/data/locales/*.json`, และ `icon` ใน `tiles.json` / `synergies.json`
 
 ## การตัดสินใจ + เหตุผล
 - **โปรเจกต์อยู่ในโฟลเดอร์ `dicebound/` ของ repo `ragrebuildproject`** — เจ้าของโปรเจกต์ขอให้แยกโฟลเดอร์ใน repo เดิม · path ใน `CLAUDE.md` นับจาก `dicebound/` · `CLAUDE.md` ที่ root ของ repo เป็นของโปรเจกต์ Ragnarok ไม่ใช้กับโฟลเดอร์นี้
