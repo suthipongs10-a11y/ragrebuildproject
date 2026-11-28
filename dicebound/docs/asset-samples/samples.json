@@ -1,0 +1,23 @@
+[
+ {
+  "source": "01_characters/char_warrior_t1_sheet.png",
+  "piece": 2,
+  "size": 256,
+  "nearest": "char_warrior_t1_nearest.png",
+  "lanczos": "char_warrior_t1_lanczos.png"
+ },
+ {
+  "source": "03_icons/icons_relics1.png",
+  "piece": 4,
+  "size": 128,
+  "nearest": "icons_relics1_nearest.png",
+  "lanczos": "icons_relics1_lanczos.png"
+ },
+ {
+  "source": "05_effects/fx_explosion.png",
+  "piece": 4,
+  "size": 256,
+  "nearest": "fx_explosion_nearest.png",
+  "lanczos": "fx_explosion_lanczos.png"
+ }
+]

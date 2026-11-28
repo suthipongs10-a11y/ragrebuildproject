@@ -17,7 +17,7 @@
     "test": "vitest run",
     "validate:data": "tsx tools/validate-data.ts",
     "check": "npm run typecheck && npm run lint && npm run test && npm run validate:data",
-    "assets": "echo \"asset pipeline lands in M1\" && exit 1",
+    "assets": "tsx tools/assets/run.ts",
     "balance": "echo \"balance bots land in M5\" && exit 1"
   },
   "build": {
@@ -49,6 +49,7 @@
     "eslint": "^10.16.0",
     "globals": "^17.14.0",
     "pixi.js": "^8.23.0",
+    "sharp": "^0.35.5",
     "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.74.0",

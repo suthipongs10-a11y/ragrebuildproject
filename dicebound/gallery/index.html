@@ -1,0 +1,214 @@
+<meta charset="utf-8">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>DICEBOUND Asset Gallery</title>
+<style>
+/* Layout: a sticky tool bar over one long contact sheet; art sits on swappable "light table" grounds. */
+:root {
+  --bg: #1c1024; --panel: #2a1a35; --line: #45305a; --fg: #f4e3c1; --muted: #a892b8;
+  --gold: #f2b134; --teal: #2aa198; --warn: #ff5fd2;
+  --sans: system-ui, "Segoe UI", "Noto Sans Thai", "Leelawadee UI", sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: dark;
+}
+body { background: var(--bg); color: var(--fg); font: 15px/1.5 var(--sans); }
+.wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); max-width: 1500px; margin: 0 auto; }
+header.top { padding-block: 20px 8px; }
+h1 { font-size: 1.5rem; margin: 0; color: var(--gold); letter-spacing: .04em; text-wrap: balance; }
+.sub { color: var(--muted); margin: 4px 0 0; }
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.bar .wrap { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; padding-block: 10px; }
+.tabs, .opts { display: flex; flex-wrap: wrap; gap: 6px; }
+button { font: inherit; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+button:hover { border-color: var(--gold); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+button[aria-pressed="true"] { background: var(--gold); border-color: var(--gold); color: #1c1024; font-weight: 600; }
+button .n { font: 12px var(--mono); opacity: .75; margin-left: 4px; }
+input[type=search] { font: inherit; color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px; min-width: 0; width: 11rem; }
+main { padding-block: 16px 48px; display: grid; gap: 28px; }
+.note { color: var(--muted); max-width: 65ch; margin: 0; }
+section.group { display: grid; gap: 8px; min-width: 0; }
+.group h2 { font: 600 .95rem var(--mono); margin: 0; color: var(--teal); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.group h2 small { color: var(--muted); font-weight: 400; }
+.cells { display: flex; flex-wrap: wrap; gap: 10px; }
+figure { margin: 0; display: grid; gap: 4px; justify-items: start; max-width: 100%; }
+figure canvas, figure img { display: block; max-width: 100%; height: auto; image-rendering: pixelated; border: 1px solid var(--line); border-radius: 4px; }
+figcaption { font: 12px var(--mono); color: var(--muted); overflow-wrap: anywhere; max-width: 100%; }
+figcaption b { color: var(--warn); }
+.g-dark canvas, .g-dark img.art { background: #1c1024; }
+.g-black canvas, .g-black img.art { background: #000; }
+.g-light canvas, .g-light img.art { background: #d9d2c5; }
+.g-check canvas, .g-check img.art { background: repeating-conic-gradient(#3a2a47 0% 25%, #24162e 0% 50%) 0 0 / 16px 16px; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; align-items: start; }
+.pair h3 { font: 600 .9rem var(--sans); margin: 0 0 6px; }
+.pair img { width: auto; }
+.status { color: var(--muted); font: 13px var(--mono); }
+@media (prefers-reduced-motion: reduce) { .anim { display: none; } }
+</style>
+
+<header class="top"><div class="wrap">
+  <h1>DICEBOUND · Asset Gallery</h1>
+  <p class="sub" id="summary">กำลังโหลดรายการ…</p>
+</div></header>
+<div class="bar"><div class="wrap">
+  <div class="tabs" id="tabs" role="group" aria-label="หมวด"></div>
+  <div class="opts" role="group" aria-label="พื้นหลัง">
+    <button data-ground="dark" aria-pressed="true">พื้นเกม</button>
+    <button data-ground="check">ตาราง</button>
+    <button data-ground="light">พื้นสว่าง</button>
+    <button data-ground="black">ดำ</button>
+  </div>
+  <input type="search" id="filter" placeholder="ค้นหา id" aria-label="ค้นหา id">
+  <span class="status" id="status"></span>
+</div></div>
+<main class="wrap g-dark" id="main"></main>
+
+<script>
+(() => {
+  // Dev server serves this page at /gallery/ with art at the site root; the published copy sits beside its art.
+  const dev = location.pathname.includes('/gallery');
+  const ART = dev ? '../' : '';
+  const SAMPLES = dev ? '../docs/asset-samples/' : 'samples/';
+  const main = document.getElementById('main');
+  const tabsEl = document.getElementById('tabs');
+  const statusEl = document.getElementById('status');
+  const filterEl = document.getElementById('filter');
+  const atlasCache = new Map();
+  let manifest = null;
+  let current = 'samples';
+  let timers = [];
+
+  const el = (tag, props = {}, ...children) => {
+    const node = Object.assign(document.createElement(tag), props);
+    node.append(...children);
+    return node;
+  };
+  const loadImage = (src) => new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('โหลดไม่ได้: ' + src));
+    img.src = src;
+  });
+  const atlas = (file) => {
+    if (!atlasCache.has(file)) atlasCache.set(file, loadImage(ART + file));
+    return atlasCache.get(file);
+  };
+  const groupOf = (id) => id.replace(/_[^_]+$/, '');
+  const draw = (canvas, img, f) => {
+    canvas.width = f.w; canvas.height = f.h;
+    canvas.getContext('2d').drawImage(img, f.x, f.y, f.w, f.h, 0, 0, f.w, f.h);
+  };
+
+  async function showSamples() {
+    main.append(el('p', { className: 'note', textContent:
+      'ต้องเลือกวิธีย่อภาพ: ภาพเดียวกัน ตัดแบบเดียวกัน ย่อสองวิธี แสดงขยาย 2 เท่าให้เห็นพิกเซล ตอนนี้ทั้งชุดรันด้วย lanczos ไว้ก่อน เปลี่ยนได้ด้วยคำสั่งเดียว' }));
+    const list = await (await fetch(SAMPLES + 'samples.json')).json();
+    for (const s of list) {
+      const pair = el('div', { className: 'pair' });
+      for (const kind of ['nearest', 'lanczos']) {
+        pair.append(el('div', {},
+          el('h3', { textContent: kind === 'nearest' ? 'nearest-neighbor' : 'lanczos + sharpen' }),
+          el('img', { className: 'art', src: SAMPLES + s[kind], width: s.size * 2, height: s.size * 2, alt: s.source + ' ' + kind })));
+      }
+      main.append(el('section', { className: 'group' },
+        el('h2', {}, s.source, el('small', { textContent: 'ชิ้นที่ ' + s.piece + ' · ' + s.size + '×' + s.size })), pair));
+    }
+  }
+
+  async function showImages(query) {
+    for (const [id, im] of Object.entries(manifest.images)) {
+      if (query && !id.includes(query)) continue;
+      main.append(el('figure', {},
+        el('img', { className: 'art', src: ART + im.file, loading: 'lazy', width: im.w, height: im.h, alt: id, style: 'max-width:min(100%,480px);image-rendering:auto' }),
+        el('figcaption', { textContent: id + ' · ' + im.w + '×' + im.h })));
+    }
+  }
+
+  async function showCategory(category, query) {
+    const files = manifest.atlases[category] || [];
+    const groups = new Map();
+    for (const [id, f] of Object.entries(manifest.frames)) {
+      if (!files.includes(f.atlas) || (query && !id.includes(query))) continue;
+      const key = groupOf(id);
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key).push([id, f]);
+    }
+    statusEl.textContent = 'กำลังโหลดภาพ…';
+    for (const [key, frames] of groups) {
+      const cells = el('div', { className: 'cells' });
+      const fx = frames[0][1].blend === 'add';
+      for (const [id, f] of frames) {
+        const canvas = el('canvas');
+        if (fx) canvas.style.background = '#000';
+        atlas(f.atlas).then((img) => draw(canvas, img, f));
+        const cap = el('figcaption', { textContent: id + ' · ' + f.w + '×' + f.h });
+        if (f.placeholder) cap.prepend(el('b', { textContent: 'PLACEHOLDER ' }));
+        cells.append(el('figure', {}, canvas, cap));
+      }
+      // Numbered effect frames are an animation: play them so timing problems show up.
+      if (fx && frames.length > 2 && /_\d+$/.test(frames[0][0]) && frames.every(([, f]) => f.w === frames[0][1].w)) {
+        const canvas = el('canvas', { className: 'anim' });
+        canvas.style.background = '#000';
+        let i = 0;
+        Promise.all(frames.map(([, f]) => atlas(f.atlas))).then((imgs) => {
+          timers.push(setInterval(() => { draw(canvas, imgs[i], frames[i][1]); i = (i + 1) % frames.length; }, 90));
+        });
+        cells.prepend(el('figure', { className: 'anim' }, canvas, el('figcaption', { textContent: 'เล่นวน' })));
+      }
+      main.append(el('section', { className: 'group' },
+        el('h2', {}, key, el('small', { textContent: frames.length + ' ชิ้น' })), cells));
+    }
+    await Promise.allSettled(files.map(atlas));
+    statusEl.textContent = groups.size ? '' : 'ไม่พบ id ที่ค้นหา';
+  }
+
+  async function render() {
+    timers.forEach(clearInterval); timers = [];
+    main.replaceChildren();
+    statusEl.textContent = '';
+    const query = filterEl.value.trim().toLowerCase();
+    try {
+      if (current === 'samples') await showSamples();
+      else if (current === 'images') await showImages(query);
+      else await showCategory(current, query);
+    } catch (error) {
+      statusEl.textContent = String(error.message || error);
+    }
+  }
+
+  function setTab(name) {
+    current = name;
+    for (const b of tabsEl.children) b.setAttribute('aria-pressed', String(b.dataset.tab === name));
+    try { localStorage.setItem('dicebound-gallery-tab', name); } catch {}
+    render();
+  }
+
+  document.querySelectorAll('[data-ground]').forEach((b) => b.addEventListener('click', () => {
+    document.querySelectorAll('[data-ground]').forEach((o) => o.setAttribute('aria-pressed', String(o === b)));
+    main.className = 'wrap g-' + b.dataset.ground;
+  }));
+  filterEl.addEventListener('input', render);
+
+  fetch(ART + 'manifest.json').then((r) => r.json()).then((data) => {
+    manifest = data;
+    const count = (cat) => Object.values(data.frames).filter((f) => data.atlases[cat].includes(f.atlas)).length;
+    const tabs = [['samples', 'เลือกวิธีย่อ', '']];
+    for (const cat of Object.keys(data.atlases)) tabs.push([cat, cat, count(cat)]);
+    tabs.push(['images', 'ภาพใหญ่', Object.keys(data.images).length]);
+    for (const [key, label, n] of tabs) {
+      const b = el('button', { textContent: label });
+      b.dataset.tab = key;
+      if (n !== '') b.append(el('span', { className: 'n', textContent: n }));
+      b.addEventListener('click', () => setTab(key));
+      tabsEl.append(b);
+    }
+    const placeholders = Object.values(data.frames).filter((f) => f.placeholder).length;
+    document.getElementById('summary').textContent =
+      Object.keys(data.frames).length + ' ชิ้นใน atlas · ' + Object.keys(data.images).length + ' ภาพใหญ่ · ย่อด้วย ' + data.resize +
+      (placeholders ? ' · placeholder ' + placeholders + ' ชิ้น' : ' · ไม่มี placeholder');
+    let saved = null;
+    try { saved = localStorage.getItem('dicebound-gallery-tab'); } catch {}
+    setTab(tabs.some(([k]) => k === saved) ? saved : 'samples');
+  }).catch((error) => { document.getElementById('summary').textContent = 'โหลด manifest.json ไม่ได้: ' + error.message; });
+})();
+</script>

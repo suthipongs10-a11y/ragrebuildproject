@@ -3,7 +3,9 @@
 อัปเดตล่าสุด: 2026-11-28
 
 ## ตอนนี้อยู่ที่
-**M0 เสร็จ — รอเจ้าของโปรเจกต์ตรวจ** ก่อนขึ้น M1 (asset pipeline)
+**M1 ส่งมอบแล้ว — รอเจ้าของโปรเจกต์ตรวจ gallery** (เกณฑ์ผ่าน M1) · M0 ยังค้างข้อเดียว: เปิด .exe บน Windows จริง (เจ้าของโปรเจกต์เน็ตช้า โหลดไฟล์ใหญ่ไม่ได้ สั่งให้ทำ M1 ต่อเมื่อ 2026-11-28)
+
+Gallery (ลิงก์ส่วนตัวของเจ้าของโปรเจกต์): https://claude.ai/artifact/SLAa4PiLNfbGRkDptKUrca · ในเครื่อง: `npm run dev` แล้วเปิด `/gallery/`
 
 ## ทำไปแล้ว
 - รับภาพครบ 5 ชุด ตรง manifest ทุกชุด: `01_characters` 26/26, `02_monsters` 32/32, `03_icons` 18/18, `04_ui` 29/29, `05_effects` 26/26 (รวม 131 ไฟล์)
@@ -18,7 +20,17 @@
   - Electron: `contextIsolation`, `sandbox`, ไม่มี `nodeIntegration`, DevTools ปิดใน build จริง, CSP ไม่มี `unsafe-eval`
   - CI: `.github/workflows/dicebound.yml` (check บน Linux → build .exe บน Windows แล้วแนบเป็น artifact)
 
+- **M1:** `npm run assets` (≈25 วิ รันซ้ำได้) → `assets/atlases/*.png` (13 หน้า, 482 ชิ้น) + `assets/images/*.webp` (22 ภาพใหญ่) + `assets/manifest.json` + `docs/ASSET_REPORT.md` + `docs/asset-samples/`
+  - ตัดชีตจากพิกเซลจริง: ท่าทาง = ก้อนพิกเซลที่ต่อกัน (กัดขอบ mask ชั่วคราวถ้าท่าชนกัน), เอฟเฟกต์พื้นดำ = ช่วงคอลัมน์ที่มีแสง, กริด = ก้อนพิกเซลจัดเข้าช่อง, ช่องกระดาน = หารอยต่อจาก alpha
+  - ทุกชีตตัดได้ครบตามจำนวนใน manifest (131 ไฟล์: 127 ใช้ในเกม + 4 mock อ้างอิง) ไม่มี placeholder
+  - หน้า gallery (`gallery/index.html`, dev เท่านั้น ไม่เข้า build เกม): แท็บตามหมวด, สลับพื้นหลัง, ค้นหา id, เล่นวนเอฟเฟกต์, แท็บเทียบ nearest กับ lanczos
+  - เทสต์ pipeline 9 ข้อ (`tests/tools/assets.test.ts`) รวมทั้งหมด 17 เทสต์
+
 ## ทดสอบแล้ว / ยังไม่ได้ทดสอบ
+- ✅ M1: `npm run check` ผ่าน · เปิด gallery ทุกแท็บในเบราว์เซอร์ที่ 1500px และ 400px ไม่มี error ไม่มีเลื่อนแนวนอน
+- ✅ M1: ดูด้วยตาแล้ว — ตัวละคร (archer ทั้ง 3 tier, cleric t1), มอน 8 ตัว, เอฟเฟกต์ 2 ชุด, ตัวอย่างย่อภาพ 3 คู่: เท้าเส้นเดียวกัน สเกลคงที่ ไม่มีชิ้นส่วนข้ามท่า
+- ❌ M1: ยังไม่ได้ดูด้วยตาทีละชิ้น: icons, ui, ภาพใหญ่, บอส/อีลิท และตัวละคร/มอน/เอฟเฟกต์ที่เหลือ — ให้เจ้าของโปรเจกต์ตรวจใน gallery
+- ❌ M1: ยังไม่ได้เปิดหน้า gallery ที่ publish แล้วด้วยตัวเอง (ทดสอบไฟล์เดียวกันผ่าน dev server)
 - ✅ `npm run check` ผ่าน · `npm run build` ผ่าน
 - ✅ dev server ในเบราว์เซอร์ที่ 1920×1080 และ 1280×800 (ไทย) — แสดงผลถูก ไม่มี console error
 - ✅ แอป Electron (Linux, จอเสมือน) โหลด build จริง — มี canvas, bridge `window.dicebound`, renderer ไม่มี `require`
@@ -29,13 +41,16 @@
 - ❌ tag `dicebound-m0` สร้างในเครื่อง build แล้วแต่ push ไม่ขึ้น (remote ตัดการเชื่อมต่อ) — M0 อยู่ที่ commit `67d5fa2`
 
 ## ค้างอยู่ (รอเจ้าของโปรเจกต์)
+- [ ] **ตรวจ gallery แล้วบอกว่าโอเคหรือชิ้นไหนต้องแก้** = เกณฑ์ผ่าน M1
+- [ ] **เลือกวิธีย่อภาพ** nearest หรือ lanczos (แท็บ "เลือกวิธีย่อ") — ตอนนี้รันทั้งชุดด้วย lanczos ไว้ก่อน เปลี่ยนที่ `tools/assets/config.ts` `resizeKernel` แล้วรัน `npm run assets`
+- [ ] ข้อที่ต้องตัดสินอื่น ๆ อยู่ใน `docs/ASSET_REPORT.md` หัวข้อ 5
 - [ ] เปิด .exe บน Windows ยืนยัน M0
 - [ ] `04_ui`: `ui_menu_bg`, `ui_run_map` เป็นแนวตั้ง 1080×1920 แต่เกมเป็นแนวนอน — สร้างเวอร์ชันแนวนอนหรือไม่ (`mock_*` 4 ไฟล์ก็แนวตั้ง แต่ใช้อ้างอิงเท่านั้น)
 - [ ] `03_icons`: ชื่อของช่อง/ไอคอนแต่ละชิ้น (manifest บอกแค่ `tile_<name>` / `icon_<name>`) — ขอโฟลเดอร์ `prompts/` หรือรายชื่อ
 - [ ] `03_icons` + ภาพหน้า/หมากใน `01_characters`: ขอบนุ่มกว่าชุด effects/UI — ดูใน gallery (M1) แล้วตัดสินว่าสร้างใหม่ไหม
 
 ## ขั้นต่อไป
-**M1 — Asset pipeline** (เริ่มเมื่อ M0 ได้รับการยืนยัน): `npm run assets`, ตัดชีตด้วย connected components, atlas, `/gallery`, `docs/ASSET_REPORT.md`, ตัวอย่างย่อภาพ nearest vs lanczos 3 ไฟล์ให้เลือก
+**M2 — Sim core** (เริ่มเมื่อ M1 ได้รับการยืนยัน): state/action/events, เต๋า, กระดาน, ช่อง, ต่อสู้, เศรษฐกิจ, unit tests, บอทสุ่ม 1,000 รัน
 
 ## การตัดสินใจ + เหตุผล
 - **โปรเจกต์อยู่ในโฟลเดอร์ `dicebound/` ของ repo `ragrebuildproject`** — เจ้าของโปรเจกต์ขอให้แยกโฟลเดอร์ใน repo เดิม · path ใน `CLAUDE.md` นับจาก `dicebound/` · `CLAUDE.md` ที่ root ของ repo เป็นของโปรเจกต์ Ragnarok ไม่ใช้กับโฟลเดอร์นี้
@@ -45,18 +60,19 @@
 - **`win.signAndEditExecutable: false`** — แก้ icon/metadata ของ .exe ต้องใช้ wine บน Linux; ยังไม่มีไอคอนแอป (รอ pipeline M1) → ตั้งไอคอน + เปิดกลับตอน build บน Windows/CI
 - **import `pixi.js/unsafe-eval`** — ให้ Pixi ทำงานภายใต้ CSP ที่ไม่มี `unsafe-eval`
 - **tag ใช้ชื่อ `dicebound-m<N>`** แทน `m<N>` — repo นี้มีหลายโปรเจกต์ กันชื่อชน
+- **M1 — ย่อด้วย lanczos ไว้ก่อน (ชั่วคราว)** — CLAUDE.md §4.5 ให้เจ้าของโปรเจกต์เลือกก่อนรันทั้งชุด แต่ต้องมีภาพทั้งชุดให้ตรวจใน gallery และรันใหม่ใช้ 25 วิ จึงรันไว้ก่อนและรอคำตอบ
+- **M1 — id ของชิ้นที่ manifest ไม่ตั้งชื่อ ใช้เลขลำดับชั่วคราว** (`icons_items_3`) — ไม่เดาชื่อจากภาพ เพราะ id เปลี่ยนไม่ได้หลังปล่อยเกม
+- **M1 — สเกลร่วมต่อ "ตัว"** — ตัวละครตัวเดียวกันทุก tier และบอสชีต A+B ใช้สเกลเดียวกัน (ท่าที่ใหญ่สุดพอดีผืน final_size ไม่ขยายเกิน 1.0) จัดชิดล่างกึ่งกลาง · เอฟเฟกต์จัดกึ่งกลางและใช้แถบแนวตั้งร่วมกันทั้งชีตเพื่อไม่ให้กระโดดระหว่างเฟรม
+- **M1 — alpha ถูกปัดเป็น 0/255 ที่ค่า 128** — ต้นฉบับ alpha ไม่สะอาด (ตัวภาพ ~252, พื้น 0–7)
+- **M1 — ภาพฉาก/ภาพใหญ่เก็บเป็น WebP แยกไฟล์ (คุณภาพ 92) ไม่เข้า atlas** — 22 ภาพรวม 4.2 MB (ถ้าเป็น PNG ≈ 50 MB) · ภาพโปร่งใสที่ใหญ่เกิน 512 (โลโก้) เป็น WebP lossless
+- **M1 — atlas หน้าละ 2048 px** — ปลอดภัยกับการ์ดจอออนบอร์ดรุ่นเก่า
+- **M1 — `assets/` commit ลง repo** — เกมและ CI build ได้โดยไม่ต้องรัน pipeline (33 MB)
+- **M1 — Vite `publicDir: 'assets'`** — เกมโหลด `manifest.json` / `atlases/` / `images/` จาก root ของเว็บ
 - ขนาด build: `win-unpacked` 359 MB (เกือบทั้งหมดคือ Electron 45) → เหลือ ~140 MB สำหรับ asset+เสียง ใต้เพดาน 500 MB ต้องจับตา
 
 ## Dependency (พร้อมเหตุผล)
 - ตาม CLAUDE.md §2: `typescript`, `vite`, `pixi.js`, `@pixi/sound`, `electron`, `electron-builder`, `vitest`, `zod` (schema ของ `data/`)
-- เพิ่ม: `eslint` + `typescript-eslint` + `@eslint/js` + `globals` (lint และบังคับกฎชั้น sim) · `tsx` (รัน `tools/*.ts`) · `concurrently` + `wait-on` + `cross-env` (`dev:electron` ข้ามแพลตฟอร์ม) · `@types/node`
+- เพิ่ม: `eslint` + `typescript-eslint` + `@eslint/js` + `globals` (lint และบังคับกฎชั้น sim) · `tsx` (รัน `tools/*.ts`) · `concurrently` + `wait-on` + `cross-env` (`dev:electron` ข้ามแพลตฟอร์ม) · `@types/node` · `sharp` (M1: อ่าน/ย่อ/เขียนภาพใน asset pipeline)
 
-## ข้อสังเกตจากการรับไฟล์ (ย้ายไป `docs/ASSET_REPORT.md` ตอน M1)
-- `02_monsters`: alpha ของชีตมอนไม่เป็น 0/255 เป๊ะ (ตัวภาพ ~252–254, พื้น 0) → pipeline ต้อง threshold alpha
-- `02_monsters`: 10 จาก 28 ชีตแยกตามช่องว่างคอลัมน์ (alpha>16) ได้น้อยกว่าจำนวนท่าใน manifest → ต้องใช้ connected components ถ้ายังติดกันให้รายงาน: `mon_bat` 2/3, `elite_giant_spider` 3/4, `elite_dark_captain` 3/4, `boss_stone_golem_a/b` 2/3, `boss_swamp_witch_a/b` 2/3, `boss_fire_dragon_a/b` 2/3, `boss_dice_demon_p2` 2/4 (อีก 18 ชีตนับได้ตรง)
-- `02_monsters`: ท่า hurt/attack มีเอฟเฟกต์วาดติดมาในเฟรม (ดาวกระแทก, ประกายเหรียญ) — ซ้อนกับเอฟเฟกต์จากโค้ดได้ ตัดสินตอนดู gallery
-- `raw/00_style_anchor.png`: ภาพอ้างอิงสไตล์ มากับ zip มอน Part 1 ไม่อยู่ใน manifest ไม่ได้ใช้ในเกม
-- `01_characters`: 8 จาก 15 ชีตท่าทางแยกตามคอลัมน์ได้ไม่ตรง 4 ท่า (แสงอาวุธ/ประกายชนท่าข้าง ๆ หรือประกายหลุดเป็นก้อนแยก): `warrior_t3` 2, `knight_t2/t3` 3, `archer_t2/t3` 3, `mage_t1` 6, `mage_t3` 3, `cleric_t2/t3` 3 · t1 ส่วนใหญ่สะอาด ปัญหาอยู่ที่ t2–t3 ซึ่งมีแสงเยอะ
-- `01_characters`: ท่า attack/hurt/victory มีเอฟเฟกต์วาดติดมา (เส้นฟัน, ดาวกระแทก, ขีดดีใจ) ซ้อนกับเอฟเฟกต์จากโค้ดได้
-- `char_knight_t3_sheet`: พื้นหลัง alpha ~4–7 ไม่ใช่ 0 (RGB ขาว) — ใช้ได้เมื่อ threshold
-- `raw/00_style_anchor_characters.png`: style anchor จาก zip ตัวละคร Part 1 เนื้อภาพต่างจากของ zip มอน (ชื่อเดิม `00_style_anchor.png` ซ้ำกัน จึงตั้งชื่อใหม่ตอนวาง ไม่ได้แก้เนื้อไฟล์)
+## ข้อสังเกตเรื่องภาพ
+ย้ายไป `docs/ASSET_REPORT.md` หัวข้อ 5 แล้ว (ต้นฉบับอยู่ที่ `tools/assets/review-notes.md`)
