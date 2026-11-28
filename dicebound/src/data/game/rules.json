@@ -1,0 +1,17 @@
+{
+  "hearts": 3,
+  "teamMax": 6,
+  "die": { "min": 1, "max": 6, "critFace": 6, "critMultiplier": 2, "forcedDieCanCrit": false },
+  "rerollsPerLap": 2,
+  "startForceDice": 1,
+  "forceDicePerGateWon": 1,
+  "startGold": 30,
+  "battleRoundsPerTurn": 4,
+  "gateMaxRounds": 40,
+  "maxStars": 3,
+  "upgradeCosts": [40, 90],
+  "unitXpForTier": [0, 3, 7],
+  "minDamage": 1,
+  "startingBoard": "classic",
+  "startingUnits": ["warrior"]
+}

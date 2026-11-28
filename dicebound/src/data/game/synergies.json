@@ -1,0 +1,7 @@
+[
+  { "id": "vanguard", "tiles": ["recruit_warrior", "recruit_knight"], "tiers": [{ "teamAtkPct": 10 }, { "teamAtkPct": 25 }] },
+  { "id": "arcane_volley", "tiles": ["recruit_archer", "recruit_mage"], "tiers": [{ "teamAtkPct": 10 }, { "teamAtkPct": 25 }] },
+  { "id": "holy_guard", "tiles": ["recruit_cleric", "buff_shield"], "tiers": [{ "teamHpPct": 10 }, { "teamHpPct": 25 }] },
+  { "id": "war_camp", "tiles": ["buff_attack", "heal_campfire"], "tiers": [{ "healPct": 20 }, { "healPct": 50 }] },
+  { "id": "prosperity", "tiles": ["gold_mine", "risk_gamble"], "tiers": [{ "goldPct": 25 }, { "goldPct": 60 }] }
+]

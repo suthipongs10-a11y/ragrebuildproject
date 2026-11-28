@@ -1,0 +1,13 @@
+[
+  { "id": "act1", "waves": [
+    ["sand_wolf", "sand_wolf"],
+    ["sand_wolf", "sand_wolf", "sand_wolf"],
+    ["scorpion", "sand_wolf"],
+    ["cactus_brute"],
+    ["vulture", "sand_wolf"],
+    ["goblin_thief", "sand_wolf"],
+    ["scorpion", "vulture"],
+    ["cactus_brute", "goblin_thief"],
+    ["vulture", "vulture", "sand_wolf"]
+  ] }
+]

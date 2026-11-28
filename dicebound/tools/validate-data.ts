@@ -1,6 +1,7 @@
 // Validates everything under src/data against its schema. Run by `npm run check`.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { ContentError, loadContent } from '../src/data/content';
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES, localeSchema, type LocaleTable } from '../src/data/schema';
 
 const errors: string[] = [];
@@ -30,9 +31,18 @@ if (reference) {
   }
 }
 
+let gameSummary = '';
+try {
+  const content = loadContent();
+  gameSummary = `, ${Object.keys(content.units).length} units, ${Object.keys(content.monsters).length} monsters, ${Object.keys(content.tiles).length} tiles, ${content.laps.length} laps`;
+} catch (error) {
+  if (error instanceof ContentError) errors.push(...error.problems);
+  else throw error;
+}
+
 if (errors.length > 0) {
   console.error(`Data validation failed (${errors.length}):`);
   for (const error of errors) console.error(`  - ${error}`);
   process.exit(1);
 }
-console.log(`Data OK: ${locales.size} locales, ${reference ? Object.keys(reference).length : 0} keys each.`);
+console.log(`Data OK: ${locales.size} locales, ${reference ? Object.keys(reference).length : 0} keys each${gameSummary}.`);

@@ -1,0 +1,12 @@
+[
+  { "id": "knight", "row": 0, "role": "melee", "tiers": [
+    { "hp": 100, "atk": 7, "armor": 3 }, { "hp": 160, "atk": 11, "armor": 5 }, { "hp": 250, "atk": 17, "armor": 8 } ] },
+  { "id": "warrior", "row": 1, "role": "melee", "tiers": [
+    { "hp": 60, "atk": 12, "armor": 1 }, { "hp": 95, "atk": 19, "armor": 2 }, { "hp": 150, "atk": 30, "armor": 3 } ] },
+  { "id": "cleric", "row": 2, "role": "healer", "tiers": [
+    { "hp": 50, "atk": 5, "armor": 0, "heal": 10 }, { "hp": 78, "atk": 8, "armor": 1, "heal": 16 }, { "hp": 122, "atk": 12, "armor": 1, "heal": 26 } ] },
+  { "id": "mage", "row": 3, "role": "aoe", "aoeShare": 0.6, "tiers": [
+    { "hp": 40, "atk": 8, "armor": 0 }, { "hp": 62, "atk": 13, "armor": 0 }, { "hp": 98, "atk": 20, "armor": 1 } ] },
+  { "id": "archer", "row": 4, "role": "backline", "tiers": [
+    { "hp": 45, "atk": 14, "armor": 0 }, { "hp": 70, "atk": 22, "armor": 1 }, { "hp": 110, "atk": 35, "armor": 1 } ] }
+]

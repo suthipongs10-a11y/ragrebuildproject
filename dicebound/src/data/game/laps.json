@@ -1,0 +1,5 @@
+[
+  { "lap": 1, "act": 1, "wavePool": "act1", "enemyScale": 0.7, "gate": { "kind": "elite", "monsters": ["alpha_wolf"] } },
+  { "lap": 2, "act": 1, "wavePool": "act1", "enemyScale": 0.85, "gate": { "kind": "elite", "monsters": ["alpha_wolf", "sand_wolf", "sand_wolf"] } },
+  { "lap": 3, "act": 1, "wavePool": "act1", "enemyScale": 1.0, "gate": { "kind": "boss", "monsters": ["stone_golem"] } }
+]

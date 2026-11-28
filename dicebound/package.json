@@ -18,7 +18,8 @@
     "validate:data": "tsx tools/validate-data.ts",
     "check": "npm run typecheck && npm run lint && npm run test && npm run validate:data",
     "assets": "tsx tools/assets/run.ts",
-    "balance": "echo \"balance bots land in M5\" && exit 1"
+    "balance": "echo \"balance bots land in M5\" && exit 1",
+    "sim:stats": "tsx tools/sim-stats.ts"
   },
   "build": {
     "appId": "com.dicebound.game",
