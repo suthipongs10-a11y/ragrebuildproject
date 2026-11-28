@@ -1,0 +1,27 @@
+﻿pack,prompt_id,title_th,save_as,gen_size,background,slice,final_size,prompt_file
+01_characters,C-warrior-t1,นักดาบ ★1 — ชีตท่าทาง 4 ท่า,char_warrior_t1_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/01_C-warrior-t1.md
+01_characters,C-warrior-t2,นักดาบ ★2 — ชีตท่าทาง 4 ท่า,char_warrior_t2_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/02_C-warrior-t2.md
+01_characters,C-warrior-t3,นักดาบ ★3 — ชีตท่าทาง 4 ท่า,char_warrior_t3_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/03_C-warrior-t3.md
+01_characters,C-warrior-portrait,นักดาบ — ภาพครึ่งตัว (tooltip / หน้าเลือกทีม),portrait_warrior.png,1024x1024,alpha,single image,256x256,prompts/04_C-warrior-portrait.md
+01_characters,C-knight-t1,อัศวิน ★1 — ชีตท่าทาง 4 ท่า,char_knight_t1_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/05_C-knight-t1.md
+01_characters,C-knight-t2,อัศวิน ★2 — ชีตท่าทาง 4 ท่า,char_knight_t2_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/06_C-knight-t2.md
+01_characters,C-knight-t3,อัศวิน ★3 — ชีตท่าทาง 4 ท่า,char_knight_t3_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/07_C-knight-t3.md
+01_characters,C-knight-portrait,อัศวิน — ภาพครึ่งตัว (tooltip / หน้าเลือกทีม),portrait_knight.png,1024x1024,alpha,single image,256x256,prompts/08_C-knight-portrait.md
+01_characters,C-archer-t1,นักธนู ★1 — ชีตท่าทาง 4 ท่า,char_archer_t1_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/09_C-archer-t1.md
+01_characters,C-archer-t2,นักธนู ★2 — ชีตท่าทาง 4 ท่า,char_archer_t2_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/10_C-archer-t2.md
+01_characters,C-archer-t3,นักธนู ★3 — ชีตท่าทาง 4 ท่า,char_archer_t3_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/11_C-archer-t3.md
+01_characters,C-archer-portrait,นักธนู — ภาพครึ่งตัว (tooltip / หน้าเลือกทีม),portrait_archer.png,1024x1024,alpha,single image,256x256,prompts/12_C-archer-portrait.md
+01_characters,C-mage-t1,จอมเวท ★1 — ชีตท่าทาง 4 ท่า,char_mage_t1_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/13_C-mage-t1.md
+01_characters,C-mage-t2,จอมเวท ★2 — ชีตท่าทาง 4 ท่า,char_mage_t2_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/14_C-mage-t2.md
+01_characters,C-mage-t3,จอมเวท ★3 — ชีตท่าทาง 4 ท่า,char_mage_t3_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/15_C-mage-t3.md
+01_characters,C-mage-portrait,จอมเวท — ภาพครึ่งตัว (tooltip / หน้าเลือกทีม),portrait_mage.png,1024x1024,alpha,single image,256x256,prompts/16_C-mage-portrait.md
+01_characters,C-cleric-t1,นักบวช ★1 — ชีตท่าทาง 4 ท่า,char_cleric_t1_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/17_C-cleric-t1.md
+01_characters,C-cleric-t2,นักบวช ★2 — ชีตท่าทาง 4 ท่า,char_cleric_t2_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/18_C-cleric-t2.md
+01_characters,C-cleric-t3,นักบวช ★3 — ชีตท่าทาง 4 ท่า,char_cleric_t3_sheet.png,1536x1024,alpha,"slice 4 cells left→right: idle, attack, hurt, victory",256x256 per cell,prompts/19_C-cleric-t3.md
+01_characters,C-cleric-portrait,นักบวช — ภาพครึ่งตัว (tooltip / หน้าเลือกทีม),portrait_cleric.png,1024x1024,alpha,single image,256x256,prompts/20_C-cleric-portrait.md
+01_characters,C-leader-captain,ผู้นำทีม: หัวหน้าทหาร (ตัวเริ่มต้น) — ภาพเลือกตัวละคร,leader_captain_portrait.png,1024x1024,alpha,single image,512x512,prompts/21_C-leader-captain.md
+01_characters,C-leader-captain-pawn,ผู้นำทีม: หัวหน้าทหาร (ตัวเริ่มต้น) — หมากเดินบนกระดาน,pawn_captain.png,1024x1024,alpha,"slice 2 cells: idle, hop",128x128 per cell,prompts/22_C-leader-captain-pawn.md
+01_characters,C-leader-gambler,ผู้นำทีม: นักพนัน — ภาพเลือกตัวละคร,leader_gambler_portrait.png,1024x1024,alpha,single image,512x512,prompts/23_C-leader-gambler.md
+01_characters,C-leader-gambler-pawn,ผู้นำทีม: นักพนัน — หมากเดินบนกระดาน,pawn_gambler.png,1024x1024,alpha,"slice 2 cells: idle, hop",128x128 per cell,prompts/24_C-leader-gambler-pawn.md
+01_characters,C-leader-merchant,ผู้นำทีม: พ่อค้า — ภาพเลือกตัวละคร,leader_merchant_portrait.png,1024x1024,alpha,single image,512x512,prompts/25_C-leader-merchant.md
+01_characters,C-leader-merchant-pawn,ผู้นำทีม: พ่อค้า — หมากเดินบนกระดาน,pawn_merchant.png,1024x1024,alpha,"slice 2 cells: idle, hop",128x128 per cell,prompts/26_C-leader-merchant-pawn.md
