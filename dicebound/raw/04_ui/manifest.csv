@@ -1,0 +1,30 @@
+﻿pack,prompt_id,title_th,save_as,gen_size,background,slice,final_size,prompt_file
+04_ui,U-logo,โลโก้เกม DICEBOUND,logo_dicebound.png,1536x1024,alpha,single image (ตรวจตัวสะกดก่อนใช้),1200 wide,prompts/01_U-logo.md
+04_ui,U-appicon,ไอคอนแอป,app_icon.png,1024x1024,scene,single image,1024x1024,prompts/02_U-appicon.md
+04_ui,U-keyart-land,ภาพหน้าปก (แนวนอน — Steam/หน้าเมนู),keyart_landscape.png,1536x1024,scene,single image,1920x1080 after upscale,prompts/03_U-keyart-land.md
+04_ui,U-keyart-port,ภาพหน้าปก (แนวตั้ง — มือถือ),keyart_portrait.png,1024x1536,scene,single image,1080x1920,prompts/04_U-keyart-port.md
+04_ui,U-bg-act1_desert,ฉากต่อสู้: act1_desert,bg_act1_desert.png,1536x1024,scene,single image (ครอปเป็นแถบกว้างในเกม),1536x1024,prompts/05_U-bg-act1_desert.md
+04_ui,U-bg-act1_desert-sky,ฉากต่อสู้: act1_desert — เลเยอร์ฟ้า (parallax),bg_act1_desert_sky.png,1536x1024,scene,tileable horizontally,1536x1024,prompts/06_U-bg-act1_desert-sky.md
+04_ui,U-board-act1_desert,พื้นกระดานธีม act1_desert,board_act1_desert.png,1024x1024,scene,single image (ช่องว่างต้องตรงกริด 5x5),1024x1024,prompts/07_U-board-act1_desert.md
+04_ui,U-bg-act2_swamp,ฉากต่อสู้: act2_swamp,bg_act2_swamp.png,1536x1024,scene,single image (ครอปเป็นแถบกว้างในเกม),1536x1024,prompts/08_U-bg-act2_swamp.md
+04_ui,U-bg-act2_swamp-sky,ฉากต่อสู้: act2_swamp — เลเยอร์ฟ้า (parallax),bg_act2_swamp_sky.png,1536x1024,scene,tileable horizontally,1536x1024,prompts/09_U-bg-act2_swamp-sky.md
+04_ui,U-board-act2_swamp,พื้นกระดานธีม act2_swamp,board_act2_swamp.png,1024x1024,scene,single image (ช่องว่างต้องตรงกริด 5x5),1024x1024,prompts/10_U-board-act2_swamp.md
+04_ui,U-bg-act3_castle,ฉากต่อสู้: act3_castle,bg_act3_castle.png,1536x1024,scene,single image (ครอปเป็นแถบกว้างในเกม),1536x1024,prompts/11_U-bg-act3_castle.md
+04_ui,U-bg-act3_castle-sky,ฉากต่อสู้: act3_castle — เลเยอร์ฟ้า (parallax),bg_act3_castle_sky.png,1536x1024,scene,tileable horizontally,1536x1024,prompts/12_U-bg-act3_castle-sky.md
+04_ui,U-board-act3_castle,พื้นกระดานธีม act3_castle,board_act3_castle.png,1024x1024,scene,single image (ช่องว่างต้องตรงกริด 5x5),1024x1024,prompts/13_U-board-act3_castle.md
+04_ui,U-bg-final_void,ฉากต่อสู้: final_void,bg_final_void.png,1536x1024,scene,single image (ครอปเป็นแถบกว้างในเกม),1536x1024,prompts/14_U-bg-final_void.md
+04_ui,U-bg-final_void-sky,ฉากต่อสู้: final_void — เลเยอร์ฟ้า (parallax),bg_final_void_sky.png,1536x1024,scene,tileable horizontally,1536x1024,prompts/15_U-bg-final_void-sky.md
+04_ui,U-board-final_void,พื้นกระดานธีม final_void,board_final_void.png,1024x1024,scene,single image (ช่องว่างต้องตรงกริด 5x5),1024x1024,prompts/16_U-board-final_void.md
+04_ui,U-tile-frames,กรอบช่องกระดาน ตามเลเวล,ui_tile_frames.png,1024x1024,alpha,slice 3x2,256x256 each,prompts/17_U-tile-frames.md
+04_ui,U-buttons,ปุ่มทั้งหมด (ปกติ/กด/ปิด),ui_buttons.png,1536x1024,alpha,slice 3x4,per button ~420x110,prompts/18_U-buttons.md
+04_ui,U-panels,แผงหน้าต่าง (9-slice),ui_panels.png,1536x1024,alpha,slice 3x2 (กำหนด 9-slice ใน Claude Code),varies,prompts/19_U-panels.md
+04_ui,U-cards,กรอบการ์ดรางวัล (เลือก 1 ใน 3),ui_reward_cards.png,1536x1024,alpha,slice 4x1,~300x460 each,prompts/20_U-cards.md
+04_ui,U-bars,แถบเลือด / บอส / ความคืบหน้า,ui_bars.png,1536x1024,alpha,slice 2x3,varies,prompts/21_U-bars.md
+04_ui,U-banners-1,แบนเนอร์ข้อความ ชุด 1,ui_banners_1.png,1536x1024,alpha,slice 2x2 (ตรวจตัวสะกด),~700x250 each,prompts/22_U-banners-1.md
+04_ui,U-banners-2,แบนเนอร์ข้อความ ชุด 2,ui_banners_2.png,1536x1024,alpha,slice 2x2 (ตรวจตัวสะกด),~700x250 each,prompts/23_U-banners-2.md
+04_ui,U-runmap,หน้าแผนที่รัน (3 Act),ui_run_map.png,1024x1536,scene,single image,1080x1920,prompts/24_U-runmap.md
+04_ui,U-title-bg,พื้นหลังหน้าเมนูหลัก,ui_menu_bg.png,1024x1536,scene,single image,1080x1920,prompts/25_U-title-bg.md
+04_ui,U-mock-battle,ม็อคอัปหน้าจอ (อ้างอิงเลย์เอาต์ ไม่ได้ใช้ในเกมจริง): battle,mock_battle.png,1024x1536,scene,reference only,—,prompts/26_U-mock-battle.md
+04_ui,U-mock-reward,ม็อคอัปหน้าจอ (อ้างอิงเลย์เอาต์ ไม่ได้ใช้ในเกมจริง): reward,mock_reward.png,1024x1536,scene,reference only,—,prompts/27_U-mock-reward.md
+04_ui,U-mock-shop,ม็อคอัปหน้าจอ (อ้างอิงเลย์เอาต์ ไม่ได้ใช้ในเกมจริง): shop,mock_shop.png,1024x1536,scene,reference only,—,prompts/28_U-mock-shop.md
+04_ui,U-mock-draft,ม็อคอัปหน้าจอ (อ้างอิงเลย์เอาต์ ไม่ได้ใช้ในเกมจริง): draft,mock_draft.png,1024x1536,scene,reference only,—,prompts/29_U-mock-draft.md
